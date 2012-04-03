@@ -1,0 +1,94 @@
+/*
+ *  RSGISVectorUtils.h
+ *  RSGIS_LIB
+ *
+ *  Created by Pete Bunting on 29/04/2008.
+ *  Copyright 2008 RSGISLib. All rights reserved.
+ *  This file is part of RSGISLib.
+ * 
+ *  RSGISLib is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  RSGISLib is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with RSGISLib.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
+#ifndef RSGISVectorUtils_H
+#define RSGISVectorUtils_H
+
+#include <iostream>
+#include <string>
+#include <stdio.h>
+#include <list>
+
+#include "ogrsf_frmts.h"
+#include "ogr_api.h"
+
+#include "geos/geom/GeometryFactory.h"
+#include "geos/geom/Coordinate.h"
+#include "geos/geom/CoordinateArraySequence.h"
+#include "geos/geom/LinearRing.h"
+#include "geos/geom/LineString.h"
+#include "geos/geom/Point.h"
+#include "geos/geom/Polygon.h"
+#include "geos/geom/MultiPolygon.h"
+#include "geos/geom/CoordinateSequence.h"
+#include "geos/geom/LineString.h"
+
+#include "vec/RSGISPolygonData.h"
+
+#include "common/RSGISVectorException.h"
+
+#include "utils/RSGISGEOSFactoryGenerator.h"
+#include "utils/RSGISFileUtils.h"
+
+using namespace std;
+using namespace geos::geom;
+using namespace rsgis::utils;
+using namespace rsgis;
+
+namespace rsgis{namespace vec{
+	class RSGISVectorUtils
+		{
+		public:
+			string getLayerName(string filepath);
+			LineString* convertOGRLineString2GEOSLineString(OGRLineString *line);
+			OGRLineString* convertGEOSLineString2OGRLineString(LineString *line);
+			LinearRing* convertOGRLinearRing2GEOSLinearRing(OGRLinearRing *ring);
+			OGRLinearRing* convertGEOSLineString2OGRLinearRing(LineString *line);
+			Polygon* convertOGRPolygon2GEOSPolygon(OGRPolygon *poly);
+			MultiPolygon* convertOGRMultiPolygonGEOSMultiPolygon(OGRMultiPolygon *mPoly);
+			Point* convertOGRPoint2GEOSPoint(OGRPoint *point);
+			OGRPolygon* convertGEOSPolygon2OGRPolygon(Polygon *poly);
+			OGRMultiPolygon* convertGEOSMultiPolygon2OGRMultiPolygon(MultiPolygon *mPoly);
+			OGRMultiPolygon* convertGEOSPolygons2OGRMultiPolygon(list<Polygon*> *polys);
+			MultiPolygon* convertGEOSPolygons2GEOSMultiPolygon(vector<Polygon*> *polys);
+			OGRPoint* convertGEOSPoint2OGRPoint(Point *point);
+			OGRPoint* convertGEOSCoordinate2OGRPoint(Coordinate *coord);
+			Envelope* getEnvelope(Geometry *geom);
+			Envelope* getEnvelope(OGRGeometry *geom);
+			Envelope* getEnvelopePixelBuffer(OGRGeometry *geom, double imageRes);
+			Point* createPoint(Coordinate *coord);
+			bool checkDIR4SHP(string dir, string shp) throw(RSGISVectorException);
+			void deleteSHP(string dir, string shp) throw(RSGISVectorException);
+			GeometryCollection* createGeomCollection(vector<Polygon*> *polys) throw(RSGISVectorException);
+			Polygon* createPolygon(double tlX, double tlY, double brX, double brY) throw(RSGISVectorException);
+			OGRPolygon* createOGRPolygon(double tlX, double tlY, double brX, double brY) throw(RSGISVectorException);
+			OGRPolygon* checkCloseOGRPolygon(OGRPolygon *poly) throw(RSGISVectorException);
+			OGRPolygon* removeHolesOGRPolygon(OGRPolygon *poly) throw(RSGISVectorException);
+			OGRPolygon* moveOGRPolygon(OGRPolygon *poly, double shiftX, double shiftY, double shiftZ) throw(RSGISVectorException);
+			vector<string>* findUniqueVals(OGRLayer *layer, string attribute) throw(RSGISVectorException);
+		};
+}}
+
+#endif
+
+

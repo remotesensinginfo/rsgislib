@@ -1,0 +1,231 @@
+#! /usr/bin/env python
+
+############################################################################
+# Copyright (c) 2009 Dr. Peter Bunting, Aberystwyth University
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+# THE SOFTWARE.
+#
+#
+# Purpose:  A class to generate XML for the RSGISLib library based
+#           on a supplied template.
+# Author: Pete Bunting
+# Email: pete.bunting@aber.ac.uk
+# Date: 01/08/2009
+# Version: 1.1
+#
+# History:
+# Version 1.0 - Created.
+# Version 1.1 - Added <PATH> option with the $ template charater
+# Version 1.2 - Added full file header to the outputted XML file
+# Version 1.3 - Changed to names rather than symbols in template
+#             - Defaults to single file, non-recursive
+#
+#############################################################################
+
+import os.path
+import sys
+from time import strftime
+
+class RSGISLibXML (object):
+
+    def checkFileExtension(self, filename, extension):
+        foundExtension = False;
+        filenamesplit = os.path.splitext(filename)
+        fileExtension = filenamesplit[1].strip()
+        if(fileExtension == extension):
+            foundExtension = True
+        return foundExtension
+
+    def findFilesIterative(self, filelist, directory, extension):
+        if os.path.exists(directory):
+            if os.path.isdir(directory):
+                dirFileList = os.listdir(directory)
+                for filename in dirFileList:
+                    if(os.path.isdir(os.path.join(directory,filename))):
+                        self.findFiles(filelist, os.path.join(directory,filename), extension)
+                    elif(os.path.isfile(os.path.join(directory,filename))):
+                        if(self.checkFileExtension(filename, extension)):
+                            filelist.append(os.path.join(directory,filename))
+                    else:
+                        print filename + ' is NOT a file or directory!'
+            else:
+                print directory + ' is not a directory!'
+        else:
+            print directory + ' does not exist!'
+
+
+    def findFiles(self, filelist, directory, extension):
+        if os.path.exists(directory):
+            if os.path.isdir(directory):
+                dirFileList = os.listdir(directory)
+                for filename in dirFileList:
+                    if(os.path.isdir(os.path.join(directory,filename))):
+                        print os.path.join(directory,filename) + ' is a directory and therefore ignored!'
+                    elif(os.path.isfile(os.path.join(directory,filename))):
+                        if(self.checkFileExtension(filename, extension)):
+                            filelist.append(os.path.join(directory,filename))
+                    else:
+                        print filename + ' is NOT a file or directory!'
+            else:
+                print directory + ' is not a directory!'
+        else:
+            print directory + ' does not exist!'
+
+    def readInputTemplate(self, inputFile):
+        xmloutline = str()
+        inputXMLFile = open(inputFile, 'r')
+        for eachLine in inputXMLFile:
+            xmloutline = xmloutline + eachLine
+        return xmloutline
+
+    def constructXMLFile(self, filelist, xmloutline, outputfile, path):
+        outputXMLFile = open(outputfile, 'w')
+        outputXMLFile.write('<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n')
+        outputXMLFile.write('<!--\n')
+        outputXMLFile.write('    Description\n')
+        outputXMLFile.write('        XML File for execution within @RSGISLIB_PACKAGE_STRING@\n')
+        outputXMLFile.write('    Created by rsgislibxml.py on ')
+        timeStr = strftime('%a %b %m %H:%M:%S %Y.')
+        outputXMLFile.write(timeStr)
+        outputXMLFile.write('\n')
+        outputXMLFile.write('    Copyright (c) @RSGISLIB_COPYRIGHT_YEAR@ [Your Organisation]. All rights reserved.\n')
+        outputXMLFile.write('-->\n')
+        outputXMLFile.write('<rsgis:commands xmlns:rsgis=\"http://www.rsgislib.org/xml/\">\n')
+        for file in filelist:
+            basefile = os.path.basename(file)
+            basename = os.path.splitext(basefile)[0]
+            comment = '\t<!-- ' + basename + ' -->\n'
+            xmloutlinereplacepath = xmloutline.replace('$PATH', path, xmloutline.count('$PATH'))
+            xmloutlinereplaceinput = xmloutlinereplacepath.replace('$FILEPATH', file, xmloutlinereplacepath.count('$FILEPATH'))
+            xmloutlinereplacename = xmloutlinereplaceinput.replace('$FILENAME', basename, xmloutlinereplaceinput.count('$FILENAME'))
+            outputXMLFile.write(comment)
+            outputXMLFile.write(xmloutlinereplacename)
+            outputXMLFile.write('\n\n')
+        outputXMLFile.write('</rsgis:commands>\n')
+        outputXMLFile.flush()
+        outputXMLFile.close()
+
+    def constructMultipleXMLFiles(self, filelist, xmloutline, outputfile, path):
+        outputShellFilePath = outputfile + "_exe_all.sh"
+        outputShellFile = open(outputShellFilePath, 'w')
+        outputShellFile.write("#!/bin/sh\n")
+        outputXMLFilePath = str()
+        shellCommand = str()
+        for file in filelist:
+            basefile = os.path.basename(file)
+            basename = os.path.splitext(basefile)[0]
+            comment = '\t<!-- ' + basename + ' -->\n'
+            xmloutlinereplacepath = xmloutline.replace('$PATH', path, xmloutline.count('$PATH'))
+            xmloutlinereplaceinput = xmloutlinereplacepath.replace('$FILEPATH', file, xmloutlinereplacepath.count('$FILEPATH'))
+            xmloutlinereplacename = xmloutlinereplaceinput.replace('$FILENAME', basename, xmloutlinereplaceinput.count('$FILENAME'))
+
+            outputXMLFilePath = outputfile + "_" + basename + ".xml"
+            outputXMLFile = open(outputXMLFilePath, 'w')
+            outputXMLFile.write('<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n')
+            outputXMLFile.write('<!--\n')
+            outputXMLFile.write('    Description\n')
+            outputXMLFile.write('        XML File for execution within @RSGISLIB_PACKAGE_STRING@\n')
+            outputXMLFile.write('    Created by rsgislibxml.py on ')
+            timeStr = strftime('%a %b %m %H:%M:%S %Y.')
+            outputXMLFile.write(timeStr)
+            outputXMLFile.write('\n')
+            outputXMLFile.write('    Copyright (c) @RSGISLIB_COPYRIGHT_YEAR@ [Your Organisation]. All rights reserved.\n')
+            outputXMLFile.write('-->\n')
+            outputXMLFile.write('<rsgis:commands xmlns:rsgis=\"http://www.rsgislib.org/xml/\">\n')
+            outputXMLFile.write(comment)
+            outputXMLFile.write(xmloutlinereplacename)
+            outputXMLFile.write('</rsgis:commands>\n')
+            outputXMLFile.flush()
+            outputXMLFile.close()
+            shellCommand = "rsgisexe -x " + outputXMLFilePath + "\n"
+            outputShellFile.write(shellCommand)
+        outputShellFile.flush()
+        outputShellFile.close()
+
+    def run(self):
+        numArgs = len(sys.argv)
+        if numArgs >= 6:
+            dir = sys.argv[1].strip()
+            extension = sys.argv[2].strip()
+            path = sys.argv[3].strip()
+            outfile = sys.argv[4].strip()
+            xmloutlineFile = sys.argv[5].strip()
+            if numArgs == 8:
+                recurse = sys.argv[6].strip()
+                outputtype = sys.argv[7].strip()
+            elif numArgs == 7:
+                print 'Need to specify both output_type and recurse options'
+            else:
+                print 'No output_type provided. Specify using.'
+                print ' --output_type=single or --output_type=multiple'
+                print 'Defaulting to single'
+                
+                print 'No recurse option provided. Specify using:'
+                print ' --recurse=yes or --recurse=no'
+                print 'Defaulting to no.'
+                    
+                recurse = '--output_type=single'
+                outputtype = '--recurse=no'
+                
+            filelist = list()
+
+            if(str(recurse) == '--recurse=yes'):
+                self.findFilesIterative(filelist, dir, extension)
+            elif(str(recurse) == '--recurse=no'):
+                self.findFiles(filelist, dir, extension)
+
+            if os.path.exists(xmloutlineFile):
+                xmloutline = self.readInputTemplate(xmloutlineFile)
+                if str(outputtype) == '--output_type=single':
+                    self.constructXMLFile(filelist, xmloutline, outfile, path)
+                    print 'Commands written to single XML file'
+                    print 'Run using:\n rsgisexe -x ' + outfile
+                elif str(outputtype) == '--output_type=multiple':
+                    self.constructMultipleXMLFiles(filelist, xmloutline, outfile, path)
+                    print 'Commands written to multiple XML files and shell script generated'
+                    print 'Run using:\n sh ' + outfile + '_exe_all.sh'
+
+            else:
+                print 'Input File does not exist'
+
+
+
+        else:
+            self.help()
+
+    def help(self):
+        print 'rsgislibxml.py script generates the XML commands for the '
+        print '@PACKAGE@ software library from a user defined template'
+        print 'Usage: python rsgislibxml.py <DIR> <EXT> <PATH> <OUTPUT> <TEMPLATE> --recurse=yes|no --output_type=single|multiple'
+        print '\t<DIR> - input directory of the files to be processed.'
+        print '\t<EXT> - file extension of the files of interest.'
+        print '\t<PATH> - path used for subsitution'
+        print '\t<OUTPUT> - the output xml file'
+        print '\t<TEMPLETE> - the xml template'
+        print '\t\t $FILEPATH - Replaced with full file path'
+        print '\t\t $FILENAME - Replaced with file name'
+        print '\t\t $PATH - Replaced with <PATH>'
+        print '\t --recurse - whether the input <DIR> should be iteratively recused for files ending <EXT>.'
+        print '\t --output_type - whether a single or multiple xml file(s) will be creates. If mutliple is selected a shell script to run all xml files will also be generated.'
+        print '\nThis script was distributed with @RSGISLIB_PACKAGE_STRING@'
+        print 'Copyright (C) @RSGISLIB_COPYRIGHT_YEAR@ Peter Bunting and Daniel Clewley'
+        print 'For maintainance email @RSGISLIB_PACKAGE_BUGREPORT@'
+
+if __name__ == '__main__':
+    obj = RSGISLibXML()
+    obj.run()
