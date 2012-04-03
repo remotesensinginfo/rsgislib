@@ -4279,7 +4279,61 @@ void RSGISExeSegment::printParameters()
 
 void RSGISExeSegment::help()
 {
-    
+    cout << "<rsgis:commands xmlns:rsgis=\"http://www.rsgislib.org/xml/\">" << endl;
+    cout << "<!-- A command to locally spectrally cluster/group the pixels into clumps -->" << endl;
+    cout << "<rsgis:command algor=\"segmentation\" option=\"specgrp\" image=\"image.env\" output=\"image_out.env\" specthreshold=\"float\" nodata=\"unsigned int\" format=\"GDAL Format\" inmemory=\"yes | no\" proj=\"OSGB | NZ2000 | NZ1949 | IMAGE\" />" << endl;
+    cout << "<!-- A command to locally spectrally cluster/group the pixels into clumps where the distance metric is weighted by the stddev of the band -->" << endl;
+    cout << "<rsgis:command algor=\"segmentation\" option=\"specgrpweighted\" image=\"image.env\" output=\"image_out.env\" specthreshold=\"float\" nodata=\"unsigned int\" format=\"GDAL Format\" inmemory=\"yes | no\" proj=\"OSGB | NZ2000 | NZ1949 | IMAGE\" />" << endl;
+    cout << "<!-- A command to generate a mean image from a spectral image and a clumped image -->" << endl;
+    cout << "<rsgis:command algor=\"segmentation\" option=\"meanimg\" image=\"image.env\" clumps=\"image.env\" output=\"image_out.env\" format=\"GDAL Format\" inmemory=\"yes | no\" proj=\"OSGB | NZ2000 | NZ1949 | IMAGE\" />" << endl;
+    cout << "<!-- A command to eliminate clumps smaller than a given size from the scene, small clump will be combined with their spectrally closest neighbouring clump unless over spectral distance threshold -->" << endl;
+    cout << "<rsgis:command algor=\"segmentation\" option=\"rmsmallclumps\" image=\"image.env\" clumps=\"image.env\" output=\"image_out.env\" minsize=\"int (in pxls)\" maxspectraldist=\"float\" format=\"GDAL Format\" inmemory=\"yes | no\" proj=\"OSGB | NZ2000 | NZ1949 | IMAGE\" />" << endl;
+    cout << "<!-- A command to eliminate clumps smaller than a given size from the scene, small clump will be combined with their spectrally closest neighbouring clump in a stepwise fashion unless over spectral distance threshold -->" << endl;
+    cout << "<rsgis:command algor=\"segmentation\" option=\"rmsmallclumpsstepwise\" image=\"image.env\" clumps=\"image.env\" output=\"image_out.env\" minsize=\"int (in pxls)\" maxspectraldist=\"float\" format=\"GDAL Format\" inmemory=\"yes | no\" proj=\"OSGB | NZ2000 | NZ1949 | IMAGE\" />" << endl;
+    cout << "<!-- A command to clump a categorical image into clumps with unique IDs -->" << endl;
+    cout << "<rsgis:command algor=\"segmentation\" option=\"clump\" image=\"image.env\" output=\"image_out.env\" nodata=\"unsigned int\" format=\"GDAL Format\" inmemory=\"yes | no\" proj=\"OSGB | NZ2000 | NZ1949 | IMAGE\" />" << endl;
+    cout << "<!-- A command to colour clumps using random colours for visualisation -->" << endl;
+    cout << "<rsgis:command algor=\"segmentation\" option=\"randomcolourclumps\" image=\"image.env\" output=\"image_out.env\" format=\"GDAL Format\" inmemory=\"yes | no\" proj=\"OSGB | NZ2000 | NZ1949 | IMAGE\" />" << endl;
+    cout << "<!-- Generate an from a list of pixel locations generate a list of clump ids which will be the seeds for a region growing algorithm -->" << endl;
+    cout << "<rsgis:command algor=\"segmentation\" option=\"regiongrowingseedclumpids\" image=\"clumpsimage.env\" output=\"clumpids.txt\" >" << endl;
+    cout << "    <rsgis:seed x=\"int\" y=\"int\" id=\"int\" />" << endl;
+    cout << "    <rsgis:seed x=\"int\" y=\"int\" id=\"int\" />" << endl;
+    cout << "    <rsgis:seed x=\"int\" y=\"int\" id=\"int\" />" << endl;
+    cout << "    <rsgis:seed x=\"int\" y=\"int\" id=\"int\" />" << endl;
+    cout << "    <rsgis:seed x=\"int\" y=\"int\" id=\"int\" />" << endl;
+    cout << "    <rsgis:seed x=\"int\" y=\"int\" id=\"int\" />" << endl;
+    cout << "</rsgis:command>" << endl;
+    cout << "<!-- A command to grow regions from seeds to there maximum extent using the clumps. -->" << endl;
+    cout << "<rsgis:command algor=\"segmentation\" option=\"growregionsusingclumps\" image=\"image.env\" clumps=\"image.env\" output=\"image_out.env\" seeds=\"seedsfile.txt\" initthreshold=\"float\" thresholdincrements=\"float\" maxthreshold=\"float\" maxiterations=\"int\" format=\"GDAL Format\" inmemory=\"yes | no\" proj=\"OSGB | NZ2000 | NZ1949 | IMAGE\" />" << endl;
+    cout << "<!-- A command to identify seeds for region growing -->" << endl;
+    cout << "<rsgis:command algor=\"segmentation\" option=\"histogramseeds\" image=\"image.env\" clumps=\"image.env\" output=\"image_out.env\" format=\"GDAL Format\" inmemory=\"yes | no\" proj=\"OSGB | NZ2000 | NZ1949 | IMAGE\" >" << endl;
+    cout << "    <rsgis:threshold band=\"int\" threshold=\"float\" />" << endl;
+    cout << "    <rsgis:threshold band=\"int\" threshold=\"float\" />" << endl;
+    cout << "    <rsgis:threshold band=\"int\" threshold=\"float\" />" << endl;
+    cout << "</rsgis:command>" << endl;
+    cout << "<!-- A command to identify seeds for region growing - output is a text file for input into growregionsusingclumps -->" << endl;
+    cout << "<rsgis:command algor=\"segmentation\" option=\"histogramseedstxt\" image=\"image.env\" clumps=\"image.env\" output=\"seedsfile.txt\" inmemory=\"yes | no\"  >" << endl;
+    cout << "    <rsgis:threshold band=\"int\" threshold=\"float\" />" << endl;
+    cout << "    <rsgis:threshold band=\"int\" threshold=\"float\" />" << endl;
+    cout << "    <rsgis:threshold band=\"int\" threshold=\"float\" />" << endl;
+    cout << "</rsgis:command>" << endl;
+    cout << "<!-- A command which selects the clump within the clumps file which intersect with either the minimum or maximum mean clump -->" << endl;
+    cout << "<rsgis:command algor=\"segmentation\" option=\"selectclumps\" image=\"image.env\" clumps=\"image.env\" largeclumps=\"image.env\" output=\"image_out.env\" type=\"max | min | mean | median | percentile75th | percentile95th\" format=\"GDAL Format\" inmemory=\"yes | no\" proj=\"OSGB | NZ2000 | NZ1949 | IMAGE\" />" << endl;
+    cout << "<!-- A command which selects the clump within the clumps file which intersect with either the minimum or maximum mean clump with output to a text file.-->" << endl;
+    cout << "<rsgis:command algor=\"segmentation\" option=\"selectclumpstxt\" image=\"image.env\" clumps=\"image.env\" largeclumps=\"image.env\" output=\"seedsfile.txt\" type=\"max | min | mean | median | percentile75th | percentile95th\" format=\"GDAL Format\" inmemory=\"yes | no\" proj=\"OSGB | NZ2000 | NZ1949 | IMAGE\" />" << endl;
+    cout << "<!-- A command to remove small clumps from a segmentation -->" << endl;
+    cout << "<rsgis:command algor=\"segmentation\" option=\"mergesmallclumps\" image=\"image.env\" clumps=\"image.env\" output=\"image_out.env\" minsize=\"int (in pxls)\" format=\"GDAL Format\" inmemory=\"yes | no\" proj=\"OSGB | NZ2000 | NZ1949 | IMAGE\" />" << endl;
+    cout << "<!-- A command to relabel clumps to ensure they are ordered consecutively -->" << endl;
+    cout << "<rsgis:command algor=\"segmentation\" option=\"relabelclumps\" image=\"image.env\" output=\"image_out.env\" format=\"GDAL Format\" inmemory=\"yes | no\" proj=\"OSGB | NZ2000 | NZ1949 | IMAGE\" />" << endl;
+    cout << "<!-- A command which labels image pixels with the id of the nearest cluster centre -->" << endl;
+    cout << "<rsgis:command algor=\"segmentation\" option=\"labelsfromclusters\" image=\"image.env\" output=\"image_out.env\" clusters=\"matrix.gmtxt\" ignorezeros=\"yes | no\" format=\"GDAL Format\" proj=\"OSGB | NZ2000 | NZ1949 | IMAGE\" />" << endl;
+    cout << "<!-- A command to grow regions from seeds up to a given distance in spectral space. -->" << endl;
+    cout << "<rsgis:command algor=\"segmentation\" option=\"growregionspixels\" image=\"image.env\" output=\"image_out.env\" seeds=\"seedsfile.txt\" threshold=\"float\" format=\"GDAL Format\" inmemory=\"yes | no\" proj=\"OSGB | NZ2000 | NZ1949 | IMAGE\" />" << endl;
+    cout << "<!-- A command to grow regions from seeds to there maximum extent on a per pixel bases. -->" << endl;
+    cout << "<rsgis:command algor=\"segmentation\" option=\"growregionspixelsauto\" image=\"image.env\" output=\"image_out.env\" seeds=\"seedsfile.txt\" initthreshold=\"float\" thresholdincrements=\"float\" maxthreshold=\"float\" maxiterations=\"int\" format=\"GDAL Format\" inmemory=\"yes | no\" proj=\"OSGB | NZ2000 | NZ1949 | IMAGE\" />" << endl;
+    cout << "<!-- A command to find spectral categories using a defined subdivision and number of levels -->" << endl;
+    cout << "<rsgis:command algor=\"segmentation\" option=\"spectraldiv\" image=\"image.env\" output=\"image_out.env\" subdivision=\"int\" nodata=\"unsigned int\" format=\"GDAL Format\" proj=\"OSGB | NZ2000 | NZ1949 | IMAGE\" />" << endl;
+    cout << "</rsgis:commands>" << endl;
 }
 
 string RSGISExeSegment::getDescription()

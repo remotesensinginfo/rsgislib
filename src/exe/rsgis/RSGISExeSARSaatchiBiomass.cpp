@@ -1012,7 +1012,7 @@ void RSGISExeSARSaatchiBiomass::printParameters()
 
 void RSGISExeSARSaatchiBiomass::help()
 {
-	cout << "<rsgis:commands>\n";
+    cout << "<rsgis:commands xmlns:rsgis=\"http://www.rsgislib.org/xml/\">" << endl;
     cout << "\t <rsgis:command algor=\"SaatchiBiomass\" option=\"stem\" input=\"inputimage\" output=\"outputimage\"\n";
 	cout <<  "\t \t a0=\"a0\" a1=\"a1\" a2=\"a2\" b1=\"b1\" b2=\"b2\" c1=\"c1\" c2=\"c2\"/>\"\n";
 	cout << "\t <rsgis:command algor=\"SaatchiBiomass\" option=\"crown\" input=\"inputimage\" output=\"outputimage\"\n";

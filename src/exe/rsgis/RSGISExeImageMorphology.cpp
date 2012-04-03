@@ -1490,7 +1490,32 @@ void RSGISExeImageMorphology::printParameters()
 
 void RSGISExeImageMorphology::help()
 {
-    
+    cout << "<rsgis:commands xmlns:rsgis=\"http://www.rsgislib.org/xml/\">" << endl;
+    cout << "<!-- A command to apply a morphological dilation to an image -->" << endl;
+    cout << "<rsgis:command algor=\"morphology\" option=\"dilate\" image=\"image.env\" output=\"image_out.env\" [operator=\"matrix.gmtxt\" | elementsize=\"int\"] />" << endl;
+    cout << "<!-- A command to apply a morphological erosion to an image -->" << endl;
+    cout << "<rsgis:command algor=\"morphology\" option=\"erode\" image=\"image.env\" output=\"image_out.env\" [operator=\"matrix.gmtxt\" | elementsize=\"int\"] />" << endl;
+    cout << "<!-- A command to apply a morphological gradient to an image -->" << endl;
+    cout << "<rsgis:command algor=\"morphology\" option=\"gradient\" image=\"image.env\" output=\"image_out.env\" [operator=\"matrix.gmtxt\" | elementsize=\"int\"] />" << endl;
+    cout << "<!-- A command to apply a morphological dilation to all image bands to produce a single band output -->" << endl;
+    cout << "<rsgis:command algor=\"morphology\" option=\"dilateall\" image=\"image.env\" output=\"image_out.env\" [operator=\"matrix.gmtxt\" | elementsize=\"int\"] />" << endl;
+    cout << "<!-- A command to apply a morphological erosion to all image bands to produce a single band output -->" << endl;
+    cout << "<rsgis:command algor=\"morphology\" option=\"erodeall\" image=\"image.env\" output=\"image_out.env\" [operator=\"matrix.gmtxt\" | elementsize=\"int\"] />" << endl;
+    cout << "<!-- A command to apply a morphological gradient to all image bands to produce a single band output -->" << endl;
+    cout << "<rsgis:command algor=\"morphology\" option=\"gradientall\" image=\"image.env\" output=\"image_out.env\" [operator=\"matrix.gmtxt\" | elementsize=\"int\"] />" << endl;
+    cout << "<!-- A command to apply a filter to find local minima - used as input into a morphological watershed -->" << endl;
+    cout << "<rsgis:command algor=\"morphology\" option=\"localminima\" image=\"image.env\" output=\"image_out.env\" [operator=\"matrix.gmtxt\" | elementsize=\"int\"] numbering=\"binary | sequencial\" allowequals=\"yes | no\" />" << endl;
+    cout << "<!-- A command to apply a filter to find local minima using all image bands to produce a single band output - used as input into a morphological watershed -->" << endl;
+    cout << "<rsgis:command algor=\"morphology\" option=\"localminimaall\" image=\"image.env\" output=\"image_out.env\" [operator=\"matrix.gmtxt\" | elementsize=\"int\"] numbering=\"binary | sequencial\" allowequals=\"yes | no\" />" << endl;
+    cout << "<!-- A command to apply a morphological closing to an image (if temp image not provided processing will be done in memory) -->" << endl;
+    cout << "<rsgis:command algor=\"morphology\" option=\"closing\" image=\"image.env\" output=\"image_out.env\" [temp=\"tmp_image.env\"] [operator=\"matrix.gmtxt\" | elementsize=\"int\"] [iterations=\"int\"] />" << endl;
+    cout << "<!-- A command to apply a morphological opening to an image (if temp image not provided processing will be done in memory) -->" << endl;
+    cout << "<rsgis:command algor=\"morphology\" option=\"opening\" image=\"image.env\" output=\"image_out.env\" [temp=\"tmp_image.env\"] [operator=\"matrix.gmtxt\" | elementsize=\"int\"] [iterations=\"int\"] />" << endl;
+    cout << "<!-- A command to apply a morphological black top hat to an image (if temp image not provided processing will be done in memory) -->" << endl;
+    cout << "<rsgis:command algor=\"morphology\" option=\"blacktophat\" image=\"image.env\" output=\"image_out.env\" [temp=\"tmp_image.env\"] [operator=\"matrix.gmtxt\" | elementsize=\"int\"] [iterations=\"int\"] />" << endl;
+    cout << "<!-- A command to apply a morphological white top hat to an image (if temp image not provided processing will be done in memory) -->" << endl;
+    cout << "<rsgis:command algor=\"morphology\" option=\"whitetophat\" image=\"image.env\" output=\"image_out.env\" [temp=\"tmp_image.env\"] [operator=\"matrix.gmtxt\" | elementsize=\"int\"] [iterations=\"int\"] />" << endl;
+    cout << "<\rsgis:commands>" << endl;
 }
 
 string RSGISExeImageMorphology::getDescription()

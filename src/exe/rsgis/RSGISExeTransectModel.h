@@ -94,7 +94,7 @@ protected:
 	options option;
 	unsigned int transectWidth, transectLenght, transectHeight;
 	unsigned int nTrees;
-	unsigned int quadratSize;
+	double quadratSize;
 	unsigned int nRuns;
 	double treeHeight;
 	double transectRes;

@@ -5765,7 +5765,7 @@ void RSGISExePostClassification::printParameters()
 
 void RSGISExePostClassification::help()
 {
-	cout << "<rsgis:commands>\n";
+    cout << "<rsgis:commands xmlns:rsgis=\"http://www.rsgislib.org/xml/\">" << endl;
 	cout << "\t<rsgis:command algor=\"postclassification\" option=\"cluster\" input=\"vector.shp\" output=\"vector_out.shp\" force=\"yes | no\">\n";
 	cout << "\t\t<rsgis:clusterer algor=\"edgestddev | edgelength\" length=\"float\" stddev=\"float\" maxedgelength=\"float\" >\n";
 	cout << "\t\t\t<rsgis:edgelength classname=\"string\" length=\"float\" />\n";

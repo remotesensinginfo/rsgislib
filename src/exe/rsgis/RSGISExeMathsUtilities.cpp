@@ -276,7 +276,7 @@ void RSGISExeMathsUtilities::printParameters()
 void RSGISExeMathsUtilities::help()
 {
 	
-	cout << "<rsgis:commands>\n";
+    cout << "<rsgis:commands xmlns:rsgis=\"http://www.rsgislib.org/xml/\">" << endl;
 	cout << "\t<rsgis:command algor=\"mathsutils\" option=\"eigenvectors\" matrix=\"matrix.mtxt\" eigen=\"out_matrix.mtxt\" />\n";
 	cout << "\t<rsgis:command algor=\"mathsutils\" option=\"meanvector\" matrix=\"matrix.mtxt\" mean=\"out_matrix.mtxt\" />\n";
 	cout << "\t<rsgis:command algor=\"mathsutils\" option=\"eigenmeanvector\" matrix=\"matrix.mtxt\" eigen=\"out_matrix.mtxt\" mean=\"out_matrix.mtxt\" />\n";

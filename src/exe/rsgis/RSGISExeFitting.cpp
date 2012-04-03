@@ -1103,7 +1103,7 @@ void RSGISExeFitting::printParameters()
 
 void RSGISExeFitting::help()
 {
-	cout << "<rsgis:commands>\n";
+	cout << "<rsgis:commands xmlns:rsgis=\"http://www.rsgislib.org/xml/\">" << endl;
 	cout << "\t<rsgis:command algor=\"visualisation\" option=\"setupplotter\" outdir=\"outDIR\" />\n";
 	cout << "\t<rsgis:command algor=\"fitting\" option=\"oneDimensionalPolyfit\" input=\"infile\"\n";
 	cout << "\t\toutput=\"outfile\" polyOrder=\"polyOrder\" />\n";
@@ -1118,10 +1118,6 @@ void RSGISExeFitting::help()
 	cout << "\t<rsgis:command algor=\"fitting\" option=\"twoDimensionalPolyTest\" input=\"infile\"\n";
 	cout << "\t<rsgis:command algor=\"fitting\" option=\"threeDimensionalPolyTest\" input=\"infile\"\n";
 	cout << "\t\tinCoeff=\"inCoefficients\" output=\"outname (name only no path or extension)\" polyOrder=\"polyOrder\" />\n";
-	cout << "<rsgis:command algor=\"fitting\" option=\"nonlinearFit\" input=\"infile\"\n";
-	cout << "\toutput=\"outfile\" function=\"ln2Var\" fixCoeffA=\"float\" fixCoeffB=\"float\" fixCoeffC=\"float\"/>\n";
-	cout << "<rsgis:command algor=\"fitting\" option=\"nonlinearTest\" input=\"infile\"\n";
-	cout << "\tinCoeff=\"inCoefficients\" output=\"outname (name only no path or extension)\"/>\n";
 	cout << "</rsgis:commands>\n";
 }
 

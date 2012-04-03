@@ -902,7 +902,7 @@ void RSGISExeSARBayesianBiomass::printParameters()
 
 void RSGISExeSARBayesianBiomass::help()
 {
-	cout <<  "<rsgis:commands>\n";
+    cout << "<rsgis:commands xmlns:rsgis=\"http://www.rsgislib.org/xml/\">" << endl;
 	cout <<  "\t <rsgis:command algor =\"BayesianBiomass\" option=\"noPrior\"  deltatype=\"area\" input=\"input image\" output = \"output image\" \n";
 	cout <<  "\t\t coefAGT=\"coefAGT\" coefBGT=\"coefBGT\" coefALT=\"coefALT\" coefBLT=\"coefBLT\" \n";
 	cout <<  "\t\t split=\"split\" variance=\"variance\" upperLimit=\"upperLimit\" lowerLimit=\"lowerLimit\" interval=\"interval (optional)\" /> \n";

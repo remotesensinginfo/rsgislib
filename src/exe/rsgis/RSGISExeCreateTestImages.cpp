@@ -116,7 +116,7 @@ void RSGISExeCreateTestImages::printParameters()
 
 void RSGISExeCreateTestImages::help()
 {
-	cout << "<rsgis:commands>\n";
+    cout << "<rsgis:commands xmlns:rsgis=\"http://www.rsgislib.org/xml/\">" << endl;
 	cout << "\t<rsgis:command algor=\"testimages\" option=\"rowmajornumbered\" output=\"image_out.env\" width=\"int\" height=\"int\" />\n";
 	cout << "</rsgis:commands>\n";
 }

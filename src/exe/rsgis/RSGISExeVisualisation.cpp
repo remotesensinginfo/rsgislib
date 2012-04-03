@@ -241,7 +241,7 @@ void RSGISExeVisualisation::printParameters()
 
 void RSGISExeVisualisation::help()
 {
-	cout << "<rsgis:commands>\n";
+    cout << "<rsgis:commands xmlns:rsgis=\"http://www.rsgislib.org/xml/\">" << endl;
 	cout << "\t<rsgis:command algor=\"visualisation\" option=\"setupplotter\" outdir=\"string\" />\n";
 	cout << "\t<rsgis:command algor=\"visualisation\" option=\"deleteplotter\" />\n";
 	cout << "\t<rsgis:command algor=\"visualisation\" option=\"line2dtoshpfile\" input=\"file.ptxt\" output=\"vector_out.shp\" force=\"yes | no\" />\n";

@@ -469,7 +469,7 @@ void RSGISExeImageConversion::printParameters()
 
 void RSGISExeImageConversion::help()
 {
-	cout << "<rsgis:commands>\n";
+    cout << "<rsgis:commands xmlns:rsgis=\"http://www.rsgislib.org/xml/\">" << endl;
 	cout << "\t<rsgis:command algor=\"imageconversion\" option=\"asciicolumn\" image=\"image.env\" output=\"ascii_file.txt\" band=\"int\" /> \n";
 	cout << "\t<rsgis:command algor=\"imageconversion\" option=\"format\" image=\"image.env\" output=\"image_out.xxx\" format=\"GDAL_NAME\" /> \n";
 	cout << "\t<rsgis:command algor=\"imageconversion\" option=\"format\" dir=\"directory\" ext=\"file_extension\" output=\"image_out_base\" format=\"GDAL_NAME\" /> \n";
