@@ -1243,8 +1243,24 @@ void RSGISExeElevationDataTools::printParameters()
 
 void RSGISExeElevationDataTools::help()
 {
-	cout << "<rsgis:commands>\n";
-	
+    cout << "<rsgis:commands xmlns:rsgis=\"http://www.rsgislib.org/xml/\">" << endl;
+	cout << "<!-- A command to calculate the slope of an elevation surface -->" << endl;
+    cout << "<rsgis:command algor=\"elevation\" option=\"slope\" input=\"image.env\" output=\"out_image.env\" [band=\"int\"] [outtype=\"radians|degrees\"] />" << endl;
+    cout << "<!-- A command to calculate the aspect of an elevation surface -->" << endl;
+    cout << "<rsgis:command algor=\"elevation\" option=\"aspect\" input=\"image.env\" output=\"out_image.env\" [band=\"int\"] />" << endl;
+    cout << "<!-- A command to calculate the slope and aspect of an elevation surface -->" << endl;
+    cout << "<rsgis:command algor=\"elevation\" option=\"slopeaspect\" input=\"image.env\" output=\"out_image.env\" [band=\"int\"] />" << endl;
+    cout << "<!-- A command to calculate the hillshade of an elevation surface -->" << endl;
+    cout << "<rsgis:command algor=\"elevation\" option=\"hillshade\" input=\"image.env\" output=\"out_image.env\" azimuth=\"float\" zenith=\"float\" [band=\"int\"]  />" << endl;
+    cout << "<!-- A command to calculate a mask for the regions of shadow from an elevation surface -->" << endl;
+    cout << "<rsgis:command algor=\"elevation\" option=\"shadowmask\" input=\"image.env\" output=\"out_image.env\" azimuth=\"float\" zenith=\"float\" maxelevation=\"int\" [band=\"int\"]  />" << endl;
+    cout << "<!-- A command to calculate the incidence angle from a elevation surface and sun position -->" << endl;
+    cout << "<rsgis:command algor=\"elevation\" option=\"incidenceangle\" input=\"image.env\" output=\"out_image.env\" azimuth=\"float\" zenith=\"float\" [band=\"int\"]  />" << endl;
+    cout << "<!-- A command to calculate the exitance angle from a elevation surface and viewer position -->" << endl;
+    cout << "<rsgis:command algor=\"elevation\" option=\"exitanceangle\" input=\"image.env\" output=\"out_image.env\" azimuth=\"float\" zenith=\"float\" [band=\"int\"]  />" << endl;
+    cout << "<!-- A command to calculate the incidence and exitance angles from a elevation surface and sun and viewer positions -->" << endl;
+    cout << "<rsgis:command algor=\"elevation\" option=\"incidenceexitanceangles\" input=\"image.env\" output=\"out_image.env\" solarAzimuth=\"float\" solarZenith=\"float\" viewAzimuth=\"float\" viewZenith=\"float\" [band=\"int\"]  />" << endl;
+
 	cout << "</rsgis:commands>\n";
 }
 

@@ -9839,7 +9839,7 @@ void RSGISExeVectorUtils::printParameters()
 
 void RSGISExeVectorUtils::help()
 {
-	cout << "<rsgis:commands>\n";
+    cout << "<rsgis:commands xmlns:rsgis=\"http://www.rsgislib.org/xml/\">" << endl;
 	cout << "\t<rsgis:command algor=\"vectorutils\" option=\"bufferpolygons\" vector=\"vector.shp\" output=\"vector_out.shp\" buffer=\"float\" force=\"yes | no\"/>\n";
 	cout << "\t<rsgis:command algor=\"vectorutils\" option=\"removeattributes\" vector=\"vector.shp\" output=\"vector_out.shp\" force=\"yes | no\"/>\n";
 	cout << "\t<rsgis:command algor=\"vectorutils\" option=\"geom2circles\" vector=\"vector.shp\" output=\"vector_out.shp\" areaattribute=\"string\" radiusattribute=\"string\" radius=\"float\" resolution=\"float\" force=\"yes | no\"/>\n";

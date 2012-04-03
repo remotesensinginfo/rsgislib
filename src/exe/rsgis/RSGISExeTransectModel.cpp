@@ -1123,13 +1123,13 @@ void RSGISExeTransectModel::retrieveParameters(DOMElement *argElement) throw(RSG
 		{
 			char *charValue = XMLString::transcode(argElement->getAttribute(qSizeCh));
 			string qSizeStr = string(charValue);
-			this->quadratSize = mathUtils.strtoint(qSizeStr);
+			this->quadratSize = mathUtils.strtodouble(qSizeStr);
 			XMLString::release(&charValue);
 		}
 		else
 		{
 			cout << "\tNo Quadrat size set using default of 5 m" << endl;
-			this->quadratSize = 5;
+			this->quadratSize = 5.;
 		}
 		XMLString::release(&qSizeCh);
 		
@@ -1250,13 +1250,13 @@ void RSGISExeTransectModel::retrieveParameters(DOMElement *argElement) throw(RSG
 		{
 			char *charValue = XMLString::transcode(argElement->getAttribute(qSizeCh));
 			string qSizeStr = string(charValue);
-			this->quadratSize = mathUtils.strtoint(qSizeStr);
+			this->quadratSize = mathUtils.strtodouble(qSizeStr);
 			XMLString::release(&charValue);
 		}
 		else
 		{
 			cout << "\tNo Quadrat size set using default of 5 m" << endl;
-			this->quadratSize = 5;
+			this->quadratSize = 5.;
 		}
 		XMLString::release(&qSizeCh);
 		
@@ -2931,27 +2931,11 @@ string RSGISExeTransectModel::getXMLSchema()
 
 void RSGISExeTransectModel::help()
 {
-	cout << "<rsgis:commands>" << endl;
-	cout << "\t<rsgis:command algor=\"visualisation\" option=\"setupplotter\" outdir=\"outDIR\" />" << endl;
-	cout << "<rsgis:command algor=\"transectModel\" option=\"singleSpeciesRandom\"" << endl;
-	cout << "transectWidth=\"width [m]\" transectLenght=\"lenght [m]\" transectHeight=\"height [m]\" transectRes=\"transect resolution [m]\"" << endl;
-	cout << "quadratSize=\"quadratSize [m] - optional\" nTrees=\"nTrees\" treeHeight=\"treeHeight [m]\" species=\"aHarpophylla\"" << endl;
-	cout << "outPlotName=\"outPlotName - optional\" outImage=\"outImage - optional\" outVector=\"outVector - optional\" calculateFPC=\"yes | no\" />" << endl;
-	cout << "<rsgis:command algor=\"transectModel\" option=\"singleSpeciesPsudoRandom\"" << endl;
-	cout << "transectWidth=\"width [m]\" transectLenght=\"lenght [m]\" transectHeight=\"height [m]\" transectRes=\"transect resolution [m]\"" << endl;
-	cout << "quadratSize=\"quadratSize [m] - optional\" nTrees=\"nTrees\" treeHeight=\"treeHeight [m]\" species=\"aHarpophylla\"" << endl;
-	cout << "outPlotName=\"outPlotName - optional\" outImage=\"outImage - optional\" outVector=\"outVector - optional\" calculateFPC=\"yes | no\" />" << endl;
-	cout << "<rsgis:command algor=\"transectModel\" option=\"singleSpeciesCanopyRandom\"" << endl;
-	cout << "transectWidth=\"width [m]\" transectLenght=\"lenght [m]\" transectHeight=\"height [m]\" transectRes=\"transect resolution [m]\"" << endl;
-	cout << "quadratSize=\"quadratSize [m] - optional\" nTrees=\"nTrees\" treeHeight=\"treeHeight [m]\" species=\"aHarpophylla\"" << endl;
-	cout << "outPlotName=\"outPlotName - optional\" outImage=\"outImage - optional\" outVector=\"outVector - optional\" calculateFPC=\"yes | no\" />" << endl;
-	cout << "<rsgis:command algor=\"transectModel\" option=\"singleSpeciesCanopyPsudoRandom\"" << endl;
-	cout << "transectWidth=\"width [m]\" transectLenght=\"lenght [m]\" transectHeight=\"height [m]\" transectRes=\"transect resolution [m]\"" << endl;
-	cout << "quadratSize=\"quadratSize [m] - optional\" nTrees=\"nTrees\" treeHeight=\"treeHeight [m]\" species=\"aHarpophylla\"" << endl;
-	cout << "outPlotName=\"outPlotName - optional\" outImage=\"outImage - optional\" outVector=\"outVector - optional\" calculateFPC=\"yes | no\" />" << endl;
-	cout << "<rsgis:command algor=\"transectModel\" option=\"singleSpeciesCanopyRandomList\"" << endl;
-	cout << "input=\"input file\" output=\"output file\" species=\"aHarpophylla\" nRuns=\"int\""  << endl;
-	cout << "outPlotName=\"outPlotName - optional\" outImage=\"outImage - optional\" outVector=\"outVector - optional\" calculateFPC=\"yes | no\"/>" << endl;
+	cout << "<rsgis:commands xmlns:rsgis=\"http://www.rsgislib.org/xml/\">" << endl;
+    cout << "<rsgis:command algor=\"transectModel\" option=\"singleSpeciesCanopyRandomList | singleSpeciesCanopyPsudoRandomList\"" << endl;
+    cout << " input=\"input file\" output=\"output file\" species=\"aHarpophylla\" calculateFPC=\"yes | no\"" << endl;
+    cout << " calculateCC=\"yes | no\" nRuns=\"int (random only)\" quadratSize=\"float (m)\"" << endl;
+    cout << " [outPlotName=\"outPlotName\"] [outImage=\"outImage\"] [outVector=\"outVector\"] />" << endl;
 	cout << "</rsgis:commands>" << endl;
 }
 

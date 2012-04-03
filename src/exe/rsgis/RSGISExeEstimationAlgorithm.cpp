@@ -15845,44 +15845,45 @@ void RSGISExeEstimationAlgorithm::printParameters()
 
 void RSGISExeEstimationAlgorithm::help()
 {
-	cout << "<rsgis:commands>\n";
-	
-	cout << "\t<rsgis:command algor=\"estimation\" option=\"fullPolSingleSpecies | fullPolSingleSpeciesMask\" parameters=\"cDepthDensity | cDepthDensityReturnPredictSigma\"\n";
-	cout << "\t initialCDepth=\"1\" initialDensity=\"1\"\n";
-	cout << "input=\"input image\" output=\"output Image\" ittmax=\"max itterations\"\n"; 
-	cout << "\t\t coefficientsHH=\"coefficientsHH\" coefficientsHV=\"coefficientsHV\" coefficientsVV=\"coefficientsVV\"/>\n";
-	
-	cout << "\t<rsgis:command algor=\"estimation\" option=\"fullPolSingleSpecies | fullPolSingleSpeciesMask\" parameters=\"diameterDensity | diameterDensityPredictSigma\"\n";
-	cout << "\t initialDiameter=\"0.2\" initialDensity=\"1\"\n";
-	cout << "input=\"input image\" output=\"output Image\" ittmax=\"max itterations\"\n"; 
-	cout << "\t\t coefficientsHH=\"coefficientsHH\" coefficientsHV=\"coefficientsHV\" coefficientsVV=\"coefficientsVV\"/>\n";	
-	
-	cout << "\t<rsgis:command algor=\"estimation\" option=\"dualPolSingleSpecies | dualPolSingleSpeciesMask\" parameters=\"cDepthDensity | cDepthDensityReturnPredictSigma\"\n";
-	cout << "\t initialCDepth=\"1\" initialDensity=\"1\"\n";
-	cout << "input=\"input image\" output=\"output Image\" ittmax=\"max itterations\"\n"; 
-	cout << "\t\t coefficientsA=\"coefficientsHH\" coefficientsB=\"coefficientsHV\"/>\n";
-	
-	cout << "\t<rsgis:command algor=\"estimation\" option=\"dualPolSingleSpecies | dualPolSingleSpeciesMask\" parameters=\"diameterDensity | diameterDensityPredictSigma\"\n";
-	cout << "\t initialDiameter=\"0.2\" initialDensity=\"1\"\n";
-	cout << "input=\"input image\" output=\"output Image\" ittmax=\"max itterations\"\n"; 
-	cout << "\t\t coefficientsA=\"coefficientsHH\" coefficientsB=\"coefficientsHV\"/>\n";	
-	
-	cout << "\t<rsgis:command algor=\"estimation\" option=\"dualPolFPCSingleSpecies\" parameters=\"diameterDensity | diameterDensityPredictSigma\"\n";
-	cout << "\t initialDiameter=\"0.2\" initialDensity=\"1\"\n";
-	cout << "input=\"input image\" output=\"output Image\" ittmax=\"max itterations\"\n"; 
-	cout << "\t\tcoefficientsHH=\"coefficientsHH\" coefficientsHV=\"coefficientsHV\"\n";
-	cout << "\t\tcoefficientsBranchFPCHH=\"coefficientsBranchFPCHH\" coefficientsBranchFPCHV=\"coefficientsBranchFPCHV\"\n";
-	cout << "\t\tcoefficientsAttenuationFPCH=\"coefficientsAttenuationFPCH\"\n";
-	cout << "\t\tcoefficientsAttenuationFPCH=\"coefficientsAttenuationFPCH\"/>\n";
-	
-	cout << "\t<rsgis:command algor=\"estimation\" option=\"dualPolFPCMoistureSingleSpecies\" parameters=\"diameterDensity | diameterDensityPredictSigma\"\n";
-	cout << "\t initialDiameter=\"0.2\" initialDensity=\"1\"\n";
-	cout << "input=\"input image\" output=\"output Image\" ittmax=\"max itterations\"\n"; 
-	cout << "\t\tcoefficientsHH=\"coefficientsHH\" coefficientsHV=\"coefficientsHV\"\n";
-	cout << "\t\tcoefficientsBranchFPCHH=\"coefficientsBranchFPCHH\" coefficientsBranchFPCHV=\"coefficientsBranchFPCHV\"\n";
-	cout << "\t\tcoefficientsAttenuationFPCH=\"coefficientsAttenuationFPCH\"\n";
-	cout << "\t\tcoefficientsAttenuationFPCH=\"coefficientsAttenuationFPCH\"/>\n";
-	cout << "</rsgis:commands>\n";
+    cout << "<rsgis:commands xmlns:rsgis=\"http://www.rsgislib.org/xml/\">" << endl;
+    cout << "<!-- A command to estimate parameters from SAR data --> " << endl;
+    cout << "<rsgis:command algor=\"estimation\" option=\"dualPolMultiSpeciesClassification | fullPolMultiSpeciesClassification\" parameters=\"heightDensity\"" << endl;
+    cout << "input=\"inputClassData.env\" output=\"output.env\"  >" << endl;
+    cout << "" << endl;
+    cout << "<rsgis:estClassParameters     " << endl;
+    cout << "    method=\"simulatedAnnealingAP\" " << endl;
+    cout << "    function=\"2DPoly\" " << endl;
+    cout << "    coefficientsHH=\"heightDensHH_Coeff.mtxt\" " << endl;
+    cout << "    coefficientsHV=\"heightDensHH_Coeff.mtxt\"" << endl;
+    cout << "    [coefficientsVV=\"heightDensVV_Coeff.mtxt\"]" << endl;
+    cout << "    covMatrixP=\"covMatrixP.mtxt\"" << endl;
+    cout << "    initialHeight=\"float\" initialDensity=\"float\"" << endl;
+    cout << "    minHeight=\"float\" maxHeight=\"float\" minDensity=\"float\" maxDensity=\"float\" heightStep=\"float\" densityStep=\"float\" startTemp=\"int\" ittmax=\"int\" />" << endl;
+    cout << "</rsgis:command>" << endl;
+    cout << "" << endl;
+    cout << "<!-- A command to estimate parameters from SAR data using image objects --> " << endl;
+    cout << "<rsgis:command algor=\"estimation\" option=\"dualPolObject | fullPolObject\" parameters=\"heightDensity\"" << endl;
+    cout << "input=\"input.env\" output=\"output.env\" object=\"objects.shp\" classField=\"ClassID\" [raster=\"objects_raster.shp\"] [outSHP=\"output.shp\"] >" << endl;
+    cout << "" << endl;
+    cout << "<rsgis:estSlowOptimiserParameters     " << endl;
+    cout << "    method=\"simulatedAnnealingAP\" " << endl;
+    cout << "    function=\"2DPoly\" " << endl;
+    cout << "    coefficientsHH=\"heightDensHH_Coeff.mtxt\" " << endl;
+    cout << "    coefficientsHV=\"heightDensHH_Coeff.mtxt\"" << endl;
+    cout << "    [coefficientsVV=\"heightDensVV_Coeff.mtxt\"]" << endl;
+    cout << "    covMatrixP=\"covMatrixP.mtxt\"" << endl;
+    cout << "    initialHeight=\"float\" initialDensity=\"float\"" << endl;
+    cout << "    minHeight=\"float\" maxHeight=\"float\" minDensity=\"float\" maxDensity=\"float\" heightStep=\"float\" densityStep=\"float\" startTemp=\"int\" ittmax=\"int\" />" << endl;
+    cout << "<rsgis:estFastOptimiserParameters     " << endl;
+    cout << "    method=\"conjugateGradient\" " << endl;
+    cout << "    function=\"2DPoly\" " << endl;
+    cout << "    coefficientsHH=\"heightDensHH_Coeff.mtxt\" " << endl;
+    cout << "    coefficientsHV=\"heightDensHH_Coeff.mtxt\"" << endl;
+    cout << "    [coefficientsVV=\"heightDensVV_Coeff.mtxt\"]" << endl;
+    cout << "    covMatrixP=\"covMatrixP.mtxt\"" << endl;
+    cout << "    initialHeight=\"float\" initialDensity=\"float\"" << endl;
+    cout << "    minHeight=\"float\" maxHeight=\"float\" minDensity=\"float\" maxDensity=\"float\" ittmax=\"int\" />" << endl;
+    cout << "</rsgis:command>" << endl;
 }
 
 string RSGISExeEstimationAlgorithm::getDescription()

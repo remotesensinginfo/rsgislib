@@ -135,7 +135,7 @@ void RSGISExeCommandLine::printParameters()
 
 void RSGISExeCommandLine::help()
 {
-	cout << "<rsgis:commands>\n";
+	cout << "<rsgis:commands xmlns:rsgis=\"http://www.rsgislib.org/xml/\">" << endl;
 	cout << "\t<rsgis:command algor=\"commandline\" option=\"execute\" command=\"string\" />\n";
 	cout << "</rsgis:commands>\n";
 }

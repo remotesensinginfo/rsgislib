@@ -301,7 +301,7 @@ void RSGISExeStackBands::printParameters()
 
 void RSGISExeStackBands::help()
 {
-	cout << "<rsgis:commands>\n";
+    cout << "<rsgis:commands xmlns:rsgis=\"http://www.rsgislib.org/xml/\">" << endl;
 	cout << "\t<rsgis:command algor=\"stackbands\" option=\"dir\" dir=\"input_DIR\" output=\"outputimage\" ext=\"file_extension\"/>\n";
 	cout << "\t<rsgis:command algor=\"stackbands\" option=\"imgs\" output=\"outputimage\">\n";
 	cout << "\t\t<rsgis:image file=\"image1\" />\n";

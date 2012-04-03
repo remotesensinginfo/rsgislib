@@ -375,7 +375,7 @@ void RSGISExeRadarUtils::printParameters()
 
 void RSGISExeRadarUtils::help()
 {
-	cout << "<rsgis:commands>\n";
+	cout << "<rsgis:commands xmlns:rsgis=\"http://www.rsgislib.org/xml/\">" << endl;
 	cout << "\t<rsgis:command algor=\"radarUtils\" option=\"convert2dB\" input=\"input image\" output=\"output Image\"\n";
 	cout << "\tcalFactor\"Callibration Factor (optional)\"/>\n";
 	cout << "\t<rsgis:command algor=\"radarUtils\" option=\"soilDielectric\" band=\"L\" temperature=\"20\"\n";
@@ -383,7 +383,6 @@ void RSGISExeRadarUtils::help()
 	cout << "\t<rsgis:command algor=\"radarUtils\" option=\"soilDielectric\" frequency=\"1.25e9\" temperature=\"20\"\n";
 	cout << "\t\tbulkDensity=\"1.5\" volMoisture=\"0.2\" clay=\"0.2\" sand=\"0.8\"/>\n";
 	cout << "\t<rsgis:command algor=\"radarUtils\" option=\"soilDielectricList\" input=\"input file\" output=\"output file\"/>\n";
-	cout << "\t<rsgis:command algor=\"radarUtils\" option=\"predictFPCList\" input=\"input file\" output=\"output file\" nRuns=\"nRuns (optional)\"/>\n";
 	cout << "</rsgis:commands>\n";
 }
 

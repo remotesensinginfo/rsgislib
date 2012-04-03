@@ -485,7 +485,7 @@ void RSGISExeFilterImages::printParameters()
 
 void RSGISExeFilterImages::help()
 {
-    cout << "<rsgis:commands>\n";
+    cout << "<rsgis:commands xmlns:rsgis=\"http://www.rsgislib.org/xml/\">" << endl;
     cout << "\t<rsgis:command algor=\"imagefilter\" option=\"filter\" image=\"image.env\" output=\"output_image_base\" >\n";
     cout << "\t\t<rsgis:filter size=\"int\" type=\"GaussianSmooth\" fileending=\"gausmooth\" stddevX=\"float\" stddevY=\"float\" angle=\"int\"/>\n";
     cout << "\t\t<rsgis:filter size=\"int\" type=\"Gaussian1st\" fileending=\"gau1st\" stddevX=\"float\" stddevY=\"float\" angle=\"int\"/>\n";
@@ -502,6 +502,7 @@ void RSGISExeFilterImages::help()
     cout << "\t\t<rsgis:filter size=\"int\" type=\"Max\" fileending=\"max\" />\n";
     cout << "\t\t<rsgis:filter size=\"int\" type=\"Total\" fileending=\"total\" />\n";
     cout << "\t\t<rsgis:filter size=\"int\" type=\"Kuwahara\" fileending=\"kuwahara\" />\n";
+    cout << "\t\t<rsgis:filter size=\"int\" type=\"Lee\" fileending=\"lee\" />\n";
     cout << "\t</rsgis:command>\n";
     cout << "\t<rsgis:command algor=\"imagefilter\" option=\"filter\" image=\"image.env\" output=\"output_image_base\" filterbank=\"LM\"/>\n";
     cout << "\t<rsgis:command algor=\"imagefilter\" option=\"exportfilterbank\" output=\"output_image_base\" >\n";
@@ -520,6 +521,7 @@ void RSGISExeFilterImages::help()
     cout << "\t\t<rsgis:filter size=\"int\" type=\"Max\" fileending=\"max\" />\n";
     cout << "\t\t<rsgis:filter size=\"int\" type=\"Total\" fileending=\"total\" />\n";
     cout << "\t\t<rsgis:filter size=\"int\" type=\"Kuwahara\" fileending=\"kuwahara\" />\n";
+    cout << "\t\t<rsgis:filter size=\"int\" type=\"Lee\" fileending=\"lee\" />\n";
     cout << "\t</rsgis:command>\n";
     cout << "\t<rsgis:command algor=\"imagefilter\" option=\"exportfilterbank\" output=\"output_image_base\" filterbank=\"LM\"/>\n";
     cout << "</rsgis:commands>\n";

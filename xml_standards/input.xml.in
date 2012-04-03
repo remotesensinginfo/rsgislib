@@ -38,28 +38,15 @@
     <rsgis:command algor="fitting" option="oneDimensionalPolyfit" input="infile"
         output="outfile" polyOrder="polyOrder" />
     <!-- Tests the fit of a one dimensional polynomial equation and print r squared value, input and predicted values are saved in 'ptxt' format -->
-    <rsgis:command algor="fitting" option="oneDimensionalPolyTest" input="infile"
-        inCoeff="inCoefficients" output="outname (name only no path or extension)" polyOrder="polyOrder" />
+    <rsgis:command algor="fitting" option="oneDimensionalPolyTest" input="infile" inCoeff="inCoefficients" output="outname (name only no path or extension)" polyOrder="polyOrder" />
      <!-- Fits a two dimensional polynomial equation, save coefficients out a 'mtxt' -->
-    <rsgis:command algor="fitting" option="twoDimensionalPolyfit" input="infile"
-        output="outfile" polyOrder="polyOrder" numX="numX" numY="numY" />
+    <rsgis:command algor="fitting" option="twoDimensionalPolyfit" input="infile" output="outfile" polyOrder="polyOrder" numX="numX" numY="numY" />
     <!-- Tests the fit of a two dimensional polynomial equation and print r squared value, input and predicted values are saved in 'ptxt' format -->
-    <rsgis:command algor="fitting" option="twoDimensionalPolyTest" input="infile"
-        inCoeff="inCoefficients" output="outname (name only no path or extension)" polyOrder="polyOrder" />
+    <rsgis:command algor="fitting" option="twoDimensionalPolyTest" input="infile" inCoeff="inCoefficients" output="outname (name only no path or extension)" polyOrder="polyOrder" />
     <!-- Fits a three dimensional polynomial equation, save coefficients out a 'mtxt' -->
-    <rsgis:command algor="fitting" option="threeDimensionalPolyfit" input="infile"
-        output="outfile" polyOrder="polyOrder" numX="numX" numY="numY" numZ="numZ" />
+    <rsgis:command algor="fitting" option="threeDimensionalPolyfit" input="infile" output="outfile" polyOrder="polyOrder" numX="numX" numY="numY" numZ="numZ" />
     <!-- Tests the fit of a three dimensional polynomial equation and print r squared value, input and predicted values are saved in 'ptxt' format -->
-    <rsgis:command algor="fitting" option="threeDimensionalPolyTest" input="infile"
-        inCoeff="inCoefficients" output="outname (name only no path or extension)" polyOrder="polyOrder" />
-    <!-- Fits a non-linear equation to data -->
-    <!-- TODO: CURRENT FUNCTION CAN BE SOLVED USING LINEAR FIT -->
-    <rsgis:command algor="fitting" option="nonlinearFit" input="infile"
-        output="outfile" function="ln2Var" coeffA="float" coeffB="float" coeffC="float"/>
-    <rsgis:command algor="fitting" option="nonlinearFit" input="infile"
-        output="outfile" function="ln2Var" fixCoeffA="float" fixCoeffB="float" fixCoeffC="float"/>
-    <rsgis:command algor="fitting" option="nonlinearTest" input="infile"
-        inCoeff="inCoefficients" output="outname (name only no path or extension)"/>
+    <rsgis:command algor="fitting" option="threeDimensionalPolyTest" input="infile" inCoeff="inCoefficients" output="outname (name only no path or extension)" polyOrder="polyOrder" />
 
     <!-- Deprecated: A command to undertake zonal stats to calculate te min, max, mean, std dev for a polygon -->
     <rsgis:command algor="zonalstats" option="polygons2shp" image="image.env" vector="polys.shp" output="output.shp" mean="yes" max="yes" min="yes" stddev="yes" force="yes | no" />
@@ -489,18 +476,6 @@
     <!-- A command to calculate cluster centres for the image using ISOData clustering -->
     <rsgis:command algor="imagecalc" option="isodatacentres" image="image.env" output="matrix.gmtxt" numclusters="int" minnumclusters="int" maxiterations="int" degreeofchange="float" subsample="int" initmethod="random | diagonal_range | diagonal_stddev | diagonal_range_attach | diagonal_stddev_attach | kpp" ignorezeros="yes | no" mindist="float" minnum="unsigned int" maxstddev="float" editstart="int" editend="int" />
 
-
-
-
-
-
-
-
-
-
-
-
-
     <!-- A command to calibrate image Landsat data from at sensor DNs to at sensor radiance (EQ: ((lmax-lmin)/(qcalmax-qcalmin)) * (DNs - qcalmin) + lmin) Eq is from landsat manual. -->
     <rsgis:command algor="imagecalibration" option="landsatradcal" output="image_out.env" format="GDAL Format" >
         <rsgis:band name="string" image="image1" band="int" [sensorband="string" | lmin="float" lmax="float" qcalmin="float" qcalmax="float"] />
@@ -572,9 +547,6 @@
               <rsgis:elevation elevationUpper="float" ax="float" bx="float" cx="float"  />
         </rsgls:band>
     </rsgis:command>
-
-
-
 
     <!-- A command to calculate the slope of an elevation surface -->
     <rsgis:command algor="elevation" option="slope" input="image.env" output="out_image.env" [band="int"] [outtype="radians|degrees"] />
@@ -990,37 +962,44 @@
         Uses experimental coefficients for closed forest -->
     <rsgis:command algor="SaatchiBiomass" option="closedCrownPL" input="inputimage" output="outputimage"/>
 
-    <!-- TODO Most of this needs redoing, lots of changes -->
-    <rsgis:command algor="estimation" option="fullPolSingleSpecies | fullPolSingleSpeciesMask" parameters="cDepthDensity | cDepthDensityReturnPredictSigma"
-     initialCDepth="1" initialDensity="1"
-input="input image" output="output Image" ittmax="max itterations"
-         coefficientsHH="coefficientsHH" coefficientsHV="coefficientsHV" coefficientsVV="coefficientsVV"/>
-    <rsgis:command algor="estimation" option="fullPolSingleSpecies | fullPolSingleSpeciesMask" parameters="diameterDensity | diameterDensityPredictSigma"
-     initialDiameter="0.2" initialDensity="1"
-input="input image" output="output Image" ittmax="max itterations"
-         coefficientsHH="coefficientsHH" coefficientsHV="coefficientsHV" coefficientsVV="coefficientsVV"/>
-    <rsgis:command algor="estimation" option="dualPolSingleSpecies | dualPolSingleSpeciesMask" parameters="cDepthDensity | cDepthDensityReturnPredictSigma"
-     initialCDepth="1" initialDensity="1"
-input="input image" output="output Image" ittmax="max itterations"
-         coefficientsA="coefficientsHH" coefficientsB="coefficientsHV"/>
-    <rsgis:command algor="estimation" option="dualPolSingleSpecies | dualPolSingleSpeciesMask" parameters="diameterDensity | diameterDensityPredictSigma"
-     initialDiameter="0.2" initialDensity="1"
-input="input image" output="output Image" ittmax="max itterations"
-         coefficientsA="coefficientsHH" coefficientsB="coefficientsHV"/>
-    <rsgis:command algor="estimation" option="dualPolFPCSingleSpecies" parameters="diameterDensity | diameterDensityPredictSigma"
-     initialDiameter="0.2" initialDensity="1"
-input="input image" output="output Image" ittmax="max itterations"
-        coefficientsHH="coefficientsHH" coefficientsHV="coefficientsHV"
-        coefficientsBranchFPCHH="coefficientsBranchFPCHH" coefficientsBranchFPCHV="coefficientsBranchFPCHV"
-        coefficientsAttenuationFPCH="coefficientsAttenuationFPCH"
-        coefficientsAttenuationFPCH="coefficientsAttenuationFPCV"/>
-    <rsgis:command algor="estimation" option="dualPolFPCMoistureSingleSpecies" parameters="diameterDensity | diameterDensityPredictSigma"
-     initialDiameter="0.2" initialDensity="1"
-input="input image" output="output Image" ittmax="max itterations"
-        coefficientsHH="coefficientsHH" coefficientsHV="coefficientsHV"
-        coefficientsBranchFPCHH="coefficientsBranchFPCHH" coefficientsBranchFPCHV="coefficientsBranchFPCHV"
-        coefficientsAttenuationFPCH="coefficientsAttenuationFPCH"
-        coefficientsAttenuationFPCH="coefficientsAttenuationFPCV"/>
+    <!-- A command to estimate parameters from SAR data --> 
+    <rsgis:command algor="estimation" option="dualPolMultiSpeciesClassification | fullPolMultiSpeciesClassification" parameters="heightDensity"
+    input="inputClassData.env" output="output.env"  >
+    
+    <rsgis:estClassParameters     
+        method="simulatedAnnealingAP" 
+        function="2DPoly" 
+        coefficientsHH="heightDensHH_Coeff.mtxt" 
+        coefficientsHV="heightDensHH_Coeff.mtxt"
+        [coefficientsVV="heightDensVV_Coeff.mtxt"]
+        covMatrixP="covMatrixP.mtxt"
+        initialHeight="float" initialDensity="float"
+        minHeight="float" maxHeight="float" minDensity="float" maxDensity="float" heightStep="float" densityStep="float" startTemp="int" ittmax="int" />
+    </rsgis:command>
+
+    <!-- A command to estimate parameters from SAR data using image objects --> 
+    <rsgis:command algor="estimation" option="dualPolObject | fullPolObject" parameters="heightDensity"
+    input="input.env" output="output.env" object="objects.shp" classField="ClassID" [raster="objects_raster.shp"] [outSHP="output.shp"] >
+    
+    <rsgis:estSlowOptimiserParameters     
+        method="simulatedAnnealingAP" 
+        function="2DPoly" 
+        coefficientsHH="heightDensHH_Coeff.mtxt" 
+        coefficientsHV="heightDensHH_Coeff.mtxt"
+        [coefficientsVV="heightDensVV_Coeff.mtxt"]
+        covMatrixP="covMatrixP.mtxt"
+        initialHeight="float" initialDensity="float"
+        minHeight="float" maxHeight="float" minDensity="float" maxDensity="float" heightStep="float" densityStep="float" startTemp="int" ittmax="int" />
+    <rsgis:estFastOptimiserParameters     
+        method="conjugateGradient" 
+        function="2DPoly" 
+        coefficientsHH="heightDensHH_Coeff.mtxt" 
+        coefficientsHV="heightDensHH_Coeff.mtxt"
+        [coefficientsVV="heightDensVV_Coeff.mtxt"]
+        covMatrixP="covMatrixP.mtxt"
+        initialHeight="float" initialDensity="float"
+        minHeight="float" maxHeight="float" minDensity="float" maxDensity="float" ittmax="int" />
+    </rsgis:command>
 
     <!-- TODO A command to -->
     <rsgis:command algor="postclassification" option="cluster" input="vector.shp" output="vector_out.shp" force="yes | no">
@@ -1098,49 +1077,8 @@ input="input image" output="output Image" ittmax="max itterations"
     <!-- A command to execute a command line utilities (e.g., mkdir) -->
     <rsgis:command algor="commandline" option="execute" command="string" />
 
-
-
-
-
-
-
-
-    <!-- This command generates a voxel based transect, which may be exported as a point cloud or image. FPC optionally may be calculated -->
-    <rsgis:command algor="transectModel" option="singleSpeciesRandom"
-        transectWidth="width [m]" transectLenght="lenght [m]" transectHeight="height [m]" transectRes="transect resolution [m]"
-        quadratSize="quadratSize [m] - optional" nTrees="nTrees" treeHeight="treeHeight [m]" species="aHarpophylla"
-        outPlotName="outPlotName - optional" outImage="outImage - optional" outVector="outVector - optional" calculateFPC="yes | no" />
-    <!-- This command generates a voxel based transect, which may be exported as a point cloud or image. FPC optionally may be calculated.
-    The same seed is used for all random numbers -->
-    <rsgis:command algor="transectModel" option="singleSpeciesPsudoRandom"
-        transectWidth="width [m]" transectLenght="lenght [m]" transectHeight="height [m]" transectRes="transect resolution [m]"
-        quadratSize="quadratSize [m] - optional" nTrees="nTrees" treeHeight="treeHeight [m]" species="aHarpophylla"
-        outPlotName="outPlotName - optional" outImage="outImage - optional" outVector="outVector - optional" calculateFPC="yes | no" />
-    <!-- This command generates a voxel based transect (canopy only), which may be exported as a point cloud or image. FPC optionally may be calculated -->
-    <rsgis:command algor="transectModel" option="singleSpeciesCanopyRandom"
-        transectWidth="width [m]" transectLenght="lenght [m]" transectHeight="height [m]" transectRes="transect resolution [m]"
-        quadratSize="quadratSize [m] - optional" nTrees="nTrees" treeHeight="treeHeight [m]" species="aHarpophylla"
-        outPlotName="outPlotName - optional" outImage="outImage - optional" outVector="outVector - optional" calculateFPC="yes | no" />
-    <!-- This command generates a voxel based transect (canopy only), which may be exported as a point cloud or image. FPC optionally may be calculated.
-    The same seed is used for all random numbers -->
-    <rsgis:command algor="transectModel" option="singleSpeciesCanopyPsudoRandom"
-        transectWidth="width [m]" transectLenght="lenght [m]" transectHeight="height [m]" transectRes="transect resolution [m]"
-        quadratSize="quadratSize [m] - optional" nTrees="nTrees" treeHeight="treeHeight [m]" species="aHarpophylla"
-        outPlotName="outPlotName - optional" outImage="outImage - optional" outVector="outVector - optional" calculateFPC="yes | no" />
-     <!-- This command generates a voxel based transect (canopy only), for a list of input parameters. FPC is optionally calculated and saved to a text file -->
-    <rsgis:command algor="transectModel" option="singleSpeciesCanopyRandomList"
-        input="input file" output="output file" species="aHarpophylla" nRuns="int"
-        outPlotName="outPlotName - optional" outImage="outImage - optional" outVector="outVector - optional" calculateFPC="yes | no"/>
-     <!-- This command generates a voxel based transect (canopy only), for a list of input parameters. FPC is optionally calculated and saved to a text file
-     The same seed is used for all random numbers -->
-    <rsgis:command algor="transectModel" option="singleSpeciesCanopyPsudoRandomList"
-        input="input file" output="output file" species="aHarpophylla"
-        outPlotName="outPlotName - optional" outImage="outImage - optional" outVector="outVector - optional" calculateFPC="yes | no"/>
-
-
-
-
-
+     <!-- This command generates a voxel based transect (canopy only), for a list of input parameters and calculates FPC and canopy cover-->
+    <rsgis:command algor="transectModel" option="singleSpeciesCanopyRandomList | singleSpeciesCanopyPsudoRandomList" input="input file" output="output file" species="aHarpophylla" calculateFPC="yes | no" calculateCC="yes | no" nRuns="int (random only)" quadratSize="float (m)" [outPlotName="outPlotName"] outImage="outImage"] [outVector="outVector"] />
 
     <!-- A command for automatically generating a set of ground control points between a pair of images - A basic algorithm with a single iteration and movement of gcps-->
     <rsgis:command algor="registration" option="basic" reference="image" floating="image" output="gcps.txt" outputType="envi_img2img|envi_img2map|rsgis_img2map" metric="euclidean|sqdiff|manhatten|correlation" pixelgap="int" window="int" search="int" threshold="float" stddevRef="float" stddevFloat="float" subpixelresolution="int"/>
