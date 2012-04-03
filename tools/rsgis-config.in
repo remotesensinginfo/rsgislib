@@ -1,0 +1,47 @@
+#!/bin/sh
+
+usage()
+{
+    cat <<EOF
+Usage: rsgis-config [OPTIONS]
+Options:
+     [--prefix]
+     [--version]
+     [--libs]
+     [--cflags]
+     [--ldflags]
+     [--includes]
+EOF
+    exit $1
+}
+if test $# -eq 0; then
+  usage 1 1>&2
+fi
+while test $# -gt 0; do
+case "$1" in
+    -*=*) optarg=`echo "$1" | sed 's/[-_a-zA-Z0-9]*=//'` ;;
+    *) optarg= ;;
+esac
+case $1 in
+    --prefix)
+      echo @CMAKE_INSTALL_PREFIX@
+     ;;
+    --version)
+      echo @RSGISLIB_PACKAGE_VERSION@
+     ;;
+    --cflags)
+      echo -I@CMAKE_INSTALL_PREFIX@/include 
+      ;;
+    --libs)
+      echo -L@CMAKE_INSTALL_PREFIX@/@PROJECT_LIBRARY_DIR@ -l@RSGISLIB_CALIBRATION_LIB_NAME@  -l@RSGISLIB_CLASSIFY_LIB_NAME@ -l@RSGISLIB_COMMONS_LIB_NAME@ -l@RSGISLIB_DATASTRUCT_LIB_NAME@ -l@RSGISLIB_FILTERING_LIB_NAME@ -l@RSGISLIB_GEOM_LIB_NAME@ -l@RSGISLIB_IMG_LIB_NAME@ -l@RSGISLIB_MATHS_LIB_NAME@ -l@RSGISLIB_MODELING_LIB_NAME@ -l@RSGISLIB_RADAR_LIB_NAME@ -l@RSGISLIB_RASTERGIS_LIB_NAME@ -l@RSGISLIB_REGISTRATION_LIB_NAME@ -l@RSGISLIB_SEGMENTATION_LIB_NAME@ -l@RSGISLIB_UTILS_LIB_NAME@ -l@RSGISLIB_VECTOR_LIB_NAME@
+      ;;
+    --ldflags)
+      echo @CMAKE_INSTALL_PREFIX@/@PROJECT_LIBRARY_DIR@
+      ;;
+    --includes)
+      echo @CMAKE_INSTALL_PREFIX@/include
+      ;;
+  esac
+  shift
+done
+

@@ -1,0 +1,1334 @@
+/*
+ *  RSGISObjectBasedEstimation.cpp
+ *  RSGIS_LIB
+ *
+ *  Created by Daniel Clewley on 25/11/2010.
+ *  Copyright 2010 RSGISLib. All rights reserved.
+ *  This file is part of RSGISLib.
+ * 
+ *  RSGISLib is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  RSGISLib is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with RSGISLib.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
+#include "RSGISObjectBasedEstimation.h"
+
+namespace rsgis{namespace radar{
+	
+	RSGISObjectBasedEstimation::RSGISObjectBasedEstimation(GDALDataset *inputImage, GDALDataset *outputImage, vector <gsl_vector*> *initialPar, vector <RSGISEstimationOptimiser*> *slowOptimiser, vector <RSGISEstimationOptimiser*> *fastOptimiser, estParameters parameters, double ***minMaxVals, string classHeading, bool useClass)
+	{
+		this->datasetsIO = new GDALDataset*[2];
+		this->datasetsInput = new GDALDataset*[1];
+		this->datasetsIO[0] = inputImage;
+		this->datasetsIO[1] = outputImage;
+		this->datasetsInput[0] = inputImage;
+		this->slowOptimiser = slowOptimiser; // Initial optimiser, for selection of object.
+		this->fastOptimiser = fastOptimiser; // Fast optimser, for entire object.
+		this->numBands = inputImage->GetRasterCount();
+		this->objectSamplesPercent = 0.1; // Percent of pixels in object to use with slow optimisers.
+		this->parameters = parameters;
+		this->initialPar = initialPar;
+		this->classHeading = classHeading;
+		this->useClass = useClass;
+		this->minMaxVals = minMaxVals;
+		this->useDefaultMinMax = true;
+		
+		if (this->parameters == cDepthDensity | this->parameters == heightDensity) // Set number of output parameters
+		{
+			this->numOutputPar = 2;
+		}
+		else if(this->parameters == dielectricDensityHeight)
+		{
+			this->numOutputPar = 3;
+		}
+		else 
+		{
+			throw RSGISException("Parameters not recognised");
+		}
+		
+		this->numOutputBands = numOutputPar + 2; // Extra bands for biomass and error
+		this->pixelVals = new vector<float>*[numBands];
+
+		// Calc image to get values (for initial inversion)
+		this->getValues = new RSGISObjectBasedEstimationGetObjVals(pixelVals, numBands);
+		this->calcImageSingle = new RSGISCalcImageSingle(getValues);
+		
+		if (!useClass) 
+		{
+			this->slowOptimiserSingle = this->slowOptimiser->at(0);
+			this->fastOptimiserSingle = this->fastOptimiser->at(0);
+			this->initialParSingle = this->initialPar->at(0);
+		}
+		if (this->minMaxVals != NULL) 
+		{
+			this->useDefaultMinMax = false; // If minimum and maximum values are passed in use these insead
+		}
+		
+	}
+	
+	void RSGISObjectBasedEstimation::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, Envelope *env, long fid) throw(RSGISVectorException)
+	{
+		try 
+		{
+			// GET DATA
+			RSGISVectorUtils vecUtils;
+			OGRPolygon *inOGRPoly;
+			Polygon *poly;
+			inOGRPoly = (OGRPolygon *) inFeature->GetGeometryRef();			
+			poly = vecUtils.convertOGRPolygon2GEOSPolygon(inOGRPoly);
+			RSGISCalcImageValue *invValuesObj;
+			RSGISCalcImageValue *invValues;
+			
+			getValues->reset();
+			calcImageSingle->calcImageWithinPolygon(this->datasetsInput, 1, NULL, env, poly, false, polyContainsPixelCenter); // The pixel in poly method is hardcoded as 'polyContainsPixelCenter', no output is required
+			
+			unsigned int estClass = 0;
+			OGRFeatureDefn *inFeatureDefn = inFeature->GetDefnRef();
+			
+			if (useClass) 
+			{
+				int fieldIdx = inFeatureDefn->GetFieldIndex(this->classHeading.c_str());
+				estClass = inFeature->GetFieldAsInteger(fieldIdx) - 1;
+				
+				if (estClass >= this->slowOptimiser->size()) 
+				{
+					cout << "Class number greater than number classes parameterised for. Using last available class.\n";
+					estClass = this->slowOptimiser->size() - 1;	
+				}
+				this->slowOptimiserSingle = this->slowOptimiser->at(estClass);
+				this->fastOptimiserSingle = this->fastOptimiser->at(estClass);
+				this->initialParSingle = this->initialPar->at(estClass);
+			}
+			
+			// OBTAIN AVERAGE FOR OBJECT AND PERFORM INVERSION
+			if (this->useDefaultMinMax) 
+			{
+				invValuesObj = new RSGISEstimationAlgorithmSingleSpecies(this->numOutputBands, this->initialParSingle, this->slowOptimiserSingle, this->parameters);
+			}
+			else 
+			{
+				invValuesObj = new RSGISEstimationAlgorithmSingleSpecies(this->numOutputBands, this->initialParSingle, this->slowOptimiserSingle, this->parameters, this->minMaxVals[estClass]);
+			}
+			
+			float *outData = new float[numOutputBands]; // Create array large enough to hold all output bands (more than parameters)
+			float *inData = new float[this->numBands];
+			bool *indB = new bool[this->numBands];
+			bool *convertdB = new bool[this->numBands];
+			
+			for (int i = 0; i < this->numBands; i++)  // Loop through bands
+			{
+				inData[i] = 0;
+				for(unsigned int r = 0; r < pixelVals[i]->size(); r++) // Loop through pixels in object
+				{
+					if (r == 0) 
+					{
+						if ((pixelVals[i]->at(0) > 0)) 
+						{
+							indB[i] = false;
+							if ((pixelVals[i]->at(0) < 1)) 
+							{
+								convertdB[i] = true;
+							}
+							else 
+							{
+								convertdB[i] = false;
+							}
+						}
+					}
+					if (indB[i])
+					{
+						inData[i] = inData[i] + pow(10,(pixelVals[i]->at(r) / 10));
+					}
+					else
+					{
+						inData[i] = inData[i] + pixelVals[i]->at(r);
+					}
+				}
+			}
+			
+			for (int i = 0; i < this->numBands; i++) // Obtain average and convert to dB
+			{
+				if (convertdB[i]) 
+				{
+					inData[i] = 10*log10(inData[i] / pixelVals[i]->size());
+				}
+				else
+				{
+					inData[i] = inData[i] / pixelVals[i]->size();
+				}
+				
+				//cout << "inData[" << i << "] = " << inData[i] << endl;
+			}
+			
+			invValuesObj->calcImageValue(inData, this->numBands, outData);
+			
+			// Get averages for each band.
+			gsl_vector *localPar;
+			localPar = gsl_vector_alloc(this->numOutputPar);
+			for(unsigned int i = 0; i < this->numOutputPar; i++)
+			{
+				gsl_vector_set(localPar, i, outData[i]);
+			}
+			
+			//cout << "object height = " << gsl_vector_get(localPar, 0) << ", object density = " << gsl_vector_get(localPar, 1) << endl;
+
+			// SAVE PARAMETERS TO OUTPUT SHAPEFILE
+			OGRFeatureDefn *outFeatureDefn = outFeature->GetDefnRef();
+			if (this->parameters == heightDensity) 
+			{
+				outFeature->SetField(outFeatureDefn->GetFieldIndex("objHeight"), outData[0]);
+				outFeature->SetField(outFeatureDefn->GetFieldIndex("objDens"), outData[1]);
+				outFeature->SetField(outFeatureDefn->GetFieldIndex("objError"), outData[3]);
+			}
+			else if (this->parameters == cDepthDensity) 
+			{
+				outFeature->SetField(outFeatureDefn->GetFieldIndex("objCDepth"), outData[0]);
+				outFeature->SetField(outFeatureDefn->GetFieldIndex("objDens"), outData[1]);
+				outFeature->SetField(outFeatureDefn->GetFieldIndex("objError"), outData[3]);
+			}
+			else if(this->parameters == dielectricDensityHeight)
+			{
+				outFeature->SetField(outFeatureDefn->GetFieldIndex("objHeight"), outData[0]);
+				outFeature->SetField(outFeatureDefn->GetFieldIndex("objDens"), outData[1]);
+				outFeature->SetField(outFeatureDefn->GetFieldIndex("objEps"), outData[2]);
+				outFeature->SetField(outFeatureDefn->GetFieldIndex("objError"), outData[4]);
+			}
+			
+			// PARAMETERISE OPIMISER USING VALUES FROM DATA
+			// Update optimser if error low enought
+			
+			if ( outData[this->numOutputBands - 1] < 0.1 )
+			{
+				this->fastOptimiserSingle->modifyAPriori(localPar);
+			}
+			else 
+			{
+				this->fastOptimiserSingle->modifyAPriori(this->initialParSingle);
+			}
+			
+			// RUN INVERISION ON ALL PIXELS IN OBJECT
+			if (this->useDefaultMinMax) 
+			{
+				invValues = new RSGISEstimationAlgorithmSingleSpecies(this->numOutputBands, localPar, this->fastOptimiserSingle, this->parameters);
+			}
+			else 
+			{
+				invValues = new RSGISEstimationAlgorithmSingleSpecies(this->numOutputBands, localPar, this->fastOptimiserSingle, this->parameters, this->minMaxVals[estClass]);
+			}
+
+			calcImage = new RSGISCalcImage(invValues, "", true);
+			calcImage->calcImageWithinPolygon(this->datasetsIO, 2, env, poly, polyContainsPixelCenter);
+			
+			// TIDY
+			gsl_vector_free(localPar);
+			delete invValues;
+			delete invValuesObj;
+			delete calcImage;
+			delete[] inData;
+			delete[] outData;
+			delete[] indB;
+			delete[] convertdB;
+		}
+		catch(RSGISException& e)
+		{
+			throw RSGISVectorException(e.what());
+		}
+		
+	}	
+	
+	void RSGISObjectBasedEstimation::processFeature(OGRFeature *inFeature, Envelope *env, long fid) throw(RSGISVectorException)
+	{
+		try 
+		{
+			// GET DATA
+			RSGISVectorUtils vecUtils;
+			OGRPolygon *inOGRPoly;
+			Polygon *poly;
+			RSGISCalcImageValue *invValuesObj;
+			RSGISCalcImageValue *invValues;
+			inOGRPoly = (OGRPolygon *) inFeature->GetGeometryRef();			
+			poly = vecUtils.convertOGRPolygon2GEOSPolygon(inOGRPoly);
+			getValues->reset();
+			calcImageSingle->calcImageWithinPolygon(this->datasetsInput, 1, NULL, env, poly, false, polyContainsPixelCenter); // The pixel in poly method is hardcoded as 'polyContainsPixelCenter', no output is required
+			
+			unsigned int estClass = 0;
+			OGRFeatureDefn *inFeatureDefn = inFeature->GetDefnRef();
+			
+			if (useClass) 
+			{
+				int fieldIdx = inFeatureDefn->GetFieldIndex(this->classHeading.c_str());
+				estClass = inFeature->GetFieldAsInteger(fieldIdx) - 1;
+				
+				if (estClass >= this->slowOptimiser->size()) 
+				{
+					cout << "Class number greater than number classes parameterised for. Using last available class.\n";
+					estClass = this->slowOptimiser->size() - 1;
+				}
+				this->slowOptimiserSingle = this->slowOptimiser->at(estClass);
+				this->fastOptimiserSingle = this->fastOptimiser->at(estClass);
+				this->initialParSingle = this->initialPar->at(estClass);
+			}
+			
+			
+			// OBTAIN AVERAGE FOR OBJECT AND PERFORM INVERSION
+			if (this->useDefaultMinMax) 
+			{
+				invValuesObj = new RSGISEstimationAlgorithmSingleSpecies(this->numOutputBands, this->initialParSingle, this->slowOptimiserSingle, this->parameters);
+			}
+			else 
+			{
+				invValuesObj = new RSGISEstimationAlgorithmSingleSpecies(this->numOutputBands, this->initialParSingle, this->slowOptimiserSingle, this->parameters, this->minMaxVals[estClass]);
+			}
+			
+			float *outData = new float[numOutputBands]; // Create array large enough to hold all output bands (more than parameters)
+			float *inData = new float[this->numBands];
+			
+			for (int i = 0; i < this->numBands; i++)  // Loop through bands
+			{
+				for(unsigned int r = 0; r < pixelVals[i]->size(); r++) // Loop through pixels in object
+				{
+					inData[i] = inData[i] + pow(10,(pixelVals[i]->at(r) / 10));
+				}
+			}
+			
+			for (int i = 0; i < this->numBands; i++) // Obtain average and convert to dB
+			{
+				inData[i] = 10*log10(inData[i] / pixelVals[i]->size());
+			}
+			
+			//invValues->calcImageValue(inData, this->numBands, outData);
+			
+			// Get averages for each band.
+			gsl_vector *localPar;
+			localPar = gsl_vector_alloc(this->numOutputPar);
+			for(unsigned int i = 0; i < this->numOutputPar; i++)
+			{
+				gsl_vector_set(localPar, i, outData[i]);
+			}
+			
+			// PARAMETERISE OPIMISER USING VALUES FROM DATA
+			// Update optimser
+			if ( outData[this->numOutputBands - 1] < 0.1 )
+			{
+				this->fastOptimiserSingle->modifyAPriori(localPar);
+			}
+			else 
+			{
+				this->fastOptimiserSingle->modifyAPriori(this->initialParSingle);
+			}
+			
+			// RUN INVERISION ON ALL PIXELS IN OBJECT
+			if (this->useDefaultMinMax) 
+			{
+				invValues = new RSGISEstimationAlgorithmSingleSpecies(this->numOutputBands, localPar, this->fastOptimiserSingle, this->parameters);
+			}
+			else 
+			{
+				invValues = new RSGISEstimationAlgorithmSingleSpecies(this->numOutputBands, localPar, this->fastOptimiserSingle, this->parameters, this->minMaxVals[estClass]);
+			}
+			calcImage = new RSGISCalcImage(invValues, "", true);
+			calcImage->calcImageWithinPolygon(this->datasetsIO, 2, env, poly, polyContainsPixelCenter);
+			
+			// TIDY
+			gsl_vector_free(localPar);
+			delete invValues;
+			delete invValuesObj;
+			delete calcImage;
+			delete[] inData;
+			delete[] outData;
+		}
+		catch(RSGISException& e)
+		{
+			throw RSGISVectorException(e.what());
+		}
+		
+	}
+	
+	void RSGISObjectBasedEstimation::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException)
+	{
+		if(this->parameters == heightDensity)
+		{
+			OGRFieldDefn shpField1("objHeight", OFTReal);
+			shpField1.SetPrecision(10);
+			if( outputLayer->CreateField( &shpField1 ) != OGRERR_NONE )
+			{
+				string message = string("Creating shapefile field \'objHeight\' has failed");
+				throw RSGISVectorOutputException(message.c_str());
+			}
+			OGRFieldDefn shpField2("objDens", OFTReal);
+			shpField2.SetPrecision(10);
+			if( outputLayer->CreateField( &shpField2 ) != OGRERR_NONE )
+			{
+				string message = string("Creating shapefile field \'objHeight\' has failed");
+				throw RSGISVectorOutputException(message.c_str());
+			}
+			OGRFieldDefn shpField3("objError", OFTReal);
+			shpField3.SetPrecision(10);
+			if( outputLayer->CreateField( &shpField3 ) != OGRERR_NONE )
+			{
+				string message = string("Creating shapefile field \'objError\' has failed");
+				throw RSGISVectorOutputException(message.c_str());
+			}
+		}
+		else if(this->parameters == cDepthDensity)
+		{
+			OGRFieldDefn shpField1("objCDepth", OFTReal);
+			shpField1.SetPrecision(10);
+			if( outputLayer->CreateField( &shpField1 ) != OGRERR_NONE )
+			{
+				string message = string("Creating shapefile field \'objCDepth\' has failed");
+				throw RSGISVectorOutputException(message.c_str());
+			}
+			OGRFieldDefn shpField2("objDens", OFTReal);
+			shpField2.SetPrecision(10);
+			if( outputLayer->CreateField( &shpField2 ) != OGRERR_NONE )
+			{
+				string message = string("Creating shapefile field \'objHeight\' has failed");
+				throw RSGISVectorOutputException(message.c_str());
+			}
+			OGRFieldDefn shpField3("objError", OFTReal);
+			shpField3.SetPrecision(10);
+			if( outputLayer->CreateField( &shpField3 ) != OGRERR_NONE )
+			{
+				string message = string("Creating shapefile field \'objError\' has failed");
+				throw RSGISVectorOutputException(message.c_str());
+			}
+		}
+		else if(this->parameters == dielectricDensityHeight)
+		{
+			OGRFieldDefn shpField1("objHeight", OFTReal);
+			shpField1.SetPrecision(10);
+			if( outputLayer->CreateField( &shpField1 ) != OGRERR_NONE )
+			{
+				string message = string("Creating shapefile field \'objHeight\' has failed");
+				throw RSGISVectorOutputException(message.c_str());
+			}
+			OGRFieldDefn shpField2("objDens", OFTReal);
+			shpField2.SetPrecision(10);
+			if( outputLayer->CreateField( &shpField2 ) != OGRERR_NONE )
+			{
+				string message = string("Creating shapefile field \'objHeight\' has failed");
+				throw RSGISVectorOutputException(message.c_str());
+			}
+			OGRFieldDefn shpField3("objEps", OFTReal);
+			shpField3.SetPrecision(10);
+			if( outputLayer->CreateField( &shpField3 ) != OGRERR_NONE )
+			{
+				string message = string("Creating shapefile field \'objEps\' has failed");
+				throw RSGISVectorOutputException(message.c_str());
+			}
+			OGRFieldDefn shpField4("objError", OFTReal);
+			shpField4.SetPrecision(10);
+			if( outputLayer->CreateField( &shpField4 ) != OGRERR_NONE )
+			{
+				string message = string("Creating shapefile field \'objError\' has failed");
+				throw RSGISVectorOutputException(message.c_str());
+			}
+		}
+		else 
+		{
+			throw RSGISVectorOutputException("Input parameters not recognised, could not create fields\n");
+		}
+	}
+		
+	RSGISObjectBasedEstimation::~RSGISObjectBasedEstimation()
+	{
+		delete[] pixelVals;
+		delete getValues;
+		delete calcImageSingle;
+	}
+    
+    RSGISObjectBasedEstimationObjectAP::RSGISObjectBasedEstimationObjectAP(GDALDataset *inputImage, GDALDataset *outputImage, vector <gsl_vector*> *initialPar, vector <RSGISEstimationOptimiser*> *slowOptimiser, vector <RSGISEstimationOptimiser*> *fastOptimiser, estParameters parameters, string *apParField, double ***minMaxVals, string classHeading, bool useClass)
+	{
+		this->datasetsIO = new GDALDataset*[2];
+		this->datasetsInput = new GDALDataset*[1];
+		this->datasetsIO[0] = inputImage;
+		this->datasetsIO[1] = outputImage;
+		this->datasetsInput[0] = inputImage;
+		this->slowOptimiser = slowOptimiser; // Initial optimiser, for selection of object.
+		this->fastOptimiser = fastOptimiser; // Fast optimser, for entire object.
+		this->numBands = inputImage->GetRasterCount();
+		this->objectSamplesPercent = 0.1; // Percent of pixels in object to use with slow optimisers.
+		this->parameters = parameters;
+		this->initialPar = initialPar;
+		this->classHeading = classHeading;
+		this->useClass = useClass;
+		this->minMaxVals = minMaxVals;
+		this->useDefaultMinMax = true;
+		this->apParField = apParField;
+		if (this->parameters == cDepthDensity | this->parameters == heightDensity) // Set number of output parameters
+		{
+			this->numOutputPar = 2;
+		}
+		else if(this->parameters == dielectricDensityHeight)
+		{
+			this->numOutputPar = 3;
+		}
+		else 
+		{
+			throw RSGISException("Parameters not recognised");
+		}
+		this->numOutputBands = numOutputPar + 2; // Extra bands for biomass and error
+		this->pixelVals = new vector<float>*[numBands];
+        
+		// Calc image to get values (for initial inversion)
+		this->getValues = new RSGISObjectBasedEstimationGetObjVals(pixelVals, numBands);
+		this->calcImageSingle = new RSGISCalcImageSingle(getValues);
+		
+		if (!useClass) 
+		{
+			this->initialParSingle = this->initialPar->at(0);
+		}
+		if (this->minMaxVals != NULL) 
+		{
+			this->useDefaultMinMax = false; // If minimum and maximum values are passed in use these insead
+		}
+		
+	}
+	
+	void RSGISObjectBasedEstimationObjectAP::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, Envelope *env, long fid) throw(RSGISVectorException)
+	{
+		try 
+		{
+			// GET DATA
+			RSGISVectorUtils vecUtils;
+			OGRPolygon *inOGRPoly;
+			Polygon *poly;
+			RSGISCalcImageValue *invValuesObj;
+			RSGISCalcImageValue *invValues;
+			
+			inOGRPoly = (OGRPolygon *) inFeature->GetGeometryRef();			
+			poly = vecUtils.convertOGRPolygon2GEOSPolygon(inOGRPoly);
+			getValues->reset();
+			calcImageSingle->calcImageWithinPolygon(this->datasetsInput, 1, NULL, env, poly, false, polyContainsPixelCenter); // The pixel in poly method is hardcoded as 'polyContainsPixelCenter', no output is required
+			
+			unsigned int estClass = 0;
+			OGRFeatureDefn *inFeatureDefn = inFeature->GetDefnRef();
+			
+			if (useClass) 
+			{
+				int fieldIdx = inFeatureDefn->GetFieldIndex(this->classHeading.c_str());
+				estClass = inFeature->GetFieldAsInteger(fieldIdx) - 1;
+				
+				if (estClass >= this->slowOptimiser->size()) 
+				{
+					cout << "Class number greater than number classes parameterised for. Using last available class.\n";
+					estClass = this->slowOptimiser->size() - 1;	
+				}
+				this->slowOptimiserSingle = this->slowOptimiser->at(estClass);
+				this->fastOptimiserSingle = this->fastOptimiser->at(estClass);
+				this->initialParSingle = this->initialPar->at(estClass);
+			}
+			
+			// MODIFY AP PARAMETERS BASED ON INPUT SHAPEFILE
+			gsl_vector *objAP;
+			objAP = gsl_vector_alloc(this->numOutputPar);
+			
+			for(unsigned int i = 0; i < this->numOutputPar; i++)
+			{
+				int fieldIdx = inFeatureDefn->GetFieldIndex(this->apParField[i].c_str());
+				double apPar = inFeature->GetFieldAsDouble(fieldIdx);
+				if (apPar != 0) 
+				{
+					gsl_vector_set(objAP, i, apPar);
+				}
+				else // If values from object are zero, revert to general a priori estimates
+				{
+					gsl_vector_set(objAP, i, gsl_vector_get(this->initialParSingle, i));
+				}
+
+			}
+			
+			this->slowOptimiserSingle->modifyAPriori(objAP);
+			
+			// OBTAIN AVERAGE FOR OBJECT AND PERFORM INVERSION
+			if (this->useDefaultMinMax) 
+			{
+				invValuesObj = new RSGISEstimationAlgorithmSingleSpecies(this->numOutputBands, this->initialParSingle, this->slowOptimiserSingle, this->parameters);
+			}
+			else 
+			{
+				invValuesObj = new RSGISEstimationAlgorithmSingleSpecies(this->numOutputBands, this->initialParSingle, this->slowOptimiserSingle, this->parameters, this->minMaxVals[estClass]);
+			}
+			
+			float *outData = new float[numOutputBands]; // Create array large enough to hold all output bands (more than parameters)
+			float *inData = new float[this->numBands];
+			bool *indB = new bool[this->numBands];
+			bool *convertdB = new bool[this->numBands];
+			
+			for (int i = 0; i < this->numBands; i++)  // Loop through bands
+			{
+				inData[i] = 0;
+				for(unsigned int r = 0; r < pixelVals[i]->size(); r++) // Loop through pixels in object
+				{
+					if (r == 0) 
+					{
+						if ((pixelVals[i]->at(0) > 0)) 
+						{
+							indB[i] = false;
+							if ((pixelVals[i]->at(0) < 1)) 
+							{
+								convertdB[i] = true;
+							}
+							else 
+							{
+								convertdB[i] = false;
+							}
+						}
+					}
+					if (indB[i])
+					{
+						inData[i] = inData[i] + pow(10,(pixelVals[i]->at(r) / 10));
+					}
+					else
+					{
+						inData[i] = inData[i] + pixelVals[i]->at(r);
+					}
+				}
+			}
+			
+			for (int i = 0; i < this->numBands; i++) // Obtain average and convert to dB
+			{
+				if (convertdB[i]) 
+				{
+					inData[i] = 10*log10(inData[i] / pixelVals[i]->size());
+				}
+				else
+				{
+					inData[i] = inData[i] / pixelVals[i]->size();
+				}
+			}
+			
+			invValuesObj->calcImageValue(inData, this->numBands, outData);
+			
+			// Get averages for each band.
+			gsl_vector *localPar;
+			localPar = gsl_vector_alloc(this->numOutputPar);
+			for(unsigned int i = 0; i < this->numOutputPar; i++)
+			{
+				gsl_vector_set(localPar, i, outData[i]);
+			}
+			
+			// SAVE PARAMETERS TO OUTPUT SHAPEFILE
+			OGRFeatureDefn *outFeatureDefn = outFeature->GetDefnRef();
+			if (this->parameters == heightDensity) 
+			{
+				outFeature->SetField(outFeatureDefn->GetFieldIndex("objHeight"), outData[0]);
+				outFeature->SetField(outFeatureDefn->GetFieldIndex("objDens"), outData[1]);
+				outFeature->SetField(outFeatureDefn->GetFieldIndex("objError"), outData[3]);
+			}
+			else if (this->parameters == cDepthDensity) 
+			{
+				outFeature->SetField(outFeatureDefn->GetFieldIndex("objCDepth"), outData[0]);
+				outFeature->SetField(outFeatureDefn->GetFieldIndex("objDens"), outData[1]);
+				outFeature->SetField(outFeatureDefn->GetFieldIndex("objError"), outData[3]);
+			}
+			else if(this->parameters == dielectricDensityHeight)
+			{
+				outFeature->SetField(outFeatureDefn->GetFieldIndex("objHeight"), outData[0]);
+				outFeature->SetField(outFeatureDefn->GetFieldIndex("objDens"), outData[1]);
+				outFeature->SetField(outFeatureDefn->GetFieldIndex("objEps"), outData[2]);
+				outFeature->SetField(outFeatureDefn->GetFieldIndex("objError"), outData[4]);
+			}
+			
+			// PARAMETERISE OPIMISER USING VALUES FROM DATA
+			// Update optimser
+			if ( outData[this->numOutputBands - 1] < 0.1 )
+			{
+				this->fastOptimiserSingle->modifyAPriori(localPar);
+			}
+			else 
+			{
+				this->fastOptimiserSingle->modifyAPriori(this->initialParSingle);
+			}
+			
+			// RUN INVERISION ON ALL PIXELS IN OBJECT
+			if (this->useDefaultMinMax) 
+			{
+				invValues = new RSGISEstimationAlgorithmSingleSpecies(this->numOutputBands, localPar, this->fastOptimiserSingle, this->parameters);
+			}
+			else 
+			{
+				invValues = new RSGISEstimationAlgorithmSingleSpecies(this->numOutputBands, localPar, this->fastOptimiserSingle, this->parameters, this->minMaxVals[estClass]);
+			}
+			
+			calcImage = new RSGISCalcImage(invValues, "", true);
+			calcImage->calcImageWithinPolygon(this->datasetsIO, 2, env, poly, polyContainsPixelCenter);
+			
+			// TIDY
+			gsl_vector_free(localPar);
+			gsl_vector_free(objAP);
+			delete invValuesObj;
+			delete invValues;
+			delete calcImage;
+			delete[] inData;
+			delete[] outData;
+		}
+		catch(RSGISException& e)
+		{
+			throw RSGISVectorException(e.what());
+		}
+		
+	}	
+	
+	void RSGISObjectBasedEstimationObjectAP::processFeature(OGRFeature *inFeature, Envelope *env, long fid) throw(RSGISVectorException)
+	{
+		try 
+		{
+			// GET DATA
+			RSGISVectorUtils vecUtils;
+			OGRPolygon *inOGRPoly;
+			Polygon *poly;
+			RSGISCalcImageValue *invValuesObj;
+			RSGISCalcImageValue *invValues;
+			
+			inOGRPoly = (OGRPolygon *) inFeature->GetGeometryRef();			
+			poly = vecUtils.convertOGRPolygon2GEOSPolygon(inOGRPoly);
+			getValues->reset();
+			calcImageSingle->calcImageWithinPolygon(this->datasetsInput, 1, NULL, env, poly, false, polyContainsPixelCenter); // The pixel in poly method is hardcoded as 'polyContainsPixelCenter', no output is required
+			
+			unsigned int estClass = 0;
+			OGRFeatureDefn *inFeatureDefn = inFeature->GetDefnRef();
+			
+			if (useClass) 
+			{
+				int fieldIdx = inFeatureDefn->GetFieldIndex(this->classHeading.c_str());
+				estClass = inFeature->GetFieldAsInteger(fieldIdx) - 1;
+				
+				if (estClass >= this->slowOptimiser->size()) 
+				{
+					cout << "Class number greater than number classes parameterised for. Using last available class.\n";
+					estClass = this->slowOptimiser->size() - 1;	
+				}
+				this->slowOptimiserSingle = this->slowOptimiser->at(estClass);
+				this->fastOptimiserSingle = this->fastOptimiser->at(estClass);
+				this->initialParSingle = this->initialPar->at(estClass);
+			}
+			
+			// MODIFY AP PARAMETERS BASED ON INPUT SHAPEFILE
+			gsl_vector *objAP;
+			objAP = gsl_vector_alloc(this->numOutputPar);
+			
+			for(unsigned int i = 0; i < this->numOutputPar; i++)
+			{
+				int fieldIdx = inFeatureDefn->GetFieldIndex(this->apParField[i].c_str());
+				double apPar = inFeature->GetFieldAsDouble(fieldIdx);
+				if (apPar != 0) 
+				{
+					gsl_vector_set(objAP, i, apPar);
+				}
+				else // If values from object are zero, revert to general a priori estimates
+				{
+					gsl_vector_set(objAP, i, gsl_vector_get(this->initialParSingle, i));
+				}
+				
+			}
+			
+			this->slowOptimiserSingle->modifyAPriori(objAP);
+			
+			// OBTAIN AVERAGE FOR OBJECT AND PERFORM INVERSION
+			if (this->useDefaultMinMax) 
+			{
+				invValuesObj = new RSGISEstimationAlgorithmSingleSpecies(this->numOutputBands, this->initialParSingle, this->slowOptimiserSingle, this->parameters);
+			}
+			else 
+			{
+				invValuesObj = new RSGISEstimationAlgorithmSingleSpecies(this->numOutputBands, this->initialParSingle, this->slowOptimiserSingle, this->parameters, this->minMaxVals[estClass]);
+			}
+			
+			float *outData = new float[numOutputBands]; // Create array large enough to hold all output bands (more than parameters)
+			float *inData = new float[this->numBands];
+			bool *indB = new bool[this->numBands];
+			bool *convertdB = new bool[this->numBands];
+			
+			for (int i = 0; i < this->numBands; i++)  // Loop through bands
+			{
+				inData[i] = 0;
+				for(unsigned int r = 0; r < pixelVals[i]->size(); r++) // Loop through pixels in object
+				{
+					if (r == 0) 
+					{
+						if ((pixelVals[i]->at(0) > 0)) 
+						{
+							indB[i] = false;
+							if ((pixelVals[i]->at(0) < 1)) 
+							{
+								convertdB[i] = true;
+							}
+							else 
+							{
+								convertdB[i] = false;
+							}
+						}
+					}
+					if (indB[i])
+					{
+						inData[i] = inData[i] + pow(10,(pixelVals[i]->at(r) / 10));
+					}
+					else
+					{
+						inData[i] = inData[i] + pixelVals[i]->at(r);
+					}
+				}
+			}
+			
+			for (int i = 0; i < this->numBands; i++) // Obtain average and convert to dB
+			{
+				if (convertdB[i]) 
+				{
+					inData[i] = 10*log10(inData[i] / pixelVals[i]->size());
+				}
+				else
+				{
+					inData[i] = inData[i] / pixelVals[i]->size();
+				}
+			}
+			
+			invValuesObj->calcImageValue(inData, this->numBands, outData);
+			
+			// Get averages for each band.
+			gsl_vector *localPar;
+			localPar = gsl_vector_alloc(this->numOutputPar);
+			for(unsigned int i = 0; i < this->numOutputPar; i++)
+			{
+				gsl_vector_set(localPar, i, outData[i]);
+			}
+			
+			// PARAMETERISE OPIMISER USING VALUES FROM DATA
+			// Update optimser
+			if ( outData[this->numOutputBands - 1] < 0.1 )
+			{
+				this->fastOptimiserSingle->modifyAPriori(localPar);
+			}
+			else 
+			{
+				this->fastOptimiserSingle->modifyAPriori(this->initialParSingle);
+			}
+			
+			// RUN INVERISION ON ALL PIXELS IN OBJECT
+			if (this->useDefaultMinMax) 
+			{
+				invValues = new RSGISEstimationAlgorithmSingleSpecies(this->numOutputBands, localPar, this->fastOptimiserSingle, this->parameters);
+			}
+			else 
+			{
+				invValues = new RSGISEstimationAlgorithmSingleSpecies(this->numOutputBands, localPar, this->fastOptimiserSingle, this->parameters, this->minMaxVals[estClass]);
+			}
+			
+			calcImage = new RSGISCalcImage(invValues, "", true);
+			calcImage->calcImageWithinPolygon(this->datasetsIO, 2, env, poly, polyContainsPixelCenter);
+			
+			// TIDY
+			gsl_vector_free(localPar);
+			gsl_vector_free(objAP);
+			delete invValues;
+			delete calcImage;
+			delete calcImage;
+			delete[] inData;
+			delete[] outData;
+		}
+		catch(RSGISException& e)
+		{
+			throw RSGISVectorException(e.what());
+		}
+		
+	}
+	
+	void RSGISObjectBasedEstimationObjectAP::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException)
+	{
+		if(this->parameters == heightDensity)
+		{
+			OGRFieldDefn shpField1("objHeight", OFTReal);
+			shpField1.SetPrecision(10);
+			if( outputLayer->CreateField( &shpField1 ) != OGRERR_NONE )
+			{
+				string message = string("Creating shapefile field \'objHeight\' has failed");
+				throw RSGISVectorOutputException(message.c_str());
+			}
+			OGRFieldDefn shpField2("objDens", OFTReal);
+			shpField2.SetPrecision(10);
+			if( outputLayer->CreateField( &shpField2 ) != OGRERR_NONE )
+			{
+				string message = string("Creating shapefile field \'objHeight\' has failed");
+				throw RSGISVectorOutputException(message.c_str());
+			}
+			OGRFieldDefn shpField3("objError", OFTReal);
+			shpField3.SetPrecision(10);
+			if( outputLayer->CreateField( &shpField3 ) != OGRERR_NONE )
+			{
+				string message = string("Creating shapefile field \'objError\' has failed");
+				throw RSGISVectorOutputException(message.c_str());
+			}
+		}
+		else if(this->parameters == cDepthDensity)
+		{
+			OGRFieldDefn shpField1("objCDepth", OFTReal);
+			shpField1.SetPrecision(10);
+			if( outputLayer->CreateField( &shpField1 ) != OGRERR_NONE )
+			{
+				string message = string("Creating shapefile field \'objCDepth\' has failed");
+				throw RSGISVectorOutputException(message.c_str());
+			}
+			OGRFieldDefn shpField2("objDens", OFTReal);
+			shpField2.SetPrecision(10);
+			if( outputLayer->CreateField( &shpField2 ) != OGRERR_NONE )
+			{
+				string message = string("Creating shapefile field \'objHeight\' has failed");
+				throw RSGISVectorOutputException(message.c_str());
+			}
+			OGRFieldDefn shpField3("objError", OFTReal);
+			shpField3.SetPrecision(10);
+			if( outputLayer->CreateField( &shpField3 ) != OGRERR_NONE )
+			{
+				string message = string("Creating shapefile field \'objError\' has failed");
+				throw RSGISVectorOutputException(message.c_str());
+			}
+		}
+		else if(this->parameters == dielectricDensityHeight)
+		{
+			OGRFieldDefn shpField1("objHeight", OFTReal);
+			shpField1.SetPrecision(10);
+			if( outputLayer->CreateField( &shpField1 ) != OGRERR_NONE )
+			{
+				string message = string("Creating shapefile field \'objHeight\' has failed");
+				throw RSGISVectorOutputException(message.c_str());
+			}
+			OGRFieldDefn shpField2("objDens", OFTReal);
+			shpField2.SetPrecision(10);
+			if( outputLayer->CreateField( &shpField2 ) != OGRERR_NONE )
+			{
+				string message = string("Creating shapefile field \'objHeight\' has failed");
+				throw RSGISVectorOutputException(message.c_str());
+			}
+			OGRFieldDefn shpField3("objEps", OFTReal);
+			shpField3.SetPrecision(10);
+			if( outputLayer->CreateField( &shpField3 ) != OGRERR_NONE )
+			{
+				string message = string("Creating shapefile field \'objEps\' has failed");
+				throw RSGISVectorOutputException(message.c_str());
+			}
+			OGRFieldDefn shpField4("objError", OFTReal);
+			shpField4.SetPrecision(10);
+			if( outputLayer->CreateField( &shpField4 ) != OGRERR_NONE )
+			{
+				string message = string("Creating shapefile field \'objError\' has failed");
+				throw RSGISVectorOutputException(message.c_str());
+			}
+		}
+		else 
+		{
+			throw RSGISVectorOutputException("Input parameters not recognised, could not create fields\n");
+		}
+	}
+    
+	RSGISObjectBasedEstimationObjectAP::~RSGISObjectBasedEstimationObjectAP()
+	{
+		delete[] pixelVals;
+		delete getValues;
+		delete calcImageSingle;
+	}
+	
+	RSGISObjectBasedEstimationRasterPolygon::RSGISObjectBasedEstimationRasterPolygon(GDALDataset *inputImage, GDALDataset *outputImage,  GDALDataset *rasterFeatures, vector <gsl_vector*> *initialPar, vector <RSGISEstimationOptimiser*> *slowOptimiser, vector <RSGISEstimationOptimiser*> *fastOptimiser, estParameters parameters, double ***minMaxVals, string classHeading, bool useClass)
+	{
+		this->datasetsIO = new GDALDataset*[3];
+		this->datasetsInput = new GDALDataset*[2];
+		this->datasetsIO[0] = rasterFeatures;
+		this->datasetsIO[1] = inputImage;
+		this->datasetsIO[2] = outputImage;
+		this->datasetsInput[0] = rasterFeatures;
+		this->datasetsInput[1] = inputImage;
+		this->slowOptimiser = slowOptimiser; // Initial optimiser, for selection of object.
+		this->fastOptimiser = fastOptimiser; // Fast optimser, for entire object.
+		this->numBands = inputImage->GetRasterCount();		
+		this->numOutputPar = 2;
+		this->numOutputBands = numOutputPar + 2; // Extra bands for biomass and error
+		this->pixelVals = new vector<float>*[numBands];
+		this->objectSamplesPercent = 0.1; // Percent of pixels in object to use with slow optimisers.
+		this->parameters = parameters;
+		this->initialPar = initialPar;
+		this->minMaxVals = minMaxVals;
+		this->useDefaultMinMax = true;
+		
+		this->classHeading = classHeading;
+		this->useClass = useClass;
+		
+		// Calc image to get values (for initial inversion)
+		this->getValues = new RSGISObjectBasedEstimationGetObjVals(pixelVals, numBands);
+		this->calcImageSingle = new RSGISCalcImageSingle(getValues);
+		
+		if (!useClass) 
+		{
+			this->slowOptimiserSingle = this->slowOptimiser->at(0);
+			this->fastOptimiserSingle = this->fastOptimiser->at(0);
+			this->initialParSingle = this->initialPar->at(0);
+		}
+		if (this->minMaxVals != NULL) 
+		{
+			this->useDefaultMinMax = false; // If minimum and maximum values are passed in use these insead
+		}
+		
+	}
+	
+	void RSGISObjectBasedEstimationRasterPolygon::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, Envelope *env, long fid) throw(RSGISVectorException)
+	{
+		try 
+		{
+			
+			// GET DATA
+			getValues->reset();
+			calcImageSingle->calcImageWithinRasterPolygon(this->datasetsInput, 2, NULL, env, fid, false);
+			unsigned int estClass = 0;
+			OGRFeatureDefn *inFeatureDefn = inFeature->GetDefnRef();
+			
+			if (useClass) 
+			{
+				//cout << "Class Heading = " << this->classHeading <<  endl;
+				int fieldIdx = inFeatureDefn->GetFieldIndex(this->classHeading.c_str());
+				estClass = inFeature->GetFieldAsInteger(fieldIdx) - 1;
+				
+				cout << "Est Class = " << estClass << endl;
+				
+				if (estClass >= this->slowOptimiser->size()) 
+				{
+					cout << "Class number greater than number classes parameterised for. Using last available class.\n";
+					estClass = this->slowOptimiser->size() - 1;
+				}
+				this->slowOptimiserSingle = this->slowOptimiser->at(estClass);
+				this->fastOptimiserSingle = this->fastOptimiser->at(estClass);
+				this->initialParSingle = this->initialPar->at(estClass);
+			}
+			
+			// OBTAIN AVERAGE FOR OBJECT AND PERFORM INVERSION
+			invValues = new RSGISEstimationAlgorithmSingleSpecies(this->numOutputBands, this->initialParSingle, this->slowOptimiserSingle, this->parameters);
+			
+			float *outData = new float[numOutputBands]; // Create array large enough to hold all output bands (more than parameters)
+			float *inData = new float[this->numBands];
+			bool *indB = new bool[this->numBands];
+			bool *convertdB = new bool[this->numBands];
+			
+			for (int i = 0; i < this->numBands; i++)  // Loop through bands
+			{
+				inData[i] = 0;
+				for(unsigned int r = 0; r < pixelVals[i]->size(); r++) // Loop through pixels in object
+				{
+					if (r == 0) 
+					{
+						if ((pixelVals[i]->at(0) > 0)) 
+						{
+							indB[i] = false;
+							if ((pixelVals[i]->at(0) < 1)) 
+							{
+								convertdB[i] = true;
+							}
+							else 
+							{
+								convertdB[i] = false;
+							}
+						}
+					}
+					if (indB[i])
+					{
+						inData[i] = inData[i] + pow(10,(pixelVals[i]->at(r) / 10));
+					}
+					else
+					{
+						inData[i] = inData[i] + pixelVals[i]->at(r);
+					}
+				}
+			}
+			
+			for (int i = 0; i < this->numBands; i++) // Obtain average and convert to dB
+			{
+				if (convertdB[i]) 
+				{
+					inData[i] = 10*log10(inData[i] / pixelVals[i]->size());
+				}
+				else
+				{
+					inData[i] = inData[i] / pixelVals[i]->size();
+				}
+			}
+			
+			invValues->calcImageValue(inData, this->numBands, outData);
+			
+			// Get averages for each band.
+			gsl_vector *localPar;
+			localPar = gsl_vector_alloc(this->numOutputPar);
+			for(unsigned int i = 0; i < this->numOutputPar; i++)
+			{
+				gsl_vector_set(localPar, i, outData[i]);
+			}
+			
+			// SAVE PARAMETERS TO OUTPUT SHAPEFILE
+			OGRFeatureDefn *outFeatureDefn = outFeature->GetDefnRef();
+			if (this->parameters == heightDensity) 
+			{
+				outFeature->SetField(outFeatureDefn->GetFieldIndex("objHeight"), outData[0]);
+				outFeature->SetField(outFeatureDefn->GetFieldIndex("objDens"), outData[1]);
+				outFeature->SetField(outFeatureDefn->GetFieldIndex("objError"), outData[3]);
+			}
+			else if (this->parameters == cDepthDensity) 
+			{
+				outFeature->SetField(outFeatureDefn->GetFieldIndex("objCDepth"), outData[0]);
+				outFeature->SetField(outFeatureDefn->GetFieldIndex("objDens"), outData[1]);
+				outFeature->SetField(outFeatureDefn->GetFieldIndex("objError"), outData[3]);
+			}
+			
+			// PARAMETERISE OPIMISER USING VALUES FROM DATA
+			// Update optimser
+
+			this->fastOptimiser->at(estClass)->modifyAPriori(localPar);
+			
+			// RUN INVERISION ON ALL PIXELS IN OBJECT
+			if (this->useDefaultMinMax) 
+			{
+				invValues = new RSGISEstimationAlgorithmSingleSpecies(this->numOutputBands, localPar, this->fastOptimiserSingle, this->parameters);
+			}
+			else 
+			{
+				invValues = new RSGISEstimationAlgorithmSingleSpecies(this->numOutputBands, localPar, this->fastOptimiserSingle, this->parameters, this->minMaxVals[estClass]);
+			}
+			calcImage = new RSGISCalcImage(invValues, "", true);
+			calcImage->calcImageWithinRasterPolygon(this->datasetsIO, 3, env, fid);
+			
+			// TIDY
+			gsl_vector_free(localPar);
+			delete invValues;
+			delete calcImage;
+			delete[] inData;
+			delete[] outData;
+		}
+		catch(RSGISException& e)
+		{
+			throw RSGISVectorException(e.what());
+		}
+		
+	}	
+	
+	void RSGISObjectBasedEstimationRasterPolygon::processFeature(OGRFeature *inFeature, Envelope *env, long fid) throw(RSGISVectorException)
+	{
+		try
+		{
+			// GET DATA
+			getValues->reset();
+			calcImageSingle->calcImageWithinRasterPolygon(this->datasetsInput, 2, NULL, env, fid, false);
+			unsigned int estClass = 0;
+			OGRFeatureDefn *inFeatureDefn = inFeature->GetDefnRef();
+			
+			if (useClass) 
+			{
+				int fieldIdx = inFeatureDefn->GetFieldIndex(this->classHeading.c_str());
+				estClass = inFeature->GetFieldAsInteger(fieldIdx) - 1;
+				
+				if (estClass >= this->slowOptimiser->size()) 
+				{
+					cout << "Class number greater than number classes parameterised for. Using last available class.\n";
+					estClass = this->slowOptimiser->size() - 1;
+				}
+				
+				this->slowOptimiserSingle = this->slowOptimiser->at(estClass);
+				this->fastOptimiserSingle = this->fastOptimiser->at(estClass);
+				this->initialParSingle = this->initialPar->at(estClass);
+			}
+			
+			// OBTAIN AVERAGE FOR OBJECT AND PERFORM INVERSION
+			invValues = new RSGISEstimationAlgorithmSingleSpecies(this->numOutputBands, this->initialParSingle, this->slowOptimiserSingle, this->parameters);
+			
+			float *outData = new float[numOutputBands]; // Create array large enough to hold all output bands (more than parameters)
+			float *inData = new float[this->numBands];
+			
+			for (int i = 0; i < this->numBands; i++)  // Loop through bands
+			{
+				for(unsigned int r = 0; r < pixelVals[i]->size(); r++) // Loop through pixels in object
+				{
+					inData[i] = inData[i] + pow(10,(pixelVals[i]->at(r) / 10));
+				}
+			}
+			
+			for (int i = 0; i < this->numBands; i++) // Obtain average and convert to dB
+			{
+				inData[i] = 10*log10(inData[i] / pixelVals[i]->size());
+			}
+			
+			invValues->calcImageValue(inData, this->numBands, outData);
+
+			// Get averages for each band.
+			gsl_vector *localPar;
+			localPar = gsl_vector_alloc(this->numOutputPar);
+			for(unsigned int i = 0; i < this->numOutputPar; i++)
+			{
+				gsl_vector_set(localPar, i, outData[i]);
+			}
+			
+			// PARAMETERISE OPIMISER USING VALUES FROM DATA
+			// Update optimser
+			this->fastOptimiserSingle->modifyAPriori(localPar);
+			
+			// RUN INVERISION ON ALL PIXELS IN OBJECT
+			if (this->useDefaultMinMax) 
+			{
+				invValues = new RSGISEstimationAlgorithmSingleSpecies(this->numOutputBands, localPar, this->fastOptimiserSingle, this->parameters);
+			}
+			else 
+			{
+				invValues = new RSGISEstimationAlgorithmSingleSpecies(this->numOutputBands, localPar, this->fastOptimiserSingle, this->parameters, this->minMaxVals[estClass]);
+			}
+			calcImage = new RSGISCalcImage(invValues, "", true);
+			calcImage->calcImageWithinRasterPolygon(this->datasetsIO, 3, env, fid);
+			
+			// TIDY
+			gsl_vector_free(localPar);
+			delete invValues;
+			delete calcImage;
+			delete[] inData;
+			delete[] outData;
+		}
+		catch(RSGISException& e)
+		{
+			throw RSGISVectorException(e.what());
+		}
+		
+	}
+	
+	void RSGISObjectBasedEstimationRasterPolygon::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException)
+	{
+		if(this->parameters == heightDensity)
+		{
+			OGRFieldDefn shpField1("objHeight", OFTReal);
+			shpField1.SetPrecision(10);
+			if( outputLayer->CreateField( &shpField1 ) != OGRERR_NONE )
+			{
+				string message = string("Creating shapefile field \'objHeight\' has failed");
+				throw RSGISVectorOutputException(message.c_str());
+			}
+			OGRFieldDefn shpField2("objDens", OFTReal);
+			shpField2.SetPrecision(10);
+			if( outputLayer->CreateField( &shpField2 ) != OGRERR_NONE )
+			{
+				string message = string("Creating shapefile field \'objHeight\' has failed");
+				throw RSGISVectorOutputException(message.c_str());
+			}
+			OGRFieldDefn shpField3("objError", OFTReal);
+			shpField3.SetPrecision(10);
+			if( outputLayer->CreateField( &shpField3 ) != OGRERR_NONE )
+			{
+				string message = string("Creating shapefile field \'objError\' has failed");
+				throw RSGISVectorOutputException(message.c_str());
+			}
+		}
+		else if(this->parameters == cDepthDensity)
+		{
+			OGRFieldDefn shpField1("objCDepth", OFTReal);
+			shpField1.SetPrecision(10);
+			if( outputLayer->CreateField( &shpField1 ) != OGRERR_NONE )
+			{
+				string message = string("Creating shapefile field \'objCDepth\' has failed");
+				throw RSGISVectorOutputException(message.c_str());
+			}
+			OGRFieldDefn shpField2("objDens", OFTReal);
+			shpField2.SetPrecision(10);
+			if( outputLayer->CreateField( &shpField2 ) != OGRERR_NONE )
+			{
+				string message = string("Creating shapefile field \'objHeight\' has failed");
+				throw RSGISVectorOutputException(message.c_str());
+			}
+			OGRFieldDefn shpField3("objError", OFTReal);
+			shpField3.SetPrecision(10);
+			if( outputLayer->CreateField( &shpField3 ) != OGRERR_NONE )
+			{
+				string message = string("Creating shapefile field \'objError\' has failed");
+				throw RSGISVectorOutputException(message.c_str());
+			}
+		}
+		else 
+		{
+			throw RSGISVectorOutputException("Input parameters not recognised, could not create fields\n");
+		}
+	}
+	
+	RSGISObjectBasedEstimationRasterPolygon::~RSGISObjectBasedEstimationRasterPolygon()
+	{
+		delete[] pixelVals;
+		delete getValues;
+		delete calcImageSingle;
+	}
+	
+	RSGISObjectBasedEstimationGetObjVals::RSGISObjectBasedEstimationGetObjVals(vector<float> **pixelVals, int numBands) : RSGISCalcImageSingleValue(numOutputValues)
+	{
+		this->pixelVals = pixelVals;
+		this->numBands = numBands;
+		
+		for(int i = 0; i < numBands; i++) 
+		{
+			this->pixelVals[i] = new vector <float>();
+		}
+	}
+	
+	void RSGISObjectBasedEstimationGetObjVals::calcImageValue(float *bandValuesImage, double interceptArea, int numBands, Polygon *poly, Point *pt) throw(RSGISImageCalcException)
+	{
+		for(int i = 0; i < this->numBands; i++) // Loop through bands
+		{
+			if ((isnan(bandValuesImage[i]) == false) && (bandValuesImage[i] != 0.0) && (bandValuesImage[i] > -100)) 
+			{
+				pixelVals[i]->push_back(bandValuesImage[i]);
+			}
+		}
+	}
+	
+	void RSGISObjectBasedEstimationGetObjVals::calcImageValue(float *bandValuesImage, int numBands, int band) throw(RSGISImageCalcException)
+	{
+		for(int i = 0; i < this->numBands - 1;  i++) // Loop through bands
+		{
+			if ((isnan(bandValuesImage[i+1]) == false) && (bandValuesImage[i+1] != 0.0) && (bandValuesImage[i+1] > -100))
+			{
+				pixelVals[i]->push_back(bandValuesImage[i+1]);
+			}
+		}
+	}
+	
+	double* RSGISObjectBasedEstimationGetObjVals::getOutputValues() throw(RSGISImageCalcException)
+	{
+		return NULL;
+	}
+	
+	void RSGISObjectBasedEstimationGetObjVals::reset()
+	{
+		for(int i = 0; i < numBands; i++)
+		{
+			pixelVals[i]->clear();
+		}
+	}
+	
+	RSGISObjectBasedEstimationGetObjVals::~RSGISObjectBasedEstimationGetObjVals()
+	{
+		for(int i = 0; i < numBands; i++)
+		{
+			pixelVals[i]->clear();
+		}
+	}
+	
+	int RSGISEstimationAssignAP::minimise(gsl_vector *inData, gsl_vector *initialPar, gsl_vector *outParError)
+	{
+		for (unsigned int i = 0; i < initialPar->size; ++i) 
+		{
+			gsl_vector_set(outParError, i, gsl_vector_get(initialPar, i));
+		}
+		gsl_vector_set(outParError, initialPar->size, 9999);
+		return 0;
+	}
+
+	
+}}
+
+
+

@@ -1,0 +1,237 @@
+/*
+ *  RSGISDEMTools.h
+ *  RSGIS_LIB
+ *
+ *  Created by Pete Bunting on 01/08/2011.
+ *  Copyright 2011 RSGISLib. All rights reserved.
+ *  This file is part of RSGISLib.
+ * 
+ *  RSGISLib is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  RSGISLib is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with RSGISLib.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
+#ifndef RSGISDEMTools_h
+#define RSGISDEMTools_h
+
+#include <iostream>
+#include <string>
+#include <math.h>
+
+#include "gdal_priv.h"
+
+#include "geos/geom/Envelope.h"
+#include "geos/geom/Point.h"
+#include "geos/geom/Polygon.h"
+#include "geos/geom/Coordinate.h"
+#include "geos/geom/CoordinateArraySequence.h"
+#include "geos/geom/PrecisionModel.h"
+
+#include "img/RSGISImageCalcException.h"
+#include "img/RSGISCalcImageValue.h"
+#include "img/RSGISImageUtils.h"
+#include "img/RSGISExtractImagePixelsInPolygon.h"
+
+#include "utils/RSGISGEOSFactoryGenerator.h"
+
+#include "math/RSGISMathsUtils.h"
+
+using namespace std;
+using namespace geos::geom;
+using namespace rsgis::utils;
+using namespace rsgis::math;
+using namespace rsgis::img;
+
+#ifndef M_PI
+# define M_PI  3.1415926535897932384626433832795
+#endif
+
+#ifndef ASTROUNIT
+# define ASTROUNIT  149597870.7
+#endif
+
+namespace rsgis{namespace calib{
+    
+    
+    /***
+     * If output type is set to 1 then output is radians if 0 then degrees.
+     *
+     */
+	class RSGISCalcSlope: public RSGISCalcImageValue
+	{
+	public: 
+		RSGISCalcSlope(int numberOutBands, unsigned int band, float ewRes, float nsRes, int outType);
+		void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException) {throw RSGISImageCalcException("No implemented");};
+		void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException) {throw RSGISImageCalcException("No implemented");};
+		void calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException) {throw RSGISImageCalcException("No implemented");};
+		void calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+		void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException);
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+		bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+		~RSGISCalcSlope();
+    private:
+        unsigned int band;
+        float ewRes;
+        float nsRes;
+        int outType;
+	};
+    
+    class RSGISCalcAspect : public RSGISCalcImageValue
+	{
+	public: 
+		RSGISCalcAspect(int numberOutBands, unsigned int band, float ewRes, float nsRes);
+		void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException) {throw RSGISImageCalcException("No implemented");};
+		void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException) {throw RSGISImageCalcException("No implemented");};
+		void calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException) {throw RSGISImageCalcException("No implemented");};
+		void calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+		void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException);
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+		bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+		~RSGISCalcAspect();
+    private:
+        unsigned int band;
+        float ewRes;
+        float nsRes;
+	};
+    
+    class RSGISCalcSlopeAspect : public RSGISCalcImageValue
+	{
+	public: 
+		RSGISCalcSlopeAspect(int numberOutBands, unsigned int band, float ewRes, float nsRes);
+		void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException) {throw RSGISImageCalcException("No implemented");};
+		void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException) {throw RSGISImageCalcException("No implemented");};
+		void calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException) {throw RSGISImageCalcException("No implemented");};
+		void calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+		void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException);
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+		bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+		~RSGISCalcSlopeAspect();
+    private:
+        unsigned int band;
+        float ewRes;
+        float nsRes;
+	};
+    
+    
+	class RSGISCalcHillShade : public RSGISCalcImageValue
+	{
+	public: 
+		RSGISCalcHillShade(int numberOutBands, unsigned int band, float ewRes, float nsRes, float sunZenith, float sunAzimuth);
+		void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException) {throw RSGISImageCalcException("No implemented");};
+		void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException) {throw RSGISImageCalcException("No implemented");};
+		void calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException) {throw RSGISImageCalcException("No implemented");};
+		void calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+		void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException);
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+		bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+		~RSGISCalcHillShade();
+    private:
+        unsigned int band;
+        float ewRes;
+        float nsRes;
+        float sunZenith;
+        float sunAzimuth;
+	};
+    
+    class RSGISCalcShadowBinaryMask : public RSGISCalcImageValue
+	{
+	public: 
+		RSGISCalcShadowBinaryMask(int numberOutBands, GDALDataset *inputImage, unsigned int band, float ewRes, float nsRes, float sunZenith, float sunAzimuth, float maxElevHeight);
+		void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+		void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException) {throw RSGISImageCalcException("No implemented");};
+		void calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException) {throw RSGISImageCalcException("No implemented");};
+		void calcImageValue(float *bandValues, int numBands, float *output, Envelope extent)throw(RSGISImageCalcException);
+		void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException) {throw RSGISImageCalcException("No implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+		bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException) {throw RSGISImageCalcException("No implemented");};
+		~RSGISCalcShadowBinaryMask();
+    private:
+        unsigned int band;
+        float ewRes;
+        float nsRes;
+        float sunZenith;
+        float sunAzimuth;
+        double sunRange;
+        double demWidth;
+        double demHeight;
+        float maxElevHeight;
+        GDALDataset *inputImage;
+	};
+    
+    class RSGISCalcRayIncidentAngle : public RSGISCalcImageValue
+	{
+	public: 
+		RSGISCalcRayIncidentAngle(int numberOutBands, unsigned int band, float ewRes, float nsRes, float sunZenith, float sunAzimuth);
+		void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException) {throw RSGISImageCalcException("No implemented");};
+		void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException) {throw RSGISImageCalcException("No implemented");};
+		void calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException) {throw RSGISImageCalcException("No implemented");};
+		void calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+		void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException);
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+		bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+		~RSGISCalcRayIncidentAngle();
+    private:
+        unsigned int band;
+        float ewRes;
+        float nsRes;
+        float sunZenith;
+        float sunAzimuth;
+	};
+    
+    class RSGISCalcRayExitanceAngle : public RSGISCalcImageValue
+	{
+	public: 
+		RSGISCalcRayExitanceAngle(int numberOutBands, unsigned int band, float ewRes, float nsRes, float viewZenith, float viewAzimuth);
+		void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException) {throw RSGISImageCalcException("No implemented");};
+		void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException) {throw RSGISImageCalcException("No implemented");};
+		void calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException) {throw RSGISImageCalcException("No implemented");};
+		void calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+		void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException);
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+		bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+		~RSGISCalcRayExitanceAngle();
+    private:
+        unsigned int band;
+        float ewRes;
+        float nsRes;
+        float viewZenith;
+        float viewAzimuth;
+	};
+    
+    class RSGISCalcRayIncidentAndExitanceAngles : public RSGISCalcImageValue
+	{
+	public: 
+		RSGISCalcRayIncidentAndExitanceAngles(int numberOutBands, unsigned int band, float ewRes, float nsRes, float sunZenith, float sunAzimuth, float viewZenith, float viewAzimuth);
+		void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException) {throw RSGISImageCalcException("No implemented");};
+		void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException) {throw RSGISImageCalcException("No implemented");};
+		void calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException) {throw RSGISImageCalcException("No implemented");};
+		void calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+		void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException);
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+		bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+		~RSGISCalcRayIncidentAndExitanceAngles();
+    private:
+        unsigned int band;
+        float ewRes;
+        float nsRes;
+        float sunZenith;
+        float sunAzimuth;
+        float viewZenith;
+        float viewAzimuth;
+	};
+	
+}}
+
+#endif
+
+
