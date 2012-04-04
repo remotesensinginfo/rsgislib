@@ -1120,6 +1120,83 @@ namespace rsgis{namespace rastergis{
         }
     }
     
+    vector<double>* RSGISAttributeTable::getDoubleField(string field) throw(RSGISAttributeTableException)
+    {
+        vector<double> *vals = new vector<double>();
+        if(this->getDataType(field) == rsgis_float)
+        {
+            unsigned int idx = this->getFieldIndex(field);
+            for(vector<RSGISFeature*>::iterator iterFeat = attTable->begin(); iterFeat != attTable->end(); ++iterFeat)
+            {
+                vals->push_back((*iterFeat)->floatFields->at(idx));
+            }
+        }
+        else
+        {
+            throw RSGISAttributeTableException("Field must be of type float.");
+        }
+        
+        return vals;
+    }
+    
+    vector<long>* RSGISAttributeTable::getLongField(string field) throw(RSGISAttributeTableException)
+    {
+        vector<long> *vals = new vector<long>();
+        if(this->getDataType(field) == rsgis_int)
+        {
+            unsigned int idx = this->getFieldIndex(field);
+            for(vector<RSGISFeature*>::iterator iterFeat = attTable->begin(); iterFeat != attTable->end(); ++iterFeat)
+            {
+                vals->push_back((*iterFeat)->intFields->at(idx));
+            }
+        }
+        else
+        {
+            throw RSGISAttributeTableException("Field must be of type int.");
+        }
+        
+        return vals;
+    }
+    
+    vector<bool>* RSGISAttributeTable::getBoolField(string field) throw(RSGISAttributeTableException)
+    {
+        vector<bool> *vals = new vector<bool>();
+        if(this->getDataType(field) == rsgis_bool)
+        {
+            unsigned int idx = this->getFieldIndex(field);
+            for(vector<RSGISFeature*>::iterator iterFeat = attTable->begin(); iterFeat != attTable->end(); ++iterFeat)
+            {
+                vals->push_back((*iterFeat)->boolFields->at(idx));
+            }
+        }
+        else
+        {
+            throw RSGISAttributeTableException("Field must be of type boolean.");
+        }
+        
+        return vals;
+    }
+     
+    vector<string>* RSGISAttributeTable::getStringField(string field) throw(RSGISAttributeTableException)
+    {
+        vector<string> *vals = new vector<string>();
+        if(this->getDataType(field) == rsgis_string)
+        {
+            unsigned int idx = this->getFieldIndex(field);
+            for(vector<RSGISFeature*>::iterator iterFeat = attTable->begin(); iterFeat != attTable->end(); ++iterFeat)
+            {
+                vals->push_back((*iterFeat)->stringFields->at(idx));
+            }
+        }
+        else
+        {
+            throw RSGISAttributeTableException("Field must be of type string.");
+        }
+        
+        return vals;
+    }
+    
+    
     RSGISAttributeTable* RSGISAttributeTable::importFromASCII(string inFile)throw(RSGISAttributeTableException)
     {
         RSGISAttributeTable *attTableObj = new RSGISAttributeTable();

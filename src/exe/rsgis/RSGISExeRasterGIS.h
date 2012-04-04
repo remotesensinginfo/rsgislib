@@ -97,7 +97,8 @@ public:
         meaneucdist2neighbours,
         calcintrapxleucdist,
         meanlitbandspopattributestats,
-        meanlitpopattributestats
+        meanlitpopattributestats,
+        exportfield2ascii
     };
     
     RSGISExeRasterGIS();

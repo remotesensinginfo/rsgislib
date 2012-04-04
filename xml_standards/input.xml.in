@@ -289,6 +289,8 @@
         <rsgis:band band="int" name="string" />
         <rsgis:band band="int" name="string" />
     </rsgis:command>
+	<!-- A command to export an attribute table column as a single ASCII table -->
+	<rsgis:command algor="rastergis" option="exportfield2ascii" table="input.att" output="output.txt" field="attribute_name" />
 
 
 

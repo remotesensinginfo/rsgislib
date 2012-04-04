@@ -61,6 +61,7 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
     XMLCh *optionFindNeighbours = XMLString::transcode("findneighbours");
     XMLCh *optionMeanEucDist2Neighbours = XMLString::transcode("meaneucdist2neighbours");
     XMLCh *optionCalcIntraPxlEucDist = XMLString::transcode("calcintrapxleucdist");
+    XMLCh *optionExportField2ASCII = XMLString::transcode("exportfield2ascii");
             
     XMLCh *optionRSGISBool = XMLString::transcode("rsgis_bool");
     XMLCh *optionRSGISInt = XMLString::transcode("rsgis_int");
@@ -2137,6 +2138,49 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
         XMLString::release(&rsgisBandXMLStr);
         
     }
+    else if(XMLString::equals(optionExportField2ASCII, optionXML))
+    {
+        this->option = RSGISExeRasterGIS::exportfield2ascii;
+        
+        XMLCh *tableXMLStr = XMLString::transcode("table");
+        if(argElement->hasAttribute(tableXMLStr))
+        {
+            char *charValue = XMLString::transcode(argElement->getAttribute(tableXMLStr));
+            this->attTableFile = string(charValue);
+            XMLString::release(&charValue);
+        }
+        else
+        {
+            throw RSGISXMLArgumentsException("No \'table\' attribute was provided.");
+        }
+        XMLString::release(&tableXMLStr);
+        
+        XMLCh *fieldXMLStr = XMLString::transcode("field");
+        if(argElement->hasAttribute(fieldXMLStr))
+        {
+            char *charValue = XMLString::transcode(argElement->getAttribute(fieldXMLStr));
+            this->attField = string(charValue);
+            XMLString::release(&charValue);
+        }
+        else
+        {
+            throw RSGISXMLArgumentsException("No \'field\' attribute was provided.");
+        }
+        XMLString::release(&fieldXMLStr);
+        
+        XMLCh *outputXMLStr = XMLString::transcode("output");
+        if(argElement->hasAttribute(outputXMLStr))
+        {
+            char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
+            this->outputFile = string(charValue);
+            XMLString::release(&charValue);
+        }
+        else
+        {
+            throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+        }
+        XMLString::release(&outputXMLStr);
+    }
     else
 	{
 		string message = string("The option (") + string(XMLString::transcode(optionXML)) + string(") is not known: RSGISExeRasterGIS.");
@@ -2165,6 +2209,7 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
     XMLString::release(&optionCalcIntraPxlEucDist);
     XMLString::release(&optionMeanLitBandsPopAttributeStats);
     XMLString::release(&optionMeanLitPopAttributeStats);
+    XMLString::release(&optionExportField2ASCII);
     
     XMLString::release(&optionRSGISBool);
     XMLString::release(&optionRSGISInt);
@@ -3150,6 +3195,141 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
             {
                 throw e;
             }            
+        }
+        else if(this->option == RSGISExeRasterGIS::exportfield2ascii)
+        {
+            cout << "A command to export an attribute table column as a single ASCII table\n";
+            cout << "Table: " << this->attTableFile << endl;
+            cout << "Field: " << this->attField << endl;
+            cout << "Output: " << this->outputFile << endl;
+            
+            try 
+            {
+                cout << "Importing Attribute Table:\n";
+                RSGISAttributeTable *attTable = RSGISAttributeTable::importFromASCII(attTableFile);
+                
+                cout << "Exporting Field to ASCII\n";
+                if(attTable->hasAttribute(attField))
+                {
+                    RSGISAttributeDataType dType = attTable->getDataType(attField);
+                    if(dType == rsgis_bool)
+                    {
+                        vector<bool> *vals = attTable->getBoolField(attField);
+                        bool first = true;
+                        ofstream outTxtFile;
+                        outTxtFile.open(this->outputFile.c_str(), ios::out | ios::trunc);
+                        for(vector<bool>::iterator iterVals = vals->begin(); iterVals != vals->end(); ++iterVals)
+                        {
+                            if(*iterVals)
+                            {
+                                if(first)
+                                {
+                                    outTxtFile << "TRUE";
+                                    first = false;
+                                }
+                                else
+                                {
+                                    outTxtFile << ",TRUE";
+                                }
+                            }
+                            else
+                            {
+                                if(first)
+                                {
+                                    outTxtFile << "FALSE";
+                                    first = false;
+                                }
+                                else
+                                {
+                                    outTxtFile << ",FALSE";
+                                }
+                            }
+                        }
+                        outTxtFile.flush();
+                        outTxtFile.close();
+                        delete vals;
+                    }
+                    else if(dType == rsgis_int)
+                    {
+                        vector<long> *vals = attTable->getLongField(attField);
+                        bool first = true;
+                        ofstream outTxtFile;
+                        outTxtFile.open(this->outputFile.c_str(), ios::out | ios::trunc);
+                        for(vector<long>::iterator iterVals = vals->begin(); iterVals != vals->end(); ++iterVals)
+                        {
+                            if(first)
+                            {
+                                outTxtFile << *iterVals;
+                                first = false;
+                            }
+                            else
+                            {
+                                outTxtFile << "," << *iterVals;
+                            }
+                        }
+                        outTxtFile.flush();
+                        outTxtFile.close();
+                        delete vals;
+                    }
+                    else if(dType == rsgis_float)
+                    {
+                        vector<double> *vals = attTable->getDoubleField(attField);
+                        bool first = true;
+                        ofstream outTxtFile;
+                        outTxtFile.open(this->outputFile.c_str(), ios::out | ios::trunc);
+                        for(vector<double>::iterator iterVals = vals->begin(); iterVals != vals->end(); ++iterVals)
+                        {
+                            if(first)
+                            {
+                                outTxtFile << *iterVals;
+                                first = false;
+                            }
+                            else
+                            {
+                                outTxtFile << "," << *iterVals;
+                            }
+                        }
+                        outTxtFile.flush();
+                        outTxtFile.close();
+                        delete vals;
+                    }
+                    else if(dType == rsgis_string)
+                    {
+                        vector<string> *vals = attTable->getStringField(attField);
+                        bool first = true;
+                        ofstream outTxtFile;
+                        outTxtFile.open(this->outputFile.c_str(), ios::out | ios::trunc);
+                        for(vector<string>::iterator iterVals = vals->begin(); iterVals != vals->end(); ++iterVals)
+                        {
+                            if(first)
+                            {
+                                outTxtFile << *iterVals;
+                                first = false;
+                            }
+                            else
+                            {
+                                outTxtFile << "," << *iterVals;
+                            }
+                        }
+                        outTxtFile.flush();
+                        outTxtFile.close();
+                        delete vals;
+                    }
+                    else
+                    {
+                        throw RSGISAttributeTableException("Data type was not recognised.");
+                    }
+                }
+                else
+                {
+                    string message = this->attField + string(" field was not within the attribute table.");
+                    throw RSGISAttributeTableException(message);
+                }
+            }
+            catch (RSGISException &e) 
+            {
+                throw e;
+            }
         }
 		else
 		{

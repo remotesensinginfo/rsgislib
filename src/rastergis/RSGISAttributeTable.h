@@ -165,6 +165,11 @@ namespace rsgis{namespace rastergis{
         
         void exportGDALRaster(GDALDataset *inDataset, unsigned int inBand) throw(RSGISAttributeTableException);
         
+        vector<double>* getDoubleField(string field) throw(RSGISAttributeTableException);
+        vector<long>* getLongField(string field) throw(RSGISAttributeTableException);
+        vector<bool>* getBoolField(string field) throw(RSGISAttributeTableException);
+        vector<string>* getStringField(string field) throw(RSGISAttributeTableException);
+        
         ~RSGISAttributeTable();
         
         static RSGISAttributeTable* importFromASCII(string inFile)throw(RSGISAttributeTableException);
