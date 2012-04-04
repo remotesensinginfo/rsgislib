@@ -94,7 +94,7 @@ class PlotAverageData (object):
         plt.savefig(outputFile, format='PDF')
 
     def run(self, cmdargs):
-		print 'rsgislibcmdxml.py script generates the XML commands for the '
+        print 'rsgislibcmdxml.py script generates the XML commands for the '
         print '@PACKAGE@ software library from a user defined template.'
         print 'This script was distributed with @RSGISLIB_PACKAGE_STRING@'
         print 'Copyright (C) @RSGISLIB_COPYRIGHT_YEAR@ Peter Bunting and Daniel Clewley'
