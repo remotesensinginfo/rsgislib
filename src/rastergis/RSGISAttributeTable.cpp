@@ -1307,7 +1307,23 @@ namespace rsgis{namespace rastergis{
                         feature->floatFields->reserve(attTableObj->numFloatFields);
                         for(unsigned int i = 0; i < attTableObj->numFloatFields; ++i)
                         {
-                            feature->floatFields->push_back(txtUtils.strtodouble(tokens->at(tokenIdx++)));
+                            try 
+                            {
+                                feature->floatFields->push_back(txtUtils.strtodouble(tokens->at(tokenIdx)));
+                                ++tokenIdx;
+                            }
+                            catch(RSGISTextException &e)
+                            {
+                                if(tokens->at(tokenIdx) == "nan")
+                                {
+                                    feature->floatFields->push_back(numeric_limits<float>::signaling_NaN());
+                                    ++tokenIdx;
+                                }
+                                else
+                                {
+                                    throw e;
+                                }
+                            }
                         }
                         feature->stringFields = new vector<string>();
                         feature->stringFields->reserve(attTableObj->numStrFields);
