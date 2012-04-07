@@ -48,7 +48,7 @@ class RSGISLibXMLSingle (object):
             xmloutline = xmloutline + eachLine
         return xmloutline
 
-    def constructXMLFile(self, files, xmloutline, outputfile, path, basename):
+    def constructXMLFile(self, files, xmloutline, outputfile, path, baseNames):
         outputXMLFile = open(outputfile, 'w')
         outputXMLFile.write('<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n')
         outputXMLFile.write('<!--\n')
@@ -63,8 +63,15 @@ class RSGISLibXMLSingle (object):
         outputXMLFile.write('<rsgis:commands xmlns:rsgis=\"http://www.rsgislib.org/xml/\">\n')
         print "Replacing: $PATH with ", path
         xmloutlinereplacepath = xmloutline.replace('$PATH', path, xmloutline.count('$PATH'))
-        print "Replacing: $FILENAME with ", basename
-        xmloutlinereplacebase = xmloutlinereplacepath.replace('$FILENAME', basename, xmloutlinereplacepath.count('$FILENAME'))
+
+        xmloutlinereplacebase = xmloutlinereplacepath
+        count = 1
+        for baseName in baseNames:
+            baseName = baseName.strip()
+            symbolReplace = str("$FILENAME") + str(count)
+            print "Replacing: ", symbolReplace, " with ", baseName
+            xmloutlinereplacebase = xmloutlinereplacebase.replace(symbolReplace, baseName, xmloutlinereplacebase.count(symbolReplace))
+            count = count + 1
 
         xmloutlinereplaceFiles = xmloutlinereplacebase
         count = 1
@@ -89,10 +96,10 @@ class RSGISLibXMLSingle (object):
         print 'For maintainance email @RSGISLIB_PACKAGE_BUGREPORT@'
 
         inTemplateStr = self.readInputTemplate(cmdargs.inputxml)
-        self.constructXMLFile(cmdargs.files, inTemplateStr, cmdargs.outputxml.strip(), cmdargs.outFilePath.strip(), cmdargs.baseName.strip())
+        self.constructXMLFile(cmdargs.files, inTemplateStr, cmdargs.outputxml.strip(), cmdargs.outFilePath.strip(), cmdargs.baseNames)
         print 'Commands written to single XML file'
         print 'Run using:\n rsgisexe -x ' + cmdargs.outputxml.strip()
-        
+
 
 # Command arguments
 class CmdArgs:
@@ -100,7 +107,7 @@ class CmdArgs:
     p = optparse.OptionParser()
     p.add_option("-i","--input", dest="inputxml", default=None, help="Input XML template")
     p.add_option("-o","--output", dest="outputxml", default=None, help="Output XML file")
-    p.add_option("-b","--base", dest="baseName", default=None, help="Output file base file name (\'$FILENAME\')")
+    p.add_option("-b","--base", action="append", dest="baseNames", default=None, help="Output file base file names (\'$FILENAME1\', \'$FILENAME2\'...\'$FILENAMEn\')")
     p.add_option("-p","--path", dest="outFilePath", default=None, help="Output file path (\'$PATH\')")
     p.add_option("-f","--file", action="append", dest="files", default=None, help="Input files to be replaced using $FILEPATHx for files in order (e.g., $FILEPATH1, $FILEPATH2 ... $FILEPATHn).")
 
