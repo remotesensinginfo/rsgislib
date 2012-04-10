@@ -65,6 +65,49 @@ namespace rsgis{namespace img{
 	{
 		
 	}
+    
+    
+    RSGISAllBandsEqualTo::RSGISAllBandsEqualTo(int numberOutBands, float value, float outTrueVal, float outFalseVal) : RSGISCalcImageValue(numberOutBands)
+	{
+		this->value = value;
+		this->outTrueVal = outTrueVal;
+		this->outFalseVal = outFalseVal;
+	}
+	
+	void RSGISAllBandsEqualTo::calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException)
+	{
+		if(!(numOutBands > 0))
+		{
+			throw RSGISImageCalcException("The number of output image bands must great or equal to 1.");
+		}
+		
+		bool valNotFound = false;
+        
+        for(int i = 0; i < numBands; ++i)
+        {
+            if(bandValues[i] != value)
+            {
+                valNotFound = true;
+                break;
+            }
+        }
+        
+        if(valNotFound)
+        {
+            output[0] = outFalseVal;
+        }
+        else
+        {
+            output[0] = outTrueVal;
+        }
+	}
+	
+    
+	
+	RSGISAllBandsEqualTo::~RSGISAllBandsEqualTo()
+	{
+		
+	}
 	
 }}
 

@@ -80,6 +80,7 @@ void RSGISExeImageCalculation::retrieveParameters(DOMElement *argElement) throw(
     XMLCh *optionExhConLinearSpecUnmix = XMLString::transcode("exhconlinearspecunmix"); 
 	XMLCh *optionKMeansCentres = XMLString::transcode("kmeanscentres");
     XMLCh *optionISODataCentres = XMLString::transcode("isodatacentres");
+    XMLCh *optionAllBandsEqualTo = XMLString::transcode("allbandsequalto");
 
 	const XMLCh *algorNameEle = argElement->getAttribute(XMLString::transcode("algor"));
 	if(!XMLString::equals(algorName, algorNameEle))
@@ -1707,6 +1708,75 @@ void RSGISExeImageCalculation::retrieveParameters(DOMElement *argElement) throw(
 		}
 		XMLString::release(&editEndXMLStr);
 	}
+    else if(XMLString::equals(optionAllBandsEqualTo, optionXML))
+    {
+        this->option = RSGISExeImageCalculation::allbandsequalto;
+		
+        XMLCh *imageXMLStr = XMLString::transcode("image");
+		if(argElement->hasAttribute(imageXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(imageXMLStr));
+			this->inputImage = string(charValue);
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+		}
+		XMLString::release(&imageXMLStr);
+        
+        XMLCh *outputXMLStr = XMLString::transcode("output");
+		if(argElement->hasAttribute(outputXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
+			this->outputImage = string(charValue);
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+		}
+		XMLString::release(&outputXMLStr);
+        
+        XMLCh *valueXMLStr = XMLString::transcode("value");
+		if(argElement->hasAttribute(valueXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(valueXMLStr));
+			this->imgValue = mathUtils.strtofloat(string(charValue));
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'value\' attribute was provided.");
+		}
+		XMLString::release(&valueXMLStr);
+        
+        XMLCh *trueOutXMLStr = XMLString::transcode("trueout");
+		if(argElement->hasAttribute(trueOutXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(trueOutXMLStr));
+			this->outputTrueVal = mathUtils.strtofloat(string(charValue));
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'trueout\' attribute was provided.");
+		}
+		XMLString::release(&trueOutXMLStr);
+        
+        XMLCh *falseOutXMLStr = XMLString::transcode("falseout");
+		if(argElement->hasAttribute(falseOutXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(falseOutXMLStr));
+			this->outputFalseVal = mathUtils.strtofloat(string(charValue));
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'falseout\' attribute was provided.");
+		}
+		XMLString::release(&falseOutXMLStr);
+    }
 	else
 	{
 		string message = string("The option (") + string(XMLString::transcode(optionXML)) + string(") is not known: RSGISExeImageCalculation.");
@@ -1735,6 +1805,7 @@ void RSGISExeImageCalculation::retrieveParameters(DOMElement *argElement) throw(
     XMLString::release(&optionExhConLinearSpecUnmix);
     XMLString::release(&optionKMeansCentres);
     XMLString::release(&optionISODataCentres);
+    XMLString::release(&optionAllBandsEqualTo);
 
 	parsed = true;
 }
@@ -2963,6 +3034,39 @@ void RSGISExeImageCalculation::runAlgorithm() throw(RSGISException)
 				throw e;
 			}
         }
+        else if(option == RSGISExeImageCalculation::allbandsequalto)
+        {
+            cout << "Test whether all bands are equal to the same value.\n";
+            cout << "Input Image: " << this->inputImage << endl;
+            cout << "Output Image: " << this->outputImage << endl;
+            cout << "Image Value: " << this->imgValue << endl;
+            cout << "If true output: " << this->outputTrueVal << endl;
+            cout << "If false output: " << this->outputFalseVal << endl;
+            			
+			try
+			{
+                GDALAllRegister();
+                GDALDataset **datasets = new GDALDataset*[1];
+				datasets[0] = (GDALDataset *) GDALOpenShared(this->inputImage.c_str(), GA_ReadOnly);
+				if(datasets[0] == NULL)
+				{
+					string message = string("Could not open image ") + this->inputImage;
+					throw RSGISImageException(message.c_str());
+				}
+                
+                RSGISAllBandsEqualTo *calcImageValue = new RSGISAllBandsEqualTo(1, this->imgValue, this->outputTrueVal, this->outputFalseVal);
+                RSGISCalcImage calcImage = RSGISCalcImage(calcImageValue, "", true);
+                calcImage.calcImage(datasets, 1, this->outputImage, false, NULL, this->imageFormat);
+                
+                GDALClose(datasets[0]);
+                delete[] datasets;
+                delete calcImageValue;
+			}
+			catch(RSGISException e)
+			{
+				throw e;
+			}
+        }
 		else
 		{
 			cout << "Options not recognised\n";
@@ -3135,6 +3239,15 @@ void RSGISExeImageCalculation::printParameters()
             cout << "Min Distance between clusters: " << minDistBetweenClusters << endl;
             cout << "Max Std Dev: " << maxStdDev << endl;
         }
+        else if(option == RSGISExeImageCalculation::allbandsequalto)
+        {
+            cout << "Test whether all bands are equal to the same value.\n";
+            cout << "Input Image: " << this->inputImage << endl;
+            cout << "Output Image: " << this->outputImage << endl;
+            cout << "Image Value: " << this->imgValue << endl;
+            cout << "If true output: " << this->outputTrueVal << endl;
+            cout << "If false output: " << this->outputFalseVal << endl;
+        }
 		else
 		{
 			cout << "Options not recognised\n";
@@ -3204,7 +3317,9 @@ void RSGISExeImageCalculation::help()
     cout << "<rsgis:command algor=\"imagecalc\" option=\"kmeanscentres\" image=\"image.env\" output=\"matrix.gmtxt\" numclusters=\"int\" maxiterations=\"int\" degreeofchange=\"float\" subsample=\"int\" initmethod=\"random | diagonal_range | diagonal_stddev | diagonal_range_attach | diagonal_stddev_attach | kpp\" ignorezeros=\"yes | no\" />" << endl;
     cout << "<!-- A command to calculate cluster centres for the image using ISOData clustering -->" << endl;
     cout << "<rsgis:command algor=\"imagecalc\" option=\"isodatacentres\" image=\"image.env\" output=\"matrix.gmtxt\" numclusters=\"int\" minnumclusters=\"int\" maxiterations=\"int\" degreeofchange=\"float\" subsample=\"int\" initmethod=\"random | diagonal_range | diagonal_stddev | diagonal_range_attach | diagonal_stddev_attach | kpp\" ignorezeros=\"yes | no\" mindist=\"float\" minnum=\"unsigned int\" maxstddev=\"float\" editstart=\"int\" editend=\"int\" />" << endl;
-	cout << "</rsgis:commands>\n";
+	cout << "<!-- A command to test whether all bands are equal to the same value - useful for creating images masks -->" << endl;
+    cout << "<rsgis:command algor=\"imagecalc\" option=\"allbandsequalto\" image=\"image.env\" output=\"image_out.env\" format=\"GDAL Format\" value=\"float\" trueout=\"float\" falseout=\"float\" />" << endl;
+    cout << "</rsgis:commands>\n";
 }
 
 string RSGISExeImageCalculation::getDescription()

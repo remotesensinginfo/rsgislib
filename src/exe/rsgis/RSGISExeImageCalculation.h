@@ -127,7 +127,8 @@ class RSGISExeImageCalculation : public RSGISAlgorithmParameters
             unconlinearspecunmix,
             exhconlinearspecunmix,
             kmeanscentres,
-            isodatacentres
+            isodatacentres,
+            allbandsequalto
 		};
 		
 		struct VariableStruct
@@ -203,6 +204,9 @@ class RSGISExeImageCalculation : public RSGISAlgorithmParameters
         unsigned int startIteration;
         unsigned int endIteration;
 		string imageFormat;
+        float imgValue;
+        float outputTrueVal;
+        float outputFalseVal;
 	};
 
 #endif

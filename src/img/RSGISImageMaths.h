@@ -56,6 +56,24 @@ namespace rsgis{namespace img{
 		Parser *muParser;
 		value_type inVal;
 	};
+    
+    class RSGISAllBandsEqualTo : public RSGISCalcImageValue
+	{
+	public: 
+		RSGISAllBandsEqualTo(int numberOutBands, float value, float outTrueVal, float outFalseVal);
+		void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException);
+		void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+		void calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+		void calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+		void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+		bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+		~RSGISAllBandsEqualTo();
+	private:
+		float value;
+        float outTrueVal;
+        float outFalseVal;
+	};
 	
 }}
 
