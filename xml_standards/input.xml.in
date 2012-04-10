@@ -477,6 +477,10 @@
     <rsgis:command algor="imagecalc" option="kmeanscentres" image="image.env" output="matrix.gmtxt" numclusters="int" maxiterations="int" degreeofchange="float" subsample="int" initmethod="random | diagonal_range | diagonal_stddev | diagonal_range_attach | diagonal_stddev_attach | kpp" ignorezeros="yes | no" />
     <!-- A command to calculate cluster centres for the image using ISOData clustering -->
     <rsgis:command algor="imagecalc" option="isodatacentres" image="image.env" output="matrix.gmtxt" numclusters="int" minnumclusters="int" maxiterations="int" degreeofchange="float" subsample="int" initmethod="random | diagonal_range | diagonal_stddev | diagonal_range_attach | diagonal_stddev_attach | kpp" ignorezeros="yes | no" mindist="float" minnum="unsigned int" maxstddev="float" editstart="int" editend="int" />
+	<!-- A command to test whether all bands are equal to the same value - useful for creating images masks -->
+	<rsgis:command algor="imagecalc" option="allbandsequalto" image="image.env" output="image_out.env" format="GDAL Format" value="float" trueout="float" falseout="float" />
+
+
 
     <!-- A command to calibrate image Landsat data from at sensor DNs to at sensor radiance (EQ: ((lmax-lmin)/(qcalmax-qcalmin)) * (DNs - qcalmin) + lmin) Eq is from landsat manual. -->
     <rsgis:command algor="imagecalibration" option="landsatradcal" output="image_out.env" format="GDAL Format" >
