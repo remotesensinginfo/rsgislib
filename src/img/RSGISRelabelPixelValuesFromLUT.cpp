@@ -31,7 +31,7 @@ namespace rsgis { namespace img {
         
     }
     
-    void RSGISRelabelPixelValuesFromLUT::relabelPixelValues(GDALDataset *inData, string outputFile, string matrixLUTFile)throw(RSGISImageCalcException)
+    void RSGISRelabelPixelValuesFromLUT::relabelPixelValues(GDALDataset *inData, string outputFile, string matrixLUTFile, string imageFormat)throw(RSGISImageCalcException)
     {
         try
         {
@@ -46,7 +46,7 @@ namespace rsgis { namespace img {
             GDALDataset **datasets = new GDALDataset*[1];
             datasets[0] = inData;
             
-            calcImage.calcImage(datasets, 1, outputFile);
+            calcImage.calcImage(datasets, 1, outputFile, false, NULL, imageFormat);
             
             delete[] datasets;
             delete calcImageValue;

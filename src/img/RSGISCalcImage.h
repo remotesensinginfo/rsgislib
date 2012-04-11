@@ -56,7 +56,7 @@ namespace rsgis
 			{
 			public:
 				RSGISCalcImage(RSGISCalcImageValue *valueCalc, string proj="", bool useImageProj=true);
-				void calcImage(GDALDataset **datasets, int numDS, string outputImage, bool setOutNames = false, string *bandNames = NULL, string gdalFormat="ENVI") throw(RSGISImageCalcException,RSGISImageBandException);
+				void calcImage(GDALDataset **datasets, int numDS, string outputImage, bool setOutNames = false, string *bandNames = NULL, string gdalFormat="ENVI", GDALDataType gdalDataType=GDT_Float32) throw(RSGISImageCalcException,RSGISImageBandException);
 				void calcImage(GDALDataset **datasets, int numDS, GDALDataset *outputImageDS) throw(RSGISImageCalcException,RSGISImageBandException);
 				void calcImage(GDALDataset **datasets, int numDS) throw(RSGISImageCalcException,RSGISImageBandException);
                 void calcImageBand(GDALDataset **datasets, int numDS, string outputImageBase, string gdalFormat="ENVI") throw(RSGISImageCalcException,RSGISImageBandException);

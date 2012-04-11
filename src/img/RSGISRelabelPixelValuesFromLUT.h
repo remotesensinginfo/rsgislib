@@ -44,7 +44,7 @@ namespace rsgis { namespace img {
     {
     public:
         RSGISRelabelPixelValuesFromLUT();
-        void relabelPixelValues(GDALDataset *inData, string outputFile, string matrixLUTFile)throw(RSGISImageCalcException);
+        void relabelPixelValues(GDALDataset *inData, string outputFile, string matrixLUTFile, string imageFormat)throw(RSGISImageCalcException);
         ~RSGISRelabelPixelValuesFromLUT();
     };
     

@@ -46,6 +46,8 @@ RSGISExeImageUtils::RSGISExeImageUtils() : RSGISAlgorithmParameters()
 	this->numImages = 0;
 	this->numClasses = 0;
 	this->projFromImage = true;
+    this->imageFormat = "ENVI";
+    this->outDataType = GDT_Float32;
 }
 
 RSGISAlgorithmParameters* RSGISExeImageUtils::getInstance()
@@ -99,6 +101,74 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 	{
 		throw RSGISXMLArgumentsException("The algorithm name is incorrect.");
 	}
+    
+    // Set output image fomat (defaults to ENVI)
+	this->imageFormat = "ENVI";
+	XMLCh *formatXMLStr = XMLString::transcode("format");
+	if(argElement->hasAttribute(formatXMLStr))
+	{
+		char *charValue = XMLString::transcode(argElement->getAttribute(formatXMLStr));
+		this->imageFormat = string(charValue);
+		XMLString::release(&charValue);
+	}
+	XMLString::release(&formatXMLStr);
+    
+    this->outDataType = GDT_Float32;
+	XMLCh *datatypeXMLStr = XMLString::transcode("datatype");
+	if(argElement->hasAttribute(datatypeXMLStr))
+	{
+        XMLCh *dtByte = XMLString::transcode("Byte");
+        XMLCh *dtUInt16 = XMLString::transcode("UInt16");
+        XMLCh *dtInt16 = XMLString::transcode("Int16");
+        XMLCh *dtUInt32 = XMLString::transcode("UInt32");
+        XMLCh *dtInt32 = XMLString::transcode("Int32");
+        XMLCh *dtFloat32 = XMLString::transcode("Float32");
+        XMLCh *dtFloat64 = XMLString::transcode("Float64");
+        
+        const XMLCh *dtXMLValue = argElement->getAttribute(datatypeXMLStr);
+        if(XMLString::equals(dtByte, dtXMLValue))
+        {
+            this->outDataType = GDT_Byte;
+        }
+        else if(XMLString::equals(dtUInt16, dtXMLValue))
+        {
+            this->outDataType = GDT_UInt16;
+        }
+        else if(XMLString::equals(dtInt16, dtXMLValue))
+        {
+            this->outDataType = GDT_Int16;
+        }
+        else if(XMLString::equals(dtUInt32, dtXMLValue))
+        {
+            this->outDataType = GDT_UInt32;
+        }
+        else if(XMLString::equals(dtInt32, dtXMLValue))
+        {
+            this->outDataType = GDT_Int32;
+        }
+        else if(XMLString::equals(dtFloat32, dtXMLValue))
+        {
+            this->outDataType = GDT_Float32;
+        }
+        else if(XMLString::equals(dtFloat64, dtXMLValue))
+        {
+            this->outDataType = GDT_Float64;
+        }
+        else
+        {
+            cerr << "Data type not recognised, defaulting to 32 bit float.";
+            this->outDataType = GDT_Float32;
+        }
+        
+        XMLString::release(&dtByte);
+        XMLString::release(&dtUInt16);
+        XMLString::release(&dtInt16);
+        XMLString::release(&dtUInt32);
+        XMLString::release(&dtInt32);
+        XMLString::release(&dtFloat32);
+        XMLString::release(&dtFloat64);
+	}
+	XMLString::release(&datatypeXMLStr);
 	
 	const XMLCh *optionXML = argElement->getAttribute(optionXMLStr);
 	if(XMLString::equals(optionColour, optionXML))
@@ -2007,19 +2077,6 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 		}
 		XMLString::release(&outputXMLStr);
         
-        XMLCh *formatXMLStr = XMLString::transcode("format");
-		if(argElement->hasAttribute(formatXMLStr))
-		{
-			char *charValue = XMLString::transcode(argElement->getAttribute(formatXMLStr));
-			this->imageFormat = string(charValue);
-			XMLString::release(&charValue);
-		}
-		else
-		{
-			this->imageFormat = "ENVI";
-		}
-		XMLString::release(&formatXMLStr);
-        
         XMLCh *inMemoryXMLStr = XMLString::transcode("inmemory");
 		if(argElement->hasAttribute(inMemoryXMLStr))
 		{
@@ -2568,7 +2625,7 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
 				}
 				
 				maskImage = new RSGISMaskImage();
-				maskImage->maskImage(dataset, mask, this->outputImage, this->nodataValue);
+				maskImage->maskImage(dataset, mask, this->outputImage, this->imageFormat, this->outDataType, this->nodataValue);
 				
 				GDALClose(dataset);
 				GDALClose(mask);
@@ -3156,7 +3213,7 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
 					throw RSGISImageException(message.c_str());
 				}
 
-				stretchImg = new RSGISStretchImage(inDataset, this->outputImage, this->ignoreZeros);
+				stretchImg = new RSGISStretchImage(inDataset, this->outputImage, this->ignoreZeros, this->imageFormat, this->outDataType);
 				if(stretchType == linearMinMax)
 				{
 					stretchImg->executeLinearMinMaxStretch();
@@ -3703,7 +3760,7 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
                 }
                 
                 RSGISRelabelPixelValuesFromLUT relabelPixels;
-                relabelPixels.relabelPixelValues(inDataset, this->outputImage, this->lutMatrixFile);
+                relabelPixels.relabelPixelValues(inDataset, this->outputImage, this->lutMatrixFile, this->imageFormat);
                 
                 GDALClose(inDataset);
                 GDALDestroyDriverManager();

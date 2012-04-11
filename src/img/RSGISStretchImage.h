@@ -48,7 +48,7 @@ namespace rsgis { namespace img {
 	class RSGISStretchImage
 	{
 	public:
-		RSGISStretchImage(GDALDataset *inputImage, string outputImage, bool ignoreZeros);
+		RSGISStretchImage(GDALDataset *inputImage, string outputImage, bool ignoreZeros, string imageFormat, GDALDataType outDataType);
 		void executeLinearMinMaxStretch() throw(RSGISImageCalcException);
 		void executeLinearPercentStretch(float percent) throw(RSGISImageCalcException);
 		void executeLinearStdDevStretch(float stddev) throw(RSGISImageCalcException);
@@ -61,6 +61,8 @@ namespace rsgis { namespace img {
 		GDALDataset *inputImage;
 		string outputImage;
         bool ignoreZeros;
+        string imageFormat;
+        GDALDataType outDataType;
 	};
 
 	class RSGISExponentStretchFunction : public RSGISMathFunction

@@ -25,11 +25,13 @@
 
 namespace rsgis { namespace img {
 
-	RSGISStretchImage::RSGISStretchImage(GDALDataset *inputImage, string outputImage, bool ignoreZeros): inputImage(NULL), outputImage(""), ignoreZeros(true)
+	RSGISStretchImage::RSGISStretchImage(GDALDataset *inputImage, string outputImage, bool ignoreZeros, string imageFormat, GDALDataType outDataType): inputImage(NULL), outputImage(""), ignoreZeros(true)
 	{
 		this->inputImage = inputImage;
 		this->outputImage = outputImage;
         this->ignoreZeros = ignoreZeros;
+        this->imageFormat = imageFormat;
+        this->outDataType = outDataType;
 	}
 	
 	void RSGISStretchImage::executeLinearMinMaxStretch() throw(RSGISImageCalcException)
@@ -79,7 +81,7 @@ namespace rsgis { namespace img {
 			
 			linearStretchImage = new RSGISLinearStretchImage(numBands, imageMax, imageMin, outMax, outMin);
 			calcImg = new RSGISCalcImage(linearStretchImage, "", true);
-			calcImg->calcImage(datasets, 1, outputImage);
+			calcImg->calcImage(datasets, 1, outputImage, false, NULL, imageFormat, outDataType);
 			
 		}
 		catch(RSGISImageCalcException e)
@@ -173,7 +175,7 @@ namespace rsgis { namespace img {
 			
 			linearStretchImage = new RSGISLinearStretchImage(numBands, imageMax, imageMin, outMax, outMin);
 			calcImg = new RSGISCalcImage(linearStretchImage, "", true);
-			calcImg->calcImage(datasets, 1, outputImage);
+			calcImg->calcImage(datasets, 1, outputImage, false, NULL, imageFormat, outDataType);
 			
 		}
 		catch(RSGISImageCalcException e)
@@ -267,7 +269,7 @@ namespace rsgis { namespace img {
 			
 			linearStretchImage = new RSGISLinearStretchImage(numBands, imageMax, imageMin, outMax, outMin);
 			calcImg = new RSGISCalcImage(linearStretchImage, "", true);
-			calcImg->calcImage(datasets, 1, outputImage);
+			calcImg->calcImage(datasets, 1, outputImage, false, NULL, imageFormat, outDataType);
 			
 		}
 		catch(RSGISImageCalcException e)
@@ -364,7 +366,7 @@ namespace rsgis { namespace img {
 			
 			stretchImage = new RSGISFuncLinearStretchImage(numBands, imageMax, imageMin, outMax, outMin, function);
 			calcImg = new RSGISCalcImage(stretchImage, "", true);
-			calcImg->calcImage(datasets, 1, outputImage);
+			calcImg->calcImage(datasets, 1, outputImage, false, NULL, imageFormat, outDataType);
 			
 		}
 		catch(RSGISImageCalcException e)
@@ -457,7 +459,7 @@ namespace rsgis { namespace img {
 			
 			stretchImage = new RSGISFuncLinearStretchImage(numBands, imageMax, imageMin, outMax, outMin, function);
 			calcImg = new RSGISCalcImage(stretchImage, "", true);
-			calcImg->calcImage(datasets, 1, outputImage);
+			calcImg->calcImage(datasets, 1, outputImage, false, NULL, imageFormat, outDataType);
 			
 		}
 		catch(RSGISImageCalcException e)
@@ -550,7 +552,7 @@ namespace rsgis { namespace img {
 			
 			stretchImage = new RSGISFuncLinearStretchImage(numBands, imageMax, imageMin, outMax, outMin, function);
 			calcImg = new RSGISCalcImage(stretchImage, "", true);
-			calcImg->calcImage(datasets, 1, outputImage);
+			calcImg->calcImage(datasets, 1, outputImage, false, NULL, imageFormat, outDataType);
 			
 		}
 		catch(RSGISImageCalcException e)

@@ -32,7 +32,7 @@ namespace rsgis{namespace img{
 		this->useImageProj = useImageProj;
 	}
 	
-	void RSGISCalcImage::calcImage(GDALDataset **datasets, int numDS, string outputImage, bool setOutNames, string *bandNames, string gdalFormat) throw(RSGISImageCalcException,RSGISImageBandException)
+	void RSGISCalcImage::calcImage(GDALDataset **datasets, int numDS, string outputImage, bool setOutNames, string *bandNames, string gdalFormat, GDALDataType gdalDataType) throw(RSGISImageCalcException,RSGISImageBandException)
 	{
 		GDALAllRegister();
 		RSGISImageUtils imgUtils;
@@ -76,7 +76,7 @@ namespace rsgis{namespace img{
 			}
 			cout << "New image width = " << width << " height = " << height << " bands = " << this->numOutBands << endl;
 			
-			outputImageDS = gdalDriver->Create(outputImage.c_str(), width, height, this->numOutBands, GDT_Float32, NULL);
+			outputImageDS = gdalDriver->Create(outputImage.c_str(), width, height, this->numOutBands, gdalDataType, NULL);
 			
 			if(outputImageDS == NULL)
 			{
