@@ -40,7 +40,7 @@ namespace rsgis{namespace img{
 		{
 		public: 
 			RSGISMaskImage();
-			void maskImage(GDALDataset *dataset, GDALDataset *mask, string outputImage, double outputValue)throw(RSGISImageCalcException,RSGISImageBandException);
+			void maskImage(GDALDataset *dataset, GDALDataset *mask, string outputImage, string imageFormat, GDALDataType outDataType, double outputValue)throw(RSGISImageCalcException,RSGISImageBandException);
 		};
 	
 	class RSGISApplyImageMask : public RSGISCalcImageValue

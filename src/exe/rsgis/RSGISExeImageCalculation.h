@@ -207,6 +207,7 @@ class RSGISExeImageCalculation : public RSGISAlgorithmParameters
         float imgValue;
         float outputTrueVal;
         float outputFalseVal;
+        GDALDataType outDataType;
 	};
 
 #endif

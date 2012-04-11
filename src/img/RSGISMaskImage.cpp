@@ -29,7 +29,7 @@ namespace rsgis{namespace img{
 		
 	}
 	
-	void RSGISMaskImage::maskImage(GDALDataset *dataset, GDALDataset *mask, string outputImage, double outputValue)throw(RSGISImageCalcException,RSGISImageBandException)
+	void RSGISMaskImage::maskImage(GDALDataset *dataset, GDALDataset *mask, string outputImage, string imageFormat, GDALDataType outDataType, double outputValue)throw(RSGISImageCalcException,RSGISImageBandException)
 	{
 		GDALDataset **datasets = NULL;
 		RSGISCalcImage *calcImg = NULL;
@@ -43,7 +43,7 @@ namespace rsgis{namespace img{
 			
 			applyMask = new RSGISApplyImageMask(dataset->GetRasterCount(), outputValue);
 			calcImg = new RSGISCalcImage(applyMask, "", true);
-			calcImg->calcImage(datasets, numDS, outputImage);
+			calcImg->calcImage(datasets, numDS, outputImage, false, NULL, imageFormat, outDataType);
 			
 		}
 		catch(RSGISImageCalcException e)

@@ -45,6 +45,8 @@ RSGISExeImageCalculation::RSGISExeImageCalculation() : RSGISAlgorithmParameters(
 	this->outMax = 0;
 	this->calcInMinMax = true;
 	this->calcMean = true;
+    this->imageFormat = "ENVI";
+    this->outDataType = GDT_Float32;
 }
 
 RSGISAlgorithmParameters* RSGISExeImageCalculation::getInstance()
@@ -100,6 +102,62 @@ void RSGISExeImageCalculation::retrieveParameters(DOMElement *argElement) throw(
 	XMLString::release(&formatXMLStr);
 
 
+    this->outDataType = GDT_Float32;
+	XMLCh *datatypeXMLStr = XMLString::transcode("datatype");
+	if(argElement->hasAttribute(datatypeXMLStr))
+	{
+        XMLCh *dtByte = XMLString::transcode("Byte");
+        XMLCh *dtUInt16 = XMLString::transcode("UInt16");
+        XMLCh *dtInt16 = XMLString::transcode("Int16");
+        XMLCh *dtUInt32 = XMLString::transcode("UInt32");
+        XMLCh *dtInt32 = XMLString::transcode("Int32");
+        XMLCh *dtFloat32 = XMLString::transcode("Float32");
+        XMLCh *dtFloat64 = XMLString::transcode("Float64");
+        
+        const XMLCh *dtXMLValue = argElement->getAttribute(datatypeXMLStr);
+        if(XMLString::equals(dtByte, dtXMLValue))
+        {
+            this->outDataType = GDT_Byte;
+        }
+        else if(XMLString::equals(dtUInt16, dtXMLValue))
+        {
+            this->outDataType = GDT_UInt16;
+        }
+        else if(XMLString::equals(dtInt16, dtXMLValue))
+        {
+            this->outDataType = GDT_Int16;
+        }
+        else if(XMLString::equals(dtUInt32, dtXMLValue))
+        {
+            this->outDataType = GDT_UInt32;
+        }
+        else if(XMLString::equals(dtInt32, dtXMLValue))
+        {
+            this->outDataType = GDT_Int32;
+        }
+        else if(XMLString::equals(dtFloat32, dtXMLValue))
+        {
+            this->outDataType = GDT_Float32;
+        }
+        else if(XMLString::equals(dtFloat64, dtXMLValue))
+        {
+            this->outDataType = GDT_Float64;
+        }
+        else
+        {
+            cerr << "Data type not recognised, defaulting to 32 bit float.";
+            this->outDataType = GDT_Float32;
+        }
+        
+        XMLString::release(&dtByte);
+        XMLString::release(&dtUInt16);
+        XMLString::release(&dtInt16);
+        XMLString::release(&dtUInt32);
+        XMLString::release(&dtInt32);
+        XMLString::release(&dtFloat32);
+        XMLString::release(&dtFloat64);
+	}
+	XMLString::release(&datatypeXMLStr);
 
 	const XMLCh *optionXML = argElement->getAttribute(XMLString::transcode("option"));
 	if(XMLString::equals(optionNormalise, optionXML))
@@ -3056,7 +3114,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(RSGISException)
                 
                 RSGISAllBandsEqualTo *calcImageValue = new RSGISAllBandsEqualTo(1, this->imgValue, this->outputTrueVal, this->outputFalseVal);
                 RSGISCalcImage calcImage = RSGISCalcImage(calcImageValue, "", true);
-                calcImage.calcImage(datasets, 1, this->outputImage, false, NULL, this->imageFormat);
+                calcImage.calcImage(datasets, 1, this->outputImage, false, NULL, this->imageFormat, this->outDataType);
                 
                 GDALClose(datasets[0]);
                 delete[] datasets;
