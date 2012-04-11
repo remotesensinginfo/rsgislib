@@ -2308,7 +2308,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(RSGISException)
 				bandmaths = new RSGISBandMath(1, processVaribles, this->numVars, muParser);
 				
 				calcImage = new RSGISCalcImage(bandmaths, "", true);
-				calcImage->calcImage(datasets, this->numVars, this->outputImage, true, outBandName, this->imageFormat);
+				calcImage->calcImage(datasets, this->numVars, this->outputImage, true, outBandName, this->imageFormat, this->outDataType);
 				
 				
 				for(int i = 0; i < this->numVars; ++i)
@@ -2477,7 +2477,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(RSGISException)
 				imageMaths = new RSGISImageMaths(numRasterBands, muParser);
 				
 				calcImage = new RSGISCalcImage(imageMaths, "", true);
-				calcImage->calcImage(datasets, 1, this->outputImage, false, NULL, this->imageFormat);
+				calcImage->calcImage(datasets, 1, this->outputImage, false, NULL, this->imageFormat, this->outDataType);
 				
 				
 				GDALClose(datasets[0]);
