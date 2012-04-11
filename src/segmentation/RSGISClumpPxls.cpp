@@ -263,10 +263,6 @@ namespace rsgis{namespace segment{
                 {
                     clumpTable.at(clumpIdxs[j]-1) = 1;
                 }
-                else
-                {
-                    
-                }
             }
         }
         cout << ". Complete\n";
@@ -279,7 +275,6 @@ namespace rsgis{namespace segment{
                 clumpTable.at(i) = idx++;
             }
         }
-        
         
         feedbackCounter = 0;
         cout << "Started ." << flush;
