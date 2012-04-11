@@ -451,7 +451,7 @@
         <rsgis:variable name="string" image="image3" band="int" />
     </rsgis:command>
     <!-- A command to apply a single expression to each band of any image (in the expression the band needs to be referred to as 'b1') -->
-    <rsgis:command algor="imagecalc" option="imagemaths" image="image.env" output="image_out.env" format="GDAL Format" expression="string" | expressionFile="string" >
+    <rsgis:command algor="imagecalc" option="imagemaths" image="image.env" output="image_out.env" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" expression="string" | expressionFile="string" >
     <!-- A command to replace values within an image which are below a given value -->
     <rsgis:command algor="imagecalc" option="replacevalueslessthan" image="image.env" output="image_out.env" threshold="float" value="float" />
     <!-- A command to convert the a spectral curve such that it has a unit area (of value 1) -->
