@@ -3125,13 +3125,13 @@ void RSGISExeSegment::runAlgorithm() throw(RSGISException)
                 cout << "Processing in Memory\n";
                 catagoryDataset = imgUtils.createCopy(inDataset, "", "MEM", GDT_UInt32, this->projFromImage, this->proj);
                 imgUtils.copyUIntGDALDataset(inDataset, catagoryDataset);
-                resultDataset = imgUtils.createCopy(inDataset, 3, "", "MEM", GDT_UInt32, this->projFromImage, this->proj);
+                resultDataset = imgUtils.createCopy(inDataset, 3, "", "MEM", GDT_Byte, this->projFromImage, this->proj);
             }
             else
             {
                 cout << "Processing using Disk\n";
                 catagoryDataset = inDataset;
-                resultDataset = imgUtils.createCopy(inDataset, 3, this->outputImage, this->imageFormat, GDT_UInt32, this->projFromImage, this->proj);
+                resultDataset = imgUtils.createCopy(inDataset, 3, this->outputImage, this->imageFormat, GDT_Byte, this->projFromImage, this->proj);
             }
             
             cout << "Generating Random Colours Image\n";
@@ -3141,8 +3141,8 @@ void RSGISExeSegment::runAlgorithm() throw(RSGISException)
             if(this->processInMemory)
             {
                 cout << "Copying output to disk\n";
-                GDALDataset *outDataset = imgUtils.createCopy(inDataset, 3, this->outputImage, this->imageFormat, GDT_UInt32, this->projFromImage, this->proj);
-                imgUtils.copyUIntGDALDataset(resultDataset, outDataset);
+                GDALDataset *outDataset = imgUtils.createCopy(inDataset, 3, this->outputImage, this->imageFormat, GDT_Byte, this->projFromImage, this->proj);
+                imgUtils.copyByteGDALDataset(resultDataset, outDataset);
                 GDALClose(outDataset);
                 GDALClose(catagoryDataset);
             }
