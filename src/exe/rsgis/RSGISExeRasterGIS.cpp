@@ -2326,7 +2326,7 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
                 }
                 
                 cout << "Importing attribute table.\n";
-                RSGISAttributeTable *attTable = RSGISAttributeTable::importFromASCII(this->attTableFile);
+                RSGISAttributeTable *attTable = RSGISAttributeTableMem::importFromASCII(this->attTableFile);
                 
                 RSGISCreateImageFromAttributeTable createImg;
                 createImg.createImageFromAttTable(clumpsDatasets, this->outputFile, attTable, bands, imageFormat);
@@ -2350,7 +2350,7 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
             try
             {
                 cout << "Importing Attribute Table:\n";
-                RSGISAttributeTable *attTable = RSGISAttributeTable::importFromASCII(attTableFile);
+                RSGISAttributeTable *attTable = RSGISAttributeTableMem::importFromASCII(attTableFile);
                 cout << "Adding Field\n";
                 attTable->addAttIntField("class", 0);
                 cout << "Populating statements with indexes\n";
@@ -2391,7 +2391,7 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
             try
             {
                 cout << "Importing Attribute Table:\n";
-                RSGISAttributeTable *attTable = RSGISAttributeTable::importFromASCII(attTableFile);
+                RSGISAttributeTable *attTable = RSGISAttributeTableMem::importFromASCII(attTableFile);
                 cout << "Adding Fields\n";
                 attTable->addAttributes(attributes);
                 cout << "Exporting Attribute Table\n";
@@ -2432,7 +2432,7 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
                 GDALClose(inDataset);
                 
                 cout << "Importing Attribute Table:\n";
-                RSGISAttributeTable *attTable = RSGISAttributeTable::importFromASCII(attTableFile);
+                RSGISAttributeTable *attTable = RSGISAttributeTableMem::importFromASCII(attTableFile);
                 
                 cout << "Populating statements with indexes\n";
                 attTable->populateIfStatementsWithIdxs(statements);
@@ -2484,7 +2484,7 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
                 
                 
                 cout << "Importing Attribute Table:\n";
-                RSGISAttributeTable *attTable = RSGISAttributeTable::importFromASCII(attTableFile);
+                RSGISAttributeTable *attTable = RSGISAttributeTableMem::importFromASCII(attTableFile);
                 
                 
                 cout << "Find majority categories\n";
@@ -2549,7 +2549,7 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
 				}
                 
                 cout << "Importing Attribute Table:\n";
-                RSGISAttributeTable *attTable = RSGISAttributeTable::importFromASCII(attTableFile);
+                RSGISAttributeTable *attTable = RSGISAttributeTableMem::importFromASCII(attTableFile);
 
                 
                 RSGISAttCountPolyIntersect attCountIntersects;
@@ -2579,7 +2579,7 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
             try
             {
                 cout << "Importing Attribute Table\n";
-                RSGISAttributeTable *attTable = RSGISAttributeTable::importFromASCII(attTableFile);
+                RSGISAttributeTable *attTable = RSGISAttributeTableMem::importFromASCII(attTableFile);
                 
                 cout << "Evalute Expression\n";
                 attTable->calculateFieldsMUParser(this->mathsExpression, this->attField, this->attFieldDT, this->variables);
@@ -2657,7 +2657,7 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
                 }
                 
                 cout << "Importing Attribute Table:\n";
-                RSGISAttributeTable *attTable = RSGISAttributeTable::importFromASCII(attTableFile);
+                RSGISAttributeTable *attTable = RSGISAttributeTableMem::importFromASCII(attTableFile);
                 
                 cout << "Calculating Statistics\n";
                 RSGISPopulateAttributeTableBandStats calcBandStats;
@@ -2700,7 +2700,7 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
                 GDALDataset *outRATDataset = imageUtils.createCopy(clumpsDataset, this->outputFile, this->imageFormat, GDT_UInt32);
                 imageUtils.copyUIntGDALDataset(clumpsDataset, outRATDataset);
                 
-                RSGISAttributeTable *attTable = RSGISAttributeTable::importFromASCII(this->attTableFile);
+                RSGISAttributeTable *attTable = RSGISAttributeTableMem::importFromASCII(this->attTableFile);
                 
                 cout << "Adding RAT\n";
                 attTable->exportGDALRaster(outRATDataset, 1);
@@ -2768,7 +2768,7 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
                 }
                 
                 cout << "Importing Attribute Table:\n";
-                RSGISAttributeTable *attTable = RSGISAttributeTable::importFromASCII(attTableFile);
+                RSGISAttributeTable *attTable = RSGISAttributeTableMem::importFromASCII(attTableFile);
                 
                 cout << "Calculating Statistics\n";
                 RSGISPopulateAttributeTableImageStats calcImageStats;
@@ -2824,7 +2824,7 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
             try 
             {
                 cout << "Importing Attribute Table:\n";
-                RSGISAttributeTable *attTable = RSGISAttributeTable::importFromASCII(attTableFile);
+                RSGISAttributeTable *attTable = RSGISAttributeTableMem::importFromASCII(attTableFile);
 
                 cout << "Getting data from attribute Table\n";
                 vector<double> *data = attTable->getFieldValues(this->attField);
@@ -2916,7 +2916,7 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
             try
             {
                 cout << "Importing Attribute Table\n";
-                RSGISAttributeTable *attTable = RSGISAttributeTable::importFromASCII(this->attTableFile);
+                RSGISAttributeTable *attTable = RSGISAttributeTableMem::importFromASCII(this->attTableFile);
                 
                 cout << "Importing Neighbours\n";
                 RSGISAttributeTableNeighbours neighboursUtils;
@@ -2993,7 +2993,7 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
                 }
                 
                 cout << "Importing Attribute Table:\n";
-                RSGISAttributeTable *attTable = RSGISAttributeTable::importFromASCII(attTableFile);
+                RSGISAttributeTable *attTable = RSGISAttributeTableMem::importFromASCII(attTableFile);
                 
                 cout << "Calculating Statistics\n";
                 RSGISCalcAttTableWithinSegmentPixelDistStats calcDistStats;
@@ -3075,7 +3075,7 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
                 }
                 
                 cout << "Importing Attribute Table:\n";
-                RSGISAttributeTable *attTable = RSGISAttributeTable::importFromASCII(attTableFile);
+                RSGISAttributeTable *attTable = RSGISAttributeTableMem::importFromASCII(attTableFile);
                 
                 cout << "Calculating Statistics\n";
                 RSGISPopulateAttributeTableBandStatsMeanLitBands calcBandStats;
@@ -3173,7 +3173,7 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
                 }
                 
                 cout << "Importing Attribute Table:\n";
-                RSGISAttributeTable *attTable = RSGISAttributeTable::importFromASCII(attTableFile);
+                RSGISAttributeTable *attTable = RSGISAttributeTableMem::importFromASCII(attTableFile);
                 
                 unsigned int meanLitBandIdx =  datasets[0]->GetRasterCount() +  datasets[1]->GetRasterCount() + this->meanLitBand-1;
                 
@@ -3206,7 +3206,7 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
             try 
             {
                 cout << "Importing Attribute Table:\n";
-                RSGISAttributeTable *attTable = RSGISAttributeTable::importFromASCII(attTableFile);
+                RSGISAttributeTable *attTable = RSGISAttributeTableMem::importFromASCII(attTableFile);
                 
                 cout << "Exporting Field to ASCII\n";
                 if(attTable->hasAttribute(attField))

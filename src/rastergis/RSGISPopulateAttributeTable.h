@@ -36,6 +36,7 @@
 #include "img/RSGISCalcImageSingleValue.h"
 
 #include "rastergis/RSGISAttributeTable.h"
+#include "rastergis/RSGISAttributeTableMem.h"
 
 #include "math/RSGISMathsUtils.h"
 
