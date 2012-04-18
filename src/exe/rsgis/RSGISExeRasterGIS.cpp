@@ -1345,18 +1345,44 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
         XMLString::release(&clumpsXMLStr);
         
         
-        XMLCh *outputXMLStr = XMLString::transcode("output");
-        if(argElement->hasAttribute(outputXMLStr))
+        XMLCh *tableXMLStr = XMLString::transcode("table");
+        if(argElement->hasAttribute(tableXMLStr))
         {
-            char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
-            this->outputFile = string(charValue);
+            inoutTable = true;
+            char *charValue = XMLString::transcode(argElement->getAttribute(tableXMLStr));
+            this->attTableFile = string(charValue);
             XMLString::release(&charValue);
+            
+            XMLCh *tableOutXMLStr = XMLString::transcode("tableout");
+            if(argElement->hasAttribute(tableOutXMLStr))
+            {
+                char *charValue = XMLString::transcode(argElement->getAttribute(tableOutXMLStr));
+                this->outAttTableFile = string(charValue);
+                XMLString::release(&charValue);
+            }
+            else
+            {
+                throw RSGISXMLArgumentsException("No \'tableout\' attribute was provided.");
+            }
+            XMLString::release(&tableOutXMLStr);
         }
         else
         {
-            throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+            inoutTable = false;
+            XMLCh *outputXMLStr = XMLString::transcode("output");
+            if(argElement->hasAttribute(outputXMLStr))
+            {
+                char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
+                this->outputFile = string(charValue);
+                XMLString::release(&charValue);
+            }
+            else
+            {
+                throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+            }
+            XMLString::release(&outputXMLStr);
         }
-        XMLString::release(&outputXMLStr);
+        XMLString::release(&tableXMLStr);
        
     }
     else if(XMLString::equals(optionMeanEucDist2Neighbours, optionXML))
@@ -1393,13 +1419,15 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
         XMLCh *neighboursXMLStr = XMLString::transcode("neighbours");
         if(argElement->hasAttribute(neighboursXMLStr))
         {
+            neighboursProvided = true;
             char *charValue = XMLString::transcode(argElement->getAttribute(neighboursXMLStr));
             this->neighboursFile = string(charValue);
             XMLString::release(&charValue);
         }
         else
         {
-            throw RSGISXMLArgumentsException("No \'neighbours\' attribute was provided.");
+            cout << "Using neighbours from attribute table\n";
+            neighboursProvided = false;
         }
         XMLString::release(&neighboursXMLStr);
         
@@ -2874,7 +2902,15 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
         {
             cout << "A command to find the neighbours of the clumps and save as a neighbours file.\n";
             cout << "Clump Image: " << this->clumpsImage << endl;
-            cout << "Output File: " << this->outputFile << endl;
+            if(inoutTable)
+            {
+                cout << "Input Table: " << this->attTableFile << endl;
+                cout << "Output: " << this->outAttTableFile << endl;
+            }
+            else
+            {
+                cout << "Output File: " << this->outputFile << endl;
+            }
             
             GDALAllRegister();
             try 
@@ -2887,12 +2923,24 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
                 }
                 
                 RSGISFindClumpNeighbours findNeighbours;
-                vector<list<unsigned long >* > *neighbours = findNeighbours.findNeighbours(clumpsDataset);
                 
-                cout << "Exporting to File\n";
-                RSGISAttributeTableNeighbours attNeighbours;
-                attNeighbours.exportToTextFile(neighbours, this->outputFile);
-                attNeighbours.clearMemory(neighbours);
+                if(inoutTable)
+                {
+                    RSGISAttributeTable *attTable = RSGISAttributeTableMem::importFromASCII(this->attTableFile);
+                    findNeighbours.findNeighbours(clumpsDataset, attTable);
+                    cout << "Exporting Attribute Table\n";
+                    attTable->exportASCII(this->outAttTableFile);
+                    delete attTable;
+                }
+                else
+                {
+                    vector<list<unsigned long >* > *neighbours = findNeighbours.findNeighbours(clumpsDataset);
+                    
+                    cout << "Exporting to File\n";
+                    RSGISAttributeTableNeighbours attNeighbours;
+                    attNeighbours.exportToTextFile(neighbours, this->outputFile);
+                    attNeighbours.clearMemory(neighbours);
+                }
                 
             }
             catch (RSGISException &e) 
@@ -2904,7 +2952,10 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
         {
             cout << "A command to find mean euclidean distance to neighbours\n";
             cout << "Table: " << this->attTableFile << endl;
-            cout << "Neighbours: " << this->neighboursFile << endl;
+            if(neighboursProvided)
+            {
+                cout << "Neighbours: " << this->neighboursFile << endl;
+            }
             cout << "Out Table: " << this->outAttTableFile << endl;
             cout << "Out Field: " << this->attField << endl;
             cout << "Fields to calculate distance: \n";
@@ -2917,18 +2968,26 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
             {
                 cout << "Importing Attribute Table\n";
                 RSGISAttributeTable *attTable = RSGISAttributeTableMem::importFromASCII(this->attTableFile);
-                
-                cout << "Importing Neighbours\n";
-                RSGISAttributeTableNeighbours neighboursUtils;
-                vector<vector<unsigned long > > *neighbours = neighboursUtils.importFromTextFile(this->neighboursFile);
-                
-                cout << "Calculating Distance to neighbours\n";
+
                 RSGISFindMeanDist2Neighbours calcMeanDist2Neighbours;
-                calcMeanDist2Neighbours.findMeanEuclideanDist2Neighbours(attTable, neighbours, attributeNames, this->attMeanField, this->attMaxField, this->attMinField);
+                if(neighboursProvided)
+                {
+                    cout << "Importing Neighbours\n";
+                    RSGISAttributeTableNeighbours neighboursUtils;
+                    vector<vector<unsigned long > > *neighbours = neighboursUtils.importFromTextFile(this->neighboursFile);
+                    cout << "Calculating Distance to neighbours\n";
+                    calcMeanDist2Neighbours.findMeanEuclideanDist2Neighbours(attTable, neighbours, attributeNames, this->attMeanField, this->attMaxField, this->attMinField);
+                    delete neighbours;
+                }
+                else
+                {
+                    cout << "Calculating Distance to neighbours\n";
+                    calcMeanDist2Neighbours.findMeanEuclideanDist2Neighbours(attTable, attributeNames, this->attMeanField, this->attMaxField, this->attMinField);
+                }
                 
                 cout << "Exporting Attribute Table\n";
                 attTable->exportASCII(this->outAttTableFile);
-                delete neighbours;
+                
                 delete attTable;
                 delete attributeNames;
             }

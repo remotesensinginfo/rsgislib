@@ -198,6 +198,169 @@ namespace rsgis{namespace rastergis{
         }
     }
     
+    void RSGISFindMeanDist2Neighbours::findMeanEuclideanDist2Neighbours(RSGISAttributeTable *attTable, vector<string> *attributeNames, string outMeanAttName, string outMaxAttName, string outMinAttName)throw(RSGISAttributeTableException)
+    {
+        try 
+        {
+            if(attributeNames->size() == 0)
+            {
+                throw RSGISAttributeTableException("There must be at least one attribute name provided\n");
+            }
+            
+            if(attTable->hasAttribute(outMeanAttName))
+            {
+                if(attTable->getDataType(outMeanAttName) != rsgis_float)
+                {
+                    string message = outMeanAttName + string(" field already exists and is not of type float and therefore cannot be used.");
+                    throw RSGISAttributeTableException(message);
+                }
+            }
+            else
+            {
+                attTable->addAttFloatField(outMeanAttName, 0);
+            }
+            unsigned int outMeanFieldIdx = attTable->getFieldIndex(outMeanAttName);
+            
+            if(attTable->hasAttribute(outMaxAttName))
+            {
+                if(attTable->getDataType(outMaxAttName) != rsgis_float)
+                {
+                    string message = outMaxAttName + string(" field already exists and is not of type float and therefore cannot be used.");
+                    throw RSGISAttributeTableException(message);
+                }
+            }
+            else
+            {
+                attTable->addAttFloatField(outMaxAttName, 0);
+            }
+            unsigned int outMaxFieldIdx = attTable->getFieldIndex(outMaxAttName);
+            
+            if(attTable->hasAttribute(outMinAttName))
+            {
+                if(attTable->getDataType(outMinAttName) != rsgis_float)
+                {
+                    string message = outMinAttName + string(" field already exists and is not of type float and therefore cannot be used.");
+                    throw RSGISAttributeTableException(message);
+                }
+            }
+            else
+            {
+                attTable->addAttFloatField(outMinAttName, 0);
+            }
+            unsigned int outMinFieldIdx = attTable->getFieldIndex(outMinAttName);
+            
+            
+            unsigned int numTestAtts = attributeNames->size();
+            RSGISAttributeDataType *attDataTypes = new RSGISAttributeDataType[numTestAtts];
+            unsigned int *attIdxes = new unsigned int[numTestAtts];
+            
+            unsigned int counter = 0;
+            for(vector<string>::iterator iterNames = attributeNames->begin(); iterNames != attributeNames->end(); ++iterNames)
+            {
+                attDataTypes[counter] = attTable->getDataType(*iterNames);
+                attIdxes[counter] = attTable->getFieldIndex(*iterNames);
+                
+                if(!((attDataTypes[counter] == rsgis_float) | (attDataTypes[counter] == rsgis_int)))
+                {
+                    throw RSGISAttributeTableException("Attribute can only be of type int or float.");
+                }
+                
+                ++counter;
+            }
+            
+            RSGISFeature *cFeat = NULL;
+            RSGISFeature *tFeat = NULL;
+            double sqDist = 0;
+            double dist = 0;
+            double sumDist = 0;
+            double minDist = 0;
+            double maxDist = 0;
+            bool first = true;
+            
+            for(unsigned long i = 0; i < attTable->getSize(); ++i)
+            {
+                cFeat = attTable->getFeature(i);
+                if(cFeat->neighbours->size() > 0)
+                {
+                    sumDist = 0;
+                    first = true;
+                    for(unsigned int j = 0; j < cFeat->neighbours->size(); ++j)
+                    {
+                        tFeat = attTable->getFeature(cFeat->neighbours->at(j));
+                        sqDist = 0;
+                        for(unsigned int k = 0; k < numTestAtts; ++k)
+                        {
+                            if(attDataTypes[k] == rsgis_float)
+                            {
+                                sqDist += pow((cFeat->floatFields->at(attIdxes[k]) - tFeat->floatFields->at(attIdxes[k])), 2.0);
+                            }
+                            else if(attDataTypes[k] == rsgis_int)
+                            {
+                                sqDist += pow(((double)(cFeat->intFields->at(attIdxes[k]) - tFeat->intFields->at(attIdxes[k]))), 2.0);
+                            }
+                        }
+                        if(sqDist != 0)
+                        {
+                            dist = sqrt(sqDist/numTestAtts);
+                            
+                            if(first)
+                            {
+                                minDist = dist;
+                                maxDist = dist;
+                                first = false;
+                            }
+                            else if(dist < minDist)
+                            {
+                                minDist = dist;
+                            }
+                            else if(dist > maxDist)
+                            {
+                                maxDist = dist;
+                            }
+                            
+                            sumDist += dist;
+                        }
+                        else
+                        {
+                            dist = 0;
+                            if(first)
+                            {
+                                minDist = dist;
+                                maxDist = dist;
+                                first = false;
+                            }
+                            else if(dist < minDist)
+                            {
+                                minDist = dist;
+                            }
+                            else if(dist > maxDist)
+                            {
+                                maxDist = dist;
+                            }
+                        }
+                    }
+                    
+                    cFeat->floatFields->at(outMeanFieldIdx) = sumDist/cFeat->neighbours->size();
+                    cFeat->floatFields->at(outMaxFieldIdx) = maxDist;
+                    cFeat->floatFields->at(outMinFieldIdx) = minDist;
+                }
+                else
+                {
+                    cFeat->floatFields->at(outMeanFieldIdx) = 0;
+                    cFeat->floatFields->at(outMaxFieldIdx) = 0;
+                    cFeat->floatFields->at(outMinFieldIdx) = 0;
+                }
+            }
+            
+            delete[] attDataTypes;
+            delete[] attIdxes;
+        } 
+        catch (RSGISAttributeTableException &e) 
+        {
+            throw e;
+        }
+    }
+    
     RSGISFindMeanDist2Neighbours::~RSGISFindMeanDist2Neighbours()
     {
         

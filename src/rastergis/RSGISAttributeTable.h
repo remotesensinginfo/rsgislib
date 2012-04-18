@@ -69,6 +69,7 @@ namespace rsgis{namespace rastergis{
         vector<long> *intFields;
         vector<double> *floatFields;
         vector<string> *stringFields;
+        vector<unsigned long long> *neighbours;
     };
     
     enum RSGISAttributeDataType

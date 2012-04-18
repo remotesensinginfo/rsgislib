@@ -32,6 +32,7 @@
 #include <algorithm>
 
 #include "img/RSGISImageCalcException.h"
+#include "rastergis/RSGISAttributeTable.h"
 
 #include "gdal_priv.h"
 #include "ogrsf_frmts.h"
@@ -47,8 +48,25 @@ namespace rsgis{namespace rastergis{
     {
     public:
         RSGISFindClumpNeighbours();
-        vector<list<unsigned long>* >* findNeighbours(GDALDataset *clumpImages) throw(RSGISImageCalcException);
+        vector<list<unsigned long>* >* findNeighbours(GDALDataset *clumpImage) throw(RSGISImageCalcException);
+        void findNeighbours(GDALDataset *clumpImage, RSGISAttributeTable *attTable) throw(RSGISImageCalcException);
         ~RSGISFindClumpNeighbours();
+    protected:
+        inline void addNeighbourToFeature(RSGISFeature *feat, unsigned long long neighbourID)
+        {
+            bool foundID = false;
+            for(vector<unsigned long long>::iterator iterNeigh = feat->neighbours->begin(); iterNeigh != feat->neighbours->end(); ++iterNeigh)
+            {
+                if((*iterNeigh) == neighbourID)
+                {
+                    foundID = true;
+                }
+            }
+            if(!foundID)
+            {
+                feat->neighbours->push_back(neighbourID);
+            }
+        };
     };
     
 }}
