@@ -44,6 +44,7 @@ namespace rsgis{namespace rastergis{
     public:
         RSGISFindMeanDist2Neighbours();
         void findMeanEuclideanDist2Neighbours(RSGISAttributeTable *attTable, vector<vector<unsigned long > > *neighbours, vector<string> *attributeNames, string outMeanAttName, string outMaxAttName, string outMinAttName)throw(RSGISAttributeTableException);
+        void findMeanEuclideanDist2Neighbours(RSGISAttributeTable *attTable, vector<string> *attributeNames, string outMeanAttName, string outMaxAttName, string outMinAttName)throw(RSGISAttributeTableException);
         ~RSGISFindMeanDist2Neighbours();
     };
     

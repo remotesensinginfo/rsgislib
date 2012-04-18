@@ -229,6 +229,166 @@ namespace rsgis{namespace rastergis{
         
         return neighbours;
     }
+    
+    void RSGISFindClumpNeighbours::findNeighbours(GDALDataset *clumpImage, RSGISAttributeTable *attTable) throw(RSGISImageCalcException)
+    {
+        try
+        {
+            unsigned int width = clumpImage->GetRasterXSize();
+            unsigned int height = clumpImage->GetRasterYSize();
+            GDALRasterBand *imgBand = clumpImage->GetRasterBand(1);
+            
+            int windowSize = 3;
+            
+            unsigned int **inputData = new unsigned int*[3];
+			for(int i = 0; i < windowSize; i++)
+            {
+                inputData[i] = new unsigned int[width];
+                for(int j = 0; j < width; j++)
+                {
+                    inputData[i][j] = 0;
+                }
+            }
+            
+            unsigned int **dataBlock = new unsigned int*[windowSize];
+            for(int i = 0; i < windowSize; i++)
+            {
+                dataBlock[i] = new unsigned int[windowSize];
+            }
+            
+            unsigned long clumpID = 0;
+            unsigned long neighbourID = 0;
+            RSGISFeature *feat = NULL;
+            bool foundID = false;
+            
+            int feedback = height/10;
+			int feedbackCounter = 0;
+			cout << "Started" << flush;
+			// Loop images to process data
+			for(int i = 0; i < height; i++)
+			{				
+				if((i % feedback) == 0)
+				{
+					cout << ".." << feedbackCounter << ".." << flush;
+					feedbackCounter = feedbackCounter + 10;
+				}
+                
+				for(int m = 0; m < windowSize; m++)
+				{
+					if(m == 0)
+					{
+						if(i == 0)
+						{
+							for(int k = 0; k < width; k++)
+                            {
+                                inputData[m][k] = 0;
+                            }
+						}
+						else
+						{
+							imgBand->RasterIO(GF_Read, 0, i-1, width, 1, inputData[m], width, 1, GDT_UInt32, 0, 0);
+						}
+					}
+					else if(m == 2)
+					{
+						if((i + 1) >= height)
+						{
+							for(int k = 0; k < width; k++)
+                            {
+                                inputData[m][k] = 0;
+                            }
+						}
+						else
+						{
+							imgBand->RasterIO(GF_Read, 0, i+1, width, 1, inputData[m], width, 1, GDT_UInt32, 0, 0);
+						}
+					}
+					else
+					{
+						imgBand->RasterIO(GF_Read, 0, i, width, 1, inputData[m], width, 1, GDT_UInt32, 0, 0);
+					}
+				}
+				
+				for(int j = 0; j < width; j++)
+				{
+					for(int m = 0; m < windowSize; m++)
+					{
+						for(int k = 0; k < windowSize; k++)
+						{
+                            
+							if(k == 0)
+							{
+								if(j == 0)
+								{
+									dataBlock[m][k] = 0;
+								}
+								else
+								{
+									dataBlock[m][k] = inputData[m][(j-1)];
+								}
+							}
+							else if(k == 2)
+							{
+								if((j + 1) >= width)
+								{
+									dataBlock[m][k] = 0;
+								}
+								else
+								{
+                                    dataBlock[m][k] = inputData[m][(j+1)];
+								}
+							}
+							else
+							{
+								dataBlock[m][k] = inputData[m][j];
+							}
+						}
+					}
+					
+					
+                    // Process Window.
+                    clumpID = dataBlock[1][1];
+                    if(clumpID > 0)
+                    {
+                        feat = attTable->getFeature(clumpID-1);
+                        if((dataBlock[0][1] > 0) & (dataBlock[0][1] != clumpID))
+                        {
+                            //neighbours->at(clumpID-1)->push_back(dataBlock[0][1]-1);
+                            this->addNeighbourToFeature(feat, dataBlock[0][1]-1);
+                        }
+                        if((dataBlock[1][0] > 0) & (dataBlock[1][0] != clumpID))
+                        {
+                            //neighbours->at(clumpID-1)->push_back(dataBlock[1][0]-1);
+                            this->addNeighbourToFeature(feat, dataBlock[1][0]-1);
+                        }
+                        if((dataBlock[1][2] > 0) & (dataBlock[1][2] != clumpID))
+                        {
+                            //neighbours->at(clumpID-1)->push_back(dataBlock[1][2]-1);
+                            this->addNeighbourToFeature(feat, dataBlock[1][2]-1);
+                        }
+                        if((dataBlock[2][1] > 0) & (dataBlock[2][1] != clumpID))
+                        {
+                            //neighbours->at(clumpID-1)->push_back(dataBlock[2][1]-1);
+                            this->addNeighbourToFeature(feat, dataBlock[2][1]-1);
+                        }
+                    }
+				}
+			}
+			cout << " Complete.\n";
+            
+			for(int i = 0; i < windowSize; i++)
+            {
+                delete[] dataBlock[i];
+                delete[] inputData[i];
+            }
+            delete[] dataBlock;
+            delete[] inputData;
+        }
+        catch(RSGISImageCalcException &e)
+        {
+            throw e;
+        }
+    }
         
     RSGISFindClumpNeighbours::~RSGISFindClumpNeighbours()
     {

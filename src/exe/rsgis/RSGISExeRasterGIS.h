@@ -148,7 +148,9 @@ protected:
     vector<string> *attributeNames;
     RSGISBandAttStats *imageStats;
     RSGISStatsSummary *statsSummary;
-    vector<RSGISBandAttName*> *bandAttNames;    
+    vector<RSGISBandAttName*> *bandAttNames;
+    bool inoutTable;
+    bool neighboursProvided;
 };
 
 #endif

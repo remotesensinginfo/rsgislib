@@ -625,11 +625,15 @@ namespace rsgis{namespace rastergis{
             unsigned int numOfExpTokens = 0;
             unsigned int tokenIdx = 0;
             unsigned long long numOfFeatures = 0;
+            unsigned long long numOfDataLines = 0;
+            unsigned long long tmpFid = 0;
             
             unsigned int tmpNumBoolFields = 0;
             unsigned int tmpNumIntFields = 0;
             unsigned int tmpNumFloatFields = 0;
             unsigned int tmpNumStrFields = 0;
+            
+            RSGISFeature *feature = NULL;
             
             while(!txtReader.endOfFile())
             {
@@ -693,6 +697,7 @@ namespace rsgis{namespace rastergis{
                     }
                     else if((lineCount > 4) & (lineCount < (5+numOfFields)))
                     {
+                        numOfDataLines = (5+numOfFields) + numOfFeatures;
                         txtUtils.tokenizeString(line, ',', tokens, true, true);
                         if(tokens->size() != 2)
                         {
@@ -735,7 +740,7 @@ namespace rsgis{namespace rastergis{
                             throw RSGISAttributeTableException("Did not recognise the data type.");
                         }
                     }
-                    else
+                    else if(lineCount < numOfDataLines)
                     {
                         if(lineCount == (5+numOfFields))
                         {
@@ -770,7 +775,7 @@ namespace rsgis{namespace rastergis{
                         }
                         tokenIdx = 0;
                         
-                        RSGISFeature *feature = new RSGISFeature();
+                        feature = new RSGISFeature();
                         feature->fid = txtUtils.strto64bitUInt(tokens->at(tokenIdx++));
                         feature->boolFields = new vector<bool>();
                         feature->boolFields->reserve(attTableObj->numBoolFields);
@@ -819,8 +824,33 @@ namespace rsgis{namespace rastergis{
                         {
                             feature->stringFields->push_back(tokens->at(tokenIdx++));
                         }
+                        feature->neighbours = new vector<unsigned long long>();
                         
                         attTableObj->attTable->push_back(feature);                        
+                    }
+                    else
+                    {
+                        txtUtils.tokenizeString(line, ',', tokens, true, true);
+                        if(tokens->size() ==  0)
+                        {
+                            cout << "Line: " << line << endl;
+                            throw RSGISAttributeTableException("Incorrect number of expected tokens for neighbours.");
+                        }
+                        tokenIdx = 0;
+                        for(unsigned i = 0; i < tokens->size(); ++i)
+                        {
+                            if(i == 0)
+                            {
+                                tmpFid = txtUtils.strto64bitUInt(tokens->at(tokenIdx++));
+                                feature = attTableObj->getFeature(tmpFid);
+                                feature->neighbours->reserve(tokens->size()-1);
+                            }
+                            else
+                            {
+                                feature->neighbours->push_back(txtUtils.strto64bitUInt(tokens->at(tokenIdx++)));
+                            }
+                        }
+                        
                     }
                     ++lineCount;
                 }

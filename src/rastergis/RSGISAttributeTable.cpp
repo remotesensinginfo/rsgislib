@@ -465,6 +465,20 @@ namespace rsgis{namespace rastergis{
             outTxtFile << endl;
         }
         
+        outTxtFile << "# Data - FID,neighbours\n";
+        for(this->start(); this->end(); ++(*this))
+        {
+            outTxtFile << (*(*this))->fid;
+            if((*(*this))->neighbours != NULL)
+            {
+                for(vector<unsigned long long>::iterator iterNeighbours = (*(*this))->neighbours->begin(); iterNeighbours != (*(*this))->neighbours->end(); ++iterNeighbours)
+                {
+                    outTxtFile << "," << *iterNeighbours;
+                }
+            }
+            outTxtFile << endl;
+        }
+        
         outTxtFile.flush();
         outTxtFile.close();
     }
