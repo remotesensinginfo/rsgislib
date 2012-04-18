@@ -115,41 +115,51 @@ namespace rsgis{namespace rastergis{
         bool ignore; // i.e., used for an else statment where nothing is to be done.
     };
     
-    class RSGISAttributeTable
+    class AttIterator
+    {
+    public:
+        virtual void operator++()=0;
+        virtual void start()=0;
+        virtual bool end()=0;
+        virtual RSGISFeature* operator *()=0;
+        virtual ~AttIterator(){};
+    };
+    
+    class RSGISAttributeTable : public AttIterator
     {
     public:        
         RSGISAttributeTable(unsigned long long numFeatures);
         RSGISAttributeTable(unsigned long long numFeatures, vector<pair<string, RSGISAttributeDataType> > *fields);
         
-        bool getBoolField(unsigned long long fid, string name) throw(RSGISAttributeTableException);
-        long getIntField(unsigned long long fid, string name) throw(RSGISAttributeTableException);
-        double getDoubleField(unsigned long long fid, string name) throw(RSGISAttributeTableException);
-        string getStringField(unsigned long long fid, string name) throw(RSGISAttributeTableException);
+        virtual bool getBoolField(unsigned long long fid, string name) throw(RSGISAttributeTableException)=0;
+        virtual long getIntField(unsigned long long fid, string name) throw(RSGISAttributeTableException)=0;
+        virtual double getDoubleField(unsigned long long fid, string name) throw(RSGISAttributeTableException)=0;
+        virtual string getStringField(unsigned long long fid, string name) throw(RSGISAttributeTableException)=0;
         
-        void setBoolField(unsigned long long fid, string name, bool value) throw(RSGISAttributeTableException);
-        void setIntField(unsigned long long fid, string name, long value) throw(RSGISAttributeTableException);
-        void setDoubleField(unsigned long long fid, string name, double value) throw(RSGISAttributeTableException);
-        void setStringField(unsigned long long fid, string name, string value) throw(RSGISAttributeTableException);
+        virtual void setBoolField(unsigned long long fid, string name, bool value) throw(RSGISAttributeTableException)=0;
+        virtual void setIntField(unsigned long long fid, string name, long value) throw(RSGISAttributeTableException)=0;
+        virtual void setDoubleField(unsigned long long fid, string name, double value) throw(RSGISAttributeTableException)=0;
+        virtual void setStringField(unsigned long long fid, string name, string value) throw(RSGISAttributeTableException)=0;
         
-        void setBoolValue(string name, bool value) throw(RSGISAttributeTableException);
-        void setIntValue(string name, long value) throw(RSGISAttributeTableException);
-        void setFloatValue(string name, double value) throw(RSGISAttributeTableException);
-        void setStringValue(string name, string value) throw(RSGISAttributeTableException);
+        virtual void setBoolValue(string name, bool value) throw(RSGISAttributeTableException)=0;
+        virtual void setIntValue(string name, long value) throw(RSGISAttributeTableException)=0;
+        virtual void setFloatValue(string name, double value) throw(RSGISAttributeTableException)=0;
+        virtual void setStringValue(string name, string value) throw(RSGISAttributeTableException)=0;
         
-        RSGISFeature* getFeature(unsigned long long fid) throw(RSGISAttributeTableException);
+        virtual RSGISFeature* getFeature(unsigned long long fid) throw(RSGISAttributeTableException)=0;
         
-        void addAttBoolField(string name, bool val);
-        void addAttIntField(string name, long val);
-        void addAttFloatField(string name, double val);
-        void addAttStringField(string name, string val);
+        virtual void addAttBoolField(string name, bool val)=0;
+        virtual void addAttIntField(string name, long val)=0;
+        virtual void addAttFloatField(string name, double val)=0;
+        virtual void addAttStringField(string name, string val)=0;
         
-        void addAttributes(vector<RSGISAttribute*> *attributes) throw(RSGISAttributeTableException);
+        virtual void addAttributes(vector<RSGISAttribute*> *attributes) throw(RSGISAttributeTableException)=0;
         
         RSGISAttributeDataType getDataType(string name) throw(RSGISAttributeTableException);
         unsigned int getFieldIndex(string name) throw(RSGISAttributeTableException);
         vector<string>* getAttributeNames();
         bool hasAttribute(string name);
-        unsigned long long getSize();
+        virtual unsigned long long getSize()=0;
         
         vector<double>* getFieldValues(string field) throw(RSGISAttributeTableException);
         
@@ -170,18 +180,20 @@ namespace rsgis{namespace rastergis{
         vector<bool>* getBoolField(string field) throw(RSGISAttributeTableException);
         vector<string>* getStringField(string field) throw(RSGISAttributeTableException);
         
-        ~RSGISAttributeTable();
+        virtual void operator++()=0;
+        virtual void start()=0;
+        virtual bool end()=0;
+        virtual RSGISFeature* operator*()=0;
         
-        static RSGISAttributeTable* importFromASCII(string inFile)throw(RSGISAttributeTableException);
-        static RSGISAttributeTable* importFromGDALRaster(string inFile)throw(RSGISAttributeTableException);
+        virtual ~RSGISAttributeTable();
+        
+        //static RSGISAttributeTable* importFromASCII(string inFile)throw(RSGISAttributeTableException);
+        //static RSGISAttributeTable* importFromGDALRaster(string inFile)throw(RSGISAttributeTableException);
         static vector<RSGISIfStatement*>* generateStatments(DOMElement *argElement)throw(RSGISAttributeTableException);
         static RSGISAttExpression* generateExpression(DOMElement *expElement)throw(RSGISAttributeTableException);
         
     protected:
         RSGISAttributeTable();
-        void createAttributeTable(unsigned long long numFeatures);
-        void createAttributeTableWithFields(unsigned long long numFeatures);
-        vector<RSGISFeature*> *attTable;
         vector<pair<string, RSGISAttributeDataType> > *fields;
         map<string, unsigned int> *fieldIdx;
         map<string, RSGISAttributeDataType> *fieldDataType;

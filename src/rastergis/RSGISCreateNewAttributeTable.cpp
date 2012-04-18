@@ -44,7 +44,7 @@ namespace rsgis{namespace rastergis{
             
             // Generate Attribute table
             cout << "Creating blank attribute table\n";
-            attTable = new RSGISAttributeTable(numClumps);
+            attTable = new RSGISAttributeTableMem(numClumps);
             attTable->addAttIntField("pxlcount", 0);
             unsigned int pxlCountIdx = attTable->getFieldIndex(string("pxlcount"));
 

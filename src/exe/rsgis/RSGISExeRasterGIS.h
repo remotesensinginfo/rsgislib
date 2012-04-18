@@ -45,6 +45,7 @@
 #include "segmentation/RSGISRegionGrowAttributeTable.h"
 
 #include "rastergis/RSGISAttributeTable.h"
+#include "rastergis/RSGISAttributeTableMem.h"
 #include "rastergis/RSGISAttributeTableNeighbours.h"
 #include "rastergis/RSGISPopulateAttributeTable.h"
 #include "rastergis/RSGISCreateImageFromAttributeTable.h"

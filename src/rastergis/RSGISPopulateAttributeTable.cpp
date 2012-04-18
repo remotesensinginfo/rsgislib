@@ -63,7 +63,7 @@ namespace rsgis{namespace rastergis{
                 fieldName = attrPrefix + string("_b") + mathUtils.uinttostring(i+1);
                 fields->push_back(pair<string, RSGISAttributeDataType>(fieldName, rsgis_float));
             }
-            attTable = new RSGISAttributeTable(numClumps, fields);
+            attTable = new RSGISAttributeTableMem(numClumps, fields);
             
             unsigned int pxlCountIdx;
             unsigned int *bandMeanIdxs = new unsigned int[numRasterBands];
