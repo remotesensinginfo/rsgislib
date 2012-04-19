@@ -577,7 +577,7 @@ namespace rsgis{namespace segment{
         delete[] spectralVals;
     }
     
-    void RSGISEliminateSmallClumps::stepwiseEliminateSmallClumpsWithAtt(GDALDataset *spectral, GDALDataset *clumps, string outputImageFile, string imageFormat, bool useImageProj, string proj, RSGISAttributeTable *attTable, unsigned int minClumpSize, float specThreshold) throw(RSGISImageCalcException)
+    void RSGISEliminateSmallClumps::stepwiseEliminateSmallClumpsWithAtt(GDALDataset *spectral, GDALDataset *clumps, string outputImageFile, string imageFormat, bool useImageProj, string proj, RSGISAttributeTable *attTable, unsigned int minClumpSize, float specThreshold, bool outputWithConsecutiveFIDs) throw(RSGISImageCalcException)
     {
         try
         {
@@ -697,6 +697,21 @@ namespace rsgis{namespace segment{
             delete ifStat;
             delete processFeature;
             
+            // Relabel output FIDs to remove gaps.
+            if(outputWithConsecutiveFIDs)
+            {
+                unsigned long fidIdxes = 0;
+                for(attTable->start(); attTable->end(); ++(*attTable))
+                {
+                    if(!(*(*attTable))->boolFields->at(eliminatedFieldIdx))
+                    {
+                        (*(*attTable))->intFields->at(outFIDIdx) = fidIdxes++;
+                        (*(*attTable))->boolFields->at(outFIDSetFieldIdx) = true;
+                    }
+                }
+                cout << "There are " << fidIdxes << " clumps following elimination\n";
+            }
+            
             // Find output FIDs for relabelling.
             cout << "Defining output FIDs within table\n";
             for(attTable->start(); attTable->end(); ++(*attTable))
@@ -707,8 +722,7 @@ namespace rsgis{namespace segment{
                 }
             }
             
-            // Relabel output FIDs to remove gaps.
-            attTable->exportASCII("/Users/pete/Desktop/tmpAtt.att");
+            //attTable->exportASCII("/Users/pete/Desktop/tmpAtt.att");
             
             // Generate output image from original and output FIDs.
             cout << "Generating output clumps file\n";
@@ -958,7 +972,7 @@ namespace rsgis{namespace segment{
                 
                 if(feat->boolFields->at(outFIDSetFieldIdx))
                 {
-                    output[0] = feat->intFields->at(outFIDIdx);
+                    output[0] = feat->intFields->at(outFIDIdx)+1;
                 }
                 else
                 {

@@ -2711,6 +2711,28 @@ void RSGISExeSegment::retrieveParameters(DOMElement *argElement) throw(RSGISXMLA
 		}
 		XMLString::release(&tmpTableXMLStr);
         
+        XMLCh *outConsecXMLStr = XMLString::transcode("outconsec");
+		if(argElement->hasAttribute(outConsecXMLStr))
+		{
+			XMLCh *yesStr = XMLString::transcode("yes");
+			const XMLCh *outConsecValue = argElement->getAttribute(outConsecXMLStr);
+			
+			if(XMLString::equals(outConsecValue, yesStr))
+			{
+				this->outputWithConsecutiveFIDs = true;
+			}
+			else
+			{
+				this->outputWithConsecutiveFIDs = false;
+			}
+			XMLString::release(&yesStr);
+		}
+		else
+		{
+            this->outputWithConsecutiveFIDs = true;
+		}
+		XMLString::release(&outConsecXMLStr);
+        
         XMLCh *specThresholdXMLStr = XMLString::transcode("maxspectraldist");
 		if(argElement->hasAttribute(specThresholdXMLStr))
 		{
@@ -4145,6 +4167,10 @@ void RSGISExeSegment::runAlgorithm() throw(RSGISException)
         {
             cout << "Temp Table: " << this->tempTable << endl;
         }
+        if(this->outputWithConsecutiveFIDs)
+        {
+            cout << "Outputting with consecutive FIDs\n";
+        }
         
         try
         {
@@ -4171,7 +4197,7 @@ void RSGISExeSegment::runAlgorithm() throw(RSGISException)
             
             cout << "Eliminating Clumps\n";
             RSGISEliminateSmallClumps eliminate;
-            eliminate.stepwiseEliminateSmallClumpsWithAtt(spectralDataset, clumpsDataset, this->outputImage, this->imageFormat, this->projFromImage, this->proj, attTable, minClumpSize, specThreshold);
+            eliminate.stepwiseEliminateSmallClumpsWithAtt(spectralDataset, clumpsDataset, this->outputImage, this->imageFormat, this->projFromImage, this->proj, attTable, minClumpSize, specThreshold, outputWithConsecutiveFIDs);
             
             // Tidy up
             delete attTable;
@@ -4464,6 +4490,10 @@ void RSGISExeSegment::printParameters()
         if(!this->processInMemory)
         {
             cout << "Temp Table: " << this->tempTable << endl;
+        }
+        if(this->outputWithConsecutiveFIDs)
+        {
+            cout << "Outputting with consecutive FIDs\n";
         }
     }
     else
