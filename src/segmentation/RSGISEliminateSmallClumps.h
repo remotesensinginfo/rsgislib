@@ -65,12 +65,14 @@ namespace rsgis{namespace segment{
         ~RSGISEliminateSmallClumps();
     protected:
         void defineOutputFID(RSGISAttributeTable *attTable, RSGISFeature *feat, unsigned int eliminatedFieldIdx, unsigned int mergedToFIDIdx, unsigned int outFIDIdx, unsigned int outFIDSetFieldIdx) throw(RSGISImageCalcException);
+        void performElimination(RSGISAttributeTable *attTable, vector<pair<unsigned long, unsigned long> > *eliminationPairs, unsigned int eliminatedFieldIdx, unsigned int mergedToFIDIdx, unsigned int pxlCountIdx, vector<RSGISBandAttStats*> *bandStats) throw(RSGISImageCalcException);
+        RSGISFeature* getEliminatedNeighbour(RSGISFeature *feat, RSGISAttributeTable *attTable, unsigned int eliminatedFieldIdx, unsigned int mergedToFIDIdx)throw(RSGISAttributeTableException);
     };
     
     class RSGISEliminateFeature : public RSGISProcessFeature
     {
     public:
-        RSGISEliminateFeature(unsigned int eliminatedFieldIdx, unsigned int mergedToFIDIdx, float specThreshold, unsigned int pxlCountIdx, vector<RSGISBandAttStats*> *bandStats);
+        RSGISEliminateFeature(unsigned int eliminatedFieldIdx, unsigned int mergedToFIDIdx, float specThreshold, unsigned int pxlCountIdx, vector<RSGISBandAttStats*> *bandStats, vector<pair<unsigned long, unsigned long> > *eliminationPairs);
         void processFeature(RSGISFeature *feat, RSGISAttributeTable *attTable)throw(RSGISAttributeTableException);
         ~RSGISEliminateFeature();
     protected:
@@ -81,6 +83,7 @@ namespace rsgis{namespace segment{
         float specThreshold;
         unsigned int pxlCountIdx;
         vector<RSGISBandAttStats*> *bandStats;
+        vector<pair<unsigned long, unsigned long> > *eliminationPairs;
     };
     
     
