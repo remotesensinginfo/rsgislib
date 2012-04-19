@@ -36,8 +36,13 @@
 #include "img/RSGISImageUtils.h"
 #include "img/RSGISImageCalcException.h"
 
+#include "rastergis/RSGISAttributeTable.h"
+#include "common/RSGISAttributeTableException.h"
+
 using namespace std;
 using namespace rsgis::img;
+using namespace rsgis::rastergis;
+using namespace rsgis;
 
 namespace rsgis{namespace segment{
         
@@ -47,6 +52,7 @@ namespace rsgis{namespace segment{
         RSGISEliminateSmallClumps();
         void eliminateSmallClumps(GDALDataset *spectral, GDALDataset *clumps, unsigned int minClumpSize, float specThreshold) throw(RSGISImageCalcException);
         void stepwiseEliminateSmallClumps(GDALDataset *spectral, GDALDataset *clumps, unsigned int minClumpSize, float specThreshold) throw(RSGISImageCalcException);
+        void stepwiseEliminateSmallClumpsWithAtt(GDALDataset *spectral, GDALDataset *clumps, GDALDataset *output, RSGISAttributeTable *attTable, unsigned int minClumpSize, float specThreshold) throw(RSGISImageCalcException);
         ~RSGISEliminateSmallClumps();
     };
     

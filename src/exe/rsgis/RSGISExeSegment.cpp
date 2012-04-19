@@ -61,6 +61,7 @@ void RSGISExeSegment::retrieveParameters(DOMElement *argElement) throw(RSGISXMLA
     XMLCh *optionGrowRegionsPixels = XMLString::transcode("growregionspixels");
     XMLCh *optionGrowRegionsPixelsAuto = XMLString::transcode("growregionspixelsauto");
     XMLCh *optionSpectralDiv = XMLString::transcode("spectraldiv");
+    XMLCh *optionStepwiseElimination = XMLString::transcode("stepwiseelimination");
     
     XMLCh *projImage = XMLString::transcode("IMAGE");
 	XMLCh *projOSGB = XMLString::transcode("OSGB");
@@ -2653,6 +2654,139 @@ void RSGISExeSegment::retrieveParameters(DOMElement *argElement) throw(RSGISXMLA
 		}
 		XMLString::release(&projXMLStr);
     }
+    else if(XMLString::equals(optionStepwiseElimination, optionXML))
+    {
+        this->option = RSGISExeSegment::stepwiseelimination;
+		
+		XMLCh *imageXMLStr = XMLString::transcode("image");
+		if(argElement->hasAttribute(imageXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(imageXMLStr));
+			this->inputImage = string(charValue);
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+		}
+		XMLString::release(&imageXMLStr);
+		
+        XMLCh *clumpsXMLStr = XMLString::transcode("clumps");
+		if(argElement->hasAttribute(clumpsXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(clumpsXMLStr));
+			this->clumpsImage = string(charValue);
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'clumps\' attribute was provided.");
+		}
+		XMLString::release(&clumpsXMLStr);
+        
+		XMLCh *outputXMLStr = XMLString::transcode("output");
+		if(argElement->hasAttribute(outputXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
+			this->outputImage = string(charValue);
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+		}
+		XMLString::release(&outputXMLStr);
+        
+        XMLCh *tmpTableXMLStr = XMLString::transcode("tmptable");
+		if(argElement->hasAttribute(tmpTableXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(tmpTableXMLStr));
+			this->tempTable = string(charValue);
+			XMLString::release(&charValue);
+            this->processInMemory = false;
+		}
+		else
+		{
+			this->processInMemory = true;
+		}
+		XMLString::release(&tmpTableXMLStr);
+        
+        XMLCh *specThresholdXMLStr = XMLString::transcode("maxspectraldist");
+		if(argElement->hasAttribute(specThresholdXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(specThresholdXMLStr));
+			this->specThreshold = mathUtils.strtofloat(string(charValue));
+			XMLString::release(&charValue);
+		}
+        else
+        {
+            throw RSGISXMLArgumentsException("No \'maxspectraldist\' attribute was provided.");
+        }
+		XMLString::release(&specThresholdXMLStr);
+        
+        XMLCh *minSizeXMLStr = XMLString::transcode("minsize");
+		if(argElement->hasAttribute(minSizeXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(minSizeXMLStr));
+			this->minClumpSize = mathUtils.strtounsignedint(string(charValue));
+			XMLString::release(&charValue);
+		}
+        else
+        {
+            throw RSGISXMLArgumentsException("No \'minsize\' attribute was provided.");
+        }
+		XMLString::release(&minSizeXMLStr);
+        
+        XMLCh *formatXMLStr = XMLString::transcode("format");
+		if(argElement->hasAttribute(formatXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(formatXMLStr));
+			this->imageFormat = string(charValue);
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			this->imageFormat = "ENVI";
+		}
+		XMLString::release(&formatXMLStr);        
+        
+        XMLCh *projXMLStr = XMLString::transcode("proj");
+		if(argElement->hasAttribute(projXMLStr))
+		{
+			const XMLCh *projXMLValue = argElement->getAttribute(projXMLStr);
+			if(XMLString::equals(projXMLValue, projImage))
+			{
+				this->projFromImage = true;
+				this->proj = "";
+			}
+			else if(XMLString::equals(projXMLValue, projOSGB))
+			{
+				this->projFromImage = false;
+				this->proj = OSGB_Proj;
+			}
+            else if(XMLString::equals(projXMLValue, projNZ2000))
+			{
+				this->projFromImage = false;
+				this->proj = NZ2000_Proj;
+			}
+            else if(XMLString::equals(projXMLValue, projNZ1949))
+			{
+				this->projFromImage = false;
+				this->proj = NZ1949_Proj;
+			}
+			else
+			{
+				cerr << "Proj not reconized therefore defaulting to image.";
+				this->projFromImage = true;
+				this->proj = "";
+			}
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'proj\' attribute was provided.");
+		}
+		XMLString::release(&projXMLStr);
+    }
     else
     {
         string message = string("The option (") + string(XMLString::transcode(optionXML)) + string(") is not known: RSGISExeSegment.");
@@ -2680,6 +2814,7 @@ void RSGISExeSegment::retrieveParameters(DOMElement *argElement) throw(RSGISXMLA
     XMLString::release(&optionGrowRegionsPixels);
     XMLString::release(&optionGrowRegionsPixelsAuto);
     XMLString::release(&optionSpectralDiv);
+    XMLString::release(&optionStepwiseElimination);
     
     XMLString::release(&projImage);
 	XMLString::release(&projOSGB);
@@ -4000,6 +4135,66 @@ void RSGISExeSegment::runAlgorithm() throw(RSGISException)
         }
         
     }
+    else if(option == RSGISExeSegment::stepwiseelimination)
+    {
+        cout << "Eliminate clumps smaller than a given size from the scene using stepwise approach using an attribute table.\n";
+        cout << "Input Image: " << this->inputImage << endl;
+        cout << "Clump Image: " << this->clumpsImage << endl;
+        cout << "Output Image: " << this->outputImage << endl;
+        if(!this->processInMemory)
+        {
+            cout << "Temp Table: " << this->tempTable << endl;
+        }
+        
+        try
+        {
+            GDALAllRegister();
+            GDALDataset *spectralDataset = NULL;
+            spectralDataset = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_ReadOnly);
+            if(spectralDataset == NULL)
+            {
+                string message = string("Could not open image ") + this->inputImage;
+                throw RSGISImageException(message.c_str());
+            }
+            
+            GDALDataset *clumpsDataset = NULL;
+            clumpsDataset = (GDALDataset *) GDALOpen(this->clumpsImage.c_str(), GA_ReadOnly);
+            if(clumpsDataset == NULL)
+            {
+                string message = string("Could not open image ") + this->clumpsImage;
+                throw RSGISImageException(message.c_str());
+            }
+            
+            RSGISImageUtils imgUtils;
+            
+            GDALDataset *resultDataset = NULL;
+            resultDataset = imgUtils.createCopy(clumpsDataset, this->outputImage, this->imageFormat, GDT_UInt32, this->projFromImage, this->proj);
+            if(resultDataset == NULL)
+            {
+                string message = string("Could not open image ") + this->outputImage;
+                throw RSGISImageException(message.c_str());
+            }
+            
+            cout << "Create Attribute Table\n";
+            RSGISCreateNewAttributeTable createAtt;
+            RSGISAttributeTable *attTable = createAtt.createAndPopPixelCount(clumpsDataset, this->processInMemory, this->tempTable);
+            
+            cout << "Eliminating Clumps\n";
+            RSGISEliminateSmallClumps eliminate;
+            eliminate.stepwiseEliminateSmallClumpsWithAtt(spectralDataset, clumpsDataset, resultDataset, attTable, minClumpSize, specThreshold);
+            
+            // Tidy up
+            delete attTable;
+            GDALClose(spectralDataset);
+            GDALClose(clumpsDataset);
+            GDALClose(resultDataset);
+            GDALDestroyDriverManager();
+        } 
+        catch (RSGISException &e) 
+        {
+            throw e;
+        }
+    }
     else
     {
         cout << "RSGISExeSegment: Options not recognised\n";
@@ -4269,6 +4464,17 @@ void RSGISExeSegment::printParameters()
         if(this->noDataValProvided)
         {
             cout << "No Data Value: " << this->noDataVal << endl;
+        }
+    }
+    else if(option == RSGISExeSegment::stepwiseelimination)
+    {
+        cout << "Eliminate clumps smaller than a given size from the scene using stepwise approach using an attribute table.\n";
+        cout << "Input Image: " << this->inputImage << endl;
+        cout << "Clump Image: " << this->clumpsImage << endl;
+        cout << "Output Image: " << this->outputImage << endl;
+        if(!this->processInMemory)
+        {
+            cout << "Temp Table: " << this->tempTable << endl;
         }
     }
     else

@@ -577,6 +577,22 @@ namespace rsgis{namespace segment{
         delete[] spectralVals;
     }
     
+    void RSGISEliminateSmallClumps::stepwiseEliminateSmallClumpsWithAtt(GDALDataset *spectral, GDALDataset *clumps, GDALDataset *output, RSGISAttributeTable *attTable, unsigned int minClumpSize, float specThreshold) throw(RSGISImageCalcException)
+    {
+        try
+        {
+            
+        }
+        catch(RSGISAttributeTableException &e)
+        {
+            throw RSGISImageCalcException(e.what());
+        }
+        catch(RSGISImageCalcException &e)
+        {
+            throw e;
+        }
+    }
+    
     RSGISEliminateSmallClumps::~RSGISEliminateSmallClumps()
     {
         

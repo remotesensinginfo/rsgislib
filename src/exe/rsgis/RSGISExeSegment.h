@@ -34,6 +34,7 @@
 #include "img/RSGISCalcImage.h"
 #include "img/RSGISProjectionStrings.h"
 #include "img/RSGISImageUtils.h"
+
 #include "segmentation/RSGISSpecGroupSegmentation.h"
 #include "segmentation/RSGISGenMeanSegImage.h"
 #include "segmentation/RSGISEliminateSmallClumps.h"
@@ -44,6 +45,9 @@
 #include "segmentation/RSGISLabelPixelsUsingClusters.h"
 #include "segmentation/RSGISRegionGrowSegmentsPixels.h"
 #include "segmentation/RSGISDefineSpectralDivision.h"
+
+#include "rastergis/RSGISAttributeTable.h"
+#include "rastergis/RSGISCreateNewAttributeTable.h"
 
 #include "utils/RSGISFileUtils.h"
 #include "math/RSGISMathsUtils.h"
@@ -85,7 +89,8 @@ class RSGISExeSegment : public RSGISAlgorithmParameters
             labelsfromclusters,
             growregionspixelsauto,
             growregionspixels,
-            spectraldiv
+            spectraldiv,
+            stepwiseelimination
 		};
 		RSGISExeSegment();
 		virtual RSGISAlgorithmParameters* getInstance();
@@ -106,6 +111,7 @@ class RSGISExeSegment : public RSGISAlgorithmParameters
         string outputTextFile;
         string seedsTextFile;
         string clustersMatrix;
+        string tempTable;
         string proj;
         unsigned int minClumpSize;
         float specThreshold;

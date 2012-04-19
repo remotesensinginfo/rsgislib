@@ -174,11 +174,18 @@
     <!-- A command to create a new attribute table with pixel counts -->
     <rsgis:command algor="rastergis" option="createattributetable" clumps="clumps.env" output="output.att" />
     <!-- A command to populate an attribute table with statistics from an image -->
+    <rsgis:command algor="rastergis" option="popattributestatsinmem" input="image.env" clumps="clumps.env" table="input.att" tableout="output.att" >
+        <rsgis:band band="int" [min="field"] [max="field"] [mean="field"] [sum="field"] [stddev="field"] [median="field"] />
+        <rsgis:band band="int" [min="field"] [max="field"] [mean="field"] [sum="field"] [stddev="field"] [median="field"] />
+        <rsgis:band band="int" [min="field"] [max="field"] [mean="field"] [sum="field"] [stddev="field"] [median="field"] />
+        <rsgis:band band="int" [min="field"] [max="field"] [mean="field"] [sum="field"] [stddev="field"] [median="field"] />
+    </rsgis:command>
+	<!-- A command to populate an attribute table with statistics from an image in a memory efficient manor -->
     <rsgis:command algor="rastergis" option="popattributestats" input="image.env" clumps="clumps.env" table="input.att" tableout="output.att" >
-        <rsgis:band band="int" [min="field"] [max="field"] [mean="field"] [sum="field"] [stddev="field"] [median="field"] />
-        <rsgis:band band="int" [min="field"] [max="field"] [mean="field"] [sum="field"] [stddev="field"] [median="field"] />
-        <rsgis:band band="int" [min="field"] [max="field"] [mean="field"] [sum="field"] [stddev="field"] [median="field"] />
-        <rsgis:band band="int" [min="field"] [max="field"] [mean="field"] [sum="field"] [stddev="field"] [median="field"] />
+        <rsgis:band band="int" [min="field"] [max="field"] [mean="field"] [sum="field"] [stddev="field"] />
+        <rsgis:band band="int" [min="field"] [max="field"] [mean="field"] [sum="field"] [stddev="field"] />
+        <rsgis:band band="int" [min="field"] [max="field"] [mean="field"] [sum="field"] [stddev="field"] />
+        <rsgis:band band="int" [min="field"] [max="field"] [mean="field"] [sum="field"] [stddev="field"] />
     </rsgis:command>
 	<!-- A command to populate an attribute table with statistics from an image where a segment value either above or below is used -->
     <rsgis:command algor="rastergis" option="meanlitbandspopattributestats" input="image.env" clumps="clumps.env" table="input.att" tableout="output.att" >
@@ -188,11 +195,18 @@
         <rsgis:band band="int" field="string" type="below | above" [min="field"] [max="field"] [mean="field"] [sum="field"] [stddev="field"] [median="field"] />
     </rsgis:command>
 	<!-- A command to populate an attribute table with statistics from an image where a segment value either above or below is used -->
+    <rsgis:command algor="rastergis" option="meanlitpopattributestatsinmem" input="image.env" clumps="clumps.env" table="input.att" tableout="output.att" field="meanlit" meanlitimage="image.env" meanlitband="int" meanlittype="below | above" >
+        <rsgis:band band="int" [min="field"] [max="field"] [mean="field"] [sum="field"] [stddev="field"] [median="field"] />
+        <rsgis:band band="int" [min="field"] [max="field"] [mean="field"] [sum="field"] [stddev="field"] [median="field"] />
+        <rsgis:band band="int" [min="field"] [max="field"] [mean="field"] [sum="field"] [stddev="field"] [median="field"] />
+        <rsgis:band band="int" [min="field"] [max="field"] [mean="field"] [sum="field"] [stddev="field"] [median="field"] />
+    </rsgis:command>
+	<!-- A command to populate an attribute table with statistics from an image where a segment value either above or below is used in a memory efficient manor -->
     <rsgis:command algor="rastergis" option="meanlitpopattributestats" input="image.env" clumps="clumps.env" table="input.att" tableout="output.att" field="meanlit" meanlitimage="image.env" meanlitband="int" meanlittype="below | above" >
-        <rsgis:band band="int" [min="field"] [max="field"] [mean="field"] [sum="field"] [stddev="field"] [median="field"] />
-        <rsgis:band band="int" [min="field"] [max="field"] [mean="field"] [sum="field"] [stddev="field"] [median="field"] />
-        <rsgis:band band="int" [min="field"] [max="field"] [mean="field"] [sum="field"] [stddev="field"] [median="field"] />
-        <rsgis:band band="int" [min="field"] [max="field"] [mean="field"] [sum="field"] [stddev="field"] [median="field"] />
+        <rsgis:band band="int" [min="field"] [max="field"] [mean="field"] [sum="field"] [stddev="field"] />
+        <rsgis:band band="int" [min="field"] [max="field"] [mean="field"] [sum="field"] [stddev="field"] />
+        <rsgis:band band="int" [min="field"] [max="field"] [mean="field"] [sum="field"] [stddev="field"] />
+        <rsgis:band band="int" [min="field"] [max="field"] [mean="field"] [sum="field"] [stddev="field"] />
     </rsgis:command>
     <!-- A command to populate attribute table with mean image values -->
     <rsgis:command algor="rastergis" option="popattributemean" input="image.env" clumps="clumps.env" output="output.att" prefix="string" />
@@ -679,6 +693,8 @@
     <rsgis:command algor="segmentation" option="rmsmallclumps" image="image.env" clumps="image.env" output="image_out.env" minsize="int (in pxls)" maxspectraldist="float" format="GDAL Format" inmemory="yes | no" proj="OSGB | NZ2000 | NZ1949 | IMAGE" />
     <!-- A command to eliminate clumps smaller than a given size from the scene, small clump will be combined with their spectrally closest neighbouring clump in a stepwise fashion unless over spectral distance threshold -->
     <rsgis:command algor="segmentation" option="rmsmallclumpsstepwise" image="image.env" clumps="image.env" output="image_out.env" minsize="int (in pxls)" maxspectraldist="float" format="GDAL Format" inmemory="yes | no" proj="OSGB | NZ2000 | NZ1949 | IMAGE" />
+	<!-- A command to eliminate clumps smaller than a given size from the scene, small clump will be combined with their spectrally closest neighbouring clump in a stepwise fashion unless over spectral distance threshold -->
+    <rsgis:command algor="segmentation" option="stepwiseelimination" image="image.env" clumps="image.env" output="image_out.env" [tmptable="table.att"] minsize="int (in pxls)" maxspectraldist="float" format="GDAL Format" proj="OSGB | NZ2000 | NZ1949 | IMAGE" />
     <!-- A command to clump a categorical image into clumps with unique IDs -->
     <rsgis:command algor="segmentation" option="clump" image="image.env" output="image_out.env" nodata="unsigned int" format="GDAL Format" inmemory="yes | no" proj="OSGB | NZ2000 | NZ1949 | IMAGE" />
     <!-- A command to colour clumps using random colours for visualisation -->

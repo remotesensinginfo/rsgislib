@@ -257,9 +257,7 @@ namespace rsgis{namespace rastergis{
             }
             
             unsigned long clumpID = 0;
-            unsigned long neighbourID = 0;
             RSGISFeature *feat = NULL;
-            bool foundID = false;
             
             int feedback = height/10;
 			int feedbackCounter = 0;
@@ -353,22 +351,18 @@ namespace rsgis{namespace rastergis{
                         feat = attTable->getFeature(clumpID-1);
                         if((dataBlock[0][1] > 0) & (dataBlock[0][1] != clumpID))
                         {
-                            //neighbours->at(clumpID-1)->push_back(dataBlock[0][1]-1);
                             this->addNeighbourToFeature(feat, dataBlock[0][1]-1);
                         }
                         if((dataBlock[1][0] > 0) & (dataBlock[1][0] != clumpID))
                         {
-                            //neighbours->at(clumpID-1)->push_back(dataBlock[1][0]-1);
                             this->addNeighbourToFeature(feat, dataBlock[1][0]-1);
                         }
                         if((dataBlock[1][2] > 0) & (dataBlock[1][2] != clumpID))
                         {
-                            //neighbours->at(clumpID-1)->push_back(dataBlock[1][2]-1);
                             this->addNeighbourToFeature(feat, dataBlock[1][2]-1);
                         }
                         if((dataBlock[2][1] > 0) & (dataBlock[2][1] != clumpID))
                         {
-                            //neighbours->at(clumpID-1)->push_back(dataBlock[2][1]-1);
                             this->addNeighbourToFeature(feat, dataBlock[2][1]-1);
                         }
                     }
