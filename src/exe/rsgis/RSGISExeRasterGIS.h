@@ -90,7 +90,7 @@ public:
         findmajority,
         countpolyintersects,
         calcattributes,
-        popattributestats,
+        popattributestatsinmem,
         export2gdal,
         popattributestatsallbands,
         summarisefield,
@@ -99,7 +99,9 @@ public:
         calcintrapxleucdist,
         meanlitbandspopattributestats,
         meanlitpopattributestats,
-        exportfield2ascii
+        meanlitpopattributestatsinmem,
+        exportfield2ascii,
+        popattributestats
     };
     
     RSGISExeRasterGIS();

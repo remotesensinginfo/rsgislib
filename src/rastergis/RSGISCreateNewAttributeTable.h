@@ -62,7 +62,7 @@ namespace rsgis{namespace rastergis{
     {
     public:
         RSGISCreateNewAttributeTable();
-        RSGISAttributeTable* createAndPopPixelCount(GDALDataset *clumpsDataset)throw(RSGISImageCalcException, RSGISAttributeTableException);
+        RSGISAttributeTable* createAndPopPixelCount(GDALDataset *clumpsDataset, bool useMemory=true, string outFilePath="")throw(RSGISImageCalcException, RSGISAttributeTableException);
         unsigned long long calcMaxValue(GDALDataset *dataset)throw(RSGISImageCalcException);
         ~RSGISCreateNewAttributeTable();
     };

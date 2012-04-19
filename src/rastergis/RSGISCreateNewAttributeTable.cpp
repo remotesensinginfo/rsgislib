@@ -30,7 +30,7 @@ namespace rsgis{namespace rastergis{
         
     }
     
-    RSGISAttributeTable* RSGISCreateNewAttributeTable::createAndPopPixelCount(GDALDataset *clumpsDataset)throw(RSGISImageCalcException, RSGISAttributeTableException)
+    RSGISAttributeTable* RSGISCreateNewAttributeTable::createAndPopPixelCount(GDALDataset *clumpsDataset, bool useMemory, string outFilePath)throw(RSGISImageCalcException, RSGISAttributeTableException)
     {
         RSGISMathsUtils mathUtils;
         
@@ -44,7 +44,14 @@ namespace rsgis{namespace rastergis{
             
             // Generate Attribute table
             cout << "Creating blank attribute table\n";
-            attTable = new RSGISAttributeTableMem(numClumps);
+            if(useMemory)
+            {
+                attTable = new RSGISAttributeTableMem(numClumps);
+            }
+            else
+            {
+                // Add for other attribute table types...
+            }
             attTable->addAttIntField("pxlcount", 0);
             unsigned int pxlCountIdx = attTable->getFieldIndex(string("pxlcount"));
 

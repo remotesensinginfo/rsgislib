@@ -52,8 +52,10 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
     XMLCh *optionFindMajority = XMLString::transcode("findmajority");
     XMLCh *optionCountPolyIntersects = XMLString::transcode("countpolyintersects");
     XMLCh *optionCalcAttributes = XMLString::transcode("calcattributes");
+    XMLCh *optionPopAttributeStatsInMem = XMLString::transcode("popattributestatsinmem");
     XMLCh *optionPopAttributeStats = XMLString::transcode("popattributestats");
     XMLCh *optionMeanLitBandsPopAttributeStats = XMLString::transcode("meanlitbandspopattributestats");
+    XMLCh *optionMeanLitPopAttributeStatsInMem = XMLString::transcode("meanlitpopattributestatsinmem");
     XMLCh *optionMeanLitPopAttributeStats = XMLString::transcode("meanlitpopattributestats");
     XMLCh *optionExport2GDAL = XMLString::transcode("export2gdal");
     XMLCh *optionPopAttributeStatsAllBands = XMLString::transcode("popattributestatsallbands");
@@ -818,9 +820,9 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
         XMLString::release(&rsgisAttributeXMLStr);
         
     }
-    else if(XMLString::equals(optionPopAttributeStats, optionXML))
+    else if(XMLString::equals(optionPopAttributeStatsInMem, optionXML))
     {
-        this->option = RSGISExeRasterGIS::popattributestats;
+        this->option = RSGISExeRasterGIS::popattributestatsinmem;
         XMLCh *inputXMLStr = XMLString::transcode("input");
         if(argElement->hasAttribute(inputXMLStr))
         {
@@ -997,6 +999,175 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
 			}
 			XMLString::release(&sumXMLStr);
             
+            bandStats->push_back(bandStat);
+		}
+        XMLString::release(&rsgisBandXMLStr);
+        
+    }
+    else if(XMLString::equals(optionPopAttributeStats, optionXML))
+    {
+        this->option = RSGISExeRasterGIS::popattributestats;
+        XMLCh *inputXMLStr = XMLString::transcode("input");
+        if(argElement->hasAttribute(inputXMLStr))
+        {
+            char *charValue = XMLString::transcode(argElement->getAttribute(inputXMLStr));
+            this->inputImage = string(charValue);
+            XMLString::release(&charValue);
+        }
+        else
+        {
+            throw RSGISXMLArgumentsException("No \'input\' attribute was provided.");
+        }
+        XMLString::release(&inputXMLStr);
+        
+        XMLCh *clumpsXMLStr = XMLString::transcode("clumps");
+        if(argElement->hasAttribute(clumpsXMLStr))
+        {
+            char *charValue = XMLString::transcode(argElement->getAttribute(clumpsXMLStr));
+            this->clumpsImage = string(charValue);
+            XMLString::release(&charValue);
+        }
+        else
+        {
+            throw RSGISXMLArgumentsException("No \'clumps\' attribute was provided.");
+        }
+        XMLString::release(&clumpsXMLStr);
+        
+        XMLCh *tableXMLStr = XMLString::transcode("table");
+        if(argElement->hasAttribute(tableXMLStr))
+        {
+            char *charValue = XMLString::transcode(argElement->getAttribute(tableXMLStr));
+            this->attTableFile = string(charValue);
+            XMLString::release(&charValue);
+        }
+        else
+        {
+            throw RSGISXMLArgumentsException("No \'table\' attribute was provided.");
+        }
+        XMLString::release(&tableXMLStr);
+        
+        
+        XMLCh *tableOutXMLStr = XMLString::transcode("tableout");
+        if(argElement->hasAttribute(tableOutXMLStr))
+        {
+            char *charValue = XMLString::transcode(argElement->getAttribute(tableOutXMLStr));
+            this->outAttTableFile = string(charValue);
+            XMLString::release(&charValue);
+        }
+        else
+        {
+            throw RSGISXMLArgumentsException("No \'tableout\' attribute was provided.");
+        }
+        XMLString::release(&tableOutXMLStr);
+        
+        
+        
+        XMLCh *rsgisBandXMLStr = XMLString::transcode("rsgis:band");
+        DOMNodeList *bandNodesList = argElement->getElementsByTagName(rsgisBandXMLStr);
+		unsigned int numBands = bandNodesList->getLength();
+		
+		cout << "Found " << numBands << " Attributes" << endl;
+		
+        bandStats = new vector<RSGISBandAttStats*>();
+        bandStats->reserve(numBands);
+        
+        RSGISBandAttStats *bandStat = NULL;
+		DOMElement *bandElement = NULL;
+		for(int i = 0; i < numBands; i++)
+		{
+			bandElement = static_cast<DOMElement*>(bandNodesList->item(i));
+			
+            bandStat = new RSGISBandAttStats();
+            
+			XMLCh *bandXMLStr = XMLString::transcode("band");
+			if(bandElement->hasAttribute(bandXMLStr))
+			{
+				char *charValue = XMLString::transcode(bandElement->getAttribute(bandXMLStr));
+				bandStat->band = mathUtils.strtounsignedint(string(charValue));
+				XMLString::release(&charValue);
+			}
+			else
+			{
+				throw RSGISXMLArgumentsException("No \'band\' attribute was provided.");
+			}
+			XMLString::release(&bandXMLStr);
+            
+            XMLCh *minXMLStr = XMLString::transcode("min");
+			if(bandElement->hasAttribute(minXMLStr))
+			{
+				char *charValue = XMLString::transcode(bandElement->getAttribute(minXMLStr));
+				bandStat->minField = string(charValue);
+				XMLString::release(&charValue);
+                
+                bandStat->calcMin = true;
+			}
+			else
+			{
+				bandStat->calcMin = false;
+			}
+			XMLString::release(&minXMLStr);
+            
+            XMLCh *maxXMLStr = XMLString::transcode("max");
+			if(bandElement->hasAttribute(maxXMLStr))
+			{
+				char *charValue = XMLString::transcode(bandElement->getAttribute(maxXMLStr));
+				bandStat->maxField = string(charValue);
+				XMLString::release(&charValue);
+                
+                bandStat->calcMax = true;
+			}
+			else
+			{
+				bandStat->calcMax = false;
+			}
+			XMLString::release(&maxXMLStr);
+            
+            XMLCh *meanXMLStr = XMLString::transcode("mean");
+			if(bandElement->hasAttribute(meanXMLStr))
+			{
+				char *charValue = XMLString::transcode(bandElement->getAttribute(meanXMLStr));
+				bandStat->meanField = string(charValue);
+				XMLString::release(&charValue);
+                
+                bandStat->calcMean = true;
+			}
+			else
+			{
+				bandStat->calcMean = false;
+			}
+			XMLString::release(&meanXMLStr);
+            
+            XMLCh *stdDevXMLStr = XMLString::transcode("stddev");
+			if(bandElement->hasAttribute(stdDevXMLStr))
+			{
+				char *charValue = XMLString::transcode(bandElement->getAttribute(stdDevXMLStr));
+				bandStat->stdDevField = string(charValue);
+				XMLString::release(&charValue);
+                
+                bandStat->calcStdDev = true;
+			}
+			else
+			{
+				bandStat->calcStdDev = false;
+			}
+			XMLString::release(&stdDevXMLStr);
+            
+            XMLCh *sumXMLStr = XMLString::transcode("sum");
+			if(bandElement->hasAttribute(sumXMLStr))
+			{
+				char *charValue = XMLString::transcode(bandElement->getAttribute(sumXMLStr));
+				bandStat->sumField = string(charValue);
+				XMLString::release(&charValue);
+                
+                bandStat->calcSum = true;
+			}
+			else
+			{
+				bandStat->calcSum = false;
+			}
+			XMLString::release(&sumXMLStr);
+            
+            bandStat->calcMedian = false;
             bandStats->push_back(bandStat);
 		}
         XMLString::release(&rsgisBandXMLStr);
@@ -1923,9 +2094,9 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
         XMLString::release(&rsgisBandXMLStr);
         
     }
-    else if(XMLString::equals(optionMeanLitPopAttributeStats, optionXML))
+    else if(XMLString::equals(optionMeanLitPopAttributeStatsInMem, optionXML))
     {
-        this->option = RSGISExeRasterGIS::meanlitpopattributestats;
+        this->option = RSGISExeRasterGIS::meanlitpopattributestatsinmem;
         XMLCh *inputXMLStr = XMLString::transcode("input");
         if(argElement->hasAttribute(inputXMLStr))
         {
@@ -2166,6 +2337,234 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
         XMLString::release(&rsgisBandXMLStr);
         
     }
+    else if(XMLString::equals(optionMeanLitPopAttributeStats, optionXML))
+    {
+        this->option = RSGISExeRasterGIS::meanlitpopattributestats;
+        XMLCh *inputXMLStr = XMLString::transcode("input");
+        if(argElement->hasAttribute(inputXMLStr))
+        {
+            char *charValue = XMLString::transcode(argElement->getAttribute(inputXMLStr));
+            this->inputImage = string(charValue);
+            XMLString::release(&charValue);
+        }
+        else
+        {
+            throw RSGISXMLArgumentsException("No \'input\' attribute was provided.");
+        }
+        XMLString::release(&inputXMLStr);
+        
+        XMLCh *clumpsXMLStr = XMLString::transcode("clumps");
+        if(argElement->hasAttribute(clumpsXMLStr))
+        {
+            char *charValue = XMLString::transcode(argElement->getAttribute(clumpsXMLStr));
+            this->clumpsImage = string(charValue);
+            XMLString::release(&charValue);
+        }
+        else
+        {
+            throw RSGISXMLArgumentsException("No \'clumps\' attribute was provided.");
+        }
+        XMLString::release(&clumpsXMLStr);
+        
+        XMLCh *tableXMLStr = XMLString::transcode("table");
+        if(argElement->hasAttribute(tableXMLStr))
+        {
+            char *charValue = XMLString::transcode(argElement->getAttribute(tableXMLStr));
+            this->attTableFile = string(charValue);
+            XMLString::release(&charValue);
+        }
+        else
+        {
+            throw RSGISXMLArgumentsException("No \'table\' attribute was provided.");
+        }
+        XMLString::release(&tableXMLStr);
+        
+        
+        XMLCh *tableOutXMLStr = XMLString::transcode("tableout");
+        if(argElement->hasAttribute(tableOutXMLStr))
+        {
+            char *charValue = XMLString::transcode(argElement->getAttribute(tableOutXMLStr));
+            this->outAttTableFile = string(charValue);
+            XMLString::release(&charValue);
+        }
+        else
+        {
+            throw RSGISXMLArgumentsException("No \'tableout\' attribute was provided.");
+        }
+        XMLString::release(&tableOutXMLStr);
+        
+        XMLCh *fieldXMLStr = XMLString::transcode("field");
+        if(argElement->hasAttribute(fieldXMLStr))
+        {
+            char *charValue = XMLString::transcode(argElement->getAttribute(fieldXMLStr));
+            this->meanlitField = string(charValue);
+            XMLString::release(&charValue);
+        }
+        else
+        {
+            throw RSGISXMLArgumentsException("No \'field\' attribute was provided.");
+        }
+        XMLString::release(&fieldXMLStr);
+        
+        XMLCh *meanlitImageXMLStr = XMLString::transcode("meanlitimage");
+        if(argElement->hasAttribute(meanlitImageXMLStr))
+        {
+            char *charValue = XMLString::transcode(argElement->getAttribute(meanlitImageXMLStr));
+            this->meanlitImage = string(charValue);
+            XMLString::release(&charValue);
+        }
+        else
+        {
+            throw RSGISXMLArgumentsException("No \'meanlitimage\' attribute was provided.");
+        }
+        XMLString::release(&meanlitImageXMLStr);
+        
+        XMLCh *meanlitImageBandXMLStr = XMLString::transcode("meanlitband");
+        if(argElement->hasAttribute(meanlitImageBandXMLStr))
+        {
+            char *charValue = XMLString::transcode(argElement->getAttribute(meanlitImageBandXMLStr));
+            this->meanLitBand = mathUtils.strtounsignedint(string(charValue));
+            XMLString::release(&charValue);
+        }
+        else
+        {
+            throw RSGISXMLArgumentsException("No \'meanlitband\' attribute was provided.");
+        }
+        XMLString::release(&meanlitImageBandXMLStr);
+        
+        XMLCh *typeXMLStr = XMLString::transcode("meanlittype");
+        if(argElement->hasAttribute(typeXMLStr))
+        {
+            string upperStr = "above";
+            char *charValue = XMLString::transcode(argElement->getAttribute(typeXMLStr));
+            string strVal = string(charValue);
+            if(upperStr == strVal)
+            {
+                meanLitUseUpper = true;
+            }
+            else
+            {
+                meanLitUseUpper = false;
+            }
+            XMLString::release(&charValue);
+        }
+        else
+        {
+            throw RSGISXMLArgumentsException("No \'meanlittype\' attribute was provided.");
+        }
+        XMLString::release(&typeXMLStr);
+        
+        XMLCh *rsgisBandXMLStr = XMLString::transcode("rsgis:band");
+        DOMNodeList *bandNodesList = argElement->getElementsByTagName(rsgisBandXMLStr);
+		unsigned int numBands = bandNodesList->getLength();
+		
+		cout << "Found " << numBands << " Attributes" << endl;
+		
+        bandStats = new vector<RSGISBandAttStats*>();
+        bandStats->reserve(numBands);
+        
+        RSGISBandAttStats *bandStat = NULL;
+		DOMElement *bandElement = NULL;
+		for(int i = 0; i < numBands; i++)
+		{
+			bandElement = static_cast<DOMElement*>(bandNodesList->item(i));
+			
+            bandStat = new RSGISBandAttStats();
+            
+			XMLCh *bandXMLStr = XMLString::transcode("band");
+			if(bandElement->hasAttribute(bandXMLStr))
+			{
+				char *charValue = XMLString::transcode(bandElement->getAttribute(bandXMLStr));
+				bandStat->band = mathUtils.strtounsignedint(string(charValue));
+				XMLString::release(&charValue);
+			}
+			else
+			{
+				throw RSGISXMLArgumentsException("No \'band\' attribute was provided.");
+			}
+			XMLString::release(&bandXMLStr);
+            
+            XMLCh *minXMLStr = XMLString::transcode("min");
+			if(bandElement->hasAttribute(minXMLStr))
+			{
+				char *charValue = XMLString::transcode(bandElement->getAttribute(minXMLStr));
+				bandStat->minField = string(charValue);
+				XMLString::release(&charValue);
+                
+                bandStat->calcMin = true;
+			}
+			else
+			{
+				bandStat->calcMin = false;
+			}
+			XMLString::release(&minXMLStr);
+            
+            XMLCh *maxXMLStr = XMLString::transcode("max");
+			if(bandElement->hasAttribute(maxXMLStr))
+			{
+				char *charValue = XMLString::transcode(bandElement->getAttribute(maxXMLStr));
+				bandStat->maxField = string(charValue);
+				XMLString::release(&charValue);
+                
+                bandStat->calcMax = true;
+			}
+			else
+			{
+				bandStat->calcMax = false;
+			}
+			XMLString::release(&maxXMLStr);
+            
+            XMLCh *meanXMLStr = XMLString::transcode("mean");
+			if(bandElement->hasAttribute(meanXMLStr))
+			{
+				char *charValue = XMLString::transcode(bandElement->getAttribute(meanXMLStr));
+				bandStat->meanField = string(charValue);
+				XMLString::release(&charValue);
+                
+                bandStat->calcMean = true;
+			}
+			else
+			{
+				bandStat->calcMean = false;
+			}
+			XMLString::release(&meanXMLStr);
+            
+            XMLCh *stdDevXMLStr = XMLString::transcode("stddev");
+			if(bandElement->hasAttribute(stdDevXMLStr))
+			{
+				char *charValue = XMLString::transcode(bandElement->getAttribute(stdDevXMLStr));
+				bandStat->stdDevField = string(charValue);
+				XMLString::release(&charValue);
+                
+                bandStat->calcStdDev = true;
+			}
+			else
+			{
+				bandStat->calcStdDev = false;
+			}
+			XMLString::release(&stdDevXMLStr);
+            
+            XMLCh *sumXMLStr = XMLString::transcode("sum");
+			if(bandElement->hasAttribute(sumXMLStr))
+			{
+				char *charValue = XMLString::transcode(bandElement->getAttribute(sumXMLStr));
+				bandStat->sumField = string(charValue);
+				XMLString::release(&charValue);
+                
+                bandStat->calcSum = true;
+			}
+			else
+			{
+				bandStat->calcSum = false;
+			}
+			XMLString::release(&sumXMLStr);
+            
+            bandStat->calcMedian = false;
+            bandStats->push_back(bandStat);
+		}
+        XMLString::release(&rsgisBandXMLStr);
+        
+    }
     else if(XMLString::equals(optionExportField2ASCII, optionXML))
     {
         this->option = RSGISExeRasterGIS::exportfield2ascii;
@@ -2228,7 +2627,7 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
     XMLString::release(&optionFindMajority);
     XMLString::release(&optionCountPolyIntersects);
     XMLString::release(&optionCalcAttributes);
-    XMLString::release(&optionPopAttributeStats);
+    XMLString::release(&optionPopAttributeStatsInMem);
     XMLString::release(&optionExport2GDAL);
     XMLString::release(&optionPopAttributeStatsAllBands);
     XMLString::release(&optionSummariseField);
@@ -2236,6 +2635,7 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
     XMLString::release(&optionMeanEucDist2Neighbours);
     XMLString::release(&optionCalcIntraPxlEucDist);
     XMLString::release(&optionMeanLitBandsPopAttributeStats);
+    XMLString::release(&optionMeanLitPopAttributeStatsInMem);
     XMLString::release(&optionMeanLitPopAttributeStats);
     XMLString::release(&optionExportField2ASCII);
     
@@ -2623,7 +3023,7 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
                 throw e;
             }
         }
-        else if(this->option == RSGISExeRasterGIS::popattributestats)
+        else if(this->option == RSGISExeRasterGIS::popattributestatsinmem)
         {
             cout << "A command to populate an attribute table with statistics from an image.\n";
             cout << "Input Image: " << this->inputImage << endl;
@@ -2689,7 +3089,84 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
                 
                 cout << "Calculating Statistics\n";
                 RSGISPopulateAttributeTableBandStats calcBandStats;
-                calcBandStats.populateWithBandStatistics(attTable, datasets, 2, bandStats);
+                calcBandStats.populateWithBandStatisticsInMem(attTable, datasets, 2, bandStats);
+                
+                cout << "Exporting Attribute Table\n";
+                attTable->exportASCII(outAttTableFile);
+                cout << "Finished\n";               
+                
+                GDALClose(datasets[0]);
+                GDALClose(datasets[1]);
+                delete[] datasets;
+                delete attTable;
+            } 
+            catch (RSGISException &e) 
+            {
+                throw e;
+            }            
+        }
+        else if(this->option == RSGISExeRasterGIS::popattributestats)
+        {
+            cout << "A command to populate an attribute table with statistics from an image in a memory efficient manor.\n";
+            cout << "Input Image: " << this->inputImage << endl;
+            cout << "Clump Image: " << this->clumpsImage << endl;
+            cout << "Input Table: " << this->attTableFile << endl;
+            cout << "Output Table: " << this->outAttTableFile << endl;
+            cout << "Statistics to be calculated:\n";
+            for(vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
+            {
+                cout << "Band " << (*iterBands)->band << ": ";
+                if((*iterBands)->calcMin)
+                {
+                    cout << "MIN (" << (*iterBands)->minField << ") ";
+                }
+                
+                if((*iterBands)->calcMax)
+                {
+                    cout << "MAX (" << (*iterBands)->maxField << ") ";
+                }
+                
+                if((*iterBands)->calcMean)
+                {
+                    cout << "MEAN (" << (*iterBands)->meanField << ") ";
+                }
+                
+                if((*iterBands)->calcSum)
+                {
+                    cout << "SUM (" << (*iterBands)->sumField << ") ";
+                }
+                
+                if((*iterBands)->calcStdDev)
+                {
+                    cout << "STDDEV (" << (*iterBands)->stdDevField << ") ";
+                }
+                
+                cout << endl;
+            }
+            
+            try 
+            {
+                GDALAllRegister();
+                GDALDataset **datasets = new GDALDataset*[2];
+                datasets[0] = (GDALDataset *) GDALOpenShared(this->clumpsImage.c_str(), GA_ReadOnly);
+                if(datasets[0] == NULL)
+                {
+                    string message = string("Could not open image ") + this->clumpsImage;
+                    throw RSGISImageException(message.c_str());
+                }
+                datasets[1] = (GDALDataset *) GDALOpenShared(this->inputImage.c_str(), GA_ReadOnly);
+                if(datasets[1] == NULL)
+                {
+                    string message = string("Could not open image ") + this->inputImage;
+                    throw RSGISImageException(message.c_str());
+                }
+                
+                cout << "Importing Attribute Table:\n";
+                RSGISAttributeTable *attTable = RSGISAttributeTableMem::importFromASCII(attTableFile);
+                
+                cout << "Calculating Statistics\n";
+                RSGISPopulateAttributeTableBandStats calcBandStats;
+                calcBandStats.populateWithBandStatisticsWithinAtt(attTable, datasets, 2, bandStats);
                 
                 cout << "Exporting Attribute Table\n";
                 attTable->exportASCII(outAttTableFile);
@@ -2800,7 +3277,7 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
                 
                 cout << "Calculating Statistics\n";
                 RSGISPopulateAttributeTableImageStats calcImageStats;
-                calcImageStats.populateWithImageStatistics(attTable, datasets, 2, imageStats);
+                calcImageStats.populateWithImageStatisticsInMem(attTable, datasets, 2, imageStats);
                 
                 cout << "Exporting Attribute Table\n";
                 attTable->exportASCII(outAttTableFile);
@@ -3138,7 +3615,7 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
                 
                 cout << "Calculating Statistics\n";
                 RSGISPopulateAttributeTableBandStatsMeanLitBands calcBandStats;
-                calcBandStats.populateWithBandStatistics(attTable, datasets, 2, bandStatsMeanLit);
+                calcBandStats.populateWithBandStatisticsInMem(attTable, datasets, 2, bandStatsMeanLit);
                 
                 cout << "Exporting Attribute Table\n";
                 attTable->exportASCII(outAttTableFile);
@@ -3154,7 +3631,7 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
                 throw e;
             }            
         }
-        else if(this->option == RSGISExeRasterGIS::meanlitpopattributestats)
+        else if(this->option == RSGISExeRasterGIS::meanlitpopattributestatsinmem)
         {
             cout << "A command to populate an attribute table with mean-lit statistics from an image.\n";
             cout << "Input Image: " << this->inputImage << endl;
@@ -3238,7 +3715,103 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
                 
                 cout << "Calculating Statistics\n";
                 RSGISPopulateAttributeTableBandStatsMeanLit calcBandStats;
-                calcBandStats.populateWithBandStatistics(attTable, datasets, 3, bandStats, meanLitBandIdx, this->meanlitField, this->meanLitUseUpper);
+                calcBandStats.populateWithBandStatisticsInMem(attTable, datasets, 3, bandStats, meanLitBandIdx, this->meanlitField, this->meanLitUseUpper);
+                
+                cout << "Exporting Attribute Table\n";
+                attTable->exportASCII(outAttTableFile);
+                cout << "Finished\n";               
+                
+                GDALClose(datasets[0]);
+                GDALClose(datasets[1]);
+                GDALClose(datasets[2]);
+                delete[] datasets;
+                delete attTable;
+            } 
+            catch (RSGISException &e) 
+            {
+                throw e;
+            }            
+        }
+        else if(this->option == RSGISExeRasterGIS::meanlitpopattributestats)
+        {
+            cout << "A command to populate an attribute table with mean-lit statistics from an image in a memory efficient manor.\n";
+            cout << "Input Image: " << this->inputImage << endl;
+            cout << "Clump Image: " << this->clumpsImage << endl;
+            cout << "Input Table: " << this->attTableFile << endl;
+            cout << "Output Table: " << this->outAttTableFile << endl;
+            cout << "Mean Lit Field: " << this->meanlitField << endl;
+            cout << "Mean Lit Image: " << this->meanlitImage << " band = " << this->meanLitBand;
+            if(this->meanLitUseUpper)
+            {
+                cout << " using upper values.\n";
+            }
+            else 
+            {
+                cout << " using lower values.\n";
+            }
+            cout << "Statistics to be calculated:\n";
+            for(vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
+            {
+                cout << "Band " << (*iterBands)->band << ": ";
+                if((*iterBands)->calcMin)
+                {
+                    cout << "MIN (" << (*iterBands)->minField << ") ";
+                }
+                
+                if((*iterBands)->calcMax)
+                {
+                    cout << "MAX (" << (*iterBands)->maxField << ") ";
+                }
+                
+                if((*iterBands)->calcMean)
+                {
+                    cout << "MEAN (" << (*iterBands)->meanField << ") ";
+                }
+                
+                if((*iterBands)->calcSum)
+                {
+                    cout << "SUM (" << (*iterBands)->sumField << ") ";
+                }
+                
+                if((*iterBands)->calcStdDev)
+                {
+                    cout << "STDDEV (" << (*iterBands)->stdDevField << ") ";
+                }
+                
+                cout << endl;
+            }
+            
+            try 
+            {
+                GDALAllRegister();
+                GDALDataset **datasets = new GDALDataset*[3];
+                datasets[0] = (GDALDataset *) GDALOpenShared(this->clumpsImage.c_str(), GA_ReadOnly);
+                if(datasets[0] == NULL)
+                {
+                    string message = string("Could not open image ") + this->clumpsImage;
+                    throw RSGISImageException(message.c_str());
+                }
+                datasets[1] = (GDALDataset *) GDALOpenShared(this->inputImage.c_str(), GA_ReadOnly);
+                if(datasets[1] == NULL)
+                {
+                    string message = string("Could not open image ") + this->inputImage;
+                    throw RSGISImageException(message.c_str());
+                }
+                datasets[2] = (GDALDataset *) GDALOpenShared(this->meanlitImage.c_str(), GA_ReadOnly);
+                if(datasets[2] == NULL)
+                {
+                    string message = string("Could not open image ") + this->meanlitImage;
+                    throw RSGISImageException(message.c_str());
+                }
+                
+                cout << "Importing Attribute Table:\n";
+                RSGISAttributeTable *attTable = RSGISAttributeTableMem::importFromASCII(attTableFile);
+                
+                unsigned int meanLitBandIdx =  datasets[0]->GetRasterCount() +  datasets[1]->GetRasterCount() + this->meanLitBand-1;
+                
+                cout << "Calculating Statistics\n";
+                RSGISPopulateAttributeTableBandStatsMeanLit calcBandStats;
+                calcBandStats.populateWithBandStatisticsWithinAtt(attTable, datasets, 3, bandStats, meanLitBandIdx, this->meanlitField, this->meanLitUseUpper);
                 
                 cout << "Exporting Attribute Table\n";
                 attTable->exportASCII(outAttTableFile);
@@ -3481,6 +4054,89 @@ void RSGISExeRasterGIS::printParameters()
             cout << "Expression: " << this->mathsExpression << endl;
             cout << "Field: " << this->attField << endl;
         }
+        else if(this->option == RSGISExeRasterGIS::popattributestatsinmem)
+        {
+            cout << "A command to populate an attribute table with statistics from an image.\n";
+            cout << "Input Image: " << this->inputImage << endl;
+            cout << "Clump Image: " << this->clumpsImage << endl;
+            cout << "Input Table: " << this->attTableFile << endl;
+            cout << "Output Table: " << this->outAttTableFile << endl;
+            cout << "Statistics to be calculated:\n";
+            for(vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
+            {
+                cout << "Band " << (*iterBands)->band << ": ";
+                if((*iterBands)->calcMin)
+                {
+                    cout << "MIN (" << (*iterBands)->minField << ") ";
+                }
+                
+                if((*iterBands)->calcMax)
+                {
+                    cout << "MAX (" << (*iterBands)->maxField << ") ";
+                }
+                
+                if((*iterBands)->calcMean)
+                {
+                    cout << "MEAN (" << (*iterBands)->meanField << ") ";
+                }
+                
+                if((*iterBands)->calcSum)
+                {
+                    cout << "SUM (" << (*iterBands)->sumField << ") ";
+                }
+                
+                if((*iterBands)->calcStdDev)
+                {
+                    cout << "STDDEV (" << (*iterBands)->stdDevField << ") ";
+                }
+                
+                if((*iterBands)->calcMedian)
+                {
+                    cout << "MEDIAN (" << (*iterBands)->medianField << ") ";
+                }
+                
+                cout << endl;
+            }
+        }
+        else if(this->option == RSGISExeRasterGIS::popattributestats)
+        {
+            cout << "A command to populate an attribute table with statistics from an image in a memory efficient manor.\n";
+            cout << "Input Image: " << this->inputImage << endl;
+            cout << "Clump Image: " << this->clumpsImage << endl;
+            cout << "Input Table: " << this->attTableFile << endl;
+            cout << "Output Table: " << this->outAttTableFile << endl;
+            cout << "Statistics to be calculated:\n";
+            for(vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
+            {
+                cout << "Band " << (*iterBands)->band << ": ";
+                if((*iterBands)->calcMin)
+                {
+                    cout << "MIN (" << (*iterBands)->minField << ") ";
+                }
+                
+                if((*iterBands)->calcMax)
+                {
+                    cout << "MAX (" << (*iterBands)->maxField << ") ";
+                }
+                
+                if((*iterBands)->calcMean)
+                {
+                    cout << "MEAN (" << (*iterBands)->meanField << ") ";
+                }
+                
+                if((*iterBands)->calcSum)
+                {
+                    cout << "SUM (" << (*iterBands)->sumField << ") ";
+                }
+                
+                if((*iterBands)->calcStdDev)
+                {
+                    cout << "STDDEV (" << (*iterBands)->stdDevField << ") ";
+                }
+                
+                cout << endl;
+            }
+        }
         else if(this->option == RSGISExeRasterGIS::export2gdal)
 		{
             cout << "Export an attribute table to a GDAL Dataset with a raster attribute table\n";
@@ -3624,7 +4280,7 @@ void RSGISExeRasterGIS::printParameters()
                 cout << endl;
             }
         }
-        else if(this->option == RSGISExeRasterGIS::meanlitpopattributestats)
+        else if(this->option == RSGISExeRasterGIS::meanlitpopattributestatsinmem)
         {
             cout << "A command to populate an attribute table with mean-lit statistics from an image.\n";
             cout << "Input Image: " << this->inputImage << endl;
@@ -3673,6 +4329,55 @@ void RSGISExeRasterGIS::printParameters()
                 if((*iterBands)->calcMedian)
                 {
                     cout << "MEDIAN (" << (*iterBands)->medianField << ") ";
+                }
+                
+                cout << endl;
+            }
+        }
+        else if(this->option == RSGISExeRasterGIS::meanlitpopattributestats)
+        {
+            cout << "A command to populate an attribute table with mean-lit statistics from an image in a memory efficient manor.\n";
+            cout << "Input Image: " << this->inputImage << endl;
+            cout << "Clump Image: " << this->clumpsImage << endl;
+            cout << "Input Table: " << this->attTableFile << endl;
+            cout << "Output Table: " << this->outAttTableFile << endl;
+            cout << "Mean Lit Field: " << this->meanlitField << endl;
+            cout << "Mean Lit Image: " << this->meanlitImage << " band = " << this->meanLitBand;
+            if(this->meanLitUseUpper)
+            {
+                cout << " using upper values.\n";
+            }
+            else 
+            {
+                cout << " using lower values.\n";
+            }
+            cout << "Statistics to be calculated:\n";
+            for(vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
+            {
+                cout << "Band " << (*iterBands)->band << ": ";
+                if((*iterBands)->calcMin)
+                {
+                    cout << "MIN (" << (*iterBands)->minField << ") ";
+                }
+                
+                if((*iterBands)->calcMax)
+                {
+                    cout << "MAX (" << (*iterBands)->maxField << ") ";
+                }
+                
+                if((*iterBands)->calcMean)
+                {
+                    cout << "MEAN (" << (*iterBands)->meanField << ") ";
+                }
+                
+                if((*iterBands)->calcSum)
+                {
+                    cout << "SUM (" << (*iterBands)->sumField << ") ";
+                }
+                
+                if((*iterBands)->calcStdDev)
+                {
+                    cout << "STDDEV (" << (*iterBands)->stdDevField << ") ";
                 }
                 
                 cout << endl;

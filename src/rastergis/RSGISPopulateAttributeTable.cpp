@@ -77,7 +77,7 @@ namespace rsgis{namespace rastergis{
             
             // Populate the attribute table.
             cout << "Populating the attribute table with sum and count values\n";
-            RSGISPopulateAttributeTableBandMeansCalcImg *popTabMeans = new RSGISPopulateAttributeTableBandMeansCalcImg(0, attTable, attrPrefix, pxlCountIdx, bandMeanIdxs, numRasterBands);
+            RSGISPopulateAttributeTableBandMeansCalcImg *popTabMeans = new RSGISPopulateAttributeTableBandMeansCalcImg(attTable, attrPrefix, pxlCountIdx, bandMeanIdxs, numRasterBands);
             RSGISCalcImage calcImage(popTabMeans);
             calcImage.calcImage(datasets, numDatasets);
             delete popTabMeans;
@@ -162,7 +162,7 @@ namespace rsgis{namespace rastergis{
     }
     
 
-    RSGISPopulateAttributeTableBandMeansCalcImg::RSGISPopulateAttributeTableBandMeansCalcImg(int numberOutBands, RSGISAttributeTable *attTable, string attrPrefix, unsigned int pxlCountIdx, unsigned int *bandMeanIdxs, unsigned int numBandMeanIdxs):RSGISCalcImageValue(numberOutBands)
+    RSGISPopulateAttributeTableBandMeansCalcImg::RSGISPopulateAttributeTableBandMeansCalcImg(RSGISAttributeTable *attTable, string attrPrefix, unsigned int pxlCountIdx, unsigned int *bandMeanIdxs, unsigned int numBandMeanIdxs):RSGISCalcImageValue(0)
     {
         this->attTable = attTable;
         this->attrPrefix = attrPrefix;
@@ -225,7 +225,7 @@ namespace rsgis{namespace rastergis{
         
     }
         
-    void RSGISPopulateAttributeTableBandStats::populateWithBandStatistics(RSGISAttributeTable *attTable, GDALDataset **datasets, int numDatasets, vector<RSGISBandAttStats*> *bandStats) throw(RSGISImageCalcException, RSGISAttributeTableException)
+    void RSGISPopulateAttributeTableBandStats::populateWithBandStatisticsInMem(RSGISAttributeTable *attTable, GDALDataset **datasets, int numDatasets, vector<RSGISBandAttStats*> *bandStats) throw(RSGISImageCalcException, RSGISAttributeTableException)
     {
         if(numDatasets != 2)
         {
@@ -402,7 +402,7 @@ namespace rsgis{namespace rastergis{
             }
             
             // Extract Data from Image.
-            RSGISGetPixelValuesForClumps *getImageVals = new RSGISGetPixelValuesForClumps(0, clumpData, numDataBands, dataBandIdxs);
+            RSGISGetPixelValuesForClumps *getImageVals = new RSGISGetPixelValuesForClumps(clumpData, numDataBands, dataBandIdxs);
             RSGISCalcImage calcImage(getImageVals);
             calcImage.calcImage(datasets, numDatasets);
             delete getImageVals;
@@ -507,6 +507,234 @@ namespace rsgis{namespace rastergis{
 
     }
     
+    void RSGISPopulateAttributeTableBandStats::populateWithBandStatisticsWithinAtt(RSGISAttributeTable *attTable, GDALDataset **datasets, int numDatasets, vector<RSGISBandAttStats*> *bandStats) throw(RSGISImageCalcException, RSGISAttributeTableException)
+    {
+        if(numDatasets != 2)
+        {
+            throw RSGISImageCalcException("Two datasets are required for this fucntion.");
+        }
+        
+        try 
+        {
+            if(datasets[0]->GetRasterCount() != 1)
+            {
+                throw RSGISImageCalcException("Clumps image should only have 1 image band.");
+            }
+            
+            if(datasets[1]->GetRasterCount() < bandStats->size())
+            {
+                throw RSGISImageCalcException("More band stats were requested than bands in the file.");
+            }
+                        
+            if(!attTable->hasAttribute("pxlcount"))
+            {
+                attTable->addAttIntField("pxlcount", 0);
+            }
+            else if(attTable->getDataType("pxlcount") != rsgis_int)
+            {
+                throw RSGISImageCalcException("Cannot proceed as \'pxlcount\' field is not of type integer.");
+            }
+            unsigned int pxlCountIdx = attTable->getFieldIndex("pxlcount");
+            
+            if(!attTable->hasAttribute("first"))
+            {
+                attTable->addAttBoolField("first", true);
+            }
+            else if(attTable->getDataType("first") != rsgis_bool)
+            {
+                throw RSGISImageCalcException("Cannot proceed as \'first\' field is not of type boolean.");
+            }
+            unsigned int firstFieldIdx = attTable->getFieldIndex("first");
+            
+            bool meanCalc = false;
+            bool stdDevCalc = false;
+            for(vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
+            {
+                if((*iterBands)->band == 0)
+                {
+                    throw RSGISImageCalcException("Band numbers start at 1.");
+                }
+                else if((*iterBands)->band > datasets[1]->GetRasterCount())
+                {
+                    throw RSGISImageCalcException("Band specified is not within the image.");
+                }
+                
+                if((*iterBands)->calcMin)
+                {
+                    if(attTable->hasAttribute((*iterBands)->minField))
+                    {
+                        if(attTable->getDataType((*iterBands)->minField) != rsgis_float)
+                        {
+                            throw RSGISAttributeTableException("All outputs must be of type float.");
+                        }
+                        cerr << "Warning. Reusing field \'" << (*iterBands)->minField << "\'\n";
+                    }
+                    else
+                    {
+                        attTable->addAttFloatField((*iterBands)->minField, 0);
+                    }
+                    (*iterBands)->minIdx = attTable->getFieldIndex((*iterBands)->minField);
+                }
+                
+                if((*iterBands)->calcMax)
+                {
+                    if(attTable->hasAttribute((*iterBands)->maxField))
+                    {
+                        if(attTable->getDataType((*iterBands)->maxField) != rsgis_float)
+                        {
+                            throw RSGISAttributeTableException("All outputs must be of type float.");
+                        }
+                        cerr << "Warning. Reusing field \'" << (*iterBands)->maxField << "\'\n";
+                    }
+                    else
+                    {
+                        attTable->addAttFloatField((*iterBands)->maxField, 0);
+                    }
+                    (*iterBands)->maxIdx = attTable->getFieldIndex((*iterBands)->maxField);
+                }
+                
+                if((*iterBands)->calcMean)
+                {
+                    meanCalc = true;
+                    if(attTable->hasAttribute((*iterBands)->meanField))
+                    {
+                        if(attTable->getDataType((*iterBands)->meanField) != rsgis_float)
+                        {
+                            throw RSGISAttributeTableException("All outputs must be of type float.");
+                        }
+                        cerr << "Warning. Reusing field \'" << (*iterBands)->meanField << "\'\n";
+                    }
+                    else
+                    {
+                        attTable->addAttFloatField((*iterBands)->meanField, 0);
+                    }
+                    (*iterBands)->meanIdx = attTable->getFieldIndex((*iterBands)->meanField);
+                }
+                
+                if((*iterBands)->calcSum)
+                {
+                    if(attTable->hasAttribute((*iterBands)->sumField))
+                    {
+                        if(attTable->getDataType((*iterBands)->sumField) != rsgis_float)
+                        {
+                            throw RSGISAttributeTableException("All outputs must be of type float.");
+                        }
+                        cerr << "Warning. Reusing field \'" << (*iterBands)->sumField << "\'\n";
+                    }
+                    else
+                    {
+                        attTable->addAttFloatField((*iterBands)->sumField, 0);
+                    }
+                    (*iterBands)->sumIdx = attTable->getFieldIndex((*iterBands)->sumField);
+                }
+                
+                if((*iterBands)->calcStdDev)
+                {
+                    stdDevCalc = true;
+                    if(attTable->hasAttribute((*iterBands)->stdDevField))
+                    {
+                        if(attTable->getDataType((*iterBands)->stdDevField) != rsgis_float)
+                        {
+                            throw RSGISAttributeTableException("All outputs must be of type float.");
+                        }
+                        cerr << "Warning. Reusing field \'" << (*iterBands)->stdDevField << "\'\n";
+                    }
+                    else
+                    {
+                        attTable->addAttFloatField((*iterBands)->stdDevField, 0);
+                    }
+                    (*iterBands)->stdDevIdx = attTable->getFieldIndex((*iterBands)->stdDevField);
+                }
+                
+                if((*iterBands)->calcMedian)
+                {
+                    cout << "WARNING: Cannot calculate median value (" << (*iterBands)->medianField << ") when processing within attribute table\n";
+                }                
+            }
+            
+            // Calculate Appropriate Min, Max, Sum and Mean Values.
+            attTable->setBoolValue("first", true);
+            RSGISCalcClumpStatsWithinAtt *calcAttStats = new RSGISCalcClumpStatsWithinAtt(attTable, bandStats, false, pxlCountIdx, firstFieldIdx);
+            RSGISCalcImage calcImage(calcAttStats);
+            calcImage.calcImage(datasets, numDatasets);
+            delete calcAttStats;
+            
+            if(meanCalc)
+            {
+                RSGISFeature *feat;
+                int feedback = attTable->getSize()/10;
+                int feedbackCounter = 0;
+                double pxlCount = 0;
+                cout << "Started (Calc Mean): " << flush;
+                // Calculate Statistics for each feature.
+                for(unsigned long long i  = 0; i < attTable->getSize(); ++i)
+                {
+                    if((i % feedback) == 0)
+                    {
+                        cout << "." << feedbackCounter << "." << flush;
+                        feedbackCounter = feedbackCounter + 10;
+                    }
+                    
+                    feat = attTable->getFeature(i);
+                    pxlCount = feat->intFields->at(pxlCountIdx);
+                    for(vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
+                    {   
+                        if((*iterBands)->calcMean)
+                        {
+                            feat->floatFields->at((*iterBands)->meanIdx) = feat->floatFields->at((*iterBands)->meanIdx) / pxlCount;
+                        }
+                    }
+                    
+                }
+                cout << " Complete.\n";
+                
+                if(stdDevCalc)
+                {
+                    
+                    // Extract Data from Image.
+                    attTable->setBoolValue("first", true);
+                    calcAttStats = new RSGISCalcClumpStatsWithinAtt(attTable, bandStats, true, pxlCountIdx, firstFieldIdx);
+                    RSGISCalcImage calcImageStdDev(calcAttStats);
+                    calcImageStdDev.calcImage(datasets, numDatasets);
+                    delete calcAttStats;
+                    
+                    feedbackCounter = 0;
+                    cout << "Started (Calc StdDev): " << flush;
+                    // Calculate Statistics for each feature.
+                    for(unsigned long long i  = 0; i < attTable->getSize(); ++i)
+                    {
+                        if((i % feedback) == 0)
+                        {
+                            cout << "." << feedbackCounter << "." << flush;
+                            feedbackCounter = feedbackCounter + 10;
+                        }
+                        
+                        feat = attTable->getFeature(i);
+                        pxlCount = feat->intFields->at(pxlCountIdx);
+                        for(vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
+                        {   
+                            if((*iterBands)->calcStdDev)
+                            {
+                                feat->floatFields->at((*iterBands)->stdDevIdx) = sqrt(feat->floatFields->at((*iterBands)->stdDevIdx) / pxlCount);
+                            }
+                        }
+                        
+                    }
+                    cout << " Complete.\n";
+                }
+            }            
+        } 
+        catch (RSGISAttributeTableException &e) 
+        {
+            throw e;
+        }
+        catch (RSGISImageCalcException &e) 
+        {
+            throw e;
+        }
+        
+    }
+    
     RSGISPopulateAttributeTableBandStats::~RSGISPopulateAttributeTableBandStats()
     {
         
@@ -520,7 +748,7 @@ namespace rsgis{namespace rastergis{
         
     }
     
-    void RSGISPopulateAttributeTableBandStatsMeanLit::populateWithBandStatistics(RSGISAttributeTable *attTable, GDALDataset **datasets, int numDatasets, vector<RSGISBandAttStats*> *bandStats, unsigned int meanLitBand, string meanLitField, bool useMeanLitValAbove) throw(RSGISImageCalcException, RSGISAttributeTableException)
+    void RSGISPopulateAttributeTableBandStatsMeanLit::populateWithBandStatisticsInMem(RSGISAttributeTable *attTable, GDALDataset **datasets, int numDatasets, vector<RSGISBandAttStats*> *bandStats, unsigned int meanLitBand, string meanLitField, bool useMeanLitValAbove) throw(RSGISImageCalcException, RSGISAttributeTableException)
     {
         if(numDatasets != 3)
         {
@@ -713,7 +941,7 @@ namespace rsgis{namespace rastergis{
             }
             
             // Extract Data from Image.
-            RSGISGetPixelValuesForClumpsMeanLit *getImageVals = new RSGISGetPixelValuesForClumpsMeanLit(0, attTable, clumpData, numDataBands, dataBandIdxs, meanLitBand, meanLitFieldIdx, meanLitFieldDT, useMeanLitValAbove);
+            RSGISGetPixelValuesForClumpsMeanLit *getImageVals = new RSGISGetPixelValuesForClumpsMeanLit(attTable, clumpData, numDataBands, dataBandIdxs, meanLitBand, meanLitFieldIdx, meanLitFieldDT, useMeanLitValAbove);
             RSGISCalcImage calcImage(getImageVals);
             calcImage.calcImage(datasets, numDatasets);
             delete getImageVals;
@@ -817,6 +1045,252 @@ namespace rsgis{namespace rastergis{
         }
     }
     
+    void RSGISPopulateAttributeTableBandStatsMeanLit::populateWithBandStatisticsWithinAtt(RSGISAttributeTable *attTable, GDALDataset **datasets, int numDatasets, vector<RSGISBandAttStats*> *bandStats, unsigned int meanLitBand, string meanLitField, bool useMeanLitValAbove) throw(RSGISImageCalcException, RSGISAttributeTableException)
+    {
+        if(numDatasets != 3)
+        {
+            throw RSGISImageCalcException("Three datasets are required for this fucntion.");
+        }
+        
+        try 
+        {
+            if(datasets[0]->GetRasterCount() != 1)
+            {
+                throw RSGISImageCalcException("Clumps image should only have 1 image band.");
+            }
+            
+            if(datasets[1]->GetRasterCount() < bandStats->size())
+            {
+                throw RSGISImageCalcException("More band stats were requested than bands in the file.");
+            }
+            
+            unsigned int meanLitFieldIdx = 0;
+            RSGISAttributeDataType meanLitFieldDT = rsgis_na;
+            if(!attTable->hasAttribute(meanLitField))
+            {
+                throw RSGISAttributeTableException("The mean-lit field supplied is not present within the attribute table.");
+            }
+            else
+            {
+                meanLitFieldIdx = attTable->getFieldIndex(meanLitField);
+                meanLitFieldDT = attTable->getDataType(meanLitField);
+                if(!((meanLitFieldDT == rsgis_int) | (meanLitFieldDT == rsgis_float)))
+                {
+                    throw RSGISAttributeTableException("Mean-lit field must has data type of either int or float.");
+                }
+            }
+            
+            if(!attTable->hasAttribute("mlpxlcount"))
+            {
+                attTable->addAttIntField("mlpxlcount", 0);
+            }
+            else if(attTable->getDataType("mlpxlcount") != rsgis_int)
+            {
+                throw RSGISImageCalcException("Cannot proceed as \'mlpxlcount\' field is not of type integer.");
+            }
+            unsigned int pxlCountIdx = attTable->getFieldIndex("mlpxlcount");
+            
+            if(!attTable->hasAttribute("first"))
+            {
+                attTable->addAttBoolField("first", true);
+            }
+            else if(attTable->getDataType("first") != rsgis_bool)
+            {
+                throw RSGISImageCalcException("Cannot proceed as \'first\' field is not of type boolean.");
+            }
+            unsigned int firstFieldIdx = attTable->getFieldIndex("first");
+                        
+            bool meanCalc = false;
+            bool stdDevCalc = false;
+            for(vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
+            {
+                if((*iterBands)->band == 0)
+                {
+                    throw RSGISImageCalcException("Band numbers start at 1.");
+                }
+                else if((*iterBands)->band > datasets[1]->GetRasterCount())
+                {
+                    throw RSGISImageCalcException("Band specified is not within the image.");
+                }
+                
+                if((*iterBands)->calcMin)
+                {
+                    if(attTable->hasAttribute((*iterBands)->minField))
+                    {
+                        if(attTable->getDataType((*iterBands)->minField) != rsgis_float)
+                        {
+                            throw RSGISAttributeTableException("All outputs must be of type float.");
+                        }
+                        cerr << "Warning. Reusing field \'" << (*iterBands)->minField << "\'\n";
+                    }
+                    else
+                    {
+                        attTable->addAttFloatField((*iterBands)->minField, 0);
+                    }
+                    (*iterBands)->minIdx = attTable->getFieldIndex((*iterBands)->minField);
+                }
+                
+                if((*iterBands)->calcMax)
+                {
+                    if(attTable->hasAttribute((*iterBands)->maxField))
+                    {
+                        if(attTable->getDataType((*iterBands)->maxField) != rsgis_float)
+                        {
+                            throw RSGISAttributeTableException("All outputs must be of type float.");
+                        }
+                        cerr << "Warning. Reusing field \'" << (*iterBands)->maxField << "\'\n";
+                    }
+                    else
+                    {
+                        attTable->addAttFloatField((*iterBands)->maxField, 0);
+                    }
+                    (*iterBands)->maxIdx = attTable->getFieldIndex((*iterBands)->maxField);
+                }
+                
+                if((*iterBands)->calcMean)
+                {
+                    meanCalc = true;
+                    if(attTable->hasAttribute((*iterBands)->meanField))
+                    {
+                        if(attTable->getDataType((*iterBands)->meanField) != rsgis_float)
+                        {
+                            throw RSGISAttributeTableException("All outputs must be of type float.");
+                        }
+                        cerr << "Warning. Reusing field \'" << (*iterBands)->meanField << "\'\n";
+                    }
+                    else
+                    {
+                        attTable->addAttFloatField((*iterBands)->meanField, 0);
+                    }
+                    (*iterBands)->meanIdx = attTable->getFieldIndex((*iterBands)->meanField);
+                }
+                
+                if((*iterBands)->calcSum)
+                {
+                    if(attTable->hasAttribute((*iterBands)->sumField))
+                    {
+                        if(attTable->getDataType((*iterBands)->sumField) != rsgis_float)
+                        {
+                            throw RSGISAttributeTableException("All outputs must be of type float.");
+                        }
+                        cerr << "Warning. Reusing field \'" << (*iterBands)->sumField << "\'\n";
+                    }
+                    else
+                    {
+                        attTable->addAttFloatField((*iterBands)->sumField, 0);
+                    }
+                    (*iterBands)->sumIdx = attTable->getFieldIndex((*iterBands)->sumField);
+                }
+                
+                if((*iterBands)->calcStdDev)
+                {
+                    stdDevCalc = true;
+                    if(attTable->hasAttribute((*iterBands)->stdDevField))
+                    {
+                        if(attTable->getDataType((*iterBands)->stdDevField) != rsgis_float)
+                        {
+                            throw RSGISAttributeTableException("All outputs must be of type float.");
+                        }
+                        cerr << "Warning. Reusing field \'" << (*iterBands)->stdDevField << "\'\n";
+                    }
+                    else
+                    {
+                        attTable->addAttFloatField((*iterBands)->stdDevField, 0);
+                    }
+                    (*iterBands)->stdDevIdx = attTable->getFieldIndex((*iterBands)->stdDevField);
+                }
+                
+                if((*iterBands)->calcMedian)
+                {
+                    cout << "WARNING: Cannot calculate median value (" << (*iterBands)->medianField << ") when processing within attribute table\n";
+                }
+            }
+            
+            
+            // Extract Data from Image.
+            attTable->setBoolValue("first", true);
+            RSGISClumpsMeanLitStatsWithinAtt *calcAttStats = new RSGISClumpsMeanLitStatsWithinAtt(attTable, bandStats, false, pxlCountIdx, firstFieldIdx, meanLitBand, meanLitFieldIdx, meanLitFieldDT, useMeanLitValAbove);
+            RSGISCalcImage calcImage(calcAttStats);
+            calcImage.calcImage(datasets, numDatasets);
+            delete calcAttStats;
+            
+            if(meanCalc)
+            {
+                RSGISFeature *feat;
+                int feedback = attTable->getSize()/10;
+                int feedbackCounter = 0;
+                double pxlCount = 0;
+                cout << "Started (Calc Mean): " << flush;
+                // Calculate Statistics for each feature.
+                for(unsigned long long i  = 0; i < attTable->getSize(); ++i)
+                {
+                    if((i % feedback) == 0)
+                    {
+                        cout << "." << feedbackCounter << "." << flush;
+                        feedbackCounter = feedbackCounter + 10;
+                    }
+                    
+                    feat = attTable->getFeature(i);
+                    pxlCount = feat->intFields->at(pxlCountIdx);
+                    for(vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
+                    {   
+                        if((*iterBands)->calcMean)
+                        {
+                            feat->floatFields->at((*iterBands)->meanIdx) = feat->floatFields->at((*iterBands)->meanIdx) / pxlCount;
+                        }
+                    }
+                    
+                }
+                cout << " Complete.\n";
+                
+                if(stdDevCalc)
+                {
+                    
+                    // Extract Data from Image.
+                    attTable->setBoolValue("first", true);
+                    RSGISClumpsMeanLitStatsWithinAtt *calcAttStats = new RSGISClumpsMeanLitStatsWithinAtt(attTable, bandStats, true, pxlCountIdx, firstFieldIdx, meanLitBand, meanLitFieldIdx, meanLitFieldDT, useMeanLitValAbove);
+                    RSGISCalcImage calcImage(calcAttStats);
+                    calcImage.calcImage(datasets, numDatasets);
+                    delete calcAttStats;
+                    
+                    feedbackCounter = 0;
+                    cout << "Started (Calc StdDev): " << flush;
+                    // Calculate Statistics for each feature.
+                    for(unsigned long long i  = 0; i < attTable->getSize(); ++i)
+                    {
+                        if((i % feedback) == 0)
+                        {
+                            cout << "." << feedbackCounter << "." << flush;
+                            feedbackCounter = feedbackCounter + 10;
+                        }
+                        
+                        feat = attTable->getFeature(i);
+                        pxlCount = feat->intFields->at(pxlCountIdx);
+                        for(vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
+                        {   
+                            if((*iterBands)->calcStdDev)
+                            {
+                                feat->floatFields->at((*iterBands)->stdDevIdx) = sqrt(feat->floatFields->at((*iterBands)->stdDevIdx) / pxlCount);
+                            }
+                        }
+                        
+                    }
+                    cout << " Complete.\n";
+                }
+            } 
+            
+            
+        } 
+        catch (RSGISAttributeTableException &e) 
+        {
+            throw e;
+        }
+        catch (RSGISImageCalcException &e) 
+        {
+            throw e;
+        }
+    }
+    
     RSGISPopulateAttributeTableBandStatsMeanLit::~RSGISPopulateAttributeTableBandStatsMeanLit()
     {
         
@@ -829,7 +1303,7 @@ namespace rsgis{namespace rastergis{
         
     }
     
-    void RSGISPopulateAttributeTableBandStatsMeanLitBands::populateWithBandStatistics(RSGISAttributeTable *attTable, GDALDataset **datasets, int numDatasets, vector<RSGISBandAttStatsMeanLit*> *bandStats) throw(RSGISImageCalcException, RSGISAttributeTableException)
+    void RSGISPopulateAttributeTableBandStatsMeanLitBands::populateWithBandStatisticsInMem(RSGISAttributeTable *attTable, GDALDataset **datasets, int numDatasets, vector<RSGISBandAttStatsMeanLit*> *bandStats) throw(RSGISImageCalcException, RSGISAttributeTableException)
     {
         if(numDatasets != 2)
         {
@@ -1017,7 +1491,7 @@ namespace rsgis{namespace rastergis{
             }
             
             // Extract Data from Image.
-            RSGISGetPixelValuesForClumps *getImageVals = new RSGISGetPixelValuesForClumps(0, clumpData, numDataBands, dataBandIdxs);
+            RSGISGetPixelValuesForClumps *getImageVals = new RSGISGetPixelValuesForClumps(clumpData, numDataBands, dataBandIdxs);
             RSGISCalcImage calcImage(getImageVals);
             calcImage.calcImage(datasets, numDatasets);
             delete getImageVals;
@@ -1169,7 +1643,7 @@ namespace rsgis{namespace rastergis{
     }
 
     
-    RSGISGetPixelValuesForClumps::RSGISGetPixelValuesForClumps(int numberOutBands, vector<vector<double> > **clumpData, unsigned int numDataBands, unsigned int *dataBandIdxs):RSGISCalcImageValue(numberOutBands)
+    RSGISGetPixelValuesForClumps::RSGISGetPixelValuesForClumps(vector<vector<double> > **clumpData, unsigned int numDataBands, unsigned int *dataBandIdxs):RSGISCalcImageValue(0)
     {
         this->clumpData = clumpData;
         this->numDataBands = numDataBands;
@@ -1214,7 +1688,132 @@ namespace rsgis{namespace rastergis{
         
     }
     
-    RSGISGetPixelValuesForClumpsMeanLit::RSGISGetPixelValuesForClumpsMeanLit(int numberOutBands, RSGISAttributeTable *attTable, vector<vector<double> > **clumpData, unsigned int numDataBands, unsigned int *dataBandIdxs, unsigned int meanLitBand, unsigned int meanLitFieldIdx, RSGISAttributeDataType meanLitFieldDT, bool useMeanLitValAbove):RSGISCalcImageValue(numberOutBands)
+    
+    RSGISCalcClumpStatsWithinAtt::RSGISCalcClumpStatsWithinAtt(RSGISAttributeTable *attTable, vector<RSGISBandAttStats*> *bandStats, bool calcStdDev, unsigned int pxlCountIdx, unsigned int firstFieldIdx):RSGISCalcImageValue(0)
+    {
+        this->attTable = attTable;
+        this->bandStats = bandStats;
+        this->calcStdDev = calcStdDev;
+        this->firstFieldIdx = firstFieldIdx;
+        this->pxlCountIdx = pxlCountIdx;
+    }
+    
+    void RSGISCalcClumpStatsWithinAtt::calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException)
+    {
+        unsigned long clumpIdx = 0;
+        
+        try
+        {
+            clumpIdx = lexical_cast<unsigned long>(bandValues[0]);
+        }
+        catch(bad_lexical_cast &e)
+        {
+            throw RSGISImageCalcException(e.what());
+        }
+        
+        if(clumpIdx > 0)
+        {
+            --clumpIdx;
+            
+            try
+            {
+                float bandVal = 0;
+                RSGISFeature *feat = attTable->getFeature(clumpIdx);
+                if(feat->boolFields->at(firstFieldIdx))
+                {
+                    feat->intFields->at(pxlCountIdx) = 1;
+                    for(vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
+                    {
+                        bandVal = bandValues[(*iterBands)->band];
+                        if(this->calcStdDev)
+                        {
+                            if((*iterBands)->calcStdDev)
+                            {
+                                feat->floatFields->at((*iterBands)->stdDevIdx) = pow((feat->floatFields->at((*iterBands)->meanIdx) - bandVal),2);
+                            }
+                        }
+                        else
+                        {
+                            if((*iterBands)->calcMin)
+                            {
+                                feat->floatFields->at((*iterBands)->minIdx) = bandVal;
+                            }
+                            if((*iterBands)->calcMax)
+                            {
+                                feat->floatFields->at((*iterBands)->maxIdx) = bandVal;
+                            }
+                            if((*iterBands)->calcMean)
+                            {
+                                feat->floatFields->at((*iterBands)->meanIdx) = bandVal;
+                            }
+                            if((*iterBands)->calcSum)
+                            {
+                                feat->floatFields->at((*iterBands)->sumIdx) = bandVal;
+                            }
+                        }
+                    }
+                    
+                    feat->boolFields->at(firstFieldIdx) = false;
+                }
+                else
+                {
+                    feat->intFields->at(pxlCountIdx) += 1;
+                    
+                    for(vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
+                    {
+                        bandVal = bandValues[(*iterBands)->band];
+                        if(this->calcStdDev)
+                        {
+                            if((*iterBands)->calcStdDev)
+                            {
+                                feat->floatFields->at((*iterBands)->stdDevIdx) += pow((feat->floatFields->at((*iterBands)->meanIdx) - bandVal),2);
+                            }
+                        }
+                        else
+                        {
+                            if((*iterBands)->calcMin)
+                            {
+                                if(bandVal < feat->floatFields->at((*iterBands)->minIdx))
+                                {
+                                    feat->floatFields->at((*iterBands)->minIdx) = bandVal;
+                                }
+                            }
+                            if((*iterBands)->calcMax)
+                            {
+                                if(bandVal > feat->floatFields->at((*iterBands)->maxIdx))
+                                {
+                                    feat->floatFields->at((*iterBands)->maxIdx) = bandVal;
+                                }
+                            }
+                            if((*iterBands)->calcMean)
+                            {
+                                feat->floatFields->at((*iterBands)->meanIdx) += bandVal;
+                            }
+                            if((*iterBands)->calcSum)
+                            {
+                                feat->floatFields->at((*iterBands)->sumIdx) += bandVal;
+                            }
+                        }
+                    }
+                }                
+            }
+            catch(RSGISAttributeTableException &e)
+            {
+                cout << "clumpIdx = " << clumpIdx << endl;
+                throw RSGISImageCalcException(e.what());
+            }
+        } 
+    }
+    
+    RSGISCalcClumpStatsWithinAtt::~RSGISCalcClumpStatsWithinAtt()
+    {
+        
+    }
+    
+    
+    
+    
+    RSGISGetPixelValuesForClumpsMeanLit::RSGISGetPixelValuesForClumpsMeanLit(RSGISAttributeTable *attTable, vector<vector<double> > **clumpData, unsigned int numDataBands, unsigned int *dataBandIdxs, unsigned int meanLitBand, unsigned int meanLitFieldIdx, RSGISAttributeDataType meanLitFieldDT, bool useMeanLitValAbove):RSGISCalcImageValue(0)
     {
         this->attTable = attTable;
         this->clumpData = clumpData;
@@ -1292,13 +1891,167 @@ namespace rsgis{namespace rastergis{
         
     }
     
+    RSGISClumpsMeanLitStatsWithinAtt::RSGISClumpsMeanLitStatsWithinAtt(RSGISAttributeTable *attTable, vector<RSGISBandAttStats*> *bandStats, bool calcStdDev, unsigned int pxlCountIdx, unsigned int firstFieldIdx, unsigned int meanLitBand, unsigned int meanLitFieldIdx, RSGISAttributeDataType meanLitFieldDT, bool useMeanLitValAbove):RSGISCalcImageValue(0)
+    {
+        this->attTable = attTable;
+        this->bandStats = bandStats;
+        this->calcStdDev = calcStdDev;
+        this->pxlCountIdx = pxlCountIdx;
+        this->firstFieldIdx = firstFieldIdx;
+        this->meanLitBand = meanLitBand;
+        this->meanLitFieldIdx = meanLitFieldIdx;
+        this->meanLitFieldDT = meanLitFieldDT;
+        this->useMeanLitValAbove = useMeanLitValAbove;
+    }
+    
+    void RSGISClumpsMeanLitStatsWithinAtt::calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException)
+    {
+        unsigned long clumpIdx = 0;
+        
+        try
+        {
+            clumpIdx = lexical_cast<unsigned long>(bandValues[0]);
+        }
+        catch(bad_lexical_cast &e)
+        {
+            throw RSGISImageCalcException(e.what());
+        }
+        
+        if(clumpIdx > 0)
+        {
+            --clumpIdx;
+            
+            try
+            {   
+                RSGISFeature *feat = attTable->getFeature(clumpIdx);
+                double threshold = 0;
+                if(this->meanLitFieldDT == rsgis_int)
+                {
+                    threshold = feat->intFields->at(this->meanLitFieldIdx);
+                }
+                else if(this->meanLitFieldDT == rsgis_float)
+                {
+                    threshold = feat->floatFields->at(this->meanLitFieldIdx);
+                }
+                else
+                {
+                    RSGISImageCalcException("Mean-lit threshold field must be of type int or float.");
+                }
+                
+                bool withinThreshold = false;
+                
+                if((this->useMeanLitValAbove) & (bandValues[meanLitBand] > threshold))
+                {
+                    withinThreshold = true;
+                }
+                else if((!this->useMeanLitValAbove) & (bandValues[meanLitBand] < threshold))
+                {
+                    withinThreshold = true;
+                }
+                
+                if(withinThreshold)
+                {
+                    float bandVal = 0;
+                    RSGISFeature *feat = attTable->getFeature(clumpIdx);
+                    if(feat->boolFields->at(firstFieldIdx))
+                    {
+                        feat->intFields->at(pxlCountIdx) = 1;
+                        for(vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
+                        {
+                            bandVal = bandValues[(*iterBands)->band];
+                            if(this->calcStdDev)
+                            {
+                                if((*iterBands)->calcStdDev)
+                                {
+                                    feat->floatFields->at((*iterBands)->stdDevIdx) = pow((feat->floatFields->at((*iterBands)->meanIdx) - bandVal),2);
+                                }
+                            }
+                            else
+                            {
+                                if((*iterBands)->calcMin)
+                                {
+                                    feat->floatFields->at((*iterBands)->minIdx) = bandVal;
+                                }
+                                if((*iterBands)->calcMax)
+                                {
+                                    feat->floatFields->at((*iterBands)->maxIdx) = bandVal;
+                                }
+                                if((*iterBands)->calcMean)
+                                {
+                                    feat->floatFields->at((*iterBands)->meanIdx) = bandVal;
+                                }
+                                if((*iterBands)->calcSum)
+                                {
+                                    feat->floatFields->at((*iterBands)->sumIdx) = bandVal;
+                                }
+                            }
+                        }
+                        
+                        feat->boolFields->at(firstFieldIdx) = false;
+                    }
+                    else
+                    {
+                        feat->intFields->at(pxlCountIdx) += 1;
+                        
+                        for(vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
+                        {
+                            bandVal = bandValues[(*iterBands)->band];
+                            if(this->calcStdDev)
+                            {
+                                if((*iterBands)->calcStdDev)
+                                {
+                                    feat->floatFields->at((*iterBands)->stdDevIdx) += pow((feat->floatFields->at((*iterBands)->meanIdx) - bandVal),2);
+                                }
+                            }
+                            else
+                            {
+                                if((*iterBands)->calcMin)
+                                {
+                                    if(bandVal < feat->floatFields->at((*iterBands)->minIdx))
+                                    {
+                                        feat->floatFields->at((*iterBands)->minIdx) = bandVal;
+                                    }
+                                }
+                                if((*iterBands)->calcMax)
+                                {
+                                    if(bandVal > feat->floatFields->at((*iterBands)->maxIdx))
+                                    {
+                                        feat->floatFields->at((*iterBands)->maxIdx) = bandVal;
+                                    }
+                                }
+                                if((*iterBands)->calcMean)
+                                {
+                                    feat->floatFields->at((*iterBands)->meanIdx) += bandVal;
+                                }
+                                if((*iterBands)->calcSum)
+                                {
+                                    feat->floatFields->at((*iterBands)->sumIdx) += bandVal;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch(RSGISAttributeTableException &e)
+            {
+                cout << "clumpIdx = " << clumpIdx << endl;
+                throw RSGISImageCalcException(e.what());
+            }
+        } 
+    }
+    
+    RSGISClumpsMeanLitStatsWithinAtt::~RSGISClumpsMeanLitStatsWithinAtt()
+    {
+        
+    }
+    
     
     RSGISPopulateAttributeTableImageStats::RSGISPopulateAttributeTableImageStats()
     {
         
     }
     
-    void RSGISPopulateAttributeTableImageStats::populateWithImageStatistics(RSGISAttributeTable *attTable, GDALDataset **datasets, int numDatasets, RSGISBandAttStats *imageStats) throw(RSGISImageCalcException, RSGISAttributeTableException)
+    void RSGISPopulateAttributeTableImageStats::populateWithImageStatisticsInMem(RSGISAttributeTable *attTable, GDALDataset **datasets, int numDatasets, RSGISBandAttStats *imageStats) throw(RSGISImageCalcException, RSGISAttributeTableException)
     {
         if(numDatasets != 2)
         {
@@ -1446,7 +2199,7 @@ namespace rsgis{namespace rastergis{
             }
             
             // Extract Data from Image.
-            RSGISGetAllBandPixelValuesForClumps *getImageVals = new RSGISGetAllBandPixelValuesForClumps(0, clumpData);
+            RSGISGetAllBandPixelValuesForClumps *getImageVals = new RSGISGetAllBandPixelValuesForClumps(clumpData);
             RSGISCalcImage calcImage(getImageVals);
             calcImage.calcImage(datasets, numDatasets);
             delete getImageVals;
@@ -1550,7 +2303,7 @@ namespace rsgis{namespace rastergis{
     }
     
     
-    RSGISGetAllBandPixelValuesForClumps::RSGISGetAllBandPixelValuesForClumps(int numberOutBands, vector<double> **clumpData):RSGISCalcImageValue(numberOutBands)
+    RSGISGetAllBandPixelValuesForClumps::RSGISGetAllBandPixelValuesForClumps(vector<double> **clumpData):RSGISCalcImageValue(0)
     {
         this->clumpData = clumpData;
     }
@@ -1768,7 +2521,7 @@ namespace rsgis{namespace rastergis{
             }
             
             // Extract Data from Image.
-            RSGISCalcEucDistWithSegments *getImageVals = new RSGISCalcEucDistWithSegments(0, attTable, clumpData, bands);
+            RSGISCalcEucDistWithSegments *getImageVals = new RSGISCalcEucDistWithSegments(attTable, clumpData, bands);
             RSGISCalcImage calcImage(getImageVals);
             calcImage.calcImage(datasets, numDatasets);
             delete getImageVals;
@@ -1873,7 +2626,7 @@ namespace rsgis{namespace rastergis{
     
     
 
-    RSGISCalcEucDistWithSegments::RSGISCalcEucDistWithSegments(int numberOutBands, RSGISAttributeTable *attTable, vector<double> **clumpData, vector<RSGISBandAttName*> *bands):RSGISCalcImageValue(numberOutBands)
+    RSGISCalcEucDistWithSegments::RSGISCalcEucDistWithSegments(RSGISAttributeTable *attTable, vector<double> **clumpData, vector<RSGISBandAttName*> *bands):RSGISCalcImageValue(0)
     {
         this->attTable = attTable;
         this->clumpData = clumpData;
