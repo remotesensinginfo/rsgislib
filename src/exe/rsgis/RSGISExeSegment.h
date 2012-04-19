@@ -130,6 +130,7 @@ class RSGISExeSegment : public RSGISAlgorithmParameters
         vector<RSGISRegionGrowPxlSeeds> *regionGrowingPxlSeeds;
         unsigned int subDivision;
         unsigned int levels;
+        bool outputWithConsecutiveFIDs;
 	};
 
 #endif
