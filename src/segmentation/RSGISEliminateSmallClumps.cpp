@@ -682,7 +682,9 @@ namespace rsgis{namespace segment{
             ifStat->noExp = false;
             ifStat->ignore = false;
             
-            RSGISProcessFeature *processFeature = new RSGISEliminateFeature(eliminatedFieldIdx, mergedToFIDIdx, specThreshold, pxlCountIdx, bandStats);
+            vector<pair<unsigned long, unsigned long> > *eliminationPairs = new vector<pair<unsigned long, unsigned long> >();
+            
+            RSGISProcessFeature *processFeature = new RSGISEliminateFeature(eliminatedFieldIdx, mergedToFIDIdx, specThreshold, pxlCountIdx, bandStats, eliminationPairs);
             
             cout << "Eliminating features of size " << flush;
             for(unsigned int i = 1; i <= minClumpSize; ++i)
@@ -690,6 +692,7 @@ namespace rsgis{namespace segment{
                 cout << i << ", " << flush;
                 areaThreshold->setValue(i);
                 attTable->processIfStatements(ifStat, processFeature, NULL);
+                this->performElimination(attTable, eliminationPairs, eliminatedFieldIdx, mergedToFIDIdx, pxlCountIdx, bandStats);
             }
             cout << "Completed\n";
             
@@ -773,6 +776,102 @@ namespace rsgis{namespace segment{
         }
     }
     
+    
+    void RSGISEliminateSmallClumps::performElimination(RSGISAttributeTable *attTable, vector<pair<unsigned long, unsigned long> > *eliminationPairs, unsigned int eliminatedFieldIdx, unsigned int mergedToFIDIdx, unsigned int pxlCountIdx, vector<RSGISBandAttStats*> *bandStats) throw(RSGISImageCalcException)
+    {
+        try 
+        {
+            RSGISFeature* pFeat = NULL; // parent
+            RSGISFeature* mFeat = NULL; // child to be merged
+            bool alreadyNeighbour = false;
+            for(vector<pair<unsigned long, unsigned long> >::iterator iterPairs = eliminationPairs->begin(); iterPairs != eliminationPairs->end(); ++iterPairs)
+            {
+                pFeat = attTable->getFeature((*iterPairs).first);
+                mFeat = attTable->getFeature((*iterPairs).second);
+                
+                if(pFeat->boolFields->at(eliminatedFieldIdx))
+                {
+                    pFeat = getEliminatedNeighbour(pFeat, attTable, eliminatedFieldIdx, mergedToFIDIdx);
+                }
+                
+                pFeat->intFields->at(pxlCountIdx) += mFeat->intFields->at(pxlCountIdx);
+                for(vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
+                {
+                    pFeat->floatFields->at((*iterBands)->sumIdx) += mFeat->floatFields->at((*iterBands)->sumIdx);
+                    pFeat->floatFields->at((*iterBands)->meanIdx) = pFeat->floatFields->at((*iterBands)->sumIdx) / pFeat->intFields->at(pxlCountIdx);
+                }
+                
+                for(vector<unsigned long long>::iterator iterNeigh = pFeat->neighbours->begin(); iterNeigh != pFeat->neighbours->end(); )
+                {
+                    if((*iterNeigh) == mFeat->fid)
+                    {
+                        iterNeigh = pFeat->neighbours->erase(iterNeigh);
+                    }
+                    else
+                    {
+                        ++iterNeigh;
+                    }
+                }
+                
+                alreadyNeighbour = false;
+                for(vector<unsigned long long>::iterator iterFeatNeigh = mFeat->neighbours->begin(); iterFeatNeigh != mFeat->neighbours->end(); ++iterFeatNeigh)
+                {
+                    if((*iterFeatNeigh) != pFeat->fid)
+                    {
+                        alreadyNeighbour = false;
+                        for(vector<unsigned long long>::iterator iterNeigh = pFeat->neighbours->begin(); iterNeigh != pFeat->neighbours->end(); ++iterNeigh)
+                        {
+                            if((*iterFeatNeigh) == (*iterNeigh))
+                            {
+                                alreadyNeighbour = true;
+                                break;
+                            }
+                        }
+                        if(!alreadyNeighbour)
+                        {
+                            pFeat->neighbours->push_back(*iterFeatNeigh);
+                        }
+                    }
+                }
+                
+                mFeat->intFields->at(mergedToFIDIdx) = (*iterPairs).first;
+                mFeat->boolFields->at(eliminatedFieldIdx) = true;
+            }
+            
+            eliminationPairs->clear();
+        }
+        catch (RSGISAttributeTableException &e) 
+        {
+            throw e;
+        }
+    }
+    
+    RSGISFeature* RSGISEliminateSmallClumps::getEliminatedNeighbour(RSGISFeature *feat, RSGISAttributeTable *attTable, unsigned int eliminatedFieldIdx, unsigned int mergedToFIDIdx)throw(RSGISAttributeTableException)
+    {
+        RSGISFeature *nFeat = NULL;
+        try 
+        {
+            if(!feat->boolFields->at(eliminatedFieldIdx))
+            {
+                nFeat = feat;
+            }
+            else
+            {
+                nFeat = attTable->getFeature(feat->intFields->at(mergedToFIDIdx));
+                if(nFeat->boolFields->at(eliminatedFieldIdx))
+                {
+                    nFeat = this->getEliminatedNeighbour(nFeat, attTable, eliminatedFieldIdx, mergedToFIDIdx);
+                }
+            }
+            
+        }
+        catch(RSGISAttributeTableException &e)
+        {
+            throw e;
+        }
+        return nFeat;
+    }
+    
     RSGISEliminateSmallClumps::~RSGISEliminateSmallClumps()
     {
         
@@ -786,13 +885,14 @@ namespace rsgis{namespace segment{
     
     
     
-    RSGISEliminateFeature::RSGISEliminateFeature(unsigned int eliminatedFieldIdx, unsigned int mergedToFIDIdx, float specThreshold, unsigned int pxlCountIdx, vector<RSGISBandAttStats*> *bandStats):RSGISProcessFeature()
+    RSGISEliminateFeature::RSGISEliminateFeature(unsigned int eliminatedFieldIdx, unsigned int mergedToFIDIdx, float specThreshold, unsigned int pxlCountIdx, vector<RSGISBandAttStats*> *bandStats, vector<pair<unsigned long, unsigned long> > *eliminationPairs):RSGISProcessFeature()
     {
         this->eliminatedFieldIdx = eliminatedFieldIdx;
         this->mergedToFIDIdx = mergedToFIDIdx;
         this->specThreshold = specThreshold;
         this->pxlCountIdx = pxlCountIdx;
         this->bandStats = bandStats;
+        this->eliminationPairs = eliminationPairs;
     }
     
     void RSGISEliminateFeature::processFeature(RSGISFeature *feat, RSGISAttributeTable *attTable)throw(RSGISAttributeTableException)
@@ -831,51 +931,7 @@ namespace rsgis{namespace segment{
             {
                 if(minDist < specThreshold)
                 {
-                    nFeat = attTable->getFeature(minFID);
-                    nFeat->intFields->at(pxlCountIdx) += feat->intFields->at(pxlCountIdx);
-                    for(vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
-                    {
-                        nFeat->floatFields->at((*iterBands)->sumIdx) += feat->floatFields->at((*iterBands)->sumIdx);
-                        nFeat->floatFields->at((*iterBands)->meanIdx) = nFeat->floatFields->at((*iterBands)->sumIdx) / nFeat->intFields->at(pxlCountIdx);
-                    }
-                    
-                    // Remove feat as neighbour
-                    for(vector<unsigned long long>::iterator iterNeigh = nFeat->neighbours->begin(); iterNeigh != nFeat->neighbours->end(); )
-                    {
-                        if((*iterNeigh) == feat->fid)
-                        {
-                            iterNeigh = nFeat->neighbours->erase(iterNeigh);
-                        }
-                        else
-                        {
-                            ++iterNeigh;
-                        }
-                    }
-                    
-                    // Add feat neighbours
-                    bool alreadyNeighbour = false;
-                    for(vector<unsigned long long>::iterator iterFeatNeigh = feat->neighbours->begin(); iterFeatNeigh != feat->neighbours->end(); ++iterFeatNeigh)
-                    {
-                        if((*iterFeatNeigh) != nFeat->fid)
-                        {
-                            alreadyNeighbour = false;
-                            for(vector<unsigned long long>::iterator iterNeigh = nFeat->neighbours->begin(); iterNeigh != nFeat->neighbours->end(); ++iterNeigh)
-                            {
-                                if((*iterFeatNeigh) == (*iterNeigh))
-                                {
-                                    alreadyNeighbour = true;
-                                    break;
-                                }
-                            }
-                            if(!alreadyNeighbour)
-                            {
-                                nFeat->neighbours->push_back(*iterFeatNeigh);
-                            }
-                        }
-                    }
-                    
-                    feat->intFields->at(mergedToFIDIdx) = minFID;
-                    feat->boolFields->at(eliminatedFieldIdx) = true;
+                    eliminationPairs->push_back(pair<unsigned long, unsigned long>(minFID, ((unsigned long) feat->fid)));
                 }
             }
         }
