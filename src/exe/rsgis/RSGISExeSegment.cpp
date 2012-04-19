@@ -4164,30 +4164,19 @@ void RSGISExeSegment::runAlgorithm() throw(RSGISException)
                 string message = string("Could not open image ") + this->clumpsImage;
                 throw RSGISImageException(message.c_str());
             }
-            
-            RSGISImageUtils imgUtils;
-            
-            GDALDataset *resultDataset = NULL;
-            resultDataset = imgUtils.createCopy(clumpsDataset, this->outputImage, this->imageFormat, GDT_UInt32, this->projFromImage, this->proj);
-            if(resultDataset == NULL)
-            {
-                string message = string("Could not open image ") + this->outputImage;
-                throw RSGISImageException(message.c_str());
-            }
-            
+                        
             cout << "Create Attribute Table\n";
             RSGISCreateNewAttributeTable createAtt;
             RSGISAttributeTable *attTable = createAtt.createAndPopPixelCount(clumpsDataset, this->processInMemory, this->tempTable);
             
             cout << "Eliminating Clumps\n";
             RSGISEliminateSmallClumps eliminate;
-            eliminate.stepwiseEliminateSmallClumpsWithAtt(spectralDataset, clumpsDataset, resultDataset, attTable, minClumpSize, specThreshold);
+            eliminate.stepwiseEliminateSmallClumpsWithAtt(spectralDataset, clumpsDataset, this->outputImage, this->imageFormat, this->projFromImage, this->proj, attTable, minClumpSize, specThreshold);
             
             // Tidy up
             delete attTable;
             GDALClose(spectralDataset);
             GDALClose(clumpsDataset);
-            GDALClose(resultDataset);
             GDALDestroyDriverManager();
         } 
         catch (RSGISException &e) 

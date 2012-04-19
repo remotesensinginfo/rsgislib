@@ -487,6 +487,46 @@ namespace rsgis{namespace rastergis{
         RSGISAttributeDataType fType;
     };
     
+    class RSGISAttExpressionNotBoolField : public RSGISAttExpression
+    {
+    public:
+        RSGISAttExpressionNotBoolField(string fName, unsigned int fIdx, RSGISAttributeDataType fType):RSGISAttExpression()
+        {
+            this->fName = fName;
+            this->fIdx = fIdx;
+            this->fType = fType;
+        };
+        bool evaluate(RSGISFeature *feat)throw(RSGISAttributeTableException)
+        {
+            if(fType != rsgis_bool)
+            {
+                throw RSGISAttributeTableException("Field has to be of type boolean.");
+            }
+            
+            return !feat->boolFields->at(this->fIdx);
+        };
+        void popIdxs(RSGISAttributeTable *att)throw(RSGISAttributeTableException)
+        {
+            try
+            {
+                this->fType = att->getDataType(fName);
+                this->fIdx = att->getFieldIndex(fName);
+            }
+            catch(RSGISAttributeTableException &e)
+            {
+                throw e;
+            }
+        };
+        ~RSGISAttExpressionNotBoolField()
+        {
+            
+        };
+    protected:
+        string fName;
+        unsigned int fIdx;
+        RSGISAttributeDataType fType;
+    };
+    
     
     class RSGISAttExpressionGreaterThan : public RSGISAttExpression2Fields 
     {

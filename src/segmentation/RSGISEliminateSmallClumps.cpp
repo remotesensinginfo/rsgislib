@@ -577,7 +577,7 @@ namespace rsgis{namespace segment{
         delete[] spectralVals;
     }
     
-    void RSGISEliminateSmallClumps::stepwiseEliminateSmallClumpsWithAtt(GDALDataset *spectral, GDALDataset *clumps, GDALDataset *output, RSGISAttributeTable *attTable, unsigned int minClumpSize, float specThreshold) throw(RSGISImageCalcException)
+    void RSGISEliminateSmallClumps::stepwiseEliminateSmallClumpsWithAtt(GDALDataset *spectral, GDALDataset *clumps, string outputImageFile, string imageFormat, bool useImageProj, string proj, RSGISAttributeTable *attTable, unsigned int minClumpSize, float specThreshold) throw(RSGISImageCalcException)
     {
         try
         {
@@ -608,6 +608,7 @@ namespace rsgis{namespace segment{
             cout << "Populate Image Stats:\n";
             RSGISPopulateAttributeTableBandStats popAttStats;
             popAttStats.populateWithBandStatisticsWithinAtt(attTable, datasets, 2, bandStats);
+            delete[] datasets;
             
             cout << "Create extra attribute tables columns\n";
             if(!attTable->hasAttribute("Eliminated"))
@@ -665,8 +666,8 @@ namespace rsgis{namespace segment{
             RSGISFindClumpNeighbours findNeighbours;
             findNeighbours.findNeighbours(clumps, attTable);
                         
-            RSGISAttExpressionLessThanConstEq *areaThreshold = new RSGISAttExpressionLessThanConstEq("pxlcount", attTable->getFieldIndex("pxlcount"), rsgis_int, 1);
-            RSGISAttExpressionBoolField *boolEliminatedExp = new RSGISAttExpressionBoolField("Eliminated", eliminatedFieldIdx, rsgis_bool);
+            RSGISAttExpressionLessThanConstEq *areaThreshold = new RSGISAttExpressionLessThanConstEq("pxlcount", pxlCountIdx, rsgis_int, 1);
+            RSGISAttExpressionNotBoolField *boolEliminatedExp = new RSGISAttExpressionNotBoolField("Eliminated", eliminatedFieldIdx, rsgis_bool);
             
             vector<RSGISAttExpression*> *exps = new vector<RSGISAttExpression*>();
             exps->push_back(areaThreshold);
@@ -696,12 +697,28 @@ namespace rsgis{namespace segment{
             delete ifStat;
             delete processFeature;
             
-            // Find output FIDs for relabelling. 
+            // Find output FIDs for relabelling.
+            cout << "Defining output FIDs within table\n";
+            for(attTable->start(); attTable->end(); ++(*attTable))
+            {
+                if(!(*(*attTable))->boolFields->at(outFIDSetFieldIdx))
+                {
+                    this->defineOutputFID(attTable, *(*attTable), eliminatedFieldIdx, mergedToFIDIdx, outFIDIdx, outFIDSetFieldIdx);
+                }
+            }
             
             // Relabel output FIDs to remove gaps.
+            attTable->exportASCII("/Users/pete/Desktop/tmpAtt.att");
             
             // Generate output image from original and output FIDs.
-            
+            cout << "Generating output clumps file\n";
+            datasets = new GDALDataset*[1];
+            datasets[0] = clumps;
+            RSGISApplyOutputFIDs *applyOutFIDs = new RSGISApplyOutputFIDs(attTable, outFIDIdx, outFIDSetFieldIdx);
+            RSGISCalcImage calcImage(applyOutFIDs, proj, useImageProj);
+            calcImage.calcImage(datasets, 1, outputImageFile, false, NULL, imageFormat, GDT_Float32);
+            delete applyOutFIDs;
+            delete[] datasets;
         }
         catch(RSGISAttributeTableException &e)
         {
@@ -710,6 +727,35 @@ namespace rsgis{namespace segment{
         catch(RSGISImageCalcException &e)
         {
             throw e;
+        }
+    }
+    
+    void RSGISEliminateSmallClumps::defineOutputFID(RSGISAttributeTable *attTable, RSGISFeature *feat, unsigned int eliminatedFieldIdx, unsigned int mergedToFIDIdx, unsigned int outFIDIdx, unsigned int outFIDSetFieldIdx) throw(RSGISImageCalcException)
+    {
+        try
+        {
+            if(!feat->boolFields->at(outFIDSetFieldIdx))
+            {
+                if(feat->boolFields->at(eliminatedFieldIdx))
+                {
+                    RSGISFeature *tmpFeat = attTable->getFeature(feat->intFields->at(mergedToFIDIdx));
+                    if(!tmpFeat->boolFields->at(outFIDSetFieldIdx))
+                    {
+                        this->defineOutputFID(attTable, tmpFeat, eliminatedFieldIdx, mergedToFIDIdx, outFIDIdx, outFIDSetFieldIdx);
+                    }
+                    feat->intFields->at(outFIDIdx) = tmpFeat->intFields->at(outFIDIdx);
+                    feat->boolFields->at(outFIDSetFieldIdx) = true;
+                }
+                else
+                {
+                    feat->intFields->at(outFIDIdx) = feat->fid;
+                    feat->boolFields->at(outFIDSetFieldIdx) = true;
+                }
+            }            
+        }
+        catch(RSGISAttributeTableException &e)
+        {
+            throw RSGISImageCalcException(e.what());
         }
     }
     
@@ -747,6 +793,10 @@ namespace rsgis{namespace segment{
             for(vector<unsigned long long>::iterator iterFeat = feat->neighbours->begin(); iterFeat != feat->neighbours->end(); ++iterFeat)
             {
                 nFeat = attTable->getFeature(*iterFeat);
+                if(nFeat->boolFields->at(eliminatedFieldIdx))
+                {
+                    nFeat = getEliminatedNeighbour(nFeat, attTable);
+                }
                 if(nFeat->intFields->at(pxlCountIdx) > feat->intFields->at(pxlCountIdx))
                 {
                     distance = this->calcDistance(feat, nFeat, bandStats);
@@ -774,6 +824,42 @@ namespace rsgis{namespace segment{
                         nFeat->floatFields->at((*iterBands)->sumIdx) += feat->floatFields->at((*iterBands)->sumIdx);
                         nFeat->floatFields->at((*iterBands)->meanIdx) = nFeat->floatFields->at((*iterBands)->sumIdx) / nFeat->intFields->at(pxlCountIdx);
                     }
+                    
+                    // Remove feat as neighbour
+                    for(vector<unsigned long long>::iterator iterNeigh = nFeat->neighbours->begin(); iterNeigh != nFeat->neighbours->end(); )
+                    {
+                        if((*iterNeigh) == feat->fid)
+                        {
+                            iterNeigh = nFeat->neighbours->erase(iterNeigh);
+                        }
+                        else
+                        {
+                            ++iterNeigh;
+                        }
+                    }
+                    
+                    // Add feat neighbours
+                    bool alreadyNeighbour = false;
+                    for(vector<unsigned long long>::iterator iterFeatNeigh = feat->neighbours->begin(); iterFeatNeigh != feat->neighbours->end(); ++iterFeatNeigh)
+                    {
+                        if((*iterFeatNeigh) != nFeat->fid)
+                        {
+                            alreadyNeighbour = false;
+                            for(vector<unsigned long long>::iterator iterNeigh = nFeat->neighbours->begin(); iterNeigh != nFeat->neighbours->end(); ++iterNeigh)
+                            {
+                                if((*iterFeatNeigh) == (*iterNeigh))
+                                {
+                                    alreadyNeighbour = true;
+                                    break;
+                                }
+                            }
+                            if(!alreadyNeighbour)
+                            {
+                                nFeat->neighbours->push_back(*iterFeatNeigh);
+                            }
+                        }
+                    }
+                    
                     feat->intFields->at(mergedToFIDIdx) = minFID;
                     feat->boolFields->at(eliminatedFieldIdx) = true;
                 }
@@ -807,7 +893,91 @@ namespace rsgis{namespace segment{
         return dist;
     }
     
+    RSGISFeature* RSGISEliminateFeature::getEliminatedNeighbour(RSGISFeature *feat, RSGISAttributeTable *attTable)throw(RSGISAttributeTableException)
+    {
+        RSGISFeature *nFeat = NULL;
+        try 
+        {
+            if(!feat->boolFields->at(eliminatedFieldIdx))
+            {
+                nFeat = feat;
+            }
+            else
+            {
+                nFeat = attTable->getFeature(feat->intFields->at(mergedToFIDIdx));
+                if(nFeat->boolFields->at(eliminatedFieldIdx))
+                {
+                    nFeat = this->getEliminatedNeighbour(nFeat, attTable);
+                }
+            }
+            
+        }
+        catch(RSGISAttributeTableException &e)
+        {
+            throw e;
+        }
+        return nFeat;
+    }
+    
     RSGISEliminateFeature::~RSGISEliminateFeature()
+    {
+        
+    }
+    
+    
+    
+    
+
+    RSGISApplyOutputFIDs::RSGISApplyOutputFIDs(RSGISAttributeTable *attTable, unsigned int outFIDIdx, unsigned int outFIDSetFieldIdx) : RSGISCalcImageValue(1)
+    {
+        this->attTable = attTable;
+        this->outFIDIdx = outFIDIdx;
+        this->outFIDSetFieldIdx = outFIDSetFieldIdx;
+    }
+    
+    void RSGISApplyOutputFIDs::calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException)
+    {
+        unsigned long clumpIdx = 0;
+        
+        try
+        {
+            clumpIdx = lexical_cast<unsigned long>(bandValues[0]);
+        }
+        catch(bad_lexical_cast &e)
+        {
+            throw RSGISImageCalcException(e.what());
+        }
+        
+        if(clumpIdx > 0)
+        {
+            --clumpIdx;
+            
+            try
+            {   
+                RSGISFeature *feat = attTable->getFeature(clumpIdx);
+                
+                if(feat->boolFields->at(outFIDSetFieldIdx))
+                {
+                    output[0] = feat->intFields->at(outFIDIdx);
+                }
+                else
+                {
+                    throw RSGISAttributeTableException("Features output FID has not been set.");
+                }
+            }
+            catch(RSGISAttributeTableException &e)
+            {
+                cout << "clumpIdx = " << clumpIdx << endl;
+                throw RSGISImageCalcException(e.what());
+            }
+        }
+        else
+        {
+            output[0] = 0;
+        }
+    }
+        
+    RSGISApplyOutputFIDs::~RSGISApplyOutputFIDs()
     {
         
     }
