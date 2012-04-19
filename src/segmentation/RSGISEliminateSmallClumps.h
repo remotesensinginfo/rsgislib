@@ -39,6 +39,8 @@
 
 #include "img/RSGISImageUtils.h"
 #include "img/RSGISImageCalcException.h"
+#include "img/RSGISCalcImageValue.h"
+#include "img/RSGISCalcImage.h"
 
 #include "rastergis/RSGISAttributeTable.h"
 #include "rastergis/RSGISPopulateAttributeTable.h"
@@ -59,8 +61,10 @@ namespace rsgis{namespace segment{
         RSGISEliminateSmallClumps();
         void eliminateSmallClumps(GDALDataset *spectral, GDALDataset *clumps, unsigned int minClumpSize, float specThreshold) throw(RSGISImageCalcException);
         void stepwiseEliminateSmallClumps(GDALDataset *spectral, GDALDataset *clumps, unsigned int minClumpSize, float specThreshold) throw(RSGISImageCalcException);
-        void stepwiseEliminateSmallClumpsWithAtt(GDALDataset *spectral, GDALDataset *clumps, GDALDataset *output, RSGISAttributeTable *attTable, unsigned int minClumpSize, float specThreshold) throw(RSGISImageCalcException);
+        void stepwiseEliminateSmallClumpsWithAtt(GDALDataset *spectral, GDALDataset *clumps, string outputImageFile, string imageFormat, bool useImageProj, string proj, RSGISAttributeTable *attTable, unsigned int minClumpSize, float specThreshold) throw(RSGISImageCalcException);
         ~RSGISEliminateSmallClumps();
+    protected:
+        void defineOutputFID(RSGISAttributeTable *attTable, RSGISFeature *feat, unsigned int eliminatedFieldIdx, unsigned int mergedToFIDIdx, unsigned int outFIDIdx, unsigned int outFIDSetFieldIdx) throw(RSGISImageCalcException);
     };
     
     class RSGISEliminateFeature : public RSGISProcessFeature
@@ -68,15 +72,36 @@ namespace rsgis{namespace segment{
     public:
         RSGISEliminateFeature(unsigned int eliminatedFieldIdx, unsigned int mergedToFIDIdx, float specThreshold, unsigned int pxlCountIdx, vector<RSGISBandAttStats*> *bandStats);
         void processFeature(RSGISFeature *feat, RSGISAttributeTable *attTable)throw(RSGISAttributeTableException);
-        double calcDistance(RSGISFeature *feat1, RSGISFeature *feat2, vector<RSGISBandAttStats*> *bandStats)throw(RSGISAttributeTableException);
         ~RSGISEliminateFeature();
     protected:
+        double calcDistance(RSGISFeature *feat1, RSGISFeature *feat2, vector<RSGISBandAttStats*> *bandStats)throw(RSGISAttributeTableException);
+        RSGISFeature* getEliminatedNeighbour(RSGISFeature *feat, RSGISAttributeTable *attTable)throw(RSGISAttributeTableException); 
         unsigned int eliminatedFieldIdx;
         unsigned int mergedToFIDIdx;
         float specThreshold;
         unsigned int pxlCountIdx;
         vector<RSGISBandAttStats*> *bandStats;
     };
+    
+    
+    class RSGISApplyOutputFIDs : public RSGISCalcImageValue
+    {
+    public:
+        RSGISApplyOutputFIDs(RSGISAttributeTable *attTable, unsigned int outFIDIdx, unsigned int outFIDSetFieldIdx);
+        void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException);
+        void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented.");};
+        void calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented.");};
+        void calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented.");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented.");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented.");};
+        bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented.");};
+        ~RSGISApplyOutputFIDs();
+    protected:
+        RSGISAttributeTable *attTable;
+        unsigned int outFIDIdx;
+        unsigned int outFIDSetFieldIdx;
+    };
+
     
 }}
 
