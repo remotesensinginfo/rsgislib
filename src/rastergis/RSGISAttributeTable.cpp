@@ -162,6 +162,27 @@ namespace rsgis{namespace rastergis{
         return changeOccured;
     }
     
+    void RSGISAttributeTable::processIfStatements(RSGISIfStatement *statement, RSGISProcessFeature *processTrue, RSGISProcessFeature *processFalse) throw(RSGISAttributeTableException)
+    {
+        try
+        {
+            for(this->start(); this->end(); ++(*this))
+            {
+                if(statement->exp->evaluate(*(*this)))
+                {
+                    processTrue->processFeature(*(*this), this);
+                }
+                else if(processFalse != NULL)
+                {
+                    processFalse->processFeature(*(*this), this);
+                }
+            }
+        }
+        catch(RSGISAttributeTableException &e)
+        {
+            throw e;
+        }
+    }
     
     void RSGISAttributeTable::populateIfStatementsWithIdxs(vector<RSGISIfStatement*> *statements) throw(RSGISAttributeTableException)
     {

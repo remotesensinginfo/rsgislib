@@ -109,6 +109,7 @@ namespace rsgis{namespace rastergis{
             {
                 feature->stringFields->push_back("");
             }
+            feature->neighbours = new vector<unsigned long long>();
             
             attTable->push_back(feature);
         }
@@ -137,6 +138,7 @@ namespace rsgis{namespace rastergis{
             feature->intFields = new vector<long>();
             feature->floatFields = new vector<double>();
             feature->stringFields = new vector<string>();
+            feature->neighbours = new vector<unsigned long long>();
             
             attTable->push_back(feature);
         }

@@ -33,15 +33,22 @@
 
 #include "gdal_priv.h"
 
+#include "common/RSGISAttributeTableException.h"
+
+#include "utils/RSGISTextUtils.h"
+
 #include "img/RSGISImageUtils.h"
 #include "img/RSGISImageCalcException.h"
 
 #include "rastergis/RSGISAttributeTable.h"
-#include "common/RSGISAttributeTableException.h"
+#include "rastergis/RSGISPopulateAttributeTable.h"
+#include "rastergis/RSGISFindClumpNeighbours.h"
+
 
 using namespace std;
 using namespace rsgis::img;
 using namespace rsgis::rastergis;
+using namespace rsgis::utils;
 using namespace rsgis;
 
 namespace rsgis{namespace segment{
@@ -54,6 +61,21 @@ namespace rsgis{namespace segment{
         void stepwiseEliminateSmallClumps(GDALDataset *spectral, GDALDataset *clumps, unsigned int minClumpSize, float specThreshold) throw(RSGISImageCalcException);
         void stepwiseEliminateSmallClumpsWithAtt(GDALDataset *spectral, GDALDataset *clumps, GDALDataset *output, RSGISAttributeTable *attTable, unsigned int minClumpSize, float specThreshold) throw(RSGISImageCalcException);
         ~RSGISEliminateSmallClumps();
+    };
+    
+    class RSGISEliminateFeature : public RSGISProcessFeature
+    {
+    public:
+        RSGISEliminateFeature(unsigned int eliminatedFieldIdx, unsigned int mergedToFIDIdx, float specThreshold, unsigned int pxlCountIdx, vector<RSGISBandAttStats*> *bandStats);
+        void processFeature(RSGISFeature *feat, RSGISAttributeTable *attTable)throw(RSGISAttributeTableException);
+        double calcDistance(RSGISFeature *feat1, RSGISFeature *feat2, vector<RSGISBandAttStats*> *bandStats)throw(RSGISAttributeTableException);
+        ~RSGISEliminateFeature();
+    protected:
+        unsigned int eliminatedFieldIdx;
+        unsigned int mergedToFIDIdx;
+        float specThreshold;
+        unsigned int pxlCountIdx;
+        vector<RSGISBandAttStats*> *bandStats;
     };
     
 }}
