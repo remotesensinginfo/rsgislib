@@ -126,6 +126,14 @@ namespace rsgis{namespace rastergis{
         virtual ~AttIterator(){};
     };
     
+    class RSGISProcessFeature
+    {
+    public:
+        RSGISProcessFeature(){};
+        virtual void processFeature(RSGISFeature *feat, RSGISAttributeTable *attTable)throw(RSGISAttributeTableException)=0;
+        virtual ~RSGISProcessFeature(){};
+    };
+    
     class RSGISAttributeTable : public AttIterator
     {
     public:        
@@ -166,6 +174,7 @@ namespace rsgis{namespace rastergis{
         
         void applyIfStatements(vector<RSGISIfStatement*> *statements) throw(RSGISAttributeTableException);
         bool applyIfStatementsToFeature(RSGISFeature *feat, vector<RSGISIfStatement*> *statements) throw(RSGISAttributeTableException);
+        void processIfStatements(RSGISIfStatement *statement, RSGISProcessFeature *processTrue, RSGISProcessFeature *processFalse) throw(RSGISAttributeTableException);
         void populateIfStatementsWithIdxs(vector<RSGISIfStatement*> *statements) throw(RSGISAttributeTableException);
         
         void calculateFieldsMUParser(string expression, string outField, RSGISAttributeDataType outFieldDT, vector<RSGISMathAttVariable*> *variables) throw(RSGISAttributeTableException);
@@ -268,6 +277,10 @@ namespace rsgis{namespace rastergis{
             {
                 throw e;
             }
+        };
+        virtual void setValue(float value)
+        {
+            this->value = value;
         };
         virtual ~RSGISAttExpressionFieldAndValue()
         {
@@ -433,6 +446,46 @@ namespace rsgis{namespace rastergis{
         RSGISAttExpression *exp;
     };
     
+    
+    class RSGISAttExpressionBoolField : public RSGISAttExpression
+    {
+    public:
+        RSGISAttExpressionBoolField(string fName, unsigned int fIdx, RSGISAttributeDataType fType):RSGISAttExpression()
+        {
+            this->fName = fName;
+            this->fIdx = fIdx;
+            this->fType = fType;
+        };
+        bool evaluate(RSGISFeature *feat)throw(RSGISAttributeTableException)
+        {
+            if(fType != rsgis_bool)
+            {
+                throw RSGISAttributeTableException("Field has to be of type boolean.");
+            }
+            
+            return feat->boolFields->at(this->fIdx);
+        };
+        void popIdxs(RSGISAttributeTable *att)throw(RSGISAttributeTableException)
+        {
+            try
+            {
+                this->fType = att->getDataType(fName);
+                this->fIdx = att->getFieldIndex(fName);
+            }
+            catch(RSGISAttributeTableException &e)
+            {
+                throw e;
+            }
+        };
+        ~RSGISAttExpressionBoolField()
+        {
+            
+        };
+    protected:
+        string fName;
+        unsigned int fIdx;
+        RSGISAttributeDataType fType;
+    };
     
     
     class RSGISAttExpressionGreaterThan : public RSGISAttExpression2Fields 

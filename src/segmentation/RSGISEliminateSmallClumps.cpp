@@ -581,6 +581,126 @@ namespace rsgis{namespace segment{
     {
         try
         {
+            RSGISTextUtils textUtils;
+            GDALDataset **datasets = new GDALDataset*[2];
+            datasets[0] = clumps;
+            datasets[1] = spectral;
+            
+            unsigned int numBands = spectral->GetRasterCount();
+            vector<RSGISBandAttStats*> *bandStats = new vector<RSGISBandAttStats*>();
+            bandStats->reserve(numBands);
+            RSGISBandAttStats *tmpBand = NULL;
+            for(unsigned int i = 0; i < numBands; ++i)
+            {
+                tmpBand = new RSGISBandAttStats();
+                tmpBand->band = i + 1;
+                tmpBand->calcMean = true;
+                tmpBand->meanField = string("b") + textUtils.uInt32bittostring(i) + string("_Mean");
+                tmpBand->calcSum = true;
+                tmpBand->sumField = string("b") + textUtils.uInt32bittostring(i) + string("_Sum");
+                tmpBand->calcMax = false;
+                tmpBand->calcMedian = false;
+                tmpBand->calcMin = false;
+                tmpBand->calcStdDev = false;
+                bandStats->push_back(tmpBand);
+            }
+            
+            cout << "Populate Image Stats:\n";
+            RSGISPopulateAttributeTableBandStats popAttStats;
+            popAttStats.populateWithBandStatisticsWithinAtt(attTable, datasets, 2, bandStats);
+            
+            cout << "Create extra attribute tables columns\n";
+            if(!attTable->hasAttribute("Eliminated"))
+            {
+                attTable->addAttBoolField("Eliminated", false);
+            }
+            else if(attTable->getDataType("Eliminated") != rsgis_bool)
+            {
+                throw RSGISImageCalcException("Cannot proceed as \'Eliminated\' field is not of type boolean.");
+            }
+            else
+            {
+                attTable->setBoolValue("Eliminated", false);
+            }
+            unsigned int eliminatedFieldIdx = attTable->getFieldIndex("Eliminated");
+            
+            if(!attTable->hasAttribute("OutputFIDSet"))
+            {
+                attTable->addAttBoolField("OutputFIDSet", false);
+            }
+            else if(attTable->getDataType("OutputFIDSet") != rsgis_bool)
+            {
+                throw RSGISImageCalcException("Cannot proceed as \'OutputFIDSet\' field is not of type boolean.");
+            }
+            else
+            {
+                attTable->setBoolValue("OutputFIDSet", false);
+            }
+            unsigned int outFIDSetFieldIdx = attTable->getFieldIndex("OutputFIDSet");
+            
+            
+            if(!attTable->hasAttribute("OutputFID"))
+            {
+                attTable->addAttIntField("OutputFID", 0);
+            }
+            else if(attTable->getDataType("OutputFID") != rsgis_int)
+            {
+                throw RSGISImageCalcException("Cannot proceed as \'OutputFID\' field is not of type integer.");
+            }
+            unsigned int outFIDIdx = attTable->getFieldIndex("OutputFID");
+            
+            if(!attTable->hasAttribute("MergedToFID"))
+            {
+                attTable->addAttIntField("MergedToFID", 0);
+            }
+            else if(attTable->getDataType("MergedToFID") != rsgis_int)
+            {
+                throw RSGISImageCalcException("Cannot proceed as \'MergedToFID\' field is not of type integer.");
+            }
+            unsigned int mergedToFIDIdx = attTable->getFieldIndex("MergedToFID");
+            
+            unsigned int pxlCountIdx = attTable->getFieldIndex("pxlcount");
+            
+            cout << "Find neighbours:\n";
+            RSGISFindClumpNeighbours findNeighbours;
+            findNeighbours.findNeighbours(clumps, attTable);
+                        
+            RSGISAttExpressionLessThanConstEq *areaThreshold = new RSGISAttExpressionLessThanConstEq("pxlcount", attTable->getFieldIndex("pxlcount"), rsgis_int, 1);
+            RSGISAttExpressionBoolField *boolEliminatedExp = new RSGISAttExpressionBoolField("Eliminated", eliminatedFieldIdx, rsgis_bool);
+            
+            vector<RSGISAttExpression*> *exps = new vector<RSGISAttExpression*>();
+            exps->push_back(areaThreshold);
+            exps->push_back(boolEliminatedExp);
+            
+            RSGISIfStatement *ifStat = new RSGISIfStatement();
+            ifStat->exp = new RSGISAttExpressionAND(exps);
+            ifStat->field = "";
+            ifStat->dataType = rsgis_na;
+            ifStat->fldIdx = 0;
+            ifStat->value = 0;
+            ifStat->noExp = false;
+            ifStat->ignore = false;
+            
+            RSGISProcessFeature *processFeature = new RSGISEliminateFeature(eliminatedFieldIdx, mergedToFIDIdx, specThreshold, pxlCountIdx, bandStats);
+            
+            cout << "Eliminating features of size " << flush;
+            for(unsigned int i = 1; i <= minClumpSize; ++i)
+            {
+                cout << i << ", " << flush;
+                areaThreshold->setValue(i);
+                attTable->processIfStatements(ifStat, processFeature, NULL);
+            }
+            cout << "Completed\n";
+            
+            delete ifStat->exp;
+            delete ifStat;
+            delete processFeature;
+            
+            // Find output FIDs for relabelling. 
+            
+            // Relabel output FIDs to remove gaps.
+            
+            // Generate output image from original and output FIDs.
             
         }
         catch(RSGISAttributeTableException &e)
@@ -594,6 +714,100 @@ namespace rsgis{namespace segment{
     }
     
     RSGISEliminateSmallClumps::~RSGISEliminateSmallClumps()
+    {
+        
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    RSGISEliminateFeature::RSGISEliminateFeature(unsigned int eliminatedFieldIdx, unsigned int mergedToFIDIdx, float specThreshold, unsigned int pxlCountIdx, vector<RSGISBandAttStats*> *bandStats):RSGISProcessFeature()
+    {
+        this->eliminatedFieldIdx = eliminatedFieldIdx;
+        this->mergedToFIDIdx = mergedToFIDIdx;
+        this->specThreshold = specThreshold;
+        this->pxlCountIdx = pxlCountIdx;
+        this->bandStats = bandStats;
+    }
+    
+    void RSGISEliminateFeature::processFeature(RSGISFeature *feat, RSGISAttributeTable *attTable)throw(RSGISAttributeTableException)
+    {
+        try 
+        {
+            unsigned long minFID = 0;
+            double minDist = 0;
+            double distance = 0;
+            bool first = true;
+            RSGISFeature *nFeat = NULL;
+            for(vector<unsigned long long>::iterator iterFeat = feat->neighbours->begin(); iterFeat != feat->neighbours->end(); ++iterFeat)
+            {
+                nFeat = attTable->getFeature(*iterFeat);
+                if(nFeat->intFields->at(pxlCountIdx) > feat->intFields->at(pxlCountIdx))
+                {
+                    distance = this->calcDistance(feat, nFeat, bandStats);
+                    if(first)
+                    {
+                        minDist = distance;
+                        minFID = *iterFeat;
+                        first = false;
+                    }
+                    else if(distance < minDist)
+                    {
+                        minDist = distance;
+                        minFID = *iterFeat; 
+                    }
+                }
+            }
+            if(!first)
+            {
+                if(minDist < specThreshold)
+                {
+                    nFeat = attTable->getFeature(minFID);
+                    nFeat->intFields->at(pxlCountIdx) += feat->intFields->at(pxlCountIdx);
+                    for(vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
+                    {
+                        nFeat->floatFields->at((*iterBands)->sumIdx) += feat->floatFields->at((*iterBands)->sumIdx);
+                        nFeat->floatFields->at((*iterBands)->meanIdx) = nFeat->floatFields->at((*iterBands)->sumIdx) / nFeat->intFields->at(pxlCountIdx);
+                    }
+                    feat->intFields->at(mergedToFIDIdx) = minFID;
+                    feat->boolFields->at(eliminatedFieldIdx) = true;
+                }
+            }
+        }
+        catch (RSGISAttributeTableException &e) 
+        {
+            throw e;
+        }
+    }
+    
+    double RSGISEliminateFeature::calcDistance(RSGISFeature *feat1, RSGISFeature *feat2, vector<RSGISBandAttStats*> *bandStats)throw(RSGISAttributeTableException)
+    {
+        double dist = 0;
+        try
+        {
+            for(vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
+            {
+                dist += pow(feat1->floatFields->at((*iterBands)->meanIdx) - feat2->floatFields->at((*iterBands)->meanIdx), 2);
+            }
+            
+            if(dist != 0)
+            {
+                dist = sqrt(dist);
+            }
+        }
+        catch (RSGISAttributeTableException &e) 
+        {
+            throw e;
+        }
+        return dist;
+    }
+    
+    RSGISEliminateFeature::~RSGISEliminateFeature()
     {
         
     }
