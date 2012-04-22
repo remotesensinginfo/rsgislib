@@ -116,7 +116,7 @@ void img::RSGISAddBands::addBandToFile(GDALDataset *input, GDALDataset *toAdd, s
 	
 	// Create new file. 
 	GDALDataset *outputImage = NULL;
-	outputImage = poDriver->Create(outputFile->c_str(), inputXSize, inputYSize, numBands, GDT_Float32, poDriver->GetMetadata());
+	outputImage = poDriver->Create(outputFile->c_str(), inputXSize, inputYSize, numBands, GDT_Float32, NULL);
 	outputImage->SetGeoTransform(inputTrans);
 	//std::cout << "Projection: " << input->GetProjectionRef() << std::endl;
 	outputImage->SetProjection(input->GetProjectionRef());
@@ -277,7 +277,7 @@ void RSGISAddBands::addMultipleBands(GDALDataset *input, GDALDataset **toAdd, st
 	}
 	
 	// Create new file. 
-	outputImage = poDriver->Create(outputFile->c_str(), inputXSize, inputYSize, numBands, GDT_Float32, poDriver->GetMetadata());
+	outputImage = poDriver->Create(outputFile->c_str(), inputXSize, inputYSize, numBands, GDT_Float32, NULL);
 	outputImage->SetGeoTransform(inputTrans);
 	//std::cout << "Projection: " << input->GetProjectionRef() << std::endl;
 	outputImage->SetProjection(input->GetProjectionRef());
@@ -376,7 +376,7 @@ void RSGISAddBands::addMultipleBands(GDALDataset *input, GDALDataset **toAdd, st
 				throw RSGISImageBandException("ENVI driver does not exists..");
 			}
 			cout << "New image width = " << width << " height = " << height << endl;
-			outputImageDS = gdalDriver->Create(outputImage.c_str(), width, height, numInBands, GDT_Float32, gdalDriver->GetMetadata());
+			outputImageDS = gdalDriver->Create(outputImage.c_str(), width, height, numInBands, GDT_Float32, NULL);
 			outputImageDS->SetGeoTransform(gdalTranslation);
 			outputImageDS->SetProjection(datasets[0]->GetProjectionRef());
 			
