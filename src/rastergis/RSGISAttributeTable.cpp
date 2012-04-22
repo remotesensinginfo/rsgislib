@@ -504,6 +504,755 @@ namespace rsgis{namespace rastergis{
         outTxtFile.close();
     }
     
+    void RSGISAttributeTable::exportHDF5(string outFile) throw(RSGISAttributeTableException)
+    {
+        try
+        {
+            Exception::dontPrint();
+            
+            FileAccPropList attAccessPlist = FileAccPropList(FileAccPropList::DEFAULT);
+            attAccessPlist.setCache(ATT_WRITE_MDC_NELMTS, ATT_WRITE_RDCC_NELMTS, ATT_WRITE_RDCC_NBYTES, ATT_WRITE_RDCC_W0);
+            attAccessPlist.setSieveBufSize(ATT_WRITE_SIEVE_BUF);
+            hsize_t metaBlockSize = ATT_WRITE_META_BLOCKSIZE;
+            attAccessPlist.setMetaBlockSize(metaBlockSize);
+            
+            const H5std_string attFilePath( outFile );
+            H5File *attH5File = new H5File( attFilePath, H5F_ACC_TRUNC, FileCreatPropList::DEFAULT, attAccessPlist);
+            
+            attH5File->createGroup( ATT_GROUPNAME_HEADER );
+			attH5File->createGroup( ATT_GROUPNAME_DATA );
+            attH5File->createGroup( ATT_GROUPNAME_NEIGHBOURS );
+            
+            RSGISAttributeIdx *boolFields = NULL;
+            if(this->numBoolFields > 0)
+            {
+                boolFields = new RSGISAttributeIdx[this->numBoolFields];
+            }
+            RSGISAttributeIdx *intFields = NULL;
+            if(this->numIntFields > 0)
+            {
+                intFields = new RSGISAttributeIdx[this->numIntFields];
+            }
+            RSGISAttributeIdx *floatFields = NULL;
+            if(this->numFloatFields > 0)
+            {
+                floatFields = new RSGISAttributeIdx[this->numFloatFields];
+            }
+            
+            unsigned int boolFieldsIdx = 0;
+            unsigned int intFieldsIdx = 0;
+            unsigned int floatFieldsIdx = 0;
+            for(map<string, unsigned int>::iterator iterFields = fieldIdx->begin(); iterFields != fieldIdx->end(); ++iterFields)
+            {
+                RSGISAttributeDataType dt = this->getDataType((*iterFields).first);
+                if(dt == rsgis_bool)
+                {
+                    boolFields[boolFieldsIdx].name = const_cast<char*>((*iterFields).first.c_str());
+                    boolFields[boolFieldsIdx].idx = (*iterFields).second;
+                    ++boolFieldsIdx;
+                }
+                else if(dt == rsgis_int)
+                {
+                    intFields[intFieldsIdx].name = const_cast<char*>((*iterFields).first.c_str());
+                    intFields[intFieldsIdx].idx = (*iterFields).second;
+                    ++intFieldsIdx;
+                }
+                else if(dt == rsgis_float)
+                {
+                    floatFields[floatFieldsIdx].name = const_cast<char*>((*iterFields).first.c_str());
+                    floatFields[floatFieldsIdx].idx = (*iterFields).second;
+                    ++floatFieldsIdx;
+                }
+                else if(dt == rsgis_string)
+                {
+                    cout << "String data type is not currently supported in HDF output - fields ignored.\n";
+                }
+                else
+                {
+                    throw RSGISAttributeTableException("Data type not recognised.");
+                }
+            }
+            
+            CompType *fieldDtDisk = this->createAttibuteIdxCompTypeDisk();
+            if(this->numBoolFields > 0)
+            {
+                hsize_t initDimsBoolFieldsDS[1];
+                initDimsBoolFieldsDS[0] = 0;
+                hsize_t maxDimsBoolFieldsDS[1];
+                maxDimsBoolFieldsDS[0] = H5S_UNLIMITED;
+                DataSpace boolFieldsDataSpace = DataSpace(1, initDimsBoolFieldsDS, maxDimsBoolFieldsDS);
+                
+                hsize_t dimsBoolFieldsChunk[1];
+                dimsBoolFieldsChunk[0] = ATT_WRITE_CHUNK_SIZE;
+                
+                DSetCreatPropList creationBoolFieldsDSPList;
+                creationBoolFieldsDSPList.setChunk(1, dimsBoolFieldsChunk);
+                creationBoolFieldsDSPList.setShuffle();
+                creationBoolFieldsDSPList.setDeflate(ATT_WRITE_DEFLATE);
+                DataSet *boolFieldsDataset = new DataSet(attH5File->createDataSet(ATT_BOOL_FIELDS_HEADER, *fieldDtDisk, boolFieldsDataSpace, creationBoolFieldsDSPList));
+
+                hsize_t extendBoolFieldsDatasetTo[1];
+                extendBoolFieldsDatasetTo[0] = this->numBoolFields;
+                boolFieldsDataset->extend( extendBoolFieldsDatasetTo );
+                
+                hsize_t boolFieldsOffset[1];
+                boolFieldsOffset[0] = 0;
+                hsize_t boolFieldsDataDims[1];
+                boolFieldsDataDims[0] = this->numBoolFields;
+                
+                DataSpace boolFieldsWriteDataSpace = boolFieldsDataset->getSpace();
+                boolFieldsWriteDataSpace.selectHyperslab(H5S_SELECT_SET, boolFieldsDataDims, boolFieldsOffset);
+                DataSpace newBoolFieldsDataspace = DataSpace(1, boolFieldsDataDims);
+                
+                boolFieldsDataset->write(boolFields, *fieldDtDisk, newBoolFieldsDataspace, boolFieldsWriteDataSpace);
+                
+                delete boolFieldsDataset;
+                delete[] boolFields;
+            }
+            
+            if(this->numIntFields > 0)
+            {
+                hsize_t initDimsIntFieldsDS[1];
+                initDimsIntFieldsDS[0] = 0;
+                hsize_t maxDimsIntFieldsDS[1];
+                maxDimsIntFieldsDS[0] = H5S_UNLIMITED;
+                DataSpace intFieldsDataSpace = DataSpace(1, initDimsIntFieldsDS, maxDimsIntFieldsDS);
+                
+                hsize_t dimsIntFieldsChunk[1];
+                dimsIntFieldsChunk[0] = ATT_WRITE_CHUNK_SIZE;
+                
+                DSetCreatPropList creationIntFieldsDSPList;
+                creationIntFieldsDSPList.setChunk(1, dimsIntFieldsChunk);
+                creationIntFieldsDSPList.setShuffle();
+                creationIntFieldsDSPList.setDeflate(ATT_WRITE_DEFLATE);
+                DataSet *intFieldsDataset = new DataSet(attH5File->createDataSet(ATT_INT_FIELDS_HEADER, *fieldDtDisk, intFieldsDataSpace, creationIntFieldsDSPList));
+                
+                hsize_t extendIntFieldsDatasetTo[1];
+                extendIntFieldsDatasetTo[0] = this->numIntFields;
+                intFieldsDataset->extend( extendIntFieldsDatasetTo );
+                
+                hsize_t intFieldsOffset[1];
+                intFieldsOffset[0] = 0;
+                hsize_t intFieldsDataDims[1];
+                intFieldsDataDims[0] = this->numIntFields;
+                
+                DataSpace intFieldsWriteDataSpace = intFieldsDataset->getSpace();
+                intFieldsWriteDataSpace.selectHyperslab(H5S_SELECT_SET, intFieldsDataDims, intFieldsOffset);
+                DataSpace newIntFieldsDataspace = DataSpace(1, intFieldsDataDims);
+                
+                intFieldsDataset->write(intFields, *fieldDtDisk, newIntFieldsDataspace, intFieldsWriteDataSpace);
+                
+                delete intFieldsDataset;
+                delete[] intFields;
+            }
+            
+            if(this->numFloatFields > 0)
+            {
+                hsize_t initDimsFloatFieldsDS[1];
+                initDimsFloatFieldsDS[0] = 0;
+                hsize_t maxDimsFloatFieldsDS[1];
+                maxDimsFloatFieldsDS[0] = H5S_UNLIMITED;
+                DataSpace floatFieldsDataSpace = DataSpace(1, initDimsFloatFieldsDS, maxDimsFloatFieldsDS);
+                
+                hsize_t dimsFloatFieldsChunk[1];
+                dimsFloatFieldsChunk[0] = ATT_WRITE_CHUNK_SIZE;
+                
+                DSetCreatPropList creationFloatFieldsDSPList;
+                creationFloatFieldsDSPList.setChunk(1, dimsFloatFieldsChunk);
+                creationFloatFieldsDSPList.setShuffle();
+                creationFloatFieldsDSPList.setDeflate(ATT_WRITE_DEFLATE);
+                DataSet *floatFieldsDataset = new DataSet(attH5File->createDataSet(ATT_FLOAT_FIELDS_HEADER, *fieldDtDisk, floatFieldsDataSpace, creationFloatFieldsDSPList));
+                
+                hsize_t extendFloatFieldsDatasetTo[1];
+                extendFloatFieldsDatasetTo[0] = this->numFloatFields;
+                floatFieldsDataset->extend( extendFloatFieldsDatasetTo );
+                
+                hsize_t floatFieldsOffset[1];
+                floatFieldsOffset[0] = 0;
+                hsize_t floatFieldsDataDims[1];
+                floatFieldsDataDims[0] = this->numFloatFields;
+                
+                DataSpace floatFieldsWriteDataSpace = floatFieldsDataset->getSpace();
+                floatFieldsWriteDataSpace.selectHyperslab(H5S_SELECT_SET, floatFieldsDataDims, floatFieldsOffset);
+                DataSpace newFloatFieldsDataspace = DataSpace(1, floatFieldsDataDims);
+                
+                floatFieldsDataset->write(floatFields, *fieldDtDisk, newFloatFieldsDataspace, floatFieldsWriteDataSpace);
+                
+                delete floatFieldsDataset;
+                delete[] floatFields;
+            }
+            
+            delete fieldDtDisk;
+
+            DataSet *boolDataset = NULL;
+            if(this->numBoolFields > 0)
+            {
+                hsize_t initDimsBoolDS[2];
+                initDimsBoolDS[0] = 0;
+                initDimsBoolDS[1] = this->numBoolFields;
+                hsize_t maxDimsBoolDS[2];
+                maxDimsBoolDS[0] = H5S_UNLIMITED;
+                maxDimsBoolDS[1] = H5S_UNLIMITED;
+                DataSpace boolDataSpace = DataSpace(2, initDimsBoolDS, maxDimsBoolDS);
+                
+                hsize_t dimsBoolChunk[2];
+                dimsBoolChunk[0] = ATT_WRITE_CHUNK_SIZE;
+                dimsBoolChunk[1] = 1;
+                
+                int fillValueInt = 0;
+                DSetCreatPropList creationBoolDSPList;
+                creationBoolDSPList.setChunk(2, dimsBoolChunk);
+                creationBoolDSPList.setShuffle();
+                creationBoolDSPList.setDeflate(ATT_WRITE_DEFLATE);
+                creationBoolDSPList.setFillValue( PredType::STD_I8LE, &fillValueInt);
+                
+                boolDataset = new DataSet(attH5File->createDataSet(ATT_BOOL_DATA, PredType::STD_I8LE, boolDataSpace, creationBoolDSPList));
+            }
+            
+            DataSet *intDataset = NULL;
+            if(this->numIntFields > 0)
+            {
+                hsize_t initDimsIntDS[2];
+                initDimsIntDS[0] = 0;
+                initDimsIntDS[1] = this->numIntFields;
+                hsize_t maxDimsIntDS[2];
+                maxDimsIntDS[0] = H5S_UNLIMITED;
+                maxDimsIntDS[1] = H5S_UNLIMITED;
+                DataSpace intDataSpace = DataSpace(2, initDimsIntDS, maxDimsIntDS);
+                
+                hsize_t dimsIntChunk[2];
+                dimsIntChunk[0] = ATT_WRITE_CHUNK_SIZE;
+                dimsIntChunk[1] = 1;
+                
+                long fillValueLongInt = 0;
+                DSetCreatPropList creationIntDSPList;
+                creationIntDSPList.setChunk(2, dimsIntChunk);
+                creationIntDSPList.setShuffle();
+                creationIntDSPList.setDeflate(ATT_WRITE_DEFLATE);
+                creationIntDSPList.setFillValue( PredType::STD_I64LE, &fillValueLongInt);
+                
+                intDataset = new DataSet(attH5File->createDataSet(ATT_INT_DATA, PredType::STD_I64LE, intDataSpace, creationIntDSPList));
+            }
+
+            DataSet *floatDataset = NULL;
+            if(this->numFloatFields > 0)
+            {
+                hsize_t initDimsFloatDS[2];
+                initDimsFloatDS[0] = 0;
+                initDimsFloatDS[1] = this->numFloatFields;
+                hsize_t maxDimsFloatDS[2];
+                maxDimsFloatDS[0] = H5S_UNLIMITED;
+                maxDimsFloatDS[1] = H5S_UNLIMITED;
+                DataSpace floatDataSpace = DataSpace(2, initDimsFloatDS, maxDimsFloatDS);
+                
+                hsize_t dimsFloatChunk[2];
+                dimsFloatChunk[0] = ATT_WRITE_CHUNK_SIZE;
+                dimsFloatChunk[1] = 1;
+                
+                double fillValueFloat = 0;
+                DSetCreatPropList creationFloatDSPList;
+                creationFloatDSPList.setChunk(2, dimsFloatChunk);
+                creationFloatDSPList.setShuffle();
+                creationFloatDSPList.setDeflate(ATT_WRITE_DEFLATE);
+                creationFloatDSPList.setFillValue( PredType::IEEE_F64LE, &fillValueFloat);
+                
+                floatDataset = new DataSet(attH5File->createDataSet(ATT_FLOAT_DATA, PredType::IEEE_F64LE, floatDataSpace, creationFloatDSPList));
+            }
+            
+            // Create Neighbours dataset
+            hsize_t maxNumNeighbours = 25;
+            hsize_t numNeighbours = 25;
+            hsize_t initDimsNeighboursDS[2];
+            initDimsNeighboursDS[0] = 0;
+            initDimsNeighboursDS[1] = 0;
+            hsize_t maxDimsNeighboursDS[2];
+            maxDimsNeighboursDS[0] = H5S_UNLIMITED;
+            maxDimsNeighboursDS[1] = H5S_UNLIMITED;
+            DataSpace neighboursDataSpace = DataSpace(2, initDimsNeighboursDS, maxDimsNeighboursDS);
+            
+            hsize_t dimsNeighboursChunk[2];
+            dimsNeighboursChunk[0] = ATT_WRITE_CHUNK_SIZE;
+            dimsNeighboursChunk[1] = ATT_WRITE_CHUNK_SIZE;
+            
+            unsigned long fillValueULong = 0;
+            DSetCreatPropList creationNeighboursDSPList;
+            creationNeighboursDSPList.setChunk(2, dimsNeighboursChunk);
+            creationNeighboursDSPList.setShuffle();
+            creationNeighboursDSPList.setDeflate(ATT_WRITE_DEFLATE);
+            creationNeighboursDSPList.setFillValue( PredType::STD_U64LE, &fillValueULong);
+            
+            DataSet *neighboursDataset = new DataSet(attH5File->createDataSet(ATT_NEIGHBOURS_DATA, PredType::STD_U64LE, neighboursDataSpace, creationNeighboursDSPList));
+            
+            // Create Number of Neighbours dataset
+            hsize_t initDimsNumNeighboursDS[1];
+            initDimsNumNeighboursDS[0] = 0;
+            hsize_t maxDimsNumNeighboursDS[1];
+            maxDimsNumNeighboursDS[0] = H5S_UNLIMITED;
+            DataSpace numNeighboursDataSpace = DataSpace(1, initDimsNumNeighboursDS, maxDimsNumNeighboursDS);
+            
+            hsize_t dimsNumNeighboursChunk[1];
+            dimsNumNeighboursChunk[0] = ATT_WRITE_CHUNK_SIZE;
+            
+            unsigned int fillValueUInt = 0;
+            DSetCreatPropList creationNumNeighboursDSPList;
+            creationNumNeighboursDSPList.setChunk(1, dimsNumNeighboursChunk);
+            creationNumNeighboursDSPList.setShuffle();
+            creationNumNeighboursDSPList.setDeflate(ATT_WRITE_DEFLATE);
+            creationNumNeighboursDSPList.setFillValue( PredType::STD_U32LE, &fillValueUInt);
+            
+            DataSet *numNeighboursDataset = new DataSet(attH5File->createDataSet(ATT_NUM_NEIGHBOURS_DATA, PredType::STD_U32LE, numNeighboursDataSpace, creationNumNeighboursDSPList));
+            
+            unsigned long numChunks = this->getSize() / ATT_WRITE_CHUNK_SIZE;
+            unsigned long remainingRows = this->getSize() - (numChunks * ATT_WRITE_CHUNK_SIZE);
+            
+            int *boolVals = NULL;
+            if(this->numBoolFields > 0)
+            {
+                boolVals = new int[ATT_WRITE_CHUNK_SIZE*this->numBoolFields];
+            }
+                        
+            long *intVals = NULL;
+            if(this->numIntFields > 0)
+            {
+                intVals = new long[ATT_WRITE_CHUNK_SIZE*this->numIntFields];
+            }
+            
+            double *floatVals = NULL;
+            if(this->numFloatFields > 0)
+            {
+                floatVals = new double[ATT_WRITE_CHUNK_SIZE*this->numFloatFields];
+            }
+            
+            unsigned long *neighbourVals = new unsigned long[ATT_WRITE_CHUNK_SIZE*maxNumNeighbours];
+            unsigned long *neighbourValsTmp = NULL;
+            
+            unsigned int *numNeighbourVals = new unsigned int[ATT_WRITE_CHUNK_SIZE];
+            
+            hsize_t extendBoolDatasetTo[2];
+            extendBoolDatasetTo[0] = 0;
+            extendBoolDatasetTo[1] = this->numBoolFields;
+            hsize_t boolDataOffset[2];
+            boolDataOffset[0] = 0;
+            boolDataOffset[1] = 0;
+            hsize_t boolDataDims[2];
+            boolDataDims[0] = ATT_WRITE_CHUNK_SIZE;
+            boolDataDims[1] = this->numBoolFields;
+            
+            hsize_t extendIntDatasetTo[2];
+            extendIntDatasetTo[0] = 0;
+            extendIntDatasetTo[1] = this->numIntFields;
+            hsize_t intDataOffset[2];
+            intDataOffset[0] = 0;
+            intDataOffset[1] = 0;
+            hsize_t intDataDims[2];
+            intDataDims[0] = ATT_WRITE_CHUNK_SIZE;
+            intDataDims[1] = this->numIntFields;
+            
+            hsize_t extendFloatDatasetTo[2];
+            extendFloatDatasetTo[0] = 0;
+            extendFloatDatasetTo[1] = this->numFloatFields;
+            hsize_t floatDataOffset[2];
+            floatDataOffset[0] = 0;
+            floatDataOffset[1] = 0;
+            hsize_t floatDataDims[2];
+            floatDataDims[0] = ATT_WRITE_CHUNK_SIZE;
+            floatDataDims[1] = this->numFloatFields;
+            
+            hsize_t extendNeighboursDatasetTo[2];
+            extendNeighboursDatasetTo[0] = 0;
+            extendNeighboursDatasetTo[1] = maxNumNeighbours;
+            hsize_t neighboursDataOffset[2];
+            neighboursDataOffset[0] = 0;
+            neighboursDataOffset[1] = 0;
+            hsize_t neighboursDataDims[2];
+            neighboursDataDims[0] = ATT_WRITE_CHUNK_SIZE;
+            neighboursDataDims[1] = maxNumNeighbours;
+            
+            hsize_t extendNumNeighboursDatasetTo[1];
+            extendNumNeighboursDatasetTo[0] = 0;
+            hsize_t numNeighboursDataOffset[1];
+            numNeighboursDataOffset[0] = 0;
+            hsize_t numNeighboursDataDims[1];
+            numNeighboursDataDims[0] = ATT_WRITE_CHUNK_SIZE;
+            
+            size_t currentSize = 0;
+            size_t rowIdx = 0;
+            RSGISFeature *feat = NULL;
+            for(unsigned long i = 0; i < numChunks; ++i)
+            {
+                for(unsigned int j = 0; j < ATT_WRITE_CHUNK_SIZE; ++j)
+                {
+                    feat = this->getFeature(rowIdx++);
+                    
+                    if(this->numBoolFields > 0)
+                    {
+                        for(unsigned int k = 0; k < feat->boolFields->size(); ++k)
+                        {
+                            boolVals[(j*this->numBoolFields)+k] = feat->boolFields->at(k);
+                        }
+                    }
+                    
+                    if(this->numIntFields > 0)
+                    {
+                        for(unsigned int k = 0; k < feat->intFields->size(); ++k)
+                        {
+                            intVals[(j*this->numIntFields)+k] = feat->intFields->at(k);
+                        }
+                    }
+                    
+                    if(this->numFloatFields > 0)
+                    {
+                        for(unsigned int k = 0; k < feat->floatFields->size(); ++k)
+                        {
+                            floatVals[(j*this->numFloatFields)+k] = feat->floatFields->at(k);
+                        }
+                    }
+                    
+                    if(maxNumNeighbours < feat->neighbours->size())
+                    {
+                        maxNumNeighbours = feat->neighbours->size();
+                        neighbourValsTmp = new unsigned long[ATT_WRITE_CHUNK_SIZE*maxNumNeighbours];
+                        for(unsigned int n = 0; n < ATT_WRITE_CHUNK_SIZE; ++n)
+                        {
+                            for(unsigned int m = 0; m < numNeighbours; ++m)
+                            {
+                                neighbourValsTmp[(n*maxNumNeighbours)+m] = neighbourVals[(n*numNeighbours)+m];
+                            }
+                            for(unsigned int m = numNeighbours; m < maxNumNeighbours; ++m)
+                            {
+                                neighbourValsTmp[(n*maxNumNeighbours)+m] = 0;
+                            }
+                        }
+                        delete[] neighbourVals;
+                        neighbourVals = neighbourValsTmp;
+                        numNeighbours = maxNumNeighbours;
+                    }
+                    
+                    for(unsigned int k = 0; k < feat->neighbours->size(); ++k)
+                    {
+                        neighbourVals[(j*numNeighbours)+k] = feat->neighbours->at(k);
+                    }
+                    for(unsigned int m = feat->neighbours->size(); m < maxNumNeighbours; ++m)
+                    {
+                        neighbourVals[(j*numNeighbours)+m] = 0;
+                    }
+                    
+                    numNeighbourVals[j] = feat->neighbours->size();
+                }
+                
+                if(this->numBoolFields > 0)
+                {
+                    extendBoolDatasetTo[0] = currentSize + ATT_WRITE_CHUNK_SIZE;
+                    extendBoolDatasetTo[1] = this->numBoolFields;
+                    boolDataset->extend( extendBoolDatasetTo );
+                    
+                    boolDataOffset[0] = currentSize;
+                    boolDataOffset[1] = 0;
+                    
+                    DataSpace boolWriteDataSpace = boolDataset->getSpace();
+                    boolWriteDataSpace.selectHyperslab(H5S_SELECT_SET, boolDataDims, boolDataOffset);
+                    DataSpace newBoolDataspace = DataSpace(2, boolDataDims);
+                    
+                    boolDataset->write(boolVals, PredType::NATIVE_INT, newBoolDataspace, boolWriteDataSpace);
+                }
+
+                if(this->numIntFields > 0)
+                {
+                    extendIntDatasetTo[0] = currentSize + ATT_WRITE_CHUNK_SIZE;
+                    extendIntDatasetTo[1] = this->numIntFields;
+                    intDataset->extend( extendIntDatasetTo );
+                    
+                    intDataOffset[0] = currentSize;
+                    intDataOffset[1] = 0;
+                    
+                    DataSpace intWriteDataSpace = intDataset->getSpace();
+                    intWriteDataSpace.selectHyperslab(H5S_SELECT_SET, intDataDims, intDataOffset);
+                    DataSpace newIntDataspace = DataSpace(1, intDataDims);
+                    
+                    intDataset->write(intVals, PredType::NATIVE_LONG, newIntDataspace, intWriteDataSpace);
+                }
+
+                if(this->numFloatFields > 0)
+                {
+                    extendFloatDatasetTo[0] = currentSize + ATT_WRITE_CHUNK_SIZE;
+                    extendFloatDatasetTo[1] = this->numFloatFields;
+                    floatDataset->extend( extendFloatDatasetTo );
+                    
+                    floatDataOffset[0] = currentSize;
+                    floatDataOffset[1] = 0;
+                    
+                    DataSpace floatWriteDataSpace = floatDataset->getSpace();
+                    floatWriteDataSpace.selectHyperslab(H5S_SELECT_SET, floatDataDims, floatDataOffset);
+                    DataSpace newFloatDataspace = DataSpace(2, floatDataDims);
+                    
+                    floatDataset->write(floatVals, PredType::NATIVE_DOUBLE, newFloatDataspace, floatWriteDataSpace);
+                }
+                
+                extendNeighboursDatasetTo[0] = currentSize + ATT_WRITE_CHUNK_SIZE;
+                extendNeighboursDatasetTo[1] = numNeighbours;
+                neighboursDataset->extend( extendNeighboursDatasetTo );
+                
+                neighboursDataOffset[0] = currentSize;
+                neighboursDataOffset[1] = 0;
+                
+                neighboursDataDims[0] = ATT_WRITE_CHUNK_SIZE;
+                neighboursDataDims[1] = maxNumNeighbours;
+                
+                DataSpace neighboursWriteDataSpace = neighboursDataset->getSpace();
+                neighboursWriteDataSpace.selectHyperslab(H5S_SELECT_SET, neighboursDataDims, neighboursDataOffset);
+                DataSpace newNeighboursDataspace = DataSpace(2, neighboursDataDims);
+                
+                neighboursDataset->write(neighbourVals, PredType::NATIVE_UINT64, newNeighboursDataspace, neighboursWriteDataSpace);
+                
+                
+                extendNumNeighboursDatasetTo[0] = currentSize + ATT_WRITE_CHUNK_SIZE;
+                numNeighboursDataset->extend( extendNumNeighboursDatasetTo );
+                
+                numNeighboursDataOffset[0] = currentSize;
+                
+                DataSpace numNeighboursWriteDataSpace = numNeighboursDataset->getSpace();
+                numNeighboursWriteDataSpace.selectHyperslab(H5S_SELECT_SET, numNeighboursDataDims, numNeighboursDataOffset);
+                DataSpace newNumNeighboursDataspace = DataSpace(1, numNeighboursDataDims);
+                
+                numNeighboursDataset->write(numNeighbourVals, PredType::NATIVE_UINT32, newNumNeighboursDataspace, numNeighboursWriteDataSpace);
+                
+                currentSize += ATT_WRITE_CHUNK_SIZE;
+            }
+            
+            for(unsigned int j = 0; j < remainingRows; ++j)
+            {
+                feat = this->getFeature(rowIdx++);
+                
+                if(this->numBoolFields > 0)
+                {
+                    for(unsigned int k = 0; k < feat->boolFields->size(); ++k)
+                    {
+                        boolVals[(j*this->numBoolFields)+k] = feat->boolFields->at(k);
+                    }
+                }
+                
+                if(this->numIntFields > 0)
+                {
+                    for(unsigned int k = 0; k < feat->intFields->size(); ++k)
+                    {
+                        intVals[(j*this->numIntFields)+k] = feat->intFields->at(k);
+                    }
+                }
+                
+                if(this->numFloatFields > 0)
+                {
+                    for(unsigned int k = 0; k < feat->floatFields->size(); ++k)
+                    {
+                        floatVals[(j*this->numFloatFields)+k] = feat->floatFields->at(k);
+                    }
+                }
+                
+                if(maxNumNeighbours < feat->neighbours->size())
+                {
+                    maxNumNeighbours = feat->neighbours->size();
+                    neighbourValsTmp = new unsigned long[ATT_WRITE_CHUNK_SIZE*maxNumNeighbours];
+                    for(unsigned int n = 0; n < ATT_WRITE_CHUNK_SIZE; ++n)
+                    {
+                        for(unsigned int m = 0; m < numNeighbours; ++m)
+                        {
+                            neighbourValsTmp[(n*maxNumNeighbours)+m] = neighbourVals[(n*numNeighbours)+m];
+                        }
+                        for(unsigned int m = numNeighbours; m < maxNumNeighbours; ++m)
+                        {
+                            neighbourValsTmp[(n*maxNumNeighbours)+m] = 0;
+                        }
+                    }
+                    delete[] neighbourVals;
+                    neighbourVals = neighbourValsTmp;
+                    numNeighbours = maxNumNeighbours;
+                }
+                
+                for(unsigned int k = 0; k < feat->neighbours->size(); ++k)
+                {
+                    neighbourVals[(j*numNeighbours)+k] = feat->neighbours->at(k);
+                }
+                for(unsigned int m = feat->neighbours->size(); m < maxNumNeighbours; ++m)
+                {
+                    neighbourVals[(j*numNeighbours)+m] = 0;
+                }
+                
+                numNeighbourVals[j] = feat->neighbours->size();
+            }
+            
+            if(this->numBoolFields > 0)
+            {
+                extendBoolDatasetTo[0] = currentSize + remainingRows;
+                extendBoolDatasetTo[1] = this->numBoolFields;
+                boolDataset->extend( extendBoolDatasetTo );
+                
+                boolDataOffset[0] = currentSize;
+                boolDataOffset[1] = 0;
+                
+                boolDataDims[0] = remainingRows;
+                boolDataDims[1] = this->numIntFields;
+                
+                DataSpace boolWriteDataSpace = boolDataset->getSpace();
+                boolWriteDataSpace.selectHyperslab(H5S_SELECT_SET, boolDataDims, boolDataOffset);
+                DataSpace newBoolDataspace = DataSpace(2, boolDataDims);
+                
+                boolDataset->write(boolVals, PredType::NATIVE_INT, newBoolDataspace, boolWriteDataSpace);
+            }
+            
+            if(this->numIntFields > 0)
+            {
+                extendIntDatasetTo[0] = currentSize + remainingRows;
+                extendIntDatasetTo[1] = this->numIntFields;
+                intDataset->extend( extendIntDatasetTo );
+                
+                intDataOffset[0] = currentSize;
+                intDataOffset[1] = 0;
+                
+                intDataDims[0] = remainingRows;
+                intDataDims[1] = this->numIntFields;
+                
+                DataSpace intWriteDataSpace = intDataset->getSpace();
+                intWriteDataSpace.selectHyperslab(H5S_SELECT_SET, intDataDims, intDataOffset);
+                DataSpace newIntDataspace = DataSpace(1, intDataDims);
+                
+                intDataset->write(intVals, PredType::NATIVE_LONG, newIntDataspace, intWriteDataSpace);
+            }
+            
+            if(this->numFloatFields > 0)
+            {
+                extendFloatDatasetTo[0] = currentSize + remainingRows;
+                extendFloatDatasetTo[1] = this->numFloatFields;
+                floatDataset->extend( extendFloatDatasetTo );
+                
+                floatDataOffset[0] = currentSize;
+                floatDataOffset[1] = 0;
+                
+                floatDataDims[0] = remainingRows;
+                floatDataDims[1] = this->numIntFields;
+                
+                DataSpace floatWriteDataSpace = floatDataset->getSpace();
+                floatWriteDataSpace.selectHyperslab(H5S_SELECT_SET, floatDataDims, floatDataOffset);
+                DataSpace newFloatDataspace = DataSpace(2, floatDataDims);
+                
+                floatDataset->write(floatVals, PredType::NATIVE_DOUBLE, newFloatDataspace, floatWriteDataSpace);
+            }
+            
+            extendNeighboursDatasetTo[0] = currentSize + remainingRows;
+            extendNeighboursDatasetTo[1] = numNeighbours;
+            neighboursDataset->extend( extendNeighboursDatasetTo );
+            
+            neighboursDataOffset[0] = currentSize;
+            neighboursDataOffset[1] = 0;
+            
+            neighboursDataDims[0] = remainingRows;
+            neighboursDataDims[1] = maxNumNeighbours;
+            
+            DataSpace neighboursWriteDataSpace = neighboursDataset->getSpace();
+            neighboursWriteDataSpace.selectHyperslab(H5S_SELECT_SET, neighboursDataDims, neighboursDataOffset);
+            DataSpace newNeighboursDataspace = DataSpace(2, neighboursDataDims);
+            
+            neighboursDataset->write(neighbourVals, PredType::NATIVE_UINT64, newNeighboursDataspace, neighboursWriteDataSpace);
+            
+            
+            extendNumNeighboursDatasetTo[0] = currentSize + remainingRows;
+            numNeighboursDataset->extend( extendNumNeighboursDatasetTo );
+            
+            numNeighboursDataOffset[0] = currentSize;
+            numNeighboursDataDims[0] = remainingRows;
+            
+            DataSpace numNeighboursWriteDataSpace = numNeighboursDataset->getSpace();
+            numNeighboursWriteDataSpace.selectHyperslab(H5S_SELECT_SET, numNeighboursDataDims, numNeighboursDataOffset);
+            DataSpace newNumNeighboursDataspace = DataSpace(1, numNeighboursDataDims);
+            
+            numNeighboursDataset->write(numNeighbourVals, PredType::NATIVE_UINT32, newNumNeighboursDataspace, numNeighboursWriteDataSpace);
+            
+            delete boolDataset;
+            delete intDataset;
+            delete floatDataset;
+            delete neighboursDataset;
+            
+            attH5File->flush(H5F_SCOPE_GLOBAL);
+			attH5File->close();
+            delete attH5File;
+        }
+        catch(RSGISAttributeTableException &e)
+        {
+            throw e;
+        }
+        catch( FileIException &e )
+        {
+            throw RSGISAttributeTableException(e.getDetailMsg());
+        }
+        catch( DataSetIException &e )
+        {
+            throw RSGISAttributeTableException(e.getDetailMsg());
+        }
+        catch( DataSpaceIException &e )
+        {
+            throw RSGISAttributeTableException(e.getDetailMsg());
+        }
+        catch( DataTypeIException &e )
+        {
+            throw RSGISAttributeTableException(e.getDetailMsg());
+        }
+    }
+    
+    CompType* RSGISAttributeTable::createAttibuteIdxCompTypeDisk() throw(RSGISAttributeTableException)
+    {
+        try
+        {
+            StrType strTypeOut(0, H5T_VARIABLE);
+            
+            CompType *attIdxDataType = new CompType( sizeof(RSGISAttributeIdx) );
+            attIdxDataType->insertMember(ATT_NAME_FIELD, HOFFSET(RSGISAttributeIdx, name), strTypeOut);
+            attIdxDataType->insertMember(ATT_INDEX_FIELD, HOFFSET(RSGISAttributeIdx, idx), PredType::STD_U32LE);
+            return attIdxDataType;
+        }
+        catch( FileIException &e )
+        {
+            throw RSGISAttributeTableException(e.getDetailMsg());
+        }
+        catch( DataSetIException &e )
+        {
+            throw RSGISAttributeTableException(e.getDetailMsg());
+        }
+        catch( DataSpaceIException &e )
+        {
+            throw RSGISAttributeTableException(e.getDetailMsg());
+        }
+        catch( DataTypeIException &e )
+        {
+            throw RSGISAttributeTableException(e.getDetailMsg());
+        }
+    }
+    
+    CompType* RSGISAttributeTable::createAttibuteIdxCompTypeMem() throw(RSGISAttributeTableException)
+    {
+        try
+        {
+            StrType strTypeIn(0, H5T_VARIABLE);
+            
+            CompType *attIdxDataType = new CompType( sizeof(RSGISAttributeIdx) );
+            attIdxDataType->insertMember(ATT_NAME_FIELD, HOFFSET(RSGISAttributeIdx, name), strTypeIn);
+            attIdxDataType->insertMember(ATT_INDEX_FIELD, HOFFSET(RSGISAttributeIdx, idx), PredType::NATIVE_UINT);
+            return attIdxDataType;
+        }
+        catch( FileIException &e )
+        {
+            throw RSGISAttributeTableException(e.getDetailMsg());
+        }
+        catch( DataSetIException &e )
+        {
+            throw RSGISAttributeTableException(e.getDetailMsg());
+        }
+        catch( DataSpaceIException &e )
+        {
+            throw RSGISAttributeTableException(e.getDetailMsg());
+        }
+        catch( DataTypeIException &e )
+        {
+            throw RSGISAttributeTableException(e.getDetailMsg());
+        }
+    }
     
     void RSGISAttributeTable::exportGDALRaster(GDALDataset *inDataset, unsigned int inBand) throw(RSGISAttributeTableException)
     {

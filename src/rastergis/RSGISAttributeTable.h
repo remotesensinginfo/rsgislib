@@ -49,16 +49,53 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/cstdint.hpp>
 
+#include "H5Cpp.h"
+
 using namespace mu;
 using namespace std;
 using namespace xercesc;
 using namespace rsgis;
 using namespace rsgis::utils;
+using namespace H5;
 
 using boost::lexical_cast;
 using boost::bad_lexical_cast;
 
 namespace rsgis{namespace rastergis{
+    
+    static const string ATT_GROUPNAME_HEADER( "/HEADER" );
+	static const string ATT_GROUPNAME_DATA( "/DATA" );
+    static const string ATT_GROUPNAME_NEIGHBOURS( "/NEIGHBOURS" );
+    
+    static const string ATT_BOOL_DATA( "/DATA/BOOL" );
+    static const string ATT_INT_DATA( "/DATA/INT" );
+    static const string ATT_FLOAT_DATA( "/DATA/FLOAT" );
+    static const string ATT_NEIGHBOURS_DATA( "/NEIGHBOURS/NEIGHBOURS" );
+    static const string ATT_NUM_NEIGHBOURS_DATA( "/NEIGHBOURS/NUM_NEIGHBOURS" );
+    
+    static const string ATT_BOOL_FIELDS_HEADER( "/HEADER/BOOL_FIELDS" );
+    static const string ATT_INT_FIELDS_HEADER( "/HEADER/INT_FIELDS" );
+    static const string ATT_FLOAT_FIELDS_HEADER( "/HEADER/FLOAT_FIELDS" );
+    
+    static const string ATT_NAME_FIELD( "NAME" );
+    static const string ATT_INDEX_FIELD( "INDEX" );
+    
+    static const int ATT_READ_MDC_NELMTS( 0 );
+    static const hsize_t ATT_READ_RDCC_NELMTS( 512 );
+    static const hsize_t ATT_READ_RDCC_NBYTES( 1048576 );
+    static const double ATT_READ_RDCC_W0( 0.75 );
+    static const hsize_t ATT_READ_SIEVE_BUF( 65536 );
+    static const hsize_t ATT_READ_META_BLOCKSIZE( 2048 );
+    
+    static const int ATT_WRITE_MDC_NELMTS( 0 );
+    static const hsize_t  ATT_WRITE_RDCC_NELMTS( 512 );
+    static const hsize_t  ATT_WRITE_RDCC_NBYTES( 1048576 );
+    static const double ATT_WRITE_RDCC_W0( 0.75 );
+    static const hsize_t  ATT_WRITE_SIEVE_BUF( 65536 );
+    static const hsize_t  ATT_WRITE_META_BLOCKSIZE( 2048 );
+    static const unsigned int ATT_WRITE_DEFLATE( 1 );
+    static const hsize_t ATT_WRITE_CHUNK_SIZE( 250 );
+    
     
     class RSGISAttributeTable;
     
@@ -85,6 +122,12 @@ namespace rsgis{namespace rastergis{
     {
         string name;
         RSGISAttributeDataType dataType;
+        unsigned int idx;
+    };
+    
+    struct RSGISAttributeIdx
+    {
+        char *name;
         unsigned int idx;
     };
     
@@ -183,6 +226,8 @@ namespace rsgis{namespace rastergis{
         
         void exportASCII(string outFile) throw(RSGISAttributeTableException);
         
+        void exportHDF5(string outFile) throw(RSGISAttributeTableException);
+        
         void exportGDALRaster(GDALDataset *inDataset, unsigned int inBand) throw(RSGISAttributeTableException);
         
         vector<double>* getDoubleField(string field) throw(RSGISAttributeTableException);
@@ -196,14 +241,14 @@ namespace rsgis{namespace rastergis{
         virtual RSGISFeature* operator*()=0;
         
         virtual ~RSGISAttributeTable();
-        
-        //static RSGISAttributeTable* importFromASCII(string inFile)throw(RSGISAttributeTableException);
-        //static RSGISAttributeTable* importFromGDALRaster(string inFile)throw(RSGISAttributeTableException);
+
         static vector<RSGISIfStatement*>* generateStatments(DOMElement *argElement)throw(RSGISAttributeTableException);
         static RSGISAttExpression* generateExpression(DOMElement *expElement)throw(RSGISAttributeTableException);
         
     protected:
         RSGISAttributeTable();
+        CompType* createAttibuteIdxCompTypeDisk() throw(RSGISAttributeTableException);
+        CompType* createAttibuteIdxCompTypeMem() throw(RSGISAttributeTableException);
         vector<pair<string, RSGISAttributeDataType> > *fields;
         map<string, unsigned int> *fieldIdx;
         map<string, RSGISAttributeDataType> *fieldDataType;
