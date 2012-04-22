@@ -89,7 +89,9 @@ namespace rsgis{namespace rastergis{
         
         ~RSGISAttributeTableMem();
         
+        static RSGISFileType findFileType(string inFile)throw(RSGISAttributeTableException);
         static RSGISAttributeTable* importFromASCII(string inFile)throw(RSGISAttributeTableException);
+        static RSGISAttributeTable* importFromHDF5(string inFile)throw(RSGISAttributeTableException);
         static RSGISAttributeTable* importFromGDALRaster(string inFile)throw(RSGISAttributeTableException);
     protected:
         RSGISAttributeTableMem();

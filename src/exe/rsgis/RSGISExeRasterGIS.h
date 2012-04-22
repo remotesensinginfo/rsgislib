@@ -102,7 +102,8 @@ public:
         meanlitpopattributestatsinmem,
         exportfield2ascii,
         popattributestats,
-        export2hdf
+        export2hdf,
+        export2ascii
     };
     
     RSGISExeRasterGIS();

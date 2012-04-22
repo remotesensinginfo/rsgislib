@@ -96,6 +96,12 @@ namespace rsgis{namespace rastergis{
     static const unsigned int ATT_WRITE_DEFLATE( 1 );
     static const hsize_t ATT_WRITE_CHUNK_SIZE( 250 );
     
+    enum RSGISFileType
+    {
+        rsgis_unknown_attft = 0,
+        rsgis_ascii_attft = 1,
+        rsgis_hdf_attft = 2
+    };
     
     class RSGISAttributeTable;
     
