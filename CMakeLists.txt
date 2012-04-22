@@ -26,7 +26,7 @@ set (PROJECT_TOOLS_DIR tools)
 set (PROJECT_XML_DIR xml_standards)
 
 # The version number.
-set (RSGISLIB_SVN_COMMIT 486)
+set (RSGISLIB_SVN_COMMIT 487)
 set (RSGISLIB_VERSION_MAJOR 2)
 set (RSGISLIB_VERSION_MINOR 0)
 set (RSGISLIB_VERSION_PATCH 0)
@@ -171,6 +171,9 @@ set(MUPARSER_LIB_PATH /usr/local/lib CACHE PATH "Library PATH for MU Parser")
 set(CGAL_INCLUDE_DIR /usr/local/include CACHE PATH "Include PATH for CGAL")
 set(CGAL_LIB_PATH /usr/local/lib CACHE PATH "Library PATH for CGAL")
 
+set(HDF5_INCLUDE_DIR /usr/local/include CACHE PATH "Include PATH for HDF5")
+set(HDF5_LIB_PATH /usr/local/lib CACHE PATH "Library PATH for HDF5")
+
 ###############################################################################
 
 ###############################################################################
@@ -298,6 +301,9 @@ set(MUPARSER_LIBRARIES -L${MUPARSER_LIB_PATH} -lmuparser)
 
 include_directories(${CGAL_INCLUDE_DIR})
 set(CGAL_LIBRARY -L${CGAL_LIB_PATH} -lCGAL)
+
+include_directories(${HDF5_INCLUDE_DIR})
+set(HDF5_LIBRARIES -L${HDF5_LIB_PATH} -lhdf5 -lhdf5_hl -lhdf5_cpp)
 
 ###############################################################################
 

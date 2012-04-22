@@ -64,6 +64,7 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
     XMLCh *optionMeanEucDist2Neighbours = XMLString::transcode("meaneucdist2neighbours");
     XMLCh *optionCalcIntraPxlEucDist = XMLString::transcode("calcintrapxleucdist");
     XMLCh *optionExportField2ASCII = XMLString::transcode("exportfield2ascii");
+    XMLCh *optionExport2HDF = XMLString::transcode("export2hdf");
             
     XMLCh *optionRSGISBool = XMLString::transcode("rsgis_bool");
     XMLCh *optionRSGISInt = XMLString::transcode("rsgis_int");
@@ -2608,6 +2609,37 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
         }
         XMLString::release(&outputXMLStr);
     }
+    else if(XMLString::equals(optionExport2HDF, optionXML))
+    {
+        this->option = RSGISExeRasterGIS::export2hdf;
+        
+        XMLCh *tableXMLStr = XMLString::transcode("table");
+        if(argElement->hasAttribute(tableXMLStr))
+        {
+            char *charValue = XMLString::transcode(argElement->getAttribute(tableXMLStr));
+            this->attTableFile = string(charValue);
+            XMLString::release(&charValue);
+        }
+        else
+        {
+            throw RSGISXMLArgumentsException("No \'table\' attribute was provided.");
+        }
+        XMLString::release(&tableXMLStr);
+        
+        
+        XMLCh *tableOutXMLStr = XMLString::transcode("tableout");
+        if(argElement->hasAttribute(tableOutXMLStr))
+        {
+            char *charValue = XMLString::transcode(argElement->getAttribute(tableOutXMLStr));
+            this->outAttTableFile = string(charValue);
+            XMLString::release(&charValue);
+        }
+        else
+        {
+            throw RSGISXMLArgumentsException("No \'tableout\' attribute was provided.");
+        }
+        XMLString::release(&tableOutXMLStr);
+    }
     else
 	{
 		string message = string("The option (") + string(XMLString::transcode(optionXML)) + string(") is not known: RSGISExeRasterGIS.");
@@ -2638,6 +2670,7 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
     XMLString::release(&optionMeanLitPopAttributeStatsInMem);
     XMLString::release(&optionMeanLitPopAttributeStats);
     XMLString::release(&optionExportField2ASCII);
+    XMLString::release(&optionExport2HDF);
     
     XMLString::release(&optionRSGISBool);
     XMLString::release(&optionRSGISInt);
@@ -3963,6 +3996,28 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
                 throw e;
             }
         }
+        else if(this->option == RSGISExeRasterGIS::export2hdf)
+        {
+            cout << "A command to export an attribute table to a hdf file.\n";
+            cout << "Input Table: " << this->attTableFile << endl;
+            cout << "Output Table: " << this->outAttTableFile << endl;
+            
+            try 
+            {
+                cout << "Importing Attribute Table:\n";
+                RSGISAttributeTable *attTable = RSGISAttributeTableMem::importFromASCII(attTableFile);
+                
+                cout << "Exporting Attribute Table\n";
+                attTable->exportHDF5(outAttTableFile);
+                cout << "Finished\n";               
+                
+                delete attTable;
+            } 
+            catch (RSGISException &e) 
+            {
+                throw e;
+            } 
+        }
 		else
 		{
 			cout << "The option is not recognised: RSGISExeRasterGIS\n";
@@ -4382,6 +4437,12 @@ void RSGISExeRasterGIS::printParameters()
                 
                 cout << endl;
             }
+        }
+        else if(this->option == RSGISExeRasterGIS::meanlitpopattributestats)
+        {
+            cout << "A command to export an attribute table to a hdf file.\n";
+            cout << "Input Table: " << this->attTableFile << endl;
+            cout << "Output Table: " << this->outAttTableFile << endl;
         }
 		else
 		{
