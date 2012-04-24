@@ -166,14 +166,49 @@ void RSGISExeImageCalculation::retrieveParameters(DOMElement *argElement) throw(
 		
 		if(argElement->hasAttribute(XMLString::transcode("dir")))
 		{
-			const XMLCh *dir = argElement->getAttribute(XMLString::transcode("dir"));
-			string dirStr = XMLString::transcode(dir);
+            string dirStr = "";
+			XMLCh *dirXMLStr = XMLString::transcode("dir");
+            if(argElement->hasAttribute(dirXMLStr))
+            {
+                char *charValue = XMLString::transcode(argElement->getAttribute(dirXMLStr));
+                dirStr = string(charValue);
+                XMLString::release(&charValue);
+            }
+            else
+            {
+                throw RSGISXMLArgumentsException("No \'dir\' attribute was provided.");
+            }
+            XMLString::release(&dirXMLStr);
+            
+            string extStr = "";
+			XMLCh *extXMLStr = XMLString::transcode("ext");
+            if(argElement->hasAttribute(extXMLStr))
+            {
+                char *charValue = XMLString::transcode(argElement->getAttribute(extXMLStr));
+                extStr = string(charValue);
+                XMLString::release(&charValue);
+            }
+            else
+            {
+                throw RSGISXMLArgumentsException("No \'ext\' attribute was provided.");
+            }
+            XMLString::release(&extXMLStr);
+            
+            
+            string outputBase = "";
+            XMLCh *outputXMLStr = XMLString::transcode("output");
+            if(argElement->hasAttribute(outputXMLStr))
+            {
+                char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
+                outputBase = string(charValue);
+                XMLString::release(&charValue);
+            }
+            else
+            {
+                throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+            }
+            XMLString::release(&outputXMLStr);
 			
-			const XMLCh *ext = argElement->getAttribute(XMLString::transcode("ext"));
-			string extStr = XMLString::transcode(ext);
-			
-			const XMLCh *output = argElement->getAttribute(XMLString::transcode("output"));
-			string outputBase = XMLString::transcode(output);
 			try
 			{
 				this->inputImages = fileUtils.getDIRList(dirStr, extStr, &this->numImages, false);
@@ -190,56 +225,171 @@ void RSGISExeImageCalculation::retrieveParameters(DOMElement *argElement) throw(
 		}
 		else
 		{
-			this->numImages = 1;
-			this->inputImages = new string[1];
-			const XMLCh *image = argElement->getAttribute(XMLString::transcode("image"));
-			this->inputImages[0] = XMLString::transcode(image);
-			
-			this->outputImages = new string[1];
-			const XMLCh *output = argElement->getAttribute(XMLString::transcode("output"));
-			this->outputImages[0] = XMLString::transcode(output);
-			
+            XMLCh *imageXMLStr = XMLString::transcode("image");
+            if(argElement->hasAttribute(imageXMLStr))
+            {
+                this->numImages = 1;
+                this->inputImages = new string[1];
+                char *charValue = XMLString::transcode(argElement->getAttribute(imageXMLStr));
+                this->inputImages[0] = string(charValue);
+                XMLString::release(&charValue);
+            }
+            else
+            {
+                throw RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+            }
+            XMLString::release(&imageXMLStr);
+                        
+            XMLCh *outputXMLStr = XMLString::transcode("output");
+            if(argElement->hasAttribute(outputXMLStr))
+            {
+                this->outputImages = new string[1];
+                char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
+                this->outputImages[0] = string(charValue);
+                XMLString::release(&charValue);
+            }
+            else
+            {
+                throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+            }
+            XMLString::release(&outputXMLStr);
 		}
-				
-		this->outMin = mathUtils.strtodouble(XMLString::transcode(argElement->getAttribute(XMLString::transcode("outmin"))));
-		this->outMax = mathUtils.strtodouble(XMLString::transcode(argElement->getAttribute(XMLString::transcode("outmax"))));
-		
-		if(argElement->hasAttribute(XMLString::transcode("inmin")) & argElement->hasAttribute(XMLString::transcode("inmax")))
+        
+        
+        XMLCh *outminXMLStr = XMLString::transcode("outmin");
+		if(argElement->hasAttribute(outminXMLStr))
 		{
-			this->inMin = mathUtils.strtodouble(XMLString::transcode(argElement->getAttribute(XMLString::transcode("inmin"))));
-			this->inMax = mathUtils.strtodouble(XMLString::transcode(argElement->getAttribute(XMLString::transcode("inmax"))));
+			char *charValue = XMLString::transcode(argElement->getAttribute(outminXMLStr));
+			this->outMin = mathUtils.strtodouble(string(charValue));
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'outmin\' attribute was provided.");
+		}
+		XMLString::release(&outminXMLStr);
+        
+        XMLCh *outmaxXMLStr = XMLString::transcode("outmax");
+		if(argElement->hasAttribute(outmaxXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(outmaxXMLStr));
+			this->outMax = mathUtils.strtodouble(string(charValue));
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'outmax\' attribute was provided.");
+		}
+		XMLString::release(&outmaxXMLStr);
+        
+        XMLCh *inmaxXMLStr = XMLString::transcode("inmax");
+        XMLCh *inminXMLStr = XMLString::transcode("inmin");
+		if(argElement->hasAttribute(inmaxXMLStr) & argElement->hasAttribute(inminXMLStr))
+		{
+            char *charValue1 = XMLString::transcode(argElement->getAttribute(inmaxXMLStr));
+			this->inMin = mathUtils.strtodouble(string(charValue1));
+			XMLString::release(&charValue1);
+            
+            char *charValue2 = XMLString::transcode(argElement->getAttribute(inminXMLStr));
+			this->inMax = mathUtils.strtodouble(string(charValue2));
+			XMLString::release(&charValue2);
+            
 			this->calcInMinMax = false;
 		}
 		else
 		{
 			this->calcInMinMax = true;
 		}
+        XMLString::release(&inmaxXMLStr);
+        XMLString::release(&inminXMLStr);
 	}
 	else if(XMLString::equals(optionCorrelation, optionXML))
 	{		
 		this->option = RSGISExeImageCalculation::correlation;
 		
-		const XMLCh *image = argElement->getAttribute(XMLString::transcode("imageA"));
-		this->inputImageA = XMLString::transcode(image);
+        XMLCh *imageAXMLStr = XMLString::transcode("imageA");
+		if(argElement->hasAttribute(imageAXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(imageAXMLStr));
+			this->inputImageA = string(charValue);
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'imageA\' attribute was provided.");
+		}
+		XMLString::release(&imageAXMLStr);
+        
+        
+        XMLCh *imageBXMLStr = XMLString::transcode("imageB");
+		if(argElement->hasAttribute(imageBXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(imageBXMLStr));
+			this->inputImageB = string(charValue);
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'imageB\' attribute was provided.");
+		}
+		XMLString::release(&imageBXMLStr);
 		
-		image = argElement->getAttribute(XMLString::transcode("imageB"));
-		this->inputImageB = XMLString::transcode(image);
-		
-		const XMLCh *output = argElement->getAttribute(XMLString::transcode("output"));
-		this->outputMatrix = XMLString::transcode(output);
+		XMLCh *outputXMLStr = XMLString::transcode("output");
+		if(argElement->hasAttribute(outputXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
+			this->outputMatrix = string(charValue);
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+		}
+		XMLString::release(&outputXMLStr);
 	}
 	else if(XMLString::equals(optionCovariance, optionXML))
 	{		
 		this->option = RSGISExeImageCalculation::covariance;
 		
-		const XMLCh *image = argElement->getAttribute(XMLString::transcode("imageA"));
-		this->inputImageA = XMLString::transcode(image);
+        XMLCh *imageAXMLStr = XMLString::transcode("imageA");
+		if(argElement->hasAttribute(imageAXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(imageAXMLStr));
+			this->inputImageA = string(charValue);
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'imageA\' attribute was provided.");
+		}
+		XMLString::release(&imageAXMLStr);
+        
+        
+        XMLCh *imageBXMLStr = XMLString::transcode("imageB");
+		if(argElement->hasAttribute(imageBXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(imageBXMLStr));
+			this->inputImageB = string(charValue);
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'imageB\' attribute was provided.");
+		}
+		XMLString::release(&imageBXMLStr);
 		
-		image = argElement->getAttribute(XMLString::transcode("imageB"));
-		this->inputImageB = XMLString::transcode(image);
-		
-		const XMLCh *output = argElement->getAttribute(XMLString::transcode("output"));
-		this->outputMatrix = XMLString::transcode(output);
+		XMLCh *outputXMLStr = XMLString::transcode("output");
+		if(argElement->hasAttribute(outputXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
+			this->outputMatrix = string(charValue);
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+		}
+		XMLString::release(&outputXMLStr);
 		
 		if(argElement->hasAttribute(XMLString::transcode("meanA")) & argElement->hasAttribute(XMLString::transcode("meanB")))
 		{
@@ -318,11 +468,35 @@ void RSGISExeImageCalculation::retrieveParameters(DOMElement *argElement) throw(
 			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
 		}
 		XMLString::release(&outputXMLStr);
-		
-		const XMLCh *eigenvectorsStr = argElement->getAttribute(XMLString::transcode("eigenvectors"));
-		this->eigenvectors = XMLString::transcode(eigenvectorsStr);
-		
-		this->numComponents = mathUtils.strtoint(XMLString::transcode(argElement->getAttribute(XMLString::transcode("components"))));
+        
+        
+        XMLCh *eigenvectorsXMLStr = XMLString::transcode("eigenvectors");
+		if(argElement->hasAttribute(eigenvectorsXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(eigenvectorsXMLStr));
+			this->eigenvectors = string(charValue);
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'eigenvectors\' attribute was provided.");
+		}
+		XMLString::release(&eigenvectorsXMLStr);
+        
+        
+        XMLCh *componentsXMLStr = XMLString::transcode("components");
+		if(argElement->hasAttribute(componentsXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(componentsXMLStr));
+			this->numComponents = mathUtils.strtoint(string(charValue));
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'components\' attribute was provided.");
+		}
+		XMLString::release(&componentsXMLStr);
+        
 	}
 	else if(XMLString::equals(optionStandardise, optionXML))
 	{		
@@ -354,12 +528,21 @@ void RSGISExeImageCalculation::retrieveParameters(DOMElement *argElement) throw(
 			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
 		}
 		XMLString::release(&outputXMLStr);
-		
-		const XMLCh *meanvectorXMLStr = argElement->getAttribute(XMLString::transcode("meanvector"));
-		this->meanvectorStr = XMLString::transcode(meanvectorXMLStr);
-		
-		this->numComponents = mathUtils.strtoint(XMLString::transcode(argElement->getAttribute(XMLString::transcode("components"))));
-	}
+
+        XMLCh *meanVectorXMLStr = XMLString::transcode("meanvector");
+		if(argElement->hasAttribute(meanVectorXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(meanVectorXMLStr));
+			this->meanvectorStr = string(charValue);
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'meanvector\' attribute was provided.");
+		}
+		XMLString::release(&meanVectorXMLStr);
+	
+    }
 	else if(XMLString::equals(optionBandMaths, optionXML))
 	{
 		this->option = RSGISExeImageCalculation::bandmaths;
