@@ -682,7 +682,7 @@ namespace rsgis{namespace segment{
             ifStat->noExp = false;
             ifStat->ignore = false;
             
-            vector<pair<unsigned long, unsigned long> > *eliminationPairs = new vector<pair<unsigned long, unsigned long> >();
+            vector<pair<size_t, size_t> > *eliminationPairs = new vector<pair<size_t, size_t> >();
             
             RSGISProcessFeature *processFeature = new RSGISEliminateFeature(eliminatedFieldIdx, mergedToFIDIdx, specThreshold, pxlCountIdx, bandStats, eliminationPairs);
             
@@ -724,9 +724,7 @@ namespace rsgis{namespace segment{
                     this->defineOutputFID(attTable, *(*attTable), eliminatedFieldIdx, mergedToFIDIdx, outFIDIdx, outFIDSetFieldIdx);
                 }
             }
-            
-            //attTable->exportASCII("/Users/pete/Desktop/tmpAtt.att");
-            
+                        
             // Generate output image from original and output FIDs.
             cout << "Generating output clumps file\n";
             datasets = new GDALDataset*[1];
@@ -777,14 +775,14 @@ namespace rsgis{namespace segment{
     }
     
     
-    void RSGISEliminateSmallClumps::performElimination(RSGISAttributeTable *attTable, vector<pair<unsigned long, unsigned long> > *eliminationPairs, unsigned int eliminatedFieldIdx, unsigned int mergedToFIDIdx, unsigned int pxlCountIdx, vector<RSGISBandAttStats*> *bandStats) throw(RSGISImageCalcException)
+    void RSGISEliminateSmallClumps::performElimination(RSGISAttributeTable *attTable, vector<pair<size_t, size_t> > *eliminationPairs, unsigned int eliminatedFieldIdx, unsigned int mergedToFIDIdx, unsigned int pxlCountIdx, vector<RSGISBandAttStats*> *bandStats) throw(RSGISImageCalcException)
     {
         try 
         {
             RSGISFeature* pFeat = NULL; // parent
             RSGISFeature* mFeat = NULL; // child to be merged
             bool alreadyNeighbour = false;
-            for(vector<pair<unsigned long, unsigned long> >::iterator iterPairs = eliminationPairs->begin(); iterPairs != eliminationPairs->end(); ++iterPairs)
+            for(vector<pair<size_t, size_t> >::iterator iterPairs = eliminationPairs->begin(); iterPairs != eliminationPairs->end(); ++iterPairs)
             {
                 pFeat = attTable->getFeature((*iterPairs).first);
                 mFeat = attTable->getFeature((*iterPairs).second);
@@ -801,7 +799,7 @@ namespace rsgis{namespace segment{
                     pFeat->floatFields->at((*iterBands)->meanIdx) = pFeat->floatFields->at((*iterBands)->sumIdx) / pFeat->intFields->at(pxlCountIdx);
                 }
                 
-                for(vector<unsigned long long>::iterator iterNeigh = pFeat->neighbours->begin(); iterNeigh != pFeat->neighbours->end(); )
+                for(vector<size_t>::iterator iterNeigh = pFeat->neighbours->begin(); iterNeigh != pFeat->neighbours->end(); )
                 {
                     if((*iterNeigh) == mFeat->fid)
                     {
@@ -814,12 +812,12 @@ namespace rsgis{namespace segment{
                 }
                 
                 alreadyNeighbour = false;
-                for(vector<unsigned long long>::iterator iterFeatNeigh = mFeat->neighbours->begin(); iterFeatNeigh != mFeat->neighbours->end(); ++iterFeatNeigh)
+                for(vector<size_t>::iterator iterFeatNeigh = mFeat->neighbours->begin(); iterFeatNeigh != mFeat->neighbours->end(); ++iterFeatNeigh)
                 {
                     if((*iterFeatNeigh) != pFeat->fid)
                     {
                         alreadyNeighbour = false;
-                        for(vector<unsigned long long>::iterator iterNeigh = pFeat->neighbours->begin(); iterNeigh != pFeat->neighbours->end(); ++iterNeigh)
+                        for(vector<size_t>::iterator iterNeigh = pFeat->neighbours->begin(); iterNeigh != pFeat->neighbours->end(); ++iterNeigh)
                         {
                             if((*iterFeatNeigh) == (*iterNeigh))
                             {
@@ -904,7 +902,7 @@ namespace rsgis{namespace segment{
             double distance = 0;
             bool first = true;
             RSGISFeature *nFeat = NULL;
-            for(vector<unsigned long long>::iterator iterFeat = feat->neighbours->begin(); iterFeat != feat->neighbours->end(); ++iterFeat)
+            for(vector<size_t>::iterator iterFeat = feat->neighbours->begin(); iterFeat != feat->neighbours->end(); ++iterFeat)
             {
                 nFeat = attTable->getFeature(*iterFeat);
                 if(nFeat->boolFields->at(eliminatedFieldIdx))
@@ -931,7 +929,7 @@ namespace rsgis{namespace segment{
             {
                 if(minDist < specThreshold)
                 {
-                    eliminationPairs->push_back(pair<unsigned long, unsigned long>(minFID, ((unsigned long) feat->fid)));
+                    eliminationPairs->push_back(pair<size_t, size_t>(minFID, ((unsigned long) feat->fid)));
                 }
             }
         }

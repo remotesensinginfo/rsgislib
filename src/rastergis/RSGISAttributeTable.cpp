@@ -492,7 +492,7 @@ namespace rsgis{namespace rastergis{
             outTxtFile << (*(*this))->fid;
             if((*(*this))->neighbours != NULL)
             {
-                for(vector<unsigned long long>::iterator iterNeighbours = (*(*this))->neighbours->begin(); iterNeighbours != (*(*this))->neighbours->end(); ++iterNeighbours)
+                for(vector<size_t>::iterator iterNeighbours = (*(*this))->neighbours->begin(); iterNeighbours != (*(*this))->neighbours->end(); ++iterNeighbours)
                 {
                     outTxtFile << "," << *iterNeighbours;
                 }
@@ -1302,7 +1302,7 @@ namespace rsgis{namespace rastergis{
             
             rasterAtt->SetRowCount(this->getSize());
             
-            unsigned long long rowCounter = 0;
+            size_t rowCounter = 0;
             for(this->start(); this->end(); ++(*this))
             {
                 rasterAtt->SetValue(rowCounter, fidRATIdx, ((int)(*(*this))->fid+1));
@@ -2122,6 +2122,16 @@ namespace rsgis{namespace rastergis{
         }
         
         return exp;
+    }
+    
+    void RSGISAttributeTable::freeFeature(RSGISFeature *feat)
+    {
+        delete feat->boolFields;
+        delete feat->intFields;
+        delete feat->floatFields;
+        delete feat->stringFields;
+        delete feat->neighbours;
+        delete feat;
     }
         
     RSGISAttributeTable::~RSGISAttributeTable()

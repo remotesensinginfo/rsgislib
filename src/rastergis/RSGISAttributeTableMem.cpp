@@ -30,18 +30,18 @@ namespace rsgis{namespace rastergis{
         
     }
     
-    RSGISAttributeTableMem::RSGISAttributeTableMem(unsigned long long numFeatures)
+    RSGISAttributeTableMem::RSGISAttributeTableMem(size_t numFeatures)
     {
         this->createAttributeTable(numFeatures);
     }
     
-    RSGISAttributeTableMem::RSGISAttributeTableMem(unsigned long long numFeatures, vector<pair<string, RSGISAttributeDataType> > *fields)
+    RSGISAttributeTableMem::RSGISAttributeTableMem(size_t numFeatures, vector<pair<string, RSGISAttributeDataType> > *fields)
     {
         this->fields = fields;
         this->createAttributeTableWithFields(numFeatures);
     }
     
-    void RSGISAttributeTableMem::createAttributeTableWithFields(unsigned long long numFeatures)
+    void RSGISAttributeTableMem::createAttributeTableWithFields(size_t numFeatures)
     {
         attTable = new vector<RSGISFeature*>();
         attTable->reserve(numFeatures);
@@ -81,7 +81,7 @@ namespace rsgis{namespace rastergis{
         }
         
         RSGISFeature *feature = NULL;
-        for(unsigned long long i = 0; i < numFeatures; ++i)
+        for(size_t i = 0; i < numFeatures; ++i)
         {
             feature = new RSGISFeature();
             feature->fid = i;
@@ -109,13 +109,13 @@ namespace rsgis{namespace rastergis{
             {
                 feature->stringFields->push_back("");
             }
-            feature->neighbours = new vector<unsigned long long>();
+            feature->neighbours = new vector<size_t>();
             
             attTable->push_back(feature);
         }
     }
     
-    void RSGISAttributeTableMem::createAttributeTable(unsigned long long numFeatures)
+    void RSGISAttributeTableMem::createAttributeTable(size_t numFeatures)
     {
         attTable = new vector<RSGISFeature*>();
         attTable->reserve(numFeatures);
@@ -130,7 +130,7 @@ namespace rsgis{namespace rastergis{
         this->numStrFields = 0;
         
         RSGISFeature *feature = NULL;
-        for(unsigned long long i = 0; i < numFeatures; ++i)
+        for(size_t i = 0; i < numFeatures; ++i)
         {
             feature = new RSGISFeature();
             feature->fid = i;
@@ -138,13 +138,13 @@ namespace rsgis{namespace rastergis{
             feature->intFields = new vector<long>();
             feature->floatFields = new vector<double>();
             feature->stringFields = new vector<string>();
-            feature->neighbours = new vector<unsigned long long>();
+            feature->neighbours = new vector<size_t>();
             
             attTable->push_back(feature);
         }
     }
     
-    bool RSGISAttributeTableMem::getBoolField(unsigned long long fid, string name) throw(RSGISAttributeTableException)
+    bool RSGISAttributeTableMem::getBoolField(size_t fid, string name) throw(RSGISAttributeTableException)
     {
         bool outVal = false;
         
@@ -178,7 +178,7 @@ namespace rsgis{namespace rastergis{
     }
     
     
-    long RSGISAttributeTableMem::getIntField(unsigned long long fid, string name) throw(RSGISAttributeTableException)
+    long RSGISAttributeTableMem::getIntField(size_t fid, string name) throw(RSGISAttributeTableException)
     {
         long outVal = 0;
         
@@ -211,7 +211,7 @@ namespace rsgis{namespace rastergis{
         return outVal;
     }
     
-    double RSGISAttributeTableMem::getDoubleField(unsigned long long fid, string name) throw(RSGISAttributeTableException)
+    double RSGISAttributeTableMem::getDoubleField(size_t fid, string name) throw(RSGISAttributeTableException)
     {
         double outVal = 0;
         
@@ -243,7 +243,7 @@ namespace rsgis{namespace rastergis{
         return outVal;
     }
     
-    string RSGISAttributeTableMem::getStringField(unsigned long long fid, string name) throw(RSGISAttributeTableException)
+    string RSGISAttributeTableMem::getStringField(size_t fid, string name) throw(RSGISAttributeTableException)
     {
         string outVal = 0;
         
@@ -275,7 +275,7 @@ namespace rsgis{namespace rastergis{
         return outVal;
     }
     
-    void RSGISAttributeTableMem::setBoolField(unsigned long long fid, string name, bool value) throw(RSGISAttributeTableException)
+    void RSGISAttributeTableMem::setBoolField(size_t fid, string name, bool value) throw(RSGISAttributeTableException)
     {
         try 
         {
@@ -303,7 +303,7 @@ namespace rsgis{namespace rastergis{
         }
     }
     
-    void RSGISAttributeTableMem::setIntField(unsigned long long fid, string name, long value) throw(RSGISAttributeTableException)
+    void RSGISAttributeTableMem::setIntField(size_t fid, string name, long value) throw(RSGISAttributeTableException)
     {
         try 
         {
@@ -331,7 +331,7 @@ namespace rsgis{namespace rastergis{
         }
     }
     
-    void RSGISAttributeTableMem::setDoubleField(unsigned long long fid, string name, double value) throw(RSGISAttributeTableException)
+    void RSGISAttributeTableMem::setDoubleField(size_t fid, string name, double value) throw(RSGISAttributeTableException)
     {
         try 
         {
@@ -359,7 +359,7 @@ namespace rsgis{namespace rastergis{
         }
     }
     
-    void RSGISAttributeTableMem::setStringField(unsigned long long fid, string name, string value) throw(RSGISAttributeTableException)
+    void RSGISAttributeTableMem::setStringField(size_t fid, string name, string value) throw(RSGISAttributeTableException)
     {
         try 
         {
@@ -487,7 +487,7 @@ namespace rsgis{namespace rastergis{
         }
     }
     
-    RSGISFeature* RSGISAttributeTableMem::getFeature(unsigned long long fid) throw(RSGISAttributeTableException)
+    RSGISFeature* RSGISAttributeTableMem::getFeature(size_t fid) throw(RSGISAttributeTableException)
     {
         if(fid >= attTable->size())
         {
@@ -499,7 +499,12 @@ namespace rsgis{namespace rastergis{
         return attTable->at(fid);
     }
     
-    void RSGISAttributeTableMem::addAttBoolField(string name, bool val)
+    void RSGISAttributeTableMem::returnFeature(RSGISFeature *feat, bool sync) throw(RSGISAttributeTableException)
+    {
+        // Nothing to do as features are stored in memory to automatically sync'd.
+    }
+    
+    void RSGISAttributeTableMem::addAttBoolField(string name, bool val) throw(RSGISAttributeTableException)
     {
         fieldIdx->insert(pair<string, unsigned int>(name, numBoolFields));
         ++numBoolFields;
@@ -512,7 +517,7 @@ namespace rsgis{namespace rastergis{
         }
     }
     
-    void RSGISAttributeTableMem::addAttIntField(string name, long val)
+    void RSGISAttributeTableMem::addAttIntField(string name, long val) throw(RSGISAttributeTableException)
     {
         fieldIdx->insert(pair<string, unsigned int>(name, numIntFields));
         ++numIntFields;
@@ -525,7 +530,7 @@ namespace rsgis{namespace rastergis{
         }
     }
     
-    void RSGISAttributeTableMem::addAttFloatField(string name, double val)
+    void RSGISAttributeTableMem::addAttFloatField(string name, double val) throw(RSGISAttributeTableException)
     {
         fieldIdx->insert(pair<string, unsigned int>(name, numFloatFields));
         ++numFloatFields;
@@ -538,7 +543,7 @@ namespace rsgis{namespace rastergis{
         }
     }
     
-    void RSGISAttributeTableMem::addAttStringField(string name, string val)
+    void RSGISAttributeTableMem::addAttStringField(string name, string val) throw(RSGISAttributeTableException)
     {
         fieldIdx->insert(pair<string, unsigned int>(name, numStrFields));
         ++numStrFields;
@@ -585,7 +590,7 @@ namespace rsgis{namespace rastergis{
         }
     }
         
-    unsigned long long RSGISAttributeTableMem::getSize()
+    size_t RSGISAttributeTableMem::getSize()
     {
         return attTable->size();
     }
@@ -646,9 +651,9 @@ namespace rsgis{namespace rastergis{
             unsigned int numOfFields = 0;
             unsigned int numOfExpTokens = 0;
             unsigned int tokenIdx = 0;
-            unsigned long long numOfFeatures = 0;
-            unsigned long long numOfDataLines = 0;
-            unsigned long long tmpFid = 0;
+            size_t numOfFeatures = 0;
+            size_t numOfDataLines = 0;
+            size_t tmpFid = 0;
             
             unsigned int tmpNumBoolFields = 0;
             unsigned int tmpNumIntFields = 0;
@@ -846,7 +851,7 @@ namespace rsgis{namespace rastergis{
                         {
                             feature->stringFields->push_back(tokens->at(tokenIdx++));
                         }
-                        feature->neighbours = new vector<unsigned long long>();
+                        feature->neighbours = new vector<size_t>();
                         
                         attTableObj->attTable->push_back(feature);                        
                     }
@@ -1043,7 +1048,7 @@ namespace rsgis{namespace rastergis{
                 throw RSGISAttributeTableException("The number features in the different neighbour datasets is not equal.");
             }
             
-            unsigned long long numFeats = numNeighboursDims[0];
+            size_t numFeats = numNeighboursDims[0];
             
             delete[] numNeighboursDims;
             delete[] neighboursDims;
@@ -1282,7 +1287,7 @@ namespace rsgis{namespace rastergis{
             
             
             RSGISFeature *feature = NULL;
-            unsigned long long cFid = 0;
+            size_t cFid = 0;
             for(unsigned long i = 0; i < numChunks; ++i)
             {
                 numNeighboursOffset[0] = i*ATT_WRITE_CHUNK_SIZE;
@@ -1346,7 +1351,7 @@ namespace rsgis{namespace rastergis{
                         }
                     }
                     feature->stringFields = new vector<string>();
-                    feature->neighbours = new vector<unsigned long long>();
+                    feature->neighbours = new vector<size_t>();
                     feature->neighbours->reserve(numNeighbourVals[j]);
                     
                     for(hsize_t n = 0; n < numNeighbourVals[j]; ++n)
@@ -1510,7 +1515,7 @@ namespace rsgis{namespace rastergis{
                     }
                 }
                 feature->stringFields = new vector<string>();
-                feature->neighbours = new vector<unsigned long long>();
+                feature->neighbours = new vector<size_t>();
                 feature->neighbours->reserve(numNeighbourVals[j]);
                 
                 for(hsize_t n = 0; n < numNeighbourVals[j]; ++n)
@@ -1579,11 +1584,7 @@ namespace rsgis{namespace rastergis{
         {
             for(vector<RSGISFeature*>::iterator iterFeats = attTable->begin(); iterFeats != attTable->end(); ++iterFeats)
             {
-                delete (*iterFeats)->boolFields;
-                delete (*iterFeats)->intFields;
-                delete (*iterFeats)->floatFields;
-                delete (*iterFeats)->stringFields;
-                delete (*iterFeats);
+                this->freeFeature(*iterFeats);
             }
             
             delete attTable;

@@ -48,14 +48,14 @@ namespace rsgis{namespace rastergis{
     {
     public:
         RSGISFindClumpNeighbours();
-        vector<list<unsigned long>* >* findNeighbours(GDALDataset *clumpImage) throw(RSGISImageCalcException);
+        vector<list<size_t>* >* findNeighbours(GDALDataset *clumpImage) throw(RSGISImageCalcException);
         void findNeighbours(GDALDataset *clumpImage, RSGISAttributeTable *attTable) throw(RSGISImageCalcException);
         ~RSGISFindClumpNeighbours();
     protected:
         inline void addNeighbourToFeature(RSGISFeature *feat, unsigned long long neighbourID)
         {
             bool foundID = false;
-            for(vector<unsigned long long>::iterator iterNeigh = feat->neighbours->begin(); iterNeigh != feat->neighbours->end(); ++iterNeigh)
+            for(vector<size_t>::iterator iterNeigh = feat->neighbours->begin(); iterNeigh != feat->neighbours->end(); ++iterNeigh)
             {
                 if((*iterNeigh) == neighbourID)
                 {
