@@ -66,6 +66,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 	XMLCh *optionRasterPolygonsToShp= XMLString::transcode("rasterpolygons2shp");
 	XMLCh *optionRasterPolygonsToTxt = XMLString::transcode("rasterpolygons2txt");
 	XMLCh *optionPixelVals2txt = XMLString::transcode("pixelVals2txt");
+    XMLCh *optionVariablesToMatrix = XMLString::transcode("variables2matrix");
 	XMLCh *optionImageToMatrix = XMLString::transcode("image2matrix");
 	XMLCh *optionPixelCount = XMLString::transcode("pixelcount");
 	XMLCh *optionPixelStats = XMLString::transcode("pixelstats");
@@ -536,6 +537,68 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 		}
 		XMLString::release(&outTXTStr);
 		
+	}
+    else if(XMLString::equals(optionVariablesToMatrix, optionXML))
+	{		
+		this->option = RSGISExeZonalStats::varibles2matrix;
+		
+		XMLCh *outputXMLStr = XMLString::transcode("output");
+		if(argElement->hasAttribute(outputXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
+			this->outputMatrix = string(charValue);
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+		}
+		XMLString::release(&outputXMLStr);
+		
+		XMLCh *attributeXMLStr = XMLString::transcode("attribute");
+		if(argElement->hasAttribute(attributeXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(attributeXMLStr));
+			this->polyAttribute = string(charValue);
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'attribute\' attribute was provided.");
+		}
+		XMLString::release(&attributeXMLStr);
+        
+        XMLCh *methodXMLStr = XMLString::transcode("method");
+		if(argElement->hasAttribute(methodXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(methodXMLStr));
+			string methodStr = string(charValue);
+			// Polygon completely contains pixel
+			if(methodStr == "polyContainsPixel"){this->method = polyContainsPixel;}
+			// Pixel center is within the polygon
+			else if(methodStr == "polyContainsPixelCenter") {this->method = polyContainsPixelCenter;}
+			// Polygon overlaps the pixel
+			else if(methodStr == "polyOverlapsPixel"){this->method = polyOverlapsPixel;}
+			// Polygon overlaps or contains the pixel
+			else if(methodStr == "polyOverlapsOrContainsPixel"){this->method = polyOverlapsOrContainsPixel;}
+			// Pixel contains the polygon
+			else if(methodStr == "pixelContainsPoly"){this->method = pixelContainsPoly;}
+			// Polygon center is within pixel
+			else if(methodStr == "pixelContainsPolyCenter"){this->method = pixelContainsPolyCenter;}
+			// The method is chosen based on relative areas of pixel and polygon.
+			else if(methodStr == "adaptive"){this->method = adaptive;}
+			// Everything within the polygons envelope is chosen (for debugging)
+			else if(methodStr == "envelope"){this->method = envelope;}
+			// Set to default value if not recognised.
+			else {cerr << "\tMethod not recognised, using default of \'polyContainsPixelCenter\'." << endl;this->method = polyContainsPixelCenter;}
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			cerr << "\tMethod not recognised, using default of \'polyContainsPixelCenter\'." << endl;
+			this->method = polyContainsPixelCenter;
+		}
+		XMLString::release(&methodXMLStr);
 	}
 	else if(XMLString::equals(optionImageToMatrix, optionXML))
 	{		
@@ -2459,6 +2522,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 	XMLString::release(&optionRasterPolygonsToShp);
 	XMLString::release(&optionRasterPolygonsToTxt);
 	XMLString::release(&optionPixelVals2txt);
+    XMLString::release(&optionVariablesToMatrix);
 	XMLString::release(&optionImageToMatrix);
 	XMLString::release(&optionPixelCount);
 	XMLString::release(&optionPixelMean);
@@ -2944,6 +3008,73 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 			OGRDataSource::DestroyDataSource(inputVecDS);
 			
 			//OGRCleanupAll();
+			GDALDestroyDriverManager();
+		}
+        else if(this->option == RSGISExeZonalStats::varibles2matrix)
+		{
+			cout << "varibles2matrix\n";
+            cout << "Input Image: " << this->inputImage << endl;
+			cout << "Input Vector: " << this->inputVecPolys << endl;
+			cout << "Output Matrix: " << this->outputMatrix << endl;
+			cout << "Attribute Name: " << this->polyAttribute << endl;
+			GDALAllRegister();
+			OGRRegisterAll();
+			
+			RSGISVectorUtils vecUtils;
+			string SHPFileInLayer = vecUtils.getLayerName(this->inputVecPolys);
+			
+			GDALDataset **images = NULL;
+			OGRDataSource *inputVecDS = NULL;
+			OGRLayer *inputVecLayer = NULL;
+			
+			RSGISZonalStats2Matrix zonalStats;
+			ClassVariables **classVars = NULL;
+			int numMatricies = 0;	
+			
+			try
+			{
+				// Open Image
+				images = new GDALDataset*[1];
+				images[0] = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_ReadOnly);
+				if(images[0] == NULL)
+				{
+					string message = string("Could not open image ") + this->inputImage;
+					throw RSGISException(message.c_str());
+				}
+				
+				// Open vector
+				inputVecDS = OGRSFDriverRegistrar::Open(this->inputVecPolys.c_str(), FALSE);
+				if(inputVecDS == NULL)
+				{
+					string message = string("Could not open vector file ") + this->inputVecPolys;
+					throw RSGISException(message.c_str());
+				}
+				inputVecLayer = inputVecDS->GetLayerByName(SHPFileInLayer.c_str());
+				if(inputVecLayer == NULL)
+				{
+					string message = string("Could not open vector layer ") + SHPFileInLayer;
+					throw RSGISException(message.c_str());
+				}
+				
+				classVars = zonalStats.findPixelStats(images, 1, inputVecLayer, this->polyAttribute, &numMatricies, this->method);
+				RSGISMatrices matrixUtils;
+				string filepath = "";
+				for(int i = 0; i < numMatricies; i++)
+				{
+					filepath = this->outputMatrix + classVars[i]->name;
+					cout << "Saving .. " << filepath << endl;
+					matrixUtils.saveMatrix2txt(classVars[i]->matrix, filepath);
+				}
+			}
+			catch(RSGISException e)
+			{
+				throw e;
+			}
+			
+			GDALClose(images[0]);
+			OGRDataSource::DestroyDataSource(inputVecDS);
+			
+			OGRCleanupAll();
 			GDALDestroyDriverManager();
 		}
 		else if(this->option == RSGISExeZonalStats::image2matrix)
@@ -4449,6 +4580,14 @@ void RSGISExeZonalStats::printParameters()
 			cout << "Output Matrix: " << this->outputMatrix << endl;
 			cout << "Method: " << this->method << endl;
 			cout << "Output file format: " << this->outtxt << endl;
+			cout << "Attribute Name: " << this->polyAttribute << endl;
+		}
+        else if(this->option == RSGISExeZonalStats::varibles2matrix)
+		{
+			cout << "varibles2matrix\n";
+			cout << "Input Image: " << this->inputImage << endl;
+			cout << "Input Vector: " << this->inputVecPolys << endl;
+			cout << "Output Matrix: " << this->outputMatrix << endl;
 			cout << "Attribute Name: " << this->polyAttribute << endl;
 		}
 		else if(this->option == RSGISExeZonalStats::image2matrix)

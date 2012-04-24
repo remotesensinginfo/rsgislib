@@ -77,6 +77,7 @@ class RSGISExeZonalStats : public RSGISAlgorithmParameters
 			rasterpolygons2shp,
 			rasterpolygons2txt,
 			pixelVals2txt,
+            varibles2matrix,
 			image2matrix,
 			pixelcount,
 			pixelstats,

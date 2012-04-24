@@ -56,7 +56,9 @@
     <rsgis:command algor="zonalstats" option="rasterpolygons2txt" image="image.env" raster="polys.env" vector="polys.shp" output="output.txt" mean="yes" max="yes" min="yes" stddev="yes" />
     <!-- A command to extract pixel values and save to a text file -->
     <rsgis:command algor="zonalstats" option="pixelVals2txt" image="image.env" vector="polys.shp" output="output_base" attribute="classname" method="polyContainsPixel | polyContainsPixelCenter | polyOverlapsPixel | polyOverlapsOrContainsPixel | pixelContainsPoly | pixelContainsPolyCenter | adaptive | envelope" outTXT="mtxt | gtxt | csv"/>
-    <!-- TODO A command to generate a matrix file for each polygon with the out -->
+	<!-- TODO A command to generate a matrix file for each polygon with the out -->
+    <rsgis:command algor="zonalstats" option="variables2matrix" image="image.env" vector="polys.shp" output="output_base" attribute="classname" method="polyContainsPixel | polyContainsPixelCenter | polyOverlapsPixel | polyOverlapsOrContainsPixel | pixelContainsPoly | pixelContainsPolyCenter | adaptive | envelope" />
+	<!-- TODO A command to generate a matrix file for each polygon with the out -->
     <rsgis:command algor="zonalstats" option="image2matrix" image="image.env" vector="polys.shp" output="output.mtxt" band="int" />
     <!-- Deprecated TODO A command to -->
     <rsgis:command algor="zonalstats" option="pixelcount" image="image.env" raster="polys.env" vector="polys.shp" output="output.shp" force="yes | no" pxlcount="yes | no" emptyset="yes | no">
@@ -172,7 +174,7 @@
 
 
     <!-- A command to create a new attribute table with pixel counts -->
-    <rsgis:command algor="rastergis" option="createattributetable" clumps="clumps.env" output="output.att" />
+    <rsgis:command algor="rastergis" option="createattributetable" clumps="clumps.env" output="output.att" inmemory="yes | no" />
     <!-- A command to populate an attribute table with statistics from an image -->
     <rsgis:command algor="rastergis" option="popattributestatsinmem" input="image.env" clumps="clumps.env" table="input.att" tableout="output.att" >
         <rsgis:band band="int" [min="field"] [max="field"] [mean="field"] [sum="field"] [stddev="field"] [median="field"] />
