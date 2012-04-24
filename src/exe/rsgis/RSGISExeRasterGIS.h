@@ -155,6 +155,7 @@ protected:
     vector<RSGISBandAttName*> *bandAttNames;
     bool inoutTable;
     bool neighboursProvided;
+    bool attInMemory;
 };
 
 #endif

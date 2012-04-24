@@ -51,17 +51,17 @@
 
 #include "H5Cpp.h"
 
-using namespace mu;
-using namespace std;
-using namespace xercesc;
-using namespace rsgis;
-using namespace rsgis::utils;
-using namespace H5;
-
-using boost::lexical_cast;
-using boost::bad_lexical_cast;
-
 namespace rsgis{namespace rastergis{
+    
+    using namespace H5;
+    using namespace mu;
+    using namespace std;
+    using namespace xercesc;
+    using namespace rsgis;
+    using namespace rsgis::utils;
+    using boost::lexical_cast;
+    using boost::bad_lexical_cast;
+    
     
     static const string ATT_GROUPNAME_HEADER( "/HEADER" );
 	static const string ATT_GROUPNAME_DATA( "/DATA" );
@@ -80,12 +80,12 @@ namespace rsgis{namespace rastergis{
     static const string ATT_NAME_FIELD( "NAME" );
     static const string ATT_INDEX_FIELD( "INDEX" );
     
-    static const int ATT_READ_MDC_NELMTS( 0 );
-    static const hsize_t ATT_READ_RDCC_NELMTS( 512 );
-    static const hsize_t ATT_READ_RDCC_NBYTES( 1048576 );
+    static const int ATT_READ_MDC_NELMTS( 0 ); //0
+    static const hsize_t ATT_READ_RDCC_NELMTS( 512 ); // 512
+    static const hsize_t ATT_READ_RDCC_NBYTES( 1048576 ); // 1048576
     static const double ATT_READ_RDCC_W0( 0.75 );
-    static const hsize_t ATT_READ_SIEVE_BUF( 65536 );
-    static const hsize_t ATT_READ_META_BLOCKSIZE( 2048 );
+    static const hsize_t ATT_READ_SIEVE_BUF( 65536 ); // 65536
+    static const hsize_t ATT_READ_META_BLOCKSIZE( 2048 ); // 2048
     
     static const int ATT_WRITE_MDC_NELMTS( 0 );
     static const hsize_t  ATT_WRITE_RDCC_NELMTS( 512 );
@@ -107,12 +107,12 @@ namespace rsgis{namespace rastergis{
     
     struct RSGISFeature
     {
-        unsigned long long fid;
+        size_t fid;
         vector<bool> *boolFields;
         vector<long> *intFields;
         vector<double> *floatFields;
         vector<string> *stringFields;
-        vector<unsigned long long> *neighbours;
+        vector<size_t> *neighbours;
     };
     
     enum RSGISAttributeDataType
@@ -185,31 +185,29 @@ namespace rsgis{namespace rastergis{
     
     class RSGISAttributeTable : public AttIterator
     {
-    public:        
-        RSGISAttributeTable(unsigned long long numFeatures);
-        RSGISAttributeTable(unsigned long long numFeatures, vector<pair<string, RSGISAttributeDataType> > *fields);
+    public:
+        virtual bool getBoolField(size_t fid, string name) throw(RSGISAttributeTableException)=0;
+        virtual long getIntField(size_t fid, string name) throw(RSGISAttributeTableException)=0;
+        virtual double getDoubleField(size_t fid, string name) throw(RSGISAttributeTableException)=0;
+        virtual string getStringField(size_t fid, string name) throw(RSGISAttributeTableException)=0;
         
-        virtual bool getBoolField(unsigned long long fid, string name) throw(RSGISAttributeTableException)=0;
-        virtual long getIntField(unsigned long long fid, string name) throw(RSGISAttributeTableException)=0;
-        virtual double getDoubleField(unsigned long long fid, string name) throw(RSGISAttributeTableException)=0;
-        virtual string getStringField(unsigned long long fid, string name) throw(RSGISAttributeTableException)=0;
-        
-        virtual void setBoolField(unsigned long long fid, string name, bool value) throw(RSGISAttributeTableException)=0;
-        virtual void setIntField(unsigned long long fid, string name, long value) throw(RSGISAttributeTableException)=0;
-        virtual void setDoubleField(unsigned long long fid, string name, double value) throw(RSGISAttributeTableException)=0;
-        virtual void setStringField(unsigned long long fid, string name, string value) throw(RSGISAttributeTableException)=0;
+        virtual void setBoolField(size_t fid, string name, bool value) throw(RSGISAttributeTableException)=0;
+        virtual void setIntField(size_t fid, string name, long value) throw(RSGISAttributeTableException)=0;
+        virtual void setDoubleField(size_t fid, string name, double value) throw(RSGISAttributeTableException)=0;
+        virtual void setStringField(size_t fid, string name, string value) throw(RSGISAttributeTableException)=0;
         
         virtual void setBoolValue(string name, bool value) throw(RSGISAttributeTableException)=0;
         virtual void setIntValue(string name, long value) throw(RSGISAttributeTableException)=0;
         virtual void setFloatValue(string name, double value) throw(RSGISAttributeTableException)=0;
         virtual void setStringValue(string name, string value) throw(RSGISAttributeTableException)=0;
         
-        virtual RSGISFeature* getFeature(unsigned long long fid) throw(RSGISAttributeTableException)=0;
+        virtual RSGISFeature* getFeature(size_t fid) throw(RSGISAttributeTableException)=0;
+        virtual void returnFeature(RSGISFeature *feat, bool sync) throw(RSGISAttributeTableException)=0;
         
-        virtual void addAttBoolField(string name, bool val)=0;
-        virtual void addAttIntField(string name, long val)=0;
-        virtual void addAttFloatField(string name, double val)=0;
-        virtual void addAttStringField(string name, string val)=0;
+        virtual void addAttBoolField(string name, bool val) throw(RSGISAttributeTableException)=0;
+        virtual void addAttIntField(string name, long val) throw(RSGISAttributeTableException)=0;
+        virtual void addAttFloatField(string name, double val) throw(RSGISAttributeTableException)=0;
+        virtual void addAttStringField(string name, string val) throw(RSGISAttributeTableException)=0;
         
         virtual void addAttributes(vector<RSGISAttribute*> *attributes) throw(RSGISAttributeTableException)=0;
         
@@ -217,7 +215,7 @@ namespace rsgis{namespace rastergis{
         unsigned int getFieldIndex(string name) throw(RSGISAttributeTableException);
         vector<string>* getAttributeNames();
         bool hasAttribute(string name);
-        virtual unsigned long long getSize()=0;
+        virtual size_t getSize()=0;
         
         vector<double>* getFieldValues(string field) throw(RSGISAttributeTableException);
         
@@ -255,6 +253,7 @@ namespace rsgis{namespace rastergis{
         RSGISAttributeTable();
         CompType* createAttibuteIdxCompTypeDisk() throw(RSGISAttributeTableException);
         CompType* createAttibuteIdxCompTypeMem() throw(RSGISAttributeTableException);
+        void freeFeature(RSGISFeature *feat);
         vector<pair<string, RSGISAttributeDataType> > *fields;
         map<string, unsigned int> *fieldIdx;
         map<string, RSGISAttributeDataType> *fieldDataType;

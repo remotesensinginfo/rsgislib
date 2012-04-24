@@ -77,6 +77,28 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
 	{
 		throw RSGISXMLArgumentsException("The algorithm name is incorrect.");
 	}
+    
+    XMLCh *inMemoryXMLStr = XMLString::transcode("inmemory");
+    if(argElement->hasAttribute(inMemoryXMLStr))
+    {
+        XMLCh *yesStr = XMLString::transcode("yes");
+        const XMLCh *inMemValue = argElement->getAttribute(inMemoryXMLStr);
+        
+        if(XMLString::equals(inMemValue, yesStr))
+        {
+            this->attInMemory = true;
+        }
+        else
+        {
+            this->attInMemory = false;
+        }
+        XMLString::release(&yesStr);
+    }
+    else
+    {
+        this->attInMemory = false;
+    }
+    XMLString::release(&inMemoryXMLStr);
 	
 	const XMLCh *optionXML = argElement->getAttribute(optionXMLStr);
 	if(XMLString::equals(optionCreateAttributeTable, optionXML))
@@ -108,7 +130,6 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
             throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
         }
         XMLString::release(&outputXMLStr);
-        
     }
     else if(XMLString::equals(optionPopAttributeMean, optionXML))
 	{		
@@ -2738,10 +2759,13 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
                 RSGISAttributeTable *attTable;
                 RSGISCreateNewAttributeTable createTable;
                 
-                attTable = createTable.createAndPopPixelCount(clumpsDataset);
+                attTable = createTable.createAndPopPixelCount(clumpsDataset, this->attInMemory, this->outputFile);
                 
-                cout << "Exporting to ASCII\n";
-                attTable->exportHDF5(this->outputFile);
+                if(this->attInMemory)
+                {
+                    cout << "Exporting to HDF5\n";
+                    attTable->exportHDF5(this->outputFile);
+                }
                 
                 delete attTable;
                 

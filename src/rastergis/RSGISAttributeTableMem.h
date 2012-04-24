@@ -41,46 +41,51 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/cstdint.hpp>
 
-using namespace std;
-using namespace rsgis;
-using namespace rsgis::utils;
-
-using boost::lexical_cast;
-using boost::bad_lexical_cast;
+#include "H5Cpp.h"
 
 namespace rsgis{namespace rastergis{
+    
+    using namespace std;
+    using namespace rsgis;
+    using namespace rsgis::utils;
+    
+    using boost::lexical_cast;
+    using boost::bad_lexical_cast;
+    
+    using namespace H5;
 
     class RSGISAttributeTableMem : public RSGISAttributeTable
     {
     public:        
-        RSGISAttributeTableMem(unsigned long long numFeatures);
-        RSGISAttributeTableMem(unsigned long long numFeatures, vector<pair<string, RSGISAttributeDataType> > *fields);
+        RSGISAttributeTableMem(size_t numFeatures);
+        RSGISAttributeTableMem(size_t numFeatures, vector<pair<string, RSGISAttributeDataType> > *fields);
         
-        bool getBoolField(unsigned long long fid, string name) throw(RSGISAttributeTableException);
-        long getIntField(unsigned long long fid, string name) throw(RSGISAttributeTableException);
-        double getDoubleField(unsigned long long fid, string name) throw(RSGISAttributeTableException);
-        string getStringField(unsigned long long fid, string name) throw(RSGISAttributeTableException);
+        bool getBoolField(size_t fid, string name) throw(RSGISAttributeTableException);
+        long getIntField(size_t fid, string name) throw(RSGISAttributeTableException);
+        double getDoubleField(size_t fid, string name) throw(RSGISAttributeTableException);
+        string getStringField(size_t fid, string name) throw(RSGISAttributeTableException);
         
-        void setBoolField(unsigned long long fid, string name, bool value) throw(RSGISAttributeTableException);
-        void setIntField(unsigned long long fid, string name, long value) throw(RSGISAttributeTableException);
-        void setDoubleField(unsigned long long fid, string name, double value) throw(RSGISAttributeTableException);
-        void setStringField(unsigned long long fid, string name, string value) throw(RSGISAttributeTableException);
+        void setBoolField(size_t fid, string name, bool value) throw(RSGISAttributeTableException);
+        void setIntField(size_t fid, string name, long value) throw(RSGISAttributeTableException);
+        void setDoubleField(size_t fid, string name, double value) throw(RSGISAttributeTableException);
+        void setStringField(size_t fid, string name, string value) throw(RSGISAttributeTableException);
         
         void setBoolValue(string name, bool value) throw(RSGISAttributeTableException);
         void setIntValue(string name, long value) throw(RSGISAttributeTableException);
         void setFloatValue(string name, double value) throw(RSGISAttributeTableException);
         void setStringValue(string name, string value) throw(RSGISAttributeTableException);
         
-        RSGISFeature* getFeature(unsigned long long fid) throw(RSGISAttributeTableException);
+        RSGISFeature* getFeature(size_t fid) throw(RSGISAttributeTableException);
+        void returnFeature(RSGISFeature *feat, bool sync) throw(RSGISAttributeTableException);
         
-        void addAttBoolField(string name, bool val);
-        void addAttIntField(string name, long val);
-        void addAttFloatField(string name, double val);
-        void addAttStringField(string name, string val);
+        void addAttBoolField(string name, bool val) throw(RSGISAttributeTableException);
+        void addAttIntField(string name, long val) throw(RSGISAttributeTableException);
+        void addAttFloatField(string name, double val) throw(RSGISAttributeTableException);
+        void addAttStringField(string name, string val) throw(RSGISAttributeTableException);
         
         void addAttributes(vector<RSGISAttribute*> *attributes) throw(RSGISAttributeTableException);
         
-        unsigned long long getSize();
+        size_t getSize();
         
         void operator++();
         void start();
@@ -95,10 +100,10 @@ namespace rsgis{namespace rastergis{
         static RSGISAttributeTable* importFromGDALRaster(string inFile)throw(RSGISAttributeTableException);
     protected:
         RSGISAttributeTableMem();
-        void createAttributeTable(unsigned long long numFeatures);
-        void createAttributeTableWithFields(unsigned long long numFeatures);
+        void createAttributeTable(size_t numFeatures);
+        void createAttributeTableWithFields(size_t numFeatures);
         vector<RSGISFeature*> *attTable;
-        unsigned long long iterIdx;
+        size_t iterIdx;
     };
 
 }}

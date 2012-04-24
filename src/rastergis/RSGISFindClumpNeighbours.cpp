@@ -29,9 +29,9 @@ namespace rsgis{namespace rastergis{
         
     }
     
-    vector<list<unsigned long>* >* RSGISFindClumpNeighbours::findNeighbours(GDALDataset *clumpImage) throw(RSGISImageCalcException)
+    vector<list<size_t>* >* RSGISFindClumpNeighbours::findNeighbours(GDALDataset *clumpImage) throw(RSGISImageCalcException)
     {
-        vector<list<unsigned long>* > *neighbours = new vector<list<unsigned long>* >();
+        vector<list<size_t>* > *neighbours = new vector<list<size_t>* >();
         
         try
         {

@@ -39,7 +39,7 @@ namespace rsgis{namespace rastergis{
         try 
         {
             // Calc max clump value = number of clumps.
-            unsigned long long numClumps = this->calcMaxValue(clumpsDataset);
+            size_t numClumps = this->calcMaxValue(clumpsDataset);
             cout << "There are " << numClumps << " in the input dataset\n";
             
             // Generate Attribute table
@@ -50,11 +50,11 @@ namespace rsgis{namespace rastergis{
             }
             else
             {
-                // Add for other attribute table types...
+                attTable = new RSGISAttributeTableHDF(numClumps, outFilePath);
             }
             attTable->addAttIntField("pxlcount", 0);
+            
             unsigned int pxlCountIdx = attTable->getFieldIndex(string("pxlcount"));
-
             
             GDALDataset **datasets = new GDALDataset*[1];
             datasets[0] = clumpsDataset;
@@ -87,14 +87,14 @@ namespace rsgis{namespace rastergis{
         return attTable;
     }
     
-    unsigned long long RSGISCreateNewAttributeTable::calcMaxValue(GDALDataset *dataset)throw(RSGISImageCalcException)
+    size_t RSGISCreateNewAttributeTable::calcMaxValue(GDALDataset *dataset)throw(RSGISImageCalcException)
     {
         unsigned int width = dataset->GetRasterXSize();
         unsigned int height = dataset->GetRasterYSize();
         GDALRasterBand *imgBand = dataset->GetRasterBand(1);
         
         unsigned int *clumpIdxs = new unsigned int[width];
-        unsigned long long maxClumpIdx = 0;
+        size_t maxClumpIdx = 0;
         
         for(unsigned int i = 0; i < height; ++i)
         {
@@ -151,6 +151,7 @@ namespace rsgis{namespace rastergis{
             {
                 RSGISFeature *feat = attTable->getFeature(clumpIdx);
                 ++feat->intFields->at(this->pxlCountIdx);
+                attTable->returnFeature(feat, true);
             }
             catch(RSGISAttributeTableException &e)
             {
