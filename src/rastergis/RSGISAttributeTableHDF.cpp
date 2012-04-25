@@ -486,12 +486,14 @@ namespace rsgis{namespace rastergis{
             {
                 size_t block = fid / ATT_WRITE_CHUNK_SIZE;
                 // Move block to back of queue.
+                //cacheQ->remove(block);
+                //cacheQ->push_back(block);
                 for(list<size_t>::iterator iterBlocks = cacheQ->begin(); iterBlocks != cacheQ->end(); )
                 {
                     if((*iterBlocks) == block)
                     {
                         iterBlocks = cacheQ->erase(iterBlocks);
-                        cacheQ->push_back(block);
+                        cacheQ->push_front(block);
                         break;
                     }
                     else
@@ -1309,8 +1311,8 @@ namespace rsgis{namespace rastergis{
             //////////////////////////////////////////////////////////////////
             if(cacheQ->size() > this->maxNumOfBlockInCache)
             {
-                size_t tmpBlock = *cacheQ->begin();
-                cacheQ->pop_front();
+                size_t tmpBlock = cacheQ->back();
+                cacheQ->pop_back();
                 this->removeFromCache(tmpBlock);
             }
             //////////////////////////////////////////////////////////////////
