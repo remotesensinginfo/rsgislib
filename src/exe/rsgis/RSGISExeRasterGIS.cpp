@@ -2756,7 +2756,7 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
                     throw RSGISImageException(message.c_str());
                 }
                 
-                RSGISAttributeTable *attTable;
+                RSGISAttributeTable *attTable = NULL;
                 RSGISCreateNewAttributeTable createTable;
                 
                 attTable = createTable.createAndPopPixelCount(clumpsDataset, this->attInMemory, this->outputFile);
