@@ -378,6 +378,10 @@ namespace rsgis{namespace rastergis{
             delete[] dataBlock;
             delete[] inputData;
         }
+        catch(RSGISAttributeTableException &e)
+        {
+            throw RSGISImageCalcException(e.what());
+        }
         catch(RSGISImageCalcException &e)
         {
             throw e;
