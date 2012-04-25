@@ -183,7 +183,7 @@
         <rsgis:band band="int" [min="field"] [max="field"] [mean="field"] [sum="field"] [stddev="field"] [median="field"] />
     </rsgis:command>
 	<!-- A command to populate an attribute table with statistics from an image in a memory efficient manor -->
-    <rsgis:command algor="rastergis" option="popattributestats" input="image.env" clumps="clumps.env" table="input.att" tableout="output.att" >
+    <rsgis:command algor="rastergis" option="popattributestats" input="image.env" clumps="clumps.env" table="input.att" [tableout="output.att"] >
         <rsgis:band band="int" [min="field"] [max="field"] [mean="field"] [sum="field"] [stddev="field"] />
         <rsgis:band band="int" [min="field"] [max="field"] [mean="field"] [sum="field"] [stddev="field"] />
         <rsgis:band band="int" [min="field"] [max="field"] [mean="field"] [sum="field"] [stddev="field"] />
@@ -279,7 +279,7 @@
     <!-- A command to populate the attribute table with the number of pixels in the clumps image which intersect with the polygon -->
     <rsgis:command algor="rastergis" option="countpolyintersects" vector="polys.shp" clumps="clumps.env" table="input.att" tableout="output.att" field="attribute_name" method="polyContainsPixel | polyContainsPixelCenter | polyOverlapsPixel | polyOverlapsOrContainsPixel | pixelContainsPoly | pixelContainsPolyCenter | adaptive | envelope" />
     <!-- A command to calculate an attribute from other attributes -->
-    <rsgis:command algor="rastergis" option="calcattributes" table="input.att" tableout="output.att" field="attribute_name" datatype="rsgis_int | rsgis_float" [expression="MU Parser Expression" | expressionfile="file.txt"] >
+    <rsgis:command algor="rastergis" option="calcattributes" table="input.att" [tableout="output.att"] field="attribute_name" datatype="rsgis_int | rsgis_float" [expression="MU Parser Expression" | expressionfile="file.txt"] >
         <rsgis:attribute variable="string" name="string" />
         <rsgis:attribute variable="string" name="string" />
         <rsgis:attribute variable="string" name="string" />

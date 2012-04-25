@@ -28,14 +28,14 @@ namespace rsgis{namespace rastergis{
         this->attOpen = false;
         this->attSize = 0;
         this->readOnly = true;
-        this->maxCacheSize = 0;
+        this->maxCacheSize = 10000;
         this->numOfReads = 0;
         this->numOfWrites = 0;
         this->featCache = NULL;
         this->cacheQ = new list<size_t>();
         this->numOfBlocks = 0;
         this->remainingFeatures = 0;
-        this->maxNumOfBlockInCache = 0;
+        this->maxNumOfBlockInCache = (this->maxCacheSize / ATT_WRITE_CHUNK_SIZE)+1;
     }
     
     RSGISAttributeTableHDF::RSGISAttributeTableHDF(size_t numFeatures, string filePath, bool readOnly, size_t maxCacheSize) throw(RSGISAttributeTableException) : RSGISAttributeTable()
@@ -171,20 +171,112 @@ namespace rsgis{namespace rastergis{
         
     bool RSGISAttributeTableHDF::getBoolField(size_t fid, string name) throw(RSGISAttributeTableException)
     {
-        throw RSGISAttributeTableException("getBoolField not implemented.");
-        return false;
+        bool outVal = false;
+        
+        try 
+        {
+            unsigned int idx = this->getFieldIndex(name);
+            RSGISAttributeDataType dt = this->getDataType(name);
+            if(dt != rsgis_bool)
+            {
+                throw RSGISAttributeTableException("Field is not of boolean data type.");
+            }
+            if(idx >= numBoolFields)
+            {
+                throw RSGISAttributeTableException("Field index is not within attribute.");
+            }
+            if(fid >= this->getSize())
+            {
+                string message = string("Feature (") + name + string(") is not within the attribute table.");
+                throw RSGISAttributeTableException(message);
+            }
+            
+            if(this->featCache[fid] == NULL)
+            {
+                this->populateCache(fid);
+            }
+            outVal = this->featCache[fid]->boolFields->at(idx);
+            
+        } 
+        catch (RSGISAttributeTableException &e) 
+        {
+            throw e;
+        }
+        
+        return outVal;
     }
     
     long RSGISAttributeTableHDF::getIntField(size_t fid, string name) throw(RSGISAttributeTableException)
     {
-        throw RSGISAttributeTableException("getIntField not implemented.");
-        return 0;
+        long outVal = 0;
+        
+        try 
+        {
+            unsigned int idx = this->getFieldIndex(name);
+            RSGISAttributeDataType dt = this->getDataType(name);
+            if(dt != rsgis_int)
+            {
+                throw RSGISAttributeTableException("Field is not of integer data type.");
+            }
+            if(idx >= numIntFields)
+            {
+                throw RSGISAttributeTableException("Field index is not within attribute.");
+            }
+            if(fid >= this->getSize())
+            {
+                string message = string("Feature (") + name + string(") is not within the attribute table.");
+                throw RSGISAttributeTableException(message);
+            }
+            
+            if(this->featCache[fid] == NULL)
+            {
+                this->populateCache(fid);
+            }
+            outVal = this->featCache[fid]->intFields->at(idx);
+            
+        } 
+        catch (RSGISAttributeTableException &e) 
+        {
+            throw e;
+        }
+        
+        return outVal;
     }
     
     double RSGISAttributeTableHDF::getDoubleField(size_t fid, string name) throw(RSGISAttributeTableException)
     {
-        throw RSGISAttributeTableException("getDoubleField not implemented.");
-        return 0.0;
+        double outVal = 0;
+        
+        try 
+        {
+            unsigned int idx = this->getFieldIndex(name);
+            RSGISAttributeDataType dt = this->getDataType(name);
+            if(dt != rsgis_float)
+            {
+                throw RSGISAttributeTableException("Field is not of float data type.");
+            }
+            if(idx >= numFloatFields)
+            {
+                throw RSGISAttributeTableException("Field index is not within attribute.");
+            }
+            if(fid >= this->getSize())
+            {
+                string message = string("Feature (") + name + string(") is not within the attribute table.");
+                throw RSGISAttributeTableException(message);
+            }
+            
+            if(this->featCache[fid] == NULL)
+            {
+                this->populateCache(fid);
+            }
+            outVal = this->featCache[fid]->floatFields->at(idx);
+        } 
+        catch (RSGISAttributeTableException &e) 
+        {
+            throw e;
+        }
+        
+        return outVal;
     }
 
     string RSGISAttributeTableHDF::getStringField(size_t fid, string name) throw(RSGISAttributeTableException)
@@ -196,17 +288,98 @@ namespace rsgis{namespace rastergis{
         
     void RSGISAttributeTableHDF::setBoolField(size_t fid, string name, bool value) throw(RSGISAttributeTableException)
     {
-        throw RSGISAttributeTableException("setBoolField not implemented.");
+        try 
+        {
+            unsigned int idx = this->getFieldIndex(name);
+            RSGISAttributeDataType dt = this->getDataType(name);
+            if(dt != rsgis_bool)
+            {
+                throw RSGISAttributeTableException("Field is not of boolean data type.");
+            }
+            if(idx >= numBoolFields)
+            {
+                throw RSGISAttributeTableException("Field index is not within attribute.");
+            }
+            if(fid >= this->getSize())
+            {
+                string message = string("Feature (") + name + string(") is not within the attribute table.");
+                throw RSGISAttributeTableException(message);
+            }
+            
+            if(this->featCache[fid] == NULL)
+            {
+                this->populateCache(fid);
+            }
+            this->featCache[fid]->boolFields->at(idx) = value;
+        } 
+        catch (RSGISAttributeTableException &e) 
+        {
+            throw e;
+        }
     }
     
     void RSGISAttributeTableHDF::setIntField(size_t fid, string name, long value) throw(RSGISAttributeTableException)
     {
-        throw RSGISAttributeTableException("setIntField not implemented.");
+        try 
+        {
+            unsigned int idx = this->getFieldIndex(name);
+            RSGISAttributeDataType dt = this->getDataType(name);
+            if(dt != rsgis_int)
+            {
+                throw RSGISAttributeTableException("Field is not of integer data type.");
+            }
+            if(idx >= numIntFields)
+            {
+                throw RSGISAttributeTableException("Field index is not within attribute.");
+            }
+            if(fid >= this->getSize())
+            {
+                string message = string("Feature (") + name + string(") is not within the attribute table.");
+                throw RSGISAttributeTableException(message);
+            }
+            
+            if(this->featCache[fid] == NULL)
+            {
+                this->populateCache(fid);
+            }
+            this->featCache[fid]->intFields->at(idx) = value;
+        } 
+        catch (RSGISAttributeTableException &e) 
+        {
+            throw e;
+        }
     }
     
     void RSGISAttributeTableHDF::setDoubleField(size_t fid, string name, double value) throw(RSGISAttributeTableException)
     {
-        throw RSGISAttributeTableException("setDoubleField not implemented.");
+        try 
+        {
+            unsigned int idx = this->getFieldIndex(name);
+            RSGISAttributeDataType dt = this->getDataType(name);
+            if(dt != rsgis_float)
+            {
+                throw RSGISAttributeTableException("Field is not of float data type.");
+            }
+            if(idx >= numFloatFields)
+            {
+                throw RSGISAttributeTableException("Field index is not within attribute.");
+            }
+            if(fid >= this->getSize())
+            {
+                string message = string("Feature (") + name + string(") is not within the attribute table.");
+                throw RSGISAttributeTableException(message);
+            }
+            
+            if(this->featCache[fid] == NULL)
+            {
+                this->populateCache(fid);
+            }
+            this->featCache[fid]->floatFields->at(idx) = value;
+        } 
+        catch (RSGISAttributeTableException &e) 
+        {
+            throw e;
+        }
     }
     
     void RSGISAttributeTableHDF::setStringField(size_t fid, string name, string value) throw(RSGISAttributeTableException)
@@ -216,17 +389,77 @@ namespace rsgis{namespace rastergis{
         
     void RSGISAttributeTableHDF::setBoolValue(string name, bool value) throw(RSGISAttributeTableException)
     {
-        throw RSGISAttributeTableException("setBoolValue not implemented.");
+        try
+        {
+            if(!this->hasAttribute(name))
+            {
+                this->addAttBoolField(name, value);
+            }
+            else if(this->getDataType(name) != rsgis_bool)
+            {
+                throw RSGISAttributeTableException("Field is not of type boolean.");
+            }
+            unsigned int idx = this->getFieldIndex(name);
+            
+            for(this->start(); this->end(); ++(*this))
+            {
+                (*(*this))->boolFields->at(idx) = value;
+            }
+        }
+        catch(RSGISAttributeTableException &e)
+        {
+            throw e;
+        }
     }
     
     void RSGISAttributeTableHDF::setIntValue(string name, long value) throw(RSGISAttributeTableException)
     {
-        throw RSGISAttributeTableException("setIntValue not implemented.");
+        try
+        {
+            if(!this->hasAttribute(name))
+            {
+                this->addAttIntField(name, value);
+            }
+            else if(this->getDataType(name) != rsgis_int)
+            {
+                throw RSGISAttributeTableException("Field is not of type integer.");
+            }
+            unsigned int idx = this->getFieldIndex(name);
+            
+            for(this->start(); this->end(); ++(*this))
+            {
+                (*(*this))->intFields->at(idx) = value;
+            }
+        }
+        catch(RSGISAttributeTableException &e)
+        {
+            throw e;
+        }
     }
         
     void RSGISAttributeTableHDF::setFloatValue(string name, double value) throw(RSGISAttributeTableException)
     {
-        throw RSGISAttributeTableException("setFloatValue not implemented.");
+        try
+        {
+            if(!this->hasAttribute(name))
+            {
+                this->addAttFloatField(name, value);
+            }
+            else if(this->getDataType(name) != rsgis_float)
+            {
+                throw RSGISAttributeTableException("Field is not of type float.");
+            }
+            unsigned int idx = this->getFieldIndex(name);
+            
+            for(this->start(); this->end(); ++(*this))
+            {
+                (*(*this))->floatFields->at(idx) = value;
+            }
+        }
+        catch(RSGISAttributeTableException &e)
+        {
+            throw e;
+        }
     }
     
     void RSGISAttributeTableHDF::setStringValue(string name, string value) throw(RSGISAttributeTableException)
@@ -400,7 +633,7 @@ namespace rsgis{namespace rastergis{
                 newBoolDataspace.close();
             }
             else
-            {
+            {                
                 hsize_t initDimsBoolFieldsDS[1];
                 initDimsBoolFieldsDS[0] = 0;
                 hsize_t maxDimsBoolFieldsDS[1];
@@ -414,7 +647,7 @@ namespace rsgis{namespace rastergis{
                 creationBoolFieldsDSPList.setChunk(1, dimsBoolFieldsChunk);
                 creationBoolFieldsDSPList.setShuffle();
                 creationBoolFieldsDSPList.setDeflate(ATT_WRITE_DEFLATE);
-                DataSet boolFieldsDataset = DataSet(attH5File->createDataSet(ATT_INT_FIELDS_HEADER, *fieldDtDisk, boolFieldsDataSpace, creationBoolFieldsDSPList));
+                DataSet boolFieldsDataset = DataSet(attH5File->createDataSet(ATT_BOOL_FIELDS_HEADER, *fieldDtDisk, boolFieldsDataSpace, creationBoolFieldsDSPList));
                 
                 hsize_t extendBoolFieldsDatasetTo[1];
                 extendBoolFieldsDatasetTo[0] = this->numBoolFields;
@@ -859,7 +1092,7 @@ namespace rsgis{namespace rastergis{
                 creationFloatFieldsDSPList.setChunk(1, dimsFloatFieldsChunk);
                 creationFloatFieldsDSPList.setShuffle();
                 creationFloatFieldsDSPList.setDeflate(ATT_WRITE_DEFLATE);
-                DataSet floatFieldsDataset = DataSet(attH5File->createDataSet(ATT_INT_FIELDS_HEADER, *fieldDtDisk, floatFieldsDataSpace, creationFloatFieldsDSPList));
+                DataSet floatFieldsDataset = DataSet(attH5File->createDataSet(ATT_FLOAT_FIELDS_HEADER, *fieldDtDisk, floatFieldsDataSpace, creationFloatFieldsDSPList));
                 
                 hsize_t extendFloatFieldsDatasetTo[1];
                 extendFloatFieldsDatasetTo[0] = this->numFloatFields;
@@ -1076,8 +1309,6 @@ namespace rsgis{namespace rastergis{
             }
             //////////////////////////////////////////////////////////////////
             
-            //cout << "Reading block " << block << endl;
-            
             /* Number of Neighbours */
             DataSpace numNeighboursDataspace = numNeighboursDataset.getSpace();
             hsize_t numNeighboursOffset[1];
@@ -1102,20 +1333,19 @@ namespace rsgis{namespace rastergis{
             
             numNeighboursMemspace.close();
             numNeighboursDataspace.close();
-            
-            
+                        
             /* Neighbours */
             DataSpace neighboursDataspace = neighboursDataset.getSpace();
             hsize_t neighboursOffset[2];
 			neighboursOffset[0] = 0;
             neighboursOffset[1] = 0;
 			hsize_t neighboursCount[2];
-			neighboursCount[0] = ATT_WRITE_CHUNK_SIZE;
+			neighboursCount[0] = blockSize;
             neighboursCount[1] = neighboursLineLength;
 			neighboursDataspace.selectHyperslab( H5S_SELECT_SET, neighboursCount, neighboursOffset );
 			
 			hsize_t neighboursDimsRead[2]; 
-			neighboursDimsRead[0] = ATT_WRITE_CHUNK_SIZE;
+			neighboursDimsRead[0] = blockSize;
             neighboursDimsRead[1] = neighboursLineLength;
 			DataSpace neighboursMemspace( 2, neighboursDimsRead );
 			
@@ -1123,7 +1353,7 @@ namespace rsgis{namespace rastergis{
             neighboursOffset_out[0] = 0;
             neighboursOffset_out[1] = 0;
 			hsize_t neighboursCount_out[2];
-			neighboursCount_out[0] = ATT_WRITE_CHUNK_SIZE;
+			neighboursCount_out[0] = blockSize;
             neighboursCount_out[1] = neighboursLineLength;
 			neighboursMemspace.selectHyperslab( H5S_SELECT_SET, neighboursCount_out, neighboursOffset_out );
             
@@ -1133,7 +1363,7 @@ namespace rsgis{namespace rastergis{
             
             neighboursDataspace.close();
             neighboursMemspace.close();
-            
+                        
             int *boolVals = NULL;
             if(this->numBoolFields > 0)
             {
@@ -1204,7 +1434,7 @@ namespace rsgis{namespace rastergis{
             if(this->numFloatFields > 0)
             {
                 floatVals = new double[blockSize*this->numFloatFields];
-
+                
                 DataSpace floatDataspace = floatDataset.getSpace();
                 hsize_t floatFieldsOffset[2];
                 floatFieldsOffset[0] = startFID;
@@ -1261,7 +1491,7 @@ namespace rsgis{namespace rastergis{
                     this->featCache[i]->floatFields->reserve(this->numFloatFields);
                     for(size_t j = 0; j < this->numFloatFields; ++j)
                     {
-                        this->featCache[i]->floatFields->push_back(boolVals[(n*this->numFloatFields)+j]);
+                        this->featCache[i]->floatFields->push_back(floatVals[(n*this->numFloatFields)+j]);
                     }
                 }
                 this->featCache[i]->stringFields = new vector<string>();
@@ -1278,9 +1508,18 @@ namespace rsgis{namespace rastergis{
             
             delete[] neighbourVals;
             delete[] numNeighbourVals;
-            delete[] boolVals;
-            delete[] intVals;
-            delete[] floatVals;
+            if(this->numBoolFields > 0)
+            {
+                delete[] boolVals;
+            }
+            if(this->numIntFields > 0)
+            {
+                delete[] intVals;
+            }
+            if(this->numFloatFields > 0)
+            {
+                delete[] floatVals;
+            }
             
             this->cacheQ->push_back(block);
             //cout << "Cache has " << this->cacheQ->size() << " blocks loaded\n";
@@ -1500,7 +1739,7 @@ namespace rsgis{namespace rastergis{
         }
     }
     
-    RSGISAttributeTable* RSGISAttributeTableHDF::importFromHDF5(string inFile)throw(RSGISAttributeTableException)
+    RSGISAttributeTable* RSGISAttributeTableHDF::importFromHDF5(string inFile, bool readOnly, size_t maxCacheSize)throw(RSGISAttributeTableException)
     {
         RSGISAttributeTableHDF *attTableObj = new RSGISAttributeTableHDF();
         try
@@ -1512,9 +1751,9 @@ namespace rsgis{namespace rastergis{
             attAccessPlist.setSieveBufSize(ATT_READ_SIEVE_BUF);
             hsize_t metaBlockSize = ATT_READ_META_BLOCKSIZE;
             attAccessPlist.setMetaBlockSize(metaBlockSize);
-            
-            attTableObj->attH5File = new H5File( inFile, H5F_ACC_RDONLY, FileCreatPropList::DEFAULT, attAccessPlist);
-            
+                        
+            attTableObj->attH5File = new H5File( inFile, H5F_ACC_RDWR, FileCreatPropList::DEFAULT, attAccessPlist);
+                        
             attTableObj->hasBoolFields = true;
             attTableObj->hasIntFields = true;
             attTableObj->hasFloatFields = true;
@@ -1772,6 +2011,9 @@ namespace rsgis{namespace rastergis{
         attTableObj->featCache = new RSGISFeature*[attTableObj->attSize];
         attTableObj->numOfBlocks = attTableObj->attSize / ATT_WRITE_CHUNK_SIZE;
         attTableObj->remainingFeatures = attTableObj->attSize - (attTableObj->numOfBlocks * ATT_WRITE_CHUNK_SIZE);
+        attTableObj->readOnly = readOnly;
+        attTableObj->maxCacheSize = maxCacheSize;
+        attTableObj->maxNumOfBlockInCache = (attTableObj->maxCacheSize / ATT_WRITE_CHUNK_SIZE)+1;
         
         return attTableObj;
     }
