@@ -95,7 +95,7 @@ namespace rsgis{namespace rastergis{
         
         ~RSGISAttributeTableHDF();
         
-        static RSGISAttributeTable* importFromHDF5(string inFile)throw(RSGISAttributeTableException);
+        static RSGISAttributeTable* importFromHDF5(string inFile, bool readOnly, size_t maxCacheSize=10000)throw(RSGISAttributeTableException);
     protected:
         RSGISAttributeTableHDF();
         void createAttributeTable(size_t numFeatures, string filePath)throw(RSGISAttributeTableException);

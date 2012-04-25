@@ -535,7 +535,7 @@ namespace rsgis{namespace rastergis{
                 throw RSGISImageCalcException("Cannot proceed as \'pxlcount\' field is not of type integer.");
             }
             unsigned int pxlCountIdx = attTable->getFieldIndex("pxlcount");
-            
+                        
             if(!attTable->hasAttribute("first"))
             {
                 attTable->addAttBoolField("first", true);
@@ -545,7 +545,7 @@ namespace rsgis{namespace rastergis{
                 throw RSGISImageCalcException("Cannot proceed as \'first\' field is not of type boolean.");
             }
             unsigned int firstFieldIdx = attTable->getFieldIndex("first");
-            
+                        
             bool meanCalc = false;
             bool stdDevCalc = false;
             for(vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
@@ -653,7 +653,9 @@ namespace rsgis{namespace rastergis{
             }
             
             // Calculate Appropriate Min, Max, Sum and Mean Values.
+            cout << "Setting true to all first features\n";
             attTable->setBoolValue("first", true);
+            cout << "set true to all first features\n";
             RSGISCalcClumpStatsWithinAtt *calcAttStats = new RSGISCalcClumpStatsWithinAtt(attTable, bandStats, false, pxlCountIdx, firstFieldIdx);
             RSGISCalcImage calcImage(calcAttStats);
             calcImage.calcImage(datasets, numDatasets);

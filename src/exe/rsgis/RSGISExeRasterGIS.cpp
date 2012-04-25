@@ -717,11 +717,12 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
         {
             char *charValue = XMLString::transcode(argElement->getAttribute(tableOutXMLStr));
             this->outAttTableFile = string(charValue);
+            this->attInMemory = true;
             XMLString::release(&charValue);
         }
         else
         {
-            throw RSGISXMLArgumentsException("No \'tableout\' attribute was provided.");
+            this->attInMemory = false;
         }
         XMLString::release(&tableOutXMLStr);
         
@@ -1075,11 +1076,12 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
         {
             char *charValue = XMLString::transcode(argElement->getAttribute(tableOutXMLStr));
             this->outAttTableFile = string(charValue);
+            this->attInMemory = true;
             XMLString::release(&charValue);
         }
         else
         {
-            throw RSGISXMLArgumentsException("No \'tableout\' attribute was provided.");
+            this->attInMemory = false;
         }
         XMLString::release(&tableOutXMLStr);
         
@@ -3150,7 +3152,14 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
         {
             cout << "A command to calculate an attribute from other attributes\n";
             cout << "Input Table: " << this->attTableFile << endl;
-            cout << "Output Table: " << this->outAttTableFile << endl;
+            if(this->attInMemory)
+            {
+                cout << "Output Table: " << this->outAttTableFile << endl;
+            }
+            else
+            {
+                cout << "Processing within existing table\n";
+            }
             cout << "Expression: " << this->mathsExpression << endl;
             cout << "Field: " << this->attField << endl;
             
@@ -3158,24 +3167,34 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
             {
                 cout << "Importing Attribute Table\n";
                 RSGISAttributeTable *attTable = NULL;
-                if(RSGISAttributeTableMem::findFileType(attTableFile) == rsgis_ascii_attft)
+                if(this->attInMemory)
                 {
-                    attTable = RSGISAttributeTableMem::importFromASCII(attTableFile);
-                }
-                else if(RSGISAttributeTableMem::findFileType(attTableFile) == rsgis_hdf_attft)
-                {
-                    attTable = RSGISAttributeTableMem::importFromHDF5(attTableFile);
+                    if(RSGISAttributeTableMem::findFileType(attTableFile) == rsgis_ascii_attft)
+                    {
+                        attTable = RSGISAttributeTableMem::importFromASCII(attTableFile);
+                    }
+                    else if(RSGISAttributeTableMem::findFileType(attTableFile) == rsgis_hdf_attft)
+                    {
+                        attTable = RSGISAttributeTableMem::importFromHDF5(attTableFile);
+                    }
+                    else
+                    {
+                        throw RSGISAttributeTableException("Could not identify attribute table file type.");
+                    }
                 }
                 else
                 {
-                    throw RSGISAttributeTableException("Could not identify attribute table file type.");
+                    attTable = RSGISAttributeTableHDF::importFromHDF5(attTableFile, false);
                 }
                 
                 cout << "Evalute Expression\n";
                 attTable->calculateFieldsMUParser(this->mathsExpression, this->attField, this->attFieldDT, this->variables);
                 
-                cout << "Exporting Attribute Table\n";
-                attTable->exportHDF5(outAttTableFile);
+                if(this->attInMemory)
+                {
+                    cout << "Exporting Attribute Table\n";
+                    attTable->exportHDF5(outAttTableFile);
+                }
                 cout << "Finished\n";
                 
                 delete attTable;
@@ -3285,7 +3304,14 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
             cout << "Input Image: " << this->inputImage << endl;
             cout << "Clump Image: " << this->clumpsImage << endl;
             cout << "Input Table: " << this->attTableFile << endl;
-            cout << "Output Table: " << this->outAttTableFile << endl;
+            if(this->attInMemory)
+            {
+                cout << "Output Table: " << this->outAttTableFile << endl;
+            }
+            else
+            {
+                cout << "Processing within existing table\n";
+            }
             cout << "Statistics to be calculated:\n";
             for(vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
             {
@@ -3337,25 +3363,35 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
                 
                 cout << "Importing Attribute Table:\n";
                 RSGISAttributeTable *attTable = NULL;
-                if(RSGISAttributeTableMem::findFileType(attTableFile) == rsgis_ascii_attft)
+                if(this->attInMemory)
                 {
-                    attTable = RSGISAttributeTableMem::importFromASCII(attTableFile);
-                }
-                else if(RSGISAttributeTableMem::findFileType(attTableFile) == rsgis_hdf_attft)
-                {
-                    attTable = RSGISAttributeTableMem::importFromHDF5(attTableFile);
+                    if(RSGISAttributeTableMem::findFileType(attTableFile) == rsgis_ascii_attft)
+                    {
+                        attTable = RSGISAttributeTableMem::importFromASCII(attTableFile);
+                    }
+                    else if(RSGISAttributeTableMem::findFileType(attTableFile) == rsgis_hdf_attft)
+                    {
+                        attTable = RSGISAttributeTableMem::importFromHDF5(attTableFile);
+                    }
+                    else
+                    {
+                        throw RSGISAttributeTableException("Could not identify attribute table file type.");
+                    }
                 }
                 else
                 {
-                    throw RSGISAttributeTableException("Could not identify attribute table file type.");
+                    attTable = RSGISAttributeTableHDF::importFromHDF5(attTableFile, false);
                 }
                 
                 cout << "Calculating Statistics\n";
                 RSGISPopulateAttributeTableBandStats calcBandStats;
                 calcBandStats.populateWithBandStatisticsWithinAtt(attTable, datasets, 2, bandStats);
                 
-                cout << "Exporting Attribute Table\n";
-                attTable->exportHDF5(outAttTableFile);
+                if(this->attInMemory)
+                {
+                    cout << "Exporting Attribute Table\n";
+                    attTable->exportHDF5(outAttTableFile);
+                }
                 cout << "Finished\n";               
                 
                 GDALClose(datasets[0]);
