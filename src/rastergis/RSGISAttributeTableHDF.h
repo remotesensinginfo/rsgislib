@@ -128,7 +128,7 @@ namespace rsgis{namespace rastergis{
     
     
     
-    
+   /* 
     
     class RSGISAttributeTableHDFSmallCache : public RSGISAttributeTable
     {
@@ -196,7 +196,7 @@ namespace rsgis{namespace rastergis{
         size_t numOfWrites;
     };
     
-    
+    */
 }}
 
 

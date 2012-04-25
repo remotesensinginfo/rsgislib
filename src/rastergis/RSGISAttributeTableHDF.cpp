@@ -545,6 +545,8 @@ namespace rsgis{namespace rastergis{
         
         try
         {
+            this->flushAllFeatures();
+            
             fieldIdx->insert(pair<string, unsigned int>(name, numBoolFields));
             fieldDataType->insert(pair<string, RSGISAttributeDataType>(name, rsgis_bool));
             fields->push_back(pair<string, RSGISAttributeDataType>(name, rsgis_bool));
@@ -767,6 +769,8 @@ namespace rsgis{namespace rastergis{
         
         try
         {
+            this->flushAllFeatures();
+            
             fieldIdx->insert(pair<string, unsigned int>(name, numIntFields));
             fieldDataType->insert(pair<string, RSGISAttributeDataType>(name, rsgis_int));
             fields->push_back(pair<string, RSGISAttributeDataType>(name, rsgis_int));
@@ -812,7 +816,7 @@ namespace rsgis{namespace rastergis{
                 
                 hsize_t intDataOffset[2];
                 intDataOffset[0] = 0;
-                intDataOffset[1] = 0;
+                intDataOffset[1] = this->numIntFields-1;
                 hsize_t intDataDims[2];
                 intDataDims[0] = ATT_WRITE_CHUNK_SIZE;
                 intDataDims[1] = 1;
@@ -990,6 +994,8 @@ namespace rsgis{namespace rastergis{
         
         try
         {
+            this->flushAllFeatures();
+            
             fieldIdx->insert(pair<string, unsigned int>(name, numFloatFields));
             fieldDataType->insert(pair<string, RSGISAttributeDataType>(name, rsgis_float));
             fields->push_back(pair<string, RSGISAttributeDataType>(name, rsgis_float));
@@ -1611,7 +1617,7 @@ namespace rsgis{namespace rastergis{
                     
                     DataSpace intWriteDataSpace = intDataset.getSpace();
                     intWriteDataSpace.selectHyperslab(H5S_SELECT_SET, intDataDims, intDataOffset);
-                    DataSpace newIntDataspace = DataSpace(1, intDataDims);
+                    DataSpace newIntDataspace = DataSpace(2, intDataDims);
                     intDataset.write(intVals, PredType::NATIVE_LONG, newIntDataspace, intWriteDataSpace);
                     
                     delete[] intVals;
@@ -2052,7 +2058,7 @@ namespace rsgis{namespace rastergis{
     
     
     
-    
+  /*  
     
     
     RSGISAttributeTableHDFSmallCache::RSGISAttributeTableHDFSmallCache() : RSGISAttributeTable()
@@ -2273,7 +2279,7 @@ namespace rsgis{namespace rastergis{
                 
                 unsigned int numNeighboursVal = 0;
                 
-                /* Number of Neighbours */
+                // Number of Neighbours
                 DataSpace numNeighboursDataspace = this->numNeighboursDataset.getSpace();
                 hsize_t numNeighboursOffset[1];
                 numNeighboursOffset[0] = fid;
@@ -2709,7 +2715,7 @@ namespace rsgis{namespace rastergis{
                 
                 hsize_t boolDataOffset[2];
                 boolDataOffset[0] = 0;
-                boolDataOffset[1] = 0;
+                boolDataOffset[1] = this->numBoolFields-1;
                 hsize_t boolDataDims[2];
                 boolDataDims[0] = ATT_WRITE_CHUNK_SIZE;
                 boolDataDims[1] = 1;
@@ -2931,7 +2937,7 @@ namespace rsgis{namespace rastergis{
                 
                 hsize_t intDataOffset[2];
                 intDataOffset[0] = 0;
-                intDataOffset[1] = 0;
+                intDataOffset[1] = this->numIntFields-1;
                 hsize_t intDataDims[2];
                 intDataDims[0] = ATT_WRITE_CHUNK_SIZE;
                 intDataDims[1] = 1;
@@ -3154,7 +3160,7 @@ namespace rsgis{namespace rastergis{
                 
                 hsize_t floatDataOffset[2];
                 floatDataOffset[0] = 0;
-                floatDataOffset[1] = 0;
+                floatDataOffset[1] = this->numFloatFields-1;
                 hsize_t floatDataDims[2];
                 floatDataDims[0] = ATT_WRITE_CHUNK_SIZE;
                 floatDataDims[1] = 1;
@@ -3677,7 +3683,7 @@ namespace rsgis{namespace rastergis{
     }
     
     
-    
+    */
     
     
     
