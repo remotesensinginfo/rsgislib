@@ -131,6 +131,7 @@ class RSGISExeSegment : public RSGISAlgorithmParameters
         unsigned int subDivision;
         unsigned int levels;
         bool outputWithConsecutiveFIDs;
+        unsigned int cacheSize;
 	};
 
 #endif

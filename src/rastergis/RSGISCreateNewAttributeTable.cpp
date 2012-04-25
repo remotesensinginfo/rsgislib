@@ -30,7 +30,7 @@ namespace rsgis{namespace rastergis{
         
     }
     
-    RSGISAttributeTable* RSGISCreateNewAttributeTable::createAndPopPixelCount(GDALDataset *clumpsDataset, bool useMemory, string outFilePath)throw(RSGISImageCalcException, RSGISAttributeTableException)
+    RSGISAttributeTable* RSGISCreateNewAttributeTable::createAndPopPixelCount(GDALDataset *clumpsDataset, bool useMemory, string outFilePath, unsigned long cacheSize)throw(RSGISImageCalcException, RSGISAttributeTableException)
     {
         RSGISMathsUtils mathUtils;
         
@@ -50,7 +50,7 @@ namespace rsgis{namespace rastergis{
             }
             else
             {
-                attTable = new RSGISAttributeTableHDF(numClumps, outFilePath, false);
+                attTable = new RSGISAttributeTableHDF(numClumps, outFilePath, false, cacheSize);
             }
             attTable->addAttIntField("pxlcount", 0);
             

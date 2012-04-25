@@ -2704,6 +2704,21 @@ void RSGISExeSegment::retrieveParameters(DOMElement *argElement) throw(RSGISXMLA
 			this->tempTable = string(charValue);
 			XMLString::release(&charValue);
             this->processInMemory = false;
+            
+            XMLCh *cacheSizeXMLStr = XMLString::transcode("cachesize");
+            if(argElement->hasAttribute(cacheSizeXMLStr))
+            {
+                char *charValue = XMLString::transcode(argElement->getAttribute(cacheSizeXMLStr));
+                this->cacheSize = mathUtils.strtounsignedint(string(charValue));
+                XMLString::release(&charValue);
+            }
+            else
+            {
+                this->cacheSize = 10000;
+            }
+            XMLString::release(&cacheSizeXMLStr);
+
+            
 		}
 		else
 		{
@@ -4166,6 +4181,7 @@ void RSGISExeSegment::runAlgorithm() throw(RSGISException)
         if(!this->processInMemory)
         {
             cout << "Temp Table: " << this->tempTable << endl;
+            cout << "Cache Size: " << this->cacheSize << endl;
         }
         if(this->outputWithConsecutiveFIDs)
         {
@@ -4193,7 +4209,7 @@ void RSGISExeSegment::runAlgorithm() throw(RSGISException)
                         
             cout << "Create Attribute Table\n";
             RSGISCreateNewAttributeTable createAtt;
-            RSGISAttributeTable *attTable = createAtt.createAndPopPixelCount(clumpsDataset, this->processInMemory, this->tempTable);
+            RSGISAttributeTable *attTable = createAtt.createAndPopPixelCount(clumpsDataset, this->processInMemory, this->tempTable, this->cacheSize);
             
             cout << "Eliminating Clumps\n";
             RSGISEliminateSmallClumps eliminate;
@@ -4490,6 +4506,7 @@ void RSGISExeSegment::printParameters()
         if(!this->processInMemory)
         {
             cout << "Temp Table: " << this->tempTable << endl;
+            cout << "Cache Size: " << this->cacheSize << endl;
         }
         if(this->outputWithConsecutiveFIDs)
         {
