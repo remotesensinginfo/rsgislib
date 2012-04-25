@@ -610,6 +610,10 @@ namespace rsgis{namespace segment{
             popAttStats.populateWithBandStatisticsWithinAtt(attTable, datasets, 2, bandStats);
             delete[] datasets;
             
+            cout << "Find neighbours:\n";
+            RSGISFindClumpNeighbours findNeighbours;
+            findNeighbours.findNeighbours(clumps, attTable);
+                                    
             cout << "Create extra attribute tables columns\n";
             if(!attTable->hasAttribute("Eliminated"))
             {
@@ -662,10 +666,6 @@ namespace rsgis{namespace segment{
             
             unsigned int pxlCountIdx = attTable->getFieldIndex("pxlcount");
             
-            cout << "Find neighbours:\n";
-            RSGISFindClumpNeighbours findNeighbours;
-            findNeighbours.findNeighbours(clumps, attTable);
-                        
             RSGISAttExpressionLessThanConstEq *areaThreshold = new RSGISAttExpressionLessThanConstEq("pxlcount", pxlCountIdx, rsgis_int, 1);
             RSGISAttExpressionNotBoolField *boolEliminatedExp = new RSGISAttExpressionNotBoolField("Eliminated", eliminatedFieldIdx, rsgis_bool);
             

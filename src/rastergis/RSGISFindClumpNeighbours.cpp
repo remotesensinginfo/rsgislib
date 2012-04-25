@@ -234,6 +234,8 @@ namespace rsgis{namespace rastergis{
     {
         try
         {
+            attTable->flushAllFeatures();
+            
             unsigned int width = clumpImage->GetRasterXSize();
             unsigned int height = clumpImage->GetRasterYSize();
             GDALRasterBand *imgBand = clumpImage->GetRasterBand(1);
