@@ -653,9 +653,7 @@ namespace rsgis{namespace rastergis{
             }
             
             // Calculate Appropriate Min, Max, Sum and Mean Values.
-            cout << "Setting true to all first features\n";
             attTable->setBoolValue("first", true);
-            cout << "set true to all first features\n";
             RSGISCalcClumpStatsWithinAtt *calcAttStats = new RSGISCalcClumpStatsWithinAtt(attTable, bandStats, false, pxlCountIdx, firstFieldIdx);
             RSGISCalcImage calcImage(calcAttStats);
             calcImage.calcImage(datasets, numDatasets);
