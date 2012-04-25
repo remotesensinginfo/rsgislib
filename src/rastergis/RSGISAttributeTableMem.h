@@ -76,7 +76,7 @@ namespace rsgis{namespace rastergis{
         void setStringValue(string name, string value) throw(RSGISAttributeTableException);
         
         RSGISFeature* getFeature(size_t fid) throw(RSGISAttributeTableException);
-        void returnFeature(RSGISFeature *feat, bool sync) throw(RSGISAttributeTableException);
+        void flushAllFeatures() throw(RSGISAttributeTableException);
         
         void addAttBoolField(string name, bool val) throw(RSGISAttributeTableException);
         void addAttIntField(string name, long val) throw(RSGISAttributeTableException);

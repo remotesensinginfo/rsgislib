@@ -50,7 +50,7 @@ namespace rsgis{namespace rastergis{
             }
             else
             {
-                attTable = new RSGISAttributeTableHDF(numClumps, outFilePath);
+                attTable = new RSGISAttributeTableHDF(numClumps, outFilePath, false);
             }
             attTable->addAttIntField("pxlcount", 0);
             
@@ -151,7 +151,6 @@ namespace rsgis{namespace rastergis{
             {
                 RSGISFeature *feat = attTable->getFeature(clumpIdx);
                 ++feat->intFields->at(this->pxlCountIdx);
-                attTable->returnFeature(feat, true);
             }
             catch(RSGISAttributeTableException &e)
             {

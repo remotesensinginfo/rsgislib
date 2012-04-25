@@ -27,13 +27,25 @@ namespace rsgis{namespace rastergis{
     {
         attOpen = false;
         attSize = 0;
+        readOnly = true;
+        maxCacheSize = 0;
+        numOfReads = 0;
+        numOfWrites = 0;
+        featCache = new  map<size_t, RSGISFeature*>();
+        cacheQ = new list<size_t>();
     }
     
-    RSGISAttributeTableHDF::RSGISAttributeTableHDF(size_t numFeatures, string filePath) throw(RSGISAttributeTableException) : RSGISAttributeTable()
+    RSGISAttributeTableHDF::RSGISAttributeTableHDF(size_t numFeatures, string filePath, bool readOnly, size_t maxCacheSize) throw(RSGISAttributeTableException) : RSGISAttributeTable()
     {        
         try
         {
+            this->readOnly = readOnly;
+            this->maxCacheSize = maxCacheSize;
             this->createAttributeTable(numFeatures, filePath);
+            featCache = new  map<size_t, RSGISFeature*>();
+            cacheQ = new list<size_t>();
+            numOfReads = 0;
+            numOfWrites = 0;
         }
         catch(RSGISAttributeTableException &e)
         {
@@ -41,10 +53,16 @@ namespace rsgis{namespace rastergis{
         }
     }
     
-    RSGISAttributeTableHDF::RSGISAttributeTableHDF(size_t numFeatures, vector<pair<string, RSGISAttributeDataType> > *fields, string filePath) throw(RSGISAttributeTableException) : RSGISAttributeTable()
+    RSGISAttributeTableHDF::RSGISAttributeTableHDF(size_t numFeatures, vector<pair<string, RSGISAttributeDataType> > *fields, string filePath, bool readOnly, size_t maxCacheSize) throw(RSGISAttributeTableException) : RSGISAttributeTable()
     {
+        this->readOnly = readOnly;
+        this->maxCacheSize = maxCacheSize;
         attOpen = false;
         attSize = 0;
+        featCache = new  map<size_t, RSGISFeature*>();
+        cacheQ = new list<size_t>();
+        numOfReads = 0;
+        numOfWrites = 0;
     }
     
     void RSGISAttributeTableHDF::createAttributeTable(size_t numFeatures, string filePath) throw(RSGISAttributeTableException)
@@ -209,194 +227,232 @@ namespace rsgis{namespace rastergis{
         RSGISFeature *feat = NULL;
         try
         {
-            feat = new RSGISFeature();
-            feat->fid = fid;
-            feat->boolFields = new vector<bool>();
-            feat->intFields = new vector<long>();
-            feat->floatFields = new vector<double>();
-            feat->stringFields = new vector<string>();
-            feat->neighbours = new vector<size_t>();
-            
-            unsigned int numNeighboursVal = 0;
-                        
-            /* Number of Neighbours */
-            DataSpace numNeighboursDataspace = this->numNeighboursDataset.getSpace();
-            hsize_t numNeighboursOffset[1];
-			numNeighboursOffset[0] = fid;
-			hsize_t numNeighboursCount[1];
-			numNeighboursCount[0]  = 1;
-			numNeighboursDataspace.selectHyperslab( H5S_SELECT_SET, numNeighboursCount, numNeighboursOffset );
-            
-			hsize_t numNeighboursDimsRead[1]; 
-			numNeighboursDimsRead[0] = 1;
-			DataSpace numNeighboursMemspace( 1, numNeighboursDimsRead );
-			
-			hsize_t numNeighboursOffset_out[1];
-            numNeighboursOffset_out[0] = 0;
-			hsize_t numNeighboursCount_out[1];
-			numNeighboursCount_out[0] = 1;
-			numNeighboursMemspace.selectHyperslab( H5S_SELECT_SET, numNeighboursCount_out, numNeighboursOffset_out );
-            
-            numNeighboursDataset.read(&numNeighboursVal, PredType::NATIVE_UINT32, numNeighboursMemspace, numNeighboursDataspace);
-            numNeighboursDataspace.close();
-            numNeighboursMemspace.close();
-            
-            if(numNeighboursVal > 0)
+            map<size_t, RSGISFeature*>::iterator iterFeat;
+            iterFeat = featCache->find(fid);
+            if(iterFeat == featCache->end())
             {
-                feat->neighbours->reserve(numNeighboursVal);
-                unsigned long *neighbourVals = new unsigned long[numNeighboursVal];
+                feat = new RSGISFeature();
+                feat->fid = fid;
+                feat->boolFields = new vector<bool>();
+                feat->intFields = new vector<long>();
+                feat->floatFields = new vector<double>();
+                feat->stringFields = new vector<string>();
+                feat->neighbours = new vector<size_t>();
                 
-                DataSpace neighboursDataspace = neighboursDataset.getSpace();
-                hsize_t neighboursOffset[2];
-                neighboursOffset[0] = fid;
-                neighboursOffset[1] = 0;
-                hsize_t neighboursCount[2];
-                neighboursCount[0] = 1;
-                neighboursCount[1] = numNeighboursVal;
-                neighboursDataspace.selectHyperslab( H5S_SELECT_SET, neighboursCount, neighboursOffset );
+                unsigned int numNeighboursVal = 0;
                 
-                hsize_t neighboursDimsRead[2]; 
-                neighboursDimsRead[0] = 1;
-                neighboursDimsRead[1] = numNeighboursVal;
-                DataSpace neighboursMemspace( 2, neighboursDimsRead );
+                /* Number of Neighbours */
+                DataSpace numNeighboursDataspace = this->numNeighboursDataset.getSpace();
+                hsize_t numNeighboursOffset[1];
+                numNeighboursOffset[0] = fid;
+                hsize_t numNeighboursCount[1];
+                numNeighboursCount[0]  = 1;
+                numNeighboursDataspace.selectHyperslab( H5S_SELECT_SET, numNeighboursCount, numNeighboursOffset );
                 
-                hsize_t neighboursOffset_out[2];
-                neighboursOffset_out[0] = 0;
-                neighboursOffset_out[1] = 0;
-                hsize_t neighboursCount_out[2];
-                neighboursCount_out[0] = 1;
-                neighboursCount_out[1] = numNeighboursVal;
-                neighboursMemspace.selectHyperslab( H5S_SELECT_SET, neighboursCount_out, neighboursOffset_out );
+                hsize_t numNeighboursDimsRead[1]; 
+                numNeighboursDimsRead[0] = 1;
+                DataSpace numNeighboursMemspace( 1, numNeighboursDimsRead );
                 
-                neighboursDataset.read(neighbourVals, PredType::NATIVE_UINT64, neighboursMemspace, neighboursDataspace);
+                hsize_t numNeighboursOffset_out[1];
+                numNeighboursOffset_out[0] = 0;
+                hsize_t numNeighboursCount_out[1];
+                numNeighboursCount_out[0] = 1;
+                numNeighboursMemspace.selectHyperslab( H5S_SELECT_SET, numNeighboursCount_out, numNeighboursOffset_out );
                 
-                for(unsigned int i = 0; i < numNeighboursVal; ++i)
+                numNeighboursDataset.read(&numNeighboursVal, PredType::NATIVE_UINT32, numNeighboursMemspace, numNeighboursDataspace);
+                numNeighboursDataspace.close();
+                numNeighboursMemspace.close();
+                
+                if(numNeighboursVal > 0)
                 {
-                    feat->neighbours->push_back(neighbourVals[i]);
+                    feat->neighbours->reserve(numNeighboursVal);
+                    unsigned long *neighbourVals = new unsigned long[numNeighboursVal];
+                    
+                    DataSpace neighboursDataspace = neighboursDataset.getSpace();
+                    hsize_t neighboursOffset[2];
+                    neighboursOffset[0] = fid;
+                    neighboursOffset[1] = 0;
+                    hsize_t neighboursCount[2];
+                    neighboursCount[0] = 1;
+                    neighboursCount[1] = numNeighboursVal;
+                    neighboursDataspace.selectHyperslab( H5S_SELECT_SET, neighboursCount, neighboursOffset );
+                    
+                    hsize_t neighboursDimsRead[2]; 
+                    neighboursDimsRead[0] = 1;
+                    neighboursDimsRead[1] = numNeighboursVal;
+                    DataSpace neighboursMemspace( 2, neighboursDimsRead );
+                    
+                    hsize_t neighboursOffset_out[2];
+                    neighboursOffset_out[0] = 0;
+                    neighboursOffset_out[1] = 0;
+                    hsize_t neighboursCount_out[2];
+                    neighboursCount_out[0] = 1;
+                    neighboursCount_out[1] = numNeighboursVal;
+                    neighboursMemspace.selectHyperslab( H5S_SELECT_SET, neighboursCount_out, neighboursOffset_out );
+                    
+                    neighboursDataset.read(neighbourVals, PredType::NATIVE_UINT64, neighboursMemspace, neighboursDataspace);
+                    
+                    for(unsigned int i = 0; i < numNeighboursVal; ++i)
+                    {
+                        feat->neighbours->push_back(neighbourVals[i]);
+                    }
+                    
+                    delete[] neighbourVals;
+                    neighboursDataspace.close();
+                    neighboursMemspace.close();
                 }
                 
-                delete[] neighbourVals;
-                neighboursDataspace.close();
-                neighboursMemspace.close();
-            }
-            
-            if(this->hasBoolFields)
-            {
-                feat->boolFields->reserve(this->numBoolFields);
-                
-                DataSpace boolDataspace = boolDataset.getSpace();
-                hsize_t boolFieldsOffset[2];
-                boolFieldsOffset[0] = fid;
-                boolFieldsOffset[1] = 0;
-                hsize_t boolFieldsCount[2];
-                boolFieldsCount[0] = 1;
-                boolFieldsCount[1] = this->numBoolFields;
-                boolDataspace.selectHyperslab( H5S_SELECT_SET, boolFieldsCount, boolFieldsOffset );
-                
-                hsize_t boolFieldsDimsRead[2]; 
-                boolFieldsDimsRead[0] = 1;
-                boolFieldsDimsRead[1] = this->numBoolFields;
-                DataSpace boolFieldsMemspace( 2, boolFieldsDimsRead );
-                
-                hsize_t boolFieldsOffset_out[2];
-                boolFieldsOffset_out[0] = 0;
-                boolFieldsOffset_out[1] = 0;
-                hsize_t boolFieldsCount_out[2];
-                boolFieldsCount_out[0] = 1;
-                boolFieldsCount_out[1] = this->numBoolFields;
-                boolFieldsMemspace.selectHyperslab( H5S_SELECT_SET, boolFieldsCount_out, boolFieldsOffset_out );
-                
-                int *boolVals = new int[this->numBoolFields];
-                boolDataset.read(boolVals, PredType::NATIVE_INT8, boolFieldsMemspace, boolDataspace);
-                
-                for(unsigned int i = 0; i < this->numBoolFields; ++i)
+                if(this->hasBoolFields)
                 {
-                    feat->boolFields->push_back(boolVals[i]);
+                    feat->boolFields->reserve(this->numBoolFields);
+                    
+                    DataSpace boolDataspace = boolDataset.getSpace();
+                    hsize_t boolFieldsOffset[2];
+                    boolFieldsOffset[0] = fid;
+                    boolFieldsOffset[1] = 0;
+                    hsize_t boolFieldsCount[2];
+                    boolFieldsCount[0] = 1;
+                    boolFieldsCount[1] = this->numBoolFields;
+                    boolDataspace.selectHyperslab( H5S_SELECT_SET, boolFieldsCount, boolFieldsOffset );
+                    
+                    hsize_t boolFieldsDimsRead[2]; 
+                    boolFieldsDimsRead[0] = 1;
+                    boolFieldsDimsRead[1] = this->numBoolFields;
+                    DataSpace boolFieldsMemspace( 2, boolFieldsDimsRead );
+                    
+                    hsize_t boolFieldsOffset_out[2];
+                    boolFieldsOffset_out[0] = 0;
+                    boolFieldsOffset_out[1] = 0;
+                    hsize_t boolFieldsCount_out[2];
+                    boolFieldsCount_out[0] = 1;
+                    boolFieldsCount_out[1] = this->numBoolFields;
+                    boolFieldsMemspace.selectHyperslab( H5S_SELECT_SET, boolFieldsCount_out, boolFieldsOffset_out );
+                    
+                    int *boolVals = new int[this->numBoolFields];
+                    boolDataset.read(boolVals, PredType::NATIVE_INT8, boolFieldsMemspace, boolDataspace);
+                    
+                    for(unsigned int i = 0; i < this->numBoolFields; ++i)
+                    {
+                        feat->boolFields->push_back(boolVals[i]);
+                    }
+                    
+                    delete[] boolVals;
+                    boolDataspace.close();
+                    boolFieldsMemspace.close();
                 }
                 
-                delete[] boolVals;
-                boolDataspace.close();
-                boolFieldsMemspace.close();
-            }
-            
-            if(this->hasIntFields)
-            {
-                feat->intFields->reserve(this->numIntFields);
-                
-                DataSpace intDataspace = intDataset.getSpace();
-                hsize_t intFieldsOffset[2];
-                intFieldsOffset[0] = fid;
-                intFieldsOffset[1] = 0;
-                hsize_t intFieldsCount[2];
-                intFieldsCount[0] = 1;
-                intFieldsCount[1] = this->numIntFields;
-                intDataspace.selectHyperslab( H5S_SELECT_SET, intFieldsCount, intFieldsOffset );
-                
-                hsize_t intFieldsDimsRead[2]; 
-                intFieldsDimsRead[0] = 1;
-                intFieldsDimsRead[1] = this->numIntFields;
-                DataSpace intFieldsMemspace( 2, intFieldsDimsRead );
-                
-                hsize_t intFieldsOffset_out[2];
-                intFieldsOffset_out[0] = 0;
-                intFieldsOffset_out[1] = 0;
-                hsize_t intFieldsCount_out[2];
-                intFieldsCount_out[0] = 1;
-                intFieldsCount_out[1] = this->numIntFields;
-                intFieldsMemspace.selectHyperslab( H5S_SELECT_SET, intFieldsCount_out, intFieldsOffset_out );
-                
-                long *intVals = new long[this->numIntFields];
-                intDataset.read(intVals, PredType::NATIVE_INT64, intFieldsMemspace, intDataspace);
-                
-                for(unsigned int i = 0; i < this->numIntFields; ++i)
+                if(this->hasIntFields)
                 {
-                    feat->intFields->push_back(intVals[i]);
+                    feat->intFields->reserve(this->numIntFields);
+                    
+                    DataSpace intDataspace = intDataset.getSpace();
+                    hsize_t intFieldsOffset[2];
+                    intFieldsOffset[0] = fid;
+                    intFieldsOffset[1] = 0;
+                    hsize_t intFieldsCount[2];
+                    intFieldsCount[0] = 1;
+                    intFieldsCount[1] = this->numIntFields;
+                    intDataspace.selectHyperslab( H5S_SELECT_SET, intFieldsCount, intFieldsOffset );
+                    
+                    hsize_t intFieldsDimsRead[2]; 
+                    intFieldsDimsRead[0] = 1;
+                    intFieldsDimsRead[1] = this->numIntFields;
+                    DataSpace intFieldsMemspace( 2, intFieldsDimsRead );
+                    
+                    hsize_t intFieldsOffset_out[2];
+                    intFieldsOffset_out[0] = 0;
+                    intFieldsOffset_out[1] = 0;
+                    hsize_t intFieldsCount_out[2];
+                    intFieldsCount_out[0] = 1;
+                    intFieldsCount_out[1] = this->numIntFields;
+                    intFieldsMemspace.selectHyperslab( H5S_SELECT_SET, intFieldsCount_out, intFieldsOffset_out );
+                    
+                    long *intVals = new long[this->numIntFields];
+                    intDataset.read(intVals, PredType::NATIVE_INT64, intFieldsMemspace, intDataspace);
+                    
+                    for(unsigned int i = 0; i < this->numIntFields; ++i)
+                    {
+                        feat->intFields->push_back(intVals[i]);
+                    }
+                    
+                    delete[] intVals;
+                    intDataspace.close();
+                    intFieldsMemspace.close();
                 }
                 
-                delete[] intVals;
-                intDataspace.close();
-                intFieldsMemspace.close();
-            }
-            
-            if(this->hasFloatFields)
-            {
-                feat->floatFields->reserve(this->numFloatFields);
-                
-                DataSpace floatDataspace = floatDataset.getSpace();
-                hsize_t floatFieldsOffset[2];
-                floatFieldsOffset[0] = fid;
-                floatFieldsOffset[1] = 0;
-                hsize_t floatFieldsCount[2];
-                floatFieldsCount[0] = 1;
-                floatFieldsCount[1] = this->numIntFields;
-                floatDataspace.selectHyperslab( H5S_SELECT_SET, floatFieldsCount, floatFieldsOffset );
-                
-                hsize_t floatFieldsDimsRead[2]; 
-                floatFieldsDimsRead[0] = 1;
-                floatFieldsDimsRead[1] = this->numFloatFields;
-                DataSpace floatFieldsMemspace( 2, floatFieldsDimsRead );
-                
-                hsize_t floatFieldsOffset_out[2];
-                floatFieldsOffset_out[0] = 0;
-                floatFieldsOffset_out[1] = 0;
-                hsize_t floatFieldsCount_out[2];
-                floatFieldsCount_out[0] = 1;
-                floatFieldsCount_out[1] = this->numFloatFields;
-                floatFieldsMemspace.selectHyperslab( H5S_SELECT_SET, floatFieldsCount_out, floatFieldsOffset_out );
-                
-                double *floatVals = new double[this->numFloatFields];
-                floatDataset.read(floatVals, PredType::NATIVE_DOUBLE, floatFieldsMemspace, floatDataspace);
-                
-                for(unsigned int i = 0; i < this->numFloatFields; ++i)
+                if(this->hasFloatFields)
                 {
-                    feat->floatFields->push_back(floatVals[i]);
+                    feat->floatFields->reserve(this->numFloatFields);
+                    
+                    DataSpace floatDataspace = floatDataset.getSpace();
+                    hsize_t floatFieldsOffset[2];
+                    floatFieldsOffset[0] = fid;
+                    floatFieldsOffset[1] = 0;
+                    hsize_t floatFieldsCount[2];
+                    floatFieldsCount[0] = 1;
+                    floatFieldsCount[1] = this->numIntFields;
+                    floatDataspace.selectHyperslab( H5S_SELECT_SET, floatFieldsCount, floatFieldsOffset );
+                    
+                    hsize_t floatFieldsDimsRead[2]; 
+                    floatFieldsDimsRead[0] = 1;
+                    floatFieldsDimsRead[1] = this->numFloatFields;
+                    DataSpace floatFieldsMemspace( 2, floatFieldsDimsRead );
+                    
+                    hsize_t floatFieldsOffset_out[2];
+                    floatFieldsOffset_out[0] = 0;
+                    floatFieldsOffset_out[1] = 0;
+                    hsize_t floatFieldsCount_out[2];
+                    floatFieldsCount_out[0] = 1;
+                    floatFieldsCount_out[1] = this->numFloatFields;
+                    floatFieldsMemspace.selectHyperslab( H5S_SELECT_SET, floatFieldsCount_out, floatFieldsOffset_out );
+                    
+                    double *floatVals = new double[this->numFloatFields];
+                    floatDataset.read(floatVals, PredType::NATIVE_DOUBLE, floatFieldsMemspace, floatDataspace);
+                    
+                    for(unsigned int i = 0; i < this->numFloatFields; ++i)
+                    {
+                        feat->floatFields->push_back(floatVals[i]);
+                    }
+                    
+                    delete[] floatVals;
+                    floatDataspace.close();
+                    floatFieldsMemspace.close();
                 }
                 
-                delete[] floatVals;
-                floatDataspace.close();
-                floatFieldsMemspace.close();
+                ++numOfReads;
+                featCache->insert(pair<size_t, RSGISFeature*>(fid, feat));
+                cacheQ->push_back(fid);
+                
+                if(featCache->size() > maxCacheSize)
+                {
+                    //cout << "Remove last element from fid queue\n";
+                    size_t tmpFID = *cacheQ->begin();
+                    cacheQ->pop_front();
+                    iterFeat = featCache->find(tmpFID);
+                    this->returnFeatureToDisk((*iterFeat).second, !this->readOnly);
+                    featCache->erase(iterFeat);
+                }
             }
-            
+            else
+            {
+                //cout << "Got " << fid << " from cache - size = " << featCache->size() << endl;
+                feat = (*iterFeat).second;
+                
+                // Move fid to back of queue.
+                for(list<size_t>::iterator iterFIDs = cacheQ->begin(); iterFIDs != cacheQ->end(); )
+                {
+                    if((*iterFIDs) == fid)
+                    {
+                        iterFIDs = cacheQ->erase(iterFIDs);
+                        cacheQ->push_back(fid);
+                        break;
+                    }
+                    else
+                    {
+                        ++iterFIDs;
+                    }
+                }
+            }
         }
         catch(RSGISAttributeTableException &e)
         {
@@ -409,7 +465,7 @@ namespace rsgis{namespace rastergis{
         return feat;
     }
     
-    void RSGISAttributeTableHDF::returnFeature(RSGISFeature *feat, bool sync) throw(RSGISAttributeTableException)
+    void RSGISAttributeTableHDF::returnFeatureToDisk(RSGISFeature *feat, bool sync) throw(RSGISAttributeTableException)
     {
         try
         {
@@ -530,8 +586,31 @@ namespace rsgis{namespace rastergis{
                     newFloatDataspace.close();
                     delete[] floatVals;
                 }
+                
+                ++numOfWrites;
             }
             this->freeFeature(feat);
+        }
+        catch(RSGISAttributeTableException &e)
+        {
+            throw e;
+        }
+        catch( Exception &e )
+        {
+            throw RSGISAttributeTableException(e.getDetailMsg());
+        }
+    }
+    
+    void RSGISAttributeTableHDF::flushAllFeatures() throw(RSGISAttributeTableException)
+    {
+        try
+        {
+            for(map<size_t, RSGISFeature*>::iterator iterFeat = featCache->begin(); iterFeat != featCache->end(); ++iterFeat)
+            {
+                this->returnFeatureToDisk((*iterFeat).second, !this->readOnly);
+            }
+            featCache->clear();
+            cacheQ->clear();
         }
         catch(RSGISAttributeTableException &e)
         {
@@ -1549,9 +1628,20 @@ namespace rsgis{namespace rastergis{
         
     RSGISAttributeTableHDF::~RSGISAttributeTableHDF()
     {
+        
+        if(featCache->size() > 0)
+        {
+            this->flushAllFeatures();
+        }
+        delete featCache;
+        delete cacheQ;
+        
         this->attH5File->flush(H5F_SCOPE_GLOBAL);
         this->attH5File->close();
         delete this->attH5File;
+        
+        cout << "There have been " << numOfReads << " reads\n";
+        cout << "There have been " << numOfWrites << " writes\n";
     }    
     
 }}

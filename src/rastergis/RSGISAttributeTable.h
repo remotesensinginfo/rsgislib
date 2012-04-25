@@ -202,7 +202,7 @@ namespace rsgis{namespace rastergis{
         virtual void setStringValue(string name, string value) throw(RSGISAttributeTableException)=0;
         
         virtual RSGISFeature* getFeature(size_t fid) throw(RSGISAttributeTableException)=0;
-        virtual void returnFeature(RSGISFeature *feat, bool sync) throw(RSGISAttributeTableException)=0;
+        virtual void flushAllFeatures() throw(RSGISAttributeTableException)=0;
         
         virtual void addAttBoolField(string name, bool val) throw(RSGISAttributeTableException)=0;
         virtual void addAttIntField(string name, long val) throw(RSGISAttributeTableException)=0;
