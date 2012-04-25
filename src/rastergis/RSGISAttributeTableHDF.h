@@ -28,6 +28,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <list>
 #include <utility>
 
 #include "common/RSGISAttributeTableException.h"
@@ -57,8 +58,8 @@ namespace rsgis{namespace rastergis{
     class RSGISAttributeTableHDF : public RSGISAttributeTable
     {
     public:        
-        RSGISAttributeTableHDF(size_t numFeatures, string filePath)throw(RSGISAttributeTableException);
-        RSGISAttributeTableHDF(size_t numFeatures, vector<pair<string, RSGISAttributeDataType> > *fields, string filePath)throw(RSGISAttributeTableException);
+        RSGISAttributeTableHDF(size_t numFeatures, string filePath, bool readOnly, size_t maxCacheSize=250)throw(RSGISAttributeTableException);
+        RSGISAttributeTableHDF(size_t numFeatures, vector<pair<string, RSGISAttributeDataType> > *fields, string filePath, bool readOnly, size_t maxCacheSize=250)throw(RSGISAttributeTableException);
         
         bool getBoolField(size_t fid, string name) throw(RSGISAttributeTableException);
         long getIntField(size_t fid, string name) throw(RSGISAttributeTableException);
@@ -76,7 +77,7 @@ namespace rsgis{namespace rastergis{
         void setStringValue(string name, string value) throw(RSGISAttributeTableException);
         
         RSGISFeature* getFeature(size_t fid) throw(RSGISAttributeTableException);
-        void returnFeature(RSGISFeature *feat, bool sync) throw(RSGISAttributeTableException);
+        void flushAllFeatures() throw(RSGISAttributeTableException);
         
         void addAttBoolField(string name, bool val) throw(RSGISAttributeTableException);
         void addAttIntField(string name, long val) throw(RSGISAttributeTableException);
@@ -98,6 +99,7 @@ namespace rsgis{namespace rastergis{
     protected:
         RSGISAttributeTableHDF();
         void createAttributeTable(size_t numFeatures, string filePath)throw(RSGISAttributeTableException);
+        void returnFeatureToDisk(RSGISFeature *feat, bool sync) throw(RSGISAttributeTableException);
         H5File *attH5File;
         DataSet neighboursDataset;
         DataSet numNeighboursDataset;
@@ -111,6 +113,12 @@ namespace rsgis{namespace rastergis{
         size_t iterIdx;
         size_t attSize;
         bool attOpen;
+        bool readOnly;
+        map<size_t, RSGISFeature*> *featCache;
+        list<size_t> *cacheQ;
+        size_t maxCacheSize;
+        size_t numOfReads;
+        size_t numOfWrites;
     };
     
 }}
