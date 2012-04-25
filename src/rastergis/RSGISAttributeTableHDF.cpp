@@ -1699,7 +1699,7 @@ namespace rsgis{namespace rastergis{
                     if(increaseNeighbourSize)
                     {
                         hsize_t extendNeighboursDatasetTo[2];
-                        extendNeighboursDatasetTo[0] = startFID;
+                        extendNeighboursDatasetTo[0] = this->attSize;
                         extendNeighboursDatasetTo[1] = neighboursLineLength;
                         neighboursDataset.extend( extendNeighboursDatasetTo );
                     }
