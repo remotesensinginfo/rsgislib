@@ -86,6 +86,8 @@ namespace rsgis{namespace rastergis{
         void addAttributes(vector<RSGISAttribute*> *attributes) throw(RSGISAttributeTableException);
         
         size_t getSize();
+        void holdFID(size_t fid);
+        void removeHoldFID(size_t fid);
         
         void operator++();
         void start();

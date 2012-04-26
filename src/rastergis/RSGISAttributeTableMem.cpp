@@ -595,6 +595,16 @@ namespace rsgis{namespace rastergis{
         return attTable->size();
     }
     
+    void RSGISAttributeTableMem::holdFID(size_t fid)
+    {
+        // Do nothing as everything is memory to nothing to 'hold'
+    }
+    
+    void RSGISAttributeTableMem::removeHoldFID(size_t fid)
+    {
+        // Do nothing as everything is memory to nothing to 'hold'
+    }
+    
     void RSGISAttributeTableMem::operator++()
     {
         ++iterIdx;
