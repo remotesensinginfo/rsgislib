@@ -785,7 +785,9 @@ namespace rsgis{namespace segment{
             for(vector<pair<size_t, size_t> >::iterator iterPairs = eliminationPairs->begin(); iterPairs != eliminationPairs->end(); ++iterPairs)
             {
                 pFeat = attTable->getFeature((*iterPairs).first);
+                attTable->holdFID((*iterPairs).first);
                 mFeat = attTable->getFeature((*iterPairs).second);
+                attTable->removeHoldFID((*iterPairs).first);
                 
                 if(pFeat->boolFields->at(eliminatedFieldIdx))
                 {
