@@ -233,9 +233,7 @@ namespace rsgis{namespace rastergis{
     void RSGISFindClumpNeighbours::findNeighbours(GDALDataset *clumpImage, RSGISAttributeTable *attTable) throw(RSGISImageCalcException)
     {
         try
-        {
-            attTable->flushAllFeatures();
-            
+        {            
             unsigned int width = clumpImage->GetRasterXSize();
             unsigned int height = clumpImage->GetRasterYSize();
             GDALRasterBand *imgBand = clumpImage->GetRasterBand(1);

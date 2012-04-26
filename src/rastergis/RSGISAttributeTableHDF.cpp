@@ -507,10 +507,7 @@ namespace rsgis{namespace rastergis{
         {
             throw e;
         }
-        catch( Exception &e )
-        {
-            throw RSGISAttributeTableException(e.getDetailMsg());
-        }
+        
         return feat;
     }
     
@@ -528,10 +525,6 @@ namespace rsgis{namespace rastergis{
         catch(RSGISAttributeTableException &e)
         {
             throw e;
-        }
-        catch( Exception &e )
-        {
-            throw RSGISAttributeTableException(e.getDetailMsg());
         }
     }
         
@@ -1307,6 +1300,8 @@ namespace rsgis{namespace rastergis{
             // CHECK WHETHER NEED TO REMOVE DATA FROM THE CACHE!
             //
             //////////////////////////////////////////////////////////////////
+            //cout << "cacheQ->size() = " << cacheQ->size() << endl;
+            //cout << "this->maxNumOfBlockInCache = " << this->maxNumOfBlockInCache << endl;
             if(cacheQ->size() > this->maxNumOfBlockInCache)
             {
                 size_t tmpBlock = cacheQ->back();
