@@ -318,7 +318,9 @@ set(LIB_IMG_H
 	${RSGIS_SRC_IMG_DIR}/RSGISLinearSpectralUnmixing.h
 	${RSGIS_SRC_IMG_DIR}/RSGISImageClustering.h
 	${RSGIS_SRC_IMG_DIR}/RSGISImageComposite.h
-	${RSGIS_SRC_IMG_DIR}/RSGISRelabelPixelValuesFromLUT.h)
+	${RSGIS_SRC_IMG_DIR}/RSGISRelabelPixelValuesFromLUT.h
+	${RSGIS_SRC_IMG_DIR}/RSGISPopWithStats.h
+	)
 	
 set(LIB_IMG_CPP
 	${RSGIS_SRC_IMG_DIR}/RSGISAddBands.cpp 
@@ -442,6 +444,8 @@ set(LIB_IMG_CPP
 	${RSGIS_SRC_IMG_DIR}/RSGISImageComposite.h
 	${RSGIS_SRC_IMG_DIR}/RSGISRelabelPixelValuesFromLUT.cpp
 	${RSGIS_SRC_IMG_DIR}/RSGISRelabelPixelValuesFromLUT.h
+	${RSGIS_SRC_IMG_DIR}/RSGISPopWithStats.cpp
+	${RSGIS_SRC_IMG_DIR}/RSGISPopWithStats.h
 	)
 ###############################################################################
 
