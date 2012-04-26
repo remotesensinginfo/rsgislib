@@ -745,7 +745,7 @@ namespace rsgis{namespace segment{
         }
     }
     
-    void RSGISEliminateSmallClumps::defineOutputFID(RSGISAttributeTable *attTable, RSGISFeature *feat, unsigned int eliminatedFieldIdx, unsigned int mergedToFIDIdx, unsigned int outFIDIdx, unsigned int outFIDSetFieldIdx) throw(RSGISImageCalcException)
+    void RSGISEliminateSmallClumps::defineOutputFID(RSGISAttributeTable *attTable, RSGISFeature *feat, unsigned int eliminatedFieldIdx, unsigned int mergedToFIDIdx, unsigned int outFIDIdx, unsigned int outFIDSetFieldIdx) throw(RSGISAttributeTableException)
     {
         try
         {
@@ -770,12 +770,12 @@ namespace rsgis{namespace segment{
         }
         catch(RSGISAttributeTableException &e)
         {
-            throw RSGISImageCalcException(e.what());
+            throw e;
         }
     }
     
     
-    void RSGISEliminateSmallClumps::performElimination(RSGISAttributeTable *attTable, vector<pair<size_t, size_t> > *eliminationPairs, unsigned int eliminatedFieldIdx, unsigned int mergedToFIDIdx, unsigned int pxlCountIdx, vector<RSGISBandAttStats*> *bandStats) throw(RSGISImageCalcException)
+    void RSGISEliminateSmallClumps::performElimination(RSGISAttributeTable *attTable, vector<pair<size_t, size_t> > *eliminationPairs, unsigned int eliminatedFieldIdx, unsigned int mergedToFIDIdx, unsigned int pxlCountIdx, vector<RSGISBandAttStats*> *bandStats) throw(RSGISAttributeTableException)
     {
         try 
         {
@@ -907,10 +907,12 @@ namespace rsgis{namespace segment{
             for(vector<size_t>::iterator iterFeat = feat->neighbours->begin(); iterFeat != feat->neighbours->end(); ++iterFeat)
             {
                 nFeat = attTable->getFeature(*iterFeat);
+                attTable->holdFID(nFeat->fid);
                 if(nFeat->boolFields->at(eliminatedFieldIdx))
                 {
                     nFeat = getEliminatedNeighbour(nFeat, attTable);
                 }
+                attTable->removeHoldFID(nFeat->fid);
                 if(nFeat->intFields->at(pxlCountIdx) > feat->intFields->at(pxlCountIdx))
                 {
                     distance = this->calcDistance(feat, nFeat, bandStats);
@@ -975,10 +977,12 @@ namespace rsgis{namespace segment{
             else
             {
                 nFeat = attTable->getFeature(feat->intFields->at(mergedToFIDIdx));
+                attTable->holdFID(nFeat->fid);
                 if(nFeat->boolFields->at(eliminatedFieldIdx))
                 {
                     nFeat = this->getEliminatedNeighbour(nFeat, attTable);
                 }
+                attTable->removeHoldFID(nFeat->fid);
             }
             
         }
