@@ -63,6 +63,7 @@
 #include "img/RSGISClumpImage.h"
 #include "img/RSGISImageComposite.h"
 #include "img/RSGISRelabelPixelValuesFromLUT.h"
+#include "img/RSGISPopWithStats.h"
 
 #include "vec/RSGISImageTileVector.h"
 #include "vec/RSGISVectorOutputException.h"
@@ -119,7 +120,8 @@ class RSGISExeImageUtils : public RSGISAlgorithmParameters
             clump,
             imageComposite,
             relabel,
-            assignproj
+            assignproj,
+            popimgstats
 		};
 		
 		enum interpolators
@@ -211,6 +213,8 @@ class RSGISExeImageUtils : public RSGISAlgorithmParameters
         compositeStat outCompStat;
         bool ignoreZeros;
         GDALDataType outDataType;
+        bool calcImgPyramids;
+        bool useIgnoreVal;
 	};
 
 #endif

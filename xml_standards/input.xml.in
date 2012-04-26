@@ -439,7 +439,8 @@
     <rsgis:command algor="imageutils" option="relabel" image="image.env" output="image_out.env" lut="matrix.gmtxt" format="GDAL Format" />
     <!-- A command to assign and update and image to a specific projection -->
     <rsgis:command algor="imageutils" option="assignproj" image="image.env" projwkt="txt.wkt" />
-
+	<!-- A command to populate an image with image statistics and image pyramids -->
+	<rsgis:command algor="imageutils" option="popimgstats" image="image.img" ignore="float" pyramids="yes | no" />
 
 
     <!-- A command to normalise an input image to output image pixel values to a given range (the input minimum and maximum as derived from the image) -->

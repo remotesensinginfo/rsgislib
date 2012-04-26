@@ -95,6 +95,7 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
     XMLCh *optionComposite = XMLString::transcode("composite");
     XMLCh *optionRelabel = XMLString::transcode("relabel");
     XMLCh *optionAssignProj = XMLString::transcode("assignproj");
+    XMLCh *optionPopImgStats = XMLString::transcode("popimgstats");
     
 	const XMLCh *algorNameEle = argElement->getAttribute(algorXMLStr);
 	if(!XMLString::equals(algorName, algorNameEle))
@@ -2293,6 +2294,73 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 		}
 		XMLString::release(&projWKTXMLStr);
     }
+    else if (XMLString::equals(optionPopImgStats, optionXML))
+    {
+        this->option = RSGISExeImageUtils::popimgstats;
+        
+        XMLCh *imageXMLStr = XMLString::transcode("image");
+		if(argElement->hasAttribute(imageXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(imageXMLStr));
+			this->inputImage = string(charValue);
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+		}
+		XMLString::release(&imageXMLStr);
+        
+        
+        XMLCh *nodataXMLStr = XMLString::transcode("ignore");
+		if(argElement->hasAttribute(nodataXMLStr))
+		{
+            XMLCh *NaNStr = XMLString::transcode("NaN");
+			const XMLCh *noDataValue = argElement->getAttribute(nodataXMLStr);
+			if(XMLString::equals(noDataValue, NaNStr))
+			{
+                const char *val = "NaN";
+				this->nodataValue = nan(val);
+			}
+			else
+			{
+				char *charValue = XMLString::transcode(argElement->getAttribute(nodataXMLStr));
+                this->nodataValue = mathUtils.strtofloat(string(charValue));
+                XMLString::release(&charValue);
+			}
+			XMLString::release(&NaNStr);
+            
+            this->useIgnoreVal = true;
+		}
+		else
+		{
+			this->useIgnoreVal = false;
+		}
+		XMLString::release(&nodataXMLStr);
+        
+        XMLCh *pyramidsXMLStr = XMLString::transcode("pyramids");
+		if(argElement->hasAttribute(pyramidsXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(pyramidsXMLStr));
+			string typeStr = string(charValue);
+			if(typeStr == "yes") 
+			{
+				this->calcImgPyramids = true;
+			}
+            else 
+            {
+                this->calcImgPyramids = false;
+            }
+            
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			this->calcImgPyramids = true;
+		}
+		XMLString::release(&pyramidsXMLStr);
+        
+    }
 	else
 	{
 		string message = string("The option (") + string(XMLString::transcode(optionXML)) + string(") is not known: RSGISExeImageUtils.");
@@ -2334,6 +2402,7 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
     XMLString::release(&optionComposite);
     XMLString::release(&optionRelabel);
     XMLString::release(&optionAssignProj);
+    XMLString::release(&optionPopImgStats);
 	
 	parsed = true;
 }
@@ -3792,6 +3861,42 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
                 string projWKTStr = textUtils.readFileToString(this->projFile);
                 
                 inDataset->SetProjection(projWKTStr.c_str());
+                
+                GDALClose(inDataset);
+                GDALDestroyDriverManager();
+            } 
+            catch (RSGISException &e) 
+            {
+                throw e;
+            }
+        }
+        else if(option == RSGISExeImageUtils::popimgstats)
+        {
+            cout << "Populate an image with image statistics and image pyramids\n";
+            cout << "Image: " << this->inputImage << endl;
+            if(this->useIgnoreVal)
+            {
+                cout << "Ignore Val: " << this->nodataValue << endl;
+            }
+            if(this->calcImgPyramids)
+            {
+                cout << "Calculating image pyramids\n";
+            }
+            
+            try 
+            {
+                GDALAllRegister();
+                GDALDataset *inDataset = NULL;
+                inDataset = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_Update);
+                if(inDataset == NULL)
+                {
+                    string message = string("Could not open image ") + this->inputImage;
+                    throw RSGISImageException(message.c_str());
+                }
+                
+                RSGISPopWithStats popWithStats;
+                popWithStats.calcPopStats( inDataset, this->useIgnoreVal, this->nodataValue, this->calcImgPyramids );
+                
                 
                 GDALClose(inDataset);
                 GDALDestroyDriverManager();
