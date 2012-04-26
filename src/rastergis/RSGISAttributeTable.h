@@ -94,7 +94,7 @@ namespace rsgis{namespace rastergis{
     static const hsize_t  ATT_WRITE_SIEVE_BUF( 65536 );
     static const hsize_t  ATT_WRITE_META_BLOCKSIZE( 2048 );
     static const unsigned int ATT_WRITE_DEFLATE( 1 );
-    static const hsize_t ATT_WRITE_CHUNK_SIZE( 250 );
+    static const hsize_t ATT_WRITE_CHUNK_SIZE( 100 );
     
     enum RSGISFileType
     {
