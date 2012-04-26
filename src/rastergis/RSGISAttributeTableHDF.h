@@ -87,6 +87,8 @@ namespace rsgis{namespace rastergis{
         void addAttributes(vector<RSGISAttribute*> *attributes) throw(RSGISAttributeTableException);
         
         size_t getSize();
+        void holdFID(size_t fid);
+        void removeHoldFID(size_t fid);
         
         void operator++();
         void start();
@@ -123,6 +125,7 @@ namespace rsgis{namespace rastergis{
         size_t numOfReads;
         size_t numOfWrites;
         size_t maxNumOfBlockInCache;
+        map<size_t,size_t> *heldBlocks;
     };
     
     

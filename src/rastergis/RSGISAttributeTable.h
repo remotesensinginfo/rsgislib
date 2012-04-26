@@ -216,6 +216,8 @@ namespace rsgis{namespace rastergis{
         vector<string>* getAttributeNames();
         bool hasAttribute(string name);
         virtual size_t getSize()=0;
+        virtual void holdFID(size_t fid)=0;
+        virtual void removeHoldFID(size_t fid)=0;
         
         vector<double>* getFieldValues(string field) throw(RSGISAttributeTableException);
         

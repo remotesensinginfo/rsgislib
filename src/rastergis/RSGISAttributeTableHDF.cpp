@@ -36,6 +36,7 @@ namespace rsgis{namespace rastergis{
         this->numOfBlocks = 0;
         this->remainingFeatures = 0;
         this->maxNumOfBlockInCache = (this->maxCacheSize / ATT_WRITE_CHUNK_SIZE)+1;
+        this->heldBlocks = new map<size_t,size_t>();
     }
     
     RSGISAttributeTableHDF::RSGISAttributeTableHDF(size_t numFeatures, string filePath, bool readOnly, size_t maxCacheSize) throw(RSGISAttributeTableException) : RSGISAttributeTable()
@@ -51,6 +52,7 @@ namespace rsgis{namespace rastergis{
             this->numOfBlocks = 0;
             this->remainingFeatures = 0;
             this->maxNumOfBlockInCache = (this->maxCacheSize / ATT_WRITE_CHUNK_SIZE)+1;
+            this->heldBlocks = new map<size_t,size_t>();
             this->createAttributeTable(numFeatures, filePath);
         }
         catch(RSGISAttributeTableException &e)
@@ -72,6 +74,7 @@ namespace rsgis{namespace rastergis{
         this->numOfBlocks = 0;
         this->remainingFeatures = 0;
         this->maxNumOfBlockInCache = 0;
+        this->heldBlocks = new map<size_t,size_t>();
     }
     
     void RSGISAttributeTableHDF::createAttributeTable(size_t numFeatures, string filePath) throw(RSGISAttributeTableException)
@@ -521,6 +524,7 @@ namespace rsgis{namespace rastergis{
             }
             
             cacheQ->clear();
+            this->heldBlocks->clear();
         }
         catch(RSGISAttributeTableException &e)
         {
@@ -1244,6 +1248,26 @@ namespace rsgis{namespace rastergis{
     {
         return attSize;
     }
+    
+    void RSGISAttributeTableHDF::holdFID(size_t fid)
+    {
+        map<size_t,size_t>::iterator iterBlock = heldBlocks->find(fid);
+        if(iterBlock != heldBlocks->end())
+        {
+            size_t block = fid / ATT_WRITE_CHUNK_SIZE;
+            heldBlocks->insert(pair<size_t,size_t>(fid, block));
+        }
+        
+    }
+    
+    void RSGISAttributeTableHDF::removeHoldFID(size_t fid)
+    {
+        map<size_t,size_t>::iterator iterBlock = heldBlocks->find(fid);
+        if(iterBlock != heldBlocks->end())
+        {
+            heldBlocks->erase(iterBlock);
+        }
+    }
         
     void RSGISAttributeTableHDF::operator++()
     {
@@ -1305,8 +1329,24 @@ namespace rsgis{namespace rastergis{
             if(cacheQ->size() > this->maxNumOfBlockInCache)
             {
                 size_t tmpBlock = cacheQ->back();
-                cacheQ->pop_back();
-                this->removeFromCache(tmpBlock);
+                bool block2BHeld = false;
+                for(map<size_t,size_t>::iterator iterPairs = heldBlocks->begin(); iterPairs != heldBlocks->end(); ++iterPairs)
+                {
+                    if((*iterPairs).second == tmpBlock)
+                    {
+                        block2BHeld = true;
+                    }
+                }
+                
+                if(block2BHeld)
+                {
+                    
+                }
+                else
+                {
+                    cacheQ->pop_back();
+                    this->removeFromCache(tmpBlock);
+                }
             }
             //////////////////////////////////////////////////////////////////
             
@@ -2024,6 +2064,8 @@ namespace rsgis{namespace rastergis{
         this->flushAllFeatures();
         delete cacheQ;
         delete[] featCache;
+        
+        delete this->heldBlocks;
         
         this->attH5File->flush(H5F_SCOPE_GLOBAL);
         this->attH5File->close();

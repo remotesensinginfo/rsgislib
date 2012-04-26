@@ -168,6 +168,7 @@ namespace rsgis{namespace rastergis{
         {
             for(this->start(); this->end(); ++(*this))
             {
+                this->holdFID((*(*this))->fid);
                 if(statement->exp->evaluate(*(*this)))
                 {
                     processTrue->processFeature(*(*this), this);
@@ -176,6 +177,7 @@ namespace rsgis{namespace rastergis{
                 {
                     processFalse->processFeature(*(*this), this);
                 }
+                this->removeHoldFID((*(*this))->fid);
             }
         }
         catch(RSGISAttributeTableException &e)
