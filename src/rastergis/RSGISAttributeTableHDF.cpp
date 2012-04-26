@@ -482,12 +482,10 @@ namespace rsgis{namespace rastergis{
             {
                 this->populateCache(fid);
             }
-            else
+            /*else
             {
                 size_t block = fid / ATT_WRITE_CHUNK_SIZE;
                 // Move block to back of queue.
-                //cacheQ->remove(block);
-                //cacheQ->push_back(block);
                 for(list<size_t>::iterator iterBlocks = cacheQ->begin(); iterBlocks != cacheQ->end(); )
                 {
                     if((*iterBlocks) == block)
@@ -501,7 +499,7 @@ namespace rsgis{namespace rastergis{
                         ++iterBlocks;
                     }
                 }
-            }
+            }*/
             
             feat = featCache[fid];
         }
@@ -1529,7 +1527,7 @@ namespace rsgis{namespace rastergis{
                 delete[] floatVals;
             }
             
-            this->cacheQ->push_back(block);
+            this->cacheQ->push_front(block);
             //cout << "Cache has " << this->cacheQ->size() << " blocks loaded\n";
             ++numOfReads;
         }
