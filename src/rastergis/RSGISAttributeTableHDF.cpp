@@ -1252,9 +1252,10 @@ namespace rsgis{namespace rastergis{
     void RSGISAttributeTableHDF::holdFID(size_t fid)
     {
         map<size_t,size_t>::iterator iterBlock = heldBlocks->find(fid);
-        if(iterBlock != heldBlocks->end())
+        if(iterBlock == heldBlocks->end())
         {
             size_t block = fid / ATT_WRITE_CHUNK_SIZE;
+            //cout << "Adding hold: [" << fid << "," << block << "]\n";
             heldBlocks->insert(pair<size_t,size_t>(fid, block));
         }
         
@@ -1262,10 +1263,12 @@ namespace rsgis{namespace rastergis{
     
     void RSGISAttributeTableHDF::removeHoldFID(size_t fid)
     {
+        //cout << "Removing hold " << fid << endl;
         map<size_t,size_t>::iterator iterBlock = heldBlocks->find(fid);
         if(iterBlock != heldBlocks->end())
         {
             heldBlocks->erase(iterBlock);
+            //cout << "Removed\n";
         }
     }
         
@@ -1335,12 +1338,13 @@ namespace rsgis{namespace rastergis{
                     if((*iterPairs).second == tmpBlock)
                     {
                         block2BHeld = true;
+                        break;
                     }
                 }
                 
                 if(block2BHeld)
                 {
-                    
+                    // Could try and remove another block but for the moment just skip removal and see if memory becomes an issue...
                 }
                 else
                 {
