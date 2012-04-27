@@ -112,9 +112,14 @@ namespace rsgis{namespace reg{
 			}
 		}
 		
-		return (((n * sumRF) - (sumR * sumF))/sqrt(((n*sumRSq)-(sumR*sumR))*((n*sumFSq)-(sumF*sumF))));
+		float val = (((n * sumRF) - (sumR * sumF))/sqrt(((n*sumRSq)-(sumR*sumR))*((n*sumFSq)-(sumF*sumF))));
+        
+        if(val < 0)
+        {
+            val *= -1;
+        }
 		
-		
+		return val;
 	}
 
 	

@@ -255,7 +255,7 @@ namespace rsgis{namespace reg{
 				++yIdx;
 			}
 			
-			//cout << "Initial shift[" << tiePt->xShift << "," << tiePt->yShift << "] Move tie points with shift [" << currentShiftX << "," << currentShiftY << "] with value " << currentMetricVal << endl;;
+			//cout << "Initial shift[" << tiePt->xShift << "," << tiePt->yShift << "] Move tie points with shift [" << currentShiftX << "," << currentShiftY << "] with value " << currentMetricVal << endl;
 			/*
 			for(unsigned int i = 0; i < numSearchPoints; ++i)
 			{
