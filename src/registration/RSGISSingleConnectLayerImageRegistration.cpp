@@ -129,7 +129,7 @@ namespace rsgis{namespace reg{
 			
 			for(iterNrTiePts = tmpTiePts->begin(); iterNrTiePts != tmpTiePts->end(); iterNrTiePts++)
 			{
-				if(((*iterNrTiePts) != (*iterTiePts)) && (*iterTiePts)->refDistance(*iterNrTiePts))
+				if(((*iterNrTiePts) != (*iterTiePts)) && ((*iterTiePts)->refDistance(*iterNrTiePts) < this->distanceThreshold))
 				{
 					tmpTiePtInLayer->nrTiePts->push_back(*iterNrTiePts);
 				}
@@ -143,6 +143,7 @@ namespace rsgis{namespace reg{
 		delete tmpTiePts;
 		
 		initExecuted = true;
+        cout << "Initialisation Complete\n";
 	}
 	
 	void RSGISSingleConnectLayerImageRegistration::executeRegistration() throw(RSGISRegistrationException)
