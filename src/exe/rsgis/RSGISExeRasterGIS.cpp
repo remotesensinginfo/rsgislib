@@ -1561,6 +1561,18 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
             else
             {
                 this->attInMemory = false;
+                XMLCh *cacheSizeXMLStr = XMLString::transcode("cachesize");
+                if(argElement->hasAttribute(cacheSizeXMLStr))
+                {
+                    char *charValue = XMLString::transcode(argElement->getAttribute(cacheSizeXMLStr));
+                    this->cacheSize = mathUtils.strtounsignedint(string(charValue));
+                    XMLString::release(&charValue);
+                }
+                else
+                {
+                    this->cacheSize = 10000;
+                }
+                XMLString::release(&cacheSizeXMLStr);
             }
             XMLString::release(&tableOutXMLStr);
         }
@@ -3822,7 +3834,7 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
                     }
                     else
                     {
-                        attTable = RSGISAttributeTableHDF::importFromHDF5(attTableFile, false);
+                        attTable = RSGISAttributeTableHDF::importFromHDF5(attTableFile, false, this->cacheSize);
                         
                         findNeighbours.findNeighboursInBlocks(clumpsDataset, attTable);
                     }

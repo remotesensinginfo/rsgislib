@@ -298,7 +298,7 @@
     <!-- A command to create summary statistics for a field in the attribute table -->
     <rsgis:command algor="rastergis" option="summarisefield" table="input.att" output="output.txt" field="attribute_name" [min="yes"] [max="yes"] [mean="yes"] [sum="yes"] [stddev="yes"] [median="yes"] />
     <!-- A command to find the neighbours of the clumps and save as a neighbours file. -->
-    <rsgis:command algor="rastergis" option="findneighbours" clumps="clumps.env" [table="input.att" [tableout="output.att"] | output="neighbours.cnf"] />
+    <rsgis:command algor="rastergis" option="findneighbours" clumps="clumps.env" [table="input.att" [tableout="output.att"] [cachesize="unsigned int"] | output="neighbours.cnf"] />
     <!-- A command to find mean euclidean distance to neighbours -->
     <rsgis:command algor="rastergis" option="meaneucdist2neighbours" table="input.att" neighbours="neighbours.cnf" tableout="output.att" meanfield="attribute_name" maxfield="attribute_name" minfield="attribute_name" >
         <rsgis:attribute name="string" />
