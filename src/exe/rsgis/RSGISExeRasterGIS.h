@@ -157,6 +157,7 @@ protected:
     bool inoutTable;
     bool neighboursProvided;
     bool attInMemory;
+    unsigned int cacheSize;
 };
 
 #endif
