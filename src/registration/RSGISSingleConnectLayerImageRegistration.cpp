@@ -251,6 +251,10 @@ namespace rsgis{namespace reg{
 		
 		unsigned int floatImgXSize = floatingIMG->GetRasterXSize();
 		unsigned int floatImgYSize = floatingIMG->GetRasterYSize();
+        
+        unsigned int numRMDue2NaN = 0;
+        unsigned int numRMDue2Metric = 0;
+        unsigned int numRMDue2ImageExtent = 0;
 		
 		list<TiePointInSingleLayer*>::iterator iterTiePts;
 		for(iterTiePts = tiePoints->begin(); iterTiePts != tiePoints->end(); )
@@ -264,48 +268,59 @@ namespace rsgis{namespace reg{
 				delete (*iterTiePts)->tiePt;
 				delete *iterTiePts;
 				tiePoints->erase(iterTiePts++);
+                ++numRMDue2NaN;
 			}
 			else if(metric->findMin() & ((*iterTiePts)->tiePt->metricVal > metricThreshold))
 			{
 				delete (*iterTiePts)->tiePt;
 				delete *iterTiePts;
 				tiePoints->erase(iterTiePts++);
+                ++numRMDue2Metric;
 			}
 			else if(!metric->findMin() & ((*iterTiePts)->tiePt->metricVal < metricThreshold))
 			{
 				delete (*iterTiePts)->tiePt;
 				delete *iterTiePts;
 				tiePoints->erase(iterTiePts++);
+                ++numRMDue2Metric;
 			}
 			else if((*iterTiePts)->tiePt->xFloat < 0)
 			{
 				delete (*iterTiePts)->tiePt;
 				delete *iterTiePts;
 				tiePoints->erase(iterTiePts++);
+                ++numRMDue2ImageExtent;
 			}
 			else if((*iterTiePts)->tiePt->xFloat > floatImgXSize)
 			{
 				delete (*iterTiePts)->tiePt;
 				delete *iterTiePts;
 				tiePoints->erase(iterTiePts++);
+                ++numRMDue2ImageExtent;
 			}
 			else if((*iterTiePts)->tiePt->yFloat < 0)
 			{
 				delete (*iterTiePts)->tiePt;
 				delete *iterTiePts;
 				tiePoints->erase(iterTiePts++);
+                ++numRMDue2ImageExtent;
 			}
 			else if((*iterTiePts)->tiePt->yFloat > floatImgYSize)
 			{
 				delete (*iterTiePts)->tiePt;
 				delete *iterTiePts;
 				tiePoints->erase(iterTiePts++);
+                ++numRMDue2ImageExtent;
 			}
 			else
 			{
 				++iterTiePts;
 			}
 		}
+        
+        cout << numRMDue2NaN << " tie points were removed due to the metric having a value of NaN.\n";
+        cout << numRMDue2Metric << " tie points were removed due to the metric being above/below threshold.\n";
+        cout << numRMDue2ImageExtent << " tie points were removed due to being move to a position outside of the image extent.\n";
 	}
 	
 	void RSGISSingleConnectLayerImageRegistration::exportTiePointsENVIImage2Map(string filepath)throw(RSGISRegistrationException)
