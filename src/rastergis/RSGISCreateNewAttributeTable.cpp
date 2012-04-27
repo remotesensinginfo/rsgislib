@@ -115,6 +115,10 @@ namespace rsgis{namespace rastergis{
             datasets[0] = clumpsDataset;
             
             size_t *counts = new size_t[numClumps];
+            for(size_t i = 0; i < numClumps; ++i)
+            {
+                counts[i] = 0;
+            }
             
             // Populate the attribute table.
             cout << "Populating the attribute table with sum and count values\n";
