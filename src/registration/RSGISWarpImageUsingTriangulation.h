@@ -38,7 +38,6 @@
 
 #include "math/RSGISMatrices.h"
 
-
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #include <CGAL/Delaunay_triangulation_2.h>
 #include <CGAL/Interpolation_traits_2.h>
@@ -48,23 +47,21 @@
 #include <CGAL/Origin.h>
 #include <CGAL/squared_distance_2.h>
 
-
-
-typedef CGAL::Exact_predicates_inexact_constructions_kernel K;
-typedef K::FT                                         CGALCoordType;
-typedef K::Vector_2                                   CGALVector;
-typedef K::Point_2                                    CGALPoint;
-
-typedef CGAL::Delaunay_triangulation_2<K>             DelaunayTriangulation;
-typedef CGAL::Interpolation_traits_2<K>               InterpTraits;
-typedef CGAL::Delaunay_triangulation_2<K>::Vertex_handle    Vertex_handle;
-typedef CGAL::Delaunay_triangulation_2<K>::Face_handle    Face_handle;
-
-typedef std::vector< std::pair<CGALPoint, CGALCoordType> >   CoordinateVector;
-typedef std::map<CGALPoint, rsgis::reg::RSGISGCPImg2MapNode*, K::Less_xy_2>     PointValueMap;
-
 namespace rsgis{namespace reg{
 	
+    typedef CGAL::Exact_predicates_inexact_constructions_kernel K;
+    typedef K::FT                                         CGALCoordType;
+    typedef K::Vector_2                                   CGALVector;
+    typedef K::Point_2                                    CGALPoint;
+    
+    typedef CGAL::Delaunay_triangulation_2<K>             DelaunayTriangulation;
+    typedef CGAL::Interpolation_traits_2<K>               InterpTraits;
+    typedef CGAL::Delaunay_triangulation_2<K>::Vertex_handle    Vertex_handle;
+    typedef CGAL::Delaunay_triangulation_2<K>::Face_handle    Face_handle;
+    
+    typedef std::vector< std::pair<CGALPoint, CGALCoordType> >   CoordinateVector;
+    typedef std::map<CGALPoint, rsgis::reg::RSGISGCPImg2MapNode*, K::Less_xy_2>     PointValueMap;
+    
     using namespace std;
     using namespace rsgis::math;
     
