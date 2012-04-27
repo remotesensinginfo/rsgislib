@@ -103,7 +103,8 @@ public:
         exportfield2ascii,
         popattributestats,
         export2hdf,
-        export2ascii
+        export2ascii,
+        popmeansumattributes
     };
     
     RSGISExeRasterGIS();

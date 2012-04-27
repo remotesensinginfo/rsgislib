@@ -4209,7 +4209,15 @@ void RSGISExeSegment::runAlgorithm() throw(RSGISException)
                         
             cout << "Create Attribute Table\n";
             RSGISCreateNewAttributeTable createAtt;
-            RSGISAttributeTable *attTable = createAtt.createAndPopPixelCount(clumpsDataset, this->processInMemory, this->tempTable, this->cacheSize);
+            RSGISAttributeTable *attTable = NULL;
+            if(this->processInMemory)
+            {
+                attTable = createAtt.createAndPopPixelCount(clumpsDataset, this->processInMemory, this->tempTable, this->cacheSize);
+            }
+            else
+            {
+                attTable = createAtt.createAndPopPixelCountOffLine(clumpsDataset, this->processInMemory, this->tempTable, this->cacheSize);
+            }
             
             cout << "Eliminating Clumps\n";
             RSGISEliminateSmallClumps eliminate;

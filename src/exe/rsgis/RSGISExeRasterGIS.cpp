@@ -66,6 +66,7 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
     XMLCh *optionExportField2ASCII = XMLString::transcode("exportfield2ascii");
     XMLCh *optionExport2HDF = XMLString::transcode("export2hdf");
     XMLCh *optionExport2ASCII = XMLString::transcode("export2ascii");
+    XMLCh *optionPopMeanSumAttributes = XMLString::transcode("popmeansumattributes");
             
     XMLCh *optionRSGISBool = XMLString::transcode("rsgis_bool");
     XMLCh *optionRSGISInt = XMLString::transcode("rsgis_int");
@@ -2696,6 +2697,134 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
         }
         XMLString::release(&tableOutXMLStr);
     }
+    else if(XMLString::equals(optionPopMeanSumAttributes, optionXML))
+    {
+        this->option = RSGISExeRasterGIS::popmeansumattributes;
+        XMLCh *inputXMLStr = XMLString::transcode("input");
+        if(argElement->hasAttribute(inputXMLStr))
+        {
+            char *charValue = XMLString::transcode(argElement->getAttribute(inputXMLStr));
+            this->inputImage = string(charValue);
+            XMLString::release(&charValue);
+        }
+        else
+        {
+            throw RSGISXMLArgumentsException("No \'input\' attribute was provided.");
+        }
+        XMLString::release(&inputXMLStr);
+        
+        XMLCh *clumpsXMLStr = XMLString::transcode("clumps");
+        if(argElement->hasAttribute(clumpsXMLStr))
+        {
+            char *charValue = XMLString::transcode(argElement->getAttribute(clumpsXMLStr));
+            this->clumpsImage = string(charValue);
+            XMLString::release(&charValue);
+        }
+        else
+        {
+            throw RSGISXMLArgumentsException("No \'clumps\' attribute was provided.");
+        }
+        XMLString::release(&clumpsXMLStr);
+        
+        XMLCh *tableXMLStr = XMLString::transcode("table");
+        if(argElement->hasAttribute(tableXMLStr))
+        {
+            char *charValue = XMLString::transcode(argElement->getAttribute(tableXMLStr));
+            this->attTableFile = string(charValue);
+            XMLString::release(&charValue);
+        }
+        else
+        {
+            throw RSGISXMLArgumentsException("No \'table\' attribute was provided.");
+        }
+        XMLString::release(&tableXMLStr);
+        
+        
+        XMLCh *tableOutXMLStr = XMLString::transcode("tableout");
+        if(argElement->hasAttribute(tableOutXMLStr))
+        {
+            char *charValue = XMLString::transcode(argElement->getAttribute(tableOutXMLStr));
+            this->outAttTableFile = string(charValue);
+            this->attInMemory = true;
+            XMLString::release(&charValue);
+        }
+        else
+        {
+            this->attInMemory = false;
+        }
+        XMLString::release(&tableOutXMLStr);
+        
+        
+        
+        XMLCh *rsgisBandXMLStr = XMLString::transcode("rsgis:band");
+        DOMNodeList *bandNodesList = argElement->getElementsByTagName(rsgisBandXMLStr);
+		unsigned int numBands = bandNodesList->getLength();
+		
+		cout << "Found " << numBands << " Attributes" << endl;
+		
+        bandStats = new vector<RSGISBandAttStats*>();
+        bandStats->reserve(numBands);
+        
+        RSGISBandAttStats *bandStat = NULL;
+		DOMElement *bandElement = NULL;
+		for(int i = 0; i < numBands; i++)
+		{
+			bandElement = static_cast<DOMElement*>(bandNodesList->item(i));
+			
+            bandStat = new RSGISBandAttStats();
+            
+			XMLCh *bandXMLStr = XMLString::transcode("band");
+			if(bandElement->hasAttribute(bandXMLStr))
+			{
+				char *charValue = XMLString::transcode(bandElement->getAttribute(bandXMLStr));
+				bandStat->band = mathUtils.strtounsignedint(string(charValue));
+				XMLString::release(&charValue);
+			}
+			else
+			{
+				throw RSGISXMLArgumentsException("No \'band\' attribute was provided.");
+			}
+			XMLString::release(&bandXMLStr);
+            
+            XMLCh *meanXMLStr = XMLString::transcode("mean");
+			if(bandElement->hasAttribute(meanXMLStr))
+			{
+				char *charValue = XMLString::transcode(bandElement->getAttribute(meanXMLStr));
+				bandStat->meanField = string(charValue);
+				XMLString::release(&charValue);
+                
+                bandStat->calcMean = true;
+			}
+			else
+			{
+				bandStat->calcMean = false;
+			}
+			XMLString::release(&meanXMLStr);            
+            
+            XMLCh *sumXMLStr = XMLString::transcode("sum");
+			if(bandElement->hasAttribute(sumXMLStr))
+			{
+				char *charValue = XMLString::transcode(bandElement->getAttribute(sumXMLStr));
+				bandStat->sumField = string(charValue);
+				XMLString::release(&charValue);
+                
+                bandStat->calcSum = true;
+			}
+			else
+			{
+				bandStat->calcSum = false;
+			}
+			XMLString::release(&sumXMLStr);
+            
+            bandStat->calcMin = false;
+            bandStat->calcMax = false;
+            bandStat->calcStdDev = false;
+            bandStat->calcMedian = false;
+            bandStats->push_back(bandStat);
+		}
+        XMLString::release(&rsgisBandXMLStr);
+        
+    }
     else
 	{
 		string message = string("The option (") + string(XMLString::transcode(optionXML)) + string(") is not known: RSGISExeRasterGIS.");
@@ -2728,6 +2857,7 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
     XMLString::release(&optionExportField2ASCII);
     XMLString::release(&optionExport2HDF);
     XMLString::release(&optionExport2ASCII);
+    XMLString::release(&optionPopMeanSumAttributes);
     
     XMLString::release(&optionRSGISBool);
     XMLString::release(&optionRSGISInt);
@@ -4388,6 +4518,98 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
                 throw e;
             } 
         }
+        else if(this->option == RSGISExeRasterGIS::popmeansumattributes)
+        {
+            cout << "A command to populate an attribute table with sum and mean values from an image in a memory efficient and fast manor.\n";
+            cout << "Input Image: " << this->inputImage << endl;
+            cout << "Clump Image: " << this->clumpsImage << endl;
+            cout << "Input Table: " << this->attTableFile << endl;
+            if(this->attInMemory)
+            {
+                cout << "Output Table: " << this->outAttTableFile << endl;
+            }
+            else
+            {
+                cout << "Processing within existing table\n";
+            }
+            cout << "Statistics to be calculated:\n";
+            for(vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
+            {
+                cout << "Band " << (*iterBands)->band << ": ";
+                
+                if((*iterBands)->calcMean)
+                {
+                    cout << "MEAN (" << (*iterBands)->meanField << ") ";
+                }
+                
+                if((*iterBands)->calcSum)
+                {
+                    cout << "SUM (" << (*iterBands)->sumField << ") ";
+                }
+                
+                cout << endl;
+            }
+            
+            try 
+            {
+                GDALAllRegister();
+                GDALDataset **datasets = new GDALDataset*[2];
+                datasets[0] = (GDALDataset *) GDALOpenShared(this->clumpsImage.c_str(), GA_ReadOnly);
+                if(datasets[0] == NULL)
+                {
+                    string message = string("Could not open image ") + this->clumpsImage;
+                    throw RSGISImageException(message.c_str());
+                }
+                datasets[1] = (GDALDataset *) GDALOpenShared(this->inputImage.c_str(), GA_ReadOnly);
+                if(datasets[1] == NULL)
+                {
+                    string message = string("Could not open image ") + this->inputImage;
+                    throw RSGISImageException(message.c_str());
+                }
+                
+                cout << "Importing Attribute Table:\n";
+                RSGISAttributeTable *attTable = NULL;
+                if(this->attInMemory)
+                {
+                    if(RSGISAttributeTableMem::findFileType(attTableFile) == rsgis_ascii_attft)
+                    {
+                        attTable = RSGISAttributeTableMem::importFromASCII(attTableFile);
+                    }
+                    else if(RSGISAttributeTableMem::findFileType(attTableFile) == rsgis_hdf_attft)
+                    {
+                        attTable = RSGISAttributeTableMem::importFromHDF5(attTableFile);
+                    }
+                    else
+                    {
+                        throw RSGISAttributeTableException("Could not identify attribute table file type.");
+                    }
+                }
+                else
+                {
+                    attTable = RSGISAttributeTableHDF::importFromHDF5(attTableFile, false);
+                }
+                
+                cout << "Calculating Statistics\n";
+                RSGISPopulateAttributeTableBandWithSumAndMeans calcBandStats;
+                calcBandStats.populateWithBandStatistics(attTable, datasets, 2, bandStats);
+                
+                if(this->attInMemory)
+                {
+                    cout << "Exporting Attribute Table\n";
+                    attTable->exportHDF5(outAttTableFile);
+                }
+                cout << "Finished\n";               
+                
+                GDALClose(datasets[0]);
+                GDALClose(datasets[1]);
+                delete[] datasets;
+                delete attTable;
+            } 
+            catch (RSGISException &e) 
+            {
+                throw e;
+            }            
+        }
 		else
 		{
 			cout << "The option is not recognised: RSGISExeRasterGIS\n";
@@ -4825,6 +5047,38 @@ void RSGISExeRasterGIS::printParameters()
             cout << "A command to export an attribute table to a ascii file.\n";
             cout << "Input Table: " << this->attTableFile << endl;
             cout << "Output Table: " << this->outAttTableFile << endl;
+        }
+        else if(this->option == RSGISExeRasterGIS::popmeansumattributes)
+        {
+            cout << "A command to populate an attribute table with sum and mean values from an image in a memory efficient and fast manor.\n";
+            cout << "Input Image: " << this->inputImage << endl;
+            cout << "Clump Image: " << this->clumpsImage << endl;
+            cout << "Input Table: " << this->attTableFile << endl;
+            if(this->attInMemory)
+            {
+                cout << "Output Table: " << this->outAttTableFile << endl;
+            }
+            else
+            {
+                cout << "Processing within existing table\n";
+            }
+            cout << "Statistics to be calculated:\n";
+            for(vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
+            {
+                cout << "Band " << (*iterBands)->band << ": ";
+                
+                if((*iterBands)->calcMean)
+                {
+                    cout << "MEAN (" << (*iterBands)->meanField << ") ";
+                }
+                
+                if((*iterBands)->calcSum)
+                {
+                    cout << "SUM (" << (*iterBands)->sumField << ") ";
+                }
+                
+                cout << endl;
+            }
         }
 		else
 		{

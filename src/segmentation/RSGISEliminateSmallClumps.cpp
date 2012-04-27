@@ -606,8 +606,8 @@ namespace rsgis{namespace segment{
             }
             
             cout << "Populate Image Stats:\n";
-            RSGISPopulateAttributeTableBandStats popAttStats;
-            popAttStats.populateWithBandStatisticsWithinAtt(attTable, datasets, 2, bandStats);
+            RSGISPopulateAttributeTableBandWithSumAndMeans popAttStats;
+            popAttStats.populateWithBandStatistics(attTable, datasets, 2, bandStats);
             delete[] datasets;
             
             cout << "Find neighbours:\n";

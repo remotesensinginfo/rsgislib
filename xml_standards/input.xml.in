@@ -189,6 +189,13 @@
         <rsgis:band band="int" [min="field"] [max="field"] [mean="field"] [sum="field"] [stddev="field"] />
         <rsgis:band band="int" [min="field"] [max="field"] [mean="field"] [sum="field"] [stddev="field"] />
     </rsgis:command>
+	<!-- A command to populate an attribute table with sum and mean values from an image in a memory efficient and fast manor -->
+    <rsgis:command algor="rastergis" option="popmeansumattributes" input="image.env" clumps="clumps.env" table="input.att" [tableout="output.att"] >
+        <rsgis:band band="int" [mean="field"] [sum="field"] />
+        <rsgis:band band="int" [mean="field"] [sum="field"] />
+		<rsgis:band band="int" [mean="field"] [sum="field"] />
+		<rsgis:band band="int" [mean="field"] [sum="field"] />
+    </rsgis:command>
 	<!-- A command to populate an attribute table with statistics from an image where a segment value either above or below is used -->
     <rsgis:command algor="rastergis" option="meanlitbandspopattributestats" input="image.env" clumps="clumps.env" table="input.att" tableout="output.att" >
         <rsgis:band band="int" field="string" type="below | above" [min="field"] [max="field"] [mean="field"] [sum="field"] [stddev="field"] [median="field"] />
