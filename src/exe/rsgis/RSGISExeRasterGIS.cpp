@@ -2762,12 +2762,15 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
                 RSGISAttributeTable *attTable = NULL;
                 RSGISCreateNewAttributeTable createTable;
                 
-                attTable = createTable.createAndPopPixelCount(clumpsDataset, this->attInMemory, this->outputFile);
-                
                 if(this->attInMemory)
                 {
+                    attTable = createTable.createAndPopPixelCount(clumpsDataset, this->attInMemory, this->outputFile);
                     cout << "Exporting to HDF5\n";
                     attTable->exportHDF5(this->outputFile);
+                }
+                else
+                {
+                    attTable = createTable.createAndPopPixelCountOffLine(clumpsDataset, this->attInMemory, this->outputFile);
                 }
                 
                 delete attTable;

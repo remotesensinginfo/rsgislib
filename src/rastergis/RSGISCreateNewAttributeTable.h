@@ -64,6 +64,7 @@ namespace rsgis{namespace rastergis{
     public:
         RSGISCreateNewAttributeTable();
         RSGISAttributeTable* createAndPopPixelCount(GDALDataset *clumpsDataset, bool useMemory=true, string outFilePath="", unsigned long cacheSize=10000)throw(RSGISImageCalcException, RSGISAttributeTableException);
+        RSGISAttributeTable* createAndPopPixelCountOffLine(GDALDataset *clumpsDataset, bool useMemory=true, string outFilePath="", unsigned long cacheSize=10000)throw(RSGISImageCalcException, RSGISAttributeTableException);
         size_t calcMaxValue(GDALDataset *dataset)throw(RSGISImageCalcException);
         ~RSGISCreateNewAttributeTable();
     };
@@ -85,6 +86,23 @@ namespace rsgis{namespace rastergis{
     protected:
         RSGISAttributeTable *attTable;
         unsigned int pxlCountIdx;
+    };
+    
+    class RSGISPopAttributeTablePxlCountArrCalcImg : public RSGISCalcImageValue
+    {
+    public: 
+        RSGISPopAttributeTablePxlCountArrCalcImg(int numberOutBands, size_t *pxlCounts, size_t len);
+        void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException);
+        void calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+        bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
+        ~RSGISPopAttributeTablePxlCountArrCalcImg();
+    protected:
+        unsigned long *pxlCounts;
+        unsigned int len;
     };
     
     
