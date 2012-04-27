@@ -29,10 +29,10 @@
 
 #include "math/RSGISMathException.h"
 
-using namespace std;
-using namespace rsgis::math;
-
 namespace rsgis{namespace reg{
+    
+    using namespace std;
+    using namespace rsgis::math;
 		
 	class RSGISImageSimilarityMetric
 	{

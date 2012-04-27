@@ -38,7 +38,7 @@
 
 #include "math/RSGISMatrices.h"
 
-/*
+
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #include <CGAL/Delaunay_triangulation_2.h>
 #include <CGAL/Interpolation_traits_2.h>
@@ -47,10 +47,9 @@
 #include <CGAL/algorithm.h>
 #include <CGAL/Origin.h>
 #include <CGAL/squared_distance_2.h>
-*/
-using namespace std;
-using namespace rsgis::math;
-/*
+
+
+
 typedef CGAL::Exact_predicates_inexact_constructions_kernel K;
 typedef K::FT                                         CGALCoordType;
 typedef K::Vector_2                                   CGALVector;
@@ -62,10 +61,13 @@ typedef CGAL::Delaunay_triangulation_2<K>::Vertex_handle    Vertex_handle;
 typedef CGAL::Delaunay_triangulation_2<K>::Face_handle    Face_handle;
 
 typedef std::vector< std::pair<CGALPoint, CGALCoordType> >   CoordinateVector;
-typedef std::map<CGALPoint, CGALCoordType, K::Less_xy_2>     PointValueMap;
-*/
+typedef std::map<CGALPoint, rsgis::reg::RSGISGCPImg2MapNode*, K::Less_xy_2>     PointValueMap;
+
 namespace rsgis{namespace reg{
 	
+    using namespace std;
+    using namespace rsgis::math;
+    
 	class RSGISWarpImageUsingTriangulation : public RSGISWarpImage
 	{
 	public:
@@ -78,8 +80,8 @@ namespace rsgis{namespace reg{
 		list<RSGISGCPImg2MapNode*>* normGCPs(list<const RSGISGCPImg2MapNode*> *gcps, double eastings, double northings);
 		void fitPlane2XPoints(list<RSGISGCPImg2MapNode*> *normPts, double *a, double *b, double *c) throw(RSGISImageWarpException);
 		void fitPlane2YPoints(list<RSGISGCPImg2MapNode*> *normPts, double *a, double *b, double *c) throw(RSGISImageWarpException);
-		//DelaunayTriangulation *dt;
-        //PointValueMap *values;
+		DelaunayTriangulation *dt;
+        PointValueMap *values;
 	};
 	
 }}

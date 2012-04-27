@@ -27,10 +27,10 @@
 
 #include "common/RSGISRegistrationException.h"
 
-using namespace std;
-using namespace rsgis;
-
 namespace rsgis{namespace reg{
+    
+    using namespace std;
+    using namespace rsgis;
 	
 	class RSGISImageWarpException : public RSGISRegistrationException
 	{

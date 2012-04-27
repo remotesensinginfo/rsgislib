@@ -38,12 +38,14 @@
 
 #include "registration/RSGISImageRegistration.h"
 
-using namespace std;
-using namespace rsgis;
-using namespace rsgis::img;
+
 
 namespace rsgis{namespace reg{
 	
+    using namespace std;
+    using namespace rsgis;
+    using namespace rsgis::img;
+    
 	class RSGISSingleConnectLayerImageRegistration : public RSGISImageRegistration
 	{
 	public:
