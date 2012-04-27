@@ -1271,6 +1271,34 @@ namespace rsgis{namespace rastergis{
             //cout << "Removed\n";
         }
     }
+    
+    size_t RSGISAttributeTableHDF::getNumOfBlocks()
+    {
+        return (maxCacheSize/ATT_WRITE_CHUNK_SIZE)+1;
+    }
+    
+    void RSGISAttributeTableHDF::loadBlocks(size_t startBlock, size_t endBlock) throw(RSGISAttributeTableException)
+    {
+        try
+        {
+            for(size_t i = startBlock; i < endBlock; ++i)
+            {
+                if(i < numOfBlocks)
+                {
+                    this->loadBlock(i);
+                }
+            }
+        }
+        catch(RSGISAttributeTableException &e)
+        {
+            throw e;
+        }
+    }
+    
+    bool RSGISAttributeTableHDF::attInMemory()
+    {
+        return false;
+    }
         
     void RSGISAttributeTableHDF::operator++()
     {
@@ -1354,6 +1382,43 @@ namespace rsgis{namespace rastergis{
             }
             //////////////////////////////////////////////////////////////////
             
+            
+            this->loadBlock(block);
+        }
+        catch(RSGISAttributeTableException &e)
+        {
+            throw e;
+        }
+        catch( Exception &e )
+        {
+            throw RSGISAttributeTableException(e.getDetailMsg());
+        }
+    }
+    
+    void RSGISAttributeTableHDF::loadBlock(size_t block) throw(RSGISAttributeTableException)
+    {
+        try
+        {            
+            size_t startFID = 0;
+            size_t endFID = 0;
+            size_t blockSize = ATT_WRITE_CHUNK_SIZE;
+            if(block > numOfBlocks)
+            {
+                throw RSGISAttributeTableException("The specificed block is not within the file");
+            }
+            else if(block < numOfBlocks)
+            {
+                startFID = block * ATT_WRITE_CHUNK_SIZE;
+                endFID = startFID + ATT_WRITE_CHUNK_SIZE;
+            }
+            else
+            {
+                startFID = block * ATT_WRITE_CHUNK_SIZE;
+                endFID = this->attSize;
+                blockSize = endFID-startFID;
+            }
+            
+            
             /* Number of Neighbours */
             DataSpace numNeighboursDataspace = numNeighboursDataset.getSpace();
             hsize_t numNeighboursOffset[1];
@@ -1378,7 +1443,7 @@ namespace rsgis{namespace rastergis{
             
             numNeighboursMemspace.close();
             numNeighboursDataspace.close();
-                        
+            
             /* Neighbours */
             DataSpace neighboursDataspace = neighboursDataset.getSpace();
             hsize_t neighboursOffset[2];
@@ -1408,7 +1473,7 @@ namespace rsgis{namespace rastergis{
             
             neighboursDataspace.close();
             neighboursMemspace.close();
-                        
+            
             int *boolVals = NULL;
             if(this->numBoolFields > 0)
             {

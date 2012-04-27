@@ -387,6 +387,189 @@ namespace rsgis{namespace rastergis{
             throw e;
         }
     }
+    
+    void RSGISFindClumpNeighbours::findNeighboursInBlocks(GDALDataset *clumpImage, RSGISAttributeTable *attTable) throw(RSGISImageCalcException)
+    {
+        try
+        {            
+            unsigned int width = clumpImage->GetRasterXSize();
+            unsigned int height = clumpImage->GetRasterYSize();
+            GDALRasterBand *imgBand = clumpImage->GetRasterBand(1);
+            
+            int windowSize = 3;
+            
+            unsigned int **inputData = new unsigned int*[3];
+			for(int i = 0; i < windowSize; i++)
+            {
+                inputData[i] = new unsigned int[width];
+                for(int j = 0; j < width; j++)
+                {
+                    inputData[i][j] = 0;
+                }
+            }
+            
+            unsigned int **dataBlock = new unsigned int*[windowSize];
+            for(int i = 0; i < windowSize; i++)
+            {
+                dataBlock[i] = new unsigned int[windowSize];
+            }
+            
+            unsigned long clumpID = 0;
+            RSGISFeature *feat = NULL;
+            
+            int feedback = height/10;
+			int feedbackCounter = 0;
+            
+            size_t totalNumBlocks = (attTable->getSize()/ATT_WRITE_CHUNK_SIZE)+1;
+            size_t numBlocksInSample = attTable->getNumOfBlocks();
+            size_t numSamples = (totalNumBlocks/numBlocksInSample)+1;
+            size_t startBlock = 0;
+            size_t endBlock = numBlocksInSample;
+            
+            size_t numFeatInSample = ATT_WRITE_CHUNK_SIZE * numBlocksInSample;
+            size_t startFID = 0;
+            size_t endFID = numFeatInSample;
+            
+            cout << "The neighbours will be processed in " << numSamples << " samples." << endl;
+            
+            for(size_t n = 0; n < numSamples; ++n)
+            {
+                attTable->loadBlocks(startBlock, endBlock);
+                
+                feedback = height/10;
+                feedbackCounter = 0;
+                cout << "Started (" << n+1 << " of " << numSamples << ")" << flush;
+                // Loop images to process data
+                for(int i = 0; i < height; i++)
+                {				
+                    if((i % feedback) == 0)
+                    {
+                        cout << ".." << feedbackCounter << ".." << flush;
+                        feedbackCounter = feedbackCounter + 10;
+                    }
+                    
+                    for(int m = 0; m < windowSize; m++)
+                    {
+                        if(m == 0)
+                        {
+                            if(i == 0)
+                            {
+                                for(int k = 0; k < width; k++)
+                                {
+                                    inputData[m][k] = 0;
+                                }
+                            }
+                            else
+                            {
+                                imgBand->RasterIO(GF_Read, 0, i-1, width, 1, inputData[m], width, 1, GDT_UInt32, 0, 0);
+                            }
+                        }
+                        else if(m == 2)
+                        {
+                            if((i + 1) >= height)
+                            {
+                                for(int k = 0; k < width; k++)
+                                {
+                                    inputData[m][k] = 0;
+                                }
+                            }
+                            else
+                            {
+                                imgBand->RasterIO(GF_Read, 0, i+1, width, 1, inputData[m], width, 1, GDT_UInt32, 0, 0);
+                            }
+                        }
+                        else
+                        {
+                            imgBand->RasterIO(GF_Read, 0, i, width, 1, inputData[m], width, 1, GDT_UInt32, 0, 0);
+                        }
+                    }
+                    
+                    for(int j = 0; j < width; j++)
+                    {
+                        // Process Window.
+                        clumpID = inputData[1][j];
+                        if((clumpID > 0) & ((clumpID >= startFID) & (clumpID <= endFID)))
+                        {
+                            for(int m = 0; m < windowSize; m++)
+                            {
+                                for(int k = 0; k < windowSize; k++)
+                                {
+                                    
+                                    if(k == 0)
+                                    {
+                                        if(j == 0)
+                                        {
+                                            dataBlock[m][k] = 0;
+                                        }
+                                        else
+                                        {
+                                            dataBlock[m][k] = inputData[m][(j-1)];
+                                        }
+                                    }
+                                    else if(k == 2)
+                                    {
+                                        if((j + 1) >= width)
+                                        {
+                                            dataBlock[m][k] = 0;
+                                        }
+                                        else
+                                        {
+                                            dataBlock[m][k] = inputData[m][(j+1)];
+                                        }
+                                    }
+                                    else
+                                    {
+                                        dataBlock[m][k] = inputData[m][j];
+                                    }
+                                }
+                            }
+                            
+                            feat = attTable->getFeature(clumpID-1);
+                            if((dataBlock[0][1] > 0) & (dataBlock[0][1] != clumpID))
+                            {
+                                this->addNeighbourToFeature(feat, dataBlock[0][1]-1);
+                            }
+                            if((dataBlock[1][0] > 0) & (dataBlock[1][0] != clumpID))
+                            {
+                                this->addNeighbourToFeature(feat, dataBlock[1][0]-1);
+                            }
+                            if((dataBlock[1][2] > 0) & (dataBlock[1][2] != clumpID))
+                            {
+                                this->addNeighbourToFeature(feat, dataBlock[1][2]-1);
+                            }
+                            if((dataBlock[2][1] > 0) & (dataBlock[2][1] != clumpID))
+                            {
+                                this->addNeighbourToFeature(feat, dataBlock[2][1]-1);
+                            }
+                        }
+                    }
+                }
+                cout << " Complete.\n";
+                
+                attTable->flushAllFeatures();
+                startBlock += numBlocksInSample;
+                endBlock += numBlocksInSample;
+                startFID += numFeatInSample;
+                endFID += numFeatInSample;
+            }
+            
+			for(int i = 0; i < windowSize; i++)
+            {
+                delete[] dataBlock[i];
+                delete[] inputData[i];
+            }
+            delete[] dataBlock;
+            delete[] inputData;
+        }
+        catch(RSGISAttributeTableException &e)
+        {
+            throw RSGISImageCalcException(e.what());
+        }
+        catch(RSGISImageCalcException &e)
+        {
+            throw e;
+        }
+    }
         
     RSGISFindClumpNeighbours::~RSGISFindClumpNeighbours()
     {

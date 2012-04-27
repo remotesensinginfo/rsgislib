@@ -50,6 +50,7 @@ namespace rsgis{namespace rastergis{
         RSGISFindClumpNeighbours();
         vector<list<size_t>* >* findNeighbours(GDALDataset *clumpImage) throw(RSGISImageCalcException);
         void findNeighbours(GDALDataset *clumpImage, RSGISAttributeTable *attTable) throw(RSGISImageCalcException);
+        void findNeighboursInBlocks(GDALDataset *clumpImage, RSGISAttributeTable *attTable) throw(RSGISImageCalcException);
         ~RSGISFindClumpNeighbours();
     protected:
         inline void addNeighbourToFeature(RSGISFeature *feat, unsigned long long neighbourID)

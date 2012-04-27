@@ -605,6 +605,21 @@ namespace rsgis{namespace rastergis{
         // Do nothing as everything is memory to nothing to 'hold'
     }
     
+    size_t RSGISAttributeTableMem::getNumOfBlocks()
+    {
+        return (attTable->size()/ATT_WRITE_CHUNK_SIZE)+1;
+    }
+    
+    void RSGISAttributeTableMem::loadBlocks(size_t startBlock, size_t endBlock) throw(RSGISAttributeTableException)
+    {
+        // Do nothing as all in memory...
+    }
+    
+    bool RSGISAttributeTableMem::attInMemory()
+    {
+        return true;
+    }
+    
     void RSGISAttributeTableMem::operator++()
     {
         ++iterIdx;
