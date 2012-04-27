@@ -40,12 +40,11 @@
 
 #include "boost/math/special_functions/fpclassify.hpp"
 
-using namespace std;
-using namespace rsgis;
-using namespace rsgis::img;
-//using namespace boost::math;
-
 namespace rsgis{namespace reg{
+    
+    using namespace std;
+    using namespace rsgis;
+    using namespace rsgis::img;
 
 	class RSGISBasicImageRegistration : public RSGISImageRegistration
 	{

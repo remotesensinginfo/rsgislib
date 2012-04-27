@@ -49,14 +49,14 @@
 #include "registration/RSGISWarpImageInterpolator.h"
 #include "registration/RSGISGCPImg2MapNode.h"
 
-using namespace std;
-using namespace rsgis::img;
-using namespace rsgis::utils;
-using namespace rsgis::math;
-using namespace geos::geom;
-
 namespace rsgis{namespace reg{
-	
+
+	using namespace std;
+    using namespace rsgis::img;
+    using namespace rsgis::utils;
+    using namespace rsgis::math;
+    using namespace geos::geom;
+    
 	class RSGISWarpImage
 	{
 	public:

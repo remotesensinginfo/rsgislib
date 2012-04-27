@@ -50,16 +50,14 @@
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_matrix.h>
 
-using namespace std;
-using namespace rsgis;
-using namespace rsgis::img;
-using namespace rsgis::math;
-using namespace geos::geom;
-using namespace boost::math;
-
-
 namespace rsgis{namespace reg{
 	
+    using namespace std;
+    using namespace rsgis;
+    using namespace rsgis::img;
+    using namespace rsgis::math;
+    using namespace geos::geom;
+    
 	class RSGISImageRegistration
 	{
 	public:

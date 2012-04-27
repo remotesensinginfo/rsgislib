@@ -33,12 +33,11 @@
 
 #include "boost/math/special_functions/fpclassify.hpp"
 
-using namespace std;
-using namespace rsgis::math;
-//using namespace boost::math;
-
 namespace rsgis{namespace reg{
 
+    using namespace std;
+    using namespace rsgis::math;
+    
 	class RSGISEuclideanSimilarityMetric : public RSGISImageSimilarityMetric
 	{
 	public:

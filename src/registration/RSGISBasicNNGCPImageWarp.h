@@ -40,12 +40,12 @@
 #include "registration/RSGISImageWarpException.h"
 #include "registration/RSGISWarpImage.h"
 
-using namespace std;
-using namespace geos::geom;
-using namespace geos::index::quadtree;
-using namespace rsgis::math;
-
 namespace rsgis{namespace reg{
+    
+    using namespace std;
+    using namespace geos::geom;
+    using namespace geos::index::quadtree;
+    using namespace rsgis::math;
 	
 	class RSGISBasicNNGCPImageWarp : public RSGISWarpImage
 	{
