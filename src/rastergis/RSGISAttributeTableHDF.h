@@ -89,6 +89,9 @@ namespace rsgis{namespace rastergis{
         size_t getSize();
         void holdFID(size_t fid);
         void removeHoldFID(size_t fid);
+        size_t getNumOfBlocks();
+        void loadBlocks(size_t startBlock, size_t endBlock) throw(RSGISAttributeTableException);
+        bool attInMemory();
         
         void operator++();
         void start();
@@ -102,6 +105,7 @@ namespace rsgis{namespace rastergis{
         RSGISAttributeTableHDF();
         void createAttributeTable(size_t numFeatures, string filePath)throw(RSGISAttributeTableException);
         void populateCache(size_t fid) throw(RSGISAttributeTableException);
+        void loadBlock(size_t block) throw(RSGISAttributeTableException);
         void removeFromCache(size_t block) throw(RSGISAttributeTableException);
         H5File *attH5File;
         DataSet neighboursDataset;

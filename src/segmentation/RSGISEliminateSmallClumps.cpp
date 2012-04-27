@@ -612,7 +612,14 @@ namespace rsgis{namespace segment{
             
             cout << "Find neighbours:\n";
             RSGISFindClumpNeighbours findNeighbours;
-            findNeighbours.findNeighbours(clumps, attTable);
+            if(attTable->attInMemory())
+            {
+                findNeighbours.findNeighbours(clumps, attTable);
+            }
+            else
+            {
+                findNeighbours.findNeighboursInBlocks(clumps, attTable);
+            }
                                     
             cout << "Create extra attribute tables columns\n";
             if(!attTable->hasAttribute("Eliminated"))

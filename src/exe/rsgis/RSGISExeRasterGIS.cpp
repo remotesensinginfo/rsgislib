@@ -3811,17 +3811,22 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
                         {
                             throw RSGISAttributeTableException("Could not identify attribute table file type.");
                         }
+                        
+                        findNeighbours.findNeighbours(clumpsDataset, attTable);
+                        
+                        if(this->attInMemory)
+                        {
+                            cout << "Exporting Attribute Table\n";
+                            attTable->exportHDF5(this->outAttTableFile);
+                        }
                     }
                     else
                     {
                         attTable = RSGISAttributeTableHDF::importFromHDF5(attTableFile, false);
+                        
+                        findNeighbours.findNeighboursInBlocks(clumpsDataset, attTable);
                     }
-                    findNeighbours.findNeighbours(clumpsDataset, attTable);
-                    if(this->attInMemory)
-                    {
-                        cout << "Exporting Attribute Table\n";
-                        attTable->exportHDF5(this->outAttTableFile);
-                    }
+                    
                     delete attTable;
                 }
                 else

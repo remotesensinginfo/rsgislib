@@ -88,6 +88,9 @@ namespace rsgis{namespace rastergis{
         size_t getSize();
         void holdFID(size_t fid);
         void removeHoldFID(size_t fid);
+        size_t getNumOfBlocks();
+        void loadBlocks(size_t startBlock, size_t endBlock) throw(RSGISAttributeTableException);
+        bool attInMemory();
         
         void operator++();
         void start();

@@ -218,6 +218,9 @@ namespace rsgis{namespace rastergis{
         virtual size_t getSize()=0;
         virtual void holdFID(size_t fid)=0;
         virtual void removeHoldFID(size_t fid)=0;
+        virtual size_t getNumOfBlocks()=0;
+        virtual void loadBlocks(size_t startBlock, size_t endBlock) throw(RSGISAttributeTableException)=0;
+        virtual bool attInMemory()=0;
         
         vector<double>* getFieldValues(string field) throw(RSGISAttributeTableException);
         
