@@ -60,7 +60,7 @@ namespace rsgis{namespace reg{
 	class RSGISWarpImage
 	{
 	public:
-		RSGISWarpImage(string inputImage, string outputImage, string outProj4, string gcpFilePath, float outImgRes, RSGISWarpImageInterpolator *interpolator);
+		RSGISWarpImage(string inputImage, string outputImage, string outProjWKT, string gcpFilePath, float outImgRes, RSGISWarpImageInterpolator *interpolator);
 		void performWarp() throw(RSGISImageWarpException);
 		void readGCPFile() throw(RSGISImageWarpException);
 		void createOutputImage() throw(RSGISImageWarpException);
@@ -72,7 +72,7 @@ namespace rsgis{namespace reg{
 		virtual void findNearestPixel(double eastings, double northings, unsigned int *x, unsigned int *y, float inImgRes) throw(RSGISImageWarpException) = 0;
 		string inputImage;
 		string outputImage;
-		string outProj4;
+		string outProjWKT;
 		string gcpFilePath;
 		vector<RSGISGCPImg2MapNode*> *gcps;
 		float outImgRes;

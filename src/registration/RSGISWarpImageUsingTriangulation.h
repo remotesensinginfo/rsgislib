@@ -68,7 +68,7 @@ namespace rsgis{namespace reg{
 	class RSGISWarpImageUsingTriangulation : public RSGISWarpImage
 	{
 	public:
-		RSGISWarpImageUsingTriangulation(string inputImage, string outputImage, string outProj4, string gcpFilePath, float outImgRes, RSGISWarpImageInterpolator *interpolator);
+		RSGISWarpImageUsingTriangulation(string inputImage, string outputImage, string outProjWKT, string gcpFilePath, float outImgRes, RSGISWarpImageInterpolator *interpolator);
 		void initWarp()throw(RSGISImageWarpException);
 		~RSGISWarpImageUsingTriangulation();
 	protected:

@@ -28,7 +28,7 @@
 namespace rsgis{namespace reg{
 	
 	
-	RSGISBasicNNGCPImageWarp::RSGISBasicNNGCPImageWarp(string inputImage, string outputImage, string outProj4, string gcpFilePath, float outImgRes, RSGISWarpImageInterpolator *interpolator) : RSGISWarpImage(inputImage, outputImage, outProj4, gcpFilePath, outImgRes, interpolator), pointIndex(NULL)
+	RSGISBasicNNGCPImageWarp::RSGISBasicNNGCPImageWarp(string inputImage, string outputImage, string outProjWKT, string gcpFilePath, float outImgRes, RSGISWarpImageInterpolator *interpolator) : RSGISWarpImage(inputImage, outputImage, outProjWKT, gcpFilePath, outImgRes, interpolator), pointIndex(NULL)
 	{
 		
 	}
