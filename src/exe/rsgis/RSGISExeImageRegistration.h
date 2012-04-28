@@ -42,6 +42,7 @@
 #include "registration/RSGISWarpImageUsingTriangulation.h"
 
 #include "utils/RSGISFileUtils.h"
+#include "utils/RSGISTextUtils.h"
 #include "math/RSGISMathsUtils.h"
 
 #include <xercesc/dom/DOM.hpp>
@@ -102,7 +103,7 @@ protected:
 	string inputReferenceImage;
 	string inputFloatingmage;
 	string outputGCPFile;
-	string proj4;
+	string projFile;
 	OutputType outputType;
 	SimilarityMetric metricType;
 	unsigned int gcpGap;

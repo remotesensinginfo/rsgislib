@@ -26,11 +26,11 @@
 
 namespace rsgis{namespace reg{
 	
-	RSGISWarpImage::RSGISWarpImage(string inputImage, string outputImage, string outProj4, string gcpFilePath, float outImgRes, RSGISWarpImageInterpolator *interpolator):inputImage(""), outputImage(""), outProj4(""), gcpFilePath(""), outImgRes(0), interpolator(NULL)
+	RSGISWarpImage::RSGISWarpImage(string inputImage, string outputImage, string outProjWKT, string gcpFilePath, float outImgRes, RSGISWarpImageInterpolator *interpolator):inputImage(""), outputImage(""), outProjWKT(""), gcpFilePath(""), outImgRes(0), interpolator(NULL)
 	{
 		this->inputImage = inputImage;
 		this->outputImage = outputImage;
-		this->outProj4 = outProj4;
+		this->outProjWKT = outProjWKT;
 		this->gcpFilePath = gcpFilePath;
 		this->outImgRes = outImgRes;
 		this->interpolator = interpolator;
@@ -110,7 +110,6 @@ namespace rsgis{namespace reg{
 
 		GDALDataset *inputImageDS = NULL;
 		Envelope *imageGeoExtent = NULL;
-		string projection = "";
 		
 		try 
 		{			
@@ -126,24 +125,7 @@ namespace rsgis{namespace reg{
 			
 			unsigned int numOutBands = inputImageDS->GetRasterCount();
 			
-			if(this->outProj4 != "")
-			{
-				OGRSpatialReference ogrSpatial = OGRSpatialReference();
-				ogrSpatial.importFromProj4(outProj4.c_str());
-				
-				char **wktspatialref = new char*[1];
-				ogrSpatial.exportToWkt(wktspatialref);			
-				
-				projection = string(wktspatialref[0]);
-				
-				OGRFree(wktspatialref);
-			}
-			else
-			{
-				projection = "";
-			}
-			
-			GDALDataset* outputImageDS = imgUtils.createBlankImage(this->outputImage, *imageGeoExtent, this->outImgRes, numOutBands, projection, 0);
+			GDALDataset* outputImageDS = imgUtils.createBlankImage(this->outputImage, *imageGeoExtent, this->outImgRes, numOutBands, outProjWKT, 0);
 				
 			GDALClose(inputImageDS);
 			GDALClose(outputImageDS);
