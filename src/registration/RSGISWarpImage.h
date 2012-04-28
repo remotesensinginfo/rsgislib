@@ -60,7 +60,7 @@ namespace rsgis{namespace reg{
 	class RSGISWarpImage
 	{
 	public:
-		RSGISWarpImage(string inputImage, string outputImage, string outProjWKT, string gcpFilePath, float outImgRes, RSGISWarpImageInterpolator *interpolator);
+		RSGISWarpImage(string inputImage, string outputImage, string outProjWKT, string gcpFilePath, float outImgRes, RSGISWarpImageInterpolator *interpolator, string gdalFormat);
 		void performWarp() throw(RSGISImageWarpException);
 		void readGCPFile() throw(RSGISImageWarpException);
 		void createOutputImage() throw(RSGISImageWarpException);
@@ -77,6 +77,7 @@ namespace rsgis{namespace reg{
 		vector<RSGISGCPImg2MapNode*> *gcps;
 		float outImgRes;
 		RSGISWarpImageInterpolator *interpolator;
+        string gdalFormat;
 	};
 	
 }}

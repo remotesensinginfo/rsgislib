@@ -612,7 +612,18 @@ void RSGISExeImageRegistration::retrieveParameters(DOMElement *argElement) throw
 			}
 			XMLString::release(&resolutionXMLStr);
 			
-			
+			XMLCh *outImageFormatXMLStr = XMLString::transcode("format");
+			if(argElement->hasAttribute(outImageFormatXMLStr))
+			{
+				char *charValue = XMLString::transcode(argElement->getAttribute(outImageFormatXMLStr));
+				this->outImageFormat = string(charValue);
+				XMLString::release(&charValue);
+			}
+			else
+			{
+				this->outImageFormat = "ENVI";
+			}
+			XMLString::release(&outImageFormatXMLStr);
 			
 		}
 		else if(XMLString::equals(optionNNWarp, optionXML))
@@ -685,6 +696,20 @@ void RSGISExeImageRegistration::retrieveParameters(DOMElement *argElement) throw
 			XMLString::release(&resolutionXMLStr);
 			
 			
+            XMLCh *outImageFormatXMLStr = XMLString::transcode("format");
+			if(argElement->hasAttribute(outImageFormatXMLStr))
+			{
+				char *charValue = XMLString::transcode(argElement->getAttribute(outImageFormatXMLStr));
+				this->outImageFormat = string(charValue);
+				XMLString::release(&charValue);
+			}
+			else
+			{
+				this->outImageFormat = "ENVI";
+			}
+			XMLString::release(&outImageFormatXMLStr);
+            
+            
 			
 		}
 		else 
@@ -975,6 +1000,7 @@ void RSGISExeImageRegistration::runAlgorithm() throw(RSGISException)
 			cout << "Output Image: " << this->outputImage << endl;
 			cout << "Projection: " << this->projFile << endl;
 			cout << "Output Resolution: " << this->resolution << endl;
+            cout << "Output Image format: " << this->outImageFormat << endl;
 			
 			GDALAllRegister();
 			RSGISWarpImage *warp = NULL;
@@ -989,7 +1015,7 @@ void RSGISExeImageRegistration::runAlgorithm() throw(RSGISException)
                     projWKTStr = textUtils.readFileToString(this->projFile);
                 }
                 
-				warp = new RSGISWarpImageUsingTriangulation(this->inputImage, this->outputImage, projWKTStr, this->inputGCPs, this->resolution, interpolator);
+				warp = new RSGISWarpImageUsingTriangulation(this->inputImage, this->outputImage, projWKTStr, this->inputGCPs, this->resolution, interpolator, this->outImageFormat);
 				warp->performWarp();
 				delete warp;
 			}
@@ -1007,6 +1033,7 @@ void RSGISExeImageRegistration::runAlgorithm() throw(RSGISException)
 			cout << "Output Image: " << this->outputImage << endl;
 			cout << "Projection: " << this->projFile << endl;
 			cout << "Output Resolution: " << this->resolution << endl;
+            cout << "Output Image format: " << this->outImageFormat << endl;
 			
 			GDALAllRegister();
 			RSGISWarpImage *warp = NULL;
@@ -1021,7 +1048,7 @@ void RSGISExeImageRegistration::runAlgorithm() throw(RSGISException)
                     projWKTStr = textUtils.readFileToString(this->projFile);
                 }
                 
-				warp = new RSGISBasicNNGCPImageWarp(this->inputImage, this->outputImage, projWKTStr, this->inputGCPs, this->resolution, interpolator);
+				warp = new RSGISBasicNNGCPImageWarp(this->inputImage, this->outputImage, projWKTStr, this->inputGCPs, this->resolution, interpolator, this->outImageFormat);
 				warp->performWarp();
 				delete warp;
 			}
@@ -1155,6 +1182,7 @@ void RSGISExeImageRegistration::printParameters()
 			cout << "Output Image: " << this->outputImage << endl;
 			cout << "Projection: " << this->projFile << endl;
 			cout << "Output Resolution: " << this->resolution << endl;
+            cout << "Output Image format: " << this->outImageFormat << endl;
 		}
 		else if(this->option == RSGISExeImageRegistration::nnwarp)
 		{
@@ -1164,6 +1192,7 @@ void RSGISExeImageRegistration::printParameters()
 			cout << "Output Image: " << this->outputImage << endl;
 			cout << "Projection: " << this->projFile << endl;
 			cout << "Output Resolution: " << this->resolution << endl;
+            cout << "Output Image format: " << this->outImageFormat << endl;
 		}
 		else
 		{
