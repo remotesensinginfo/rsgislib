@@ -1334,7 +1334,7 @@ namespace rsgis{namespace img{
 		}
 	}
 	
-	GDALDataset* RSGISImageUtils::createBlankImage(string imageFile, double *transformation, int xSize, int ySize, int numBands, string projection, float value) throw(RSGISImageException, RSGISImageBandException)
+	GDALDataset* RSGISImageUtils::createBlankImage(string imageFile, double *transformation, int xSize, int ySize, int numBands, string projection, float value, string gdalFormat) throw(RSGISImageException, RSGISImageBandException)
 	{
 		GDALAllRegister();
 		GDALDriver *poDriver = NULL;
@@ -1363,10 +1363,10 @@ namespace rsgis{namespace img{
 				throw RSGISImageException("The image needs to have a ySize > 0");
 			}
 			
-			poDriver = GetGDALDriverManager()->GetDriverByName("ENVI");
+			poDriver = GetGDALDriverManager()->GetDriverByName(gdalFormat.c_str());
 			if(poDriver == NULL)
 			{
-				throw RSGISImageException("ENVI image driver is not available.");
+				throw RSGISImageException("Image driver is not available.");
 			}
 			
 			// Create new file. 
@@ -1444,7 +1444,7 @@ namespace rsgis{namespace img{
 		return outputImage;
 	}
     
-    GDALDataset* RSGISImageUtils::createBlankImage(string imageFile, double *transformation, int xSize, int ySize, int numBands, string projection, float value, vector<string> bandNames) throw(RSGISImageException, RSGISImageBandException)
+    GDALDataset* RSGISImageUtils::createBlankImage(string imageFile, double *transformation, int xSize, int ySize, int numBands, string projection, float value, vector<string> bandNames, string gdalFormat) throw(RSGISImageException, RSGISImageBandException)
     {
         GDALAllRegister();
 		GDALDriver *poDriver = NULL;
@@ -1473,10 +1473,10 @@ namespace rsgis{namespace img{
 				throw RSGISImageException("The image needs to have a ySize > 0");
 			}
 			
-			poDriver = GetGDALDriverManager()->GetDriverByName("ENVI");
+			poDriver = GetGDALDriverManager()->GetDriverByName(gdalFormat.c_str());
 			if(poDriver == NULL)
 			{
-				throw RSGISImageException("ENVI image driver is not available.");
+				throw RSGISImageException("Image driver is not available.");
 			}
 			
 			// Create new file. 
@@ -1553,7 +1553,7 @@ namespace rsgis{namespace img{
 		return outputImage;
     }
 	
-	GDALDataset* RSGISImageUtils::createBlankImage(string imageFile, Envelope extent, double resolution, int numBands, string projection, float value) throw(RSGISImageException, RSGISImageBandException)
+	GDALDataset* RSGISImageUtils::createBlankImage(string imageFile, Envelope extent, double resolution, int numBands, string projection, float value, string gdalFormat) throw(RSGISImageException, RSGISImageBandException)
 	{
 		GDALAllRegister();
 		GDALDriver *poDriver = NULL;
@@ -1596,10 +1596,10 @@ namespace rsgis{namespace img{
 			transformation[4] = 0;
 			transformation[5] = resolution * (-1);
 			
-			poDriver = GetGDALDriverManager()->GetDriverByName("ENVI");
+			poDriver = GetGDALDriverManager()->GetDriverByName(gdalFormat.c_str());
 			if(poDriver == NULL)
 			{
-				throw RSGISImageException("ENVI image driver is not available.");
+				throw RSGISImageException("Image driver is not available.");
 			}
 			
 			// Create new file.

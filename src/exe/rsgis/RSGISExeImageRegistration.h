@@ -104,6 +104,7 @@ protected:
 	string inputFloatingmage;
 	string outputGCPFile;
 	string projFile;
+    string outImageFormat;
 	OutputType outputType;
 	SimilarityMetric metricType;
 	unsigned int gcpGap;

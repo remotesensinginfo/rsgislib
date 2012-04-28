@@ -26,7 +26,7 @@
 
 namespace rsgis{namespace reg{
 	
-	RSGISWarpImage::RSGISWarpImage(string inputImage, string outputImage, string outProjWKT, string gcpFilePath, float outImgRes, RSGISWarpImageInterpolator *interpolator):inputImage(""), outputImage(""), outProjWKT(""), gcpFilePath(""), outImgRes(0), interpolator(NULL)
+	RSGISWarpImage::RSGISWarpImage(string inputImage, string outputImage, string outProjWKT, string gcpFilePath, float outImgRes, RSGISWarpImageInterpolator *interpolator, string gdalFormat):inputImage(""), outputImage(""), outProjWKT(""), gcpFilePath(""), outImgRes(0), interpolator(NULL), gdalFormat("ENVI")
 	{
 		this->inputImage = inputImage;
 		this->outputImage = outputImage;
@@ -34,6 +34,7 @@ namespace rsgis{namespace reg{
 		this->gcpFilePath = gcpFilePath;
 		this->outImgRes = outImgRes;
 		this->interpolator = interpolator;
+        this->gdalFormat = gdalFormat;
 		gcps = new vector<RSGISGCPImg2MapNode*>();
 	}
 	
@@ -125,7 +126,7 @@ namespace rsgis{namespace reg{
 			
 			unsigned int numOutBands = inputImageDS->GetRasterCount();
 			
-			GDALDataset* outputImageDS = imgUtils.createBlankImage(this->outputImage, *imageGeoExtent, this->outImgRes, numOutBands, outProjWKT, 0);
+			GDALDataset* outputImageDS = imgUtils.createBlankImage(this->outputImage, *imageGeoExtent, this->outImgRes, numOutBands, outProjWKT, 0, this->gdalFormat);
 				
 			GDALClose(inputImageDS);
 			GDALClose(outputImageDS);

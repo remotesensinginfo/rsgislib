@@ -128,9 +128,9 @@ namespace rsgis
 				void getImagesExtent(GDALDataset **datasets, int numDS, int *width, int *height, double *gdalTransform) throw(RSGISImageBandException);
                 void getImagesExtent(string *inputImages, int numDS, int *width, int *height, double *gdalTransform) throw(RSGISImageBandException);
 				void exportImageToTextCol(GDALDataset *image, int band, string outputText)throw(RSGISImageBandException, RSGISOutputStreamException);
-				GDALDataset* createBlankImage(string imageFile, double *transformation, int xSize, int ySize, int numBands, string projection, float value) throw(RSGISImageException, RSGISImageBandException);
-                GDALDataset* createBlankImage(string imageFile, double *transformation, int xSize, int ySize, int numBands, string projection, float value, vector<string> bandNames) throw(RSGISImageException, RSGISImageBandException);
-				GDALDataset* createBlankImage(string imageFile, Envelope extent, double resolution, int numBands, string projection, float value) throw(RSGISImageException, RSGISImageBandException);
+				GDALDataset* createBlankImage(string imageFile, double *transformation, int xSize, int ySize, int numBands, string projection, float value, string gdalFormat="ENVI") throw(RSGISImageException, RSGISImageBandException);
+                GDALDataset* createBlankImage(string imageFile, double *transformation, int xSize, int ySize, int numBands, string projection, float value, vector<string> bandNames, string gdalFormat="ENVI") throw(RSGISImageException, RSGISImageBandException);
+				GDALDataset* createBlankImage(string imageFile, Envelope extent, double resolution, int numBands, string projection, float value, string gdalFormat="ENVI") throw(RSGISImageException, RSGISImageBandException);
 				void exportImageBands(string imageFile, string outputFilebase, string format) throw(RSGISImageException, RSGISImageBandException);
 				void exportImageStack(string *inputImages, string *outputImages, string outputFormat, int numImages)  throw(RSGISImageException, RSGISImageBandException);
 				void exportImageStackWithMask(string *inputImages, string *outputImages, string imageMask, string outputFormat, int numImages, float maskValue)  throw(RSGISImageException, RSGISImageBandException);

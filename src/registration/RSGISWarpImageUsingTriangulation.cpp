@@ -26,7 +26,7 @@
 
 namespace rsgis{namespace reg{
 
-	RSGISWarpImageUsingTriangulation::RSGISWarpImageUsingTriangulation(string inputImage, string outputImage, string outProjWKT, string gcpFilePath, float outImgRes, RSGISWarpImageInterpolator *interpolator) : RSGISWarpImage(inputImage, outputImage, outProjWKT, gcpFilePath, outImgRes, interpolator)//, dt(NULL), values(NULL)
+	RSGISWarpImageUsingTriangulation::RSGISWarpImageUsingTriangulation(string inputImage, string outputImage, string outProjWKT, string gcpFilePath, float outImgRes, RSGISWarpImageInterpolator *interpolator, string gdalFormat) : RSGISWarpImage(inputImage, outputImage, outProjWKT, gcpFilePath, outImgRes, interpolator, gdalFormat), dt(NULL), values(NULL)
 	{
         
 	}

@@ -50,7 +50,7 @@ namespace rsgis{namespace reg{
 	class RSGISBasicNNGCPImageWarp : public RSGISWarpImage
 	{
 	public:
-		RSGISBasicNNGCPImageWarp(string inputImage, string outputImage, string outProjWKT, string gcpFilePath, float outImgRes, RSGISWarpImageInterpolator *interpolator);
+		RSGISBasicNNGCPImageWarp(string inputImage, string outputImage, string outProjWKT, string gcpFilePath, float outImgRes, RSGISWarpImageInterpolator *interpolator, string gdalFormat);
 		void initWarp()throw(RSGISImageWarpException);
 		~RSGISBasicNNGCPImageWarp();
 	protected:
