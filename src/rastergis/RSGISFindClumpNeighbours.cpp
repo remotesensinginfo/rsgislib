@@ -421,7 +421,7 @@ namespace rsgis{namespace rastergis{
 			int feedbackCounter = 0;
             
             size_t totalNumBlocks = (attTable->getSize()/ATT_WRITE_CHUNK_SIZE)+1;
-            size_t numBlocksInSample = attTable->getNumOfBlocks();
+            size_t numBlocksInSample = attTable->getNumOfBlocks()*0.9;
             size_t numSamples = (totalNumBlocks/numBlocksInSample)+1;
             size_t startBlock = 0;
             size_t endBlock = numBlocksInSample;
@@ -444,7 +444,7 @@ namespace rsgis{namespace rastergis{
                 {				
                     if((i % feedback) == 0)
                     {
-                        cout << ".." << feedbackCounter << ".." << flush;
+                        cout << "." << feedbackCounter << "." << flush;
                         feedbackCounter = feedbackCounter + 10;
                     }
                     
@@ -546,7 +546,7 @@ namespace rsgis{namespace rastergis{
                 }
                 cout << " Complete.\n";
                 
-                attTable->flushAllFeatures();
+                attTable->flushAllFeatures(true);
                 startBlock += numBlocksInSample;
                 endBlock += numBlocksInSample;
                 startFID += numFeatInSample;
