@@ -145,7 +145,7 @@ namespace rsgis{namespace img{
 				
 				if((i % feedback) == 0)
 				{
-					cout << ".." << feedbackCounter << ".." << flush;
+					cout << "." << feedbackCounter << "." << flush;
 					feedbackCounter = feedbackCounter + 10;
 				}
 				
@@ -509,7 +509,7 @@ namespace rsgis{namespace img{
 				
 				if((i % feedback) == 0)
 				{
-					cout << ".." << feedbackCounter << ".." << flush;
+					cout << "." << feedbackCounter << "." << flush;
 					feedbackCounter = feedbackCounter + 10;
 				}
 				
@@ -833,7 +833,7 @@ namespace rsgis{namespace img{
 				//cout << i << " of " << height << endl;
 				if((i % feedback) == 0)
 				{
-					cout << ".." << feedbackCounter << ".." << flush;
+					cout << "." << feedbackCounter << "." << flush;
 					feedbackCounter = feedbackCounter + 10;
 				}
 				
@@ -1120,7 +1120,7 @@ namespace rsgis{namespace img{
                     
                     if((i % feedback) == 0)
                     {
-                        cout << ".." << feedbackCounter << ".." << flush;
+                        cout << "." << feedbackCounter << "." << flush;
                         feedbackCounter = feedbackCounter + 10;
                     }
 
@@ -1374,7 +1374,7 @@ namespace rsgis{namespace img{
 				
 				if((i % feedback) == 0)
 				{
-					cout << ".." << feedbackCounter << ".." << flush;
+					cout << "." << feedbackCounter << "." << flush;
 					feedbackCounter = feedbackCounter + 10;
 				}
 				
@@ -1721,7 +1721,7 @@ namespace rsgis{namespace img{
 				
 				if((i % feedback) == 0)
 				{
-					cout << ".." << feedbackCounter << ".." << flush;
+					cout << "." << feedbackCounter << "." << flush;
 					feedbackCounter = feedbackCounter + 10;
 				}
 				
@@ -2033,7 +2033,7 @@ namespace rsgis{namespace img{
 				
 				if((i % feedback) == 0)
 				{
-					cout << ".." << feedbackCounter << ".." << flush;
+					cout << "." << feedbackCounter << "." << flush;
 					feedbackCounter = feedbackCounter + 10;
 				}
 				
@@ -2450,7 +2450,7 @@ namespace rsgis{namespace img{
 			{				
 				if((i % feedback) == 0)
 				{
-					cout << ".." << feedbackCounter << ".." << flush;
+					cout << "." << feedbackCounter << "." << flush;
 					feedbackCounter = feedbackCounter + 10;
 				}
 				
@@ -2928,7 +2928,7 @@ namespace rsgis{namespace img{
 			{				
 				if((i % feedback) == 0)
 				{
-					cout << ".." << feedbackCounter << ".." << flush;
+					cout << "." << feedbackCounter << "." << flush;
 					feedbackCounter = feedbackCounter + 10;
 				}
 				
@@ -3433,7 +3433,7 @@ namespace rsgis{namespace img{
 			{				
 				if((i % feedback) == 0)
 				{
-					cout << ".." << feedbackCounter << ".." << flush;
+					cout << "." << feedbackCounter << "." << flush;
 					feedbackCounter = feedbackCounter + 10;
 				}
 				
@@ -3948,7 +3948,7 @@ namespace rsgis{namespace img{
 				{				
 					if((i % feedback) == 0)
 					{
-						cout << ".." << feedbackCounter << ".." << flush;
+						cout << "." << feedbackCounter << "." << flush;
 						feedbackCounter = feedbackCounter + 10;
 					}
 					
@@ -4422,7 +4422,7 @@ namespace rsgis{namespace img{
 			{				
 				if(((i % feedback) == 0) && (height > 100))
 				{
-					cout << ".." << feedbackCounter << ".." << flush;
+					cout << "." << feedbackCounter << "." << flush;
 					feedbackCounter = feedbackCounter + 10;
 				}
 				
@@ -4929,7 +4929,7 @@ namespace rsgis{namespace img{
 			{				
 				if(((i % feedback) == 0) && (height > 100))
 				{
-					cout << ".." << feedbackCounter << ".." << flush;
+					cout << "." << feedbackCounter << "." << flush;
 					feedbackCounter = feedbackCounter + 10;
 				}
 				
@@ -5815,7 +5815,7 @@ namespace rsgis{namespace img{
 			{				
 				if(((i % feedback) == 0) && (height > 100))
 				{
-					cout << ".." << feedbackCounter << ".." << flush;
+					cout << "." << feedbackCounter << "." << flush;
 					feedbackCounter = feedbackCounter + 10;
 				}
 				counter = 0;

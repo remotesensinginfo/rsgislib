@@ -329,8 +329,17 @@ namespace rsgis{namespace rastergis{
             
             idx = 0;
             size_t j = 0;
+            int feedback = attTable->getSize()/10;
+			int feedbackCounter = 0;
+            cout << "Writing to attribute table\n";
+			cout << "Started" << flush;
             for(attTable->start(); attTable->end(); ++(*attTable))
             {
+                if((idx % feedback) == 0)
+				{
+					cout << "." << feedbackCounter << "." << flush;
+					feedbackCounter = feedbackCounter + 10;
+				}
                 (*(*attTable))->intFields->at(pxlCountIdx) = pxlCount[idx];
                 j = 0;
                 for(vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
@@ -345,9 +354,10 @@ namespace rsgis{namespace rastergis{
                     }
                     ++j;
                 }
-                ++idx;
                 delete[] sumVals[idx];
+                ++idx;
             }
+            cout << " Complete.\n";
             
             delete[] sumVals;
             delete[] pxlCount;
