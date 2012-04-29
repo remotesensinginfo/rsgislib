@@ -71,11 +71,11 @@ namespace rsgis{namespace rastergis{
     static const string ATT_INT_DATA( "/DATA/INT" );
     static const string ATT_FLOAT_DATA( "/DATA/FLOAT" );
     static const string ATT_NEIGHBOURS_DATA( "/NEIGHBOURS/NEIGHBOURS" );
-    static const string ATT_NUM_NEIGHBOURS_DATA( "/NEIGHBOURS/NUM_NEIGHBOURS" );
     
     static const string ATT_BOOL_FIELDS_HEADER( "/HEADER/BOOL_FIELDS" );
     static const string ATT_INT_FIELDS_HEADER( "/HEADER/INT_FIELDS" );
     static const string ATT_FLOAT_FIELDS_HEADER( "/HEADER/FLOAT_FIELDS" );
+    static const string ATT_SIZE_HEADER( "/HEADER/SIZE" );
     
     static const string ATT_NAME_FIELD( "NAME" );
     static const string ATT_INDEX_FIELD( "INDEX" );
@@ -114,6 +114,12 @@ namespace rsgis{namespace rastergis{
         vector<string> *stringFields;
         vector<size_t> *neighbours;
     };
+    
+    typedef struct {
+        size_t length;
+        void   *p;
+    } hvl_t;
+
     
     enum RSGISAttributeDataType
     {

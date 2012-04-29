@@ -27,7 +27,7 @@ namespace rsgis{namespace rastergis{
     
     RSGISAttributeTable::RSGISAttributeTable()
     {
-        
+
     }
         
     RSGISAttributeDataType RSGISAttributeTable::getDataType(string name) throw(RSGISAttributeTableException)
@@ -525,6 +525,14 @@ namespace rsgis{namespace rastergis{
 			attH5File->createGroup( ATT_GROUPNAME_DATA );
             attH5File->createGroup( ATT_GROUPNAME_NEIGHBOURS );
             
+            hsize_t dimsAttSize[1];
+			dimsAttSize[0] = 1;
+            size_t numFeatures = this->getSize();
+			DataSpace attSizeDataSpace(1, dimsAttSize);
+            DataSet sizeDataset = attH5File->createDataSet(ATT_SIZE_HEADER, PredType::STD_U64LE, attSizeDataSpace);
+			sizeDataset.write( &numFeatures, PredType::STD_U64LE );
+            attSizeDataSpace.close();
+            
             RSGISAttributeIdx *boolFields = NULL;
             if(this->numBoolFields > 0)
             {
@@ -762,47 +770,26 @@ namespace rsgis{namespace rastergis{
             }
             
             // Create Neighbours dataset
-            hsize_t maxNumNeighbours = 25;
-            hsize_t numNeighbours = 25;
-            hsize_t initDimsNeighboursDS[2];
+            hsize_t initDimsNeighboursDS[1];
             initDimsNeighboursDS[0] = 0;
-            initDimsNeighboursDS[1] = 0;
-            hsize_t maxDimsNeighboursDS[2];
+            hsize_t maxDimsNeighboursDS[1];
             maxDimsNeighboursDS[0] = H5S_UNLIMITED;
-            maxDimsNeighboursDS[1] = H5S_UNLIMITED;
-            DataSpace neighboursDataSpace = DataSpace(2, initDimsNeighboursDS, maxDimsNeighboursDS);
+            DataSpace neighboursDataspace = DataSpace(1, initDimsNeighboursDS, maxDimsNeighboursDS);
             
-            hsize_t dimsNeighboursChunk[2];
+            hsize_t dimsNeighboursChunk[1];
             dimsNeighboursChunk[0] = ATT_WRITE_CHUNK_SIZE;
-            dimsNeighboursChunk[1] = ATT_WRITE_CHUNK_SIZE;
             
-            unsigned long fillValueULong = 0;
+            DataType intVarLenDiskDT = VarLenType(&PredType::STD_U64LE);
+            hvl_t neighboursDataFillVal[1];
+            neighboursDataFillVal[0].p = NULL;
+            neighboursDataFillVal[0].length = 0;
             DSetCreatPropList creationNeighboursDSPList;
-            creationNeighboursDSPList.setChunk(2, dimsNeighboursChunk);
+            creationNeighboursDSPList.setChunk(1, dimsNeighboursChunk);
             creationNeighboursDSPList.setShuffle();
             creationNeighboursDSPList.setDeflate(ATT_WRITE_DEFLATE);
-            creationNeighboursDSPList.setFillValue( PredType::STD_U64LE, &fillValueULong);
+            creationNeighboursDSPList.setFillValue( intVarLenDiskDT, &neighboursDataFillVal);
             
-            DataSet *neighboursDataset = new DataSet(attH5File->createDataSet(ATT_NEIGHBOURS_DATA, PredType::STD_U64LE, neighboursDataSpace, creationNeighboursDSPList));
-            
-            // Create Number of Neighbours dataset
-            hsize_t initDimsNumNeighboursDS[1];
-            initDimsNumNeighboursDS[0] = 0;
-            hsize_t maxDimsNumNeighboursDS[1];
-            maxDimsNumNeighboursDS[0] = H5S_UNLIMITED;
-            DataSpace numNeighboursDataSpace = DataSpace(1, initDimsNumNeighboursDS, maxDimsNumNeighboursDS);
-            
-            hsize_t dimsNumNeighboursChunk[1];
-            dimsNumNeighboursChunk[0] = ATT_WRITE_CHUNK_SIZE;
-            
-            unsigned int fillValueUInt = 0;
-            DSetCreatPropList creationNumNeighboursDSPList;
-            creationNumNeighboursDSPList.setChunk(1, dimsNumNeighboursChunk);
-            creationNumNeighboursDSPList.setShuffle();
-            creationNumNeighboursDSPList.setDeflate(ATT_WRITE_DEFLATE);
-            creationNumNeighboursDSPList.setFillValue( PredType::STD_U32LE, &fillValueUInt);
-            
-            DataSet *numNeighboursDataset = new DataSet(attH5File->createDataSet(ATT_NUM_NEIGHBOURS_DATA, PredType::STD_U32LE, numNeighboursDataSpace, creationNumNeighboursDSPList));
+            DataSet neighboursDataset = attH5File->createDataSet(ATT_NEIGHBOURS_DATA, intVarLenDiskDT, neighboursDataspace, creationNeighboursDSPList);
             
             unsigned long numChunks = this->getSize() / ATT_WRITE_CHUNK_SIZE;
             unsigned long remainingRows = this->getSize() - (numChunks * ATT_WRITE_CHUNK_SIZE);
@@ -825,10 +812,8 @@ namespace rsgis{namespace rastergis{
                 floatVals = new double[ATT_WRITE_CHUNK_SIZE*this->numFloatFields];
             }
             
-            unsigned long *neighbourVals = new unsigned long[ATT_WRITE_CHUNK_SIZE*maxNumNeighbours];
-            unsigned long *neighbourValsTmp = NULL;
+            hvl_t *neighbourVals = new hvl_t[ATT_WRITE_CHUNK_SIZE];
             
-            unsigned int *numNeighbourVals = new unsigned int[ATT_WRITE_CHUNK_SIZE];
             
             hsize_t extendBoolDatasetTo[2];
             extendBoolDatasetTo[0] = 0;
@@ -860,22 +845,13 @@ namespace rsgis{namespace rastergis{
             floatDataDims[0] = ATT_WRITE_CHUNK_SIZE;
             floatDataDims[1] = this->numFloatFields;
             
-            hsize_t extendNeighboursDatasetTo[2];
+            hsize_t extendNeighboursDatasetTo[1];
             extendNeighboursDatasetTo[0] = 0;
-            extendNeighboursDatasetTo[1] = maxNumNeighbours;
-            hsize_t neighboursDataOffset[2];
+            hsize_t neighboursDataOffset[1];
             neighboursDataOffset[0] = 0;
-            neighboursDataOffset[1] = 0;
-            hsize_t neighboursDataDims[2];
+            hsize_t neighboursDataDims[1];
             neighboursDataDims[0] = ATT_WRITE_CHUNK_SIZE;
-            neighboursDataDims[1] = maxNumNeighbours;
-            
-            hsize_t extendNumNeighboursDatasetTo[1];
-            extendNumNeighboursDatasetTo[0] = 0;
-            hsize_t numNeighboursDataOffset[1];
-            numNeighboursDataOffset[0] = 0;
-            hsize_t numNeighboursDataDims[1];
-            numNeighboursDataDims[0] = ATT_WRITE_CHUNK_SIZE;
+            DataType intVarLenMemDT = VarLenType(&PredType::NATIVE_UINT64);
             
             size_t currentSize = 0;
             size_t rowIdx = 0;
@@ -910,36 +886,20 @@ namespace rsgis{namespace rastergis{
                         }
                     }
                     
-                    if(maxNumNeighbours < feat->neighbours->size())
+                    if(feat->neighbours->size() > 0)
                     {
-                        maxNumNeighbours = feat->neighbours->size();
-                        neighbourValsTmp = new unsigned long[ATT_WRITE_CHUNK_SIZE*maxNumNeighbours];
-                        for(unsigned int n = 0; n < ATT_WRITE_CHUNK_SIZE; ++n)
+                        neighbourVals[j].length = feat->neighbours->size();
+                        neighbourVals[j].p = new size_t[feat->neighbours->size()];
+                        for(unsigned int k = 0; k < feat->neighbours->size(); ++k)
                         {
-                            for(unsigned int m = 0; m < numNeighbours; ++m)
-                            {
-                                neighbourValsTmp[(n*maxNumNeighbours)+m] = neighbourVals[(n*numNeighbours)+m];
-                            }
-                            for(unsigned int m = numNeighbours; m < maxNumNeighbours; ++m)
-                            {
-                                neighbourValsTmp[(n*maxNumNeighbours)+m] = 0;
-                            }
+                            ((size_t*)neighbourVals[j].p)[k] = feat->neighbours->at(k);
                         }
-                        delete[] neighbourVals;
-                        neighbourVals = neighbourValsTmp;
-                        numNeighbours = maxNumNeighbours;
                     }
-                    
-                    for(unsigned int k = 0; k < feat->neighbours->size(); ++k)
+                    else
                     {
-                        neighbourVals[(j*numNeighbours)+k] = feat->neighbours->at(k);
+                        neighbourVals[j].length = 0;
+                        neighbourVals[j].p = NULL;
                     }
-                    for(unsigned int m = feat->neighbours->size(); m < maxNumNeighbours; ++m)
-                    {
-                        neighbourVals[(j*numNeighbours)+m] = 0;
-                    }
-                    
-                    numNeighbourVals[j] = feat->neighbours->size();
                 }
                 
                 if(this->numBoolFields > 0)
@@ -991,32 +951,24 @@ namespace rsgis{namespace rastergis{
                 }
                 
                 extendNeighboursDatasetTo[0] = currentSize + ATT_WRITE_CHUNK_SIZE;
-                extendNeighboursDatasetTo[1] = numNeighbours;
-                neighboursDataset->extend( extendNeighboursDatasetTo );
-                
+                neighboursDataset.extend( extendNeighboursDatasetTo );
                 neighboursDataOffset[0] = currentSize;
-                neighboursDataOffset[1] = 0;
-                
                 neighboursDataDims[0] = ATT_WRITE_CHUNK_SIZE;
-                neighboursDataDims[1] = maxNumNeighbours;
                 
-                DataSpace neighboursWriteDataSpace = neighboursDataset->getSpace();
+                DataSpace neighboursWriteDataSpace = neighboursDataset.getSpace();
                 neighboursWriteDataSpace.selectHyperslab(H5S_SELECT_SET, neighboursDataDims, neighboursDataOffset);
-                DataSpace newNeighboursDataspace = DataSpace(2, neighboursDataDims);
+                DataSpace newNeighboursDataspace = DataSpace(1, neighboursDataDims);
                 
-                neighboursDataset->write(neighbourVals, PredType::NATIVE_UINT64, newNeighboursDataspace, neighboursWriteDataSpace);
+                neighboursDataset.write(neighbourVals, intVarLenMemDT, newNeighboursDataspace, neighboursWriteDataSpace);
                 
-                
-                extendNumNeighboursDatasetTo[0] = currentSize + ATT_WRITE_CHUNK_SIZE;
-                numNeighboursDataset->extend( extendNumNeighboursDatasetTo );
-                
-                numNeighboursDataOffset[0] = currentSize;
-                
-                DataSpace numNeighboursWriteDataSpace = numNeighboursDataset->getSpace();
-                numNeighboursWriteDataSpace.selectHyperslab(H5S_SELECT_SET, numNeighboursDataDims, numNeighboursDataOffset);
-                DataSpace newNumNeighboursDataspace = DataSpace(1, numNeighboursDataDims);
-                
-                numNeighboursDataset->write(numNeighbourVals, PredType::NATIVE_UINT32, newNumNeighboursDataspace, numNeighboursWriteDataSpace);
+                for(size_t i = 0; i < ATT_WRITE_CHUNK_SIZE; ++i)
+                {
+                    if(neighbourVals[i].length > 0)
+                    {
+                        neighbourVals[i].length = 0;
+                        delete[] ((size_t*)neighbourVals[i].p);
+                    }
+                }
                 
                 currentSize += ATT_WRITE_CHUNK_SIZE;
             }
@@ -1049,36 +1001,20 @@ namespace rsgis{namespace rastergis{
                     }
                 }
                 
-                if(maxNumNeighbours < feat->neighbours->size())
+                if(feat->neighbours->size() > 0)
                 {
-                    maxNumNeighbours = feat->neighbours->size();
-                    neighbourValsTmp = new unsigned long[ATT_WRITE_CHUNK_SIZE*maxNumNeighbours];
-                    for(unsigned int n = 0; n < ATT_WRITE_CHUNK_SIZE; ++n)
+                    neighbourVals[j].length = feat->neighbours->size();
+                    neighbourVals[j].p = new size_t[feat->neighbours->size()];
+                    for(unsigned int k = 0; k < feat->neighbours->size(); ++k)
                     {
-                        for(unsigned int m = 0; m < numNeighbours; ++m)
-                        {
-                            neighbourValsTmp[(n*maxNumNeighbours)+m] = neighbourVals[(n*numNeighbours)+m];
-                        }
-                        for(unsigned int m = numNeighbours; m < maxNumNeighbours; ++m)
-                        {
-                            neighbourValsTmp[(n*maxNumNeighbours)+m] = 0;
-                        }
+                        ((size_t*)neighbourVals[j].p)[k] = feat->neighbours->at(k);
                     }
-                    delete[] neighbourVals;
-                    neighbourVals = neighbourValsTmp;
-                    numNeighbours = maxNumNeighbours;
                 }
-                
-                for(unsigned int k = 0; k < feat->neighbours->size(); ++k)
+                else
                 {
-                    neighbourVals[(j*numNeighbours)+k] = feat->neighbours->at(k);
+                    neighbourVals[j].length = 0;
+                    neighbourVals[j].p = NULL;
                 }
-                for(unsigned int m = feat->neighbours->size(); m < maxNumNeighbours; ++m)
-                {
-                    neighbourVals[(j*numNeighbours)+m] = 0;
-                }
-                
-                numNeighbourVals[j] = feat->neighbours->size();
             }
             
             if(this->numBoolFields > 0)
@@ -1138,39 +1074,31 @@ namespace rsgis{namespace rastergis{
                 floatDataset->write(floatVals, PredType::NATIVE_DOUBLE, newFloatDataspace, floatWriteDataSpace);
             }
             
+            
             extendNeighboursDatasetTo[0] = currentSize + remainingRows;
-            extendNeighboursDatasetTo[1] = numNeighbours;
-            neighboursDataset->extend( extendNeighboursDatasetTo );
-            
+            neighboursDataset.extend( extendNeighboursDatasetTo );
             neighboursDataOffset[0] = currentSize;
-            neighboursDataOffset[1] = 0;
-            
             neighboursDataDims[0] = remainingRows;
-            neighboursDataDims[1] = maxNumNeighbours;
             
-            DataSpace neighboursWriteDataSpace = neighboursDataset->getSpace();
+            DataSpace neighboursWriteDataSpace = neighboursDataset.getSpace();
             neighboursWriteDataSpace.selectHyperslab(H5S_SELECT_SET, neighboursDataDims, neighboursDataOffset);
-            DataSpace newNeighboursDataspace = DataSpace(2, neighboursDataDims);
+            DataSpace newNeighboursDataspace = DataSpace(1, neighboursDataDims);
             
-            neighboursDataset->write(neighbourVals, PredType::NATIVE_UINT64, newNeighboursDataspace, neighboursWriteDataSpace);
+            neighboursDataset.write(neighbourVals, intVarLenMemDT, newNeighboursDataspace, neighboursWriteDataSpace);
             
+            for(size_t i = 0; i < remainingRows; ++i)
+            {
+                if(neighbourVals[i].length > 0)
+                {
+                    neighbourVals[i].length = 0;
+                    delete[] ((size_t*)neighbourVals[i].p);
+                }
+            }
             
-            extendNumNeighboursDatasetTo[0] = currentSize + remainingRows;
-            numNeighboursDataset->extend( extendNumNeighboursDatasetTo );
-            
-            numNeighboursDataOffset[0] = currentSize;
-            numNeighboursDataDims[0] = remainingRows;
-            
-            DataSpace numNeighboursWriteDataSpace = numNeighboursDataset->getSpace();
-            numNeighboursWriteDataSpace.selectHyperslab(H5S_SELECT_SET, numNeighboursDataDims, numNeighboursDataOffset);
-            DataSpace newNumNeighboursDataspace = DataSpace(1, numNeighboursDataDims);
-            
-            numNeighboursDataset->write(numNeighbourVals, PredType::NATIVE_UINT32, newNumNeighboursDataspace, numNeighboursWriteDataSpace);
             
             delete boolDataset;
             delete intDataset;
             delete floatDataset;
-            delete neighboursDataset;
             
             attH5File->flush(H5F_SCOPE_GLOBAL);
 			attH5File->close();
