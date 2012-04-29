@@ -111,6 +111,7 @@ namespace rsgis{namespace rastergis{
             
             unsigned int pxlCountIdx = attTable->getFieldIndex(string("pxlcount"));
             
+            
             GDALDataset **datasets = new GDALDataset*[1];
             datasets[0] = clumpsDataset;
             
@@ -135,6 +136,7 @@ namespace rsgis{namespace rastergis{
             }
             
             delete[] counts;
+             
         } 
         catch (RSGISImageCalcException &e) 
         {

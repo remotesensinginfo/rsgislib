@@ -948,6 +948,16 @@ namespace rsgis{namespace rastergis{
             attTableObj->numFloatFields = 0;
             attTableObj->numStrFields = 0;
             
+            hsize_t dimsAttSize[1];
+			dimsAttSize[0] = 1;
+            size_t numFeats = 0;
+			DataSpace attSizeDataSpace(1, dimsAttSize);
+            DataSet sizeDataset = attH5File->openDataSet( ATT_SIZE_HEADER );
+            sizeDataset.read(&numFeats, PredType::NATIVE_ULLONG, attSizeDataSpace);
+            attSizeDataSpace.close();
+            
+            cout << "Table has " << numFeats << " features\n";
+            
             CompType *fieldCompTypeMem = attTableObj->createAttibuteIdxCompTypeMem();
             try
             {
@@ -1049,33 +1059,21 @@ namespace rsgis{namespace rastergis{
                         
             DataSet neighboursDataset = attH5File->openDataSet( ATT_NEIGHBOURS_DATA );
             DataSpace neighboursDataspace = neighboursDataset.getSpace();
-                        
-            int neighboursNDims = neighboursDataspace.getSimpleExtentNdims();
             
-            if(neighboursNDims != 2)
+            int neighboursNDims = neighboursDataspace.getSimpleExtentNdims();
+            if(neighboursNDims != 1)
             {
-                throw RSGISAttributeTableException("The neighbours datasets needs to have 2 dimensions.");
+                throw RSGISAttributeTableException("The neighbours datasets needs to have 1 dimension.");
             }
             
             hsize_t *neighboursDims = new hsize_t[neighboursNDims];
             neighboursDataspace.getSimpleExtentDims(neighboursDims);
             
-            unsigned int neighboursLineLength = neighboursDims[1];
-            
-            DataSet numNeighboursDataset = attH5File->openDataSet( ATT_NUM_NEIGHBOURS_DATA );
-            DataSpace numNeighboursDataspace = numNeighboursDataset.getSpace();
-            
-            hsize_t *numNeighboursDims = new hsize_t[1];
-            numNeighboursDataspace.getSimpleExtentDims(numNeighboursDims);
-            
-            if(numNeighboursDims[0] != neighboursDims[0])
+            if(neighboursDims[0] != numFeats)
             {
-                throw RSGISAttributeTableException("The number features in the different neighbour datasets is not equal.");
+                throw RSGISAttributeTableException("The number of features in neighbours datasets does not match expected values.");
             }
             
-            size_t numFeats = numNeighboursDims[0];
-            
-            delete[] numNeighboursDims;
             delete[] neighboursDims;
             
             //cout << "Number of Features = " << numFeats << endl;
@@ -1180,49 +1178,26 @@ namespace rsgis{namespace rastergis{
                  floatVals = new double[ATT_WRITE_CHUNK_SIZE*attTableObj->numFloatFields];
             }
             
-            unsigned long *neighbourVals = new unsigned long[ATT_WRITE_CHUNK_SIZE*neighboursLineLength];            
-            unsigned int *numNeighbourVals = new unsigned int[ATT_WRITE_CHUNK_SIZE];
-
             attTableObj->attTable = new vector<RSGISFeature*>();
             attTableObj->attTable->reserve(numFeats);
-            
-            /* Number of Neighbours */
-            hsize_t numNeighboursOffset[1];
-			numNeighboursOffset[0] = 0;
-			hsize_t numNeighboursCount[1];
-			numNeighboursCount[0]  = ATT_WRITE_CHUNK_SIZE;
-			numNeighboursDataspace.selectHyperslab( H5S_SELECT_SET, numNeighboursCount, numNeighboursOffset );
-			
-			hsize_t numNeighboursDimsRead[1]; 
-			numNeighboursDimsRead[0] = ATT_WRITE_CHUNK_SIZE;
-			DataSpace numNeighboursMemspace( 1, numNeighboursDimsRead );
-			
-			hsize_t numNeighboursOffset_out[1];
-            numNeighboursOffset_out[0] = 0;
-			hsize_t numNeighboursCount_out[1];
-			numNeighboursCount_out[0] = ATT_WRITE_CHUNK_SIZE;
-			numNeighboursMemspace.selectHyperslab( H5S_SELECT_SET, numNeighboursCount_out, numNeighboursOffset_out );
-    
+ 
             /* Neighbours */
-            hsize_t neighboursOffset[2];
+            hvl_t *neighbourVals = new hvl_t[ATT_WRITE_CHUNK_SIZE];
+            DataType intVarLenMemDT = VarLenType(&PredType::NATIVE_UINT64);
+            hsize_t neighboursOffset[1];
 			neighboursOffset[0] = 0;
-            neighboursOffset[1] = 0;
-			hsize_t neighboursCount[2];
+			hsize_t neighboursCount[1];
 			neighboursCount[0] = ATT_WRITE_CHUNK_SIZE;
-            neighboursCount[1] = neighboursLineLength;
 			neighboursDataspace.selectHyperslab( H5S_SELECT_SET, neighboursCount, neighboursOffset );
 			
-			hsize_t neighboursDimsRead[2]; 
+			hsize_t neighboursDimsRead[1]; 
 			neighboursDimsRead[0] = ATT_WRITE_CHUNK_SIZE;
-            neighboursDimsRead[1] = neighboursLineLength;
-			DataSpace neighboursMemspace( 2, neighboursDimsRead );
+			DataSpace neighboursMemspace( 1, neighboursDimsRead );
 			
-			hsize_t neighboursOffset_out[2];
+			hsize_t neighboursOffset_out[1];
             neighboursOffset_out[0] = 0;
-            neighboursOffset_out[1] = 0;
-			hsize_t neighboursCount_out[2];
+			hsize_t neighboursCount_out[1];
 			neighboursCount_out[0] = ATT_WRITE_CHUNK_SIZE;
-            neighboursCount_out[1] = neighboursLineLength;
 			neighboursMemspace.selectHyperslab( H5S_SELECT_SET, neighboursCount_out, neighboursOffset_out );
             
             /* Bool fields */
@@ -1315,13 +1290,9 @@ namespace rsgis{namespace rastergis{
             size_t cFid = 0;
             for(unsigned long i = 0; i < numChunks; ++i)
             {
-                numNeighboursOffset[0] = i*ATT_WRITE_CHUNK_SIZE;
-                numNeighboursDataspace.selectHyperslab( H5S_SELECT_SET, numNeighboursCount, numNeighboursOffset );
-                numNeighboursDataset.read(numNeighbourVals, PredType::NATIVE_UINT32, numNeighboursMemspace, numNeighboursDataspace);
-
                 neighboursOffset[0] = i*ATT_WRITE_CHUNK_SIZE;
                 neighboursDataspace.selectHyperslab( H5S_SELECT_SET, neighboursCount, neighboursOffset );
-                neighboursDataset.read(neighbourVals, PredType::NATIVE_UINT64, neighboursMemspace, neighboursDataspace);
+                neighboursDataset.read(neighbourVals, intVarLenMemDT, neighboursMemspace, neighboursDataspace);
                 
                 if(hasBoolFields)
                 {
@@ -1377,47 +1348,30 @@ namespace rsgis{namespace rastergis{
                     }
                     feature->stringFields = new vector<string>();
                     feature->neighbours = new vector<size_t>();
-                    feature->neighbours->reserve(numNeighbourVals[j]);
-                    
-                    for(hsize_t n = 0; n < numNeighbourVals[j]; ++n)
+                    feature->neighbours->reserve(neighbourVals[j].length);
+
+                    for(hsize_t n = 0; n < neighbourVals[j].length; ++n)
                     {
-                        feature->neighbours->push_back(neighbourVals[(j*neighboursLineLength)+n]);
+                        feature->neighbours->push_back(((unsigned long long*)neighbourVals[j].p)[n]);
                     }
+                    delete[] ((size_t*)neighbourVals[j].p);
                     
-                    //cout << cFid << " has " << numNeighbourVals[j] << " neighbours\n";
+                    //cout << cFid << " has " << neighbourVals[j].length << " neighbours\n";
                     
                     attTableObj->attTable->push_back(feature);
                 }
             }
             
-            
-            /* Number of Neighbours */
-			numNeighboursOffset[0] = numChunks*ATT_WRITE_CHUNK_SIZE;
-			numNeighboursCount[0]  = remainingRows;
-			numNeighboursDataspace.selectHyperslab( H5S_SELECT_SET, numNeighboursCount, numNeighboursOffset );
-			
-			numNeighboursDimsRead[0] = remainingRows;
-			numNeighboursMemspace = DataSpace( 1, numNeighboursDimsRead );
-			
-            numNeighboursOffset_out[0] = 0;
-			numNeighboursCount_out[0] = remainingRows;
-			numNeighboursMemspace.selectHyperslab( H5S_SELECT_SET, numNeighboursCount_out, numNeighboursOffset_out );
-            
             /* Neighbours */
 			neighboursOffset[0] = numChunks*ATT_WRITE_CHUNK_SIZE;
-            neighboursOffset[1] = 0;
 			neighboursCount[0] = remainingRows;
-            neighboursCount[1] = neighboursLineLength;
 			neighboursDataspace.selectHyperslab( H5S_SELECT_SET, neighboursCount, neighboursOffset );
 			
 			neighboursDimsRead[0] = remainingRows;
-            neighboursDimsRead[1] = neighboursLineLength;
-			neighboursMemspace = DataSpace( 2, neighboursDimsRead );
+			neighboursMemspace = DataSpace( 1, neighboursDimsRead );
 			
             neighboursOffset_out[0] = 0;
-            neighboursOffset_out[1] = 0;
 			neighboursCount_out[0] = remainingRows;
-            neighboursCount_out[1] = neighboursLineLength;
 			neighboursMemspace.selectHyperslab( H5S_SELECT_SET, neighboursCount_out, neighboursOffset_out );
             
             /* Bool fields */
@@ -1489,9 +1443,7 @@ namespace rsgis{namespace rastergis{
                 floatFieldsMemspace.selectHyperslab( H5S_SELECT_SET, floatFieldsCount_out, floatFieldsOffset_out );
             }
             
-            numNeighboursDataset.read(numNeighbourVals, PredType::NATIVE_UINT32, numNeighboursMemspace, numNeighboursDataspace);
-            
-            neighboursDataset.read(neighbourVals, PredType::NATIVE_UINT64, neighboursMemspace, neighboursDataspace);
+            neighboursDataset.read(neighbourVals, intVarLenMemDT, neighboursMemspace, neighboursDataspace);
             
             if(hasBoolFields)
             {
@@ -1541,12 +1493,15 @@ namespace rsgis{namespace rastergis{
                 }
                 feature->stringFields = new vector<string>();
                 feature->neighbours = new vector<size_t>();
-                feature->neighbours->reserve(numNeighbourVals[j]);
+                feature->neighbours->reserve(neighbourVals[j].length);
                 
-                for(hsize_t n = 0; n < numNeighbourVals[j]; ++n)
+                for(hsize_t n = 0; n < neighbourVals[j].length; ++n)
                 {
-                    feature->neighbours->push_back(neighbourVals[(j*neighboursLineLength)+n]);
+                    feature->neighbours->push_back(((unsigned long long*)neighbourVals[j].p)[n]);
                 }
+                delete[] ((size_t*)neighbourVals[j].p);
+                
+                //cout << cFid << " has " << neighbourVals[j].length << " neighbours\n";
                                 
                 attTableObj->attTable->push_back(feature);
             }
@@ -1567,8 +1522,6 @@ namespace rsgis{namespace rastergis{
                 delete[] floatVals;
             }
             delete[] neighbourVals;
-            delete[] numNeighbourVals;
-
         }
         catch(RSGISAttributeTableException &e)
         {

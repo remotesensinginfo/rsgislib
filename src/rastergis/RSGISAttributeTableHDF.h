@@ -113,10 +113,10 @@ namespace rsgis{namespace rastergis{
         DataSet boolDataset;
         DataSet intDataset;
         DataSet floatDataset;
+        DataSet sizeDataset;
         bool hasBoolFields;
         bool hasIntFields;
         bool hasFloatFields;
-        size_t neighboursLineLength;
         size_t iterIdx;
         size_t attSize;
         bool attOpen;
