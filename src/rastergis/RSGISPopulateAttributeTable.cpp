@@ -238,7 +238,7 @@ namespace rsgis{namespace rastergis{
                 throw RSGISImageCalcException("Clumps image should only have 1 image band.");
             }
             
-            if(datasets[1]->GetRasterCount() < bandStats->size())
+            if(datasets[1]->GetRasterCount() < ((int)bandStats->size()))
             {
                 throw RSGISImageCalcException("More band stats were requested than bands in the file.");
             }
@@ -249,7 +249,7 @@ namespace rsgis{namespace rastergis{
                 {
                     throw RSGISImageCalcException("Band numbers start at 1.");
                 }
-                else if((*iterBands)->band > datasets[1]->GetRasterCount())
+                else if(((int)(*iterBands)->band) > datasets[1]->GetRasterCount())
                 {
                     throw RSGISImageCalcException("Band specified is not within the image.");
                 }
@@ -399,7 +399,7 @@ namespace rsgis{namespace rastergis{
                 throw RSGISImageCalcException("Clumps image should only have 1 image band.");
             }
             
-            if(datasets[1]->GetRasterCount() < bandStats->size())
+            if(datasets[1]->GetRasterCount() < ((int)bandStats->size()))
             {
                 throw RSGISImageCalcException("More band stats were requested than bands in the file.");
             }
@@ -430,7 +430,7 @@ namespace rsgis{namespace rastergis{
                 {
                     throw RSGISImageCalcException("Band numbers start at 1.");
                 }
-                else if((*iterBands)->band > datasets[1]->GetRasterCount())
+                else if(((int)(*iterBands)->band) > datasets[1]->GetRasterCount())
                 {
                     throw RSGISImageCalcException("Band specified is not within the image.");
                 }
@@ -681,7 +681,7 @@ namespace rsgis{namespace rastergis{
                 throw RSGISImageCalcException("Clumps image should only have 1 image band.");
             }
             
-            if(datasets[1]->GetRasterCount() < bandStats->size())
+            if(datasets[1]->GetRasterCount() < ((int)bandStats->size()))
             {
                 throw RSGISImageCalcException("More band stats were requested than bands in the file.");
             }
@@ -714,7 +714,7 @@ namespace rsgis{namespace rastergis{
                 {
                     throw RSGISImageCalcException("Band numbers start at 1.");
                 }
-                else if((*iterBands)->band > datasets[1]->GetRasterCount())
+                else if(((int)(*iterBands)->band) > datasets[1]->GetRasterCount())
                 {
                     throw RSGISImageCalcException("Band specified is not within the image.");
                 }
@@ -922,7 +922,7 @@ namespace rsgis{namespace rastergis{
                 throw RSGISImageCalcException("Clumps image should only have 1 image band.");
             }
             
-            if(datasets[1]->GetRasterCount() < bandStats->size())
+            if(datasets[1]->GetRasterCount() < ((int)bandStats->size()))
             {
                 throw RSGISImageCalcException("More band stats were requested than bands in the file.");
             }
@@ -969,7 +969,7 @@ namespace rsgis{namespace rastergis{
                 {
                     throw RSGISImageCalcException("Band numbers start at 1.");
                 }
-                else if((*iterBands)->band > datasets[1]->GetRasterCount())
+                else if(((int)(*iterBands)->band) > datasets[1]->GetRasterCount())
                 {
                     throw RSGISImageCalcException("Band specified is not within the image.");
                 }
@@ -1219,7 +1219,7 @@ namespace rsgis{namespace rastergis{
                 throw RSGISImageCalcException("Clumps image should only have 1 image band.");
             }
             
-            if(datasets[1]->GetRasterCount() < bandStats->size())
+            if(datasets[1]->GetRasterCount() < ((int)bandStats->size()))
             {
                 throw RSGISImageCalcException("More band stats were requested than bands in the file.");
             }
@@ -1268,7 +1268,7 @@ namespace rsgis{namespace rastergis{
                 {
                     throw RSGISImageCalcException("Band numbers start at 1.");
                 }
-                else if((*iterBands)->band > datasets[1]->GetRasterCount())
+                else if(((int)(*iterBands)->band) > datasets[1]->GetRasterCount())
                 {
                     throw RSGISImageCalcException("Band specified is not within the image.");
                 }
@@ -1477,7 +1477,7 @@ namespace rsgis{namespace rastergis{
                 throw RSGISImageCalcException("Clumps image should only have 1 image band.");
             }
             
-            if(datasets[1]->GetRasterCount() < bandStats->size())
+            if(datasets[1]->GetRasterCount() < ((int)bandStats->size()))
             {
                 throw RSGISImageCalcException("More band stats were requested than bands in the file.");
             }
@@ -1508,7 +1508,7 @@ namespace rsgis{namespace rastergis{
                 {
                     throw RSGISImageCalcException("Band numbers start at 1.");
                 }
-                else if((*iterBands)->band > datasets[1]->GetRasterCount())
+                else if(((int)(*iterBands)->band) > datasets[1]->GetRasterCount())
                 {
                     throw RSGISImageCalcException("Band specified is not within the image.");
                 }
@@ -1829,7 +1829,7 @@ namespace rsgis{namespace rastergis{
             
             try
             {                
-                for(int i = 0; i < numDataBands; ++i)
+                for(unsigned int i = 0; i < numDataBands; ++i)
                 {                   
                     clumpData[i]->at(clumpIdx).push_back(bandValues[dataBandIdxs[i]]);
                 }
@@ -2032,7 +2032,7 @@ namespace rsgis{namespace rastergis{
                 
                 if(withinThreshold)
                 {
-                    for(int i = 0; i < numDataBands; ++i)
+                    for(unsigned int i = 0; i < numDataBands; ++i)
                     {                   
                         clumpData[i]->at(clumpIdx).push_back(bandValues[dataBandIdxs[i]]);
                     }
