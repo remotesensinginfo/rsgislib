@@ -1799,6 +1799,10 @@ namespace rsgis{namespace rastergis{
                             ((size_t*)neighbourVals[n].p)[m] = this->featCache[i]->neighbours->at(m);
                         }
                     }
+                    else
+                    {
+                        neighbourVals[n].p = NULL;
+                    }
                 }
                 
                 hsize_t extendNeighboursDatasetTo[1];
@@ -1821,7 +1825,10 @@ namespace rsgis{namespace rastergis{
                 
                 for(size_t i = startFID, n = 0; i < endFID; ++i, ++n)
                 {
-                    delete[] ((size_t*)neighbourVals[n].p);
+                    if(neighbourVals[n].length > 0)
+                    {
+                        delete[] ((size_t*)neighbourVals[n].p);
+                    }
                 }
                 delete[] neighbourVals;
                 
