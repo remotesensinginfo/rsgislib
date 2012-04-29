@@ -94,7 +94,7 @@ namespace rsgis{namespace rastergis{
     static const hsize_t  ATT_WRITE_SIEVE_BUF( 65536 );
     static const hsize_t  ATT_WRITE_META_BLOCKSIZE( 2048 );
     static const unsigned int ATT_WRITE_DEFLATE( 1 );
-    static const hsize_t ATT_WRITE_CHUNK_SIZE( 100 );
+    static const hsize_t ATT_WRITE_CHUNK_SIZE( 250 ); //100
     
     enum RSGISFileType
     {
@@ -202,7 +202,7 @@ namespace rsgis{namespace rastergis{
         virtual void setStringValue(string name, string value) throw(RSGISAttributeTableException)=0;
         
         virtual RSGISFeature* getFeature(size_t fid) throw(RSGISAttributeTableException)=0;
-        virtual void flushAllFeatures() throw(RSGISAttributeTableException)=0;
+        virtual void flushAllFeatures(bool progressFeedback=false) throw(RSGISAttributeTableException)=0;
         
         virtual void addAttBoolField(string name, bool val) throw(RSGISAttributeTableException)=0;
         virtual void addAttIntField(string name, long val) throw(RSGISAttributeTableException)=0;

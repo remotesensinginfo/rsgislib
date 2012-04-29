@@ -514,13 +514,30 @@ namespace rsgis{namespace rastergis{
         return feat;
     }
     
-    void RSGISAttributeTableHDF::flushAllFeatures() throw(RSGISAttributeTableException)
+    void RSGISAttributeTableHDF::flushAllFeatures(bool progressFeedback) throw(RSGISAttributeTableException)
     {
         try
         {
+            int feedback = cacheQ->size()/10;
+			int feedbackCounter = 0;
+            size_t idx = 0;
+            if(progressFeedback)
+            {
+                cout << "Started (Flushing Att)" << flush;
+            }
             for(list<size_t>::iterator iterBlocks = cacheQ->begin(); iterBlocks != cacheQ->end(); ++iterBlocks)
             {
+                if(progressFeedback && ((idx % feedback) == 0))
+                {
+                    cout << "." << feedbackCounter << "." << flush;
+                    feedbackCounter = feedbackCounter + 10;
+                }
                 this->removeFromCache(*iterBlocks);
+                ++idx;
+            }
+            if(progressFeedback)
+            {
+                cout << " Complete.\n";
             }
             
             cacheQ->clear();
@@ -1397,6 +1414,7 @@ namespace rsgis{namespace rastergis{
     
     void RSGISAttributeTableHDF::loadBlock(size_t block) throw(RSGISAttributeTableException)
     {
+        //cout << "Loading block " << block << endl;
         try
         {            
             size_t startFID = 0;

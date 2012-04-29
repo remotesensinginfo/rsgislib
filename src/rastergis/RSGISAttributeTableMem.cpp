@@ -499,7 +499,7 @@ namespace rsgis{namespace rastergis{
         return attTable->at(fid);
     }
     
-    void RSGISAttributeTableMem::flushAllFeatures() throw(RSGISAttributeTableException)
+    void RSGISAttributeTableMem::flushAllFeatures(bool progressFeedback) throw(RSGISAttributeTableException)
     {
         // Nothing to do as features are stored in memory to automatically sync'd.
     }
