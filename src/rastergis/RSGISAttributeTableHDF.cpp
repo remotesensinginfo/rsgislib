@@ -507,7 +507,7 @@ namespace rsgis{namespace rastergis{
         
     RSGISFeature* RSGISAttributeTableHDF::getFeature(size_t fid) throw(RSGISAttributeTableException)
     {
-        cout << "Retrieving feature = " << fid << endl;
+        //cout << "Retrieving feature = " << fid << endl;
         if(fid >= this->attSize)
         {
             cout << "Couldn't find " << fid << endl;
@@ -1449,7 +1449,7 @@ namespace rsgis{namespace rastergis{
     
     void RSGISAttributeTableHDF::loadBlock(size_t block) throw(RSGISAttributeTableException)
     {
-        cout << "Loading block " << block << endl;
+        //cout << "Loading block " << block << endl;
         try
         {            
             size_t startFID = 0;
