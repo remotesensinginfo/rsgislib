@@ -105,7 +105,14 @@ public:
         export2hdf,
         export2ascii,
         popmeansumattributes,
-        printattsummary
+        printattsummary,
+        exportsize
+    };
+    
+    enum outFileTypeAddition 
+    {
+        rsgis_trunk,
+        rsgis_append
     };
     
     RSGISExeRasterGIS();
@@ -159,6 +166,7 @@ protected:
     bool neighboursProvided;
     bool attInMemory;
     unsigned int cacheSize;
+    outFileTypeAddition outFileType;
 };
 
 #endif
