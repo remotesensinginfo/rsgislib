@@ -923,7 +923,7 @@ namespace rsgis{namespace rastergis{
         
         try
         {
-            Exception::dontPrint();
+            //Exception::dontPrint();
             
             FileAccPropList attAccessPlist = FileAccPropList(FileAccPropList::DEFAULT);
             attAccessPlist.setCache(ATT_READ_MDC_NELMTS, ATT_READ_RDCC_NELMTS, ATT_READ_RDCC_NBYTES, ATT_READ_RDCC_W0);
@@ -1292,27 +1292,32 @@ namespace rsgis{namespace rastergis{
             {
                 neighboursOffset[0] = i*ATT_WRITE_CHUNK_SIZE;
                 neighboursDataspace.selectHyperslab( H5S_SELECT_SET, neighboursCount, neighboursOffset );
+                //cout << "reading neighbours\n";
                 neighboursDataset.read(neighbourVals, intVarLenMemDT, neighboursMemspace, neighboursDataspace);
+                //cout << "neighbours read\n";
                 
                 if(hasBoolFields)
                 {
-                    boolFieldsOffset[0] = i*attTableObj->numBoolFields;
+                    boolFieldsOffset[0] = i*ATT_WRITE_CHUNK_SIZE;
                     boolDataspace.selectHyperslab( H5S_SELECT_SET, boolFieldsCount, boolFieldsOffset );
                     boolDataset.read(boolVals, PredType::NATIVE_INT32, boolFieldsMemspace, boolDataspace);
                 }
                 
                 if(hasIntFields)
                 {
-                    intFieldsOffset[0] = i*attTableObj->numIntFields;
+                    intFieldsOffset[0] = i*ATT_WRITE_CHUNK_SIZE;
+                    //cout << "intFieldsOffset[0] = " << intFieldsOffset[0] << endl;
                     intDataspace.selectHyperslab( H5S_SELECT_SET, intFieldsCount, intFieldsOffset );
                     intDataset.read(intVals, PredType::NATIVE_INT64, intFieldsMemspace, intDataspace);
                 }
                 
                 if(hasFloatFields)
                 {
-                    floatFieldsOffset[0] = i*attTableObj->numFloatFields;
+                    floatFieldsOffset[0] = i*ATT_WRITE_CHUNK_SIZE;
+                    //cout << "floatFieldsOffset[0] = " << floatFieldsOffset[0] << endl;
                     floatDataspace.selectHyperslab( H5S_SELECT_SET, floatFieldsCount, floatFieldsOffset );
                     floatDataset.read(floatVals, PredType::NATIVE_DOUBLE, floatFieldsMemspace, floatDataspace);
+                    //cout << "read floats\n";
                 }
                 
                 for(hsize_t j = 0; j < ATT_WRITE_CHUNK_SIZE; ++j)
@@ -1344,6 +1349,7 @@ namespace rsgis{namespace rastergis{
                         for(hsize_t n = 0; n < attTableObj->numFloatFields; ++n)
                         {
                             feature->floatFields->push_back(floatVals[(j*attTableObj->numFloatFields)+n]);
+                            //cout << feature->fid << ":\t" << floatVals[(j*attTableObj->numFloatFields)+n] << endl;
                         }
                     }
                     feature->stringFields = new vector<string>();
@@ -1452,11 +1458,13 @@ namespace rsgis{namespace rastergis{
             
             if(hasIntFields)
             {
+                //cout << "remaining: intFieldsOffset[0] = " << intFieldsOffset[0] << endl;
                 intDataset.read(intVals, PredType::NATIVE_INT64, intFieldsMemspace, intDataspace);
             }
             
             if(hasFloatFields)
             {
+                //cout << "remaining: floatFieldsOffset[0] = " << floatFieldsOffset[0] << endl;
                 floatDataset.read(floatVals, PredType::NATIVE_DOUBLE, floatFieldsMemspace, floatDataspace);
             }
             
@@ -1527,24 +1535,14 @@ namespace rsgis{namespace rastergis{
         {
             throw RSGISAttributeTableException(e.what());
         }
-        catch( FileIException &e )
-        {
-            throw RSGISAttributeTableException(e.getDetailMsg());
-        }
-        catch( DataSetIException &e )
-        {
-            throw RSGISAttributeTableException(e.getDetailMsg());
-        }
-        catch( DataSpaceIException &e )
-        {
-            throw RSGISAttributeTableException(e.getDetailMsg());
-        }
-        catch( DataTypeIException &e )
-        {
-            throw RSGISAttributeTableException(e.getDetailMsg());
-        }
         catch( Exception &e )
         {
+            /*e.printError();
+            cout << e.getCFuncName() << endl;
+            cout << e.getCDetailMsg() << endl;
+            cout << e.getFuncName() << endl;
+            cout << e.getDetailMsg() << endl;*/
+            
             throw RSGISAttributeTableException(e.getDetailMsg());
         }
         

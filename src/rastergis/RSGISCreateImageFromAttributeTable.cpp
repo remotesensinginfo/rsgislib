@@ -105,6 +105,7 @@ namespace rsgis{namespace rastergis{
                     }
                     else if(attBands[i].first == rsgis_float)
                     {
+                        //cout << "clumpIdx = " << clumpIdx << " band[" << i << "]:\t" << feat->floatFields->at(attBands[i].second) << endl;
                         output[i] = feat->floatFields->at(attBands[i].second);
                     }
                     else

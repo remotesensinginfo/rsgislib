@@ -3011,7 +3011,6 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
                 }
                 
                 cout << "Importing attribute table.\n";
-                //RSGISAttributeTable *attTable = RSGISAttributeTableMem::importFromASCII(this->attTableFile);
                 RSGISAttributeTable *attTable = NULL;
                 if(RSGISAttributeTableMem::findFileType(attTableFile) == rsgis_ascii_attft)
                 {
@@ -3025,7 +3024,6 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
                 {
                     throw RSGISAttributeTableException("Could not identify attribute table file type.");
                 }
-
                 
                 RSGISCreateImageFromAttributeTable createImg;
                 createImg.createImageFromAttTable(clumpsDatasets, this->outputFile, attTable, bands, imageFormat);
