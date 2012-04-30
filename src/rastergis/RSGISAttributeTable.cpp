@@ -2054,6 +2054,264 @@ namespace rsgis{namespace rastergis{
         return exp;
     }
     
+    
+    void RSGISAttributeTable::printSummaryHDFAtt(string inFile)throw(RSGISAttributeTableException)
+    {
+        try
+        {
+            Exception::dontPrint();
+            
+            FileAccPropList attAccessPlist = FileAccPropList(FileAccPropList::DEFAULT);
+            attAccessPlist.setCache(ATT_READ_MDC_NELMTS, ATT_READ_RDCC_NELMTS, ATT_READ_RDCC_NBYTES, ATT_READ_RDCC_W0);
+            attAccessPlist.setSieveBufSize(ATT_READ_SIEVE_BUF);
+            hsize_t metaBlockSize = ATT_READ_META_BLOCKSIZE;
+            attAccessPlist.setMetaBlockSize(metaBlockSize);
+            
+            H5File *attH5File = new H5File( inFile, H5F_ACC_RDONLY, FileCreatPropList::DEFAULT, attAccessPlist);
+            
+            bool hasBoolFields = true;
+            bool hasIntFields = true;
+            bool hasFloatFields = true;
+            
+            hsize_t dimsAttSize[1];
+			dimsAttSize[0] = 1;
+            size_t numFeats = 0;
+			DataSpace attSizeDataSpace(1, dimsAttSize);
+            DataSet sizeDataset = attH5File->openDataSet( ATT_SIZE_HEADER );
+            sizeDataset.read(&numFeats, PredType::NATIVE_ULLONG, attSizeDataSpace);
+            attSizeDataSpace.close();
+            
+            cout << "Table has " << numFeats << " features\n";
+            
+            CompType *fieldCompTypeMem = RSGISAttributeTable::createAttibuteIdxCompTypeMem();
+            try
+            {
+                DataSet boolFieldsDataset = attH5File->openDataSet( ATT_BOOL_FIELDS_HEADER );
+                DataSpace boolFieldsDataspace = boolFieldsDataset.getSpace();
+                
+                unsigned int numBoolFields = boolFieldsDataspace.getSelectNpoints();
+                
+                cout << "There are " << numBoolFields << " boolean fields." << endl;
+                
+                RSGISAttributeIdx *fields = new RSGISAttributeIdx[numBoolFields];
+                
+                hsize_t boolFieldsDims[1]; 
+                boolFieldsDims[0] = numBoolFields;
+                DataSpace boolFieldsMemspace(1, boolFieldsDims);
+                
+                boolFieldsDataset.read(fields, *fieldCompTypeMem, boolFieldsMemspace, boolFieldsDataspace);
+                
+                for(unsigned int i = 0; i < numBoolFields; ++i)
+                {
+                    cout << "Boolean Field: " << fields[i].name << " has index " << fields[i].idx << endl;
+                }
+                
+                delete[] fields;
+            }
+            catch( Exception &e )
+            {
+                hasBoolFields = false;
+            }
+            
+            try
+            {
+                DataSet intFieldsDataset = attH5File->openDataSet( ATT_INT_FIELDS_HEADER );
+                DataSpace intFieldsDataspace = intFieldsDataset.getSpace();
+                
+                unsigned int numIntFields = intFieldsDataspace.getSelectNpoints();
+                
+                cout << "There are " << numIntFields << " integer fields." << endl;
+                
+                RSGISAttributeIdx *fields = new RSGISAttributeIdx[numIntFields];
+                
+                hsize_t intFieldsDims[1]; 
+                intFieldsDims[0] = numIntFields;
+                DataSpace intFieldsMemspace(1, intFieldsDims);
+                
+                intFieldsDataset.read(fields, *fieldCompTypeMem, intFieldsMemspace, intFieldsDataspace);
+                
+                for(unsigned int i = 0; i < numIntFields; ++i)
+                {
+                    cout << "Integer Field: " << fields[i].name << ": " << fields[i].idx << endl;
+                }
+                
+                delete[] fields;
+            }
+            catch( Exception &e )
+            {
+                hasIntFields = false;
+            }
+            
+            try
+            {
+                DataSet floatFieldsDataset = attH5File->openDataSet( ATT_FLOAT_FIELDS_HEADER );
+                DataSpace floatFieldsDataspace = floatFieldsDataset.getSpace();
+                
+                unsigned int numFloatFields = floatFieldsDataspace.getSelectNpoints();
+                
+                cout << "There are " << numFloatFields << " float fields." << endl;
+                
+                RSGISAttributeIdx *fields = new RSGISAttributeIdx[numFloatFields];
+                
+                hsize_t floatFieldsDims[1]; 
+                floatFieldsDims[0] = numFloatFields;
+                DataSpace floatFieldsMemspace(1, floatFieldsDims);
+                
+                floatFieldsDataset.read(fields, *fieldCompTypeMem, floatFieldsMemspace, floatFieldsDataspace);
+                
+                for(unsigned int i = 0; i < numFloatFields; ++i)
+                {
+                    cout << "Float Field: " << fields[i].name << ": " << fields[i].idx << endl;
+                }
+                
+                delete[] fields;
+            }
+            catch( Exception &e )
+            {
+                hasFloatFields = false;
+            }
+            
+            delete fieldCompTypeMem;
+            
+            DataSet neighboursDataset = attH5File->openDataSet( ATT_NEIGHBOURS_DATA );
+            DataSpace neighboursDataspace = neighboursDataset.getSpace();
+            
+            int neighboursNDims = neighboursDataspace.getSimpleExtentNdims();
+            if(neighboursNDims != 1)
+            {
+                throw RSGISAttributeTableException("The neighbours datasets needs to have 1 dimension.");
+            }
+            
+            hsize_t *neighboursDims = new hsize_t[neighboursNDims];
+            neighboursDataspace.getSimpleExtentDims(neighboursDims);
+            
+            if(neighboursDims[0] != numFeats)
+            {
+                throw RSGISAttributeTableException("The number of features in neighbours datasets does not match expected values.");
+            }
+            
+            delete[] neighboursDims;
+            
+            unsigned long numChunks = numFeats / ATT_WRITE_CHUNK_SIZE;
+            unsigned long remainingRows = numFeats - (numChunks * ATT_WRITE_CHUNK_SIZE);
+            
+            /* Neighbours */
+            hvl_t *neighbourVals = new hvl_t[ATT_WRITE_CHUNK_SIZE];
+            DataType intVarLenMemDT = VarLenType(&PredType::NATIVE_UINT64);
+            hsize_t neighboursOffset[1];
+			neighboursOffset[0] = 0;
+			hsize_t neighboursCount[1];
+			neighboursCount[0] = ATT_WRITE_CHUNK_SIZE;
+			neighboursDataspace.selectHyperslab( H5S_SELECT_SET, neighboursCount, neighboursOffset );
+			
+			hsize_t neighboursDimsRead[1]; 
+			neighboursDimsRead[0] = ATT_WRITE_CHUNK_SIZE;
+			DataSpace neighboursMemspace( 1, neighboursDimsRead );
+			
+			hsize_t neighboursOffset_out[1];
+            neighboursOffset_out[0] = 0;
+			hsize_t neighboursCount_out[1];
+			neighboursCount_out[0] = ATT_WRITE_CHUNK_SIZE;
+			neighboursMemspace.selectHyperslab( H5S_SELECT_SET, neighboursCount_out, neighboursOffset_out );
+            
+            
+            unsigned int maxNumNeighbours = 0; 
+            unsigned int minNumNeighbours = 0;
+            bool first = 0;
+                        
+            for(unsigned long i = 0; i < numChunks; ++i)
+            {
+                neighboursOffset[0] = i*ATT_WRITE_CHUNK_SIZE;
+                neighboursDataspace.selectHyperslab( H5S_SELECT_SET, neighboursCount, neighboursOffset );
+                neighboursDataset.read(neighbourVals, intVarLenMemDT, neighboursMemspace, neighboursDataspace);
+                
+                
+                for(hsize_t j = 0; j < ATT_WRITE_CHUNK_SIZE; ++j)
+                {
+                    if(first)
+                    {
+                        maxNumNeighbours = neighbourVals[j].length;
+                        minNumNeighbours = neighbourVals[j].length;
+                        first = false;
+                    }
+                    else if(neighbourVals[j].length > maxNumNeighbours)
+                    {
+                        maxNumNeighbours = neighbourVals[j].length;
+                    }
+                    else if(neighbourVals[j].length < minNumNeighbours)
+                    {
+                        minNumNeighbours = neighbourVals[j].length;
+                    }
+                    
+                    delete[] ((size_t*)neighbourVals[j].p);
+                }
+            }
+            
+            /* Neighbours */
+			neighboursOffset[0] = numChunks*ATT_WRITE_CHUNK_SIZE;
+			neighboursCount[0] = remainingRows;
+			neighboursDataspace.selectHyperslab( H5S_SELECT_SET, neighboursCount, neighboursOffset );
+			
+			neighboursDimsRead[0] = remainingRows;
+			neighboursMemspace = DataSpace( 1, neighboursDimsRead );
+			
+            neighboursOffset_out[0] = 0;
+			neighboursCount_out[0] = remainingRows;
+			neighboursMemspace.selectHyperslab( H5S_SELECT_SET, neighboursCount_out, neighboursOffset_out );
+                        
+            neighboursDataset.read(neighbourVals, intVarLenMemDT, neighboursMemspace, neighboursDataspace);
+            
+            for(hsize_t j = 0; j < remainingRows; ++j)
+            {
+                if(first)
+                {
+                    maxNumNeighbours = neighbourVals[j].length;
+                    minNumNeighbours = neighbourVals[j].length;
+                    first = false;
+                }
+                else if(neighbourVals[j].length > maxNumNeighbours)
+                {
+                    maxNumNeighbours = neighbourVals[j].length;
+                }
+                else if(neighbourVals[j].length < minNumNeighbours)
+                {
+                    minNumNeighbours = neighbourVals[j].length;
+                }
+                
+                delete[] ((size_t*)neighbourVals[j].p);
+            }
+            
+            attH5File->close();
+            delete attH5File;
+
+            delete[] neighbourVals;
+        }
+        catch(RSGISAttributeTableException &e)
+        {
+            throw RSGISAttributeTableException(e.what());
+        }
+        catch( FileIException &e )
+        {
+            throw RSGISAttributeTableException(e.getDetailMsg());
+        }
+        catch( DataSetIException &e )
+        {
+            throw RSGISAttributeTableException(e.getDetailMsg());
+        }
+        catch( DataSpaceIException &e )
+        {
+            throw RSGISAttributeTableException(e.getDetailMsg());
+        }
+        catch( DataTypeIException &e )
+        {
+            throw RSGISAttributeTableException(e.getDetailMsg());
+        }
+        catch( Exception &e )
+        {
+            throw RSGISAttributeTableException(e.getDetailMsg());
+        }
+    }
+    
     void RSGISAttributeTable::freeFeature(RSGISFeature *feat)
     {
         delete feat->boolFields;

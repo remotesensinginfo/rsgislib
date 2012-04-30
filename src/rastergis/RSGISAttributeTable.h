@@ -260,10 +260,12 @@ namespace rsgis{namespace rastergis{
         static vector<RSGISIfStatement*>* generateStatments(DOMElement *argElement)throw(RSGISAttributeTableException);
         static RSGISAttExpression* generateExpression(DOMElement *expElement)throw(RSGISAttributeTableException);
         
+        static void printSummaryHDFAtt(string inFile)throw(RSGISAttributeTableException);
+        
     protected:
         RSGISAttributeTable();
-        CompType* createAttibuteIdxCompTypeDisk() throw(RSGISAttributeTableException);
-        CompType* createAttibuteIdxCompTypeMem() throw(RSGISAttributeTableException);
+        static CompType* createAttibuteIdxCompTypeDisk() throw(RSGISAttributeTableException);
+        static CompType* createAttibuteIdxCompTypeMem() throw(RSGISAttributeTableException);
         void freeFeature(RSGISFeature *feat);
         vector<pair<string, RSGISAttributeDataType> > *fields;
         map<string, unsigned int> *fieldIdx;

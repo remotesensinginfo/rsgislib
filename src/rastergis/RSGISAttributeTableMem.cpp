@@ -910,7 +910,7 @@ namespace rsgis{namespace rastergis{
         }
         catch(RSGISTextException &e)
         {
-            delete attTableObj;
+            //delete attTableObj;
             throw RSGISAttributeTableException(e.what());
         }
         
