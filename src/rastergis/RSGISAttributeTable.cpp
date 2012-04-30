@@ -972,7 +972,7 @@ namespace rsgis{namespace rastergis{
                 
                 currentSize += ATT_WRITE_CHUNK_SIZE;
             }
-            
+            //cout << "Write remaining\n";
             for(unsigned int j = 0; j < remainingRows; ++j)
             {
                 feat = this->getFeature(rowIdx++);
@@ -997,6 +997,7 @@ namespace rsgis{namespace rastergis{
                 {
                     for(unsigned int k = 0; k < feat->floatFields->size(); ++k)
                     {
+                        //cout << feat->fid << ": b" << k << " = " << feat->floatFields->at(k) << endl;
                         floatVals[(j*this->numFloatFields)+k] = feat->floatFields->at(k);
                     }
                 }
@@ -1019,11 +1020,11 @@ namespace rsgis{namespace rastergis{
             
             if(this->numBoolFields > 0)
             {
-                extendBoolDatasetTo[0] = currentSize + remainingRows;
+                extendBoolDatasetTo[0] = (numChunks * ATT_WRITE_CHUNK_SIZE) + remainingRows;
                 extendBoolDatasetTo[1] = this->numBoolFields;
                 boolDataset->extend( extendBoolDatasetTo );
                 
-                boolDataOffset[0] = currentSize;
+                boolDataOffset[0] = numChunks * ATT_WRITE_CHUNK_SIZE;
                 boolDataOffset[1] = 0;
                 
                 boolDataDims[0] = remainingRows;
@@ -1038,11 +1039,11 @@ namespace rsgis{namespace rastergis{
             
             if(this->numIntFields > 0)
             {
-                extendIntDatasetTo[0] = currentSize + remainingRows;
+                extendIntDatasetTo[0] = (numChunks * ATT_WRITE_CHUNK_SIZE) + remainingRows;
                 extendIntDatasetTo[1] = this->numIntFields;
                 intDataset->extend( extendIntDatasetTo );
                 
-                intDataOffset[0] = currentSize;
+                intDataOffset[0] = numChunks * ATT_WRITE_CHUNK_SIZE;
                 intDataOffset[1] = 0;
                 
                 intDataDims[0] = remainingRows;
@@ -1057,15 +1058,15 @@ namespace rsgis{namespace rastergis{
             
             if(this->numFloatFields > 0)
             {
-                extendFloatDatasetTo[0] = currentSize + remainingRows;
+                extendFloatDatasetTo[0] = (numChunks * ATT_WRITE_CHUNK_SIZE) + remainingRows;
                 extendFloatDatasetTo[1] = this->numFloatFields;
                 floatDataset->extend( extendFloatDatasetTo );
                 
-                floatDataOffset[0] = currentSize;
+                floatDataOffset[0] = numChunks * ATT_WRITE_CHUNK_SIZE;
                 floatDataOffset[1] = 0;
                 
                 floatDataDims[0] = remainingRows;
-                floatDataDims[1] = this->numIntFields;
+                floatDataDims[1] = this->numFloatFields;
                 
                 DataSpace floatWriteDataSpace = floatDataset->getSpace();
                 floatWriteDataSpace.selectHyperslab(H5S_SELECT_SET, floatDataDims, floatDataOffset);
@@ -1077,7 +1078,7 @@ namespace rsgis{namespace rastergis{
             
             extendNeighboursDatasetTo[0] = currentSize + remainingRows;
             neighboursDataset.extend( extendNeighboursDatasetTo );
-            neighboursDataOffset[0] = currentSize;
+            neighboursDataOffset[0] = numChunks * ATT_WRITE_CHUNK_SIZE;
             neighboursDataDims[0] = remainingRows;
             
             DataSpace neighboursWriteDataSpace = neighboursDataset.getSpace();
