@@ -320,6 +320,8 @@
 	<rsgis:command algor="rastergis" option="export2ascii" table="input.att" tableout="output.att" />
 	<!-- A command to print a summary of an attribute table - useful for debugging -->
 	<rsgis:command algor="rastergis" option="printattsummary" table="input.att" />
+	<!-- A command to export the attribute table size and output to the text file -->
+	<rsgis:command algor="rastergis" option="exportsize" table="input.att" output="input.txt" file="trunk | append" />
 
 
 

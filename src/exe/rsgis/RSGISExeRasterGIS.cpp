@@ -68,6 +68,7 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
     XMLCh *optionExport2ASCII = XMLString::transcode("export2ascii");
     XMLCh *optionPopMeanSumAttributes = XMLString::transcode("popmeansumattributes");
     XMLCh *optionPrintAttSummary = XMLString::transcode("printattsummary");
+    XMLCh *optionExportSize = XMLString::transcode("exportsize");
             
     XMLCh *optionRSGISBool = XMLString::transcode("rsgis_bool");
     XMLCh *optionRSGISInt = XMLString::transcode("rsgis_int");
@@ -2855,6 +2856,62 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
         }
         XMLString::release(&tableXMLStr);
     }
+    else if(XMLString::equals(optionExportSize, optionXML))
+    {
+        this->option = RSGISExeRasterGIS::exportsize;
+        
+        XMLCh *tableXMLStr = XMLString::transcode("table");
+        if(argElement->hasAttribute(tableXMLStr))
+        {
+            char *charValue = XMLString::transcode(argElement->getAttribute(tableXMLStr));
+            this->attTableFile = string(charValue);
+            XMLString::release(&charValue);
+        }
+        else
+        {
+            throw RSGISXMLArgumentsException("No \'table\' attribute was provided.");
+        }
+        XMLString::release(&tableXMLStr);
+        
+        XMLCh *outputXMLStr = XMLString::transcode("output");
+        if(argElement->hasAttribute(outputXMLStr))
+        {
+            char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
+            this->outputFile = string(charValue);
+            XMLString::release(&charValue);
+        }
+        else
+        {
+            throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+        }
+        XMLString::release(&outputXMLStr);
+        
+        XMLCh *fileXMLStr = XMLString::transcode("file");
+        if(argElement->hasAttribute(fileXMLStr))
+        {
+            char *charValue = XMLString::transcode(argElement->getAttribute(fileXMLStr));
+            string fileOut = string(charValue);
+            if(fileOut == "trunk")
+            {
+                outFileType = rsgis_trunk;
+            }
+            else if(fileOut == "append")
+            {
+                outFileType = rsgis_append;
+            }
+            else
+            {
+                cerr << "Default is to append to output file.";
+            }
+                
+            XMLString::release(&charValue);
+        }
+        else
+        {
+            throw RSGISXMLArgumentsException("No \'file\' attribute was provided.");
+        }
+        XMLString::release(&fileXMLStr);
+    }
     else
 	{
 		string message = string("The option (") + string(XMLString::transcode(optionXML)) + string(") is not known: RSGISExeRasterGIS.");
@@ -2889,6 +2946,7 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
     XMLString::release(&optionExport2ASCII);
     XMLString::release(&optionPopMeanSumAttributes);
     XMLString::release(&optionPrintAttSummary);
+    XMLString::release(&optionExportSize);
     
     XMLString::release(&optionRSGISBool);
     XMLString::release(&optionRSGISInt);
@@ -4661,7 +4719,7 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
         else if(this->option == RSGISExeRasterGIS::printattsummary)
         {
             cout << "A command to print a summary of an attribute table.\n";
-            cout << "Input Image: " << this->inputImage << endl;
+            cout << "Input table: " << this->attTableFile << endl;
             
             try 
             {
@@ -4679,6 +4737,74 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
                 {
                     throw RSGISAttributeTableException("Could not identify attribute table file type.");
                 }
+            } 
+            catch (RSGISException &e) 
+            {
+                throw e;
+            } 
+        }
+        else if(this->option == RSGISExeRasterGIS::exportsize)
+        {
+            cout << "A command to export the attribute table size and output to the text file.\n";
+            cout << "Input table: " << this->attTableFile << endl;
+            cout << "Output file: " << this->outputFile << endl;
+            if(this->outFileType == rsgis_trunk)
+            {
+                cout << "Truncate the output file\n";
+            }
+            else if(this->outFileType == rsgis_append)
+            {
+                cout << "Append to the output file\n";
+            }
+            else
+            {
+                throw RSGISException("Output type is not recognised.");
+            }
+            
+            try 
+            {
+                cout << "Importing Attribute Table:\n";
+                RSGISAttributeTable *attTable = NULL;
+                if(RSGISAttributeTableMem::findFileType(attTableFile) == rsgis_ascii_attft)
+                {
+                    attTable = RSGISAttributeTableMem::importFromASCII(attTableFile);
+                }
+                else if(RSGISAttributeTableMem::findFileType(attTableFile) == rsgis_hdf_attft)
+                {
+                    attTable = RSGISAttributeTableHDF::importFromHDF5(attTableFile, false);
+                }
+                else
+                {
+                    throw RSGISAttributeTableException("Could not identify attribute table file type.");
+                }
+                
+                ofstream outTxtFile;
+                if(this->outFileType == rsgis_trunk)
+                {
+                    outTxtFile.open(this->outputFile.c_str(), ios::out | ios::trunc);
+                }
+                else if(this->outFileType == rsgis_append)
+                {
+                    outTxtFile.open(this->outputFile.c_str(), ios::out | ios::app);
+                }
+                else
+                {
+                    throw RSGISException("Output type is not recognised.");
+                }
+                
+                if(outTxtFile.is_open())
+                {
+                    outTxtFile << attTable->getSize() << endl;
+                    outTxtFile.flush();
+                    outTxtFile.close();
+                }
+                else
+                {
+                    throw RSGISException("Could not open text file.");
+                }
+                
+                delete attTable;
+                
             } 
             catch (RSGISException &e) 
             {
@@ -5159,6 +5285,24 @@ void RSGISExeRasterGIS::printParameters()
         {
             cout << "A command to print a summary of an attribute table.\n";
             cout << "Input Image: " << this->inputImage << endl;
+        }
+        else if(this->option == RSGISExeRasterGIS::exportsize)
+        {
+            cout << "A command to export the attribute table size and output to the text file.\n";
+            cout << "Input table: " << this->attTableFile << endl;
+            cout << "Output file: " << this->outputFile << endl;
+            if(this->outFileType == rsgis_trunk)
+            {
+                cout << "Truncate the output file\n";
+            }
+            else if(this->outFileType == rsgis_append)
+            {
+                cout << "Append to the output file\n";
+            }
+            else
+            {
+                throw RSGISException("Output type is not recognised.");
+            }
         }
 		else
 		{
