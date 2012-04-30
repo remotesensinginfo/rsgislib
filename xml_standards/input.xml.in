@@ -318,6 +318,8 @@
 	<rsgis:command algor="rastergis" option="export2hdf" table="input.att" tableout="output.att" />
 	<!-- A command to export an attribute table to a ascii file -->
 	<rsgis:command algor="rastergis" option="export2ascii" table="input.att" tableout="output.att" />
+	<!-- A command to print a summary of an attribute table - useful for debugging -->
+	<rsgis:command algor="rastergis" option="printattsummary" table="input.att" />
 
 
 

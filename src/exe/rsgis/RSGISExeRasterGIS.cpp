@@ -67,6 +67,7 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
     XMLCh *optionExport2HDF = XMLString::transcode("export2hdf");
     XMLCh *optionExport2ASCII = XMLString::transcode("export2ascii");
     XMLCh *optionPopMeanSumAttributes = XMLString::transcode("popmeansumattributes");
+    XMLCh *optionPrintAttSummary = XMLString::transcode("printattsummary");
             
     XMLCh *optionRSGISBool = XMLString::transcode("rsgis_bool");
     XMLCh *optionRSGISInt = XMLString::transcode("rsgis_int");
@@ -2837,6 +2838,23 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
         XMLString::release(&rsgisBandXMLStr);
         
     }
+    else if(XMLString::equals(optionPrintAttSummary, optionXML))
+    {
+        this->option = RSGISExeRasterGIS::printattsummary;
+        
+        XMLCh *tableXMLStr = XMLString::transcode("table");
+        if(argElement->hasAttribute(tableXMLStr))
+        {
+            char *charValue = XMLString::transcode(argElement->getAttribute(tableXMLStr));
+            this->attTableFile = string(charValue);
+            XMLString::release(&charValue);
+        }
+        else
+        {
+            throw RSGISXMLArgumentsException("No \'table\' attribute was provided.");
+        }
+        XMLString::release(&tableXMLStr);
+    }
     else
 	{
 		string message = string("The option (") + string(XMLString::transcode(optionXML)) + string(") is not known: RSGISExeRasterGIS.");
@@ -2870,6 +2888,7 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
     XMLString::release(&optionExport2HDF);
     XMLString::release(&optionExport2ASCII);
     XMLString::release(&optionPopMeanSumAttributes);
+    XMLString::release(&optionPrintAttSummary);
     
     XMLString::release(&optionRSGISBool);
     XMLString::release(&optionRSGISInt);
@@ -2992,7 +3011,21 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
                 }
                 
                 cout << "Importing attribute table.\n";
-                RSGISAttributeTable *attTable = RSGISAttributeTableMem::importFromASCII(this->attTableFile);
+                //RSGISAttributeTable *attTable = RSGISAttributeTableMem::importFromASCII(this->attTableFile);
+                RSGISAttributeTable *attTable = NULL;
+                if(RSGISAttributeTableMem::findFileType(attTableFile) == rsgis_ascii_attft)
+                {
+                    attTable = RSGISAttributeTableMem::importFromASCII(attTableFile);
+                }
+                else if(RSGISAttributeTableMem::findFileType(attTableFile) == rsgis_hdf_attft)
+                {
+                    attTable = RSGISAttributeTableMem::importFromHDF5(attTableFile);
+                }
+                else
+                {
+                    throw RSGISAttributeTableException("Could not identify attribute table file type.");
+                }
+
                 
                 RSGISCreateImageFromAttributeTable createImg;
                 createImg.createImageFromAttTable(clumpsDatasets, this->outputFile, attTable, bands, imageFormat);
@@ -4627,6 +4660,33 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
                 throw e;
             }            
         }
+        else if(this->option == RSGISExeRasterGIS::printattsummary)
+        {
+            cout << "A command to print a summary of an attribute table.\n";
+            cout << "Input Image: " << this->inputImage << endl;
+            
+            try 
+            {
+                cout << "Importing Attribute Table:\n";
+                if(RSGISAttributeTableMem::findFileType(attTableFile) == rsgis_ascii_attft)
+                {
+                    //RSGISAttributeTableMem::importFromASCII(attTableFile);
+                    cout << "Can only provide a summary for HDF files\n";
+                }
+                else if(RSGISAttributeTableMem::findFileType(attTableFile) == rsgis_hdf_attft)
+                {
+                    RSGISAttributeTableMem::printSummaryHDFAtt(attTableFile);
+                }
+                else
+                {
+                    throw RSGISAttributeTableException("Could not identify attribute table file type.");
+                }
+            } 
+            catch (RSGISException &e) 
+            {
+                throw e;
+            } 
+        }
 		else
 		{
 			cout << "The option is not recognised: RSGISExeRasterGIS\n";
@@ -5096,6 +5156,11 @@ void RSGISExeRasterGIS::printParameters()
                 
                 cout << endl;
             }
+        }
+        else if(this->option == RSGISExeRasterGIS::printattsummary)
+        {
+            cout << "A command to print a summary of an attribute table.\n";
+            cout << "Input Image: " << this->inputImage << endl;
         }
 		else
 		{

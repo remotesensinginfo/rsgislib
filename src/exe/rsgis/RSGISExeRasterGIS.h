@@ -104,7 +104,8 @@ public:
         popattributestats,
         export2hdf,
         export2ascii,
-        popmeansumattributes
+        popmeansumattributes,
+        printattsummary
     };
     
     RSGISExeRasterGIS();

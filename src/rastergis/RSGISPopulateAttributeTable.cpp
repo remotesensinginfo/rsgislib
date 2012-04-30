@@ -299,14 +299,16 @@ namespace rsgis{namespace rastergis{
             }
             size_t pxlCountIdx = attTable->getFieldIndex("pxlcount");
             
+            cout << "pxlCountIdx = " << pxlCountIdx << endl;
+            
             size_t fieldCount = bandStats->size();
-            //cout << "field count = " << fieldCount << endl;
+            cout << "field count = " << fieldCount << endl;
             size_t *bandIdxs = new size_t[fieldCount];
             size_t idx = 0;
             for(vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
             {
                 bandIdxs[idx] = (*iterBands)->band;
-                //cout << "bandIdxs[" << idx << "]: " << bandIdxs[idx] << endl;
+                cout << "bandIdxs[" << idx << "]: " << bandIdxs[idx] << endl;
                 ++idx;
             }
             
@@ -335,6 +337,7 @@ namespace rsgis{namespace rastergis{
 			cout << "Started" << flush;
             for(attTable->start(); attTable->end(); ++(*attTable))
             {
+                cout << "Processing: " << (*(*attTable))->fid << endl;
                 if((idx % feedback) == 0)
 				{
 					cout << "." << feedbackCounter << "." << flush;

@@ -507,7 +507,7 @@ namespace rsgis{namespace rastergis{
         
     RSGISFeature* RSGISAttributeTableHDF::getFeature(size_t fid) throw(RSGISAttributeTableException)
     {
-        //cout << "Retrieving feature = " << fid << endl;
+        cout << "Retrieving feature = " << fid << endl;
         if(fid >= this->attSize)
         {
             cout << "Couldn't find " << fid << endl;
@@ -1449,7 +1449,7 @@ namespace rsgis{namespace rastergis{
     
     void RSGISAttributeTableHDF::loadBlock(size_t block) throw(RSGISAttributeTableException)
     {
-        //cout << "Loading block " << block << endl;
+        cout << "Loading block " << block << endl;
         try
         {            
             size_t startFID = 0;
@@ -1866,9 +1866,9 @@ namespace rsgis{namespace rastergis{
             
             attTableObj->attH5File = new H5File( inFile, H5F_ACC_RDWR, FileCreatPropList::DEFAULT, attAccessPlist);
             
-            attTableObj->hasBoolFields = true;
-            attTableObj->hasIntFields = true;
-            attTableObj->hasFloatFields = true;
+            attTableObj->hasBoolFields = false;
+            attTableObj->hasIntFields = false;
+            attTableObj->hasFloatFields = false;
             
             attTableObj->numStrFields = 0;
             
@@ -1880,7 +1880,6 @@ namespace rsgis{namespace rastergis{
             attTableObj->numIntFields = 0;
             attTableObj->numFloatFields = 0;
             attTableObj->numStrFields = 0;
-            
              
             hsize_t dimsAttSize[1];
 			dimsAttSize[0] = 1;
@@ -1902,23 +1901,27 @@ namespace rsgis{namespace rastergis{
                 
                 cout << "There are " << attTableObj->numBoolFields << " boolean fields." << endl;
                 
-                RSGISAttributeIdx *fields = new RSGISAttributeIdx[attTableObj->numBoolFields];
-                
-                hsize_t boolFieldsDims[1]; 
-                boolFieldsDims[0] = attTableObj->numBoolFields;
-                DataSpace boolFieldsMemspace(1, boolFieldsDims);
-                
-                boolFieldsDataset.read(fields, *fieldCompTypeMem, boolFieldsMemspace, boolFieldsDataspace);
-                
-                for(unsigned int i = 0; i < attTableObj->numBoolFields; ++i)
+                if(attTableObj->numBoolFields > 0)
                 {
-                    //cout << fields[i].name << ": " << fields[i].idx << endl;
-                    attTableObj->fields->push_back(pair<string, RSGISAttributeDataType>(fields[i].name, rsgis_bool));
-                    attTableObj->fieldIdx->insert(pair<string, unsigned int>(fields[i].name, fields[i].idx));
-                    attTableObj->fieldDataType->insert(pair<string, RSGISAttributeDataType>(fields[i].name, rsgis_bool));
+                    attTableObj->hasBoolFields = true;
+                    RSGISAttributeIdx *fields = new RSGISAttributeIdx[attTableObj->numBoolFields];
+                    
+                    hsize_t boolFieldsDims[1]; 
+                    boolFieldsDims[0] = attTableObj->numBoolFields;
+                    DataSpace boolFieldsMemspace(1, boolFieldsDims);
+                    
+                    boolFieldsDataset.read(fields, *fieldCompTypeMem, boolFieldsMemspace, boolFieldsDataspace);
+                    
+                    for(unsigned int i = 0; i < attTableObj->numBoolFields; ++i)
+                    {
+                        //cout << fields[i].name << ": " << fields[i].idx << endl;
+                        attTableObj->fields->push_back(pair<string, RSGISAttributeDataType>(fields[i].name, rsgis_bool));
+                        attTableObj->fieldIdx->insert(pair<string, unsigned int>(fields[i].name, fields[i].idx));
+                        attTableObj->fieldDataType->insert(pair<string, RSGISAttributeDataType>(fields[i].name, rsgis_bool));
+                    }
+                    
+                    delete[] fields;
                 }
-                
-                delete[] fields;
             }
             catch( Exception &e )
             {
@@ -1934,23 +1937,27 @@ namespace rsgis{namespace rastergis{
                 
                 cout << "There are " << attTableObj->numIntFields << " integer fields." << endl;
                 
-                RSGISAttributeIdx *fields = new RSGISAttributeIdx[attTableObj->numIntFields];
-                
-                hsize_t intFieldsDims[1]; 
-                intFieldsDims[0] = attTableObj->numIntFields;
-                DataSpace intFieldsMemspace(1, intFieldsDims);
-                
-                intFieldsDataset.read(fields, *fieldCompTypeMem, intFieldsMemspace, intFieldsDataspace);
-                
-                for(unsigned int i = 0; i < attTableObj->numIntFields; ++i)
+                if(attTableObj->numIntFields > 0)
                 {
-                    //cout << fields[i].name << ": " << fields[i].idx << endl;
-                    attTableObj->fields->push_back(pair<string, RSGISAttributeDataType>(fields[i].name, rsgis_int));
-                    attTableObj->fieldIdx->insert(pair<string, unsigned int>(fields[i].name, fields[i].idx));
-                    attTableObj->fieldDataType->insert(pair<string, RSGISAttributeDataType>(fields[i].name, rsgis_int));
+                    attTableObj->hasIntFields = true;
+                    RSGISAttributeIdx *fields = new RSGISAttributeIdx[attTableObj->numIntFields];
+                    
+                    hsize_t intFieldsDims[1]; 
+                    intFieldsDims[0] = attTableObj->numIntFields;
+                    DataSpace intFieldsMemspace(1, intFieldsDims);
+                    
+                    intFieldsDataset.read(fields, *fieldCompTypeMem, intFieldsMemspace, intFieldsDataspace);
+                    
+                    for(unsigned int i = 0; i < attTableObj->numIntFields; ++i)
+                    {
+                        //cout << fields[i].name << ": " << fields[i].idx << endl;
+                        attTableObj->fields->push_back(pair<string, RSGISAttributeDataType>(fields[i].name, rsgis_int));
+                        attTableObj->fieldIdx->insert(pair<string, unsigned int>(fields[i].name, fields[i].idx));
+                        attTableObj->fieldDataType->insert(pair<string, RSGISAttributeDataType>(fields[i].name, rsgis_int));
+                    }
+                    
+                    delete[] fields;
                 }
-                
-                delete[] fields;
             }
             catch( Exception &e )
             {
@@ -1966,23 +1973,27 @@ namespace rsgis{namespace rastergis{
                 
                 cout << "There are " << attTableObj->numFloatFields << " float fields." << endl;
                 
-                RSGISAttributeIdx *fields = new RSGISAttributeIdx[attTableObj->numFloatFields];
-                
-                hsize_t floatFieldsDims[1]; 
-                floatFieldsDims[0] = attTableObj->numFloatFields;
-                DataSpace floatFieldsMemspace(1, floatFieldsDims);
-                
-                floatFieldsDataset.read(fields, *fieldCompTypeMem, floatFieldsMemspace, floatFieldsDataspace);
-                
-                for(unsigned int i = 0; i < attTableObj->numFloatFields; ++i)
+                if(attTableObj->numFloatFields > 0)
                 {
-                    //cout << fields[i].name << ": " << fields[i].idx << endl;
-                    attTableObj->fields->push_back(pair<string, RSGISAttributeDataType>(fields[i].name, rsgis_float));
-                    attTableObj->fieldIdx->insert(pair<string, unsigned int>(fields[i].name, fields[i].idx));
-                    attTableObj->fieldDataType->insert(pair<string, RSGISAttributeDataType>(fields[i].name, rsgis_float));
+                    attTableObj->hasFloatFields = true;
+                    RSGISAttributeIdx *fields = new RSGISAttributeIdx[attTableObj->numFloatFields];
+                    
+                    hsize_t floatFieldsDims[1]; 
+                    floatFieldsDims[0] = attTableObj->numFloatFields;
+                    DataSpace floatFieldsMemspace(1, floatFieldsDims);
+                    
+                    floatFieldsDataset.read(fields, *fieldCompTypeMem, floatFieldsMemspace, floatFieldsDataspace);
+                    
+                    for(unsigned int i = 0; i < attTableObj->numFloatFields; ++i)
+                    {
+                        //cout << fields[i].name << ": " << fields[i].idx << endl;
+                        attTableObj->fields->push_back(pair<string, RSGISAttributeDataType>(fields[i].name, rsgis_float));
+                        attTableObj->fieldIdx->insert(pair<string, unsigned int>(fields[i].name, fields[i].idx));
+                        attTableObj->fieldDataType->insert(pair<string, RSGISAttributeDataType>(fields[i].name, rsgis_float));
+                    }
+                    
+                    delete[] fields;
                 }
-                
-                delete[] fields;
             }
             catch( Exception &e )
             {
@@ -2117,7 +2128,7 @@ namespace rsgis{namespace rastergis{
         {
             throw RSGISAttributeTableException(e.getDetailMsg());
         }
-         
+                
         attTableObj->attOpen = true;
         attTableObj->featCache = new RSGISFeature*[attTableObj->attSize];
         attTableObj->numOfBlocks = attTableObj->attSize / ATT_WRITE_CHUNK_SIZE;
