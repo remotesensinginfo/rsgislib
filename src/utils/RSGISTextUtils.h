@@ -46,11 +46,11 @@ namespace rsgis{namespace utils{
 		{
 		public:
 			RSGISTextUtils();
-			int countLines(string input) throw(RSGISTextException);
+			size_t countLines(string input) throw(RSGISTextException);
 			void transpose(string input, string output, string delimiter) throw(RSGISTextException);
 			bool lineStart(string line, char token);
 			bool blankline(string line);
-			void tokenizeString(string line, char token, vector<string> *tokens, bool ignoreDuplicateTokens, bool trimWhitespace=false);
+			void tokenizeString(string line, char token, vector<string> *tokens, bool ignoreDuplicateTokens=true, bool trimWhitespace=false);
 			string removeNewLine(string line);
 			
 			string readFileToString(string input) throw(RSGISTextException);

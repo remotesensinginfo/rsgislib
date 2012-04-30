@@ -132,6 +132,10 @@ class RSGISExeSegment : public RSGISAlgorithmParameters
         unsigned int levels;
         bool outputWithConsecutiveFIDs;
         unsigned int cacheSize;
+        string importLUTFile;
+        bool importLUT;
+        string exportLUTFile;
+        bool exportLUT;
 	};
 
 #endif

@@ -30,9 +30,9 @@ namespace rsgis{namespace utils{
 		
 	}
 	
-	int RSGISTextUtils::countLines(string input)throw(RSGISTextException)
+	size_t RSGISTextUtils::countLines(string input)throw(RSGISTextException)
 	{
-		int count = 0;
+		size_t count = 0;
 		ifstream inputFile;
 		inputFile.open(input.c_str());
 		if(inputFile.is_open())

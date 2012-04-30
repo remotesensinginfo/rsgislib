@@ -825,6 +825,36 @@ void RSGISExeSegment::retrieveParameters(DOMElement *argElement) throw(RSGISXMLA
 			throw RSGISXMLArgumentsException("No \'proj\' attribute was provided.");
 		}
 		XMLString::release(&projXMLStr);
+        
+        XMLCh *importLUTXMLStr = XMLString::transcode("importLUT");
+		if(argElement->hasAttribute(importLUTXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(importLUTXMLStr));
+			this->importLUTFile = string(charValue);
+            this->importLUT = true;
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			this->importLUT = false;
+		}
+		XMLString::release(&importLUTXMLStr);
+        
+        
+        XMLCh *exportLUTXMLStr = XMLString::transcode("exportLUT");
+		if(argElement->hasAttribute(exportLUTXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(exportLUTXMLStr));
+			this->exportLUTFile = string(charValue);
+            this->exportLUT = true;
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			this->exportLUT = false;
+		}
+		XMLString::release(&exportLUTXMLStr);
+        
     }
     else if(XMLString::equals(optionRegionGrowingSeedClumpIds, optionXML))
     {
@@ -3308,7 +3338,7 @@ void RSGISExeSegment::runAlgorithm() throw(RSGISException)
             
             cout << "Generating Random Colours Image\n";
             RSGISRandomColourClumps colourClumps;
-            colourClumps.generateRandomColouredClump(catagoryDataset, resultDataset);
+            colourClumps.generateRandomColouredClump(catagoryDataset, resultDataset, this->importLUTFile, this->importLUT, this->exportLUTFile, this->exportLUT);
             
             if(this->processInMemory)
             {
