@@ -1028,7 +1028,7 @@ namespace rsgis{namespace rastergis{
                 boolDataOffset[1] = 0;
                 
                 boolDataDims[0] = remainingRows;
-                boolDataDims[1] = this->numIntFields;
+                boolDataDims[1] = this->numBoolFields;
                 
                 DataSpace boolWriteDataSpace = boolDataset->getSpace();
                 boolWriteDataSpace.selectHyperslab(H5S_SELECT_SET, boolDataDims, boolDataOffset);
