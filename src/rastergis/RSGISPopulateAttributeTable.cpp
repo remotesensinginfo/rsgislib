@@ -622,6 +622,7 @@ namespace rsgis{namespace rastergis{
                     {
                         mean = gsl_stats_mean (&(clumpData[bandCount]->at(i))[0], 1, clumpData[bandCount]->at(i).size());
                         feat->floatFields->at((*iterBands)->meanIdx) = mean;
+                        //cout << feat->fid << " mean value = " << feat->floatFields->at((*iterBands)->meanIdx) << "\tPixel Count: " << clumpData[bandCount]->at(i).size()  << endl;
                     }
                     else if(!(*iterBands)->calcMean & (*iterBands)->calcStdDev)
                     {
