@@ -718,7 +718,7 @@
     <!-- A command to clump a categorical image into clumps with unique IDs -->
     <rsgis:command algor="segmentation" option="clump" image="image.env" output="image_out.env" nodata="unsigned int" format="GDAL Format" inmemory="yes | no" proj="OSGB | NZ2000 | NZ1949 | IMAGE" />
     <!-- A command to colour clumps using random colours for visualisation -->
-    <rsgis:command algor="segmentation" option="randomcolourclumps" image="image.env" output="image_out.env" format="GDAL Format" inmemory="yes | no" proj="OSGB | NZ2000 | NZ1949 | IMAGE" />
+    <rsgis:command algor="segmentation" option="randomcolourclumps" image="image.env" output="image_out.env" [importLUT="file.lut"] [exportLUT="file.lut"] format="GDAL Format" inmemory="yes | no" proj="OSGB | NZ2000 | NZ1949 | IMAGE" />
     <!-- Generate an from a list of pixel locations generate a list of clump ids which will be the seeds for a region growing algorithm -->
     <rsgis:command algor="segmentation" option="regiongrowingseedclumpids" image="clumpsimage.env" output="clumpids.txt" >
         <rsgis:seed x="int" y="int" id="int" />

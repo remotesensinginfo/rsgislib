@@ -29,7 +29,7 @@ namespace rsgis{namespace segment{
         
     }
         
-    void RSGISRandomColourClumps::generateRandomColouredClump(GDALDataset *clumps, GDALDataset *colourImg) throw(RSGISImageCalcException)
+    void RSGISRandomColourClumps::generateRandomColouredClump(GDALDataset *clumps, GDALDataset *colourImg, string inputLUTFile, bool importLUT, string exportLUTFile, bool exportLUT) throw(RSGISImageCalcException)
     {
         if(clumps->GetRasterXSize() != colourImg->GetRasterXSize())
         {
@@ -77,18 +77,27 @@ namespace rsgis{namespace segment{
             }
         }
         
-        vector<ImgClumpRGB*> clumpTab;
-        clumpTab.reserve(maxClumpIdx);
         ImgClumpRGB *cClump;
-        for(unsigned int i = 0; i < maxClumpIdx; ++i)
+        vector<ImgClumpRGB*> *clumpTab = NULL;
+        if(importLUT)
         {
-            cClump = new ImgClumpRGB(i+1);
-            cClump->red = rand() % 255 + 1;
-            cClump->green = rand() % 255 + 1;
-            cClump->blue = rand() % 255 + 1;
-            clumpTab.push_back(cClump);
+            cout << "Importing Colours LUT\n";
+            clumpTab = this->importLUTFromFile(inputLUTFile);
         }
-        
+        else
+        {
+            clumpTab = new vector<ImgClumpRGB*>();
+            clumpTab->reserve(maxClumpIdx);
+            srand ( time(NULL) );
+            for(unsigned int i = 0; i < maxClumpIdx; ++i)
+            {
+                cClump = new ImgClumpRGB(i+1);
+                cClump->red = rand() % 255 + 1;
+                cClump->green = rand() % 255 + 1;
+                cClump->blue = rand() % 255 + 1;
+                clumpTab->push_back(cClump);
+            }
+        }
         
         for(unsigned int i = 0; i < height; ++i)
         {
@@ -98,7 +107,7 @@ namespace rsgis{namespace segment{
             {
                 if(clumpIdxs[j] != 0)
                 {
-                    cClump = clumpTab.at(clumpIdxs[j] - 1);
+                    cClump = clumpTab->at(clumpIdxs[j] - 1);
                     
                     clrRVals[j] = cClump->red;
                     clrGVals[j] = cClump->green;
@@ -117,16 +126,87 @@ namespace rsgis{namespace segment{
             bClrBand->RasterIO(GF_Write, 0, i, width, 1, clrBVals, width, 1, GDT_UInt32, 0, 0);
         }
         
+        if(exportLUT)
+        {
+            this->exportLUT2File(exportLUTFile, clumpTab);
+        }
+        
         delete[] clumpIdxs;
         delete[] clrRVals;
         delete[] clrGVals;
         delete[] clrBVals;
         
-        for(vector<ImgClumpRGB*>::iterator iterClumps = clumpTab.begin(); iterClumps != clumpTab.end(); ++iterClumps)
+        for(vector<ImgClumpRGB*>::iterator iterClumps = clumpTab->begin(); iterClumps != clumpTab->end(); ++iterClumps)
         {
             delete *iterClumps;
         }
-        
+        delete clumpTab;
+    }
+    
+    vector<ImgClumpRGB*>* RSGISRandomColourClumps::importLUTFromFile(string inFile) throw(RSGISTextException)
+    {
+        vector<ImgClumpRGB*> *clumpTab = new vector<ImgClumpRGB*>();
+        try 
+        {
+            RSGISTextUtils txtUtils;
+            size_t numLines = txtUtils.countLines(inFile);
+            clumpTab->reserve(numLines);
+            vector<string> *tokens = new vector<string>();
+            string line = "";
+            size_t count = 1;
+            ImgClumpRGB *cRGB = NULL;
+            RSGISTextFileLineReader reader;
+            reader.openFile(inFile);
+            while(!reader.endOfFile())
+            {
+                line = reader.readLine();
+                if(!txtUtils.blankline(line))
+                {
+                    txtUtils.tokenizeString(line, ',', tokens, true, true);
+                    if(tokens->size() != 3)
+                    {
+                        cout << "Line: " << line << endl;
+                        throw RSGISTextException("Line must has 3 tokens");
+                    }
+                    cRGB = new ImgClumpRGB(count++);
+                    cRGB->red = txtUtils.strto32bitInt(tokens->at(0));
+                    cRGB->green = txtUtils.strto32bitInt(tokens->at(1));
+                    cRGB->blue = txtUtils.strto32bitInt(tokens->at(2));
+                    clumpTab->push_back(cRGB);
+                    tokens->clear();
+                }
+            }
+            
+            delete tokens;
+        }
+        catch (RSGISTextException &e) 
+        {
+            throw e;
+        }
+        return clumpTab;
+    }
+    
+    void RSGISRandomColourClumps::exportLUT2File(string outFile, vector<ImgClumpRGB*> *clumpTab) throw(RSGISTextException)
+    {
+        try 
+        {
+            ofstream outTxtFile;
+            outTxtFile.open(outFile.c_str(), ios::out | ios::trunc);
+            
+            if(outTxtFile.is_open())
+            {
+                for(vector<ImgClumpRGB*>::iterator iterClumps = clumpTab->begin(); iterClumps != clumpTab->end(); ++iterClumps)
+                {
+                    outTxtFile << (*iterClumps)->red << "," << (*iterClumps)->green << "," << (*iterClumps)->blue << endl;
+                }
+                outTxtFile.flush();
+                outTxtFile.close();
+            }
+        }
+        catch (RSGISTextException &e) 
+        {
+            throw e;
+        }
     }
     
     RSGISRandomColourClumps::~RSGISRandomColourClumps()

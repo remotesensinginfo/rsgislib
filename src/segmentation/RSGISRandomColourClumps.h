@@ -29,14 +29,18 @@
 #include <queue>
 #include <math.h>
 #include <stdlib.h>
+#include <time.h>
 
 #include "gdal_priv.h"
 
 #include "img/RSGISImageUtils.h"
 #include "img/RSGISImageCalcException.h"
+#include "utils/RSGISTextUtils.h"
+#include "utils/RSGISTextException.h"
 
 using namespace std;
 using namespace rsgis::img;
+using namespace rsgis::utils;
 
 namespace rsgis{namespace segment{
     
@@ -57,8 +61,11 @@ namespace rsgis{namespace segment{
     {
     public:
         RSGISRandomColourClumps();
-        void generateRandomColouredClump(GDALDataset *clumps, GDALDataset *colourImg) throw(RSGISImageCalcException);
+        void generateRandomColouredClump(GDALDataset *clumps, GDALDataset *colourImg, string inputLUTFile, bool importLUT, string exportLUTFile, bool exportLUT) throw(RSGISImageCalcException);
         ~RSGISRandomColourClumps();
+    protected:
+        vector<ImgClumpRGB*>* importLUTFromFile(string inFile) throw(RSGISTextException);
+        void exportLUT2File(string outFile, vector<ImgClumpRGB*> *clumpTab) throw(RSGISTextException);
     };
     
 }}
