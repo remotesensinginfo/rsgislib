@@ -91,6 +91,7 @@ namespace rsgis{namespace rastergis{
         size_t getNumOfBlocks();
         void loadBlocks(size_t startBlock, size_t endBlock) throw(RSGISAttributeTableException);
         bool attInMemory();
+        void findFIDRangeInNeighbours(size_t startFID, size_t endFID, size_t *minFID, size_t *maxFID) throw(RSGISAttributeTableException);
         
         void operator++();
         void start();

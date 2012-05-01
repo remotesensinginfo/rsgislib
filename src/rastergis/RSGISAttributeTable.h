@@ -227,12 +227,14 @@ namespace rsgis{namespace rastergis{
         virtual size_t getNumOfBlocks()=0;
         virtual void loadBlocks(size_t startBlock, size_t endBlock) throw(RSGISAttributeTableException)=0;
         virtual bool attInMemory()=0;
+        virtual void findFIDRangeInNeighbours(size_t startFID, size_t endFID, size_t *minFID, size_t *maxFID) throw(RSGISAttributeTableException)=0;
         
         vector<double>* getFieldValues(string field) throw(RSGISAttributeTableException);
         
         void applyIfStatements(vector<RSGISIfStatement*> *statements) throw(RSGISAttributeTableException);
         bool applyIfStatementsToFeature(RSGISFeature *feat, vector<RSGISIfStatement*> *statements) throw(RSGISAttributeTableException);
         void processIfStatements(RSGISIfStatement *statement, RSGISProcessFeature *processTrue, RSGISProcessFeature *processFalse) throw(RSGISAttributeTableException);
+        void processIfStatementsInBlocks(RSGISIfStatement *statement, RSGISProcessFeature *processTrue, RSGISProcessFeature *processFalse) throw(RSGISAttributeTableException);
         void populateIfStatementsWithIdxs(vector<RSGISIfStatement*> *statements) throw(RSGISAttributeTableException);
         
         void calculateFieldsMUParser(string expression, string outField, RSGISAttributeDataType outFieldDT, vector<RSGISMathAttVariable*> *variables) throw(RSGISAttributeTableException);

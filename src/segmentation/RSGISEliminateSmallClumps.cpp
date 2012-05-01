@@ -693,15 +693,32 @@ namespace rsgis{namespace segment{
             
             RSGISProcessFeature *processFeature = new RSGISEliminateFeature(eliminatedFieldIdx, mergedToFIDIdx, specThreshold, pxlCountIdx, bandStats, eliminationPairs);
             
-            cout << "Eliminating features of size " << flush;
-            for(unsigned int i = 1; i <= minClumpSize; ++i)
+            if(attTable->attInMemory())
             {
-                cout << i << ", " << flush;
-                areaThreshold->setValue(i);
-                attTable->processIfStatements(ifStat, processFeature, NULL);
-                this->performElimination(attTable, eliminationPairs, eliminatedFieldIdx, mergedToFIDIdx, pxlCountIdx, bandStats);
+                cout << "Eliminating features of size " << flush;
+                for(unsigned int i = 1; i <= minClumpSize; ++i)
+                {
+                    cout << i << ", " << flush;
+                    areaThreshold->setValue(i);
+                    attTable->processIfStatements(ifStat, processFeature, NULL);
+                    this->performElimination(attTable, eliminationPairs, eliminatedFieldIdx, mergedToFIDIdx, pxlCountIdx, bandStats);
+                }
+                cout << "Completed\n";
             }
-            cout << "Completed\n";
+            else
+            {
+                cout << "Eliminating features: " << endl;
+                for(unsigned int i = 1; i <= minClumpSize; ++i)
+                {
+                    cout << "Process features with area " << i << endl;
+                    areaThreshold->setValue(i);
+                    attTable->processIfStatementsInBlocks(ifStat, processFeature, NULL);
+                    cout << "Update table with elimination\n";
+                    this->performElimination(attTable, eliminationPairs, eliminatedFieldIdx, mergedToFIDIdx, pxlCountIdx, bandStats);
+                    cout << endl;
+                }
+                cout << "Completed\n";
+            }
             
             delete ifStat->exp;
             delete ifStat;

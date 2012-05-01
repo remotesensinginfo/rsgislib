@@ -186,6 +186,83 @@ namespace rsgis{namespace rastergis{
         }
     }
     
+    void RSGISAttributeTable::processIfStatementsInBlocks(RSGISIfStatement *statement, RSGISProcessFeature *processTrue, RSGISProcessFeature *processFalse) throw(RSGISAttributeTableException)
+    {
+        try
+        {
+            size_t totalNumBlocks = (this->getSize()/ATT_WRITE_CHUNK_SIZE)+1;
+            size_t numBlocksInSample = this->getNumOfBlocks()*0.6;
+            size_t numSamples = (totalNumBlocks/numBlocksInSample)+1;
+            size_t startBlock = 0;
+            size_t endBlock = numBlocksInSample;
+            
+            size_t numFeatInSample = ATT_WRITE_CHUNK_SIZE * numBlocksInSample;
+            size_t startFID = 0;
+            size_t endFID = numFeatInSample;
+            
+            size_t maxFID = 0;
+            size_t minFID = 0;
+
+            long diffFID = 0;
+            size_t numBlocks = 0;
+            RSGISFeature *feat = NULL;
+            cout << "Processing " << numSamples << " samples: " << endl;
+            for(size_t n = 0; n < numSamples; ++n)
+            {
+                cout << "Sample " << n+1 << " of " << numSamples << " - " << flush;
+                
+                if(n == numSamples-1)
+                {
+                    endFID = this->getSize();
+                }
+                
+                this->loadBlocks(startBlock, endBlock);
+                this->findFIDRangeInNeighbours(startFID, endFID, &minFID, &maxFID);
+                
+                diffFID = startFID - minFID;
+                if(diffFID > 0)
+                {
+                    numBlocks = (diffFID/ATT_WRITE_CHUNK_SIZE)+1;
+                    this->loadBlocks(startFID-numBlocks, startFID);
+                }
+                
+                diffFID = maxFID - endFID;
+                if(diffFID > 0)
+                {
+                    numBlocks = (diffFID/ATT_WRITE_CHUNK_SIZE)+1;
+                    this->loadBlocks(endBlock, endBlock+numBlocks);
+                }
+                
+                for(size_t j = startFID; j < endFID; ++j)
+                {
+                    //cout << "processing " << j << flush;
+                    feat = this->getFeature(j);
+                    //cout << " with fid " << feat->fid << endl;
+                    this->holdFID(feat->fid);
+                    if(statement->exp->evaluate(feat))
+                    {
+                        processTrue->processFeature(feat, this);
+                    }
+                    else if(processFalse != NULL)
+                    {
+                        processFalse->processFeature(feat, this);
+                    }
+                    this->removeHoldFID(feat->fid);
+                }
+                
+                this->flushAllFeatures(true);
+                startBlock += numBlocksInSample;
+                endBlock += numBlocksInSample;
+                startFID += numFeatInSample;
+                endFID += numFeatInSample;
+            }
+        }
+        catch(RSGISAttributeTableException &e)
+        {
+            throw e;
+        }
+    }
+    
     void RSGISAttributeTable::populateIfStatementsWithIdxs(vector<RSGISIfStatement*> *statements) throw(RSGISAttributeTableException)
     {
         try
