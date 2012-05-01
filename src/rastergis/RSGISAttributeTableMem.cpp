@@ -620,6 +620,44 @@ namespace rsgis{namespace rastergis{
         return true;
     }
     
+    void RSGISAttributeTableMem::findFIDRangeInNeighbours(size_t startFID, size_t endFID, size_t *minFID, size_t *maxFID) throw(RSGISAttributeTableException)
+    {
+        try
+        {
+            if(endFID > this->attTable->size())
+            {
+                throw RSGISAttributeTableException("Features are not all within the attribute table.");
+            }
+            bool first = true;
+            RSGISFeature *feat;
+            for(size_t i = startFID; i < endFID; ++i)
+            {
+                feat = this->attTable->at(i);
+                for(vector<size_t>::iterator iterNeighbours = feat->neighbours->begin(); iterNeighbours != feat->neighbours->end(); ++iterNeighbours)
+                {
+                    if(first)
+                    {
+                        *minFID = *iterNeighbours;
+                        *maxFID = *iterNeighbours;
+                        first = false;
+                    }
+                    else if((*iterNeighbours) < *minFID)
+                    {
+                        *minFID = *iterNeighbours;
+                    }
+                    else if((*iterNeighbours) > *maxFID)
+                    {
+                        *maxFID = *iterNeighbours;
+                    }
+                }
+            }
+        }
+        catch(RSGISAttributeTableException &e)
+        {
+            throw e;
+        }
+    }
+    
     void RSGISAttributeTableMem::operator++()
     {
         ++iterIdx;
