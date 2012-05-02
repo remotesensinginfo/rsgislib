@@ -40,6 +40,7 @@
 #include "registration/RSGISBasicNNGCPImageWarp.h"
 #include "registration/RSGISWarpImageInterpolator.h"
 #include "registration/RSGISWarpImageUsingTriangulation.h"
+#include "registration/RSGISPolynomialImageWarp.h"
 
 #include "utils/RSGISFileUtils.h"
 #include "utils/RSGISTextUtils.h"
@@ -66,7 +67,8 @@ public:
 		basic,
 		singlelayer,
 		triangularwarp,
-		nnwarp
+		nnwarp,
+        polywarp
 	};
 	
 	enum OutputType
@@ -119,6 +121,7 @@ protected:
 	float moveChangeThreshold;
 	float pSmoothness;
 	float resolution;
+    int polyOrder;
 };
 
 #endif
