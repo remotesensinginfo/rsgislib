@@ -1675,7 +1675,9 @@ namespace rsgis{namespace rastergis{
                     {
                         this->featCache[i]->neighbours->push_back(((unsigned long long*)neighbourVals[n].p)[j]);
                     }
+                    delete[] ((size_t*)neighbourVals[n].p);
                 }
+                
             }
             
             delete[] neighbourVals;
