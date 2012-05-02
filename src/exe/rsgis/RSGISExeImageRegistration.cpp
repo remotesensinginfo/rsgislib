@@ -42,6 +42,7 @@ void RSGISExeImageRegistration::retrieveParameters(DOMElement *argElement) throw
 	XMLCh *optionSingleLayer = XMLString::transcode("singlelayer");
 	XMLCh *optionTriangularWarp = XMLString::transcode("triangularwarp");
 	XMLCh *optionNNWarp = XMLString::transcode("nnwarp");
+    XMLCh *optionPolyWarp = XMLString::transcode("polywarp");
 	
 	try
 	{
@@ -626,9 +627,10 @@ void RSGISExeImageRegistration::retrieveParameters(DOMElement *argElement) throw
 			XMLString::release(&outImageFormatXMLStr);
 			
 		}
-		else if(XMLString::equals(optionNNWarp, optionXML))
+		else if((XMLString::equals(optionNNWarp, optionXML)) | (XMLString::equals(optionPolyWarp, optionXML)))
 		{
-			this->option = nnwarp;
+			if(XMLString::equals(optionNNWarp, optionXML)){this->option = nnwarp;}
+            else{this->option = polywarp;}
 			
 			XMLCh *gcpsXMLStr = XMLString::transcode("gcps");
 			if(argElement->hasAttribute(gcpsXMLStr))
@@ -709,7 +711,21 @@ void RSGISExeImageRegistration::retrieveParameters(DOMElement *argElement) throw
 			}
 			XMLString::release(&outImageFormatXMLStr);
             
-            
+            if(this->option == polywarp) // Get polynominal order for polynominal warp
+            {
+                XMLCh *polyOrderStr = XMLString::transcode("polyOrder"); // Polynomial Order
+                if(argElement->hasAttribute(polyOrderStr))
+                {
+                    char *charValue = XMLString::transcode(argElement->getAttribute(polyOrderStr));
+                    this->polyOrder = mathUtils.strtoint(string(charValue));
+                    XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw RSGISXMLArgumentsException("No value provided for polynomial order");
+                }
+                XMLString::release(&polyOrderStr);
+            }
 			
 		}
 		else 
@@ -731,6 +747,7 @@ void RSGISExeImageRegistration::retrieveParameters(DOMElement *argElement) throw
 	XMLString::release(&optionSingleLayer);
 	XMLString::release(&optionTriangularWarp);
 	XMLString::release(&optionNNWarp);
+    XMLString::release(&optionPolyWarp);
 	
 	parsed = true; // if all successful, it is parsed
 }
@@ -1049,6 +1066,44 @@ void RSGISExeImageRegistration::runAlgorithm() throw(RSGISException)
                 }
                 
 				warp = new RSGISBasicNNGCPImageWarp(this->inputImage, this->outputImage, projWKTStr, this->inputGCPs, this->resolution, interpolator, this->outImageFormat);
+				warp->performWarp();
+				delete warp;
+			}
+			catch (RSGISException &e) 
+			{
+				throw e;
+			}
+			GDALDestroyDriverManager();
+		}
+		else if(this->option == RSGISExeImageRegistration::polywarp)
+		{
+			cout << "Warp an image using a set of image to map ground control points using a "; 
+            if (this->polyOrder == 1) {cout << "1st order polynominal" << endl;}
+            if (this->polyOrder == 2) {cout << "2nd order polynominal" << endl;}
+            if (this->polyOrder == 3) {cout << "3rd order polynominal" << endl;}
+            else {cout << this->polyOrder << "th order polynominal" << endl;}
+            
+			cout << "GCPs: " << this->inputGCPs << endl;
+			cout << "Image: " << this->inputImage << endl;
+			cout << "Output Image: " << this->outputImage << endl;
+			cout << "Projection: " << this->projFile << endl;
+			cout << "Output Resolution: " << this->resolution << endl;
+            cout << "Output Image format: " << this->outImageFormat << endl;
+			
+			GDALAllRegister();
+			RSGISWarpImage *warp = NULL;
+			RSGISWarpImageInterpolator *interpolator = new RSGISWarpImageNNInterpolator();
+			
+			try 
+			{
+                string projWKTStr = "";
+                if(this->projFile != "")
+                {
+                    RSGISTextUtils textUtils;
+                    projWKTStr = textUtils.readFileToString(this->projFile);
+                }
+                
+				warp = new RSGISPolynomialImageWarp(this->inputImage, this->outputImage, projWKTStr, this->inputGCPs, this->resolution, interpolator, this->polyOrder, this->outImageFormat);
 				warp->performWarp();
 				delete warp;
 			}

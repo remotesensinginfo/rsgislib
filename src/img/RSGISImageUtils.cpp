@@ -1371,17 +1371,7 @@ namespace rsgis{namespace img{
 			
 			// Create new file. 
 			// Set unsupported options to NULL
-			char **papszOptions = poDriver->GetMetadata();
-			/*papszOptions = CSLSetNameValue (papszOptions, "DMD_LONGNAME", NULL);
-			papszOptions = CSLSetNameValue (papszOptions, "DMD_HELPTOPIC", NULL); 	
-			papszOptions = CSLSetNameValue (papszOptions, "DMD_EXTENSION", NULL); 	
-			papszOptions = CSLSetNameValue (papszOptions, "DMD_CREATIONDATATYPES", NULL); 	
-			papszOptions = CSLSetNameValue (papszOptions, "DMD_CREATIONOPTIONLIST", NULL); 
-			papszOptions = CSLSetNameValue (papszOptions, "DCAP_VIRTUALIO", NULL); 
-			papszOptions = CSLSetNameValue (papszOptions, "DCAP_CREATE", NULL); */
-			
-			//outputImage = poDriver->Create(imageFile.c_str(), xSize, ySize, numBands, GDT_Float32, poDriver->GetMetadata());
-			outputImage = poDriver->Create(imageFile.c_str(), xSize, ySize, numBands, GDT_Float32, papszOptions);
+			outputImage = poDriver->Create(imageFile.c_str(), xSize, ySize, numBands, GDT_Float32, NULL);
 			
 			if(outputImage == NULL)
 			{
@@ -1480,17 +1470,7 @@ namespace rsgis{namespace img{
 			}
 			
 			// Create new file. 
-			char **papszOptions = poDriver->GetMetadata();
-			/*papszOptions = CSLSetNameValue (papszOptions, "DMD_LONGNAME", NULL);
-			papszOptions = CSLSetNameValue (papszOptions, "DMD_HELPTOPIC", NULL); 	
-			papszOptions = CSLSetNameValue (papszOptions, "DMD_EXTENSION", NULL); 	
-			papszOptions = CSLSetNameValue (papszOptions, "DMD_CREATIONDATATYPES", NULL); 	
-			papszOptions = CSLSetNameValue (papszOptions, "DMD_CREATIONOPTIONLIST", NULL); 
-			papszOptions = CSLSetNameValue (papszOptions, "DCAP_VIRTUALIO", NULL); 
-			papszOptions = CSLSetNameValue (papszOptions, "DCAP_CREATE", NULL); */
-			
-			//outputImage = poDriver->Create(imageFile.c_str(), xSize, ySize, numBands, GDT_Float32, poDriver->GetMetadata());
-			outputImage = poDriver->Create(imageFile.c_str(), xSize, ySize, numBands, GDT_Float32, papszOptions);
+			outputImage = poDriver->Create(imageFile.c_str(), xSize, ySize, numBands, GDT_Float32, NULL);
 			if(outputImage == NULL)
 			{
 				throw RSGISImageException("Image could not be created.");
@@ -1603,17 +1583,7 @@ namespace rsgis{namespace img{
 			}
 			
 			// Create new file.
-			char **papszOptions = poDriver->GetMetadata();
-			/*papszOptions = CSLSetNameValue (papszOptions, "DMD_LONGNAME", NULL);
-			papszOptions = CSLSetNameValue (papszOptions, "DMD_HELPTOPIC", NULL); 	
-			papszOptions = CSLSetNameValue (papszOptions, "DMD_EXTENSION", NULL); 	
-			papszOptions = CSLSetNameValue (papszOptions, "DMD_CREATIONDATATYPES", NULL); 	
-			papszOptions = CSLSetNameValue (papszOptions, "DMD_CREATIONOPTIONLIST", NULL); 
-			papszOptions = CSLSetNameValue (papszOptions, "DCAP_VIRTUALIO", NULL); 
-			papszOptions = CSLSetNameValue (papszOptions, "DCAP_CREATE", NULL); */
-			
-			//outputImage = poDriver->Create(imageFile.c_str(), xSize, ySize, numBands, GDT_Float32, poDriver->GetMetadata());
-			outputImage = poDriver->Create(imageFile.c_str(), xSize, ySize, numBands, GDT_Float32, papszOptions);
+			outputImage = poDriver->Create(imageFile.c_str(), xSize, ySize, numBands, GDT_Float32, NULL);
 			
 			if(outputImage == NULL)
 			{
@@ -1734,18 +1704,8 @@ namespace rsgis{namespace img{
 				*outStrStream << outputFilebase << "_b" << i << ".tif";
 				outImageFile = outStrStream->str();
 				cout << "File: " << outImageFile << endl;
-				
-				char **papszOptions = gdalDriver->GetMetadata();
-				/*papszOptions = CSLSetNameValue (papszOptions, "DMD_LONGNAME", NULL);
-				papszOptions = CSLSetNameValue (papszOptions, "DMD_HELPTOPIC", NULL); 	
-				papszOptions = CSLSetNameValue (papszOptions, "DMD_EXTENSION", NULL); 	
-				papszOptions = CSLSetNameValue (papszOptions, "DMD_CREATIONDATATYPES", NULL); 	
-				papszOptions = CSLSetNameValue (papszOptions, "DMD_CREATIONOPTIONLIST", NULL); 
-				papszOptions = CSLSetNameValue (papszOptions, "DCAP_VIRTUALIO", NULL); 
-				papszOptions = CSLSetNameValue (papszOptions, "DCAP_CREATE", NULL); */
-				
-				//outputImage = gdalDriver->Create(outImageFile.c_str(), xSize, ySize, 1, GDT_Float32, gdalDriver->GetMetadata());
-				outputImage = gdalDriver->Create(outImageFile.c_str(), xSize, ySize, 1, GDT_Float32, papszOptions);
+
+				outputImage = gdalDriver->Create(outImageFile.c_str(), xSize, ySize, 1, GDT_Float32, NULL);
 				
 				if(outputImage == NULL)
 				{
@@ -1827,17 +1787,8 @@ namespace rsgis{namespace img{
 			{
 				cout << "Converting image " << inputImages[i] << endl;
 				numOutBands = inDatasets[i]->GetRasterCount();
-				char **papszOptions = gdalDriver->GetMetadata();
-				/*papszOptions = CSLSetNameValue (papszOptions, "DMD_LONGNAME", NULL);
-				papszOptions = CSLSetNameValue (papszOptions, "DMD_HELPTOPIC", NULL); 	
-				papszOptions = CSLSetNameValue (papszOptions, "DMD_EXTENSION", NULL); 	
-				papszOptions = CSLSetNameValue (papszOptions, "DMD_CREATIONDATATYPES", NULL); 	
-				papszOptions = CSLSetNameValue (papszOptions, "DMD_CREATIONOPTIONLIST", NULL); 
-				papszOptions = CSLSetNameValue (papszOptions, "DCAP_VIRTUALIO", NULL); 
-				papszOptions = CSLSetNameValue (papszOptions, "DCAP_CREATE", NULL); */
-				
-				//outputImageDS = gdalDriver->Create(outputImages[i].c_str(), stackWidth, stackHeight, numOutBands, GDT_Float32, gdalDriver->GetMetadata());
-				outputImageDS = gdalDriver->Create(outputImages[i].c_str(), stackWidth, stackHeight, numOutBands, GDT_Float32, papszOptions);
+
+				outputImageDS = gdalDriver->Create(outputImages[i].c_str(), stackWidth, stackHeight, numOutBands, GDT_Float32, NULL);
 				
 				outputImageDS->SetGeoTransform(gdalTranslation);
 				outputImageDS->SetProjection(inDatasets[0]->GetProjectionRef());
@@ -1951,17 +1902,7 @@ namespace rsgis{namespace img{
 			{
 				cout << "Converting image " << inputImages[i-1] << endl;
 				numOutBands = inDatasets[i]->GetRasterCount();
-				char **papszOptions = gdalDriver->GetMetadata();
-				/*papszOptions = CSLSetNameValue (papszOptions, "DMD_LONGNAME", NULL);
-				papszOptions = CSLSetNameValue (papszOptions, "DMD_HELPTOPIC", NULL); 	
-				papszOptions = CSLSetNameValue (papszOptions, "DMD_EXTENSION", NULL); 	
-				papszOptions = CSLSetNameValue (papszOptions, "DMD_CREATIONDATATYPES", NULL); 	
-				papszOptions = CSLSetNameValue (papszOptions, "DMD_CREATIONOPTIONLIST", NULL); 
-				papszOptions = CSLSetNameValue (papszOptions, "DCAP_VIRTUALIO", NULL); 
-				papszOptions = CSLSetNameValue (papszOptions, "DCAP_CREATE", NULL); */
-				
-				//outputImageDS = gdalDriver->Create(outputImages[i-1].c_str(), stackWidth, stackHeight, numOutBands, GDT_Float32, gdalDriver->GetMetadata());
-				outputImageDS = gdalDriver->Create(outputImages[i-1].c_str(), stackWidth, stackHeight, numOutBands, GDT_Float32, papszOptions);
+				outputImageDS = gdalDriver->Create(outputImages[i-1].c_str(), stackWidth, stackHeight, numOutBands, GDT_Float32, NULL);
 				outputImageDS->SetGeoTransform(gdalTranslation);
 				outputImageDS->SetProjection(inDatasets[0]->GetProjectionRef());
 				
@@ -2213,17 +2154,7 @@ namespace rsgis{namespace img{
 			transformation[5] = -1;
 			
 			cout << "Creating image " << outputImage << endl;
-			char **papszOptions = gdalDriver->GetMetadata();
-			/*papszOptions = CSLSetNameValue (papszOptions, "DMD_LONGNAME", NULL);
-			papszOptions = CSLSetNameValue (papszOptions, "DMD_HELPTOPIC", NULL); 	
-			papszOptions = CSLSetNameValue (papszOptions, "DMD_EXTENSION", NULL); 	
-			papszOptions = CSLSetNameValue (papszOptions, "DMD_CREATIONDATATYPES", NULL); 	
-			papszOptions = CSLSetNameValue (papszOptions, "DMD_CREATIONOPTIONLIST", NULL); 
-			papszOptions = CSLSetNameValue (papszOptions, "DCAP_VIRTUALIO", NULL); 
-			papszOptions = CSLSetNameValue (papszOptions, "DCAP_CREATE", NULL); */
-			
-			//outDataset = gdalDriver->Create(outputImage.c_str(), width, height, numOutBands, GDT_Float32, gdalDriver->GetMetadata());
-			outDataset = gdalDriver->Create(outputImage.c_str(), width, height, numOutBands, GDT_Float32, papszOptions);
+			outDataset = gdalDriver->Create(outputImage.c_str(), width, height, numOutBands, GDT_Float32, NULL);
 			
 			if(outDataset == NULL)
 			{
@@ -2324,18 +2255,7 @@ namespace rsgis{namespace img{
 			transformation[5] = yRes;
 			
 			cout << "Creating image " << outputImage << endl;
-			
-			char **papszOptions = gdalDriver->GetMetadata();
-			/*papszOptions = CSLSetNameValue (papszOptions, "DMD_LONGNAME", NULL);
-			papszOptions = CSLSetNameValue (papszOptions, "DMD_HELPTOPIC", NULL); 	
-			papszOptions = CSLSetNameValue (papszOptions, "DMD_EXTENSION", NULL); 	
-			papszOptions = CSLSetNameValue (papszOptions, "DMD_CREATIONDATATYPES", NULL); 	
-			papszOptions = CSLSetNameValue (papszOptions, "DMD_CREATIONOPTIONLIST", NULL); 
-			papszOptions = CSLSetNameValue (papszOptions, "DCAP_VIRTUALIO", NULL); 
-			papszOptions = CSLSetNameValue (papszOptions, "DCAP_CREATE", NULL); */
-			
-			//outDataset = gdalDriver->Create(outputImage.c_str(), width, height, numOutBands, GDT_Float32, gdalDriver->GetMetadata());
-			outDataset = gdalDriver->Create(outputImage.c_str(), width, height, numOutBands, GDT_Float32, papszOptions);
+			outDataset = gdalDriver->Create(outputImage.c_str(), width, height, numOutBands, GDT_Float32, NULL);
 			if(outDataset == NULL)
 			{
 				string message = string("Could not open image ") + outputImage;
@@ -2441,17 +2361,7 @@ namespace rsgis{namespace img{
             for(int i = 0; i < dataset->GetRasterYSize(); ++i)
             {
                 string outputImage = outputImageBase + mathUtils.inttostring(i) + string(".env");
-				char **papszOptions = gdalDriver->GetMetadata();
-				/*papszOptions = CSLSetNameValue (papszOptions, "DMD_LONGNAME", NULL);
-				papszOptions = CSLSetNameValue (papszOptions, "DMD_HELPTOPIC", NULL); 	
-				papszOptions = CSLSetNameValue (papszOptions, "DMD_EXTENSION", NULL); 	
-				papszOptions = CSLSetNameValue (papszOptions, "DMD_CREATIONDATATYPES", NULL); 	
-				papszOptions = CSLSetNameValue (papszOptions, "DMD_CREATIONOPTIONLIST", NULL); 
-				papszOptions = CSLSetNameValue (papszOptions, "DCAP_VIRTUALIO", NULL); 
-				papszOptions = CSLSetNameValue (papszOptions, "DCAP_CREATE", NULL); */
-				
-                //outDataset = gdalDriver->Create(outputImage.c_str(), width, height, 1, GDT_Float32, gdalDriver->GetMetadata());
-				outDataset = gdalDriver->Create(outputImage.c_str(), width, height, 1, GDT_Float32, papszOptions);
+				outDataset = gdalDriver->Create(outputImage.c_str(), width, height, 1, GDT_Float32, NULL);
                 if(outDataset == NULL)
                 {
                     string message = string("Could not open image ") + outputImage;
