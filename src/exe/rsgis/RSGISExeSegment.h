@@ -45,6 +45,7 @@
 #include "segmentation/RSGISLabelPixelsUsingClusters.h"
 #include "segmentation/RSGISRegionGrowSegmentsPixels.h"
 #include "segmentation/RSGISDefineSpectralDivision.h"
+#include "segmentation/RSGISEliminateSinglePixels.h"
 
 #include "rastergis/RSGISAttributeTable.h"
 #include "rastergis/RSGISCreateNewAttributeTable.h"
@@ -90,7 +91,8 @@ class RSGISExeSegment : public RSGISAlgorithmParameters
             growregionspixelsauto,
             growregionspixels,
             spectraldiv,
-            stepwiseelimination
+            stepwiseelimination,
+            elimsinglepxls
 		};
 		RSGISExeSegment();
 		virtual RSGISAlgorithmParameters* getInstance();
@@ -112,6 +114,7 @@ class RSGISExeSegment : public RSGISAlgorithmParameters
         string seedsTextFile;
         string clustersMatrix;
         string tempTable;
+        string tempImage;
         string proj;
         unsigned int minClumpSize;
         float specThreshold;

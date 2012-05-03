@@ -46,15 +46,14 @@
 #include "rastergis/RSGISPopulateAttributeTable.h"
 #include "rastergis/RSGISFindClumpNeighbours.h"
 
-
-using namespace std;
-using namespace rsgis::img;
-using namespace rsgis::rastergis;
-using namespace rsgis::utils;
-using namespace rsgis;
-
 namespace rsgis{namespace segment{
-        
+    
+    using namespace std;
+    using namespace rsgis::img;
+    using namespace rsgis::rastergis;
+    using namespace rsgis::utils;
+    using namespace rsgis;
+    
     class RSGISEliminateSmallClumps
     {
     public:

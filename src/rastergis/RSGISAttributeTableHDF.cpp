@@ -1333,6 +1333,257 @@ namespace rsgis{namespace rastergis{
     {
         try
         {
+            /*
+            size_t startFID = 0;
+            size_t endFID = 0;
+            size_t blockSize = ATT_WRITE_CHUNK_SIZE;
+            size_t remainingFeats = 0;
+            size_t numBlocks = endBlock - startBlock;
+            if(startBlock > numOfBlocks)
+            {
+                throw RSGISAttributeTableException("The specificed block is not within the file");
+            }
+            else if((startBlock < numOfBlocks) & (endBlock < numOfBlocks))
+            {
+                startFID = startBlock * ATT_WRITE_CHUNK_SIZE;
+                endFID = (endBlock * ATT_WRITE_CHUNK_SIZE) + ATT_WRITE_CHUNK_SIZE;
+            }
+            else
+            {
+                startFID = startBlock * ATT_WRITE_CHUNK_SIZE;
+                endFID = this->attSize;
+                remainingFeats = endFID-startFID;
+                numBlocks = (startFID-endFID)/ATT_WRITE_CHUNK_SIZE;
+            }
+            
+             // Neighbours
+            
+            DataSpace neighboursDataspace = neighboursDataset.getSpace();
+            hsize_t neighboursOffset[1];
+            neighboursOffset[0] = startFID;
+            hsize_t neighboursCount[1];
+            neighboursCount[0] = blockSize;
+            neighboursDataspace.selectHyperslab( H5S_SELECT_SET, neighboursCount, neighboursOffset );
+            
+            hsize_t neighboursDimsRead[1]; 
+            neighboursDimsRead[0] = blockSize;
+            DataSpace neighboursMemspace( 1, neighboursDimsRead );
+            
+            hsize_t neighboursOffset_out[1];
+            neighboursOffset_out[0] = 0;
+            hsize_t neighboursCount_out[1];
+            neighboursCount_out[0] = blockSize;
+            neighboursMemspace.selectHyperslab( H5S_SELECT_SET, neighboursCount_out, neighboursOffset_out );
+            
+            hvl_t *neighbourVals = new hvl_t[blockSize];
+            DataType intVarLenMemDT = VarLenType(&PredType::NATIVE_UINT64);
+            
+            
+            int *boolVals = NULL;
+            DataSpace boolDataspace;
+            DataSpace boolFieldsMemspace;
+            hsize_t boolFieldsOffset[2];
+            hsize_t boolFieldsCount[2];
+            if(this->numBoolFields > 0)
+            {
+                boolVals = new int[blockSize*this->numBoolFields];
+                
+                boolDataspace = boolDataset.getSpace();
+                boolFieldsOffset[0] = startFID;
+                boolFieldsOffset[1] = 0;
+                boolFieldsCount[0] = blockSize;
+                boolFieldsCount[1] = this->numBoolFields;
+                boolDataspace.selectHyperslab( H5S_SELECT_SET, boolFieldsCount, boolFieldsOffset );
+                
+                hsize_t boolFieldsDimsRead[2]; 
+                boolFieldsDimsRead[0] = blockSize;
+                boolFieldsDimsRead[1] = this->numBoolFields;
+                boolFieldsMemspace = DataSpace( 2, boolFieldsDimsRead );
+                
+                hsize_t boolFieldsOffset_out[2];
+                boolFieldsOffset_out[0] = 0;
+                boolFieldsOffset_out[1] = 0;
+                hsize_t boolFieldsCount_out[2];
+                boolFieldsCount_out[0] = blockSize;
+                boolFieldsCount_out[1] = this->numBoolFields;
+                boolFieldsMemspace.selectHyperslab( H5S_SELECT_SET, boolFieldsCount_out, boolFieldsOffset_out );
+            }
+            
+            long *intVals = NULL;
+            DataSpace intDataspace;
+            DataSpace intFieldsMemspace;
+            hsize_t intFieldsOffset[2];
+            hsize_t intFieldsCount[2];
+            if(this->numIntFields > 0)
+            {
+                intVals = new long[blockSize*this->numIntFields];
+                
+                intDataspace = intDataset.getSpace();
+                intFieldsOffset[0] = startFID;
+                intFieldsOffset[1] = 0;
+                intFieldsCount[0] = blockSize;
+                intFieldsCount[1] = this->numIntFields;
+                intDataspace.selectHyperslab( H5S_SELECT_SET, intFieldsCount, intFieldsOffset );
+                
+                hsize_t intFieldsDimsRead[2]; 
+                intFieldsDimsRead[0] = blockSize;
+                intFieldsDimsRead[1] = this->numIntFields;
+                intFieldsMemspace = DataSpace( 2, intFieldsDimsRead );
+                
+                hsize_t intFieldsOffset_out[2];
+                intFieldsOffset_out[0] = 0;
+                intFieldsOffset_out[1] = 0;
+                hsize_t intFieldsCount_out[2];
+                intFieldsCount_out[0] = blockSize;
+                intFieldsCount_out[1] = this->numIntFields;
+                intFieldsMemspace.selectHyperslab( H5S_SELECT_SET, intFieldsCount_out, intFieldsOffset_out );
+            }
+            
+            double *floatVals = NULL;
+            DataSpace floatDataspace;
+            DataSpace floatFieldsMemspace;
+            hsize_t floatFieldsOffset[2];
+            hsize_t floatFieldsCount[2];
+            if(this->numFloatFields > 0)
+            {
+                floatVals = new double[blockSize*this->numFloatFields];
+                
+                floatDataspace = floatDataset.getSpace();
+                floatFieldsOffset[0] = startFID;
+                floatFieldsOffset[1] = 0;
+                floatFieldsCount[0] = blockSize;
+                floatFieldsCount[1] = this->numFloatFields;
+                floatDataspace.selectHyperslab( H5S_SELECT_SET, floatFieldsCount, floatFieldsOffset );
+                
+                hsize_t floatFieldsDimsRead[2]; 
+                floatFieldsDimsRead[0] = blockSize;
+                floatFieldsDimsRead[1] = this->numFloatFields;
+                floatFieldsMemspace = DataSpace( 2, floatFieldsDimsRead );
+                
+                hsize_t floatFieldsOffset_out[2];
+                floatFieldsOffset_out[0] = 0;
+                floatFieldsOffset_out[1] = 0;
+                hsize_t floatFieldsCount_out[2];
+                floatFieldsCount_out[0] = blockSize;
+                floatFieldsCount_out[1] = this->numFloatFields;
+                floatFieldsMemspace.selectHyperslab( H5S_SELECT_SET, floatFieldsCount_out, floatFieldsOffset_out );
+            }
+            
+            size_t currentStartFID = startFID;
+            size_t currentEndFID = startFID + ATT_WRITE_CHUNK_SIZE;
+            for(size_t block1 = 0; block1 < numBlocks; ++block1)
+            {
+                neighboursOffset[0] = currentStartFID;
+                neighboursDataspace.selectHyperslab( H5S_SELECT_SET, neighboursCount, neighboursOffset );
+                neighboursDataset.read(neighbourVals, intVarLenMemDT, neighboursMemspace, neighboursDataspace);
+                
+                if(this->numBoolFields > 0)
+                {
+                    boolFieldsOffset[0] = currentStartFID;
+                    boolDataspace.selectHyperslab( H5S_SELECT_SET, boolFieldsCount, boolFieldsOffset );
+                    
+                    boolDataset.read(boolVals, PredType::NATIVE_INT32, boolFieldsMemspace, boolDataspace);
+                }
+                
+                if(this->numIntFields > 0)
+                {
+                    intFieldsOffset[0] = currentStartFID;
+                    intDataspace.selectHyperslab( H5S_SELECT_SET, intFieldsCount, intFieldsOffset );
+                    
+                    intDataset.read(intVals, PredType::NATIVE_INT64, intFieldsMemspace, intDataspace);
+                }
+                
+                if(this->numFloatFields > 0)
+                {
+                    floatFieldsOffset[0] = currentStartFID;
+                    floatDataspace.selectHyperslab( H5S_SELECT_SET, floatFieldsCount, floatFieldsOffset );
+                    
+                    floatDataset.read(floatVals, PredType::NATIVE_DOUBLE, floatFieldsMemspace, floatDataspace);
+                }
+                
+                for(size_t i = currentStartFID, n = 0; i < currentEndFID; ++i, ++n)
+                {
+                    this->featCache[i] = new RSGISFeature();
+                    this->featCache[i]->fid = i;
+                    this->featCache[i]->boolFields = new vector<bool>();
+                    if(this->numBoolFields > 0)
+                    {
+                        this->featCache[i]->boolFields->reserve(this->numBoolFields);
+                        for(size_t j = 0; j < this->numBoolFields; ++j)
+                        {
+                            this->featCache[i]->boolFields->push_back(boolVals[(n*this->numBoolFields)+j]);
+                        }
+                    }
+                    this->featCache[i]->intFields = new vector<long>();
+                    if(this->numIntFields > 0)
+                    {
+                        this->featCache[i]->intFields->reserve(this->numIntFields);
+                        for(size_t j = 0; j < this->numIntFields; ++j)
+                        {
+                            this->featCache[i]->intFields->push_back(intVals[(n*this->numIntFields)+j]);
+                        }
+                    }
+                    this->featCache[i]->floatFields = new vector<double>();
+                    if(this->numFloatFields > 0)
+                    {
+                        this->featCache[i]->floatFields->reserve(this->numFloatFields);
+                        for(size_t j = 0; j < this->numFloatFields; ++j)
+                        {
+                            this->featCache[i]->floatFields->push_back(floatVals[(n*this->numFloatFields)+j]);
+                        }
+                    }
+                    this->featCache[i]->stringFields = new vector<string>();
+                    this->featCache[i]->neighbours = new vector<size_t>();
+                    if(neighbourVals[n].length > 0)
+                    {
+                        this->featCache[i]->neighbours->reserve(neighbourVals[n].length);
+                        //cout << "neighbourVals[" << n << "].length " << neighbourVals[n].length << endl;
+                        for(size_t j = 0; j < neighbourVals[n].length; ++j)
+                        {
+                            this->featCache[i]->neighbours->push_back(((unsigned long long*)neighbourVals[n].p)[j]);
+                        }
+                        delete[] ((size_t*)neighbourVals[n].p);
+                    }
+                }
+                
+                this->cacheQ->push_front(startBlock+block1);
+            }
+            
+            if(remainingFeats > 0)
+            {
+                
+            }
+            
+            delete[] neighbourVals;
+            if(this->numBoolFields > 0)
+            {
+                delete[] boolVals;
+            }
+            if(this->numIntFields > 0)
+            {
+                delete[] intVals;
+            }
+            if(this->numFloatFields > 0)
+            {
+                delete[] floatVals;
+            }
+            
+            neighboursDataspace.close();
+            neighboursMemspace.close();
+            boolDataspace.close();
+            boolFieldsMemspace.close();
+            intDataspace.close();
+            intFieldsMemspace.close();
+            floatDataspace.close();
+            floatFieldsMemspace.close();
+            
+            //this->cacheQ->push_front(block);
+            //cout << "Cache has " << this->cacheQ->size() << " blocks loaded\n";
+            ++numOfReads;
+            */
+
+            
+            
             for(size_t i = startBlock; i < endBlock; ++i)
             {
                 if(i < numOfBlocks)
@@ -1340,10 +1591,21 @@ namespace rsgis{namespace rastergis{
                     this->loadBlock(i);
                 }
             }
+            
+            
         }
         catch(RSGISAttributeTableException &e)
         {
             throw e;
+        }
+        catch( Exception &e )
+        {
+            cout << e.getCDetailMsg() << endl;
+            cout << e.getCFuncName() << endl;
+            cout << e.getDetailMsg() << endl;
+            cout << e.getFuncName() << endl;
+            e.printError();
+            throw RSGISAttributeTableException(e.getDetailMsg());
         }
     }
     

@@ -38,11 +38,11 @@
 #include "utils/RSGISTextUtils.h"
 #include "utils/RSGISTextException.h"
 
-using namespace std;
-using namespace rsgis::img;
-using namespace rsgis::utils;
-
 namespace rsgis{namespace segment{
+    
+    using namespace std;
+    using namespace rsgis::img;
+    using namespace rsgis::utils;
     
     struct ImgClumpRGB
     {
