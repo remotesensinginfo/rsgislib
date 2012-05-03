@@ -26,7 +26,7 @@ set (PROJECT_TOOLS_DIR tools)
 set (PROJECT_XML_DIR xml_standards)
 
 # The version number.
-set (RSGISLIB_SVN_COMMIT 535)
+set (RSGISLIB_SVN_COMMIT 536)
 set (RSGISLIB_VERSION_MAJOR 2)
 set (RSGISLIB_VERSION_MINOR 0)
 set (RSGISLIB_VERSION_PATCH 0)
@@ -241,7 +241,7 @@ else()
   # Recommended C++ compilation flags
   # -Weffc++
   set(RSGISLIB_COMMON_CXX_FLAGS
-	"-ansi -Wall -frounding-math -Wpointer-arith -Wcast-align -Wcast-qual -Wredundant-decls -Wno-long-long")
+	"-Wall -Wpointer-arith -Wcast-align -Wcast-qual -Wredundant-decls -Wno-long-long")
 	#"-pedantic -ansi -Wall -Wpointer-arith -Wcast-align -Wcast-qual -Wfloat-equal -Wredundant-decls -Wno-long-long")
 
   if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
