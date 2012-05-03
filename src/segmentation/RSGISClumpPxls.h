@@ -34,10 +34,10 @@
 #include "img/RSGISImageUtils.h"
 #include "img/RSGISImageCalcException.h"
 
-using namespace std;
-using namespace rsgis::img;
-
 namespace rsgis{namespace segment{
+    
+    using namespace std;
+    using namespace rsgis::img;
     
     class RSGISClumpPxls
     {

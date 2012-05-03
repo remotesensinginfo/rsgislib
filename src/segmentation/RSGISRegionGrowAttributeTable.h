@@ -39,12 +39,12 @@
 #include "ogrsf_frmts.h"
 #include "ogr_api.h"
 
-using namespace std;
-using namespace rsgis;
-using namespace rsgis::math;
-using namespace rsgis::rastergis;
-
 namespace rsgis{namespace segment{
+    
+    using namespace std;
+    using namespace rsgis;
+    using namespace rsgis::math;
+    using namespace rsgis::rastergis;
     
     class RSGISRegionGrowAttributeTable
     {

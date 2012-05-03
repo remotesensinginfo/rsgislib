@@ -354,7 +354,7 @@ namespace rsgis{namespace vec{
 
 	int RSGISRasterizeVector::editPixels(GDALDataset *image, float pixelValue, Envelope *env, OGRGeometry *geom) throw(RSGISImageException)
 	{
-		int pixelsEdited; // Count for number of pixels edited
+		long pixelsEdited = 0; // Count for number of pixels edited
 		
 		try
 		{

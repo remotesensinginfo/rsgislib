@@ -62,6 +62,7 @@ void RSGISExeSegment::retrieveParameters(DOMElement *argElement) throw(RSGISXMLA
     XMLCh *optionGrowRegionsPixelsAuto = XMLString::transcode("growregionspixelsauto");
     XMLCh *optionSpectralDiv = XMLString::transcode("spectraldiv");
     XMLCh *optionStepwiseElimination = XMLString::transcode("stepwiseelimination");
+    XMLCh *optionElimSinglePxls = XMLString::transcode("elimsinglepxls");
     
     XMLCh *projImage = XMLString::transcode("IMAGE");
 	XMLCh *projOSGB = XMLString::transcode("OSGB");
@@ -2854,6 +2855,137 @@ void RSGISExeSegment::retrieveParameters(DOMElement *argElement) throw(RSGISXMLA
 		}
 		XMLString::release(&projXMLStr);
     }
+    else if(XMLString::equals(optionElimSinglePxls, optionXML))
+    {
+        this->option = RSGISExeSegment::elimsinglepxls;
+		
+		XMLCh *imageXMLStr = XMLString::transcode("image");
+		if(argElement->hasAttribute(imageXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(imageXMLStr));
+			this->inputImage = string(charValue);
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+		}
+		XMLString::release(&imageXMLStr);
+		
+        XMLCh *clumpsXMLStr = XMLString::transcode("clumps");
+		if(argElement->hasAttribute(clumpsXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(clumpsXMLStr));
+			this->clumpsImage = string(charValue);
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'clumps\' attribute was provided.");
+		}
+		XMLString::release(&clumpsXMLStr);
+        
+		XMLCh *outputXMLStr = XMLString::transcode("output");
+		if(argElement->hasAttribute(outputXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
+			this->outputImage = string(charValue);
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+		}
+		XMLString::release(&outputXMLStr);
+        
+        XMLCh *tmpTableXMLStr = XMLString::transcode("temp");
+		if(argElement->hasAttribute(tmpTableXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(tmpTableXMLStr));
+			this->tempImage = string(charValue);
+			XMLString::release(&charValue);
+            this->processInMemory = false;
+		}
+		else
+		{
+			this->processInMemory = true;
+		}
+		XMLString::release(&tmpTableXMLStr);
+        
+        XMLCh *ignoreZerosXMLStr = XMLString::transcode("ignorezeros");
+		if(argElement->hasAttribute(ignoreZerosXMLStr))
+		{
+            XMLCh *noStr = XMLString::transcode("no");
+			const XMLCh *strValue = argElement->getAttribute(ignoreZerosXMLStr);
+			
+			if(XMLString::equals(strValue, noStr))
+			{
+				this->ignoreZeros = false;
+			}
+			else
+			{
+				this->ignoreZeros = true;
+			}
+			XMLString::release(&noStr);
+		}
+		else
+		{
+			this->ignoreZeros = true;
+            cerr << "Ignoring zeros options not specified by default zero will be ignored.\n";
+		}
+		XMLString::release(&ignoreZerosXMLStr);
+
+        
+        XMLCh *formatXMLStr = XMLString::transcode("format");
+		if(argElement->hasAttribute(formatXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(formatXMLStr));
+			this->imageFormat = string(charValue);
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			this->imageFormat = "ENVI";
+		}
+		XMLString::release(&formatXMLStr);        
+        
+        XMLCh *projXMLStr = XMLString::transcode("proj");
+		if(argElement->hasAttribute(projXMLStr))
+		{
+			const XMLCh *projXMLValue = argElement->getAttribute(projXMLStr);
+			if(XMLString::equals(projXMLValue, projImage))
+			{
+				this->projFromImage = true;
+				this->proj = "";
+			}
+			else if(XMLString::equals(projXMLValue, projOSGB))
+			{
+				this->projFromImage = false;
+				this->proj = OSGB_Proj;
+			}
+            else if(XMLString::equals(projXMLValue, projNZ2000))
+			{
+				this->projFromImage = false;
+				this->proj = NZ2000_Proj;
+			}
+            else if(XMLString::equals(projXMLValue, projNZ1949))
+			{
+				this->projFromImage = false;
+				this->proj = NZ1949_Proj;
+			}
+			else
+			{
+				cerr << "Proj not reconized therefore defaulting to image.";
+				this->projFromImage = true;
+				this->proj = "";
+			}
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'proj\' attribute was provided.");
+		}
+		XMLString::release(&projXMLStr);
+    }
     else
     {
         string message = string("The option (") + string(XMLString::transcode(optionXML)) + string(") is not known: RSGISExeSegment.");
@@ -2882,6 +3014,7 @@ void RSGISExeSegment::retrieveParameters(DOMElement *argElement) throw(RSGISXMLA
     XMLString::release(&optionGrowRegionsPixelsAuto);
     XMLString::release(&optionSpectralDiv);
     XMLString::release(&optionStepwiseElimination);
+    XMLString::release(&optionElimSinglePxls);
     
     XMLString::release(&projImage);
 	XMLString::release(&projOSGB);
@@ -4264,6 +4397,68 @@ void RSGISExeSegment::runAlgorithm() throw(RSGISException)
             throw e;
         }
     }
+    else if(option == RSGISExeSegment::elimsinglepxls)
+    {
+        cout << "A command which iteratively removes single pixel labelled neighbours into spectrally closest large group.\n";
+        cout << "Input Image: " << this->inputImage << endl;
+        cout << "Clump Image: " << this->clumpsImage << endl;
+        cout << "Output Image: " << this->outputImage << endl;
+        if(!this->processInMemory)
+        {
+            cout << "Temp Image: " << this->tempImage << endl;
+        }
+        if(this->ignoreZeros)
+        {
+            cout << "Ignoring pixels with a value of zero in clumps file\n";
+        }
+        
+        try
+        {
+            RSGISImageUtils imgUtils;
+            
+            GDALAllRegister();
+            GDALDataset *spectralDataset = NULL;
+            spectralDataset = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_ReadOnly);
+            if(spectralDataset == NULL)
+            {
+                string message = string("Could not open image ") + this->inputImage;
+                throw RSGISImageException(message.c_str());
+            }
+            
+            GDALDataset *clumpsDataset = NULL;
+            clumpsDataset = (GDALDataset *) GDALOpen(this->clumpsImage.c_str(), GA_ReadOnly);
+            if(clumpsDataset == NULL)
+            {
+                string message = string("Could not open image ") + this->clumpsImage;
+                throw RSGISImageException(message.c_str());
+            }
+            
+            GDALDataset *pixelMaskDataset = NULL;
+            if(this->processInMemory)
+            {
+                pixelMaskDataset = imgUtils.createCopy(clumpsDataset, 1, "", "MEM", GDT_Byte , this->projFromImage, this->proj);
+            }
+            else 
+            {
+                pixelMaskDataset = imgUtils.createCopy(clumpsDataset, 1, this->tempImage, this->imageFormat, GDT_Byte, this->projFromImage, this->proj);
+            }
+
+            
+            cout << "Eliminating Individual Pixels\n";
+            RSGISEliminateSinglePixels eliminate;
+            eliminate.eliminate(spectralDataset, clumpsDataset, pixelMaskDataset, this->outputImage, 0, this->ignoreZeros, this->projFromImage, this->proj, this->imageFormat);
+            
+            // Tidy up
+            GDALClose(spectralDataset);
+            GDALClose(clumpsDataset);
+            GDALClose(pixelMaskDataset);
+            GDALDestroyDriverManager();
+        } 
+        catch (RSGISException &e) 
+        {
+            throw e;
+        }
+    }
     else
     {
         cout << "RSGISExeSegment: Options not recognised\n";
@@ -4549,6 +4744,21 @@ void RSGISExeSegment::printParameters()
         if(this->outputWithConsecutiveFIDs)
         {
             cout << "Outputting with consecutive FIDs\n";
+        }
+    }
+    else if(option == RSGISExeSegment::elimsinglepxls)
+    {
+        cout << "A command which iteratively removes single pixel labelled neighbours into spectrally closest large group.\n";
+        cout << "Input Image: " << this->inputImage << endl;
+        cout << "Clump Image: " << this->clumpsImage << endl;
+        cout << "Output Image: " << this->outputImage << endl;
+        if(!this->processInMemory)
+        {
+            cout << "Temp Image: " << this->tempImage << endl;
+        }
+        if(this->ignoreZeros)
+        {
+            cout << "Ignoring pixels with a value of zero in clumps file\n";
         }
     }
     else

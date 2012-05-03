@@ -41,11 +41,11 @@
 
 #include "math/RSGISMathsUtils.h"
 
-using namespace rsgis::utils;
-using namespace rsgis::math;
-using namespace rsgis::img;
-
 namespace rsgis{namespace segment{
+    
+    using namespace rsgis::utils;
+    using namespace rsgis::math;
+    using namespace rsgis::img;
     
     struct ImgSeeds
     {

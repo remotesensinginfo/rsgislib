@@ -65,7 +65,7 @@ namespace rsgis{namespace segment{
         {
             if((i % feedback) == 0)
             {
-                cout << ".." << feedbackCounter << ".." << flush;
+                cout << "." << feedbackCounter << "." << flush;
                 feedbackCounter = feedbackCounter + 10;
             }
             
