@@ -857,6 +857,7 @@ namespace rsgis{namespace segment{
                         }
                     }
                 }
+                mFeat->neighbours->clear();
                 
                 mFeat->intFields->at(mergedToFIDIdx) = (*iterPairs).first;
                 mFeat->boolFields->at(eliminatedFieldIdx) = true;
