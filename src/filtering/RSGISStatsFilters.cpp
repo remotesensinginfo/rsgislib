@@ -82,7 +82,8 @@ namespace rsgis{namespace filter{
 		double outputValue = 0;
 		int numberElements = winSize * winSize;
 		int median = floor(((float)numberElements)/2.0);
-		SortedGenericList<float> *sortedList = new SortedGenericList<float>();
+		vector<float> sortedList;
+        sortedList.reserve(numberElements);
 		
 		for(int i = 0; i < numBands; i++)
 		{
@@ -91,16 +92,15 @@ namespace rsgis{namespace filter{
 			{
 				for(int k = 0; k < size; k++)
 				{
-					sortedList->add(&dataBlock[i][j][k]);
+					sortedList.push_back(dataBlock[i][j][k]);
 				}
 			}
 			//sortedList->printAsc();
 			//cout << "Median = " << *sortedList->getAt(median) << endl;
-			output[i] = *sortedList->getAt(median);
-			sortedList->clearList();
-		}
-		
-		delete sortedList;
+            sort(sortedList.begin(), sortedList.end());
+			output[i] = sortedList[median];
+			sortedList.clear();
+		}		
 	}
 	
 	bool RSGISMedianFilter::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException)

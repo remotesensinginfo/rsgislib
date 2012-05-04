@@ -24,6 +24,8 @@
 #define RSGISStatsFilters_H
 
 #include <iostream>
+#include <vector>
+#include <algorithm>
 
 #include "common/RSGISImageException.h"
 
