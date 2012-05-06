@@ -121,7 +121,8 @@ class RSGISExeImageUtils : public RSGISAlgorithmParameters
             imageComposite,
             relabel,
             assignproj,
-            popimgstats
+            popimgstats,
+            createcopy
 		};
 		
 		enum interpolators
@@ -180,6 +181,7 @@ class RSGISExeImageUtils : public RSGISAlgorithmParameters
 		unsigned int skipBand;
 		float maskValue;
 		float resampleScale;
+        float dataValue;
 		int numClasses;
 		int numImages;
 		bool projFromImage;
