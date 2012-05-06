@@ -2757,6 +2757,54 @@ namespace rsgis{namespace img{
         }
     }
     
+    void RSGISImageUtils::assignValGDALDataset(GDALDataset *data, float value) throw(RSGISImageException)
+    {
+        try
+        {
+            unsigned long width = data->GetRasterXSize();
+            unsigned long height = data->GetRasterYSize();
+            unsigned int numBands = data->GetRasterCount();
+            
+            GDALRasterBand **rasterBands = new GDALRasterBand*[numBands];
+            float *dataVals = new float[width];
+            
+            for(unsigned int i = 0; i < width; ++i)
+            {
+                dataVals[i] = value;
+            }
+            
+            for(unsigned int n = 0; n < numBands; ++n)
+            {
+                rasterBands[n] = data->GetRasterBand(n+1);
+            }
+            
+            int feedback = height/10;
+			int feedbackCounter = 0;
+			cout << "Started" << flush;
+            for(unsigned long y = 0; y < height; ++y)
+            {
+                if((y % feedback) == 0)
+				{
+					cout << "." << feedbackCounter << "." << flush;
+					feedbackCounter = feedbackCounter + 10;
+				}
+                
+                for(unsigned int n = 0; n < numBands; ++n)
+                {
+                    rasterBands[n]->RasterIO(GF_Write, 0, y, width, 1, dataVals, width, 1, GDT_Float32, 0, 0);
+                }
+            }
+            cout << " Complete.\n";
+            
+            delete[] rasterBands;
+            delete[] dataVals;
+        }
+        catch(RSGISImageException &e)
+        {
+            throw e;
+        }
+    }
+    
     GDALDataset* RSGISImageUtils::createCopy(GDALDataset *inData, string outputFilePath, string outputFormat, GDALDataType eType, bool useImgProj, string proj)throw(RSGISImageException)
     {
         unsigned long width = inData->GetRasterXSize();

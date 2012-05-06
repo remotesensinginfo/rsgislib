@@ -96,6 +96,7 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
     XMLCh *optionRelabel = XMLString::transcode("relabel");
     XMLCh *optionAssignProj = XMLString::transcode("assignproj");
     XMLCh *optionPopImgStats = XMLString::transcode("popimgstats");
+    XMLCh *optionCreateCopy = XMLString::transcode("createcopy");
     
 	const XMLCh *algorNameEle = argElement->getAttribute(algorXMLStr);
 	if(!XMLString::equals(algorName, algorNameEle))
@@ -2361,6 +2362,76 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 		XMLString::release(&pyramidsXMLStr);
         
     }
+    else if (XMLString::equals(optionCreateCopy, optionXML))
+	{		
+		this->option = RSGISExeImageUtils::createcopy;
+		
+		XMLCh *imageXMLStr = XMLString::transcode("image");
+		if(argElement->hasAttribute(imageXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(imageXMLStr));
+			this->inputImage = string(charValue);
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+		}
+		XMLString::release(&imageXMLStr);
+		
+		
+		XMLCh *outputXMLStr = XMLString::transcode("output");
+		if(argElement->hasAttribute(outputXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
+			this->outputImage = string(charValue);
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+		}
+		XMLString::release(&outputXMLStr);
+        
+        
+        XMLCh *pixelValXMLStr = XMLString::transcode("pixelval");
+		if(argElement->hasAttribute(pixelValXMLStr))
+		{
+            XMLCh *NaNStr = XMLString::transcode("NaN");
+			const XMLCh *dataValue = argElement->getAttribute(pixelValXMLStr);
+			if(XMLString::equals(dataValue, NaNStr))
+			{
+                const char *val = "NaN";
+				this->dataValue = nan(val);
+			}
+			else
+			{
+				char *charValue = XMLString::transcode(argElement->getAttribute(pixelValXMLStr));
+                this->dataValue = mathUtils.strtofloat(string(charValue));
+                XMLString::release(&charValue);
+			}
+			XMLString::release(&NaNStr);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'pixelval\' attribute was provided.");
+		}
+		XMLString::release(&pixelValXMLStr);
+        
+        XMLCh *numBandsXMLStr = XMLString::transcode("numbands");
+		if(argElement->hasAttribute(numBandsXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(numBandsXMLStr));
+			this->numBands = mathUtils.strtoint(string(charValue));
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'numbands\' attribute was provided.");
+		}
+		XMLString::release(&numBandsXMLStr);
+        
+	}
 	else
 	{
 		string message = string("The option (") + string(XMLString::transcode(optionXML)) + string(") is not known: RSGISExeImageUtils.");
@@ -2403,7 +2474,8 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
     XMLString::release(&optionRelabel);
     XMLString::release(&optionAssignProj);
     XMLString::release(&optionPopImgStats);
-	
+	XMLString::release(&optionCreateCopy);
+    
 	parsed = true;
 }
 
@@ -3906,6 +3978,39 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
                 throw e;
             }
         }
+        else if(option == RSGISExeImageUtils::createcopy)
+        {
+            cout << "Create a new image from an existing image\n";
+            cout << "Image: " << this->inputImage << endl;
+            cout << "Output: " << this->outputImage << endl;
+            cout << "Data Value: " << this->dataValue << endl;
+            cout << "Num Image Bands: " << this->numBands << endl;
+            cout << "Image format: " << this->imageFormat << endl;
+            
+            try 
+            {
+                GDALAllRegister();
+                GDALDataset *inDataset = NULL;
+                inDataset = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_Update);
+                if(inDataset == NULL)
+                {
+                    string message = string("Could not open image ") + this->inputImage;
+                    throw RSGISImageException(message.c_str());
+                }
+                
+                RSGISImageUtils imgUtils;
+                GDALDataset *outDataset = imgUtils.createCopy(inDataset, this->outputImage, this->imageFormat, outDataType);
+                imgUtils.assignValGDALDataset(outDataset, this->dataValue);
+                
+                GDALClose(inDataset);
+                GDALClose(outDataset);
+                GDALDestroyDriverManager();
+            } 
+            catch (RSGISException &e) 
+            {
+                throw e;
+            }
+        }
 		else
 		{
 			cout << "Options not recognised\n";
@@ -4162,6 +4267,34 @@ void RSGISExeImageUtils::printParameters()
             cout << "Input Image: " << this->inputImage << endl;
             cout << "Output Image: " << this->outputImage << endl;
             cout << "Look Up Table: " << this->lutMatrixFile << endl;
+        }
+        else if(option == RSGISExeImageUtils::assignproj)
+        {
+            cout << "Assign and update and image to a specific projection\n";
+            cout << "Image: " << this->inputImage << endl;
+            cout << "Projection File: " << this->projFile << endl;
+        }
+        else if(option == RSGISExeImageUtils::popimgstats)
+        {
+            cout << "Populate an image with image statistics and image pyramids\n";
+            cout << "Image: " << this->inputImage << endl;
+            if(this->useIgnoreVal)
+            {
+                cout << "Ignore Val: " << this->nodataValue << endl;
+            }
+            if(this->calcImgPyramids)
+            {
+                cout << "Calculating image pyramids\n";
+            }
+        }
+        else if(option == RSGISExeImageUtils::createcopy)
+        {
+            cout << "Create a new image from an existing image\n";
+            cout << "Image: " << this->inputImage << endl;
+            cout << "Output: " << this->outputImage << endl;
+            cout << "Data Value: " << this->dataValue << endl;
+            cout << "Num Image Bands: " << this->numBands << endl;
+            cout << "Image format: " << this->imageFormat << endl;
         }
 		else
 		{
