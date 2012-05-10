@@ -400,7 +400,7 @@
     <!-- A command to include a set of input images from a directory into an existing image -->
     <rsgis:command algor="imageutils" option="include" image="base_image.env" dir="directory" ext="file_extension" />
     <!-- A command to cut an image to an input shapefile where each polygon geometry will created a new output image representing the region within the polygon -->
-    <rsgis:command algor="imageutils" option="cut2poly" image="image.env" output="image_out_base" vector="vector.shp" outfilename="attribute" nodata="float" />
+    <rsgis:command algor="imageutils" option="cut2polys" image="image.env" output="image_out_base" vector="vector.shp" outfilename="attribute" nodata="float" />
     <!-- A command to mask the input image with a second 'mask' image -->
     <rsgis:command algor="imageutils" option="mask" image="image.env" mask="mask.env" output="image_out.env" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" maskvalue="float" />
     <!-- A command resample an input image to another resolution -->

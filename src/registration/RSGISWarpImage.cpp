@@ -178,8 +178,8 @@ namespace rsgis{namespace reg{
 			double *gdalTransformation= new double[6];
 			inputImageDS->GetGeoTransform(gdalTransformation);
 			
-			double inTLX = gdalTransformation[0];
-			double inTLY = gdalTransformation[3];
+			//double inTLX = gdalTransformation[0];
+			//double inTLY = gdalTransformation[3];
 			//double inBRX = inTLX + (inputImageDS->GetRasterXSize() * gdalTransformation[1]);
 			//double inBRY = inTLY + (inputImageDS->GetRasterYSize() * gdalTransformation[5]);
 			float inImgRes = gdalTransformation[1];

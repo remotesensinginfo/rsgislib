@@ -67,6 +67,7 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 	XMLCh *optionMosaic = XMLString::transcode("mosaic");
 	XMLCh *optionInclude = XMLString::transcode("include");
 	XMLCh *optionCut2Poly = XMLString::transcode("cut2poly");
+    XMLCh *optionCut2Polys = XMLString::transcode("cut2polys");
 	XMLCh *optionMask = XMLString::transcode("mask");
 	XMLCh *optionResample = XMLString::transcode("resample");
 	XMLCh *optionRasteriseDef = XMLString::transcode("rasterisedefiniens");
@@ -733,9 +734,11 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 		XMLString::release(&dirXMLStr);
 		XMLString::release(&extXMLStr);	
 	}
-	else if (XMLString::equals(optionCut2Poly, optionXML))
+	else if ((XMLString::equals(optionCut2Poly, optionXML)) | (XMLString::equals(optionCut2Polys, optionXML))) 
 	{		
-		this->option = RSGISExeImageUtils::cut2poly;
+		/* Changed to cut2polys for concistency with subset to polys. 
+           Also works with cut2poly to enable compatibility with old scripts - Dan */
+        this->option = RSGISExeImageUtils::cut2poly;
 		
 		XMLCh *imageXMLStr = XMLString::transcode("image");
 		if(argElement->hasAttribute(imageXMLStr))
@@ -2445,6 +2448,7 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 	XMLString::release(&optionMosaic);
 	XMLString::release(&optionInclude);
 	XMLString::release(&optionCut2Poly);
+    XMLString::release(&optionCut2Polys);
 	XMLString::release(&optionMask);
 	XMLString::release(&optionResample);
 	XMLString::release(&optionRasteriseDef);
@@ -2721,11 +2725,33 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
 				copyImage = new RSGISCopyImage(numImageBands);
 				calcImage = new RSGISCalcImage(copyImage, "", true);
 				
+                unsigned int failCount = 0;
+                
 				for(int i = 0; i < numFeatures; i++)
 				{
-					outputFilePath = this->outputImage + data[i]->getFileName();
+					outputFilePath = this->outputImage + data[i]->getFileName() + ".env";
 					cout << i << ": " << outputFilePath << endl;
-					calcImage->calcImageWithinPolygon(dataset, 1, outputFilePath, data[i]->getBBox(), data[i]->getPolygon(), this->nodataValue, polyContainsPixelCenter);
+                    try
+                    {
+                        calcImage->calcImageWithinPolygon(dataset, 1, outputFilePath, data[i]->getBBox(), data[i]->getPolygon(), this->nodataValue, polyContainsPixelCenter);
+                    }
+                    catch (RSGISImageBandException e)
+                    {
+                        ++failCount;
+                        if(failCount <= 100)
+                        {
+                            cerr << "RSGISException caught: " << e.what() << endl;
+                            cerr << "Check output path exists and is writable and all polygons in shapefile:" << endl;
+                            cerr << " " << this->inputVector << endl;
+                            cerr << "Are completely within:" << endl;
+                            cerr << " " << this->inputImage << endl;
+                        }
+                        else
+                        {
+                            cerr << "Over 100 exceptions have been caught, exiting" << endl;
+                            throw e;
+                        }
+                    }
 				}
 				
 				GDALClose(dataset[0]);
@@ -2738,7 +2764,7 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
 			}
 			catch(RSGISException e)
 			{
-				cout << "RSGISException caught: " << e.what() << endl;
+				cerr << "RSGISException caught: " << e.what() << endl;
 			}
 		}
 		else if(option == RSGISExeImageUtils::mask)
@@ -3683,12 +3709,33 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
 				
 				copyImage = new RSGISCopyImage(numImageBands);
 				calcImage = new RSGISCalcImage(copyImage, "", true);
-				
+                
+				unsigned int failCount = 0;
 				for(int i = 0; i < numFeatures; i++)
 				{
-					outputFilePath = this->outputImage + data[i]->getFileName();
+					outputFilePath = this->outputImage + data[i]->getFileName() + ".env";
 					cout << i << ": " << outputFilePath << endl;
-					calcImage->calcImageInEnv(dataset, 1, outputFilePath, data[i]->getBBox());
+                    try
+                    {
+                        calcImage->calcImageInEnv(dataset, 1, outputFilePath, data[i]->getBBox());
+                    }
+                    catch (RSGISImageBandException e)
+                    {
+                        ++failCount;
+                        if(failCount <= 100)
+                        {
+                            cerr << "RSGISException caught: " << e.what() << endl;
+                            cerr << "Check output path exists and is writable and all polygons in shapefile:" << endl;
+                            cerr << " " << this->inputVector << endl;
+                            cerr << "Are completely within:" << endl;
+                            cerr << " " << this->inputImage << endl;
+                        }
+                        else
+                        {
+                            cerr << "Over 100 exceptions have been caught, exiting" << endl;
+                            throw e;
+                        }
+                    }
 				}
 				
 				GDALClose(dataset[0]);
@@ -3701,7 +3748,7 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
 			}
 			catch(RSGISException e)
 			{
-				cout << "RSGISException caught: " << e.what() << endl;
+				cerr << "RSGISException caught: " << e.what() << endl;
 			}
 		}
 		else if(option == RSGISExeImageUtils::pansharpen)
