@@ -47,6 +47,15 @@ namespace rsgis{namespace reg{
 		{
 			outValues[i] = dataVals[i][0];
 		}
+        
+        // Tidy up
+        for(unsigned int i = 0; i < numOutVals; ++i)
+		{
+			delete[] dataVals[i];
+		}
+        
+        delete[] dataVals;
+        delete[] dsOffsets;
 	}
 
 }}

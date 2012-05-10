@@ -68,7 +68,7 @@ namespace rsgis{namespace reg{
 		virtual void initWarp() throw(RSGISImageWarpException) = 0;
 		virtual ~RSGISWarpImage();
 	protected:
-		virtual Envelope* newImageExtent() throw(RSGISImageWarpException) = 0;
+		virtual Envelope* newImageExtent(unsigned int width, unsigned int height) throw(RSGISImageWarpException) = 0;
 		virtual void findNearestPixel(double eastings, double northings, unsigned int *x, unsigned int *y, float inImgRes) throw(RSGISImageWarpException) = 0;
 		string inputImage;
 		string outputImage;

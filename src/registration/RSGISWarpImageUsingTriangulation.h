@@ -72,7 +72,7 @@ namespace rsgis{namespace reg{
 		void initWarp()throw(RSGISImageWarpException);
 		~RSGISWarpImageUsingTriangulation();
 	protected:
-		Envelope* newImageExtent() throw(RSGISImageWarpException);
+		Envelope* newImageExtent(unsigned int width, unsigned int height) throw(RSGISImageWarpException);
 		void findNearestPixel(double eastings, double northings, unsigned int *x, unsigned int *y, float inImgRes) throw(RSGISImageWarpException);
 		list<RSGISGCPImg2MapNode*>* normGCPs(list<const RSGISGCPImg2MapNode*> *gcps, double eastings, double northings);
 		void fitPlane2XPoints(list<RSGISGCPImg2MapNode*> *normPts, double *a, double *b, double *c) throw(RSGISImageWarpException);
