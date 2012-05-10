@@ -1589,6 +1589,9 @@ namespace rsgis{namespace img{
 			{
 				throw RSGISImageException("Image could not be created.");
 			}
+            
+            cout << "Projection = " << projection << endl;
+            
 			outputImage->SetGeoTransform(transformation);
 			outputImage->SetProjection(projection.c_str());
 			

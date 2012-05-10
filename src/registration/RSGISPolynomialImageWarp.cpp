@@ -35,7 +35,12 @@ namespace rsgis{namespace reg{
 	
 	void RSGISPolynomialImageWarp::initWarp()throw(RSGISImageWarpException)
 	{
-		// Create polynominal model based on ground countrol points.
+		/** Initialises warp by create polynominal models based on ground countrol points.
+            Models are created expressing image pixels as a function of easting and northing, used for warping
+            and expressing easting and northing as a function of image pixels to determine the corner location of the
+            image to be warped.
+         */
+         
         
         cout << "Fitting polynomial..." << endl;
         
@@ -43,10 +48,15 @@ namespace rsgis{namespace reg{
         
 		// Set up matrices
 		gsl_matrix *eastNorthPow = gsl_matrix_alloc(gcps->size(), coeffSize); // Matrix to hold powers of easting and northing (used for both fits)
+        gsl_matrix *xyPow = gsl_matrix_alloc(gcps->size(), coeffSize); // Matrix to hold powers of x and y (used for both fits)
 		gsl_vector *pixValX = gsl_vector_alloc(gcps->size()); // Vector to hold pixel values (X)
         gsl_vector *pixValY = gsl_vector_alloc(gcps->size()); // Vector to hold pixel values (Y)
+		gsl_vector *eastingVal = gsl_vector_alloc(gcps->size()); // Vector to hold easting values
+        gsl_vector *northingVal = gsl_vector_alloc(gcps->size()); // Vector to hold northing values
 		this->aX = gsl_vector_alloc(coeffSize); // Vector to hold coeffifients of X (Easting)
         this->aY = gsl_vector_alloc(coeffSize); // Vector to hold coeffifients of Y (Northing)
+		this->aE = gsl_vector_alloc(coeffSize); // Vector to hold coeffifients of Easting (X)
+        this->aN = gsl_vector_alloc(coeffSize); // Vector to hold coeffifients of Northing (Y)
         
         unsigned int pointN = 0;
         unsigned int offset = 0;
@@ -57,8 +67,11 @@ namespace rsgis{namespace reg{
             // Add pixel values into vectors
             gsl_vector_set(pixValX, pointN, (*iterGCPs)->imgX()); // Pixel X
             gsl_vector_set(pixValY, pointN, (*iterGCPs)->imgY()); // Pixel Y
+            gsl_vector_set(eastingVal, pointN, (*iterGCPs)->eastings()); // Easting
+            gsl_vector_set(northingVal, pointN, (*iterGCPs)->northings()); // Northing
 
             gsl_matrix_set(eastNorthPow, pointN, 0, 1.);
+             gsl_matrix_set(xyPow, pointN, 0, 1.);
             
 			for(int j = 1; j < polyOrder; ++j)
 			{
@@ -66,11 +79,18 @@ namespace rsgis{namespace reg{
                 gsl_matrix_set(eastNorthPow, pointN, offset, pow((*iterGCPs)->eastings(), j));
                 gsl_matrix_set(eastNorthPow, pointN, offset+1, pow((*iterGCPs)->northings(), j));
                 gsl_matrix_set(eastNorthPow, pointN, offset+2, pow((*iterGCPs)->eastings()*(*iterGCPs)->northings(), j));
+                
+                gsl_matrix_set(xyPow, pointN, offset, pow((*iterGCPs)->imgX(), j));
+                gsl_matrix_set(xyPow, pointN, offset+1, pow((*iterGCPs)->imgY(), j));
+                gsl_matrix_set(xyPow, pointN, offset+2, pow((*iterGCPs)->imgX()*(*iterGCPs)->imgY(), j));
 			}
             
             offset = 1 + (3 * (this->polyOrder - 1));
             gsl_matrix_set(eastNorthPow, pointN, offset, pow((*iterGCPs)->eastings(), this->polyOrder));
             gsl_matrix_set(eastNorthPow, pointN, offset+1, pow((*iterGCPs)->northings(), this->polyOrder));
+            
+            gsl_matrix_set(xyPow, pointN, offset, pow((*iterGCPs)->imgX(), this->polyOrder));
+            gsl_matrix_set(xyPow, pointN, offset+1, pow((*iterGCPs)->imgY(), this->polyOrder));
             
             ++pointN;
 		}
@@ -85,7 +105,11 @@ namespace rsgis{namespace reg{
         // Fit for X
 		gsl_multifit_linear(eastNorthPow, pixValX, this->aX, cov, &chisq, workspace);
         // Fit for Y
-		gsl_multifit_linear(eastNorthPow, pixValY, this->aY, cov, &chisq, workspace);        
+		gsl_multifit_linear(eastNorthPow, pixValY, this->aY, cov, &chisq, workspace);       
+        // Fit for E
+		gsl_multifit_linear(xyPow, eastingVal, this->aE, cov, &chisq, workspace);
+        // Fit for N
+		gsl_multifit_linear(xyPow, northingVal, this->aN, cov, &chisq, workspace);       
         
         cout << "Fitted polynomial." << endl;
         
@@ -135,60 +159,67 @@ namespace rsgis{namespace reg{
         // Tidy up
 		gsl_multifit_linear_free(workspace);
 		gsl_matrix_free(eastNorthPow);
+        gsl_matrix_free(xyPow);
 		gsl_vector_free(pixValX);
         gsl_vector_free(pixValY);
+        gsl_vector_free(eastingVal);
+        gsl_vector_free(northingVal);
 		gsl_matrix_free(cov);
 
 	}
 	
-	Envelope* RSGISPolynomialImageWarp::newImageExtent() throw(RSGISImageWarpException)
+	Envelope* RSGISPolynomialImageWarp::newImageExtent(unsigned int width, unsigned int height) throw(RSGISImageWarpException)
 	{
-		double minEastings = 0;
+		
+        double minEastings = 0;
 		double maxEastings = 0;
 		double minNorthings = 0;
 		double maxNorthings = 0;
-		bool first = true;
+        
+        minEastings = gsl_vector_get(this->aE, 0);
+        minNorthings = gsl_vector_get(this->aN, 0);
+        
+        maxEastings = gsl_vector_get(this->aE, 0);
+        maxNorthings = gsl_vector_get(this->aN, 0);
+        
+        unsigned int offset = 0;
+        
+        for(int j = 1; j < this->polyOrder; ++j)
+        {
+            offset = 1 + (3 * (j - 1));
+            
+            maxEastings = maxEastings + (gsl_vector_get(this->aE, offset) * pow(float(width), j));
+            maxEastings = maxEastings + (gsl_vector_get(this->aE, offset+1) * pow(float(height), j));
+            maxEastings = maxEastings + (gsl_vector_get(this->aE, offset+2) * pow(float(width)*float(height), j));
+            
+            maxNorthings = maxNorthings + (gsl_vector_get(this->aN, offset) * pow(float(width), j));
+            maxNorthings = maxNorthings + (gsl_vector_get(this->aN, offset+1) * pow(float(height), j));
+            maxNorthings = maxNorthings + (gsl_vector_get(this->aN, offset+2) * pow(float(width)*float(height), j));
+        }
+        
+        offset = 1 + (3 * (this->polyOrder - 1));
+        maxEastings = maxEastings + (gsl_vector_get(this->aE, offset) * pow(float(width), this->polyOrder));
+        maxEastings = maxEastings + (gsl_vector_get(this->aE, offset+1) * pow(float(height), this->polyOrder));
+        
+        maxNorthings = maxNorthings + (gsl_vector_get(this->aN, offset) * pow(float(width), this->polyOrder));
+        maxNorthings = maxNorthings + (gsl_vector_get(this->aN, offset+1) * pow(float(height), this->polyOrder));
 		
-		vector<RSGISGCPImg2MapNode*>::iterator iterGCPs;
-		for(iterGCPs = gcps->begin(); iterGCPs != gcps->end(); ++iterGCPs)
-		{
-			if(first)
-			{
-				minEastings = (*iterGCPs)->eastings();
-				maxEastings = (*iterGCPs)->eastings();
-				minNorthings = (*iterGCPs)->northings();
-				maxNorthings = (*iterGCPs)->northings();
-				first = false;
-			}
-			else
-			{
-				if((*iterGCPs)->eastings() < minEastings)
-				{
-					minEastings = (*iterGCPs)->eastings();
-				}
-				else if((*iterGCPs)->eastings() > maxEastings)
-				{
-					maxEastings = (*iterGCPs)->eastings();
-				}
-				
-				if((*iterGCPs)->northings() < minNorthings)
-				{
-					minNorthings = (*iterGCPs)->northings();
-				}
-				else if((*iterGCPs)->northings() > maxNorthings)
-				{
-					maxNorthings = (*iterGCPs)->northings();
-				}
-			}
-		}
+        if(maxNorthings < minNorthings) // Swap min and max northings for southern hemisphere lat / long.
+        {
+            double tempNorthing = maxNorthings;
+            maxNorthings = minNorthings;
+            minNorthings = tempNorthing;
+        }
 		
-		cout << "Eastings: [" << minEastings << "," << maxEastings << "]\n";
+        cout << "Eastings: [" << minEastings << "," << maxEastings << "]\n";
 		cout << "Northings: [" << minNorthings << "," << maxNorthings << "]\n";
-		
+        
 		Envelope *env = new Envelope(minEastings, maxEastings, minNorthings, maxNorthings);
 		
 		double geoWidth = maxEastings - minEastings;
 		double geoHeight = maxNorthings - minNorthings;
+        
+        //cout << "geoWidth = " << geoWidth << ", geoHeight = " << geoHeight << endl;
 		
 		if((geoWidth <= 0) | (geoHeight <= 0))
 		{
@@ -239,6 +270,8 @@ namespace rsgis{namespace reg{
 	{
         gsl_vector_free(this->aX);
         gsl_vector_free(this->aY);
+        gsl_vector_free(this->aE);
+        gsl_vector_free(this->aN);
 	}
 	
 }}

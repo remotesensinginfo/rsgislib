@@ -54,7 +54,7 @@ namespace rsgis{namespace reg{
 		void initWarp()throw(RSGISImageWarpException);
 		~RSGISBasicNNGCPImageWarp();
 	protected:
-		Envelope* newImageExtent() throw(RSGISImageWarpException);
+		Envelope* newImageExtent(unsigned int width, unsigned int height) throw(RSGISImageWarpException);
 		void findNearestPixel(double eastings, double northings, unsigned int *x, unsigned int *y, float inImgRes) throw(RSGISImageWarpException);
 		Quadtree *pointIndex;
 	};

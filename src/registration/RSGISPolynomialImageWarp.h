@@ -57,11 +57,13 @@ namespace rsgis{namespace reg{
 		void initWarp()throw(RSGISImageWarpException);
 		~RSGISPolynomialImageWarp();
 	protected:
-		Envelope* newImageExtent() throw(RSGISImageWarpException);
+		Envelope* newImageExtent(unsigned int width, unsigned int height) throw(RSGISImageWarpException);
 		void findNearestPixel(double eastings, double northings, unsigned int *x, unsigned int *y, float inImgRes) throw(RSGISImageWarpException);
         int polyOrder; // Polynominal order
         gsl_vector *aX;
         gsl_vector *aY;
+        gsl_vector *aE;
+        gsl_vector *aN;
 	};
 	
 }}

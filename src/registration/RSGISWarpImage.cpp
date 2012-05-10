@@ -114,10 +114,10 @@ namespace rsgis{namespace reg{
 		
 		try 
 		{			
-			imageGeoExtent = this->newImageExtent();
-			
 			inputImageDS = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_ReadOnly);
-			
+            			
+            imageGeoExtent = this->newImageExtent(inputImageDS->GetRasterXSize()-1, inputImageDS->GetRasterYSize()-1);
+            
 			if(inputImageDS == NULL)
 			{
 				string message = string("Could not open image ") + this->inputImage;
@@ -180,19 +180,19 @@ namespace rsgis{namespace reg{
 			
 			double inTLX = gdalTransformation[0];
 			double inTLY = gdalTransformation[3];
-			double inBRX = inTLX + (inputImageDS->GetRasterXSize() * gdalTransformation[1]);
-			double inBRY = inTLY + (inputImageDS->GetRasterYSize() * gdalTransformation[5]);
+			//double inBRX = inTLX + (inputImageDS->GetRasterXSize() * gdalTransformation[1]);
+			//double inBRY = inTLY + (inputImageDS->GetRasterYSize() * gdalTransformation[5]);
 			float inImgRes = gdalTransformation[1];
 			
 			outputImageDS->GetGeoTransform(gdalTransformation);
 			
 			double outTLX = gdalTransformation[0];
 			double outTLY = gdalTransformation[3];
-			double outBRX = outTLX + (outputImageDS->GetRasterXSize() * gdalTransformation[1]);
-			double outBRY = outTLY + (outputImageDS->GetRasterYSize() * gdalTransformation[5]);
+			//double outBRX = outTLX + (outputImageDS->GetRasterXSize() * gdalTransformation[1]);
+			//double outBRY = outTLY + (outputImageDS->GetRasterYSize() * gdalTransformation[5]);
 
 			delete gdalTransformation;
-			
+			/*
 			if(outTLX < inTLX)
 			{
 				throw RSGISImageWarpException("Output image is outside input image, TLX");
@@ -212,7 +212,7 @@ namespace rsgis{namespace reg{
 			{
 				throw RSGISImageWarpException("Output image is outside input image, BRY");
 			}
-			
+			*/
 			unsigned int outWidth = outputImageDS->GetRasterXSize();
 			unsigned int outHeight = outputImageDS->GetRasterYSize();
 			
@@ -255,7 +255,19 @@ namespace rsgis{namespace reg{
 					try 
 					{
 						this->findNearestPixel(currentEastings, currentNorthings, &xPxl, &yPxl, inImgRes);
-						this->interpolator->calcValue(inputImageDS, outDataColumn, numBands, currentEastings, currentEastings, xPxl, yPxl, inImgRes, outImgRes);
+                        
+						if((xPxl < outWidth) && (yPxl < outHeight))
+                        {
+                            this->interpolator->calcValue(inputImageDS, outDataColumn, numBands, currentEastings, currentEastings, xPxl, yPxl, inImgRes, outImgRes);
+                        }
+                        else
+                        {
+                            for(unsigned int n = 0; n < numBands; n++)
+                            {
+                                outDataColumn[n] = 0;
+                            }
+                        }
+                        
 					}
 					catch (RSGISImageWarpException) 
 					{

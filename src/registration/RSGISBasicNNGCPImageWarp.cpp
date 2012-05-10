@@ -47,7 +47,7 @@ namespace rsgis{namespace reg{
 		}
 	}
 	
-	Envelope* RSGISBasicNNGCPImageWarp::newImageExtent() throw(RSGISImageWarpException)
+	Envelope* RSGISBasicNNGCPImageWarp::newImageExtent(unsigned int width, unsigned int height) throw(RSGISImageWarpException)
 	{
 		double minEastings = 0;
 		double maxEastings = 0;
