@@ -371,13 +371,13 @@ namespace rsgis{namespace img{
 			}
 			
 			// Create new Image
-			gdalDriver = GetGDALDriverManager()->GetDriverByName("ENVI");
+			gdalDriver = GetGDALDriverManager()->GetDriverByName(gdalFormat.c_str());
 			if(gdalDriver == NULL)
 			{
 				throw RSGISImageBandException("ENVI driver does not exists..");
 			}
 			cout << "New image width = " << width << " height = " << height << endl;
-			outputImageDS = gdalDriver->Create(outputImage.c_str(), width, height, numInBands, GDT_Float32, NULL);
+			outputImageDS = gdalDriver->Create(outputImage.c_str(), width, height, numInBands, gdalDataType, NULL);
 			outputImageDS->SetGeoTransform(gdalTranslation);
 			outputImageDS->SetProjection(datasets[0]->GetProjectionRef());
 			
@@ -434,7 +434,7 @@ namespace rsgis{namespace img{
 				
 				for(int n = 0; n < numInBands; n++)
 				{
-					inputRasterBands[n]->RasterIO(GF_Read, bandOffsets[n][0], (bandOffsets[n][1]+i), width, 1, inputData[n], width, 1, GDT_Float32, 0, 0);
+					inputRasterBands[n]->RasterIO(GF_Read, bandOffsets[n][0], (bandOffsets[n][1]+i), width, 1, inputData[n], width, 1, gdalDataType, 0, 0);
 				}
                 
                 if(skipPixels) // If skipping pixels, look through input values and check for skip value in any of the bands.
@@ -462,7 +462,7 @@ namespace rsgis{namespace img{
 
                 for(int n = 0; n < numInBands; n++)
                 {
-                    outputRasterBands[n]->RasterIO(GF_Write, 0, i, width, 1, inputData[n], width, 1, GDT_Float32, 0, 0);
+                    outputRasterBands[n]->RasterIO(GF_Write, 0, i, width, 1, inputData[n], width, 1, gdalDataType, 0, 0);
                 }
 
 
