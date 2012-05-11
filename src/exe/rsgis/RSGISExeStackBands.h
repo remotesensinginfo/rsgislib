@@ -64,6 +64,11 @@ class RSGISExeStackBands : public RSGISAlgorithmParameters
 		bool useBandNames;
 		int numImages;
         string *imageBandNames;
+		float noDataValue;
+		float skipValue;
+        bool skipPixels;
+        GDALDataType outDataType;
+        string imageFormat;
 	};
 
 #endif

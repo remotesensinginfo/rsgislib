@@ -44,7 +44,7 @@ namespace rsgis
 				RSGISAddBands();
 				void addMultipleBands(GDALDataset *input, GDALDataset **toAdd, string *outputFile, int *band, int numAddBands) throw(RSGISImageBandException);
 				void addBandToFile(GDALDataset *input, GDALDataset *toAdd, string *outputFile, int band) throw(RSGISImageBandException);
-				void stackImages(GDALDataset **datasets, int numDS, string outputImage, string *imageBandNames) throw(RSGISImageBandException);
+				void stackImages(GDALDataset **datasets, int numDS, string outputImage, string *imageBandNames, bool skipPixels, float skipValue = 0, float noDataValue = 0, string gdalFormat="ENVI", GDALDataType gdalDataType=GDT_Float32) throw(RSGISImageBandException);
 				~RSGISAddBands();
 		};
 	}
