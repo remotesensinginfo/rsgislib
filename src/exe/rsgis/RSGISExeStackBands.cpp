@@ -29,6 +29,12 @@ RSGISExeStackBands::RSGISExeStackBands() : RSGISAlgorithmParameters()
 	this->outputImage = "";
 	this->numImages = 0;
     this->imageBandNames = NULL;
+    this->createVRT = false; // Create GDAL virtual raster
+	this->useBandNames = false;
+    this->imageFormat = "ENVI";
+    this->outDataType = GDT_Float32;
+    this->skipValue = 0;
+    this->skipPixels = false;
 }
 
 RSGISAlgorithmParameters* RSGISExeStackBands::getInstance()
@@ -46,10 +52,89 @@ void RSGISExeStackBands::retrieveParameters(DOMElement *argElement) throw(RSGISX
 	XMLCh *optionXMLStr = XMLString::transcode("option");
 	XMLCh *optionDIR = XMLString::transcode("dir");
 	XMLCh *optionIMGS = XMLString::transcode("imgs");
-	
-	this->createVRT = false; // Create GDAL virtual raster
-	this->useBandNames = false;
-	
+    
+    XMLCh *createVRTXMLStr = XMLString::transcode("createVRT");
+	if(argElement->hasAttribute(createVRTXMLStr))
+	{
+		XMLCh *yesStr = XMLString::transcode("yes");
+		const XMLCh *vrtValue = argElement->getAttribute(createVRTXMLStr);
+		if(XMLString::equals(vrtValue, yesStr))
+		{
+			this->createVRT = true;
+			cout << "\tCreating GDAL Virtual Raster Table (VRT) using \'gdalbuildvrt\'" << endl;
+		}
+		XMLString::release(&yesStr);
+	}
+	XMLString::release(&createVRTXMLStr);
+    
+    // Set output image fomat (defaults to ENVI)
+	XMLCh *formatXMLStr = XMLString::transcode("format");
+	if(argElement->hasAttribute(formatXMLStr))
+	{
+		if(this->createVRT){cout << "\'format\' not supported for GDAL VRT" << endl;}
+        char *charValue = XMLString::transcode(argElement->getAttribute(formatXMLStr));
+		this->imageFormat = string(charValue);
+		XMLString::release(&charValue);
+	}
+	XMLString::release(&formatXMLStr);
+
+    // Set output data type (defaults to Float32)
+	XMLCh *datatypeXMLStr = XMLString::transcode("datatype");
+	if(argElement->hasAttribute(datatypeXMLStr))
+	{
+        if(this->createVRT){cout << "\'datatype\' not supported for GDAL VRT" << endl;}
+        XMLCh *dtByte = XMLString::transcode("Byte");
+        XMLCh *dtUInt16 = XMLString::transcode("UInt16");
+        XMLCh *dtInt16 = XMLString::transcode("Int16");
+        XMLCh *dtUInt32 = XMLString::transcode("UInt32");
+        XMLCh *dtInt32 = XMLString::transcode("Int32");
+        XMLCh *dtFloat32 = XMLString::transcode("Float32");
+        XMLCh *dtFloat64 = XMLString::transcode("Float64");
+        
+        const XMLCh *dtXMLValue = argElement->getAttribute(datatypeXMLStr);
+        if(XMLString::equals(dtByte, dtXMLValue))
+        {
+            this->outDataType = GDT_Byte;
+        }
+        else if(XMLString::equals(dtUInt16, dtXMLValue))
+        {
+            this->outDataType = GDT_UInt16;
+        }
+        else if(XMLString::equals(dtInt16, dtXMLValue))
+        {
+            this->outDataType = GDT_Int16;
+        }
+        else if(XMLString::equals(dtUInt32, dtXMLValue))
+        {
+            this->outDataType = GDT_UInt32;
+        }
+        else if(XMLString::equals(dtInt32, dtXMLValue))
+        {
+            this->outDataType = GDT_Int32;
+        }
+        else if(XMLString::equals(dtFloat32, dtXMLValue))
+        {
+            this->outDataType = GDT_Float32;
+        }
+        else if(XMLString::equals(dtFloat64, dtXMLValue))
+        {
+            this->outDataType = GDT_Float64;
+        }
+        else
+        {
+            this->outDataType = GDT_Float32;
+        }
+        
+        XMLString::release(&dtByte);
+        XMLString::release(&dtUInt16);
+        XMLString::release(&dtInt16);
+        XMLString::release(&dtUInt32);
+        XMLString::release(&dtInt32);
+        XMLString::release(&dtFloat32);
+        XMLString::release(&dtFloat64);
+	}
+	XMLString::release(&datatypeXMLStr);
+
 	const XMLCh *algorNameEle = argElement->getAttribute(algorXMLStr);
 	if(!XMLString::equals(algorName, algorNameEle))
 	{
@@ -68,21 +153,48 @@ void RSGISExeStackBands::retrieveParameters(DOMElement *argElement) throw(RSGISX
 		throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
 	}
 	XMLString::release(&outputXMLStr);
-	
-	XMLCh *createVRTXMLStr = XMLString::transcode("createVRT");
-	if(argElement->hasAttribute(createVRTXMLStr))
-	{
-		XMLCh *yesStr = XMLString::transcode("yes");
-		const XMLCh *vrtValue = argElement->getAttribute(createVRTXMLStr);
-		if(XMLString::equals(vrtValue, yesStr))
-		{
-			this->createVRT = true;
-			cout << "\tCreating GDAL Virtual Raster Table (VRT) using \'gdalbuildvrt\'" << endl;
-		}
-		XMLString::release(&yesStr);
-	}
-	XMLString::release(&createVRTXMLStr);
-	
+    
+    // Set value in any band to skip, if non is set standard algoritm is used and no error is printed
+    XMLCh *skipValueXMLStr = XMLString::transcode("skipValue");
+    if(argElement->hasAttribute(skipValueXMLStr))
+    {
+        char *charValue = XMLString::transcode(argElement->getAttribute(skipValueXMLStr));
+        this->skipValue = mathsUtils.strtofloat(string(charValue));
+        cout << "\tSkipping pixels with a value of " << this->skipValue << ", in any band." << endl;
+        this->skipPixels = true;
+        XMLString::release(&charValue);
+    }
+    XMLString::release(&skipValueXMLStr);
+    
+    // Get no data value
+    XMLCh *nodataXMLStr = XMLString::transcode("nodata");
+    if(argElement->hasAttribute(nodataXMLStr))
+    {
+        XMLCh *NaNStr = XMLString::transcode("NaN");
+        const XMLCh *noDataValue = argElement->getAttribute(nodataXMLStr);
+        if(XMLString::equals(noDataValue, NaNStr))
+        {
+            const char *val = "NaN";
+            this->noDataValue = nan(val);
+        }
+        else
+        {
+            char *charValue = XMLString::transcode(argElement->getAttribute(nodataXMLStr));
+            this->noDataValue = mathsUtils.strtofloat(string(charValue));
+            XMLString::release(&charValue);
+        }
+        XMLString::release(&NaNStr);
+    }
+    else
+    {
+        if(this->skipPixels)
+        {
+            cout << "\tUsing default of 0 for background values" << endl;
+        }
+        this->noDataValue = 0;
+    }
+    XMLString::release(&nodataXMLStr);
+
 	const XMLCh *optionXML = argElement->getAttribute(optionXMLStr);
 	if(XMLString::equals(optionDIR, optionXML))
 	{		
@@ -218,9 +330,16 @@ void RSGISExeStackBands::runAlgorithm() throw(RSGISException)
 	{
 		if (this->createVRT) 
 		{
-			cout << "There are " << this->numImages << " images to stack\n";
+			RSGISMathsUtils mathsUtils;
+            
+            cout << "There are " << this->numImages << " images to stack\n";
 			
-			string gdalCommand = "gdalbuildvrt -separate -overwrite " + this->outputImage + ".vrt";
+			string gdalCommand = "gdalbuildvrt -separate -overwrite ";
+            if (this->skipPixels) 
+            {
+                gdalCommand = gdalCommand + " -srcnodata " + mathsUtils.doubletostring(this->skipValue).c_str() + " -vrtnodata " + mathsUtils.doubletostring(this->noDataValue).c_str() + " ";
+            }
+            gdalCommand = gdalCommand + this->outputImage + ".vrt";
 			for(int i = 0; i < numImages; i++)
 			{
 				gdalCommand = gdalCommand + " " +  this->inputImages[i];
@@ -251,7 +370,7 @@ void RSGISExeStackBands::runAlgorithm() throw(RSGISException)
 					}
 				}
 				
-				stackbands.stackImages(datasets, this->numImages, this->outputImage, this->imageBandNames);
+				stackbands.stackImages(datasets, this->numImages, this->outputImage, this->imageBandNames, this->skipPixels, this->skipValue, this->noDataValue, this->imageFormat, this->outDataType);
 				
 				if(datasets != NULL)
 				{

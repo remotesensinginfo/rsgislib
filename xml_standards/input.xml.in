@@ -1,8 +1,8 @@
 <rsgis:commands xmlns:rsgis="http://www.rsgislib.org/xml/">
-    <!-- Stacks all the image bands within a directory into a single image file (ENVI format) -->
-    <rsgis:command algor="stackbands" option="dir" dir="input_DIR" output="outputimage" ext="file_extension" createVRT="yes | no"/>
-    <!-- Stacks all the image bands provided in list into a single image file (ENVI format) -->
-    <rsgis:command algor="stackbands" option="imgs" output="outputimage">
+    <!-- Stacks all the image bands within a directory into a single image file -->
+    <rsgis:command algor="stackbands" option="dir" dir="input_DIR" output="outputimage" ext="file_extension" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" skipValue="float" nodata="float" createVRT="yes | no" />
+    <!-- Stacks all the image bands provided in list into a single image file -->
+    <rsgis:command algor="stackbands" option="imgs" output="outputimage" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" skipValue="float" nodata="float" createVRT="yes | no">
         <rsgis:image name="band(s) name" file="image1" />
         <rsgis:image name="band(s) name" file="image2" />
         <rsgis:image name="band(s) name" file="image3" />
