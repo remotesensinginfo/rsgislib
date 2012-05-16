@@ -625,6 +625,27 @@ void RSGISExeImageRegistration::retrieveParameters(DOMElement *argElement) throw
 				this->outImageFormat = "ENVI";
 			}
 			XMLString::release(&outImageFormatXMLStr);
+            
+            XMLCh *outTransformXMLStr = XMLString::transcode("transform");
+			if(argElement->hasAttribute(outTransformXMLStr))
+			{
+				char *charValue = XMLString::transcode(argElement->getAttribute(outTransformXMLStr));
+				string outTransform = string(charValue);
+                if(outTransform == "yes")
+                {
+                    this->genTransformImage = true;
+                }
+                else
+                {
+                    this->genTransformImage = false;
+                }
+				XMLString::release(&charValue);
+			}
+			else
+			{
+				this->genTransformImage = false;
+			}
+			XMLString::release(&outTransformXMLStr);
 			
 		}
 		else if((XMLString::equals(optionNNWarp, optionXML)) | (XMLString::equals(optionPolyWarp, optionXML)))
@@ -726,6 +747,29 @@ void RSGISExeImageRegistration::retrieveParameters(DOMElement *argElement) throw
                 }
                 XMLString::release(&polyOrderStr);
             }
+            
+            
+            
+            XMLCh *outTransformXMLStr = XMLString::transcode("transform");
+			if(argElement->hasAttribute(outTransformXMLStr))
+			{
+				char *charValue = XMLString::transcode(argElement->getAttribute(outTransformXMLStr));
+				string outTransform = string(charValue);
+                if(outTransform == "yes")
+                {
+                    this->genTransformImage = true;
+                }
+                else
+                {
+                    this->genTransformImage = false;
+                }
+				XMLString::release(&charValue);
+			}
+			else
+			{
+				this->genTransformImage = false;
+			}
+			XMLString::release(&outTransformXMLStr);
 			
 		}
 		else 
@@ -1033,7 +1077,14 @@ void RSGISExeImageRegistration::runAlgorithm() throw(RSGISException)
                 }
                 
 				warp = new RSGISWarpImageUsingTriangulation(this->inputImage, this->outputImage, projWKTStr, this->inputGCPs, this->resolution, interpolator, this->outImageFormat);
-				warp->performWarp();
+				if(this->genTransformImage)
+                {
+                    warp->generateTransformImage();
+                }
+                else
+                {
+                    warp->performWarp();
+                }
 				delete warp;
 			}
 			catch (RSGISException &e) 
@@ -1066,7 +1117,14 @@ void RSGISExeImageRegistration::runAlgorithm() throw(RSGISException)
                 }
                 
 				warp = new RSGISBasicNNGCPImageWarp(this->inputImage, this->outputImage, projWKTStr, this->inputGCPs, this->resolution, interpolator, this->outImageFormat);
-				warp->performWarp();
+				if(this->genTransformImage)
+                {
+                    warp->generateTransformImage();
+                }
+                else
+                {
+                    warp->performWarp();
+                }
 				delete warp;
 			}
 			catch (RSGISException &e) 
@@ -1104,7 +1162,14 @@ void RSGISExeImageRegistration::runAlgorithm() throw(RSGISException)
                 }
                 
 				warp = new RSGISPolynomialImageWarp(this->inputImage, this->outputImage, projWKTStr, this->inputGCPs, this->resolution, interpolator, this->polyOrder, this->outImageFormat);
-				warp->performWarp();
+				if(this->genTransformImage)
+                {
+                    warp->generateTransformImage();
+                }
+                else
+                {
+                    warp->performWarp();
+                }
 				delete warp;
 			}
 			catch (RSGISException &e) 

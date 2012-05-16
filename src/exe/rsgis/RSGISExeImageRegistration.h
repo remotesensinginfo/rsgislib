@@ -122,6 +122,7 @@ protected:
 	float pSmoothness;
 	float resolution;
     int polyOrder;
+    bool genTransformImage;
 };
 
 #endif
