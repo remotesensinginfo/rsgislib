@@ -3126,6 +3126,7 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
                 attTable->applyIfStatements(statements);
                 cout << "Exporting Attribute Table\n";
                 attTable->exportHDF5(outAttTableFile);
+                //attTable->exportASCII(outAttTableFile);
                 cout << "Finished\n";
                 delete attTable;
             }

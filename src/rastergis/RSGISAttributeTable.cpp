@@ -770,7 +770,7 @@ namespace rsgis{namespace rastergis{
             }
             
             delete fieldDtDisk;
-
+            
             DataSet *boolDataset = NULL;
             if(this->numBoolFields > 0)
             {
@@ -994,7 +994,7 @@ namespace rsgis{namespace rastergis{
                     
                     boolDataset->write(boolVals, PredType::NATIVE_INT, newBoolDataspace, boolWriteDataSpace);
                 }
-
+                
                 if(this->numIntFields > 0)
                 {
                     extendIntDatasetTo[0] = currentSize + ATT_WRITE_CHUNK_SIZE;
@@ -1006,11 +1006,11 @@ namespace rsgis{namespace rastergis{
                     
                     DataSpace intWriteDataSpace = intDataset->getSpace();
                     intWriteDataSpace.selectHyperslab(H5S_SELECT_SET, intDataDims, intDataOffset);
-                    DataSpace newIntDataspace = DataSpace(1, intDataDims);
+                    DataSpace newIntDataspace = DataSpace(2, intDataDims);
                     
                     intDataset->write(intVals, PredType::NATIVE_LONG, newIntDataspace, intWriteDataSpace);
                 }
-
+                
                 if(this->numFloatFields > 0)
                 {
                     extendFloatDatasetTo[0] = currentSize + ATT_WRITE_CHUNK_SIZE;
@@ -1128,7 +1128,7 @@ namespace rsgis{namespace rastergis{
                 
                 DataSpace intWriteDataSpace = intDataset->getSpace();
                 intWriteDataSpace.selectHyperslab(H5S_SELECT_SET, intDataDims, intDataOffset);
-                DataSpace newIntDataspace = DataSpace(1, intDataDims);
+                DataSpace newIntDataspace = DataSpace(2, intDataDims);
                 
                 intDataset->write(intVals, PredType::NATIVE_LONG, newIntDataspace, intWriteDataSpace);
             }
