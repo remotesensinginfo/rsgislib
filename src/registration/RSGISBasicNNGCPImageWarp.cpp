@@ -108,50 +108,57 @@ namespace rsgis{namespace reg{
 	{
 		RSGISGCPImg2MapNode *pxl = new RSGISGCPImg2MapNode(eastings, northings, 0, 0);
 		
-		Envelope *searchEnv = new Envelope((eastings-(10*inImgRes)), (eastings+(10*inImgRes)), (northings-(10*inImgRes)), (northings+(10*inImgRes)));
+		Envelope *searchEnv = new Envelope((eastings-(20*inImgRes)), (eastings+(20*inImgRes)), (northings-(20*inImgRes)), (northings+(20*inImgRes)));
 		vector<void*> values = vector<void*>();
 		
 		this->pointIndex->query(searchEnv, values);
 		
+        if(values.size() > 0)
+        {
 		
-		RSGISGCPImg2MapNode *tmpGCP = NULL;
-		bool first = true;
-		double distance = 0;
-		RSGISGCPImg2MapNode *closestGCP = NULL;
-		double closestDist = 0;
-		vector<void*>::iterator iterVals;
-		for(iterVals = values.begin(); iterVals != values.end(); ++iterVals)
-		{
-			tmpGCP = (RSGISGCPImg2MapNode*)(*iterVals);
-			distance = tmpGCP->distanceGeo(pxl);
-			if(first)
-			{
-				closestGCP = tmpGCP;
-				closestDist = distance;
-				first = false;
-			}
-			else if(distance < closestDist)
-			{
-				closestGCP = tmpGCP;
-				closestDist = distance;
-			}			
-		}
-		
-		//cout.precision(12);
-		//cout << "Pixel : [" << eastings << "," << northings << "]\n";
-		//cout << "Closest: [" << closestGCP->eastings << "," << closestGCP->northings << "] = [" << closestGCP->imgX << "," << closestGCP->imgY << "]\n";
-		
-		double xDistance = closestGCP->eastings() - eastings;
-		double yDistance = closestGCP->northings() - northings;
-		
-		double pxlDistX = xDistance/inImgRes;
-		double pxlDistY = yDistance/inImgRes;
-		
-		*x = floor((closestGCP->imgX()-pxlDistX)+0.5);
-		*y = floor((closestGCP->imgY()+pxlDistY)+0.5);
-		
-		//*x = floor((closestGCP->imgX)+0.5);
-		//*y = floor((closestGCP->imgY)+0.5);
+            RSGISGCPImg2MapNode *tmpGCP = NULL;
+            bool first = true;
+            double distance = 0;
+            RSGISGCPImg2MapNode *closestGCP = NULL;
+            double closestDist = 0;
+            vector<void*>::iterator iterVals;
+            for(iterVals = values.begin(); iterVals != values.end(); ++iterVals)
+            {
+                tmpGCP = (RSGISGCPImg2MapNode*)(*iterVals);
+                distance = tmpGCP->distanceGeo(pxl);
+                if(first)
+                {
+                    closestGCP = tmpGCP;
+                    closestDist = distance;
+                    first = false;
+                }
+                else if(distance < closestDist)
+                {
+                    closestGCP = tmpGCP;
+                    closestDist = distance;
+                }			
+            }
+            
+            //cout.precision(12);
+            //cout << "Pixel : [" << eastings << "," << northings << "]\n";
+            //cout << "Closest: [" << closestGCP->eastings << "," << closestGCP->northings << "] = [" << closestGCP->imgX << "," << closestGCP->imgY << "]\n";
+            
+            double xDistance = closestGCP->eastings() - eastings;
+            double yDistance = closestGCP->northings() - northings;
+            
+            double pxlDistX = xDistance/inImgRes;
+            double pxlDistY = yDistance/inImgRes;
+            
+            *x = floor((closestGCP->imgX()-pxlDistX)+0.5);
+            *y = floor((closestGCP->imgY()+pxlDistY)+0.5);
+            
+            //*x = floor((closestGCP->imgX)+0.5);
+            //*y = floor((closestGCP->imgY)+0.5);
+        }
+        else 
+        {
+            throw RSGISImageWarpException("Tie point could not be founded within search radius.");
+        }
 		
 		delete pxl;
 		delete searchEnv;
