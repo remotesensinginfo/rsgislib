@@ -56,6 +56,25 @@ namespace rsgis{namespace reg{
 			throw e;
 		}
 	}
+    
+    void RSGISWarpImage::generateTransformImage() throw(RSGISImageWarpException)
+	{
+		try 
+		{
+			cout << "Read in GCPs\n";
+			this->readGCPFile();
+			cout << "Initialise Warp\n";
+			this->initWarp();
+			cout << "Create blank output image\n";
+			this->createOutputTransformImage();
+			cout << "Assign Output Pixel values\n";
+			this->populateTransformImage();
+		}
+		catch (RSGISImageWarpException &e) 
+		{
+			throw e;
+		}
+	}
 	
 	void RSGISWarpImage::readGCPFile() throw(RSGISImageWarpException)
 	{
@@ -128,6 +147,44 @@ namespace rsgis{namespace reg{
 			
 			GDALDataset* outputImageDS = imgUtils.createBlankImage(this->outputImage, *imageGeoExtent, this->outImgRes, numOutBands, outProjWKT, 0, this->gdalFormat);
 				
+			GDALClose(inputImageDS);
+			GDALClose(outputImageDS);
+		}
+		catch (RSGISImageWarpException &e) 
+		{
+			throw e;
+		}
+		catch (RSGISImageBandException &e) 
+		{
+			throw RSGISImageWarpException(e.what());
+		}
+		catch (RSGISImageException &e) 
+		{
+			throw RSGISImageWarpException(e.what());
+		} 
+	}
+    
+    void RSGISWarpImage::createOutputTransformImage() throw(RSGISImageWarpException)
+	{
+		RSGISImageUtils imgUtils;
+        
+		GDALDataset *inputImageDS = NULL;
+		Envelope *imageGeoExtent = NULL;
+		
+		try 
+		{			
+			inputImageDS = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_ReadOnly);
+            
+            imageGeoExtent = this->newImageExtent(inputImageDS->GetRasterXSize()-1, inputImageDS->GetRasterYSize()-1);
+            
+			if(inputImageDS == NULL)
+			{
+				string message = string("Could not open image ") + this->inputImage;
+				throw RSGISImageException(message.c_str());
+			}
+						
+			GDALDataset* outputImageDS = imgUtils.createBlankImage(this->outputImage, *imageGeoExtent, this->outImgRes, 2, outProjWKT, 0, this->gdalFormat);
+            
 			GDALClose(inputImageDS);
 			GDALClose(outputImageDS);
 		}
@@ -258,7 +315,7 @@ namespace rsgis{namespace reg{
                         
 						if((xPxl < outWidth) && (yPxl < outHeight))
                         {
-                            this->interpolator->calcValue(inputImageDS, outDataColumn, numBands, currentEastings, currentEastings, xPxl, yPxl, inImgRes, outImgRes);
+                            this->interpolator->calcValue(inputImageDS, outDataColumn, numBands, currentEastings, currentNorthings, xPxl, yPxl, inImgRes, outImgRes);
                         }
                         else
                         {
@@ -268,6 +325,179 @@ namespace rsgis{namespace reg{
                             }
                         }
                         
+					}
+					catch (RSGISImageWarpException) 
+					{
+						// ignore... - set output as NaN
+						for(unsigned int n = 0; n < numBands; n++)
+						{
+							outDataColumn[n] = numeric_limits<double>::signaling_NaN();//NAN;
+						}
+					}
+					
+					for(unsigned int n = 0; n < numBands; n++)
+					{
+						outputData[n][j] = outDataColumn[n];
+					}
+					
+					currentEastings += this->outImgRes;
+				}
+				
+				for(unsigned int n = 0; n < numBands; n++)
+				{
+					outputRasterBands[n]->RasterIO(GF_Write, 0, i, outWidth, 1, outputData[n], outWidth, 1, GDT_Float32, 0, 0);
+				}
+				
+				currentNorthings -= this->outImgRes;
+			}
+			cout << ". Complete\n";
+			
+			delete[] outputRasterBands;
+			
+			for(unsigned int i = 0; i < numBands; i++)
+			{
+				CPLFree(outputData[i]);
+			}
+			delete[] outputData;
+			delete[] outDataColumn;
+			
+			GDALClose(inputImageDS);
+			GDALClose(outputImageDS);
+		}
+		catch (RSGISImageWarpException &e) 
+		{
+			GDALClose(inputImageDS);
+			GDALClose(outputImageDS);
+			throw e;
+		}
+		catch (RSGISImageBandException &e) 
+		{
+			GDALClose(inputImageDS);
+			GDALClose(outputImageDS);
+			throw RSGISImageWarpException(e.what());
+		}
+		catch (RSGISImageException &e) 
+		{
+			GDALClose(inputImageDS);
+			GDALClose(outputImageDS);
+			throw RSGISImageWarpException(e.what());
+		} 
+	}
+    
+    void RSGISWarpImage::populateTransformImage() throw(RSGISImageWarpException)
+	{
+		RSGISImageUtils imgUtils;
+		
+		GDALDataset *inputImageDS = NULL;
+		GDALDataset *outputImageDS = NULL;
+        
+		
+		try 
+		{
+			inputImageDS = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_ReadOnly);
+			if(inputImageDS == NULL)
+			{
+				string message = string("Could not open image ") + this->inputImage;
+				throw RSGISImageException(message.c_str());
+			}
+			outputImageDS = (GDALDataset *) GDALOpen(this->outputImage.c_str(), GA_Update);
+			if(outputImageDS == NULL)
+			{
+				string message = string("Could not open image ") + this->outputImage;
+				throw RSGISImageException(message.c_str());
+			}
+
+			
+			unsigned int numBands = outputImageDS->GetRasterCount();
+			
+			double *gdalTransformation= new double[6];
+			inputImageDS->GetGeoTransform(gdalTransformation);
+			
+			double inTLX = gdalTransformation[0];
+			double inTLY = gdalTransformation[3];
+			//double inBRX = inTLX + (inputImageDS->GetRasterXSize() * gdalTransformation[1]);
+			//double inBRY = inTLY + (inputImageDS->GetRasterYSize() * gdalTransformation[5]);
+			float inImgRes = gdalTransformation[1];
+			
+			outputImageDS->GetGeoTransform(gdalTransformation);
+			
+			double outTLX = gdalTransformation[0];
+			double outTLY = gdalTransformation[3];
+			//double outBRX = outTLX + (outputImageDS->GetRasterXSize() * gdalTransformation[1]);
+			//double outBRY = outTLY + (outputImageDS->GetRasterYSize() * gdalTransformation[5]);
+            
+			delete gdalTransformation;
+			/*
+             if(outTLX < inTLX)
+             {
+             throw RSGISImageWarpException("Output image is outside input image, TLX");
+             }
+             
+             if(outBRX > inBRX)
+             {
+             throw RSGISImageWarpException("Output image is outside input image, BRX");
+             }
+             
+             if(outTLY > inTLY)
+             {
+             throw RSGISImageWarpException("Output image is outside input image, TLY");
+             }
+             
+             if(outBRY < inBRY)
+             {
+             throw RSGISImageWarpException("Output image is outside input image, BRY");
+             }
+             */
+			unsigned int outWidth = outputImageDS->GetRasterXSize();
+			unsigned int outHeight = outputImageDS->GetRasterYSize();
+			
+			//Get Image Output Bands
+			GDALRasterBand **outputRasterBands = new GDALRasterBand*[numBands];
+			for(unsigned int i = 0; i < numBands; i++)
+			{
+				outputRasterBands[i] = outputImageDS->GetRasterBand(i+1);
+			}
+			
+			// Allocate memory			
+			float **outputData = new float*[numBands];
+			for(unsigned int i = 0; i < numBands; i++)
+			{
+				outputData[i] = (float *) CPLMalloc(sizeof(float)*outWidth);
+			}
+			float *outDataColumn = new float[numBands];
+			
+			double startEastings = outTLX - (this->outImgRes+(this->outImgRes/2));
+			double startNorthings = outTLY + (this->outImgRes+(this->outImgRes/2));
+			double currentEastings = startEastings;
+			double currentNorthings = startNorthings;
+            double pxlEastings = 0;
+			double pxlNorthings = 0;
+			
+			unsigned int xPxl = 0;
+			unsigned int yPxl = 0;
+			
+			int feedback = outHeight/10;
+			int feedbackCounter = 0;
+			cout << "Started ." << flush;
+			for(unsigned int i = 0; i < outHeight; ++i)
+			{
+				if((outHeight > 10) && ((i % feedback) == 0))
+				{
+					cout << "." << feedbackCounter << "." << flush;
+					feedbackCounter = feedbackCounter + 10;
+				}
+				currentEastings = startEastings;
+				for(unsigned int j = 0; j < outWidth; ++j)
+				{
+					try 
+					{
+						this->findNearestPixel(currentEastings, currentNorthings, &xPxl, &yPxl, inImgRes);
+                        
+                        pxlEastings = inTLX + (xPxl*inImgRes);
+                        pxlNorthings = inTLY - (yPxl*inImgRes);
+                        
+						outDataColumn[0] = (currentEastings - pxlEastings)/this->outImgRes;
+                        outDataColumn[1] = (currentNorthings - pxlNorthings)/this->outImgRes;
 					}
 					catch (RSGISImageWarpException) 
 					{

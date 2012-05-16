@@ -1125,17 +1125,27 @@
     <!-- A command to execute a command line utilities (e.g., mkdir) -->
     <rsgis:command algor="commandline" option="execute" command="string" />
 
+
+
+
+
      <!-- This command generates a voxel based transect (canopy only), for a list of input parameters and calculates FPC and canopy cover-->
     <rsgis:command algor="transectModel" option="singleSpeciesCanopyRandomList | singleSpeciesCanopyPsudoRandomList" input="input file" output="output file" species="aHarpophylla" calculateFPC="yes | no" calculateCC="yes | no" nRuns="int (random only)" quadratSize="float (m)" [outPlotName="outPlotName"] outImage="outImage"] [outVector="outVector"] />
+
+
+
+
+
+
 
     <!-- A command for automatically generating a set of ground control points between a pair of images - A basic algorithm with a single iteration and movement of gcps-->
     <rsgis:command algor="registration" option="basic" reference="image" floating="image" output="gcps.txt" outputType="envi_img2img|envi_img2map|rsgis_img2map" metric="euclidean|sqdiff|manhatten|correlation" pixelgap="int" window="int" search="int" threshold="float" stddevRef="float" stddevFloat="float" subpixelresolution="int"/>
     <!-- A command for automatically generating a set of ground control points between a pair of images - An algorithm with a single layer of connected gcps which used IDW to shift neighbouring gcps within a distance threshold -->
     <rsgis:command algor="registration" option="singlelayer" reference="image" floating="image" output="gcps.txt" outputType="envi_img2img|envi_img2map|rsgis_img2map" metric="euclidean|sqdiff|manhatten|correlation" pixelgap="int" window="int" search="int" threshold="float" stddevRef="float" stddevFloat="float" subpixelresolution="int" distanceThreshold="float" maxiterations="int" movementThreshold="float" pSmoothness="float"/>
     <!-- A command to warp an input image using a set of ground control points using a nearest neighbour algorithm -->
-    <rsgis:command algor="registration" option="nnwarp" gcps="string" image="string" output="string" projection="file.wkt" resolution="float" format="string"/>
-    <!-- A command to warp an input image using a set of ground control points using a polynominal -->
-    <rsgis:command algor="registration" option="polywarp" gcps="string" image="string" output="string" projection="file.wkt" resolution="float" format="string" polyOrder="int"/>
+    <rsgis:command algor="registration" option="nnwarp" gcps="string" image="string" output="string" projection="file.wkt" resolution="float" format="string" transform="yes | no" />
+    <!-- A command to warp an input image using a set of ground control points using a polynomial -->
+    <rsgis:command algor="registration" option="polywarp" gcps="string" image="string" output="string" projection="file.wkt" resolution="float" format="string" polyOrder="int" transform="yes | no" />
     <!-- A command to warp an input image using a set of ground control points using a triangulation -->
-    <rsgis:command algor="registration" option="triangularwarp" gcps="string" image="string" output="string" projection="file.wkt" resolution="float" format="string" />
+    <rsgis:command algor="registration" option="triangularwarp" gcps="string" image="string" output="string" projection="file.wkt" resolution="float" format="string" transform="yes | no" />
 </rsgis:commands>

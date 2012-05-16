@@ -115,7 +115,6 @@ namespace rsgis{namespace reg{
 	
 	void RSGISWarpImageUsingTriangulation::findNearestPixel(double eastings, double northings, unsigned int *x, unsigned int *y, float inImgRes) throw(RSGISImageWarpException)
 	{
-        
 		CGALPoint p(eastings, northings);
         Vertex_handle vh = dt->nearest_vertex(p);
         CGALPoint nearestPt = vh->point();

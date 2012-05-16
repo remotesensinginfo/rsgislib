@@ -62,15 +62,18 @@ namespace rsgis{namespace reg{
 	public:
 		RSGISWarpImage(string inputImage, string outputImage, string outProjWKT, string gcpFilePath, float outImgRes, RSGISWarpImageInterpolator *interpolator, string gdalFormat);
 		void performWarp() throw(RSGISImageWarpException);
+        void generateTransformImage() throw(RSGISImageWarpException);
 		void readGCPFile() throw(RSGISImageWarpException);
 		void createOutputImage() throw(RSGISImageWarpException);
+        void createOutputTransformImage() throw(RSGISImageWarpException);
 		void populateOutputImage() throw(RSGISImageWarpException);
+        void populateTransformImage() throw(RSGISImageWarpException);
 		virtual void initWarp() throw(RSGISImageWarpException) = 0;
 		virtual ~RSGISWarpImage();
 	protected:
 		virtual Envelope* newImageExtent(unsigned int width, unsigned int height) throw(RSGISImageWarpException) = 0;
 		virtual void findNearestPixel(double eastings, double northings, unsigned int *x, unsigned int *y, float inImgRes) throw(RSGISImageWarpException) = 0;
-		string inputImage;
+        string inputImage;
 		string outputImage;
 		string outProjWKT;
 		string gcpFilePath;

@@ -134,9 +134,7 @@ namespace rsgis{namespace reg{
 			{
 				closestGCP = tmpGCP;
 				closestDist = distance;
-			}
-			
-			
+			}			
 		}
 		
 		//cout.precision(12);
