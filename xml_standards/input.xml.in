@@ -226,7 +226,7 @@
         <rsgis:band attribute="name" />
     </rsgis:command>
     <!-- A command to classify the attribute table using boolean logic  -->
-    <rsgis:command algor="rastergis" option="boolclasstable" table="input.att" tableout="output.att" >
+    <rsgis:command algor="rastergis" option="boolclasstable" table="input.att" [tableout="output.att"] >
         <rsgis:if field="string" value="number">
             <rsgis:exp type="and"></rsgis:exp>
             <rsgis:exp type="or"></rsgis:exp>
@@ -251,7 +251,7 @@
         <rsgis:else [field="string" value="number"] />
     </rsgis:command>
     <!-- A command to add attributes to an attribute fields to the table -->
-    <rsgis:command algor="rastergis" option="addfields" table="input.att" tableout="output.att" >
+    <rsgis:command algor="rastergis" option="addfields" table="input.att" [tableout="output.att"] >
         <rsgis:attribute name="string" datatype="rsgis_bool | rsgis_int | rsgis_float | rsgis_string" />
         <rsgis:attribute name="string" datatype="rsgis_bool | rsgis_int | rsgis_float | rsgis_string" />
         <rsgis:attribute name="string" datatype="rsgis_bool | rsgis_int | rsgis_float | rsgis_string" />
