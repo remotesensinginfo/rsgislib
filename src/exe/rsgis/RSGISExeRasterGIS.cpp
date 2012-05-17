@@ -306,11 +306,12 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
         {
             char *charValue = XMLString::transcode(argElement->getAttribute(tableOutXMLStr));
             this->outAttTableFile = string(charValue);
+            this->attInMemory = true;
             XMLString::release(&charValue);
         }
         else
         {
-            throw RSGISXMLArgumentsException("No \'tableout\' attribute was provided.");
+            this->attInMemory = false;
         }
         XMLString::release(&tableOutXMLStr);
         
@@ -346,11 +347,12 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
         {
             char *charValue = XMLString::transcode(argElement->getAttribute(tableOutXMLStr));
             this->outAttTableFile = string(charValue);
+            this->attInMemory = true;
             XMLString::release(&charValue);
         }
         else
         {
-            throw RSGISXMLArgumentsException("No \'tableout\' attribute was provided.");
+            this->attInMemory = false;
         }
         XMLString::release(&tableOutXMLStr);
 
@@ -455,11 +457,12 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
         {
             char *charValue = XMLString::transcode(argElement->getAttribute(tableOutXMLStr));
             this->outAttTableFile = string(charValue);
+            this->attInMemory = true;
             XMLString::release(&charValue);
         }
         else
         {
-            throw RSGISXMLArgumentsException("No \'tableout\' attribute was provided.");
+            this->attInMemory = false;
         }
         XMLString::release(&tableOutXMLStr);
         
@@ -546,11 +549,12 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
         {
             char *charValue = XMLString::transcode(argElement->getAttribute(tableOutXMLStr));
             this->outAttTableFile = string(charValue);
+            this->attInMemory = true;
             XMLString::release(&charValue);
         }
         else
         {
-            throw RSGISXMLArgumentsException("No \'tableout\' attribute was provided.");
+            this->attInMemory = false;
         }
         XMLString::release(&tableOutXMLStr);
         
@@ -644,11 +648,12 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
         {
             char *charValue = XMLString::transcode(argElement->getAttribute(tableOutXMLStr));
             this->outAttTableFile = string(charValue);
+            this->attInMemory = true;
             XMLString::release(&charValue);
         }
         else
         {
-            throw RSGISXMLArgumentsException("No \'tableout\' attribute was provided.");
+            this->attInMemory = false;
         }
         XMLString::release(&tableOutXMLStr);
         
@@ -895,11 +900,12 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
         {
             char *charValue = XMLString::transcode(argElement->getAttribute(tableOutXMLStr));
             this->outAttTableFile = string(charValue);
+            this->attInMemory = true;
             XMLString::release(&charValue);
         }
         else
         {
-            throw RSGISXMLArgumentsException("No \'tableout\' attribute was provided.");
+            this->attInMemory = false;
         }
         XMLString::release(&tableOutXMLStr);
         
@@ -1308,11 +1314,12 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
         {
             char *charValue = XMLString::transcode(argElement->getAttribute(tableOutXMLStr));
             this->outAttTableFile = string(charValue);
+            this->attInMemory = true;
             XMLString::release(&charValue);
         }
         else
         {
-            throw RSGISXMLArgumentsException("No \'tableout\' attribute was provided.");
+            this->attInMemory = false;
         }
         XMLString::release(&tableOutXMLStr);
         
@@ -1620,11 +1627,12 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
         {
             char *charValue = XMLString::transcode(argElement->getAttribute(tableOutXMLStr));
             this->outAttTableFile = string(charValue);
+            this->attInMemory = true;
             XMLString::release(&charValue);
         }
         else
         {
-            throw RSGISXMLArgumentsException("No \'tableout\' attribute was provided.");
+            this->attInMemory = false;
         }
         XMLString::release(&tableOutXMLStr);
         
@@ -1760,11 +1768,12 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
         {
             char *charValue = XMLString::transcode(argElement->getAttribute(tableOutXMLStr));
             this->outAttTableFile = string(charValue);
+            this->attInMemory = true;
             XMLString::release(&charValue);
         }
         else
         {
-            throw RSGISXMLArgumentsException("No \'tableout\' attribute was provided.");
+            this->attInMemory = false;
         }
         XMLString::release(&tableOutXMLStr);
         
@@ -1960,11 +1969,12 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
         {
             char *charValue = XMLString::transcode(argElement->getAttribute(tableOutXMLStr));
             this->outAttTableFile = string(charValue);
+            this->attInMemory = true;
             XMLString::release(&charValue);
         }
         else
         {
-            throw RSGISXMLArgumentsException("No \'tableout\' attribute was provided.");
+            this->attInMemory = false;
         }
         XMLString::release(&tableOutXMLStr);
         
@@ -2183,11 +2193,12 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
         {
             char *charValue = XMLString::transcode(argElement->getAttribute(tableOutXMLStr));
             this->outAttTableFile = string(charValue);
+            this->attInMemory = true;
             XMLString::release(&charValue);
         }
         else
         {
-            throw RSGISXMLArgumentsException("No \'tableout\' attribute was provided.");
+            this->attInMemory = false;
         }
         XMLString::release(&tableOutXMLStr);
         
@@ -2426,11 +2437,12 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
         {
             char *charValue = XMLString::transcode(argElement->getAttribute(tableOutXMLStr));
             this->outAttTableFile = string(charValue);
+            this->attInMemory = true;
             XMLString::release(&charValue);
         }
         else
         {
-            throw RSGISXMLArgumentsException("No \'tableout\' attribute was provided.");
+            this->attInMemory = false;
         }
         XMLString::release(&tableOutXMLStr);
         
@@ -3100,23 +3112,33 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
         {
             cout << "A command to apply boolean statements to the attribute table (i.e., for classification)\n";
             cout << "Input Table: " << this->attTableFile << endl;
-            cout << "Output Table: " << this->outAttTableFile << endl;
+            if(this->attInMemory)
+            {
+                cout << "Output Table: " << this->outAttTableFile << endl;
+            }
             
             try
             {
                 cout << "Importing Attribute Table:\n";
                 RSGISAttributeTable *attTable = NULL;
-                if(RSGISAttributeTableMem::findFileType(attTableFile) == rsgis_ascii_attft)
+                if(this->attInMemory)
                 {
-                    attTable = RSGISAttributeTableMem::importFromASCII(attTableFile);
-                }
-                else if(RSGISAttributeTableMem::findFileType(attTableFile) == rsgis_hdf_attft)
-                {
-                    attTable = RSGISAttributeTableMem::importFromHDF5(attTableFile);
+                    if(RSGISAttributeTableMem::findFileType(attTableFile) == rsgis_ascii_attft)
+                    {
+                        attTable = RSGISAttributeTableMem::importFromASCII(attTableFile);
+                    }
+                    else if(RSGISAttributeTableMem::findFileType(attTableFile) == rsgis_hdf_attft)
+                    {
+                        attTable = RSGISAttributeTableMem::importFromHDF5(attTableFile);
+                    }
+                    else
+                    {
+                        throw RSGISAttributeTableException("Could not identify attribute table file type.");
+                    }
                 }
                 else
                 {
-                    throw RSGISAttributeTableException("Could not identify attribute table file type.");
+                    attTable = RSGISAttributeTableHDF::importFromHDF5(attTableFile, false);
                 }
                 cout << "Adding Field\n";
                 attTable->addAttIntField("class", 0);
@@ -3124,9 +3146,12 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
                 attTable->populateIfStatementsWithIdxs(statements);
                 cout << "Apply if statement\n";
                 attTable->applyIfStatements(statements);
-                cout << "Exporting Attribute Table\n";
-                attTable->exportHDF5(outAttTableFile);
-                //attTable->exportASCII(outAttTableFile);
+                if(this->attInMemory)
+                {
+                    cout << "Exporting Attribute Table\n";
+                    attTable->exportHDF5(outAttTableFile);
+                    //attTable->exportASCII(outAttTableFile);
+                }
                 cout << "Finished\n";
                 delete attTable;
             }
