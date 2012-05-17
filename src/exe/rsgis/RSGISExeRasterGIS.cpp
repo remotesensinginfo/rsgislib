@@ -3185,22 +3185,33 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
             {
                 cout << "Importing Attribute Table:\n";
                 RSGISAttributeTable *attTable = NULL;
-                if(RSGISAttributeTableMem::findFileType(attTableFile) == rsgis_ascii_attft)
+                if(this->attInMemory)
                 {
-                    attTable = RSGISAttributeTableMem::importFromASCII(attTableFile);
-                }
-                else if(RSGISAttributeTableMem::findFileType(attTableFile) == rsgis_hdf_attft)
-                {
-                    attTable = RSGISAttributeTableMem::importFromHDF5(attTableFile);
+                    if(RSGISAttributeTableMem::findFileType(attTableFile) == rsgis_ascii_attft)
+                    {
+                        attTable = RSGISAttributeTableMem::importFromASCII(attTableFile);
+                    }
+                    else if(RSGISAttributeTableMem::findFileType(attTableFile) == rsgis_hdf_attft)
+                    {
+                        attTable = RSGISAttributeTableMem::importFromHDF5(attTableFile);
+                    }
+                    else
+                    {
+                        throw RSGISAttributeTableException("Could not identify attribute table file type.");
+                    }
                 }
                 else
                 {
-                    throw RSGISAttributeTableException("Could not identify attribute table file type.");
+                    attTable = RSGISAttributeTableHDF::importFromHDF5(attTableFile, false);
                 }
                 cout << "Adding Fields\n";
                 attTable->addAttributes(attributes);
-                cout << "Exporting Attribute Table\n";
-                attTable->exportHDF5(outAttTableFile);
+                if(this->attInMemory)
+                {
+                    cout << "Exporting Attribute Table\n";
+                    attTable->exportHDF5(outAttTableFile);
+                    //attTable->exportASCII(outAttTableFile);
+                }
                 cout << "Finished\n";
                 
                 delete attributes;
