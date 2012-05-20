@@ -1012,41 +1012,14 @@
 
     <!-- A command to estimate parameters from SAR data --> 
     <rsgis:command algor="estimation" option="dualPolMultiSpeciesClassification | fullPolMultiSpeciesClassification" parameters="heightDensity"
-    input="inputClassData.env" output="output.env"  >
-    
-    <rsgis:estClassParameters     
-        method="simulatedAnnealingAP" 
-        function="2DPoly" 
-        coefficientsHH="heightDensHH_Coeff.mtxt" 
-        coefficientsHV="heightDensHH_Coeff.mtxt"
-        [coefficientsVV="heightDensVV_Coeff.mtxt"]
-        covMatrixP="covMatrixP.mtxt"
-        initialHeight="float" initialDensity="float"
-        minHeight="float" maxHeight="float" minDensity="float" maxDensity="float" heightStep="float" densityStep="float" startTemp="int" ittmax="int" />
+    input="inputClassData.env" output="output.env" >
+    <rsgis:estClassParameters method="simulatedAnnealingAP" function="2DPoly" coefficientsHH="heightDensHH_Coeff.mtxt" coefficientsHV="heightDensHH_Coeff.mtxt" [coefficientsVV="heightDensVV_Coeff.mtxt"] covMatrixP="covMatrixP.mtxt" initialHeight="float" initialDensity="float" minHeight="float" maxHeight="float" minDensity="float" maxDensity="float" heightStep="float" densityStep="float" startTemp="int" ittmax="int" />
     </rsgis:command>
 
     <!-- A command to estimate parameters from SAR data using image objects --> 
-    <rsgis:command algor="estimation" option="dualPolObject | fullPolObject" parameters="heightDensity"
-    input="input.env" output="output.env" object="objects.shp" classField="ClassID" [raster="objects_raster.shp"] [outSHP="output.shp"] >
-    
-    <rsgis:estSlowOptimiserParameters     
-        method="simulatedAnnealingAP" 
-        function="2DPoly" 
-        coefficientsHH="heightDensHH_Coeff.mtxt" 
-        coefficientsHV="heightDensHH_Coeff.mtxt"
-        [coefficientsVV="heightDensVV_Coeff.mtxt"]
-        covMatrixP="covMatrixP.mtxt"
-        initialHeight="float" initialDensity="float"
-        minHeight="float" maxHeight="float" minDensity="float" maxDensity="float" heightStep="float" densityStep="float" startTemp="int" ittmax="int" />
-    <rsgis:estFastOptimiserParameters     
-        method="conjugateGradient" 
-        function="2DPoly" 
-        coefficientsHH="heightDensHH_Coeff.mtxt" 
-        coefficientsHV="heightDensHH_Coeff.mtxt"
-        [coefficientsVV="heightDensVV_Coeff.mtxt"]
-        covMatrixP="covMatrixP.mtxt"
-        initialHeight="float" initialDensity="float"
-        minHeight="float" maxHeight="float" minDensity="float" maxDensity="float" ittmax="int" />
+    <rsgis:command algor="estimation" option="dualPolObject | fullPolObject" parameters="heightDensity" input="input.env" output="output.env" object="objects.shp" classField="ClassID" [raster="objects_raster.shp"] [outSHP="output.shp"] >
+        <rsgis:estSlowOptimiserParameters method="simulatedAnnealingAP" function="2DPoly" coefficientsHH="heightDensHH_Coeff.mtxt" coefficientsHV="heightDensHH_Coeff.mtxt" [coefficientsVV="heightDensVV_Coeff.mtxt"] covMatrixP="covMatrixP.mtxt" initialHeight="float" initialDensity="float" minHeight="float" maxHeight="float" minDensity="float" maxDensity="float" heightStep="float" densityStep="float" startTemp="int" ittmax="int" />
+        <rsgis:estFastOptimiserParameters method="conjugateGradient" function="2DPoly" coefficientsHH="heightDensHH_Coeff.mtxt" coefficientsHV="heightDensHH_Coeff.mtxt" [coefficientsVV="heightDensVV_Coeff.mtxt"] covMatrixP="covMatrixP.mtxt" initialHeight="float" initialDensity="float" minHeight="float" maxHeight="float" minDensity="float" maxDensity="float" ittmax="int" />
     </rsgis:command>
 
     <!-- TODO A command to -->
