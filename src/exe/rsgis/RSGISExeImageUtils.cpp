@@ -4046,7 +4046,7 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
                 }
                 
                 RSGISImageUtils imgUtils;
-                GDALDataset *outDataset = imgUtils.createCopy(inDataset, this->outputImage, this->imageFormat, outDataType);
+                GDALDataset *outDataset = imgUtils.createCopy(inDataset, this->numBands, this->outputImage, this->imageFormat, outDataType);
                 imgUtils.assignValGDALDataset(outDataset, this->dataValue);
                 
                 GDALClose(inDataset);
