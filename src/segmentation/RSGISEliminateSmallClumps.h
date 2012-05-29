@@ -60,6 +60,7 @@ namespace rsgis{namespace segment{
         RSGISEliminateSmallClumps();
         void eliminateSmallClumps(GDALDataset *spectral, GDALDataset *clumps, unsigned int minClumpSize, float specThreshold) throw(RSGISImageCalcException);
         void stepwiseEliminateSmallClumps(GDALDataset *spectral, GDALDataset *clumps, unsigned int minClumpSize, float specThreshold) throw(RSGISImageCalcException);
+        void stepwiseEliminateSmallClumpsNoMean(GDALDataset *spectral, GDALDataset *clumps, unsigned int minClumpSize, float specThreshold) throw(RSGISImageCalcException);
         void stepwiseEliminateSmallClumpsWithAtt(GDALDataset *spectral, GDALDataset *clumps, string outputImageFile, string imageFormat, bool useImageProj, string proj, RSGISAttributeTable *attTable, unsigned int minClumpSize, float specThreshold, bool outputWithConsecutiveFIDs) throw(RSGISImageCalcException);
         ~RSGISEliminateSmallClumps();
     protected:
