@@ -30,19 +30,62 @@
 #
 # History:
 # Version 1.0 - Created.
+# Version 1.1 - Updated to parse XML command list and print in format for
+#               rsgiscmd
 #
 #############################################################################
 
 import sys, re, os
 import tempfile as tempfile
 
-incommand = ''
-rsgiscmd = ''
+def getCommands(algorithm):
 
-first = True
+    ''' Convert RSGISLib XML commands list in to list of commands for rsgiscmd '''
 
-if len(sys.argv) == 1 or (len(sys.argv) >= 2 and sys.argv[1] == '--help'):
-    print '''rsgiscmd - Generates and runs an XML file within RSGISLib, using command line options.
+    xmlFile = open("@CMAKE_INSTALL_PREFIX@/doc/RSGISLib_XML_Listing.xml",'r')
+    
+    xmlstring = ""
+    
+    singleLineCommand = False
+    
+    for line in xmlFile:
+        if line.find("<!--") < 0:
+            xmlstring = xmlstring + line
+    
+    xmlstring = re.sub("\n","",xmlstring)
+    xmlstring = re.sub('<rsgis:commands xmlns:rsgis="http://www.rsgislib.org/xml/">',"",xmlstring)
+    xmlstring = re.sub("/>","",xmlstring)
+    xmlstring = re.sub("\[","",xmlstring)
+    xmlstring = re.sub("\]","",xmlstring)
+    xmlstring = re.sub("<rsgis:command",";",xmlstring)
+    xmlstring = re.sub('="','$',xmlstring)
+    xmlstring = re.sub('"','$',xmlstring)
+    xmlstringCommand = xmlstring.split(';',xmlstring.count(';'))
+    outCommands = ''
+    selectedOutCommands = ''
+    for line in xmlstringCommand:
+        commandString = ''
+        xmlCommandOptions = line.split('$',line.count('$'))
+        i = 0
+        while i < (len(xmlCommandOptions)-1):
+            if(xmlCommandOptions[i].find("<rsgis:")) > 0:
+                i = len(xmlCommandOptions)
+                commandString = ''
+            else:
+                commandString = commandString + ' --' + xmlCommandOptions[i].strip()+ ' ' + xmlCommandOptions[i+1].strip()
+                i = i + 2
+        if commandString != '':
+            outCommands = outCommands + commandString + '\n'
+            if commandString.find('--algor ' + algorithm) > 0:
+                selectedOutCommands = selectedOutCommands + commandString + '\n'
+    
+    return selectedOutCommands, outCommands
+
+def getAvailableCommands():
+    os.system('rsgisexe -l')
+
+
+helpText = '''rsgiscmd - Generates and runs an XML file within RSGISLib, using command line options.
 Usage:
     rsgiscmd --xml '<rsgis:command XMLOPTIONS />'
 or
@@ -51,13 +94,61 @@ eg:
     rsgiscmd --algor imagecalc --option apply2VarFunction --input INPUT_IMAGE.env 
         --output OUTPUT_IMAGE.env --function 2DPoly --coefficients COEFFICIENTS
 
+To get a list of available algorithms, use:
+    rsgiscmd -l
+
+To get available options for selected algorithm use:
+    rsgiscmd -h algorithm
+or to see options for all algorithms use:
+    rsgiscmd -h all
+
+Note: not all algorithms are availabe using rsgiscmd. To see
+all available commands in RSGISLib using the main XML interface
+run:
+    rsgislibxmllist
+or open:
+    @CMAKE_INSTALL_PREFIX@/doc/RSGISLib_XML_Listing.xml
+
 This script was distributed with @RSGISLIB_PACKAGE_STRING@.
 Copyright (C) @RSGISLIB_COPYRIGHT_YEAR@ Peter Bunting and Daniel Clewley
 
 Report bugs on the trac or directly to @RSGISLIB_PACKAGE_BUGREPORT@
-
 '''
+
+if len(sys.argv) == 1: 
+    print helpText
     exit()
+
+elif (len(sys.argv) == 2):
+    if(sys.argv[1] == '--help' or sys.argv[1] == '-h'):
+        print helpText
+        exit()
+
+elif (len(sys.argv) >= 3):
+    if(sys.argv[1] == '--help' or sys.argv[1] == '-h'):
+        algorithm = sys.argv[2].strip()
+        (selectedOutCommands, allOutCommands) = getCommands(algorithm)
+        
+        if algorithm == 'all':
+            if allOutCommands != '':
+                print allOutCommands
+            else:
+                print helpText
+        
+        elif selectedOutCommands != '':
+            print selectedOutCommands
+        else:
+            print helpText
+        exit()
+        
+    elif(sys.argv[1] == '-l'):
+        getAvailableCommands()
+        exit()
+
+incommand = ''
+rsgiscmd = ''
+
+first = True
 
 # Check for XML
 if len(sys.argv) == 3 and sys.argv[1] == '--xml':
