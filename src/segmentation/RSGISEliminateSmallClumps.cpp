@@ -541,8 +541,8 @@ namespace rsgis{namespace segment{
                     pair2Merge.second->meanVals[b] = pair2Merge.second->sumVals[b]/pair2Merge.second->pxls->size();
                 }
 
-                delete pair2Merge.first->sumVals;
-                delete pair2Merge.first->meanVals;
+                delete[] pair2Merge.first->sumVals;
+                delete[] pair2Merge.first->meanVals;
                 delete pair2Merge.first->pxls;
                 pair2Merge.first->active = false;
             }
@@ -558,8 +558,8 @@ namespace rsgis{namespace segment{
             {
                 if((*iterClumps)->active)
                 {
-                    delete (*iterClumps)->sumVals;
-                    delete (*iterClumps)->meanVals;
+                    delete[] (*iterClumps)->sumVals;
+                    delete[] (*iterClumps)->meanVals;
                     delete (*iterClumps)->pxls;
                 }
                 delete (*iterClumps);
@@ -691,7 +691,6 @@ namespace rsgis{namespace segment{
                     }
                 }
             }
-            
             cout << "Found " << smallClumps.size() << " small clumps to be eliminated." << endl;
             
             mergeLookupTab.clear();
@@ -821,7 +820,7 @@ namespace rsgis{namespace segment{
                     pair2Merge.second->sumVals[b] += pair2Merge.first->sumVals[b];
                 }
                 
-                delete pair2Merge.first->sumVals;
+                delete[] pair2Merge.first->sumVals;
                 delete pair2Merge.first->pxls;
                 pair2Merge.first->active = false;
             }
@@ -837,7 +836,7 @@ namespace rsgis{namespace segment{
             {
                 if((*iterClumps)->active)
                 {
-                    delete (*iterClumps)->sumVals;
+                    delete[] (*iterClumps)->sumVals;
                     delete (*iterClumps)->pxls;
                 }
                 delete (*iterClumps);
