@@ -534,6 +534,29 @@ void RSGISExeSegment::retrieveParameters(DOMElement *argElement) throw(RSGISXMLA
         }
 		XMLString::release(&minSizeXMLStr);
         
+        
+        XMLCh *storeMeanXMLStr = XMLString::transcode("storemean");
+		if(argElement->hasAttribute(storeMeanXMLStr))
+		{
+			XMLCh *yesStr = XMLString::transcode("yes");
+			const XMLCh *storeMValue = argElement->getAttribute(storeMeanXMLStr);
+			
+			if(XMLString::equals(storeMValue, yesStr))
+			{
+				this->storeMean = true;
+			}
+			else
+			{
+				this->storeMean = false;
+			}
+			XMLString::release(&yesStr);
+		}
+		else
+		{
+            this->storeMean = true;
+		}
+		XMLString::release(&storeMeanXMLStr);
+        
         XMLCh *formatXMLStr = XMLString::transcode("format");
 		if(argElement->hasAttribute(formatXMLStr))
 		{
@@ -3305,6 +3328,22 @@ void RSGISExeSegment::runAlgorithm() throw(RSGISException)
         cout << "Input Image: " << this->inputImage << endl;
         cout << "Clump Image: " << this->clumpsImage << endl;
         cout << "Output Image: " << this->outputImage << endl;
+        if(processInMemory)
+        {
+            cout << "Processing to be undertaken in Memory\n";
+        }
+        else
+        {
+            cout << "Processing to undertaken from disk\n";
+        }
+        if(this->storeMean)
+        {
+            cout << "Mean values are stored in memory.\n";
+        }
+        else
+        {
+            cout << "Mean values are calculated at runtime.\n";
+        }
         
         try
         {
@@ -3351,7 +3390,14 @@ void RSGISExeSegment::runAlgorithm() throw(RSGISException)
             
             cout << "Eliminant Clumps\n";
             RSGISEliminateSmallClumps eliminate;
-            eliminate.stepwiseEliminateSmallClumps(spectralDataset, resultDataset, minClumpSize, specThreshold);
+            if(this->storeMean)
+            {
+                eliminate.stepwiseEliminateSmallClumps(spectralDataset, resultDataset, minClumpSize, specThreshold);
+            }
+            else
+            {
+                eliminate.stepwiseEliminateSmallClumpsNoMean(spectralDataset, resultDataset, minClumpSize, specThreshold);
+            }
             
             if(this->processInMemory)
             {
@@ -4549,6 +4595,14 @@ void RSGISExeSegment::printParameters()
         else
         {
             cout << "Processing to undertaken from disk\n";
+        }
+        if(this->storeMean)
+        {
+            cout << "Mean values are stored in memory.\n";
+        }
+        else
+        {
+            cout << "Mean values are calculated at runtime.\n";
         }
     }
     else if(option == RSGISExeSegment::clump)

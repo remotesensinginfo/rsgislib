@@ -87,6 +87,19 @@ namespace rsgis
             bool active;
         };
         
+        struct ImgClumpSum
+        {
+            ImgClumpSum(unsigned int clumpID)
+            {
+                this->clumpID = clumpID;
+                this->active = true;
+            };
+            unsigned int clumpID;
+            vector<PxlLoc> *pxls;
+            float *sumVals;
+            bool active;
+        };
+        
         struct ImgClumpMean
         {
             ImgClumpMean(unsigned long clumpID)

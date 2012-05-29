@@ -139,6 +139,7 @@ class RSGISExeSegment : public RSGISAlgorithmParameters
         bool importLUT;
         string exportLUTFile;
         bool exportLUT;
+        bool storeMean;
 	};
 
 #endif
