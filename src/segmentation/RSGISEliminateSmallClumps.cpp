@@ -594,8 +594,8 @@ namespace rsgis{namespace segment{
             {
                 tmpBand = new RSGISBandAttStats();
                 tmpBand->band = i + 1;
-                tmpBand->calcMean = true;
-                tmpBand->meanField = string("b") + textUtils.uInt32bittostring(i) + string("_Mean");
+                tmpBand->calcMean = false;//true;
+                //tmpBand->meanField = string("b") + textUtils.uInt32bittostring(i) + string("_Mean");
                 tmpBand->calcSum = true;
                 tmpBand->sumField = string("b") + textUtils.uInt32bittostring(i) + string("_Sum");
                 tmpBand->calcMax = false;
@@ -822,10 +822,10 @@ namespace rsgis{namespace segment{
                 for(vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
                 {
                     pFeat->floatFields->at((*iterBands)->sumIdx) += mFeat->floatFields->at((*iterBands)->sumIdx);
-                    pFeat->floatFields->at((*iterBands)->meanIdx) = pFeat->floatFields->at((*iterBands)->sumIdx) / pFeat->intFields->at(pxlCountIdx);
+                    //pFeat->floatFields->at((*iterBands)->meanIdx) = pFeat->floatFields->at((*iterBands)->sumIdx) / pFeat->intFields->at(pxlCountIdx);
                 }
                 
-                for(vector<size_t>::iterator iterNeigh = pFeat->neighbours->begin(); iterNeigh != pFeat->neighbours->end(); )
+                for(vector<boost::uint_fast32_t>::iterator iterNeigh = pFeat->neighbours->begin(); iterNeigh != pFeat->neighbours->end(); )
                 {
                     if((*iterNeigh) == mFeat->fid)
                     {
@@ -838,12 +838,12 @@ namespace rsgis{namespace segment{
                 }
                 
                 alreadyNeighbour = false;
-                for(vector<size_t>::iterator iterFeatNeigh = mFeat->neighbours->begin(); iterFeatNeigh != mFeat->neighbours->end(); ++iterFeatNeigh)
+                for(vector<boost::uint_fast32_t>::iterator iterFeatNeigh = mFeat->neighbours->begin(); iterFeatNeigh != mFeat->neighbours->end(); ++iterFeatNeigh)
                 {
                     if((*iterFeatNeigh) != pFeat->fid)
                     {
                         alreadyNeighbour = false;
-                        for(vector<size_t>::iterator iterNeigh = pFeat->neighbours->begin(); iterNeigh != pFeat->neighbours->end(); ++iterNeigh)
+                        for(vector<boost::uint_fast32_t>::iterator iterNeigh = pFeat->neighbours->begin(); iterNeigh != pFeat->neighbours->end(); ++iterNeigh)
                         {
                             if((*iterFeatNeigh) == (*iterNeigh))
                             {
@@ -929,7 +929,7 @@ namespace rsgis{namespace segment{
             double distance = 0;
             bool first = true;
             RSGISFeature *nFeat = NULL;
-            for(vector<size_t>::iterator iterFeat = feat->neighbours->begin(); iterFeat != feat->neighbours->end(); ++iterFeat)
+            for(vector<boost::uint_fast32_t>::iterator iterFeat = feat->neighbours->begin(); iterFeat != feat->neighbours->end(); ++iterFeat)
             {
                 nFeat = attTable->getFeature(*iterFeat);
                 attTable->holdFID(nFeat->fid);
@@ -971,11 +971,16 @@ namespace rsgis{namespace segment{
     double RSGISEliminateFeature::calcDistance(RSGISFeature *feat1, RSGISFeature *feat2, vector<RSGISBandAttStats*> *bandStats)throw(RSGISAttributeTableException)
     {
         double dist = 0;
+        double mean1 = 0;
+        double mean2 = 0;
         try
         {
             for(vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
             {
-                dist += pow(feat1->floatFields->at((*iterBands)->meanIdx) - feat2->floatFields->at((*iterBands)->meanIdx), 2);
+                mean1 = feat1->floatFields->at((*iterBands)->sumIdx) / feat1->intFields->at(pxlCountIdx);
+                mean2 = feat2->floatFields->at((*iterBands)->sumIdx) / feat2->intFields->at(pxlCountIdx);
+                dist += pow((mean1 - mean2), 2);
+                //dist += pow(feat1->floatFields->at((*iterBands)->meanIdx) - feat2->floatFields->at((*iterBands)->meanIdx), 2);
             }
             
             if(dist != 0)

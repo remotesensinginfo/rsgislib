@@ -109,7 +109,7 @@ namespace rsgis{namespace rastergis{
             {
                 feature->stringFields->push_back("");
             }
-            feature->neighbours = new vector<size_t>();
+            feature->neighbours = new vector<boost::uint_fast32_t>();
             
             attTable->push_back(feature);
         }
@@ -138,7 +138,7 @@ namespace rsgis{namespace rastergis{
             feature->intFields = new vector<long>();
             feature->floatFields = new vector<double>();
             feature->stringFields = new vector<string>();
-            feature->neighbours = new vector<size_t>();
+            feature->neighbours = new vector<boost::uint_fast32_t>();
             
             attTable->push_back(feature);
         }
@@ -633,7 +633,7 @@ namespace rsgis{namespace rastergis{
             for(size_t i = startFID; i < endFID; ++i)
             {
                 feat = this->attTable->at(i);
-                for(vector<size_t>::iterator iterNeighbours = feat->neighbours->begin(); iterNeighbours != feat->neighbours->end(); ++iterNeighbours)
+                for(vector<boost::uint_fast32_t>::iterator iterNeighbours = feat->neighbours->begin(); iterNeighbours != feat->neighbours->end(); ++iterNeighbours)
                 {
                     if(first)
                     {
@@ -914,7 +914,7 @@ namespace rsgis{namespace rastergis{
                         {
                             feature->stringFields->push_back(tokens->at(tokenIdx++));
                         }
-                        feature->neighbours = new vector<size_t>();
+                        feature->neighbours = new vector<boost::uint_fast32_t>();
                         
                         attTableObj->attTable->push_back(feature);                        
                     }
@@ -1391,7 +1391,7 @@ namespace rsgis{namespace rastergis{
                         }
                     }
                     feature->stringFields = new vector<string>();
-                    feature->neighbours = new vector<size_t>();
+                    feature->neighbours = new vector<boost::uint_fast32_t>();
                     feature->neighbours->reserve(neighbourVals[j].length);
 
                     for(hsize_t n = 0; n < neighbourVals[j].length; ++n)
@@ -1538,7 +1538,7 @@ namespace rsgis{namespace rastergis{
                     }
                 }
                 feature->stringFields = new vector<string>();
-                feature->neighbours = new vector<size_t>();
+                feature->neighbours = new vector<boost::uint_fast32_t>();
                 feature->neighbours->reserve(neighbourVals[j].length);
                 
                 for(hsize_t n = 0; n < neighbourVals[j].length; ++n)
