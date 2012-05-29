@@ -571,7 +571,7 @@ namespace rsgis{namespace rastergis{
             outTxtFile << (*(*this))->fid;
             if((*(*this))->neighbours != NULL)
             {
-                for(vector<size_t>::iterator iterNeighbours = (*(*this))->neighbours->begin(); iterNeighbours != (*(*this))->neighbours->end(); ++iterNeighbours)
+                for(vector<boost::uint_fast32_t>::iterator iterNeighbours = (*(*this))->neighbours->begin(); iterNeighbours != (*(*this))->neighbours->end(); ++iterNeighbours)
                 {
                     outTxtFile << "," << *iterNeighbours;
                 }

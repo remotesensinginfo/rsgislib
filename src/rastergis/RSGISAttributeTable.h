@@ -107,12 +107,12 @@ namespace rsgis{namespace rastergis{
     
     struct RSGISFeature
     {
-        size_t fid;
+        boost::uint_fast32_t fid;
         vector<bool> *boolFields;
         vector<long> *intFields;
         vector<double> *floatFields;
         vector<string> *stringFields;
-        vector<size_t> *neighbours;
+        vector<boost::uint_fast32_t> *neighbours;
     };
     
     typedef struct {

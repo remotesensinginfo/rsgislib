@@ -1627,7 +1627,7 @@ namespace rsgis{namespace rastergis{
             for(size_t i = startFID; i < endFID; ++i)
             {
                 feat = this->getFeature(i);
-                for(vector<size_t>::iterator iterNeighbours = feat->neighbours->begin(); iterNeighbours != feat->neighbours->end(); ++iterNeighbours)
+                for(vector<boost::uint_fast32_t>::iterator iterNeighbours = feat->neighbours->begin(); iterNeighbours != feat->neighbours->end(); ++iterNeighbours)
                 {
                     if(first)
                     {
@@ -1928,7 +1928,7 @@ namespace rsgis{namespace rastergis{
                     }
                 }
                 this->featCache[i]->stringFields = new vector<string>();
-                this->featCache[i]->neighbours = new vector<size_t>();
+                this->featCache[i]->neighbours = new vector<boost::uint_fast32_t>();
                 if(neighbourVals[n].length > 0)
                 {
                     this->featCache[i]->neighbours->reserve(neighbourVals[n].length);

@@ -56,7 +56,7 @@ namespace rsgis{namespace rastergis{
         inline void addNeighbourToFeature(RSGISFeature *feat, unsigned long long neighbourID)
         {
             bool foundID = false;
-            for(vector<size_t>::iterator iterNeigh = feat->neighbours->begin(); iterNeigh != feat->neighbours->end(); ++iterNeigh)
+            for(vector<boost::uint_fast32_t>::iterator iterNeigh = feat->neighbours->begin(); iterNeigh != feat->neighbours->end(); ++iterNeigh)
             {
                 if((*iterNeigh) == neighbourID)
                 {
