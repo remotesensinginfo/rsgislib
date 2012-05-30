@@ -43,6 +43,7 @@
 #include "segmentation/RSGISRegionGrowingFromClumps.h"
 #include "segmentation/RSGISMergeSmallClumps.h"
 #include "segmentation/RSGISLabelPixelsUsingClusters.h"
+#include "segmentation/RSGISLabelPixelsUsingPixels.h"
 #include "segmentation/RSGISRegionGrowSegmentsPixels.h"
 #include "segmentation/RSGISDefineSpectralDivision.h"
 #include "segmentation/RSGISEliminateSinglePixels.h"
@@ -88,6 +89,7 @@ class RSGISExeSegment : public RSGISAlgorithmParameters
             relabelclumps,
             specgrpweighted,
             labelsfromclusters,
+            labelsfrompixels,
             growregionspixelsauto,
             growregionspixels,
             spectraldiv,
