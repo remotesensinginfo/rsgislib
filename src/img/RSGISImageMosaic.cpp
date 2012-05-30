@@ -525,10 +525,25 @@ namespace rsgis{namespace img{
                     throw RSGISImageException(message.c_str());
                 }
                 
-				if(dataset->GetRasterCount() != numberBands)
-				{
-					throw RSGISImageBandException("All input images need to have the same number of bands.");
-				}
+                if(!bandsDefined)
+                {
+                    if(dataset->GetRasterCount() != numberBands)
+                    {
+                        throw RSGISImageBandException("All input images need to have the same number of bands.");
+                    }
+                }
+                else 
+                {
+                    for(vector<int>::iterator iterBands = bands.begin(); iterBands != bands.end(); ++iterBands)
+                    {
+                        if(((*iterBands) <= 0) | ((*iterBands) > dataset->GetRasterCount()))
+                        {
+                            cerr << "Band = " << *iterBands << endl;
+                            string message = string("Band is not within the input dataset ") + inputImages[i];
+                            throw RSGISImageException(message.c_str());
+                        }
+                    }
+                }
                 GDALClose(dataset);
 			}
             
