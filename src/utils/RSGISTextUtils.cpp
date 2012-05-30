@@ -202,6 +202,31 @@ namespace rsgis{namespace utils{
 		
 		return wholeFile;
 	}
+    
+    void RSGISTextUtils::writeStringToFile(string file, string output) throw(RSGISTextException)
+    {
+        try 
+        {
+            ofstream outFile;
+            outFile.open(file.c_str());
+            if(outFile.is_open())
+            {
+                outFile << output << endl;
+                outFile.flush();
+                outFile.close();
+            }
+            else 
+            {
+                string message = string("File \'") + file + string("\' could not be created.");
+                throw RSGISTextException(message);
+            }
+            
+        }
+        catch (RSGISTextException &e)
+        {
+            throw e;
+        }
+    }
 	
 	double RSGISTextUtils::strtodouble(string inValue) throw(RSGISTextException)
 	{

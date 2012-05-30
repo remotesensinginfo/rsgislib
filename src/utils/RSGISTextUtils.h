@@ -54,6 +54,7 @@ namespace rsgis{namespace utils{
 			string removeNewLine(string line);
 			
 			string readFileToString(string input) throw(RSGISTextException);
+            void writeStringToFile(string file, string output) throw(RSGISTextException);
 			
 			double strtodouble(string inValue)throw(RSGISTextException);
 			float strtofloat(string inValue)throw(RSGISTextException);
