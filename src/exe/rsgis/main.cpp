@@ -35,6 +35,7 @@
 #include "common/RSGISAlgorParamsFactory.h"
 
 #include "utils/RSGISFileUtils.h"
+#include "utils/RSGISTextUtils.h"
 
 #include "RSGISExeStackBands.h"
 #include "RSGISExeSARSaatchiBiomass.h"
@@ -73,6 +74,7 @@ class Control
 		void runXML(string xmlFile);
 		void printParameters(string xmlFile);
 		void listAlgorithms();
+        void createBlankXMLFile(string xmlFile);
 		void help(string algor);
 		void help();
         void versionInfo();
@@ -286,6 +288,44 @@ void Control::listAlgorithms()
 	}
 }
 
+void Control::createBlankXMLFile(string xmlFile)
+{
+    try
+    {
+        struct tm *timeInfo = 0;
+        time_t rawStartTime = 0;
+        
+        time(&rawStartTime);
+        timeInfo = localtime(&rawStartTime);
+        string formatedTime = string(asctime(timeInfo));
+        formatedTime = formatedTime.substr(0, (formatedTime.length()-1));
+        char buffer [80];
+        strftime (buffer,80,"%Y",timeInfo);
+        string year = string(buffer);
+        
+        string newFileText = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n";
+		newFileText += "<!--\n";
+		newFileText += "    Description:\n";
+		newFileText += "        XML File for execution within RSGISLib\n";
+		newFileText += string("    Created by **ME** on ") + formatedTime + string(".\n");
+		newFileText += string("    Copyright (c) ") + year + string(" **Organisation**. All rights reserved.\n");
+		newFileText += "-->\n\n";
+		newFileText += "<rsgis:commands xmlns:rsgis=\"http://www.rsgislib.org/xml/\">\n";
+		newFileText += "\n    <!-- ENTER YOUR XML HERE -->\n\n";
+		newFileText += "</rsgis:commands>\n";
+        
+        
+        RSGISTextUtils textUtils;
+        textUtils.writeStringToFile(xmlFile, newFileText);
+        
+        cout << xmlFile << " has been created\n";
+    }
+    catch(RSGISException& e)
+	{
+		cerr << "ERROR: " << e.what() << endl;
+	}
+}
+
 void Control::help(string algor)
 {
 	RSGISAlgorithmParameters *algorParams;
@@ -319,6 +359,7 @@ void Control::help()
 	cout << "-h - Prints this messgae\n";
 	cout << "-l - List available algorithms\n";
 	cout << "-h algorithm - Print help for the algorithm specified\n";
+    cout << "-b xml file - Creates a blank rsgislib xml file to be populated with commands\n";
 	cout << "-p xml file - Parses and prints the parameters for the xml file specified\n";
 	cout << "-x xml file - Executes the application with the algorithms and parameters specified\n";
     cout << "-v - Prints the version information for the software\n";
@@ -419,6 +460,23 @@ int main(int argc, char **argv)
 				else if(argXML->numVals == 1)
 				{
 					ctrl->printParameters(argXML->value[0]);
+				}
+				else
+				{
+					ctrl->help();
+				}
+				delete argXML;
+			}
+            else if(cmdParser->argumentPresent(string("-b")))
+			{
+				argpair *argXML = cmdParser->findArgument(string("-b"));
+				if(argXML == NULL)
+				{
+					throw RSGISCommandLineException("An XML file needs to be provided");
+				}
+				else if(argXML->numVals == 1)
+				{
+					ctrl->createBlankXMLFile(argXML->value[0]);
 				}
 				else
 				{
