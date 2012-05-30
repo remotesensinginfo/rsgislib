@@ -621,8 +621,7 @@ namespace rsgis{namespace segment{
                 }
             }
         }
-        vector<ImgClumpSum*> *clumpTable = new vector<ImgClumpSum*>();
-        clumpTable->reserve(maxClumpIdx);
+        ImgClumpSum **clumpTable = new ImgClumpSum*[maxClumpIdx];
         
         cout << "Build clump table\n";
         ImgClumpSum *cClump = NULL;
@@ -637,11 +636,11 @@ namespace rsgis{namespace segment{
             {
                 cClump->sumVals[n] = 0;
             }
-            clumpTable->push_back(cClump);
+            clumpTable[i] = cClump;
         }
         
-        deque<ImgClumpSum*> smallClumps;
-        vector< pair<ImgClumpSum*, ImgClumpSum*> > mergeLookupTab;
+        deque<unsigned int> smallClumps;
+        vector< pair<unsigned int, unsigned int> > mergeLookupTab;
         
         cout << "Calculate Initial Clump Means\n";
         for(unsigned int i = 0; i < height; ++i)
@@ -655,7 +654,7 @@ namespace rsgis{namespace segment{
             {
                 if(clumpIdxs[j] != 0)
                 {
-                    cClump = clumpTable->at(clumpIdxs[j] - 1);
+                    cClump = clumpTable[clumpIdxs[j] - 1];
                     for(unsigned int n = 0; n < numSpecBands; ++n)
                     {
                         cClump->sumVals[n] += spectralVals[n][j];
@@ -665,7 +664,7 @@ namespace rsgis{namespace segment{
             }
         }        
 
-        cout << "There are " << clumpTable->size() << " clumps.\n";
+        cout << "There are " << maxClumpIdx << " clumps.\n";
         
         PxlLoc tLoc;
         list<unsigned long> neighbours;
@@ -675,19 +674,21 @@ namespace rsgis{namespace segment{
         float distance = 0;
         float cMean = 0;
         float tMean = 0;
+        unsigned int idx = 0;
         
         cout << "Eliminating Small Clumps." << endl;
         long smallClumpsCounter = 0;
         for(unsigned int clumpArea = 1; clumpArea <= minClumpSize; ++clumpArea)
         {
             cout << "Eliminating clumps of size " << clumpArea << endl;
-            for(vector<ImgClumpSum*>::iterator iterClumps = clumpTable->begin(); iterClumps != clumpTable->end(); ++iterClumps)
+            //for(vector<ImgClumpSum*>::iterator iterClumps = clumpTable->begin(); iterClumps != clumpTable->end(); ++iterClumps)
+            for(unsigned int i = 0; i < maxClumpIdx; ++i)
             {
-                if(((*iterClumps) != NULL) && ((*iterClumps)->active))
+                if((clumpTable[i] != NULL) && (clumpTable[i]->active))
                 {
-                    if((*iterClumps)->pxls->size() <= clumpArea)
+                    if(clumpTable[i]->pxls->size() <= clumpArea)
                     {
-                        smallClumps.push_back(*iterClumps);
+                        smallClumps.push_back(i);
                     }
                 }
             }
@@ -696,7 +697,8 @@ namespace rsgis{namespace segment{
             mergeLookupTab.clear();
             while(smallClumps.size() > 0)
             {
-                cClump = smallClumps.front();
+                idx = smallClumps.front();
+                cClump = clumpTable[idx];
                 smallClumps.pop_front();
                 // Check that the clump was not selected for a merging already and therefore over minimum size...
                 if((cClump->active) & (cClump->pxls->size() < minClumpSize))
@@ -751,12 +753,12 @@ namespace rsgis{namespace segment{
                     firstNeighbourTested = true;
                     for(list<unsigned long>::iterator iterClumps = neighbours.begin(); iterClumps != neighbours.end(); ++iterClumps)
                     {
-                        if(clumpTable->at((*iterClumps)-1)->pxls->size() > cClump->pxls->size())
+                        if(clumpTable[(*iterClumps)-1]->pxls->size() > cClump->pxls->size())
                         {
                             for(unsigned int b = 0; b < numSpecBands; ++b)
                             {
                                 cMean = cClump->sumVals[b] / cClump->pxls->size();
-                                tMean = clumpTable->at((*iterClumps)-1)->sumVals[b] / clumpTable->at((*iterClumps)-1)->pxls->size();
+                                tMean = clumpTable[(*iterClumps)-1]->sumVals[b] / clumpTable[(*iterClumps)-1]->pxls->size();
                                 if(b == 0)
                                 {
                                     distance = (cMean - tMean)*(cMean - tMean);
@@ -789,8 +791,8 @@ namespace rsgis{namespace segment{
                         if(closestNeighbourDist < specThreshold)
                         {
                             // PUT INTO LOOK UP TABLE TO BE APPLIED AFTERWARDS.
-                            tClump = clumpTable->at(closestNeighbour-1);
-                            pair<ImgClumpSum*, ImgClumpSum*> pair2Merge = pair<ImgClumpSum*, ImgClumpSum*>(cClump, tClump);
+                            tClump = clumpTable[closestNeighbour-1];
+                            pair<unsigned int, unsigned int> pair2Merge = pair<unsigned int, unsigned int>(cClump->clumpID-1, tClump->clumpID-1);
                             mergeLookupTab.push_back(pair2Merge);
                         }
                     }
@@ -801,28 +803,30 @@ namespace rsgis{namespace segment{
             }
             
             // Update Clump Table
-            pair<ImgClumpSum*, ImgClumpSum*> pair2Merge;
+            pair<unsigned int, unsigned int> pair2Merge;
             for(size_t idx = 0; idx < mergeLookupTab.size(); ++idx)
             {
                 pair2Merge = mergeLookupTab.at(idx);
                 
-                closestNeighbour = pair2Merge.second->clumpID;
-                for(size_t n = 0; n < pair2Merge.first->pxls->size(); ++n)
+                closestNeighbour = clumpTable[pair2Merge.second]->clumpID;
+                for(size_t n = 0; n < clumpTable[pair2Merge.first]->pxls->size(); ++n)
                 {
-                    tLoc = pair2Merge.first->pxls->at(n);
-                    pair2Merge.second->pxls->push_back(tLoc);
+                    tLoc = clumpTable[pair2Merge.first]->pxls->at(n);
+                    clumpTable[pair2Merge.second]->pxls->push_back(tLoc);
                     
                     // Update Pixel Values - in clump image.
                     clumpBand->RasterIO(GF_Write, tLoc.xPos, tLoc.yPos, 1, 1, &closestNeighbour, 1, 1, GDT_UInt32, 0, 0);
                 }
                 for(unsigned int b = 0; b < numSpecBands; ++b)
                 {
-                    pair2Merge.second->sumVals[b] += pair2Merge.first->sumVals[b];
+                    clumpTable[pair2Merge.second]->sumVals[b] += clumpTable[pair2Merge.first]->sumVals[b];
                 }
                 
-                delete[] pair2Merge.first->sumVals;
-                delete pair2Merge.first->pxls;
-                pair2Merge.first->active = false;
+                delete[] clumpTable[pair2Merge.first]->sumVals;
+                delete clumpTable[pair2Merge.first]->pxls;
+                clumpTable[pair2Merge.first]->active = false;
+                delete clumpTable[pair2Merge.first];
+                clumpTable[pair2Merge.first] = NULL;
             }
             cout << "Eliminated " << smallClumpsCounter << " small clumps\n";
         }
@@ -830,16 +834,17 @@ namespace rsgis{namespace segment{
         
         
         
-        for(vector<ImgClumpSum*>::iterator iterClumps = clumpTable->begin(); iterClumps != clumpTable->end(); ++iterClumps)
+        //for(vector<ImgClumpSum*>::iterator iterClumps = clumpTable->begin(); iterClumps != clumpTable->end(); ++iterClumps)
+        for(unsigned int i = 0; i < maxClumpIdx; ++i)
         {
-            if((*iterClumps) != NULL)
+            if(clumpTable[i] != NULL)
             {
-                if((*iterClumps)->active)
+                if(clumpTable[i]->active)
                 {
-                    delete[] (*iterClumps)->sumVals;
-                    delete (*iterClumps)->pxls;
+                    delete[] clumpTable[i]->sumVals;
+                    delete clumpTable[i]->pxls;
                 }
-                delete (*iterClumps);
+                delete clumpTable[i];
             }
         }
         delete clumpTable;
