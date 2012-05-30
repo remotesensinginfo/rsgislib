@@ -58,6 +58,7 @@ void RSGISExeSegment::retrieveParameters(DOMElement *argElement) throw(RSGISXMLA
     XMLCh *optionRelabelClumps = XMLString::transcode("relabelclumps");
     XMLCh *optionSpecGrpWeighted = XMLString::transcode("specgrpweighted");
     XMLCh *optionLabelsFromClusters = XMLString::transcode("labelsfromclusters");
+    XMLCh *optionLabelsFromPixels = XMLString::transcode("labelsfrompixels");
     XMLCh *optionGrowRegionsPixels = XMLString::transcode("growregionspixels");
     XMLCh *optionGrowRegionsPixelsAuto = XMLString::transcode("growregionspixelsauto");
     XMLCh *optionSpectralDiv = XMLString::transcode("spectraldiv");
@@ -2288,6 +2289,112 @@ void RSGISExeSegment::retrieveParameters(DOMElement *argElement) throw(RSGISXMLA
 		}
 		XMLString::release(&projXMLStr);
     }
+    else if(XMLString::equals(optionLabelsFromPixels, optionXML))
+    {
+        this->option = RSGISExeSegment::labelsfrompixels;
+		
+		XMLCh *imageXMLStr = XMLString::transcode("image");
+		if(argElement->hasAttribute(imageXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(imageXMLStr));
+			this->inputImage = string(charValue);
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+		}
+		XMLString::release(&imageXMLStr);
+		
+		XMLCh *outputXMLStr = XMLString::transcode("output");
+		if(argElement->hasAttribute(outputXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
+			this->outputImage = string(charValue);
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+		}
+		XMLString::release(&outputXMLStr);
+
+        XMLCh *ignoreZerosXMLStr = XMLString::transcode("ignorezeros");
+		if(argElement->hasAttribute(ignoreZerosXMLStr))
+		{
+            XMLCh *noStr = XMLString::transcode("no");
+			const XMLCh *strValue = argElement->getAttribute(ignoreZerosXMLStr);
+			
+			if(XMLString::equals(strValue, noStr))
+			{
+				this->ignoreZeros = false;
+			}
+			else
+			{
+				this->ignoreZeros = true;
+			}
+			XMLString::release(&noStr);
+		}
+		else
+		{
+			this->ignoreZeros = true;
+            cerr << "Ignoring zeros options not specified by default zero will be ignored.\n";
+		}
+		XMLString::release(&ignoreZerosXMLStr);
+        
+        
+        
+        
+        XMLCh *formatXMLStr = XMLString::transcode("format");
+		if(argElement->hasAttribute(formatXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(formatXMLStr));
+			this->imageFormat = string(charValue);
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			this->imageFormat = "ENVI";
+		}
+		XMLString::release(&formatXMLStr);
+        
+        XMLCh *projXMLStr = XMLString::transcode("proj");
+		if(argElement->hasAttribute(projXMLStr))
+		{
+			const XMLCh *projXMLValue = argElement->getAttribute(projXMLStr);
+			if(XMLString::equals(projXMLValue, projImage))
+			{
+				this->projFromImage = true;
+				this->proj = "";
+			}
+			else if(XMLString::equals(projXMLValue, projOSGB))
+			{
+				this->projFromImage = false;
+				this->proj = OSGB_Proj;
+			}
+            else if(XMLString::equals(projXMLValue, projNZ2000))
+			{
+				this->projFromImage = false;
+				this->proj = NZ2000_Proj;
+			}
+            else if(XMLString::equals(projXMLValue, projNZ1949))
+			{
+				this->projFromImage = false;
+				this->proj = NZ1949_Proj;
+			}
+			else
+			{
+				cerr << "Proj not reconized therefore defaulting to image.";
+				this->projFromImage = true;
+				this->proj = "";
+			}
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'proj\' attribute was provided.");
+		}
+		XMLString::release(&projXMLStr);
+    }
     else if(XMLString::equals(optionGrowRegionsPixels, optionXML))
     {
         this->option = RSGISExeSegment::growregionspixels;
@@ -3033,6 +3140,8 @@ void RSGISExeSegment::retrieveParameters(DOMElement *argElement) throw(RSGISXMLA
     XMLString::release(&optionMergeSmallClumps);
     XMLString::release(&optionRelabelClumps);
     XMLString::release(&optionSpecGrpWeighted);
+    XMLString::release(&optionLabelsFromClusters);
+    XMLString::release(&optionLabelsFromPixels);
     XMLString::release(&optionGrowRegionsPixels);
     XMLString::release(&optionGrowRegionsPixelsAuto);
     XMLString::release(&optionSpectralDiv);
@@ -4179,6 +4288,62 @@ void RSGISExeSegment::runAlgorithm() throw(RSGISException)
         {
             throw e;
         }   
+    }
+    else if(option == RSGISExeSegment::labelsfrompixels)
+    {
+        cout << "A command which produces an output image using the number of each pixel.\n";
+        cout << "Input Image: " << this->inputImage << endl;
+        cout << "Output Image: " << this->outputImage << endl;
+        if(ignoreZeros)
+        {
+            cout << "Ignoring Zeros\n";
+        }
+        
+        
+        GDALAllRegister();
+        GDALDataset **datasets = NULL;
+        try
+        {
+            datasets = new GDALDataset*[1];
+            cout << this->inputImage << endl;
+            datasets[0] = (GDALDataset *) GDALOpenShared(this->inputImage.c_str(), GA_ReadOnly);
+            if(datasets[0] == NULL)
+            {
+                string message = string("Could not open image ") + this->inputImage;
+                throw RSGISImageException(message.c_str());
+            }
+        }
+        catch(RSGISException& e)
+        {
+            throw e;
+        }
+        
+        RSGISCalcImage *calcImg = NULL;
+        RSGISLabelPixelsUsingPixelsCalcImg *labelPixelsUsingPixels = NULL;
+        
+        try
+        {
+            string *outBandName = new string[1];
+            outBandName[0] = "clumps";
+            
+            labelPixelsUsingPixels = new RSGISLabelPixelsUsingPixelsCalcImg(1, this->ignoreZeros);
+            calcImg = new RSGISCalcImage(labelPixelsUsingPixels, "", true);
+            calcImg->calcImage(datasets, 1, this->outputImage, true, outBandName, this->imageFormat, GDT_UInt32);
+            
+            delete[] outBandName;
+        }
+        catch(RSGISException& e)
+        {
+            throw e;
+        }
+        if(datasets != NULL)
+        {
+            GDALClose(&datasets[0]);
+            delete[] datasets;
+        }
+        delete calcImg;
+        delete labelPixelsUsingPixels;
+        
     }
     else if(option == RSGISExeSegment::growregionspixels)
     {
