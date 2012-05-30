@@ -59,6 +59,7 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 {
 	RSGISMathsUtils mathUtils;
 	RSGISFileUtils fileUtils;
+    RSGISTextUtils textUtils;
 	
 	XMLCh *algorName = XMLString::transcode(this->algorithm.c_str());
 	XMLCh *algorXMLStr = XMLString::transcode("algor");
@@ -683,6 +684,35 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'image\' attribute was provided.");
 		}
 		XMLString::release(&imageXMLStr);
+        
+        XMLCh *bandsXMLStr = XMLString::transcode("bands");
+		if(argElement->hasAttribute(bandsXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(bandsXMLStr));
+			string bandsList = string(charValue);
+			XMLString::release(&charValue);
+            
+            vector<string> *tokens = new vector<string>();
+            textUtils.tokenizeString(bandsList, ',', tokens, true, true);
+            for(vector<string>::iterator iterTokens = tokens->begin(); iterTokens != tokens->end(); ++iterTokens)
+            {
+                try 
+                {
+                    bands.push_back(mathUtils.strtoint(*iterTokens));
+                } 
+                catch (RSGISMathException &e) 
+                {
+                    cout << "Warning: " << *iterTokens << " is not an integer!\n";
+                }
+            }
+            bandsDefined = true;
+		}
+		else
+		{
+			bandsDefined = false;
+		}
+		XMLString::release(&bandsXMLStr);
+        
 		
 		XMLCh *dirXMLStr = XMLString::transcode("dir");
 		XMLCh *extXMLStr = XMLString::transcode("ext");
@@ -2629,6 +2659,14 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
 		}
 		else if(option == RSGISExeImageUtils::include)
 		{
+            cout << "Include images into a larger image\n";
+            if(bandsDefined)
+            {
+                for(vector<int>::iterator iterBands = bands.begin(); iterBands != bands.end(); ++iterBands)
+                {
+                    cout << "Band " << *iterBands << endl;
+                }
+            }
 			GDALAllRegister();
 			GDALDataset *baseDS = NULL;
 			RSGISImageMosaic mosaic;
@@ -2642,7 +2680,7 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
 					throw RSGISImageException(message.c_str());
 				}
 				
-				mosaic.includeDatasets(baseDS, this->inputImages, this->numImages);
+				mosaic.includeDatasets(baseDS, this->inputImages, this->numImages, this->bands, this->bandsDefined);
 				
 				GDALClose(baseDS);
 				GDALDestroyDriverManager();
