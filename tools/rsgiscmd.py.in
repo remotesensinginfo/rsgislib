@@ -76,7 +76,7 @@ def getCommands(algorithm):
                 i = i + 2
         if commandString != '':
             outCommands = outCommands + commandString + '\n'
-            if commandString.find('--algor ' + algorithm) > 0:
+            if commandString.find('--algor ' + algorithm + ' ') > 0:
                 selectedOutCommands = selectedOutCommands + commandString + '\n'
     
     return selectedOutCommands, outCommands
@@ -123,6 +123,9 @@ elif (len(sys.argv) == 2):
     if(sys.argv[1] == '--help' or sys.argv[1] == '-h'):
         print helpText
         exit()
+    elif(sys.argv[1] == '-l'):
+        getAvailableCommands()
+        exit()
 
 elif (len(sys.argv) >= 3):
     if(sys.argv[1] == '--help' or sys.argv[1] == '-h'):
@@ -140,10 +143,12 @@ elif (len(sys.argv) >= 3):
         else:
             print helpText
         exit()
-        
+    
     elif(sys.argv[1] == '-l'):
         getAvailableCommands()
         exit()
+        
+
 
 incommand = ''
 rsgiscmd = ''
