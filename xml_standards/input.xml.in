@@ -391,14 +391,14 @@
     <!-- A command to mosaic a set of input images from a directory to generate a single output image -->
     <rsgis:command algor="imageutils" option="mosaic" dir="directory" ext="file_extension" output="image_out.env" nodata="float=0" skipValue="float (optional)" skipLowerThreash="float (optional)" skipUpperThreash="float (optional)"  proj="OSGB | NZ2000 | NZ1949 | IMAGE" />
     <!-- A command to include a set of input images into an existing image -->
-    <rsgis:command algor="imageutils" option="include" image="base_image.env" >
+    <rsgis:command algor="imageutils" option="include" image="base_image.env" bands="b1,b2,b3,...,bn" >
         <rsgis:image file="image1" />
         <rsgis:image file="image2" />
         <rsgis:image file="image3" />
         <rsgis:image file="image4" />
     </rsgis:command>
     <!-- A command to include a set of input images from a directory into an existing image -->
-    <rsgis:command algor="imageutils" option="include" image="base_image.env" dir="directory" ext="file_extension" />
+    <rsgis:command algor="imageutils" option="include" image="base_image.env" dir="directory" ext="file_extension" bands="b1,b2,b3,...,bn" />
     <!-- A command to cut an image to an input shapefile where each polygon geometry will created a new output image representing the region within the polygon -->
     <rsgis:command algor="imageutils" option="cut2polys" image="image.env" output="image_out_base" vector="vector.shp" outfilename="attribute" nodata="float" />
     <!-- A command to mask the input image with a second 'mask' image -->

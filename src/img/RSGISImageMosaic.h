@@ -45,7 +45,7 @@ namespace rsgis
 				void mosaic(string *inputImages, int numDS, string outputImage, float background, bool projFromImage, string proj) throw(RSGISImageException);
 				void mosaicSkipVals(string *inputImages, int numDS, string outputImage, float background, float skipVal, bool projFromImage, string proj, unsigned int skipBand = 0) throw(RSGISImageException);
 				void mosaicSkipThreash(string *inputImages, int numDS, string outputImage, float background, float skipLowerThreash, float skipUpperThreash, bool projFromImage, string proj, unsigned int threashBand = 0) throw(RSGISImageException);
-				void includeDatasets(GDALDataset *baseImage, string *inputImages, int numDS) throw(RSGISImageException);
+				void includeDatasets(GDALDataset *baseImage, string *inputImages, int numDS, vector<int> bands, bool bandsDefined) throw(RSGISImageException);
 				~RSGISImageMosaic();
 			};
 	}

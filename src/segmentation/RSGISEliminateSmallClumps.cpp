@@ -624,19 +624,19 @@ namespace rsgis{namespace segment{
         ImgClumpSum **clumpTable = new ImgClumpSum*[maxClumpIdx];
         
         cout << "Build clump table\n";
-        ImgClumpSum *cClump = NULL;
+        //ImgClumpSum *cClump = NULL;
         ImgClumpSum *tClump = NULL;
+        unsigned int cClumpIdx = 0;
         for(unsigned int i = 0; i < maxClumpIdx; ++i)
         {
-            cClump = new ImgClumpSum(i+1);
-            cClump->sumVals = new float[numSpecBands];
-            cClump->pxls = new vector<PxlLoc>();
-            cClump->active = true;
+            clumpTable[i] = new ImgClumpSum(i+1);
+            clumpTable[i]->sumVals = new float[numSpecBands];
+            clumpTable[i]->pxls = new vector<PxlLoc>();
+            clumpTable[i]->active = true;
             for(unsigned int n = 0; n < numSpecBands; ++n)
             {
-                cClump->sumVals[n] = 0;
+                clumpTable[i]->sumVals[n] = 0;
             }
-            clumpTable[i] = cClump;
         }
         
         deque<unsigned int> smallClumps;
@@ -654,12 +654,12 @@ namespace rsgis{namespace segment{
             {
                 if(clumpIdxs[j] != 0)
                 {
-                    cClump = clumpTable[clumpIdxs[j] - 1];
+                    cClumpIdx = clumpIdxs[j] - 1;
                     for(unsigned int n = 0; n < numSpecBands; ++n)
                     {
-                        cClump->sumVals[n] += spectralVals[n][j];
+                        clumpTable[cClumpIdx]->sumVals[n] += spectralVals[n][j];
                     }
-                    cClump->pxls->push_back(PxlLoc(j, i));
+                    clumpTable[cClumpIdx]->pxls->push_back(PxlLoc(j, i));
                 }
             }
         }        
@@ -667,21 +667,20 @@ namespace rsgis{namespace segment{
         cout << "There are " << maxClumpIdx << " clumps.\n";
         
         PxlLoc tLoc;
-        list<unsigned long> neighbours;
-        unsigned long closestNeighbour = 0;
+        list<unsigned int> neighbours;
+        unsigned int closestNeighbour = 0;
         bool firstNeighbourTested = true;
         float closestNeighbourDist = 0;
         float distance = 0;
         float cMean = 0;
         float tMean = 0;
-        unsigned int idx = 0;
         
         cout << "Eliminating Small Clumps." << endl;
         long smallClumpsCounter = 0;
         for(unsigned int clumpArea = 1; clumpArea <= minClumpSize; ++clumpArea)
         {
             cout << "Eliminating clumps of size " << clumpArea << endl;
-            //for(vector<ImgClumpSum*>::iterator iterClumps = clumpTable->begin(); iterClumps != clumpTable->end(); ++iterClumps)
+
             for(unsigned int i = 0; i < maxClumpIdx; ++i)
             {
                 if((clumpTable[i] != NULL) && (clumpTable[i]->active))
@@ -697,21 +696,21 @@ namespace rsgis{namespace segment{
             mergeLookupTab.clear();
             while(smallClumps.size() > 0)
             {
-                idx = smallClumps.front();
-                cClump = clumpTable[idx];
+                cClumpIdx = smallClumps.front();
+                //cClump = clumpTable[cClumpIdx];
                 smallClumps.pop_front();
                 // Check that the clump was not selected for a merging already and therefore over minimum size...
-                if((cClump->active) & (cClump->pxls->size() < minClumpSize))
+                if((clumpTable[cClumpIdx]->active) & (clumpTable[cClumpIdx]->pxls->size() < minClumpSize))
                 {
                     // Get list of neighbours.
                     neighbours.clear();
-                    for(vector<PxlLoc>::iterator iterPxls = cClump->pxls->begin(); iterPxls != cClump->pxls->end(); ++iterPxls)
+                    for(vector<PxlLoc>::iterator iterPxls = clumpTable[cClumpIdx]->pxls->begin(); iterPxls != clumpTable[cClumpIdx]->pxls->end(); ++iterPxls)
                     {
                         // Above
                         if(((long)(*iterPxls).yPos)-1 >= 0)
                         {
                             clumpBand->RasterIO(GF_Read, (*iterPxls).xPos, (*iterPxls).yPos-1, 1, 1, &uiPxlVal, 1, 1, GDT_UInt32, 0, 0);
-                            if((uiPxlVal != cClump->clumpID) & (uiPxlVal != 0))
+                            if((uiPxlVal != clumpTable[cClumpIdx]->clumpID) & (uiPxlVal != 0))
                             {
                                 neighbours.push_back(uiPxlVal);
                             }
@@ -720,7 +719,7 @@ namespace rsgis{namespace segment{
                         if(((long)(*iterPxls).yPos)+1 < height)
                         {
                             clumpBand->RasterIO(GF_Read, (*iterPxls).xPos, (*iterPxls).yPos+1, 1, 1, &uiPxlVal, 1, 1, GDT_UInt32, 0, 0);
-                            if((uiPxlVal != cClump->clumpID) & (uiPxlVal != 0))
+                            if((uiPxlVal != clumpTable[cClumpIdx]->clumpID) & (uiPxlVal != 0))
                             {
                                 neighbours.push_back(uiPxlVal);
                             }
@@ -729,7 +728,7 @@ namespace rsgis{namespace segment{
                         if(((long)(*iterPxls).xPos-1) >= 0)
                         {
                             clumpBand->RasterIO(GF_Read, (*iterPxls).xPos-1, (*iterPxls).yPos, 1, 1, &uiPxlVal, 1, 1, GDT_UInt32, 0, 0);
-                            if((uiPxlVal != cClump->clumpID) & (uiPxlVal != 0))
+                            if((uiPxlVal != clumpTable[cClumpIdx]->clumpID) & (uiPxlVal != 0))
                             {
                                 neighbours.push_back(uiPxlVal);
                             }
@@ -738,7 +737,7 @@ namespace rsgis{namespace segment{
                         if(((long)(*iterPxls).xPos+1) < width)
                         {
                             clumpBand->RasterIO(GF_Read, (*iterPxls).xPos+1, (*iterPxls).yPos, 1, 1, &uiPxlVal, 1, 1, GDT_UInt32, 0, 0);
-                            if((uiPxlVal != cClump->clumpID) & (uiPxlVal != 0))
+                            if((uiPxlVal != clumpTable[cClumpIdx]->clumpID) & (uiPxlVal != 0))
                             {
                                 neighbours.push_back(uiPxlVal);
                             }
@@ -747,17 +746,15 @@ namespace rsgis{namespace segment{
                     neighbours.sort();
                     neighbours.unique();
                     
-                     
-                    
                     // Decide on which neighbour to measure with.
                     firstNeighbourTested = true;
-                    for(list<unsigned long>::iterator iterClumps = neighbours.begin(); iterClumps != neighbours.end(); ++iterClumps)
+                    for(list<unsigned int>::iterator iterClumps = neighbours.begin(); iterClumps != neighbours.end(); ++iterClumps)
                     {
-                        if(clumpTable[(*iterClumps)-1]->pxls->size() > cClump->pxls->size())
+                        if(clumpTable[(*iterClumps)-1]->pxls->size() > clumpTable[cClumpIdx]->pxls->size())
                         {
                             for(unsigned int b = 0; b < numSpecBands; ++b)
                             {
-                                cMean = cClump->sumVals[b] / cClump->pxls->size();
+                                cMean = clumpTable[cClumpIdx]->sumVals[b] / clumpTable[cClumpIdx]->pxls->size();
                                 tMean = clumpTable[(*iterClumps)-1]->sumVals[b] / clumpTable[(*iterClumps)-1]->pxls->size();
                                 if(b == 0)
                                 {
@@ -792,11 +789,10 @@ namespace rsgis{namespace segment{
                         {
                             // PUT INTO LOOK UP TABLE TO BE APPLIED AFTERWARDS.
                             tClump = clumpTable[closestNeighbour-1];
-                            pair<unsigned int, unsigned int> pair2Merge = pair<unsigned int, unsigned int>(cClump->clumpID-1, tClump->clumpID-1);
+                            pair<unsigned int, unsigned int> pair2Merge = pair<unsigned int, unsigned int>(cClumpIdx, tClump->clumpID-1);
                             mergeLookupTab.push_back(pair2Merge);
                         }
                     }
-                    
                 }
                 
                 ++smallClumpsCounter;

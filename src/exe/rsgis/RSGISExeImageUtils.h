@@ -217,6 +217,8 @@ class RSGISExeImageUtils : public RSGISAlgorithmParameters
         GDALDataType outDataType;
         bool calcImgPyramids;
         bool useIgnoreVal;
+        bool bandsDefined;
+        vector<int> bands;
 	};
 
 #endif

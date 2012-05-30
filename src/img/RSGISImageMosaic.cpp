@@ -490,7 +490,7 @@ namespace rsgis{namespace img{
         GDALDestroyDriverManager();
 	}
 	
-	void RSGISImageMosaic::includeDatasets(GDALDataset *baseImage, string *inputImages, int numDS) throw(RSGISImageException)
+	void RSGISImageMosaic::includeDatasets(GDALDataset *baseImage, string *inputImages, int numDS, vector<int> bands, bool bandsDefined) throw(RSGISImageException)
 	{
 		RSGISImageUtils imgUtils;
         GDALDataset *dataset = NULL;
@@ -531,6 +531,14 @@ namespace rsgis{namespace img{
 				}
                 GDALClose(dataset);
 			}
+            
+            if(bandsDefined)
+            {
+                if(numberBands < bands.size())
+                {
+                    throw RSGISImageException("The base image does not have enough image bands for the output data specificed.");
+                }
+            }
             
             projection = string(baseImage->GetProjectionRef());
 			imgUtils.getImagesExtent(inputImages, numDS, &width, &height, transformation);
@@ -611,16 +619,44 @@ namespace rsgis{namespace img{
 				yStart = floor(yDiff/baseTransform[1]);
 				imgData = (float *) CPLMalloc(sizeof(float)*tileXSize);
 				
-				for(int n = 1; n <= numberBands; n++)
-				{
-					inputBand = dataset->GetRasterBand(n);
-					outputBand = baseImage->GetRasterBand(n);
-					for(int m = 0; m < tileYSize; m++)
-					{
-						inputBand->RasterIO(GF_Read, 0, m, tileXSize, 1, imgData, tileXSize, 1, GDT_Float32, 0, 0);
-						outputBand->RasterIO(GF_Write, xStart, (yStart + m), tileXSize, 1, imgData, tileXSize, 1, GDT_Float32, 0, 0);
-					}
-				}
+                if(bandsDefined)
+                {
+                    int nBand = 1;
+                    for(vector<int>::iterator iterBands = bands.begin(); iterBands != bands.end(); ++iterBands)
+                    {
+                        if(((*iterBands) <= 0) | ((*iterBands) > dataset->GetRasterCount()))
+                        {
+                            throw RSGISImageException("Band is not within the input dataset.");
+                        }
+                        inputBand = dataset->GetRasterBand(*iterBands);
+                        outputBand = baseImage->GetRasterBand(nBand);
+                        for(int m = 0; m < tileYSize; m++)
+                        {
+                            inputBand->RasterIO(GF_Read, 0, m, tileXSize, 1, imgData, tileXSize, 1, GDT_Float32, 0, 0);
+                            outputBand->RasterIO(GF_Write, xStart, (yStart + m), tileXSize, 1, imgData, tileXSize, 1, GDT_Float32, 0, 0);
+                        }
+                        ++nBand;
+                    }
+                }
+                else 
+                {
+                    if(numberBands != dataset->GetRasterCount())
+                    {
+                        throw RSGISImageException("The number of bands in the input datasets and base dataset need to be the same.");
+                    }
+                    
+                    for(int n = 1; n <= numberBands; n++)
+                    {
+                        inputBand = dataset->GetRasterBand(n);
+                        outputBand = baseImage->GetRasterBand(n);
+                        for(int m = 0; m < tileYSize; m++)
+                        {
+                            inputBand->RasterIO(GF_Read, 0, m, tileXSize, 1, imgData, tileXSize, 1, GDT_Float32, 0, 0);
+                            outputBand->RasterIO(GF_Write, xStart, (yStart + m), tileXSize, 1, imgData, tileXSize, 1, GDT_Float32, 0, 0);
+                        }
+                    }
+                }
+				
 				delete imgData;
                 GDALClose(dataset);
 			}
