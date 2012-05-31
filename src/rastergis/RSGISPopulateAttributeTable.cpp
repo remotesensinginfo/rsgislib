@@ -198,9 +198,21 @@ namespace rsgis{namespace rastergis{
                 RSGISFeature *feat = attTable->getFeature(clumpIdx);
                 ++feat->intFields->at(this->pxlCountIdx);
                 
+                bool nanPresent = false;
                 for(int i = 1; i < numBands; ++i)
                 {
-                    feat->floatFields->at(this->bandMeanIdxs[i-1]) += bandValues[i];
+                    if(boost::math::isnan(bandValues[i]))
+                    {
+                        nanPresent = true;
+                    }
+                }
+                
+                if(!nanPresent)
+                {
+                    for(int i = 1; i < numBands; ++i)
+                    {
+                        feat->floatFields->at(this->bandMeanIdxs[i-1]) += bandValues[i];
+                    }
                 }
                 
             }
@@ -1832,10 +1844,22 @@ namespace rsgis{namespace rastergis{
             --clumpIdx;
             
             try
-            {                
-                for(unsigned int i = 0; i < numDataBands; ++i)
-                {                   
-                    clumpData[i]->at(clumpIdx).push_back(bandValues[dataBandIdxs[i]]);
+            {   
+                bool nanPresent = false;
+                for(int i = 0; i < numDataBands; ++i)
+                {
+                    if(boost::math::isnan(bandValues[dataBandIdxs[i]]))
+                    {
+                        nanPresent = true;
+                    }
+                }
+                
+                if(!nanPresent)
+                {                
+                    for(unsigned int i = 0; i < numDataBands; ++i)
+                    {                   
+                        clumpData[i]->at(clumpIdx).push_back(bandValues[dataBandIdxs[i]]);
+                    }
                 }
                 
             }
@@ -1885,77 +1909,101 @@ namespace rsgis{namespace rastergis{
                 RSGISFeature *feat = attTable->getFeature(clumpIdx);
                 if(feat->boolFields->at(firstFieldIdx))
                 {
-                    feat->intFields->at(pxlCountIdx) = 1;
+                    bool nanPresent = false;
                     for(vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
                     {
-                        bandVal = bandValues[(*iterBands)->band];
-                        if(this->calcStdDev)
+                        if(boost::math::isnan(bandValues[(*iterBands)->band]))
                         {
-                            if((*iterBands)->calcStdDev)
-                            {
-                                feat->floatFields->at((*iterBands)->stdDevIdx) = pow((feat->floatFields->at((*iterBands)->meanIdx) - bandVal),2);
-                            }
-                        }
-                        else
-                        {
-                            if((*iterBands)->calcMin)
-                            {
-                                feat->floatFields->at((*iterBands)->minIdx) = bandVal;
-                            }
-                            if((*iterBands)->calcMax)
-                            {
-                                feat->floatFields->at((*iterBands)->maxIdx) = bandVal;
-                            }
-                            if((*iterBands)->calcMean)
-                            {
-                                feat->floatFields->at((*iterBands)->meanIdx) = bandVal;
-                            }
-                            if((*iterBands)->calcSum)
-                            {
-                                feat->floatFields->at((*iterBands)->sumIdx) = bandVal;
-                            }
+                            nanPresent = true;
                         }
                     }
                     
-                    feat->boolFields->at(firstFieldIdx) = false;
-                }
-                else
-                {
-                    feat->intFields->at(pxlCountIdx) += 1;
-                    
-                    for(vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
+                    if(!nanPresent)
                     {
-                        bandVal = bandValues[(*iterBands)->band];
-                        if(this->calcStdDev)
+                        feat->intFields->at(pxlCountIdx) = 1;
+                        for(vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
                         {
-                            if((*iterBands)->calcStdDev)
+                            bandVal = bandValues[(*iterBands)->band];
+                            if(this->calcStdDev)
                             {
-                                feat->floatFields->at((*iterBands)->stdDevIdx) += pow((feat->floatFields->at((*iterBands)->meanIdx) - bandVal),2);
+                                if((*iterBands)->calcStdDev)
+                                {
+                                    feat->floatFields->at((*iterBands)->stdDevIdx) = pow((feat->floatFields->at((*iterBands)->meanIdx) - bandVal),2);
+                                }
                             }
-                        }
-                        else
-                        {
-                            if((*iterBands)->calcMin)
+                            else
                             {
-                                if(bandVal < feat->floatFields->at((*iterBands)->minIdx))
+                                if((*iterBands)->calcMin)
                                 {
                                     feat->floatFields->at((*iterBands)->minIdx) = bandVal;
                                 }
-                            }
-                            if((*iterBands)->calcMax)
-                            {
-                                if(bandVal > feat->floatFields->at((*iterBands)->maxIdx))
+                                if((*iterBands)->calcMax)
                                 {
                                     feat->floatFields->at((*iterBands)->maxIdx) = bandVal;
                                 }
+                                if((*iterBands)->calcMean)
+                                {
+                                    feat->floatFields->at((*iterBands)->meanIdx) = bandVal;
+                                }
+                                if((*iterBands)->calcSum)
+                                {
+                                    feat->floatFields->at((*iterBands)->sumIdx) = bandVal;
+                                }
                             }
-                            if((*iterBands)->calcMean)
+                        }
+                        
+                        feat->boolFields->at(firstFieldIdx) = false;
+                    }                    
+                }
+                else
+                {
+                    bool nanPresent = false;
+                    for(vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
+                    {
+                        if(boost::math::isnan(bandValues[(*iterBands)->band]))
+                        {
+                            nanPresent = true;
+                        }
+                    }
+                    
+                    if(!nanPresent)
+                    {
+                        feat->intFields->at(pxlCountIdx) += 1;
+                        
+                        for(vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
+                        {
+                            bandVal = bandValues[(*iterBands)->band];
+                            if(this->calcStdDev)
                             {
-                                feat->floatFields->at((*iterBands)->meanIdx) += bandVal;
+                                if((*iterBands)->calcStdDev)
+                                {
+                                    feat->floatFields->at((*iterBands)->stdDevIdx) += pow((feat->floatFields->at((*iterBands)->meanIdx) - bandVal),2);
+                                }
                             }
-                            if((*iterBands)->calcSum)
+                            else
                             {
-                                feat->floatFields->at((*iterBands)->sumIdx) += bandVal;
+                                if((*iterBands)->calcMin)
+                                {
+                                    if(bandVal < feat->floatFields->at((*iterBands)->minIdx))
+                                    {
+                                        feat->floatFields->at((*iterBands)->minIdx) = bandVal;
+                                    }
+                                }
+                                if((*iterBands)->calcMax)
+                                {
+                                    if(bandVal > feat->floatFields->at((*iterBands)->maxIdx))
+                                    {
+                                        feat->floatFields->at((*iterBands)->maxIdx) = bandVal;
+                                    }
+                                }
+                                if((*iterBands)->calcMean)
+                                {
+                                    feat->floatFields->at((*iterBands)->meanIdx) += bandVal;
+                                }
+                                if((*iterBands)->calcSum)
+                                {
+                                    feat->floatFields->at((*iterBands)->sumIdx) += bandVal;
+                                }
                             }
                         }
                     }
@@ -2036,9 +2084,21 @@ namespace rsgis{namespace rastergis{
                 
                 if(withinThreshold)
                 {
+                    bool nanPresent = false;
                     for(unsigned int i = 0; i < numDataBands; ++i)
-                    {                   
-                        clumpData[i]->at(clumpIdx).push_back(bandValues[dataBandIdxs[i]]);
+                    {  
+                        if(boost::math::isnan(bandValues[dataBandIdxs[i]]))
+                        {
+                            nanPresent = true;
+                        }
+                    }
+                    
+                    if(!nanPresent)
+                    { 
+                        for(unsigned int i = 0; i < numDataBands; ++i)
+                        {                   
+                            clumpData[i]->at(clumpIdx).push_back(bandValues[dataBandIdxs[i]]);
+                        }
                     }
                 }
             }
@@ -2119,77 +2179,101 @@ namespace rsgis{namespace rastergis{
                     RSGISFeature *feat = attTable->getFeature(clumpIdx);
                     if(feat->boolFields->at(firstFieldIdx))
                     {
-                        feat->intFields->at(pxlCountIdx) = 1;
+                        bool nanPresent = false;
                         for(vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
                         {
-                            bandVal = bandValues[(*iterBands)->band];
-                            if(this->calcStdDev)
+                            if(boost::math::isnan(bandValues[(*iterBands)->band]))
                             {
-                                if((*iterBands)->calcStdDev)
-                                {
-                                    feat->floatFields->at((*iterBands)->stdDevIdx) = pow((feat->floatFields->at((*iterBands)->meanIdx) - bandVal),2);
-                                }
-                            }
-                            else
-                            {
-                                if((*iterBands)->calcMin)
-                                {
-                                    feat->floatFields->at((*iterBands)->minIdx) = bandVal;
-                                }
-                                if((*iterBands)->calcMax)
-                                {
-                                    feat->floatFields->at((*iterBands)->maxIdx) = bandVal;
-                                }
-                                if((*iterBands)->calcMean)
-                                {
-                                    feat->floatFields->at((*iterBands)->meanIdx) = bandVal;
-                                }
-                                if((*iterBands)->calcSum)
-                                {
-                                    feat->floatFields->at((*iterBands)->sumIdx) = bandVal;
-                                }
+                                nanPresent = true;
                             }
                         }
                         
-                        feat->boolFields->at(firstFieldIdx) = false;
-                    }
-                    else
-                    {
-                        feat->intFields->at(pxlCountIdx) += 1;
-                        
-                        for(vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
+                        if(!nanPresent)
                         {
-                            bandVal = bandValues[(*iterBands)->band];
-                            if(this->calcStdDev)
+                            feat->intFields->at(pxlCountIdx) = 1;
+                            for(vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
                             {
-                                if((*iterBands)->calcStdDev)
+                                bandVal = bandValues[(*iterBands)->band];
+                                if(this->calcStdDev)
                                 {
-                                    feat->floatFields->at((*iterBands)->stdDevIdx) += pow((feat->floatFields->at((*iterBands)->meanIdx) - bandVal),2);
+                                    if((*iterBands)->calcStdDev)
+                                    {
+                                        feat->floatFields->at((*iterBands)->stdDevIdx) = pow((feat->floatFields->at((*iterBands)->meanIdx) - bandVal),2);
+                                    }
                                 }
-                            }
-                            else
-                            {
-                                if((*iterBands)->calcMin)
+                                else
                                 {
-                                    if(bandVal < feat->floatFields->at((*iterBands)->minIdx))
+                                    if((*iterBands)->calcMin)
                                     {
                                         feat->floatFields->at((*iterBands)->minIdx) = bandVal;
                                     }
-                                }
-                                if((*iterBands)->calcMax)
-                                {
-                                    if(bandVal > feat->floatFields->at((*iterBands)->maxIdx))
+                                    if((*iterBands)->calcMax)
                                     {
                                         feat->floatFields->at((*iterBands)->maxIdx) = bandVal;
                                     }
+                                    if((*iterBands)->calcMean)
+                                    {
+                                        feat->floatFields->at((*iterBands)->meanIdx) = bandVal;
+                                    }
+                                    if((*iterBands)->calcSum)
+                                    {
+                                        feat->floatFields->at((*iterBands)->sumIdx) = bandVal;
+                                    }
                                 }
-                                if((*iterBands)->calcMean)
+                            }
+                            
+                            feat->boolFields->at(firstFieldIdx) = false;
+                        }
+                    }
+                    else
+                    {
+                        bool nanPresent = false;
+                        for(vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
+                        {
+                            if(boost::math::isnan(bandValues[(*iterBands)->band]))
+                            {
+                                nanPresent = true;
+                            }
+                        }
+                        
+                        if(!nanPresent)
+                        {
+                            feat->intFields->at(pxlCountIdx) += 1;
+                            
+                            for(vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
+                            {
+                                bandVal = bandValues[(*iterBands)->band];
+                                if(this->calcStdDev)
                                 {
-                                    feat->floatFields->at((*iterBands)->meanIdx) += bandVal;
+                                    if((*iterBands)->calcStdDev)
+                                    {
+                                        feat->floatFields->at((*iterBands)->stdDevIdx) += pow((feat->floatFields->at((*iterBands)->meanIdx) - bandVal),2);
+                                    }
                                 }
-                                if((*iterBands)->calcSum)
+                                else
                                 {
-                                    feat->floatFields->at((*iterBands)->sumIdx) += bandVal;
+                                    if((*iterBands)->calcMin)
+                                    {
+                                        if(bandVal < feat->floatFields->at((*iterBands)->minIdx))
+                                        {
+                                            feat->floatFields->at((*iterBands)->minIdx) = bandVal;
+                                        }
+                                    }
+                                    if((*iterBands)->calcMax)
+                                    {
+                                        if(bandVal > feat->floatFields->at((*iterBands)->maxIdx))
+                                        {
+                                            feat->floatFields->at((*iterBands)->maxIdx) = bandVal;
+                                        }
+                                    }
+                                    if((*iterBands)->calcMean)
+                                    {
+                                        feat->floatFields->at((*iterBands)->meanIdx) += bandVal;
+                                    }
+                                    if((*iterBands)->calcSum)
+                                    {
+                                        feat->floatFields->at((*iterBands)->sumIdx) += bandVal;
+                                    }
                                 }
                             }
                         }
@@ -2490,10 +2574,22 @@ namespace rsgis{namespace rastergis{
             --clumpIdx;
             
             try
-            {                
+            {    
+                bool nanPresent = false;
                 for(int i = 1; i < numBands; ++i)
-                {                   
-                    clumpData[clumpIdx]->push_back(bandValues[i]);
+                { 
+                    if(boost::math::isnan(bandValues[i]))
+                    {
+                        nanPresent = true;
+                    }
+                }
+                
+                if(!nanPresent)
+                {
+                    for(int i = 1; i < numBands; ++i)
+                    {                   
+                        clumpData[clumpIdx]->push_back(bandValues[i]);
+                    }
                 }
                 
             }
