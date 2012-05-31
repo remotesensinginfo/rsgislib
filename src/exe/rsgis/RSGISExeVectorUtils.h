@@ -159,6 +159,7 @@ class RSGISExeVectorUtils : public RSGISAlgorithmParameters
 			mergetouchingpoly,
 			freqdist,
 			rasterise,
+            burnrasterise,
 			polygonplots,
 			polygonImageFootprints,
 			polygonizempolys,

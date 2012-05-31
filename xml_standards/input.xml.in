@@ -848,8 +848,9 @@
         <rsgis:vector file="vector4" />
     </rsgis:command>
     <!-- A command to create a raster version of a polygon -->
-    <rsgis:command algor="vectorutils" option="rasterise" vector="vector.shp" output="image_out.env" resolution="float" attribute="string" image="inputImage.env (optional)" constval="float"
-    method="polyContainsPixel | polyContainsPixelCenter | polyOverlapsPixel | pixelContainsPoly | pixelContainsPolyCenter | adaptive" />
+    <rsgis:command algor="vectorutils" option="rasterise" vector="vector.shp" output="image_out.env" resolution="float" attribute="string" image="inputImage.env (optional)" constval="float" method="polyContainsPixel | polyContainsPixelCenter | polyOverlapsPixel | pixelContainsPoly | pixelContainsPolyCenter | adaptive" />
+	<!-- A command to create a raster version of a polygon shapefile which is burnt into an existing raster -->
+    <rsgis:command algor="vectorutils" option="burnrasterise" image="inputImage.env" vector="vector.shp" attribute="string" method="polyContainsPixel | polyContainsPixelCenter | polyOverlapsPixel | pixelContainsPoly | pixelContainsPolyCenter | adaptive" />
     <!-- A command to create polygons based on plot center, length width and orientation -->
     <rsgis:command algor="vectorutils" option="polygonplots" input="input.csv" output="vector_out.shp" force="yes | no" />
     <!-- A command to create a polygon showing image footprints from list of corner coordinates -->

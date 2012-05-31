@@ -102,6 +102,8 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 	XMLCh *optionFreqDist = XMLString::transcode("freqdist");
 	XMLCh *optionRasterise = XMLString::transcode("rasterise");
 	XMLCh *optionRasterize = XMLString::transcode("rasterize");
+    XMLCh *optionBurnRasterise = XMLString::transcode("burnrasterise");
+	XMLCh *optionBurnRasterize = XMLString::transcode("burnrasterize");
 	XMLCh *optionPolygonPlots = XMLString::transcode("polygonplots");
 	XMLCh *optionPolygonImageFootprints = XMLString::transcode("polygonImageFootprints");
 	XMLCh *optionPolygoniseMPolys = XMLString::transcode("polygonizempolys");
@@ -2197,6 +2199,79 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 		XMLString::release(&constValXMLStr);
 		
 	}
+    else if(XMLString::equals(optionBurnRasterise, optionXML) | XMLString::equals(optionBurnRasterize, optionXML) ) // Check for British or American spelling
+	{		
+		this->option = RSGISExeVectorUtils::burnrasterise;
+		
+		if(!singlevector)
+		{
+			throw RSGISXMLArgumentsException("This algorithm requires only a single vector input.");
+		}
+		
+		if(noInputProvide)
+		{
+			throw RSGISXMLArgumentsException("No input file has been provided.");
+		}
+		
+		XMLCh *imageXMLStr = XMLString::transcode("image");
+		if(argElement->hasAttribute(imageXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(imageXMLStr));
+			this->inputImage = string(charValue);
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+		}
+		XMLString::release(&imageXMLStr);
+		
+		XMLCh *attributeXMLStr = XMLString::transcode("attribute");
+		if(argElement->hasAttribute(attributeXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(attributeXMLStr));
+			this->attribute = string(charValue);
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'attribute\' attribute was provided.");
+		}
+		XMLString::release(&attributeXMLStr);
+		
+		// Retrieve method for calculating pixels in polygon
+		XMLCh *methodXMLStr = XMLString::transcode("method");
+		if(argElement->hasAttribute(methodXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(methodXMLStr));
+			string methodStr = string(charValue);
+			// Polygon completely contains pixel
+			if(methodStr == "polyContainsPixel"){this->method = polyContainsPixel;}
+			// Pixel center is within the polygon
+			else if(methodStr == "polyContainsPixelCenter") {this->method = polyContainsPixelCenter;}
+			// Polygon overlaps the pixel
+			else if(methodStr == "polyOverlapsPixel"){this->method = polyOverlapsPixel;}
+			// Polygon overlaps or contains the pixel
+			else if(methodStr == "polyOverlapsOrContainsPixel"){this->method = polyOverlapsOrContainsPixel;}
+			// Pixel contains the polygon
+			else if(methodStr == "pixelContainsPoly"){this->method = pixelContainsPoly;}
+			// Polygon center is within pixel
+			else if(methodStr == "pixelContainsPolyCenter"){this->method = pixelContainsPolyCenter;}
+			// The method is chosen based on relative areas of pixel and polygon.
+			else if(methodStr == "adaptive"){this->method = adaptive;}
+			// Everything within the polygons envelope is chosen (for debugging)
+			else if(methodStr == "envelope"){this->method = envelope;}
+			// Set to default value if not recognised.
+			else {cout << "Method not recognised, using default of \'polyContainsPixelCenter\'." << endl;this->method = polyContainsPixelCenter;}
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			cout << "No method was provided, using default of \'polyContainsPixelCenter\'." << endl;
+			this->method = polyContainsPixelCenter;
+		}
+		XMLString::release(&methodXMLStr);
+	}
 	else if(XMLString::equals(optionPolygonPlots, optionXML))
 	{
 		this->option = RSGISExeVectorUtils::polygonplots;
@@ -4117,6 +4192,8 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 	XMLString::release(&optionFreqDist);
 	XMLString::release(&optionRasterise);
 	XMLString::release(&optionRasterize);
+    XMLString::release(&optionBurnRasterise);
+	XMLString::release(&optionBurnRasterize);
 	XMLString::release(&optionConvexOutline);
 	XMLString::release(&optionPolygonPlots);
 	XMLString::release(&optionPolygoniseMPolys);
@@ -6692,6 +6769,63 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				rasteriseVec.rasterizeLayer(inputSHPLayer, imageData, this->attribute, this->method);
 				
 				GDALClose(imageData);
+				OGRDataSource::DestroyDataSource(inputSHPDS);
+				//OGRCleanupAll();
+			}
+			catch(RSGISException &e)
+			{
+				throw e;
+			}			
+		}
+        else if(option == RSGISExeVectorUtils::burnrasterise)
+		{
+			cout << "Rasterise a vector\n";
+			cout << "Input Vector = " << this->inputVector << endl;
+			cout << "Input Image = " << this->inputImage << endl;
+			cout << "Attribute = " << this->attribute << endl;
+			
+			try
+			{
+				OGRRegisterAll();
+				GDALAllRegister();
+				
+				RSGISVectorUtils vecUtils;
+				RSGISRasterizeVector rasteriseVec;
+                
+				OGRDataSource *inputSHPDS = NULL;
+				OGRLayer *inputSHPLayer = NULL;
+				
+				/////////////////////////////////////
+				//
+				// Open Input Shapfile.
+				//
+				/////////////////////////////////////
+				string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
+				
+				inputSHPDS = OGRSFDriverRegistrar::Open(this->inputVector.c_str(), FALSE);
+				if(inputSHPDS == NULL)
+				{
+					string message = string("Could not open vector file ") + this->inputVector;
+					throw RSGISFileException(message.c_str());
+				}
+				inputSHPLayer = inputSHPDS->GetLayerByName(SHPFileInLayer.c_str());
+				if(inputSHPLayer == NULL)
+				{
+					string message = string("Could not open vector layer ") + SHPFileInLayer;
+					throw RSGISFileException(message.c_str());
+				}
+				
+                GDALDataset *imgDataset = NULL;
+                imgDataset = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_Update);
+                if(imgDataset == NULL)
+                {
+                    string message = string("Could not open image ") + this->inputImage;
+                    throw RSGISException(message.c_str());
+                }
+                				
+				rasteriseVec.rasterizeLayer(inputSHPLayer, imgDataset, this->attribute, this->method);
+				
+				GDALClose(imgDataset);
 				OGRDataSource::DestroyDataSource(inputSHPDS);
 				//OGRCleanupAll();
 			}
