@@ -942,16 +942,6 @@ namespace rsgis{namespace rastergis{
                 throw RSGISImageCalcException("More band stats were requested than bands in the file.");
             }
             
-            if(!attTable->hasAttribute("pxlcount"))
-            {
-                attTable->addAttIntField("pxlcount", 0);
-            }
-            else if(attTable->getDataType("pxlcount") != rsgis_int)
-            {
-                throw RSGISImageCalcException("Cannot proceed as \'pxlcount\' field is not of type integer.");
-            }
-            unsigned int pxlCountIdx = attTable->getFieldIndex("pxlcount");
-            
             if(!attTable->hasAttribute("first"))
             {
                 attTable->addAttBoolField("first", true);
@@ -1084,7 +1074,7 @@ namespace rsgis{namespace rastergis{
             
             // Calculate Appropriate Min, Max, Sum and Mean Values.
             attTable->setBoolValue("first", true);
-            RSGISCalcClumpStatsWithinAtt *calcAttStats = new RSGISCalcClumpStatsWithinAtt(attTable, bandStats, false, pxlCountIdx, firstFieldIdx);
+            RSGISCalcClumpThresholdedStatsWithinAtt *calcAttStats = new RSGISCalcClumpThresholdedStatsWithinAtt(attTable, bandStats, false, firstFieldIdx);
             RSGISCalcImage calcImage(calcAttStats);
             calcImage.calcImage(datasets, numDatasets);
             delete calcAttStats;
@@ -1123,7 +1113,7 @@ namespace rsgis{namespace rastergis{
                     
                     // Extract Data from Image.
                     attTable->setBoolValue("first", true);
-                    calcAttStats = new RSGISCalcClumpStatsWithinAtt(attTable, bandStats, true, pxlCountIdx, firstFieldIdx);
+                    calcAttStats = new RSGISCalcClumpThresholdedStatsWithinAtt(attTable, bandStats, true, firstFieldIdx);
                     RSGISCalcImage calcImageStdDev(calcAttStats);
                     calcImageStdDev.calcImage(datasets, numDatasets);
                     delete calcAttStats;
