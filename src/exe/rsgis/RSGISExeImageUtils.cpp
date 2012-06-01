@@ -99,6 +99,7 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
     XMLCh *optionAssignProj = XMLString::transcode("assignproj");
     XMLCh *optionPopImgStats = XMLString::transcode("popimgstats");
     XMLCh *optionCreateCopy = XMLString::transcode("createcopy");
+    XMLCh *optionCreateKMLFile = XMLString::transcode("createKMLFile");
     
 	const XMLCh *algorNameEle = argElement->getAttribute(algorXMLStr);
 	if(!XMLString::equals(algorName, algorNameEle))
@@ -2465,6 +2466,36 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 		XMLString::release(&numBandsXMLStr);
         
 	}
+    else if (XMLString::equals(optionCreateKMLFile, optionXML))
+	{		
+		this->option = RSGISExeImageUtils::createKMLFile;
+		
+		XMLCh *imageXMLStr = XMLString::transcode("image");
+		if(argElement->hasAttribute(imageXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(imageXMLStr));
+			this->inputImage = string(charValue);
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+		}
+		XMLString::release(&imageXMLStr);
+        
+        XMLCh *outKMLFileXMLStr = XMLString::transcode("outKMLFile");
+		if(argElement->hasAttribute(outKMLFileXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(outKMLFileXMLStr));
+			this->outKMLFile = string(charValue);
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'outKMLFile\' attribute was provided.");
+		}
+		XMLString::release(&outKMLFileXMLStr);
+	}
 	else
 	{
 		string message = string("The option (") + string(XMLString::transcode(optionXML)) + string(") is not known: RSGISExeImageUtils.");
@@ -2509,6 +2540,7 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
     XMLString::release(&optionAssignProj);
     XMLString::release(&optionPopImgStats);
 	XMLString::release(&optionCreateCopy);
+    XMLString::release(&optionCreateKMLFile);
     
 	parsed = true;
 }
@@ -4096,6 +4128,17 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
                 throw e;
             }
         }
+        else if(option == RSGISExeImageUtils::createKMLFile)
+		{
+			RSGISImageUtils imgUtils;
+            
+            cout << "Create KML Text file for:" << this->inputImage << endl;
+            cout << "Saving to: " <<  this->outKMLFile << endl;
+            cout << "NOTE: This command assumed relavent pre-processing has already" << endl;
+            cout << "been carried out for the image and will only work for a stretched " << endl;
+            cout << "three band image, readable by GoogleEarth" << endl;
+            imgUtils.createKMLText(this->inputImage, this->outKMLFile);
+		}
 		else
 		{
 			cout << "Options not recognised\n";

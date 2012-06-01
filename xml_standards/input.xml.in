@@ -461,7 +461,8 @@
 	<rsgis:command algor="imageutils" option="popimgstats" image="image.img" ignore="float" pyramids="yes | no" />
 	<!-- A command to create a new image from an existing image -->
 	<rsgis:command algor="imageutils" option="createcopy" image="image.img" output="image_out.env" numbands="int" pixelval="float" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
-
+    <!-- A command to create a KML text file for an existing image -->
+    <rsgis:command algor="imageutils" option="createKMLFile" image="image.png" outKMLFile="string"/>
 
 
 
