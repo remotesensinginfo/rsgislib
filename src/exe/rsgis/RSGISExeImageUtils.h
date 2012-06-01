@@ -122,7 +122,8 @@ class RSGISExeImageUtils : public RSGISAlgorithmParameters
             relabel,
             assignproj,
             popimgstats,
-            createcopy
+            createcopy,
+            createKMLFile
 		};
 		
 		enum interpolators
@@ -219,6 +220,7 @@ class RSGISExeImageUtils : public RSGISAlgorithmParameters
         bool useIgnoreVal;
         bool bandsDefined;
         vector<int> bands;
+        string outKMLFile;
 	};
 
 #endif

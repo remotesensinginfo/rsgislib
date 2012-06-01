@@ -2890,6 +2890,69 @@ namespace rsgis{namespace img{
         return dataset;
         
     }
+
+    void RSGISImageUtils::createKMLText(string inputImage, string outKMLFile) throw(RSGISImageBandException)
+    {
+        
+        // Open text file for writing
+        ofstream outKML;
+        outKML.open(outKMLFile.c_str());
+        
+        GDALAllRegister();
+        GDALDataset *dataset = NULL;
+        dataset = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_ReadOnly);
+        
+        if(dataset == NULL)
+        {
+            string message = string("Could not open image ") + inputImage;
+            throw RSGISImageException(message.c_str());
+        }
+        
+        double *transformations = new double[6];
+        dataset->GetGeoTransform(transformations);
+        double xSize = dataset->GetRasterXSize();
+        double ySize = dataset->GetRasterYSize();
+        double pixelXRes = transformations[1];
+        double pixelYRes = transformations[5];
+        
+        double minX = transformations[0];
+        double maxY = transformations[3];
+        
+        double maxX = minX + (xSize * pixelXRes);
+        double minY = maxY - (ySize * abs(pixelYRes));
+        
+        // Write out information 
+        outKML << "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
+        outKML << "	<kml xmlns=\"http://earth.google.com/kml/2.1\">\n";
+        outKML << "	  <Document>\n";
+        outKML << "	    <Name>" << inputImage << "</Name>\n";
+        outKML << "	    <Description></Description>\n";
+        outKML << "	    <Style>\n";
+        outKML << "	      <ListStyle id=\"hideChildren\">\n";
+        outKML << "	        <listItemType>checkHideChildren</listItemType>\n";
+        outKML << "	      </ListStyle>\n";
+        outKML << "	    </Style>\n";
+        outKML << "	    <GroundOverlay>\n";
+        outKML << "	      <Icon>\n";
+        outKML << "	        <href>" << inputImage << "</href>\n";
+        outKML << "	      </Icon>\n";
+        outKML << "	      <LatLonBox>\n";
+        outKML << "	        <north>" <<  maxY << "</north>\n";
+        outKML << "	        <south>" << minY << "</south>\n";
+        outKML << "	        <east>" << minX << "</east>\n";
+        outKML << "	        <west>" << maxX << "</west>\n";
+        outKML << "	      </LatLonBox>\n";
+        outKML << "	    </GroundOverlay>\n";
+        outKML << "	    </Document>\n";
+        outKML << "	</kml>\n";
+        
+        delete[] transformations;
+        
+        
+        GDALClose(dataset);
+        
+        
+    }
 	
 	RSGISImageUtils::~RSGISImageUtils()
 	{

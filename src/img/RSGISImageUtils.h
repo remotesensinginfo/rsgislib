@@ -163,6 +163,7 @@ namespace rsgis
                 void assignValGDALDataset(GDALDataset *data, float value) throw(RSGISImageException);
                 GDALDataset* createCopy(GDALDataset *inData, string outputFilePath, string outputFormat, GDALDataType eType, bool useImgProj=true, string proj="")throw(RSGISImageException);
                 GDALDataset* createCopy(GDALDataset *inData, unsigned int numBands, string outputFilePath, string outputFormat, GDALDataType eType, bool useImgProj=true, string proj="")throw(RSGISImageException);
+                void createKMLText(string inputImage, string outKMLFile) throw(RSGISImageBandException);
                 ~RSGISImageUtils();
 			};
 	}
