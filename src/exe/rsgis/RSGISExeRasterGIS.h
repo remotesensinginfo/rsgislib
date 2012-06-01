@@ -106,7 +106,8 @@ public:
         export2ascii,
         popmeansumattributes,
         printattsummary,
-        exportsize
+        exportsize,
+        popattributestatsthresholded
     };
     
     enum outFileTypeAddition 
