@@ -68,6 +68,16 @@ namespace rsgis{namespace math{
         compare_neq
     };
     
+    enum rsgisdistmetrics
+    {
+        rsgis_euclidean,
+        rsgis_manhatten,
+        rsgis_mahalanobis,
+        rsgis_minkowski,
+        rsgis_chebyshev,
+        rsgis_mutualinfo
+    };
+    
     struct RSGISStatsSummary
     {
         bool calcMin;

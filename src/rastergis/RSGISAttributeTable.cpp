@@ -263,6 +263,43 @@ namespace rsgis{namespace rastergis{
         }
     }
     
+    
+    void RSGISAttributeTable::applyIfStatementBoolOut(RSGISIfStatement *statement) throw(RSGISAttributeTableException)
+    {
+        try
+        {
+            for(this->start(); this->end(); ++(*this))
+            {
+                if(statement->noExp || statement->exp->evaluate(*(*this)))
+                {
+                    if(statement->dataType == rsgis_bool)
+                    {
+                        (*(*this))->boolFields->at(statement->fldIdx) = true;
+                    }
+                    else
+                    {
+                        throw RSGISAttributeTableException("Only boolean output types are supported.");
+                    }
+                }
+                else
+                {
+                    if(statement->dataType == rsgis_bool)
+                    {
+                        (*(*this))->boolFields->at(statement->fldIdx) = false;
+                    }
+                    else
+                    {
+                        throw RSGISAttributeTableException("Only boolean output types are supported.");
+                    }
+                }
+            }
+        }
+        catch(RSGISAttributeTableException &e)
+        {
+            throw e;
+        }
+    }
+    
     void RSGISAttributeTable::populateIfStatementsWithIdxs(vector<RSGISIfStatement*> *statements) throw(RSGISAttributeTableException)
     {
         try
@@ -272,6 +309,44 @@ namespace rsgis{namespace rastergis{
                 if(!(*iterStatement)->noExp)
                 {
                     (*iterStatement)->exp->popIdxs(this);
+                }
+            }
+        }
+        catch(RSGISAttributeTableException &e)
+        {
+            throw e;
+        }
+    }
+    
+    void RSGISAttributeTable::createIfStatementsFields(vector<RSGISIfStatement*> *statements, RSGISAttributeDataType dataType) throw(RSGISAttributeTableException)
+    {
+        try
+        {
+            for(vector<RSGISIfStatement*>::iterator iterStatement = statements->begin(); iterStatement != statements->end(); ++iterStatement)
+            {
+                if((*iterStatement)->field != "")
+                {
+                    if(!this->hasAttribute((*iterStatement)->field))
+                    {
+                        if(dataType == rsgis_int)
+                        {
+                            this->addAttIntField((*iterStatement)->field, 0);
+                        }
+                        else if(dataType == rsgis_float)
+                        {
+                            this->addAttFloatField((*iterStatement)->field, 0);
+                        }
+                        else if(dataType == rsgis_bool)
+                        {
+                            this->addAttBoolField((*iterStatement)->field, false);
+                        }
+                        else
+                        {
+                            throw RSGISAttributeTableException("Field data type is not recognised.");
+                        }
+                    }
+                    (*iterStatement)->dataType = this->getDataType((*iterStatement)->field);
+                    (*iterStatement)->fldIdx = this->getFieldIndex((*iterStatement)->field);
                 }
             }
         }
@@ -1483,7 +1558,7 @@ namespace rsgis{namespace rastergis{
                     }
                     else
                     {
-                        throw RSGISAttributeTableException("No \'field\' attribute was provided for else.");
+                        throw RSGISAttributeTableException("No \'field\' attribute was provided for if.");
                     }
                     
                     if(ifElement->hasAttribute(valueXMLStr))
@@ -1494,7 +1569,8 @@ namespace rsgis{namespace rastergis{
                     }
                     else
                     {
-                        throw RSGISAttributeTableException("No \'value\' attribute was provided for else.");
+                        cerr << "WARNING: No \'value\' attribute was provided for if - Defaulting to 0.\n";
+                        ifStatment->value = 0;
                     }
                     statements->push_back(ifStatment);
                 }
