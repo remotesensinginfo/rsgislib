@@ -70,6 +70,8 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
     XMLCh *optionPrintAttSummary = XMLString::transcode("printattsummary");
     XMLCh *optionExportSize = XMLString::transcode("exportsize");
     XMLCh *optionPopAttributeStatsThresholded = XMLString::transcode("popattributestatsthresholded");
+    XMLCh *optionKNNExtrapolate = XMLString::transcode("knnextrapolate");
+    XMLCh *optionPopBoolField = XMLString::transcode("popboolfield");
             
     XMLCh *optionRSGISBool = XMLString::transcode("rsgis_bool");
     XMLCh *optionRSGISInt = XMLString::transcode("rsgis_int");
@@ -3122,8 +3124,193 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
         XMLString::release(&rsgisBandXMLStr);
         
     }
-    
-    
+    else if(XMLString::equals(optionKNNExtrapolate, optionXML))
+    {
+        this->option = RSGISExeRasterGIS::knnextrapolate;
+        
+        XMLCh *tableXMLStr = XMLString::transcode("table");
+        if(argElement->hasAttribute(tableXMLStr))
+        {
+            char *charValue = XMLString::transcode(argElement->getAttribute(tableXMLStr));
+            this->attTableFile = string(charValue);
+            XMLString::release(&charValue);
+        }
+        else
+        {
+            throw RSGISXMLArgumentsException("No \'table\' attribute was provided.");
+        }
+        XMLString::release(&tableXMLStr);
+        
+        
+        XMLCh *tableOutXMLStr = XMLString::transcode("tableout");
+        if(argElement->hasAttribute(tableOutXMLStr))
+        {
+            char *charValue = XMLString::transcode(argElement->getAttribute(tableOutXMLStr));
+            this->outAttTableFile = string(charValue);
+            this->attInMemory = true;
+            XMLString::release(&charValue);
+        }
+        else
+        {
+            this->attInMemory = false;
+        }
+        XMLString::release(&tableOutXMLStr);
+        
+        XMLCh *trainingFieldXMLStr = XMLString::transcode("training");
+        if(argElement->hasAttribute(trainingFieldXMLStr))
+        {
+            char *charValue = XMLString::transcode(argElement->getAttribute(trainingFieldXMLStr));
+            this->trainingField = string(charValue);
+            XMLString::release(&charValue);
+        }
+        else
+        {
+            throw RSGISXMLArgumentsException("No \'training\' attribute was provided.");
+        }
+        XMLString::release(&trainingFieldXMLStr);
+        
+        XMLCh *valueFieldXMLStr = XMLString::transcode("value");
+        if(argElement->hasAttribute(valueFieldXMLStr))
+        {
+            char *charValue = XMLString::transcode(argElement->getAttribute(valueFieldXMLStr));
+            this->valueField = string(charValue);
+            XMLString::release(&charValue);
+        }
+        else
+        {
+            throw RSGISXMLArgumentsException("No \'value\' attribute was provided.");
+        }
+        XMLString::release(&valueFieldXMLStr);
+        
+        XMLCh *kNumberXMLStr = XMLString::transcode("k");
+        if(argElement->hasAttribute(kNumberXMLStr))
+        {
+            char *charValue = XMLString::transcode(argElement->getAttribute(kNumberXMLStr));
+            this->numkNN = mathUtils.strtounsignedint(string(charValue));
+            XMLString::release(&charValue);
+        }
+        else
+        {
+            throw RSGISXMLArgumentsException("No \'k\' attribute was provided.");
+        }
+        XMLString::release(&kNumberXMLStr);
+        
+        XMLCh *distThresholdXMLStr = XMLString::transcode("distancethreshold");
+        if(argElement->hasAttribute(distThresholdXMLStr))
+        {
+            char *charValue = XMLString::transcode(argElement->getAttribute(distThresholdXMLStr));
+            this->distanceThreshold = mathUtils.strtofloat(string(charValue));
+            XMLString::release(&charValue);
+        }
+        else
+        {
+            cerr << "WARNING: The distance metric threshold has not been defined therefore a really large number is being used such that the threshold is ignored.\n";
+            this->distanceThreshold = 1000000000000;
+        }
+        XMLString::release(&distThresholdXMLStr);
+        
+        XMLCh *maxFieldXMLStr = XMLString::transcode("distancemetric");
+        if(argElement->hasAttribute(maxFieldXMLStr))
+        {
+            char *charValue = XMLString::transcode(argElement->getAttribute(maxFieldXMLStr));
+            string metric = string(charValue);
+            
+            if(metric == "euc")
+            {
+                distMetric = rsgis_euclidean;
+            }
+            else if(metric == "man")
+            {
+                distMetric = rsgis_manhatten;
+            }
+            else if(metric == "mah")
+            {
+                distMetric = rsgis_mahalanobis;
+            }
+            else 
+            {
+                throw RSGISXMLArgumentsException("Did not recognised the distance metric specified.");
+            }
+            
+            XMLString::release(&charValue);
+        }
+        else
+        {
+            cerr << "WARNING: No distance metric was specified, defaulting to Euclidean.\n"; 
+            distMetric = rsgis_euclidean;
+        }
+        XMLString::release(&maxFieldXMLStr);
+        
+        XMLCh *rsgisAttributeXMLStr = XMLString::transcode("rsgis:attribute");
+        DOMNodeList *attributeNodesList = argElement->getElementsByTagName(rsgisAttributeXMLStr);
+		unsigned int numAttributes = attributeNodesList->getLength();
+		
+		cout << "Found " << numAttributes << " Attributes" << endl;
+		
+        attributeNames = new vector<string>();
+        attributeNames->reserve(numAttributes);
+        
+		DOMElement *attElement = NULL;
+        string attName = "";
+		for(int i = 0; i < numAttributes; i++)
+		{
+			attElement = static_cast<DOMElement*>(attributeNodesList->item(i));
+            
+			XMLCh *nameXMLStr = XMLString::transcode("name");
+			if(attElement->hasAttribute(nameXMLStr))
+			{
+				char *charValue = XMLString::transcode(attElement->getAttribute(nameXMLStr));
+				attributeNames->push_back(string(charValue));
+				XMLString::release(&charValue);
+			}
+			else
+			{
+				throw RSGISXMLArgumentsException("No \'name\' attribute was provided.");
+			}
+			XMLString::release(&nameXMLStr);
+        }        
+    }
+    else if(XMLString::equals(optionPopBoolField, optionXML))
+	{		
+		this->option = RSGISExeRasterGIS::popboolfield;
+        
+        XMLCh *tableXMLStr = XMLString::transcode("table");
+        if(argElement->hasAttribute(tableXMLStr))
+        {
+            char *charValue = XMLString::transcode(argElement->getAttribute(tableXMLStr));
+            this->attTableFile = string(charValue);
+            XMLString::release(&charValue);
+        }
+        else
+        {
+            throw RSGISXMLArgumentsException("No \'table\' attribute was provided.");
+        }
+        XMLString::release(&tableXMLStr);
+        
+        
+        XMLCh *tableOutXMLStr = XMLString::transcode("tableout");
+        if(argElement->hasAttribute(tableOutXMLStr))
+        {
+            char *charValue = XMLString::transcode(argElement->getAttribute(tableOutXMLStr));
+            this->outAttTableFile = string(charValue);
+            this->attInMemory = true;
+            XMLString::release(&charValue);
+        }
+        else
+        {
+            this->attInMemory = false;
+        }
+        XMLString::release(&tableOutXMLStr);
+        
+        try 
+        {
+            this->statements = RSGISAttributeTable::generateStatments(argElement);
+        } 
+        catch (RSGISException &e) 
+        {
+            throw RSGISXMLArgumentsException(e.what());
+        }
+	}
     else
 	{
 		string message = string("The option (") + string(XMLString::transcode(optionXML)) + string(") is not known: RSGISExeRasterGIS.");
@@ -3160,6 +3347,8 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
     XMLString::release(&optionPrintAttSummary);
     XMLString::release(&optionExportSize);
     XMLString::release(&optionPopAttributeStatsThresholded);
+    XMLString::release(&optionKNNExtrapolate);
+    XMLString::release(&optionPopBoolField);
     
     XMLString::release(&optionRSGISBool);
     XMLString::release(&optionRSGISInt);
@@ -3341,8 +3530,10 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
                 {
                     attTable = RSGISAttributeTableHDF::importFromHDF5(attTableFile, false);
                 }
-                cout << "Adding Field\n";
-                attTable->addAttIntField("class", 0);
+                //cout << "Adding Field\n";
+                //attTable->addAttIntField("class", 0);
+                cout << "Create output field\n";
+                attTable->createIfStatementsFields(statements, rsgis_int);
                 cout << "Populating statements with indexes\n";
                 attTable->populateIfStatementsWithIdxs(statements);
                 cout << "Apply if statement\n";
@@ -5158,6 +5349,143 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
                 throw e;
             }            
         }
+        else if(this->option == RSGISExeRasterGIS::knnextrapolate)
+        {
+            cout << "A command to extrapolate values for field in the attribute table using a KNN approach\n";
+            cout << "Table: " << this->attTableFile << endl;
+            if(this->attInMemory)
+            {
+                cout << "Output Table: " << this->outAttTableFile << endl;
+            }
+            cout << "Training Field: " << this->trainingField << endl;
+            cout << "Value Field: " << this->valueField << endl;
+            cout << "K = " << this->numkNN << endl;
+            cout << "Distance threshold: " << this->distanceThreshold << endl;
+            if(distMetric == rsgis_euclidean)
+            {
+                cout << "Distance Metric: Euclidean\n";
+            }
+            else if(distMetric == rsgis_manhatten)
+            {
+                cout << "Distance Metric: Manhatten\n";
+            }
+            else if(distMetric == rsgis_mahalanobis)
+            {
+                cout << "Distance Metric: Mahalanobis\n";
+            }
+            else
+            {
+                cout << "Unknown distance metric\n";
+            }
+            cout << "Fields to calculate distance: \n";
+            for(vector<string>::iterator iterNames = attributeNames->begin(); iterNames != attributeNames->end(); ++iterNames)
+            {
+                cout << "\t" << *iterNames << endl;
+            }
+            
+            try
+            {
+                cout << "Importing Attribute Table:\n";
+                RSGISAttributeTable *attTable = NULL;
+                if(this->attInMemory)
+                {
+                    if(RSGISAttributeTableMem::findFileType(attTableFile) == rsgis_ascii_attft)
+                    {
+                        attTable = RSGISAttributeTableMem::importFromASCII(attTableFile);
+                    }
+                    else if(RSGISAttributeTableMem::findFileType(attTableFile) == rsgis_hdf_attft)
+                    {
+                        attTable = RSGISAttributeTableMem::importFromHDF5(attTableFile);
+                    }
+                    else
+                    {
+                        throw RSGISAttributeTableException("Could not identify attribute table file type.");
+                    }
+                }
+                else
+                {
+                    attTable = RSGISAttributeTableHDF::importFromHDF5(attTableFile, false);
+                }
+                
+                cout << "Perform KNN extrapolation\n";
+                RSGISKNNATTableExtrapolation kNNExtrap;
+                kNNExtrap.performExtrapolation(attTable, trainingField, valueField, numkNN, distanceThreshold, distMetric, attributeNames);
+                
+                if(this->attInMemory)
+                {
+                    cout << "Exporting Attribute Table\n";
+                    attTable->exportHDF5(outAttTableFile);
+                }
+                
+                delete attTable;
+                delete attributeNames;
+            }
+            catch(RSGISException &e)
+            {
+                throw e;
+            }
+        }
+        else if(this->option == RSGISExeRasterGIS::popboolfield)
+        {
+            cout << "A command to populate a bool field within the attribute table\n";
+            cout << "Input Table: " << this->attTableFile << endl;
+            if(this->attInMemory)
+            {
+                cout << "Output Table: " << this->outAttTableFile << endl;
+            }
+            
+            try
+            {
+                if(statements->size() > 1)
+                {
+                    cerr << "WARNING: Only the first statment will be used, is this what you intend?\n";
+                }
+                else if(statements->size() == 0)
+                {
+                    throw RSGISAttributeTableException("At least 1 statment must be provided.");
+                }
+                
+                cout << "Importing Attribute Table:\n";
+                RSGISAttributeTable *attTable = NULL;
+                if(this->attInMemory)
+                {
+                    if(RSGISAttributeTableMem::findFileType(attTableFile) == rsgis_ascii_attft)
+                    {
+                        attTable = RSGISAttributeTableMem::importFromASCII(attTableFile);
+                    }
+                    else if(RSGISAttributeTableMem::findFileType(attTableFile) == rsgis_hdf_attft)
+                    {
+                        attTable = RSGISAttributeTableMem::importFromHDF5(attTableFile);
+                    }
+                    else
+                    {
+                        throw RSGISAttributeTableException("Could not identify attribute table file type.");
+                    }
+                }
+                else
+                {
+                    attTable = RSGISAttributeTableHDF::importFromHDF5(attTableFile, false);
+                }
+                cout << "Create output field\n";
+                attTable->createIfStatementsFields(statements, rsgis_bool);
+                cout << "Populating statements with indexes\n";
+                attTable->populateIfStatementsWithIdxs(statements);
+                cout << "Apply if statement\n";
+                attTable->applyIfStatementBoolOut(statements->front());
+                if(this->attInMemory)
+                {
+                    cout << "Exporting Attribute Table\n";
+                    attTable->exportHDF5(outAttTableFile);
+                    //attTable->exportASCII(outAttTableFile);
+                }
+                cout << "Finished\n";
+                delete attTable;
+            }
+            catch(RSGISException &e)
+            {
+                throw e;
+            }
+        }
 		else
 		{
 			cout << "The option is not recognised: RSGISExeRasterGIS\n";
@@ -5649,6 +5977,49 @@ void RSGISExeRasterGIS::printParameters()
             else
             {
                 throw RSGISException("Output type is not recognised.");
+            }
+        }
+        else if(this->option == RSGISExeRasterGIS::knnextrapolate)
+        {
+            cout << "A command to extrapolate values for field in the attribute table using a KNN approach\n";
+            cout << "Table: " << this->attTableFile << endl;
+            if(this->attInMemory)
+            {
+                cout << "Output Table: " << this->outAttTableFile << endl;
+            }
+            cout << "Training Field: " << this->trainingField << endl;
+            cout << "Value Field: " << this->valueField << endl;
+            cout << "K = " << this->numkNN << endl;
+            cout << "Distance threshold: " << this->distanceThreshold << endl;
+            if(distMetric == rsgis_euclidean)
+            {
+                cout << "Distance Metric: Euclidean\n";
+            }
+            else if(distMetric == rsgis_manhatten)
+            {
+                cout << "Distance Metric: Manhatten\n";
+            }
+            else if(distMetric == rsgis_mahalanobis)
+            {
+                cout << "Distance Metric: Mahalanobis\n";
+            }
+            else
+            {
+                cout << "Unknown distance metric\n";
+            }
+            cout << "Fields to calculate distance: \n";
+            for(vector<string>::iterator iterNames = attributeNames->begin(); iterNames != attributeNames->end(); ++iterNames)
+            {
+                cout << "\t" << *iterNames << endl;
+            }
+        }
+        else if(this->option == RSGISExeRasterGIS::popboolfield)
+        {
+            cout << "A command to populate a bool field within the attribute table\n";
+            cout << "Input Table: " << this->attTableFile << endl;
+            if(this->attInMemory)
+            {
+                cout << "Output Table: " << this->outAttTableFile << endl;
             }
         }
 		else

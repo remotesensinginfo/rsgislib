@@ -53,6 +53,7 @@
 #include "rastergis/RSGISCreateNewAttributeTable.h"
 #include "rastergis/RSGISFindClumpNeighbours.h"
 #include "rastergis/RSGISFindMeanDist2Neighbours.h"
+#include "rastergis/RSGISKNNATTable.h"
 
 #include "vec/RSGISVectorUtils.h"
 #include "vec/RSGISAttCountPolyIntersect.h"
@@ -107,7 +108,9 @@ public:
         popmeansumattributes,
         printattsummary,
         exportsize,
-        popattributestatsthresholded
+        popattributestatsthresholded,
+        knnextrapolate,
+        popboolfield
     };
     
     enum outFileTypeAddition 
@@ -147,6 +150,8 @@ protected:
     RSGISAttributeDataType attFieldDT;
     string meanlitField;
     string meanlitImage;
+    string trainingField;
+    string valueField;
     unsigned int meanLitBand;
     bool meanLitUseUpper;
     string areaField;
@@ -168,6 +173,9 @@ protected:
     bool attInMemory;
     unsigned int cacheSize;
     outFileTypeAddition outFileType;
+    unsigned int numkNN;
+    float distanceThreshold;
+    rsgisdistmetrics distMetric;
 };
 
 #endif

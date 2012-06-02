@@ -653,7 +653,8 @@ set(LIB_RASTERGIS_H
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISHierarchicalClumps.h
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindClumpNeighbours.h
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindClumpCategoryMajority.h
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindMeanDist2Neighbours.h )
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindMeanDist2Neighbours.h 
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISKNNATTable.h )
 	
 set(LIB_RASTERGIS_CPP
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISAttributeTable.cpp
@@ -677,7 +678,9 @@ set(LIB_RASTERGIS_CPP
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindClumpCategoryMajority.cpp
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindClumpCategoryMajority.h
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindMeanDist2Neighbours.cpp
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindMeanDist2Neighbours.h )
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindMeanDist2Neighbours.h
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISKNNATTable.cpp
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISKNNATTable.h )
 ###############################################################################
 
 ###############################################################################

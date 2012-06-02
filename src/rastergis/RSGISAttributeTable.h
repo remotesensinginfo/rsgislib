@@ -235,7 +235,9 @@ namespace rsgis{namespace rastergis{
         bool applyIfStatementsToFeature(RSGISFeature *feat, vector<RSGISIfStatement*> *statements) throw(RSGISAttributeTableException);
         void processIfStatements(RSGISIfStatement *statement, RSGISProcessFeature *processTrue, RSGISProcessFeature *processFalse) throw(RSGISAttributeTableException);
         void processIfStatementsInBlocks(RSGISIfStatement *statement, RSGISProcessFeature *processTrue, RSGISProcessFeature *processFalse) throw(RSGISAttributeTableException);
+        void applyIfStatementBoolOut(RSGISIfStatement *statement) throw(RSGISAttributeTableException);
         void populateIfStatementsWithIdxs(vector<RSGISIfStatement*> *statements) throw(RSGISAttributeTableException);
+        void createIfStatementsFields(vector<RSGISIfStatement*> *statements, RSGISAttributeDataType dataType) throw(RSGISAttributeTableException);
         
         void calculateFieldsMUParser(string expression, string outField, RSGISAttributeDataType outFieldDT, vector<RSGISMathAttVariable*> *variables) throw(RSGISAttributeTableException);
         

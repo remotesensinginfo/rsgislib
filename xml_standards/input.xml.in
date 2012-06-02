@@ -56,9 +56,9 @@
     <rsgis:command algor="zonalstats" option="rasterpolygons2txt" image="image.env" raster="polys.env" vector="polys.shp" output="output.txt" mean="yes" max="yes" min="yes" stddev="yes" />
     <!-- A command to extract pixel values and save to a text file -->
     <rsgis:command algor="zonalstats" option="pixelVals2txt" image="image.env" vector="polys.shp" output="output_base" attribute="classname" method="polyContainsPixel | polyContainsPixelCenter | polyOverlapsPixel | polyOverlapsOrContainsPixel | pixelContainsPoly | pixelContainsPolyCenter | adaptive | envelope" outTXT="mtxt | gtxt | csv"/>
-	<!-- TODO A command to generate a matrix file for each polygon with the out -->
+    <!-- TODO A command to generate a matrix file for each polygon with the out -->
     <rsgis:command algor="zonalstats" option="variables2matrix" image="image.env" vector="polys.shp" output="output_base" attribute="classname" method="polyContainsPixel | polyContainsPixelCenter | polyOverlapsPixel | polyOverlapsOrContainsPixel | pixelContainsPoly | pixelContainsPolyCenter | adaptive | envelope" />
-	<!-- TODO A command to generate a matrix file for each polygon with the out -->
+    <!-- TODO A command to generate a matrix file for each polygon with the out -->
     <rsgis:command algor="zonalstats" option="image2matrix" image="image.env" vector="polys.shp" output="output.mtxt" band="int" />
     <!-- Deprecated TODO A command to -->
     <rsgis:command algor="zonalstats" option="pixelcount" image="image.env" raster="polys.env" vector="polys.shp" output="output.shp" force="yes | no" pxlcount="yes | no" emptyset="yes | no">
@@ -182,42 +182,42 @@
         <rsgis:band band="int" [min="field"] [max="field"] [mean="field"] [sum="field"] [stddev="field"] [median="field"] />
         <rsgis:band band="int" [min="field"] [max="field"] [mean="field"] [sum="field"] [stddev="field"] [median="field"] />
     </rsgis:command>
-	<!-- A command to populate an attribute table with statistics from an image in a memory efficient manor -->
+    <!-- A command to populate an attribute table with statistics from an image in a memory efficient manor -->
     <rsgis:command algor="rastergis" option="popattributestats" input="image.env" clumps="clumps.env" table="input.att" [tableout="output.att"] >
         <rsgis:band band="int" [min="field"] [max="field"] [mean="field"] [sum="field"] [stddev="field"] />
         <rsgis:band band="int" [min="field"] [max="field"] [mean="field"] [sum="field"] [stddev="field"] />
         <rsgis:band band="int" [min="field"] [max="field"] [mean="field"] [sum="field"] [stddev="field"] />
         <rsgis:band band="int" [min="field"] [max="field"] [mean="field"] [sum="field"] [stddev="field"] />
     </rsgis:command>
-	<!-- A command to populate an attribute table with statistics from an image in a memory efficient manor where a threshold is defined per band and only values above that threshold are valid -->
+    <!-- A command to populate an attribute table with statistics from an image in a memory efficient manor where a threshold is defined per band and only values above that threshold are valid -->
     <rsgis:command algor="rastergis" option="popattributestatsthresholded" input="image.env" clumps="clumps.env" table="input.att" [tableout="output.att"] >
         <rsgis:band band="int" threshold="float" count="field" [min="field"] [max="field"] [mean="field"] [sum="field"] [stddev="field"] />
         <rsgis:band band="int" threshold="float" count="field" [min="field"] [max="field"] [mean="field"] [sum="field"] [stddev="field"] />
         <rsgis:band band="int" threshold="float" count="field" [min="field"] [max="field"] [mean="field"] [sum="field"] [stddev="field"] />
         <rsgis:band band="int" threshold="float" count="field" [min="field"] [max="field"] [mean="field"] [sum="field"] [stddev="field"] />
     </rsgis:command>
-	<!-- A command to populate an attribute table with sum and mean values from an image in a memory efficient and fast manor -->
+    <!-- A command to populate an attribute table with sum and mean values from an image in a memory efficient and fast manor -->
     <rsgis:command algor="rastergis" option="popmeansumattributes" input="image.env" clumps="clumps.env" table="input.att" [tableout="output.att"] >
         <rsgis:band band="int" [mean="field"] [sum="field"] />
         <rsgis:band band="int" [mean="field"] [sum="field"] />
-		<rsgis:band band="int" [mean="field"] [sum="field"] />
-		<rsgis:band band="int" [mean="field"] [sum="field"] />
+        <rsgis:band band="int" [mean="field"] [sum="field"] />
+        <rsgis:band band="int" [mean="field"] [sum="field"] />
     </rsgis:command>
-	<!-- A command to populate an attribute table with statistics from an image where a segment value either above or below is used -->
+    <!-- A command to populate an attribute table with statistics from an image where a segment value either above or below is used -->
     <rsgis:command algor="rastergis" option="meanlitbandspopattributestats" input="image.env" clumps="clumps.env" table="input.att" tableout="output.att" >
         <rsgis:band band="int" field="string" type="below | above" [min="field"] [max="field"] [mean="field"] [sum="field"] [stddev="field"] [median="field"] />
         <rsgis:band band="int" field="string" type="below | above" [min="field"] [max="field"] [mean="field"] [sum="field"] [stddev="field"] [median="field"] />
         <rsgis:band band="int" field="string" type="below | above" [min="field"] [max="field"] [mean="field"] [sum="field"] [stddev="field"] [median="field"] />
         <rsgis:band band="int" field="string" type="below | above" [min="field"] [max="field"] [mean="field"] [sum="field"] [stddev="field"] [median="field"] />
     </rsgis:command>
-	<!-- A command to populate an attribute table with statistics from an image where a segment value either above or below is used -->
+    <!-- A command to populate an attribute table with statistics from an image where a segment value either above or below is used -->
     <rsgis:command algor="rastergis" option="meanlitpopattributestatsinmem" input="image.env" clumps="clumps.env" table="input.att" tableout="output.att" field="meanlit" meanlitimage="image.env" meanlitband="int" meanlittype="below | above" >
         <rsgis:band band="int" [min="field"] [max="field"] [mean="field"] [sum="field"] [stddev="field"] [median="field"] />
         <rsgis:band band="int" [min="field"] [max="field"] [mean="field"] [sum="field"] [stddev="field"] [median="field"] />
         <rsgis:band band="int" [min="field"] [max="field"] [mean="field"] [sum="field"] [stddev="field"] [median="field"] />
         <rsgis:band band="int" [min="field"] [max="field"] [mean="field"] [sum="field"] [stddev="field"] [median="field"] />
     </rsgis:command>
-	<!-- A command to populate an attribute table with statistics from an image where a segment value either above or below is used in a memory efficient manor -->
+    <!-- A command to populate an attribute table with statistics from an image where a segment value either above or below is used in a memory efficient manor -->
     <rsgis:command algor="rastergis" option="meanlitpopattributestats" input="image.env" clumps="clumps.env" table="input.att" tableout="output.att" field="meanlit" meanlitimage="image.env" meanlitband="int" meanlittype="below | above" >
         <rsgis:band band="int" [min="field"] [max="field"] [mean="field"] [sum="field"] [stddev="field"] />
         <rsgis:band band="int" [min="field"] [max="field"] [mean="field"] [sum="field"] [stddev="field"] />
@@ -319,17 +319,47 @@
         <rsgis:band band="int" name="string" />
         <rsgis:band band="int" name="string" />
     </rsgis:command>
-	<!-- A command to export an attribute table column as a single ASCII table -->
-	<rsgis:command algor="rastergis" option="exportfield2ascii" table="input.att" output="output.txt" field="attribute_name" />
-	<!-- A command to export an attribute table to a hdf file -->
-	<rsgis:command algor="rastergis" option="export2hdf" table="input.att" tableout="output.att" />
-	<!-- A command to export an attribute table to a ascii file -->
-	<rsgis:command algor="rastergis" option="export2ascii" table="input.att" tableout="output.att" />
-	<!-- A command to print a summary of an attribute table - useful for debugging -->
-	<rsgis:command algor="rastergis" option="printattsummary" table="input.att" />
-	<!-- A command to export the attribute table size and output to the text file -->
-	<rsgis:command algor="rastergis" option="exportsize" table="input.att" output="input.txt" file="trunk | append" />
-
+    <!-- A command to export an attribute table column as a single ASCII table -->
+    <rsgis:command algor="rastergis" option="exportfield2ascii" table="input.att" output="output.txt" field="attribute_name" />
+    <!-- A command to export an attribute table to a hdf file -->
+    <rsgis:command algor="rastergis" option="export2hdf" table="input.att" tableout="output.att" />
+    <!-- A command to export an attribute table to a ascii file -->
+    <rsgis:command algor="rastergis" option="export2ascii" table="input.att" tableout="output.att" />
+    <!-- A command to print a summary of an attribute table - useful for debugging -->
+    <rsgis:command algor="rastergis" option="printattsummary" table="input.att" />
+    <!-- A command to export the attribute table size and output to the text file -->
+    <rsgis:command algor="rastergis" option="exportsize" table="input.att" output="input.txt" file="trunk | append" />
+    <!-- A command to extrapolate values for field in the attribute table using a KNN approach  -->
+    <rsgis:command algor="rastergis" option="knnextrapolate" table="input.att" [tableout="output.att"] training="bool field - true for training samples" value="float field - training values and output extrapolated" k="int" distancemetric="euc | mah | man" distancethreshold="float" >
+        <rsgis:attribute name="string" />
+        <rsgis:attribute name="string" />
+        <rsgis:attribute name="string" />
+    </rsgis:command>
+	<!-- A command to populate a bool field within the attribute table  -->
+    <rsgis:command algor="rastergis" option="popboolfield" table="input.att" [tableout="output.att"] >
+        <rsgis:if field="string" >
+            <rsgis:exp type="and"></rsgis:exp>
+            <rsgis:exp type="or"></rsgis:exp>
+            <rsgis:exp type="not"></rsgis:exp>
+            <rsgis:exp type="gt" field1="string" field2="string" />
+            <rsgis:exp type="lt" field1="string" field2="string" />
+            <rsgis:exp type="gteq" field1="string" field2="string" />
+            <rsgis:exp type="lteq" field1="string" field2="string" />
+            <rsgis:exp type="eq" field1="string" field2="string" />
+            <rsgis:exp type="neq" field1="string" field2="string" />
+            <rsgis:exp type="gtconst" field="string" value="float" />
+            <rsgis:exp type="ltconst" field="string" value="float" />
+            <rsgis:exp type="gteqconst" field="string" value="float" />
+            <rsgis:exp type="lteqconst" field="string" value="float" />
+            <rsgis:exp type="eqconst" field="string" value="float" />
+            <rsgis:exp type="neqconst" field="string" value="float" />
+            <rsgis:exp type="constgt" field="string" value="float" />
+            <rsgis:exp type="constlt" field="string" value="float" />
+            <rsgis:exp type="constgteq" field="string" value="float" />
+            <rsgis:exp type="constlteq" field="string" value="float" />
+        </rsgis:if>
+		<rsgis:else />
+    </rsgis:command>
 
 
 
@@ -457,10 +487,10 @@
     <rsgis:command algor="imageutils" option="relabel" image="image.env" output="image_out.env" lut="matrix.gmtxt" format="GDAL Format" />
     <!-- A command to assign and update and image to a specific projection -->
     <rsgis:command algor="imageutils" option="assignproj" image="image.env" projwkt="txt.wkt" />
-	<!-- A command to populate an image with image statistics and image pyramids -->
-	<rsgis:command algor="imageutils" option="popimgstats" image="image.img" ignore="float" pyramids="yes | no" />
-	<!-- A command to create a new image from an existing image -->
-	<rsgis:command algor="imageutils" option="createcopy" image="image.img" output="image_out.env" numbands="int" pixelval="float" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
+    <!-- A command to populate an image with image statistics and image pyramids -->
+    <rsgis:command algor="imageutils" option="popimgstats" image="image.img" ignore="float" pyramids="yes | no" />
+    <!-- A command to create a new image from an existing image -->
+    <rsgis:command algor="imageutils" option="createcopy" image="image.img" output="image_out.env" numbands="int" pixelval="float" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
     <!-- A command to create a KML text file for an existing image -->
     <rsgis:command algor="imageutils" option="createKMLFile" image="image.png" outKMLFile="string"/>
 
@@ -523,8 +553,8 @@
     <rsgis:command algor="imagecalc" option="kmeanscentres" image="image.env" output="matrix.gmtxt" numclusters="int" maxiterations="int" degreeofchange="float" subsample="int" initmethod="random | diagonal_range | diagonal_stddev | diagonal_range_attach | diagonal_stddev_attach | kpp" ignorezeros="yes | no" />
     <!-- A command to calculate cluster centres for the image using ISOData clustering -->
     <rsgis:command algor="imagecalc" option="isodatacentres" image="image.env" output="matrix.gmtxt" numclusters="int" minnumclusters="int" maxiterations="int" degreeofchange="float" subsample="int" initmethod="random | diagonal_range | diagonal_stddev | diagonal_range_attach | diagonal_stddev_attach | kpp" ignorezeros="yes | no" mindist="float" minnum="unsigned int" maxstddev="float" editstart="int" editend="int" />
-	<!-- A command to test whether all bands are equal to the same value - useful for creating images masks -->
-	<rsgis:command algor="imagecalc" option="allbandsequalto" image="image.env" output="image_out.env" format="GDAL Format" value="float" trueout="float" falseout="float" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
+    <!-- A command to test whether all bands are equal to the same value - useful for creating images masks -->
+    <rsgis:command algor="imagecalc" option="allbandsequalto" image="image.env" output="image_out.env" format="GDAL Format" value="float" trueout="float" falseout="float" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
 
 
 
@@ -725,7 +755,7 @@
     <rsgis:command algor="segmentation" option="rmsmallclumps" image="image.env" clumps="image.env" output="image_out.env" minsize="int (in pxls)" maxspectraldist="float" format="GDAL Format" inmemory="yes | no" proj="OSGB | NZ2000 | NZ1949 | IMAGE" />
     <!-- A command to eliminate clumps smaller than a given size from the scene, small clump will be combined with their spectrally closest neighbouring clump in a stepwise fashion unless over spectral distance threshold -->
     <rsgis:command algor="segmentation" option="rmsmallclumpsstepwise" image="image.env" clumps="image.env" output="image_out.env" minsize="int (in pxls)" storemean="yes | no" maxspectraldist="float" format="GDAL Format" inmemory="yes | no" proj="OSGB | NZ2000 | NZ1949 | IMAGE" />
-	<!-- A command to eliminate clumps smaller than a given size from the scene, small clump will be combined with their spectrally closest neighbouring clump in a stepwise fashion unless over spectral distance threshold -->
+    <!-- A command to eliminate clumps smaller than a given size from the scene, small clump will be combined with their spectrally closest neighbouring clump in a stepwise fashion unless over spectral distance threshold -->
     <rsgis:command algor="segmentation" option="stepwiseelimination" image="image.env" clumps="image.env" output="image_out.env" [tmptable="table.att" [cachesize="unsigned int"]] outconsec="yes | no" minsize="int (in pxls)" maxspectraldist="float" format="GDAL Format" proj="OSGB | NZ2000 | NZ1949 | IMAGE" />
     <!-- A command to clump a categorical image into clumps with unique IDs -->
     <rsgis:command algor="segmentation" option="clump" image="image.env" output="image_out.env" nodata="unsigned int" format="GDAL Format" inmemory="yes | no" proj="OSGB | NZ2000 | NZ1949 | IMAGE" />
@@ -766,8 +796,8 @@
     <rsgis:command algor="segmentation" option="labelsfromclusters" image="image.env" output="image_out.env" clusters="matrix.gmtxt" ignorezeros="yes | no" format="GDAL Format" proj="OSGB | NZ2000 | NZ1949 | IMAGE" />
     <!-- A command which creates in image with a unique id for each pixel -->
     <rsgis:command algor="segmentation" option="labelsfromcpixels" image="image.env" output="image_out.env" ignorezeros="yes | no" format="GDAL Format" proj="OSGB | NZ2000 | NZ1949 | IMAGE" />
-	<!-- A command which iteratively removes single pixel labelled neighbours into spectrally closest large group -->
-	<rsgis:command algor="segmentation" option="elimsinglepxls" image="image.env" clumps="image.env" [temp="image.env"] output="image_out.env" ignorezeros="yes | no" format="GDAL Format" proj="OSGB | NZ2000 | NZ1949 | IMAGE" />
+    <!-- A command which iteratively removes single pixel labelled neighbours into spectrally closest large group -->
+    <rsgis:command algor="segmentation" option="elimsinglepxls" image="image.env" clumps="image.env" [temp="image.env"] output="image_out.env" ignorezeros="yes | no" format="GDAL Format" proj="OSGB | NZ2000 | NZ1949 | IMAGE" />
     <!-- A command to grow regions from seeds up to a given distance in spectral space. -->
     <rsgis:command algor="segmentation" option="growregionspixels" image="image.env" output="image_out.env" seeds="seedsfile.txt" threshold="float" format="GDAL Format" inmemory="yes | no" proj="OSGB | NZ2000 | NZ1949 | IMAGE" />
     <!-- A command to grow regions from seeds to there maximum extent on a per pixel bases. -->
@@ -857,7 +887,7 @@
     </rsgis:command>
     <!-- A command to create a raster version of a polygon -->
     <rsgis:command algor="vectorutils" option="rasterise" vector="vector.shp" output="image_out.env" resolution="float" attribute="string" image="inputImage.env (optional)" constval="float" method="polyContainsPixel | polyContainsPixelCenter | polyOverlapsPixel | pixelContainsPoly | pixelContainsPolyCenter | adaptive" />
-	<!-- A command to create a raster version of a polygon shapefile which is burnt into an existing raster -->
+    <!-- A command to create a raster version of a polygon shapefile which is burnt into an existing raster -->
     <rsgis:command algor="vectorutils" option="burnrasterise" image="inputImage.env" vector="vector.shp" attribute="string" method="polyContainsPixel | polyContainsPixelCenter | polyOverlapsPixel | pixelContainsPoly | pixelContainsPolyCenter | adaptive" />
     <!-- A command to create polygons based on plot center, length width and orientation -->
     <rsgis:command algor="vectorutils" option="polygonplots" input="input.csv" output="vector_out.shp" force="yes | no" />
@@ -1021,13 +1051,13 @@
         Uses experimental coefficients for closed forest -->
     <rsgis:command algor="SaatchiBiomass" option="closedCrownPL" input="inputimage" output="outputimage"/>
 
-    <!-- A command to estimate parameters from SAR data --> 
+    <!-- A command to estimate parameters from SAR data -->
     <rsgis:command algor="estimation" option="dualPolMultiSpeciesClassification | fullPolMultiSpeciesClassification" parameters="heightDensity"
     input="inputClassData.env" output="output.env" >
     <rsgis:estClassParameters method="simulatedAnnealingAP" function="2DPoly" coefficientsHH="heightDensHH_Coeff.mtxt" coefficientsHV="heightDensHH_Coeff.mtxt" [coefficientsVV="heightDensVV_Coeff.mtxt"] covMatrixP="covMatrixP.mtxt" initialHeight="float" initialDensity="float" minHeight="float" maxHeight="float" minDensity="float" maxDensity="float" heightStep="float" densityStep="float" startTemp="int" ittmax="int" />
     </rsgis:command>
 
-    <!-- A command to estimate parameters from SAR data using image objects --> 
+    <!-- A command to estimate parameters from SAR data using image objects -->
     <rsgis:command algor="estimation" option="dualPolObject | fullPolObject" parameters="heightDensity" input="input.env" output="output.env" object="objects.shp" classField="ClassID" [raster="objects_raster.shp"] [outSHP="output.shp"] >
         <rsgis:estSlowOptimiserParameters method="simulatedAnnealingAP" function="2DPoly" coefficientsHH="heightDensHH_Coeff.mtxt" coefficientsHV="heightDensHH_Coeff.mtxt" [coefficientsVV="heightDensVV_Coeff.mtxt"] covMatrixP="covMatrixP.mtxt" initialHeight="float" initialDensity="float" minHeight="float" maxHeight="float" minDensity="float" maxDensity="float" heightStep="float" densityStep="float" startTemp="int" ittmax="int" />
         <rsgis:estFastOptimiserParameters method="conjugateGradient" function="2DPoly" coefficientsHH="heightDensHH_Coeff.mtxt" coefficientsHV="heightDensHH_Coeff.mtxt" [coefficientsVV="heightDensVV_Coeff.mtxt"] covMatrixP="covMatrixP.mtxt" initialHeight="float" initialDensity="float" minHeight="float" maxHeight="float" minDensity="float" maxDensity="float" ittmax="int" />
