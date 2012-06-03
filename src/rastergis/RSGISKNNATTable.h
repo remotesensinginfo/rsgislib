@@ -34,6 +34,7 @@
 #include "common/RSGISAttributeTableException.h"
 
 #include "math/RSGISMathsUtils.h"
+#include "math/RSGISMatrices.h"
 #include "math/RSGISMathException.h"
 
 #include "rastergis/RSGISAttributeTable.h"
@@ -44,6 +45,49 @@ using namespace rsgis::math;
 
 namespace rsgis{namespace rastergis{
     
+    class RSGISKNNATTable
+    {
+    public:
+        RSGISKNNATTable();
+        void initKNN(RSGISAttributeTable *attTable, string trainField, string classField, bool limitToClass, int classVal, unsigned int k, float distThreshold, rsgisdistmetrics distMetric, vector<string> *attributeNames)throw(RSGISAttributeTableException);
+        virtual void performKNN()throw(RSGISAttributeTableException)=0;
+        virtual ~RSGISKNNATTable();
+    protected:
+        double calcDist(rsgisdistmetrics distMetric, vector<double> *vals1, vector<double> *vals2) throw(RSGISMathException);
+        vector<double> *calcVariableMeans() throw(RSGISMathException);
+        Matrix* calcCovarianceMatrix() throw(RSGISMathException);
+        bool initialised;
+        RSGISAttributeTable *attTable;
+        string trainField;
+        unsigned int trainFieldIdx;
+        RSGISAttributeDataType trainFieldDT;
+        bool limitToClass;
+        string classField;
+        int classVal;
+        unsigned int classFieldIdx;
+        RSGISAttributeDataType classFieldDT;
+        unsigned int k;
+        float distThreshold;
+        rsgisdistmetrics distMetric;
+        vector<RSGISAttribute*> attributes;
+        vector< vector<double>* > *knownData;
+    };
+    
+    
+    class RSGISKNNATTableExtrapolation : public RSGISKNNATTable
+    {
+    public:
+        RSGISKNNATTableExtrapolation(string valField);
+        void performKNN()throw(RSGISAttributeTableException);
+        ~RSGISKNNATTableExtrapolation();
+    protected:
+        double calcNewVal(unsigned int k, float distThreshold, rsgisdistmetrics distMetric, vector<double> *knownVals, vector< vector<double>* > *knownData, vector<double> *unknownData) throw(RSGISMathException);
+        string valField;
+        unsigned int valFieldIdx;
+        RSGISAttributeDataType valFieldDT;
+    };
+    
+    /*
     class RSGISKNNATTableExtrapolation
     {
     public:
@@ -54,6 +98,7 @@ namespace rsgis{namespace rastergis{
         double calcNewVal(unsigned int k, float distThreshold, rsgisdistmetrics distMetric, vector<double> *knownVals, vector< vector<double>* > *knownData, vector<double> *unknownData) throw(RSGISMathException);
         double calcDist(rsgisdistmetrics distMetric, vector<double> *vals1, vector<double> *vals2) throw(RSGISMathException);
     };
+    */
     
 }}
 

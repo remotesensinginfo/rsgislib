@@ -330,7 +330,7 @@
     <!-- A command to export the attribute table size and output to the text file -->
     <rsgis:command algor="rastergis" option="exportsize" table="input.att" output="input.txt" file="trunk | append" />
     <!-- A command to extrapolate values for field in the attribute table using a KNN approach  -->
-    <rsgis:command algor="rastergis" option="knnextrapolate" table="input.att" [tableout="output.att"] training="bool field - true for training samples" value="float field - training values and output extrapolated" k="int" distancemetric="euc | mah | man" distancethreshold="float" >
+    <rsgis:command algor="rastergis" option="knnextrapolate" table="input.att" [tableout="output.att"] training="bool field - true for training samples" [classfield="int field - option to limit analysis to a class" classval="int"] value="float field - training values and output extrapolated" k="int" distancemetric="euc | mah | man" distancethreshold="float" >
         <rsgis:attribute name="string" />
         <rsgis:attribute name="string" />
         <rsgis:attribute name="string" />

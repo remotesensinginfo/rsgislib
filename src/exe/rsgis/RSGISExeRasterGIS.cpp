@@ -3169,6 +3169,38 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
         }
         XMLString::release(&trainingFieldXMLStr);
         
+        
+        XMLCh *classFieldXMLStr = XMLString::transcode("classfield");
+        if(argElement->hasAttribute(classFieldXMLStr))
+        {
+            char *charValue = XMLString::transcode(argElement->getAttribute(classFieldXMLStr));
+            this->trainingField = string(charValue);
+            XMLString::release(&charValue);
+            
+            XMLCh *classValXMLStr = XMLString::transcode("classval");
+            if(argElement->hasAttribute(classValXMLStr))
+            {
+                char *charValue = XMLString::transcode(argElement->getAttribute(classValXMLStr));
+                this->classVal = mathUtils.strtoint(string(charValue));
+                XMLString::release(&charValue);
+            }
+            else
+            {
+                throw RSGISXMLArgumentsException("No \'classval\' attribute was provided.");
+            }
+            XMLString::release(&classValXMLStr);
+            
+            
+            classFieldDefined = true;
+        }
+        else
+        {
+            classFieldDefined = false;
+        }
+        XMLString::release(&classFieldXMLStr);
+        
+        
+        
         XMLCh *valueFieldXMLStr = XMLString::transcode("value");
         if(argElement->hasAttribute(valueFieldXMLStr))
         {
@@ -5351,6 +5383,7 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
         }
         else if(this->option == RSGISExeRasterGIS::knnextrapolate)
         {
+            cout.precision(12);
             cout << "A command to extrapolate values for field in the attribute table using a KNN approach\n";
             cout << "Table: " << this->attTableFile << endl;
             if(this->attInMemory)
@@ -5408,8 +5441,10 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
                 }
                 
                 cout << "Perform KNN extrapolation\n";
-                RSGISKNNATTableExtrapolation kNNExtrap;
-                kNNExtrap.performExtrapolation(attTable, trainingField, valueField, numkNN, distanceThreshold, distMetric, attributeNames);
+                RSGISKNNATTableExtrapolation kNNExtrap(valueField);
+                kNNExtrap.initKNN(attTable, trainingField, classField, classFieldDefined, classVal, numkNN, distanceThreshold, distMetric, attributeNames);
+                kNNExtrap.performKNN();
+                //kNNExtrap.performExtrapolation(attTable, trainingField, valueField, numkNN, distanceThreshold, distMetric, attributeNames);
                 
                 if(this->attInMemory)
                 {

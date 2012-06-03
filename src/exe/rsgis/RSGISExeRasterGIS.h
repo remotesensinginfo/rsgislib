@@ -151,7 +151,10 @@ protected:
     string meanlitField;
     string meanlitImage;
     string trainingField;
+    string classField;
     string valueField;
+    int classVal;
+    bool classFieldDefined;
     unsigned int meanLitBand;
     bool meanLitUseUpper;
     string areaField;
