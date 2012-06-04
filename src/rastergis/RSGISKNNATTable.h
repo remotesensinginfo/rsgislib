@@ -31,10 +31,16 @@
 #include <vector>
 #include <algorithm>
 
+#include <gsl/gsl_matrix.h>
+#include <gsl/gsl_vector.h>
+#include <gsl/gsl_linalg.h>
+#include <gsl/gsl_blas.h>
+
 #include "common/RSGISAttributeTableException.h"
 
 #include "math/RSGISMathsUtils.h"
 #include "math/RSGISMatrices.h"
+#include "math/RSGISVectors.h"
 #include "math/RSGISMathException.h"
 
 #include "rastergis/RSGISAttributeTable.h"
@@ -54,8 +60,9 @@ namespace rsgis{namespace rastergis{
         virtual ~RSGISKNNATTable();
     protected:
         double calcDist(rsgisdistmetrics distMetric, vector<double> *vals1, vector<double> *vals2) throw(RSGISMathException);
-        vector<double> *calcVariableMeans() throw(RSGISMathException);
-        Matrix* calcCovarianceMatrix() throw(RSGISMathException);
+        Vector* calcVariableMeans() throw(RSGISMathException);
+        Matrix* calcCovarianceMatrix(Vector *attMeans) throw(RSGISMathException);
+        double calcCovariance(RSGISAttribute *a, RSGISAttribute *b, double aMean, double bMean) throw(RSGISMathException);
         bool initialised;
         RSGISAttributeTable *attTable;
         string trainField;
@@ -71,6 +78,9 @@ namespace rsgis{namespace rastergis{
         rsgisdistmetrics distMetric;
         vector<RSGISAttribute*> attributes;
         vector< vector<double>* > *knownData;
+        bool mahDistInit;
+        //gsl_vector *variableMeans;
+        gsl_matrix *invCovarianceMatrix;
     };
     
     
@@ -86,19 +96,6 @@ namespace rsgis{namespace rastergis{
         unsigned int valFieldIdx;
         RSGISAttributeDataType valFieldDT;
     };
-    
-    /*
-    class RSGISKNNATTableExtrapolation
-    {
-    public:
-        RSGISKNNATTableExtrapolation();
-        void performExtrapolation(RSGISAttributeTable *attTable, string trainField, string valField, unsigned int k, float distThreshold, rsgisdistmetrics distMetric, vector<string> *attributeNames)throw(RSGISAttributeTableException);
-        ~RSGISKNNATTableExtrapolation();
-    protected:
-        double calcNewVal(unsigned int k, float distThreshold, rsgisdistmetrics distMetric, vector<double> *knownVals, vector< vector<double>* > *knownData, vector<double> *unknownData) throw(RSGISMathException);
-        double calcDist(rsgisdistmetrics distMetric, vector<double> *vals1, vector<double> *vals2) throw(RSGISMathException);
-    };
-    */
     
 }}
 
