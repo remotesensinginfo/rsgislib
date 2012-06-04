@@ -5444,7 +5444,6 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
                 RSGISKNNATTableExtrapolation kNNExtrap(valueField);
                 kNNExtrap.initKNN(attTable, trainingField, classField, classFieldDefined, classVal, numkNN, distanceThreshold, distMetric, attributeNames);
                 kNNExtrap.performKNN();
-                //kNNExtrap.performExtrapolation(attTable, trainingField, valueField, numkNN, distanceThreshold, distMetric, attributeNames);
                 
                 if(this->attInMemory)
                 {

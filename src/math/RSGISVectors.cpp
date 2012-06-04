@@ -369,7 +369,7 @@ namespace rsgis{namespace math{
 			double velement = inVector->vector[index++];
 			gsl_vector_set(convertedVector,j,velement);
 		}
-		cout << endl;
+		//cout << endl;
 		
 		return convertedVector;
 	}
