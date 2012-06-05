@@ -79,8 +79,9 @@ namespace rsgis{namespace rastergis{
         vector<RSGISAttribute*> attributes;
         vector< vector<double>* > *knownData;
         bool mahDistInit;
-        //gsl_vector *variableMeans;
         gsl_matrix *invCovarianceMatrix;
+        gsl_vector *dVals;
+        gsl_vector *outVec;
     };
     
     
