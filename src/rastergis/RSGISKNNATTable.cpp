@@ -151,7 +151,9 @@ namespace rsgis{namespace rastergis{
                 RSGISMatrices matrixUtils;
                 Vector *varMeans = this->calcVariableMeans();
                 Matrix *covarianceMatrix = this->calcCovarianceMatrix(varMeans);
-                                
+                
+                size_t numVals = covarianceMatrix->m;
+                
                 //this->variableMeans = vecUtils.convertRSGIS2GSLVector(varMeans);
                 gsl_matrix *coVarGSL = matrixUtils.convertRSGIS2GSLMatrix(covarianceMatrix);
                 
@@ -170,6 +172,9 @@ namespace rsgis{namespace rastergis{
                 
                 cout << "Inverse Covariance Matrix:\n";
                 matrixUtils.printGSLMatrix(this->invCovarianceMatrix);
+                
+                dVals = gsl_vector_alloc(numVals);
+                outVec = gsl_vector_alloc(numVals);
                 
                 this->mahDistInit = true;
             }
@@ -227,10 +232,10 @@ namespace rsgis{namespace rastergis{
                     //throw RSGISMathException("Mahalanobis distance metric is currently not implemented...");
                     
                     
-                    RSGISVectors vecUtils;
+                    //RSGISVectors vecUtils;
                     size_t numVals = vals1->size();
                     
-                    gsl_vector *dVals = gsl_vector_alloc(numVals);
+                    //gsl_vector *dVals = gsl_vector_alloc(numVals);
                     
                     for(size_t i = 0; i < numVals; ++i)
                     {
@@ -239,7 +244,7 @@ namespace rsgis{namespace rastergis{
                     //cout << "\nVector D:\n";
                     //vecUtils.printGSLVector(dVals);
                     
-                    gsl_vector *outVec = gsl_vector_alloc(numVals);
+                    //gsl_vector *outVec = gsl_vector_alloc(numVals);
                     
                     gsl_blas_dgemv(CblasNoTrans, 1.0, this->invCovarianceMatrix, dVals, 0.0, outVec );
                     
@@ -256,8 +261,8 @@ namespace rsgis{namespace rastergis{
                     
                     //cout << "mah dist = " << dist << endl;
                     
-                    gsl_vector_free(dVals);
-                    gsl_vector_free(outVec);
+                    //gsl_vector_free(dVals);
+                    //gsl_vector_free(outVec);
                      
                 }
                 else
@@ -389,6 +394,8 @@ namespace rsgis{namespace rastergis{
         if(this->mahDistInit)
         {
             gsl_matrix_free(this->invCovarianceMatrix);
+            gsl_vector_free(this->dVals);
+            gsl_vector_free(this->outVec);
             this->mahDistInit = false;
         }
     }
