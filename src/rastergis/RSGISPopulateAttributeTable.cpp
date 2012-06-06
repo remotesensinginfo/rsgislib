@@ -2833,17 +2833,26 @@ namespace rsgis{namespace rastergis{
             double median = 0;
             double sum = 0;
             
+            bool showCountFeedback = true;
+            if(attTable->getSize() <= 20)
+            {
+                showCountFeedback = false;
+            }
             int feedback = attTable->getSize()/10;
 			int feedbackCounter = 0;
 			cout << "Started" << flush;
             // Calculate Statistics for each feature.
             for(unsigned long long i  = 0; i < attTable->getSize(); ++i)
             {
-                if((i % feedback) == 0)
+                if(showCountFeedback && (i % feedback) == 0)
 				{
 					cout << ".." << feedbackCounter << ".." << flush;
 					feedbackCounter = feedbackCounter + 10;
 				}
+                else if(!showCountFeedback)
+                {
+                    cout << ".." << i << ".." << flush;
+                }
                 
                 feat = attTable->getFeature(i);
                 
