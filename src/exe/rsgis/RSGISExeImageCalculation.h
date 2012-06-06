@@ -126,6 +126,8 @@ class RSGISExeImageCalculation : public RSGISAlgorithmParameters
             imagestats,
             unconlinearspecunmix,
             exhconlinearspecunmix,
+            consum1linearspecunmix,
+            nnconsum1linearspecunmix,
             kmeanscentres,
             isodatacentres,
             allbandsequalto
@@ -208,6 +210,9 @@ class RSGISExeImageCalculation : public RSGISAlgorithmParameters
         float outputTrueVal;
         float outputFalseVal;
         GDALDataType outDataType;
+        float lsumWeight;
+        float lsumGain;
+        float lsumOffset;
 	};
 
 #endif

@@ -546,9 +546,13 @@
     <!-- A command to calculate the statistics for the whole image across all bands -->
     <rsgis:command algor="imagecalc" option="imagestats" image="image.env" output="outfile.txt" ignorezeros="yes | no" />
     <!-- A command to undertake an unconstrained linear spectral unmixing of the input image for a set of endmembers -->
-    <rsgis:command algor="imagecalc" option="unconlinearspecunmix" image="image.env" output="image" endmembers="matrix.mtxt" />
+    <rsgis:command algor="imagecalc" option="unconlinearspecunmix" image="image.env" output="image" endmembers="matrix.mtxt" [gain="float" offset="float" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64"] />
     <!-- A command to undertake an exhaustive constrained linear spectral unmixing of the input image for a set of endmembers -->
-    <rsgis:command algor="imagecalc" option="exhconlinearspecunmix" image="image.env" output="image" endmembers="matrix.mtxt" step="float" />
+    <rsgis:command algor="imagecalc" option="exhconlinearspecunmix" image="image.env" output="image" endmembers="matrix.mtxt" step="float" [gain="float" offset="float" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64"] />
+	<!-- A command to undertake a partially constrained linear spectral unmixing of the input image for a set of endmembers where the sum of the unmixing will be approximately 1 -->
+    <rsgis:command algor="imagecalc" option="consum1linearspecunmix" image="image.env" output="image" endmembers="matrix.mtxt" weight="float" [gain="float" offset="float" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64"] />
+	<!-- A command to undertake a constrained linear spectral unmixing of the input image for a set of endmembers where the sum of the unmixing will be approximately 1 and non-negative -->
+    <rsgis:command algor="imagecalc" option="nnconsum1linearspecunmix" image="image.env" output="image" endmembers="matrix.mtxt" weight="float" [gain="float" offset="float" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64"] />
     <!-- A command to calculate cluster centres for the image using K-Means clustering -->
     <rsgis:command algor="imagecalc" option="kmeanscentres" image="image.env" output="matrix.gmtxt" numclusters="int" maxiterations="int" degreeofchange="float" subsample="int" initmethod="random | diagonal_range | diagonal_stddev | diagonal_range_attach | diagonal_stddev_attach | kpp" ignorezeros="yes | no" />
     <!-- A command to calculate cluster centres for the image using ISOData clustering -->

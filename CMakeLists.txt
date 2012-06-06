@@ -26,7 +26,7 @@ set (PROJECT_TOOLS_DIR tools)
 set (PROJECT_XML_DIR xml_standards)
 
 # The version number.
-set (RSGISLIB_SVN_COMMIT 574)
+set (RSGISLIB_SVN_COMMIT 575)
 set (RSGISLIB_VERSION_MAJOR 2)
 set (RSGISLIB_VERSION_MINOR 0)
 set (RSGISLIB_VERSION_PATCH 0)
@@ -174,6 +174,12 @@ set(CGAL_LIB_PATH /usr/local/lib CACHE PATH "Library PATH for CGAL")
 set(HDF5_INCLUDE_DIR /usr/local/include CACHE PATH "Include PATH for HDF5")
 set(HDF5_LIB_PATH /usr/local/lib CACHE PATH "Library PATH for HDF5")
 
+set(GMP_INCLUDE_DIR /usr/local/include CACHE PATH "Include PATH for GMP")
+set(GMP_LIB_PATH /usr/local/lib CACHE PATH "Library PATH for GMP")
+
+set(MPFR_INCLUDE_DIR /usr/local/include CACHE PATH "Include PATH for MPFR")
+set(MPFR_LIB_PATH /usr/local/lib CACHE PATH "Library PATH for MPFR")
+
 ###############################################################################
 
 ###############################################################################
@@ -304,6 +310,12 @@ set(CGAL_LIBRARY -L${CGAL_LIB_PATH} -lCGAL -lgmp)
 
 include_directories(${HDF5_INCLUDE_DIR})
 set(HDF5_LIBRARIES -L${HDF5_LIB_PATH} -lhdf5 -lhdf5_hl -lhdf5_cpp)
+
+include_directories(${GMP_INCLUDE_DIR})
+set(GMP_LIBRARIES -L${GMP_LIB_PATH} -lgmp)
+
+include_directories(${MPFR_INCLUDE_DIR})
+set(MPFR_LIBRARIES -L${MPFR_LIB_PATH} -lmpfr)
 
 ###############################################################################
 

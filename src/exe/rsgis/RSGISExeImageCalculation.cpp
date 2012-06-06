@@ -79,7 +79,9 @@ void RSGISExeImageCalculation::retrieveParameters(DOMElement *argElement) throw(
     XMLCh *optionImageBandStats = XMLString::transcode("imagebandstats"); 
     XMLCh *optionImageStats = XMLString::transcode("imagestats"); 
     XMLCh *optionUnconLinearSpecUnmix = XMLString::transcode("unconlinearspecunmix"); 
-    XMLCh *optionExhConLinearSpecUnmix = XMLString::transcode("exhconlinearspecunmix"); 
+    XMLCh *optionExhConLinearSpecUnmix = XMLString::transcode("exhconlinearspecunmix");
+    XMLCh *optionConSum1LinearSpecUnmix = XMLString::transcode("consum1linearspecunmix"); 
+    XMLCh *optionNNConSum1LinearSpecUnmix = XMLString::transcode("nnconsum1linearspecunmix");
 	XMLCh *optionKMeansCentres = XMLString::transcode("kmeanscentres");
     XMLCh *optionISODataCentres = XMLString::transcode("isodatacentres");
     XMLCh *optionAllBandsEqualTo = XMLString::transcode("allbandsequalto");
@@ -1481,6 +1483,32 @@ void RSGISExeImageCalculation::retrieveParameters(DOMElement *argElement) throw(
 			throw RSGISXMLArgumentsException("No \'endmembers\' attribute was provided.");
 		}
 		XMLString::release(&endmembersXMLStr);
+        
+        XMLCh *gainXMLStr = XMLString::transcode("gain");
+		if(argElement->hasAttribute(gainXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(gainXMLStr));
+			this->lsumGain = mathUtils.strtofloat(string(charValue));
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			this->lsumGain = 1;
+		}
+		XMLString::release(&gainXMLStr);
+        
+        XMLCh *offsetXMLStr = XMLString::transcode("offset");
+		if(argElement->hasAttribute(offsetXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(offsetXMLStr));
+			this->lsumOffset = mathUtils.strtofloat(string(charValue));
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			this->lsumOffset = 0;
+		}
+		XMLString::release(&offsetXMLStr);
 	}
     else if(XMLString::equals(optionExhConLinearSpecUnmix, optionXML))
 	{		
@@ -1538,6 +1566,198 @@ void RSGISExeImageCalculation::retrieveParameters(DOMElement *argElement) throw(
 			throw RSGISXMLArgumentsException("No \'step\' attribute was provided.");
 		}
 		XMLString::release(&stepXMLStr);
+        
+        XMLCh *gainXMLStr = XMLString::transcode("gain");
+		if(argElement->hasAttribute(gainXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(gainXMLStr));
+			this->lsumGain = mathUtils.strtofloat(string(charValue));
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			this->lsumGain = 1;
+		}
+		XMLString::release(&gainXMLStr);
+        
+        XMLCh *offsetXMLStr = XMLString::transcode("offset");
+		if(argElement->hasAttribute(offsetXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(offsetXMLStr));
+			this->lsumOffset = mathUtils.strtofloat(string(charValue));
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			this->lsumOffset = 0;
+		}
+		XMLString::release(&offsetXMLStr);
+	}
+    else if(XMLString::equals(optionConSum1LinearSpecUnmix, optionXML))
+	{		
+		this->option = RSGISExeImageCalculation::consum1linearspecunmix;
+		
+        
+        XMLCh *imageXMLStr = XMLString::transcode("image");
+		if(argElement->hasAttribute(imageXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(imageXMLStr));
+			this->inputImage = string(charValue);
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+		}
+		XMLString::release(&imageXMLStr);
+        
+        XMLCh *outputXMLStr = XMLString::transcode("output");
+		if(argElement->hasAttribute(outputXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
+			this->outputFile = string(charValue);
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+		}
+		XMLString::release(&outputXMLStr);
+        
+        XMLCh *endmembersXMLStr = XMLString::transcode("endmembers");
+		if(argElement->hasAttribute(endmembersXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(endmembersXMLStr));
+			this->endmembersFile = string(charValue);
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'endmembers\' attribute was provided.");
+		}
+		XMLString::release(&endmembersXMLStr);
+        
+        XMLCh *weightXMLStr = XMLString::transcode("weight");
+		if(argElement->hasAttribute(weightXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(weightXMLStr));
+			this->lsumWeight = mathUtils.strtofloat(string(charValue));
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'weight\' attribute was provided.");
+		}
+		XMLString::release(&weightXMLStr);
+        
+        XMLCh *gainXMLStr = XMLString::transcode("gain");
+		if(argElement->hasAttribute(gainXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(gainXMLStr));
+			this->lsumGain = mathUtils.strtofloat(string(charValue));
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			this->lsumGain = 1;
+		}
+		XMLString::release(&gainXMLStr);
+        
+        XMLCh *offsetXMLStr = XMLString::transcode("offset");
+		if(argElement->hasAttribute(offsetXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(offsetXMLStr));
+			this->lsumOffset = mathUtils.strtofloat(string(charValue));
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			this->lsumOffset = 0;
+		}
+		XMLString::release(&offsetXMLStr);
+	}
+    else if(XMLString::equals(optionNNConSum1LinearSpecUnmix, optionXML))
+	{		
+		this->option = RSGISExeImageCalculation::nnconsum1linearspecunmix;
+		
+        
+        XMLCh *imageXMLStr = XMLString::transcode("image");
+		if(argElement->hasAttribute(imageXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(imageXMLStr));
+			this->inputImage = string(charValue);
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+		}
+		XMLString::release(&imageXMLStr);
+        
+        XMLCh *outputXMLStr = XMLString::transcode("output");
+		if(argElement->hasAttribute(outputXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
+			this->outputFile = string(charValue);
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+		}
+		XMLString::release(&outputXMLStr);
+        
+        XMLCh *endmembersXMLStr = XMLString::transcode("endmembers");
+		if(argElement->hasAttribute(endmembersXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(endmembersXMLStr));
+			this->endmembersFile = string(charValue);
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'endmembers\' attribute was provided.");
+		}
+		XMLString::release(&endmembersXMLStr);
+        
+        XMLCh *weightXMLStr = XMLString::transcode("weight");
+		if(argElement->hasAttribute(weightXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(weightXMLStr));
+			this->lsumWeight = mathUtils.strtofloat(string(charValue));
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'weight\' attribute was provided.");
+		}
+		XMLString::release(&weightXMLStr);
+        
+        XMLCh *gainXMLStr = XMLString::transcode("gain");
+		if(argElement->hasAttribute(gainXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(gainXMLStr));
+			this->lsumGain = mathUtils.strtofloat(string(charValue));
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			this->lsumGain = 1;
+		}
+		XMLString::release(&gainXMLStr);
+        
+        XMLCh *offsetXMLStr = XMLString::transcode("offset");
+		if(argElement->hasAttribute(offsetXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(offsetXMLStr));
+			this->lsumOffset = mathUtils.strtofloat(string(charValue));
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			this->lsumOffset = 0;
+		}
+		XMLString::release(&offsetXMLStr);
 	}
     else if(XMLString::equals(optionKMeansCentres, optionXML))
 	{		
@@ -2044,6 +2264,8 @@ void RSGISExeImageCalculation::retrieveParameters(DOMElement *argElement) throw(
     XMLString::release(&optionImageStats);
     XMLString::release(&optionUnconLinearSpecUnmix);
     XMLString::release(&optionExhConLinearSpecUnmix);
+    XMLString::release(&optionConSum1LinearSpecUnmix);
+    XMLString::release(&optionNNConSum1LinearSpecUnmix);
     XMLString::release(&optionKMeansCentres);
     XMLString::release(&optionISODataCentres);
     XMLString::release(&optionAllBandsEqualTo);
@@ -3147,12 +3369,12 @@ void RSGISExeImageCalculation::runAlgorithm() throw(RSGISException)
             cout << "Input Image: " << this->inputImage << endl;
             cout << "Output File: " << this->outputFile << endl;
             cout << "Endmemebers File: " << this->endmembersFile << endl;
+            cout << "Gain: " << this->lsumGain << endl;
+            cout << "Offset: " << this->lsumOffset << endl;
             
 			GDALAllRegister();
 			GDALDataset **datasets = NULL;
-			
-			RSGISCalcLinearSpectralUnmixing calcSpecUnmix;
-			
+						
 			try
 			{
 				datasets = new GDALDataset*[1];
@@ -3163,6 +3385,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(RSGISException)
 					throw RSGISImageException(message.c_str());
 				}
                 
+                RSGISCalcLinearSpectralUnmixing calcSpecUnmix(this->imageFormat, this->outDataType, this->lsumGain, this->lsumOffset);
                 calcSpecUnmix.performUnconstainedLinearSpectralUnmixing(datasets, 1, this->outputFile, this->endmembersFile);
                 
                 GDALClose(datasets[0]);
@@ -3180,11 +3403,12 @@ void RSGISExeImageCalculation::runAlgorithm() throw(RSGISException)
             cout << "Output File: " << this->outputFile << endl;
             cout << "Endmemebers File: " << this->endmembersFile << endl;
             cout << "Step Resolution: " << this->stepResolution << endl;
+            cout << "Gain: " << this->lsumGain << endl;
+            cout << "Offset: " << this->lsumOffset << endl;
             
 			GDALAllRegister();
 			GDALDataset **datasets = NULL;
 			
-			RSGISCalcLinearSpectralUnmixing calcSpecUnmix;
 			try
 			{
 				datasets = new GDALDataset*[1];
@@ -3195,7 +3419,76 @@ void RSGISExeImageCalculation::runAlgorithm() throw(RSGISException)
 					throw RSGISImageException(message.c_str());
 				}
                 
+                RSGISCalcLinearSpectralUnmixing calcSpecUnmix(this->imageFormat, this->outDataType, this->lsumGain, this->lsumOffset);
                 calcSpecUnmix.performExhaustiveConstrainedSpectralUnmixing(datasets, 1, this->outputFile, this->endmembersFile, this->stepResolution);
+                
+                GDALClose(datasets[0]);
+                delete[] datasets;
+			}
+			catch(RSGISException e)
+			{
+				throw e;
+			}
+        }
+        else if(option == RSGISExeImageCalculation::consum1linearspecunmix)
+		{
+            cout << "A command to undertake a partially constrained linear spectral unmixing of the input image for a set of endmembers where the sum of the unmixing will be approximately 1\n";
+            cout << "Input Image: " << this->inputImage << endl;
+            cout << "Output File: " << this->outputFile << endl;
+            cout << "Endmemebers File: " << this->endmembersFile << endl;
+            cout << "Weight: " << this->lsumWeight << endl;
+            cout << "Gain: " << this->lsumGain << endl;
+            cout << "Offset: " << this->lsumOffset << endl;
+            
+			GDALAllRegister();
+			GDALDataset **datasets = NULL;
+						
+			try
+			{
+				datasets = new GDALDataset*[1];
+				datasets[0] = (GDALDataset *) GDALOpenShared(this->inputImage.c_str(), GA_ReadOnly);
+				if(datasets[0] == NULL)
+				{
+					string message = string("Could not open image ") + this->inputImage;
+					throw RSGISImageException(message.c_str());
+				}
+                
+                RSGISCalcLinearSpectralUnmixing calcSpecUnmix(this->imageFormat, this->outDataType, this->lsumGain, this->lsumOffset);
+                calcSpecUnmix.performPartConstainedLinearSpectralUnmixing(datasets, 1, this->outputFile, this->endmembersFile, this->lsumWeight);
+                
+                GDALClose(datasets[0]);
+                delete[] datasets;
+			}
+			catch(RSGISException e)
+			{
+				throw e;
+			}
+        }
+        else if(option == RSGISExeImageCalculation::nnconsum1linearspecunmix)
+		{
+            cout << "A command to undertake a constrained linear spectral unmixing of the input image for a set of endmembers where the sum of the unmixing will be approximately 1 and non-negative\n";
+            cout << "Input Image: " << this->inputImage << endl;
+            cout << "Output File: " << this->outputFile << endl;
+            cout << "Endmemebers File: " << this->endmembersFile << endl;
+            cout << "Weight: " << this->lsumWeight << endl;
+            cout << "Gain: " << this->lsumGain << endl;
+            cout << "Offset: " << this->lsumOffset << endl;
+            
+			GDALAllRegister();
+			GDALDataset **datasets = NULL;
+						
+			try
+			{
+				datasets = new GDALDataset*[1];
+				datasets[0] = (GDALDataset *) GDALOpenShared(this->inputImage.c_str(), GA_ReadOnly);
+				if(datasets[0] == NULL)
+				{
+					string message = string("Could not open image ") + this->inputImage;
+					throw RSGISImageException(message.c_str());
+				}
+                
+                RSGISCalcLinearSpectralUnmixing calcSpecUnmix(this->imageFormat, this->outDataType, this->lsumGain, this->lsumOffset);
+                calcSpecUnmix.performConstainedNNLinearSpectralUnmixing(datasets, 1, this->outputFile, this->endmembersFile, this->lsumWeight);
                 
                 GDALClose(datasets[0]);
                 delete[] datasets;
@@ -3456,6 +3749,22 @@ void RSGISExeImageCalculation::printParameters()
             cout << "Output File: " << this->outputFile << endl;
             cout << "Endmemebers File: " << this->endmembersFile << endl;
             cout << "Step Resolution: " << this->stepResolution << endl;
+        }
+        else if(option == RSGISExeImageCalculation::consum1linearspecunmix)
+		{
+            cout << "A command to undertake a partially constrained linear spectral unmixing of the input image for a set of endmembers where the sum of the unmixing will be approximately 1\n";
+            cout << "Input Image: " << this->inputImage << endl;
+            cout << "Output File: " << this->outputFile << endl;
+            cout << "Endmemebers File: " << this->endmembersFile << endl;
+            cout << "Weight: " << this->lsumWeight << endl;
+        }
+        else if(option == RSGISExeImageCalculation::nnconsum1linearspecunmix)
+		{
+            cout << "A command to undertake a constrained linear spectral unmixing of the input image for a set of endmembers where the sum of the unmixing will be approximately 1 and non-negative\n";
+            cout << "Input Image: " << this->inputImage << endl;
+            cout << "Output File: " << this->outputFile << endl;
+            cout << "Endmemebers File: " << this->endmembersFile << endl;
+            cout << "Weight: " << this->lsumWeight << endl;
         }
         else if(option == RSGISExeImageCalculation::kmeanscentres)
         {
