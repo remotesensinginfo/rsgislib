@@ -548,7 +548,8 @@ set(LIB_MATH_CPP
 	${RSGIS_SRC_MATH_DIR}/RSGISNonLinearFit.cpp 
 	${RSGIS_SRC_MATH_DIR}/RSGISNonLinearFit.h
 	${RSGIS_SRC_MATH_DIR}/RSGISClustering.cpp
-	${RSGIS_SRC_MATH_DIR}/RSGISClustering.h )
+	${RSGIS_SRC_MATH_DIR}/RSGISClustering.h
+	${RSGIS_SRC_MATH_DIR}/RSGISnnls.c )
 ###############################################################################
 
 ###############################################################################
