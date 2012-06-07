@@ -301,7 +301,7 @@
     <!-- A command export an attribute table to a GDAL Dataset with a raster attribute table -->
     <rsgis:command algor="rastergis" option="export2gdal" clumps="clumps.env" table="input.att" output="output.img" format="GDAL Format" />
     <!-- A command to populate an attribute table with statistics from an image across all image bands-->
-    <rsgis:command algor="rastergis" option="popattributestatsallbands" input="image.env" clumps="clumps.env" table="input.att" tableout="output.att" [min="field"] [max="field"] [mean="field"] [sum="field"] [stddev="field"] [median="field"] />
+    <rsgis:command algor="rastergis" option="popattributestatsallbands" input="image.env" clumps="clumps.env" table="input.att" tableout="output.att" [nodata="float"] [min="field"] [max="field"] [mean="field"] [sum="field"] [stddev="field"] [median="field"] />
     <!-- A command to create summary statistics for a field in the attribute table -->
     <rsgis:command algor="rastergis" option="summarisefield" table="input.att" output="output.txt" field="attribute_name" [min="yes"] [max="yes"] [mean="yes"] [sum="yes"] [stddev="yes"] [median="yes"] />
     <!-- A command to find the neighbours of the clumps and save as a neighbours file. -->

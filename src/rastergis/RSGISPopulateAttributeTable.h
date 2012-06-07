@@ -308,14 +308,14 @@ namespace rsgis{namespace rastergis{
     {
     public:
         RSGISPopulateAttributeTableImageStats();
-        void populateWithImageStatisticsInMem(RSGISAttributeTable *attTable, GDALDataset **datasets, int numDatasets, RSGISBandAttStats *imageStats) throw(RSGISImageCalcException, RSGISAttributeTableException);
+        void populateWithImageStatisticsInMem(RSGISAttributeTable *attTable, GDALDataset **datasets, int numDatasets, RSGISBandAttStats *imageStats, float noDataVal, bool noDataValDefined) throw(RSGISImageCalcException, RSGISAttributeTableException);
         ~RSGISPopulateAttributeTableImageStats();
     };
     
     class RSGISGetAllBandPixelValuesForClumps : public RSGISCalcImageValue
     {
     public: 
-        RSGISGetAllBandPixelValuesForClumps(vector<double> **clumpData);
+        RSGISGetAllBandPixelValuesForClumps(vector<double> **clumpData, float noDataVal, bool noDataValDefined);
         void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
         void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException);
         void calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
@@ -327,6 +327,8 @@ namespace rsgis{namespace rastergis{
     protected:
         vector<double> **clumpData;
         unsigned int numBands;
+        float noDataVal;
+        bool noDataValDefined;
     };
     
     

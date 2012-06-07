@@ -1326,6 +1326,19 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
         }
         XMLString::release(&tableOutXMLStr);
         
+        XMLCh *noDataXMLStr = XMLString::transcode("nodata");
+        if(argElement->hasAttribute(noDataXMLStr))
+        {
+            char *charValue = XMLString::transcode(argElement->getAttribute(noDataXMLStr));
+            this->noDataVal = mathUtils.strtofloat(string(charValue));
+            this->noDataValDefined = true;
+            XMLString::release(&charValue);
+        }
+        else
+        {
+            this->noDataValDefined = false;
+        }
+        XMLString::release(&noDataXMLStr);
 		
         imageStats = new RSGISBandAttStats();
         
@@ -4159,6 +4172,10 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
             cout << "Clump Image: " << this->clumpsImage << endl;
             cout << "Input Table: " << this->attTableFile << endl;
             cout << "Output Table: " << this->outAttTableFile << endl;
+            if(noDataValDefined)
+            {
+                cout << "No Data Value: " << this->noDataVal << endl;
+            }
             cout << "Statistics to be calculated:\n";
             if(imageStats->calcMin)
             {
@@ -4220,7 +4237,7 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
                 
                 cout << "Calculating Statistics\n";
                 RSGISPopulateAttributeTableImageStats calcImageStats;
-                calcImageStats.populateWithImageStatisticsInMem(attTable, datasets, 2, imageStats);
+                calcImageStats.populateWithImageStatisticsInMem(attTable, datasets, 2, imageStats, this->noDataVal, this->noDataValDefined);
                 
                 cout << "Exporting Attribute Table\n";
                 attTable->exportHDF5(outAttTableFile);
