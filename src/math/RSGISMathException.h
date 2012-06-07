@@ -25,13 +25,13 @@
 
 #include "common/RSGISException.h"
 
-using namespace std;
-
 namespace rsgis 
 {
 	/// Maths classes
 	namespace math
 	{
+        using namespace std;
+        
 		class RSGISMathException : public RSGISException
 			{
 			public:

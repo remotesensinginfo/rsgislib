@@ -22,6 +22,7 @@
 
 #include "RSGISExeFFTUtils.h"
 
+namespace rsgisexe{
 
 RSGISExeFFTUtils::RSGISExeFFTUtils() : RSGISAlgorithmParameters()
 {
@@ -484,5 +485,7 @@ string RSGISExeFFTUtils::getXMLSchema()
 RSGISExeFFTUtils::~RSGISExeFFTUtils()
 {
 	
+}
+    
 }
 

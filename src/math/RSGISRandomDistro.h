@@ -30,9 +30,9 @@
 #include <gsl/gsl_sf_gamma.h>
 #include "math/RSGISProbDistro.h"
 
-using namespace std;
-
 namespace rsgis{ namespace math {
+    
+    using namespace std;
 
 	class RSGISRandDistroGaussian : public RSGISProbDistro
 	{

@@ -33,10 +33,10 @@
 #include "geos/geom/Coordinate.h"
 #include "geos/geom/Envelope.h"
 
-using namespace std;
-using namespace geos::geom;
-
 namespace rsgis{namespace math{
+    
+    using namespace std;
+    using namespace geos::geom;
 	
 	class RSGISGlobalOptimiser2D
 		{

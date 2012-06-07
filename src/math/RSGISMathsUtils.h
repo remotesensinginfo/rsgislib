@@ -40,12 +40,12 @@
 #include "math/RSGISVectors.h"
 #include "math/RSGISMatrices.h"
 
-using boost::lexical_cast;
-using boost::bad_lexical_cast;
-using namespace std;
-
 namespace rsgis{namespace math{
 	
+    using boost::lexical_cast;
+    using boost::bad_lexical_cast;
+    using namespace std;
+    
 	enum rsgissummarytype
 	{
 		sumtype_mean,

@@ -29,13 +29,13 @@
 
 #include "math/RSGISMathFunction.h"
 
-using namespace std;
-using namespace rsgis::math;
-
 namespace rsgis
 {
 	namespace radar
 	{
+        using namespace std;
+        using namespace rsgis::math;
+        
 		/// Function for calculating gamma0 for a given value of biomass.
 		class RSGISDefaultSplitBiomassFunction : public RSGISMathFunction
 			{

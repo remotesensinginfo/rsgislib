@@ -87,6 +87,8 @@
 
 #include "muParser.h"
 
+namespace rsgisexe{
+
 using namespace std;
 using namespace xercesc;
 using namespace mu;
@@ -214,6 +216,6 @@ class RSGISExeImageCalculation : public RSGISAlgorithmParameters
         float lsumGain;
         float lsumOffset;
 	};
-
+}
 #endif
 

@@ -32,14 +32,14 @@
 #include "img/RSGISImageBandException.h"
 #include "img/RSGISImageCalcException.h"
 
-using namespace std;
-using namespace rsgis::img;
-
 namespace rsgis 
 {
 	namespace radar
 	/// Radar utilities
 	{
+        using namespace std;
+        using namespace rsgis::img;
+        
 		class RSGISCalcSaatchiBiomassCrown : public RSGISCalcImageValue
 			/// Estimates Crown Biomass from L or P band data with correction for local incidence angle.			
 			/** Called using:

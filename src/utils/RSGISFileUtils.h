@@ -33,12 +33,12 @@
 #include <sys/stat.h>
 #include "common/RSGISFileException.h"
 
-using namespace std;
-
 namespace rsgis 
 {
 	namespace utils
 	{
+        using namespace std;
+        
 		class RSGISFileUtils
 		{
 			public: 

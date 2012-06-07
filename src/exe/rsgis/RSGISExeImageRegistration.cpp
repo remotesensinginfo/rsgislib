@@ -22,6 +22,8 @@
 
 #include "RSGISExeImageRegistration.h"
 
+namespace rsgisexe{
+
 RSGISExeImageRegistration::RSGISExeImageRegistration() : RSGISAlgorithmParameters()
 {
 	this->algorithm = "registration";
@@ -1348,5 +1350,5 @@ RSGISExeImageRegistration::~RSGISExeImageRegistration()
 	
 }
 
-
+}
 

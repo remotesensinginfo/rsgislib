@@ -34,11 +34,11 @@
 #include "img/RSGISCalcImageValue.h"
 #include "img/RSGISCalcImage.h"
 
-using namespace std;
-using namespace rsgis::img;
-
 namespace rsgis{namespace calib{
 	
+    using namespace std;
+    using namespace rsgis::img;
+    
     inline double rsgisCalcSolarDistance(int julianDay)throw(rsgis::RSGISException)
     {
         if((julianDay < 1) | (julianDay > 366))

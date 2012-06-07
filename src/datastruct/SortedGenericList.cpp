@@ -29,10 +29,10 @@
 #include <string>
 #include "datastruct/RSGISItemNotFoundException.h"
 
-using namespace std;
-
 namespace rsgis{ namespace datastruct{
 	
+    using namespace std;
+    
 	template <typename T>
 	class SortedGenericList
 		{

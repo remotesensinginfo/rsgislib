@@ -100,6 +100,8 @@
 
 #include "geos/geom/Coordinate.h"
 
+namespace rsgisexe{
+
 using namespace std;
 using namespace xercesc;
 using namespace boost;
@@ -272,7 +274,7 @@ class RSGISExeVectorUtils : public RSGISAlgorithmParameters
         bool outTextFile;
         bool bufferValueInText;
 	};
-
+}
 #endif
 
 

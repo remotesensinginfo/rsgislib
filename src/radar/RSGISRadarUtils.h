@@ -32,13 +32,13 @@
 #include "img/RSGISImageBandException.h"
 #include "img/RSGISImageCalcException.h"
 
-using namespace std;
-using namespace rsgis::img;
-
 namespace rsgis 
 {
 	namespace radar
 	{
+        using namespace std;
+        using namespace rsgis::img;
+        
 		class RSGISConvert2dB : public RSGISCalcImageValue
 			/**
 			 * Class to convert from intensity to dB using the following formula:<br>

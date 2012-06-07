@@ -65,12 +65,12 @@
 #include "RSGISExeImageMorphology.h"
 
 using namespace std;
-using namespace rsgis;
+//using namespace rsgis;
 
 class Control
 	{
 	public:
-		Control() throw(RSGISException);
+		Control() throw(rsgis::RSGISException);
 		void runXML(string xmlFile);
 		void printParameters(string xmlFile);
 		void listAlgorithms();
@@ -80,8 +80,8 @@ class Control
         void versionInfo();
 		~Control();
 	private:
-		void setUpAlgorithmFactory() throw(RSGISException);
-		RSGISAlgorParamsFactory *factory;
+		void setUpAlgorithmFactory() throw(rsgis::RSGISException);
+        rsgis::RSGISAlgorParamsFactory *factory;
 	};
 
 
@@ -90,44 +90,44 @@ Control::Control() throw(RSGISException)
 	this->setUpAlgorithmFactory();
 }
 
-void Control::setUpAlgorithmFactory() throw(RSGISException)
+void Control::setUpAlgorithmFactory() throw(rsgis::RSGISException)
 {
-	vector<RSGISAlgorithmParameters*> *algorParams = new vector<RSGISAlgorithmParameters*>();
+	vector<rsgis::RSGISAlgorithmParameters*> *algorParams = new vector<rsgis::RSGISAlgorithmParameters*>();
 
-	algorParams->push_back(new RSGISExeImageUtils());
-	algorParams->push_back(new RSGISExeStackBands());
-	algorParams->push_back(new RSGISExeImageCalculation());
-	algorParams->push_back(new RSGISExeImageConversion());
-	algorParams->push_back(new RSGISExeClassification());
-	algorParams->push_back(new RSGISExeCreateTestImages());
-	algorParams->push_back(new RSGISExeFilterImages());
-	algorParams->push_back(new RSGISExeFFTUtils());
-	algorParams->push_back(new RSGISExeVectorUtils());
-	algorParams->push_back(new RSGISExeMathsUtilities());
-	algorParams->push_back(new RSGISExeFitting());
-	algorParams->push_back(new RSGISExeSARSaatchiBiomass());
-	algorParams->push_back(new RSGISExeSARBayesianBiomass());
-	algorParams->push_back(new RSGISExeEstimationAlgorithm());
-	algorParams->push_back(new RSGISExeRadarUtils());
-	algorParams->push_back(new RSGISExePostClassification());
-	algorParams->push_back(new RSGISExeVisualisation());
-	algorParams->push_back(new RSGISExeCommandLine());
-	algorParams->push_back(new RSGISExeTransectModel());
-	algorParams->push_back(new RSGISExeSegment());
-	algorParams->push_back(new RSGISExeImageRegistration());
-	algorParams->push_back(new RSGISExeZonalStats());
-    algorParams->push_back(new RSGISExeImageCalibration());
-    algorParams->push_back(new RSGISExeElevationDataTools());
-    algorParams->push_back(new RSGISExeRasterGIS());
-    algorParams->push_back(new RSGISExeImageMorphology());
+	algorParams->push_back(new rsgisexe::RSGISExeImageUtils());
+	algorParams->push_back(new rsgisexe::RSGISExeStackBands());
+	algorParams->push_back(new rsgisexe::RSGISExeImageCalculation());
+	algorParams->push_back(new rsgisexe::RSGISExeImageConversion());
+	algorParams->push_back(new rsgisexe::RSGISExeClassification());
+	algorParams->push_back(new rsgisexe::RSGISExeCreateTestImages());
+	algorParams->push_back(new rsgisexe::RSGISExeFilterImages());
+	algorParams->push_back(new rsgisexe::RSGISExeFFTUtils());
+	algorParams->push_back(new rsgisexe::RSGISExeVectorUtils());
+	algorParams->push_back(new rsgisexe::RSGISExeMathsUtilities());
+	algorParams->push_back(new rsgisexe::RSGISExeFitting());
+	algorParams->push_back(new rsgisexe::RSGISExeSARSaatchiBiomass());
+	algorParams->push_back(new rsgisexe::RSGISExeSARBayesianBiomass());
+	algorParams->push_back(new rsgisexe::RSGISExeEstimationAlgorithm());
+	algorParams->push_back(new rsgisexe::RSGISExeRadarUtils());
+	algorParams->push_back(new rsgisexe::RSGISExePostClassification());
+	algorParams->push_back(new rsgisexe::RSGISExeVisualisation());
+	algorParams->push_back(new rsgisexe::RSGISExeCommandLine());
+	algorParams->push_back(new rsgisexe::RSGISExeTransectModel());
+	algorParams->push_back(new rsgisexe::RSGISExeSegment());
+	algorParams->push_back(new rsgisexe::RSGISExeImageRegistration());
+	algorParams->push_back(new rsgisexe::RSGISExeZonalStats());
+    algorParams->push_back(new rsgisexe::RSGISExeImageCalibration());
+    algorParams->push_back(new rsgisexe::RSGISExeElevationDataTools());
+    algorParams->push_back(new rsgisexe::RSGISExeRasterGIS());
+    algorParams->push_back(new rsgisexe::RSGISExeImageMorphology());
 
-	factory = new RSGISAlgorParamsFactory(algorParams);
+	factory = new rsgis::RSGISAlgorParamsFactory(algorParams);
 }
 
 void Control::runXML(string xmlFile)
 {
-	RSGISFileUtils fileUtils;
-	RSGISAlgorithmParameters **algorParams = NULL;
+    rsgis::utils::RSGISFileUtils fileUtils;
+	rsgis::RSGISAlgorithmParameters **algorParams = NULL;
 	int numCommands = 0;
 	time_t rawStartTime = 0;
 	struct tm *timeInfo = 0;
@@ -138,7 +138,7 @@ void Control::runXML(string xmlFile)
 	{
 		if(fileUtils.checkFilePresent(xmlFile))
 		{
-			RSGISParseXMLArguments parseXMLArguments = RSGISParseXMLArguments(xmlFile);
+			rsgis::RSGISParseXMLArguments parseXMLArguments = rsgis::RSGISParseXMLArguments(xmlFile);
 
 			algorParams = parseXMLArguments.parseArguments(&numCommands, factory);
 			if (numCommands == 1)
@@ -189,11 +189,11 @@ void Control::runXML(string xmlFile)
 		}
 		else
 		{
-			throw RSGISXMLArgumentsException("Input XML file is not present or accessable");
+			throw rsgis::RSGISXMLArgumentsException("Input XML file is not present or accessable");
 		}
 
 	}
-	catch(RSGISXMLArgumentsException &e)
+	catch(rsgis::RSGISXMLArgumentsException &e)
 	{
 		time(&rawStartTime);
 		timeInfo = localtime(&rawStartTime);
@@ -203,7 +203,7 @@ void Control::runXML(string xmlFile)
 		cerr << "ERROR: " << e.what() << endl;
 		cerr << "Error Occurred on " << formatedTime << "\n";
 	}
-	catch(RSGISException &e)
+	catch(rsgis::RSGISException &e)
 	{
 		time(&rawStartTime);
 		timeInfo = localtime(&rawStartTime);
@@ -228,14 +228,14 @@ void Control::runXML(string xmlFile)
 
 void Control::printParameters(string xmlFile)
 {
-	RSGISFileUtils fileUtils;
-	RSGISAlgorithmParameters **algorParams = NULL;
+    rsgis::utils::RSGISFileUtils fileUtils;
+    rsgis::RSGISAlgorithmParameters **algorParams = NULL;
 	int numCommands = 0;
 	try
 	{
 		if(fileUtils.checkFilePresent(xmlFile))
 		{
-			RSGISParseXMLArguments parseXMLArguments = RSGISParseXMLArguments(xmlFile);
+            rsgis::RSGISParseXMLArguments parseXMLArguments = rsgis::RSGISParseXMLArguments(xmlFile);
 			algorParams = parseXMLArguments.parseArguments(&numCommands, factory);
 			cout << "There are " << numCommands << " commands to be printed:\n";
 			for(int i = 0; i < numCommands; i++)
@@ -249,7 +249,7 @@ void Control::printParameters(string xmlFile)
 			cerr << "ERROR: Input XML file is not present or accessable\n";
 		}
 	}
-	catch(RSGISException& e)
+	catch(rsgis::RSGISException& e)
 	{
 		cerr << "ERROR: " << e.what() << endl;
 	}
@@ -277,7 +277,7 @@ void Control::listAlgorithms()
 			cout << i << ": " << algorithms[i] << endl;
 		}
 	}
-	catch(RSGISException& e)
+	catch(rsgis::RSGISException& e)
 	{
 		cerr << "ERROR: " << e.what() << endl;
 	}
@@ -315,12 +315,12 @@ void Control::createBlankXMLFile(string xmlFile)
 		newFileText += "</rsgis:commands>\n";
         
         
-        RSGISTextUtils textUtils;
+        rsgis::utils::RSGISTextUtils textUtils;
         textUtils.writeStringToFile(xmlFile, newFileText);
         
         cout << xmlFile << " has been created\n";
     }
-    catch(RSGISException& e)
+    catch(rsgis::RSGISException& e)
 	{
 		cerr << "ERROR: " << e.what() << endl;
 	}
@@ -328,7 +328,7 @@ void Control::createBlankXMLFile(string xmlFile)
 
 void Control::help(string algor)
 {
-	RSGISAlgorithmParameters *algorParams;
+    rsgis::RSGISAlgorithmParameters *algorParams;
 	try
 	{
 		algorParams = factory->getAlgorithmParamterObj(algor);
@@ -341,7 +341,7 @@ void Control::help(string algor)
 			cout << "Algorithm \"" << algor	<< "\" cannot be found\n";
 		}
 	}
-	catch(RSGISException& e)
+	catch(rsgis::RSGISException& e)
 	{
 		cerr << "ERROR: " << e.what() << endl;
 	}
@@ -407,7 +407,7 @@ int main(int argc, char **argv)
 	{
 		if(argc > 1)
 		{
-			RSGISCommandLineParser *cmdParser = new RSGISCommandLineParser();
+            rsgis::RSGISCommandLineParser *cmdParser = new rsgis::RSGISCommandLineParser();
 			ctrl = new Control();
 
 			cmdParser->parseArguments(argc, argv);
@@ -500,12 +500,12 @@ int main(int argc, char **argv)
 			ctrl->help();
 		}
 	}
-	catch(RSGISCommandLineException& e)
+	catch(rsgis::RSGISCommandLineException& e)
 	{
 		cerr << "ERROR: " << e.what() << endl;
 		ctrl->help();
 	}
-	catch(RSGISException& e)
+	catch(rsgis::RSGISException& e)
 	{
 		cerr << "ERROR: " << e.what() << endl;
 	}

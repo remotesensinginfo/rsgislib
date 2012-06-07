@@ -48,6 +48,8 @@
 
 #include "gdal_priv.h"
 
+namespace rsgisexe{
+
 using namespace std;
 using namespace xercesc;
 using namespace rsgis;
@@ -81,6 +83,7 @@ class RSGISExeFilterImages : public RSGISAlgorithmParameters
 		string outputImageBase;
 		RSGISFilterBank *filterBank;
 	};
+}
 
 #endif
 

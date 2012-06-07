@@ -32,10 +32,10 @@
 #include "img/RSGISImageBandException.h"
 #include "img/RSGISImageCalcException.h"
 
-using namespace rsgis::img;
-
 namespace rsgis { namespace classifier {
 	
+    using namespace rsgis::img;
+    
 	/**
 	 This implements the Spectral Correlation mapper approach to calculate the correlation between image specta and a reffernce spectra.
 	 As only correlation is importand not negative or positive values, the result is normallised to be between 0 and 1

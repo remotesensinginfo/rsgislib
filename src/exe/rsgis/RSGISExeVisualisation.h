@@ -46,6 +46,8 @@
 #include <xercesc/dom/DOM.hpp>
 #include <xercesc/util/XMLString.hpp>
 
+namespace rsgisexe{
+
 using namespace std;
 using namespace xercesc;
 using namespace rsgis;
@@ -82,7 +84,7 @@ class RSGISExeVisualisation : public RSGISAlgorithmParameters
 		string outputDIR;
 		bool force;
 	};
-
+}
 #endif
 
 

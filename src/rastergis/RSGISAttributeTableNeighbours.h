@@ -35,11 +35,11 @@
 
 #include "utils/RSGISTextUtils.h"
 
-using namespace std;
-using namespace rsgis;
-using namespace rsgis::utils;
-
 namespace rsgis{namespace rastergis{
+    
+    using namespace std;
+    using namespace rsgis;
+    using namespace rsgis::utils;
     
     class RSGISAttributeTableNeighbours
     {

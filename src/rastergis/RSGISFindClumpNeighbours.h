@@ -38,11 +38,11 @@
 #include "ogrsf_frmts.h"
 #include "ogr_api.h"
 
-using namespace std;
-using namespace rsgis;
-using namespace rsgis::img;
-
 namespace rsgis{namespace rastergis{
+    
+    using namespace std;
+    using namespace rsgis;
+    using namespace rsgis::img;
     
     class RSGISFindClumpNeighbours
     {

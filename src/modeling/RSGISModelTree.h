@@ -30,11 +30,11 @@
 #include "modeling/RSGISModelingException.h"
 #include "math/RSGISProbDistro.h"
 
-
-using namespace std;
-using namespace rsgis::math;
-
 namespace rsgis { namespace modeling{
+    
+    using namespace std;
+    using namespace rsgis::math;
+    
 	class RSGISModelTree : public RSGISModelAddVegetation
 	{
 	public:

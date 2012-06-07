@@ -32,14 +32,13 @@
 #include "math/RSGISVectors.h"
 #include "math/RSGISLinearFit.h"
 #include "radar/RSGISEstimationOptimiser.h"
-
-
 #include "math/RSGISFunctions.h"
 
-using namespace std;
-using namespace rsgis::math;
-
 namespace rsgis {namespace radar{
+    
+    using namespace std;
+    using namespace rsgis::math;
+    
 	class RSGISEstimationLinearLeastSquares : public RSGISEstimationOptimiser
 	{
 	public:

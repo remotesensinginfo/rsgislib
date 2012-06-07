@@ -25,12 +25,12 @@
 
 #include "common/RSGISException.h"
 
-using namespace std;
-
 namespace rsgis 
 {
 	namespace datastruct
 	{
+        using namespace std;
+        
 		class RSGISListException : public RSGISException
 			{
 			public:

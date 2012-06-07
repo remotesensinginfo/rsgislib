@@ -30,11 +30,11 @@
 #include "geos/geom/GeometryFactory.h"
 #include "geos/geom/PrecisionModel.h"
 
-using namespace std;
-using namespace geos::geom;
-
 namespace rsgis{namespace utils{
 	
+    using namespace std;
+    using namespace geos::geom;
+    
 	class RSGISGEOSFactoryGenerator
 		{
 		public: 

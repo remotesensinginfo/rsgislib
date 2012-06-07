@@ -33,11 +33,10 @@
 #include "math/RSGISMathFunction.h"
 #include "math/RSGISProbDistro.h"
 
-using namespace std;
-using namespace rsgis::math;
-
 namespace rsgis{namespace math{
 	
+    using namespace std;
+    
 	class RSGISBaysianIntergrateFunctionPrior : public RSGISMathFunction
 		{
 		public:

@@ -35,13 +35,14 @@
 #include <boost/cstdint.hpp>
 #include <boost/algorithm/string/trim.hpp>
 
-using boost::lexical_cast;
-using boost::bad_lexical_cast;
-using boost::trim;
-
-using namespace std;
-
 namespace rsgis{namespace utils{
+    
+    using boost::lexical_cast;
+    using boost::bad_lexical_cast;
+    using boost::trim;
+    
+    using namespace std;
+    
 	class RSGISTextUtils
 		{
 		public:

@@ -41,6 +41,8 @@
 
 #include "gdal_priv.h"
 
+namespace rsgisexe{
+
 using namespace std;
 using namespace xercesc;
 using namespace rsgis;
@@ -97,7 +99,7 @@ class RSGISExeRadarUtils : public RSGISAlgorithmParameters
 		double sand;
 		unsigned int nRuns;
 	};
-
+}
 #endif
 
 

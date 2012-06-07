@@ -50,14 +50,14 @@
 #include "ogrsf_frmts.h"
 #include "ogr_api.h"
 
-using namespace rsgis::utils;
-using namespace rsgis::math;
-using namespace rsgis::vec;
-using namespace std;
-using namespace xercesc;
-
 namespace rsgis{ namespace classifier{
 	
+    using namespace rsgis::utils;
+    using namespace rsgis::math;
+    using namespace rsgis::vec;
+    using namespace std;
+    using namespace xercesc;
+    
 	class RSGISClassificationUtils
 		{
 		public:

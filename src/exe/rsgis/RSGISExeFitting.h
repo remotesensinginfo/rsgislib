@@ -48,6 +48,8 @@
 
 #include "gdal_priv.h"
 
+namespace rsgisexe{
+
 using namespace std;
 using namespace xercesc;
 using namespace rsgis::math;
@@ -105,6 +107,6 @@ class RSGISExeFitting : public RSGISAlgorithmParameters
 		bool *fixCoefficients;
 		functionType function;
 	};
-
+}
 #endif
 

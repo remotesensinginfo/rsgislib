@@ -28,9 +28,9 @@
 #include "math/RSGISMultivariantStats.h"
 #include "math/RSGISMultivariantStatsException.h"
 
-using namespace std;
-
 namespace rsgis{namespace math{
+    
+    using namespace std;
 	
 	class RSGISPrincipalComponentAnalysis
 		{

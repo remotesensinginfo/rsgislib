@@ -32,6 +32,9 @@
 #include "math/RSGISClustererException.h"
 
 namespace rsgis {namespace math{
+    
+    using namespace std;
+    using namespace rsgis;
 	
     struct RSGISClusterCentre
     {

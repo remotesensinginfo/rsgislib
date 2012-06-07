@@ -45,11 +45,11 @@
 
 #include "rastergis/RSGISAttributeTable.h"
 
-using namespace std;
-using namespace rsgis;
-using namespace rsgis::math;
-
 namespace rsgis{namespace rastergis{
+    
+    using namespace std;
+    using namespace rsgis;
+    using namespace rsgis::math;
     
     class RSGISKNNATTable
     {

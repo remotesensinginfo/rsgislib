@@ -32,10 +32,10 @@
 #include "math/RSGISVectors.h"
 #include "math/RSGISMatrices.h"
 
-using namespace std;
-using namespace mu;
-
 namespace rsgis{namespace math{
+    
+    using namespace std;
+    using namespace mu;
 	
 	enum functionType 
 	{

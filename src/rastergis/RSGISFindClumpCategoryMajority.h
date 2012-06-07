@@ -47,15 +47,15 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/cstdint.hpp>
 
-using namespace std;
-using namespace rsgis;
-using namespace rsgis::utils;
-using namespace rsgis::math;
-using namespace rsgis::img;
-using boost::lexical_cast;
-using boost::bad_lexical_cast;
-
 namespace rsgis{namespace rastergis{
+    
+    using namespace std;
+    using namespace rsgis;
+    using namespace rsgis::utils;
+    using namespace rsgis::math;
+    using namespace rsgis::img;
+    using boost::lexical_cast;
+    using boost::bad_lexical_cast;
     
     class RSGISFindClumpCategoryMajority
     {

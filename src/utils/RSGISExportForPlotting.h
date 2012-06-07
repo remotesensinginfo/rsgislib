@@ -35,14 +35,14 @@
 
 #include "geos/geom/LineSegment.h"
 
-using namespace std;
-using namespace rsgis;
-using namespace geos::geom;
-
 namespace rsgis 
 {
 	namespace utils
 	{
+        using namespace std;
+        using namespace rsgis;
+        using namespace geos::geom;
+        
 		class RSGISExportForPlotting
 			{
 			public: 

@@ -35,10 +35,10 @@
 #include "ogrsf_frmts.h"
 #include "ogr_api.h"
 
-using namespace std;
-using namespace rsgis;
-
 namespace rsgis{namespace rastergis{
+    
+    using namespace std;
+    using namespace rsgis;
     
     struct RSGISSubClumps
     {

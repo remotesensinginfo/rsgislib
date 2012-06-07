@@ -29,11 +29,12 @@
 #include "math/RSGISMatrices.h"
 #include "utils/RSGISExportForPlotting.h"
 
-using namespace std;
-using namespace rsgis::math;
-using namespace rsgis::utils;
-
 namespace rsgis{namespace modeling {
+    
+    using namespace std;
+    using namespace rsgis::math;
+    using namespace rsgis::utils;
+    
 	/** Class to store transect data
 	 * Data is stored as char.
 	 */

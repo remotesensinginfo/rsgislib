@@ -60,6 +60,8 @@
 #include <xercesc/dom/DOM.hpp>
 #include <xercesc/util/XMLString.hpp>
 
+namespace rsgisexe{
+
 using namespace std;
 using namespace xercesc;
 using namespace rsgis;
@@ -131,7 +133,7 @@ class RSGISExeClassification : public RSGISAlgorithmParameters
 		bool groupSamples;
 		std::vector<std::string> *valueAttributes;
 	};
-
+}
 #endif
 
 

@@ -78,6 +78,8 @@
 #include <xercesc/dom/DOM.hpp>
 #include <xercesc/util/XMLString.hpp>
 
+namespace rsgisexe{
+
 using namespace std;
 using namespace xercesc;
 using namespace rsgis;
@@ -222,7 +224,7 @@ class RSGISExeImageUtils : public RSGISAlgorithmParameters
         vector<int> bands;
         string outKMLFile;
 	};
-
+}
 #endif
 
 

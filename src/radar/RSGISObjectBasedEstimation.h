@@ -54,14 +54,14 @@
 #include "radar/RSGISEstimationParameters.h"
 #include "radar/RSGISEstimationConjugateGradient.h"
 
-using namespace std;
-using namespace rsgis;
-using namespace rsgis::img;
-using namespace rsgis::math;
-using namespace rsgis::vec;
-using namespace geos::geom;
-
 namespace rsgis{namespace radar{
+    
+    using namespace std;
+    using namespace rsgis;
+    using namespace rsgis::img;
+    using namespace rsgis::math;
+    using namespace rsgis::vec;
+    using namespace geos::geom;
 	
 	class RSGISObjectBasedEstimation : public RSGISProcessOGRFeature
 	{

@@ -35,11 +35,11 @@
 #include "math/RSGISMatrices.h"
 #include "math/RSGISVectors.h"
 
-using namespace rsgis::img;
-using namespace rsgis::math;
-
 namespace rsgis { namespace classifier {
 	
+    using namespace rsgis::img;
+    using namespace rsgis::math;
+    
 	/**
 	 * A pair of classes which generate the a rule image (distance to sample) using
 	 * the euclidean distance to measure the distance between two cumulative area

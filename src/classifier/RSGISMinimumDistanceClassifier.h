@@ -29,12 +29,12 @@
 #include "math/RSGISMatrices.h"
 #include "common/RSGISClassificationException.h"
 
-using namespace rsgis;
-using namespace rsgis::math;
-using namespace std;
-
 namespace rsgis{ namespace classifier{
 	
+    using namespace rsgis;
+    using namespace rsgis::math;
+    using namespace std;
+    
 	enum MinDistCentreType
 	{
 		mean = 0,

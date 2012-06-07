@@ -29,12 +29,11 @@
 #include "math/RSGISBaysianStatsException.h"
 #include "math/RSGISBaysianDeltaType.h"
 
-using namespace std;
-
 namespace rsgis
 {
 	namespace math
 	{
+        using namespace std;
 		
 		class RSGISBaysianStatsNoPrior
 			{

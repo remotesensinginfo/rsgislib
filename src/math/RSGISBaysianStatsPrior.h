@@ -29,13 +29,12 @@
 #include "math/RSGISBaysianDeltaType.h"
 #include "math/RSGISProbDistro.h"
 
-using namespace std;
-
 namespace rsgis
 {
 	namespace math
 	{
-		
+		using namespace std;
+        
 		class RSGISBaysianStatsPrior			
 			{
 			public:

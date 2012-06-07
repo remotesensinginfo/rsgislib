@@ -32,11 +32,12 @@
 #include "RSGISException.h"
 #include "RSGISXMLArgumentsException.h"
 
-using namespace std;
-using namespace xercesc;
-
 namespace rsgis
 {	
+    
+    using namespace std;
+    using namespace xercesc;
+    
 	class RSGISAlgorithmParameters
 		{
 		public:

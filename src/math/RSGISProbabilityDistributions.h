@@ -28,10 +28,10 @@
 #include "math/RSGISProbDistro.h"
 #include "math/RSGISMathException.h"
 
-using namespace std;
-using namespace rsgis::math;
 
 namespace rsgis{namespace math{
+    
+    using namespace std;
 	
 	class RSGISProbDistGamma : public RSGISProbDistro
 	{

@@ -22,6 +22,7 @@
 
 #include "RSGISExeRasterGIS.h"
 
+namespace rsgisexe{
 
 RSGISExeRasterGIS::RSGISExeRasterGIS() : RSGISAlgorithmParameters()
 {
@@ -6222,6 +6223,8 @@ string RSGISExeRasterGIS::getXMLSchema()
 RSGISExeRasterGIS::~RSGISExeRasterGIS()
 {
 	
+}
+
 }
 
 

@@ -22,6 +22,7 @@
 
 #include "RSGISExeVectorUtils.h"
 
+namespace rsgisexe{
 
 RSGISExeVectorUtils::RSGISExeVectorUtils() : RSGISAlgorithmParameters()
 {
@@ -10055,5 +10056,5 @@ RSGISExeVectorUtils::~RSGISExeVectorUtils()
 	}
 }
 
-
+}
 

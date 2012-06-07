@@ -51,6 +51,8 @@
 
 #include "gdal_priv.h"
 
+namespace rsgisexe{
+
 using namespace std;
 using namespace xercesc;
 using namespace rsgis;
@@ -98,5 +100,7 @@ protected:
     bool useMemory;
     unsigned int numIterations;
 };
+    
+}
 
 #endif

@@ -34,10 +34,10 @@
 #include "common/RSGISAttributeTableException.h"
 #include "rastergis/RSGISAttributeTable.h"
 
-using namespace std;
-using namespace rsgis;
-
 namespace rsgis{namespace rastergis{
+    
+    using namespace std;
+    using namespace rsgis;
     
     class RSGISFindMeanDist2Neighbours
     {

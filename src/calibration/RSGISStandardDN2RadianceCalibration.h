@@ -34,11 +34,11 @@
 #include "img/RSGISCalcImageValue.h"
 #include "img/RSGISCalcImage.h"
 
-using namespace std;
-using namespace rsgis::img;
-
 namespace rsgis{namespace calib{
 	
+    using namespace std;
+    using namespace rsgis::img;
+    
 	struct LandsatRadianceGainsOffsets
     {
         string bandName;

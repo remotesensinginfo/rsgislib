@@ -22,6 +22,8 @@
 
 #include "RSGISExeCommandLine.h"
 
+namespace rsgisexe{
+
 RSGISExeCommandLine::RSGISExeCommandLine() : RSGISAlgorithmParameters()
 {
 	this->algorithm = "commandline";
@@ -155,7 +157,7 @@ RSGISExeCommandLine::~RSGISExeCommandLine()
 	
 }
 
-
+}
 
 
 

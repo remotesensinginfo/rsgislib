@@ -22,6 +22,7 @@
 
 #include "RSGISExeImageUtils.h"
 
+namespace rsgisexe{
 
 RSGISExeImageUtils::RSGISExeImageUtils() : RSGISAlgorithmParameters()
 {
@@ -4534,6 +4535,8 @@ string RSGISExeImageUtils::getXMLSchema()
 
 RSGISExeImageUtils::~RSGISExeImageUtils()
 {
+
+}
 
 }
 

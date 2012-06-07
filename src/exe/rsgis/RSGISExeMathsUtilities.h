@@ -42,6 +42,8 @@
 #include <xercesc/dom/DOM.hpp>
 #include <xercesc/util/XMLString.hpp>
 
+namespace rsgisexe{
+
 using namespace std;
 using namespace xercesc;
 using namespace rsgis;
@@ -81,7 +83,7 @@ class RSGISExeMathsUtilities : public RSGISAlgorithmParameters
 		int yDup;
 		options option;
 	};
-
+}
 #endif
 
 

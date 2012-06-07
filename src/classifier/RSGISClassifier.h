@@ -33,14 +33,14 @@
 #include "common/RSGISClassificationException.h"
 #include "utils/RSGIS_ENVI_ASCII_ROI.h"
 
-using namespace rsgis;
-using namespace rsgis::img;
-using namespace rsgis::math;
-using namespace rsgis::utils;
-using namespace std;
-
 namespace rsgis{ namespace classifier{
 		
+    using namespace rsgis;
+    using namespace rsgis::img;
+    using namespace rsgis::math;
+    using namespace rsgis::utils;
+    using namespace std;
+    
 	struct ClassData
 	{
 		string className;

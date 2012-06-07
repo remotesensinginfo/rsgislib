@@ -30,12 +30,12 @@
 
 #include "math/RSGISMathFunction.h"
 
-using namespace std;
-
 namespace rsgis
 {
 	namespace radar
 	{
+        using namespace std;
+        
 		class RSGISSoilDielectricMixingModel
 			{
 			/**

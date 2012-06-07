@@ -22,6 +22,8 @@
 
 #include "RSGISExeEstimationAlgorithm.h"
 
+namespace rsgisexe{
+
 RSGISExeEstimationAlgorithm::RSGISExeEstimationAlgorithm() : RSGISAlgorithmParameters()
 {
 	this->algorithm = "estimation";
@@ -15901,5 +15903,5 @@ RSGISExeEstimationAlgorithm::~RSGISExeEstimationAlgorithm()
 
 }
 
-
+}
 

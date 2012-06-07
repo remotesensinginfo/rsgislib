@@ -46,12 +46,6 @@
 
 #include "math/RSGISMathsUtils.h"
 
-using namespace std;
-using namespace geos::geom;
-using namespace rsgis::utils;
-using namespace rsgis::math;
-using namespace rsgis::img;
-
 #ifndef M_PI
 # define M_PI  3.1415926535897932384626433832795
 #endif
@@ -61,6 +55,12 @@ using namespace rsgis::img;
 #endif
 
 namespace rsgis{namespace calib{
+    
+    using namespace std;
+    using namespace geos::geom;
+    using namespace rsgis::utils;
+    using namespace rsgis::math;
+    using namespace rsgis::img;
     
     
     /***

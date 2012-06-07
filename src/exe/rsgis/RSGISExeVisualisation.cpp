@@ -22,6 +22,8 @@
 
 #include "RSGISExeVisualisation.h"
 
+namespace rsgisexe{
+
 RSGISExeVisualisation::RSGISExeVisualisation() : RSGISAlgorithmParameters()
 {
 	this->algorithm = "visualisation";
@@ -263,7 +265,7 @@ RSGISExeVisualisation::~RSGISExeVisualisation()
 	
 }
 
-
+}
 
 
 

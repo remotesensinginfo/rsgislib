@@ -32,10 +32,11 @@
 #include "math/RSGISVectors.h"
 #include "math/RSGISMatrices.h"
 
-using namespace std;
-using namespace rsgis;
-
 namespace rsgis {namespace math{
+    
+    using namespace std;
+    using namespace rsgis;
+    
 	/// Class to perform polynomaial fitting	
 	class RSGISLinearFit
 	{

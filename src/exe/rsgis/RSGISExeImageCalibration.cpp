@@ -22,6 +22,7 @@
 
 #include "RSGISExeImageCalibration.h"
 
+namespace rsgisexe{
 
 RSGISExeImageCalibration::RSGISExeImageCalibration() : RSGISAlgorithmParameters()
 {
@@ -3154,3 +3155,7 @@ RSGISExeImageCalibration::~RSGISExeImageCalibration()
 {
 	
 }
+    
+    
+}
+    

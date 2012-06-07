@@ -23,6 +23,8 @@
 
 #include "RSGISExeSARBayesianBiomass.h"
 
+namespace rsgisexe{
+
 RSGISExeSARBayesianBiomass::RSGISExeSARBayesianBiomass() : RSGISAlgorithmParameters()
 {
 	this->algorithm = "BayesianBiomass";
@@ -956,5 +958,7 @@ string RSGISExeSARBayesianBiomass::getXMLSchema()
 RSGISExeSARBayesianBiomass::~RSGISExeSARBayesianBiomass()
 {
 	
+}
+    
 }
 

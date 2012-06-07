@@ -25,10 +25,10 @@
 
 #include "RSGISException.h"
 
-using namespace std;
-
 namespace rsgis 
 {
+    using namespace std;
+    
 	class RSGISXMLArgumentsException : public RSGISException
 		{
 		public:

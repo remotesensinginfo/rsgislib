@@ -39,14 +39,14 @@
 
 #include "modeling/RSGISTransect.h"
 
-using namespace std;
-using namespace rsgis::modeling;
-using namespace rsgis::math;
-using namespace geos::geom;
-using namespace rsgis::geom;
-using namespace rsgis::vec;
-
 namespace rsgis{namespace modeling{
+    
+    using namespace std;
+    using namespace rsgis::math;
+    using namespace geos::geom;
+    using namespace rsgis::geom;
+    using namespace rsgis::vec;
+    
 	class RSGISModelAddVegetation
 	{
 	/** Abstract class to model vegetation

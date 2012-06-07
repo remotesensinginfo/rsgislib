@@ -48,6 +48,8 @@
 
 #include "gdal_priv.h"
 
+namespace rsgisexe{
+
 using namespace std;
 using namespace xercesc;
 using namespace rsgis;
@@ -89,7 +91,7 @@ class RSGISExeFFTUtils : public RSGISAlgorithmParameters
 		int imageband;
 		options option;
 	};
-
+}
 #endif
 
 
