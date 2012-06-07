@@ -2673,7 +2673,7 @@ namespace rsgis{namespace rastergis{
         
     }
     
-    void RSGISPopulateAttributeTableImageStats::populateWithImageStatisticsInMem(RSGISAttributeTable *attTable, GDALDataset **datasets, int numDatasets, RSGISBandAttStats *imageStats) throw(RSGISImageCalcException, RSGISAttributeTableException)
+    void RSGISPopulateAttributeTableImageStats::populateWithImageStatisticsInMem(RSGISAttributeTable *attTable, GDALDataset **datasets, int numDatasets, RSGISBandAttStats *imageStats, float noDataVal, bool noDataValDefined) throw(RSGISImageCalcException, RSGISAttributeTableException)
     {
         if(numDatasets != 2)
         {
@@ -2821,7 +2821,7 @@ namespace rsgis{namespace rastergis{
             }
             
             // Extract Data from Image.
-            RSGISGetAllBandPixelValuesForClumps *getImageVals = new RSGISGetAllBandPixelValuesForClumps(clumpData);
+            RSGISGetAllBandPixelValuesForClumps *getImageVals = new RSGISGetAllBandPixelValuesForClumps(clumpData, noDataVal, noDataValDefined);
             RSGISCalcImage calcImage(getImageVals);
             calcImage.calcImage(datasets, numDatasets);
             delete getImageVals;
@@ -2934,9 +2934,11 @@ namespace rsgis{namespace rastergis{
     }
     
     
-    RSGISGetAllBandPixelValuesForClumps::RSGISGetAllBandPixelValuesForClumps(vector<double> **clumpData):RSGISCalcImageValue(0)
+    RSGISGetAllBandPixelValuesForClumps::RSGISGetAllBandPixelValuesForClumps(vector<double> **clumpData, float noDataVal, bool noDataValDefined):RSGISCalcImageValue(0)
     {
         this->clumpData = clumpData;
+        this->noDataVal = noDataVal;
+        this->noDataValDefined = noDataValDefined;
     }
     
     void RSGISGetAllBandPixelValuesForClumps::calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException)
@@ -2970,8 +2972,18 @@ namespace rsgis{namespace rastergis{
                 if(!nanPresent)
                 {
                     for(int i = 1; i < numBands; ++i)
-                    {                   
-                        clumpData[clumpIdx]->push_back(bandValues[i]);
+                    {   
+                        if(this->noDataValDefined)
+                        {
+                            if(bandValues[i] != noDataVal)
+                            {
+                                clumpData[clumpIdx]->push_back(bandValues[i]);
+                            }
+                        }
+                        else 
+                        {
+                            clumpData[clumpIdx]->push_back(bandValues[i]);
+                        }
                     }
                 }
                 

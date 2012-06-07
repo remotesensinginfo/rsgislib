@@ -179,6 +179,8 @@ protected:
     unsigned int numkNN;
     float distanceThreshold;
     rsgisdistmetrics distMetric;
+    bool noDataValDefined;
+    float noDataVal;
 };
 
 #endif
