@@ -35,12 +35,12 @@
 #include "math/RSGISMatrices.h"
 #include "math/RSGISVectors.h"
 
-using namespace std;
-
 namespace rsgis 
 {
 	namespace math
 	{
+        using namespace std;
+        
 		class RSGISSingularValueDecomposition
 			{
 			public:

@@ -28,10 +28,10 @@
 
 #include "RSGISCommandLineException.h"
 
-using namespace std;
-
 namespace rsgis
 {
+    using namespace std;
+    
 	struct argpair
 	{
 		string arg;

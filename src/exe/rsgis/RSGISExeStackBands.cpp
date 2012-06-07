@@ -22,6 +22,8 @@
 
 #include "RSGISExeStackBands.h"
 
+namespace rsgisexe{
+
 RSGISExeStackBands::RSGISExeStackBands() : RSGISAlgorithmParameters()
 {
 	this->algorithm = "stackbands";
@@ -444,5 +446,7 @@ string RSGISExeStackBands::getXMLSchema()
 RSGISExeStackBands::~RSGISExeStackBands()
 {
 	
+}
+    
 }
 

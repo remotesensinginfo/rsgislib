@@ -46,6 +46,8 @@
 
 #include "gdal_priv.h"
 
+namespace rsgisexe{
+    
 using namespace std;
 using namespace xercesc;
 using namespace rsgis;
@@ -186,5 +188,6 @@ class RSGISExeSARBayesianBiomass : public RSGISAlgorithmParameters
 		double scaleB;
 		deltatypedef deltatype;
 	};
+}
 
 #endif

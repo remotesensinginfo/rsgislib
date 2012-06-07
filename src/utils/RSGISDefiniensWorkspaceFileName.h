@@ -28,13 +28,13 @@
 #include "math/RSGISMathsUtils.h"
 #include "utils/RSGISFileUtils.h"
 
-using namespace std;
-using namespace rsgis::math;
-
 namespace rsgis 
 {
 	namespace utils
 	{
+        using namespace std;
+        using namespace rsgis::math;
+        
 		class RSGISDefiniensWorkspaceFileName
 			{
 			public:

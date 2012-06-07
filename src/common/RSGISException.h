@@ -31,10 +31,10 @@
 #include <iostream>
 #include <string>
 
-using namespace std;
-
 namespace rsgis
 {
+    using namespace std;
+    
 	class RSGISException : public std::exception
 	{
 		public:

@@ -48,6 +48,8 @@
 #include <xercesc/dom/DOM.hpp>
 #include <xercesc/util/XMLString.hpp>
 
+namespace rsgisexe{
+
 using namespace std;
 using namespace xercesc;
 using namespace rsgis;
@@ -96,7 +98,7 @@ class RSGISExeImageConversion : public RSGISAlgorithmParameters
         bool projFromImage;
 		float resolution;
 	};
-
+}
 #endif
 
 

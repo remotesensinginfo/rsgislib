@@ -32,12 +32,12 @@
 #include "geom/RSGISGeometry.h"
 #include "vec/RSGISVectorIO.h"
 
-using namespace std;
-using namespace geos::geom;
-using namespace rsgis::geom;
-using namespace rsgis::vec;
-
 namespace rsgis { namespace modeling {
+    
+    using namespace std;
+    using namespace geos::geom;
+    using namespace rsgis::geom;
+    using namespace rsgis::vec;
 
 	class RSGISCalcCanopyCover
 	{

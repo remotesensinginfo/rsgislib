@@ -28,10 +28,10 @@
 #include <iostream>
 #include "RSGISAlgorithmParameters.h"
 
-using namespace std;
-
 namespace rsgis
 {	
+    using namespace std;
+    
 	class RSGISAlgorParamsFactory
 		{
 		public:

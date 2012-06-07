@@ -31,10 +31,10 @@
 
 #include "geos/geom/Coordinate.h"
 
-using namespace std;
-using namespace geos::geom;
-
 namespace rsgis{namespace math{
+    
+    using namespace std;
+    using namespace geos::geom;
 	
 	class RSGISGlobalOptimisationFunction
 		{

@@ -29,10 +29,11 @@
 #include "math/RSGISProbDistro.h"
 #include "math/RSGISRandomDistro.h"
 
-using namespace std;
-using namespace rsgis::utils;
-
 namespace rsgis { namespace modeling {
+    
+    using namespace std;
+    using namespace rsgis::utils;
+    
 	/// Abstract tree class
 	class RSGISTree 
 	{

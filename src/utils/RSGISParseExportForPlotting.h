@@ -34,12 +34,12 @@
 
 #include "math/RSGISMathsUtils.h"
 
-using namespace std;
-using namespace rsgis;
-using namespace rsgis::math;
-
 namespace rsgis{namespace utils{
 	
+    using namespace std;
+    using namespace rsgis;
+    using namespace rsgis::math;
+    
 	enum PlotTypes
 	{
 		unknown,

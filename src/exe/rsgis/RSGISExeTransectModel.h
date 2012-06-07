@@ -46,6 +46,8 @@
 #include "modeling/RSGISModelTreeParameters.h"
 #include "modeling/RSGISCalcCanopyCover.h"
 
+namespace rsgisexe{
+
 using namespace std;
 using namespace xercesc;
 using namespace rsgis::utils;
@@ -106,6 +108,7 @@ protected:
 	string outVectorFile;
 	string inputFile, outputFile;
 };
+}
 
 #endif
 

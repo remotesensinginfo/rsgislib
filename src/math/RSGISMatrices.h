@@ -38,11 +38,12 @@
 #include <gsl/gsl_eigen.h>
 #include <gsl/gsl_math.h>
 
-using namespace rsgis;
-using namespace std;
-
 namespace rsgis{namespace math{
 	/// Utilities for RSGIS and GSL matrices
+    
+    using namespace rsgis;
+    using namespace std;
+    
 	/**
 	 * m - x axis
 	 * n - y axis

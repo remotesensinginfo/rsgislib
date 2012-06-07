@@ -33,25 +33,24 @@
 #include <math.h>
 #include "math/RSGISMathFunction.h"
 
-using namespace std;
-using namespace rsgis::math;
-
 namespace rsgis{namespace math{
 	
-		class RSGISBaysianIntergrateFunctionNoPrior : public RSGISMathFunction
-			{
-			public:
-				RSGISBaysianIntergrateFunctionNoPrior(RSGISMathFunction *function, double variance);
-				void updateValue(float value);
-				virtual double dX(double value) throw(RSGISMathException){throw RSGISMathException("Not implemented");};
-				virtual double calcFunction(double predictVal) throw(RSGISMathException);
-				virtual int numCoefficients() throw(RSGISMathException){throw RSGISMathException("Not implemented");};
-				virtual void updateCoefficents(double *newCoefficents) throw(RSGISMathException){throw RSGISMathException("Not implemented");};
-			protected:
-				RSGISMathFunction *function;
-				double variance; 
-				float value;
-			};
+    using namespace std;
+
+    class RSGISBaysianIntergrateFunctionNoPrior : public RSGISMathFunction
+        {
+        public:
+            RSGISBaysianIntergrateFunctionNoPrior(RSGISMathFunction *function, double variance);
+            void updateValue(float value);
+            virtual double dX(double value) throw(RSGISMathException){throw RSGISMathException("Not implemented");};
+            virtual double calcFunction(double predictVal) throw(RSGISMathException);
+            virtual int numCoefficients() throw(RSGISMathException){throw RSGISMathException("Not implemented");};
+            virtual void updateCoefficents(double *newCoefficents) throw(RSGISMathException){throw RSGISMathException("Not implemented");};
+        protected:
+            RSGISMathFunction *function;
+            double variance; 
+            float value;
+        };
 		
 }}
 

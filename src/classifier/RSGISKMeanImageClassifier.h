@@ -46,13 +46,13 @@
 #include <boost/random/uniform_int.hpp>
 #include <boost/random/variate_generator.hpp>
 
-using namespace rsgis;
-using namespace rsgis::img;
-using namespace rsgis::utils;
-using namespace std;
-
 namespace rsgis{ namespace classifier{
 	
+    using namespace rsgis;
+    using namespace rsgis::img;
+    using namespace rsgis::utils;
+    using namespace std;
+    
 	
 	class RSGISKMeansClassifier
 	{

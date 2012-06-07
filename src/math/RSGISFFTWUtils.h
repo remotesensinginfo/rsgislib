@@ -29,10 +29,10 @@
 #include "RSGISMatrices.h"
 #include "RSGISMatricesException.h"
 
-using namespace std;
-
 namespace rsgis{namespace math{
 	
+    using namespace std;
+    
 	class RSGISFFTWUtils
 		{
 		public:

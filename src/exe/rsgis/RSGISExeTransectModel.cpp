@@ -23,6 +23,8 @@
 
 #include "RSGISExeTransectModel.h"
 
+namespace rsgisexe{
+
 RSGISExeTransectModel::RSGISExeTransectModel() : RSGISAlgorithmParameters()
 {
 	this->algorithm = "transectModel";
@@ -2943,3 +2945,7 @@ RSGISExeTransectModel::~RSGISExeTransectModel()
 {
 	
 }
+    
+    
+}
+    

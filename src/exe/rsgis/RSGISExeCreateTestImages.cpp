@@ -22,6 +22,8 @@
 
 #include "RSGISExeCreateTestImages.h"
 
+namespace rsgisexe{
+
 RSGISExeCreateTestImages::RSGISExeCreateTestImages() : RSGISAlgorithmParameters()
 {
 	this->algorithm = "testimages";
@@ -136,4 +138,5 @@ RSGISExeCreateTestImages::~RSGISExeCreateTestImages()
 	
 }
 
+}
 

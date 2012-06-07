@@ -70,6 +70,7 @@
 #include <xercesc/dom/DOM.hpp>
 #include <xercesc/util/XMLString.hpp>
 
+namespace rsgisexe{
 //using namespace std;
 using namespace xercesc;
 using namespace rsgis;
@@ -183,7 +184,7 @@ class RSGISExePostClassification : public RSGISAlgorithmParameters
 		dominantspecies dominant;
 
 	};
-
+}
 #endif
 
 

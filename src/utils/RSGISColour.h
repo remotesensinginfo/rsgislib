@@ -27,10 +27,10 @@
 #include <string>
 #include <iostream>
 
-using namespace std;
-
 namespace rsgis{namespace utils{
 
+    using namespace std;
+    
 	class RSGISColour
 		{
 		public:

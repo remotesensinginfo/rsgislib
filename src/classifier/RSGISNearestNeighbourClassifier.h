@@ -30,12 +30,12 @@
 #include "common/RSGISClassificationException.h"
 #include <math.h>
 
-using namespace rsgis;
-using namespace rsgis::math;
-using namespace std;
-
 namespace rsgis{ namespace classifier{
 
+    using namespace rsgis;
+    using namespace rsgis::math;
+    using namespace std;
+    
 	class RSGISNearestNeighbourClassifier : public RSGISClassifier
 		{
 		public:

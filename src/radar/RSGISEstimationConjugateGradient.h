@@ -38,10 +38,11 @@
 #include "math/RSGISFunctions.h"
 #include "radar/RSGISEstimationOptimiser.h"
 
-using namespace std;
-using namespace rsgis::math;
-
 namespace rsgis {namespace radar{
+    
+    using namespace std;
+    using namespace rsgis::math;
+    
 	/** There are three classes for conjugate gradient.
 	 * the first 'RSGISEstimationConjugateGradient' is the old implementation for polynomials.
 	 * many parameters are hardcoded.

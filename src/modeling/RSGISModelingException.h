@@ -27,11 +27,12 @@
 
 #include "common/RSGISException.h"
 
-using namespace std;
-using namespace rsgis;
-
 namespace rsgis 
 {	/// Modeling - library to provide modeling functunality.
+    
+    using namespace std;
+    using namespace rsgis;
+    
 	namespace modeling
 	{
 		/// Exception for modelling class

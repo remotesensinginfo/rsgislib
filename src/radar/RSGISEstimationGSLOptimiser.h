@@ -36,11 +36,10 @@
 #include "math/RSGISFunctions.h"
 #include "radar/RSGISEstimationOptimiser.h"
 
-
-using namespace std;
-using namespace rsgis::math;
-
 namespace rsgis {namespace radar{
+    
+    using namespace std;
+    using namespace rsgis::math;
 	
 	enum gslOptimizer 
 	{

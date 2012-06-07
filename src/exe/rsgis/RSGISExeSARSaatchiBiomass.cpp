@@ -22,6 +22,8 @@
 
 #include "RSGISExeSARSaatchiBiomass.h"
 
+namespace rsgisexe{
+
 RSGISExeSARSaatchiBiomass::RSGISExeSARSaatchiBiomass() : RSGISAlgorithmParameters()
 {
 	this->algorithm = "SaatchiBiomass";
@@ -1042,4 +1044,6 @@ string RSGISExeSARSaatchiBiomass::getXMLSchema()
 RSGISExeSARSaatchiBiomass::~RSGISExeSARSaatchiBiomass()
 {
 	
+}
+    
 }

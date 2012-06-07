@@ -22,6 +22,8 @@
 
 #include "RSGISExeImageMorphology.h"
 
+namespace rsgisexe{
+
 RSGISExeImageMorphology::RSGISExeImageMorphology() : RSGISAlgorithmParameters()
 {
 	this->algorithm = "morphology";
@@ -1531,5 +1533,8 @@ string RSGISExeImageMorphology::getXMLSchema()
 RSGISExeImageMorphology::~RSGISExeImageMorphology()
 {
 	
+}
+    
+    
 }
 

@@ -30,13 +30,13 @@
 
 #include "utils/RSGISAllometricSpecies.h"
 
-using namespace std;
-using namespace rsgis::utils;
-
 namespace rsgis 
 {
 	namespace utils
 	{
+        using namespace std;
+        using namespace rsgis::utils;
+        
 		class RSGISAllometricEquations
 			{
 			public:

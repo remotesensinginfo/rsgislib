@@ -41,6 +41,7 @@
 
 #include "gdal_priv.h"
 
+namespace rsgisexe{
 
 using namespace std;
 using namespace xercesc;
@@ -157,6 +158,7 @@ class RSGISExeSARSaatchiBiomass : public RSGISAlgorithmParameters
 		double c2;
 		
 	};
+}
 
 #endif
 

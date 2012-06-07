@@ -22,6 +22,7 @@
 
 #include "RSGISExeZonalStats.h"
 
+namespace rsgisexe{
 
 RSGISExeZonalStats::RSGISExeZonalStats() : RSGISAlgorithmParameters()
 {
@@ -4889,5 +4890,5 @@ RSGISExeZonalStats::~RSGISExeZonalStats()
 	
 }
 
-
+}
 

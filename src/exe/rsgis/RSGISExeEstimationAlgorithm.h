@@ -53,6 +53,8 @@
 
 #include "gdal_priv.h"
 
+namespace rsgisexe{
+
 using namespace std;
 using namespace xercesc;
 using namespace rsgis;
@@ -153,5 +155,5 @@ class RSGISExeEstimationAlgorithm : public RSGISAlgorithmParameters
 		int polyOrderY;
 		int polyOrderZ;
 	};
-
+}
 #endif

@@ -22,6 +22,7 @@
 
 #include "RSGISExePostClassification.h"
 
+namespace rsgisexe{
 
 
 RSGISExePostClassification::RSGISExePostClassification() : RSGISAlgorithmParameters()
@@ -5974,5 +5975,5 @@ RSGISExePostClassification::~RSGISExePostClassification()
 	}
 }
 
-
+}
 

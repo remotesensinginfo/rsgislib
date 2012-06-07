@@ -26,12 +26,12 @@
 
 #include "common/RSGISException.h"
 
-using namespace std;
-
 namespace rsgis 
 {
 	namespace utils
 	{
+        using namespace std;
+        
 		class RSGISENVIROIException : public RSGISException
 			{
 			public:

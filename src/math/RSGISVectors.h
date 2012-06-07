@@ -33,12 +33,12 @@
 #include "common/RSGISInputStreamException.h"
 #include "common/RSGISOutputStreamException.h"
 
-using namespace rsgis;
-using namespace std;
-
 namespace rsgis{namespace math{
 	/// Utilities for RSGIS and GSL vectors
 	
+    using namespace rsgis;
+    using namespace std;
+    
 	/** 
 	 * n - size
 	 */

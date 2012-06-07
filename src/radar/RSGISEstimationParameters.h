@@ -24,8 +24,6 @@
 #ifndef RSGISEstimationParameters_H
 #define RSGISEstimationParameters_H
 
-#include <iostream>
-
 namespace rsgis
 {
 	namespace radar

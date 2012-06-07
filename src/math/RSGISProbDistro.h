@@ -25,8 +25,6 @@
 
 #include <math.h>
 
-//using namespace std;
-
 namespace rsgis{namespace math{
 
 	class RSGISProbDistro

@@ -39,6 +39,8 @@
 
 #include "gdal_priv.h"
 
+namespace rsgisexe{
+
 using namespace std;
 using namespace xercesc;
 using namespace rsgis;
@@ -70,6 +72,6 @@ class RSGISExeStackBands : public RSGISAlgorithmParameters
         GDALDataType outDataType;
         string imageFormat;
 	};
-
+}
 #endif
 

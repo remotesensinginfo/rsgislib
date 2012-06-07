@@ -38,11 +38,12 @@
 #include "radar/RSGISEstimationOptimiser.h"
 #include "radar/RSGISEstimationGSLOptimiser.h"
 
-using namespace std;
-using namespace rsgis::math;
-using namespace rsgis::utils;
-
 namespace rsgis {namespace radar{
+    
+    using namespace std;
+    using namespace rsgis::math;
+    using namespace rsgis::utils;
+    
 	class RSGISEstimationExhaustiveSearch2Var2Data : public RSGISEstimationOptimiser
 	{
 	public:

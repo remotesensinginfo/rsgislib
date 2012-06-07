@@ -22,6 +22,7 @@
 
 #include "RSGISExeFilterImages.h"
 
+namespace rsgisexe{
 
 RSGISExeFilterImages::RSGISExeFilterImages() : RSGISAlgorithmParameters()
 {
@@ -539,6 +540,8 @@ string RSGISExeFilterImages::getXMLSchema()
 
 RSGISExeFilterImages::~RSGISExeFilterImages()
 {
+    
+}
     
 }
 

@@ -36,10 +36,11 @@
 #include "math/RSGISProbDistro.h"
 #include "radar/RSGISEstimationOptimiser.h"
 
-using namespace std;
-using namespace rsgis::math;
-
 namespace rsgis {namespace radar{
+    
+    using namespace std;
+    using namespace rsgis::math;
+    
 	class RSGISEstimationSimulatedAnnealing2Var2Data : public RSGISEstimationOptimiser
 	{
 	/// Simulated Annealing to use in Estimation algorithm

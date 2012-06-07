@@ -32,10 +32,10 @@
 #include "img/RSGISImageBandException.h"
 #include "img/RSGISImageCalcException.h"
 
-using namespace rsgis::img;
-
 namespace rsgis { namespace classifier {
 
+    using namespace rsgis::img;
+    
 	class RSGISSpectralAngleMapperRule : public RSGISCalcImageValue
 	{
 	public:

@@ -22,6 +22,7 @@
 
 #include "RSGISExeImageConversion.h"
 
+namespace rsgisexe{
 
 RSGISExeImageConversion::RSGISExeImageConversion() : RSGISAlgorithmParameters()
 {
@@ -491,6 +492,8 @@ string RSGISExeImageConversion::getXMLSchema()
 RSGISExeImageConversion::~RSGISExeImageConversion()
 {
 	
+}
+    
 }
 
 

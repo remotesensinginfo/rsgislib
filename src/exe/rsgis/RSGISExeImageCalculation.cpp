@@ -22,6 +22,7 @@
 
 #include "RSGISExeImageCalculation.h"
 
+namespace rsgisexe{
 
 RSGISExeImageCalculation::RSGISExeImageCalculation() : RSGISAlgorithmParameters()
 {
@@ -3887,6 +3888,6 @@ RSGISExeImageCalculation::~RSGISExeImageCalculation()
 	
 }
 
-
+}
 
 

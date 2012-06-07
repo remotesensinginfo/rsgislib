@@ -22,6 +22,8 @@
 
 #include "RSGISExeRadarUtils.h"
 
+namespace rsgisexe{
+
 RSGISExeRadarUtils::RSGISExeRadarUtils() : RSGISAlgorithmParameters()
 {
 	this->algorithm = "radarUtils";
@@ -399,4 +401,6 @@ string RSGISExeRadarUtils::getXMLSchema()
 RSGISExeRadarUtils::~RSGISExeRadarUtils()
 {
 	
+}
+    
 }

@@ -22,6 +22,7 @@
 
 #include "RSGISExeElevationDataTools.h"
 
+namespace rsgisexe{
 
 RSGISExeElevationDataTools::RSGISExeElevationDataTools() : RSGISAlgorithmParameters()
 {
@@ -1279,5 +1280,5 @@ RSGISExeElevationDataTools::~RSGISExeElevationDataTools()
 	
 }
 
-
+}
 

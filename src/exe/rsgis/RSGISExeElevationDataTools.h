@@ -47,6 +47,8 @@
 
 #include "gdal_priv.h"
 
+namespace rsgisexe{
+
 using namespace std;
 using namespace xercesc;
 using namespace rsgis;
@@ -92,6 +94,8 @@ protected:
     int slopeOutputType;
     float maxElevHeight;
 };
+    
+}
 
 #endif
 

@@ -25,12 +25,12 @@
 
 #include "RSGISListException.h"
 
-using namespace std;
-
 namespace rsgis 
 {
 	namespace datastruct
 	{
+        using namespace std;
+        
 		class RSGISItemNotFoundException : public RSGISListException
 			{
 			public:

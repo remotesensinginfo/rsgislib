@@ -22,6 +22,8 @@
 
 #include "RSGISExeSegment.h"
 
+namespace rsgisexe{
+
 RSGISExeSegment::RSGISExeSegment() : RSGISAlgorithmParameters()
 {
 	this->algorithm = "segmentation";
@@ -5058,5 +5060,7 @@ string RSGISExeSegment::getXMLSchema()
 RSGISExeSegment::~RSGISExeSegment()
 {
 	
+}
+
 }
 

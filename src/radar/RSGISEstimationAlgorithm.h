@@ -49,14 +49,14 @@
 #include "utils/RSGISAllometricEquations.h"
 #include "utils/RSGISAllometricSpecies.h"
 
-using namespace std;
-using namespace rsgis::img;
-using namespace rsgis::utils;
-
 namespace rsgis 
 {
 	namespace radar
 	{
+        
+        using namespace std;
+        using namespace rsgis::img;
+        using namespace rsgis::utils;
 		
 		class RSGISEstimationAlgorithmFullPolSingleSpeciesPoly : public RSGISCalcImageValue
 		{

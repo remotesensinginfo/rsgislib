@@ -22,6 +22,7 @@
 
 #include "RSGISExeMathsUtilities.h"
 
+namespace rsgisexe{
 
 RSGISExeMathsUtilities::RSGISExeMathsUtilities() : RSGISAlgorithmParameters()
 {
@@ -300,5 +301,6 @@ RSGISExeMathsUtilities::~RSGISExeMathsUtilities()
 	
 }
 
+}
 
 

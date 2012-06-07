@@ -35,11 +35,11 @@
 #include "math/RSGISMatrices.h"
 #include "utils/RSGISENVIROIException.h"
 
-using namespace std;
-using namespace rsgis::math;
-
 namespace rsgis{namespace utils{
 	
+    using namespace std;
+    using namespace rsgis::math;
+    
 	struct enviroi
 	{
 		string name;

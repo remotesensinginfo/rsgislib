@@ -46,6 +46,8 @@
 
 #include "boost/date_time/gregorian/gregorian.hpp"
 
+namespace rsgisexe{
+
 using namespace std;
 using namespace xercesc;
 using namespace rsgis;
@@ -110,6 +112,8 @@ protected:
 	unsigned int numElevation;
 	string imageFormat;
 };
+
+}
 
 #endif
 

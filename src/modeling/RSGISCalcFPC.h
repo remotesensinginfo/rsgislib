@@ -28,10 +28,10 @@
 #include <gsl/gsl_rng.h>
 #include "modeling/RSGISTransect.h"
 
-using namespace std;
-using namespace rsgis::modeling;
-
 namespace rsgis { namespace modeling {
+    
+    using namespace std;
+    
 	/*
 	 * Class to calculate FPC from a transect by replicating the field sampling stratergy used by SLATS.<br>
 	 * The field techniqe for obtaining FPC is equation one in the following paper:<br>

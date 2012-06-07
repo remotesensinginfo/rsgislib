@@ -22,6 +22,8 @@
 
 #include "RSGISExeFitting.h"
 
+namespace rsgisexe{
+
 RSGISExeFitting::RSGISExeFitting() : RSGISAlgorithmParameters()
 {
 	this->algorithm = "fitting";
@@ -1134,4 +1136,6 @@ string RSGISExeFitting::getXMLSchema()
 RSGISExeFitting::~RSGISExeFitting()
 {
 	
+}
+    
 }

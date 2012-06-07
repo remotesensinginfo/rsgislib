@@ -59,6 +59,8 @@
 
 #include "gdal_priv.h"
 
+namespace rsgisexe{
+
 using namespace std;
 using namespace xercesc;
 using namespace rsgis;
@@ -143,5 +145,5 @@ class RSGISExeSegment : public RSGISAlgorithmParameters
         bool exportLUT;
         bool storeMean;
 	};
-
+}
 #endif

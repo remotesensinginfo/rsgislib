@@ -35,14 +35,14 @@
 #include "geom/RSGISGeometry.h"
 #include "vec/RSGISVectorIO.h"
 
-using namespace std;
-using namespace geos::geom;
-using namespace rsgis::geom;
-using namespace rsgis::vec;
-using namespace rsgis::modeling;
-using namespace rsgis::math;
-
 namespace rsgis { namespace modeling{
+    
+    using namespace std;
+    using namespace geos::geom;
+    using namespace rsgis::geom;
+    using namespace rsgis::vec;
+    using namespace rsgis::math;
+    
 	/// Class to create tree canopy
 	/*
 	 * Class to create a tree canopy based on statistical distrobutions and tree parameters<br>

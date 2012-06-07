@@ -38,11 +38,12 @@
 #include "RSGISInputStreamException.h"
 #include "RSGISAlgorParamsFactory.h"
 
-using namespace std;
-using namespace xercesc;
-
 namespace rsgis
 {	
+    
+    using namespace std;
+    using namespace xercesc;
+    
 	class RSGISParseXMLArguments
 		{
 		public:
