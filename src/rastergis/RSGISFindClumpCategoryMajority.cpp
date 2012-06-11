@@ -60,7 +60,7 @@ namespace rsgis{namespace rastergis{
             }
             else if(attTable->getDataType(majorityRatioField) != rsgis_float)
             {
-                throw RSGISAttributeTableException("Majority ratio field must be of type integer.");
+                throw RSGISAttributeTableException("Majority ratio field must be of type float.");
             }
             unsigned int majorityRatioFieldIdx = attTable->getFieldIndex(majorityRatioField);
             
