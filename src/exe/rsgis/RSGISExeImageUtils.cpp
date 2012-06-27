@@ -2592,7 +2592,7 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
 				colourImage = new RSGISColourUpImage(3, this->classColour, this->numClasses);
 				calcImage = new RSGISCalcImage(colourImage, "", true);
 				
-				calcImage->calcImage(datasets, 1, this->outputImage);
+				calcImage->calcImage(datasets, 1, this->outputImage, false, NULL, this->imageFormat, this->outDataType);
 				
 				if(datasets != NULL)
 				{

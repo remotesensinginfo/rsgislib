@@ -407,7 +407,7 @@
 
 
     <!-- A command that will generate an RGB colour image based on thresholds applied to the input image - useful for generating quicklooks and visualisation of classification -->
-    <rsgis:command algor="imageutils" option="colourimage" image="image.env" output="image_out.env">
+    <rsgis:command algor="imageutils" option="colourimage" image="image.env" output="image_out.env" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64">
         <rsgis:colour name="class_name_1" id="int" band="int" lower="double" upper="double" red="int" green="int" blue="int" />
         <rsgis:colour name="class_name_2" id="int" band="int" lower="double" upper="double" red="int" green="int" blue="int" />
         <rsgis:colour name="class_name_3" id="int" band="int" lower="double" upper="double" red="int" green="int" blue="int" />
