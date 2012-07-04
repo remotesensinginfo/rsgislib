@@ -374,6 +374,28 @@ namespace rsgis{namespace math{
 		int orderY;
 		int orderZ;
 	};
+    
+	class RSGISFunctionNDPoly : public RSGISMathNVariableFunction
+ 	{
+		/// N dimensional polynomial function
+		/** z = a0(y) + a1(y)b + a2(y)b^2
+		 *   aN(y) = b0 + b1y + b2y^2
+		 *   The function and differentials are calculated seperately.
+		 */
+	public: 
+		RSGISFunctionNDPoly(gsl_matrix *inCoefficients, vector <int> *polyOrders);
+		virtual double calcFunction(vector <double> *values) throw(RSGISMathException);
+		virtual int numCoefficients() throw(RSGISMathException);
+        virtual int numVariables() throw(RSGISMathException);
+		virtual void updateCoefficents(double *newCoefficents) throw(RSGISMathException){throw RSGISMathException("Not implemented");};
+		virtual ~RSGISFunctionNDPoly();
+	private:
+		gsl_matrix *coefficients;
+		vector <int> *polyOrders;
+        vector <double> *values;
+        int numVar;
+	};
+    
 	
 	class RSGISFunctionRosenbrocksParabolicValley : public RSGISMathTwoVariableFunction
  	{

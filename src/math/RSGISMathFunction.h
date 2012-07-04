@@ -23,6 +23,7 @@
 #ifndef RSGISMathFunction_H
 #define RSGISMathFunction_H
 
+#include <vector>
 #include "math/RSGISMathException.h"
 
 namespace rsgis{namespace math{
@@ -72,6 +73,20 @@ namespace rsgis{namespace math{
 		virtual int numCoefficients() throw(RSGISMathException) = 0;
 		virtual void updateCoefficents(double *coefficients) = 0;
 		virtual ~RSGISMathThreeVariableFunction(){};
+	};
+    
+    class RSGISMathNVariableFunction
+	{
+		/** RSGISMathThreeVariableFunction
+		 *  Abstract class two variable function
+		 */
+	public: 
+		RSGISMathNVariableFunction(){};
+		virtual double calcFunction(vector <double> *values) throw(RSGISMathException) = 0;
+		virtual int numCoefficients() throw(RSGISMathException) = 0;
+        virtual int numVariables() throw(RSGISMathException) = 0;
+		virtual void updateCoefficents(double *coefficients) = 0;
+		virtual ~RSGISMathNVariableFunction(){};
 	};
 	
 }}

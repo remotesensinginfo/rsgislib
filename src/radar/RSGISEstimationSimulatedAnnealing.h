@@ -299,7 +299,52 @@ namespace rsgis {namespace radar{
 		gsl_vector *aPrioriPar;
 	};
 	
-	
+	class RSGISEstimationSimulatedAnnealingWithAP : public RSGISEstimationOptimiser
+    {
+        /// Simulated Annealing to use in Estimation algorithm
+    public:
+        RSGISEstimationSimulatedAnnealingWithAP(vector <RSGISMathNVariableFunction*> *allFunctions,
+                                                double **minMaxIntervalAll,
+                                                double minEnergy,
+                                                double startTemp,
+                                                unsigned int runsStep,
+                                                unsigned int runsTemp,
+                                                double cooling,
+                                                unsigned int maxItt,
+                                                gsl_matrix *covMatrixP, 
+                                                gsl_matrix *invCovMatrixD,
+                                                gsl_vector *aPrioriPar);
+        int minimise(gsl_vector *inData, gsl_vector *initialPar, gsl_vector *outParError);
+        virtual void modifyAPriori(gsl_vector *newAPrioriPar){this->aPrioriPar = newAPrioriPar;};
+        gsl_vector* getAPrioriPar(){return this->aPrioriPar;};
+        virtual estOptimizerType getOptimiserType(){return simulatedAnnealing;}; 
+        virtual void printOptimiser(){cout << "Simulated Annealing - 3 Var 3 Data (with a Priori)" << endl;};
+        double calcLeastSquares(vector <double> *values);
+        ~RSGISEstimationSimulatedAnnealingWithAP();
+    private:
+        double startTemp;
+        unsigned int runsStep; // Number of runs at each step size
+        unsigned int runsTemp; // Number of times step is changed at each temperature
+        double cooling; // Cooling factor
+        unsigned int nPar;
+        unsigned int nData;
+        double **minMaxIntervalAll;
+        double minEnergy; // Set the target energy
+        unsigned int maxItt; // Maximum number of itterations
+        double *initialStepSize;
+        gsl_rng *randgsl;
+        vector <RSGISMathNVariableFunction*> *allFunctions;
+        gsl_matrix *covMatrixP;
+        gsl_matrix *invCovMatrixD;
+        gsl_matrix *invCovMatrixP;
+        gsl_vector *aPrioriPar;
+        gsl_vector *deltaD;
+        gsl_vector *deltaX;
+        gsl_vector *tempD;
+        gsl_vector *tempX;
+        gsl_vector *inData;
+        bool useAP;
+    };
 }}
 
 #endif

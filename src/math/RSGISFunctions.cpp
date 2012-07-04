@@ -724,7 +724,7 @@ namespace rsgis{namespace math{
 			//cout << "HH - b_" << x << " = " << bcoeffPowY << endl;
 		}
 		outVal = aCoeffPowX;
-
+        
 		return outVal;
 	}
 	double RSGISFunction3DPoly::dX(double valueX, double valueY, double valueZ) throw(RSGISMathException)
@@ -899,8 +899,97 @@ namespace rsgis{namespace math{
 		outValdZ = aCoeffPowXdZ;
 		return outValdZ;
 	}
-	
 	RSGISFunction3DPoly::~RSGISFunction3DPoly()
+	{
+		gsl_matrix_free(this->coefficients);
+	}
+    
+	RSGISFunctionNDPoly::RSGISFunctionNDPoly(gsl_matrix *inCoefficients, vector <int> *polyOrders)
+	{
+		this->coefficients = gsl_matrix_alloc(inCoefficients->size1, inCoefficients->size2);
+		gsl_matrix_memcpy(this->coefficients, inCoefficients);
+        this->polyOrders = polyOrders;
+        this->numVar = polyOrders->size();
+	}
+	double RSGISFunctionNDPoly::calcFunction(vector <double> *values) throw(RSGISMathException)
+	{		
+		double outVal = 0.0;
+        if(values->size() != this->numVar)
+        {
+            throw RSGISMathException("Number of values not equal to number of variables coefficients provided for");
+        }
+        
+		double aCoeffPowX = 0.0;
+		double bcoeffPowY = 0;
+		double cCoeffPowZ = 0;
+		double zPow = 0;
+		double cCoeff = 0;
+		double yPow = 0;
+		double xPow = 0;
+        
+        if (this->numVar == 2) 
+        {
+            for(int x = 0; x < this->polyOrders->at(0); x ++) 
+            {
+                double xPow = pow(values->at(0), x); // x^n;
+                
+                double aCoeff = 0.0; 
+                
+                for(int y = 0; y < this->polyOrders->at(1) ; y++) // Calculate a_n(density)
+                {
+                    double yPow = pow(values->at(1),y); // y^n;
+                    double bcoeff = gsl_matrix_get(coefficients, x, y); // b_n
+                    aCoeff = aCoeff + (bcoeff * yPow);
+                }
+                
+                double acoeffXPow = xPow * aCoeff;
+                
+                outVal = outVal + acoeffXPow;
+            }
+        }
+        
+        else if(this->numVar == 3)
+        {
+            unsigned int c = 0;
+            for(int x = 0; x < this->polyOrders->at(0); x ++) 
+            {
+                bcoeffPowY = 0.0; 
+                for(int y = 0; y < this->polyOrders->at(1); y++)
+                {
+                    cCoeffPowZ = 0.0;
+                    for(int z = 0; z < this->polyOrders->at(2); z++)
+                    {     
+                        zPow = pow(values->at(2), z); // z^n;
+                        //cCoeff = gsl_matrix_get(coefficients, y + (x * this->polyOrders->at(0)), z);
+                        cCoeff = gsl_matrix_get(coefficients, c, z);
+                        cCoeffPowZ = cCoeffPowZ + (cCoeff * zPow);
+                    }
+                    yPow = pow(values->at(1), y); // y^n;
+                    bcoeffPowY = bcoeffPowY + (cCoeffPowZ * yPow); // c_n * y^n
+                    c++;
+                }
+                xPow = pow(values->at(0), x); // dielectric^n;
+                aCoeffPowX = aCoeffPowX + (bcoeffPowY * xPow);
+                //cout << "HH - b_" << x << " = " << bcoeffPowY << endl;
+            }
+            outVal = aCoeffPowX;
+        }
+        else
+        {
+            throw RSGISMathException("Currently no implamentation for specified number of values");
+        }
+        
+		return outVal;
+	}
+    int RSGISFunctionNDPoly::numCoefficients() throw(RSGISMathException)
+    {
+        return 1;
+    }
+    int RSGISFunctionNDPoly::numVariables() throw(RSGISMathException)
+    {
+        return this->numVar;
+    }
+	RSGISFunctionNDPoly::~RSGISFunctionNDPoly()
 	{
 		gsl_matrix_free(this->coefficients);
 	}

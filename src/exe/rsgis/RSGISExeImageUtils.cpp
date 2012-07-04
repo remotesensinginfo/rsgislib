@@ -2580,7 +2580,7 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
 					classColour[i]->numInputBands = numBands;
 					
 					cout << i <<  ") Class " << classColour[i]->className << " with ID ";
-					cout << classColour[i]->classID << " uses image band " << classColour[i]->imgBand;
+					cout << classColour[i]->classID << " uses image band " << classColour[i]->imgBand + 1;
 					cout << " where a total of " << classColour[i]->numInputBands << " is available:\n";
 					cout << "Lower = " << classColour[i]->lower << endl;
 					cout << "Upper = " << classColour[i]->upper << endl;
