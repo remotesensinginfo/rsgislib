@@ -732,7 +732,7 @@
     <!-- A command to apply a morphological gradient to all image bands to produce a single band output -->
     <rsgis:command algor="morphology" option="gradientall" image="image.env" output="image_out.env" [operator="matrix.gmtxt" | elementsize="int"] />
     <!-- A command to apply a filter to find local minima - used as input into a morphological watershed -->
-    <rsgis:command algor="morphology" option="localminima" image="image.env" output="image_out.env" [operator="matrix.gmtxt" | elementsize="int"] numbering="binary | sequencial" allowequals="yes | no" />
+    <rsgis:command algor="morphology" option="localminima" image="image.env" output="image_out.env" [operator="matrix.gmtxt" | elementsize="int"] numbering="binary | sequential" allowequals="yes | no" />
     <!-- A command to apply a filter to find local minima using all image bands to produce a single band output - used as input into a morphological watershed -->
     <rsgis:command algor="morphology" option="localminimaall" image="image.env" output="image_out.env" [operator="matrix.gmtxt" | elementsize="int"] numbering="binary | sequencial" allowequals="yes | no" />
     <!-- A command to apply a morphological closing to an image (if temp image not provided processing will be done in memory) -->
