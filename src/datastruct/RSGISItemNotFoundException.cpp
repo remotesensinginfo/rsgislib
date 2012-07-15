@@ -35,7 +35,7 @@ namespace rsgis {namespace datastruct{
 
 	}
 	
-	RSGISItemNotFoundException::RSGISItemNotFoundException(string message) : RSGISListException(message)
+	RSGISItemNotFoundException::RSGISItemNotFoundException(std::string message) : RSGISListException(message)
 	{
 		
 	}

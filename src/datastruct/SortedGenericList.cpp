@@ -20,8 +20,6 @@
  *
  */
 
-//#include "SortedGenericList.h"
-
 #ifndef SortedGenericList_H
 #define SortedGenericList_H
 
@@ -30,9 +28,7 @@
 #include "datastruct/RSGISItemNotFoundException.h"
 
 namespace rsgis{ namespace datastruct{
-	
-    using namespace std;
-    
+	    
 	template <typename T>
 	class SortedGenericList
 		{
@@ -182,13 +178,13 @@ namespace rsgis{ namespace datastruct{
 	template <typename T>
 	void SortedGenericList<T>::clearListDelete()
 	{
-		//cout << "size  = " << size << endl;
+		//std::cout << "size  = " << size << std::endl;
 		for(int i = 0; i < size; i++)
 		{
-			//cout << "list[" << i << "] = " << *list[i] << endl;
+			//std::cout << "list[" << i << "] = " << *list[i] << std::endl;
 			if(list[i] != NULL)
 			{
-				//cout << "deleting\n";
+				//std::cout << "deleting\n";
 				delete list[i];
 			}
 		}
@@ -198,10 +194,10 @@ namespace rsgis{ namespace datastruct{
 	template <typename T>
 	void SortedGenericList<T>::printDesc()
 	{
-		cout << " ************ Descending (" << size << ")************* \n";
+        std::cout << " ************ Descending (" << size << ")************* \n";
 		if(size == 0)
 		{
-			cout << "List is empty!\n";
+			std::cout << "List is empty!\n";
 		}
 		else if(list == NULL)
 		{
@@ -211,14 +207,14 @@ namespace rsgis{ namespace datastruct{
 		{
 			for(int i = 0; i < size; i++)
 			{
-				cout << i << ") ";
+				std::cout << i << ") ";
 				if(list[i] == NULL)
 				{
-					cout << "NULL\n";
+					std::cout << "NULL\n";
 				}
 				else
 				{
-					cout << *list[i] << endl;
+					std::cout << *list[i] << std::endl;
 				}
 			}
 		}
@@ -251,10 +247,10 @@ namespace rsgis{ namespace datastruct{
 	template <typename T>
 	void SortedGenericList<T>::printAsc()
 	{
-		cout << " ************ Ascending (" << size << ")************* \n";
+		std::cout << " ************ Ascending (" << size << ")************* \n";
 		if(size == 0)
 		{
-			cout << "List is empty!\n";
+			std::cout << "List is empty!\n";
 		}
 		else
 		{
@@ -264,11 +260,11 @@ namespace rsgis{ namespace datastruct{
 				std::cout << counter++ << ") ";
 				if(list[i] == NULL)
 				{
-					cout << "NULL\n";
+					std::cout << "NULL\n";
 				}
 				else
 				{
-					cout << *list[i] << endl;
+					std::cout << *list[i] << std::endl;
 				}
 			}
 		}
@@ -384,7 +380,7 @@ namespace rsgis{ namespace datastruct{
 			{
 				if(*data == *list[min])
 				{
-					//cout << "EQUAL found - [" << *list[min] << "]\n";
+					//std::cout << "EQUAL found - [" << *list[min] << "]\n";
 					*location = min;
 					continueLoop = false;
 					break;

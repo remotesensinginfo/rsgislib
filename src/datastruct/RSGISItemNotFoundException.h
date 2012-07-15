@@ -23,22 +23,19 @@
 #ifndef RSGISItemNotFoundException_H
 #define RSGISItemNotFoundException_H
 
+#include <string.h>
+
 #include "RSGISListException.h"
 
-namespace rsgis 
-{
-	namespace datastruct
-	{
-        using namespace std;
-        
-		class RSGISItemNotFoundException : public RSGISListException
-			{
-			public:
-				RSGISItemNotFoundException();
-				RSGISItemNotFoundException(const char* message);
-				RSGISItemNotFoundException(string message);
-			};
-	}
-}
+namespace rsgis{namespace datastruct{
+    
+    class RSGISItemNotFoundException : public RSGISListException
+        {
+        public:
+            RSGISItemNotFoundException();
+            RSGISItemNotFoundException(const char* message);
+            RSGISItemNotFoundException(std::string message);
+        };
+}}
 
 #endif
