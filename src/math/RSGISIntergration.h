@@ -30,9 +30,7 @@
 #include "math/RSGISMathException.h"
 
 namespace rsgis{namespace math{
-	
-    using namespace std;
-    
+	    
 	struct point2D
 	{
 		double x;

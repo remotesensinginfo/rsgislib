@@ -34,7 +34,7 @@ namespace rsgis{namespace math{
 		
 	}
 
-	RSGISMatricesException::RSGISMatricesException(string message) : RSGISMathException(message)
+	RSGISMatricesException::RSGISMatricesException(std::string message) : RSGISMathException(message)
 	{
 		
 	}

@@ -35,9 +35,6 @@
 
 namespace rsgis{namespace math{
 	/// Utilities for RSGIS and GSL vectors
-	
-    using namespace rsgis;
-    using namespace std;
     
 	/** 
 	 * n - size
@@ -57,14 +54,14 @@ namespace rsgis{namespace math{
 			void freeVector(Vector *vector);
 			void printVector(Vector *vector);
 			void printGSLVector(gsl_vector *vector);
-			void saveVector2GridTxt(Vector *vector, string filepath) throw(RSGISVectorsException,RSGISOutputStreamException);
-			void saveVector2txt(Vector *vector, string filepath) throw(RSGISVectorsException,RSGISOutputStreamException);
-			void saveGSLVector2Txt(gsl_vector *gslVector, string filepath) throw(RSGISVectorsException,RSGISOutputStreamException);
-			void saveGSLVector2GridTxt(gsl_vector *gslVector, string filepath) throw(RSGISVectorsException,RSGISOutputStreamException);
-			Vector* readVectorFromTxt(string filepath) throw(RSGISVectorsException,RSGISInputStreamException);
-			Vector* readVectorFromGridTxt(string filepath) throw(RSGISVectorsException,RSGISInputStreamException);
-			gsl_vector* readGSLVectorFromTxt(string filepath) throw(RSGISVectorsException);
-			gsl_vector* readGSLVectorFromGridTxt(string filepath) throw(RSGISVectorsException);
+			void saveVector2GridTxt(Vector *vector, std::string filepath) throw(RSGISVectorsException,RSGISOutputStreamException);
+			void saveVector2txt(Vector *vector, std::string filepath) throw(RSGISVectorsException,RSGISOutputStreamException);
+			void saveGSLVector2Txt(gsl_vector *gslVector, std::string filepath) throw(RSGISVectorsException,RSGISOutputStreamException);
+			void saveGSLVector2GridTxt(gsl_vector *gslVector, std::string filepath) throw(RSGISVectorsException,RSGISOutputStreamException);
+			Vector* readVectorFromTxt(std::string filepath) throw(RSGISVectorsException,RSGISInputStreamException);
+			Vector* readVectorFromGridTxt(std::string filepath) throw(RSGISVectorsException,RSGISInputStreamException);
+			gsl_vector* readGSLVectorFromTxt(std::string filepath) throw(RSGISVectorsException);
+			gsl_vector* readGSLVectorFromGridTxt(std::string filepath) throw(RSGISVectorsException);
 			gsl_vector* convertRSGIS2GSLVector(Vector *vector) throw(RSGISVectorsException);
 			Vector* convertGSL2RSGISVector(gsl_vector *inVector) throw(RSGISVectorsException);
 			double dotProductVectorVectorGSL(gsl_vector *inVectorA, gsl_vector *inVectorB) throw(RSGISVectorsException);

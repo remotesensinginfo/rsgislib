@@ -32,8 +32,6 @@
 
 namespace rsgis{ namespace math {
     
-    using namespace std;
-
 	class RSGISRandDistroGaussian : public RSGISProbDistro
 	{
 	/** Randomly sample from a gausian distrobution.

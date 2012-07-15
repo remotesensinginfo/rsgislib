@@ -16,9 +16,7 @@
 #define nnls_abs(x) ((x) >= 0 ? (x) : -(x))
 
 namespace rsgis{namespace math{
-    
-    using namespace std;
-    
+        
     class RSGISNNLS
     {
     public:

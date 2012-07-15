@@ -34,9 +34,6 @@
 #include "geos/geom/Envelope.h"
 
 namespace rsgis{namespace math{
-    
-    using namespace std;
-    using namespace geos::geom;
 	
 	class RSGISGlobalOptimiser2D
 		{
@@ -46,8 +43,8 @@ namespace rsgis{namespace math{
 				this->func = func;
 				this->maximise = maximise;
 			}
-			virtual vector<Coordinate*>* optimise4Neighbor(vector<Coordinate*> *coords, double step, Envelope *boundary) throw(RSGISOptimisationException) = 0;
-			virtual vector<Coordinate*>* optimise8Neighbor(vector<Coordinate*> *coords, double step, Envelope *boundary) throw(RSGISOptimisationException) = 0;
+			virtual std::vector<geos::geom::Coordinate*>* optimise4Neighbor(std::vector<geos::geom::Coordinate*> *coords, double step, geos::geom::Envelope *boundary) throw(RSGISOptimisationException) = 0;
+			virtual std::vector<geos::geom::Coordinate*>* optimise8Neighbor(std::vector<geos::geom::Coordinate*> *coords, double step, geos::geom::Envelope *boundary) throw(RSGISOptimisationException) = 0;
 			virtual ~RSGISGlobalOptimiser2D(){};
 		protected:
 			RSGISGlobalOptimisationFunction *func;

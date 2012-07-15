@@ -33,11 +33,7 @@
 #include "geos/geom/Coordinate.h"
 #include "geos/geom/Envelope.h"
 
-
 namespace rsgis{namespace math{
-	
-    using namespace std;
-    using namespace geos::geom;
     
 	class RSGISOptimiser2D
 		{
@@ -47,7 +43,7 @@ namespace rsgis{namespace math{
 				this->func = func;
 				this->maximise = maximise;
 			}
-			virtual Coordinate* optimise(Coordinate *coord, double step, Envelope *boundary) throw(RSGISOptimisationException) = 0;
+			virtual Coordinate* optimise(geos::geom::Coordinate *coord, double step, geos::geom::Envelope *boundary) throw(RSGISOptimisationException) = 0;
 			virtual ~RSGISOptimiser2D(){};
 		protected:
 			RSGISOptimisationFunction *func;

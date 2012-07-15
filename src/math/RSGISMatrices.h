@@ -41,9 +41,6 @@
 namespace rsgis{namespace math{
 	/// Utilities for RSGIS and GSL matrices
     
-    using namespace rsgis;
-    using namespace std;
-    
 	/**
 	 * m - x axis
 	 * n - y axis
@@ -83,21 +80,21 @@ namespace rsgis{namespace math{
 			void productMatrixVectorGSL(gsl_matrix *inMatrix, gsl_vector *inVector, gsl_vector *outVector) throw(RSGISMatricesException);
 			void printMatrix(Matrix *matrix);
 			void printGSLMatrix(gsl_matrix *matrix);
-			void saveMatrix2GridTxt(Matrix *matrix, string filepath) throw(RSGISMatricesException,RSGISOutputStreamException);
-			void saveMatrix2CSV(Matrix *matrix, string filepath) throw(RSGISMatricesException,RSGISOutputStreamException);
-			void saveMatrix2txt(Matrix *matrix, string filepath) throw(RSGISMatricesException,RSGISOutputStreamException);
-			void saveMatrix2txtOptions(Matrix *matrix, string filepath, outTXTform outtxt) throw(RSGISMatricesException,RSGISOutputStreamException);
-			void saveMatrix2Binary(Matrix *matrix, string filepath) throw(RSGISMatricesException,RSGISOutputStreamException);
-			void saveGSLMatrix2GridTxt(gsl_matrix *gslMatrix, string filepath) throw(RSGISMatricesException,RSGISOutputStreamException);
-			void saveGSLMatrix2Txt(gsl_matrix *gslMatrix, string filepath) throw(RSGISMatricesException,RSGISOutputStreamException);
-			void saveGSLMatrix2CSV(gsl_matrix *gslMatrix, string filepath) throw(RSGISMatricesException,RSGISOutputStreamException);
-			void exportAsImage(Matrix *matrix, string filepath) throw(RSGISMatricesException);
-			Matrix* readMatrixFromTxt(string filepath) throw(RSGISMatricesException,RSGISInputStreamException);
-			Matrix* readMatrixFromGridTxt(string filepath) throw(RSGISMatricesException,RSGISInputStreamException);
-			Matrix* readMatrixFromBinary(string filepath) throw(RSGISMatricesException,RSGISInputStreamException);
-			gsl_matrix* readGSLMatrixFromTxt(string filepath) throw(RSGISMatricesException);
-			gsl_matrix* readGSLMatrixFromGridTxt(string filepath) throw(RSGISMatricesException);
-			gsl_matrix* readGSLMatrixFromBinary(string filepath) throw(RSGISMatricesException);
+			void saveMatrix2GridTxt(Matrix *matrix, std::string filepath) throw(RSGISMatricesException,RSGISOutputStreamException);
+			void saveMatrix2CSV(Matrix *matrix, std::string filepath) throw(RSGISMatricesException,RSGISOutputStreamException);
+			void saveMatrix2txt(Matrix *matrix, std::string filepath) throw(RSGISMatricesException,RSGISOutputStreamException);
+			void saveMatrix2txtOptions(Matrix *matrix, std::string filepath, outTXTform outtxt) throw(RSGISMatricesException,RSGISOutputStreamException);
+			void saveMatrix2Binary(Matrix *matrix, std::string filepath) throw(RSGISMatricesException,RSGISOutputStreamException);
+			void saveGSLMatrix2GridTxt(gsl_matrix *gslMatrix, std::string filepath) throw(RSGISMatricesException,RSGISOutputStreamException);
+			void saveGSLMatrix2Txt(gsl_matrix *gslMatrix, std::string filepath) throw(RSGISMatricesException,RSGISOutputStreamException);
+			void saveGSLMatrix2CSV(gsl_matrix *gslMatrix, std::string filepath) throw(RSGISMatricesException,RSGISOutputStreamException);
+			void exportAsImage(Matrix *matrix, std::string filepath) throw(RSGISMatricesException);
+			Matrix* readMatrixFromTxt(std::string filepath) throw(RSGISMatricesException,RSGISInputStreamException);
+			Matrix* readMatrixFromGridTxt(std::string filepath) throw(RSGISMatricesException,RSGISInputStreamException);
+			Matrix* readMatrixFromBinary(std::string filepath) throw(RSGISMatricesException,RSGISInputStreamException);
+			gsl_matrix* readGSLMatrixFromTxt(std::string filepath) throw(RSGISMatricesException);
+			gsl_matrix* readGSLMatrixFromGridTxt(std::string filepath) throw(RSGISMatricesException);
+			gsl_matrix* readGSLMatrixFromBinary(std::string filepath) throw(RSGISMatricesException);
 			void calcEigenVectorValue(Matrix *matrix, Matrix *eigenvalues, Matrix *eigenvectors) throw(RSGISMatricesException);
 			Matrix* normalisedMatrix(Matrix *matrix, double min, double max) throw(RSGISMatricesException);
             Matrix* normalisedColumnsMatrix(Matrix *matrix) throw(RSGISMatricesException);

@@ -96,8 +96,8 @@ namespace rsgis{namespace math{
 		this->outS = outS;
 		RSGISVectors vectorUtils;
 		svdSolve = gsl_linalg_SV_solve (inA, outV, outS, inB, outX);
-		cout << "solved!" << endl;
-		cout << "coefficients are: ";
+		std::cout << "solved!" << std::endl;
+		std::cout << "coefficients are: ";
 		vectorUtils.printGSLVector(outX);
 		gsl_matrix_free(outV);
 		gsl_vector_free(outS);

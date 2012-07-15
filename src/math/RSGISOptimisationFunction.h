@@ -32,14 +32,11 @@
 #include "geos/geom/Coordinate.h"
 
 namespace rsgis{namespace math{
-	
-    using namespace std;
-    using namespace geos::geom;
     
 	class RSGISOptimisationFunction
 		{
 		public:
-			virtual double calcValue(Coordinate *coord) throw(RSGISOptimisationException) = 0;
+			virtual double calcValue(geos::geom::Coordinate *coord) throw(RSGISOptimisationException) = 0;
 			virtual ~RSGISOptimisationFunction(){};
 		};
 }}

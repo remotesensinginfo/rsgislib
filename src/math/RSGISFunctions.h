@@ -33,9 +33,6 @@
 #include "math/RSGISMatrices.h"
 
 namespace rsgis{namespace math{
-    
-    using namespace std;
-    using namespace mu;
 	
 	enum functionType 
 	{
@@ -433,16 +430,16 @@ namespace rsgis{namespace math{
 		  * If no derivative is supplied then an exception will be thrown if 'dX' is called'
 		  */
 	public: 
-		RSGISFunctionMuParser(string fxExpression, string varName = "x", string dxExpression = "", bool usedX = false);
+		RSGISFunctionMuParser(std::string fxExpression, std::string varName = "x", std::string dxExpression = "", bool usedX = false);
 		virtual double calcFunction(double value) throw(RSGISMathException);
 		virtual double dX(double value) throw(RSGISMathException);
 		virtual int numCoefficients() throw(RSGISMathException) {throw RSGISMathException("Not known for muparser expression");};
 		virtual void updateCoefficents(double *newCoefficents) throw(RSGISMathException){throw RSGISMathException("Not implemented");};
 		virtual ~RSGISFunctionMuParser();
 	private:
-		Parser *muParserfX; // muParser to hold function
-		Parser *muParserdX; // muParser to hold first derivative
-		value_type *inVals;
+        mu::Parser *muParserfX; // muParser to hold function
+        mu::Parser *muParserdX; // muParser to hold first derivative
+        mu::value_type *inVals;
 		bool usedX; // Check if using derivative information
 	};
 	
@@ -456,7 +453,7 @@ namespace rsgis{namespace math{
 		 * If no derivative is supplied then an exception will be thrown if 'dX' is called'
 		 */
 	public: 
-		RSGISFunctionMuParser2Var(string fxyExpression, string varName1 = "x", string varName2 = "y", string dxExpression = "", string dyExpression = "", bool usediff = false);
+		RSGISFunctionMuParser2Var(std::string fxyExpression, std::string varName1 = "x", std::string varName2 = "y", std::string dxExpression = "", std::string dyExpression = "", bool usediff = false);
 		virtual double calcFunction(double valueX, double valueY) throw(RSGISMathException);
 		virtual double dX(double valueX, double valueY) throw(RSGISMathException);
 		virtual double dY(double valueX, double valueY) throw(RSGISMathException);
@@ -464,10 +461,10 @@ namespace rsgis{namespace math{
 		virtual void updateCoefficents(double *newCoefficents) throw(RSGISMathException){throw RSGISMathException("Not implemented");};
 		virtual ~RSGISFunctionMuParser2Var();
 	private:
-		Parser *muParserfXY; // muParser to hold function
-		Parser *muParserdX; // muParser to hold first derivative with respect to x
-		Parser *muParserdY; // muParser to hold first derivative with respect to y
-		value_type *inVals;
+        mu::Parser *muParserfXY; // muParser to hold function
+        mu::Parser *muParserdX; // muParser to hold first derivative with respect to x
+        mu::Parser *muParserdY; // muParser to hold first derivative with respect to y
+        mu::value_type *inVals;
 		bool usediff; // Check if using derivative information
 	};
 	

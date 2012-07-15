@@ -21,7 +21,8 @@
  */
 
 #ifndef RSGISBaysianStatPrior_H
-#define  RSGISBaysianStatPrior_H
+#define RSGISBaysianStatPrior_H
+
 #include "math/RSGISBaysianIntergrateFunctionPrior.h"
 #include "math/RSGISMathFunction.h"
 #include "math/RSGISIntergration.h"
@@ -32,9 +33,7 @@
 namespace rsgis
 {
 	namespace math
-	{
-		using namespace std;
-        
+	{        
 		class RSGISBaysianStatsPrior			
 			{
 			public:

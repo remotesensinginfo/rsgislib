@@ -34,7 +34,7 @@ namespace rsgis{namespace math{
 		
 	}
 	
-	RSGISClustererException::RSGISClustererException(string message) : RSGISMathException(message)
+	RSGISClustererException::RSGISClustererException(std::string message) : RSGISMathException(message)
 	{
 		
 	}

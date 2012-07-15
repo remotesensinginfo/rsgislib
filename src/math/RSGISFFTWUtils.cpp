@@ -51,11 +51,11 @@ namespace rsgis{namespace math{
 			in[i][1] = 0;
 		}
 		
-		cout << "Executing FFTW...\n";
+		std::cout << "Executing FFTW...\n";
 		fftw_execute(plan_f);
-		cout << "Finished FFTW...\n";
+		std::cout << "Finished FFTW...\n";
 		
-		//cout << "DC = " << sqrt((out[0][0] * out[0][0]) + (out[0][1] * out[0][1])) << endl;
+		//std::cout << "DC = " << sqrt((out[0][0] * out[0][0]) + (out[0][1] * out[0][1])) << std::endl;
 				
 		for(int i = 0; i < inputSize; i++)
 		{

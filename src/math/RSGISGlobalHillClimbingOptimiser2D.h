@@ -35,16 +35,13 @@
 #include "geos/geom/Envelope.h"
 
 namespace rsgis{namespace math{
-    
-    using namespace std;
-    using namespace geos::geom;
 	
 	class RSGISGlobalHillClimbingOptimiser2D : public RSGISGlobalOptimiser2D
 		{
 		public:
 			RSGISGlobalHillClimbingOptimiser2D(RSGISGlobalOptimisationFunction *func, bool maximise, int maxNumIterations);
-			virtual vector<Coordinate*>* optimise4Neighbor(vector<Coordinate*> *coords, double step, Envelope *boundary) throw(RSGISOptimisationException);
-			virtual vector<Coordinate*>* optimise8Neighbor(vector<Coordinate*> *coords, double step, Envelope *boundary) throw(RSGISOptimisationException);
+			virtual std::vector<geos::geom::Coordinate*>* optimise4Neighbor(std::vector<geos::geom::Coordinate*> *coords, double step, geos::geom::Envelope *boundary) throw(RSGISOptimisationException);
+			virtual std::vector<geos::geom::Coordinate*>* optimise8Neighbor(std::vector<geos::geom::Coordinate*> *coords, double step, geos::geom::Envelope *boundary) throw(RSGISOptimisationException);
 			virtual ~RSGISGlobalHillClimbingOptimiser2D();
 		private:
 			int maxNumIterations;
@@ -54,12 +51,12 @@ namespace rsgis{namespace math{
 	{
 	public:
 		RSGISGlobalHillClimbingOptimiser2DVaryNumPts(RSGISGlobalOptimisationFunction *func, bool maximise, int maxNumIterations);
-		virtual vector<Coordinate*>* optimise4Neighbor(vector<Coordinate*> *coords, double step, Envelope *boundary) throw(RSGISOptimisationException);
-		virtual vector<Coordinate*>* optimise8Neighbor(vector<Coordinate*> *coords, double step, Envelope *boundary) throw(RSGISOptimisationException);
+		virtual std::vector<geos::geom::Coordinate*>* optimise4Neighbor(std::vector<geos::geom::Coordinate*> *coords, double step, geos::geom::Envelope *boundary) throw(RSGISOptimisationException);
+		virtual std::vector<geos::geom::Coordinate*>* optimise8Neighbor(std::vector<geos::geom::Coordinate*> *coords, double step, geos::geom::Envelope *boundary) throw(RSGISOptimisationException);
 		virtual ~RSGISGlobalHillClimbingOptimiser2DVaryNumPts();
 	private:
 		int maxNumIterations;
-		void findPointOnLine(Coordinate *p1, Coordinate *p2, float distance, Coordinate *p3);
+		void findPointOnLine(geos::geom::Coordinate *p1, geos::geom::Coordinate *p2, float distance, geos::geom::Coordinate *p3);
 	};
 }}
 
