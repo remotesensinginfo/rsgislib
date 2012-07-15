@@ -27,7 +27,7 @@
 
 namespace rsgis{namespace reg{
 	
-	RSGISImageWarpException::RSGISImageWarpException() : RSGISRegistrationException("A RSGISImageWarpException has been created..")
+	RSGISImageWarpException::RSGISImageWarpException() : rsgis::RSGISRegistrationException("A RSGISImageWarpException has been created..")
 	{
 		
 	}
@@ -38,7 +38,7 @@ namespace rsgis{namespace reg{
 		
 	}
 	
-	RSGISImageWarpException::RSGISImageWarpException(string message)  : RSGISRegistrationException(message)
+	RSGISImageWarpException::RSGISImageWarpException(std::string message)  : RSGISRegistrationException(message)
 	{
 		
 	}
