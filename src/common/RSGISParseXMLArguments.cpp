@@ -25,25 +25,25 @@
 namespace rsgis
 {	
 
-	RSGISParseXMLArguments::RSGISParseXMLArguments(string xmlFile)
+	RSGISParseXMLArguments::RSGISParseXMLArguments(std::string xmlFile)
 	{
 		this->xmlFile = xmlFile;
 	}
 	
 	RSGISAlgorithmParameters** RSGISParseXMLArguments::parseArguments(int *numParams, RSGISAlgorParamsFactory *algorFactory) throw(RSGISXMLArgumentsException)
 	{
-		XMLCh tempStr[100];
-		DOMImplementation *impl = NULL;
-		DOMLSParser* parser = NULL;
-		ErrorHandler* errHandler = NULL;
-		DOMDocument *doc = NULL;
-		DOMElement *rootElement = NULL;
-		DOMNodeList *argumentsList = NULL;
-		DOMElement *argElement = NULL;
+        XMLCh tempStr[100];
+		xercesc::DOMImplementation *impl = NULL;
+		xercesc::DOMLSParser* parser = NULL;
+		xercesc::ErrorHandler* errHandler = NULL;
+		xercesc::DOMDocument *doc = NULL;
+		xercesc::DOMElement *rootElement = NULL;
+		xercesc::DOMNodeList *argumentsList = NULL;
+		xercesc::DOMElement *argElement = NULL;
 		//const XMLCh *algorName = NULL;
 		XMLCh *algorXMLStr = NULL;
 		char *algorNameChar = NULL;
-		string algorNameStr = "";
+        std::string algorNameStr = "";
 		XMLCh *commandsTag = NULL;
 		XMLCh *commandTag = NULL;
 		
@@ -51,23 +51,23 @@ namespace rsgis
 		
 		try 
 		{
-			XMLPlatformUtils::Initialize();
+			xercesc::XMLPlatformUtils::Initialize();
 			
-			commandsTag = XMLString::transcode("rsgis:commands");
-			commandTag = XMLString::transcode("rsgis:command");
-			algorXMLStr = XMLString::transcode("algor");
+			commandsTag = xercesc::XMLString::transcode("rsgis:commands");
+			commandTag = xercesc::XMLString::transcode("rsgis:command");
+			algorXMLStr = xercesc::XMLString::transcode("algor");
 
-			XMLString::transcode("LS", tempStr, 99);
-			impl = DOMImplementationRegistry::getDOMImplementation(tempStr);
+			xercesc::XMLString::transcode("LS", tempStr, 99);
+			impl = xercesc::DOMImplementationRegistry::getDOMImplementation(tempStr);
 			if(impl == NULL)
 			{
 				throw RSGISXMLArgumentsException("DOMImplementation is NULL");
 			}
 			
 			// Create Parser
-			parser = ((DOMImplementationLS*)impl)->createLSParser(DOMImplementationLS::MODE_SYNCHRONOUS, 0);
-			errHandler = (ErrorHandler*) new HandlerBase();
-			parser->getDomConfig()->setParameter(XMLUni::fgDOMErrorHandler, errHandler);
+			parser = ((xercesc::DOMImplementationLS*)impl)->createLSParser(xercesc::DOMImplementationLS::MODE_SYNCHRONOUS, 0);
+			errHandler = (xercesc::ErrorHandler*) new xercesc::HandlerBase();
+			parser->getDomConfig()->setParameter(xercesc::XMLUni::fgDOMErrorHandler, errHandler);
 			
 			// Open Document
 			doc = parser->parseURI(xmlFile.c_str());	
@@ -75,7 +75,7 @@ namespace rsgis
 			// Get the Root element
 			rootElement = doc->getDocumentElement();
 			//cout << "Root Element: " << XMLString::transcode(rootElement->getTagName()) << endl;
-			if(!XMLString::equals(rootElement->getTagName(), commandsTag))
+			if(!xercesc::XMLString::equals(rootElement->getTagName(), commandsTag))
 			{
 				throw RSGISXMLArgumentsException("Incorrect root element; Root element should be \"rsgis:commands\"");
 			}
@@ -88,13 +88,13 @@ namespace rsgis
 			
 			for(int i = 0; i < *numParams; i++)
 			{
-				argElement = static_cast<DOMElement*>(argumentsList->item(i));
-				algorNameChar = XMLString::transcode(argElement->getAttribute(algorXMLStr));
+				argElement = static_cast<xercesc::DOMElement*>(argumentsList->item(i));
+				algorNameChar = xercesc::XMLString::transcode(argElement->getAttribute(algorXMLStr));
 				algorNameStr = string(algorNameChar);
 				cout << "Algorithm = " << algorNameStr << endl;
 				
 				args[i] = algorFactory->getAlgorithmParamterObj(algorNameStr);
-				XMLString::release(&algorNameChar);
+				xercesc::XMLString::release(&algorNameChar);
 				algorNameStr.erase();
 				
 				args[i]->retrieveParameters(argElement);
@@ -102,24 +102,24 @@ namespace rsgis
 			
 			parser->release();
 			delete errHandler;
-			XMLString::release(&commandsTag);
-			XMLString::release(&commandTag);
-			XMLString::release(&algorXMLStr);
+			xercesc::XMLString::release(&commandsTag);
+			xercesc::XMLString::release(&commandTag);
+			xercesc::XMLString::release(&algorXMLStr);
 			
-			XMLPlatformUtils::Terminate();
+			xercesc::XMLPlatformUtils::Terminate();
 		}
-		catch (const XMLException& e) 
+		catch (const xercesc::XMLException& e) 
 		{
 			parser->release();
-			char *message = XMLString::transcode(e.getMessage());
-			string outMessage =  string("XMLException : ") + string(message);
+			char *message = xercesc::XMLString::transcode(e.getMessage());
+            std::string outMessage =  std::string("XMLException : ") + std::string(message);
 			throw RSGISXMLArgumentsException(outMessage.c_str());
 		}
-		catch (const DOMException& e) 
+		catch (const xercesc::DOMException& e) 
 		{
 			parser->release();
-			char *message = XMLString::transcode(e.getMessage());
-			string outMessage =  string("DOMException : ") + string(message);
+			char *message = xercesc::XMLString::transcode(e.getMessage());
+            std::string outMessage =  std::string("DOMException : ") + std::string(message);
 			throw RSGISXMLArgumentsException(outMessage.c_str());
 		}
 		catch(RSGISXMLArgumentsException &e)

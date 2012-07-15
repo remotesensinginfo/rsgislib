@@ -35,7 +35,7 @@ namespace rsgis
 
 	}
 	
-	RSGISOutputStreamException::RSGISOutputStreamException(string message) : RSGISException(message)
+	RSGISOutputStreamException::RSGISOutputStreamException(std::string message) : RSGISException(message)
 	{
 		
 	}

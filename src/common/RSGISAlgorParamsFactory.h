@@ -29,18 +29,16 @@
 #include "RSGISAlgorithmParameters.h"
 
 namespace rsgis
-{	
-    using namespace std;
-    
+{    
 	class RSGISAlgorParamsFactory
 		{
 		public:
-			RSGISAlgorParamsFactory(vector<RSGISAlgorithmParameters*> *params);
-			RSGISAlgorithmParameters* getAlgorithmParamterObj(string algorithm);
-			string* availableAlgorithms(int *numAlgor);
+			RSGISAlgorParamsFactory(std::vector<RSGISAlgorithmParameters*> *params);
+			RSGISAlgorithmParameters* getAlgorithmParamterObj(std::string algorithm);
+            std::string* availableAlgorithms(int *numAlgor);
 			~RSGISAlgorParamsFactory();
 		protected:
-			vector<RSGISAlgorithmParameters*> *params;
+            std::vector<RSGISAlgorithmParameters*> *params;
 		};
 }
 

@@ -34,7 +34,7 @@ namespace rsgis
 		public:
 			RSGISVectorException();
 			RSGISVectorException(const char* message);
-			RSGISVectorException(string message);
+			RSGISVectorException(std::string message);
 		};
 }
 

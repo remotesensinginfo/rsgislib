@@ -32,7 +32,7 @@ namespace rsgis
 		this->parsed = false;
 	}
 	
-	string RSGISAlgorithmParameters::getAlgorithm()
+    std::string RSGISAlgorithmParameters::getAlgorithm()
 	{
 		return this->algorithm;
 	}

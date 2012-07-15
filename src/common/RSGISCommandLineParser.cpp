@@ -32,7 +32,7 @@ namespace rsgis
 	
 	void RSGISCommandLineParser::parseArguments(int argc, char **argv) throw(RSGISCommandLineException)
 	{
-		string tmpStr;
+		std::string tmpStr;
 		numArguments = 0;
 		for(int i = 1; i < argc; i++)
 		{
@@ -51,7 +51,7 @@ namespace rsgis
 		for(int i = 0; i < numArguments; i++)
 		{
 			arguments[i] = new argpair();
-			arguments[i]->arg = string("");
+			arguments[i]->arg = std::string("");
 			arguments[i]->numVals = 0;
 		}
 		
@@ -60,7 +60,7 @@ namespace rsgis
 		{
 			if(argv[i][0] == '-')
 			{
-				arguments[argNum++]->arg = string(argv[i]);
+				arguments[argNum++]->arg = std::string(argv[i]);
 			}
 			else
 			{
@@ -76,7 +76,7 @@ namespace rsgis
 			{
 				if(arguments[argNum]->numVals > 0)
 				{
-					arguments[argNum]->value = new string[arguments[argNum]->numVals];
+					arguments[argNum]->value = new std::string[arguments[argNum]->numVals];
 				}
 				else
 				{
@@ -87,7 +87,7 @@ namespace rsgis
 			}
 			else
 			{
-				tmpStr = string(argv[i]);
+				tmpStr = std::string(argv[i]);
 				if(tmpStr.at(0) == '%')
 				{
 					tmpStr = tmpStr.substr(1);
@@ -103,7 +103,7 @@ namespace rsgis
 		return numArguments;
 	}
 	
-	bool RSGISCommandLineParser::argumentPresent(string arg)
+	bool RSGISCommandLineParser::argumentPresent(std::string arg)
 	{
 		for(int i = 0; i < numArguments; i++)
 		{
@@ -115,7 +115,7 @@ namespace rsgis
 		return false;
 	}
 	
-	argpair* RSGISCommandLineParser::findArgument(string arg)
+	argpair* RSGISCommandLineParser::findArgument(std::string arg)
 	{
 		for(int i = 0; i < numArguments; i++)
 		{

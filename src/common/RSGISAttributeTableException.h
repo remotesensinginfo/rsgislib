@@ -26,15 +26,13 @@
 #include "RSGISException.h"
 
 namespace rsgis 
-{
-    using namespace std;
-    
+{    
 	class RSGISAttributeTableException : public RSGISException
 	{
 	public:
 		RSGISAttributeTableException();
 		RSGISAttributeTableException(const char* message);
-		RSGISAttributeTableException(string message);
+		RSGISAttributeTableException(std::string message);
 	};
 }
 
