@@ -30,14 +30,11 @@
 #include "math/RSGISMathException.h"
 
 namespace rsgis{namespace reg{
-    
-    using namespace std;
-    using namespace rsgis::math;
-		
+    		
 	class RSGISImageSimilarityMetric
 	{
 	public:
-		virtual float calcValue(float **reference, float **floating, unsigned int numVals, unsigned int numDims) throw(RSGISMathException)=0;
+		virtual float calcValue(float **reference, float **floating, unsigned int numVals, unsigned int numDims) throw(rsgis::math::RSGISMathException)=0;
 		virtual bool findMin()=0;
 		virtual ~RSGISImageSimilarityMetric(){};
 	};

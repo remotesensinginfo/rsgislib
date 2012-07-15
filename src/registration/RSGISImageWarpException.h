@@ -28,16 +28,13 @@
 #include "common/RSGISRegistrationException.h"
 
 namespace rsgis{namespace reg{
-    
-    using namespace std;
-    using namespace rsgis;
 	
-	class RSGISImageWarpException : public RSGISRegistrationException
+	class RSGISImageWarpException : public rsgis::RSGISRegistrationException
 	{
 	public:
 		RSGISImageWarpException();
 		RSGISImageWarpException(const char* message);
-		RSGISImageWarpException(string message);
+		RSGISImageWarpException(std::string message);
 	};
 
 }}
