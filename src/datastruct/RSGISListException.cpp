@@ -24,7 +24,7 @@
 
 namespace rsgis {namespace datastruct{
 	
-	RSGISListException::RSGISListException() : RSGISException("A RSGISListException has been created..")
+	RSGISListException::RSGISListException() : rsgis::RSGISException("A RSGISListException has been created..")
 	{
 
 	}
@@ -35,7 +35,7 @@ namespace rsgis {namespace datastruct{
 
 	}
 	
-	RSGISListException::RSGISListException(string message) : RSGISException(message)
+	RSGISListException::RSGISListException(std::string message) : RSGISException(message)
 	{
 		
 	}

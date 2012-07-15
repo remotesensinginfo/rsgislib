@@ -23,22 +23,19 @@
 #ifndef RSGISListException_H
 #define RSGISListException_H
 
+#include <string.h>
+
 #include "common/RSGISException.h"
 
-namespace rsgis 
-{
-	namespace datastruct
-	{
-        using namespace std;
-        
-		class RSGISListException : public RSGISException
-			{
-			public:
-				RSGISListException();
-				RSGISListException(const char* message);
-				RSGISListException(string message);
-			};
-	}
-}
+namespace rsgis{namespace datastruct{
+    
+    class RSGISListException : public rsgis::RSGISException
+        {
+        public:
+            RSGISListException();
+            RSGISListException(const char* message);
+            RSGISListException(std::string message);
+        };
+}}
 
 #endif
