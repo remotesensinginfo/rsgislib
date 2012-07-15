@@ -34,7 +34,7 @@ namespace rsgis
 		public:
 			RSGISInputStreamException();
 			RSGISInputStreamException(const char* message);
-			RSGISInputStreamException(string message);
+			RSGISInputStreamException(std::string message);
 		};
 }
 #endif

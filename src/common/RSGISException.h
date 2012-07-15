@@ -32,19 +32,17 @@
 #include <string>
 
 namespace rsgis
-{
-    using namespace std;
-    
+{    
 	class RSGISException : public std::exception
 	{
 		public:
 			RSGISException();
 			RSGISException(const char *message);
-			RSGISException(string message);
+            RSGISException(std::string message);
 			virtual ~RSGISException() throw();
 			virtual const char* what() const throw();
 		protected:
-			string msgs;
+            std::string msgs;
 	};
 }
 

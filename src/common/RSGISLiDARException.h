@@ -26,15 +26,13 @@
 #include "RSGISException.h"
 
 namespace rsgis 
-{
-    using namespace std;
-    
+{    
 	class RSGISLiDARException : public RSGISException
 	{
 	public:
 		RSGISLiDARException();
 		RSGISLiDARException(const char* message);
-		RSGISLiDARException(string message);
+		RSGISLiDARException(std::string message);
 	};
 }
 

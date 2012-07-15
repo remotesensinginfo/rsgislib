@@ -36,7 +36,7 @@ namespace rsgis {
 		
 	}
 	
-	RSGISAttributeTableException::RSGISAttributeTableException(string message)  : RSGISException(message)
+	RSGISAttributeTableException::RSGISAttributeTableException(std::string message)  : RSGISException(message)
 	{
 		
 	}

@@ -39,19 +39,15 @@
 #include "RSGISAlgorParamsFactory.h"
 
 namespace rsgis
-{	
-    
-    using namespace std;
-    using namespace xercesc;
-    
+{
 	class RSGISParseXMLArguments
 		{
 		public:
-			RSGISParseXMLArguments(string xmlFile);
+			RSGISParseXMLArguments(std::string xmlFile);
 			RSGISAlgorithmParameters** parseArguments(int *numParams, RSGISAlgorParamsFactory *algorFactory) throw(RSGISXMLArgumentsException);
 			~RSGISParseXMLArguments();
 		protected:
-			string xmlFile;
+            std::string xmlFile;
 			int numArguments;
 		};
 }

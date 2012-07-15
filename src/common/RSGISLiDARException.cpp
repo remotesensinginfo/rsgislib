@@ -35,7 +35,7 @@ namespace rsgis {
 		
 	}
 	
-	RSGISLiDARException::RSGISLiDARException(string message)  : RSGISException(message)
+	RSGISLiDARException::RSGISLiDARException(std::string message)  : RSGISException(message)
 	{
 		
 	}

@@ -29,17 +29,17 @@
 namespace rsgis
 {
 
-	RSGISException::RSGISException() : exception()
+	RSGISException::RSGISException() : std::exception()
 	{
 		msgs = "A RSGISException has been created..";
 	}
 
 	RSGISException::RSGISException(const char* message) : exception()
 	{
-		msgs = string(message);
+		msgs = std::string(message);
 	}
 	
-	RSGISException::RSGISException(string message) : exception()
+	RSGISException::RSGISException(std::string message) : std::exception()
 	{
 		msgs = message;
 	}

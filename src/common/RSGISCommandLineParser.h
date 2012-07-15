@@ -29,13 +29,11 @@
 #include "RSGISCommandLineException.h"
 
 namespace rsgis
-{
-    using namespace std;
-    
+{    
 	struct argpair
 	{
-		string arg;
-		string *value;
+		std::string arg;
+		std::string *value;
 		int numVals;
 	};
 	
@@ -46,8 +44,8 @@ namespace rsgis
 			RSGISCommandLineParser();
 			void parseArguments(int argc, char **argv) throw(RSGISCommandLineException);
 			int getNumArgs();
-			bool argumentPresent(string arg);
-			argpair* findArgument(string arg);
+			bool argumentPresent(std::string arg);
+			argpair* findArgument(std::string arg);
 			~RSGISCommandLineParser();
 		protected:
 			argpair **arguments;

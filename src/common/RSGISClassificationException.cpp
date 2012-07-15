@@ -35,7 +35,7 @@ namespace rsgis {
 		
 	}
 	
-	RSGISClassificationException::RSGISClassificationException(string message) : RSGISException(message)
+	RSGISClassificationException::RSGISClassificationException(std::string message) : RSGISException(message)
 	{
 		
 	}

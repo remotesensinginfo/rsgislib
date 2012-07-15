@@ -25,16 +25,16 @@
 
 namespace rsgis
 {	
-	RSGISAlgorParamsFactory::RSGISAlgorParamsFactory(vector<RSGISAlgorithmParameters*> *params)
+	RSGISAlgorParamsFactory::RSGISAlgorParamsFactory(std::vector<RSGISAlgorithmParameters*> *params)
 	{
 		this->params = params;
 	}
 	
-	RSGISAlgorithmParameters* RSGISAlgorParamsFactory::getAlgorithmParamterObj(string algorithm)
+	RSGISAlgorithmParameters* RSGISAlgorParamsFactory::getAlgorithmParamterObj(std::string algorithm)
 	{
 		RSGISAlgorithmParameters *param = NULL;
 		
-		vector<RSGISAlgorithmParameters*>::iterator iterParams;
+        std::vector<RSGISAlgorithmParameters*>::iterator iterParams;
 		for(iterParams = params->begin(); iterParams != params->end(); ++iterParams)
 		{
 			if((*iterParams)->getAlgorithm() == algorithm)
@@ -52,10 +52,10 @@ namespace rsgis
 		return param;
 	}
 	
-	string* RSGISAlgorParamsFactory::availableAlgorithms(int *numAlgor)
+    std::string* RSGISAlgorParamsFactory::availableAlgorithms(int *numAlgor)
 	{
 		*numAlgor = params->size();
-		string *algorithms = new string[*numAlgor];
+        std::string *algorithms = new std::string[*numAlgor];
 		for(int i = 0; i < *numAlgor; i++)
 		{
 			algorithms[i] = this->params->at(i)->getAlgorithm();
@@ -65,7 +65,7 @@ namespace rsgis
 	
 	RSGISAlgorParamsFactory::~RSGISAlgorParamsFactory()
 	{
-		vector<RSGISAlgorithmParameters*>::iterator iterParams;
+        std::vector<RSGISAlgorithmParameters*>::iterator iterParams;
 		for(iterParams = params->begin(); iterParams != params->end(); )
 		{
 			delete *iterParams;

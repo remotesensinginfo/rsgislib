@@ -36,7 +36,7 @@ namespace rsgis {
 		
 	}
 	
-	RSGISRegistrationException::RSGISRegistrationException(string message)  : RSGISException(message)
+	RSGISRegistrationException::RSGISRegistrationException(std::string message)  : RSGISException(message)
 	{
 		
 	}

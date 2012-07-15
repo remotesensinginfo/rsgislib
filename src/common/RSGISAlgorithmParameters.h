@@ -34,25 +34,21 @@
 
 namespace rsgis
 {	
-    
-    using namespace std;
-    using namespace xercesc;
-    
 	class RSGISAlgorithmParameters
 		{
 		public:
 			RSGISAlgorithmParameters();
 			virtual RSGISAlgorithmParameters* getInstance() = 0;
-			virtual void retrieveParameters(DOMElement *argElement) throw(RSGISXMLArgumentsException) = 0;
+			virtual void retrieveParameters(xercesc::DOMElement *argElement) throw(RSGISXMLArgumentsException) = 0;
 			virtual void runAlgorithm() throw(RSGISException) = 0;
 			virtual void printParameters() = 0;
-			virtual string getDescription() = 0;
-			virtual string getXMLSchema() = 0;
+			virtual std::string getDescription() = 0;
+			virtual std::string getXMLSchema() = 0;
 			virtual void help() = 0;
-			virtual string getAlgorithm();
+			virtual std::string getAlgorithm();
 			virtual ~RSGISAlgorithmParameters(){};
 		protected:
-			string algorithm;
+			std::string algorithm;
 			bool parsed;
 		};
 }
