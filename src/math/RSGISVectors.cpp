@@ -82,10 +82,10 @@ namespace rsgis{namespace math{
 		cout << endl;		
 	}
 	
-	void RSGISVectors::saveVector2GridTxt(Vector *vector, string filepath) throw(RSGISVectorsException,RSGISOutputStreamException)
+	void RSGISVectors::saveVector2GridTxt(Vector *vector, std::string filepath) throw(RSGISVectorsException,RSGISOutputStreamException)
 	{
-		string outputFilename = filepath + string(".gmtxt");
-		ofstream outTxtFile;
+		std::string outputFilename = filepath + std::string(".gmtxt");
+		std::ofstream outTxtFile;
 		outTxtFile.open(outputFilename.c_str(), ios::out | ios::trunc);
 		
 		if(outTxtFile.is_open())
@@ -119,15 +119,15 @@ namespace rsgis{namespace math{
 		
 	}
 	
-	void RSGISVectors::saveVector2txt(Vector *vector, string filepath) throw(RSGISVectorsException,RSGISOutputStreamException)
+	void RSGISVectors::saveVector2txt(Vector *vector, std::string filepath) throw(RSGISVectorsException,RSGISOutputStreamException)
 	{
-		string outputFilename = filepath + string(".mtxt");
-		ofstream outTxtFile;
+		std::string outputFilename = filepath + std::string(".mtxt");
+		std::ofstream outTxtFile;
 		outTxtFile.open(outputFilename.c_str(), ios::out | ios::trunc);
 		
 		if(outTxtFile.is_open())
 		{
-			outTxtFile << "n=" << vector->n << endl;
+			outTxtFile << "n=" << vector->n << std::endl;
 			
 			int totalElements = vector->n;
 			int lastElement = totalElements-1;
@@ -151,7 +151,7 @@ namespace rsgis{namespace math{
 		} 
 	}
 	
-	void RSGISVectors::saveGSLVector2GridTxt(gsl_vector *gslVector, string filepath) throw(RSGISVectorsException,RSGISOutputStreamException)
+	void RSGISVectors::saveGSLVector2GridTxt(gsl_vector *gslVector, std::string filepath) throw(RSGISVectorsException,RSGISOutputStreamException)
 	{
 		Vector *rsgisVector;
 		rsgisVector = this->convertGSL2RSGISVector(gslVector);
@@ -159,7 +159,7 @@ namespace rsgis{namespace math{
 		this->freeVector(rsgisVector);
 	}
 	
-	void RSGISVectors::saveGSLVector2Txt(gsl_vector *gslVector, string filepath) throw(RSGISVectorsException,RSGISOutputStreamException)
+	void RSGISVectors::saveGSLVector2Txt(gsl_vector *gslVector, std::string filepath) throw(RSGISVectorsException,RSGISOutputStreamException)
 	{
 		Vector *rsgisVector;
 		rsgisVector = this->convertGSL2RSGISVector(gslVector);
@@ -167,10 +167,10 @@ namespace rsgis{namespace math{
 		this->freeVector(rsgisVector);
 	}	
 	
-	Vector* RSGISVectors::readVectorFromTxt(string filepath) throw(RSGISVectorsException,RSGISInputStreamException)
+	Vector* RSGISVectors::readVectorFromTxt(std::string filepath) throw(RSGISVectorsException,RSGISInputStreamException)
 	{
 		Vector *vector = new Vector();
-		ifstream inputVector;
+		std::ifstream inputVector;
 		inputVector.open(filepath.c_str());
 		if(!inputVector.is_open())
 		{
@@ -178,8 +178,8 @@ namespace rsgis{namespace math{
 		}
 		else
 		{
-			string strLine;
-			string word;
+			std::string strLine;
+			std::string word;
 			int number;
 			float value;
 			int lineCounter = 0;
@@ -249,10 +249,10 @@ namespace rsgis{namespace math{
 		return vector;
 	}
 	
-	Vector* RSGISVectors::readVectorFromGridTxt(string filepath) throw(RSGISVectorsException,RSGISInputStreamException)
+	Vector* RSGISVectors::readVectorFromGridTxt(std::string filepath) throw(RSGISVectorsException,RSGISInputStreamException)
 	{
 		Vector *vector = new Vector();
-		ifstream inputVector;
+		std::ifstream inputVector;
 		inputVector.open(filepath.c_str());
 		if(!inputVector.is_open())
 		{
@@ -260,9 +260,9 @@ namespace rsgis{namespace math{
 		}
 		else
 		{
-			string strLine;
-			string wholeline;
-			string word;
+			std::string strLine;
+			std::string wholeline;
+			std::string word;
 			int number;
 			float value;
 			int lineCounter = 0;
@@ -336,7 +336,7 @@ namespace rsgis{namespace math{
 		return vector;
 	}
 	
-	gsl_vector* RSGISVectors::readGSLVectorFromTxt(string filepath) throw(RSGISVectorsException)
+	gsl_vector* RSGISVectors::readGSLVectorFromTxt(std::string filepath) throw(RSGISVectorsException)
 	{
 		Vector *rsgisVector;
 		gsl_vector *gslVector;
@@ -348,7 +348,7 @@ namespace rsgis{namespace math{
 		return gslVector;
 	}
 	
-	gsl_vector* RSGISVectors::readGSLVectorFromGridTxt(string filepath) throw(RSGISVectorsException)
+	gsl_vector* RSGISVectors::readGSLVectorFromGridTxt(std::string filepath) throw(RSGISVectorsException)
 	{
 		Vector *rsgisVector;
 		gsl_vector *gslVector;

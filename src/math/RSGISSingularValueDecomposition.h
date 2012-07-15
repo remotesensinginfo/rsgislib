@@ -38,9 +38,7 @@
 namespace rsgis 
 {
 	namespace math
-	{
-        using namespace std;
-        
+	{        
 		class RSGISSingularValueDecomposition
 			{
 			public:

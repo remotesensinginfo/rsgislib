@@ -27,9 +27,7 @@
 #include "math/RSGISMathException.h"
 
 namespace rsgis{namespace math{
-    
-    using namespace std;
-    
+        
 	class RSGISMathFunction
 	{
 		/** RSGISMathFunction
@@ -82,7 +80,7 @@ namespace rsgis{namespace math{
 		 */
 	public: 
 		RSGISMathNVariableFunction(){};
-		virtual double calcFunction(vector <double> *values) throw(RSGISMathException) = 0;
+		virtual double calcFunction(std::vector <double> *values) throw(RSGISMathException) = 0;
 		virtual int numCoefficients() throw(RSGISMathException) = 0;
         virtual int numVariables() throw(RSGISMathException) = 0;
 		virtual void updateCoefficents(double *coefficients) = 0;

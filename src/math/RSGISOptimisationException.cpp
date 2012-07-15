@@ -34,7 +34,7 @@ namespace rsgis{namespace math{
 		
 	}
 	
-	RSGISOptimisationException::RSGISOptimisationException(string message) : RSGISMathException(message)
+	RSGISOptimisationException::RSGISOptimisationException(std::string message) : RSGISMathException(message)
 	{
 		
 	}

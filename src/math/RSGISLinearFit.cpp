@@ -63,12 +63,12 @@ namespace rsgis {namespace math{
 		cov = gsl_matrix_alloc(a->size2, a->size2);
 		gsl_multifit_linear(a, b, x, cov, &chisq, workspace);
 		
-		cout << "----------------------------------------------------------------------------" << endl;
-		cout << "coefficients are : ";
+        std::cout << "----------------------------------------------------------------------------" << std::endl;
+		std::cout << "coefficients are : ";
 		vectorUtils.printGSLVector(x); 
-		cout << " chisq = " << chisq << endl;
-		cout << "----------------------------------------------------------------------------" << endl;
-		cout << endl;
+		std::cout << " chisq = " << chisq << std::endl;
+		std::cout << "----------------------------------------------------------------------------" << std::endl;
+		std::cout << std::endl;
 		
 		// Clean up
 		gsl_multifit_linear_free(workspace);
@@ -131,12 +131,12 @@ namespace rsgis {namespace math{
 		cov = gsl_matrix_alloc(a->size2, a->size2);
 		gsl_multifit_wlinear(a, weights, b, x, cov, &chisq, workspace);
 		
-		cout << "----------------------------------------------------------------------------" << endl;
-		cout << "coefficients are : ";
+		std::cout << "----------------------------------------------------------------------------" << std::endl;
+		std::cout << "coefficients are : ";
 		vectorUtils.printGSLVector(x); 
-		cout << " chisq = " << chisq << endl;
-		cout << "----------------------------------------------------------------------------" << endl;
-		cout << endl;
+		std::cout << " chisq = " << chisq << std::endl;
+		std::cout << "----------------------------------------------------------------------------" << std::endl;
+		std::cout << endl;
 		
 		// Clean up
 		gsl_multifit_linear_free(workspace);

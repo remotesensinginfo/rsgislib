@@ -25,17 +25,16 @@
 
 #include <iostream>
 #include <math.h>
+
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_matrix.h>
 #include <gsl/gsl_multifit.h>
+
 #include "math/RSGISSingularValueDecomposition.h"
 #include "math/RSGISVectors.h"
 #include "math/RSGISMatrices.h"
 
 namespace rsgis {namespace math{
-    
-    using namespace std;
-    using namespace rsgis;
     
 	/// Class to perform polynomaial fitting	
 	class RSGISPolyFit

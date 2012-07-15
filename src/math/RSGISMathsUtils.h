@@ -29,7 +29,6 @@
 #include <stdio.h>
 #include <algorithm>
 
-
 #include <boost/numeric/conversion/cast.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/cstdint.hpp>
@@ -41,10 +40,6 @@
 #include "math/RSGISMatrices.h"
 
 namespace rsgis{namespace math{
-	
-    using boost::lexical_cast;
-    using boost::bad_lexical_cast;
-    using namespace std;
     
 	enum rsgissummarytype
 	{
@@ -98,17 +93,17 @@ namespace rsgis{namespace math{
 		{
 		public:
 			RSGISMathsUtils();
-			double strtodouble(string inValue)throw(RSGISMathException);
-			float strtofloat(string inValue)throw(RSGISMathException);
-			int strtoint(string inValue)throw(RSGISMathException);
-			unsigned int strtounsignedint(string inValue)throw(RSGISMathException);
-			long strtolong(string inValue)throw(RSGISMathException);
-            unsigned long strtounsignedlong(string inValue)throw(RSGISMathException);
-			string doubletostring(double number)throw(RSGISMathException);
-			string floattostring(float number)throw(RSGISMathException);
-			string inttostring(int number)throw(RSGISMathException);
-            string uinttostring(unsigned int number)throw(RSGISMathException);
-			string longtostring(long number)throw(RSGISMathException);
+			double strtodouble(std::string inValue)throw(RSGISMathException);
+			float strtofloat(std::string inValue)throw(RSGISMathException);
+			int strtoint(std::string inValue)throw(RSGISMathException);
+			unsigned int strtounsignedint(std::string inValue)throw(RSGISMathException);
+			long strtolong(std::string inValue)throw(RSGISMathException);
+            unsigned long strtounsignedlong(std::string inValue)throw(RSGISMathException);
+			std::string doubletostring(double number)throw(RSGISMathException);
+			std::string floattostring(float number)throw(RSGISMathException);
+			std::string inttostring(int number)throw(RSGISMathException);
+            std::string uinttostring(unsigned int number)throw(RSGISMathException);
+			std::string longtostring(long number)throw(RSGISMathException);
 			void getPowerSet(int numItems, int *numBands, int **indexes, int numSets) throw(RSGISMathException);
 			float degreesToRadians(float angle);
 			float radiansToDegrees(float angle);

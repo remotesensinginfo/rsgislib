@@ -33,5 +33,10 @@ namespace rsgis{namespace math{
 	{
 		
 	}
+    
+    RSGISBaysianStatsException::RSGISBaysianStatsException(std::string message) : RSGISException(message)
+	{
+		
+	}
 	
 }} //rsgis::math

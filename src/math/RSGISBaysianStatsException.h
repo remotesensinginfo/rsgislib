@@ -25,20 +25,16 @@
 
 #include "common/RSGISException.h"
 
-namespace rsgis 
-{
-	namespace math
-	{
-        using namespace std;
+namespace rsgis{namespace math{
         
-		class RSGISBaysianStatsException : public RSGISException
-			{
-			public:
-				RSGISBaysianStatsException();
-				RSGISBaysianStatsException(const char* message);
-			};
-	}
-}
+    class RSGISBaysianStatsException : public RSGISException
+        {
+        public:
+            RSGISBaysianStatsException();
+            RSGISBaysianStatsException(const char* message);
+            RSGISBaysianStatsException(std::string message);
+        };
+}}
 
 #endif
 

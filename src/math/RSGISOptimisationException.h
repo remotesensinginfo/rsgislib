@@ -25,21 +25,16 @@
 
 #include "math/RSGISMathException.h"
 
-namespace rsgis 
-{
-	namespace math
-	{
-        using namespace std;
-        
-		class RSGISOptimisationException : public RSGISMathException
-			{
-			public:
-				RSGISOptimisationException();
-				RSGISOptimisationException(const char* message);
-				RSGISOptimisationException(string message);
-			};
-	}
-}
+namespace rsgis{namespace math{        
+
+    class RSGISOptimisationException : public RSGISMathException
+        {
+        public:
+            RSGISOptimisationException();
+            RSGISOptimisationException(const char* message);
+            RSGISOptimisationException(std::string message);
+        };
+}}
 
 #endif
 

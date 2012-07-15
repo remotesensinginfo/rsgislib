@@ -23,22 +23,19 @@
 #ifndef RSGISMultivariantStatsException_H
 #define RSGISMultivariantStatsException_H
 
+#include <string.h>
 #include "common/RSGISException.h"
 
-namespace rsgis 
-{
-	namespace math
-	{
-        using namespace std;
-        
-		class RSGISMultivariantStatsException : public RSGISException
-			{
-			public:
-				RSGISMultivariantStatsException();
-				RSGISMultivariantStatsException(const char* message);
-			};
-	}
-}
+namespace rsgis{namespace math{        
+
+    class RSGISMultivariantStatsException : public RSGISException
+        {
+        public:
+            RSGISMultivariantStatsException();
+            RSGISMultivariantStatsException(const char* message);
+            RSGISMultivariantStatsException(std::string message);
+        };
+}}
 
 #endif
 

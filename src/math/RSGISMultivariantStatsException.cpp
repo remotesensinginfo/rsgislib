@@ -33,6 +33,11 @@ namespace rsgis{namespace math{
 	{
 		
 	}
+    
+    RSGISMultivariantStatsException::RSGISMultivariantStatsException(std::string message) : RSGISException(message)
+	{
+		
+	}
 	
 }} //rsgis::math
 

@@ -133,12 +133,12 @@ namespace rsgis {namespace math {
 		cov = gsl_matrix_alloc(order, order);
 		gsl_multifit_linear(indVarPow, depVar, outCoefficients, cov, &chisq, workspace);
 		
-		cout << "----------------------------------------------------------------------------" << endl;
-		cout << "coefficients are : ";
+		std::cout << "----------------------------------------------------------------------------" << std::endl;
+		std::cout << "coefficients are : ";
 		vectorUtils.printGSLVector(outCoefficients); 
-		cout << " chisq = " << chisq << endl;
-		cout << "----------------------------------------------------------------------------" << endl;
-		cout << endl;
+		std::cout << " chisq = " << chisq << std::endl;
+		std::cout << "----------------------------------------------------------------------------" << std::endl;
+		std::cout << std::endl;
 		
 		// Clean up
 		gsl_multifit_linear_free(workspace);
@@ -194,7 +194,7 @@ namespace rsgis {namespace math {
 		
 		// Solve Equation
 		svd.SVDLinSolve(outCoefficients, depVar);
-		cout << "coefficents are : ";
+		std::cout << "coefficents are : ";
 		vectorUtils.printGSLVector(outCoefficients);
 		
 		// Clean up
@@ -332,10 +332,10 @@ namespace rsgis {namespace math {
 		}
 		
 		errorA = errorA / numY; // Calculate average ChiSq
-		cout << "-----------------------------" << endl;
-		cout << "First set of fits complete!" << endl;
-		cout << " Average ChiSq = " << errorA << endl;
-		cout << endl;
+		std::cout << "-----------------------------" << std::endl;
+		std::cout << "First set of fits complete!" << std::endl;
+		std::cout << " Average ChiSq = " << errorA << std::endl;
+		std::cout << std::endl;
 		//matrixUtils.printGSLMatrix(aCoeff);
 		//matrixUtils.saveGSLMatrix2GridTxt(aCoeff, "/users/danclewley/Documents/Temp/L_HH_aCoeff");
 		
@@ -399,10 +399,10 @@ namespace rsgis {namespace math {
 		}
 		
 		errorB = errorB / orderX; // Calculate average ChiSq
-		cout << "Second set of fits complete!" << endl;
-		cout << " Average ChiSq = " << errorB << endl;
-		cout << "-----------------------------" << endl;
-		cout << endl;
+		std::cout << "Second set of fits complete!" << std::endl;
+		std::cout << " Average ChiSq = " << errorB << std::endl;
+		std::cout << "-----------------------------" << std::endl;
+		std::cout << std::endl;
 		//cout << "Coefficients are : " << endl;
 		//matrixUtils.printGSLMatrix(bCoeff);
 		

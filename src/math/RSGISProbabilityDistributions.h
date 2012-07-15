@@ -30,9 +30,7 @@
 
 
 namespace rsgis{namespace math{
-    
-    using namespace std;
-	
+    	
 	class RSGISProbDistGamma : public RSGISProbDistro
 	{
 		/// Statistical function for a Gamma distribution.
@@ -46,7 +44,7 @@ namespace rsgis{namespace math{
 	public:
 		RSGISProbDistGamma(double shape, double scale);
 		virtual double calcProb(double predictVal) throw(RSGISMathException);
-		virtual double calcRand(){cout << "Not Implemented" << endl; return 0;};
+		virtual double calcRand(){std::cout << "Not Implemented" << std::endl; return 0;};
 		~RSGISProbDistGamma();
 	protected:
 		double shape;
@@ -68,7 +66,7 @@ namespace rsgis{namespace math{
 	public:
 		RSGISProbDistExponential(double rate);
 		virtual double calcProb(double predictVal) throw(RSGISMathException);
-		virtual double calcRand(){cout << "Not Implemented" << endl; return 0;};
+		virtual double calcRand(){std::cout << "Not Implemented" << std::endl; return 0;};
 		~RSGISProbDistExponential();
 	protected:
 		double rate;
@@ -88,7 +86,7 @@ namespace rsgis{namespace math{
 	public:
 		RSGISProbDistNormal(double mean, double stdev);
 		virtual double calcProb (double predictVal) throw(RSGISMathException);
-		virtual double calcRand(){cout << "Not Implemented" << endl; return 0;};
+		virtual double calcRand(){std::cout << "Not Implemented" << std::endl; return 0;};
 		virtual ~RSGISProbDistNormal();
 	protected:
 		double mean;

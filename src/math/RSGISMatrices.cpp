@@ -310,9 +310,9 @@ namespace rsgis{namespace math{
 		{
 			throw RSGISMatricesException("Multipication required the number of columns to match the number of rows.");
 		}
-		//cout << "Creating new matrix\n";
-		//cout << "matrix2->n = " << matrix2->n << endl;
-		//cout << "matrix1->m = " << matrix1->m << endl;
+		//std::cout << "Creating new matrix\n";
+		//std::cout << "matrix2->n = " << matrix2->n << std::endl;
+		//std::cout << "matrix1->m = " << matrix1->m << std::endl;
 		Matrix *newMatrix = this->createMatrix(matrix2->n, matrix1->m);
 		
 		double value = 0;
@@ -343,13 +343,13 @@ namespace rsgis{namespace math{
 	void RSGISMatrices::productMatrixVectorGSL(gsl_matrix *inMatrix, gsl_vector *inVector, gsl_vector *outVector) throw(RSGISMatricesException)
 	{
 		/// Calculates the product of a gsl_matrix and a gsl_vector, returns a gsl_vector
-		//cout << "calculating product.." << endl;
+		//std::cout << "calculating product.." << std::endl;
 		//this->printGSLMatrix(inMatrix);
-		//cout << "vec size = " <<inVector->size << endl;
-		//cout << "mat size = " << inMatrix->size2 << endl;
+		//std::cout << "vec size = " <<inVector->size << std::endl;
+		//std::cout << "mat size = " << inMatrix->size2 << std::endl;
 		if(inMatrix->size2 != inVector->size) // Check sizes
 		{
-			cout << "Input vector has less elements than number of matrix colums" << endl;
+			std::cout << "Input vector has less elements than number of matrix colums" << std::endl;
 			throw RSGISMatricesException("Input vector has less elements than number of matrix colums");
 		}
 		
@@ -362,7 +362,7 @@ namespace rsgis{namespace math{
 				double velement = gsl_vector_get(inVector, j);
 				mvsum = mvsum + (melement * velement);
 			}
-			//cout << "mvsum = " << mvsum << endl; 
+			//std::cout << "mvsum = " << mvsum << std::endl; 
 			gsl_vector_set(outVector, i, mvsum);
 		
 		}
@@ -375,9 +375,9 @@ namespace rsgis{namespace math{
 		{
 			for(int j = 0; j < matrix->m; j++)
 			{
-				cout << matrix->matrix[index++] << " ";
+				std::cout << matrix->matrix[index++] << " ";
 			}
-			cout << endl;
+			std::cout << std::endl;
 		}
 	}
 	
@@ -388,16 +388,16 @@ namespace rsgis{namespace math{
 			for(unsigned int j = 0; j < matrix->size2; j++)
 			{
 				double outm = gsl_matrix_get(matrix, i, j); 
-				cout << outm << " " ;
+				std::cout << outm << " " ;
 			}
-			cout << endl;
+			std::cout << std::endl;
 		}
 	}
 	
-	void RSGISMatrices::saveMatrix2GridTxt(Matrix *matrix, string filepath) throw(RSGISMatricesException,RSGISOutputStreamException)
+	void RSGISMatrices::saveMatrix2GridTxt(Matrix *matrix, std::string filepath) throw(RSGISMatricesException,RSGISOutputStreamException)
 	{
-		string outputFilename = filepath + string(".gmtxt");
-		ofstream outTxtFile;
+		std::string outputFilename = filepath + std::string(".gmtxt");
+		std::ofstream outTxtFile;
 		outTxtFile.open(outputFilename.c_str(), ios::out | ios::trunc);
 		
 		if(outTxtFile.is_open())
@@ -432,10 +432,10 @@ namespace rsgis{namespace math{
 		
 	}
 	
-	void RSGISMatrices::saveMatrix2CSV(Matrix *matrix, string filepath) throw(RSGISMatricesException,RSGISOutputStreamException)
+	void RSGISMatrices::saveMatrix2CSV(Matrix *matrix, std::string filepath) throw(RSGISMatricesException,RSGISOutputStreamException)
 	{
-		string outputFilename = filepath + string(".csv");
-		ofstream outTxtFile;
+		std::string outputFilename = filepath + std::string(".csv");
+		std::ofstream outTxtFile;
 		outTxtFile.open(outputFilename.c_str(), ios::out | ios::trunc);
 		
 		if(outTxtFile.is_open())
@@ -467,7 +467,7 @@ namespace rsgis{namespace math{
 		
 	}
 	
-	void RSGISMatrices::saveGSLMatrix2CSV(gsl_matrix *gslMatrix, string filepath) throw(RSGISMatricesException,RSGISOutputStreamException)
+	void RSGISMatrices::saveGSLMatrix2CSV(gsl_matrix *gslMatrix, std::string filepath) throw(RSGISMatricesException,RSGISOutputStreamException)
 	{
 		Matrix *rsgisMatrix;
 		rsgisMatrix = this->convertGSL2RSGISMatrix(gslMatrix);
@@ -475,10 +475,10 @@ namespace rsgis{namespace math{
 		this->freeMatrix(rsgisMatrix);
 	}
 	
-	void RSGISMatrices::saveMatrix2txt(Matrix *matrix, string filepath) throw(RSGISMatricesException,RSGISOutputStreamException)
+	void RSGISMatrices::saveMatrix2txt(Matrix *matrix, std::string filepath) throw(RSGISMatricesException,RSGISOutputStreamException)
 	{
-		string outputFilename = filepath + string(".mtxt");
-		ofstream outTxtFile;
+		std::string outputFilename = filepath + std::string(".mtxt");
+		std::ofstream outTxtFile;
 		outTxtFile.open(outputFilename.c_str(), ios::out | ios::trunc);
 		
 		if(outTxtFile.is_open())
@@ -508,7 +508,7 @@ namespace rsgis{namespace math{
 		}
 	}
 	
-	void RSGISMatrices::saveMatrix2txtOptions(Matrix *matrix, string filepath, outTXTform outtxt) throw(RSGISMatricesException,RSGISOutputStreamException)
+	void RSGISMatrices::saveMatrix2txtOptions(Matrix *matrix, std::string filepath, outTXTform outtxt) throw(RSGISMatricesException,RSGISOutputStreamException)
 	{		
 		if(outtxt == mtxt)
 		{
@@ -529,7 +529,7 @@ namespace rsgis{namespace math{
 
 	}
 	
-	void RSGISMatrices::saveGSLMatrix2GridTxt(gsl_matrix *gslMatrix, string filepath) throw(RSGISMatricesException,RSGISOutputStreamException)
+	void RSGISMatrices::saveGSLMatrix2GridTxt(gsl_matrix *gslMatrix, std::string filepath) throw(RSGISMatricesException,RSGISOutputStreamException)
 	{
 		Matrix *rsgisMatrix;
 		//cout << "gsl matrix" << endl;
@@ -541,7 +541,7 @@ namespace rsgis{namespace math{
 		this->freeMatrix(rsgisMatrix);
 	}
 
-	void RSGISMatrices::saveGSLMatrix2Txt(gsl_matrix *gslMatrix, string filepath) throw(RSGISMatricesException,RSGISOutputStreamException)
+	void RSGISMatrices::saveGSLMatrix2Txt(gsl_matrix *gslMatrix, std::string filepath) throw(RSGISMatricesException,RSGISOutputStreamException)
 	{
 		Matrix *rsgisMatrix;
 		rsgisMatrix = this->convertGSL2RSGISMatrix(gslMatrix);
@@ -549,10 +549,10 @@ namespace rsgis{namespace math{
 		this->freeMatrix(rsgisMatrix);
 	}
 	
-	void RSGISMatrices::saveMatrix2Binary(Matrix *matrix, string filepath) throw(RSGISMatricesException,RSGISOutputStreamException)
+	void RSGISMatrices::saveMatrix2Binary(Matrix *matrix, std::string filepath) throw(RSGISMatricesException,RSGISOutputStreamException)
 	{
-		ofstream matrixOutput;
-		string matrixFilepath = filepath + string(".mtx");
+		std::ofstream matrixOutput;
+		std::string matrixFilepath = filepath + string(".mtx");
 		matrixOutput.open(matrixFilepath.c_str(), ios::out | ios::trunc | ios::binary);
 		if(!matrixOutput.is_open())
 		{
@@ -572,10 +572,10 @@ namespace rsgis{namespace math{
 		matrixOutput.close();
 	}
 	
-	Matrix* RSGISMatrices::readMatrixFromTxt(string filepath) throw(RSGISMatricesException,RSGISInputStreamException)
+	Matrix* RSGISMatrices::readMatrixFromTxt(std::string filepath) throw(RSGISMatricesException,RSGISInputStreamException)
 	{
 		Matrix *matrix = new Matrix();
-		ifstream inputMatrix;
+		std::ifstream inputMatrix;
 		inputMatrix.open(filepath.c_str());
 		if(!inputMatrix.is_open())
 		{
@@ -583,8 +583,8 @@ namespace rsgis{namespace math{
 		}
 		else
 		{
-			string strLine;
-			string word;
+			std::string strLine;
+			std::string word;
 			int number;
 			float value;
 			int lineCounter = 0;
@@ -665,10 +665,10 @@ namespace rsgis{namespace math{
 		return matrix;
 	}
 	
-	Matrix* RSGISMatrices::readMatrixFromGridTxt(string filepath) throw(RSGISMatricesException,RSGISInputStreamException)
+	Matrix* RSGISMatrices::readMatrixFromGridTxt(std::string filepath) throw(RSGISMatricesException,RSGISInputStreamException)
 	{
 		Matrix *matrix = new Matrix();
-		ifstream inputMatrix;
+		std::ifstream inputMatrix;
 		inputMatrix.open(filepath.c_str());
 		if(!inputMatrix.is_open())
 		{
@@ -676,9 +676,9 @@ namespace rsgis{namespace math{
 		}
 		else
 		{
-			string strLine;
-			string wholeline;
-			string word;
+			std::string strLine;
+			std::string wholeline;
+			std::string word;
 			int number;
 			float value;
 			int lineCounter = 0;
@@ -761,11 +761,11 @@ namespace rsgis{namespace math{
 	}
 	
 	
-	Matrix* RSGISMatrices::readMatrixFromBinary(string filepath) throw(RSGISMatricesException,RSGISInputStreamException)
+	Matrix* RSGISMatrices::readMatrixFromBinary(std::string filepath) throw(RSGISMatricesException,RSGISInputStreamException)
 	{
 		Matrix *matrix = new Matrix();
-		string matrixFilepath = filepath + string(".mtx");
-		ifstream matrixInput;
+		std::string matrixFilepath = filepath + std::string(".mtx");
+		std::ifstream matrixInput;
 		matrixInput.open(matrixFilepath.c_str(), ios::in | ios::binary);
 		if(!matrixInput.is_open())
 		{
@@ -797,7 +797,7 @@ namespace rsgis{namespace math{
 		return matrix;
 	}
 	
-	gsl_matrix* RSGISMatrices::readGSLMatrixFromTxt(string filepath) throw(RSGISMatricesException)
+	gsl_matrix* RSGISMatrices::readGSLMatrixFromTxt(std::string filepath) throw(RSGISMatricesException)
 	{
 		Matrix *rsgisMatrix;
 		gsl_matrix *gslMatrix;
@@ -807,7 +807,7 @@ namespace rsgis{namespace math{
 		return gslMatrix;
 	}
 
-	gsl_matrix* RSGISMatrices::readGSLMatrixFromGridTxt(string filepath) throw(RSGISMatricesException)
+	gsl_matrix* RSGISMatrices::readGSLMatrixFromGridTxt(std::string filepath) throw(RSGISMatricesException)
 	{
 		Matrix *rsgisMatrix;
 		gsl_matrix *gslMatrix;
@@ -817,7 +817,7 @@ namespace rsgis{namespace math{
 		return gslMatrix;
 	}
 	
-	gsl_matrix* RSGISMatrices::readGSLMatrixFromBinary(string filepath) throw(RSGISMatricesException)
+	gsl_matrix* RSGISMatrices::readGSLMatrixFromBinary(std::string filepath) throw(RSGISMatricesException)
 	{
 		Matrix *rsgisMatrix;
 		gsl_matrix *gslMatrix;
@@ -864,7 +864,7 @@ namespace rsgis{namespace math{
 		gsl_matrix_free (eigenVectorsGSL);
 	}
 	
-	void RSGISMatrices::exportAsImage(Matrix *matrix, string filepath) throw(RSGISMatricesException)
+	void RSGISMatrices::exportAsImage(Matrix *matrix, std::string filepath) throw(RSGISMatricesException)
 	{
 		GDALAllRegister();
 		GDALDataset *outputImageDS = NULL;

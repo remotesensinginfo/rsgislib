@@ -24,6 +24,7 @@
 #include "RSGISFunctions.h"
 
 namespace rsgis{namespace math{
+    
 	RSGISFunctionPolynomial::RSGISFunctionPolynomial(double *coefficients, int order)
 	{
 		this->coefficients = coefficients;
@@ -211,7 +212,7 @@ namespace rsgis{namespace math{
 		
 		if(returnVal < 0)
 		{
-			cout << "ERROR" << endl;
+            std::cout << "ERROR - but continuing!" << std::endl;
 		}
 		return returnVal;
 	}
@@ -999,13 +1000,13 @@ namespace rsgis{namespace math{
 		return (100*pow(valueY - (valueX*valueX),2)) + pow(1 - valueX,2);
 	}
 	
-	RSGISFunctionMuParser::RSGISFunctionMuParser(string fxExpression, string varName, string dxExpression, bool usedX)
+	RSGISFunctionMuParser::RSGISFunctionMuParser(std::string fxExpression, std::string varName, std::string dxExpression, bool usedX)
 	{
 		unsigned int nVar = 1;
 		this->usedX = usedX;
-		this->muParserfX = new Parser();
-		this->muParserdX = new Parser();
-		this->inVals = new value_type[nVar];
+		this->muParserfX = new mu::Parser();
+		this->muParserdX = new mu::Parser();
+		this->inVals = new mu::value_type[nVar];
 		
 		this->muParserfX->DefineVar(_T(varName.c_str()), &inVals[0]);
 		this->muParserfX->SetExpr(fxExpression.c_str());
@@ -1027,9 +1028,9 @@ namespace rsgis{namespace math{
 			outVal = this->muParserfX->Eval();
 			
 		}
-		catch (ParserError &e) // Catch muParser error
+		catch (mu::ParserError &e) // Catch muParser error
 		{
-			string message = string("ERROR: ") + string(e.GetMsg()) + string(":\t \'") + string(e.GetExpr()) +string("\'");
+			std::string message = string("ERROR: ") + std::string(e.GetMsg()) + std::string(":\t \'") + std::string(e.GetExpr()) + std::string("\'");
 			throw RSGISMathException(message);
 		}
 		
@@ -1046,9 +1047,9 @@ namespace rsgis{namespace math{
 				outVal = this->muParserdX->Eval();
 				
 			}
-			catch (ParserError &e) // Catch muParser error
+			catch (mu::ParserError &e) // Catch muParser error
 			{
-				string message = string("ERROR: ") + string(e.GetMsg()) + string(":\t \'") + string(e.GetExpr()) +string("\'");
+				std::string message = std::string("ERROR: ") + std::string(e.GetMsg()) + std::string(":\t \'") + std::string(e.GetExpr()) + std::string("\'");
 				throw RSGISMathException(message);
 			}
 		}
@@ -1066,14 +1067,14 @@ namespace rsgis{namespace math{
 		delete this->muParserdX;
 	}
 
-	RSGISFunctionMuParser2Var::RSGISFunctionMuParser2Var(string fxyExpression, string varName1, string varName2, string dxExpression, string dyExpression, bool usediff)
+	RSGISFunctionMuParser2Var::RSGISFunctionMuParser2Var(std::string fxyExpression, std::string varName1, std::string varName2, std::string dxExpression, std::string dyExpression, bool usediff)
 	{
 		unsigned int nVar = 2;
 		this->usediff = usediff;
-		this->muParserfXY = new Parser();
-		this->muParserdX = new Parser();
-		this->muParserdY = new Parser();
-		this->inVals = new value_type[nVar];
+		this->muParserfXY = new mu::Parser();
+		this->muParserdX = new mu::Parser();
+		this->muParserdY = new mu::Parser();
+		this->inVals = new mu::value_type[nVar];
 		
 		this->muParserfXY->DefineVar(_T(varName1.c_str()), &inVals[0]);
 		this->muParserfXY->DefineVar(_T(varName2.c_str()), &inVals[1]);
@@ -1101,9 +1102,9 @@ namespace rsgis{namespace math{
 			outVal = this->muParserfXY->Eval();
 			
 		}
-		catch (ParserError &e) // Catch muParser error
+		catch (mu::ParserError &e) // Catch muParser error
 		{
-			string message = string("ERROR: ") + string(e.GetMsg()) + string(":\t \'") + string(e.GetExpr()) +string("\'");
+			std::string message = std::string("ERROR: ") + std::string(e.GetMsg()) + std::string(":\t \'") + std::string(e.GetExpr()) + std::string("\'");
 			throw RSGISMathException(message);
 		}
 		
@@ -1121,9 +1122,9 @@ namespace rsgis{namespace math{
 				outVal = this->muParserdX->Eval();
 				
 			}
-			catch (ParserError &e) // Catch muParser error
+			catch (mu::ParserError &e) // Catch muParser error
 			{
-				string message = string("ERROR: ") + string(e.GetMsg()) + string(":\t \'") + string(e.GetExpr()) +string("\'");
+				std::string message = string("ERROR: ") + std::string(e.GetMsg()) + std::string(":\t \'") + std::string(e.GetExpr()) + std::string("\'");
 				throw RSGISMathException(message);
 			}
 		}
@@ -1146,9 +1147,9 @@ namespace rsgis{namespace math{
 				outVal = this->muParserdY->Eval();
 				
 			}
-			catch (ParserError &e) // Catch muParser error
+			catch (mu::ParserError &e) // Catch muParser error
 			{
-				string message = string("ERROR: ") + string(e.GetMsg()) + string(":\t \'") + string(e.GetExpr()) +string("\'");
+				std::string message = std::string("ERROR: ") + std::string(e.GetMsg()) + std::string(":\t \'") + std::string(e.GetExpr()) + std::string("\'");
 				throw RSGISMathException(message);
 			}
 		}

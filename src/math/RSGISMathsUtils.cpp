@@ -30,160 +30,160 @@ namespace rsgis{namespace math{
 		
 	}
 	
-	double RSGISMathsUtils::strtodouble(string inValue)throw(RSGISMathException)
+	double RSGISMathsUtils::strtodouble(std::string inValue)throw(RSGISMathException)
 	{
 		double outValue = 0;
 		try
         {
-            outValue = lexical_cast<double>(inValue);
+            outValue = boost::lexical_cast<double>(inValue);
         }
-        catch(bad_lexical_cast &e)
+        catch(boost::bad_lexical_cast &e)
         {
-			string message = string("Trying to convert \"") + inValue + string("\" - ") + string(e.what());
+			std::string message = std::string("Trying to convert \"") + inValue + std::string("\" - ") + std::string(e.what());
             throw RSGISMathException(message);
         }
 		return outValue;
 	}
 	
-	float RSGISMathsUtils::strtofloat(string inValue)throw(RSGISMathException)
+	float RSGISMathsUtils::strtofloat(std::string inValue)throw(RSGISMathException)
 	{
 		float outValue = 0;
 		try
         {
-            outValue = lexical_cast<float>(inValue);
+            outValue = boost::lexical_cast<float>(inValue);
         }
-        catch(bad_lexical_cast &e)
+        catch(boost::bad_lexical_cast &e)
         {
-            string message = string("Trying to convert \"") + inValue + string("\" - ") + string(e.what());
+            std::string message = std::string("Trying to convert \"") + inValue + std::string("\" - ") + std::string(e.what());
             throw RSGISMathException(message);
         }
 		return outValue;
 	}
 	
-	int RSGISMathsUtils::strtoint(string inValue)throw(RSGISMathException)
+	int RSGISMathsUtils::strtoint(std::string inValue)throw(RSGISMathException)
 	{
 		int outValue = 0;
 		try
         {
-            outValue = lexical_cast<int>(inValue);
+            outValue = boost::lexical_cast<int>(inValue);
         }
-        catch(bad_lexical_cast &e)
+        catch(boost::bad_lexical_cast &e)
         {
-            string message = string("Trying to convert \"") + inValue + string("\" - ") + string(e.what());
+            std::string message = std::string("Trying to convert \"") + inValue + std::string("\" - ") + std::string(e.what());
             throw RSGISMathException(message);
         }
 		return outValue;
 	}
 	
-	unsigned int RSGISMathsUtils::strtounsignedint(string inValue)throw(RSGISMathException)
+	unsigned int RSGISMathsUtils::strtounsignedint(std::string inValue)throw(RSGISMathException)
 	{
 		unsigned int outValue = 0;
 		try
         {
-            outValue = lexical_cast<unsigned int>(inValue);
+            outValue = boost::lexical_cast<unsigned int>(inValue);
         }
-        catch(bad_lexical_cast &e)
+        catch(boost::bad_lexical_cast &e)
         {
-            string message = string("Trying to convert \"") + inValue + string("\" - ") + string(e.what());
+            std::string message = std::string("Trying to convert \"") + inValue + std::string("\" - ") + std::string(e.what());
             throw RSGISMathException(message);
         }
 		return outValue;
 	}
 	
-	long RSGISMathsUtils::strtolong(string inValue)throw(RSGISMathException)
+	long RSGISMathsUtils::strtolong(std::string inValue)throw(RSGISMathException)
 	{
 		long outValue = 0;
 		try
         {
-            outValue = lexical_cast<long>(inValue);
+            outValue = boost::lexical_cast<long>(inValue);
         }
-        catch(bad_lexical_cast &e)
+        catch(boost::bad_lexical_cast &e)
         {
-            string message = string("Trying to convert \"") + inValue + string("\" - ") + string(e.what());
+            std::string message = std::string("Trying to convert \"") + inValue + std::string("\" - ") + std::string(e.what());
             throw RSGISMathException(message);
         }
 		return outValue;
 	}
     
-    unsigned long RSGISMathsUtils::strtounsignedlong(string inValue)throw(RSGISMathException)
+    unsigned long RSGISMathsUtils::strtounsignedlong(std::string inValue)throw(RSGISMathException)
 	{
 		unsigned long outValue = 0;
 		try
         {
-            outValue = lexical_cast<unsigned long>(inValue);
+            outValue = boost::lexical_cast<unsigned long>(inValue);
         }
-        catch(bad_lexical_cast &e)
+        catch(boost::bad_lexical_cast &e)
         {
-            string message = string("Trying to convert \"") + inValue + string("\" - ") + string(e.what());
+            std::string message = std::string("Trying to convert \"") + inValue + std::string("\" - ") + std::string(e.what());
             throw RSGISMathException(message);
         }
 		return outValue;
 	}
 	
-	string RSGISMathsUtils::floattostring(float number)throw(RSGISMathException)
+	std::string RSGISMathsUtils::floattostring(float number)throw(RSGISMathException)
 	{
-		string outValue = "";
+		std::string outValue = "";
 		try
         {
-            outValue = lexical_cast<string>(number);
+            outValue = boost::lexical_cast<std::string>(number);
         }
-        catch(bad_lexical_cast &e)
+        catch(boost::bad_lexical_cast &e)
         {
             throw RSGISMathException(e.what());
         }
 		return outValue;
 	}
 	
-	string RSGISMathsUtils::doubletostring(double number)throw(RSGISMathException)
+	std::string RSGISMathsUtils::doubletostring(double number)throw(RSGISMathException)
 	{
-		string outValue = "";
+		std::string outValue = "";
 		try
         {
-            outValue = lexical_cast<string>(number);
+            outValue = boost::lexical_cast<std::string>(number);
         }
-        catch(bad_lexical_cast &e)
+        catch(boost::bad_lexical_cast &e)
         {
             throw RSGISMathException(e.what());
         }
 		return outValue;
 	}
 	
-	string RSGISMathsUtils::inttostring(int number)throw(RSGISMathException)
+	std::string RSGISMathsUtils::inttostring(int number)throw(RSGISMathException)
 	{
-		string outValue = "";
+		std::string outValue = "";
 		try
         {
-            outValue = lexical_cast<string>(number);
+            outValue = boost::lexical_cast<std::string>(number);
         }
-        catch(bad_lexical_cast &e)
+        catch(boost::bad_lexical_cast &e)
         {
             throw RSGISMathException(e.what());
         }
 		return outValue;
 	}
     
-    string RSGISMathsUtils::uinttostring(unsigned int number)throw(RSGISMathException)
+    std::string RSGISMathsUtils::uinttostring(unsigned int number)throw(RSGISMathException)
 	{
 		string outValue = "";
 		try
         {
-            outValue = lexical_cast<string>(number);
+            outValue = boost::lexical_cast<std::string>(number);
         }
-        catch(bad_lexical_cast &e)
+        catch(boost::bad_lexical_cast &e)
         {
             throw RSGISMathException(e.what());
         }
 		return outValue;
 	}
 	
-	string RSGISMathsUtils::longtostring(long number)throw(RSGISMathException)
+	std::string RSGISMathsUtils::longtostring(long number)throw(RSGISMathException)
 	{
-		string outValue = "";
+		std::string outValue = "";
 		try
         {
-            outValue = lexical_cast<string>(number);
+            outValue = boost::lexical_cast<std::string>(number);
         }
-        catch(bad_lexical_cast &e)
+        catch(boost::bad_lexical_cast &e)
         {
             throw RSGISMathException(e.what());
         }
@@ -526,9 +526,9 @@ namespace rsgis{namespace math{
 					currentArea += widths->matrix[(i*2)+1] * inData->matrix[(j*inData->m)+i];
 					outData->matrix[(j*inData->m)+i] = currentArea;
 				}
-				cout << currentArea << ", ";
+                std::cout << currentArea << ", ";
 			}
-			cout << endl;
+            std::cout << std::endl;
 		}
 		
 		return outData;

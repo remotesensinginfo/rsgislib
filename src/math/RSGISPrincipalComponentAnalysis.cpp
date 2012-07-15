@@ -65,13 +65,13 @@ namespace rsgis{namespace math{
 		{
 			index = (i * inputData->n) + component;
 		}*/
-		cout << "Matrix* RSGISPrincipalComponentAnalysis::getComponent(int component) NOT IMPLEMENTED!\n";
+		std::cout << "Matrix* RSGISPrincipalComponentAnalysis::getComponent(int component) NOT IMPLEMENTED!\n";
 		return NULL;
 	}
 	
 	Matrix* RSGISPrincipalComponentAnalysis::getComponents(int num)
 	{
-		cout << "Matrix* RSGISPrincipalComponentAnalysis::getComponents(int num) NOT IMPLEMENTED!\n";
+		std::cout << "Matrix* RSGISPrincipalComponentAnalysis::getComponents(int num) NOT IMPLEMENTED!\n";
 		return NULL;
 	}
 	

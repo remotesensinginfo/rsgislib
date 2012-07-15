@@ -31,15 +31,15 @@ namespace rsgis{namespace math{
 		this->maxNumIterations = maxNumIterations;
 	}
 	
-	vector<Coordinate*>* RSGISGlobalHillClimbingOptimiser2D::optimise4Neighbor(vector<Coordinate*> *coords, double step, Envelope *boundary) throw(RSGISOptimisationException)
+    std::vector<geos::geom::Coordinate*>* RSGISGlobalHillClimbingOptimiser2D::optimise4Neighbor(std::vector<geos::geom::Coordinate*> *coords, double step, geos::geom::Envelope *boundary) throw(RSGISOptimisationException)
 	{
-		vector<Coordinate*> *outCoords = new vector<Coordinate*>();
+        std::vector<geos::geom::Coordinate*> *outCoords = new std::vector<geos::geom::Coordinate*>();
 		try
 		{
-			vector<Coordinate*>::iterator iterCoords;
+            std::vector<geos::geom::Coordinate*>::iterator iterCoords;
 			for(iterCoords = coords->begin(); iterCoords != coords->end(); ++iterCoords)
 			{
-				outCoords->push_back(new Coordinate((*iterCoords)->x, (*iterCoords)->y, (*iterCoords)->z));
+				outCoords->push_back(new geos::geom::Coordinate((*iterCoords)->x, (*iterCoords)->y, (*iterCoords)->z));
 			}
 			
 			/*
@@ -53,13 +53,13 @@ namespace rsgis{namespace math{
 			double selectValue = 0;
 			int selectIdx = 0;
 			bool first = true;
-			Coordinate *coord = new Coordinate();
+			geos::geom::Coordinate *coord = new geos::geom::Coordinate();
 			int numIteration = 0;
 			int nodeCount = 0;
 			
-			Envelope *minBoundary = new Envelope(boundary->getMinX(), (boundary->getMaxX()-step), boundary->getMinY(), (boundary->getMaxY()-step));
+			geos::geom::Envelope *minBoundary = new geos::geom::Envelope(boundary->getMinX(), (boundary->getMaxX()-step), boundary->getMinY(), (boundary->getMaxY()-step));
 						
-			cout << "Started " << flush;
+            std::cout << "Started " << std::flush;
 			
 			bool change = true;
 			while(change)
@@ -68,7 +68,7 @@ namespace rsgis{namespace math{
 				{
 					break;
 				}
-				cout << "." << flush;
+                std::cout << "." << std::flush;
 				
 				change = false;
 				nodeCount = 0;
@@ -186,7 +186,7 @@ namespace rsgis{namespace math{
 				++numIteration;
 			}
 			
-			cout << " Complete\n";
+            std::cout << " Complete\n";
 			
 			delete minBoundary;
 			delete coord;			
@@ -199,15 +199,15 @@ namespace rsgis{namespace math{
 		return outCoords;
 	}
 	
-	vector<Coordinate*>* RSGISGlobalHillClimbingOptimiser2D::optimise8Neighbor(vector<Coordinate*> *coords, double step, Envelope *boundary) throw(RSGISOptimisationException)
+    std::vector<geos::geom::Coordinate*>* RSGISGlobalHillClimbingOptimiser2D::optimise8Neighbor(std::vector<geos::geom::Coordinate*> *coords, double step, geos::geom::Envelope *boundary) throw(RSGISOptimisationException)
 	{
-		vector<Coordinate*> *outCoords = new vector<Coordinate*>();
+        std::vector<geos::geom::Coordinate*> *outCoords = new std::vector<geos::geom::Coordinate*>();
 		try
 		{
-			vector<Coordinate*>::iterator iterCoords;
+            std::vector<geos::geom::Coordinate*>::iterator iterCoords;
 			for(iterCoords = coords->begin(); iterCoords != coords->end(); ++iterCoords)
 			{
-				outCoords->push_back(new Coordinate((*iterCoords)->x, (*iterCoords)->y, (*iterCoords)->z));
+				outCoords->push_back(new geos::geom::Coordinate((*iterCoords)->x, (*iterCoords)->y, (*iterCoords)->z));
 			}
 			
 			/*
@@ -225,13 +225,13 @@ namespace rsgis{namespace math{
 			double selectValue = 0;
 			int selectIdx = 0;
 			bool first = true;
-			Coordinate *coord = new Coordinate();
+			geos::geom::Coordinate *coord = new geos::geom::Coordinate();
 			int numIteration = 0;
 			int nodeCount = 0;
 			
-			Envelope *minBoundary = new Envelope(boundary->getMinX(), (boundary->getMaxX()-step), boundary->getMinY(), (boundary->getMaxY()-step));
+			geos::geom::Envelope *minBoundary = new geos::geom::Envelope(boundary->getMinX(), (boundary->getMaxX()-step), boundary->getMinY(), (boundary->getMaxY()-step));
 						
-			cout << "Started " << flush;
+            std::cout << "Started " << std::flush;
 			
 			bool change = true;
 			while(change)
@@ -240,7 +240,7 @@ namespace rsgis{namespace math{
 				{
 					break;
 				}
-				cout << "." << flush;
+                std::cout << "." << std::flush;
 				
 				change = false;
 				nodeCount = 0;
@@ -411,7 +411,7 @@ namespace rsgis{namespace math{
 				++numIteration;
 			}
 			
-			cout << " Complete\n";
+            std::cout << " Complete\n";
 			
 			delete minBoundary;
 			delete coord;			
@@ -436,15 +436,15 @@ namespace rsgis{namespace math{
 		this->maxNumIterations = maxNumIterations;
 	}
 	
-	vector<Coordinate*>* RSGISGlobalHillClimbingOptimiser2DVaryNumPts::optimise4Neighbor(vector<Coordinate*> *coords, double step, Envelope *boundary) throw(RSGISOptimisationException)
+    std::vector<geos::geom::Coordinate*>* RSGISGlobalHillClimbingOptimiser2DVaryNumPts::optimise4Neighbor(std::vector<geos::geom::Coordinate*> *coords, double step, geos::geom::Envelope *boundary) throw(RSGISOptimisationException)
 	{
-		vector<Coordinate*> *outCoords = new vector<Coordinate*>();
+        std::vector<geos::geom::Coordinate*> *outCoords = new std::vector<geos::geom::Coordinate*>();
 		try
 		{
-			vector<Coordinate*>::iterator iterCoords;
+            std::vector<geos::geom::Coordinate*>::iterator iterCoords;
 			for(iterCoords = coords->begin(); iterCoords != coords->end(); ++iterCoords)
 			{
-				outCoords->push_back(new Coordinate((*iterCoords)->x, (*iterCoords)->y, (*iterCoords)->z));
+				outCoords->push_back(new geos::geom::Coordinate((*iterCoords)->x, (*iterCoords)->y, (*iterCoords)->z));
 			}
 			
 			/*
@@ -459,14 +459,14 @@ namespace rsgis{namespace math{
 			double selectValue = 0;
 			int selectIdx = 0;
 			bool first = true;
-			Coordinate *coord = new Coordinate();
+			geos::geom::Coordinate *coord = new geos::geom::Coordinate();
 			int numIteration = 0;
 			int nodeCount = 0;
-			Coordinate *tmpCoord = NULL;
+			geos::geom::Coordinate *tmpCoord = NULL;
 			
-			Envelope *minBoundary = new Envelope(boundary->getMinX(), (boundary->getMaxX()-step), boundary->getMinY(), (boundary->getMaxY()-step));
+			geos::geom::Envelope *minBoundary = new geos::geom::Envelope(boundary->getMinX(), (boundary->getMaxX()-step), boundary->getMinY(), (boundary->getMaxY()-step));
 			
-			cout << "Started " << flush;
+            std::cout << "Started " << std::flush;
 			
 			bool change = true;
 			while(change)
@@ -475,7 +475,7 @@ namespace rsgis{namespace math{
 				{
 					break;
 				}
-				cout << "." << flush;
+                std::cout << "." << std::flush;
 				
 				change = false;
 				nodeCount = 0;
@@ -627,7 +627,7 @@ namespace rsgis{namespace math{
 						{
 							//cout << "Add Coordinate\n";
 							float tmpDist = distance/2;
-							tmpCoord = new Coordinate();
+							tmpCoord = new geos::geom::Coordinate();
 							this->findPointOnLine(coord, (*iterCoords), tmpDist, tmpCoord);
 							//cout << "tmpCoord= [" << tmpCoord->x << "," << tmpCoord->y << "]\n";
 							iterCoords = outCoords->insert(iterCoords,tmpCoord);
@@ -645,7 +645,7 @@ namespace rsgis{namespace math{
 				++numIteration;
 			}
 			
-			cout << " Complete\n";
+            std::cout << " Complete\n";
 			
 			delete minBoundary;
 			delete coord;			
@@ -658,15 +658,15 @@ namespace rsgis{namespace math{
 		return outCoords;
 	}
 	
-	vector<Coordinate*>* RSGISGlobalHillClimbingOptimiser2DVaryNumPts::optimise8Neighbor(vector<Coordinate*> *coords, double step, Envelope *boundary) throw(RSGISOptimisationException)
+    std::vector<geos::geom::Coordinate*>* RSGISGlobalHillClimbingOptimiser2DVaryNumPts::optimise8Neighbor(std::vector<geos::geom::Coordinate*> *coords, double step, geos::geom::Envelope *boundary) throw(RSGISOptimisationException)
 	{
-		vector<Coordinate*> *outCoords = new vector<Coordinate*>();
+        std::vector<geos::geom::Coordinate*> *outCoords = new std::vector<geos::geom::Coordinate*>();
 		try
 		{
-			vector<Coordinate*>::iterator iterCoords;
+            std::vector<geos::geom::Coordinate*>::iterator iterCoords;
 			for(iterCoords = coords->begin(); iterCoords != coords->end(); ++iterCoords)
 			{
-				outCoords->push_back(new Coordinate((*iterCoords)->x, (*iterCoords)->y, (*iterCoords)->z));
+				outCoords->push_back(new geos::geom::Coordinate((*iterCoords)->x, (*iterCoords)->y, (*iterCoords)->z));
 			}
 			
 			/*
@@ -685,14 +685,14 @@ namespace rsgis{namespace math{
 			double distance = 0;
 			int selectIdx = 0;
 			bool first = true;
-			Coordinate *coord = new Coordinate();
-			Coordinate *tmpCoord = NULL;
+			geos::geom::Coordinate *coord = new geos::geom::Coordinate();
+			geos::geom::Coordinate *tmpCoord = NULL;
 			int numIteration = 0;
 			int nodeCount = 0;
 			
-			Envelope *minBoundary = new Envelope(boundary->getMinX(), (boundary->getMaxX()-step), boundary->getMinY(), (boundary->getMaxY()-step));
+			geos::geom::Envelope *minBoundary = new geos::geom::Envelope(boundary->getMinX(), (boundary->getMaxX()-step), boundary->getMinY(), (boundary->getMaxY()-step));
 			
-			cout << "Started " << flush;
+            std::cout << "Started " << std::flush;
 			
 			bool change = true;
 			while(change)
@@ -701,7 +701,7 @@ namespace rsgis{namespace math{
 				{
 					break;
 				}
-				cout << "." << flush;
+                std::cout << "." << std::flush;
 				
 				change = false;
 				nodeCount = 0;
@@ -906,7 +906,7 @@ namespace rsgis{namespace math{
 						{
 							//cout << "Add Coordinate\n";
 							float tmpDist = distance/2;
-							tmpCoord = new Coordinate();
+							tmpCoord = new geos::geom::Coordinate();
 							this->findPointOnLine(coord, (*iterCoords), tmpDist, tmpCoord);
 							//cout << "tmpCoord= [" << tmpCoord->x << "," << tmpCoord->y << "]\n";
 							iterCoords = outCoords->insert(iterCoords,tmpCoord);
@@ -926,7 +926,7 @@ namespace rsgis{namespace math{
 				++numIteration;
 			}
 			
-			cout << " Complete\n";
+            std::cout << " Complete\n";
 			
 			/*
 			cout << endl;
@@ -948,7 +948,7 @@ namespace rsgis{namespace math{
 		return outCoords;
 	}
 	
-	void RSGISGlobalHillClimbingOptimiser2DVaryNumPts::findPointOnLine(Coordinate *p1, Coordinate *p2, float distance, Coordinate *p3)
+	void RSGISGlobalHillClimbingOptimiser2DVaryNumPts::findPointOnLine(geos::geom::Coordinate *p1, geos::geom::Coordinate *p2, float distance, geos::geom::Coordinate *p3)
 	{
 		if(distance == 0)
 		{

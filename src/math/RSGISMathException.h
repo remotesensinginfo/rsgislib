@@ -23,24 +23,20 @@
 #ifndef RSGISMathException_H
 #define RSGISMathException_H
 
+#include <string.h>
+
 #include "common/RSGISException.h"
 
-namespace rsgis 
-{
-	/// Maths classes
-	namespace math
-	{
-        using namespace std;
-        
-		class RSGISMathException : public RSGISException
-			{
-			public:
-				RSGISMathException();
-				RSGISMathException(const char* message);
-				RSGISMathException(string message);
-			};
-	}
-}
+namespace rsgis{namespace math{
+    
+    class RSGISMathException : public rsgis::RSGISException
+    {
+    public:
+        RSGISMathException();
+        RSGISMathException(const char* message);
+        RSGISMathException(std::string message);
+    };
+}}
 
 #endif
 
