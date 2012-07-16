@@ -559,7 +559,9 @@
     <rsgis:command algor="imagecalc" option="isodatacentres" image="image.env" output="matrix.gmtxt" numclusters="int" minnumclusters="int" maxiterations="int" degreeofchange="float" subsample="int" initmethod="random | diagonal_range | diagonal_stddev | diagonal_range_attach | diagonal_stddev_attach | kpp" ignorezeros="yes | no" mindist="float" minnum="unsigned int" maxstddev="float" editstart="int" editend="int" />
     <!-- A command to test whether all bands are equal to the same value - useful for creating images masks -->
     <rsgis:command algor="imagecalc" option="allbandsequalto" image="image.env" output="image_out.env" format="GDAL Format" value="float" trueout="float" falseout="float" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
-
+	<!-- A command to generate a histogram for a region of an image given a mask. If min and max values are not provided the image extremes will be calculated -->
+    <rsgis:command algor="imagecalc" option="histogram" image="image.env" output="image_out.txt" mask="mask.env" value="int" band="int" [min="float" max="float"] [width="float"] />
+	
 
 
     <!-- A command to calibrate image Landsat data from at sensor DNs to at sensor radiance (EQ: ((lmax-lmin)/(qcalmax-qcalmin)) * (DNs - qcalmin) + lmin) Eq is from landsat manual. -->

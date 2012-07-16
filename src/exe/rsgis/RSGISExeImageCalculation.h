@@ -64,6 +64,7 @@
 #include "img/RSGISImageStatistics.h"
 #include "img/RSGISLinearSpectralUnmixing.h"
 #include "img/RSGISImageClustering.h"
+#include "img/RSGISGenHistogram.h"
 
 #include "vec/RSGISVectorUtils.h"
 #include "vec/RSGISGetOGRGeometries.h"
@@ -88,20 +89,6 @@
 #include "muParser.h"
 
 namespace rsgisexe{
-
-    /*
-using namespace std;
-using namespace xercesc;
-using namespace mu;
-using namespace boost;
-using namespace rsgis;
-using namespace rsgis::math;
-using namespace rsgis::img;
-using namespace rsgis::utils;
-using namespace rsgis::vec;
-using namespace rsgis::geom;
-using namespace geos::geom;
-     */
 
 class RSGISExeImageCalculation : public RSGISAlgorithmParameters
 	{
@@ -172,6 +159,7 @@ class RSGISExeImageCalculation : public RSGISAlgorithmParameters
         std::string inputVector;
         std::string outputFile;
         std::string endmembersFile;
+        std::string imageMask;
 		int numComponents;
 		int numImages;
 		int numVars;
@@ -181,6 +169,7 @@ class RSGISExeImageCalculation : public RSGISAlgorithmParameters
 		double inMax;
 		double outMin;
 		double outMax;
+        double binWidth;
 		bool calcInMinMax;
 		bool calcMean;
 		VariableStruct *variables;
@@ -192,8 +181,8 @@ class RSGISExeImageCalculation : public RSGISAlgorithmParameters
 		float lower;
         float stepResolution;
 		gsl_matrix *coeffMatrix;
-		RSGISMathTwoVariableFunction *twoVarFunction;
-		RSGISMathThreeVariableFunction *threeVarFunction;
+		rsgis::math::RSGISMathTwoVariableFunction *twoVarFunction;
+		rsgis::math::RSGISMathThreeVariableFunction *threeVarFunction;
 		unsigned int polyOrderX;
 		unsigned int polyOrderY;
 		unsigned int polyOrderZ;
@@ -218,6 +207,7 @@ class RSGISExeImageCalculation : public RSGISAlgorithmParameters
         float lsumWeight;
         float lsumGain;
         float lsumOffset;
+        unsigned int imgBand;
 	};
 }
 #endif
