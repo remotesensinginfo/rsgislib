@@ -86,6 +86,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 	XMLCh *optionKMeansCentres = xercesc::XMLString::transcode("kmeanscentres");
     XMLCh *optionISODataCentres = xercesc::XMLString::transcode("isodatacentres");
     XMLCh *optionAllBandsEqualTo = xercesc::XMLString::transcode("allbandsequalto");
+    XMLCh *optionHistogram = xercesc::XMLString::transcode("histogram");
 
 	const XMLCh *algorNameEle = argElement->getAttribute(xercesc::XMLString::transcode("algor"));
 	if(!xercesc::XMLString::equals(algorName, algorNameEle))
@@ -2239,6 +2240,119 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 		}
 		xercesc::XMLString::release(&falseOutXMLStr);
     }
+    else if(xercesc::XMLString::equals(optionHistogram, optionXML))
+    {
+        this->option = RSGISExeImageCalculation::histogram;
+		
+        XMLCh *imageXMLStr = xercesc::XMLString::transcode("image");
+		if(argElement->hasAttribute(imageXMLStr))
+		{
+			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(imageXMLStr));
+			this->inputImage = std::string(charValue);
+			xercesc::XMLString::release(&charValue);
+		}
+		else
+		{
+			throw rsgis::RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+		}
+		xercesc::XMLString::release(&imageXMLStr);
+        
+        XMLCh *outputXMLStr = xercesc::XMLString::transcode("output");
+		if(argElement->hasAttribute(outputXMLStr))
+		{
+			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outputXMLStr));
+			this->outputFile = std::string(charValue);
+			xercesc::XMLString::release(&charValue);
+		}
+		else
+		{
+			throw rsgis::RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+		}
+		xercesc::XMLString::release(&outputXMLStr);
+        
+        XMLCh *maskXMLStr = xercesc::XMLString::transcode("mask");
+		if(argElement->hasAttribute(maskXMLStr))
+		{
+			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(maskXMLStr));
+			this->imageMask = std::string(charValue);
+			xercesc::XMLString::release(&charValue);
+		}
+		else
+		{
+			throw rsgis::RSGISXMLArgumentsException("No \'mask\' attribute was provided.");
+		}
+		xercesc::XMLString::release(&maskXMLStr);
+        
+        XMLCh *valueXMLStr = xercesc::XMLString::transcode("value");
+		if(argElement->hasAttribute(valueXMLStr))
+		{
+			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(valueXMLStr));
+			this->imgValue = mathUtils.strtofloat(string(charValue));
+			xercesc::XMLString::release(&charValue);
+		}
+		else
+		{
+			throw rsgis::RSGISXMLArgumentsException("No \'value\' attribute was provided.");
+		}
+		xercesc::XMLString::release(&valueXMLStr);
+        
+        XMLCh *bandXMLStr = xercesc::XMLString::transcode("band");
+		if(argElement->hasAttribute(bandXMLStr))
+		{
+			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(bandXMLStr));
+			this->imgBand = mathUtils.strtounsignedint(string(charValue));
+			xercesc::XMLString::release(&charValue);
+		}
+		else
+		{
+			throw rsgis::RSGISXMLArgumentsException("No \'band\' attribute was provided.");
+		}
+		xercesc::XMLString::release(&bandXMLStr);
+        
+        calcInMinMax = false;
+        
+        XMLCh *minXMLStr = xercesc::XMLString::transcode("min");
+		if(argElement->hasAttribute(minXMLStr))
+		{
+			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(minXMLStr));
+			this->inMin = mathUtils.strtoint(string(charValue));
+			xercesc::XMLString::release(&charValue);
+		}
+		else
+		{
+			calcInMinMax = true;
+            std::cerr << "Calculating the min and max values of the input image\n";
+		}
+		xercesc::XMLString::release(&minXMLStr);
+        
+        XMLCh *maxXMLStr = xercesc::XMLString::transcode("max");
+		if(argElement->hasAttribute(maxXMLStr))
+		{
+			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(maxXMLStr));
+			this->inMax = mathUtils.strtoint(string(charValue));
+			xercesc::XMLString::release(&charValue);
+		}
+		else
+		{
+			calcInMinMax = true;
+            std::cerr << "Calculating the min and max values of the input image\n";
+		}
+		xercesc::XMLString::release(&maxXMLStr);
+        
+        XMLCh *widthXMLStr = xercesc::XMLString::transcode("width");
+		if(argElement->hasAttribute(widthXMLStr))
+		{
+			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(widthXMLStr));
+			this->binWidth = mathUtils.strtodouble(string(charValue));
+			xercesc::XMLString::release(&charValue);
+		}
+		else
+		{
+			this->binWidth = 1;
+            std::cerr << "No bin width provided, defaulting to a value of 1.\n";
+		}
+		xercesc::XMLString::release(&widthXMLStr);
+    }
 	else
 	{
 		string message = std::string("The option (") + std::string(xercesc::XMLString::transcode(optionXML)) + std::string(") is not known: RSGISExeImageCalculation.");
@@ -2270,6 +2384,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
     xercesc::XMLString::release(&optionKMeansCentres);
     xercesc::XMLString::release(&optionISODataCentres);
     xercesc::XMLString::release(&optionAllBandsEqualTo);
+    xercesc::XMLString::release(&optionHistogram);
 
 	parsed = true;
 }
@@ -2306,7 +2421,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 					if(dataset == NULL)
 					{
 						string message = std::string("Could not open image ") + this->inputImages[i];
-						throw RSGISImageException(message.c_str());
+						throw rsgis::RSGISImageException(message.c_str());
 					}
 					
 					rasterCount = dataset->GetRasterCount();
@@ -2374,7 +2489,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 				if(datasetsA[0] == NULL)
 				{
 					string message = std::string("Could not open image ") + this->inputImageA;
-					throw RSGISImageException(message.c_str());
+					throw rsgis::RSGISImageException(message.c_str());
 				}
 				
 				
@@ -2384,7 +2499,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 				if(datasetsB[0] == NULL)
 				{
 					string message = std::string("Could not open image ") + this->inputImageB;
-					throw RSGISImageException(message.c_str());
+					throw rsgis::RSGISImageException(message.c_str());
 				}
 				
 				calcCC = new rsgis::img::RSGISCalcCC(1);
@@ -2430,7 +2545,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 				if(datasetsA[0] == NULL)
 				{
 					string message = std::string("Could not open image ") + this->inputImageA;
-					throw RSGISImageException(message.c_str());
+					throw rsgis::RSGISImageException(message.c_str());
 				}
 				
 				datasetsB = new GDALDataset*[1];
@@ -2439,7 +2554,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 				if(datasetsB[0] == NULL)
 				{
 					string message = std::string("Could not open image ") + this->inputImageB;
-					throw RSGISImageException(message.c_str());
+					throw rsgis::RSGISImageException(message.c_str());
 				}
 				
 				
@@ -2529,7 +2644,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 				if(datasets[0] == NULL)
 				{
 					string message = std::string("Could not open image ") + this->inputImage;
-					throw RSGISImageException(message.c_str());
+					throw rsgis::RSGISImageException(message.c_str());
 				}
 				
 				calcMean = new rsgis::img::RSGISCalcMeanVectorIndividual(1);
@@ -2583,7 +2698,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 				if(datasets[0] == NULL)
 				{
 					string message = std::string("Could not open image ") + this->inputImage;
-					throw RSGISImageException(message.c_str());
+					throw rsgis::RSGISImageException(message.c_str());
 				}
 				
 				applyPCA = new rsgis::img::RSGISApplyEigenvectors(this->numComponents, eigenvectorsMatrix);
@@ -2633,7 +2748,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 				if(datasets[0] == NULL)
 				{
 					string message = std::string("Could not open image ") + this->inputImage;
-					throw RSGISImageException(message.c_str());
+					throw rsgis::RSGISImageException(message.c_str());
 				}
 				
 				stdImg = new rsgis::img::RSGISStandardiseImage(datasets[0]->GetRasterCount(), meanVectorMatrix);
@@ -2685,14 +2800,14 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 					if(datasets[i] == NULL)
 					{
 						string message = std::string("Could not open image ") + this->variables[i].image;
-						throw RSGISImageException(message.c_str());
+						throw rsgis::RSGISImageException(message.c_str());
 					}
 					
 					numRasterBands = datasets[i]->GetRasterCount();
 					
 					if((this->variables[i].bandNum < 0) | (this->variables[i].bandNum > numRasterBands))
 					{
-						throw RSGISImageException("You have specified a band which is not within the image");
+						throw rsgis::RSGISImageException("You have specified a band which is not within the image");
 					}
 					
 					processVaribles[i] = new rsgis::img::VariableBands();
@@ -2765,7 +2880,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 				if(datasets[0] == NULL)
 				{
 					string message = std::string("Could not open image ") + this->inputImage;
-					throw RSGISImageException(message.c_str());
+					throw rsgis::RSGISImageException(message.c_str());
 				}
 				
 				int numImgBands = datasets[0]->GetRasterCount();
@@ -2808,7 +2923,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 				if(datasets[0] == NULL)
 				{
 					string message = std::string("Could not open image ") + this->inputImage;
-					throw RSGISImageException(message.c_str());
+					throw rsgis::RSGISImageException(message.c_str());
 				}
 				
 				int numImgBands = datasets[0]->GetRasterCount();
@@ -2871,7 +2986,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 				if(datasets[0] == NULL)
 				{
 					string message = std::string("Could not open image ") + this->inputImage;
-					throw RSGISImageException(message.c_str());
+					throw rsgis::RSGISImageException(message.c_str());
 				}
 				
 				int numRasterBands = datasets[0]->GetRasterCount();
@@ -2931,7 +3046,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 					if(datasets[i] == NULL)
 					{
 						string message = std::string("Could not open image ") + this->inputImages[i];
-						throw RSGISImageException(message.c_str());
+						throw rsgis::RSGISImageException(message.c_str());
 					}
 					
 					numRasterBands = datasets[i]->GetRasterCount();
@@ -2941,7 +3056,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 					
 					if(imageBands[i] > (numRasterBands-1))
 					{
-						throw RSGISImageException("You have specified a band which is not within the image");
+						throw rsgis::RSGISImageException("You have specified a band which is not within the image");
 					}
 					
 					totalNumRasterBands += numRasterBands;
@@ -3005,7 +3120,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 				if(datasets[0] == NULL)
 				{
 					string message = std::string("Could not open image ") + this->inputImage;
-					throw RSGISImageException(message.c_str());
+					throw rsgis::RSGISImageException(message.c_str());
 				}
 				
 				calcImageValue = new rsgis::img::RSGISCountValsAboveThresInCol(1, upper, lower);
@@ -3044,7 +3159,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 				if(datasetsA[0] == NULL)
 				{
 					string message = std::string("Could not open image ") + this->inputImageA;
-					throw RSGISImageException(message.c_str());
+					throw rsgis::RSGISImageException(message.c_str());
 				}
 				
 				
@@ -3054,7 +3169,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 				if(datasetsB[0] == NULL)
 				{
 					string message = std::string("Could not open image ") + this->inputImageB;
-					throw RSGISImageException(message.c_str());
+					throw rsgis::RSGISImageException(message.c_str());
 				}
 				
 				calculateRSME = new rsgis::img::RSGISCalcRMSE(1);
@@ -3097,7 +3212,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 				if(datasets[0] == NULL)
 				{
 					string message = std::string("Could not open image ") + this->inputImage;
-					throw RSGISImageException(message.c_str());
+					throw rsgis::RSGISImageException(message.c_str());
 				}
 			}
 			catch(rsgis::RSGISException& e)
@@ -3138,7 +3253,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 				if(datasets[0] == NULL)
 				{
 					string message = std::string("Could not open image ") + this->inputImage;
-					throw RSGISImageException(message.c_str());
+					throw rsgis::RSGISImageException(message.c_str());
 				}
 			}
 			catch(rsgis::RSGISException& e)
@@ -3274,7 +3389,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 				if(datasets[0] == NULL)
 				{
 					string message = std::string("Could not open image ") + this->inputImage;
-					throw RSGISImageException(message.c_str());
+					throw rsgis::RSGISImageException(message.c_str());
 				}
                 
                 int numImageBands = datasets[0]->GetRasterCount();
@@ -3334,7 +3449,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 				if(datasets[0] == NULL)
 				{
 					string message = std::string("Could not open image ") + this->inputImage;
-					throw RSGISImageException(message.c_str());
+					throw rsgis::RSGISImageException(message.c_str());
 				}
                 
                 rsgis::img::ImageStats *stats = new rsgis::img::ImageStats();
@@ -3383,7 +3498,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 				if(datasets[0] == NULL)
 				{
 					string message = std::string("Could not open image ") + this->inputImage;
-					throw RSGISImageException(message.c_str());
+					throw rsgis::RSGISImageException(message.c_str());
 				}
                 
                 rsgis::img::RSGISCalcLinearSpectralUnmixing calcSpecUnmix(this->imageFormat, this->outDataType, this->lsumGain, this->lsumOffset);
@@ -3417,7 +3532,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 				if(datasets[0] == NULL)
 				{
 					string message = std::string("Could not open image ") + this->inputImage;
-					throw RSGISImageException(message.c_str());
+					throw rsgis::RSGISImageException(message.c_str());
 				}
                 
                 rsgis::img::RSGISCalcLinearSpectralUnmixing calcSpecUnmix(this->imageFormat, this->outDataType, this->lsumGain, this->lsumOffset);
@@ -3451,7 +3566,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 				if(datasets[0] == NULL)
 				{
 					string message = std::string("Could not open image ") + this->inputImage;
-					throw RSGISImageException(message.c_str());
+					throw rsgis::RSGISImageException(message.c_str());
 				}
                 
                 rsgis::img::RSGISCalcLinearSpectralUnmixing calcSpecUnmix(this->imageFormat, this->outDataType, this->lsumGain, this->lsumOffset);
@@ -3485,7 +3600,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 				if(datasets[0] == NULL)
 				{
 					string message = std::string("Could not open image ") + this->inputImage;
-					throw RSGISImageException(message.c_str());
+					throw rsgis::RSGISImageException(message.c_str());
 				}
                 
                 rsgis::img::RSGISCalcLinearSpectralUnmixing calcSpecUnmix(this->imageFormat, this->outDataType, this->lsumGain, this->lsumOffset);
@@ -3518,7 +3633,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 				if(dataset == NULL)
 				{
 					string message = std::string("Could not open image ") + this->inputImage;
-					throw RSGISImageException(message.c_str());
+					throw rsgis::RSGISImageException(message.c_str());
 				}
                 
                 rsgis::img::RSGISImageClustering imgClustering;
@@ -3556,7 +3671,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 				if(dataset == NULL)
 				{
 					string message = std::string("Could not open image ") + this->inputImage;
-					throw RSGISImageException(message.c_str());
+					throw rsgis::RSGISImageException(message.c_str());
 				}
                 
                 rsgis::img::RSGISImageClustering imgClustering;
@@ -3586,7 +3701,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 				if(datasets[0] == NULL)
 				{
 					string message = std::string("Could not open image ") + this->inputImage;
-					throw RSGISImageException(message.c_str());
+					throw rsgis::RSGISImageException(message.c_str());
 				}
                 
                 rsgis::img::RSGISAllBandsEqualTo *calcImageValue = new rsgis::img::RSGISAllBandsEqualTo(1, this->imgValue, this->outputTrueVal, this->outputFalseVal);
@@ -3596,6 +3711,86 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
                 GDALClose(datasets[0]);
                 delete[] datasets;
                 delete calcImageValue;
+			}
+			catch(rsgis::RSGISException e)
+			{
+				throw e;
+			}
+        }
+        else if(option == RSGISExeImageCalculation::histogram)
+        {
+            std::cout << "Generate a histogram for the region of the mask selected.\n";
+            std::cout << "Input Image: " << this->inputImage << std::endl;
+            std::cout << "Mask Image: " << this->imageMask << std::endl;
+            std::cout << "Output File: " << this->outputFile << std::endl;
+            std::cout << "Image Band: " << this->imgBand << std::endl;
+            std::cout << "Mask Value: " << this->imgValue << std::endl;
+            std::cout << "Histogram Bin Width: " << this->binWidth << std::endl;
+            if(this->calcInMinMax)
+            {
+                std::cout << "Calculating Min and Max Values from the image.\n";
+            }
+            else
+            {
+                std::cout << "Min: " << this->inMin << std::endl;
+                std::cout << "Max: " << this->inMax << std::endl;
+            }
+            
+			try
+			{
+                GDALAllRegister();
+                GDALDataset **datasets = new GDALDataset*[2];
+				
+                datasets[0] = (GDALDataset *) GDALOpenShared(this->imageMask.c_str(), GA_ReadOnly);
+				if(datasets[0] == NULL)
+				{
+					string message = std::string("Could not open image ") + this->imageMask;
+					throw rsgis::RSGISImageException(message.c_str());
+				}
+                
+                datasets[1] = (GDALDataset *) GDALOpenShared(this->inputImage.c_str(), GA_ReadOnly);
+				if(datasets[1] == NULL)
+				{
+					string message = std::string("Could not open image ") + this->inputImage;
+					throw rsgis::RSGISImageException(message.c_str());
+				}
+                
+                if(this->calcInMinMax)
+                {
+                    unsigned int numImgBands = datasets[1]->GetRasterCount();
+                    rsgis::img::ImageStats **imgStats = new rsgis::img::ImageStats*[numImgBands];
+                    for(unsigned int i = 0; i < numImgBands; ++i)
+                    {
+                        imgStats[i] = new rsgis::img::ImageStats();
+                        imgStats[i]->max = 0;
+                        imgStats[i]->min = 0;
+                        imgStats[i]->mean = 0;
+                        imgStats[i]->stddev = 0;
+                        imgStats[i]->sum = 0;
+                    }
+                    rsgis::img::RSGISImageStatistics calcStats;
+                    calcStats.calcImageStatistics(&datasets[1], 1, imgStats, numImgBands, false, false);
+                    
+                    this->inMin = imgStats[this->imgBand-1]->min;
+                    this->inMax = imgStats[this->imgBand-1]->max;
+                    
+                    for(unsigned int i = 0; i < numImgBands; ++i)
+                    {
+                        delete imgStats;
+                    }
+                    delete[] imgStats;
+                }
+                
+                this->inMin = floor(this->inMin);
+                this->inMax = ceil(this->inMax);
+                
+                rsgis::img::RSGISGenHistogram genHistogram;
+                genHistogram.genHistogram(datasets, 2, this->outputFile, this->imgBand, this->inMin, this->inMax, this->imgValue, this->binWidth);
+
+                
+                GDALClose(datasets[0]);
+                GDALClose(datasets[1]);
+                delete[] datasets;
 			}
 			catch(rsgis::RSGISException e)
 			{
@@ -3798,6 +3993,44 @@ void RSGISExeImageCalculation::printParameters()
             std::cout << "Image Value: " << this->imgValue << std::endl;
             std::cout << "If true output: " << this->outputTrueVal << std::endl;
             std::cout << "If false output: " << this->outputFalseVal << std::endl;
+        }
+        else if(option == RSGISExeImageCalculation::histogram)
+        {
+            std::cout << "Generate a histogram for the region of the mask selected.\n";
+            std::cout << "Input Image: " << this->inputImage << std::endl;
+            std::cout << "Mask Image: " << this->imageMask << std::endl;
+            std::cout << "Output File: " << this->outputFile << std::endl;
+            std::cout << "Image Band: " << this->imgBand << std::endl;
+            std::cout << "Mask Value: " << this->imgValue << std::endl;
+            std::cout << "Histogram Bin Width: " << this->binWidth << std::endl;
+            if(this->calcInMinMax)
+            {
+                std::cout << "Calculating Min and Max Values from the image.\n";
+            }
+            else
+            {
+                std::cout << "Min: " << this->inMin << std::endl;
+                std::cout << "Max: " << this->inMax << std::endl;
+            }
+        }
+        else if(option == RSGISExeImageCalculation::histogram)
+        {
+            std::cout << "Generate a histogram for the region of the mask selected.\n";
+            std::cout << "Input Image: " << this->inputImage << std::endl;
+            std::cout << "Mask Image: " << this->imageMask << std::endl;
+            std::cout << "Output File: " << this->outputFile << std::endl;
+            std::cout << "Image Band: " << this->imgBand << std::endl;
+            std::cout << "Mask Value: " << this->imgValue << std::endl;
+            std::cout << "Histogram Bin Width: " << this->binWidth << std::endl;
+            if(this->calcInMinMax)
+            {
+                std::cout << "Calculating Min and Max Values from the image.\n";
+            }
+            else
+            {
+                std::cout << "Min: " << this->inMin << std::endl;
+                std::cout << "Max: " << this->inMax << std::endl;
+            }
         }
 		else
 		{
