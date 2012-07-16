@@ -941,7 +941,7 @@ namespace rsgis{namespace rastergis{
             {
                 throw RSGISImageCalcException("More band stats were requested than bands in the file.");
             }
-            
+                        
             if(!attTable->hasAttribute("first"))
             {
                 attTable->addAttBoolField("first", true);
@@ -951,7 +951,7 @@ namespace rsgis{namespace rastergis{
                 throw RSGISImageCalcException("Cannot proceed as \'first\' field is not of type boolean.");
             }
             unsigned int firstFieldIdx = attTable->getFieldIndex("first");
-            
+                        
             bool meanCalc = false;
             bool stdDevCalc = false;
             for(vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
@@ -1071,9 +1071,10 @@ namespace rsgis{namespace rastergis{
                     cout << "WARNING: Cannot calculate median value (" << (*iterBands)->medianField << ") when processing within attribute table\n";
                 }                
             }
-            
+                        
             // Calculate Appropriate Min, Max, Sum and Mean Values.
             attTable->setBoolValue("first", true);
+
             RSGISCalcClumpThresholdedStatsWithinAtt *calcAttStats = new RSGISCalcClumpThresholdedStatsWithinAtt(attTable, bandStats, false, firstFieldIdx);
             RSGISCalcImage calcImage(calcAttStats);
             calcImage.calcImage(datasets, numDatasets);
@@ -1151,6 +1152,10 @@ namespace rsgis{namespace rastergis{
         catch (RSGISImageCalcException &e) 
         {
             throw e;
+        }
+        catch (RSGISException &e) 
+        {
+            throw RSGISImageCalcException(e.what());
         }
         
     }
@@ -2279,6 +2284,8 @@ namespace rsgis{namespace rastergis{
     
     void RSGISCalcClumpThresholdedStatsWithinAtt::calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException)
     {
+        cout << "in calcImageValue\n";
+        
         unsigned long clumpIdx = 0;
         
         try

@@ -61,7 +61,7 @@ namespace rsgis{namespace img{
 		{
 			// Find image overlap
 			imgUtils.getImageOverlap(datasets, numDS, dsOffsets, &width, &height, gdalTranslation);
-
+            
 			// Count number of image bands
 			for(int i = 0; i < numDS; i++)
 			{
@@ -72,7 +72,7 @@ namespace rsgis{namespace img{
 			gdalDriver = GetGDALDriverManager()->GetDriverByName(gdalFormat.c_str());
 			if(gdalDriver == NULL)
 			{
-				throw RSGISImageBandException("ENVI driver does not exists..");
+				throw RSGISImageBandException("GDAL driver does not exists..");
 			}
 			cout << "New image width = " << width << " height = " << height << " bands = " << this->numOutBands << endl;
 			
@@ -792,7 +792,7 @@ namespace rsgis{namespace img{
 		{
 			// Find image overlap
 			imgUtils.getImageOverlap(datasets, numDS, dsOffsets, &width, &height, gdalTranslation);
-			
+            
 			// Count number of image bands
 			for(int i = 0; i < numDS; i++)
 			{
