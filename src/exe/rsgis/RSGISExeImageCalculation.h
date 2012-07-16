@@ -83,12 +83,13 @@
 #include <gsl/gsl_vector.h>
 
 #include <xercesc/dom/DOM.hpp>
-#include <xercesc/util/XMLString.hpp>
+#include <xercesc/util/XMLstring.hpp>
 
 #include "muParser.h"
 
 namespace rsgisexe{
 
+    /*
 using namespace std;
 using namespace xercesc;
 using namespace mu;
@@ -100,6 +101,7 @@ using namespace rsgis::utils;
 using namespace rsgis::vec;
 using namespace rsgis::geom;
 using namespace geos::geom;
+     */
 
 class RSGISExeImageCalculation : public RSGISAlgorithmParameters
 	{
@@ -132,43 +134,44 @@ class RSGISExeImageCalculation : public RSGISAlgorithmParameters
             nnconsum1linearspecunmix,
             kmeanscentres,
             isodatacentres,
-            allbandsequalto
+            allbandsequalto,
+            histogram
 		};
 		
 		struct VariableStruct
 		{
-			string image;
-			string name;
+			std::string image;
+			std::string name;
 			int bandNum;
 		};
 		
 		RSGISExeImageCalculation();
-		virtual RSGISAlgorithmParameters* getInstance();
-		virtual void retrieveParameters(DOMElement *argElement) throw(RSGISXMLArgumentsException);
+		virtual rsgis::RSGISAlgorithmParameters* getInstance();
+		virtual void retrieveParameters(xercesc::DOMElement *argElement) throw(rsgis::RSGISXMLArgumentsException);
 		virtual void runAlgorithm() throw(RSGISException);
 		virtual void printParameters();
-		virtual string getDescription();
-		virtual string getXMLSchema();
+		virtual std::string getDescription();
+		virtual std::string getXMLSchema();
 		virtual void help();
 		~RSGISExeImageCalculation();
 	protected:
 		options option;
-		string inputImage;
-		string *inputImages;
-		string outputImage;
-		string *outputImages;
-		string inputImageA;
-		string inputImageB;
-		string inputMatrixA;
-		string inputMatrixB;
-		string outputMatrix;
-		string eigenvectors;
-		string meanvectorStr;
-		string mathsExpression;
-		string inMatrixfile;
-        string inputVector;
-        string outputFile;
-        string endmembersFile;
+		std::string inputImage;
+		std::string *inputImages;
+		std::string outputImage;
+		std::string *outputImages;
+		std::string inputImageA;
+		std::string inputImageB;
+		std::string inputMatrixA;
+		std::string inputMatrixB;
+		std::string outputMatrix;
+		std::string eigenvectors;
+		std::string meanvectorStr;
+		std::string mathsExpression;
+		std::string inMatrixfile;
+        std::string inputVector;
+        std::string outputFile;
+        std::string endmembersFile;
 		int numComponents;
 		int numImages;
 		int numVars;
@@ -207,7 +210,7 @@ class RSGISExeImageCalculation : public RSGISAlgorithmParameters
         unsigned int minNumClusters;
         unsigned int startIteration;
         unsigned int endIteration;
-		string imageFormat;
+		std::string imageFormat;
         float imgValue;
         float outputTrueVal;
         float outputFalseVal;
