@@ -55,7 +55,7 @@ namespace rsgis
 	{
         struct ImagePixelValuePt
         {
-            Coordinate *pt;
+            geos::geom::Coordinate *pt;
             uint_fast32_t imgX;
             uint_fast32_t imgY;
             float value;
@@ -135,8 +135,8 @@ namespace rsgis
 			public:
 				RSGISImageUtils();
 				void getImageOverlap(GDALDataset **datasets, int numDS, int **dsOffsets, int *width, int *height, double *gdalTransform) throw(RSGISImageBandException);
-				void getImageOverlap(GDALDataset **datasets, int numDS, int **dsOffsets, int *width, int *height, double *gdalTransform, Envelope *env) throw(RSGISImageBandException);
-                void getImageOverlapCut2Env(GDALDataset **datasets, int numDS,  int **dsOffsets, int *width, int *height, double *gdalTransform, Envelope *env) throw(RSGISImageBandException);
+				void getImageOverlap(GDALDataset **datasets, int numDS, int **dsOffsets, int *width, int *height, double *gdalTransform, geos::geom::Envelope *env) throw(RSGISImageBandException);
+                void getImageOverlapCut2Env(GDALDataset **datasets, int numDS,  int **dsOffsets, int *width, int *height, double *gdalTransform, geos::geom::Envelope *env) throw(RSGISImageBandException);
 				void getImageOverlap(GDALDataset **datasets, int numDS, int *width, int *height, Envelope *env) throw(RSGISImageBandException);
 				void getImagesExtent(GDALDataset **datasets, int numDS, int *width, int *height, double *gdalTransform) throw(RSGISImageBandException);
                 void getImagesExtent(string *inputImages, int numDS, int *width, int *height, double *gdalTransform) throw(RSGISImageBandException);

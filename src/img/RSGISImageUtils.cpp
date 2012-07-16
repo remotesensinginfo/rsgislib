@@ -59,7 +59,12 @@ namespace rsgis{namespace img{
 		try
 		{
 			for(int i = 0; i < numDS; i++)
-			{
+			{                
+                if(transformations[i] == NULL)
+                {
+                    throw RSGISImageBandException("No projection transformation has been provided..");
+                }
+                
 				if(first)
 				{
 					pixelXRes = transformations[i][1];
@@ -88,7 +93,7 @@ namespace rsgis{namespace img{
 					first = false;
 				}
 				else
-				{
+				{                    
 					if(transformations[i][1] != pixelXRes & transformations[i][5] != pixelYRes)
 					{
 						throw RSGISImageBandException("Not all image bands have the same resolution..");
@@ -103,7 +108,7 @@ namespace rsgis{namespace img{
 					{
 						cout << "Not all image bands have the same projection" << endl;
 					}
-					
+                    
 					if(transformations[i][0] > minX)
 					{
 						minX = transformations[i][0];
@@ -128,7 +133,7 @@ namespace rsgis{namespace img{
 					}
 				}
 			}
-			
+            			
 			if(maxX - minX <= 0)
 			{
 				throw RSGISImageBandException("Images do not overlap in the X axis");
