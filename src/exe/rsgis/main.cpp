@@ -368,7 +368,7 @@ void Control::help()
 
 void Control::versionInfo()
 {
-    cout << "You are using SVN version " << RSGISLIB_SVN_COMMIT << endl << endl;
+    cout << "You are using Mercurial version " << RSGISLIB_HG_COMMIT << endl << endl;
     
     cout << "With library versions:\n";
     cout << "Calibration Library Version: " << RSGISLIB_CALIBRATION_VERSION << endl;
