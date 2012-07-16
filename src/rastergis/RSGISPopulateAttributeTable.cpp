@@ -1088,7 +1088,9 @@ namespace rsgis{namespace rastergis{
                 double pxlCount = 0;
                 cout << "Started (Calc Mean): " << flush;
                 // Calculate Statistics for each feature.
-                for(unsigned long long i  = 0; i < attTable->getSize(); ++i)
+                //for(unsigned long long i  = 0; i < attTable->getSize(); ++i)
+                size_t i = 0;
+                for(attTable->start(); attTable->end(); ++(*attTable))
                 {
                     if((i % feedback) == 0)
                     {
@@ -1096,16 +1098,23 @@ namespace rsgis{namespace rastergis{
                         feedbackCounter = feedbackCounter + 10;
                     }
                     
-                    feat = attTable->getFeature(i);
+                    feat = *(*attTable);
                     for(vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
                     {   
                         if((*iterBands)->calcMean)
                         {
                             pxlCount = feat->intFields->at((*iterBands)->countIdx);
-                            feat->floatFields->at((*iterBands)->meanIdx) = feat->floatFields->at((*iterBands)->meanIdx) / pxlCount;
+                            if(pxlCount > 0)
+                            {
+                                feat->floatFields->at((*iterBands)->meanIdx) = feat->floatFields->at((*iterBands)->meanIdx) / pxlCount;
+                            }
+                            else
+                            {
+                                feat->floatFields->at((*iterBands)->meanIdx) = 0;
+                            }
                         }
                     }
-                    
+                    ++i;
                 }
                 cout << " Complete.\n";
                 
@@ -1122,7 +1131,9 @@ namespace rsgis{namespace rastergis{
                     feedbackCounter = 0;
                     cout << "Started (Calc StdDev): " << flush;
                     // Calculate Statistics for each feature.
-                    for(unsigned long long i  = 0; i < attTable->getSize(); ++i)
+                    //for(unsigned long long i  = 0; i < attTable->getSize(); ++i)
+                    size_t i = 0;
+                    for(attTable->start(); attTable->end(); ++(*attTable))
                     {
                         if((i % feedback) == 0)
                         {
@@ -1130,16 +1141,23 @@ namespace rsgis{namespace rastergis{
                             feedbackCounter = feedbackCounter + 10;
                         }
                         
-                        feat = attTable->getFeature(i);
+                        feat = *(*attTable);
                         for(vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
                         {   
                             if((*iterBands)->calcStdDev)
                             {
                                 pxlCount = feat->intFields->at((*iterBands)->countIdx);
-                                feat->floatFields->at((*iterBands)->stdDevIdx) = sqrt(feat->floatFields->at((*iterBands)->stdDevIdx) / pxlCount);
+                                if(pxlCount > 0)
+                                {
+                                    feat->floatFields->at((*iterBands)->stdDevIdx) = sqrt(feat->floatFields->at((*iterBands)->stdDevIdx) / pxlCount);
+                                }
+                                else
+                                {
+                                    feat->floatFields->at((*iterBands)->stdDevIdx) = 0;
+                                }
                             }
                         }
-                        
+                        ++i;
                     }
                     cout << " Complete.\n";
                 }
