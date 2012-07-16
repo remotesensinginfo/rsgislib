@@ -1175,6 +1175,10 @@ namespace rsgis{namespace rastergis{
         {
             throw RSGISImageCalcException(e.what());
         }
+        catch (exception &e) 
+        {
+            throw RSGISImageCalcException(e.what());
+        }
         
     }
     
@@ -2301,9 +2305,7 @@ namespace rsgis{namespace rastergis{
     }
     
     void RSGISCalcClumpThresholdedStatsWithinAtt::calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException)
-    {
-        cout << "in calcImageValue\n";
-        
+    {        
         unsigned long clumpIdx = 0;
         
         try
