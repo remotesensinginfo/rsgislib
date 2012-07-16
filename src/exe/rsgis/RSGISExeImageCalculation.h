@@ -84,7 +84,7 @@
 #include <gsl/gsl_vector.h>
 
 #include <xercesc/dom/DOM.hpp>
-#include <xercesc/util/XMLstring.hpp>
+#include <xercesc/util/XMLString.hpp>
 
 #include "muParser.h"
 
