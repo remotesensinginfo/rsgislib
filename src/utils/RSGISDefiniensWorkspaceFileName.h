@@ -25,49 +25,46 @@
 #define RSGISDefiniensWorkspaceFileName_H
 
 #include <iostream>
+#include <string>
+
 #include "math/RSGISMathsUtils.h"
 #include "utils/RSGISFileUtils.h"
 
-namespace rsgis 
-{
-	namespace utils
-	{
-        using namespace std;
-        using namespace rsgis::math;
+namespace rsgis{namespace utils{
         
-		class RSGISDefiniensWorkspaceFileName
-			{
-			public:
-				RSGISDefiniensWorkspaceFileName(string filename);
-				const string getFileName() const;
-				string getFileNameWithPath();
-				string getFileNameNoExtension();
-				int getTile();
-				int getVersion();
-				string getBaseName();
-				void setOldVersion(bool oldVersion);
-				bool getOldVersion() const;
-				friend ostream& operator<<(ostream& ostr, const RSGISDefiniensWorkspaceFileName& name);
-				ostream& operator<<(ostream& ostr);
-				bool operator==(RSGISDefiniensWorkspaceFileName name) const;
-				bool operator!=(RSGISDefiniensWorkspaceFileName name) const;
-				bool operator>(RSGISDefiniensWorkspaceFileName name) const;
-				bool operator<(RSGISDefiniensWorkspaceFileName name) const;
-				bool operator>=(RSGISDefiniensWorkspaceFileName name) const;
-				bool operator<=(RSGISDefiniensWorkspaceFileName name) const;
-				virtual ~RSGISDefiniensWorkspaceFileName();
-			private:
-				void parseFileName(string filename);
-				string path;
-				string start;
-				string tileNumStr;
-				int tile;
-				int version;
-				string extension;
-				bool oldVersion;
-			};
-	}
-}
+    class RSGISDefiniensWorkspaceFileName
+        {
+        public:
+            RSGISDefiniensWorkspaceFileName(std::string filename);
+            const std::string getFileName() const;
+            std::string getFileNameWithPath();
+            std::string getFileNameNoExtension();
+            int getTile();
+            int getVersion();
+            std::string getBaseName();
+            void setOldVersion(bool oldVersion);
+            bool getOldVersion() const;
+            friend std::ostream& operator<<(std::ostream& ostr, const RSGISDefiniensWorkspaceFileName& name);
+            std::ostream& operator<<(std::ostream& ostr);
+            bool operator==(RSGISDefiniensWorkspaceFileName name) const;
+            bool operator!=(RSGISDefiniensWorkspaceFileName name) const;
+            bool operator>(RSGISDefiniensWorkspaceFileName name) const;
+            bool operator<(RSGISDefiniensWorkspaceFileName name) const;
+            bool operator>=(RSGISDefiniensWorkspaceFileName name) const;
+            bool operator<=(RSGISDefiniensWorkspaceFileName name) const;
+            virtual ~RSGISDefiniensWorkspaceFileName();
+        private:
+            void parseFileName(std::string filename);
+            std::string path;
+            std::string start;
+            std::string tileNumStr;
+            int tile;
+            int version;
+            std::string extension;
+            bool oldVersion;
+        };
+    
+}}
 
 #endif
 

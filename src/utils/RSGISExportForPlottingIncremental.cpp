@@ -33,97 +33,97 @@ namespace rsgis{namespace utils{
 		type = unknown;
 	}
 	
-	bool RSGISExportForPlottingIncremental::openFile(string file, PlotTypes inType) throw(RSGISOutputStreamException)
+	bool RSGISExportForPlottingIncremental::openFile(std::string file, PlotTypes inType) throw(rsgis::RSGISOutputStreamException)
 	{
-		outputFileStream = new ofstream();
+		outputFileStream = new std::ofstream();
 		outputFileStream->open(file.c_str(), ios::out | ios::trunc);
 		
 		if(!outputFileStream->is_open())
 		{
 			open = false;
 			
-			string message = string("Could not open file ") + file;
-			throw RSGISOutputStreamException(message);
+			std::string message = std::string("Could not open file ") + file;
+			throw rsgis::RSGISOutputStreamException(message);
 		}
 		open = true;
 		
 		if(inType == freq2d)
 		{
-			(*outputFileStream) << "#freq2D" << endl;
-			(*outputFileStream) << "#value" << endl;
+			(*outputFileStream) << "#freq2D" << std::endl;
+			(*outputFileStream) << "#value" << std::endl;
 		}
 		else if(inType == freq3d)
 		{
-			(*outputFileStream) << "#freq3D" << endl;
-			(*outputFileStream) << "#value1,value2" << endl;
+			(*outputFileStream) << "#freq3D" << std::endl;
+			(*outputFileStream) << "#value1,value2" << std::endl;
 		}
 		else if(inType == scatternd)
 		{
-			(*outputFileStream) << "#NDScatter" << endl;
-			(*outputFileStream) << "#v1,v2,v3,...vn" << endl;
+			(*outputFileStream) << "#NDScatter" << std::endl;
+			(*outputFileStream) << "#v1,v2,v3,...vn" << std::endl;
 		}
 		else if(inType == scatter2d)
 		{
-			(*outputFileStream) << "#2DScatter" << endl;
-			(*outputFileStream) << "#x,y" << endl;
+			(*outputFileStream) << "#2DScatter" << std::endl;
+			(*outputFileStream) << "#x,y" << std::endl;
 		}
 		else if(inType == scatter3d)
 		{
-			(*outputFileStream) << "#3DScatter" << endl;
-			(*outputFileStream) << "#x,y,z" << endl;
+			(*outputFileStream) << "#3DScatter" << std::endl;
+			(*outputFileStream) << "#x,y,z" << std::endl;
 		}
 		else if(inType == cscatter2d)
 		{
-			(*outputFileStream) << "#c2DScatter" << endl;
-			(*outputFileStream) << "#x,y,c" << endl;
+			(*outputFileStream) << "#c2DScatter" << std::endl;
+			(*outputFileStream) << "#x,y,c" << std::endl;
 		}
 		else if(inType == cscatter3d)
 		{
-			(*outputFileStream) << "#c3DScatter" << endl;
-			(*outputFileStream) << "#x,y,z,c" << endl;
+			(*outputFileStream) << "#c3DScatter" << std::endl;
+			(*outputFileStream) << "#x,y,z,c" << std::endl;
 		}
 		else if(inType == density)
 		{
-			(*outputFileStream) << "#Density" << endl;
-			(*outputFileStream) << "#x,y" << endl;
+			(*outputFileStream) << "#Density" << std::endl;
+			(*outputFileStream) << "#x,y" << std::endl;
 		}
 		else if(inType == surface)
 		{
-			(*outputFileStream) << "#Surface" << endl;
-			(*outputFileStream) << "#x,y,z" << endl;
+			(*outputFileStream) << "#Surface" << std::endl;
+			(*outputFileStream) << "#x,y,z" << std::endl;
 		}
 		else if(inType == csurface)
 		{
-			(*outputFileStream) << "#cSurface" << endl;
-			(*outputFileStream) << "#x,y,z,c" << endl;
+			(*outputFileStream) << "#cSurface" << std::endl;
+			(*outputFileStream) << "#x,y,z,c" << std::endl;
 		}
 		else if(inType == lines2d)
 		{
-			(*outputFileStream) << "#lines2D" << endl;
-			(*outputFileStream) << "#x1,y1,x2,y2" << endl;
+			(*outputFileStream) << "#lines2D" << std::endl;
+			(*outputFileStream) << "#x1,y1,x2,y2" << std::endl;
 		}
 		else if(inType == lines3d)
 		{
-			(*outputFileStream) << "#lines3D" << endl;
-			(*outputFileStream) << "#x1,y1,z1,x2,y2,z2" << endl;
+			(*outputFileStream) << "#lines3D" << std::endl;
+			(*outputFileStream) << "#x1,y1,z1,x2,y2,z2" << std::endl;
 		}
 		else if(inType == triangle2d)
 		{
-			(*outputFileStream) << "#triangle2d" << endl;
-			(*outputFileStream) << "#x1,y1" << endl;
-			(*outputFileStream) << "#x2,y2" << endl;
-			(*outputFileStream) << "#x3,y3" << endl;
+			(*outputFileStream) << "#triangle2d" << std::endl;
+			(*outputFileStream) << "#x1,y1" << std::endl;
+			(*outputFileStream) << "#x2,y2" << std::endl;
+			(*outputFileStream) << "#x3,y3" << std::endl;
 		}
 		else if(inType == triangle3d)
 		{
-			(*outputFileStream) << "#triangle3d" << endl;
-			(*outputFileStream) << "#x1,y1,z1" << endl;
-			(*outputFileStream) << "#x2,y2,z2" << endl;
-			(*outputFileStream) << "#x3,y3,z3" << endl;
+			(*outputFileStream) << "#triangle3d" << std::endl;
+			(*outputFileStream) << "#x1,y1,z1" << std::endl;
+			(*outputFileStream) << "#x2,y2,z2" << std::endl;
+			(*outputFileStream) << "#x3,y3,z3" << std::endl;
 		}			
 		else 
 		{
-			throw RSGISOutputStreamException("Type is unknown.");
+			throw rsgis::RSGISOutputStreamException("Type is unknown.");
 		}
 		
 		this->type = inType;
@@ -132,43 +132,43 @@ namespace rsgis{namespace utils{
 		
 	}
 	
-	void RSGISExportForPlottingIncremental::writeFrequency2DLine(double value) throw(RSGISOutputStreamException)
+	void RSGISExportForPlottingIncremental::writeFrequency2DLine(double value) throw(rsgis::RSGISOutputStreamException)
 	{
 		if(!open)
 		{
-			throw RSGISOutputStreamException("File is not open!");
+			throw rsgis::RSGISOutputStreamException("File is not open!");
 		}
 		else if(this->type != freq2d)
 		{
-			throw RSGISOutputStreamException("Open file is not of type freq2d");
+			throw rsgis::RSGISOutputStreamException("Open file is not of type freq2d");
 		}
 		
-		(*outputFileStream) << value << endl;
+		(*outputFileStream) << value << std::endl;
 	}
 	
-	void RSGISExportForPlottingIncremental::writeFrequency3DLine(double value1, double value2) throw(RSGISOutputStreamException)
+	void RSGISExportForPlottingIncremental::writeFrequency3DLine(double value1, double value2) throw(rsgis::RSGISOutputStreamException)
 	{
 		if(!open)
 		{
-			throw RSGISOutputStreamException("File is not open!");
+			throw rsgis::RSGISOutputStreamException("File is not open!");
 		}
 		else if(this->type != freq3d)
 		{
-			throw RSGISOutputStreamException("Open file is not of type freq2d");
+			throw rsgis::RSGISOutputStreamException("Open file is not of type freq2d");
 		}
 		
-		(*outputFileStream) << value1 << "," << value2 << endl;	
+		(*outputFileStream) << value1 << "," << value2 << std::endl;	
 	}
 
-	void RSGISExportForPlottingIncremental::writeScatterNDLine(vector<double> *vals) throw(RSGISOutputStreamException)
+	void RSGISExportForPlottingIncremental::writeScatterNDLine(vector<double> *vals) throw(rsgis::RSGISOutputStreamException)
 	{
 		if(!open)
 		{
-			throw RSGISOutputStreamException("File is not open!");
+			throw rsgis::RSGISOutputStreamException("File is not open!");
 		}
 		else if(this->type != scatter2d)
 		{
-			throw RSGISOutputStreamException("Open file is not of type freq2d");
+			throw rsgis::RSGISOutputStreamException("Open file is not of type freq2d");
 		}
 		
 		bool first = true;
@@ -185,165 +185,165 @@ namespace rsgis{namespace utils{
 			}
 
 		}
-		 (*outputFileStream) << endl;	
+		 (*outputFileStream) << std::endl;	
 	}
 	
-	void RSGISExportForPlottingIncremental::writeScatter2DLine(double x, double y) throw(RSGISOutputStreamException)
+	void RSGISExportForPlottingIncremental::writeScatter2DLine(double x, double y) throw(rsgis::RSGISOutputStreamException)
 	{
 		if(!open)
 		{
-			throw RSGISOutputStreamException("File is not open!");
+			throw rsgis::RSGISOutputStreamException("File is not open!");
 		}
 		else if(this->type != scatter2d)
 		{
-			throw RSGISOutputStreamException("Open file is not of type freq2d");
+			throw rsgis::RSGISOutputStreamException("Open file is not of type freq2d");
 		}
 		
-		(*outputFileStream) << x << "," << y << endl;	
+		(*outputFileStream) << x << "," << y << std::endl;	
 	}
 	
-	void RSGISExportForPlottingIncremental::writeScatter3DLine(double x, double y, double z) throw(RSGISOutputStreamException)
+	void RSGISExportForPlottingIncremental::writeScatter3DLine(double x, double y, double z) throw(rsgis::RSGISOutputStreamException)
 	{
 		if(!open)
 		{
-			throw RSGISOutputStreamException("File is not open!");
+			throw rsgis::RSGISOutputStreamException("File is not open!");
 		}
 		else if(this->type != scatter3d)
 		{
-			throw RSGISOutputStreamException("Open file is not of type freq2d");
+			throw rsgis::RSGISOutputStreamException("Open file is not of type freq2d");
 		}
 		
-		(*outputFileStream) << x << "," << y << "," << z << endl;
+		(*outputFileStream) << x << "," << y << "," << z << std::endl;
 	}
 	
-	void RSGISExportForPlottingIncremental::writeCScatter2DLine(double x, double y, double c) throw(RSGISOutputStreamException)
+	void RSGISExportForPlottingIncremental::writeCScatter2DLine(double x, double y, double c) throw(rsgis::RSGISOutputStreamException)
 	{
 		if(!open)
 		{
-			throw RSGISOutputStreamException("File is not open!");
+			throw rsgis::RSGISOutputStreamException("File is not open!");
 		}
 		else if(this->type != cscatter2d)
 		{
-			throw RSGISOutputStreamException("Open file is not of type freq2d");
+			throw rsgis::RSGISOutputStreamException("Open file is not of type freq2d");
 		}
 		
-		(*outputFileStream) << x << "," << y << "," << c << endl;
+		(*outputFileStream) << x << "," << y << "," << c << std::endl;
 	}
 	
-	void RSGISExportForPlottingIncremental::writeCScatter3DLine(double x, double y, double z, double c) throw(RSGISOutputStreamException)
+	void RSGISExportForPlottingIncremental::writeCScatter3DLine(double x, double y, double z, double c) throw(rsgis::RSGISOutputStreamException)
 	{
 		if(!open)
 		{
-			throw RSGISOutputStreamException("File is not open!");
+			throw rsgis::RSGISOutputStreamException("File is not open!");
 		}
 		else if(this->type != cscatter3d)
 		{
-			throw RSGISOutputStreamException("Open file is not of type freq2d");
+			throw rsgis::RSGISOutputStreamException("Open file is not of type freq2d");
 		}
 		
-		(*outputFileStream) << x << "," << y << "," << z << "," << c << endl;
+		(*outputFileStream) << x << "," << y << "," << z << "," << c << std::endl;
 	}
 	
-	void RSGISExportForPlottingIncremental::writeDensityLine(double x, double y) throw(RSGISOutputStreamException)
+	void RSGISExportForPlottingIncremental::writeDensityLine(double x, double y) throw(rsgis::RSGISOutputStreamException)
 	{
 		if(!open)
 		{
-			throw RSGISOutputStreamException("File is not open!");
+			throw rsgis::RSGISOutputStreamException("File is not open!");
 		}
 		else if(this->type != density)
 		{
-			throw RSGISOutputStreamException("Open file is not of type freq2d");
+			throw rsgis::RSGISOutputStreamException("Open file is not of type freq2d");
 		}
 		
-		(*outputFileStream) << x << "," << y << endl;
+		(*outputFileStream) << x << "," << y << std::endl;
 	}
 	
-	void RSGISExportForPlottingIncremental::writeSurfaceLine(double x, double y, double z) throw(RSGISOutputStreamException)
+	void RSGISExportForPlottingIncremental::writeSurfaceLine(double x, double y, double z) throw(rsgis::RSGISOutputStreamException)
 	{
 		if(!open)
 		{
-			throw RSGISOutputStreamException("File is not open!");
+			throw rsgis::RSGISOutputStreamException("File is not open!");
 		}
 		else if(this->type != surface)
 		{
-			throw RSGISOutputStreamException("Open file is not of type freq2d");
+			throw rsgis::RSGISOutputStreamException("Open file is not of type freq2d");
 		}
 		
-		(*outputFileStream) << x << "," << y << "," << z << endl;
+		(*outputFileStream) << x << "," << y << "," << z << std::endl;
 	}
 	
-	void RSGISExportForPlottingIncremental::writeCSurfaceLine(double x, double y, double z, double c) throw(RSGISOutputStreamException)
+	void RSGISExportForPlottingIncremental::writeCSurfaceLine(double x, double y, double z, double c) throw(rsgis::RSGISOutputStreamException)
 	{
 		if(!open)
 		{
-			throw RSGISOutputStreamException("File is not open!");
+			throw rsgis::RSGISOutputStreamException("File is not open!");
 		}
 		else if(this->type != csurface)
 		{
-			throw RSGISOutputStreamException("Open file is not of type freq2d");
+			throw rsgis::RSGISOutputStreamException("Open file is not of type freq2d");
 		}
 		
-		(*outputFileStream) << x << "," << y << "," << z << "," << c << endl;
+		(*outputFileStream) << x << "," << y << "," << z << "," << c << std::endl;
 	}
 	
-	void RSGISExportForPlottingIncremental::writeLines2DLine(double x1, double y1, double x2, double y2) throw(RSGISOutputStreamException)
+	void RSGISExportForPlottingIncremental::writeLines2DLine(double x1, double y1, double x2, double y2) throw(rsgis::RSGISOutputStreamException)
 	{
 		if(!open)
 		{
-			throw RSGISOutputStreamException("File is not open!");
+			throw rsgis::RSGISOutputStreamException("File is not open!");
 		}
 		else if(this->type != lines2d)
 		{
-			throw RSGISOutputStreamException("Open file is not of type freq2d");
+			throw rsgis::RSGISOutputStreamException("Open file is not of type freq2d");
 		}
 		
-		(*outputFileStream) << x1 << "," << y1 << "," << x2 << "," << y2 << endl;
+		(*outputFileStream) << x1 << "," << y1 << "," << x2 << "," << y2 << std::endl;
 	}
 	
-	void RSGISExportForPlottingIncremental::writeLines3DLine(double x1, double y1, double z1, double x2, double y2, double z2) throw(RSGISOutputStreamException)
+	void RSGISExportForPlottingIncremental::writeLines3DLine(double x1, double y1, double z1, double x2, double y2, double z2) throw(rsgis::RSGISOutputStreamException)
 	{
 		if(!open)
 		{
-			throw RSGISOutputStreamException("File is not open!");
+			throw rsgis::RSGISOutputStreamException("File is not open!");
 		}
 		else if(this->type != lines3d)
 		{
-			throw RSGISOutputStreamException("Open file is not of type freq2d");
+			throw rsgis::RSGISOutputStreamException("Open file is not of type freq2d");
 		}
 		
-		(*outputFileStream) << x1 << "," << y1 << "," << z1 << "," << x2 << "," << y2 << "," << z2 << endl;
+		(*outputFileStream) << x1 << "," << y1 << "," << z1 << "," << x2 << "," << y2 << "," << z2 << std::endl;
 	}
 	
-	void RSGISExportForPlottingIncremental::writeTriangle2D(double x1, double y1, double x2, double y2, double x3, double y3) throw(RSGISOutputStreamException)
+	void RSGISExportForPlottingIncremental::writeTriangle2D(double x1, double y1, double x2, double y2, double x3, double y3) throw(rsgis::RSGISOutputStreamException)
 	{
 		if(!open)
 		{
-			throw RSGISOutputStreamException("File is not open!");
+			throw rsgis::RSGISOutputStreamException("File is not open!");
 		}
 		else if(this->type != triangle2d)
 		{
-			throw RSGISOutputStreamException("Open file is not of type triangle2d");
+			throw rsgis::RSGISOutputStreamException("Open file is not of type triangle2d");
 		}
 		
-		(*outputFileStream) << x1 << "," << y1 << endl;
-		(*outputFileStream) << x2 << "," << y2 << endl;
-		(*outputFileStream) << x3 << "," << y3 << endl;
+		(*outputFileStream) << x1 << "," << y1 << std::endl;
+		(*outputFileStream) << x2 << "," << y2 << std::endl;
+		(*outputFileStream) << x3 << "," << y3 << std::endl;
 	}
 	
-	void RSGISExportForPlottingIncremental::writeTriangle3D(double x1, double y1, double z1, double x2, double y2, double z2, double x3, double y3, double z3) throw(RSGISOutputStreamException)
+	void RSGISExportForPlottingIncremental::writeTriangle3D(double x1, double y1, double z1, double x2, double y2, double z2, double x3, double y3, double z3) throw(rsgis::RSGISOutputStreamException)
 	{
 		if(!open)
 		{
-			throw RSGISOutputStreamException("File is not open!");
+			throw rsgis::RSGISOutputStreamException("File is not open!");
 		}
 		else if(this->type != triangle3d)
 		{
-			throw RSGISOutputStreamException("Open file is not of type triangle3d");
+			throw rsgis::RSGISOutputStreamException("Open file is not of type triangle3d");
 		}
 		
-		(*outputFileStream) << x1 << "," << y1 << "," << z1 << endl;
-		(*outputFileStream) << x2 << "," << y2 << "," << z2 << endl;
-		(*outputFileStream) << x3 << "," << y3 << "," << z3 << endl;
+		(*outputFileStream) << x1 << "," << y1 << "," << z1 << std::endl;
+		(*outputFileStream) << x2 << "," << y2 << "," << z2 << std::endl;
+		(*outputFileStream) << x3 << "," << y3 << "," << z3 << std::endl;
 	}
 	
 	PlotTypes RSGISExportForPlottingIncremental::getPlotType()

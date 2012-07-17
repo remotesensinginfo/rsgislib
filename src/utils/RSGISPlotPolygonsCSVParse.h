@@ -28,6 +28,7 @@
 #include <fstream>
 
 #include <string>
+#include <vector>
 
 #include "utils/RSGISTextUtils.h"
 #include "utils/RSGISTextException.h"
@@ -37,10 +38,6 @@
 #include "math/RSGISMathsUtils.h"
 
 namespace rsgis{ namespace utils{
-	
-    using namespace std;
-    using namespace rsgis;
-    using namespace rsgis::math;
     
 	struct PlotPoly
 	{
@@ -53,19 +50,19 @@ namespace rsgis{ namespace utils{
 		double eastSide;
 		double northSide;
 		double orientation;
-		string siteName;
-		string study;
-		string site;
+		std::string siteName;
+		std::string study;
+		std::string site;
 		int extraID;
-		string issues;
+		std::string issues;
 	};
 	
 	class RSGISPlotPolygonsCSVParse
 	{
 		public:
 			RSGISPlotPolygonsCSVParse();
-			vector<PlotPoly*>* parsePolyPlots(string inputfile) throw(RSGISInputStreamException,RSGISTextException);
-			string formatedString(PlotPoly *poly);
+			std::vector<PlotPoly*>* parsePolyPlots(std::string inputfile) throw(rsgis::RSGISInputStreamException,RSGISTextException);
+			std::string formattedString(PlotPoly *poly);
 			~RSGISPlotPolygonsCSVParse();
 	};
 }}

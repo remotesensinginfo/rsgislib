@@ -28,8 +28,6 @@
 #include <iostream>
 
 namespace rsgis{namespace utils{
-
-    using namespace std;
     
 	class RSGISColour
 		{

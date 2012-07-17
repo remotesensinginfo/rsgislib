@@ -25,17 +25,17 @@
 
 namespace rsgis{namespace utils{
 	
-	RSGISENVIROIException::RSGISENVIROIException() : RSGISException("A RSGISENVIROIException has been created..")
+	RSGISENVIROIException::RSGISENVIROIException() : rsgis::RSGISException("A RSGISENVIROIException has been created..")
 	{
 		
 	}
 	
-	RSGISENVIROIException::RSGISENVIROIException(const char* message) : RSGISException(message)
+	RSGISENVIROIException::RSGISENVIROIException(const char* message) : rsgis::RSGISException(message)
 	{
 		
 	}
 	
-	RSGISENVIROIException::RSGISENVIROIException(string message) : RSGISException(message)
+	RSGISENVIROIException::RSGISENVIROIException(std::string message) : rsgis::RSGISException(message)
 	{
 		
 	}

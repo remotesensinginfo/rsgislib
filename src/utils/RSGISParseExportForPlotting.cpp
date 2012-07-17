@@ -30,23 +30,23 @@ namespace rsgis{namespace utils{
 		
 	}
 	
-	PlotTypes RSGISParseExportForPlotting::identify(string file) throw(RSGISInputStreamException)
+	PlotTypes RSGISParseExportForPlotting::identify(std::string file) throw(rsgis::RSGISInputStreamException)
 	{
 		PlotTypes returnType = unknown;
 		
-		ifstream openInFile;
+		std::ifstream openInFile;
 		openInFile.open(file.c_str());
 		if(!openInFile.is_open())
 		{
-			throw RSGISInputStreamException("Could not open input text file.");
+			throw rsgis::RSGISInputStreamException("Could not open input text file.");
 		}
 		else
 		{
-			string strLine;
-			openInFile.seekg(ios_base::beg);
+			std::string strLine;
+			openInFile.seekg(std::ios_base::beg);
 			getline(openInFile, strLine);
 			openInFile.close();
-			cout << "strLine: " << strLine << endl;
+			std::cout << "strLine: " << strLine << std::endl;
 			if(strLine == "#freq2D")
 			{
 				returnType = freq2d;
@@ -108,74 +108,74 @@ namespace rsgis{namespace utils{
 		return returnType;
 	}
 	
-	void RSGISParseExportForPlotting::parseFrequency2D(string file, list<double> *value) throw(RSGISInputStreamException)
+	void RSGISParseExportForPlotting::parseFrequency2D(std::string file, std::list<double> *value) throw(rsgis::RSGISInputStreamException)
 	{
-		throw RSGISInputStreamException("Parser not written yet.");
+		throw rsgis::RSGISInputStreamException("Parser not written yet.");
 	}
 	
-	void RSGISParseExportForPlotting::parseFrequency3D(string file, list<double> *value1, list<double> *value2) throw(RSGISInputStreamException)
+	void RSGISParseExportForPlotting::parseFrequency3D(std::string file, std::list<double> *value1, std::list<double> *value2) throw(rsgis::RSGISInputStreamException)
 	{
-		throw RSGISInputStreamException("Parser not written yet.");
+		throw rsgis::RSGISInputStreamException("Parser not written yet.");
 	}
 	
-	void RSGISParseExportForPlotting::parseScatter2D(string file, list<double> *x, list<double> *y) throw(RSGISInputStreamException)
+	void RSGISParseExportForPlotting::parseScatter2D(std::string file, std::list<double> *x, std::list<double> *y) throw(rsgis::RSGISInputStreamException)
 	{
-		throw RSGISInputStreamException("Parser not written yet.");
+		throw rsgis::RSGISInputStreamException("Parser not written yet.");
 	}
 	
-	void RSGISParseExportForPlotting::parseScatter3D(string file, list<double> *x, list<double> *y, list<double> *z) throw(RSGISInputStreamException)
+	void RSGISParseExportForPlotting::parseScatter3D(std::string file, std::list<double> *x, std::list<double> *y, std::list<double> *z) throw(rsgis::RSGISInputStreamException)
 	{
-		throw RSGISInputStreamException("Parser not written yet.");
+		throw rsgis::RSGISInputStreamException("Parser not written yet.");
 	}
 	
-	void RSGISParseExportForPlotting::parseCScatter2D(string file, list<double> *x, list<double> *y, list<double> *c) throw(RSGISInputStreamException)
+	void RSGISParseExportForPlotting::parseCScatter2D(std::string file, std::list<double> *x, std::list<double> *y, std::list<double> *c) throw(rsgis::RSGISInputStreamException)
 	{
-		throw RSGISInputStreamException("Parser not written yet.");
+		throw rsgis::RSGISInputStreamException("Parser not written yet.");
 	}
 	
-	void RSGISParseExportForPlotting::parseCScatter3D(string file, list<double> *x, list<double> *y, list<double> *z, list<double> *c) throw(RSGISInputStreamException)
+	void RSGISParseExportForPlotting::parseCScatter3D(std::string file, std::list<double> *x, std::list<double> *y, std::list<double> *z, std::list<double> *c) throw(rsgis::RSGISInputStreamException)
 	{
-		throw RSGISInputStreamException("Parser not written yet.");
+		throw rsgis::RSGISInputStreamException("Parser not written yet.");
 	}
 	
-	void RSGISParseExportForPlotting::parseDensity(string file, list<double> *x, list<double> *y) throw(RSGISInputStreamException)
+	void RSGISParseExportForPlotting::parseDensity(std::string file, std::list<double> *x, std::list<double> *y) throw(rsgis::RSGISInputStreamException)
 	{
-		throw RSGISInputStreamException("Parser not written yet.");
+		throw rsgis::RSGISInputStreamException("Parser not written yet.");
 	}
 	
-	void RSGISParseExportForPlotting::parseSurface(string file, list<double> *x, list<double> *y, list<double> *z) throw(RSGISInputStreamException)
+	void RSGISParseExportForPlotting::parseSurface(std::string file, std::list<double> *x, std::list<double> *y, std::list<double> *z) throw(rsgis::RSGISInputStreamException)
 	{
-		throw RSGISInputStreamException("Parser not written yet.");
+		throw rsgis::RSGISInputStreamException("Parser not written yet.");
 	}
 	
-	void RSGISParseExportForPlotting::parseCSurface(string file, list<double> *x, list<double> *y, list<double> *z, list<double> *c) throw(RSGISInputStreamException)
+	void RSGISParseExportForPlotting::parseCSurface(std::string file, std::list<double> *x, std::list<double> *y, std::list<double> *z, std::list<double> *c) throw(rsgis::RSGISInputStreamException)
 	{
-		throw RSGISInputStreamException("Parser not written yet.");
+		throw rsgis::RSGISInputStreamException("Parser not written yet.");
 	}
 	
-	void RSGISParseExportForPlotting::parseLines2D(string file, list<double> *x1, list<double> *y1, list<double> *x2, list<double> *y2) throw(RSGISInputStreamException)
+	void RSGISParseExportForPlotting::parseLines2D(std::string file, std::list<double> *x1, std::list<double> *y1, std::list<double> *x2, std::list<double> *y2) throw(rsgis::RSGISInputStreamException)
 	{
 		RSGISTextUtils textUtils;
-		RSGISMathsUtils mathUtils;
-		ifstream openInFile;
+		rsgis::math::RSGISMathsUtils mathUtils;
+		std::ifstream openInFile;
 		openInFile.open(file.c_str());
 		if(!openInFile.is_open())
 		{
-			throw RSGISInputStreamException("Could not open input text file.");
+			throw rsgis::RSGISInputStreamException("Could not open input text file.");
 		}
 		else
 		{
-			string strLine;
-			vector<string> *tokens = new vector<string>();
-			openInFile.seekg(ios_base::beg);
+			std::string strLine;
+			std::vector<std::string> *tokens = new std::vector<std::string>();
+			openInFile.seekg(std::ios_base::beg);
 			getline(openInFile, strLine);
 			if(strLine != "#lines2D")
 			{
 				openInFile.close();
-				throw RSGISInputStreamException("Could not parse lines2D file as format incorrect.");
+				throw rsgis::RSGISInputStreamException("Could not parse lines2D file as format incorrect.");
 			}
 			
-			openInFile.seekg(ios_base::beg);
+			openInFile.seekg(std::ios_base::beg);
 			while(!openInFile.eof())
 			{
 				getline(openInFile, strLine);
@@ -189,12 +189,12 @@ namespace rsgis{namespace utils{
 				}
 				else
 				{
-					//cout << strLine << endl;
+					//std::cout << strLine << std::endl;
 					textUtils.tokenizeString(strLine, ',', tokens, true);
 					if(tokens->size() != 4)
 					{
 						openInFile.close();
-						throw RSGISInputStreamException("Error while parsing. File format is incorrect for lines2D file.");
+						throw rsgis::RSGISInputStreamException("Error while parsing. File format is incorrect for lines2D file.");
 					}
 					x1->push_back(mathUtils.strtodouble(tokens->at(0)));
 					y1->push_back(mathUtils.strtodouble(tokens->at(1)));
@@ -208,29 +208,29 @@ namespace rsgis{namespace utils{
 		openInFile.close();
 	}
 	
-	void RSGISParseExportForPlotting::parseLines3D(string file, list<double> *x1, list<double> *y1, list<double> *z1, list<double> *x2, list<double> *y2, list<double> *z2) throw(RSGISInputStreamException)
+	void RSGISParseExportForPlotting::parseLines3D(std::string file, std::list<double> *x1, std::list<double> *y1, std::list<double> *z1, std::list<double> *x2, std::list<double> *y2, std::list<double> *z2) throw(rsgis::RSGISInputStreamException)
 	{
 		RSGISTextUtils textUtils;
-		RSGISMathsUtils mathUtils;
-		ifstream openInFile;
+		rsgis::math::RSGISMathsUtils mathUtils;
+		std::ifstream openInFile;
 		openInFile.open(file.c_str());
 		if(!openInFile.is_open())
 		{
-			throw RSGISInputStreamException("Could not open input text file.");
+			throw rsgis::RSGISInputStreamException("Could not open input text file.");
 		}
 		else
 		{
-			string strLine;
-			vector<string> *tokens = new vector<string>();
-			openInFile.seekg(ios_base::beg);
+			std::string strLine;
+			std::vector<std::string> *tokens = new std::vector<std::string>();
+			openInFile.seekg(std::ios_base::beg);
 			getline(openInFile, strLine);
 			if(strLine != "#lines3D")
 			{
 				openInFile.close();
-				throw RSGISInputStreamException("Could not parse lines3D file as format incorrect.");
+				throw rsgis::RSGISInputStreamException("Could not parse lines3D file as format incorrect.");
 			}
 			
-			openInFile.seekg(ios_base::beg);
+			openInFile.seekg(std::ios_base::beg);
 			while(!openInFile.eof())
 			{
 				getline(openInFile, strLine);
@@ -244,12 +244,12 @@ namespace rsgis{namespace utils{
 				}
 				else
 				{
-					//cout << strLine << endl;
+					//std::cout << strLine << std::endl;
 					textUtils.tokenizeString(strLine, ',', tokens, true);
 					if(tokens->size() != 6)
 					{
 						openInFile.close();
-						throw RSGISInputStreamException("Error while parsing. File format is incorrect for lines3D file.");
+						throw rsgis::RSGISInputStreamException("Error while parsing. File format is incorrect for lines3D file.");
 					}
 					x1->push_back(mathUtils.strtodouble(tokens->at(0)));
 					y1->push_back(mathUtils.strtodouble(tokens->at(1)));
@@ -265,14 +265,14 @@ namespace rsgis{namespace utils{
 		openInFile.close();
 	}
 	
-	void RSGISParseExportForPlotting::parseTriangles2D(string file, list<double> *x, list<double> *y) throw(RSGISInputStreamException)
+	void RSGISParseExportForPlotting::parseTriangles2D(std::string file, std::list<double> *x, std::list<double> *y) throw(rsgis::RSGISInputStreamException)
 	{
-		throw RSGISInputStreamException("Parser not written yet.");
+		throw rsgis::RSGISInputStreamException("Parser not written yet.");
 	}
 	
-	void RSGISParseExportForPlotting::parseTriangles3D(string file, list<double> *x, list<double> *y, list<double> *z) throw(RSGISInputStreamException)
+	void RSGISParseExportForPlotting::parseTriangles3D(std::string file, std::list<double> *x, std::list<double> *y, std::list<double> *z) throw(rsgis::RSGISInputStreamException)
 	{
-		throw RSGISInputStreamException("Parser not written yet.");
+		throw rsgis::RSGISInputStreamException("Parser not written yet.");
 	}
 	
 	RSGISParseExportForPlotting::~RSGISParseExportForPlotting()

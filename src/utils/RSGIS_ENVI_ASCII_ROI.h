@@ -36,34 +36,31 @@
 #include "utils/RSGISENVIROIException.h"
 
 namespace rsgis{namespace utils{
-	
-    using namespace std;
-    using namespace rsgis::math;
     
 	struct enviroi
 	{
-		string name;
+		std::string name;
 		int samples;
 		RSGISColour *colour;
-		Matrix *data;
+		rsgis::math::Matrix *data;
 	};
 	
 	class RSGISReadENVIASCIIROI
 		{
 		public:
-			RSGISReadENVIASCIIROI(string file)throw(RSGISInputStreamException,RSGISTextException);
+			RSGISReadENVIASCIIROI(std::string file)throw(rsgis::RSGISInputStreamException,RSGISTextException);
 			void printROIs();
 			int getNumROIs();
-			string* getName(int i) throw(RSGISENVIROIException);
-			Matrix* getMatrix(int i) throw(RSGISENVIROIException);
+			std::string* getName(int i) throw(RSGISENVIROIException);
+			rsgis::math::Matrix* getMatrix(int i) throw(RSGISENVIROIException);
 			int getNumSamples(int i) throw(RSGISENVIROIException);
 			RSGISColour* getColour(int i) throw(RSGISENVIROIException);
 			int getNumVariables();
 			enviroi* getENVIROI(int i) throw(RSGISENVIROIException);
 			~RSGISReadENVIASCIIROI();
 		protected:
-			void parsefile() throw(RSGISInputStreamException,RSGISTextException);
-			string inputfile;
+			void parsefile() throw(rsgis::RSGISInputStreamException,RSGISTextException);
+			std::string inputfile;
 			enviroi *rois;
 			int numrois;
 			int numVariables;

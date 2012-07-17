@@ -25,7 +25,7 @@
 
 namespace rsgis{namespace utils{
 	
-	RSGISReadENVIASCIIROI::RSGISReadENVIASCIIROI(string file) throw(RSGISInputStreamException,RSGISTextException)
+	RSGISReadENVIASCIIROI::RSGISReadENVIASCIIROI(std::string file) throw(rsgis::RSGISInputStreamException,RSGISTextException)
 	{
 		this->inputfile = file;
 		this->parsefile();
@@ -33,7 +33,7 @@ namespace rsgis{namespace utils{
 	
 	void RSGISReadENVIASCIIROI::printROIs()
 	{
-		RSGISMatrices matrixUtils;
+		rsgis::math::RSGISMatrices matrixUtils;
 		for(int i = 0; i < this->numrois; i++)
 		{
 			cout << "ROI " << rois[i].name << " has " << rois[i].samples << endl;
@@ -46,7 +46,7 @@ namespace rsgis{namespace utils{
 		return numrois;
 	}
 	
-	string* RSGISReadENVIASCIIROI::getName(int i) throw(RSGISENVIROIException)
+	std::string* RSGISReadENVIASCIIROI::getName(int i) throw(RSGISENVIROIException)
 	{
 		if(i < 0 & i >= numrois)
 		{
@@ -55,7 +55,7 @@ namespace rsgis{namespace utils{
 		return &rois[i].name;
 	}
 	
-	Matrix* RSGISReadENVIASCIIROI::getMatrix(int i) throw(RSGISENVIROIException)
+	rsgis::math::Matrix* RSGISReadENVIASCIIROI::getMatrix(int i) throw(RSGISENVIROIException)
 	{
 		if(i < 0 & i >= numrois)
 		{
@@ -101,22 +101,22 @@ namespace rsgis{namespace utils{
 		
 	}
 	
-	void RSGISReadENVIASCIIROI::parsefile() throw(RSGISInputStreamException,RSGISTextException)
+	void RSGISReadENVIASCIIROI::parsefile() throw(rsgis::RSGISInputStreamException,RSGISTextException)
 	{
-		RSGISMatrices matrixUtils;
+		rsgis::math::RSGISMatrices matrixUtils;
 		RSGISTextUtils textUtils;
-		ifstream inputROIFile;
+        std::ifstream inputROIFile;
 		inputROIFile.open(inputfile.c_str());
 		if(!inputROIFile.is_open())
 		{
-			string message = string("Could not open input text file: ") + inputfile;
-			throw RSGISInputStreamException(message);
+			std::string message = std::string("Could not open input text file: ") + inputfile;
+			throw rsgis::RSGISInputStreamException(message);
 		}
 		else
 		{
 			//cout << "ROI file open\n";
-			string strLine;
-			string word;
+			std::string strLine;
+			std::string word;
 			int lineCounter = 0;
 			int roicount = 0;
 			int headingsLine = 0;
@@ -124,8 +124,8 @@ namespace rsgis{namespace utils{
 			int variable = 0;
 			int dataindex = 0;
 			int dataStart = 0;
-			inputROIFile.seekg(ios_base::beg);
-			vector<string> *tokens = new vector<string>();
+			inputROIFile.seekg(std::ios_base::beg);
+            std::vector<std::string> *tokens = new std::vector<std::string>();
 			while(!inputROIFile.eof())
 			{
 				getline(inputROIFile, strLine);
@@ -140,10 +140,10 @@ namespace rsgis{namespace utils{
 						for(unsigned int i = 0; i < tokens->size(); i++)
 						{
 							//cout << i << ") " << tokens->at(i) << endl;
-							if(tokens->at(1) == string("ENVI") &
-							   tokens->at(2) == string("Output") &
-							   tokens->at(3) == string("of") &
-							   tokens->at(4) == string("ROIs"))
+							if(tokens->at(1) == std::string("ENVI") &
+							   tokens->at(2) == std::string("Output") &
+							   tokens->at(3) == std::string("of") &
+							   tokens->at(4) == std::string("ROIs"))
 							{
 								// correct file type;
 							}
@@ -172,11 +172,11 @@ namespace rsgis{namespace utils{
 							textUtils.tokenizeString(strLine, ' ', tokens, true);
 							//cout << "Number tokens = " << tokens->size() << endl;
 							int varDiff = 0;
-							string b1 = string("B1");
+							std::string b1 = std::string("B1");
 							for(unsigned int i = 0; i < tokens->size(); i++)
 							{
 								//cout << i << ") \'" << tokens->at(i) << "\'" << endl;
-								if(string(tokens->at(i)) == b1)
+								if(std::string(tokens->at(i)) == b1)
 								{
 									varDiff = i;
 								}
@@ -209,15 +209,15 @@ namespace rsgis{namespace utils{
 							for(unsigned int i = 0; i < tokens->size(); i++)
 							{
 								//cout << i << ") \'" << tokens->at(i) << "\'" << endl;
-								if(tokens->at(i) == string("; ROI name"))
+								if(tokens->at(i) == std::string("; ROI name"))
 								{
 									rois[roicount].name = tokens->at(i+1);
 								}
-								else if(tokens->at(i) == string("; ROI rgb value"))
+								else if(tokens->at(i) == std::string("; ROI rgb value"))
 								{
 									rois[roicount].colour = new RSGISColour();
 								}
-								else if(tokens->at(i) == string("; ROI npts"))
+								else if(tokens->at(i) == std::string("; ROI npts"))
 								{
 									rois[roicount].samples = strtol(tokens->at(1).c_str(), NULL, 10);
 									roicount++;

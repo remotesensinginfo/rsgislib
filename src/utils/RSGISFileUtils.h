@@ -33,31 +33,27 @@
 #include <sys/stat.h>
 #include "common/RSGISFileException.h"
 
-namespace rsgis 
-{
-	namespace utils
-	{
-        using namespace std;
+namespace rsgis{namespace utils{
         
-		class RSGISFileUtils
-		{
-			public: 
-				RSGISFileUtils();
-				void getDIRList(string dir, list<string> *files) throw(RSGISFileException);
-				void getDIRList(string dir, vector<string> *files) throw(RSGISFileException);
-				void getDIRList(string dir, string ext, list<string> *files, bool withpath) throw(RSGISFileException);
-				void getDIRList(string dir, string ext, vector<string> *files, bool withpath) throw(RSGISFileException);
-				string* getDIRList(string dir, string ext, int *numFiles, bool withpath) throw(RSGISFileException);
-				string* getFilesInDIRWithName(string dir, string name, int *numFiles) throw(RSGISFileException);
-				string getFileNameNoExtension(string filepath);
-				string getFileName(string filepath);
-				string removeExtension(string filepath);
-				string getExtension(string filepath);
-				string getFileDirectoryPath(string filepath);
-				bool checkFilePresent(string file);
-				~RSGISFileUtils();
-		};
-	}
-}
+    class RSGISFileUtils
+    {
+        public: 
+            RSGISFileUtils();
+            void getDIRList(std::string dir, std::list<std::string> *files) throw(RSGISFileException);
+            void getDIRList(std::string dir, std::vector<std::string> *files) throw(RSGISFileException);
+            void getDIRList(std::string dir, std::string ext, std::list<std::string> *files, bool withpath) throw(RSGISFileException);
+            void getDIRList(std::string dir, std::string ext, std::vector<std::string> *files, bool withpath) throw(RSGISFileException);
+            std::string* getDIRList(std::string dir, std::string ext, int *numFiles, bool withpath) throw(RSGISFileException);
+            std::string* getFilesInDIRWithName(std::string dir, std::string name, int *numFiles) throw(RSGISFileException);
+            std::string getFileNameNoExtension(std::string filepath);
+            std::string getFileName(std::string filepath);
+            std::string removeExtension(std::string filepath);
+            std::string getExtension(std::string filepath);
+            std::string getFileDirectoryPath(std::string filepath);
+            bool checkFilePresent(std::string file);
+            ~RSGISFileUtils();
+    };
+    
+}}
 
 #endif

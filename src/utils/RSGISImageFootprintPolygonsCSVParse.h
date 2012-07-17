@@ -37,14 +37,10 @@
 #include "math/RSGISMathsUtils.h"
 
 namespace rsgis{ namespace utils{
-	
-    using namespace std;
-    using namespace rsgis;
-    using namespace rsgis::math;
     
 	struct ImageFootPrintPoly
 	{
-		string scene;
+		std::string scene;
 		int fid;
 		double ulE;
 		double ulN;
@@ -60,8 +56,8 @@ namespace rsgis{ namespace utils{
 	{
 		public:
 			RSGISImageFootprintPolygonsCSVParse();
-			vector<ImageFootPrintPoly*>* parsePoly(string inputfile) throw(RSGISInputStreamException,RSGISTextException);
-			string formatedString(ImageFootPrintPoly *poly);
+            std::vector<ImageFootPrintPoly*>* parsePoly(std::string inputfile) throw(rsgis::RSGISInputStreamException,RSGISTextException);
+			std::string formatedString(ImageFootPrintPoly *poly);
 			~RSGISImageFootprintPolygonsCSVParse();
 	};
 }}

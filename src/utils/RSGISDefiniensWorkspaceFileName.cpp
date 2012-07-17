@@ -25,30 +25,30 @@
 
 namespace rsgis{namespace utils{
 	
-	RSGISDefiniensWorkspaceFileName::RSGISDefiniensWorkspaceFileName(string filename) 
+	RSGISDefiniensWorkspaceFileName::RSGISDefiniensWorkspaceFileName(std::string filename) 
 	{
 		this->parseFileName(filename);
 		this->oldVersion = false;
 	}
 	
-	const string RSGISDefiniensWorkspaceFileName::getFileName() const
+	const std::string RSGISDefiniensWorkspaceFileName::getFileName() const
 	{
-		RSGISMathsUtils mathsUtils;
-		string filename = start + string(".tile") + tileNumStr + string(".v") + mathsUtils.inttostring(version) + extension;
+		rsgis::math::RSGISMathsUtils mathsUtils;
+		std::string filename = start + std::string(".tile") + tileNumStr + std::string(".v") + mathsUtils.inttostring(version) + extension;
 		return filename;
 	}
 	
-	string RSGISDefiniensWorkspaceFileName::getFileNameWithPath()
+	std::string RSGISDefiniensWorkspaceFileName::getFileNameWithPath()
 	{
-		RSGISMathsUtils mathsUtils;
-		string filename = path + start + string(".tile") + tileNumStr + string(".v") + mathsUtils.inttostring(version) + extension;
+		rsgis::math::RSGISMathsUtils mathsUtils;
+		std::string filename = path + start + std::string(".tile") + tileNumStr + std::string(".v") + mathsUtils.inttostring(version) + extension;
 		return filename;
 	}
 	
-	string RSGISDefiniensWorkspaceFileName::getFileNameNoExtension()
+	std::string RSGISDefiniensWorkspaceFileName::getFileNameNoExtension()
 	{
-		RSGISMathsUtils mathsUtils;
-		string filename = start + string(".tile") + tileNumStr + string(".v") + mathsUtils.inttostring(version);
+		rsgis::math::RSGISMathsUtils mathsUtils;
+		std::string filename = start + std::string(".tile") + tileNumStr + std::string(".v") + mathsUtils.inttostring(version);
 		return filename;
 	}
 	
@@ -62,7 +62,7 @@ namespace rsgis{namespace utils{
 		return this->version;
 	}
 	
-	string RSGISDefiniensWorkspaceFileName::getBaseName()
+	std::string RSGISDefiniensWorkspaceFileName::getBaseName()
 	{
 		return this->start;
 	}
@@ -77,7 +77,7 @@ namespace rsgis{namespace utils{
 		return this->oldVersion;
 	}
 	
-	ostream& operator<<(ostream& ostr, const RSGISDefiniensWorkspaceFileName& name)
+    std::ostream& operator<<(std::ostream& ostr, const RSGISDefiniensWorkspaceFileName& name)
 	{
 		ostr << name.getFileName();
 		if(name.getOldVersion())
@@ -87,7 +87,7 @@ namespace rsgis{namespace utils{
 		return ostr;
 	}
 	
-	ostream& RSGISDefiniensWorkspaceFileName::operator<<(ostream& ostr)
+	std::ostream& RSGISDefiniensWorkspaceFileName::operator<<(std::ostream& ostr)
 	{
 		ostr << start << ".tile" << tile << ".v" << version << "." << extension;
 		if(oldVersion)
@@ -204,28 +204,28 @@ namespace rsgis{namespace utils{
 		return false;
 	}
 	
-	void RSGISDefiniensWorkspaceFileName::parseFileName(string filename)
+	void RSGISDefiniensWorkspaceFileName::parseFileName(std::string filename)
 	{
 		RSGISFileUtils fileUtils;
-		RSGISMathsUtils mathsUtils;
+        rsgis::math::RSGISMathsUtils mathsUtils;
 		//cout << "Parsing filename: " << filename << endl;
 		this->path = fileUtils.getFileDirectoryPath(filename);
 		//cout << "Path: " << this->path << endl;
 		this->extension = fileUtils.getExtension(filename);
 		//cout << "Extension: \'" << this->extension << "\'" << endl;
-		string filenameNoExtension = fileUtils.getFileNameNoExtension(filename);
+		std::string filenameNoExtension = fileUtils.getFileNameNoExtension(filename);
 		//cout << "File Name no extension: " << filenameNoExtension << endl;
-		string versionStr = fileUtils.getExtension(filenameNoExtension);
-		//cout << "Version (String): " << versionStr << endl;
-		string versionNumStr = versionStr.substr(2);
-		//cout << "Version Number Only (as string): \'" << versionNumStr << "\'" << endl;
+		std::string versionStr = fileUtils.getExtension(filenameNoExtension);
+		//cout << "Version (std::string): " << versionStr << endl;
+		std::string versionNumStr = versionStr.substr(2);
+		//cout << "Version Number Only (as std::string): \'" << versionNumStr << "\'" << endl;
 		this->version = mathsUtils.strtoint(versionNumStr);
 		//cout << "Version: " << this->version << endl;
-		string filenameNoVersion = fileUtils.getFileNameNoExtension(filenameNoExtension);
-		string tileStr = fileUtils.getExtension(filenameNoVersion);
-		//cout << "Tile (String): " << tileStr << endl;
+		std::string filenameNoVersion = fileUtils.getFileNameNoExtension(filenameNoExtension);
+		std::string tileStr = fileUtils.getExtension(filenameNoVersion);
+		//cout << "Tile (std::string): " << tileStr << endl;
 		this->tileNumStr = tileStr.substr(5);
-		//cout << "Tile Number Only (as string): \'" << tileNumStr << "\'" << endl;
+		//cout << "Tile Number Only (as std::string): \'" << tileNumStr << "\'" << endl;
 		this->tile = mathsUtils.strtoint(tileNumStr);
 		//cout << "tile: " << this->tile << endl;
 		this->start = fileUtils.getFileNameNoExtension(filenameNoVersion);

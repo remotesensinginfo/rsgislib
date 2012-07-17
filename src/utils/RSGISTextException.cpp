@@ -25,17 +25,17 @@
 
 namespace rsgis{namespace utils{
 	
-	RSGISTextException::RSGISTextException() : RSGISException("A RSGISTextException has been created..")
+	RSGISTextException::RSGISTextException() : rsgis::RSGISException("A RSGISTextException has been created..")
 	{
 		
 	}
 	
-	RSGISTextException::RSGISTextException(const char* message) : RSGISException(message)
+	RSGISTextException::RSGISTextException(const char* message) : rsgis::RSGISException(message)
 	{
 		
 	}
 	
-	RSGISTextException::RSGISTextException(string message) : RSGISException(message)
+	RSGISTextException::RSGISTextException(std::string message) : rsgis::RSGISException(message)
 	{
 		
 	}

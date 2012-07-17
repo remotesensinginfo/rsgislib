@@ -30,14 +30,14 @@ namespace rsgis{namespace utils{
 		
 	}
 	
-	size_t RSGISTextUtils::countLines(string input)throw(RSGISTextException)
+	size_t RSGISTextUtils::countLines(std::string input)throw(RSGISTextException)
 	{
 		size_t count = 0;
-		ifstream inputFile;
+        std::ifstream inputFile;
 		inputFile.open(input.c_str());
 		if(inputFile.is_open())
 		{
-			string strLine;		
+			std::string strLine;		
 			while(!inputFile.eof())
 			{
 				getline(inputFile, strLine, '\n');
@@ -49,19 +49,19 @@ namespace rsgis{namespace utils{
 		}
 		else
 		{
-			string message = string("Text file ") + input + string(" could not be openned.");
+			std::string message = std::string("Text file ") + input + std::string(" could not be openned.");
 			throw RSGISTextException(message.c_str());
 		}
 		
 		return count;
 	}
 	
-	void RSGISTextUtils::transpose(string input, string output, string delimiter) throw(RSGISTextException)
+	void RSGISTextUtils::transpose(std::string input, std::string output, std::string delimiter) throw(RSGISTextException)
 	{
 		
 	}
 	
-	bool RSGISTextUtils::lineStart(string line, char token)
+	bool RSGISTextUtils::lineStart(std::string line, char token)
 	{
 		int lineLength = line.length();
 		for(int i = 0; i < lineLength; i++)
@@ -82,7 +82,7 @@ namespace rsgis{namespace utils{
 		return false;
 	}
 	
-	bool RSGISTextUtils::blankline(string line)
+	bool RSGISTextUtils::blankline(std::string line)
 	{
 		int lineLength = line.length();
 		if(lineLength == 1)
@@ -106,9 +106,9 @@ namespace rsgis{namespace utils{
 		return true;
 	}
 	
-	void RSGISTextUtils::tokenizeString(string line, char token, vector<string> *tokens, bool ignoreDuplicateTokens, bool trimWhitespace)
+	void RSGISTextUtils::tokenizeString(std::string line, char token, std::vector<std::string> *tokens, bool ignoreDuplicateTokens, bool trimWhitespace)
 	{
-		string word;
+		std::string word;
 		int start = 0;
 		int lineLength = line.length();
 		for(int i = 0; i < lineLength; i++)
@@ -122,7 +122,7 @@ namespace rsgis{namespace utils{
 					{
                         if(trimWhitespace)
                         {
-                            trim(word);
+                            boost::trim(word);
                         }
 						tokens->push_back(word);
 					}
@@ -131,7 +131,7 @@ namespace rsgis{namespace utils{
 				{
                     if(trimWhitespace)
                     {
-                        trim(word);
+                        boost::trim(word);
                     }
 					tokens->push_back(word);
 				}
@@ -142,29 +142,29 @@ namespace rsgis{namespace utils{
 		word = line.substr(start);
         if(trimWhitespace)
         {
-            trim(word);
+            boost::trim(word);
         }
 		tokens->push_back(word);
 	}
 	
-	string RSGISTextUtils::removeNewLine(string line)
+	std::string RSGISTextUtils::removeNewLine(std::string line)
 	{
 		int lineLength = line.length();
-		string output = line.substr(0, lineLength-1);
+		std::string output = line.substr(0, lineLength-1);
 		return output;
 	}
 	
-	string RSGISTextUtils::readFileToString(string input) throw(RSGISTextException)
+	std::string RSGISTextUtils::readFileToString(std::string input) throw(RSGISTextException)
 	{
-		string wholeFile = "";
-		ifstream inputFileStream;
-		inputFileStream.open(input.c_str(), ios_base::in);
+		std::string wholeFile = "";
+		std::ifstream inputFileStream;
+		inputFileStream.open(input.c_str(), std::ios_base::in);
 		if(!inputFileStream.is_open())
 		{
 			throw RSGISTextException("File could not be opened.");
 		}
 		
-		string strLine = "";
+		std::string strLine = "";
 		bool lineEnding = false;
 		char ch, lastch;
 		inputFileStream.get(ch);
@@ -203,21 +203,21 @@ namespace rsgis{namespace utils{
 		return wholeFile;
 	}
     
-    void RSGISTextUtils::writeStringToFile(string file, string output) throw(RSGISTextException)
+    void RSGISTextUtils::writeStringToFile(std::string file, std::string output) throw(RSGISTextException)
     {
         try 
         {
-            ofstream outFile;
+            std::ofstream outFile;
             outFile.open(file.c_str());
             if(outFile.is_open())
             {
-                outFile << output << endl;
+                outFile << output << std::endl;
                 outFile.flush();
                 outFile.close();
             }
             else 
             {
-                string message = string("File \'") + file + string("\' could not be created.");
+                std::string message = std::string("File \'") + file + std::string("\' could not be created.");
                 throw RSGISTextException(message);
             }
             
@@ -228,290 +228,290 @@ namespace rsgis{namespace utils{
         }
     }
 	
-	double RSGISTextUtils::strtodouble(string inValue) throw(RSGISTextException)
+	double RSGISTextUtils::strtodouble(std::string inValue) throw(RSGISTextException)
 	{
 		double outValue = 0;
 		try
         {
-            outValue = lexical_cast<double>(inValue);
+            outValue = boost::lexical_cast<double>(inValue);
         }
-        catch(bad_lexical_cast &e)
+        catch(boost::bad_lexical_cast &e)
         {
-			string message = string("Trying to convert \"") + inValue + string("\" - ") + string(e.what());
+			std::string message = std::string("Trying to convert \"") + inValue + std::string("\" - ") + std::string(e.what());
             throw RSGISTextException(message);
         }
 		return outValue;
 	}
 	
-	float RSGISTextUtils::strtofloat(string inValue) throw(RSGISTextException)
+	float RSGISTextUtils::strtofloat(std::string inValue) throw(RSGISTextException)
 	{
 		float outValue = 0;
 		try
         {
-            outValue = lexical_cast<float>(inValue);
+            outValue = boost::lexical_cast<float>(inValue);
         }
-        catch(bad_lexical_cast &e)
+        catch(boost::bad_lexical_cast &e)
         {
-            string message = string("Trying to convert \"") + inValue + string("\" - ") + string(e.what());
+            std::string message = std::string("Trying to convert \"") + inValue + std::string("\" - ") + std::string(e.what());
             throw RSGISTextException(message);
         }
 		return outValue;
 	}
 	
-	uint_fast8_t RSGISTextUtils::strto8bitUInt(string inValue) throw(RSGISTextException)
+	uint_fast8_t RSGISTextUtils::strto8bitUInt(std::string inValue) throw(RSGISTextException)
 	{
 		uint_fast8_t outValue = 0;
 		try
         {
-            outValue = lexical_cast<uint_fast8_t>(inValue);
+            outValue = boost::lexical_cast<uint_fast8_t>(inValue);
         }
-        catch(bad_lexical_cast &e)
+        catch(boost::bad_lexical_cast &e)
         {
-            string message = string("Trying to convert \"") + inValue + string("\" - ") + string(e.what());
+            std::string message = std::string("Trying to convert \"") + inValue + std::string("\" - ") + std::string(e.what());
             throw RSGISTextException(message);
         }
 		return outValue;
 	}
 	
-	uint_fast16_t RSGISTextUtils::strto16bitUInt(string inValue) throw(RSGISTextException)
+	uint_fast16_t RSGISTextUtils::strto16bitUInt(std::string inValue) throw(RSGISTextException)
 	{
 		uint_fast16_t outValue = 0;
 		try
         {
-            outValue = lexical_cast<uint_fast16_t>(inValue);
+            outValue = boost::lexical_cast<uint_fast16_t>(inValue);
         }
-        catch(bad_lexical_cast &e)
+        catch(boost::bad_lexical_cast &e)
         {
-            string message = string("Trying to convert \"") + inValue + string("\" - ") + string(e.what());
+            std::string message = std::string("Trying to convert \"") + inValue + std::string("\" - ") + std::string(e.what());
             throw RSGISTextException(message);
         }
 		return outValue;
 	}
 	
-	uint_fast32_t RSGISTextUtils::strto32bitUInt(string inValue) throw(RSGISTextException)
+	uint_fast32_t RSGISTextUtils::strto32bitUInt(std::string inValue) throw(RSGISTextException)
 	{
 		uint_fast32_t outValue = 0;
 		try
         {
-            outValue = lexical_cast<uint_fast32_t>(inValue);
+            outValue = boost::lexical_cast<uint_fast32_t>(inValue);
         }
-        catch(bad_lexical_cast &e)
+        catch(boost::bad_lexical_cast &e)
         {
-            string message = string("Trying to convert \"") + inValue + string("\" - ") + string(e.what());
+            std::string message = std::string("Trying to convert \"") + inValue + std::string("\" - ") + std::string(e.what());
             throw RSGISTextException(message);
         }
 		return outValue;
 	}
 	
-	uint_fast64_t RSGISTextUtils::strto64bitUInt(string inValue) throw(RSGISTextException)
+	uint_fast64_t RSGISTextUtils::strto64bitUInt(std::string inValue) throw(RSGISTextException)
 	{
 		uint_fast64_t outValue = 0;
 		try
         {
-            outValue = lexical_cast<uint_fast64_t>(inValue);
+            outValue = boost::lexical_cast<uint_fast64_t>(inValue);
         }
-        catch(bad_lexical_cast &e)
+        catch(boost::bad_lexical_cast &e)
         {
-            string message = string("Trying to convert \"") + inValue + string("\" - ") + string(e.what());
+            std::string message = std::string("Trying to convert \"") + inValue + std::string("\" - ") + std::string(e.what());
             throw RSGISTextException(message);
         }
 		return outValue;
 	}
 	
-	int_fast8_t RSGISTextUtils::strto8bitInt(string inValue) throw(RSGISTextException)
+	int_fast8_t RSGISTextUtils::strto8bitInt(std::string inValue) throw(RSGISTextException)
 	{
 		int_fast8_t outValue = 0;
 		try
         {
-            outValue = lexical_cast<int_fast8_t>(inValue);
+            outValue = boost::lexical_cast<int_fast8_t>(inValue);
         }
-        catch(bad_lexical_cast &e)
+        catch(boost::bad_lexical_cast &e)
         {
-            string message = string("Trying to convert \"") + inValue + string("\" - ") + string(e.what());
+            std::string message = std::string("Trying to convert \"") + inValue + std::string("\" - ") + std::string(e.what());
             throw RSGISTextException(message);
         }
 		return outValue;
 	}
 	
-	int_fast16_t RSGISTextUtils::strto16bitInt(string inValue) throw(RSGISTextException)
+	int_fast16_t RSGISTextUtils::strto16bitInt(std::string inValue) throw(RSGISTextException)
 	{
 		int_fast16_t outValue = 0;
 		try
         {
-            outValue = lexical_cast<int_fast16_t>(inValue);
+            outValue = boost::lexical_cast<int_fast16_t>(inValue);
         }
-        catch(bad_lexical_cast &e)
+        catch(boost::bad_lexical_cast &e)
         {
-            string message = string("Trying to convert \"") + inValue + string("\" - ") + string(e.what());
+            std::string message = std::string("Trying to convert \"") + inValue + std::string("\" - ") + std::string(e.what());
             throw RSGISTextException(message);
         }
 		return outValue;
 	}
 	
-	int_fast32_t RSGISTextUtils::strto32bitInt(string inValue) throw(RSGISTextException)
+	int_fast32_t RSGISTextUtils::strto32bitInt(std::string inValue) throw(RSGISTextException)
 	{
 		int_fast32_t outValue = 0;
 		try
         {
-            outValue = lexical_cast<int_fast32_t>(inValue);
+            outValue = boost::lexical_cast<int_fast32_t>(inValue);
         }
-        catch(bad_lexical_cast &e)
+        catch(boost::bad_lexical_cast &e)
         {
-            string message = string("Trying to convert \"") + inValue + string("\" - ") + string(e.what());
+            std::string message = std::string("Trying to convert \"") + inValue + std::string("\" - ") + std::string(e.what());
             throw RSGISTextException(message);
         }
 		return outValue;
 	}
 	
-	int_fast64_t RSGISTextUtils::strto64bitInt(string inValue) throw(RSGISTextException)
+	int_fast64_t RSGISTextUtils::strto64bitInt(std::string inValue) throw(RSGISTextException)
 	{
 		int_fast64_t outValue = 0;
 		try
         {
-            outValue = lexical_cast<int_fast64_t>(inValue);
+            outValue = boost::lexical_cast<int_fast64_t>(inValue);
         }
-        catch(bad_lexical_cast &e)
+        catch(boost::bad_lexical_cast &e)
         {
-            string message = string("Trying to convert \"") + inValue + string("\" - ") + string(e.what());
+            std::string message = std::string("Trying to convert \"") + inValue + std::string("\" - ") + std::string(e.what());
             throw RSGISTextException(message);
         }
 		return outValue;
 	}
 	
-	string RSGISTextUtils::doubletostring(double number) throw(RSGISTextException)
+	std::string RSGISTextUtils::doubletostring(double number) throw(RSGISTextException)
 	{
-		string outValue = "";
+		std::string outValue = "";
 		try
         {
-            outValue = lexical_cast<string>(number);
+            outValue = boost::lexical_cast<std::string>(number);
         }
-        catch(bad_lexical_cast &e)
+        catch(boost::bad_lexical_cast &e)
         {
             throw RSGISTextException(e.what());
         }
 		return outValue;
 	}
 	
-	string RSGISTextUtils::floattostring(float number) throw(RSGISTextException)
+	std::string RSGISTextUtils::floattostring(float number) throw(RSGISTextException)
 	{
-		string outValue = "";
+		std::string outValue = "";
 		try
         {
-            outValue = lexical_cast<string>(number);
+            outValue = boost::lexical_cast<std::string>(number);
         }
-        catch(bad_lexical_cast &e)
+        catch(boost::bad_lexical_cast &e)
         {
             throw RSGISTextException(e.what());
         }
 		return outValue;
 	}
 	
-	string RSGISTextUtils::uInt8bittostring(uint_fast8_t number) throw(RSGISTextException)
+	std::string RSGISTextUtils::uInt8bittostring(uint_fast8_t number) throw(RSGISTextException)
 	{
-		string outValue = "";
+		std::string outValue = "";
 		try
         {
-            outValue = lexical_cast<string>(number);
+            outValue = boost::lexical_cast<std::string>(number);
         }
-        catch(bad_lexical_cast &e)
+        catch(boost::bad_lexical_cast &e)
         {
             throw RSGISTextException(e.what());
         }
 		return outValue;
 	}
 	
-	string RSGISTextUtils::uInt16bittostring(uint_fast16_t number) throw(RSGISTextException)
+	std::string RSGISTextUtils::uInt16bittostring(uint_fast16_t number) throw(RSGISTextException)
 	{
-		string outValue = "";
+		std::string outValue = "";
 		try
         {
-            outValue = lexical_cast<string>(number);
+            outValue = boost::lexical_cast<std::string>(number);
         }
-        catch(bad_lexical_cast &e)
+        catch(boost::bad_lexical_cast &e)
         {
             throw RSGISTextException(e.what());
         }
 		return outValue;
 	}
 	
-	string RSGISTextUtils::uInt32bittostring(uint_fast32_t number) throw(RSGISTextException)
+	std::string RSGISTextUtils::uInt32bittostring(uint_fast32_t number) throw(RSGISTextException)
 	{
-		string outValue = "";
+		std::string outValue = "";
 		try
         {
-            outValue = lexical_cast<string>(number);
+            outValue = boost::lexical_cast<std::string>(number);
         }
-        catch(bad_lexical_cast &e)
+        catch(boost::bad_lexical_cast &e)
         {
             throw RSGISTextException(e.what());
         }
 		return outValue;
 	}
 	
-	string RSGISTextUtils::uInt64bittostring(uint_fast64_t number) throw(RSGISTextException)
+	std::string RSGISTextUtils::uInt64bittostring(uint_fast64_t number) throw(RSGISTextException)
 	{
-		string outValue = "";
+		std::string outValue = "";
 		try
         {
-            outValue = lexical_cast<string>(number);
+            outValue = boost::lexical_cast<std::string>(number);
         }
-        catch(bad_lexical_cast &e)
+        catch(boost::bad_lexical_cast &e)
         {
             throw RSGISTextException(e.what());
         }
 		return outValue;
 	}
 	
-	string RSGISTextUtils::int8bittostring(int_fast8_t number) throw(RSGISTextException)
+	std::string RSGISTextUtils::int8bittostring(int_fast8_t number) throw(RSGISTextException)
 	{
-		string outValue = "";
+		std::string outValue = "";
 		try
         {
-            outValue = lexical_cast<string>(number);
+            outValue = boost::lexical_cast<std::string>(number);
         }
-        catch(bad_lexical_cast &e)
+        catch(boost::bad_lexical_cast &e)
         {
             throw RSGISTextException(e.what());
         }
 		return outValue;
 	}
 	
-	string RSGISTextUtils::int16bittostring(int_fast16_t number) throw(RSGISTextException)
+	std::string RSGISTextUtils::int16bittostring(int_fast16_t number) throw(RSGISTextException)
 	{
-		string outValue = "";
+		std::string outValue = "";
 		try
         {
-            outValue = lexical_cast<string>(number);
+            outValue = boost::lexical_cast<std::string>(number);
         }
-        catch(bad_lexical_cast &e)
+        catch(boost::bad_lexical_cast &e)
         {
             throw RSGISTextException(e.what());
         }
 		return outValue;
 	}
 	
-	string RSGISTextUtils::int32bittostring(int_fast32_t number) throw(RSGISTextException)
+	std::string RSGISTextUtils::int32bittostring(int_fast32_t number) throw(RSGISTextException)
 	{
-		string outValue = "";
+		std::string outValue = "";
 		try
         {
-            outValue = lexical_cast<string>(number);
+            outValue = boost::lexical_cast<std::string>(number);
         }
-        catch(bad_lexical_cast &e)
+        catch(boost::bad_lexical_cast &e)
         {
             throw RSGISTextException(e.what());
         }
 		return outValue;
 	}
 	
-	string RSGISTextUtils::int64bittostring(int_fast64_t number) throw(RSGISTextException)
+	std::string RSGISTextUtils::int64bittostring(int_fast64_t number) throw(RSGISTextException)
 	{
-		string outValue = "";
+		std::string outValue = "";
 		try
         {
-            outValue = lexical_cast<string>(number);
+            outValue = boost::lexical_cast<std::string>(number);
         }
-        catch(bad_lexical_cast &e)
+        catch(boost::bad_lexical_cast &e)
         {
             throw RSGISTextException(e.what());
         }
@@ -532,9 +532,9 @@ namespace rsgis{namespace utils{
 		
 	}
 	
-	void RSGISTextFileLineReader::openFile(string filepath)throw(RSGISTextException)
+	void RSGISTextFileLineReader::openFile(std::string filepath)throw(RSGISTextException)
 	{
-		inputFileStream.open(filepath.c_str(), ios_base::in);
+		inputFileStream.open(filepath.c_str(), std::ios_base::in);
 		if(!inputFileStream.is_open())
 		{
 			throw RSGISTextException("File could not be opened.");
@@ -551,9 +551,9 @@ namespace rsgis{namespace utils{
 		return true;
 	}
 	
-	string RSGISTextFileLineReader::readLine()throw(RSGISTextException)
+	std::string RSGISTextFileLineReader::readLine()throw(RSGISTextException)
 	{
-		string strLine = "";
+		std::string strLine = "";
 		bool lineEnding = false;
 		char ch, lastch;
 		inputFileStream.get(ch);
