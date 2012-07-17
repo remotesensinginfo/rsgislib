@@ -80,6 +80,7 @@
 
 namespace rsgisexe{
 
+    /*
 using namespace std;
 using namespace xercesc;
 using namespace rsgis;
@@ -88,8 +89,9 @@ using namespace rsgis::img;
 using namespace rsgis::utils;
 using namespace rsgis::vec;
 using namespace rsgis::datastruct;
+     */
 
-class RSGISExeImageUtils : public RSGISAlgorithmParameters
+class RSGISExeImageUtils : public rsgis::RSGISAlgorithmParameters
 	{
 	public:
 		
@@ -149,34 +151,34 @@ class RSGISExeImageUtils : public RSGISAlgorithmParameters
 		};
 		
 		RSGISExeImageUtils();
-		virtual RSGISAlgorithmParameters* getInstance();
-		virtual void retrieveParameters(DOMElement *argElement) throw(RSGISXMLArgumentsException);
-		virtual void runAlgorithm() throw(RSGISException);
+		virtual rsgis::RSGISAlgorithmParameters* getInstance();
+		virtual void retrieveParameters(xercesc::DOMElement *argElement) throw(rsgis::RSGISXMLArgumentsException);
+		virtual void runAlgorithm() throw(rsgis::RSGISException);
 		virtual void printParameters();
-		virtual string getDescription();
-		virtual string getXMLSchema();
+		virtual std::string getDescription();
+		virtual std::string getXMLSchema();
 		virtual void help();
 		~RSGISExeImageUtils();
 	protected:
 		options option;
 		interpolators interpolator;
 		stretches stretchType;
-		string inputImage;
-		string outputImage;
-		string *inputImages;
-		string inputVector;
-        string inputCSV;
-		string outputFile;
-		string filenameAttribute;
-		string imageMask;
-		string inputDIR;
-		string outputDIR;
-		string inMatrixfile;
-		string proj;
-        string projFile;
-        string imageFormat;
-        string lutMatrixFile;
-		ClassColour **classColour;
+		std::string inputImage;
+		std::string outputImage;
+		std::string *inputImages;
+		std::string inputVector;
+        std::string inputCSV;
+		std::string outputFile;
+		std::string filenameAttribute;
+		std::string imageMask;
+		std::string inputDIR;
+		std::string outputDIR;
+		std::string inMatrixfile;
+		std::string proj;
+        std::string projFile;
+        std::string imageFormat;
+        std::string lutMatrixFile;
+        rsgis::img::ClassColour **classColour;
 		float nodataValue;
 		float skipValue;
 		float skipUpperThreash;
@@ -190,7 +192,7 @@ class RSGISExeImageUtils : public RSGISAlgorithmParameters
 		bool projFromImage;
 		int imgBand1;
 		int imgBand2;
-		string bandFloatValuesVector;
+		std::string bandFloatValuesVector;
 		int order;
 		int window;
 		int height;
@@ -209,20 +211,20 @@ class RSGISExeImageUtils : public RSGISAlgorithmParameters
 		float upperRangeValue;
 		bool mosaicSkipVals;
 		bool mosaicSkipThreash;
-		noiseType noise;
+		rsgis::img::noiseType noise;
 		float scale;
         bool definiensTiles;
 		int panWinSize;
         bool processInMemory;
         unsigned int compositeBands;
-        compositeStat outCompStat;
+        rsgis::img::compositeStat outCompStat;
         bool ignoreZeros;
         GDALDataType outDataType;
         bool calcImgPyramids;
         bool useIgnoreVal;
         bool bandsDefined;
-        vector<int> bands;
-        string outKMLFile;
+        std::vector<int> bands;
+        std::string outKMLFile;
 	};
 }
 #endif
