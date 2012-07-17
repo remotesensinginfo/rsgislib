@@ -24,17 +24,17 @@
 
 namespace rsgis{namespace geom{
 	
-	RSGISGeometryException::RSGISGeometryException() : RSGISException("A RSGISGeometryException has been created..")
+	RSGISGeometryException::RSGISGeometryException() : rsgis::RSGISException("A RSGISGeometryException has been created..")
 	{
 		
 	}
 	
-	RSGISGeometryException::RSGISGeometryException(const char* message) : RSGISException(message)
+	RSGISGeometryException::RSGISGeometryException(const char* message) : rsgis::RSGISException(message)
 	{
 		
 	}
 	
-	RSGISGeometryException::RSGISGeometryException(string message) : RSGISException(message)
+	RSGISGeometryException::RSGISGeometryException(std::string message) : rsgis::RSGISException(message)
 	{
 		
 	}

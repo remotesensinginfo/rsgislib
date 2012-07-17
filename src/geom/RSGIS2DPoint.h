@@ -31,19 +31,16 @@
 
 #include "geos/geom/Coordinate.h"
 
-using namespace std;
-using namespace geos::geom;
-
 namespace rsgis{namespace geom{
 	
 	class RSGIS2DPoint
 		{
 		public:
 			RSGIS2DPoint();
-			RSGIS2DPoint(Coordinate *pt);
-			RSGIS2DPoint(Coordinate *pt, int classID);
-			virtual void setPoint(Coordinate *pt);
-			virtual const Coordinate* getPoint();
+			RSGIS2DPoint(geos::geom::Coordinate *pt);
+			RSGIS2DPoint(geos::geom::Coordinate *pt, int classID);
+			virtual void setPoint(geos::geom::Coordinate *pt);
+			virtual const geos::geom::Coordinate* getPoint();
 			virtual double getX();
 			virtual double getY();
 			virtual double getZ();
@@ -54,9 +51,9 @@ namespace rsgis{namespace geom{
 			virtual void setClassID(unsigned int classID);
 			virtual unsigned int getClassID();
 			virtual double distance(RSGIS2DPoint *pt);
-			virtual double distance(Coordinate *pt);
-			friend ostream& operator<<(ostream& ostr, const RSGIS2DPoint& pt);
-			ostream& operator<<(ostream& ostr);
+			virtual double distance(geos::geom::Coordinate *pt);
+			friend std::ostream& operator<<(std::ostream& ostr, const RSGIS2DPoint& pt);
+            std::ostream& operator<<(std::ostream& ostr);
 			bool operator==(RSGIS2DPoint pt) const;
 			bool operator!=(RSGIS2DPoint pt) const;
 			bool operator>(RSGIS2DPoint pt) const;
@@ -71,7 +68,7 @@ namespace rsgis{namespace geom{
 			bool operator<=(RSGIS2DPoint *pt) const;
 			virtual ~RSGIS2DPoint();
 		protected:
-			Coordinate *point;
+			geos::geom::Coordinate *point;
 			int index;
 			bool touched;
 			unsigned int classID;

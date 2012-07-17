@@ -29,15 +29,15 @@ namespace rsgis{namespace geom{
 		
 	}
 	
-	RSGISPolygon::RSGISPolygon(Polygon *poly)
+	RSGISPolygon::RSGISPolygon(geos::geom::Polygon *poly)
 	{
 		this->setPolygon(poly);
 	}
 	
-	void RSGISPolygon::setPolygon(Polygon *poly)
+	void RSGISPolygon::setPolygon(geos::geom::Polygon *poly)
 	{
 		this->poly = poly;
-		this->point = new Coordinate();
+		this->point = new geos::geom::Coordinate();
 		this->poly->getCentroid(*this->point);
 		//cout << "Centroid = [" << this->point->x << "," << this->point->y << "]" << endl;
 		
@@ -54,13 +54,13 @@ namespace rsgis{namespace geom{
 				cout << "Y has value NaN\n";
 			}
 			
-			const LineString *lineStringPoly = poly->getExteriorRing();
-			const CoordinateSequence *coorSeq = lineStringPoly->getCoordinatesRO();
+			const geos::geom::LineString *lineStringPoly = poly->getExteriorRing();
+			const geos::geom::CoordinateSequence *coorSeq = lineStringPoly->getCoordinatesRO();
 			int numPts = coorSeq->getSize();
 			cout << "Polygon has " << poly->getNumPoints() << " points\n"; 
 			cout << "CoordinateSequence has " << numPts << " points\n"; 
 			
-			Coordinate coord;
+			geos::geom::Coordinate coord;
 			for(int i = 0; i < numPts; i++)
 			{
 				coorSeq->getAt(i, coord);
@@ -69,39 +69,39 @@ namespace rsgis{namespace geom{
 		}
 	}
 	
-	Polygon* RSGISPolygon::getPolygon()
+	geos::geom::Polygon* RSGISPolygon::getPolygon()
 	{
 		return this->poly;
 	}
 	
-	void RSGISPolygon::getPoints(list<RSGIS2DPoint*> *pts)
+	void RSGISPolygon::getPoints(std::list<RSGIS2DPoint*> *pts)
 	{
 		if(poly != NULL)
 		{
-			CoordinateSequence *coords = poly->getCoordinates();
-			Coordinate coord;
+			geos::geom::CoordinateSequence *coords = poly->getCoordinates();
+			geos::geom::Coordinate coord;
 			RSGIS2DPoint *pt = NULL;
 			for(unsigned int i = 0; i < coords->getSize(); i++)
 			{
 				coord = coords->getAt(i);
-				pt = new RSGIS2DPoint(new Coordinate(coord.x, coord.y, coord.z));
+				pt = new RSGIS2DPoint(new geos::geom::Coordinate(coord.x, coord.y, coord.z));
 				pts->push_back(pt);
 			}
 			delete coords;
 		}
 	}
 	
-	void RSGISPolygon::getPoints(list<RSGIS2DPoint*> *pts, unsigned int classID)
+	void RSGISPolygon::getPoints(std::list<RSGIS2DPoint*> *pts, unsigned int classID)
 	{
 		if(poly != NULL)
 		{
-			CoordinateSequence *coords = poly->getCoordinates();
-			Coordinate coord;
+			geos::geom::CoordinateSequence *coords = poly->getCoordinates();
+			geos::geom::Coordinate coord;
 			RSGIS2DPoint *pt = NULL;
 			for(unsigned int i = 0; i < coords->getSize(); i++)
 			{
 				coord = coords->getAt(i);
-				pt = new RSGIS2DPoint(new Coordinate(coord.x, coord.y, coord.z));
+				pt = new RSGIS2DPoint(new geos::geom::Coordinate(coord.x, coord.y, coord.z));
 				pt->setClassID(classID);
 				pts->push_back(pt);
 			}

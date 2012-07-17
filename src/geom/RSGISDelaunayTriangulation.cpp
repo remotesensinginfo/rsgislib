@@ -26,10 +26,10 @@ namespace rsgis{namespace geom{
 	
 	RSGISDelaunayTriangulation::RSGISDelaunayTriangulation(RSGIS2DPoint *a, RSGIS2DPoint *b, RSGIS2DPoint *c)
 	{
-		this->triangleList = new list<RSGISTriangle*>();
+		this->triangleList = new std::list<RSGISTriangle*>();
 		RSGISTriangle *tri = new RSGISTriangle(a, b, c);
 		triangleList->push_back(tri);
-		this->bbox = new Envelope();
+		this->bbox = new geos::geom::Envelope();
 		this->bbox->expandToInclude(tri->getBBox());
 		this->aOuter = a;
 		this->bOuter = b;
@@ -38,24 +38,24 @@ namespace rsgis{namespace geom{
 	
 	RSGISDelaunayTriangulation::RSGISDelaunayTriangulation(RSGISTriangle *tri)
 	{
-		this->triangleList = new list<RSGISTriangle*>();
+		this->triangleList = new std::list<RSGISTriangle*>();
 		triangleList->push_back(tri);
-		this->bbox = new Envelope();
+		this->bbox = new geos::geom::Envelope();
 		this->bbox->expandToInclude(tri->getBBox());
 		this->aOuter = tri->getPointA();
 		this->bOuter = tri->getPointB();
 		this->cOuter = tri->getPointC();
 	}
 	
-	RSGISDelaunayTriangulation::RSGISDelaunayTriangulation(list<RSGIS2DPoint*> *data) throw(RSGISGeometryException)
+	RSGISDelaunayTriangulation::RSGISDelaunayTriangulation(std::list<RSGIS2DPoint*> *data) throw(RSGISGeometryException)
 	{
 		RSGISGeometry geomUtils;
 		RSGISTriangle *tri = geomUtils.findBoundingTriangle(data);
 		
-		this->triangleList = new list<RSGISTriangle*>();
+		this->triangleList = new std::list<RSGISTriangle*>();
 		triangleList->push_back(tri);
 		
-		this->bbox = new Envelope();
+		this->bbox = new geos::geom::Envelope();
 		this->bbox->expandToInclude(tri->getBBox());
 		this->aOuter = tri->getPointA();
 		this->bOuter = tri->getPointB();
@@ -66,7 +66,7 @@ namespace rsgis{namespace geom{
 		int feedbackCounter = 0;
 		
 		cout << "Started" << flush;
-		list<RSGIS2DPoint*>::iterator iterData;
+		std::list<RSGIS2DPoint*>::iterator iterData;
 		for(iterData = data->begin(); iterData != data->end(); ++iterData)
 		{
 			if((i % feedback) == 0)
@@ -81,15 +81,15 @@ namespace rsgis{namespace geom{
 		this->finaliseTriangulation();
 	}
 	
-	RSGISDelaunayTriangulation::RSGISDelaunayTriangulation(vector<RSGIS2DPoint*> *data) throw(RSGISGeometryException)
+	RSGISDelaunayTriangulation::RSGISDelaunayTriangulation(std::vector<RSGIS2DPoint*> *data) throw(RSGISGeometryException)
 	{
 		RSGISGeometry geomUtils;
 		RSGISTriangle *tri = geomUtils.findBoundingTriangle(data);
 		
-		this->triangleList = new list<RSGISTriangle*>();
+		this->triangleList = new std::list<RSGISTriangle*>();
 		triangleList->push_back(tri);
 		
-		this->bbox = new Envelope();
+		this->bbox = new geos::geom::Envelope();
 		this->bbox->expandToInclude(tri->getBBox());
 		this->aOuter = tri->getPointA();
 		this->bOuter = tri->getPointB();
@@ -100,7 +100,7 @@ namespace rsgis{namespace geom{
 		int feedbackCounter = 0;
 		
 		cout << "Started" << flush;
-		vector<RSGIS2DPoint*>::iterator iterData;
+		std::vector<RSGIS2DPoint*>::iterator iterData;
 		for(iterData = data->begin(); iterData != data->end(); ++iterData)
 		{
 			if((data->size() > 10) && ((i % feedback) == 0))
@@ -115,15 +115,15 @@ namespace rsgis{namespace geom{
 		this->finaliseTriangulation();
 	}
 	
-	void RSGISDelaunayTriangulation::createDelaunayTriangulation(list<RSGIS2DPoint*> *data) throw(RSGISGeometryException)
+	void RSGISDelaunayTriangulation::createDelaunayTriangulation(std::list<RSGIS2DPoint*> *data) throw(RSGISGeometryException)
 	{
-		RSGISMathsUtils mathsUtils;
+		rsgis::math::RSGISMathsUtils mathsUtils;
 		int i = 0;
 		int feedback = data->size()/10;
 		int feedbackCounter = 0;
 		
 		cout << "Started (" << data->size() << " nodes)" << flush;
-		list<RSGIS2DPoint*>::iterator iterData;
+		std::list<RSGIS2DPoint*>::iterator iterData;
 		for(iterData = data->begin(); iterData != data->end(); ++iterData)
 		{
 			if((data->size() > 10) && ((i % feedback) == 0))
@@ -147,9 +147,9 @@ namespace rsgis{namespace geom{
 		RSGISGeometry geomUtils;
 		try
 		{
-			list<RSGISTriangle*>::iterator iterTriangles;
+			std::list<RSGISTriangle*>::iterator iterTriangles;
 			
-			list<RSGISTriangle*> *tmpTriangles = new list<RSGISTriangle*>();
+			std::list<RSGISTriangle*> *tmpTriangles = new std::list<RSGISTriangle*>();
 			
 			RSGISTriangle *tri = NULL;
 			bool foundTri = false;
@@ -182,8 +182,8 @@ namespace rsgis{namespace geom{
 						
 			if(foundTri)
 			{
-				list<RSGIS2DPoint*> *pts = this->getPtsClockwise(tmpTriangles, pt);
-				list<RSGIS2DPoint*>::iterator iterPTS;
+				std::list<RSGIS2DPoint*> *pts = this->getPtsClockwise(tmpTriangles, pt);
+				std::list<RSGIS2DPoint*>::iterator iterPTS;
 				/*
 				cout << "PT: " << *pt << endl;
 				for(iterPTS = pts->begin(); iterPTS != pts->end(); ++iterPTS)
@@ -255,13 +255,13 @@ namespace rsgis{namespace geom{
 		}
 	}
 	
-	void RSGISDelaunayTriangulation::finaliseTriangulation(list<RSGIS2DPoint*> *data)
+	void RSGISDelaunayTriangulation::finaliseTriangulation(std::list<RSGIS2DPoint*> *data)
 	{
-		list<RSGISTriangle*>::iterator iterTriangles;
-		list<RSGIS2DPoint*>::iterator iterPts;
+		std::list<RSGISTriangle*>::iterator iterTriangles;
+		std::list<RSGIS2DPoint*>::iterator iterPts;
 		RSGISTriangle *tri = NULL;
 		RSGIS2DPoint *pt = NULL;
-		Envelope *env = new Envelope();
+		geos::geom::Envelope *env = new geos::geom::Envelope();
 		bool found = false;
 		
 		for(iterTriangles = triangleList->begin(); iterTriangles != triangleList->end(); ++iterTriangles)
@@ -319,9 +319,9 @@ namespace rsgis{namespace geom{
 	
 	void RSGISDelaunayTriangulation::finaliseTriangulation()
 	{
-		list<RSGISTriangle*>::iterator iterTriangles;
+		std::list<RSGISTriangle*>::iterator iterTriangles;
 		RSGISTriangle *tri = NULL;
-		Envelope *env = new Envelope();
+		geos::geom::Envelope *env = new geos::geom::Envelope();
 		
 		for(iterTriangles = triangleList->begin(); iterTriangles != triangleList->end(); )
 		{
@@ -357,17 +357,17 @@ namespace rsgis{namespace geom{
 		bbox = env;
 	}
 	
-	list<RSGISTriangle*>* RSGISDelaunayTriangulation::getTriangulation()
+	std::list<RSGISTriangle*>* RSGISDelaunayTriangulation::getTriangulation()
 	{
 		return triangleList;
 	}
 	
-	list<RSGIS2DPoint*>* RSGISDelaunayTriangulation::getPtsClockwise(list<RSGISTriangle*> *tris, RSGIS2DPoint *pt)
+	std::list<RSGIS2DPoint*>* RSGISDelaunayTriangulation::getPtsClockwise(std::list<RSGISTriangle*> *tris, RSGIS2DPoint *pt)
 	{
 		RSGISGeometry geomUtils;
-		list<RSGIS2DPoint*> *pts = new list<RSGIS2DPoint*>();
-		list<RSGISTriangle*>::iterator iterTriangles;	
-		list<RSGIS2DPoint*>::iterator iterPTS;
+		std::list<RSGIS2DPoint*> *pts = new std::list<RSGIS2DPoint*>();
+		std::list<RSGISTriangle*>::iterator iterTriangles;	
+		std::list<RSGIS2DPoint*>::iterator iterPTS;
 		RSGISTriangle *tri = NULL;
 		RSGIS2DPoint *tmpPt = NULL;
 		
@@ -436,24 +436,24 @@ namespace rsgis{namespace geom{
 	
 	void RSGISDelaunayTriangulation::plotTriangulationAsEdges(string filename)
 	{
-		list<LineSegment> *lines = new list<LineSegment>();
-		list<RSGISTriangle*>::iterator iterTriangles;
+		std::list<geos::geom::LineSegment> *lines = new std::list<geos::geom::LineSegment>();
+		std::list<RSGISTriangle*>::iterator iterTriangles;
 		RSGISTriangle *tri = NULL;
 		for(iterTriangles = triangleList->begin(); iterTriangles != triangleList->end(); ++iterTriangles)
 		{
 			tri = *iterTriangles;
-			lines->push_back(LineSegment(*tri->getPointA()->getPoint(), *tri->getPointB()->getPoint()));
-			lines->push_back(LineSegment(*tri->getPointB()->getPoint(), *tri->getPointC()->getPoint()));
-			lines->push_back(LineSegment(*tri->getPointC()->getPoint(), *tri->getPointA()->getPoint()));
+			lines->push_back(geos::geom::LineSegment(*tri->getPointA()->getPoint(), *tri->getPointB()->getPoint()));
+			lines->push_back(geos::geom::LineSegment(*tri->getPointB()->getPoint(), *tri->getPointC()->getPoint()));
+			lines->push_back(geos::geom::LineSegment(*tri->getPointC()->getPoint(), *tri->getPointA()->getPoint()));
 		}
-		RSGISExportForPlotting::getInstance()->export2DLines(filename, lines);
+        rsgis::utils::RSGISExportForPlotting::getInstance()->export2DLines(filename, lines);
 		lines->clear();
 		delete lines;
 	}
 	
 	RSGISDelaunayTriangulation::~RSGISDelaunayTriangulation()
 	{
-		list<RSGISTriangle*>::iterator iterTriangles;
+		std::list<RSGISTriangle*>::iterator iterTriangles;
 		for(iterTriangles = triangleList->begin(); iterTriangles != triangleList->end(); )
 		{
 			delete *iterTriangles;

@@ -37,24 +37,20 @@
 #include "geos/geom/CoordinateSequence.h"
 #include "geos/geom/LineString.h"
 
-using namespace std;
-using namespace geos::geom;
-using namespace rsgis::math;
-
 namespace rsgis{namespace geom{
 	
 	class RSGISPolygon : public RSGIS2DPoint
 		{
 		public:
 			RSGISPolygon();
-			RSGISPolygon(Polygon *poly);
-			virtual void setPolygon(Polygon *poly);
-			virtual Polygon* getPolygon();
-			virtual void getPoints(list<RSGIS2DPoint*> *pts);
-			virtual void getPoints(list<RSGIS2DPoint*> *pts, unsigned int classID);
+			RSGISPolygon(geos::geom::Polygon *poly);
+			virtual void setPolygon(geos::geom::Polygon *poly);
+			virtual geos::geom::Polygon* getPolygon();
+			virtual void getPoints(std::list<RSGIS2DPoint*> *pts);
+			virtual void getPoints(std::list<RSGIS2DPoint*> *pts, unsigned int classID);
 			virtual ~RSGISPolygon();
 		protected:
-			Polygon *poly;
+			geos::geom::Polygon *poly;
 		};
 }}
 

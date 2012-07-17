@@ -34,7 +34,7 @@ namespace rsgis{namespace geom{
 		double maxX = centre->getPoint()->x + radius;
 		double minY = centre->getPoint()->y - radius;
 		double maxY = centre->getPoint()->y + radius;
-		bbox = new Envelope(minX, maxX, minY, maxY);
+		bbox = new geos::geom::Envelope(minX, maxX, minY, maxY);
 	}
 	
 	RSGISCircle::RSGISCircle(RSGIS2DPoint *a, RSGIS2DPoint *b, RSGIS2DPoint *c) throw(RSGISGeometryException)
@@ -45,12 +45,12 @@ namespace rsgis{namespace geom{
 		double maxX = centre->getPoint()->x + radius;
 		double minY = centre->getPoint()->y - radius;
 		double maxY = centre->getPoint()->y + radius;
-		bbox = new Envelope(minX, maxX, minY, maxY);
+		bbox = new geos::geom::Envelope(minX, maxX, minY, maxY);
 	}
 	
 	void RSGISCircle::updateCircle(RSGIS2DPoint *a, RSGIS2DPoint *b, RSGIS2DPoint *c) throw(RSGISGeometryException)
 	{
-        Coordinate *centreCoord = new Coordinate();
+        geos::geom::Coordinate *centreCoord = new geos::geom::Coordinate();
         // Centre X
         // Upper Part
         double tmpU1 = (c->getPoint()->y - b->getPoint()->y)*((a->getPoint()->x*a->getPoint()->x)+(a->getPoint()->y*a->getPoint()->y));
@@ -63,14 +63,14 @@ namespace rsgis{namespace geom{
         
         if(tmpL == 0)
         {
-			RSGISMathsUtils mathsUtils;
-			string message  = string("No circle cannot be identified. a : [") 
-							+ mathsUtils.floattostring(a->getX()) + string(",") 
-							+ mathsUtils.floattostring(a->getY()) + string("] b: [") 
-							+ mathsUtils.floattostring(b->getX()) + string(",") 
-							+ mathsUtils.floattostring(b->getY()) + string("] c: [") 
-							+ mathsUtils.floattostring(c->getX()) + string(",") 
-							+ mathsUtils.floattostring(c->getY()) + string("]\n");
+            rsgis::math::RSGISMathsUtils mathsUtils;
+            std::string message  = std::string("No circle cannot be identified. a : [") 
+							+ mathsUtils.floattostring(a->getX()) + std::string(",") 
+							+ mathsUtils.floattostring(a->getY()) + std::string("] b: [") 
+							+ mathsUtils.floattostring(b->getX()) + std::string(",") 
+							+ mathsUtils.floattostring(b->getY()) + std::string("] c: [") 
+							+ mathsUtils.floattostring(c->getX()) + std::string(",") 
+							+ mathsUtils.floattostring(c->getY()) + std::string("]\n");
             throw RSGISGeometryException(message);
         }
         
@@ -115,12 +115,13 @@ namespace rsgis{namespace geom{
 		return centre;
 	}
 	
-	ostream& operator<<(ostream& ostr, const RSGISCircle& circle)
+    std::ostream& operator<<(std::ostream& ostr, const RSGISCircle& circle)
 	{
-		ostr << "CIRCLE[" << circle.centre->getPoint()->x << "," << circle.centre->getPoint()->y << "]: " << circle.radius;		return ostr;
+		ostr << "CIRCLE[" << circle.centre->getPoint()->x << "," << circle.centre->getPoint()->y << "]: " << circle.radius;
+        return ostr;
 	}
 	
-	ostream& RSGISCircle::operator<<(ostream& ostr)
+    std::ostream& RSGISCircle::operator<<(std::ostream& ostr)
 	{
 		ostr << "CIRCLE[" << centre->getPoint()->x << "," << centre->getPoint()->y << "]: " << radius;
 		return ostr;

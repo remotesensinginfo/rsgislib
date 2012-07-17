@@ -44,31 +44,27 @@
 #include "utils/RSGISGEOSFactoryGenerator.h"
 #include "utils/RSGISFileUtils.h"
 
-using namespace rsgis::utils;
-using namespace std;
-using namespace geos::geom;
-
 namespace rsgis{namespace geom{
 	class RSGISGeomTestExport
 		{
 		public:
 			RSGISGeomTestExport();
 			
-			string getLayerName(string filepath);
-			OGRLineString* convertGEOSLineSegment2OGRLineString(LineSegment *line);
-			OGRLineString* convertGEOSLineString2OGRLineString(LineString *line);
-			OGRLinearRing* convertGEOSLineString2OGRLinearRing(LineString *line);
-			OGRPolygon* convertGEOSPolygon2OGRPolygon(Polygon *poly);
-			OGRPoint* convertGEOSPoint2OGRPoint(Point *point);
-			OGRPoint* convertGEOSCoordinate2OGRPoint(Coordinate *coord);
-			bool checkDIR4SHP(string dir, string shp) throw(RSGISGeometryException);
-			void deleteSHP(string dir, string shp) throw(RSGISGeometryException);
+            std::string getLayerName(std::string filepath);
+			OGRLineString* convertGEOSLineSegment2OGRLineString(geos::geom::LineSegment *line);
+			OGRLineString* convertGEOSLineString2OGRLineString(geos::geom::LineString *line);
+			OGRLinearRing* convertGEOSLineString2OGRLinearRing(geos::geom::LineString *line);
+			OGRPolygon* convertGEOSPolygon2OGRPolygon(geos::geom::Polygon *poly);
+			OGRPoint* convertGEOSPoint2OGRPoint(geos::geom::Point *point);
+			OGRPoint* convertGEOSCoordinate2OGRPoint(geos::geom::Coordinate *coord);
+			bool checkDIR4SHP(std::string dir, std::string shp) throw(RSGISGeometryException);
+			void deleteSHP(std::string dir, std::string shp) throw(RSGISGeometryException);
 			
-			void exportGEOSPolygons2SHP(string outputFile, bool deleteIfPresent, list<Polygon*> *polys) throw(RSGISGeometryException);
-			void exportGEOSPolygons2SHP(string outputFile, bool deleteIfPresent, vector<Polygon*> *polys) throw(RSGISGeometryException);
-			void exportGEOSCoordinates2SHP(string outputFile, bool deleteIfPresent, vector<Coordinate*> *coords) throw(RSGISGeometryException);
-			void exportGEOSLineStrings2SHP(string outputFile, bool deleteIfPresent, vector<LineString*> *lines) throw(RSGISGeometryException);
-			void exportGEOSLineSegments2SHP(string outputFile, bool deleteIfPresent, vector<LineSegment*> *lines) throw(RSGISGeometryException);
+			void exportGEOSPolygons2SHP(std::string outputFile, bool deleteIfPresent, std::list<geos::geom::Polygon*> *polys) throw(RSGISGeometryException);
+			void exportGEOSPolygons2SHP(std::string outputFile, bool deleteIfPresent, std::vector<geos::geom::Polygon*> *polys) throw(RSGISGeometryException);
+			void exportGEOSCoordinates2SHP(std::string outputFile, bool deleteIfPresent, std::vector<geos::geom::Coordinate*> *coords) throw(RSGISGeometryException);
+			void exportGEOSLineStrings2SHP(std::string outputFile, bool deleteIfPresent, std::vector<geos::geom::LineString*> *lines) throw(RSGISGeometryException);
+			void exportGEOSLineSegments2SHP(std::string outputFile, bool deleteIfPresent, std::vector<geos::geom::LineSegment*> *lines) throw(RSGISGeometryException);
 			
 			~RSGISGeomTestExport();
 		};

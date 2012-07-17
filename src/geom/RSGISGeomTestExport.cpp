@@ -30,9 +30,9 @@ namespace rsgis{namespace geom{
 	}
 	
 	
-	string RSGISGeomTestExport::getLayerName(string filepath)
+	std::string RSGISGeomTestExport::getLayerName(std::string filepath)
 	{
-		//cout << filepath << endl;
+		//std::cout << filepath << std::endl;
 		int strSize = filepath.size();
 		int lastSlash = 0;
 		for(int i = 0; i < strSize; i++)
@@ -42,8 +42,8 @@ namespace rsgis{namespace geom{
 				lastSlash = i;
 			}
 		}
-		string filename = filepath.substr(lastSlash+1);
-		//cout << filename << endl;
+		std::string filename = filepath.substr(lastSlash+1);
+		//std::cout << filename << std::endl;
 		
 		strSize = filename.size();
 		int lastpt = 0;
@@ -55,12 +55,12 @@ namespace rsgis{namespace geom{
 			}
 		}
 		
-		string layerName = filename.substr(0, lastpt);
-		//cout << layerName << endl;
+		std::string layerName = filename.substr(0, lastpt);
+		//std::cout << layerName << std::endl;
 		return layerName;		
 	}
 	
-	OGRLineString* RSGISGeomTestExport::convertGEOSLineSegment2OGRLineString(LineSegment *line)
+	OGRLineString* RSGISGeomTestExport::convertGEOSLineSegment2OGRLineString(geos::geom::LineSegment *line)
 	{
 		OGRLineString *OGRLine = new OGRLineString();
 		OGRLine->addPoint(line->p0.x, line->p0.y, line->p0.z);
@@ -68,12 +68,12 @@ namespace rsgis{namespace geom{
 		return OGRLine;
 	}
 	
-	OGRLineString* RSGISGeomTestExport::convertGEOSLineString2OGRLineString(LineString *line)
+	OGRLineString* RSGISGeomTestExport::convertGEOSLineString2OGRLineString(geos::geom::LineString *line)
 	{
 		OGRLineString *OGRLine = new OGRLineString();
 		
-		CoordinateSequence *coordSeq = line->getCoordinates();
-		Coordinate coord;
+		geos::geom::CoordinateSequence *coordSeq = line->getCoordinates();
+		geos::geom::Coordinate coord;
 		int numCoords = coordSeq->getSize();
 		for(int i = 0; i < numCoords; i++)
 		{
@@ -84,13 +84,13 @@ namespace rsgis{namespace geom{
 		return OGRLine;
 	}
 	
-	OGRLinearRing* RSGISGeomTestExport::convertGEOSLineString2OGRLinearRing(LineString *line)
+	OGRLinearRing* RSGISGeomTestExport::convertGEOSLineString2OGRLinearRing(geos::geom::LineString *line)
 	{
 		OGRLinearRing *ring = new OGRLinearRing();
-		const CoordinateSequence *coords = line->getCoordinatesRO();
+		const geos::geom::CoordinateSequence *coords = line->getCoordinatesRO();
 		int numCoords = coords->getSize();
-		Coordinate coord;
-		//cout << "numCoords = " << numCoords << endl;
+		geos::geom::Coordinate coord;
+		//std::cout << "numCoords = " << numCoords << std::endl;
 		for(int i = 0; i < numCoords; i++)
 		{
 			coord = coords->getAt(i);
@@ -99,23 +99,23 @@ namespace rsgis{namespace geom{
 		return ring;
 	}
 	
-	OGRPolygon* RSGISGeomTestExport::convertGEOSPolygon2OGRPolygon(Polygon *poly)
+	OGRPolygon* RSGISGeomTestExport::convertGEOSPolygon2OGRPolygon(geos::geom::Polygon *poly)
 	{
 		OGRPolygon *ogrPoly = new OGRPolygon();
 		
 		// Add outer ring!
-		const LineString *exteriorRing = poly->getExteriorRing();
-		OGRLinearRing *ogrRing = this->convertGEOSLineString2OGRLinearRing(const_cast<LineString *>(exteriorRing));
+		const geos::geom::LineString *exteriorRing = poly->getExteriorRing();
+		OGRLinearRing *ogrRing = this->convertGEOSLineString2OGRLinearRing(const_cast<geos::geom::LineString *>(exteriorRing));
 		ogrPoly->addRing(ogrRing);
 		delete ogrRing;
 		
 		int numInternalRings = poly->getNumInteriorRing();
 		
-		LineString *innerRing = NULL;
+		geos::geom::LineString *innerRing = NULL;
 		
 		for(int i = 0; i < numInternalRings; i++)
 		{
-			innerRing = const_cast<LineString *>(poly->getInteriorRingN(i));
+			innerRing = const_cast<geos::geom::LineString *>(poly->getInteriorRingN(i));
 			ogrRing = this->convertGEOSLineString2OGRLinearRing(innerRing);
 			ogrPoly->addRing(ogrRing);
 			delete ogrRing;
@@ -123,17 +123,17 @@ namespace rsgis{namespace geom{
 		
 		return ogrPoly;	}
 	
-	OGRPoint* RSGISGeomTestExport::convertGEOSPoint2OGRPoint(Point *point)
+	OGRPoint* RSGISGeomTestExport::convertGEOSPoint2OGRPoint(geos::geom::Point *point)
 	{
 		OGRPoint *outPoint = new OGRPoint();
-		const Coordinate *coord = point->getCoordinate();
+		const geos::geom::Coordinate *coord = point->getCoordinate();
 		outPoint->setX(coord->x);
 		outPoint->setY(coord->y);
 		outPoint->setZ(coord->z);
 		return outPoint;
 	}
 	
-	OGRPoint* RSGISGeomTestExport::convertGEOSCoordinate2OGRPoint(Coordinate *coord)
+	OGRPoint* RSGISGeomTestExport::convertGEOSCoordinate2OGRPoint(geos::geom::Coordinate *coord)
 	{
 		OGRPoint *outPoint = new OGRPoint();
 		outPoint->setX(coord->x);
@@ -142,10 +142,10 @@ namespace rsgis{namespace geom{
 		return outPoint;
 	}
 
-	bool RSGISGeomTestExport::checkDIR4SHP(string dir, string shp) throw(RSGISGeometryException)
+	bool RSGISGeomTestExport::checkDIR4SHP(std::string dir, std::string shp) throw(RSGISGeometryException)
 	{
-		RSGISFileUtils fileUtils;
-		string *dirList = NULL;
+        rsgis::utils::RSGISFileUtils fileUtils;
+		std::string *dirList = NULL;
 		int numFiles = 0;
 		bool returnVal = false;
 		
@@ -163,9 +163,9 @@ namespace rsgis{namespace geom{
 				}
 			}
 		}
-		catch(RSGISException e)
+		catch(rsgis::RSGISException e)
 		{
-			cout << e.what() << endl;
+			std::cout << e.what() << std::endl;
 			throw RSGISGeometryException(e.what());
 		}
 		delete[] dirList;
@@ -173,10 +173,10 @@ namespace rsgis{namespace geom{
 		return returnVal;
 	}
 	
-	void RSGISGeomTestExport::deleteSHP(string dir, string shp) throw(RSGISGeometryException)
+	void RSGISGeomTestExport::deleteSHP(std::string dir, std::string shp) throw(RSGISGeometryException)
 	{
-		RSGISFileUtils fileUtils;
-		string *dirList = NULL;
+		rsgis::utils::RSGISFileUtils fileUtils;
+		std::string *dirList = NULL;
 		int numFiles = 0;
 		
 		try
@@ -184,68 +184,68 @@ namespace rsgis{namespace geom{
 			dirList = fileUtils.getFilesInDIRWithName(dir, shp, &numFiles);
 			if(numFiles > 0)
 			{
-				cout << "Deleting shapefile...\n";
+				std::cout << "Deleting shapefile...\n";
 				for(int i = 0; i < numFiles; i++)
 				{
 					if(fileUtils.getExtension(dirList[i]) == ".shp")
 					{
-						cout << dirList[i];
+						std::cout << dirList[i];
 						if( remove( dirList[i].c_str() ) != 0 )
 						{
-							throw RSGISException("Could not delete file.");
+							throw rsgis::RSGISException("Could not delete file.");
 						}
-						cout << " deleted\n";
+						std::cout << " deleted\n";
 					}
 					else if(fileUtils.getExtension(dirList[i]) == ".shx")
 					{
-						cout << dirList[i];
+						std::cout << dirList[i];
 						if( remove( dirList[i].c_str() ) != 0 )
 						{
-							throw RSGISException("Could not delete file.");
+							throw rsgis::RSGISException("Could not delete file.");
 						}
-						cout << " deleted\n";
+						std::cout << " deleted\n";
 					}
 					else if(fileUtils.getExtension(dirList[i]) == ".sbx")
 					{
-						cout << dirList[i];
+						std::cout << dirList[i];
 						if( remove( dirList[i].c_str() ) != 0 )
 						{
-							throw RSGISException("Could not delete file.");
+							throw rsgis::RSGISException("Could not delete file.");
 						}
-						cout << " deleted\n";
+						std::cout << " deleted\n";
 					}
 					else if(fileUtils.getExtension(dirList[i]) == ".sbn")
 					{
-						cout << dirList[i];
+						std::cout << dirList[i];
 						if( remove( dirList[i].c_str() ) != 0 )
 						{
-							throw RSGISException("Could not delete file.");
+							throw rsgis::RSGISException("Could not delete file.");
 						}
-						cout << " deleted\n";
+						std::cout << " deleted\n";
 					}
 					else if(fileUtils.getExtension(dirList[i]) == ".dbf")
 					{
-						cout << dirList[i];
+						std::cout << dirList[i];
 						if( remove( dirList[i].c_str() ) != 0 )
 						{
-							throw RSGISException("Could not delete file.");
+							throw rsgis::RSGISException("Could not delete file.");
 						}
-						cout << " deleted\n";
+						std::cout << " deleted\n";
 					}
 					else if(fileUtils.getExtension(dirList[i]) == ".prj")
 					{
-						cout << dirList[i];
+						std::cout << dirList[i];
 						if( remove( dirList[i].c_str() ) != 0 )
 						{
-							throw RSGISException("Could not delete file.");
+							throw rsgis::RSGISException("Could not delete file.");
 						}
-						cout << " deleted\n";
+						std::cout << " deleted\n";
 					}
 					
 				}
 			}
 		}
-		catch(RSGISException e)
+		catch(rsgis::RSGISException e)
 		{
 			throw RSGISGeometryException(e.what());
 		}
@@ -253,18 +253,18 @@ namespace rsgis{namespace geom{
 	}
 	
 	
-	void RSGISGeomTestExport::exportGEOSPolygons2SHP(string outputFile, bool deleteIfPresent, list<Polygon*> *polys) throw(RSGISGeometryException)
+	void RSGISGeomTestExport::exportGEOSPolygons2SHP(std::string outputFile, bool deleteIfPresent, std::list<geos::geom::Polygon*> *polys) throw(RSGISGeometryException)
 	{
 		OGRRegisterAll();
-		RSGISFileUtils fileUtils;
+		rsgis::utils::RSGISFileUtils fileUtils;
 		
 		/////////////////////////////////////
 		//
 		// Check whether file already present.
 		//
 		/////////////////////////////////////
-		string SHPFileOutLayer = this->getLayerName(outputFile);
-		string outputDIR = fileUtils.getFileDirectoryPath(outputFile);
+		std::string SHPFileOutLayer = this->getLayerName(outputFile);
+		std::string outputDIR = fileUtils.getFileDirectoryPath(outputFile);
 		
 		if(this->checkDIR4SHP(outputDIR, SHPFileOutLayer))
 		{
@@ -296,14 +296,14 @@ namespace rsgis{namespace geom{
 		outputSHPDS = shpFiledriver->CreateDataSource(outputFile.c_str(), NULL);
 		if( outputSHPDS == NULL )
 		{
-			string message = string("Could not create vector file ") + outputFile;
+			std::string message = std::string("Could not create vector file ") + outputFile;
 			throw RSGISGeometryException(message.c_str());
 		}
 		
 		outputSHPLayer = outputSHPDS->CreateLayer(SHPFileOutLayer.c_str(), NULL, wkbPolygon, NULL );
 		if( outputSHPLayer == NULL )
 		{
-			string message = string("Could not create vector layer ") + SHPFileOutLayer;
+			std::string message = std::string("Could not create vector layer ") + SHPFileOutLayer;
 			throw RSGISGeometryException(message.c_str());
 		}
 		
@@ -311,7 +311,7 @@ namespace rsgis{namespace geom{
 		OGRFeature *featureOutput = NULL;
 		
 		// Write Polygons to file
-		list<Polygon*>::iterator iterPolys;
+        std::list<geos::geom::Polygon*>::iterator iterPolys;
 		for(iterPolys = polys->begin(); iterPolys != polys->end(); iterPolys++)
 		{
 			featureOutput = OGRFeature::CreateFeature(outputDefn);
@@ -326,18 +326,18 @@ namespace rsgis{namespace geom{
 		OGRDataSource::DestroyDataSource(outputSHPDS);
 	}
 	
-	void RSGISGeomTestExport::exportGEOSPolygons2SHP(string outputFile, bool deleteIfPresent, vector<Polygon*> *polys) throw(RSGISGeometryException)
+	void RSGISGeomTestExport::exportGEOSPolygons2SHP(std::string outputFile, bool deleteIfPresent, std::vector<geos::geom::Polygon*> *polys) throw(RSGISGeometryException)
 	{
 		OGRRegisterAll();
-		RSGISFileUtils fileUtils;
+        rsgis::utils::RSGISFileUtils fileUtils;
 		
 		/////////////////////////////////////
 		//
 		// Check whether file already present.
 		//
 		/////////////////////////////////////
-		string SHPFileOutLayer = this->getLayerName(outputFile);
-		string outputDIR = fileUtils.getFileDirectoryPath(outputFile);
+		std::string SHPFileOutLayer = this->getLayerName(outputFile);
+		std::string outputDIR = fileUtils.getFileDirectoryPath(outputFile);
 		
 		if(this->checkDIR4SHP(outputDIR, SHPFileOutLayer))
 		{
@@ -369,14 +369,14 @@ namespace rsgis{namespace geom{
 		outputSHPDS = shpFiledriver->CreateDataSource(outputFile.c_str(), NULL);
 		if( outputSHPDS == NULL )
 		{
-			string message = string("Could not create vector file ") + outputFile;
+			std::string message = std::string("Could not create vector file ") + outputFile;
 			throw RSGISGeometryException(message.c_str());
 		}
 		
 		outputSHPLayer = outputSHPDS->CreateLayer(SHPFileOutLayer.c_str(), NULL, wkbPolygon, NULL );
 		if( outputSHPLayer == NULL )
 		{
-			string message = string("Could not create vector layer ") + SHPFileOutLayer;
+			std::string message = std::string("Could not create vector layer ") + SHPFileOutLayer;
 			throw RSGISGeometryException(message.c_str());
 		}
 		
@@ -384,7 +384,7 @@ namespace rsgis{namespace geom{
 		OGRFeature *featureOutput = NULL;
 		
 		// Write Polygons to file
-		vector<Polygon*>::iterator iterPolys;
+        std::vector<geos::geom::Polygon*>::iterator iterPolys;
 		for(iterPolys = polys->begin(); iterPolys != polys->end(); iterPolys++)
 		{
 			featureOutput = OGRFeature::CreateFeature(outputDefn);
@@ -399,18 +399,18 @@ namespace rsgis{namespace geom{
 		OGRDataSource::DestroyDataSource(outputSHPDS);
 	}
 	
-	void RSGISGeomTestExport::exportGEOSCoordinates2SHP(string outputFile, bool deleteIfPresent, vector<Coordinate*> *coords) throw(RSGISGeometryException)
+	void RSGISGeomTestExport::exportGEOSCoordinates2SHP(std::string outputFile, bool deleteIfPresent, std::vector<geos::geom::Coordinate*> *coords) throw(RSGISGeometryException)
 	{
 		OGRRegisterAll();
-		RSGISFileUtils fileUtils;
+        rsgis::utils::RSGISFileUtils fileUtils;
 		
 		/////////////////////////////////////
 		//
 		// Check whether file already present.
 		//
 		/////////////////////////////////////
-		string SHPFileOutLayer = this->getLayerName(outputFile);
-		string outputDIR = fileUtils.getFileDirectoryPath(outputFile);
+		std::string SHPFileOutLayer = this->getLayerName(outputFile);
+		std::string outputDIR = fileUtils.getFileDirectoryPath(outputFile);
 		
 		if(this->checkDIR4SHP(outputDIR, SHPFileOutLayer))
 		{
@@ -442,14 +442,14 @@ namespace rsgis{namespace geom{
 		outputSHPDS = shpFiledriver->CreateDataSource(outputFile.c_str(), NULL);
 		if( outputSHPDS == NULL )
 		{
-			string message = string("Could not create vector file ") + outputFile;
+			std::string message = std::string("Could not create vector file ") + outputFile;
 			throw RSGISGeometryException(message.c_str());
 		}
 		
 		outputSHPLayer = outputSHPDS->CreateLayer(SHPFileOutLayer.c_str(), NULL, wkbPoint, NULL );
 		if( outputSHPLayer == NULL )
 		{
-			string message = string("Could not create vector layer ") + SHPFileOutLayer;
+			std::string message = std::string("Could not create vector layer ") + SHPFileOutLayer;
 			throw RSGISGeometryException(message.c_str());
 		}
 		
@@ -457,7 +457,7 @@ namespace rsgis{namespace geom{
 		OGRFeature *featureOutput = NULL;
 		
 		// Write Polygons to file
-		vector<Coordinate*>::iterator iterCoords;
+        std::vector<geos::geom::Coordinate*>::iterator iterCoords;
 		for(iterCoords = coords->begin(); iterCoords != coords->end(); iterCoords++)
 		{
 			featureOutput = OGRFeature::CreateFeature(outputDefn);
@@ -472,18 +472,18 @@ namespace rsgis{namespace geom{
 		OGRDataSource::DestroyDataSource(outputSHPDS);
 	}
 	
-	void RSGISGeomTestExport::exportGEOSLineStrings2SHP(string outputFile, bool deleteIfPresent, vector<LineString*> *lines) throw(RSGISGeometryException)
+	void RSGISGeomTestExport::exportGEOSLineStrings2SHP(std::string outputFile, bool deleteIfPresent, std::vector<geos::geom::LineString*> *lines) throw(RSGISGeometryException)
 	{
 		OGRRegisterAll();
-		RSGISFileUtils fileUtils;
+        rsgis::utils::RSGISFileUtils fileUtils;
 		
 		/////////////////////////////////////
 		//
 		// Check whether file already present.
 		//
 		/////////////////////////////////////
-		string SHPFileOutLayer = this->getLayerName(outputFile);
-		string outputDIR = fileUtils.getFileDirectoryPath(outputFile);
+		std::string SHPFileOutLayer = this->getLayerName(outputFile);
+		std::string outputDIR = fileUtils.getFileDirectoryPath(outputFile);
 		
 		if(this->checkDIR4SHP(outputDIR, SHPFileOutLayer))
 		{
@@ -515,14 +515,14 @@ namespace rsgis{namespace geom{
 		outputSHPDS = shpFiledriver->CreateDataSource(outputFile.c_str(), NULL);
 		if( outputSHPDS == NULL )
 		{
-			string message = string("Could not create vector file ") + outputFile;
+			std::string message = std::string("Could not create vector file ") + outputFile;
 			throw RSGISGeometryException(message.c_str());
 		}
 		
 		outputSHPLayer = outputSHPDS->CreateLayer(SHPFileOutLayer.c_str(), NULL, wkbLineString, NULL );
 		if( outputSHPLayer == NULL )
 		{
-			string message = string("Could not create vector layer ") + SHPFileOutLayer;
+			std::string message = std::string("Could not create vector layer ") + SHPFileOutLayer;
 			throw RSGISGeometryException(message.c_str());
 		}
 		
@@ -530,10 +530,10 @@ namespace rsgis{namespace geom{
 		OGRFeature *featureOutput = NULL;
 		
 		// Write Polygons to file
-		vector<LineString*>::iterator iterlines;
+        std::vector<geos::geom::LineString*>::iterator iterlines;
 		for(iterlines = lines->begin(); iterlines != lines->end(); iterlines++)
 		{
-			//cout << "GML: " << (*iterlines)->toString() << endl;
+			//std::cout << "GML: " << (*iterlines)->tostd::string() << std::endl;
 			featureOutput = OGRFeature::CreateFeature(outputDefn);
 			featureOutput->SetGeometryDirectly(this->convertGEOSLineString2OGRLineString((*iterlines)));
 			
@@ -546,18 +546,18 @@ namespace rsgis{namespace geom{
 		OGRDataSource::DestroyDataSource(outputSHPDS);
 	}
 	
-	void RSGISGeomTestExport::exportGEOSLineSegments2SHP(string outputFile, bool deleteIfPresent, vector<LineSegment*> *lines) throw(RSGISGeometryException)
+	void RSGISGeomTestExport::exportGEOSLineSegments2SHP(std::string outputFile, bool deleteIfPresent, std::vector<geos::geom::LineSegment*> *lines) throw(RSGISGeometryException)
 	{
 		OGRRegisterAll();
-		RSGISFileUtils fileUtils;
+        rsgis::utils::RSGISFileUtils fileUtils;
 		
 		/////////////////////////////////////
 		//
 		// Check whether file already present.
 		//
 		/////////////////////////////////////
-		string SHPFileOutLayer = this->getLayerName(outputFile);
-		string outputDIR = fileUtils.getFileDirectoryPath(outputFile);
+		std::string SHPFileOutLayer = this->getLayerName(outputFile);
+		std::string outputDIR = fileUtils.getFileDirectoryPath(outputFile);
 		
 		if(this->checkDIR4SHP(outputDIR, SHPFileOutLayer))
 		{
@@ -589,14 +589,14 @@ namespace rsgis{namespace geom{
 		outputSHPDS = shpFiledriver->CreateDataSource(outputFile.c_str(), NULL);
 		if( outputSHPDS == NULL )
 		{
-			string message = string("Could not create vector file ") + outputFile;
+			std::string message = std::string("Could not create vector file ") + outputFile;
 			throw RSGISGeometryException(message.c_str());
 		}
 		
 		outputSHPLayer = outputSHPDS->CreateLayer(SHPFileOutLayer.c_str(), NULL, wkbLineString, NULL );
 		if( outputSHPLayer == NULL )
 		{
-			string message = string("Could not create vector layer ") + SHPFileOutLayer;
+			std::string message = std::string("Could not create vector layer ") + SHPFileOutLayer;
 			throw RSGISGeometryException(message.c_str());
 		}
 		
@@ -604,10 +604,10 @@ namespace rsgis{namespace geom{
 		OGRFeature *featureOutput = NULL;
 		
 		// Write Polygons to file
-		vector<LineSegment*>::iterator iterlines;
+        std::vector<geos::geom::LineSegment*>::iterator iterlines;
 		for(iterlines = lines->begin(); iterlines != lines->end(); iterlines++)
 		{
-			//cout << "GML: " << (*iterlines)->toString() << endl;
+			//std::cout << "GML: " << (*iterlines)->tostd::string() << std::endl;
 			featureOutput = OGRFeature::CreateFeature(outputDefn);
 			featureOutput->SetGeometryDirectly(this->convertGEOSLineSegment2OGRLineString((*iterlines)));
 			

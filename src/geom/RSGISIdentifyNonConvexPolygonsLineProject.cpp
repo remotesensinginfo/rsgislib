@@ -29,19 +29,19 @@ namespace rsgis{namespace geom{
 		this->resolution = resolution;
 	}
 	
-	vector<Polygon*>* RSGISIdentifyNonConvexPolygonsLineProject::retrievePolygons(list<RSGIS2DPoint*> **clusters, int numClusters) throw(RSGISGeometryException)
+	std::vector<geos::geom::Polygon*>* RSGISIdentifyNonConvexPolygonsLineProject::retrievePolygons(std::list<RSGIS2DPoint*> **clusters, int numClusters) throw(RSGISGeometryException)
 	{
 		RSGISGeometry geomUtils;
-		vector<Polygon*> *polys = new vector<Polygon*>();
+		std::vector<geos::geom::Polygon*> *polys = new std::vector<geos::geom::Polygon*>();
 		try
 		{
 			RSGISPolygon *poly = NULL;
-			list<RSGIS2DPoint*>::iterator iterPts;
-			vector<LineSegment> *lines = NULL;
+			std::list<RSGIS2DPoint*>::iterator iterPts;
+			std::vector<geos::geom::LineSegment> *lines = NULL;
 		
 			for(int n = 0; n < numClusters; n++)
 			{
-				lines = new vector<LineSegment>();
+				lines = new std::vector<geos::geom::LineSegment>();
 				for(iterPts = clusters[n]->begin(); iterPts != clusters[n]->end(); iterPts++)
 				{
 					poly = (RSGISPolygon*) (*iterPts);
@@ -60,19 +60,19 @@ namespace rsgis{namespace geom{
 		return polys;
 	}
 	
-	vector<Polygon*>* RSGISIdentifyNonConvexPolygonsLineProject::retrievePolygons(list<RSGISPolygon*> **clusters, int numClusters) throw(RSGISGeometryException)
+	std::vector<geos::geom::Polygon*>* RSGISIdentifyNonConvexPolygonsLineProject::retrievePolygons(std::list<RSGISPolygon*> **clusters, int numClusters) throw(RSGISGeometryException)
 	{
 		RSGISGeometry geomUtils;
-		vector<Polygon*> *polys = new vector<Polygon*>();
+		std::vector<geos::geom::Polygon*> *polys = new std::vector<geos::geom::Polygon*>();
 		try
 		{
 			RSGISPolygon *poly = NULL;
-			list<RSGISPolygon*>::iterator iterPolys;
-			vector<LineSegment> *lines = NULL;
+			std::list<RSGISPolygon*>::iterator iterPolys;
+			std::vector<geos::geom::LineSegment> *lines = NULL;
 			
 			for(int n = 0; n < numClusters; n++)
 			{
-				lines = new vector<LineSegment>();
+				lines = new std::vector<geos::geom::LineSegment>();
 				for(iterPolys = clusters[n]->begin(); iterPolys != clusters[n]->end(); iterPolys++)
 				{
 					poly = (*iterPolys);
@@ -91,19 +91,19 @@ namespace rsgis{namespace geom{
 		return polys;
 	}
 	
-	vector<Polygon*>* RSGISIdentifyNonConvexPolygonsLineProject::retrievePolygons(list<Polygon*> **clusters, int numClusters) throw(RSGISGeometryException)
+	std::vector<geos::geom::Polygon*>* RSGISIdentifyNonConvexPolygonsLineProject::retrievePolygons(std::list<geos::geom::Polygon*> **clusters, int numClusters) throw(RSGISGeometryException)
 	{
 		RSGISGeometry geomUtils;
-		vector<Polygon*> *polys = new vector<Polygon*>();
+		std::vector<geos::geom::Polygon*> *polys = new std::vector<geos::geom::Polygon*>();
 		try
 		{
-			Polygon *poly = NULL;
-			list<Polygon*>::iterator iterPolys;
-			vector<LineSegment> *lines = NULL;
+			geos::geom::Polygon *poly = NULL;
+			std::list<geos::geom::Polygon*>::iterator iterPolys;
+			std::vector<geos::geom::LineSegment> *lines = NULL;
 			
 			for(int n = 0; n < numClusters; n++)
 			{
-				lines = new vector<LineSegment>();
+				lines = new std::vector<geos::geom::LineSegment>();
 				for(iterPolys = clusters[n]->begin(); iterPolys != clusters[n]->end(); iterPolys++)
 				{
 					poly = (*iterPolys);
@@ -122,14 +122,14 @@ namespace rsgis{namespace geom{
 		return polys;
 	}
 	
-	Polygon* RSGISIdentifyNonConvexPolygonsLineProject::retrievePolygon(vector<Polygon*> *polygons) throw(RSGISGeometryException)
+	geos::geom::Polygon* RSGISIdentifyNonConvexPolygonsLineProject::retrievePolygon(std::vector<geos::geom::Polygon*> *polygons) throw(RSGISGeometryException)
 	{
 		RSGISGeometry geomUtils;
-		Polygon *poly = NULL;
+		geos::geom::Polygon *poly = NULL;
 		try
 		{
-			vector<Polygon*>::iterator iterPolys;
-			vector<LineSegment> *lines = new vector<LineSegment>();
+			std::vector<geos::geom::Polygon*>::iterator iterPolys;
+			std::vector<geos::geom::LineSegment> *lines = new std::vector<geos::geom::LineSegment>();
 			for(iterPolys = polygons->begin(); iterPolys != polygons->end(); iterPolys++)
 			{
 				geomUtils.covert2LineSegments(*iterPolys, lines);
@@ -147,14 +147,14 @@ namespace rsgis{namespace geom{
 		return poly;
 	}
 	
-	Polygon* RSGISIdentifyNonConvexPolygonsLineProject::retrievePolygon(list<Polygon*> *polygons) throw(RSGISGeometryException)
+	geos::geom::Polygon* RSGISIdentifyNonConvexPolygonsLineProject::retrievePolygon(std::list<geos::geom::Polygon*> *polygons) throw(RSGISGeometryException)
 	{
 		RSGISGeometry geomUtils;
-		Polygon *poly = NULL;
+		geos::geom::Polygon *poly = NULL;
 		try
 		{
-			list<Polygon*>::iterator iterPolys;
-			vector<LineSegment> *lines = new vector<LineSegment>();
+			std::list<geos::geom::Polygon*>::iterator iterPolys;
+			std::vector<geos::geom::LineSegment> *lines = new std::vector<geos::geom::LineSegment>();
 			for(iterPolys = polygons->begin(); iterPolys != polygons->end(); iterPolys++)
 			{
 				geomUtils.covert2LineSegments(*iterPolys, lines);
@@ -172,48 +172,48 @@ namespace rsgis{namespace geom{
 		return poly;
 	}
 	
-	Polygon* RSGISIdentifyNonConvexPolygonsLineProject::identifyIrregularBoundaryLineProj(vector<LineSegment> *lines) throw(RSGISGeometryException)
+	geos::geom::Polygon* RSGISIdentifyNonConvexPolygonsLineProject::identifyIrregularBoundaryLineProj(std::vector<geos::geom::LineSegment> *lines) throw(RSGISGeometryException)
 	{
-		Polygon *poly = NULL;
+		geos::geom::Polygon *poly = NULL;
 		RSGISGeometry geomUtils;
 		
 		try
 		{
 			// Find Convex Hull
-			Polygon *convexhull = geomUtils.findConvexHull(lines);
+			geos::geom::Polygon *convexhull = geomUtils.findConvexHull(lines);
 			
 			
 			// Find new boundary within convex hull
-			vector<Coordinate*> *coordsLines = this->identifyIrregularBoundaryCoordinatesLineProj(lines, convexhull);
+			std::vector<geos::geom::Coordinate*> *coordsLines = this->identifyIrregularBoundaryCoordinatesLineProj(lines, convexhull);
 			
 			// Create Line representing new boundary
-			vector<LineSegment> *newlines = new vector<LineSegment>();
+			std::vector<geos::geom::LineSegment> *newlines = new std::vector<geos::geom::LineSegment>();
 			
 			int numPts = coordsLines->size()-1;
 			
 			for(int i = 0; i < numPts; i++)
 			{
-				newlines->push_back(LineSegment(*coordsLines->at(i), *coordsLines->at(i+1)));
+				newlines->push_back(geos::geom::LineSegment(*coordsLines->at(i), *coordsLines->at(i+1)));
 			}
-			newlines->push_back(LineSegment(*coordsLines->at(numPts), *coordsLines->at(0)));
+			newlines->push_back(geos::geom::LineSegment(*coordsLines->at(numPts), *coordsLines->at(0)));
 			
 			// Find new boundary within convex hull from the line
-			vector<Coordinate*> *coordsPolys = this->identifyIrregularBoundaryCoordinatesLineProj(newlines, convexhull);
+			std::vector<geos::geom::Coordinate*> *coordsPolys = this->identifyIrregularBoundaryCoordinatesLineProj(newlines, convexhull);
 			
 			// Create the polygon representing the new boundary
-			GeometryFactory* geomFactory = RSGISGEOSFactoryGenerator::getInstance()->getFactory();
+			geos::geom::GeometryFactory* geomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
 			
-			CoordinateArraySequence *coordSeq = new CoordinateArraySequence();
-			vector<Coordinate*>::iterator iterCoords;
-			Coordinate coord;
+			geos::geom::CoordinateArraySequence *coordSeq = new geos::geom::CoordinateArraySequence();
+			std::vector<geos::geom::Coordinate*>::iterator iterCoords;
+			geos::geom::Coordinate coord;
 			for(iterCoords = coordsPolys->begin(); iterCoords != coordsPolys->end(); iterCoords++)
 			{
-				coord = Coordinate((*iterCoords)->x, (*iterCoords)->y, (*iterCoords)->z);
+				coord = geos::geom::Coordinate((*iterCoords)->x, (*iterCoords)->y, (*iterCoords)->z);
 				coordSeq->add(coord, false);
 			}
-			coord = Coordinate((coordsPolys->at(0))->x, (coordsPolys->at(0))->y, (coordsPolys->at(0))->z);
+			coord = geos::geom::Coordinate((coordsPolys->at(0))->x, (coordsPolys->at(0))->y, (coordsPolys->at(0))->z);
 			coordSeq->add(coord, false);
-			LinearRing *polyRing = new LinearRing(coordSeq, geomFactory);
+			geos::geom::LinearRing *polyRing = new geos::geom::LinearRing(coordSeq, geomFactory);
 			poly = geomFactory->createPolygon(polyRing, NULL);
 			
 			delete newlines;
@@ -239,21 +239,21 @@ namespace rsgis{namespace geom{
 		return poly;
 	}
 	
-	vector<Coordinate*>* RSGISIdentifyNonConvexPolygonsLineProject::identifyIrregularBoundaryCoordinatesLineProj(vector<LineSegment> *lines, Polygon *convexhull) throw(RSGISGeometryException)
+	std::vector<geos::geom::Coordinate*>* RSGISIdentifyNonConvexPolygonsLineProject::identifyIrregularBoundaryCoordinatesLineProj(std::vector<geos::geom::LineSegment> *lines, geos::geom::Polygon *convexhull) throw(RSGISGeometryException)
 	{
 		RSGISGeometry geomUtils;
-		vector<Coordinate*> *coords = new vector<Coordinate*>();
+		std::vector<geos::geom::Coordinate*> *coords = new std::vector<geos::geom::Coordinate*>();
 		try
 		{
-			Envelope *bbox = geomUtils.getEnvelope(convexhull);
+			geos::geom::Envelope *bbox = geomUtils.getEnvelope(convexhull);
 			double lineLength = sqrt((bbox->getWidth() * bbox->getWidth()) + (bbox->getHeight() * bbox->getHeight()));
-			CoordinateSequence *coordsSeq = convexhull->getExteriorRing()->getCoordinates();
-			LineSegment *line = NULL;
-			Coordinate start;
-			Coordinate end;
-			Coordinate *currentS;
-			Coordinate *currentE;
-			Coordinate *intersect;
+			geos::geom::CoordinateSequence *coordsSeq = convexhull->getExteriorRing()->getCoordinates();
+			geos::geom::LineSegment *line = NULL;
+			geos::geom::Coordinate start;
+			geos::geom::Coordinate end;
+			geos::geom::Coordinate *currentS;
+			geos::geom::Coordinate *currentE;
+			geos::geom::Coordinate *intersect;
 			double steps = 0;
 			double length = 0;
 			double gap = 0;
@@ -276,16 +276,16 @@ namespace rsgis{namespace geom{
 				
 				for(int j = 0; j < steps; j++)
 				{
-					currentS = new Coordinate();
-					currentE = new Coordinate();
-					intersect = new Coordinate();
+					currentS = new geos::geom::Coordinate();
+					currentE = new geos::geom::Coordinate();
+					intersect = new geos::geom::Coordinate();
 					gap = resolution*j;
 					if(gap < length)
 					{
 						geomUtils.findPointOnLine(&start, &end, gap, currentS);
 						geomUtils.findPoint2Side(&start, currentS, &end, lineLength, currentE);
 						
-						line = new LineSegment(*currentS, *currentE);
+						line = new geos::geom::LineSegment(*currentS, *currentE);
 						
 						if(geomUtils.findClosestIntersect(lines, line, currentS, intersect))
 						{

@@ -28,20 +28,20 @@ namespace rsgis{namespace geom{
 
 	}
 
-	vector<Polygon*>* RSGISIdentifyNonConvexPolygonsDelaunay::retrievePolygons(list<RSGIS2DPoint*> **clusters, int numClusters) throw(RSGISGeometryException)
+	std::vector<geos::geom::Polygon*>* RSGISIdentifyNonConvexPolygonsDelaunay::retrievePolygons(std::list<RSGIS2DPoint*> **clusters, int numClusters) throw(RSGISGeometryException)
 	{
 		/*RSGISGeometry geomUtils;
-		RSGISMathsUtils mathUtils;
-		vector<Polygon*> *polys = new vector<Polygon*>();
-		vector<Polygon*> **polysClusters = new vector<Polygon*>*[numClusters];
+		rsgis::math::RSGISMathsUtils mathUtils;
+		std::vector<geos::geom::Polygon*> *polys = new std::vector<geos::geom::Polygon*>();
+		std::vector<geos::geom::Polygon*> **polysClusters = new std::vector<geos::geom::Polygon*>*[numClusters];
 		try
 		{
-			list<RSGIS2DPoint*> *pts = new list<RSGIS2DPoint*>();
-			list<RSGIS2DPoint*>::iterator iterPts;
+			std::list<RSGIS2DPoint*> *pts = new std::list<RSGIS2DPoint*>();
+			std::list<RSGIS2DPoint*>::iterator iterPts;
 			RSGISPolygon *poly = NULL;
 			for(int n = 0; n < numClusters; n++)
 			{
-				polysClusters[n] = new vector<Polygon*>();
+				polysClusters[n] = new std::vector<geos::geom::Polygon*>();
 				for(iterPts = clusters[n]->begin(); iterPts != clusters[n]->end(); iterPts++)
 				{
 					poly = (RSGISPolygon*) (*iterPts);
@@ -94,8 +94,8 @@ namespace rsgis{namespace geom{
 			RSGISDelaunayTriangulation *delaunayTriangulation = new RSGISDelaunayTriangulation(pts);
 			delaunayTriangulation->plotTriangulationAsEdges("triangulation");
 			
-			list<RSGISTriangle*> *triangulation = delaunayTriangulation->getTriangulation();
-			list<RSGISTriangle*>::iterator iterTri;
+			std::list<RSGISTriangle*> *triangulation = delaunayTriangulation->getTriangulation();
+			std::list<RSGISTriangle*>::iterator iterTri;
 			RSGISTriangle *tri = NULL;
 			for(iterTri = triangulation->begin(); iterTri != triangulation->end(); iterTri++)
 			{
@@ -110,10 +110,10 @@ namespace rsgis{namespace geom{
 			
 			//delaunayTriangulation->plotTriangulationAsEdges("triangulation_classsplit");
 			
-			list<RSGISTriangle*> **clusterTriangles = new list<RSGISTriangle*>*[numClusters];
+			std::list<RSGISTriangle*> **clusterTriangles = new std::list<RSGISTriangle*>*[numClusters];
 			for(int i = 0; i < numClusters; i++)
 			{
-				clusterTriangles[i] = new list<RSGISTriangle*>();
+				clusterTriangles[i] = new std::list<RSGISTriangle*>();
 			}
 			
 			unsigned int zero = 0;
@@ -162,20 +162,20 @@ namespace rsgis{namespace geom{
 		return NULL;
 	}
 
-	vector<Polygon*>* RSGISIdentifyNonConvexPolygonsDelaunay::retrievePolygons(list<RSGISPolygon*> **clusters, int numClusters) throw(RSGISGeometryException)
+	std::vector<geos::geom::Polygon*>* RSGISIdentifyNonConvexPolygonsDelaunay::retrievePolygons(std::list<RSGISPolygon*> **clusters, int numClusters) throw(RSGISGeometryException)
 	{
 		throw RSGISGeometryException("NOT IMPLEMENT!");
 		return NULL;
 	}
 	
-	vector<Polygon*>* RSGISIdentifyNonConvexPolygonsDelaunay::retrievePolygons(list<Polygon*> **clusters, int numClusters) throw(RSGISGeometryException)
+	std::vector<geos::geom::Polygon*>* RSGISIdentifyNonConvexPolygonsDelaunay::retrievePolygons(std::list<geos::geom::Polygon*> **clusters, int numClusters) throw(RSGISGeometryException)
 	{
-		vector<Polygon*> *polys = NULL;
+		std::vector<geos::geom::Polygon*> *polys = NULL;
 		
 		try
 		{
-			list<RSGIS2DPoint*> *pts = new list<RSGIS2DPoint*>();
-			list<Polygon*>::iterator iterPolys;
+			std::list<RSGIS2DPoint*> *pts = new std::list<RSGIS2DPoint*>();
+			std::list<geos::geom::Polygon*>::iterator iterPolys;
 			for(int i = 0; i < numClusters; ++i)
 			{
 				for(iterPolys = clusters[i]->begin(); iterPolys != clusters[i]->end(); ++iterPolys)
@@ -194,10 +194,10 @@ namespace rsgis{namespace geom{
 		return polys;
 	}
 
-	Polygon* RSGISIdentifyNonConvexPolygonsDelaunay::retrievePolygon(vector<Polygon*> *polygons) throw(RSGISGeometryException)
+	geos::geom::Polygon* RSGISIdentifyNonConvexPolygonsDelaunay::retrievePolygon(std::vector<geos::geom::Polygon*> *polygons) throw(RSGISGeometryException)
 	{
 		RSGISGeometry geomUtils;
-		Polygon *poly = NULL;
+		geos::geom::Polygon *poly = NULL;
 		try
 		{
 			if(polygons->size() == 0)
@@ -205,8 +205,8 @@ namespace rsgis{namespace geom{
 				throw RSGISGeometryException("There are no polygons from which to find a new polygon.");
 			}
 			
-			Polygon *convexHull = geomUtils.findConvexHull(polygons);
-			Envelope *env = geomUtils.getEnvelope(convexHull);
+			geos::geom::Polygon *convexHull = geomUtils.findConvexHull(polygons);
+			geos::geom::Envelope *env = geomUtils.getEnvelope(convexHull);
 			float buffer = 0;
 			if(env->getWidth() > env->getHeight())
 			{
@@ -217,14 +217,14 @@ namespace rsgis{namespace geom{
 				buffer = env->getHeight();
 			}
 			delete env;
-			Polygon *bufferedCHBuffer = dynamic_cast<Polygon*>(convexHull->buffer(buffer));
-			Polygon *bufferedCH5 = dynamic_cast<Polygon*>(convexHull->buffer(5));
+			geos::geom::Polygon *bufferedCHBuffer = dynamic_cast<geos::geom::Polygon*>(convexHull->buffer(buffer));
+			geos::geom::Polygon *bufferedCH5 = dynamic_cast<geos::geom::Polygon*>(convexHull->buffer(5));
 			
-			CoordinateSequence *coords = bufferedCHBuffer->getCoordinates();
-			Coordinate coord = Coordinate(0,0,0);
-			Coordinate coordN = Coordinate(0,0,0);
+			geos::geom::CoordinateSequence *coords = bufferedCHBuffer->getCoordinates();
+			geos::geom::Coordinate coord = geos::geom::Coordinate(0,0,0);
+			geos::geom::Coordinate coordN = geos::geom::Coordinate(0,0,0);
 			float distance = 0;
-			list<RSGIS2DPoint*> *pts_edge = new list<RSGIS2DPoint*>();
+			std::list<RSGIS2DPoint*> *pts_edge = new std::list<RSGIS2DPoint*>();
 			for(unsigned int i = 0; i < coords->size()-1; i++)
 			{
 				coord = coords->getAt(i);
@@ -234,7 +234,7 @@ namespace rsgis{namespace geom{
 				{
 					geomUtils.findPointOnLine(&coord, &coordN, 10, pts_edge);
 				}
-				pts_edge->push_back(new RSGIS2DPoint(new Coordinate(coord.x, coord.y, coord.z)));
+				pts_edge->push_back(new RSGIS2DPoint(new geos::geom::Coordinate(coord.x, coord.y, coord.z)));
 			}
 			
 			coord = coords->getAt(coords->size()-1);
@@ -244,11 +244,11 @@ namespace rsgis{namespace geom{
 			{
 				geomUtils.findPointOnLine(&coord, &coordN, 10, pts_edge);
 			}
-			pts_edge->push_back(new RSGIS2DPoint(new Coordinate(coord.x, coord.y, coord.z)));
+			pts_edge->push_back(new RSGIS2DPoint(new geos::geom::Coordinate(coord.x, coord.y, coord.z)));
 			delete coords;
 			
 			coords = bufferedCH5->getCoordinates();
-			list<RSGIS2DPoint*> *pts_edge2 = new list<RSGIS2DPoint*>();
+			std::list<RSGIS2DPoint*> *pts_edge2 = new std::list<RSGIS2DPoint*>();
 			for(unsigned int i = 0; i < coords->size()-1; i++)
 			{
 				coord = coords->getAt(i);
@@ -258,7 +258,7 @@ namespace rsgis{namespace geom{
 				{
 					geomUtils.findPointOnLine(&coord, &coordN, 5, pts_edge2);
 				}
-				pts_edge2->push_back(new RSGIS2DPoint(new Coordinate(coord.x, coord.y, coord.z)));
+				pts_edge2->push_back(new RSGIS2DPoint(new geos::geom::Coordinate(coord.x, coord.y, coord.z)));
 			}
 			
 			coord = coords->getAt(coords->size()-1);
@@ -268,24 +268,24 @@ namespace rsgis{namespace geom{
 			{
 				geomUtils.findPointOnLine(&coord, &coordN, 5, pts_edge2);
 			}
-			pts_edge2->push_back(new RSGIS2DPoint(new Coordinate(coord.x, coord.y, coord.z)));
+			pts_edge2->push_back(new RSGIS2DPoint(new geos::geom::Coordinate(coord.x, coord.y, coord.z)));
 			delete coords;
 			
-			list<RSGIS2DPoint*> *pts = new list<RSGIS2DPoint*>();
-			vector<Polygon*>::iterator iterPolys;
+			std::list<RSGIS2DPoint*> *pts = new std::list<RSGIS2DPoint*>();
+			std::vector<geos::geom::Polygon*>::iterator iterPolys;
 			for(iterPolys = polygons->begin(); iterPolys != polygons->end(); iterPolys++)
 			{
 				coords = (*iterPolys)->getCoordinates();
 				for(unsigned int i = 0; i < coords->size(); i++)
 				{
 					coord = coords->getAt(i);
-					pts->push_back(new RSGIS2DPoint(new Coordinate(coord.x, coord.y, coord.z)));
+					pts->push_back(new RSGIS2DPoint(new geos::geom::Coordinate(coord.x, coord.y, coord.z)));
 				}
 				delete coords;
 			}
 			
-			list<RSGIS2DPoint*>::iterator iterPTS; 
-			list<RSGIS2DPoint*> *pts_edge_all = new list<RSGIS2DPoint*>();
+			std::list<RSGIS2DPoint*>::iterator iterPTS; 
+			std::list<RSGIS2DPoint*> *pts_edge_all = new std::list<RSGIS2DPoint*>();
 			for(iterPTS = pts_edge->begin(); iterPTS != pts_edge->end(); ++iterPTS)
 			{
 				pts_edge_all->push_back(*iterPTS);
@@ -341,10 +341,10 @@ namespace rsgis{namespace geom{
 		return poly;
 	}
 	
-	Polygon* RSGISIdentifyNonConvexPolygonsDelaunay::retrievePolygon(list<Polygon*> *polygons) throw(RSGISGeometryException)
+	geos::geom::Polygon* RSGISIdentifyNonConvexPolygonsDelaunay::retrievePolygon(std::list<geos::geom::Polygon*> *polygons) throw(RSGISGeometryException)
 	{
 		RSGISGeometry geomUtils;
-		Polygon *poly = NULL;
+		geos::geom::Polygon *poly = NULL;
 		try
 		{
 			if(polygons->size() == 0)
@@ -352,8 +352,8 @@ namespace rsgis{namespace geom{
 				throw RSGISGeometryException("There are no polygons from which to find a new polygon.");
 			}
 			
-			Polygon *convexHull = geomUtils.findConvexHull(polygons);
-			Envelope *env = geomUtils.getEnvelope(convexHull);
+			geos::geom::Polygon *convexHull = geomUtils.findConvexHull(polygons);
+			geos::geom::Envelope *env = geomUtils.getEnvelope(convexHull);
 			float buffer = 0;
 			if(env->getWidth() > env->getHeight())
 			{
@@ -364,14 +364,14 @@ namespace rsgis{namespace geom{
 				buffer = env->getHeight();
 			}
 			delete env;
-			Polygon *bufferedCHBuffer = dynamic_cast<Polygon*>(convexHull->buffer(buffer));
-			Polygon *bufferedCH5 = dynamic_cast<Polygon*>(convexHull->buffer(5));
+			geos::geom::Polygon *bufferedCHBuffer = dynamic_cast<geos::geom::Polygon*>(convexHull->buffer(buffer));
+			geos::geom::Polygon *bufferedCH5 = dynamic_cast<geos::geom::Polygon*>(convexHull->buffer(5));
 			
-			CoordinateSequence *coords = bufferedCHBuffer->getCoordinates();
-			Coordinate coord = Coordinate(0,0,0);
-			Coordinate coordN = Coordinate(0,0,0);
+			geos::geom::CoordinateSequence *coords = bufferedCHBuffer->getCoordinates();
+			geos::geom::Coordinate coord = geos::geom::Coordinate(0,0,0);
+			geos::geom::Coordinate coordN = geos::geom::Coordinate(0,0,0);
 			float distance = 0;
-			list<RSGIS2DPoint*> *pts_edge = new list<RSGIS2DPoint*>();
+			std::list<RSGIS2DPoint*> *pts_edge = new std::list<RSGIS2DPoint*>();
 			for(unsigned int i = 0; i < coords->size()-1; i++)
 			{
 				coord = coords->getAt(i);
@@ -381,7 +381,7 @@ namespace rsgis{namespace geom{
 				{
 					geomUtils.findPointOnLine(&coord, &coordN, 10, pts_edge);
 				}
-				pts_edge->push_back(new RSGIS2DPoint(new Coordinate(coord.x, coord.y, coord.z)));
+				pts_edge->push_back(new RSGIS2DPoint(new geos::geom::Coordinate(coord.x, coord.y, coord.z)));
 			}
 			
 			coord = coords->getAt(coords->size()-1);
@@ -391,11 +391,11 @@ namespace rsgis{namespace geom{
 			{
 				geomUtils.findPointOnLine(&coord, &coordN, 10, pts_edge);
 			}
-			pts_edge->push_back(new RSGIS2DPoint(new Coordinate(coord.x, coord.y, coord.z)));
+			pts_edge->push_back(new RSGIS2DPoint(new geos::geom::Coordinate(coord.x, coord.y, coord.z)));
 			delete coords;
 			
 			coords = bufferedCH5->getCoordinates();
-			list<RSGIS2DPoint*> *pts_edge2 = new list<RSGIS2DPoint*>();
+			std::list<RSGIS2DPoint*> *pts_edge2 = new std::list<RSGIS2DPoint*>();
 			for(unsigned int i = 0; i < coords->size()-1; i++)
 			{
 				coord = coords->getAt(i);
@@ -405,7 +405,7 @@ namespace rsgis{namespace geom{
 				{
 					geomUtils.findPointOnLine(&coord, &coordN, 5, pts_edge2);
 				}
-				pts_edge2->push_back(new RSGIS2DPoint(new Coordinate(coord.x, coord.y, coord.z)));
+				pts_edge2->push_back(new RSGIS2DPoint(new geos::geom::Coordinate(coord.x, coord.y, coord.z)));
 			}
 			
 			coord = coords->getAt(coords->size()-1);
@@ -415,24 +415,24 @@ namespace rsgis{namespace geom{
 			{
 				geomUtils.findPointOnLine(&coord, &coordN, 5, pts_edge2);
 			}
-			pts_edge2->push_back(new RSGIS2DPoint(new Coordinate(coord.x, coord.y, coord.z)));
+			pts_edge2->push_back(new RSGIS2DPoint(new geos::geom::Coordinate(coord.x, coord.y, coord.z)));
 			delete coords;
 			
-			list<RSGIS2DPoint*> *pts = new list<RSGIS2DPoint*>();
-			list<Polygon*>::iterator iterPolys;
+			std::list<RSGIS2DPoint*> *pts = new std::list<RSGIS2DPoint*>();
+			std::list<geos::geom::Polygon*>::iterator iterPolys;
 			for(iterPolys = polygons->begin(); iterPolys != polygons->end(); iterPolys++)
 			{
 				coords = (*iterPolys)->getCoordinates();
 				for(unsigned int i = 0; i < coords->size(); i++)
 				{
 					coord = coords->getAt(i);
-					pts->push_back(new RSGIS2DPoint(new Coordinate(coord.x, coord.y, coord.z)));
+					pts->push_back(new RSGIS2DPoint(new geos::geom::Coordinate(coord.x, coord.y, coord.z)));
 				}
 				delete coords;
 			}
 			
-			list<RSGIS2DPoint*>::iterator iterPTS; 
-			list<RSGIS2DPoint*> *pts_edge_all = new list<RSGIS2DPoint*>();
+			std::list<RSGIS2DPoint*>::iterator iterPTS; 
+			std::list<RSGIS2DPoint*> *pts_edge_all = new std::list<RSGIS2DPoint*>();
 			for(iterPTS = pts_edge->begin(); iterPTS != pts_edge->end(); ++iterPTS)
 			{
 				pts_edge_all->push_back(*iterPTS);
@@ -488,17 +488,17 @@ namespace rsgis{namespace geom{
 		return poly;
 	}
 
-	vector<Polygon*>* RSGISIdentifyNonConvexPolygonsDelaunay::findPolygonsFromCoordinates(list<RSGIS2DPoint*> *pts, int numClusters) throw(RSGISGeometryException)
+	std::vector<geos::geom::Polygon*>* RSGISIdentifyNonConvexPolygonsDelaunay::findPolygonsFromCoordinates(std::list<RSGIS2DPoint*> *pts, int numClusters) throw(RSGISGeometryException)
 	{
-		vector<Polygon*> *polys = new vector<Polygon*>();
+		std::vector<geos::geom::Polygon*> *polys = new std::vector<geos::geom::Polygon*>();
 		try
 		{
 			cout << "Create delaunay triangulation\n";
 			RSGISDelaunayTriangulation *delaunayTriangulation = new RSGISDelaunayTriangulation(pts);
 			
 			cout << "Remove triangles across class/cluster border\n";
-			list<RSGISTriangle*> *triangulation = delaunayTriangulation->getTriangulation();
-			list<RSGISTriangle*>::iterator iterTri;
+			std::list<RSGISTriangle*> *triangulation = delaunayTriangulation->getTriangulation();
+			std::list<RSGISTriangle*>::iterator iterTri;
 			RSGISTriangle *tri = NULL;
 			for(iterTri = triangulation->begin(); iterTri != triangulation->end(); iterTri++)
 			{
@@ -511,10 +511,10 @@ namespace rsgis{namespace geom{
 				}
 			}
 			
-			list<RSGISTriangle*> **clusterTriangles = new list<RSGISTriangle*>*[numClusters];
+			std::list<RSGISTriangle*> **clusterTriangles = new std::list<RSGISTriangle*>*[numClusters];
 			for(int i = 0; i < numClusters; i++)
 			{
-				clusterTriangles[i] = new list<RSGISTriangle*>();
+				clusterTriangles[i] = new std::list<RSGISTriangle*>();
 			}
 			
 			unsigned int zero = 0;
@@ -557,16 +557,16 @@ namespace rsgis{namespace geom{
 		return polys;
 	}
 	
-	Polygon* RSGISIdentifyNonConvexPolygonsDelaunay::findPolygonFromTriangles(list<RSGISTriangle*> *cluster, int id, bool tryAgain) throw(RSGISGeometryException)
+	geos::geom::Polygon* RSGISIdentifyNonConvexPolygonsDelaunay::findPolygonFromTriangles(std::list<RSGISTriangle*> *cluster, int id, bool tryAgain) throw(RSGISGeometryException)
 	{
-		Polygon *outPoly = NULL;
+		geos::geom::Polygon *outPoly = NULL;
 		RSGISGeometry geomUtils;
-		RSGISMathsUtils mathUtils;
+		rsgis::math::RSGISMathsUtils mathUtils;
 		try
 		{
 			// Loop through and merge all neighboring triangles.
-			vector<Polygon*> *polys = new vector<Polygon*>();
-			list<RSGISTriangle*>::iterator iterTri;
+			std::vector<geos::geom::Polygon*> *polys = new std::vector<geos::geom::Polygon*>();
+			std::list<RSGISTriangle*>::iterator iterTri;
 
 			for(iterTri = cluster->begin(); iterTri != cluster->end(); iterTri++)
 			{
@@ -594,9 +594,9 @@ namespace rsgis{namespace geom{
 				float totalarea = 0;
 				float maxPolyAreaValue = 0;
 				float area = 0;
-				Polygon *maxAreaPoly = NULL;
+				geos::geom::Polygon *maxAreaPoly = NULL;
 				bool first = true;
-				vector<Polygon*>::iterator iterPolys;
+				std::vector<geos::geom::Polygon*>::iterator iterPolys;
 				for(iterPolys = polys->begin(); iterPolys != polys->end(); ++iterPolys )
 				{
 					if(first)
@@ -653,7 +653,7 @@ namespace rsgis{namespace geom{
 				}
 			}
 			
-			vector<Polygon*>::iterator iterPolys;
+			std::vector<geos::geom::Polygon*>::iterator iterPolys;
 			for(iterPolys = polys->begin(); iterPolys != polys->end(); )
 			{
 				delete *iterPolys;
@@ -669,34 +669,34 @@ namespace rsgis{namespace geom{
 		return outPoly;
 	}
 	
-	void RSGISIdentifyNonConvexPolygonsDelaunay::plotTriangulationAsEdges(string filename, list<RSGISTriangle*> *triangleList)
+	void RSGISIdentifyNonConvexPolygonsDelaunay::plotTriangulationAsEdges(string filename, std::list<RSGISTriangle*> *triangleList)
 	{
-		list<LineSegment> *lines = new list<LineSegment>();
-		list<RSGISTriangle*>::iterator iterTriangles;
+		std::list<geos::geom::LineSegment> *lines = new std::list<geos::geom::LineSegment>();
+		std::list<RSGISTriangle*>::iterator iterTriangles;
 		RSGISTriangle *tri = NULL;
 		for(iterTriangles = triangleList->begin(); iterTriangles != triangleList->end(); iterTriangles++)
 		{
 			tri = *iterTriangles;
-			lines->push_back(LineSegment(*tri->getPointA()->getPoint(), *tri->getPointB()->getPoint()));
-			lines->push_back(LineSegment(*tri->getPointB()->getPoint(), *tri->getPointC()->getPoint()));
-			lines->push_back(LineSegment(*tri->getPointC()->getPoint(), *tri->getPointA()->getPoint()));
+			lines->push_back(geos::geom::LineSegment(*tri->getPointA()->getPoint(), *tri->getPointB()->getPoint()));
+			lines->push_back(geos::geom::LineSegment(*tri->getPointB()->getPoint(), *tri->getPointC()->getPoint()));
+			lines->push_back(geos::geom::LineSegment(*tri->getPointC()->getPoint(), *tri->getPointA()->getPoint()));
 		}
-		RSGISExportForPlotting::getInstance()->export2DLines(filename, lines);
+        rsgis::utils::RSGISExportForPlotting::getInstance()->export2DLines(filename, lines);
 		lines->clear();
 		delete lines;
 	}
 	
-	void RSGISIdentifyNonConvexPolygonsDelaunay::getPoints(Polygon *poly, list<RSGIS2DPoint*> *pts, unsigned int classID)
+	void RSGISIdentifyNonConvexPolygonsDelaunay::getPoints(geos::geom::Polygon *poly, std::list<RSGIS2DPoint*> *pts, unsigned int classID)
 	{
 		if(poly != NULL)
 		{
-			CoordinateSequence *coords = poly->getCoordinates();
-			Coordinate coord;
+			geos::geom::CoordinateSequence *coords = poly->getCoordinates();
+			geos::geom::Coordinate coord;
 			RSGIS2DPoint *pt = NULL;
 			for(unsigned int i = 0; i < coords->getSize(); i++)
 			{
 				coord = coords->getAt(i);
-				pt = new RSGIS2DPoint(new Coordinate(coord.x, coord.y, coord.z));
+				pt = new RSGIS2DPoint(new geos::geom::Coordinate(coord.x, coord.y, coord.z));
 				pt->setClassID(classID);
 				pts->push_back(pt);
 			}

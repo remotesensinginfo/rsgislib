@@ -29,15 +29,13 @@
 #include "geos/geom/Polygon.h"
 #include "RSGISGeometryException.h"
 
-using namespace std;
-using namespace geos::geom;
 
 namespace rsgis{namespace geom{
 	
 	class RSGISAbstractOutlinePolygon
 		{
 		public:
-			virtual Polygon* createOutline(MultiPolygon *mPoly) throw(RSGISGeometryException)=0;
+			virtual geos::geom::Polygon* createOutline(geos::geom::MultiPolygon *mPoly) throw(RSGISGeometryException)=0;
 			virtual ~RSGISAbstractOutlinePolygon(){};
 		};
 }}

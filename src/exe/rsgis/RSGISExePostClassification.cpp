@@ -5891,7 +5891,7 @@ void RSGISExePostClassification::buildClusterDataStructure(vector<RSGISClusterDa
 										clusterPolygons->push_back(*iterIndividuals);
 									}
 								}
-								catch (TopologyException &e) 
+								catch (geos::util::TopologyException &e) 
 								{
 									
 									vector<Polygon*> *outPolys = new vector<Polygon*>();
@@ -5909,7 +5909,7 @@ void RSGISExePostClassification::buildClusterDataStructure(vector<RSGISClusterDa
 					}
 					//++countIndividuals;
 				}
-				catch (TopologyException &e) 
+				catch (geos::util::TopologyException &e) 
 				{
 					/*
 					vector<Polygon*> *outPolys = new vector<Polygon*>();
@@ -5951,7 +5951,7 @@ void RSGISExePostClassification::buildClusterDataStructure(vector<RSGISClusterDa
 		inClusterPolys->clear();
 		delete inClusterPolys;
 	}
-	catch (TopologyException &e) 
+	catch (geos::util::TopologyException &e) 
 	{
 		throw RSGISException(e.what());
 	}

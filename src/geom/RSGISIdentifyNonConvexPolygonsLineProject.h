@@ -37,25 +37,22 @@
 #include "geos/geom/Polygon.h"
 #include "geos/geom/LineSegment.h"
 
-using namespace std;
-using namespace geos::geom;
-
 namespace rsgis{namespace geom{
 	
 	class RSGISIdentifyNonConvexPolygonsLineProject : public RSGISIdentifyNonConvexPolygons
 		{
 		public:
 			RSGISIdentifyNonConvexPolygonsLineProject(float resolution);
-			virtual vector<Polygon*>* retrievePolygons(list<RSGIS2DPoint*> **clusters, int numClusters) throw(RSGISGeometryException);
-			virtual vector<Polygon*>* retrievePolygons(list<RSGISPolygon*> **clusters, int numClusters) throw(RSGISGeometryException);
-			virtual vector<Polygon*>* retrievePolygons(list<Polygon*> **clusters, int numClusters) throw(RSGISGeometryException);
-			virtual Polygon* retrievePolygon(vector<Polygon*> *polygons) throw(RSGISGeometryException);
-			virtual Polygon* retrievePolygon(list<Polygon*> *polygons) throw(RSGISGeometryException);
+			virtual std::vector<geos::geom::Polygon*>* retrievePolygons(std::list<RSGIS2DPoint*> **clusters, int numClusters) throw(RSGISGeometryException);
+			virtual std::vector<geos::geom::Polygon*>* retrievePolygons(std::list<RSGISPolygon*> **clusters, int numClusters) throw(RSGISGeometryException);
+			virtual std::vector<geos::geom::Polygon*>* retrievePolygons(std::list<geos::geom::Polygon*> **clusters, int numClusters) throw(RSGISGeometryException);
+			virtual geos::geom::Polygon* retrievePolygon(std::vector<geos::geom::Polygon*> *polygons) throw(RSGISGeometryException);
+			virtual geos::geom::Polygon* retrievePolygon(std::list<geos::geom::Polygon*> *polygons) throw(RSGISGeometryException);
 			virtual ~RSGISIdentifyNonConvexPolygonsLineProject();
 		protected:
 			float resolution;
-			virtual Polygon* identifyIrregularBoundaryLineProj(vector<LineSegment> *lines) throw(RSGISGeometryException);
-			virtual vector<Coordinate*>* identifyIrregularBoundaryCoordinatesLineProj(vector<LineSegment> *lines, Polygon *convexhull) throw(RSGISGeometryException);
+			virtual geos::geom::Polygon* identifyIrregularBoundaryLineProj(std::vector<geos::geom::LineSegment> *lines) throw(RSGISGeometryException);
+			virtual std::vector<geos::geom::Coordinate*>* identifyIrregularBoundaryCoordinatesLineProj(std::vector<geos::geom::LineSegment> *lines, geos::geom::Polygon *convexhull) throw(RSGISGeometryException);
 		};
 }}
 

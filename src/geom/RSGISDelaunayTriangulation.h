@@ -36,10 +36,6 @@
 
 #include "math/RSGISMathsUtils.h"
 
-using namespace std;
-using namespace geos::geom;
-using namespace rsgis::math;
-
 namespace rsgis{namespace geom{
 	
 	class RSGISDelaunayTriangulation
@@ -59,19 +55,19 @@ namespace rsgis{namespace geom{
 			 */
 			RSGISDelaunayTriangulation(RSGIS2DPoint *a, RSGIS2DPoint *b, RSGIS2DPoint *c);
 			RSGISDelaunayTriangulation(RSGISTriangle *tri);
-			RSGISDelaunayTriangulation(list<RSGIS2DPoint*> *data) throw(RSGISGeometryException);
-			RSGISDelaunayTriangulation(vector<RSGIS2DPoint*> *data) throw(RSGISGeometryException);
-			void createDelaunayTriangulation(list<RSGIS2DPoint*> *data) throw(RSGISGeometryException);
+			RSGISDelaunayTriangulation(std::list<RSGIS2DPoint*> *data) throw(RSGISGeometryException);
+			RSGISDelaunayTriangulation(std::vector<RSGIS2DPoint*> *data) throw(RSGISGeometryException);
+			void createDelaunayTriangulation(std::list<RSGIS2DPoint*> *data) throw(RSGISGeometryException);
 			void addVertex(RSGIS2DPoint *pt) throw(RSGISGeometryException);
-			void finaliseTriangulation(list<RSGIS2DPoint*> *data);
+			void finaliseTriangulation(std::list<RSGIS2DPoint*> *data);
 			void finaliseTriangulation();
-			list<RSGISTriangle*>* getTriangulation();
-			void plotTriangulationAsEdges(string filename);
+			std::list<RSGISTriangle*>* getTriangulation();
+			void plotTriangulationAsEdges(std::string filename);
 			~RSGISDelaunayTriangulation();
 		protected:
-			list<RSGIS2DPoint*>* getPtsClockwise(list<RSGISTriangle*> *tris, RSGIS2DPoint *pt);
-			list<RSGISTriangle*> *triangleList;
-			Envelope *bbox;
+			std::list<RSGIS2DPoint*>* getPtsClockwise(std::list<RSGISTriangle*> *tris, RSGIS2DPoint *pt);
+			std::list<RSGISTriangle*> *triangleList;
+            geos::geom::Envelope *bbox;
 			RSGIS2DPoint *aOuter;
 			RSGIS2DPoint *bOuter;
 			RSGIS2DPoint *cOuter;

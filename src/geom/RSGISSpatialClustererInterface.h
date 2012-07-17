@@ -31,15 +31,12 @@
 
 #include "math/RSGISClustererException.h"
 
-using namespace std;
-using namespace rsgis::math;
-
 namespace rsgis{namespace geom{
 	/// Abstract interface to implement Spatial Clusterers
 	class RSGISSpatialClustererInterface
 		{
 		public:
-			virtual list<RSGIS2DPoint*>** clusterData(vector<RSGIS2DPoint*> *data, int *numclusters, double *threshold) throw(RSGISClustererException) = 0;
+			virtual std::list<RSGIS2DPoint*>** clusterData(std::vector<RSGIS2DPoint*> *data, int *numclusters, double *threshold) throw(rsgis::math::RSGISClustererException) = 0;
 			virtual ~RSGISSpatialClustererInterface(){};
 		};
 }}

@@ -36,10 +36,6 @@
 #include "geos/geom/Coordinate.h"
 #include "geos/geom/Envelope.h"
 
-using namespace std;
-using namespace geos::geom;
-using namespace rsgis::math;
-
 namespace rsgis{namespace geom{
 	
 	class RSGISCircle
@@ -52,13 +48,13 @@ namespace rsgis{namespace geom{
 			bool containedBBOX(RSGIS2DPoint *pt);
 			double getRadius();
 			RSGIS2DPoint* getCentre();
-			friend ostream& operator<<(ostream& ostr, const RSGISCircle& tri);
-			ostream& operator<<(ostream& ostr);
+			friend std::ostream& operator<<(std::ostream& ostr, const RSGISCircle& tri);
+            std::ostream& operator<<(std::ostream& ostr);
 			virtual ~RSGISCircle();
 		protected:
 			RSGIS2DPoint *centre;
 			double radius;
-			Envelope *bbox;
+			geos::geom::Envelope *bbox;
 		};
 }}
 
