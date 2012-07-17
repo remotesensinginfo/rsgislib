@@ -36,20 +36,16 @@
 
 #include "utils/RSGISGEOSFactoryGenerator.h"
 
-using namespace std;
-using namespace geos::geom;
-using namespace rsgis::utils;
-
 namespace rsgis{namespace geom{
 	
 	class RSGISIdentifyNonConvexPolygons
 		{
 		public:
-			virtual vector<Polygon*>* retrievePolygons(list<RSGIS2DPoint*> **clusters, int numClusters) throw(RSGISGeometryException) = 0;
-			virtual vector<Polygon*>* retrievePolygons(list<RSGISPolygon*> **clusters, int numClusters) throw(RSGISGeometryException) = 0;
-			virtual vector<Polygon*>* retrievePolygons(list<Polygon*> **clusters, int numClusters) throw(RSGISGeometryException) = 0;
-			virtual Polygon* retrievePolygon(vector<Polygon*> *polygons) throw(RSGISGeometryException) = 0;
-			virtual Polygon* retrievePolygon(list<Polygon*> *polygons) throw(RSGISGeometryException) = 0;
+			virtual std::vector<geos::geom::Polygon*>* retrievePolygons(std::list<RSGIS2DPoint*> **clusters, int numClusters) throw(RSGISGeometryException) = 0;
+			virtual std::vector<geos::geom::Polygon*>* retrievePolygons(std::list<RSGISPolygon*> **clusters, int numClusters) throw(RSGISGeometryException) = 0;
+			virtual std::vector<geos::geom::Polygon*>* retrievePolygons(std::list<geos::geom::Polygon*> **clusters, int numClusters) throw(RSGISGeometryException) = 0;
+			virtual geos::geom::Polygon* retrievePolygon(std::vector<geos::geom::Polygon*> *polygons) throw(RSGISGeometryException) = 0;
+			virtual geos::geom::Polygon* retrievePolygon(std::list<geos::geom::Polygon*> *polygons) throw(RSGISGeometryException) = 0;
 			virtual ~RSGISIdentifyNonConvexPolygons(){};
 		};
 }}

@@ -44,28 +44,23 @@
 
 #include "utils/RSGISExportForPlotting.h"
 
-using namespace std;
-using namespace geos::geom;
-using namespace rsgis::utils;
-using namespace rsgis::math;
-
 namespace rsgis{namespace geom{
 	
 	class RSGISIdentifyNonConvexPolygonsDelaunay : public RSGISIdentifyNonConvexPolygons
 		{
 		public:
 			RSGISIdentifyNonConvexPolygonsDelaunay();
-			virtual vector<Polygon*>* retrievePolygons(list<RSGIS2DPoint*> **clusters, int numClusters) throw(RSGISGeometryException);
-			virtual vector<Polygon*>* retrievePolygons(list<RSGISPolygon*> **clusters, int numClusters) throw(RSGISGeometryException);
-			virtual vector<Polygon*>* retrievePolygons(list<Polygon*> **clusters, int numClusters) throw(RSGISGeometryException);
-			virtual Polygon* retrievePolygon(vector<Polygon*> *polygons) throw(RSGISGeometryException);
-			virtual Polygon* retrievePolygon(list<Polygon*> *polygons) throw(RSGISGeometryException);
+			virtual std::vector<geos::geom::Polygon*>* retrievePolygons(std::list<RSGIS2DPoint*> **clusters, int numClusters) throw(RSGISGeometryException);
+			virtual std::vector<geos::geom::Polygon*>* retrievePolygons(std::list<RSGISPolygon*> **clusters, int numClusters) throw(RSGISGeometryException);
+			virtual std::vector<geos::geom::Polygon*>* retrievePolygons(std::list<geos::geom::Polygon*> **clusters, int numClusters) throw(RSGISGeometryException);
+			virtual geos::geom::Polygon* retrievePolygon(std::vector<geos::geom::Polygon*> *polygons) throw(RSGISGeometryException);
+			virtual geos::geom::Polygon* retrievePolygon(std::list<geos::geom::Polygon*> *polygons) throw(RSGISGeometryException);
 			virtual ~RSGISIdentifyNonConvexPolygonsDelaunay();
 		private:
-			vector<Polygon*>* findPolygonsFromCoordinates(list<RSGIS2DPoint*> *pts, int numClusters) throw(RSGISGeometryException);
-			Polygon* findPolygonFromTriangles(list<RSGISTriangle*> *cluster, int id, bool tryAgain) throw(RSGISGeometryException);
-			void plotTriangulationAsEdges(string filename, list<RSGISTriangle*> *triangleList);
-			void getPoints(Polygon *poly, list<RSGIS2DPoint*> *pts, unsigned int classID);
+			std::vector<geos::geom::Polygon*>* findPolygonsFromCoordinates(std::list<RSGIS2DPoint*> *pts, int numClusters) throw(RSGISGeometryException);
+			geos::geom::Polygon* findPolygonFromTriangles(std::list<RSGISTriangle*> *cluster, int id, bool tryAgain) throw(RSGISGeometryException);
+			void plotTriangulationAsEdges(std::string filename, std::list<RSGISTriangle*> *triangleList);
+			void getPoints(geos::geom::Polygon *poly, std::list<RSGIS2DPoint*> *pts, unsigned int classID);
 		};
 }}
 

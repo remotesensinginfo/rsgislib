@@ -44,9 +44,6 @@
 
 #include <gsl/gsl_vector.h>
 
-using namespace std;
-using namespace geos::geom;
-using namespace rsgis::math;
 
 namespace rsgis{namespace geom{
 	
@@ -70,22 +67,22 @@ namespace rsgis{namespace geom{
 			bool contained(RSGIS2DPoint *pt);
 			bool containedBBOX(RSGIS2DPoint *pt);
 			bool containedCircle(RSGIS2DPoint *pt);
-			Envelope* getBBox();
+			geos::geom::Envelope* getBBox();
 			RSGISCircle* getCircle();
 			RSGIS2DPoint* getPointA();
 			RSGIS2DPoint* getPointB();
 			RSGIS2DPoint* getPointC();
 			double getArea();
-			Polygon* createPolygon();
-			friend ostream& operator<<(ostream& ostr, const RSGISTriangle& tri);
-			ostream& operator<<(ostream& ostr);
+			geos::geom::Polygon* createPolygon();
+			friend std::ostream& operator<<(std::ostream& ostr, const RSGISTriangle& tri);
+            std::ostream& operator<<(std::ostream& ostr);
 			virtual ~RSGISTriangle();
 		protected:
 			void setTriangleVertex(RSGIS2DPoint *p1, RSGIS2DPoint *p2, RSGIS2DPoint *p3);
 			RSGIS2DPoint *a;
 			RSGIS2DPoint *b;
 			RSGIS2DPoint *c;
-			Envelope *bbox;
+			geos::geom::Envelope *bbox;
 			RSGISCircle *circle;
 		};
 }}

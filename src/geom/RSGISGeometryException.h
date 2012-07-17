@@ -25,21 +25,16 @@
 
 #include "common/RSGISException.h"
 
-using namespace std;
-
-namespace rsgis 
-{
-	namespace geom
-	{
-		class RSGISGeometryException : public RSGISException
-			{
-			public:
-				RSGISGeometryException();
-				RSGISGeometryException(const char* message);
-				RSGISGeometryException(string message);
-			};
-	}
-}
+namespace rsgis{namespace geom{
+		
+    class RSGISGeometryException : public rsgis::RSGISException
+        {
+        public:
+            RSGISGeometryException();
+            RSGISGeometryException(const char* message);
+            RSGISGeometryException(std::string message);
+        };
+}}
 
 #endif
 

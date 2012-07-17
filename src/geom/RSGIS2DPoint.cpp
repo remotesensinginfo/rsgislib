@@ -31,7 +31,7 @@ namespace rsgis{namespace geom{
 		touched = false;
 	}
 	
-	RSGIS2DPoint::RSGIS2DPoint(Coordinate *pt)
+	RSGIS2DPoint::RSGIS2DPoint(geos::geom::Coordinate *pt)
 	{
 		this->point = pt;
 		index = 0;
@@ -39,7 +39,7 @@ namespace rsgis{namespace geom{
 		touched = false;
 	}
 	
-	RSGIS2DPoint::RSGIS2DPoint(Coordinate *pt, int classID)
+	RSGIS2DPoint::RSGIS2DPoint(geos::geom::Coordinate *pt, int classID)
 	{
 		this->point = pt;
 		index = 0;
@@ -47,12 +47,12 @@ namespace rsgis{namespace geom{
 		this->classID = classID;
 	}
 	
-	void RSGIS2DPoint::setPoint(Coordinate *pt)
+	void RSGIS2DPoint::setPoint(geos::geom::Coordinate *pt)
 	{
 		point = pt;
 	}
 	
-	const Coordinate* RSGIS2DPoint::getPoint()
+	const geos::geom::Coordinate* RSGIS2DPoint::getPoint()
 	{
 		return point;
 	}
@@ -107,18 +107,18 @@ namespace rsgis{namespace geom{
 		return sqrt(((pt->getPoint()->x - point->x)*(pt->getPoint()->x - point->x))+((pt->getPoint()->y - point->y)*(pt->getPoint()->y - point->y))); 
 	}
 	
-	double RSGIS2DPoint::distance(Coordinate *pt)
+	double RSGIS2DPoint::distance(geos::geom::Coordinate *pt)
 	{
 		return sqrt(((pt->x - point->x)*(pt->x - point->x))+((pt->y - point->y)*(pt->y - point->y)));
 	}
 	
-	ostream& operator<<(ostream& ostr, const RSGIS2DPoint& pt)
+	std::ostream& operator<<(std::ostream& ostr, const RSGIS2DPoint& pt)
 	{
 		ostr << "[" << pt.point->x << "," << pt.point->y << "," << pt.point->z << "]";
 		return ostr;
 	}
 	
-	ostream& RSGIS2DPoint::operator<<(ostream& ostr)
+	std::ostream& RSGIS2DPoint::operator<<(std::ostream& ostr)
 	{
 		ostr << "[" << point->x << "," << point->y << "," << point->z << "]";
 		return ostr;

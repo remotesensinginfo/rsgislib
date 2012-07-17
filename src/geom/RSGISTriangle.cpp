@@ -71,7 +71,7 @@ namespace rsgis{namespace geom{
 			maxY = this->c->getPoint()->y;
 		}
 		
-		bbox = new Envelope(minX, maxX, minY, maxY);
+		bbox = new geos::geom::Envelope(minX, maxX, minY, maxY);
 		circle = new RSGISCircle(a, b, c);
 	}
 	
@@ -126,7 +126,7 @@ namespace rsgis{namespace geom{
 		}
 		delete bbox;
 		delete circle;
-		bbox = new Envelope(minX, maxX, minY, maxY);
+		bbox = new geos::geom::Envelope(minX, maxX, minY, maxY);
 		circle = new RSGISCircle(a, b, c);
 	}
 	
@@ -139,7 +139,7 @@ namespace rsgis{namespace geom{
 		 */
 		bool returnValue = false;
 		
-		RSGISVectors vecUtils;
+        rsgis::math::RSGISVectors vecUtils;
 		
 		// C - A
 		gsl_vector *v0 = gsl_vector_alloc(2);
@@ -186,7 +186,7 @@ namespace rsgis{namespace geom{
 		return circle->contained(pt);
 	}
 	
-	Envelope* RSGISTriangle::getBBox()
+	geos::geom::Envelope* RSGISTriangle::getBBox()
 	{
 		return bbox;
 	}
@@ -279,30 +279,30 @@ namespace rsgis{namespace geom{
 			
 	}
 	
-	Polygon* RSGISTriangle::createPolygon()
+	geos::geom::Polygon* RSGISTriangle::createPolygon()
 	{
-		CoordinateSequence *coords = new CoordinateArraySequence();
-		coords->add(Coordinate(a->getX(), a->getY(), a->getZ()));
-		coords->add(Coordinate(b->getX(), b->getY(), b->getZ()));
-		coords->add(Coordinate(c->getX(), c->getY(), c->getZ()));
-		coords->add(Coordinate(a->getX(), a->getY(), a->getZ()));
+		geos::geom::CoordinateSequence *coords = new geos::geom::CoordinateArraySequence();
+		coords->add(geos::geom::Coordinate(a->getX(), a->getY(), a->getZ()));
+		coords->add(geos::geom::Coordinate(b->getX(), b->getY(), b->getZ()));
+		coords->add(geos::geom::Coordinate(c->getX(), c->getY(), c->getZ()));
+		coords->add(geos::geom::Coordinate(a->getX(), a->getY(), a->getZ()));
 		
-		PrecisionModel *pm = new PrecisionModel();
-		GeometryFactory *geomFac = new GeometryFactory(pm);
-		LinearRing *lr = geomFac->createLinearRing(coords);
+		geos::geom::PrecisionModel *pm = new geos::geom::PrecisionModel();
+		geos::geom::GeometryFactory *geomFac = new geos::geom::GeometryFactory(pm);
+		geos::geom::LinearRing *lr = geomFac->createLinearRing(coords);
 		
-		Polygon *polyTri = geomFac->createPolygon(lr, NULL);
+		geos::geom::Polygon *polyTri = geomFac->createPolygon(lr, NULL);
 		
 		return polyTri;
 	}
 	
-	ostream& operator<<(ostream& ostr, const RSGISTriangle& tri)
+    std::ostream& operator<<(std::ostream& ostr, const RSGISTriangle& tri)
 	{
 		ostr << "TRIANGLE[[" << tri.a->getPoint()->x << "," << tri.a->getPoint()->y << "][" << tri.b->getPoint()->x << "," << tri.b->getPoint()->y << "][" << tri.c->getPoint()->x << "," << tri.c->getPoint()->y << "]]";
 		return ostr;
 	}
 	
-	ostream& RSGISTriangle::operator<<(ostream& ostr)
+    std::ostream& RSGISTriangle::operator<<(std::ostream& ostr)
 	{
 		ostr << "TRIANGLE[[" << a->getPoint()->x << "," << a->getPoint()->y << "][" << b->getPoint()->x << "," << b->getPoint()->y << "][" << c->getPoint()->x << "," << c->getPoint()->y << "]]";
 		return ostr;

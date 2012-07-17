@@ -55,21 +55,13 @@
 #include "geos/simplify/DouglasPeuckerSimplifier.h"
 #include "geos/simplify/TopologyPreservingSimplifier.h"
 
-using namespace std;
-using namespace geos::geom;
-using namespace geos::util;
-using namespace geos::algorithm;
-using namespace rsgis::math;
-using namespace geos::index::quadtree;
-using namespace rsgis::utils;
-
 namespace rsgis{namespace geom{
 
-	struct SortCoordinates : binary_function< Coordinate, Coordinate, bool >
+	struct SortCoordinates : binary_function< geos::geom::Coordinate, geos::geom::Coordinate, bool >
 	{
-		const Coordinate coord;
-		SortCoordinates( const Coordinate& coord_ ): coord( coord_ ) { }
-		bool operator()( const Coordinate& a, const Coordinate& b ) const
+		const geos::geom::Coordinate coord;
+		SortCoordinates( const geos::geom::Coordinate& coord_ ): coord( coord_ ) { }
+		bool operator()( const geos::geom::Coordinate& a, const geos::geom::Coordinate& b ) const
 		{
 			bool returnVal = false;
 			if(a.x < b.x)
@@ -124,21 +116,21 @@ namespace rsgis{namespace geom{
 		double calcPlaneFit(point3D *pts, int numPts, double a, double b, double c) throw(RSGISGeometryException);
 		double calcPlaneZAt(double a, double b, double c, double x, double y) throw(RSGISGeometryException);
 		double distance2D(point3D *pt1, point2D *pt2);
-		Polygon* createCircle(float a, float b, float r, float resolution)throw(RSGISGeometryException);
-		Polygon* createPolygon(float xTL, float yTL, float xBR, float yBR);
-		//SortedGenericList<double>* findValuesOnEdge(Matrix *matrix, Polygon **bboxes, Polygon *poly);
-		Polygon** findMaxPointsOnPolyEdge(Matrix *matrix, Polygon **bboxes, Polygon *poly, int *numPolys);
-		Envelope* findBBox(list<RSGIS2DPoint*> *pts) throw(RSGISGeometryException);
-		Envelope* findBBox(vector<RSGIS2DPoint*> *pts) throw(RSGISGeometryException);
-		RSGISTriangle* findBoundingTriangle(list<RSGIS2DPoint*> *pts) throw(RSGISGeometryException);
-		RSGISTriangle* findBoundingTriangle(vector<RSGIS2DPoint*> *pts) throw(RSGISGeometryException);
+		geos::geom::Polygon* createCircle(float a, float b, float r, float resolution)throw(RSGISGeometryException);
+		geos::geom::Polygon* createPolygon(float xTL, float yTL, float xBR, float yBR);
+		//SortedGenericList<double>* findValuesOnEdge(rsgis::math::Matrix *matrix, geos::geom::Polygon **bboxes, geos::geom::Polygon *poly);
+		geos::geom::Polygon** findMaxPointsOnPolyEdge(rsgis::math::Matrix *matrix, geos::geom::Polygon **bboxes, geos::geom::Polygon *poly, int *numPolys);
+		geos::geom::Envelope* findBBox(std::list<RSGIS2DPoint*> *pts) throw(RSGISGeometryException);
+		geos::geom::Envelope* findBBox(std::vector<RSGIS2DPoint*> *pts) throw(RSGISGeometryException);
+		RSGISTriangle* findBoundingTriangle(std::list<RSGIS2DPoint*> *pts) throw(RSGISGeometryException);
+		RSGISTriangle* findBoundingTriangle(std::vector<RSGIS2DPoint*> *pts) throw(RSGISGeometryException);
 		double calcAngle(RSGIS2DPoint *pbase, RSGIS2DPoint *pt);
-		MultiPolygon* createMultiPolygon(const vector<Geometry*> *polygons);
-		Polygon* findConvexHull(vector<Polygon*> *geoms) throw(RSGISGeometryException);
-		Polygon* findConvexHull(list<Polygon*> *geoms) throw(RSGISGeometryException);
-		Polygon* findConvexHull(const vector<Geometry*> *geometries) throw(RSGISGeometryException);
-		Polygon* findConvexHull(vector<LineSegment> *lines) throw(RSGISGeometryException);
-		Polygon* findConvexHull(vector<Coordinate> *coordinates) throw(RSGISGeometryException);
+		geos::geom::MultiPolygon* createMultiPolygon(const std::vector<geos::geom::Geometry*> *polygons);
+		geos::geom::Polygon* findConvexHull(std::vector<geos::geom::Polygon*> *geoms) throw(RSGISGeometryException);
+		geos::geom::Polygon* findConvexHull(std::list<geos::geom::Polygon*> *geoms) throw(RSGISGeometryException);
+		geos::geom::Polygon* findConvexHull(const std::vector<geos::geom::Geometry*> *geometries) throw(RSGISGeometryException);
+		geos::geom::Polygon* findConvexHull(std::vector<geos::geom::LineSegment> *lines) throw(RSGISGeometryException);
+		geos::geom::Polygon* findConvexHull(std::vector<geos::geom::Coordinate> *coordinates) throw(RSGISGeometryException);
 		/** 
 		 * turnDirection. A method to identify which direction the middle point b 
 		 * is turning. 
@@ -147,83 +139,83 @@ namespace rsgis{namespace geom{
 		 * c - Right Hand Point
 		 * return int Direction -1 -> Left hand turn 0 -> No turn 1 -> Right hand turn
 		 */
-		int turnDirections(Coordinate *a, Coordinate *b, Coordinate *c);
-		bool removeItem(vector<Coordinate> *coordinates, Coordinate coord);
+		int turnDirections(geos::geom::Coordinate *a, geos::geom::Coordinate *b, geos::geom::Coordinate *c);
+		bool removeItem(std::vector<geos::geom::Coordinate> *coordinates, geos::geom::Coordinate coord);
 		/**
 		 * Find the straight line between the two points
 		 * y = mx + c
 		 */
-		void findLine(Coordinate *p1, Coordinate *p2, double *m, double *c);
-		void findPointOnLine(Coordinate *p1, Coordinate *p2, float distance, Coordinate *p3);
-		void findPointOnLine(Coordinate *p1, Coordinate *p2, float distance, list<RSGIS2DPoint*> *pts);
-		void findPointOnLine(Coordinate *p1, Coordinate *p2, float distance, CoordinateSequence *coords);
-		void findPoint2Side(Coordinate *pStart, Coordinate *p2, Coordinate *pEnd, float distance, Coordinate *p3);
-		Envelope* getEnvelope(Geometry *geom);
-		bool findClosestIntersect(vector<LineSegment> *lines, LineSegment *line, Coordinate *pt, Coordinate *coord);
-		void covert2LineSegments(Polygon *poly, vector<LineSegment> *lines);
-		void dissolveMergeSmallPolygons(vector<Polygon*> *polygons, vector<Polygon*> *smallPolygons, RSGISIdentifyNonConvexPolygons *nonconvexoutline) throw(RSGISGeometryException);
-		void mergeWithNearest(vector<Polygon*> *polygons, vector<Polygon*> *polygonsToMerge, RSGISIdentifyNonConvexPolygons *identifyNonConvexPolygon) throw(RSGISGeometryException);
-		void mergeWithNeighbor(vector<Polygon*> *polygons, vector<Polygon*> *polygonsToMerge, float relBorderThreshold, RSGISIdentifyNonConvexPolygons *nonconvexoutline) throw(RSGISGeometryException);
-		float calcRelativeBorder(Polygon *poly1, Polygon *poly2) throw(RSGISGeometryException);
-		Polygon* mergePolygons(Polygon *poly1, Polygon *poly2, RSGISIdentifyNonConvexPolygons *nonconvexoutline) throw(RSGISGeometryException);
-		Polygon* mergePolygons(Polygon *poly1, vector<Polygon*> *polygons, RSGISIdentifyNonConvexPolygons *nonconvexoutline) throw(RSGISGeometryException);
-		void findContaining(Polygon *outline, vector<Polygon*> *polygons, vector<Polygon*> *outPolygons) throw(RSGISGeometryException);
-		void removeOverlaps(vector<Polygon*> *polygons, Envelope *env, float tolerance, float dissolveThreshold) throw(RSGISGeometryException);
-		Polygon* createHole(const Polygon *poly, const Polygon *hole) throw(RSGISGeometryException);
-		Polygon* insertIntersectNodes(Polygon *poly, Polygon *intersect) throw(RSGISGeometryException);
-		double minDistanceBetweenPoints(Polygon *poly) throw(RSGISGeometryException);
-		Polygon* snapToXYGrid(Polygon *poly, double tolerance, bool calcTolerance, Envelope *env) throw(RSGISGeometryException);
-		void printPolygonCoords2File(Polygon *poly, string filename);
-		void retrievePolygons(Geometry *geom, vector<Polygon*> *polygons) throw(RSGISGeometryException);
-		void retrieveLines(Geometry *geom, vector<LineString*> *lines) throw(RSGISGeometryException);
-		void performMorphologicalOperation(vector<Polygon*> *polygons, Morphology morphology, float buffer, int curveSegments) throw(RSGISGeometryException);
-		void performMorphologicalOperation(vector<Geometry*> *geometries, Morphology morphology, float buffer, int curveSegments) throw(RSGISGeometryException);
+		void findLine(geos::geom::Coordinate *p1, geos::geom::Coordinate *p2, double *m, double *c);
+		void findPointOnLine(geos::geom::Coordinate *p1, geos::geom::Coordinate *p2, float distance, geos::geom::Coordinate *p3);
+		void findPointOnLine(geos::geom::Coordinate *p1, geos::geom::Coordinate *p2, float distance, std::list<RSGIS2DPoint*> *pts);
+		void findPointOnLine(geos::geom::Coordinate *p1, geos::geom::Coordinate *p2, float distance, geos::geom::CoordinateSequence *coords);
+		void findPoint2Side(geos::geom::Coordinate *pStart, geos::geom::Coordinate *p2, geos::geom::Coordinate *pEnd, float distance, geos::geom::Coordinate *p3);
+		geos::geom::Envelope* getEnvelope(geos::geom::Geometry *geom);
+		bool findClosestIntersect(std::vector<geos::geom::LineSegment> *lines, geos::geom::LineSegment *line, geos::geom::Coordinate *pt, geos::geom::Coordinate *coord);
+		void covert2LineSegments(geos::geom::Polygon *poly, std::vector<geos::geom::LineSegment> *lines);
+		void dissolveMergeSmallPolygons(std::vector<geos::geom::Polygon*> *polygons, std::vector<geos::geom::Polygon*> *smallPolygons, RSGISIdentifyNonConvexPolygons *nonconvexoutline) throw(RSGISGeometryException);
+		void mergeWithNearest(std::vector<geos::geom::Polygon*> *polygons, std::vector<geos::geom::Polygon*> *polygonsToMerge, RSGISIdentifyNonConvexPolygons *identifyNonConvexPolygon) throw(RSGISGeometryException);
+		void mergeWithNeighbor(std::vector<geos::geom::Polygon*> *polygons, std::vector<geos::geom::Polygon*> *polygonsToMerge, float relBorderThreshold, RSGISIdentifyNonConvexPolygons *nonconvexoutline) throw(RSGISGeometryException);
+		float calcRelativeBorder(geos::geom::Polygon *poly1, geos::geom::Polygon *poly2) throw(RSGISGeometryException);
+		geos::geom::Polygon* mergePolygons(geos::geom::Polygon *poly1, geos::geom::Polygon *poly2, RSGISIdentifyNonConvexPolygons *nonconvexoutline) throw(RSGISGeometryException);
+		geos::geom::Polygon* mergePolygons(geos::geom::Polygon *poly1, std::vector<geos::geom::Polygon*> *polygons, RSGISIdentifyNonConvexPolygons *nonconvexoutline) throw(RSGISGeometryException);
+		void findContaining(geos::geom::Polygon *outline, std::vector<geos::geom::Polygon*> *polygons, std::vector<geos::geom::Polygon*> *outPolygons) throw(RSGISGeometryException);
+		void removeOverlaps(std::vector<geos::geom::Polygon*> *polygons, geos::geom::Envelope *env, float tolerance, float dissolveThreshold) throw(RSGISGeometryException);
+		geos::geom::Polygon* createHole(const geos::geom::Polygon *poly, const geos::geom::Polygon *hole) throw(RSGISGeometryException);
+		geos::geom::Polygon* insertIntersectNodes(geos::geom::Polygon *poly, geos::geom::Polygon *intersect) throw(RSGISGeometryException);
+		double minDistanceBetweenPoints(geos::geom::Polygon *poly) throw(RSGISGeometryException);
+		geos::geom::Polygon* snapToXYGrid(geos::geom::Polygon *poly, double tolerance, bool calcTolerance, geos::geom::Envelope *env) throw(RSGISGeometryException);
+		void printPolygonCoords2File(geos::geom::Polygon *poly, string filename);
+		void retrievePolygons(geos::geom::Geometry *geom, std::vector<geos::geom::Polygon*> *polygons) throw(RSGISGeometryException);
+		void retrieveLines(geos::geom::Geometry *geom, std::vector<geos::geom::LineString*> *lines) throw(RSGISGeometryException);
+		void performMorphologicalOperation(std::vector<geos::geom::Polygon*> *polygons, Morphology morphology, float buffer, int curveSegments) throw(RSGISGeometryException);
+		void performMorphologicalOperation(std::vector<geos::geom::Geometry*> *geometries, Morphology morphology, float buffer, int curveSegments) throw(RSGISGeometryException);
 		/** Find the Euclidian distance between two points in 3D space (r in a sperical coordinate system) */ 
-		double get3DlineLenght(LineSegment *inLine);
+		double get3DlineLenght(geos::geom::LineSegment *inLine);
 		/** 
 		 * Find the zenith (phi) and azimuth (theta) angle of a line in 3D space. May also be used for converting from
 		 * Cartesian to Spherical coordinates.
 		 * A full explanation is provided here http://mathworld.wolfram.com/SphericalCoordinates.html
 		 */
-		double get3DLineZenithAngle(LineSegment *inLine);
-		double get3DlineAzimuthAngle(LineSegment *inLine);
-		double get3DLineZenithAngleDeg(LineSegment *inLine);
-		double get3DlineAzimuthAngleDeg(LineSegment *inLine);
-		vector<Polygon*>* polygonsBasicClean(vector<Polygon*> *polygons) throw(RSGISGeometryException);
-		vector<Polygon*>* polygonsSnapToXYGrid(vector<Polygon*> *polygons, float tolerance) throw(RSGISGeometryException);
-		Geometry* getIntersection(Polygon *poly1, Polygon *poly2) throw(RSGISGeometryException);
-		Geometry* getIntersection(Geometry *geom1, Geometry *geom2) throw(RSGISGeometryException);
-		Geometry* getDifference(Geometry *geom1, Geometry *geom2) throw(RSGISGeometryException);
+		double get3DLineZenithAngle(geos::geom::LineSegment *inLine);
+		double get3DlineAzimuthAngle(geos::geom::LineSegment *inLine);
+		double get3DLineZenithAngleDeg(geos::geom::LineSegment *inLine);
+		double get3DlineAzimuthAngleDeg(geos::geom::LineSegment *inLine);
+		std::vector<geos::geom::Polygon*>* polygonsBasicClean(std::vector<geos::geom::Polygon*> *polygons) throw(RSGISGeometryException);
+		std::vector<geos::geom::Polygon*>* polygonsSnapToXYGrid(std::vector<geos::geom::Polygon*> *polygons, float tolerance) throw(RSGISGeometryException);
+		geos::geom::Geometry* getIntersection(geos::geom::Polygon *poly1, geos::geom::Polygon *poly2) throw(RSGISGeometryException);
+		geos::geom::Geometry* getIntersection(geos::geom::Geometry *geom1, geos::geom::Geometry *geom2) throw(RSGISGeometryException);
+		geos::geom::Geometry* getDifference(geos::geom::Geometry *geom1, geos::geom::Geometry *geom2) throw(RSGISGeometryException);
 		/// Merge touching polygons
-		void mergeTouchingPolygons(vector<Polygon*> *polys) throw(RSGISGeometryException);
+		void mergeTouchingPolygons(std::vector<geos::geom::Polygon*> *polys) throw(RSGISGeometryException);
 		/// Merge touching polygons
-		void mergeTouchingPolygonsWithIndex(vector<Polygon*> *polys) throw(RSGISGeometryException);
+		void mergeTouchingPolygonsWithIndex(std::vector<geos::geom::Polygon*> *polys) throw(RSGISGeometryException);
 		/// Merge touching polygons, ignores geos topography warnings
-		void mergeTouchingPolygonsForce(vector<Polygon*> *polys) throw(RSGISGeometryException);
-		Polygon* polygonUnion(Polygon *poly1, Polygon *poly2) throw(RSGISGeometryException);
-		bool shareBorder(Polygon *poly1, Polygon *poly2) throw(RSGISGeometryException);
-		bool equalLineSegments(LineSegment *line1, LineSegment *line2, float threshold) throw(RSGISGeometryException);
+		void mergeTouchingPolygonsForce(std::vector<geos::geom::Polygon*> *polys) throw(RSGISGeometryException);
+		geos::geom::Polygon* polygonUnion(geos::geom::Polygon *poly1, geos::geom::Polygon *poly2) throw(RSGISGeometryException);
+		bool shareBorder(geos::geom::Polygon *poly1, geos::geom::Polygon *poly2) throw(RSGISGeometryException);
+		bool equalLineSegments(geos::geom::LineSegment *line1, geos::geom::LineSegment *line2, float threshold) throw(RSGISGeometryException);
 		bool straightLine(RSGIS2DPoint *p1, RSGIS2DPoint *p2, RSGIS2DPoint *p3) throw(RSGISGeometryException);
-		float amountOfOverlap(Polygon *poly, vector<Polygon*> *polys) throw(RSGISGeometryException);
-		void mergeTouchingPolygons(vector<Polygon*> *polys, float sizeThreshold) throw(RSGISGeometryException);
-		bool geometryBetweenFast(Polygon *poly1, Polygon *poly2, Geometry *master) throw(RSGISGeometryException);
-		bool geometryBetweenAccurate(Polygon *poly1, Polygon *poly2, Geometry *master) throw(RSGISGeometryException);
-		Polygon* addNodes(Polygon *poly, int nodeStep) throw(RSGISGeometryException);
-		vector<LineSegment*>* findLineProj(Polygon *poly) throw(RSGISGeometryException);
-		vector<LineSegment*>* findLineProj(vector<Coordinate*> *coords, float lineLength) throw(RSGISGeometryException);
-		void removeNeighborDuplicates(vector<Coordinate*> *coords);
+		float amountOfOverlap(geos::geom::Polygon *poly, std::vector<geos::geom::Polygon*> *polys) throw(RSGISGeometryException);
+		void mergeTouchingPolygons(std::vector<geos::geom::Polygon*> *polys, float sizeThreshold) throw(RSGISGeometryException);
+		bool geometryBetweenFast(geos::geom::Polygon *poly1, geos::geom::Polygon *poly2, geos::geom::Geometry *master) throw(RSGISGeometryException);
+		bool geometryBetweenAccurate(geos::geom::Polygon *poly1, geos::geom::Polygon *poly2, geos::geom::Geometry *master) throw(RSGISGeometryException);
+		geos::geom::Polygon* addNodes(geos::geom::Polygon *poly, int nodeStep) throw(RSGISGeometryException);
+		std::vector<geos::geom::LineSegment*>* findLineProj(geos::geom::Polygon *poly) throw(RSGISGeometryException);
+		std::vector<geos::geom::LineSegment*>* findLineProj(std::vector<geos::geom::Coordinate*> *coords, float lineLength) throw(RSGISGeometryException);
+		void removeNeighborDuplicates(std::vector<geos::geom::Coordinate*> *coords);
 		/// Check for overlaping polygons
-		float overlap(Geometry *geom1, Geometry *geom2) throw(RSGISGeometryException);
+		float overlap(geos::geom::Geometry *geom1, geos::geom::Geometry *geom2) throw(RSGISGeometryException);
 		/// Check for overlaping polygons, ignore geos topography warnings
-		float overlapForce(Geometry *geom1, Geometry *geom2) throw(RSGISGeometryException);
-		Polygon* removeHoles(Polygon* poly);
-        vector<Polygon*>* removeHoles(vector<Polygon*> *polys);
+		float overlapForce(geos::geom::Geometry *geom1, geos::geom::Geometry *geom2) throw(RSGISGeometryException);
+		geos::geom::Polygon* removeHoles(geos::geom::Polygon* poly);
+        std::vector<geos::geom::Polygon*>* removeHoles(std::vector<geos::geom::Polygon*> *polys);
         void convertGeometryCollection2Lines(OGRGeometryCollection *geomCollectionIn, OGRGeometryCollection *geomCollectionOut) throw(RSGISGeometryException);
         void convertPolygons2Lines(OGRPolygon *poly, OGRGeometryCollection *geomCollectionOut) throw(RSGISGeometryException);
-        vector<Polygon*>* simplifyPolygons(vector<Polygon*> *polys, double distTol);
-        //vector<Polygon*>* simplifyTopologyPolygons(vector<Polygon*> *polys);
-		Polygon* applyOffset2Polygon(Polygon *poly, double xOff, double yOff);
-        vector<Polygon*>* applyOffset2Polygons(vector<Polygon*> *polys, double xOff, double yOff);
+        std::vector<geos::geom::Polygon*>* simplifyPolygons(std::vector<geos::geom::Polygon*> *polys, double distTol);
+        //std::vector<geos::geom::Polygon*>* simplifyTopologyPolygons(std::vector<geos::geom::Polygon*> *polys);
+		geos::geom::Polygon* applyOffset2Polygon(geos::geom::Polygon *poly, double xOff, double yOff);
+        std::vector<geos::geom::Polygon*>* applyOffset2Polygons(std::vector<geos::geom::Polygon*> *polys, double xOff, double yOff);
         ~RSGISGeometry();
 	};
 	

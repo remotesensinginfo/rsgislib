@@ -39,28 +39,24 @@
 #include <boost/graph/kruskal_min_spanning_tree.hpp>
 #include <boost/graph/connected_components.hpp>
 
-using namespace std;
-using namespace rsgis::math;
-using namespace boost;
-
 namespace rsgis{namespace geom{
 	
 	/// Class that implments the abstract interface RSGISSpatialClustererInterface.
 	/// The clusterer calculates the minimum spanning tree from a delaunay triangulation 
 	/// and removes the edges above a length threshold.
 	
-	typedef adjacency_list< vecS, vecS, undirectedS, property< vertex_name_t, string >, property< edge_weight_t, float > > ClusterGraph;
+	typedef boost::adjacency_list< boost::vecS, boost::vecS, boost::undirectedS, boost::property< boost::vertex_name_t, std::string >, boost::property< boost::edge_weight_t, float > > ClusterGraph;
 	
 	class RSGISMinSpanTreeClustererEdgeLenThreshold : public RSGISSpatialClustererInterface
 		{
 		public:
 			RSGISMinSpanTreeClustererEdgeLenThreshold(float lengththreshold);
-			virtual list<RSGIS2DPoint*>** clusterData(vector<RSGIS2DPoint*> *data, int *numclusters, double *threshold) throw(RSGISClustererException);
+			virtual std::list<RSGIS2DPoint*>** clusterData(std::vector<RSGIS2DPoint*> *data, int *numclusters, double *threshold) throw(rsgis::math::RSGISClustererException);
 			void updateLengthThreshold(float lengththreshold);
 			virtual ~RSGISMinSpanTreeClustererEdgeLenThreshold();
 		protected:
 			float lengththreshold;
-			ClusterGraph* constructGraph(RSGISDelaunayTriangulation *tri, vector<RSGIS2DPoint*> *data);
+			ClusterGraph* constructGraph(RSGISDelaunayTriangulation *tri, std::vector<RSGIS2DPoint*> *data);
 			void constructMinimumSpanningTree(ClusterGraph *cg);
 		};
 }}

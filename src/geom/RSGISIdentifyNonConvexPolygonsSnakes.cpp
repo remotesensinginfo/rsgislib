@@ -39,32 +39,32 @@ namespace rsgis{namespace geom{
 		this->maxNumIterations = maxNumIterations;
 	}
 			
-	vector<Polygon*>* RSGISIdentifyNonConvexPolygonsSnakes::retrievePolygons(list<RSGIS2DPoint*> **clusters, int numClusters) throw(RSGISGeometryException)
+	std::vector<geos::geom::Polygon*>* RSGISIdentifyNonConvexPolygonsSnakes::retrievePolygons(std::list<RSGIS2DPoint*> **clusters, int numClusters) throw(RSGISGeometryException)
 	{
 		throw RSGISGeometryException("Not Implemented");
 		
 		return NULL;
 	}
 	
-	vector<Polygon*>* RSGISIdentifyNonConvexPolygonsSnakes::retrievePolygons(list<RSGISPolygon*> **clusters, int numClusters) throw(RSGISGeometryException)
+	std::vector<geos::geom::Polygon*>* RSGISIdentifyNonConvexPolygonsSnakes::retrievePolygons(std::list<RSGISPolygon*> **clusters, int numClusters) throw(RSGISGeometryException)
 	{
-		vector<Polygon*> *outPolys = new vector<Polygon*>();
+		std::vector<geos::geom::Polygon*> *outPolys = new std::vector<geos::geom::Polygon*>();
 		
 		try
 		{
-			list<RSGISPolygon*>::iterator iterPolys;
-			list<Polygon*> *polys = new list<Polygon*>();
+			std::list<RSGISPolygon*>::iterator iterPolys;
+			std::list<geos::geom::Polygon*> *polys = new std::list<geos::geom::Polygon*>();
 			
 			for(int i = 0; i < numClusters; ++i)
 			{
-				cout << "\nPolygon " << i << endl;
+				std::cout << "\nPolygon " << i << std::endl;
 				for(iterPolys = clusters[i]->begin(); iterPolys != clusters[i]->end(); ++iterPolys)
 				{
 					polys->push_back((*iterPolys)->getPolygon());
 				}
 				outPolys->push_back(this->retrievePolygon(polys));
 				polys->clear();
-				cout << "End Calc Polygon\n";
+				std::cout << "End Calc Polygon\n";
 			}	
 			delete polys;
 		}
@@ -76,17 +76,17 @@ namespace rsgis{namespace geom{
 		return outPolys;
 	}
 	
-	vector<Polygon*>* RSGISIdentifyNonConvexPolygonsSnakes::retrievePolygons(list<Polygon*> **clusters, int numClusters) throw(RSGISGeometryException)
+	std::vector<geos::geom::Polygon*>* RSGISIdentifyNonConvexPolygonsSnakes::retrievePolygons(std::list<geos::geom::Polygon*> **clusters, int numClusters) throw(RSGISGeometryException)
 	{
-		vector<Polygon*> *outPolys = new vector<Polygon*>();
+		std::vector<geos::geom::Polygon*> *outPolys = new std::vector<geos::geom::Polygon*>();
 		
 		try
 		{			
 			for(int i = 0; i < numClusters; ++i)
 			{
-				cout << "\nPolygon " << i << endl;
+				std::cout << "\nPolygon " << i << std::endl;
 				outPolys->push_back(this->retrievePolygon(clusters[i]));
-				cout << "End Calc Polygon\n";
+				std::cout << "End Calc Polygon\n";
 			}			
 		}
 		catch(RSGISGeometryException &e)
@@ -97,41 +97,41 @@ namespace rsgis{namespace geom{
 		return outPolys;
 	}
 	
-	Polygon* RSGISIdentifyNonConvexPolygonsSnakes::retrievePolygon(vector<Polygon*> *polygons) throw(RSGISGeometryException)
+	geos::geom::Polygon* RSGISIdentifyNonConvexPolygonsSnakes::retrievePolygon(std::vector<geos::geom::Polygon*> *polygons) throw(RSGISGeometryException)
 	{
 		RSGISGeometry geomUtils;
-		Polygon *outPoly = NULL;
+		geos::geom::Polygon *outPoly = NULL;
 		GDALDataset *imageDist = NULL;
 		try
 		{
-			GeometryFactory* geosGeomFactory = RSGISGEOSFactoryGenerator::getInstance()->getFactory();
-			GeometryCollection *geom = this->createGeomCollection(polygons);
+			geos::geom::GeometryFactory * geosGeomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
+			geos::geom::GeometryCollection  *geom = this->createGeomCollection(polygons);
 			
 			if(gdalDriver == NULL)
 			{
 				throw RSGISGeometryException("MEM (Memory) driver does not exists..");
 			}
 			
-			imageDist = this->createDataset(gdalDriver, geom, "/Users/pete/Temp/DistanceImage_contains.env", this->resolution, 0);
-			cout << "Create distance image\n";
+			imageDist = this->createDataset(gdalDriver, geom, "", this->resolution, 0);
+			std::cout << "Create distance image\n";
 			this->createDistanceImage(imageDist, geom);
 			geosGeomFactory->destroyGeometry(geom);
 			
-			cout << "Retrieve Polygons from image pixels\n";
-			vector<Polygon*> *pxlPolys = new vector<Polygon*>();
+			std::cout << "Retrieve Polygons from image pixels\n";
+			std::vector<geos::geom::Polygon*> *pxlPolys = new std::vector<geos::geom::Polygon*>();
 			this->populatePixelPolygons(imageDist, resolution*2, pxlPolys);
 			
 			//RSGISGeomTestExport exportGeom;
 			//exportGeom.exportGEOSPolygons2SHP("/Users/pete/Temp/pixelpolys.shp", true, pxlPolys);
 			
-			cout << "Merge touching Polygons.\n";
+			std::cout << "Merge touching Polygons.\n";
 			geomUtils.mergeTouchingPolygonsWithIndex(pxlPolys);
 			//exportGeom.exportGEOSPolygons2SHP("/Users/pete/Temp/pixelpoly_merged.shp", true, pxlPolys);
 			
 			int bufferIterations = 0;
 			while(pxlPolys->size() > 1)
 			{
-                //cout << "Buffering " << bufferIterations << " pxlPolys->size() = " << pxlPolys->size() << endl;
+                //std::cout << "Buffering " << bufferIterations << " pxlPolys->size() = " << pxlPolys->size() << std::endl;
 				geomUtils.performMorphologicalOperation(pxlPolys, dilation, resolution, 6);
 				geomUtils.mergeTouchingPolygonsForce(pxlPolys);
 				++bufferIterations;
@@ -142,7 +142,7 @@ namespace rsgis{namespace geom{
 			}
 			//exportGeom.exportGEOSPolygons2SHP("/Users/pete/Temp/pixelpoly_merged_single.shp", true, pxlPolys);
             
-			Envelope *imgBoundary = new Envelope();
+			geos::geom::Envelope *imgBoundary = new geos::geom::Envelope();
 			int imgWidth = imageDist->GetRasterXSize();
 			int imgHeight = imageDist->GetRasterYSize();			
 			double *trans = new double[6];
@@ -155,15 +155,15 @@ namespace rsgis{namespace geom{
 			imgBoundary->init(xMin, xMax, yMin, yMax);
 			delete[] trans;
 			
-			vector<LineSegment*> *lines = NULL;
-			CoordinateSequence *coords = NULL;
-			Polygon *convexhull = NULL;
-			Polygon *convexHullNodesAdded = NULL;
-			Polygon *outlinePoly = NULL;
-			vector<Coordinate*> *coordsVec = new vector<Coordinate*>();
+			std::vector<geos::geom::LineSegment*> *lines = NULL;
+			geos::geom::CoordinateSequence *coords = NULL;
+			geos::geom::Polygon *convexhull = NULL;
+			geos::geom::Polygon *convexHullNodesAdded = NULL;
+			geos::geom::Polygon *outlinePoly = NULL;
+			std::vector<geos::geom::Coordinate*> *coordsVec = new std::vector<geos::geom::Coordinate*>();
 			
-			RSGISGlobalOptimisationFunction *optimiseFunc = NULL;
-			RSGISGlobalOptimiser2D *optimise = NULL;
+			rsgis::math::RSGISGlobalOptimisationFunction *optimiseFunc = NULL;
+			rsgis::math::RSGISGlobalOptimiser2D *optimise = NULL;
 			
 			if(pxlPolys->size() == 1)
 			{
@@ -171,31 +171,31 @@ namespace rsgis{namespace geom{
 				outlinePoly = geomUtils.removeHoles(pxlPolys->at(0));
 				coords = outlinePoly->getCoordinates();
 				
-				Coordinate coord;
+				geos::geom::Coordinate coord;
 				for(unsigned int i = 1; i < coords->size(); ++i)
 				{
 					coord = coords->getAt(i);
-					coordsVec->push_back(new Coordinate(coord.x, coord.y, coord.z));
+					coordsVec->push_back(new geos::geom::Coordinate(coord.x, coord.y, coord.z));
 				}
 				delete coords;
 				
 				geomUtils.removeNeighborDuplicates(coordsVec);
 				
 				optimiseFunc = new RSGISSnakeNonConvexGlobalOptimisationFunction(imageDist, this->alpha, this->beta, this->gamma);
-				optimise = new RSGISGlobalHillClimbingOptimiser2DVaryNumPts(optimiseFunc, false, maxNumIterations);
+				optimise = new rsgis::math::RSGISGlobalHillClimbingOptimiser2DVaryNumPts(optimiseFunc, false, maxNumIterations);
 			}
 			else
 			{
-				cout << "Reverting to Convex Hull as starting point.\n";
+				std::cout << "Reverting to Convex Hull as starting point.\n";
 				convexhull = geomUtils.findConvexHull(polygons);
 				convexHullNodesAdded = geomUtils.addNodes(convexhull, resolution);
 				coords = convexHullNodesAdded->getCoordinates();
 				
-				Coordinate coord;
+				geos::geom::Coordinate coord;
 				for(unsigned int i = 1; i < coords->size(); ++i)
 				{
 					coord = coords->getAt(i);
-					coordsVec->push_back(new Coordinate(coord.x, coord.y, coord.z));
+					coordsVec->push_back(new geos::geom::Coordinate(coord.x, coord.y, coord.z));
 				}
 				delete coords;
 				
@@ -219,25 +219,25 @@ namespace rsgis{namespace geom{
 				}
 				
 				optimiseFunc = new RSGISSnakeNonConvexLineProjGlobalOptimisationFunction(imageDist, this->alpha, this->beta, this->gamma, delta, lines);
-				optimise = new RSGISGlobalHillClimbingOptimiser2D(optimiseFunc, false, (maxNumIterations * 3));
+				optimise = new rsgis::math::RSGISGlobalHillClimbingOptimiser2D(optimiseFunc, false, (maxNumIterations * 3));
 			}
-			cout << "CoordVec has " << coordsVec->size() << " nodes\n";
+			std::cout << "CoordVec has " << coordsVec->size() << " nodes\n";
 			
-			cout << "Perform snakes based refinement of boundary\n";
-			vector<Coordinate*> *coordsVecOp = optimise->optimise8Neighbor(coordsVec, resolution, imgBoundary);
+			std::cout << "Perform snakes based refinement of boundary\n";
+			std::vector<geos::geom::Coordinate*> *coordsVecOp = optimise->optimise8Neighbor(coordsVec, resolution, imgBoundary);
 				
-			vector<Coordinate*>::iterator iterCoords;
-			coords = new CoordinateArraySequence();
-			Coordinate *ptrCoord;
+			std::vector<geos::geom::Coordinate*>::iterator iterCoords;
+			coords = new geos::geom::CoordinateArraySequence();
+			geos::geom::Coordinate *ptrCoord;
 			for(iterCoords = coordsVecOp->begin(); iterCoords != coordsVecOp->end(); ++iterCoords)
 			{
 				ptrCoord = *iterCoords;
-				coords->add(Coordinate(ptrCoord->x, ptrCoord->y, ptrCoord->z));
+				coords->add(geos::geom::Coordinate(ptrCoord->x, ptrCoord->y, ptrCoord->z));
 			}
 			ptrCoord = coordsVecOp->front();
-			coords->add(Coordinate(ptrCoord->x, ptrCoord->y, ptrCoord->z));
+			coords->add(geos::geom::Coordinate(ptrCoord->x, ptrCoord->y, ptrCoord->z));
 						
-			LinearRing *ring = geosGeomFactory->createLinearRing(coords);
+			geos::geom::LinearRing *ring = geosGeomFactory->createLinearRing(coords);
 			outPoly = geosGeomFactory->createPolygon(ring, NULL);
 			
 			delete optimise;
@@ -258,7 +258,7 @@ namespace rsgis{namespace geom{
 				delete outlinePoly;
 			}
 			
-			vector<Polygon*>::iterator iterPolys;
+			std::vector<geos::geom::Polygon*>::iterator iterPolys;
 			for(iterPolys = pxlPolys->begin(); iterPolys != pxlPolys->end(); )
 			{
 				delete *iterPolys;
@@ -282,7 +282,7 @@ namespace rsgis{namespace geom{
 			
 			if(lines != NULL)
 			{
-				vector<LineSegment*>::iterator iterLines;
+				std::vector<geos::geom::LineSegment*>::iterator iterLines;
 				for(iterLines = lines->begin(); iterLines != lines->end(); )
 				{
 					delete *iterLines;
@@ -294,7 +294,7 @@ namespace rsgis{namespace geom{
 			delete imgBoundary;
 			GDALClose(imageDist);
 		}
-		catch(TopologyException &e)
+		catch(geos::util::TopologyException &e)
 		{
 			GDALClose(imageDist);
 			throw RSGISGeometryException(e.what());
@@ -304,7 +304,7 @@ namespace rsgis{namespace geom{
 			GDALClose(imageDist);
 			throw RSGISGeometryException(e.what());
 		}
-		catch(IllegalArgumentException &e)
+		catch(geos::util::IllegalArgumentException &e)
 		{
 			throw RSGISGeometryException(e.what());
 		}
@@ -312,34 +312,34 @@ namespace rsgis{namespace geom{
 		return outPoly;
 	}
 	
-	Polygon* RSGISIdentifyNonConvexPolygonsSnakes::retrievePolygon(list<Polygon*> *polygons) throw(RSGISGeometryException)
+	geos::geom::Polygon* RSGISIdentifyNonConvexPolygonsSnakes::retrievePolygon(std::list<geos::geom::Polygon*> *polygons) throw(RSGISGeometryException)
 	{
 		RSGISGeometry geomUtils;
-		Polygon *outPoly = NULL;
+		geos::geom::Polygon *outPoly = NULL;
 		GDALDataset *imageDist = NULL;
 		try
 		{
-			GeometryFactory* geosGeomFactory = RSGISGEOSFactoryGenerator::getInstance()->getFactory();
-			GeometryCollection *geom = this->createGeomCollection(polygons);
+			geos::geom::GeometryFactory * geosGeomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
+			geos::geom::GeometryCollection  *geom = this->createGeomCollection(polygons);
 			
 			if(gdalDriver == NULL)
 			{
 				throw RSGISGeometryException("MEM (Memory) driver does not exists..");
 			}
 			
-			imageDist = this->createDataset(gdalDriver, geom, "/Users/pete/Temp/DistanceImage_contains.env", this->resolution, 0);
-			cout << "Create distance image\n";
+			imageDist = this->createDataset(gdalDriver, geom, "", this->resolution, 0);
+			std::cout << "Create distance image\n";
 			this->createDistanceImage(imageDist, geom);
 			geosGeomFactory->destroyGeometry(geom);
 			
-			cout << "Retrieve Polygons from image pixels\n";
-			vector<Polygon*> *pxlPolys = new vector<Polygon*>();
+			std::cout << "Retrieve Polygons from image pixels\n";
+			std::vector<geos::geom::Polygon*> *pxlPolys = new std::vector<geos::geom::Polygon*>();
 			this->populatePixelPolygons(imageDist, resolution*2, pxlPolys);
 			
 			//RSGISGeomTestExport exportGeom;
 			//exportGeom.exportGEOSPolygons2SHP("/Users/pete/Temp/Clustering/test/snakestest/pixelpolys.shp", true, pxlPolys);
 			
-			cout << "Merge touching Polygons.\n";
+			std::cout << "Merge touching Polygons.\n";
 			geomUtils.mergeTouchingPolygonsWithIndex(pxlPolys);
 			//exportGeom.exportGEOSPolygons2SHP("/Users/pete/Temp/Clustering/test/snakestest/pixelpoly_merged.shp", true, pxlPolys);
 			
@@ -356,7 +356,7 @@ namespace rsgis{namespace geom{
 			}
 			//exportGeom.exportGEOSPolygons2SHP("/Users/pete/Temp/Clustering/test/snakestest/pixelpoly_merged_single.shp", true, pxlPolys);
 			
-			Envelope *imgBoundary = new Envelope();
+			geos::geom::Envelope  *imgBoundary = new geos::geom::Envelope ();
 			int imgWidth = imageDist->GetRasterXSize();
 			int imgHeight = imageDist->GetRasterYSize();			
 			double *trans = new double[6];
@@ -369,15 +369,15 @@ namespace rsgis{namespace geom{
 			imgBoundary->init(xMin, xMax, yMin, yMax);
 			delete[] trans;
 			
-			vector<LineSegment*> *lines = NULL;
-			CoordinateSequence *coords = NULL;
-			Polygon *convexhull = NULL;
-			Polygon *convexHullNodesAdded = NULL;
-			Polygon *outlinePoly = NULL;
-			vector<Coordinate*> *coordsVec = new vector<Coordinate*>();
+			std::vector<geos::geom::LineSegment*> *lines = NULL;
+			geos::geom::CoordinateSequence *coords = NULL;
+			geos::geom::Polygon *convexhull = NULL;
+			geos::geom::Polygon *convexHullNodesAdded = NULL;
+			geos::geom::Polygon *outlinePoly = NULL;
+			std::vector<geos::geom::Coordinate*> *coordsVec = new std::vector<geos::geom::Coordinate*>();
 			
-			RSGISGlobalOptimisationFunction *optimiseFunc = NULL;
-			RSGISGlobalOptimiser2D *optimise = NULL;
+			rsgis::math::RSGISGlobalOptimisationFunction *optimiseFunc = NULL;
+			rsgis::math::RSGISGlobalOptimiser2D *optimise = NULL;
 			
 			if(pxlPolys->size() == 1)
 			{
@@ -386,31 +386,31 @@ namespace rsgis{namespace geom{
 				coords = outlinePoly->getCoordinates();
 				
 				
-				Coordinate coord;
+				geos::geom::Coordinate coord;
 				for(unsigned int i = 1; i < coords->size(); ++i)
 				{
 					coord = coords->getAt(i);
-					coordsVec->push_back(new Coordinate(coord.x, coord.y, coord.z));
+					coordsVec->push_back(new geos::geom::Coordinate(coord.x, coord.y, coord.z));
 				}
 				delete coords;
 				
 				geomUtils.removeNeighborDuplicates(coordsVec);
 				
 				optimiseFunc = new RSGISSnakeNonConvexGlobalOptimisationFunction(imageDist, this->alpha, this->beta, this->gamma);
-				optimise = new RSGISGlobalHillClimbingOptimiser2DVaryNumPts(optimiseFunc, false, maxNumIterations);
+				optimise = new rsgis::math::RSGISGlobalHillClimbingOptimiser2DVaryNumPts(optimiseFunc, false, maxNumIterations);
 			}
 			else
 			{
-				cout << "Reverting to Convex Hull as starting point.\n";
+				std::cout << "Reverting to Convex Hull as starting point.\n";
 				convexhull = geomUtils.findConvexHull(polygons);
 				convexHullNodesAdded = geomUtils.addNodes(convexhull, resolution);
 				coords = convexHullNodesAdded->getCoordinates();
 				
-				Coordinate coord;
+				geos::geom::Coordinate coord;
 				for(unsigned int i = 1; i < coords->size(); ++i)
 				{
 					coord = coords->getAt(i);
-					coordsVec->push_back(new Coordinate(coord.x, coord.y, coord.z));
+					coordsVec->push_back(new geos::geom::Coordinate(coord.x, coord.y, coord.z));
 				}
 				delete coords;
 				
@@ -434,25 +434,25 @@ namespace rsgis{namespace geom{
 				}
 				
 				optimiseFunc = new RSGISSnakeNonConvexLineProjGlobalOptimisationFunction(imageDist, this->alpha, this->beta, this->gamma, delta, lines);
-				optimise = new RSGISGlobalHillClimbingOptimiser2D(optimiseFunc, false, (maxNumIterations * 3));
+				optimise = new rsgis::math::RSGISGlobalHillClimbingOptimiser2D(optimiseFunc, false, (maxNumIterations * 3));
 			}
-			cout << "CoordVec has " << coordsVec->size() << " nodes\n";
+			std::cout << "CoordVec has " << coordsVec->size() << " nodes\n";
 			
-			cout << "Perform snakes based refinement of boundary\n";
-			vector<Coordinate*> *coordsVecOp = optimise->optimise8Neighbor(coordsVec, resolution, imgBoundary);
+			std::cout << "Perform snakes based refinement of boundary\n";
+			std::vector<geos::geom::Coordinate*> *coordsVecOp = optimise->optimise8Neighbor(coordsVec, resolution, imgBoundary);
 			
-			vector<Coordinate*>::iterator iterCoords;
-			coords = new CoordinateArraySequence();
-			Coordinate *ptrCoord;
+			std::vector<geos::geom::Coordinate*>::iterator iterCoords;
+			coords = new geos::geom::CoordinateArraySequence();
+			geos::geom::Coordinate *ptrCoord;
 			for(iterCoords = coordsVecOp->begin(); iterCoords != coordsVecOp->end(); ++iterCoords)
 			{
 				ptrCoord = *iterCoords;
-				coords->add(Coordinate(ptrCoord->x, ptrCoord->y, ptrCoord->z));
+				coords->add(geos::geom::Coordinate(ptrCoord->x, ptrCoord->y, ptrCoord->z));
 			}
 			ptrCoord = coordsVecOp->front();
-			coords->add(Coordinate(ptrCoord->x, ptrCoord->y, ptrCoord->z));
+			coords->add(geos::geom::Coordinate(ptrCoord->x, ptrCoord->y, ptrCoord->z));
 			
-			LinearRing *ring = geosGeomFactory->createLinearRing(coords);
+			geos::geom::LinearRing *ring = geosGeomFactory->createLinearRing(coords);
 			outPoly = geosGeomFactory->createPolygon(ring, NULL);
 			
 			delete optimise;
@@ -473,7 +473,7 @@ namespace rsgis{namespace geom{
 				delete outlinePoly;
 			}
 			
-			vector<Polygon*>::iterator iterPolys;
+			std::vector<geos::geom::Polygon*>::iterator iterPolys;
 			for(iterPolys = pxlPolys->begin(); iterPolys != pxlPolys->end(); )
 			{
 				delete *iterPolys;
@@ -497,7 +497,7 @@ namespace rsgis{namespace geom{
 			
 			if(lines != NULL)
 			{
-				vector<LineSegment*>::iterator iterLines;
+				std::vector<geos::geom::LineSegment*>::iterator iterLines;
 				for(iterLines = lines->begin(); iterLines != lines->end(); )
 				{
 					delete *iterLines;
@@ -509,7 +509,7 @@ namespace rsgis{namespace geom{
 			delete imgBoundary;
 			GDALClose(imageDist);
 		}
-		catch(TopologyException &e)
+		catch(geos::util::TopologyException &e)
 		{
 			GDALClose(imageDist);
 			throw RSGISGeometryException(e.what());
@@ -519,7 +519,7 @@ namespace rsgis{namespace geom{
 			GDALClose(imageDist);
 			throw RSGISGeometryException(e.what());
 		}
-		catch(IllegalArgumentException &e)
+		catch(geos::util::IllegalArgumentException &e)
 		{
 			throw RSGISGeometryException(e.what());
 		}
@@ -527,11 +527,11 @@ namespace rsgis{namespace geom{
 		return outPoly;
 	}
 		
-	GDALDataset* RSGISIdentifyNonConvexPolygonsSnakes::createDataset(GDALDriver *gdalDriver, Geometry *geom, string filename, float resolution, float constVal) throw(RSGISImageException)
+	GDALDataset* RSGISIdentifyNonConvexPolygonsSnakes::createDataset(GDALDriver *gdalDriver, geos::geom::Geometry *geom, std::string filename, float resolution, float constVal) throw(RSGISImageException)
 	{
 		RSGISGeometry geomUtils;
 		
-		Envelope *env = geomUtils.getEnvelope(geom);
+		geos::geom::Envelope  *env = geomUtils.getEnvelope (geom);
 		
 		int imageWidth = (int) ((env->getWidth()/resolution)+0.5) + 100;
 		int imageHeight = (int) ((env->getHeight()/resolution)+0.5) + 100;
@@ -574,11 +574,11 @@ namespace rsgis{namespace geom{
 		return imageDS;
 	}
 	
-	void RSGISIdentifyNonConvexPolygonsSnakes::rasterizeLayer(Geometry *geom, GDALDataset *image, float constVal) throw(RSGISImageException)
+	void RSGISIdentifyNonConvexPolygonsSnakes::rasterizeLayer(geos::geom::Geometry *geom, GDALDataset *image, float constVal) throw(rsgis::RSGISImageException)
 	{		
 		try
 		{
-			Envelope *envImage = new Envelope();
+			geos::geom::Envelope  *envImage = new geos::geom::Envelope ();
 			double *gdalTranslation = new double[6];
 			image->GetGeoTransform(gdalTranslation);
 			envImage->init(gdalTranslation[0], (gdalTranslation[0]+(image->GetRasterXSize()*resolution)), (gdalTranslation[3]-(image->GetRasterYSize()*resolution)), gdalTranslation[3]);
@@ -591,10 +591,10 @@ namespace rsgis{namespace geom{
 			float *inData = (float *) CPLMalloc(sizeof(float)*imgWidth);
 			float *outData = (float *) CPLMalloc(sizeof(float)*imgWidth);
 			
-			GeometryFactory* geomFactory = RSGISGEOSFactoryGenerator::getInstance()->getFactory();
+			geos::geom::GeometryFactory * geomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
 			
-			Coordinate coord;
-			Point *pt = NULL;
+			geos::geom::Coordinate coord;
+			geos::geom::Point *pt = NULL;
 			
 			double pxlMinX = envImage->getMinX();
 			double pxlMaxY = envImage->getMaxY();
@@ -608,14 +608,14 @@ namespace rsgis{namespace geom{
 
 			if(imgHeight >= 10)
 			{
-				cout << "Started" << flush;
+				std::cout << "Started" << flush;
 			}
 			
 			for(unsigned int i = 0; i < imgHeight; ++i)
 			{
 				if((imgHeight >= 10) && ((i % feedback) == 0))
 				{
-					cout << ".." << feedbackCounter << ".." << flush;
+					std::cout << ".." << feedbackCounter << ".." << flush;
 					feedbackCounter = feedbackCounter + 10;
 				}
 						
@@ -627,7 +627,7 @@ namespace rsgis{namespace geom{
 				{
 					pxlX = pxlMinX + halfPxlWidth;
 					pxlY = pxlMaxY - halfPxlWidth;
-					coord = Coordinate(pxlX, pxlY, 0);
+					coord = geos::geom::Coordinate(pxlX, pxlY, 0);
 					
 					pt = geomFactory->createPoint(coord);
 										
@@ -651,7 +651,7 @@ namespace rsgis{namespace geom{
 			}
 			if(imgHeight >= 10)
 			{
-				cout << " Complete.\n";
+				std::cout << " Complete.\n";
 			}
 			
 			delete[] inData;
@@ -663,11 +663,11 @@ namespace rsgis{namespace geom{
 		}
 	}
 	
-	void RSGISIdentifyNonConvexPolygonsSnakes::createDistanceImage(GDALDataset *image, Geometry *geom) throw(RSGISImageException, RSGISGeometryException)
+	void RSGISIdentifyNonConvexPolygonsSnakes::createDistanceImage(GDALDataset *image, geos::geom::Geometry *geom) throw(RSGISImageException, RSGISGeometryException)
 	{
 		try
 		{
-			Envelope *envImage = new Envelope();
+			geos::geom::Envelope *envImage = new geos::geom::Envelope();
 			double *gdalTranslation = new double[6];
 			image->GetGeoTransform(gdalTranslation);
 			envImage->init(gdalTranslation[0], (gdalTranslation[0]+(image->GetRasterXSize()*resolution)), (gdalTranslation[3]-(image->GetRasterYSize()*resolution)), gdalTranslation[3]);
@@ -679,10 +679,10 @@ namespace rsgis{namespace geom{
 			GDALRasterBand *imageBand = image->GetRasterBand(1);
 			float *outData = (float *) CPLMalloc(sizeof(float)*imgWidth);
 			
-			GeometryFactory* geomFactory = RSGISGEOSFactoryGenerator::getInstance()->getFactory();
+			geos::geom::GeometryFactory * geomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
 			
-			Coordinate coord;
-			Point *pt = NULL;
+			geos::geom::Coordinate coord;
+			geos::geom::Point *pt = NULL;
 			
 			double pxlMinX = envImage->getMinX();
 			double pxlMaxY = envImage->getMaxY();
@@ -696,14 +696,14 @@ namespace rsgis{namespace geom{
 			
 			if(imgHeight >= 10)
 			{
-				cout << "Started" << flush;
+				std::cout << "Started" << flush;
 			}
 			
 			for(unsigned int i = 0; i < imgHeight; ++i)
 			{
 				if((imgHeight >= 10) && ((i % feedback) == 0))
 				{
-					cout << ".." << feedbackCounter << ".." << flush;
+					std::cout << ".." << feedbackCounter << ".." << flush;
 					feedbackCounter = feedbackCounter + 10;
 				}
 				
@@ -713,7 +713,7 @@ namespace rsgis{namespace geom{
 				{
 					pxlX = pxlMinX + halfPxlWidth;
 					pxlY = pxlMaxY - halfPxlWidth;
-					coord = Coordinate(pxlX, pxlY, 0);
+					coord = geos::geom::Coordinate(pxlX, pxlY, 0);
 					
 					pt = geomFactory->createPoint(coord);
 					
@@ -738,7 +738,7 @@ namespace rsgis{namespace geom{
 			}
 			if(imgHeight >= 10)
 			{
-				cout << " Complete.\n";
+				std::cout << " Complete.\n";
 			}
 			
 			CPLFree(outData);
@@ -754,19 +754,19 @@ namespace rsgis{namespace geom{
 		}
 	}
 	
-	GeometryCollection* RSGISIdentifyNonConvexPolygonsSnakes::createGeomCollection(vector<Polygon*> *polys) throw(RSGISGeometryException)
+	geos::geom::GeometryCollection * RSGISIdentifyNonConvexPolygonsSnakes::createGeomCollection(std::vector<geos::geom::Polygon*> *polys) throw(RSGISGeometryException)
 	{
-		GeometryCollection *geom = NULL;
+		geos::geom::GeometryCollection  *geom = NULL;
 		try
 		{
-			vector<Geometry*> *geoms = new vector<Geometry*>();
-			vector<Polygon*>::iterator iterPolys;
+			std::vector<geos::geom::Geometry*> *geoms = new std::vector<geos::geom::Geometry*>();
+			std::vector<geos::geom::Polygon*>::iterator iterPolys;
 			for(iterPolys = polys->begin(); iterPolys != polys->end(); ++iterPolys)
 			{
 				geoms->push_back((*iterPolys)->getBoundary());
 			}
 			
-			GeometryFactory* geomFactory = RSGISGEOSFactoryGenerator::getInstance()->getFactory();
+			geos::geom::GeometryFactory * geomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
 			geom = geomFactory->createGeometryCollection(geoms);
 		}
 		catch(RSGISGeometryException &e)
@@ -777,20 +777,20 @@ namespace rsgis{namespace geom{
 		return geom;
 	}
 	
-	GeometryCollection* RSGISIdentifyNonConvexPolygonsSnakes::createGeomCollection(list<Polygon*> *polys) throw(RSGISGeometryException)
+	geos::geom::GeometryCollection * RSGISIdentifyNonConvexPolygonsSnakes::createGeomCollection(std::list<geos::geom::Polygon*> *polys) throw(RSGISGeometryException)
 	{
-		GeometryCollection *geom = NULL;
+		geos::geom::GeometryCollection  *geom = NULL;
 		try
 		{
-			vector<Geometry*> *geoms = new vector<Geometry*>();
-			list<Polygon*>::iterator iterPolys;
+			std::vector<geos::geom::Geometry*> *geoms = new std::vector<geos::geom::Geometry*>();
+			std::list<geos::geom::Polygon*>::iterator iterPolys;
 			for(iterPolys = polys->begin(); iterPolys != polys->end(); ++iterPolys)
 			{
 				geoms->push_back((*iterPolys)->getBoundary());
 			}
 			
-			GeometryFactory* geomFactory = RSGISGEOSFactoryGenerator::getInstance()->getFactory();
-			geom = geomFactory->createGeometryCollection(geoms);
+			geos::geom::GeometryFactory * geomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
+			geom = geomFactory->createGeometryCollection (geoms);
 		}
 		catch(RSGISGeometryException &e)
 		{
@@ -800,7 +800,7 @@ namespace rsgis{namespace geom{
 		return geom;
 	}
 	
-	void RSGISIdentifyNonConvexPolygonsSnakes::populatePixelPolygons(GDALDataset *image, float threshold, vector<Polygon*> *polys) throw(RSGISGeometryException)
+	void RSGISIdentifyNonConvexPolygonsSnakes::populatePixelPolygons(GDALDataset *image, float threshold, std::vector<geos::geom::Polygon*> *polys) throw(RSGISGeometryException)
 	{
 		double *gdalTranslation = new double[6];
 		int height = 0;
@@ -810,7 +810,7 @@ namespace rsgis{namespace geom{
 		
 		GDALRasterBand *inputRasterBand = NULL;
 		
-		Envelope extent;
+		geos::geom::Envelope  extent;
 		double pxlTLX = 0;
 		double pxlTLY = 0;
 		double pxlWidth = 0;
@@ -843,15 +843,15 @@ namespace rsgis{namespace geom{
 			
 			int feedback = height/10;
 			int feedbackCounter = 0;
-			cout << "Started" << flush;
+			std::cout << "Started" << flush;
 			// Loop images to process data
 			for(int i = 0; i < height; i++)
 			{
-				//cout << i << " of " << height << endl;
+				//std::cout << i << " of " << height << std::endl;
 				
 				if((i % feedback) == 0)
 				{
-					cout << ".." << feedbackCounter << ".." << flush;
+					std::cout << ".." << feedbackCounter << ".." << flush;
 					feedbackCounter = feedbackCounter + 10;
 				}
 				
@@ -871,7 +871,7 @@ namespace rsgis{namespace geom{
 				pxlTLY -= pxlHeight;
 				pxlTLX = gdalTranslation[0];
 			}
-			cout << " Complete.\n";
+			std::cout << " Complete.\n";
 		}
 		catch(RSGISException& e)
 		{
@@ -898,21 +898,21 @@ namespace rsgis{namespace geom{
 		}
 	}
 	
-	Polygon* RSGISIdentifyNonConvexPolygonsSnakes::createPolygonFromEnv(Envelope env)
+	geos::geom::Polygon* RSGISIdentifyNonConvexPolygonsSnakes::createPolygonFromEnv(geos::geom::Envelope  env)
 	{
-		vector<Coordinate> *coords = new vector<Coordinate>();
+		std::vector<geos::geom::Coordinate> *coords = new std::vector<geos::geom::Coordinate>();
 		
-		coords->push_back(Coordinate((env.getMaxX() + 0.1), (env.getMaxY() + 0.1), 0));
-		coords->push_back(Coordinate((env.getMaxX() + 0.1), (env.getMinY() - 0.1), 0));
-		coords->push_back(Coordinate((env.getMinX() - 0.1), (env.getMinY() - 0.1), 0));
-		coords->push_back(Coordinate((env.getMinX() - 0.1), (env.getMaxY() + 0.1), 0));
-		coords->push_back(Coordinate((env.getMaxX() + 0.1), (env.getMaxY() + 0.1), 0));
+		coords->push_back(geos::geom::Coordinate((env.getMaxX() + 0.1), (env.getMaxY() + 0.1), 0));
+		coords->push_back(geos::geom::Coordinate((env.getMaxX() + 0.1), (env.getMinY() - 0.1), 0));
+		coords->push_back(geos::geom::Coordinate((env.getMinX() - 0.1), (env.getMinY() - 0.1), 0));
+		coords->push_back(geos::geom::Coordinate((env.getMinX() - 0.1), (env.getMaxY() + 0.1), 0));
+		coords->push_back(geos::geom::Coordinate((env.getMaxX() + 0.1), (env.getMaxY() + 0.1), 0));
 		
-		CoordinateArraySequence *coordSeq = new CoordinateArraySequence(coords);
+		geos::geom::CoordinateArraySequence *coordSeq = new geos::geom::CoordinateArraySequence(coords);
 		
-		GeometryFactory* geosGeomFactory = RSGISGEOSFactoryGenerator::getInstance()->getFactory();
-		LinearRing *linearRingShell = new LinearRing(coordSeq, geosGeomFactory);
-		Polygon *polygonGeom = geosGeomFactory->createPolygon(linearRingShell, NULL);
+		geos::geom::GeometryFactory * geosGeomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
+		geos::geom::LinearRing *linearRingShell = new geos::geom::LinearRing(coordSeq, geosGeomFactory);
+		geos::geom::Polygon *polygonGeom = geosGeomFactory->createPolygon(linearRingShell, NULL);
 		
 		return polygonGeom;
 	}
@@ -935,7 +935,7 @@ namespace rsgis{namespace geom{
 		this->imgWidth = image->GetRasterXSize();
 		this->imgHeight = image->GetRasterYSize();
 		
-		this->env = new Envelope();
+		this->env = new geos::geom::Envelope ();
 		double *trans = new double[6];
 		image->GetGeoTransform(trans);
 		this->resolution = trans[1];		
@@ -953,9 +953,9 @@ namespace rsgis{namespace geom{
 		this->gamma = gamma;
 	}
 	
-	double RSGISSnakeNonConvexGlobalOptimisationFunction::calcValue(vector<Coordinate*> *coords) throw(RSGISOptimisationException)
+	double RSGISSnakeNonConvexGlobalOptimisationFunction::calcValue(std::vector<geos::geom::Coordinate*> *coords) throw(rsgis::math::RSGISOptimisationException)
 	{
-		RSGISMathsUtils mathUtils;
+        rsgis::math::RSGISMathsUtils mathUtils;
 		
 		double energyValue = 0;
 		double internalEnergy = 0;
@@ -974,11 +974,11 @@ namespace rsgis{namespace geom{
 		
 		int nodeCount = 0;
 		
-		Coordinate *prev;
-		Coordinate *next;
-		Coordinate *current2 = new Coordinate();
+		geos::geom::Coordinate *prev;
+		geos::geom::Coordinate *next;
+		geos::geom::Coordinate *current2 = new geos::geom::Coordinate();
 		
-		vector<Coordinate*>::iterator iterCoords;
+		std::vector<geos::geom::Coordinate*>::iterator iterCoords;
 		for(iterCoords = coords->begin(); iterCoords != coords->end(); ++iterCoords)
 		{
 			if(iterCoords == coords->begin())
@@ -1004,19 +1004,19 @@ namespace rsgis{namespace geom{
 			
 			if((y < 0) | (y >= imgHeight))
 			{
-                cout << "Image Height: " << imgHeight << endl;
-                cout << "Image Width: " << imgWidth << endl;
-				string message = string("Y Does not fit within the image: ") + mathUtils.inttostring(y); 
-				throw RSGISOptimisationException(message);
+                std::cout << "Image Height: " << imgHeight << std::endl;
+                std::cout << "Image Width: " << imgWidth << std::endl;
+				std::string message = std::string("Y Does not fit within the image: ") + mathUtils.inttostring(y); 
+				throw rsgis::math::RSGISOptimisationException(message);
 			}
 			
 			if((x < 0) | (x >= imgWidth))
 			{
-                cout << "Image Height: " << imgHeight << endl;
-                cout << "Image Width: " << imgWidth << endl;
+                std::cout << "Image Height: " << imgHeight << std::endl;
+                std::cout << "Image Width: " << imgWidth << std::endl;
                 
-				string message = string("X Does not fit within the image: ") + mathUtils.inttostring(x); 
-				throw RSGISOptimisationException(message);
+				std::string message = std::string("X Does not fit within the image: ") + mathUtils.inttostring(x); 
+				throw rsgis::math::RSGISOptimisationException(message);
 			}
 						
 			imageBand->RasterIO(GF_Read, 0, y, imgWidth, 1, data, imgWidth, 1, GDT_Float32, 0, 0);
@@ -1047,9 +1047,9 @@ namespace rsgis{namespace geom{
 		
 		energyValue = externalEnergy + internalEnergy;
 		
-		//cout << "external Energy = " << externalEnergy << endl;
-		//cout << "internal Energy = " << internalEnergy << endl;
-		//cout << "Total Energy = " << energyValue << endl;
+		//std::cout << "external Energy = " << externalEnergy << std::endl;
+		//std::cout << "internal Energy = " << internalEnergy << std::endl;
+		//std::cout << "Total Energy = " << energyValue << std::endl;
 		
 		return energyValue;
 	}
@@ -1067,13 +1067,13 @@ namespace rsgis{namespace geom{
 	 *
 	 */
 	
-	RSGISSnakeNonConvexLineProjGlobalOptimisationFunction::RSGISSnakeNonConvexLineProjGlobalOptimisationFunction(GDALDataset *image, double alpha, double beta, double gamma, double delta, vector<LineSegment*> *lines)
+	RSGISSnakeNonConvexLineProjGlobalOptimisationFunction::RSGISSnakeNonConvexLineProjGlobalOptimisationFunction(GDALDataset *image, double alpha, double beta, double gamma, double delta, std::vector<geos::geom::LineSegment*> *lines)
 	{
 		this->image = image;
 		this->imgWidth = image->GetRasterXSize();
 		this->imgHeight = image->GetRasterYSize();
 		
-		this->env = new Envelope();
+		this->env = new geos::geom::Envelope ();
 		double *trans = new double[6];
 		image->GetGeoTransform(trans);
 		this->resolution = trans[1];		
@@ -1093,9 +1093,9 @@ namespace rsgis{namespace geom{
 		this->lines = lines;
 	}
 	
-	double RSGISSnakeNonConvexLineProjGlobalOptimisationFunction::calcValue(vector<Coordinate*> *coords) throw(RSGISOptimisationException)
+	double RSGISSnakeNonConvexLineProjGlobalOptimisationFunction::calcValue(std::vector<geos::geom::Coordinate*> *coords) throw(rsgis::math::RSGISOptimisationException)
 	{
-		RSGISMathsUtils mathUtils;
+        rsgis::math::RSGISMathsUtils mathUtils;
 		
 		double energyValue = 0;
 		double internalEnergy = 0;
@@ -1115,12 +1115,12 @@ namespace rsgis{namespace geom{
 		
 		int nodeCount = 0;
 		
-		Coordinate *prev;
-		Coordinate *next;
-		Coordinate *current2 = new Coordinate();
+        geos::geom::Coordinate *prev;
+		geos::geom::Coordinate *next;
+		geos::geom::Coordinate *current2 = new geos::geom::Coordinate();
 		
-		vector<Coordinate*>::iterator iterCoords;
-		vector<LineSegment*>::iterator iterLines;
+		std::vector<geos::geom::Coordinate*>::iterator iterCoords;
+		std::vector<geos::geom::LineSegment*>::iterator iterLines;
 		iterLines = lines->begin();
 		for(iterCoords = coords->begin(); iterCoords != coords->end(); ++iterCoords)
 		{
@@ -1152,20 +1152,20 @@ namespace rsgis{namespace geom{
 			
 			if((y < 0) | (y >= imgHeight))
 			{
-				cout << "Image Height: " << imgHeight << endl;
-                cout << "Image Width: " << imgWidth << endl;
+				std::cout << "Image Height: " << imgHeight << std::endl;
+                std::cout << "Image Width: " << imgWidth << std::endl;
 				
-				string message = string("Y Does not fit within the image: ") + mathUtils.inttostring(y); 
-				throw RSGISOptimisationException(message);
+				std::string message = std::string("Y Does not fit within the image: ") + mathUtils.inttostring(y); 
+				throw rsgis::math::RSGISOptimisationException(message);
 			}
 			
 			if((x < 0) | (x >= imgWidth))
 			{
-				cout << "Image Height: " << imgHeight << endl;
-                cout << "Image Width: " << imgWidth << endl;
+				std::cout << "Image Height: " << imgHeight << std::endl;
+                std::cout << "Image Width: " << imgWidth << std::endl;
 				
-				string message = string("X Does not fit within the image: ") + mathUtils.inttostring(x); 
-				throw RSGISOptimisationException(message);
+				std::string message = std::string("X Does not fit within the image: ") + mathUtils.inttostring(x); 
+				throw rsgis::math::RSGISOptimisationException(message);
 			}
 			
 			imageBand->RasterIO(GF_Read, 0, y, imgWidth, 1, data, imgWidth, 1, GDT_Float32, 0, 0);
@@ -1185,10 +1185,10 @@ namespace rsgis{namespace geom{
 			currentNextStiff = beta * (currentNextStiffPart * currentNextStiffPart);
 			
 			currentNextDist2Line = delta * ((*iterLines)->distancePerpendicular(*(*iterCoords)));
-			//cout << "((*iterLines)->distance(*(*iterCoords))) = " << ((*iterLines)->distance(*(*iterCoords))) << endl;
-			//cout << "Coords: " << (*(*iterCoords)) << endl;
-			//cout << "Line: " << (*(*iterLines)) << endl;
-			//cout << "currentNextDist2Line = " << currentNextDist2Line << endl;
+			//std::cout << "((*iterLines)->distance(*(*iterCoords))) = " << ((*iterLines)->distance(*(*iterCoords))) << std::endl;
+			//std::cout << "Coords: " << (*(*iterCoords)) << std::endl;
+			//std::cout << "Line: " << (*(*iterLines)) << std::endl;
+			//std::cout << "currentNextDist2Line = " << currentNextDist2Line << std::endl;
 			
 			internalEnergy += (currentNextElas + currentNextStiff + currentNextDist2Line);
 			
@@ -1202,9 +1202,9 @@ namespace rsgis{namespace geom{
 		
 		energyValue = externalEnergy + internalEnergy;
 		
-		//cout << "external Energy = " << externalEnergy << endl;
-		//cout << "internal Energy = " << internalEnergy << endl;
-		//cout << "Total Energy = " << energyValue << endl;
+		//std::cout << "external Energy = " << externalEnergy << std::endl;
+		//std::cout << "internal Energy = " << internalEnergy << std::endl;
+		//std::cout << "Total Energy = " << energyValue << std::endl;
 		
 		return energyValue;
 	}
