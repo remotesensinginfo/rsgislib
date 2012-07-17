@@ -80,17 +80,6 @@
 
 namespace rsgisexe{
 
-    /*
-using namespace std;
-using namespace xercesc;
-using namespace rsgis;
-using namespace rsgis::math;
-using namespace rsgis::img;
-using namespace rsgis::utils;
-using namespace rsgis::vec;
-using namespace rsgis::datastruct;
-     */
-
 class RSGISExeImageUtils : public rsgis::RSGISAlgorithmParameters
 	{
 	public:
@@ -127,7 +116,8 @@ class RSGISExeImageUtils : public rsgis::RSGISAlgorithmParameters
             assignproj,
             popimgstats,
             createcopy,
-            createKMLFile
+            createKMLFile,
+            assignspatialinfo
 		};
 		
 		enum interpolators
@@ -204,6 +194,8 @@ class RSGISExeImageUtils : public rsgis::RSGISAlgorithmParameters
 		float resolution;
 		float xRes;
 		float yRes;
+        float xRot;
+		float yRot;
 		float percent;
 		float stddev;
 		float power;

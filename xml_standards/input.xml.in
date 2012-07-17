@@ -485,7 +485,7 @@
     <rsgis:command algor="imageutils" option="composite" image="image.env" output="image_out.env" compositeBands="int" stats="mean | min | max | range" />
     <!-- A command to relabel image pixel using a look up table from a gmtxt matrix file (m=2 n=X) -->
     <rsgis:command algor="imageutils" option="relabel" image="image.env" output="image_out.env" lut="matrix.gmtxt" format="GDAL Format" />
-    <!-- A command to assign and update and image to a specific projection -->
+    <!-- A command to assign and update an image to a specific projection -->
     <rsgis:command algor="imageutils" option="assignproj" image="image.env" projwkt="txt.wkt" />
     <!-- A command to populate an image with image statistics and image pyramids -->
     <rsgis:command algor="imageutils" option="popimgstats" image="image.img" ignore="float" pyramids="yes | no" />
@@ -493,7 +493,8 @@
     <rsgis:command algor="imageutils" option="createcopy" image="image.img" output="image_out.env" numbands="int" pixelval="float" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
     <!-- A command to create a KML text file for an existing image -->
     <rsgis:command algor="imageutils" option="createKMLFile" image="image.png" outKMLFile="string"/>
-
+	<!-- A command to assign and update an image with specific spatial location -->
+    <rsgis:command algor="imageutils" option="assignspatialinfo" image="image.env" tlx="double" tly="double" resX="double" resY="double" [rotX="double"] [rotY="double"] />
 
 
 

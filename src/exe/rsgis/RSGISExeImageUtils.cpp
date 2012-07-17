@@ -101,6 +101,7 @@ void RSGISExeImageUtils::retrieveParameters(xercesc::DOMElement *argElement) thr
     XMLCh *optionPopImgStats = xercesc::XMLString::transcode("popimgstats");
     XMLCh *optionCreateCopy = xercesc::XMLString::transcode("createcopy");
     XMLCh *optionCreateKMLFile = xercesc::XMLString::transcode("createKMLFile");
+    XMLCh *optionAssignSpatialInfo = xercesc::XMLString::transcode("assignspatialinfo");
     
 	const XMLCh *algorNameEle = argElement->getAttribute(algorXMLStr);
 	if(!xercesc::XMLString::equals(algorName, algorNameEle))
@@ -237,7 +238,7 @@ void RSGISExeImageUtils::retrieveParameters(xercesc::DOMElement *argElement) thr
 			if(classElement->hasAttribute(idXMLStr))
 			{
 				char *charValue = xercesc::XMLString::transcode(classElement->getAttribute(idXMLStr));
-				classColour[i]->classID = mathUtils.strtoint(string(charValue));
+				classColour[i]->classID = mathUtils.strtoint(std::string(charValue));
 				xercesc::XMLString::release(&charValue);
 			}
 			else
@@ -250,7 +251,7 @@ void RSGISExeImageUtils::retrieveParameters(xercesc::DOMElement *argElement) thr
 			if(classElement->hasAttribute(bandXMLStr))
 			{
 				char *charValue = xercesc::XMLString::transcode(classElement->getAttribute(bandXMLStr));
-				classColour[i]->imgBand = mathUtils.strtoint(string(charValue))-1; // Band refers to the array index not image band
+				classColour[i]->imgBand = mathUtils.strtoint(std::string(charValue))-1; // Band refers to the array index not image band
  				xercesc::XMLString::release(&charValue);
 			}
 			else
@@ -263,7 +264,7 @@ void RSGISExeImageUtils::retrieveParameters(xercesc::DOMElement *argElement) thr
 			if(classElement->hasAttribute(lowerXMLStr))
 			{
 				char *charValue = xercesc::XMLString::transcode(classElement->getAttribute(lowerXMLStr));
-				classColour[i]->lower = mathUtils.strtofloat(string(charValue));
+				classColour[i]->lower = mathUtils.strtofloat(std::string(charValue));
 				xercesc::XMLString::release(&charValue);
 			}
 			else
@@ -276,7 +277,7 @@ void RSGISExeImageUtils::retrieveParameters(xercesc::DOMElement *argElement) thr
 			if(classElement->hasAttribute(upperXMLStr))
 			{
 				char *charValue = xercesc::XMLString::transcode(classElement->getAttribute(upperXMLStr));
-				classColour[i]->upper = mathUtils.strtofloat(string(charValue));
+				classColour[i]->upper = mathUtils.strtofloat(std::string(charValue));
 				xercesc::XMLString::release(&charValue);
 			}
 			else
@@ -289,7 +290,7 @@ void RSGISExeImageUtils::retrieveParameters(xercesc::DOMElement *argElement) thr
 			if(classElement->hasAttribute(redXMLStr))
 			{
 				char *charValue = xercesc::XMLString::transcode(classElement->getAttribute(redXMLStr));
-				classColour[i]->red = mathUtils.strtoint(string(charValue));
+				classColour[i]->red = mathUtils.strtoint(std::string(charValue));
 				xercesc::XMLString::release(&charValue);
 			}
 			else
@@ -302,7 +303,7 @@ void RSGISExeImageUtils::retrieveParameters(xercesc::DOMElement *argElement) thr
 			if(classElement->hasAttribute(greenXMLStr))
 			{
 				char *charValue = xercesc::XMLString::transcode(classElement->getAttribute(greenXMLStr));
-				classColour[i]->green = mathUtils.strtoint(string(charValue));
+				classColour[i]->green = mathUtils.strtoint(std::string(charValue));
 				xercesc::XMLString::release(&charValue);
 			}
 			else
@@ -315,7 +316,7 @@ void RSGISExeImageUtils::retrieveParameters(xercesc::DOMElement *argElement) thr
 			if(classElement->hasAttribute(blueXMLStr))
 			{
 				char *charValue = xercesc::XMLString::transcode(classElement->getAttribute(blueXMLStr));
-				classColour[i]->blue = mathUtils.strtoint(string(charValue));
+				classColour[i]->blue = mathUtils.strtoint(std::string(charValue));
 				xercesc::XMLString::release(&charValue);
 			}
 			else
@@ -385,7 +386,7 @@ void RSGISExeImageUtils::retrieveParameters(xercesc::DOMElement *argElement) thr
 			if(classElement->hasAttribute(idXMLStr))
 			{
 				char *charValue = xercesc::XMLString::transcode(classElement->getAttribute(idXMLStr));
-				classColour[i]->classID = mathUtils.strtoint(string(charValue));
+				classColour[i]->classID = mathUtils.strtoint(std::string(charValue));
 				xercesc::XMLString::release(&charValue);
 			}
 			else
@@ -398,7 +399,7 @@ void RSGISExeImageUtils::retrieveParameters(xercesc::DOMElement *argElement) thr
 			if(classElement->hasAttribute(lowerXMLStr))
 			{
 				char *charValue = xercesc::XMLString::transcode(classElement->getAttribute(lowerXMLStr));
-				classColour[i]->lower = mathUtils.strtofloat(string(charValue));
+				classColour[i]->lower = mathUtils.strtofloat(std::string(charValue));
 				xercesc::XMLString::release(&charValue);
 			}
 			else
@@ -411,7 +412,7 @@ void RSGISExeImageUtils::retrieveParameters(xercesc::DOMElement *argElement) thr
 			if(classElement->hasAttribute(upperXMLStr))
 			{
 				char *charValue = xercesc::XMLString::transcode(classElement->getAttribute(upperXMLStr));
-				classColour[i]->upper = mathUtils.strtofloat(string(charValue));
+				classColour[i]->upper = mathUtils.strtofloat(std::string(charValue));
 				xercesc::XMLString::release(&charValue);
 			}
 			else
@@ -424,7 +425,7 @@ void RSGISExeImageUtils::retrieveParameters(xercesc::DOMElement *argElement) thr
 			if(classElement->hasAttribute(redXMLStr))
 			{
 				char *charValue = xercesc::XMLString::transcode(classElement->getAttribute(redXMLStr));
-				classColour[i]->red = mathUtils.strtoint(string(charValue));
+				classColour[i]->red = mathUtils.strtoint(std::string(charValue));
 				xercesc::XMLString::release(&charValue);
 			}
 			else
@@ -437,7 +438,7 @@ void RSGISExeImageUtils::retrieveParameters(xercesc::DOMElement *argElement) thr
 			if(classElement->hasAttribute(greenXMLStr))
 			{
 				char *charValue = xercesc::XMLString::transcode(classElement->getAttribute(greenXMLStr));
-				classColour[i]->green = mathUtils.strtoint(string(charValue));
+				classColour[i]->green = mathUtils.strtoint(std::string(charValue));
 				xercesc::XMLString::release(&charValue);
 			}
 			else
@@ -450,7 +451,7 @@ void RSGISExeImageUtils::retrieveParameters(xercesc::DOMElement *argElement) thr
 			if(classElement->hasAttribute(blueXMLStr))
 			{
 				char *charValue = xercesc::XMLString::transcode(classElement->getAttribute(blueXMLStr));
-				classColour[i]->blue = mathUtils.strtoint(string(charValue));
+				classColour[i]->blue = mathUtils.strtoint(std::string(charValue));
 				xercesc::XMLString::release(&charValue);
 			}
 			else
@@ -495,7 +496,7 @@ void RSGISExeImageUtils::retrieveParameters(xercesc::DOMElement *argElement) thr
 			else
 			{
 				char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(nodataXMLStr));
-                this->nodataValue = mathUtils.strtofloat(string(charValue));
+                this->nodataValue = mathUtils.strtofloat(std::string(charValue));
                 xercesc::XMLString::release(&charValue);
 			}
 			xercesc::XMLString::release(&NaNStr);
@@ -513,7 +514,7 @@ void RSGISExeImageUtils::retrieveParameters(xercesc::DOMElement *argElement) thr
 		if(argElement->hasAttribute(skipValueXMLStr))
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(skipValueXMLStr));
-			this->skipValue = mathUtils.strtofloat(string(charValue));
+			this->skipValue = mathUtils.strtofloat(std::string(charValue));
 			this->mosaicSkipVals = true;
 			xercesc::XMLString::release(&charValue);
 		}
@@ -524,7 +525,7 @@ void RSGISExeImageUtils::retrieveParameters(xercesc::DOMElement *argElement) thr
 		if(argElement->hasAttribute(skipUpperThreashXMLStr))
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(skipUpperThreashXMLStr));
-			this->skipUpperThreash = mathUtils.strtofloat(string(charValue));
+			this->skipUpperThreash = mathUtils.strtofloat(std::string(charValue));
 			this->mosaicSkipThreash = true;
 			xercesc::XMLString::release(&charValue);
 			if (mosaicSkipVals) 
@@ -539,7 +540,7 @@ void RSGISExeImageUtils::retrieveParameters(xercesc::DOMElement *argElement) thr
 		if(argElement->hasAttribute(skipLowerThreashXMLStr))
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(skipLowerThreashXMLStr));
-			this->skipLowerThreash = mathUtils.strtofloat(string(charValue));
+			this->skipLowerThreash = mathUtils.strtofloat(std::string(charValue));
 			this->mosaicSkipThreash = true;
 			xercesc::XMLString::release(&charValue);
 			if (mosaicSkipVals) 
@@ -553,7 +554,7 @@ void RSGISExeImageUtils::retrieveParameters(xercesc::DOMElement *argElement) thr
 		if(argElement->hasAttribute(skipBandXMLStr))
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(skipBandXMLStr));
-			this->skipBand = mathUtils.strtofloat(string(charValue)) - 1;
+			this->skipBand = mathUtils.strtofloat(std::string(charValue)) - 1;
 			xercesc::XMLString::release(&charValue);
 			if (this->mosaicSkipVals) 
 			{
@@ -839,7 +840,7 @@ void RSGISExeImageUtils::retrieveParameters(xercesc::DOMElement *argElement) thr
 			else
 			{
 				char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(nodataXMLStr));
-                this->nodataValue = mathUtils.strtofloat(string(charValue));
+                this->nodataValue = mathUtils.strtofloat(std::string(charValue));
                 xercesc::XMLString::release(&charValue);
 			}
 			xercesc::XMLString::release(&NaNStr);
@@ -900,7 +901,7 @@ void RSGISExeImageUtils::retrieveParameters(xercesc::DOMElement *argElement) thr
 		if(argElement->hasAttribute(maskvalueXMLStr))
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(maskvalueXMLStr));
-			this->maskValue = mathUtils.strtofloat(string(charValue));
+			this->maskValue = mathUtils.strtofloat(std::string(charValue));
 			xercesc::XMLString::release(&charValue);
 		}
 		else
@@ -944,7 +945,7 @@ void RSGISExeImageUtils::retrieveParameters(xercesc::DOMElement *argElement) thr
 		if(argElement->hasAttribute(scaleXMLStr))
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(scaleXMLStr));
-			this->resampleScale = mathUtils.strtofloat(string(charValue));
+			this->resampleScale = mathUtils.strtofloat(std::string(charValue));
 			xercesc::XMLString::release(&charValue);
 		}
 		else
@@ -1165,7 +1166,7 @@ void RSGISExeImageUtils::retrieveParameters(xercesc::DOMElement *argElement) thr
 		if(argElement->hasAttribute(band1XMLStr))
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(band1XMLStr));
-			this->imgBand1 = mathUtils.strtoint(string(charValue));
+			this->imgBand1 = mathUtils.strtoint(std::string(charValue));
 			xercesc::XMLString::release(&charValue);
 		}
 		else
@@ -1178,7 +1179,7 @@ void RSGISExeImageUtils::retrieveParameters(xercesc::DOMElement *argElement) thr
 		if(argElement->hasAttribute(band2XMLStr))
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(band2XMLStr));
-			this->imgBand2 = mathUtils.strtoint(string(charValue));
+			this->imgBand2 = mathUtils.strtoint(std::string(charValue));
 			xercesc::XMLString::release(&charValue);
 		}
 		else
@@ -1259,7 +1260,7 @@ void RSGISExeImageUtils::retrieveParameters(xercesc::DOMElement *argElement) thr
 		if(argElement->hasAttribute(orderXMLStr))
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(orderXMLStr));
-			this->order = mathUtils.strtoint(string(charValue))+1; // Order starts at zero therefore +1
+			this->order = mathUtils.strtoint(std::string(charValue))+1; // Order starts at zero therefore +1
 			xercesc::XMLString::release(&charValue);
 		}
 		else
@@ -1272,7 +1273,7 @@ void RSGISExeImageUtils::retrieveParameters(xercesc::DOMElement *argElement) thr
 		if(argElement->hasAttribute(windowXMLStr))
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(windowXMLStr));
-			this->window = mathUtils.strtoint(string(charValue));
+			this->window = mathUtils.strtoint(std::string(charValue));
 			xercesc::XMLString::release(&charValue);
 		}
 		else
@@ -1359,7 +1360,7 @@ void RSGISExeImageUtils::retrieveParameters(xercesc::DOMElement *argElement) thr
 		if(argElement->hasAttribute(numBandsXMLStr))
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(numBandsXMLStr));
-			this->numBands = mathUtils.strtoint(string(charValue));
+			this->numBands = mathUtils.strtoint(std::string(charValue));
 			xercesc::XMLString::release(&charValue);
 		}
 		else
@@ -1372,7 +1373,7 @@ void RSGISExeImageUtils::retrieveParameters(xercesc::DOMElement *argElement) thr
 		if(argElement->hasAttribute(widthXMLStr))
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(widthXMLStr));
-			this->width = mathUtils.strtoint(string(charValue));
+			this->width = mathUtils.strtoint(std::string(charValue));
 			xercesc::XMLString::release(&charValue);
 		}
 		else
@@ -1385,7 +1386,7 @@ void RSGISExeImageUtils::retrieveParameters(xercesc::DOMElement *argElement) thr
 		if(argElement->hasAttribute(heightXMLStr))
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(heightXMLStr));
-			this->height = mathUtils.strtoint(string(charValue));
+			this->height = mathUtils.strtoint(std::string(charValue));
 			xercesc::XMLString::release(&charValue);
 		}
 		else
@@ -1399,7 +1400,7 @@ void RSGISExeImageUtils::retrieveParameters(xercesc::DOMElement *argElement) thr
 		if(argElement->hasAttribute(eastingsXMLStr))
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(eastingsXMLStr));
-			this->eastings = mathUtils.strtodouble(string(charValue));
+			this->eastings = mathUtils.strtodouble(std::string(charValue));
 			xercesc::XMLString::release(&charValue);
 		}
 		else
@@ -1413,7 +1414,7 @@ void RSGISExeImageUtils::retrieveParameters(xercesc::DOMElement *argElement) thr
 		if(argElement->hasAttribute(northingsXMLStr))
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(northingsXMLStr));
-			this->northings = mathUtils.strtodouble(string(charValue));
+			this->northings = mathUtils.strtodouble(std::string(charValue));
 			xercesc::XMLString::release(&charValue);
 		}
 		else
@@ -1426,7 +1427,7 @@ void RSGISExeImageUtils::retrieveParameters(xercesc::DOMElement *argElement) thr
 		if(argElement->hasAttribute(valueXMLStr))
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(valueXMLStr));
-			this->outValue = mathUtils.strtofloat(string(charValue));
+			this->outValue = mathUtils.strtofloat(std::string(charValue));
 			xercesc::XMLString::release(&charValue);
 		}
 		else
@@ -1440,7 +1441,7 @@ void RSGISExeImageUtils::retrieveParameters(xercesc::DOMElement *argElement) thr
 		if(argElement->hasAttribute(resolutionXMLStr))
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(resolutionXMLStr));
-			this->resolution = mathUtils.strtofloat(string(charValue));
+			this->resolution = mathUtils.strtofloat(std::string(charValue));
 			xercesc::XMLString::release(&charValue);
 		}
 		else
@@ -1520,7 +1521,7 @@ void RSGISExeImageUtils::retrieveParameters(xercesc::DOMElement *argElement) thr
 				if(argElement->hasAttribute(percentXMLStr))
 				{
 					char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(percentXMLStr));
-					this->percent = mathUtils.strtofloat(string(charValue));
+					this->percent = mathUtils.strtofloat(std::string(charValue));
 					xercesc::XMLString::release(&charValue);
 				}
 				else
@@ -1537,7 +1538,7 @@ void RSGISExeImageUtils::retrieveParameters(xercesc::DOMElement *argElement) thr
 				if(argElement->hasAttribute(stdDevXMLStr))
 				{
 					char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(stdDevXMLStr));
-					this->stddev = mathUtils.strtofloat(string(charValue));
+					this->stddev = mathUtils.strtofloat(std::string(charValue));
 					xercesc::XMLString::release(&charValue);
 				}
 				else
@@ -1565,7 +1566,7 @@ void RSGISExeImageUtils::retrieveParameters(xercesc::DOMElement *argElement) thr
 				if(argElement->hasAttribute(powerXMLStr))
 				{
 					char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(powerXMLStr));
-					this->power = mathUtils.strtofloat(string(charValue));
+					this->power = mathUtils.strtofloat(std::string(charValue));
 					xercesc::XMLString::release(&charValue);
 				}
 				else
@@ -1650,7 +1651,7 @@ void RSGISExeImageUtils::retrieveParameters(xercesc::DOMElement *argElement) thr
 		if(argElement->hasAttribute(bandXMLStr))
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(bandXMLStr));
-			this->imgBand1 = mathUtils.strtoint(string(charValue))-1; // -1 so interface starts at 1 not 0.
+			this->imgBand1 = mathUtils.strtoint(std::string(charValue))-1; // -1 so interface starts at 1 not 0.
 			xercesc::XMLString::release(&charValue);
 		}
 		else
@@ -1664,7 +1665,7 @@ void RSGISExeImageUtils::retrieveParameters(xercesc::DOMElement *argElement) thr
 		if(argElement->hasAttribute(lowValueXMLStr))
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(lowValueXMLStr));
-			this->lowerRangeValue = mathUtils.strtofloat(string(charValue));
+			this->lowerRangeValue = mathUtils.strtofloat(std::string(charValue));
 			xercesc::XMLString::release(&charValue);
 		}
 		else
@@ -1677,7 +1678,7 @@ void RSGISExeImageUtils::retrieveParameters(xercesc::DOMElement *argElement) thr
 		if(argElement->hasAttribute(highValueXMLStr))
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(highValueXMLStr));
-			this->upperRangeValue = mathUtils.strtofloat(string(charValue));
+			this->upperRangeValue = mathUtils.strtofloat(std::string(charValue));
 			xercesc::XMLString::release(&charValue);
 		}
 		else
@@ -1699,7 +1700,7 @@ void RSGISExeImageUtils::retrieveParameters(xercesc::DOMElement *argElement) thr
 			else
 			{
 				char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(backgroundXMLStr));
-                this->nodataValue = mathUtils.strtofloat(string(charValue));
+                this->nodataValue = mathUtils.strtofloat(std::string(charValue));
                 xercesc::XMLString::release(&charValue);
 			}
 			xercesc::XMLString::release(&NaNStr);
@@ -1777,7 +1778,7 @@ void RSGISExeImageUtils::retrieveParameters(xercesc::DOMElement *argElement) thr
 		if(argElement->hasAttribute(scaleXMLStr))
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(scaleXMLStr));
-			this->scale = mathUtils.strtofloat(string(charValue));
+			this->scale = mathUtils.strtofloat(std::string(charValue));
 			xercesc::XMLString::release(&charValue);
 		}
 		else
@@ -1858,7 +1859,7 @@ void RSGISExeImageUtils::retrieveParameters(xercesc::DOMElement *argElement) thr
 		if(argElement->hasAttribute(tlxXMLStr))
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(tlxXMLStr));
-			this->eastings = mathUtils.strtodouble(string(charValue));
+			this->eastings = mathUtils.strtodouble(std::string(charValue));
 			xercesc::XMLString::release(&charValue);
 		}
 		else
@@ -1871,7 +1872,7 @@ void RSGISExeImageUtils::retrieveParameters(xercesc::DOMElement *argElement) thr
 		if(argElement->hasAttribute(tlyXMLStr))
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(tlyXMLStr));
-			this->northings = mathUtils.strtodouble(string(charValue));
+			this->northings = mathUtils.strtodouble(std::string(charValue));
 			xercesc::XMLString::release(&charValue);
 		}
 		else
@@ -1884,7 +1885,7 @@ void RSGISExeImageUtils::retrieveParameters(xercesc::DOMElement *argElement) thr
 		if(argElement->hasAttribute(resxXMLStr))
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(resxXMLStr));
-			this->xRes = mathUtils.strtofloat(string(charValue));
+			this->xRes = mathUtils.strtofloat(std::string(charValue));
 			xercesc::XMLString::release(&charValue);
 		}
 		else
@@ -1897,7 +1898,7 @@ void RSGISExeImageUtils::retrieveParameters(xercesc::DOMElement *argElement) thr
 		if(argElement->hasAttribute(resyXMLStr))
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(resyXMLStr));
-			this->yRes = mathUtils.strtofloat(string(charValue));
+			this->yRes = mathUtils.strtofloat(std::string(charValue));
 			xercesc::XMLString::release(&charValue);
 		}
 		else
@@ -2043,7 +2044,7 @@ void RSGISExeImageUtils::retrieveParameters(xercesc::DOMElement *argElement) thr
 		if(argElement->hasAttribute(winSizeXMLStr))
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(winSizeXMLStr));
-			this->panWinSize = mathUtils.strtoint(string(charValue));
+			this->panWinSize = mathUtils.strtoint(std::string(charValue));
 			xercesc::XMLString::release(&charValue);
 		}
 		else
@@ -2209,7 +2210,7 @@ void RSGISExeImageUtils::retrieveParameters(xercesc::DOMElement *argElement) thr
 		if(argElement->hasAttribute(cBandsXMLStr))
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(cBandsXMLStr));
-			this->compositeBands = mathUtils.strtoint(string(charValue));
+			this->compositeBands = mathUtils.strtoint(std::string(charValue));
 			xercesc::XMLString::release(&charValue);
 		}
 		else
@@ -2361,7 +2362,7 @@ void RSGISExeImageUtils::retrieveParameters(xercesc::DOMElement *argElement) thr
 			else
 			{
 				char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(nodataXMLStr));
-                this->nodataValue = mathUtils.strtofloat(string(charValue));
+                this->nodataValue = mathUtils.strtofloat(std::string(charValue));
                 xercesc::XMLString::release(&charValue);
 			}
 			xercesc::XMLString::release(&NaNStr);
@@ -2442,7 +2443,7 @@ void RSGISExeImageUtils::retrieveParameters(xercesc::DOMElement *argElement) thr
 			else
 			{
 				char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(pixelValXMLStr));
-                this->dataValue = mathUtils.strtofloat(string(charValue));
+                this->dataValue = mathUtils.strtofloat(std::string(charValue));
                 xercesc::XMLString::release(&charValue);
 			}
 			xercesc::XMLString::release(&NaNStr);
@@ -2457,7 +2458,7 @@ void RSGISExeImageUtils::retrieveParameters(xercesc::DOMElement *argElement) thr
 		if(argElement->hasAttribute(numBandsXMLStr))
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(numBandsXMLStr));
-			this->numBands = mathUtils.strtoint(string(charValue));
+			this->numBands = mathUtils.strtoint(std::string(charValue));
 			xercesc::XMLString::release(&charValue);
 		}
 		else
@@ -2496,6 +2497,104 @@ void RSGISExeImageUtils::retrieveParameters(xercesc::DOMElement *argElement) thr
 			throw rsgis::RSGISXMLArgumentsException("No \'outKMLFile\' attribute was provided.");
 		}
 		xercesc::XMLString::release(&outKMLFileXMLStr);
+	}
+    else if (xercesc::XMLString::equals(optionAssignSpatialInfo, optionXML))
+	{		
+		this->option = RSGISExeImageUtils::assignspatialinfo;
+		
+		XMLCh *imageXMLStr = xercesc::XMLString::transcode("image");
+		if(argElement->hasAttribute(imageXMLStr))
+		{
+			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(imageXMLStr));
+			this->inputImage = std::string(charValue);
+			xercesc::XMLString::release(&charValue);
+		}
+		else
+		{
+			throw rsgis::RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+		}
+		xercesc::XMLString::release(&imageXMLStr);
+        
+        XMLCh *tlxXMLStr = xercesc::XMLString::transcode("tlx");
+		if(argElement->hasAttribute(tlxXMLStr))
+		{
+			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(tlxXMLStr));
+			this->eastings = mathUtils.strtodouble(std::string(charValue));
+			xercesc::XMLString::release(&charValue);
+		}
+		else
+		{
+			throw rsgis::RSGISXMLArgumentsException("No \'tlx\' attribute was provided.");
+		}
+		xercesc::XMLString::release(&tlxXMLStr);
+        
+        XMLCh *tlyXMLStr = xercesc::XMLString::transcode("tly");
+		if(argElement->hasAttribute(tlyXMLStr))
+		{
+			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(tlyXMLStr));
+			this->northings = mathUtils.strtodouble(std::string(charValue));
+			xercesc::XMLString::release(&charValue);
+		}
+		else
+		{
+			throw rsgis::RSGISXMLArgumentsException("No \'tly\' attribute was provided.");
+		}
+		xercesc::XMLString::release(&tlyXMLStr);
+        
+        XMLCh *resxXMLStr = xercesc::XMLString::transcode("resX");
+		if(argElement->hasAttribute(resxXMLStr))
+		{
+			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(resxXMLStr));
+			this->xRes = mathUtils.strtodouble(std::string(charValue));
+			xercesc::XMLString::release(&charValue);
+		}
+		else
+		{
+			throw rsgis::RSGISXMLArgumentsException("No \'resX\' attribute was provided.");
+		}
+		xercesc::XMLString::release(&resxXMLStr);
+        
+        XMLCh *resyXMLStr = xercesc::XMLString::transcode("resY");
+		if(argElement->hasAttribute(resyXMLStr))
+		{
+			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(resyXMLStr));
+			this->yRes = mathUtils.strtodouble(std::string(charValue));
+			xercesc::XMLString::release(&charValue);
+		}
+		else
+		{
+			throw rsgis::RSGISXMLArgumentsException("No \'resYy\' attribute was provided.");
+		}
+		xercesc::XMLString::release(&resyXMLStr);
+        
+        XMLCh *rotxXMLStr = xercesc::XMLString::transcode("rotX");
+		if(argElement->hasAttribute(rotxXMLStr))
+		{
+			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(rotxXMLStr));
+			this->xRot = mathUtils.strtodouble(std::string(charValue));
+			xercesc::XMLString::release(&charValue);
+		}
+		else
+		{
+            std::cerr << "X rotation was not provided defaulting to value of 0.\n";
+            this->xRot = 0;
+		}
+		xercesc::XMLString::release(&rotxXMLStr);
+        
+        XMLCh *rotyXMLStr = xercesc::XMLString::transcode("rotY");
+		if(argElement->hasAttribute(rotyXMLStr))
+		{
+			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(rotyXMLStr));
+			this->yRot = mathUtils.strtodouble(std::string(charValue));
+			xercesc::XMLString::release(&charValue);
+		}
+		else
+		{
+            std::cerr << "Y rotation was not provided defaulting to value of 0.\n";
+            this->yRot = 0;
+		}
+		xercesc::XMLString::release(&rotyXMLStr);
+        
 	}
 	else
 	{
@@ -2542,6 +2641,7 @@ void RSGISExeImageUtils::retrieveParameters(xercesc::DOMElement *argElement) thr
     xercesc::XMLString::release(&optionPopImgStats);
 	xercesc::XMLString::release(&optionCreateCopy);
     xercesc::XMLString::release(&optionCreateKMLFile);
+    xercesc::XMLString::release(&optionAssignSpatialInfo);
     
 	parsed = true;
 }
@@ -4140,6 +4240,44 @@ void RSGISExeImageUtils::runAlgorithm() throw(rsgis::RSGISException)
             std::cout << "three band image, readable by GoogleEarth" << std::endl;
             imgUtils.createKMLText(this->inputImage, this->outKMLFile);
 		}
+        else if(option == RSGISExeImageUtils::assignspatialinfo)
+        {
+            std::cout << "Assign and update an images spatial info.\n";
+            std::cout << "Image: " << this->inputImage << std::endl;
+            std::cout << "TL  [: " << this->eastings << "," << this->northings << "]" << std::endl;
+            std::cout << "Res [: " << this->xRes << "," << this->yRes << "]" << std::endl;
+            std::cout << "Rot [: " << this->xRot << "," << this->yRot << "]" << std::endl;
+            
+            try 
+            {
+                GDALAllRegister();
+                GDALDataset *inDataset = NULL;
+                inDataset = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_Update);
+                if(inDataset == NULL)
+                {
+                    std::string message = std::string("Could not open image ") + this->inputImage;
+                    throw RSGISImageException(message.c_str());
+                }
+                
+                double *trans = new double[6];
+                trans[0] = this->eastings;
+                trans[1] = this->xRes; 
+                trans[2] = this->xRot; 
+                trans[3] = this->northings;
+                trans[4] = this->yRot;
+                trans[5] = this->yRes;
+                
+                inDataset->SetGeoTransform(trans);
+                delete[] trans;
+                
+                GDALClose(inDataset);
+                GDALDestroyDriverManager();
+            } 
+            catch (rsgis::RSGISException &e) 
+            {
+                throw e;
+            }
+        }
 		else
 		{
 			std::cout << "Options not recognised\n";
@@ -4424,6 +4562,14 @@ void RSGISExeImageUtils::printParameters()
             std::cout << "Data Value: " << this->dataValue << std::endl;
             std::cout << "Num Image Bands: " << this->numBands << std::endl;
             std::cout << "Image format: " << this->imageFormat << std::endl;
+        }
+        else if(option == RSGISExeImageUtils::assignspatialinfo)
+        {
+            std::cout << "Assign and update an images spatial info.\n";
+            std::cout << "Image: " << this->inputImage << std::endl;
+            std::cout << "TL  [: " << this->eastings << "," << this->northings << "]" << std::endl;
+            std::cout << "Res [: " << this->xRes << "," << this->yRes << "]" << std::endl;
+            std::cout << "Rot [: " << this->xRot << "," << this->yRot << "]" << std::endl;
         }
 		else
 		{
