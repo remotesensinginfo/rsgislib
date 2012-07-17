@@ -30,8 +30,8 @@ namespace rsgis{namespace utils{
 	
 	RSGISGEOSFactoryGenerator::RSGISGEOSFactoryGenerator()
 	{
-		this->pm = new PrecisionModel();
-		this->geomFactory = new GeometryFactory(this->pm);
+		this->pm = new geos::geom::PrecisionModel();
+		this->geomFactory = new geos::geom::GeometryFactory(this->pm);
 		instance = NULL;
 	}
 	
@@ -44,12 +44,12 @@ namespace rsgis{namespace utils{
 		return instance;
 	}
 	
-	GeometryFactory* RSGISGEOSFactoryGenerator::getFactory()
+	geos::geom::GeometryFactory* RSGISGEOSFactoryGenerator::getFactory()
 	{
 		return this->geomFactory;
 	}
 	
-	PrecisionModel* RSGISGEOSFactoryGenerator::getPrecision()
+	geos::geom::PrecisionModel* RSGISGEOSFactoryGenerator::getPrecision()
 	{
 		return this->pm;
 	}

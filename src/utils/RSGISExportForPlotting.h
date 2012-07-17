@@ -35,43 +35,37 @@
 
 #include "geos/geom/LineSegment.h"
 
-namespace rsgis 
-{
-	namespace utils
-	{
-        using namespace std;
-        using namespace rsgis;
-        using namespace geos::geom;
+namespace rsgis{namespace utils{
         
-		class RSGISExportForPlotting
-			{
-			public: 
-				static RSGISExportForPlotting* getInstance(string filepath);
-				static RSGISExportForPlotting* getInstance() throw(RSGISException);
-				string getFilePath();
-				void export2DFreq(string filename, list<double> *values) throw(RSGISOutputStreamException);
-				void export3DFreq(string filename, list<double> *values1, list<double> *values2) throw(RSGISOutputStreamException);
-				void export2DLines(string filename, list<LineSegment> *lines) throw(RSGISOutputStreamException);
-				void export3DLines(string filename, list<LineSegment> *lines) throw(RSGISOutputStreamException);
-				void exportDensity(string filename, double *x, double *y, int numPts) throw(RSGISOutputStreamException);
-				void export2DScatter(string filename, double *x, double *y, int numPts) throw(RSGISOutputStreamException);
-				void export3DScatter(string filename, double *x, double *y, double *z, int numPts) throw(RSGISOutputStreamException);
-				void export2DColourScatter(string filename, double *x, double *y, double *c, int numPts) throw(RSGISOutputStreamException);
-				void export3DColourScatter(string filename, double *x, double *y, double *z, double *c, int numPts) throw(RSGISOutputStreamException);
-				void exportSurface(string filename, double *x, double *y, double *z, int numPts) throw(RSGISOutputStreamException);
-				void exportColourSurface(string filename, double *x, double *y, double *z, double *c, int numPts) throw(RSGISOutputStreamException);
-				void exportTriangles2d(string filename, double *x, double *y, unsigned long numPts) throw(RSGISOutputStreamException);
-				void exportTriangles3d(string filename, double *x, double *y, double *z, unsigned long numPts) throw(RSGISOutputStreamException);
-				~RSGISExportForPlotting();
-			private:
-				RSGISExportForPlotting(string filepath);
-				RSGISExportForPlotting(const RSGISExportForPlotting&){};
-				RSGISExportForPlotting& operator=(const RSGISExportForPlotting&){return *instance;};
-				string filepath;
-				static RSGISExportForPlotting *instance;
-			};
-	}
-}
+    class RSGISExportForPlotting
+        {
+        public: 
+            static RSGISExportForPlotting* getInstance(std::string filepath);
+            static RSGISExportForPlotting* getInstance() throw(rsgis::RSGISException);
+            std::string getFilePath();
+            void export2DFreq(std::string filename, std::list<double> *values) throw(rsgis::RSGISOutputStreamException);
+            void export3DFreq(std::string filename, std::list<double> *values1, std::list<double> *values2) throw(rsgis::RSGISOutputStreamException);
+            void export2DLines(std::string filename, std::list<geos::geom::LineSegment> *lines) throw(rsgis::RSGISOutputStreamException);
+            void export3DLines(std::string filename, std::list<geos::geom::LineSegment> *lines) throw(rsgis::RSGISOutputStreamException);
+            void exportDensity(std::string filename, double *x, double *y, int numPts) throw(rsgis::RSGISOutputStreamException);
+            void export2DScatter(std::string filename, double *x, double *y, int numPts) throw(rsgis::RSGISOutputStreamException);
+            void export3DScatter(std::string filename, double *x, double *y, double *z, int numPts) throw(rsgis::RSGISOutputStreamException);
+            void export2DColourScatter(std::string filename, double *x, double *y, double *c, int numPts) throw(rsgis::RSGISOutputStreamException);
+            void export3DColourScatter(std::string filename, double *x, double *y, double *z, double *c, int numPts) throw(rsgis::RSGISOutputStreamException);
+            void exportSurface(std::string filename, double *x, double *y, double *z, int numPts) throw(rsgis::RSGISOutputStreamException);
+            void exportColourSurface(std::string filename, double *x, double *y, double *z, double *c, int numPts) throw(rsgis::RSGISOutputStreamException);
+            void exportTriangles2d(std::string filename, double *x, double *y, unsigned long numPts) throw(rsgis::RSGISOutputStreamException);
+            void exportTriangles3d(std::string filename, double *x, double *y, double *z, unsigned long numPts) throw(rsgis::RSGISOutputStreamException);
+            ~RSGISExportForPlotting();
+        private:
+            RSGISExportForPlotting(std::string filepath);
+            RSGISExportForPlotting(const RSGISExportForPlotting&){};
+            RSGISExportForPlotting& operator=(const RSGISExportForPlotting&){return *instance;};
+            std::string filepath;
+            static RSGISExportForPlotting *instance;
+        };
+    
+}}
 
 #endif
 

@@ -42,7 +42,7 @@ namespace rsgis{namespace utils
 		}
 		else
 		{
-			cout << "Species not recognised" << endl;
+			std::cout << "Species not recognised" << std::endl;
 		}
 		return biomass;
 	}
@@ -65,7 +65,7 @@ namespace rsgis{namespace utils
 		}
 		else
 		{
-			cout << "Species not recognised" << endl;
+			std::cout << "Species not recognised" << std::endl;
 		}
 		return biomass;
 	}
@@ -84,7 +84,7 @@ namespace rsgis{namespace utils
 		}
 		else
 		{
-			cout << "Species not recognised" << endl;
+			std::cout << "Species not recognised" << std::endl;
 		}
 		return biomass;
 	}
@@ -102,7 +102,7 @@ namespace rsgis{namespace utils
 		}
 		else
 		{
-			cout << "Species not recognised" << endl;
+			std::cout << "Species not recognised" << std::endl;
 		}
 		return biomass;
 	}
@@ -120,7 +120,7 @@ namespace rsgis{namespace utils
 		}
 		else
 		{
-			cout << "Species not recognised" << endl;
+			std::cout << "Species not recognised" << std::endl;
 		}
 		return biomass;
 	}

@@ -31,28 +31,28 @@ namespace rsgis{ namespace utils{
 		
 	}
 	
-	vector<PlotPoly*>* RSGISPlotPolygonsCSVParse::parsePolyPlots(string inputfile) throw(RSGISInputStreamException, RSGISTextException)
+	std::vector<PlotPoly*>* RSGISPlotPolygonsCSVParse::parsePolyPlots(std::string inputfile) throw(rsgis::RSGISInputStreamException, RSGISTextException)
 	{
-		vector<PlotPoly*> *plotPolys = new vector<PlotPoly*>();
+		std::vector<PlotPoly*> *plotPolys = new std::vector<PlotPoly*>();
 		
 		try 
 		{
-			ifstream inputCSVFile;
+			std::ifstream inputCSVFile;
 			inputCSVFile.open(inputfile.c_str());
 			if(!inputCSVFile.is_open())
 			{
-				string message = string("Could not open input text file: ") + inputfile;
-				throw RSGISInputStreamException(message);
+				std::string message = std::string("Could not open input text file: ") + inputfile;
+				throw rsgis::RSGISInputStreamException(message);
 			}
 			else
 			{
 				RSGISTextUtils textUtils;
-				RSGISMathsUtils mathsUtils;
+                rsgis::math::RSGISMathsUtils mathsUtils;
 				
-				string strLine;
-				string word;
-				vector<string>::iterator iterTokens;
-				vector<string> *tokens = new vector<string>();
+				std::string strLine;
+				std::string word;
+				std::vector<std::string>::iterator iterTokens;
+				std::vector<std::string> *tokens = new std::vector<std::string>();
 				PlotPoly *poly = NULL;
 				inputCSVFile.seekg(ios_base::beg);
 				while(!inputCSVFile.eof())
@@ -82,7 +82,7 @@ namespace rsgis{ namespace utils{
 						}
 						else 
 						{
-							string message = string("Line does not an sufficient tokens (") + mathsUtils.inttostring(tokens->size()) + string("): ") + strLine;
+							std::string message = std::string("Line does not an sufficient tokens (") + mathsUtils.inttostring(tokens->size()) + std::string("): ") + strLine;
 							throw RSGISTextException(message);
 						}
 						tokens->clear();
@@ -92,7 +92,7 @@ namespace rsgis{ namespace utils{
 				inputCSVFile.close();
 			}
 		}
-		catch (RSGISInputStreamException &e) 
+		catch (rsgis::RSGISInputStreamException &e) 
 		{
 			throw e;
 		}
@@ -104,11 +104,11 @@ namespace rsgis{ namespace utils{
 		return plotPolys;
 	}
 	
-	string RSGISPlotPolygonsCSVParse::formatedString(PlotPoly *poly)
+	std::string RSGISPlotPolygonsCSVParse::formattedString(PlotPoly *poly)
 	{
-		RSGISMathsUtils mathsUtils;
+        rsgis::math::RSGISMathsUtils mathsUtils;
 		
-		string output = "";
+		std::string output = "";
 		
 		output = mathsUtils.inttostring(poly->fid) + "," + 
 				mathsUtils.inttostring(poly->zone) + "," +

@@ -31,28 +31,28 @@ namespace rsgis{ namespace utils{
 		
 	}
 	
-	vector<ImageFootPrintPoly*>* RSGISImageFootprintPolygonsCSVParse::parsePoly(string inputfile) throw(RSGISInputStreamException, RSGISTextException)
+	std::vector<ImageFootPrintPoly*>* RSGISImageFootprintPolygonsCSVParse::parsePoly(std::string inputfile) throw(rsgis::RSGISInputStreamException, RSGISTextException)
 	{
-		vector<ImageFootPrintPoly*> *plotPolys = new vector<ImageFootPrintPoly*>();
+		std::vector<ImageFootPrintPoly*> *plotPolys = new std::vector<ImageFootPrintPoly*>();
 		
 		try 
 		{
-			ifstream inputCSVFile;
+			std::ifstream inputCSVFile;
 			inputCSVFile.open(inputfile.c_str());
 			if(!inputCSVFile.is_open())
 			{
-				string message = string("Could not open input text file: ") + inputfile;
-				throw RSGISInputStreamException(message);
+				std::string message = std::string("Could not open input text file: ") + inputfile;
+				throw rsgis::RSGISInputStreamException(message);
 			}
 			else
 			{
 				RSGISTextUtils textUtils;
-				RSGISMathsUtils mathsUtils;
+                rsgis::math::RSGISMathsUtils mathsUtils;
 				
-				string strLine;
-				string word;
-				vector<string>::iterator iterTokens;
-				vector<string> *tokens = new vector<string>();
+				std::string strLine;
+				std::string word;
+				std::vector<std::string>::iterator iterTokens;
+				std::vector<std::string> *tokens = new std::vector<std::string>();
 				ImageFootPrintPoly *poly = NULL;
 				inputCSVFile.seekg(ios_base::beg);
 				
@@ -82,12 +82,12 @@ namespace rsgis{ namespace utils{
 						}
 						else 
 						{
-							string message = string("Line does not an sufficient tokens (") + mathsUtils.inttostring(tokens->size()) + string("): ") + strLine;
+							std::string message = std::string("Line does not an sufficient tokens (") + mathsUtils.inttostring(tokens->size()) + std::string("): ") + strLine;
 							throw RSGISTextException(message);
 						}
 						tokens->clear();
 						
-						//cout << this->formatedString(poly) << endl;
+						//cout << this->formatedstd::string(poly) << endl;
 					}
 					// ELSE IGNORE AS EITHER BLANK LINE OR COMMENT
 				}
@@ -106,11 +106,11 @@ namespace rsgis{ namespace utils{
 		return plotPolys;
 	}
 	
-	string RSGISImageFootprintPolygonsCSVParse::formatedString(ImageFootPrintPoly *poly)
+	std::string RSGISImageFootprintPolygonsCSVParse::formatedString(ImageFootPrintPoly *poly)
 	{
-		RSGISMathsUtils mathsUtils;
+        rsgis::math::RSGISMathsUtils mathsUtils;
 		
-		string output = "";
+		std::string output = "";
 		
 		output = mathsUtils.inttostring(poly->fid) + "," + 
 				poly->scene + "," +

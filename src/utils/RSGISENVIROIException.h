@@ -26,21 +26,16 @@
 
 #include "common/RSGISException.h"
 
-namespace rsgis 
-{
-	namespace utils
-	{
-        using namespace std;
-        
-		class RSGISENVIROIException : public RSGISException
-			{
-			public:
-				RSGISENVIROIException();
-				RSGISENVIROIException(const char* message);
-				RSGISENVIROIException(string message);
-			};
-	}
-}
+namespace rsgis{namespace utils	{
+    
+    class RSGISENVIROIException : public rsgis::RSGISException
+        {
+        public:
+            RSGISENVIROIException();
+            RSGISENVIROIException(const char* message);
+            RSGISENVIROIException(std::string message);
+        };
+}}
 
 #endif
 

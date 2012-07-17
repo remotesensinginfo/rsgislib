@@ -30,27 +30,21 @@
 
 #include "utils/RSGISAllometricSpecies.h"
 
-namespace rsgis 
-{
-	namespace utils
-	{
-        using namespace std;
-        using namespace rsgis::utils;
+namespace rsgis{namespace utils{
         
-		class RSGISAllometricEquations
-			{
-			public:
-				RSGISAllometricEquations();
-				double calculateTotalBiomassHeight(double height, treeSpecies species);
-				double calculateTotalBiomassDiameter(double diameter, treeSpecies species);
-				double calculateLeafBiomassHeight(double height, treeSpecies species);
-				double calculateBranchBiomassHeight(double height, treeSpecies species);
-				double calculateStemBiomassHeight(double height, treeSpecies species);
-				~RSGISAllometricEquations();
-			private:
-				treeSpecies species;
-			};
-	}
-}
+    class RSGISAllometricEquations
+        {
+        public:
+            RSGISAllometricEquations();
+            double calculateTotalBiomassHeight(double height, treeSpecies species);
+            double calculateTotalBiomassDiameter(double diameter, treeSpecies species);
+            double calculateLeafBiomassHeight(double height, treeSpecies species);
+            double calculateBranchBiomassHeight(double height, treeSpecies species);
+            double calculateStemBiomassHeight(double height, treeSpecies species);
+            ~RSGISAllometricEquations();
+        private:
+            treeSpecies species;
+        };
+}}
 
 #endif

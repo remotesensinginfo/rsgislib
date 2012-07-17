@@ -27,13 +27,13 @@ namespace rsgis{namespace utils{
 	
 	RSGISExportForPlotting* RSGISExportForPlotting::instance = NULL;
 	
-	RSGISExportForPlotting::RSGISExportForPlotting(string filepath)
+	RSGISExportForPlotting::RSGISExportForPlotting(std::string filepath)
 	{
 		this->filepath = filepath;
 		instance = NULL;
 	}
 	
-	RSGISExportForPlotting* RSGISExportForPlotting::getInstance(string filepath)
+	RSGISExportForPlotting* RSGISExportForPlotting::getInstance(std::string filepath)
 	{
 		if(instance == NULL)
 		{
@@ -42,37 +42,37 @@ namespace rsgis{namespace utils{
 		return instance;
 	}
 	
-	RSGISExportForPlotting* RSGISExportForPlotting::getInstance() throw(RSGISException)
+	RSGISExportForPlotting* RSGISExportForPlotting::getInstance() throw(rsgis::RSGISException)
 	{
 		if(instance == NULL)
 		{
-			throw RSGISException("Plotter is not instanciated, a filepath needs to be specified: <rsgis:command algor=\"visualisation\" option=\"setupplotter\" outdir=\"string\" />");
+			throw rsgis::RSGISException("Plotter is not instanciated, a filepath needs to be specified: <rsgis:command algor=\"visualisation\" option=\"setupplotter\" outdir=\"std::string\" />");
 		}
 		return instance;
 	}
 	
-	string RSGISExportForPlotting::getFilePath()
+	std::string RSGISExportForPlotting::getFilePath()
 	{
 		return filepath;
 	}
 	
-	void RSGISExportForPlotting::export2DFreq(string filename, list<double> *values) throw(RSGISOutputStreamException)
+	void RSGISExportForPlotting::export2DFreq(std::string filename, std::list<double> *values) throw(rsgis::RSGISOutputStreamException)
 	{
-		string outputFilename = this->filepath + filename + string(".ptxt");
-		ofstream outTxtFile;
-		outTxtFile.open(outputFilename.c_str(), ios::out | ios::trunc);
+		std::string outputFilename = this->filepath + filename + std::string(".ptxt");
+		std::ofstream outTxtFile;
+		outTxtFile.open(outputFilename.c_str(), std::ios::out | std::ios::trunc);
 		
 		if(outTxtFile.is_open())
 		{
 			outTxtFile.precision(10);
-			outTxtFile << "#freq2D" << endl;
-			outTxtFile << "#value" << endl;
+			outTxtFile << "#freq2D" << std::endl;
+			outTxtFile << "#value" << std::endl;
 			
-			list<double>::iterator iterValues;
+			std::list<double>::iterator iterValues;
 			
 			for(iterValues = values->begin(); iterValues != values->end(); ++iterValues)
 			{
-				outTxtFile << (*iterValues) << endl;
+				outTxtFile << (*iterValues) << std::endl;
 			}
 			
 			outTxtFile.flush();
@@ -80,36 +80,36 @@ namespace rsgis{namespace utils{
 		}
 		else
 		{
-			throw RSGISOutputStreamException("Could not open text file.");
+			throw rsgis::RSGISOutputStreamException("Could not open text file.");
 		}
 	}
 	
-	void RSGISExportForPlotting::export3DFreq(string filename, list<double> *values1, list<double> *values2) throw(RSGISOutputStreamException)
+	void RSGISExportForPlotting::export3DFreq(std::string filename, std::list<double> *values1, std::list<double> *values2) throw(rsgis::RSGISOutputStreamException)
 	{
-		string outputFilename = filepath + filename + string(".ptxt");
-		ofstream outTxtFile;
-		outTxtFile.open(outputFilename.c_str(), ios::out | ios::trunc);
+		std::string outputFilename = filepath + filename + std::string(".ptxt");
+		std::ofstream outTxtFile;
+		outTxtFile.open(outputFilename.c_str(), std::ios::out | std::ios::trunc);
 		
 		if(values1->size() != values2->size())
 		{
-			throw RSGISOutputStreamException("Number of values for 1 and 2 are not equal.");
+			throw rsgis::RSGISOutputStreamException("Number of values for 1 and 2 are not equal.");
 		}
 		
 		if(outTxtFile.is_open())
 		{
 			outTxtFile.precision(10);
-			outTxtFile << "#freq3D" << endl;
-			outTxtFile << "#value1,value2" << endl;
+			outTxtFile << "#freq3D" << std::endl;
+			outTxtFile << "#value1,value2" << std::endl;
 			
-			list<double>::iterator iterValues1;
-			list<double>::iterator iterValues2;
+			std::list<double>::iterator iterValues1;
+			std::list<double>::iterator iterValues2;
 			
 			iterValues1 = values1->begin();
 			iterValues2 = values2->begin();
 			
 			while(iterValues1 != values1->end() & iterValues2 != values2->end())
 			{
-				outTxtFile << (*iterValues1) << "," << (*iterValues2) << endl;
+				outTxtFile << (*iterValues1) << "," << (*iterValues2) << std::endl;
 				
 				++iterValues1;
 				++iterValues2;
@@ -120,27 +120,27 @@ namespace rsgis{namespace utils{
 		}
 		else
 		{
-			throw RSGISOutputStreamException("Could not open text file.");
+			throw rsgis::RSGISOutputStreamException("Could not open text file.");
 		}	
 	}
 	
-	void RSGISExportForPlotting::export2DLines(string filename, list<LineSegment> *lines) throw(RSGISOutputStreamException)
+	void RSGISExportForPlotting::export2DLines(std::string filename, std::list<geos::geom::LineSegment> *lines) throw(rsgis::RSGISOutputStreamException)
 	{
-		string outputFilename = filepath + filename + string(".ptxt");
-		ofstream outTxtFile;
-		outTxtFile.open(outputFilename.c_str(), ios::out | ios::trunc);
+		std::string outputFilename = filepath + filename + std::string(".ptxt");
+		std::ofstream outTxtFile;
+		outTxtFile.open(outputFilename.c_str(), std::ios::out | std::ios::trunc);
 		
 		if(outTxtFile.is_open())
 		{
 			outTxtFile.precision(10);
-			outTxtFile << "#lines2D" << endl;
-			outTxtFile << "#x1,y1,x2,y2" << endl;
+			outTxtFile << "#lines2D" << std::endl;
+			outTxtFile << "#x1,y1,x2,y2" << std::endl;
 			
-			list<LineSegment>::iterator iterLines;
+			std::list<geos::geom::LineSegment>::iterator iterLines;
 			
 			for(iterLines = lines->begin(); iterLines != lines->end(); iterLines++)
 			{
-				outTxtFile << (*iterLines).p0.x << "," << (*iterLines).p0.y << "," << (*iterLines).p1.x << "," << (*iterLines).p1.y << endl;
+				outTxtFile << (*iterLines).p0.x << "," << (*iterLines).p0.y << "," << (*iterLines).p1.x << "," << (*iterLines).p1.y << std::endl;
 			}
 		
 			outTxtFile.flush();
@@ -148,27 +148,27 @@ namespace rsgis{namespace utils{
 		}
 		else
 		{
-			throw RSGISOutputStreamException("Could not open text file.");
+			throw rsgis::RSGISOutputStreamException("Could not open text file.");
 		}	
 	}
 	
-	void RSGISExportForPlotting::export3DLines(string filename, list<LineSegment> *lines) throw(RSGISOutputStreamException)
+	void RSGISExportForPlotting::export3DLines(std::string filename, std::list<geos::geom::LineSegment> *lines) throw(rsgis::RSGISOutputStreamException)
 	{
-		string outputFilename = filepath + filename + string(".ptxt");
-		ofstream outTxtFile;
-		outTxtFile.open(outputFilename.c_str(), ios::out | ios::trunc);
+		std::string outputFilename = filepath + filename + std::string(".ptxt");
+		std::ofstream outTxtFile;
+		outTxtFile.open(outputFilename.c_str(), std::ios::out | std::ios::trunc);
 		
 		if(outTxtFile.is_open())
 		{
 			outTxtFile.precision(10);
-			outTxtFile << "#lines3D" << endl;
-			outTxtFile << "#x1,y1,z1,x2,y2,z2" << endl;
+			outTxtFile << "#lines3D" << std::endl;
+			outTxtFile << "#x1,y1,z1,x2,y2,z2" << std::endl;
 			
-			list<LineSegment>::iterator iterLines;
+			std::list<geos::geom::LineSegment>::iterator iterLines;
 			
 			for(iterLines = lines->begin(); iterLines != lines->end(); iterLines++)
 			{
-				outTxtFile << (*iterLines).p0.x << "," << (*iterLines).p0.y << "," << (*iterLines).p0.z << "," << (*iterLines).p1.x << "," << (*iterLines).p1.y << "," << (*iterLines).p1.z << endl;
+				outTxtFile << (*iterLines).p0.x << "," << (*iterLines).p0.y << "," << (*iterLines).p0.z << "," << (*iterLines).p1.x << "," << (*iterLines).p1.y << "," << (*iterLines).p1.z << std::endl;
 			}
 			
 			outTxtFile.flush();
@@ -176,25 +176,25 @@ namespace rsgis{namespace utils{
 		}
 		else
 		{
-			throw RSGISOutputStreamException("Could not open text file.");
+			throw rsgis::RSGISOutputStreamException("Could not open text file.");
 		}	
 	}
 	
-	void RSGISExportForPlotting::exportDensity(string filename, double *x, double *y, int numPts) throw(RSGISOutputStreamException)
+	void RSGISExportForPlotting::exportDensity(std::string filename, double *x, double *y, int numPts) throw(rsgis::RSGISOutputStreamException)
 	{
-		string outputFilename = filepath + filename + string(".ptxt");
-		ofstream outTxtFile;
-		outTxtFile.open(outputFilename.c_str(), ios::out | ios::trunc);
+		std::string outputFilename = filepath + filename + std::string(".ptxt");
+		std::ofstream outTxtFile;
+		outTxtFile.open(outputFilename.c_str(), std::ios::out | std::ios::trunc);
 		
 		if(outTxtFile.is_open())
 		{
 			outTxtFile.precision(10);
-			outTxtFile << "#Density" << endl;
-			outTxtFile << "#x,y" << endl;
+			outTxtFile << "#Density" << std::endl;
+			outTxtFile << "#x,y" << std::endl;
 			
 			for(int i = 0; i < numPts; i++)
 			{
-				outTxtFile << x[i] << "," << y[i] << endl;
+				outTxtFile << x[i] << "," << y[i] << std::endl;
 			}
 			
 			outTxtFile.flush();
@@ -202,25 +202,25 @@ namespace rsgis{namespace utils{
 		}
 		else
 		{
-			throw RSGISOutputStreamException("Could not open text file.");
+			throw rsgis::RSGISOutputStreamException("Could not open text file.");
 		}	
 	}
 	
-	void RSGISExportForPlotting::export2DScatter(string filename, double *x, double *y, int numPts) throw(RSGISOutputStreamException)
+	void RSGISExportForPlotting::export2DScatter(std::string filename, double *x, double *y, int numPts) throw(rsgis::RSGISOutputStreamException)
 	{
-		string outputFilename = filepath + filename + string(".ptxt");
-		ofstream outTxtFile;
-		outTxtFile.open(outputFilename.c_str(), ios::out | ios::trunc);
+		std::string outputFilename = filepath + filename + std::string(".ptxt");
+		std::ofstream outTxtFile;
+		outTxtFile.open(outputFilename.c_str(), std::ios::out | std::ios::trunc);
 		
 		if(outTxtFile.is_open())
 		{
 			outTxtFile.precision(10);
-			outTxtFile << "#2DScatter" << endl;
-			outTxtFile << "#x,y" << endl;
+			outTxtFile << "#2DScatter" << std::endl;
+			outTxtFile << "#x,y" << std::endl;
 			
 			for(int i = 0; i < numPts; i++)
 			{
-				outTxtFile << x[i] << "," << y[i] << endl;
+				outTxtFile << x[i] << "," << y[i] << std::endl;
 			}
 			
 			outTxtFile.flush();
@@ -228,25 +228,25 @@ namespace rsgis{namespace utils{
 		}
 		else
 		{
-			throw RSGISOutputStreamException("Could not open text file.");
+			throw rsgis::RSGISOutputStreamException("Could not open text file.");
 		}	
 	}
 	
-	void RSGISExportForPlotting::export3DScatter(string filename, double *x, double *y, double *z, int numPts) throw(RSGISOutputStreamException)
+	void RSGISExportForPlotting::export3DScatter(std::string filename, double *x, double *y, double *z, int numPts) throw(rsgis::RSGISOutputStreamException)
 	{
-		string outputFilename = filepath + filename + string(".ptxt");
-		ofstream outTxtFile;
-		outTxtFile.open(outputFilename.c_str(), ios::out | ios::trunc);
+		std::string outputFilename = filepath + filename + std::string(".ptxt");
+		std::ofstream outTxtFile;
+		outTxtFile.open(outputFilename.c_str(), std::ios::out | std::ios::trunc);
 		
 		if(outTxtFile.is_open())
 		{
 			outTxtFile.precision(10);
-			outTxtFile << "#3DScatter" << endl;
-			outTxtFile << "#x,y,z" << endl;
+			outTxtFile << "#3DScatter" << std::endl;
+			outTxtFile << "#x,y,z" << std::endl;
 			
 			for(int i = 0; i < numPts; i++)
 			{
-				outTxtFile << x[i] << "," << y[i] << "," << z[i] << endl;
+				outTxtFile << x[i] << "," << y[i] << "," << z[i] << std::endl;
 			}
 			
 			outTxtFile.flush();
@@ -254,25 +254,25 @@ namespace rsgis{namespace utils{
 		}
 		else
 		{
-			throw RSGISOutputStreamException("Could not open text file.");
+			throw rsgis::RSGISOutputStreamException("Could not open text file.");
 		}	
 	}
 	
-	void RSGISExportForPlotting::export2DColourScatter(string filename, double *x, double *y, double *c, int numPts) throw(RSGISOutputStreamException)
+	void RSGISExportForPlotting::export2DColourScatter(std::string filename, double *x, double *y, double *c, int numPts) throw(rsgis::RSGISOutputStreamException)
 	{
-		string outputFilename = filepath + filename + string(".ptxt");
-		ofstream outTxtFile;
-		outTxtFile.open(outputFilename.c_str(), ios::out | ios::trunc);
+		std::string outputFilename = filepath + filename + std::string(".ptxt");
+		std::ofstream outTxtFile;
+		outTxtFile.open(outputFilename.c_str(), std::ios::out | std::ios::trunc);
 		
 		if(outTxtFile.is_open())
 		{
 			outTxtFile.precision(10);
-			outTxtFile << "#c2DScatter" << endl;
-			outTxtFile << "#x,y,c" << endl;
+			outTxtFile << "#c2DScatter" << std::endl;
+			outTxtFile << "#x,y,c" << std::endl;
 			
 			for(int i = 0; i < numPts; i++)
 			{
-				outTxtFile << x[i] << "," << y[i] << "," << c[i] << endl;
+				outTxtFile << x[i] << "," << y[i] << "," << c[i] << std::endl;
 			}
 			
 			outTxtFile.flush();
@@ -280,25 +280,25 @@ namespace rsgis{namespace utils{
 		}
 		else
 		{
-			throw RSGISOutputStreamException("Could not open text file.");
+			throw rsgis::RSGISOutputStreamException("Could not open text file.");
 		}	
 	}
 	
-	void RSGISExportForPlotting::export3DColourScatter(string filename, double *x, double *y, double *z, double *c, int numPts) throw(RSGISOutputStreamException)
+	void RSGISExportForPlotting::export3DColourScatter(std::string filename, double *x, double *y, double *z, double *c, int numPts) throw(rsgis::RSGISOutputStreamException)
 	{
-		string outputFilename = filepath + filename + string(".ptxt");
-		ofstream outTxtFile;
-		outTxtFile.open(outputFilename.c_str(), ios::out | ios::trunc);
+		std::string outputFilename = filepath + filename + std::string(".ptxt");
+		std::ofstream outTxtFile;
+		outTxtFile.open(outputFilename.c_str(), std::ios::out | std::ios::trunc);
 		
 		if(outTxtFile.is_open())
 		{
 			outTxtFile.precision(10);
-			outTxtFile << "#c3DScatter" << endl;
-			outTxtFile << "#x,y,z,c" << endl;
+			outTxtFile << "#c3DScatter" << std::endl;
+			outTxtFile << "#x,y,z,c" << std::endl;
 			
 			for(int i = 0; i < numPts; i++)
 			{
-				outTxtFile << x[i] << "," << y[i] << "," << z[i] << "," << c[i] << endl;
+				outTxtFile << x[i] << "," << y[i] << "," << z[i] << "," << c[i] << std::endl;
 			}
 			
 			outTxtFile.flush();
@@ -306,25 +306,25 @@ namespace rsgis{namespace utils{
 		}
 		else
 		{
-			throw RSGISOutputStreamException("Could not open text file.");
+			throw rsgis::RSGISOutputStreamException("Could not open text file.");
 		}			
 	}
 	
-	void RSGISExportForPlotting::exportSurface(string filename, double *x, double *y, double *z, int numPts) throw(RSGISOutputStreamException)
+	void RSGISExportForPlotting::exportSurface(std::string filename, double *x, double *y, double *z, int numPts) throw(rsgis::RSGISOutputStreamException)
 	{
-		string outputFilename = filepath + filename + string(".ptxt");
-		ofstream outTxtFile;
-		outTxtFile.open(outputFilename.c_str(), ios::out | ios::trunc);
+		std::string outputFilename = filepath + filename + std::string(".ptxt");
+		std::ofstream outTxtFile;
+		outTxtFile.open(outputFilename.c_str(), std::ios::out | std::ios::trunc);
 		
 		if(outTxtFile.is_open())
 		{
 			outTxtFile.precision(10);
-			outTxtFile << "#Surface" << endl;
-			outTxtFile << "#x,y,z" << endl;
+			outTxtFile << "#Surface" << std::endl;
+			outTxtFile << "#x,y,z" << std::endl;
 			
 			for(int i = 0; i < numPts; i++)
 			{
-				outTxtFile << x[i] << "," << y[i] << "," << z[i] << endl;
+				outTxtFile << x[i] << "," << y[i] << "," << z[i] << std::endl;
 			}
 			
 			outTxtFile.flush();
@@ -332,25 +332,25 @@ namespace rsgis{namespace utils{
 		}
 		else
 		{
-			throw RSGISOutputStreamException("Could not open text file.");
+			throw rsgis::RSGISOutputStreamException("Could not open text file.");
 		}	
 	}
 	
-	void RSGISExportForPlotting::exportColourSurface(string filename, double *x, double *y, double *z, double *c, int numPts) throw(RSGISOutputStreamException)
+	void RSGISExportForPlotting::exportColourSurface(std::string filename, double *x, double *y, double *z, double *c, int numPts) throw(rsgis::RSGISOutputStreamException)
 	{
-		string outputFilename = filepath + filename + string(".ptxt");
-		ofstream outTxtFile;
-		outTxtFile.open(outputFilename.c_str(), ios::out | ios::trunc);
+		std::string outputFilename = filepath + filename + std::string(".ptxt");
+		std::ofstream outTxtFile;
+		outTxtFile.open(outputFilename.c_str(), std::ios::out | std::ios::trunc);
 		
 		if(outTxtFile.is_open())
 		{
 			outTxtFile.precision(10);
-			outTxtFile << "#cSurface" << endl;
-			outTxtFile << "#x,y,z,c" << endl;
+			outTxtFile << "#cSurface" << std::endl;
+			outTxtFile << "#x,y,z,c" << std::endl;
 			
 			for(int i = 0; i < numPts; i++)
 			{
-				outTxtFile << x[i] << "," << y[i] << "," << z[i] << "," << c[i] << endl;
+				outTxtFile << x[i] << "," << y[i] << "," << z[i] << "," << c[i] << std::endl;
 			}
 			
 			outTxtFile.flush();
@@ -358,27 +358,27 @@ namespace rsgis{namespace utils{
 		}
 		else
 		{
-			throw RSGISOutputStreamException("Could not open text file.");
+			throw rsgis::RSGISOutputStreamException("Could not open text file.");
 		}			
 	}
 	
-	void RSGISExportForPlotting::exportTriangles2d(string filename, double *x, double *y, unsigned long numPts) throw(RSGISOutputStreamException)
+	void RSGISExportForPlotting::exportTriangles2d(std::string filename, double *x, double *y, unsigned long numPts) throw(rsgis::RSGISOutputStreamException)
 	{
-		string outputFilename = filepath + filename + string(".ptxt");
-		ofstream outTxtFile;
-		outTxtFile.open(outputFilename.c_str(), ios::out | ios::trunc);
+		std::string outputFilename = filepath + filename + std::string(".ptxt");
+		std::ofstream outTxtFile;
+		outTxtFile.open(outputFilename.c_str(), std::ios::out | std::ios::trunc);
 		
 		if(outTxtFile.is_open())
 		{
 			outTxtFile.precision(10);
-			outTxtFile << "#triangle2d" << endl;
-			outTxtFile << "#x1,y1" << endl;
-			outTxtFile << "#x2,y2" << endl;
-			outTxtFile << "#x3,y3" << endl;
+			outTxtFile << "#triangle2d" << std::endl;
+			outTxtFile << "#x1,y1" << std::endl;
+			outTxtFile << "#x2,y2" << std::endl;
+			outTxtFile << "#x3,y3" << std::endl;
 			
 			for(unsigned int i = 0; i < numPts; i++)
 			{
-				outTxtFile << x[i] << "," << y[i] << endl;
+				outTxtFile << x[i] << "," << y[i] << std::endl;
 			}
 			
 			outTxtFile.flush();
@@ -386,28 +386,28 @@ namespace rsgis{namespace utils{
 		}
 		else
 		{
-			throw RSGISOutputStreamException("Could not open text file.");
+			throw rsgis::RSGISOutputStreamException("Could not open text file.");
 		}			
 		
 	}
 	
-	void RSGISExportForPlotting::exportTriangles3d(string filename, double *x, double *y, double *z, unsigned long numPts) throw(RSGISOutputStreamException)
+	void RSGISExportForPlotting::exportTriangles3d(std::string filename, double *x, double *y, double *z, unsigned long numPts) throw(rsgis::RSGISOutputStreamException)
 	{
-		string outputFilename = filepath + filename + string(".ptxt");
-		ofstream outTxtFile;
-		outTxtFile.open(outputFilename.c_str(), ios::out | ios::trunc);
+		std::string outputFilename = filepath + filename + std::string(".ptxt");
+		std::ofstream outTxtFile;
+		outTxtFile.open(outputFilename.c_str(), std::ios::out | std::ios::trunc);
 		
 		if(outTxtFile.is_open())
 		{
 			outTxtFile.precision(10);
-			outTxtFile << "#triangle3d" << endl;
-			outTxtFile << "#x1,y1,z1" << endl;
-			outTxtFile << "#x2,y2,z2" << endl;
-			outTxtFile << "#x3,y3,z3" << endl;
+			outTxtFile << "#triangle3d" << std::endl;
+			outTxtFile << "#x1,y1,z1" << std::endl;
+			outTxtFile << "#x2,y2,z2" << std::endl;
+			outTxtFile << "#x3,y3,z3" << std::endl;
 			
 			for(unsigned int i = 0; i < numPts; i++)
 			{
-				outTxtFile << x[i] << "," << y[i] << "," << z[i] << endl;
+				outTxtFile << x[i] << "," << y[i] << "," << z[i] << std::endl;
 			}
 			
 			outTxtFile.flush();
@@ -415,7 +415,7 @@ namespace rsgis{namespace utils{
 		}
 		else
 		{
-			throw RSGISOutputStreamException("Could not open text file.");
+			throw rsgis::RSGISOutputStreamException("Could not open text file.");
 		}			
 		
 	}

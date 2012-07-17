@@ -36,35 +36,31 @@
 #include "math/RSGISMathsUtils.h"
 
 namespace rsgis{namespace utils{
-	
-    using namespace std;
-    using namespace rsgis;
-    using namespace rsgis::math;
     
 	class RSGISExportForPlottingIncremental
 	{
 	public:
 		RSGISExportForPlottingIncremental();
-		bool openFile(string file, PlotTypes inType) throw(RSGISOutputStreamException);
-		void writeFrequency2DLine(double value) throw(RSGISOutputStreamException);
-		void writeFrequency3DLine(double value1, double value2) throw(RSGISOutputStreamException);
-		void writeScatterNDLine(vector<double> *vals) throw(RSGISOutputStreamException);
-		void writeScatter2DLine(double x, double y) throw(RSGISOutputStreamException);
-		void writeScatter3DLine(double x, double y, double z) throw(RSGISOutputStreamException);
-		void writeCScatter2DLine(double x, double y, double c) throw(RSGISOutputStreamException);
-		void writeCScatter3DLine(double x, double y, double z, double c) throw(RSGISOutputStreamException);
-		void writeDensityLine(double x, double y) throw(RSGISOutputStreamException);
-		void writeSurfaceLine(double x, double y, double z) throw(RSGISOutputStreamException);
-		void writeCSurfaceLine(double x, double y, double z, double c) throw(RSGISOutputStreamException);
-		void writeLines2DLine(double x1, double y1, double x2, double y2) throw(RSGISOutputStreamException);
-		void writeLines3DLine(double x1, double y1, double z1, double x2, double y2, double z2) throw(RSGISOutputStreamException);
-		void writeTriangle2D(double x1, double y1, double x2, double y2, double x3, double y3) throw(RSGISOutputStreamException);
-		void writeTriangle3D(double x1, double y1, double z1, double x2, double y2, double z2, double x3, double y3, double z3) throw(RSGISOutputStreamException);
+		bool openFile(std::string file, PlotTypes inType) throw(rsgis::RSGISOutputStreamException);
+		void writeFrequency2DLine(double value) throw(rsgis::RSGISOutputStreamException);
+		void writeFrequency3DLine(double value1, double value2) throw(rsgis::RSGISOutputStreamException);
+		void writeScatterNDLine(vector<double> *vals) throw(rsgis::RSGISOutputStreamException);
+		void writeScatter2DLine(double x, double y) throw(rsgis::RSGISOutputStreamException);
+		void writeScatter3DLine(double x, double y, double z) throw(rsgis::RSGISOutputStreamException);
+		void writeCScatter2DLine(double x, double y, double c) throw(rsgis::RSGISOutputStreamException);
+		void writeCScatter3DLine(double x, double y, double z, double c) throw(rsgis::RSGISOutputStreamException);
+		void writeDensityLine(double x, double y) throw(rsgis::RSGISOutputStreamException);
+		void writeSurfaceLine(double x, double y, double z) throw(rsgis::RSGISOutputStreamException);
+		void writeCSurfaceLine(double x, double y, double z, double c) throw(rsgis::RSGISOutputStreamException);
+		void writeLines2DLine(double x1, double y1, double x2, double y2) throw(rsgis::RSGISOutputStreamException);
+		void writeLines3DLine(double x1, double y1, double z1, double x2, double y2, double z2) throw(rsgis::RSGISOutputStreamException);
+		void writeTriangle2D(double x1, double y1, double x2, double y2, double x3, double y3) throw(rsgis::RSGISOutputStreamException);
+		void writeTriangle3D(double x1, double y1, double z1, double x2, double y2, double z2, double x3, double y3, double z3) throw(rsgis::RSGISOutputStreamException);
 		PlotTypes getPlotType();
 		void close();
 		~RSGISExportForPlottingIncremental();
 	private:
-		ofstream *outputFileStream;
+		std::ofstream *outputFileStream;
 		bool open;
 		PlotTypes type;
 	};

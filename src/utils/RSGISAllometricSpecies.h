@@ -27,17 +27,15 @@
 #include <iostream>
 #include <string>
 
-namespace rsgis 
-{
-	namespace utils
-	{
-		enum treeSpecies
-		{
-			aHarpophylla,
-			newSpecies
-		};
-	}
-}
+namespace rsgis{namespace utils{
+ 
+    enum treeSpecies
+    {
+        aHarpophylla,
+        newSpecies
+    };
+    
+}}
 
 #endif
 

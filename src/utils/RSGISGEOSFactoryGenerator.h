@@ -32,22 +32,20 @@
 
 namespace rsgis{namespace utils{
 	
-    using namespace std;
-    using namespace geos::geom;
     
 	class RSGISGEOSFactoryGenerator
 		{
 		public: 
 			static RSGISGEOSFactoryGenerator* getInstance();
-			GeometryFactory* getFactory();
-			PrecisionModel* getPrecision();
+			geos::geom::GeometryFactory* getFactory();
+			geos::geom::PrecisionModel* getPrecision();
 			~RSGISGEOSFactoryGenerator();
 		private:
 			RSGISGEOSFactoryGenerator();
 			RSGISGEOSFactoryGenerator(const RSGISGEOSFactoryGenerator&){};
 			RSGISGEOSFactoryGenerator& operator=(const RSGISGEOSFactoryGenerator&){return *instance;};
-			GeometryFactory *geomFactory;
-			PrecisionModel *pm;
+			geos::geom::GeometryFactory *geomFactory;
+			geos::geom::PrecisionModel *pm;
 			static RSGISGEOSFactoryGenerator *instance;
 		};
 }}

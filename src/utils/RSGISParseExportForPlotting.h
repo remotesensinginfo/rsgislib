@@ -35,10 +35,6 @@
 #include "math/RSGISMathsUtils.h"
 
 namespace rsgis{namespace utils{
-	
-    using namespace std;
-    using namespace rsgis;
-    using namespace rsgis::math;
     
 	enum PlotTypes
 	{
@@ -63,20 +59,20 @@ namespace rsgis{namespace utils{
 		{
 		public:
 			RSGISParseExportForPlotting();
-			PlotTypes identify(string file) throw(RSGISInputStreamException);	
-			void parseFrequency2D(string file, list<double> *value) throw(RSGISInputStreamException);
-			void parseFrequency3D(string file, list<double> *value1, list<double> *value2) throw(RSGISInputStreamException);
-			void parseScatter2D(string file, list<double> *x, list<double> *y) throw(RSGISInputStreamException);
-			void parseScatter3D(string file, list<double> *x, list<double> *y, list<double> *z) throw(RSGISInputStreamException);
-			void parseCScatter2D(string file, list<double> *x, list<double> *y, list<double> *c) throw(RSGISInputStreamException);
-			void parseCScatter3D(string file, list<double> *x, list<double> *y, list<double> *z, list<double> *c) throw(RSGISInputStreamException);
-			void parseDensity(string file, list<double> *x, list<double> *y) throw(RSGISInputStreamException);
-			void parseSurface(string file, list<double> *x, list<double> *y, list<double> *z) throw(RSGISInputStreamException);
-			void parseCSurface(string file, list<double> *x, list<double> *y, list<double> *z, list<double> *c) throw(RSGISInputStreamException);
-			void parseLines2D(string file, list<double> *x1, list<double> *y1, list<double> *x2, list<double> *y2) throw(RSGISInputStreamException);
-			void parseLines3D(string file, list<double> *x1, list<double> *y1, list<double> *z1, list<double> *x2, list<double> *y2, list<double> *z2) throw(RSGISInputStreamException);
-			void parseTriangles2D(string file, list<double> *x, list<double> *y) throw(RSGISInputStreamException);
-			void parseTriangles3D(string file, list<double> *x, list<double> *y, list<double> *z) throw(RSGISInputStreamException);
+			PlotTypes identify(std::string file) throw(rsgis::RSGISInputStreamException);	
+			void parseFrequency2D(std::string file, std::list<double> *value) throw(rsgis::RSGISInputStreamException);
+			void parseFrequency3D(std::string file, std::list<double> *value1, std::list<double> *value2) throw(rsgis::RSGISInputStreamException);
+			void parseScatter2D(std::string file, std::list<double> *x, std::list<double> *y) throw(rsgis::RSGISInputStreamException);
+			void parseScatter3D(std::string file, std::list<double> *x, std::list<double> *y, std::list<double> *z) throw(rsgis::RSGISInputStreamException);
+			void parseCScatter2D(std::string file, std::list<double> *x, std::list<double> *y, std::list<double> *c) throw(rsgis::RSGISInputStreamException);
+			void parseCScatter3D(std::string file, std::list<double> *x, std::list<double> *y, std::list<double> *z, std::list<double> *c) throw(rsgis::RSGISInputStreamException);
+			void parseDensity(std::string file, std::list<double> *x, std::list<double> *y) throw(rsgis::RSGISInputStreamException);
+			void parseSurface(std::string file, std::list<double> *x, std::list<double> *y, std::list<double> *z) throw(rsgis::RSGISInputStreamException);
+			void parseCSurface(std::string file, std::list<double> *x, std::list<double> *y, std::list<double> *z, std::list<double> *c) throw(rsgis::RSGISInputStreamException);
+			void parseLines2D(std::string file, std::list<double> *x1, std::list<double> *y1, std::list<double> *x2, std::list<double> *y2) throw(rsgis::RSGISInputStreamException);
+			void parseLines3D(std::string file, std::list<double> *x1, std::list<double> *y1, std::list<double> *z1, std::list<double> *x2, std::list<double> *y2, std::list<double> *z2) throw(rsgis::RSGISInputStreamException);
+			void parseTriangles2D(std::string file, std::list<double> *x, std::list<double> *y) throw(rsgis::RSGISInputStreamException);
+			void parseTriangles3D(std::string file, std::list<double> *x, std::list<double> *y, std::list<double> *z) throw(rsgis::RSGISInputStreamException);
 			~RSGISParseExportForPlotting();
 		};
 }}
