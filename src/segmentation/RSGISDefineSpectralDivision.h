@@ -37,8 +37,6 @@
 #include "img/RSGISCalcImageSingleValue.h"
 #include "img/RSGISImageStatistics.h"
 
-//#include "utils/RSGISAttributeTable.h"
-
 #include "math/RSGISMathsUtils.h"
 
 #include "gdal_priv.h"
@@ -48,19 +46,14 @@
 
 namespace rsgis{namespace segment{
     
-    using namespace std;
-    using namespace rsgis;
-    using namespace rsgis::math;
-    using namespace rsgis::img;
-    
     class RSGISDefineSpectralDivision
     {
     public:
         RSGISDefineSpectralDivision();
-        void findSpectralDivision(GDALDataset *inData, string outputImage, unsigned int subDivision, float noDataVal, bool noDataValProvided, bool projFromImage, string proj, string format)throw(RSGISImageCalcException);
+        void findSpectralDivision(GDALDataset *inData, std::string outputImage, unsigned int subDivision, float noDataVal, bool noDataValProvided, bool projFromImage, std::string proj, std::string format)throw(rsgis::img::RSGISImageCalcException);
         ~RSGISDefineSpectralDivision();
     private:
-        void assignToCategory(GDALDataset *reflDataset, GDALDataset *catsDataset, vector<pair<float, float> > **catThresholds, unsigned int numBands, unsigned int numCats, float noDataVal, bool noDataValProvided)throw(RSGISImageCalcException);
+        void assignToCategory(GDALDataset *reflDataset, GDALDataset *catsDataset, vector<pair<float, float> > **catThresholds, unsigned int numBands, unsigned int numCats, float noDataVal, bool noDataValProvided)throw(rsgis::img::RSGISImageCalcException);
         void generateSpectralDivThresholds(pair<float, float> *pThreshold, unsigned int bandIdx, unsigned int numBands, unsigned int subDivision, vector<pair<float, float> > **bandThresholds, vector<pair<float, float> > **catThresholds);
     };
     

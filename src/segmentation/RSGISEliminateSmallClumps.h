@@ -48,59 +48,53 @@
 
 namespace rsgis{namespace segment{
     
-    using namespace std;
-    using namespace rsgis::img;
-    using namespace rsgis::rastergis;
-    using namespace rsgis::utils;
-    using namespace rsgis;
-    
     class RSGISEliminateSmallClumps
     {
     public:
         RSGISEliminateSmallClumps();
-        void eliminateSmallClumps(GDALDataset *spectral, GDALDataset *clumps, unsigned int minClumpSize, float specThreshold) throw(RSGISImageCalcException);
-        void stepwiseEliminateSmallClumps(GDALDataset *spectral, GDALDataset *clumps, unsigned int minClumpSize, float specThreshold) throw(RSGISImageCalcException);
-        void stepwiseEliminateSmallClumpsNoMean(GDALDataset *spectral, GDALDataset *clumps, unsigned int minClumpSize, float specThreshold) throw(RSGISImageCalcException);
-        void stepwiseEliminateSmallClumpsWithAtt(GDALDataset *spectral, GDALDataset *clumps, string outputImageFile, string imageFormat, bool useImageProj, string proj, RSGISAttributeTable *attTable, unsigned int minClumpSize, float specThreshold, bool outputWithConsecutiveFIDs) throw(RSGISImageCalcException);
+        void eliminateSmallClumps(GDALDataset *spectral, GDALDataset *clumps, unsigned int minClumpSize, float specThreshold) throw(rsgis::img::RSGISImageCalcException);
+        void stepwiseEliminateSmallClumps(GDALDataset *spectral, GDALDataset *clumps, unsigned int minClumpSize, float specThreshold) throw(rsgis::img::RSGISImageCalcException);
+        void stepwiseEliminateSmallClumpsNoMean(GDALDataset *spectral, GDALDataset *clumps, unsigned int minClumpSize, float specThreshold) throw(rsgis::img::RSGISImageCalcException);
+        void stepwiseEliminateSmallClumpsWithAtt(GDALDataset *spectral, GDALDataset *clumps, std::string outputImageFile, std::string imageFormat, bool useImageProj, std::string proj, rsgis::rastergis::RSGISAttributeTable *attTable, unsigned int minClumpSize, float specThreshold, bool outputWithConsecutiveFIDs) throw(rsgis::img::RSGISImageCalcException);
         ~RSGISEliminateSmallClumps();
     protected:
-        void defineOutputFID(RSGISAttributeTable *attTable, RSGISFeature *feat, unsigned int eliminatedFieldIdx, unsigned int mergedToFIDIdx, unsigned int outFIDIdx, unsigned int outFIDSetFieldIdx) throw(RSGISAttributeTableException);
-        void performElimination(RSGISAttributeTable *attTable, vector<pair<unsigned long, unsigned long> > *eliminationPairs, unsigned int eliminatedFieldIdx, unsigned int mergedToFIDIdx, unsigned int pxlCountIdx, vector<RSGISBandAttStats*> *bandStats) throw(RSGISAttributeTableException);
-        RSGISFeature* getEliminatedNeighbour(RSGISFeature *feat, RSGISAttributeTable *attTable, unsigned int eliminatedFieldIdx, unsigned int mergedToFIDIdx)throw(RSGISAttributeTableException);
+        void defineOutputFID(rsgis::rastergis::RSGISAttributeTable *attTable, rsgis::rastergis::RSGISFeature *feat, unsigned int eliminatedFieldIdx, unsigned int mergedToFIDIdx, unsigned int outFIDIdx, unsigned int outFIDSetFieldIdx) throw(rsgis::RSGISAttributeTableException);
+        void performElimination(rsgis::rastergis::RSGISAttributeTable *attTable, std::vector<std::pair<unsigned long, unsigned long> > *eliminationVectors, unsigned int eliminatedFieldIdx, unsigned int mergedToFIDIdx, unsigned int pxlCountIdx, std::vector<rsgis::rastergis::RSGISBandAttStats*> *bandStats) throw(rsgis::RSGISAttributeTableException);
+        rsgis::rastergis::RSGISFeature* getEliminatedNeighbour(rsgis::rastergis::RSGISFeature *feat, rsgis::rastergis::RSGISAttributeTable *attTable, unsigned int eliminatedFieldIdx, unsigned int mergedToFIDIdx)throw(rsgis::RSGISAttributeTableException);
     };
     
-    class RSGISEliminateFeature : public RSGISProcessFeature
+    class RSGISEliminateFeature : public rsgis::rastergis::RSGISProcessFeature
     {
     public:
-        RSGISEliminateFeature(unsigned int eliminatedFieldIdx, unsigned int mergedToFIDIdx, float specThreshold, unsigned int pxlCountIdx, vector<RSGISBandAttStats*> *bandStats, vector<pair<unsigned long, unsigned long> > *eliminationPairs);
-        void processFeature(RSGISFeature *feat, RSGISAttributeTable *attTable)throw(RSGISAttributeTableException);
+        RSGISEliminateFeature(unsigned int eliminatedFieldIdx, unsigned int mergedToFIDIdx, float specThreshold, unsigned int pxlCountIdx, std::vector<rsgis::rastergis::RSGISBandAttStats*> *bandStats, std::vector<std::pair<unsigned long, unsigned long> > *eliminationPairs);
+        void processFeature(rsgis::rastergis::RSGISFeature *feat, rsgis::rastergis::RSGISAttributeTable *attTable)throw(rsgis::RSGISAttributeTableException);
         ~RSGISEliminateFeature();
     protected:
-        double calcDistance(RSGISFeature *feat1, RSGISFeature *feat2, vector<RSGISBandAttStats*> *bandStats)throw(RSGISAttributeTableException);
-        RSGISFeature* getEliminatedNeighbour(RSGISFeature *feat, RSGISAttributeTable *attTable)throw(RSGISAttributeTableException); 
+        double calcDistance(rsgis::rastergis::RSGISFeature *feat1, rsgis::rastergis::RSGISFeature *feat2, std::vector<rsgis::rastergis::RSGISBandAttStats*> *bandStats)throw(rsgis::RSGISAttributeTableException);
+        rsgis::rastergis::RSGISFeature* getEliminatedNeighbour(rsgis::rastergis::RSGISFeature *feat, rsgis::rastergis::RSGISAttributeTable *attTable)throw(rsgis::RSGISAttributeTableException); 
         unsigned int eliminatedFieldIdx;
         unsigned int mergedToFIDIdx;
         float specThreshold;
         unsigned int pxlCountIdx;
-        vector<RSGISBandAttStats*> *bandStats;
-        vector<pair<unsigned long, unsigned long> > *eliminationPairs;
+        std::vector<rsgis::rastergis::RSGISBandAttStats*> *bandStats;
+        std::vector<std::pair<unsigned long, unsigned long> > *eliminationPairs;
     };
     
     
-    class RSGISApplyOutputFIDs : public RSGISCalcImageValue
+    class RSGISApplyOutputFIDs : public rsgis::img::RSGISCalcImageValue
     {
     public:
-        RSGISApplyOutputFIDs(RSGISAttributeTable *attTable, unsigned int outFIDIdx, unsigned int outFIDSetFieldIdx);
-        void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException);
-        void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented.");};
-        void calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented.");};
-        void calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented.");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented.");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented.");};
-        bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented.");};
+        RSGISApplyOutputFIDs(rsgis::rastergis::RSGISAttributeTable *attTable, unsigned int outFIDIdx, unsigned int outFIDSetFieldIdx);
+        void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException);
+        void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented.");};
+        void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented.");};
+        void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented.");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented.");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented.");};
+        bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented.");};
         ~RSGISApplyOutputFIDs();
     protected:
-        RSGISAttributeTable *attTable;
+        rsgis::rastergis::RSGISAttributeTable *attTable;
         unsigned int outFIDIdx;
         unsigned int outFIDSetFieldIdx;
     };

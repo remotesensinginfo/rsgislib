@@ -31,32 +31,32 @@ namespace rsgis{namespace segment{
         
     }
     
-    void RSGISLabelPixelsUsingClusters::labelPixelsUsingClusters(GDALDataset **datasets, int numDatasets, string output, string clusterCentresFile, bool ignoreZeros, string imageFormat, bool useImageProj, string outProjStr) throw(RSGISImageException)
+    void RSGISLabelPixelsUsingClusters::labelPixelsUsingClusters(GDALDataset **datasets, int numDatasets, std::string output, std::string clusterCentresFile, bool ignoreZeros, std::string imageFormat, bool useImageProj, std::string outProjStr) throw(rsgis::RSGISImageException)
     {
         try 
         {
-            RSGISMatrices matrixUtils;
-            Matrix *clusterCentres = matrixUtils.readMatrixFromGridTxt(clusterCentresFile);
+            rsgis::math::RSGISMatrices matrixUtils;
+            rsgis::math::Matrix *clusterCentres = matrixUtils.readMatrixFromGridTxt(clusterCentresFile);
             
-            string *bandNames = new string[1];
+            std::string *bandNames = new std::string[1];
             bandNames[0] = "Clusters";
             
             RSGISLabelPixelsUsingClustersCalcImg *calcValue = new RSGISLabelPixelsUsingClustersCalcImg(1, clusterCentres, ignoreZeros);
-            RSGISCalcImage calcImage = RSGISCalcImage(calcValue, outProjStr, useImageProj);
+            rsgis::img::RSGISCalcImage calcImage = rsgis::img::RSGISCalcImage(calcValue, outProjStr, useImageProj);
             calcImage.calcImage(datasets, numDatasets, output, true, bandNames, imageFormat);
             
             delete calcValue;
             matrixUtils.freeMatrix(clusterCentres);
         } 
-        catch (RSGISMathException &e) 
+        catch (rsgis::math::RSGISMathException &e) 
         {
-            throw RSGISImageException(e.what());
+            throw rsgis::RSGISImageException(e.what());
         }
-        catch(RSGISImageCalcException &e)
+        catch(rsgis::img::RSGISImageCalcException &e)
         {
-            throw RSGISImageException(e.what());
+            throw rsgis::RSGISImageException(e.what());
         }
-        catch (RSGISImageException &e) 
+        catch (rsgis::RSGISImageException &e) 
         {
             throw e;
         }
@@ -69,13 +69,13 @@ namespace rsgis{namespace segment{
     
     
 
-    RSGISLabelPixelsUsingClustersCalcImg::RSGISLabelPixelsUsingClustersCalcImg(int numberOutBands, Matrix *clusterCentres, bool ignoreZeros) : RSGISCalcImageValue(numberOutBands)
+    RSGISLabelPixelsUsingClustersCalcImg::RSGISLabelPixelsUsingClustersCalcImg(int numberOutBands, rsgis::math::Matrix *clusterCentres, bool ignoreZeros) : RSGISCalcImageValue(numberOutBands)
     {
         this->clusterCentres = clusterCentres;
         this->ignoreZeros = ignoreZeros;
     }
     
-    void RSGISLabelPixelsUsingClustersCalcImg::calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException)
+    void RSGISLabelPixelsUsingClustersCalcImg::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
     {
         unsigned int clusterID = 0;
         float minDist = 0;

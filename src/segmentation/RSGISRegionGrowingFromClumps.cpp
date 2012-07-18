@@ -30,7 +30,7 @@ namespace rsgis{namespace segment{
         
     }
     
-    void RSGISFindClumpIDs::exportClumpIDsAsTxtFile(GDALDataset *clumps, string outputText, vector<ImgSeeds> *seedPxls) throw(RSGISImageCalcException)
+    void RSGISFindClumpIDs::exportClumpIDsAsTxtFile(GDALDataset *clumps, std::string outputText, std::vector<ImgSeeds> *seedPxls) throw(rsgis::img::RSGISImageCalcException)
     {
         unsigned int width = clumps->GetRasterXSize();
         unsigned int height = clumps->GetRasterYSize();
@@ -42,7 +42,7 @@ namespace rsgis{namespace segment{
         ofstream outTextFile;
         outTextFile.open (outputText.c_str());
         
-        for(vector<ImgSeeds>::iterator iterSeeds = seedPxls->begin(); iterSeeds != seedPxls->end(); ++iterSeeds)
+        for(std::vector<ImgSeeds>::iterator iterSeeds = seedPxls->begin(); iterSeeds != seedPxls->end(); ++iterSeeds)
         {
             if(((*iterSeeds).xPxl < width) & ((*iterSeeds).yPxl < height))
             {
@@ -53,7 +53,7 @@ namespace rsgis{namespace segment{
             {
                 outTextFile.flush();
                 outTextFile.close();
-                throw RSGISImageCalcException("Pixel is not within the clump Image.");
+                throw rsgis::img::RSGISImageCalcException("Pixel is not within the clump Image.");
             }
         }
         
@@ -61,18 +61,18 @@ namespace rsgis{namespace segment{
         outTextFile.close();
     }
     
-    vector<ClumpSeed>* RSGISFindClumpIDs::readClumpSeedIDs(string inputTextFile)throw(RSGISTextException)
+    std::vector<ClumpSeed>* RSGISFindClumpIDs::readClumpSeedIDs(std::string inputTextFile)throw(rsgis::utils::RSGISTextException)
     {
-        vector<ClumpSeed> *clumpSeeds = new vector<ClumpSeed>();
+        std::vector<ClumpSeed> *clumpSeeds = new std::vector<ClumpSeed>();
         
         unsigned long clump = 0;
         unsigned long id = 0;
-        string line = "";
-        vector<string> *tokens = new vector<string>();
+        std::string line = "";
+        std::vector<std::string> *tokens = new std::vector<std::string>();
         
-        RSGISMathsUtils mathUtils;
-        RSGISTextUtils textUtils;
-        RSGISTextFileLineReader reader;
+        rsgis::math::RSGISMathsUtils mathUtils;
+        rsgis::utils::RSGISTextUtils textUtils;
+        rsgis::utils::RSGISTextFileLineReader reader;
         reader.openFile(inputTextFile);
         while(!reader.endOfFile())
         {
@@ -83,7 +83,7 @@ namespace rsgis{namespace segment{
                 textUtils.tokenizeString(line, ',', tokens, true);
                 if(tokens->size() != 2)
                 {
-                    throw RSGISTextException("Could not parse file, format incorrect.");
+                    throw rsgis::utils::RSGISTextException("Could not parse file, format incorrect.");
                 }
                 clump = mathUtils.strtounsignedlong(tokens->at(0));
                 id = mathUtils.strtounsignedlong(tokens->at(1));
@@ -106,20 +106,20 @@ namespace rsgis{namespace segment{
         
     }
     
-    void RSGISRegionGrowingSegmentation::performRegionGrowUsingClumps(GDALDataset *spectral, GDALDataset *clumps, GDALDataset *output, vector<ClumpSeed> *seeds, float initThreshold, float thresholdIncrements, float maxThreshold, unsigned int maxIterations )throw(RSGISImageCalcException)
+    void RSGISRegionGrowingSegmentation::performRegionGrowUsingClumps(GDALDataset *spectral, GDALDataset *clumps, GDALDataset *output, std::vector<ClumpSeed> *seeds, float initThreshold, float thresholdIncrements, float maxThreshold, unsigned int maxIterations )throw(rsgis::img::RSGISImageCalcException)
     {
         if((spectral->GetRasterXSize() != clumps->GetRasterXSize()) |
            (spectral->GetRasterXSize() != output->GetRasterXSize()))
         {
-            throw RSGISImageCalcException("Widths are not the same");
+            throw rsgis::img::RSGISImageCalcException("Widths are not the same");
         }
         if((spectral->GetRasterYSize() != clumps->GetRasterYSize()) |
            (spectral->GetRasterYSize() != output->GetRasterYSize()))
         {
-            throw RSGISImageCalcException("Heights are not the same");
+            throw rsgis::img::RSGISImageCalcException("Heights are not the same");
         }
         
-        RSGISImageUtils imgUtils;
+        rsgis::img::RSGISImageUtils imgUtils;
         imgUtils.zerosUIntGDALDataset(output);
         
         unsigned int width = spectral->GetRasterXSize();
@@ -159,15 +159,15 @@ namespace rsgis{namespace segment{
             }
         }
         
-        vector<ImgClumpRG*> *clumpTab = new vector<ImgClumpRG*>();
+        std::vector<rsgis::img::ImgClumpRG*> *clumpTab = new std::vector<rsgis::img::ImgClumpRG*>();
         clumpTab->reserve(maxClumpIdx);
-        ImgClumpRG *cClump;
+        rsgis::img::ImgClumpRG *cClump;
         for(unsigned int i = 0; i < maxClumpIdx; ++i)
         {
-            cClump = new ImgClumpRG(i+1);
+            cClump = new rsgis::img::ImgClumpRG(i+1);
             cClump->sumVals = new float[numSpecBands];
             cClump->meanVals = new float[numSpecBands];
-            cClump->pxls = new vector<PxlLoc>();
+            cClump->pxls = new std::vector<rsgis::img::PxlLoc>();
             for(unsigned int n = 0; n < numSpecBands; ++n)
             {
                 cClump->sumVals[n] = 0;
@@ -201,7 +201,7 @@ namespace rsgis{namespace segment{
                     {
                         cClump->sumVals[n] += spectralVals[n][j];
                     }
-                    cClump->pxls->push_back(PxlLoc(j,i));
+                    cClump->pxls->push_back(rsgis::img::PxlLoc(j,i));
                     
                     // Above
                     if(((long)i)-1 >= 0)
@@ -239,7 +239,7 @@ namespace rsgis{namespace segment{
             }
         }
         
-        for(vector<ImgClumpRG*>::iterator iterClumps = clumpTab->begin(); iterClumps != clumpTab->end(); ++iterClumps)
+        for(std::vector<rsgis::img::ImgClumpRG*>::iterator iterClumps = clumpTab->begin(); iterClumps != clumpTab->end(); ++iterClumps)
         {
             for(unsigned int n = 0; n < numSpecBands; ++n)
             {
@@ -252,16 +252,16 @@ namespace rsgis{namespace segment{
         unsigned int numThresSteps = ceil((maxThreshold - initThreshold)/thresholdIncrements);
         float cThres = 0;
         float percentInAreaInc = 0;
-        ImgClumpRG *cRegion = NULL;
-        ImgClumpRG *pRegion = NULL;
-        list<unsigned long> *pClumpIds = NULL;
-        list<unsigned long> *cClumpIds = NULL;
+        rsgis::img::ImgClumpRG *cRegion = NULL;
+        rsgis::img::ImgClumpRG *pRegion = NULL;
+        std::list<unsigned long> *pClumpIds = NULL;
+        std::list<unsigned long> *cClumpIds = NULL;
         
         cout << "Processing seeds\n";
-        for(vector<ClumpSeed>::iterator iterSeeds = seeds->begin(); iterSeeds != seeds->end(); ++iterSeeds)
+        for(std::vector<ClumpSeed>::iterator iterSeeds = seeds->begin(); iterSeeds != seeds->end(); ++iterSeeds)
         {
             cout << "Processing seed " << (*iterSeeds).seedID << endl;
-            pClumpIds = new list<unsigned long>();
+            pClumpIds = new std::list<unsigned long>();
             pRegion = this->growRegion(initThreshold, maxIterations, clumpTab, numSpecBands, (*iterSeeds).clumpID, (*iterSeeds).seedID, pClumpIds);
             
             if(pRegion == NULL)
@@ -276,7 +276,7 @@ namespace rsgis{namespace segment{
                 {
                     cThres = initThreshold + (i * thresholdIncrements);
                     
-                    cClumpIds = new list<unsigned long>();
+                    cClumpIds = new std::list<unsigned long>();
                     cRegion = this->growRegion(cThres, maxIterations, clumpTab, numSpecBands, (*iterSeeds).clumpID, (*iterSeeds).seedID, cClumpIds);
                     
                     if(cRegion != NULL)
@@ -320,7 +320,7 @@ namespace rsgis{namespace segment{
                 }
             }
             
-            for(list<unsigned long>::iterator iterClumpIDs = cClumpIds->begin(); iterClumpIDs != cClumpIds->end(); ++iterClumpIDs)
+            for(std::list<unsigned long>::iterator iterClumpIDs = cClumpIds->begin(); iterClumpIDs != cClumpIds->end(); ++iterClumpIDs)
             {
                 clumpTab->at((*iterClumpIDs)-1)->seedVal = (*iterSeeds).seedID;
             }
@@ -352,7 +352,7 @@ namespace rsgis{namespace segment{
             outBand->RasterIO(GF_Write, 0, i, width, 1, outVals, width, 1, GDT_UInt32, 0, 0);
         }
         
-        for(vector<ImgClumpRG*>::iterator iterClumps = clumpTab->begin(); iterClumps != clumpTab->end(); ++iterClumps)
+        for(std::vector<rsgis::img::ImgClumpRG*>::iterator iterClumps = clumpTab->begin(); iterClumps != clumpTab->end(); ++iterClumps)
         {
             delete[] (*iterClumps)->meanVals;
             delete[] (*iterClumps)->sumVals;
@@ -371,36 +371,36 @@ namespace rsgis{namespace segment{
     }
     
     
-    ImgClumpRG* RSGISRegionGrowingSegmentation::growRegion(float threshold, unsigned int maxNumIterations, vector<ImgClumpRG*> *clumpTab, unsigned int numSpecBands, unsigned long seedClumpID, unsigned long seed, list<unsigned long> *regionClumps)throw(RSGISImageCalcException)
+    rsgis::img::ImgClumpRG* RSGISRegionGrowingSegmentation::growRegion(float threshold, unsigned int maxNumIterations, std::vector<rsgis::img::ImgClumpRG*> *clumpTab, unsigned int numSpecBands, unsigned long seedClumpID, unsigned long seed, std::list<unsigned long> *regionClumps)throw(rsgis::img::RSGISImageCalcException)
     {
-        ImgClumpRG *region = NULL;
+        rsgis::img::ImgClumpRG *region = NULL;
         try 
         {
-            region = new ImgClumpRG(seed);
+            region = new rsgis::img::ImgClumpRG(seed);
             region->meanVals = new float[numSpecBands];
             region->sumVals = new float[numSpecBands];
-            region->pxls = new vector<PxlLoc>();
+            region->pxls = new std::vector<rsgis::img::PxlLoc>();
             regionClumps->clear();
             regionClumps->push_back(seedClumpID);
             
-            ImgClumpRG *tmpClump = clumpTab->at(seedClumpID-1);
+            rsgis::img::ImgClumpRG *tmpClump = clumpTab->at(seedClumpID-1);
             for(unsigned int n = 0; n < numSpecBands; ++n)
             {
                 region->meanVals[n] = tmpClump->meanVals[n];
                 region->sumVals[n] = tmpClump->sumVals[n];
             }
-            for(vector<PxlLoc>::iterator iterPxls = tmpClump->pxls->begin(); iterPxls != tmpClump->pxls->end(); ++iterPxls)
+            for(std::vector<rsgis::img::PxlLoc>::iterator iterPxls = tmpClump->pxls->begin(); iterPxls != tmpClump->pxls->end(); ++iterPxls)
             {
                 region->pxls->push_back(*iterPxls);
             }
-            for(list<unsigned long>::iterator iterNeighbours = tmpClump->neighbours.begin(); iterNeighbours != tmpClump->neighbours.end(); ++iterNeighbours)
+            for(std::list<unsigned long>::iterator iterNeighbours = tmpClump->neighbours.begin(); iterNeighbours != tmpClump->neighbours.end(); ++iterNeighbours)
             {
                 region->neighbours.push_back(*iterNeighbours);
             }
             
             float *cMean = new float[numSpecBands];
-            list<unsigned long> nextNeighbours;
-            list<unsigned long> testedClumps;
+            std::list<unsigned long> nextNeighbours;
+            std::list<unsigned long> testedClumps;
             testedClumps.push_back(seedClumpID);
             double distance = 0;
             bool alreadyTested = true;
@@ -419,7 +419,7 @@ namespace rsgis{namespace segment{
                 
                 // Test all neighbours to see whether they are part of the region.
                 nextNeighbours.clear();
-                for(list<unsigned long>::iterator iterNeighbour = region->neighbours.begin(); iterNeighbour != region->neighbours.end(); ++iterNeighbour)
+                for(std::list<unsigned long>::iterator iterNeighbour = region->neighbours.begin(); iterNeighbour != region->neighbours.end(); ++iterNeighbour)
                 {
                     tmpClump = clumpTab->at(*iterNeighbour-1);
                     
@@ -437,11 +437,11 @@ namespace rsgis{namespace segment{
                         {
                             region->sumVals[n] += tmpClump->sumVals[n];
                         }
-                        for(vector<PxlLoc>::iterator iterPxls = tmpClump->pxls->begin(); iterPxls != tmpClump->pxls->end(); ++iterPxls)
+                        for(std::vector<rsgis::img::PxlLoc>::iterator iterPxls = tmpClump->pxls->begin(); iterPxls != tmpClump->pxls->end(); ++iterPxls)
                         {
                             region->pxls->push_back(*iterPxls);
                         }
-                        for(list<unsigned long>::iterator iterClumpNeighbours = tmpClump->neighbours.begin(); iterClumpNeighbours != tmpClump->neighbours.end(); ++iterClumpNeighbours)
+                        for(std::list<unsigned long>::iterator iterClumpNeighbours = tmpClump->neighbours.begin(); iterClumpNeighbours != tmpClump->neighbours.end(); ++iterClumpNeighbours)
                         {
                             nextNeighbours.push_back(*iterClumpNeighbours);
                         }
@@ -460,11 +460,11 @@ namespace rsgis{namespace segment{
                 region->neighbours.clear();
                 nextNeighbours.sort();
                 nextNeighbours.unique();
-                for(list<unsigned long>::iterator iterNeighbour = nextNeighbours.begin(); iterNeighbour != nextNeighbours.end(); ++iterNeighbour)
+                for(std::list<unsigned long>::iterator iterNeighbour = nextNeighbours.begin(); iterNeighbour != nextNeighbours.end(); ++iterNeighbour)
                 {
                     alreadyTested = false;
                     
-                    for(list<unsigned long>::iterator iterClumps = testedClumps.begin(); iterClumps != testedClumps.end(); ++iterClumps)
+                    for(std::list<unsigned long>::iterator iterClumps = testedClumps.begin(); iterClumps != testedClumps.end(); ++iterClumps)
                     {
                         if((*iterNeighbour) == (*iterClumps))
                         {
@@ -503,7 +503,7 @@ namespace rsgis{namespace segment{
                         
             delete[] cMean;
         } 
-        catch (RSGISImageCalcException &e) 
+        catch (rsgis::img::RSGISImageCalcException &e) 
         {
             throw e;
         }
@@ -531,33 +531,33 @@ namespace rsgis{namespace segment{
         
     }
     
-    void RSGISGenerateSeeds::genSeedsHistogram(GDALDataset *spectral, GDALDataset *clumps, GDALDataset *output, vector<BandThreshold> *thresholds) throw(RSGISImageCalcException)
+    void RSGISGenerateSeeds::genSeedsHistogram(GDALDataset *spectral, GDALDataset *clumps, GDALDataset *output, std::vector<BandThreshold> *thresholds) throw(rsgis::img::RSGISImageCalcException)
     {
         if((spectral->GetRasterXSize() != clumps->GetRasterXSize()) |
            (spectral->GetRasterXSize() != output->GetRasterXSize()))
         {
-            throw RSGISImageCalcException("Widths are not the same");
+            throw rsgis::img::RSGISImageCalcException("Widths are not the same");
         }
         if((spectral->GetRasterYSize() != clumps->GetRasterYSize()) |
            (spectral->GetRasterYSize() != output->GetRasterYSize()))
         {
-            throw RSGISImageCalcException("Heights are not the same");
+            throw rsgis::img::RSGISImageCalcException("Heights are not the same");
         }
         
         if(((unsigned int)spectral->GetRasterCount()) != thresholds->size())
         {
-            throw RSGISImageCalcException("The number of bands is not the same as the number of thresholds supplied.");
+            throw rsgis::img::RSGISImageCalcException("The number of bands is not the same as the number of thresholds supplied.");
         }
         
         for(unsigned int i = 0; i < thresholds->size(); ++i)
         {
             if((thresholds->at(i).band < 1) | (thresholds->at(i).band > ((unsigned int) spectral->GetRasterCount())))
             {
-                throw RSGISImageCalcException("Band specified is not within the image.");
+                throw rsgis::img::RSGISImageCalcException("Band specified is not within the image.");
             }
         }
         
-        RSGISImageUtils imgUtils;
+        rsgis::img::RSGISImageUtils imgUtils;
         imgUtils.zerosUIntGDALDataset(output);
         
         unsigned int width = spectral->GetRasterXSize();
@@ -575,7 +575,7 @@ namespace rsgis{namespace segment{
                 {
                     if((thresholds->at(j).threshold < 0) | (thresholds->at(j).threshold > 1))
                     {
-                        throw RSGISImageCalcException("Threshold should be between 0 and 1.");
+                        throw rsgis::img::RSGISImageCalcException("Threshold should be between 0 and 1.");
                     }
                     percentThresholds[i-1] = thresholds->at(j).threshold;
                     bandFound = true;
@@ -584,7 +584,7 @@ namespace rsgis{namespace segment{
             }
             if(!bandFound)
             {
-                throw RSGISImageCalcException("Thresholds were not provided for all bands.");
+                throw rsgis::img::RSGISImageCalcException("Thresholds were not provided for all bands.");
             }
         }
         
@@ -619,12 +619,12 @@ namespace rsgis{namespace segment{
             }
         }
         
-        vector<ImgClumpMean*> *clumpTab = new vector<ImgClumpMean*>();
+        std::vector<rsgis::img::ImgClumpMean*> *clumpTab = new std::vector<rsgis::img::ImgClumpMean*>();
         clumpTab->reserve(maxClumpIdx);
-        ImgClumpMean *cClump;
+        rsgis::img::ImgClumpMean *cClump;
         for(unsigned int i = 0; i < maxClumpIdx; ++i)
         {
-            cClump = new ImgClumpMean(i+1);
+            cClump = new rsgis::img::ImgClumpMean(i+1);
             cClump->sumVals = new float[numSpecBands];
             cClump->meanVals = new float[numSpecBands];
             for(unsigned int n = 0; n < numSpecBands; ++n)
@@ -658,7 +658,7 @@ namespace rsgis{namespace segment{
         
         
         
-        for(vector<ImgClumpMean*>::iterator iterClumps = clumpTab->begin(); iterClumps != clumpTab->end(); ++iterClumps)
+        for(std::vector<rsgis::img::ImgClumpMean*>::iterator iterClumps = clumpTab->begin(); iterClumps != clumpTab->end(); ++iterClumps)
         {
             for(unsigned int n = 0; n < numSpecBands; ++n)
             {
@@ -669,7 +669,7 @@ namespace rsgis{namespace segment{
         float *minVals = new float[numSpecBands];
         float *maxVals = new float[numSpecBands];
         bool first = true;
-        for(vector<ImgClumpMean*>::iterator iterClumps = clumpTab->begin(); iterClumps != clumpTab->end(); ++iterClumps)
+        for(std::vector<rsgis::img::ImgClumpMean*>::iterator iterClumps = clumpTab->begin(); iterClumps != clumpTab->end(); ++iterClumps)
         {
             if(first)
             {
@@ -710,7 +710,7 @@ namespace rsgis{namespace segment{
         }
         
         unsigned int idx = 0;
-        for(vector<ImgClumpMean*>::iterator iterClumps = clumpTab->begin(); iterClumps != clumpTab->end(); ++iterClumps)
+        for(std::vector<rsgis::img::ImgClumpMean*>::iterator iterClumps = clumpTab->begin(); iterClumps != clumpTab->end(); ++iterClumps)
         {
             for(unsigned int n = 0; n < numSpecBands; ++n)
             {
@@ -798,7 +798,7 @@ namespace rsgis{namespace segment{
         
         delete[] outVals;
         
-        for(vector<ImgClumpMean*>::iterator iterClumps = clumpTab->begin(); iterClumps != clumpTab->end(); ++iterClumps)
+        for(std::vector<rsgis::img::ImgClumpMean*>::iterator iterClumps = clumpTab->begin(); iterClumps != clumpTab->end(); ++iterClumps)
         {
             delete[] (*iterClumps)->meanVals;
             delete[] (*iterClumps)->sumVals;
@@ -807,27 +807,27 @@ namespace rsgis{namespace segment{
         delete clumpTab;
     }
     
-    void RSGISGenerateSeeds::genSeedsHistogram(GDALDataset *spectral, GDALDataset *clumps, string outputFile, vector<BandThreshold> *thresholds) throw(RSGISImageCalcException)
+    void RSGISGenerateSeeds::genSeedsHistogram(GDALDataset *spectral, GDALDataset *clumps, std::string outputFile, std::vector<BandThreshold> *thresholds) throw(rsgis::img::RSGISImageCalcException)
     {
         if(spectral->GetRasterXSize() != clumps->GetRasterXSize())
         {
-            throw RSGISImageCalcException("Widths are not the same");
+            throw rsgis::img::RSGISImageCalcException("Widths are not the same");
         }
         if(spectral->GetRasterYSize() != clumps->GetRasterYSize())
         {
-            throw RSGISImageCalcException("Heights are not the same");
+            throw rsgis::img::RSGISImageCalcException("Heights are not the same");
         }
         
         if(((unsigned int)spectral->GetRasterCount()) != thresholds->size())
         {
-            throw RSGISImageCalcException("The number of bands is not the same as the number of thresholds supplied.");
+            throw rsgis::img::RSGISImageCalcException("The number of bands is not the same as the number of thresholds supplied.");
         }
         
         for(unsigned int i = 0; i < thresholds->size(); ++i)
         {
             if((thresholds->at(i).band < 1) | (thresholds->at(i).band > ((unsigned int) spectral->GetRasterCount())))
             {
-                throw RSGISImageCalcException("Band specified is not within the image.");
+                throw rsgis::img::RSGISImageCalcException("Band specified is not within the image.");
             }
         }
                 
@@ -846,7 +846,7 @@ namespace rsgis{namespace segment{
                 {
                     if((thresholds->at(j).threshold < 0) | (thresholds->at(j).threshold > 1))
                     {
-                        throw RSGISImageCalcException("Threshold should be between 0 and 1.");
+                        throw rsgis::img::RSGISImageCalcException("Threshold should be between 0 and 1.");
                     }
                     percentThresholds[i-1] = thresholds->at(j).threshold;
                     bandFound = true;
@@ -855,7 +855,7 @@ namespace rsgis{namespace segment{
             }
             if(!bandFound)
             {
-                throw RSGISImageCalcException("Thresholds were not provided for all bands.");
+                throw rsgis::img::RSGISImageCalcException("Thresholds were not provided for all bands.");
             }
         }
         
@@ -888,12 +888,12 @@ namespace rsgis{namespace segment{
             }
         }
         
-        vector<ImgClumpMean*> *clumpTab = new vector<ImgClumpMean*>();
+        std::vector<rsgis::img::ImgClumpMean*> *clumpTab = new std::vector<rsgis::img::ImgClumpMean*>();
         clumpTab->reserve(maxClumpIdx);
-        ImgClumpMean *cClump;
+        rsgis::img::ImgClumpMean *cClump;
         for(unsigned int i = 0; i < maxClumpIdx; ++i)
         {
-            cClump = new ImgClumpMean(i+1);
+            cClump = new rsgis::img::ImgClumpMean(i+1);
             cClump->sumVals = new float[numSpecBands];
             cClump->meanVals = new float[numSpecBands];
             for(unsigned int n = 0; n < numSpecBands; ++n)
@@ -927,7 +927,7 @@ namespace rsgis{namespace segment{
         
         
         
-        for(vector<ImgClumpMean*>::iterator iterClumps = clumpTab->begin(); iterClumps != clumpTab->end(); ++iterClumps)
+        for(std::vector<rsgis::img::ImgClumpMean*>::iterator iterClumps = clumpTab->begin(); iterClumps != clumpTab->end(); ++iterClumps)
         {
             for(unsigned int n = 0; n < numSpecBands; ++n)
             {
@@ -938,7 +938,7 @@ namespace rsgis{namespace segment{
         float *minVals = new float[numSpecBands];
         float *maxVals = new float[numSpecBands];
         bool first = true;
-        for(vector<ImgClumpMean*>::iterator iterClumps = clumpTab->begin(); iterClumps != clumpTab->end(); ++iterClumps)
+        for(std::vector<rsgis::img::ImgClumpMean*>::iterator iterClumps = clumpTab->begin(); iterClumps != clumpTab->end(); ++iterClumps)
         {
             if(first)
             {
@@ -979,7 +979,7 @@ namespace rsgis{namespace segment{
         }
         
         unsigned int idx = 0;
-        for(vector<ImgClumpMean*>::iterator iterClumps = clumpTab->begin(); iterClumps != clumpTab->end(); ++iterClumps)
+        for(std::vector<rsgis::img::ImgClumpMean*>::iterator iterClumps = clumpTab->begin(); iterClumps != clumpTab->end(); ++iterClumps)
         {
             for(unsigned int n = 0; n < numSpecBands; ++n)
             {
@@ -1007,7 +1007,7 @@ namespace rsgis{namespace segment{
         }
         
         bool classified = false;
-        list<unsigned long> outClumpsIds;
+        std::list<unsigned long> outClumpsIds;
         for(unsigned int i = 0; i < height; ++i)
         {
             clumpBand->RasterIO(GF_Read, 0, i, width, 1, clumpIdxs, width, 1, GDT_UInt32, 0, 0);
@@ -1040,7 +1040,7 @@ namespace rsgis{namespace segment{
         ofstream outTxtFile;
         outTxtFile.open(outputFile.c_str());
         unsigned long seedID = 1;
-        for(list<unsigned long>::iterator iterClumps = outClumpsIds.begin(); iterClumps != outClumpsIds.end(); ++iterClumps)
+        for(std::list<unsigned long>::iterator iterClumps = outClumpsIds.begin(); iterClumps != outClumpsIds.end(); ++iterClumps)
         {
             outTxtFile << *iterClumps << "," << seedID++ << endl;
         }
@@ -1068,7 +1068,7 @@ namespace rsgis{namespace segment{
         
         delete[] spectralBands;
                 
-        for(vector<ImgClumpMean*>::iterator iterClumps = clumpTab->begin(); iterClumps != clumpTab->end(); ++iterClumps)
+        for(std::vector<rsgis::img::ImgClumpMean*>::iterator iterClumps = clumpTab->begin(); iterClumps != clumpTab->end(); ++iterClumps)
         {
             delete[] (*iterClumps)->meanVals;
             delete[] (*iterClumps)->sumVals;
@@ -1089,23 +1089,23 @@ namespace rsgis{namespace segment{
         
     }
     
-    void RSGISSelectClumps::selectClumps(GDALDataset *spectral, GDALDataset *clumps, GDALDataset *largeClumps, GDALDataset *output, ClumpSelection selection) throw(RSGISImageCalcException)
+    void RSGISSelectClumps::selectClumps(GDALDataset *spectral, GDALDataset *clumps, GDALDataset *largeClumps, GDALDataset *output, ClumpSelection selection) throw(rsgis::img::RSGISImageCalcException)
     {
         if((spectral->GetRasterXSize() != clumps->GetRasterXSize()) |
            (spectral->GetRasterXSize() != largeClumps->GetRasterXSize()) |
            (spectral->GetRasterXSize() != output->GetRasterXSize()))
         {
-            throw RSGISImageCalcException("Widths are not the same");
+            throw rsgis::img::RSGISImageCalcException("Widths are not the same");
         }
         if((spectral->GetRasterYSize() != clumps->GetRasterYSize()) |
            (spectral->GetRasterYSize() != largeClumps->GetRasterYSize()) |
            (spectral->GetRasterYSize() != output->GetRasterYSize()))
         {
-            throw RSGISImageCalcException("Heights are not the same");
+            throw rsgis::img::RSGISImageCalcException("Heights are not the same");
         }
 
         
-        RSGISImageUtils imgUtils;
+        rsgis::img::RSGISImageUtils imgUtils;
         imgUtils.zerosUIntGDALDataset(output);
         
         unsigned int width = spectral->GetRasterXSize();
@@ -1155,19 +1155,19 @@ namespace rsgis{namespace segment{
             }
         }
         
-        vector< list<unsigned long>* > *largeClumpTab = new vector< list<unsigned long>* >();
+        std::vector< std::list<unsigned long>* > *largeClumpTab = new std::vector< std::list<unsigned long>* >();
         largeClumpTab->reserve(maxLClumpIdx);
         for(unsigned int i = 0; i < maxLClumpIdx; ++i)
         {
-            largeClumpTab->push_back(new list<unsigned long>());
+            largeClumpTab->push_back(new std::list<unsigned long>());
         }
         
-        vector<ImgClumpMean*> *clumpTab = new vector<ImgClumpMean*>();
+        std::vector<rsgis::img::ImgClumpMean*> *clumpTab = new std::vector<rsgis::img::ImgClumpMean*>();
         clumpTab->reserve(maxClumpIdx);
-        ImgClumpMean *cClump;
+        rsgis::img::ImgClumpMean *cClump;
         for(unsigned int i = 0; i < maxClumpIdx; ++i)
         {
-            cClump = new ImgClumpMean(i+1);
+            cClump = new rsgis::img::ImgClumpMean(i+1);
             cClump->sumVals = new float[numSpecBands];
             cClump->meanVals = new float[numSpecBands];
             for(unsigned int n = 0; n < numSpecBands; ++n)
@@ -1205,7 +1205,7 @@ namespace rsgis{namespace segment{
             }
         }
         
-        for(vector<ImgClumpMean*>::iterator iterClumps = clumpTab->begin(); iterClumps != clumpTab->end(); ++iterClumps)
+        for(std::vector<rsgis::img::ImgClumpMean*>::iterator iterClumps = clumpTab->begin(); iterClumps != clumpTab->end(); ++iterClumps)
         {
             for(unsigned int n = 0; n < numSpecBands; ++n)
             {
@@ -1219,7 +1219,7 @@ namespace rsgis{namespace segment{
             largeClumpTab->at(i)->unique();
         }
         
-        list<unsigned long> outClumps;
+        std::list<unsigned long> outClumps;
         float tmpMeanVal = 0;
         float distVal = 0;
         unsigned long sClump = 0;
@@ -1227,8 +1227,8 @@ namespace rsgis{namespace segment{
         float meanBrightness = 0;
         float medianBrightness = 0;
         float sumVals = 0;
-        list<float> allVals;
-        vector<double> allValsVec;
+        std::list<float> allVals;
+        std::vector<double> allValsVec;
         bool first = true;
         for(unsigned int i = 0; i < maxLClumpIdx; ++i)
         {
@@ -1238,7 +1238,7 @@ namespace rsgis{namespace segment{
             sumVals = 0;
             if(largeClumpTab->at(i)->size() > 0)
             {
-                for(list<unsigned long>::iterator iterClump = largeClumpTab->at(i)->begin(); iterClump != largeClumpTab->at(i)->end(); ++iterClump)
+                for(std::list<unsigned long>::iterator iterClump = largeClumpTab->at(i)->begin(); iterClump != largeClumpTab->at(i)->end(); ++iterClump)
                 {
                     for(unsigned int i = 0; i < numSpecBands; ++i)
                     {
@@ -1294,14 +1294,14 @@ namespace rsgis{namespace segment{
                     }
                     else
                     {
-                        throw RSGISImageCalcException("Did not recognise clump selection choice.");
+                        throw rsgis::img::RSGISImageCalcException("Did not recognise clump selection choice.");
                     }
                 }
                 if(selection == median)
                 {
                     allVals.sort();
                     unsigned int counter = 0;
-                    for(list<float>::iterator iterVals = allVals.begin(); iterVals != allVals.end(); ++iterVals)
+                    for(std::list<float>::iterator iterVals = allVals.begin(); iterVals != allVals.end(); ++iterVals)
                     {
                         if(counter++ == (allVals.size()/2))
                         {
@@ -1311,7 +1311,7 @@ namespace rsgis{namespace segment{
                     }
                     
                     first = true;
-                    for(list<unsigned long>::iterator iterClump = largeClumpTab->at(i)->begin(); iterClump != largeClumpTab->at(i)->end(); ++iterClump)
+                    for(std::list<unsigned long>::iterator iterClump = largeClumpTab->at(i)->begin(); iterClump != largeClumpTab->at(i)->end(); ++iterClump)
                     {
                         for(unsigned int i = 0; i < numSpecBands; ++i)
                         {
@@ -1343,7 +1343,7 @@ namespace rsgis{namespace segment{
                 {
                     meanBrightness = sumVals/largeClumpTab->size();
                     first = true;
-                    for(list<unsigned long>::iterator iterClump = largeClumpTab->at(i)->begin(); iterClump != largeClumpTab->at(i)->end(); ++iterClump)
+                    for(std::list<unsigned long>::iterator iterClump = largeClumpTab->at(i)->begin(); iterClump != largeClumpTab->at(i)->end(); ++iterClump)
                     {
                         for(unsigned int i = 0; i < numSpecBands; ++i)
                         {
@@ -1377,7 +1377,7 @@ namespace rsgis{namespace segment{
                     float percentileVal = gsl_stats_quantile_from_sorted_data(&allValsVec[0], 1, allValsVec.size(), 0.75);
                     //cout << "percentileVal = " << percentileVal << endl;
                     first = true;
-                    for(list<unsigned long>::iterator iterClump = largeClumpTab->at(i)->begin(); iterClump != largeClumpTab->at(i)->end(); ++iterClump)
+                    for(std::list<unsigned long>::iterator iterClump = largeClumpTab->at(i)->begin(); iterClump != largeClumpTab->at(i)->end(); ++iterClump)
                     {
                         for(unsigned int i = 0; i < numSpecBands; ++i)
                         {
@@ -1412,7 +1412,7 @@ namespace rsgis{namespace segment{
                     float percentileVal = gsl_stats_quantile_from_sorted_data(&allValsVec[0], 1, allValsVec.size(), 0.95);
                     //cout << "percentileVal = " << percentileVal << endl;
                     first = true;
-                    for(list<unsigned long>::iterator iterClump = largeClumpTab->at(i)->begin(); iterClump != largeClumpTab->at(i)->end(); ++iterClump)
+                    for(std::list<unsigned long>::iterator iterClump = largeClumpTab->at(i)->begin(); iterClump != largeClumpTab->at(i)->end(); ++iterClump)
                     {
                         for(unsigned int i = 0; i < numSpecBands; ++i)
                         {
@@ -1457,7 +1457,7 @@ namespace rsgis{namespace segment{
                 if(clumpIdxs[j] != 0)
                 {
                     foundClump = false;
-                    for(list<unsigned long>::iterator iterClump = outClumps.begin(); iterClump != outClumps.end(); ++iterClump)
+                    for(std::list<unsigned long>::iterator iterClump = outClumps.begin(); iterClump != outClumps.end(); ++iterClump)
                     {
                         if(clumpIdxs[j] == *iterClump)
                         {
@@ -1480,7 +1480,7 @@ namespace rsgis{namespace segment{
             outClumpBand->RasterIO(GF_Write, 0, i, width, 1, outClumpIdxs, width, 1, GDT_UInt32, 0, 0);
         }
                 
-        for(vector< list<unsigned long>* >::iterator iterLClumps = largeClumpTab->begin(); iterLClumps != largeClumpTab->end(); ++iterLClumps)
+        for(std::vector< std::list<unsigned long>* >::iterator iterLClumps = largeClumpTab->begin(); iterLClumps != largeClumpTab->end(); ++iterLClumps)
         {
             delete *iterLClumps;
         }
@@ -1496,7 +1496,7 @@ namespace rsgis{namespace segment{
         delete[] spectralVals;
         delete[] spectralBands;
         
-        for(vector<ImgClumpMean*>::iterator iterClumps = clumpTab->begin(); iterClumps != clumpTab->end(); ++iterClumps)
+        for(std::vector<rsgis::img::ImgClumpMean*>::iterator iterClumps = clumpTab->begin(); iterClumps != clumpTab->end(); ++iterClumps)
         {
             delete[] (*iterClumps)->meanVals;
             delete[] (*iterClumps)->sumVals;
@@ -1505,17 +1505,17 @@ namespace rsgis{namespace segment{
         delete clumpTab;
     }
     
-    void RSGISSelectClumps::selectClumps(GDALDataset *spectral, GDALDataset *clumps, GDALDataset *largeClumps, string outputFile, ClumpSelection selection) throw(RSGISImageCalcException)
+    void RSGISSelectClumps::selectClumps(GDALDataset *spectral, GDALDataset *clumps, GDALDataset *largeClumps, std::string outputFile, ClumpSelection selection) throw(rsgis::img::RSGISImageCalcException)
     {
         if((spectral->GetRasterXSize() != clumps->GetRasterXSize()) |
            (spectral->GetRasterXSize() != largeClumps->GetRasterXSize()))
         {
-            throw RSGISImageCalcException("Widths are not the same");
+            throw rsgis::img::RSGISImageCalcException("Widths are not the same");
         }
         if((spectral->GetRasterYSize() != clumps->GetRasterYSize()) |
            (spectral->GetRasterYSize() != largeClumps->GetRasterYSize()))
         {
-            throw RSGISImageCalcException("Heights are not the same");
+            throw rsgis::img::RSGISImageCalcException("Heights are not the same");
         }
         
         unsigned int width = spectral->GetRasterXSize();
@@ -1563,19 +1563,19 @@ namespace rsgis{namespace segment{
             }
         }
         
-        vector< list<unsigned long>* > *largeClumpTab = new vector< list<unsigned long>* >();
+        std::vector< std::list<unsigned long>* > *largeClumpTab = new std::vector< std::list<unsigned long>* >();
         largeClumpTab->reserve(maxLClumpIdx);
         for(unsigned int i = 0; i < maxLClumpIdx; ++i)
         {
-            largeClumpTab->push_back(new list<unsigned long>());
+            largeClumpTab->push_back(new std::list<unsigned long>());
         }
         
-        vector<ImgClumpMean*> *clumpTab = new vector<ImgClumpMean*>();
+        std::vector<rsgis::img::ImgClumpMean*> *clumpTab = new std::vector<rsgis::img::ImgClumpMean*>();
         clumpTab->reserve(maxClumpIdx);
-        ImgClumpMean *cClump;
+        rsgis::img::ImgClumpMean *cClump;
         for(unsigned int i = 0; i < maxClumpIdx; ++i)
         {
-            cClump = new ImgClumpMean(i+1);
+            cClump = new rsgis::img::ImgClumpMean(i+1);
             cClump->sumVals = new float[numSpecBands];
             cClump->meanVals = new float[numSpecBands];
             for(unsigned int n = 0; n < numSpecBands; ++n)
@@ -1613,7 +1613,7 @@ namespace rsgis{namespace segment{
             }
         }
         
-        for(vector<ImgClumpMean*>::iterator iterClumps = clumpTab->begin(); iterClumps != clumpTab->end(); ++iterClumps)
+        for(std::vector<rsgis::img::ImgClumpMean*>::iterator iterClumps = clumpTab->begin(); iterClumps != clumpTab->end(); ++iterClumps)
         {
             for(unsigned int n = 0; n < numSpecBands; ++n)
             {
@@ -1627,7 +1627,7 @@ namespace rsgis{namespace segment{
             largeClumpTab->at(i)->unique();
         }
         
-        list<unsigned long> outClumps;
+        std::list<unsigned long> outClumps;
         float tmpMeanVal = 0;
         float distVal = 0;
         unsigned long sClump = 0;
@@ -1635,8 +1635,8 @@ namespace rsgis{namespace segment{
         float meanBrightness = 0;
         float medianBrightness = 0;
         float sumVals = 0;
-        list<float> allVals;
-        vector<double> allValsVec;
+        std::list<float> allVals;
+        std::vector<double> allValsVec;
         bool first = true;
         for(unsigned int i = 0; i < maxLClumpIdx; ++i)
         {
@@ -1646,7 +1646,7 @@ namespace rsgis{namespace segment{
             sumVals = 0;
             if(largeClumpTab->at(i)->size() > 0)
             {
-                for(list<unsigned long>::iterator iterClump = largeClumpTab->at(i)->begin(); iterClump != largeClumpTab->at(i)->end(); ++iterClump)
+                for(std::list<unsigned long>::iterator iterClump = largeClumpTab->at(i)->begin(); iterClump != largeClumpTab->at(i)->end(); ++iterClump)
                 {
                     for(unsigned int i = 0; i < numSpecBands; ++i)
                     {
@@ -1702,14 +1702,14 @@ namespace rsgis{namespace segment{
                     }
                     else
                     {
-                        throw RSGISImageCalcException("Did not recognise clump selection choice.");
+                        throw rsgis::img::RSGISImageCalcException("Did not recognise clump selection choice.");
                     }
                 }
                 if(selection == median)
                 {
                     allVals.sort();
                     unsigned int counter = 0;
-                    for(list<float>::iterator iterVals = allVals.begin(); iterVals != allVals.end(); ++iterVals)
+                    for(std::list<float>::iterator iterVals = allVals.begin(); iterVals != allVals.end(); ++iterVals)
                     {
                         if(counter++ == (allVals.size()/2))
                         {
@@ -1719,7 +1719,7 @@ namespace rsgis{namespace segment{
                     }
                     
                     first = true;
-                    for(list<unsigned long>::iterator iterClump = largeClumpTab->at(i)->begin(); iterClump != largeClumpTab->at(i)->end(); ++iterClump)
+                    for(std::list<unsigned long>::iterator iterClump = largeClumpTab->at(i)->begin(); iterClump != largeClumpTab->at(i)->end(); ++iterClump)
                     {
                         for(unsigned int i = 0; i < numSpecBands; ++i)
                         {
@@ -1751,7 +1751,7 @@ namespace rsgis{namespace segment{
                 {
                     meanBrightness = sumVals/largeClumpTab->size();
                     first = true;
-                    for(list<unsigned long>::iterator iterClump = largeClumpTab->at(i)->begin(); iterClump != largeClumpTab->at(i)->end(); ++iterClump)
+                    for(std::list<unsigned long>::iterator iterClump = largeClumpTab->at(i)->begin(); iterClump != largeClumpTab->at(i)->end(); ++iterClump)
                     {
                         for(unsigned int i = 0; i < numSpecBands; ++i)
                         {
@@ -1785,7 +1785,7 @@ namespace rsgis{namespace segment{
                     float percentileVal = gsl_stats_quantile_from_sorted_data(&allValsVec[0], 1, allValsVec.size(), 0.75);
                     //cout << "percentileVal = " << percentileVal << endl;
                     first = true;
-                    for(list<unsigned long>::iterator iterClump = largeClumpTab->at(i)->begin(); iterClump != largeClumpTab->at(i)->end(); ++iterClump)
+                    for(std::list<unsigned long>::iterator iterClump = largeClumpTab->at(i)->begin(); iterClump != largeClumpTab->at(i)->end(); ++iterClump)
                     {
                         for(unsigned int i = 0; i < numSpecBands; ++i)
                         {
@@ -1820,7 +1820,7 @@ namespace rsgis{namespace segment{
                     float percentileVal = gsl_stats_quantile_from_sorted_data(&allValsVec[0], 1, allValsVec.size(), 0.95);
                     //cout << "percentileVal = " << percentileVal << endl;
                     first = true;
-                    for(list<unsigned long>::iterator iterClump = largeClumpTab->at(i)->begin(); iterClump != largeClumpTab->at(i)->end(); ++iterClump)
+                    for(std::list<unsigned long>::iterator iterClump = largeClumpTab->at(i)->begin(); iterClump != largeClumpTab->at(i)->end(); ++iterClump)
                     {
                         for(unsigned int i = 0; i < numSpecBands; ++i)
                         {
@@ -1858,14 +1858,14 @@ namespace rsgis{namespace segment{
         ofstream outTxtFile;
         outTxtFile.open(outputFile.c_str());
         unsigned long seedID = 1;
-        for(list<unsigned long>::iterator iterClumps = outClumps.begin(); iterClumps != outClumps.end(); ++iterClumps)
+        for(std::list<unsigned long>::iterator iterClumps = outClumps.begin(); iterClumps != outClumps.end(); ++iterClumps)
         {
             outTxtFile << *iterClumps << "," << seedID++ << endl;
         }
         outTxtFile.flush();
         outTxtFile.close();
         
-        for(vector< list<unsigned long>* >::iterator iterLClumps = largeClumpTab->begin(); iterLClumps != largeClumpTab->end(); ++iterLClumps)
+        for(std::vector< std::list<unsigned long>* >::iterator iterLClumps = largeClumpTab->begin(); iterLClumps != largeClumpTab->end(); ++iterLClumps)
         {
             delete *iterLClumps;
         }
@@ -1880,7 +1880,7 @@ namespace rsgis{namespace segment{
         delete[] spectralVals;
         delete[] spectralBands;
         
-        for(vector<ImgClumpMean*>::iterator iterClumps = clumpTab->begin(); iterClumps != clumpTab->end(); ++iterClumps)
+        for(std::vector<rsgis::img::ImgClumpMean*>::iterator iterClumps = clumpTab->begin(); iterClumps != clumpTab->end(); ++iterClumps)
         {
             delete[] (*iterClumps)->meanVals;
             delete[] (*iterClumps)->sumVals;

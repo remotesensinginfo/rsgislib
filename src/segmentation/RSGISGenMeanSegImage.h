@@ -36,15 +36,12 @@
 
 namespace rsgis{namespace segment{
     
-    using namespace std;
-    using namespace rsgis::img;
-    
     class RSGISGenMeanSegImage
     {
     public:
         RSGISGenMeanSegImage();
-        void generateMeanImage(GDALDataset *spectral, GDALDataset *clumps, GDALDataset *meanImg) throw(RSGISImageCalcException);
-        void generateMeanImageUsingClumpTable(GDALDataset *spectral, GDALDataset *clumps, GDALDataset *meanImg) throw(RSGISImageCalcException);
+        void generateMeanImage(GDALDataset *spectral, GDALDataset *clumps, GDALDataset *meanImg) throw(rsgis::img::RSGISImageCalcException);
+        void generateMeanImageUsingClumpTable(GDALDataset *spectral, GDALDataset *clumps, GDALDataset *meanImg) throw(rsgis::img::RSGISImageCalcException);
         ~RSGISGenMeanSegImage();
     };
     

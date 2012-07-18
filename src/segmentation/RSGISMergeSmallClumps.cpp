@@ -30,15 +30,15 @@ namespace rsgis{namespace segment{
         
     }
     
-    void RSGISMergeSmallClumps::mergeSmallClumps(GDALDataset *spectral, GDALDataset *clumps, unsigned int minClumpSize) throw(RSGISImageCalcException)
+    void RSGISMergeSmallClumps::mergeSmallClumps(GDALDataset *spectral, GDALDataset *clumps, unsigned int minClumpSize) throw(rsgis::img::RSGISImageCalcException)
     {
         if(spectral->GetRasterXSize() != clumps->GetRasterXSize())
         {
-            throw RSGISImageCalcException("Widths are not the same");
+            throw rsgis::img::RSGISImageCalcException("Widths are not the same");
         }
         if(spectral->GetRasterYSize() != clumps->GetRasterYSize())
         {
-            throw RSGISImageCalcException("Heights are not the same");
+            throw rsgis::img::RSGISImageCalcException("Heights are not the same");
         }
         
         unsigned int width = spectral->GetRasterXSize();
@@ -74,18 +74,18 @@ namespace rsgis{namespace segment{
                 }
             }
         }
-        vector<ImgClump*> *clumpTable = new vector<ImgClump*>();
+        std::vector<rsgis::img::ImgClump*> *clumpTable = new std::vector<rsgis::img::ImgClump*>();
         clumpTable->reserve(maxClumpIdx);
-        deque<ImgClump*> smallClumps;
+        std::deque<rsgis::img::ImgClump*> smallClumps;
         
-        ImgClump *cClump = NULL;
-        ImgClump *tClump = NULL;
+        rsgis::img::ImgClump *cClump = NULL;
+        rsgis::img::ImgClump *tClump = NULL;
         for(unsigned int i = 0; i < maxClumpIdx; ++i)
         {
-            cClump = new ImgClump(i+1);
+            cClump = new rsgis::img::ImgClump(i+1);
             cClump->sumVals = new float[numSpecBands];
             cClump->meanVals = new float[numSpecBands];
-            cClump->pxls = new vector<PxlLoc>();
+            cClump->pxls = new std::vector<rsgis::img::PxlLoc>();
             cClump->active = true;
             for(unsigned int n = 0; n < numSpecBands; ++n)
             {
@@ -95,7 +95,7 @@ namespace rsgis{namespace segment{
             clumpTable->push_back(cClump);
         }
         
-        cout << "Calculate Initial Clump Means\n";
+        std::cout << "Calculate Initial Clump Means\n";
         for(unsigned int i = 0; i < height; ++i)
         {
             clumpBand->RasterIO(GF_Read, 0, i, width, 1, clumpIdxs, width, 1, GDT_UInt32, 0, 0);
@@ -112,12 +112,12 @@ namespace rsgis{namespace segment{
                     {
                         cClump->sumVals[n] += spectralVals[n][j];
                     }
-                    cClump->pxls->push_back(PxlLoc(j, i));
+                    cClump->pxls->push_back(rsgis::img::PxlLoc(j, i));
                 }
             }
         }
         
-        for(vector<ImgClump*>::iterator iterClumps = clumpTable->begin(); iterClumps != clumpTable->end(); ++iterClumps)
+        for(std::vector<rsgis::img::ImgClump*>::iterator iterClumps = clumpTable->begin(); iterClumps != clumpTable->end(); ++iterClumps)
         {
             for(unsigned int n = 0; n < numSpecBands; ++n)
             {
@@ -129,21 +129,21 @@ namespace rsgis{namespace segment{
             } 
         }
         
-        cout << "There are " << clumpTable->size() << " clumps. " << smallClumps.size() << " are too small\n";
+        std::cout << "There are " << clumpTable->size() << " clumps. " << smallClumps.size() << " are too small\n";
         
-        PxlLoc tLoc;
+        rsgis::img::PxlLoc tLoc;
         list<unsigned long> neighbours;
         unsigned long closestNeighbour = 0;
         bool firstNeighbourTested = true;
         float closestNeighbourDist = 0;
         
-        cout << "Eliminating Small Clumps." << endl;
+        std::cout << "Eliminating Small Clumps." << endl;
         long smallClumpsCounter = 0;
         while(smallClumps.size() > 0)
         {
             if((smallClumpsCounter % 10000) == 0)
             {
-                cout << "Eliminated " << smallClumpsCounter << " > " << smallClumps.size() << " to go...\r";
+                std::cout << "Eliminated " << smallClumpsCounter << " > " << smallClumps.size() << " to go...\r";
             }
             
             cClump = smallClumps.front();
@@ -153,7 +153,7 @@ namespace rsgis{namespace segment{
             {
                 // Get list of neighbours.
                 neighbours.clear();
-                for(vector<PxlLoc>::iterator iterPxls = cClump->pxls->begin(); iterPxls != cClump->pxls->end(); ++iterPxls)
+                for(std::vector<rsgis::img::PxlLoc>::iterator iterPxls = cClump->pxls->begin(); iterPxls != cClump->pxls->end(); ++iterPxls)
                 {
                     // Above
                     if(((long)(*iterPxls).yPos)-1 >= 0)
@@ -225,7 +225,7 @@ namespace rsgis{namespace segment{
                     }
                 }
                 
-                //cout << "For " << cClump->clumpID << "(size = " << cClump->pxls->size() << ") the closest neighbour is " << closestNeighbour << " with distance " << closestNeighbourDist << endl;
+                //std::cout << "For " << cClump->clumpID << "(size = " << cClump->pxls->size() << ") the closest neighbour is " << closestNeighbour << " with distance " << closestNeighbourDist << endl;
                 
                 // Perform Merge
                 if(!firstNeighbourTested)
@@ -262,11 +262,11 @@ namespace rsgis{namespace segment{
             
             ++smallClumpsCounter;
         }
-        cout << "Eliminated " << smallClumpsCounter << " small clumps\n";
+        std::cout << "Eliminated " << smallClumpsCounter << " small clumps\n";
         
         
         
-        for(vector<ImgClump*>::iterator iterClumps = clumpTable->begin(); iterClumps != clumpTable->end(); ++iterClumps)
+        for(std::vector<rsgis::img::ImgClump*>::iterator iterClumps = clumpTable->begin(); iterClumps != clumpTable->end(); ++iterClumps)
         {
             if((*iterClumps) != NULL)
             {

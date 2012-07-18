@@ -40,10 +40,6 @@
 
 namespace rsgis{namespace segment{
     
-    using namespace std;
-    using namespace rsgis::img;
-    using namespace rsgis::utils;
-    
     struct ImgClumpRGB
     {
         ImgClumpRGB(unsigned long clumpID)
@@ -61,11 +57,11 @@ namespace rsgis{namespace segment{
     {
     public:
         RSGISRandomColourClumps();
-        void generateRandomColouredClump(GDALDataset *clumps, GDALDataset *colourImg, string inputLUTFile, bool importLUT, string exportLUTFile, bool exportLUT) throw(RSGISImageCalcException);
+        void generateRandomColouredClump(GDALDataset *clumps, GDALDataset *colourImg, std::string inputLUTFile, bool importLUT, std::string exportLUTFile, bool exportLUT) throw(rsgis::img::RSGISImageCalcException);
         ~RSGISRandomColourClumps();
     protected:
-        vector<ImgClumpRGB*>* importLUTFromFile(string inFile) throw(RSGISTextException);
-        void exportLUT2File(string outFile, vector<ImgClumpRGB*> *clumpTab) throw(RSGISTextException);
+        vector<ImgClumpRGB*>* importLUTFromFile(std::string inFile) throw(rsgis::utils::RSGISTextException);
+        void exportLUT2File(std::string outFile, vector<ImgClumpRGB*> *clumpTab) throw(rsgis::utils::RSGISTextException);
     };
     
 }}

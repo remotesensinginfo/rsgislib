@@ -45,12 +45,6 @@
 
 namespace rsgis{namespace segment{
     
-    using namespace std;
-    using namespace rsgis;
-    using namespace rsgis::utils;
-    using namespace rsgis::img;
-    using namespace rsgis::rastergis;
-    
     struct RSGISRegionGrowPxlSeeds
     {
         RSGISRegionGrowPxlSeeds()
@@ -72,12 +66,12 @@ namespace rsgis{namespace segment{
     class RSGISRegionGrowSegmentsPixels
     {
     public:
-        RSGISRegionGrowSegmentsPixels(GDALDataset *inRefl, GDALDataset *outDataset)throw(RSGISImageException);
-        void performRegionGrowing(vector<RSGISRegionGrowPxlSeeds> *seeds, float threshold)throw(RSGISImageCalcException);
-        void performRegionGrowing(vector<RSGISRegionGrowPxlSeeds> *seeds, float initThreshold, float thresholdIncrements, float maxThreshold, unsigned int maxIterations)throw(RSGISImageCalcException);
-        void growSeed(RSGISRegionGrowPxlSeeds *seed, float threshold)throw(RSGISImageCalcException);
-        void growSeed(RSGISRegionGrowPxlSeeds *seed, float initThreshold, float thresholdIncrements, float maxThreshold, unsigned int maxNumPixels)throw(RSGISImageCalcException);
-        static vector<RSGISRegionGrowPxlSeeds>* parseSeedsText(string inFile) throw(RSGISTextException);
+        RSGISRegionGrowSegmentsPixels(GDALDataset *inRefl, GDALDataset *outDataset)throw(rsgis::RSGISImageException);
+        void performRegionGrowing(std::vector<RSGISRegionGrowPxlSeeds> *seeds, float threshold)throw(rsgis::img::RSGISImageCalcException);
+        void performRegionGrowing(std::vector<RSGISRegionGrowPxlSeeds> *seeds, float initThreshold, float thresholdIncrements, float maxThreshold, unsigned int maxIterations)throw(rsgis::img::RSGISImageCalcException);
+        void growSeed(RSGISRegionGrowPxlSeeds *seed, float threshold)throw(rsgis::img::RSGISImageCalcException);
+        void growSeed(RSGISRegionGrowPxlSeeds *seed, float initThreshold, float thresholdIncrements, float maxThreshold, unsigned int maxNumPixels)throw(rsgis::img::RSGISImageCalcException);
+        static std::vector<RSGISRegionGrowPxlSeeds>* parseSeedsText(std::string inFile) throw(rsgis::utils::RSGISTextException);
         ~RSGISRegionGrowSegmentsPixels();
     private:
         double eucDistance(float *vals1, float *vals2, unsigned int numVals)
@@ -111,7 +105,7 @@ namespace rsgis{namespace segment{
     {
     public:
         RSGISFindRegionGrowingSeeds();
-        vector<RSGISRegionGrowPxlSeeds>* findSeeds(GDALDataset *inRefl, GDALDataset *clumps,  vector<RSGISSubClumps*> *regions)throw(RSGISImageCalcException);
+        std::vector<RSGISRegionGrowPxlSeeds>* findSeeds(GDALDataset *inRefl, GDALDataset *clumps, std::vector<rsgis::rastergis::RSGISSubClumps*> *regions)throw(rsgis::img::RSGISImageCalcException);
         ~RSGISFindRegionGrowingSeeds();
     };
     

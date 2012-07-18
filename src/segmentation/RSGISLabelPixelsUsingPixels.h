@@ -24,7 +24,6 @@
 #define RSGISLabelPixelsUsingPixels_H
 
 #include <iostream>
-#include <string>
 #include <math.h>
 
 #include "common/RSGISImageException.h"
@@ -40,24 +39,18 @@
 #include "ogr_api.h"
 
 namespace rsgis{namespace segment{
-    
-    using namespace std;
-    using namespace rsgis;
-    using namespace rsgis::math;
-    using namespace rsgis::img;
-    
 
-    class RSGISLabelPixelsUsingPixelsCalcImg : public RSGISCalcImageValue
+    class RSGISLabelPixelsUsingPixelsCalcImg : public rsgis::img::RSGISCalcImageValue
     {
     public: 
         RSGISLabelPixelsUsingPixelsCalcImg(int numberOutBands, bool ignoreZeros);
-        void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException);
-        void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
-        bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException);
+        void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+        bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
         ~RSGISLabelPixelsUsingPixelsCalcImg();
     private:
         bool ignoreZeros;

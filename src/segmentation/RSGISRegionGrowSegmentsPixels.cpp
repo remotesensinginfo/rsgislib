@@ -64,11 +64,11 @@ namespace rsgis{namespace segment{
     }
     
     
-    void RSGISRegionGrowSegmentsPixels::performRegionGrowing(vector<RSGISRegionGrowPxlSeeds> *seeds, float threshold)throw(RSGISImageCalcException)
+    void RSGISRegionGrowSegmentsPixels::performRegionGrowing(std::vector<RSGISRegionGrowPxlSeeds> *seeds, float threshold)throw(rsgis::img::RSGISImageCalcException)
     {
         cout << "There are " << seeds->size() << " seeds to process\n";
         unsigned int seedCounter = 1;
-        for(vector<RSGISRegionGrowPxlSeeds>::iterator iterSeed = seeds->begin(); iterSeed != seeds->end(); ++iterSeed)
+        for(std::vector<RSGISRegionGrowPxlSeeds>::iterator iterSeed = seeds->begin(); iterSeed != seeds->end(); ++iterSeed)
         {
             cout << "Processing seed " << seedCounter++ << endl;
             try 
@@ -82,25 +82,25 @@ namespace rsgis{namespace segment{
                 }
                 this->growSeed(&(*iterSeed), threshold);
             } 
-            catch (RSGISImageCalcException &e) 
+            catch (rsgis::img::RSGISImageCalcException &e) 
             {
                 throw e;
             }
         }
     }
     
-    void RSGISRegionGrowSegmentsPixels::performRegionGrowing(vector<RSGISRegionGrowPxlSeeds> *seeds, float initThreshold, float thresholdIncrements, float maxThreshold, unsigned int maxIterations)throw(RSGISImageCalcException)
+    void RSGISRegionGrowSegmentsPixels::performRegionGrowing(std::vector<RSGISRegionGrowPxlSeeds> *seeds, float initThreshold, float thresholdIncrements, float maxThreshold, unsigned int maxIterations)throw(rsgis::img::RSGISImageCalcException)
     {
         cout << "There are " << seeds->size() << " seeds to process\n";
         unsigned int seedCounter = 1;
-        for(vector<RSGISRegionGrowPxlSeeds>::iterator iterSeed = seeds->begin(); iterSeed != seeds->end(); ++iterSeed)
+        for(std::vector<RSGISRegionGrowPxlSeeds>::iterator iterSeed = seeds->begin(); iterSeed != seeds->end(); ++iterSeed)
         {
             cout << "Processing seed " << seedCounter++ << endl;
             try 
             {
                 this->growSeed(&(*iterSeed), initThreshold, thresholdIncrements, maxThreshold, maxIterations);
             } 
-            catch (RSGISImageCalcException &e) 
+            catch (rsgis::img::RSGISImageCalcException &e) 
             {
                 throw e;
             }
@@ -108,16 +108,16 @@ namespace rsgis{namespace segment{
     }
     
     
-    void RSGISRegionGrowSegmentsPixels::growSeed(RSGISRegionGrowPxlSeeds *seed, float threshold)throw(RSGISImageCalcException)
+    void RSGISRegionGrowSegmentsPixels::growSeed(RSGISRegionGrowPxlSeeds *seed, float threshold)throw(rsgis::img::RSGISImageCalcException)
     {
         if(seed->xPxl >= width)
         {
-            throw RSGISImageCalcException("Seed is not within image: Width.");
+            throw rsgis::img::RSGISImageCalcException("Seed is not within image: Width.");
         }
         
         if(seed->yPxl >= height)
         {
-            throw RSGISImageCalcException("Seed is not within image: Height.");
+            throw rsgis::img::RSGISImageCalcException("Seed is not within image: Height.");
         }
         
         for(unsigned int n = 0; n < numSpecBands; ++n)
@@ -129,11 +129,11 @@ namespace rsgis{namespace segment{
         mask[seed->yPxl][seed->xPxl] = true;
         outBand->RasterIO(GF_Write, seed->xPxl, seed->yPxl, 1, 1, &seed->fid, 1, 1, GDT_UInt32, 0, 0);
         
-        deque<PxlLoc> searchPxls;
-        searchPxls.push_back(PxlLoc(seed->xPxl, seed->yPxl));
+        std::deque<rsgis::img::PxlLoc> searchPxls;
+        searchPxls.push_back(rsgis::img::PxlLoc(seed->xPxl, seed->yPxl));
         
         double distance = 0;
-        PxlLoc pxl;
+        rsgis::img::PxlLoc pxl;
         while(searchPxls.size() > 0)
         {
             //cout << "searchPxls.size() = " << searchPxls.size() << endl;
@@ -157,7 +157,7 @@ namespace rsgis{namespace segment{
                     {
                         //cout << "\t\tWithin region\n";
                         outBand->RasterIO(GF_Write, pxl.xPos+1, pxl.yPos, 1, 1, &seed->fid, 1, 1, GDT_UInt32, 0, 0);
-                        searchPxls.push_back(PxlLoc(pxl.xPos+1, pxl.yPos));
+                        searchPxls.push_back(rsgis::img::PxlLoc(pxl.xPos+1, pxl.yPos));
                     }
                 }
             }
@@ -178,7 +178,7 @@ namespace rsgis{namespace segment{
                     {
                         //cout << "\t\tWithin region\n";
                         outBand->RasterIO(GF_Write, pxl.xPos-1, pxl.yPos, 1, 1, &seed->fid, 1, 1, GDT_UInt32, 0, 0);
-                        searchPxls.push_back(PxlLoc(pxl.xPos-1, pxl.yPos));
+                        searchPxls.push_back(rsgis::img::PxlLoc(pxl.xPos-1, pxl.yPos));
                     }
                 }
             }
@@ -199,7 +199,7 @@ namespace rsgis{namespace segment{
                     {
                         //cout << "\t\tWithin region\n";
                         outBand->RasterIO(GF_Write, pxl.xPos, pxl.yPos+1, 1, 1, &seed->fid, 1, 1, GDT_UInt32, 0, 0);
-                        searchPxls.push_back(PxlLoc(pxl.xPos, pxl.yPos+1));
+                        searchPxls.push_back(rsgis::img::PxlLoc(pxl.xPos, pxl.yPos+1));
                     }
                 }
             }
@@ -220,7 +220,7 @@ namespace rsgis{namespace segment{
                     {
                         //cout << "\t\tWithin region\n";
                         outBand->RasterIO(GF_Write, pxl.xPos, pxl.yPos-1, 1, 1, &seed->fid, 1, 1, GDT_UInt32, 0, 0);
-                        searchPxls.push_back(PxlLoc(pxl.xPos, pxl.yPos-1));
+                        searchPxls.push_back(rsgis::img::PxlLoc(pxl.xPos, pxl.yPos-1));
                     }
                 }
             }            
@@ -228,22 +228,22 @@ namespace rsgis{namespace segment{
         
     }
     
-    void RSGISRegionGrowSegmentsPixels::growSeed(RSGISRegionGrowPxlSeeds *seed, float initThreshold, float thresholdIncrements, float maxThreshold, unsigned int maxNumPixels)throw(RSGISImageCalcException)
+    void RSGISRegionGrowSegmentsPixels::growSeed(RSGISRegionGrowPxlSeeds *seed, float initThreshold, float thresholdIncrements, float maxThreshold, unsigned int maxNumPixels)throw(rsgis::img::RSGISImageCalcException)
     {
         if(seed->xPxl >= width)
         {
-            throw RSGISImageCalcException("Seed is not within image: Width.");
+            throw rsgis::img::RSGISImageCalcException("Seed is not within image: Width.");
         }
         
         if(seed->yPxl >= height)
         {
-            throw RSGISImageCalcException("Seed is not within image: Height.");
+            throw rsgis::img::RSGISImageCalcException("Seed is not within image: Height.");
         }
         
-        deque<PxlLoc> searchPxls;
+        std::deque<rsgis::img::PxlLoc> searchPxls;
         
         double distance = 0;
-        PxlLoc pxl;
+        rsgis::img::PxlLoc pxl;
         
         unsigned int numThresholdSteps = ceil((maxThreshold - initThreshold)/thresholdIncrements);
         
@@ -274,7 +274,7 @@ namespace rsgis{namespace segment{
             
             searchPxls.clear();
             mask[seed->yPxl][seed->xPxl] = true;
-            searchPxls.push_back(PxlLoc(seed->xPxl, seed->yPxl));
+            searchPxls.push_back(rsgis::img::PxlLoc(seed->xPxl, seed->yPxl));
             numPxlsInClump = 1;
 
             
@@ -300,7 +300,7 @@ namespace rsgis{namespace segment{
                         if(distance < threshold)
                         {
                             //cout << "\t\tWithin region\n";
-                            searchPxls.push_back(PxlLoc(pxl.xPos+1, pxl.yPos));
+                            searchPxls.push_back(rsgis::img::PxlLoc(pxl.xPos+1, pxl.yPos));
                             ++numPxlsInClump;
                             for(unsigned int n = 0; n < numSpecBands; ++n)
                             {
@@ -326,7 +326,7 @@ namespace rsgis{namespace segment{
                         if(distance < threshold)
                         {
                             //cout << "\t\tWithin region\n";
-                            searchPxls.push_back(PxlLoc(pxl.xPos-1, pxl.yPos));
+                            searchPxls.push_back(rsgis::img::PxlLoc(pxl.xPos-1, pxl.yPos));
                             ++numPxlsInClump;
                             for(unsigned int n = 0; n < numSpecBands; ++n)
                             {
@@ -352,7 +352,7 @@ namespace rsgis{namespace segment{
                         if(distance < threshold)
                         {
                             //cout << "\t\tWithin region\n";
-                            searchPxls.push_back(PxlLoc(pxl.xPos, pxl.yPos+1));
+                            searchPxls.push_back(rsgis::img::PxlLoc(pxl.xPos, pxl.yPos+1));
                             ++numPxlsInClump;
                             for(unsigned int n = 0; n < numSpecBands; ++n)
                             {
@@ -378,7 +378,7 @@ namespace rsgis{namespace segment{
                         if(distance < threshold)
                         {
                             //cout << "\t\tWithin region\n";
-                            searchPxls.push_back(PxlLoc(pxl.xPos, pxl.yPos-1));
+                            searchPxls.push_back(rsgis::img::PxlLoc(pxl.xPos, pxl.yPos-1));
                             ++numPxlsInClump;
                             for(unsigned int n = 0; n < numSpecBands; ++n)
                             {
@@ -441,7 +441,7 @@ namespace rsgis{namespace segment{
             
             searchPxls.clear();
             mask[seed->yPxl][seed->xPxl] = true;
-            searchPxls.push_back(PxlLoc(seed->xPxl, seed->yPxl));
+            searchPxls.push_back(rsgis::img::PxlLoc(seed->xPxl, seed->yPxl));
             numPxlsInClump = 1;
             
             while(searchPxls.size() > 0)
@@ -467,7 +467,7 @@ namespace rsgis{namespace segment{
                         {
                             //cout << "\t\tWithin region\n";
                             outBand->RasterIO(GF_Write, pxl.xPos+1, pxl.yPos, 1, 1, &seed->fid, 1, 1, GDT_UInt32, 0, 0);
-                            searchPxls.push_back(PxlLoc(pxl.xPos+1, pxl.yPos));
+                            searchPxls.push_back(rsgis::img::PxlLoc(pxl.xPos+1, pxl.yPos));
                             ++numPxlsInClump;
                             for(unsigned int n = 0; n < numSpecBands; ++n)
                             {
@@ -494,7 +494,7 @@ namespace rsgis{namespace segment{
                         {
                             //cout << "\t\tWithin region\n";
                             outBand->RasterIO(GF_Write, pxl.xPos-1, pxl.yPos, 1, 1, &seed->fid, 1, 1, GDT_UInt32, 0, 0);
-                            searchPxls.push_back(PxlLoc(pxl.xPos-1, pxl.yPos));
+                            searchPxls.push_back(rsgis::img::PxlLoc(pxl.xPos-1, pxl.yPos));
                             ++numPxlsInClump;
                             for(unsigned int n = 0; n < numSpecBands; ++n)
                             {
@@ -521,7 +521,7 @@ namespace rsgis{namespace segment{
                         {
                             //cout << "\t\tWithin region\n";
                             outBand->RasterIO(GF_Write, pxl.xPos, pxl.yPos+1, 1, 1, &seed->fid, 1, 1, GDT_UInt32, 0, 0);
-                            searchPxls.push_back(PxlLoc(pxl.xPos, pxl.yPos+1));
+                            searchPxls.push_back(rsgis::img::PxlLoc(pxl.xPos, pxl.yPos+1));
                             ++numPxlsInClump;
                             for(unsigned int n = 0; n < numSpecBands; ++n)
                             {
@@ -548,7 +548,7 @@ namespace rsgis{namespace segment{
                         {
                             //cout << "\t\tWithin region\n";
                             outBand->RasterIO(GF_Write, pxl.xPos, pxl.yPos-1, 1, 1, &seed->fid, 1, 1, GDT_UInt32, 0, 0);
-                            searchPxls.push_back(PxlLoc(pxl.xPos, pxl.yPos-1));
+                            searchPxls.push_back(rsgis::img::PxlLoc(pxl.xPos, pxl.yPos-1));
                             ++numPxlsInClump;
                             for(unsigned int n = 0; n < numSpecBands; ++n)
                             {
@@ -564,18 +564,18 @@ namespace rsgis{namespace segment{
         
     }
     
-    vector<RSGISRegionGrowPxlSeeds>* RSGISRegionGrowSegmentsPixels::parseSeedsText(string inFile) throw(RSGISTextException)
+    std::vector<RSGISRegionGrowPxlSeeds>* RSGISRegionGrowSegmentsPixels::parseSeedsText(std::string inFile) throw(rsgis::utils::RSGISTextException)
     {
-        vector<RSGISRegionGrowPxlSeeds> *seeds = new vector<RSGISRegionGrowPxlSeeds>();
+        std::vector<RSGISRegionGrowPxlSeeds> *seeds = new std::vector<RSGISRegionGrowPxlSeeds>();
         
         try 
         {
-            RSGISTextUtils txtUtils;
-            RSGISTextFileLineReader txtReader;
+            rsgis::utils::RSGISTextUtils txtUtils;
+            rsgis::utils::RSGISTextFileLineReader txtReader;
             txtReader.openFile(inFile);
             
-            vector<string> *tokens = new vector<string>();
-            string line = "";
+            std::vector<std::string> *tokens = new std::vector<std::string>();
+            std::string line = "";
             unsigned long fid = 0;
             unsigned int xPxl = 0;
             unsigned int yPxl = 0;
@@ -597,7 +597,7 @@ namespace rsgis{namespace segment{
                     }
                     else
                     {
-                        throw RSGISTextException("Seeds file requires format FID,xPixel,yPixel.");
+                        throw rsgis::utils::RSGISTextException("Seeds file requires format FID,xPixel,yPixel.");
                     }
                     tokens->clear();
                 }
@@ -607,7 +607,7 @@ namespace rsgis{namespace segment{
             txtReader.closeFile();
             
         } 
-        catch (RSGISTextException &e) 
+        catch (rsgis::utils::RSGISTextException &e) 
         {
             throw e;
         }
@@ -653,17 +653,17 @@ namespace rsgis{namespace segment{
         
     }
     
-    vector<RSGISRegionGrowPxlSeeds>* RSGISFindRegionGrowingSeeds::findSeeds(GDALDataset *inRefl, GDALDataset *clumps,  vector<RSGISSubClumps*> *regions)throw(RSGISImageCalcException)
+    std::vector<RSGISRegionGrowPxlSeeds>* RSGISFindRegionGrowingSeeds::findSeeds(GDALDataset *inRefl, GDALDataset *clumps,  std::vector<rsgis::rastergis::RSGISSubClumps*> *regions)throw(rsgis::img::RSGISImageCalcException)
     {
-        vector<RSGISRegionGrowPxlSeeds> *seeds = new vector<RSGISRegionGrowPxlSeeds>();
+        std::vector<RSGISRegionGrowPxlSeeds> *seeds = new std::vector<RSGISRegionGrowPxlSeeds>();
         
         if(inRefl->GetRasterXSize() != clumps->GetRasterXSize())
         {
-            throw RSGISImageCalcException("Widths are not the same");
+            throw rsgis::img::RSGISImageCalcException("Widths are not the same");
         }
         if(inRefl->GetRasterYSize() != clumps->GetRasterYSize())
         {
-            throw RSGISImageCalcException("Heights are not the same");
+            throw rsgis::img::RSGISImageCalcException("Heights are not the same");
         }
         
         unsigned int width = inRefl->GetRasterXSize();
@@ -682,7 +682,7 @@ namespace rsgis{namespace segment{
         unsigned int subClumpHeight = 0;
         float brightnessVal = 0;
         float brightnessSeedVal = 0;
-        list<float> brightnessVals;
+        std::list<float> brightnessVals;
         unsigned int seedIdx = 0;
         unsigned int counter = 0;
         
@@ -695,21 +695,21 @@ namespace rsgis{namespace segment{
         
         try
         {
-            RSGISSubClumps *subClump = NULL;
+            rsgis::rastergis::RSGISSubClumps *subClump = NULL;
             
-            for(vector<RSGISSubClumps*>::iterator iterSubClumps = regions->begin(); iterSubClumps != regions->end(); ++iterSubClumps)
+            for(std::vector<rsgis::rastergis::RSGISSubClumps*>::iterator iterSubClumps = regions->begin(); iterSubClumps != regions->end(); ++iterSubClumps)
             {
                 subClump = (*iterSubClumps);
                 foundSeed = false;
                 
                 if(subClump->maxPxlY >= height)
                 {
-                    throw RSGISImageCalcException("Subclump is not within dataset: Height");
+                    throw rsgis::img::RSGISImageCalcException("Subclump is not within dataset: Height");
                 }
                 
                 if(subClump->maxPxlX >= width)
                 {
-                    throw RSGISImageCalcException("Subclump is not within dataset: Width");
+                    throw rsgis::img::RSGISImageCalcException("Subclump is not within dataset: Width");
                 }
                 
                 cSeed.xPxl = 0;
@@ -725,7 +725,7 @@ namespace rsgis{namespace segment{
                 cout << "Y: [" << subClump->minPxlY << "," << subClump->maxPxlY << "]\n";
                 
                 cout << "Sub Clumps:\n";
-                for(list<unsigned int>::iterator iterIdx = subClump->subclumps.begin(); iterIdx != subClump->subclumps.end(); ++iterIdx)
+                for(std::list<unsigned int>::iterator iterIdx = subClump->subclumps.begin(); iterIdx != subClump->subclumps.end(); ++iterIdx)
                 {
                     cout << "\t" << (*iterIdx)+1 << endl;
                 }
@@ -748,7 +748,7 @@ namespace rsgis{namespace segment{
                     for(unsigned int x = 0; x < subClumpWidth; ++x)
                     {
                         //cout << clumpIdxs[x] << endl;
-                        for(list<unsigned int>::iterator iterIdx = subClump->subclumps.begin(); iterIdx != subClump->subclumps.end(); ++iterIdx)
+                        for(std::list<unsigned int>::iterator iterIdx = subClump->subclumps.begin(); iterIdx != subClump->subclumps.end(); ++iterIdx)
                         {
                             //cout << "\t" << (*iterIdx)+1 << endl;
                             if(((*iterIdx)+1) == clumpIdxs[x])
@@ -769,7 +769,7 @@ namespace rsgis{namespace segment{
                 
                 if(brightnessVals.size() == 0)
                 {
-                    throw RSGISImageCalcException("Did not find any of the sub clumps.");
+                    throw rsgis::img::RSGISImageCalcException("Did not find any of the sub clumps.");
                 }
                 brightnessVals.sort();
                 
@@ -778,7 +778,7 @@ namespace rsgis{namespace segment{
                 //cout << "Seed Idx: " << seedIdx << endl;
                 
                 counter = 0;
-                for(list<float>::iterator iterBright = brightnessVals.begin(); iterBright != brightnessVals.end(); ++iterBright)
+                for(std::list<float>::iterator iterBright = brightnessVals.begin(); iterBright != brightnessVals.end(); ++iterBright)
                 {
                     //cout << "(*iterBright) = " << *iterBright << endl;
                     if(counter == seedIdx)
@@ -792,7 +792,7 @@ namespace rsgis{namespace segment{
                 
                 if(!foundSeed)
                 {
-                    throw RSGISImageCalcException("Did not find a seed.");
+                    throw rsgis::img::RSGISImageCalcException("Did not find a seed.");
                 }
                 
                 //cout << "brightnessSeedVal = " << brightnessSeedVal << endl;
@@ -808,7 +808,7 @@ namespace rsgis{namespace segment{
                     
                     for(unsigned int x = 0; x < subClumpWidth; ++x)
                     {
-                        for(list<unsigned int>::iterator iterIdx = subClump->subclumps.begin(); iterIdx != subClump->subclumps.end(); ++iterIdx)
+                        for(std::list<unsigned int>::iterator iterIdx = subClump->subclumps.begin(); iterIdx != subClump->subclumps.end(); ++iterIdx)
                         {
                             if(((*iterIdx)+1) == clumpIdxs[x])
                             {
@@ -850,7 +850,7 @@ namespace rsgis{namespace segment{
             }
             
         }
-        catch(RSGISImageCalcException &e)
+        catch(rsgis::img::RSGISImageCalcException &e)
         {
             throw e;
         }
