@@ -42,7 +42,7 @@
 #include "utils/RSGISTextUtils.h"
 
 #include <xercesc/dom/DOM.hpp>
-#include <xercesc/util/XMLString.hpp>
+#include <xercesc/util/XMLstring.hpp>
 
 #include "boost/math/special_functions/fpclassify.hpp"
 #include <boost/numeric/conversion/cast.hpp>
@@ -53,32 +53,22 @@
 
 namespace rsgis{namespace rastergis{
     
-    using namespace H5;
-    using namespace mu;
-    using namespace std;
-    using namespace xercesc;
-    using namespace rsgis;
-    using namespace rsgis::utils;
-    using boost::lexical_cast;
-    using boost::bad_lexical_cast;
+    static const std::string ATT_GROUPNAME_HEADER( "/HEADER" );
+	static const std::string ATT_GROUPNAME_DATA( "/DATA" );
+    static const std::string ATT_GROUPNAME_NEIGHBOURS( "/NEIGHBOURS" );
     
+    static const std::string ATT_BOOL_DATA( "/DATA/BOOL" );
+    static const std::string ATT_INT_DATA( "/DATA/INT" );
+    static const std::string ATT_FLOAT_DATA( "/DATA/FLOAT" );
+    static const std::string ATT_NEIGHBOURS_DATA( "/NEIGHBOURS/NEIGHBOURS" );
     
-    static const string ATT_GROUPNAME_HEADER( "/HEADER" );
-	static const string ATT_GROUPNAME_DATA( "/DATA" );
-    static const string ATT_GROUPNAME_NEIGHBOURS( "/NEIGHBOURS" );
+    static const std::string ATT_BOOL_FIELDS_HEADER( "/HEADER/BOOL_FIELDS" );
+    static const std::string ATT_INT_FIELDS_HEADER( "/HEADER/INT_FIELDS" );
+    static const std::string ATT_FLOAT_FIELDS_HEADER( "/HEADER/FLOAT_FIELDS" );
+    static const std::string ATT_SIZE_HEADER( "/HEADER/SIZE" );
     
-    static const string ATT_BOOL_DATA( "/DATA/BOOL" );
-    static const string ATT_INT_DATA( "/DATA/INT" );
-    static const string ATT_FLOAT_DATA( "/DATA/FLOAT" );
-    static const string ATT_NEIGHBOURS_DATA( "/NEIGHBOURS/NEIGHBOURS" );
-    
-    static const string ATT_BOOL_FIELDS_HEADER( "/HEADER/BOOL_FIELDS" );
-    static const string ATT_INT_FIELDS_HEADER( "/HEADER/INT_FIELDS" );
-    static const string ATT_FLOAT_FIELDS_HEADER( "/HEADER/FLOAT_FIELDS" );
-    static const string ATT_SIZE_HEADER( "/HEADER/SIZE" );
-    
-    static const string ATT_NAME_FIELD( "NAME" );
-    static const string ATT_INDEX_FIELD( "INDEX" );
+    static const std::string ATT_NAME_FIELD( "NAME" );
+    static const std::string ATT_INDEX_FIELD( "INDEX" );
     
     static const int ATT_READ_MDC_NELMTS( 0 ); //0
     static const hsize_t ATT_READ_RDCC_NELMTS( 512 ); // 512
@@ -108,11 +98,11 @@ namespace rsgis{namespace rastergis{
     struct RSGISFeature
     {
         boost::uint_fast32_t fid;
-        vector<bool> *boolFields;
-        vector<long> *intFields;
-        vector<double> *floatFields;
-        vector<string> *stringFields;
-        vector<boost::uint_fast32_t> *neighbours;
+        std::vector<bool> *boolFields;
+        std::vector<long> *intFields;
+        std::vector<double> *floatFields;
+        std::vector<std::string> *stringFields;
+        std::vector<boost::uint_fast32_t> *neighbours;
     };
     
     typedef struct {
@@ -132,7 +122,7 @@ namespace rsgis{namespace rastergis{
     
     struct RSGISAttribute
     {
-        string name;
+        std::string name;
         RSGISAttributeDataType dataType;
         unsigned int idx;
     };
@@ -145,8 +135,8 @@ namespace rsgis{namespace rastergis{
     
     struct RSGISMathAttVariable
     {
-        string variable;
-        string field;
+        std::string variable;
+        std::string field;
         unsigned int fieldIdx;
         RSGISAttributeDataType fieldDT;
     };
@@ -163,7 +153,7 @@ namespace rsgis{namespace rastergis{
     struct RSGISIfStatement
     {
         RSGISAttExpression *exp;
-        string field;
+        std::string field;
         RSGISAttributeDataType dataType;
         unsigned int fldIdx;
         long value;
@@ -192,35 +182,35 @@ namespace rsgis{namespace rastergis{
     class RSGISAttributeTable : public AttIterator
     {
     public:
-        virtual bool getBoolField(size_t fid, string name) throw(RSGISAttributeTableException)=0;
-        virtual long getIntField(size_t fid, string name) throw(RSGISAttributeTableException)=0;
-        virtual double getDoubleField(size_t fid, string name) throw(RSGISAttributeTableException)=0;
-        virtual string getStringField(size_t fid, string name) throw(RSGISAttributeTableException)=0;
+        virtual bool getBoolField(size_t fid, std::string name) throw(RSGISAttributeTableException)=0;
+        virtual long getIntField(size_t fid, std::string name) throw(RSGISAttributeTableException)=0;
+        virtual double getDoubleField(size_t fid, std::string name) throw(RSGISAttributeTableException)=0;
+        virtual std::string getStringField(size_t fid, std::string name) throw(RSGISAttributeTableException)=0;
         
-        virtual void setBoolField(size_t fid, string name, bool value) throw(RSGISAttributeTableException)=0;
-        virtual void setIntField(size_t fid, string name, long value) throw(RSGISAttributeTableException)=0;
-        virtual void setDoubleField(size_t fid, string name, double value) throw(RSGISAttributeTableException)=0;
-        virtual void setStringField(size_t fid, string name, string value) throw(RSGISAttributeTableException)=0;
+        virtual void setBoolField(size_t fid, std::string name, bool value) throw(RSGISAttributeTableException)=0;
+        virtual void setIntField(size_t fid, std::string name, long value) throw(RSGISAttributeTableException)=0;
+        virtual void setDoubleField(size_t fid, std::string name, double value) throw(RSGISAttributeTableException)=0;
+        virtual void setStringField(size_t fid, std::string name, std::string value) throw(RSGISAttributeTableException)=0;
         
-        virtual void setBoolValue(string name, bool value) throw(RSGISAttributeTableException)=0;
-        virtual void setIntValue(string name, long value) throw(RSGISAttributeTableException)=0;
-        virtual void setFloatValue(string name, double value) throw(RSGISAttributeTableException)=0;
-        virtual void setStringValue(string name, string value) throw(RSGISAttributeTableException)=0;
+        virtual void setBoolValue(std::string name, bool value) throw(RSGISAttributeTableException)=0;
+        virtual void setIntValue(std::string name, long value) throw(RSGISAttributeTableException)=0;
+        virtual void setFloatValue(std::string name, double value) throw(RSGISAttributeTableException)=0;
+        virtual void setStringValue(std::string name, std::string value) throw(RSGISAttributeTableException)=0;
         
         virtual RSGISFeature* getFeature(size_t fid) throw(RSGISAttributeTableException)=0;
         virtual void flushAllFeatures(bool progressFeedback=false) throw(RSGISAttributeTableException)=0;
         
-        virtual void addAttBoolField(string name, bool val) throw(RSGISAttributeTableException)=0;
-        virtual void addAttIntField(string name, long val) throw(RSGISAttributeTableException)=0;
-        virtual void addAttFloatField(string name, double val) throw(RSGISAttributeTableException)=0;
-        virtual void addAttStringField(string name, string val) throw(RSGISAttributeTableException)=0;
+        virtual void addAttBoolField(std::string name, bool val) throw(RSGISAttributeTableException)=0;
+        virtual void addAttIntField(std::string name, long val) throw(RSGISAttributeTableException)=0;
+        virtual void addAttFloatField(std::string name, double val) throw(RSGISAttributeTableException)=0;
+        virtual void addAttStringField(std::string name, std::string val) throw(RSGISAttributeTableException)=0;
         
-        virtual void addAttributes(vector<RSGISAttribute*> *attributes) throw(RSGISAttributeTableException)=0;
+        virtual void addAttributes(std::vector<RSGISAttribute*> *attributes) throw(RSGISAttributeTableException)=0;
         
-        RSGISAttributeDataType getDataType(string name) throw(RSGISAttributeTableException);
-        unsigned int getFieldIndex(string name) throw(RSGISAttributeTableException);
-        vector<string>* getAttributeNames();
-        bool hasAttribute(string name);
+        RSGISAttributeDataType getDataType(std::string name) throw(RSGISAttributeTableException);
+        unsigned int getFieldIndex(std::string name) throw(RSGISAttributeTableException);
+        std::vector<std::string>* getAttributeNames();
+        bool hasAttribute(std::string name);
         virtual size_t getSize()=0;
         virtual void holdFID(size_t fid)=0;
         virtual void removeHoldFID(size_t fid)=0;
@@ -229,30 +219,30 @@ namespace rsgis{namespace rastergis{
         virtual bool attInMemory()=0;
         virtual void findFIDRangeInNeighbours(size_t startFID, size_t endFID, size_t *minFID, size_t *maxFID) throw(RSGISAttributeTableException)=0;
         
-        vector<double>* getFieldValues(string field) throw(RSGISAttributeTableException);
+        std::vector<double>* getFieldValues(std::string field) throw(RSGISAttributeTableException);
         
-        void applyIfStatements(vector<RSGISIfStatement*> *statements) throw(RSGISAttributeTableException);
-        bool applyIfStatementsToFeature(RSGISFeature *feat, vector<RSGISIfStatement*> *statements) throw(RSGISAttributeTableException);
+        void applyIfStatements(std::vector<RSGISIfStatement*> *statements) throw(RSGISAttributeTableException);
+        bool applyIfStatementsToFeature(RSGISFeature *feat, std::vector<RSGISIfStatement*> *statements) throw(RSGISAttributeTableException);
         void processIfStatements(RSGISIfStatement *statement, RSGISProcessFeature *processTrue, RSGISProcessFeature *processFalse) throw(RSGISAttributeTableException);
         void processIfStatementsInBlocks(RSGISIfStatement *statement, RSGISProcessFeature *processTrue, RSGISProcessFeature *processFalse) throw(RSGISAttributeTableException);
         void applyIfStatementBoolOut(RSGISIfStatement *statement) throw(RSGISAttributeTableException);
-        void populateIfStatementsWithIdxs(vector<RSGISIfStatement*> *statements) throw(RSGISAttributeTableException);
-        void createIfStatementsFields(vector<RSGISIfStatement*> *statements, RSGISAttributeDataType dataType) throw(RSGISAttributeTableException);
+        void populateIfStatementsWithIdxs(std::vector<RSGISIfStatement*> *statements) throw(RSGISAttributeTableException);
+        void createIfStatementsFields(std::vector<RSGISIfStatement*> *statements, RSGISAttributeDataType dataType) throw(RSGISAttributeTableException);
         
-        void calculateFieldsMUParser(string expression, string outField, RSGISAttributeDataType outFieldDT, vector<RSGISMathAttVariable*> *variables) throw(RSGISAttributeTableException);
+        void calculateFieldsMUParser(std::string expression, std::string outField, RSGISAttributeDataType outFieldDT, std::vector<RSGISMathAttVariable*> *variables) throw(RSGISAttributeTableException);
         
-        void copyValues(string fromField, string toField) throw(RSGISAttributeTableException);
+        void copyValues(std::string fromField, std::string toField) throw(RSGISAttributeTableException);
         
-        void exportASCII(string outFile) throw(RSGISAttributeTableException);
+        void exportASCII(std::string outFile) throw(RSGISAttributeTableException);
         
-        void exportHDF5(string outFile) throw(RSGISAttributeTableException);
+        void exportHDF5(std::string outFile) throw(RSGISAttributeTableException);
         
         void exportGDALRaster(GDALDataset *inDataset, unsigned int inBand) throw(RSGISAttributeTableException);
         
-        vector<double>* getDoubleField(string field) throw(RSGISAttributeTableException);
-        vector<long>* getLongField(string field) throw(RSGISAttributeTableException);
-        vector<bool>* getBoolField(string field) throw(RSGISAttributeTableException);
-        vector<string>* getStringField(string field) throw(RSGISAttributeTableException);
+        std::vector<double>* getDoubleField(std::string field) throw(RSGISAttributeTableException);
+        std::vector<long>* getLongField(std::string field) throw(RSGISAttributeTableException);
+        std::vector<bool>* getBoolField(std::string field) throw(RSGISAttributeTableException);
+        std::vector<std::string>* getStringField(std::string field) throw(RSGISAttributeTableException);
         
         virtual void operator++()=0;
         virtual void start()=0;
@@ -261,19 +251,19 @@ namespace rsgis{namespace rastergis{
         
         virtual ~RSGISAttributeTable();
 
-        static vector<RSGISIfStatement*>* generateStatments(DOMElement *argElement)throw(RSGISAttributeTableException);
-        static RSGISAttExpression* generateExpression(DOMElement *expElement)throw(RSGISAttributeTableException);
+        static std::vector<RSGISIfStatement*>* generateStatments(xercesc::DOMElement *argElement)throw(RSGISAttributeTableException);
+        static RSGISAttExpression* generateExpression(xercesc::DOMElement *expElement)throw(RSGISAttributeTableException);
         
-        static void printSummaryHDFAtt(string inFile)throw(RSGISAttributeTableException);
+        static void printSummaryHDFAtt(std::string inFile)throw(RSGISAttributeTableException);
         
     protected:
         RSGISAttributeTable();
-        static CompType* createAttibuteIdxCompTypeDisk() throw(RSGISAttributeTableException);
-        static CompType* createAttibuteIdxCompTypeMem() throw(RSGISAttributeTableException);
+        static H5::CompType* createAttibuteIdxCompTypeDisk() throw(RSGISAttributeTableException);
+        static H5::CompType* createAttibuteIdxCompTypeMem() throw(RSGISAttributeTableException);
         void freeFeature(RSGISFeature *feat);
-        vector<pair<string, RSGISAttributeDataType> > *fields;
-        map<string, unsigned int> *fieldIdx;
-        map<string, RSGISAttributeDataType> *fieldDataType;
+        std::vector<std::pair<std::string, RSGISAttributeDataType> > *fields;
+        std::map<std::string, unsigned int> *fieldIdx;
+        std::map<std::string, RSGISAttributeDataType> *fieldDataType;
         unsigned int numBoolFields;
         unsigned int numIntFields;
         unsigned int numFloatFields;
@@ -284,7 +274,7 @@ namespace rsgis{namespace rastergis{
     class RSGISAttExpression2Fields : public RSGISAttExpression
     {
     public:
-        RSGISAttExpression2Fields(string f1Name, unsigned int f1Idx, RSGISAttributeDataType f1Type, string f2Name, unsigned int f2Idx, RSGISAttributeDataType f2Type):RSGISAttExpression()
+        RSGISAttExpression2Fields(std::string f1Name, unsigned int f1Idx, RSGISAttributeDataType f1Type, std::string f2Name, unsigned int f2Idx, RSGISAttributeDataType f2Type):RSGISAttExpression()
         {
             this->f1Name = f1Name;
             this->f1Idx = f1Idx;
@@ -314,10 +304,10 @@ namespace rsgis{namespace rastergis{
             
         };
     protected:
-        string f1Name;
+        std::string f1Name;
         unsigned int f1Idx;
         RSGISAttributeDataType f1Type;
-        string f2Name;
+        std::string f2Name;
         unsigned int f2Idx;
         RSGISAttributeDataType f2Type;
     };
@@ -325,7 +315,7 @@ namespace rsgis{namespace rastergis{
     class RSGISAttExpressionFieldAndValue : public RSGISAttExpression
     {
     public:
-        RSGISAttExpressionFieldAndValue(string fName, unsigned int fIdx, RSGISAttributeDataType fType, float value):RSGISAttExpression()
+        RSGISAttExpressionFieldAndValue(std::string fName, unsigned int fIdx, RSGISAttributeDataType fType, float value):RSGISAttExpression()
         {
             this->fName = fName;
             this->fIdx = fIdx;
@@ -354,7 +344,7 @@ namespace rsgis{namespace rastergis{
             
         };
     protected:
-        string fName;
+        std::string fName;
         unsigned int fIdx;
         RSGISAttributeDataType fType;
         float value;
@@ -363,7 +353,7 @@ namespace rsgis{namespace rastergis{
     class RSGISAttExpressionAND : public RSGISAttExpression
     {
     public:
-        RSGISAttExpressionAND(vector<RSGISAttExpression*> *exps):RSGISAttExpression()
+        RSGISAttExpressionAND(std::vector<RSGISAttExpression*> *exps):RSGISAttExpression()
         {
             this->exps = exps;
         };
@@ -372,7 +362,7 @@ namespace rsgis{namespace rastergis{
             bool outVal = true;
             try
             {
-                for(vector<RSGISAttExpression*>::iterator iterExp = exps->begin(); iterExp != exps->end(); ++iterExp)
+                for(std::vector<RSGISAttExpression*>::iterator iterExp = exps->begin(); iterExp != exps->end(); ++iterExp)
                 {
                     if(!(*iterExp)->evaluate(feat))
                     {
@@ -392,7 +382,7 @@ namespace rsgis{namespace rastergis{
         {
             try
             {
-                for(vector<RSGISAttExpression*>::iterator iterExp = exps->begin(); iterExp != exps->end(); ++iterExp)
+                for(std::vector<RSGISAttExpression*>::iterator iterExp = exps->begin(); iterExp != exps->end(); ++iterExp)
                 {
                     (*iterExp)->popIdxs(att);
                 }
@@ -406,7 +396,7 @@ namespace rsgis{namespace rastergis{
         {
             if(exps != NULL)
             {
-                for(vector<RSGISAttExpression*>::iterator iterExp = exps->begin(); iterExp != exps->end(); ++iterExp)
+                for(std::vector<RSGISAttExpression*>::iterator iterExp = exps->begin(); iterExp != exps->end(); ++iterExp)
                 {
                     delete *iterExp;
                 }
@@ -414,13 +404,13 @@ namespace rsgis{namespace rastergis{
             }
         };
     private:
-        vector<RSGISAttExpression*> *exps;
+        std::vector<RSGISAttExpression*> *exps;
     };
     
     class RSGISAttExpressionOR : public RSGISAttExpression
     {
     public:
-        RSGISAttExpressionOR(vector<RSGISAttExpression*> *exps):RSGISAttExpression()
+        RSGISAttExpressionOR(std::vector<RSGISAttExpression*> *exps):RSGISAttExpression()
         {
             this->exps = exps;
         };
@@ -429,7 +419,7 @@ namespace rsgis{namespace rastergis{
             bool outVal = false;
             try
             {
-                for(vector<RSGISAttExpression*>::iterator iterExp = exps->begin(); iterExp != exps->end(); ++iterExp)
+                for(std::vector<RSGISAttExpression*>::iterator iterExp = exps->begin(); iterExp != exps->end(); ++iterExp)
                 {
                     if((*iterExp)->evaluate(feat))
                     {
@@ -448,7 +438,7 @@ namespace rsgis{namespace rastergis{
         {
             try
             {
-                for(vector<RSGISAttExpression*>::iterator iterExp = exps->begin(); iterExp != exps->end(); ++iterExp)
+                for(std::vector<RSGISAttExpression*>::iterator iterExp = exps->begin(); iterExp != exps->end(); ++iterExp)
                 {
                     (*iterExp)->popIdxs(att);
                 }
@@ -462,7 +452,7 @@ namespace rsgis{namespace rastergis{
         {
             if(exps != NULL)
             {
-                for(vector<RSGISAttExpression*>::iterator iterExp = exps->begin(); iterExp != exps->end(); ++iterExp)
+                for(std::vector<RSGISAttExpression*>::iterator iterExp = exps->begin(); iterExp != exps->end(); ++iterExp)
                 {
                     delete *iterExp;
                 }
@@ -470,7 +460,7 @@ namespace rsgis{namespace rastergis{
             }
         };
     private:
-        vector<RSGISAttExpression*> *exps;
+        std::vector<RSGISAttExpression*> *exps;
     };
     
     class RSGISAttExpressionNot : public RSGISAttExpression
@@ -517,7 +507,7 @@ namespace rsgis{namespace rastergis{
     class RSGISAttExpressionBoolField : public RSGISAttExpression
     {
     public:
-        RSGISAttExpressionBoolField(string fName, unsigned int fIdx, RSGISAttributeDataType fType):RSGISAttExpression()
+        RSGISAttExpressionBoolField(std::string fName, unsigned int fIdx, RSGISAttributeDataType fType):RSGISAttExpression()
         {
             this->fName = fName;
             this->fIdx = fIdx;
@@ -549,7 +539,7 @@ namespace rsgis{namespace rastergis{
             
         };
     protected:
-        string fName;
+        std::string fName;
         unsigned int fIdx;
         RSGISAttributeDataType fType;
     };
@@ -557,7 +547,7 @@ namespace rsgis{namespace rastergis{
     class RSGISAttExpressionNotBoolField : public RSGISAttExpression
     {
     public:
-        RSGISAttExpressionNotBoolField(string fName, unsigned int fIdx, RSGISAttributeDataType fType):RSGISAttExpression()
+        RSGISAttExpressionNotBoolField(std::string fName, unsigned int fIdx, RSGISAttributeDataType fType):RSGISAttExpression()
         {
             this->fName = fName;
             this->fIdx = fIdx;
@@ -589,7 +579,7 @@ namespace rsgis{namespace rastergis{
             
         };
     protected:
-        string fName;
+        std::string fName;
         unsigned int fIdx;
         RSGISAttributeDataType fType;
     };
@@ -598,7 +588,7 @@ namespace rsgis{namespace rastergis{
     class RSGISAttExpressionGreaterThan : public RSGISAttExpression2Fields 
     {
     public:
-        RSGISAttExpressionGreaterThan(string f1Name, unsigned int f1Idx, RSGISAttributeDataType f1Type, string f2Name, unsigned int f2Idx, RSGISAttributeDataType f2Type):RSGISAttExpression2Fields(f1Name, f1Idx, f1Type, f2Name, f2Idx, f2Type)
+        RSGISAttExpressionGreaterThan(std::string f1Name, unsigned int f1Idx, RSGISAttributeDataType f1Type, std::string f2Name, unsigned int f2Idx, RSGISAttributeDataType f2Type):RSGISAttExpression2Fields(f1Name, f1Idx, f1Type, f2Name, f2Idx, f2Type)
         {
             
         };
@@ -649,7 +639,7 @@ namespace rsgis{namespace rastergis{
     class RSGISAttExpressionLessThan : public RSGISAttExpression2Fields
     {
     public:
-        RSGISAttExpressionLessThan(string f1Name, unsigned int f1Idx, RSGISAttributeDataType f1Type, string f2Name, unsigned int f2Idx, RSGISAttributeDataType f2Type):RSGISAttExpression2Fields(f1Name, f1Idx, f1Type, f2Name, f2Idx, f2Type)
+        RSGISAttExpressionLessThan(std::string f1Name, unsigned int f1Idx, RSGISAttributeDataType f1Type, std::string f2Name, unsigned int f2Idx, RSGISAttributeDataType f2Type):RSGISAttExpression2Fields(f1Name, f1Idx, f1Type, f2Name, f2Idx, f2Type)
         {
             
         };
@@ -699,7 +689,7 @@ namespace rsgis{namespace rastergis{
     class RSGISAttExpressionGreaterThanEq : public RSGISAttExpression2Fields
     {
     public:
-        RSGISAttExpressionGreaterThanEq(string f1Name, unsigned int f1Idx, RSGISAttributeDataType f1Type, string f2Name, unsigned int f2Idx, RSGISAttributeDataType f2Type):RSGISAttExpression2Fields(f1Name, f1Idx, f1Type, f2Name, f2Idx, f2Type)
+        RSGISAttExpressionGreaterThanEq(std::string f1Name, unsigned int f1Idx, RSGISAttributeDataType f1Type, std::string f2Name, unsigned int f2Idx, RSGISAttributeDataType f2Type):RSGISAttExpression2Fields(f1Name, f1Idx, f1Type, f2Name, f2Idx, f2Type)
         {
             
         };
@@ -749,7 +739,7 @@ namespace rsgis{namespace rastergis{
     class RSGISAttExpressionLessThanEq : public RSGISAttExpression2Fields
     {
     public:
-        RSGISAttExpressionLessThanEq(string f1Name, unsigned int f1Idx, RSGISAttributeDataType f1Type, string f2Name, unsigned int f2Idx, RSGISAttributeDataType f2Type):RSGISAttExpression2Fields(f1Name, f1Idx, f1Type, f2Name, f2Idx, f2Type)
+        RSGISAttExpressionLessThanEq(std::string f1Name, unsigned int f1Idx, RSGISAttributeDataType f1Type, std::string f2Name, unsigned int f2Idx, RSGISAttributeDataType f2Type):RSGISAttExpression2Fields(f1Name, f1Idx, f1Type, f2Name, f2Idx, f2Type)
         {
             
         };
@@ -799,7 +789,7 @@ namespace rsgis{namespace rastergis{
     class RSGISAttExpressionEquals : public RSGISAttExpression2Fields
     {
     public:
-        RSGISAttExpressionEquals(string f1Name, unsigned int f1Idx, RSGISAttributeDataType f1Type, string f2Name, unsigned int f2Idx, RSGISAttributeDataType f2Type):RSGISAttExpression2Fields(f1Name, f1Idx, f1Type, f2Name, f2Idx, f2Type)
+        RSGISAttExpressionEquals(std::string f1Name, unsigned int f1Idx, RSGISAttributeDataType f1Type, std::string f2Name, unsigned int f2Idx, RSGISAttributeDataType f2Type):RSGISAttExpression2Fields(f1Name, f1Idx, f1Type, f2Name, f2Idx, f2Type)
         {
             
         };
@@ -849,7 +839,7 @@ namespace rsgis{namespace rastergis{
     class RSGISAttExpressionNotEquals : public RSGISAttExpression2Fields
     {
     public:
-        RSGISAttExpressionNotEquals(string f1Name, unsigned int f1Idx, RSGISAttributeDataType f1Type, string f2Name, unsigned int f2Idx, RSGISAttributeDataType f2Type):RSGISAttExpression2Fields(f1Name, f1Idx, f1Type, f2Name, f2Idx, f2Type)
+        RSGISAttExpressionNotEquals(std::string f1Name, unsigned int f1Idx, RSGISAttributeDataType f1Type, std::string f2Name, unsigned int f2Idx, RSGISAttributeDataType f2Type):RSGISAttExpression2Fields(f1Name, f1Idx, f1Type, f2Name, f2Idx, f2Type)
         {
             
         };
@@ -901,7 +891,7 @@ namespace rsgis{namespace rastergis{
     class RSGISAttExpressionGreaterThanConst : public RSGISAttExpressionFieldAndValue
     {
     public:
-        RSGISAttExpressionGreaterThanConst(string fName, unsigned int fIdx, RSGISAttributeDataType fType, float value):RSGISAttExpressionFieldAndValue(fName, fIdx, fType, value)
+        RSGISAttExpressionGreaterThanConst(std::string fName, unsigned int fIdx, RSGISAttributeDataType fType, float value):RSGISAttExpressionFieldAndValue(fName, fIdx, fType, value)
         {
             
         };
@@ -937,7 +927,7 @@ namespace rsgis{namespace rastergis{
     class RSGISAttExpressionLessThanConst : public RSGISAttExpressionFieldAndValue
     {
     public:
-        RSGISAttExpressionLessThanConst(string fName, unsigned int fIdx, RSGISAttributeDataType fType, float value):RSGISAttExpressionFieldAndValue(fName, fIdx, fType, value)
+        RSGISAttExpressionLessThanConst(std::string fName, unsigned int fIdx, RSGISAttributeDataType fType, float value):RSGISAttExpressionFieldAndValue(fName, fIdx, fType, value)
         {
             
         };
@@ -973,7 +963,7 @@ namespace rsgis{namespace rastergis{
     class RSGISAttExpressionGreaterThanConstEq : public RSGISAttExpressionFieldAndValue
     {
     public:
-        RSGISAttExpressionGreaterThanConstEq(string fName, unsigned int fIdx, RSGISAttributeDataType fType, float value):RSGISAttExpressionFieldAndValue(fName, fIdx, fType, value)
+        RSGISAttExpressionGreaterThanConstEq(std::string fName, unsigned int fIdx, RSGISAttributeDataType fType, float value):RSGISAttExpressionFieldAndValue(fName, fIdx, fType, value)
         {
             
         };
@@ -1009,7 +999,7 @@ namespace rsgis{namespace rastergis{
     class RSGISAttExpressionLessThanConstEq : public RSGISAttExpressionFieldAndValue
     {
     public:
-        RSGISAttExpressionLessThanConstEq(string fName, unsigned int fIdx, RSGISAttributeDataType fType, float value):RSGISAttExpressionFieldAndValue(fName, fIdx, fType, value)
+        RSGISAttExpressionLessThanConstEq(std::string fName, unsigned int fIdx, RSGISAttributeDataType fType, float value):RSGISAttExpressionFieldAndValue(fName, fIdx, fType, value)
         {
             
         };
@@ -1045,7 +1035,7 @@ namespace rsgis{namespace rastergis{
     class RSGISAttExpressionEqualsConst : public RSGISAttExpressionFieldAndValue
     {
     public:
-        RSGISAttExpressionEqualsConst(string fName, unsigned int fIdx, RSGISAttributeDataType fType, float value):RSGISAttExpressionFieldAndValue(fName, fIdx, fType, value)
+        RSGISAttExpressionEqualsConst(std::string fName, unsigned int fIdx, RSGISAttributeDataType fType, float value):RSGISAttExpressionFieldAndValue(fName, fIdx, fType, value)
         {
             
         };
@@ -1081,7 +1071,7 @@ namespace rsgis{namespace rastergis{
     class RSGISAttExpressionNotEqualsConst : public RSGISAttExpressionFieldAndValue
     {
     public:
-        RSGISAttExpressionNotEqualsConst(string fName, unsigned int fIdx, RSGISAttributeDataType fType, float value):RSGISAttExpressionFieldAndValue(fName, fIdx, fType, value)
+        RSGISAttExpressionNotEqualsConst(std::string fName, unsigned int fIdx, RSGISAttributeDataType fType, float value):RSGISAttExpressionFieldAndValue(fName, fIdx, fType, value)
         {
             
         };
@@ -1119,7 +1109,7 @@ namespace rsgis{namespace rastergis{
     class RSGISAttExpressionConstGreaterThan : public RSGISAttExpressionFieldAndValue
     {
     public:
-        RSGISAttExpressionConstGreaterThan(string fName, unsigned int fIdx, RSGISAttributeDataType fType, float value):RSGISAttExpressionFieldAndValue(fName, fIdx, fType, value)
+        RSGISAttExpressionConstGreaterThan(std::string fName, unsigned int fIdx, RSGISAttributeDataType fType, float value):RSGISAttExpressionFieldAndValue(fName, fIdx, fType, value)
         {
             
         };
@@ -1155,7 +1145,7 @@ namespace rsgis{namespace rastergis{
     class RSGISAttExpressionConstLessThan : public RSGISAttExpressionFieldAndValue
     {
     public:
-        RSGISAttExpressionConstLessThan(string fName, unsigned int fIdx, RSGISAttributeDataType fType, float value):RSGISAttExpressionFieldAndValue(fName, fIdx, fType, value)
+        RSGISAttExpressionConstLessThan(std::string fName, unsigned int fIdx, RSGISAttributeDataType fType, float value):RSGISAttExpressionFieldAndValue(fName, fIdx, fType, value)
         {
             
         };
@@ -1191,7 +1181,7 @@ namespace rsgis{namespace rastergis{
     class RSGISAttExpressionConstGreaterThanEq : public RSGISAttExpressionFieldAndValue
     {
     public:
-        RSGISAttExpressionConstGreaterThanEq(string fName, unsigned int fIdx, RSGISAttributeDataType fType, float value):RSGISAttExpressionFieldAndValue(fName, fIdx, fType, value)
+        RSGISAttExpressionConstGreaterThanEq(std::string fName, unsigned int fIdx, RSGISAttributeDataType fType, float value):RSGISAttExpressionFieldAndValue(fName, fIdx, fType, value)
         {
             
         };
@@ -1227,7 +1217,7 @@ namespace rsgis{namespace rastergis{
     class RSGISAttExpressionConstLessThanEq : public RSGISAttExpressionFieldAndValue
     {
     public:
-        RSGISAttExpressionConstLessThanEq(string fName, unsigned int fIdx, RSGISAttributeDataType fType, float value):RSGISAttExpressionFieldAndValue(fName, fIdx, fType, value)
+        RSGISAttExpressionConstLessThanEq(std::string fName, unsigned int fIdx, RSGISAttributeDataType fType, float value):RSGISAttExpressionFieldAndValue(fName, fIdx, fType, value)
         {
             
         };

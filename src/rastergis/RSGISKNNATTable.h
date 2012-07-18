@@ -47,22 +47,18 @@
 
 namespace rsgis{namespace rastergis{
     
-    using namespace std;
-    using namespace rsgis;
-    using namespace rsgis::math;
-    
     class RSGISKNNATTable
     {
     public:
         RSGISKNNATTable();
-        void initKNN(RSGISAttributeTable *attTable, string trainField, string classField, bool limitToClass, int classVal, unsigned int k, float distThreshold, rsgisdistmetrics distMetric, vector<string> *attributeNames)throw(RSGISAttributeTableException);
+        void initKNN(RSGISAttributeTable *attTable, string trainField, string classField, bool limitToClass, int classVal, unsigned int k, float distThreshold, rsgis::math::rsgisdistmetrics distMetric, std::vector<string> *attributeNames)throw(RSGISAttributeTableException);
         virtual void performKNN()throw(RSGISAttributeTableException)=0;
         virtual ~RSGISKNNATTable();
     protected:
-        double calcDist(rsgisdistmetrics distMetric, vector<double> *vals1, vector<double> *vals2) throw(RSGISMathException);
-        Vector* calcVariableMeans() throw(RSGISMathException);
-        Matrix* calcCovarianceMatrix(Vector *attMeans) throw(RSGISMathException);
-        double calcCovariance(RSGISAttribute *a, RSGISAttribute *b, double aMean, double bMean) throw(RSGISMathException);
+        double calcDist(rsgis::math::rsgisdistmetrics distMetric, std::vector<double> *vals1, std::vector<double> *vals2) throw(rsgis::math::RSGISMathException);
+        rsgis::math::Vector* calcVariableMeans() throw(rsgis::math::RSGISMathException);
+        rsgis::math::Matrix* calcCovarianceMatrix(rsgis::math::Vector *attMeans) throw(rsgis::math::RSGISMathException);
+        double calcCovariance(RSGISAttribute *a, RSGISAttribute *b, double aMean, double bMean) throw(rsgis::math::RSGISMathException);
         bool initialised;
         RSGISAttributeTable *attTable;
         string trainField;
@@ -75,9 +71,9 @@ namespace rsgis{namespace rastergis{
         RSGISAttributeDataType classFieldDT;
         unsigned int k;
         float distThreshold;
-        rsgisdistmetrics distMetric;
-        vector<RSGISAttribute*> attributes;
-        vector< vector<double>* > *knownData;
+        rsgis::math::rsgisdistmetrics distMetric;
+        std::vector<RSGISAttribute*> attributes;
+        std::vector< std::vector<double>* > *knownData;
         bool mahDistInit;
         gsl_matrix *invCovarianceMatrix;
         gsl_vector *dVals;
@@ -92,7 +88,7 @@ namespace rsgis{namespace rastergis{
         void performKNN()throw(RSGISAttributeTableException);
         ~RSGISKNNATTableExtrapolation();
     protected:
-        double calcNewVal(unsigned int k, float distThreshold, rsgisdistmetrics distMetric, vector<double> *knownVals, vector< vector<double>* > *knownData, vector<double> *unknownData) throw(RSGISMathException);
+        double calcNewVal(unsigned int k, float distThreshold, rsgis::math::rsgisdistmetrics distMetric, std::vector<double> *knownVals, std::vector< std::vector<double>* > *knownData, std::vector<double> *unknownData) throw(rsgis::math::RSGISMathException);
         string valField;
         unsigned int valFieldIdx;
         RSGISAttributeDataType valFieldDT;

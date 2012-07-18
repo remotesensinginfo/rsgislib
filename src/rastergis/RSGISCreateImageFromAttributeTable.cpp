@@ -31,10 +31,10 @@ namespace rsgis{namespace rastergis{
         
     }
         
-    void RSGISCreateImageFromAttributeTable::createImageFromAttTable(GDALDataset *clumpsDataset, string outputImage, RSGISAttributeTable *attTable, vector<pair<unsigned int, string> > *bands, string outImageFormat)throw(RSGISImageCalcException, RSGISAttributeTableException)
+    void RSGISCreateImageFromAttributeTable::createImageFromAttTable(GDALDataset *clumpsDataset, std::string outputImage, RSGISAttributeTable *attTable, std::vector<std::pair<unsigned int, std::string> > *bands, std::string outImageFormat)throw(rsgis::img::RSGISImageCalcException, RSGISAttributeTableException)
     {
-        pair<RSGISAttributeDataType, unsigned int> *attBands = new pair<RSGISAttributeDataType, unsigned int>[bands->size()];
-        string *outputNames = new string[bands->size()];
+        std::pair<RSGISAttributeDataType, unsigned int> *attBands = new std::pair<RSGISAttributeDataType, unsigned int>[bands->size()];
+        std::string *outputNames = new std::string[bands->size()];
         for(unsigned int i = 0; i < bands->size(); ++i)
         {
             outputNames[i] = bands->at(i).second;
@@ -45,7 +45,7 @@ namespace rsgis{namespace rastergis{
         GDALDataset **datasets = new GDALDataset*[1];
         datasets[0] = clumpsDataset;
         RSGISCreateImageFromAttributeTableCalcImg *popImgBands = new RSGISCreateImageFromAttributeTableCalcImg(bands->size(), attTable, attBands);
-        RSGISCalcImage calcImage(popImgBands);
+        rsgis::img::RSGISCalcImage calcImage(popImgBands);
         calcImage.calcImage(datasets, 1, outputImage, true, outputNames, outImageFormat);
         delete popImgBands;
 
@@ -62,13 +62,13 @@ namespace rsgis{namespace rastergis{
     
     
     
-    RSGISCreateImageFromAttributeTableCalcImg::RSGISCreateImageFromAttributeTableCalcImg(int numberOutBands, RSGISAttributeTable *attTable, pair<RSGISAttributeDataType, unsigned int> *attBands): RSGISCalcImageValue(numberOutBands)
+    RSGISCreateImageFromAttributeTableCalcImg::RSGISCreateImageFromAttributeTableCalcImg(int numberOutBands, RSGISAttributeTable *attTable, std::pair<RSGISAttributeDataType, unsigned int> *attBands): RSGISCalcImageValue(numberOutBands)
     {
         this->attTable = attTable;
         this->attBands = attBands;
     }
     
-    void RSGISCreateImageFromAttributeTableCalcImg::calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException)
+    void RSGISCreateImageFromAttributeTableCalcImg::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
     {
         unsigned long clumpIdx = 0;
         
@@ -79,11 +79,11 @@ namespace rsgis{namespace rastergis{
         
         try
         {
-            clumpIdx = lexical_cast<unsigned long>(bandValues[0]);
+            clumpIdx = boost::lexical_cast<unsigned long>(bandValues[0]);
         }
-        catch(bad_lexical_cast &e)
+        catch(boost::bad_lexical_cast &e)
         {
-            throw RSGISImageCalcException(e.what());
+            throw rsgis::img::RSGISImageCalcException(e.what());
         }
         
         if(clumpIdx > 0)
@@ -110,7 +110,7 @@ namespace rsgis{namespace rastergis{
                     }
                     else
                     {
-                        throw RSGISImageCalcException("Data type is either not recognised or cannot be written to an image.");
+                        throw rsgis::img::RSGISImageCalcException("Data type is either not recognised or cannot be written to an image.");
                     }
                     
                 }
@@ -119,9 +119,9 @@ namespace rsgis{namespace rastergis{
             catch(RSGISAttributeTableException &e)
             {
                 cout << "clumpIdx = " << clumpIdx << endl;
-                throw RSGISImageCalcException(e.what());
+                throw rsgis::img::RSGISImageCalcException(e.what());
             }
-            catch(RSGISImageCalcException &e)
+            catch(rsgis::img::RSGISImageCalcException &e)
             {
                 cout << "clumpIdx = " << clumpIdx << endl;
                 throw e;

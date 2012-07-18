@@ -37,9 +37,6 @@
 
 namespace rsgis{namespace rastergis{
     
-    using namespace std;
-    using namespace rsgis;
-    
     struct RSGISSubClumps
     {
         double area;
@@ -51,14 +48,14 @@ namespace rsgis{namespace rastergis{
         unsigned int minPxlY;
         unsigned int maxPxlX;
         unsigned int maxPxlY;
-        list<unsigned int> subclumps;
+        std::list<unsigned int> subclumps;
     };
     
     class RSGISHierarchicalClumps
     {
     public:
         RSGISHierarchicalClumps();
-        vector<RSGISSubClumps*>* findSubClumps(GDALDataset *catagories, GDALDataset *clumps, bool noDataValProvided, unsigned int noDataVal) throw(RSGISImageException);
+        std::vector<RSGISSubClumps*>* findSubClumps(GDALDataset *catagories, GDALDataset *clumps, bool noDataValProvided, unsigned int noDataVal) throw(RSGISImageException);
         ~RSGISHierarchicalClumps();
     };
     

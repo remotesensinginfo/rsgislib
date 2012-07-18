@@ -31,7 +31,7 @@ namespace rsgis{namespace rastergis{
         this->mahDistInit = false;
     }
         
-    void RSGISKNNATTable::initKNN(RSGISAttributeTable *attTable, string trainField, string classField, bool limitToClass, int classVal, unsigned int k, float distThreshold, rsgisdistmetrics distMetric, vector<string> *attributeNames)throw(RSGISAttributeTableException)
+    void RSGISKNNATTable::initKNN(RSGISAttributeTable *attTable, std::string trainField, std::string classField, bool limitToClass, int classVal, unsigned int k, float distThreshold, rsgis::math::rsgisdistmetrics distMetric, std::vector<std::string> *attributeNames)throw(RSGISAttributeTableException)
     {
         try
         {
@@ -63,23 +63,23 @@ namespace rsgis{namespace rastergis{
             
             if(!this->attTable->hasAttribute(this->trainField))
             {
-                string message = string("The field specified for training \'") + this->trainField + string("\' does not exist.");
+                std::string message = std::string("The field specified for training \'") + this->trainField + std::string("\' does not exist.");
                 throw RSGISAttributeTableException(message);
             }
             else if(this->attTable->getDataType(this->trainField) != rsgis_bool)
             {
-                string message = string("Cannot proceed as \'") + trainField + string("\' field is not of type boolean.");
+                std::string message = std::string("Cannot proceed as \'") + trainField + std::string("\' field is not of type boolean.");
                 throw RSGISAttributeTableException(message);
             }
             this->trainFieldIdx = this->attTable->getFieldIndex(this->trainField);
-            cout << "Training field index = " << this->trainFieldIdx << endl;
+            std::cout << "Training field index = " << this->trainFieldIdx << std::endl;
             
             RSGISAttribute *attribute = NULL;
-            for(vector<string>::iterator iterNames = attributeNames->begin(); iterNames != attributeNames->end(); ++iterNames)
+            for(std::vector<std::string>::iterator iterNames = attributeNames->begin(); iterNames != attributeNames->end(); ++iterNames)
             {
                 if(!this->attTable->hasAttribute(*iterNames))
                 {
-                    string message = string("The field \'") + *iterNames + string("\' does not exist.");
+                    std::string message = std::string("The field \'") + *iterNames + std::string("\' does not exist.");
                     throw RSGISAttributeTableException(message);
                 }
                 else if(this->attTable->getDataType(*iterNames) == rsgis_float)
@@ -100,34 +100,34 @@ namespace rsgis{namespace rastergis{
                 }
                 else
                 {
-                    string message = string("The data type for \'") + *iterNames + string("\' is not float or int.");
+                    std::string message = std::string("The data type for \'") + *iterNames + std::string("\' is not float or int.");
                     throw RSGISAttributeTableException(message);
                 }
             }
             
-            cout << "All fields has present and checked\n";
+            std::cout << "All fields has present and checked\n";
             
             // Build training data.
-            cout << "Get training data\n";
-            knownData = new vector< vector<double>* >();
+            std::cout << "Get training data\n";
+            knownData = new std::vector< std::vector<double>* >();
             
             unsigned int idx = 0;
             unsigned int rowCount = 0;
             unsigned long feedback = attTable->getSize()/10;
             int feedbackCounter = 0;
-            cout << "Started" << flush;
+            std::cout << "Started" << flush;
             for(this->attTable->start(); this->attTable->end(); ++(*this->attTable))
             {
                 if((rowCount % feedback) == 0)
                 {
-                    cout << "." << feedbackCounter << "." << flush;
+                    std::cout << "." << feedbackCounter << "." << flush;
                     feedbackCounter = feedbackCounter + 10;
                 }
                 if((*(*this->attTable))->boolFields->at(this->trainFieldIdx))
                 {
-                    knownData->push_back(new vector<double>());
+                    knownData->push_back(new std::vector<double>());
                     knownData->at(idx)->reserve(attributes.size());
-                    for(vector<RSGISAttribute*>::iterator iterAtt = attributes.begin(); iterAtt != attributes.end(); ++iterAtt)
+                    for(std::vector<RSGISAttribute*>::iterator iterAtt = attributes.begin(); iterAtt != attributes.end(); ++iterAtt)
                     {
                         if((*iterAtt)->dataType == rsgis_float)
                         {
@@ -142,15 +142,15 @@ namespace rsgis{namespace rastergis{
                 }
                 ++rowCount;
             }
-            cout << " Complete.\n";
+            std::cout << " Complete.\n";
             
-            if(this->distMetric == rsgis_mahalanobis)
+            if(this->distMetric == rsgis::math::rsgis_mahalanobis)
             {
-                cout << "Initilising Covariance Matrix for Mahalanobis distance - may take a little while\n";
-                RSGISVectors vecUtils;
-                RSGISMatrices matrixUtils;
-                Vector *varMeans = this->calcVariableMeans();
-                Matrix *covarianceMatrix = this->calcCovarianceMatrix(varMeans);
+                std::cout << "Initilising Covariance Matrix for Mahalanobis distance - may take a little while\n";
+                rsgis::math::RSGISVectors vecUtils;
+                rsgis::math::RSGISMatrices matrixUtils;
+                rsgis::math::Vector *varMeans = this->calcVariableMeans();
+                rsgis::math::Matrix *covarianceMatrix = this->calcCovarianceMatrix(varMeans);
                 
                 size_t numVals = covarianceMatrix->m;
                 
@@ -165,12 +165,12 @@ namespace rsgis{namespace rastergis{
                 gsl_permutation_free(p);
                 gsl_matrix_free(coVarGSL);
                 
-                //cout << "signum = " << signum << endl;
+                //std::cout << "signum = " << signum << std::endl;
                 
                 vecUtils.freeVector(varMeans);
                 matrixUtils.freeMatrix(covarianceMatrix);
                 
-                cout << "Inverse Covariance Matrix:\n";
+                std::cout << "Inverse Covariance Matrix:\n";
                 matrixUtils.printGSLMatrix(this->invCovarianceMatrix);
                 
                 dVals = gsl_vector_alloc(numVals);
@@ -183,7 +183,7 @@ namespace rsgis{namespace rastergis{
         {
             throw e;
         }
-        catch(RSGISMathException &e)
+        catch(rsgis::math::RSGISMathException &e)
         {
             throw RSGISAttributeTableException(e.what());
         }
@@ -195,17 +195,17 @@ namespace rsgis{namespace rastergis{
         this->initialised = true;
     }
     
-    double RSGISKNNATTable::calcDist(rsgisdistmetrics distMetric, vector<double> *vals1, vector<double> *vals2) throw(RSGISMathException)
+    double RSGISKNNATTable::calcDist(rsgis::math::rsgisdistmetrics distMetric, std::vector<double> *vals1, std::vector<double> *vals2) throw(rsgis::math::RSGISMathException)
     {
         double dist = numeric_limits<double>::signaling_NaN();
         try 
         {
             if(vals1->size() != vals2->size())
             {
-                throw RSGISMathException("Known data and value arrays need to be of the same length.");
+                throw rsgis::math::RSGISMathException("Known data and value arrays need to be of the same length.");
             }
             
-            if(distMetric == rsgis_euclidean)
+            if(distMetric == rsgis::math::rsgis_euclidean)
             {
                 double sum = 0;
                 size_t numVals = vals1->size();
@@ -215,7 +215,7 @@ namespace rsgis{namespace rastergis{
                 }
                 dist = sqrt(sum/((double)numVals));
             }
-            else if(distMetric == rsgis_manhatten)
+            else if(distMetric == rsgis::math::rsgis_manhatten)
             {
                 double sum = 0;
                 size_t numVals = vals1->size();
@@ -225,30 +225,30 @@ namespace rsgis{namespace rastergis{
                 }
                 dist = sum/((double)numVals);
             }
-            else if(distMetric == rsgis_mahalanobis)
+            else if(distMetric == rsgis::math::rsgis_mahalanobis)
             {
                 if(this->mahDistInit)
                 {
-                    //throw RSGISMathException("Mahalanobis distance metric is currently not implemented...");
+                    //throw rsgis::math::RSGISMathException("Mahalanobis distance metric is currently not implemented...");
                     
                     
-                    //RSGISVectors vecUtils;
+                    //rsgis::math::RSGISVectors vecUtils;
                     size_t numVals = vals1->size();
                     
-                    //gsl_vector *dVals = gsl_vector_alloc(numVals);
+                    //gsl_rsgis::math::Vector *dVals = gsl_vector_alloc(numVals);
                     
                     for(size_t i = 0; i < numVals; ++i)
                     {
                         gsl_vector_set(dVals, i, (vals1->at(i) - vals2->at(i)));
                     }
-                    //cout << "\nVector D:\n";
+                    //std::cout << "\nVector D:\n";
                     //vecUtils.printGSLVector(dVals);
                     
-                    //gsl_vector *outVec = gsl_vector_alloc(numVals);
+                    //gsl_rsgis::math::Vector *outVec = gsl_vector_alloc(numVals);
                     
                     gsl_blas_dgemv(CblasNoTrans, 1.0, this->invCovarianceMatrix, dVals, 0.0, outVec );
                     
-                    //cout << "Mah Out Vec:\n";
+                    //std::cout << "Mah Out Vec:\n";
                     //vecUtils.printGSLVector(outVec);
                     
                     dist = 0;
@@ -259,7 +259,7 @@ namespace rsgis{namespace rastergis{
                     
                     dist = sqrt(dist);
                     
-                    //cout << "mah dist = " << dist << endl;
+                    //std::cout << "mah dist = " << dist << std::endl;
                     
                     //gsl_vector_free(dVals);
                     //gsl_vector_free(outVec);
@@ -267,15 +267,15 @@ namespace rsgis{namespace rastergis{
                 }
                 else
                 {
-                    throw RSGISMathException("Mahalanobis distance metric is not initilised...");
+                    throw rsgis::math::RSGISMathException("Mahalanobis distance metric is not initilised...");
                 }
             }
             else 
             {
-                throw RSGISMathException("Distance metric is unknown.");
+                throw rsgis::math::RSGISMathException("Distance metric is unknown.");
             }
         }
-        catch (RSGISMathException &e)
+        catch (rsgis::math::RSGISMathException &e)
         {
             throw e;
         }
@@ -283,16 +283,16 @@ namespace rsgis{namespace rastergis{
         return dist;
     }
 
-    Vector* RSGISKNNATTable::calcVariableMeans() throw(RSGISMathException)
+    rsgis::math::Vector* RSGISKNNATTable::calcVariableMeans() throw(rsgis::math::RSGISMathException)
     {
-        RSGISVectors vecUtils;
-        Vector *means = vecUtils.createVector(this->attributes.size());
+        rsgis::math::RSGISVectors vecUtils;
+        rsgis::math::Vector *means = vecUtils.createVector(this->attributes.size());
         
         unsigned int idx = 0;
         for(this->attTable->start(); this->attTable->end(); ++(*this->attTable))
         {
             idx = 0;
-            for(vector<RSGISAttribute*>::iterator iterAtt = attributes.begin(); iterAtt != attributes.end(); ++iterAtt)
+            for(std::vector<RSGISAttribute*>::iterator iterAtt = attributes.begin(); iterAtt != attributes.end(); ++iterAtt)
             {
                 if((*iterAtt)->dataType == rsgis_float)
                 {
@@ -311,16 +311,16 @@ namespace rsgis{namespace rastergis{
             means->vector[i] = means->vector[i] / ((double)this->attTable->getSize());
         }
         
-        cout << "Mean Vector:\n";
+        std::cout << "Mean Vector:\n";
         vecUtils.printVector(means);
         
         return means;
     }
     
-    Matrix* RSGISKNNATTable::calcCovarianceMatrix(Vector *attMeans) throw(RSGISMathException)
+    rsgis::math::Matrix* RSGISKNNATTable::calcCovarianceMatrix(rsgis::math::Vector *attMeans) throw(rsgis::math::RSGISMathException)
     {
-        RSGISMatrices matrixUtils;
-        Matrix *covarMatrix = matrixUtils.createMatrix(this->attributes.size(), this->attributes.size());
+        rsgis::math::RSGISMatrices matrixUtils;
+        rsgis::math::Matrix *covarMatrix = matrixUtils.createMatrix(this->attributes.size(), this->attributes.size());
         
         for(size_t i = 0; i < covarMatrix->n; ++i)
         {
@@ -330,20 +330,20 @@ namespace rsgis{namespace rastergis{
             }
         }
         
-        cout << "Covariance Matrix:\n";
+        std::cout << "Covariance Matrix:\n";
         matrixUtils.printMatrix(covarMatrix);
         
         return covarMatrix;
     }
     
-    double RSGISKNNATTable::calcCovariance(RSGISAttribute *a, RSGISAttribute *b, double aMean, double bMean) throw(RSGISMathException)
+    double RSGISKNNATTable::calcCovariance(RSGISAttribute *a, RSGISAttribute *b, double aMean, double bMean) throw(rsgis::math::RSGISMathException)
     {
         double covar = 0;
         double valA = 0;
         double valB = 0;
         
-        //cout << "a = " << a->name << " - " << a->idx << " MEAN = " << aMean << endl;
-        //cout << "b = " << b->name << " - " << b->idx << " MEAN = " << bMean << endl;
+        //std::cout << "a = " << a->name << " - " << a->idx << " MEAN = " << aMean << std::endl;
+        //std::cout << "b = " << b->name << " - " << b->idx << " MEAN = " << bMean << std::endl;
         
         for(this->attTable->start(); this->attTable->end(); ++(*this->attTable))
         {
@@ -373,7 +373,7 @@ namespace rsgis{namespace rastergis{
         
         covar = covar / ((double)this->attTable->getSize());
         
-        //cout << "Covariance = " << covar << endl << endl;
+        //std::cout << "Covariance = " << covar << std::endl << std::endl;
         
         return covar;
     }
@@ -381,11 +381,11 @@ namespace rsgis{namespace rastergis{
     
     RSGISKNNATTable::~RSGISKNNATTable()
     {
-        for(vector<RSGISAttribute*>::iterator iterAtt = attributes.begin(); iterAtt != attributes.end(); ++iterAtt)
+        for(std::vector<RSGISAttribute*>::iterator iterAtt = attributes.begin(); iterAtt != attributes.end(); ++iterAtt)
         {
             delete *iterAtt;
         }            
-        for(vector< vector<double>* >::iterator iterData = knownData->begin(); iterData != knownData->end(); ++iterData)
+        for(std::vector< std::vector<double>* >::iterator iterData = knownData->begin(); iterData != knownData->end(); ++iterData)
         {
             delete *iterData;
         }
@@ -400,7 +400,7 @@ namespace rsgis{namespace rastergis{
         }
     }
 
-    RSGISKNNATTableExtrapolation::RSGISKNNATTableExtrapolation(string valField) : RSGISKNNATTable()
+    RSGISKNNATTableExtrapolation::RSGISKNNATTableExtrapolation(std::string valField) : RSGISKNNATTable()
     {
         this->valField = valField;
         this->valFieldIdx = 0;
@@ -418,29 +418,29 @@ namespace rsgis{namespace rastergis{
             
             if(!this->attTable->hasAttribute(valField))
             {
-                string message = string("The field specified for data values \'") + this->valField + string("\' does not exist.");
+                std::string message = std::string("The field specified for data values \'") + this->valField + std::string("\' does not exist.");
                 throw RSGISAttributeTableException(message);
             }
             else if(this->attTable->getDataType(valField) != rsgis_float)
             {
-                string message = string("Cannot proceed as \'") + this->valField + string("\' field is not of type float.");
+                std::string message = std::string("Cannot proceed as \'") + this->valField + std::string("\' field is not of type float.");
                 throw RSGISAttributeTableException(message);
             }
             this->valFieldIdx = this->attTable->getFieldIndex(valField);
-            cout << "Value field index = " << this->valFieldIdx << endl;
+            std::cout << "Value field index = " << this->valFieldIdx << std::endl;
             
-            cout << "Get training known values\n";
-            vector<double> *knownVals = new vector<double>();
+            std::cout << "Get training known values\n";
+            std::vector<double> *knownVals = new std::vector<double>();
             unsigned int idx = 0;
             unsigned int rowCount = 0;
             unsigned long feedback = attTable->getSize()/10;
 			int feedbackCounter = 0;
-			cout << "Started" << flush;
+			std::cout << "Started" << flush;
             for(this->attTable->start(); this->attTable->end(); ++(*this->attTable))
             {
                 if((rowCount % feedback) == 0)
 				{
-					cout << "." << feedbackCounter << "." << flush;
+					std::cout << "." << feedbackCounter << "." << flush;
 					feedbackCounter = feedbackCounter + 10;
 				}
                 if((*(*this->attTable))->boolFields->at(this->trainFieldIdx))
@@ -450,28 +450,28 @@ namespace rsgis{namespace rastergis{
                 }
                 ++rowCount;
             }
-            cout << " Complete.\n";
+            std::cout << " Complete.\n";
             
             
             // Apply to attribute table.
-            cout << "Extrapolate values for unknowns\n";
+            std::cout << "Extrapolate values for unknowns\n";
             idx = 0;
             feedback = attTable->getSize()/10;
 			feedbackCounter = 0;
-            vector<double> *data = new vector<double>();
+            std::vector<double> *data = new std::vector<double>();
             data->reserve(attributes.size());
-			cout << "Started" << flush;
+			std::cout << "Started" << flush;
             for(attTable->start(); attTable->end(); ++(*attTable))
             {
                 if((idx % feedback) == 0)
 				{
-					cout << "." << feedbackCounter << "." << flush;
+					std::cout << "." << feedbackCounter << "." << flush;
 					feedbackCounter = feedbackCounter + 10;
 				}
                 if(!(*(*attTable))->boolFields->at(trainFieldIdx))
                 {
                     data->clear();
-                    for(vector<RSGISAttribute*>::iterator iterAtt = attributes.begin(); iterAtt != attributes.end(); ++iterAtt)
+                    for(std::vector<RSGISAttribute*>::iterator iterAtt = attributes.begin(); iterAtt != attributes.end(); ++iterAtt)
                     {
                         if((*iterAtt)->dataType == rsgis_float)
                         {
@@ -487,7 +487,7 @@ namespace rsgis{namespace rastergis{
                 }
                 ++idx;
             }
-            cout << " Complete.\n";
+            std::cout << " Complete.\n";
             
             // Clean up memory
             delete data;
@@ -498,7 +498,7 @@ namespace rsgis{namespace rastergis{
         {
             throw e;
         }
-        catch(RSGISMathException &e)
+        catch(rsgis::math::RSGISMathException &e)
         {
             throw RSGISAttributeTableException(e.what());
         }
@@ -508,17 +508,17 @@ namespace rsgis{namespace rastergis{
         }
     }
     
-    double RSGISKNNATTableExtrapolation::calcNewVal(unsigned int k, float distThreshold, rsgisdistmetrics distMetric, vector<double> *knownLocalVals, vector< vector<double>* > *knownLocalData, vector<double> *unknownData) throw(RSGISMathException)
+    double RSGISKNNATTableExtrapolation::calcNewVal(unsigned int k, float distThreshold, rsgis::math::rsgisdistmetrics distMetric, std::vector<double> *knownLocalVals, std::vector< std::vector<double>* > *knownLocalData, std::vector<double> *unknownData) throw(rsgis::math::RSGISMathException)
     {
-        double outVal = numeric_limits<double>::signaling_NaN();
+        double outVal = std::numeric_limits<double>::signaling_NaN();
         try 
         {
             if(knownLocalVals->size() != knownLocalData->size())
             {
-                throw RSGISMathException("Known data and value arrays need to be of the same length.");
+                throw rsgis::math::RSGISMathException("Known data and value arrays need to be of the same length.");
             }
             
-            vector< pair<size_t, double> > neighbours;
+            std::vector< pair<size_t, double> > neighbours;
             double cDistThreshold = 0;
             double maxDist = 0;
             bool maxDistFirst = true;
@@ -546,7 +546,7 @@ namespace rsgis{namespace rastergis{
                 {
                     maxDistFirst = true;
                     maxDist = 0;
-                    for(vector< pair<size_t, double> >::iterator iterNeighbours = neighbours.begin(); iterNeighbours != neighbours.end(); ++iterNeighbours)
+                    for(std::vector< pair<size_t, double> >::iterator iterNeighbours = neighbours.begin(); iterNeighbours != neighbours.end(); ++iterNeighbours)
                     {
                         if((*iterNeighbours).second == cDistThreshold)
                         {
@@ -569,24 +569,24 @@ namespace rsgis{namespace rastergis{
                 //else ignore as outside of the knn
             }
             
-            //cout << "\nNeighbours:\n";
+            //std::cout << "\nNeighbours:\n";
             double sumDist = 0;
-            for(vector< pair<size_t, double> >::iterator iterNeighbours = neighbours.begin(); iterNeighbours != neighbours.end(); ++iterNeighbours)
+            for(std::vector< pair<size_t, double> >::iterator iterNeighbours = neighbours.begin(); iterNeighbours != neighbours.end(); ++iterNeighbours)
             {
-                //cout << "\t" << (*iterNeighbours).first << " = " << (*iterNeighbours).second << ": Data = " << knownVals->at((*iterNeighbours).first) << endl;
+                //std::cout << "\t" << (*iterNeighbours).first << " = " << (*iterNeighbours).second << ": Data = " << knownVals->at((*iterNeighbours).first) << std::endl;
                 sumDist += (*iterNeighbours).second;
             }
-            //cout << "Total Distance = " << sumDist << endl;
+            //std::cout << "Total Distance = " << sumDist << std::endl;
             
             outVal = 0;
-            for(vector< pair<size_t, double> >::iterator iterNeighbours = neighbours.begin(); iterNeighbours != neighbours.end(); ++iterNeighbours)
+            for(std::vector< pair<size_t, double> >::iterator iterNeighbours = neighbours.begin(); iterNeighbours != neighbours.end(); ++iterNeighbours)
             {
                 outVal += knownLocalVals->at((*iterNeighbours).first) * ((*iterNeighbours).second/sumDist);
             }
-            //cout << "Output Value = " << outVal << endl;
+            //std::cout << "Output Value = " << outVal << std::endl;
             
         }
-        catch (RSGISMathException &e)
+        catch (rsgis::math::RSGISMathException &e)
         {
             throw e;
         }

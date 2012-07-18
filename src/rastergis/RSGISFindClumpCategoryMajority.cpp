@@ -30,7 +30,7 @@ namespace rsgis{namespace rastergis{
         
     }
     
-    void RSGISFindClumpCategoryMajority::findMajorityCategory(GDALDataset *categoriesDataset, GDALDataset *clumpsDataset, RSGISAttributeTable *attTable, string areaField, string majorityRatioField, string majorityCatField)throw(RSGISAttributeTableException)
+    void RSGISFindClumpCategoryMajority::findMajorityCategory(GDALDataset *categoriesDataset, GDALDataset *clumpsDataset, RSGISAttributeTable *attTable, std::string areaField, std::string majorityRatioField, std::string majorityCatField)throw(RSGISAttributeTableException)
     {
         try
         {
@@ -66,12 +66,12 @@ namespace rsgis{namespace rastergis{
             
             unsigned long long attSize = attTable->getSize();
             
-            vector<vector< pair<unsigned long, unsigned int> > > *attMajorityFields = new vector<vector< pair<unsigned long, unsigned int> > >();
+            std::vector<std::vector< std::pair<unsigned long, unsigned int> > > *attMajorityFields = new std::vector<std::vector< std::pair<unsigned long, unsigned int> > >();
             attMajorityFields->reserve(attSize);
             
             for(unsigned long long i = 0; i < attSize; ++i)
             {
-                attMajorityFields->push_back(vector< pair<unsigned long, unsigned int> >());
+                attMajorityFields->push_back(std::vector< std::pair<unsigned long, unsigned int> >());
             }
             
             
@@ -80,7 +80,7 @@ namespace rsgis{namespace rastergis{
             datasets[1] = categoriesDataset;
             
             RSGISFindClumpCategoryMajorityCalcImage *calcMajorities = new RSGISFindClumpCategoryMajorityCalcImage(0, attMajorityFields);
-            RSGISCalcImage calcImage(calcMajorities);
+            rsgis::img::RSGISCalcImage calcImage(calcMajorities);
             calcImage.calcImage(datasets, 2);
             delete calcMajorities;
             delete[] datasets;
@@ -101,7 +101,7 @@ namespace rsgis{namespace rastergis{
                 }
                 else
                 {
-                    for(vector< pair<unsigned long, unsigned int> >::iterator iterCats = attMajorityFields->at(i).begin(); iterCats != attMajorityFields->at(i).end(); ++iterCats)
+                    for(std::vector< std::pair<unsigned long, unsigned int> >::iterator iterCats = attMajorityFields->at(i).begin(); iterCats != attMajorityFields->at(i).end(); ++iterCats)
                     {
                         if(first)
                         {
@@ -127,7 +127,7 @@ namespace rsgis{namespace rastergis{
         {
             throw e;
         }
-        catch(RSGISImageCalcException &e)
+        catch(rsgis::img::RSGISImageCalcException &e)
         {
             throw RSGISAttributeTableException(e.what());
         }
@@ -143,24 +143,24 @@ namespace rsgis{namespace rastergis{
     
     
     
-    RSGISFindClumpCategoryMajorityCalcImage::RSGISFindClumpCategoryMajorityCalcImage(int numberOutBands, vector<vector< pair<unsigned long, unsigned int> > > *attMajorityFields):RSGISCalcImageValue(numberOutBands)
+    RSGISFindClumpCategoryMajorityCalcImage::RSGISFindClumpCategoryMajorityCalcImage(int numberOutBands, std::vector<std::vector< std::pair<unsigned long, unsigned int> > > *attMajorityFields):rsgis::img::RSGISCalcImageValue(numberOutBands)
     {
         this->attMajorityFields = attMajorityFields;
     }
         
-    void RSGISFindClumpCategoryMajorityCalcImage::calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException)
+    void RSGISFindClumpCategoryMajorityCalcImage::calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException)
     {
         unsigned long clumpIdx = 0;
         unsigned long category = 0;
         
         try
         {
-            clumpIdx = lexical_cast<unsigned long>(bandValues[0]);
-            category = lexical_cast<unsigned long>(bandValues[1]);
+            clumpIdx = boost::lexical_cast<unsigned long>(bandValues[0]);
+            category = boost::lexical_cast<unsigned long>(bandValues[1]);
         }
-        catch(bad_lexical_cast &e)
+        catch(boost::bad_lexical_cast &e)
         {
-            throw RSGISImageCalcException(e.what());
+            throw rsgis::img::RSGISImageCalcException(e.what());
         }
         
         if(clumpIdx != 0)
@@ -170,7 +170,7 @@ namespace rsgis{namespace rastergis{
             bool foundCat = false;
             if(attMajorityFields->at(clumpIdx).size() > 0)
             {
-                for(vector< pair<unsigned long, unsigned int> >::iterator iterCats = attMajorityFields->at(clumpIdx).begin(); iterCats != attMajorityFields->at(clumpIdx).end(); ++iterCats)
+                for(std::vector< std::pair<unsigned long, unsigned int> >::iterator iterCats = attMajorityFields->at(clumpIdx).begin(); iterCats != attMajorityFields->at(clumpIdx).end(); ++iterCats)
                 {
                     if((*iterCats).first == category)
                     {
@@ -183,7 +183,7 @@ namespace rsgis{namespace rastergis{
             
             if(!foundCat)
             {
-                attMajorityFields->at(clumpIdx).push_back(pair<unsigned long, unsigned int>(category, 1));
+                attMajorityFields->at(clumpIdx).push_back(std::pair<unsigned long, unsigned int>(category, 1));
             }
         }
     }

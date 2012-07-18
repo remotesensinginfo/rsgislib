@@ -44,46 +44,37 @@
 #include "H5Cpp.h"
 
 namespace rsgis{namespace rastergis{
-    
-    using namespace std;
-    using namespace rsgis;
-    using namespace rsgis::utils;
-    
-    using boost::lexical_cast;
-    using boost::bad_lexical_cast;
-    
-    using namespace H5;
 
     class RSGISAttributeTableMem : public RSGISAttributeTable
     {
     public:        
         RSGISAttributeTableMem(size_t numFeatures);
-        RSGISAttributeTableMem(size_t numFeatures, vector<pair<string, RSGISAttributeDataType> > *fields);
+        RSGISAttributeTableMem(size_t numFeatures, std::vector<std::pair<std::string, RSGISAttributeDataType> > *fields);
         
-        bool getBoolField(size_t fid, string name) throw(RSGISAttributeTableException);
-        long getIntField(size_t fid, string name) throw(RSGISAttributeTableException);
-        double getDoubleField(size_t fid, string name) throw(RSGISAttributeTableException);
-        string getStringField(size_t fid, string name) throw(RSGISAttributeTableException);
+        bool getBoolField(size_t fid, std::string name) throw(RSGISAttributeTableException);
+        long getIntField(size_t fid, std::string name) throw(RSGISAttributeTableException);
+        double getDoubleField(size_t fid, std::string name) throw(RSGISAttributeTableException);
+        std::string getStringField(size_t fid, std::string name) throw(RSGISAttributeTableException);
         
-        void setBoolField(size_t fid, string name, bool value) throw(RSGISAttributeTableException);
-        void setIntField(size_t fid, string name, long value) throw(RSGISAttributeTableException);
-        void setDoubleField(size_t fid, string name, double value) throw(RSGISAttributeTableException);
-        void setStringField(size_t fid, string name, string value) throw(RSGISAttributeTableException);
+        void setBoolField(size_t fid, std::string name, bool value) throw(RSGISAttributeTableException);
+        void setIntField(size_t fid, std::string name, long value) throw(RSGISAttributeTableException);
+        void setDoubleField(size_t fid, std::string name, double value) throw(RSGISAttributeTableException);
+        void setStringField(size_t fid, std::string name, std::string value) throw(RSGISAttributeTableException);
         
-        void setBoolValue(string name, bool value) throw(RSGISAttributeTableException);
-        void setIntValue(string name, long value) throw(RSGISAttributeTableException);
-        void setFloatValue(string name, double value) throw(RSGISAttributeTableException);
-        void setStringValue(string name, string value) throw(RSGISAttributeTableException);
+        void setBoolValue(std::string name, bool value) throw(RSGISAttributeTableException);
+        void setIntValue(std::string name, long value) throw(RSGISAttributeTableException);
+        void setFloatValue(std::string name, double value) throw(RSGISAttributeTableException);
+        void setStringValue(std::string name, std::string value) throw(RSGISAttributeTableException);
         
         RSGISFeature* getFeature(size_t fid) throw(RSGISAttributeTableException);
         void flushAllFeatures(bool progressFeedback=false) throw(RSGISAttributeTableException);
         
-        void addAttBoolField(string name, bool val) throw(RSGISAttributeTableException);
-        void addAttIntField(string name, long val) throw(RSGISAttributeTableException);
-        void addAttFloatField(string name, double val) throw(RSGISAttributeTableException);
-        void addAttStringField(string name, string val) throw(RSGISAttributeTableException);
+        void addAttBoolField(std::string name, bool val) throw(RSGISAttributeTableException);
+        void addAttIntField(std::string name, long val) throw(RSGISAttributeTableException);
+        void addAttFloatField(std::string name, double val) throw(RSGISAttributeTableException);
+        void addAttStringField(std::string name, std::string val) throw(RSGISAttributeTableException);
         
-        void addAttributes(vector<RSGISAttribute*> *attributes) throw(RSGISAttributeTableException);
+        void addAttributes(std::vector<RSGISAttribute*> *attributes) throw(RSGISAttributeTableException);
         
         size_t getSize();
         void holdFID(size_t fid);
@@ -100,15 +91,15 @@ namespace rsgis{namespace rastergis{
         
         ~RSGISAttributeTableMem();
         
-        static RSGISFileType findFileType(string inFile)throw(RSGISAttributeTableException);
-        static RSGISAttributeTable* importFromASCII(string inFile)throw(RSGISAttributeTableException);
-        static RSGISAttributeTable* importFromHDF5(string inFile)throw(RSGISAttributeTableException);
-        static RSGISAttributeTable* importFromGDALRaster(string inFile)throw(RSGISAttributeTableException);
+        static RSGISFileType findFileType(std::string inFile)throw(RSGISAttributeTableException);
+        static RSGISAttributeTable* importFromASCII(std::string inFile)throw(RSGISAttributeTableException);
+        static RSGISAttributeTable* importFromHDF5(std::string inFile)throw(RSGISAttributeTableException);
+        static RSGISAttributeTable* importFromGDALRaster(std::string inFile)throw(RSGISAttributeTableException);
     protected:
         RSGISAttributeTableMem();
         void createAttributeTable(size_t numFeatures);
         void createAttributeTableWithFields(size_t numFeatures);
-        vector<RSGISFeature*> *attTable;
+        std::vector<RSGISFeature*> *attTable;
         size_t iterIdx;
     };
 

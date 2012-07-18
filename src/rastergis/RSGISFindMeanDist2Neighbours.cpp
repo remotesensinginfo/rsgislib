@@ -30,7 +30,7 @@ namespace rsgis{namespace rastergis{
         
     }
     
-    void RSGISFindMeanDist2Neighbours::findMeanEuclideanDist2Neighbours(RSGISAttributeTable *attTable, vector<vector<unsigned long > > *neighbours, vector<string> *attributeNames, string outMeanAttName, string outMaxAttName, string outMinAttName)throw(RSGISAttributeTableException)
+    void RSGISFindMeanDist2Neighbours::findMeanEuclideanDist2Neighbours(RSGISAttributeTable *attTable, std::vector<std::vector<unsigned long > > *neighbours, std::vector<std::string> *attributeNames, std::string outMeanAttName, std::string outMaxAttName, std::string outMinAttName)throw(RSGISAttributeTableException)
     {
         try 
         {
@@ -48,7 +48,7 @@ namespace rsgis{namespace rastergis{
             {
                 if(attTable->getDataType(outMeanAttName) != rsgis_float)
                 {
-                    string message = outMeanAttName + string(" field already exists and is not of type float and therefore cannot be used.");
+                    std::string message = outMeanAttName + std::string(" field already exists and is not of type float and therefore cannot be used.");
                     throw RSGISAttributeTableException(message);
                 }
             }
@@ -62,7 +62,7 @@ namespace rsgis{namespace rastergis{
             {
                 if(attTable->getDataType(outMaxAttName) != rsgis_float)
                 {
-                    string message = outMaxAttName + string(" field already exists and is not of type float and therefore cannot be used.");
+                    std::string message = outMaxAttName + std::string(" field already exists and is not of type float and therefore cannot be used.");
                     throw RSGISAttributeTableException(message);
                 }
             }
@@ -76,7 +76,7 @@ namespace rsgis{namespace rastergis{
             {
                 if(attTable->getDataType(outMinAttName) != rsgis_float)
                 {
-                    string message = outMinAttName + string(" field already exists and is not of type float and therefore cannot be used.");
+                    std::string message = outMinAttName + std::string(" field already exists and is not of type float and therefore cannot be used.");
                     throw RSGISAttributeTableException(message);
                 }
             }
@@ -92,7 +92,7 @@ namespace rsgis{namespace rastergis{
             unsigned int *attIdxes = new unsigned int[numTestAtts];
             
             unsigned int counter = 0;
-            for(vector<string>::iterator iterNames = attributeNames->begin(); iterNames != attributeNames->end(); ++iterNames)
+            for(std::vector<std::string>::iterator iterNames = attributeNames->begin(); iterNames != attributeNames->end(); ++iterNames)
             {
                 attDataTypes[counter] = attTable->getDataType(*iterNames);
                 attIdxes[counter] = attTable->getFieldIndex(*iterNames);
@@ -198,7 +198,7 @@ namespace rsgis{namespace rastergis{
         }
     }
     
-    void RSGISFindMeanDist2Neighbours::findMeanEuclideanDist2Neighbours(RSGISAttributeTable *attTable, vector<string> *attributeNames, string outMeanAttName, string outMaxAttName, string outMinAttName)throw(RSGISAttributeTableException)
+    void RSGISFindMeanDist2Neighbours::findMeanEuclideanDist2Neighbours(RSGISAttributeTable *attTable, std::vector<std::string> *attributeNames, std::string outMeanAttName, std::string outMaxAttName, std::string outMinAttName)throw(RSGISAttributeTableException)
     {
         try 
         {
@@ -211,7 +211,7 @@ namespace rsgis{namespace rastergis{
             {
                 if(attTable->getDataType(outMeanAttName) != rsgis_float)
                 {
-                    string message = outMeanAttName + string(" field already exists and is not of type float and therefore cannot be used.");
+                    std::string message = outMeanAttName + std::string(" field already exists and is not of type float and therefore cannot be used.");
                     throw RSGISAttributeTableException(message);
                 }
             }
@@ -225,7 +225,7 @@ namespace rsgis{namespace rastergis{
             {
                 if(attTable->getDataType(outMaxAttName) != rsgis_float)
                 {
-                    string message = outMaxAttName + string(" field already exists and is not of type float and therefore cannot be used.");
+                    std::string message = outMaxAttName + std::string(" field already exists and is not of type float and therefore cannot be used.");
                     throw RSGISAttributeTableException(message);
                 }
             }
@@ -239,7 +239,7 @@ namespace rsgis{namespace rastergis{
             {
                 if(attTable->getDataType(outMinAttName) != rsgis_float)
                 {
-                    string message = outMinAttName + string(" field already exists and is not of type float and therefore cannot be used.");
+                    std::string message = outMinAttName + std::string(" field already exists and is not of type float and therefore cannot be used.");
                     throw RSGISAttributeTableException(message);
                 }
             }
@@ -255,7 +255,7 @@ namespace rsgis{namespace rastergis{
             unsigned int *attIdxes = new unsigned int[numTestAtts];
             
             unsigned int counter = 0;
-            for(vector<string>::iterator iterNames = attributeNames->begin(); iterNames != attributeNames->end(); ++iterNames)
+            for(std::vector<std::string>::iterator iterNames = attributeNames->begin(); iterNames != attributeNames->end(); ++iterNames)
             {
                 attDataTypes[counter] = attTable->getDataType(*iterNames);
                 attIdxes[counter] = attTable->getFieldIndex(*iterNames);

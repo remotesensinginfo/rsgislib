@@ -29,9 +29,9 @@ namespace rsgis{namespace rastergis{
         
     }
     
-    vector<list<size_t>* >* RSGISFindClumpNeighbours::findNeighbours(GDALDataset *clumpImage) throw(RSGISImageCalcException)
+    std::vector<std::list<size_t>* >* RSGISFindClumpNeighbours::findNeighbours(GDALDataset *clumpImage) throw(rsgis::img::RSGISImageCalcException)
     {
-        vector<list<size_t>* > *neighbours = new vector<list<size_t>* >();
+        std::vector<std::list<size_t>* > *neighbours = new std::vector<std::list<size_t>* >();
         
         try
         {
@@ -45,13 +45,13 @@ namespace rsgis{namespace rastergis{
             
             int feedback = height/10;
 			int feedbackCounter = 0;
-			cout << "Started" << flush;
+			std::cout << "Started" << std::flush;
             
             for(unsigned int i = 0; i < height; ++i)
             {
                 if((i % feedback) == 0)
 				{
-					cout << ".." << feedbackCounter << ".." << flush;
+					std::cout << ".." << feedbackCounter << ".." << std::flush;
 					feedbackCounter = feedbackCounter + 10;
 				}
                 imgBand->RasterIO(GF_Read, 0, i, width, 1, clumpIdxs, width, 1, GDT_UInt32, 0, 0);
@@ -67,16 +67,16 @@ namespace rsgis{namespace rastergis{
                     }
                 }
             }
-            cout << " Complete.\n";
+            std::cout << " Complete.\n";
             delete[] clumpIdxs;
             
-            cout << "Number of clumps = " << maxClumpIdx << endl;
+            std::cout << "Number of clumps = " << maxClumpIdx << std::endl;
             
             neighbours->reserve(maxClumpIdx);
             
             for(unsigned long i = 0; i < maxClumpIdx; ++i)
             {
-                neighbours->push_back(new list<unsigned long>());
+                neighbours->push_back(new std::list<unsigned long>());
             }
             
             int windowSize = 3;
@@ -100,13 +100,13 @@ namespace rsgis{namespace rastergis{
             unsigned long clumpID = 0;
             
 			feedbackCounter = 0;
-			cout << "Started" << flush;
+			std::cout << "Started" << std::flush;
 			// Loop images to process data
 			for(int i = 0; i < height; i++)
 			{				
 				if((i % feedback) == 0)
 				{
-					cout << ".." << feedbackCounter << ".." << flush;
+					std::cout << ".." << feedbackCounter << ".." << std::flush;
 					feedbackCounter = feedbackCounter + 10;
 				}
 				                
@@ -206,7 +206,7 @@ namespace rsgis{namespace rastergis{
                     }
 				}
 			}
-			cout << " Complete.\n";
+			std::cout << " Complete.\n";
             
 			for(int i = 0; i < windowSize; i++)
             {
@@ -222,7 +222,7 @@ namespace rsgis{namespace rastergis{
                 neighbours->at(i)->unique();
             }
         }
-        catch(RSGISImageCalcException &e)
+        catch(rsgis::img::RSGISImageCalcException &e)
         {
             throw e;
         }
@@ -230,7 +230,7 @@ namespace rsgis{namespace rastergis{
         return neighbours;
     }
     
-    void RSGISFindClumpNeighbours::findNeighbours(GDALDataset *clumpImage, RSGISAttributeTable *attTable) throw(RSGISImageCalcException)
+    void RSGISFindClumpNeighbours::findNeighbours(GDALDataset *clumpImage, RSGISAttributeTable *attTable) throw(rsgis::img::RSGISImageCalcException)
     {
         try
         {            
@@ -261,13 +261,13 @@ namespace rsgis{namespace rastergis{
             
             int feedback = height/10;
 			int feedbackCounter = 0;
-			cout << "Started" << flush;
+			std::cout << "Started" << std::flush;
 			// Loop images to process data
 			for(int i = 0; i < height; i++)
 			{				
 				if((i % feedback) == 0)
 				{
-					cout << ".." << feedbackCounter << ".." << flush;
+					std::cout << ".." << feedbackCounter << ".." << std::flush;
 					feedbackCounter = feedbackCounter + 10;
 				}
                 
@@ -368,7 +368,7 @@ namespace rsgis{namespace rastergis{
                     }
 				}
 			}
-			cout << " Complete.\n";
+			std::cout << " Complete.\n";
             
 			for(int i = 0; i < windowSize; i++)
             {
@@ -380,15 +380,15 @@ namespace rsgis{namespace rastergis{
         }
         catch(RSGISAttributeTableException &e)
         {
-            throw RSGISImageCalcException(e.what());
+            throw rsgis::img::RSGISImageCalcException(e.what());
         }
-        catch(RSGISImageCalcException &e)
+        catch(rsgis::img::RSGISImageCalcException &e)
         {
             throw e;
         }
     }
     
-    void RSGISFindClumpNeighbours::findNeighboursInBlocks(GDALDataset *clumpImage, RSGISAttributeTable *attTable) throw(RSGISImageCalcException)
+    void RSGISFindClumpNeighbours::findNeighboursInBlocks(GDALDataset *clumpImage, RSGISAttributeTable *attTable) throw(rsgis::img::RSGISImageCalcException)
     {
         try
         {            
@@ -430,7 +430,7 @@ namespace rsgis{namespace rastergis{
             size_t startFID = 0;
             size_t endFID = numFeatInSample;
             
-            cout << "The neighbours will be processed in " << numSamples << " samples." << endl;
+            std::cout << "The neighbours will be processed in " << numSamples << " samples." << std::endl;
             
             for(size_t n = 0; n < numSamples; ++n)
             {
@@ -438,13 +438,13 @@ namespace rsgis{namespace rastergis{
                 
                 feedback = height/10;
                 feedbackCounter = 0;
-                cout << "Started (" << n+1 << " of " << numSamples << ")" << flush;
+                std::cout << "Started (" << n+1 << " of " << numSamples << ")" << std::flush;
                 // Loop images to process data
                 for(int i = 0; i < height; i++)
                 {				
                     if((i % feedback) == 0)
                     {
-                        cout << "." << feedbackCounter << "." << flush;
+                        std::cout << "." << feedbackCounter << "." << std::flush;
                         feedbackCounter = feedbackCounter + 10;
                     }
                     
@@ -544,7 +544,7 @@ namespace rsgis{namespace rastergis{
                         }
                     }
                 }
-                cout << " Complete.\n";
+                std::cout << " Complete.\n";
                 
                 attTable->flushAllFeatures(true);
                 startBlock += numBlocksInSample;
@@ -563,9 +563,9 @@ namespace rsgis{namespace rastergis{
         }
         catch(RSGISAttributeTableException &e)
         {
-            throw RSGISImageCalcException(e.what());
+            throw rsgis::img::RSGISImageCalcException(e.what());
         }
-        catch(RSGISImageCalcException &e)
+        catch(rsgis::img::RSGISImageCalcException &e)
         {
             throw e;
         }

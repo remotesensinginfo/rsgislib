@@ -33,7 +33,6 @@
 #include "img/RSGISImageCalcException.h"
 #include "img/RSGISCalcImageValue.h"
 #include "img/RSGISCalcImage.h"
-#include "img/RSGISCalcImageSingleValue.h"
 
 #include "rastergis/RSGISAttributeTable.h"
 
@@ -49,38 +48,28 @@
 
 namespace rsgis{namespace rastergis{
     
-    using namespace std;
-    using namespace rsgis;
-    using namespace rsgis::utils;
-    using namespace rsgis::math;
-    using namespace rsgis::img;
-    using boost::lexical_cast;
-    using boost::bad_lexical_cast;
-    
     class RSGISFindClumpCategoryMajority
     {
     public:
         RSGISFindClumpCategoryMajority();
-        void findMajorityCategory(GDALDataset *categoriesDataset, GDALDataset *clumpsDataset, RSGISAttributeTable *attTable, string areaField, string majorityRatioField, string majorityCatField)throw(RSGISAttributeTableException);
+        void findMajorityCategory(GDALDataset *categoriesDataset, GDALDataset *clumpsDataset, RSGISAttributeTable *attTable, std::string areaField, std::string majorityRatioField, std::string majorityCatField)throw(RSGISAttributeTableException);
         ~RSGISFindClumpCategoryMajority();
     };
-    
-    
-    
-    class RSGISFindClumpCategoryMajorityCalcImage : public RSGISCalcImageValue
+        
+    class RSGISFindClumpCategoryMajorityCalcImage : public rsgis::img::RSGISCalcImageValue
     {
     public: 
-        RSGISFindClumpCategoryMajorityCalcImage(int numberOutBands, vector<vector< pair<unsigned long, unsigned int> > > *attMajorityFields);
-        void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException);
-        void calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
-        bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
+        RSGISFindClumpCategoryMajorityCalcImage(int numberOutBands, std::vector<std::vector< std::pair<unsigned long, unsigned int> > > *attMajorityFields);
+        void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException);
+        void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+        bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
         ~RSGISFindClumpCategoryMajorityCalcImage();
     protected:
-        vector<vector< pair<unsigned long, unsigned int> > > *attMajorityFields;
+        std::vector<std::vector< std::pair<unsigned long, unsigned int> > > *attMajorityFields;
     };
     
     

@@ -36,15 +36,12 @@
 
 namespace rsgis{namespace rastergis{
     
-    using namespace std;
-    using namespace rsgis;
-    
     class RSGISFindMeanDist2Neighbours
     {
     public:
         RSGISFindMeanDist2Neighbours();
-        void findMeanEuclideanDist2Neighbours(RSGISAttributeTable *attTable, vector<vector<unsigned long > > *neighbours, vector<string> *attributeNames, string outMeanAttName, string outMaxAttName, string outMinAttName)throw(RSGISAttributeTableException);
-        void findMeanEuclideanDist2Neighbours(RSGISAttributeTable *attTable, vector<string> *attributeNames, string outMeanAttName, string outMaxAttName, string outMinAttName)throw(RSGISAttributeTableException);
+        void findMeanEuclideanDist2Neighbours(RSGISAttributeTable *attTable, std::vector<std::vector<unsigned long > > *neighbours, std::vector<std::string> *attributeNames, std::string outMeanAttName, std::string outMaxAttName, std::string outMinAttName)throw(RSGISAttributeTableException);
+        void findMeanEuclideanDist2Neighbours(RSGISAttributeTable *attTable, std::vector<std::string> *attributeNames, std::string outMeanAttName, std::string outMaxAttName, std::string outMinAttName)throw(RSGISAttributeTableException);
         ~RSGISFindMeanDist2Neighbours();
     };
     
