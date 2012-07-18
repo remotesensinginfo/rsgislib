@@ -13,7 +13,7 @@
 namespace rsgis{namespace img{
 	
 
-	RSGISSavitzkyGolaySmoothingFilters::RSGISSavitzkyGolaySmoothingFilters(int numberOutBands, int order, int window, Vector *imagebandValues) : RSGISCalcImageValue(numberOutBands)
+	RSGISSavitzkyGolaySmoothingFilters::RSGISSavitzkyGolaySmoothingFilters(int numberOutBands, int order, int window, rsgis::math::Vector *imagebandValues) : RSGISCalcImageValue(numberOutBands)
 	{
 		this->order = order;
 		this->window = window;
@@ -36,7 +36,7 @@ namespace rsgis{namespace img{
 		int numRows = 0;
 		int startVal = 0;
 		
-		RSGISPolyFit polyFit;
+        rsgis::math::RSGISPolyFit polyFit;
 		gsl_vector *coefficients = NULL;
 		gsl_matrix *inputValues = NULL;
 		
@@ -87,12 +87,12 @@ namespace rsgis{namespace img{
 		throw RSGISImageCalcException("Not implemented");
 	}
 	
-	void RSGISSavitzkyGolaySmoothingFilters::calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException)
+	void RSGISSavitzkyGolaySmoothingFilters::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(RSGISImageCalcException)
 	{
 		throw RSGISImageCalcException("Not implemented");
 	}
 	
-	void RSGISSavitzkyGolaySmoothingFilters::calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException)
+	void RSGISSavitzkyGolaySmoothingFilters::calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(RSGISImageCalcException)
 	{
 		throw RSGISImageCalcException("Not implemented");
 	}

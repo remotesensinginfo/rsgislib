@@ -36,9 +36,6 @@
 
 #include "img/RSGISImageUtils.h"
 
-using namespace rsgis;
-using namespace rsgis::utils;
-
 namespace rsgis { namespace img {	
 		
 	class RSGISGenerateImageFromXYZData
@@ -51,17 +48,17 @@ namespace rsgis { namespace img {
 		};
 		
 	public:
-		RSGISGenerateImageFromXYZData(string inputDataFile, string outputFile, char delimiter, string proj4, bool xyOrder, float resolution);
-		void createImageRepresentingXYZData() throw(RSGISFileException, RSGISImageException);
-		void readInputData() throw(RSGISFileException);
+		RSGISGenerateImageFromXYZData(string inputDataFile, std::string outputFile, char delimiter, std::string proj4, bool xyOrder, float resolution);
+		void createImageRepresentingXYZData() throw(rsgis::RSGISFileException, rsgis::RSGISImageException);
+		void readInputData() throw(rsgis::RSGISFileException);
 		~RSGISGenerateImageFromXYZData();
 	protected:
-		string inputFile;
-		string outputFile;
+        std::string inputFile;
+        std::string outputFile;
 		char delimiter;
 		bool xyOrder;
-		string proj4;
-		vector<XYZData*> *data;
+        std::string proj4;
+        std::vector<XYZData*> *data;
 		double *bbox;
 		float resolution;
 	};

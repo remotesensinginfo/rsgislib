@@ -31,10 +31,10 @@ namespace rsgis{namespace img{
 		
 	}
 	
-	Polygon** RSGISFFTProcessing::findDominateFreq(Matrix *magnitude, int startCircle, int endCircle, int *numPolys) throw(RSGISFFTException)
+    geos::geom::Polygon** RSGISFFTProcessing::findDominateFreq(rsgis::math::Matrix *magnitude, int startCircle, int endCircle, int *numPolys) throw(RSGISFFTException)
 	{
-		RSGISMatrices matrixUtils;
-		RSGISGeometry geomUtils;
+		rsgis::math::RSGISMatrices matrixUtils;
+		rsgis::geom::RSGISGeometry geomUtils;
 		int length = magnitude->m * magnitude->n;
 		int halfWidth = (magnitude->m/2);
 		int halfHeight = (magnitude->n/2);
@@ -52,8 +52,8 @@ namespace rsgis{namespace img{
 		int distFromCentre = 0;
 		float distPixels = 0;
 		
-		Polygon **circles = NULL;
-		Polygon **bboxes = NULL;
+		geos::geom::Polygon **circles = NULL;
+		geos::geom::Polygon **bboxes = NULL;
 		
 		try
 		{
@@ -67,8 +67,8 @@ namespace rsgis{namespace img{
 			}
 			
 			//matrixUtils.printMatrix(magnitude);
-			//cout << "DC = " << dc << " value = " << magnitude->matrix[dc] << endl;
-			cout << "Centre Point [" << halfWidth << "," << halfHeight << "](" << ((halfHeight) * magnitude->m)+halfWidth << ") = " << magnitude->matrix[((halfHeight) * magnitude->m)+halfWidth] << endl;
+			//std::cout << "DC = " << dc << " value = " << magnitude->matrix[dc] << std::endl;
+			std::cout << "Centre Point [" << halfWidth << "," << halfHeight << "](" << ((halfHeight) * magnitude->m)+halfWidth << ") = " << magnitude->matrix[((halfHeight) * magnitude->m)+halfWidth] << std::endl;
 			
 			if(startCircle > endCircle)
 			{
@@ -76,12 +76,12 @@ namespace rsgis{namespace img{
 			}
 			if(endCircle > maxCircleRadius)
 			{
-				cout << "endCircle was larger than the image. Defaulting to image size " << maxCircleRadius << endl;
+				std::cout << "endCircle was larger than the image. Defaulting to image size " << maxCircleRadius << std::endl;
 				endCircle = maxCircleRadius;
 			}
 			
 			numCircles = endCircle - startCircle;
-			circles = new Polygon*[numCircles];
+			circles = new geos::geom::Polygon*[numCircles];
 			circleCounter = 0;
 			
 			for(int i = startCircle; i < endCircle; i++)
@@ -89,11 +89,11 @@ namespace rsgis{namespace img{
 				circles[circleCounter++] = geomUtils.createCircle(0, 0, i, 0.5);
 			}
 			
-			cout << "Created " << circleCounter << " circles\n";
+			std::cout << "Created " << circleCounter << " circles\n";
 			
-			bboxes = new Polygon*[length];
+			bboxes = new geos::geom::Polygon*[length];
 			
-			cout << "Matrix size = [" << magnitude->m << "," << magnitude->n << "] centre = ["  << halfWidth << "," << halfHeight << "]\n";
+			std::cout << "Matrix size = [" << magnitude->m << "," << magnitude->n << "] centre = ["  << halfWidth << "," << halfHeight << "]\n";
 			
 			row = 0;
 			column = 0;
@@ -104,11 +104,11 @@ namespace rsgis{namespace img{
 			topY = halfHeight + 0.5;
 			bottomY = topY - step;
 			
-			cout << "TL [" << leftX << "," << topY << "]\n";
+			std::cout << "TL [" << leftX << "," << topY << "]\n";
 			
 			for(int i = 0; i < length; i++)
 			{
-				//cout << "[column,row]: [" << column << "," << row << "]" << endl;
+				//std::cout << "[column,row]: [" << column << "," << row << "]" << std::endl;
 				bboxes[i] = geomUtils.createPolygon(leftX, topY, rightX, bottomY);
 				
 				leftX = leftX + step;
@@ -127,7 +127,7 @@ namespace rsgis{namespace img{
 			}
 			*numPolys = length;
 			
-			//cout << "DC Polygon = " << bboxes[dc]->toString() << endl;
+			//std::cout << "DC Polygon = " << bboxes[dc]->toString() << std::endl;
 			
 			
 			
@@ -137,11 +137,11 @@ namespace rsgis{namespace img{
 			//SortedGenericList<double> *values = NULL;
 			for(int i = 0; i < numCircles; i++)
 			{
-				cout << "Circle " << i << ":" << endl;
+				std::cout << "Circle " << i << ":" << std::endl;
 				/*
 				values = geomUtils.findValuesOnEdge(magnitude, bboxes, circles[i]);
-				cout << "max: " << *values->peekTop() << endl;
-				cout << "min: " << *values->peekBottom() << endl;
+				std::cout << "max: " << *values->peekTop() << std::endl;
+				std::cout << "min: " << *values->peekBottom() << std::endl;
 				
 				if(first)
 				{
@@ -162,20 +162,20 @@ namespace rsgis{namespace img{
 			distFromCentre = startCircle + maxCircle;
 			distPixels = ((float)distFromCentre)/2;
 			
-			cout << "\nCircle " << maxCircle << " is the circle with the distance on it\n";
-			cout << "Distance value = " << maxValue << endl;
-			cout << "Distance from centre = " << distFromCentre << " therefore width is " << distPixels << " pixels." << endl;
+			std::cout << "\nCircle " << maxCircle << " is the circle with the distance on it\n";
+			std::cout << "Distance value = " << maxValue << std::endl;
+			std::cout << "Distance from centre = " << distFromCentre << " therefore width is " << distPixels << " pixels." << std::endl;
 			
 			int numPts = 0;
-			Polygon **ptPolys = geomUtils.findMaxPointsOnPolyEdge(magnitude, bboxes, circles[maxCircle], &numPts);
+			geos::geom::Polygon **ptPolys = geomUtils.findMaxPointsOnPolyEdge(magnitude, bboxes, circles[maxCircle], &numPts);
 						
-			Coordinate centre;
-			cout << "number of points = " << numPts << endl;
+			geos::geom::Coordinate centre;
+			std::cout << "number of points = " << numPts << std::endl;
 			float angle = 0;
 			if(numPts == 2)
 			{
-				Coordinate left;
-				Coordinate right;
+				geos::geom::Coordinate left;
+				geos::geom::Coordinate right;
 				ptPolys[0]->getCentroid(centre);
 				if(centre.x < 0)
 				{
@@ -192,21 +192,21 @@ namespace rsgis{namespace img{
 			}
 			else if(numPts == 1)
 			{
-				cout << "Polygon = " << ptPolys[0]->toString() << endl;
+				std::cout << "Polygon = " << ptPolys[0]->toString() << std::endl;
 				ptPolys[0]->getCentroid(centre);
-				cout << "Centre = [" << centre.x << "," << centre.y << "]" << endl;
+				std::cout << "Centre = [" << centre.x << "," << centre.y << "]" << std::endl;
 				angle = atan(centre.y/centre.x);
 			}
 			else if(numPts > 2)
 			{
-				cout << "Do not know how to deal with more points...\n";
+				std::cout << "Do not know how to deal with more points...\n";
 			}
 			else
 			{
-				cout << "No point found!\n";
+				std::cout << "No point found!\n";
 			}
 			
-			cout << "Angle: " << angle << " radians = " << (angle / M_PI)*180 << " degrees." << endl;
+			std::cout << "Angle: " << angle << " radians = " << (angle / M_PI)*180 << " degrees." << std::endl;
 			
 			*numPolys = numPts;
 			return ptPolys;

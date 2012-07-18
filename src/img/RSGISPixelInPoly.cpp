@@ -30,7 +30,7 @@ namespace rsgis{namespace img {
 		this->method = method;
 		this->polyOGRPoly = NULL;
 	}
-	bool RSGISPixelInPoly::findPixelInPoly(OGRGeometry *poly, OGRPolygon *pixel) throw(RSGISVectorException)
+	bool RSGISPixelInPoly::findPixelInPoly(OGRGeometry *poly, OGRPolygon *pixel) throw(rsgis::RSGISVectorException)
 	{
 		bool returnVal = false;
 		
@@ -125,11 +125,11 @@ namespace rsgis{namespace img {
 		}
 		else if(method == pixelAreaInPoly)
 		{
-			throw RSGISVectorException("The option 'pixelAreaInPoly' can not be used here");		
+			throw rsgis::RSGISVectorException("The option 'pixelAreaInPoly' can not be used here");		
 		}
 		else 
 		{
-			throw RSGISVectorException("Method for determining pixel in polygon was not recognised");
+			throw rsgis::RSGISVectorException("Method for determining pixel in polygon was not recognised");
 		}
 		
 		return returnVal;

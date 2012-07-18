@@ -40,12 +40,12 @@ namespace rsgis{namespace img{
 		throw RSGISImageCalcException("Not implemented!");
 	}
 	
-	void RSGISPolygonPixelCount::calcImageValue(float *bandValuesImage, int numBands, Envelope *extent) throw(RSGISImageCalcException)
+	void RSGISPolygonPixelCount::calcImageValue(float *bandValuesImage, int numBands, geos::geom::Envelope *extent) throw(RSGISImageCalcException)
 	{
 		throw RSGISImageCalcException("Not implemented!");
 	}
 	
-	void RSGISPolygonPixelCount::calcImageValue(float *bandValuesImage, double interceptArea, int numBands, Polygon *poly, Point *pt) throw(RSGISImageCalcException)
+	void RSGISPolygonPixelCount::calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt) throw(RSGISImageCalcException)
 	{
 		if(poly->contains(pt))
 		{

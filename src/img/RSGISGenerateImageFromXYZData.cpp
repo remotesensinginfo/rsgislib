@@ -26,7 +26,7 @@
 namespace rsgis { namespace img {	
 	
 
-	RSGISGenerateImageFromXYZData::RSGISGenerateImageFromXYZData(string inputDataFile, string outputFile, char delimiter, string proj4, bool xyOrder, float resolution)
+	RSGISGenerateImageFromXYZData::RSGISGenerateImageFromXYZData(std::string inputDataFile, std::string outputFile, char delimiter, std::string proj4, bool xyOrder, float resolution)
 	{
 		this->inputFile = inputDataFile;
 		this->outputFile = outputFile;
@@ -38,14 +38,14 @@ namespace rsgis { namespace img {
 		this->resolution = resolution;
 	}
 	
-	void RSGISGenerateImageFromXYZData::createImageRepresentingXYZData() throw(RSGISFileException, RSGISImageException)
+	void RSGISGenerateImageFromXYZData::createImageRepresentingXYZData() throw(rsgis::RSGISFileException, rsgis::RSGISImageException)
 	{
 		try 
 		{
 			// Read input data
 			this->readInputData();
 			
-			cout << "BBOX: [" << bbox[0] << "," << bbox[1] << "][" << bbox[2] << "," << bbox[3] << "]\n";
+			std::cout << "BBOX: [" << bbox[0] << "," << bbox[1] << "][" << bbox[2] << "," << bbox[3] << "]\n";
 			
 			// Create output Image
 			RSGISImageUtils imgUtils;
@@ -61,7 +61,7 @@ namespace rsgis { namespace img {
 			unsigned int xSize = ceil((bbox[1] - bbox[0])/resolution)+1;
 			unsigned int ySize = ceil((bbox[3] - bbox[2])/resolution)+1;
 			
-			cout << "Size = [" << xSize << ", " << ySize << "]\n";
+			std::cout << "Size = [" << xSize << ", " << ySize << "]\n";
 			
 			GDALDataset* outImage = NULL;
 			outImage = imgUtils.createBlankImage(outputFile, transformation, xSize, ySize, 2, proj4, 0);
@@ -86,7 +86,7 @@ namespace rsgis { namespace img {
 			unsigned int xPxl = 0;
 			unsigned int yPxl = 0;
 			
-			cout << "TL [" << TLX << ", " << TLY << "]\n";
+			std::cout << "TL [" << TLX << ", " << TLY << "]\n";
 			
 			vector<XYZData*>::iterator iterData;
 			for(iterData = data->begin(); iterData != data->end(); ++iterData)
@@ -121,28 +121,28 @@ namespace rsgis { namespace img {
 			GDALClose(outImage);
 			delete transformation;
 		}
-		catch (RSGISFileException &e) 
+		catch (rsgis::RSGISFileException &e) 
 		{
 			throw e;
 		}
 		catch (RSGISImageBandException &e) 
 		{
-			throw RSGISImageException(e.what());
+			throw rsgis::RSGISImageException(e.what());
 		}
-		catch (RSGISImageException &e) 
+		catch (rsgis::RSGISImageException &e) 
 		{
 			throw e;
 		}
 		catch (RSGISException &e) 
 		{
-			throw RSGISImageException(e.what());
+			throw rsgis::RSGISImageException(e.what());
 		}
 	}
 	
-	void RSGISGenerateImageFromXYZData::readInputData() throw(RSGISFileException)
+	void RSGISGenerateImageFromXYZData::readInputData() throw(rsgis::RSGISFileException)
 	{
-		RSGISTextFileLineReader lineReader;
-		RSGISTextUtils textUtils;
+        rsgis::utils::RSGISTextFileLineReader lineReader;
+		rsgis::utils::RSGISTextUtils textUtils;
 		
 		try 
 		{
@@ -150,8 +150,8 @@ namespace rsgis { namespace img {
 			unsigned long numLines = textUtils.countLines(inputFile);
 			data->reserve(numLines);
 
-			string line = "";
-			vector<string> *lineTokens = new vector<string>();
+			std::string line = "";
+			vector<std::string> *lineTokens = new vector<std::string>();
 			XYZData *dataItem = NULL;
 			lineReader.openFile(inputFile);
 			while(!lineReader.endOfFile())
@@ -162,8 +162,8 @@ namespace rsgis { namespace img {
 					textUtils.tokenizeString(line, delimiter, lineTokens, true);
 					if(lineTokens->size() < 3)
 					{
-						cout << "ERROR LINE: " << line << endl;
-						throw RSGISFileException("The line needs to have at least 3 tokens.");
+						std::cout << "ERROR LINE: " << line << std::endl;
+						throw rsgis::RSGISFileException("The line needs to have at least 3 tokens.");
 					}
 					
 					dataItem = new XYZData();
@@ -212,13 +212,13 @@ namespace rsgis { namespace img {
 			}
 			delete lineTokens;
 		}
-		catch (RSGISFileException &e) 
+		catch (rsgis::RSGISFileException &e) 
 		{
 			throw e;
 		}
 		catch (RSGISException &e) 
 		{
-			throw RSGISFileException(e.what());
+			throw rsgis::RSGISFileException(e.what());
 		}
 		
 	}

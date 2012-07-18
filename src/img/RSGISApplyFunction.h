@@ -36,9 +36,6 @@
 #include "math/RSGISFunctions.h"
 #include "math/RSGISMathFunction.h"
 
-using namespace std;
-using namespace rsgis::math;
-
 namespace rsgis{namespace img{
 
 
@@ -46,16 +43,16 @@ namespace rsgis{namespace img{
 	{
 		/// Applies RSGISMathFunction to image
 	public: 
-		RSGISApplySingleVarFunction(int numOutputBands, RSGISMathFunction *imagefunction, float ignoreVal = 0);
+		RSGISApplySingleVarFunction(int numOutputBands, rsgis::math::RSGISMathFunction *imagefunction, float ignoreVal = 0);
 		virtual void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException);
 		virtual void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-		virtual void calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-		virtual void calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
+		virtual void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
+		virtual void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
 		virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
 		virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};													
 		~RSGISApplySingleVarFunction();
 	protected:
-		RSGISMathFunction *imagefunction;
+        rsgis::math::RSGISMathFunction *imagefunction;
 		float ignoreVal;
 	};
 	
@@ -63,17 +60,17 @@ namespace rsgis{namespace img{
 	{
 		/// Applies RSGISMathTwoVariableFunction to image
 	public: 
-		RSGISApplyTwoVarFunction(int numOutputBands, RSGISMathTwoVariableFunction *imagefunction, float ignoreVal = 0);
+		RSGISApplyTwoVarFunction(int numOutputBands, rsgis::math::RSGISMathTwoVariableFunction *imagefunction, float ignoreVal = 0);
 		virtual void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException);
 		virtual void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-		virtual void calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-		virtual void calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
+		virtual void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
+		virtual void calcImageValue(float *bandValues, int numBands, float *output,geos::geom:: Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
 		virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-        virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");}
+        virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");}
 		virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};													
 		~RSGISApplyTwoVarFunction();
 	protected:
-		RSGISMathTwoVariableFunction *imagefunction;
+        rsgis::math::RSGISMathTwoVariableFunction *imagefunction;
 		float ignoreVal;
 	};
 	
@@ -82,17 +79,17 @@ namespace rsgis{namespace img{
 	{
 		/// Applies RSGISMathThreeVariableFunction to image
 	public: 
-		RSGISApplyThreeVarFunction(int numOutputBands, RSGISMathThreeVariableFunction *imagefunction, float ignoreVal = 0);
+		RSGISApplyThreeVarFunction(int numOutputBands, rsgis::math::RSGISMathThreeVariableFunction *imagefunction, float ignoreVal = 0);
 		virtual void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException);
 		virtual void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-		virtual void calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-		virtual void calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
+		virtual void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
+		virtual void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
 		virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-		virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");}
+		virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");}
 		virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};													
 		~RSGISApplyThreeVarFunction();
 	protected:
-		RSGISMathThreeVariableFunction *imagefunction;
+        rsgis::math::RSGISMathThreeVariableFunction *imagefunction;
 		float ignoreVal;
 	};
 

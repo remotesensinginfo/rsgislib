@@ -24,15 +24,13 @@
 #define RSGISApplyEigenvectors_H
 
 #include <iostream>
-#include <string>
+
 #include "img/RSGISImageCalcException.h"
-#include <geos/geom/Envelope.h>
-#include "math/RSGISMatrices.h"
 #include "img/RSGISCalcImageValue.h"
 
-using namespace std;
-using namespace geos::geom;
-using namespace rsgis::math;
+#include "math/RSGISMatrices.h"
+
+#include <geos/geom/Envelope.h>
 
 namespace rsgis 
 {
@@ -41,17 +39,17 @@ namespace rsgis
 		class RSGISApplyEigenvectors : public RSGISCalcImageValue
 			{
 			public: 
-				RSGISApplyEigenvectors(int numberOutBands, Matrix *eigenvectors);
+				RSGISApplyEigenvectors(int numberOutBands, rsgis::math::Matrix *eigenvectors);
 				void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException);
 				void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException);
-				void calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException);
-				void calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException);
+				void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(RSGISImageCalcException);
+				void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(RSGISImageCalcException);
 				void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException);
-                void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+                void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
 				bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException);
 				~RSGISApplyEigenvectors();
 			protected:
-				Matrix *eigenvectors;
+                rsgis::math::Matrix *eigenvectors;
 			};
 	}
 }

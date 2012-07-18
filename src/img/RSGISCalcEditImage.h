@@ -38,9 +38,6 @@
 #include "img/RSGISCalcImageValue.h"
 #include "img/RSGISImageUtils.h"
 
-using namespace std;
-using namespace geos::geom;
-
 namespace rsgis 
 {
 	namespace img

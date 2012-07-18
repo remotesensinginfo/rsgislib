@@ -30,16 +30,13 @@
 
 #include "gdal_priv.h"
 
-using namespace std;
-using namespace rsgis;
-
 namespace rsgis{namespace img{
 	
 	class RSGISCreateTestImages
 		{
 		public:
 			RSGISCreateTestImages();
-			void createRowMajorNumberedImage(string outputImage, int width, int height) throw(RSGISImageException);
+			void createRowMajorNumberedImage(std::string outputImage, int width, int height) throw(RSGISImageException);
 			~RSGISCreateTestImages();
 		};
 }}

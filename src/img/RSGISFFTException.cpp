@@ -24,12 +24,17 @@
 
 namespace rsgis{namespace img{
 	
-	RSGISFFTException::RSGISFFTException() : RSGISImageException("A RSGISFFTException has been created..")
+	RSGISFFTException::RSGISFFTException() : rsgis::RSGISImageException("A RSGISFFTException has been created..")
 	{
 		
 	}
 	
-	RSGISFFTException::RSGISFFTException(const char* message) : RSGISImageException(message)
+	RSGISFFTException::RSGISFFTException(const char* message) : rsgis::RSGISImageException(message)
+	{
+		
+	}
+    
+    RSGISFFTException::RSGISFFTException(std::string message) : rsgis::RSGISImageException(message)
 	{
 		
 	}

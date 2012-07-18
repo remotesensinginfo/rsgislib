@@ -34,14 +34,11 @@
 
 #include "muParser.h"
 
-using namespace std;
-using namespace mu;
-
 namespace rsgis{namespace img{
 	
 	struct VariableBands
 	{
-		string name;
+        std::string name;
 		int band;
 	};
 	
@@ -49,20 +46,20 @@ namespace rsgis{namespace img{
 	class RSGISBandMath : public RSGISCalcImageValue
 		{
 		public: 
-			RSGISBandMath(int numberOutBands, VariableBands **variables, int numVariables, Parser *muParser);
+			RSGISBandMath(int numberOutBands, VariableBands **variables, int numVariables, mu::Parser *muParser);
 			void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException);
 			void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException);
-			void calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException);
-			void calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException);
+			void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(RSGISImageCalcException);
+			void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(RSGISImageCalcException);
 			void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException);
-            void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+            void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
 			bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException);
 			~RSGISBandMath();
 		private:
 			VariableBands **variables;
 			int numVariables;
-			Parser *muParser;
-			value_type *inVals;
+            mu::Parser *muParser;
+            mu::value_type *inVals;
 		};
 	
 }}

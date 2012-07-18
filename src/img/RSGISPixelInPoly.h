@@ -29,10 +29,6 @@
 
 #include "common/RSGISVectorException.h"
 
-using namespace std;
-using namespace rsgis;
-using namespace geos::geom;
-
 namespace rsgis{namespace img {
 	
 	enum pixelInPolyOption 
@@ -53,7 +49,7 @@ namespace rsgis{namespace img {
 	{
 	public:
 		RSGISPixelInPoly(pixelInPolyOption method);
-		bool findPixelInPoly(OGRGeometry *poly, OGRPolygon *pixel) throw(RSGISVectorException);
+		bool findPixelInPoly(OGRGeometry *poly, OGRPolygon *pixel) throw(rsgis::RSGISVectorException);
 		~RSGISPixelInPoly();
 	private:
 		pixelInPolyOption method;

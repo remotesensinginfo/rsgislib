@@ -34,9 +34,6 @@
 
 #include "math/RSGISMatrices.h"
 
-using namespace std;
-using namespace rsgis::math;
-
 namespace rsgis{namespace img{
 	
 	/***
@@ -49,17 +46,17 @@ namespace rsgis{namespace img{
 	class RSGISConvertSpectralToUnitArea : public RSGISCalcImageValue
 	{
 	public: 
-		RSGISConvertSpectralToUnitArea(int numberOutBands, Matrix *bandValuesWidths);
+		RSGISConvertSpectralToUnitArea(int numberOutBands, rsgis::math::Matrix *bandValuesWidths);
 		void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException);
 		void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException);
-		void calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException);
-		void calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException);
+		void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(RSGISImageCalcException);
+		void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(RSGISImageCalcException);
 		void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException);
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
 		bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException);
 		~RSGISConvertSpectralToUnitArea();
 	private:
-		Matrix *bandValuesWidths;
+        rsgis::math::Matrix *bandValuesWidths;
 	};
 	
 }}

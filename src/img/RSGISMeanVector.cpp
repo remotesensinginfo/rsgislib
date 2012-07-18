@@ -35,12 +35,12 @@ namespace rsgis{namespace img{
 		throw RSGISImageCalcException("Not implemented!");
 	}
 	
-	void RSGISCalcMeanVectorIndividual::calcImageValue(float *bandValuesImageA, int numBands, Envelope *extent) throw(RSGISImageCalcException)
+	void RSGISCalcMeanVectorIndividual::calcImageValue(float *bandValuesImageA, int numBands, geos::geom::Envelope *extent) throw(RSGISImageCalcException)
 	{
 		throw RSGISImageCalcException("Not implemented!");
 	}
 	
-	void RSGISCalcMeanVectorIndividual::calcImageValue(float *bandValuesImage, double interceptArea, int numBands, Polygon *poly, Point *pt) throw(RSGISImageCalcException)
+	void RSGISCalcMeanVectorIndividual::calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt) throw(RSGISImageCalcException)
 	{
 		throw RSGISImageCalcException("Not implemented!");
 	}
@@ -75,7 +75,7 @@ namespace rsgis{namespace img{
 		throw RSGISImageCalcException("Not implemented!");
 	}
 	
-	void RSGISCalcMeanVectorAll::calcImageValue(float *bandValuesImage, int numBands, Envelope *extent) throw(RSGISImageCalcException)
+	void RSGISCalcMeanVectorAll::calcImageValue(float *bandValuesImage, int numBands, geos::geom::Envelope *extent) throw(RSGISImageCalcException)
 	{
 		throw RSGISImageCalcException("Not implemented!");
 	}
@@ -94,7 +94,7 @@ namespace rsgis{namespace img{
 		}
 	}
 	
-	void RSGISCalcMeanVectorAll::calcImageValue(float *bandValuesImage, double interceptArea, int numBands, Polygon *poly, Point *pt) throw(RSGISImageCalcException)
+	void RSGISCalcMeanVectorAll::calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt) throw(RSGISImageCalcException)
 	{
 		throw RSGISImageCalcException("Not implemented!");
 	}

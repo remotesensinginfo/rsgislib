@@ -25,7 +25,7 @@
 
 namespace rsgis{namespace img{
 
-	RSGISApplySingleVarFunction::RSGISApplySingleVarFunction(int numOutputBands, RSGISMathFunction *imagefunction, float ignoreVal) : RSGISCalcImageValue(numOutputBands)
+	RSGISApplySingleVarFunction::RSGISApplySingleVarFunction(int numOutputBands, rsgis::math::RSGISMathFunction *imagefunction, float ignoreVal) : RSGISCalcImageValue(numOutputBands)
 	{
 		this->imagefunction = imagefunction;
 		this->ignoreVal = ignoreVal;
@@ -47,7 +47,7 @@ namespace rsgis{namespace img{
 		
 	}
 	
-	RSGISApplyTwoVarFunction::RSGISApplyTwoVarFunction(int numOutputBands, RSGISMathTwoVariableFunction *imagefunction, float ignoreVal) : RSGISCalcImageValue(numOutputBands)
+	RSGISApplyTwoVarFunction::RSGISApplyTwoVarFunction(int numOutputBands, rsgis::math::RSGISMathTwoVariableFunction *imagefunction, float ignoreVal) : RSGISCalcImageValue(numOutputBands)
 	{
 		this->imagefunction = imagefunction;
 		this->ignoreVal = ignoreVal;
@@ -69,7 +69,7 @@ namespace rsgis{namespace img{
 		
 	}
 	
-	RSGISApplyThreeVarFunction::RSGISApplyThreeVarFunction(int numOutputBands, RSGISMathThreeVariableFunction *imagefunction, float ignoreVal) : RSGISCalcImageValue(numOutputBands)
+	RSGISApplyThreeVarFunction::RSGISApplyThreeVarFunction(int numOutputBands, rsgis::math::RSGISMathThreeVariableFunction *imagefunction, float ignoreVal) : RSGISCalcImageValue(numOutputBands)
 	{
 		this->imagefunction = imagefunction;
 		this->ignoreVal = ignoreVal;

@@ -30,7 +30,7 @@ namespace rsgis{namespace img{
 		
 	}
 	
-	void RSGISCreateTestImages::createRowMajorNumberedImage(string outputImage, int width, int height) throw(RSGISImageException)
+	void RSGISCreateTestImages::createRowMajorNumberedImage(std::string outputImage, int width, int height) throw(RSGISImageException)
 	{
 		GDALAllRegister();
 		GDALDriver *poDriver = NULL;

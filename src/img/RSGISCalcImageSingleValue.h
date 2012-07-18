@@ -31,9 +31,6 @@
 #include <geos/geom/Polygon.h>
 #include <geos/geom/Point.h>
 
-using namespace std;
-using namespace geos::geom;
-
 namespace rsgis{namespace img{
 	
 	class RSGISCalcImageSingleValue
@@ -42,8 +39,8 @@ namespace rsgis{namespace img{
 			RSGISCalcImageSingleValue(int numOutputValues);
 			virtual void calcImageValue(float *bandValuesImageA, float *bandValuesImageB, int numBands, int bandA, int bandB) throw(RSGISImageCalcException) = 0;
 			virtual void calcImageValue(float *bandValuesImage, int numBands, int band) throw(RSGISImageCalcException) = 0;
-			virtual void calcImageValue(float *bandValuesImage, int numBands, Envelope *extent) throw(RSGISImageCalcException) = 0;
-			virtual void calcImageValue(float *bandValuesImage, double interceptArea, int numBands, Polygon *poly, Point *pt) throw(RSGISImageCalcException) = 0;
+			virtual void calcImageValue(float *bandValuesImage, int numBands, geos::geom::Envelope *extent) throw(RSGISImageCalcException) = 0;
+			virtual void calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt) throw(RSGISImageCalcException) = 0;
 			int getNumberOfOutValues();
 			virtual double* getOutputValues() throw(RSGISImageCalcException) = 0;
 			virtual void reset() = 0;

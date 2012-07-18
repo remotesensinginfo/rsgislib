@@ -25,7 +25,7 @@
 namespace rsgis{namespace img{
 	
 
-	RSGISExport2DScatterPTxt::RSGISExport2DScatterPTxt(RSGISExportForPlottingIncremental *plotter, int b1, int b2): RSGISCalcImageValue(0)
+	RSGISExport2DScatterPTxt::RSGISExport2DScatterPTxt(rsgis::utils::RSGISExportForPlottingIncremental *plotter, int b1, int b2): RSGISCalcImageValue(0)
 	{
 		this->plotter = plotter;
 		this->b1 = b1;
@@ -60,12 +60,12 @@ namespace rsgis{namespace img{
 		}
 	}
 	
-	void RSGISExport2DScatterPTxt::calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException)
+	void RSGISExport2DScatterPTxt::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(RSGISImageCalcException)
 	{
 		throw RSGISImageCalcException("Not Implemented");
 	}
 	
-	void RSGISExport2DScatterPTxt::calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException)
+	void RSGISExport2DScatterPTxt::calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(RSGISImageCalcException)
 	{
 		throw RSGISImageCalcException("Not Implemented.");
 	}

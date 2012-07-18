@@ -28,7 +28,7 @@ namespace rsgis{namespace img{
 	{
 		this->matrixCounter = 0;
 		this->numPixels = numPixels;
-		RSGISMatrices rsgisMatrices;
+        rsgis::math::RSGISMatrices rsgisMatrices;
 		this->matrix = rsgisMatrices.createMatrix(numOutputValues, numPixels);
 	}
 	
@@ -42,12 +42,12 @@ namespace rsgis{namespace img{
 		throw RSGISImageCalcException("Not implemented!");
 	}
 	
-	void RSGISPopulateMatrix::calcImageValue(float *bandValuesImage, int numBands, Envelope *extent) throw(RSGISImageCalcException)
+	void RSGISPopulateMatrix::calcImageValue(float *bandValuesImage, int numBands, geos::geom::Envelope *extent) throw(RSGISImageCalcException)
 	{
 		throw RSGISImageCalcException("Not implemented!");
 	}
 	
-	void RSGISPopulateMatrix::calcImageValue(float *bandValuesImage, double interceptArea, int numBands, Polygon *poly, Point *pt) throw(RSGISImageCalcException)
+	void RSGISPopulateMatrix::calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt) throw(RSGISImageCalcException)
 	{
 		if(numBands != numOutputValues)
 		{
@@ -69,7 +69,7 @@ namespace rsgis{namespace img{
 		return outputValues;
 	}
 	
-	Matrix* RSGISPopulateMatrix::getMatrix()
+    rsgis::math::Matrix* RSGISPopulateMatrix::getMatrix()
 	{
 		return matrix;
 	}
@@ -86,7 +86,7 @@ namespace rsgis{namespace img{
 		}
 		this->matrixCounter = 0;
 		this->numPixels = numPixels;
-		RSGISMatrices rsgisMatrices;
+        rsgis::math::RSGISMatrices rsgisMatrices;
 		this->matrix = rsgisMatrices.createMatrix(numOutputValues, numPixels);
 	}
 	

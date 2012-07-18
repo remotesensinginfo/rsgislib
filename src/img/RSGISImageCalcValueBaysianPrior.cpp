@@ -24,7 +24,7 @@
 
 namespace rsgis{namespace img{
 	
-	RSGISImageCalcValueBaysianPrior::RSGISImageCalcValueBaysianPrior(int numberOutBands, RSGISMathFunction *function, RSGISProbDistro *probDistro, double variance, double interval, double minVal, double maxVal, double lowerLimit, double upperLimit, deltatypedef deltatype) : RSGISCalcImageValue(numberOutBands)
+	RSGISImageCalcValueBaysianPrior::RSGISImageCalcValueBaysianPrior(int numberOutBands, rsgis::math::RSGISMathFunction *function, rsgis::math::RSGISProbDistro *probDistro, double variance, double interval, double minVal, double maxVal, double lowerLimit, double upperLimit, rsgis::math::deltatypedef deltatype) : RSGISCalcImageValue(numberOutBands)
 	{
 		this->function = function;
 		this->probDistro = probDistro;
@@ -35,7 +35,7 @@ namespace rsgis{namespace img{
 		this->upperLimit = upperLimit;
 		this->lowerLimit = lowerLimit;
 		this->deltatype = deltatype;
-		baysianStats = new RSGISBaysianStatsPrior(function, probDistro, variance, interval, minVal, maxVal, upperLimit, lowerLimit, deltatype);
+		baysianStats = new rsgis::math::RSGISBaysianStatsPrior(function, probDistro, variance, interval, minVal, maxVal, upperLimit, lowerLimit, deltatype);
 		cout << "Delta type " << deltatype << endl;
 	}
 	
@@ -59,12 +59,12 @@ namespace rsgis{namespace img{
 		throw RSGISImageCalcException("Not implemented");
 	}
 	
-	void RSGISImageCalcValueBaysianPrior::calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException)
+	void RSGISImageCalcValueBaysianPrior::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(RSGISImageCalcException)
 	{
 		throw RSGISImageCalcException("Not Implemented");
 	}
 	
-	void RSGISImageCalcValueBaysianPrior::calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException)
+	void RSGISImageCalcValueBaysianPrior::calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(RSGISImageCalcException)
 	{
 		throw RSGISImageCalcException("Not implemented");
 	}

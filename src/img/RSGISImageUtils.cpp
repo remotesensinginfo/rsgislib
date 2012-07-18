@@ -40,7 +40,7 @@ namespace rsgis{namespace img{
 			datasets[i]->GetGeoTransform(transformations[i]);
 			xSize[i] = datasets[i]->GetRasterXSize();
 			ySize[i] = datasets[i]->GetRasterYSize();
-			//cout << "TL [" << transformations[i][0] << "," << transformations[i][3] << "]\n";
+			//std::cout << "TL [" << transformations[i][0] << "," << transformations[i][3] << "]\n";
 		}
 		double rotateX = 0;
 		double rotateY = 0;
@@ -104,9 +104,9 @@ namespace rsgis{namespace img{
 						throw RSGISImageBandException("Not all image bands have the same rotation..");
 					}
 					
-					if(string(datasets[i]->GetProjectionRef()) != string(proj))
+					if(std::string(datasets[i]->GetProjectionRef()) != std::string(proj))
 					{
-						cout << "Not all image bands have the same projection" << endl;
+						std::cout << "Not all image bands have the same projection" << std::endl;
 					}
                     
 					if(transformations[i][0] > minX)
@@ -221,7 +221,7 @@ namespace rsgis{namespace img{
 		}
 	}
 	
-	void RSGISImageUtils::getImageOverlap(GDALDataset **datasets, int numDS,  int **dsOffsets, int *width, int *height, double *gdalTransform, Envelope *env) throw(RSGISImageBandException)
+	void RSGISImageUtils::getImageOverlap(GDALDataset **datasets, int numDS,  int **dsOffsets, int *width, int *height, double *gdalTransform, geos::geom::Envelope *env) throw(RSGISImageBandException)
 	{
 		double **transformations = new double*[numDS];
 		int *xSize = new int[numDS];
@@ -233,7 +233,7 @@ namespace rsgis{namespace img{
 			xSize[i] = datasets[i]->GetRasterXSize();
 			ySize[i] = datasets[i]->GetRasterYSize();
 			
-			//cout << "TL [" << transformations[i][0] << "," << transformations[i][3] << "]\n";
+			//std::cout << "TL [" << transformations[i][0] << "," << transformations[i][3] << "]\n";
 		}
 		double rotateX = 0;
 		double rotateY = 0;
@@ -289,10 +289,10 @@ namespace rsgis{namespace img{
 						throw RSGISImageBandException("Not all image bands have the same resolution..");
 					}
 					
-					if(string(datasets[i]->GetProjectionRef()) != string(proj))
+					if(std::string(datasets[i]->GetProjectionRef()) != std::string(proj))
 					{
-						//cout << "Band 1 Projection = " << proj << endl;
-						//cout << "Band " << i <<  " Projection = " << datasets[i]->GetProjectionRef()<< endl;
+						//std::cout << "Band 1 Projection = " << proj << std::endl;
+						//std::cout << "Band " << i <<  " Projection = " << datasets[i]->GetProjectionRef()<< std::endl;
 						throw RSGISImageBandException("Not all image bands have the same projection..");
 					}
 					
@@ -326,22 +326,22 @@ namespace rsgis{namespace img{
 				}
 			}
 			/*
-			cout << "MinX = " << minX << endl;
-			cout << "MaxX = " << maxX << endl;
-			cout << "MinY = " << minY << endl;
-			cout << "MaxY = " << maxY << endl;
+			std::cout << "MinX = " << minX << std::endl;
+			std::cout << "MaxX = " << maxX << std::endl;
+			std::cout << "MinY = " << minY << std::endl;
+			std::cout << "MaxY = " << maxY << std::endl;
 			*/
 			if(maxX - minX <= 0)
 			{
-				cout << "MinX = " << minX << endl;
-				cout << "MaxX = " << maxX << endl;
+				std::cout << "MinX = " << minX << std::endl;
+				std::cout << "MaxX = " << maxX << std::endl;
 				throw RSGISImageBandException("Images do not overlap in the X axis");
 			}
 			
 			if(maxY - minY <= 0)
 			{
-				cout << "MinY = " << minY << endl;
-				cout << "MaxY = " << maxY << endl;
+				std::cout << "MinY = " << minY << std::endl;
+				std::cout << "MaxY = " << maxY << std::endl;
 				throw RSGISImageBandException("Images do not overlap in the Y axis");
 			}
 			
@@ -351,37 +351,37 @@ namespace rsgis{namespace img{
 			
 			if(minX > env->getMinX())
 			{
-				//cout.precision(10);
-				//cout << "Envelope does not fit within the image overlap (MinX)" << endl;
+				//std::cout.precision(10);
+				//std::cout << "Envelope does not fit within the image overlap (MinX)" << std::endl;
 				process = false;
-				//cout << "Image Min X = " << minX << " Envelope Min X = " << env->getMinX() << endl;
+				//std::cout << "Image Min X = " << minX << " Envelope Min X = " << env->getMinX() << std::endl;
 				//throw RSGISImageBandException("Envelope does not fit within the image overlap (MinX)");
 			}
 			
 			if(minY > env->getMinY())
 			{
-				//cout.precision(10);
-				//cout << "Envelope does not fit within the image overlap (MinY)" << endl;
+				//std::cout.precision(10);
+				//std::cout << "Envelope does not fit within the image overlap (MinY)" << std::endl;
 				process = false;
-				//cout << "Image Min Y = " << minY << " Envelope Min Y = " << env->getMinY() << endl;
+				//std::cout << "Image Min Y = " << minY << " Envelope Min Y = " << env->getMinY() << std::endl;
 				//throw RSGISImageBandException("Envelope does not fit within the image overlap (MinY)");
 			}
 			
 			if(maxX < env->getMaxX())
 			{
-				//cout.precision(10);
-				//cout << "Envelope does not fit within the image overlap (MaxX)" << endl;
+				//std::cout.precision(10);
+				//std::cout << "Envelope does not fit within the image overlap (MaxX)" << std::endl;
 				process = false;
-				//cout << "Image Max X = " << maxX << " Envelope Max X = " << env->getMaxX() << endl;
+				//std::cout << "Image Max X = " << maxX << " Envelope Max X = " << env->getMaxX() << std::endl;
 				//throw RSGISImageBandException("Envelope does not fit within the image overlap (MaxX)");
 			}
 			
 			if(maxY < env->getMaxY())
 			{
-				//cout.precision(10);
-				//cout << "Envelope does not fit within the image overlap (MaxY)" << endl;
+				//std::cout.precision(10);
+				//std::cout << "Envelope does not fit within the image overlap (MaxY)" << std::endl;
 				process = false;
-				//cout << "Image Max Y = " << maxY << " Envelope Max Y = " << env->getMaxY() << endl;
+				//std::cout << "Image Max Y = " << maxY << " Envelope Max Y = " << env->getMaxY() << std::endl;
 				//throw RSGISImageBandException("Envelope does not fit within the image overlap (MaxY)");
 			}
 			
@@ -527,7 +527,7 @@ namespace rsgis{namespace img{
 		}
 	}
     
-    void RSGISImageUtils::getImageOverlapCut2Env(GDALDataset **datasets, int numDS,  int **dsOffsets, int *width, int *height, double *gdalTransform, Envelope *env) throw(RSGISImageBandException)
+    void RSGISImageUtils::getImageOverlapCut2Env(GDALDataset **datasets, int numDS,  int **dsOffsets, int *width, int *height, double *gdalTransform, geos::geom::Envelope *env) throw(RSGISImageBandException)
 	{
 		double **transformations = new double*[numDS];
 		int *xSize = new int[numDS];
@@ -539,7 +539,7 @@ namespace rsgis{namespace img{
 			xSize[i] = datasets[i]->GetRasterXSize();
 			ySize[i] = datasets[i]->GetRasterYSize();
 			
-			//cout << "TL [" << transformations[i][0] << "," << transformations[i][3] << "]\n";
+			//std::cout << "TL [" << transformations[i][0] << "," << transformations[i][3] << "]\n";
 		}
 		double rotateX = 0;
 		double rotateY = 0;
@@ -595,10 +595,10 @@ namespace rsgis{namespace img{
 						throw RSGISImageBandException("Not all image bands have the same resolution..");
 					}
 					
-					if(string(datasets[i]->GetProjectionRef()) != string(proj))
+					if(std::string(datasets[i]->GetProjectionRef()) != std::string(proj))
 					{
-						//cout << "Band 1 Projection = " << proj << endl;
-						//cout << "Band " << i <<  " Projection = " << datasets[i]->GetProjectionRef()<< endl;
+						//std::cout << "Band 1 Projection = " << proj << std::endl;
+						//std::cout << "Band " << i <<  " Projection = " << datasets[i]->GetProjectionRef()<< std::endl;
 						throw RSGISImageBandException("Not all image bands have the same projection..");
 					}
 					
@@ -634,15 +634,15 @@ namespace rsgis{namespace img{
             
 			if(maxX - minX <= 0)
 			{
-				cout << "MinX = " << minX << endl;
-				cout << "MaxX = " << maxX << endl;
+				std::cout << "MinX = " << minX << std::endl;
+				std::cout << "MaxX = " << maxX << std::endl;
 				throw RSGISImageBandException("Images do not overlap in the X axis");
 			}
 			
 			if(maxY - minY <= 0)
 			{
-				cout << "MinY = " << minY << endl;
-				cout << "MaxY = " << maxY << endl;
+				std::cout << "MinY = " << minY << std::endl;
+				std::cout << "MaxY = " << maxY << std::endl;
 				throw RSGISImageBandException("Images do not overlap in the Y axis");
 			}
 			
@@ -669,15 +669,15 @@ namespace rsgis{namespace img{
 			
             if(maxX - minX <= 0)
 			{
-				cout << "MinX = " << minX << endl;
-				cout << "MaxX = " << maxX << endl;
+				std::cout << "MinX = " << minX << std::endl;
+				std::cout << "MaxX = " << maxX << std::endl;
 				throw RSGISImageBandException("Images and Envelope do not overlap in the X axis");
 			}
 			
 			if(maxY - minY <= 0)
 			{
-				cout << "MinY = " << minY << endl;
-				cout << "MaxY = " << maxY << endl;
+				std::cout << "MinY = " << minY << std::endl;
+				std::cout << "MaxY = " << maxY << std::endl;
 				throw RSGISImageBandException("Images and Envelope do not overlap in the Y axis");
 			}
             
@@ -758,7 +758,7 @@ namespace rsgis{namespace img{
 		}
 	}
 	
-	void RSGISImageUtils::getImageOverlap(GDALDataset **datasets, int numDS, int *width, int *height, Envelope *env) throw(RSGISImageBandException)
+	void RSGISImageUtils::getImageOverlap(GDALDataset **datasets, int numDS, int *width, int *height, geos::geom::Envelope *env) throw(RSGISImageBandException)
 	{
 		double **transformations = new double*[numDS];
 		int *xSize = new int[numDS];
@@ -769,7 +769,7 @@ namespace rsgis{namespace img{
 			datasets[i]->GetGeoTransform(transformations[i]);
 			xSize[i] = datasets[i]->GetRasterXSize();
 			ySize[i] = datasets[i]->GetRasterYSize();
-			//cout << "TL [" << transformations[i][0] << "," << transformations[i][3] << "]\n";
+			//std::cout << "TL [" << transformations[i][0] << "," << transformations[i][3] << "]\n";
 		}
 		double rotateX = 0;
 		double rotateY = 0;
@@ -825,7 +825,7 @@ namespace rsgis{namespace img{
 						throw RSGISImageBandException("Not all image bands have the same resolution..");
 					}
 					
-					if(string(datasets[i]->GetProjectionRef()) != string(proj))
+					if(std::string(datasets[i]->GetProjectionRef()) != std::string(proj))
 					{
 						throw RSGISImageBandException("Not all image bands have the same projection..");
 					}
@@ -949,8 +949,8 @@ namespace rsgis{namespace img{
 			datasets[i]->GetGeoTransform(transformations[i]);
 			xSize[i] = datasets[i]->GetRasterXSize();
 			ySize[i] = datasets[i]->GetRasterYSize();
-			//cout << "TL [" << transformations[i][0] << "," << transformations[i][3] << "]\n";
-			//cout << "Size: [" << xSize[i] << "," << ySize[i] << "]\n";
+			//std::cout << "TL [" << transformations[i][0] << "," << transformations[i][3] << "]\n";
+			//std::cout << "Size: [" << xSize[i] << "," << ySize[i] << "]\n";
 		}
 		double rotateX = 0;
 		double rotateY = 0;
@@ -1004,7 +1004,7 @@ namespace rsgis{namespace img{
 						throw RSGISImageBandException("Not all image bands have the same resolution..");
 					}
 					
-					if(string(datasets[i]->GetProjectionRef()) != string(proj))
+					if(std::string(datasets[i]->GetProjectionRef()) != std::string(proj))
 					{
 						throw RSGISImageBandException("Not all image bands have the same projection..");
 					}
@@ -1089,7 +1089,7 @@ namespace rsgis{namespace img{
 		}
 	}
 	
-    void RSGISImageUtils::getImagesExtent(string *inputImages, int numDS, int *width, int *height, double *gdalTransform) throw(RSGISImageBandException)
+    void RSGISImageUtils::getImagesExtent(std::string *inputImages, int numDS, int *width, int *height, double *gdalTransform) throw(RSGISImageBandException)
     {
         double **transformations = new double*[numDS];
 		int *xSize = new int[numDS];
@@ -1100,7 +1100,7 @@ namespace rsgis{namespace img{
             dataset = (GDALDataset *) GDALOpenShared(inputImages[i].c_str(), GA_ReadOnly);
             if(dataset == NULL)
             {
-                string message = string("Could not open image ") + inputImages[i];
+                std::string message = std::string("Could not open image ") + inputImages[i];
                 throw RSGISImageException(message.c_str());
             }
             
@@ -1123,7 +1123,7 @@ namespace rsgis{namespace img{
 		double minY = 0;
 		double tmpMinY = 0;
 		double maxY = 0;
-		string proj = "";
+		std::string proj = "";
 		
 		try
 		{
@@ -1132,7 +1132,7 @@ namespace rsgis{namespace img{
                 dataset = (GDALDataset *) GDALOpenShared(inputImages[i].c_str(), GA_ReadOnly);
                 if(dataset == NULL)
                 {
-                    string message = string("Could not open image ") + inputImages[i];
+                    std::string message = std::string("Could not open image ") + inputImages[i];
                     throw RSGISImageException(message.c_str());
                 }
                 
@@ -1159,7 +1159,7 @@ namespace rsgis{namespace img{
 					maxX = minX + (xSize[i] * pixelXRes);
 					minY = maxY - (ySize[i] * pixelYResPos);
 					
-					proj = string(dataset->GetProjectionRef()); // Get projection of first band in image
+					proj = std::string(dataset->GetProjectionRef()); // Get projection of first band in image
 				}
 				else
 				{
@@ -1168,10 +1168,10 @@ namespace rsgis{namespace img{
 						throw RSGISImageBandException("Not all image bands have the same resolution..");
 					}
 					
-					if(string(dataset->GetProjectionRef()) != proj)
+					if(std::string(dataset->GetProjectionRef()) != proj)
 					{
-                        cout << "First: (" << i << ")" << proj << endl;
-                        cout << "Dataset: (" << i << ")" << string(dataset->GetProjectionRef()) << endl;
+                        std::cout << "First: (" << i << ")" << proj << std::endl;
+                        std::cout << "Dataset: (" << i << ")" << std::string(dataset->GetProjectionRef()) << std::endl;
 						throw RSGISImageBandException("Not all image bands have the same projection..");
 					}
 					
@@ -1256,7 +1256,7 @@ namespace rsgis{namespace img{
 		}
     }
     
-	void RSGISImageUtils::exportImageToTextCol(GDALDataset *image, int band, string outputText)throw(RSGISImageBandException, RSGISOutputStreamException)
+	void RSGISImageUtils::exportImageToTextCol(GDALDataset *image, int band, std::string outputText)throw(RSGISImageBandException, RSGISOutputStreamException)
 	{
 		RSGISImageUtils imgUtils;
 		double *gdalTranslation = new double[6];
@@ -1299,13 +1299,13 @@ namespace rsgis{namespace img{
 			
 			int feedback = height/10;
 			int feedbackCounter = 0;
-			cout << "Started" << flush;
+			std::cout << "Started" << std::flush;
 			// Loop images to process data
 			for(int i = 0; i < height; i++)
 			{
 				if((i % feedback) == 0)
 				{
-					cout << ".." << feedbackCounter << ".." << flush;
+					std::cout << ".." << feedbackCounter << ".." << std::flush;
 					feedbackCounter = feedbackCounter + 10;
 				}
 				inputRasterBand->RasterIO(GF_Read, 0, i, width, 1, inputData, width, 1, GDT_Float32, 0, 0);
@@ -1313,10 +1313,10 @@ namespace rsgis{namespace img{
 				for(int j = 0; j < width; j++)
 				{
 					// Output to text file...
-					outFile << inputData[j] << endl;
+					outFile << inputData[j] << std::endl;
 				}
 			}
-			cout << "..100 Complete.\n";
+			std::cout << "..100 Complete.\n";
 		}
 		catch(RSGISImageBandException e)
 		{
@@ -1339,7 +1339,7 @@ namespace rsgis{namespace img{
 		}
 	}
 	
-	GDALDataset* RSGISImageUtils::createBlankImage(string imageFile, double *transformation, int xSize, int ySize, int numBands, string projection, float value, string gdalFormat) throw(RSGISImageException, RSGISImageBandException)
+	GDALDataset* RSGISImageUtils::createBlankImage(std::string imageFile, double *transformation, int xSize, int ySize, int numBands, std::string projection, float value, std::string gdalFormat) throw(RSGISImageException, RSGISImageBandException)
 	{
 		GDALAllRegister();
 		GDALDriver *poDriver = NULL;
@@ -1391,20 +1391,20 @@ namespace rsgis{namespace img{
 				imgData[i] = value;
 			}
 			
-			/*cout << "Created Image: \n";
-			cout << "xSize = " << xSize << endl;
-			cout << "ySize = " << ySize << endl;*/
-			cout << "Started (total " << numBands << ")." << flush;
+			/*std::cout << "Created Image: \n";
+			std::cout << "xSize = " << xSize << std::endl;
+			std::cout << "ySize = " << ySize << std::endl;*/
+			std::cout << "Started (total " << numBands << ")." << std::flush;
 			for(int n = 1; n <= numBands; n++)
 			{
-				cout << "." << n << "." << flush;
+				std::cout << "." << n << "." << std::flush;
 				imgBand = outputImage->GetRasterBand(n);
 				for(int i = 0; i < ySize; i++)
 				{
 					imgBand->RasterIO(GF_Write, 0, i, xSize, 1, imgData, xSize, 1, GDT_Float32, 0, 0);
 				}
 			}
-			cout << ". Complete\n";
+			std::cout << ". Complete\n";
 		}
 		catch(RSGISImageBandException e)
 		{
@@ -1439,7 +1439,7 @@ namespace rsgis{namespace img{
 		return outputImage;
 	}
     
-    GDALDataset* RSGISImageUtils::createBlankImage(string imageFile, double *transformation, int xSize, int ySize, int numBands, string projection, float value, vector<string> bandNames, string gdalFormat) throw(RSGISImageException, RSGISImageBandException)
+    GDALDataset* RSGISImageUtils::createBlankImage(std::string imageFile, double *transformation, int xSize, int ySize, int numBands, std::string projection, float value, std::vector<std::string> bandNames, std::string gdalFormat) throw(RSGISImageException, RSGISImageBandException)
     {
         GDALAllRegister();
 		GDALDriver *poDriver = NULL;
@@ -1489,13 +1489,13 @@ namespace rsgis{namespace img{
 				imgData[i] = value;
 			}
 			
-			/*cout << "Created Image: \n";
-             cout << "xSize = " << xSize << endl;
-             cout << "ySize = " << ySize << endl;*/
-			cout << "Started (total " << numBands << ")." << flush;
+			/*std::cout << "Created Image: \n";
+             std::cout << "xSize = " << xSize << std::endl;
+             std::cout << "ySize = " << ySize << std::endl;*/
+			std::cout << "Started (total " << numBands << ")." << std::flush;
 			for(int n = 1; n <= numBands; n++)
 			{
-				cout << "." << n << "." << flush;
+				std::cout << "." << n << "." << std::flush;
 				imgBand = outputImage->GetRasterBand(n);
                 imgBand->SetDescription(bandNames.at(n-1).c_str());
 				for(int i = 0; i < ySize; i++)
@@ -1503,7 +1503,7 @@ namespace rsgis{namespace img{
 					imgBand->RasterIO(GF_Write, 0, i, xSize, 1, imgData, xSize, 1, GDT_Float32, 0, 0);
 				}
 			}
-			cout << ". Complete\n";
+			std::cout << ". Complete\n";
 		}
 		catch(RSGISImageBandException e)
 		{
@@ -1538,7 +1538,7 @@ namespace rsgis{namespace img{
 		return outputImage;
     }
 	
-	GDALDataset* RSGISImageUtils::createBlankImage(string imageFile, Envelope extent, double resolution, int numBands, string projection, float value, string gdalFormat) throw(RSGISImageException, RSGISImageBandException)
+	GDALDataset* RSGISImageUtils::createBlankImage(std::string imageFile, geos::geom::Envelope extent, double resolution, int numBands, std::string projection, float value, std::string gdalFormat) throw(RSGISImageException, RSGISImageBandException)
 	{
 		GDALAllRegister();
 		GDALDriver *poDriver = NULL;
@@ -1595,7 +1595,7 @@ namespace rsgis{namespace img{
 				throw RSGISImageException("Image could not be created.");
 			}
             
-            cout << "Projection = " << projection << endl;
+            std::cout << "Projection = " << projection << std::endl;
             
 			outputImage->SetGeoTransform(transformation);
 			outputImage->SetProjection(projection.c_str());
@@ -1606,13 +1606,13 @@ namespace rsgis{namespace img{
 				imgData[i] = value;
 			}
 			
-			cout << "Created Image: \n";
-			cout << "xSize = " << xSize << endl;
-			cout << "ySize = " << ySize << endl;
+			std::cout << "Created Image: \n";
+			std::cout << "xSize = " << xSize << std::endl;
+			std::cout << "ySize = " << ySize << std::endl;
 			
 			for(int n = 1; n <= numBands; n++)
 			{
-				cout << "Zeroing band " << n << " of " << numBands << endl;
+				std::cout << "Zeroing band " << n << " of " << numBands << std::endl;
 				imgBand = outputImage->GetRasterBand(n);
 				for(int i = 0; i < ySize; i++)
 				{
@@ -1657,7 +1657,7 @@ namespace rsgis{namespace img{
 		return outputImage;
 	}
 	
-	void RSGISImageUtils::exportImageBands(string imageFile, string outputFilebase, string format) throw(RSGISImageException, RSGISImageBandException)
+	void RSGISImageUtils::exportImageBands(std::string imageFile, std::string outputFilebase, std::string format) throw(RSGISImageException, RSGISImageBandException)
 	{
 		GDALAllRegister();
 		GDALDataset *dataset = NULL;
@@ -1665,33 +1665,33 @@ namespace rsgis{namespace img{
 		GDALRasterBand *inputImgBand = NULL;
 		GDALRasterBand *outputImgBand = NULL;
 		GDALDataset *outputImage = NULL;
-		string outImageFile = "";
-		stringstream *outStrStream;
+		std::string outImageFile = "";
+		std::stringstream *outStrStream;
 		double *transformation = new double[6];
 		float *imageData = NULL;
 		char **gdalDriverMetaInfo;
 		
 		try
 		{
-			cout << imageFile << endl;
+			std::cout << imageFile << std::endl;
 			dataset = (GDALDataset *) GDALOpenShared(imageFile.c_str(), GA_ReadOnly);
 			if(dataset == NULL)
 			{
-				string message = string("Could not open image ") + imageFile;
+				std::string message = std::string("Could not open image ") + imageFile;
 				throw RSGISImageException(message.c_str());
 			}
 			
 			gdalDriver = GetGDALDriverManager()->GetDriverByName(format.c_str());
 			if(gdalDriver == NULL)
 			{
-				string message = format + string(" image driver is not available.");
+				std::string message = format + std::string(" image driver is not available.");
 				throw RSGISImageException(message.c_str());
 			}
 			
 			gdalDriverMetaInfo = gdalDriver->GetMetadata();
 			if(CSLFetchBoolean(gdalDriverMetaInfo, GDAL_DCAP_CREATE, FALSE ))
 			{
-				cout << "Driver for " << format << " supports CreateCopy\n";
+				std::cout << "Driver for " << format << " supports CreateCopy\n";
 			}
 			else
 			{
@@ -1707,11 +1707,11 @@ namespace rsgis{namespace img{
 			
 			for(int i = 1; i <= numBands; i++)
 			{
-				cout << "Outputting band " << i << " of " << numBands << endl;
-				outStrStream = new stringstream();
+				std::cout << "Outputting band " << i << " of " << numBands << std::endl;
+				outStrStream = new std::stringstream();
 				*outStrStream << outputFilebase << "_b" << i << ".tif";
 				outImageFile = outStrStream->str();
-				cout << "File: " << outImageFile << endl;
+				std::cout << "File: " << outImageFile << std::endl;
 
 				outputImage = gdalDriver->Create(outImageFile.c_str(), xSize, ySize, 1, GDT_Float32, NULL);
 				
@@ -1741,7 +1741,7 @@ namespace rsgis{namespace img{
 		}
 	}
 	
-	void RSGISImageUtils::exportImageStack(string *inputImages, string *outputImages, string outputFormat, int numImages)  throw(RSGISImageException, RSGISImageBandException)
+	void RSGISImageUtils::exportImageStack(std::string *inputImages, std::string *outputImages, std::string outputFormat, int numImages)  throw(RSGISImageException, RSGISImageBandException)
 	{
 		GDALAllRegister();
 		GDALDataset **inDatasets = NULL;
@@ -1767,18 +1767,18 @@ namespace rsgis{namespace img{
 			gdalDriver = GetGDALDriverManager()->GetDriverByName(outputFormat.c_str());
 			if(gdalDriver == NULL)
 			{
-				string message = string("Driver for ") + outputFormat + string(" does not exist\n");
+				std::string message = std::string("Driver for ") + outputFormat + std::string(" does not exist\n");
 				throw RSGISImageException(message.c_str());
 			}
 			
 			inDatasets = new GDALDataset*[numImages];
 			for(int i = 0; i < numImages; i++)
 			{
-				cout << inputImages[i] << endl;
+				std::cout << inputImages[i] << std::endl;
 				inDatasets[i] = (GDALDataset *) GDALOpenShared(inputImages[i].c_str(), GA_ReadOnly);
 				if(inDatasets[i] == NULL)
 				{
-					string message = string("Could not open image ") + inputImages[i];
+					std::string message = std::string("Could not open image ") + inputImages[i];
 					throw RSGISImageException(message.c_str());
 				}
 			}
@@ -1786,14 +1786,14 @@ namespace rsgis{namespace img{
 			// Find image overlap
 			this->getImageOverlap(inDatasets, numImages, dsOffsets, &stackWidth, &stackHeight, gdalTranslation);
 			
-			cout << "Stack Height = " << stackHeight << endl;
-			cout << "Stack Width = " << stackWidth << endl;
+			std::cout << "Stack Height = " << stackHeight << std::endl;
+			std::cout << "Stack Width = " << stackWidth << std::endl;
 			
 			data = (float *) CPLMalloc(sizeof(float)*stackWidth);
 			
 			for(int i = 0; i < numImages; i++)
 			{
-				cout << "Converting image " << inputImages[i] << endl;
+				std::cout << "Converting image " << inputImages[i] << std::endl;
 				numOutBands = inDatasets[i]->GetRasterCount();
 
 				outputImageDS = gdalDriver->Create(outputImages[i].c_str(), stackWidth, stackHeight, numOutBands, GDT_Float32, NULL);
@@ -1803,26 +1803,26 @@ namespace rsgis{namespace img{
 				
 				for(int n = 1; n <= numOutBands; n++)
 				{
-					cout << "Image Band " << n << " of " << numOutBands << endl;
+					std::cout << "Image Band " << n << " of " << numOutBands << std::endl;
 					
 					inputRasterBand = inDatasets[i]->GetRasterBand(n);
 					outputRasterBand = outputImageDS->GetRasterBand(n);
 					
 					int feedback = stackHeight/10;
 					int feedbackCounter = 0;
-					cout << "Started" << flush;
+					std::cout << "Started" << std::flush;
 					
 					for(int m = 0; m < stackHeight; m++)
 					{
 						if((m % feedback) == 0)
 						{
-							cout << ".." << feedbackCounter << ".." << flush;
+							std::cout << ".." << feedbackCounter << ".." << std::flush;
 							feedbackCounter = feedbackCounter + 10;
 						}
 						inputRasterBand->RasterIO(GF_Read, dsOffsets[i][0], (dsOffsets[i][1]+m), stackWidth, 1, data, stackWidth, 1, GDT_Float32, 0, 0);						
 						outputRasterBand->RasterIO(GF_Write, 0, m, stackWidth, 1, data, stackWidth, 1, GDT_Float32, 0, 0);
 					}
-					cout << " Complete.\n";
+					std::cout << " Complete.\n";
 				}
 
 				GDALClose(outputImageDS);
@@ -1843,7 +1843,7 @@ namespace rsgis{namespace img{
 		}
 	}
 	
-	void RSGISImageUtils::exportImageStackWithMask(string *inputImages, string *outputImages, string imageMask, string outputFormat, int numImages, float maskValue)  throw(RSGISImageException, RSGISImageBandException)
+	void RSGISImageUtils::exportImageStackWithMask(std::string *inputImages, std::string *outputImages, std::string imageMask, std::string outputFormat, int numImages, float maskValue)  throw(RSGISImageException, RSGISImageBandException)
 	{
 		GDALAllRegister();
 		GDALDataset **inDatasets = NULL;
@@ -1868,25 +1868,25 @@ namespace rsgis{namespace img{
 			gdalDriver = GetGDALDriverManager()->GetDriverByName(outputFormat.c_str());
 			if(gdalDriver == NULL)
 			{
-				string message = string("Driver for ") + outputFormat + string(" does not exist\n");
+				std::string message = std::string("Driver for ") + outputFormat + std::string(" does not exist\n");
 				throw RSGISImageException(message.c_str());
 			}
 			
 			inDatasets = new GDALDataset*[numImages];
-			cout << imageMask << endl;
+			std::cout << imageMask << std::endl;
 			inDatasets[0] = (GDALDataset *) GDALOpenShared(imageMask.c_str(), GA_ReadOnly);
 			if(inDatasets[0] == NULL)
 			{
-				string message = string("Could not open image ") + imageMask;
+				std::string message = std::string("Could not open image ") + imageMask;
 				throw RSGISImageException(message.c_str());
 			}
 			for(int i = 1; i < numImages; i++)
 			{
-				cout << inputImages[i-1] << endl;
+				std::cout << inputImages[i-1] << std::endl;
 				inDatasets[i] = (GDALDataset *) GDALOpenShared(inputImages[i-1].c_str(), GA_ReadOnly);
 				if(inDatasets[i] == NULL)
 				{
-					string message = string("Could not open image ") + inputImages[i-1];
+					std::string message = std::string("Could not open image ") + inputImages[i-1];
 					throw RSGISImageException(message.c_str());
 				}
 			}
@@ -1900,15 +1900,15 @@ namespace rsgis{namespace img{
 			// Find image overlap
 			this->getImageOverlap(inDatasets, numImages, dsOffsets, &stackWidth, &stackHeight, gdalTranslation);
 			
-			cout << "Stack Height = " << stackHeight << endl;
-			cout << "Stack Width = " << stackWidth << endl;
+			std::cout << "Stack Height = " << stackHeight << std::endl;
+			std::cout << "Stack Width = " << stackWidth << std::endl;
 			
 			data = (float *) CPLMalloc(sizeof(float)*stackWidth);
 			mask = (float *) CPLMalloc(sizeof(float)*stackWidth);
 			imageMaskBand = inDatasets[0]->GetRasterBand(1);
 			for(int i = 1; i < numImages; i++)
 			{
-				cout << "Converting image " << inputImages[i-1] << endl;
+				std::cout << "Converting image " << inputImages[i-1] << std::endl;
 				numOutBands = inDatasets[i]->GetRasterCount();
 				outputImageDS = gdalDriver->Create(outputImages[i-1].c_str(), stackWidth, stackHeight, numOutBands, GDT_Float32, NULL);
 				outputImageDS->SetGeoTransform(gdalTranslation);
@@ -1916,19 +1916,19 @@ namespace rsgis{namespace img{
 				
 				for(int n = 1; n <= numOutBands; n++)
 				{
-					cout << "Image Band " << n << " of " << numOutBands << endl;
+					std::cout << "Image Band " << n << " of " << numOutBands << std::endl;
 					inputRasterBand = inDatasets[i]->GetRasterBand(n);
 					outputRasterBand = outputImageDS->GetRasterBand(n);
 					
 					int feedback = stackHeight/10;
 					int feedbackCounter = 0;
-					cout << "Started" << flush;
+					std::cout << "Started" << std::flush;
 					
 					for(int m = 0; m < stackHeight; m++)
 					{
 						if((m % feedback) == 0)
 						{
-							cout << ".." << feedbackCounter << ".." << flush;
+							std::cout << ".." << feedbackCounter << ".." << std::flush;
 							feedbackCounter = feedbackCounter + 10;
 						}
 						
@@ -1945,7 +1945,7 @@ namespace rsgis{namespace img{
 						
 						outputRasterBand->RasterIO(GF_Write, 0, m, stackWidth, 1, data, stackWidth, 1, GDT_Float32, 0, 0);
 					}
-					cout << " Complete.\n";
+					std::cout << " Complete.\n";
 				}
 				GDALClose(outputImageDS);
 			}
@@ -1963,7 +1963,7 @@ namespace rsgis{namespace img{
 		}
 	}
 	
-	void RSGISImageUtils::convertImageFileFormat(string inputImage, string outputImage, string outputImageFormat, bool projFromImage, string wktProjStr)
+	void RSGISImageUtils::convertImageFileFormat(std::string inputImage, std::string outputImage, std::string outputImageFormat, bool projFromImage, std::string wktProjStr)
 	{
 		GDALAllRegister();
 		GDALDataset *inDataset = NULL;
@@ -1986,33 +1986,33 @@ namespace rsgis{namespace img{
 			gdalDriver = GetGDALDriverManager()->GetDriverByName(outputImageFormat.c_str());
 			if(gdalDriver == NULL)
 			{
-				string message = string("Driver for ") + outputImageFormat + string(" does not exist\n");
+				std::string message = std::string("Driver for ") + outputImageFormat + std::string(" does not exist\n");
 				throw RSGISImageException(message.c_str());
 			}
 			
 			gdalDriverMetaInfo = gdalDriver->GetMetadata();
 			if(CSLFetchBoolean(gdalDriverMetaInfo, GDAL_DCAP_CREATECOPY, FALSE ))
 			{
-				cout << "Driver for " << outputImageFormat << " supports CreateCopy\n";
+				std::cout << "Driver for " << outputImageFormat << " supports CreateCopy\n";
 			}
 			else
 			{
 				throw RSGISImageException("Image driver does not support image copy. Therefore cannot create file of this type.");
 			}
 			
-			cout << "Openning image " << inputImage << endl;
+			std::cout << "Openning image " << inputImage << std::endl;
 			inDataset = (GDALDataset *) GDALOpenShared(inputImage.c_str(), GA_ReadOnly);
 			if(inDataset == NULL)
 			{
-				string message = string("Could not open image ") + inputImage;
+				std::string message = std::string("Could not open image ") + inputImage;
 				throw RSGISImageException(message.c_str());
 			}
 			
-			cout << "Creating image " << outputImage << endl;
+			std::cout << "Creating image " << outputImage << std::endl;
 			outDataset = gdalDriver->CreateCopy(outputImage.c_str(), inDataset, FALSE, NULL, NULL, NULL);
 			if(outDataset == NULL)
 			{
-				string message = string("Could not open image ") + outputImage;
+				std::string message = std::string("Could not open image ") + outputImage;
 				throw RSGISImageException(outputImage.c_str());
 			}
             
@@ -2024,31 +2024,31 @@ namespace rsgis{namespace img{
 			width = inDataset->GetRasterXSize();
 			height = inDataset->GetRasterYSize();
 			data = (float *) CPLMalloc(sizeof(float)*width);
-			cout << "Image size [" << width << "," << height << "]\n";
+			std::cout << "Image size [" << width << "," << height << "]\n";
 			
 			numOutBands = inDataset->GetRasterCount();
 			for(int n = 1; n <= numOutBands; n++)
 			{
-				cout << "Image Band " << n << " of " << numOutBands << endl;
+				std::cout << "Image Band " << n << " of " << numOutBands << std::endl;
 				inputRasterBand = inDataset->GetRasterBand(n);
 				outputRasterBand = outDataset->GetRasterBand(n);
 				
 				int feedback = height/10;
 				int feedbackCounter = 0;
-				cout << "Started" << flush;
+				std::cout << "Started" << std::flush;
 				
 				for(int m = 0; m < height; m++)
 				{
 					if((m % feedback) == 0)
 					{
-						cout << ".." << feedbackCounter << ".." << flush;
+						std::cout << ".." << feedbackCounter << ".." << std::flush;
 						feedbackCounter = feedbackCounter + 10;
 					}
 					
 					inputRasterBand->RasterIO(GF_Read, 0, m, width, 1, data, width, 1, GDT_Float32, 0, 0);
 					outputRasterBand->RasterIO(GF_Write, 0, m, width, 1, data, width, 1, GDT_Float32, 0, 0);
 				}
-				cout << " Complete.\n";
+				std::cout << " Complete.\n";
 			}
 			
 			GDALClose(outDataset);
@@ -2063,11 +2063,11 @@ namespace rsgis{namespace img{
 	
 	float** RSGISImageUtils::getImageDataBlock(GDALDataset *dataset, int *dsOffsets, unsigned int width, unsigned int height, unsigned int *numVals)
 	{
-		//cout << "Reading data block\n";
+		//std::cout << "Reading data block\n";
 		
-		//cout << "width = " << width << endl;
-		//cout << "height = " << height << endl;
-		//cout << "Offset = [" << dsOffsets[0] << "," << dsOffsets[1] << "]\n";
+		//std::cout << "width = " << width << std::endl;
+		//std::cout << "height = " << height << std::endl;
+		//std::cout << "Offset = [" << dsOffsets[0] << "," << dsOffsets[1] << "]\n";
 		
 		unsigned int numImageBands = dataset->GetRasterCount();
 		*numVals = width*height;
@@ -2107,12 +2107,12 @@ namespace rsgis{namespace img{
 		delete[] imgData;
 		delete[]rasterBands;
 		
-		//cout << "Read data block\n";
+		//std::cout << "Read data block\n";
 		
 		return outVals;
 	}
 	
-	void RSGISImageUtils::copyImageRemoveSpatialReference(string inputImage, string outputImage)throw(RSGISImageException)
+	void RSGISImageUtils::copyImageRemoveSpatialReference(std::string inputImage, std::string outputImage)throw(RSGISImageException)
 	{
 		GDALAllRegister();
 		GDALDataset *inDataset = NULL;
@@ -2135,16 +2135,16 @@ namespace rsgis{namespace img{
 			gdalDriver = GetGDALDriverManager()->GetDriverByName("ENVI");
 			if(gdalDriver == NULL)
 			{
-				string message = string("Driver for ENVI does not exist\n");
+				std::string message = std::string("Driver for ENVI does not exist\n");
 				throw RSGISImageException(message.c_str());
 			}
 			
 			
-			cout << "Openning image " << inputImage << endl;
+			std::cout << "Openning image " << inputImage << std::endl;
 			inDataset = (GDALDataset *) GDALOpenShared(inputImage.c_str(), GA_ReadOnly);
 			if(inDataset == NULL)
 			{
-				string message = string("Could not open image ") + inputImage;
+				std::string message = std::string("Could not open image ") + inputImage;
 				throw RSGISImageException(message.c_str());
 			}
 			
@@ -2161,12 +2161,12 @@ namespace rsgis{namespace img{
 			transformation[4] = 0;
 			transformation[5] = -1;
 			
-			cout << "Creating image " << outputImage << endl;
+			std::cout << "Creating image " << outputImage << std::endl;
 			outDataset = gdalDriver->Create(outputImage.c_str(), width, height, numOutBands, GDT_Float32, NULL);
 			
 			if(outDataset == NULL)
 			{
-				string message = string("Could not open image ") + outputImage;
+				std::string message = std::string("Could not open image ") + outputImage;
 				throw RSGISImageException(outputImage.c_str());
 			}
 			
@@ -2175,31 +2175,31 @@ namespace rsgis{namespace img{
 			
 			
 			data = (float *) CPLMalloc(sizeof(float)*width);
-			cout << "Image size [" << width << "," << height << "]\n";
+			std::cout << "Image size [" << width << "," << height << "]\n";
 			
 			
 			for(int n = 1; n <= numOutBands; n++)
 			{
-				cout << "Image Band " << n << " of " << numOutBands << endl;
+				std::cout << "Image Band " << n << " of " << numOutBands << std::endl;
 				inputRasterBand = inDataset->GetRasterBand(n);
 				outputRasterBand = outDataset->GetRasterBand(n);
 				
 				int feedback = height/10;
 				int feedbackCounter = 0;
-				cout << "Started" << flush;
+				std::cout << "Started" << std::flush;
 				
 				for(int m = 0; m < height; m++)
 				{
 					if((m % feedback) == 0)
 					{
-						cout << ".." << feedbackCounter << ".." << flush;
+						std::cout << ".." << feedbackCounter << ".." << std::flush;
 						feedbackCounter = feedbackCounter + 10;
 					}
 					
 					inputRasterBand->RasterIO(GF_Read, 0, m, width, 1, data, width, 1, GDT_Float32, 0, 0);
 					outputRasterBand->RasterIO(GF_Write, 0, m, width, 1, data, width, 1, GDT_Float32, 0, 0);
 				}
-				cout << " Complete.\n";
+				std::cout << " Complete.\n";
 			}
 			
 			GDALClose(outDataset);
@@ -2213,7 +2213,7 @@ namespace rsgis{namespace img{
 		}
 	}
 
-	void RSGISImageUtils::copyImageDefiningSpatialReference(string inputImage, string outputImage, string proj, double tlX, double tlY, float xRes, float yRes)throw(RSGISImageException)
+	void RSGISImageUtils::copyImageDefiningSpatialReference(std::string inputImage, std::string outputImage, std::string proj, double tlX, double tlY, float xRes, float yRes)throw(RSGISImageException)
 	{
 		GDALAllRegister();
 		GDALDataset *inDataset = NULL;
@@ -2236,16 +2236,16 @@ namespace rsgis{namespace img{
 			gdalDriver = GetGDALDriverManager()->GetDriverByName("ENVI");
 			if(gdalDriver == NULL)
 			{
-				string message = string("Driver for ENVI does not exist\n");
+				std::string message = std::string("Driver for ENVI does not exist\n");
 				throw RSGISImageException(message.c_str());
 			}
 			
 			
-			cout << "Openning image " << inputImage << endl;
+			std::cout << "Openning image " << inputImage << std::endl;
 			inDataset = (GDALDataset *) GDALOpenShared(inputImage.c_str(), GA_ReadOnly);
 			if(inDataset == NULL)
 			{
-				string message = string("Could not open image ") + inputImage;
+				std::string message = std::string("Could not open image ") + inputImage;
 				throw RSGISImageException(message.c_str());
 			}
 			
@@ -2262,16 +2262,16 @@ namespace rsgis{namespace img{
 			transformation[4] = 0;
 			transformation[5] = yRes;
 			
-			cout << "Creating image " << outputImage << endl;
+			std::cout << "Creating image " << outputImage << std::endl;
 			outDataset = gdalDriver->Create(outputImage.c_str(), width, height, numOutBands, GDT_Float32, NULL);
 			if(outDataset == NULL)
 			{
-				string message = string("Could not open image ") + outputImage;
+				std::string message = std::string("Could not open image ") + outputImage;
 				throw RSGISImageException(outputImage.c_str());
 			}
 			
 			outDataset->SetGeoTransform(transformation);
-			cout << "Defining projections as :\'" << proj << "\'\n";
+			std::cout << "Defining projections as :\'" << proj << "\'\n";
 			char **wktInSpatialRef = new char*[1];
 			wktInSpatialRef[0] = const_cast<char *>(proj.c_str());
 			OGRSpatialReference ogrSpatial = OGRSpatialReference();
@@ -2290,38 +2290,38 @@ namespace rsgis{namespace img{
 			char **proj4spatialref = new char*[1];
 			proj4spatialref[0] = new char[1000];
 			ogrSpatial.exportToProj4(proj4spatialref);
-			cout << "As Proj4: \'" << proj4spatialref[0] << "\'" << endl;
+			std::cout << "As Proj4: \'" << proj4spatialref[0] << "\'" << std::endl;
 			
 			OGRFree(wktspatialref);
 			OGRFree(wktInSpatialRef);
 			OGRFree(proj4spatialref);
 			
 			data = (float *) CPLMalloc(sizeof(float)*width);
-			cout << "Image size [" << width << "," << height << "]\n";
+			std::cout << "Image size [" << width << "," << height << "]\n";
 			
 			
 			for(int n = 1; n <= numOutBands; n++)
 			{
-				cout << "Image Band " << n << " of " << numOutBands << endl;
+				std::cout << "Image Band " << n << " of " << numOutBands << std::endl;
 				inputRasterBand = inDataset->GetRasterBand(n);
 				outputRasterBand = outDataset->GetRasterBand(n);
 				
 				int feedback = height/10;
 				int feedbackCounter = 0;
-				cout << "Started" << flush;
+				std::cout << "Started" << std::flush;
 				
 				for(int m = 0; m < height; m++)
 				{
 					if((m % feedback) == 0)
 					{
-						cout << ".." << feedbackCounter << ".." << flush;
+						std::cout << ".." << feedbackCounter << ".." << std::flush;
 						feedbackCounter = feedbackCounter + 10;
 					}
 					
 					inputRasterBand->RasterIO(GF_Read, 0, m, width, 1, data, width, 1, GDT_Float32, 0, 0);
 					outputRasterBand->RasterIO(GF_Write, 0, m, width, 1, data, width, 1, GDT_Float32, 0, 0);
 				}
-				cout << " Complete.\n";
+				std::cout << " Complete.\n";
 			}
 			
 			GDALClose(outDataset);
@@ -2335,9 +2335,9 @@ namespace rsgis{namespace img{
 		}
 	}
     
-    void RSGISImageUtils::createImageSlices(GDALDataset *dataset, string outputImageBase) throw(RSGISImageException)
+    void RSGISImageUtils::createImageSlices(GDALDataset *dataset, std::string outputImageBase) throw(RSGISImageException)
     {
-        RSGISMathsUtils mathUtils;
+        rsgis::math::RSGISMathsUtils mathUtils;
         
         GDALDriver *gdalDriver = NULL;
         GDALDataset *outDataset = NULL;
@@ -2351,7 +2351,7 @@ namespace rsgis{namespace img{
 			gdalDriver = GetGDALDriverManager()->GetDriverByName("ENVI");
 			if(gdalDriver == NULL)
 			{
-				string message = string("Driver for ENVI does not exist\n");
+				std::string message = std::string("Driver for ENVI does not exist\n");
 				throw RSGISImageException(message.c_str());
 			}
             
@@ -2368,11 +2368,11 @@ namespace rsgis{namespace img{
             
             for(int i = 0; i < dataset->GetRasterYSize(); ++i)
             {
-                string outputImage = outputImageBase + mathUtils.inttostring(i) + string(".env");
+                std::string outputImage = outputImageBase + mathUtils.inttostring(i) + std::string(".env");
 				outDataset = gdalDriver->Create(outputImage.c_str(), width, height, 1, GDT_Float32, NULL);
                 if(outDataset == NULL)
                 {
-                    string message = string("Could not open image ") + outputImage;
+                    std::string message = std::string("Could not open image ") + outputImage;
                     throw RSGISImageException(outputImage.c_str());
                 }
                 outputRasterBand = outDataset->GetRasterBand(1);
@@ -2788,12 +2788,12 @@ namespace rsgis{namespace img{
             
             int feedback = height/10;
 			int feedbackCounter = 0;
-			cout << "Started" << flush;
+			std::cout << "Started" << std::flush;
             for(unsigned long y = 0; y < height; ++y)
             {
                 if((y % feedback) == 0)
 				{
-					cout << "." << feedbackCounter << "." << flush;
+					std::cout << "." << feedbackCounter << "." << std::flush;
 					feedbackCounter = feedbackCounter + 10;
 				}
                 
@@ -2802,7 +2802,7 @@ namespace rsgis{namespace img{
                     rasterBands[n]->RasterIO(GF_Write, 0, y, width, 1, dataVals, width, 1, GDT_Float32, 0, 0);
                 }
             }
-            cout << " Complete.\n";
+            std::cout << " Complete.\n";
             
             delete[] rasterBands;
             delete[] dataVals;
@@ -2813,7 +2813,7 @@ namespace rsgis{namespace img{
         }
     }
     
-    GDALDataset* RSGISImageUtils::createCopy(GDALDataset *inData, string outputFilePath, string outputFormat, GDALDataType eType, bool useImgProj, string proj)throw(RSGISImageException)
+    GDALDataset* RSGISImageUtils::createCopy(GDALDataset *inData, std::string outputFilePath, std::string outputFormat, GDALDataType eType, bool useImgProj, std::string proj)throw(RSGISImageException)
     {
         unsigned long width = inData->GetRasterXSize();
         unsigned long height = inData->GetRasterYSize();
@@ -2828,14 +2828,14 @@ namespace rsgis{namespace img{
         if(gdalDriver == NULL)
         {
             delete[] gdalTranslation;
-            string message = string("Driver for ") + outputFormat + string(" does not exist\n");
+            std::string message = std::string("Driver for ") + outputFormat + std::string(" does not exist\n");
             throw RSGISImageException(message.c_str());
         }
         GDALDataset *dataset = gdalDriver->Create(outputFilePath.c_str(), width, height, numBands, eType, NULL);
         if(dataset == NULL)
         {
             delete[] gdalTranslation;
-            string message = string("Could not create GDALDataset.");
+            std::string message = std::string("Could not create GDALDataset.");
             throw RSGISImageException(message);
         }
         
@@ -2855,7 +2855,7 @@ namespace rsgis{namespace img{
 
     }
     
-    GDALDataset* RSGISImageUtils::createCopy(GDALDataset *inData, unsigned int numBands, string outputFilePath, string outputFormat, GDALDataType eType, bool useImgProj, string proj)throw(RSGISImageException)
+    GDALDataset* RSGISImageUtils::createCopy(GDALDataset *inData, unsigned int numBands, std::string outputFilePath, std::string outputFormat, GDALDataType eType, bool useImgProj, std::string proj)throw(RSGISImageException)
     {
         unsigned long width = inData->GetRasterXSize();
         unsigned long height = inData->GetRasterYSize();
@@ -2869,14 +2869,14 @@ namespace rsgis{namespace img{
         if(gdalDriver == NULL)
         {
             delete[] gdalTranslation;
-            string message = string("Driver for ") + outputFormat + string(" does not exist\n");
+            std::string message = std::string("Driver for ") + outputFormat + std::string(" does not exist\n");
             throw RSGISImageException(message.c_str());
         }
         GDALDataset *dataset = gdalDriver->Create(outputFilePath.c_str(), width, height, numBands, eType, NULL);
         if(dataset == NULL)
         {
             delete[] gdalTranslation;
-            string message = string("Could not create GDALDataset.");
+            std::string message = std::string("Could not create GDALDataset.");
             throw RSGISImageException(message);
         }
         
@@ -2896,7 +2896,7 @@ namespace rsgis{namespace img{
         
     }
 
-    void RSGISImageUtils::createKMLText(string inputImage, string outKMLFile) throw(RSGISImageBandException)
+    void RSGISImageUtils::createKMLText(std::string inputImage, std::string outKMLFile) throw(RSGISImageBandException)
     {
         
         // Open text file for writing
@@ -2909,7 +2909,7 @@ namespace rsgis{namespace img{
         
         if(dataset == NULL)
         {
-            string message = string("Could not open image ") + inputImage;
+            std::string message = std::string("Could not open image ") + inputImage;
             throw RSGISImageException(message.c_str());
         }
         

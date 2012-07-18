@@ -71,12 +71,12 @@ namespace rsgis{ namespace img{
 		throw RSGISImageCalcException("Not Implemented");
 	}
 	
-	void RSGISColourUpImage::calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException)
+	void RSGISColourUpImage::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(RSGISImageCalcException)
 	{
 		throw RSGISImageCalcException("Not Implemented");
 	}
 	
-	void RSGISColourUpImage::calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException)
+	void RSGISColourUpImage::calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(RSGISImageCalcException)
 	{
 		throw RSGISImageCalcException("Not Implemented");
 	}
@@ -135,12 +135,12 @@ namespace rsgis{ namespace img{
 		throw RSGISImageCalcException("Not Implemented");
 	}
 	
-	void RSGISColourUpImageBand::calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException)
+	void RSGISColourUpImageBand::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(RSGISImageCalcException)
 	{
 		throw RSGISImageCalcException("Not Implemented");
 	}
 	
-	void RSGISColourUpImageBand::calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException)
+	void RSGISColourUpImageBand::calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(RSGISImageCalcException)
 	{
 		throw RSGISImageCalcException("Not Implemented");
 	}
@@ -168,20 +168,20 @@ namespace rsgis{ namespace img{
 		
 	}
 	
-	ClassColour** RSGISClassColourReader::readClassColourXML(int *numClasses, string xmlFile) throw(RSGISParseColourException)
+	ClassColour** RSGISClassColourReader::readClassColourXML(int *numClasses, std::string xmlFile) throw(RSGISParseColourException)
 	{
-		RSGISMathsUtils mathsUtils;
+        rsgis::math::RSGISMathsUtils mathsUtils;
 		
 		XMLCh tempStr[100];
-		DOMImplementation *impl = NULL;
-		DOMLSParser* parser = NULL;
-		ErrorHandler* errHandler = NULL;
-		DOMDocument *doc = NULL;
-		DOMElement *rootClassificationElement = NULL;
-		DOMNodeList *classesNode = NULL;
-		DOMElement *classesElement = NULL;
-		DOMNodeList *classNodesList = NULL;
-		DOMElement *classElement = NULL;
+        xercesc::DOMImplementation *impl = NULL;
+		xercesc::DOMLSParser* parser = NULL;
+		xercesc::ErrorHandler* errHandler = NULL;
+		xercesc::DOMDocument *doc = NULL;
+		xercesc::DOMElement *rootClassificationElement = NULL;
+		xercesc::DOMNodeList *classesNode = NULL;
+		xercesc::DOMElement *classesElement = NULL;
+		xercesc::DOMNodeList *classNodesList = NULL;
+		xercesc::DOMElement *classElement = NULL;
 
 		
 		ClassColour **classData = NULL;
@@ -189,40 +189,40 @@ namespace rsgis{ namespace img{
 		
 		try 
 		{
-			XMLPlatformUtils::Initialize();
+			xercesc::XMLPlatformUtils::Initialize();
 			
-			XMLString::transcode("LS", tempStr, 99);
-			impl = DOMImplementationRegistry::getDOMImplementation(tempStr);
+			xercesc::XMLString::transcode("LS", tempStr, 99);
+			impl = xercesc::DOMImplementationRegistry::getDOMImplementation(tempStr);
 			if(impl == NULL)
 			{
 				throw RSGISParseColourException("DOMImplementation is NULL");
 			}
 			// Create Parser
-			parser = ((DOMImplementationLS*)impl)->createLSParser(DOMImplementationLS::MODE_SYNCHRONOUS, 0);
-			errHandler = (ErrorHandler*) new HandlerBase();
-			parser->getDomConfig()->setParameter(XMLUni::fgDOMErrorHandler, errHandler);
+			parser = ((xercesc::DOMImplementationLS*)impl)->createLSParser(xercesc::DOMImplementationLS::MODE_SYNCHRONOUS, 0);
+			errHandler = (xercesc::ErrorHandler*) new xercesc::HandlerBase();
+			parser->getDomConfig()->setParameter(xercesc::XMLUni::fgDOMErrorHandler, errHandler);
 			
 			// Open Document
 			doc = parser->parseURI(xmlFile.c_str());	
 			
 			// Get the Root element
 			rootClassificationElement = doc->getDocumentElement();
-			//cout << "Root Element: " << XMLString::transcode(rootClassificationElement->getTagName()) << endl;
-			if(!XMLString::equals(rootClassificationElement->getTagName(), XMLString::transcode("slices")))
+			//cout << "Root Element: " << xercesc::XMLString::transcode(rootClassificationElement->getTagName()) << endl;
+			if(!xercesc::XMLString::equals(rootClassificationElement->getTagName(), xercesc::XMLString::transcode("slices")))
 			{
 				throw RSGISParseColourException("Incorrect root element; Root element should be \"slices\"");
 			}
 			//cout << ""
-			numBands = mathsUtils.strtoint(XMLString::transcode(rootClassificationElement->getAttribute(XMLString::transcode("inputbands"))));
+			numBands = mathsUtils.strtoint(xercesc::XMLString::transcode(rootClassificationElement->getAttribute(xercesc::XMLString::transcode("inputbands"))));
 			
-			classesNode = rootClassificationElement->getElementsByTagName(XMLString::transcode("classes"));
+			classesNode = rootClassificationElement->getElementsByTagName(xercesc::XMLString::transcode("classes"));
 			if(classesNode->getLength() != 1)
 			{
 				throw RSGISParseColourException("There should be only 1 classes node");
 			}
-			classesElement = static_cast<DOMElement*>(classesNode->item(0));
+			classesElement = static_cast<xercesc::DOMElement*>(classesNode->item(0));
 			
-			classNodesList = classesElement->getElementsByTagName(XMLString::transcode("class"));
+			classNodesList = classesElement->getElementsByTagName(xercesc::XMLString::transcode("class"));
 			*numClasses = classNodesList->getLength();
 			//cout << "There are " << *numClasses << " class nodes." << endl;
 			
@@ -230,33 +230,33 @@ namespace rsgis{ namespace img{
 			for(int i = 0; i < *numClasses; i++)
 			{
 				classData[i] = new ClassColour();
-				classElement = static_cast<DOMElement*>(classNodesList->item(i));
-				classData[i]->className = string(XMLString::transcode(classElement->getAttribute(XMLString::transcode("name"))));
-				classData[i]->classID = mathsUtils.strtoint(XMLString::transcode(classElement->getAttribute(XMLString::transcode("id"))));
-				classData[i]->imgBand = mathsUtils.strtoint(XMLString::transcode(classElement->getAttribute(XMLString::transcode("band"))));
-				classData[i]->lower = mathsUtils.strtofloat(XMLString::transcode(classElement->getAttribute(XMLString::transcode("lower"))));
-				classData[i]->upper = mathsUtils.strtofloat(XMLString::transcode(classElement->getAttribute(XMLString::transcode("upper"))));
-				classData[i]->red = mathsUtils.strtoint(XMLString::transcode(classElement->getAttribute(XMLString::transcode("red"))));
-				classData[i]->green = mathsUtils.strtoint(XMLString::transcode(classElement->getAttribute(XMLString::transcode("green"))));
-				classData[i]->blue = mathsUtils.strtoint(XMLString::transcode(classElement->getAttribute(XMLString::transcode("blue"))));
+				classElement = static_cast<xercesc::DOMElement*>(classNodesList->item(i));
+				classData[i]->className = std::string(xercesc::XMLString::transcode(classElement->getAttribute(xercesc::XMLString::transcode("name"))));
+				classData[i]->classID = mathsUtils.strtoint(xercesc::XMLString::transcode(classElement->getAttribute(xercesc::XMLString::transcode("id"))));
+				classData[i]->imgBand = mathsUtils.strtoint(xercesc::XMLString::transcode(classElement->getAttribute(xercesc::XMLString::transcode("band"))));
+				classData[i]->lower = mathsUtils.strtofloat(xercesc::XMLString::transcode(classElement->getAttribute(xercesc::XMLString::transcode("lower"))));
+				classData[i]->upper = mathsUtils.strtofloat(xercesc::XMLString::transcode(classElement->getAttribute(xercesc::XMLString::transcode("upper"))));
+				classData[i]->red = mathsUtils.strtoint(xercesc::XMLString::transcode(classElement->getAttribute(xercesc::XMLString::transcode("red"))));
+				classData[i]->green = mathsUtils.strtoint(xercesc::XMLString::transcode(classElement->getAttribute(xercesc::XMLString::transcode("green"))));
+				classData[i]->blue = mathsUtils.strtoint(xercesc::XMLString::transcode(classElement->getAttribute(xercesc::XMLString::transcode("blue"))));
 				classData[i]->numInputBands = numBands;
 			}
 			
 			parser->release();
 			delete errHandler;
 			
-			XMLPlatformUtils::Terminate();
+			xercesc::XMLPlatformUtils::Terminate();
 		}
-		catch (const XMLException& e) 
+		catch (const xercesc::XMLException& e) 
 		{
-			char *message = XMLString::transcode(e.getMessage());
-			string outMessage =  string("XMLException : ") + string(message);
+			char *message = xercesc::XMLString::transcode(e.getMessage());
+			string outMessage =  std::string("XMLException : ") + std::string(message);
 			throw RSGISParseColourException(outMessage.c_str());
 		}
-		catch (const DOMException& e) 
+		catch (const xercesc::DOMException& e) 
 		{
-			char *message = XMLString::transcode(e.getMessage());
-			string outMessage =  string("DOMException : ") + string(message);
+			char *message = xercesc::XMLString::transcode(e.getMessage());
+			string outMessage =  std::string("DOMException : ") + std::string(message);
 			throw RSGISParseColourException(outMessage.c_str());
 		}
 		catch(RSGISInputStreamException e)

@@ -156,9 +156,9 @@ namespace rsgis { namespace img {
 				onePercentUpper = (stats[i]->max - stats[i]->mean)/50;
 				onePercentLower = (stats[i]->mean - stats[i]->min)/50;
 				
-				//cout << "Band " << i << " 1 % = " << onePercent << endl;
-				//cout << "Band " << i << " 1 % U = " << onePercentUpper << endl;
-				//cout << "Band " << i << " 1 % L = " << onePercentLower << endl;
+				//std::cout << "Band " << i << " 1 % = " << onePercent << std::endl;
+				//std::cout << "Band " << i << " 1 % U = " << onePercentUpper << std::endl;
+				//std::cout << "Band " << i << " 1 % L = " << onePercentLower << std::endl;
 				
 				imageMin[i] = stats[i]->min + (onePercentLower * percent);
 				imageMax[i] = stats[i]->max - (onePercentUpper * percent);
@@ -254,7 +254,7 @@ namespace rsgis { namespace img {
                     imageMax[i] = stats[i]->max;
                 }
                 
-                cout << "Band[" << i+1 << "] Min = " << stats[i]->min << " Mean = " << stats[i]->mean << " (Std Dev = " << stats[i]->stddev << ") max = " << stats[i]->max << endl;
+                std::cout << "Band[" << i+1 << "] Min = " << stats[i]->min << " Mean = " << stats[i]->mean << " (Std Dev = " << stats[i]->stddev << ") max = " << stats[i]->max << std::endl;
                 
 				outMax[i] = 255;
 				outMin[i] = 0;
@@ -320,7 +320,7 @@ namespace rsgis { namespace img {
 		double *outMax = NULL;
 		double *outMin = NULL;
 		
-		RSGISMathFunction *function = new RSGISExponentStretchFunction();
+		rsgis::math::RSGISMathFunction *function = new RSGISExponentStretchFunction();
 		
 		try
 		{
@@ -413,7 +413,7 @@ namespace rsgis { namespace img {
 		double *outMax = NULL;
 		double *outMin = NULL;
 		
-		RSGISMathFunction *function = new RSGISLogrithmStretchFunction();
+		rsgis::math::RSGISMathFunction *function = new RSGISLogrithmStretchFunction();
 		
 		try
 		{
@@ -506,7 +506,7 @@ namespace rsgis { namespace img {
 		double *outMax = NULL;
 		double *outMin = NULL;
 		
-		RSGISMathFunction *function = new RSGISPowerLawStretchFunction(power);
+		rsgis::math::RSGISMathFunction *function = new RSGISPowerLawStretchFunction(power);
 		
 		try
 		{
@@ -593,9 +593,9 @@ namespace rsgis { namespace img {
 	}
 	
 	
-	double RSGISExponentStretchFunction::calcFunction(double value) throw(RSGISMathException)
+	double RSGISExponentStretchFunction::calcFunction(double value) throw(rsgis::math::RSGISMathException)
 	{
-		//cout << value << " = " << exp(value) << endl;
+		//std::cout << value << " = " << exp(value) << std::endl;
 		float outVal = exp(value);
 		if((boost::math::isinf)(outVal))
 		{
@@ -604,7 +604,7 @@ namespace rsgis { namespace img {
 		return outVal;
 	}
 	
-	double RSGISLogrithmStretchFunction::calcFunction(double value) throw(RSGISMathException)
+	double RSGISLogrithmStretchFunction::calcFunction(double value) throw(rsgis::math::RSGISMathException)
 	{
 		float outVal = log(value);
 		if(((boost::math::isinf)(outVal)) & (outVal < 0))
@@ -614,7 +614,7 @@ namespace rsgis { namespace img {
 		return outVal;
 	}
 	
-	double RSGISPowerLawStretchFunction::calcFunction(double value) throw(RSGISMathException)
+	double RSGISPowerLawStretchFunction::calcFunction(double value) throw(rsgis::math::RSGISMathException)
 	{
 		return pow(value,((double)power));
 	}
@@ -664,7 +664,7 @@ namespace rsgis { namespace img {
 
 	
 	
-	RSGISFuncLinearStretchImage::RSGISFuncLinearStretchImage(int numberOutBands, double *imageMaxIn, double *imageMinIn, double *outMaxIn, double *outMinIn, RSGISMathFunction *func) : RSGISCalcImageValue(numberOutBands)
+	RSGISFuncLinearStretchImage::RSGISFuncLinearStretchImage(int numberOutBands, double *imageMaxIn, double *imageMinIn, double *outMaxIn, double *outMinIn, rsgis::math::RSGISMathFunction *func) : RSGISCalcImageValue(numberOutBands)
 	{
 		this->imageMax = imageMaxIn;
 		this->imageMin = imageMinIn;

@@ -27,7 +27,7 @@
 namespace rsgis { namespace img {
 	
 	
-	RSGISCumulativeArea::RSGISCumulativeArea(int numOutBands, Matrix *bandValuesWidths) : RSGISCalcImageValue(numOutBands)
+	RSGISCumulativeArea::RSGISCumulativeArea(int numOutBands, rsgis::math::Matrix *bandValuesWidths) : RSGISCalcImageValue(numOutBands)
 	{
 		this->bandValuesWidths = bandValuesWidths;
 	}

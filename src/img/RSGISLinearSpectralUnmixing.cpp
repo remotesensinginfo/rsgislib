@@ -25,7 +25,7 @@
 
 namespace rsgis{namespace img{
 
-    RSGISCalcLinearSpectralUnmixing::RSGISCalcLinearSpectralUnmixing(string gdalFormat, GDALDataType gdalDataType, float gain, float offset)
+    RSGISCalcLinearSpectralUnmixing::RSGISCalcLinearSpectralUnmixing(std::string gdalFormat, GDALDataType gdalDataType, float gain, float offset)
     {
         this->gdalFormat = gdalFormat;
         this->gdalDataType = gdalDataType;
@@ -33,7 +33,7 @@ namespace rsgis{namespace img{
         this->offset = offset;
     }
     
-    void RSGISCalcLinearSpectralUnmixing::performUnconstainedLinearSpectralUnmixing(GDALDataset **datasets, int numDatasets, string outputImage, string endmembersFilePath)throw(RSGISImageCalcException)
+    void RSGISCalcLinearSpectralUnmixing::performUnconstainedLinearSpectralUnmixing(GDALDataset **datasets, int numDatasets, std::string outputImage, std::string endmembersFilePath)throw(RSGISImageCalcException)
     {
         try
         {
@@ -43,10 +43,10 @@ namespace rsgis{namespace img{
                 numOfImageBands += datasets[i]->GetRasterCount();
             }            
             
-            RSGISMatrices matrixUtils;
+            rsgis::math::RSGISMatrices matrixUtils;
             gsl_matrix *endmembers = matrixUtils.readGSLMatrixFromTxt(endmembersFilePath);
             matrixUtils.printGSLMatrix(endmembers);
-            cout << endl;
+            std::cout << std::endl;
             
             if(endmembers->size1 != numOfImageBands)
             {
@@ -90,7 +90,7 @@ namespace rsgis{namespace img{
         }
     }
     
-    void RSGISCalcLinearSpectralUnmixing::performPartConstainedLinearSpectralUnmixing(GDALDataset **datasets, int numDatasets, string outputImage, string endmembersFilePath, float weight) throw(RSGISImageCalcException)
+    void RSGISCalcLinearSpectralUnmixing::performPartConstainedLinearSpectralUnmixing(GDALDataset **datasets, int numDatasets, std::string outputImage, std::string endmembersFilePath, float weight) throw(RSGISImageCalcException)
     {
         
         try
@@ -101,10 +101,10 @@ namespace rsgis{namespace img{
                 numOfImageBands += datasets[i]->GetRasterCount();
             }            
             
-            RSGISMatrices matrixUtils;
+            rsgis::math::RSGISMatrices matrixUtils;
             gsl_matrix *endmembersIn = matrixUtils.readGSLMatrixFromTxt(endmembersFilePath);
             matrixUtils.printGSLMatrix(endmembersIn);
-            cout << endl;
+            std::cout << std::endl;
             
             if(endmembersIn->size1 != numOfImageBands)
             {
@@ -164,7 +164,7 @@ namespace rsgis{namespace img{
         }
     }
     
-    void RSGISCalcLinearSpectralUnmixing::performConstainedNNLinearSpectralUnmixing(GDALDataset **datasets, int numDatasets, string outputImage, string endmembersFilePath, float weight) throw(RSGISImageCalcException)
+    void RSGISCalcLinearSpectralUnmixing::performConstainedNNLinearSpectralUnmixing(GDALDataset **datasets, int numDatasets, std::string outputImage, std::string endmembersFilePath, float weight) throw(RSGISImageCalcException)
     {
         try
         {
@@ -174,11 +174,11 @@ namespace rsgis{namespace img{
                 numOfImageBands += datasets[i]->GetRasterCount();
             }            
             
-            RSGISVectors vecUtils;
-            RSGISMatrices matrixUtils;
+            rsgis::math::RSGISVectors vecUtils;
+            rsgis::math::RSGISMatrices matrixUtils;
             gsl_matrix *endmembersIn = matrixUtils.readGSLMatrixFromTxt(endmembersFilePath);
             matrixUtils.printGSLMatrix(endmembersIn);
-            cout << endl;
+            std::cout << std::endl;
             
             if(endmembersIn->size1 != numOfImageBands)
             {
@@ -206,14 +206,14 @@ namespace rsgis{namespace img{
                 gsl_matrix_set(endmembers, endmembersIn->size1, j, weight);
             }
             matrixUtils.printGSLMatrix(endmembers);
-            cout << endl;
+            std::cout << std::endl;
             
             
             gsl_matrix *V = gsl_matrix_alloc (endmembers->size2, endmembers->size2);
             gsl_vector *S = gsl_vector_alloc(endmembers->size2);
             gsl_vector *work = gsl_vector_alloc(endmembers->size2);
             int outVal = gsl_linalg_SV_decomp(endmembers, V, S, work);
-            cout << "outVal = " << outVal << endl;
+            std::cout << "outVal = " << outVal << std::endl;
             matrixUtils.printGSLMatrix(endmembers);
             
             gsl_vector *b = gsl_vector_alloc(endmembers->size1);
@@ -227,14 +227,14 @@ namespace rsgis{namespace img{
             gsl_vector_set(b, 3, ((206.63*e1)+(213.85*e2)+(18.61*e3)));
             gsl_vector_set(b, 4, weight);
             
-            cout << "B = \n";
+            std::cout << "B = \n";
             vecUtils.printGSLVector(b);
             
             
             gsl_vector *x = gsl_vector_alloc(endmembers->size2);
             
             outVal = gsl_linalg_SV_solve(endmembers, V, S, b, x);
-            cout << "outVal = " << outVal << endl;
+            std::cout << "outVal = " << outVal << std::endl;
              
             vecUtils.printGSLVector(x);
             */
@@ -242,8 +242,8 @@ namespace rsgis{namespace img{
             int m = endmembersIn->size1+1;
             int n = endmembersIn->size2;
             
-            cout << "m = " << m << endl;
-            cout << "n = " << n << endl;
+            std::cout << "m = " << m << std::endl;
+            std::cout << "n = " << n << std::endl;
             
             int mda = m;
             
@@ -274,14 +274,14 @@ namespace rsgis{namespace img{
                 {
                     if( j == 0 )
                     {
-                        cout << a[(i*n)+j];
+                        std::cout << a[(i*n)+j];
                     }
                     else
                     {
-                        cout << "," << a[(i*n)+j];
+                        std::cout << "," << a[(i*n)+j];
                     }
                 }
-                cout << "\n";
+                std::cout << "\n";
             }
             
             float e1 = 0.5;
@@ -293,18 +293,18 @@ namespace rsgis{namespace img{
             b[3] = ((206.63*e1)+(213.85*e2)+(18.61*e3));
             b[4] = weight;
             
-            cout << "B: [" << b[0] << "," << b[1] << "," << b[2] << "," << b[3] << "," << b[4] << "]\n";
+            std::cout << "B: [" << b[0] << "," << b[1] << "," << b[2] << "," << b[3] << "," << b[4] << "]\n";
             
-            RSGISNNLS nnls;
+            rsgis::math::RSGISNNLS nnls;
             
             //double* a, int* mda, int* m, int* n, double* b, double* x, double* rnorm, double* w, double* zz, int* index, int* mode
             
             int outVal = nnls.nnls_c(a, &mda, &m, &n, b, x, &rNorm, w, zz, index, &mode); 
-            cout << "outVal = " << outVal << endl;
-            cout << "rNorm = " << rNorm << endl;
+            std::cout << "outVal = " << outVal << std::endl;
+            std::cout << "rNorm = " << rNorm << std::endl;
             
-            cout << "E: [" << e1 << "," << e2 << "," << e3 << "]\n";
-            cout << "X: [" << x[0] << "," << x[1] << "," << x[2] << "]\n";
+            std::cout << "E: [" << e1 << "," << e2 << "," << e3 << "]\n";
+            std::cout << "X: [" << x[0] << "," << x[1] << "," << x[2] << "]\n";
                         
         }
         catch(RSGISException &e)
@@ -314,7 +314,7 @@ namespace rsgis{namespace img{
     }
     
     
-    void RSGISCalcLinearSpectralUnmixing::performExhaustiveConstrainedSpectralUnmixing(GDALDataset **datasets, int numDatasets, string outputImage, string endmembersFilePath, float stepResolution)throw(RSGISImageCalcException)
+    void RSGISCalcLinearSpectralUnmixing::performExhaustiveConstrainedSpectralUnmixing(GDALDataset **datasets, int numDatasets, std::string outputImage, std::string endmembersFilePath, float stepResolution)throw(RSGISImageCalcException)
     {
         try
         {
@@ -324,10 +324,10 @@ namespace rsgis{namespace img{
                 numOfImageBands += datasets[i]->GetRasterCount();
             }            
             
-            RSGISMatrices matrixUtils;
+            rsgis::math::RSGISMatrices matrixUtils;
             gsl_matrix *endmembersRaw = matrixUtils.readGSLMatrixFromTxt(endmembersFilePath);
             matrixUtils.printGSLMatrix(endmembersRaw);
-            cout << endl;
+            std::cout << std::endl;
             
             if(endmembersRaw->size1 != numOfImageBands)
             {
@@ -347,7 +347,7 @@ namespace rsgis{namespace img{
             
             gsl_matrix *endmembersNorm = matrixUtils.normalisedColumnsMatrix(endmembersRaw);
             matrixUtils.printGSLMatrix(endmembersNorm);
-            cout << endl;
+            std::cout << std::endl;
             
             RSGISExhaustiveLinearSpectralUnmixing *calcExhaustive = new RSGISExhaustiveLinearSpectralUnmixing(endmembersNorm->size2+1, endmembersNorm, stepResolution, this->gain, this->offset);
             RSGISCalcImage calcImage(calcExhaustive);
@@ -538,7 +538,7 @@ namespace rsgis{namespace img{
                         if((em1Val+em2Val) < threshold)
                         {
                             distVal = this->calcDistance2MeasuredSpectra(em1Val, em2Val, normBandVals, numBands);
-                            //cout << "[" << em1Val << "," << em2Val << "] = " << (em1Val+em2Val) << " Deviation = " << distVal << endl;
+                            //std::cout << "[" << em1Val << "," << em2Val << "] = " << (em1Val+em2Val) << " Deviation = " << distVal << std::endl;
                             
                             if(first)
                             {
@@ -558,12 +558,12 @@ namespace rsgis{namespace img{
                     }
                     em1Val += this->stepRes;
                 }
-                //cout << endl;
+                //std::cout << std::endl;
             }
             
             if(!first)
             {
-                //cout << "Min Error = " << minError << endl;
+                //std::cout << "Min Error = " << minError << std::endl;
                 output[0] = offset + (minEM1Val * gain);
                 output[1] = offset + (minEM2Val * gain);
                 output[2] = offset + (minError * gain);
@@ -606,7 +606,7 @@ namespace rsgis{namespace img{
                             if((em1Val+em2Val+em3Val) < threshold)
                             {
                                 distVal = this->calcDistance2MeasuredSpectra(em1Val, em2Val, em3Val, normBandVals, numBands);
-                                //cout << "[" << em1Val << "," << em2Val << "," << em3Val << "] = " << (em1Val+em2Val+em3Val) << " Deviation = " << distVal << endl;
+                                //std::cout << "[" << em1Val << "," << em2Val << "," << em3Val << "] = " << (em1Val+em2Val+em3Val) << " Deviation = " << distVal << std::endl;
                                 
                                 if(first)
                                 {
@@ -630,12 +630,12 @@ namespace rsgis{namespace img{
                     }
                     em1Val += this->stepRes;
                 }
-                //cout << endl;
+                //std::cout << std::endl;
             }
             
             if(!first)
             {
-                //cout << "Min Error = " << minError << endl;
+                //std::cout << "Min Error = " << minError << std::endl;
                 output[0] = offset + (minEM1Val * gain);
                 output[1] = offset + (minEM2Val * gain);
                 output[2] = offset + (minEM3Val * gain);
@@ -663,7 +663,7 @@ namespace rsgis{namespace img{
         for(unsigned int i = 0; i < numBands; ++i)
         {
             genSpectra[i] = (gsl_matrix_get(endmembers, i, 0) * em1Val) + (gsl_matrix_get(endmembers, i, 1) * em2Val) + (gsl_matrix_get(endmembers, i, 2) * em3Val);
-            //cout << i << ": " <<  genSpectra[i] << endl;
+            //std::cout << i << ": " <<  genSpectra[i] << std::endl;
         }
         
         float errorVal = 0;
@@ -672,7 +672,7 @@ namespace rsgis{namespace img{
             errorVal += ((genSpectra[i] - normSpectra[i])*(genSpectra[i] - normSpectra[i]));
         }
         
-        //cout << "errorVal = " << errorVal << endl;
+        //std::cout << "errorVal = " << errorVal << std::endl;
         
         delete[] genSpectra;
         
@@ -687,7 +687,7 @@ namespace rsgis{namespace img{
         for(unsigned int i = 0; i < numBands; ++i)
         {
             genSpectra[i] = (gsl_matrix_get(endmembers, i, 0) * em1Val) + (gsl_matrix_get(endmembers, i, 1) * em2Val);
-            //cout << i << ": " <<  genSpectra[i] << endl;
+            //std::cout << i << ": " <<  genSpectra[i] << std::endl;
         }
         
         float errorVal = 0;
@@ -696,7 +696,7 @@ namespace rsgis{namespace img{
             errorVal += ((genSpectra[i] - normSpectra[i])*(genSpectra[i] - normSpectra[i]));
         }
         
-        //cout << "errorVal = " << errorVal << endl;
+        //std::cout << "errorVal = " << errorVal << std::endl;
         
         delete[] genSpectra;
         

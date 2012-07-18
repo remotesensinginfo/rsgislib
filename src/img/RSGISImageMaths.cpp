@@ -25,7 +25,7 @@
 
 namespace rsgis{namespace img{
 	
-	RSGISImageMaths::RSGISImageMaths(int numberOutBands, Parser *muParser) : RSGISCalcImageValue(numberOutBands)
+	RSGISImageMaths::RSGISImageMaths(int numberOutBands, mu::Parser *muParser) : RSGISCalcImageValue(numberOutBands)
 	{
 		
 		this->muParser = muParser;
@@ -43,7 +43,7 @@ namespace rsgis{namespace img{
 		
 		try 
 		{
-			value_type result = 0;
+            mu::value_type result = 0;
 			for(int i = 0; i < numBands; ++i)
 			{
 				inVal = bandValues[i];
@@ -52,9 +52,9 @@ namespace rsgis{namespace img{
 			}
 			
 		}
-		catch (ParserError &e) 
+		catch (mu::ParserError &e) 
 		{
-			string message = string("ERROR: ") + string(e.GetMsg()) + string(":\t \'") + string(e.GetExpr()) +string("\'");
+            std::string message = std::string("ERROR: ") + std::string(e.GetMsg()) + std::string(":\t \'") + std::string(e.GetExpr()) + std::string("\'");
 			throw RSGISImageCalcException(message);
 		}
 	}

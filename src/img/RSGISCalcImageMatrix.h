@@ -28,14 +28,12 @@
 #include <string>
 
 #include "gdal_priv.h"
+
 #include "img/RSGISImageCalcException.h"
 #include "img/RSGISCalcImageSingleValue.h"
 #include "img/RSGISCalcImageSingle.h"
-#include "math/RSGISMatrices.h"
 
-using namespace std;
-//using namespace rsgis::utils;
-using namespace rsgis::math;
+#include "math/RSGISMatrices.h"
 
 namespace rsgis{namespace img{
 	
@@ -43,8 +41,8 @@ namespace rsgis{namespace img{
 		{
 		public:
 			RSGISCalcImageMatrix(RSGISCalcImageSingle *calcImage);
-			Matrix* calcImageMatrix(GDALDataset **datasetsA, GDALDataset **datasetsB, int numDS) throw(RSGISImageCalcException,RSGISImageBandException);
-			Matrix* calcImageVector(GDALDataset **datasetsA, int numDS) throw(RSGISImageCalcException,RSGISImageBandException);
+            rsgis::math::Matrix* calcImageMatrix(GDALDataset **datasetsA, GDALDataset **datasetsB, int numDS) throw(RSGISImageCalcException,RSGISImageBandException);
+			rsgis::math::Matrix* calcImageVector(GDALDataset **datasetsA, int numDS) throw(RSGISImageCalcException,RSGISImageBandException);
 			~RSGISCalcImageMatrix();
 		protected:
 			RSGISCalcImageSingle *calcImage;

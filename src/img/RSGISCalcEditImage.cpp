@@ -68,7 +68,7 @@ namespace rsgis
                 }
                 inDataColumn = new float[numInBands];
                 
-                Envelope extent;
+                geos::geom::Envelope extent;
                 double pxlTLX = 0;
                 double pxlTLY = 0;
                 double pxlWidth = 0;
@@ -86,14 +86,14 @@ namespace rsgis
                 
                 int feedback = height/10;
                 int feedbackCounter = 0;
-                cout << "Started" << flush;
+                std::cout << "Started" << std::flush;
                 // Loop images to process data
                 for(int i = 0; i < height; i++)
                 {
-                    //cout << i << " of " << height << endl;
+                    //std::cout << i << " of " << height << std::endl;
                     if((i % feedback) == 0)
                     {
-                        cout << ".." << feedbackCounter << ".." << flush;
+                        std::cout << ".." << feedbackCounter << ".." << std::flush;
                         feedbackCounter = feedbackCounter + 10;
                     }
                     
@@ -128,7 +128,7 @@ namespace rsgis
                     pxlTLY -= pxlHeight;
                     pxlTLX = gdalTranslation[0];
                 }
-                cout << " Complete.\n";
+                std::cout << " Complete.\n";
             }
             catch(RSGISImageCalcException& e)
             {

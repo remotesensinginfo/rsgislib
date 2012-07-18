@@ -34,7 +34,7 @@ namespace rsgis{namespace img{
 		
 	}
 	
-	void RSGISImageMosaic::mosaic(string *inputImages, int numDS, string outputImage, float background, bool projFromImage, string proj) throw(RSGISImageException)
+	void RSGISImageMosaic::mosaic(std::string *inputImages, int numDS, std::string outputImage, float background, bool projFromImage, std::string proj) throw(RSGISImageException)
 	{
 		RSGISImageUtils imgUtils;
         GDALAllRegister();
@@ -51,13 +51,13 @@ namespace rsgis{namespace img{
 		double yDiff = 0;
 		int xStart = 0;
 		int yStart = 0;
-		string projection = proj;
+		std::string projection = proj;
 		GDALDataset *outputDataset = NULL;
 		GDALRasterBand *inputBand = NULL;
 		GDALRasterBand *outputBand = NULL;
 		float *imgData = NULL;
 		
-        vector<string> bandnames;
+        std::vector<std::string> bandnames;
         
 		try
 		{
@@ -66,7 +66,7 @@ namespace rsgis{namespace img{
                 dataset = (GDALDataset *) GDALOpenShared(inputImages[i].c_str(), GA_ReadOnly);
                 if(dataset == NULL)
                 {
-                    string message = string("Could not open image ") + inputImages[i];
+                    std::string message = std::string("Could not open image ") + inputImages[i];
                     throw RSGISImageException(message.c_str());
                 }
 
@@ -76,11 +76,11 @@ namespace rsgis{namespace img{
                     for(int j = 0; j < numberBands; ++j)
                     {
                         imgBand = dataset->GetRasterBand(j+1);
-                        bandnames.push_back(string(imgBand->GetDescription()));
+                        bandnames.push_back(std::string(imgBand->GetDescription()));
                     }
                     if(projFromImage)
                     {
-                        projection = string(dataset->GetProjectionRef());
+                        projection = std::string(dataset->GetProjectionRef());
                     }
 				}
 				else
@@ -110,7 +110,7 @@ namespace rsgis{namespace img{
                 dataset = (GDALDataset *) GDALOpenShared(inputImages[i].c_str(), GA_ReadOnly);
                 if(dataset == NULL)
                 {
-                    string message = string("Could not open image ") + inputImages[i];
+                    std::string message = std::string("Could not open image ") + inputImages[i];
                     throw RSGISImageException(message.c_str());
                 }
                 
@@ -169,7 +169,7 @@ namespace rsgis{namespace img{
         GDALDestroyDriverManager();
 	}
 	
-	void RSGISImageMosaic::mosaicSkipVals(string *inputImages, int numDS, string outputImage, float background, float skipVal, bool projFromImage, string proj, unsigned int skipBand) throw(RSGISImageException)
+	void RSGISImageMosaic::mosaicSkipVals(std::string *inputImages, int numDS, std::string outputImage, float background, float skipVal, bool projFromImage, std::string proj, unsigned int skipBand) throw(RSGISImageException)
 	{
 		RSGISImageUtils imgUtils;
         GDALAllRegister();
@@ -186,13 +186,13 @@ namespace rsgis{namespace img{
 		double yDiff = 0;
 		int xStart = 0;
 		int yStart = 0;
-		string projection = proj;
+		std::string projection = proj;
 		GDALDataset *outputDataset = NULL;
 		GDALRasterBand *inputBand = NULL;
 		GDALRasterBand *outputBand = NULL;
 		float **imgData = new float*[numberBands];
 		bool skip;
-        vector<string> bandnames;
+        std::vector<std::string> bandnames;
 		
 		try
 		{
@@ -201,7 +201,7 @@ namespace rsgis{namespace img{
                 dataset = (GDALDataset *) GDALOpenShared(inputImages[i].c_str(), GA_ReadOnly);
                 if(dataset == NULL)
                 {
-                    string message = string("Could not open image ") + inputImages[i];
+                    std::string message = std::string("Could not open image ") + inputImages[i];
                     throw RSGISImageException(message.c_str());
                 }
                 
@@ -211,11 +211,11 @@ namespace rsgis{namespace img{
                     for(int j = 0; j < numberBands; ++j)
                     {
                         imgBand = dataset->GetRasterBand(j+1);
-                        bandnames.push_back(string(imgBand->GetDescription()));
+                        bandnames.push_back(std::string(imgBand->GetDescription()));
                     }
                     if(projFromImage)
                     {
-                        projection = string(dataset->GetProjectionRef());
+                        projection = std::string(dataset->GetProjectionRef());
                     }
 				}
 				else
@@ -245,7 +245,7 @@ namespace rsgis{namespace img{
                 dataset = (GDALDataset *) GDALOpenShared(inputImages[i].c_str(), GA_ReadOnly);
                 if(dataset == NULL)
                 {
-                    string message = string("Could not open image ") + inputImages[i];
+                    std::string message = std::string("Could not open image ") + inputImages[i];
                     throw RSGISImageException(message.c_str());
                 }
                 
@@ -331,7 +331,7 @@ namespace rsgis{namespace img{
         GDALDestroyDriverManager();
 	}
 	
-	void RSGISImageMosaic::mosaicSkipThreash(string *inputImages, int numDS, string outputImage, float background, float skipLowerThreash, float skipUpperThreash, bool projFromImage, string proj, unsigned int threashBand) throw(RSGISImageException)
+	void RSGISImageMosaic::mosaicSkipThreash(std::string *inputImages, int numDS, std::string outputImage, float background, float skipLowerThreash, float skipUpperThreash, bool projFromImage, std::string proj, unsigned int threashBand) throw(RSGISImageException)
 	{
 		RSGISImageUtils imgUtils;
         GDALAllRegister();
@@ -348,13 +348,13 @@ namespace rsgis{namespace img{
 		double yDiff = 0;
 		int xStart = 0;
 		int yStart = 0;
-		string projection = proj;
+		std::string projection = proj;
 		GDALDataset *outputDataset = NULL;
 		GDALRasterBand *inputBand = NULL;
 		GDALRasterBand *outputBand = NULL;
 		float **imgData = new float*[numberBands];
 		bool skip;
-        vector<string> bandnames;
+        std::vector<std::string> bandnames;
 		
 		try
 		{
@@ -363,7 +363,7 @@ namespace rsgis{namespace img{
                 dataset = (GDALDataset *) GDALOpenShared(inputImages[i].c_str(), GA_ReadOnly);
                 if(dataset == NULL)
                 {
-                    string message = string("Could not open image ") + inputImages[i];
+                    std::string message = std::string("Could not open image ") + inputImages[i];
                     throw RSGISImageException(message.c_str());
                 }
                 
@@ -373,11 +373,11 @@ namespace rsgis{namespace img{
                     for(int j = 0; j < numberBands; ++j)
                     {
                         imgBand = dataset->GetRasterBand(j+1);
-                        bandnames.push_back(string(imgBand->GetDescription()));
+                        bandnames.push_back(std::string(imgBand->GetDescription()));
                     }
                     if(projFromImage)
                     {
-                        projection = string(dataset->GetProjectionRef());
+                        projection = std::string(dataset->GetProjectionRef());
                     }
 				}
 				else
@@ -407,7 +407,7 @@ namespace rsgis{namespace img{
                 dataset = (GDALDataset *) GDALOpenShared(inputImages[i].c_str(), GA_ReadOnly);
                 if(dataset == NULL)
                 {
-                    string message = string("Could not open image ") + inputImages[i];
+                    std::string message = std::string("Could not open image ") + inputImages[i];
                     throw RSGISImageException(message.c_str());
                 }
                 
@@ -490,7 +490,7 @@ namespace rsgis{namespace img{
         GDALDestroyDriverManager();
 	}
 	
-	void RSGISImageMosaic::includeDatasets(GDALDataset *baseImage, string *inputImages, int numDS, vector<int> bands, bool bandsDefined) throw(RSGISImageException)
+	void RSGISImageMosaic::includeDatasets(GDALDataset *baseImage, std::string *inputImages, int numDS, std::vector<int> bands, bool bandsDefined) throw(RSGISImageException)
 	{
 		RSGISImageUtils imgUtils;
         GDALDataset *dataset = NULL;
@@ -507,7 +507,7 @@ namespace rsgis{namespace img{
 		double yDiff = 0;
 		int xStart = 0;
 		int yStart = 0;
-		string projection;
+		std::string projection;
 
 		GDALRasterBand *inputBand = NULL;
 		GDALRasterBand *outputBand = NULL;
@@ -521,7 +521,7 @@ namespace rsgis{namespace img{
                 dataset = (GDALDataset *) GDALOpenShared(inputImages[i].c_str(), GA_ReadOnly);
                 if(dataset == NULL)
                 {
-                    string message = string("Could not open image ") + inputImages[i];
+                    std::string message = std::string("Could not open image ") + inputImages[i];
                     throw RSGISImageException(message.c_str());
                 }
                 
@@ -534,12 +534,12 @@ namespace rsgis{namespace img{
                 }
                 else 
                 {
-                    for(vector<int>::iterator iterBands = bands.begin(); iterBands != bands.end(); ++iterBands)
+                    for(std::vector<int>::iterator iterBands = bands.begin(); iterBands != bands.end(); ++iterBands)
                     {
                         if(((*iterBands) <= 0) | ((*iterBands) > dataset->GetRasterCount()))
                         {
                             cerr << "Band = " << *iterBands << endl;
-                            string message = string("Band is not within the input dataset ") + inputImages[i];
+                            std::string message = std::string("Band is not within the input dataset ") + inputImages[i];
                             throw RSGISImageException(message.c_str());
                         }
                     }
@@ -555,7 +555,7 @@ namespace rsgis{namespace img{
                 }
             }
             
-            projection = string(baseImage->GetProjectionRef());
+            projection = std::string(baseImage->GetProjectionRef());
 			imgUtils.getImagesExtent(inputImages, numDS, &width, &height, transformation);
 			
 			baseImage->GetGeoTransform(baseTransform);
@@ -619,7 +619,7 @@ namespace rsgis{namespace img{
                 dataset = (GDALDataset *) GDALOpenShared(inputImages[i].c_str(), GA_ReadOnly);
                 if(dataset == NULL)
                 {
-                    string message = string("Could not open image ") + inputImages[i];
+                    std::string message = std::string("Could not open image ") + inputImages[i];
                     throw RSGISImageException(message.c_str());
                 }
                 
@@ -637,7 +637,7 @@ namespace rsgis{namespace img{
                 if(bandsDefined)
                 {
                     int nBand = 1;
-                    for(vector<int>::iterator iterBands = bands.begin(); iterBands != bands.end(); ++iterBands)
+                    for(std::vector<int>::iterator iterBands = bands.begin(); iterBands != bands.end(); ++iterBands)
                     {
                         if(((*iterBands) <= 0) | ((*iterBands) > dataset->GetRasterCount()))
                         {

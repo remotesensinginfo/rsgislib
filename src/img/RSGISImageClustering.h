@@ -37,19 +37,15 @@
 #include "ogrsf_frmts.h"
 #include "ogr_api.h"
 
-using namespace std;
-using namespace rsgis;
-using namespace rsgis::math;
-
 namespace rsgis{namespace img{
     
     class RSGISImageClustering
     {
     public:
         RSGISImageClustering();
-        void findKMeansCentres(GDALDataset *dataset, string outputMatrix, unsigned int numClusters, unsigned int maxNumIterations, unsigned int subSample, bool ignoreZeros, float degreeOfChange, InitClustererMethods initMethod)throw(RSGISImageException, RSGISClustererException);
-        void findISODataCentres(GDALDataset *dataset, string outputMatrix, unsigned int numClusters, unsigned int maxNumIterations, unsigned int subSample, bool ignoreZeros, float degreeOfChange, InitClustererMethods initMethod, float minDistBetweenClusters, unsigned int minNumFeatures, float maxStdDev, unsigned int minNumClusters, unsigned int startIteration, unsigned int endIteration)throw(RSGISImageException, RSGISClustererException);
-        vector< vector<float> >* sampleImage(GDALDataset *dataset, unsigned int subSample, bool ignoreZeros) throw(RSGISImageException);
+        void findKMeansCentres(GDALDataset *dataset, std::string outputMatrix, unsigned int numClusters, unsigned int maxNumIterations, unsigned int subSample, bool ignoreZeros, float degreeOfChange, rsgis::math::InitClustererMethods initMethod)throw(rsgis::RSGISImageException, rsgis::math::RSGISClustererException);
+        void findISODataCentres(GDALDataset *dataset, std::string outputMatrix, unsigned int numClusters, unsigned int maxNumIterations, unsigned int subSample, bool ignoreZeros, float degreeOfChange, rsgis::math::InitClustererMethods initMethod, float minDistBetweenClusters, unsigned int minNumFeatures, float maxStdDev, unsigned int minNumClusters, unsigned int startIteration, unsigned int endIteration)throw(rsgis::RSGISImageException, rsgis::math::RSGISClustererException);
+        std::vector< std::vector<float> >* sampleImage(GDALDataset *dataset, unsigned int subSample, bool ignoreZeros) throw(rsgis::RSGISImageException);
         ~RSGISImageClustering();
     };
     

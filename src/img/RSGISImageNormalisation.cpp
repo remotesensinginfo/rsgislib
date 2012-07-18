@@ -30,7 +30,7 @@ namespace rsgis{namespace img{
 		
 	}
 	
-	void RSGISImageNormalisation::normaliseImage(GDALDataset *dataset, double *imageMax, double *imageMin, double *outMax, double *outMin, bool calcStats, string outputImage)throw(RSGISImageCalcException,RSGISImageBandException)
+	void RSGISImageNormalisation::normaliseImage(GDALDataset *dataset, double *imageMax, double *imageMin, double *outMax, double *outMin, bool calcStats, std::string outputImage)throw(RSGISImageCalcException,RSGISImageBandException)
 	{
 		GDALDataset **datasets = NULL;
 		RSGISImageStatistics *calcImageStats = NULL;
@@ -64,7 +64,7 @@ namespace rsgis{namespace img{
 				
 				for(int i = 0; i < numBands; i++)
 				{
-					cout << "band " << i << " Min = " << stats[i]->min << " Max = " << stats[i]->max << endl;
+					std::cout << "band " << i << " Min = " << stats[i]->min << " Max = " << stats[i]->max << std::endl;
 					imageMin[i] = stats[i]->min;
 					imageMax[i] = stats[i]->max;
 				}
@@ -79,7 +79,7 @@ namespace rsgis{namespace img{
 			
 			/*for(int i = 0; i < numBands; i++)
 			{
-				cout << "Band " << i << " imageMax = " << imageMax[i] << " imageMin = " << imageMin[i] << " outMax = " << outMax[i] << " outMin = " << outMin[i] << endl;
+				std::cout << "Band " << i << " imageMax = " << imageMax[i] << " imageMin = " << imageMin[i] << " outMax = " << outMax[i] << " outMin = " << outMin[i] << std::endl;
 			}*/
 			normImage = new RSGISNormaliseImage(numBands, imageMax, imageMin, outMax, outMin); //??? creates what we are to do with the calc image?
 			calcImg = new RSGISCalcImage(normImage, "", true);
@@ -124,7 +124,7 @@ namespace rsgis{namespace img{
 		double outDiff = 0;
 		for(int i = 0; i < numBands; i++)
 		{
-			//cout << "band " << i << " imageValue = " << bandValues[i] << " ImageMin = " << imageMin[i] << " ImageMax = " << imageMax[i] << " OutMin = " << outMin[i] << " OutMax = " << outMax[i] << endl;
+			//std::cout << "band " << i << " imageValue = " << bandValues[i] << " ImageMin = " << imageMin[i] << " ImageMax = " << imageMax[i] << " OutMin = " << outMin[i] << " OutMax = " << outMax[i] << std::endl;
 			if(bandValues[i] < imageMin[i])
 			{
 				output[i] = outMin[i];
@@ -148,12 +148,12 @@ namespace rsgis{namespace img{
 		throw RSGISImageCalcException("No implemented");
 	}
 	
-	void RSGISNormaliseImage::calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException)
+	void RSGISNormaliseImage::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(RSGISImageCalcException)
 	{
 		throw RSGISImageCalcException("Not Implemented");
 	}
 	
-	void RSGISNormaliseImage::calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException)
+	void RSGISNormaliseImage::calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(RSGISImageCalcException)
 	{
 		throw RSGISImageCalcException("No implemented");
 	}

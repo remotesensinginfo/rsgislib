@@ -82,7 +82,7 @@ namespace rsgis{namespace img{
 		}
 	}
 	
-	void RSGISImageStatistics::calcImageStatistics(GDALDataset **datasets, int numDS, ImageStats **stats, int numInputBands, bool stddev, RSGISMathFunction *func, bool ignoreZeros)throw(RSGISImageCalcException,RSGISImageBandException)
+	void RSGISImageStatistics::calcImageStatistics(GDALDataset **datasets, int numDS, ImageStats **stats, int numInputBands, bool stddev, rsgis::math::RSGISMathFunction *func, bool ignoreZeros)throw(RSGISImageCalcException,RSGISImageBandException)
 	{
 		RSGISCalcImageStatistics *calcImageStats = NULL;
 		RSGISCalcImage *calcImg = NULL;
@@ -193,7 +193,7 @@ namespace rsgis{namespace img{
     
     
     
-	RSGISCalcImageStatistics::RSGISCalcImageStatistics(int numberOutBands, int numInputBands, bool calcSD, RSGISMathFunction *func, bool ignoreZeros) : RSGISCalcImageValue(numberOutBands)
+	RSGISCalcImageStatistics::RSGISCalcImageStatistics(int numberOutBands, int numInputBands, bool calcSD, rsgis::math::RSGISMathFunction *func, bool ignoreZeros) : RSGISCalcImageValue(numberOutBands)
 	{
         this->ignoreZeros = ignoreZeros;
 		this->calcSD = calcSD;
@@ -369,7 +369,7 @@ namespace rsgis{namespace img{
     
     
     
-    RSGISCalcImageStatisticsAllBands::RSGISCalcImageStatisticsAllBands(int numberOutBands, bool calcSD, RSGISMathFunction *func, bool ignoreZeros) : RSGISCalcImageValue(numberOutBands)
+    RSGISCalcImageStatisticsAllBands::RSGISCalcImageStatisticsAllBands(int numberOutBands, bool calcSD, rsgis::math::RSGISMathFunction *func, bool ignoreZeros) : RSGISCalcImageValue(numberOutBands)
 	{
         this->ignoreZeros = ignoreZeros;
 		this->calcSD = calcSD;

@@ -38,9 +38,6 @@
 #include "math/RSGISPolyFit.h"
 #include "math/RSGISVectors.h"
 
-using namespace std;
-using namespace rsgis::math;
-
 namespace rsgis{namespace img{
 	
 	/***
@@ -55,19 +52,19 @@ namespace rsgis{namespace img{
 	class RSGISSavitzkyGolaySmoothingFilters : public RSGISCalcImageValue
 	{
 	public: 
-		RSGISSavitzkyGolaySmoothingFilters(int numberOutBands, int order, int window, Vector *imagebandValues);
+		RSGISSavitzkyGolaySmoothingFilters(int numberOutBands, int order, int window, rsgis::math::Vector *imagebandValues);
 		void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException);
 		void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException);
-		void calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException);
-		void calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException);
+		void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(RSGISImageCalcException);
+		void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(RSGISImageCalcException);
 		void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException);
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
 		bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException);
 		~RSGISSavitzkyGolaySmoothingFilters();
 	private:
 		int order;
 		int window;
-		Vector *imagebandValues; 
+        rsgis::math::Vector *imagebandValues; 
 	};
 	
 }}

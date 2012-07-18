@@ -45,10 +45,6 @@
 
 #include <boost/cstdint.hpp>
 
-using namespace std;
-using namespace geos::geom;
-using namespace rsgis::math;
-
 namespace rsgis 
 {
 	namespace img
@@ -81,7 +77,7 @@ namespace rsgis
                 this->active = true;
             };
             unsigned long clumpID;
-            vector<PxlLoc> *pxls;
+            std::vector<PxlLoc> *pxls;
             float *sumVals;
             float *meanVals;
             bool active;
@@ -95,7 +91,7 @@ namespace rsgis
                 this->active = true;
             };
             unsigned int clumpID;
-            vector<PxlLoc> *pxls;
+            std::vector<PxlLoc> *pxls;
             float *sumVals;
             bool active;
         };
@@ -122,11 +118,11 @@ namespace rsgis
                 this->seedVal = 0;
             };
             unsigned long clumpID;
-            vector<PxlLoc> *pxls;
+            std::vector<PxlLoc> *pxls;
             float *sumVals;
             float *meanVals;
             bool active;
-            list<unsigned long> neighbours;
+            std::list<unsigned long> neighbours;
             unsigned long seedVal;
         };
         
@@ -137,21 +133,21 @@ namespace rsgis
 				void getImageOverlap(GDALDataset **datasets, int numDS, int **dsOffsets, int *width, int *height, double *gdalTransform) throw(RSGISImageBandException);
 				void getImageOverlap(GDALDataset **datasets, int numDS, int **dsOffsets, int *width, int *height, double *gdalTransform, geos::geom::Envelope *env) throw(RSGISImageBandException);
                 void getImageOverlapCut2Env(GDALDataset **datasets, int numDS,  int **dsOffsets, int *width, int *height, double *gdalTransform, geos::geom::Envelope *env) throw(RSGISImageBandException);
-				void getImageOverlap(GDALDataset **datasets, int numDS, int *width, int *height, Envelope *env) throw(RSGISImageBandException);
+				void getImageOverlap(GDALDataset **datasets, int numDS, int *width, int *height, geos::geom::Envelope *env) throw(RSGISImageBandException);
 				void getImagesExtent(GDALDataset **datasets, int numDS, int *width, int *height, double *gdalTransform) throw(RSGISImageBandException);
-                void getImagesExtent(string *inputImages, int numDS, int *width, int *height, double *gdalTransform) throw(RSGISImageBandException);
-				void exportImageToTextCol(GDALDataset *image, int band, string outputText)throw(RSGISImageBandException, RSGISOutputStreamException);
-				GDALDataset* createBlankImage(string imageFile, double *transformation, int xSize, int ySize, int numBands, string projection, float value, string gdalFormat="ENVI") throw(RSGISImageException, RSGISImageBandException);
-                GDALDataset* createBlankImage(string imageFile, double *transformation, int xSize, int ySize, int numBands, string projection, float value, vector<string> bandNames, string gdalFormat="ENVI") throw(RSGISImageException, RSGISImageBandException);
-				GDALDataset* createBlankImage(string imageFile, Envelope extent, double resolution, int numBands, string projection, float value, string gdalFormat="ENVI") throw(RSGISImageException, RSGISImageBandException);
-				void exportImageBands(string imageFile, string outputFilebase, string format) throw(RSGISImageException, RSGISImageBandException);
-				void exportImageStack(string *inputImages, string *outputImages, string outputFormat, int numImages)  throw(RSGISImageException, RSGISImageBandException);
-				void exportImageStackWithMask(string *inputImages, string *outputImages, string imageMask, string outputFormat, int numImages, float maskValue)  throw(RSGISImageException, RSGISImageBandException);
-				void convertImageFileFormat(string inputImage, string outputImage, string outputImageFormat, bool projFromImage=false, string wktProjStr="");
+                void getImagesExtent(std::string *inputImages, int numDS, int *width, int *height, double *gdalTransform) throw(RSGISImageBandException);
+				void exportImageToTextCol(GDALDataset *image, int band, std::string outputText)throw(RSGISImageBandException, RSGISOutputStreamException);
+				GDALDataset* createBlankImage(std::string imageFile, double *transformation, int xSize, int ySize, int numBands, std::string projection, float value, std::string gdalFormat="ENVI") throw(RSGISImageException, RSGISImageBandException);
+                GDALDataset* createBlankImage(std::string imageFile, double *transformation, int xSize, int ySize, int numBands, std::string projection, float value, std::vector<std::string> bandNames, std::string gdalFormat="ENVI") throw(RSGISImageException, RSGISImageBandException);
+				GDALDataset* createBlankImage(std::string imageFile, geos::geom::Envelope extent, double resolution, int numBands, std::string projection, float value, std::string gdalFormat="ENVI") throw(RSGISImageException, RSGISImageBandException);
+				void exportImageBands(std::string imageFile, std::string outputFilebase, std::string format) throw(RSGISImageException, RSGISImageBandException);
+				void exportImageStack(std::string *inputImages, std::string *outputImages, std::string outputFormat, int numImages)  throw(RSGISImageException, RSGISImageBandException);
+				void exportImageStackWithMask(std::string *inputImages, std::string *outputImages, std::string imageMask, std::string outputFormat, int numImages, float maskValue)  throw(RSGISImageException, RSGISImageBandException);
+				void convertImageFileFormat(std::string inputImage, std::string outputImage, std::string outputImageFormat, bool projFromImage=false, std::string wktProjStr="");
 				float** getImageDataBlock(GDALDataset *dataset, int *dsOffsets, unsigned int width, unsigned int height, unsigned int *numVals);
-				void copyImageRemoveSpatialReference(string inputImage, string outputImage)throw(RSGISImageException);
-				void copyImageDefiningSpatialReference(string inputImage, string outputImage, string proj, double tlX, double tlY, float xRes, float yRes)throw(RSGISImageException);
-                void createImageSlices(GDALDataset *dataset, string outputImageBase) throw(RSGISImageException);
+				void copyImageRemoveSpatialReference(std::string inputImage, std::string outputImage)throw(RSGISImageException);
+				void copyImageDefiningSpatialReference(std::string inputImage, std::string outputImage, std::string proj, double tlX, double tlY, float xRes, float yRes)throw(RSGISImageException);
+                void createImageSlices(GDALDataset *dataset, std::string outputImageBase) throw(RSGISImageException);
                 void copyFloatGDALDataset(GDALDataset *inData, GDALDataset *outData) throw(RSGISImageException);
                 void copyIntGDALDataset(GDALDataset *inData, GDALDataset *outData) throw(RSGISImageException);
                 void copyUIntGDALDataset(GDALDataset *inData, GDALDataset *outData) throw(RSGISImageException);
@@ -161,9 +157,9 @@ namespace rsgis
                 void zerosFloatGDALDataset(GDALDataset *data) throw(RSGISImageException);
                 void zerosByteGDALDataset(GDALDataset *data) throw(RSGISImageException);
                 void assignValGDALDataset(GDALDataset *data, float value) throw(RSGISImageException);
-                GDALDataset* createCopy(GDALDataset *inData, string outputFilePath, string outputFormat, GDALDataType eType, bool useImgProj=true, string proj="")throw(RSGISImageException);
-                GDALDataset* createCopy(GDALDataset *inData, unsigned int numBands, string outputFilePath, string outputFormat, GDALDataType eType, bool useImgProj=true, string proj="")throw(RSGISImageException);
-                void createKMLText(string inputImage, string outKMLFile) throw(RSGISImageBandException);
+                GDALDataset* createCopy(GDALDataset *inData, std::string outputFilePath, std::string outputFormat, GDALDataType eType, bool useImgProj=true, std::string proj="")throw(RSGISImageException);
+                GDALDataset* createCopy(GDALDataset *inData, unsigned int numBands, std::string outputFilePath, std::string outputFormat, GDALDataType eType, bool useImgProj=true, std::string proj="")throw(RSGISImageException);
+                void createKMLText(std::string inputImage, std::string outKMLFile) throw(RSGISImageBandException);
                 ~RSGISImageUtils();
 			};
 	}

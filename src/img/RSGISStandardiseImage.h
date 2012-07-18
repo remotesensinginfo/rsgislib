@@ -30,10 +30,6 @@
 #include "math/RSGISMatrices.h"
 #include "img/RSGISCalcImageValue.h"
 
-using namespace std;
-using namespace geos::geom;
-using namespace rsgis::math;
-
 namespace rsgis 
 {
 	namespace img
@@ -41,17 +37,17 @@ namespace rsgis
 		class RSGISStandardiseImage : public RSGISCalcImageValue
 			{
 			public: 
-				RSGISStandardiseImage(int numberOutBands, Matrix *meanVector);
+				RSGISStandardiseImage(int numberOutBands, rsgis::math::Matrix *meanVector);
 				void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException);
 				void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException);
-				void calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException);
-				void calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException);
+				void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(RSGISImageCalcException);
+				void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(RSGISImageCalcException);
 				void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException);
-                void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+                void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
 				bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException);
 				~RSGISStandardiseImage();
 			protected:
-				Matrix *meanVector;
+                rsgis::math::Matrix *meanVector;
 			};
 	}
 }

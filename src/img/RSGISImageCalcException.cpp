@@ -24,17 +24,17 @@
 
 namespace rsgis{namespace img{
 	
-	RSGISImageCalcException::RSGISImageCalcException() : RSGISImageException("A RSGISImageBandException has been created..")
+	RSGISImageCalcException::RSGISImageCalcException() : rsgis::RSGISImageException("A RSGISImageBandException has been created..")
 	{
 
 	}
 	
-	RSGISImageCalcException::RSGISImageCalcException(const char* message) : RSGISImageException(message)
+	RSGISImageCalcException::RSGISImageCalcException(const char* message) : rsgis::RSGISImageException(message)
 	{
 
 	}
 	
-	RSGISImageCalcException::RSGISImageCalcException(string message) : RSGISImageException(message)
+	RSGISImageCalcException::RSGISImageCalcException(std::string message) : rsgis::RSGISImageException(message)
 	{
 		
 	}

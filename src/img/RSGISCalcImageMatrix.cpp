@@ -29,11 +29,11 @@ namespace rsgis{namespace img{
 		this->calcImage = calcImage;
 	}
 	
-	Matrix* RSGISCalcImageMatrix::calcImageMatrix(GDALDataset **datasetsA, GDALDataset **datasetsB, int numDS) throw(RSGISImageCalcException,RSGISImageBandException)
+	rsgis::math::Matrix* RSGISCalcImageMatrix::calcImageMatrix(GDALDataset **datasetsA, GDALDataset **datasetsB, int numDS) throw(RSGISImageCalcException,RSGISImageBandException)
 	{
 		GDALAllRegister();
 		RSGISImageUtils imgUtils;
-		RSGISMatrices matrixUtils;
+		rsgis::math::RSGISMatrices matrixUtils;
 		RSGISCalcImageSingleValue *calcImageSingleValue = this->calcImage->getRSGISCalcImageSingleValue();
 
 		int numInBandsDSA = 0;
@@ -42,7 +42,7 @@ namespace rsgis{namespace img{
 		//double **matrix = NULL;
 		double *outputValue = new double[calcImageSingleValue->getNumberOfOutValues()];
 		
-		Matrix *outputMatrix = new Matrix();
+		rsgis::math::Matrix *outputMatrix = new rsgis::math::Matrix();
 		
 		try
 		{
@@ -113,11 +113,11 @@ namespace rsgis{namespace img{
 		return outputMatrix;
 	}
 	
-	Matrix* RSGISCalcImageMatrix::calcImageVector(GDALDataset **datasetsA, int numDS) throw(RSGISImageCalcException,RSGISImageBandException)
+	rsgis::math::Matrix* RSGISCalcImageMatrix::calcImageVector(GDALDataset **datasetsA, int numDS) throw(RSGISImageCalcException,RSGISImageBandException)
 	{
 		GDALAllRegister();
 		RSGISImageUtils imgUtils;
-		RSGISMatrices matrixUtils;
+		rsgis::math::RSGISMatrices matrixUtils;
 		RSGISCalcImageSingleValue *calcImageSingleValue = this->calcImage->getRSGISCalcImageSingleValue();
 		
 		int numInBandsDSA = 0;
@@ -125,7 +125,7 @@ namespace rsgis{namespace img{
 		//double **matrix = NULL;
 		double *outputValue = new double[calcImageSingleValue->getNumberOfOutValues()];
 		
-		Matrix *outputMatrix = new Matrix();
+		rsgis::math::Matrix *outputMatrix = new rsgis::math::Matrix();
 		
 		try
 		{

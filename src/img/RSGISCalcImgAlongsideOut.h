@@ -32,8 +32,6 @@
 #include "img/RSGISImageCalcException.h"
 #include "img/RSGISImageUtils.h"
 
-using namespace std;
-
 namespace rsgis 
 {
 	namespace img

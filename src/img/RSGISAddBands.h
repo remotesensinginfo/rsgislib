@@ -32,8 +32,6 @@
 #include "img/RSGISImageBandException.h"
 #include "img/RSGISImageUtils.h"
 
-using namespace std;
-
 namespace rsgis 
 {
 	namespace img
@@ -42,9 +40,9 @@ namespace rsgis
 		{
 			public:
 				RSGISAddBands();
-				void addMultipleBands(GDALDataset *input, GDALDataset **toAdd, string *outputFile, int *band, int numAddBands) throw(RSGISImageBandException);
-				void addBandToFile(GDALDataset *input, GDALDataset *toAdd, string *outputFile, int band) throw(RSGISImageBandException);
-				void stackImages(GDALDataset **datasets, int numDS, string outputImage, string *imageBandNames, bool skipPixels, float skipValue = 0, float noDataValue = 0, string gdalFormat="ENVI", GDALDataType gdalDataType=GDT_Float32) throw(RSGISImageBandException);
+				void addMultipleBands(GDALDataset *input, GDALDataset **toAdd, std::string *outputFile, int *band, int numAddBands) throw(RSGISImageBandException);
+				void addBandToFile(GDALDataset *input, GDALDataset *toAdd, std::string *outputFile, int band) throw(RSGISImageBandException);
+				void stackImages(GDALDataset **datasets, int numDS, std::string outputImage, std::string *imageBandNames, bool skipPixels, float skipValue = 0, float noDataValue = 0, std::string gdalFormat="ENVI", GDALDataType gdalDataType=GDT_Float32) throw(RSGISImageBandException);
 				~RSGISAddBands();
 		};
 	}

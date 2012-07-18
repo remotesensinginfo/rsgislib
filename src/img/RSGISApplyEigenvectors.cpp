@@ -24,7 +24,7 @@
 
 namespace rsgis{namespace img{
 
-	RSGISApplyEigenvectors::RSGISApplyEigenvectors(int numberOutBands, Matrix *eigenvectors) : RSGISCalcImageValue(numberOutBands)
+	RSGISApplyEigenvectors::RSGISApplyEigenvectors(int numberOutBands, rsgis::math::Matrix *eigenvectors) : RSGISCalcImageValue(numberOutBands)
 	{
 		this->eigenvectors = eigenvectors;
 	}
@@ -54,12 +54,12 @@ namespace rsgis{namespace img{
 		throw RSGISImageCalcException("Not implemented");
 	}
 	
-	void RSGISApplyEigenvectors::calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException)
+	void RSGISApplyEigenvectors::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(RSGISImageCalcException)
 	{
 		throw RSGISImageCalcException("Not Implemented");
 	}
 	
-	void RSGISApplyEigenvectors::calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException)
+	void RSGISApplyEigenvectors::calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(RSGISImageCalcException)
 	{
 		throw RSGISImageCalcException("Not implemented");
 	}
