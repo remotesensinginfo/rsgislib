@@ -27,23 +27,23 @@
 namespace rsgis{namespace calib{
     
 
-    RSGISCalcSlope::RSGISCalcSlope(int numberOutBands, unsigned int band, float ewRes, float nsRes, int outType) : RSGISCalcImageValue(numberOutBands)
+    RSGISCalcSlope::RSGISCalcSlope(int numberOutBands, unsigned int band, float ewRes, float nsRes, int outType) : rsgis::img::RSGISCalcImageValue(numberOutBands)
     {
         this->band = band;
         this->ewRes = ewRes;
         this->nsRes = nsRes;
         this->outType = outType;
     }
-    void RSGISCalcSlope::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException)
+    void RSGISCalcSlope::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
     {
         if(winSize != 3)
         {
-            throw RSGISImageCalcException("Window size must be equal to 3 for the calculate of slope.");
+            throw rsgis::img::RSGISImageCalcException("Window size must be equal to 3 for the calculate of slope.");
         }
         
         if(!(band < numBands))
         {
-            throw RSGISImageCalcException("Specified image band is not within the image.");
+            throw rsgis::img::RSGISImageCalcException("Specified image band is not within the image.");
         }
 
         const double radiansToDegrees = 180.0 / M_PI;
@@ -73,23 +73,23 @@ namespace rsgis{namespace calib{
         
     }
 
-    RSGISCalcAspect::RSGISCalcAspect(int numberOutBands, unsigned int band, float ewRes, float nsRes) : RSGISCalcImageValue(numberOutBands)
+    RSGISCalcAspect::RSGISCalcAspect(int numberOutBands, unsigned int band, float ewRes, float nsRes) : rsgis::img::RSGISCalcImageValue(numberOutBands)
     {
         this->band = band;
         this->ewRes = ewRes;
         this->nsRes = nsRes;
     }
 		
-    void RSGISCalcAspect::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException)
+    void RSGISCalcAspect::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
     {
         if(winSize != 3)
         {
-            throw RSGISImageCalcException("Window size must be equal to 3 for the calculate of slope.");
+            throw rsgis::img::RSGISImageCalcException("Window size must be equal to 3 for the calculate of slope.");
         }
         
         if(!(band < numBands))
         {
-            throw RSGISImageCalcException("Specified image band is not within the image.");
+            throw rsgis::img::RSGISImageCalcException("Specified image band is not within the image.");
         }
         
         const double radiansToDegrees = 180.0 / M_PI;
@@ -132,22 +132,22 @@ namespace rsgis{namespace calib{
     
     
 
-    RSGISCalcSlopeAspect::RSGISCalcSlopeAspect(int numberOutBands, unsigned int band, float ewRes, float nsRes) : RSGISCalcImageValue(numberOutBands)
+    RSGISCalcSlopeAspect::RSGISCalcSlopeAspect(int numberOutBands, unsigned int band, float ewRes, float nsRes) : rsgis::img::RSGISCalcImageValue(numberOutBands)
     {
         this->band = band;
         this->ewRes = ewRes;
         this->nsRes = nsRes;
     }
-    void RSGISCalcSlopeAspect::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException)
+    void RSGISCalcSlopeAspect::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
     {
         if(winSize != 3)
         {
-            throw RSGISImageCalcException("Window size must be equal to 3 for the calculate of slope.");
+            throw rsgis::img::RSGISImageCalcException("Window size must be equal to 3 for the calculate of slope.");
         }
         
         if(!(band < numBands))
         {
-            throw RSGISImageCalcException("Specified image band is not within the image.");
+            throw rsgis::img::RSGISImageCalcException("Specified image band is not within the image.");
         }
         
         const double radiansToDegrees = 180.0 / M_PI;
@@ -201,7 +201,7 @@ namespace rsgis{namespace calib{
     
     
     
-    RSGISCalcHillShade::RSGISCalcHillShade(int numberOutBands, unsigned int band, float ewRes, float nsRes, float sunZenith, float sunAzimuth) : RSGISCalcImageValue(numberOutBands)
+    RSGISCalcHillShade::RSGISCalcHillShade(int numberOutBands, unsigned int band, float ewRes, float nsRes, float sunZenith, float sunAzimuth) : rsgis::img::RSGISCalcImageValue(numberOutBands)
     {
         this->band = band;
         this->ewRes = ewRes;
@@ -210,16 +210,16 @@ namespace rsgis{namespace calib{
         this->sunAzimuth = sunAzimuth;
     }
     
-    void RSGISCalcHillShade::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException)
+    void RSGISCalcHillShade::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
     {
         if(winSize != 3)
         {
-            throw RSGISImageCalcException("Window size must be equal to 3 for the calculate of slope.");
+            throw rsgis::img::RSGISImageCalcException("Window size must be equal to 3 for the calculate of slope.");
         }
         
         if(!(band < numBands))
         {
-            throw RSGISImageCalcException("Specified image band is not within the image.");
+            throw rsgis::img::RSGISImageCalcException("Specified image band is not within the image.");
         }
         
         const double degreesToRadians = M_PI / 180.0;
@@ -265,7 +265,7 @@ namespace rsgis{namespace calib{
     
     
     
-    RSGISCalcShadowBinaryMask::RSGISCalcShadowBinaryMask(int numberOutBands, GDALDataset *inputImage, unsigned int band, float ewRes, float nsRes, float sunZenith, float sunAzimuth, float maxElevHeight) : RSGISCalcImageValue(numberOutBands)
+    RSGISCalcShadowBinaryMask::RSGISCalcShadowBinaryMask(int numberOutBands, GDALDataset *inputImage, unsigned int band, float ewRes, float nsRes, float sunZenith, float sunAzimuth, float maxElevHeight) : rsgis::img::RSGISCalcImageValue(numberOutBands)
     {
         this->band = band;
         this->ewRes = ewRes;
@@ -282,7 +282,7 @@ namespace rsgis{namespace calib{
         
     }
 		
-    void RSGISCalcShadowBinaryMask::calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException)
+    void RSGISCalcShadowBinaryMask::calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException)
     {
         float outputValue = 1;
         
@@ -301,34 +301,34 @@ namespace rsgis{namespace calib{
             double sunZ = z + (sunRange * cos(sunZenith * degreesToRadians));
             
             // Create Ray Line
-            Coordinate pxlPt;
+            geos::geom::Coordinate pxlPt;
             pxlPt.x = x;
             pxlPt.y = y;
             pxlPt.z = z;
             
-            Coordinate sunPt;
+            geos::geom::Coordinate sunPt;
             sunPt.x = sunX;
             sunPt.y = sunY;
             sunPt.z = sunZ;
             
-            RSGISExtractImagePixelsOnLine extractPixels;
-            vector<ImagePixelValuePt*> *imagePxlPts = extractPixels.getImagePixelValues(inputImage, band, &pxlPt, (sunAzimuth * degreesToRadians), (sunZenith * degreesToRadians), maxElevHeight);
+            rsgis::img::RSGISExtractImagePixelsOnLine extractPixels;
+            std::vector<rsgis::img::ImagePixelValuePt*> *imagePxlPts = extractPixels.getImagePixelValues(inputImage, band, &pxlPt, (sunAzimuth * degreesToRadians), (sunZenith * degreesToRadians), maxElevHeight);
             /*
-            cout << "Point, " << x << "," << y << "," << z << endl;
-            cout << "Sun, " << sunX << "," << sunY << "," << sunZ << endl;
-            cout << "Resolution, " << ewRes << "," << nsRes << endl;
+            std::cout << "Point, " << x << "," << y << "," << z << std::endl;
+            std::cout << "Sun, " << sunX << "," << sunY << "," << sunZ << std::endl;
+            std::cout << "Resolution, " << ewRes << "," << nsRes << std::endl;
             
-            cout << imagePxlPts->size() << " extracted pixels\n";
+            std::cout << imagePxlPts->size() << " extracted pixels\n";
             
             for(vector<ImagePixelValuePt*>::iterator iterPxls = imagePxlPts->begin(); iterPxls != imagePxlPts->end(); ++iterPxls)
             {
-                cout << (*iterPxls)->pt->x << "," << (*iterPxls)->pt->y << "," << (*iterPxls)->pt->z << "," << (*iterPxls)->imgX << "," << (*iterPxls)->imgY << "," << (*iterPxls)->value << "\n";
+                std::cout << (*iterPxls)->pt->x << "," << (*iterPxls)->pt->y << "," << (*iterPxls)->pt->z << "," << (*iterPxls)->imgX << "," << (*iterPxls)->imgY << "," << (*iterPxls)->value << "\n";
             }
-            cout << endl << endl;
+            std::cout << std::endl << std::endl;
             */
             
             // Check whether pixel intersects with ray.
-            for(vector<ImagePixelValuePt*>::iterator iterPxls = imagePxlPts->begin(); iterPxls != imagePxlPts->end(); ++iterPxls)
+            for(std::vector<rsgis::img::ImagePixelValuePt*>::iterator iterPxls = imagePxlPts->begin(); iterPxls != imagePxlPts->end(); ++iterPxls)
             {
                 if((*iterPxls)->pt->z < (*iterPxls)->value)
                 {
@@ -338,7 +338,7 @@ namespace rsgis{namespace calib{
             }
             
             // Clean up memory..
-            for(vector<ImagePixelValuePt*>::iterator iterPxls = imagePxlPts->begin(); iterPxls != imagePxlPts->end(); )
+            for(std::vector<rsgis::img::ImagePixelValuePt*>::iterator iterPxls = imagePxlPts->begin(); iterPxls != imagePxlPts->end(); )
             {
                 delete (*iterPxls)->pt;
                 delete (*iterPxls);
@@ -346,7 +346,7 @@ namespace rsgis{namespace calib{
             }
             delete imagePxlPts;
         } 
-        catch (RSGISImageCalcException &e) 
+        catch (rsgis::img::RSGISImageCalcException &e) 
         {
             throw e;
         }
@@ -365,7 +365,7 @@ namespace rsgis{namespace calib{
     
     
 
-    RSGISCalcRayIncidentAngle::RSGISCalcRayIncidentAngle(int numberOutBands, unsigned int band, float ewRes, float nsRes, float sunZenith, float sunAzimuth) : RSGISCalcImageValue(numberOutBands)
+    RSGISCalcRayIncidentAngle::RSGISCalcRayIncidentAngle(int numberOutBands, unsigned int band, float ewRes, float nsRes, float sunZenith, float sunAzimuth) : rsgis::img::RSGISCalcImageValue(numberOutBands)
     {
         this->band = band;
         this->ewRes = ewRes;
@@ -374,7 +374,7 @@ namespace rsgis{namespace calib{
         this->sunAzimuth = sunAzimuth;
     }
 		
-    void RSGISCalcRayIncidentAngle::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException)
+    void RSGISCalcRayIncidentAngle::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
     {
         float outputValue = 0;
         
@@ -384,12 +384,12 @@ namespace rsgis{namespace calib{
         {
             if(winSize != 3)
             {
-                throw RSGISImageCalcException("Window size must be equal to 3 for the calculate of slope.");
+                throw rsgis::img::RSGISImageCalcException("Window size must be equal to 3 for the calculate of slope.");
             }
             
             if(!(band < numBands))
             {
-                throw RSGISImageCalcException("Specified image band is not within the image.");
+                throw rsgis::img::RSGISImageCalcException("Specified image band is not within the image.");
             }
             
             const double radiansToDegrees = 180.0 / M_PI;
@@ -437,27 +437,27 @@ namespace rsgis{namespace calib{
             double pB = sin(slope*degreesToRadians) * sin(aspect*degreesToRadians);
             double pC = cos(slope*degreesToRadians);
             
-            //cout << "Plane: " << pA << ", " << pB << ", " << pC << endl;
+            //std::cout << "Plane: " << pA << ", " << pB << ", " << pC << std::endl;
             
             // UNIT VECTOR FOR INCIDENT RAY
             double rA = sin((sunZenith)*degreesToRadians) * cos(sunAzimuth*degreesToRadians);
             double rB = sin((sunZenith)*degreesToRadians) * sin(sunAzimuth*degreesToRadians);
             double rC = cos((sunZenith)*degreesToRadians);
             
-            //cout << "Ray: " << rA << ", " << rB << ", " << rC << endl;
+            //std::cout << "Ray: " << rA << ", " << rB << ", " << rC << std::endl;
             
-            //cout << "output value (radians) = " << acos((pA*rA)+(pB*rB)+(pC*rC)) << endl;
+            //std::cout << "output value (radians) = " << acos((pA*rA)+(pB*rB)+(pC*rC)) << std::endl;
             
             outputValue = acos((pA*rA)+(pB*rB)+(pC*rC)) * radiansToDegrees;
             
-            //cout << "output value = " << outputValue << endl << endl;
+            //std::cout << "output value = " << outputValue << std::endl << std::endl;
             
             if(isnan(outputValue))
             {
                 outputValue = sunZenith;
             }
         } 
-        catch (RSGISImageCalcException &e) 
+        catch (rsgis::img::RSGISImageCalcException &e) 
         {
             throw e;
         }
@@ -472,7 +472,7 @@ namespace rsgis{namespace calib{
     
     
     
-    RSGISCalcRayExitanceAngle::RSGISCalcRayExitanceAngle(int numberOutBands, unsigned int band, float ewRes, float nsRes, float viewZenith, float viewAzimuth) : RSGISCalcImageValue(numberOutBands)
+    RSGISCalcRayExitanceAngle::RSGISCalcRayExitanceAngle(int numberOutBands, unsigned int band, float ewRes, float nsRes, float viewZenith, float viewAzimuth) : rsgis::img::RSGISCalcImageValue(numberOutBands)
     {
         this->band = band;
         this->ewRes = ewRes;
@@ -481,7 +481,7 @@ namespace rsgis{namespace calib{
         this->viewAzimuth = viewAzimuth;
     }
 		
-    void RSGISCalcRayExitanceAngle::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException)
+    void RSGISCalcRayExitanceAngle::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
     {
         float outputValue = 0;
         
@@ -491,12 +491,12 @@ namespace rsgis{namespace calib{
         {
             if(winSize != 3)
             {
-                throw RSGISImageCalcException("Window size must be equal to 3 for the calculate of slope.");
+                throw rsgis::img::RSGISImageCalcException("Window size must be equal to 3 for the calculate of slope.");
             }
             
             if(!(band < numBands))
             {
-                throw RSGISImageCalcException("Specified image band is not within the image.");
+                throw rsgis::img::RSGISImageCalcException("Specified image band is not within the image.");
             }
             
             const double radiansToDegrees = 180.0 / M_PI;
@@ -544,27 +544,27 @@ namespace rsgis{namespace calib{
             double pB = sin(slope*degreesToRadians) * sin(aspect*degreesToRadians);
             double pC = cos(slope*degreesToRadians);
             
-            //cout << "Plane: " << pA << ", " << pB << ", " << pC << endl;
+            //std::cout << "Plane: " << pA << ", " << pB << ", " << pC << std::endl;
             
             // UNIT VECTOR FOR EXITANCE RAY
             double rA = sin(viewZenith*degreesToRadians) * cos(viewAzimuth*degreesToRadians);
             double rB = sin(viewZenith*degreesToRadians) * sin(viewAzimuth*degreesToRadians);
             double rC = cos(viewZenith*degreesToRadians);
             
-            //cout << "Ray: " << rA << ", " << rB << ", " << rC << endl;
+            //std::cout << "Ray: " << rA << ", " << rB << ", " << rC << std::endl;
             
-            //cout << "output value (radians) = " << acos((pA*rA)+(pB*rB)+(pC*rC)) << endl;
+            //std::cout << "output value (radians) = " << acos((pA*rA)+(pB*rB)+(pC*rC)) << std::endl;
             
             outputValue = acos((pA*rA)+(pB*rB)+(pC*rC)) * radiansToDegrees;
             
-            //cout << "output value = " << incidenceAngle << endl << endl;
+            //std::cout << "output value = " << incidenceAngle << std::endl << std::endl;
             
             if(isnan(outputValue))
             {
                 outputValue = 0;
             }
         } 
-        catch (RSGISImageCalcException &e) 
+        catch (rsgis::img::RSGISImageCalcException &e) 
         {
             throw e;
         }
@@ -580,7 +580,7 @@ namespace rsgis{namespace calib{
     
     
     
-    RSGISCalcRayIncidentAndExitanceAngles::RSGISCalcRayIncidentAndExitanceAngles(int numberOutBands, unsigned int band, float ewRes, float nsRes, float sunZenith, float sunAzimuth, float viewZenith, float viewAzimuth) : RSGISCalcImageValue(numberOutBands)
+    RSGISCalcRayIncidentAndExitanceAngles::RSGISCalcRayIncidentAndExitanceAngles(int numberOutBands, unsigned int band, float ewRes, float nsRes, float sunZenith, float sunAzimuth, float viewZenith, float viewAzimuth) : rsgis::img::RSGISCalcImageValue(numberOutBands)
     {
         this->band = band;
         this->ewRes = ewRes;
@@ -591,7 +591,7 @@ namespace rsgis{namespace calib{
         this->viewAzimuth = viewAzimuth;
     }
 		
-    void RSGISCalcRayIncidentAndExitanceAngles::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException)
+    void RSGISCalcRayIncidentAndExitanceAngles::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
     {
         float incidenceAngle = 0;
         float existanceAngle = 0;
@@ -602,12 +602,12 @@ namespace rsgis{namespace calib{
         {
             if(winSize != 3)
             {
-                throw RSGISImageCalcException("Window size must be equal to 3 for the calculate of slope.");
+                throw rsgis::img::RSGISImageCalcException("Window size must be equal to 3 for the calculate of slope.");
             }
             
             if(!(band < numBands))
             {
-                throw RSGISImageCalcException("Specified image band is not within the image.");
+                throw rsgis::img::RSGISImageCalcException("Specified image band is not within the image.");
             }
             
             const double radiansToDegrees = 180.0 / M_PI;
@@ -655,7 +655,7 @@ namespace rsgis{namespace calib{
             double pB = sin(slope*degreesToRadians) * sin(aspect*degreesToRadians);
             double pC = cos(slope*degreesToRadians);
             
-            //cout << "Plane: " << pA << ", " << pB << ", " << pC << endl;
+            //std::cout << "Plane: " << pA << ", " << pB << ", " << pC << std::endl;
             
             // UNIT VECTOR FOR INCIDENT RAY
             double rA = sin((sunZenith)*degreesToRadians) * cos(sunAzimuth*degreesToRadians);
@@ -681,7 +681,7 @@ namespace rsgis{namespace calib{
                 existanceAngle = 0;
             }            
         } 
-        catch (RSGISImageCalcException &e) 
+        catch (rsgis::img::RSGISImageCalcException &e) 
         {
             throw e;
         }

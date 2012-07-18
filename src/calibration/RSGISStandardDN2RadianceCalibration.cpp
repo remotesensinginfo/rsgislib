@@ -25,7 +25,7 @@
 
 namespace rsgis{namespace calib{
     
-    void RSGISLandsatRadianceCalibration::calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException)
+    void RSGISLandsatRadianceCalibration::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
     {
         double gain = 0;
         
@@ -42,7 +42,7 @@ namespace rsgis{namespace calib{
             {
                 if(this->radGainOff[i].band > numBands)
                 {
-                    throw RSGISImageCalcException("Band is not within input image bands.");
+                    throw rsgis::img::RSGISImageCalcException("Band is not within input image bands.");
                 }
                 gain = (this->radGainOff[i].lMax - this->radGainOff[i].lMin)/(this->radGainOff[i].qCalMax - this->radGainOff[i].qCalMin);
                 output[i] = gain * (bandValues[i] - this->radGainOff[i].qCalMin) + this->radGainOff[i].lMin;
@@ -50,43 +50,43 @@ namespace rsgis{namespace calib{
         }
     }
     
-    void RSGISSPOTRadianceCalibration::calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException)
+    void RSGISSPOTRadianceCalibration::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
     {
         for(unsigned int i = 0; i < this->numOutBands; ++i)
         {
             if(this->radGainOff[i].band > numBands)
             {
-                throw RSGISImageCalcException("Band is not within input image bands.");
+                throw rsgis::img::RSGISImageCalcException("Band is not within input image bands.");
             }
             output[i] = bandValues[i]/this->radGainOff[i].gain;
         }
     }
     
-    void RSGISIkonosRadianceCalibration::calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException)
+    void RSGISIkonosRadianceCalibration::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
     {
         for(unsigned int i = 0; i < this->numOutBands; ++i)
         {
             if(this->radGainOff[i].band > numBands)
             {
-                throw RSGISImageCalcException("Band is not within input image bands.");
+                throw rsgis::img::RSGISImageCalcException("Band is not within input image bands.");
             }
             output[i] = (100000*bandValues[i])/(this->radGainOff[i].calCoef * this->radGainOff[i].bandwidth);
         }
     }
     
-    void RSGISASTERRadianceCalibration::calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException)
+    void RSGISASTERRadianceCalibration::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
     {
         for(unsigned int i = 0; i < this->numOutBands; ++i)
         {
             if(this->radGainOff[i].band > numBands)
             {
-                throw RSGISImageCalcException("Band is not within input image bands.");
+                throw rsgis::img::RSGISImageCalcException("Band is not within input image bands.");
             }
             output[i] = (bandValues[i]-1)*this->radGainOff[i].unitConCoef;
         }
     }
     
-    void RSGISIRSRadianceCalibration::calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException)
+    void RSGISIRSRadianceCalibration::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
     {
         double gain = 0;
         
@@ -94,44 +94,44 @@ namespace rsgis{namespace calib{
         {
             if(this->radGainOff[i].band > numBands)
             {
-                throw RSGISImageCalcException("Band is not within input image bands.");
+                throw rsgis::img::RSGISImageCalcException("Band is not within input image bands.");
             }
             gain = (this->radGainOff[i].lMax - this->radGainOff[i].lMin)/(this->radGainOff[i].qCalMax - this->radGainOff[i].qCalMin);
             output[i] = gain * (bandValues[i] - this->radGainOff[i].qCalMin) + this->radGainOff[i].lMin;
         }
     }
     
-    void RSGISQuickbird16bitRadianceCalibration::calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException)
+    void RSGISQuickbird16bitRadianceCalibration::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
     {
         for(unsigned int i = 0; i < this->numOutBands; ++i)
         {
             if(this->radGainOff[i].band > numBands)
             {
-                throw RSGISImageCalcException("Band is not within input image bands.");
+                throw rsgis::img::RSGISImageCalcException("Band is not within input image bands.");
             }
             output[i] = (bandValues[i] * this->radGainOff[i].calFactor)/this->radGainOff[i].bandIntegrate;
         }
     }
     
-    void RSGISQuickbird8bitRadianceCalibration::calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException)
+    void RSGISQuickbird8bitRadianceCalibration::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
     {
         for(unsigned int i = 0; i < this->numOutBands; ++i)
         {
             if(this->radGainOff[i].band > numBands)
             {
-                throw RSGISImageCalcException("Band is not within input image bands.");
+                throw rsgis::img::RSGISImageCalcException("Band is not within input image bands.");
             }
             output[i] = (bandValues[i] * this->radGainOff[i].calFactor * this->radGainOff[i].k)/this->radGainOff[i].bandIntegrate;
         }
     }
     
-    void RSGISWorldView2RadianceCalibration::calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException)
+    void RSGISWorldView2RadianceCalibration::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
     {
         for(unsigned int i = 0; i < this->numOutBands; ++i)
         {
             if(this->radGainOff[i].band > numBands)
             {
-                throw RSGISImageCalcException("Band is not within input image bands.");
+                throw rsgis::img::RSGISImageCalcException("Band is not within input image bands.");
             }
             output[i] = (this->radGainOff[i].calFactor * bandValues[i])/this->radGainOff[i].bandIntegrate;
         }

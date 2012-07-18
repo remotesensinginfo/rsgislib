@@ -25,7 +25,7 @@
 
 namespace rsgis{namespace calib{
     
-    RSGISCalculateTopOfAtmosphereReflectance::RSGISCalculateTopOfAtmosphereReflectance(int numberOutBands, float *solarIrradiance, double distance, float solarZenith, float scaleFactor):RSGISCalcImageValue(numberOutBands)
+    RSGISCalculateTopOfAtmosphereReflectance::RSGISCalculateTopOfAtmosphereReflectance(int numberOutBands, float *solarIrradiance, double distance, float solarZenith, float scaleFactor):rsgis::img::RSGISCalcImageValue(numberOutBands)
     {
         this->solarIrradiance = solarIrradiance;
         this->distance = distance;
@@ -33,11 +33,11 @@ namespace rsgis{namespace calib{
         this->scaleFactor = scaleFactor;
     }
     
-    void RSGISCalculateTopOfAtmosphereReflectance::calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException)
+    void RSGISCalculateTopOfAtmosphereReflectance::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
     {
         if(numBands != this->numOutBands)
         {
-            throw RSGISImageCalcException("The number of input and output image bands needs to be the same.");
+            throw rsgis::img::RSGISImageCalcException("The number of input and output image bands needs to be the same.");
         }
         
         double distSq = distance * distance;
