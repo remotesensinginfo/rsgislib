@@ -28,7 +28,7 @@
 namespace rsgis{namespace reg{
 	
 	
-	RSGISBasicNNGCPImageWarp::RSGISBasicNNGCPImageWarp(string inputImage, string outputImage, string outProjWKT, string gcpFilePath, float outImgRes, RSGISWarpImageInterpolator *interpolator, string gdalFormat) : RSGISWarpImage(inputImage, outputImage, outProjWKT, gcpFilePath, outImgRes, interpolator, gdalFormat), pointIndex(NULL)
+	RSGISBasicNNGCPImageWarp::RSGISBasicNNGCPImageWarp(std::string inputImage, std::string outputImage, std::string outProjWKT, std::string gcpFilePath, float outImgRes, RSGISWarpImageInterpolator *interpolator, std::string gdalFormat) : RSGISWarpImage(inputImage, outputImage, outProjWKT, gcpFilePath, outImgRes, interpolator, gdalFormat), pointIndex(NULL)
 	{
 		
 	}
@@ -36,18 +36,18 @@ namespace rsgis{namespace reg{
 	void RSGISBasicNNGCPImageWarp::initWarp()throw(RSGISImageWarpException)
 	{
 		// Create Index
-		cout << "Creating Index\n";
-		this->pointIndex = new Quadtree();
-		Envelope *env = NULL;
-		vector<RSGISGCPImg2MapNode*>::iterator iterGCPs;
+		std::cout << "Creating Index\n";
+		this->pointIndex = new geos::index::quadtree::Quadtree();
+		geos::geom::Envelope *env = NULL;
+		std::vector<RSGISGCPImg2MapNode*>::iterator iterGCPs;
 		for(iterGCPs = gcps->begin(); iterGCPs != gcps->end(); ++iterGCPs)
 		{
-			env = new Envelope(((*iterGCPs)->eastings() - 2), ((*iterGCPs)->eastings() + 2), ((*iterGCPs)->northings() - 2), ((*iterGCPs)->northings() + 2));
+			env = new geos::geom::Envelope(((*iterGCPs)->eastings() - 2), ((*iterGCPs)->eastings() + 2), ((*iterGCPs)->northings() - 2), ((*iterGCPs)->northings() + 2));
 			pointIndex->insert(env, *iterGCPs);
 		}
 	}
 	
-	Envelope* RSGISBasicNNGCPImageWarp::newImageExtent(unsigned int width, unsigned int height) throw(RSGISImageWarpException)
+	geos::geom::Envelope* RSGISBasicNNGCPImageWarp::newImageExtent(unsigned int width, unsigned int height) throw(RSGISImageWarpException)
 	{
 		double minEastings = 0;
 		double maxEastings = 0;
@@ -55,7 +55,7 @@ namespace rsgis{namespace reg{
 		double maxNorthings = 0;
 		bool first = true;
 		
-		vector<RSGISGCPImg2MapNode*>::iterator iterGCPs;
+		std::vector<RSGISGCPImg2MapNode*>::iterator iterGCPs;
 		for(iterGCPs = gcps->begin(); iterGCPs != gcps->end(); ++iterGCPs)
 		{
 			if(first)
@@ -88,10 +88,10 @@ namespace rsgis{namespace reg{
 			}
 		}
 		
-		cout << "Eastings: [" << minEastings << "," << maxEastings << "]\n";
-		cout << "Northings: [" << minNorthings << "," << maxNorthings << "]\n";
+		std::cout << "Eastings: [" << minEastings << "," << maxEastings << "]\n";
+		std::cout << "Northings: [" << minNorthings << "," << maxNorthings << "]\n";
 		
-		Envelope *env = new Envelope(minEastings, maxEastings, minNorthings, maxNorthings);
+		geos::geom::Envelope *env = new geos::geom::Envelope(minEastings, maxEastings, minNorthings, maxNorthings);
 		
 		double geoWidth = maxEastings - minEastings;
 		double geoHeight = maxNorthings - minNorthings;
@@ -108,8 +108,8 @@ namespace rsgis{namespace reg{
 	{
 		RSGISGCPImg2MapNode *pxl = new RSGISGCPImg2MapNode(eastings, northings, 0, 0);
 		
-		Envelope *searchEnv = new Envelope((eastings-(20*inImgRes)), (eastings+(20*inImgRes)), (northings-(20*inImgRes)), (northings+(20*inImgRes)));
-		vector<void*> values = vector<void*>();
+		geos::geom::Envelope *searchEnv = new geos::geom::Envelope((eastings-(20*inImgRes)), (eastings+(20*inImgRes)), (northings-(20*inImgRes)), (northings+(20*inImgRes)));
+		std::vector<void*> values = std::vector<void*>();
 		
 		this->pointIndex->query(searchEnv, values);
 		
@@ -121,7 +121,7 @@ namespace rsgis{namespace reg{
             double distance = 0;
             RSGISGCPImg2MapNode *closestGCP = NULL;
             double closestDist = 0;
-            vector<void*>::iterator iterVals;
+            std::vector<void*>::iterator iterVals;
             for(iterVals = values.begin(); iterVals != values.end(); ++iterVals)
             {
                 tmpGCP = (RSGISGCPImg2MapNode*)(*iterVals);
@@ -139,9 +139,9 @@ namespace rsgis{namespace reg{
                 }			
             }
             
-            //cout.precision(12);
-            //cout << "Pixel : [" << eastings << "," << northings << "]\n";
-            //cout << "Closest: [" << closestGCP->eastings << "," << closestGCP->northings << "] = [" << closestGCP->imgX << "," << closestGCP->imgY << "]\n";
+            //std::cout.precision(12);
+            //std::cout << "Pixel : [" << eastings << "," << northings << "]\n";
+            //std::cout << "Closest: [" << closestGCP->eastings << "," << closestGCP->northings << "] = [" << closestGCP->imgX << "," << closestGCP->imgY << "]\n";
             
             double xDistance = closestGCP->eastings() - eastings;
             double yDistance = closestGCP->northings() - northings;

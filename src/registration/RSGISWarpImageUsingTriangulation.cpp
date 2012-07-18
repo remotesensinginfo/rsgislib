@@ -26,21 +26,21 @@
 
 namespace rsgis{namespace reg{
 
-	RSGISWarpImageUsingTriangulation::RSGISWarpImageUsingTriangulation(string inputImage, string outputImage, string outProjWKT, string gcpFilePath, float outImgRes, RSGISWarpImageInterpolator *interpolator, string gdalFormat) : RSGISWarpImage(inputImage, outputImage, outProjWKT, gcpFilePath, outImgRes, interpolator, gdalFormat), dt(NULL), values(NULL)
+	RSGISWarpImageUsingTriangulation::RSGISWarpImageUsingTriangulation(std::string inputImage, std::string outputImage, std::string outProjWKT, std::string gcpFilePath, float outImgRes, RSGISWarpImageInterpolator *interpolator, std::string gdalFormat) : RSGISWarpImage(inputImage, outputImage, outProjWKT, gcpFilePath, outImgRes, interpolator, gdalFormat), dt(NULL), values(NULL)
 	{
         
 	}
 	
 	void RSGISWarpImageUsingTriangulation::initWarp()throw(RSGISImageWarpException)
 	{
-        cout << "Building Triangulation\n";
+        std::cout << "Building Triangulation\n";
         
         try
         {
             dt = new DelaunayTriangulation();
             values = new PointValueMap();
             
-            vector<RSGISGCPImg2MapNode*>::iterator iterGCPs;
+            std::vector<RSGISGCPImg2MapNode*>::iterator iterGCPs;
             for(iterGCPs = gcps->begin(); iterGCPs != gcps->end(); ++iterGCPs)
             {
                 K::Point_2 cgalPt((*iterGCPs)->eastings(),(*iterGCPs)->northings());
@@ -56,7 +56,7 @@ namespace rsgis{namespace reg{
         
 	}
 	
-	Envelope* RSGISWarpImageUsingTriangulation::newImageExtent(unsigned int width, unsigned int height) throw(RSGISImageWarpException)
+	geos::geom::Envelope* RSGISWarpImageUsingTriangulation::newImageExtent(unsigned int width, unsigned int height) throw(RSGISImageWarpException)
 	{
 		double minEastings = 0;
 		double maxEastings = 0;
@@ -64,7 +64,7 @@ namespace rsgis{namespace reg{
 		double maxNorthings = 0;
 		bool first = true;
 		
-		vector<RSGISGCPImg2MapNode*>::iterator iterGCPs;
+		std::vector<RSGISGCPImg2MapNode*>::iterator iterGCPs;
 		for(iterGCPs = gcps->begin(); iterGCPs != gcps->end(); ++iterGCPs)
 		{
 			if(first)
@@ -97,10 +97,10 @@ namespace rsgis{namespace reg{
 			}
 		}
 		
-		cout << "Eastings: [" << minEastings << "," << maxEastings << "]\n";
-		cout << "Northings: [" << minNorthings << "," << maxNorthings << "]\n";
+		std::cout << "Eastings: [" << minEastings << "," << maxEastings << "]\n";
+		std::cout << "Northings: [" << minNorthings << "," << maxNorthings << "]\n";
 		
-		Envelope *env = new Envelope(minEastings, maxEastings, minNorthings, maxNorthings);
+		geos::geom::Envelope *env = new geos::geom::Envelope(minEastings, maxEastings, minNorthings, maxNorthings);
 		
 		double geoWidth = maxEastings - minEastings;
 		double geoHeight = maxNorthings - minNorthings;
@@ -131,18 +131,18 @@ namespace rsgis{namespace reg{
         RSGISGCPImg2MapNode *nodeC = (*iterVal).second;
 		
         /*
-		cout << "GCP 1: [" << nodeA->imgX() << "," << nodeA->imgY() << "]\n";
-		cout << "GCP 2: [" << nodeB->imgX() << "," << nodeB->imgY() << "]\n";
-		cout << "GCP 3: [" << nodeC->imgX() << "," << nodeC->imgY() << "]\n\n";
+		std::cout << "GCP 1: [" << nodeA->imgX() << "," << nodeA->imgY() << "]\n";
+		std::cout << "GCP 2: [" << nodeB->imgX() << "," << nodeB->imgY() << "]\n";
+		std::cout << "GCP 3: [" << nodeC->imgX() << "," << nodeC->imgY() << "]\n\n";
 		*/
         
 		// Create node list
-		list<const RSGISGCPImg2MapNode*> *triPts = new list<const RSGISGCPImg2MapNode*>();
+        std::list<const RSGISGCPImg2MapNode*> *triPts = new std::list<const RSGISGCPImg2MapNode*>();
 		triPts->push_back(nodeA);
 		triPts->push_back(nodeB);
 		triPts->push_back(nodeC);
 		
-		list<RSGISGCPImg2MapNode*> *normTriPts = normGCPs(triPts, eastings, northings);
+        std::list<RSGISGCPImg2MapNode*> *normTriPts = normGCPs(triPts, eastings, northings);
 		
 		double planeA = 0;
 		double planeB = 0;
@@ -153,7 +153,7 @@ namespace rsgis{namespace reg{
 		this->fitPlane2YPoints(normTriPts, &planeA, &planeB, &planeC);
 		*y = floor(planeC+0.5);
 		
-		list<RSGISGCPImg2MapNode*>::iterator iterGCPs;
+        std::list<RSGISGCPImg2MapNode*>::iterator iterGCPs;
 		for(iterGCPs = normTriPts->begin(); iterGCPs != normTriPts->end(); )
 		{
 			delete *iterGCPs;
@@ -164,11 +164,11 @@ namespace rsgis{namespace reg{
 	
 	list<RSGISGCPImg2MapNode*>* RSGISWarpImageUsingTriangulation::normGCPs(list<const RSGISGCPImg2MapNode*> *gcps, double eastings, double northings)
 	{
-		list<RSGISGCPImg2MapNode*> *normTriPts = new list<RSGISGCPImg2MapNode*>();
+        std::list<RSGISGCPImg2MapNode*> *normTriPts = new std::list<RSGISGCPImg2MapNode*>();
 		
 		RSGISGCPImg2MapNode *tmpGCP = NULL;
 		
-		list<const RSGISGCPImg2MapNode*>::iterator iterGCPs;
+        std::list<const RSGISGCPImg2MapNode*>::iterator iterGCPs;
 		for(iterGCPs = gcps->begin(); iterGCPs != gcps->end(); ++iterGCPs)
 		{
 			tmpGCP = new RSGISGCPImg2MapNode(((*iterGCPs)->eastings() - eastings),
@@ -183,7 +183,7 @@ namespace rsgis{namespace reg{
 	
 	void RSGISWarpImageUsingTriangulation::fitPlane2XPoints(list<RSGISGCPImg2MapNode*> *normPts, double *a, double *b, double *c) throw(RSGISImageWarpException)
 	{
-		RSGISMatrices matrices;
+		rsgis::math::RSGISMatrices matrices;
 		
 		try
 		{
@@ -196,7 +196,7 @@ namespace rsgis{namespace reg{
 			double sYZ = 0;
 			double sZ = 0;
 			
-			list<RSGISGCPImg2MapNode*>::iterator iterPts;
+            std::list<RSGISGCPImg2MapNode*>::iterator iterPts;
 			
 			for(iterPts = normPts->begin(); iterPts != normPts->end(); ++iterPts)
 			{
@@ -210,7 +210,7 @@ namespace rsgis{namespace reg{
 				sZ += (*iterPts)->imgX();
 			}
 			
-			Matrix *matrixA = matrices.createMatrix(3, 3);
+			rsgis::math::Matrix *matrixA = matrices.createMatrix(3, 3);
 			matrixA->matrix[0] = sXSqu;
 			matrixA->matrix[1] = sXY;
 			matrixA->matrix[2] = sX;
@@ -220,17 +220,17 @@ namespace rsgis{namespace reg{
 			matrixA->matrix[6] = sX;
 			matrixA->matrix[7] = sY;
 			matrixA->matrix[8] = normPts->size();
-			Matrix *matrixB = matrices.createMatrix(1, 3);
+			rsgis::math::Matrix *matrixB = matrices.createMatrix(1, 3);
 			matrixB->matrix[0] = sXZ;
 			matrixB->matrix[1] = sYZ;
 			matrixB->matrix[2] = sZ;
 			
 			double determinantA = matrices.determinant(matrixA);
-			Matrix *matrixCoFactors = matrices.cofactors(matrixA);
-			Matrix *matrixCoFactorsT = matrices.transpose(matrixCoFactors);
+			rsgis::math::Matrix *matrixCoFactors = matrices.cofactors(matrixA);
+			rsgis::math::Matrix *matrixCoFactorsT = matrices.transpose(matrixCoFactors);
 			double multiplier = 1/determinantA;
 			matrices.multipleSingle(matrixCoFactorsT, multiplier);
-			Matrix *outputs = matrices.multiplication(matrixCoFactorsT, matrixB);
+			rsgis::math::Matrix *outputs = matrices.multiplication(matrixCoFactorsT, matrixB);
 			*a = outputs->matrix[0];
 			*b = outputs->matrix[1];
 			*c = outputs->matrix[2];
@@ -241,7 +241,7 @@ namespace rsgis{namespace reg{
 			matrices.freeMatrix(matrixCoFactorsT);
 			matrices.freeMatrix(outputs);
 		}
-		catch(RSGISMatricesException e)
+		catch(rsgis::math::RSGISMatricesException e)
 		{
 			throw RSGISImageWarpException(e.what());
 		}
@@ -249,7 +249,7 @@ namespace rsgis{namespace reg{
 	
 	void RSGISWarpImageUsingTriangulation::fitPlane2YPoints(list<RSGISGCPImg2MapNode*> *normPts, double *a, double *b, double *c) throw(RSGISImageWarpException)
 	{
-		RSGISMatrices matrices;
+		rsgis::math::RSGISMatrices matrices;
 		
 		try
 		{
@@ -262,7 +262,7 @@ namespace rsgis{namespace reg{
 			double sYZ = 0;
 			double sZ = 0;
 			
-			list<RSGISGCPImg2MapNode*>::iterator iterPts;
+            std::list<RSGISGCPImg2MapNode*>::iterator iterPts;
 			
 			for(iterPts = normPts->begin(); iterPts != normPts->end(); ++iterPts)
 			{
@@ -276,7 +276,7 @@ namespace rsgis{namespace reg{
 				sZ += (*iterPts)->imgY();
 			}
 			
-			Matrix *matrixA = matrices.createMatrix(3, 3);
+			rsgis::math::Matrix *matrixA = matrices.createMatrix(3, 3);
 			matrixA->matrix[0] = sXSqu;
 			matrixA->matrix[1] = sXY;
 			matrixA->matrix[2] = sX;
@@ -286,17 +286,17 @@ namespace rsgis{namespace reg{
 			matrixA->matrix[6] = sX;
 			matrixA->matrix[7] = sY;
 			matrixA->matrix[8] = normPts->size();
-			Matrix *matrixB = matrices.createMatrix(1, 3);
+			rsgis::math::Matrix *matrixB = matrices.createMatrix(1, 3);
 			matrixB->matrix[0] = sXZ;
 			matrixB->matrix[1] = sYZ;
 			matrixB->matrix[2] = sZ;
 			
 			double determinantA = matrices.determinant(matrixA);
-			Matrix *matrixCoFactors = matrices.cofactors(matrixA);
-			Matrix *matrixCoFactorsT = matrices.transpose(matrixCoFactors);
+			rsgis::math::Matrix *matrixCoFactors = matrices.cofactors(matrixA);
+			rsgis::math::Matrix *matrixCoFactorsT = matrices.transpose(matrixCoFactors);
 			double multiplier = 1/determinantA;
 			matrices.multipleSingle(matrixCoFactorsT, multiplier);
-			Matrix *outputs = matrices.multiplication(matrixCoFactorsT, matrixB);
+			rsgis::math::Matrix *outputs = matrices.multiplication(matrixCoFactorsT, matrixB);
 			*a = outputs->matrix[0];
 			*b = outputs->matrix[1];
 			*c = outputs->matrix[2];
@@ -307,7 +307,7 @@ namespace rsgis{namespace reg{
 			matrices.freeMatrix(matrixCoFactorsT);
 			matrices.freeMatrix(outputs);
 		}
-		catch(RSGISMatricesException e)
+		catch(rsgis::math::RSGISMatricesException e)
 		{
 			throw RSGISImageWarpException(e.what());
 		}

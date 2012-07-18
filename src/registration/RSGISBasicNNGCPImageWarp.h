@@ -41,22 +41,17 @@
 #include "registration/RSGISWarpImage.h"
 
 namespace rsgis{namespace reg{
-    
-    using namespace std;
-    using namespace geos::geom;
-    using namespace geos::index::quadtree;
-    using namespace rsgis::math;
-	
+    	
 	class RSGISBasicNNGCPImageWarp : public RSGISWarpImage
 	{
 	public:
-		RSGISBasicNNGCPImageWarp(string inputImage, string outputImage, string outProjWKT, string gcpFilePath, float outImgRes, RSGISWarpImageInterpolator *interpolator, string gdalFormat);
+		RSGISBasicNNGCPImageWarp(std::string inputImage, std::string outputImage, std::string outProjWKT, std::string gcpFilePath, float outImgRes, RSGISWarpImageInterpolator *interpolator, std::string gdalFormat);
 		void initWarp()throw(RSGISImageWarpException);
 		~RSGISBasicNNGCPImageWarp();
 	protected:
-		Envelope* newImageExtent(unsigned int width, unsigned int height) throw(RSGISImageWarpException);
+		geos::geom::Envelope* newImageExtent(unsigned int width, unsigned int height) throw(RSGISImageWarpException);
 		void findNearestPixel(double eastings, double northings, unsigned int *x, unsigned int *y, float inImgRes) throw(RSGISImageWarpException);
-        Quadtree *pointIndex;
+        geos::index::quadtree::Quadtree *pointIndex;
 	};
 	
 }}

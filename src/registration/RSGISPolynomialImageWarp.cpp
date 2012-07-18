@@ -28,7 +28,7 @@
 namespace rsgis{namespace reg{
 	
 	
-	RSGISPolynomialImageWarp::RSGISPolynomialImageWarp(string inputImage, string outputImage, string outProjWKT, string gcpFilePath, float outImgRes, RSGISWarpImageInterpolator *interpolator, unsigned int polyOrder, string gdalFormat) : RSGISWarpImage(inputImage, outputImage, outProjWKT, gcpFilePath, outImgRes, interpolator, gdalFormat)
+	RSGISPolynomialImageWarp::RSGISPolynomialImageWarp(std::string inputImage, std::string outputImage, std::string outProjWKT, std::string gcpFilePath, float outImgRes, RSGISWarpImageInterpolator *interpolator, unsigned int polyOrder, std::string gdalFormat) : RSGISWarpImage(inputImage, outputImage, outProjWKT, gcpFilePath, outImgRes, interpolator, gdalFormat)
 	{
 		this->polyOrder = polyOrder;
 	}
@@ -42,7 +42,7 @@ namespace rsgis{namespace reg{
          */
          
         
-        cout << "Fitting polynomial..." << endl;
+        std::cout << "Fitting polynomial..." << std::endl;
         
         unsigned int coeffSize = 3 * this->polyOrder; // x**N + y**N + xy**(N-1) + 1
         
@@ -61,7 +61,7 @@ namespace rsgis{namespace reg{
         unsigned int pointN = 0;
         unsigned int offset = 0;
 		
-        vector<RSGISGCPImg2MapNode*>::iterator iterGCPs;
+        std::vector<RSGISGCPImg2MapNode*>::iterator iterGCPs;
 		for(iterGCPs = gcps->begin(); iterGCPs != gcps->end(); ++iterGCPs) // Populate matrices using ground control points.
 		{
             // Add pixel values into vectors
@@ -71,7 +71,7 @@ namespace rsgis{namespace reg{
             gsl_vector_set(northingVal, pointN, (*iterGCPs)->northings()); // Northing
 
             gsl_matrix_set(eastNorthPow, pointN, 0, 1.);
-             gsl_matrix_set(xyPow, pointN, 0, 1.);
+            gsl_matrix_set(xyPow, pointN, 0, 1.);
             
 			for(int j = 1; j < polyOrder; ++j)
 			{
@@ -111,7 +111,7 @@ namespace rsgis{namespace reg{
         // Fit for N
 		gsl_multifit_linear(xyPow, northingVal, this->aN, cov, &chisq, workspace);       
         
-        cout << "Fitted polynomial." << endl;
+        std::cout << "Fitted polynomial." << std::endl;
         
         // Test polynominal fit and calculate RMSE
         double sqSum = 0;
@@ -147,14 +147,14 @@ namespace rsgis{namespace reg{
             
             sqSum = sqSum + (pow((*iterGCPs)->imgX() - pX ,2) + pow((*iterGCPs)->imgY() - pY ,2));
             
-            //cout <<  << ", " << pX << ", " << (*iterGCPs)->imgY() << ", " << pY << endl;
+            //std::cout <<  << ", " << pX << ", " << (*iterGCPs)->imgY() << ", " << pY << std::endl;
         }
     
         double sqMean = sqSum / double(gcps->size());
 		
 		double rmse = sqrt(sqMean);
 		
-		cout << "RMSE = " << rmse << " pixels " << endl;
+		std::cout << "RMSE = " << rmse << " pixels " << std::endl;
         
         // Tidy up
 		gsl_multifit_linear_free(workspace);
@@ -168,7 +168,7 @@ namespace rsgis{namespace reg{
 
 	}
 	
-	Envelope* RSGISPolynomialImageWarp::newImageExtent(unsigned int width, unsigned int height) throw(RSGISImageWarpException)
+	geos::geom::Envelope* RSGISPolynomialImageWarp::newImageExtent(unsigned int width, unsigned int height) throw(RSGISImageWarpException)
 	{
 		
         double minEastings = 0;
@@ -211,15 +211,15 @@ namespace rsgis{namespace reg{
             minNorthings = tempNorthing;
         }
 		
-        cout << "Eastings: [" << minEastings << "," << maxEastings << "]\n";
-		cout << "Northings: [" << minNorthings << "," << maxNorthings << "]\n";
+        std::cout << "Eastings: [" << minEastings << "," << maxEastings << "]\n";
+		std::cout << "Northings: [" << minNorthings << "," << maxNorthings << "]\n";
         
-		Envelope *env = new Envelope(minEastings, maxEastings, minNorthings, maxNorthings);
+		geos::geom::Envelope *env = new geos::geom::Envelope(minEastings, maxEastings, minNorthings, maxNorthings);
 		
 		double geoWidth = maxEastings - minEastings;
 		double geoHeight = maxNorthings - minNorthings;
         
-        //cout << "geoWidth = " << geoWidth << ", geoHeight = " << geoHeight << endl;
+        //std::cout << "geoWidth = " << geoWidth << ", geoHeight = " << geoHeight << std::endl;
 		
 		if((geoWidth <= 0) | (geoHeight <= 0))
 		{

@@ -26,7 +26,7 @@
 
 namespace rsgis{namespace reg{
 	
-	RSGISWarpImage::RSGISWarpImage(string inputImage, string outputImage, string outProjWKT, string gcpFilePath, float outImgRes, RSGISWarpImageInterpolator *interpolator, string gdalFormat):inputImage(""), outputImage(""), outProjWKT(""), gcpFilePath(""), outImgRes(0), interpolator(NULL), gdalFormat("ENVI")
+	RSGISWarpImage::RSGISWarpImage(std::string inputImage, std::string outputImage, std::string outProjWKT, std::string gcpFilePath, float outImgRes, RSGISWarpImageInterpolator *interpolator, std::string gdalFormat):inputImage(""), outputImage(""), outProjWKT(""), gcpFilePath(""), outImgRes(0), interpolator(NULL), gdalFormat("ENVI")
 	{
 		this->inputImage = inputImage;
 		this->outputImage = outputImage;
@@ -35,20 +35,20 @@ namespace rsgis{namespace reg{
 		this->outImgRes = outImgRes;
 		this->interpolator = interpolator;
         this->gdalFormat = gdalFormat;
-		gcps = new vector<RSGISGCPImg2MapNode*>();
+		gcps = new std::vector<RSGISGCPImg2MapNode*>();
 	}
 	
 	void RSGISWarpImage::performWarp() throw(RSGISImageWarpException)
 	{
 		try 
 		{
-			cout << "Read in GCPs\n";
+			std::cout << "Read in GCPs\n";
 			this->readGCPFile();
-			cout << "Initialise Warp\n";
+			std::cout << "Initialise Warp\n";
 			this->initWarp();
-			cout << "Create blank output image\n";
+			std::cout << "Create blank output image\n";
 			this->createOutputImage();
-			cout << "Assign Output Pixel values\n";
+			std::cout << "Assign Output Pixel values\n";
 			this->populateOutputImage();
 		}
 		catch (RSGISImageWarpException &e) 
@@ -61,13 +61,13 @@ namespace rsgis{namespace reg{
 	{
 		try 
 		{
-			cout << "Read in GCPs\n";
+			std::cout << "Read in GCPs\n";
 			this->readGCPFile();
-			cout << "Initialise Warp\n";
+			std::cout << "Initialise Warp\n";
 			this->initWarp();
-			cout << "Create blank output image\n";
+			std::cout << "Create blank output image\n";
 			this->createOutputTransformImage();
-			cout << "Assign Output Pixel values\n";
+			std::cout << "Assign Output Pixel values\n";
 			this->populateTransformImage();
 		}
 		catch (RSGISImageWarpException &e) 
@@ -78,15 +78,15 @@ namespace rsgis{namespace reg{
 	
 	void RSGISWarpImage::readGCPFile() throw(RSGISImageWarpException)
 	{
-		RSGISTextUtils textUtils;
-		RSGISMathsUtils mathUtils;
+        rsgis::utils::RSGISTextUtils textUtils;
+        rsgis::math::RSGISMathsUtils mathUtils;
 		
 		ifstream gcpFile;
 		gcpFile.open(gcpFilePath.c_str());
 		if(gcpFile.is_open())
 		{
-			vector<string> *tokens = new vector<string>();
-			string strLine;
+			std::vector<std::string> *tokens = new std::vector<std::string>();
+			std::string strLine;
 			RSGISGCPImg2MapNode *gcp = NULL;
 			while(!gcpFile.eof())
 			{
@@ -99,7 +99,7 @@ namespace rsgis{namespace reg{
 					{
 						delete tokens;
 						gcpFile.close();
-						string message = "Line should have 4 tokens: \"" + strLine + "\"";
+						std::string message = "Line should have 4 tokens: \"" + strLine + "\"";
 						throw RSGISImageWarpException(message);
 					}
 					
@@ -119,17 +119,17 @@ namespace rsgis{namespace reg{
 		}
 		else
 		{
-			string message = "Could not open " + gcpFilePath;
+			std::string message = "Could not open " + gcpFilePath;
 			throw RSGISImageWarpException(message);
 		}
 	}
 	
 	void RSGISWarpImage::createOutputImage() throw(RSGISImageWarpException)
 	{
-		RSGISImageUtils imgUtils;
+        rsgis::img::RSGISImageUtils imgUtils;
 
 		GDALDataset *inputImageDS = NULL;
-		Envelope *imageGeoExtent = NULL;
+        geos::geom::Envelope *imageGeoExtent = NULL;
 		
 		try 
 		{			
@@ -139,7 +139,7 @@ namespace rsgis{namespace reg{
             
 			if(inputImageDS == NULL)
 			{
-				string message = string("Could not open image ") + this->inputImage;
+				std::string message = std::string("Could not open image ") + this->inputImage;
 				throw RSGISImageException(message.c_str());
 			}
 			
@@ -154,7 +154,7 @@ namespace rsgis{namespace reg{
 		{
 			throw e;
 		}
-		catch (RSGISImageBandException &e) 
+		catch (rsgis::img::RSGISImageBandException &e) 
 		{
 			throw RSGISImageWarpException(e.what());
 		}
@@ -166,10 +166,10 @@ namespace rsgis{namespace reg{
     
     void RSGISWarpImage::createOutputTransformImage() throw(RSGISImageWarpException)
 	{
-		RSGISImageUtils imgUtils;
+        rsgis::img::RSGISImageUtils imgUtils;
         
 		GDALDataset *inputImageDS = NULL;
-		Envelope *imageGeoExtent = NULL;
+        geos::geom::Envelope *imageGeoExtent = NULL;
 		
 		try 
 		{			
@@ -179,7 +179,7 @@ namespace rsgis{namespace reg{
             
 			if(inputImageDS == NULL)
 			{
-				string message = string("Could not open image ") + this->inputImage;
+				std::string message = std::string("Could not open image ") + this->inputImage;
 				throw RSGISImageException(message.c_str());
 			}
 						
@@ -192,7 +192,7 @@ namespace rsgis{namespace reg{
 		{
 			throw e;
 		}
-		catch (RSGISImageBandException &e) 
+		catch (rsgis::img::RSGISImageBandException &e) 
 		{
 			throw RSGISImageWarpException(e.what());
 		}
@@ -204,7 +204,7 @@ namespace rsgis{namespace reg{
 	
 	void RSGISWarpImage::populateOutputImage() throw(RSGISImageWarpException)
 	{
-		RSGISImageUtils imgUtils;
+        rsgis::img::RSGISImageUtils imgUtils;
 		
 		GDALDataset *inputImageDS = NULL;
 		GDALDataset *outputImageDS = NULL;
@@ -215,13 +215,13 @@ namespace rsgis{namespace reg{
 			inputImageDS = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_ReadOnly);
 			if(inputImageDS == NULL)
 			{
-				string message = string("Could not open image ") + this->inputImage;
+				std::string message = std::string("Could not open image ") + this->inputImage;
 				throw RSGISImageException(message.c_str());
 			}
 			outputImageDS = (GDALDataset *) GDALOpen(this->outputImage.c_str(), GA_Update);
 			if(outputImageDS == NULL)
 			{
-				string message = string("Could not open image ") + this->outputImage;
+				std::string message = std::string("Could not open image ") + this->outputImage;
 				throw RSGISImageException(message.c_str());
 			}
 			
@@ -298,12 +298,12 @@ namespace rsgis{namespace reg{
 			
 			int feedback = outHeight/10;
 			int feedbackCounter = 0;
-			cout << "Started ." << flush;
+			std::cout << "Started ." << std::flush;
 			for(unsigned int i = 0; i < outHeight; ++i)
 			{
 				if((outHeight > 10) && ((i % feedback) == 0))
 				{
-					cout << "." << feedbackCounter << "." << flush;
+					std::cout << "." << feedbackCounter << "." << std::flush;
 					feedbackCounter = feedbackCounter + 10;
 				}
 				currentEastings = startEastings;
@@ -331,7 +331,7 @@ namespace rsgis{namespace reg{
 						// ignore... - set output as NaN
 						for(unsigned int n = 0; n < numBands; n++)
 						{
-							outDataColumn[n] = numeric_limits<double>::signaling_NaN();//NAN;
+							outDataColumn[n] = std::numeric_limits<double>::signaling_NaN();//NAN;
 						}
 					}
 					
@@ -350,7 +350,7 @@ namespace rsgis{namespace reg{
 				
 				currentNorthings -= this->outImgRes;
 			}
-			cout << ". Complete\n";
+			std::cout << ". Complete\n";
 			
 			delete[] outputRasterBands;
 			
@@ -370,7 +370,7 @@ namespace rsgis{namespace reg{
 			GDALClose(outputImageDS);
 			throw e;
 		}
-		catch (RSGISImageBandException &e) 
+		catch (rsgis::img::RSGISImageBandException &e) 
 		{
 			GDALClose(inputImageDS);
 			GDALClose(outputImageDS);
@@ -386,28 +386,26 @@ namespace rsgis{namespace reg{
     
     void RSGISWarpImage::populateTransformImage() throw(RSGISImageWarpException)
 	{
-		RSGISImageUtils imgUtils;
+		rsgis::img::RSGISImageUtils imgUtils;
 		
 		GDALDataset *inputImageDS = NULL;
 		GDALDataset *outputImageDS = NULL;
-        
 		
 		try 
 		{
 			inputImageDS = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_ReadOnly);
 			if(inputImageDS == NULL)
 			{
-				string message = string("Could not open image ") + this->inputImage;
+				std::string message = std::string("Could not open image ") + this->inputImage;
 				throw RSGISImageException(message.c_str());
 			}
 			outputImageDS = (GDALDataset *) GDALOpen(this->outputImage.c_str(), GA_Update);
 			if(outputImageDS == NULL)
 			{
-				string message = string("Could not open image ") + this->outputImage;
+				std::string message = std::string("Could not open image ") + this->outputImage;
 				throw RSGISImageException(message.c_str());
 			}
 
-			
 			unsigned int numBands = outputImageDS->GetRasterCount();
 			
 			double *gdalTransformation= new double[6];
@@ -478,12 +476,12 @@ namespace rsgis{namespace reg{
 			
 			int feedback = outHeight/10;
 			int feedbackCounter = 0;
-			cout << "Started ." << flush;
+			std::cout << "Started ." << std::flush;
 			for(unsigned int i = 0; i < outHeight; ++i)
 			{
 				if((outHeight > 10) && ((i % feedback) == 0))
 				{
-					cout << "." << feedbackCounter << "." << flush;
+					std::cout << "." << feedbackCounter << "." << std::flush;
 					feedbackCounter = feedbackCounter + 10;
 				}
 				currentEastings = startEastings;
@@ -523,7 +521,7 @@ namespace rsgis{namespace reg{
 				
 				currentNorthings -= this->outImgRes;
 			}
-			cout << ". Complete\n";
+			std::cout << ". Complete\n";
 			
 			delete[] outputRasterBands;
 			
@@ -543,7 +541,7 @@ namespace rsgis{namespace reg{
 			GDALClose(outputImageDS);
 			throw e;
 		}
-		catch (RSGISImageBandException &e) 
+		catch (rsgis::img::RSGISImageBandException &e) 
 		{
 			GDALClose(inputImageDS);
 			GDALClose(outputImageDS);

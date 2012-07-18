@@ -28,7 +28,7 @@ namespace rsgis{namespace reg{
 
 	RSGISBasicImageRegistration::RSGISBasicImageRegistration(GDALDataset *reference, GDALDataset *floating, unsigned int gap, float metricThreshold, unsigned int windowSize, unsigned int searchArea, RSGISImageSimilarityMetric *metric, float stdDevRefThreshold, float stdDevFloatThreshold, unsigned int subPixelResolution):RSGISImageRegistration(reference, floating), tiePoints(NULL), gap(1), metricThreshold(0), initExecuted(false), windowSize(0), searchArea(0), metric(NULL), stdDevRefThreshold(0), stdDevFloatThreshold(0), subPixelResolution(0)
 	{
-		tiePoints = new list<TiePoint*>();
+		tiePoints = new std::list<TiePoint*>();
 		this->gap = gap;
 		this->metricThreshold = metricThreshold;
 		this->windowSize = windowSize;
@@ -64,9 +64,9 @@ namespace rsgis{namespace reg{
 		unsigned int numXPts = this->overlap->xSize/gap;
 		unsigned int numYPts = this->overlap->ySize/gap;
         
-        cout << numXPts << " columns of tie points will be generated\n";
-        cout << numYPts << " rows of tie points will be generated\n";
-        cout << "Therefore, a total of " << (numXPts * numYPts) << " tie points will be generated\n";
+        std::cout << numXPts << " columns of tie points will be generated\n";
+        std::cout << numYPts << " rows of tie points will be generated\n";
+        std::cout << "Therefore, a total of " << (numXPts * numYPts) << " tie points will be generated\n";
 		
 		unsigned int startXOff = 0;
 		unsigned int startYOff = 0;
@@ -81,7 +81,7 @@ namespace rsgis{namespace reg{
 		
 		TiePoint *tmpTiePt = NULL;
 		
-		//cout << "Start offset = [" << startXOff << "," << startYOff << "]" << endl;
+		//std::cout << "Start offset = [" << startXOff << "," << startYOff << "]" << std::endl;
 		
 		for(unsigned int i = 0; i < numYPts; ++i)
 		{
@@ -110,7 +110,7 @@ namespace rsgis{namespace reg{
 		
 		this->removeTiePointsWithLowStdDev(tiePoints, windowSize, stdDevRefThreshold, stdDevFloatThreshold);
         
-        cout << tiePoints->size() << " are remaining following removal of tie points with low standard deviation of image regions\n";
+        std::cout << tiePoints->size() << " are remaining following removal of tie points with low standard deviation of image regions\n";
 		
 		initExecuted = true;
 	}
@@ -132,25 +132,25 @@ namespace rsgis{namespace reg{
 			giveFeedback = true;
 		}
 		
-		cout << "Started ." << flush;
+		std::cout << "Started ." << flush;
 		
 		float xShift = 0;
 		float yShift = 0;
 		
-		list<TiePoint*>::iterator iterTiePts;
+		std::list<TiePoint*>::iterator iterTiePts;
 		for(iterTiePts = tiePoints->begin(); iterTiePts != tiePoints->end(); ++iterTiePts)
 		{
 			if(giveFeedback && ((counter % feedback) == 0))
 			{
-				cout << "." << feedbackVal << "." << flush;
+				std::cout << "." << feedbackVal << "." << flush;
 				feedbackVal += 10;
 			}
 			
-			//cout << "Finding location of tie point " << counter << endl;
+			//std::cout << "Finding location of tie point " << counter << std::endl;
 			this->findTiePointLocation(*iterTiePts, windowSize, searchArea, metric, metricThreshold, subPixelResolution, &xShift, &yShift);
 			++counter;
 		}
-		cout << ". Complete\n";
+		std::cout << ". Complete\n";
 	}
 	
 	void RSGISBasicImageRegistration::finaliseRegistration() throw(RSGISRegistrationException)
@@ -163,7 +163,7 @@ namespace rsgis{namespace reg{
 		unsigned int floatImgXSize = floatingIMG->GetRasterXSize();
 		unsigned int floatImgYSize = floatingIMG->GetRasterYSize();
 		
-		list<TiePoint*>::iterator iterTiePts;
+		std::list<TiePoint*>::iterator iterTiePts;
 		for(iterTiePts = tiePoints->begin(); iterTiePts != tiePoints->end(); )
 		{
 			(*iterTiePts)->xFloat -= (*iterTiePts)->xShift;
@@ -211,24 +211,24 @@ namespace rsgis{namespace reg{
 		}
 	}
 	
-	void RSGISBasicImageRegistration::exportTiePointsENVIImage2Map(string filepath)throw(RSGISRegistrationException)
+	void RSGISBasicImageRegistration::exportTiePointsENVIImage2Map(std::string filepath)throw(RSGISRegistrationException)
 	{
 		this->exportTiePointsENVIImage2MapImpl(filepath, tiePoints);
 	}
 	
-	void RSGISBasicImageRegistration::exportTiePointsENVIImage2Image(string filepath)throw(RSGISRegistrationException)
+	void RSGISBasicImageRegistration::exportTiePointsENVIImage2Image(std::string filepath)throw(RSGISRegistrationException)
 	{
 		this->exportTiePointsENVIImage2ImageImpl(filepath, tiePoints);
 	}
 	
-	void RSGISBasicImageRegistration::exportTiePointsRSGISImage2Map(string filepath)throw(RSGISRegistrationException)
+	void RSGISBasicImageRegistration::exportTiePointsRSGISImage2Map(std::string filepath)throw(RSGISRegistrationException)
 	{
 		this->exportTiePointsRSGISImage2MapImpl(filepath, tiePoints);
 	}
 	
 	RSGISBasicImageRegistration::~RSGISBasicImageRegistration()
 	{
-		list<TiePoint*>::iterator iterTiePts;
+		std::list<TiePoint*>::iterator iterTiePts;
 		for(iterTiePts = tiePoints->begin(); iterTiePts != tiePoints->end(); )
 		{
 			delete *iterTiePts;

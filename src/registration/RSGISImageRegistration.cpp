@@ -36,17 +36,17 @@ namespace rsgis{namespace reg{
 	
 	void RSGISImageRegistration::runCompleteRegistration()
 	{
-		cout << "Initialising the registration process\n"; 
+		std::cout << "Initialising the registration process\n"; 
 		this->initRegistration();
-		cout << "Execunting the registration\n";
+		std::cout << "Execunting the registration\n";
 		this->executeRegistration();
-		cout << "Finalising the registration\n";
+		std::cout << "Finalising the registration\n";
 		this->finaliseRegistration();
 	}
 	
 	void RSGISImageRegistration::findOverlap() throw(RSGISRegistrationException)
 	{
-		RSGISImageUtils imgUtils;
+		rsgis::img::RSGISImageUtils imgUtils;
 		try 
 		{
 			// Find overlapping region.
@@ -90,7 +90,7 @@ namespace rsgis{namespace reg{
 			delete[] dsOffsets;
 			delete[] imgs;
 		}
-		catch (RSGISImageBandException &e) 
+		catch (rsgis::img::RSGISImageBandException &e) 
 		{
 			throw RSGISRegistrationException(e.what());
 		}
@@ -123,7 +123,7 @@ namespace rsgis{namespace reg{
 			throw RSGISRegistrationException("The overlap needs to be defined before tie location can be defined.");
 		}
 		
-		RSGISImageUtils imgUtils;
+		rsgis::img::RSGISImageUtils imgUtils;
 		try 
 		{
 			// Setup overlapping region variables.
@@ -137,7 +137,7 @@ namespace rsgis{namespace reg{
 			double windowXWidth = (((double)windowSize)*overlap->xRes);
 			double windowYHeight = (((double)windowSize)*overlap->yRes);
 			
-			Envelope *env = new Envelope();
+			geos::geom::Envelope *env = new geos::geom::Envelope();
 			env->init((tiePt->eastings - windowXWidth), 
 					  (tiePt->eastings + windowXWidth + overlap->xRes), 
 					  (tiePt->northings - windowYHeight),
@@ -176,16 +176,16 @@ namespace rsgis{namespace reg{
 				xIdx = 0;
 				for(int xShift = xShiftStart; xShift <= xShiftEnd; ++xShift)
 				{
-					//cout << "Shift = [" << xShift << "," << yShift << "]\n";
-					//cout << "Shift = [" << (((float)xShift)+tiePt->xShift) << "," << (((float)yShift)+tiePt->yShift) << "]\n";
+					//std::cout << "Shift = [" << xShift << "," << yShift << "]\n";
+					//std::cout << "Shift = [" << (((float)xShift)+tiePt->xShift) << "," << (((float)yShift)+tiePt->yShift) << "]\n";
 					try 
 					{
 						this->getImageOverlapWithFloatShift((((float)xShift)+tiePt->xShift), (((float)yShift)+tiePt->yShift), dsOffsets, &overlapWidth, &overlapHeight, overlapTransform, env);
 						
-						//cout << "Overlap Width = " << overlapWidth << endl;
-						//cout << "Overlap Height = " << overlapHeight << endl;
-						//cout << "Reference Offset = [" << dsOffsets[0][0] << "," << dsOffsets[0][1] << "]\n";
-						//cout << "Floating Offset = [" << dsOffsets[1][0] << "," << dsOffsets[1][1] << "]\n";
+						//std::cout << "Overlap Width = " << overlapWidth << std::endl;
+						//std::cout << "Overlap Height = " << overlapHeight << std::endl;
+						//std::cout << "Reference Offset = [" << dsOffsets[0][0] << "," << dsOffsets[0][1] << "]\n";
+						//std::cout << "Floating Offset = [" << dsOffsets[1][0] << "," << dsOffsets[1][1] << "]\n";
 						
 						if((overlapWidth > 0) & (overlapHeight > 0))
 						{
@@ -204,7 +204,7 @@ namespace rsgis{namespace reg{
 							
 							imageSimilarity[yIdx][xIdx] = metricVal;
 							
-							//cout << "Metric = " << metricVal << endl;
+							//std::cout << "Metric = " << metricVal << std::endl;
 							if(!((boost::math::isnan)(metricVal)))
 							{
 								if(first)
@@ -246,16 +246,16 @@ namespace rsgis{namespace reg{
 					catch (RSGISRegistrationException &e) 
 					{
 						// ignore
-						cerr << "Tie Point = [" << tiePt->xRef << "," << tiePt->yRef << "]\n";
-						cerr << "Shift = [" << (xShift+tiePt->xShift) << "," << (yShift+tiePt->yShift) << "]\n";
-						cerr << "WARNING: " << e.what() << endl;
+						std::cerr << "Tie Point = [" << tiePt->xRef << "," << tiePt->yRef << "]\n";
+						std::cerr << "Shift = [" << (xShift+tiePt->xShift) << "," << (yShift+tiePt->yShift) << "]\n";
+						std::cerr << "WARNING: " << e.what() << std::endl;
 					}
 					xIdx++;
 				}
 				++yIdx;
 			}
 			
-			//cout << "Initial shift[" << tiePt->xShift << "," << tiePt->yShift << "] Move tie points with shift [" << currentShiftX << "," << currentShiftY << "] with value " << currentMetricVal << endl;
+			//std::cout << "Initial shift[" << tiePt->xShift << "," << tiePt->yShift << "] Move tie points with shift [" << currentShiftX << "," << currentShiftY << "] with value " << currentMetricVal << std::endl;
 			/*
 			for(unsigned int i = 0; i < numSearchPoints; ++i)
 			{
@@ -263,14 +263,14 @@ namespace rsgis{namespace reg{
 				{
 					if(j == 0)
 					{
-						cout << imageSimilarity[i][j];
+						std::cout << imageSimilarity[i][j];
 					}
 					else 
 					{
-						cout << "," << imageSimilarity[i][j];
+						std::cout << "," << imageSimilarity[i][j];
 					}
 				}
-				cout << endl;
+				std::cout << std::endl;
 			}
 			 */
 			
@@ -279,15 +279,15 @@ namespace rsgis{namespace reg{
 			float subPixelXMetric = currentMetricVal;
 			float subPixelYMetric = currentMetricVal;
 			
-			RSGISPolyFit polyFit;
+			rsgis::math::RSGISPolyFit polyFit;
 			
-			//cout << "Current Index = [" << currentXIdx << "," << currentYIdx << "]\n";
+			//std::cout << "Current Index = [" << currentXIdx << "," << currentYIdx << "]\n";
 						
 			// Find subpixel component
 			if(searchArea == 1)
 			{
 				// 2nd Order Poly
-				//cout << "Finding 2nd order subpixel component\n";
+				//std::cout << "Finding 2nd order subpixel component\n";
 				
 				// Find subpixel X
 				if((currentXIdx != 0) & (currentXIdx != (numSearchPoints-1)))
@@ -329,11 +329,11 @@ namespace rsgis{namespace reg{
 			}
 			else
 			{
-				//cout << "Finding 4th order subpixel component\n";
+				//std::cout << "Finding 4th order subpixel component\n";
 				// 4th Order Poly
 				if((currentXIdx > 1) & (currentXIdx < (numSearchPoints-2)))
 				{
-					//cout << "for X\n";
+					//std::cout << "for X\n";
 					gsl_matrix *inputDataMatrix = gsl_matrix_alloc(5,2);
 					gsl_matrix_set (inputDataMatrix, 0, 0, -2);
 					gsl_matrix_set (inputDataMatrix, 0, 1, imageSimilarity[currentYIdx][currentXIdx-2]);
@@ -357,7 +357,7 @@ namespace rsgis{namespace reg{
 				
 				if((currentYIdx > 1) & (currentYIdx < (numSearchPoints-2)))
 				{
-					//cout << "for Y\n";
+					//std::cout << "for Y\n";
 					gsl_matrix *inputDataMatrix = gsl_matrix_alloc(5,2);
 					gsl_matrix_set (inputDataMatrix, 0, 0, -2);
 					gsl_matrix_set (inputDataMatrix, 0, 1, imageSimilarity[currentYIdx-2][currentXIdx]);
@@ -381,8 +381,8 @@ namespace rsgis{namespace reg{
 				
 			}
 			
-			//cout << "Sub pixel component = [" << subPixelXShift << "," << subPixelYShift << "]\n";
-			//cout << "Extrema values = [" << subPixelXMetric << "," << subPixelYMetric << "]\n";
+			//std::cout << "Sub pixel component = [" << subPixelXShift << "," << subPixelYShift << "]\n";
+			//std::cout << "Extrema values = [" << subPixelXMetric << "," << subPixelYMetric << "]\n";
 			
 			currentMetricVal = (subPixelXMetric + subPixelYMetric)/2;
 			
@@ -419,7 +419,7 @@ namespace rsgis{namespace reg{
 			delete[] dsOffsets[1];
 			delete[] dsOffsets;
 		}
-		catch (RSGISImageBandException &e) 
+		catch (rsgis::img::RSGISImageBandException &e) 
 		{
 			throw RSGISRegistrationException(e.what());
 		}
@@ -435,12 +435,12 @@ namespace rsgis{namespace reg{
 	{
 		double division = ((float)1)/((float)resolution);
 		
-		//cout << "Division = " << division << endl;
+		//std::cout << "Division = " << division << std::endl;
 		
 		float range = maxRange - minRange;
 		unsigned int numTests = ceil(range/division);
 		
-		//cout << "Num test = " << numTests << endl;
+		//std::cout << "Num test = " << numTests << std::endl;
 		
 		double xValue = 0;
 		double yPredicted = 0;
@@ -477,14 +477,14 @@ namespace rsgis{namespace reg{
 				extremeX = xValue;
 				extremeY = yPredicted;
 			}
-			//cout << xValue << " = " << yPredicted << endl;
+			//std::cout << xValue << " = " << yPredicted << std::endl;
 		}
 		
 		*extremeVal = extremeY;
 		return extremeX;
 	}
 	
-	void RSGISImageRegistration::getImageOverlapWithFloatShift(int xShift, int yShift, int **dsOffsets, int *width, int *height, double *gdalTransform, Envelope *env) throw(RSGISRegistrationException)
+	void RSGISImageRegistration::getImageOverlapWithFloatShift(int xShift, int yShift, int **dsOffsets, int *width, int *height, double *gdalTransform, geos::geom::Envelope *env) throw(RSGISRegistrationException)
 	{
 		if(!overlapDefined)
 		{
@@ -572,7 +572,7 @@ namespace rsgis{namespace reg{
 			}
 			
 			// Check whether the overlapping region intersects within the Envelop
-			Envelope overlapEnv = Envelope(tlX, brX, brY, tlY);
+			geos::geom::Envelope overlapEnv = geos::geom::Envelope(tlX, brX, brY, tlY);
 			if(!env->intersects(&overlapEnv))
 			{
 				throw RSGISRegistrationException("The overlapping region of the images does not intersect with the envelop provided");
@@ -667,9 +667,9 @@ namespace rsgis{namespace reg{
 
 	}
 	
-	void RSGISImageRegistration::removeTiePointsWithLowStdDev(list<TiePoint*> *tiePts, unsigned int windowSize, float stdDevRefThreshold, float stdDevFloatThreshold)
+	void RSGISImageRegistration::removeTiePointsWithLowStdDev(std::list<TiePoint*> *tiePts, unsigned int windowSize, float stdDevRefThreshold, float stdDevFloatThreshold)
 	{
-		RSGISImageUtils imgUtils;
+		rsgis::img::RSGISImageUtils imgUtils;
 		
 		int **dsOffsets = new int*[2];
 		dsOffsets[0] = new int[2];
@@ -681,7 +681,7 @@ namespace rsgis{namespace reg{
 		double windowXWidth = (((double)windowSize)*overlap->xRes);
 		double windowYHeight = (((double)windowSize)*overlap->yRes);
 		
-		Envelope *env = new Envelope();
+		geos::geom::Envelope *env = new geos::geom::Envelope();
 		
 		float **refDataBlock = NULL;
 		float **floatDataBlock = NULL;
@@ -693,7 +693,7 @@ namespace rsgis{namespace reg{
 		
 		try 
 		{
-			list<TiePoint*>::iterator iterTiePts;
+			std::list<TiePoint*>::iterator iterTiePts;
 			for(iterTiePts = tiePts->begin(); iterTiePts != tiePts->end(); )
 			{
 				env->init(((*iterTiePts)->eastings - windowXWidth), 
@@ -714,7 +714,7 @@ namespace rsgis{namespace reg{
 				refStdDev = this->calcStdDev(refDataBlock, numRefDataVals, overlap->numRefBands);
 				floatStdDev = this->calcStdDev(floatDataBlock, numFloatDataVals, overlap->numRefBands);
 				
-				//cout << "Std Dev = [" << refStdDev << "," << floatStdDev << "]\n";
+				//std::cout << "Std Dev = [" << refStdDev << "," << floatStdDev << "]\n";
 				
 				if((refStdDev < stdDevRefThreshold) | (floatStdDev < stdDevFloatThreshold))
 				{
@@ -735,7 +735,7 @@ namespace rsgis{namespace reg{
 				delete[] floatDataBlock;
 			}
 		}
-		catch (RSGISImageBandException &e) 
+		catch (rsgis::img::RSGISImageBandException &e) 
 		{
 			throw RSGISRegistrationException(e.what());
 		}
@@ -785,13 +785,13 @@ namespace rsgis{namespace reg{
 		return sqrt(sqDiff/totalNumVals);
 	}
 	
-	void RSGISImageRegistration::exportTiePointsENVIImage2MapImpl(string filepath, list<TiePoint*> *tiePts) throw(RSGISRegistrationException)
+	void RSGISImageRegistration::exportTiePointsENVIImage2MapImpl(std::string filepath, std::list<TiePoint*> *tiePts) throw(RSGISRegistrationException)
 	{
-		ofstream outPtsFile(filepath.c_str(), ios::out | ios::trunc);
+        std::ofstream outPtsFile(filepath.c_str(), std::ios::out | std::ios::trunc);
 		
 		if(!outPtsFile.is_open())
 		{
-			string message = string("Could not open tie points file: ") + filepath;
+			std::string message = std::string("Could not open tie points file: ") + filepath;
 			throw RSGISRegistrationException(message);
 		}
 		
@@ -804,27 +804,27 @@ namespace rsgis{namespace reg{
 		outPtsFile << "; Map (x,y), Image (x,y)\n";
 		outPtsFile << ";\n";
 		
-		cout << tiePts->size() << " tie points to be exported\n";
+		std::cout << tiePts->size() << " tie points to be exported\n";
 		
-		list<TiePoint*>::iterator iterTiePts;
+		std::list<TiePoint*>::iterator iterTiePts;
 		for(iterTiePts = tiePts->begin(); iterTiePts != tiePts->end(); ++iterTiePts)
 		{
-			outPtsFile << "\t" << (*iterTiePts)->eastings << "\t" << (*iterTiePts)->northings << "\t" << (*iterTiePts)->xFloat << "\t" << (*iterTiePts)->yFloat << endl;
+			outPtsFile << "\t" << (*iterTiePts)->eastings << "\t" << (*iterTiePts)->northings << "\t" << (*iterTiePts)->xFloat << "\t" << (*iterTiePts)->yFloat << std::endl;
 		}
 		
-		cout << "Export Complete\n";
+		std::cout << "Export Complete\n";
 		
 		outPtsFile.flush();
 		outPtsFile.close();
 	}
 	
-	void RSGISImageRegistration::exportTiePointsENVIImage2ImageImpl(string filepath, list<TiePoint*> *tiePts) throw(RSGISRegistrationException)
+	void RSGISImageRegistration::exportTiePointsENVIImage2ImageImpl(std::string filepath, std::list<TiePoint*> *tiePts) throw(RSGISRegistrationException)
 	{
-		ofstream outPtsFile(filepath.c_str(), ios::out | ios::trunc);
+        std::ofstream outPtsFile(filepath.c_str(), std::ios::out | std::ios::trunc);
 		
 		if(!outPtsFile.is_open())
 		{
-			string message = string("Could not open tie points file: ") + filepath;
+			std::string message = std::string("Could not open tie points file: ") + filepath;
 			throw RSGISRegistrationException(message);
 		}
 		
@@ -837,27 +837,27 @@ namespace rsgis{namespace reg{
 		outPtsFile << "; Base Image (x,y), Warp Image (x,y)\n";
 		outPtsFile << ";\n";
 		
-		cout << tiePts->size() << " tie points to be exported\n";
+		std::cout << tiePts->size() << " tie points to be exported\n";
 		
-		list<TiePoint*>::iterator iterTiePts;
+		std::list<TiePoint*>::iterator iterTiePts;
 		for(iterTiePts = tiePts->begin(); iterTiePts != tiePts->end(); ++iterTiePts)
 		{
-			outPtsFile << "\t" << (*iterTiePts)->xRef << "\t" << (*iterTiePts)->yRef << "\t" << (*iterTiePts)->xFloat << "\t" << (*iterTiePts)->yFloat << endl;
+			outPtsFile << "\t" << (*iterTiePts)->xRef << "\t" << (*iterTiePts)->yRef << "\t" << (*iterTiePts)->xFloat << "\t" << (*iterTiePts)->yFloat << std::endl;
 		}
 		
-		cout << "Export Complete\n";
+		std::cout << "Export Complete\n";
 		
 		outPtsFile.flush();
 		outPtsFile.close();
 	}
 	
-	void RSGISImageRegistration::exportTiePointsRSGISImage2MapImpl(string filepath, list<TiePoint*> *tiePts) throw(RSGISRegistrationException)
+	void RSGISImageRegistration::exportTiePointsRSGISImage2MapImpl(std::string filepath, std::list<TiePoint*> *tiePts) throw(RSGISRegistrationException)
 	{
-		ofstream outPtsFile(filepath.c_str(), ios::out | ios::trunc);
+		std::ofstream outPtsFile(filepath.c_str(), std::ios::out | std::ios::trunc);
 		
 		if(!outPtsFile.is_open())
 		{
-			string message = string("Could not open tie points file: ") + filepath;
+			std::string message = std::string("Could not open tie points file: ") + filepath;
 			throw RSGISRegistrationException(message);
 		}
 		
@@ -868,17 +868,17 @@ namespace rsgis{namespace reg{
 		outPtsFile << "# Reference Map (E,N), Floating Image (x,y)\n";
 		outPtsFile << "#\n";
 		
-		cout << tiePts->size() << " tie points to be exported\n";
+		std::cout << tiePts->size() << " tie points to be exported\n";
 		
-		list<TiePoint*>::iterator iterTiePts;
+		std::list<TiePoint*>::iterator iterTiePts;
 		for(iterTiePts = tiePts->begin(); iterTiePts != tiePts->end(); ++iterTiePts)
 		{
-			outPtsFile << (*iterTiePts)->eastings << "," << (*iterTiePts)->northings << "," << (*iterTiePts)->xFloat << "," << (*iterTiePts)->yFloat << endl;
+			outPtsFile << (*iterTiePts)->eastings << "," << (*iterTiePts)->northings << "," << (*iterTiePts)->xFloat << "," << (*iterTiePts)->yFloat << std::endl;
 		}
 		
 		outPtsFile << "# End Of File\n";
 		
-		cout << "Export Complete\n";
+		std::cout << "Export Complete\n";
 		
 		outPtsFile.flush();
 		outPtsFile.close();
