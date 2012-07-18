@@ -25,7 +25,7 @@
 
 namespace rsgis{namespace calib{
     
-    RSGISApply6SCoefficients::RSGISApply6SCoefficients(int numberOutBands, unsigned int *imageBands, float **aX, float **bX, float **cX, int numValues, float *elevationThreash, int numElevation, float scaleFactor):RSGISCalcImageValue(numberOutBands)
+    RSGISApply6SCoefficients::RSGISApply6SCoefficients(int numberOutBands, unsigned int *imageBands, float **aX, float **bX, float **cX, int numValues, float *elevationThreash, int numElevation, float scaleFactor):rsgis::img::RSGISCalcImageValue(numberOutBands)
     {
         this->useTopo6S = true;
 		this->imageBands = imageBands;
@@ -44,16 +44,16 @@ namespace rsgis{namespace calib{
 		}
     }
     
-    void RSGISApply6SCoefficients::calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException)
+    void RSGISApply6SCoefficients::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
     {
         if(numValues != this->numOutBands)
         {
-            throw RSGISImageCalcException("The number of input image bands needs to be equal to the number of output image bands.");
+            throw rsgis::img::RSGISImageCalcException("The number of input image bands needs to be equal to the number of output image bands.");
         }
         
         if(numBands <= numValues)
         {
-            throw RSGISImageCalcException("The number of input values needs to be equal to or less than the number of input image bands.");
+            throw rsgis::img::RSGISImageCalcException("The number of input values needs to be equal to or less than the number of input image bands.");
         }
         
         double tmpVal = 0;
@@ -94,7 +94,7 @@ namespace rsgis{namespace calib{
                 if(imageBands[i]+bandOffset > numBands)
                 {
                     cout << "Image band: " << imageBands[i] << endl;
-                    throw RSGISImageCalcException("Image band is not within image.");
+                    throw rsgis::img::RSGISImageCalcException("Image band is not within image.");
                 }
                 tmpVal=aX[i][elv]*bandValues[imageBands[i]+bandOffset]-bX[i][elv];
                 output[i] = (tmpVal/(1.0+cX[i][elv]*tmpVal))*this->scaleFactor;
