@@ -30,9 +30,9 @@ namespace rsgis{namespace rastergis{
         
     }
     
-    RSGISAttributeTable* RSGISCreateNewAttributeTable::createAndPopPixelCount(GDALDataset *clumpsDataset, bool useMemory, string outFilePath, unsigned long cacheSize)throw(RSGISImageCalcException, RSGISAttributeTableException)
+    RSGISAttributeTable* RSGISCreateNewAttributeTable::createAndPopPixelCount(GDALDataset *clumpsDataset, bool useMemory, std::string outFilePath, unsigned long cacheSize)throw(rsgis::img::RSGISImageCalcException, RSGISAttributeTableException)
     {
-        RSGISMathsUtils mathUtils;
+        rsgis::math::RSGISMathsUtils mathUtils;
         
         RSGISAttributeTable *attTable = NULL;
         
@@ -40,10 +40,10 @@ namespace rsgis{namespace rastergis{
         {
             // Calc max clump value = number of clumps.
             size_t numClumps = this->calcMaxValue(clumpsDataset);
-            cout << "There are " << numClumps << " in the input dataset\n";
+            std::cout << "There are " << numClumps << " in the input dataset\n";
             
             // Generate Attribute table
-            cout << "Creating blank attribute table\n";
+            std::cout << "Creating blank attribute table\n";
             if(useMemory)
             {
                 attTable = new RSGISAttributeTableMem(numClumps);
@@ -54,26 +54,26 @@ namespace rsgis{namespace rastergis{
             }
             attTable->addAttIntField("pxlcount", 0);
             
-            unsigned int pxlCountIdx = attTable->getFieldIndex(string("pxlcount"));
+            unsigned int pxlCountIdx = attTable->getFieldIndex(std::string("pxlcount"));
             
             GDALDataset **datasets = new GDALDataset*[1];
             datasets[0] = clumpsDataset;
             
             // Populate the attribute table.
-            cout << "Populating the attribute table with sum and count values\n";
+            std::cout << "Populating the attribute table with sum and count values\n";
             RSGISPopAttributeTablePxlCountCalcImg *popTabPxlCount = new RSGISPopAttributeTablePxlCountCalcImg(0, attTable, pxlCountIdx);
-            RSGISCalcImage calcImage(popTabPxlCount);
+            rsgis::img::RSGISCalcImage calcImage(popTabPxlCount);
             calcImage.calcImage(datasets, 1);
             delete popTabPxlCount;
             delete[] datasets;
         } 
-        catch (RSGISImageCalcException &e) 
+        catch (rsgis::img::RSGISImageCalcException &e) 
         {
             throw e;
         }
-        catch(RSGISImageBandException &e)
+        catch(rsgis::img::RSGISImageBandException &e)
         {
-            throw RSGISImageCalcException(e.what());
+            throw rsgis::img::RSGISImageCalcException(e.what());
         }
         catch (RSGISAttributeTableException &e) 
         {
@@ -87,7 +87,7 @@ namespace rsgis{namespace rastergis{
         return attTable;
     }
     
-    RSGISAttributeTable* RSGISCreateNewAttributeTable::createAndPopPixelCountOffLine(GDALDataset *clumpsDataset, bool useMemory, string outFilePath, unsigned long cacheSize)throw(RSGISImageCalcException, RSGISAttributeTableException)
+    RSGISAttributeTable* RSGISCreateNewAttributeTable::createAndPopPixelCountOffLine(GDALDataset *clumpsDataset, bool useMemory, std::string outFilePath, unsigned long cacheSize)throw(rsgis::img::RSGISImageCalcException, RSGISAttributeTableException)
     {
         RSGISAttributeTable *attTable = NULL;
         
@@ -95,10 +95,10 @@ namespace rsgis{namespace rastergis{
         {
             // Calc max clump value = number of clumps.
             size_t numClumps = this->calcMaxValue(clumpsDataset);
-            cout << "There are " << numClumps << " in the input dataset\n";
+            std::cout << "There are " << numClumps << " in the input dataset\n";
             
             // Generate Attribute table
-            cout << "Creating blank attribute table\n";
+            std::cout << "Creating blank attribute table\n";
             if(useMemory)
             {
                 attTable = new RSGISAttributeTableMem(numClumps);
@@ -109,7 +109,7 @@ namespace rsgis{namespace rastergis{
             }
             attTable->addAttIntField("pxlcount", 0);
             
-            unsigned int pxlCountIdx = attTable->getFieldIndex(string("pxlcount"));
+            unsigned int pxlCountIdx = attTable->getFieldIndex(std::string("pxlcount"));
             
             
             GDALDataset **datasets = new GDALDataset*[1];
@@ -122,9 +122,9 @@ namespace rsgis{namespace rastergis{
             }
             
             // Populate the attribute table.
-            cout << "Populating the attribute table with sum and count values\n";
+            std::cout << "Populating the attribute table with sum and count values\n";
             RSGISPopAttributeTablePxlCountArrCalcImg *popTabPxlCount = new RSGISPopAttributeTablePxlCountArrCalcImg(0, counts, numClumps);
-            RSGISCalcImage calcImage(popTabPxlCount);
+            rsgis::img::RSGISCalcImage calcImage(popTabPxlCount);
             calcImage.calcImage(datasets, 1);
             delete popTabPxlCount;
             delete[] datasets;
@@ -138,13 +138,13 @@ namespace rsgis{namespace rastergis{
             delete[] counts;
              
         } 
-        catch (RSGISImageCalcException &e) 
+        catch (rsgis::img::RSGISImageCalcException &e) 
         {
             throw e;
         }
-        catch(RSGISImageBandException &e)
+        catch(rsgis::img::RSGISImageBandException &e)
         {
-            throw RSGISImageCalcException(e.what());
+            throw rsgis::img::RSGISImageCalcException(e.what());
         }
         catch (RSGISAttributeTableException &e) 
         {
@@ -159,7 +159,7 @@ namespace rsgis{namespace rastergis{
     }
 
     
-    size_t RSGISCreateNewAttributeTable::calcMaxValue(GDALDataset *dataset)throw(RSGISImageCalcException)
+    size_t RSGISCreateNewAttributeTable::calcMaxValue(GDALDataset *dataset)throw(rsgis::img::RSGISImageCalcException)
     {
         unsigned int width = dataset->GetRasterXSize();
         unsigned int height = dataset->GetRasterYSize();
@@ -196,23 +196,23 @@ namespace rsgis{namespace rastergis{
     }
     
     
-    RSGISPopAttributeTablePxlCountCalcImg::RSGISPopAttributeTablePxlCountCalcImg(int numberOutBands, RSGISAttributeTable *attTable, unsigned int pxlCountIdx):RSGISCalcImageValue(numberOutBands)
+    RSGISPopAttributeTablePxlCountCalcImg::RSGISPopAttributeTablePxlCountCalcImg(int numberOutBands, RSGISAttributeTable *attTable, unsigned int pxlCountIdx):rsgis::img::RSGISCalcImageValue(numberOutBands)
     {
         this->attTable = attTable;
         this->pxlCountIdx = pxlCountIdx;
     }
     
-    void RSGISPopAttributeTablePxlCountCalcImg::calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException)
+    void RSGISPopAttributeTablePxlCountCalcImg::calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException)
     {
         unsigned long clumpIdx = 0;
         
         try
         {
-            clumpIdx = lexical_cast<unsigned long>(bandValues[0]);
+            clumpIdx = boost::lexical_cast<unsigned long>(bandValues[0]);
         }
-        catch(bad_lexical_cast &e)
+        catch(boost::bad_lexical_cast &e)
         {
-            throw RSGISImageCalcException(e.what());
+            throw rsgis::img::RSGISImageCalcException(e.what());
         }
         
         if(clumpIdx > 0)
@@ -226,8 +226,8 @@ namespace rsgis{namespace rastergis{
             }
             catch(RSGISAttributeTableException &e)
             {
-                cout << "clumpIdx = " << clumpIdx << endl;
-                throw RSGISImageCalcException(e.what());
+                std::cout << "clumpIdx = " << clumpIdx << std::endl;
+                throw rsgis::img::RSGISImageCalcException(e.what());
             }
         }        
     }
@@ -238,23 +238,23 @@ namespace rsgis{namespace rastergis{
     }
     
     
-    RSGISPopAttributeTablePxlCountArrCalcImg::RSGISPopAttributeTablePxlCountArrCalcImg(int numberOutBands, size_t *pxlCounts, size_t len):RSGISCalcImageValue(numberOutBands)
+    RSGISPopAttributeTablePxlCountArrCalcImg::RSGISPopAttributeTablePxlCountArrCalcImg(int numberOutBands, size_t *pxlCounts, size_t len):rsgis::img::RSGISCalcImageValue(numberOutBands)
     {
         this->len = len;
         this->pxlCounts = pxlCounts;
     }
     
-    void RSGISPopAttributeTablePxlCountArrCalcImg::calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException)
+    void RSGISPopAttributeTablePxlCountArrCalcImg::calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException)
     {
         unsigned long clumpIdx = 0;
         
         try
         {
-            clumpIdx = lexical_cast<unsigned long>(bandValues[0]);
+            clumpIdx = boost::lexical_cast<unsigned long>(bandValues[0]);
         }
-        catch(bad_lexical_cast &e)
+        catch(boost::bad_lexical_cast &e)
         {
-            throw RSGISImageCalcException(e.what());
+            throw rsgis::img::RSGISImageCalcException(e.what());
         }
         
         if(clumpIdx > 0)
@@ -263,7 +263,7 @@ namespace rsgis{namespace rastergis{
             
             if(clumpIdx >= len)
             {
-                throw RSGISImageCalcException("Clump index is only within table.");
+                throw rsgis::img::RSGISImageCalcException("Clump index is only within table.");
             }
             
             ++this->pxlCounts[clumpIdx];

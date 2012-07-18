@@ -50,46 +50,36 @@
 
 namespace rsgis{namespace rastergis{
     
-    using namespace std;
-    using namespace rsgis;
-    using namespace rsgis::utils;
-    using namespace rsgis::math;
-    using namespace rsgis::img;
-    using boost::lexical_cast;
-    using boost::bad_lexical_cast;
-    
     class RSGISCreateImageFromAttributeTable
     {
     public:
         RSGISCreateImageFromAttributeTable();
-        void createImageFromAttTable(GDALDataset *clumpsDataset, string outputImage, RSGISAttributeTable *attTable, vector<pair<unsigned int, string> > *bands, string outImageFormat)throw(RSGISImageCalcException, RSGISAttributeTableException);
+        void createImageFromAttTable(GDALDataset *clumpsDataset, std::string outputImage, RSGISAttributeTable *attTable, std::vector<std::pair<unsigned int, std::string> > *bands, std::string outImageFormat)throw(rsgis::img::RSGISImageCalcException, RSGISAttributeTableException);
         ~RSGISCreateImageFromAttributeTable();
-    };
+    };    
     
-    
-    
-    class RSGISCreateImageFromAttributeTableCalcImg : public RSGISCalcImageValue
+    class RSGISCreateImageFromAttributeTableCalcImg : public rsgis::img::RSGISCalcImageValue
     {
     public: 
         RSGISCreateImageFromAttributeTableCalcImg(int numberOutBands, RSGISAttributeTable *attTable, pair<RSGISAttributeDataType, unsigned int> *attBands);
-        void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException);
-        void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
-        bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException);
+        void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+        bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
         ~RSGISCreateImageFromAttributeTableCalcImg();
     protected:
         RSGISAttributeTable *attTable;
-        pair<RSGISAttributeDataType, unsigned int> *attBands;
+        std::pair<RSGISAttributeDataType, unsigned int> *attBands;
     };
     
     class RSGISAttributeTableImageUtils
     {
     public:
         RSGISAttributeTableImageUtils(RSGISAttributeTable *attTable);
-        void populateGDALDataset(GDALDataset *clumps, GDALDataset *output, RSGISAttributeDataType dataType, unsigned int attributeIdx)throw(RSGISImageException, RSGISAttributeTableException);
+        void populateGDALDataset(GDALDataset *clumps, GDALDataset *output, RSGISAttributeDataType dataType, unsigned int attributeIdx)throw(rsgis::RSGISImageException, RSGISAttributeTableException);
         ~RSGISAttributeTableImageUtils();
     protected:
         RSGISAttributeTable *attTable;

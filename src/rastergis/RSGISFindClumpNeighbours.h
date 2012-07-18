@@ -40,23 +40,19 @@
 
 namespace rsgis{namespace rastergis{
     
-    using namespace std;
-    using namespace rsgis;
-    using namespace rsgis::img;
-    
     class RSGISFindClumpNeighbours
     {
     public:
         RSGISFindClumpNeighbours();
-        vector<list<size_t>* >* findNeighbours(GDALDataset *clumpImage) throw(RSGISImageCalcException);
-        void findNeighbours(GDALDataset *clumpImage, RSGISAttributeTable *attTable) throw(RSGISImageCalcException);
-        void findNeighboursInBlocks(GDALDataset *clumpImage, RSGISAttributeTable *attTable) throw(RSGISImageCalcException);
+        std::vector<std::list<size_t>* >* findNeighbours(GDALDataset *clumpImage) throw(rsgis::img::RSGISImageCalcException);
+        void findNeighbours(GDALDataset *clumpImage, RSGISAttributeTable *attTable) throw(rsgis::img::RSGISImageCalcException);
+        void findNeighboursInBlocks(GDALDataset *clumpImage, RSGISAttributeTable *attTable) throw(rsgis::img::RSGISImageCalcException);
         ~RSGISFindClumpNeighbours();
     protected:
         inline void addNeighbourToFeature(RSGISFeature *feat, unsigned long long neighbourID)
         {
             bool foundID = false;
-            for(vector<boost::uint_fast32_t>::iterator iterNeigh = feat->neighbours->begin(); iterNeigh != feat->neighbours->end(); ++iterNeigh)
+            for(std::vector<boost::uint_fast32_t>::iterator iterNeigh = feat->neighbours->begin(); iterNeigh != feat->neighbours->end(); ++iterNeigh)
             {
                 if((*iterNeigh) == neighbourID)
                 {

@@ -37,18 +37,14 @@
 
 namespace rsgis{namespace rastergis{
     
-    using namespace std;
-    using namespace rsgis;
-    using namespace rsgis::utils;
-    
     class RSGISAttributeTableNeighbours
     {
     public:
         RSGISAttributeTableNeighbours();
-        vector<vector<unsigned long > >* importFromTextFile(string inFilePath) throw(RSGISAttributeTableException);
-        void exportToTextFile(vector<list<unsigned long >* > *neighbours, string outFilePath) throw(RSGISAttributeTableException);
-        void exportToTextFile(vector<vector<unsigned long > > *neighbours, string outFilePath) throw(RSGISAttributeTableException);
-        void clearMemory(vector<list<unsigned long >* > *neighbours);
+        std::vector<std::vector<unsigned long > >* importFromTextFile(std::string inFilePath) throw(RSGISAttributeTableException);
+        void exportToTextFile(std::vector<std::list<unsigned long >* > *neighbours, std::string outFilePath) throw(RSGISAttributeTableException);
+        void exportToTextFile(std::vector<std::vector<unsigned long > > *neighbours, std::string outFilePath) throw(RSGISAttributeTableException);
+        void clearMemory(std::vector<std::list<unsigned long >* > *neighbours);
         ~RSGISAttributeTableNeighbours();
     };
     

@@ -30,39 +30,39 @@ namespace rsgis{namespace rastergis{
 
     }
         
-    RSGISAttributeDataType RSGISAttributeTable::getDataType(string name) throw(RSGISAttributeTableException)
+    RSGISAttributeDataType RSGISAttributeTable::getDataType(std::string name) throw(RSGISAttributeTableException)
     {
-        map<string, RSGISAttributeDataType>::iterator iter;
+        std::map<std::string, RSGISAttributeDataType>::iterator iter;
         iter = fieldDataType->find(name);
         
         if(iter == fieldDataType->end())
         {
-            string message = string("Field \'") + name + string("\' could not be found.");
+            std::string message = std::string("Field \'") + name + std::string("\' could not be found.");
             throw RSGISAttributeTableException(message);
         }
         
         return (*iter).second;
     }
     
-    unsigned int RSGISAttributeTable::getFieldIndex(string name) throw(RSGISAttributeTableException)
+    unsigned int RSGISAttributeTable::getFieldIndex(std::string name) throw(RSGISAttributeTableException)
     {
-        map<string, unsigned int>::iterator iter;
+        std::map<std::string, unsigned int>::iterator iter;
         iter = fieldIdx->find(name);
         
         
         if(iter == fieldIdx->end())
         {
-            string message = string("Field \'") + name + string("\' could not be found.");
+            std::string message = std::string("Field \'") + name + std::string("\' could not be found.");
             throw RSGISAttributeTableException(message);
         }
         
         return (*iter).second;
     }
     
-    vector<string>* RSGISAttributeTable::getAttributeNames()
+    std::vector<std::string>* RSGISAttributeTable::getAttributeNames()
     {
-        vector<string> *names = new vector<string>();
-        for(vector<pair<string, RSGISAttributeDataType> >::iterator iterFields = fields->begin(); iterFields != fields->end(); ++iterFields)
+        std::vector<std::string> *names = new std::vector<std::string>();
+        for(std::vector<std::pair<std::string, RSGISAttributeDataType> >::iterator iterFields = fields->begin(); iterFields != fields->end(); ++iterFields)
         {
             names->push_back((*iterFields).first);
         }
@@ -70,9 +70,9 @@ namespace rsgis{namespace rastergis{
         return names;
     }
     
-    bool RSGISAttributeTable::hasAttribute(string name)
+    bool RSGISAttributeTable::hasAttribute(std::string name)
     {
-        map<string, unsigned int>::iterator iter;
+        std::map<std::string, unsigned int>::iterator iter;
         iter = fieldIdx->find(name);
         
         
@@ -84,13 +84,13 @@ namespace rsgis{namespace rastergis{
         return true;
     }
     
-    void RSGISAttributeTable::applyIfStatements(vector<RSGISIfStatement*> *statements) throw(RSGISAttributeTableException)
+    void RSGISAttributeTable::applyIfStatements(std::vector<RSGISIfStatement*> *statements) throw(RSGISAttributeTableException)
     {
         try
         {
             for(this->start(); this->end(); ++(*this))
             {
-                for(vector<RSGISIfStatement*>::iterator iterStatement = statements->begin(); iterStatement != statements->end(); ++iterStatement)
+                for(std::vector<RSGISIfStatement*>::iterator iterStatement = statements->begin(); iterStatement != statements->end(); ++iterStatement)
                 {
                     if((*iterStatement)->noExp || (*iterStatement)->exp->evaluate(*(*this)))
                     {
@@ -123,12 +123,12 @@ namespace rsgis{namespace rastergis{
         }
     }
     
-    bool RSGISAttributeTable::applyIfStatementsToFeature(RSGISFeature *feat, vector<RSGISIfStatement*> *statements) throw(RSGISAttributeTableException)
+    bool RSGISAttributeTable::applyIfStatementsToFeature(RSGISFeature *feat, std::vector<RSGISIfStatement*> *statements) throw(RSGISAttributeTableException)
     {
         bool changeOccured = false;
         try
         {
-            for(vector<RSGISIfStatement*>::iterator iterStatement = statements->begin(); iterStatement != statements->end(); ++iterStatement)
+            for(std::vector<RSGISIfStatement*>::iterator iterStatement = statements->begin(); iterStatement != statements->end(); ++iterStatement)
             {
                 if((*iterStatement)->noExp || (*iterStatement)->exp->evaluate(feat))
                 {
@@ -206,10 +206,10 @@ namespace rsgis{namespace rastergis{
             long diffFID = 0;
             size_t numBlocks = 0;
             RSGISFeature *feat = NULL;
-            cout << "Processing " << numSamples << " samples: " << endl;
+            std::cout << "Processing " << numSamples << " samples: " << std::endl;
             for(size_t n = 0; n < numSamples; ++n)
             {
-                cout << "Sample " << n+1 << " of " << numSamples << " - " << flush;
+                std::cout << "Sample " << n+1 << " of " << numSamples << " - " << std::flush;
                 
                 if(n == numSamples-1)
                 {
@@ -235,9 +235,9 @@ namespace rsgis{namespace rastergis{
                 
                 for(size_t j = startFID; j < endFID; ++j)
                 {
-                    //cout << "processing " << j << flush;
+                    //std::cout << "processing " << j << std::flush;
                     feat = this->getFeature(j);
-                    //cout << " with fid " << feat->fid << endl;
+                    //std::cout << " with fid " << feat->fid << std::endl;
                     this->holdFID(feat->fid);
                     if(statement->exp->evaluate(feat))
                     {
@@ -300,11 +300,11 @@ namespace rsgis{namespace rastergis{
         }
     }
     
-    void RSGISAttributeTable::populateIfStatementsWithIdxs(vector<RSGISIfStatement*> *statements) throw(RSGISAttributeTableException)
+    void RSGISAttributeTable::populateIfStatementsWithIdxs(std::vector<RSGISIfStatement*> *statements) throw(RSGISAttributeTableException)
     {
         try
         {
-            for(vector<RSGISIfStatement*>::iterator iterStatement = statements->begin(); iterStatement != statements->end(); ++iterStatement)
+            for(std::vector<RSGISIfStatement*>::iterator iterStatement = statements->begin(); iterStatement != statements->end(); ++iterStatement)
             {
                 if(!(*iterStatement)->noExp)
                 {
@@ -318,11 +318,11 @@ namespace rsgis{namespace rastergis{
         }
     }
     
-    void RSGISAttributeTable::createIfStatementsFields(vector<RSGISIfStatement*> *statements, RSGISAttributeDataType dataType) throw(RSGISAttributeTableException)
+    void RSGISAttributeTable::createIfStatementsFields(std::vector<RSGISIfStatement*> *statements, RSGISAttributeDataType dataType) throw(RSGISAttributeTableException)
     {
         try
         {
-            for(vector<RSGISIfStatement*>::iterator iterStatement = statements->begin(); iterStatement != statements->end(); ++iterStatement)
+            for(std::vector<RSGISIfStatement*>::iterator iterStatement = statements->begin(); iterStatement != statements->end(); ++iterStatement)
             {
                 if((*iterStatement)->field != "")
                 {
@@ -356,7 +356,7 @@ namespace rsgis{namespace rastergis{
         }
     }
     
-    void RSGISAttributeTable::calculateFieldsMUParser(string expression, string outField, RSGISAttributeDataType outFieldDT, vector<RSGISMathAttVariable*> *variables) throw(RSGISAttributeTableException)
+    void RSGISAttributeTable::calculateFieldsMUParser(std::string expression, std::string outField, RSGISAttributeDataType outFieldDT, std::vector<RSGISMathAttVariable*> *variables) throw(RSGISAttributeTableException)
     {
         try 
         {
@@ -382,14 +382,14 @@ namespace rsgis{namespace rastergis{
             
             unsigned int outFieldIdx = this->getFieldIndex(outField);
             
-            Parser *muParser = new Parser();
-			value_type *inVals = new value_type[variables->size()];
+            mu::Parser *muParser = new mu::Parser();
+			mu::value_type *inVals = new mu::value_type[variables->size()];
             unsigned int i = 0;
-            for(vector<RSGISMathAttVariable*>::iterator iterVars = variables->begin(); iterVars != variables->end(); ++iterVars)
+            for(std::vector<RSGISMathAttVariable*>::iterator iterVars = variables->begin(); iterVars != variables->end(); ++iterVars)
             {
                 if(!this->hasAttribute((*iterVars)->field))
                 {
-                    string message = string("Field \'") + (*iterVars)->field + string("\' is not present within the attribute table.");
+                    std::string message = std::string("Field \'") + (*iterVars)->field + std::string("\' is not present within the attribute table.");
                     throw RSGISAttributeTableException(message);
                 }
                 (*iterVars)->fieldDT = this->getDataType((*iterVars)->field);
@@ -408,11 +408,11 @@ namespace rsgis{namespace rastergis{
             muParser->SetExpr(expression.c_str());
             
             bool intTrunkWarning = true;
-            value_type result = 0;
+            mu::value_type result = 0;
             for(this->start(); this->end(); ++(*this))
             {
                 unsigned int i = 0;
-                for(vector<RSGISMathAttVariable*>::iterator iterVars = variables->begin(); iterVars != variables->end(); ++iterVars)
+                for(std::vector<RSGISMathAttVariable*>::iterator iterVars = variables->begin(); iterVars != variables->end(); ++iterVars)
                 {
                     if((*iterVars)->fieldDT == rsgis_int)
                     {
@@ -432,20 +432,20 @@ namespace rsgis{namespace rastergis{
                 {
                     try
                     {
-                        (*(*this))->intFields->at(outFieldIdx)  = lexical_cast<unsigned long>(result);
+                        (*(*this))->intFields->at(outFieldIdx)  = boost::lexical_cast<unsigned long>(result);
                     }
-                    catch(bad_lexical_cast &e)
+                    catch(boost::bad_lexical_cast &e)
                     {
                         if(intTrunkWarning)
                         {
-                            cerr << "Warning you are losing precision in the output using an integer.\n";
+                            std::cerr << "Warning you are losing precision in the output using an integer.\n";
                             intTrunkWarning = false;
                         }
                         try
                         {
-                            (*(*this))->intFields->at(outFieldIdx) = lexical_cast<unsigned long>(floor(result+0.5));
+                            (*(*this))->intFields->at(outFieldIdx) = boost::lexical_cast<unsigned long>(floor(result+0.5));
                         }
-                        catch(bad_lexical_cast &e)
+                        catch(boost::bad_lexical_cast &e)
                         {
                             throw RSGISAttributeTableException(e.what());
                         }
@@ -455,9 +455,9 @@ namespace rsgis{namespace rastergis{
                 {
                     try
                     {
-                        (*(*this))->floatFields->at(outFieldIdx)  = lexical_cast<double>(result);
+                        (*(*this))->floatFields->at(outFieldIdx)  = boost::lexical_cast<double>(result);
                     }
-                    catch(bad_lexical_cast &e)
+                    catch(boost::bad_lexical_cast &e)
                     {
                         throw RSGISAttributeTableException(e.what());
                     }
@@ -474,7 +474,7 @@ namespace rsgis{namespace rastergis{
         }
     }
     
-    void RSGISAttributeTable::copyValues(string fromField, string toField) throw(RSGISAttributeTableException)
+    void RSGISAttributeTable::copyValues(std::string fromField, std::string toField) throw(RSGISAttributeTableException)
     {
         try
         {
@@ -521,9 +521,9 @@ namespace rsgis{namespace rastergis{
     
     
     
-    vector<double>* RSGISAttributeTable::getFieldValues(string field) throw(RSGISAttributeTableException)
+    std::vector<double>* RSGISAttributeTable::getFieldValues(std::string field) throw(RSGISAttributeTableException)
     {
-        vector<double> *data = NULL;
+        std::vector<double> *data = NULL;
         try
         {
             if(!this->hasAttribute(field))
@@ -539,7 +539,7 @@ namespace rsgis{namespace rastergis{
             unsigned int fieldIdx = this->getFieldIndex(field);
             RSGISAttributeDataType dataType = this->getDataType(field);
             
-            data = new vector<double>();
+            data = new std::vector<double>();
             data->reserve(this->getSize());
             
             for(this->start(); this->end(); ++(*this))
@@ -568,22 +568,22 @@ namespace rsgis{namespace rastergis{
     }
     
     
-    void RSGISAttributeTable::exportASCII(string outFile) throw(RSGISAttributeTableException)
+    void RSGISAttributeTable::exportASCII(std::string outFile) throw(RSGISAttributeTableException)
     {
-        ofstream outTxtFile;
-		outTxtFile.open(outFile.c_str(), ios::out | ios::trunc);
+        std::ofstream outTxtFile;
+		outTxtFile.open(outFile.c_str(), std::ios::out | std::ios::trunc);
         
         outTxtFile << "# Number of features in table\n";
-        outTxtFile << this->getSize() << endl;
+        outTxtFile << this->getSize() << std::endl;
         
         outTxtFile << "# Number of Fields\n";
-        outTxtFile << "nBool: " << this->numBoolFields << endl;
-        outTxtFile << "nInt: " << this->numIntFields << endl;
-        outTxtFile << "nFloat: " << this->numFloatFields << endl;
-        outTxtFile << "nString: " << this->numStrFields << endl;
+        outTxtFile << "nBool: " << this->numBoolFields << std::endl;
+        outTxtFile << "nInt: " << this->numIntFields << std::endl;
+        outTxtFile << "nFloat: " << this->numFloatFields << std::endl;
+        outTxtFile << "nString: " << this->numStrFields << std::endl;
         
         outTxtFile << "# Field Name / Type Pairs\n";
-        vector<pair<string, RSGISAttributeDataType> >::iterator iterFields;
+        std::vector<std::pair<std::string, RSGISAttributeDataType> >::iterator iterFields;
         for(iterFields = fields->begin(); iterFields != fields->end(); ++iterFields)
         {
             outTxtFile << (*iterFields).first << ",";
@@ -609,7 +609,7 @@ namespace rsgis{namespace rastergis{
         for(this->start(); this->end(); ++(*this))
         {
             outTxtFile << (*(*this))->fid;
-            for(vector<bool>::iterator iterBools = (*(*this))->boolFields->begin(); iterBools != (*(*this))->boolFields->end(); ++iterBools)
+            for(std::vector<bool>::iterator iterBools = (*(*this))->boolFields->begin(); iterBools != (*(*this))->boolFields->end(); ++iterBools)
             {
                 if(*iterBools)
                 {
@@ -621,23 +621,23 @@ namespace rsgis{namespace rastergis{
                 }
             }
             
-            for(vector<long>::iterator iterInts = (*(*this))->intFields->begin(); iterInts != (*(*this))->intFields->end(); ++iterInts)
+            for(std::vector<long>::iterator iterInts = (*(*this))->intFields->begin(); iterInts != (*(*this))->intFields->end(); ++iterInts)
             {
                 outTxtFile << "," << *iterInts;
             }
             
             outTxtFile.precision(12);
-            for(vector<double>::iterator iterFloats = (*(*this))->floatFields->begin(); iterFloats != (*(*this))->floatFields->end(); ++iterFloats)
+            for(std::vector<double>::iterator iterFloats = (*(*this))->floatFields->begin(); iterFloats != (*(*this))->floatFields->end(); ++iterFloats)
             {
                 outTxtFile << "," << *iterFloats;
             }
             
-            for(vector<string>::iterator iterStrs = (*(*this))->stringFields->begin(); iterStrs != (*(*this))->stringFields->end(); ++iterStrs)
+            for(std::vector<std::string>::iterator iterStrs = (*(*this))->stringFields->begin(); iterStrs != (*(*this))->stringFields->end(); ++iterStrs)
             {
                 outTxtFile << "," << *iterStrs;
             }
             
-            outTxtFile << endl;
+            outTxtFile << std::endl;
         }
         
         outTxtFile << "# Data - FID,neighbours\n";
@@ -646,32 +646,32 @@ namespace rsgis{namespace rastergis{
             outTxtFile << (*(*this))->fid;
             if((*(*this))->neighbours != NULL)
             {
-                for(vector<boost::uint_fast32_t>::iterator iterNeighbours = (*(*this))->neighbours->begin(); iterNeighbours != (*(*this))->neighbours->end(); ++iterNeighbours)
+                for(std::vector<boost::uint_fast32_t>::iterator iterNeighbours = (*(*this))->neighbours->begin(); iterNeighbours != (*(*this))->neighbours->end(); ++iterNeighbours)
                 {
                     outTxtFile << "," << *iterNeighbours;
                 }
             }
-            outTxtFile << endl;
+            outTxtFile << std::endl;
         }
         
         outTxtFile.flush();
         outTxtFile.close();
     }
     
-    void RSGISAttributeTable::exportHDF5(string outFile) throw(RSGISAttributeTableException)
+    void RSGISAttributeTable::exportHDF5(std::string outFile) throw(RSGISAttributeTableException)
     {
         try
         {
-            Exception::dontPrint();
+            H5::Exception::dontPrint();
             
-            FileAccPropList attAccessPlist = FileAccPropList(FileAccPropList::DEFAULT);
+            H5::FileAccPropList attAccessPlist = H5::FileAccPropList(H5::FileAccPropList::DEFAULT);
             attAccessPlist.setCache(ATT_WRITE_MDC_NELMTS, ATT_WRITE_RDCC_NELMTS, ATT_WRITE_RDCC_NBYTES, ATT_WRITE_RDCC_W0);
             attAccessPlist.setSieveBufSize(ATT_WRITE_SIEVE_BUF);
             hsize_t metaBlockSize = ATT_WRITE_META_BLOCKSIZE;
             attAccessPlist.setMetaBlockSize(metaBlockSize);
             
             const H5std_string attFilePath( outFile );
-            H5File *attH5File = new H5File( attFilePath, H5F_ACC_TRUNC, FileCreatPropList::DEFAULT, attAccessPlist);
+            H5::H5File *attH5File = new H5::H5File( attFilePath, H5F_ACC_TRUNC, H5::FileCreatPropList::DEFAULT, attAccessPlist);
             
             attH5File->createGroup( ATT_GROUPNAME_HEADER );
 			attH5File->createGroup( ATT_GROUPNAME_DATA );
@@ -680,9 +680,9 @@ namespace rsgis{namespace rastergis{
             hsize_t dimsAttSize[1];
 			dimsAttSize[0] = 1;
             size_t numFeatures = this->getSize();
-			DataSpace attSizeDataSpace(1, dimsAttSize);
-            DataSet sizeDataset = attH5File->createDataSet(ATT_SIZE_HEADER, PredType::STD_U64LE, attSizeDataSpace);
-			sizeDataset.write( &numFeatures, PredType::STD_U64LE );
+			H5::DataSpace attSizeDataSpace(1, dimsAttSize);
+            H5::DataSet sizeDataset = attH5File->createDataSet(ATT_SIZE_HEADER, H5::PredType::STD_U64LE, attSizeDataSpace);
+			sizeDataset.write( &numFeatures, H5::PredType::STD_U64LE );
             attSizeDataSpace.close();
             
             RSGISAttributeIdx *boolFields = NULL;
@@ -704,7 +704,7 @@ namespace rsgis{namespace rastergis{
             unsigned int boolFieldsIdx = 0;
             unsigned int intFieldsIdx = 0;
             unsigned int floatFieldsIdx = 0;
-            for(map<string, unsigned int>::iterator iterFields = fieldIdx->begin(); iterFields != fieldIdx->end(); ++iterFields)
+            for(std::map<std::string, unsigned int>::iterator iterFields = fieldIdx->begin(); iterFields != fieldIdx->end(); ++iterFields)
             {
                 RSGISAttributeDataType dt = this->getDataType((*iterFields).first);
                 if(dt == rsgis_bool)
@@ -727,7 +727,7 @@ namespace rsgis{namespace rastergis{
                 }
                 else if(dt == rsgis_string)
                 {
-                    cout << "String data type is not currently supported in HDF output - fields ignored.\n";
+                    std::cout << "String data type is not currently supported in HDF output - fields ignored.\n";
                 }
                 else
                 {
@@ -735,23 +735,23 @@ namespace rsgis{namespace rastergis{
                 }
             }
             
-            CompType *fieldDtDisk = this->createAttibuteIdxCompTypeDisk();
+            H5::CompType *fieldDtDisk = this->createAttibuteIdxCompTypeDisk();
             if(this->numBoolFields > 0)
             {
                 hsize_t initDimsBoolFieldsDS[1];
                 initDimsBoolFieldsDS[0] = 0;
                 hsize_t maxDimsBoolFieldsDS[1];
                 maxDimsBoolFieldsDS[0] = H5S_UNLIMITED;
-                DataSpace boolFieldsDataSpace = DataSpace(1, initDimsBoolFieldsDS, maxDimsBoolFieldsDS);
+                H5::DataSpace boolFieldsDataSpace = H5::DataSpace(1, initDimsBoolFieldsDS, maxDimsBoolFieldsDS);
                 
                 hsize_t dimsBoolFieldsChunk[1];
                 dimsBoolFieldsChunk[0] = ATT_WRITE_CHUNK_SIZE;
                 
-                DSetCreatPropList creationBoolFieldsDSPList;
+                H5::DSetCreatPropList creationBoolFieldsDSPList;
                 creationBoolFieldsDSPList.setChunk(1, dimsBoolFieldsChunk);
                 creationBoolFieldsDSPList.setShuffle();
                 creationBoolFieldsDSPList.setDeflate(ATT_WRITE_DEFLATE);
-                DataSet *boolFieldsDataset = new DataSet(attH5File->createDataSet(ATT_BOOL_FIELDS_HEADER, *fieldDtDisk, boolFieldsDataSpace, creationBoolFieldsDSPList));
+                H5::DataSet *boolFieldsDataset = new H5::DataSet(attH5File->createDataSet(ATT_BOOL_FIELDS_HEADER, *fieldDtDisk, boolFieldsDataSpace, creationBoolFieldsDSPList));
 
                 hsize_t extendBoolFieldsDatasetTo[1];
                 extendBoolFieldsDatasetTo[0] = this->numBoolFields;
@@ -762,9 +762,9 @@ namespace rsgis{namespace rastergis{
                 hsize_t boolFieldsDataDims[1];
                 boolFieldsDataDims[0] = this->numBoolFields;
                 
-                DataSpace boolFieldsWriteDataSpace = boolFieldsDataset->getSpace();
+                H5::DataSpace boolFieldsWriteDataSpace = boolFieldsDataset->getSpace();
                 boolFieldsWriteDataSpace.selectHyperslab(H5S_SELECT_SET, boolFieldsDataDims, boolFieldsOffset);
-                DataSpace newBoolFieldsDataspace = DataSpace(1, boolFieldsDataDims);
+                H5::DataSpace newBoolFieldsDataspace = H5::DataSpace(1, boolFieldsDataDims);
                 
                 boolFieldsDataset->write(boolFields, *fieldDtDisk, newBoolFieldsDataspace, boolFieldsWriteDataSpace);
                 
@@ -778,16 +778,16 @@ namespace rsgis{namespace rastergis{
                 initDimsIntFieldsDS[0] = 0;
                 hsize_t maxDimsIntFieldsDS[1];
                 maxDimsIntFieldsDS[0] = H5S_UNLIMITED;
-                DataSpace intFieldsDataSpace = DataSpace(1, initDimsIntFieldsDS, maxDimsIntFieldsDS);
+                H5::DataSpace intFieldsDataSpace = H5::DataSpace(1, initDimsIntFieldsDS, maxDimsIntFieldsDS);
                 
                 hsize_t dimsIntFieldsChunk[1];
                 dimsIntFieldsChunk[0] = ATT_WRITE_CHUNK_SIZE;
                 
-                DSetCreatPropList creationIntFieldsDSPList;
+                H5::DSetCreatPropList creationIntFieldsDSPList;
                 creationIntFieldsDSPList.setChunk(1, dimsIntFieldsChunk);
                 creationIntFieldsDSPList.setShuffle();
                 creationIntFieldsDSPList.setDeflate(ATT_WRITE_DEFLATE);
-                DataSet *intFieldsDataset = new DataSet(attH5File->createDataSet(ATT_INT_FIELDS_HEADER, *fieldDtDisk, intFieldsDataSpace, creationIntFieldsDSPList));
+                H5::DataSet *intFieldsDataset = new H5::DataSet(attH5File->createDataSet(ATT_INT_FIELDS_HEADER, *fieldDtDisk, intFieldsDataSpace, creationIntFieldsDSPList));
                 
                 hsize_t extendIntFieldsDatasetTo[1];
                 extendIntFieldsDatasetTo[0] = this->numIntFields;
@@ -798,9 +798,9 @@ namespace rsgis{namespace rastergis{
                 hsize_t intFieldsDataDims[1];
                 intFieldsDataDims[0] = this->numIntFields;
                 
-                DataSpace intFieldsWriteDataSpace = intFieldsDataset->getSpace();
+                H5::DataSpace intFieldsWriteDataSpace = intFieldsDataset->getSpace();
                 intFieldsWriteDataSpace.selectHyperslab(H5S_SELECT_SET, intFieldsDataDims, intFieldsOffset);
-                DataSpace newIntFieldsDataspace = DataSpace(1, intFieldsDataDims);
+                H5::DataSpace newIntFieldsDataspace = H5::DataSpace(1, intFieldsDataDims);
                 
                 intFieldsDataset->write(intFields, *fieldDtDisk, newIntFieldsDataspace, intFieldsWriteDataSpace);
                 
@@ -814,16 +814,16 @@ namespace rsgis{namespace rastergis{
                 initDimsFloatFieldsDS[0] = 0;
                 hsize_t maxDimsFloatFieldsDS[1];
                 maxDimsFloatFieldsDS[0] = H5S_UNLIMITED;
-                DataSpace floatFieldsDataSpace = DataSpace(1, initDimsFloatFieldsDS, maxDimsFloatFieldsDS);
+                H5::DataSpace floatFieldsDataSpace = H5::DataSpace(1, initDimsFloatFieldsDS, maxDimsFloatFieldsDS);
                 
                 hsize_t dimsFloatFieldsChunk[1];
                 dimsFloatFieldsChunk[0] = ATT_WRITE_CHUNK_SIZE;
                 
-                DSetCreatPropList creationFloatFieldsDSPList;
+                H5::DSetCreatPropList creationFloatFieldsDSPList;
                 creationFloatFieldsDSPList.setChunk(1, dimsFloatFieldsChunk);
                 creationFloatFieldsDSPList.setShuffle();
                 creationFloatFieldsDSPList.setDeflate(ATT_WRITE_DEFLATE);
-                DataSet *floatFieldsDataset = new DataSet(attH5File->createDataSet(ATT_FLOAT_FIELDS_HEADER, *fieldDtDisk, floatFieldsDataSpace, creationFloatFieldsDSPList));
+                H5::DataSet *floatFieldsDataset = new H5::DataSet(attH5File->createDataSet(ATT_FLOAT_FIELDS_HEADER, *fieldDtDisk, floatFieldsDataSpace, creationFloatFieldsDSPList));
                 
                 hsize_t extendFloatFieldsDatasetTo[1];
                 extendFloatFieldsDatasetTo[0] = this->numFloatFields;
@@ -834,9 +834,9 @@ namespace rsgis{namespace rastergis{
                 hsize_t floatFieldsDataDims[1];
                 floatFieldsDataDims[0] = this->numFloatFields;
                 
-                DataSpace floatFieldsWriteDataSpace = floatFieldsDataset->getSpace();
+                H5::DataSpace floatFieldsWriteDataSpace = floatFieldsDataset->getSpace();
                 floatFieldsWriteDataSpace.selectHyperslab(H5S_SELECT_SET, floatFieldsDataDims, floatFieldsOffset);
-                DataSpace newFloatFieldsDataspace = DataSpace(1, floatFieldsDataDims);
+                H5::DataSpace newFloatFieldsDataspace = H5::DataSpace(1, floatFieldsDataDims);
                 
                 floatFieldsDataset->write(floatFields, *fieldDtDisk, newFloatFieldsDataspace, floatFieldsWriteDataSpace);
                 
@@ -846,7 +846,7 @@ namespace rsgis{namespace rastergis{
             
             delete fieldDtDisk;
             
-            DataSet *boolDataset = NULL;
+            H5::DataSet *boolDataset = NULL;
             if(this->numBoolFields > 0)
             {
                 hsize_t initDimsBoolDS[2];
@@ -855,23 +855,23 @@ namespace rsgis{namespace rastergis{
                 hsize_t maxDimsBoolDS[2];
                 maxDimsBoolDS[0] = H5S_UNLIMITED;
                 maxDimsBoolDS[1] = H5S_UNLIMITED;
-                DataSpace boolDataSpace = DataSpace(2, initDimsBoolDS, maxDimsBoolDS);
+                H5::DataSpace boolDataSpace = H5::DataSpace(2, initDimsBoolDS, maxDimsBoolDS);
                 
                 hsize_t dimsBoolChunk[2];
                 dimsBoolChunk[0] = ATT_WRITE_CHUNK_SIZE;
                 dimsBoolChunk[1] = 1;
                 
                 int fillValueInt = 0;
-                DSetCreatPropList creationBoolDSPList;
+                H5::DSetCreatPropList creationBoolDSPList;
                 creationBoolDSPList.setChunk(2, dimsBoolChunk);
                 creationBoolDSPList.setShuffle();
                 creationBoolDSPList.setDeflate(ATT_WRITE_DEFLATE);
-                creationBoolDSPList.setFillValue( PredType::STD_I8LE, &fillValueInt);
+                creationBoolDSPList.setFillValue( H5::PredType::STD_I8LE, &fillValueInt);
                 
-                boolDataset = new DataSet(attH5File->createDataSet(ATT_BOOL_DATA, PredType::STD_I8LE, boolDataSpace, creationBoolDSPList));
+                boolDataset = new H5::DataSet(attH5File->createDataSet(ATT_BOOL_DATA, H5::PredType::STD_I8LE, boolDataSpace, creationBoolDSPList));
             }
             
-            DataSet *intDataset = NULL;
+            H5::DataSet *intDataset = NULL;
             if(this->numIntFields > 0)
             {
                 hsize_t initDimsIntDS[2];
@@ -880,23 +880,23 @@ namespace rsgis{namespace rastergis{
                 hsize_t maxDimsIntDS[2];
                 maxDimsIntDS[0] = H5S_UNLIMITED;
                 maxDimsIntDS[1] = H5S_UNLIMITED;
-                DataSpace intDataSpace = DataSpace(2, initDimsIntDS, maxDimsIntDS);
+                H5::DataSpace intDataSpace = H5::DataSpace(2, initDimsIntDS, maxDimsIntDS);
                 
                 hsize_t dimsIntChunk[2];
                 dimsIntChunk[0] = ATT_WRITE_CHUNK_SIZE;
                 dimsIntChunk[1] = 1;
                 
                 long fillValueLongInt = 0;
-                DSetCreatPropList creationIntDSPList;
+                H5::DSetCreatPropList creationIntDSPList;
                 creationIntDSPList.setChunk(2, dimsIntChunk);
                 creationIntDSPList.setShuffle();
                 creationIntDSPList.setDeflate(ATT_WRITE_DEFLATE);
-                creationIntDSPList.setFillValue( PredType::STD_I64LE, &fillValueLongInt);
+                creationIntDSPList.setFillValue( H5::PredType::STD_I64LE, &fillValueLongInt);
                 
-                intDataset = new DataSet(attH5File->createDataSet(ATT_INT_DATA, PredType::STD_I64LE, intDataSpace, creationIntDSPList));
+                intDataset = new H5::DataSet(attH5File->createDataSet(ATT_INT_DATA, H5::PredType::STD_I64LE, intDataSpace, creationIntDSPList));
             }
 
-            DataSet *floatDataset = NULL;
+            H5::DataSet *floatDataset = NULL;
             if(this->numFloatFields > 0)
             {
                 hsize_t initDimsFloatDS[2];
@@ -905,20 +905,20 @@ namespace rsgis{namespace rastergis{
                 hsize_t maxDimsFloatDS[2];
                 maxDimsFloatDS[0] = H5S_UNLIMITED;
                 maxDimsFloatDS[1] = H5S_UNLIMITED;
-                DataSpace floatDataSpace = DataSpace(2, initDimsFloatDS, maxDimsFloatDS);
+                H5::DataSpace floatDataSpace = H5::DataSpace(2, initDimsFloatDS, maxDimsFloatDS);
                 
                 hsize_t dimsFloatChunk[2];
                 dimsFloatChunk[0] = ATT_WRITE_CHUNK_SIZE;
                 dimsFloatChunk[1] = 1;
                 
                 double fillValueFloat = 0;
-                DSetCreatPropList creationFloatDSPList;
+                H5::DSetCreatPropList creationFloatDSPList;
                 creationFloatDSPList.setChunk(2, dimsFloatChunk);
                 creationFloatDSPList.setShuffle();
                 creationFloatDSPList.setDeflate(ATT_WRITE_DEFLATE);
-                creationFloatDSPList.setFillValue( PredType::IEEE_F64LE, &fillValueFloat);
+                creationFloatDSPList.setFillValue( H5::PredType::IEEE_F64LE, &fillValueFloat);
                 
-                floatDataset = new DataSet(attH5File->createDataSet(ATT_FLOAT_DATA, PredType::IEEE_F64LE, floatDataSpace, creationFloatDSPList));
+                floatDataset = new H5::DataSet(attH5File->createDataSet(ATT_FLOAT_DATA, H5::PredType::IEEE_F64LE, floatDataSpace, creationFloatDSPList));
             }
             
             // Create Neighbours dataset
@@ -926,22 +926,22 @@ namespace rsgis{namespace rastergis{
             initDimsNeighboursDS[0] = 0;
             hsize_t maxDimsNeighboursDS[1];
             maxDimsNeighboursDS[0] = H5S_UNLIMITED;
-            DataSpace neighboursDataspace = DataSpace(1, initDimsNeighboursDS, maxDimsNeighboursDS);
+            H5::DataSpace neighboursDataspace = H5::DataSpace(1, initDimsNeighboursDS, maxDimsNeighboursDS);
             
             hsize_t dimsNeighboursChunk[1];
             dimsNeighboursChunk[0] = ATT_WRITE_CHUNK_SIZE;
             
-            DataType intVarLenDiskDT = VarLenType(&PredType::STD_U64LE);
+            H5::DataType intVarLenDiskDT = H5::VarLenType(&H5::PredType::STD_U64LE);
             hvl_t neighboursDataFillVal[1];
             neighboursDataFillVal[0].p = NULL;
             neighboursDataFillVal[0].length = 0;
-            DSetCreatPropList creationNeighboursDSPList;
+            H5::DSetCreatPropList creationNeighboursDSPList;
             creationNeighboursDSPList.setChunk(1, dimsNeighboursChunk);
             creationNeighboursDSPList.setShuffle();
             creationNeighboursDSPList.setDeflate(ATT_WRITE_DEFLATE);
             creationNeighboursDSPList.setFillValue( intVarLenDiskDT, &neighboursDataFillVal);
             
-            DataSet neighboursDataset = attH5File->createDataSet(ATT_NEIGHBOURS_DATA, intVarLenDiskDT, neighboursDataspace, creationNeighboursDSPList);
+            H5::DataSet neighboursDataset = attH5File->createDataSet(ATT_NEIGHBOURS_DATA, intVarLenDiskDT, neighboursDataspace, creationNeighboursDSPList);
             
             unsigned long numChunks = this->getSize() / ATT_WRITE_CHUNK_SIZE;
             unsigned long remainingRows = this->getSize() - (numChunks * ATT_WRITE_CHUNK_SIZE);
@@ -1003,7 +1003,7 @@ namespace rsgis{namespace rastergis{
             neighboursDataOffset[0] = 0;
             hsize_t neighboursDataDims[1];
             neighboursDataDims[0] = ATT_WRITE_CHUNK_SIZE;
-            DataType intVarLenMemDT = VarLenType(&PredType::NATIVE_UINT64);
+            H5::DataType intVarLenMemDT = H5::VarLenType(&H5::PredType::NATIVE_UINT64);
             
             size_t currentSize = 0;
             size_t rowIdx = 0;
@@ -1063,11 +1063,11 @@ namespace rsgis{namespace rastergis{
                     boolDataOffset[0] = currentSize;
                     boolDataOffset[1] = 0;
                     
-                    DataSpace boolWriteDataSpace = boolDataset->getSpace();
+                    H5::DataSpace boolWriteDataSpace = boolDataset->getSpace();
                     boolWriteDataSpace.selectHyperslab(H5S_SELECT_SET, boolDataDims, boolDataOffset);
-                    DataSpace newBoolDataspace = DataSpace(2, boolDataDims);
+                    H5::DataSpace newBoolDataspace = H5::DataSpace(2, boolDataDims);
                     
-                    boolDataset->write(boolVals, PredType::NATIVE_INT, newBoolDataspace, boolWriteDataSpace);
+                    boolDataset->write(boolVals, H5::PredType::NATIVE_INT, newBoolDataspace, boolWriteDataSpace);
                 }
                 
                 if(this->numIntFields > 0)
@@ -1079,11 +1079,11 @@ namespace rsgis{namespace rastergis{
                     intDataOffset[0] = currentSize;
                     intDataOffset[1] = 0;
                     
-                    DataSpace intWriteDataSpace = intDataset->getSpace();
+                    H5::DataSpace intWriteDataSpace = intDataset->getSpace();
                     intWriteDataSpace.selectHyperslab(H5S_SELECT_SET, intDataDims, intDataOffset);
-                    DataSpace newIntDataspace = DataSpace(2, intDataDims);
+                    H5::DataSpace newIntDataspace = H5::DataSpace(2, intDataDims);
                     
-                    intDataset->write(intVals, PredType::NATIVE_LONG, newIntDataspace, intWriteDataSpace);
+                    intDataset->write(intVals, H5::PredType::NATIVE_LONG, newIntDataspace, intWriteDataSpace);
                 }
                 
                 if(this->numFloatFields > 0)
@@ -1095,11 +1095,11 @@ namespace rsgis{namespace rastergis{
                     floatDataOffset[0] = currentSize;
                     floatDataOffset[1] = 0;
                     
-                    DataSpace floatWriteDataSpace = floatDataset->getSpace();
+                    H5::DataSpace floatWriteDataSpace = floatDataset->getSpace();
                     floatWriteDataSpace.selectHyperslab(H5S_SELECT_SET, floatDataDims, floatDataOffset);
-                    DataSpace newFloatDataspace = DataSpace(2, floatDataDims);
+                    H5::DataSpace newFloatDataspace = H5::DataSpace(2, floatDataDims);
                     
-                    floatDataset->write(floatVals, PredType::NATIVE_DOUBLE, newFloatDataspace, floatWriteDataSpace);
+                    floatDataset->write(floatVals, H5::PredType::NATIVE_DOUBLE, newFloatDataspace, floatWriteDataSpace);
                 }
                 
                 extendNeighboursDatasetTo[0] = currentSize + ATT_WRITE_CHUNK_SIZE;
@@ -1107,9 +1107,9 @@ namespace rsgis{namespace rastergis{
                 neighboursDataOffset[0] = currentSize;
                 neighboursDataDims[0] = ATT_WRITE_CHUNK_SIZE;
                 
-                DataSpace neighboursWriteDataSpace = neighboursDataset.getSpace();
+                H5::DataSpace neighboursWriteDataSpace = neighboursDataset.getSpace();
                 neighboursWriteDataSpace.selectHyperslab(H5S_SELECT_SET, neighboursDataDims, neighboursDataOffset);
-                DataSpace newNeighboursDataspace = DataSpace(1, neighboursDataDims);
+                H5::DataSpace newNeighboursDataspace = H5::DataSpace(1, neighboursDataDims);
                 
                 neighboursDataset.write(neighbourVals, intVarLenMemDT, newNeighboursDataspace, neighboursWriteDataSpace);
                 
@@ -1124,7 +1124,7 @@ namespace rsgis{namespace rastergis{
                 
                 currentSize += ATT_WRITE_CHUNK_SIZE;
             }
-            //cout << "Write remaining\n";
+            //std::cout << "Write remaining\n";
             for(unsigned int j = 0; j < remainingRows; ++j)
             {
                 feat = this->getFeature(rowIdx++);
@@ -1149,7 +1149,7 @@ namespace rsgis{namespace rastergis{
                 {
                     for(unsigned int k = 0; k < feat->floatFields->size(); ++k)
                     {
-                        //cout << feat->fid << ": b" << k << " = " << feat->floatFields->at(k) << endl;
+                        //std::cout << feat->fid << ": b" << k << " = " << feat->floatFields->at(k) << std::endl;
                         floatVals[(j*this->numFloatFields)+k] = feat->floatFields->at(k);
                     }
                 }
@@ -1182,11 +1182,11 @@ namespace rsgis{namespace rastergis{
                 boolDataDims[0] = remainingRows;
                 boolDataDims[1] = this->numBoolFields;
                 
-                DataSpace boolWriteDataSpace = boolDataset->getSpace();
+                H5::DataSpace boolWriteDataSpace = boolDataset->getSpace();
                 boolWriteDataSpace.selectHyperslab(H5S_SELECT_SET, boolDataDims, boolDataOffset);
-                DataSpace newBoolDataspace = DataSpace(2, boolDataDims);
+                H5::DataSpace newBoolDataspace = H5::DataSpace(2, boolDataDims);
                 
-                boolDataset->write(boolVals, PredType::NATIVE_INT, newBoolDataspace, boolWriteDataSpace);
+                boolDataset->write(boolVals, H5::PredType::NATIVE_INT, newBoolDataspace, boolWriteDataSpace);
             }
             
             if(this->numIntFields > 0)
@@ -1201,11 +1201,11 @@ namespace rsgis{namespace rastergis{
                 intDataDims[0] = remainingRows;
                 intDataDims[1] = this->numIntFields;
                 
-                DataSpace intWriteDataSpace = intDataset->getSpace();
+                H5::DataSpace intWriteDataSpace = intDataset->getSpace();
                 intWriteDataSpace.selectHyperslab(H5S_SELECT_SET, intDataDims, intDataOffset);
-                DataSpace newIntDataspace = DataSpace(2, intDataDims);
+                H5::DataSpace newIntDataspace = H5::DataSpace(2, intDataDims);
                 
-                intDataset->write(intVals, PredType::NATIVE_LONG, newIntDataspace, intWriteDataSpace);
+                intDataset->write(intVals, H5::PredType::NATIVE_LONG, newIntDataspace, intWriteDataSpace);
             }
             
             if(this->numFloatFields > 0)
@@ -1220,11 +1220,11 @@ namespace rsgis{namespace rastergis{
                 floatDataDims[0] = remainingRows;
                 floatDataDims[1] = this->numFloatFields;
                 
-                DataSpace floatWriteDataSpace = floatDataset->getSpace();
+                H5::DataSpace floatWriteDataSpace = floatDataset->getSpace();
                 floatWriteDataSpace.selectHyperslab(H5S_SELECT_SET, floatDataDims, floatDataOffset);
-                DataSpace newFloatDataspace = DataSpace(2, floatDataDims);
+                H5::DataSpace newFloatDataspace = H5::DataSpace(2, floatDataDims);
                 
-                floatDataset->write(floatVals, PredType::NATIVE_DOUBLE, newFloatDataspace, floatWriteDataSpace);
+                floatDataset->write(floatVals, H5::PredType::NATIVE_DOUBLE, newFloatDataspace, floatWriteDataSpace);
             }
             
             
@@ -1233,9 +1233,9 @@ namespace rsgis{namespace rastergis{
             neighboursDataOffset[0] = numChunks * ATT_WRITE_CHUNK_SIZE;
             neighboursDataDims[0] = remainingRows;
             
-            DataSpace neighboursWriteDataSpace = neighboursDataset.getSpace();
+            H5::DataSpace neighboursWriteDataSpace = neighboursDataset.getSpace();
             neighboursWriteDataSpace.selectHyperslab(H5S_SELECT_SET, neighboursDataDims, neighboursDataOffset);
-            DataSpace newNeighboursDataspace = DataSpace(1, neighboursDataDims);
+            H5::DataSpace newNeighboursDataspace = H5::DataSpace(1, neighboursDataDims);
             
             neighboursDataset.write(neighbourVals, intVarLenMemDT, newNeighboursDataspace, neighboursWriteDataSpace);
             
@@ -1261,77 +1261,77 @@ namespace rsgis{namespace rastergis{
         {
             throw e;
         }
-        catch( FileIException &e )
+        catch( H5::FileIException &e )
         {
             throw RSGISAttributeTableException(e.getDetailMsg());
         }
-        catch( DataSetIException &e )
+        catch( H5::DataSetIException &e )
         {
             throw RSGISAttributeTableException(e.getDetailMsg());
         }
-        catch( DataSpaceIException &e )
+        catch( H5::DataSpaceIException &e )
         {
             throw RSGISAttributeTableException(e.getDetailMsg());
         }
-        catch( DataTypeIException &e )
+        catch( H5::DataTypeIException &e )
         {
             throw RSGISAttributeTableException(e.getDetailMsg());
         }
     }
     
-    CompType* RSGISAttributeTable::createAttibuteIdxCompTypeDisk() throw(RSGISAttributeTableException)
+    H5::CompType* RSGISAttributeTable::createAttibuteIdxCompTypeDisk() throw(RSGISAttributeTableException)
     {
         try
         {
-            StrType strTypeOut(0, H5T_VARIABLE);
+            H5::StrType strTypeOut(0, H5T_VARIABLE);
             
-            CompType *attIdxDataType = new CompType( sizeof(RSGISAttributeIdx) );
+            H5::CompType *attIdxDataType = new H5::CompType( sizeof(RSGISAttributeIdx) );
             attIdxDataType->insertMember(ATT_NAME_FIELD, HOFFSET(RSGISAttributeIdx, name), strTypeOut);
-            attIdxDataType->insertMember(ATT_INDEX_FIELD, HOFFSET(RSGISAttributeIdx, idx), PredType::STD_U32LE);
+            attIdxDataType->insertMember(ATT_INDEX_FIELD, HOFFSET(RSGISAttributeIdx, idx), H5::PredType::STD_U32LE);
             return attIdxDataType;
         }
-        catch( FileIException &e )
+        catch( H5::FileIException &e )
         {
             throw RSGISAttributeTableException(e.getDetailMsg());
         }
-        catch( DataSetIException &e )
+        catch( H5::DataSetIException &e )
         {
             throw RSGISAttributeTableException(e.getDetailMsg());
         }
-        catch( DataSpaceIException &e )
+        catch( H5::DataSpaceIException &e )
         {
             throw RSGISAttributeTableException(e.getDetailMsg());
         }
-        catch( DataTypeIException &e )
+        catch( H5::DataTypeIException &e )
         {
             throw RSGISAttributeTableException(e.getDetailMsg());
         }
     }
     
-    CompType* RSGISAttributeTable::createAttibuteIdxCompTypeMem() throw(RSGISAttributeTableException)
+    H5::CompType* RSGISAttributeTable::createAttibuteIdxCompTypeMem() throw(RSGISAttributeTableException)
     {
         try
         {
-            StrType strTypeIn(0, H5T_VARIABLE);
+            H5::StrType strTypeIn(0, H5T_VARIABLE);
             
-            CompType *attIdxDataType = new CompType( sizeof(RSGISAttributeIdx) );
+            H5::CompType *attIdxDataType = new H5::CompType( sizeof(RSGISAttributeIdx) );
             attIdxDataType->insertMember(ATT_NAME_FIELD, HOFFSET(RSGISAttributeIdx, name), strTypeIn);
-            attIdxDataType->insertMember(ATT_INDEX_FIELD, HOFFSET(RSGISAttributeIdx, idx), PredType::NATIVE_UINT);
+            attIdxDataType->insertMember(ATT_INDEX_FIELD, HOFFSET(RSGISAttributeIdx, idx), H5::PredType::NATIVE_UINT);
             return attIdxDataType;
         }
-        catch( FileIException &e )
+        catch( H5::FileIException &e )
         {
             throw RSGISAttributeTableException(e.getDetailMsg());
         }
-        catch( DataSetIException &e )
+        catch( H5::DataSetIException &e )
         {
             throw RSGISAttributeTableException(e.getDetailMsg());
         }
-        catch( DataSpaceIException &e )
+        catch( H5::DataSpaceIException &e )
         {
             throw RSGISAttributeTableException(e.getDetailMsg());
         }
-        catch( DataTypeIException &e )
+        catch( H5::DataTypeIException &e )
         {
             throw RSGISAttributeTableException(e.getDetailMsg());
         }
@@ -1346,40 +1346,40 @@ namespace rsgis{namespace rastergis{
             rasterAtt->CreateColumn("FID", GFT_Integer, GFU_MinMax);
             unsigned int fidRATIdx = rasterAtt->GetColumnCount()-1;
             
-            vector<pair<unsigned int, unsigned int> > intFieldRATIdxs;
-            vector<pair<unsigned int, unsigned int> > floatFieldRATIdxs;
-            vector<pair<unsigned int, unsigned int> > stringFieldRATIdxs;
-            vector<pair<unsigned int, unsigned int> > boolFieldRATIdxs;
+            std::vector<std::pair<unsigned int, unsigned int> > intFieldRATIdxs;
+            std::vector<std::pair<unsigned int, unsigned int> > floatFieldRATIdxs;
+            std::vector<std::pair<unsigned int, unsigned int> > stringFieldRATIdxs;
+            std::vector<std::pair<unsigned int, unsigned int> > boolFieldRATIdxs;
             
-            cout << "There are " << fields->size() << " fields within the attribute table\n";
+            std::cout << "There are " << fields->size() << " fields within the attribute table\n";
             
-            vector<pair<string, RSGISAttributeDataType> >::iterator iterFields;
+            std::vector<std::pair<std::string, RSGISAttributeDataType> >::iterator iterFields;
             for(iterFields = fields->begin(); iterFields != fields->end(); ++iterFields)
             {
-                cout << "Adding Field: " << (*iterFields).first << endl;
+                std::cout << "Adding Field: " << (*iterFields).first << std::endl;
                 if((*iterFields).second == rsgis_int)
                 {
                     rasterAtt->CreateColumn((*iterFields).first.c_str(), GFT_Integer, GFU_Generic);
-                    intFieldRATIdxs.push_back(pair<unsigned int, unsigned int>(this->getFieldIndex((*iterFields).first), rasterAtt->GetColumnCount()-1));
+                    intFieldRATIdxs.push_back(std::pair<unsigned int, unsigned int>(this->getFieldIndex((*iterFields).first), rasterAtt->GetColumnCount()-1));
                 }
                 else if((*iterFields).second == rsgis_float)
                 {
                     rasterAtt->CreateColumn((*iterFields).first.c_str(), GFT_Real, GFU_Generic);
-                    floatFieldRATIdxs.push_back(pair<unsigned int, unsigned int>(this->getFieldIndex((*iterFields).first), rasterAtt->GetColumnCount()-1));
+                    floatFieldRATIdxs.push_back(std::pair<unsigned int, unsigned int>(this->getFieldIndex((*iterFields).first), rasterAtt->GetColumnCount()-1));
                 }
                 else if((*iterFields).second == rsgis_string)
                 {
                     rasterAtt->CreateColumn((*iterFields).first.c_str(), GFT_String, GFU_Generic);
-                    stringFieldRATIdxs.push_back(pair<unsigned int, unsigned int>(this->getFieldIndex((*iterFields).first), rasterAtt->GetColumnCount()-1));
+                    stringFieldRATIdxs.push_back(std::pair<unsigned int, unsigned int>(this->getFieldIndex((*iterFields).first), rasterAtt->GetColumnCount()-1));
                 }
                 else if((*iterFields).second == rsgis_bool)
                 {
                     rasterAtt->CreateColumn((*iterFields).first.c_str(), GFT_Integer, GFU_Generic);
-                    boolFieldRATIdxs.push_back(pair<unsigned int, unsigned int>(this->getFieldIndex((*iterFields).first), rasterAtt->GetColumnCount()-1));
+                    boolFieldRATIdxs.push_back(std::pair<unsigned int, unsigned int>(this->getFieldIndex((*iterFields).first), rasterAtt->GetColumnCount()-1));
                 }
                 else
                 {
-                    cout << "Warning: " << (*iterFields).first << " will not be output as type unknown.\n";
+                    std::cout << "Warning: " << (*iterFields).first << " will not be output as type unknown.\n";
                 }
             }
             
@@ -1390,22 +1390,22 @@ namespace rsgis{namespace rastergis{
             {
                 rasterAtt->SetValue(rowCounter, fidRATIdx, ((int)(*(*this))->fid+1));
                 
-                for(vector<pair<unsigned int, unsigned int> >::iterator iterAtts = intFieldRATIdxs.begin(); iterAtts != intFieldRATIdxs.end(); ++iterAtts)
+                for(std::vector<std::pair<unsigned int, unsigned int> >::iterator iterAtts = intFieldRATIdxs.begin(); iterAtts != intFieldRATIdxs.end(); ++iterAtts)
                 {
                     rasterAtt->SetValue(rowCounter, (*iterAtts).second, ((int)(*(*this))->intFields->at((*iterAtts).first)));
                 }
                 
-                for(vector<pair<unsigned int, unsigned int> >::iterator iterAtts = floatFieldRATIdxs.begin(); iterAtts != floatFieldRATIdxs.end(); ++iterAtts)
+                for(std::vector<std::pair<unsigned int, unsigned int> >::iterator iterAtts = floatFieldRATIdxs.begin(); iterAtts != floatFieldRATIdxs.end(); ++iterAtts)
                 {
                     rasterAtt->SetValue(rowCounter, (*iterAtts).second, ((float)(*(*this))->floatFields->at((*iterAtts).first)));
                 }
                 
-                for(vector<pair<unsigned int, unsigned int> >::iterator iterAtts = stringFieldRATIdxs.begin(); iterAtts != stringFieldRATIdxs.end(); ++iterAtts)
+                for(std::vector<std::pair<unsigned int, unsigned int> >::iterator iterAtts = stringFieldRATIdxs.begin(); iterAtts != stringFieldRATIdxs.end(); ++iterAtts)
                 {
                     rasterAtt->SetValue(rowCounter, (*iterAtts).second, (*(*this))->stringFields->at((*iterAtts).first).c_str());
                 }
                 
-                for(vector<pair<unsigned int, unsigned int> >::iterator iterAtts = boolFieldRATIdxs.begin(); iterAtts != boolFieldRATIdxs.end(); ++iterAtts)
+                for(std::vector<std::pair<unsigned int, unsigned int> >::iterator iterAtts = boolFieldRATIdxs.begin(); iterAtts != boolFieldRATIdxs.end(); ++iterAtts)
                 {
                     rasterAtt->SetValue(rowCounter, (*iterAtts).second, ((int)(*(*this))->boolFields->at((*iterAtts).first)));
                 }
@@ -1420,15 +1420,15 @@ namespace rsgis{namespace rastergis{
         {
             throw e;
         }
-        catch(exception &e)
+        catch(std::exception &e)
         {
-            cout << "ERROR: " << e.what() << endl;
+            std::cout << "ERROR: " << e.what() << std::endl;
         }
     }
     
-    vector<double>* RSGISAttributeTable::getDoubleField(string field) throw(RSGISAttributeTableException)
+    std::vector<double>* RSGISAttributeTable::getDoubleField(std::string field) throw(RSGISAttributeTableException)
     {
-        vector<double> *vals = new vector<double>();
+        std::vector<double> *vals = new std::vector<double>();
         if(this->getDataType(field) == rsgis_float)
         {
             unsigned int idx = this->getFieldIndex(field);
@@ -1445,9 +1445,9 @@ namespace rsgis{namespace rastergis{
         return vals;
     }
     
-    vector<long>* RSGISAttributeTable::getLongField(string field) throw(RSGISAttributeTableException)
+    std::vector<long>* RSGISAttributeTable::getLongField(std::string field) throw(RSGISAttributeTableException)
     {
-        vector<long> *vals = new vector<long>();
+        std::vector<long> *vals = new std::vector<long>();
         if(this->getDataType(field) == rsgis_int)
         {
             unsigned int idx = this->getFieldIndex(field);
@@ -1464,9 +1464,9 @@ namespace rsgis{namespace rastergis{
         return vals;
     }
     
-    vector<bool>* RSGISAttributeTable::getBoolField(string field) throw(RSGISAttributeTableException)
+    std::vector<bool>* RSGISAttributeTable::getBoolField(std::string field) throw(RSGISAttributeTableException)
     {
-        vector<bool> *vals = new vector<bool>();
+        std::vector<bool> *vals = new std::vector<bool>();
         if(this->getDataType(field) == rsgis_bool)
         {
             unsigned int idx = this->getFieldIndex(field);
@@ -1483,9 +1483,9 @@ namespace rsgis{namespace rastergis{
         return vals;
     }
      
-    vector<string>* RSGISAttributeTable::getStringField(string field) throw(RSGISAttributeTableException)
+    std::vector<std::string>* RSGISAttributeTable::getStringField(std::string field) throw(RSGISAttributeTableException)
     {
-        vector<string> *vals = new vector<string>();
+        std::vector<std::string> *vals = new std::vector<std::string>();
         if(this->getDataType(field) == rsgis_string)
         {
             unsigned int idx = this->getFieldIndex(field);
@@ -1502,15 +1502,15 @@ namespace rsgis{namespace rastergis{
         return vals;
     }
     
-    vector<RSGISIfStatement*>* RSGISAttributeTable::generateStatments(DOMElement *argElement)throw(RSGISAttributeTableException)
+    std::vector<RSGISIfStatement*>* RSGISAttributeTable::generateStatments(xercesc::DOMElement *argElement)throw(RSGISAttributeTableException)
     {
-        vector<RSGISIfStatement*> *statements = new vector<RSGISIfStatement*>();
+        std::vector<RSGISIfStatement*> *statements = new std::vector<RSGISIfStatement*>();
         
         try
         {
-            RSGISTextUtils textUtils;
-            XMLCh *rsgisIfXMLStr = XMLString::transcode("rsgis:if");
-            DOMNodeList *ifNodesList = argElement->getElementsByTagName(rsgisIfXMLStr);
+            rsgis::utils::RSGISTextUtils textUtils;
+            XMLCh *rsgisIfXMLStr = xercesc::XMLString::transcode("rsgis:if");
+            xercesc::DOMNodeList *ifNodesList = argElement->getElementsByTagName(rsgisIfXMLStr);
             unsigned int numIfStatments = ifNodesList->getLength();        
             
             if(numIfStatments == 0)
@@ -1518,8 +1518,8 @@ namespace rsgis{namespace rastergis{
                 throw RSGISAttributeTableException("Must have at least 1 if statment.");
             }
             
-            XMLCh *rsgisElseXMLStr = XMLString::transcode("rsgis:else");
-            DOMNodeList *elseNodesList = argElement->getElementsByTagName(rsgisElseXMLStr);
+            XMLCh *rsgisElseXMLStr = xercesc::XMLString::transcode("rsgis:else");
+            xercesc::DOMNodeList *elseNodesList = argElement->getElementsByTagName(rsgisElseXMLStr);
             unsigned int numElseStatments = elseNodesList->getLength();        
             
             if(numElseStatments != 1)
@@ -1527,18 +1527,18 @@ namespace rsgis{namespace rastergis{
                 throw RSGISAttributeTableException("Must have at 1 and only 1 else statment.");
             }
             
-            XMLCh *fieldXMLStr = XMLString::transcode("field");
-            XMLCh *valueXMLStr = XMLString::transcode("value");
-            XMLCh *typeXMLStr = XMLString::transcode("type");
+            XMLCh *fieldXMLStr = xercesc::XMLString::transcode("field");
+            XMLCh *valueXMLStr = xercesc::XMLString::transcode("value");
+            XMLCh *typeXMLStr = xercesc::XMLString::transcode("type");
 
             
             unsigned int numChildElements = argElement->getChildElementCount();
-            DOMElement *ifElement = argElement->getFirstElementChild();
+            xercesc::DOMElement *ifElement = argElement->getFirstElementChild();
             
             for(boost::uint_fast32_t i = 0; i < numChildElements; ++i)
             {
                 const XMLCh* tagName = ifElement->getTagName();
-                if(XMLString::equals(tagName, rsgisIfXMLStr))
+                if(xercesc::XMLString::equals(tagName, rsgisIfXMLStr))
                 {
                     if(ifElement->getChildElementCount() != 1)
                     {
@@ -1552,9 +1552,9 @@ namespace rsgis{namespace rastergis{
 
                     if(ifElement->hasAttribute(fieldXMLStr))
                     {
-                        char *charValue = XMLString::transcode(ifElement->getAttribute(fieldXMLStr));
-                        ifStatment->field = string(charValue);
-                        XMLString::release(&charValue);
+                        char *charValue = xercesc::XMLString::transcode(ifElement->getAttribute(fieldXMLStr));
+                        ifStatment->field = std::string(charValue);
+                        xercesc::XMLString::release(&charValue);
                     }
                     else
                     {
@@ -1563,18 +1563,18 @@ namespace rsgis{namespace rastergis{
                     
                     if(ifElement->hasAttribute(valueXMLStr))
                     {
-                        char *charValue = XMLString::transcode(ifElement->getAttribute(valueXMLStr));
-                        ifStatment->value = textUtils.strto32bitInt(string(charValue));
-                        XMLString::release(&charValue);
+                        char *charValue = xercesc::XMLString::transcode(ifElement->getAttribute(valueXMLStr));
+                        ifStatment->value = textUtils.strto32bitInt(std::string(charValue));
+                        xercesc::XMLString::release(&charValue);
                     }
                     else
                     {
-                        cerr << "WARNING: No \'value\' attribute was provided for if - Defaulting to 0.\n";
+                        std::cerr << "WARNING: No \'value\' attribute was provided for if - Defaulting to 0.\n";
                         ifStatment->value = 0;
                     }
                     statements->push_back(ifStatment);
                 }
-                else if(XMLString::equals(tagName, rsgisElseXMLStr))
+                else if(xercesc::XMLString::equals(tagName, rsgisElseXMLStr))
                 {
                     RSGISIfStatement *elseStatment = new RSGISIfStatement();
                     elseStatment->exp = NULL;
@@ -1585,10 +1585,10 @@ namespace rsgis{namespace rastergis{
                     
                     if(ifElement->hasAttribute(fieldXMLStr))
                     {
-                        char *charValue = XMLString::transcode(ifElement->getAttribute(fieldXMLStr));
-                        elseStatment->field = string(charValue);
+                        char *charValue = xercesc::XMLString::transcode(ifElement->getAttribute(fieldXMLStr));
+                        elseStatment->field = std::string(charValue);
                         fieldSet = true;
-                        XMLString::release(&charValue);
+                        xercesc::XMLString::release(&charValue);
                     }
                     else
                     {
@@ -1598,10 +1598,10 @@ namespace rsgis{namespace rastergis{
                     
                     if(ifElement->hasAttribute(valueXMLStr))
                     {
-                        char *charValue = XMLString::transcode(ifElement->getAttribute(valueXMLStr));
-                        elseStatment->value = textUtils.strto32bitInt(string(charValue));
+                        char *charValue = xercesc::XMLString::transcode(ifElement->getAttribute(valueXMLStr));
+                        elseStatment->value = textUtils.strto32bitInt(std::string(charValue));
                         valueSet = true;
-                        XMLString::release(&charValue);
+                        xercesc::XMLString::release(&charValue);
                     }
                     else
                     {
@@ -1628,11 +1628,11 @@ namespace rsgis{namespace rastergis{
                 ifElement = ifElement->getNextElementSibling();
             }
             
-			XMLString::release(&fieldXMLStr);
-            XMLString::release(&valueXMLStr);
-            XMLString::release(&typeXMLStr);
-            XMLString::release(&rsgisIfXMLStr);
-            XMLString::release(&rsgisElseXMLStr);
+			xercesc::XMLString::release(&fieldXMLStr);
+            xercesc::XMLString::release(&valueXMLStr);
+            xercesc::XMLString::release(&typeXMLStr);
+            xercesc::XMLString::release(&rsgisIfXMLStr);
+            xercesc::XMLString::release(&rsgisElseXMLStr);
             
         }
         catch(RSGISAttributeTableException &e)
@@ -1644,48 +1644,48 @@ namespace rsgis{namespace rastergis{
     }
     
     
-    RSGISAttExpression* RSGISAttributeTable::generateExpression(DOMElement *expElement)throw(RSGISAttributeTableException)
+    RSGISAttExpression* RSGISAttributeTable::generateExpression(xercesc::DOMElement *expElement)throw(RSGISAttributeTableException)
     {
         RSGISAttExpression *exp = NULL;
         
         try 
         {
-            RSGISTextUtils textUtils;
-            XMLCh *rsgisExpXMLStr = XMLString::transcode("rsgis:exp");
+            rsgis::utils::RSGISTextUtils textUtils;
+            XMLCh *rsgisExpXMLStr = xercesc::XMLString::transcode("rsgis:exp");
             const XMLCh* tagName = expElement->getTagName();
-            if(XMLString::equals(tagName, rsgisExpXMLStr))
+            if(xercesc::XMLString::equals(tagName, rsgisExpXMLStr))
             {
-                XMLCh *andXMLStr = XMLString::transcode("and");
-                XMLCh *orXMLStr = XMLString::transcode("or");
-                XMLCh *notXMLStr = XMLString::transcode("not");
-                XMLCh *gtXMLStr = XMLString::transcode("gt");
-                XMLCh *ltXMLStr = XMLString::transcode("lt");
-                XMLCh *gteqXMLStr = XMLString::transcode("gteq");
-                XMLCh *lteqXMLStr = XMLString::transcode("lteq");
-                XMLCh *eqXMLStr = XMLString::transcode("eq");
-                XMLCh *neqXMLStr = XMLString::transcode("neq");
-                XMLCh *gtConstXMLStr = XMLString::transcode("gtconst");
-                XMLCh *ltConstXMLStr = XMLString::transcode("ltconst");
-                XMLCh *gteqConstXMLStr = XMLString::transcode("gteqconst");
-                XMLCh *lteqConstXMLStr = XMLString::transcode("lteqconst");
-                XMLCh *eqConstXMLStr = XMLString::transcode("eqconst");
-                XMLCh *neqConstXMLStr = XMLString::transcode("netconst");
-                XMLCh *constGTXMLStr = XMLString::transcode("constgt");
-                XMLCh *constLTXMLStr = XMLString::transcode("constlt");
-                XMLCh *constGTEQXMLStr = XMLString::transcode("constgteq");
-                XMLCh *constLTEQXMLStr = XMLString::transcode("constlteq");
+                XMLCh *andXMLStr = xercesc::XMLString::transcode("and");
+                XMLCh *orXMLStr = xercesc::XMLString::transcode("or");
+                XMLCh *notXMLStr = xercesc::XMLString::transcode("not");
+                XMLCh *gtXMLStr = xercesc::XMLString::transcode("gt");
+                XMLCh *ltXMLStr = xercesc::XMLString::transcode("lt");
+                XMLCh *gteqXMLStr = xercesc::XMLString::transcode("gteq");
+                XMLCh *lteqXMLStr = xercesc::XMLString::transcode("lteq");
+                XMLCh *eqXMLStr = xercesc::XMLString::transcode("eq");
+                XMLCh *neqXMLStr = xercesc::XMLString::transcode("neq");
+                XMLCh *gtConstXMLStr = xercesc::XMLString::transcode("gtconst");
+                XMLCh *ltConstXMLStr = xercesc::XMLString::transcode("ltconst");
+                XMLCh *gteqConstXMLStr = xercesc::XMLString::transcode("gteqconst");
+                XMLCh *lteqConstXMLStr = xercesc::XMLString::transcode("lteqconst");
+                XMLCh *eqConstXMLStr = xercesc::XMLString::transcode("eqconst");
+                XMLCh *neqConstXMLStr = xercesc::XMLString::transcode("netconst");
+                XMLCh *constGTXMLStr = xercesc::XMLString::transcode("constgt");
+                XMLCh *constLTXMLStr = xercesc::XMLString::transcode("constlt");
+                XMLCh *constGTEQXMLStr = xercesc::XMLString::transcode("constgteq");
+                XMLCh *constLTEQXMLStr = xercesc::XMLString::transcode("constlteq");
                 
-                XMLCh *field1XMLStr = XMLString::transcode("field1");
-                XMLCh *field2XMLStr = XMLString::transcode("field2");
-                XMLCh *fieldXMLStr = XMLString::transcode("field");
-                XMLCh *valueXMLStr = XMLString::transcode("value");
-                XMLCh *typeXMLStr = XMLString::transcode("type");
+                XMLCh *field1XMLStr = xercesc::XMLString::transcode("field1");
+                XMLCh *field2XMLStr = xercesc::XMLString::transcode("field2");
+                XMLCh *fieldXMLStr = xercesc::XMLString::transcode("field");
+                XMLCh *valueXMLStr = xercesc::XMLString::transcode("value");
+                XMLCh *typeXMLStr = xercesc::XMLString::transcode("type");
                 
                 
-                string f1Name = "";
+                std::string f1Name = "";
                 unsigned int f1Idx = 0;
                 RSGISAttributeDataType f1Type = rsgis_na;
-                string f2Name = "";
+                std::string f2Name = "";
                 unsigned int f2Idx = 0;
                 RSGISAttributeDataType f2Type = rsgis_na;
                 float value = 0;
@@ -1694,7 +1694,7 @@ namespace rsgis{namespace rastergis{
                 {
                     const XMLCh *typeInXMLStr = expElement->getAttribute(typeXMLStr);
                     
-                    if(XMLString::equals(typeInXMLStr, andXMLStr))
+                    if(xercesc::XMLString::equals(typeInXMLStr, andXMLStr))
                     {
                         unsigned int numChildElements = expElement->getChildElementCount();
                         if(numChildElements == 0)
@@ -1702,9 +1702,9 @@ namespace rsgis{namespace rastergis{
                             throw RSGISAttributeTableException("There must be at least one child element of a AND expression.");
                         }
                         
-                        vector<RSGISAttExpression*> *exps = new vector<RSGISAttExpression*>();
+                        std::vector<RSGISAttExpression*> *exps = new std::vector<RSGISAttExpression*>();
                         
-                        DOMElement *expElementChild = expElement->getFirstElementChild();
+                        xercesc::DOMElement *expElementChild = expElement->getFirstElementChild();
                         for(unsigned int i = 0; i < numChildElements; ++i)
                         {
                             exps->push_back(RSGISAttributeTable::generateExpression(expElementChild));
@@ -1714,7 +1714,7 @@ namespace rsgis{namespace rastergis{
                         
                         exp = new RSGISAttExpressionAND(exps);
                     }
-                    else if(XMLString::equals(typeInXMLStr, orXMLStr))
+                    else if(xercesc::XMLString::equals(typeInXMLStr, orXMLStr))
                     {
                         unsigned int numChildElements = expElement->getChildElementCount();
                         if(numChildElements == 0)
@@ -1722,9 +1722,9 @@ namespace rsgis{namespace rastergis{
                             throw RSGISAttributeTableException("There must be at least one child element of a OR expression.");
                         }
                         
-                        vector<RSGISAttExpression*> *exps = new vector<RSGISAttExpression*>();
+                        std::vector<RSGISAttExpression*> *exps = new std::vector<RSGISAttExpression*>();
                         
-                        DOMElement *expElementChild = expElement->getFirstElementChild();
+                        xercesc::DOMElement *expElementChild = expElement->getFirstElementChild();
                         for(unsigned int i = 0; i < numChildElements; ++i)
                         {
                             exps->push_back(RSGISAttributeTable::generateExpression(expElementChild));
@@ -1734,7 +1734,7 @@ namespace rsgis{namespace rastergis{
                         
                         exp = new RSGISAttExpressionOR(exps);
                     }
-                    else if(XMLString::equals(typeInXMLStr, notXMLStr))
+                    else if(xercesc::XMLString::equals(typeInXMLStr, notXMLStr))
                     {
                         unsigned int numChildElements = expElement->getChildElementCount();
                         if(numChildElements != 1)
@@ -1743,13 +1743,13 @@ namespace rsgis{namespace rastergis{
                         }                        
                         exp = new RSGISAttExpressionNot(RSGISAttributeTable::generateExpression(expElement->getFirstElementChild()));
                     }
-                    else if(XMLString::equals(typeInXMLStr, gtXMLStr))
+                    else if(xercesc::XMLString::equals(typeInXMLStr, gtXMLStr))
                     {
                         if(expElement->hasAttribute(field1XMLStr))
                         {
-                            char *charValue = XMLString::transcode(expElement->getAttribute(field1XMLStr));
-                            f1Name = string(charValue);
-                            XMLString::release(&charValue);
+                            char *charValue = xercesc::XMLString::transcode(expElement->getAttribute(field1XMLStr));
+                            f1Name = std::string(charValue);
+                            xercesc::XMLString::release(&charValue);
                         }
                         else
                         {
@@ -1758,9 +1758,9 @@ namespace rsgis{namespace rastergis{
                         
                         if(expElement->hasAttribute(field2XMLStr))
                         {
-                            char *charValue = XMLString::transcode(expElement->getAttribute(field2XMLStr));
-                            f2Name = string(charValue);
-                            XMLString::release(&charValue);
+                            char *charValue = xercesc::XMLString::transcode(expElement->getAttribute(field2XMLStr));
+                            f2Name = std::string(charValue);
+                            xercesc::XMLString::release(&charValue);
                         }
                         else
                         {
@@ -1769,13 +1769,13 @@ namespace rsgis{namespace rastergis{
                         
                         exp = new RSGISAttExpressionGreaterThan(f1Name, f1Idx, f1Type, f2Name, f2Idx, f2Type);
                     }
-                    else if(XMLString::equals(typeInXMLStr, ltXMLStr))
+                    else if(xercesc::XMLString::equals(typeInXMLStr, ltXMLStr))
                     {
                         if(expElement->hasAttribute(field1XMLStr))
                         {
-                            char *charValue = XMLString::transcode(expElement->getAttribute(field1XMLStr));
-                            f1Name = string(charValue);
-                            XMLString::release(&charValue);
+                            char *charValue = xercesc::XMLString::transcode(expElement->getAttribute(field1XMLStr));
+                            f1Name = std::string(charValue);
+                            xercesc::XMLString::release(&charValue);
                         }
                         else
                         {
@@ -1784,9 +1784,9 @@ namespace rsgis{namespace rastergis{
                         
                         if(expElement->hasAttribute(field2XMLStr))
                         {
-                            char *charValue = XMLString::transcode(expElement->getAttribute(field2XMLStr));
-                            f2Name = string(charValue);
-                            XMLString::release(&charValue);
+                            char *charValue = xercesc::XMLString::transcode(expElement->getAttribute(field2XMLStr));
+                            f2Name = std::string(charValue);
+                            xercesc::XMLString::release(&charValue);
                         }
                         else
                         {
@@ -1795,13 +1795,13 @@ namespace rsgis{namespace rastergis{
                         
                         exp = new RSGISAttExpressionLessThan(f1Name, f1Idx, f1Type, f2Name, f2Idx, f2Type);
                     }
-                    else if(XMLString::equals(typeInXMLStr, gteqXMLStr))
+                    else if(xercesc::XMLString::equals(typeInXMLStr, gteqXMLStr))
                     {
                         if(expElement->hasAttribute(field1XMLStr))
                         {
-                            char *charValue = XMLString::transcode(expElement->getAttribute(field1XMLStr));
-                            f1Name = string(charValue);
-                            XMLString::release(&charValue);
+                            char *charValue = xercesc::XMLString::transcode(expElement->getAttribute(field1XMLStr));
+                            f1Name = std::string(charValue);
+                            xercesc::XMLString::release(&charValue);
                         }
                         else
                         {
@@ -1810,9 +1810,9 @@ namespace rsgis{namespace rastergis{
                         
                         if(expElement->hasAttribute(field2XMLStr))
                         {
-                            char *charValue = XMLString::transcode(expElement->getAttribute(field2XMLStr));
-                            f2Name = string(charValue);
-                            XMLString::release(&charValue);
+                            char *charValue = xercesc::XMLString::transcode(expElement->getAttribute(field2XMLStr));
+                            f2Name = std::string(charValue);
+                            xercesc::XMLString::release(&charValue);
                         }
                         else
                         {
@@ -1821,13 +1821,13 @@ namespace rsgis{namespace rastergis{
                         
                         exp = new RSGISAttExpressionGreaterThanEq(f1Name, f1Idx, f1Type, f2Name, f2Idx, f2Type);
                     }
-                    else if(XMLString::equals(typeInXMLStr, lteqXMLStr))
+                    else if(xercesc::XMLString::equals(typeInXMLStr, lteqXMLStr))
                     {
                         if(expElement->hasAttribute(field1XMLStr))
                         {
-                            char *charValue = XMLString::transcode(expElement->getAttribute(field1XMLStr));
-                            f1Name = string(charValue);
-                            XMLString::release(&charValue);
+                            char *charValue = xercesc::XMLString::transcode(expElement->getAttribute(field1XMLStr));
+                            f1Name = std::string(charValue);
+                            xercesc::XMLString::release(&charValue);
                         }
                         else
                         {
@@ -1836,9 +1836,9 @@ namespace rsgis{namespace rastergis{
                         
                         if(expElement->hasAttribute(field2XMLStr))
                         {
-                            char *charValue = XMLString::transcode(expElement->getAttribute(field2XMLStr));
-                            f2Name = string(charValue);
-                            XMLString::release(&charValue);
+                            char *charValue = xercesc::XMLString::transcode(expElement->getAttribute(field2XMLStr));
+                            f2Name = std::string(charValue);
+                            xercesc::XMLString::release(&charValue);
                         }
                         else
                         {
@@ -1847,13 +1847,13 @@ namespace rsgis{namespace rastergis{
                         
                         exp = new RSGISAttExpressionLessThanEq(f1Name, f1Idx, f1Type, f2Name, f2Idx, f2Type);
                     }
-                    else if(XMLString::equals(typeInXMLStr, eqXMLStr))
+                    else if(xercesc::XMLString::equals(typeInXMLStr, eqXMLStr))
                     {
                         if(expElement->hasAttribute(field1XMLStr))
                         {
-                            char *charValue = XMLString::transcode(expElement->getAttribute(field1XMLStr));
-                            f1Name = string(charValue);
-                            XMLString::release(&charValue);
+                            char *charValue = xercesc::XMLString::transcode(expElement->getAttribute(field1XMLStr));
+                            f1Name = std::string(charValue);
+                            xercesc::XMLString::release(&charValue);
                         }
                         else
                         {
@@ -1862,9 +1862,9 @@ namespace rsgis{namespace rastergis{
                         
                         if(expElement->hasAttribute(field2XMLStr))
                         {
-                            char *charValue = XMLString::transcode(expElement->getAttribute(field2XMLStr));
-                            f2Name = string(charValue);
-                            XMLString::release(&charValue);
+                            char *charValue = xercesc::XMLString::transcode(expElement->getAttribute(field2XMLStr));
+                            f2Name = std::string(charValue);
+                            xercesc::XMLString::release(&charValue);
                         }
                         else
                         {
@@ -1873,13 +1873,13 @@ namespace rsgis{namespace rastergis{
                         
                         exp = new RSGISAttExpressionEquals(f1Name, f1Idx, f1Type, f2Name, f2Idx, f2Type);
                     }
-                    else if(XMLString::equals(typeInXMLStr, neqXMLStr))
+                    else if(xercesc::XMLString::equals(typeInXMLStr, neqXMLStr))
                     {
                         if(expElement->hasAttribute(field1XMLStr))
                         {
-                            char *charValue = XMLString::transcode(expElement->getAttribute(field1XMLStr));
-                            f1Name = string(charValue);
-                            XMLString::release(&charValue);
+                            char *charValue = xercesc::XMLString::transcode(expElement->getAttribute(field1XMLStr));
+                            f1Name = std::string(charValue);
+                            xercesc::XMLString::release(&charValue);
                         }
                         else
                         {
@@ -1888,9 +1888,9 @@ namespace rsgis{namespace rastergis{
                         
                         if(expElement->hasAttribute(field2XMLStr))
                         {
-                            char *charValue = XMLString::transcode(expElement->getAttribute(field2XMLStr));
-                            f2Name = string(charValue);
-                            XMLString::release(&charValue);
+                            char *charValue = xercesc::XMLString::transcode(expElement->getAttribute(field2XMLStr));
+                            f2Name = std::string(charValue);
+                            xercesc::XMLString::release(&charValue);
                         }
                         else
                         {
@@ -1899,13 +1899,13 @@ namespace rsgis{namespace rastergis{
                         
                         exp = new RSGISAttExpressionNotEquals(f1Name, f1Idx, f1Type, f2Name, f2Idx, f2Type);
                     }
-                    else if(XMLString::equals(typeInXMLStr, gtConstXMLStr))
+                    else if(xercesc::XMLString::equals(typeInXMLStr, gtConstXMLStr))
                     {
                         if(expElement->hasAttribute(fieldXMLStr))
                         {
-                            char *charValue = XMLString::transcode(expElement->getAttribute(fieldXMLStr));
-                            f1Name = string(charValue);
-                            XMLString::release(&charValue);
+                            char *charValue = xercesc::XMLString::transcode(expElement->getAttribute(fieldXMLStr));
+                            f1Name = std::string(charValue);
+                            xercesc::XMLString::release(&charValue);
                         }
                         else
                         {
@@ -1914,9 +1914,9 @@ namespace rsgis{namespace rastergis{
                         
                         if(expElement->hasAttribute(valueXMLStr))
                         {
-                            char *charValue = XMLString::transcode(expElement->getAttribute(valueXMLStr));
-                            value = textUtils.strtofloat(string(charValue));
-                            XMLString::release(&charValue);
+                            char *charValue = xercesc::XMLString::transcode(expElement->getAttribute(valueXMLStr));
+                            value = textUtils.strtofloat(std::string(charValue));
+                            xercesc::XMLString::release(&charValue);
                         }
                         else
                         {
@@ -1925,13 +1925,13 @@ namespace rsgis{namespace rastergis{
                         
                         exp = new RSGISAttExpressionGreaterThanConst(f1Name, f1Idx, f1Type, value);
                     }
-                    else if(XMLString::equals(typeInXMLStr, ltConstXMLStr))
+                    else if(xercesc::XMLString::equals(typeInXMLStr, ltConstXMLStr))
                     {
                         if(expElement->hasAttribute(fieldXMLStr))
                         {
-                            char *charValue = XMLString::transcode(expElement->getAttribute(fieldXMLStr));
-                            f1Name = string(charValue);
-                            XMLString::release(&charValue);
+                            char *charValue = xercesc::XMLString::transcode(expElement->getAttribute(fieldXMLStr));
+                            f1Name = std::string(charValue);
+                            xercesc::XMLString::release(&charValue);
                         }
                         else
                         {
@@ -1940,9 +1940,9 @@ namespace rsgis{namespace rastergis{
                         
                         if(expElement->hasAttribute(valueXMLStr))
                         {
-                            char *charValue = XMLString::transcode(expElement->getAttribute(valueXMLStr));
-                            value = textUtils.strtofloat(string(charValue));
-                            XMLString::release(&charValue);
+                            char *charValue = xercesc::XMLString::transcode(expElement->getAttribute(valueXMLStr));
+                            value = textUtils.strtofloat(std::string(charValue));
+                            xercesc::XMLString::release(&charValue);
                         }
                         else
                         {
@@ -1951,13 +1951,13 @@ namespace rsgis{namespace rastergis{
                         
                         exp = new RSGISAttExpressionLessThanConst(f1Name, f1Idx, f1Type, value);
                     }
-                    else if(XMLString::equals(typeInXMLStr, gteqConstXMLStr))
+                    else if(xercesc::XMLString::equals(typeInXMLStr, gteqConstXMLStr))
                     {
                         if(expElement->hasAttribute(fieldXMLStr))
                         {
-                            char *charValue = XMLString::transcode(expElement->getAttribute(fieldXMLStr));
-                            f1Name = string(charValue);
-                            XMLString::release(&charValue);
+                            char *charValue = xercesc::XMLString::transcode(expElement->getAttribute(fieldXMLStr));
+                            f1Name = std::string(charValue);
+                            xercesc::XMLString::release(&charValue);
                         }
                         else
                         {
@@ -1966,9 +1966,9 @@ namespace rsgis{namespace rastergis{
                         
                         if(expElement->hasAttribute(valueXMLStr))
                         {
-                            char *charValue = XMLString::transcode(expElement->getAttribute(valueXMLStr));
-                            value = textUtils.strtofloat(string(charValue));
-                            XMLString::release(&charValue);
+                            char *charValue = xercesc::XMLString::transcode(expElement->getAttribute(valueXMLStr));
+                            value = textUtils.strtofloat(std::string(charValue));
+                            xercesc::XMLString::release(&charValue);
                         }
                         else
                         {
@@ -1977,13 +1977,13 @@ namespace rsgis{namespace rastergis{
                         
                         exp = new RSGISAttExpressionGreaterThanConstEq(f1Name, f1Idx, f1Type, value);
                     }
-                    else if(XMLString::equals(typeInXMLStr, lteqConstXMLStr))
+                    else if(xercesc::XMLString::equals(typeInXMLStr, lteqConstXMLStr))
                     {
                         if(expElement->hasAttribute(fieldXMLStr))
                         {
-                            char *charValue = XMLString::transcode(expElement->getAttribute(fieldXMLStr));
-                            f1Name = string(charValue);
-                            XMLString::release(&charValue);
+                            char *charValue = xercesc::XMLString::transcode(expElement->getAttribute(fieldXMLStr));
+                            f1Name = std::string(charValue);
+                            xercesc::XMLString::release(&charValue);
                         }
                         else
                         {
@@ -1992,9 +1992,9 @@ namespace rsgis{namespace rastergis{
                         
                         if(expElement->hasAttribute(valueXMLStr))
                         {
-                            char *charValue = XMLString::transcode(expElement->getAttribute(valueXMLStr));
-                            value = textUtils.strtofloat(string(charValue));
-                            XMLString::release(&charValue);
+                            char *charValue = xercesc::XMLString::transcode(expElement->getAttribute(valueXMLStr));
+                            value = textUtils.strtofloat(std::string(charValue));
+                            xercesc::XMLString::release(&charValue);
                         }
                         else
                         {
@@ -2003,13 +2003,13 @@ namespace rsgis{namespace rastergis{
                         
                         exp = new RSGISAttExpressionLessThanConstEq(f1Name, f1Idx, f1Type, value);
                     }
-                    else if(XMLString::equals(typeInXMLStr, eqConstXMLStr))
+                    else if(xercesc::XMLString::equals(typeInXMLStr, eqConstXMLStr))
                     {
                         if(expElement->hasAttribute(fieldXMLStr))
                         {
-                            char *charValue = XMLString::transcode(expElement->getAttribute(fieldXMLStr));
-                            f1Name = string(charValue);
-                            XMLString::release(&charValue);
+                            char *charValue = xercesc::XMLString::transcode(expElement->getAttribute(fieldXMLStr));
+                            f1Name = std::string(charValue);
+                            xercesc::XMLString::release(&charValue);
                         }
                         else
                         {
@@ -2018,9 +2018,9 @@ namespace rsgis{namespace rastergis{
                         
                         if(expElement->hasAttribute(valueXMLStr))
                         {
-                            char *charValue = XMLString::transcode(expElement->getAttribute(valueXMLStr));
-                            value = textUtils.strtofloat(string(charValue));
-                            XMLString::release(&charValue);
+                            char *charValue = xercesc::XMLString::transcode(expElement->getAttribute(valueXMLStr));
+                            value = textUtils.strtofloat(std::string(charValue));
+                            xercesc::XMLString::release(&charValue);
                         }
                         else
                         {
@@ -2029,13 +2029,13 @@ namespace rsgis{namespace rastergis{
                         
                         exp = new RSGISAttExpressionEqualsConst(f1Name, f1Idx, f1Type, value);
                     }
-                    else if(XMLString::equals(typeInXMLStr, neqConstXMLStr))
+                    else if(xercesc::XMLString::equals(typeInXMLStr, neqConstXMLStr))
                     {
                         if(expElement->hasAttribute(fieldXMLStr))
                         {
-                            char *charValue = XMLString::transcode(expElement->getAttribute(fieldXMLStr));
-                            f1Name = string(charValue);
-                            XMLString::release(&charValue);
+                            char *charValue = xercesc::XMLString::transcode(expElement->getAttribute(fieldXMLStr));
+                            f1Name = std::string(charValue);
+                            xercesc::XMLString::release(&charValue);
                         }
                         else
                         {
@@ -2044,9 +2044,9 @@ namespace rsgis{namespace rastergis{
                         
                         if(expElement->hasAttribute(valueXMLStr))
                         {
-                            char *charValue = XMLString::transcode(expElement->getAttribute(valueXMLStr));
-                            value = textUtils.strtofloat(string(charValue));
-                            XMLString::release(&charValue);
+                            char *charValue = xercesc::XMLString::transcode(expElement->getAttribute(valueXMLStr));
+                            value = textUtils.strtofloat(std::string(charValue));
+                            xercesc::XMLString::release(&charValue);
                         }
                         else
                         {
@@ -2055,13 +2055,13 @@ namespace rsgis{namespace rastergis{
                         
                         exp = new RSGISAttExpressionNotEqualsConst(f1Name, f1Idx, f1Type, value);
                     }
-                    else if(XMLString::equals(typeInXMLStr, constGTXMLStr))
+                    else if(xercesc::XMLString::equals(typeInXMLStr, constGTXMLStr))
                     {
                         if(expElement->hasAttribute(fieldXMLStr))
                         {
-                            char *charValue = XMLString::transcode(expElement->getAttribute(fieldXMLStr));
-                            f1Name = string(charValue);
-                            XMLString::release(&charValue);
+                            char *charValue = xercesc::XMLString::transcode(expElement->getAttribute(fieldXMLStr));
+                            f1Name = std::string(charValue);
+                            xercesc::XMLString::release(&charValue);
                         }
                         else
                         {
@@ -2070,9 +2070,9 @@ namespace rsgis{namespace rastergis{
                         
                         if(expElement->hasAttribute(valueXMLStr))
                         {
-                            char *charValue = XMLString::transcode(expElement->getAttribute(valueXMLStr));
-                            value = textUtils.strtofloat(string(charValue));
-                            XMLString::release(&charValue);
+                            char *charValue = xercesc::XMLString::transcode(expElement->getAttribute(valueXMLStr));
+                            value = textUtils.strtofloat(std::string(charValue));
+                            xercesc::XMLString::release(&charValue);
                         }
                         else
                         {
@@ -2081,13 +2081,13 @@ namespace rsgis{namespace rastergis{
                         
                         exp = new RSGISAttExpressionConstGreaterThan(f1Name, f1Idx, f1Type, value);
                     }
-                    else if(XMLString::equals(typeInXMLStr, constLTXMLStr))
+                    else if(xercesc::XMLString::equals(typeInXMLStr, constLTXMLStr))
                     {
                         if(expElement->hasAttribute(fieldXMLStr))
                         {
-                            char *charValue = XMLString::transcode(expElement->getAttribute(fieldXMLStr));
-                            f1Name = string(charValue);
-                            XMLString::release(&charValue);
+                            char *charValue = xercesc::XMLString::transcode(expElement->getAttribute(fieldXMLStr));
+                            f1Name = std::string(charValue);
+                            xercesc::XMLString::release(&charValue);
                         }
                         else
                         {
@@ -2096,9 +2096,9 @@ namespace rsgis{namespace rastergis{
                         
                         if(expElement->hasAttribute(valueXMLStr))
                         {
-                            char *charValue = XMLString::transcode(expElement->getAttribute(valueXMLStr));
-                            value = textUtils.strtofloat(string(charValue));
-                            XMLString::release(&charValue);
+                            char *charValue = xercesc::XMLString::transcode(expElement->getAttribute(valueXMLStr));
+                            value = textUtils.strtofloat(std::string(charValue));
+                            xercesc::XMLString::release(&charValue);
                         }
                         else
                         {
@@ -2107,13 +2107,13 @@ namespace rsgis{namespace rastergis{
                         
                         exp = new RSGISAttExpressionConstLessThan(f1Name, f1Idx, f1Type, value);
                     }
-                    else if(XMLString::equals(typeInXMLStr, constGTEQXMLStr))
+                    else if(xercesc::XMLString::equals(typeInXMLStr, constGTEQXMLStr))
                     {
                         if(expElement->hasAttribute(fieldXMLStr))
                         {
-                            char *charValue = XMLString::transcode(expElement->getAttribute(fieldXMLStr));
-                            f1Name = string(charValue);
-                            XMLString::release(&charValue);
+                            char *charValue = xercesc::XMLString::transcode(expElement->getAttribute(fieldXMLStr));
+                            f1Name = std::string(charValue);
+                            xercesc::XMLString::release(&charValue);
                         }
                         else
                         {
@@ -2122,9 +2122,9 @@ namespace rsgis{namespace rastergis{
                         
                         if(expElement->hasAttribute(valueXMLStr))
                         {
-                            char *charValue = XMLString::transcode(expElement->getAttribute(valueXMLStr));
-                            value = textUtils.strtofloat(string(charValue));
-                            XMLString::release(&charValue);
+                            char *charValue = xercesc::XMLString::transcode(expElement->getAttribute(valueXMLStr));
+                            value = textUtils.strtofloat(std::string(charValue));
+                            xercesc::XMLString::release(&charValue);
                         }
                         else
                         {
@@ -2133,13 +2133,13 @@ namespace rsgis{namespace rastergis{
                         
                         exp = new RSGISAttExpressionConstGreaterThanEq(f1Name, f1Idx, f1Type, value);
                     }
-                    else if(XMLString::equals(typeInXMLStr, constLTEQXMLStr))
+                    else if(xercesc::XMLString::equals(typeInXMLStr, constLTEQXMLStr))
                     {
                         if(expElement->hasAttribute(fieldXMLStr))
                         {
-                            char *charValue = XMLString::transcode(expElement->getAttribute(fieldXMLStr));
-                            f1Name = string(charValue);
-                            XMLString::release(&charValue);
+                            char *charValue = xercesc::XMLString::transcode(expElement->getAttribute(fieldXMLStr));
+                            f1Name = std::string(charValue);
+                            xercesc::XMLString::release(&charValue);
                         }
                         else
                         {
@@ -2148,9 +2148,9 @@ namespace rsgis{namespace rastergis{
                         
                         if(expElement->hasAttribute(valueXMLStr))
                         {
-                            char *charValue = XMLString::transcode(expElement->getAttribute(valueXMLStr));
-                            value = textUtils.strtofloat(string(charValue));
-                            XMLString::release(&charValue);
+                            char *charValue = xercesc::XMLString::transcode(expElement->getAttribute(valueXMLStr));
+                            value = textUtils.strtofloat(std::string(charValue));
+                            xercesc::XMLString::release(&charValue);
                         }
                         else
                         {
@@ -2170,30 +2170,30 @@ namespace rsgis{namespace rastergis{
                     throw RSGISAttributeTableException("No \'type\' attribute was provided for else.");
                 }
                 
-                XMLString::release(&typeXMLStr);
-                XMLString::release(&valueXMLStr);
-                XMLString::release(&fieldXMLStr);
-                XMLString::release(&field2XMLStr);
-                XMLString::release(&field1XMLStr);
-                XMLString::release(&andXMLStr);
-                XMLString::release(&orXMLStr);
-                XMLString::release(&notXMLStr);
-                XMLString::release(&gtXMLStr);
-                XMLString::release(&ltXMLStr);
-                XMLString::release(&gteqXMLStr);
-                XMLString::release(&lteqXMLStr);
-                XMLString::release(&eqXMLStr);
-                XMLString::release(&neqXMLStr);
-                XMLString::release(&gtConstXMLStr);
-                XMLString::release(&ltConstXMLStr);
-                XMLString::release(&gteqConstXMLStr);
-                XMLString::release(&lteqConstXMLStr);
-                XMLString::release(&eqConstXMLStr);
-                XMLString::release(&neqConstXMLStr);
-                XMLString::release(&constGTXMLStr);
-                XMLString::release(&constLTXMLStr);
-                XMLString::release(&constGTEQXMLStr);
-                XMLString::release(&constLTEQXMLStr);
+                xercesc::XMLString::release(&typeXMLStr);
+                xercesc::XMLString::release(&valueXMLStr);
+                xercesc::XMLString::release(&fieldXMLStr);
+                xercesc::XMLString::release(&field2XMLStr);
+                xercesc::XMLString::release(&field1XMLStr);
+                xercesc::XMLString::release(&andXMLStr);
+                xercesc::XMLString::release(&orXMLStr);
+                xercesc::XMLString::release(&notXMLStr);
+                xercesc::XMLString::release(&gtXMLStr);
+                xercesc::XMLString::release(&ltXMLStr);
+                xercesc::XMLString::release(&gteqXMLStr);
+                xercesc::XMLString::release(&lteqXMLStr);
+                xercesc::XMLString::release(&eqXMLStr);
+                xercesc::XMLString::release(&neqXMLStr);
+                xercesc::XMLString::release(&gtConstXMLStr);
+                xercesc::XMLString::release(&ltConstXMLStr);
+                xercesc::XMLString::release(&gteqConstXMLStr);
+                xercesc::XMLString::release(&lteqConstXMLStr);
+                xercesc::XMLString::release(&eqConstXMLStr);
+                xercesc::XMLString::release(&neqConstXMLStr);
+                xercesc::XMLString::release(&constGTXMLStr);
+                xercesc::XMLString::release(&constLTXMLStr);
+                xercesc::XMLString::release(&constGTEQXMLStr);
+                xercesc::XMLString::release(&constLTEQXMLStr);
             }
             else
             {
@@ -2209,19 +2209,19 @@ namespace rsgis{namespace rastergis{
     }
     
     
-    void RSGISAttributeTable::printSummaryHDFAtt(string inFile)throw(RSGISAttributeTableException)
+    void RSGISAttributeTable::printSummaryHDFAtt(std::string inFile)throw(RSGISAttributeTableException)
     {
         try
         {
-            Exception::dontPrint();
+            H5::Exception::dontPrint();
             
-            FileAccPropList attAccessPlist = FileAccPropList(FileAccPropList::DEFAULT);
+            H5::FileAccPropList attAccessPlist = H5::FileAccPropList(H5::FileAccPropList::DEFAULT);
             attAccessPlist.setCache(ATT_READ_MDC_NELMTS, ATT_READ_RDCC_NELMTS, ATT_READ_RDCC_NBYTES, ATT_READ_RDCC_W0);
             attAccessPlist.setSieveBufSize(ATT_READ_SIEVE_BUF);
             hsize_t metaBlockSize = ATT_READ_META_BLOCKSIZE;
             attAccessPlist.setMetaBlockSize(metaBlockSize);
             
-            H5File *attH5File = new H5File( inFile, H5F_ACC_RDONLY, FileCreatPropList::DEFAULT, attAccessPlist);
+            H5::H5File *attH5File = new H5::H5File( inFile, H5F_ACC_RDONLY, H5::FileCreatPropList::DEFAULT, attAccessPlist);
             
             bool hasBoolFields = true;
             bool hasIntFields = true;
@@ -2230,105 +2230,105 @@ namespace rsgis{namespace rastergis{
             hsize_t dimsAttSize[1];
 			dimsAttSize[0] = 1;
             size_t numFeats = 0;
-			DataSpace attSizeDataSpace(1, dimsAttSize);
-            DataSet sizeDataset = attH5File->openDataSet( ATT_SIZE_HEADER );
-            sizeDataset.read(&numFeats, PredType::NATIVE_ULLONG, attSizeDataSpace);
+			H5::DataSpace attSizeDataSpace(1, dimsAttSize);
+            H5::DataSet sizeDataset = attH5File->openDataSet( ATT_SIZE_HEADER );
+            sizeDataset.read(&numFeats, H5::PredType::NATIVE_ULLONG, attSizeDataSpace);
             attSizeDataSpace.close();
             
-            cout << "Table has " << numFeats << " features\n";
+            std::cout << "Table has " << numFeats << " features\n";
             
-            CompType *fieldCompTypeMem = RSGISAttributeTable::createAttibuteIdxCompTypeMem();
+            H5::CompType *fieldCompTypeMem = RSGISAttributeTable::createAttibuteIdxCompTypeMem();
             try
             {
-                DataSet boolFieldsDataset = attH5File->openDataSet( ATT_BOOL_FIELDS_HEADER );
-                DataSpace boolFieldsDataspace = boolFieldsDataset.getSpace();
+                H5::DataSet boolFieldsDataset = attH5File->openDataSet( ATT_BOOL_FIELDS_HEADER );
+                H5::DataSpace boolFieldsDataspace = boolFieldsDataset.getSpace();
                 
                 unsigned int numBoolFields = boolFieldsDataspace.getSelectNpoints();
                 
-                cout << "There are " << numBoolFields << " boolean fields." << endl;
+                std::cout << "There are " << numBoolFields << " boolean fields." << std::endl;
                 
                 RSGISAttributeIdx *fields = new RSGISAttributeIdx[numBoolFields];
                 
                 hsize_t boolFieldsDims[1]; 
                 boolFieldsDims[0] = numBoolFields;
-                DataSpace boolFieldsMemspace(1, boolFieldsDims);
+                H5::DataSpace boolFieldsMemspace(1, boolFieldsDims);
                 
                 boolFieldsDataset.read(fields, *fieldCompTypeMem, boolFieldsMemspace, boolFieldsDataspace);
                 
                 for(unsigned int i = 0; i < numBoolFields; ++i)
                 {
-                    cout << "Boolean Field: " << fields[i].name << " has index " << fields[i].idx << endl;
+                    std::cout << "Boolean Field: " << fields[i].name << " has index " << fields[i].idx << std::endl;
                 }
                 
                 delete[] fields;
             }
-            catch( Exception &e )
+            catch( H5::Exception &e )
             {
                 hasBoolFields = false;
             }
             
             try
             {
-                DataSet intFieldsDataset = attH5File->openDataSet( ATT_INT_FIELDS_HEADER );
-                DataSpace intFieldsDataspace = intFieldsDataset.getSpace();
+                H5::DataSet intFieldsDataset = attH5File->openDataSet( ATT_INT_FIELDS_HEADER );
+                H5::DataSpace intFieldsDataspace = intFieldsDataset.getSpace();
                 
                 unsigned int numIntFields = intFieldsDataspace.getSelectNpoints();
                 
-                cout << "There are " << numIntFields << " integer fields." << endl;
+                std::cout << "There are " << numIntFields << " integer fields." << std::endl;
                 
                 RSGISAttributeIdx *fields = new RSGISAttributeIdx[numIntFields];
                 
                 hsize_t intFieldsDims[1]; 
                 intFieldsDims[0] = numIntFields;
-                DataSpace intFieldsMemspace(1, intFieldsDims);
+                H5::DataSpace intFieldsMemspace(1, intFieldsDims);
                 
                 intFieldsDataset.read(fields, *fieldCompTypeMem, intFieldsMemspace, intFieldsDataspace);
                 
                 for(unsigned int i = 0; i < numIntFields; ++i)
                 {
-                    cout << "Integer Field: " << fields[i].name << ": " << fields[i].idx << endl;
+                    std::cout << "Integer Field: " << fields[i].name << ": " << fields[i].idx << std::endl;
                 }
                 
                 delete[] fields;
             }
-            catch( Exception &e )
+            catch( H5::Exception &e )
             {
                 hasIntFields = false;
             }
             
             try
             {
-                DataSet floatFieldsDataset = attH5File->openDataSet( ATT_FLOAT_FIELDS_HEADER );
-                DataSpace floatFieldsDataspace = floatFieldsDataset.getSpace();
+                H5::DataSet floatFieldsDataset = attH5File->openDataSet( ATT_FLOAT_FIELDS_HEADER );
+                H5::DataSpace floatFieldsDataspace = floatFieldsDataset.getSpace();
                 
                 unsigned int numFloatFields = floatFieldsDataspace.getSelectNpoints();
                 
-                cout << "There are " << numFloatFields << " float fields." << endl;
+                std::cout << "There are " << numFloatFields << " float fields." << std::endl;
                 
                 RSGISAttributeIdx *fields = new RSGISAttributeIdx[numFloatFields];
                 
                 hsize_t floatFieldsDims[1]; 
                 floatFieldsDims[0] = numFloatFields;
-                DataSpace floatFieldsMemspace(1, floatFieldsDims);
+                H5::DataSpace floatFieldsMemspace(1, floatFieldsDims);
                 
                 floatFieldsDataset.read(fields, *fieldCompTypeMem, floatFieldsMemspace, floatFieldsDataspace);
                 
                 for(unsigned int i = 0; i < numFloatFields; ++i)
                 {
-                    cout << "Float Field: " << fields[i].name << ": " << fields[i].idx << endl;
+                    std::cout << "Float Field: " << fields[i].name << ": " << fields[i].idx << std::endl;
                 }
                 
                 delete[] fields;
             }
-            catch( Exception &e )
+            catch( H5::Exception &e )
             {
                 hasFloatFields = false;
             }
             
             delete fieldCompTypeMem;
             
-            DataSet neighboursDataset = attH5File->openDataSet( ATT_NEIGHBOURS_DATA );
-            DataSpace neighboursDataspace = neighboursDataset.getSpace();
+            H5::DataSet neighboursDataset = attH5File->openDataSet( ATT_NEIGHBOURS_DATA );
+            H5::DataSpace neighboursDataspace = neighboursDataset.getSpace();
             
             int neighboursNDims = neighboursDataspace.getSimpleExtentNdims();
             if(neighboursNDims != 1)
@@ -2351,7 +2351,7 @@ namespace rsgis{namespace rastergis{
             
             /* Neighbours */
             hvl_t *neighbourVals = new hvl_t[ATT_WRITE_CHUNK_SIZE];
-            DataType intVarLenMemDT = VarLenType(&PredType::NATIVE_UINT64);
+            H5::DataType intVarLenMemDT = H5::VarLenType(&H5::PredType::NATIVE_UINT64);
             hsize_t neighboursOffset[1];
 			neighboursOffset[0] = 0;
 			hsize_t neighboursCount[1];
@@ -2360,7 +2360,7 @@ namespace rsgis{namespace rastergis{
 			
 			hsize_t neighboursDimsRead[1]; 
 			neighboursDimsRead[0] = ATT_WRITE_CHUNK_SIZE;
-			DataSpace neighboursMemspace( 1, neighboursDimsRead );
+			H5::DataSpace neighboursMemspace( 1, neighboursDimsRead );
 			
 			hsize_t neighboursOffset_out[1];
             neighboursOffset_out[0] = 0;
@@ -2407,7 +2407,7 @@ namespace rsgis{namespace rastergis{
 			neighboursDataspace.selectHyperslab( H5S_SELECT_SET, neighboursCount, neighboursOffset );
 			
 			neighboursDimsRead[0] = remainingRows;
-			neighboursMemspace = DataSpace( 1, neighboursDimsRead );
+			neighboursMemspace = H5::DataSpace( 1, neighboursDimsRead );
 			
             neighboursOffset_out[0] = 0;
 			neighboursCount_out[0] = remainingRows;
@@ -2444,23 +2444,23 @@ namespace rsgis{namespace rastergis{
         {
             throw RSGISAttributeTableException(e.what());
         }
-        catch( FileIException &e )
+        catch( H5::FileIException &e )
         {
             throw RSGISAttributeTableException(e.getDetailMsg());
         }
-        catch( DataSetIException &e )
+        catch( H5::DataSetIException &e )
         {
             throw RSGISAttributeTableException(e.getDetailMsg());
         }
-        catch( DataSpaceIException &e )
+        catch( H5::DataSpaceIException &e )
         {
             throw RSGISAttributeTableException(e.getDetailMsg());
         }
-        catch( DataTypeIException &e )
+        catch( H5::DataTypeIException &e )
         {
             throw RSGISAttributeTableException(e.getDetailMsg());
         }
-        catch( Exception &e )
+        catch( H5::Exception &e )
         {
             throw RSGISAttributeTableException(e.getDetailMsg());
         }

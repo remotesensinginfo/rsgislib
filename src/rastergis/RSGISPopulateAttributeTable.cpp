@@ -30,13 +30,13 @@ namespace rsgis{namespace rastergis{
         
     }
     
-    RSGISAttributeTable* RSGISPopulateAttributeTableBandMeans::populateWithBandsMeans(GDALDataset **datasets, int numDatasets, string attrPrefix)throw(RSGISImageCalcException, RSGISAttributeTableException)
+    RSGISAttributeTable* RSGISPopulateAttributeTableBandMeans::populateWithBandsMeans(GDALDataset **datasets, int numDatasets, std::string attrPrefix)throw(rsgis::img::RSGISImageCalcException, RSGISAttributeTableException)
     {
         if(numDatasets < 2)
         {
-            throw RSGISImageCalcException("At least two datasets are required for this fucntion.");
+            throw rsgis::img::RSGISImageCalcException("At least two datasets are required for this fucntion.");
         }
-        RSGISMathsUtils mathUtils;
+        rsgis::math::RSGISMathsUtils mathUtils;
         
         RSGISAttributeTable *attTable = NULL;
         
@@ -54,31 +54,31 @@ namespace rsgis{namespace rastergis{
             
             // Generate Attribute table
             cout << "Creating blank attribute table\n";
-            vector<pair<string, RSGISAttributeDataType> > *fields = new vector<pair<string, RSGISAttributeDataType> >();
-            fields->push_back(pair<string, RSGISAttributeDataType>(attrPrefix + string("_pxlcount"), rsgis_int));
+            vector<pair<std::string, RSGISAttributeDataType> > *fields = new vector<pair<std::string, RSGISAttributeDataType> >();
+            fields->push_back(pair<std::string, RSGISAttributeDataType>(attrPrefix + std::string("_pxlcount"), rsgis_int));
             
-            string fieldName = "";
+            std::string fieldName = "";
             for(unsigned int i = 0; i < numRasterBands; ++i)
             {
-                fieldName = attrPrefix + string("_b") + mathUtils.uinttostring(i+1);
-                fields->push_back(pair<string, RSGISAttributeDataType>(fieldName, rsgis_float));
+                fieldName = attrPrefix + std::string("_b") + mathUtils.uinttostring(i+1);
+                fields->push_back(pair<std::string, RSGISAttributeDataType>(fieldName, rsgis_float));
             }
             attTable = new RSGISAttributeTableMem(numClumps, fields);
             
             unsigned int pxlCountIdx;
             unsigned int *bandMeanIdxs = new unsigned int[numRasterBands];
             
-            pxlCountIdx = attTable->getFieldIndex(attrPrefix + string("_pxlcount"));
+            pxlCountIdx = attTable->getFieldIndex(attrPrefix + std::string("_pxlcount"));
             for(unsigned int i = 0; i < numRasterBands; ++i)
             {
-                fieldName = attrPrefix + string("_b") + mathUtils.uinttostring(i+1);
+                fieldName = attrPrefix + std::string("_b") + mathUtils.uinttostring(i+1);
                 bandMeanIdxs[i] = attTable->getFieldIndex(fieldName);
             }
             
             // Populate the attribute table.
             cout << "Populating the attribute table with sum and count values\n";
             RSGISPopulateAttributeTableBandMeansCalcImg *popTabMeans = new RSGISPopulateAttributeTableBandMeansCalcImg(attTable, attrPrefix, pxlCountIdx, bandMeanIdxs, numRasterBands);
-            RSGISCalcImage calcImage(popTabMeans);
+            rsgis::img::RSGISCalcImage calcImage(popTabMeans);
             calcImage.calcImage(datasets, numDatasets);
             delete popTabMeans;
             
@@ -86,7 +86,7 @@ namespace rsgis{namespace rastergis{
             cout << "Calc mean values\n";
             long pxlCount = 0;
             double sumVal = 0;
-            string pxlCountName = attrPrefix + string("_pxlcount");
+            std::string pxlCountName = attrPrefix + std::string("_pxlcount");
             for(unsigned long long i = 0; i < numClumps; ++i)
             {
                 RSGISFeature *feat = attTable->getFeature(i);
@@ -105,13 +105,13 @@ namespace rsgis{namespace rastergis{
             
             delete[] bandMeanIdxs;
         } 
-        catch (RSGISImageCalcException &e) 
+        catch (rsgis::img::RSGISImageCalcException &e) 
         {
             throw e;
         }
-        catch(RSGISImageBandException &e)
+        catch(rsgis::img::RSGISImageBandException &e)
         {
-            throw RSGISImageCalcException(e.what());
+            throw rsgis::img::RSGISImageCalcException(e.what());
         }
         catch (RSGISAttributeTableException &e) 
         {
@@ -125,7 +125,7 @@ namespace rsgis{namespace rastergis{
         return attTable;
     }
     
-    unsigned long long RSGISPopulateAttributeTableBandMeans::calcMaxValue(GDALDataset *dataset)throw(RSGISImageCalcException)
+    unsigned long long RSGISPopulateAttributeTableBandMeans::calcMaxValue(GDALDataset *dataset)throw(rsgis::img::RSGISImageCalcException)
     {
         unsigned int width = dataset->GetRasterXSize();
         unsigned int height = dataset->GetRasterYSize();
@@ -162,7 +162,7 @@ namespace rsgis{namespace rastergis{
     }
     
 
-    RSGISPopulateAttributeTableBandMeansCalcImg::RSGISPopulateAttributeTableBandMeansCalcImg(RSGISAttributeTable *attTable, string attrPrefix, unsigned int pxlCountIdx, unsigned int *bandMeanIdxs, unsigned int numBandMeanIdxs):RSGISCalcImageValue(0)
+    RSGISPopulateAttributeTableBandMeansCalcImg::RSGISPopulateAttributeTableBandMeansCalcImg(RSGISAttributeTable *attTable, std::string attrPrefix, unsigned int pxlCountIdx, unsigned int *bandMeanIdxs, unsigned int numBandMeanIdxs):rsgis::img::RSGISCalcImageValue(0)
     {
         this->attTable = attTable;
         this->attrPrefix = attrPrefix;
@@ -171,22 +171,22 @@ namespace rsgis{namespace rastergis{
         this->numBandMeanIdxs = numBandMeanIdxs;
     }
     
-    void RSGISPopulateAttributeTableBandMeansCalcImg::calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException)
+    void RSGISPopulateAttributeTableBandMeansCalcImg::calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException)
     {
         if(((long)numBandMeanIdxs) != (numBands-1))
         {
-            throw RSGISImageCalcException("The number of indexes provided and input bands is different.");
+            throw rsgis::img::RSGISImageCalcException("The number of indexes provided and input bands is different.");
         }
         
         unsigned long clumpIdx = 0;
         
         try
         {
-            clumpIdx = lexical_cast<unsigned long>(bandValues[0]);
+            clumpIdx = boost::lexical_cast<unsigned long>(bandValues[0]);
         }
-        catch(bad_lexical_cast &e)
+        catch(boost::bad_lexical_cast &e)
         {
-            throw RSGISImageCalcException(e.what());
+            throw rsgis::img::RSGISImageCalcException(e.what());
         }
         
         if(clumpIdx > 0)
@@ -219,7 +219,7 @@ namespace rsgis{namespace rastergis{
             catch(RSGISAttributeTableException &e)
             {
                 cout << "clumpIdx = " << clumpIdx << endl;
-                throw RSGISImageCalcException(e.what());
+                throw rsgis::img::RSGISImageCalcException(e.what());
             }
         }        
     }
@@ -236,34 +236,34 @@ namespace rsgis{namespace rastergis{
         
     }
     
-    void RSGISPopulateAttributeTableBandWithSumAndMeans::populateWithBandStatistics(RSGISAttributeTable *attTable, GDALDataset **datasets, int numDatasets, vector<RSGISBandAttStats*> *bandStats) throw(RSGISImageCalcException, RSGISAttributeTableException)
+    void RSGISPopulateAttributeTableBandWithSumAndMeans::populateWithBandStatistics(RSGISAttributeTable *attTable, GDALDataset **datasets, int numDatasets, vector<RSGISBandAttStats*> *bandStats) throw(rsgis::img::RSGISImageCalcException, RSGISAttributeTableException)
     {
         if(numDatasets != 2)
         {
-            throw RSGISImageCalcException("Two datasets are required for this fucntion.");
+            throw rsgis::img::RSGISImageCalcException("Two datasets are required for this fucntion.");
         }
         
         try 
         {
             if(datasets[0]->GetRasterCount() != 1)
             {
-                throw RSGISImageCalcException("Clumps image should only have 1 image band.");
+                throw rsgis::img::RSGISImageCalcException("Clumps image should only have 1 image band.");
             }
             
             if(datasets[1]->GetRasterCount() < ((int)bandStats->size()))
             {
-                throw RSGISImageCalcException("More band stats were requested than bands in the file.");
+                throw rsgis::img::RSGISImageCalcException("More band stats were requested than bands in the file.");
             }
                         
             for(vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
             {
                 if((*iterBands)->band == 0)
                 {
-                    throw RSGISImageCalcException("Band numbers start at 1.");
+                    throw rsgis::img::RSGISImageCalcException("Band numbers start at 1.");
                 }
                 else if(((int)(*iterBands)->band) > datasets[1]->GetRasterCount())
                 {
-                    throw RSGISImageCalcException("Band specified is not within the image.");
+                    throw rsgis::img::RSGISImageCalcException("Band specified is not within the image.");
                 }
                 
                 if((*iterBands)->calcMean)
@@ -307,7 +307,7 @@ namespace rsgis{namespace rastergis{
             }
             else if(attTable->getDataType("pxlcount") != rsgis_int)
             {
-                throw RSGISImageCalcException("Cannot proceed as \'pxlcount\' field is not of type integer.");
+                throw rsgis::img::RSGISImageCalcException("Cannot proceed as \'pxlcount\' field is not of type integer.");
             }
             size_t pxlCountIdx = attTable->getFieldIndex("pxlcount");
             
@@ -337,7 +337,7 @@ namespace rsgis{namespace rastergis{
             }
             
             RSGISCalcClumpSumAndCount *clumpSumAndCount = new RSGISCalcClumpSumAndCount(pxlCount, sumVals, bandIdxs, fieldCount, attTable->getSize());
-            RSGISCalcImage calcImage(clumpSumAndCount);
+            rsgis::img::RSGISCalcImage calcImage(clumpSumAndCount);
             calcImage.calcImage(datasets, numDatasets);
             delete clumpSumAndCount;
             
@@ -382,7 +382,7 @@ namespace rsgis{namespace rastergis{
         {
             throw e;
         }
-        catch (RSGISImageCalcException &e) 
+        catch (rsgis::img::RSGISImageCalcException &e) 
         {
             throw e;
         }
@@ -400,23 +400,23 @@ namespace rsgis{namespace rastergis{
         
     }
         
-    void RSGISPopulateAttributeTableBandStats::populateWithBandStatisticsInMem(RSGISAttributeTable *attTable, GDALDataset **datasets, int numDatasets, vector<RSGISBandAttStats*> *bandStats) throw(RSGISImageCalcException, RSGISAttributeTableException)
+    void RSGISPopulateAttributeTableBandStats::populateWithBandStatisticsInMem(RSGISAttributeTable *attTable, GDALDataset **datasets, int numDatasets, vector<RSGISBandAttStats*> *bandStats) throw(rsgis::img::RSGISImageCalcException, RSGISAttributeTableException)
     {
         if(numDatasets != 2)
         {
-            throw RSGISImageCalcException("Two datasets are required for this fucntion.");
+            throw rsgis::img::RSGISImageCalcException("Two datasets are required for this fucntion.");
         }
         
         try 
         {
             if(datasets[0]->GetRasterCount() != 1)
             {
-                throw RSGISImageCalcException("Clumps image should only have 1 image band.");
+                throw rsgis::img::RSGISImageCalcException("Clumps image should only have 1 image band.");
             }
             
             if(datasets[1]->GetRasterCount() < ((int)bandStats->size()))
             {
-                throw RSGISImageCalcException("More band stats were requested than bands in the file.");
+                throw rsgis::img::RSGISImageCalcException("More band stats were requested than bands in the file.");
             }
             
             unsigned int numDataBands = bandStats->size();
@@ -443,11 +443,11 @@ namespace rsgis{namespace rastergis{
             {
                 if((*iterBands)->band == 0)
                 {
-                    throw RSGISImageCalcException("Band numbers start at 1.");
+                    throw rsgis::img::RSGISImageCalcException("Band numbers start at 1.");
                 }
                 else if(((int)(*iterBands)->band) > datasets[1]->GetRasterCount())
                 {
-                    throw RSGISImageCalcException("Band specified is not within the image.");
+                    throw rsgis::img::RSGISImageCalcException("Band specified is not within the image.");
                 }
                 
                 dataBandIdxs[bandCount++] = (*iterBands)->band;                
@@ -578,7 +578,7 @@ namespace rsgis{namespace rastergis{
             
             // Extract Data from Image.
             RSGISGetPixelValuesForClumps *getImageVals = new RSGISGetPixelValuesForClumps(clumpData, numDataBands, dataBandIdxs);
-            RSGISCalcImage calcImage(getImageVals);
+            rsgis::img::RSGISCalcImage calcImage(getImageVals);
             calcImage.calcImage(datasets, numDatasets);
             delete getImageVals;
 
@@ -676,30 +676,30 @@ namespace rsgis{namespace rastergis{
         {
             throw e;
         }
-        catch (RSGISImageCalcException &e) 
+        catch (rsgis::img::RSGISImageCalcException &e) 
         {
             throw e;
         }
 
     }
     
-    void RSGISPopulateAttributeTableBandStats::populateWithBandStatisticsWithinAtt(RSGISAttributeTable *attTable, GDALDataset **datasets, int numDatasets, vector<RSGISBandAttStats*> *bandStats) throw(RSGISImageCalcException, RSGISAttributeTableException)
+    void RSGISPopulateAttributeTableBandStats::populateWithBandStatisticsWithinAtt(RSGISAttributeTable *attTable, GDALDataset **datasets, int numDatasets, vector<RSGISBandAttStats*> *bandStats) throw(rsgis::img::RSGISImageCalcException, RSGISAttributeTableException)
     {
         if(numDatasets != 2)
         {
-            throw RSGISImageCalcException("Two datasets are required for this fucntion.");
+            throw rsgis::img::RSGISImageCalcException("Two datasets are required for this fucntion.");
         }
         
         try 
         {
             if(datasets[0]->GetRasterCount() != 1)
             {
-                throw RSGISImageCalcException("Clumps image should only have 1 image band.");
+                throw rsgis::img::RSGISImageCalcException("Clumps image should only have 1 image band.");
             }
             
             if(datasets[1]->GetRasterCount() < ((int)bandStats->size()))
             {
-                throw RSGISImageCalcException("More band stats were requested than bands in the file.");
+                throw rsgis::img::RSGISImageCalcException("More band stats were requested than bands in the file.");
             }
                         
             if(!attTable->hasAttribute("pxlcount"))
@@ -708,7 +708,7 @@ namespace rsgis{namespace rastergis{
             }
             else if(attTable->getDataType("pxlcount") != rsgis_int)
             {
-                throw RSGISImageCalcException("Cannot proceed as \'pxlcount\' field is not of type integer.");
+                throw rsgis::img::RSGISImageCalcException("Cannot proceed as \'pxlcount\' field is not of type integer.");
             }
             unsigned int pxlCountIdx = attTable->getFieldIndex("pxlcount");
                         
@@ -718,7 +718,7 @@ namespace rsgis{namespace rastergis{
             }
             else if(attTable->getDataType("first") != rsgis_bool)
             {
-                throw RSGISImageCalcException("Cannot proceed as \'first\' field is not of type boolean.");
+                throw rsgis::img::RSGISImageCalcException("Cannot proceed as \'first\' field is not of type boolean.");
             }
             unsigned int firstFieldIdx = attTable->getFieldIndex("first");
                         
@@ -728,11 +728,11 @@ namespace rsgis{namespace rastergis{
             {
                 if((*iterBands)->band == 0)
                 {
-                    throw RSGISImageCalcException("Band numbers start at 1.");
+                    throw rsgis::img::RSGISImageCalcException("Band numbers start at 1.");
                 }
                 else if(((int)(*iterBands)->band) > datasets[1]->GetRasterCount())
                 {
-                    throw RSGISImageCalcException("Band specified is not within the image.");
+                    throw rsgis::img::RSGISImageCalcException("Band specified is not within the image.");
                 }
                 
                 if((*iterBands)->calcMin)
@@ -831,7 +831,7 @@ namespace rsgis{namespace rastergis{
             // Calculate Appropriate Min, Max, Sum and Mean Values.
             attTable->setBoolValue("first", true);
             RSGISCalcClumpStatsWithinAtt *calcAttStats = new RSGISCalcClumpStatsWithinAtt(attTable, bandStats, false, pxlCountIdx, firstFieldIdx);
-            RSGISCalcImage calcImage(calcAttStats);
+            rsgis::img::RSGISCalcImage calcImage(calcAttStats);
             calcImage.calcImage(datasets, numDatasets);
             delete calcAttStats;
             
@@ -870,7 +870,7 @@ namespace rsgis{namespace rastergis{
                     // Extract Data from Image.
                     attTable->setBoolValue("first", true);
                     calcAttStats = new RSGISCalcClumpStatsWithinAtt(attTable, bandStats, true, pxlCountIdx, firstFieldIdx);
-                    RSGISCalcImage calcImageStdDev(calcAttStats);
+                    rsgis::img::RSGISCalcImage calcImageStdDev(calcAttStats);
                     calcImageStdDev.calcImage(datasets, numDatasets);
                     delete calcAttStats;
                     
@@ -904,7 +904,7 @@ namespace rsgis{namespace rastergis{
         {
             throw e;
         }
-        catch (RSGISImageCalcException &e) 
+        catch (rsgis::img::RSGISImageCalcException &e) 
         {
             throw e;
         }
@@ -923,23 +923,23 @@ namespace rsgis{namespace rastergis{
         
     }
     
-    void RSGISPopulateAttributeTableBandThresholdedStats::populateWithBandStatisticsWithinAtt(RSGISAttributeTable *attTable, GDALDataset **datasets, int numDatasets, vector<RSGISBandAttStats*> *bandStats) throw(RSGISImageCalcException, RSGISAttributeTableException)
+    void RSGISPopulateAttributeTableBandThresholdedStats::populateWithBandStatisticsWithinAtt(RSGISAttributeTable *attTable, GDALDataset **datasets, int numDatasets, vector<RSGISBandAttStats*> *bandStats) throw(rsgis::img::RSGISImageCalcException, RSGISAttributeTableException)
     {
         if(numDatasets != 2)
         {
-            throw RSGISImageCalcException("Two datasets are required for this fucntion.");
+            throw rsgis::img::RSGISImageCalcException("Two datasets are required for this fucntion.");
         }
         
         try 
         {
             if(datasets[0]->GetRasterCount() != 1)
             {
-                throw RSGISImageCalcException("Clumps image should only have 1 image band.");
+                throw rsgis::img::RSGISImageCalcException("Clumps image should only have 1 image band.");
             }
             
             if(datasets[1]->GetRasterCount() < ((int)bandStats->size()))
             {
-                throw RSGISImageCalcException("More band stats were requested than bands in the file.");
+                throw rsgis::img::RSGISImageCalcException("More band stats were requested than bands in the file.");
             }
                         
             if(!attTable->hasAttribute("first"))
@@ -948,7 +948,7 @@ namespace rsgis{namespace rastergis{
             }
             else if(attTable->getDataType("first") != rsgis_bool)
             {
-                throw RSGISImageCalcException("Cannot proceed as \'first\' field is not of type boolean.");
+                throw rsgis::img::RSGISImageCalcException("Cannot proceed as \'first\' field is not of type boolean.");
             }
             unsigned int firstFieldIdx = attTable->getFieldIndex("first");
                         
@@ -958,11 +958,11 @@ namespace rsgis{namespace rastergis{
             {
                 if((*iterBands)->band == 0)
                 {
-                    throw RSGISImageCalcException("Band numbers start at 1.");
+                    throw rsgis::img::RSGISImageCalcException("Band numbers start at 1.");
                 }
                 else if(((int)(*iterBands)->band) > datasets[1]->GetRasterCount())
                 {
-                    throw RSGISImageCalcException("Band specified is not within the image.");
+                    throw rsgis::img::RSGISImageCalcException("Band specified is not within the image.");
                 }
                 
                 if(attTable->hasAttribute((*iterBands)->countField))
@@ -1076,7 +1076,7 @@ namespace rsgis{namespace rastergis{
             attTable->setBoolValue("first", true);
 
             RSGISCalcClumpThresholdedStatsWithinAtt *calcAttStats = new RSGISCalcClumpThresholdedStatsWithinAtt(attTable, bandStats, false, firstFieldIdx);
-            RSGISCalcImage calcImage(calcAttStats);
+            rsgis::img::RSGISCalcImage calcImage(calcAttStats);
             calcImage.calcImage(datasets, numDatasets);
             delete calcAttStats;
             
@@ -1124,7 +1124,7 @@ namespace rsgis{namespace rastergis{
                     // Extract Data from Image.
                     attTable->setBoolValue("first", true);
                     calcAttStats = new RSGISCalcClumpThresholdedStatsWithinAtt(attTable, bandStats, true, firstFieldIdx);
-                    RSGISCalcImage calcImageStdDev(calcAttStats);
+                    rsgis::img::RSGISCalcImage calcImageStdDev(calcAttStats);
                     calcImageStdDev.calcImage(datasets, numDatasets);
                     delete calcAttStats;
                     
@@ -1167,17 +1167,17 @@ namespace rsgis{namespace rastergis{
         {
             throw e;
         }
-        catch (RSGISImageCalcException &e) 
+        catch (rsgis::img::RSGISImageCalcException &e) 
         {
             throw e;
         }
         catch (RSGISException &e) 
         {
-            throw RSGISImageCalcException(e.what());
+            throw rsgis::img::RSGISImageCalcException(e.what());
         }
         catch (exception &e) 
         {
-            throw RSGISImageCalcException(e.what());
+            throw rsgis::img::RSGISImageCalcException(e.what());
         }
         
     }
@@ -1196,23 +1196,23 @@ namespace rsgis{namespace rastergis{
         
     }
     
-    void RSGISPopulateAttributeTableBandStatsMeanLit::populateWithBandStatisticsInMem(RSGISAttributeTable *attTable, GDALDataset **datasets, int numDatasets, vector<RSGISBandAttStats*> *bandStats, unsigned int meanLitBand, string meanLitField, bool useMeanLitValAbove) throw(RSGISImageCalcException, RSGISAttributeTableException)
+    void RSGISPopulateAttributeTableBandStatsMeanLit::populateWithBandStatisticsInMem(RSGISAttributeTable *attTable, GDALDataset **datasets, int numDatasets, vector<RSGISBandAttStats*> *bandStats, unsigned int meanLitBand, std::string meanLitField, bool useMeanLitValAbove) throw(rsgis::img::RSGISImageCalcException, RSGISAttributeTableException)
     {
         if(numDatasets != 3)
         {
-            throw RSGISImageCalcException("Three datasets are required for this fucntion.");
+            throw rsgis::img::RSGISImageCalcException("Three datasets are required for this fucntion.");
         }
         
         try 
         {
             if(datasets[0]->GetRasterCount() != 1)
             {
-                throw RSGISImageCalcException("Clumps image should only have 1 image band.");
+                throw rsgis::img::RSGISImageCalcException("Clumps image should only have 1 image band.");
             }
             
             if(datasets[1]->GetRasterCount() < ((int)bandStats->size()))
             {
-                throw RSGISImageCalcException("More band stats were requested than bands in the file.");
+                throw rsgis::img::RSGISImageCalcException("More band stats were requested than bands in the file.");
             }
             
             unsigned int meanLitFieldIdx = 0;
@@ -1255,11 +1255,11 @@ namespace rsgis{namespace rastergis{
             {
                 if((*iterBands)->band == 0)
                 {
-                    throw RSGISImageCalcException("Band numbers start at 1.");
+                    throw rsgis::img::RSGISImageCalcException("Band numbers start at 1.");
                 }
                 else if(((int)(*iterBands)->band) > datasets[1]->GetRasterCount())
                 {
-                    throw RSGISImageCalcException("Band specified is not within the image.");
+                    throw rsgis::img::RSGISImageCalcException("Band specified is not within the image.");
                 }
                 
                 dataBandIdxs[bandCount++] = (*iterBands)->band;                
@@ -1390,7 +1390,7 @@ namespace rsgis{namespace rastergis{
             
             // Extract Data from Image.
             RSGISGetPixelValuesForClumpsMeanLit *getImageVals = new RSGISGetPixelValuesForClumpsMeanLit(attTable, clumpData, numDataBands, dataBandIdxs, meanLitBand, meanLitFieldIdx, meanLitFieldDT, useMeanLitValAbove);
-            RSGISCalcImage calcImage(getImageVals);
+            rsgis::img::RSGISCalcImage calcImage(getImageVals);
             calcImage.calcImage(datasets, numDatasets);
             delete getImageVals;
             
@@ -1487,29 +1487,29 @@ namespace rsgis{namespace rastergis{
         {
             throw e;
         }
-        catch (RSGISImageCalcException &e) 
+        catch (rsgis::img::RSGISImageCalcException &e) 
         {
             throw e;
         }
     }
     
-    void RSGISPopulateAttributeTableBandStatsMeanLit::populateWithBandStatisticsWithinAtt(RSGISAttributeTable *attTable, GDALDataset **datasets, int numDatasets, vector<RSGISBandAttStats*> *bandStats, unsigned int meanLitBand, string meanLitField, bool useMeanLitValAbove) throw(RSGISImageCalcException, RSGISAttributeTableException)
+    void RSGISPopulateAttributeTableBandStatsMeanLit::populateWithBandStatisticsWithinAtt(RSGISAttributeTable *attTable, GDALDataset **datasets, int numDatasets, vector<RSGISBandAttStats*> *bandStats, unsigned int meanLitBand, std::string meanLitField, bool useMeanLitValAbove) throw(rsgis::img::RSGISImageCalcException, RSGISAttributeTableException)
     {
         if(numDatasets != 3)
         {
-            throw RSGISImageCalcException("Three datasets are required for this fucntion.");
+            throw rsgis::img::RSGISImageCalcException("Three datasets are required for this fucntion.");
         }
         
         try 
         {
             if(datasets[0]->GetRasterCount() != 1)
             {
-                throw RSGISImageCalcException("Clumps image should only have 1 image band.");
+                throw rsgis::img::RSGISImageCalcException("Clumps image should only have 1 image band.");
             }
             
             if(datasets[1]->GetRasterCount() < ((int)bandStats->size()))
             {
-                throw RSGISImageCalcException("More band stats were requested than bands in the file.");
+                throw rsgis::img::RSGISImageCalcException("More band stats were requested than bands in the file.");
             }
             
             unsigned int meanLitFieldIdx = 0;
@@ -1534,7 +1534,7 @@ namespace rsgis{namespace rastergis{
             }
             else if(attTable->getDataType("mlpxlcount") != rsgis_int)
             {
-                throw RSGISImageCalcException("Cannot proceed as \'mlpxlcount\' field is not of type integer.");
+                throw rsgis::img::RSGISImageCalcException("Cannot proceed as \'mlpxlcount\' field is not of type integer.");
             }
             unsigned int pxlCountIdx = attTable->getFieldIndex("mlpxlcount");
             
@@ -1544,7 +1544,7 @@ namespace rsgis{namespace rastergis{
             }
             else if(attTable->getDataType("first") != rsgis_bool)
             {
-                throw RSGISImageCalcException("Cannot proceed as \'first\' field is not of type boolean.");
+                throw rsgis::img::RSGISImageCalcException("Cannot proceed as \'first\' field is not of type boolean.");
             }
             unsigned int firstFieldIdx = attTable->getFieldIndex("first");
                         
@@ -1554,11 +1554,11 @@ namespace rsgis{namespace rastergis{
             {
                 if((*iterBands)->band == 0)
                 {
-                    throw RSGISImageCalcException("Band numbers start at 1.");
+                    throw rsgis::img::RSGISImageCalcException("Band numbers start at 1.");
                 }
                 else if(((int)(*iterBands)->band) > datasets[1]->GetRasterCount())
                 {
-                    throw RSGISImageCalcException("Band specified is not within the image.");
+                    throw rsgis::img::RSGISImageCalcException("Band specified is not within the image.");
                 }
                 
                 if((*iterBands)->calcMin)
@@ -1658,7 +1658,7 @@ namespace rsgis{namespace rastergis{
             // Extract Data from Image.
             attTable->setBoolValue("first", true);
             RSGISClumpsMeanLitStatsWithinAtt *calcAttStats = new RSGISClumpsMeanLitStatsWithinAtt(attTable, bandStats, false, pxlCountIdx, firstFieldIdx, meanLitBand, meanLitFieldIdx, meanLitFieldDT, useMeanLitValAbove);
-            RSGISCalcImage calcImage(calcAttStats);
+            rsgis::img::RSGISCalcImage calcImage(calcAttStats);
             calcImage.calcImage(datasets, numDatasets);
             delete calcAttStats;
             
@@ -1697,7 +1697,7 @@ namespace rsgis{namespace rastergis{
                     // Extract Data from Image.
                     attTable->setBoolValue("first", true);
                     RSGISClumpsMeanLitStatsWithinAtt *calcAttStats = new RSGISClumpsMeanLitStatsWithinAtt(attTable, bandStats, true, pxlCountIdx, firstFieldIdx, meanLitBand, meanLitFieldIdx, meanLitFieldDT, useMeanLitValAbove);
-                    RSGISCalcImage calcImage(calcAttStats);
+                    rsgis::img::RSGISCalcImage calcImage(calcAttStats);
                     calcImage.calcImage(datasets, numDatasets);
                     delete calcAttStats;
                     
@@ -1733,7 +1733,7 @@ namespace rsgis{namespace rastergis{
         {
             throw e;
         }
-        catch (RSGISImageCalcException &e) 
+        catch (rsgis::img::RSGISImageCalcException &e) 
         {
             throw e;
         }
@@ -1751,23 +1751,23 @@ namespace rsgis{namespace rastergis{
         
     }
     
-    void RSGISPopulateAttributeTableBandStatsMeanLitBands::populateWithBandStatisticsInMem(RSGISAttributeTable *attTable, GDALDataset **datasets, int numDatasets, vector<RSGISBandAttStatsMeanLit*> *bandStats) throw(RSGISImageCalcException, RSGISAttributeTableException)
+    void RSGISPopulateAttributeTableBandStatsMeanLitBands::populateWithBandStatisticsInMem(RSGISAttributeTable *attTable, GDALDataset **datasets, int numDatasets, vector<RSGISBandAttStatsMeanLit*> *bandStats) throw(rsgis::img::RSGISImageCalcException, RSGISAttributeTableException)
     {
         if(numDatasets != 2)
         {
-            throw RSGISImageCalcException("Two datasets are required for this fucntion.");
+            throw rsgis::img::RSGISImageCalcException("Two datasets are required for this fucntion.");
         }
         
         try 
         {
             if(datasets[0]->GetRasterCount() != 1)
             {
-                throw RSGISImageCalcException("Clumps image should only have 1 image band.");
+                throw rsgis::img::RSGISImageCalcException("Clumps image should only have 1 image band.");
             }
             
             if(datasets[1]->GetRasterCount() < ((int)bandStats->size()))
             {
-                throw RSGISImageCalcException("More band stats were requested than bands in the file.");
+                throw rsgis::img::RSGISImageCalcException("More band stats were requested than bands in the file.");
             }
             
             unsigned int numDataBands = bandStats->size();
@@ -1794,17 +1794,17 @@ namespace rsgis{namespace rastergis{
             {
                 if((*iterBands)->band == 0)
                 {
-                    throw RSGISImageCalcException("Band numbers start at 1.");
+                    throw rsgis::img::RSGISImageCalcException("Band numbers start at 1.");
                 }
                 else if(((int)(*iterBands)->band) > datasets[1]->GetRasterCount())
                 {
-                    throw RSGISImageCalcException("Band specified is not within the image.");
+                    throw rsgis::img::RSGISImageCalcException("Band specified is not within the image.");
                 }
                 
                 if(!attTable->hasAttribute((*iterBands)->fieldName))
                 {
-                    string message = (*iterBands)->fieldName + string(" is not found within the attribute table.");
-                    throw RSGISImageCalcException(message);
+                    std::string message = (*iterBands)->fieldName + std::string(" is not found within the attribute table.");
+                    throw rsgis::img::RSGISImageCalcException(message);
                 }
                 else
                 {
@@ -1940,7 +1940,7 @@ namespace rsgis{namespace rastergis{
             
             // Extract Data from Image.
             RSGISGetPixelValuesForClumps *getImageVals = new RSGISGetPixelValuesForClumps(clumpData, numDataBands, dataBandIdxs);
-            RSGISCalcImage calcImage(getImageVals);
+            rsgis::img::RSGISCalcImage calcImage(getImageVals);
             calcImage.calcImage(datasets, numDatasets);
             delete getImageVals;
             
@@ -1980,7 +1980,7 @@ namespace rsgis{namespace rastergis{
                     }
                     else
                     {
-                        throw RSGISImageCalcException("Threshold values must come from either an integer or floating point field.");
+                        throw rsgis::img::RSGISImageCalcException("Threshold values must come from either an integer or floating point field.");
                     }
                     
                     for(vector<double>::iterator iterVals = clumpData[bandCount]->at(i).begin(); iterVals != clumpData[bandCount]->at(i).end(); )
@@ -2079,7 +2079,7 @@ namespace rsgis{namespace rastergis{
         {
             throw e;
         }
-        catch (RSGISImageCalcException &e) 
+        catch (rsgis::img::RSGISImageCalcException &e) 
         {
             throw e;
         }
@@ -2091,24 +2091,24 @@ namespace rsgis{namespace rastergis{
     }
 
     
-    RSGISGetPixelValuesForClumps::RSGISGetPixelValuesForClumps(vector<vector<double> > **clumpData, unsigned int numDataBands, unsigned int *dataBandIdxs):RSGISCalcImageValue(0)
+    RSGISGetPixelValuesForClumps::RSGISGetPixelValuesForClumps(vector<vector<double> > **clumpData, unsigned int numDataBands, unsigned int *dataBandIdxs):rsgis::img::RSGISCalcImageValue(0)
     {
         this->clumpData = clumpData;
         this->numDataBands = numDataBands;
         this->dataBandIdxs = dataBandIdxs;
     }
     
-    void RSGISGetPixelValuesForClumps::calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException)
+    void RSGISGetPixelValuesForClumps::calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException)
     {
         unsigned long clumpIdx = 0;
         
         try
         {
-            clumpIdx = lexical_cast<unsigned long>(bandValues[0]);
+            clumpIdx = boost::lexical_cast<unsigned long>(bandValues[0]);
         }
-        catch(bad_lexical_cast &e)
+        catch(boost::bad_lexical_cast &e)
         {
-            throw RSGISImageCalcException(e.what());
+            throw rsgis::img::RSGISImageCalcException(e.what());
         }
         
         if(clumpIdx > 0)
@@ -2138,7 +2138,7 @@ namespace rsgis{namespace rastergis{
             catch(RSGISAttributeTableException &e)
             {
                 cout << "clumpIdx = " << clumpIdx << endl;
-                throw RSGISImageCalcException(e.what());
+                throw rsgis::img::RSGISImageCalcException(e.what());
             }
         } 
     }
@@ -2149,7 +2149,7 @@ namespace rsgis{namespace rastergis{
     }
     
     
-    RSGISCalcClumpStatsWithinAtt::RSGISCalcClumpStatsWithinAtt(RSGISAttributeTable *attTable, vector<RSGISBandAttStats*> *bandStats, bool calcStdDev, unsigned int pxlCountIdx, unsigned int firstFieldIdx):RSGISCalcImageValue(0)
+    RSGISCalcClumpStatsWithinAtt::RSGISCalcClumpStatsWithinAtt(RSGISAttributeTable *attTable, vector<RSGISBandAttStats*> *bandStats, bool calcStdDev, unsigned int pxlCountIdx, unsigned int firstFieldIdx):rsgis::img::RSGISCalcImageValue(0)
     {
         this->attTable = attTable;
         this->bandStats = bandStats;
@@ -2158,17 +2158,17 @@ namespace rsgis{namespace rastergis{
         this->pxlCountIdx = pxlCountIdx;
     }
     
-    void RSGISCalcClumpStatsWithinAtt::calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException)
+    void RSGISCalcClumpStatsWithinAtt::calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException)
     {
         unsigned long clumpIdx = 0;
         
         try
         {
-            clumpIdx = lexical_cast<unsigned long>(bandValues[0]);
+            clumpIdx = boost::lexical_cast<unsigned long>(bandValues[0]);
         }
-        catch(bad_lexical_cast &e)
+        catch(boost::bad_lexical_cast &e)
         {
-            throw RSGISImageCalcException(e.what());
+            throw rsgis::img::RSGISImageCalcException(e.what());
         }
         
         if(clumpIdx > 0)
@@ -2284,7 +2284,7 @@ namespace rsgis{namespace rastergis{
             catch(RSGISAttributeTableException &e)
             {
                 cout << "clumpIdx = " << clumpIdx << endl;
-                throw RSGISImageCalcException(e.what());
+                throw rsgis::img::RSGISImageCalcException(e.what());
             }
         } 
     }
@@ -2296,7 +2296,7 @@ namespace rsgis{namespace rastergis{
     
     
     
-    RSGISCalcClumpThresholdedStatsWithinAtt::RSGISCalcClumpThresholdedStatsWithinAtt(RSGISAttributeTable *attTable, vector<RSGISBandAttStats*> *bandStats, bool calcStdDev, unsigned int firstFieldIdx):RSGISCalcImageValue(0)
+    RSGISCalcClumpThresholdedStatsWithinAtt::RSGISCalcClumpThresholdedStatsWithinAtt(RSGISAttributeTable *attTable, vector<RSGISBandAttStats*> *bandStats, bool calcStdDev, unsigned int firstFieldIdx):rsgis::img::RSGISCalcImageValue(0)
     {
         this->attTable = attTable;
         this->bandStats = bandStats;
@@ -2304,17 +2304,17 @@ namespace rsgis{namespace rastergis{
         this->firstFieldIdx = firstFieldIdx;
     }
     
-    void RSGISCalcClumpThresholdedStatsWithinAtt::calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException)
+    void RSGISCalcClumpThresholdedStatsWithinAtt::calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException)
     {        
         unsigned long clumpIdx = 0;
         
         try
         {
-            clumpIdx = lexical_cast<unsigned long>(bandValues[0]);
+            clumpIdx = boost::lexical_cast<unsigned long>(bandValues[0]);
         }
-        catch(bad_lexical_cast &e)
+        catch(boost::bad_lexical_cast &e)
         {
-            throw RSGISImageCalcException(e.what());
+            throw rsgis::img::RSGISImageCalcException(e.what());
         }
         
         if(clumpIdx > 0)
@@ -2413,7 +2413,7 @@ namespace rsgis{namespace rastergis{
             catch(RSGISAttributeTableException &e)
             {
                 cout << "clumpIdx = " << clumpIdx << endl;
-                throw RSGISImageCalcException(e.what());
+                throw rsgis::img::RSGISImageCalcException(e.what());
             }
         } 
     }
@@ -2426,7 +2426,7 @@ namespace rsgis{namespace rastergis{
     
     
     
-    RSGISGetPixelValuesForClumpsMeanLit::RSGISGetPixelValuesForClumpsMeanLit(RSGISAttributeTable *attTable, vector<vector<double> > **clumpData, unsigned int numDataBands, unsigned int *dataBandIdxs, unsigned int meanLitBand, unsigned int meanLitFieldIdx, RSGISAttributeDataType meanLitFieldDT, bool useMeanLitValAbove):RSGISCalcImageValue(0)
+    RSGISGetPixelValuesForClumpsMeanLit::RSGISGetPixelValuesForClumpsMeanLit(RSGISAttributeTable *attTable, vector<vector<double> > **clumpData, unsigned int numDataBands, unsigned int *dataBandIdxs, unsigned int meanLitBand, unsigned int meanLitFieldIdx, RSGISAttributeDataType meanLitFieldDT, bool useMeanLitValAbove):rsgis::img::RSGISCalcImageValue(0)
     {
         this->attTable = attTable;
         this->clumpData = clumpData;
@@ -2438,17 +2438,17 @@ namespace rsgis{namespace rastergis{
         this->useMeanLitValAbove = useMeanLitValAbove;
     }
     
-    void RSGISGetPixelValuesForClumpsMeanLit::calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException)
+    void RSGISGetPixelValuesForClumpsMeanLit::calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException)
     {
         unsigned long clumpIdx = 0;
         
         try
         {
-            clumpIdx = lexical_cast<unsigned long>(bandValues[0]);
+            clumpIdx = boost::lexical_cast<unsigned long>(bandValues[0]);
         }
-        catch(bad_lexical_cast &e)
+        catch(boost::bad_lexical_cast &e)
         {
-            throw RSGISImageCalcException(e.what());
+            throw rsgis::img::RSGISImageCalcException(e.what());
         }
         
         if(clumpIdx > 0)
@@ -2469,7 +2469,7 @@ namespace rsgis{namespace rastergis{
                 }
                 else
                 {
-                    RSGISImageCalcException("Mean-lit threshold field must be of type int or float.");
+                    rsgis::img::RSGISImageCalcException("Mean-lit threshold field must be of type int or float.");
                 }
                 
                 bool withinThreshold = false;
@@ -2506,7 +2506,7 @@ namespace rsgis{namespace rastergis{
             catch(RSGISAttributeTableException &e)
             {
                 cout << "clumpIdx = " << clumpIdx << endl;
-                throw RSGISImageCalcException(e.what());
+                throw rsgis::img::RSGISImageCalcException(e.what());
             }
         } 
     }
@@ -2516,7 +2516,7 @@ namespace rsgis{namespace rastergis{
         
     }
     
-    RSGISClumpsMeanLitStatsWithinAtt::RSGISClumpsMeanLitStatsWithinAtt(RSGISAttributeTable *attTable, vector<RSGISBandAttStats*> *bandStats, bool calcStdDev, unsigned int pxlCountIdx, unsigned int firstFieldIdx, unsigned int meanLitBand, unsigned int meanLitFieldIdx, RSGISAttributeDataType meanLitFieldDT, bool useMeanLitValAbove):RSGISCalcImageValue(0)
+    RSGISClumpsMeanLitStatsWithinAtt::RSGISClumpsMeanLitStatsWithinAtt(RSGISAttributeTable *attTable, vector<RSGISBandAttStats*> *bandStats, bool calcStdDev, unsigned int pxlCountIdx, unsigned int firstFieldIdx, unsigned int meanLitBand, unsigned int meanLitFieldIdx, RSGISAttributeDataType meanLitFieldDT, bool useMeanLitValAbove):rsgis::img::RSGISCalcImageValue(0)
     {
         this->attTable = attTable;
         this->bandStats = bandStats;
@@ -2529,17 +2529,17 @@ namespace rsgis{namespace rastergis{
         this->useMeanLitValAbove = useMeanLitValAbove;
     }
     
-    void RSGISClumpsMeanLitStatsWithinAtt::calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException)
+    void RSGISClumpsMeanLitStatsWithinAtt::calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException)
     {
         unsigned long clumpIdx = 0;
         
         try
         {
-            clumpIdx = lexical_cast<unsigned long>(bandValues[0]);
+            clumpIdx = boost::lexical_cast<unsigned long>(bandValues[0]);
         }
-        catch(bad_lexical_cast &e)
+        catch(boost::bad_lexical_cast &e)
         {
-            throw RSGISImageCalcException(e.what());
+            throw rsgis::img::RSGISImageCalcException(e.what());
         }
         
         if(clumpIdx > 0)
@@ -2560,7 +2560,7 @@ namespace rsgis{namespace rastergis{
                 }
                 else
                 {
-                    RSGISImageCalcException("Mean-lit threshold field must be of type int or float.");
+                    rsgis::img::RSGISImageCalcException("Mean-lit threshold field must be of type int or float.");
                 }
                 
                 bool withinThreshold = false;
@@ -2684,7 +2684,7 @@ namespace rsgis{namespace rastergis{
             catch(RSGISAttributeTableException &e)
             {
                 cout << "clumpIdx = " << clumpIdx << endl;
-                throw RSGISImageCalcException(e.what());
+                throw rsgis::img::RSGISImageCalcException(e.what());
             }
         } 
     }
@@ -2700,18 +2700,18 @@ namespace rsgis{namespace rastergis{
         
     }
     
-    void RSGISPopulateAttributeTableImageStats::populateWithImageStatisticsInMem(RSGISAttributeTable *attTable, GDALDataset **datasets, int numDatasets, RSGISBandAttStats *imageStats, float noDataVal, bool noDataValDefined) throw(RSGISImageCalcException, RSGISAttributeTableException)
+    void RSGISPopulateAttributeTableImageStats::populateWithImageStatisticsInMem(RSGISAttributeTable *attTable, GDALDataset **datasets, int numDatasets, RSGISBandAttStats *imageStats, float noDataVal, bool noDataValDefined) throw(rsgis::img::RSGISImageCalcException, RSGISAttributeTableException)
     {
         if(numDatasets != 2)
         {
-            throw RSGISImageCalcException("Two datasets are required for this fucntion.");
+            throw rsgis::img::RSGISImageCalcException("Two datasets are required for this fucntion.");
         }
         
         try 
         {
             if(datasets[0]->GetRasterCount() != 1)
             {
-                throw RSGISImageCalcException("Clumps image should only have 1 image band.");
+                throw rsgis::img::RSGISImageCalcException("Clumps image should only have 1 image band.");
             }
             
             unsigned int numImageBands = datasets[1]->GetRasterCount();
@@ -2849,7 +2849,7 @@ namespace rsgis{namespace rastergis{
             
             // Extract Data from Image.
             RSGISGetAllBandPixelValuesForClumps *getImageVals = new RSGISGetAllBandPixelValuesForClumps(clumpData, noDataVal, noDataValDefined);
-            RSGISCalcImage calcImage(getImageVals);
+            rsgis::img::RSGISCalcImage calcImage(getImageVals);
             calcImage.calcImage(datasets, numDatasets);
             delete getImageVals;
             
@@ -2948,7 +2948,7 @@ namespace rsgis{namespace rastergis{
         {
             throw e;
         }
-        catch (RSGISImageCalcException &e) 
+        catch (rsgis::img::RSGISImageCalcException &e) 
         {
             throw e;
         }
@@ -2961,24 +2961,24 @@ namespace rsgis{namespace rastergis{
     }
     
     
-    RSGISGetAllBandPixelValuesForClumps::RSGISGetAllBandPixelValuesForClumps(vector<double> **clumpData, float noDataVal, bool noDataValDefined):RSGISCalcImageValue(0)
+    RSGISGetAllBandPixelValuesForClumps::RSGISGetAllBandPixelValuesForClumps(vector<double> **clumpData, float noDataVal, bool noDataValDefined):rsgis::img::RSGISCalcImageValue(0)
     {
         this->clumpData = clumpData;
         this->noDataVal = noDataVal;
         this->noDataValDefined = noDataValDefined;
     }
     
-    void RSGISGetAllBandPixelValuesForClumps::calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException)
+    void RSGISGetAllBandPixelValuesForClumps::calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException)
     {
         unsigned long clumpIdx = 0;
         
         try
         {
-            clumpIdx = lexical_cast<unsigned long>(bandValues[0]);
+            clumpIdx = boost::lexical_cast<unsigned long>(bandValues[0]);
         }
-        catch(bad_lexical_cast &e)
+        catch(boost::bad_lexical_cast &e)
         {
-            throw RSGISImageCalcException(e.what());
+            throw rsgis::img::RSGISImageCalcException(e.what());
         }
         
         if(clumpIdx > 0)
@@ -3018,7 +3018,7 @@ namespace rsgis{namespace rastergis{
             catch(RSGISAttributeTableException &e)
             {
                 cout << "clumpIdx = " << clumpIdx << endl;
-                throw RSGISImageCalcException(e.what());
+                throw rsgis::img::RSGISImageCalcException(e.what());
             }
         } 
     }
@@ -3040,18 +3040,18 @@ namespace rsgis{namespace rastergis{
         
     }
     
-    void RSGISCalcAttTableWithinSegmentPixelDistStats::populateWithImageStatistics(RSGISAttributeTable *attTable, GDALDataset **datasets, int numDatasets, vector<RSGISBandAttName*> *bands, RSGISBandAttStats *imageStats) throw(RSGISImageCalcException, RSGISAttributeTableException)
+    void RSGISCalcAttTableWithinSegmentPixelDistStats::populateWithImageStatistics(RSGISAttributeTable *attTable, GDALDataset **datasets, int numDatasets, vector<RSGISBandAttName*> *bands, RSGISBandAttStats *imageStats) throw(rsgis::img::RSGISImageCalcException, RSGISAttributeTableException)
     {
         if(numDatasets != 2)
         {
-            throw RSGISImageCalcException("Two datasets are required for this fucntion.");
+            throw rsgis::img::RSGISImageCalcException("Two datasets are required for this fucntion.");
         }
         
         try 
         {
             if(datasets[0]->GetRasterCount() != 1)
             {
-                throw RSGISImageCalcException("Clumps image should only have 1 image band.");
+                throw rsgis::img::RSGISImageCalcException("Clumps image should only have 1 image band.");
             }
             
             unsigned int numImageBands = datasets[1]->GetRasterCount();
@@ -3077,7 +3077,7 @@ namespace rsgis{namespace rastergis{
             {
                 if(!attTable->hasAttribute((*iterBands)->attName))
                 {
-                    string message = (*iterBands)->attName + string(" does not exist in attribute table.");
+                    std::string message = (*iterBands)->attName + std::string(" does not exist in attribute table.");
                     throw RSGISAttributeTableException(message);
                 }
                 else
@@ -3204,7 +3204,7 @@ namespace rsgis{namespace rastergis{
             
             // Extract Data from Image.
             RSGISCalcEucDistWithSegments *getImageVals = new RSGISCalcEucDistWithSegments(attTable, clumpData, bands);
-            RSGISCalcImage calcImage(getImageVals);
+            rsgis::img::RSGISCalcImage calcImage(getImageVals);
             calcImage.calcImage(datasets, numDatasets);
             delete getImageVals;
             
@@ -3294,7 +3294,7 @@ namespace rsgis{namespace rastergis{
         {
             throw e;
         }
-        catch (RSGISImageCalcException &e) 
+        catch (rsgis::img::RSGISImageCalcException &e) 
         {
             throw e;
         }
@@ -3308,24 +3308,24 @@ namespace rsgis{namespace rastergis{
     
     
 
-    RSGISCalcEucDistWithSegments::RSGISCalcEucDistWithSegments(RSGISAttributeTable *attTable, vector<double> **clumpData, vector<RSGISBandAttName*> *bands):RSGISCalcImageValue(0)
+    RSGISCalcEucDistWithSegments::RSGISCalcEucDistWithSegments(RSGISAttributeTable *attTable, vector<double> **clumpData, vector<RSGISBandAttName*> *bands):rsgis::img::RSGISCalcImageValue(0)
     {
         this->attTable = attTable;
         this->clumpData = clumpData;
         this->bands = bands;
     }
 
-    void RSGISCalcEucDistWithSegments::calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException)
+    void RSGISCalcEucDistWithSegments::calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException)
     {
         unsigned long clumpIdx = 0;
         
         try
         {
-            clumpIdx = lexical_cast<unsigned long>(bandValues[0]);
+            clumpIdx = boost::lexical_cast<unsigned long>(bandValues[0]);
         }
-        catch(bad_lexical_cast &e)
+        catch(boost::bad_lexical_cast &e)
         {
-            throw RSGISImageCalcException(e.what());
+            throw rsgis::img::RSGISImageCalcException(e.what());
         }
         
         if(clumpIdx > 0)
@@ -3350,7 +3350,7 @@ namespace rsgis{namespace rastergis{
                     }
                     else
                     {
-                        throw RSGISImageCalcException("Field data type not int or float.");
+                        throw rsgis::img::RSGISImageCalcException("Field data type not int or float.");
                     }
                     
                     val += (meanVal - bandValues[(*iterBands)->band]) * (meanVal - bandValues[(*iterBands)->band]);
@@ -3361,7 +3361,7 @@ namespace rsgis{namespace rastergis{
             catch(RSGISAttributeTableException &e)
             {
                 cout << "clumpIdx = " << clumpIdx << endl;
-                throw RSGISImageCalcException(e.what());
+                throw rsgis::img::RSGISImageCalcException(e.what());
             }
         }
     }
@@ -3374,7 +3374,7 @@ namespace rsgis{namespace rastergis{
     
     
     
-    RSGISCalcClumpSumAndCount::RSGISCalcClumpSumAndCount(size_t *pxlCount, double **sumVals, size_t *bandIdxs, size_t numSpecBands, size_t numFeats):RSGISCalcImageValue(0)
+    RSGISCalcClumpSumAndCount::RSGISCalcClumpSumAndCount(size_t *pxlCount, double **sumVals, size_t *bandIdxs, size_t numSpecBands, size_t numFeats):rsgis::img::RSGISCalcImageValue(0)
     {
         this->pxlCount = pxlCount;
         this->sumVals = sumVals;
@@ -3383,17 +3383,17 @@ namespace rsgis{namespace rastergis{
         this->numFeats = numFeats;
     }
     
-    void RSGISCalcClumpSumAndCount::calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException)
+    void RSGISCalcClumpSumAndCount::calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException)
     {
         unsigned long clumpIdx = 0;
         
         try
         {
-            clumpIdx = lexical_cast<unsigned long>(bandValues[0]);
+            clumpIdx = boost::lexical_cast<unsigned long>(bandValues[0]);
         }
-        catch(bad_lexical_cast &e)
+        catch(boost::bad_lexical_cast &e)
         {
-            throw RSGISImageCalcException(e.what());
+            throw rsgis::img::RSGISImageCalcException(e.what());
         }
         
         if(clumpIdx > 0)

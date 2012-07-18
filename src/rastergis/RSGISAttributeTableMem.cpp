@@ -35,7 +35,7 @@ namespace rsgis{namespace rastergis{
         this->createAttributeTable(numFeatures);
     }
     
-    RSGISAttributeTableMem::RSGISAttributeTableMem(size_t numFeatures, vector<pair<string, RSGISAttributeDataType> > *fields)
+    RSGISAttributeTableMem::RSGISAttributeTableMem(size_t numFeatures, std::vector<std::pair<std::string, RSGISAttributeDataType> > *fields)
     {
         this->fields = fields;
         this->createAttributeTableWithFields(numFeatures);
@@ -43,41 +43,41 @@ namespace rsgis{namespace rastergis{
     
     void RSGISAttributeTableMem::createAttributeTableWithFields(size_t numFeatures)
     {
-        attTable = new vector<RSGISFeature*>();
+        attTable = new std::vector<RSGISFeature*>();
         attTable->reserve(numFeatures);
         
-        fieldIdx = new map<string, unsigned int>();
-        fieldDataType = new map<string, RSGISAttributeDataType>();
+        fieldIdx = new std::map<std::string, unsigned int>();
+        fieldDataType = new std::map<std::string, RSGISAttributeDataType>();
         
         numBoolFields = 0;
         numIntFields = 0;
         numFloatFields = 0;
         numStrFields = 0;
-        vector<pair<string, RSGISAttributeDataType> >::iterator iterFields;
+        std::vector<std::pair<std::string, RSGISAttributeDataType> >::iterator iterFields;
         for(iterFields = fields->begin(); iterFields != fields->end(); ++iterFields)
         {
             if((*iterFields).second == rsgis_bool)
             {
-                fieldIdx->insert(pair<string, unsigned int>((*iterFields).first, numBoolFields));
+                fieldIdx->insert(std::pair<std::string, unsigned int>((*iterFields).first, numBoolFields));
                 ++numBoolFields;
             }
             else if((*iterFields).second == rsgis_int)
             {
-                fieldIdx->insert(pair<string, unsigned int>((*iterFields).first, numIntFields));
+                fieldIdx->insert(std::pair<std::string, unsigned int>((*iterFields).first, numIntFields));
                 ++numIntFields;
             }
             else if((*iterFields).second == rsgis_float)
             {
-                fieldIdx->insert(pair<string, unsigned int>((*iterFields).first, numFloatFields));
+                fieldIdx->insert(std::pair<std::string, unsigned int>((*iterFields).first, numFloatFields));
                 ++numFloatFields;
             }
             else if((*iterFields).second == rsgis_string)
             {
-                fieldIdx->insert(pair<string, unsigned int>((*iterFields).first, numStrFields));
+                fieldIdx->insert(std::pair<std::string, unsigned int>((*iterFields).first, numStrFields));
                 ++numStrFields;
             }
             
-            fieldDataType->insert(pair<string, RSGISAttributeDataType>((*iterFields).first, (*iterFields).second));
+            fieldDataType->insert(std::pair<std::string, RSGISAttributeDataType>((*iterFields).first, (*iterFields).second));
         }
         
         RSGISFeature *feature = NULL;
@@ -85,31 +85,31 @@ namespace rsgis{namespace rastergis{
         {
             feature = new RSGISFeature();
             feature->fid = i;
-            feature->boolFields = new vector<bool>();
+            feature->boolFields = new std::vector<bool>();
             feature->boolFields->reserve(numBoolFields);
             for(unsigned int i = 0; i < numBoolFields; ++i)
             {
                 feature->boolFields->push_back(false);
             }            
-            feature->intFields = new vector<long>();
+            feature->intFields = new std::vector<long>();
             feature->intFields->reserve(numIntFields);
             for(unsigned int i = 0; i < numIntFields; ++i)
             {
                 feature->intFields->push_back(0);
             }
-            feature->floatFields = new vector<double>();
+            feature->floatFields = new std::vector<double>();
             feature->floatFields->reserve(numFloatFields);
             for(unsigned int i = 0; i < numFloatFields; ++i)
             {
                 feature->floatFields->push_back(0.0);
             }
-            feature->stringFields = new vector<string>();
+            feature->stringFields = new std::vector<std::string>();
             feature->stringFields->reserve(numStrFields);
             for(unsigned int i = 0; i < numStrFields; ++i)
             {
                 feature->stringFields->push_back("");
             }
-            feature->neighbours = new vector<boost::uint_fast32_t>();
+            feature->neighbours = new std::vector<boost::uint_fast32_t>();
             
             attTable->push_back(feature);
         }
@@ -117,12 +117,12 @@ namespace rsgis{namespace rastergis{
     
     void RSGISAttributeTableMem::createAttributeTable(size_t numFeatures)
     {
-        attTable = new vector<RSGISFeature*>();
+        attTable = new std::vector<RSGISFeature*>();
         attTable->reserve(numFeatures);
         
-        fieldIdx = new map<string, unsigned int>();
-        fieldDataType = new map<string, RSGISAttributeDataType>();
-        fields = new vector<pair<string, RSGISAttributeDataType> >();
+        fieldIdx = new std::map<std::string, unsigned int>();
+        fieldDataType = new std::map<std::string, RSGISAttributeDataType>();
+        fields = new std::vector<std::pair<std::string, RSGISAttributeDataType> >();
         
         this->numBoolFields = 0;
         this->numIntFields = 0;
@@ -134,17 +134,17 @@ namespace rsgis{namespace rastergis{
         {
             feature = new RSGISFeature();
             feature->fid = i;
-            feature->boolFields = new vector<bool>();
-            feature->intFields = new vector<long>();
-            feature->floatFields = new vector<double>();
-            feature->stringFields = new vector<string>();
-            feature->neighbours = new vector<boost::uint_fast32_t>();
+            feature->boolFields = new std::vector<bool>();
+            feature->intFields = new std::vector<long>();
+            feature->floatFields = new std::vector<double>();
+            feature->stringFields = new std::vector<std::string>();
+            feature->neighbours = new std::vector<boost::uint_fast32_t>();
             
             attTable->push_back(feature);
         }
     }
     
-    bool RSGISAttributeTableMem::getBoolField(size_t fid, string name) throw(RSGISAttributeTableException)
+    bool RSGISAttributeTableMem::getBoolField(size_t fid, std::string name) throw(RSGISAttributeTableException)
     {
         bool outVal = false;
         
@@ -162,7 +162,7 @@ namespace rsgis{namespace rastergis{
             }
             if(fid >= attTable->size())
             {
-                string message = string("Feature (") + name + string(") is not within the attribute table.");
+                std::string message = std::string("Feature (") + name + std::string(") is not within the attribute table.");
                 throw RSGISAttributeTableException(message);
             }
             
@@ -178,7 +178,7 @@ namespace rsgis{namespace rastergis{
     }
     
     
-    long RSGISAttributeTableMem::getIntField(size_t fid, string name) throw(RSGISAttributeTableException)
+    long RSGISAttributeTableMem::getIntField(size_t fid, std::string name) throw(RSGISAttributeTableException)
     {
         long outVal = 0;
         
@@ -196,7 +196,7 @@ namespace rsgis{namespace rastergis{
             }
             if(fid >= attTable->size())
             {
-                string message = string("Feature (") + name + string(") is not within the attribute table.");
+                std::string message = std::string("Feature (") + name + std::string(") is not within the attribute table.");
                 throw RSGISAttributeTableException(message);
             }
             
@@ -211,7 +211,7 @@ namespace rsgis{namespace rastergis{
         return outVal;
     }
     
-    double RSGISAttributeTableMem::getDoubleField(size_t fid, string name) throw(RSGISAttributeTableException)
+    double RSGISAttributeTableMem::getDoubleField(size_t fid, std::string name) throw(RSGISAttributeTableException)
     {
         double outVal = 0;
         
@@ -229,7 +229,7 @@ namespace rsgis{namespace rastergis{
             }
             if(fid >= attTable->size())
             {
-                string message = string("Feature (") + name + string(") is not within the attribute table.");
+                std::string message = std::string("Feature (") + name + std::string(") is not within the attribute table.");
                 throw RSGISAttributeTableException(message);
             }
             
@@ -243,9 +243,9 @@ namespace rsgis{namespace rastergis{
         return outVal;
     }
     
-    string RSGISAttributeTableMem::getStringField(size_t fid, string name) throw(RSGISAttributeTableException)
+    std::string RSGISAttributeTableMem::getStringField(size_t fid, std::string name) throw(RSGISAttributeTableException)
     {
-        string outVal = 0;
+        std::string outVal = 0;
         
         try 
         {
@@ -261,7 +261,7 @@ namespace rsgis{namespace rastergis{
             }
             if(fid >= attTable->size())
             {
-                string message = string("Feature (") + name + string(") is not within the attribute table.");
+                std::string message = std::string("Feature (") + name + std::string(") is not within the attribute table.");
                 throw RSGISAttributeTableException(message);
             }
             
@@ -275,7 +275,7 @@ namespace rsgis{namespace rastergis{
         return outVal;
     }
     
-    void RSGISAttributeTableMem::setBoolField(size_t fid, string name, bool value) throw(RSGISAttributeTableException)
+    void RSGISAttributeTableMem::setBoolField(size_t fid, std::string name, bool value) throw(RSGISAttributeTableException)
     {
         try 
         {
@@ -291,7 +291,7 @@ namespace rsgis{namespace rastergis{
             }
             if(fid >= attTable->size())
             {
-                string message = string("Feature (") + name + string(") is not within the attribute table.");
+                std::string message = std::string("Feature (") + name + std::string(") is not within the attribute table.");
                 throw RSGISAttributeTableException(message);
             }
             
@@ -303,7 +303,7 @@ namespace rsgis{namespace rastergis{
         }
     }
     
-    void RSGISAttributeTableMem::setIntField(size_t fid, string name, long value) throw(RSGISAttributeTableException)
+    void RSGISAttributeTableMem::setIntField(size_t fid, std::string name, long value) throw(RSGISAttributeTableException)
     {
         try 
         {
@@ -319,7 +319,7 @@ namespace rsgis{namespace rastergis{
             }
             if(fid >= attTable->size())
             {
-                string message = string("Feature (") + name + string(") is not within the attribute table.");
+                std::string message = std::string("Feature (") + name + std::string(") is not within the attribute table.");
                 throw RSGISAttributeTableException(message);
             }
             
@@ -331,7 +331,7 @@ namespace rsgis{namespace rastergis{
         }
     }
     
-    void RSGISAttributeTableMem::setDoubleField(size_t fid, string name, double value) throw(RSGISAttributeTableException)
+    void RSGISAttributeTableMem::setDoubleField(size_t fid, std::string name, double value) throw(RSGISAttributeTableException)
     {
         try 
         {
@@ -347,7 +347,7 @@ namespace rsgis{namespace rastergis{
             }
             if(fid >= attTable->size())
             {
-                string message = string("Feature (") + name + string(") is not within the attribute table.");
+                std::string message = std::string("Feature (") + name + std::string(") is not within the attribute table.");
                 throw RSGISAttributeTableException(message);
             }
             
@@ -359,7 +359,7 @@ namespace rsgis{namespace rastergis{
         }
     }
     
-    void RSGISAttributeTableMem::setStringField(size_t fid, string name, string value) throw(RSGISAttributeTableException)
+    void RSGISAttributeTableMem::setStringField(size_t fid, std::string name, std::string value) throw(RSGISAttributeTableException)
     {
         try 
         {
@@ -375,7 +375,7 @@ namespace rsgis{namespace rastergis{
             }
             if(fid >= attTable->size())
             {
-                string message = string("Feature (") + name + string(") is not within the attribute table.");
+                std::string message = std::string("Feature (") + name + std::string(") is not within the attribute table.");
                 throw RSGISAttributeTableException(message);
             }
             
@@ -387,7 +387,7 @@ namespace rsgis{namespace rastergis{
         }
     }
     
-    void RSGISAttributeTableMem::setBoolValue(string name, bool value) throw(RSGISAttributeTableException)
+    void RSGISAttributeTableMem::setBoolValue(std::string name, bool value) throw(RSGISAttributeTableException)
     {
         try
         {
@@ -401,7 +401,7 @@ namespace rsgis{namespace rastergis{
             }
             unsigned int idx = this->getFieldIndex(name);
             
-            for(vector<RSGISFeature*>::iterator iterFeats = attTable->begin(); iterFeats != attTable->end(); ++iterFeats)
+            for(std::vector<RSGISFeature*>::iterator iterFeats = attTable->begin(); iterFeats != attTable->end(); ++iterFeats)
             {
                 (*iterFeats)->boolFields->at(idx) = value;
             }
@@ -412,7 +412,7 @@ namespace rsgis{namespace rastergis{
         }
     }
     
-    void RSGISAttributeTableMem::setIntValue(string name, long value) throw(RSGISAttributeTableException)
+    void RSGISAttributeTableMem::setIntValue(std::string name, long value) throw(RSGISAttributeTableException)
     {
         try
         {
@@ -426,7 +426,7 @@ namespace rsgis{namespace rastergis{
             }
             unsigned int idx = this->getFieldIndex(name);
             
-            for(vector<RSGISFeature*>::iterator iterFeats = attTable->begin(); iterFeats != attTable->end(); ++iterFeats)
+            for(std::vector<RSGISFeature*>::iterator iterFeats = attTable->begin(); iterFeats != attTable->end(); ++iterFeats)
             {
                 (*iterFeats)->intFields->at(idx) = value;
             }
@@ -437,7 +437,7 @@ namespace rsgis{namespace rastergis{
         }
     }
     
-    void RSGISAttributeTableMem::setFloatValue(string name, double value) throw(RSGISAttributeTableException)
+    void RSGISAttributeTableMem::setFloatValue(std::string name, double value) throw(RSGISAttributeTableException)
     {
         try
         {
@@ -451,7 +451,7 @@ namespace rsgis{namespace rastergis{
             }
             unsigned int idx = this->getFieldIndex(name);
             
-            for(vector<RSGISFeature*>::iterator iterFeats = attTable->begin(); iterFeats != attTable->end(); ++iterFeats)
+            for(std::vector<RSGISFeature*>::iterator iterFeats = attTable->begin(); iterFeats != attTable->end(); ++iterFeats)
             {
                 (*iterFeats)->floatFields->at(idx) = value;
             }
@@ -462,7 +462,7 @@ namespace rsgis{namespace rastergis{
         }
     }
     
-    void RSGISAttributeTableMem::setStringValue(string name, string value) throw(RSGISAttributeTableException)
+    void RSGISAttributeTableMem::setStringValue(std::string name, std::string value) throw(RSGISAttributeTableException)
     {
         try
         {
@@ -476,7 +476,7 @@ namespace rsgis{namespace rastergis{
             }
             unsigned int idx = this->getFieldIndex(name);
             
-            for(vector<RSGISFeature*>::iterator iterFeats = attTable->begin(); iterFeats != attTable->end(); ++iterFeats)
+            for(std::vector<RSGISFeature*>::iterator iterFeats = attTable->begin(); iterFeats != attTable->end(); ++iterFeats)
             {
                 (*iterFeats)->stringFields->at(idx) = value;
             }
@@ -491,8 +491,8 @@ namespace rsgis{namespace rastergis{
     {
         if(fid >= attTable->size())
         {
-            RSGISTextUtils textUtils;
-            string message = string("Feature (") + textUtils.uInt64bittostring(fid) + string(") is not within the attribute table.");
+            rsgis::utils::RSGISTextUtils textUtils;
+            std::string message = std::string("Feature (") + textUtils.uInt64bittostring(fid) + std::string(") is not within the attribute table.");
             throw RSGISAttributeTableException(message);
         }
         
@@ -504,63 +504,63 @@ namespace rsgis{namespace rastergis{
         // Nothing to do as features are stored in memory to automatically sync'd.
     }
     
-    void RSGISAttributeTableMem::addAttBoolField(string name, bool val) throw(RSGISAttributeTableException)
+    void RSGISAttributeTableMem::addAttBoolField(std::string name, bool val) throw(RSGISAttributeTableException)
     {
-        fieldIdx->insert(pair<string, unsigned int>(name, numBoolFields));
+        fieldIdx->insert(std::pair<std::string, unsigned int>(name, numBoolFields));
         ++numBoolFields;
-        fieldDataType->insert(pair<string, RSGISAttributeDataType>(name, rsgis_bool));
-        fields->push_back(pair<string, RSGISAttributeDataType>(name, rsgis_bool));
+        fieldDataType->insert(std::pair<std::string, RSGISAttributeDataType>(name, rsgis_bool));
+        fields->push_back(std::pair<std::string, RSGISAttributeDataType>(name, rsgis_bool));
         
-        for(vector<RSGISFeature*>::iterator iterFeats = attTable->begin(); iterFeats != attTable->end(); ++iterFeats)
+        for(std::vector<RSGISFeature*>::iterator iterFeats = attTable->begin(); iterFeats != attTable->end(); ++iterFeats)
         {
             (*iterFeats)->boolFields->push_back(val);
         }
     }
     
-    void RSGISAttributeTableMem::addAttIntField(string name, long val) throw(RSGISAttributeTableException)
+    void RSGISAttributeTableMem::addAttIntField(std::string name, long val) throw(RSGISAttributeTableException)
     {
-        fieldIdx->insert(pair<string, unsigned int>(name, numIntFields));
+        fieldIdx->insert(std::pair<std::string, unsigned int>(name, numIntFields));
         ++numIntFields;
-        fieldDataType->insert(pair<string, RSGISAttributeDataType>(name, rsgis_int));
-        fields->push_back(pair<string, RSGISAttributeDataType>(name, rsgis_int));
+        fieldDataType->insert(std::pair<std::string, RSGISAttributeDataType>(name, rsgis_int));
+        fields->push_back(std::pair<std::string, RSGISAttributeDataType>(name, rsgis_int));
         
-        for(vector<RSGISFeature*>::iterator iterFeats = attTable->begin(); iterFeats != attTable->end(); ++iterFeats)
+        for(std::vector<RSGISFeature*>::iterator iterFeats = attTable->begin(); iterFeats != attTable->end(); ++iterFeats)
         {
             (*iterFeats)->intFields->push_back(val);
         }
     }
     
-    void RSGISAttributeTableMem::addAttFloatField(string name, double val) throw(RSGISAttributeTableException)
+    void RSGISAttributeTableMem::addAttFloatField(std::string name, double val) throw(RSGISAttributeTableException)
     {
-        fieldIdx->insert(pair<string, unsigned int>(name, numFloatFields));
+        fieldIdx->insert(std::pair<std::string, unsigned int>(name, numFloatFields));
         ++numFloatFields;
-        fieldDataType->insert(pair<string, RSGISAttributeDataType>(name, rsgis_float));
-        fields->push_back(pair<string, RSGISAttributeDataType>(name, rsgis_float));
+        fieldDataType->insert(std::pair<std::string, RSGISAttributeDataType>(name, rsgis_float));
+        fields->push_back(std::pair<std::string, RSGISAttributeDataType>(name, rsgis_float));
         
-        for(vector<RSGISFeature*>::iterator iterFeats = attTable->begin(); iterFeats != attTable->end(); ++iterFeats)
+        for(std::vector<RSGISFeature*>::iterator iterFeats = attTable->begin(); iterFeats != attTable->end(); ++iterFeats)
         {
             (*iterFeats)->floatFields->push_back(val);
         }
     }
     
-    void RSGISAttributeTableMem::addAttStringField(string name, string val) throw(RSGISAttributeTableException)
+    void RSGISAttributeTableMem::addAttStringField(std::string name, std::string val) throw(RSGISAttributeTableException)
     {
-        fieldIdx->insert(pair<string, unsigned int>(name, numStrFields));
+        fieldIdx->insert(std::pair<std::string, unsigned int>(name, numStrFields));
         ++numStrFields;
-        fieldDataType->insert(pair<string, RSGISAttributeDataType>(name, rsgis_string));
-        fields->push_back(pair<string, RSGISAttributeDataType>(name, rsgis_string));
+        fieldDataType->insert(std::pair<std::string, RSGISAttributeDataType>(name, rsgis_string));
+        fields->push_back(std::pair<std::string, RSGISAttributeDataType>(name, rsgis_string));
         
-        for(vector<RSGISFeature*>::iterator iterFeats = attTable->begin(); iterFeats != attTable->end(); ++iterFeats)
+        for(std::vector<RSGISFeature*>::iterator iterFeats = attTable->begin(); iterFeats != attTable->end(); ++iterFeats)
         {
             (*iterFeats)->stringFields->push_back(val);
         }
     }
     
-    void RSGISAttributeTableMem::addAttributes(vector<RSGISAttribute*> *attributes) throw(RSGISAttributeTableException)
+    void RSGISAttributeTableMem::addAttributes(std::vector<RSGISAttribute*> *attributes) throw(RSGISAttributeTableException)
     {
         try 
         {
-            for(vector<RSGISAttribute*>::iterator iterAtt = attributes->begin(); iterAtt != attributes->end(); ++iterAtt)
+            for(std::vector<RSGISAttribute*>::iterator iterAtt = attributes->begin(); iterAtt != attributes->end(); ++iterAtt)
             {
                 if((*iterAtt)->dataType == rsgis_bool)
                 {
@@ -633,7 +633,7 @@ namespace rsgis{namespace rastergis{
             for(size_t i = startFID; i < endFID; ++i)
             {
                 feat = this->attTable->at(i);
-                for(vector<boost::uint_fast32_t>::iterator iterNeighbours = feat->neighbours->begin(); iterNeighbours != feat->neighbours->end(); ++iterNeighbours)
+                for(std::vector<boost::uint_fast32_t>::iterator iterNeighbours = feat->neighbours->begin(); iterNeighbours != feat->neighbours->end(); ++iterNeighbours)
                 {
                     if(first)
                     {
@@ -678,19 +678,19 @@ namespace rsgis{namespace rastergis{
         return attTable->at(iterIdx);
     }
     
-    RSGISFileType RSGISAttributeTableMem::findFileType(string inFile)throw(RSGISAttributeTableException)
+    RSGISFileType RSGISAttributeTableMem::findFileType(std::string inFile)throw(RSGISAttributeTableException)
     {
         RSGISFileType fileType = rsgis_unknown_attft;
         try
         {
-            Exception::dontPrint();
-            H5File *attH5File = new H5File( inFile, H5F_ACC_RDONLY);
+            H5::Exception::dontPrint();
+            H5::H5File *attH5File = new H5::H5File( inFile, H5F_ACC_RDONLY);
             attH5File->close();
             delete attH5File;
             
             fileType = rsgis_hdf_attft;
         }
-        catch( Exception &e )
+        catch( H5::Exception &e )
         {
             fileType = rsgis_ascii_attft;
         }
@@ -698,18 +698,18 @@ namespace rsgis{namespace rastergis{
         return fileType;
     }
     
-    RSGISAttributeTable* RSGISAttributeTableMem::importFromASCII(string inFile)throw(RSGISAttributeTableException)
+    RSGISAttributeTable* RSGISAttributeTableMem::importFromASCII(std::string inFile)throw(RSGISAttributeTableException)
     {
         RSGISAttributeTableMem *attTableObj = new RSGISAttributeTableMem();
         
         try
         {
-            RSGISTextUtils txtUtils;
-            RSGISTextFileLineReader txtReader;
+            rsgis::utils::RSGISTextUtils txtUtils;
+            rsgis::utils::RSGISTextFileLineReader txtReader;
             txtReader.openFile(inFile);
             
-            vector<string> *tokens = new vector<string>();
-            string line = "";
+            std::vector<std::string> *tokens = new std::vector<std::string>();
+            std::string line = "";
             unsigned int lineCount = 0;
             unsigned int numOfFields = 0;
             unsigned int numOfExpTokens = 0;
@@ -734,19 +734,19 @@ namespace rsgis{namespace rastergis{
                     if(lineCount == 0)
                     {
                         numOfFeatures = txtUtils.strto64bitUInt(line);
-                        attTableObj->attTable = new vector<RSGISFeature*>();
+                        attTableObj->attTable = new std::vector<RSGISFeature*>();
                         attTableObj->attTable->reserve(numOfFeatures);
                         
-                        attTableObj->fieldIdx = new map<string, unsigned int>();
-                        attTableObj->fieldDataType = new map<string, RSGISAttributeDataType>();
-                        attTableObj->fields = new vector<pair<string, RSGISAttributeDataType> >();
+                        attTableObj->fieldIdx = new std::map<std::string, unsigned int>();
+                        attTableObj->fieldDataType = new std::map<std::string, RSGISAttributeDataType>();
+                        attTableObj->fields = new std::vector<std::pair<std::string, RSGISAttributeDataType> >();
                     }
                     else if(lineCount == 1)
                     {
                         txtUtils.tokenizeString(line, ':', tokens, true, true);
                         if(tokens->size() != 2)
                         {
-                            cout << "Line: " << line << endl;
+                            std::cout << "Line: " << line << std::endl;
                             throw RSGISAttributeTableException("Expected two tokens.");
                         }
                         attTableObj->numBoolFields = txtUtils.strto32bitUInt(tokens->at(1));
@@ -757,7 +757,7 @@ namespace rsgis{namespace rastergis{
                         txtUtils.tokenizeString(line, ':', tokens, true, true);
                         if(tokens->size() != 2)
                         {
-                            cout << "Line: " << line << endl;
+                            std::cout << "Line: " << line << std::endl;
                             throw RSGISAttributeTableException("Expected two tokens.");
                         }
                         attTableObj->numIntFields = txtUtils.strto32bitUInt(tokens->at(1));
@@ -768,7 +768,7 @@ namespace rsgis{namespace rastergis{
                         txtUtils.tokenizeString(line, ':', tokens, true, true);
                         if(tokens->size() != 2)
                         {
-                            cout << "Line: " << line << endl;
+                            std::cout << "Line: " << line << std::endl;
                             throw RSGISAttributeTableException("Expected two tokens.");
                         }
                         attTableObj->numFloatFields = txtUtils.strto32bitUInt(tokens->at(1));
@@ -779,7 +779,7 @@ namespace rsgis{namespace rastergis{
                         txtUtils.tokenizeString(line, ':', tokens, true, true);
                         if(tokens->size() != 2)
                         {
-                            cout << "Line: " << line << endl;
+                            std::cout << "Line: " << line << std::endl;
                             throw RSGISAttributeTableException("Expected two tokens.");
                         }
                         attTableObj->numStrFields = txtUtils.strto32bitUInt(tokens->at(1));
@@ -791,42 +791,42 @@ namespace rsgis{namespace rastergis{
                         txtUtils.tokenizeString(line, ',', tokens, true, true);
                         if(tokens->size() != 2)
                         {
-                            cout << "Line: " << line << endl;
+                            std::cout << "Line: " << line << std::endl;
                             throw RSGISAttributeTableException("Expected two tokens.");
                         }
                         
                         if(tokens->at(1) == "rsgis_bool")
                         {
-                            attTableObj->fieldIdx->insert(pair<string, unsigned int>(tokens->at(0), tmpNumBoolFields));
-                            attTableObj->fieldDataType->insert(pair<string, RSGISAttributeDataType>(tokens->at(0), rsgis_bool));
-                            attTableObj->fields->push_back(pair<string, RSGISAttributeDataType>(tokens->at(0), rsgis_bool));
+                            attTableObj->fieldIdx->insert(std::pair<std::string, unsigned int>(tokens->at(0), tmpNumBoolFields));
+                            attTableObj->fieldDataType->insert(std::pair<std::string, RSGISAttributeDataType>(tokens->at(0), rsgis_bool));
+                            attTableObj->fields->push_back(std::pair<std::string, RSGISAttributeDataType>(tokens->at(0), rsgis_bool));
                             ++tmpNumBoolFields;
                             
                         }
                         else if(tokens->at(1) == "rsgis_int")
                         {
-                            attTableObj->fieldIdx->insert(pair<string, unsigned int>(tokens->at(0), tmpNumIntFields));
-                            attTableObj->fieldDataType->insert(pair<string, RSGISAttributeDataType>(tokens->at(0), rsgis_int));
-                            attTableObj->fields->push_back(pair<string, RSGISAttributeDataType>(tokens->at(0), rsgis_int));
+                            attTableObj->fieldIdx->insert(std::pair<std::string, unsigned int>(tokens->at(0), tmpNumIntFields));
+                            attTableObj->fieldDataType->insert(std::pair<std::string, RSGISAttributeDataType>(tokens->at(0), rsgis_int));
+                            attTableObj->fields->push_back(std::pair<std::string, RSGISAttributeDataType>(tokens->at(0), rsgis_int));
                             ++tmpNumIntFields;
                         }
                         else if(tokens->at(1) == "rsgis_float")
                         {
-                            attTableObj->fieldIdx->insert(pair<string, unsigned int>(tokens->at(0), tmpNumFloatFields));
-                            attTableObj->fieldDataType->insert(pair<string, RSGISAttributeDataType>(tokens->at(0), rsgis_float));
-                            attTableObj->fields->push_back(pair<string, RSGISAttributeDataType>(tokens->at(0), rsgis_float));
+                            attTableObj->fieldIdx->insert(std::pair<std::string, unsigned int>(tokens->at(0), tmpNumFloatFields));
+                            attTableObj->fieldDataType->insert(std::pair<std::string, RSGISAttributeDataType>(tokens->at(0), rsgis_float));
+                            attTableObj->fields->push_back(std::pair<std::string, RSGISAttributeDataType>(tokens->at(0), rsgis_float));
                             ++tmpNumFloatFields;
                         }
                         else if(tokens->at(1) == "rsgis_string")
                         {
-                            attTableObj->fieldIdx->insert(pair<string, unsigned int>(tokens->at(0), tmpNumStrFields));
-                            attTableObj->fieldDataType->insert(pair<string, RSGISAttributeDataType>(tokens->at(0), rsgis_string));
-                            attTableObj->fields->push_back(pair<string, RSGISAttributeDataType>(tokens->at(0), rsgis_string));
+                            attTableObj->fieldIdx->insert(std::pair<std::string, unsigned int>(tokens->at(0), tmpNumStrFields));
+                            attTableObj->fieldDataType->insert(std::pair<std::string, RSGISAttributeDataType>(tokens->at(0), rsgis_string));
+                            attTableObj->fields->push_back(std::pair<std::string, RSGISAttributeDataType>(tokens->at(0), rsgis_string));
                             ++tmpNumStrFields;
                         }
                         else
                         {
-                            cout << "Line: " << line << endl;
+                            std::cout << "Line: " << line << std::endl;
                             throw RSGISAttributeTableException("Did not recognise the data type.");
                         }
                     }
@@ -860,14 +860,14 @@ namespace rsgis{namespace rastergis{
                         txtUtils.tokenizeString(line, ',', tokens, true, true);
                         if(tokens->size() != numOfExpTokens)
                         {
-                            cout << "Line: " << line << endl;
+                            std::cout << "Line: " << line << std::endl;
                             throw RSGISAttributeTableException("Incorrect number of expected tokens.");
                         }
                         tokenIdx = 0;
                         
                         feature = new RSGISFeature();
                         feature->fid = txtUtils.strto64bitUInt(tokens->at(tokenIdx++));
-                        feature->boolFields = new vector<bool>();
+                        feature->boolFields = new std::vector<bool>();
                         feature->boolFields->reserve(attTableObj->numBoolFields);
                         for(unsigned int i = 0; i < attTableObj->numBoolFields; ++i)
                         {
@@ -880,13 +880,13 @@ namespace rsgis{namespace rastergis{
                                 feature->boolFields->push_back(false);
                             }
                         }            
-                        feature->intFields = new vector<long>();
+                        feature->intFields = new std::vector<long>();
                         feature->intFields->reserve(attTableObj->numIntFields);
                         for(unsigned int i = 0; i < attTableObj->numIntFields; ++i)
                         {
                             feature->intFields->push_back(txtUtils.strto32bitUInt(tokens->at(tokenIdx++)));
                         }
-                        feature->floatFields = new vector<double>();
+                        feature->floatFields = new std::vector<double>();
                         feature->floatFields->reserve(attTableObj->numFloatFields);
                         for(unsigned int i = 0; i < attTableObj->numFloatFields; ++i)
                         {
@@ -895,11 +895,11 @@ namespace rsgis{namespace rastergis{
                                 feature->floatFields->push_back(txtUtils.strtodouble(tokens->at(tokenIdx)));
                                 ++tokenIdx;
                             }
-                            catch(RSGISTextException &e)
+                            catch(rsgis::utils::RSGISTextException &e)
                             {
                                 if(tokens->at(tokenIdx) == "nan")
                                 {
-                                    feature->floatFields->push_back(numeric_limits<float>::signaling_NaN());
+                                    feature->floatFields->push_back(std::numeric_limits<float>::signaling_NaN());
                                     ++tokenIdx;
                                 }
                                 else
@@ -908,13 +908,13 @@ namespace rsgis{namespace rastergis{
                                 }
                             }
                         }
-                        feature->stringFields = new vector<string>();
+                        feature->stringFields = new std::vector<std::string>();
                         feature->stringFields->reserve(attTableObj->numStrFields);
                         for(unsigned int i = 0; i < attTableObj->numStrFields; ++i)
                         {
                             feature->stringFields->push_back(tokens->at(tokenIdx++));
                         }
-                        feature->neighbours = new vector<boost::uint_fast32_t>();
+                        feature->neighbours = new std::vector<boost::uint_fast32_t>();
                         
                         attTableObj->attTable->push_back(feature);                        
                     }
@@ -923,7 +923,7 @@ namespace rsgis{namespace rastergis{
                         txtUtils.tokenizeString(line, ',', tokens, true, true);
                         if(tokens->size() ==  0)
                         {
-                            cout << "Line: " << line << endl;
+                            std::cout << "Line: " << line << std::endl;
                             throw RSGISAttributeTableException("Incorrect number of expected tokens for neighbours.");
                         }
                         tokenIdx = 0;
@@ -946,7 +946,7 @@ namespace rsgis{namespace rastergis{
                 }
             }
         }
-        catch(RSGISTextException &e)
+        catch(rsgis::utils::RSGISTextException &e)
         {
             //delete attTableObj;
             throw RSGISAttributeTableException(e.what());
@@ -955,7 +955,7 @@ namespace rsgis{namespace rastergis{
         return attTableObj;
     }
     
-    RSGISAttributeTable* RSGISAttributeTableMem::importFromHDF5(string inFile)throw(RSGISAttributeTableException)
+    RSGISAttributeTable* RSGISAttributeTableMem::importFromHDF5(std::string inFile)throw(RSGISAttributeTableException)
     {
         RSGISAttributeTableMem *attTableObj = new RSGISAttributeTableMem();
         
@@ -963,13 +963,13 @@ namespace rsgis{namespace rastergis{
         {
             //Exception::dontPrint();
             
-            FileAccPropList attAccessPlist = FileAccPropList(FileAccPropList::DEFAULT);
+            H5::FileAccPropList attAccessPlist = H5::FileAccPropList(H5::FileAccPropList::DEFAULT);
             attAccessPlist.setCache(ATT_READ_MDC_NELMTS, ATT_READ_RDCC_NELMTS, ATT_READ_RDCC_NBYTES, ATT_READ_RDCC_W0);
             attAccessPlist.setSieveBufSize(ATT_READ_SIEVE_BUF);
             hsize_t metaBlockSize = ATT_READ_META_BLOCKSIZE;
             attAccessPlist.setMetaBlockSize(metaBlockSize);
             
-            H5File *attH5File = new H5File( inFile, H5F_ACC_RDONLY, FileCreatPropList::DEFAULT, attAccessPlist);
+            H5::H5File *attH5File = new H5::H5File( inFile, H5F_ACC_RDONLY, H5::FileCreatPropList::DEFAULT, attAccessPlist);
                         
             bool hasBoolFields = true;
             bool hasIntFields = true;
@@ -977,9 +977,9 @@ namespace rsgis{namespace rastergis{
             
             attTableObj->numStrFields = 0;
             
-            attTableObj->fields = new vector<pair<string, RSGISAttributeDataType> >();
-            attTableObj->fieldIdx = new map<string, unsigned int>();
-            attTableObj->fieldDataType = new map<string, RSGISAttributeDataType>();
+            attTableObj->fields = new std::vector<std::pair<std::string, RSGISAttributeDataType> >();
+            attTableObj->fieldIdx = new std::map<std::string, unsigned int>();
+            attTableObj->fieldDataType = new std::map<std::string, RSGISAttributeDataType>();
             
             attTableObj->numBoolFields = 0;
             attTableObj->numIntFields = 0;
@@ -989,114 +989,114 @@ namespace rsgis{namespace rastergis{
             hsize_t dimsAttSize[1];
 			dimsAttSize[0] = 1;
             size_t numFeats = 0;
-			DataSpace attSizeDataSpace(1, dimsAttSize);
-            DataSet sizeDataset = attH5File->openDataSet( ATT_SIZE_HEADER );
-            sizeDataset.read(&numFeats, PredType::NATIVE_ULLONG, attSizeDataSpace);
+			H5::DataSpace attSizeDataSpace(1, dimsAttSize);
+            H5::DataSet sizeDataset = attH5File->openDataSet( ATT_SIZE_HEADER );
+            sizeDataset.read(&numFeats, H5::PredType::NATIVE_ULLONG, attSizeDataSpace);
             attSizeDataSpace.close();
             
-            cout << "Table has " << numFeats << " features\n";
+            std::cout << "Table has " << numFeats << " features\n";
             
-            CompType *fieldCompTypeMem = attTableObj->createAttibuteIdxCompTypeMem();
+            H5::CompType *fieldCompTypeMem = attTableObj->createAttibuteIdxCompTypeMem();
             try
             {
-                DataSet boolFieldsDataset = attH5File->openDataSet( ATT_BOOL_FIELDS_HEADER );
-                DataSpace boolFieldsDataspace = boolFieldsDataset.getSpace();
+                H5::DataSet boolFieldsDataset = attH5File->openDataSet( ATT_BOOL_FIELDS_HEADER );
+                H5::DataSpace boolFieldsDataspace = boolFieldsDataset.getSpace();
                 
                 attTableObj->numBoolFields = boolFieldsDataspace.getSelectNpoints();
                 
-                cout << "There are " << attTableObj->numBoolFields << " boolean fields." << endl;
+                std::cout << "There are " << attTableObj->numBoolFields << " boolean fields." << std::endl;
                 
                 RSGISAttributeIdx *fields = new RSGISAttributeIdx[attTableObj->numBoolFields];
                 
                 hsize_t boolFieldsDims[1]; 
                 boolFieldsDims[0] = attTableObj->numBoolFields;
-                DataSpace boolFieldsMemspace(1, boolFieldsDims);
+                H5::DataSpace boolFieldsMemspace(1, boolFieldsDims);
                 
                 boolFieldsDataset.read(fields, *fieldCompTypeMem, boolFieldsMemspace, boolFieldsDataspace);
                 
                 for(unsigned int i = 0; i < attTableObj->numBoolFields; ++i)
                 {
-                    //cout << fields[i].name << ": " << fields[i].idx << endl;
-                    attTableObj->fields->push_back(pair<string, RSGISAttributeDataType>(fields[i].name, rsgis_bool));
-                    attTableObj->fieldIdx->insert(pair<string, unsigned int>(fields[i].name, fields[i].idx));
-                    attTableObj->fieldDataType->insert(pair<string, RSGISAttributeDataType>(fields[i].name, rsgis_bool));
+                    //std::cout << fields[i].name << ": " << fields[i].idx << std::endl;
+                    attTableObj->fields->push_back(std::pair<std::string, RSGISAttributeDataType>(fields[i].name, rsgis_bool));
+                    attTableObj->fieldIdx->insert(std::pair<std::string, unsigned int>(fields[i].name, fields[i].idx));
+                    attTableObj->fieldDataType->insert(std::pair<std::string, RSGISAttributeDataType>(fields[i].name, rsgis_bool));
                 }
                 
                 delete[] fields;
             }
-            catch( Exception &e )
+            catch( H5::Exception &e )
             {
                 hasBoolFields = false;
             }
             
             try
             {
-                DataSet intFieldsDataset = attH5File->openDataSet( ATT_INT_FIELDS_HEADER );
-                DataSpace intFieldsDataspace = intFieldsDataset.getSpace();
+                H5::DataSet intFieldsDataset = attH5File->openDataSet( ATT_INT_FIELDS_HEADER );
+                H5::DataSpace intFieldsDataspace = intFieldsDataset.getSpace();
                 
                 attTableObj->numIntFields = intFieldsDataspace.getSelectNpoints();
                 
-                cout << "There are " << attTableObj->numIntFields << " integer fields." << endl;
+                std::cout << "There are " << attTableObj->numIntFields << " integer fields." << std::endl;
                 
                 RSGISAttributeIdx *fields = new RSGISAttributeIdx[attTableObj->numIntFields];
                 
                 hsize_t intFieldsDims[1]; 
                 intFieldsDims[0] = attTableObj->numIntFields;
-                DataSpace intFieldsMemspace(1, intFieldsDims);
+                H5::DataSpace intFieldsMemspace(1, intFieldsDims);
                 
                 intFieldsDataset.read(fields, *fieldCompTypeMem, intFieldsMemspace, intFieldsDataspace);
                 
                 for(unsigned int i = 0; i < attTableObj->numIntFields; ++i)
                 {
-                    //cout << fields[i].name << ": " << fields[i].idx << endl;
-                    attTableObj->fields->push_back(pair<string, RSGISAttributeDataType>(fields[i].name, rsgis_int));
-                    attTableObj->fieldIdx->insert(pair<string, unsigned int>(fields[i].name, fields[i].idx));
-                    attTableObj->fieldDataType->insert(pair<string, RSGISAttributeDataType>(fields[i].name, rsgis_int));
+                    //std::cout << fields[i].name << ": " << fields[i].idx << std::endl;
+                    attTableObj->fields->push_back(std::pair<std::string, RSGISAttributeDataType>(fields[i].name, rsgis_int));
+                    attTableObj->fieldIdx->insert(std::pair<std::string, unsigned int>(fields[i].name, fields[i].idx));
+                    attTableObj->fieldDataType->insert(std::pair<std::string, RSGISAttributeDataType>(fields[i].name, rsgis_int));
                 }
                 
                 delete[] fields;
             }
-            catch( Exception &e )
+            catch( H5::Exception &e )
             {
                 hasIntFields = false;
             }
             
             try
             {
-                DataSet floatFieldsDataset = attH5File->openDataSet( ATT_FLOAT_FIELDS_HEADER );
-                DataSpace floatFieldsDataspace = floatFieldsDataset.getSpace();
+                H5::DataSet floatFieldsDataset = attH5File->openDataSet( ATT_FLOAT_FIELDS_HEADER );
+                H5::DataSpace floatFieldsDataspace = floatFieldsDataset.getSpace();
                 
                 attTableObj->numFloatFields = floatFieldsDataspace.getSelectNpoints();
                 
-                cout << "There are " << attTableObj->numFloatFields << " float fields." << endl;
+                std::cout << "There are " << attTableObj->numFloatFields << " float fields." << std::endl;
                 
                 RSGISAttributeIdx *fields = new RSGISAttributeIdx[attTableObj->numFloatFields];
                 
                 hsize_t floatFieldsDims[1]; 
                 floatFieldsDims[0] = attTableObj->numFloatFields;
-                DataSpace floatFieldsMemspace(1, floatFieldsDims);
+                H5::DataSpace floatFieldsMemspace(1, floatFieldsDims);
                 
                 floatFieldsDataset.read(fields, *fieldCompTypeMem, floatFieldsMemspace, floatFieldsDataspace);
                 
                 for(unsigned int i = 0; i < attTableObj->numFloatFields; ++i)
                 {
-                    //cout << fields[i].name << ": " << fields[i].idx << endl;
-                    attTableObj->fields->push_back(pair<string, RSGISAttributeDataType>(fields[i].name, rsgis_float));
-                    attTableObj->fieldIdx->insert(pair<string, unsigned int>(fields[i].name, fields[i].idx));
-                    attTableObj->fieldDataType->insert(pair<string, RSGISAttributeDataType>(fields[i].name, rsgis_float));
+                    //std::cout << fields[i].name << ": " << fields[i].idx << std::endl;
+                    attTableObj->fields->push_back(std::pair<std::string, RSGISAttributeDataType>(fields[i].name, rsgis_float));
+                    attTableObj->fieldIdx->insert(std::pair<std::string, unsigned int>(fields[i].name, fields[i].idx));
+                    attTableObj->fieldDataType->insert(std::pair<std::string, RSGISAttributeDataType>(fields[i].name, rsgis_float));
                 }
                 
                 delete[] fields;
             }
-            catch( Exception &e )
+            catch( H5::Exception &e )
             {
                 hasFloatFields = false;
             }
             
             delete fieldCompTypeMem;
                         
-            DataSet neighboursDataset = attH5File->openDataSet( ATT_NEIGHBOURS_DATA );
-            DataSpace neighboursDataspace = neighboursDataset.getSpace();
+            H5::DataSet neighboursDataset = attH5File->openDataSet( ATT_NEIGHBOURS_DATA );
+            H5::DataSpace neighboursDataspace = neighboursDataset.getSpace();
             
             int neighboursNDims = neighboursDataspace.getSimpleExtentNdims();
             if(neighboursNDims != 1)
@@ -1114,17 +1114,17 @@ namespace rsgis{namespace rastergis{
             
             delete[] neighboursDims;
             
-            //cout << "Number of Features = " << numFeats << endl;
-            //cout << "Neighbours Line Length = " << neighboursLineLength << endl;
+            //std::cout << "Number of Features = " << numFeats << std::endl;
+            //std::cout << "Neighbours Line Length = " << neighboursLineLength << std::endl;
             
             unsigned long numChunks = numFeats / ATT_WRITE_CHUNK_SIZE;
             unsigned long remainingRows = numFeats - (numChunks * ATT_WRITE_CHUNK_SIZE);
             
-            //cout << "Number of Chunks: " << numChunks << endl;
-            //cout << "Remaining Rows: " << remainingRows << endl;
+            //std::cout << "Number of Chunks: " << numChunks << std::endl;
+            //std::cout << "Remaining Rows: " << remainingRows << std::endl;
             
-            DataSet boolDataset;
-            DataSpace boolDataspace;
+            H5::DataSet boolDataset;
+            H5::DataSpace boolDataspace;
             int *boolVals = NULL;
             if(hasBoolFields)
             {
@@ -1154,8 +1154,8 @@ namespace rsgis{namespace rastergis{
                 boolVals = new int[ATT_WRITE_CHUNK_SIZE*attTableObj->numBoolFields];
             }
             
-            DataSet intDataset;
-            DataSpace intDataspace;
+            H5::DataSet intDataset;
+            H5::DataSpace intDataspace;
             long *intVals = NULL;
             if(hasIntFields)
             {
@@ -1185,8 +1185,8 @@ namespace rsgis{namespace rastergis{
                 intVals = new long[ATT_WRITE_CHUNK_SIZE*attTableObj->numIntFields];
             }
             
-            DataSet floatDataset;
-            DataSpace floatDataspace;
+            H5::DataSet floatDataset;
+            H5::DataSpace floatDataspace;
             double *floatVals = NULL;
             if(hasFloatFields)
             {
@@ -1216,12 +1216,12 @@ namespace rsgis{namespace rastergis{
                  floatVals = new double[ATT_WRITE_CHUNK_SIZE*attTableObj->numFloatFields];
             }
             
-            attTableObj->attTable = new vector<RSGISFeature*>();
+            attTableObj->attTable = new std::vector<RSGISFeature*>();
             attTableObj->attTable->reserve(numFeats);
  
             /* Neighbours */
             hvl_t *neighbourVals = new hvl_t[ATT_WRITE_CHUNK_SIZE];
-            DataType intVarLenMemDT = VarLenType(&PredType::NATIVE_UINT64);
+            H5::DataType intVarLenMemDT = H5::VarLenType(&H5::PredType::NATIVE_UINT64);
             hsize_t neighboursOffset[1];
 			neighboursOffset[0] = 0;
 			hsize_t neighboursCount[1];
@@ -1230,7 +1230,7 @@ namespace rsgis{namespace rastergis{
 			
 			hsize_t neighboursDimsRead[1]; 
 			neighboursDimsRead[0] = ATT_WRITE_CHUNK_SIZE;
-			DataSpace neighboursMemspace( 1, neighboursDimsRead );
+			H5::DataSpace neighboursMemspace( 1, neighboursDimsRead );
 			
 			hsize_t neighboursOffset_out[1];
             neighboursOffset_out[0] = 0;
@@ -1253,7 +1253,7 @@ namespace rsgis{namespace rastergis{
 			hsize_t boolFieldsDimsRead[2]; 
 			boolFieldsDimsRead[0] = ATT_WRITE_CHUNK_SIZE;
             boolFieldsDimsRead[1] = attTableObj->numBoolFields;
-			DataSpace boolFieldsMemspace( 2, boolFieldsDimsRead );
+			H5::DataSpace boolFieldsMemspace( 2, boolFieldsDimsRead );
 			
 			hsize_t boolFieldsOffset_out[2];
             boolFieldsOffset_out[0] = 0;
@@ -1281,7 +1281,7 @@ namespace rsgis{namespace rastergis{
 			hsize_t intFieldsDimsRead[2]; 
 			intFieldsDimsRead[0] = ATT_WRITE_CHUNK_SIZE;
             intFieldsDimsRead[1] = attTableObj->numIntFields;
-			DataSpace intFieldsMemspace( 2, intFieldsDimsRead );
+			H5::DataSpace intFieldsMemspace( 2, intFieldsDimsRead );
 			
 			hsize_t intFieldsOffset_out[2];
             intFieldsOffset_out[0] = 0;
@@ -1309,7 +1309,7 @@ namespace rsgis{namespace rastergis{
 			hsize_t floatFieldsDimsRead[2]; 
 			floatFieldsDimsRead[0] = ATT_WRITE_CHUNK_SIZE;
             floatFieldsDimsRead[1] = attTableObj->numFloatFields;
-			DataSpace floatFieldsMemspace( 2, floatFieldsDimsRead );
+			H5::DataSpace floatFieldsMemspace( 2, floatFieldsDimsRead );
 			
 			hsize_t floatFieldsOffset_out[2];
             floatFieldsOffset_out[0] = 0;
@@ -1330,39 +1330,39 @@ namespace rsgis{namespace rastergis{
             {
                 neighboursOffset[0] = i*ATT_WRITE_CHUNK_SIZE;
                 neighboursDataspace.selectHyperslab( H5S_SELECT_SET, neighboursCount, neighboursOffset );
-                //cout << "reading neighbours\n";
+                //std::cout << "reading neighbours\n";
                 neighboursDataset.read(neighbourVals, intVarLenMemDT, neighboursMemspace, neighboursDataspace);
-                //cout << "neighbours read\n";
+                //std::cout << "neighbours read\n";
                 
                 if(hasBoolFields)
                 {
                     boolFieldsOffset[0] = i*ATT_WRITE_CHUNK_SIZE;
                     boolDataspace.selectHyperslab( H5S_SELECT_SET, boolFieldsCount, boolFieldsOffset );
-                    boolDataset.read(boolVals, PredType::NATIVE_INT32, boolFieldsMemspace, boolDataspace);
+                    boolDataset.read(boolVals, H5::PredType::NATIVE_INT32, boolFieldsMemspace, boolDataspace);
                 }
                 
                 if(hasIntFields)
                 {
                     intFieldsOffset[0] = i*ATT_WRITE_CHUNK_SIZE;
-                    //cout << "intFieldsOffset[0] = " << intFieldsOffset[0] << endl;
+                    //std::cout << "intFieldsOffset[0] = " << intFieldsOffset[0] << std::endl;
                     intDataspace.selectHyperslab( H5S_SELECT_SET, intFieldsCount, intFieldsOffset );
-                    intDataset.read(intVals, PredType::NATIVE_INT64, intFieldsMemspace, intDataspace);
+                    intDataset.read(intVals, H5::PredType::NATIVE_INT64, intFieldsMemspace, intDataspace);
                 }
                 
                 if(hasFloatFields)
                 {
                     floatFieldsOffset[0] = i*ATT_WRITE_CHUNK_SIZE;
-                    //cout << "floatFieldsOffset[0] = " << floatFieldsOffset[0] << endl;
+                    //std::cout << "floatFieldsOffset[0] = " << floatFieldsOffset[0] << std::endl;
                     floatDataspace.selectHyperslab( H5S_SELECT_SET, floatFieldsCount, floatFieldsOffset );
-                    floatDataset.read(floatVals, PredType::NATIVE_DOUBLE, floatFieldsMemspace, floatDataspace);
-                    //cout << "read floats\n";
+                    floatDataset.read(floatVals, H5::PredType::NATIVE_DOUBLE, floatFieldsMemspace, floatDataspace);
+                    //std::cout << "read floats\n";
                 }
                 
                 for(hsize_t j = 0; j < ATT_WRITE_CHUNK_SIZE; ++j)
                 {
                     feature = new RSGISFeature();
                     feature->fid = cFid++;
-                    feature->boolFields = new vector<bool>();
+                    feature->boolFields = new std::vector<bool>();
                     if(hasBoolFields)
                     {
                         feature->boolFields->reserve(attTableObj->numBoolFields);
@@ -1371,7 +1371,7 @@ namespace rsgis{namespace rastergis{
                             feature->boolFields->push_back(boolVals[(j*attTableObj->numBoolFields)+n]);
                         }
                     }
-                    feature->intFields = new vector<long>();
+                    feature->intFields = new std::vector<long>();
                     if(hasIntFields)
                     {
                         feature->intFields->reserve(attTableObj->numIntFields);
@@ -1380,18 +1380,18 @@ namespace rsgis{namespace rastergis{
                             feature->intFields->push_back(intVals[(j*attTableObj->numIntFields)+n]);
                         }
                     }
-                    feature->floatFields = new vector<double>();
+                    feature->floatFields = new std::vector<double>();
                     if(hasFloatFields)
                     {
                         feature->floatFields->reserve(attTableObj->numFloatFields);
                         for(hsize_t n = 0; n < attTableObj->numFloatFields; ++n)
                         {
                             feature->floatFields->push_back(floatVals[(j*attTableObj->numFloatFields)+n]);
-                            //cout << feature->fid << ":\t" << floatVals[(j*attTableObj->numFloatFields)+n] << endl;
+                            //std::cout << feature->fid << ":\t" << floatVals[(j*attTableObj->numFloatFields)+n] << std::endl;
                         }
                     }
-                    feature->stringFields = new vector<string>();
-                    feature->neighbours = new vector<boost::uint_fast32_t>();
+                    feature->stringFields = new std::vector<std::string>();
+                    feature->neighbours = new std::vector<boost::uint_fast32_t>();
                     feature->neighbours->reserve(neighbourVals[j].length);
 
                     for(hsize_t n = 0; n < neighbourVals[j].length; ++n)
@@ -1400,7 +1400,7 @@ namespace rsgis{namespace rastergis{
                     }
                     delete[] ((size_t*)neighbourVals[j].p);
                     
-                    //cout << cFid << " has " << neighbourVals[j].length << " neighbours\n";
+                    //std::cout << cFid << " has " << neighbourVals[j].length << " neighbours\n";
                     
                     attTableObj->attTable->push_back(feature);
                 }
@@ -1412,7 +1412,7 @@ namespace rsgis{namespace rastergis{
 			neighboursDataspace.selectHyperslab( H5S_SELECT_SET, neighboursCount, neighboursOffset );
 			
 			neighboursDimsRead[0] = remainingRows;
-			neighboursMemspace = DataSpace( 1, neighboursDimsRead );
+			neighboursMemspace = H5::DataSpace( 1, neighboursDimsRead );
 			
             neighboursOffset_out[0] = 0;
 			neighboursCount_out[0] = remainingRows;
@@ -1430,7 +1430,7 @@ namespace rsgis{namespace rastergis{
 			
 			boolFieldsDimsRead[0] = remainingRows;
             boolFieldsDimsRead[1] = attTableObj->numBoolFields;
-			boolFieldsMemspace = DataSpace( 2, boolFieldsDimsRead );
+			boolFieldsMemspace = H5::DataSpace( 2, boolFieldsDimsRead );
 			
             boolFieldsOffset_out[0] = 0;
             boolFieldsOffset_out[1] = 0;
@@ -1453,7 +1453,7 @@ namespace rsgis{namespace rastergis{
 			
 			intFieldsDimsRead[0] = remainingRows;
             intFieldsDimsRead[1] = attTableObj->numIntFields;
-			intFieldsMemspace = DataSpace( 2, intFieldsDimsRead );
+			intFieldsMemspace = H5::DataSpace( 2, intFieldsDimsRead );
 			
             intFieldsOffset_out[0] = 0;
             intFieldsOffset_out[1] = 0;
@@ -1476,7 +1476,7 @@ namespace rsgis{namespace rastergis{
 			
 			floatFieldsDimsRead[0] = remainingRows;
             floatFieldsDimsRead[1] = attTableObj->numFloatFields;
-			floatFieldsMemspace = DataSpace( 2, floatFieldsDimsRead );
+			floatFieldsMemspace = H5::DataSpace( 2, floatFieldsDimsRead );
 			
             floatFieldsOffset_out[0] = 0;
             floatFieldsOffset_out[1] = 0;
@@ -1491,26 +1491,26 @@ namespace rsgis{namespace rastergis{
             
             if(hasBoolFields)
             {
-                boolDataset.read(boolVals, PredType::NATIVE_INT32, boolFieldsMemspace, boolDataspace);
+                boolDataset.read(boolVals, H5::PredType::NATIVE_INT32, boolFieldsMemspace, boolDataspace);
             }
             
             if(hasIntFields)
             {
-                //cout << "remaining: intFieldsOffset[0] = " << intFieldsOffset[0] << endl;
-                intDataset.read(intVals, PredType::NATIVE_INT64, intFieldsMemspace, intDataspace);
+                //std::cout << "remaining: intFieldsOffset[0] = " << intFieldsOffset[0] << std::endl;
+                intDataset.read(intVals, H5::PredType::NATIVE_INT64, intFieldsMemspace, intDataspace);
             }
             
             if(hasFloatFields)
             {
-                //cout << "remaining: floatFieldsOffset[0] = " << floatFieldsOffset[0] << endl;
-                floatDataset.read(floatVals, PredType::NATIVE_DOUBLE, floatFieldsMemspace, floatDataspace);
+                //std::cout << "remaining: floatFieldsOffset[0] = " << floatFieldsOffset[0] << std::endl;
+                floatDataset.read(floatVals, H5::PredType::NATIVE_DOUBLE, floatFieldsMemspace, floatDataspace);
             }
             
             for(hsize_t j = 0; j < remainingRows; ++j)
             {
                 feature = new RSGISFeature();
                 feature->fid = cFid++;
-                feature->boolFields = new vector<bool>();
+                feature->boolFields = new std::vector<bool>();
                 if(hasBoolFields)
                 {
                     feature->boolFields->reserve(attTableObj->numBoolFields);
@@ -1519,7 +1519,7 @@ namespace rsgis{namespace rastergis{
                         feature->boolFields->push_back(boolVals[(j*attTableObj->numBoolFields)+n]);
                     }
                 }
-                feature->intFields = new vector<long>();
+                feature->intFields = new std::vector<long>();
                 if(hasIntFields)
                 {
                     feature->intFields->reserve(attTableObj->numIntFields);
@@ -1528,7 +1528,7 @@ namespace rsgis{namespace rastergis{
                         feature->intFields->push_back(intVals[(j*attTableObj->numIntFields)+n]);
                     }
                 }
-                feature->floatFields = new vector<double>();
+                feature->floatFields = new std::vector<double>();
                 if(hasFloatFields)
                 {
                     feature->floatFields->reserve(attTableObj->numFloatFields);
@@ -1537,8 +1537,8 @@ namespace rsgis{namespace rastergis{
                         feature->floatFields->push_back(floatVals[(j*attTableObj->numFloatFields)+n]);
                     }
                 }
-                feature->stringFields = new vector<string>();
-                feature->neighbours = new vector<boost::uint_fast32_t>();
+                feature->stringFields = new std::vector<std::string>();
+                feature->neighbours = new std::vector<boost::uint_fast32_t>();
                 feature->neighbours->reserve(neighbourVals[j].length);
                 
                 for(hsize_t n = 0; n < neighbourVals[j].length; ++n)
@@ -1547,7 +1547,7 @@ namespace rsgis{namespace rastergis{
                 }
                 delete[] ((size_t*)neighbourVals[j].p);
                 
-                //cout << cFid << " has " << neighbourVals[j].length << " neighbours\n";
+                //std::cout << cFid << " has " << neighbourVals[j].length << " neighbours\n";
                                 
                 attTableObj->attTable->push_back(feature);
             }
@@ -1573,13 +1573,13 @@ namespace rsgis{namespace rastergis{
         {
             throw RSGISAttributeTableException(e.what());
         }
-        catch( Exception &e )
+        catch( H5::Exception &e )
         {
             /*e.printError();
-            cout << e.getCFuncName() << endl;
-            cout << e.getCDetailMsg() << endl;
-            cout << e.getFuncName() << endl;
-            cout << e.getDetailMsg() << endl;*/
+            std::cout << e.getCFuncName() << std::endl;
+            std::cout << e.getCDetailMsg() << std::endl;
+            std::cout << e.getFuncName() << std::endl;
+            std::cout << e.getDetailMsg() << std::endl;*/
             
             throw RSGISAttributeTableException(e.getDetailMsg());
         }
@@ -1587,7 +1587,7 @@ namespace rsgis{namespace rastergis{
         return attTableObj;
     }
     
-    RSGISAttributeTable* RSGISAttributeTableMem::importFromGDALRaster(string inFile)throw(RSGISAttributeTableException)
+    RSGISAttributeTable* RSGISAttributeTableMem::importFromGDALRaster(std::string inFile)throw(RSGISAttributeTableException)
     {
         return NULL;
     }
@@ -1596,7 +1596,7 @@ namespace rsgis{namespace rastergis{
     {
         if(attTable != NULL)
         {
-            for(vector<RSGISFeature*>::iterator iterFeats = attTable->begin(); iterFeats != attTable->end(); ++iterFeats)
+            for(std::vector<RSGISFeature*>::iterator iterFeats = attTable->begin(); iterFeats != attTable->end(); ++iterFeats)
             {
                 this->freeFeature(*iterFeats);
             }

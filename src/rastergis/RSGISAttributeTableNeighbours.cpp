@@ -30,18 +30,18 @@ namespace rsgis{namespace rastergis{
         
     }
     
-    vector<vector<unsigned long > >* RSGISAttributeTableNeighbours::importFromTextFile(string inFilePath) throw(RSGISAttributeTableException)
+    std::vector<std::vector<unsigned long > >* RSGISAttributeTableNeighbours::importFromTextFile(std::string inFilePath) throw(RSGISAttributeTableException)
     {
-        vector<vector<unsigned long > > *neighbours = NULL;
+        std::vector<std::vector<unsigned long > > *neighbours = NULL;
         
         try 
         {
-            RSGISTextUtils txtUtils;
-            RSGISTextFileLineReader txtReader;
+            rsgis::utils::RSGISTextUtils txtUtils;
+            rsgis::utils::RSGISTextFileLineReader txtReader;
             txtReader.openFile(inFilePath);
             
-            vector<string> *tokens = new vector<string>();
-            string line = "";
+            std::vector<std::string> *tokens = new std::vector<std::string>();
+            std::string line = "";
             unsigned long lineCount = 0;
             unsigned long numNeighbours = 0;
             unsigned long numVals = 0;
@@ -57,14 +57,14 @@ namespace rsgis{namespace rastergis{
                     if(lineCount == 0)
                     {
                         numNeighbours = txtUtils.strto64bitUInt(line);
-                        neighbours = new vector<vector<unsigned long > >();
+                        neighbours = new std::vector<std::vector<unsigned long > >();
                         neighbours->reserve(numNeighbours);
                     }
                     else
                     {
                         txtUtils.tokenizeString(line, ',', tokens, true);
                         valCount = 0;
-                        for(vector<string>::iterator iterStr = tokens->begin(); iterStr != tokens->end(); ++iterStr)
+                        for(std::vector<std::string>::iterator iterStr = tokens->begin(); iterStr != tokens->end(); ++iterStr)
                         {
                             if(valCount == 0)
                             {
@@ -74,7 +74,7 @@ namespace rsgis{namespace rastergis{
                             else if(valCount == 1)
                             {
                                 numVals = txtUtils.strto64bitUInt(*iterStr);
-                                vector<unsigned long > valsList = vector<unsigned long >();
+                                std::vector<unsigned long > valsList = std::vector<unsigned long >();
                                 if(numVals > 0)
                                 {
                                     valsList.reserve(numVals);
@@ -104,19 +104,19 @@ namespace rsgis{namespace rastergis{
         return neighbours;
     }
     
-    void RSGISAttributeTableNeighbours::exportToTextFile(vector<list<unsigned long >* > *neighbours, string outFilePath) throw(RSGISAttributeTableException)
+    void RSGISAttributeTableNeighbours::exportToTextFile(std::vector<std::list<unsigned long >* > *neighbours, std::string outFilePath) throw(RSGISAttributeTableException)
     {
         try 
         {
-            ofstream outTxtFile;
-            outTxtFile.open(outFilePath.c_str(), ios::out | ios::trunc);
+            std::ofstream outTxtFile;
+            outTxtFile.open(outFilePath.c_str(), std::ios::out | std::ios::trunc);
             
             outTxtFile << "# Number of features.\n";
-            outTxtFile << neighbours->size() << endl;
+            outTxtFile << neighbours->size() << std::endl;
             outTxtFile << "# FID, Number of Neighbours, Neighbour FIDs.\n";
             unsigned long cFID = 0;
-            vector<list<unsigned long >* >::iterator iterNeighbours;
-            list<unsigned long >::iterator iterNeighbourFIDs;
+            std::vector<std::list<unsigned long >* >::iterator iterNeighbours;
+            std::list<unsigned long >::iterator iterNeighbourFIDs;
             for(iterNeighbours = neighbours->begin(); iterNeighbours != neighbours->end(); ++iterNeighbours)
             {
                 outTxtFile << cFID++ << "," << (*iterNeighbours)->size();
@@ -124,7 +124,7 @@ namespace rsgis{namespace rastergis{
                 {
                     outTxtFile << "," << *iterNeighbourFIDs;
                 }
-                outTxtFile << endl;
+                outTxtFile << std::endl;
             }
             outTxtFile.flush();
             outTxtFile.close();
@@ -135,19 +135,19 @@ namespace rsgis{namespace rastergis{
         }
     }
     
-    void RSGISAttributeTableNeighbours::exportToTextFile(vector<vector<unsigned long > > *neighbours, string outFilePath) throw(RSGISAttributeTableException)
+    void RSGISAttributeTableNeighbours::exportToTextFile(std::vector<std::vector<unsigned long > > *neighbours, std::string outFilePath) throw(RSGISAttributeTableException)
     {
         try 
         {
-            ofstream outTxtFile;
-            outTxtFile.open(outFilePath.c_str(), ios::out | ios::trunc);
+            std::ofstream outTxtFile;
+            outTxtFile.open(outFilePath.c_str(), std::ios::out | std::ios::trunc);
             
             outTxtFile << "# Number of features.\n";
-            outTxtFile << neighbours->size() << endl;
+            outTxtFile << neighbours->size() << std::endl;
             outTxtFile << "# FID, Number of Neighbours, Neighbour FIDs.\n";
             unsigned long cFID = 0;
-            vector<vector<unsigned long > >::iterator iterNeighbours;
-            vector<unsigned long >::iterator iterNeighbourFIDs;
+            std::vector<std::vector<unsigned long > >::iterator iterNeighbours;
+            std::vector<unsigned long >::iterator iterNeighbourFIDs;
             for(iterNeighbours = neighbours->begin(); iterNeighbours != neighbours->end(); ++iterNeighbours)
             {
                 outTxtFile << cFID++ << "," << (*iterNeighbours).size();
@@ -155,7 +155,7 @@ namespace rsgis{namespace rastergis{
                 {
                     outTxtFile << "," << *iterNeighbourFIDs;
                 }
-                outTxtFile << endl;
+                outTxtFile << std::endl;
             }
             outTxtFile.flush();
             outTxtFile.close();
@@ -166,9 +166,9 @@ namespace rsgis{namespace rastergis{
         }
     }
     
-    void RSGISAttributeTableNeighbours::clearMemory(vector<list<unsigned long >* > *neighbours)
+    void RSGISAttributeTableNeighbours::clearMemory(std::vector<std::list<unsigned long >* > *neighbours)
     {
-        vector<list<unsigned long >* >::iterator iterNeighbours;
+        std::vector<std::list<unsigned long >* >::iterator iterNeighbours;
         for(iterNeighbours = neighbours->begin(); iterNeighbours != neighbours->end(); ++iterNeighbours)
         {
             delete *iterNeighbours;

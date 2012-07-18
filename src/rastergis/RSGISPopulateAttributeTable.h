@@ -33,7 +33,6 @@
 #include "img/RSGISImageCalcException.h"
 #include "img/RSGISCalcImageValue.h"
 #include "img/RSGISCalcImage.h"
-#include "img/RSGISCalcImageSingleValue.h"
 
 #include "rastergis/RSGISAttributeTable.h"
 #include "rastergis/RSGISAttributeTableMem.h"
@@ -52,65 +51,57 @@
 
 namespace rsgis{namespace rastergis{
     
-    using namespace std;
-    using namespace rsgis;
-    using namespace rsgis::utils;
-    using namespace rsgis::math;
-    using namespace rsgis::img;
-    using boost::lexical_cast;
-    using boost::bad_lexical_cast;
-    
     struct RSGISBandAttStats
     {
         unsigned int band;
         float threshold;
         bool calcCount;
-        string countField;
+        std::string countField;
         unsigned int countIdx;
         bool calcMin;
-        string minField;
+        std::string minField;
         unsigned int minIdx;
         bool calcMax;
-        string maxField;
+        std::string maxField;
         unsigned int maxIdx;
         bool calcMean;
-        string meanField;
+        std::string meanField;
         unsigned int meanIdx;
         bool calcStdDev;
-        string stdDevField;
+        std::string stdDevField;
         unsigned int stdDevIdx;
         bool calcMedian;
-        string medianField;
+        std::string medianField;
         unsigned int medianIdx;
         bool calcSum;
-        string sumField;
+        std::string sumField;
         unsigned int sumIdx;
     };
     
     struct RSGISBandAttStatsMeanLit
     {
         unsigned int band;
-        string fieldName;
+        std::string fieldName;
         unsigned int fieldIdx;
         RSGISAttributeDataType fieldDT;
         bool useUpperVals;
         bool calcMin;
-        string minField;
+        std::string minField;
         unsigned int minIdx;
         bool calcMax;
-        string maxField;
+        std::string maxField;
         unsigned int maxIdx;
         bool calcMean;
-        string meanField;
+        std::string meanField;
         unsigned int meanIdx;
         bool calcStdDev;
-        string stdDevField;
+        std::string stdDevField;
         unsigned int stdDevIdx;
         bool calcMedian;
-        string medianField;
+        std::string medianField;
         unsigned int medianIdx;
         bool calcSum;
-        string sumField;
+        std::string sumField;
         unsigned int sumIdx;
     };
     
@@ -118,7 +109,7 @@ namespace rsgis{namespace rastergis{
     struct RSGISBandAttName
     {
         unsigned int band;
-        string attName;
+        std::string attName;
         unsigned int fieldIdx;
         RSGISAttributeDataType fieldDT;
     };
@@ -128,27 +119,27 @@ namespace rsgis{namespace rastergis{
     {
     public:
         RSGISPopulateAttributeTableBandMeans();
-        RSGISAttributeTable* populateWithBandsMeans(GDALDataset **datasets, int numDatasets, string attrPrefix)throw(RSGISImageCalcException, RSGISAttributeTableException);
-        void populateWithBandStatistics(GDALDataset **datasets, int numDatasets, vector<RSGISBandAttStats*> *bandStats) throw(RSGISImageCalcException, RSGISAttributeTableException);
-        unsigned long long calcMaxValue(GDALDataset *dataset)throw(RSGISImageCalcException);
+        RSGISAttributeTable* populateWithBandsMeans(GDALDataset **datasets, int numDatasets, std::string attrPrefix)throw(rsgis::img::RSGISImageCalcException, RSGISAttributeTableException);
+        void populateWithBandStatistics(GDALDataset **datasets, int numDatasets, std::vector<RSGISBandAttStats*> *bandStats) throw(rsgis::img::RSGISImageCalcException, RSGISAttributeTableException);
+        unsigned long long calcMaxValue(GDALDataset *dataset)throw(rsgis::img::RSGISImageCalcException);
         ~RSGISPopulateAttributeTableBandMeans();
     };
         
-    class RSGISPopulateAttributeTableBandMeansCalcImg : public RSGISCalcImageValue
+    class RSGISPopulateAttributeTableBandMeansCalcImg : public rsgis::img::RSGISCalcImageValue
     {
     public: 
-        RSGISPopulateAttributeTableBandMeansCalcImg(RSGISAttributeTable *attTable, string attrPrefix, unsigned int pxlCountIdx, unsigned int *bandMeanIdxs, unsigned int numBandMeanIdxs);
-        void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException);
-        void calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
-        bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
+        RSGISPopulateAttributeTableBandMeansCalcImg(RSGISAttributeTable *attTable, std::string attrPrefix, unsigned int pxlCountIdx, unsigned int *bandMeanIdxs, unsigned int numBandMeanIdxs);
+        void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException);
+        void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+        bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
         ~RSGISPopulateAttributeTableBandMeansCalcImg();
     protected:
         RSGISAttributeTable *attTable;
-        string attrPrefix;
+        std::string attrPrefix;
         unsigned int pxlCountIdx;
         unsigned int *bandMeanIdxs;
         unsigned int numBandMeanIdxs;
@@ -159,7 +150,7 @@ namespace rsgis{namespace rastergis{
     {
     public:
         RSGISPopulateAttributeTableBandWithSumAndMeans();
-        void populateWithBandStatistics(RSGISAttributeTable *attTable, GDALDataset **datasets, int numDatasets, vector<RSGISBandAttStats*> *bandStats) throw(RSGISImageCalcException, RSGISAttributeTableException);
+        void populateWithBandStatistics(RSGISAttributeTable *attTable, GDALDataset **datasets, int numDatasets, std::vector<RSGISBandAttStats*> *bandStats) throw(rsgis::img::RSGISImageCalcException, RSGISAttributeTableException);
         ~RSGISPopulateAttributeTableBandWithSumAndMeans();
     };
     
@@ -168,8 +159,8 @@ namespace rsgis{namespace rastergis{
     {
     public:
         RSGISPopulateAttributeTableBandStats();
-        void populateWithBandStatisticsInMem(RSGISAttributeTable *attTable, GDALDataset **datasets, int numDatasets, vector<RSGISBandAttStats*> *bandStats) throw(RSGISImageCalcException, RSGISAttributeTableException);
-        void populateWithBandStatisticsWithinAtt(RSGISAttributeTable *attTable, GDALDataset **datasets, int numDatasets, vector<RSGISBandAttStats*> *bandStats) throw(RSGISImageCalcException, RSGISAttributeTableException);
+        void populateWithBandStatisticsInMem(RSGISAttributeTable *attTable, GDALDataset **datasets, int numDatasets, std::vector<RSGISBandAttStats*> *bandStats) throw(rsgis::img::RSGISImageCalcException, RSGISAttributeTableException);
+        void populateWithBandStatisticsWithinAtt(RSGISAttributeTable *attTable, GDALDataset **datasets, int numDatasets, std::vector<RSGISBandAttStats*> *bandStats) throw(rsgis::img::RSGISImageCalcException, RSGISAttributeTableException);
         ~RSGISPopulateAttributeTableBandStats();
     };
     
@@ -177,7 +168,7 @@ namespace rsgis{namespace rastergis{
     {
     public:
         RSGISPopulateAttributeTableBandThresholdedStats();
-        void populateWithBandStatisticsWithinAtt(RSGISAttributeTable *attTable, GDALDataset **datasets, int numDatasets, vector<RSGISBandAttStats*> *bandStats) throw(RSGISImageCalcException, RSGISAttributeTableException);
+        void populateWithBandStatisticsWithinAtt(RSGISAttributeTable *attTable, GDALDataset **datasets, int numDatasets, std::vector<RSGISBandAttStats*> *bandStats) throw(rsgis::img::RSGISImageCalcException, RSGISAttributeTableException);
         ~RSGISPopulateAttributeTableBandThresholdedStats();
     };
     
@@ -185,8 +176,8 @@ namespace rsgis{namespace rastergis{
     {
     public:
         RSGISPopulateAttributeTableBandStatsMeanLit();
-        void populateWithBandStatisticsInMem(RSGISAttributeTable *attTable, GDALDataset **datasets, int numDatasets, vector<RSGISBandAttStats*> *bandStats, unsigned int meanLitBand, string meanLitField, bool useMeanLitValAbove) throw(RSGISImageCalcException, RSGISAttributeTableException);
-        void populateWithBandStatisticsWithinAtt(RSGISAttributeTable *attTable, GDALDataset **datasets, int numDatasets, vector<RSGISBandAttStats*> *bandStats, unsigned int meanLitBand, string meanLitField, bool useMeanLitValAbove) throw(RSGISImageCalcException, RSGISAttributeTableException);
+        void populateWithBandStatisticsInMem(RSGISAttributeTable *attTable, GDALDataset **datasets, int numDatasets, std::vector<RSGISBandAttStats*> *bandStats, unsigned int meanLitBand, std::string meanLitField, bool useMeanLitValAbove) throw(rsgis::img::RSGISImageCalcException, RSGISAttributeTableException);
+        void populateWithBandStatisticsWithinAtt(RSGISAttributeTable *attTable, GDALDataset **datasets, int numDatasets, std::vector<RSGISBandAttStats*> *bandStats, unsigned int meanLitBand, std::string meanLitField, bool useMeanLitValAbove) throw(rsgis::img::RSGISImageCalcException, RSGISAttributeTableException);
         ~RSGISPopulateAttributeTableBandStatsMeanLit();
     };
     
@@ -194,83 +185,83 @@ namespace rsgis{namespace rastergis{
     {
     public:
         RSGISPopulateAttributeTableBandStatsMeanLitBands();
-        void populateWithBandStatisticsInMem(RSGISAttributeTable *attTable, GDALDataset **datasets, int numDatasets, vector<RSGISBandAttStatsMeanLit*> *bandStats) throw(RSGISImageCalcException, RSGISAttributeTableException);
+        void populateWithBandStatisticsInMem(RSGISAttributeTable *attTable, GDALDataset **datasets, int numDatasets, std::vector<RSGISBandAttStatsMeanLit*> *bandStats) throw(rsgis::img::RSGISImageCalcException, RSGISAttributeTableException);
         ~RSGISPopulateAttributeTableBandStatsMeanLitBands();
     };
     
-    class RSGISGetPixelValuesForClumps : public RSGISCalcImageValue
+    class RSGISGetPixelValuesForClumps : public rsgis::img::RSGISCalcImageValue
     {
     public: 
-        RSGISGetPixelValuesForClumps(vector<vector<double> > **clumpData, unsigned int numDataBands, unsigned int *dataBandIdxs);
-        void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException);
-        void calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
-        bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
+        RSGISGetPixelValuesForClumps(std::vector<std::vector<double> > **clumpData, unsigned int numDataBands, unsigned int *dataBandIdxs);
+        void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException);
+        void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+        bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
         ~RSGISGetPixelValuesForClumps();
     protected:
-        vector<vector<double> > **clumpData;
+        std::vector<std::vector<double> > **clumpData;
         unsigned int numBands;
         unsigned int numDataBands;
         unsigned int *dataBandIdxs;
     };
     
-    class RSGISCalcClumpStatsWithinAtt : public RSGISCalcImageValue
+    class RSGISCalcClumpStatsWithinAtt : public rsgis::img::RSGISCalcImageValue
     {
     public: 
-        RSGISCalcClumpStatsWithinAtt(RSGISAttributeTable *attTable, vector<RSGISBandAttStats*> *bandStats, bool calcStdDev, unsigned int pxlCountIdx, unsigned int firstFieldIdx);
-        void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException);
-        void calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
-        bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
+        RSGISCalcClumpStatsWithinAtt(RSGISAttributeTable *attTable, std::vector<RSGISBandAttStats*> *bandStats, bool calcStdDev, unsigned int pxlCountIdx, unsigned int firstFieldIdx);
+        void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException);
+        void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+        bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
         ~RSGISCalcClumpStatsWithinAtt();
     protected:
         RSGISAttributeTable *attTable;
-        vector<RSGISBandAttStats*> *bandStats;
+        std::vector<RSGISBandAttStats*> *bandStats;
         bool calcStdDev;
         unsigned int pxlCountIdx;
         unsigned int firstFieldIdx;
     };
     
-    class RSGISCalcClumpThresholdedStatsWithinAtt : public RSGISCalcImageValue
+    class RSGISCalcClumpThresholdedStatsWithinAtt : public rsgis::img::RSGISCalcImageValue
     {
     public: 
-        RSGISCalcClumpThresholdedStatsWithinAtt(RSGISAttributeTable *attTable, vector<RSGISBandAttStats*> *bandStats, bool calcStdDev, unsigned int firstFieldIdx);
-        void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException);
-        void calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
-        bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
+        RSGISCalcClumpThresholdedStatsWithinAtt(RSGISAttributeTable *attTable, std::vector<RSGISBandAttStats*> *bandStats, bool calcStdDev, unsigned int firstFieldIdx);
+        void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException);
+        void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+        bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
         ~RSGISCalcClumpThresholdedStatsWithinAtt();
     protected:
         RSGISAttributeTable *attTable;
-        vector<RSGISBandAttStats*> *bandStats;
+        std::vector<RSGISBandAttStats*> *bandStats;
         bool calcStdDev;
         unsigned int firstFieldIdx;
     };
     
-    class RSGISGetPixelValuesForClumpsMeanLit : public RSGISCalcImageValue
+    class RSGISGetPixelValuesForClumpsMeanLit : public rsgis::img::RSGISCalcImageValue
     {
     public: 
-        RSGISGetPixelValuesForClumpsMeanLit(RSGISAttributeTable *attTable, vector<vector<double> > **clumpData, unsigned int numDataBands, unsigned int *dataBandIdxs, unsigned int meanLitBand, unsigned int meanLitFieldIdx, RSGISAttributeDataType meanLitFieldDT, bool useMeanLitValAbove);
-        void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException);
-        void calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
-        bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
+        RSGISGetPixelValuesForClumpsMeanLit(RSGISAttributeTable *attTable, std::vector<std::vector<double> > **clumpData, unsigned int numDataBands, unsigned int *dataBandIdxs, unsigned int meanLitBand, unsigned int meanLitFieldIdx, RSGISAttributeDataType meanLitFieldDT, bool useMeanLitValAbove);
+        void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException);
+        void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+        bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
         ~RSGISGetPixelValuesForClumpsMeanLit();
     protected:
         RSGISAttributeTable *attTable;
-        vector<vector<double> > **clumpData;
+        std::vector<std::vector<double> > **clumpData;
         unsigned int numBands;
         unsigned int numDataBands;
         unsigned int *dataBandIdxs;
@@ -280,21 +271,21 @@ namespace rsgis{namespace rastergis{
         bool useMeanLitValAbove;
     };
     
-    class RSGISClumpsMeanLitStatsWithinAtt : public RSGISCalcImageValue
+    class RSGISClumpsMeanLitStatsWithinAtt : public rsgis::img::RSGISCalcImageValue
     {
     public: 
-        RSGISClumpsMeanLitStatsWithinAtt(RSGISAttributeTable *attTable, vector<RSGISBandAttStats*> *bandStats, bool calcStdDev, unsigned int pxlCountIdx, unsigned int firstFieldIdx, unsigned int meanLitBand, unsigned int meanLitFieldIdx, RSGISAttributeDataType meanLitFieldDT, bool useMeanLitValAbove);
-        void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException);
-        void calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
-        bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
+        RSGISClumpsMeanLitStatsWithinAtt(RSGISAttributeTable *attTable, std::vector<RSGISBandAttStats*> *bandStats, bool calcStdDev, unsigned int pxlCountIdx, unsigned int firstFieldIdx, unsigned int meanLitBand, unsigned int meanLitFieldIdx, RSGISAttributeDataType meanLitFieldDT, bool useMeanLitValAbove);
+        void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException);
+        void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+        bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
         ~RSGISClumpsMeanLitStatsWithinAtt();
     protected:
         RSGISAttributeTable *attTable;
-        vector<RSGISBandAttStats*> *bandStats;
+        std::vector<RSGISBandAttStats*> *bandStats;
         bool calcStdDev;
         unsigned int pxlCountIdx;
         unsigned int firstFieldIdx;
@@ -308,24 +299,24 @@ namespace rsgis{namespace rastergis{
     {
     public:
         RSGISPopulateAttributeTableImageStats();
-        void populateWithImageStatisticsInMem(RSGISAttributeTable *attTable, GDALDataset **datasets, int numDatasets, RSGISBandAttStats *imageStats, float noDataVal, bool noDataValDefined) throw(RSGISImageCalcException, RSGISAttributeTableException);
+        void populateWithImageStatisticsInMem(RSGISAttributeTable *attTable, GDALDataset **datasets, int numDatasets, RSGISBandAttStats *imageStats, float noDataVal, bool noDataValDefined) throw(rsgis::img::RSGISImageCalcException, RSGISAttributeTableException);
         ~RSGISPopulateAttributeTableImageStats();
     };
     
-    class RSGISGetAllBandPixelValuesForClumps : public RSGISCalcImageValue
+    class RSGISGetAllBandPixelValuesForClumps : public rsgis::img::RSGISCalcImageValue
     {
     public: 
-        RSGISGetAllBandPixelValuesForClumps(vector<double> **clumpData, float noDataVal, bool noDataValDefined);
-        void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException);
-        void calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
-        bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
+        RSGISGetAllBandPixelValuesForClumps(std::vector<double> **clumpData, float noDataVal, bool noDataValDefined);
+        void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException);
+        void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+        bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
         ~RSGISGetAllBandPixelValuesForClumps();
     protected:
-        vector<double> **clumpData;
+        std::vector<double> **clumpData;
         unsigned int numBands;
         float noDataVal;
         bool noDataValDefined;
@@ -336,40 +327,40 @@ namespace rsgis{namespace rastergis{
     {
     public:
         RSGISCalcAttTableWithinSegmentPixelDistStats();
-        void populateWithImageStatistics(RSGISAttributeTable *attTable, GDALDataset **datasets, int numDatasets, vector<RSGISBandAttName*> *bands, RSGISBandAttStats *imageStats) throw(RSGISImageCalcException, RSGISAttributeTableException);
+        void populateWithImageStatistics(RSGISAttributeTable *attTable, GDALDataset **datasets, int numDatasets, std::vector<RSGISBandAttName*> *bands, RSGISBandAttStats *imageStats) throw(rsgis::img::RSGISImageCalcException, RSGISAttributeTableException);
         ~RSGISCalcAttTableWithinSegmentPixelDistStats();
     };
     
-    class RSGISCalcEucDistWithSegments : public RSGISCalcImageValue
+    class RSGISCalcEucDistWithSegments : public rsgis::img::RSGISCalcImageValue
     {
     public: 
-        RSGISCalcEucDistWithSegments(RSGISAttributeTable *attTable, vector<double> **clumpData, vector<RSGISBandAttName*> *bands);
-        void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException);
-        void calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
-        bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
+        RSGISCalcEucDistWithSegments(RSGISAttributeTable *attTable, std::vector<double> **clumpData, std::vector<RSGISBandAttName*> *bands);
+        void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException);
+        void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+        bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
         ~RSGISCalcEucDistWithSegments();
     protected:
         RSGISAttributeTable *attTable;
-        vector<RSGISBandAttName*> *bands;
-        vector<double> **clumpData;
+        std::vector<RSGISBandAttName*> *bands;
+        std::vector<double> **clumpData;
         unsigned int numBands;
     };
     
-    class RSGISCalcClumpSumAndCount : public RSGISCalcImageValue
+    class RSGISCalcClumpSumAndCount : public rsgis::img::RSGISCalcImageValue
     {
     public: 
         RSGISCalcClumpSumAndCount(size_t *pxlCount, double **sumVals, size_t *bandIdxs, size_t numSpecBands, size_t numFeats);
-        void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException);
-        void calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
-        bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException);
+        void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+        bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
         ~RSGISCalcClumpSumAndCount();
     protected:
         size_t *pxlCount;

@@ -29,9 +29,9 @@ namespace rsgis{namespace rastergis{
     {
         
     }
-    vector<RSGISSubClumps*>* RSGISHierarchicalClumps::findSubClumps(GDALDataset *clumps, GDALDataset *subClumps, bool noDataValProvided, unsigned int noDataVal) throw(RSGISImageException)
+    std::vector<RSGISSubClumps*>* RSGISHierarchicalClumps::findSubClumps(GDALDataset *clumps, GDALDataset *subClumps, bool noDataValProvided, unsigned int noDataVal) throw(RSGISImageException)
     {
-        vector<RSGISSubClumps*> *clumpStats = new vector<RSGISSubClumps*>();
+        std::vector<RSGISSubClumps*> *clumpStats = new std::vector<RSGISSubClumps*>();
         
         try 
         {
