@@ -32,7 +32,7 @@ namespace rsgis { namespace classifier {
 		cout << "Number of Refference Spectra = " << refSpectra->size2 << endl;
 		this->imageSpecArray = new double[refSpectra->size1];
 	}
-	void RSGISSpectralAngleMapperRule::calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException)
+	void RSGISSpectralAngleMapperRule::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 
 		// Load pixel into memory - saves time on disk reads when comparing to a large number of refference spectra.
@@ -76,7 +76,7 @@ namespace rsgis { namespace classifier {
 		this->refSpectra = refSpectra;
 		cout << "Number of Refference Spectra = " << refSpectra->size2 << endl;
 	}
-	void RSGISSpectralAngleMapperED::calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException)
+	void RSGISSpectralAngleMapperED::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		
 		// Loop through output spectra
@@ -114,7 +114,7 @@ namespace rsgis { namespace classifier {
 	{
 		this->threashold = threashold;
 	}
-	void RSGISSpectralAngleMapperClassifier::calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException)
+	void RSGISSpectralAngleMapperClassifier::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
 	{										
 		double minAngleTemp = 100;
 		double minAngle = 100;

@@ -26,7 +26,7 @@
 
 namespace rsgis{ namespace classifier{
 	
-	RSGISKMeansClassifier::RSGISKMeansClassifier(string inputImageFile, bool printinfo): clusterCentres(NULL), numClusters(0), hasInitClusterCentres(false), datasets(NULL), numDatasets(0), printinfo(false)
+	RSGISKMeansClassifier::RSGISKMeansClassifier(std::string inputImageFile, bool printinfo): clusterCentres(NULL), numClusters(0), hasInitClusterCentres(false), datasets(NULL), numDatasets(0), printinfo(false)
 	{
 		this->inputImageFile = inputImageFile;
 		this->printinfo = printinfo;
@@ -35,7 +35,7 @@ namespace rsgis{ namespace classifier{
 	void RSGISKMeansClassifier::initClusterCentresKpp(unsigned int numClusters)throw(RSGISClassificationException)
 	{
 		throw RSGISClassificationException("Implementation not complete!!");
-		RSGISVectors vecUtils;
+		rsgis::math::RSGISVectors vecUtils;
 		this->numClusters = numClusters;
 		
 		// Open Image
@@ -48,7 +48,7 @@ namespace rsgis{ namespace classifier{
 			datasets[0] = (GDALDataset *) GDALOpenShared(this->inputImageFile.c_str(), GA_ReadOnly);
 			if(datasets[0] == NULL)
 			{
-				string message = string("Could not open image ") + this->inputImageFile;
+				std::string message = std::string("Could not open image ") + this->inputImageFile;
 				throw RSGISClassificationException(message.c_str());
 			}
 		}
@@ -60,18 +60,18 @@ namespace rsgis{ namespace classifier{
 		// Calculate image band stats
 		numImageBands = datasets[0]->GetRasterCount();
 		
-		ImageStats **stats = new ImageStats*[numImageBands];
+		rsgis::img::ImageStats **stats = new rsgis::img::ImageStats*[numImageBands];
 		for(unsigned int i = 0; i < numImageBands; ++i)
 		{
-			stats[i] = new ImageStats();
+			stats[i] = new rsgis::img::ImageStats();
 		}
 		
-		RSGISImageStatistics calcImgStats;
+		rsgis::img::RSGISImageStatistics calcImgStats;
 		try 
 		{
 			calcImgStats.calcImageStatistics(datasets, 1, stats, numImageBands, true);
 		}
-		catch (RSGISImageCalcException &e) 
+		catch (rsgis::img::RSGISImageCalcException &e) 
 		{
 			for(unsigned int i = 0; i < numImageBands; ++i)
 			{
@@ -81,7 +81,7 @@ namespace rsgis{ namespace classifier{
 			
 			throw RSGISClassificationException(e.what());
 		}
-		catch (RSGISImageBandException &e) 
+		catch (rsgis::img::RSGISImageBandException &e) 
 		{
 			for(unsigned int i = 0; i < numImageBands; ++i)
 			{
@@ -117,7 +117,7 @@ namespace rsgis{ namespace classifier{
 		
 		// Select the remaining cluster centres from a distribution weighted by D(x)^2
 		RSGISCalcDist2NrCentreCalcImageVal *calcDist2Centres = new RSGISCalcDist2NrCentreCalcImageVal(0, this->clusterCentres, this->numClusters);
-		RSGISCalcImage *calcImage = new RSGISCalcImage(calcDist2Centres, "", true);
+		rsgis::img::RSGISCalcImage *calcImage = new rsgis::img::RSGISCalcImage(calcDist2Centres, "", true);
 		double sumSqDist = 0;
 		calcDist2Centres->setClusterCentres(clusterCentres, 1);
 		calcImage->calcImage(datasets, numDatasets);
@@ -160,7 +160,7 @@ namespace rsgis{ namespace classifier{
 	
 	void RSGISKMeansClassifier::initClusterCentresRandom(unsigned int numClusters)throw(RSGISClassificationException)
 	{
-		RSGISVectors vecUtils;
+        rsgis::math::RSGISVectors vecUtils;
 		this->numClusters = numClusters;
 		
 		// Open Image
@@ -173,7 +173,7 @@ namespace rsgis{ namespace classifier{
 			datasets[0] = (GDALDataset *) GDALOpenShared(this->inputImageFile.c_str(), GA_ReadOnly);
 			if(datasets[0] == NULL)
 			{
-				string message = string("Could not open image ") + this->inputImageFile;
+				std::string message = std::string("Could not open image ") + this->inputImageFile;
 				throw RSGISClassificationException(message.c_str());
 			}
 		}
@@ -185,18 +185,18 @@ namespace rsgis{ namespace classifier{
 		// Calculate image band stats
 		numImageBands = datasets[0]->GetRasterCount();
 		
-		ImageStats **stats = new ImageStats*[numImageBands];
+		rsgis::img::ImageStats **stats = new rsgis::img::ImageStats*[numImageBands];
 		for(unsigned int i = 0; i < numImageBands; ++i)
 		{
-			stats[i] = new ImageStats();
+			stats[i] = new rsgis::img::ImageStats();
 		}
 		
-		RSGISImageStatistics calcImgStats;
+		rsgis::img::RSGISImageStatistics calcImgStats;
 		try 
 		{
 			calcImgStats.calcImageStatistics(datasets, 1, stats, numImageBands, false);
 		}
-		catch (RSGISImageCalcException &e) 
+		catch (rsgis::img::RSGISImageCalcException &e) 
 		{
 			for(unsigned int i = 0; i < numImageBands; ++i)
 			{
@@ -206,7 +206,7 @@ namespace rsgis{ namespace classifier{
 			
 			throw RSGISClassificationException(e.what());
 		}
-		catch (RSGISImageBandException &e) 
+		catch (rsgis::img::RSGISImageBandException &e) 
 		{
 			for(unsigned int i = 0; i < numImageBands; ++i)
 			{
@@ -267,11 +267,11 @@ namespace rsgis{ namespace classifier{
 	{
 		if(hasInitClusterCentres)
 		{
-			RSGISVectors vecUtils;
+			rsgis::math::RSGISVectors vecUtils;
 			try 
 			{
 				RSGISKMeanCalcPixelClusterCalcImageVal *calcClusterCentre = new RSGISKMeanCalcPixelClusterCalcImageVal(0, this->clusterCentres, this->numClusters, this->numImageBands);
-				RSGISCalcImage *calcImage = new RSGISCalcImage(calcClusterCentre, "", true);
+				rsgis::img::RSGISCalcImage *calcImage = new rsgis::img::RSGISCalcImage(calcClusterCentre, "", true);
 				
 				ClusterCentre **newClusterCentres = NULL;
 				unsigned long *numPxlsInCluster = NULL;
@@ -352,7 +352,7 @@ namespace rsgis{ namespace classifier{
 				delete calcClusterCentre;
 				delete calcImage;
 			}
-			catch (RSGISImageCalcException &e) 
+			catch (rsgis::img::RSGISImageCalcException &e) 
 			{
 				throw RSGISClassificationException(e.what());
 			}
@@ -363,12 +363,12 @@ namespace rsgis{ namespace classifier{
 		}
 	}
 	
-	void RSGISKMeansClassifier::generateOutputImage(string outputImageFile)throw(RSGISClassificationException)
+	void RSGISKMeansClassifier::generateOutputImage(std::string outputImageFile)throw(RSGISClassificationException)
 	{
 		if(hasInitClusterCentres)
 		{
 			RSGISApplyKMeanClassifierCalcImageVal *applyClass = new RSGISApplyKMeanClassifierCalcImageVal(1, this->clusterCentres, this->numClusters);
-			RSGISCalcImage *calcImage = new RSGISCalcImage(applyClass, "", true);
+			rsgis::img::RSGISCalcImage *calcImage = new rsgis::img::RSGISCalcImage(applyClass, "", true);
 			calcImage->calcImage(this->datasets, this->numDatasets, outputImageFile);
 			
 			delete applyClass;
@@ -384,7 +384,7 @@ namespace rsgis{ namespace classifier{
 	{
 		if(hasInitClusterCentres)
 		{
-			RSGISVectors vecUtils;
+			rsgis::math::RSGISVectors vecUtils;
 			for(unsigned int i = 0; i < numClusters; ++i)
 			{
 				vecUtils.freeVector(clusterCentres[i]->data);
@@ -407,7 +407,7 @@ namespace rsgis{ namespace classifier{
 		this->numClusters = numClusters;
 		this->numImageBands = numImageBands;
 		
-		RSGISVectors vecUtils;
+		rsgis::math::RSGISVectors vecUtils;
 		newClusterCentres = new ClusterCentre*[numClusters];
 		numPxlInClusters = new unsigned long[numClusters];
 		for(unsigned int i = 0; i < numClusters; ++i)
@@ -421,7 +421,7 @@ namespace rsgis{ namespace classifier{
 		
 	}
 	
-	void RSGISKMeanCalcPixelClusterCalcImageVal::calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException)
+	void RSGISKMeanCalcPixelClusterCalcImageVal::calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException)
 	{
 		// Identify cluster within which point is associated with
 		double minDistance = 0;
@@ -484,7 +484,7 @@ namespace rsgis{ namespace classifier{
 	
 	RSGISKMeanCalcPixelClusterCalcImageVal::~RSGISKMeanCalcPixelClusterCalcImageVal()
 	{
-		RSGISVectors vecUtils;
+		rsgis::math::RSGISVectors vecUtils;
 		for(unsigned int i = 0; i < numClusters; ++i)
 		{
 			vecUtils.freeVector(newClusterCentres[i]->data);
@@ -502,7 +502,7 @@ namespace rsgis{ namespace classifier{
 		sumSqDistance = 0;
 	}
 	
-	void RSGISCalcDist2NrCentreCalcImageVal::calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException)
+	void RSGISCalcDist2NrCentreCalcImageVal::calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException)
 	{
 		double minDistance = 0;
 		unsigned int minIdx = 0;
@@ -564,7 +564,7 @@ namespace rsgis{ namespace classifier{
 		this->sqDistance = sqDistance;
 	}
 	
-	void RSGISCalcDist2NrCentreDistributionCalcImageVal::calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException)
+	void RSGISCalcDist2NrCentreDistributionCalcImageVal::calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException)
 	{
 		double probX = 0;
 		double minDistance = 0;
@@ -620,7 +620,7 @@ namespace rsgis{ namespace classifier{
 		this->numClusters = numClusters;
 	}
 	
-	void RSGISApplyKMeanClassifierCalcImageVal::calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException)
+	void RSGISApplyKMeanClassifierCalcImageVal::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		double minDistance = 0;
 		unsigned int minIdx = 0;

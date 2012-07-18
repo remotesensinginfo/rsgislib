@@ -31,10 +31,6 @@
 #include <math.h>
 
 namespace rsgis{ namespace classifier{
-
-    using namespace rsgis;
-    using namespace rsgis::math;
-    using namespace std;
     
 	class RSGISNearestNeighbourClassifier : public RSGISClassifier
 		{

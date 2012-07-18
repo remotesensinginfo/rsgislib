@@ -25,22 +25,22 @@
 namespace rsgis { namespace classifier {
 	
 	
-	RSGISCumulativeAreaClassifierGenRules::RSGISCumulativeAreaClassifierGenRules(int numOutBands, Matrix *bandValuesWidths, Matrix *samples) : RSGISCalcImageValue(numOutBands)
+	RSGISCumulativeAreaClassifierGenRules::RSGISCumulativeAreaClassifierGenRules(int numOutBands, rsgis::math::Matrix *bandValuesWidths, rsgis::math::Matrix *samples) : RSGISCalcImageValue(numOutBands)
 	{
 		this->bandValuesWidths = bandValuesWidths;
 		this->samples = samples;
 	}
 	
-	void RSGISCumulativeAreaClassifierGenRules::calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException)
+	void RSGISCumulativeAreaClassifierGenRules::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		if(this->samples->m != this->numOutBands)
 		{
-			throw RSGISImageCalcException("The number of output image bands needs to be equal to the number of samples.");
+			throw rsgis::img::RSGISImageCalcException("The number of output image bands needs to be equal to the number of samples.");
 		}
 		
 		if(bandValuesWidths->n != numBands)
 		{
-			throw RSGISImageCalcException("Band values (i.e., wavelength) and widths need to be defined for all image bands");
+			throw rsgis::img::RSGISImageCalcException("Band values (i.e., wavelength) and widths need to be defined for all image bands");
 		}
 		
 		float *cumulativeArea = new float[numBands];
@@ -67,7 +67,7 @@ namespace rsgis { namespace classifier {
 		delete[] cumulativeArea;
 	}
 	
-	float RSGISCumulativeAreaClassifierGenRules::calcEuclideanDistance(Matrix *samples, int sampleNum, float *data)
+	float RSGISCumulativeAreaClassifierGenRules::calcEuclideanDistance(rsgis::math::Matrix *samples, int sampleNum, float *data)
 	{
 		float eucDist = 0;
 		double sumSQs = 0;
@@ -89,12 +89,12 @@ namespace rsgis { namespace classifier {
 
 	}
 	
-	RSGISCumulativeAreaClassifierDecide::RSGISCumulativeAreaClassifierDecide(int numOutBands, double threshold) : RSGISCalcImageValue(numOutBands)
+	RSGISCumulativeAreaClassifierDecide::RSGISCumulativeAreaClassifierDecide(int numOutBands, double threshold) : rsgis::img::RSGISCalcImageValue(numOutBands)
 	{
 		this->threshold = threshold;
 	}
 	
-	void RSGISCumulativeAreaClassifierDecide::calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException)
+	void RSGISCumulativeAreaClassifierDecide::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
 	{		
 		bool first = true;
 		int minIdx = 0;

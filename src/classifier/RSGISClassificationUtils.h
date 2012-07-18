@@ -51,20 +51,14 @@
 #include "ogr_api.h"
 
 namespace rsgis{ namespace classifier{
-	
-    using namespace rsgis::utils;
-    using namespace rsgis::math;
-    using namespace rsgis::vec;
-    using namespace std;
-    using namespace xercesc;
     
 	class RSGISClassificationUtils
 		{
 		public:
 			RSGISClassificationUtils();
 			ClassData* convertROIs2ClassData(enviroi *enviroi, int id);
-			ClassData** parseClassificationInputFile(string inputFile, int *numClasses) throw(RSGISClassificationException, RSGISInputStreamException, RSGISMatricesException);
-			void convertShapeFile2SpecLib(string vector, string outputFile, string classAttribute, std::vector<std::string> *attributes, bool group) throw(RSGISClassificationException);
+			ClassData** parseClassificationInputFile(std::string inputFile, int *numClasses) throw(RSGISClassificationException, rsgis::RSGISInputStreamException, rsgis::math::RSGISMatricesException);
+			void convertShapeFile2SpecLib(std::string vector, std::string outputFile, std::string classAttribute, std::vector<std::string> *attributes, bool group) throw(RSGISClassificationException);
 			~RSGISClassificationUtils();
 		};
 	

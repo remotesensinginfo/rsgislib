@@ -32,7 +32,7 @@ namespace rsgis{ namespace classifier{
 
 	ClassData* RSGISClassificationUtils::convertROIs2ClassData(enviroi *enviroi, int id)
 	{
-		RSGISMatrices matrixUtils;
+        rsgis::math::RSGISMatrices matrixUtils;
 		ClassData *classData = new ClassData();
 		classData->className = enviroi->name;
 		classData->classID = id;
@@ -40,21 +40,21 @@ namespace rsgis{ namespace classifier{
 		return classData;
 	}
 
-	ClassData** RSGISClassificationUtils::parseClassificationInputFile(string inputFile, int *numClasses) throw(RSGISClassificationException, RSGISInputStreamException, RSGISMatricesException)
+	ClassData** RSGISClassificationUtils::parseClassificationInputFile(std::string inputFile, int *numClasses) throw(RSGISClassificationException, rsgis::RSGISInputStreamException, rsgis::math::RSGISMatricesException)
 	{
-		RSGISMathsUtils mathsUtils;
-		RSGISMatrices matrixUtils;
+        rsgis::math::RSGISMathsUtils mathsUtils;
+        rsgis::math::RSGISMatrices matrixUtils;
 		
 		XMLCh tempStr[100];
-		DOMImplementation *impl = NULL;
-		DOMLSParser* parser = NULL;
-		ErrorHandler* errHandler = NULL;
-		DOMDocument *doc = NULL;
-		DOMElement *rootClassificationElement = NULL;
-		DOMNodeList *classesNode = NULL;
-		DOMElement *classesElement = NULL;
-		DOMNodeList *classNodesList = NULL;
-		DOMElement *classElement = NULL;
+        xercesc::DOMImplementation *impl = NULL;
+		xercesc::DOMLSParser* parser = NULL;
+		xercesc::ErrorHandler* errHandler = NULL;
+		xercesc::DOMDocument *doc = NULL;
+		xercesc::DOMElement *rootClassificationElement = NULL;
+		xercesc::DOMNodeList *classesNode = NULL;
+		xercesc::DOMElement *classesElement = NULL;
+		xercesc::DOMNodeList *classNodesList = NULL;
+		xercesc::DOMElement *classElement = NULL;
 		const XMLCh *className = NULL;
 		const XMLCh *classID = NULL;
 		const XMLCh *classMatrix = NULL;
@@ -63,72 +63,72 @@ namespace rsgis{ namespace classifier{
 		
 		try 
 		{
-			XMLPlatformUtils::Initialize();
+			xercesc::XMLPlatformUtils::Initialize();
 			
-			XMLString::transcode("LS", tempStr, 99);
-			impl = DOMImplementationRegistry::getDOMImplementation(tempStr);
+			xercesc::XMLString::transcode("LS", tempStr, 99);
+			impl = xercesc::DOMImplementationRegistry::getDOMImplementation(tempStr);
 			if(impl == NULL)
 			{
 				throw RSGISClassificationException("DOMImplementation is NULL");
 			}
 			// Create Parser
-			parser = ((DOMImplementationLS*)impl)->createLSParser(DOMImplementationLS::MODE_SYNCHRONOUS, 0);
-			errHandler = (ErrorHandler*) new HandlerBase();
-			parser->getDomConfig()->setParameter(XMLUni::fgDOMErrorHandler, errHandler);
+			parser = ((xercesc::DOMImplementationLS*)impl)->createLSParser(xercesc::DOMImplementationLS::MODE_SYNCHRONOUS, 0);
+			errHandler = (xercesc::ErrorHandler*) new xercesc::HandlerBase();
+			parser->getDomConfig()->setParameter(xercesc::XMLUni::fgDOMErrorHandler, errHandler);
 
 			// Open Document
 			doc = parser->parseURI(inputFile.c_str());	
 			
 			// Get the Root element
 			rootClassificationElement = doc->getDocumentElement();
-			//cout << "Root Element: " << XMLString::transcode(rootClassificationElement->getTagName()) << endl;
-			if(!XMLString::equals(rootClassificationElement->getTagName(), XMLString::transcode("classification")))
+			//std::cout << "Root Element: " << XMLString::transcode(rootClassificationElement->getTagName()) << std::endl;
+			if(!xercesc::XMLString::equals(rootClassificationElement->getTagName(), xercesc::XMLString::transcode("classification")))
 			{
 				throw RSGISClassificationException("Incorrect root element; Root element should be \"classification\"");
 			}
 			
-			classesNode = rootClassificationElement->getElementsByTagName(XMLString::transcode("classes"));
+			classesNode = rootClassificationElement->getElementsByTagName(xercesc::XMLString::transcode("classes"));
 			if(classesNode->getLength() != 1)
 			{
 				throw RSGISClassificationException("There should be only 1 classes node");
 			}
-			classesElement = static_cast<DOMElement*>(classesNode->item(0));
+			classesElement = static_cast<xercesc::DOMElement*>(classesNode->item(0));
 			
-			classNodesList = classesElement->getElementsByTagName(XMLString::transcode("class"));
+			classNodesList = classesElement->getElementsByTagName(xercesc::XMLString::transcode("class"));
 			*numClasses = classNodesList->getLength();
-			//cout << "There are " << *numClasses << "class nodes." << endl;
+			//std::cout << "There are " << *numClasses << "class nodes." << std::endl;
 			
 			classData = new ClassData*[*numClasses];
 			for(int i = 0; i < *numClasses; i++)
 			{
 				classData[i] = new ClassData();
-				classElement = static_cast<DOMElement*>(classNodesList->item(i));
-				className = classElement->getAttribute(XMLString::transcode("name"));
-				//cout << "Found class with name " << XMLString::transcode(className) << endl;
-				classData[i]->className = string(XMLString::transcode(className));
-				classID = classElement->getAttribute(XMLString::transcode("id"));
-				//cout << "Found class with id " << XMLString::transcode(classID) << endl;
-				classData[i]->classID = mathsUtils.strtoint(XMLString::transcode(classID));
-				classMatrix = classElement->getAttribute(XMLString::transcode("matrix"));
-				//cout << "Found class with matrix " << XMLString::transcode(classMatrix) << endl;
-				classData[i]->data = matrixUtils.readMatrixFromTxt(string((XMLString::transcode(classMatrix))));
+				classElement = static_cast<xercesc::DOMElement*>(classNodesList->item(i));
+				className = classElement->getAttribute(xercesc::XMLString::transcode("name"));
+				//std::cout << "Found class with name " << XMLString::transcode(className) << std::endl;
+				classData[i]->className = std::string(xercesc::XMLString::transcode(className));
+				classID = classElement->getAttribute(xercesc::XMLString::transcode("id"));
+				//std::cout << "Found class with id " << XMLString::transcode(classID) << std::endl;
+				classData[i]->classID = mathsUtils.strtoint(xercesc::XMLString::transcode(classID));
+				classMatrix = classElement->getAttribute(xercesc::XMLString::transcode("matrix"));
+				//std::cout << "Found class with matrix " << XMLString::transcode(classMatrix) << std::endl;
+				classData[i]->data = matrixUtils.readMatrixFromTxt(std::string((xercesc::XMLString::transcode(classMatrix))));
 			}
 				
 			parser->release();
 			delete errHandler;
 			
-			XMLPlatformUtils::Terminate();
+			xercesc::XMLPlatformUtils::Terminate();
 		}
-		catch (const XMLException& e) 
+		catch (const xercesc::XMLException& e) 
 		{
-			char *message = XMLString::transcode(e.getMessage());
-			string outMessage =  string("XMLException : ") + string(message);
+			char *message = xercesc::XMLString::transcode(e.getMessage());
+			std::string outMessage =  std::string("XMLException : ") + std::string(message);
 			throw RSGISClassificationException(outMessage.c_str());
 		}
-		catch (const DOMException& e) 
+		catch (const xercesc::DOMException& e) 
 		{
-			char *message = XMLString::transcode(e.getMessage());
-			string outMessage =  string("DOMException : ") + string(message);
+			char *message = xercesc::XMLString::transcode(e.getMessage());
+			std::string outMessage =  std::string("DOMException : ") + std::string(message);
 			throw RSGISClassificationException(outMessage.c_str());
 		}
 		catch(RSGISInputStreamException e)
@@ -139,27 +139,27 @@ namespace rsgis{ namespace classifier{
 		{
 			throw e;
 		}
-		catch(RSGISMatricesException e)
+		catch(rsgis::math::RSGISMatricesException e)
 		{
 			throw e;
 		}
 		
 		/*for(int i = 0; i < *numClasses; i++)
 		{
-			cout << "Class: " << classData[i]->className << " has ID: " << classData[i]->classID << endl;
+			std::cout << "Class: " << classData[i]->className << " has ID: " << classData[i]->classID << std::endl;
 		}*/
 		
 		return classData;
 	}
 	
-	void RSGISClassificationUtils::convertShapeFile2SpecLib(string vector, string outputFile, string classAttribute, std::vector<std::string> *attributes, bool group) throw(RSGISClassificationException)
+	void RSGISClassificationUtils::convertShapeFile2SpecLib(std::string vector, std::string outputFile, std::string classAttribute, std::vector<std::string> *attributes, bool group) throw(RSGISClassificationException)
 	{
 		OGRRegisterAll();
 		
-		RSGISVectorUtils vecUtils;
-		RSGISMatrices matrixUtils;
+        rsgis::vec::RSGISVectorUtils vecUtils;
+		rsgis::math::RSGISMatrices matrixUtils;
 		
-		string vectorLayerName = vecUtils.getLayerName(vector);
+		std::string vectorLayerName = vecUtils.getLayerName(vector);
 		
 		OGRDataSource *inputSHPDS = NULL;
 		OGRLayer *inputSHPLayer = NULL;
@@ -174,16 +174,16 @@ namespace rsgis{ namespace classifier{
 			inputSHPDS = OGRSFDriverRegistrar::Open(vector.c_str(), FALSE);
 			if(inputSHPDS == NULL)
 			{
-				string message = string("Could not open vector file ") + vector;
+				std::string message = std::string("Could not open vector file ") + vector;
 				throw RSGISFileException(message.c_str());
 			}
 			
-			string sqlStatment = string("SELECT * FROM ") + vectorLayerName + string(" ORDER BY ") + classAttribute + string(" ASC");
+			std::string sqlStatment = std::string("SELECT * FROM ") + vectorLayerName + std::string(" ORDER BY ") + classAttribute + std::string(" ASC");
 			
 			inputSHPLayer = inputSHPDS->ExecuteSQL(sqlStatment.c_str(), NULL, NULL);
 			if(inputSHPLayer == NULL)
 			{
-				string message = string("Could not open vector layer ") + vectorLayerName + string(" with SQL statment: \'") + sqlStatment + string("\'");
+				std::string message = std::string("Could not open vector layer ") + vectorLayerName + std::string(" with SQL statment: \'") + sqlStatment + std::string("\'");
 				throw RSGISFileException(message.c_str());
 			}
 			
@@ -196,7 +196,7 @@ namespace rsgis{ namespace classifier{
 				std::vector<std::string> *classes = vecUtils.findUniqueVals(inputSHPLayer, classAttribute);
 				std::vector<std::string>::iterator iterClasses;
 				unsigned int numClasses = classes->size();
-				Matrix *specLib = matrixUtils.createMatrix(numAttributes, numClasses);
+                rsgis::math::Matrix *specLib = matrixUtils.createMatrix(numAttributes, numClasses);
 				
 				unsigned int classCount = 0;
 				unsigned int featureCount = 0;
@@ -206,12 +206,12 @@ namespace rsgis{ namespace classifier{
 				
 				for(iterClasses = classes->begin(); iterClasses != classes->end(); ++iterClasses)
 				{
-					cout << "Processing class " << *iterClasses << endl;
-					string sqlStatment = string("SELECT * FROM ") + vectorLayerName + string(" WHERE ") + classAttribute + string(" = ") + (*iterClasses);
+					std::cout << "Processing class " << *iterClasses << std::endl;
+					std::string sqlStatment = std::string("SELECT * FROM ") + vectorLayerName + std::string(" WHERE ") + classAttribute + std::string(" = ") + (*iterClasses);
 					inputSHPLayer = inputSHPDS->ExecuteSQL(sqlStatment.c_str(), NULL, NULL);
 					if(inputSHPLayer == NULL)
 					{
-						string message = string("Could not open vector layer ") + vectorLayerName + string(" with SQL statment: \'") + sqlStatment + string("\'");
+						std::string message = std::string("Could not open vector layer ") + vectorLayerName + std::string(" with SQL statment: \'") + sqlStatment + std::string("\'");
 						throw RSGISFileException(message.c_str());
 					}
 					
@@ -252,7 +252,7 @@ namespace rsgis{ namespace classifier{
 			else 
 			{
 				unsigned int numFeatures = inputSHPLayer->GetFeatureCount(true);
-				Matrix *specLib = matrixUtils.createMatrix(numAttributes, numFeatures);
+                rsgis::math::Matrix *specLib = matrixUtils.createMatrix(numAttributes, numFeatures);
 				
 				unsigned int featureCount = 0;
 				unsigned int attributeCount = 0;
@@ -263,8 +263,8 @@ namespace rsgis{ namespace classifier{
 				inputSHPLayer->ResetReading();
 				while( (feature = inputSHPLayer->GetNextFeature()) != NULL )
 				{
-					string attrStrVal = feature->GetFieldAsString(featureDefn->GetFieldIndex(classAttribute.c_str()));
-					cout << "Class " << featureCount << " is " << attrStrVal << endl;
+					std::string attrStrVal = feature->GetFieldAsString(featureDefn->GetFieldIndex(classAttribute.c_str()));
+					std::cout << "Class " << featureCount << " is " << attrStrVal << std::endl;
 					
 					attributeCount = 0;
 					for(iterAttributes = attributes->begin(); iterAttributes != attributes->end(); ++iterAttributes)

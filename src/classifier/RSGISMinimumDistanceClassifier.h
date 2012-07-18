@@ -30,10 +30,6 @@
 #include "common/RSGISClassificationException.h"
 
 namespace rsgis{ namespace classifier{
-	
-    using namespace rsgis;
-    using namespace rsgis::math;
-    using namespace std;
     
 	enum MinDistCentreType
 	{

@@ -48,23 +48,17 @@
 
 namespace rsgis{ namespace classifier{
 	
-    using namespace rsgis;
-    using namespace rsgis::img;
-    using namespace rsgis::utils;
-    using namespace std;
-    
-	
 	class RSGISKMeansClassifier
 	{
 	public:
-		RSGISKMeansClassifier(string inputImageFile, bool printinfo);
+		RSGISKMeansClassifier(std::string inputImageFile, bool printinfo);
 		void initClusterCentresRandom(unsigned int numClusters)throw(RSGISClassificationException);
 		void initClusterCentresKpp(unsigned int numClusters)throw(RSGISClassificationException);
 		void calcClusterCentres(double terminalThreshold, unsigned int maxIterations)throw(RSGISClassificationException);
-		void generateOutputImage(string outputImageFile)throw(RSGISClassificationException);
+		void generateOutputImage(std::string outputImageFile)throw(RSGISClassificationException);
 		~RSGISKMeansClassifier();
 	protected:
-		string inputImageFile;
+		std::string inputImageFile;
 		ClusterCentre **clusterCentres;
 		unsigned int numClusters;
 		bool hasInitClusterCentres;
@@ -74,17 +68,17 @@ namespace rsgis{ namespace classifier{
 		bool printinfo;
 	};
 	
-	class RSGISKMeanCalcPixelClusterCalcImageVal : public RSGISCalcImageValue
+	class RSGISKMeanCalcPixelClusterCalcImageVal : public rsgis::img::RSGISCalcImageValue
 	{
 	public: 
 		RSGISKMeanCalcPixelClusterCalcImageVal(int numOutBands, ClusterCentre **clusterCentres, unsigned int numClusters, unsigned int numImageBands);
-		void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented");};
-		void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException);
-		void calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented");};
-		void calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented");};
-		void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
-		bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented");};
+		void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not Implemented");};
+		void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException);
+		void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not Implemented");};
+		void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not Implemented");};
+		void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not Implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+		bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not Implemented");};
 		unsigned long* getPxlsInClusters();
 		ClusterCentre** getNewClusterCentres();
 		void reset();
@@ -97,17 +91,17 @@ namespace rsgis{ namespace classifier{
 		unsigned int numImageBands;
 	};
 	
-	class RSGISCalcDist2NrCentreCalcImageVal : public RSGISCalcImageValue
+	class RSGISCalcDist2NrCentreCalcImageVal : public rsgis::img::RSGISCalcImageValue
 	{
 	public: 
 		RSGISCalcDist2NrCentreCalcImageVal(int numOutBands, ClusterCentre **clusterCentres, unsigned int numClusters);
-		void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented");};
-		void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException);
-		void calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented");};
-		void calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented");};
-		void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
-		bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented");};
+		void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not Implemented");};
+		void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException);
+		void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not Implemented");};
+		void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not Implemented");};
+		void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not Implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+		bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not Implemented");};
 		double getSumSqDistance();
 		void reset();
 		void setClusterCentres(ClusterCentre **clusterCentres, unsigned int numClusters);
@@ -119,16 +113,16 @@ namespace rsgis{ namespace classifier{
 	};
 	
 	
-	class RSGISCalcDist2NrCentreDistributionCalcImageVal : public RSGISCalcImageValue
+	class RSGISCalcDist2NrCentreDistributionCalcImageVal : public rsgis::img::RSGISCalcImageValue
 	{
 	public: 
 		RSGISCalcDist2NrCentreDistributionCalcImageVal(int numOutBands, ClusterCentre **clusterCentres, unsigned int numClusters, double sqDistance);
-		void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented");};
-		void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException);
-		void calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented");};
-		void calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented");};
-		void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented");};
-		bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented");};
+		void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not Implemented");};
+		void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException);
+		void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not Implemented");};
+		void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not Implemented");};
+		void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not Implemented");};
+		bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not Implemented");};
 		void setClusterCentres(ClusterCentre **clusterCentres, unsigned int numClusters, double sqDistance);
 		~RSGISCalcDist2NrCentreDistributionCalcImageVal();
 	protected:
@@ -139,17 +133,17 @@ namespace rsgis{ namespace classifier{
 	
 	
 	
-	class RSGISApplyKMeanClassifierCalcImageVal : public RSGISCalcImageValue
+	class RSGISApplyKMeanClassifierCalcImageVal : public rsgis::img::RSGISCalcImageValue
 	{
 	public: 
 		RSGISApplyKMeanClassifierCalcImageVal(int numOutBands, ClusterCentre **clusterCentres, unsigned int numClusters);
-		void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException);
-		void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented");};
-		void calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented");};
-		void calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented");};
-		void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
-		bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented");};
+		void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException);
+		void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not Implemented");};
+		void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not Implemented");};
+		void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not Implemented");};
+		void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not Implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+		bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not Implemented");};
 		~RSGISApplyKMeanClassifierCalcImageVal();
 	protected:
 		ClusterCentre **clusterCentres;
