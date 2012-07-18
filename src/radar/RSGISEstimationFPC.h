@@ -33,77 +33,74 @@
 
 namespace rsgis { namespace radar{
     
-    using namespace rsgis::img;
-    using namespace rsgis::math;
-    
-    class RSGISEstimationFPCCanopyScattering : public RSGISCalcImageValue
+    class RSGISEstimationFPCCanopyScattering : public rsgis::img::RSGISCalcImageValue
     {
         /// Calculate canopy scattering from FPC
         /** Takes FPC image and returns canopy scattering in HH, HV and VV.
          */
     public: 
-        RSGISEstimationFPCCanopyScattering(int numberOutBands, RSGISMathFunction *calcScatteringHH, RSGISMathFunction *calcScatteringHV, RSGISMathFunction *calcScatteringVV);
-        virtual void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException);
-        virtual void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-        virtual void calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-        virtual void calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-        virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
-        virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};											
+        RSGISEstimationFPCCanopyScattering(int numberOutBands, rsgis::math::RSGISMathFunction *calcScatteringHH, rsgis::math::RSGISMathFunction *calcScatteringHV, rsgis::math::RSGISMathFunction *calcScatteringVV);
+        virtual void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException);
+        virtual void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        virtual void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        virtual void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+        virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};											
         void calcValue(double fpc, double *canopyScattering);
         ~RSGISEstimationFPCCanopyScattering();
     private:
-        RSGISMathFunction *calcScatteringHH;
-        RSGISMathFunction *calcScatteringHV;
-        RSGISMathFunction *calcScatteringVV;
+        rsgis::math::RSGISMathFunction *calcScatteringHH;
+        rsgis::math::RSGISMathFunction *calcScatteringHV;
+        rsgis::math::RSGISMathFunction *calcScatteringVV;
     };
     
-    class RSGISEstimationFPCCanopyAttenuation : public RSGISCalcImageValue
+    class RSGISEstimationFPCCanopyAttenuation : public rsgis::img::RSGISCalcImageValue
     {
     public:
         /// Calculate canopy attenuation from FPC
         /** Takes FPC image and returns canopy attenuation at H and V polarisation.
          */
-        RSGISEstimationFPCCanopyAttenuation(int numberOutBands, RSGISMathFunction *calcAttenuationH, RSGISMathFunction *calcAttenuationV);
-        virtual void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException);
-        virtual void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-        virtual void calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-        virtual void calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-        virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
-        virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};											
+        RSGISEstimationFPCCanopyAttenuation(int numberOutBands, rsgis::math::RSGISMathFunction *calcAttenuationH, rsgis::math::RSGISMathFunction *calcAttenuationV);
+        virtual void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException);
+        virtual void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        virtual void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        virtual void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+        virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};											
         void calcValue(double fpc, double *canopyAttenuation);
         ~RSGISEstimationFPCCanopyAttenuation();
     private:
-        RSGISMathFunction *calcAttenuationH;
-        RSGISMathFunction *calcAttenuationV;
+        rsgis::math::RSGISMathFunction *calcAttenuationH;
+        rsgis::math::RSGISMathFunction *calcAttenuationV;
     };
     
-    class RSGISEstimationFPCCanopyScatteringAttenuation : public RSGISCalcImageValue
+    class RSGISEstimationFPCCanopyScatteringAttenuation : public rsgis::img::RSGISCalcImageValue
     {
         /// Calculate canopy scattering and attenuation from FPC
         /** Takes FPC image and returns 5 band image with canopy scattering in HH, HV and VV and
          *  canopy attenuation at H and V polarisation.
          */
     public: 
-        RSGISEstimationFPCCanopyScatteringAttenuation(int numberOutBands, RSGISMathFunction *calcScatteringHH, RSGISMathFunction *calcScatteringHV, RSGISMathFunction *calcScatteringVV,RSGISMathFunction *calcAttenuationH, RSGISMathFunction *calcAttenuationV);
-        virtual void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException);
-        virtual void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-        virtual void calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-        virtual void calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-        virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
-        virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
+        RSGISEstimationFPCCanopyScatteringAttenuation(int numberOutBands, rsgis::math::RSGISMathFunction *calcScatteringHH, rsgis::math::RSGISMathFunction *calcScatteringHV, rsgis::math::RSGISMathFunction *calcScatteringVV,rsgis::math::RSGISMathFunction *calcAttenuationH, rsgis::math::RSGISMathFunction *calcAttenuationV);
+        virtual void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException);
+        virtual void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        virtual void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        virtual void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+        virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
         ~RSGISEstimationFPCCanopyScatteringAttenuation();
     private:
-        RSGISMathFunction *calcScatteringHH;
-        RSGISMathFunction *calcScatteringHV;
-        RSGISMathFunction *calcScatteringVV;
-        RSGISMathFunction *calcAttenuationH;
-        RSGISMathFunction *calcAttenuationV;
+        rsgis::math::RSGISMathFunction *calcScatteringHH;
+        rsgis::math::RSGISMathFunction *calcScatteringHV;
+        rsgis::math::RSGISMathFunction *calcScatteringVV;
+        rsgis::math::RSGISMathFunction *calcAttenuationH;
+        rsgis::math::RSGISMathFunction *calcAttenuationV;
     };
     
-    class RSGISEstimationFPCDualPolTrunkGround : public RSGISCalcImageValue
+    class RSGISEstimationFPCDualPolTrunkGround : public rsgis::img::RSGISCalcImageValue
     {
         /// Calculates calcuates trunk-ground + ground return from total backscatter using FPC
         /** Takes 2 band image FPC, HH, HV
@@ -111,24 +108,24 @@ namespace rsgis { namespace radar{
          * Returns 2 band image trunk-ground + ground scattering in HH and HV.
          */
     public: 
-        RSGISEstimationFPCDualPolTrunkGround(int numberOutBands, RSGISMathFunction *calcScatteringHH, RSGISMathFunction *calcScatteringHV, RSGISMathFunction *calcAttenuationH, RSGISMathFunction *calcAttenuationV);
-        virtual void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException);
-        virtual void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-        virtual void calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-        virtual void calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-        virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
-        virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};											
+        RSGISEstimationFPCDualPolTrunkGround(int numberOutBands, rsgis::math::RSGISMathFunction *calcScatteringHH, rsgis::math::RSGISMathFunction *calcScatteringHV, rsgis::math::RSGISMathFunction *calcAttenuationH, rsgis::math::RSGISMathFunction *calcAttenuationV);
+        virtual void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException);
+        virtual void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        virtual void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        virtual void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+        virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};											
         void calcValue(double fpc, double totalHH, double totalHV, double *trunkGround);
         ~RSGISEstimationFPCDualPolTrunkGround();
     private:
-        RSGISMathFunction *calcScatteringHH;
-        RSGISMathFunction *calcScatteringHV;
-        RSGISMathFunction *calcAttenuationH;
-        RSGISMathFunction *calcAttenuationV;
+        rsgis::math::RSGISMathFunction *calcScatteringHH;
+        rsgis::math::RSGISMathFunction *calcScatteringHV;
+        rsgis::math::RSGISMathFunction *calcAttenuationH;
+        rsgis::math::RSGISMathFunction *calcAttenuationV;
     };
     
-    class RSGISEstimationFPCFullPolTrunkGroundDualPol : public RSGISCalcImageValue
+    class RSGISEstimationFPCFullPolTrunkGroundDualPol : public rsgis::img::RSGISCalcImageValue
     {
         /// Calculates calcuates trunk-ground + ground return from total backscatter using FPC
         /** Takes 4 band image FPC, HH, HV, VV
@@ -136,22 +133,22 @@ namespace rsgis { namespace radar{
          * Returns 3 band image trunk-ground + ground scattering in HH, HV and VV
          */
     public: 
-        RSGISEstimationFPCFullPolTrunkGroundDualPol(int numberOutBands, RSGISMathFunction *calcScatteringHH, RSGISMathFunction *calcScatteringHV, RSGISMathFunction *calcScatteringVV, RSGISMathFunction *calcAttenuationH, RSGISMathFunction *calcAttenuationV);
-        virtual void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException);
-        virtual void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-        virtual void calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-        virtual void calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-        virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
-        virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};											
+        RSGISEstimationFPCFullPolTrunkGroundDualPol(int numberOutBands, rsgis::math::RSGISMathFunction *calcScatteringHH, rsgis::math::RSGISMathFunction *calcScatteringHV, rsgis::math::RSGISMathFunction *calcScatteringVV, rsgis::math::RSGISMathFunction *calcAttenuationH, rsgis::math::RSGISMathFunction *calcAttenuationV);
+        virtual void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException);
+        virtual void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        virtual void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        virtual void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+        virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};											
         void calcValue(double fpc, double totalHH, double totalHV, double totalVV, double *trunkGround);
         ~RSGISEstimationFPCFullPolTrunkGroundDualPol();
     private:
-        RSGISMathFunction *calcScatteringHH;
-        RSGISMathFunction *calcScatteringHV;
-        RSGISMathFunction *calcScatteringVV;
-        RSGISMathFunction *calcAttenuationH;
-        RSGISMathFunction *calcAttenuationV;
+        rsgis::math::RSGISMathFunction *calcScatteringHH;
+        rsgis::math::RSGISMathFunction *calcScatteringHV;
+        rsgis::math::RSGISMathFunction *calcScatteringVV;
+        rsgis::math::RSGISMathFunction *calcAttenuationH;
+        rsgis::math::RSGISMathFunction *calcAttenuationV;
     };
 }}
 

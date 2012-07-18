@@ -36,7 +36,7 @@ namespace rsgis{namespace radar{
 		this->c2 = c2Coef;
 	}
 	
-	void RSGISCalcSaatchiBiomassCrown::calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException)
+	void RSGISCalcSaatchiBiomassCrown::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		// Input Bands Order:
 		// HH
@@ -47,7 +47,7 @@ namespace rsgis{namespace radar{
 		
 		if(numBands != 5)
 		{
-			throw RSGISImageCalcException("The correct number of bands was not provided.");
+			throw rsgis::img::RSGISImageCalcException("The correct number of bands was not provided.");
 		}
 		
 		// Calculate HV term
@@ -73,15 +73,15 @@ namespace rsgis{namespace radar{
 		output[0] = exp(logBio);
 	}
 	
-	void RSGISCalcSaatchiBiomassCrown::calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException)
+	void RSGISCalcSaatchiBiomassCrown::calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException)
 	{
-		throw RSGISImageCalcException("Not implemented");
+		throw rsgis::img::RSGISImageCalcException("Not implemented");
 	}
 		
 	
-	void RSGISCalcSaatchiBiomassCrown::calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException)
+	void RSGISCalcSaatchiBiomassCrown::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException)
 	{
-		throw RSGISImageCalcException("Not Implemented");
+		throw rsgis::img::RSGISImageCalcException("Not Implemented");
 	}
 	
 	
@@ -96,7 +96,7 @@ namespace rsgis{namespace radar{
 		this->c2 = c2Coef;
 	}
 	
-	void RSGISCalcSaatchiBiomassStem::calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException)
+	void RSGISCalcSaatchiBiomassStem::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		// Bands Order:
 		// HH
@@ -107,7 +107,7 @@ namespace rsgis{namespace radar{
 		
 		if(numBands != 5)
 		{
-			throw RSGISImageCalcException("The correct number of bands was not provided.");
+			throw rsgis::img::RSGISImageCalcException("The correct number of bands was not provided.");
 		}
 		
 		// Calculate HV term (0 when no incidence angle equal to local incidence angle)	
@@ -134,14 +134,14 @@ namespace rsgis{namespace radar{
 		output[0] = exp(locBio);
 	}
 	
-	void RSGISCalcSaatchiBiomassStem::calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException)
+	void RSGISCalcSaatchiBiomassStem::calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException)
 	{
-		throw RSGISImageCalcException("Not implemented");
+		throw rsgis::img::RSGISImageCalcException("Not implemented");
 	}
 	
-	void RSGISCalcSaatchiBiomassStem::calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException)
+	void RSGISCalcSaatchiBiomassStem::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException)
 	{
-		throw RSGISImageCalcException("Not Implemented");
+		throw rsgis::img::RSGISImageCalcException("Not Implemented");
 	}
 	
 	
@@ -154,7 +154,7 @@ namespace rsgis{namespace radar{
 		this->b2 = b2Coef;
 	}
 	
-	void RSGISCalcSaatchiBiomassCrownPL::calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException)
+	void RSGISCalcSaatchiBiomassCrownPL::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		
 		// Bands Order:
@@ -169,7 +169,7 @@ namespace rsgis{namespace radar{
 		
 		if(numBands != 8)
 		{
-			throw RSGISImageCalcException("The correct number of bands was not provided.");
+			throw rsgis::img::RSGISImageCalcException("The correct number of bands was not provided.");
 		}
 		
 		// Calculate L-band term
@@ -190,14 +190,14 @@ namespace rsgis{namespace radar{
 		output[0] = exp(logbio);
 	}
 	
-	void RSGISCalcSaatchiBiomassCrownPL::calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException)
+	void RSGISCalcSaatchiBiomassCrownPL::calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException)
 	{
-		throw RSGISImageCalcException("Not implemented");
+		throw rsgis::img::RSGISImageCalcException("Not implemented");
 	}
 	
-	void RSGISCalcSaatchiBiomassCrownPL::calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException)
+	void RSGISCalcSaatchiBiomassCrownPL::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException)
 	{
-		throw RSGISImageCalcException("Not Implemented");
+		throw rsgis::img::RSGISImageCalcException("Not Implemented");
 	}
 	
 	RSGISCalcSaatchiNoIABiomassCrown::RSGISCalcSaatchiNoIABiomassCrown(int numberOutBands, double a0Coef, double a1Coef, double a2Coef, double c1Coef, double c2Coef) : RSGISCalcImageValue(numberOutBands)
@@ -209,7 +209,7 @@ namespace rsgis{namespace radar{
 		this->c2 = c2Coef;
 	}
 	
-	void RSGISCalcSaatchiNoIABiomassCrown::calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException)
+	void RSGISCalcSaatchiNoIABiomassCrown::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		// Input Bands Order:
 		// HH
@@ -217,8 +217,8 @@ namespace rsgis{namespace radar{
 		// VV
 		
 		if(numBands < 3) 
-				{
-			throw RSGISImageCalcException("The correct number of bands was not provided.");
+        {
+			throw rsgis::img::RSGISImageCalcException("The correct number of bands was not provided.");
 		}
 		
 		// Calculate HV term
@@ -236,14 +236,14 @@ namespace rsgis{namespace radar{
 		output[0] = exp(logBio);
 	}
 	
-	void RSGISCalcSaatchiNoIABiomassCrown::calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException)
+	void RSGISCalcSaatchiNoIABiomassCrown::calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException)
 	{
-		throw RSGISImageCalcException("Not implemented");
+		throw rsgis::img::RSGISImageCalcException("Not implemented");
 	}
 	
-	void RSGISCalcSaatchiNoIABiomassCrown::calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException)
+	void RSGISCalcSaatchiNoIABiomassCrown::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException)
 	{
-		throw RSGISImageCalcException("Not Implemented");
+		throw rsgis::img::RSGISImageCalcException("Not Implemented");
 	}
 	
 	RSGISCalcSaatchiNoIABiomassStem::RSGISCalcSaatchiNoIABiomassStem(int numberOutBands, double a0Coef, double a1Coef, double a2Coef, double b1Coef, double b2Coef, double c1Coef, double c2Coef) : RSGISCalcImageValue(numberOutBands)
@@ -257,7 +257,7 @@ namespace rsgis{namespace radar{
 		this->c2 = c2Coef;
 	}
 	
-	void RSGISCalcSaatchiNoIABiomassStem::calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException)
+	void RSGISCalcSaatchiNoIABiomassStem::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		// Bands Order:
 		// HH
@@ -266,7 +266,7 @@ namespace rsgis{namespace radar{
 		
 		if(numBands < 3)
 		{
-			throw RSGISImageCalcException("The correct number of bands was not provided.");
+			throw rsgis::img::RSGISImageCalcException("The correct number of bands was not provided.");
 		}
 		
 		// Calculate HV term
@@ -290,14 +290,14 @@ namespace rsgis{namespace radar{
 		output[0] = exp(locBio);
 	}
 	
-	void RSGISCalcSaatchiNoIABiomassStem::calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException)
+	void RSGISCalcSaatchiNoIABiomassStem::calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException)
 	{
-		throw RSGISImageCalcException("Not implemented");
+		throw rsgis::img::RSGISImageCalcException("Not implemented");
 	}
 	
-	void RSGISCalcSaatchiNoIABiomassStem::calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException)
+	void RSGISCalcSaatchiNoIABiomassStem::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException)
 	{
-		throw RSGISImageCalcException("Not Implemented");
+		throw rsgis::img::RSGISImageCalcException("Not Implemented");
 	}
 	
 	RSGISCalcSaatchiNoIABiomassCrownPL::RSGISCalcSaatchiNoIABiomassCrownPL(int numberOutBands, double a0Coef, double a1Coef, double a2Coef, double b1Coef, double b2Coef) : RSGISCalcImageValue(numberOutBands)
@@ -309,7 +309,7 @@ namespace rsgis{namespace radar{
 		this->b2 = b2Coef;
 	}
 	
-	void RSGISCalcSaatchiNoIABiomassCrownPL::calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException)
+	void RSGISCalcSaatchiNoIABiomassCrownPL::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		
 		// Bands Order:
@@ -322,7 +322,7 @@ namespace rsgis{namespace radar{
 		
 		if(numBands < 6)
 		{
-			throw RSGISImageCalcException("The correct number of bands was not provided.");
+			throw rsgis::img::RSGISImageCalcException("The correct number of bands was not provided.");
 		}
 		
 		// Calculate L-band term
@@ -341,14 +341,14 @@ namespace rsgis{namespace radar{
 		output[0] = exp(logbio);
 	}
 	
-	void RSGISCalcSaatchiNoIABiomassCrownPL::calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException)
+	void RSGISCalcSaatchiNoIABiomassCrownPL::calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException)
 	{
-		throw RSGISImageCalcException("Not implemented");
+		throw rsgis::img::RSGISImageCalcException("Not implemented");
 	}
 	
-	void RSGISCalcSaatchiNoIABiomassCrownPL::calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException)
+	void RSGISCalcSaatchiNoIABiomassCrownPL::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException)
 	{
-		throw RSGISImageCalcException("Not Implemented");
+		throw rsgis::img::RSGISImageCalcException("Not Implemented");
 	}
 	
 	

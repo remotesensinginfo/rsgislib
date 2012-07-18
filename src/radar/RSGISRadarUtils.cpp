@@ -25,12 +25,12 @@
 
 namespace rsgis { namespace radar{
 	
-	RSGISConvert2dB::RSGISConvert2dB(int numOutputBands, double calFactor) : RSGISCalcImageValue(numOutputBands)
+	RSGISConvert2dB::RSGISConvert2dB(int numOutputBands, double calFactor) : rsgis::img::RSGISCalcImageValue(numOutputBands)
 	{
 		this->calFactor = calFactor;
 	}
 	
-	void RSGISConvert2dB::calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException)
+	void RSGISConvert2dB::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		double intensity = 0;
 		double dB = 0;

@@ -25,13 +25,13 @@
 
 namespace rsgis { namespace radar {
 
-	RSGISEstimationFPCCanopyScattering::RSGISEstimationFPCCanopyScattering(int numberOutBands, RSGISMathFunction *calcScatteringHH, RSGISMathFunction *calcScatteringHV, RSGISMathFunction *calcScatteringVV) : RSGISCalcImageValue(numberOutBands)
+	RSGISEstimationFPCCanopyScattering::RSGISEstimationFPCCanopyScattering(int numberOutBands, rsgis::math::RSGISMathFunction *calcScatteringHH, rsgis::math::RSGISMathFunction *calcScatteringHV, rsgis::math::RSGISMathFunction *calcScatteringVV) : rsgis::img::RSGISCalcImageValue(numberOutBands)
 	{
 		this->calcScatteringHH = calcScatteringHH;
 		this->calcScatteringHV = calcScatteringHV;
 		this->calcScatteringVV = calcScatteringVV;
 	}
-	void RSGISEstimationFPCCanopyScattering::calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException)
+	void RSGISEstimationFPCCanopyScattering::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		double fpc = bandValues[0]; // Get FPC
 		output[0] = calcScatteringHH->calcFunction(fpc);
@@ -50,12 +50,12 @@ namespace rsgis { namespace radar {
 		
 	}
 	
-	RSGISEstimationFPCCanopyAttenuation::RSGISEstimationFPCCanopyAttenuation(int numberOutBands, RSGISMathFunction *calcAttenuationH, RSGISMathFunction *calcAttenuationV) : RSGISCalcImageValue(numberOutBands)
+	RSGISEstimationFPCCanopyAttenuation::RSGISEstimationFPCCanopyAttenuation(int numberOutBands, rsgis::math::RSGISMathFunction *calcAttenuationH, rsgis::math::RSGISMathFunction *calcAttenuationV) : rsgis::img::RSGISCalcImageValue(numberOutBands)
 	{
 		this->calcAttenuationH = calcAttenuationH;
 		this->calcAttenuationV = calcAttenuationV;
 	}
-	void RSGISEstimationFPCCanopyAttenuation::calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException)
+	void RSGISEstimationFPCCanopyAttenuation::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		double fpc = bandValues[0]; // Get FPC
 		output[0] = calcAttenuationH->calcFunction(fpc);
@@ -71,7 +71,7 @@ namespace rsgis { namespace radar {
 		
 	}
 	
-	RSGISEstimationFPCCanopyScatteringAttenuation::RSGISEstimationFPCCanopyScatteringAttenuation(int numberOutBands, RSGISMathFunction *calcScatteringHH, RSGISMathFunction *calcScatteringHV, RSGISMathFunction *calcScatteringVV,RSGISMathFunction *calcAttenuationH, RSGISMathFunction *calcAttenuationV) : RSGISCalcImageValue(numberOutBands)
+	RSGISEstimationFPCCanopyScatteringAttenuation::RSGISEstimationFPCCanopyScatteringAttenuation(int numberOutBands, rsgis::math::RSGISMathFunction *calcScatteringHH, rsgis::math::RSGISMathFunction *calcScatteringHV, rsgis::math::RSGISMathFunction *calcScatteringVV,rsgis::math::RSGISMathFunction *calcAttenuationH, rsgis::math::RSGISMathFunction *calcAttenuationV) : rsgis::img::RSGISCalcImageValue(numberOutBands)
 	{
 		this->calcScatteringHH = calcScatteringHH;
 		this->calcScatteringHV = calcScatteringHV;
@@ -79,7 +79,7 @@ namespace rsgis { namespace radar {
 		this->calcAttenuationH = calcAttenuationH;
 		this->calcAttenuationV = calcAttenuationV;
 	}
-	void RSGISEstimationFPCCanopyScatteringAttenuation::calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException)
+	void RSGISEstimationFPCCanopyScatteringAttenuation::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		double fpc = bandValues[0]; // Get FPC
 		output[0] = calcScatteringHH->calcFunction(fpc);
@@ -93,14 +93,14 @@ namespace rsgis { namespace radar {
 		
 	}
 	
-	RSGISEstimationFPCDualPolTrunkGround::RSGISEstimationFPCDualPolTrunkGround(int numberOutBands, RSGISMathFunction *calcScatteringHH, RSGISMathFunction *calcScatteringHV, RSGISMathFunction *calcAttenuationH, RSGISMathFunction *calcAttenuationV) : RSGISCalcImageValue(numberOutBands)
+	RSGISEstimationFPCDualPolTrunkGround::RSGISEstimationFPCDualPolTrunkGround(int numberOutBands, rsgis::math::RSGISMathFunction *calcScatteringHH, rsgis::math::RSGISMathFunction *calcScatteringHV, rsgis::math::RSGISMathFunction *calcAttenuationH, rsgis::math::RSGISMathFunction *calcAttenuationV) : rsgis::img::RSGISCalcImageValue(numberOutBands)
 	{
 		this->calcScatteringHH = calcScatteringHH;
 		this->calcScatteringHV = calcScatteringHV;
 		this->calcAttenuationH = calcAttenuationH;
 		this->calcAttenuationV = calcAttenuationV;
 	}
-	void RSGISEstimationFPCDualPolTrunkGround::calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException)
+	void RSGISEstimationFPCDualPolTrunkGround::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		double fpc = bandValues[0];
 		double totalHH = bandValues[1];
@@ -137,7 +137,7 @@ namespace rsgis { namespace radar {
 		
 	}
 	
-	RSGISEstimationFPCFullPolTrunkGroundDualPol::RSGISEstimationFPCFullPolTrunkGroundDualPol(int numberOutBands, RSGISMathFunction *calcScatteringHH, RSGISMathFunction *calcScatteringHV, RSGISMathFunction *calcScatteringVV, RSGISMathFunction *calcAttenuationH, RSGISMathFunction *calcAttenuationV) : RSGISCalcImageValue(numberOutBands)
+	RSGISEstimationFPCFullPolTrunkGroundDualPol::RSGISEstimationFPCFullPolTrunkGroundDualPol(int numberOutBands, rsgis::math::RSGISMathFunction *calcScatteringHH, rsgis::math::RSGISMathFunction *calcScatteringHV, rsgis::math::RSGISMathFunction *calcScatteringVV, rsgis::math::RSGISMathFunction *calcAttenuationH, rsgis::math::RSGISMathFunction *calcAttenuationV) : rsgis::img::RSGISCalcImageValue(numberOutBands)
 	{
 		this->calcScatteringHH = calcScatteringHH;
 		this->calcScatteringHV = calcScatteringHV;
@@ -145,7 +145,7 @@ namespace rsgis { namespace radar {
 		this->calcAttenuationH = calcAttenuationH;
 		this->calcAttenuationV = calcAttenuationV;
 	}
-	void RSGISEstimationFPCFullPolTrunkGroundDualPol::calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException)
+	void RSGISEstimationFPCFullPolTrunkGroundDualPol::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		double fpc = bandValues[0];
 		double totalHH = bandValues[1];

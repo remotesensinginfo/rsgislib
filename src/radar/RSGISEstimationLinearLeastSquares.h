@@ -36,9 +36,6 @@
 
 namespace rsgis {namespace radar{
     
-    using namespace std;
-    using namespace rsgis::math;
-    
 	class RSGISEstimationLinearLeastSquares : public RSGISEstimationOptimiser
 	{
 	public:
@@ -46,7 +43,7 @@ namespace rsgis {namespace radar{
 		int minimise(gsl_vector *inData, gsl_vector *initialPar, gsl_vector *outParError);
 		virtual void modifyAPriori(gsl_vector *newAPrioriPar){};
 		virtual estOptimizerType getOptimiserType(){return unknown;}; 
-		virtual void printOptimiser(){cout << "Linear Least Squares" << endl;};
+		virtual void printOptimiser(){std::cout << "Linear Least Squares" << std::endl;};
 		~RSGISEstimationLinearLeastSquares();
 	private:
 		gsl_matrix *a;
@@ -60,7 +57,7 @@ namespace rsgis {namespace radar{
 		int minimise(gsl_vector *inData, gsl_vector *initialPar, gsl_vector *outParError);
 		virtual void modifyAPriori(gsl_vector *newAPrioriPar){};
 		virtual estOptimizerType getOptimiserType(){return unknown;}; 
-		virtual void printOptimiser(){cout << "Linearize and solve using linear Least Squares" << endl;};
+		virtual void printOptimiser(){std::cout << "Linearize and solve using linear Least Squares" << std::endl;};
 		~RSGISEstimationLinearize();
 	private:
 		gsl_matrix *a;
@@ -76,7 +73,7 @@ namespace rsgis {namespace radar{
 		int minimise(gsl_vector *inData, gsl_vector *initialPar, gsl_vector *outParError);
 		virtual void modifyAPriori(gsl_vector *newAPrioriPar){};
 		virtual estOptimizerType getOptimiserType(){return unknown;}; 
-		virtual void printOptimiser(){cout << "Linearize and solve using linear Least Squares (with Priors)" << endl;};
+		virtual void printOptimiser(){std::cout << "Linearize and solve using linear Least Squares (with Priors)" << std::endl;};
 		~RSGISEstimationLinearizeWithPriors();
 	private:
 		gsl_matrix *a;

@@ -27,7 +27,7 @@ namespace rsgis { namespace radar {
 
 	double function(const gsl_vector *predictParams, void *inData)
 	{
-		RSGISMatrices matrixUtils;
+        rsgis::math::RSGISMatrices matrixUtils;
 		double *inDataDouble = (double *) inData;
 		
 		// Function to minimise
@@ -39,8 +39,8 @@ namespace rsgis { namespace radar {
 		gsl_matrix *coeffHV = matrixUtils.readGSLMatrixFromTxt(coeffHVFile);
 		gsl_matrix *coeffFPC = matrixUtils.readGSLMatrixFromTxt(coeffFPCFile);
 
-		RSGISFunction2DPoly *functionHV = new RSGISFunction2DPoly(coeffHV);
-		RSGISFunction2DPoly *functionFPC = new RSGISFunction2DPoly(coeffFPC);
+		rsgis::math::RSGISFunction2DPoly *functionHV = new rsgis::math::RSGISFunction2DPoly(coeffHV);
+		rsgis::math::RSGISFunction2DPoly *functionFPC = new rsgis::math::RSGISFunction2DPoly(coeffFPC);
 		
 		double diffA = inDataDouble[0] - functionFPC->calcFunction(h, d);
 		double diffB = (inDataDouble[1] - functionHV->calcFunction(h, d)) * 0.1;

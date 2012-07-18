@@ -53,27 +53,22 @@ namespace rsgis
 {
 	namespace radar
 	{
-        
-        using namespace std;
-        using namespace rsgis::img;
-        using namespace rsgis::utils;
-		
-		class RSGISEstimationAlgorithmFullPolSingleSpeciesPoly : public RSGISCalcImageValue
+		class RSGISEstimationAlgorithmFullPolSingleSpeciesPoly : public rsgis::img::RSGISCalcImageValue
 		{
 			/// Estimates parameters from full-pol SAR data for a single species
 			public: 
 				RSGISEstimationAlgorithmFullPolSingleSpeciesPoly(int numOutputBands, gsl_matrix *coeffHH, gsl_matrix *coeffHV, gsl_matrix *coeffVV, estParameters parameters, gsl_vector *initialPar, int ittmax);
-				virtual void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException);
-				virtual void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-				virtual void calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-				virtual void calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-				virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-                void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
-				virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};									
+				virtual void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException);
+				virtual void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+				virtual void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+				virtual void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+				virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+                void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+				virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};									
 				~RSGISEstimationAlgorithmFullPolSingleSpeciesPoly();
 			protected:
 				estParameters parameters;
-				treeSpecies species;
+				rsgis::utils::treeSpecies species;
 				gsl_matrix *coeffHH;
 				gsl_matrix *coeffHV;
 				gsl_matrix *coeffVV;
@@ -81,29 +76,29 @@ namespace rsgis
 				int ittmax;
 			};
 		
-		class RSGISEstimationAlgorithmDualPolSingleSpeciesPoly : public RSGISCalcImageValue
+		class RSGISEstimationAlgorithmDualPolSingleSpeciesPoly : public rsgis::img::RSGISCalcImageValue
 		{
 			/// Estimates parameters from dual-pol SAR data for a single species
 			public: 
 				RSGISEstimationAlgorithmDualPolSingleSpeciesPoly(int numOutputBands, gsl_matrix *coeffHH, gsl_matrix *coeffVV, estParameters parameters, gsl_vector *initialPar,  int ittmax);
-				virtual void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException);
-				virtual void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-				virtual void calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-				virtual void calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-				virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-                void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
-				virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};													
+				virtual void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException);
+				virtual void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+				virtual void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+				virtual void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+				virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+                void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+				virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};													
 				~RSGISEstimationAlgorithmDualPolSingleSpeciesPoly();
 			protected:
 				estParameters parameters;
-				treeSpecies species;
+				rsgis::utils::treeSpecies species;
 				gsl_matrix *coeffHH;
 				gsl_matrix *coeffVV;
 				gsl_vector *initialPar;
 				int ittmax;
 			};
 		
-		class RSGISEstimationAlgorithmDualPolFPCSingleSpecies : public RSGISCalcImageValue
+		class RSGISEstimationAlgorithmDualPolFPCSingleSpecies : public rsgis::img::RSGISCalcImageValue
 		{
 			/// Estimates parameters from dual-pol SAR data, FPC for a single species
 			/**
@@ -113,18 +108,18 @@ namespace rsgis
 			 * HV<br>
 			 */
 		public: 
-			RSGISEstimationAlgorithmDualPolFPCSingleSpecies(int numOutputBands, double nonForestThreashold, gsl_matrix *coeffHH, gsl_matrix *coeffHV, gsl_vector *coeffFPCHH, gsl_vector *coeffFPCHV, gsl_vector *coeffFPCAttenuationH, gsl_vector *coeffFPCAttenuationV, estParameters parameters, treeSpecies species, int ittmax);
-			virtual void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException);
-			virtual void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-			virtual void calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-			virtual void calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-			virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-            void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
-			virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};													
+			RSGISEstimationAlgorithmDualPolFPCSingleSpecies(int numOutputBands, double nonForestThreashold, gsl_matrix *coeffHH, gsl_matrix *coeffHV, gsl_vector *coeffFPCHH, gsl_vector *coeffFPCHV, gsl_vector *coeffFPCAttenuationH, gsl_vector *coeffFPCAttenuationV, estParameters parameters, rsgis::utils::treeSpecies species, int ittmax);
+			virtual void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException);
+			virtual void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+			virtual void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+			virtual void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+			virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+            void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+			virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};													
 			~RSGISEstimationAlgorithmDualPolFPCSingleSpecies();
 		protected:
 			estParameters parameters;
-			treeSpecies species;
+			rsgis::utils::treeSpecies species;
 			gsl_matrix *coeffHH;
 			gsl_matrix *coeffHV;
 			gsl_vector *coeffFPCHH;
@@ -137,22 +132,22 @@ namespace rsgis
 			int ittmax;
 		};
 		
-		class RSGISEstimationAlgorithmFullPolSingleSpeciesPolyMask : public RSGISCalcImageValue
+		class RSGISEstimationAlgorithmFullPolSingleSpeciesPolyMask : public rsgis::img::RSGISCalcImageValue
 		{
 			/// Estimates parameters from full-pol SAR data for a single species defined using a mask
 			public: 
 				RSGISEstimationAlgorithmFullPolSingleSpeciesPolyMask(int numOutputBands, gsl_matrix *coeffHH, gsl_matrix *coeffHV, gsl_matrix *coeffVV, estParameters parameters, gsl_vector *initialPar, int ittmax);
-				virtual void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException);
-				virtual void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-				virtual void calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-				virtual void calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-				virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-                void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
-				virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};													
+				virtual void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException);
+				virtual void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+				virtual void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+				virtual void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+				virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+                void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+				virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};													
 				~RSGISEstimationAlgorithmFullPolSingleSpeciesPolyMask();
 			protected:
 				estParameters parameters;
-				treeSpecies species;
+				rsgis::utils::treeSpecies species;
 				gsl_matrix *coeffHH;
 				gsl_matrix *coeffHV;
 				gsl_matrix *coeffVV;
@@ -160,22 +155,22 @@ namespace rsgis
 				int ittmax;
 			};
 		
-		class RSGISEstimationAlgorithmDualPolSingleSpeciesPolyMask : public RSGISCalcImageValue
+		class RSGISEstimationAlgorithmDualPolSingleSpeciesPolyMask : public rsgis::img::RSGISCalcImageValue
 		{
 			/// Estimates parameters from dual-pol SAR data for a single species defined using a mask
 			public: 
 				RSGISEstimationAlgorithmDualPolSingleSpeciesPolyMask(int numOutputBands, double nonForestThreashold, gsl_matrix *coeffHH, gsl_matrix *coeffVV, estParameters parameters, gsl_vector *initialPar, int ittmax);
-				virtual void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException);
-				virtual void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-				virtual void calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-				virtual void calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-				virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-                void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
-				virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};													
+				virtual void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException);
+				virtual void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+				virtual void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+				virtual void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+				virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+                void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+				virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};													
 				~RSGISEstimationAlgorithmDualPolSingleSpeciesPolyMask();
 			protected:
 				estParameters parameters;
-				treeSpecies species;
+				rsgis::utils::treeSpecies species;
 				gsl_matrix *coeffHH;
 				gsl_matrix *coeffVV;
 				gsl_vector *initialPar;
@@ -183,7 +178,7 @@ namespace rsgis
 				double nonForestThreashold;
 			};
 		
-		class RSGISEstimationAlgorithmDualPolFPCMoistureSingleSpecies : public RSGISCalcImageValue
+		class RSGISEstimationAlgorithmDualPolFPCMoistureSingleSpecies : public rsgis::img::RSGISCalcImageValue
 		{
 			/// Estimates parameters from dual-pol SAR data, FPC and moisture for a single species
 			/**
@@ -196,18 +191,18 @@ namespace rsgis
 			 * Average / estimated soil moisture
 			 */
 		public: 
-			RSGISEstimationAlgorithmDualPolFPCMoistureSingleSpecies(int numOutputBands, gsl_matrix *coeffHH, gsl_matrix *coeffHV, gsl_vector *coeffFPCHH, gsl_vector *coeffFPCHV, gsl_vector *coeffFPCAttenuationH, gsl_vector *coeffFPCAttenuationV, estParameters parameters, treeSpecies species, int ittmax);
-			virtual void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException);
-			virtual void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-			virtual void calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-			virtual void calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-			virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-            void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
-			virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};													
+			RSGISEstimationAlgorithmDualPolFPCMoistureSingleSpecies(int numOutputBands, gsl_matrix *coeffHH, gsl_matrix *coeffHV, gsl_vector *coeffFPCHH, gsl_vector *coeffFPCHV, gsl_vector *coeffFPCAttenuationH, gsl_vector *coeffFPCAttenuationV, estParameters parameters, rsgis::utils::treeSpecies species, int ittmax);
+			virtual void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException);
+			virtual void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+			virtual void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+			virtual void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+			virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+            void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+			virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};													
 			~RSGISEstimationAlgorithmDualPolFPCMoistureSingleSpecies();
 		protected:
 			estParameters parameters;
-			treeSpecies species;
+			rsgis::utils::treeSpecies species;
 			gsl_matrix *coeffHH;
 			gsl_matrix *coeffHV;
 			gsl_vector *coeffFPCHH;
@@ -219,7 +214,7 @@ namespace rsgis
 			int ittmax;
 		};
 		
-		class RSGISEstimationAlgorithmSingleSpecies : public RSGISCalcImageValue
+		class RSGISEstimationAlgorithmSingleSpecies : public rsgis::img::RSGISCalcImageValue
 		{
 			/// Estimates parameters from SAR data for a single species.
 			/** 
@@ -234,18 +229,18 @@ namespace rsgis
 																	  RSGISEstimationOptimiser *estOptimiser, 
 																	  estParameters parameters,
 																      double **minMaxVals = NULL);
-			virtual void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException);
-			virtual void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-			virtual void calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-			virtual void calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-			virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-            void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
-			virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};													
+			virtual void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException);
+			virtual void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+			virtual void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+			virtual void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+			virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+            void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+			virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};													
 			~RSGISEstimationAlgorithmSingleSpecies();
 		protected:
 			gsl_vector *initialPar;
 			estParameters parameters;
-			treeSpecies species;
+			rsgis::utils::treeSpecies species;
 			RSGISEstimationOptimiser *estOptimiser;
 			int numOutputPar; // Number of output parameters
 			int numOutputBands;
@@ -253,7 +248,7 @@ namespace rsgis
 			bool useDefaultMinMax; // Use default min-max values for parameters
 		};
 		
-		class RSGISEstimationAlgorithmSingleSpeciesMask : public RSGISCalcImageValue
+		class RSGISEstimationAlgorithmSingleSpeciesMask : public rsgis::img::RSGISCalcImageValue
 		{
 			/// Estimates parameters from SAR data for a single species. Takes an D+1 band image (where D is the total number of data channels)
 			/// where the first band is used to classify forest / non-forest areas.
@@ -271,26 +266,26 @@ namespace rsgis
 																	  RSGISEstimationOptimiser *estOptimiser, 
 																	  estParameters parameters,
 																	  double **minMaxVals = NULL);
-			virtual void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException);
-			virtual void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-			virtual void calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-			virtual void calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-			virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-            void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
-			virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};													
+			virtual void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException);
+			virtual void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+			virtual void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+			virtual void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+			virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+            void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+			virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};													
 			~RSGISEstimationAlgorithmSingleSpeciesMask();
 		protected:
 			double nonForestThreashold;
 			gsl_vector *initialPar;
 			estParameters parameters;
-			treeSpecies species;
+			rsgis::utils::treeSpecies species;
 			RSGISEstimationOptimiser *estOptimiser;
 			int numOutputBands;
 			double **minMaxVals; // Array of arrays to hold min, max values for estimation
 			bool useDefaultMinMax; // Use default min-max values for parameters
 		};
 		
-		class RSGISEstimationAlgorithmSingleSpeciesPixAP : public RSGISCalcImageValue
+		class RSGISEstimationAlgorithmSingleSpeciesPixAP : public rsgis::img::RSGISCalcImageValue
 		{
 			/// Estimates parameters from SAR data for a single species. Takes pixel based a priori estimates.
 			/** 
@@ -305,18 +300,18 @@ namespace rsgis
 												  RSGISEstimationOptimiser *estOptimiser, 
 												  estParameters parameters,
 												  double **minMaxVals = NULL);
-			virtual void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException);
-			virtual void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-			virtual void calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-			virtual void calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-			virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-            void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
-			virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};													
+			virtual void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException);
+			virtual void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+			virtual void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+			virtual void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+			virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+            void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+			virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};													
 			~RSGISEstimationAlgorithmSingleSpeciesPixAP();
 		protected:
 			gsl_vector *initialPar;
 			estParameters parameters;
-			treeSpecies species;
+			rsgis::utils::treeSpecies species;
 			RSGISEstimationOptimiser *estOptimiser;
 			int numOutputBands;
 			int nPar;
@@ -324,7 +319,7 @@ namespace rsgis
 			bool useDefaultMinMax; // Use default min-max values for parameters
 		};
 		
-		class RSGISEstimationAlgorithmDualPolSingleSpeciesMaskPixAP : public RSGISCalcImageValue
+		class RSGISEstimationAlgorithmDualPolSingleSpeciesMaskPixAP : public rsgis::img::RSGISCalcImageValue
 		{
 			/** Estimates parameters from dual-pol SAR data for a single species. <br>
 			 * A priori estimates for each pixel are passed in as image bands.<br>
@@ -343,24 +338,24 @@ namespace rsgis
 																	  gsl_vector *initialPar,
 																	  RSGISEstimationOptimiser *estOptimiser, 
 																	  estParameters parameters);
-			virtual void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException);
-			virtual void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-			virtual void calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-			virtual void calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-			virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-            void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
-			virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};													
+			virtual void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException);
+			virtual void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+			virtual void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+			virtual void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+			virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+            void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+			virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};													
 			~RSGISEstimationAlgorithmDualPolSingleSpeciesMaskPixAP();
 		protected:
 			double nonForestThreashold;
 			gsl_vector *initialPar;
 			estParameters parameters;
-			treeSpecies species;
+			rsgis::utils::treeSpecies species;
 			RSGISEstimationOptimiser *estOptimiser;
 			gsl_vector *aPrioriPar;
 		};
 		
-		class RSGISEstimationAlgorithmDualPolMultiSpeciesClassification : public RSGISCalcImageValue
+		class RSGISEstimationAlgorithmDualPolMultiSpeciesClassification : public rsgis::img::RSGISCalcImageValue
 		{
 			/// Estimates parameters from dual-pol SAR data for a single species. Takes a 3 band image
 			/// where the first band is a classification.
@@ -374,38 +369,38 @@ namespace rsgis
 																				vector <gsl_vector*> *initialPar,
 																				vector <RSGISEstimationOptimiser*> *estOptimiser, 
 																				estParameters parameters,
-																				vector<treeSpecies> *species);
-			virtual void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException);
-			virtual void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-			virtual void calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-			virtual void calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-			virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-            void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
-			virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};													
+																				vector<rsgis::utils::treeSpecies> *species);
+			virtual void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException);
+			virtual void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+			virtual void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+			virtual void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+			virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+            void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+			virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};													
 			~RSGISEstimationAlgorithmDualPolMultiSpeciesClassification();
 		protected:
 			vector<gsl_vector*> *initialPar;
 			estParameters parameters;
-			vector<treeSpecies> *species;
+			vector<rsgis::utils::treeSpecies> *species;
 			vector<RSGISEstimationOptimiser*> *estOptimiser;
 		};
 		
-		class RSGISEstimationAlgorithmGenerateSimulatedData2Var2Data : public RSGISCalcImageValue
+		class RSGISEstimationAlgorithmGenerateSimulatedData2Var2Data : public rsgis::img::RSGISCalcImageValue
 		{
 			/// Generates simulated data
 		public: 
-			RSGISEstimationAlgorithmGenerateSimulatedData2Var2Data(int numOutputBands, RSGISMathTwoVariableFunction *hhFunction, RSGISMathTwoVariableFunction *hvFunction);
-			virtual void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException);
-			virtual void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-			virtual void calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-			virtual void calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-			virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-            void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
-			virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};													
+			RSGISEstimationAlgorithmGenerateSimulatedData2Var2Data(int numOutputBands, rsgis::math::RSGISMathTwoVariableFunction *hhFunction, rsgis::math::RSGISMathTwoVariableFunction *hvFunction);
+			virtual void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException);
+			virtual void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+			virtual void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+			virtual void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+			virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+            void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+			virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};													
 			~RSGISEstimationAlgorithmGenerateSimulatedData2Var2Data();
 		protected:
-			RSGISMathTwoVariableFunction *hhFunction;
-			RSGISMathTwoVariableFunction *hvFunction;
+			rsgis::math::RSGISMathTwoVariableFunction *hhFunction;
+			rsgis::math::RSGISMathTwoVariableFunction *hvFunction;
 		};
 	}
 }

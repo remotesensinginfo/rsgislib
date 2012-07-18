@@ -40,22 +40,18 @@
 
 namespace rsgis {namespace radar{
     
-    using namespace std;
-    using namespace rsgis::math;
-    using namespace rsgis::utils;
-    
 	class RSGISEstimationExhaustiveSearch2Var2Data : public RSGISEstimationOptimiser
 	{
 	public:
-		RSGISEstimationExhaustiveSearch2Var2Data(RSGISMathTwoVariableFunction *functionHH, RSGISMathTwoVariableFunction *functionHV, double *minMaxIntervalA, double *minMaxIntervalB);
+		RSGISEstimationExhaustiveSearch2Var2Data(rsgis::math::RSGISMathTwoVariableFunction *functionHH, rsgis::math::RSGISMathTwoVariableFunction *functionHV, double *minMaxIntervalA, double *minMaxIntervalB);
 		virtual void modifyAPriori(gsl_vector *newAPrioriPar){};
 		int minimise(gsl_vector *inData, gsl_vector *initialPar, gsl_vector *outParError);
 		virtual estOptimizerType getOptimiserType(){return exhaustiveSearch;}; 
-		virtual void printOptimiser(){cout << "Exhaustive search - 2 Var 2 Data" << endl;};
+		virtual void printOptimiser(){std::cout << "Exhaustive search - 2 Var 2 Data" << std::endl;};
 		~RSGISEstimationExhaustiveSearch2Var2Data();
 	private:
-		RSGISMathTwoVariableFunction *functionHH;
-		RSGISMathTwoVariableFunction *functionHV;
+		rsgis::math::RSGISMathTwoVariableFunction *functionHH;
+		rsgis::math::RSGISMathTwoVariableFunction *functionHV;
 		double *minMaxIntervalA;
 		double *minMaxIntervalB;
 	};
@@ -63,25 +59,25 @@ namespace rsgis {namespace radar{
 	class RSGISEstimationExhaustiveSearch2Var2DataExportPoints : public RSGISEstimationOptimiser
 	{
 	public:
-		RSGISEstimationExhaustiveSearch2Var2DataExportPoints(RSGISMathTwoVariableFunction *functionHH, RSGISMathTwoVariableFunction *functionHV, double *minMaxIntervalA, double *minMaxIntervalB, string outFilenameBase);
+		RSGISEstimationExhaustiveSearch2Var2DataExportPoints(rsgis::math::RSGISMathTwoVariableFunction *functionHH, rsgis::math::RSGISMathTwoVariableFunction *functionHV, double *minMaxIntervalA, double *minMaxIntervalB, std::string outFilenameBase);
 		virtual void modifyAPriori(gsl_vector *newAPrioriPar){};
 		int minimise(gsl_vector *inData, gsl_vector *initialPar, gsl_vector *outParError);
 		virtual estOptimizerType getOptimiserType(){return exhaustiveSearch;};
-		virtual void printOptimiser(){cout << "Exhaustive search - 2 Var 2 Data" << endl;};
+		virtual void printOptimiser(){std::cout << "Exhaustive search - 2 Var 2 Data" << std::endl;};
 		~RSGISEstimationExhaustiveSearch2Var2DataExportPoints();
 	private:
-		RSGISMathTwoVariableFunction *functionHH;
-		RSGISMathTwoVariableFunction *functionHV;
+		rsgis::math::RSGISMathTwoVariableFunction *functionHH;
+		rsgis::math::RSGISMathTwoVariableFunction *functionHV;
 		double *minMaxIntervalA;
 		double *minMaxIntervalB;
-		string outFilenameBase;
+		std::string outFilenameBase;
 		int nMinimiseRuns;
 	};
 	
 	class RSGISEstimationExhaustiveSearch2Var2DataWithAP : public RSGISEstimationOptimiser
 	{
 	public:
-		RSGISEstimationExhaustiveSearch2Var2DataWithAP(RSGISMathTwoVariableFunction *functionHH, RSGISMathTwoVariableFunction *functionHV,
+		RSGISEstimationExhaustiveSearch2Var2DataWithAP(rsgis::math::RSGISMathTwoVariableFunction *functionHH, rsgis::math::RSGISMathTwoVariableFunction *functionHV,
 													   gsl_matrix *covMatrixP, 
 													   gsl_matrix *invCovMatrixD,
 													   gsl_vector *aPrioriPar,
@@ -89,11 +85,11 @@ namespace rsgis {namespace radar{
 		virtual void modifyAPriori(gsl_vector *newAPrioriPar){this->aPrioriPar = newAPrioriPar;};
 		int minimise(gsl_vector *inData, gsl_vector *initialPar, gsl_vector *outParError);
 		virtual estOptimizerType getOptimiserType(){return exhaustiveSearch;}; 
-		virtual void printOptimiser(){cout << "Exhaustive search - 2 Var 2 Data (with a priori estimates)" << endl;};
+		virtual void printOptimiser(){std::cout << "Exhaustive search - 2 Var 2 Data (with a priori estimates)" << std::endl;};
 		~RSGISEstimationExhaustiveSearch2Var2DataWithAP();
 	private:
-		RSGISMathTwoVariableFunction *functionHH;
-		RSGISMathTwoVariableFunction *functionHV;
+		rsgis::math::RSGISMathTwoVariableFunction *functionHH;
+		rsgis::math::RSGISMathTwoVariableFunction *functionHV;
 		gsl_matrix *covMatrixP;
 		gsl_matrix *invCovMatrixD;
 		gsl_matrix *invCovMatrixP;
@@ -105,16 +101,16 @@ namespace rsgis {namespace radar{
 	class RSGISEstimationExhaustiveSearch2Var3Data : public RSGISEstimationOptimiser
 	{
 	public:
-		RSGISEstimationExhaustiveSearch2Var3Data(RSGISMathTwoVariableFunction *function1, RSGISMathTwoVariableFunction *function2, RSGISMathTwoVariableFunction *function3, double *minMaxIntervalA, double *minMaxIntervalB);
+		RSGISEstimationExhaustiveSearch2Var3Data(rsgis::math::RSGISMathTwoVariableFunction *function1, rsgis::math::RSGISMathTwoVariableFunction *function2, rsgis::math::RSGISMathTwoVariableFunction *function3, double *minMaxIntervalA, double *minMaxIntervalB);
 		virtual void modifyAPriori(gsl_vector *newAPrioriPar){};
 		int minimise(gsl_vector *inData, gsl_vector *initialPar, gsl_vector *outParError);
 		virtual estOptimizerType getOptimiserType(){return exhaustiveSearch;};
-		virtual void printOptimiser(){cout << "Exhaustive search - 2 Var 3 Data" << endl;};
+		virtual void printOptimiser(){std::cout << "Exhaustive search - 2 Var 3 Data" << std::endl;};
 		~RSGISEstimationExhaustiveSearch2Var3Data();
 	private:
-		RSGISMathTwoVariableFunction *function1;
-		RSGISMathTwoVariableFunction *function2;
-		RSGISMathTwoVariableFunction *function3;
+		rsgis::math::RSGISMathTwoVariableFunction *function1;
+		rsgis::math::RSGISMathTwoVariableFunction *function2;
+		rsgis::math::RSGISMathTwoVariableFunction *function3;
 		double *minMaxIntervalA;
 		double *minMaxIntervalB;
 	};
@@ -122,34 +118,34 @@ namespace rsgis {namespace radar{
 	class RSGISEstimationExhaustiveSearch2Var3DataExportPoints : public RSGISEstimationOptimiser
 	{
 	public:
-		RSGISEstimationExhaustiveSearch2Var3DataExportPoints(RSGISMathTwoVariableFunction *function1, RSGISMathTwoVariableFunction *function2, RSGISMathTwoVariableFunction *function3, double *minMaxIntervalA, double *minMaxIntervalB, string outFilenameBase);
+		RSGISEstimationExhaustiveSearch2Var3DataExportPoints(rsgis::math::RSGISMathTwoVariableFunction *function1, rsgis::math::RSGISMathTwoVariableFunction *function2, rsgis::math::RSGISMathTwoVariableFunction *function3, double *minMaxIntervalA, double *minMaxIntervalB, std::string outFilenameBase);
 		virtual void modifyAPriori(gsl_vector *newAPrioriPar){};
 		int minimise(gsl_vector *inData, gsl_vector *initialPar, gsl_vector *outParError);
 		virtual estOptimizerType getOptimiserType(){return exhaustiveSearch;};
-		virtual void printOptimiser(){cout << "Exhaustive search - 2 Var 3 Data" << endl;};
+		virtual void printOptimiser(){std::cout << "Exhaustive search - 2 Var 3 Data" << std::endl;};
 		~RSGISEstimationExhaustiveSearch2Var3DataExportPoints();
 	private:
-		RSGISMathTwoVariableFunction *function1;
-		RSGISMathTwoVariableFunction *function2;
-		RSGISMathTwoVariableFunction *function3;
+		rsgis::math::RSGISMathTwoVariableFunction *function1;
+		rsgis::math::RSGISMathTwoVariableFunction *function2;
+		rsgis::math::RSGISMathTwoVariableFunction *function3;
 		double *minMaxIntervalA;
 		double *minMaxIntervalB;
-		string outFilenameBase;
+		std::string outFilenameBase;
 		int nMinimiseRuns;
 	};
 	
 	class RSGISEstimationExhaustiveSearchWithGSLOptimiser2Var2Data : public RSGISEstimationOptimiser
 	{
 	public:
-		RSGISEstimationExhaustiveSearchWithGSLOptimiser2Var2Data(RSGISMathTwoVariableFunction *functionHH, RSGISMathTwoVariableFunction *functionHV, double *minMaxIntervalA, double *minMaxIntervalB);
+		RSGISEstimationExhaustiveSearchWithGSLOptimiser2Var2Data(rsgis::math::RSGISMathTwoVariableFunction *functionHH, rsgis::math::RSGISMathTwoVariableFunction *functionHV, double *minMaxIntervalA, double *minMaxIntervalB);
 		virtual void modifyAPriori(gsl_vector *newAPrioriPar){};
 		int minimise(gsl_vector *inData, gsl_vector *initialPar, gsl_vector *outParError);
 		virtual estOptimizerType getOptimiserType(){return exhaustiveSearch;};
-		virtual void printOptimiser(){cout << "Exhaustive search - 2 Var 2 Data" << endl;};
+		virtual void printOptimiser(){std::cout << "Exhaustive search - 2 Var 2 Data" << std::endl;};
 		~RSGISEstimationExhaustiveSearchWithGSLOptimiser2Var2Data();
 	private:
-		RSGISMathTwoVariableFunction *functionHH;
-		RSGISMathTwoVariableFunction *functionHV;
+		rsgis::math::RSGISMathTwoVariableFunction *functionHH;
+		rsgis::math::RSGISMathTwoVariableFunction *functionHV;
 		double *minMaxIntervalA;
 		double *minMaxIntervalB;
 	};
