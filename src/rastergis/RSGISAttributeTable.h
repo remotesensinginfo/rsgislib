@@ -42,7 +42,7 @@
 #include "utils/RSGISTextUtils.h"
 
 #include <xercesc/dom/DOM.hpp>
-#include <xercesc/util/XMLstring.hpp>
+#include <xercesc/util/XMLString.hpp>
 
 #include "boost/math/special_functions/fpclassify.hpp"
 #include <boost/numeric/conversion/cast.hpp>
