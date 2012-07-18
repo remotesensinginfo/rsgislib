@@ -41,7 +41,7 @@ namespace rsgis{ namespace modeling  {
 		this->convexHull = true;
 	}
 	
-	void RSGISModelTransect::populateSingleSizeSpecies(double quadratSize, unsigned int numTrees, RSGISProbDistro *vegDistro, RSGISProbDistro *treePosXDistro, RSGISProbDistro *treePosYDistro, RSGISModelAddVegetation *addVeg)
+	void RSGISModelTransect::populateSingleSizeSpecies(double quadratSize, unsigned int numTrees, rsgis::math::RSGISProbDistro *vegDistro, rsgis::math::RSGISProbDistro *treePosXDistro, rsgis::math::RSGISProbDistro *treePosYDistro, RSGISModelAddVegetation *addVeg)
 	{		
 		
 		// Populate transect with trees

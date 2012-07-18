@@ -37,12 +37,6 @@
 
 namespace rsgis { namespace modeling{
     
-    using namespace std;
-    using namespace geos::geom;
-    using namespace rsgis::geom;
-    using namespace rsgis::vec;
-    using namespace rsgis::math;
-    
 	/// Class to create tree canopy
 	/*
 	 * Class to create a tree canopy based on statistical distrobutions and tree parameters<br>
@@ -76,20 +70,20 @@ namespace rsgis { namespace modeling{
 	class RSGISModelTreeCanopy : public RSGISModelAddVegetation
 	{
 	public:
-		RSGISModelTreeCanopy(vector<double> *modelPar, RSGISProbDistro *leafPosHDistro, RSGISProbDistro *leafPosVDistro, RSGISProbDistro *leafThetaDistro,
-							 RSGISProbDistro *smallBranchPosHDistro, RSGISProbDistro *smallBranchPosVDistro, RSGISProbDistro *smallBranchThetaDistro, RSGISProbDistro *smallBranchPhiDistro, 
-							 RSGISProbDistro *largeBranchPosHDistro, RSGISProbDistro *largeBranchPosVDistro, RSGISProbDistro *largeBranchThetaDistro, RSGISProbDistro *largeBranchPhiDistro);
+		RSGISModelTreeCanopy(std::vector<double> *modelPar, rsgis::math::RSGISProbDistro *leafPosHDistro, rsgis::math::RSGISProbDistro *leafPosVDistro, rsgis::math::RSGISProbDistro *leafThetaDistro,
+							 rsgis::math::RSGISProbDistro *smallBranchPosHDistro, rsgis::math::RSGISProbDistro *smallBranchPosVDistro, rsgis::math::RSGISProbDistro *smallBranchThetaDistro, rsgis::math::RSGISProbDistro *smallBranchPhiDistro, 
+							 rsgis::math::RSGISProbDistro *largeBranchPosHDistro, rsgis::math::RSGISProbDistro *largeBranchPosVDistro, rsgis::math::RSGISProbDistro *largeBranchThetaDistro, rsgis::math::RSGISProbDistro *largeBranchPhiDistro);
 		virtual void createVeg(){};
 		virtual void addVegTrans(RSGISTransect *transect, unsigned int centerX, unsigned int centerY, unsigned int sizeX, unsigned int sizeY);
-		virtual void addVegTransConvexHull(RSGISTransect *transect, unsigned int centerX, unsigned int centerY, unsigned int sizeX, unsigned int sizeY, vector<Polygon*> *canopyPolys);
+		virtual void addVegTransConvexHull(RSGISTransect *transect, unsigned int centerX, unsigned int centerY, unsigned int sizeX, unsigned int sizeY, std::vector<Polygon*> *canopyPolys);
 		virtual ~RSGISModelTreeCanopy();
 	private:
 		double leafLenght, leafWidth, leafThickness, leafDensity;
 		double smallBranchLenght, smallBranchRadius, smallBranchDensity;
 		double largeBranchLenght, largeBranchRadius, largeBranchDensity;
-		RSGISProbDistro *leafPosHDistro, *leafPosVDistro, *leafThetaDistro;
-		RSGISProbDistro *smallBranchPosHDistro, *smallBranchPosVDistro, *smallBranchThetaDistro, *smallBranchPhiDistro;
-		RSGISProbDistro *largeBranchPosHDistro, *largeBranchPosVDistro, *largeBranchThetaDistro, *largeBranchPhiDistro;
+		rsgis::math::RSGISProbDistro *leafPosHDistro, *leafPosVDistro, *leafThetaDistro;
+		rsgis::math::RSGISProbDistro *smallBranchPosHDistro, *smallBranchPosVDistro, *smallBranchThetaDistro, *smallBranchPhiDistro;
+		rsgis::math::RSGISProbDistro *largeBranchPosHDistro, *largeBranchPosVDistro, *largeBranchThetaDistro, *largeBranchPhiDistro;
 	};
 	
 }}

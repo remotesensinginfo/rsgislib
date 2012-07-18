@@ -31,10 +31,6 @@
 
 namespace rsgis{namespace modeling {
     
-    using namespace std;
-    using namespace rsgis::math;
-    using namespace rsgis::utils;
-    
 	/** Class to store transect data
 	 * Data is stored as char.
 	 */
@@ -61,11 +57,11 @@ namespace rsgis{namespace modeling {
 		/// Count the number of points in the transect
 		unsigned int countPoints();
 		/// Export transect as an image
-		void exportImage(string outFileName);
+		void exportImage(std::string outFileName);
 		/// Export the transect in ptxt format
-		void exportPlot(string outFileName, unsigned int numPts);
+		void exportPlot(std::string outFileName, unsigned int numPts);
 		/// Export in SPD format
-		void exportSPD(string outFileName);
+		void exportSPD(std::string outFileName);
 		~RSGISTransect();
 	protected:
 		unsigned int transectLenght;

@@ -26,17 +26,17 @@
 
 namespace rsgis{namespace modeling{
 	
-	RSGISModelingException::RSGISModelingException() : RSGISException("A RSGISClustererException has been created..")
+	RSGISModelingException::RSGISModelingException() : rsgis::RSGISException("A RSGISClustererException has been created..")
 	{
 		
 	}
 	
-	RSGISModelingException::RSGISModelingException(const char* message) : RSGISException(message)
+	RSGISModelingException::RSGISModelingException(const char* message) : rsgis::RSGISException(message)
 	{
 		
 	}
 	
-	RSGISModelingException::RSGISModelingException(string message) : RSGISException(message)
+	RSGISModelingException::RSGISModelingException(std::string message) : rsgis::RSGISException(message)
 	{
 		
 	}

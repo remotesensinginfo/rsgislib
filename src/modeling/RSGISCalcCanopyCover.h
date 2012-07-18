@@ -33,11 +33,6 @@
 #include "vec/RSGISVectorIO.h"
 
 namespace rsgis { namespace modeling {
-    
-    using namespace std;
-    using namespace geos::geom;
-    using namespace rsgis::geom;
-    using namespace rsgis::vec;
 
 	class RSGISCalcCanopyCover
 	{
@@ -51,13 +46,13 @@ namespace rsgis { namespace modeling {
 		 *
 		 */
 	public:
-		RSGISCalcCanopyCover(RSGISTransect *transect, vector<Polygon*> *canopyPoly);
+		RSGISCalcCanopyCover(RSGISTransect *transect, std::vector<geos::geom::Polygon*> *canopyPoly);
 		double calcCanopyCover();
 		void exportCanopyPoly(string outFile);
 		~RSGISCalcCanopyCover();
 	private:
 		RSGISTransect *transect;
-		vector<Polygon*> *canopyPoly;
+        std::vector<geos::geom::Polygon*> *canopyPoly;
 	};
 	
 }}

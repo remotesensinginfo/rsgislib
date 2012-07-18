@@ -24,10 +24,10 @@
 #include "RSGISModelTreeCanopy.h"
 
 namespace rsgis { namespace modeling{
-	RSGISModelTreeCanopy::RSGISModelTreeCanopy(vector<double> *modelPar, 
-											   RSGISProbDistro *leafPosHDistro, RSGISProbDistro *leafPosVDistro, RSGISProbDistro *leafThetaDistro,
-											   RSGISProbDistro *smallBranchPosHDistro, RSGISProbDistro *smallBranchPosVDistro, RSGISProbDistro *smallBranchThetaDistro, RSGISProbDistro *smallBranchPhiDistro, 
-											   RSGISProbDistro *largeBranchPosHDistro, RSGISProbDistro *largeBranchPosVDistro, RSGISProbDistro *largeBranchThetaDistro, RSGISProbDistro *largeBranchPhiDistro)
+	RSGISModelTreeCanopy::RSGISModelTreeCanopy(std::vector<double> *modelPar, 
+											   rsgis::math::RSGISProbDistro *leafPosHDistro, rsgis::math::RSGISProbDistro *leafPosVDistro, rsgis::math::RSGISProbDistro *leafThetaDistro,
+											   rsgis::math::RSGISProbDistro *smallBranchPosHDistro, rsgis::math::RSGISProbDistro *smallBranchPosVDistro, rsgis::math::RSGISProbDistro *smallBranchThetaDistro, rsgis::math::RSGISProbDistro *smallBranchPhiDistro, 
+											   rsgis::math::RSGISProbDistro *largeBranchPosHDistro, rsgis::math::RSGISProbDistro *largeBranchPosVDistro, rsgis::math::RSGISProbDistro *largeBranchThetaDistro, rsgis::math::RSGISProbDistro *largeBranchPhiDistro)
 	{
 		
 		// Read in model parameters from input vector
@@ -304,7 +304,7 @@ namespace rsgis { namespace modeling{
 		}
 
 	}
-	void RSGISModelTreeCanopy::addVegTransConvexHull(RSGISTransect *transect, unsigned int centerX, unsigned int centerY, unsigned int sizeX, unsigned int sizeY, vector<Polygon*> *canopyPolys)
+	void RSGISModelTreeCanopy::addVegTransConvexHull(RSGISTransect *transect, unsigned int centerX, unsigned int centerY, unsigned int sizeX, unsigned int sizeY, std::vector<geos::geom::Polygon*> *canopyPolys)
 	{
 		double pi = 3.1415926536;
 		
@@ -336,7 +336,7 @@ namespace rsgis { namespace modeling{
 		double largeBranchTheta = 0;
 		double largeBranchPhi = 0;
 		
-		vector<Coordinate> *coordinates = new vector<Coordinate>;
+		std::vector<Coordinate> *coordinates = new std::vector<Coordinate>;
 		
 		double transectRes = transect->getRes();
 		

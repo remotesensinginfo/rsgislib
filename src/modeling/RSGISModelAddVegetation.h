@@ -41,12 +41,6 @@
 
 namespace rsgis{namespace modeling{
     
-    using namespace std;
-    using namespace rsgis::math;
-    using namespace geos::geom;
-    using namespace rsgis::geom;
-    using namespace rsgis::vec;
-    
 	class RSGISModelAddVegetation
 	{
 	/** Abstract class to model vegetation
@@ -55,10 +49,8 @@ namespace rsgis{namespace modeling{
 	public:
 		RSGISModelAddVegetation(){};
 		virtual void createVeg() = 0;
-		virtual void addVegTrans(RSGISTransect *transect, unsigned int centerX, unsigned int centerY, 
-								 unsigned int sizeX, unsigned int sizeY) = 0;
-		virtual void addVegTransConvexHull(RSGISTransect *transect, unsigned int centerX, unsigned int centerY, 
-								unsigned int sizeX, unsigned int sizeY, vector<Polygon*> *canopyPolys) = 0;
+		virtual void addVegTrans(RSGISTransect *transect, unsigned int centerX, unsigned int centerY, unsigned int sizeX, unsigned int sizeY) = 0;
+		virtual void addVegTransConvexHull(RSGISTransect *transect, unsigned int centerX, unsigned int centerY, unsigned int sizeX, unsigned int sizeY, std::vector<geos::geom::Polygon*> *canopyPolys) = 0;
 		virtual ~RSGISModelAddVegetation(){};
 	};
 }}
