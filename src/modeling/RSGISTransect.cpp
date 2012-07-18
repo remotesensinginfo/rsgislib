@@ -24,6 +24,7 @@
 #include "RSGISTransect.h"
 
 namespace rsgis{ namespace modeling  {
+    
 	RSGISTransect::RSGISTransect(unsigned int transectWidth, unsigned int transectLenght, unsigned int transectHeight, double transectRes)
 	{
 		this->transectLenght = transectLenght;
@@ -163,11 +164,11 @@ namespace rsgis{ namespace modeling  {
 		
 		return nPoints;
 	}
-	void RSGISTransect::exportImage(string outFileName)
+	void RSGISTransect::exportImage(std::string outFileName)
 	{
 		// Generate image - Produces an ENVI file displaying a flattened view of the canopy
-		RSGISMatrices matrixUtils;
-		Matrix *imageMatrix = matrixUtils.createMatrix(transectLenght, transectWidth);
+        rsgis::math::RSGISMatrices matrixUtils;
+		rsgis::math::Matrix *imageMatrix = matrixUtils.createMatrix(transectLenght, transectWidth);
 		
 		int mIndex = 0;
 		int mElement = 0;
@@ -198,11 +199,11 @@ namespace rsgis{ namespace modeling  {
 		matrixUtils.exportAsImage(imageMatrix, outFileName);
 		delete imageMatrix;
 	}
-	void RSGISTransect::exportSPD(string outFileName)
+	void RSGISTransect::exportSPD(std::string outFileName)
 	{
 		
 	}
-	void RSGISTransect::exportPlot(string outFileName, unsigned int numPts)
+	void RSGISTransect::exportPlot(std::string outFileName, unsigned int numPts)
 	{
 		double *xCoord = new double[numPts];
 		double *yCoord = new double[numPts];
@@ -230,9 +231,9 @@ namespace rsgis{ namespace modeling  {
 			}
 		}
 		
-		RSGISExportForPlotting::getInstance()->export3DColourScatter(outFileName, xCoord, yCoord, zCoord, col, numPts);
+		rsgis::utils::RSGISExportForPlotting::getInstance()->export3DColourScatter(outFileName, xCoord, yCoord, zCoord, col, numPts);
 		
-		cout << "Saved " << numPts << " points to: " << outFileName << endl;
+        std::cout << "Saved " << numPts << " points to: " << outFileName << std::endl;
 
 		delete[] xCoord;
 		delete[] yCoord;

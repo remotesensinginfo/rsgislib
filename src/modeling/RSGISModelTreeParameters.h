@@ -31,9 +31,6 @@
 
 namespace rsgis { namespace modeling {
     
-    using namespace std;
-    using namespace rsgis::utils;
-    
 	/// Abstract tree class
 	class RSGISTree 
 	{
@@ -89,7 +86,7 @@ namespace rsgis { namespace modeling {
 		double smallBranchRadius, largeBranchRadius;
 		double smallBranchLength, largeBranchLength;
 		int numLargeBranches, numSmallBranches;
-		treeSpecies species;
+        rsgis::utils::treeSpecies species;
 	};
 }}
 

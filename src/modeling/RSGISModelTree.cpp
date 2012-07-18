@@ -25,10 +25,10 @@
 #include "RSGISModelTree.h"
 
 namespace rsgis { namespace modeling{
-	RSGISModelTree::RSGISModelTree(vector<double> *modelPar, 
-											   RSGISProbDistro *leafPosHDistro, RSGISProbDistro *leafPosVDistro, RSGISProbDistro *leafThetaDistro,
-											   RSGISProbDistro *smallBranchPosHDistro, RSGISProbDistro *smallBranchPosVDistro, RSGISProbDistro *smallBranchThetaDistro, RSGISProbDistro *smallBranchPhiDistro, 
-											   RSGISProbDistro *largeBranchPosHDistro, RSGISProbDistro *largeBranchPosVDistro, RSGISProbDistro *largeBranchThetaDistro, RSGISProbDistro *largeBranchPhiDistro)
+	RSGISModelTree::RSGISModelTree(std::vector<double> *modelPar, 
+											   rsgis::math::RSGISProbDistro *leafPosHDistro, rsgis::math::RSGISProbDistro *leafPosVDistro, rsgis::math::RSGISProbDistro *leafThetaDistro,
+											   rsgis::math::RSGISProbDistro *smallBranchPosHDistro, rsgis::math::RSGISProbDistro *smallBranchPosVDistro, rsgis::math::RSGISProbDistro *smallBranchThetaDistro, rsgis::math::RSGISProbDistro *smallBranchPhiDistro, 
+											   rsgis::math::RSGISProbDistro *largeBranchPosHDistro, rsgis::math::RSGISProbDistro *largeBranchPosVDistro, rsgis::math::RSGISProbDistro *largeBranchThetaDistro, rsgis::math::RSGISProbDistro *largeBranchPhiDistro)
 	{
 		
 		// Read in model parameters from input vector
@@ -352,7 +352,7 @@ namespace rsgis { namespace modeling{
 		
 		
 	}
-	void RSGISModelTree::addVegTransConvexHull(RSGISTransect *transect, unsigned int centerX, unsigned int centerY, unsigned int sizeX, unsigned int sizeY, vector<Polygon*> *canopyPolys)
+	void RSGISModelTree::addVegTransConvexHull(RSGISTransect *transect, unsigned int centerX, unsigned int centerY, unsigned int sizeX, unsigned int sizeY, std::vector<Polygon*> *canopyPolys)
 	{
 		double pi = 3.1415926536;
 		
@@ -405,7 +405,7 @@ namespace rsgis { namespace modeling{
 		unsigned int maxY = transect->getLenth();
 		unsigned int maxZ = transect->getHeight();
 		
-		vector<Coordinate> *coordinates = new vector<Coordinate>;
+		std::vector<geos::geom::Coordinate> *coordinates = new std::vector<geos::geom::Coordinate>;
 		
 		/*************
 		 * ADD STEM  *
@@ -560,7 +560,7 @@ namespace rsgis { namespace modeling{
 						{
 							if (leafStartY > 0 && leafStartY < transect->getLenth()) 
 							{
-								coordinates->push_back(Coordinate(leafStartX, leafStartY, leafStartZ));
+								coordinates->push_back(geos::geom::Coordinate(leafStartX, leafStartY, leafStartZ));
 							}
 							
 						}
@@ -585,7 +585,7 @@ namespace rsgis { namespace modeling{
 								{
 									if (yLeaf > 0 && yLeaf < transect->getLenth()) 
 									{
-										coordinates->push_back(Coordinate(xLeaf, yLeaf, zLeaf));
+										coordinates->push_back(geos::geom::Coordinate(xLeaf, yLeaf, zLeaf));
 									}
 									
 								}
@@ -657,7 +657,7 @@ namespace rsgis { namespace modeling{
 		/*************************
 		 * CALCULATE CONVEX HULL *
 		 *************************/
-		RSGISGeometry geometry;
+        rsgis::geom::RSGISGeometry geometry;
 		
 		if (coordinates->size() > 4)
 		{

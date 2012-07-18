@@ -25,7 +25,7 @@
 
 namespace rsgis { namespace modeling {
 	
-	RSGISCalcCanopyCover::RSGISCalcCanopyCover(RSGISTransect *transect, vector<Polygon*> *canopyPoly)
+	RSGISCalcCanopyCover::RSGISCalcCanopyCover(RSGISTransect *transect, std::vector<geos::geom::Polygon*> *canopyPoly)
 	{
 		this->transect = transect;
 		this->canopyPoly = canopyPoly;
@@ -36,7 +36,7 @@ namespace rsgis { namespace modeling {
 		double canopyArea = 0;
 		double transectArea = transect->getWidth() * transect->getLenth();
 		
-		RSGISGeometry geometry;
+        rsgis::geom::RSGISGeometry geometry;
 		
 		// Merge polygons
 		geometry.mergeTouchingPolygonsForce(canopyPoly);
@@ -58,7 +58,7 @@ namespace rsgis { namespace modeling {
 	}
 	void RSGISCalcCanopyCover::exportCanopyPoly(string outFile)
 	{
-		RSGISVectorIO vectorIO;
+		rsgis::vec::RSGISVectorIO vectorIO;
 		// Write to shapefile
 		vectorIO.exportGEOSPolygons2SHP(outFile, true, canopyPoly);
 	}

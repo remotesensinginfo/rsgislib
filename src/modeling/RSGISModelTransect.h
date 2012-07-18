@@ -36,12 +36,6 @@
 
 namespace rsgis{ namespace modeling  {
     
-    using namespace std;
-    using namespace rsgis::math;
-    using namespace geos::geom;
-    using namespace rsgis::geom;
-    using namespace rsgis::vec;
-    
 	/// Class to model a transect
 	/**  
 	 * Takes a transect and adds vegetaion based on the 'RSGISModelAddVegetation' abstract class.
@@ -59,8 +53,8 @@ namespace rsgis{ namespace modeling  {
 		 *  treePoxYDistro - Random number sampling from distrobution to describe the location of trees within a quadrat
 		 *  addVeg - Class to add vegetation to transect
 		 */
-		void createConvexHull(vector<Polygon*> *canopyPoly);
-		void populateSingleSizeSpecies(double quadratSize, unsigned int numTrees, RSGISProbDistro *vegDistro, RSGISProbDistro *treePosXDistro, RSGISProbDistro *treePosYDistro, RSGISModelAddVegetation *addVeg);
+		void createConvexHull(std::vector<geos::geom::Polygon*> *canopyPoly);
+		void populateSingleSizeSpecies(double quadratSize, unsigned int numTrees, rsgis::math::RSGISProbDistro *vegDistro, rsgis::math::RSGISProbDistro *treePosXDistro, rsgis::math::RSGISProbDistro *treePosYDistro, RSGISModelAddVegetation *addVeg);
 		~RSGISModelTransect();
 	private:
 		RSGISTransect *transect;
@@ -68,7 +62,7 @@ namespace rsgis{ namespace modeling  {
 		unsigned int transectWidth;
 		unsigned int transectHeight;
 		double transectRes;
-		vector<Polygon*> *canopyPoly;
+        std::vector<geos::geom::Polygon*> *canopyPoly;
 		bool convexHull;
 	};
 }}

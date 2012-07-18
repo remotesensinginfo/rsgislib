@@ -30,18 +30,15 @@
 namespace rsgis 
 {	/// Modeling - library to provide modeling functunality.
     
-    using namespace std;
-    using namespace rsgis;
-    
 	namespace modeling
 	{
 		/// Exception for modelling class
-		class RSGISModelingException : public RSGISException
+		class RSGISModelingException : public rsgis::RSGISException
 		{
 		public:
 			RSGISModelingException();
 			RSGISModelingException(const char* message);
-			RSGISModelingException(string message);
+			RSGISModelingException(std::string message);
 		};
 	}
 }

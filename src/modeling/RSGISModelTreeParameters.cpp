@@ -27,7 +27,7 @@ namespace rsgis{ namespace modeling {
 
 	RSGISAcaciaHarpophylla::RSGISAcaciaHarpophylla(double treeHeight)
 	{
-		RSGISAllometricEquations allometricEquation;
+        rsgis::utils::RSGISAllometricEquations allometricEquation;
 		
 		double pi = 3.1415926536;
 		
@@ -35,7 +35,7 @@ namespace rsgis{ namespace modeling {
 		
 		this->treeHeight = treeHeight;
 		double treeHeightCm = treeHeight * 100;
-		this->species = aHarpophylla;
+		this->species = rsgis::utils::aHarpophylla;
 		
 		this->canopyDepth = 0.1130 + 0.3193*treeHeight;
 		
@@ -97,7 +97,7 @@ namespace rsgis{ namespace modeling {
 	int RSGISAcaciaHarpophylla::getNumLeaves()
 	{
 		double leafMass = 0.27; // Leaf mass [g]
-		RSGISAllometricEquations allometricEquation;
+		rsgis::utils::RSGISAllometricEquations allometricEquation;
 		double leafBiomass = allometricEquation.calculateLeafBiomassHeight((treeHeight * 100), species);
 		double numLeaves = leafBiomass / leafMass;
 		return int(numLeaves + 0.5);
