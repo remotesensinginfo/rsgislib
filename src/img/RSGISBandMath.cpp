@@ -24,13 +24,13 @@
 
 namespace rsgis{namespace img{
 
-	RSGISBandMath::RSGISBandMath(int numberOutBands, VariableBands **variables, int numVariables, Parser *muParser) : RSGISCalcImageValue(numberOutBands)
+	RSGISBandMath::RSGISBandMath(int numberOutBands, VariableBands **variables, int numVariables, mu::Parser *muParser) : RSGISCalcImageValue(numberOutBands)
 	{
 		this->variables = variables;
 		this->numVariables = numVariables;
 		
 		this->muParser = muParser;
-		this->inVals = new value_type[numVariables];
+		this->inVals = new mu::value_type[numVariables];
 		for(int i = 0; i < numVariables; ++i)
 		{
 			muParser->DefineVar(_T(variables[i]->name.c_str()), &inVals[i]);
@@ -51,14 +51,14 @@ namespace rsgis{namespace img{
 			{
 				inVals[i] = bandValues[variables[i]->band];
 			}
-			value_type result = 0;
+            mu::value_type result = 0;
 			result = muParser->Eval();
 			
 			output[0] = result;
 		}
-		catch (ParserError &e) 
+		catch (mu::ParserError &e) 
 		{
-			string message = string("ERROR: ") + string(e.GetMsg()) + string(":\t \'") + string(e.GetExpr()) +string("\'");
+            std::string message = std::string("ERROR: ") + std::string(e.GetMsg()) + std::string(":\t \'") + std::string(e.GetExpr()) + std::string("\'");
 			throw RSGISImageCalcException(message);
 		}
 	}
@@ -68,12 +68,12 @@ namespace rsgis{namespace img{
 		throw RSGISImageCalcException("No implemented");
 	}
 	
-	void RSGISBandMath::calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException)
+	void RSGISBandMath::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(RSGISImageCalcException)
 	{
 		throw RSGISImageCalcException("Not Implemented");
 	}
 
-	void RSGISBandMath::calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException)
+	void RSGISBandMath::calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(RSGISImageCalcException)
 	{
 		throw RSGISImageCalcException("No implemented");
 	}

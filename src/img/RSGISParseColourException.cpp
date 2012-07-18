@@ -24,17 +24,17 @@
 
 namespace rsgis{namespace img{
 	
-	RSGISParseColourException::RSGISParseColourException() : RSGISImageException("A RSGISParseColourException has been created..")
+	RSGISParseColourException::RSGISParseColourException() : rsgis::RSGISImageException("A RSGISParseColourException has been created..")
 	{
 		
 	}
 	
-	RSGISParseColourException::RSGISParseColourException(const char* message) : RSGISImageException(message)
+	RSGISParseColourException::RSGISParseColourException(const char* message) : rsgis::RSGISImageException(message)
 	{
 		
 	}
 	
-	RSGISParseColourException::RSGISParseColourException(string message) : RSGISImageException(message)
+	RSGISParseColourException::RSGISParseColourException(std::string message) : rsgis::RSGISImageException(message)
 	{
 		
 	}

@@ -47,12 +47,12 @@ namespace rsgis{namespace img{
 		throw RSGISImageCalcException("No implemented");
 	}
 	
-	void RSGISCopyImage::calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException)
+	void RSGISCopyImage::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(RSGISImageCalcException)
 	{
 		throw RSGISImageCalcException("Not Implemented");
 	}
 	
-	void RSGISCopyImage::calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException)
+	void RSGISCopyImage::calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(RSGISImageCalcException)
 	{
 		throw RSGISImageCalcException("No implemented");
 	}

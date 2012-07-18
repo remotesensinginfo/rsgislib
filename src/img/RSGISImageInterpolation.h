@@ -32,8 +32,6 @@
 #include "common/RSGISImageException.h"
 #include "img/RSGISImageInterpolator.h"
 
-using namespace std;
-
 namespace rsgis{namespace img{
 	
 	class RSGISImageInterpolation
@@ -43,14 +41,14 @@ namespace rsgis{namespace img{
 			void interpolateNewImage(GDALDataset *data,
 											 double outputXResolution, 
 											 double outputYResolution, 
-											 string filename)
-			throw(RSGISFileException, RSGISImageException);
+                                             std::string filename)
+			throw(rsgis::RSGISFileException, rsgis::RSGISImageException);
 			void interpolateNewImage(GDALDataset *data,
 											 double outputXResolution, 
 											 double outputYResolution, 
-											 string filename,
+											 std::string filename,
 											 int band)
-			throw(RSGISFileException, RSGISImageException);
+			throw(rsgis::RSGISFileException, rsgis::RSGISImageException);
 			void findOutputResolution(GDALDataset *dataset, float scale, int *outResolutionX, int *outResolutionY);
 			~RSGISImageInterpolation();
 		protected:

@@ -38,12 +38,12 @@ namespace rsgis{namespace img{
 	{
 		if(bandA > numBands)
 		{
-			cout << "The band A specificed is larger than the number of available bands." << endl;
+			std::cout << "The band A specificed is larger than the number of available bands." << std::endl;
 			throw new RSGISImageCalcException("The band A specificed is larger than the number of available bands.");
 		}
 		else if(bandB > numBands)
 		{
-			cout << "The band B specificed is larger than the number of available bands." << endl;
+			std::cout << "The band B specificed is larger than the number of available bands." << std::endl;
 			throw new RSGISImageCalcException("The band B specificed is larger than the number of available bands.");
 		}
 		
@@ -60,38 +60,38 @@ namespace rsgis{namespace img{
 		throw RSGISImageCalcException("Not implemented!");
 	}
 	
-	void RSGISCalcCC::calcImageValue(float *bandValuesImageA, int numBands, Envelope *extent) throw(RSGISImageCalcException)
+	void RSGISCalcCC::calcImageValue(float *bandValuesImageA, int numBands, geos::geom::Envelope *extent) throw(RSGISImageCalcException)
 	{
 		throw RSGISImageCalcException("Not implemented!");
 	}
 	
-	void RSGISCalcCC::calcImageValue(float *bandValuesImage, double interceptArea, int numBands, Polygon *poly, Point *pt) throw(RSGISImageCalcException)
+	void RSGISCalcCC::calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt) throw(RSGISImageCalcException)
 	{
 		throw RSGISImageCalcException("Not implemented!");
 	}
 	
 	double* RSGISCalcCC::getOutputValues()  throw(RSGISImageCalcException)
 	{
-		/*cout << "n = " << n << endl;
-		cout << "a = " << a << endl;
-		cout << "b = " << b << endl;
-		cout << "ab = " << ab << endl;
-		cout << "aSQ = " << aSQ << endl;
-		cout << "bSQ = " << bSQ << endl;
+		/*std::cout << "n = " << n << std::endl;
+		std::cout << "a = " << a << std::endl;
+		std::cout << "b = " << b << std::endl;
+		std::cout << "ab = " << ab << std::endl;
+		std::cout << "aSQ = " << aSQ << std::endl;
+		std::cout << "bSQ = " << bSQ << std::endl;
 		*/
 		double partA = n * ab;
 		double partB = a * b;
 		double topline = partA - partB;
 		
-		//cout << "topline = " << topline << endl;
+		//std::cout << "topline = " << topline << std::endl;
 		
 		double partC = (n * aSQ) - (a * a);
 		double partD = (n * bSQ) - (b * b);
 		double bottomline = sqrt(partC * partD);
 		
-		//cout << "bottomline = " << bottomline << endl;
+		//std::cout << "bottomline = " << bottomline << std::endl;
 		
-		//cout << "CC = " << topline/bottomline << endl;
+		//std::cout << "CC = " << topline/bottomline << std::endl;
 		
 		this->outputValues[0] = topline/bottomline;
 		return this->outputValues;

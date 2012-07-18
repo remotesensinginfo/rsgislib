@@ -24,12 +24,10 @@
 #define RSGISCalcCorrelationCoefficient_H
 
 #include <iostream>
-#include <string>
+
 #include "img/RSGISImageCalcException.h"
 #include "img/RSGISCalcImageSingleValue.h"
 #include "img/RSGISCalcImageSingle.h"
-
-using namespace std;
 
 namespace rsgis{namespace img{
 	
@@ -39,8 +37,8 @@ namespace rsgis{namespace img{
 			RSGISCalcCC(int numOutputValues);
 			void calcImageValue(float *bandValuesImageA, float *bandValuesImageB, int numBands, int bandA, int bandB) throw(RSGISImageCalcException);
 			void calcImageValue(float *bandValuesImageA, int numBands, int band) throw(RSGISImageCalcException);
-			void calcImageValue(float *bandValuesImageA, int numBands, Envelope *extent) throw(RSGISImageCalcException);
-			void calcImageValue(float *bandValuesImage, double interceptArea, int numBands, Polygon *poly, Point *pt) throw(RSGISImageCalcException);
+			void calcImageValue(float *bandValuesImageA, int numBands, geos::geom::Envelope *extent) throw(RSGISImageCalcException);
+			void calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt) throw(RSGISImageCalcException);
 			double* getOutputValues() throw(RSGISImageCalcException);
 			void reset();
 			void setBandA(int band);

@@ -35,7 +35,7 @@ namespace rsgis { namespace img {
     {
         try
         {
-            RSGISMatrices matrixUtils;
+            rsgis::math::RSGISMatrices matrixUtils;
             gsl_matrix *lut = matrixUtils.readGSLMatrixFromGridTxt(matrixLUTFile);
             
             //cout << "LUT: " << lut->size1 << ", " << lut->size2 << endl;

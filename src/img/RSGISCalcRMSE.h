@@ -30,8 +30,6 @@
 #include "img/RSGISCalcImageSingleValue.h"
 #include "img/RSGISCalcImageSingle.h"
 
-using namespace std;
-
 namespace rsgis{namespace img{
 	
 	class RSGISCalcRMSE : public RSGISCalcImageSingleValue
@@ -41,8 +39,8 @@ namespace rsgis{namespace img{
 		RSGISCalcRMSE(int numOutputValues);
 		void calcImageValue(float *bandValuesImageA, float *bandValuesImageB, int numBands, int bandA, int bandB) throw(RSGISImageCalcException);
 		void calcImageValue(float *bandValuesImage, int numBands, int band) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented");};
-		void calcImageValue(float *bandValuesImage, int numBands, Envelope *extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented");};
-		void calcImageValue(float *bandValuesImage, double interceptArea, int numBands, Polygon *poly, Point *pt) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented");};
+		void calcImageValue(float *bandValuesImage, int numBands, geos::geom::Envelope *extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented");};
+		void calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented");};
 		double* getOutputValues() throw(RSGISImageCalcException);
 		void reset();
 		~RSGISCalcRMSE();

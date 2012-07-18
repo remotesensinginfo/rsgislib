@@ -39,16 +39,11 @@
 #include <xercesc/util/PlatformUtils.hpp>
 #include <xercesc/framework/LocalFileFormatTarget.hpp>
 
-using namespace rsgis;
-using namespace std;
-using namespace rsgis::math;
-using namespace xercesc;
-
 namespace rsgis{ namespace img{
 	
 	struct ClassColour
 	{
-		string className;
+        std::string className;
 		int classID;
 		int imgBand;
 		float lower;
@@ -65,10 +60,10 @@ namespace rsgis{ namespace img{
 			RSGISColourUpImage(int numberOutBands, ClassColour **classColour, int numClasses);
 			void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException);
 			void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException);
-			void calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException);
-			void calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException);
+			void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(RSGISImageCalcException);
+			void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(RSGISImageCalcException);
 			void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException);
-            void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+            void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
 			bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException);
 			~RSGISColourUpImage();
 		protected:
@@ -82,10 +77,10 @@ namespace rsgis{ namespace img{
         RSGISColourUpImageBand(int numberOutBands, ClassColour **classColour, int numClasses);
         void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException);
         void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException);
-        void calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException);
-        void calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException);
+        void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(RSGISImageCalcException);
+        void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(RSGISImageCalcException);
         void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException);
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
         bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException);
         ~RSGISColourUpImageBand();
     protected:
@@ -97,7 +92,7 @@ namespace rsgis{ namespace img{
 	{
 	public:
 		RSGISClassColourReader();
-		ClassColour** readClassColourXML(int *numClasses, string xmlFile) throw(RSGISParseColourException); 
+		ClassColour** readClassColourXML(int *numClasses, std::string xmlFile) throw(RSGISParseColourException); 
 		~RSGISClassColourReader();
 	};
 }}

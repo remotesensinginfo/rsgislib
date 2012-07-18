@@ -32,15 +32,13 @@
 #include "img/RSGISCalcImageValue.h"
 #include "img/RSGISCalcImage.h"
 
-using namespace std;
-
 namespace rsgis{namespace img{
 	
 	class RSGISMaskImage
 		{
 		public: 
 			RSGISMaskImage();
-			void maskImage(GDALDataset *dataset, GDALDataset *mask, string outputImage, string imageFormat, GDALDataType outDataType, double outputValue)throw(RSGISImageCalcException,RSGISImageBandException);
+			void maskImage(GDALDataset *dataset, GDALDataset *mask, std::string outputImage, std::string imageFormat, GDALDataType outDataType, double outputValue)throw(RSGISImageCalcException,RSGISImageBandException);
 		};
 	
 	class RSGISApplyImageMask : public RSGISCalcImageValue
@@ -49,10 +47,10 @@ namespace rsgis{namespace img{
 			RSGISApplyImageMask(int numberOutBands, double outputValue);
 			void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException);
 			void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException);
-			void calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException);
-			void calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException);
+			void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(RSGISImageCalcException);
+			void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(RSGISImageCalcException);
 			void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException);
-            void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+            void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
 			bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException);
 			~RSGISApplyImageMask();
 		protected:

@@ -44,10 +44,6 @@
 
 #include "math/RSGISMathsUtils.h"
 
-using namespace std;
-using namespace geos::geom;
-using namespace rsgis::math;
-
 namespace rsgis 
 {
 	namespace img
@@ -55,27 +51,27 @@ namespace rsgis
 		class RSGISCalcImage
 			{
 			public:
-				RSGISCalcImage(RSGISCalcImageValue *valueCalc, string proj="", bool useImageProj=true);
-				void calcImage(GDALDataset **datasets, int numDS, string outputImage, bool setOutNames = false, string *bandNames = NULL, string gdalFormat="ENVI", GDALDataType gdalDataType=GDT_Float32) throw(RSGISImageCalcException,RSGISImageBandException);
+				RSGISCalcImage(RSGISCalcImageValue *valueCalc, std::string proj="", bool useImageProj=true);
+				void calcImage(GDALDataset **datasets, int numDS, std::string outputImage, bool setOutNames = false, std::string *bandNames = NULL, std::string gdalFormat="ENVI", GDALDataType gdalDataType=GDT_Float32) throw(RSGISImageCalcException,RSGISImageBandException);
 				void calcImage(GDALDataset **datasets, int numDS, GDALDataset *outputImageDS) throw(RSGISImageCalcException,RSGISImageBandException);
 				void calcImage(GDALDataset **datasets, int numDS) throw(RSGISImageCalcException,RSGISImageBandException);
-                void calcImageBand(GDALDataset **datasets, int numDS, string outputImageBase, string gdalFormat="ENVI") throw(RSGISImageCalcException,RSGISImageBandException);
-                void calcImageInEnv(GDALDataset **datasets, int numDS, string outputImage, Envelope *env, bool setOutNames = false, string *bandNames = NULL, string gdalFormat="ENVI") throw(RSGISImageCalcException,RSGISImageBandException);
+                void calcImageBand(GDALDataset **datasets, int numDS, std::string outputImageBase, std::string gdalFormat="ENVI") throw(RSGISImageCalcException,RSGISImageBandException);
+                void calcImageInEnv(GDALDataset **datasets, int numDS, std::string outputImage, geos::geom::Envelope *env, bool setOutNames = false, std::string *bandNames = NULL, std::string gdalFormat="ENVI") throw(RSGISImageCalcException,RSGISImageBandException);
 				void calcImageExtent(GDALDataset **datasets, int numDS) throw(RSGISImageCalcException,RSGISImageBandException);
-				void calcImageExtent(GDALDataset **datasets, int numDS, string outputImage, string gdalFormat="ENVI") throw(RSGISImageCalcException,RSGISImageBandException);
-				void calcImageWindowData(GDALDataset **datasets, int numDS, string outputImage, int windowSize, string gdalFormat="ENVI") throw(RSGISImageCalcException,RSGISImageBandException);
+				void calcImageExtent(GDALDataset **datasets, int numDS, std::string outputImage, std::string gdalFormat="ENVI") throw(RSGISImageCalcException,RSGISImageBandException);
+				void calcImageWindowData(GDALDataset **datasets, int numDS, std::string outputImage, int windowSize, std::string gdalFormat="ENVI") throw(RSGISImageCalcException,RSGISImageBandException);
                 void calcImageWindowData(GDALDataset **datasets, int numDS, GDALDataset *outputImageDS, int windowSize) throw(RSGISImageCalcException,RSGISImageBandException);
-                void calcImageWindowDataExtent(GDALDataset **datasets, int numDS, string outputImage, int windowSize, string gdalFormat="ENVI") throw(RSGISImageCalcException,RSGISImageBandException);
-				void calcImageWindowDataLoop(GDALDataset **datasets, int numDS, string outputImage, int windowSize, string gdalFormat="ENVI") throw(RSGISImageCalcException,RSGISImageBandException);	
-				void calcImageWithinPolygon(GDALDataset **datasets, int numDS, string outputImage, Envelope *env, Polygon *poly, float nodata, pixelInPolyOption pixelPolyOption, string gdalFormat="ENVI") throw(RSGISImageCalcException,RSGISImageBandException);
-				void calcImageWithinPolygon(GDALDataset **datasets, int numDS, Envelope *env, Polygon *poly, pixelInPolyOption pixelPolyOption) throw(RSGISImageCalcException,RSGISImageBandException);
-                void calcImageWithinPolygonExtent(GDALDataset **datasets, int numDS, Envelope *env, Polygon *poly, pixelInPolyOption pixelPolyOption) throw(RSGISImageCalcException,RSGISImageBandException);
-				void calcImageWithinRasterPolygon(GDALDataset **datasets, int numDS, Envelope *env, long fid) throw(RSGISImageCalcException,RSGISImageBandException);
+                void calcImageWindowDataExtent(GDALDataset **datasets, int numDS, std::string outputImage, int windowSize, std::string gdalFormat="ENVI") throw(RSGISImageCalcException,RSGISImageBandException);
+				void calcImageWindowDataLoop(GDALDataset **datasets, int numDS, std::string outputImage, int windowSize, std::string gdalFormat="ENVI") throw(RSGISImageCalcException,RSGISImageBandException);	
+				void calcImageWithinPolygon(GDALDataset **datasets, int numDS, std::string outputImage, geos::geom::Envelope *env, geos::geom::Polygon *poly, float nodata, pixelInPolyOption pixelPolyOption, std::string gdalFormat="ENVI") throw(RSGISImageCalcException,RSGISImageBandException);
+				void calcImageWithinPolygon(GDALDataset **datasets, int numDS, geos::geom::Envelope *env, geos::geom::Polygon *poly, pixelInPolyOption pixelPolyOption) throw(RSGISImageCalcException,RSGISImageBandException);
+                void calcImageWithinPolygonExtent(GDALDataset **datasets, int numDS, geos::geom::Envelope *env, geos::geom::Polygon *poly, pixelInPolyOption pixelPolyOption) throw(RSGISImageCalcException,RSGISImageBandException);
+				void calcImageWithinRasterPolygon(GDALDataset **datasets, int numDS, geos::geom::Envelope *env, long fid) throw(RSGISImageCalcException,RSGISImageBandException);
 				virtual ~RSGISCalcImage();
 			private:
 				RSGISCalcImageValue *calc;
 				int numOutBands;
-				string proj;
+				std::string proj;
 				bool useImageProj;
 			};
 	}

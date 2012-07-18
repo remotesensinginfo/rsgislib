@@ -25,18 +25,16 @@
 
 #include "common/RSGISImageException.h"
 
-using namespace std;
-using namespace rsgis;
-
 namespace rsgis 
 {
 	namespace img
 	{
-		class RSGISFFTException : public RSGISImageException
+		class RSGISFFTException : public rsgis::RSGISImageException
 			{
 			public:
 				RSGISFFTException();
 				RSGISFFTException(const char* message);
+                RSGISFFTException(std::string message);
 			};
 	}
 }

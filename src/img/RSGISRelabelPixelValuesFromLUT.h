@@ -36,15 +36,13 @@
 
 #include <gsl/gsl_matrix.h>
 
-using namespace rsgis::math;
-
 namespace rsgis { namespace img {
 	
     class RSGISRelabelPixelValuesFromLUT
     {
     public:
         RSGISRelabelPixelValuesFromLUT();
-        void relabelPixelValues(GDALDataset *inData, string outputFile, string matrixLUTFile, string imageFormat)throw(RSGISImageCalcException);
+        void relabelPixelValues(GDALDataset *inData, std::string outputFile, std::string matrixLUTFile, std::string imageFormat)throw(RSGISImageCalcException);
         ~RSGISRelabelPixelValuesFromLUT();
     };
     
@@ -55,10 +53,10 @@ namespace rsgis { namespace img {
 		RSGISRelabelPixelValuesFromLUTCalcVal(int numOutBands, gsl_matrix *lut);
 		void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException);
 		void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-		void calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-		void calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
+		void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
+		void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
 		void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};	
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
 		bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};															
 		~RSGISRelabelPixelValuesFromLUTCalcVal();
 	private:

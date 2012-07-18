@@ -25,7 +25,7 @@
 
 namespace rsgis{namespace img{
 	
-	RSGISCalcCovariance::RSGISCalcCovariance(int numOutputValues, Matrix *aMeans, Matrix *bMeans) : RSGISCalcImageSingleValue(numOutputValues)
+	RSGISCalcCovariance::RSGISCalcCovariance(int numOutputValues, rsgis::math::Matrix *aMeans, rsgis::math::Matrix *bMeans) : RSGISCalcImageSingleValue(numOutputValues)
 	{
 		this->n = 0;
 		this->sum = 0;
@@ -55,12 +55,12 @@ namespace rsgis{namespace img{
 		throw RSGISImageCalcException("Not implemented!");
 	}
 	
-	void RSGISCalcCovariance::calcImageValue(float *bandValuesImage, int numBands, Envelope *extent) throw(RSGISImageCalcException)
+	void RSGISCalcCovariance::calcImageValue(float *bandValuesImage, int numBands, geos::geom::Envelope *extent) throw(RSGISImageCalcException)
 	{
 		throw RSGISImageCalcException("Not implemented!");
 	}
 	
-	void RSGISCalcCovariance::calcImageValue(float *bandValuesImage, double interceptArea, int numBands, Polygon *poly, Point *pt) throw(RSGISImageCalcException)
+	void RSGISCalcCovariance::calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt) throw(RSGISImageCalcException)
 	{
 		throw RSGISImageCalcException("Not implemented!");
 	}

@@ -50,7 +50,7 @@ namespace rsgis{namespace img{
 	RSGISAddRandomGaussianNoisePercent::RSGISAddRandomGaussianNoisePercent(int numberOutBands, float scale) : RSGISCalcImageValue(numberOutBands)
 	{
 		this->scale = scale;
-		this->gRand = new RSGISRandDistroGaussian(0,1);
+		this->gRand = new rsgis::math::RSGISRandDistroGaussian(0,1);
 	}
 	
 	void RSGISAddRandomGaussianNoisePercent::calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException)

@@ -37,9 +37,6 @@
 
 #include "boost/math/special_functions/fpclassify.hpp"
 
-using namespace std;
-//using namespace boost::math;
-
 namespace rsgis{namespace img{
 
 	class RSGISCalculateImageMovementSpeed : public RSGISCalcImageValue
@@ -48,10 +45,10 @@ namespace rsgis{namespace img{
 		RSGISCalculateImageMovementSpeed(int numberOutBands, int numImages, unsigned int *imageBands, float *times, float upper, float lower);
 		void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException);
 		void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
-		void calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
-		void calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+		void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+		void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
 		void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
 		bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
 		~RSGISCalculateImageMovementSpeed();
 	private:

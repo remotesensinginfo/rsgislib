@@ -33,9 +33,9 @@ namespace rsgis
             
         }
         
-        vector<ImagePixelValuePt*>* RSGISExtractImagePixelsOnLine::getImagePixelValues(GDALDataset *image, unsigned int imageBand, Coordinate *pt1, float azimuthRad, float zenithRad, float rayElevThreshold) throw(RSGISImageCalcException)
+        std::vector<ImagePixelValuePt*>* RSGISExtractImagePixelsOnLine::getImagePixelValues(GDALDataset *image, unsigned int imageBand, geos::geom::Coordinate *pt1, float azimuthRad, float zenithRad, float rayElevThreshold) throw(RSGISImageCalcException)
         {
-            vector<ImagePixelValuePt*> *pxlValues = new vector<ImagePixelValuePt*>();
+            std::vector<ImagePixelValuePt*> *pxlValues = new std::vector<ImagePixelValuePt*>();
             
             try 
             {
@@ -47,46 +47,46 @@ namespace rsgis
                 double yMax = transform[3];
                 double yMin = transform[3] + image->GetRasterYSize()*transform[5];
                 
-                //cout << "TL: [" << xMin << "," << yMax << "]\n";
-                //cout << "BR: [" << xMax << "," << yMin << "]\n";
+                //std::cout << "TL: [" << xMin << "," << yMax << "]\n";
+                //std::cout << "BR: [" << xMax << "," << yMin << "]\n";
                 
                 if(transform[5] < 0)
                 {
                     transform[5] *= -1;
                 }
                 
-                //cout << "Pt: [" << pt1->x << "," << pt1->y << "]\n";
+                //std::cout << "Pt: [" << pt1->x << "," << pt1->y << "]\n";
                                 
                 double xDiff = (pt1->x - xMin)/transform[1];
                 double yDiff = (yMax - pt1->y)/transform[5];
                 
-                //cout << "Diff: [" << xDiff << "," << yDiff << "]\n";
+                //std::cout << "Diff: [" << xDiff << "," << yDiff << "]\n";
                 
-                uint_fast32_t xPxl = 0;
-                uint_fast32_t yPxl = 0;
+                boost::uint_fast32_t xPxl = 0;
+                boost::uint_fast32_t yPxl = 0;
                 
-                uint_fast32_t xPxlPrev = 0;
-                uint_fast32_t yPxlPrev = 0;
+                boost::uint_fast32_t xPxlPrev = 0;
+                boost::uint_fast32_t yPxlPrev = 0;
                 
                 try
                 {
-                    xPxlPrev = xPxl = numeric_cast<uint_fast32_t>(xDiff);
-                    yPxlPrev = yPxl = numeric_cast<uint_fast32_t>(yDiff);
+                    xPxlPrev = xPxl = boost::numeric_cast<boost::uint_fast32_t>(xDiff);
+                    yPxlPrev = yPxl = boost::numeric_cast<boost::uint_fast32_t>(yDiff);
                 }
-                catch(negative_overflow& e) 
+                catch(boost::numeric::negative_overflow& e) 
                 {
                     throw RSGISImageCalcException(e.what());
                 }
-                catch(positive_overflow& e) 
+                catch(boost::numeric::positive_overflow& e) 
                 {
                     throw RSGISImageCalcException(e.what());
                 }
-                catch(bad_numeric_cast& e) 
+                catch(boost::numeric::bad_numeric_cast& e) 
                 {
                     throw RSGISImageCalcException(e.what());
                 }
 
-                //cout << "Pixel: [" << xPxl << "," << yPxl << "]\n";
+                //std::cout << "Pixel: [" << xPxl << "," << yPxl << "]\n";
                 
                 double stepRange = sqrt((transform[1]*transform[1])+(transform[5]*transform[5]));
                 double xStep = (stepRange * sin(zenithRad) * cos(azimuthRad))/3;
@@ -96,9 +96,9 @@ namespace rsgis
                 //double dx = pt2->x - pt1->x;
                 //double dy = pt2->y - pt1->y;
                 
-                //cout << "dx,dy: [" << dx << "," << dy << "]\n";
+                //std::cout << "dx,dy: [" << dx << "," << dy << "]\n";
                 
-                //cout << "Step: [" << xStep << "," << yStep << "," << zStep << "]\n";
+                //std::cout << "Step: [" << xStep << "," << yStep << "," << zStep << "]\n";
                 
                 double xVal = pt1->x;
                 double yVal = pt1->y;
@@ -111,7 +111,7 @@ namespace rsgis
                     yVal += yStep;
                     zVal += zStep;
                     
-                    //cout << "Val: [" << xVal << "," << yVal << "]\n";
+                    //std::cout << "Val: [" << xVal << "," << yVal << "]\n";
                                         
                     // Reached edge of image?
                     if(xVal < xMin)
@@ -139,33 +139,33 @@ namespace rsgis
                     xDiff = (xVal - xMin)/transform[1];
                     yDiff = (yMax - yVal)/transform[5];
                     
-                    //cout << "Diff: [" << xDiff << "," << yDiff << "]\n";
+                    //std::cout << "Diff: [" << xDiff << "," << yDiff << "]\n";
                     
                     try
                     {
-                        xPxl = numeric_cast<uint_fast32_t>(xDiff);
-                        yPxl = numeric_cast<uint_fast32_t>(yDiff);
+                        xPxl = boost::numeric_cast<boost::uint_fast32_t>(xDiff);
+                        yPxl = boost::numeric_cast<boost::uint_fast32_t>(yDiff);
                     }
-                    catch(negative_overflow& e) 
+                    catch(boost::numeric::negative_overflow& e) 
                     {
                         throw RSGISImageCalcException(e.what());
                     }
-                    catch(positive_overflow& e) 
+                    catch(boost::numeric::positive_overflow& e) 
                     {
                         throw RSGISImageCalcException(e.what());
                     }
-                    catch(bad_numeric_cast& e) 
+                    catch(boost::numeric::bad_numeric_cast& e) 
                     {
                         throw RSGISImageCalcException(e.what());
                     }
-                    //cout << "Pixel: [" << xPxl << "," << yPxl << "]\n";
+                    //std::cout << "Pixel: [" << xPxl << "," << yPxl << "]\n";
                     
                     if(!complete)
                     {
                         if((xPxl != xPxlPrev) | (yPxl != yPxlPrev))
                         {
                             ImagePixelValuePt *pxlVal = new ImagePixelValuePt();
-                            pxlVal->pt  = new Coordinate();
+                            pxlVal->pt  = new geos::geom::Coordinate();
                             pxlVal->pt->x = xVal;
                             pxlVal->pt->y = yVal;
                             pxlVal->pt->z = zVal;
@@ -189,7 +189,7 @@ namespace rsgis
                 
                 this->populateWithImageValues(image, imageBand, pxlValues);                
             }
-            catch (exception &e) 
+            catch (std::exception &e) 
             {
                 throw RSGISImageCalcException(e.what());
             }
@@ -197,7 +197,7 @@ namespace rsgis
             return pxlValues;
         }
         
-        void RSGISExtractImagePixelsOnLine::populateWithImageValues(GDALDataset *image, unsigned int imageBand, vector<ImagePixelValuePt*> *ptPxlValues) throw(RSGISImageException)
+        void RSGISExtractImagePixelsOnLine::populateWithImageValues(GDALDataset *image, unsigned int imageBand, std::vector<ImagePixelValuePt*> *ptPxlValues) throw(RSGISImageException)
         {
             if(ptPxlValues->size() > 0)
             {
@@ -215,10 +215,10 @@ namespace rsgis
                     
                     GDALRasterBand *gdalImgBand = image->GetRasterBand(imageBand);
                     
-                    uint_fast32_t imgXSize = gdalImgBand->GetXSize();
-                    uint_fast32_t imgYSize = gdalImgBand->GetYSize();
+                    boost::uint_fast32_t imgXSize = gdalImgBand->GetXSize();
+                    boost::uint_fast32_t imgYSize = gdalImgBand->GetYSize();
                     
-                    for(vector<ImagePixelValuePt*>::iterator iterPxls = ptPxlValues->begin(); iterPxls != ptPxlValues->end(); ++iterPxls)
+                    for(std::vector<ImagePixelValuePt*>::iterator iterPxls = ptPxlValues->begin(); iterPxls != ptPxlValues->end(); ++iterPxls)
                     {
                         if(((*iterPxls)->imgX > imgXSize) | ((*iterPxls)->imgY > imgYSize))
                         {

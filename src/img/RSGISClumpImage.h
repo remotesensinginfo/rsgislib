@@ -34,8 +34,6 @@
 #include "img/RSGISImageUtils.h"
 #include "img/RSGISCalcImgAlongsideOut.h"
 
-using namespace std;
-
 namespace rsgis 
 {
 	namespace img

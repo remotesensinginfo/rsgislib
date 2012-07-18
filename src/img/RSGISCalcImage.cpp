@@ -24,7 +24,7 @@
 
 namespace rsgis{namespace img{
 	
-	RSGISCalcImage::RSGISCalcImage(RSGISCalcImageValue *valueCalc, string proj, bool useImageProj)
+	RSGISCalcImage::RSGISCalcImage(RSGISCalcImageValue *valueCalc, std::string proj, bool useImageProj)
 	{
 		this->calc = valueCalc;
 		this->numOutBands = valueCalc->getNumOutBands();
@@ -32,7 +32,7 @@ namespace rsgis{namespace img{
 		this->useImageProj = useImageProj;
 	}
 	
-	void RSGISCalcImage::calcImage(GDALDataset **datasets, int numDS, string outputImage, bool setOutNames, string *bandNames, string gdalFormat, GDALDataType gdalDataType) throw(RSGISImageCalcException,RSGISImageBandException)
+	void RSGISCalcImage::calcImage(GDALDataset **datasets, int numDS, std::string outputImage, bool setOutNames, std::string *bandNames, std::string gdalFormat, GDALDataType gdalDataType) throw(RSGISImageCalcException,RSGISImageBandException)
 	{
 		GDALAllRegister();
 		RSGISImageUtils imgUtils;
@@ -74,7 +74,7 @@ namespace rsgis{namespace img{
 			{
 				throw RSGISImageBandException("GDAL driver does not exists..");
 			}
-			cout << "New image width = " << width << " height = " << height << " bands = " << this->numOutBands << endl;
+			std::cout << "New image width = " << width << " height = " << height << " bands = " << this->numOutBands << std::endl;
 			
 			outputImageDS = gdalDriver->Create(outputImage.c_str(), width, height, this->numOutBands, gdalDataType, NULL);
 			
@@ -104,7 +104,7 @@ namespace rsgis{namespace img{
 					bandOffsets[counter] = new int[2];
 					bandOffsets[counter][0] = dsOffsets[i][0];
 					bandOffsets[counter][1] = dsOffsets[i][1];
-					//cout << counter << ") dataset " << i << " band " << j << " offset [" << bandOffsets[counter][0] << "," << bandOffsets[counter][1] << "]\n";
+					//std::cout << counter << ") dataset " << i << " band " << j << " offset [" << bandOffsets[counter][0] << "," << bandOffsets[counter][1] << "]\n";
 					counter++;
 				}
 			}
@@ -137,15 +137,15 @@ namespace rsgis{namespace img{
 
 			int feedback = height/10;
 			int feedbackCounter = 0;
-			cout << "Started" << flush;
+			std::cout << "Started" << std::flush;
 			// Loop images to process data
 			for(int i = 0; i < height; i++)
 			{
-				//cout << i << " of " << height << endl;
+				//std::cout << i << " of " << height << std::endl;
 				
 				if((i % feedback) == 0)
 				{
-					cout << "." << feedbackCounter << "." << flush;
+					std::cout << "." << feedbackCounter << "." << std::flush;
 					feedbackCounter = feedbackCounter + 10;
 				}
 				
@@ -175,7 +175,7 @@ namespace rsgis{namespace img{
 					outputRasterBands[n]->RasterIO(GF_Write, 0, i, width, 1, outputData[n], width, 1, GDT_Float32, 0, 0);
 				}
 			}
-			cout << " Complete.\n";
+			std::cout << " Complete.\n";
 		}
 		catch(RSGISImageCalcException& e)
 		{
@@ -472,7 +472,7 @@ namespace rsgis{namespace img{
 					bandOffsets[counter] = new int[2];
 					bandOffsets[counter][0] = dsOffsets[i][0];
 					bandOffsets[counter][1] = dsOffsets[i][1];
-					//cout << counter << ") dataset " << i << " band " << j << " offset [" << bandOffsets[counter][0] << "," << bandOffsets[counter][1] << "]\n";
+					//std::cout << counter << ") dataset " << i << " band " << j << " offset [" << bandOffsets[counter][0] << "," << bandOffsets[counter][1] << "]\n";
 					counter++;
 				}
 			}
@@ -501,15 +501,15 @@ namespace rsgis{namespace img{
             
 			int feedback = height/10;
 			int feedbackCounter = 0;
-			cout << "Started" << flush;
+			std::cout << "Started" << std::flush;
 			// Loop images to process data
 			for(int i = 0; i < height; i++)
 			{
-				//cout << i << " of " << height << endl;
+				//std::cout << i << " of " << height << std::endl;
 				
 				if((i % feedback) == 0)
 				{
-					cout << "." << feedbackCounter << "." << flush;
+					std::cout << "." << feedbackCounter << "." << std::flush;
 					feedbackCounter = feedbackCounter + 10;
 				}
 				
@@ -539,7 +539,7 @@ namespace rsgis{namespace img{
 					outputRasterBands[n]->RasterIO(GF_Write, 0, i, width, 1, outputData[n], width, 1, GDT_Float32, 0, 0);
 				}
 			}
-			cout << " Complete.\n";
+			std::cout << " Complete.\n";
 		}
 		catch(RSGISImageCalcException& e)
 		{			
@@ -811,7 +811,7 @@ namespace rsgis{namespace img{
 					bandOffsets[counter] = new int[2];
 					bandOffsets[counter][0] = dsOffsets[i][0];
 					bandOffsets[counter][1] = dsOffsets[i][1];
-					//cout << counter << ") dataset " << i << " band " << j << " offset [" << bandOffsets[counter][0] << "," << bandOffsets[counter][1] << "]\n";
+					//std::cout << counter << ") dataset " << i << " band " << j << " offset [" << bandOffsets[counter][0] << "," << bandOffsets[counter][1] << "]\n";
 					counter++;
 				}
 			}
@@ -826,14 +826,14 @@ namespace rsgis{namespace img{
 			
 			int feedback = height/10;
 			int feedbackCounter = 0;
-			cout << "Started" << flush;
+			std::cout << "Started" << std::flush;
 			// Loop images to process data
 			for(int i = 0; i < height; i++)
 			{
-				//cout << i << " of " << height << endl;
+				//std::cout << i << " of " << height << std::endl;
 				if((i % feedback) == 0)
 				{
-					cout << "." << feedbackCounter << "." << flush;
+					std::cout << "." << feedbackCounter << "." << std::flush;
 					feedbackCounter = feedbackCounter + 10;
 				}
 				
@@ -850,7 +850,7 @@ namespace rsgis{namespace img{
 					this->calc->calcImageValue(inDataColumn, numInBands);
 				}
 			}
-			cout << " Complete.\n";
+			std::cout << " Complete.\n";
 		}
 		catch(RSGISImageCalcException& e)
 		{
@@ -1007,11 +1007,11 @@ namespace rsgis{namespace img{
 		}
 	}
     
-    void RSGISCalcImage::calcImageBand(GDALDataset **datasets, int numDS, string outputImageBase, string gdalFormat) throw(RSGISImageCalcException,RSGISImageBandException)
+    void RSGISCalcImage::calcImageBand(GDALDataset **datasets, int numDS, std::string outputImageBase, std::string gdalFormat) throw(RSGISImageCalcException,RSGISImageBandException)
 	{
 		GDALAllRegister();
 		RSGISImageUtils imgUtils;
-        RSGISMathsUtils mathUtils;
+        rsgis::math::RSGISMathsUtils mathUtils;
 		double *gdalTranslation = new double[6];
 		int **dsOffsets = new int*[numDS];
 		for(int i = 0; i < numDS; i++)
@@ -1033,7 +1033,7 @@ namespace rsgis{namespace img{
 		GDALRasterBand **outputRasterBands = NULL;
 		GDALDriver *gdalDriver = NULL;
         
-        string outputImageFileName = "";
+        std::string outputImageFileName = "";
 		
 		try
 		{
@@ -1055,9 +1055,9 @@ namespace rsgis{namespace img{
             
             for(int cImgBand = 0; cImgBand < numInBands; ++cImgBand)
             {
-                outputImageFileName = outputImageBase + mathUtils.inttostring(cImgBand) + string(".env");
+                outputImageFileName = outputImageBase + mathUtils.inttostring(cImgBand) + std::string(".env");
                 
-                cout << "New image width = " << width << " height = " << height << " bands = " << this->numOutBands << endl;
+                std::cout << "New image width = " << width << " height = " << height << " bands = " << this->numOutBands << std::endl;
 				
 				outputImageDS = gdalDriver->Create(outputImageFileName.c_str(), width, height, this->numOutBands, GDT_Float32, NULL);
 				
@@ -1087,7 +1087,7 @@ namespace rsgis{namespace img{
                         bandOffsets[counter] = new int[2];
                         bandOffsets[counter][0] = dsOffsets[i][0];
                         bandOffsets[counter][1] = dsOffsets[i][1];
-                        //cout << counter << ") dataset " << i << " band " << j << " offset [" << bandOffsets[counter][0] << "," << bandOffsets[counter][1] << "]\n";
+                        //std::cout << counter << ") dataset " << i << " band " << j << " offset [" << bandOffsets[counter][0] << "," << bandOffsets[counter][1] << "]\n";
                         counter++;
                     }
                 }
@@ -1112,15 +1112,15 @@ namespace rsgis{namespace img{
             
                 int feedback = height/10;
                 int feedbackCounter = 0;
-                cout << "Started (Band " << cImgBand+1 << "):\t" << flush;
+                std::cout << "Started (Band " << cImgBand+1 << "):\t" << std::flush;
                 // Loop images to process data
                 for(int i = 0; i < height; i++)
                 {
-                    //cout << i << " of " << height << endl;
+                    //std::cout << i << " of " << height << std::endl;
                     
                     if((i % feedback) == 0)
                     {
-                        cout << "." << feedbackCounter << "." << flush;
+                        std::cout << "." << feedbackCounter << "." << std::flush;
                         feedbackCounter = feedbackCounter + 10;
                     }
 
@@ -1144,7 +1144,7 @@ namespace rsgis{namespace img{
                         outputRasterBands[n]->RasterIO(GF_Write, 0, i, width, 1, outputData[n], width, 1, GDT_Float32, 0, 0);
                     }
                 }
-                cout << " Complete.\n";
+                std::cout << " Complete.\n";
                 
                 GDALClose(outputImageDS);
                 
@@ -1261,7 +1261,7 @@ namespace rsgis{namespace img{
 
 	}
     
-    void RSGISCalcImage::calcImageInEnv(GDALDataset **datasets, int numDS, string outputImage, Envelope *env, bool setOutNames, string *bandNames, string gdalFormat) throw(RSGISImageCalcException,RSGISImageBandException)
+    void RSGISCalcImage::calcImageInEnv(GDALDataset **datasets, int numDS, std::string outputImage, geos::geom::Envelope *env, bool setOutNames, std::string *bandNames, std::string gdalFormat) throw(RSGISImageCalcException,RSGISImageBandException)
 	{
 		GDALAllRegister();
 		RSGISImageUtils imgUtils;
@@ -1303,7 +1303,7 @@ namespace rsgis{namespace img{
 			{
 				throw RSGISImageBandException("ENVI driver does not exists..");
 			}
-			cout << "New image width = " << width << " height = " << height << " bands = " << this->numOutBands << endl;
+			std::cout << "New image width = " << width << " height = " << height << " bands = " << this->numOutBands << std::endl;
 
 			outputImageDS = gdalDriver->Create(outputImage.c_str(), width, height, this->numOutBands, GDT_Float32, NULL);
 			
@@ -1333,7 +1333,7 @@ namespace rsgis{namespace img{
 					bandOffsets[counter] = new int[2];
 					bandOffsets[counter][0] = dsOffsets[i][0];
 					bandOffsets[counter][1] = dsOffsets[i][1];
-					//cout << counter << ") dataset " << i << " band " << j << " offset [" << bandOffsets[counter][0] << "," << bandOffsets[counter][1] << "]\n";
+					//std::cout << counter << ") dataset " << i << " band " << j << " offset [" << bandOffsets[counter][0] << "," << bandOffsets[counter][1] << "]\n";
 					counter++;
 				}
 			}
@@ -1366,15 +1366,15 @@ namespace rsgis{namespace img{
             
 			int feedback = height/10;
 			int feedbackCounter = 0;
-			cout << "Started" << flush;
+			std::cout << "Started" << std::flush;
 			// Loop images to process data
 			for(int i = 0; i < height; i++)
 			{
-				//cout << i << " of " << height << endl;
+				//std::cout << i << " of " << height << std::endl;
 				
 				if((i % feedback) == 0)
 				{
-					cout << "." << feedbackCounter << "." << flush;
+					std::cout << "." << feedbackCounter << "." << std::flush;
 					feedbackCounter = feedbackCounter + 10;
 				}
 				
@@ -1404,7 +1404,7 @@ namespace rsgis{namespace img{
 					outputRasterBands[n]->RasterIO(GF_Write, 0, i, width, 1, outputData[n], width, 1, GDT_Float32, 0, 0);
 				}
 			}
-			cout << " Complete.\n";
+			std::cout << " Complete.\n";
 		}
 		catch(RSGISImageCalcException& e)
 		{
@@ -1659,7 +1659,7 @@ namespace rsgis{namespace img{
 		
 		GDALRasterBand **inputRasterBands = NULL;
 
-		Envelope extent;
+        geos::geom::Envelope extent;
 		double pxlTLX = 0;
 		double pxlTLY = 0;
 		double pxlWidth = 0;
@@ -1698,7 +1698,7 @@ namespace rsgis{namespace img{
 					bandOffsets[counter] = new int[2];
 					bandOffsets[counter][0] = dsOffsets[i][0];
 					bandOffsets[counter][1] = dsOffsets[i][1];
-					//cout << counter << ") dataset " << i << " band " << j << " offset [" << bandOffsets[counter][0] << "," << bandOffsets[counter][1] << "]\n";
+					//std::cout << counter << ") dataset " << i << " band " << j << " offset [" << bandOffsets[counter][0] << "," << bandOffsets[counter][1] << "]\n";
 					counter++;
 				}
 			}
@@ -1713,15 +1713,15 @@ namespace rsgis{namespace img{
 			
 			int feedback = height/10;
 			int feedbackCounter = 0;
-			cout << "Started" << flush;
+			std::cout << "Started" << std::flush;
 			// Loop images to process data
 			for(int i = 0; i < height; i++)
 			{
-				//cout << i << " of " << height << endl;
+				//std::cout << i << " of " << height << std::endl;
 				
 				if((i % feedback) == 0)
 				{
-					cout << "." << feedbackCounter << "." << flush;
+					std::cout << "." << feedbackCounter << "." << std::flush;
 					feedbackCounter = feedbackCounter + 10;
 				}
 				
@@ -1746,7 +1746,7 @@ namespace rsgis{namespace img{
 				pxlTLY -= pxlHeight;
 				pxlTLX = gdalTranslation[0];
 			}
-			cout << " Complete.\n";
+			std::cout << " Complete.\n";
 		}
 		catch(RSGISImageCalcException& e)
 		{
@@ -1909,7 +1909,7 @@ namespace rsgis{namespace img{
 		}
 	}
 	
-	void RSGISCalcImage::calcImageExtent(GDALDataset **datasets, int numDS, string outputImage, string gdalFormat) throw(RSGISImageCalcException,RSGISImageBandException)
+	void RSGISCalcImage::calcImageExtent(GDALDataset **datasets, int numDS, std::string outputImage, std::string gdalFormat) throw(RSGISImageCalcException,RSGISImageBandException)
 	{
 		GDALAllRegister();
 		RSGISImageUtils imgUtils;
@@ -1933,7 +1933,7 @@ namespace rsgis{namespace img{
 		GDALRasterBand **inputRasterBands = NULL;
 		GDALRasterBand **outputRasterBands = NULL;
 		GDALDriver *gdalDriver = NULL;
-		Envelope extent;
+		geos::geom::Envelope extent;
 		double pxlTLX = 0;
 		double pxlTLY = 0;
 		double pxlWidth = 0;
@@ -1954,9 +1954,9 @@ namespace rsgis{namespace img{
 			gdalDriver = GetGDALDriverManager()->GetDriverByName(gdalFormat.c_str());
 			if(gdalDriver == NULL)
 			{
-				throw RSGISImageBandException(gdalFormat + string(" driver does not exists.."));
+				throw RSGISImageBandException(gdalFormat + std::string(" driver does not exists.."));
 			}
-			//cout << "New image width = " << width << " height = " << height << endl;
+			//std::cout << "New image width = " << width << " height = " << height << std::endl;
 
 			outputImageDS = gdalDriver->Create(outputImage.c_str(), width, height, this->numOutBands, GDT_Float32, NULL);
 			
@@ -1996,7 +1996,7 @@ namespace rsgis{namespace img{
 					bandOffsets[counter] = new int[2];
 					bandOffsets[counter][0] = dsOffsets[i][0];
 					bandOffsets[counter][1] = dsOffsets[i][1];
-					//cout << counter << ") dataset " << i << " band " << j << " offset [" << bandOffsets[counter][0] << "," << bandOffsets[counter][1] << "]\n";
+					//std::cout << counter << ") dataset " << i << " band " << j << " offset [" << bandOffsets[counter][0] << "," << bandOffsets[counter][1] << "]\n";
 					counter++;
 				}
 			}
@@ -2025,15 +2025,15 @@ namespace rsgis{namespace img{
 			
 			int feedback = height/10;
 			int feedbackCounter = 0;
-			cout << "Started" << flush;
+			std::cout << "Started" << std::flush;
 			// Loop images to process data
 			for(int i = 0; i < height; i++)
 			{
-				//cout << i << " of " << height << endl;
+				//std::cout << i << " of " << height << std::endl;
 				
 				if((i % feedback) == 0)
 				{
-					cout << "." << feedbackCounter << "." << flush;
+					std::cout << "." << feedbackCounter << "." << std::flush;
 					feedbackCounter = feedbackCounter + 10;
 				}
 				
@@ -2069,7 +2069,7 @@ namespace rsgis{namespace img{
 					outputRasterBands[n]->RasterIO(GF_Write, 0, i, width, 1, outputData[n], width, 1, GDT_Float32, 0, 0);
 				}
 			}
-			cout << " Complete.\n";
+			std::cout << " Complete.\n";
 		}
 		catch(RSGISImageCalcException& e)
 		{
@@ -2305,7 +2305,7 @@ namespace rsgis{namespace img{
 	}
 	
 	/* Keeps returning a window of data based upon the supplied windowSize until all finished*/
-	void RSGISCalcImage::calcImageWindowData(GDALDataset **datasets, int numDS, string outputImage, int windowSize, string gdalFormat) throw(RSGISImageCalcException,RSGISImageBandException)
+	void RSGISCalcImage::calcImageWindowData(GDALDataset **datasets, int numDS, std::string outputImage, int windowSize, std::string gdalFormat) throw(RSGISImageCalcException,RSGISImageBandException)
 	{
 		GDALAllRegister();
 		RSGISImageUtils imgUtils;
@@ -2358,7 +2358,7 @@ namespace rsgis{namespace img{
 			{
 				throw RSGISImageBandException("Driver does not exists..");
 			}
-			//cout << "New image width = " << width << " height = " << height << endl;
+			//std::cout << "New image width = " << width << " height = " << height << std::endl;
             
 			outputImageDS = gdalDriver->Create(outputImage.c_str(), width, height, this->numOutBands, GDT_Float32, NULL);
 			
@@ -2388,7 +2388,7 @@ namespace rsgis{namespace img{
 					bandOffsets[counter] = new int[2];
 					bandOffsets[counter][0] = dsOffsets[i][0];
 					bandOffsets[counter][1] = dsOffsets[i][1];
-					//cout << counter << ") dataset " << i << " band " << j << " offset [" << bandOffsets[counter][0] << "," << bandOffsets[counter][1] << "]\n";
+					//std::cout << counter << ") dataset " << i << " band " << j << " offset [" << bandOffsets[counter][0] << "," << bandOffsets[counter][1] << "]\n";
 					counter++;
 				}
 			}
@@ -2444,13 +2444,13 @@ namespace rsgis{namespace img{
 			int feedbackCounter = 0;
 			int xOffset = 0;
 			int yOffset = 0;
-			cout << "Started" << flush;
+			std::cout << "Started" << std::flush;
 			// Loop images to process data
 			for(int i = 0; i < height; i++)
 			{				
 				if((i % feedback) == 0)
 				{
-					cout << "." << feedbackCounter << "." << flush;
+					std::cout << "." << feedbackCounter << "." << std::flush;
 					feedbackCounter = feedbackCounter + 10;
 				}
 				
@@ -2579,7 +2579,7 @@ namespace rsgis{namespace img{
 					outputRasterBands[n]->RasterIO(GF_Write, 0, i, width, 1, outputData[n], width, 1, GDT_Float32, 0, 0);
 				}
 			}
-			cout << " Complete.\n";
+			std::cout << " Complete.\n";
 		}
 		catch(RSGISImageCalcException& e)
 		{
@@ -2866,7 +2866,7 @@ namespace rsgis{namespace img{
 					bandOffsets[counter] = new int[2];
 					bandOffsets[counter][0] = dsOffsets[i][0];
 					bandOffsets[counter][1] = dsOffsets[i][1];
-					//cout << counter << ") dataset " << i << " band " << j << " offset [" << bandOffsets[counter][0] << "," << bandOffsets[counter][1] << "]\n";
+					//std::cout << counter << ") dataset " << i << " band " << j << " offset [" << bandOffsets[counter][0] << "," << bandOffsets[counter][1] << "]\n";
 					counter++;
 				}
 			}
@@ -2922,13 +2922,13 @@ namespace rsgis{namespace img{
 			int feedbackCounter = 0;
 			int xOffset = 0;
 			int yOffset = 0;
-			cout << "Started" << flush;
+			std::cout << "Started" << std::flush;
 			// Loop images to process data
 			for(int i = 0; i < height; i++)
 			{				
 				if((i % feedback) == 0)
 				{
-					cout << "." << feedbackCounter << "." << flush;
+					std::cout << "." << feedbackCounter << "." << std::flush;
 					feedbackCounter = feedbackCounter + 10;
 				}
 				
@@ -3057,7 +3057,7 @@ namespace rsgis{namespace img{
 					outputRasterBands[n]->RasterIO(GF_Write, 0, i, width, 1, outputData[n], width, 1, GDT_Float32, 0, 0);
 				}
 			}
-			cout << " Complete.\n";
+			std::cout << " Complete.\n";
 		}
 		catch(RSGISImageCalcException& e)
 		{
@@ -3272,7 +3272,7 @@ namespace rsgis{namespace img{
 	}
     
     /* Keeps returning a window of data based upon the supplied windowSize until all finished provides the extent on the central pixel (as envelope) at each iteration */
-	void RSGISCalcImage::calcImageWindowDataExtent(GDALDataset **datasets, int numDS, string outputImage, int windowSize, string gdalFormat) throw(RSGISImageCalcException,RSGISImageBandException)
+	void RSGISCalcImage::calcImageWindowDataExtent(GDALDataset **datasets, int numDS, std::string outputImage, int windowSize, std::string gdalFormat) throw(RSGISImageCalcException,RSGISImageBandException)
 	{
 		GDALAllRegister();
 		RSGISImageUtils imgUtils;
@@ -3298,7 +3298,7 @@ namespace rsgis{namespace img{
 		GDALRasterBand **outputRasterBands = NULL;
 		GDALDriver *gdalDriver = NULL;
         
-		Envelope extent;
+		geos::geom::Envelope extent;
 		double pxlTLX = 0;
 		double pxlTLY = 0;
 		double pxlWidth = 0;
@@ -3331,7 +3331,7 @@ namespace rsgis{namespace img{
 			{
 				throw RSGISImageBandException("ENVI driver does not exists..");
 			}
-			//cout << "New image width = " << width << " height = " << height << endl;
+			//std::cout << "New image width = " << width << " height = " << height << std::endl;
 
 			outputImageDS = gdalDriver->Create(outputImage.c_str(), width, height, this->numOutBands, GDT_Float32, NULL);
 			
@@ -3371,7 +3371,7 @@ namespace rsgis{namespace img{
 					bandOffsets[counter] = new int[2];
 					bandOffsets[counter][0] = dsOffsets[i][0];
 					bandOffsets[counter][1] = dsOffsets[i][1];
-					//cout << counter << ") dataset " << i << " band " << j << " offset [" << bandOffsets[counter][0] << "," << bandOffsets[counter][1] << "]\n";
+					//std::cout << counter << ") dataset " << i << " band " << j << " offset [" << bandOffsets[counter][0] << "," << bandOffsets[counter][1] << "]\n";
 					counter++;
 				}
 			}
@@ -3427,13 +3427,13 @@ namespace rsgis{namespace img{
 			int feedbackCounter = 0;
 			int xOffset = 0;
 			int yOffset = 0;
-			cout << "Started" << flush;
+			std::cout << "Started" << std::flush;
 			// Loop images to process data
 			for(int i = 0; i < height; i++)
 			{				
 				if((i % feedback) == 0)
 				{
-					cout << "." << feedbackCounter << "." << flush;
+					std::cout << "." << feedbackCounter << "." << std::flush;
 					feedbackCounter = feedbackCounter + 10;
 				}
 				
@@ -3569,7 +3569,7 @@ namespace rsgis{namespace img{
                 
                 pxlTLY -= pxlHeight;
 			}
-			cout << " Complete.\n";
+			std::cout << " Complete.\n";
 		}
 		catch(RSGISImageCalcException& e)
 		{
@@ -3786,7 +3786,7 @@ namespace rsgis{namespace img{
 	}
 	
 	/* Martin's version that iterates through an image until iterateCondition == false.- Editted by Pete */
-	void RSGISCalcImage::calcImageWindowDataLoop(GDALDataset **datasets, int numDS, string outputImage, int windowSize, string gdalFormat) throw(RSGISImageCalcException,RSGISImageBandException)
+	void RSGISCalcImage::calcImageWindowDataLoop(GDALDataset **datasets, int numDS, std::string outputImage, int windowSize, std::string gdalFormat) throw(RSGISImageCalcException,RSGISImageBandException)
 	{
 		/*Register Datasets etc*/
 		GDALAllRegister();
@@ -3812,7 +3812,7 @@ namespace rsgis{namespace img{
 		GDALRasterBand **inputRasterBands = NULL;
 		GDALRasterBand **outputRasterBands = NULL;
 		GDALDriver *gdalDriver = NULL;
-		Envelope extent;
+		geos::geom::Envelope extent;
 		double pxlTLX = 0;
 		double pxlTLY = 0;
 		double pxlWidth = 0;
@@ -3846,7 +3846,7 @@ namespace rsgis{namespace img{
 			{
 				throw RSGISImageBandException("ENVI driver does not exists..");
 			}
-			//cout << "New image width = " << width << " height = " << height << endl;
+			//std::cout << "New image width = " << width << " height = " << height << std::endl;
 			outputImageDS = gdalDriver->Create(outputImage.c_str(), width, height, this->numOutBands, GDT_Float32, NULL);
 			
 			if(outputImageDS == NULL)
@@ -3880,7 +3880,7 @@ namespace rsgis{namespace img{
 					bandOffsets[counter] = new int[2];
 					bandOffsets[counter][0] = dsOffsets[i][0];
 					bandOffsets[counter][1] = dsOffsets[i][1];
-					//cout << counter << ") dataset " << i << " band " << j << " offset [" << bandOffsets[counter][0] << "," << bandOffsets[counter][1] << "]\n";
+					//std::cout << counter << ") dataset " << i << " band " << j << " offset [" << bandOffsets[counter][0] << "," << bandOffsets[counter][1] << "]\n";
 					counter++;
 				}
 			}
@@ -3942,13 +3942,13 @@ namespace rsgis{namespace img{
 			while(iterateCondition)
 			{
 				iterateCondition = false;
-				cout << "Started (iteration = 0)" << flush;
+				std::cout << "Started (iteration = 0)" << std::flush;
 				// Loop images to process data
 				for(int i = 0; i < height; i++)
 				{				
 					if((i % feedback) == 0)
 					{
-						cout << "." << feedbackCounter << "." << flush;
+						std::cout << "." << feedbackCounter << "." << std::flush;
 						feedbackCounter = feedbackCounter + 10;
 					}
 					
@@ -4082,7 +4082,7 @@ namespace rsgis{namespace img{
 						outputRasterBands[n]->RasterIO(GF_Write, 0, i, width, 1, outputData[n], width, 1, GDT_Float32, 0, 0);
 					}
 				}
-				cout << " Complete.\n";
+				std::cout << " Complete.\n";
 				++iteration;
 			}
 		}
@@ -4300,7 +4300,7 @@ namespace rsgis{namespace img{
 		GDALClose(outputImageDS);
 	}
 	
-	void RSGISCalcImage::calcImageWithinPolygon(GDALDataset **datasets, int numDS, string outputImage, Envelope *env, Polygon *poly, float nodata, pixelInPolyOption pixelPolyOption, string gdalFormat) throw(RSGISImageCalcException,RSGISImageBandException)
+	void RSGISCalcImage::calcImageWithinPolygon(GDALDataset **datasets, int numDS, std::string outputImage, geos::geom::Envelope *env, geos::geom::Polygon *poly, float nodata, pixelInPolyOption pixelPolyOption, std::string gdalFormat) throw(RSGISImageCalcException,RSGISImageBandException)
 	{
 		GDALAllRegister();
 		RSGISImageUtils imgUtils;
@@ -4324,9 +4324,9 @@ namespace rsgis{namespace img{
 		GDALRasterBand **inputRasterBands = NULL;
 		GDALRasterBand **outputRasterBands = NULL;
 		GDALDriver *gdalDriver = NULL;
-		Envelope extent;
-		Coordinate pxlCentre;
-		GeometryFactory geomFactory;
+		geos::geom::Envelope extent;
+		geos::geom::Coordinate pxlCentre;
+		geos::geom::GeometryFactory geomFactory;
 		double pxlTLX = 0;
 		double pxlTLY = 0;
 		double pxlWidth = 0;
@@ -4349,7 +4349,7 @@ namespace rsgis{namespace img{
 			{
 				throw RSGISImageBandException("ENVI driver does not exists..");
 			}
-			//cout << "New image width = " << width << " height = " << height << endl;
+			//std::cout << "New image width = " << width << " height = " << height << std::endl;
 
 			outputImageDS = gdalDriver->Create(outputImage.c_str(), width, height, this->numOutBands, GDT_Float32, NULL);
 			
@@ -4384,7 +4384,7 @@ namespace rsgis{namespace img{
 					bandOffsets[counter] = new int[2];
 					bandOffsets[counter][0] = dsOffsets[i][0];
 					bandOffsets[counter][1] = dsOffsets[i][1];
-					//cout << counter << ") dataset " << i << " band " << j << " offset [" << bandOffsets[counter][0] << "," << bandOffsets[counter][1] << "]\n";
+					//std::cout << counter << ") dataset " << i << " band " << j << " offset [" << bandOffsets[counter][0] << "," << bandOffsets[counter][1] << "]\n";
 					counter++;
 				}
 			}
@@ -4416,13 +4416,13 @@ namespace rsgis{namespace img{
 			int feedbackCounter = 0;
 			if(height > 100)
 			{
-				cout << "Started" << flush;
+				std::cout << "Started" << std::flush;
 			}			// Loop images to process data
 			for(int i = 0; i < height; i++)
 			{				
 				if(((i % feedback) == 0) && (height > 100))
 				{
-					cout << "." << feedbackCounter << "." << flush;
+					std::cout << "." << feedbackCounter << "." << std::flush;
 					feedbackCounter = feedbackCounter + 10;
 				}
 				
@@ -4438,9 +4438,9 @@ namespace rsgis{namespace img{
 						inDataColumn[n] = inputData[n][j];
 					}
 					
-					Coordinate pxlCentre;
-					GeometryFactory geomFactory;
-					Point *pt = NULL;
+                    geos::geom::Coordinate pxlCentre;
+					geos::geom::GeometryFactory geomFactory;
+					geos::geom::Point *pt = NULL;
 					
 					extent.init(pxlTLX, (pxlTLX+pxlWidth), pxlTLY, (pxlTLY-pxlHeight));
 					extent.centre(pxlCentre);
@@ -4464,20 +4464,20 @@ namespace rsgis{namespace img{
 					}
 					else if (pixelPolyOption == pixelAreaInPoly) 
 					{
-						CoordinateSequence *coords = NULL;
-						LinearRing *ring = NULL;
-						Polygon *pixelGeosPoly = NULL;
-						Geometry *intersectionGeom;
+						geos::geom::CoordinateSequence *coords = NULL;
+						geos::geom::LinearRing *ring = NULL;
+						geos::geom::Polygon *pixelGeosPoly = NULL;
+						geos::geom::Geometry *intersectionGeom;
 						
-						PrecisionModel *pm = new PrecisionModel();
-						GeometryFactory *geomFactory = new GeometryFactory(pm);
+						geos::geom::PrecisionModel *pm = new geos::geom::PrecisionModel();
+						geos::geom::GeometryFactory *geomFactory = new geos::geom::GeometryFactory(pm);
 						
-						coords = new CoordinateArraySequence();
-						coords->add(Coordinate(pxlTLX, pxlTLY, 0));
-						coords->add(Coordinate(pxlTLX + pxlWidth, pxlTLY, 0));
-						coords->add(Coordinate(pxlTLX + pxlWidth, pxlTLY - pxlHeight, 0));
-						coords->add(Coordinate(pxlTLX, pxlTLY - pxlHeight, 0));
-						coords->add(Coordinate(pxlTLX, pxlTLY, 0));
+						coords = new geos::geom::CoordinateArraySequence();
+						coords->add(geos::geom::Coordinate(pxlTLX, pxlTLY, 0));
+						coords->add(geos::geom::Coordinate(pxlTLX + pxlWidth, pxlTLY, 0));
+						coords->add(geos::geom::Coordinate(pxlTLX + pxlWidth, pxlTLY - pxlHeight, 0));
+						coords->add(geos::geom::Coordinate(pxlTLX, pxlTLY - pxlHeight, 0));
+						coords->add(geos::geom::Coordinate(pxlTLX, pxlTLY, 0));
 						ring = geomFactory->createLinearRing(coords);
 						pixelGeosPoly = geomFactory->createPolygon(ring, NULL);
 						
@@ -4521,11 +4521,11 @@ namespace rsgis{namespace img{
 						pixelPoly->addRingDirectly(ring);
 						
 						ogrPoly = new OGRPolygon();
-						const LineString *line = poly->getExteriorRing();
+						const geos::geom::LineString *line = poly->getExteriorRing();
 						OGRLinearRing *ogrRing = new OGRLinearRing();
-						const CoordinateSequence *coords = line->getCoordinatesRO();
+						const geos::geom::CoordinateSequence *coords = line->getCoordinatesRO();
 						int numCoords = coords->getSize();
-						Coordinate coord;
+						geos::geom::Coordinate coord;
 						for(int i = 0; i < numCoords; i++)
 						{
 							coord = coords->getAt(i);
@@ -4574,7 +4574,7 @@ namespace rsgis{namespace img{
 			}
 			if (height > 100) 
 			{
-				cout << " Complete.\n";
+				std::cout << " Complete.\n";
 			}
 		}
 		catch(RSGISImageCalcException& e)
@@ -4811,7 +4811,7 @@ namespace rsgis{namespace img{
 	}
 	
 	/* calcImageWithinPolygon - takes existing output image */
-	void RSGISCalcImage::calcImageWithinPolygon(GDALDataset **datasets, int numDS, Envelope *env, Polygon *poly, pixelInPolyOption pixelPolyOption) throw(RSGISImageCalcException,RSGISImageBandException)
+	void RSGISCalcImage::calcImageWithinPolygon(GDALDataset **datasets, int numDS, geos::geom::Envelope *env, geos::geom::Polygon *poly, pixelInPolyOption pixelPolyOption) throw(RSGISImageCalcException,RSGISImageBandException)
 	{
 		/* Input and output images as gdal datasets
 		 * Stored as:
@@ -4841,9 +4841,9 @@ namespace rsgis{namespace img{
 		
 		GDALRasterBand **inputRasterBands = NULL;
 		GDALRasterBand **outputRasterBands = NULL;
-		Envelope extent;
-		Coordinate pxlCentre;
-		GeometryFactory geomFactory;
+		geos::geom::Envelope extent;
+		geos::geom::Coordinate pxlCentre;
+		geos::geom::GeometryFactory geomFactory;
 		double pxlTLX = 0;
 		double pxlTLY = 0;
 		double pxlWidth = 0;
@@ -4885,7 +4885,7 @@ namespace rsgis{namespace img{
 					bandOffsets[counter] = new int[2];
 					bandOffsets[counter][0] = dsOffsets[i][0];
 					bandOffsets[counter][1] = dsOffsets[i][1];
-					//cout << counter << ") dataset " << i << " band " << j << " offset [" << bandOffsets[counter][0] << "," << bandOffsets[counter][1] << "]\n";
+					//std::cout << counter << ") dataset " << i << " band " << j << " offset [" << bandOffsets[counter][0] << "," << bandOffsets[counter][1] << "]\n";
 					counter++;
 				}
 			}
@@ -4898,7 +4898,7 @@ namespace rsgis{namespace img{
 				bandOffsets[counter] = new int[2];
 				bandOffsets[counter][0] = dsOffsets[numDS-1][0];
 				bandOffsets[counter][1] = dsOffsets[numDS-1][1];
-				//cout << counter << ") dataset " << numDS-1 << " band " << j << " offset [" << bandOffsets[counter][0] << "," << bandOffsets[counter][1] << "]\n";
+				//std::cout << counter << ") dataset " << numDS-1 << " band " << j << " offset [" << bandOffsets[counter][0] << "," << bandOffsets[counter][1] << "]\n";
 				counter++;
 			}
 			
@@ -4922,14 +4922,14 @@ namespace rsgis{namespace img{
 			int feedbackCounter = 0;
 			if(height > 100)
 			{
-				cout << "\rStarted" << flush;
+				std::cout << "\rStarted" << std::flush;
 			}			
 			// Loop images to process data
 			for(int i = 0; i < height; i++)
 			{				
 				if(((i % feedback) == 0) && (height > 100))
 				{
-					cout << "." << feedbackCounter << "." << flush;
+					std::cout << "." << feedbackCounter << "." << std::flush;
 					feedbackCounter = feedbackCounter + 10;
 				}
 				
@@ -4950,9 +4950,9 @@ namespace rsgis{namespace img{
 						inDataColumn[n] = inputData[n][j];
 					}
 					
-					Coordinate pxlCentre;
-					GeometryFactory geomFactory;
-					Point *pt = NULL;
+					geos::geom::Coordinate pxlCentre;
+					geos::geom::GeometryFactory geomFactory;
+					geos::geom::Point *pt = NULL;
 					
 					extent.init(pxlTLX, (pxlTLX+pxlWidth), pxlTLY, (pxlTLY-pxlHeight));
 					extent.centre(pxlCentre);
@@ -4975,20 +4975,20 @@ namespace rsgis{namespace img{
 					}
 					else if (pixelPolyOption == pixelAreaInPoly) 
 					{
-						CoordinateSequence *coords = NULL;
-						LinearRing *ring = NULL;
-						Polygon *pixelGeosPoly = NULL;
-						Geometry *intersectionGeom;
+						geos::geom::CoordinateSequence *coords = NULL;
+						geos::geom::LinearRing *ring = NULL;
+						geos::geom::Polygon *pixelGeosPoly = NULL;
+						geos::geom::Geometry *intersectionGeom;
 						
-						PrecisionModel *pm = new PrecisionModel();
-						GeometryFactory *geomFactory = new GeometryFactory(pm);
+						geos::geom::PrecisionModel *pm = new geos::geom::PrecisionModel();
+						geos::geom::GeometryFactory *geomFactory = new geos::geom::GeometryFactory(pm);
 						
-						coords = new CoordinateArraySequence();
-						coords->add(Coordinate(pxlTLX, pxlTLY, 0));
-						coords->add(Coordinate(pxlTLX + pxlWidth, pxlTLY, 0));
-						coords->add(Coordinate(pxlTLX + pxlWidth, pxlTLY - pxlHeight, 0));
-						coords->add(Coordinate(pxlTLX, pxlTLY - pxlHeight, 0));
-						coords->add(Coordinate(pxlTLX, pxlTLY, 0));
+						coords = new geos::geom::CoordinateArraySequence();
+						coords->add(geos::geom::Coordinate(pxlTLX, pxlTLY, 0));
+						coords->add(geos::geom::Coordinate(pxlTLX + pxlWidth, pxlTLY, 0));
+						coords->add(geos::geom::Coordinate(pxlTLX + pxlWidth, pxlTLY - pxlHeight, 0));
+						coords->add(geos::geom::Coordinate(pxlTLX, pxlTLY - pxlHeight, 0));
+						coords->add(geos::geom::Coordinate(pxlTLX, pxlTLY, 0));
 						ring = geomFactory->createLinearRing(coords);
 						pixelGeosPoly = geomFactory->createPolygon(ring, NULL);
 						
@@ -5032,11 +5032,11 @@ namespace rsgis{namespace img{
 						pixelPoly->addRingDirectly(ring);
 						
 						ogrPoly = new OGRPolygon();
-						const LineString *line = poly->getExteriorRing();
+						const geos::geom::LineString *line = poly->getExteriorRing();
 						OGRLinearRing *ogrRing = new OGRLinearRing();
-						const CoordinateSequence *coords = line->getCoordinatesRO();
+						const geos::geom::CoordinateSequence *coords = line->getCoordinatesRO();
 						int numCoords = coords->getSize();
-						Coordinate coord;
+						geos::geom::Coordinate coord;
 						for(int i = 0; i < numCoords; i++)
 						{
 							coord = coords->getAt(i);
@@ -5085,10 +5085,10 @@ namespace rsgis{namespace img{
 			}
 			if (height > 100) 
 			{
-				cout << "Complete\r" << flush;
-				cout << "\r                                                                                                                            \r" << flush;
+				std::cout << "Complete\r" << std::flush;
+				std::cout << "\r                                                                                                                            \r" << std::flush;
 			}
-			//cout << "Done the main bit, starting to tidy up!" << endl;
+			//std::cout << "Done the main bit, starting to tidy up!" << std::endl;
 			
 		}
 		catch(RSGISImageCalcException& e)
@@ -5323,7 +5323,7 @@ namespace rsgis{namespace img{
 	}
     
     /* calcImageWithinPolygon - Does not use an output image */
-	void RSGISCalcImage::calcImageWithinPolygonExtent(GDALDataset **datasets, int numDS, Envelope *env, Polygon *poly, pixelInPolyOption pixelPolyOption) throw(RSGISImageCalcException,RSGISImageBandException)
+	void RSGISCalcImage::calcImageWithinPolygonExtent(GDALDataset **datasets, int numDS, geos::geom::Envelope *env, geos::geom::Polygon *poly, pixelInPolyOption pixelPolyOption) throw(RSGISImageCalcException,RSGISImageBandException)
 	{
 		GDALAllRegister();
 		RSGISImageUtils imgUtils;
@@ -5342,9 +5342,9 @@ namespace rsgis{namespace img{
 		float *inDataColumn = NULL;
 		
 		GDALRasterBand **inputRasterBands = NULL;
-		Envelope extent;
-		Coordinate pxlCentre;
-		GeometryFactory geomFactory;
+		geos::geom::Envelope extent;
+		geos::geom::Coordinate pxlCentre;
+		geos::geom::GeometryFactory geomFactory;
 		double pxlTLX = 0;
 		double pxlTLY = 0;
 		double pxlWidth = 0;
@@ -5384,7 +5384,7 @@ namespace rsgis{namespace img{
 					bandOffsets[counter] = new int[2];
 					bandOffsets[counter][0] = dsOffsets[i][0];
 					bandOffsets[counter][1] = dsOffsets[i][1];
-					//cout << counter << ") dataset " << i << " band " << j << " offset [" << bandOffsets[counter][0] << "," << bandOffsets[counter][1] << "]\n";
+					//std::cout << counter << ") dataset " << i << " band " << j << " offset [" << bandOffsets[counter][0] << "," << bandOffsets[counter][1] << "]\n";
 					counter++;
 				}
 			}
@@ -5412,9 +5412,9 @@ namespace rsgis{namespace img{
 						inDataColumn[n] = inputData[n][j];
 					}
 					
-					Coordinate pxlCentre;
-					GeometryFactory geomFactory;
-					Point *pt = NULL;
+					geos::geom::Coordinate pxlCentre;
+					geos::geom::GeometryFactory geomFactory;
+					geos::geom::Point *pt = NULL;
 					
 					extent.init(pxlTLX, (pxlTLX+pxlWidth), pxlTLY, (pxlTLY-pxlHeight));
 					extent.centre(pxlCentre);
@@ -5429,20 +5429,20 @@ namespace rsgis{namespace img{
 					}
 					else if (pixelPolyOption == pixelAreaInPoly) 
 					{
-						CoordinateSequence *coords = NULL;
-						LinearRing *ring = NULL;
-						Polygon *pixelGeosPoly = NULL;
-						Geometry *intersectionGeom;
+						geos::geom::CoordinateSequence *coords = NULL;
+						geos::geom::LinearRing *ring = NULL;
+						geos::geom::Polygon *pixelGeosPoly = NULL;
+						geos::geom::Geometry *intersectionGeom;
 						
-						PrecisionModel *pm = new PrecisionModel();
-						GeometryFactory *geomFactory = new GeometryFactory(pm);
+						geos::geom::PrecisionModel *pm = new geos::geom::PrecisionModel();
+						geos::geom::GeometryFactory *geomFactory = new geos::geom::GeometryFactory(pm);
 						
-						coords = new CoordinateArraySequence();
-						coords->add(Coordinate(pxlTLX, pxlTLY, 0));
-						coords->add(Coordinate(pxlTLX + pxlWidth, pxlTLY, 0));
-						coords->add(Coordinate(pxlTLX + pxlWidth, pxlTLY - pxlHeight, 0));
-						coords->add(Coordinate(pxlTLX, pxlTLY - pxlHeight, 0));
-						coords->add(Coordinate(pxlTLX, pxlTLY, 0));
+						coords = new geos::geom::CoordinateArraySequence();
+						coords->add(geos::geom::Coordinate(pxlTLX, pxlTLY, 0));
+						coords->add(geos::geom::Coordinate(pxlTLX + pxlWidth, pxlTLY, 0));
+						coords->add(geos::geom::Coordinate(pxlTLX + pxlWidth, pxlTLY - pxlHeight, 0));
+						coords->add(geos::geom::Coordinate(pxlTLX, pxlTLY - pxlHeight, 0));
+						coords->add(geos::geom::Coordinate(pxlTLX, pxlTLY, 0));
 						ring = geomFactory->createLinearRing(coords);
 						pixelGeosPoly = geomFactory->createPolygon(ring, NULL);
 						
@@ -5476,11 +5476,11 @@ namespace rsgis{namespace img{
 						pixelPoly->addRingDirectly(ring);
 						
 						ogrPoly = new OGRPolygon();
-						const LineString *line = poly->getExteriorRing();
+						const geos::geom::LineString *line = poly->getExteriorRing();
 						OGRLinearRing *ogrRing = new OGRLinearRing();
-						const CoordinateSequence *coords = line->getCoordinatesRO();
+						const geos::geom::CoordinateSequence *coords = line->getCoordinatesRO();
 						int numCoords = coords->getSize();
-						Coordinate coord;
+						geos::geom::Coordinate coord;
 						for(int i = 0; i < numCoords; i++)
 						{
 							coord = coords->getAt(i);
@@ -5508,7 +5508,7 @@ namespace rsgis{namespace img{
 				pxlTLY -= pxlHeight;
 				pxlTLX = gdalTranslation[0];
 			}
-			//cout << "Done the main bit, starting to tidy up!" << endl;
+			//std::cout << "Done the main bit, starting to tidy up!" << std::endl;
 			
 		}
 		catch(RSGISImageCalcException& e)
@@ -5679,7 +5679,7 @@ namespace rsgis{namespace img{
 	}
 	
 	/* calcImageWithinRasterPolygon - takes existing output image */
-	void RSGISCalcImage::calcImageWithinRasterPolygon(GDALDataset **datasets, int numDS, Envelope *env, long fid) throw(RSGISImageCalcException,RSGISImageBandException)
+	void RSGISCalcImage::calcImageWithinRasterPolygon(GDALDataset **datasets, int numDS, geos::geom::Envelope *env, long fid) throw(RSGISImageCalcException,RSGISImageBandException)
 	{
 		/** Input and output images as gdal datasets
 		 * Stored as:
@@ -5713,9 +5713,9 @@ namespace rsgis{namespace img{
 		GDALRasterBand **outputRasterBands = NULL;
 		GDALRasterBand **inputMaskBand = NULL;
 
-		Envelope extent;
-		Coordinate pxlCentre;
-		GeometryFactory geomFactory;
+		geos::geom::Envelope extent;
+		geos::geom::Coordinate pxlCentre;
+		geos::geom::GeometryFactory geomFactory;
 		double pxlTLX = 0;
 		double pxlTLY = 0;
 		double pxlWidth = 0;
@@ -5755,7 +5755,7 @@ namespace rsgis{namespace img{
 			bandOffsets[counter] = new int[2];
 			bandOffsets[counter][0] = dsOffsets[0][0];
 			bandOffsets[counter][1] = dsOffsets[0][1];
-			//cout << counter << ") dataset " << i << " band " << j << " offset [" << bandOffsets[counter][0] << "," << bandOffsets[counter][1] << "]\n";
+			//std::cout << counter << ") dataset " << i << " band " << j << " offset [" << bandOffsets[counter][0] << "," << bandOffsets[counter][1] << "]\n";
 			counter++;
 			
 			// Get Image Input Bands
@@ -5768,7 +5768,7 @@ namespace rsgis{namespace img{
 					inputRasterBands[j] = datasets[i]->GetRasterBand(j+1);
 					bandOffsets[counter][0] = dsOffsets[i][0];
 					bandOffsets[counter][1] = dsOffsets[i][1];
-					//cout << counter << ") dataset " << i << " band " << j << " offset [" << bandOffsets[counter][0] << "," << bandOffsets[counter][1] << "]\n";
+					//std::cout << counter << ") dataset " << i << " band " << j << " offset [" << bandOffsets[counter][0] << "," << bandOffsets[counter][1] << "]\n";
 					counter++;
 				}
 			}
@@ -5781,7 +5781,7 @@ namespace rsgis{namespace img{
 				outputRasterBands[j] = datasets[numDS-1]->GetRasterBand(j+1);
 				bandOffsets[counter][0] = dsOffsets[numDS-1][0];
 				bandOffsets[counter][1] = dsOffsets[numDS-1][1];
-				//cout << counter << ") dataset " << numDS-1 << " band " << j << " offset [" << bandOffsets[counter][0] << "," << bandOffsets[counter][1] << "]\n";
+				//std::cout << counter << ") dataset " << numDS-1 << " band " << j << " offset [" << bandOffsets[counter][0] << "," << bandOffsets[counter][1] << "]\n";
 				counter++;
 			}
 			
@@ -5808,14 +5808,14 @@ namespace rsgis{namespace img{
 			int feedbackCounter = 0;
 			if(height > 100)
 			{
-				cout << "\rStarted (Object:" << fid << ")..";
+				std::cout << "\rStarted (Object:" << fid << ")..";
 			}	
 			// Loop images to process data
 			for(int i = 0; i < height; i++)
 			{				
 				if(((i % feedback) == 0) && (height > 100))
 				{
-					cout << "." << feedbackCounter << "." << flush;
+					std::cout << "." << feedbackCounter << "." << std::flush;
 					feedbackCounter = feedbackCounter + 10;
 				}
 				counter = 0;
@@ -5869,10 +5869,10 @@ namespace rsgis{namespace img{
 			}
 			if (height > 100) 
 			{
-				cout << "Complete" << flush;
-				cout << "\r                                                                                                                            \r" << flush;
+				std::cout << "Complete" << std::flush;
+				std::cout << "\r                                                                                                                            \r" << std::flush;
 			}
-			//cout << "Done the main bit, starting to tidy up!" << endl;
+			//std::cout << "Done the main bit, starting to tidy up!" << std::endl;
 			
 		}
 		catch(RSGISImageCalcException& e)

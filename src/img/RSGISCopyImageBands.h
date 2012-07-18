@@ -31,11 +31,8 @@
 #include "img/RSGISImageBandException.h"
 #include "img/RSGISImageCalcException.h"
 #include "img/RSGISCalcImage.h"
+
 #include "common/RSGISImageException.h"
-
-using namespace std;
-using namespace rsgis;
-
 
 namespace rsgis{namespace img{
 	
@@ -53,10 +50,10 @@ namespace rsgis{namespace img{
 			RSGISIdentifyImageValues(int numberOutBands, int *outBands);
 			void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException);
 			void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException);
-			void calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException);
-			void calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException);
+			void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(RSGISImageCalcException);
+			void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(RSGISImageCalcException);
 			void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException);
-            void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+            void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
 			bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException);
 		protected:
 			int *outBands;

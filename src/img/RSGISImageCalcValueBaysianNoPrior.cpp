@@ -24,7 +24,7 @@
 
 namespace rsgis{namespace img{
 	
-	RSGISImageCalcValueBaysianNoPrior::RSGISImageCalcValueBaysianNoPrior(int numberOutBands, RSGISMathFunction *function, double variance, double interval, double minVal, double maxVal, double lowerLimit, double upperLimit, deltatypedef deltatype) : RSGISCalcImageValue(numberOutBands)
+	RSGISImageCalcValueBaysianNoPrior::RSGISImageCalcValueBaysianNoPrior(int numberOutBands, rsgis::math::RSGISMathFunction *function, double variance, double interval, double minVal, double maxVal, double lowerLimit, double upperLimit, rsgis::math::deltatypedef deltatype) : RSGISCalcImageValue(numberOutBands)
 	{
 		this->function = function;
 		this->variance = variance;
@@ -35,7 +35,7 @@ namespace rsgis{namespace img{
 		this->lowerLimit = lowerLimit;
 		this->deltatype = deltatype;
 
-		baysianStats = new RSGISBaysianStatsNoPrior(function, variance, interval, minVal, maxVal, lowerLimit, upperLimit, deltatype);
+		baysianStats = new rsgis::math::RSGISBaysianStatsNoPrior(function, variance, interval, minVal, maxVal, lowerLimit, upperLimit, deltatype);
 	}
 	
 	void RSGISImageCalcValueBaysianNoPrior::calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException)
@@ -58,12 +58,12 @@ namespace rsgis{namespace img{
 		throw RSGISImageCalcException("Not implemented");
 	}
 	
-	void RSGISImageCalcValueBaysianNoPrior::calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException)
+	void RSGISImageCalcValueBaysianNoPrior::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(RSGISImageCalcException)
 	{
 		throw RSGISImageCalcException("Not Implemented");
 	}
 	
-	void RSGISImageCalcValueBaysianNoPrior::calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException)
+	void RSGISImageCalcValueBaysianNoPrior::calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(RSGISImageCalcException)
 	{
 		throw RSGISImageCalcException("Not implemented");
 	}

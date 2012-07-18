@@ -35,25 +35,22 @@
 
 #include "gdal_priv.h"
 
-using namespace std;
-using namespace rsgis::math;
-
 namespace rsgis{namespace img{
 	class RSGISImageCalcValueBaysianNoPrior	: public RSGISCalcImageValue
 		{
 		public:
-			RSGISImageCalcValueBaysianNoPrior(int numberOutBands, RSGISMathFunction *function, double variance, double interval, double minVal, double maxVal, double lowerLimit, double upperLimit, deltatypedef deltatype);
+			RSGISImageCalcValueBaysianNoPrior(int numberOutBands, rsgis::math::RSGISMathFunction *function, double variance, double interval, double minVal, double maxVal, double lowerLimit, double upperLimit, rsgis::math::deltatypedef deltatype);
 			void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException);
 			void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException);
-			void calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException);
-			void calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException);
+			void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(RSGISImageCalcException);
+			void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(RSGISImageCalcException);
 			void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException);
-            void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+            void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
 			bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException);
 			~RSGISImageCalcValueBaysianNoPrior();
 		protected:
-			RSGISMathFunction *function;
-			RSGISMathFunction *probDistro;
+			rsgis::math::RSGISMathFunction *function;
+			rsgis::math::RSGISMathFunction *probDistro;
 			double variance;
 			double interval;
 			double minVal;
@@ -61,8 +58,8 @@ namespace rsgis{namespace img{
 			double upperLimit;
 			double lowerLimit;
 			double* outputVals;
-			deltatypedef deltatype;
-			RSGISBaysianStatsNoPrior *baysianStats;
+			rsgis::math::deltatypedef deltatype;
+			rsgis::math::RSGISBaysianStatsNoPrior *baysianStats;
 		};	
 }}
 #endif

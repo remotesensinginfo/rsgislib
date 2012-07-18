@@ -31,21 +31,21 @@ namespace rsgis{namespace img{
         
     }
         
-    void RSGISImageClustering::findKMeansCentres(GDALDataset *dataset, string outputMatrix, unsigned int numClusters, unsigned int maxNumIterations, unsigned int subSample, bool ignoreZeros, float degreeOfChange, InitClustererMethods initMethod)throw(RSGISImageException, RSGISClustererException)
+    void RSGISImageClustering::findKMeansCentres(GDALDataset *dataset, std::string outputMatrix, unsigned int numClusters, unsigned int maxNumIterations, unsigned int subSample, bool ignoreZeros, float degreeOfChange, rsgis::math::InitClustererMethods initMethod)throw(rsgis::RSGISImageException, rsgis::math::RSGISClustererException)
     {
         try 
         {
             unsigned int numImgBands = dataset->GetRasterCount();
-            cout << "Subsampling the image to read into memory\n";
-            vector< vector<float> > *pxlValues = this->sampleImage(dataset, subSample, ignoreZeros);
+            std::cout << "Subsampling the image to read into memory\n";
+            std::vector< std::vector<float> > *pxlValues = this->sampleImage(dataset, subSample, ignoreZeros);
             
-            cout << "Performing clustering\n";
-            RSGISKMeansClusterer clusterer(initMethod);
-            vector< RSGISClusterCentre > *clusterCentres = clusterer.calcClusterCentres(pxlValues, numImgBands, numClusters, maxNumIterations, degreeOfChange);
+            std::cout << "Performing clustering\n";
+            rsgis::math::RSGISKMeansClusterer clusterer(initMethod);
+            std::vector< rsgis::math::RSGISClusterCentre > *clusterCentres = clusterer.calcClusterCentres(pxlValues, numImgBands, numClusters, maxNumIterations, degreeOfChange);
             
-            cout << "Exporting cluster centres to output file\n";
-            RSGISMatrices matrixUtils;
-            Matrix *clusterMatrix = matrixUtils.createMatrix(numImgBands, clusterCentres->size());
+            std::cout << "Exporting cluster centres to output file\n";
+            rsgis::math::RSGISMatrices matrixUtils;
+            rsgis::math::Matrix *clusterMatrix = matrixUtils.createMatrix(numImgBands, clusterCentres->size());
             unsigned int matrixIdx = 0;
             for(unsigned int i = 0; i < clusterCentres->size(); ++i)
             {
@@ -60,32 +60,32 @@ namespace rsgis{namespace img{
             delete pxlValues;
             delete clusterCentres;
         }
-        catch (RSGISImageException &e) 
+        catch (rsgis::RSGISImageException &e) 
         {
             throw e;
         }
-        catch(RSGISClustererException &e)
+        catch(rsgis::math::RSGISClustererException &e)
         {
             throw e;
         }
     }
         
     
-    void RSGISImageClustering::findISODataCentres(GDALDataset *dataset, string outputMatrix, unsigned int numClusters, unsigned int maxNumIterations, unsigned int subSample, bool ignoreZeros, float degreeOfChange, InitClustererMethods initMethod, float minDistBetweenClusters, unsigned int minNumFeatures, float maxStdDev, unsigned int minNumClusters, unsigned int startIteration, unsigned int endIteration)throw(RSGISImageException, RSGISClustererException)
+    void RSGISImageClustering::findISODataCentres(GDALDataset *dataset, std::string outputMatrix, unsigned int numClusters, unsigned int maxNumIterations, unsigned int subSample, bool ignoreZeros, float degreeOfChange, rsgis::math::InitClustererMethods initMethod, float minDistBetweenClusters, unsigned int minNumFeatures, float maxStdDev, unsigned int minNumClusters, unsigned int startIteration, unsigned int endIteration)throw(rsgis::RSGISImageException, rsgis::math::RSGISClustererException)
     {
         try 
         {
             unsigned int numImgBands = dataset->GetRasterCount();
-            cout << "Subsampling the image to read into memory\n";
-            vector< vector<float> > *pxlValues = this->sampleImage(dataset, subSample, ignoreZeros);
+            std::cout << "Subsampling the image to read into memory\n";
+            std::vector< std::vector<float> > *pxlValues = this->sampleImage(dataset, subSample, ignoreZeros);
             
-            cout << "Performing clustering\n";
-            RSGISISODataClusterer clusterer(initMethod, minDistBetweenClusters, minNumFeatures, maxStdDev, minNumClusters, startIteration, endIteration);
-            vector< RSGISClusterCentre > *clusterCentres = clusterer.calcClusterCentres(pxlValues, dataset->GetRasterCount(), numClusters, maxNumIterations, degreeOfChange);
+            std::cout << "Performing clustering\n";
+            rsgis::math::RSGISISODataClusterer clusterer(initMethod, minDistBetweenClusters, minNumFeatures, maxStdDev, minNumClusters, startIteration, endIteration);
+            std::vector< rsgis::math::RSGISClusterCentre > *clusterCentres = clusterer.calcClusterCentres(pxlValues, dataset->GetRasterCount(), numClusters, maxNumIterations, degreeOfChange);
             
-            cout << "Exporting cluster centres to output file\n";
-            RSGISMatrices matrixUtils;
-            Matrix *clusterMatrix = matrixUtils.createMatrix(numImgBands, clusterCentres->size());
+            std::cout << "Exporting cluster centres to output file\n";
+            rsgis::math::RSGISMatrices matrixUtils;
+            rsgis::math::Matrix *clusterMatrix = matrixUtils.createMatrix(numImgBands, clusterCentres->size());
             unsigned int matrixIdx = 0;
             for(unsigned int i = 0; i < clusterCentres->size(); ++i)
             {
@@ -100,20 +100,20 @@ namespace rsgis{namespace img{
             delete pxlValues;
             delete clusterCentres;
         }
-        catch (RSGISImageException &e) 
+        catch (rsgis::RSGISImageException &e) 
         {
             throw e;
         }
-        catch(RSGISClustererException &e)
+        catch(rsgis::math::RSGISClustererException &e)
         {
             throw e;
         }
     }
     
     
-    vector< vector<float> >* RSGISImageClustering::sampleImage(GDALDataset *dataset, unsigned int subSample, bool ignoreZeros) throw(RSGISImageException)
+    std::vector< std::vector<float> >* RSGISImageClustering::sampleImage(GDALDataset *dataset, unsigned int subSample, bool ignoreZeros) throw(rsgis::RSGISImageException)
     {
-        vector< vector<float> > *pxlValues = new vector< vector<float> >();
+        std::vector< std::vector<float> > *pxlValues = new std::vector< std::vector<float> >();
         
         unsigned int numImgBands = dataset->GetRasterCount();
         
@@ -142,7 +142,7 @@ namespace rsgis{namespace img{
                 if((pxlCount % subSample) == 0)
                 {
                     nonZeroFound = false;
-                    vector<float> col;
+                    std::vector<float> col;
                     col.reserve(numImgBands);
                     for(unsigned n = 0; n < numImgBands; ++n)
                     {

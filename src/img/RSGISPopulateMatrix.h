@@ -30,9 +30,6 @@
 #include "img/RSGISCalcImageSingle.h"
 #include "math/RSGISMatrices.h"
 
-using namespace std;
-using namespace rsgis::math;
-
 namespace rsgis{namespace img{
 	
 	class RSGISPopulateMatrix : public RSGISCalcImageSingleValue
@@ -41,15 +38,15 @@ namespace rsgis{namespace img{
 			RSGISPopulateMatrix(int numOutputValues, int numPixels);
 			void calcImageValue(float *bandValuesImageA, float *bandValuesImageB, int numBands, int bandA, int bandB) throw(RSGISImageCalcException);
 			void calcImageValue(float *bandValuesImage, int numBands, int band) throw(RSGISImageCalcException);
-			void calcImageValue(float *bandValuesImage, int numBands, Envelope *extent) throw(RSGISImageCalcException);
-			void calcImageValue(float *bandValuesImage, double interceptArea, int numBands, Polygon *poly, Point *pt) throw(RSGISImageCalcException);
-			Matrix* getMatrix();
+			void calcImageValue(float *bandValuesImage, int numBands, geos::geom::Envelope *extent) throw(RSGISImageCalcException);
+			void calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt) throw(RSGISImageCalcException);
+            rsgis::math::Matrix* getMatrix();
 			double* getOutputValues() throw(RSGISImageCalcException);
 			void reset(int numPixels);
 			~RSGISPopulateMatrix();
 		protected:
 			void reset();
-			Matrix *matrix;
+            rsgis::math::Matrix *matrix;
 			int numPixels;
 			int matrixCounter;
 		};

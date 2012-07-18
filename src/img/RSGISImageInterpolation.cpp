@@ -32,7 +32,7 @@ namespace rsgis{namespace img{
 	void RSGISImageInterpolation::interpolateNewImage(GDALDataset *data,
 															  double outputXResolution, 
 															  double outputYResolution, 
-															  string filename) throw(RSGISFileException, RSGISImageException)
+															  std::string filename) throw(rsgis::RSGISFileException, rsgis::RSGISImageException)
 	{
 		// Image Data Stores.
 		float *scanline0 = NULL;
@@ -74,7 +74,7 @@ namespace rsgis{namespace img{
 			int ySize = static_cast<int>(dataYSize*yScale); //mathUtils.round(dataYSize*yScale);;
 			int bands = data->GetRasterCount();
 			
-			cout << "size [" << xSize << "," << ySize << "]\n";
+			std::cout << "size [" << xSize << "," << ySize << "]\n";
 			
 			transformation[1] = outputXResolution;
 			transformation[5] = outputYResolution;
@@ -84,7 +84,7 @@ namespace rsgis{namespace img{
 			poDriver = GetGDALDriverManager()->GetDriverByName("ENVI");
 			if(poDriver == NULL)
 			{
-				throw RSGISImageException("Could not find ENVI driver");
+				throw rsgis::RSGISImageException("Could not find ENVI driver");
 			}
 			
 			output = poDriver->Create(filename.c_str(), xSize, ySize, bands, GDT_Float32, poDriver->GetMetadata());
@@ -106,18 +106,18 @@ namespace rsgis{namespace img{
 						
 			for(int n = 1; n <= bands; n++)
 			{
-				cout << "Interpolating band "  << n << ".." << endl;
+				std::cout << "Interpolating band "  << n << ".." << std::endl;
 				outputRasterBand = output->GetRasterBand(n);
 				rasterband = data->GetRasterBand(n);
 				
 				int feedback = ySize/10;
 				int feedbackCounter = 0;
-				cout << "Started " << flush;
+				std::cout << "Started " << std::flush;
 				for( int i = 0; i < ySize; i++)
 				{
 					if((ySize > 10) && (i % feedback) == 0)
 					{
-						cout << ".." << feedbackCounter << ".." << flush;
+						std::cout << ".." << feedbackCounter << ".." << std::flush;
 						feedbackCounter = feedbackCounter + 10;
 					}
 					
@@ -285,12 +285,12 @@ namespace rsgis{namespace img{
 					}
 					outputRasterBand->RasterIO(GF_Write, 0, i, xSize, 1, newLine, xSize, 1, GDT_Float32, 0, 0);
 				}
-				cout << " Completed\n";
+				std::cout << " Completed\n";
 			}
 			GDALClose(output);
-			cout << "Interpolation complete\n";
+			std::cout << "Interpolation complete\n";
 		}
-		catch(RSGISFileException e)
+		catch(rsgis::RSGISFileException e)
 		{
 			if( transformation != NULL )
 			{
@@ -318,7 +318,7 @@ namespace rsgis{namespace img{
 			}
 			throw e;
 		}
-		catch(RSGISImageException e)
+		catch(rsgis::RSGISImageException e)
 		{
 			if( transformation != NULL )
 			{
@@ -376,8 +376,8 @@ namespace rsgis{namespace img{
 	void RSGISImageInterpolation::interpolateNewImage(GDALDataset *data,
 															  double outputXResolution, 
 															  double outputYResolution, 
-															  string filename,
-															  int band) throw(RSGISFileException, RSGISImageException)
+															  std::string filename,
+															  int band) throw(rsgis::RSGISFileException, rsgis::RSGISImageException)
 	{
 		// Image Data Stores.
 		float *scanline0 = NULL;
@@ -424,7 +424,7 @@ namespace rsgis{namespace img{
 			poDriver = GetGDALDriverManager()->GetDriverByName("ENVI");
 			if(poDriver == NULL)
 			{
-				throw RSGISImageException("Could not find ENVI driver");
+				throw rsgis::RSGISImageException("Could not find ENVI driver");
 			}
 			
 			output = poDriver->Create(filename.c_str(), xSize, ySize, 1, GDT_Float32, poDriver->GetMetadata());
@@ -450,13 +450,13 @@ namespace rsgis{namespace img{
 			
 			int feedback = ySize/10;
 			int feedbackCounter = 0;
-			cout << "Started Interpolating";
+			std::cout << "Started Interpolating";
 			
 			for( int i = 0; i < ySize; i++)
 			{
 				if((ySize > 10) && (i % feedback) == 0)
 				{
-					cout << ".." << feedbackCounter << "..";
+					std::cout << ".." << feedbackCounter << "..";
 					feedbackCounter = feedbackCounter + 10;
 				}
 				yShift = this->findFloatingPointComponent(((i*outputYResolution)/inputYResolution),
@@ -623,9 +623,9 @@ namespace rsgis{namespace img{
 				outputRasterBand->RasterIO(GF_Write, 0, i, xSize, 1, newLine, xSize, 1, GDT_Float32, 0, 0);
 			}
 			GDALClose(output);
-			cout << ".. Complete." << endl;
+			std::cout << ".. Complete." << std::endl;
 		}
-		catch(RSGISFileException e)
+		catch(rsgis::RSGISFileException e)
 		{
 			if( transformation != NULL )
 			{
@@ -653,7 +653,7 @@ namespace rsgis{namespace img{
 			}
 			throw e;
 		}
-		catch(RSGISImageException e)
+		catch(rsgis::RSGISImageException e)
 		{
 			if( transformation != NULL )
 			{
@@ -711,7 +711,7 @@ namespace rsgis{namespace img{
 	
 	double RSGISImageInterpolation::findFloatingPointComponent(double floatingPointNum, int *integer)
 	{
-		//std::cout << "Starting find floating point\n";
+		//std::std::cout << "Starting find floating point\n";
 		*integer = 0;
 		bool negative = false;
 		if(floatingPointNum < 0)
@@ -726,11 +726,11 @@ namespace rsgis{namespace img{
 		{
 			while(floatingPointNum > reduction & reduction != 0)
 			{
-				//std::cout << "floatingPointNum = " << floatingPointNum << " reduction = " << reduction << std::endl;
+				//std::std::cout << "floatingPointNum = " << floatingPointNum << " reduction = " << reduction << std::std::endl;
 				floatingPointNum = floatingPointNum - reduction;
 				*integer = *integer + reduction;
 			}
-			//std::cout << "Adjust reduction: floatingPointNum = " << floatingPointNum << std::endl;
+			//std::std::cout << "Adjust reduction: floatingPointNum = " << floatingPointNum << std::std::endl;
 			reduction = reduction / 10;
 		}
 		if(floatingPointNum > -0.000000001 & floatingPointNum < 0.000000001)
@@ -747,7 +747,7 @@ namespace rsgis{namespace img{
 		{
 			*integer = (*integer) * (-1);
 		}
-		//std::cout << "finished floating point\n";
+		//std::std::cout << "finished floating point\n";
 		return floatingPointNum;
 	}
 	

@@ -35,15 +35,13 @@
 #include "img/RSGISCalcImage.h"
 #include "img/RSGISImageStatistics.h"
 
-using namespace std;
-
 namespace rsgis{namespace img{
 	
 	class RSGISImageNormalisation
 		{
 		public: 
 			RSGISImageNormalisation();
-			void normaliseImage(GDALDataset *dataset, double *imageMax, double *imageMin, double *outMax, double *outMin, bool calcStats, string outputImage)throw(RSGISImageCalcException,RSGISImageBandException);
+			void normaliseImage(GDALDataset *dataset, double *imageMax, double *imageMin, double *outMax, double *outMin, bool calcStats, std::string outputImage)throw(RSGISImageCalcException,RSGISImageBandException);
 		};
 	
 	class RSGISNormaliseImage : public RSGISCalcImageValue
@@ -52,10 +50,10 @@ namespace rsgis{namespace img{
 			RSGISNormaliseImage(int numberOutBands, double *imageMaxIn, double *imageMinIn, double *outMaxIn, double *outMinIn);
 			void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException);
 			void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException);
-			void calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException);
-			void calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException);
+			void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(RSGISImageCalcException);
+			void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(RSGISImageCalcException);
 			void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException);
-            void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+            void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
 			bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException);
 			~RSGISNormaliseImage();
 		protected:

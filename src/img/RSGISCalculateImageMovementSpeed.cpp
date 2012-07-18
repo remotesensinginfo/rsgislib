@@ -54,8 +54,8 @@ namespace rsgis{namespace img{
             
             if(((boost::math::isnan)(bandValues[imageBands[i]])) | ((boost::math::isnan)(bandValues[imageBands[i+1]])))
             {
-                displacement = numeric_limits<float>::signaling_NaN();
-                movement = numeric_limits<float>::signaling_NaN();
+                displacement = std::numeric_limits<float>::signaling_NaN();
+                movement = std::numeric_limits<float>::signaling_NaN();
             }
             else
             {
@@ -101,9 +101,9 @@ namespace rsgis{namespace img{
 		}
 		else
 		{
-			output[0] = numeric_limits<float>::signaling_NaN();
-			output[1] = numeric_limits<float>::signaling_NaN();
-			output[2] = numeric_limits<float>::signaling_NaN();
+			output[0] = std::numeric_limits<float>::signaling_NaN();
+			output[1] = std::numeric_limits<float>::signaling_NaN();
+			output[2] = std::numeric_limits<float>::signaling_NaN();
 		}
 		
 	}

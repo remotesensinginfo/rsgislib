@@ -24,13 +24,13 @@
 
 namespace rsgis{namespace img{
 	
-	RSGISDefiniensCSVRasterise::RSGISDefiniensCSVRasterise(bool projFromImage, string proj)
+	RSGISDefiniensCSVRasterise::RSGISDefiniensCSVRasterise(bool projFromImage, std::string proj)
 	{
 		this->imageProj = projFromImage;
 		this->proj = proj;
 	}
 	
-	void RSGISDefiniensCSVRasterise::rasteriseTiles(SortedGenericList<RSGISDefiniensWorkspaceFileName> *sortedTIFs, SortedGenericList<RSGISDefiniensWorkspaceFileName> *sortedCSVs, string outputDIR) throw(RSGISImageException,RSGISFileException)
+	void RSGISDefiniensCSVRasterise::rasteriseTiles(rsgis::datastruct::SortedGenericList<rsgis::utils::RSGISDefiniensWorkspaceFileName> *sortedTIFs, rsgis::datastruct::SortedGenericList<rsgis::utils::RSGISDefiniensWorkspaceFileName> *sortedCSVs, std::string outputDIR) throw(rsgis::RSGISImageException,rsgis::RSGISFileException)
 	{
 		int size = sortedTIFs->getSize();
 		
@@ -51,17 +51,17 @@ namespace rsgis{namespace img{
 					{
 						first = false;
 						this->calcNumFeaturesObjects(sortedCSVs->getAt(i), &numFeatures, &numObjects);
-						cout << "Tile " << sortedCSVs->getAt(i)->getTile() << " has " << numFeatures << " features for " << numObjects << " objects\n";
+						std::cout << "Tile " << sortedCSVs->getAt(i)->getTile() << " has " << numFeatures << " features for " << numObjects << " objects\n";
 						numFeaturesFirst = numFeatures;
 					}
 					else
 					{
 						this->calcNumFeaturesObjects(sortedCSVs->getAt(i), &numFeatures, &numObjects);
-						cout << "Tile " << sortedCSVs->getAt(i)->getTile() << " has " << numFeatures << " features for " << numObjects << " objects\n";
+						std::cout << "Tile " << sortedCSVs->getAt(i)->getTile() << " has " << numFeatures << " features for " << numObjects << " objects\n";
 						if(numFeatures != numFeaturesFirst)
 						{
 							string message = "File " + sortedCSVs->getAt(i)->getFileNameWithPath() + " has a different number of features (attributes)";
-							throw RSGISImageException(message.c_str());
+							throw rsgis::RSGISImageException(message.c_str());
 						}
 					}
 					
@@ -85,17 +85,17 @@ namespace rsgis{namespace img{
 				}
 			}
 		}
-		catch(RSGISImageException e)
+		catch(rsgis::RSGISImageException e)
 		{
 			throw e;
 		}
-		catch (RSGISFileException e) 
+		catch (rsgis::RSGISFileException e) 
 		{
 			throw e;
 		}
 	}
     
-    void RSGISDefiniensCSVRasterise::rasteriseFile(string tifFile, string csvFile, string outputImage) throw(RSGISImageException, RSGISFileException)
+    void RSGISDefiniensCSVRasterise::rasteriseFile(std::string tifFile, std::string csvFile, std::string outputImage) throw(rsgis::RSGISImageException, rsgis::RSGISFileException)
     {
         try
         {
@@ -123,19 +123,19 @@ namespace rsgis{namespace img{
             delete[] csvData;
             
         }
-        catch(RSGISImageException &e)
+        catch(rsgis::RSGISImageException &e)
         {
             throw e;
         }
-        catch(RSGISFileException &e)
+        catch(rsgis::RSGISFileException &e)
         {
             throw e;
         }
     }
 	
-	void RSGISDefiniensCSVRasterise::calcNumFeaturesObjects(RSGISDefiniensWorkspaceFileName *csvFilepath, int *numFeatures, int *numObjects) throw(RSGISFileException)
+	void RSGISDefiniensCSVRasterise::calcNumFeaturesObjects(rsgis::utils::RSGISDefiniensWorkspaceFileName *csvFilepath, int *numFeatures, int *numObjects) throw(rsgis::RSGISFileException)
 	{
-		ifstream csvFile;
+		std::ifstream csvFile;
 		csvFile.open(csvFilepath->getFileNameWithPath().c_str());
 		
 		if(csvFile.is_open())
@@ -180,14 +180,14 @@ namespace rsgis{namespace img{
 		}
 		else
 		{
-			string message = string("Could not open file: ") + csvFilepath->getFileNameWithPath();
-			throw RSGISFileException(message.c_str());
+			string message = std::string("Could not open file: ") + csvFilepath->getFileNameWithPath();
+			throw rsgis::RSGISFileException(message.c_str());
 		}
 	}
     
-    void RSGISDefiniensCSVRasterise::calcNumFeaturesObjects(string csvInFile, int *numFeatures, int *numObjects) throw(RSGISFileException)
+    void RSGISDefiniensCSVRasterise::calcNumFeaturesObjects(std::string csvInFile, int *numFeatures, int *numObjects) throw(rsgis::RSGISFileException)
 	{
-		ifstream csvFile;
+		std::ifstream csvFile;
 		csvFile.open(csvInFile.c_str());
 		
 		if(csvFile.is_open())
@@ -232,14 +232,14 @@ namespace rsgis{namespace img{
 		}
 		else
 		{
-			string message = string("Could not open file: ") + csvInFile;
-			throw RSGISFileException(message.c_str());
+			string message = std::string("Could not open file: ") + csvInFile;
+			throw rsgis::RSGISFileException(message.c_str());
 		}
 	}
 	
-	void RSGISDefiniensCSVRasterise::readCSVToMemory(RSGISDefiniensWorkspaceFileName *csvFilepath, float **csvData, int numFeatures, int numObjects) throw(RSGISFileException)
+	void RSGISDefiniensCSVRasterise::readCSVToMemory(rsgis::utils::RSGISDefiniensWorkspaceFileName *csvFilepath, float **csvData, int numFeatures, int numObjects) throw(rsgis::RSGISFileException)
 	{
-		ifstream csvFile;
+		std::ifstream csvFile;
 		csvFile.open(csvFilepath->getFileNameWithPath().c_str());
 		
 		if(csvFile.is_open())
@@ -250,7 +250,7 @@ namespace rsgis{namespace img{
 			bool first = true;
 			string strLine;
 			
-			cout.precision(11);
+			std::cout.precision(11);
 			while(!csvFile.eof())
 			{
 				getline(csvFile, strLine, '\n');
@@ -272,14 +272,14 @@ namespace rsgis{namespace img{
 		}
 		else
 		{
-			string message = string("Could not open file: ") + csvFilepath->getFileNameWithPath();
-			throw RSGISFileException(message.c_str());
+			string message = std::string("Could not open file: ") + csvFilepath->getFileNameWithPath();
+			throw rsgis::RSGISFileException(message.c_str());
 		}
 	}
     
-    void RSGISDefiniensCSVRasterise::readCSVToMemory(string csvInFile, float **csvData, int numFeatures, int numObjects) throw(RSGISFileException)
+    void RSGISDefiniensCSVRasterise::readCSVToMemory(std::string csvInFile, float **csvData, int numFeatures, int numObjects) throw(rsgis::RSGISFileException)
 	{
-		ifstream csvFile;
+		std::ifstream csvFile;
 		csvFile.open(csvInFile.c_str());
 		
 		if(csvFile.is_open())
@@ -290,7 +290,7 @@ namespace rsgis{namespace img{
 			bool first = true;
 			string strLine;
 			
-			//cout.precision(11);
+			//std::cout.precision(11);
 			while(!csvFile.eof())
 			{
 				getline(csvFile, strLine, '\n');
@@ -312,16 +312,16 @@ namespace rsgis{namespace img{
 		}
 		else
 		{
-			string message = string("Could not open file: ") + csvInFile;
-			throw RSGISFileException(message.c_str());
+			string message = std::string("Could not open file: ") + csvInFile;
+			throw rsgis::RSGISFileException(message.c_str());
 		}
 	}
 	
-	void RSGISDefiniensCSVRasterise::convertCSVLine(string strLine, float *data, int numFeatures, int objNumber) throw(RSGISFileException)
+	void RSGISDefiniensCSVRasterise::convertCSVLine(std::string strLine, float *data, int numFeatures, int objNumber) throw(rsgis::RSGISFileException)
 	{
 		try
         {
-            RSGISMathsUtils mathsUtils;
+            rsgis::math::RSGISMathsUtils mathsUtils;
             int lineLength = strLine.size();
             char semiColon = ';';
             int featNum = 0;
@@ -337,8 +337,8 @@ namespace rsgis{namespace img{
                         readObjNum = mathsUtils.strtoint(strLine.substr(strStart, (i-strStart)));
                         if(readObjNum != objNumber)
                         {
-                            string message = "Object ID read from file (" + mathsUtils.inttostring(readObjNum) + ") does not expected value (" + mathsUtils.inttostring(objNumber) + ")";
-                            throw RSGISFileException(message.c_str());
+                            std::string message = "Object ID read from file (" + mathsUtils.inttostring(readObjNum) + ") does not expected value (" + mathsUtils.inttostring(objNumber) + ")";
+                            throw rsgis::RSGISFileException(message.c_str());
                         }
                         first = false;
                     }
@@ -352,17 +352,17 @@ namespace rsgis{namespace img{
             }
             data[featNum] = mathsUtils.strtofloat(strLine.substr(strStart));
         }
-        catch(RSGISFileException &e)
+        catch(rsgis::RSGISFileException &e)
         {
             throw e;
         }
-        catch(RSGISMathException &e)
+        catch(rsgis::math::RSGISMathException &e)
         {
-            throw RSGISFileException(e.what());
+            throw rsgis::RSGISFileException(e.what());
         }
 	}
 	
-	void RSGISDefiniensCSVRasterise::checkTIFCreatePopulateImageTile(RSGISDefiniensWorkspaceFileName *tifFilepath, string outputDIR, int numFeatures, int numObjects, float **csvData) throw(RSGISImageException)
+	void RSGISDefiniensCSVRasterise::checkTIFCreatePopulateImageTile(rsgis::utils::RSGISDefiniensWorkspaceFileName *tifFilepath, std::string outputDIR, int numFeatures, int numObjects, float **csvData) throw(rsgis::RSGISImageException)
 	{
 		GDALAllRegister();
 		
@@ -379,8 +379,8 @@ namespace rsgis{namespace img{
 			dataset[0] = (GDALDataset *) GDALOpenShared(tifFilepath->getFileNameWithPath().c_str(), GA_ReadOnly);
 			if(dataset == NULL)
 			{
-				string message = string("Could not open image ") + tifFilepath->getFileNameWithPath();
-				throw RSGISImageException(message.c_str());
+				string message = std::string("Could not open image ") + tifFilepath->getFileNameWithPath();
+				throw rsgis::RSGISImageException(message.c_str());
 			}
 			
 			inputBands = dataset[0]->GetRasterCount();
@@ -393,11 +393,11 @@ namespace rsgis{namespace img{
 			
 			calcImgStats.calcImageStatistics(dataset, 1, imageStats, inputBands, false);
 			
-			cout << "Number of objects in image = " << imageStats[0]->max+1 << endl;
+			std::cout << "Number of objects in image = " << imageStats[0]->max+1 << std::endl;
 			
 			if(numObjects != (imageStats[0]->max + 1))
 			{
-				throw RSGISImageException("The number of objects in the image and CSV file do not match.");
+				throw rsgis::RSGISImageException("The number of objects in the image and CSV file do not match.");
 			}
 			
 			for(int i = 0; i < inputBands; i++)
@@ -421,19 +421,19 @@ namespace rsgis{namespace img{
 		}
 		catch(RSGISImageCalcException e)
 		{
-			throw RSGISImageException(e.what());
+			throw rsgis::RSGISImageException(e.what());
 		}
 		catch(RSGISImageBandException e)
 		{
-			throw RSGISImageException(e.what());
+			throw rsgis::RSGISImageException(e.what());
 		}
-		catch(RSGISImageException e)
+		catch(rsgis::RSGISImageException e)
 		{
 			throw e;
 		}
 	}
     
-    void RSGISDefiniensCSVRasterise::checkTIFCreatePopulateImageTile(string tifFilepath, string outputFile, int numFeatures, int numObjects, float **csvData) throw(RSGISImageException)
+    void RSGISDefiniensCSVRasterise::checkTIFCreatePopulateImageTile(std::string tifFilepath, std::string outputFile, int numFeatures, int numObjects, float **csvData) throw(rsgis::RSGISImageException)
 	{
 		GDALAllRegister();
 		
@@ -450,8 +450,8 @@ namespace rsgis{namespace img{
 			dataset[0] = (GDALDataset *) GDALOpenShared(tifFilepath.c_str(), GA_ReadOnly);
 			if(dataset == NULL)
 			{
-				string message = string("Could not open image ") + tifFilepath;
-				throw RSGISImageException(message.c_str());
+				string message = std::string("Could not open image ") + tifFilepath;
+				throw rsgis::RSGISImageException(message.c_str());
 			}
 			
 			inputBands = dataset[0]->GetRasterCount();
@@ -464,11 +464,11 @@ namespace rsgis{namespace img{
 			
 			calcImgStats.calcImageStatistics(dataset, 1, imageStats, inputBands, false);
 			
-			cout << "Number of objects in image = " << imageStats[0]->max+1 << endl;
+			std::cout << "Number of objects in image = " << imageStats[0]->max+1 << std::endl;
 			
 			if(numObjects != (imageStats[0]->max + 1))
 			{
-				throw RSGISImageException("The number of objects in the image and CSV file do not match.");
+				throw rsgis::RSGISImageException("The number of objects in the image and CSV file do not match.");
 			}
 			
 			for(int i = 0; i < inputBands; i++)
@@ -491,13 +491,13 @@ namespace rsgis{namespace img{
 		}
 		catch(RSGISImageCalcException e)
 		{
-			throw RSGISImageException(e.what());
+			throw rsgis::RSGISImageException(e.what());
 		}
 		catch(RSGISImageBandException e)
 		{
-			throw RSGISImageException(e.what());
+			throw rsgis::RSGISImageException(e.what());
 		}
-		catch(RSGISImageException e)
+		catch(rsgis::RSGISImageException e)
 		{
 			throw e;
 		}
@@ -541,12 +541,12 @@ namespace rsgis{namespace img{
 		throw RSGISImageCalcException("Not implemented");
 	}
 	
-	void RSGISDefiniensCSVRasteriseValue::calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException)
+	void RSGISDefiniensCSVRasteriseValue::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(RSGISImageCalcException)
 	{
 		throw RSGISImageCalcException("Not Implemented");
 	}
 	
-	void RSGISDefiniensCSVRasteriseValue::calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException)
+	void RSGISDefiniensCSVRasteriseValue::calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(RSGISImageCalcException)
 	{
 		throw RSGISImageCalcException("Not implemented");
 	}

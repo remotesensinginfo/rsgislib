@@ -32,8 +32,6 @@
 #include <string>
 #include "img/RSGISImageUtils.h"
 
-using namespace std;
-
 namespace rsgis 
 {
 	namespace img
@@ -42,10 +40,10 @@ namespace rsgis
 			{
 			public: 
 				RSGISImageMosaic();
-				void mosaic(string *inputImages, int numDS, string outputImage, float background, bool projFromImage, string proj) throw(RSGISImageException);
-				void mosaicSkipVals(string *inputImages, int numDS, string outputImage, float background, float skipVal, bool projFromImage, string proj, unsigned int skipBand = 0) throw(RSGISImageException);
-				void mosaicSkipThreash(string *inputImages, int numDS, string outputImage, float background, float skipLowerThreash, float skipUpperThreash, bool projFromImage, string proj, unsigned int threashBand = 0) throw(RSGISImageException);
-				void includeDatasets(GDALDataset *baseImage, string *inputImages, int numDS, vector<int> bands, bool bandsDefined) throw(RSGISImageException);
+				void mosaic(std::string *inputImages, int numDS, std::string outputImage, float background, bool projFromImage, std::string proj) throw(RSGISImageException);
+				void mosaicSkipVals(std::string *inputImages, int numDS, std::string outputImage, float background, float skipVal, bool projFromImage, std::string proj, unsigned int skipBand = 0) throw(RSGISImageException);
+				void mosaicSkipThreash(std::string *inputImages, int numDS, std::string outputImage, float background, float skipLowerThreash, float skipUpperThreash, bool projFromImage, std::string proj, unsigned int threashBand = 0) throw(RSGISImageException);
+				void includeDatasets(GDALDataset *baseImage, std::string *inputImages, int numDS, std::vector<int> bands, bool bandsDefined) throw(RSGISImageException);
 				~RSGISImageMosaic();
 			};
 	}

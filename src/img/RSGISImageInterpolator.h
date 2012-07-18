@@ -28,16 +28,13 @@
 
 #include "common/RSGISImageException.h"
 
-using namespace std;
-using namespace rsgis;
-
 namespace rsgis{namespace img{
 	
 	class RSGISInterpolator
 		{
 		public:
 			RSGISInterpolator();
-			virtual double interpolate(double xShift, double yShift, double *pixels) throw(RSGISImageException)=0;
+			virtual double interpolate(double xShift, double yShift, double *pixels) throw(rsgis::RSGISImageException)=0;
 			virtual ~RSGISInterpolator();
 		};
 	
@@ -45,7 +42,7 @@ namespace rsgis{namespace img{
 		{
 		public:
 			RSGISCubicInterpolator();
-			double interpolate(double xShift, double yShift, double *pixels) throw(RSGISImageException);
+			double interpolate(double xShift, double yShift, double *pixels) throw(rsgis::RSGISImageException);
 		protected:
 			double estimateNewValueFromCurve(double *pixels, double shift);
 		};
@@ -54,21 +51,21 @@ namespace rsgis{namespace img{
 		{
 		public:
 			RSGISBilinearAreaInterpolator();
-			double interpolate(double xShift, double yShift, double *pixels) throw(RSGISImageException);
+			double interpolate(double xShift, double yShift, double *pixels) throw(rsgis::RSGISImageException);
 		};
 	
 	class RSGISBilinearPointInterpolator : public RSGISInterpolator
 		{
 		public:
 			RSGISBilinearPointInterpolator();
-			double interpolate(double xShift, double yShift, double *pixels) throw(RSGISImageException);
+			double interpolate(double xShift, double yShift, double *pixels) throw(rsgis::RSGISImageException);
 		};
 	
 	class RSGISNearestNeighbourInterpolator : public RSGISInterpolator
 		{
 		public:
 			RSGISNearestNeighbourInterpolator();
-			double interpolate(double xShift, double yShift, double *pixels) throw(RSGISImageException);
+			double interpolate(double xShift, double yShift, double *pixels) throw(rsgis::RSGISImageException);
 		protected:
 			int findIndexOfMax(double *arr, int size);
 		};
@@ -77,7 +74,7 @@ namespace rsgis{namespace img{
 		{
 		public:
 			RSGISTriangulationInterpolator();
-			double interpolate(double xShift, double yShift, double *pixels) throw(RSGISImageException);
+			double interpolate(double xShift, double yShift, double *pixels) throw(rsgis::RSGISImageException);
 		protected:
 			double triangle(double xShift, double yShift, double *pixels, bool triangulation);
 		};

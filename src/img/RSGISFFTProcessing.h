@@ -32,19 +32,13 @@
 
 #include "geos/geom/Polygon.h"
 
-using namespace std;
-using namespace rsgis::math;
-using namespace rsgis::geom;
-//using namespace rsgis::datastruct;
-using namespace geos::geom;
-
 namespace rsgis{namespace img{
 	
 	class RSGISFFTProcessing
 		{
 		public:
 			RSGISFFTProcessing();
-			Polygon** findDominateFreq(Matrix *magnitude, int startCircle, int endCircle, int *numPolys) throw(RSGISFFTException);
+            geos::geom::Polygon** findDominateFreq(rsgis::math::Matrix *magnitude, int startCircle, int endCircle, int *numPolys) throw(RSGISFFTException);
 			~RSGISFFTProcessing();
 		};
 }}

@@ -28,20 +28,16 @@
 #define RSGISImageBandException_H
 
 #include "common/RSGISImageException.h"
-
-using namespace std;
-using namespace rsgis;
-
 namespace rsgis 
 {
 	namespace img
 	{
-		class RSGISImageBandException : public RSGISImageException
+		class RSGISImageBandException : public rsgis::RSGISImageException
 		{
 			public:
 				RSGISImageBandException();
 				RSGISImageBandException(const char* message);
-				RSGISImageBandException(string message);
+                RSGISImageBandException(std::string message);
 		};
 	}
 }

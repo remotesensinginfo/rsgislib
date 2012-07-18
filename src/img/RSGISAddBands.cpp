@@ -32,7 +32,7 @@ namespace rsgis{namespace img{
         
     }
     
-    void img::RSGISAddBands::addBandToFile(GDALDataset *input, GDALDataset *toAdd, string *outputFile, int band) throw(RSGISImageBandException)
+    void img::RSGISAddBands::addBandToFile(GDALDataset *input, GDALDataset *toAdd, std::string *outputFile, int band) throw(RSGISImageBandException)
     {
         double *inputTrans = new double[6];
         input->GetGeoTransform(inputTrans);
@@ -59,7 +59,7 @@ namespace rsgis{namespace img{
         int toAddXSize = toAdd->GetRasterXSize();
         int toAddYSize = toAdd->GetRasterYSize();
         
-        cout << "input image: [" << inputXSize << "," << inputYSize << "] To Add Image: [" << toAddXSize << "," << toAddYSize << "]\n";
+        std::cout << "input image: [" << inputXSize << "," << inputYSize << "] To Add Image: [" << toAddXSize << "," << toAddYSize << "]\n";
         
         double *inputDimensions = new double[4];
         inputDimensions[0] = inputTrans[0];
@@ -72,8 +72,8 @@ namespace rsgis{namespace img{
         toAddDimensions[2] = toAddTrans[0] + (toAddXSize * pixelXRes);
         toAddDimensions[3] = toAddTrans[3] + (toAddYSize * pixelYRes);
         
-        cout << "Input Image: [" << inputDimensions[0] << "," << inputDimensions[1] << "][" << inputDimensions[2] << "," << inputDimensions[3] << "]\n";
-        cout << "Image to Add Image: [" << toAddDimensions[0] << "," << toAddDimensions[1] << "][" << toAddDimensions[2] << "," << toAddDimensions[3] << "]\n";
+        std::cout << "Input Image: [" << inputDimensions[0] << "," << inputDimensions[1] << "][" << inputDimensions[2] << "," << inputDimensions[3] << "]\n";
+        std::cout << "Image to Add Image: [" << toAddDimensions[0] << "," << toAddDimensions[1] << "][" << toAddDimensions[2] << "," << toAddDimensions[3] << "]\n";
         
         if(inputDimensions[0] < toAddDimensions[0])
         {
@@ -95,7 +95,7 @@ namespace rsgis{namespace img{
             throw RSGISImageBandException("Input image yMin too small.");
         }
         
-        cout << "Input Image fits within the image to be added will proceed...\n";
+        std::cout << "Input Image fits within the image to be added will proceed...\n";
         
         double xDiff = inputDimensions[0] - toAddDimensions[0];
         double yDiff = toAddDimensions[1] - inputDimensions[1];
@@ -103,7 +103,7 @@ namespace rsgis{namespace img{
         int xStart = ((int)(xDiff/pixelXRes));
         int yStart = ((int)(yDiff/pixelXRes));
         
-        cout << "Start [" << xStart << "," << yStart << "]\n";
+        std::cout << "Start [" << xStart << "," << yStart << "]\n";
         
         GDALDriver *poDriver;
         poDriver = GetGDALDriverManager()->GetDriverByName("ENVI");
@@ -137,7 +137,7 @@ namespace rsgis{namespace img{
             }
         }
         
-        cout << "Adding new bands data\n";
+        std::cout << "Adding new bands data\n";
         
         GDALRasterBand *toAddBand = toAdd->GetRasterBand(band);
         outputBand = outputImage->GetRasterBand(numBands);
@@ -152,7 +152,7 @@ namespace rsgis{namespace img{
         GDALClose(outputImage);
     }
     
-    void RSGISAddBands::addMultipleBands(GDALDataset *input, GDALDataset **toAdd, string *outputFile, int *band, int numAddBands) throw(RSGISImageBandException)
+    void RSGISAddBands::addMultipleBands(GDALDataset *input, GDALDataset **toAdd, std::string *outputFile, int *band, int numAddBands) throw(RSGISImageBandException)
     {
         double *toAddTrans = NULL;
         double *inputDimensions = NULL;
@@ -180,7 +180,7 @@ namespace rsgis{namespace img{
         double *inputTrans = new double[6];
         input->GetGeoTransform(inputTrans);
         
-        cout << "Checking input files ...\n";
+        std::cout << "Checking input files ...\n";
         
         for(int i = 0; i < numAddBands; i++)
         {
@@ -255,7 +255,7 @@ namespace rsgis{namespace img{
             
         }
         
-        cout << "All files have successfully been checked so stacking can proceed.\n";
+        std::cout << "All files have successfully been checked so stacking can proceed.\n";
         
         numBands = input->GetRasterCount()+numAddBands;
         baseBands = input->GetRasterCount();
@@ -316,7 +316,7 @@ namespace rsgis{namespace img{
             
             std::cout << "Adding addtional band " << i << " of " << numAddBands << std::endl;
             toAddBand = toAdd[i]->GetRasterBand(band[i]);
-            cout << "Output band: " <<  baseBands+i+1 << endl;
+            std::cout << "Output band: " <<  baseBands+i+1 << std::endl;
             outputBand = outputImage->GetRasterBand(baseBands+i+1);
             
             for(int n = 0; n < inputYSize; n++)
@@ -330,7 +330,7 @@ namespace rsgis{namespace img{
         GDALClose(outputImage);
     }
 	
-	void RSGISAddBands::stackImages(GDALDataset **datasets, int numDS, string outputImage, string *imageBandNames, bool skipPixels, float skipValue, float noDataValue, string gdalFormat, GDALDataType gdalDataType) throw(RSGISImageBandException)
+	void RSGISAddBands::stackImages(GDALDataset **datasets, int numDS, std::string outputImage, std::string *imageBandNames, bool skipPixels, float skipValue, float noDataValue, std::string gdalFormat, GDALDataType gdalDataType) throw(RSGISImageBandException)
 	{
 		bool useBandNames = false;
 
@@ -376,14 +376,14 @@ namespace rsgis{namespace img{
 			{
 				throw RSGISImageBandException("ENVI driver does not exists..");
 			}
-			cout << "New image width = " << width << " height = " << height << endl;
+			std::cout << "New image width = " << width << " height = " << height << std::endl;
 			outputImageDS = gdalDriver->Create(outputImage.c_str(), width, height, numInBands, gdalDataType, NULL);
 			outputImageDS->SetGeoTransform(gdalTranslation);
 			outputImageDS->SetProjection(datasets[0]->GetProjectionRef());
 			
 			// Get Image Input Bands
 			bandOffsets = new int*[numInBands];
-            string *bandNames = new string[numInBands];
+            std::string *bandNames = new std::string[numInBands];
 			inputRasterBands = new GDALRasterBand*[numInBands];
 			int counter = 0;
 			for(int i = 0; i < numDS; i++)
@@ -395,7 +395,7 @@ namespace rsgis{namespace img{
 					bandOffsets[counter] = new int[2];
 					bandOffsets[counter][0] = dsOffsets[i][0];
 					bandOffsets[counter][1] = dsOffsets[i][1];
-					//cout << counter << ") dataset " << i << " band " << j << " offset [" << bandOffsets[counter][0] << "," << bandOffsets[counter][1] << "]\n";
+					//std::cout << counter << ") dataset " << i << " band " << j << " offset [" << bandOffsets[counter][0] << "," << bandOffsets[counter][1] << "]\n";
 					counter++;
 				}
 			}
@@ -420,15 +420,15 @@ namespace rsgis{namespace img{
 			
 			int feedback = height/10;
 			int feedbackCounter = 0;
-			cout << "Started" << flush;
+			std::cout << "Started" << flush;
 			// Loop images to process data
 			for(int i = 0; i < height; i++)
 			{
-				//cout << i << " of " << height << endl;
+				//std::cout << i << " of " << height << std::endl;
 				
 				if((i % feedback) == 0)
 				{
-					cout << ".." << feedbackCounter << ".." << flush;
+					std::cout << ".." << feedbackCounter << ".." << flush;
 					feedbackCounter = feedbackCounter + 10;
 				}
 				
@@ -467,7 +467,7 @@ namespace rsgis{namespace img{
 
 
 			}
-			cout << " Complete.\n";
+			std::cout << " Complete.\n";
 		}
 		catch(RSGISImageBandException e)
 		{

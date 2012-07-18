@@ -32,7 +32,7 @@ namespace rsgis{namespace img{
         this->geomOrigCollection = geomOrigCollection;
     }
 
-    void RSGISCalcDist2Geom::calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException)
+    void RSGISCalcDist2Geom::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(RSGISImageCalcException)
     {
         try 
         {
@@ -47,7 +47,7 @@ namespace rsgis{namespace img{
                 bandValues[0]  *= (-1);
             }
         } 
-        catch (exception &e) 
+        catch (std::exception &e) 
         {
             RSGISImageCalcException(e.what());
         }

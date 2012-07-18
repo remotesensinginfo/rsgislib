@@ -26,10 +26,8 @@
 #include <iostream>
 #include <string>
 #include "img/RSGISImageCalcException.h"
-#include <geos/geom/Envelope.h>
 
-using namespace std;
-using namespace geos::geom;
+#include <geos/geom/Envelope.h>
 
 namespace rsgis 
 {
@@ -41,13 +39,13 @@ namespace rsgis
 				RSGISCalcImageValue(int numberOutBands);
 				virtual void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException) = 0;
 				virtual void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException) = 0;
-				virtual void calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException) = 0;
-				virtual void calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException) = 0;
+				virtual void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(RSGISImageCalcException) = 0;
+				virtual void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(RSGISImageCalcException) = 0;
 				virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException) = 0;
                 /**
                  * Extent only refers to the central window.
                  */
-                virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, Envelope extent) throw(RSGISImageCalcException) = 0;
+                virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(RSGISImageCalcException) = 0;
 				virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException) = 0;
 				virtual int getNumOutBands();
 				virtual void setNumOutBands(int bands);

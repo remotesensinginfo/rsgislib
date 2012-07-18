@@ -38,28 +38,24 @@
 #include "geos/geom/LinearRing.h"
 #include "geos/geom/Polygon.h"
 
-using namespace std;
-using namespace rsgis::utils;
-using namespace geos::geom;
-
 namespace rsgis{namespace img{
 	
 	
 	class RSGISCreatePixelPolygons : public RSGISCalcImageValue
 	{
 	public: 
-		RSGISCreatePixelPolygons(vector<Polygon*> *polys, float threshold);
+		RSGISCreatePixelPolygons(std::vector<geos::geom::Polygon*> *polys, float threshold);
 		void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException);
 		void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException);
-		void calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException);
-		void calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException);
+		void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(RSGISImageCalcException);
+		void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(RSGISImageCalcException);
 		void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException);
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
 		bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException);
 		~RSGISCreatePixelPolygons();
 	protected:
-		Polygon* createPolygonFromEnv(Envelope env);
-		vector<Polygon*> *polys;
+		geos::geom::Polygon* createPolygonFromEnv(geos::geom::Envelope env);
+        std::vector<geos::geom::Polygon*> *polys;
 		float threshold;
 	};
 	

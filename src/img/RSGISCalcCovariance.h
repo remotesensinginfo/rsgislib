@@ -30,26 +30,23 @@
 #include "img/RSGISCalcImageSingle.h"
 #include "math/RSGISMatrices.h"
 
-using namespace std;
-using namespace rsgis::math;
-
 namespace rsgis{namespace img{
 	
 	class RSGISCalcCovariance : public RSGISCalcImageSingleValue
 		{
 		public:
-			RSGISCalcCovariance(int numOutputValues, Matrix *aMeans, Matrix *bMeans);
+			RSGISCalcCovariance(int numOutputValues, rsgis::math::Matrix *aMeans, rsgis::math::Matrix *bMeans);
 			void calcImageValue(float *bandValuesImageA, float *bandValuesImageB, int numBands, int bandA, int bandB) throw(RSGISImageCalcException);
 			void calcImageValue(float *bandValuesImage, int numBands, int band) throw(RSGISImageCalcException);
-			void calcImageValue(float *bandValuesImage, int numBands, Envelope *extent) throw(RSGISImageCalcException);
-			void calcImageValue(float *bandValuesImage, double interceptArea, int numBands, Polygon *poly, Point *pt) throw(RSGISImageCalcException);
+			void calcImageValue(float *bandValuesImage, int numBands, geos::geom::Envelope *extent) throw(RSGISImageCalcException);
+			void calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt) throw(RSGISImageCalcException);
 			double* getOutputValues() throw(RSGISImageCalcException);
 			void reset();
 		private:
 			int n;
 			double sum;
-			Matrix *aMeans;
-			Matrix *bMeans;
+			rsgis::math::Matrix *aMeans;
+			rsgis::math::Matrix *bMeans;
 		};
 }}
 
