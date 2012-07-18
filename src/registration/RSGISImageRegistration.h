@@ -51,12 +51,6 @@
 #include <gsl/gsl_matrix.h>
 
 namespace rsgis{namespace reg{
-	
-    using namespace std;
-    using namespace rsgis;
-    using namespace rsgis::img;
-    using namespace rsgis::math;
-    using namespace geos::geom;
     
 	class RSGISImageRegistration
 	{
@@ -143,12 +137,12 @@ namespace rsgis{namespace reg{
 		void defineFirstTiePoint(unsigned int *startXOff, unsigned int *startYOff, unsigned int numXPts, unsigned int numYPts, unsigned int gap) throw(RSGISRegistrationException);
 		float findTiePointLocation(TiePoint *tiePt, unsigned int windowSize, unsigned int searchArea, RSGISImageSimilarityMetric *metric, float metricThreshold, unsigned int subPixelResolution, float *moveInX, float *moveInY) throw(RSGISRegistrationException);
 		float findExtreme(bool findMin, gsl_vector *coefficients, unsigned int order, float minRange, float maxRange, unsigned int resolution, float *extremeVal);
-		void getImageOverlapWithFloatShift(int xShift, int yShift, int **dsOffsets, int *width, int *height, double *gdalTransform, Envelope *env) throw(RSGISRegistrationException);
-		void removeTiePointsWithLowStdDev(list<TiePoint*> *tiePts, unsigned int windowSize, float stdDevRefThreshold, float stdDevFloatThreshold);
+		void getImageOverlapWithFloatShift(int xShift, int yShift, int **dsOffsets, int *width, int *height, double *gdalTransform, geos::geom::Envelope *env) throw(RSGISRegistrationException);
+		void removeTiePointsWithLowStdDev(std::list<TiePoint*> *tiePts, unsigned int windowSize, float stdDevRefThreshold, float stdDevFloatThreshold);
 		double calcStdDev(float **data, unsigned int numVals, unsigned int numDims);
-		void exportTiePointsENVIImage2MapImpl(string filepath, list<TiePoint*> *tiePts)throw(RSGISRegistrationException);
-		void exportTiePointsENVIImage2ImageImpl(string filepath, list<TiePoint*> *tiePts)throw(RSGISRegistrationException);
-		void exportTiePointsRSGISImage2MapImpl(string filepath, list<TiePoint*> *tiePts)throw(RSGISRegistrationException);
+		void exportTiePointsENVIImage2MapImpl(std::string filepath, std::list<TiePoint*> *tiePts)throw(RSGISRegistrationException);
+		void exportTiePointsENVIImage2ImageImpl(std::string filepath, std::list<TiePoint*> *tiePts)throw(RSGISRegistrationException);
+		void exportTiePointsRSGISImage2MapImpl(std::string filepath, std::list<TiePoint*> *tiePts)throw(RSGISRegistrationException);
 		GDALDataset *referenceIMG;
 		GDALDataset *floatingIMG;
 		OverlapRegion* overlap;

@@ -34,15 +34,12 @@
 #include "boost/math/special_functions/fpclassify.hpp"
 
 namespace rsgis{namespace reg{
-
-    using namespace std;
-    using namespace rsgis::math;
     
 	class RSGISEuclideanSimilarityMetric : public RSGISImageSimilarityMetric
 	{
 	public:
 		RSGISEuclideanSimilarityMetric(){};
-		float calcValue(float **reference, float **floating, unsigned int numVals, unsigned int numDims) throw(RSGISMathException);
+		float calcValue(float **reference, float **floating, unsigned int numVals, unsigned int numDims) throw(rsgis::math::RSGISMathException);
 		bool findMin(){return true;};
 		~RSGISEuclideanSimilarityMetric(){};
 	};
@@ -51,7 +48,7 @@ namespace rsgis{namespace reg{
 	{
 	public:
 		RSGISManhattanSimilarityMetric(){};
-		float calcValue(float **reference, float **floating, unsigned int numVals, unsigned int numDims) throw(RSGISMathException);
+		float calcValue(float **reference, float **floating, unsigned int numVals, unsigned int numDims) throw(rsgis::math::RSGISMathException);
 		bool findMin(){return true;};
 		~RSGISManhattanSimilarityMetric(){};
 	};
@@ -60,7 +57,7 @@ namespace rsgis{namespace reg{
 	{
 	public:
 		RSGISSquaredDifferenceSimilarityMetric(){};
-		float calcValue(float **reference, float **floating, unsigned int numVals, unsigned int numDims) throw(RSGISMathException);
+		float calcValue(float **reference, float **floating, unsigned int numVals, unsigned int numDims) throw(rsgis::math::RSGISMathException);
 		bool findMin(){return true;};
 		~RSGISSquaredDifferenceSimilarityMetric(){};
 	};
@@ -69,7 +66,7 @@ namespace rsgis{namespace reg{
 	{
 	public:
 		RSGISCorrelationSimilarityMetric(){};
-		float calcValue(float **reference, float **floating, unsigned int numVals, unsigned int numDims) throw(RSGISMathException);
+		float calcValue(float **reference, float **floating, unsigned int numVals, unsigned int numDims) throw(rsgis::math::RSGISMathException);
 		bool findMin(){return false;};
 		~RSGISCorrelationSimilarityMetric(){};
 	};

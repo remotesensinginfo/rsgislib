@@ -41,10 +41,6 @@
 #include "boost/math/special_functions/fpclassify.hpp"
 
 namespace rsgis{namespace reg{
-    
-    using namespace std;
-    using namespace rsgis;
-    using namespace rsgis::img;
 
 	class RSGISBasicImageRegistration : public RSGISImageRegistration
 	{
@@ -53,12 +49,12 @@ namespace rsgis{namespace reg{
 		void initRegistration()throw(RSGISRegistrationException);
 		void executeRegistration()throw(RSGISRegistrationException);
 		void finaliseRegistration()throw(RSGISRegistrationException);
-		void exportTiePointsENVIImage2Map(string filepath)throw(RSGISRegistrationException);
-		void exportTiePointsENVIImage2Image(string filepath)throw(RSGISRegistrationException);
-		void exportTiePointsRSGISImage2Map(string filepath)throw(RSGISRegistrationException);
+		void exportTiePointsENVIImage2Map(std::string filepath)throw(RSGISRegistrationException);
+		void exportTiePointsENVIImage2Image(std::string filepath)throw(RSGISRegistrationException);
+		void exportTiePointsRSGISImage2Map(std::string filepath)throw(RSGISRegistrationException);
 		~RSGISBasicImageRegistration();
 	private:
-		list<TiePoint*> *tiePoints;
+		std::list<TiePoint*> *tiePoints;
 		unsigned int gap;
 		float metricThreshold;
 		bool initExecuted;

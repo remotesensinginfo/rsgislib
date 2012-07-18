@@ -38,13 +38,7 @@
 
 #include "registration/RSGISImageRegistration.h"
 
-
-
 namespace rsgis{namespace reg{
-	
-    using namespace std;
-    using namespace rsgis;
-    using namespace rsgis::img;
     
 	class RSGISSingleConnectLayerImageRegistration : public RSGISImageRegistration
 	{
@@ -53,9 +47,8 @@ namespace rsgis{namespace reg{
 		struct TiePointInSingleLayer
 		{
 			TiePoint *tiePt;
-			list<TiePoint*> *nrTiePts;
+			std::list<TiePoint*> *nrTiePts;
 		};
-		
 		
 		RSGISSingleConnectLayerImageRegistration(GDALDataset *reference, GDALDataset *floating, unsigned int gap, float metricThreshold, unsigned int windowSize, unsigned int searchArea, RSGISImageSimilarityMetric *metric, float stdDevRefThreshold, float stdDevFloatThreshold, unsigned int subPixelResolution, float distanceThreshold, unsigned int maxNumIterations, float moveChangeThreshold, float pSmoothness);
 		void initRegistration()throw(RSGISRegistrationException);
@@ -66,7 +59,7 @@ namespace rsgis{namespace reg{
 		void exportTiePointsRSGISImage2Map(string filepath)throw(RSGISRegistrationException);
 		~RSGISSingleConnectLayerImageRegistration();
 	private:
-		list<TiePointInSingleLayer*> *tiePoints;
+		std::list<TiePointInSingleLayer*> *tiePoints;
 		unsigned int gap;
 		float metricThreshold;
 		bool initExecuted;

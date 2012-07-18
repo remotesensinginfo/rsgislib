@@ -27,7 +27,7 @@
 
 namespace rsgis{namespace reg{
 	
-	float RSGISEuclideanSimilarityMetric::calcValue(float **reference, float **floating, unsigned int numVals, unsigned int numDims) throw(RSGISMathException)
+	float RSGISEuclideanSimilarityMetric::calcValue(float **reference, float **floating, unsigned int numVals, unsigned int numDims) throw(rsgis::math::RSGISMathException)
 	{
 		unsigned int totalNumVals = numDims * numVals;
 		
@@ -47,7 +47,7 @@ namespace rsgis{namespace reg{
 		return sqrt(sqDiff/totalNumVals);
 	}
 	
-	float RSGISSquaredDifferenceSimilarityMetric::calcValue(float **reference, float **floating, unsigned int numVals, unsigned int numDims) throw(RSGISMathException)
+	float RSGISSquaredDifferenceSimilarityMetric::calcValue(float **reference, float **floating, unsigned int numVals, unsigned int numDims) throw(rsgis::math::RSGISMathException)
 	{
 		unsigned int totalNumVals = numDims * numVals;
 		
@@ -67,7 +67,7 @@ namespace rsgis{namespace reg{
 		return sqrt(sqDiff/totalNumVals);
 	}
 	
-	float RSGISManhattanSimilarityMetric::calcValue(float **reference, float **floating, unsigned int numVals, unsigned int numDims) throw(RSGISMathException)
+	float RSGISManhattanSimilarityMetric::calcValue(float **reference, float **floating, unsigned int numVals, unsigned int numDims) throw(rsgis::math::RSGISMathException)
 	{
 		unsigned int totalNumVals = numDims * numVals;
 		
@@ -87,7 +87,7 @@ namespace rsgis{namespace reg{
 		return absDiff/totalNumVals;
 	}
 	
-	float RSGISCorrelationSimilarityMetric::calcValue(float **reference, float **floating, unsigned int numVals, unsigned int numDims) throw(RSGISMathException)
+	float RSGISCorrelationSimilarityMetric::calcValue(float **reference, float **floating, unsigned int numVals, unsigned int numDims) throw(rsgis::math::RSGISMathException)
 	{
 		unsigned int n = numDims * numVals;
 		

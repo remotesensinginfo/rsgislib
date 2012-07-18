@@ -50,17 +50,11 @@
 #include "registration/RSGISGCPImg2MapNode.h"
 
 namespace rsgis{namespace reg{
-
-	using namespace std;
-    using namespace rsgis::img;
-    using namespace rsgis::utils;
-    using namespace rsgis::math;
-    using namespace geos::geom;
     
 	class RSGISWarpImage
 	{
 	public:
-		RSGISWarpImage(string inputImage, string outputImage, string outProjWKT, string gcpFilePath, float outImgRes, RSGISWarpImageInterpolator *interpolator, string gdalFormat);
+		RSGISWarpImage(std::string inputImage, std::string outputImage, std::string outProjWKT, std::string gcpFilePath, float outImgRes, RSGISWarpImageInterpolator *interpolator, std::string gdalFormat);
 		void performWarp() throw(RSGISImageWarpException);
         void generateTransformImage() throw(RSGISImageWarpException);
 		void readGCPFile() throw(RSGISImageWarpException);
@@ -71,16 +65,16 @@ namespace rsgis{namespace reg{
 		virtual void initWarp() throw(RSGISImageWarpException) = 0;
 		virtual ~RSGISWarpImage();
 	protected:
-		virtual Envelope* newImageExtent(unsigned int width, unsigned int height) throw(RSGISImageWarpException) = 0;
+		virtual geos::geom::Envelope* newImageExtent(unsigned int width, unsigned int height) throw(RSGISImageWarpException) = 0;
 		virtual void findNearestPixel(double eastings, double northings, unsigned int *x, unsigned int *y, float inImgRes) throw(RSGISImageWarpException) = 0;
-        string inputImage;
-		string outputImage;
-		string outProjWKT;
-		string gcpFilePath;
-		vector<RSGISGCPImg2MapNode*> *gcps;
+        std::string inputImage;
+		std::string outputImage;
+		std::string outProjWKT;
+		std::string gcpFilePath;
+		std::vector<RSGISGCPImg2MapNode*> *gcps;
 		float outImgRes;
 		RSGISWarpImageInterpolator *interpolator;
-        string gdalFormat;
+        std::string gdalFormat;
 	};
 	
 }}

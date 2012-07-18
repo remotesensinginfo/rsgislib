@@ -29,7 +29,7 @@ namespace rsgis{namespace reg{
 	
 	RSGISSingleConnectLayerImageRegistration::RSGISSingleConnectLayerImageRegistration(GDALDataset *reference, GDALDataset *floating, unsigned int gap, float metricThreshold, unsigned int windowSize, unsigned int searchArea, RSGISImageSimilarityMetric *metric, float stdDevRefThreshold, float stdDevFloatThreshold, unsigned int subPixelResolution, float distanceThreshold, unsigned int maxNumIterations, float moveChangeThreshold, float pSmoothness):RSGISImageRegistration(reference, floating), tiePoints(NULL), gap(1), metricThreshold(0), initExecuted(false), windowSize(0), searchArea(0), metric(NULL), stdDevRefThreshold(0), stdDevFloatThreshold(0), subPixelResolution(0), distanceThreshold(0), maxNumIterations(10), moveChangeThreshold(0), pSmoothness(0)
 	{
-		tiePoints = new list<TiePointInSingleLayer*>();
+		tiePoints = new std::list<TiePointInSingleLayer*>();
 		this->gap = gap;
 		this->metricThreshold = metricThreshold;
 		this->windowSize = windowSize;
@@ -69,9 +69,9 @@ namespace rsgis{namespace reg{
 		unsigned int numXPts = this->overlap->xSize/gap;
 		unsigned int numYPts = this->overlap->ySize/gap;
         
-        cout << numXPts << " columns of tie points will be generated\n";
-        cout << numYPts << " rows of tie points will be generated\n";
-        cout << "Therefore, a total of " << (numXPts * numYPts) << " tie points will be generated\n";
+        std::cout << numXPts << " columns of tie points will be generated\n";
+        std::cout << numYPts << " rows of tie points will be generated\n";
+        std::cout << "Therefore, a total of " << (numXPts * numYPts) << " tie points will be generated\n";
 		
 		unsigned int startXOff = 0;
 		unsigned int startYOff = 0;
@@ -85,9 +85,9 @@ namespace rsgis{namespace reg{
 		double currentNorthings = startNorthings;
 		
 		TiePoint *tmpTiePt = NULL;
-		list<TiePoint*> *tmpTiePts = new list<TiePoint*>();
+		std::list<TiePoint*> *tmpTiePts = new std::list<TiePoint*>();
 		
-		//cout << "Start offset = [" << startXOff << "," << startYOff << "]" << endl;
+		//std::cout << "Start offset = [" << startXOff << "," << startYOff << "]" << std::endl;
 		
 		for(unsigned int i = 0; i < numYPts; ++i)
 		{
@@ -116,16 +116,16 @@ namespace rsgis{namespace reg{
 		
 		this->removeTiePointsWithLowStdDev(tmpTiePts, windowSize, stdDevRefThreshold, stdDevFloatThreshold);
         
-        cout << tmpTiePts->size() << " are remaining following removal of tie points with low standard deviation of image regions\n";
+        std::cout << tmpTiePts->size() << " are remaining following removal of tie points with low standard deviation of image regions\n";
 		
 		TiePointInSingleLayer *tmpTiePtInLayer = NULL;
-		list<TiePoint*>::iterator iterTiePts;
-		list<TiePoint*>::iterator iterNrTiePts;
+		std::list<TiePoint*>::iterator iterTiePts;
+		std::list<TiePoint*>::iterator iterNrTiePts;
 		for(iterTiePts = tmpTiePts->begin(); iterTiePts != tmpTiePts->end(); iterTiePts++)
 		{
 			tmpTiePtInLayer = new TiePointInSingleLayer();
 			tmpTiePtInLayer->tiePt = *iterTiePts;
-			tmpTiePtInLayer->nrTiePts = new list<TiePoint*>();
+			tmpTiePtInLayer->nrTiePts = new std::list<TiePoint*>();
 			
 			for(iterNrTiePts = tmpTiePts->begin(); iterNrTiePts != tmpTiePts->end(); iterNrTiePts++)
 			{
@@ -135,15 +135,13 @@ namespace rsgis{namespace reg{
 				}
 			}
 			
-			
 			tiePoints->push_back(tmpTiePtInLayer);
-			
 		}
 
 		delete tmpTiePts;
 		
 		initExecuted = true;
-        cout << "Initialisation Complete\n";
+        std::cout << "Initialisation Complete\n";
 	}
 	
 	void RSGISSingleConnectLayerImageRegistration::executeRegistration() throw(RSGISRegistrationException)
@@ -161,9 +159,7 @@ namespace rsgis{namespace reg{
 		{
 			feedback = tiePoints->size()/10;
 			giveFeedback = true;
-		}
-		
-		
+		}		
 		
 		float xShift = 0;
 		float yShift = 0;
@@ -177,12 +173,12 @@ namespace rsgis{namespace reg{
 		bool first = true;
 		float prevAverage = 0;
 		
-		list<TiePointInSingleLayer*>::iterator iterTiePts;
-		list<TiePoint*>::iterator iterNrTiePts;
+		std::list<TiePointInSingleLayer*>::iterator iterTiePts;
+		std::list<TiePoint*>::iterator iterNrTiePts;
 		
 		for(unsigned int i = 0; i < maxNumIterations; ++i)
 		{
-			cout << "Started (Iteration " << i << ")." << flush;
+			std::cout << "Started (Iteration " << i << ")." << std::flush;
 			totalMovement = 0;
 			counter = 0;
 			feedbackVal = 0;
@@ -190,11 +186,11 @@ namespace rsgis{namespace reg{
 			{
 				if(giveFeedback && ((counter % feedback) == 0))
 				{
-					cout << "." << feedbackVal << "." << flush;
+					std::cout << "." << feedbackVal << "." << std::flush;
 					feedbackVal += 10;
 				}
 				
-				//cout << "Finding location of tie point " << counter << endl;
+				//std::cout << "Finding location of tie point " << counter << std::endl;
 				totalMovement += this->findTiePointLocation((*iterTiePts)->tiePt, windowSize, searchArea, metric, metricThreshold, subPixelResolution, &xShift, &yShift);
 
 				for(iterNrTiePts = (*iterTiePts)->nrTiePts->begin(); iterNrTiePts != (*iterTiePts)->nrTiePts->end(); ++iterNrTiePts)
@@ -212,16 +208,16 @@ namespace rsgis{namespace reg{
 					xShiftDiff = xShift - (*iterNrTiePts)->xShift;
 					yShiftDiff = yShift - (*iterNrTiePts)->yShift;
 					
-					//cout << "Before = [" << (*iterNrTiePts)->xShift << "," << (*iterNrTiePts)->yShift << "]\n";
+					//std::cout << "Before = [" << (*iterNrTiePts)->xShift << "," << (*iterNrTiePts)->yShift << "]\n";
 					(*iterNrTiePts)->xShift += invDist*xShiftDiff;
 					(*iterNrTiePts)->yShift += invDist*yShiftDiff;
-					//cout << "After = [" << (*iterNrTiePts)->xShift << "," << (*iterNrTiePts)->yShift << "]\n\n";
+					//std::cout << "After = [" << (*iterNrTiePts)->xShift << "," << (*iterNrTiePts)->yShift << "]\n\n";
 				}
 				
 				++counter;
 			}
 			averageMovement = totalMovement/tiePoints->size();
-			cout << ". Complete - Movement = "<< averageMovement << endl;
+			std::cout << ". Complete - Movement = "<< averageMovement << std::endl;
 			if(first)
 			{
 				prevAverage = averageMovement;
@@ -256,7 +252,7 @@ namespace rsgis{namespace reg{
         unsigned int numRMDue2Metric = 0;
         unsigned int numRMDue2ImageExtent = 0;
 		
-		list<TiePointInSingleLayer*>::iterator iterTiePts;
+		std::list<TiePointInSingleLayer*>::iterator iterTiePts;
 		for(iterTiePts = tiePoints->begin(); iterTiePts != tiePoints->end(); )
 		{
 			(*iterTiePts)->tiePt->xFloat -= (*iterTiePts)->tiePt->xShift;
@@ -318,15 +314,15 @@ namespace rsgis{namespace reg{
 			}
 		}
         
-        cout << numRMDue2NaN << " tie points were removed due to the metric having a value of NaN.\n";
-        cout << numRMDue2Metric << " tie points were removed due to the metric being above/below threshold.\n";
-        cout << numRMDue2ImageExtent << " tie points were removed due to being move to a position outside of the image extent.\n";
+        std::cout << numRMDue2NaN << " tie points were removed due to the metric having a value of NaN.\n";
+        std::cout << numRMDue2Metric << " tie points were removed due to the metric being above/below threshold.\n";
+        std::cout << numRMDue2ImageExtent << " tie points were removed due to being move to a position outside of the image extent.\n";
 	}
 	
-	void RSGISSingleConnectLayerImageRegistration::exportTiePointsENVIImage2Map(string filepath)throw(RSGISRegistrationException)
+	void RSGISSingleConnectLayerImageRegistration::exportTiePointsENVIImage2Map(std::string filepath)throw(RSGISRegistrationException)
 	{
-		list<TiePoint*> *tmpTiePts = new list<TiePoint*>();
-		list<TiePointInSingleLayer*>::iterator iterTiePts;
+		std::list<TiePoint*> *tmpTiePts = new std::list<TiePoint*>();
+		std::list<TiePointInSingleLayer*>::iterator iterTiePts;
 		for(iterTiePts = tiePoints->begin(); iterTiePts != tiePoints->end(); ++iterTiePts)
 		{
 			tmpTiePts->push_back((*iterTiePts)->tiePt);
@@ -335,10 +331,10 @@ namespace rsgis{namespace reg{
 		delete tmpTiePts;
 	}
 	
-	void RSGISSingleConnectLayerImageRegistration::exportTiePointsENVIImage2Image(string filepath)throw(RSGISRegistrationException)
+	void RSGISSingleConnectLayerImageRegistration::exportTiePointsENVIImage2Image(std::string filepath)throw(RSGISRegistrationException)
 	{
-		list<TiePoint*> *tmpTiePts = new list<TiePoint*>();
-		list<TiePointInSingleLayer*>::iterator iterTiePts;
+		std::list<TiePoint*> *tmpTiePts = new std::list<TiePoint*>();
+		std::list<TiePointInSingleLayer*>::iterator iterTiePts;
 		for(iterTiePts = tiePoints->begin(); iterTiePts != tiePoints->end(); ++iterTiePts)
 		{
 			tmpTiePts->push_back((*iterTiePts)->tiePt);
@@ -347,10 +343,10 @@ namespace rsgis{namespace reg{
 		delete tmpTiePts;
 	}
 	
-	void RSGISSingleConnectLayerImageRegistration::exportTiePointsRSGISImage2Map(string filepath)throw(RSGISRegistrationException)
+	void RSGISSingleConnectLayerImageRegistration::exportTiePointsRSGISImage2Map(std::string filepath)throw(RSGISRegistrationException)
 	{
-		list<TiePoint*> *tmpTiePts = new list<TiePoint*>();
-		list<TiePointInSingleLayer*>::iterator iterTiePts;
+		std::list<TiePoint*> *tmpTiePts = new std::list<TiePoint*>();
+		std::list<TiePointInSingleLayer*>::iterator iterTiePts;
 		for(iterTiePts = tiePoints->begin(); iterTiePts != tiePoints->end(); ++iterTiePts)
 		{
 			tmpTiePts->push_back((*iterTiePts)->tiePt);
@@ -361,7 +357,7 @@ namespace rsgis{namespace reg{
 	
 	RSGISSingleConnectLayerImageRegistration::~RSGISSingleConnectLayerImageRegistration()
 	{
-		list<TiePointInSingleLayer*>::iterator iterTiePts;
+		std::list<TiePointInSingleLayer*>::iterator iterTiePts;
 		for(iterTiePts = tiePoints->begin(); iterTiePts != tiePoints->end(); )
 		{
 			delete (*iterTiePts)->tiePt;

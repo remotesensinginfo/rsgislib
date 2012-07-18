@@ -45,19 +45,15 @@
 #include "registration/RSGISGCPImg2MapNode.h"
 
 namespace rsgis{namespace reg{
-    
-    using namespace std;
-    using namespace geos::geom;
-    using namespace rsgis::math;
 	
 	class RSGISPolynomialImageWarp : public RSGISWarpImage
 	{
 	public:
-		RSGISPolynomialImageWarp(string inputImage, string outputImage, string outProjWKT, string gcpFilePath, float outImgRes, RSGISWarpImageInterpolator *interpolator, unsigned int polyOrder = 2, string gdalFormat = "ENVI");
+		RSGISPolynomialImageWarp(std::string inputImage, std::string outputImage, std::string outProjWKT, std::string gcpFilePath, float outImgRes, RSGISWarpImageInterpolator *interpolator, unsigned int polyOrder = 2, std::string gdalFormat = "ENVI");
 		void initWarp()throw(RSGISImageWarpException);
 		~RSGISPolynomialImageWarp();
 	protected:
-		Envelope* newImageExtent(unsigned int width, unsigned int height) throw(RSGISImageWarpException);
+		geos::geom::Envelope* newImageExtent(unsigned int width, unsigned int height) throw(RSGISImageWarpException);
 		void findNearestPixel(double eastings, double northings, unsigned int *x, unsigned int *y, float inImgRes) throw(RSGISImageWarpException);
         int polyOrder; // Polynominal order
         gsl_vector *aX;

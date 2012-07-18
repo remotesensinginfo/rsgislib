@@ -39,9 +39,6 @@
 #include "registration/RSGISImageWarpException.h"
 
 namespace rsgis{namespace reg{
-    
-    using namespace std;
-    using namespace rsgis::img;
 	
 	class RSGISWarpImageInterpolator
 	{

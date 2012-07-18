@@ -28,7 +28,7 @@ namespace rsgis{namespace reg{
 	
 	void RSGISWarpImageNNInterpolator::calcValue(GDALDataset *image, float *outValues, unsigned int numOutVals, double eastings, double northings, unsigned int xPxl, unsigned int yPxl, float inImgRes, float outImgRes) throw(RSGISImageWarpException)
 	{
-		RSGISImageUtils imgUtils;
+        rsgis::img::RSGISImageUtils imgUtils;
 		
 		int *dsOffsets = new int[2];
 		dsOffsets[0] = xPxl;
