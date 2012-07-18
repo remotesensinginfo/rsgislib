@@ -29,16 +29,16 @@ namespace rsgis{namespace filter{
     }
     
     // Closing - Input Image
-    void RSGISImageMorphologyTopHat::performBlackTopHat(GDALDataset *dataset, string outputImage, string tempImage, bool useMemory, Matrix *matrixOperator) throw(RSGISImageCalcException, RSGISImageBandException)
+    void RSGISImageMorphologyTopHat::performBlackTopHat(GDALDataset *dataset, string outputImage, string tempImage, bool useMemory, rsgis::math::Matrix *matrixOperator) throw(rsgis::img::RSGISImageCalcException, rsgis::img::RSGISImageBandException)
     {
         try 
         {
             if(matrixOperator->n != matrixOperator->m)
             {
-                throw RSGISImageCalcException("Morphological operator must be a square matrix.");
+                throw rsgis::img::RSGISImageCalcException("Morphological operator must be a square matrix.");
             }
             
-            RSGISImageUtils imgUtils;
+            rsgis::img::RSGISImageUtils imgUtils;
             GDALDataset *outDataset = NULL;
             GDALDataset *tmpDataset = NULL;
             GDALDataset **tmpGDALDataArray = new GDALDataset*[2];
@@ -57,12 +57,12 @@ namespace rsgis{namespace filter{
             imgUtils.zerosFloatGDALDataset(tmpDataset);
             
             
-            RSGISCalcImageValue *imgErode = new RSGISMorphologyErode(dataset->GetRasterCount(), matrixOperator);
-            RSGISCalcImage calcImageErode(imgErode);
-            RSGISCalcImageValue *imgDilate = new RSGISMorphologyDilate(dataset->GetRasterCount(), matrixOperator);
-            RSGISCalcImage calcImageDilate(imgDilate);
-            RSGISCalcImageValue *imgDiff = new RSGISMorphologyImageDiff(dataset->GetRasterCount());
-            RSGISCalcImage calcImageDiff(imgDiff);
+            rsgis::img::RSGISCalcImageValue *imgErode = new RSGISMorphologyErode(dataset->GetRasterCount(), matrixOperator);
+            rsgis::img::RSGISCalcImage calcImageErode(imgErode);
+            rsgis::img::RSGISCalcImageValue *imgDilate = new RSGISMorphologyDilate(dataset->GetRasterCount(), matrixOperator);
+            rsgis::img::RSGISCalcImage calcImageDilate(imgDilate);
+            rsgis::img::RSGISCalcImageValue *imgDiff = new RSGISMorphologyImageDiff(dataset->GetRasterCount());
+            rsgis::img::RSGISCalcImage calcImageDiff(imgDiff);
             
             tmpGDALDataArray[0] = dataset;
             calcImageDilate.calcImageWindowData(tmpGDALDataArray, 1, outDataset, matrixOperator->n);
@@ -83,31 +83,31 @@ namespace rsgis{namespace filter{
             GDALClose(outDataset);
             GDALClose(tmpDataset);
         } 
-        catch (RSGISImageCalcException &e) 
+        catch (rsgis::img::RSGISImageCalcException &e) 
         {
             throw e;
         }
-        catch (RSGISImageBandException &e) 
+        catch (rsgis::img::RSGISImageBandException &e) 
         {
             throw e;
         }
         catch (RSGISImageException &e) 
         {
-            throw RSGISImageCalcException(e.what());
+            throw rsgis::img::RSGISImageCalcException(e.what());
         }
     }
     
     // Input Image - Opening
-    void RSGISImageMorphologyTopHat::performWhiteTopHat(GDALDataset *dataset, string outputImage, string tempImage, bool useMemory, Matrix *matrixOperator) throw(RSGISImageCalcException, RSGISImageBandException)
+    void RSGISImageMorphologyTopHat::performWhiteTopHat(GDALDataset *dataset, string outputImage, string tempImage, bool useMemory, rsgis::math::Matrix *matrixOperator) throw(rsgis::img::RSGISImageCalcException, rsgis::img::RSGISImageBandException)
     {
         try 
         {
             if(matrixOperator->n != matrixOperator->m)
             {
-                throw RSGISImageCalcException("Morphological operator must be a square matrix.");
+                throw rsgis::img::RSGISImageCalcException("Morphological operator must be a square matrix.");
             }
             
-            RSGISImageUtils imgUtils;
+            rsgis::img::RSGISImageUtils imgUtils;
             GDALDataset *outDataset = NULL;
             GDALDataset *tmpDataset = NULL;
             GDALDataset **tmpGDALDataArray = new GDALDataset*[2];
@@ -126,12 +126,12 @@ namespace rsgis{namespace filter{
             imgUtils.zerosFloatGDALDataset(tmpDataset);
             
             
-            RSGISCalcImageValue *imgErode = new RSGISMorphologyErode(dataset->GetRasterCount(), matrixOperator);
-            RSGISCalcImage calcImageErode(imgErode);
-            RSGISCalcImageValue *imgDilate = new RSGISMorphologyDilate(dataset->GetRasterCount(), matrixOperator);
-            RSGISCalcImage calcImageDilate(imgDilate);
-            RSGISCalcImageValue *imgDiff = new RSGISMorphologyImageDiff(dataset->GetRasterCount());
-            RSGISCalcImage calcImageDiff(imgDiff);
+            rsgis::img::RSGISCalcImageValue *imgErode = new RSGISMorphologyErode(dataset->GetRasterCount(), matrixOperator);
+            rsgis::img::RSGISCalcImage calcImageErode(imgErode);
+            rsgis::img::RSGISCalcImageValue *imgDilate = new RSGISMorphologyDilate(dataset->GetRasterCount(), matrixOperator);
+            rsgis::img::RSGISCalcImage calcImageDilate(imgDilate);
+            rsgis::img::RSGISCalcImageValue *imgDiff = new RSGISMorphologyImageDiff(dataset->GetRasterCount());
+            rsgis::img::RSGISCalcImage calcImageDiff(imgDiff);
             
             tmpGDALDataArray[0] = dataset;
             calcImageErode.calcImageWindowData(tmpGDALDataArray, 1, outDataset, matrixOperator->n);
@@ -152,17 +152,17 @@ namespace rsgis{namespace filter{
             GDALClose(outDataset);
             GDALClose(tmpDataset);
         } 
-        catch (RSGISImageCalcException &e) 
+        catch (rsgis::img::RSGISImageCalcException &e) 
         {
             throw e;
         }
-        catch (RSGISImageBandException &e) 
+        catch (rsgis::img::RSGISImageBandException &e) 
         {
             throw e;
         }
         catch (RSGISImageException &e) 
         {
-            throw RSGISImageCalcException(e.what());
+            throw rsgis::img::RSGISImageCalcException(e.what());
         }
     }
     
@@ -177,11 +177,11 @@ namespace rsgis{namespace filter{
 
 	}
     
-	void RSGISMorphologyImageDiff::calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException)
+	void RSGISMorphologyImageDiff::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
 	{        
         if((numBands/2) != this->numOutBands)
         {
-            throw RSGISImageCalcException("Expecting twice as many input bands as output.");
+            throw rsgis::img::RSGISImageCalcException("Expecting twice as many input bands as output.");
         }
         
 		for(int b = 0; b < this->numOutBands; b++)

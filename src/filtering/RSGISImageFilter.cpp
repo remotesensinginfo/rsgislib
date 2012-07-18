@@ -24,15 +24,15 @@
 
 namespace rsgis{namespace filter{
 
-	RSGISImageFilter::RSGISImageFilter(int numberOutBands, int size, string filenameEnding) : RSGISCalcImageValue(numberOutBands)
+	RSGISImageFilter::RSGISImageFilter(int numberOutBands, int size, std::string filenameEnding) : rsgis::img::RSGISCalcImageValue(numberOutBands)
 	{
 		this->size = size;
 		this->filenameEnding = filenameEnding;
 	}
 	
-	void RSGISImageFilter::runFilter(GDALDataset **datasets, int numDS, string outputImage) throw(RSGISImageException)
+	void RSGISImageFilter::runFilter(GDALDataset **datasets, int numDS, std::string outputImage) throw(rsgis::RSGISImageException)
 	{
-		RSGISCalcImage* calcImage = this->getCalcImage();
+		rsgis::img::RSGISCalcImage* calcImage = this->getCalcImage();
 		try
 		{
 			calcImage->calcImageWindowData(datasets, numDS, outputImage, this->size);
@@ -45,32 +45,32 @@ namespace rsgis{namespace filter{
 		}
 	}
 	
-	RSGISCalcImage* RSGISImageFilter::getCalcImage() throw(RSGISImageException)
+	rsgis::img::RSGISCalcImage* RSGISImageFilter::getCalcImage() throw(RSGISImageException)
 	{
-		return new RSGISCalcImage(this, "", true);
+		return new rsgis::img::RSGISCalcImage(this, "", true);
 	}
 	
-	void RSGISImageFilter::calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException)
+	void RSGISImageFilter::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
 	{
-		throw RSGISImageCalcException("Function not implemented");
+		throw rsgis::img::RSGISImageCalcException("Function not implemented");
 	}
 	
-	void RSGISImageFilter::calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException)
+	void RSGISImageFilter::calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException)
 	{
-		throw RSGISImageCalcException("Function not implemented");
+		throw rsgis::img::RSGISImageCalcException("Function not implemented");
 	}
 	
-	void RSGISImageFilter::calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException)
+	void RSGISImageFilter::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException)
 	{
-		throw RSGISImageCalcException("Not Implemented");
+		throw rsgis::img::RSGISImageCalcException("Not Implemented");
 	}
 	
-	void RSGISImageFilter::calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException)
+	void RSGISImageFilter::calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException)
 	{
-		throw RSGISImageCalcException("Function not implemented");
+		throw rsgis::img::RSGISImageCalcException("Function not implemented");
 	}
 	
-	string RSGISImageFilter::getFileNameEnding()
+	std::string RSGISImageFilter::getFileNameEnding()
 	{
 		return this->filenameEnding;
 	}

@@ -26,8 +26,6 @@
 #include <iostream>
 #include "filtering/RSGISImageFilterException.h"
 
-using namespace std;
-
 namespace rsgis{namespace filter{
 	
 	class RSGISCalcFilter

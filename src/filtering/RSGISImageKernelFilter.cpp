@@ -29,11 +29,11 @@ namespace rsgis{namespace filter{
 		this->filter = filter;
 	}
 	
-	void RSGISImageKernelFilter::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException)
+	void RSGISImageKernelFilter::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
 	{		
 		if(winSize != size)
 		{
-			throw RSGISImageCalcException("Filter Size and window size do not match.");
+			throw rsgis::img::RSGISImageCalcException("Filter Size and window size do not match.");
 		}
 		
 		//dataBlock[i][j][k]; i = band; j = y axis; k = x axis
@@ -52,9 +52,9 @@ namespace rsgis{namespace filter{
 		}
 	}
 	
-	bool RSGISImageKernelFilter::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException)
+	bool RSGISImageKernelFilter::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
 	{
-		throw RSGISImageCalcException("Not implemented");
+		throw rsgis::img::RSGISImageCalcException("Not implemented");
 	}
 
 	void RSGISImageKernelFilter::exportAsImage(string filename) throw(RSGISImageFilterException)
@@ -85,7 +85,7 @@ namespace rsgis{namespace filter{
 				outputRasterBand->RasterIO(GF_Write, 0, i, filter->size, 1, outputData, filter->size, 1, GDT_Float32, 0, 0);
 			}	
 		}
-		catch(RSGISImageException e)
+		catch(rsgis::RSGISImageException e)
 		{
 			if(outputData == NULL)
 			{

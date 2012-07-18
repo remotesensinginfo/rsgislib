@@ -28,8 +28,6 @@
 #include "filtering/RSGISImageFilterException.h"
 #include "filtering/RSGISCalcFilter.h"
 
-using namespace std;
-
 namespace rsgis{namespace filter{
 	
 	class RSGISCalcLapacianFilter : public RSGISCalcFilter

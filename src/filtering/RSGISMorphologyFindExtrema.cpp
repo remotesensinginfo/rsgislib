@@ -29,49 +29,49 @@ namespace rsgis{namespace filter{
         
 	}
     
-    void RSGISImageMorphologyFindExtrema::findMinima(GDALDataset **datasets, string outputImage, Matrix *matrixOperator, RSGISMinimaOutputs outputType, bool allowEquals) throw(RSGISImageCalcException, RSGISImageBandException)
+    void RSGISImageMorphologyFindExtrema::findMinima(GDALDataset **datasets, std::string outputImage, rsgis::math::Matrix *matrixOperator, RSGISMinimaOutputs outputType, bool allowEquals) throw(rsgis::img::RSGISImageCalcException, rsgis::img::RSGISImageBandException)
 	{
         if(matrixOperator->n != matrixOperator->m)
         {
-            throw RSGISImageCalcException("Morphological operator must be a square matrix.");
+            throw rsgis::img::RSGISImageCalcException("Morphological operator must be a square matrix.");
         }
         
 		int numBands = datasets[0]->GetRasterCount();
 		RSGISMorphologyFindLocalMinima *findMinima = new RSGISMorphologyFindLocalMinima(numBands, matrixOperator, outputType, allowEquals);
-		RSGISCalcImage calcImg = RSGISCalcImage(findMinima, "", true);
+		rsgis::img::RSGISCalcImage calcImg = rsgis::img::RSGISCalcImage(findMinima, "", true);
         try 
         {
             calcImg.calcImageWindowData(datasets, 1, outputImage, matrixOperator->n);
         }
-        catch(RSGISImageCalcException &e)
+        catch(rsgis::img::RSGISImageCalcException &e)
         {
             throw e;
         }
-        catch(RSGISImageBandException &e)
+        catch(rsgis::img::RSGISImageBandException &e)
         {
             throw e;
         }
         delete findMinima;
 	}
     
-    void RSGISImageMorphologyFindExtrema::findMinimaAll(GDALDataset **datasets, string outputImage, Matrix *matrixOperator, RSGISMinimaOutputs outputType, bool allowEquals) throw(RSGISImageCalcException, RSGISImageBandException)
+    void RSGISImageMorphologyFindExtrema::findMinimaAll(GDALDataset **datasets, string outputImage, rsgis::math::Matrix *matrixOperator, RSGISMinimaOutputs outputType, bool allowEquals) throw(rsgis::img::RSGISImageCalcException, rsgis::img::RSGISImageBandException)
 	{
         if(matrixOperator->n != matrixOperator->m)
         {
-            throw RSGISImageCalcException("Morphological operator must be a square matrix.");
+            throw rsgis::img::RSGISImageCalcException("Morphological operator must be a square matrix.");
         }
         
 		RSGISMorphologyFindLocalMinimaAll *findMinima = new RSGISMorphologyFindLocalMinimaAll(1, matrixOperator, outputType, allowEquals);
-		RSGISCalcImage calcImg = RSGISCalcImage(findMinima, "", true);
+		rsgis::img::RSGISCalcImage calcImg = rsgis::img::RSGISCalcImage(findMinima, "", true);
         try 
         {
             calcImg.calcImageWindowData(datasets, 1, outputImage, matrixOperator->n);
         }
-        catch(RSGISImageCalcException &e)
+        catch(rsgis::img::RSGISImageCalcException &e)
         {
             throw e;
         }
-        catch(RSGISImageBandException &e)
+        catch(rsgis::img::RSGISImageBandException &e)
         {
             throw e;
         }
@@ -79,7 +79,7 @@ namespace rsgis{namespace filter{
 	}
     
     
-	RSGISMorphologyFindLocalMinima::RSGISMorphologyFindLocalMinima(int numberOutBands, Matrix *matrixOperator, RSGISImageMorphologyFindExtrema::RSGISMinimaOutputs outputType, bool allowEquals) : RSGISCalcImageValue(numberOutBands)
+	RSGISMorphologyFindLocalMinima::RSGISMorphologyFindLocalMinima(int numberOutBands, rsgis::math::Matrix *matrixOperator, RSGISImageMorphologyFindExtrema::RSGISMinimaOutputs outputType, bool allowEquals) : rsgis::img::RSGISCalcImageValue(numberOutBands)
 	{
         this->matrixOperator = matrixOperator;
         this->outputType = outputType;
@@ -91,7 +91,7 @@ namespace rsgis{namespace filter{
         }
 	}
     
-	void RSGISMorphologyFindLocalMinima::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException)
+	void RSGISMorphologyFindLocalMinima::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
 	{
         int cPxlIdx = ((winSize-1)/2);
 		float *values = new float[numBands];
@@ -176,7 +176,7 @@ namespace rsgis{namespace filter{
 		delete[] outVal;
 	}
     
-    RSGISMorphologyFindLocalMinimaAll::RSGISMorphologyFindLocalMinimaAll(int numberOutBands, Matrix *matrixOperator, RSGISImageMorphologyFindExtrema::RSGISMinimaOutputs outputType, bool allowEquals) : RSGISCalcImageValue(numberOutBands)
+    RSGISMorphologyFindLocalMinimaAll::RSGISMorphologyFindLocalMinimaAll(int numberOutBands, rsgis::math::Matrix *matrixOperator, RSGISImageMorphologyFindExtrema::RSGISMinimaOutputs outputType, bool allowEquals) : rsgis::img::RSGISCalcImageValue(numberOutBands)
 	{
         this->matrixOperator = matrixOperator;
         this->outputType = outputType;
@@ -184,7 +184,7 @@ namespace rsgis{namespace filter{
         this->outVal = 1;
 	}
     
-	void RSGISMorphologyFindLocalMinimaAll::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException)
+	void RSGISMorphologyFindLocalMinimaAll::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		int cPxlIdx = ((winSize-1)/2);
 		float value = 0;

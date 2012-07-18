@@ -29,61 +29,61 @@ namespace rsgis{namespace filter{
         
 	}
     
-	void RSGISImageMorphologyGradient::calcGradientImage(GDALDataset **datasets, string outputImage, Matrix *matrixOperator) throw(RSGISImageCalcException, RSGISImageBandException)
+	void RSGISImageMorphologyGradient::calcGradientImage(GDALDataset **datasets, std::string outputImage, rsgis::math::Matrix *matrixOperator) throw(rsgis::img::RSGISImageCalcException, rsgis::img::RSGISImageBandException)
 	{
         if(matrixOperator->n != matrixOperator->m)
         {
-            throw RSGISImageCalcException("Morphological operator must be a square matrix.");
+            throw rsgis::img::RSGISImageCalcException("Morphological operator must be a square matrix.");
         }
         
 		int numBands = datasets[0]->GetRasterCount();
 		RSGISMorphologyGradient *gradImage = new RSGISMorphologyGradient(numBands, matrixOperator);
-		RSGISCalcImage calcImg = RSGISCalcImage(gradImage, "", true); // creates the calc that we are going to do
+		rsgis::img::RSGISCalcImage calcImg = rsgis::img::RSGISCalcImage(gradImage, "", true); // creates the calc that we are going to do
         try
         {
             calcImg.calcImageWindowData(datasets, 1, outputImage, matrixOperator->n);
         }
-        catch(RSGISImageCalcException &e)
+        catch(rsgis::img::RSGISImageCalcException &e)
         {
             throw e;
         }
-        catch(RSGISImageBandException &e)
+        catch(rsgis::img::RSGISImageBandException &e)
         {
             throw e;
         }
         delete gradImage;
 	}
     
-    void RSGISImageMorphologyGradient::calcGradientImageAll(GDALDataset **datasets, string outputImage, Matrix *matrixOperator) throw(RSGISImageCalcException, RSGISImageBandException)
+    void RSGISImageMorphologyGradient::calcGradientImageAll(GDALDataset **datasets, string outputImage, rsgis::math::Matrix *matrixOperator) throw(rsgis::img::RSGISImageCalcException, rsgis::img::RSGISImageBandException)
 	{
         if(matrixOperator->n != matrixOperator->m)
         {
-            throw RSGISImageCalcException("Morphological operator must be a square matrix.");
+            throw rsgis::img::RSGISImageCalcException("Morphological operator must be a square matrix.");
         }
         
 		RSGISMorphologyGradientAll *gradImage = new RSGISMorphologyGradientAll(1, matrixOperator);
-		RSGISCalcImage calcImg = RSGISCalcImage(gradImage, "", true);
+		rsgis::img::RSGISCalcImage calcImg = rsgis::img::RSGISCalcImage(gradImage, "", true);
         try
         {
             calcImg.calcImageWindowData(datasets, 1, outputImage, matrixOperator->n);
         }
-        catch(RSGISImageCalcException &e)
+        catch(rsgis::img::RSGISImageCalcException &e)
         {
             throw e;
         }
-        catch(RSGISImageBandException &e)
+        catch(rsgis::img::RSGISImageBandException &e)
         {
             throw e;
         }
         delete gradImage;
 	}
     
-	RSGISMorphologyGradient::RSGISMorphologyGradient(int numberOutBands, Matrix *matrixOperator) : RSGISCalcImageValue(numberOutBands)
+	RSGISMorphologyGradient::RSGISMorphologyGradient(int numberOutBands, rsgis::math::Matrix *matrixOperator) : rsgis::img::RSGISCalcImageValue(numberOutBands)
 	{
         this->matrixOperator = matrixOperator;
 	}
 	
-	void RSGISMorphologyGradient::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException)
+	void RSGISMorphologyGradient::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		bool first = true;
 		double *largest = new double[numBands];
@@ -140,12 +140,12 @@ namespace rsgis{namespace filter{
 		
 	}
     
-    RSGISMorphologyGradientAll::RSGISMorphologyGradientAll(int numberOutBands, Matrix *matrixOperator) : RSGISCalcImageValue(numberOutBands)
+    RSGISMorphologyGradientAll::RSGISMorphologyGradientAll(int numberOutBands, rsgis::math::Matrix *matrixOperator) : rsgis::img::RSGISCalcImageValue(numberOutBands)
 	{
         this->matrixOperator = matrixOperator;
 	}
 	
-	void RSGISMorphologyGradientAll::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException)
+	void RSGISMorphologyGradientAll::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		bool first = true;
 		double largest = 0;

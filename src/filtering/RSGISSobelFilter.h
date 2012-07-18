@@ -32,13 +32,9 @@
 #include "img/RSGISCalcImageValue.h"
 #include "filtering/RSGISImageFilter.h"
 
-using namespace rsgis;
-using namespace rsgis::img;
 
 namespace rsgis{namespace filter{
-	
-	
-	
+		
 	class RSGISSobelFilter : public RSGISImageFilter
 		{
 		public: 
@@ -50,10 +46,10 @@ namespace rsgis{namespace filter{
 				xy
 			};			
 			
-			RSGISSobelFilter(int numberOutBands, int size, string filenameEnding, FilterDirection filterType);
-			virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException);
-			virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException);
-			virtual void exportAsImage(string filename) throw(RSGISImageFilterException);
+			RSGISSobelFilter(int numberOutBands, int size, std::string filenameEnding, FilterDirection filterType);
+			virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException);
+			virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException);
+			virtual void exportAsImage(std::string filename) throw(RSGISImageFilterException);
 			~RSGISSobelFilter();
 		protected:
 			FilterDirection filterType;

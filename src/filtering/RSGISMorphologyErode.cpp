@@ -29,61 +29,61 @@ namespace rsgis{namespace filter{
 
 	}
 
-	void RSGISImageMorphologyErode::erodeImage(GDALDataset **datasets, string outputImage, Matrix *matrixOperator) throw(RSGISImageCalcException, RSGISImageBandException)
+	void RSGISImageMorphologyErode::erodeImage(GDALDataset **datasets, std::string outputImage, rsgis::math::Matrix *matrixOperator) throw(rsgis::img::RSGISImageCalcException, rsgis::img::RSGISImageBandException)
 	{
         if(matrixOperator->n != matrixOperator->m)
         {
-            throw RSGISImageCalcException("Morphological operator must be a square matrix.");
+            throw rsgis::img::RSGISImageCalcException("Morphological operator must be a square matrix.");
         }
         
 		int numBands = datasets[0]->GetRasterCount();
 		RSGISMorphologyErode *erodeImage = new RSGISMorphologyErode(numBands, matrixOperator);
-		RSGISCalcImage calcImg = RSGISCalcImage(erodeImage, "", true);
+		rsgis::img::RSGISCalcImage calcImg = rsgis::img::RSGISCalcImage(erodeImage, "", true);
         try 
         {
             calcImg.calcImageWindowData(datasets, 1, outputImage, matrixOperator->n);
         }
-        catch(RSGISImageCalcException &e)
+        catch(rsgis::img::RSGISImageCalcException &e)
         {
             throw e;
         }
-        catch(RSGISImageBandException &e)
+        catch(rsgis::img::RSGISImageBandException &e)
         {
             throw e;
         }
         delete erodeImage;
 	}
     
-    void RSGISImageMorphologyErode::erodeImageAll(GDALDataset **datasets, string outputImage, Matrix *matrixOperator) throw(RSGISImageCalcException, RSGISImageBandException)
+    void RSGISImageMorphologyErode::erodeImageAll(GDALDataset **datasets, std::string outputImage, rsgis::math::Matrix *matrixOperator) throw(rsgis::img::RSGISImageCalcException, rsgis::img::RSGISImageBandException)
 	{
         if(matrixOperator->n != matrixOperator->m)
         {
-            throw RSGISImageCalcException("Morphological operator must be a square matrix.");
+            throw rsgis::img::RSGISImageCalcException("Morphological operator must be a square matrix.");
         }
         
 		RSGISMorphologyErodeAll *erodeImage = new RSGISMorphologyErodeAll(1, matrixOperator);
-		RSGISCalcImage calcImg = RSGISCalcImage(erodeImage, "", true);
+		rsgis::img::RSGISCalcImage calcImg = rsgis::img::RSGISCalcImage(erodeImage, "", true);
         try 
         {
             calcImg.calcImageWindowData(datasets, 1, outputImage, matrixOperator->n);
         }
-        catch(RSGISImageCalcException &e)
+        catch(rsgis::img::RSGISImageCalcException &e)
         {
             throw e;
         }
-        catch(RSGISImageBandException &e)
+        catch(rsgis::img::RSGISImageBandException &e)
         {
             throw e;
         }
         delete erodeImage;
 	}
 
-	RSGISMorphologyErode::RSGISMorphologyErode(int numberOutBands, Matrix *matrixOperator) : RSGISCalcImageValue(numberOutBands)
+	RSGISMorphologyErode::RSGISMorphologyErode(int numberOutBands, rsgis::math::Matrix *matrixOperator) : rsgis::img::RSGISCalcImageValue(numberOutBands)
 	{
         this->matrixOperator = matrixOperator;
 	}
 
-	void RSGISMorphologyErode::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException)
+	void RSGISMorphologyErode::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		bool first = true;
 		double *smallest = new double[numBands];
@@ -133,12 +133,12 @@ namespace rsgis{namespace filter{
 		
 	}
     
-    RSGISMorphologyErodeAll::RSGISMorphologyErodeAll(int numberOutBands, Matrix *matrixOperator) : RSGISCalcImageValue(numberOutBands)
+    RSGISMorphologyErodeAll::RSGISMorphologyErodeAll(int numberOutBands, rsgis::math::Matrix *matrixOperator) : rsgis::img::RSGISCalcImageValue(numberOutBands)
 	{
         this->matrixOperator = matrixOperator;
 	}
     
-	void RSGISMorphologyErodeAll::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException)
+	void RSGISMorphologyErodeAll::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		bool first = true;
 		double smallest = 0;
