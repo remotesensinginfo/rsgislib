@@ -47,7 +47,7 @@ void RSGISExeTransectModel::retrieveParameters(DOMElement *argElement) throw(RSG
 	 * READ IN VARIABLES FROM XML * 
 	 ******************************/
 	
-	RSGISMathsUtils mathUtils;
+	rsgis::math::RSGISMathsUtils mathUtils;
 	XMLCh *algorName = XMLString::transcode(this->algorithm.c_str());
 	
 	// Options
@@ -1353,26 +1353,26 @@ void RSGISExeTransectModel::runAlgorithm() throw(RSGISException)
 			transect->setZero();
 			
 			RSGISModelTreeCanopy *treeCanopy = NULL; // Set up canopy model
-			RSGISProbDistNeymanTypeA *stemDistro = NULL; // Set up stem distro
-			RSGISRandDistroGaussian *posDistroX = NULL; // Set up stem position offset distrobution
-			RSGISRandDistroGaussian *posDistroY = NULL; // Set up stem position offset distrobution
+			rsgis::math::RSGISProbDistNeymanTypeA *stemDistro = NULL; // Set up stem distro
+			rsgis::math::RSGISProbDistNeymanTypeA *posDistroX = NULL; // Set up stem position offset distrobution
+			rsgis::math::RSGISProbDistNeymanTypeA *posDistroY = NULL; // Set up stem position offset distrobution
 			
 			vector <double> *modelPar = new vector<double>; // Set up vector to hold model parameters
 			
 			// Set up tree distrobutions
-			RSGISRandDistroGaussian *leafPosHDistro = NULL;
-			RSGISRandDistroUniformInt *leafPosVDistro = NULL;
-			RSGISRandDistroGaussian *leafThetaDistro = NULL;
-			RSGISRandDistroGaussian *smallBranchPosHDistro = NULL;
-			RSGISRandDistroUniformInt *smallBranchPosVDistro = NULL;
-			RSGISRandDistroGaussian *smallBranchThetaDistro = NULL;
-			RSGISRandDistroUniformInt *smallBranchPhiDistro = NULL;
-			RSGISRandDistroGaussian *largeBranchPosHDistro = NULL;
-			RSGISRandDistroGamma *largeBranchPosVDistro = NULL;
-			RSGISRandDistroGaussian *largeBranchThetaDistro = NULL;
-			RSGISRandDistroUniformInt *largeBranchPhiDistro = NULL;
+			rsgis::math::RSGISProbDistNeymanTypeA *leafPosHDistro = NULL;
+			rsgis::math::RSGISRandDistroUniformInt *leafPosVDistro = NULL;
+			rsgis::math::RSGISProbDistNeymanTypeA *leafThetaDistro = NULL;
+			rsgis::math::RSGISProbDistNeymanTypeA *smallBranchPosHDistro = NULL;
+			rsgis::math::RSGISRandDistroUniformInt *smallBranchPosVDistro = NULL;
+			rsgis::math::RSGISProbDistNeymanTypeA *smallBranchThetaDistro = NULL;
+			rsgis::math::RSGISRandDistroUniformInt *smallBranchPhiDistro = NULL;
+			rsgis::math::RSGISProbDistNeymanTypeA *largeBranchPosHDistro = NULL;
+			rsgis::math::RSGISRandDistroGamma *largeBranchPosVDistro = NULL;
+			rsgis::math::RSGISProbDistNeymanTypeA *largeBranchThetaDistro = NULL;
+			rsgis::math::RSGISRandDistroUniformInt *largeBranchPhiDistro = NULL;
 			
-			if (species == aHarpophylla) 
+			if (species == rsgis::utils::aHarpophylla) 
 			{
 				// Get tree parameters
 				RSGISAcaciaHarpophylla *bgl = NULL;
@@ -1401,17 +1401,17 @@ void RSGISExeTransectModel::runAlgorithm() throw(RSGISException)
 				modelPar->push_back(largeBranchDensity);
 				
 				// Set up tree distrobutions
-				leafPosHDistro = new RSGISRandDistroGaussian(0, (smallBranchLenght / transectRes)/2); // Distribution of leaf loctions (horizontal)
-				leafPosVDistro = new RSGISRandDistroUniformInt((smallBranchLenght / transectRes)/-4, (smallBranchLenght / transectRes)/4);
-				leafThetaDistro = new RSGISRandDistroGaussian(-6, 93); // Distribution of leaf incidence angles
-				smallBranchPosHDistro = new RSGISRandDistroGaussian(0, (smallBranchLenght / transectRes)); // Distribution of small branch locations (horizontal)
-				smallBranchPosVDistro = new RSGISRandDistroUniformInt((smallBranchLenght / transectRes)/-4, (smallBranchLenght / transectRes)/4);
-				smallBranchThetaDistro = new RSGISRandDistroGaussian(72, 40); // Distribution of small branch incidence angles
-				smallBranchPhiDistro = new RSGISRandDistroUniformInt(0,90); // Distribution of small branch angles into the incidence plane
-				largeBranchPosHDistro = new RSGISRandDistroGaussian(0, 50); // Distribution of large branch positions (horizontal)
-				largeBranchPosVDistro = new RSGISRandDistroGamma(1, 0.1); // Distribution of large branch positions (vertical)
-				largeBranchThetaDistro = new RSGISRandDistroGaussian(60, 40); // Distribution of large branch incidence angles
-				largeBranchPhiDistro = new RSGISRandDistroUniformInt(0,360); // Distribution of large branch angles into the incidence plane
+				leafPosHDistro = new rsgis::math::RSGISProbDistNeymanTypeA(0, (smallBranchLenght / transectRes)/2); // Distribution of leaf loctions (horizontal)
+				leafPosVDistro = new rsgis::math::RSGISRandDistroUniformInt((smallBranchLenght / transectRes)/-4, (smallBranchLenght / transectRes)/4);
+				leafThetaDistro = new rsgis::math::RSGISProbDistNeymanTypeA(-6, 93); // Distribution of leaf incidence angles
+				smallBranchPosHDistro = new rsgis::math::RSGISProbDistNeymanTypeA(0, (smallBranchLenght / transectRes)); // Distribution of small branch locations (horizontal)
+				smallBranchPosVDistro = new rsgis::math::RSGISRandDistroUniformInt((smallBranchLenght / transectRes)/-4, (smallBranchLenght / transectRes)/4);
+				smallBranchThetaDistro = new rsgis::math::RSGISProbDistNeymanTypeA(72, 40); // Distribution of small branch incidence angles
+				smallBranchPhiDistro = new rsgis::math::RSGISRandDistroUniformInt(0,90); // Distribution of small branch angles into the incidence plane
+				largeBranchPosHDistro = new rsgis::math::RSGISProbDistNeymanTypeA(0, 50); // Distribution of large branch positions (horizontal)
+				largeBranchPosVDistro = new rsgis::math::RSGISRandDistroGamma(1, 0.1); // Distribution of large branch positions (vertical)
+				largeBranchThetaDistro = new rsgis::math::RSGISProbDistNeymanTypeA(60, 40); // Distribution of large branch incidence angles
+				largeBranchPhiDistro = new rsgis::math::RSGISRandDistroUniformInt(0,360); // Distribution of large branch angles into the incidence plane
 				
 				// Set up canopy model
 				treeCanopy = new RSGISModelTreeCanopy(modelPar, leafPosHDistro, leafPosVDistro, leafThetaDistro,smallBranchPosHDistro, smallBranchPosVDistro, smallBranchThetaDistro, smallBranchPhiDistro, largeBranchPosHDistro, largeBranchPosVDistro, largeBranchThetaDistro, largeBranchPhiDistro);
@@ -1419,9 +1419,9 @@ void RSGISExeTransectModel::runAlgorithm() throw(RSGISException)
 				// Set up stem distrobution
 				int neyManA = 4;
 				int neyManB = (transectLenght / 2) / neyManA;
-				stemDistro = new RSGISProbDistNeymanTypeA(neyManA,neyManB);
-				posDistroX = new RSGISRandDistroGaussian(0, (transectWidth / this->transectRes)/ 3);
-				posDistroY = new RSGISRandDistroGaussian(0, (this->quadratSize / this->transectRes) / 1);
+				stemDistro = new rsgis::math::RSGISProbDistNeymanTypeA(neyManA,neyManB);
+				posDistroX = new rsgis::math::RSGISProbDistNeymanTypeA(0, (transectWidth / this->transectRes)/ 3);
+				posDistroY = new rsgis::math::RSGISProbDistNeymanTypeA(0, (this->quadratSize / this->transectRes) / 1);
 			}
 			else 
 			{
@@ -1525,23 +1525,23 @@ void RSGISExeTransectModel::runAlgorithm() throw(RSGISException)
 			transect->setZero();
 			
 			RSGISModelTreeCanopy *treeCanopy = NULL; // Set up canopy model
-			RSGISProbDistNeymanTypeA *stemDistro = NULL; // Set up stem distro
-			RSGISPsudoRandDistroUniformInt *posDistroX = NULL; // Set up stem position offset distrobution
-			RSGISPsudoRandDistroUniformInt *posDistroY = NULL; // Set up stem position offset distrobution
+			rsgis::math::RSGISProbDistNeymanTypeA *stemDistro = NULL; // Set up stem distro
+			rsgis::math::RSGISPsudoRandDistroUniformInt *posDistroX = NULL; // Set up stem position offset distrobution
+			rsgis::math::RSGISPsudoRandDistroUniformInt *posDistroY = NULL; // Set up stem position offset distrobution
 			vector <double> *modelPar = new vector<double>; // Set up vector to hold model parameters
 			
 			// Set up tree distrobutions
-			RSGISPsudoRandDistroGaussian *leafPosHDistro = NULL;
-			RSGISPsudoRandDistroUniformInt *leafPosVDistro = NULL;
-			RSGISPsudoRandDistroGaussian *leafThetaDistro = NULL;
-			RSGISPsudoRandDistroGaussian *smallBranchPosHDistro = NULL;
-			RSGISPsudoRandDistroUniformInt *smallBranchPosVDistro = NULL;
-			RSGISPsudoRandDistroGaussian *smallBranchThetaDistro = NULL;
-			RSGISPsudoRandDistroUniformInt *smallBranchPhiDistro = NULL;
-			RSGISPsudoRandDistroGaussian *largeBranchPosHDistro = NULL;
-			RSGISPsudoRandDistroGamma *largeBranchPosVDistro = NULL;
-			RSGISPsudoRandDistroGaussian *largeBranchThetaDistro = NULL;
-			RSGISPsudoRandDistroUniformInt *largeBranchPhiDistro = NULL;
+			rsgis::math::RSGISPsudoRandDistroGaussian *leafPosHDistro = NULL;
+			rsgis::math::RSGISPsudoRandDistroUniformInt *leafPosVDistro = NULL;
+			rsgis::math::RSGISPsudoRandDistroGaussian *leafThetaDistro = NULL;
+			rsgis::math::RSGISPsudoRandDistroGaussian *smallBranchPosHDistro = NULL;
+			rsgis::math::RSGISPsudoRandDistroUniformInt *smallBranchPosVDistro = NULL;
+			rsgis::math::RSGISPsudoRandDistroGaussian *smallBranchThetaDistro = NULL;
+			rsgis::math::RSGISPsudoRandDistroUniformInt *smallBranchPhiDistro = NULL;
+			rsgis::math::RSGISPsudoRandDistroGaussian *largeBranchPosHDistro = NULL;
+			rsgis::math::RSGISPsudoRandDistroGamma *largeBranchPosVDistro = NULL;
+			rsgis::math::RSGISPsudoRandDistroGaussian *largeBranchThetaDistro = NULL;
+			rsgis::math::RSGISPsudoRandDistroUniformInt *largeBranchPhiDistro = NULL;
 			
 			if (species == aHarpophylla) 
 			{
@@ -1572,17 +1572,17 @@ void RSGISExeTransectModel::runAlgorithm() throw(RSGISException)
 				modelPar->push_back(largeBranchDensity);
 				
 				// Set up tree distrobutions
-				leafPosHDistro = new RSGISPsudoRandDistroGaussian(0, (smallBranchLenght / transectRes)/2); // Distribution of leaf loctions (horizontal);
-				leafPosVDistro = new RSGISPsudoRandDistroUniformInt((smallBranchLenght / transectRes)/-4, (smallBranchLenght / transectRes)/4);
-				leafThetaDistro = new RSGISPsudoRandDistroGaussian(-6, 93); // Distribution of leaf incidence angles
-				smallBranchPosHDistro = new RSGISPsudoRandDistroGaussian(0, (smallBranchLenght / transectRes)); // Distribution of small branch locations (horizontal)
-				smallBranchPosVDistro = new RSGISPsudoRandDistroUniformInt((smallBranchLenght / transectRes)/-4, (smallBranchLenght / transectRes)/4);
-				smallBranchThetaDistro = new RSGISPsudoRandDistroGaussian(72, 40); // Distribution of small branch incidence angles
-				smallBranchPhiDistro = new RSGISPsudoRandDistroUniformInt(0,90); // Distribution of small branch angles into the incidence plane
-				largeBranchPosHDistro = new RSGISPsudoRandDistroGaussian(0, 50); // Distribution of large branch positions (horizontal)
-				largeBranchPosVDistro = new RSGISPsudoRandDistroGamma(1, 0.1); // Distribution of large branch positions (vertical)
-				largeBranchThetaDistro = new RSGISPsudoRandDistroGaussian(60, 40); // Distribution of large branch incidence angles
-				largeBranchPhiDistro = new RSGISPsudoRandDistroUniformInt(0,360); // Distribution of large branch angles into the incidence plane
+				leafPosHDistro = new rsgis::math::RSGISPsudoRandDistroGaussian(0, (smallBranchLenght / transectRes)/2); // Distribution of leaf loctions (horizontal);
+				leafPosVDistro = new rsgis::math::RSGISPsudoRandDistroUniformInt((smallBranchLenght / transectRes)/-4, (smallBranchLenght / transectRes)/4);
+				leafThetaDistro = new rsgis::math::RSGISPsudoRandDistroGaussian(-6, 93); // Distribution of leaf incidence angles
+				smallBranchPosHDistro = new rsgis::math::RSGISPsudoRandDistroGaussian(0, (smallBranchLenght / transectRes)); // Distribution of small branch locations (horizontal)
+				smallBranchPosVDistro = new rsgis::math::RSGISPsudoRandDistroUniformInt((smallBranchLenght / transectRes)/-4, (smallBranchLenght / transectRes)/4);
+				smallBranchThetaDistro = new rsgis::math::RSGISPsudoRandDistroGaussian(72, 40); // Distribution of small branch incidence angles
+				smallBranchPhiDistro = new rsgis::math::RSGISPsudoRandDistroUniformInt(0,90); // Distribution of small branch angles into the incidence plane
+				largeBranchPosHDistro = new rsgis::math::RSGISPsudoRandDistroGaussian(0, 50); // Distribution of large branch positions (horizontal)
+				largeBranchPosVDistro = new rsgis::math::RSGISPsudoRandDistroGamma(1, 0.1); // Distribution of large branch positions (vertical)
+				largeBranchThetaDistro = new rsgis::math::RSGISPsudoRandDistroGaussian(60, 40); // Distribution of large branch incidence angles
+				largeBranchPhiDistro = new rsgis::math::RSGISPsudoRandDistroUniformInt(0,360); // Distribution of large branch angles into the incidence plane
 				
 				// Set up canopy model
 				treeCanopy = new RSGISModelTreeCanopy(modelPar, leafPosHDistro, leafPosVDistro, leafThetaDistro,smallBranchPosHDistro, smallBranchPosVDistro, smallBranchThetaDistro, smallBranchPhiDistro, largeBranchPosHDistro, largeBranchPosVDistro, largeBranchThetaDistro, largeBranchPhiDistro);
@@ -1590,10 +1590,10 @@ void RSGISExeTransectModel::runAlgorithm() throw(RSGISException)
 				// Set up stem distrobution
 				int neyManA = 4;
 				int neyManB = (transectLenght / 2) / neyManA;
-				stemDistro = new RSGISProbDistNeymanTypeA(neyManA,neyManB);
+				stemDistro = new rsgis::math::RSGISProbDistNeymanTypeA(neyManA,neyManB);
 				
-				posDistroX = new RSGISPsudoRandDistroUniformInt(0,int((transectWidth / this->transectRes)));
-				posDistroY = new RSGISPsudoRandDistroUniformInt(0,int((this->quadratSize / this->transectRes)));
+				posDistroX = new rsgis::math::RSGISPsudoRandDistroUniformInt(0,int((transectWidth / this->transectRes)));
+				posDistroY = new rsgis::math::RSGISPsudoRandDistroUniformInt(0,int((this->quadratSize / this->transectRes)));
 			}
 			else 
 			{
@@ -1698,23 +1698,23 @@ void RSGISExeTransectModel::runAlgorithm() throw(RSGISException)
 			transect->setZero();
 			
 			RSGISModelTree *treeModel = NULL; // Set up tree model
-			RSGISProbDistNeymanTypeA *stemDistro = NULL; // Set up stem distro
-			RSGISRandDistroGaussian *posDistroX = NULL; // Set up stem position offset distrobution
-			RSGISRandDistroGaussian *posDistroY = NULL; // Set up stem position offset distrobution
+			rsgis::math::RSGISProbDistNeymanTypeA *stemDistro = NULL; // Set up stem distro
+			rsgis::math::RSGISProbDistNeymanTypeA *posDistroX = NULL; // Set up stem position offset distrobution
+			rsgis::math::RSGISProbDistNeymanTypeA *posDistroY = NULL; // Set up stem position offset distrobution
 			vector <double> *modelPar = new vector<double>; // Set up vector to hold model parameters
 			
 			// Set up tree distrobutions
-			RSGISRandDistroGaussian *leafPosHDistro = NULL;
-			RSGISRandDistroUniformInt *leafPosVDistro = NULL;
-			RSGISRandDistroGaussian *leafThetaDistro = NULL;
-			RSGISRandDistroGaussian *smallBranchPosHDistro = NULL;
-			RSGISRandDistroUniformInt *smallBranchPosVDistro = NULL;
-			RSGISRandDistroGaussian *smallBranchThetaDistro = NULL;
-			RSGISRandDistroUniformInt *smallBranchPhiDistro = NULL;
-			RSGISRandDistroGaussian *largeBranchPosHDistro = NULL;
-			RSGISRandDistroGamma *largeBranchPosVDistro = NULL;
-			RSGISRandDistroGaussian *largeBranchThetaDistro = NULL;
-			RSGISRandDistroUniformInt *largeBranchPhiDistro = NULL;
+			rsgis::math::RSGISProbDistNeymanTypeA *leafPosHDistro = NULL;
+			rsgis::math::RSGISRandDistroUniformInt *leafPosVDistro = NULL;
+			rsgis::math::RSGISProbDistNeymanTypeA *leafThetaDistro = NULL;
+			rsgis::math::RSGISProbDistNeymanTypeA *smallBranchPosHDistro = NULL;
+			rsgis::math::RSGISRandDistroUniformInt *smallBranchPosVDistro = NULL;
+			rsgis::math::RSGISProbDistNeymanTypeA *smallBranchThetaDistro = NULL;
+			rsgis::math::RSGISRandDistroUniformInt *smallBranchPhiDistro = NULL;
+			rsgis::math::RSGISProbDistNeymanTypeA *largeBranchPosHDistro = NULL;
+			rsgis::math::RSGISRandDistroGamma *largeBranchPosVDistro = NULL;
+			rsgis::math::RSGISProbDistNeymanTypeA *largeBranchThetaDistro = NULL;
+			rsgis::math::RSGISRandDistroUniformInt *largeBranchPhiDistro = NULL;
 			
 			if (species == aHarpophylla) 
 			{
@@ -1752,26 +1752,26 @@ void RSGISExeTransectModel::runAlgorithm() throw(RSGISException)
 				modelPar->push_back(largeBranchDensity);
 				
 				// Set up tree distrobutions
-				leafPosHDistro = new RSGISRandDistroGaussian(0, (smallBranchLenght / transectRes)/2); // Distribution of leaf loctions (horizontal)
-				leafPosVDistro = new RSGISRandDistroUniformInt((smallBranchLenght / transectRes)/-4, (smallBranchLenght / transectRes)/4);
-				leafThetaDistro = new RSGISRandDistroGaussian(-6, 93); // Distribution of leaf incidence angles
-				smallBranchPosHDistro = new RSGISRandDistroGaussian(0, (smallBranchLenght / transectRes)); // Distribution of small branch locations (horizontal)
-				smallBranchPosVDistro = new RSGISRandDistroUniformInt((smallBranchLenght / transectRes)/-4, (smallBranchLenght / transectRes)/4);
-				smallBranchThetaDistro = new RSGISRandDistroGaussian(72, 40); // Distribution of small branch incidence angles
-				smallBranchPhiDistro = new RSGISRandDistroUniformInt(0,90); // Distribution of small branch angles into the incidence plane
-				largeBranchPosHDistro = new RSGISRandDistroGaussian(0, 50); // Distribution of large branch positions (horizontal)
-				largeBranchPosVDistro = new RSGISRandDistroGamma(1, 0.1); // Distribution of large branch positions (vertical)
-				largeBranchThetaDistro = new RSGISRandDistroGaussian(60, 40); // Distribution of large branch incidence angles
-				largeBranchPhiDistro = new RSGISRandDistroUniformInt(0,360); // Distribution of large branch angles into the incidence plane
+				leafPosHDistro = new rsgis::math::RSGISProbDistNeymanTypeA(0, (smallBranchLenght / transectRes)/2); // Distribution of leaf loctions (horizontal)
+				leafPosVDistro = new rsgis::math::RSGISRandDistroUniformInt((smallBranchLenght / transectRes)/-4, (smallBranchLenght / transectRes)/4);
+				leafThetaDistro = new rsgis::math::RSGISProbDistNeymanTypeA(-6, 93); // Distribution of leaf incidence angles
+				smallBranchPosHDistro = new rsgis::math::RSGISProbDistNeymanTypeA(0, (smallBranchLenght / transectRes)); // Distribution of small branch locations (horizontal)
+				smallBranchPosVDistro = new rsgis::math::RSGISRandDistroUniformInt((smallBranchLenght / transectRes)/-4, (smallBranchLenght / transectRes)/4);
+				smallBranchThetaDistro = new rsgis::math::RSGISProbDistNeymanTypeA(72, 40); // Distribution of small branch incidence angles
+				smallBranchPhiDistro = new rsgis::math::RSGISRandDistroUniformInt(0,90); // Distribution of small branch angles into the incidence plane
+				largeBranchPosHDistro = new rsgis::math::RSGISProbDistNeymanTypeA(0, 50); // Distribution of large branch positions (horizontal)
+				largeBranchPosVDistro = new rsgis::math::RSGISRandDistroGamma(1, 0.1); // Distribution of large branch positions (vertical)
+				largeBranchThetaDistro = new rsgis::math::RSGISProbDistNeymanTypeA(60, 40); // Distribution of large branch incidence angles
+				largeBranchPhiDistro = new rsgis::math::RSGISRandDistroUniformInt(0,360); // Distribution of large branch angles into the incidence plane
 				
 				// Set up tree model
 				treeModel = new RSGISModelTree(modelPar, leafPosHDistro, leafPosVDistro, leafThetaDistro,smallBranchPosHDistro, smallBranchPosVDistro, smallBranchThetaDistro, smallBranchPhiDistro, largeBranchPosHDistro, largeBranchPosVDistro, largeBranchThetaDistro, largeBranchPhiDistro);
 				// Set up stem distrobution
 				int neyManA = 4;
 				int neyManB = (transectLenght / 2) / neyManA;
-				stemDistro = new RSGISProbDistNeymanTypeA(neyManA,neyManB);
-				posDistroX = new RSGISRandDistroGaussian(0, (transectWidth / this->transectRes)/ 3);
-				posDistroY = new RSGISRandDistroGaussian(0, (this->quadratSize / this->transectRes) / 1);
+				stemDistro = new rsgis::math::RSGISProbDistNeymanTypeA(neyManA,neyManB);
+				posDistroX = new rsgis::math::RSGISProbDistNeymanTypeA(0, (transectWidth / this->transectRes)/ 3);
+				posDistroY = new rsgis::math::RSGISProbDistNeymanTypeA(0, (this->quadratSize / this->transectRes) / 1);
 			}
 			else 
 			{
@@ -1877,23 +1877,23 @@ void RSGISExeTransectModel::runAlgorithm() throw(RSGISException)
 			transect->setZero();
 			
 			RSGISModelTree *treeModel = NULL; // Set up tree model
-			RSGISProbDistNeymanTypeA *stemDistro = NULL; // Set up stem distro
-			RSGISPsudoRandDistroUniformInt *posDistroX = NULL; // Set up stem position offset distrobution
-			RSGISPsudoRandDistroUniformInt *posDistroY = NULL; // Set up stem position offset distrobution
+			rsgis::math::RSGISProbDistNeymanTypeA *stemDistro = NULL; // Set up stem distro
+			rsgis::math::RSGISPsudoRandDistroUniformInt *posDistroX = NULL; // Set up stem position offset distrobution
+			rsgis::math::RSGISPsudoRandDistroUniformInt *posDistroY = NULL; // Set up stem position offset distrobution
 			vector <double> *modelPar = new vector<double>; // Set up vector to hold model parameters
 			
 			// Set up tree distrobutions
-			RSGISPsudoRandDistroGaussian *leafPosHDistro = NULL;
-			RSGISPsudoRandDistroGaussian *leafPosVDistro = NULL;
-			RSGISPsudoRandDistroGaussian *leafThetaDistro = NULL;
-			RSGISPsudoRandDistroGaussian *smallBranchPosHDistro = NULL;
-			RSGISPsudoRandDistroUniformInt *smallBranchPosVDistro = NULL;
-			RSGISPsudoRandDistroGaussian *smallBranchThetaDistro = NULL;
-			RSGISPsudoRandDistroUniformInt *smallBranchPhiDistro = NULL;
-			RSGISPsudoRandDistroGaussian *largeBranchPosHDistro = NULL;
-			RSGISPsudoRandDistroGamma *largeBranchPosVDistro = NULL;
-			RSGISPsudoRandDistroGaussian *largeBranchThetaDistro = NULL;
-			RSGISPsudoRandDistroUniformInt *largeBranchPhiDistro = NULL;
+			rsgis::math::RSGISPsudoRandDistroGaussian *leafPosHDistro = NULL;
+			rsgis::math::RSGISPsudoRandDistroGaussian *leafPosVDistro = NULL;
+			rsgis::math::RSGISPsudoRandDistroGaussian *leafThetaDistro = NULL;
+			rsgis::math::RSGISPsudoRandDistroGaussian *smallBranchPosHDistro = NULL;
+			rsgis::math::RSGISPsudoRandDistroUniformInt *smallBranchPosVDistro = NULL;
+			rsgis::math::RSGISPsudoRandDistroGaussian *smallBranchThetaDistro = NULL;
+			rsgis::math::RSGISPsudoRandDistroUniformInt *smallBranchPhiDistro = NULL;
+			rsgis::math::RSGISPsudoRandDistroGaussian *largeBranchPosHDistro = NULL;
+			rsgis::math::RSGISPsudoRandDistroGamma *largeBranchPosVDistro = NULL;
+			rsgis::math::RSGISPsudoRandDistroGaussian *largeBranchThetaDistro = NULL;
+			rsgis::math::RSGISPsudoRandDistroUniformInt *largeBranchPhiDistro = NULL;
 			
 			if (species == aHarpophylla) 
 			{
@@ -1931,17 +1931,17 @@ void RSGISExeTransectModel::runAlgorithm() throw(RSGISException)
 				
 				// Set up tree distrobutions
                 // Set up tree distrobutions
-                leafPosHDistro = new RSGISPsudoRandDistroGaussian(0, 10); // Distribution of leaf loctions (horizontal)
-                leafPosVDistro = new RSGISPsudoRandDistroGaussian(0, 10);
-                leafThetaDistro = new RSGISPsudoRandDistroGaussian(-6, 93); // Distribution of leaf incidence angles
-                smallBranchPosHDistro = new RSGISPsudoRandDistroGaussian(0, 1 / transectRes); // Distribution of small branch locations (horizontal)
-                smallBranchPosVDistro = new RSGISPsudoRandDistroUniformInt((largeBranchLenght / transectRes) / 2,largeBranchLenght / transectRes); // Start small branches from halfway up large branch.
-                smallBranchThetaDistro = new RSGISPsudoRandDistroGaussian(72, 10); // Distribution of small branch incidence angles
-                smallBranchPhiDistro = new RSGISPsudoRandDistroUniformInt(0,360); // Distribution of small branch angles into the incidence plane
-                largeBranchPosHDistro = new RSGISPsudoRandDistroGaussian(0, 1 / transectRes); // Distribution of large branch positions (horizontal)
-                largeBranchPosVDistro = new RSGISPsudoRandDistroGamma(1, 0.1); // Distribution of large branch positions (vertical)
-                largeBranchThetaDistro = new RSGISPsudoRandDistroGaussian(60, 10); // Distribution of large branch incidence angles
-                largeBranchPhiDistro = new RSGISPsudoRandDistroUniformInt(0,360); // Distribution of large branch angles into the incidence plane
+                leafPosHDistro = new rsgis::math::RSGISPsudoRandDistroGaussian(0, 10); // Distribution of leaf loctions (horizontal)
+                leafPosVDistro = new rsgis::math::RSGISPsudoRandDistroGaussian(0, 10);
+                leafThetaDistro = new rsgis::math::RSGISPsudoRandDistroGaussian(-6, 93); // Distribution of leaf incidence angles
+                smallBranchPosHDistro = new rsgis::math::RSGISPsudoRandDistroGaussian(0, 1 / transectRes); // Distribution of small branch locations (horizontal)
+                smallBranchPosVDistro = new rsgis::math::RSGISPsudoRandDistroUniformInt((largeBranchLenght / transectRes) / 2,largeBranchLenght / transectRes); // Start small branches from halfway up large branch.
+                smallBranchThetaDistro = new rsgis::math::RSGISPsudoRandDistroGaussian(72, 10); // Distribution of small branch incidence angles
+                smallBranchPhiDistro = new rsgis::math::RSGISPsudoRandDistroUniformInt(0,360); // Distribution of small branch angles into the incidence plane
+                largeBranchPosHDistro = new rsgis::math::RSGISPsudoRandDistroGaussian(0, 1 / transectRes); // Distribution of large branch positions (horizontal)
+                largeBranchPosVDistro = new rsgis::math::RSGISPsudoRandDistroGamma(1, 0.1); // Distribution of large branch positions (vertical)
+                largeBranchThetaDistro = new rsgis::math::RSGISPsudoRandDistroGaussian(60, 10); // Distribution of large branch incidence angles
+                largeBranchPhiDistro = new rsgis::math::RSGISPsudoRandDistroUniformInt(0,360); // Distribution of large branch angles into the incidence plane
                 
 								
 				// Set up tree model
@@ -1949,9 +1949,9 @@ void RSGISExeTransectModel::runAlgorithm() throw(RSGISException)
 				// Set up stem distrobution
 				int neyNanB = 6;
 				int neyManA = (transectLenght / 2) / neyNanB;
-				stemDistro = new RSGISProbDistNeymanTypeA(neyManA,neyNanB);
-				posDistroX = new RSGISPsudoRandDistroUniformInt(0,int((transectWidth / this->transectRes)));
-				posDistroY = new RSGISPsudoRandDistroUniformInt(0,int((this->quadratSize / this->transectRes)));
+				stemDistro = new rsgis::math::RSGISProbDistNeymanTypeA(neyManA,neyNanB);
+				posDistroX = new rsgis::math::RSGISPsudoRandDistroUniformInt(0,int((transectWidth / this->transectRes)));
+				posDistroY = new rsgis::math::RSGISPsudoRandDistroUniformInt(0,int((this->quadratSize / this->transectRes)));
 			}
 			
 			else 
@@ -2054,15 +2054,15 @@ void RSGISExeTransectModel::runAlgorithm() throw(RSGISException)
 		}
 		else if (option == RSGISExeTransectModel::singleSpeciesCanopyRandomList) 
 		{			
-			RSGISMatrices matrixUtils;
-			RSGISMathsUtils mathUtils;
+			rsgis::math::RSGISMatrices matrixUtils;
+			rsgis::math::RSGISMathsUtils mathUtils;
 			gsl_matrix *inPar = matrixUtils.readGSLMatrixFromGridTxt(this->inputFile);
 			if(inPar->size2 != 15)
 			{
 				throw RSGISException("The correct number of parameters was not provided");
 			}
 			
-			Matrix *outPar = matrixUtils.createMatrix(inPar->size1, 10);
+			rsgis::math::Matrix *outPar = matrixUtils.createMatrix(inPar->size1, 10);
 			
 			unsigned int indexIn = 0;
 			unsigned int indexOut = 0;
@@ -2144,37 +2144,37 @@ void RSGISExeTransectModel::runAlgorithm() throw(RSGISException)
 				}
 				
 				RSGISModelTreeCanopy *treeCanopy = NULL; // Set up canopy model
-				RSGISProbDistNeymanTypeA *stemDistro = NULL; // Set up stem distro
-				RSGISRandDistroGaussian *posDistroX = NULL; // Set up stem position offset distrobution
-				RSGISRandDistroGaussian *posDistroY = NULL; // Set up stem position offset distrobution
+				rsgis::math::RSGISProbDistNeymanTypeA *stemDistro = NULL; // Set up stem distro
+				rsgis::math::RSGISProbDistNeymanTypeA *posDistroX = NULL; // Set up stem position offset distrobution
+				rsgis::math::RSGISProbDistNeymanTypeA *posDistroY = NULL; // Set up stem position offset distrobution
 				vector <double> *modelPar = new vector<double>; // Set up vector to hold model parameters
 				
 				// Set up tree distrobutions
-				RSGISRandDistroGaussian *leafPosHDistro = NULL;
-				//RSGISRandDistroGamma *leafPosHDistro = NULL;
-				RSGISRandDistroGaussian *leafPosVDistro = NULL;
-				RSGISRandDistroGaussian *leafThetaDistro = NULL;
-				RSGISRandDistroGaussian *smallBranchPosHDistro = NULL;
-				RSGISRandDistroUniformInt *smallBranchPosVDistro = NULL;
-				RSGISRandDistroGaussian *smallBranchThetaDistro = NULL;
-				RSGISRandDistroUniformInt *smallBranchPhiDistro = NULL;
-				RSGISRandDistroGaussian *largeBranchPosHDistro = NULL;
-				RSGISRandDistroGamma *largeBranchPosVDistro = NULL;
-				RSGISRandDistroGaussian *largeBranchThetaDistro = NULL;
-				RSGISRandDistroUniformInt *largeBranchPhiDistro = NULL;
+				rsgis::math::RSGISProbDistNeymanTypeA *leafPosHDistro = NULL;
+				//rsgis::math::RSGISRandDistroGamma *leafPosHDistro = NULL;
+				rsgis::math::RSGISProbDistNeymanTypeA *leafPosVDistro = NULL;
+				rsgis::math::RSGISProbDistNeymanTypeA *leafThetaDistro = NULL;
+				rsgis::math::RSGISProbDistNeymanTypeA *smallBranchPosHDistro = NULL;
+				rsgis::math::RSGISRandDistroUniformInt *smallBranchPosVDistro = NULL;
+				rsgis::math::RSGISProbDistNeymanTypeA *smallBranchThetaDistro = NULL;
+				rsgis::math::RSGISRandDistroUniformInt *smallBranchPhiDistro = NULL;
+				rsgis::math::RSGISProbDistNeymanTypeA *largeBranchPosHDistro = NULL;
+				rsgis::math::RSGISRandDistroGamma *largeBranchPosVDistro = NULL;
+				rsgis::math::RSGISProbDistNeymanTypeA *largeBranchThetaDistro = NULL;
+				rsgis::math::RSGISRandDistroUniformInt *largeBranchPhiDistro = NULL;
 				
-				/*RSGISRandDistroUniformInt *leafPosHDistro = NULL;
-				//RSGISRandDistroGamma *leafPosHDistro = NULL;
-				RSGISRandDistroUniformInt *leafPosVDistro = NULL;
-				RSGISRandDistroUniformInt *leafThetaDistro = NULL;
-				RSGISRandDistroUniformInt *smallBranchPosHDistro = NULL;
-				RSGISRandDistroUniformInt *smallBranchPosVDistro = NULL;
-				RSGISRandDistroGaussian *smallBranchThetaDistro = NULL;
-				RSGISRandDistroUniformInt *smallBranchPhiDistro = NULL;
-				RSGISRandDistroUniformInt *largeBranchPosHDistro = NULL;
-				RSGISRandDistroUniformInt *largeBranchPosVDistro = NULL;
-				RSGISRandDistroGaussian *largeBranchThetaDistro = NULL;
-				RSGISRandDistroUniformInt *largeBranchPhiDistro = NULL;*/
+				/*rsgis::math::RSGISRandDistroUniformInt *leafPosHDistro = NULL;
+				//rsgis::math::RSGISRandDistroGamma *leafPosHDistro = NULL;
+				rsgis::math::RSGISRandDistroUniformInt *leafPosVDistro = NULL;
+				rsgis::math::RSGISRandDistroUniformInt *leafThetaDistro = NULL;
+				rsgis::math::RSGISRandDistroUniformInt *smallBranchPosHDistro = NULL;
+				rsgis::math::RSGISRandDistroUniformInt *smallBranchPosVDistro = NULL;
+				rsgis::math::RSGISProbDistNeymanTypeA *smallBranchThetaDistro = NULL;
+				rsgis::math::RSGISRandDistroUniformInt *smallBranchPhiDistro = NULL;
+				rsgis::math::RSGISRandDistroUniformInt *largeBranchPosHDistro = NULL;
+				rsgis::math::RSGISRandDistroUniformInt *largeBranchPosVDistro = NULL;
+				rsgis::math::RSGISProbDistNeymanTypeA *largeBranchThetaDistro = NULL;
+				rsgis::math::RSGISRandDistroUniformInt *largeBranchPhiDistro = NULL;*/
 				
 				if (species == aHarpophylla) 
 				{
@@ -2206,44 +2206,44 @@ void RSGISExeTransectModel::runAlgorithm() throw(RSGISException)
 					modelPar->push_back(largeBranchDensity);
 					
 					// Set up tree distrobutions
-					leafPosHDistro = new RSGISRandDistroGaussian(0, (smallBranchLenght / transectRes)/3); // Distribution of leaf loctions (horizontal)
-					//leafPosHDistro = new RSGISRandDistroGamma(5.73, gammaScale); // Distribution of leaf loctions (horizontal)
-					leafPosVDistro = new RSGISRandDistroGaussian(0, (smallBranchLenght / transectRes)/3);
-					leafThetaDistro = new RSGISRandDistroGaussian(-6, 93); // Distribution of leaf incidence angles
-					smallBranchPosHDistro = new RSGISRandDistroGaussian(0,(smallBranchLenght / transectRes)/2); // Distribution of small branch locations (horizontal)
-					smallBranchPosVDistro = new RSGISRandDistroUniformInt((largeBranchLenght / transectRes) * 0.667,largeBranchLenght / transectRes);
-					smallBranchThetaDistro = new RSGISRandDistroGaussian(72, 10); // Distribution of small branch incidence angles
-					smallBranchPhiDistro = new RSGISRandDistroUniformInt(0,360); // Distribution of small branch angles into the incidence plane
-					largeBranchPosHDistro = new RSGISRandDistroGaussian(0, (smallBranchLenght / transectRes)/2); // Distribution of large branch positions (horizontal)
-					largeBranchPosVDistro = new RSGISRandDistroGamma(1, 0.1); // Distribution of large m positions (vertical)
-					largeBranchThetaDistro = new RSGISRandDistroGaussian(60, 10); // Distribution of large branch incidence angles
-					largeBranchPhiDistro = new RSGISRandDistroUniformInt(0,360); // Distribution of large branch angles into the incidence plane
+					leafPosHDistro = new rsgis::math::RSGISProbDistNeymanTypeA(0, (smallBranchLenght / transectRes)/3); // Distribution of leaf loctions (horizontal)
+					//leafPosHDistro = new rsgis::math::RSGISRandDistroGamma(5.73, gammaScale); // Distribution of leaf loctions (horizontal)
+					leafPosVDistro = new rsgis::math::RSGISProbDistNeymanTypeA(0, (smallBranchLenght / transectRes)/3);
+					leafThetaDistro = new rsgis::math::RSGISProbDistNeymanTypeA(-6, 93); // Distribution of leaf incidence angles
+					smallBranchPosHDistro = new rsgis::math::RSGISProbDistNeymanTypeA(0,(smallBranchLenght / transectRes)/2); // Distribution of small branch locations (horizontal)
+					smallBranchPosVDistro = new rsgis::math::RSGISRandDistroUniformInt((largeBranchLenght / transectRes) * 0.667,largeBranchLenght / transectRes);
+					smallBranchThetaDistro = new rsgis::math::RSGISProbDistNeymanTypeA(72, 10); // Distribution of small branch incidence angles
+					smallBranchPhiDistro = new rsgis::math::RSGISRandDistroUniformInt(0,360); // Distribution of small branch angles into the incidence plane
+					largeBranchPosHDistro = new rsgis::math::RSGISProbDistNeymanTypeA(0, (smallBranchLenght / transectRes)/2); // Distribution of large branch positions (horizontal)
+					largeBranchPosVDistro = new rsgis::math::RSGISRandDistroGamma(1, 0.1); // Distribution of large m positions (vertical)
+					largeBranchThetaDistro = new rsgis::math::RSGISProbDistNeymanTypeA(60, 10); // Distribution of large branch incidence angles
+					largeBranchPhiDistro = new rsgis::math::RSGISRandDistroUniformInt(0,360); // Distribution of large branch angles into the incidence plane
 					
 					//double gammaScale = (0.033*this->treeHeight - 0.039) / transectRes;
 					/*int qSizeVox = int(quadratSize / transectRes);
-					leafPosHDistro = new RSGISRandDistroUniformInt(-250, 250); // Distribution of leaf loctions (horizontal)
-					//leafPosHDistro = new RSGISRandDistroGamma(5.73, gammaScale); // Distribution of leaf loctions (horizontal)
-					leafPosVDistro = new RSGISRandDistroUniformInt(0, 4  / transectRes);
-					leafThetaDistro = new RSGISRandDistroUniformInt(-45, 45); // Distribution of leaf incidence angles
-					smallBranchPosHDistro = new RSGISRandDistroUniformInt(-250, 250); // Distribution of small branch locations (horizontal)
-					smallBranchPosVDistro = new RSGISRandDistroUniformInt(0, 4  / transectRes);
-					smallBranchThetaDistro = new RSGISRandDistroGaussian(72, 10); // Distribution of small branch incidence angles
-					smallBranchPhiDistro = new RSGISRandDistroUniformInt(0,360); // Distribution of small branch angles into the incidence plane
-					largeBranchPosHDistro = new RSGISRandDistroUniformInt(-250, 250); // Distribution of large branch positions (horizontal)
-					largeBranchPosVDistro = new RSGISRandDistroUniformInt(0, 4  / transectRes); // Distribution of large m positions (vertical)
-					largeBranchThetaDistro = new RSGISRandDistroGaussian(60, 10); // Distribution of large branch incidence angles
-					largeBranchPhiDistro = new RSGISRandDistroUniformInt(0,360); // Distribution of large branch angles into the incidence plane*/
+					leafPosHDistro = new rsgis::math::RSGISRandDistroUniformInt(-250, 250); // Distribution of leaf loctions (horizontal)
+					//leafPosHDistro = new rsgis::math::RSGISRandDistroGamma(5.73, gammaScale); // Distribution of leaf loctions (horizontal)
+					leafPosVDistro = new rsgis::math::RSGISRandDistroUniformInt(0, 4  / transectRes);
+					leafThetaDistro = new rsgis::math::RSGISRandDistroUniformInt(-45, 45); // Distribution of leaf incidence angles
+					smallBranchPosHDistro = new rsgis::math::RSGISRandDistroUniformInt(-250, 250); // Distribution of small branch locations (horizontal)
+					smallBranchPosVDistro = new rsgis::math::RSGISRandDistroUniformInt(0, 4  / transectRes);
+					smallBranchThetaDistro = new rsgis::math::RSGISProbDistNeymanTypeA(72, 10); // Distribution of small branch incidence angles
+					smallBranchPhiDistro = new rsgis::math::RSGISRandDistroUniformInt(0,360); // Distribution of small branch angles into the incidence plane
+					largeBranchPosHDistro = new rsgis::math::RSGISRandDistroUniformInt(-250, 250); // Distribution of large branch positions (horizontal)
+					largeBranchPosVDistro = new rsgis::math::RSGISRandDistroUniformInt(0, 4  / transectRes); // Distribution of large m positions (vertical)
+					largeBranchThetaDistro = new rsgis::math::RSGISProbDistNeymanTypeA(60, 10); // Distribution of large branch incidence angles
+					largeBranchPhiDistro = new rsgis::math::RSGISRandDistroUniformInt(0,360); // Distribution of large branch angles into the incidence plane*/
 					
 					// Set up canopy model
 					treeCanopy = new RSGISModelTreeCanopy(modelPar, leafPosHDistro, leafPosVDistro, leafThetaDistro,smallBranchPosHDistro, smallBranchPosVDistro, smallBranchThetaDistro, smallBranchPhiDistro, largeBranchPosHDistro, largeBranchPosVDistro, largeBranchThetaDistro, largeBranchPhiDistro);
 					
 					// Set up stem distrobution
 					int neyNanB = 6;
-					stemDistro = new RSGISProbDistNeymanTypeA(60 / neyNanB , neyNanB);
-					//posDistroX = new RSGISRandDistroUniformInt(0,int((transectWidth / this->transectRes)/10));
-					//posDistroY = new RSGISRandDistroUniformInt(0,int((this->quadratSize / this->transectRes)/10));
-					posDistroX = new RSGISRandDistroGaussian(0,(quadratSize / transectRes) / 2);
-					posDistroY = new RSGISRandDistroGaussian(0,(quadratSize / transectRes) / 2);
+					stemDistro = new rsgis::math::RSGISProbDistNeymanTypeA(60 / neyNanB , neyNanB);
+					//posDistroX = new rsgis::math::RSGISRandDistroUniformInt(0,int((transectWidth / this->transectRes)/10));
+					//posDistroY = new rsgis::math::RSGISRandDistroUniformInt(0,int((this->quadratSize / this->transectRes)/10));
+					posDistroX = new rsgis::math::RSGISProbDistNeymanTypeA(0,(quadratSize / transectRes) / 2);
+					posDistroY = new rsgis::math::RSGISProbDistNeymanTypeA(0,(quadratSize / transectRes) / 2);
 				}
 				else 
 				{
@@ -2394,15 +2394,15 @@ void RSGISExeTransectModel::runAlgorithm() throw(RSGISException)
 		}
 		else if (option == RSGISExeTransectModel::singleSpeciesCanopyPsudoRandomList) 
 		{			
-			RSGISMatrices matrixUtils;
-			RSGISMathsUtils mathUtils;
+			rsgis::math::RSGISMatrices matrixUtils;
+			rsgis::math::RSGISMathsUtils mathUtils;
 			gsl_matrix *inPar = matrixUtils.readGSLMatrixFromGridTxt(this->inputFile);
 			if(inPar->size2 != 15)
 			{
 				throw RSGISException("The correct number of parameters was not provided");
 			}
 			
-			Matrix *outPar = matrixUtils.createMatrix(inPar->size1, 9);
+			rsgis::math::Matrix *outPar = matrixUtils.createMatrix(inPar->size1, 9);
 			
 			unsigned int indexIn = 0;
 			unsigned int indexOut = 0;
@@ -2468,23 +2468,23 @@ void RSGISExeTransectModel::runAlgorithm() throw(RSGISException)
 				}
 				
 				RSGISModelTreeCanopy *treeCanopy = NULL; // Set up canopy model
-				RSGISPsudoRandDistNeymanTypeA *stemDistro = NULL; // Set up stem distro
-				RSGISPsudoRandDistroGaussian *posDistroX = NULL; // Set up stem position offset distrobution
-				RSGISPsudoRandDistroGaussian *posDistroY = NULL; // Set up stem position offset distrobution
+				rsgis::math::RSGISPsudoRandDistNeymanTypeA *stemDistro = NULL; // Set up stem distro
+				rsgis::math::RSGISPsudoRandDistroGaussian *posDistroX = NULL; // Set up stem position offset distrobution
+				rsgis::math::RSGISPsudoRandDistroGaussian *posDistroY = NULL; // Set up stem position offset distrobution
 				vector <double> *modelPar = new vector<double>; // Set up vector to hold model parameters
 				
 				// Set up tree distrobutions
-				RSGISPsudoRandDistroGaussian *leafPosHDistro = NULL;
-				RSGISPsudoRandDistroGaussian *leafPosVDistro = NULL;
-				RSGISPsudoRandDistroGaussian *leafThetaDistro = NULL;
-				RSGISPsudoRandDistroGaussian *smallBranchPosHDistro = NULL;
-				RSGISPsudoRandDistroUniformInt *smallBranchPosVDistro = NULL;
-				RSGISPsudoRandDistroGaussian *smallBranchThetaDistro = NULL;
-				RSGISPsudoRandDistroUniformInt *smallBranchPhiDistro = NULL;
-				RSGISPsudoRandDistroGaussian *largeBranchPosHDistro = NULL;
-				RSGISPsudoRandDistroGamma *largeBranchPosVDistro = NULL;
-				RSGISPsudoRandDistroGaussian *largeBranchThetaDistro = NULL;
-				RSGISPsudoRandDistroUniformInt *largeBranchPhiDistro = NULL;
+				rsgis::math::RSGISPsudoRandDistroGaussian *leafPosHDistro = NULL;
+				rsgis::math::RSGISPsudoRandDistroGaussian *leafPosVDistro = NULL;
+				rsgis::math::RSGISPsudoRandDistroGaussian *leafThetaDistro = NULL;
+				rsgis::math::RSGISPsudoRandDistroGaussian *smallBranchPosHDistro = NULL;
+				rsgis::math::RSGISPsudoRandDistroUniformInt *smallBranchPosVDistro = NULL;
+				rsgis::math::RSGISPsudoRandDistroGaussian *smallBranchThetaDistro = NULL;
+				rsgis::math::RSGISPsudoRandDistroUniformInt *smallBranchPhiDistro = NULL;
+				rsgis::math::RSGISPsudoRandDistroGaussian *largeBranchPosHDistro = NULL;
+				rsgis::math::RSGISPsudoRandDistroGamma *largeBranchPosVDistro = NULL;
+				rsgis::math::RSGISPsudoRandDistroGaussian *largeBranchThetaDistro = NULL;
+				rsgis::math::RSGISPsudoRandDistroUniformInt *largeBranchPhiDistro = NULL;
 				
 				if (species == aHarpophylla) 
 				{
@@ -2516,30 +2516,30 @@ void RSGISExeTransectModel::runAlgorithm() throw(RSGISException)
 					
 					// Set up tree distrobutions
 					//double gammaScale = (0.033*this->treeHeight - 0.039) / transectRes;
-					leafPosHDistro = new RSGISPsudoRandDistroGaussian(0, (smallBranchLenght / transectRes)/4); // Distribution of leaf loctions (horizontal)
-					leafPosVDistro = new RSGISPsudoRandDistroGaussian(0, (smallBranchLenght / transectRes)/4);
-					leafThetaDistro = new RSGISPsudoRandDistroGaussian(-6, 93); // Distribution of leaf incidence angles
-					//smallBranchPosHDistro = new RSGISPsudoRandDistroGaussian(0, 50); // Distribution of small branch locations (horizontal) - 2cm res
-					smallBranchPosHDistro = new RSGISPsudoRandDistroGaussian(0, 0.25 / transectRes); // Distribution of small branch locations (horizontal)
-					smallBranchPosVDistro = new RSGISPsudoRandDistroUniformInt((largeBranchLenght / transectRes) * 0.667,largeBranchLenght / transectRes);
-					smallBranchThetaDistro = new RSGISPsudoRandDistroGaussian(72, 10); // Distribution of small branch incidence angles
-					smallBranchPhiDistro = new RSGISPsudoRandDistroUniformInt(0,360); // Distribution of small branch angles into the incidence plane
-					largeBranchPosHDistro = new RSGISPsudoRandDistroGaussian(0, smallBranchLenght / transectRes); // Distribution of large branch positions (horizontal)
-					largeBranchPosVDistro = new RSGISPsudoRandDistroGamma(1, 0.1); // Distribution of large m positions (vertical)
-					largeBranchThetaDistro = new RSGISPsudoRandDistroGaussian(60, 10); // Distribution of large branch incidence angles
-					largeBranchPhiDistro = new RSGISPsudoRandDistroUniformInt(0,360); // Distribution of large branch angles into the incidence plane
+					leafPosHDistro = new rsgis::math::RSGISPsudoRandDistroGaussian(0, (smallBranchLenght / transectRes)/4); // Distribution of leaf loctions (horizontal)
+					leafPosVDistro = new rsgis::math::RSGISPsudoRandDistroGaussian(0, (smallBranchLenght / transectRes)/4);
+					leafThetaDistro = new rsgis::math::RSGISPsudoRandDistroGaussian(-6, 93); // Distribution of leaf incidence angles
+					//smallBranchPosHDistro = new rsgis::math::RSGISPsudoRandDistroGaussian(0, 50); // Distribution of small branch locations (horizontal) - 2cm res
+					smallBranchPosHDistro = new rsgis::math::RSGISPsudoRandDistroGaussian(0, 0.25 / transectRes); // Distribution of small branch locations (horizontal)
+					smallBranchPosVDistro = new rsgis::math::RSGISPsudoRandDistroUniformInt((largeBranchLenght / transectRes) * 0.667,largeBranchLenght / transectRes);
+					smallBranchThetaDistro = new rsgis::math::RSGISPsudoRandDistroGaussian(72, 10); // Distribution of small branch incidence angles
+					smallBranchPhiDistro = new rsgis::math::RSGISPsudoRandDistroUniformInt(0,360); // Distribution of small branch angles into the incidence plane
+					largeBranchPosHDistro = new rsgis::math::RSGISPsudoRandDistroGaussian(0, smallBranchLenght / transectRes); // Distribution of large branch positions (horizontal)
+					largeBranchPosVDistro = new rsgis::math::RSGISPsudoRandDistroGamma(1, 0.1); // Distribution of large m positions (vertical)
+					largeBranchThetaDistro = new rsgis::math::RSGISPsudoRandDistroGaussian(60, 10); // Distribution of large branch incidence angles
+					largeBranchPhiDistro = new rsgis::math::RSGISPsudoRandDistroUniformInt(0,360); // Distribution of large branch angles into the incidence plane
 					
 					// Set up canopy model
 					treeCanopy = new RSGISModelTreeCanopy(modelPar, leafPosHDistro, leafPosVDistro, leafThetaDistro,smallBranchPosHDistro, smallBranchPosVDistro, smallBranchThetaDistro, smallBranchPhiDistro, largeBranchPosHDistro, largeBranchPosVDistro, largeBranchThetaDistro, largeBranchPhiDistro);
 					
 					// Set up stem distrobution
 					int neyNanB = 6;
-					stemDistro = new RSGISPsudoRandDistNeymanTypeA(60 / neyNanB , neyNanB);
+					stemDistro = new rsgis::math::RSGISPsudoRandDistNeymanTypeA(60 / neyNanB , neyNanB);
 					
-					//posDistroX = new RSGISPsudoRandDistroUniformInt(0,int((transectWidth / this->transectRes)/10));
-					//posDistroY = new RSGISPsudoRandDistroUniformInt(0,int((this->quadratSize / this->transectRes)/10));
-					posDistroX = new RSGISPsudoRandDistroGaussian(0,(quadratSize / transectRes) / 2);
-					posDistroY = new RSGISPsudoRandDistroGaussian(0,(quadratSize / transectRes) / 2);
+					//posDistroX = new rsgis::math::RSGISPsudoRandDistroUniformInt(0,int((transectWidth / this->transectRes)/10));
+					//posDistroY = new rsgis::math::RSGISPsudoRandDistroUniformInt(0,int((this->quadratSize / this->transectRes)/10));
+					posDistroX = new rsgis::math::RSGISPsudoRandDistroGaussian(0,(quadratSize / transectRes) / 2);
+					posDistroY = new rsgis::math::RSGISPsudoRandDistroGaussian(0,(quadratSize / transectRes) / 2);
 				}
 				else 
 				{
@@ -2685,8 +2685,8 @@ void RSGISExeTransectModel::runAlgorithm() throw(RSGISException)
 		}
 		else if (option == RSGISExeTransectModel::visualiseModelInput) 
 		{			
-			RSGISMatrices matrixUtils;
-			RSGISMathsUtils mathUtils;
+			rsgis::math::RSGISMatrices matrixUtils;
+			rsgis::math::RSGISMathsUtils mathUtils;
 			
 			
 			cout << "Reading parameters from: " << this->inputFile << endl;
@@ -2766,42 +2766,42 @@ void RSGISExeTransectModel::runAlgorithm() throw(RSGISException)
 				}
 				
 				RSGISModelTree *tree = NULL; // Set up canopy model
-				RSGISPsudoRandDistroGaussian *stemDistro = NULL; // Set up stem distro
-				RSGISPsudoRandDistroUniformInt *posDistroX = NULL; // Set up stem position offset distrobution
-				RSGISPsudoRandDistroUniformInt *posDistroY = NULL; // Set up stem position offset distrobution
+				rsgis::math::RSGISPsudoRandDistroGaussian *stemDistro = NULL; // Set up stem distro
+				rsgis::math::RSGISPsudoRandDistroUniformInt *posDistroX = NULL; // Set up stem position offset distrobution
+				rsgis::math::RSGISPsudoRandDistroUniformInt *posDistroY = NULL; // Set up stem position offset distrobution
 				
 				// Set up tree distrobutions
-				RSGISPsudoRandDistroUniformInt *leafPosHDistro = NULL;
-				RSGISPsudoRandDistroUniformInt *leafPosVDistro = NULL;
-				RSGISPsudoRandDistroGaussian *leafThetaDistro = NULL;
-				RSGISPsudoRandDistroUniformInt *smallBranchPosHDistro = NULL;
-				RSGISPsudoRandDistroUniformInt *smallBranchPosVDistro = NULL;
-				RSGISPsudoRandDistroGaussian *smallBranchThetaDistro = NULL;
-				RSGISPsudoRandDistroUniformInt *smallBranchPhiDistro = NULL;
-				RSGISPsudoRandDistroUniformInt *largeBranchPosHDistro = NULL;
-				RSGISPsudoRandDistroUniformInt *largeBranchPosVDistro = NULL;
-				RSGISPsudoRandDistroGaussian *largeBranchThetaDistro = NULL;
-				RSGISPsudoRandDistroUniformInt *largeBranchPhiDistro = NULL;
+				rsgis::math::RSGISPsudoRandDistroUniformInt *leafPosHDistro = NULL;
+				rsgis::math::RSGISPsudoRandDistroUniformInt *leafPosVDistro = NULL;
+				rsgis::math::RSGISPsudoRandDistroGaussian *leafThetaDistro = NULL;
+				rsgis::math::RSGISPsudoRandDistroUniformInt *smallBranchPosHDistro = NULL;
+				rsgis::math::RSGISPsudoRandDistroUniformInt *smallBranchPosVDistro = NULL;
+				rsgis::math::RSGISPsudoRandDistroGaussian *smallBranchThetaDistro = NULL;
+				rsgis::math::RSGISPsudoRandDistroUniformInt *smallBranchPhiDistro = NULL;
+				rsgis::math::RSGISPsudoRandDistroUniformInt *largeBranchPosHDistro = NULL;
+				rsgis::math::RSGISPsudoRandDistroUniformInt *largeBranchPosVDistro = NULL;
+				rsgis::math::RSGISPsudoRandDistroGaussian *largeBranchThetaDistro = NULL;
+				rsgis::math::RSGISPsudoRandDistroUniformInt *largeBranchPhiDistro = NULL;
 				
 				// Set up tree distrobutions
-				leafPosHDistro = new RSGISPsudoRandDistroUniformInt(0, this->transectLenght / this->transectRes);
-				leafPosVDistro = new RSGISPsudoRandDistroUniformInt(0, canopyDepth / transectRes);
-				leafThetaDistro = new RSGISPsudoRandDistroGaussian(45, 45); // Distribution of leaf incidence angles
-				smallBranchPosHDistro = new RSGISPsudoRandDistroUniformInt(0, this->transectLenght / this->transectRes); // Distribution of small branch locations (horizontal)
-				smallBranchPosVDistro = new RSGISPsudoRandDistroUniformInt(0, canopyDepth / transectRes); 
-				smallBranchThetaDistro = new RSGISPsudoRandDistroGaussian(smallBranchAngle, 20); // Distribution of small branch incidence angles
-				smallBranchPhiDistro = new RSGISPsudoRandDistroUniformInt(0,360); // Distribution of small branch angles into the incidence plane
-				largeBranchPosHDistro = new RSGISPsudoRandDistroUniformInt(0, this->transectLenght / this->transectRes);; // Distribution of large branch positions (horizontal)
-				largeBranchPosVDistro = new RSGISPsudoRandDistroUniformInt(0, canopyDepth / transectRes); // Distribution of large branch positions (vertical)
-				largeBranchThetaDistro = new RSGISPsudoRandDistroGaussian(largeBranchAngle, 20); // Distribution of large branch incidence angles
-				largeBranchPhiDistro = new RSGISPsudoRandDistroUniformInt(0,360); // Distribution of large branch angles into the incidence plane
+				leafPosHDistro = new rsgis::math::RSGISPsudoRandDistroUniformInt(0, this->transectLenght / this->transectRes);
+				leafPosVDistro = new rsgis::math::RSGISPsudoRandDistroUniformInt(0, canopyDepth / transectRes);
+				leafThetaDistro = new rsgis::math::RSGISPsudoRandDistroGaussian(45, 45); // Distribution of leaf incidence angles
+				smallBranchPosHDistro = new rsgis::math::RSGISPsudoRandDistroUniformInt(0, this->transectLenght / this->transectRes); // Distribution of small branch locations (horizontal)
+				smallBranchPosVDistro = new rsgis::math::RSGISPsudoRandDistroUniformInt(0, canopyDepth / transectRes); 
+				smallBranchThetaDistro = new rsgis::math::RSGISPsudoRandDistroGaussian(smallBranchAngle, 20); // Distribution of small branch incidence angles
+				smallBranchPhiDistro = new rsgis::math::RSGISPsudoRandDistroUniformInt(0,360); // Distribution of small branch angles into the incidence plane
+				largeBranchPosHDistro = new rsgis::math::RSGISPsudoRandDistroUniformInt(0, this->transectLenght / this->transectRes);; // Distribution of large branch positions (horizontal)
+				largeBranchPosVDistro = new rsgis::math::RSGISPsudoRandDistroUniformInt(0, canopyDepth / transectRes); // Distribution of large branch positions (vertical)
+				largeBranchThetaDistro = new rsgis::math::RSGISPsudoRandDistroGaussian(largeBranchAngle, 20); // Distribution of large branch incidence angles
+				largeBranchPhiDistro = new rsgis::math::RSGISPsudoRandDistroUniformInt(0,360); // Distribution of large branch angles into the incidence plane
 				
 				// Set up canopy model
 				tree = new RSGISModelTree(modelPar, leafPosHDistro, leafPosVDistro, leafThetaDistro,smallBranchPosHDistro, smallBranchPosVDistro, smallBranchThetaDistro, smallBranchPhiDistro, largeBranchPosHDistro, largeBranchPosVDistro, largeBranchThetaDistro, largeBranchPhiDistro);
 				
-				stemDistro = new RSGISPsudoRandDistroGaussian(nTrees / (this->transectLenght/ this->quadratSize),1);
-				posDistroX = new RSGISPsudoRandDistroUniformInt(0,this->transectLenght / this->transectRes);
-				posDistroY = new RSGISPsudoRandDistroUniformInt(0,this->transectWidth / this->transectRes);
+				stemDistro = new rsgis::math::RSGISPsudoRandDistroGaussian(nTrees / (this->transectLenght/ this->quadratSize),1);
+				posDistroX = new rsgis::math::RSGISPsudoRandDistroUniformInt(0,this->transectLenght / this->transectRes);
+				posDistroY = new rsgis::math::RSGISPsudoRandDistroUniformInt(0,this->transectWidth / this->transectRes);
 				
 				double totalFPC = 0;
 				double averageFPC = 0;

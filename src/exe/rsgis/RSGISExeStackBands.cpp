@@ -46,8 +46,8 @@ RSGISAlgorithmParameters* RSGISExeStackBands::getInstance()
 
 void RSGISExeStackBands::retrieveParameters(DOMElement *argElement) throw(RSGISXMLArgumentsException)
 {
-	RSGISFileUtils fileUtils;
-	RSGISMathsUtils mathsUtils;
+	rsgis::utils::RSGISFileUtils fileUtils;
+	rsgis::math::RSGISMathsUtils mathsUtils;
 	
 	XMLCh *algorName = XMLString::transcode(this->algorithm.c_str());
 	XMLCh *algorXMLStr = XMLString::transcode("algor");
@@ -332,7 +332,7 @@ void RSGISExeStackBands::runAlgorithm() throw(RSGISException)
 	{
 		if (this->createVRT) 
 		{
-			RSGISMathsUtils mathsUtils;
+			rsgis::math::RSGISMathsUtils mathsUtils;
             
             cout << "There are " << this->numImages << " images to stack\n";
 			

@@ -24,7 +24,7 @@
 
 namespace rsgisexe{
 
-RSGISExeFitting::RSGISExeFitting() : RSGISAlgorithmParameters()
+RSGISExeFitting::RSGISExeFitting() : rsgis::RSGISAlgorithmParameters()
 {
 	this->algorithm = "fitting";
 	this->infile = "";
@@ -32,12 +32,12 @@ RSGISExeFitting::RSGISExeFitting() : RSGISAlgorithmParameters()
 	this->option = RSGISExeFitting::none;
 }
 
-RSGISAlgorithmParameters* RSGISExeFitting::getInstance()
+rsgis::RSGISAlgorithmParameters* RSGISExeFitting::getInstance()
 {
 	return new RSGISExeFitting();
 }
 
-void RSGISExeFitting::retrieveParameters(DOMElement *argElement) throw(RSGISXMLArgumentsException)
+void RSGISExeFitting::retrieveParameters(DOMElement *argElement) throw(rsgis::RSGISXMLArgumentsException)
 {
 	
 	RSGISMathsUtils mathUtils;
@@ -60,7 +60,7 @@ void RSGISExeFitting::retrieveParameters(DOMElement *argElement) throw(RSGISXMLA
 	const XMLCh *algorNameEle = argElement->getAttribute(XMLString::transcode("algor"));
 	if(!XMLString::equals(algorName, algorNameEle))
 	{
-		throw RSGISXMLArgumentsException("The algorithm name is incorrect.");
+		throw rsgis::RSGISXMLArgumentsException("The algorithm name is incorrect.");
 	}
 	
 	// Retrieve input and output file
@@ -73,7 +73,7 @@ void RSGISExeFitting::retrieveParameters(DOMElement *argElement) throw(RSGISXMLA
 	}
 	else
 	{
-		throw RSGISXMLArgumentsException("Input file not provided..");
+		throw rsgis::RSGISXMLArgumentsException("Input file not provided..");
 	}
 	XMLString::release(&inputXMLStr);
 	
@@ -86,7 +86,7 @@ void RSGISExeFitting::retrieveParameters(DOMElement *argElement) throw(RSGISXMLA
 	}
 	else
 	{
-		throw RSGISXMLArgumentsException("Output file not provided..");
+		throw rsgis::RSGISXMLArgumentsException("Output file not provided..");
 	}
 	XMLString::release(&outputXMLStr);
 	const XMLCh *optionStr = argElement->getAttribute(XMLString::transcode("option"));
@@ -103,7 +103,7 @@ void RSGISExeFitting::retrieveParameters(DOMElement *argElement) throw(RSGISXMLA
 		}
 		else
 		{
-			throw RSGISXMLArgumentsException("No value provided for polynomial order");
+			throw rsgis::RSGISXMLArgumentsException("No value provided for polynomial order");
 		}
 		XMLString::release(&polyOrderStr);
 	}
@@ -120,7 +120,7 @@ void RSGISExeFitting::retrieveParameters(DOMElement *argElement) throw(RSGISXMLA
 		}
 		else
 		{
-			throw RSGISXMLArgumentsException("Coefficients not Provided");
+			throw rsgis::RSGISXMLArgumentsException("Coefficients not Provided");
 		}
 		XMLString::release(&inCoeff);
 		XMLCh *polyOrderStr = XMLString::transcode("polyOrder"); // Polynomial Order
@@ -132,7 +132,7 @@ void RSGISExeFitting::retrieveParameters(DOMElement *argElement) throw(RSGISXMLA
 		}
 		else
 		{
-			throw RSGISXMLArgumentsException("No value provided for polynomial order");
+			throw rsgis::RSGISXMLArgumentsException("No value provided for polynomial order");
 		}
 		XMLString::release(&polyOrderStr);
 	}
@@ -165,7 +165,7 @@ void RSGISExeFitting::retrieveParameters(DOMElement *argElement) throw(RSGISXMLA
 		{
 			if (!sameOrderBothFits) 
 			{
-				throw RSGISXMLArgumentsException("No value provided for polynomial order for x fits");
+				throw rsgis::RSGISXMLArgumentsException("No value provided for polynomial order for x fits");
 			}
 		}
 		XMLString::release(&polyOrderXStr);
@@ -181,7 +181,7 @@ void RSGISExeFitting::retrieveParameters(DOMElement *argElement) throw(RSGISXMLA
 		{
 			if (!sameOrderBothFits) 
 			{
-				throw RSGISXMLArgumentsException("No value provided for polynomial order for y fits");
+				throw rsgis::RSGISXMLArgumentsException("No value provided for polynomial order for y fits");
 			}
 		}
 		XMLString::release(&polyOrderYStr);
@@ -194,7 +194,7 @@ void RSGISExeFitting::retrieveParameters(DOMElement *argElement) throw(RSGISXMLA
 		}
 		else
 		{
-			throw RSGISXMLArgumentsException("No value provided for number of x terms");
+			throw rsgis::RSGISXMLArgumentsException("No value provided for number of x terms");
 		}
 		XMLString::release(&numXStr);
 		XMLCh *numYStr = XMLString::transcode("numY"); // Num Y
@@ -206,7 +206,7 @@ void RSGISExeFitting::retrieveParameters(DOMElement *argElement) throw(RSGISXMLA
 		}
 		else
 		{
-			throw RSGISXMLArgumentsException("No value provided for number of y terms");
+			throw rsgis::RSGISXMLArgumentsException("No value provided for number of y terms");
 		}
 		XMLString::release(&numYStr);
 	}
@@ -223,7 +223,7 @@ void RSGISExeFitting::retrieveParameters(DOMElement *argElement) throw(RSGISXMLA
 		}
 		else
 		{
-			throw RSGISXMLArgumentsException("Coefficients not Provided");
+			throw rsgis::RSGISXMLArgumentsException("Coefficients not Provided");
 		}
 		XMLString::release(&inCoeff);
 		bool sameOrderBothFits = false;
@@ -251,7 +251,7 @@ void RSGISExeFitting::retrieveParameters(DOMElement *argElement) throw(RSGISXMLA
 		{
 			if (!sameOrderBothFits) 
 			{
-				throw RSGISXMLArgumentsException("No value provided for polynomial order for x fits");
+				throw rsgis::RSGISXMLArgumentsException("No value provided for polynomial order for x fits");
 			}
 		}
 		XMLString::release(&polyOrderXStr);
@@ -267,7 +267,7 @@ void RSGISExeFitting::retrieveParameters(DOMElement *argElement) throw(RSGISXMLA
 		{
 			if (!sameOrderBothFits) 
 			{
-				throw RSGISXMLArgumentsException("No value provided for polynomial order for y fits");
+				throw rsgis::RSGISXMLArgumentsException("No value provided for polynomial order for y fits");
 			}
 		}
 		XMLString::release(&polyOrderYStr);
@@ -302,7 +302,7 @@ void RSGISExeFitting::retrieveParameters(DOMElement *argElement) throw(RSGISXMLA
 		{
 			if (!sameOrderBothFits) 
 			{
-				throw RSGISXMLArgumentsException("No value provided for polynomial order for x fits");
+				throw rsgis::RSGISXMLArgumentsException("No value provided for polynomial order for x fits");
 			}
 		}
 		XMLString::release(&polyOrderXStr);
@@ -318,7 +318,7 @@ void RSGISExeFitting::retrieveParameters(DOMElement *argElement) throw(RSGISXMLA
 		{
 			if (!sameOrderBothFits) 
 			{
-				throw RSGISXMLArgumentsException("No value provided for polynomial order for y fits");
+				throw rsgis::RSGISXMLArgumentsException("No value provided for polynomial order for y fits");
 			}
 		}
 		XMLString::release(&polyOrderYStr);
@@ -334,7 +334,7 @@ void RSGISExeFitting::retrieveParameters(DOMElement *argElement) throw(RSGISXMLA
 		{
 			if (!sameOrderBothFits) 
 			{
-				throw RSGISXMLArgumentsException("No value provided for polynomial order for z fits");
+				throw rsgis::RSGISXMLArgumentsException("No value provided for polynomial order for z fits");
 			}
 		}
 		XMLString::release(&polyOrderZStr);
@@ -347,7 +347,7 @@ void RSGISExeFitting::retrieveParameters(DOMElement *argElement) throw(RSGISXMLA
 		}
 		else
 		{
-			throw RSGISXMLArgumentsException("No value provided for number of x terms");
+			throw rsgis::RSGISXMLArgumentsException("No value provided for number of x terms");
 		}
 		XMLString::release(&numXStr);
 		XMLCh *numYStr = XMLString::transcode("numY"); // Num Y
@@ -359,7 +359,7 @@ void RSGISExeFitting::retrieveParameters(DOMElement *argElement) throw(RSGISXMLA
 		}
 		else
 		{
-			throw RSGISXMLArgumentsException("No value provided for number of y terms");
+			throw rsgis::RSGISXMLArgumentsException("No value provided for number of y terms");
 		}
 		XMLString::release(&numYStr);
 		XMLCh *numZStr = XMLString::transcode("numZ"); // Num Z
@@ -371,7 +371,7 @@ void RSGISExeFitting::retrieveParameters(DOMElement *argElement) throw(RSGISXMLA
 		}
 		else
 		{
-			throw RSGISXMLArgumentsException("No value provided for number of z terms");
+			throw rsgis::RSGISXMLArgumentsException("No value provided for number of z terms");
 		}
 		XMLString::release(&numZStr);
 	}
@@ -388,7 +388,7 @@ void RSGISExeFitting::retrieveParameters(DOMElement *argElement) throw(RSGISXMLA
 		}
 		else
 		{
-			throw RSGISXMLArgumentsException("Coefficients not Provided");
+			throw rsgis::RSGISXMLArgumentsException("Coefficients not Provided");
 		}
 		XMLString::release(&inCoeff);
 		bool sameOrderBothFits = false;
@@ -417,7 +417,7 @@ void RSGISExeFitting::retrieveParameters(DOMElement *argElement) throw(RSGISXMLA
 		{
 			if (!sameOrderBothFits) 
 			{
-				throw RSGISXMLArgumentsException("No value provided for polynomial order for x fits");
+				throw rsgis::RSGISXMLArgumentsException("No value provided for polynomial order for x fits");
 			}
 		}
 		XMLString::release(&polyOrderXStr);
@@ -433,7 +433,7 @@ void RSGISExeFitting::retrieveParameters(DOMElement *argElement) throw(RSGISXMLA
 		{
 			if (!sameOrderBothFits) 
 			{
-				throw RSGISXMLArgumentsException("No value provided for polynomial order for y fits");
+				throw rsgis::RSGISXMLArgumentsException("No value provided for polynomial order for y fits");
 			}
 		}
 		XMLString::release(&polyOrderYStr);
@@ -449,7 +449,7 @@ void RSGISExeFitting::retrieveParameters(DOMElement *argElement) throw(RSGISXMLA
 		{
 			if (!sameOrderBothFits) 
 			{
-				throw RSGISXMLArgumentsException("No value provided for polynomial order for z fits");
+				throw rsgis::RSGISXMLArgumentsException("No value provided for polynomial order for z fits");
 			}
 		}
 		XMLString::release(&polyOrderZStr);		
@@ -549,7 +549,7 @@ void RSGISExeFitting::retrieveParameters(DOMElement *argElement) throw(RSGISXMLA
 			XMLString::release(&inCoeffC);
 			XMLString::release(&inFixCoeffC);
 		}
-		else {throw RSGISXMLArgumentsException("Function not recognised\n");}
+		else {throw rsgis::RSGISXMLArgumentsException("Function not recognised\n");}
 	}
 	
 	else if(XMLString::equals(typeNonlinearTest, optionStr))
@@ -560,7 +560,7 @@ void RSGISExeFitting::retrieveParameters(DOMElement *argElement) throw(RSGISXMLA
 		{
 			this->function = ln2Var;
 		}
-		else{throw RSGISXMLArgumentsException("Function not provided / recognised");}
+		else{throw rsgis::RSGISXMLArgumentsException("Function not provided / recognised");}
 		
 		XMLCh *inCoeff = XMLString::transcode("inCoeff"); // Coefficients
 		if(argElement->hasAttribute(inCoeff))
@@ -571,7 +571,7 @@ void RSGISExeFitting::retrieveParameters(DOMElement *argElement) throw(RSGISXMLA
 		}
 		else
 		{
-			throw RSGISXMLArgumentsException("Coefficients not Provided");
+			throw rsgis::RSGISXMLArgumentsException("Coefficients not Provided");
 		}
 		XMLString::release(&inCoeff);
 	}
@@ -580,7 +580,7 @@ void RSGISExeFitting::retrieveParameters(DOMElement *argElement) throw(RSGISXMLA
 	else
 	{
 		string message = string("The option (") + string(XMLString::transcode(optionStr)) + string(") is not known: RSGISExeFitting.");
-		throw RSGISXMLArgumentsException(message.c_str());
+		throw rsgis::RSGISXMLArgumentsException(message.c_str());
 	}
 	
 	parsed = true;
@@ -596,11 +596,11 @@ void RSGISExeFitting::retrieveParameters(DOMElement *argElement) throw(RSGISXMLA
 	
 }
 
-void RSGISExeFitting::runAlgorithm() throw(RSGISException)
+void RSGISExeFitting::runAlgorithm() throw(rsgis::RSGISException)
 {
 	if(!parsed)
 	{
-		throw RSGISException("Before running the parameters much be retrieved");
+		throw rsgis::RSGISException("Before running the parameters much be retrieved");
 	}
 	else
 	{
@@ -621,7 +621,7 @@ void RSGISExeFitting::runAlgorithm() throw(RSGISException)
 				cout << "Coefficients written to: " << outfile << ".mtxt" << endl;
 				cout << "\n";
 			}
-			catch(RSGISException e)
+			catch(rsgis::RSGISException e)
 			{
 				throw e;
 			}
@@ -682,7 +682,7 @@ void RSGISExeFitting::runAlgorithm() throw(RSGISException)
 				delete measured;
 				delete predicted;
 			}
-			catch(RSGISException e)
+			catch(rsgis::RSGISException e)
 			{
 				throw e;
 			}
@@ -706,7 +706,7 @@ void RSGISExeFitting::runAlgorithm() throw(RSGISException)
 				cout << "Coefficients written to: " << outfile << ".mtxt" << endl;
 				cout << "\n";
 			}
-			catch(RSGISException e)
+			catch(rsgis::RSGISException e)
 			{
 				throw e;
 			}
@@ -783,7 +783,7 @@ void RSGISExeFitting::runAlgorithm() throw(RSGISException)
 				delete predicted;
 			
 			}
-			catch(RSGISException e)
+			catch(rsgis::RSGISException e)
 			{
 				throw e;
 			}
@@ -809,7 +809,7 @@ void RSGISExeFitting::runAlgorithm() throw(RSGISException)
 				cout << "Coefficients written to: " << outfile << ".gtxt" << endl;
 				cout << "\n";
 			}
-			catch(RSGISException e)
+			catch(rsgis::RSGISException e)
 			{
 				throw e;
 			}
@@ -899,7 +899,7 @@ void RSGISExeFitting::runAlgorithm() throw(RSGISException)
 				RSGISExportForPlotting::getInstance()->export2DScatter(this->outfile, measured, predicted, numPts);
 				
 			}
-			catch(RSGISException e)
+			catch(rsgis::RSGISException e)
 			{
 				throw e;
 			}
@@ -933,7 +933,7 @@ void RSGISExeFitting::runAlgorithm() throw(RSGISException)
 					}
 					else 
 					{
-						throw RSGISException("Input file has incorrect number of columns, should be 3 or 4\n");
+						throw rsgis::RSGISException("Input file has incorrect number of columns, should be 3 or 4\n");
 					}
 
 					
@@ -992,7 +992,7 @@ void RSGISExeFitting::runAlgorithm() throw(RSGISException)
 					
 				}
 			}
-			catch (RSGISException e) 
+			catch (rsgis::RSGISException e) 
 			{
 				throw e;
 			}
@@ -1069,7 +1069,7 @@ void RSGISExeFitting::runAlgorithm() throw(RSGISException)
 					
 				}
 			}
-			catch (RSGISException e) 
+			catch (rsgis::RSGISException e) 
 			{
 				throw e;
 			}

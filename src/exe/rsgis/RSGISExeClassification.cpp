@@ -940,7 +940,7 @@ void RSGISExeClassification::runAlgorithm() throw(RSGISException)
 			GDALAllRegister();
 			GDALDataset **datasets = NULL;
 			
-			RSGISCalcImage *calcImage = NULL;
+			rsgis::img::RSGISCalcImage *calcImage = NULL;
 			RSGISNearestNeighbourClassifier *nnClassifier = NULL;
 			RSGISApplyClassifier *applyClassifier = NULL;
 			
@@ -958,7 +958,7 @@ void RSGISExeClassification::runAlgorithm() throw(RSGISException)
 				nnClassifier = new RSGISNearestNeighbourClassifier(this->trainingData, this->numClasses);
 				nnClassifier->printClassIDs();
 				applyClassifier = new RSGISApplyClassifier(1, nnClassifier);
-				calcImage = new RSGISCalcImage(applyClassifier, "", true);
+				calcImage = new rsgis::img::RSGISCalcImage(applyClassifier, "", true);
 				calcImage->calcImage(datasets, 1, this->outputImage);
 				
 				GDALClose(datasets[0]);
@@ -1029,7 +1029,7 @@ void RSGISExeClassification::runAlgorithm() throw(RSGISException)
 			GDALAllRegister();
 			GDALDataset **datasets = NULL;
 			
-			RSGISCalcImage *calcImg = NULL;
+			rsgis::img::RSGISCalcImage *calcImg = NULL;
 			RSGISSpectralAngleMapperRule *samRule = NULL;
 			int numOutputBands = specLib->size2;
 			
@@ -1053,7 +1053,7 @@ void RSGISExeClassification::runAlgorithm() throw(RSGISException)
 			{
 				cout << "Producing Rule image" <<endl;
 				samRule = new RSGISSpectralAngleMapperRule(numOutputBands, specLib);
-				calcImg = new RSGISCalcImage(samRule, "", true);
+				calcImg = new rsgis::img::RSGISCalcImage(samRule, "", true);
 				calcImg->calcImage(datasets, 1, this->ruleImage);
 			}
 			catch(RSGISException& e)
@@ -1075,7 +1075,7 @@ void RSGISExeClassification::runAlgorithm() throw(RSGISException)
 			GDALAllRegister();
 			GDALDataset **datasets = NULL;
 			
-			RSGISCalcImage *calcImg = NULL;
+			rsgis::img::RSGISCalcImage *calcImg = NULL;
 			RSGISSpectralAngleMapperClassifier *samClassify = NULL;
 
 			try
@@ -1098,7 +1098,7 @@ void RSGISExeClassification::runAlgorithm() throw(RSGISException)
 			{
 				cout << "Producing classification" <<endl;
 				samClassify = new RSGISSpectralAngleMapperClassifier(1, this->threshold);
-				calcImg = new RSGISCalcImage(samClassify, "", true);
+				calcImg = new rsgis::img::RSGISCalcImage(samClassify, "", true);
 				calcImg->calcImage(datasets, 1, this->outputImage);
 			}
 			catch(RSGISException& e)
@@ -1121,7 +1121,7 @@ void RSGISExeClassification::runAlgorithm() throw(RSGISException)
 			GDALAllRegister();
 			GDALDataset **datasets = NULL;
 			
-			RSGISCalcImage *calcImg = NULL;
+			rsgis::img::RSGISCalcImage *calcImg = NULL;
 			RSGISSpectralCorrelationMapperRule *scmRule = NULL;
 			int numOutputBands = specLib->size2;
 			
@@ -1145,7 +1145,7 @@ void RSGISExeClassification::runAlgorithm() throw(RSGISException)
 			{
 				cout << "Producing Rule image" <<endl;
 				scmRule = new RSGISSpectralCorrelationMapperRule(numOutputBands, specLib);
-				calcImg = new RSGISCalcImage(scmRule, "", true);
+				calcImg = new rsgis::img::RSGISCalcImage(scmRule, "", true);
 				calcImg->calcImage(datasets, 1, this->ruleImage);
 			}
 			catch(RSGISException& e)
@@ -1167,7 +1167,7 @@ void RSGISExeClassification::runAlgorithm() throw(RSGISException)
 			GDALAllRegister();
 			GDALDataset **datasets = NULL;
 			
-			RSGISCalcImage *calcImg = NULL;
+			rsgis::img::RSGISCalcImage *calcImg = NULL;
 			RSGISSpectralCorrelationMapperClassifier *scmClassify = NULL;
 			
 			try
@@ -1190,7 +1190,7 @@ void RSGISExeClassification::runAlgorithm() throw(RSGISException)
 			{
 				cout << "Producing classification" <<endl;
 				scmClassify = new RSGISSpectralCorrelationMapperClassifier(1, this->threshold);
-				calcImg = new RSGISCalcImage(scmClassify, "", true);
+				calcImg = new rsgis::img::RSGISCalcImage(scmClassify, "", true);
 				calcImg->calcImage(datasets, 1, this->outputImage);
 			}
 			catch(RSGISException& e)
@@ -1217,8 +1217,8 @@ void RSGISExeClassification::runAlgorithm() throw(RSGISException)
 			
 			GDALAllRegister();
 			GDALDataset **datasets = NULL;
-			RSGISCalcImageValue *calcImageValue = NULL;
-			RSGISCalcImage *calcImage = NULL;
+			rsgis::img::RSGISCalcImageValue *calcImageValue = NULL;
+			rsgis::img::RSGISCalcImage *calcImage = NULL;
 			RSGISMatrices matrixUtils;
 			RSGISMathsUtils mathsUtils;
 			
@@ -1263,7 +1263,7 @@ void RSGISExeClassification::runAlgorithm() throw(RSGISException)
 				
 				calcImageValue = new RSGISCumulativeAreaClassifierGenRules(cumAreaRefDataMatrix->m, bandsValuesMatrix, cumAreaRefDataMatrix);
 				
-				calcImage = new RSGISCalcImage(calcImageValue, "", true);
+				calcImage = new rsgis::img::RSGISCalcImage(calcImageValue, "", true);
 				calcImage->calcImage(datasets, 1, this->outputImage);
 				
 				
@@ -1290,8 +1290,8 @@ void RSGISExeClassification::runAlgorithm() throw(RSGISException)
 			
 			GDALAllRegister();
 			GDALDataset **datasets = NULL;
-			RSGISCalcImageValue *calcImageValue = NULL;
-			RSGISCalcImage *calcImage = NULL;
+			rsgis::img::RSGISCalcImageValue *calcImageValue = NULL;
+			rsgis::img::RSGISCalcImage *calcImage = NULL;
 			
 			try
 			{
@@ -1306,7 +1306,7 @@ void RSGISExeClassification::runAlgorithm() throw(RSGISException)
 				
 				calcImageValue = new RSGISCumulativeAreaClassifierDecide(1, threshold);
 				
-				calcImage = new RSGISCalcImage(calcImageValue, "", true);
+				calcImage = new rsgis::img::RSGISCalcImage(calcImageValue, "", true);
 				calcImage->calcImage(datasets, 1, this->outputImage);
 				
 				

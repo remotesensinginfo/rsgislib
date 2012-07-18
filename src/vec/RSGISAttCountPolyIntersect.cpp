@@ -186,9 +186,9 @@ namespace rsgis{namespace vec{
             unsigned long clumpIdx = 0;
             try
             {
-                clumpIdx = lexical_cast<unsigned long>(bandValues[0])-1;
+                clumpIdx = boost::lexical_cast<unsigned long>(bandValues[0])-1;
             }
-            catch(bad_lexical_cast &e)
+            catch(boost::bad_lexical_cast &e)
             {
                 throw RSGISImageCalcException(e.what());
             }

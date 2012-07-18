@@ -4584,8 +4584,8 @@ void RSGISExeSegment::runAlgorithm() throw(RSGISException)
             }
                         
             cout << "Create Attribute Table\n";
-            RSGISCreateNewAttributeTable createAtt;
-            RSGISAttributeTable *attTable = NULL;
+            rsgis::rastergis::RSGISCreateNewAttributeTable createAtt;
+            rsgis::rastergis::RSGISAttributeTable *attTable = NULL;
             if(this->processInMemory)
             {
                 attTable = createAtt.createAndPopPixelCount(clumpsDataset, this->processInMemory, this->tempTable, this->cacheSize);
