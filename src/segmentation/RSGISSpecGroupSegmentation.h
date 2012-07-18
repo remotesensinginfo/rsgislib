@@ -35,17 +35,14 @@
 #include "img/RSGISImageCalcException.h"
 
 namespace rsgis{namespace segment{
-
-    using namespace std;
-    using namespace rsgis::img;
     
     class RSGISSpecGroupSegmentation
     {
     public:
         RSGISSpecGroupSegmentation();
-        void performSimpleClump(GDALDataset *spectral, GDALDataset *clumps, float specThreshold, bool noDataValProvided, float noDataVal) throw(RSGISImageCalcException);
-        void performSimpleClumpKeepPxlVals(GDALDataset *spectral, GDALDataset *clumps, float specThreshold) throw(RSGISImageCalcException);
-        void performSimpleClumpStdDevWeights(GDALDataset *spectral, GDALDataset *clumps, float specThreshold, bool noDataValProvided, float noDataVal) throw(RSGISImageCalcException);
+        void performSimpleClump(GDALDataset *spectral, GDALDataset *clumps, float specThreshold, bool noDataValProvided, float noDataVal) throw(rsgis::img::RSGISImageCalcException);
+        void performSimpleClumpKeepPxlVals(GDALDataset *spectral, GDALDataset *clumps, float specThreshold) throw(rsgis::img::RSGISImageCalcException);
+        void performSimpleClumpStdDevWeights(GDALDataset *spectral, GDALDataset *clumps, float specThreshold, bool noDataValProvided, float noDataVal) throw(rsgis::img::RSGISImageCalcException);
         ~RSGISSpecGroupSegmentation();
     protected:
         float eucDistance(float *vals1, float *vals2, unsigned int numVals);

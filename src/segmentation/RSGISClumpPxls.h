@@ -24,7 +24,6 @@
 #define RSGISClumpPxls_h
 
 #include <iostream>
-#include <string>
 #include <vector>
 #include <queue>
 #include <math.h>
@@ -35,15 +34,12 @@
 #include "img/RSGISImageCalcException.h"
 
 namespace rsgis{namespace segment{
-    
-    using namespace std;
-    using namespace rsgis::img;
-    
+
     class RSGISClumpPxls
     {
     public:
         RSGISClumpPxls();
-        void performClump(GDALDataset *catagories, GDALDataset *clumps, bool noDataValProvided, unsigned int noDataVal) throw(RSGISImageCalcException);
+        void performClump(GDALDataset *catagories, GDALDataset *clumps, bool noDataValProvided, unsigned int noDataVal) throw(rsgis::img::RSGISImageCalcException);
         ~RSGISClumpPxls();
     };
     
@@ -51,7 +47,7 @@ namespace rsgis{namespace segment{
     {
     public:
         RSGISRelabelClumps();
-        void relabelClumps(GDALDataset *catagories, GDALDataset *clumps) throw(RSGISImageCalcException);
+        void relabelClumps(GDALDataset *catagories, GDALDataset *clumps) throw(rsgis::img::RSGISImageCalcException);
         ~RSGISRelabelClumps();
     };
     

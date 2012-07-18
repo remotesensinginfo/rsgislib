@@ -29,22 +29,22 @@ namespace rsgis{namespace segment{
         
     }
         
-    void RSGISRandomColourClumps::generateRandomColouredClump(GDALDataset *clumps, GDALDataset *colourImg, string inputLUTFile, bool importLUT, string exportLUTFile, bool exportLUT) throw(RSGISImageCalcException)
+    void RSGISRandomColourClumps::generateRandomColouredClump(GDALDataset *clumps, GDALDataset *colourImg, std::string inputLUTFile, bool importLUT, std::string exportLUTFile, bool exportLUT) throw(rsgis::img::RSGISImageCalcException)
     {
         if(clumps->GetRasterXSize() != colourImg->GetRasterXSize())
         {
-            throw RSGISImageCalcException("Widths are not the same");
+            throw rsgis::img::RSGISImageCalcException("Widths are not the same");
         }
         if(clumps->GetRasterYSize() != colourImg->GetRasterYSize())
         {
-            throw RSGISImageCalcException("Heights are not the same");
+            throw rsgis::img::RSGISImageCalcException("Heights are not the same");
         }
         if(colourImg->GetRasterCount() != 3)
         {
-            throw RSGISImageCalcException("Colour image needs to have 3 image bands.");
+            throw rsgis::img::RSGISImageCalcException("Colour image needs to have 3 image bands.");
         }
         
-        RSGISImageUtils imgUtils;
+        rsgis::img::RSGISImageUtils imgUtils;
         imgUtils.zerosUIntGDALDataset(colourImg);
         
         unsigned int width = clumps->GetRasterXSize();
@@ -143,19 +143,19 @@ namespace rsgis{namespace segment{
         delete clumpTab;
     }
     
-    vector<ImgClumpRGB*>* RSGISRandomColourClumps::importLUTFromFile(string inFile) throw(RSGISTextException)
+    vector<ImgClumpRGB*>* RSGISRandomColourClumps::importLUTFromFile(std::string inFile) throw(rsgis::utils::RSGISTextException)
     {
         vector<ImgClumpRGB*> *clumpTab = new vector<ImgClumpRGB*>();
         try 
         {
-            RSGISTextUtils txtUtils;
+            rsgis::utils::RSGISTextUtils txtUtils;
             size_t numLines = txtUtils.countLines(inFile);
             clumpTab->reserve(numLines);
-            vector<string> *tokens = new vector<string>();
-            string line = "";
+            vector<std::string> *tokens = new vector<std::string>();
+            std::string line = "";
             size_t count = 1;
             ImgClumpRGB *cRGB = NULL;
-            RSGISTextFileLineReader reader;
+            rsgis::utils::RSGISTextFileLineReader reader;
             reader.openFile(inFile);
             while(!reader.endOfFile())
             {
@@ -166,7 +166,7 @@ namespace rsgis{namespace segment{
                     if(tokens->size() != 3)
                     {
                         cout << "Line: " << line << endl;
-                        throw RSGISTextException("Line must has 3 tokens");
+                        throw rsgis::utils::RSGISTextException("Line must has 3 tokens");
                     }
                     cRGB = new ImgClumpRGB(count++);
                     cRGB->red = txtUtils.strto32bitInt(tokens->at(0));
@@ -179,14 +179,14 @@ namespace rsgis{namespace segment{
             
             delete tokens;
         }
-        catch (RSGISTextException &e) 
+        catch (rsgis::utils::RSGISTextException &e) 
         {
             throw e;
         }
         return clumpTab;
     }
     
-    void RSGISRandomColourClumps::exportLUT2File(string outFile, vector<ImgClumpRGB*> *clumpTab) throw(RSGISTextException)
+    void RSGISRandomColourClumps::exportLUT2File(std::string outFile, vector<ImgClumpRGB*> *clumpTab) throw(rsgis::utils::RSGISTextException)
     {
         try 
         {
@@ -203,7 +203,7 @@ namespace rsgis{namespace segment{
                 outTxtFile.close();
             }
         }
-        catch (RSGISTextException &e) 
+        catch (rsgis::utils::RSGISTextException &e) 
         {
             throw e;
         }

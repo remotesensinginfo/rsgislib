@@ -29,33 +29,32 @@ namespace rsgis{namespace segment{
         
     }
     
-    void RSGISEliminateSinglePixels::eliminate(GDALDataset *inSpecData, GDALDataset *inClumpsData, GDALDataset *tmpData, string outputImage, float noDataVal, bool noDataValProvided, bool projFromImage, string proj, string format)throw(RSGISImageCalcException)
+    void RSGISEliminateSinglePixels::eliminate(GDALDataset *inSpecData, GDALDataset *inClumpsData, GDALDataset *tmpData, std::string outputImage, float noDataVal, bool noDataValProvided, bool projFromImage, std::string proj, std::string format)throw(rsgis::img::RSGISImageCalcException)
     {
         try
         {
             // Check images have the same size!
             if(inSpecData->GetRasterXSize() != inClumpsData->GetRasterXSize())
             {
-                throw RSGISImageCalcException("Widths are not the same (spectral and categories)");
+                throw rsgis::img::RSGISImageCalcException("Widths are not the same (spectral and categories)");
             }
             if(inSpecData->GetRasterYSize() != inClumpsData->GetRasterYSize())
             {
-                throw RSGISImageCalcException("Heights are not the same (spectral and categories)");
+                throw rsgis::img::RSGISImageCalcException("Heights are not the same (spectral and categories)");
             }
             if(inSpecData->GetRasterXSize() != tmpData->GetRasterXSize())
             {
-                throw RSGISImageCalcException("Widths are not the same (spectral and temp)");
+                throw rsgis::img::RSGISImageCalcException("Widths are not the same (spectral and temp)");
             }
             if(inSpecData->GetRasterYSize() != tmpData->GetRasterYSize())
             {
-                throw RSGISImageCalcException("Heights are not the same (spectral and temp)");
+                throw rsgis::img::RSGISImageCalcException("Heights are not the same (spectral and temp)");
             }
             
             GDALDataset *outData = NULL;
-            RSGISImageUtils imgUtils;
+            rsgis::img::RSGISImageUtils imgUtils;
             outData = imgUtils.createCopy(inClumpsData, outputImage, format, GDT_UInt32, projFromImage, proj);
             imgUtils.copyUIntGDALDataset(inClumpsData, outData);
-
             
             unsigned long singlesCount = 0;
             bool singlesRemoved = false;
@@ -83,18 +82,18 @@ namespace rsgis{namespace segment{
             GDALClose(outData);
             
         }
-        catch(RSGISImageCalcException &e)
+        catch(rsgis::img::RSGISImageCalcException &e)
         {
             throw e;
         }
         catch(RSGISImageException &e)
         {
-            throw RSGISImageCalcException(e.what());
+            throw rsgis::img::RSGISImageCalcException(e.what());
         }
     }
     
     
-    unsigned long RSGISEliminateSinglePixels::findSinglePixels(GDALDataset *inClumpsData, GDALDataset *tmpData, float noDataVal, bool noDataValProvided) throw(RSGISImageCalcException)
+    unsigned long RSGISEliminateSinglePixels::findSinglePixels(GDALDataset *inClumpsData, GDALDataset *tmpData, float noDataVal, bool noDataValProvided) throw(rsgis::img::RSGISImageCalcException)
     {
         unsigned long countSingles = 0;
         try 
@@ -359,7 +358,7 @@ namespace rsgis{namespace segment{
             delete[] inData;
             delete[] outData;
         }
-        catch (RSGISImageCalcException &e)
+        catch (rsgis::img::RSGISImageCalcException &e)
         {
             throw e;
         }
@@ -367,7 +366,7 @@ namespace rsgis{namespace segment{
         return countSingles;
     }
     
-    bool RSGISEliminateSinglePixels::eliminateSinglePixels(GDALDataset *inSpecData, GDALDataset *inClumpsData, GDALDataset *tmpData, GDALDataset *outDataset, float noDataVal, bool noDataValProvided) throw(RSGISImageCalcException)
+    bool RSGISEliminateSinglePixels::eliminateSinglePixels(GDALDataset *inSpecData, GDALDataset *inClumpsData, GDALDataset *tmpData, GDALDataset *outDataset, float noDataVal, bool noDataValProvided) throw(rsgis::img::RSGISImageCalcException)
     {
         bool hasChangeOccured = false;
         try 
@@ -1068,7 +1067,7 @@ namespace rsgis{namespace segment{
             delete[] specData;
             delete[] outData;
         }
-        catch (RSGISImageCalcException &e)
+        catch (rsgis::img::RSGISImageCalcException &e)
         {
             throw e;
         }

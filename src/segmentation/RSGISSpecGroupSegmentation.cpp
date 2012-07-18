@@ -31,18 +31,18 @@ namespace rsgis{namespace segment{
         
     }
     
-    void RSGISSpecGroupSegmentation::performSimpleClump(GDALDataset *spectral, GDALDataset *clumps, float specThreshold, bool noDataValProvided, float noDataVal) throw(RSGISImageCalcException)
+    void RSGISSpecGroupSegmentation::performSimpleClump(GDALDataset *spectral, GDALDataset *clumps, float specThreshold, bool noDataValProvided, float noDataVal) throw(rsgis::img::RSGISImageCalcException)
     {
         if(spectral->GetRasterXSize() != clumps->GetRasterXSize())
         {
-            throw RSGISImageCalcException("Widths are not the same");
+            throw rsgis::img::RSGISImageCalcException("Widths are not the same");
         }
         if(spectral->GetRasterYSize() != clumps->GetRasterYSize())
         {
-            throw RSGISImageCalcException("Heights are not the same");
+            throw rsgis::img::RSGISImageCalcException("Heights are not the same");
         }
         
-        RSGISImageUtils imgUtils;
+        rsgis::img::RSGISImageUtils imgUtils;
         imgUtils.zerosUIntGDALDataset(clumps);
         
         unsigned int width = spectral->GetRasterXSize();
@@ -57,8 +57,8 @@ namespace rsgis{namespace segment{
         GDALRasterBand *clumpBand = clumps->GetRasterBand(1);
         
         unsigned long clumpIdx = 1;
-        vector<PxlLoc> clumpPxls;
-        queue<PxlLoc> clumpSearchPxls;
+        std::vector<rsgis::img::PxlLoc> clumpPxls;
+        std::queue<rsgis::img::PxlLoc> clumpSearchPxls;
         float *specPxlVals = new float[numSpecBands];
         float *specCPxlVals = new float[numSpecBands];
         
@@ -68,18 +68,18 @@ namespace rsgis{namespace segment{
         
         int feedback = height/10;
         int feedbackCounter = 0;
-        cout << "Started" << flush;
+        std::cout << "Started" << std::flush;
         for(unsigned int i = 0; i < height; ++i)
         {
             if((i % feedback) == 0)
             {
-                cout << ".." << feedbackCounter << ".." << flush;
+                std::cout << ".." << feedbackCounter << ".." << std::flush;
                 feedbackCounter = feedbackCounter + 10;
             }
             
             for(unsigned int j = 0; j < width; ++j)
             {
-                //cout << "Processing Pixel [" << j << "," << i << "]\n";
+                //std::cout << "Processing Pixel [" << j << "," << i << "]\n";
                 // Get pixel value from clump image for (j,i)
                 clumpBand->RasterIO(GF_Read, j, i, 1, 1, &uiPxlVal, 1, 1, GDT_UInt32, 0, 0);
                 
@@ -109,19 +109,19 @@ namespace rsgis{namespace segment{
                             }
                         }
                         
-                        clumpPxls.push_back(PxlLoc(j, i));
-                        clumpSearchPxls.push(PxlLoc(j, i));
+                        clumpPxls.push_back(rsgis::img::PxlLoc(j, i));
+                        clumpSearchPxls.push(rsgis::img::PxlLoc(j, i));
                         clumpBand->RasterIO(GF_Write, j, i, 1, 1, &clumpIdx, 1, 1, GDT_UInt32, 0, 0);
                         
                         // Add neigbouring pixels to clump.
                         // If no more pixels to add then stop.
                         while(clumpSearchPxls.size() > 0)
                         {
-                            PxlLoc pxl = clumpSearchPxls.front();
+                            rsgis::img::PxlLoc pxl = clumpSearchPxls.front();
                             clumpSearchPxls.pop();
                             
-                            //cout << "\tSearch Size = " << clumpSearchPxls.size() << endl;
-                            //cout << "\t\tProcessing [" << pxl.xPos << "," << pxl.yPos << "]\n";
+                            //std::cout << "\tSearch Size = " << clumpSearchPxls.size() << std::endl;
+                            //std::cout << "\t\tProcessing [" << pxl.xPos << "," << pxl.yPos << "]\n";
                             
                             // Above
                             if(((long)pxl.yPos)-1 >= 0)
@@ -144,8 +144,8 @@ namespace rsgis{namespace segment{
                                         
                                         if(dist <= specThreshold)
                                         {
-                                            clumpPxls.push_back(PxlLoc(pxl.xPos, pxl.yPos-1));
-                                            clumpSearchPxls.push(PxlLoc(pxl.xPos, pxl.yPos-1));
+                                            clumpPxls.push_back(rsgis::img::PxlLoc(pxl.xPos, pxl.yPos-1));
+                                            clumpSearchPxls.push(rsgis::img::PxlLoc(pxl.xPos, pxl.yPos-1));
                                             clumpBand->RasterIO(GF_Write, pxl.xPos, pxl.yPos-1, 1, 1, &clumpIdx, 1, 1, GDT_UInt32, 0, 0);
                                         }
                                     }
@@ -173,8 +173,8 @@ namespace rsgis{namespace segment{
                                         
                                         if(dist <= specThreshold)
                                         {
-                                            clumpPxls.push_back(PxlLoc(pxl.xPos, pxl.yPos+1));
-                                            clumpSearchPxls.push(PxlLoc(pxl.xPos, pxl.yPos+1));
+                                            clumpPxls.push_back(rsgis::img::PxlLoc(pxl.xPos, pxl.yPos+1));
+                                            clumpSearchPxls.push(rsgis::img::PxlLoc(pxl.xPos, pxl.yPos+1));
                                             clumpBand->RasterIO(GF_Write, pxl.xPos, pxl.yPos+1, 1, 1, &clumpIdx, 1, 1, GDT_UInt32, 0, 0);
                                         }
                                     }
@@ -203,8 +203,8 @@ namespace rsgis{namespace segment{
                                         
                                         if(dist <= specThreshold)
                                         {
-                                            clumpPxls.push_back(PxlLoc(pxl.xPos-1, pxl.yPos));
-                                            clumpSearchPxls.push(PxlLoc(pxl.xPos-1, pxl.yPos));
+                                            clumpPxls.push_back(rsgis::img::PxlLoc(pxl.xPos-1, pxl.yPos));
+                                            clumpSearchPxls.push(rsgis::img::PxlLoc(pxl.xPos-1, pxl.yPos));
                                             clumpBand->RasterIO(GF_Write, pxl.xPos-1, pxl.yPos, 1, 1, &clumpIdx, 1, 1, GDT_UInt32, 0, 0);
                                         }
                                     }
@@ -233,8 +233,8 @@ namespace rsgis{namespace segment{
                                         
                                         if(dist <= specThreshold)
                                         {
-                                            clumpPxls.push_back(PxlLoc(pxl.xPos+1, pxl.yPos));
-                                            clumpSearchPxls.push(PxlLoc(pxl.xPos+1, pxl.yPos));
+                                            clumpPxls.push_back(rsgis::img::PxlLoc(pxl.xPos+1, pxl.yPos));
+                                            clumpSearchPxls.push(rsgis::img::PxlLoc(pxl.xPos+1, pxl.yPos));
                                             clumpBand->RasterIO(GF_Write, pxl.xPos+1, pxl.yPos, 1, 1, &clumpIdx, 1, 1, GDT_UInt32, 0, 0);
                                         }
                                     }
@@ -248,24 +248,24 @@ namespace rsgis{namespace segment{
                 }
             }
         }
-        cout << " Complete (Generated " << clumpIdx-1 << " clumps).\n";
+        std::cout << " Complete (Generated " << clumpIdx-1 << " clumps).\n";
         
         delete[] specPxlVals;
         delete[] specCPxlVals;
     }
     
-    void RSGISSpecGroupSegmentation::performSimpleClumpKeepPxlVals(GDALDataset *spectral, GDALDataset *clumps, float specThreshold) throw(RSGISImageCalcException)
+    void RSGISSpecGroupSegmentation::performSimpleClumpKeepPxlVals(GDALDataset *spectral, GDALDataset *clumps, float specThreshold) throw(rsgis::img::RSGISImageCalcException)
     {
         if(spectral->GetRasterXSize() != clumps->GetRasterXSize())
         {
-            throw RSGISImageCalcException("Widths are not the same");
+            throw rsgis::img::RSGISImageCalcException("Widths are not the same");
         }
         if(spectral->GetRasterYSize() != clumps->GetRasterYSize())
         {
-            throw RSGISImageCalcException("Heights are not the same");
+            throw rsgis::img::RSGISImageCalcException("Heights are not the same");
         }
         
-        RSGISImageUtils imgUtils;
+        rsgis::img::RSGISImageUtils imgUtils;
         imgUtils.zerosUIntGDALDataset(clumps);
         
         unsigned int width = spectral->GetRasterXSize();
@@ -280,9 +280,9 @@ namespace rsgis{namespace segment{
         GDALRasterBand *clumpBand = clumps->GetRasterBand(1);
         
         unsigned long clumpIdx = 1;
-        vector<PxlLoc> clumpPxls;
-        queue<PxlLoc> clumpSearchPxls;
-        vector<float> *clumpSpecPxlVals = new  vector<float>[numSpecBands];
+        std::vector<rsgis::img::PxlLoc> clumpPxls;
+        std::queue<rsgis::img::PxlLoc> clumpSearchPxls;
+        std::vector<float> *clumpSpecPxlVals = new  std::vector<float>[numSpecBands];
         float *specPxlVals = new float[numSpecBands];
         float *specCPxlVals = new float[numSpecBands];
         
@@ -291,18 +291,18 @@ namespace rsgis{namespace segment{
         
         int feedback = height/10;
         int feedbackCounter = 0;
-        cout << "Started" << flush;
+        std::cout << "Started" << std::flush;
         for(unsigned int i = 0; i < height; ++i)
         {
             if((i % feedback) == 0)
             {
-                cout << ".." << feedbackCounter << ".." << flush;
+                std::cout << ".." << feedbackCounter << ".." << std::flush;
                 feedbackCounter = feedbackCounter + 10;
             }
             
             for(unsigned int j = 0; j < width; ++j)
             {
-                //cout << "Processing Pixel [" << j << "," << i << "]\n";
+                //std::cout << "Processing Pixel [" << j << "," << i << "]\n";
                 // Get pixel value from clump image for (j,i)
                 clumpBand->RasterIO(GF_Read, j, i, 1, 1, &uiPxlVal, 1, 1, GDT_UInt32, 0, 0);
                 
@@ -324,19 +324,19 @@ namespace rsgis{namespace segment{
                         spectralBands[n]->RasterIO(GF_Read, j, i, 1, 1, &specPxlVals[n], 1, 1, GDT_Float32, 0, 0);
                         clumpSpecPxlVals[n].push_back(specPxlVals[n]);
                     }
-                    clumpPxls.push_back(PxlLoc(j, i));
-                    clumpSearchPxls.push(PxlLoc(j, i));
+                    clumpPxls.push_back(rsgis::img::PxlLoc(j, i));
+                    clumpSearchPxls.push(rsgis::img::PxlLoc(j, i));
                     clumpBand->RasterIO(GF_Write, j, i, 1, 1, &clumpIdx, 1, 1, GDT_UInt32, 0, 0);
                     
                     // Add neigbouring pixels to clump.
                     // If no more pixels to add then stop.
                     while(clumpSearchPxls.size() > 0)
                     {
-                        PxlLoc pxl = clumpSearchPxls.front();
+                        rsgis::img::PxlLoc pxl = clumpSearchPxls.front();
                         clumpSearchPxls.pop();
                         
-                        //cout << "\tSearch Size = " << clumpSearchPxls.size() << endl;
-                        //cout << "\t\tProcessing [" << pxl.xPos << "," << pxl.yPos << "]\n";
+                        //std::cout << "\tSearch Size = " << clumpSearchPxls.size() << std::endl;
+                        //std::cout << "\t\tProcessing [" << pxl.xPos << "," << pxl.yPos << "]\n";
                         
                         // Above
                         if(((long)pxl.yPos)-1 >= 0)
@@ -353,8 +353,8 @@ namespace rsgis{namespace segment{
                                 
                                 if(dist <= specThreshold)
                                 {
-                                    clumpPxls.push_back(PxlLoc(pxl.xPos, pxl.yPos-1));
-                                    clumpSearchPxls.push(PxlLoc(pxl.xPos, pxl.yPos-1));
+                                    clumpPxls.push_back(rsgis::img::PxlLoc(pxl.xPos, pxl.yPos-1));
+                                    clumpSearchPxls.push(rsgis::img::PxlLoc(pxl.xPos, pxl.yPos-1));
                                     for(unsigned int n = 0; n < numSpecBands; ++n)
                                     {
                                         clumpSpecPxlVals[n].push_back(specCPxlVals[n]);
@@ -378,8 +378,8 @@ namespace rsgis{namespace segment{
                                 
                                 if(dist <= specThreshold)
                                 {
-                                    clumpPxls.push_back(PxlLoc(pxl.xPos, pxl.yPos+1));
-                                    clumpSearchPxls.push(PxlLoc(pxl.xPos, pxl.yPos+1));
+                                    clumpPxls.push_back(rsgis::img::PxlLoc(pxl.xPos, pxl.yPos+1));
+                                    clumpSearchPxls.push(rsgis::img::PxlLoc(pxl.xPos, pxl.yPos+1));
                                     for(unsigned int n = 0; n < numSpecBands; ++n)
                                     {
                                         clumpSpecPxlVals[n].push_back(specCPxlVals[n]);
@@ -404,8 +404,8 @@ namespace rsgis{namespace segment{
                                 
                                 if(dist <= specThreshold)
                                 {
-                                    clumpPxls.push_back(PxlLoc(pxl.xPos-1, pxl.yPos));
-                                    clumpSearchPxls.push(PxlLoc(pxl.xPos-1, pxl.yPos));
+                                    clumpPxls.push_back(rsgis::img::PxlLoc(pxl.xPos-1, pxl.yPos));
+                                    clumpSearchPxls.push(rsgis::img::PxlLoc(pxl.xPos-1, pxl.yPos));
                                     for(unsigned int n = 0; n < numSpecBands; ++n)
                                     {
                                         clumpSpecPxlVals[n].push_back(specCPxlVals[n]);
@@ -430,8 +430,8 @@ namespace rsgis{namespace segment{
                                 
                                 if(dist <= specThreshold)
                                 {
-                                    clumpPxls.push_back(PxlLoc(pxl.xPos+1, pxl.yPos));
-                                    clumpSearchPxls.push(PxlLoc(pxl.xPos+1, pxl.yPos));
+                                    clumpPxls.push_back(rsgis::img::PxlLoc(pxl.xPos+1, pxl.yPos));
+                                    clumpSearchPxls.push(rsgis::img::PxlLoc(pxl.xPos+1, pxl.yPos));
                                     for(unsigned int n = 0; n < numSpecBands; ++n)
                                     {
                                         clumpSpecPxlVals[n].push_back(specCPxlVals[n]);
@@ -447,25 +447,25 @@ namespace rsgis{namespace segment{
                 }
             }
         }
-        cout << " Complete (Generated " << clumpIdx-1 << " clumps).\n";
+        std::cout << " Complete (Generated " << clumpIdx-1 << " clumps).\n";
         
         delete[] clumpSpecPxlVals;
         delete[] specPxlVals;
         delete[] specCPxlVals;
     }
 
-    void RSGISSpecGroupSegmentation::performSimpleClumpStdDevWeights(GDALDataset *spectral, GDALDataset *clumps, float specThreshold, bool noDataValProvided, float noDataVal) throw(RSGISImageCalcException)
+    void RSGISSpecGroupSegmentation::performSimpleClumpStdDevWeights(GDALDataset *spectral, GDALDataset *clumps, float specThreshold, bool noDataValProvided, float noDataVal) throw(rsgis::img::RSGISImageCalcException)
     {
         if(spectral->GetRasterXSize() != clumps->GetRasterXSize())
         {
-            throw RSGISImageCalcException("Widths are not the same");
+            throw rsgis::img::RSGISImageCalcException("Widths are not the same");
         }
         if(spectral->GetRasterYSize() != clumps->GetRasterYSize())
         {
-            throw RSGISImageCalcException("Heights are not the same");
+            throw rsgis::img::RSGISImageCalcException("Heights are not the same");
         }
         
-        RSGISImageUtils imgUtils;
+        rsgis::img::RSGISImageUtils imgUtils;
         imgUtils.zerosUIntGDALDataset(clumps);
         
         unsigned int width = spectral->GetRasterXSize();
@@ -482,8 +482,8 @@ namespace rsgis{namespace segment{
         GDALRasterBand *clumpBand = clumps->GetRasterBand(1);
         
         unsigned long clumpIdx = 1;
-        vector<PxlLoc> clumpPxls;
-        queue<PxlLoc> clumpSearchPxls;
+        std::vector<rsgis::img::PxlLoc> clumpPxls;
+        std::queue<rsgis::img::PxlLoc> clumpSearchPxls;
         float *specPxlVals = new float[numSpecBands];
         float *specCPxlVals = new float[numSpecBands];
         
@@ -544,18 +544,18 @@ namespace rsgis{namespace segment{
         
         int feedback = height/10;
         int feedbackCounter = 0;
-        cout << "Started" << flush;
+        std::cout << "Started" << std::flush;
         for(unsigned int i = 0; i < height; ++i)
         {
             if((i % feedback) == 0)
             {
-                cout << ".." << feedbackCounter << ".." << flush;
+                std::cout << ".." << feedbackCounter << ".." << std::flush;
                 feedbackCounter = feedbackCounter + 10;
             }
             
             for(unsigned int j = 0; j < width; ++j)
             {
-                //cout << "Processing Pixel [" << j << "," << i << "]\n";
+                //std::cout << "Processing Pixel [" << j << "," << i << "]\n";
                 // Get pixel value from clump image for (j,i)
                 clumpBand->RasterIO(GF_Read, j, i, 1, 1, &uiPxlVal, 1, 1, GDT_UInt32, 0, 0);
                 
@@ -585,19 +585,19 @@ namespace rsgis{namespace segment{
                             }
                         }
                         
-                        clumpPxls.push_back(PxlLoc(j, i));
-                        clumpSearchPxls.push(PxlLoc(j, i));
+                        clumpPxls.push_back(rsgis::img::PxlLoc(j, i));
+                        clumpSearchPxls.push(rsgis::img::PxlLoc(j, i));
                         clumpBand->RasterIO(GF_Write, j, i, 1, 1, &clumpIdx, 1, 1, GDT_UInt32, 0, 0);
                         
                         // Add neigbouring pixels to clump.
                         // If no more pixels to add then stop.
                         while(clumpSearchPxls.size() > 0)
                         {
-                            PxlLoc pxl = clumpSearchPxls.front();
+                            rsgis::img::PxlLoc pxl = clumpSearchPxls.front();
                             clumpSearchPxls.pop();
                             
-                            //cout << "\tSearch Size = " << clumpSearchPxls.size() << endl;
-                            //cout << "\t\tProcessing [" << pxl.xPos << "," << pxl.yPos << "]\n";
+                            //std::cout << "\tSearch Size = " << clumpSearchPxls.size() << std::endl;
+                            //std::cout << "\t\tProcessing [" << pxl.xPos << "," << pxl.yPos << "]\n";
                             
                             // Above
                             if(((long)pxl.yPos)-1 >= 0)
@@ -620,8 +620,8 @@ namespace rsgis{namespace segment{
                                         
                                         if(dist <= specThreshold)
                                         {
-                                            clumpPxls.push_back(PxlLoc(pxl.xPos, pxl.yPos-1));
-                                            clumpSearchPxls.push(PxlLoc(pxl.xPos, pxl.yPos-1));
+                                            clumpPxls.push_back(rsgis::img::PxlLoc(pxl.xPos, pxl.yPos-1));
+                                            clumpSearchPxls.push(rsgis::img::PxlLoc(pxl.xPos, pxl.yPos-1));
                                             clumpBand->RasterIO(GF_Write, pxl.xPos, pxl.yPos-1, 1, 1, &clumpIdx, 1, 1, GDT_UInt32, 0, 0);
                                         }
                                     }
@@ -649,8 +649,8 @@ namespace rsgis{namespace segment{
                                         
                                         if(dist <= specThreshold)
                                         {
-                                            clumpPxls.push_back(PxlLoc(pxl.xPos, pxl.yPos+1));
-                                            clumpSearchPxls.push(PxlLoc(pxl.xPos, pxl.yPos+1));
+                                            clumpPxls.push_back(rsgis::img::PxlLoc(pxl.xPos, pxl.yPos+1));
+                                            clumpSearchPxls.push(rsgis::img::PxlLoc(pxl.xPos, pxl.yPos+1));
                                             clumpBand->RasterIO(GF_Write, pxl.xPos, pxl.yPos+1, 1, 1, &clumpIdx, 1, 1, GDT_UInt32, 0, 0);
                                         }
                                     }
@@ -679,8 +679,8 @@ namespace rsgis{namespace segment{
                                         
                                         if(dist <= specThreshold)
                                         {
-                                            clumpPxls.push_back(PxlLoc(pxl.xPos-1, pxl.yPos));
-                                            clumpSearchPxls.push(PxlLoc(pxl.xPos-1, pxl.yPos));
+                                            clumpPxls.push_back(rsgis::img::PxlLoc(pxl.xPos-1, pxl.yPos));
+                                            clumpSearchPxls.push(rsgis::img::PxlLoc(pxl.xPos-1, pxl.yPos));
                                             clumpBand->RasterIO(GF_Write, pxl.xPos-1, pxl.yPos, 1, 1, &clumpIdx, 1, 1, GDT_UInt32, 0, 0);
                                         }
                                     }
@@ -709,8 +709,8 @@ namespace rsgis{namespace segment{
                                         
                                         if(dist <= specThreshold)
                                         {
-                                            clumpPxls.push_back(PxlLoc(pxl.xPos+1, pxl.yPos));
-                                            clumpSearchPxls.push(PxlLoc(pxl.xPos+1, pxl.yPos));
+                                            clumpPxls.push_back(rsgis::img::PxlLoc(pxl.xPos+1, pxl.yPos));
+                                            clumpSearchPxls.push(rsgis::img::PxlLoc(pxl.xPos+1, pxl.yPos));
                                             clumpBand->RasterIO(GF_Write, pxl.xPos+1, pxl.yPos, 1, 1, &clumpIdx, 1, 1, GDT_UInt32, 0, 0);
                                         }
                                     }
@@ -724,7 +724,7 @@ namespace rsgis{namespace segment{
                 }
             }
         }
-        cout << " Complete (Generated " << clumpIdx-1 << " clumps).\n";
+        std::cout << " Complete (Generated " << clumpIdx-1 << " clumps).\n";
         
         delete[] specPxlVals;
         delete[] specCPxlVals;
@@ -752,7 +752,7 @@ namespace rsgis{namespace segment{
             sqSum += (((vals1[i] - vals2[i])*(vals1[i] - vals2[i]))/stddev[i]);
         }
         
-        //cout << "Distance = " << sqrt(sqSum) << endl;
+        //std::cout << "Distance = " << sqrt(sqSum) << std::endl;
         
         return sqrt(sqSum)/numVals;
     }

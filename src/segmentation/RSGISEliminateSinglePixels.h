@@ -38,20 +38,15 @@
 
 namespace rsgis{namespace segment{
     
-    using namespace std;
-    using namespace rsgis;
-    using namespace rsgis::math;
-    using namespace rsgis::img;
-    
     class RSGISEliminateSinglePixels
     {
     public:
         RSGISEliminateSinglePixels();
-        void eliminate(GDALDataset *inSpecData, GDALDataset *inClumpsData, GDALDataset *tmpData, string outputImage, float noDataVal, bool noDataValProvided, bool projFromImage, string proj, string format)throw(RSGISImageCalcException);
+        void eliminate(GDALDataset *inSpecData, GDALDataset *inClumpsData, GDALDataset *tmpData, std::string outputImage, float noDataVal, bool noDataValProvided, bool projFromImage, std::string proj, std::string format)throw(rsgis::img::RSGISImageCalcException);
         ~RSGISEliminateSinglePixels();
     private:
-        unsigned long findSinglePixels(GDALDataset *inClumpsData, GDALDataset *tmpData, float noDataVal, bool noDataValProvided) throw(RSGISImageCalcException);
-        bool eliminateSinglePixels(GDALDataset *inSpecData, GDALDataset *inClumpsData, GDALDataset *tmpData, GDALDataset *outDataset, float noDataVal, bool noDataValProvided) throw(RSGISImageCalcException);
+        unsigned long findSinglePixels(GDALDataset *inClumpsData, GDALDataset *tmpData, float noDataVal, bool noDataValProvided) throw(rsgis::img::RSGISImageCalcException);
+        bool eliminateSinglePixels(GDALDataset *inSpecData, GDALDataset *inClumpsData, GDALDataset *tmpData, GDALDataset *outDataset, float noDataVal, bool noDataValProvided) throw(rsgis::img::RSGISImageCalcException);
         inline float eucDistance(float **vals1, float **vals2, unsigned int numBands, unsigned int col1, unsigned int col2);
     };
     

@@ -41,21 +41,16 @@
 
 namespace rsgis{namespace segment{
     
-    using namespace std;
-    using namespace rsgis;
-    using namespace rsgis::math;
-    using namespace rsgis::rastergis;
-    
     class RSGISRegionGrowAttributeTable
     {
     public:
         RSGISRegionGrowAttributeTable();
-        void growClassRegionsUsingThresholds(RSGISAttributeTable *attTable, GDALDataset *clumps, vector<RSGISIfStatement*> *statements, string classAttName, int classAttVal)throw(RSGISAttributeTableException,RSGISImageException);
+        void growClassRegionsUsingThresholds(rsgis::rastergis::RSGISAttributeTable *attTable, GDALDataset *clumps, vector<rsgis::rastergis::RSGISIfStatement*> *statements, std::string classAttName, int classAttVal)throw(rsgis::RSGISAttributeTableException,rsgis::RSGISImageException);
         ~RSGISRegionGrowAttributeTable();
     private:
-        bool** createMask(RSGISAttributeTable *attTable, GDALDataset *clumps, unsigned int *width, unsigned int *height, unsigned int classFieldIdx, int classVal);
-        void updateMask(bool **mask, RSGISAttributeTable *attTable, GDALDataset *clumps, unsigned int width, unsigned int height, unsigned int classFieldIdx, int classVal);
-        void getConnectedClumps(list<unsigned int> *connectedClumps, RSGISAttributeTable *attTable, GDALDataset *clumps, bool **mask, unsigned int width, unsigned int height);
+        bool** createMask(rsgis::rastergis::RSGISAttributeTable *attTable, GDALDataset *clumps, unsigned int *width, unsigned int *height, unsigned int classFieldIdx, int classVal);
+        void updateMask(bool **mask, rsgis::rastergis::RSGISAttributeTable *attTable, GDALDataset *clumps, unsigned int width, unsigned int height, unsigned int classFieldIdx, int classVal);
+        void getConnectedClumps(list<unsigned int> *connectedClumps, rsgis::rastergis::RSGISAttributeTable *attTable, GDALDataset *clumps, bool **mask, unsigned int width, unsigned int height);
     };
     
 }}

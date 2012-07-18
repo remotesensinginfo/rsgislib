@@ -30,12 +30,12 @@ namespace rsgis{namespace segment{
         
     }
     
-    void RSGISRegionGrowAttributeTable::growClassRegionsUsingThresholds(RSGISAttributeTable *attTable, GDALDataset *clumps, vector<RSGISIfStatement*> *statements, string classAttName, int classAttVal)throw(RSGISAttributeTableException,RSGISImageException)
+    void RSGISRegionGrowAttributeTable::growClassRegionsUsingThresholds(rsgis::rastergis::RSGISAttributeTable *attTable, GDALDataset *clumps, std::vector<rsgis::rastergis::RSGISIfStatement*> *statements, std::string classAttName, int classAttVal)throw(rsgis::RSGISAttributeTableException,rsgis::RSGISImageException)
     {
         try
         {
-            RSGISAttributeDataType classFieldDT = attTable->getDataType(classAttName);
-            if(classFieldDT != rsgis_int)
+            rsgis::rastergis::RSGISAttributeDataType classFieldDT = attTable->getDataType(classAttName);
+            if(classFieldDT != rsgis::rastergis::rsgis_int)
             {
                 throw RSGISAttributeTableException("The class field needs to be of type integer.");
             }
@@ -47,9 +47,9 @@ namespace rsgis{namespace segment{
             
             bool **mask = this->createMask(attTable, clumps, &width, &height, classFieldIdx, classAttVal);
             
-            list<unsigned int> *connectClumps = new list<unsigned int>();
+            std::list<unsigned int> *connectClumps = new std::list<unsigned int>();
             
-            RSGISFeature *feat = NULL;
+            rsgis::rastergis::RSGISFeature *feat = NULL;
             bool change = true;
             while(change)
             {
@@ -58,7 +58,7 @@ namespace rsgis{namespace segment{
                             
                 if(connectClumps->size() > 0)
                 {
-                    for(list<unsigned int>::iterator iterClumpIdxs = connectClumps->begin(); iterClumpIdxs != connectClumps->end(); ++iterClumpIdxs)
+                    for(std::list<unsigned int>::iterator iterClumpIdxs = connectClumps->begin(); iterClumpIdxs != connectClumps->end(); ++iterClumpIdxs)
                     {
                         //cout << "Testing clump " << *iterClumpIdxs << " to see whether it meets critria\n";
                         feat = attTable->getFeature((*iterClumpIdxs));
@@ -98,7 +98,7 @@ namespace rsgis{namespace segment{
         }
     }
     
-    bool** RSGISRegionGrowAttributeTable::createMask(RSGISAttributeTable *attTable, GDALDataset *clumps, unsigned int *width, unsigned int *height, unsigned int classFieldIdx, int classVal)
+    bool** RSGISRegionGrowAttributeTable::createMask(rsgis::rastergis::RSGISAttributeTable *attTable, GDALDataset *clumps, unsigned int *width, unsigned int *height, unsigned int classFieldIdx, int classVal)
     {
         *width = clumps->GetRasterXSize();
         *height = clumps->GetRasterYSize();
@@ -106,7 +106,7 @@ namespace rsgis{namespace segment{
         GDALRasterBand *clumpsBand = clumps->GetRasterBand(1);
         unsigned int *clumpIdxs = new unsigned int[*width];
         
-        RSGISFeature *feat = NULL;
+        rsgis::rastergis::RSGISFeature *feat = NULL;
         
         bool **mask = new bool*[*height];
         for(unsigned int i = 0; i < *height; ++i)
@@ -141,12 +141,12 @@ namespace rsgis{namespace segment{
         return mask;
     }
     
-    void RSGISRegionGrowAttributeTable::updateMask(bool **mask, RSGISAttributeTable *attTable, GDALDataset *clumps, unsigned int width, unsigned int height, unsigned int classFieldIdx, int classVal)
+    void RSGISRegionGrowAttributeTable::updateMask(bool **mask, rsgis::rastergis::RSGISAttributeTable *attTable, GDALDataset *clumps, unsigned int width, unsigned int height, unsigned int classFieldIdx, int classVal)
     {
         GDALRasterBand *clumpsBand = clumps->GetRasterBand(1);
         unsigned int *clumpIdxs = new unsigned int[width];
         
-        RSGISFeature *feat = NULL;
+        rsgis::rastergis::RSGISFeature *feat = NULL;
         
         for(unsigned int i = 0; i < height; ++i)
         {            
@@ -176,7 +176,7 @@ namespace rsgis{namespace segment{
         delete[] clumpIdxs;        
     }
     
-    void RSGISRegionGrowAttributeTable::getConnectedClumps(list<unsigned int> *connectedClumps, RSGISAttributeTable *attTable, GDALDataset *clumps, bool **mask, unsigned int width, unsigned int height)
+    void RSGISRegionGrowAttributeTable::getConnectedClumps(std::list<unsigned int> *connectedClumps, rsgis::rastergis::RSGISAttributeTable *attTable, GDALDataset *clumps, bool **mask, unsigned int width, unsigned int height)
     {        
         GDALRasterBand *clumpsBand = clumps->GetRasterBand(1);
         unsigned int *clumpIdxs = new unsigned int[width];

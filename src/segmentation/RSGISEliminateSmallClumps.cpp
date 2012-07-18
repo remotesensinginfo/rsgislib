@@ -29,15 +29,15 @@ namespace rsgis{namespace segment{
         
     }
     
-    void RSGISEliminateSmallClumps::eliminateSmallClumps(GDALDataset *spectral, GDALDataset *clumps, unsigned int minClumpSize, float specThreshold) throw(RSGISImageCalcException)
+    void RSGISEliminateSmallClumps::eliminateSmallClumps(GDALDataset *spectral, GDALDataset *clumps, unsigned int minClumpSize, float specThreshold) throw(rsgis::img::RSGISImageCalcException)
     {
         if(spectral->GetRasterXSize() != clumps->GetRasterXSize())
         {
-            throw RSGISImageCalcException("Widths are not the same");
+            throw rsgis::img::RSGISImageCalcException("Widths are not the same");
         }
         if(spectral->GetRasterYSize() != clumps->GetRasterYSize())
         {
-            throw RSGISImageCalcException("Heights are not the same");
+            throw rsgis::img::RSGISImageCalcException("Heights are not the same");
         }
                 
         unsigned int width = spectral->GetRasterXSize();
@@ -73,18 +73,18 @@ namespace rsgis{namespace segment{
                 }
             }
         }
-        vector<ImgClump*> *clumpTable = new vector<ImgClump*>();
+        std::vector<rsgis::img::ImgClump*> *clumpTable = new std::vector<rsgis::img::ImgClump*>();
         clumpTable->reserve(maxClumpIdx);
-        deque<ImgClump*> smallClumps;
+        std::deque<rsgis::img::ImgClump*> smallClumps;
         
-        ImgClump *cClump = NULL;
-        ImgClump *tClump = NULL;
+        rsgis::img::ImgClump *cClump = NULL;
+        rsgis::img::ImgClump *tClump = NULL;
         for(unsigned int i = 0; i < maxClumpIdx; ++i)
         {
-            cClump = new ImgClump(i+1);
+            cClump = new rsgis::img::ImgClump(i+1);
             cClump->sumVals = new float[numSpecBands];
             cClump->meanVals = new float[numSpecBands];
-            cClump->pxls = new vector<PxlLoc>();
+            cClump->pxls = new std::vector<rsgis::img::PxlLoc>();
             cClump->active = true;
             for(unsigned int n = 0; n < numSpecBands; ++n)
             {
@@ -94,7 +94,7 @@ namespace rsgis{namespace segment{
             clumpTable->push_back(cClump);
         }
         
-        cout << "Calculate Initial Clump Means\n";
+        std::cout << "Calculate Initial Clump Means\n";
         for(unsigned int i = 0; i < height; ++i)
         {
             clumpBand->RasterIO(GF_Read, 0, i, width, 1, clumpIdxs, width, 1, GDT_UInt32, 0, 0);
@@ -111,12 +111,12 @@ namespace rsgis{namespace segment{
                     {
                         cClump->sumVals[n] += spectralVals[n][j];
                     }
-                    cClump->pxls->push_back(PxlLoc(j, i));
+                    cClump->pxls->push_back(rsgis::img::PxlLoc(j, i));
                 }
             }
         }
         
-        for(vector<ImgClump*>::iterator iterClumps = clumpTable->begin(); iterClumps != clumpTable->end(); ++iterClumps)
+        for(std::vector<rsgis::img::ImgClump*>::iterator iterClumps = clumpTable->begin(); iterClumps != clumpTable->end(); ++iterClumps)
         {
             for(unsigned int n = 0; n < numSpecBands; ++n)
             {
@@ -128,22 +128,22 @@ namespace rsgis{namespace segment{
             } 
         }
         
-        cout << "There are " << clumpTable->size() << " clumps. " << smallClumps.size() << " are too small\n";
+        std::cout << "There are " << clumpTable->size() << " clumps. " << smallClumps.size() << " are too small\n";
         
-        PxlLoc tLoc;
+        rsgis::img::PxlLoc tLoc;
         list<unsigned long> neighbours;
         unsigned long closestNeighbour = 0;
         bool firstNeighbourTested = true;
         float closestNeighbourDist = 0;
         float distance = 0;
         
-        cout << "Eliminating Small Clumps." << endl;
+        std::cout << "Eliminating Small Clumps." << std::endl;
         long smallClumpsCounter = 0;
         while(smallClumps.size() > 0)
         {
             if((smallClumpsCounter % 10000) == 0)
             {
-                cout << "Eliminated " << smallClumpsCounter << " > " << smallClumps.size() << " to go...\r";
+                std::cout << "Eliminated " << smallClumpsCounter << " > " << smallClumps.size() << " to go...\r";
             }
             
             cClump = smallClumps.front();
@@ -153,7 +153,7 @@ namespace rsgis{namespace segment{
             {
                 // Get list of neighbours.
                 neighbours.clear();
-                for(vector<PxlLoc>::iterator iterPxls = cClump->pxls->begin(); iterPxls != cClump->pxls->end(); ++iterPxls)
+                for(std::vector<rsgis::img::PxlLoc>::iterator iterPxls = cClump->pxls->begin(); iterPxls != cClump->pxls->end(); ++iterPxls)
                 {
                     // Above
                     if(((long)(*iterPxls).yPos)-1 >= 0)
@@ -224,7 +224,7 @@ namespace rsgis{namespace segment{
                     }
                 }
                 
-                //cout << "For " << cClump->clumpID << "(size = " << cClump->pxls->size() << ") the closest neighbour is " << closestNeighbour << " with distance " << closestNeighbourDist << endl;
+                //std::cout << "For " << cClump->clumpID << "(size = " << cClump->pxls->size() << ") the closest neighbour is " << closestNeighbour << " with distance " << closestNeighbourDist << std::endl;
                 
                 // Perform Merge
                 if(!firstNeighbourTested)
@@ -264,11 +264,11 @@ namespace rsgis{namespace segment{
             
             ++smallClumpsCounter;
         }
-        cout << "Eliminated " << smallClumpsCounter << " small clumps\n";
+        std::cout << "Eliminated " << smallClumpsCounter << " small clumps\n";
         
         
         
-        for(vector<ImgClump*>::iterator iterClumps = clumpTable->begin(); iterClumps != clumpTable->end(); ++iterClumps)
+        for(std::vector<rsgis::img::ImgClump*>::iterator iterClumps = clumpTable->begin(); iterClumps != clumpTable->end(); ++iterClumps)
         {
             if((*iterClumps) != NULL)
             {
@@ -293,15 +293,15 @@ namespace rsgis{namespace segment{
         delete[] spectralVals;
     }
     
-    void RSGISEliminateSmallClumps::stepwiseEliminateSmallClumps(GDALDataset *spectral, GDALDataset *clumps, unsigned int minClumpSize, float specThreshold) throw(RSGISImageCalcException)
+    void RSGISEliminateSmallClumps::stepwiseEliminateSmallClumps(GDALDataset *spectral, GDALDataset *clumps, unsigned int minClumpSize, float specThreshold) throw(rsgis::img::RSGISImageCalcException)
     {
         if(spectral->GetRasterXSize() != clumps->GetRasterXSize())
         {
-            throw RSGISImageCalcException("Widths are not the same");
+            throw rsgis::img::RSGISImageCalcException("Widths are not the same");
         }
         if(spectral->GetRasterYSize() != clumps->GetRasterYSize())
         {
-            throw RSGISImageCalcException("Heights are not the same");
+            throw rsgis::img::RSGISImageCalcException("Heights are not the same");
         }
         
         unsigned int width = spectral->GetRasterXSize();
@@ -320,7 +320,7 @@ namespace rsgis{namespace segment{
         
         unsigned int uiPxlVal = 0;
         
-        cout << "Calc Number of clumps\n";
+        std::cout << "Calc Number of clumps\n";
         unsigned long maxClumpIdx = 0;
         for(unsigned int i = 0; i < height; ++i)
         {
@@ -337,18 +337,18 @@ namespace rsgis{namespace segment{
                 }
             }
         }
-        vector<ImgClump*> *clumpTable = new vector<ImgClump*>();
+        std::vector<rsgis::img::ImgClump*> *clumpTable = new std::vector<rsgis::img::ImgClump*>();
         clumpTable->reserve(maxClumpIdx);
         
-        cout << "Build clump table\n";
-        ImgClump *cClump = NULL;
-        ImgClump *tClump = NULL;
+        std::cout << "Build clump table\n";
+        rsgis::img::ImgClump *cClump = NULL;
+        rsgis::img::ImgClump *tClump = NULL;
         for(unsigned int i = 0; i < maxClumpIdx; ++i)
         {
-            cClump = new ImgClump(i+1);
+            cClump = new rsgis::img::ImgClump(i+1);
             cClump->sumVals = new float[numSpecBands];
             cClump->meanVals = new float[numSpecBands];
-            cClump->pxls = new vector<PxlLoc>();
+            cClump->pxls = new std::vector<rsgis::img::PxlLoc>();
             cClump->active = true;
             for(unsigned int n = 0; n < numSpecBands; ++n)
             {
@@ -358,10 +358,10 @@ namespace rsgis{namespace segment{
             clumpTable->push_back(cClump);
         }
         
-        deque<ImgClump*> smallClumps;
-        vector< pair<ImgClump*, ImgClump*> > mergeLookupTab;
+        std::deque<rsgis::img::ImgClump*> smallClumps;
+        std::vector< pair<rsgis::img::ImgClump*, rsgis::img::ImgClump*> > mergeLookupTab;
         
-        cout << "Calculate Initial Clump Means\n";
+        std::cout << "Calculate Initial Clump Means\n";
         for(unsigned int i = 0; i < height; ++i)
         {
             clumpBand->RasterIO(GF_Read, 0, i, width, 1, clumpIdxs, width, 1, GDT_UInt32, 0, 0);
@@ -378,33 +378,33 @@ namespace rsgis{namespace segment{
                     {
                         cClump->sumVals[n] += spectralVals[n][j];
                     }
-                    cClump->pxls->push_back(PxlLoc(j, i));
+                    cClump->pxls->push_back(rsgis::img::PxlLoc(j, i));
                 }
             }
         }
         
-        for(vector<ImgClump*>::iterator iterClumps = clumpTable->begin(); iterClumps != clumpTable->end(); ++iterClumps)
+        for(std::vector<rsgis::img::ImgClump*>::iterator iterClumps = clumpTable->begin(); iterClumps != clumpTable->end(); ++iterClumps)
         {
             for(unsigned int n = 0; n < numSpecBands; ++n)
             {
                 (*iterClumps)->meanVals[n] = (*iterClumps)->sumVals[n] / (*iterClumps)->pxls->size();
             }
         }
-        cout << "There are " << clumpTable->size() << " clumps.\n";
+        std::cout << "There are " << clumpTable->size() << " clumps.\n";
         
-        PxlLoc tLoc;
+        rsgis::img::PxlLoc tLoc;
         list<unsigned long> neighbours;
         unsigned long closestNeighbour = 0;
         bool firstNeighbourTested = true;
         float closestNeighbourDist = 0;
         float distance = 0;
         
-        cout << "Eliminating Small Clumps." << endl;
+        std::cout << "Eliminating Small Clumps." << std::endl;
         long smallClumpsCounter = 0;
         for(unsigned int clumpArea = 1; clumpArea <= minClumpSize; ++clumpArea)
         {
-            cout << "Eliminating clumps of size " << clumpArea << endl;
-            for(vector<ImgClump*>::iterator iterClumps = clumpTable->begin(); iterClumps != clumpTable->end(); ++iterClumps)
+            std::cout << "Eliminating clumps of size " << clumpArea << std::endl;
+            for(std::vector<rsgis::img::ImgClump*>::iterator iterClumps = clumpTable->begin(); iterClumps != clumpTable->end(); ++iterClumps)
             {
                 if(((*iterClumps) != NULL) && ((*iterClumps)->active))
                 {
@@ -415,7 +415,7 @@ namespace rsgis{namespace segment{
                 }
             }
             
-            cout << "Found " << smallClumps.size() << " small clumps to be eliminated." << endl;
+            std::cout << "Found " << smallClumps.size() << " small clumps to be eliminated." << std::endl;
             
             mergeLookupTab.clear();
             while(smallClumps.size() > 0)
@@ -427,7 +427,7 @@ namespace rsgis{namespace segment{
                 {
                     // Get list of neighbours.
                     neighbours.clear();
-                    for(vector<PxlLoc>::iterator iterPxls = cClump->pxls->begin(); iterPxls != cClump->pxls->end(); ++iterPxls)
+                    for(std::vector<rsgis::img::PxlLoc>::iterator iterPxls = cClump->pxls->begin(); iterPxls != cClump->pxls->end(); ++iterPxls)
                     {
                         // Above
                         if(((long)(*iterPxls).yPos)-1 >= 0)
@@ -501,7 +501,7 @@ namespace rsgis{namespace segment{
                         }
                     }
                     
-                    //cout << "For " << cClump->clumpID << "(size = " << cClump->pxls->size() << ") the closest neighbour is " << closestNeighbour << " with distance " << closestNeighbourDist << endl;
+                    //std::cout << "For " << cClump->clumpID << "(size = " << cClump->pxls->size() << ") the closest neighbour is " << closestNeighbour << " with distance " << closestNeighbourDist << std::endl;
                     
                     // Perform Merge
                     if(!firstNeighbourTested)
@@ -510,7 +510,7 @@ namespace rsgis{namespace segment{
                         {
                             // PUT INTO LOOK UP TABLE TO BE APPLIED AFTERWARDS.
                             tClump = clumpTable->at(closestNeighbour-1);
-                            pair<ImgClump*, ImgClump*> pair2Merge = pair<ImgClump*, ImgClump*>(cClump, tClump);
+                            pair<rsgis::img::ImgClump*, rsgis::img::ImgClump*> pair2Merge = pair<rsgis::img::ImgClump*, rsgis::img::ImgClump*>(cClump, tClump);
                             mergeLookupTab.push_back(pair2Merge);
                         }
                     }
@@ -521,7 +521,7 @@ namespace rsgis{namespace segment{
             }
             
             // Update Clump Table
-            pair<ImgClump*, ImgClump*> pair2Merge;
+            pair<rsgis::img::ImgClump*, rsgis::img::ImgClump*> pair2Merge;
             for(size_t idx = 0; idx < mergeLookupTab.size(); ++idx)
             {
                 pair2Merge = mergeLookupTab.at(idx);
@@ -546,13 +546,13 @@ namespace rsgis{namespace segment{
                 delete pair2Merge.first->pxls;
                 pair2Merge.first->active = false;
             }
-            cout << "Eliminated " << smallClumpsCounter << " small clumps\n";
+            std::cout << "Eliminated " << smallClumpsCounter << " small clumps\n";
         }
-        cout << "Finshed Elimination. " << smallClumpsCounter << " small clumps eliminated\n";
+        std::cout << "Finshed Elimination. " << smallClumpsCounter << " small clumps eliminated\n";
         
         
         
-        for(vector<ImgClump*>::iterator iterClumps = clumpTable->begin(); iterClumps != clumpTable->end(); ++iterClumps)
+        for(std::vector<rsgis::img::ImgClump*>::iterator iterClumps = clumpTable->begin(); iterClumps != clumpTable->end(); ++iterClumps)
         {
             if((*iterClumps) != NULL)
             {
@@ -577,15 +577,15 @@ namespace rsgis{namespace segment{
         delete[] spectralVals;
     }
     
-    void RSGISEliminateSmallClumps::stepwiseEliminateSmallClumpsNoMean(GDALDataset *spectral, GDALDataset *clumps, unsigned int minClumpSize, float specThreshold) throw(RSGISImageCalcException)
+    void RSGISEliminateSmallClumps::stepwiseEliminateSmallClumpsNoMean(GDALDataset *spectral, GDALDataset *clumps, unsigned int minClumpSize, float specThreshold) throw(rsgis::img::RSGISImageCalcException)
     {
         if(spectral->GetRasterXSize() != clumps->GetRasterXSize())
         {
-            throw RSGISImageCalcException("Widths are not the same");
+            throw rsgis::img::RSGISImageCalcException("Widths are not the same");
         }
         if(spectral->GetRasterYSize() != clumps->GetRasterYSize())
         {
-            throw RSGISImageCalcException("Heights are not the same");
+            throw rsgis::img::RSGISImageCalcException("Heights are not the same");
         }
         
         unsigned int width = spectral->GetRasterXSize();
@@ -604,7 +604,7 @@ namespace rsgis{namespace segment{
         
         unsigned int uiPxlVal = 0;
         
-        cout << "Calc Number of clumps\n";
+        std::cout << "Calc Number of clumps\n";
         unsigned long maxClumpIdx = 0;
         for(unsigned int i = 0; i < height; ++i)
         {
@@ -621,17 +621,17 @@ namespace rsgis{namespace segment{
                 }
             }
         }
-        ImgClumpSum **clumpTable = new ImgClumpSum*[maxClumpIdx];
+        rsgis::img::ImgClumpSum **clumpTable = new rsgis::img::ImgClumpSum*[maxClumpIdx];
         
-        cout << "Build clump table\n";
-        //ImgClumpSum *cClump = NULL;
-        ImgClumpSum *tClump = NULL;
+        std::cout << "Build clump table\n";
+        //rsgis::img::ImgClumpSum *cClump = NULL;
+        rsgis::img::ImgClumpSum *tClump = NULL;
         unsigned int cClumpIdx = 0;
         for(unsigned int i = 0; i < maxClumpIdx; ++i)
         {
-            clumpTable[i] = new ImgClumpSum(i+1);
+            clumpTable[i] = new rsgis::img::ImgClumpSum(i+1);
             clumpTable[i]->sumVals = new float[numSpecBands];
-            clumpTable[i]->pxls = new vector<PxlLoc>();
+            clumpTable[i]->pxls = new std::vector<rsgis::img::PxlLoc>();
             clumpTable[i]->active = true;
             for(unsigned int n = 0; n < numSpecBands; ++n)
             {
@@ -639,10 +639,10 @@ namespace rsgis{namespace segment{
             }
         }
         
-        deque<unsigned int> smallClumps;
-        vector< pair<unsigned int, unsigned int> > mergeLookupTab;
+        std::deque<unsigned int> smallClumps;
+        std::vector< pair<unsigned int, unsigned int> > mergeLookupTab;
         
-        cout << "Calculate Initial Clump Means\n";
+        std::cout << "Calculate Initial Clump Means\n";
         for(unsigned int i = 0; i < height; ++i)
         {
             clumpBand->RasterIO(GF_Read, 0, i, width, 1, clumpIdxs, width, 1, GDT_UInt32, 0, 0);
@@ -659,14 +659,14 @@ namespace rsgis{namespace segment{
                     {
                         clumpTable[cClumpIdx]->sumVals[n] += spectralVals[n][j];
                     }
-                    clumpTable[cClumpIdx]->pxls->push_back(PxlLoc(j, i));
+                    clumpTable[cClumpIdx]->pxls->push_back(rsgis::img::PxlLoc(j, i));
                 }
             }
         }        
 
-        cout << "There are " << maxClumpIdx << " clumps.\n";
+        std::cout << "There are " << maxClumpIdx << " clumps.\n";
         
-        PxlLoc tLoc;
+        rsgis::img::PxlLoc tLoc;
         list<unsigned int> neighbours;
         unsigned int closestNeighbour = 0;
         bool firstNeighbourTested = true;
@@ -675,11 +675,11 @@ namespace rsgis{namespace segment{
         float cMean = 0;
         float tMean = 0;
         
-        cout << "Eliminating Small Clumps." << endl;
+        std::cout << "Eliminating Small Clumps." << std::endl;
         long smallClumpsCounter = 0;
         for(unsigned int clumpArea = 1; clumpArea <= minClumpSize; ++clumpArea)
         {
-            cout << "Eliminating clumps of size " << clumpArea << endl;
+            std::cout << "Eliminating clumps of size " << clumpArea << std::endl;
 
             for(unsigned int i = 0; i < maxClumpIdx; ++i)
             {
@@ -691,7 +691,7 @@ namespace rsgis{namespace segment{
                     }
                 }
             }
-            cout << "Found " << smallClumps.size() << " small clumps to be eliminated." << endl;
+            std::cout << "Found " << smallClumps.size() << " small clumps to be eliminated." << std::endl;
             
             mergeLookupTab.clear();
             while(smallClumps.size() > 0)
@@ -704,7 +704,7 @@ namespace rsgis{namespace segment{
                 {
                     // Get list of neighbours.
                     neighbours.clear();
-                    for(vector<PxlLoc>::iterator iterPxls = clumpTable[cClumpIdx]->pxls->begin(); iterPxls != clumpTable[cClumpIdx]->pxls->end(); ++iterPxls)
+                    for(std::vector<rsgis::img::PxlLoc>::iterator iterPxls = clumpTable[cClumpIdx]->pxls->begin(); iterPxls != clumpTable[cClumpIdx]->pxls->end(); ++iterPxls)
                     {
                         // Above
                         if(((long)(*iterPxls).yPos)-1 >= 0)
@@ -780,7 +780,7 @@ namespace rsgis{namespace segment{
                         }
                     }
                     
-                    //cout << "For " << cClump->clumpID << "(size = " << cClump->pxls->size() << ") the closest neighbour is " << closestNeighbour << " with distance " << closestNeighbourDist << endl;
+                    //std::cout << "For " << cClump->clumpID << "(size = " << cClump->pxls->size() << ") the closest neighbour is " << closestNeighbour << " with distance " << closestNeighbourDist << std::endl;
                     
                     // Perform Merge
                     if(!firstNeighbourTested)
@@ -824,13 +824,13 @@ namespace rsgis{namespace segment{
                 delete clumpTable[pair2Merge.first];
                 clumpTable[pair2Merge.first] = NULL;
             }
-            cout << "Eliminated " << smallClumpsCounter << " small clumps\n";
+            std::cout << "Eliminated " << smallClumpsCounter << " small clumps\n";
         }
-        cout << "Finshed Elimination. " << smallClumpsCounter << " small clumps eliminated\n";
+        std::cout << "Finshed Elimination. " << smallClumpsCounter << " small clumps eliminated\n";
         
         
         
-        //for(vector<ImgClumpSum*>::iterator iterClumps = clumpTable->begin(); iterClumps != clumpTable->end(); ++iterClumps)
+        //for(std::vector<rsgis::img::ImgClumpSum*>::iterator iterClumps = clumpTable->begin(); iterClumps != clumpTable->end(); ++iterClumps)
         for(unsigned int i = 0; i < maxClumpIdx; ++i)
         {
             if(clumpTable[i] != NULL)
@@ -855,27 +855,27 @@ namespace rsgis{namespace segment{
         delete[] spectralVals;
     }
     
-    void RSGISEliminateSmallClumps::stepwiseEliminateSmallClumpsWithAtt(GDALDataset *spectral, GDALDataset *clumps, string outputImageFile, string imageFormat, bool useImageProj, string proj, RSGISAttributeTable *attTable, unsigned int minClumpSize, float specThreshold, bool outputWithConsecutiveFIDs) throw(RSGISImageCalcException)
+    void RSGISEliminateSmallClumps::stepwiseEliminateSmallClumpsWithAtt(GDALDataset *spectral, GDALDataset *clumps, std::string outputImageFile, std::string imageFormat, bool useImageProj, std::string proj, rsgis::rastergis::RSGISAttributeTable *attTable, unsigned int minClumpSize, float specThreshold, bool outputWithConsecutiveFIDs) throw(rsgis::img::RSGISImageCalcException)
     {
         try
         {
-            RSGISTextUtils textUtils;
+            rsgis::utils::RSGISTextUtils textUtils;
             GDALDataset **datasets = new GDALDataset*[2];
             datasets[0] = clumps;
             datasets[1] = spectral;
             
             unsigned int numBands = spectral->GetRasterCount();
-            vector<RSGISBandAttStats*> *bandStats = new vector<RSGISBandAttStats*>();
+            std::vector<rsgis::rastergis::RSGISBandAttStats*> *bandStats = new std::vector<rsgis::rastergis::RSGISBandAttStats*>();
             bandStats->reserve(numBands);
-            RSGISBandAttStats *tmpBand = NULL;
+            rsgis::rastergis::RSGISBandAttStats *tmpBand = NULL;
             for(unsigned int i = 0; i < numBands; ++i)
             {
-                tmpBand = new RSGISBandAttStats();
+                tmpBand = new rsgis::rastergis::RSGISBandAttStats();
                 tmpBand->band = i + 1;
                 tmpBand->calcMean = false;//true;
-                //tmpBand->meanField = string("b") + textUtils.uInt32bittostring(i) + string("_Mean");
+                //tmpBand->meanField = std::string("b") + textUtils.uInt32bittostring(i) + std::string("_Mean");
                 tmpBand->calcSum = true;
-                tmpBand->sumField = string("b") + textUtils.uInt32bittostring(i) + string("_Sum");
+                tmpBand->sumField = std::string("b") + textUtils.uInt32bittostring(i) + std::string("_Sum");
                 tmpBand->calcMax = false;
                 tmpBand->calcMedian = false;
                 tmpBand->calcMin = false;
@@ -883,13 +883,13 @@ namespace rsgis{namespace segment{
                 bandStats->push_back(tmpBand);
             }
             
-            cout << "Populate Image Stats:\n";
-            RSGISPopulateAttributeTableBandWithSumAndMeans popAttStats;
+            std::cout << "Populate Image Stats:\n";
+            rsgis::rastergis::RSGISPopulateAttributeTableBandWithSumAndMeans popAttStats;
             popAttStats.populateWithBandStatistics(attTable, datasets, 2, bandStats);
             delete[] datasets;
             
-            cout << "Find neighbours:\n";
-            RSGISFindClumpNeighbours findNeighbours;
+            std::cout << "Find neighbours:\n";
+            rsgis::rastergis::RSGISFindClumpNeighbours findNeighbours;
             if(attTable->attInMemory())
             {
                 findNeighbours.findNeighbours(clumps, attTable);
@@ -899,14 +899,14 @@ namespace rsgis{namespace segment{
                 findNeighbours.findNeighboursInBlocks(clumps, attTable);
             }
                                     
-            cout << "Create extra attribute tables columns\n";
+            std::cout << "Create extra attribute tables columns\n";
             if(!attTable->hasAttribute("Eliminated"))
             {
                 attTable->addAttBoolField("Eliminated", false);
             }
-            else if(attTable->getDataType("Eliminated") != rsgis_bool)
+            else if(attTable->getDataType("Eliminated") != rsgis::rastergis::rsgis_bool)
             {
-                throw RSGISImageCalcException("Cannot proceed as \'Eliminated\' field is not of type boolean.");
+                throw rsgis::img::RSGISImageCalcException("Cannot proceed as \'Eliminated\' field is not of type boolean.");
             }
             else
             {
@@ -918,9 +918,9 @@ namespace rsgis{namespace segment{
             {
                 attTable->addAttBoolField("OutputFIDSet", false);
             }
-            else if(attTable->getDataType("OutputFIDSet") != rsgis_bool)
+            else if(attTable->getDataType("OutputFIDSet") != rsgis::rastergis::rsgis_bool)
             {
-                throw RSGISImageCalcException("Cannot proceed as \'OutputFIDSet\' field is not of type boolean.");
+                throw rsgis::img::RSGISImageCalcException("Cannot proceed as \'OutputFIDSet\' field is not of type boolean.");
             }
             else
             {
@@ -933,9 +933,9 @@ namespace rsgis{namespace segment{
             {
                 attTable->addAttIntField("OutputFID", 0);
             }
-            else if(attTable->getDataType("OutputFID") != rsgis_int)
+            else if(attTable->getDataType("OutputFID") != rsgis::rastergis::rsgis_int)
             {
-                throw RSGISImageCalcException("Cannot proceed as \'OutputFID\' field is not of type integer.");
+                throw rsgis::img::RSGISImageCalcException("Cannot proceed as \'OutputFID\' field is not of type integer.");
             }
             unsigned int outFIDIdx = attTable->getFieldIndex("OutputFID");
             
@@ -943,59 +943,59 @@ namespace rsgis{namespace segment{
             {
                 attTable->addAttIntField("MergedToFID", 0);
             }
-            else if(attTable->getDataType("MergedToFID") != rsgis_int)
+            else if(attTable->getDataType("MergedToFID") != rsgis::rastergis::rsgis_int)
             {
-                throw RSGISImageCalcException("Cannot proceed as \'MergedToFID\' field is not of type integer.");
+                throw rsgis::img::RSGISImageCalcException("Cannot proceed as \'MergedToFID\' field is not of type integer.");
             }
             unsigned int mergedToFIDIdx = attTable->getFieldIndex("MergedToFID");
             
             unsigned int pxlCountIdx = attTable->getFieldIndex("pxlcount");
             
-            RSGISAttExpressionLessThanConstEq *areaThreshold = new RSGISAttExpressionLessThanConstEq("pxlcount", pxlCountIdx, rsgis_int, 1);
-            RSGISAttExpressionNotBoolField *boolEliminatedExp = new RSGISAttExpressionNotBoolField("Eliminated", eliminatedFieldIdx, rsgis_bool);
+            rsgis::rastergis::RSGISAttExpressionLessThanConstEq *areaThreshold = new rsgis::rastergis::RSGISAttExpressionLessThanConstEq("pxlcount", pxlCountIdx, rsgis::rastergis::rsgis_int, 1);
+            rsgis::rastergis::RSGISAttExpressionNotBoolField *boolEliminatedExp = new rsgis::rastergis::RSGISAttExpressionNotBoolField("Eliminated", eliminatedFieldIdx, rsgis::rastergis::rsgis_bool);
             
-            vector<RSGISAttExpression*> *exps = new vector<RSGISAttExpression*>();
+            std::vector<rsgis::rastergis::RSGISAttExpression*> *exps = new std::vector<rsgis::rastergis::RSGISAttExpression*>();
             exps->push_back(areaThreshold);
             exps->push_back(boolEliminatedExp);
             
-            RSGISIfStatement *ifStat = new RSGISIfStatement();
-            ifStat->exp = new RSGISAttExpressionAND(exps);
+            rsgis::rastergis::RSGISIfStatement *ifStat = new rsgis::rastergis::RSGISIfStatement();
+            ifStat->exp = new rsgis::rastergis::RSGISAttExpressionAND(exps);
             ifStat->field = "";
-            ifStat->dataType = rsgis_na;
+            ifStat->dataType = rsgis::rastergis::rsgis_na;
             ifStat->fldIdx = 0;
             ifStat->value = 0;
             ifStat->noExp = false;
             ifStat->ignore = false;
             
-            vector<pair<size_t, size_t> > *eliminationPairs = new vector<pair<size_t, size_t> >();
+            std::vector<std::pair<size_t, size_t> > *eliminationPairs = new std::vector<std::pair<size_t, size_t> >();
             
-            RSGISProcessFeature *processFeature = new RSGISEliminateFeature(eliminatedFieldIdx, mergedToFIDIdx, specThreshold, pxlCountIdx, bandStats, eliminationPairs);
+            rsgis::rastergis::RSGISProcessFeature *processFeature = new RSGISEliminateFeature(eliminatedFieldIdx, mergedToFIDIdx, specThreshold, pxlCountIdx, bandStats, eliminationPairs);
             
             if(attTable->attInMemory())
             {
-                cout << "Eliminating features of size " << flush;
+                std::cout << "Eliminating features of size " << std::flush;
                 for(unsigned int i = 1; i <= minClumpSize; ++i)
                 {
-                    cout << i << ", " << flush;
+                    std::cout << i << ", " << std::flush;
                     areaThreshold->setValue(i);
                     attTable->processIfStatements(ifStat, processFeature, NULL);
                     this->performElimination(attTable, eliminationPairs, eliminatedFieldIdx, mergedToFIDIdx, pxlCountIdx, bandStats);
                 }
-                cout << "Completed\n";
+                std::cout << "Completed\n";
             }
             else
             {
-                cout << "Eliminating features: " << endl;
+                std::cout << "Eliminating features: " << std::endl;
                 for(unsigned int i = 1; i <= minClumpSize; ++i)
                 {
-                    cout << "Process features with area " << i << endl;
+                    std::cout << "Process features with area " << i << std::endl;
                     areaThreshold->setValue(i);
                     attTable->processIfStatementsInBlocks(ifStat, processFeature, NULL);
-                    cout << "Update table with elimination\n";
+                    std::cout << "Update table with elimination\n";
                     this->performElimination(attTable, eliminationPairs, eliminatedFieldIdx, mergedToFIDIdx, pxlCountIdx, bandStats);
-                    cout << endl;
+                    std::cout << std::endl;
                 }
-                cout << "Completed\n";
+                std::cout << "Completed\n";
             }
             
             delete ifStat->exp;
@@ -1014,11 +1014,11 @@ namespace rsgis{namespace segment{
                         (*(*attTable))->boolFields->at(outFIDSetFieldIdx) = true;
                     }
                 }
-                cout << "There are " << fidIdxes << " clumps following elimination\n";
+                std::cout << "There are " << fidIdxes << " clumps following elimination\n";
             }
             
             // Find output FIDs for relabelling.
-            cout << "Defining output FIDs within table\n";
+            std::cout << "Defining output FIDs within table\n";
             for(attTable->start(); attTable->end(); ++(*attTable))
             {
                 if(!(*(*attTable))->boolFields->at(outFIDSetFieldIdx))
@@ -1028,26 +1028,26 @@ namespace rsgis{namespace segment{
             }
                         
             // Generate output image from original and output FIDs.
-            cout << "Generating output clumps file\n";
+            std::cout << "Generating output clumps file\n";
             datasets = new GDALDataset*[1];
             datasets[0] = clumps;
             RSGISApplyOutputFIDs *applyOutFIDs = new RSGISApplyOutputFIDs(attTable, outFIDIdx, outFIDSetFieldIdx);
-            RSGISCalcImage calcImage(applyOutFIDs, proj, useImageProj);
+            rsgis::img::RSGISCalcImage calcImage(applyOutFIDs, proj, useImageProj);
             calcImage.calcImage(datasets, 1, outputImageFile, false, NULL, imageFormat, GDT_Float32);
             delete applyOutFIDs;
             delete[] datasets;
         }
         catch(RSGISAttributeTableException &e)
         {
-            throw RSGISImageCalcException(e.what());
+            throw rsgis::img::RSGISImageCalcException(e.what());
         }
-        catch(RSGISImageCalcException &e)
+        catch(rsgis::img::RSGISImageCalcException &e)
         {
             throw e;
         }
     }
     
-    void RSGISEliminateSmallClumps::defineOutputFID(RSGISAttributeTable *attTable, RSGISFeature *feat, unsigned int eliminatedFieldIdx, unsigned int mergedToFIDIdx, unsigned int outFIDIdx, unsigned int outFIDSetFieldIdx) throw(RSGISAttributeTableException)
+    void RSGISEliminateSmallClumps::defineOutputFID(rsgis::rastergis::RSGISAttributeTable *attTable, rsgis::rastergis::RSGISFeature *feat, unsigned int eliminatedFieldIdx, unsigned int mergedToFIDIdx, unsigned int outFIDIdx, unsigned int outFIDSetFieldIdx) throw(rsgis::RSGISAttributeTableException)
     {
         try
         {
@@ -1055,7 +1055,7 @@ namespace rsgis{namespace segment{
             {
                 if(feat->boolFields->at(eliminatedFieldIdx))
                 {
-                    RSGISFeature *tmpFeat = attTable->getFeature(feat->intFields->at(mergedToFIDIdx));
+                    rsgis::rastergis::RSGISFeature *tmpFeat = attTable->getFeature(feat->intFields->at(mergedToFIDIdx));
                     if(!tmpFeat->boolFields->at(outFIDSetFieldIdx))
                     {
                         this->defineOutputFID(attTable, tmpFeat, eliminatedFieldIdx, mergedToFIDIdx, outFIDIdx, outFIDSetFieldIdx);
@@ -1076,15 +1076,14 @@ namespace rsgis{namespace segment{
         }
     }
     
-    
-    void RSGISEliminateSmallClumps::performElimination(RSGISAttributeTable *attTable, vector<pair<size_t, size_t> > *eliminationPairs, unsigned int eliminatedFieldIdx, unsigned int mergedToFIDIdx, unsigned int pxlCountIdx, vector<RSGISBandAttStats*> *bandStats) throw(RSGISAttributeTableException)
+    void RSGISEliminateSmallClumps::performElimination(rsgis::rastergis::RSGISAttributeTable *attTable, std::vector<std::pair<size_t, size_t> > *eliminationPairs, unsigned int eliminatedFieldIdx, unsigned int mergedToFIDIdx, unsigned int pxlCountIdx, std::vector<rsgis::rastergis::RSGISBandAttStats*> *bandStats) throw(RSGISAttributeTableException)
     {
         try 
         {
-            RSGISFeature* pFeat = NULL; // parent
-            RSGISFeature* mFeat = NULL; // child to be merged
+            rsgis::rastergis::RSGISFeature* pFeat = NULL; // parent
+            rsgis::rastergis::RSGISFeature* mFeat = NULL; // child to be merged
             bool alreadyNeighbour = false;
-            for(vector<pair<size_t, size_t> >::iterator iterPairs = eliminationPairs->begin(); iterPairs != eliminationPairs->end(); ++iterPairs)
+            for(std::vector<pair<size_t, size_t> >::iterator iterPairs = eliminationPairs->begin(); iterPairs != eliminationPairs->end(); ++iterPairs)
             {
                 pFeat = attTable->getFeature((*iterPairs).first);
                 attTable->holdFID((*iterPairs).first);
@@ -1097,13 +1096,13 @@ namespace rsgis{namespace segment{
                 }
                 
                 pFeat->intFields->at(pxlCountIdx) += mFeat->intFields->at(pxlCountIdx);
-                for(vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
+                for(std::vector<rsgis::rastergis::RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
                 {
                     pFeat->floatFields->at((*iterBands)->sumIdx) += mFeat->floatFields->at((*iterBands)->sumIdx);
                     //pFeat->floatFields->at((*iterBands)->meanIdx) = pFeat->floatFields->at((*iterBands)->sumIdx) / pFeat->intFields->at(pxlCountIdx);
                 }
                 
-                for(vector<boost::uint_fast32_t>::iterator iterNeigh = pFeat->neighbours->begin(); iterNeigh != pFeat->neighbours->end(); )
+                for(std::vector<boost::uint_fast32_t>::iterator iterNeigh = pFeat->neighbours->begin(); iterNeigh != pFeat->neighbours->end(); )
                 {
                     if((*iterNeigh) == mFeat->fid)
                     {
@@ -1116,12 +1115,12 @@ namespace rsgis{namespace segment{
                 }
                 
                 alreadyNeighbour = false;
-                for(vector<boost::uint_fast32_t>::iterator iterFeatNeigh = mFeat->neighbours->begin(); iterFeatNeigh != mFeat->neighbours->end(); ++iterFeatNeigh)
+                for(std::vector<boost::uint_fast32_t>::iterator iterFeatNeigh = mFeat->neighbours->begin(); iterFeatNeigh != mFeat->neighbours->end(); ++iterFeatNeigh)
                 {
                     if((*iterFeatNeigh) != pFeat->fid)
                     {
                         alreadyNeighbour = false;
-                        for(vector<boost::uint_fast32_t>::iterator iterNeigh = pFeat->neighbours->begin(); iterNeigh != pFeat->neighbours->end(); ++iterNeigh)
+                        for(std::vector<boost::uint_fast32_t>::iterator iterNeigh = pFeat->neighbours->begin(); iterNeigh != pFeat->neighbours->end(); ++iterNeigh)
                         {
                             if((*iterFeatNeigh) == (*iterNeigh))
                             {
@@ -1149,9 +1148,9 @@ namespace rsgis{namespace segment{
         }
     }
     
-    RSGISFeature* RSGISEliminateSmallClumps::getEliminatedNeighbour(RSGISFeature *feat, RSGISAttributeTable *attTable, unsigned int eliminatedFieldIdx, unsigned int mergedToFIDIdx)throw(RSGISAttributeTableException)
+    rsgis::rastergis::RSGISFeature* RSGISEliminateSmallClumps::getEliminatedNeighbour(rsgis::rastergis::RSGISFeature *feat, rsgis::rastergis::RSGISAttributeTable *attTable, unsigned int eliminatedFieldIdx, unsigned int mergedToFIDIdx)throw(RSGISAttributeTableException)
     {
-        RSGISFeature *nFeat = NULL;
+        rsgis::rastergis::RSGISFeature *nFeat = NULL;
         try 
         {
             if(!feat->boolFields->at(eliminatedFieldIdx))
@@ -1188,7 +1187,7 @@ namespace rsgis{namespace segment{
     
     
     
-    RSGISEliminateFeature::RSGISEliminateFeature(unsigned int eliminatedFieldIdx, unsigned int mergedToFIDIdx, float specThreshold, unsigned int pxlCountIdx, vector<RSGISBandAttStats*> *bandStats, vector<pair<unsigned long, unsigned long> > *eliminationPairs):RSGISProcessFeature()
+    RSGISEliminateFeature::RSGISEliminateFeature(unsigned int eliminatedFieldIdx, unsigned int mergedToFIDIdx, float specThreshold, unsigned int pxlCountIdx, std::vector<rsgis::rastergis::RSGISBandAttStats*> *bandStats, std::vector<std::pair<unsigned long, unsigned long> > *eliminationPairs):RSGISProcessFeature()
     {
         this->eliminatedFieldIdx = eliminatedFieldIdx;
         this->mergedToFIDIdx = mergedToFIDIdx;
@@ -1198,7 +1197,7 @@ namespace rsgis{namespace segment{
         this->eliminationPairs = eliminationPairs;
     }
     
-    void RSGISEliminateFeature::processFeature(RSGISFeature *feat, RSGISAttributeTable *attTable)throw(RSGISAttributeTableException)
+    void RSGISEliminateFeature::processFeature(rsgis::rastergis::RSGISFeature *feat, rsgis::rastergis::RSGISAttributeTable *attTable)throw(RSGISAttributeTableException)
     {
         try 
         {
@@ -1206,8 +1205,8 @@ namespace rsgis{namespace segment{
             double minDist = 0;
             double distance = 0;
             bool first = true;
-            RSGISFeature *nFeat = NULL;
-            for(vector<boost::uint_fast32_t>::iterator iterFeat = feat->neighbours->begin(); iterFeat != feat->neighbours->end(); ++iterFeat)
+            rsgis::rastergis::RSGISFeature *nFeat = NULL;
+            for(std::vector<boost::uint_fast32_t>::iterator iterFeat = feat->neighbours->begin(); iterFeat != feat->neighbours->end(); ++iterFeat)
             {
                 nFeat = attTable->getFeature(*iterFeat);
                 attTable->holdFID(nFeat->fid);
@@ -1236,7 +1235,7 @@ namespace rsgis{namespace segment{
             {
                 if(minDist < specThreshold)
                 {
-                    eliminationPairs->push_back(pair<size_t, size_t>(minFID, ((unsigned long) feat->fid)));
+                    eliminationPairs->push_back(std::pair<size_t, size_t>(minFID, ((unsigned long) feat->fid)));
                 }
             }
         }
@@ -1246,14 +1245,14 @@ namespace rsgis{namespace segment{
         }
     }
     
-    double RSGISEliminateFeature::calcDistance(RSGISFeature *feat1, RSGISFeature *feat2, vector<RSGISBandAttStats*> *bandStats)throw(RSGISAttributeTableException)
+    double RSGISEliminateFeature::calcDistance(rsgis::rastergis::RSGISFeature *feat1, rsgis::rastergis::RSGISFeature *feat2, std::vector<rsgis::rastergis::RSGISBandAttStats*> *bandStats)throw(RSGISAttributeTableException)
     {
         double dist = 0;
         double mean1 = 0;
         double mean2 = 0;
         try
         {
-            for(vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
+            for(std::vector<rsgis::rastergis::RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
             {
                 mean1 = feat1->floatFields->at((*iterBands)->sumIdx) / feat1->intFields->at(pxlCountIdx);
                 mean2 = feat2->floatFields->at((*iterBands)->sumIdx) / feat2->intFields->at(pxlCountIdx);
@@ -1273,9 +1272,9 @@ namespace rsgis{namespace segment{
         return dist;
     }
     
-    RSGISFeature* RSGISEliminateFeature::getEliminatedNeighbour(RSGISFeature *feat, RSGISAttributeTable *attTable)throw(RSGISAttributeTableException)
+    rsgis::rastergis::RSGISFeature* RSGISEliminateFeature::getEliminatedNeighbour(rsgis::rastergis::RSGISFeature *feat, rsgis::rastergis::RSGISAttributeTable *attTable)throw(RSGISAttributeTableException)
     {
-        RSGISFeature *nFeat = NULL;
+        rsgis::rastergis::RSGISFeature *nFeat = NULL;
         try 
         {
             if(!feat->boolFields->at(eliminatedFieldIdx))
@@ -1310,24 +1309,24 @@ namespace rsgis{namespace segment{
     
     
 
-    RSGISApplyOutputFIDs::RSGISApplyOutputFIDs(RSGISAttributeTable *attTable, unsigned int outFIDIdx, unsigned int outFIDSetFieldIdx) : RSGISCalcImageValue(1)
+    RSGISApplyOutputFIDs::RSGISApplyOutputFIDs(rsgis::rastergis::RSGISAttributeTable *attTable, unsigned int outFIDIdx, unsigned int outFIDSetFieldIdx) : RSGISCalcImageValue(1)
     {
         this->attTable = attTable;
         this->outFIDIdx = outFIDIdx;
         this->outFIDSetFieldIdx = outFIDSetFieldIdx;
     }
     
-    void RSGISApplyOutputFIDs::calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException)
+    void RSGISApplyOutputFIDs::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
     {
         unsigned long clumpIdx = 0;
         
         try
         {
-            clumpIdx = lexical_cast<unsigned long>(bandValues[0]);
+            clumpIdx = boost::lexical_cast<unsigned long>(bandValues[0]);
         }
-        catch(bad_lexical_cast &e)
+        catch(boost::bad_lexical_cast &e)
         {
-            throw RSGISImageCalcException(e.what());
+            throw rsgis::img::RSGISImageCalcException(e.what());
         }
         
         if(clumpIdx > 0)
@@ -1336,7 +1335,7 @@ namespace rsgis{namespace segment{
             
             try
             {   
-                RSGISFeature *feat = attTable->getFeature(clumpIdx);
+                rsgis::rastergis::RSGISFeature *feat = attTable->getFeature(clumpIdx);
                 
                 if(feat->boolFields->at(outFIDSetFieldIdx))
                 {
@@ -1349,8 +1348,8 @@ namespace rsgis{namespace segment{
             }
             catch(RSGISAttributeTableException &e)
             {
-                cout << "clumpIdx = " << clumpIdx << endl;
-                throw RSGISImageCalcException(e.what());
+                std::cout << "clumpIdx = " << clumpIdx << std::endl;
+                throw rsgis::img::RSGISImageCalcException(e.what());
             }
         }
         else

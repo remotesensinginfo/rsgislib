@@ -32,23 +32,23 @@ namespace rsgis{namespace segment{
         
     }
         
-    void RSGISDefineSpectralDivision::findSpectralDivision(GDALDataset *inData, string outputImage, unsigned int subDivision, float noDataVal, bool noDataValProvided, bool projFromImage, string proj, string format)throw(RSGISImageCalcException)
+    void RSGISDefineSpectralDivision::findSpectralDivision(GDALDataset *inData, std::string outputImage, unsigned int subDivision, float noDataVal, bool noDataValProvided, bool projFromImage, std::string proj, std::string format)throw(rsgis::img::RSGISImageCalcException)
     {
         try
         {
             GDALDataset **datasets = new GDALDataset*[1];
             datasets[0] = inData;
             
-            RSGISImageUtils imgUtils;
+            rsgis::img::RSGISImageUtils imgUtils;
             
             GDALDataset *outImageDataset = imgUtils.createCopy(inData, 1, outputImage, format, GDT_UInt32, projFromImage, proj);
             imgUtils.zerosUIntGDALDataset(outImageDataset);
             
             int numBands = inData->GetRasterCount();
-            ImageStats **stats = new ImageStats*[numBands];
+            rsgis::img::ImageStats **stats = new rsgis::img::ImageStats*[numBands];
             for(int n = 0; n < numBands; ++n)
             {
-                stats[n] = new ImageStats();
+                stats[n] = new rsgis::img::ImageStats();
                 stats[n]->min = 0;
                 stats[n]->max = 0;
                 stats[n]->mean = 0;
@@ -56,8 +56,8 @@ namespace rsgis{namespace segment{
                 stats[n]->stddev = 0;
             }
             
-            cout << "Calc Image Stats\n";
-            RSGISImageStatistics imgStats;
+            std::cout << "Calc Image Stats\n";
+            rsgis::img::RSGISImageStatistics imgStats;
             imgStats.calcImageStatistics(datasets, 1, stats, numBands, false);
             
             unsigned int numCats = subDivision;
@@ -66,67 +66,67 @@ namespace rsgis{namespace segment{
                 numCats *= subDivision;
             }
             
-            cout << "Generating " << numCats << " categories\n";
+            std::cout << "Generating " << numCats << " categories\n";
             
             
-            vector<pair<float, float> > **catThresholds = new vector<pair<float, float> >*[numBands];
-            vector<pair<float, float> > **bandThresholds = new vector<pair<float, float> >*[numBands];
+            std::vector<std::pair<float, float> > **catThresholds = new std::vector<std::pair<float, float> >*[numBands];
+            std::vector<std::pair<float, float> > **bandThresholds = new std::vector<std::pair<float, float> >*[numBands];
             
             float bandStep = 0;
             float bandMin = 0;
             float bandMax = 0;
             for(int n = 0; n < numBands; ++n)
             {
-                catThresholds[n] = new vector<pair<float, float> >();
+                catThresholds[n] = new std::vector<std::pair<float, float> >();
                 catThresholds[n]->reserve(numCats);
-                bandThresholds[n] = new vector<pair<float, float> >();
+                bandThresholds[n] = new std::vector<std::pair<float, float> >();
                 bandThresholds[n]->reserve(subDivision);
                 bandStep = (stats[n]->max - stats[n]->min)/subDivision;
                 bandMin = stats[n]->min;
                 bandMax = bandMin + bandStep;
                 for(unsigned j = 0; j < subDivision; ++j)
                 {
-                    bandThresholds[n]->push_back(pair<float,float>(bandMin, bandMax));
+                    bandThresholds[n]->push_back(std::pair<float,float>(bandMin, bandMax));
                     bandMin += bandStep;
                     bandMax += bandStep;
                 }
             }
             
-            pair<float, float> *pThreshold = NULL;
+            std::pair<float, float> *pThreshold = NULL;
             for(unsigned j = 0; j < subDivision; ++j)
             {
-                pThreshold = new pair<float, float>[numBands];
+                pThreshold = new std::pair<float, float>[numBands];
                 for(int n = 0; n < numBands; ++n)
                 {
-                    pThreshold[n] = pair<float, float>(0,0);
+                    pThreshold[n] = std::pair<float, float>(0,0);
                 }
-                pThreshold[0] = pair<float,float>(bandThresholds[0]->at(j).first, bandThresholds[0]->at(j).second);
+                pThreshold[0] = std::pair<float,float>(bandThresholds[0]->at(j).first, bandThresholds[0]->at(j).second);
                 
                 this->generateSpectralDivThresholds(pThreshold, 1, numBands, subDivision, bandThresholds, catThresholds);
             }
             
-            cout << "Number of categories: " << catThresholds[0]->size() << endl;
+            std::cout << "Number of categories: " << catThresholds[0]->size() << std::endl;
             
             if(catThresholds[0]->size() != numCats)
             {
-                throw RSGISImageCalcException("The number of categories generated is not what was expected.");
+                throw rsgis::img::RSGISImageCalcException("The number of categories generated is not what was expected.");
             }
             
             /*
             for(unsigned int c = 0; c < numCats; ++c)
             {
-                cout << "Category " << c+1 << ":\n";
+                std::cout << "Category " << c+1 << ":\n";
                 for(unsigned int n = 0; n < numBands; ++n)
                 {
-                    cout << "\tB" << n+1 << ": " << catThresholds[n]->at(c).first << " - " << catThresholds[n]->at(c).second << "\n";
+                    std::cout << "\tB" << n+1 << ": " << catThresholds[n]->at(c).first << " - " << catThresholds[n]->at(c).second << "\n";
                 }
             }
             */
             
-            cout << "Applying to output image\n";
+            std::cout << "Applying to output image\n";
             this->assignToCategory(inData, outImageDataset, catThresholds, numBands, numCats, noDataVal, noDataValProvided);
             
-            cout << "Completed\n";
+            std::cout << "Completed\n";
             GDALClose(outImageDataset);
             for(int n = 0; n < numBands; ++n)
             {
@@ -145,31 +145,31 @@ namespace rsgis{namespace segment{
         }
     }
     
-    void RSGISDefineSpectralDivision::generateSpectralDivThresholds(pair<float, float> *pThreshold, unsigned int bandIdx, unsigned int numBands, unsigned int subDivision, vector<pair<float, float> > **bandThresholds, vector<pair<float, float> > **catThresholds)
+    void RSGISDefineSpectralDivision::generateSpectralDivThresholds(std::pair<float, float> *pThreshold, unsigned int bandIdx, unsigned int numBands, unsigned int subDivision, std::vector<std::pair<float, float> > **bandThresholds, std::vector<std::pair<float, float> > **catThresholds)
     {
         if(bandIdx == numBands)
         {
             for(unsigned int n = 0; n < numBands; ++n)
             {
-                catThresholds[n]->push_back(pair<float, float>(pThreshold[n].first, pThreshold[n].second));
+                catThresholds[n]->push_back(std::pair<float, float>(pThreshold[n].first, pThreshold[n].second));
             }
         }
         else
         {
-            pair<float, float> *cThreshold = NULL;
+            std::pair<float, float> *cThreshold = NULL;
             for(unsigned j = 0; j < subDivision; ++j)
             {
-                cThreshold = new pair<float, float>[numBands];
+                cThreshold = new std::pair<float, float>[numBands];
                 for(unsigned int n = 0; n < numBands; ++n)
                 {
-                    cThreshold[n] = pair<float, float>(0,0);
+                    cThreshold[n] = std::pair<float, float>(0,0);
                 }
                 for(unsigned int n = 0; n < bandIdx; ++n)
                 {
-                    cThreshold[n] = pair<float, float>(pThreshold[n].first, pThreshold[n].second);
+                    cThreshold[n] = std::pair<float, float>(pThreshold[n].first, pThreshold[n].second);
                 }
                 
-                cThreshold[bandIdx] = pair<float,float>(bandThresholds[bandIdx]->at(j).first, bandThresholds[bandIdx]->at(j).second);
+                cThreshold[bandIdx] = std::pair<float,float>(bandThresholds[bandIdx]->at(j).first, bandThresholds[bandIdx]->at(j).second);
                 
                 this->generateSpectralDivThresholds(cThreshold, bandIdx+1, numBands, subDivision, bandThresholds, catThresholds);
             }
@@ -178,23 +178,23 @@ namespace rsgis{namespace segment{
         delete[] pThreshold;
     }
     
-    void RSGISDefineSpectralDivision::assignToCategory(GDALDataset *reflDataset, GDALDataset *catsDataset, vector<pair<float, float> > **catThresholds, unsigned int numBands, unsigned int numCats, float noDataVal, bool noDataValProvided)throw(RSGISImageCalcException)
+    void RSGISDefineSpectralDivision::assignToCategory(GDALDataset *reflDataset, GDALDataset *catsDataset, std::vector<std::pair<float, float> > **catThresholds, unsigned int numBands, unsigned int numCats, float noDataVal, bool noDataValProvided)throw(rsgis::img::RSGISImageCalcException)
     {
         try 
         {
             if(numBands != reflDataset->GetRasterCount())
             {
-                throw RSGISImageCalcException("The number of image bands does not match.");
+                throw rsgis::img::RSGISImageCalcException("The number of image bands does not match.");
             }
             
             if(reflDataset->GetRasterXSize() != catsDataset->GetRasterXSize())
             {
-                throw RSGISImageCalcException("Widths do not match.");
+                throw rsgis::img::RSGISImageCalcException("Widths do not match.");
             }
             
             if(reflDataset->GetRasterYSize() != catsDataset->GetRasterYSize())
             {
-                throw RSGISImageCalcException("Heights do not match.");
+                throw rsgis::img::RSGISImageCalcException("Heights do not match.");
             }
             
             unsigned int width = reflDataset->GetRasterXSize();
@@ -284,7 +284,7 @@ namespace rsgis{namespace segment{
         } 
         catch (RSGISException &e) 
         {
-            throw RSGISImageCalcException(e.what());
+            throw rsgis::img::RSGISImageCalcException(e.what());
         }
         
     }

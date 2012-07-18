@@ -24,7 +24,6 @@
 #define RSGISMergeSmallClumps_h
 
 #include <iostream>
-#include <string>
 #include <vector>
 #include <queue>
 #include <deque>
@@ -38,14 +37,11 @@
 
 namespace rsgis{namespace segment{
     
-    using namespace std;
-    using namespace rsgis::img;
-    
     class RSGISMergeSmallClumps
     {
     public:
         RSGISMergeSmallClumps();
-        void mergeSmallClumps(GDALDataset *spectral, GDALDataset *clumps, unsigned int minClumpSize) throw(RSGISImageCalcException);
+        void mergeSmallClumps(GDALDataset *spectral, GDALDataset *clumps, unsigned int minClumpSize) throw(rsgis::img::RSGISImageCalcException);
         ~RSGISMergeSmallClumps();
     };
     
