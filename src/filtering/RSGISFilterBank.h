@@ -46,13 +46,13 @@ namespace rsgis{namespace filter{
 			void addFilter(RSGISImageFilter *filter);
 			RSGISImageFilter* getFilter(int i);
 			int getNumFilters();
-			void executeFilters(GDALDataset **datasets, int numDS, string outImageBase) throw(RSGISImageException);
-			void exectuteFilter(int i, GDALDataset **datasets, int numDS, string outImageBase) throw(RSGISImageException);
+			void executeFilters(GDALDataset **datasets, int numDS, string outImageBase) throw(rsgis::RSGISImageException);
+			void exectuteFilter(int i, GDALDataset **datasets, int numDS, string outImageBase) throw(rsgis::RSGISImageException);
 			void exportFilterBankImages(string imagebase);
-			void createLeungMalikFilterBank() throw(RSGISImageException);
+			void createLeungMalikFilterBank() throw(rsgis::RSGISImageException);
 			~RSGISFilterBank();
 		protected:
-			vector<RSGISImageFilter*> *filters;
+            std::vector<RSGISImageFilter*> *filters;
 		};
 	
 	

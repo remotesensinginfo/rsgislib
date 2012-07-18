@@ -27,7 +27,7 @@ namespace rsgis{namespace filter{
 
 	RSGISFilterBank::RSGISFilterBank()
 	{
-		this->filters = new vector<RSGISImageFilter*>();
+		this->filters = new std::vector<RSGISImageFilter*>();
 	}
 	
 	void RSGISFilterBank::addFilter(RSGISImageFilter *filter)
@@ -45,7 +45,7 @@ namespace rsgis{namespace filter{
 		return this->filters->size();
 	}
 	
-	void RSGISFilterBank::executeFilters(GDALDataset **datasets, int numDS, string outImageBase) throw(RSGISImageException)
+	void RSGISFilterBank::executeFilters(GDALDataset **datasets, int numDS, string outImageBase) throw(rsgis::RSGISImageException)
 	{
 		try
 		{
@@ -61,24 +61,24 @@ namespace rsgis{namespace filter{
 			{
 				cout << "Executing filter " << (i+1) << " of " << size << endl;
 				filename = outImageBase + string("_") + this->filters->at(i)->getFileNameEnding() + string(".env");
-				dynamic_cast<RSGISCalcImageValue*>(this->filters->at(i))->setNumOutBands(numOutBands);
+				dynamic_cast<rsgis::img::RSGISCalcImageValue*>(this->filters->at(i))->setNumOutBands(numOutBands);
 				this->filters->at(i)->runFilter(datasets, numDS, filename);
 			}
 		}
-		catch(RSGISImageException e)
+		catch(rsgis::RSGISImageException e)
 		{
 			throw e;
 		}
 	}
 	
-	void RSGISFilterBank::exectuteFilter(int i, GDALDataset **datasets, int numDS, string outImageBase) throw(RSGISImageException)
+	void RSGISFilterBank::exectuteFilter(int i, GDALDataset **datasets, int numDS, string outImageBase) throw(rsgis::RSGISImageException)
 	{
 		try
 		{
 			string filename = outImageBase + this->filters->at(i)->getFileNameEnding();
 			this->filters->at(i)->runFilter(datasets, numDS, filename);
 		}
-		catch(RSGISImageException e)
+		catch(rsgis::RSGISImageException e)
 		{
 			throw e;
 		}
@@ -95,7 +95,7 @@ namespace rsgis{namespace filter{
 		}
 	}
 	
-	void RSGISFilterBank::createLeungMalikFilterBank() throw(RSGISImageException)
+	void RSGISFilterBank::createLeungMalikFilterBank() throw(rsgis::RSGISImageException)
 	{
 		float stddev = 0;
 		float stddevX = 0;
@@ -341,7 +341,7 @@ namespace rsgis{namespace filter{
 			
 			
 		}
-		catch (RSGISImageException e)
+		catch (rsgis::RSGISImageException e)
 		{
 			throw e;
 		}

@@ -37,34 +37,30 @@
 
 #include "math/RSGISMatrices.h"
 
-using namespace rsgis;
-using namespace rsgis::math;
-using namespace rsgis::img;
-
 namespace rsgis{namespace filter{
     
     class RSGISImageMorphologyTopHat
     {
     public:
         RSGISImageMorphologyTopHat();
-        void performBlackTopHat(GDALDataset *dataset, string outputImage, string tempImage, bool useMemory, Matrix *matrixOperator) throw(RSGISImageCalcException, RSGISImageBandException);
-        void performWhiteTopHat(GDALDataset *dataset, string outputImage, string tempImage, bool useMemory, Matrix *matrixOperator) throw(RSGISImageCalcException, RSGISImageBandException);
+        void performBlackTopHat(GDALDataset *dataset, string outputImage, std::string tempImage, bool useMemory, rsgis::math::Matrix *matrixOperator) throw(rsgis::img::RSGISImageCalcException, rsgis::img::RSGISImageBandException);
+        void performWhiteTopHat(GDALDataset *dataset, string outputImage, std::string tempImage, bool useMemory, rsgis::math::Matrix *matrixOperator) throw(rsgis::img::RSGISImageCalcException, rsgis::img::RSGISImageBandException);
         ~RSGISImageMorphologyTopHat();
     };
     
     
-    class RSGISMorphologyImageDiff : public RSGISCalcImageValue
+    class RSGISMorphologyImageDiff : public rsgis::img::RSGISCalcImageValue
     {
     public: 
         RSGISMorphologyImageDiff(int numberOutBands); 			
-        virtual RSGISCalcImage* getCalcImage()throw(RSGISImageException){return new RSGISCalcImage(this, "", true);};
-        void calcImageValue(float *bandValues, int numBands, float *output)throw(RSGISImageCalcException);
-        void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented.");};
-        void calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented.");};
-        void calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented.");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented.");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
-        bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented.");};
+        virtual rsgis::img::RSGISCalcImage* getCalcImage()throw(RSGISImageException){return new rsgis::img::RSGISCalcImage(this, "", true);};
+        void calcImageValue(float *bandValues, int numBands, float *output)throw(rsgis::img::RSGISImageCalcException);
+        void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not Implemented.");};
+        void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not Implemented.");};
+        void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not Implemented.");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not Implemented.");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+        bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not Implemented.");};
         ~RSGISMorphologyImageDiff();
     };
     

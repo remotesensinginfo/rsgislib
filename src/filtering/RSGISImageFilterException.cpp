@@ -24,17 +24,17 @@
 
 namespace rsgis{namespace filter{
 	
-	RSGISImageFilterException::RSGISImageFilterException() : RSGISImageException("A RSGISImageFilterException has been created..")
+	RSGISImageFilterException::RSGISImageFilterException() : rsgis::RSGISImageException("A RSGISImageFilterException has been created..")
 	{
 		
 	}
 	
-	RSGISImageFilterException::RSGISImageFilterException(const char* message) : RSGISImageException(message)
+	RSGISImageFilterException::RSGISImageFilterException(const char* message) : rsgis::RSGISImageException(message)
 	{
 		
 	}
 	
-	RSGISImageFilterException::RSGISImageFilterException(string message) : RSGISImageException(message)
+	RSGISImageFilterException::RSGISImageFilterException(std::string message) : rsgis::RSGISImageException(message)
 	{
 		
 	}

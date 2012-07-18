@@ -28,8 +28,6 @@
 #include "filtering/RSGISCalcFilter.h"
 #include "filtering/RSGISImageFilter.h"
 
-using namespace std;
-
 namespace rsgis{namespace filter{
 
 	class RSGISGenerateFilter

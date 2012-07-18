@@ -24,7 +24,7 @@
 
 namespace rsgis{namespace filter{
 
-	RSGISSobelFilter::RSGISSobelFilter(int numberOutBands, int size, string filenameEnding, FilterDirection filterType) : RSGISImageFilter(numberOutBands, size, filenameEnding)
+	RSGISSobelFilter::RSGISSobelFilter(int numberOutBands, int size, std::string filenameEnding, FilterDirection filterType) : RSGISImageFilter(numberOutBands, size, filenameEnding)
 	{
 		this->filterType = filterType;
 		this->filterX = new int*[3];
@@ -57,11 +57,11 @@ namespace rsgis{namespace filter{
 		this->filterY[2][2] = 1;
 	}
 	
-	void RSGISSobelFilter::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException)
+	void RSGISSobelFilter::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		if(this->size != 3 & winSize != 3)
 		{
-			throw RSGISImageCalcException("Window size is required to be 3.");
+			throw rsgis::img::RSGISImageCalcException("Window size is required to be 3.");
 		}
 		//dataBlock[i][j][k]; i = band; j = y axis; k = x axis
 		
@@ -115,12 +115,12 @@ namespace rsgis{namespace filter{
 		
 	}
 	
-	bool RSGISSobelFilter::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException)
+	bool RSGISSobelFilter::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
 	{
-		throw RSGISImageCalcException("Not implemented");
+		throw rsgis::img::RSGISImageCalcException("Not implemented");
 	}
 
-	void RSGISSobelFilter::exportAsImage(string filename) throw(RSGISImageFilterException)
+	void RSGISSobelFilter::exportAsImage(std::string filename) throw(RSGISImageFilterException)
 	{
 		GDALAllRegister();
 		GDALDataset *outputImageDS = NULL;
@@ -152,7 +152,7 @@ namespace rsgis{namespace filter{
 				outputRasterBand->RasterIO(GF_Write, 0, i, this->size, 1, outputData, this->size, 1, GDT_Float32, 0, 0);
 			}	
 		}
-		catch(RSGISImageException e)
+		catch(rsgis::RSGISImageException e)
 		{
 			if(outputData == NULL)
 			{

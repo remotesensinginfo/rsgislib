@@ -24,12 +24,12 @@
 
 namespace rsgis{namespace filter{
     
-	RSGISLeeFilter::RSGISLeeFilter(int numberOutBands, int size, string filenameEnding, unsigned int nLooks) : RSGISImageFilter(numberOutBands, size, filenameEnding)
+	RSGISLeeFilter::RSGISLeeFilter(int numberOutBands, int size, std::string filenameEnding, unsigned int nLooks) : RSGISImageFilter(numberOutBands, size, filenameEnding)
     {
         this->nLooks = nLooks;
     }
 	
-	void RSGISLeeFilter::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException)
+	void RSGISLeeFilter::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 	
         unsigned int middleVal = floor(((float)winSize) / 2);

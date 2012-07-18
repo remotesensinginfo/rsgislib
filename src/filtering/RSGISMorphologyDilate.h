@@ -33,53 +33,49 @@
 
 #include "math/RSGISMatrices.h"
 
-using namespace rsgis;
-using namespace rsgis::math;
-using namespace rsgis::img;
-
 namespace rsgis{namespace filter{
     
     class RSGISImageMorphologyDilate
     {
     public:
         RSGISImageMorphologyDilate();
-        void dilateImage(GDALDataset **dataset, string outputImage, Matrix *matrixOperator) throw(RSGISImageCalcException, RSGISImageBandException);
-        void dilateImageAll(GDALDataset **dataset, string outputImage, Matrix *matrixOperator) throw(RSGISImageCalcException, RSGISImageBandException);
+        void dilateImage(GDALDataset **dataset, std::string outputImage, rsgis::math::Matrix *matrixOperator) throw(rsgis::img::RSGISImageCalcException, rsgis::img::RSGISImageBandException);
+        void dilateImageAll(GDALDataset **dataset, std::string outputImage, rsgis::math::Matrix *matrixOperator) throw(rsgis::img::RSGISImageCalcException, rsgis::img::RSGISImageBandException);
         ~RSGISImageMorphologyDilate(){};
     };
     
-    class RSGISMorphologyDilate : public RSGISCalcImageValue
+    class RSGISMorphologyDilate : public rsgis::img::RSGISCalcImageValue
     {
     public: 
-        RSGISMorphologyDilate(int numberOutBands, Matrix *matrixOperator); 			
-        virtual RSGISCalcImage* getCalcImage()throw(RSGISImageException){return new RSGISCalcImage(this, "", true);};
-        void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented.");};
-        void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented.");};
-        void calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented.");};
-        void calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented.");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException);
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
-        bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented.");};
+        RSGISMorphologyDilate(int numberOutBands, rsgis::math::Matrix *matrixOperator); 			
+        virtual rsgis::img::RSGISCalcImage* getCalcImage()throw(rsgis::RSGISImageException){return new rsgis::img::RSGISCalcImage(this, "", true);};
+        void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not Implemented.");};
+        void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not Implemented.");};
+        void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not Implemented.");};
+        void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not Implemented.");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException);
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+        bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not Implemented.");};
         ~RSGISMorphologyDilate();
     private:
-        Matrix *matrixOperator;
+        rsgis::math::Matrix *matrixOperator;
     };
     
-    class RSGISMorphologyDilateAll : public RSGISCalcImageValue
+    class RSGISMorphologyDilateAll : public rsgis::img::RSGISCalcImageValue
     {
     public: 
-        RSGISMorphologyDilateAll(int numberOutBands, Matrix *matrixOperator); 			
-        virtual RSGISCalcImage* getCalcImage()throw(RSGISImageException){return new RSGISCalcImage(this, "", true);};
-        void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented.");};
-        void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented.");};
-        void calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented.");};
-        void calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented.");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException);
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
-        bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented.");};
+        RSGISMorphologyDilateAll(int numberOutBands, rsgis::math::Matrix *matrixOperator); 			
+        virtual rsgis::img::RSGISCalcImage* getCalcImage()throw(rsgis::RSGISImageException){return new rsgis::img::RSGISCalcImage(this, "", true);};
+        void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not Implemented.");};
+        void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not Implemented.");};
+        void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not Implemented.");};
+        void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not Implemented.");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException);
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+        bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not Implemented.");};
         ~RSGISMorphologyDilateAll();
     private:
-        Matrix *matrixOperator;
+        rsgis::math::Matrix *matrixOperator;
     };
 
 }}

@@ -32,9 +32,6 @@
 #include "img/RSGISCalcImageValue.h"
 #include "filtering/RSGISImageFilter.h"
 
-using namespace rsgis;
-using namespace rsgis::img;
-
 namespace rsgis{namespace filter{
 	
 	class RSGISPrewittFilter : public RSGISImageFilter
@@ -48,10 +45,10 @@ namespace rsgis{namespace filter{
 				xy
 			};			
 			
-			RSGISPrewittFilter(int numberOutBands, int size, string filenameEnding, FilterDirection filterType);
-			virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException);
-			virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException);
-			virtual void exportAsImage(string filename) throw(RSGISImageFilterException);
+			RSGISPrewittFilter(int numberOutBands, int size, std::string filenameEnding, FilterDirection filterType);
+			virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException);
+			virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException);
+			virtual void exportAsImage(std::string filename) throw(RSGISImageFilterException);
 			~RSGISPrewittFilter();
 		protected:
 			FilterDirection filterType;

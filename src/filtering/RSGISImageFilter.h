@@ -24,6 +24,7 @@
 #define RSGISImageFilter_H
 
 #include <iostream>
+#include <string>
 
 #include "common/RSGISImageException.h"
 
@@ -31,9 +32,6 @@
 #include "img/RSGISImageCalcException.h"
 #include "img/RSGISCalcImage.h"
 #include "img/RSGISCalcImageValue.h"
-
-using namespace rsgis;
-using namespace rsgis::img;
 
 namespace rsgis{namespace filter{
 	
@@ -44,25 +42,25 @@ namespace rsgis{namespace filter{
 	};
 	
 	
-	class RSGISImageFilter : public RSGISCalcImageValue
+	class RSGISImageFilter : public rsgis::img::RSGISCalcImageValue
 		{
 		public: 
-			RSGISImageFilter(int numberOutBands, int size, string filenameEnding);
-			void runFilter(GDALDataset **datasets, int numDS, string outputImage) throw(RSGISImageException);
-			virtual RSGISCalcImage* getCalcImage()throw(RSGISImageException);
-			virtual void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException);
-			virtual void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException);
-			virtual void calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException);
-			virtual void calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException);
-			virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException) = 0;
-            void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
-			virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException) = 0;
-			virtual void exportAsImage(string filename) throw(RSGISImageFilterException) = 0;
-			virtual string getFileNameEnding();
+			RSGISImageFilter(int numberOutBands, int size, std::string filenameEnding);
+			void runFilter(GDALDataset **datasets, int numDS, std::string outputImage) throw(rsgis::RSGISImageException);
+			virtual rsgis::img::RSGISCalcImage* getCalcImage()throw(rsgis::RSGISImageException);
+			virtual void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException);
+			virtual void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException);
+			virtual void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException);
+			virtual void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException);
+			virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException) = 0;
+            void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+			virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException) = 0;
+			virtual void exportAsImage(std::string filename) throw(RSGISImageFilterException) = 0;
+			virtual std::string getFileNameEnding();
 			~RSGISImageFilter();
 		protected:
 			int size;
-			string filenameEnding;
+			std::string filenameEnding;
 		};
 }}
 

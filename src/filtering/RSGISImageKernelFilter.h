@@ -33,9 +33,6 @@
 #include "img/RSGISCalcImageValue.h"
 #include "filtering/RSGISImageFilter.h"
 
-using namespace rsgis;
-using namespace rsgis::img;
-
 namespace rsgis{namespace filter{
 	
 	
@@ -43,8 +40,8 @@ namespace rsgis{namespace filter{
 		{
 		public: 
 			RSGISImageKernelFilter(int numberOutBands, int size, string filenameEnding, ImageFilter *filter);
-			virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException);
-			virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException);
+			virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException);
+			virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException);
 			virtual void exportAsImage(string filename) throw(RSGISImageFilterException);
 			~RSGISImageKernelFilter();
 		protected:

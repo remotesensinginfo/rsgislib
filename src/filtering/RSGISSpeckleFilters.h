@@ -32,9 +32,6 @@
 #include "img/RSGISCalcImageValue.h"
 #include "filtering/RSGISImageFilter.h"
 
-using namespace rsgis;
-using namespace rsgis::img;
-
 namespace rsgis{namespace filter{
 	
 	class RSGISLeeFilter : public RSGISImageFilter
@@ -51,10 +48,10 @@ namespace rsgis{namespace filter{
         
     public: 
         
-        RSGISLeeFilter(int numberOutBands, int size, string filenameEnding, unsigned int nLooks);
-        virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException);
-        virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageFilterException("Not implemented for Lee filter!");};;
-        virtual void exportAsImage(string filename) throw(RSGISImageFilterException){throw RSGISImageFilterException("No image to output!");};
+        RSGISLeeFilter(int numberOutBands, int size, std::string filenameEnding, unsigned int nLooks);
+        virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException);
+        virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw RSGISImageFilterException("Not implemented for Lee filter!");};;
+        virtual void exportAsImage(std::string filename) throw(RSGISImageFilterException){throw RSGISImageFilterException("No image to output!");};
         ~RSGISLeeFilter();
     protected:
         unsigned int nLooks;

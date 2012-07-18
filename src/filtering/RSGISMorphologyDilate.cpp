@@ -29,61 +29,61 @@ namespace rsgis{namespace filter{
 
 	}
 
-	void RSGISImageMorphologyDilate::dilateImage(GDALDataset **datasets, string outputImage, Matrix *matrixOperator) throw(RSGISImageCalcException, RSGISImageBandException)
+	void RSGISImageMorphologyDilate::dilateImage(GDALDataset **datasets, string outputImage,rsgis::math::Matrix *matrixOperator) throw(rsgis::img::RSGISImageCalcException, rsgis::img::RSGISImageBandException)
 	{
         if(matrixOperator->n != matrixOperator->m)
         {
-            throw RSGISImageCalcException("Morphological operator must be a square matrix.");
+            throw rsgis::img::RSGISImageCalcException("Morphological operator must be a square matrix.");
         }
         
 		int numBands = datasets[0]->GetRasterCount();
 		RSGISMorphologyDilate *dilateImage = new RSGISMorphologyDilate(numBands, matrixOperator);
-		RSGISCalcImage calcImg = RSGISCalcImage(dilateImage, "", true);
+		rsgis::img::RSGISCalcImage calcImg = rsgis::img::RSGISCalcImage(dilateImage, "", true);
         try
         {
             calcImg.calcImageWindowData(datasets, 1, outputImage, matrixOperator->n);
         }
-        catch(RSGISImageCalcException &e)
+        catch(rsgis::img::RSGISImageCalcException &e)
         {
             throw e;
         }
-        catch(RSGISImageBandException &e)
+        catch(rsgis::img::RSGISImageBandException &e)
         {
             throw e;
         }
         delete dilateImage;
 	}
     
-    void RSGISImageMorphologyDilate::dilateImageAll(GDALDataset **datasets, string outputImage, Matrix *matrixOperator) throw(RSGISImageCalcException, RSGISImageBandException)
+    void RSGISImageMorphologyDilate::dilateImageAll(GDALDataset **datasets, string outputImage,rsgis::math::Matrix*matrixOperator) throw(rsgis::img::RSGISImageCalcException, rsgis::img::RSGISImageBandException)
 	{
         if(matrixOperator->n != matrixOperator->m)
         {
-            throw RSGISImageCalcException("Morphological operator must be a square matrix.");
+            throw rsgis::img::RSGISImageCalcException("Morphological operator must be a square matrix.");
         }
         
 		RSGISMorphologyDilateAll *dilateImage = new RSGISMorphologyDilateAll(1, matrixOperator);
-		RSGISCalcImage calcImg = RSGISCalcImage(dilateImage, "", true);
+		rsgis::img::RSGISCalcImage calcImg = rsgis::img::RSGISCalcImage(dilateImage, "", true);
         try
         {
             calcImg.calcImageWindowData(datasets, 1, outputImage, matrixOperator->n);
         }
-        catch(RSGISImageCalcException &e)
+        catch(rsgis::img::RSGISImageCalcException &e)
         {
             throw e;
         }
-        catch(RSGISImageBandException &e)
+        catch(rsgis::img::RSGISImageBandException &e)
         {
             throw e;
         }
         delete dilateImage;
 	}
 
-	RSGISMorphologyDilate::RSGISMorphologyDilate(int numberOutBands, Matrix *matrixOperator) : RSGISCalcImageValue(numberOutBands)
+	RSGISMorphologyDilate::RSGISMorphologyDilate(int numberOutBands,rsgis::math::Matrix*matrixOperator) : rsgis::img::RSGISCalcImageValue(numberOutBands)
 	{
         this->matrixOperator = matrixOperator;
 	}
 
-	void RSGISMorphologyDilate::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException)
+	void RSGISMorphologyDilate::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		bool first = true;
 		double *largest = new double[numBands];
@@ -134,12 +134,12 @@ namespace rsgis{namespace filter{
 		
 	}
     
-    RSGISMorphologyDilateAll::RSGISMorphologyDilateAll(int numberOutBands, Matrix *matrixOperator) : RSGISCalcImageValue(numberOutBands)
+    RSGISMorphologyDilateAll::RSGISMorphologyDilateAll(int numberOutBands,rsgis::math::Matrix*matrixOperator) : rsgis::img::RSGISCalcImageValue(numberOutBands)
 	{
         this->matrixOperator = matrixOperator;
 	}
     
-	void RSGISMorphologyDilateAll::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException)
+	void RSGISMorphologyDilateAll::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		bool first = true;
 		double largest = 0;
