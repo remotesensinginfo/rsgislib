@@ -42,7 +42,7 @@ namespace rsgis{ namespace classifier{
 	
 	void RSGISMinimumDistanceClassifier::calcClusterCentres() throw(RSGISClassificationException)
 	{
-		RSGISMatrices matrixUtils;
+        rsgis::math::RSGISMatrices matrixUtils;
 		clusterCentres = new ClassData[numClasses];
 		
 		if(centreType == mean)
