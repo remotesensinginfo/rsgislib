@@ -37,13 +37,13 @@ namespace rsgis {namespace radar
 			this->ittmax = ittmax;
 			this->parameters = parameters;
 		}
-		void RSGISEstimationAlgorithmFullPolSingleSpeciesPoly::calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException)
+		void RSGISEstimationAlgorithmFullPolSingleSpeciesPoly::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
 		{
 			RSGISEstimationConjugateGradient conjGrad;
-			RSGISVectors vectorUtils;
-			RSGISAllometricEquations allometric = RSGISAllometricEquations();
+			rsgis::math::RSGISVectors vectorUtils;
+			rsgis::utils::RSGISAllometricEquations allometric = rsgis::utils::RSGISAllometricEquations();
 			
-			species = aHarpophylla;
+			species = rsgis::utils::aHarpophylla;
 			gsl_vector *inSigma0dB;
 			gsl_vector *outPar;
 			outPar = gsl_vector_alloc(numOutBands);
@@ -557,7 +557,7 @@ namespace rsgis {namespace radar
 				}
 				else
 				{
-					cout << "Parameters not recognised, cannot calculate biomass.";
+					std::cout << "Parameters not recognised, cannot calculate biomass.";
 				}
 				
 			}			
@@ -581,13 +581,13 @@ namespace rsgis {namespace radar
 			this->ittmax = ittmax;
 			this->parameters = parameters;
 		}
-		void RSGISEstimationAlgorithmDualPolSingleSpeciesPoly::calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException)
+		void RSGISEstimationAlgorithmDualPolSingleSpeciesPoly::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
 		{
 			RSGISEstimationConjugateGradient conjGrad;
-			RSGISVectors vectorUtils;
-			RSGISAllometricEquations allometric = RSGISAllometricEquations();
+			rsgis::math::RSGISVectors vectorUtils;
+			rsgis::utils::RSGISAllometricEquations allometric = rsgis::utils::RSGISAllometricEquations();
 			
-			species = aHarpophylla;
+			species = rsgis::utils::aHarpophylla;
 			gsl_vector *inSigma0dB;
 			gsl_vector *outPar;
 			outPar = gsl_vector_alloc(numOutBands);
@@ -655,7 +655,7 @@ namespace rsgis {namespace radar
 					double density = gsl_vector_get(outPar, 1);
 					double error = gsl_vector_get(outPar, 2);
 					
-					//cout << "Canopy depth = " << cDepth << endl;
+					//std::cout << "Canopy depth = " << cDepth << std::endl;
 					
 					// Set parameters to limits of equation
 					if(cDepth > 3)
@@ -680,11 +680,11 @@ namespace rsgis {namespace radar
 					/*double aCoeff = 0.724416488101816;
 					double bCoeff = -0.025097647604632307;
 					height =  (2 * ( exp(log(cDepth) / aCoeff) + bCoeff )) * 100;*/
-					//cout << "Canopy depth = " << cDepth << " Height = " << height << endl;
+					//std::cout << "Canopy depth = " << cDepth << " Height = " << height << std::endl;
 					double tMass = allometric.calculateTotalBiomassHeight(height, species);
 					double biomass = ((tMass*(density*10000)))/1000000;
 					
-					//cout << "canopy depth = " << cDepth << " height = " << height << endl;
+					//std::cout << "canopy depth = " << cDepth << " height = " << height << std::endl;
 					
 					// Write out
 					output[0] = cDepth;
@@ -830,7 +830,7 @@ namespace rsgis {namespace radar
 				}
 				else
 				{
-					cout << "Parameters not recognised, cannot calculate biomass.";
+					std::cout << "Parameters not recognised, cannot calculate biomass.";
 				}
 				
 			}
@@ -850,7 +850,7 @@ namespace rsgis {namespace radar
 		 * DUAL-POL SINGLE SPECIES WITH FPC                          *
 		 * - FPC used to calculate canopy scattering and attenuation *
 		 *************************************************************/
-		RSGISEstimationAlgorithmDualPolFPCSingleSpecies::RSGISEstimationAlgorithmDualPolFPCSingleSpecies(int numOutputBands, double nonForestThreashold, gsl_matrix *coeffHH, gsl_matrix *coeffHV, gsl_vector *coeffFPCHH, gsl_vector *coeffFPCHV, gsl_vector *coeffFPCAttenuationH, gsl_vector *coeffFPCAttenuationV, estParameters parameters, treeSpecies species, int ittmax) : RSGISCalcImageValue(numOutputBands)
+		RSGISEstimationAlgorithmDualPolFPCSingleSpecies::RSGISEstimationAlgorithmDualPolFPCSingleSpecies(int numOutputBands, double nonForestThreashold, gsl_matrix *coeffHH, gsl_matrix *coeffHV, gsl_vector *coeffFPCHH, gsl_vector *coeffFPCHV, gsl_vector *coeffFPCAttenuationH, gsl_vector *coeffFPCAttenuationV, estParameters parameters, rsgis::utils::treeSpecies species, int ittmax) : RSGISCalcImageValue(numOutputBands)
 		{
 			this->coeffHH = coeffHH;
 			this->coeffHV = coeffHV;
@@ -864,15 +864,15 @@ namespace rsgis {namespace radar
 			this->fpcOrder = coeffFPCHV->size;
 			this->nonForestThreashold = nonForestThreashold;
 			
-			cout << "FPC Order = " << fpcOrder << endl;
+			std::cout << "FPC Order = " << fpcOrder << std::endl;
 			
 			this->species = species;
 		}
-		void RSGISEstimationAlgorithmDualPolFPCSingleSpecies::calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException)
+		void RSGISEstimationAlgorithmDualPolFPCSingleSpecies::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
 		{
 			RSGISEstimationConjugateGradient conjGrad;
-			RSGISVectors vectorUtils;
-			RSGISAllometricEquations allometric = RSGISAllometricEquations();
+			rsgis::math::RSGISVectors vectorUtils;
+			rsgis::utils::RSGISAllometricEquations allometric = rsgis::utils::RSGISAllometricEquations();
 			
 			gsl_vector *inSigma0dB;
 			gsl_vector *outPar;
@@ -887,17 +887,17 @@ namespace rsgis {namespace radar
 			
 			double *sigmaTrunkGround = new double[2];
 			
-			RSGISFunctionPolynomialGSL *canopyScatteringFunctionHH;
-			RSGISFunctionPolynomialGSL *canopyScatteringFunctionHV;
+			rsgis::math::RSGISFunctionPolynomialGSL *canopyScatteringFunctionHH;
+			rsgis::math::RSGISFunctionPolynomialGSL *canopyScatteringFunctionHV;
 			
-			RSGISFunctionPolynomialGSL *canopyAttenuationFunctionH;
-			RSGISFunctionPolynomialGSL *canopyAttenuationFunctionV;
+			rsgis::math::RSGISFunctionPolynomialGSL *canopyAttenuationFunctionH;
+			rsgis::math::RSGISFunctionPolynomialGSL *canopyAttenuationFunctionV;
 			
-			canopyScatteringFunctionHH = new RSGISFunctionPolynomialGSL(coeffFPCHH, fpcOrder);
-			canopyScatteringFunctionHV = new RSGISFunctionPolynomialGSL(coeffFPCHV, fpcOrder);
+			canopyScatteringFunctionHH = new rsgis::math::RSGISFunctionPolynomialGSL(coeffFPCHH, fpcOrder);
+			canopyScatteringFunctionHV = new rsgis::math::RSGISFunctionPolynomialGSL(coeffFPCHV, fpcOrder);
 			
-			canopyAttenuationFunctionH = new RSGISFunctionPolynomialGSL(coeffFPCAttenuationH, fpcOrder);
-			canopyAttenuationFunctionV = new RSGISFunctionPolynomialGSL(coeffFPCAttenuationV, fpcOrder);
+			canopyAttenuationFunctionH = new rsgis::math::RSGISFunctionPolynomialGSL(coeffFPCAttenuationH, fpcOrder);
+			canopyAttenuationFunctionV = new rsgis::math::RSGISFunctionPolynomialGSL(coeffFPCAttenuationV, fpcOrder);
 			
 			RSGISEstimationFPCDualPolTrunkGround *calcTrunkGround;
 			
@@ -909,7 +909,7 @@ namespace rsgis {namespace radar
 			double sigmaHVTrunkGround = sigmaTrunkGround[1];
 			
 			
-			//cout << "Total HH = " << bandValues[1] << " Trunk-ground HH = " << sigmaHHTrunkGround << endl;
+			//std::cout << "Total HH = " << bandValues[1] << " Trunk-ground HH = " << sigmaHHTrunkGround << std::endl;
 			
 			/************************
 			 * SET INPUT PARAMETERS *
@@ -1074,7 +1074,7 @@ namespace rsgis {namespace radar
 			}
 			else
 			{
-				cout << "Parameters not recognised, cannot calculate biomass.";
+				std::cout << "Parameters not recognised, cannot calculate biomass.";
 			}
 			
 			gsl_vector_free(inSigma0dB);
@@ -1101,13 +1101,13 @@ namespace rsgis {namespace radar
 			this->ittmax = ittmax;
 			this->parameters = parameters;
 		}
-		void RSGISEstimationAlgorithmFullPolSingleSpeciesPolyMask::calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException)
+		void RSGISEstimationAlgorithmFullPolSingleSpeciesPolyMask::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
 		{
 			RSGISEstimationConjugateGradient conjGrad;
-			RSGISVectors vectorUtils;
-			RSGISAllometricEquations allometric = RSGISAllometricEquations();
+			rsgis::math::RSGISVectors vectorUtils;
+			rsgis::utils::RSGISAllometricEquations allometric = rsgis::utils::RSGISAllometricEquations();
 			
-			species = aHarpophylla;
+			species = rsgis::utils::aHarpophylla;
 			gsl_vector *inSigma0dB;
 			gsl_vector *outPar;
 			outPar = gsl_vector_alloc(numOutBands);
@@ -1409,7 +1409,7 @@ namespace rsgis {namespace radar
 				}
 				else
 				{
-					cout << "Parameters not recognised, cannot calculate biomass.";
+					std::cout << "Parameters not recognised, cannot calculate biomass.";
 				}
 			}
 			else // Not mask
@@ -1440,16 +1440,16 @@ namespace rsgis {namespace radar
 			this->ittmax = ittmax;
 			this->parameters = parameters;
 			this->nonForestThreashold = nonForestThreashold;
-			cout << "numOutputBands " << numOutputBands << endl;
+			std::cout << "numOutputBands " << numOutputBands << std::endl;
 		}
-		void RSGISEstimationAlgorithmDualPolSingleSpeciesPolyMask::calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException)
+		void RSGISEstimationAlgorithmDualPolSingleSpeciesPolyMask::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
 		{
 			RSGISEstimationConjugateGradient conjGrad;
-			RSGISVectors vectorUtils;
-			RSGISMatrices matrixUtils;
-			RSGISAllometricEquations allometric = RSGISAllometricEquations();
+			rsgis::math::RSGISVectors vectorUtils;
+			rsgis::math::RSGISMatrices matrixUtils;
+			rsgis::utils::RSGISAllometricEquations allometric = rsgis::utils::RSGISAllometricEquations();
 			
-			species = aHarpophylla;
+			species = rsgis::utils::aHarpophylla;
 			gsl_vector *inSigma0dB;
 			gsl_vector *outPar;
 			outPar = gsl_vector_alloc(numOutBands-1);
@@ -1479,7 +1479,7 @@ namespace rsgis {namespace radar
 			gsl_matrix_set(invCovMatrixD, 0, 0, dCovInv1); // Set diagonal elements of the matrix
 			gsl_matrix_set(invCovMatrixD, 1, 1, dCovInv2);
 			
-			//cout << "Cov Matrix P = ";
+			//std::cout << "Cov Matrix P = ";
 			//matrixUtils.printGSLMatrix(covMatrixP);
 			
 			/***********************************/
@@ -1670,7 +1670,7 @@ namespace rsgis {namespace radar
 				}
 				else
 				{
-					cout << "Parameters not recognised, cannot calculate biomass.";
+					std::cout << "Parameters not recognised, cannot calculate biomass.";
 				}
 			}
 			else // Not mask
@@ -1692,7 +1692,7 @@ namespace rsgis {namespace radar
 		 * - FPC used to calculate canopy scattering and attenuation  *
 		 * - Soil moisture information used                           *
 		 **************************************************************/
-		RSGISEstimationAlgorithmDualPolFPCMoistureSingleSpecies::RSGISEstimationAlgorithmDualPolFPCMoistureSingleSpecies(int numOutputBands, gsl_matrix *coeffHH, gsl_matrix *coeffHV, gsl_vector *coeffFPCHH, gsl_vector *coeffFPCHV, gsl_vector *coeffFPCAttenuationH, gsl_vector *coeffFPCAttenuationV, estParameters parameters, treeSpecies species, int ittmax) : RSGISCalcImageValue(numOutputBands)
+		RSGISEstimationAlgorithmDualPolFPCMoistureSingleSpecies::RSGISEstimationAlgorithmDualPolFPCMoistureSingleSpecies(int numOutputBands, gsl_matrix *coeffHH, gsl_matrix *coeffHV, gsl_vector *coeffFPCHH, gsl_vector *coeffFPCHV, gsl_vector *coeffFPCAttenuationH, gsl_vector *coeffFPCAttenuationV, estParameters parameters, rsgis::utils::treeSpecies species, int ittmax) : RSGISCalcImageValue(numOutputBands)
 		{
 			this->coeffHH = coeffHH;
 			this->coeffHV = coeffHV;
@@ -1706,11 +1706,11 @@ namespace rsgis {namespace radar
 			this->fpcOrder = coeffFPCHV->size - 1;
 			this->species = species;
 		}
-		void RSGISEstimationAlgorithmDualPolFPCMoistureSingleSpecies::calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException)
+		void RSGISEstimationAlgorithmDualPolFPCMoistureSingleSpecies::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
 		{
 			RSGISEstimationConjugateGradient conjGrad;
-			RSGISVectors vectorUtils;
-			RSGISAllometricEquations allometric = RSGISAllometricEquations();
+			rsgis::math::RSGISVectors vectorUtils;
+			rsgis::utils::RSGISAllometricEquations allometric = rsgis::utils::RSGISAllometricEquations();
 			
 			gsl_vector *inSigma0dB;
 			gsl_vector *outPar;
@@ -1725,17 +1725,17 @@ namespace rsgis {namespace radar
 			
 			double *sigmaTrunkGround = new double[2];
 			
-			RSGISFunctionPolynomialGSL *canopyScatteringFunctionHH;
-			RSGISFunctionPolynomialGSL *canopyScatteringFunctionHV;
+			rsgis::math::RSGISFunctionPolynomialGSL *canopyScatteringFunctionHH;
+			rsgis::math::RSGISFunctionPolynomialGSL *canopyScatteringFunctionHV;
 			
-			RSGISFunctionPolynomialGSL *canopyAttenuationFunctionH;
-			RSGISFunctionPolynomialGSL *canopyAttenuationFunctionV;
+			rsgis::math::RSGISFunctionPolynomialGSL *canopyAttenuationFunctionH;
+			rsgis::math::RSGISFunctionPolynomialGSL *canopyAttenuationFunctionV;
 			
-			canopyScatteringFunctionHH = new RSGISFunctionPolynomialGSL(coeffFPCHH, fpcOrder);
-			canopyScatteringFunctionHV = new RSGISFunctionPolynomialGSL(coeffFPCHV, fpcOrder);
+			canopyScatteringFunctionHH = new rsgis::math::RSGISFunctionPolynomialGSL(coeffFPCHH, fpcOrder);
+			canopyScatteringFunctionHV = new rsgis::math::RSGISFunctionPolynomialGSL(coeffFPCHV, fpcOrder);
 			
-			canopyAttenuationFunctionH = new RSGISFunctionPolynomialGSL(coeffFPCAttenuationH, fpcOrder);
-			canopyAttenuationFunctionV = new RSGISFunctionPolynomialGSL(coeffFPCAttenuationV, fpcOrder);
+			canopyAttenuationFunctionH = new rsgis::math::RSGISFunctionPolynomialGSL(coeffFPCAttenuationH, fpcOrder);
+			canopyAttenuationFunctionV = new rsgis::math::RSGISFunctionPolynomialGSL(coeffFPCAttenuationV, fpcOrder);
 			
 			RSGISEstimationFPCDualPolTrunkGround *calcTrunkGround;
 			
@@ -1959,7 +1959,7 @@ namespace rsgis {namespace radar
 			}
 			else
 			{
-				cout << "Parameters not recognised, cannot calculate biomass.";
+				std::cout << "Parameters not recognised, cannot calculate biomass.";
 			}
 			
 			gsl_vector_free(inSigma0dB);
@@ -2013,12 +2013,12 @@ namespace rsgis {namespace radar
 			}
 			
 		}
-		void RSGISEstimationAlgorithmSingleSpecies::calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException)
+		void RSGISEstimationAlgorithmSingleSpecies::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
 		{
-			RSGISVectors vectorUtils;
-			RSGISAllometricEquations allometric = RSGISAllometricEquations();
+			rsgis::math::RSGISVectors vectorUtils;
+			rsgis::utils::RSGISAllometricEquations allometric = rsgis::utils::RSGISAllometricEquations();
 			
-			species = aHarpophylla;
+			species = rsgis::utils::aHarpophylla;
 			gsl_vector *inSigma0dB;
 			gsl_vector *outPar;
 			outPar = gsl_vector_alloc(this->numOutputPar + 1); // Output parameters + error
@@ -2204,9 +2204,9 @@ namespace rsgis {namespace radar
 				}
 				else if(parameters == dielectricDensityHeight)
 				{
-					//cout << "Starting optimisation...";
+					//std::cout << "Starting optimisation...";
 					estOptimiser->minimise(inSigma0dB, initialPar, outPar);
-					//cout << "..finished optimisation" << endl;
+					//std::cout << "..finished optimisation" << std::endl;
 					
 					double height = gsl_vector_get(outPar, 0);
 					double density = gsl_vector_get(outPar, 1);
@@ -2284,7 +2284,7 @@ namespace rsgis {namespace radar
 				}
 				else
 				{
-					cout << "Parameters not recognised, cannot calculate biomass.";
+					std::cout << "Parameters not recognised, cannot calculate biomass.";
 				}
 				
 			}
@@ -2326,12 +2326,12 @@ namespace rsgis {namespace radar
 				}
 			}
 		}
-		void RSGISEstimationAlgorithmSingleSpeciesMask::calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException)
+		void RSGISEstimationAlgorithmSingleSpeciesMask::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
 		{
-			RSGISVectors vectorUtils;
-			RSGISAllometricEquations allometric = RSGISAllometricEquations();
+			rsgis::math::RSGISVectors vectorUtils;
+			rsgis::utils::RSGISAllometricEquations allometric = rsgis::utils::RSGISAllometricEquations();
 			
-			species = aHarpophylla;
+			species = rsgis::utils::aHarpophylla;
 			unsigned int nData = numBands - 1;
 			gsl_vector *inSigma0dB;
 			gsl_vector *outPar;
@@ -2506,7 +2506,7 @@ namespace rsgis {namespace radar
 				}
 				else
 				{
-					cout << "Parameters not recognised, cannot calculate biomass.";
+					std::cout << "Parameters not recognised, cannot calculate biomass.";
 				}
 				
 			}
@@ -2557,12 +2557,12 @@ namespace rsgis {namespace radar
 			}
 			
 		}
-		void RSGISEstimationAlgorithmSingleSpeciesPixAP::calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException)
+		void RSGISEstimationAlgorithmSingleSpeciesPixAP::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
 		{
-			RSGISVectors vectorUtils;
-			RSGISAllometricEquations allometric = RSGISAllometricEquations();
+			rsgis::math::RSGISVectors vectorUtils;
+			rsgis::utils::RSGISAllometricEquations allometric = rsgis::utils::RSGISAllometricEquations();
 			
-			species = aHarpophylla;
+			species = rsgis::utils::aHarpophylla;
 			gsl_vector *inSigma0dB;
 			gsl_vector *outPar;
 			outPar = gsl_vector_alloc(nPar + 1); // Number of parameters + error
@@ -2596,11 +2596,11 @@ namespace rsgis {namespace radar
 				}
 				if(parameters == heightDensity) // Retrieve stem diameter and density
 				{
-					//cout << "initial height = " << gsl_vector_get(initialPar, 0) << ", initial density = " << gsl_vector_get(initialPar, 1) << endl;
-					//cout << "Starting optimisation...";
+					//std::cout << "initial height = " << gsl_vector_get(initialPar, 0) << ", initial density = " << gsl_vector_get(initialPar, 1) << std::endl;
+					//std::cout << "Starting optimisation...";
 					estOptimiser->modifyAPriori(initialPar);
 					estOptimiser->minimise(inSigma0dB, initialPar, outPar);
-					//cout << "..finished optimisation" << endl;
+					//std::cout << "..finished optimisation" << std::endl;
 					
 					double height = gsl_vector_get(outPar, 0);
 					double density = gsl_vector_get(outPar, 1);
@@ -2756,7 +2756,7 @@ namespace rsgis {namespace radar
 				}
 				else
 				{
-					cout << "Parameters not recognised, cannot calculate biomass.";
+					std::cout << "Parameters not recognised, cannot calculate biomass.";
 				}
 				
 			}
@@ -2787,12 +2787,12 @@ namespace rsgis {namespace radar
 			this->parameters = parameters;
 			this->aPrioriPar = gsl_vector_alloc(2);
 		}
-		void RSGISEstimationAlgorithmDualPolSingleSpeciesMaskPixAP::calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException)
+		void RSGISEstimationAlgorithmDualPolSingleSpeciesMaskPixAP::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
 		{
-			RSGISVectors vectorUtils;
-			RSGISAllometricEquations allometric = RSGISAllometricEquations();
+			rsgis::math::RSGISVectors vectorUtils;
+			rsgis::utils::RSGISAllometricEquations allometric = rsgis::utils::RSGISAllometricEquations();
 			
-			species = aHarpophylla;
+			species = rsgis::utils::aHarpophylla;
 			gsl_vector *inSigma0dB;
 			gsl_vector *outPar;
 			outPar = gsl_vector_alloc(3);
@@ -2944,7 +2944,7 @@ namespace rsgis {namespace radar
 				}
 				else
 				{
-					cout << "Parameters not recognised, cannot calculate biomass.";
+					std::cout << "Parameters not recognised, cannot calculate biomass.";
 				}
 				
 			}
@@ -2968,7 +2968,7 @@ namespace rsgis {namespace radar
 																															 vector <gsl_vector*> *initialPar,
 																															 vector <RSGISEstimationOptimiser*> *estOptimiser, 
 																															 estParameters parameters,
-																															 vector<treeSpecies> *species
+																															 vector<rsgis::utils::treeSpecies> *species
 																															  ) : RSGISCalcImageValue(numOutputBands)
 		{
 			this->initialPar = initialPar;
@@ -2985,7 +2985,7 @@ namespace rsgis {namespace radar
 				throw RSGISException("Number of species is not equal to number of parameters");
 			}
 		}
-		void RSGISEstimationAlgorithmDualPolMultiSpeciesClassification::calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException)
+		void RSGISEstimationAlgorithmDualPolMultiSpeciesClassification::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
 		{
 			
 			/** 
@@ -2996,8 +2996,8 @@ namespace rsgis {namespace radar
 			   -997 - One or more values outside limits
 			 */
 			
-			RSGISVectors vectorUtils;
-			RSGISAllometricEquations allometric = RSGISAllometricEquations();
+			rsgis::math::RSGISVectors vectorUtils;
+			rsgis::utils::RSGISAllometricEquations allometric = rsgis::utils::RSGISAllometricEquations();
 			
 			gsl_vector *inSigma0dB;
 			gsl_vector *outPar;
@@ -3087,7 +3087,7 @@ namespace rsgis {namespace radar
 				}
 				else
 				{
-					cout << "Parameters not recognised, cannot calculate biomass.";
+					std::cout << "Parameters not recognised, cannot calculate biomass.";
 				}
 			}
 			
@@ -3105,18 +3105,18 @@ namespace rsgis {namespace radar
 		 * Generates simulated data suitible for testing algorithm with     *
 		 ********************************************************************/
 		
-		RSGISEstimationAlgorithmGenerateSimulatedData2Var2Data::RSGISEstimationAlgorithmGenerateSimulatedData2Var2Data(int numOutputBands, RSGISMathTwoVariableFunction *hhFunction, RSGISMathTwoVariableFunction *hvFunction) : RSGISCalcImageValue(numOutputBands)
+		RSGISEstimationAlgorithmGenerateSimulatedData2Var2Data::RSGISEstimationAlgorithmGenerateSimulatedData2Var2Data(int numOutputBands, rsgis::math::RSGISMathTwoVariableFunction *hhFunction, rsgis::math::RSGISMathTwoVariableFunction *hvFunction) : RSGISCalcImageValue(numOutputBands)
 		{
 			this->hhFunction = hhFunction;
 			this->hvFunction = hvFunction;
 		}
-		void RSGISEstimationAlgorithmGenerateSimulatedData2Var2Data::calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException)
+		void RSGISEstimationAlgorithmGenerateSimulatedData2Var2Data::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
 		{
 			if (bandValues[0] > 0) 
 			{
 				output[0] = hhFunction->calcFunction(bandValues[0], bandValues[1]);
 				output[1] = hvFunction->calcFunction(bandValues[0], bandValues[1]);
-				//cout << "height = " << bandValues[0] << ", density = " << bandValues[1] << ". HH = " << output[0] << ", HV = " << output[1] << endl;
+				//std::cout << "height = " << bandValues[0] << ", density = " << bandValues[1] << ". HH = " << output[0] << ", HV = " << output[1] << std::endl;
 			}
 			else 
 			{

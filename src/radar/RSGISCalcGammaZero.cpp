@@ -31,7 +31,7 @@ namespace rsgis{namespace radar{
 		this->deg = deg;
 	}
 	
-	void RSGISCalcGammaZero::calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException)
+	void RSGISCalcGammaZero::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		// Input bands
 		// Incidence Angle
@@ -39,7 +39,7 @@ namespace rsgis{namespace radar{
 		
 		if(this->numOutBands != numBands-1)
 		{
-			throw RSGISImageCalcException("Number of input and output bands are the same!");
+			throw rsgis::img::RSGISImageCalcException("Number of input and output bands are the same!");
 		}
 		
 		double pi = 3.14159265358979323846;
@@ -60,18 +60,16 @@ namespace rsgis{namespace radar{
 		}
 	}
 	
-	void RSGISCalcGammaZero::calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException)
+	void RSGISCalcGammaZero::calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException)
 	{
-		throw RSGISImageCalcException("Not implemented");
+		throw rsgis::img::RSGISImageCalcException("Not implemented");
 	}
 	
-	void RSGISCalcGammaZero::calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException)
+	void RSGISCalcGammaZero::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException)
 	{
-		throw RSGISImageCalcException("Not Implemented");
+		throw rsgis::img::RSGISImageCalcException("Not Implemented");
 	}
-	
-	
-	
+		
 	RSGISCalcGammaZero::~RSGISCalcGammaZero()
 	{
 		

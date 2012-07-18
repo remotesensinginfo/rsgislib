@@ -25,7 +25,7 @@
 
 namespace rsgis{namespace radar{
 	
-	RSGISObjectBasedEstimation::RSGISObjectBasedEstimation(GDALDataset *inputImage, GDALDataset *outputImage, vector <gsl_vector*> *initialPar, vector <RSGISEstimationOptimiser*> *slowOptimiser, vector <RSGISEstimationOptimiser*> *fastOptimiser, estParameters parameters, double ***minMaxVals, string classHeading, bool useClass)
+	RSGISObjectBasedEstimation::RSGISObjectBasedEstimation(GDALDataset *inputImage, GDALDataset *outputImage, vector <gsl_vector*> *initialPar, vector <RSGISEstimationOptimiser*> *slowOptimiser, vector <RSGISEstimationOptimiser*> *fastOptimiser, estParameters parameters, double ***minMaxVals, std::string classHeading, bool useClass)
 	{
 		this->datasetsIO = new GDALDataset*[2];
 		this->datasetsInput = new GDALDataset*[1];
@@ -61,7 +61,7 @@ namespace rsgis{namespace radar{
 
 		// Calc image to get values (for initial inversion)
 		this->getValues = new RSGISObjectBasedEstimationGetObjVals(pixelVals, numBands);
-		this->calcImageSingle = new RSGISCalcImageSingle(getValues);
+		this->calcImageSingle = new rsgis::img::RSGISCalcImageSingle(getValues);
 		
 		if (!useClass) 
 		{
@@ -81,16 +81,16 @@ namespace rsgis{namespace radar{
 		try 
 		{
 			// GET DATA
-			RSGISVectorUtils vecUtils;
+			rsgis::vec::RSGISVectorUtils vecUtils;
 			OGRPolygon *inOGRPoly;
 			Polygon *poly;
 			inOGRPoly = (OGRPolygon *) inFeature->GetGeometryRef();			
 			poly = vecUtils.convertOGRPolygon2GEOSPolygon(inOGRPoly);
-			RSGISCalcImageValue *invValuesObj;
-			RSGISCalcImageValue *invValues;
+			rsgis::img::RSGISCalcImageValue *invValuesObj;
+			rsgis::img::RSGISCalcImageValue *invValues;
 			
 			getValues->reset();
-			calcImageSingle->calcImageWithinPolygon(this->datasetsInput, 1, NULL, env, poly, false, polyContainsPixelCenter); // The pixel in poly method is hardcoded as 'polyContainsPixelCenter', no output is required
+			calcImageSingle->calcImageWithinPolygon(this->datasetsInput, 1, NULL, env, poly, false, rsgis::img::polyContainsPixelCenter); // The pixel in poly method is hardcoded as 'polyContainsPixelCenter', no output is required
 			
 			unsigned int estClass = 0;
 			OGRFeatureDefn *inFeatureDefn = inFeature->GetDefnRef();
@@ -102,7 +102,7 @@ namespace rsgis{namespace radar{
 				
 				if (estClass >= this->slowOptimiser->size()) 
 				{
-					cout << "Class number greater than number classes parameterised for. Using last available class.\n";
+					std::cout << "Class number greater than number classes parameterised for. Using last available class.\n";
 					estClass = this->slowOptimiser->size() - 1;	
 				}
 				this->slowOptimiserSingle = this->slowOptimiser->at(estClass);
@@ -167,7 +167,7 @@ namespace rsgis{namespace radar{
 					inData[i] = inData[i] / pixelVals[i]->size();
 				}
 				
-				//cout << "inData[" << i << "] = " << inData[i] << endl;
+				//std::cout << "inData[" << i << "] = " << inData[i] << std::endl;
 			}
 			
 			invValuesObj->calcImageValue(inData, this->numBands, outData);
@@ -180,7 +180,7 @@ namespace rsgis{namespace radar{
 				gsl_vector_set(localPar, i, outData[i]);
 			}
 			
-			//cout << "object height = " << gsl_vector_get(localPar, 0) << ", object density = " << gsl_vector_get(localPar, 1) << endl;
+			//std::cout << "object height = " << gsl_vector_get(localPar, 0) << ", object density = " << gsl_vector_get(localPar, 1) << std::endl;
 
 			// SAVE PARAMETERS TO OUTPUT SHAPEFILE
 			OGRFeatureDefn *outFeatureDefn = outFeature->GetDefnRef();
@@ -226,8 +226,8 @@ namespace rsgis{namespace radar{
 				invValues = new RSGISEstimationAlgorithmSingleSpecies(this->numOutputBands, localPar, this->fastOptimiserSingle, this->parameters, this->minMaxVals[estClass]);
 			}
 
-			calcImage = new RSGISCalcImage(invValues, "", true);
-			calcImage->calcImageWithinPolygon(this->datasetsIO, 2, env, poly, polyContainsPixelCenter);
+			calcImage = new rsgis::img::RSGISCalcImage(invValues, "", true);
+			calcImage->calcImageWithinPolygon(this->datasetsIO, 2, env, poly, rsgis::img::polyContainsPixelCenter);
 			
 			// TIDY
 			gsl_vector_free(localPar);
@@ -251,15 +251,15 @@ namespace rsgis{namespace radar{
 		try 
 		{
 			// GET DATA
-			RSGISVectorUtils vecUtils;
+			rsgis::vec::RSGISVectorUtils vecUtils;
 			OGRPolygon *inOGRPoly;
 			Polygon *poly;
-			RSGISCalcImageValue *invValuesObj;
-			RSGISCalcImageValue *invValues;
+			rsgis::img::RSGISCalcImageValue *invValuesObj;
+			rsgis::img::RSGISCalcImageValue *invValues;
 			inOGRPoly = (OGRPolygon *) inFeature->GetGeometryRef();			
 			poly = vecUtils.convertOGRPolygon2GEOSPolygon(inOGRPoly);
 			getValues->reset();
-			calcImageSingle->calcImageWithinPolygon(this->datasetsInput, 1, NULL, env, poly, false, polyContainsPixelCenter); // The pixel in poly method is hardcoded as 'polyContainsPixelCenter', no output is required
+			calcImageSingle->calcImageWithinPolygon(this->datasetsInput, 1, NULL, env, poly, false, rsgis::img::polyContainsPixelCenter); // The pixel in poly method is hardcoded as 'polyContainsPixelCenter', no output is required
 			
 			unsigned int estClass = 0;
 			OGRFeatureDefn *inFeatureDefn = inFeature->GetDefnRef();
@@ -271,7 +271,7 @@ namespace rsgis{namespace radar{
 				
 				if (estClass >= this->slowOptimiser->size()) 
 				{
-					cout << "Class number greater than number classes parameterised for. Using last available class.\n";
+					std::cout << "Class number greater than number classes parameterised for. Using last available class.\n";
 					estClass = this->slowOptimiser->size() - 1;
 				}
 				this->slowOptimiserSingle = this->slowOptimiser->at(estClass);
@@ -336,8 +336,8 @@ namespace rsgis{namespace radar{
 			{
 				invValues = new RSGISEstimationAlgorithmSingleSpecies(this->numOutputBands, localPar, this->fastOptimiserSingle, this->parameters, this->minMaxVals[estClass]);
 			}
-			calcImage = new RSGISCalcImage(invValues, "", true);
-			calcImage->calcImageWithinPolygon(this->datasetsIO, 2, env, poly, polyContainsPixelCenter);
+			calcImage = new rsgis::img::RSGISCalcImage(invValues, "", true);
+			calcImage->calcImageWithinPolygon(this->datasetsIO, 2, env, poly, rsgis::img::polyContainsPixelCenter);
 			
 			// TIDY
 			gsl_vector_free(localPar);
@@ -354,7 +354,7 @@ namespace rsgis{namespace radar{
 		
 	}
 	
-	void RSGISObjectBasedEstimation::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException)
+	void RSGISObjectBasedEstimation::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(rsgis::vec::RSGISVectorOutputException)
 	{
 		if(this->parameters == heightDensity)
 		{
@@ -362,22 +362,22 @@ namespace rsgis{namespace radar{
 			shpField1.SetPrecision(10);
 			if( outputLayer->CreateField( &shpField1 ) != OGRERR_NONE )
 			{
-				string message = string("Creating shapefile field \'objHeight\' has failed");
-				throw RSGISVectorOutputException(message.c_str());
+				std::string message = std::string("Creating shapefile field \'objHeight\' has failed");
+				throw rsgis::vec::RSGISVectorOutputException(message.c_str());
 			}
 			OGRFieldDefn shpField2("objDens", OFTReal);
 			shpField2.SetPrecision(10);
 			if( outputLayer->CreateField( &shpField2 ) != OGRERR_NONE )
 			{
-				string message = string("Creating shapefile field \'objHeight\' has failed");
-				throw RSGISVectorOutputException(message.c_str());
+				std::string message = std::string("Creating shapefile field \'objHeight\' has failed");
+				throw rsgis::vec::RSGISVectorOutputException(message.c_str());
 			}
 			OGRFieldDefn shpField3("objError", OFTReal);
 			shpField3.SetPrecision(10);
 			if( outputLayer->CreateField( &shpField3 ) != OGRERR_NONE )
 			{
-				string message = string("Creating shapefile field \'objError\' has failed");
-				throw RSGISVectorOutputException(message.c_str());
+				std::string message = std::string("Creating shapefile field \'objError\' has failed");
+				throw rsgis::vec::RSGISVectorOutputException(message.c_str());
 			}
 		}
 		else if(this->parameters == cDepthDensity)
@@ -386,22 +386,22 @@ namespace rsgis{namespace radar{
 			shpField1.SetPrecision(10);
 			if( outputLayer->CreateField( &shpField1 ) != OGRERR_NONE )
 			{
-				string message = string("Creating shapefile field \'objCDepth\' has failed");
-				throw RSGISVectorOutputException(message.c_str());
+				std::string message = std::string("Creating shapefile field \'objCDepth\' has failed");
+				throw rsgis::vec::RSGISVectorOutputException(message.c_str());
 			}
 			OGRFieldDefn shpField2("objDens", OFTReal);
 			shpField2.SetPrecision(10);
 			if( outputLayer->CreateField( &shpField2 ) != OGRERR_NONE )
 			{
-				string message = string("Creating shapefile field \'objHeight\' has failed");
-				throw RSGISVectorOutputException(message.c_str());
+				std::string message = std::string("Creating shapefile field \'objHeight\' has failed");
+				throw rsgis::vec::RSGISVectorOutputException(message.c_str());
 			}
 			OGRFieldDefn shpField3("objError", OFTReal);
 			shpField3.SetPrecision(10);
 			if( outputLayer->CreateField( &shpField3 ) != OGRERR_NONE )
 			{
-				string message = string("Creating shapefile field \'objError\' has failed");
-				throw RSGISVectorOutputException(message.c_str());
+				std::string message = std::string("Creating shapefile field \'objError\' has failed");
+				throw rsgis::vec::RSGISVectorOutputException(message.c_str());
 			}
 		}
 		else if(this->parameters == dielectricDensityHeight)
@@ -410,34 +410,34 @@ namespace rsgis{namespace radar{
 			shpField1.SetPrecision(10);
 			if( outputLayer->CreateField( &shpField1 ) != OGRERR_NONE )
 			{
-				string message = string("Creating shapefile field \'objHeight\' has failed");
-				throw RSGISVectorOutputException(message.c_str());
+				std::string message = std::string("Creating shapefile field \'objHeight\' has failed");
+				throw rsgis::vec::RSGISVectorOutputException(message.c_str());
 			}
 			OGRFieldDefn shpField2("objDens", OFTReal);
 			shpField2.SetPrecision(10);
 			if( outputLayer->CreateField( &shpField2 ) != OGRERR_NONE )
 			{
-				string message = string("Creating shapefile field \'objHeight\' has failed");
-				throw RSGISVectorOutputException(message.c_str());
+				std::string message = std::string("Creating shapefile field \'objHeight\' has failed");
+				throw rsgis::vec::RSGISVectorOutputException(message.c_str());
 			}
 			OGRFieldDefn shpField3("objEps", OFTReal);
 			shpField3.SetPrecision(10);
 			if( outputLayer->CreateField( &shpField3 ) != OGRERR_NONE )
 			{
-				string message = string("Creating shapefile field \'objEps\' has failed");
-				throw RSGISVectorOutputException(message.c_str());
+				std::string message = std::string("Creating shapefile field \'objEps\' has failed");
+				throw rsgis::vec::RSGISVectorOutputException(message.c_str());
 			}
 			OGRFieldDefn shpField4("objError", OFTReal);
 			shpField4.SetPrecision(10);
 			if( outputLayer->CreateField( &shpField4 ) != OGRERR_NONE )
 			{
-				string message = string("Creating shapefile field \'objError\' has failed");
-				throw RSGISVectorOutputException(message.c_str());
+				std::string message = std::string("Creating shapefile field \'objError\' has failed");
+				throw rsgis::vec::RSGISVectorOutputException(message.c_str());
 			}
 		}
 		else 
 		{
-			throw RSGISVectorOutputException("Input parameters not recognised, could not create fields\n");
+			throw rsgis::vec::RSGISVectorOutputException("Input parameters not recognised, could not create fields\n");
 		}
 	}
 		
@@ -448,7 +448,7 @@ namespace rsgis{namespace radar{
 		delete calcImageSingle;
 	}
     
-    RSGISObjectBasedEstimationObjectAP::RSGISObjectBasedEstimationObjectAP(GDALDataset *inputImage, GDALDataset *outputImage, vector <gsl_vector*> *initialPar, vector <RSGISEstimationOptimiser*> *slowOptimiser, vector <RSGISEstimationOptimiser*> *fastOptimiser, estParameters parameters, string *apParField, double ***minMaxVals, string classHeading, bool useClass)
+    RSGISObjectBasedEstimationObjectAP::RSGISObjectBasedEstimationObjectAP(GDALDataset *inputImage, GDALDataset *outputImage, vector <gsl_vector*> *initialPar, vector <RSGISEstimationOptimiser*> *slowOptimiser, vector <RSGISEstimationOptimiser*> *fastOptimiser, estParameters parameters, std::string *apParField, double ***minMaxVals, std::string classHeading, bool useClass)
 	{
 		this->datasetsIO = new GDALDataset*[2];
 		this->datasetsInput = new GDALDataset*[1];
@@ -483,7 +483,7 @@ namespace rsgis{namespace radar{
         
 		// Calc image to get values (for initial inversion)
 		this->getValues = new RSGISObjectBasedEstimationGetObjVals(pixelVals, numBands);
-		this->calcImageSingle = new RSGISCalcImageSingle(getValues);
+		this->calcImageSingle = new rsgis::img::RSGISCalcImageSingle(getValues);
 		
 		if (!useClass) 
 		{
@@ -501,16 +501,16 @@ namespace rsgis{namespace radar{
 		try 
 		{
 			// GET DATA
-			RSGISVectorUtils vecUtils;
+			rsgis::vec::RSGISVectorUtils vecUtils;
 			OGRPolygon *inOGRPoly;
 			Polygon *poly;
-			RSGISCalcImageValue *invValuesObj;
-			RSGISCalcImageValue *invValues;
+			rsgis::img::RSGISCalcImageValue *invValuesObj;
+			rsgis::img::RSGISCalcImageValue *invValues;
 			
 			inOGRPoly = (OGRPolygon *) inFeature->GetGeometryRef();			
 			poly = vecUtils.convertOGRPolygon2GEOSPolygon(inOGRPoly);
 			getValues->reset();
-			calcImageSingle->calcImageWithinPolygon(this->datasetsInput, 1, NULL, env, poly, false, polyContainsPixelCenter); // The pixel in poly method is hardcoded as 'polyContainsPixelCenter', no output is required
+			calcImageSingle->calcImageWithinPolygon(this->datasetsInput, 1, NULL, env, poly, false, rsgis::img::polyContainsPixelCenter); // The pixel in poly method is hardcoded as 'polyContainsPixelCenter', no output is required
 			
 			unsigned int estClass = 0;
 			OGRFeatureDefn *inFeatureDefn = inFeature->GetDefnRef();
@@ -522,7 +522,7 @@ namespace rsgis{namespace radar{
 				
 				if (estClass >= this->slowOptimiser->size()) 
 				{
-					cout << "Class number greater than number classes parameterised for. Using last available class.\n";
+					std::cout << "Class number greater than number classes parameterised for. Using last available class.\n";
 					estClass = this->slowOptimiser->size() - 1;	
 				}
 				this->slowOptimiserSingle = this->slowOptimiser->at(estClass);
@@ -662,8 +662,8 @@ namespace rsgis{namespace radar{
 				invValues = new RSGISEstimationAlgorithmSingleSpecies(this->numOutputBands, localPar, this->fastOptimiserSingle, this->parameters, this->minMaxVals[estClass]);
 			}
 			
-			calcImage = new RSGISCalcImage(invValues, "", true);
-			calcImage->calcImageWithinPolygon(this->datasetsIO, 2, env, poly, polyContainsPixelCenter);
+			calcImage = new rsgis::img::RSGISCalcImage(invValues, "", true);
+			calcImage->calcImageWithinPolygon(this->datasetsIO, 2, env, poly, rsgis::img::polyContainsPixelCenter);
 			
 			// TIDY
 			gsl_vector_free(localPar);
@@ -686,16 +686,16 @@ namespace rsgis{namespace radar{
 		try 
 		{
 			// GET DATA
-			RSGISVectorUtils vecUtils;
+			rsgis::vec::RSGISVectorUtils vecUtils;
 			OGRPolygon *inOGRPoly;
 			Polygon *poly;
-			RSGISCalcImageValue *invValuesObj;
-			RSGISCalcImageValue *invValues;
+			rsgis::img::RSGISCalcImageValue *invValuesObj;
+			rsgis::img::RSGISCalcImageValue *invValues;
 			
 			inOGRPoly = (OGRPolygon *) inFeature->GetGeometryRef();			
 			poly = vecUtils.convertOGRPolygon2GEOSPolygon(inOGRPoly);
 			getValues->reset();
-			calcImageSingle->calcImageWithinPolygon(this->datasetsInput, 1, NULL, env, poly, false, polyContainsPixelCenter); // The pixel in poly method is hardcoded as 'polyContainsPixelCenter', no output is required
+			calcImageSingle->calcImageWithinPolygon(this->datasetsInput, 1, NULL, env, poly, false, rsgis::img::polyContainsPixelCenter); // The pixel in poly method is hardcoded as 'polyContainsPixelCenter', no output is required
 			
 			unsigned int estClass = 0;
 			OGRFeatureDefn *inFeatureDefn = inFeature->GetDefnRef();
@@ -707,7 +707,7 @@ namespace rsgis{namespace radar{
 				
 				if (estClass >= this->slowOptimiser->size()) 
 				{
-					cout << "Class number greater than number classes parameterised for. Using last available class.\n";
+					std::cout << "Class number greater than number classes parameterised for. Using last available class.\n";
 					estClass = this->slowOptimiser->size() - 1;	
 				}
 				this->slowOptimiserSingle = this->slowOptimiser->at(estClass);
@@ -825,8 +825,8 @@ namespace rsgis{namespace radar{
 				invValues = new RSGISEstimationAlgorithmSingleSpecies(this->numOutputBands, localPar, this->fastOptimiserSingle, this->parameters, this->minMaxVals[estClass]);
 			}
 			
-			calcImage = new RSGISCalcImage(invValues, "", true);
-			calcImage->calcImageWithinPolygon(this->datasetsIO, 2, env, poly, polyContainsPixelCenter);
+			calcImage = new rsgis::img::RSGISCalcImage(invValues, "", true);
+			calcImage->calcImageWithinPolygon(this->datasetsIO, 2, env, poly, rsgis::img::polyContainsPixelCenter);
 			
 			// TIDY
 			gsl_vector_free(localPar);
@@ -844,7 +844,7 @@ namespace rsgis{namespace radar{
 		
 	}
 	
-	void RSGISObjectBasedEstimationObjectAP::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException)
+	void RSGISObjectBasedEstimationObjectAP::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(rsgis::vec::RSGISVectorOutputException)
 	{
 		if(this->parameters == heightDensity)
 		{
@@ -852,22 +852,22 @@ namespace rsgis{namespace radar{
 			shpField1.SetPrecision(10);
 			if( outputLayer->CreateField( &shpField1 ) != OGRERR_NONE )
 			{
-				string message = string("Creating shapefile field \'objHeight\' has failed");
-				throw RSGISVectorOutputException(message.c_str());
+				std::string message = std::string("Creating shapefile field \'objHeight\' has failed");
+				throw rsgis::vec::RSGISVectorOutputException(message.c_str());
 			}
 			OGRFieldDefn shpField2("objDens", OFTReal);
 			shpField2.SetPrecision(10);
 			if( outputLayer->CreateField( &shpField2 ) != OGRERR_NONE )
 			{
-				string message = string("Creating shapefile field \'objHeight\' has failed");
-				throw RSGISVectorOutputException(message.c_str());
+				std::string message = std::string("Creating shapefile field \'objHeight\' has failed");
+				throw rsgis::vec::RSGISVectorOutputException(message.c_str());
 			}
 			OGRFieldDefn shpField3("objError", OFTReal);
 			shpField3.SetPrecision(10);
 			if( outputLayer->CreateField( &shpField3 ) != OGRERR_NONE )
 			{
-				string message = string("Creating shapefile field \'objError\' has failed");
-				throw RSGISVectorOutputException(message.c_str());
+				std::string message = std::string("Creating shapefile field \'objError\' has failed");
+				throw rsgis::vec::RSGISVectorOutputException(message.c_str());
 			}
 		}
 		else if(this->parameters == cDepthDensity)
@@ -876,22 +876,22 @@ namespace rsgis{namespace radar{
 			shpField1.SetPrecision(10);
 			if( outputLayer->CreateField( &shpField1 ) != OGRERR_NONE )
 			{
-				string message = string("Creating shapefile field \'objCDepth\' has failed");
-				throw RSGISVectorOutputException(message.c_str());
+				std::string message = std::string("Creating shapefile field \'objCDepth\' has failed");
+				throw rsgis::vec::RSGISVectorOutputException(message.c_str());
 			}
 			OGRFieldDefn shpField2("objDens", OFTReal);
 			shpField2.SetPrecision(10);
 			if( outputLayer->CreateField( &shpField2 ) != OGRERR_NONE )
 			{
-				string message = string("Creating shapefile field \'objHeight\' has failed");
-				throw RSGISVectorOutputException(message.c_str());
+				std::string message = std::string("Creating shapefile field \'objHeight\' has failed");
+				throw rsgis::vec::RSGISVectorOutputException(message.c_str());
 			}
 			OGRFieldDefn shpField3("objError", OFTReal);
 			shpField3.SetPrecision(10);
 			if( outputLayer->CreateField( &shpField3 ) != OGRERR_NONE )
 			{
-				string message = string("Creating shapefile field \'objError\' has failed");
-				throw RSGISVectorOutputException(message.c_str());
+				std::string message = std::string("Creating shapefile field \'objError\' has failed");
+				throw rsgis::vec::RSGISVectorOutputException(message.c_str());
 			}
 		}
 		else if(this->parameters == dielectricDensityHeight)
@@ -900,34 +900,34 @@ namespace rsgis{namespace radar{
 			shpField1.SetPrecision(10);
 			if( outputLayer->CreateField( &shpField1 ) != OGRERR_NONE )
 			{
-				string message = string("Creating shapefile field \'objHeight\' has failed");
-				throw RSGISVectorOutputException(message.c_str());
+				std::string message = std::string("Creating shapefile field \'objHeight\' has failed");
+				throw rsgis::vec::RSGISVectorOutputException(message.c_str());
 			}
 			OGRFieldDefn shpField2("objDens", OFTReal);
 			shpField2.SetPrecision(10);
 			if( outputLayer->CreateField( &shpField2 ) != OGRERR_NONE )
 			{
-				string message = string("Creating shapefile field \'objHeight\' has failed");
-				throw RSGISVectorOutputException(message.c_str());
+				std::string message = std::string("Creating shapefile field \'objHeight\' has failed");
+				throw rsgis::vec::RSGISVectorOutputException(message.c_str());
 			}
 			OGRFieldDefn shpField3("objEps", OFTReal);
 			shpField3.SetPrecision(10);
 			if( outputLayer->CreateField( &shpField3 ) != OGRERR_NONE )
 			{
-				string message = string("Creating shapefile field \'objEps\' has failed");
-				throw RSGISVectorOutputException(message.c_str());
+				std::string message = std::string("Creating shapefile field \'objEps\' has failed");
+				throw rsgis::vec::RSGISVectorOutputException(message.c_str());
 			}
 			OGRFieldDefn shpField4("objError", OFTReal);
 			shpField4.SetPrecision(10);
 			if( outputLayer->CreateField( &shpField4 ) != OGRERR_NONE )
 			{
-				string message = string("Creating shapefile field \'objError\' has failed");
-				throw RSGISVectorOutputException(message.c_str());
+				std::string message = std::string("Creating shapefile field \'objError\' has failed");
+				throw rsgis::vec::RSGISVectorOutputException(message.c_str());
 			}
 		}
 		else 
 		{
-			throw RSGISVectorOutputException("Input parameters not recognised, could not create fields\n");
+			throw rsgis::vec::RSGISVectorOutputException("Input parameters not recognised, could not create fields\n");
 		}
 	}
     
@@ -938,7 +938,7 @@ namespace rsgis{namespace radar{
 		delete calcImageSingle;
 	}
 	
-	RSGISObjectBasedEstimationRasterPolygon::RSGISObjectBasedEstimationRasterPolygon(GDALDataset *inputImage, GDALDataset *outputImage,  GDALDataset *rasterFeatures, vector <gsl_vector*> *initialPar, vector <RSGISEstimationOptimiser*> *slowOptimiser, vector <RSGISEstimationOptimiser*> *fastOptimiser, estParameters parameters, double ***minMaxVals, string classHeading, bool useClass)
+	RSGISObjectBasedEstimationRasterPolygon::RSGISObjectBasedEstimationRasterPolygon(GDALDataset *inputImage, GDALDataset *outputImage,  GDALDataset *rasterFeatures, vector <gsl_vector*> *initialPar, vector <RSGISEstimationOptimiser*> *slowOptimiser, vector <RSGISEstimationOptimiser*> *fastOptimiser, estParameters parameters, double ***minMaxVals, std::string classHeading, bool useClass)
 	{
 		this->datasetsIO = new GDALDataset*[3];
 		this->datasetsInput = new GDALDataset*[2];
@@ -977,7 +977,7 @@ namespace rsgis{namespace radar{
         
 		// Calc image to get values (for initial inversion)
 		this->getValues = new RSGISObjectBasedEstimationGetObjVals(pixelVals, numBands);
-		this->calcImageSingle = new RSGISCalcImageSingle(getValues);
+		this->calcImageSingle = new rsgis::img::RSGISCalcImageSingle(getValues);
 		
 		if (!useClass) 
 		{
@@ -998,13 +998,13 @@ namespace rsgis{namespace radar{
         try
         {
             // GET DATA
-            RSGISVectorUtils vecUtils;
+            rsgis::vec::RSGISVectorUtils vecUtils;
             OGRPolygon *inOGRPoly;
             Polygon *poly;
             inOGRPoly = (OGRPolygon *) inFeature->GetGeometryRef();			
             poly = vecUtils.convertOGRPolygon2GEOSPolygon(inOGRPoly);
-            RSGISCalcImageValue *invValuesObj;
-            RSGISCalcImageValue *invValues;
+            rsgis::img::RSGISCalcImageValue *invValuesObj;
+            rsgis::img::RSGISCalcImageValue *invValues;
             
             getValues->reset();
             calcImageSingle->calcImageWithinRasterPolygon(this->datasetsInput, 2, NULL, env, fid, false);
@@ -1019,7 +1019,7 @@ namespace rsgis{namespace radar{
                 
                 if (estClass >= this->slowOptimiser->size()) 
                 {
-                    cout << "Class number greater than number classes parameterised for. Using last available class.\n";
+                    std::cout << "Class number greater than number classes parameterised for. Using last available class.\n";
                     estClass = this->slowOptimiser->size() - 1;	
                 }
                 this->slowOptimiserSingle = this->slowOptimiser->at(estClass);
@@ -1084,7 +1084,7 @@ namespace rsgis{namespace radar{
                     inData[i] = inData[i] / pixelVals[i]->size();
                 }
                 
-                //cout << "inData[" << i << "] = " << inData[i] << endl;
+                //std::cout << "inData[" << i << "] = " << inData[i] << std::endl;
             }
             
             invValuesObj->calcImageValue(inData, this->numBands, outData);
@@ -1097,7 +1097,7 @@ namespace rsgis{namespace radar{
                 gsl_vector_set(localPar, i, outData[i]);
             }
             
-            //cout << "object height = " << gsl_vector_get(localPar, 0) << ", object density = " << gsl_vector_get(localPar, 1) << endl;
+            //std::cout << "object height = " << gsl_vector_get(localPar, 0) << ", object density = " << gsl_vector_get(localPar, 1) << std::endl;
             
             // SAVE PARAMETERS TO OUTPUT SHAPEFILE
             OGRFeatureDefn *outFeatureDefn = outFeature->GetDefnRef();
@@ -1143,7 +1143,7 @@ namespace rsgis{namespace radar{
                 invValues = new RSGISEstimationAlgorithmSingleSpecies(this->numOutputBands, localPar, this->fastOptimiserSingle, this->parameters, this->minMaxVals[estClass]);
             }
             
-            calcImage = new RSGISCalcImage(invValues, "", true);
+            calcImage = new rsgis::img::RSGISCalcImage(invValues, "", true);
             calcImage->calcImageWithinRasterPolygon(this->datasetsIO, 3, env, fid);
             
             // TIDY
@@ -1170,13 +1170,13 @@ namespace rsgis{namespace radar{
         try
         {
             // GET DATA
-            RSGISVectorUtils vecUtils;
+            rsgis::vec::RSGISVectorUtils vecUtils;
             OGRPolygon *inOGRPoly;
             Polygon *poly;
             inOGRPoly = (OGRPolygon *) inFeature->GetGeometryRef();			
             poly = vecUtils.convertOGRPolygon2GEOSPolygon(inOGRPoly);
-            RSGISCalcImageValue *invValuesObj;
-            RSGISCalcImageValue *invValues;
+            rsgis::img::RSGISCalcImageValue *invValuesObj;
+            rsgis::img::RSGISCalcImageValue *invValues;
             
             getValues->reset();
             calcImageSingle->calcImageWithinRasterPolygon(this->datasetsInput, 2, NULL, env, fid, false);
@@ -1191,7 +1191,7 @@ namespace rsgis{namespace radar{
                 
                 if (estClass >= this->slowOptimiser->size()) 
                 {
-                    cout << "Class number greater than number classes parameterised for. Using last available class.\n";
+                    std::cout << "Class number greater than number classes parameterised for. Using last available class.\n";
                     estClass = this->slowOptimiser->size() - 1;	
                 }
                 this->slowOptimiserSingle = this->slowOptimiser->at(estClass);
@@ -1256,7 +1256,7 @@ namespace rsgis{namespace radar{
                     inData[i] = inData[i] / pixelVals[i]->size();
                 }
                 
-                //cout << "inData[" << i << "] = " << inData[i] << endl;
+                //std::cout << "inData[" << i << "] = " << inData[i] << std::endl;
             }
             
             invValuesObj->calcImageValue(inData, this->numBands, outData);
@@ -1291,7 +1291,7 @@ namespace rsgis{namespace radar{
                 invValues = new RSGISEstimationAlgorithmSingleSpecies(this->numOutputBands, localPar, this->fastOptimiserSingle, this->parameters, this->minMaxVals[estClass]);
             }
             
-            calcImage = new RSGISCalcImage(invValues, "", true);
+            calcImage = new rsgis::img::RSGISCalcImage(invValues, "", true);
             calcImage->calcImageWithinRasterPolygon(this->datasetsIO, 3, env, fid);
             
             // TIDY
@@ -1311,7 +1311,7 @@ namespace rsgis{namespace radar{
 		
 	}
 	
-	void RSGISObjectBasedEstimationRasterPolygon::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException)
+	void RSGISObjectBasedEstimationRasterPolygon::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(rsgis::vec::RSGISVectorOutputException)
 	{
 		if(this->parameters == heightDensity)
 		{
@@ -1319,22 +1319,22 @@ namespace rsgis{namespace radar{
 			shpField1.SetPrecision(10);
 			if( outputLayer->CreateField( &shpField1 ) != OGRERR_NONE )
 			{
-				string message = string("Creating shapefile field \'objHeight\' has failed");
-				throw RSGISVectorOutputException(message.c_str());
+				std::string message = std::string("Creating shapefile field \'objHeight\' has failed");
+				throw rsgis::vec::RSGISVectorOutputException(message.c_str());
 			}
 			OGRFieldDefn shpField2("objDens", OFTReal);
 			shpField2.SetPrecision(10);
 			if( outputLayer->CreateField( &shpField2 ) != OGRERR_NONE )
 			{
-				string message = string("Creating shapefile field \'objHeight\' has failed");
-				throw RSGISVectorOutputException(message.c_str());
+				std::string message = std::string("Creating shapefile field \'objHeight\' has failed");
+				throw rsgis::vec::RSGISVectorOutputException(message.c_str());
 			}
 			OGRFieldDefn shpField3("objError", OFTReal);
 			shpField3.SetPrecision(10);
 			if( outputLayer->CreateField( &shpField3 ) != OGRERR_NONE )
 			{
-				string message = string("Creating shapefile field \'objError\' has failed");
-				throw RSGISVectorOutputException(message.c_str());
+				std::string message = std::string("Creating shapefile field \'objError\' has failed");
+				throw rsgis::vec::RSGISVectorOutputException(message.c_str());
 			}
 		}
 		else if(this->parameters == cDepthDensity)
@@ -1343,27 +1343,27 @@ namespace rsgis{namespace radar{
 			shpField1.SetPrecision(10);
 			if( outputLayer->CreateField( &shpField1 ) != OGRERR_NONE )
 			{
-				string message = string("Creating shapefile field \'objCDepth\' has failed");
-				throw RSGISVectorOutputException(message.c_str());
+				std::string message = std::string("Creating shapefile field \'objCDepth\' has failed");
+				throw rsgis::vec::RSGISVectorOutputException(message.c_str());
 			}
 			OGRFieldDefn shpField2("objDens", OFTReal);
 			shpField2.SetPrecision(10);
 			if( outputLayer->CreateField( &shpField2 ) != OGRERR_NONE )
 			{
-				string message = string("Creating shapefile field \'objHeight\' has failed");
-				throw RSGISVectorOutputException(message.c_str());
+				std::string message = std::string("Creating shapefile field \'objHeight\' has failed");
+				throw rsgis::vec::RSGISVectorOutputException(message.c_str());
 			}
 			OGRFieldDefn shpField3("objError", OFTReal);
 			shpField3.SetPrecision(10);
 			if( outputLayer->CreateField( &shpField3 ) != OGRERR_NONE )
 			{
-				string message = string("Creating shapefile field \'objError\' has failed");
-				throw RSGISVectorOutputException(message.c_str());
+				std::string message = std::string("Creating shapefile field \'objError\' has failed");
+				throw rsgis::vec::RSGISVectorOutputException(message.c_str());
 			}
 		}
 		else 
 		{
-			throw RSGISVectorOutputException("Input parameters not recognised, could not create fields\n");
+			throw rsgis::vec::RSGISVectorOutputException("Input parameters not recognised, could not create fields\n");
 		}
 	}
 	
@@ -1385,7 +1385,7 @@ namespace rsgis{namespace radar{
 		}
 	}
 	
-	void RSGISObjectBasedEstimationGetObjVals::calcImageValue(float *bandValuesImage, double interceptArea, int numBands, Polygon *poly, Point *pt) throw(RSGISImageCalcException)
+	void RSGISObjectBasedEstimationGetObjVals::calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt) throw(rsgis::img::RSGISImageCalcException)
 	{
 		for(int i = 0; i < this->numBands; i++) // Loop through bands
 		{
@@ -1396,7 +1396,7 @@ namespace rsgis{namespace radar{
 		}
 	}
 	
-	void RSGISObjectBasedEstimationGetObjVals::calcImageValue(float *bandValuesImage, int numBands, int band) throw(RSGISImageCalcException)
+	void RSGISObjectBasedEstimationGetObjVals::calcImageValue(float *bandValuesImage, int numBands, int band) throw(rsgis::img::RSGISImageCalcException)
 	{
 		for(int i = 0; i < this->numBands - 1;  i++) // Loop through bands
 		{
@@ -1407,7 +1407,7 @@ namespace rsgis{namespace radar{
 		}
 	}
 	
-	double* RSGISObjectBasedEstimationGetObjVals::getOutputValues() throw(RSGISImageCalcException)
+	double* RSGISObjectBasedEstimationGetObjVals::getOutputValues() throw(rsgis::img::RSGISImageCalcException)
 	{
 		return NULL;
 	}

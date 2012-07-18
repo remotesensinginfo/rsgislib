@@ -55,134 +55,127 @@
 #include "radar/RSGISEstimationConjugateGradient.h"
 
 namespace rsgis{namespace radar{
-    
-    using namespace std;
-    using namespace rsgis;
-    using namespace rsgis::img;
-    using namespace rsgis::math;
-    using namespace rsgis::vec;
-    using namespace geos::geom;
 	
-	class RSGISObjectBasedEstimation : public RSGISProcessOGRFeature
+	class RSGISObjectBasedEstimation : public rsgis::vec::RSGISProcessOGRFeature
 	{
 	public:
-		RSGISObjectBasedEstimation(GDALDataset *inputImage, GDALDataset *outputImage, vector <gsl_vector*> *initialPar, vector <RSGISEstimationOptimiser*> *slowOptimiser, vector <RSGISEstimationOptimiser*> *fastOptimiser, estParameters parameters, double ***minMaxVals = NULL, string classHeading = "", bool useClass = false);
-		virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, Envelope *env, long fid)throw(RSGISVectorException);
-		virtual void processFeature(OGRFeature *feature, Envelope *env, long fid)throw(RSGISVectorException);
-		virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException);
+		RSGISObjectBasedEstimation(GDALDataset *inputImage, GDALDataset *outputImage, std::vector<gsl_vector*> *initialPar, std::vector<RSGISEstimationOptimiser*> *slowOptimiser, std::vector<RSGISEstimationOptimiser*> *fastOptimiser, estParameters parameters, double ***minMaxVals = NULL, string classHeading = "", bool useClass = false);
+		virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid)throw(RSGISVectorException);
+		virtual void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid)throw(RSGISVectorException);
+		virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(rsgis::vec::RSGISVectorOutputException);
 		virtual ~RSGISObjectBasedEstimation();
 	protected:
 		GDALDataset **datasetsIO;
 		GDALDataset **datasetsInput;
-		vector<float> **pixelVals;
+		std::vector<float> **pixelVals;
 		int numBands;
 		unsigned int objectSamples;
 		double objectSamplesPercent;
 		unsigned int numOutputPar;
 		unsigned int numOutputBands;
-		RSGISCalcImageSingleValue *getValues;
-		RSGISCalcImageSingle *calcImageSingle;
-		RSGISCalcImage *calcImage;
-		vector <gsl_vector*> *initialPar;
-		vector <RSGISEstimationOptimiser*> *slowOptimiser;
-		vector <RSGISEstimationOptimiser*> *fastOptimiser;
+        rsgis::img::RSGISCalcImageSingleValue *getValues;
+		rsgis::img::RSGISCalcImageSingle *calcImageSingle;
+		rsgis::img::RSGISCalcImage *calcImage;
+		std::vector<gsl_vector*> *initialPar;
+		std::vector<RSGISEstimationOptimiser*> *slowOptimiser;
+        std::vector<RSGISEstimationOptimiser*> *fastOptimiser;
 		RSGISEstimationOptimiser *slowOptimiserSingle;
 		RSGISEstimationOptimiser *fastOptimiserSingle;
 		gsl_vector *initialParSingle;
 		estParameters parameters;
-		string classHeading;
+		std::string classHeading;
 		bool useClass; // Use multiple classes
 		bool useDefaultMinMax; // Pass in minimum and maximum values to estimation algorithm or use default
 		double ***minMaxVals; // Minimum and maximum values for parameters
 		
 	};
     
-    class RSGISObjectBasedEstimationObjectAP : public RSGISProcessOGRFeature
+    class RSGISObjectBasedEstimationObjectAP : public rsgis::vec::RSGISProcessOGRFeature
 	{
 	public:
 		RSGISObjectBasedEstimationObjectAP(GDALDataset *inputImage, GDALDataset *outputImage, vector <gsl_vector*> *initialPar, vector <RSGISEstimationOptimiser*> *slowOptimiser, vector <RSGISEstimationOptimiser*> *fastOptimiser, estParameters parameters, string *apParField, double ***minMaxVals = NULL, string classHeading = "", bool useClass = false);
 		virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, Envelope *env, long fid)throw(RSGISVectorException);
         virtual void processFeature(OGRFeature *feature, Envelope *env, long fid)throw(RSGISVectorException);
-		virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException);
+		virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(rsgis::vec::RSGISVectorOutputException);
 		virtual ~RSGISObjectBasedEstimationObjectAP();
 	protected:
 		GDALDataset **datasetsIO;
 		GDALDataset **datasetsInput;
-		vector<float> **pixelVals;
+		std::vector<float> **pixelVals;
 		int numBands;
 		unsigned int objectSamples;
 		double objectSamplesPercent;
 		unsigned int numOutputPar;
 		unsigned int numOutputBands;
-		RSGISCalcImageSingleValue *getValues;
-		RSGISCalcImageSingle *calcImageSingle;
-		RSGISCalcImage *calcImage;
-		vector <gsl_vector*> *initialPar;
-		vector <RSGISEstimationOptimiser*> *slowOptimiser;
-		vector <RSGISEstimationOptimiser*> *fastOptimiser;
+		rsgis::img::RSGISCalcImageSingleValue *getValues;
+		rsgis::img::RSGISCalcImageSingle *calcImageSingle;
+		rsgis::img::RSGISCalcImage *calcImage;
+		std::vector <gsl_vector*> *initialPar;
+		std::vector <RSGISEstimationOptimiser*> *slowOptimiser;
+		std::vector <RSGISEstimationOptimiser*> *fastOptimiser;
 		RSGISEstimationOptimiser *slowOptimiserSingle;
 		RSGISEstimationOptimiser *fastOptimiserSingle;
 		gsl_vector *initialParSingle;
 		estParameters parameters;
-		string classHeading;
+		std::string classHeading;
 		bool useClass; // Use multiple classes
 		bool useDefaultMinMax; // Pass in minimum and maximum values to estimation algorithm or use default
 		double ***minMaxVals; // Minimum and maximum values for parameters
-		string *apParField;
+		std::string *apParField;
         gsl_matrix *covMatrixP;
         gsl_matrix *invCovMatrixD;
-        RSGISMathTwoVariableFunction *functionA;
-        RSGISMathTwoVariableFunction *functionB;
+        rsgis::math::RSGISMathTwoVariableFunction *functionA;
+        rsgis::math::RSGISMathTwoVariableFunction *functionB;
 	};
 	
-	class RSGISObjectBasedEstimationRasterPolygon : public RSGISProcessOGRFeature
+	class RSGISObjectBasedEstimationRasterPolygon : public rsgis::vec::RSGISProcessOGRFeature
 	{
 	public:
 		RSGISObjectBasedEstimationRasterPolygon(GDALDataset *inputImage, GDALDataset *outputImage,  GDALDataset *rasterFeatures, vector <gsl_vector*> *initialPar, vector <RSGISEstimationOptimiser*> *slowOptimiser, vector <RSGISEstimationOptimiser*> *fastOptimiser, estParameters parameters, double ***minMaxVals = NULL, string classHeading = "", bool useClass = false);
 		virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, Envelope *env, long fid) throw(RSGISVectorException);
 		virtual void processFeature(OGRFeature *feature, Envelope *env, long fid)throw(RSGISVectorException);
-		virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException);
+		virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(rsgis::vec::RSGISVectorOutputException);
 		virtual ~RSGISObjectBasedEstimationRasterPolygon();
 	protected:
 		GDALDataset **datasetsIO;
 		GDALDataset **datasetsInput;
-		vector<float> **pixelVals;
+		std::vector<float> **pixelVals;
 		int numBands;
 		unsigned int objectSamples;
 		double objectSamplesPercent;
 		unsigned int numOutputPar;
 		unsigned int numOutputBands;
-		RSGISCalcImageSingleValue *getValues;
-		RSGISCalcImageSingle *calcImageSingle;
-		RSGISCalcImageValue *invValues;
-		RSGISCalcImage *calcImage;
-		vector <gsl_vector*> *initialPar;
-		vector <RSGISEstimationOptimiser*> *slowOptimiser;
-		vector <RSGISEstimationOptimiser*> *fastOptimiser;
+		rsgis::img::RSGISCalcImageSingleValue *getValues;
+		rsgis::img::RSGISCalcImageSingle *calcImageSingle;
+		rsgis::img::RSGISCalcImageValue *invValues;
+		rsgis::img::RSGISCalcImage *calcImage;
+		std::vector <gsl_vector*> *initialPar;
+		std::vector <RSGISEstimationOptimiser*> *slowOptimiser;
+		std::vector <RSGISEstimationOptimiser*> *fastOptimiser;
 		RSGISEstimationOptimiser *slowOptimiserSingle;
 		RSGISEstimationOptimiser *fastOptimiserSingle;
 		gsl_vector *initialParSingle;
 		estParameters parameters;
-		string classHeading;
+		std::string classHeading;
 		bool useClass; // Use multiple classes
 		bool useDefaultMinMax; // Pass in minimum and maximum values to estimation algorithm or use default
 		double ***minMaxVals; // Minimum and maximum values for parameters
 	};
 	
-	class RSGISObjectBasedEstimationGetObjVals : public RSGISCalcImageSingleValue
+	class RSGISObjectBasedEstimationGetObjVals : public rsgis::img::RSGISCalcImageSingleValue
 	{
 		/// Loops though bands and loads pixel values to vectors
 	public: 
-		RSGISObjectBasedEstimationGetObjVals(vector<float> **pixelVals, int numBands);
-		void calcImageValue(float *bandValuesImageA, float *bandValuesImageB, int numBands, int bandA, int bandB) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented");};
-		void calcImageValue(float *bandValuesImage, int numBands, int band) throw(RSGISImageCalcException);
-		void calcImageValue(float *bandValuesImage, int numBands, Envelope *extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented");};
-		void calcImageValue(float *bandValuesImage, double interceptArea, int numBands, Polygon *poly, Point *pt) throw(RSGISImageCalcException);
-		double* getOutputValues() throw(RSGISImageCalcException);
+		RSGISObjectBasedEstimationGetObjVals(std::vector<float> **pixelVals, int numBands);
+		void calcImageValue(float *bandValuesImageA, float *bandValuesImageB, int numBands, int bandA, int bandB) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not Implemented");};
+		void calcImageValue(float *bandValuesImage, int numBands, int band) throw(rsgis::img::RSGISImageCalcException);
+		void calcImageValue(float *bandValuesImage, int numBands, Envelope *extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not Implemented");};
+		void calcImageValue(float *bandValuesImage, double interceptArea, int numBands, Polygon *poly, Point *pt) throw(rsgis::img::RSGISImageCalcException);
+		double* getOutputValues() throw(rsgis::img::RSGISImageCalcException);
 		void reset();
 		~RSGISObjectBasedEstimationGetObjVals();
 	protected:
-		vector<float> **pixelVals;
+		std::vector<float> **pixelVals;
 		int numBands;
 	};
 	
@@ -196,7 +189,7 @@ namespace rsgis{namespace radar{
 		virtual int minimise(gsl_vector *inData, gsl_vector *initialPar, gsl_vector *outParError);
 		virtual void modifyAPriori(gsl_vector *newAPrioriPar){};
 		virtual estOptimizerType getOptimiserType(){return assignAP;}; 
-		virtual void printOptimiser(){cout << "Assign" << endl;};
+		virtual void printOptimiser(){std::cout << "Assign" << std::endl;};
 		~RSGISEstimationAssignAP(){};
 	private:
 	};

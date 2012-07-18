@@ -30,9 +30,9 @@ namespace rsgis {namespace radar
 		}
 		void RSGISEstimationConjugateGradient::estimateTwoDimensionalPolyTwoChannel(gsl_vector *inSigma0dB, gsl_matrix *coeffHH, gsl_matrix *coeffVV, gsl_vector *initialPar, gsl_vector *outParError, gsl_vector *predicted, gsl_matrix *covMatrixP, gsl_matrix *invCovMatrixD, int ittmax)
 		{
-			//cout << "Starting Estimation" << endl;
-			RSGISMatrices matrixUtils;
-			RSGISVectors vectorUtils;
+			//std::cout << "Starting Estimation" << std::endl;
+			rsgis::math::RSGISMatrices matrixUtils;
+			rsgis::math::RSGISVectors vectorUtils;
 			
 			gsl_vector *estimatedPar; // Vector to hold the estimated parameters
 			gsl_matrix *invCovMatrixP; // Inverse covarence matrix for prior estimates
@@ -100,7 +100,7 @@ namespace rsgis {namespace radar
 			// START ITTERATING
 			for(int itt = 0; itt < ittmax;itt++)
 			{
-				//cout << "Itteration " << itt + 1<< endl;
+				//std::cout << "Itteration " << itt + 1<< std::endl;
 				// Zero matrices
 				gsl_vector_set_zero(aux1);
 				gsl_vector_set_zero(aux2);
@@ -221,11 +221,11 @@ namespace rsgis {namespace radar
 					predictSq = predictSq + pow(predictMeasElement,2); // Predicted data squared.
 				}
 				error = 0.0;
-				//cout << "predictSq = " << predictSq << endl;
-				//cout << "sigmaSq = " << sigmaSq << endl;
+				//std::cout << "predictSq = " << predictSq << std::endl;
+				//std::cout << "sigmaSq = " << sigmaSq << std::endl;
 				error = sqrt(predictSq / sigmaSq); // Square Root [Sum(Predicted Squared) / Sum(Measured Squared)]
 				
-				//cout << "error = " << error << endl;
+				//std::cout << "error = " << error << std::endl;
 				if(error < 0.00001)
 				{
 					break;
@@ -234,16 +234,16 @@ namespace rsgis {namespace radar
 				// FIND GRADIENT DIRECTION
 				matrixUtils.productMatrixVectorGSL(invCovMatrixD, dPredictMeas, aux1); // aux1 = invCovMatrixD . dPredictMeas
 				matrixUtils.productMatrixVectorGSL(frechet, aux1, aux2); // aux2 = Frechet . aux1
-				//cout << "F.C_d.C_ap = ";
+				//std::cout << "F.C_d.C_ap = ";
 				//vectorUtils.printGSLVector(aux2);
 				matrixUtils.productMatrixVectorGSL(covMatrixP, aux2, gamma); // gamma = covMatrixP . aux2
 				
 				for(int i = 0; i < nPar; i++)
 				{
 					gammaElement = gsl_vector_get(gamma, i);
-					//cout << "gamma element " << gammaElement << endl;
+					//std::cout << "gamma element " << gammaElement << std::endl;
 					currPriorDiff = gsl_vector_get(estimatedPar, i) - gsl_vector_get(initialPar, i); // X_i - X_ap
-					//cout << "X_i - X_ap " << currPriorDiff << endl;
+					//std::cout << "X_i - X_ap " << currPriorDiff << std::endl;
 					gsl_vector_set(gamma, i, (gammaElement + currPriorDiff));
 				}
 				
@@ -253,23 +253,23 @@ namespace rsgis {namespace radar
 				matrixUtils.productMatrixVectorGSL(invCovMatrixD, aux1, aux3); // aux3 = invCovMatrixD . aux1
 				s1 = vectorUtils.dotProductVectorVectorGSL(aux1, aux3); // s1 = aux1 . aux3
 				matrixUtils.productMatrixVectorGSL(invCovMatrixP, gamma, aux2); // aux2 = invCovMatrixP . gamma
-				//cout << "Gamma = ";
+				//std::cout << "Gamma = ";
 				//vectorUtils.printGSLVector(gamma);
 				s2 = vectorUtils.dotProductVectorVectorGSL(gamma, aux2); // s2 = gamma . aux2
 				s1DivS2 = s1 / s2;
 				alpha = 1 / (1 + s1DivS2); // 1 / (1 + (s1/s2))
 				
 				/*
-				 cout << "Frechet:" << endl;
+				 std::cout << "Frechet:" << std::endl;
 				 matrixUtils.printGSLMatrix(frechet);
-				 cout << "Gamma:" << endl;
+				 std::cout << "Gamma:" << std::endl;
 				 vectorUtils.printGSLVector(gamma);
-				 cout << "Predicted Sigma0: " << endl;
+				 std::cout << "Predicted Sigma0: " << std::endl;
 				 vectorUtils.printGSLVector(predicted);
-				 cout << "Measured Sigma0: " << endl;
+				 std::cout << "Measured Sigma0: " << std::endl;
 				 vectorUtils.printGSLVector(inSigma0dB);
-				 cout << "Error = " << error << endl;
-				 cout << "==============================" << endl;
+				 std::cout << "Error = " << error << std::endl;
+				 std::cout << "==============================" << std::endl;
 				*/ 
 				
 				// UPDATE VALUES
@@ -277,9 +277,9 @@ namespace rsgis {namespace radar
 				{
 					predictParElement = gsl_vector_get(estimatedPar, i);					
 					gammaElement = gsl_vector_get(gamma, i);
-					//cout << "gamma = " << gammaElement << " alpha = " << alpha << endl;
+					//std::cout << "gamma = " << gammaElement << " alpha = " << alpha << std::endl;
 					predictParElement = predictParElement - (alpha * gammaElement);
-					//cout << "updated val = " << predictParElement << endl;
+					//std::cout << "updated val = " << predictParElement << std::endl;
 					gsl_vector_set(estimatedPar, i, predictParElement);
 					gsl_vector_set(outParError, i, predictParElement);
 				}
@@ -289,9 +289,9 @@ namespace rsgis {namespace radar
 			}
 			
 			/*
-			 cout << "Predicted Sigma0: " << endl;
+			 std::cout << "Predicted Sigma0: " << std::endl;
 			 vectorUtils.printGSLVector(predicted);
-			 cout << "Measured Sigma0: " << endl;
+			 std::cout << "Measured Sigma0: " << std::endl;
 			 vectorUtils.printGSLVector(inSigma0dB);
 			 */ 
 			
@@ -312,9 +312,9 @@ namespace rsgis {namespace radar
 		}
 		void RSGISEstimationConjugateGradient::estimateTwoDimensionalPolyThreeChannel(gsl_vector *inSigma0dB, gsl_matrix *coeffHH, gsl_matrix *coeffHV, gsl_matrix *coeffVV, gsl_vector *initialPar, gsl_vector *outParError, gsl_vector *predicted, gsl_matrix *covMatrixP, gsl_matrix *invCovMatrixD, int ittmax)
 		{
-			//cout << "Starting Estimation" << endl;
-			RSGISMatrices matrixUtils;
-			RSGISVectors vectorUtils;
+			//std::cout << "Starting Estimation" << std::endl;
+			rsgis::math::RSGISMatrices matrixUtils;
+			rsgis::math::RSGISVectors vectorUtils;
 			
 			gsl_vector *estimatedPar; // Vector to hold the estimated parameters
 			gsl_matrix *invCovMatrixP; // Inverse covarence matrix for prior estimates
@@ -383,7 +383,7 @@ namespace rsgis {namespace radar
 			// START ITTERATING
 			for(int itt = 0; itt < ittmax;itt++)
 			{
-				//cout << "Itteration " << itt + 1<< endl;
+				//std::cout << "Itteration " << itt + 1<< std::endl;
 				
 				// Set up equations and Frechet derivative operator
 				height = gsl_vector_get(estimatedPar, 0);
@@ -534,7 +534,7 @@ namespace rsgis {namespace radar
 				error = 0.0;
 				error = sqrt(predictSq / sigmaSq); // Square Root [Sum(Predicted Squared) / Sum(Measured Squared)]
 				
-				//cout << "error = " << error << endl;
+				//std::cout << "error = " << error << std::endl;
 				if(error < 0.00001)
 				{
 					break;
@@ -548,9 +548,9 @@ namespace rsgis {namespace radar
 				for(int i = 0; i < nPar; i++)
 				{
 					gammaElement = gsl_vector_get(gamma, i);
-					//cout << "gamma element " << gammaElement << endl;
+					//std::cout << "gamma element " << gammaElement << std::endl;
 					currPriorDiff = gsl_vector_get(estimatedPar, i) - gsl_vector_get(initialPar, i); // X_i - X_ap
-					//cout << "X_i - X_ap " << currPriorDiff << endl;
+					//std::cout << "X_i - X_ap " << currPriorDiff << std::endl;
 					gsl_vector_set(gamma, i, (gammaElement + currPriorDiff));
 				}
 				
@@ -561,7 +561,7 @@ namespace rsgis {namespace radar
 				matrixUtils.productMatrixVectorGSL(invCovMatrixD, aux1, aux3); // aux3 = invCovMatrixD . aux1
 				s1 = vectorUtils.dotProductVectorVectorGSL(aux1, aux3); // s1 = aux1 . aux2
 				matrixUtils.productMatrixVectorGSL(invCovMatrixP, gamma, aux2); // aux2 = invCovMatrixP . gamma
-				//cout << "Gamma = ";
+				//std::cout << "Gamma = ";
 				//vectorUtils.printGSLVector(gamma);
 				s2 = vectorUtils.dotProductVectorVectorGSL(gamma, aux2); // s2 = gamma . aux2
 				s1DivS2 = s1 / s2;
@@ -572,9 +572,9 @@ namespace rsgis {namespace radar
 				{
 					predictParElement = gsl_vector_get(estimatedPar, i);					
 					gammaElement = gsl_vector_get(gamma, i);
-					//cout << "gamma = " << gammaElement << " alpha = " << alpha << endl;
+					//std::cout << "gamma = " << gammaElement << " alpha = " << alpha << std::endl;
 					predictParElement = predictParElement - (alpha * gammaElement);
-					//cout << "updated val = " << predictParElement << endl;
+					//std::cout << "updated val = " << predictParElement << std::endl;
 					gsl_vector_set(estimatedPar, i, predictParElement);
 					gsl_vector_set(outParError, i, predictParElement);
 				}
@@ -582,22 +582,22 @@ namespace rsgis {namespace radar
 				gsl_vector_set(outParError, nPar, error);
 				
 				/*
-				 cout << "Predicted Sigma0: " << endl;
+				 std::cout << "Predicted Sigma0: " << std::endl;
 				 vectorUtils.printGSLVector(predicted);
-				 cout << "Measured Sigma0: " << endl;
+				 std::cout << "Measured Sigma0: " << std::endl;
 				 vectorUtils.printGSLVector(inSigma0dB);
-				 cout << "Error = " << error << endl;
-				 cout << "Frechet:" << endl;
+				 std::cout << "Error = " << error << std::endl;
+				 std::cout << "Frechet:" << std::endl;
 				 matrixUtils.printGSLMatrix(frechet);
-				 cout << "==============================" << endl;
+				 std::cout << "==============================" << std::endl;
 				 */
 				
 			}
 			
 			/*
-			 cout << "Predicted Sigma0: " << endl;
+			 std::cout << "Predicted Sigma0: " << std::endl;
 			 vectorUtils.printGSLVector(predicted);
-			 cout << "Measured Sigma0: " << endl;
+			 std::cout << "Measured Sigma0: " << std::endl;
 			 vectorUtils.printGSLVector(inSigma0dB);
 			 */
 			
@@ -618,9 +618,9 @@ namespace rsgis {namespace radar
 		}
 		void RSGISEstimationConjugateGradient::estimateThreeDimensionalPolyThreeChannel(gsl_vector *inSigma0dB, gsl_matrix *coeffHH, gsl_matrix *coeffHV, gsl_matrix *coeffVV, gsl_vector *initialPar, gsl_vector *outParError, gsl_vector *predicted, gsl_matrix *covMatrixP, gsl_matrix *invCovMatrixD, int ittmax)
 		{
-			//cout << "Starting Estimation" << endl;
-			RSGISMatrices matrixUtils;
-			RSGISVectors vectorUtils;
+			//std::cout << "Starting Estimation" << std::endl;
+			rsgis::math::RSGISMatrices matrixUtils;
+			rsgis::math::RSGISVectors vectorUtils;
 			
 			gsl_vector *estimatedPar; // Vector to hold the estimated parameters
 			gsl_matrix *invCovMatrixP; // Inverse covarence matrix for prior estimates
@@ -640,7 +640,7 @@ namespace rsgis {namespace radar
 			{
 				throw RSGISException("Different order polynomials for x and y terms are not supported!");
 			}
-			//cout << "order = " << order << endl;
+			//std::cout << "order = " << order << std::endl;
 			
 			// Allocate vectors and matrices
 			estimatedPar = gsl_vector_alloc(nPar); 
@@ -712,7 +712,7 @@ namespace rsgis {namespace radar
 			// START ITTERATING
 			for(int itt = 0; itt < ittmax;itt++)
 			{
-				//cout << "Itteration " << itt + 1<< endl;
+				//std::cout << "Itteration " << itt + 1<< std::endl;
 				
 				// Set up equations and Frechet derivative operator
 				dielectric = gsl_vector_get(estimatedPar, 0);
@@ -773,7 +773,7 @@ namespace rsgis {namespace radar
 					aCoeffPowXdX = aCoeffPowXdX + (bcoeffPowY * dxPow);
 					aCoeffPowXdY = aCoeffPowXdY + (bcoeffPowYdY * xPow);
 					aCoeffPowXdZ = aCoeffPowXdZ + (bcoeffPowYdZ * xPow);
-					//cout << "HH - b_" << x << " = " << bcoeffPowY << endl;
+					//std::cout << "HH - b_" << x << " = " << bcoeffPowY << std::endl;
 				}
 				// Save values to matrixes.
 				gsl_vector_set(predicted, 0, aCoeffPowX);
@@ -820,11 +820,11 @@ namespace rsgis {namespace radar
 					aCoeffPowXdX = aCoeffPowXdX + (bcoeffPowY * dxPow);
 					aCoeffPowXdY = aCoeffPowXdY + (bcoeffPowYdY * xPow);
 					aCoeffPowXdZ = aCoeffPowXdZ + (bcoeffPowYdZ * xPow);
-					//cout << "HV - b_" << x << " = " << bcoeffPowY << endl;
-					/*cout << "bcoeffPowYdY: " << bcoeffPowYdY << endl;
-					 cout << "aCoeffPowXdX: " << aCoeffPowXdX << endl;
-					 cout << "aCoeffPowXdY: " << aCoeffPowXdY << endl;
-					 cout << "aCoeffPowXdZ: " << aCoeffPowXdZ << endl;*/
+					//std::cout << "HV - b_" << x << " = " << bcoeffPowY << std::endl;
+					/*std::cout << "bcoeffPowYdY: " << bcoeffPowYdY << std::endl;
+					 std::cout << "aCoeffPowXdX: " << aCoeffPowXdX << std::endl;
+					 std::cout << "aCoeffPowXdY: " << aCoeffPowXdY << std::endl;
+					 std::cout << "aCoeffPowXdZ: " << aCoeffPowXdZ << std::endl;*/
 				}
 				// Save values to matrixes.
 				gsl_vector_set(predicted, 1, aCoeffPowX);
@@ -871,7 +871,7 @@ namespace rsgis {namespace radar
 					aCoeffPowXdX = aCoeffPowXdX + (bcoeffPowY * dxPow);
 					aCoeffPowXdY = aCoeffPowXdY + (bcoeffPowYdY * xPow);
 					aCoeffPowXdZ = aCoeffPowXdZ + (bcoeffPowYdZ * xPow);
-					//cout << "VV - b_" << x << ".x = " << bcoeffPowY * xPow << endl;
+					//std::cout << "VV - b_" << x << ".x = " << bcoeffPowY * xPow << std::endl;
 				}
 				// Save values to matrixes.
 				gsl_vector_set(predicted, 2, aCoeffPowX);
@@ -890,7 +890,7 @@ namespace rsgis {namespace radar
 				error = 0.0;
 				error = sqrt(predictSq / sigmaSq); // Square Root [Sum(Predicted Squared) / Sum(Measured Squared)]
 				
-				//cout << "error = " << error << endl;
+				//std::cout << "error = " << error << std::endl;
 				if(error < 0.00001)
 				{
 					break;
@@ -904,9 +904,9 @@ namespace rsgis {namespace radar
 				for(int i = 0; i < nPar; i++)
 				{
 					gammaElement = gsl_vector_get(gamma, i);
-					//cout << "gamma element " << gammaElement << endl;
+					//std::cout << "gamma element " << gammaElement << std::endl;
 					currPriorDiff = gsl_vector_get(estimatedPar, i) - gsl_vector_get(initialPar, i); // X_i - X_ap
-					//cout << "X_i - X_ap " << currPriorDiff << endl;
+					//std::cout << "X_i - X_ap " << currPriorDiff << std::endl;
 					gsl_vector_set(gamma, i, (gammaElement + currPriorDiff));
 				}
 				
@@ -916,7 +916,7 @@ namespace rsgis {namespace radar
 				matrixUtils.productMatrixVectorGSL(invCovMatrixD, aux1, aux3); // aux3 = invCovMatrixD . aux1
 				s1 = vectorUtils.dotProductVectorVectorGSL(aux1, aux3); // s1 = aux1 . aux2
 				matrixUtils.productMatrixVectorGSL(invCovMatrixP, gamma, aux2); // aux2 = invCovMatrixP . gamma
-				//cout << "Gamma = ";
+				//std::cout << "Gamma = ";
 				//vectorUtils.printGSLVector(gamma);
 				s2 = vectorUtils.dotProductVectorVectorGSL(gamma, aux2); // s2 = gamma . aux2
 				s1DivS2 = s1 / s2;
@@ -928,9 +928,9 @@ namespace rsgis {namespace radar
 				{
 					predictParElement = gsl_vector_get(estimatedPar, i);					
 					gammaElement = gsl_vector_get(gamma, i);
-					//cout << "gamma = " << gammaElement << " alpha = " << alpha << endl;
+					//std::cout << "gamma = " << gammaElement << " alpha = " << alpha << std::endl;
 					predictParElement = predictParElement - (alpha * gammaElement);
-					//cout << "updated val = " << predictParElement << endl;
+					//std::cout << "updated val = " << predictParElement << std::endl;
 					gsl_vector_set(estimatedPar, i, predictParElement);
 					gsl_vector_set(outParError, i, predictParElement);
 				}
@@ -938,29 +938,29 @@ namespace rsgis {namespace radar
 				gsl_vector_set(outParError, nPar, error);
 				
 				/*
-				 cout << "Itteration " << itt << endl;
-				 cout << "Predicted Sigma0: ";
+				 std::cout << "Itteration " << itt << std::endl;
+				 std::cout << "Predicted Sigma0: ";
 				 vectorUtils.printGSLVector(predicted);
-				 cout << "Measured Sigma0: ";
+				 std::cout << "Measured Sigma0: ";
 				 vectorUtils.printGSLVector(inSigma0dB);
-				 cout << "Predicted Parameters: ";
+				 std::cout << "Predicted Parameters: ";
 				 vectorUtils.printGSLVector(outParError);
-				 cout << "Error = " << error << endl;
-				 cout << "Frechet:" << endl;
+				 std::cout << "Error = " << error << std::endl;
+				 std::cout << "Frechet:" << std::endl;
 				 matrixUtils.printGSLMatrix(frechet);
-				 cout << "==============================" << endl;
+				 std::cout << "==============================" << std::endl;
 				 */
 				
 			}
 			
 			/*
-			 cout << "Predicted Sigma0: ";
+			 std::cout << "Predicted Sigma0: ";
 			 vectorUtils.printGSLVector(predicted);
-			 cout << "Measured Sigma0: ";
+			 std::cout << "Measured Sigma0: ";
 			 vectorUtils.printGSLVector(inSigma0dB);
-			 cout << "Predicted Parameters: ";
+			 std::cout << "Predicted Parameters: ";
 			 vectorUtils.printGSLVector(outParError);
-			 cout << "==============================" << endl;
+			 std::cout << "==============================" << std::endl;
 			 */
 			
 			
@@ -991,7 +991,7 @@ namespace rsgis {namespace radar
 													   gsl_matrix *covMatrixP, gsl_matrix *invCovMatrixD, 
 													   int ittmax)
 		{
-			RSGISMatrices matrixUtils;
+			rsgis::math::RSGISMatrices matrixUtils;
 			this->coeffHH = coeffHH;
 			this->coeffHV = coeffHV;
 			this->covMatrixP = covMatrixP;
@@ -1008,9 +1008,9 @@ namespace rsgis {namespace radar
 		int RSGISEstimationConjugateGradient2DPoly2Channel::minimise(gsl_vector *inData, gsl_vector *initialPar, gsl_vector *outParError)
 		{
 			
-			//cout << "Starting Estimation" << endl;
-			RSGISMatrices matrixUtils;
-			RSGISVectors vectorUtils;
+			//std::cout << "Starting Estimation" << std::endl;
+			rsgis::math::RSGISMatrices matrixUtils;
+			rsgis::math::RSGISVectors vectorUtils;
 			
 			gsl_vector *estimatedPar; // Vector to hold the estimated parameters
 			gsl_matrix *frechet; // Vector to hold the Frechet derivative operator
@@ -1067,7 +1067,7 @@ namespace rsgis {namespace radar
 			// START ITTERATING
 			for(int itt = 0; itt < ittmax;itt++)
 			{
-				//cout << "Itteration " << itt + 1<< endl;
+				//std::cout << "Itteration " << itt + 1<< std::endl;
 				// Zero matrices
 				gsl_vector_set_zero(aux1);
 				gsl_vector_set_zero(aux2);
@@ -1188,11 +1188,11 @@ namespace rsgis {namespace radar
 					predictSq = predictSq + pow(predictMeasElement,2); // Predicted data squared.
 				}
 				error = 0.0;
-				//cout << "predictSq = " << predictSq << endl;
-				//cout << "sigmaSq = " << sigmaSq << endl;
+				//std::cout << "predictSq = " << predictSq << std::endl;
+				//std::cout << "sigmaSq = " << sigmaSq << std::endl;
 				error = sqrt(predictSq / sigmaSq); // Square Root [Sum(Predicted Squared) / Sum(Measured Squared)]
 				
-				//cout << "error = " << error << endl;
+				//std::cout << "error = " << error << std::endl;
 				if(error < 0.00001)
 				{
 					break;
@@ -1201,16 +1201,16 @@ namespace rsgis {namespace radar
 				// FIND GRADIENT DIRECTION
 				matrixUtils.productMatrixVectorGSL(invCovMatrixD, dPredictMeas, aux1); // aux1 = invCovMatrixD . dPredictMeas
 				matrixUtils.productMatrixVectorGSL(frechet, aux1, aux2); // aux2 = Frechet . aux1
-				//cout << "F.C_d.C_ap = ";
+				//std::cout << "F.C_d.C_ap = ";
 				//vectorUtils.printGSLVector(aux2);
 				matrixUtils.productMatrixVectorGSL(covMatrixP, aux2, gamma); // gamma = covMatrixP . aux2
 				
 				for(int i = 0; i < nPar; i++)
 				{
 					gammaElement = gsl_vector_get(gamma, i);
-					//cout << "gamma element " << gammaElement << endl;
+					//std::cout << "gamma element " << gammaElement << std::endl;
 					currPriorDiff = gsl_vector_get(estimatedPar, i) - gsl_vector_get(initialPar, i); // X_i - X_ap
-					//cout << "X_i - X_ap " << currPriorDiff << endl;
+					//std::cout << "X_i - X_ap " << currPriorDiff << std::endl;
 					gsl_vector_set(gamma, i, (gammaElement + currPriorDiff));
 				}
 				
@@ -1220,23 +1220,23 @@ namespace rsgis {namespace radar
 				matrixUtils.productMatrixVectorGSL(invCovMatrixD, aux1, aux3); // aux3 = invCovMatrixD . aux1
 				s1 = vectorUtils.dotProductVectorVectorGSL(aux1, aux3); // s1 = aux1 . aux3
 				matrixUtils.productMatrixVectorGSL(invCovMatrixP, gamma, aux2); // aux2 = invCovMatrixP . gamma
-				//cout << "Gamma = ";
+				//std::cout << "Gamma = ";
 				//vectorUtils.printGSLVector(gamma);
 				s2 = vectorUtils.dotProductVectorVectorGSL(gamma, aux2); // s2 = gamma . aux2
 				s1DivS2 = s1 / s2;
 				alpha = 1 / (1 + s1DivS2); // 1 / (1 + (s1/s2))
 				
 				/*
-				 cout << "Frechet:" << endl;
+				 std::cout << "Frechet:" << std::endl;
 				 matrixUtils.printGSLMatrix(frechet);
-				 cout << "Gamma:" << endl;
+				 std::cout << "Gamma:" << std::endl;
 				 vectorUtils.printGSLVector(gamma);
-				 cout << "Predicted Sigma0: " << endl;
+				 std::cout << "Predicted Sigma0: " << std::endl;
 				 vectorUtils.printGSLVector(predicted);
-				 cout << "Measured Sigma0: " << endl;
+				 std::cout << "Measured Sigma0: " << std::endl;
 				 vectorUtils.printGSLVector(inData);
-				 cout << "Error = " << error << endl;
-				 cout << "==============================" << endl;
+				 std::cout << "Error = " << error << std::endl;
+				 std::cout << "==============================" << std::endl;
 				 */
 				 				
 				// UPDATE VALUES
@@ -1244,9 +1244,9 @@ namespace rsgis {namespace radar
 				{
 					predictParElement = gsl_vector_get(estimatedPar, i);					
 					gammaElement = gsl_vector_get(gamma, i);
-					//cout << "gamma = " << gammaElement << " alpha = " << alpha << endl;
+					//std::cout << "gamma = " << gammaElement << " alpha = " << alpha << std::endl;
 					predictParElement = predictParElement - (alpha * gammaElement);
-					//cout << "updated val = " << predictParElement << endl;
+					//std::cout << "updated val = " << predictParElement << std::endl;
 					gsl_vector_set(estimatedPar, i, predictParElement);
 					gsl_vector_set(outParError, i, predictParElement);
 				}
@@ -1256,9 +1256,9 @@ namespace rsgis {namespace radar
 			}
 			
 			/*
-			 cout << "Predicted Sigma0: " << endl;
+			 std::cout << "Predicted Sigma0: " << std::endl;
 			 vectorUtils.printGSLVector(predicted);
-			 cout << "Measured Sigma0: " << endl;
+			 std::cout << "Measured Sigma0: " << std::endl;
 			 vectorUtils.printGSLVector(inSigma0dB);
 			 */ 
 			
@@ -1290,7 +1290,7 @@ namespace rsgis {namespace radar
 																									   gsl_vector *aPrioriPar, gsl_matrix *covMatrixP, gsl_matrix *invCovMatrixD, 
 																									   double minError, int ittmax)
 		{
-			RSGISMatrices matrixUtils;
+			rsgis::math::RSGISMatrices matrixUtils;
 			this->coeffHH = coeffHH;
 			this->coeffHV = coeffHV;
 			this->coeffVV = coeffVV;
@@ -1316,10 +1316,10 @@ namespace rsgis {namespace radar
 		}
 		int RSGISEstimationConjugateGradient3DPoly3Channel::minimise(gsl_vector *inData, gsl_vector *initialPar, gsl_vector *outParError)
 		{
-			//cout << "Starting Estimation" << endl;
+			//std::cout << "Starting Estimation" << std::endl;
 			
-			RSGISMatrices matrixUtils;
-			RSGISVectors vectorUtils;
+			rsgis::math::RSGISMatrices matrixUtils;
+			rsgis::math::RSGISVectors vectorUtils;
 			
 			gsl_vector *estimatedPar; // Vector to hold the estimated parameters
 			gsl_vector *predicted; // Vector to hold predicted values of backscatter
@@ -1402,7 +1402,7 @@ namespace rsgis {namespace radar
 			// START ITTERATING
 			for(int itt = 0; itt < ittmax;itt++)
 			{
-				//cout << "Itteration " << itt + 1<< endl;
+				//std::cout << "Itteration " << itt + 1<< std::endl;
 				
 				// Set up equations and Frechet derivative operator
 				dielectric = gsl_vector_get(estimatedPar, 0);
@@ -1472,7 +1472,7 @@ namespace rsgis {namespace radar
 					aCoeffPowXdX = aCoeffPowXdX + (bcoeffPowY * dxPow);
 					aCoeffPowXdY = aCoeffPowXdY + (bcoeffPowYdY * xPow);
 					aCoeffPowXdZ = aCoeffPowXdZ + (bcoeffPowYdZ * xPow);
-					//cout << "HH - b_" << x << " = " << bcoeffPowY << endl;
+					//std::cout << "HH - b_" << x << " = " << bcoeffPowY << std::endl;
 				}
 				// Save values to matrixes.
 				gsl_vector_set(predicted, 0, aCoeffPowX);
@@ -1570,7 +1570,7 @@ namespace rsgis {namespace radar
 					aCoeffPowXdX = aCoeffPowXdX + (bcoeffPowY * dxPow);
 					aCoeffPowXdY = aCoeffPowXdY + (bcoeffPowYdY * xPow);
 					aCoeffPowXdZ = aCoeffPowXdZ + (bcoeffPowYdZ * xPow);
-					//cout << "VV - b_" << x << ".x = " << bcoeffPowY * xPow << endl;
+					//std::cout << "VV - b_" << x << ".x = " << bcoeffPowY * xPow << std::endl;
 				}
 				// Save values to matrixes.
 				gsl_vector_set(predicted, 2, aCoeffPowX);
@@ -1595,7 +1595,7 @@ namespace rsgis {namespace radar
 				}
 				error = error / sigmaSq;
 				
-				//cout << "error = " << error << ", prev error = " << prevError << ", diff = " << abs(prevError - error) << endl;
+				//std::cout << "error = " << error << ", prev error = " << prevError << ", diff = " << abs(prevError - error) << std::endl;
 				if((error < minError) | (abs(prevError - error) < 10e-10) | isnan(error))
 				{
 					for(int i = 0; i < nPar; i++)
@@ -1639,9 +1639,9 @@ namespace rsgis {namespace radar
 					for(int i = 0; i < nPar; i++)
 					{
 						gammaElement = gsl_vector_get(gamma, i);
-						//cout << "gamma element " << gammaElement << endl;
+						//std::cout << "gamma element " << gammaElement << std::endl;
 						currPriorDiff = gsl_vector_get(estimatedPar, i) - gsl_vector_get(initialPar, i); // X_i - X_ap
-						//cout << "X_i - X_ap " << currPriorDiff << endl;
+						//std::cout << "X_i - X_ap " << currPriorDiff << std::endl;
 						gsl_vector_set(gamma, i, (gammaElement + currPriorDiff));
 					}
 					
@@ -1651,7 +1651,7 @@ namespace rsgis {namespace radar
 					matrixUtils.productMatrixVectorGSL(invCovMatrixD, aux1, aux3); // aux3 = invCovMatrixD . aux1
 					s1 = vectorUtils.dotProductVectorVectorGSL(aux1, aux3); // s1 = aux1 . aux2
 					matrixUtils.productMatrixVectorGSL(this->invCovMatrixP, gamma, aux2); // aux2 = invCovMatrixP . gamma
-					//cout << "Gamma = ";
+					//std::cout << "Gamma = ";
 					//vectorUtils.printGSLVector(gamma);
 					s2 = vectorUtils.dotProductVectorVectorGSL(gamma, aux2); // s2 = gamma . aux2
 					s1DivS2 = s1 / s2;
@@ -1668,10 +1668,10 @@ namespace rsgis {namespace radar
 						}
 						// Calculate new values
 						gammaElement = gsl_vector_get(gamma, i);
-						//cout << "gamma = " << gammaElement << " alpha = " << alpha << endl;
+						//std::cout << "gamma = " << gammaElement << " alpha = " << alpha << std::endl;
 						predictParElement = predictParElement - (alpha * gammaElement);
 						//predictParElement = predictParElement - (alpha * gammaElement);
-						//cout << "updated val = " << predictParElement << endl;
+						//std::cout << "updated val = " << predictParElement << std::endl;
 						gsl_vector_set(estimatedPar, i, predictParElement);
 					}
 					
@@ -1682,29 +1682,29 @@ namespace rsgis {namespace radar
 					
 				}
 				/*
-				 cout << "Itteration " << itt << endl;
-				 cout << "Predicted Sigma0: ";
+				 std::cout << "Itteration " << itt << std::endl;
+				 std::cout << "Predicted Sigma0: ";
 				 vectorUtils.printGSLVector(predicted);
-				 cout << "Measured Sigma0: ";
+				 std::cout << "Measured Sigma0: ";
 				 vectorUtils.printGSLVector(inData);
-				 cout << "Predicted Parameters: ";
+				 std::cout << "Predicted Parameters: ";
 				 vectorUtils.printGSLVector(estimatedPar);
-				 cout << "Error = " << error << endl;
-				 cout << "Frechet:" << endl;
+				 std::cout << "Error = " << error << std::endl;
+				 std::cout << "Frechet:" << std::endl;
 				 matrixUtils.printGSLMatrix(frechet);
-				 cout << "==============================" << endl;
+				 std::cout << "==============================" << std::endl;
 				*/
 				
 			}
 
 			/*
-			 cout << "Predicted Sigma0: ";
+			 std::cout << "Predicted Sigma0: ";
 			 vectorUtils.printGSLVector(predicted);
-			 cout << "Measured Sigma0: ";
+			 std::cout << "Measured Sigma0: ";
 			 vectorUtils.printGSLVector(inData);
-			 cout << "Predicted Parameters: ";
+			 std::cout << "Predicted Parameters: ";
 			 vectorUtils.printGSLVector(outParError);
-			 cout << "==============================" << endl;
+			 std::cout << "==============================" << std::endl;
 			*/
 			
 			
@@ -1737,7 +1737,7 @@ namespace rsgis {namespace radar
 																									   gsl_vector *aPrioriPar, gsl_matrix *covMatrixP, gsl_matrix *invCovMatrixD, 
 																									   double minError, int ittmax)
 		{
-			RSGISMatrices matrixUtils;
+			rsgis::math::RSGISMatrices matrixUtils;
 			this->coeffA = coeffA;
 			this->coeffB = coeffB;
 			this->coeffC = coeffC;
@@ -1762,9 +1762,9 @@ namespace rsgis {namespace radar
 		}
 		int RSGISEstimationConjugateGradient3DPoly4Channel::minimise(gsl_vector *inData, gsl_vector *initialPar, gsl_vector *outParError)
 		{
-			//cout << "Starting Estimation" << endl;
-			RSGISMatrices matrixUtils;
-			RSGISVectors vectorUtils;
+			//std::cout << "Starting Estimation" << std::endl;
+			rsgis::math::RSGISMatrices matrixUtils;
+			rsgis::math::RSGISVectors vectorUtils;
 			
 			gsl_vector *estimatedPar; // Vector to hold the estimated parameters
 			gsl_vector *predicted; // Vector to hold predicted values of backscatter
@@ -1846,7 +1846,7 @@ namespace rsgis {namespace radar
 			// START ITTERATING
 			for(int itt = 0; itt < ittmax;itt++)
 			{
-				//cout << "Itteration " << itt + 1<< endl;
+				//std::cout << "Itteration " << itt + 1<< std::endl;
 				
 				// Set up equations and Frechet derivative operator
 				dielectric = gsl_vector_get(estimatedPar, 0);
@@ -1916,7 +1916,7 @@ namespace rsgis {namespace radar
 					aCoeffPowXdX = aCoeffPowXdX + (bcoeffPowY * dxPow);
 					aCoeffPowXdY = aCoeffPowXdY + (bcoeffPowYdY * xPow);
 					aCoeffPowXdZ = aCoeffPowXdZ + (bcoeffPowYdZ * xPow);
-					//cout << "HH - b_" << x << " = " << bcoeffPowY << endl;
+					//std::cout << "HH - b_" << x << " = " << bcoeffPowY << std::endl;
 				}
 				// Save values to matrixes.
 				gsl_vector_set(predicted, 0, aCoeffPowX);
@@ -2014,7 +2014,7 @@ namespace rsgis {namespace radar
 					aCoeffPowXdX = aCoeffPowXdX + (bcoeffPowY * dxPow);
 					aCoeffPowXdY = aCoeffPowXdY + (bcoeffPowYdY * xPow);
 					aCoeffPowXdZ = aCoeffPowXdZ + (bcoeffPowYdZ * xPow);
-					//cout << "VV - b_" << x << ".x = " << bcoeffPowY * xPow << endl;
+					//std::cout << "VV - b_" << x << ".x = " << bcoeffPowY * xPow << std::endl;
 				}
 				// Save values to matrixes.
 				gsl_vector_set(predicted, 2, aCoeffPowX);
@@ -2064,7 +2064,7 @@ namespace rsgis {namespace radar
 					aCoeffPowXdX = aCoeffPowXdX + (bcoeffPowY * dxPow);
 					aCoeffPowXdY = aCoeffPowXdY + (bcoeffPowYdY * xPow);
 					aCoeffPowXdZ = aCoeffPowXdZ + (bcoeffPowYdZ * xPow);
-					//cout << "VV - b_" << x << ".x = " << bcoeffPowY * xPow << endl;
+					//std::cout << "VV - b_" << x << ".x = " << bcoeffPowY * xPow << std::endl;
 				}
 				// Save values to matrixes.
 				gsl_vector_set(predicted, 3, aCoeffPowX);
@@ -2133,9 +2133,9 @@ namespace rsgis {namespace radar
 					for(int i = 0; i < nPar; i++)
 					{
 						gammaElement = gsl_vector_get(gamma, i);
-						//cout << "gamma element " << gammaElement << endl;
+						//std::cout << "gamma element " << gammaElement << std::endl;
 						currPriorDiff = gsl_vector_get(estimatedPar, i) - gsl_vector_get(initialPar, i); // X_i - X_ap
-						//cout << "X_i - X_ap " << currPriorDiff << endl;
+						//std::cout << "X_i - X_ap " << currPriorDiff << std::endl;
 						gsl_vector_set(gamma, i, (gammaElement + currPriorDiff));
 					}
 					
@@ -2145,7 +2145,7 @@ namespace rsgis {namespace radar
 					matrixUtils.productMatrixVectorGSL(invCovMatrixD, aux1, aux3); // aux3 = invCovMatrixD . aux1
 					s1 = vectorUtils.dotProductVectorVectorGSL(aux1, aux3); // s1 = aux1 . aux2
 					matrixUtils.productMatrixVectorGSL(this->invCovMatrixP, gamma, aux2); // aux2 = invCovMatrixP . gamma
-					//cout << "Gamma = ";
+					//std::cout << "Gamma = ";
 					//vectorUtils.printGSLVector(gamma);
 					s2 = vectorUtils.dotProductVectorVectorGSL(gamma, aux2); // s2 = gamma . aux2
 					s1DivS2 = s1 / s2;
@@ -2161,10 +2161,10 @@ namespace rsgis {namespace radar
 						}
 						// Calculate new values
 						gammaElement = gsl_vector_get(gamma, i);
-						//cout << "gamma = " << gammaElement << " alpha = " << alpha << endl;
+						//std::cout << "gamma = " << gammaElement << " alpha = " << alpha << std::endl;
 						predictParElement = predictParElement - (alpha * gammaElement);
 						//predictParElement = predictParElement - (alpha * gammaElement);
-						//cout << "updated val = " << predictParElement << endl;
+						//std::cout << "updated val = " << predictParElement << std::endl;
 
 						gsl_vector_set(estimatedPar, i, predictParElement);
 						
@@ -2178,36 +2178,36 @@ namespace rsgis {namespace radar
 				}
 				
 				/*
-				 cout << "Itteration " << itt << endl;
-				 cout << "Predicted Sigma0: ";
+				 std::cout << "Itteration " << itt << std::endl;
+				 std::cout << "Predicted Sigma0: ";
 				 vectorUtils.printGSLVector(predicted);
-				 cout << "Measured Sigma0: ";
+				 std::cout << "Measured Sigma0: ";
 				 vectorUtils.printGSLVector(inData);
-				 cout << "Predicted Parameters: ";
+				 std::cout << "Predicted Parameters: ";
 				 vectorUtils.printGSLVector(estimatedPar);
-				 cout << "Error = " << error << endl;
-				 cout << "Frechet:" << endl;
+				 std::cout << "Error = " << error << std::endl;
+				 std::cout << "Frechet:" << std::endl;
 				 matrixUtils.printGSLMatrix(frechet);
-				 cout << "Gamma:" << endl;
+				 std::cout << "Gamma:" << std::endl;
 				 vectorUtils.printGSLVector(gamma);
-				 cout << "alpha:" << alpha << endl;
-				 cout << "==============================" << endl;
+				 std::cout << "alpha:" << alpha << std::endl;
+				 std::cout << "==============================" << std::endl;
 			    */
 				
 			}
 			
 			
-			//cout << "Best Par = " << endl;
+			//std::cout << "Best Par = " << std::endl;
 			//vectorUtils.printGSLVector(outParError);
 			
 			/*
-			 cout << "Predicted Sigma0: ";
+			 std::cout << "Predicted Sigma0: ";
 			 vectorUtils.printGSLVector(predicted);
-			 cout << "Measured Sigma0: ";
+			 std::cout << "Measured Sigma0: ";
 			 vectorUtils.printGSLVector(inData);
-			 cout << "Predicted Parameters: ";
+			 std::cout << "Predicted Parameters: ";
 			 vectorUtils.printGSLVector(outParError);
-			 cout << "==============================" << endl;
+			 std::cout << "==============================" << std::endl;
 			*/ 
 			
 			
@@ -2236,8 +2236,8 @@ namespace rsgis {namespace radar
 		}		
 		
 		RSGISEstimationConjugateGradient2Var2Data::RSGISEstimationConjugateGradient2Var2Data(
-																							 RSGISMathTwoVariableFunction *functionA, 
-																							 RSGISMathTwoVariableFunction *functionB,
+																							 rsgis::math::RSGISMathTwoVariableFunction *functionA, 
+																							 rsgis::math::RSGISMathTwoVariableFunction *functionB,
 																							 gsl_vector *aPrioriPar,
 																							 gsl_matrix *covMatrixP, 
 																							 gsl_matrix *invCovMatrixD,
@@ -2245,7 +2245,7 @@ namespace rsgis {namespace radar
 																							 int ittmax
 		)
 		{
-			RSGISMatrices matrixUtils;
+			rsgis::math::RSGISMatrices matrixUtils;
 			this->functionA = functionA;
 			this->functionB = functionB;
 			this->aPrioriPar = gsl_vector_alloc(2);
@@ -2263,12 +2263,12 @@ namespace rsgis {namespace radar
 		}
 		int RSGISEstimationConjugateGradient2Var2Data::minimise(gsl_vector *inSigma0dB, gsl_vector *initialPar, gsl_vector *outParError)
 		{
-			RSGISMatrices matrixUtils;
-			RSGISVectors vectorUtils;
+			rsgis::math::RSGISMatrices matrixUtils;
+			rsgis::math::RSGISVectors vectorUtils;
 			
-			//cout << "invCovD = " << endl;
+			//std::cout << "invCovD = " << std::endl;
 			//matrixUtils.printGSLMatrix(invCovMatrixD);
-			//cout << "*******************************" << endl;
+			//std::cout << "*******************************" << std::endl;
 			
 			// TEST
 			//gsl_vector_set(inSigma0dB, 0, functionA->calcFunction(4, 0.1));
@@ -2325,14 +2325,14 @@ namespace rsgis {namespace radar
 
 			matrixUtils.inv2x2GSLMatrix(covMatrixP, this->invCovMatrixP);
 			
-			cout << "covMatrixP" << endl;
+			std::cout << "covMatrixP" << std::endl;
 			matrixUtils.printGSLMatrix(covMatrixP);
 			*/
 			
 			// START ITTERATING
 			for(int itt = 0; itt < ittmax;itt++)
 			{
-				//cout << "Itteration " << itt + 1<< endl;
+				//std::cout << "Itteration " << itt + 1<< std::endl;
 				// Zero matrices
 				gsl_vector_set_zero(aux1);
 				gsl_vector_set_zero(aux2);
@@ -2414,16 +2414,16 @@ namespace rsgis {namespace radar
 				// FIND GRADIENT DIRECTION
 				matrixUtils.productMatrixVectorGSL(invCovMatrixD, dPredictMeas, aux1); // aux1 = invCovMatrixD . dPredictMeas
 				matrixUtils.productMatrixVectorGSL(frechet, aux1, aux2); // aux2 = Frechet . aux1
-				//cout << "F.C_d.C_ap = ";
+				//std::cout << "F.C_d.C_ap = ";
 				//vectorUtils.printGSLVector(aux2);
 				matrixUtils.productMatrixVectorGSL(covMatrixP, aux2, gamma); // gamma = covMatrixP . aux2
 				
 				for(int i = 0; i < nPar; i++)
 				{
 					gammaElement = gsl_vector_get(gamma, i);
-					//cout << "gamma element " << gammaElement << endl;
+					//std::cout << "gamma element " << gammaElement << std::endl;
 					currPriorDiff = gsl_vector_get(estimatedPar, i) - gsl_vector_get(aPrioriPar, i); // X_i - X_ap
-					//cout << "X_i - X_ap " << currPriorDiff << endl;
+					//std::cout << "X_i - X_ap " << currPriorDiff << std::endl;
 					gsl_vector_set(gamma, i, (gammaElement + currPriorDiff));
 				}
 				
@@ -2433,26 +2433,26 @@ namespace rsgis {namespace radar
 				matrixUtils.productMatrixVectorGSL(invCovMatrixD, aux1, aux3); // aux3 = invCovMatrixD . aux1
 				s1 = vectorUtils.dotProductVectorVectorGSL(aux1, aux3); // s1 = aux1 . aux3
 				matrixUtils.productMatrixVectorGSL(invCovMatrixP, gamma, aux2); // aux2 = invCovMatrixP . gamma
-				//cout << "Gamma = ";
+				//std::cout << "Gamma = ";
 				//vectorUtils.printGSLVector(gamma);
 				s2 = vectorUtils.dotProductVectorVectorGSL(gamma, aux2); // s2 = gamma . aux2
 				s1DivS2 = s1 / s2;
 				alpha = 1 / (1 + s1DivS2); // 1 / (1 + (s1/s2))
 				
 				/*
-				cout << "Itteration: " << itt << endl;
-				cout << "Frechet:" << endl;
+				std::cout << "Itteration: " << itt << std::endl;
+				std::cout << "Frechet:" << std::endl;
 				matrixUtils.printGSLMatrix(frechet);
-				cout << "Gamma:" << endl;
+				std::cout << "Gamma:" << std::endl;
 				vectorUtils.printGSLVector(gamma);
-				cout << "Predicted Sigma0: " << endl;
+				std::cout << "Predicted Sigma0: " << std::endl;
 				vectorUtils.printGSLVector(predicted);
-				cout << "Measured Sigma0: " << endl;
+				std::cout << "Measured Sigma0: " << std::endl;
 				vectorUtils.printGSLVector(inSigma0dB);
-				cout << "Predicted Parameters: " << endl;
+				std::cout << "Predicted Parameters: " << std::endl;
 				vectorUtils.printGSLVector(estimatedPar);
-				cout << "Error = " << error << endl;
-				cout << "==============================" << endl;
+				std::cout << "Error = " << error << std::endl;
+				std::cout << "==============================" << std::endl;
 				*/
 				
 				// UPDATE VALUES
@@ -2460,10 +2460,10 @@ namespace rsgis {namespace radar
 				{
 					predictParElement = gsl_vector_get(estimatedPar, i);					
 					gammaElement = gsl_vector_get(gamma, i);
-					//cout << "gamma = " << gammaElement << " alpha = " << alpha << endl;
+					//std::cout << "gamma = " << gammaElement << " alpha = " << alpha << std::endl;
 					predictParElement = predictParElement - (alpha * gammaElement);
 					//predictParElement = predictParElement - (alpha * gammaElement);
-					//cout << "updated val = " << predictParElement << endl;
+					//std::cout << "updated val = " << predictParElement << std::endl;
 					gsl_vector_set(estimatedPar, i, predictParElement);
 					if (error < gsl_vector_get(outParError, nPar)) 
 					{
@@ -2477,18 +2477,18 @@ namespace rsgis {namespace radar
 					gsl_vector_set(outParError, nPar, error);
 				}
 				
-				//cout << "error = " << error << endl;
+				//std::cout << "error = " << error << std::endl;
 			}
 			/*
-			cout << "Predicted Sigma0: " << endl;
+			std::cout << "Predicted Sigma0: " << std::endl;
 			vectorUtils.printGSLVector(predicted);
-			cout << "Measured Sigma0: " << endl;
+			std::cout << "Measured Sigma0: " << std::endl;
 			vectorUtils.printGSLVector(inSigma0dB);
-			cout << "Predicted Parameters: " << endl;
+			std::cout << "Predicted Parameters: " << std::endl;
 			vectorUtils.printGSLVector(outParError);
-			cout << "==============================" << endl;
+			std::cout << "==============================" << std::endl;
 			*/
-			//cout << "error = " << error << endl;
+			//std::cout << "error = " << error << std::endl;
 			// FREE MATRICES
 			gsl_vector_free(estimatedPar);
 			gsl_vector_free(predicted);
@@ -2510,9 +2510,9 @@ namespace rsgis {namespace radar
 		}
 		
 		RSGISEstimationConjugateGradient2Var3Data::RSGISEstimationConjugateGradient2Var3Data(
-																							 RSGISMathTwoVariableFunction *functionA, 
-																							 RSGISMathTwoVariableFunction *functionB,
-																							 RSGISMathTwoVariableFunction *functionC,
+																							 rsgis::math::RSGISMathTwoVariableFunction *functionA, 
+																							 rsgis::math::RSGISMathTwoVariableFunction *functionB,
+																							 rsgis::math::RSGISMathTwoVariableFunction *functionC,
 																							 gsl_vector *aPrioriPar,
 																							 gsl_matrix *covMatrixP, 
 																							 gsl_matrix *invCovMatrixD,
@@ -2520,7 +2520,7 @@ namespace rsgis {namespace radar
 																							 int ittmax
 																							 )
 		{
-			RSGISMatrices matrixUtils;
+			rsgis::math::RSGISMatrices matrixUtils;
 			this->functionA = functionA;
 			this->functionB = functionB;
 			this->functionC = functionC;
@@ -2539,9 +2539,9 @@ namespace rsgis {namespace radar
 		}
 		int RSGISEstimationConjugateGradient2Var3Data::minimise(gsl_vector *inSigma0dB, gsl_vector *initialPar, gsl_vector *outParError)
 		{
-			//cout << "Starting Estimation" << endl;
-			RSGISMatrices matrixUtils;
-			RSGISVectors vectorUtils;
+			//std::cout << "Starting Estimation" << std::endl;
+			rsgis::math::RSGISMatrices matrixUtils;
+			rsgis::math::RSGISVectors vectorUtils;
 			
 			int nData = 3; // Data channels
 			int nPar = 2; // Parameters to be retrieved
@@ -2581,7 +2581,7 @@ namespace rsgis {namespace radar
 			// START ITTERATING
 			for(int itt = 0; itt < ittmax;itt++)
 			{
-				//cout << "Itteration " << itt + 1<< endl;
+				//std::cout << "Itteration " << itt + 1<< std::endl;
 				// Zero matrices
 				gsl_vector_set_zero(aux1);
 				gsl_vector_set_zero(aux2);
@@ -2627,8 +2627,8 @@ namespace rsgis {namespace radar
 				}
 				error = error / (pow(gsl_vector_get(inSigma0dB, 0),2)+pow(gsl_vector_get(inSigma0dB, 1),2)+pow(gsl_vector_get(inSigma0dB, 2),2));
 				
-				//cout << "predictSq = " << predictSq << endl;
-				//cout << "sigmaSq = " << sigmaSq << endl;
+				//std::cout << "predictSq = " << predictSq << std::endl;
+				//std::cout << "sigmaSq = " << sigmaSq << std::endl;
 				//error = sqrt(predictSq / sigmaSq); // Square Root [Sum(Predicted Squared) / Sum(Measured Squared)]
 
 				if((error < minError) | (abs(prevError - error) < 10e-10) | isnan(error))
@@ -2663,16 +2663,16 @@ namespace rsgis {namespace radar
 				// FIND GRADIENT DIRECTION
 				matrixUtils.productMatrixVectorGSL(invCovMatrixD, dPredictMeas, aux1); // aux1 = invCovMatrixD . dPredictMeas
 				matrixUtils.productMatrixVectorGSL(frechet, aux1, aux2); // aux2 = Frechet . aux1
-				//cout << "F.C_d.C_ap = ";
+				//std::cout << "F.C_d.C_ap = ";
 				//vectorUtils.printGSLVector(aux2);
 				matrixUtils.productMatrixVectorGSL(covMatrixP, aux2, gamma); // gamma = covMatrixP . aux2
 				
 				for(int i = 0; i < nPar; i++)
 				{
 					gammaElement = gsl_vector_get(gamma, i);
-					//cout << "gamma element " << gammaElement << endl;
+					//std::cout << "gamma element " << gammaElement << std::endl;
 					currPriorDiff = gsl_vector_get(estimatedPar, i) - gsl_vector_get(aPrioriPar, i); // X_i - X_ap
-					//cout << "X_i - X_ap " << currPriorDiff << endl;
+					//std::cout << "X_i - X_ap " << currPriorDiff << std::endl;
 					gsl_vector_set(gamma, i, (gammaElement + currPriorDiff));
 				}
 				
@@ -2682,23 +2682,23 @@ namespace rsgis {namespace radar
 				matrixUtils.productMatrixVectorGSL(invCovMatrixD, aux1, aux3); // aux3 = invCovMatrixD . aux1
 				s1 = vectorUtils.dotProductVectorVectorGSL(aux1, aux3); // s1 = aux1 . aux3
 				matrixUtils.productMatrixVectorGSL(invCovMatrixP, gamma, aux2); // aux2 = invCovMatrixP . gamma
-				//cout << "Gamma = ";
+				//std::cout << "Gamma = ";
 				//vectorUtils.printGSLVector(gamma);
 				s2 = vectorUtils.dotProductVectorVectorGSL(gamma, aux2); // s2 = gamma . aux2
 				s1DivS2 = s1 / s2;
 				alpha = 1 / (1 + s1DivS2); // 1 / (1 + (s1/s2))
 				/*
-				 cout << "Itteration: " << itt << endl;
-				 cout << "Frechet:" << endl;
+				 std::cout << "Itteration: " << itt << std::endl;
+				 std::cout << "Frechet:" << std::endl;
 				 matrixUtils.printGSLMatrix(frechet);
-				 cout << "Gamma:" << endl;
+				 std::cout << "Gamma:" << std::endl;
 				 vectorUtils.printGSLVector(gamma);
-				 cout << "Predicted Sigma0: " << endl;
+				 std::cout << "Predicted Sigma0: " << std::endl;
 				 vectorUtils.printGSLVector(predicted);
-				 cout << "Measured Sigma0: " << endl;
+				 std::cout << "Measured Sigma0: " << std::endl;
 				 vectorUtils.printGSLVector(inSigma0dB);
-				 cout << "Error = " << error << endl;
-				 cout << "==============================" << endl;
+				 std::cout << "Error = " << error << std::endl;
+				 std::cout << "==============================" << std::endl;
 				 */
 
 				// UPDATE VALUES
@@ -2706,9 +2706,9 @@ namespace rsgis {namespace radar
 				{
 					predictParElement = gsl_vector_get(estimatedPar, i);					
 					gammaElement = gsl_vector_get(gamma, i);
-					//cout << "gamma = " << gammaElement << " alpha = " << alpha << endl;
+					//std::cout << "gamma = " << gammaElement << " alpha = " << alpha << std::endl;
 					predictParElement = predictParElement - (alpha * gammaElement);
-					//cout << "updated val = " << predictParElement << endl;
+					//std::cout << "updated val = " << predictParElement << std::endl;
 					gsl_vector_set(estimatedPar, i, predictParElement);
 					if (error < gsl_vector_get(outParError, nPar)) 
 					{
@@ -2724,13 +2724,13 @@ namespace rsgis {namespace radar
 			}
 			
 			/*
-			 cout << "Predicted Sigma0: " << endl;
+			 std::cout << "Predicted Sigma0: " << std::endl;
 			 vectorUtils.printGSLVector(predicted);
-			 cout << "Measured Sigma0: " << endl;
+			 std::cout << "Measured Sigma0: " << std::endl;
 			 vectorUtils.printGSLVector(inSigma0dB);
-			 cout << "Predicted Parameters: " << endl;
+			 std::cout << "Predicted Parameters: " << std::endl;
 			 vectorUtils.printGSLVector(outParError);
-			 cout << "==============================" << endl;
+			 std::cout << "==============================" << std::endl;
 			*/
 			
 			// FREE MATRICES
@@ -2753,8 +2753,8 @@ namespace rsgis {namespace radar
 		}
 		
 		RSGISEstimationConjugateGradient2Var2DataWithRestarts::RSGISEstimationConjugateGradient2Var2DataWithRestarts(
-																													 RSGISMathTwoVariableFunction *functionA, 
-																													 RSGISMathTwoVariableFunction *functionB,
+																													 rsgis::math::RSGISMathTwoVariableFunction *functionA, 
+																													 rsgis::math::RSGISMathTwoVariableFunction *functionB,
 																													 double *minMaxIntervalA,
 																													 double *minMaxIntervalB,
 																													 gsl_vector *aPrioriPar,
@@ -2765,7 +2765,7 @@ namespace rsgis {namespace radar
 																													 int nRestarts
 																													 )
 		{
-			RSGISMatrices matrixUtils;
+			rsgis::math::RSGISMatrices matrixUtils;
 			this->functionA = functionA;
 			this->functionB = functionB;
 			this->minMaxIntervalA = minMaxIntervalA;
@@ -2816,7 +2816,7 @@ namespace rsgis {namespace radar
 			double stepA = (minMaxIntervalA[1] - minMaxIntervalA[0]) / sqrt(float(nRestarts));
 			double stepB =  (minMaxIntervalB[1] - minMaxIntervalB[0]) / sqrt(float(nRestarts));
 			
-			//cout << "=========================================" << endl;
+			//std::cout << "=========================================" << std::endl;
 			
 			double a = minMaxIntervalA[0];
 			while (a < minMaxIntervalA[1]) 
@@ -2827,7 +2827,7 @@ namespace rsgis {namespace radar
 					gsl_vector_set(testInitialPar, 0, a);
 					gsl_vector_set(testInitialPar, 1, b);
 					
-					//cout << "height = " << randA << " density = " << randB << endl;
+					//std::cout << "height = " << randA << " density = " << randB << std::endl;
 					
 					conjGradOpt->minimise(inData, testInitialPar, currentParError);
 					
@@ -2887,9 +2887,9 @@ namespace rsgis {namespace radar
 		}
 		
 		RSGISEstimationConjugateGradient2Var3DataWithRestarts::RSGISEstimationConjugateGradient2Var3DataWithRestarts(
-																													 RSGISMathTwoVariableFunction *functionA, 
-																													 RSGISMathTwoVariableFunction *functionB,
-																													 RSGISMathTwoVariableFunction *functionC,
+																													 rsgis::math::RSGISMathTwoVariableFunction *functionA, 
+																													 rsgis::math::RSGISMathTwoVariableFunction *functionB,
+																													 rsgis::math::RSGISMathTwoVariableFunction *functionC,
 																													 double *minMaxIntervalA,
 																													 double *minMaxIntervalB,
 																													 gsl_vector *aPrioriPar,
@@ -2900,7 +2900,7 @@ namespace rsgis {namespace radar
 																													 int nRestarts
 																													 )
 		{
-			RSGISMatrices matrixUtils;
+			rsgis::math::RSGISMatrices matrixUtils;
 			this->functionA = functionA;
 			this->functionB = functionB;
 			this->functionC = functionC;
@@ -2960,7 +2960,7 @@ namespace rsgis {namespace radar
 					gsl_vector_set(testInitialPar, 0, a);
 					gsl_vector_set(testInitialPar, 1, b);
 					
-					//cout << "height = " << randA << " density = " << randB << endl;
+					//std::cout << "height = " << randA << " density = " << randB << std::endl;
 					
 					conjGradOpt->minimise(inData, testInitialPar, currentParError);
 					
@@ -3032,7 +3032,7 @@ namespace rsgis {namespace radar
 																													 int nRestarts
 																													 )
 		{
-			RSGISMatrices matrixUtils;
+			rsgis::math::RSGISMatrices matrixUtils;
 			this->minMaxIntervalA = minMaxIntervalA;
 			this->minMaxIntervalB = minMaxIntervalB;
 			this->minMaxIntervalC = minMaxIntervalC;
@@ -3171,7 +3171,7 @@ namespace rsgis {namespace radar
 																													 int nRestarts
 																													 )
 		{
-			RSGISMatrices matrixUtils;
+			rsgis::math::RSGISMatrices matrixUtils;
 			this->minMaxIntervalA = minMaxIntervalA;
 			this->minMaxIntervalB = minMaxIntervalB;
 			this->minMaxIntervalC = minMaxIntervalC;
@@ -3238,7 +3238,7 @@ namespace rsgis {namespace radar
 						gsl_vector_set(testInitialPar, 1, b);
 						gsl_vector_set(testInitialPar, 2, c);
 						
-						//cout << "a, b, c: " << a << ", " << b << ", " << c << endl;
+						//std::cout << "a, b, c: " << a << ", " << b << ", " << c << std::endl;
 						
 						conjGradOpt->minimise(inData, testInitialPar, currentParError);
 						
@@ -3304,10 +3304,10 @@ namespace rsgis {namespace radar
 		}
 		
 		RSGISEstimationConjugateGradient2Var2DataDistro::RSGISEstimationConjugateGradient2Var2DataDistro(
-																													 RSGISMathTwoVariableFunction *functionA, 
-																													 RSGISMathTwoVariableFunction *functionB,
-																										             RSGISProbDistro *distroA,
-																										             RSGISProbDistro *distroB,
+																													 rsgis::math::RSGISMathTwoVariableFunction *functionA, 
+																													 rsgis::math::RSGISMathTwoVariableFunction *functionB,
+																										             rsgis::math::RSGISProbDistro *distroA,
+																										             rsgis::math::RSGISProbDistro *distroB,
 																													 double *minMaxIntervalA,
 																													 double *minMaxIntervalB,
 																													 gsl_vector *aPrioriPar,
@@ -3354,7 +3354,7 @@ namespace rsgis {namespace radar
 				gsl_vector_set(testInitialPar, 0, randA);
 				gsl_vector_set(testInitialPar, 1, randB);
 				
-				//cout << "height = " << randA << " density = " << randB << endl;
+				//std::cout << "height = " << randA << " density = " << randB << std::endl;
 				
 				this->conjGradOpt->minimise(inData, testInitialPar, currentParError);
 				

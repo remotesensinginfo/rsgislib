@@ -37,10 +37,8 @@ namespace rsgis
 	namespace radar
 	/// Radar utilities
 	{
-        using namespace std;
-        using namespace rsgis::img;
         
-		class RSGISCalcSaatchiBiomassCrown : public RSGISCalcImageValue
+		class RSGISCalcSaatchiBiomassCrown : public rsgis::img::RSGISCalcImageValue
 			/// Estimates Crown Biomass from L or P band data with correction for local incidence angle.			
 			/** Called using:
 			sartools -s -c -i \<input images\> -o \<output image\> -a0 \<a0\> -a1 \<a1\> -a2 \<a2\> -b1 \<b1\> -b2 \<b2\> -c1 \<c1\> -c2 \<c2\>
@@ -59,13 +57,13 @@ namespace rsgis
 			{
 			public: 
 				RSGISCalcSaatchiBiomassCrown(int numberOutBands, double a0Coef, double a1Coef, double a2Coef, double b1Coef, double b2Coef, double c1Coef, double c2Coef);
-				void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException);
-				void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException);
-				void calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException);
-				void calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-				void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-                void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
-				bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};					
+				void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException);
+				void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException);
+				void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException);
+				void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+				void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+                void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+				bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};					
 			protected:
 				double a0;
 				double a1;
@@ -76,7 +74,7 @@ namespace rsgis
 				double c2;
 			};
 		
-		class RSGISCalcSaatchiBiomassStem : public RSGISCalcImageValue
+		class RSGISCalcSaatchiBiomassStem : public rsgis::img::RSGISCalcImageValue
 			 /// Estimates stem Biomass from L or P band data with correction for local incidence angle.
 			/** Called using:
 			sartools -s -st -i \<input images> -o \<output image> -a0 \<a0> -a1 \<a1> -a2 \<a2> -b1 \<b1> -b2 \<b2> -c1 \<c1> -c2 \<c2>
@@ -95,13 +93,13 @@ namespace rsgis
 			{
 			public: 
 				RSGISCalcSaatchiBiomassStem(int numberOutBands, double a0Coef, double a1Coef, double a2Coef, double b1Coef, double b2Coef, double c1Coef, double c2Coef);
-				void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException);
-				void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException);
-				void calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException);
-				void calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-				void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-                void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
-				bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};					
+				void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException);
+				void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException);
+				void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException);
+				void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+				void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+                void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+				bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};					
 			protected:
 				double a0;
 				double a1;
@@ -113,7 +111,7 @@ namespace rsgis
 			};
 		
 		
-		class RSGISCalcSaatchiBiomassCrownPL : public RSGISCalcImageValue
+		class RSGISCalcSaatchiBiomassCrownPL : public rsgis::img::RSGISCalcImageValue
 			 /// Estimates crown Biomass from L and P band data with correction for local incidence angle.
 			/** Called using:
 			sartools -s -cPL -i \<input images> -o \<output image> -a0 \<a0> -a1 \<a1> -a2 \<a2> -b1 \<b1> -b2 \<b2> -c1 \<c1> -c2 \<c2>
@@ -132,13 +130,13 @@ namespace rsgis
 			{
 			public: 
 				RSGISCalcSaatchiBiomassCrownPL(int numberOutBands, double a0Coef, double a1Coef, double a2Coef, double b1Coef, double b2Coef);
-				void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException);
-				void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException);
-				void calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException);
-				void calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-				void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-                void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
-				bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};					
+				void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException);
+				void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException);
+				void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException);
+				void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+				void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+                void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+				bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};					
 			protected:
 				double a0;
 				double a1;
@@ -147,7 +145,7 @@ namespace rsgis
 				double b2;
 			};
 		
-		class RSGISCalcSaatchiNoIABiomassCrown : public RSGISCalcImageValue
+		class RSGISCalcSaatchiNoIABiomassCrown : public rsgis::img::RSGISCalcImageValue
 			 /// Estimates crown Biomass from L or P band data with no correction for local incidence angle.
 			/** 
 			This implements a version where the difference between incidence angle and local incidence angle is assumed to be zero,
@@ -164,13 +162,13 @@ namespace rsgis
 			{
 			public: 
 				RSGISCalcSaatchiNoIABiomassCrown(int numberOutBands, double a0Coef, double a1Coef, double a2Coef, double c1Coef, double c2Coef);
-				void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException);
-				void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException);
-				void calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException);
-				void calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-				void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-                void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
-				bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};					
+				void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException);
+				void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException);
+				void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException);
+				void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+				void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+                void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+				bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};					
 			protected:
 				double a0;
 				double a1;
@@ -179,7 +177,7 @@ namespace rsgis
 				double c2;
 			};
 		
-		class RSGISCalcSaatchiNoIABiomassStem : public RSGISCalcImageValue
+		class RSGISCalcSaatchiNoIABiomassStem : public rsgis::img::RSGISCalcImageValue
 			 /// Estimates stem Biomass from L or P band data with no correction for local incidence angle.
 			/** 
 			This implements a modification of Saatchi's algorithm by LeToan whereby the difference between the incidence angle and local incidence angle is assumed to be zero, 
@@ -200,13 +198,13 @@ namespace rsgis
 			{
 			public: 
 				RSGISCalcSaatchiNoIABiomassStem(int numberOutBands, double a0Coef, double a1Coef, double a2Coef, double b1Coef, double b2Coef, double c1Coef, double c2Coef);
-				void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException);
-				void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException);
-				void calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException);
-				void calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-				void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-                void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
-				bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};					
+				void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException);
+				void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException);
+				void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException);
+				void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+				void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+                void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+				bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};					
 			protected:
 				double a0;
 				double a1;
@@ -218,7 +216,7 @@ namespace rsgis
 			};
 		
 		
-		class RSGISCalcSaatchiNoIABiomassCrownPL : public RSGISCalcImageValue
+		class RSGISCalcSaatchiNoIABiomassCrownPL : public rsgis::img::RSGISCalcImageValue
 			/// Estimates crown Biomass from L and P band data with no correction for local incidence angle.
 			/** 
 			This implements a version where the difference between incidence angle and local incidence angle is assumed to be zero.
@@ -234,13 +232,13 @@ namespace rsgis
 
 			public: 
 				RSGISCalcSaatchiNoIABiomassCrownPL(int numberOutBands, double a0Coef, double a1Coef, double a2Coef, double b1Coef, double b2Coef);
-				void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException);
-				void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException);
-				void calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException);
-				void calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-				void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-                void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
-				bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};					
+				void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException);
+				void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException);
+				void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException);
+				void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+				void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+                void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+				bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};					
 			protected:
 				double a0;
 				double a1;

@@ -26,8 +26,8 @@
 namespace rsgis {namespace radar{
 	
 	RSGISEstimationSimulatedAnnealing2Var2Data::RSGISEstimationSimulatedAnnealing2Var2Data(
-																						   RSGISMathTwoVariableFunction *functionHH, 
-																						   RSGISMathTwoVariableFunction *functionHV,
+																						   rsgis::math::RSGISMathTwoVariableFunction *functionHH, 
+																						   rsgis::math::RSGISMathTwoVariableFunction *functionHV,
 																						   double *minMaxIntervalA,
 																						   double *minMaxIntervalB,
 																						   double minEnergy,
@@ -85,8 +85,8 @@ namespace rsgis {namespace radar{
 			}
 		}
 		
-		RSGISVectors vectorUtils;
-		RSGISMatrices matrixUtils;
+		rsgis::math::RSGISVectors vectorUtils;
+		rsgis::math::RSGISMatrices matrixUtils;
 		
 		unsigned int numItt = 0;
 		double temp = startTemp;
@@ -125,8 +125,8 @@ namespace rsgis {namespace radar{
 		currentParError[nPar] = 99999;
 		bestParError[nPar] = 99999;
 		
-		RSGISFunction2Var2DataLeastSquares *leastSquares;
-		leastSquares = new RSGISFunction2Var2DataLeastSquares(functionHH, functionHV, gsl_vector_get(inData, 0), gsl_vector_get(inData, 1)); 
+		rsgis::math::RSGISFunction2Var2DataLeastSquares *leastSquares;
+		leastSquares = new rsgis::math::RSGISFunction2Var2DataLeastSquares(functionHH, functionHV, gsl_vector_get(inData, 0), gsl_vector_get(inData, 1)); 
 		
 		/* Set maximum number of temperature runs
 		 Divide by runsStep * runsTemp * 2 so temperature will be reduced in maximum number of itterations
@@ -314,8 +314,8 @@ namespace rsgis {namespace radar{
 	}
 	
 	RSGISEstimationSimulatedAnnealing2Var2DataWithAP::RSGISEstimationSimulatedAnnealing2Var2DataWithAP(
-																									   RSGISMathTwoVariableFunction *functionHH, 
-																									   RSGISMathTwoVariableFunction *functionHV,
+																									   rsgis::math::RSGISMathTwoVariableFunction *functionHH, 
+																									   rsgis::math::RSGISMathTwoVariableFunction *functionHV,
 																									   double *minMaxIntervalA,
 																									   double *minMaxIntervalB,
 																									   double minEnergy,
@@ -335,7 +335,7 @@ namespace rsgis {namespace radar{
 		 this->cooling = 0.85; // Cooling factor
 		 this->minEnergy = minEnergy; // Set the target energy
 		 this->maxItt = 100000; // Maximum number of itterations*/
-		RSGISMatrices matrixUtils;
+		rsgis::math::RSGISMatrices matrixUtils;
 		
 		this->startTemp = startTemp;
 		this->runsStep = runsStep; // Number of runs at each step size
@@ -392,8 +392,8 @@ namespace rsgis {namespace radar{
 		 outTxtFile.open("/Users/danclewley/Documents/Research/PhD/Inversion/ALOS/PLR/SAIttTest/SAIttTest.csv");
 		 outTxtFile << "itt,bestHErr,bestDErr,CurrHErr,CurrDErr,lsDiff" << endl;*/
 		
-		RSGISVectors vectorUtils;
-		RSGISMatrices matrixUtils;
+		rsgis::math::RSGISVectors vectorUtils;
+		rsgis::math::RSGISMatrices matrixUtils;
 		
 		unsigned int numItt = 0;
 		double temp = startTemp;
@@ -432,8 +432,8 @@ namespace rsgis {namespace radar{
 		currentParError[nPar] = 99999;
 		bestParError[nPar] = 99999;
 		
-		RSGISFunction2Var2DataPreconditionedLeastSquares *leastSquares;
-		leastSquares = new RSGISFunction2Var2DataPreconditionedLeastSquares(functionHH, functionHV, gsl_vector_get(inData, 0), gsl_vector_get(inData, 1), gsl_vector_get(this->aPrioriPar, 0), gsl_vector_get(this->aPrioriPar, 1), this->invCovMatrixP, this->invCovMatrixD);
+		rsgis::math::RSGISFunction2Var2DataPreconditionedLeastSquares *leastSquares;
+		leastSquares = new rsgis::math::RSGISFunction2Var2DataPreconditionedLeastSquares(functionHH, functionHV, gsl_vector_get(inData, 0), gsl_vector_get(inData, 1), gsl_vector_get(this->aPrioriPar, 0), gsl_vector_get(this->aPrioriPar, 1), this->invCovMatrixP, this->invCovMatrixD);
 		
 		/* Set maximum number of temperature runs
 		 Divide by runsStep * runsTemp * 2 so temperature will be reduced in maximum number of itterations
@@ -711,9 +711,9 @@ namespace rsgis {namespace radar{
 	}
 	
 	RSGISEstimationSimulatedAnnealing2Var3Data::RSGISEstimationSimulatedAnnealing2Var3Data(
-																						   RSGISMathTwoVariableFunction *functionHH, 
-																						   RSGISMathTwoVariableFunction *functionHV,
-																						   RSGISMathTwoVariableFunction *functionVV,
+																						   rsgis::math::RSGISMathTwoVariableFunction *functionHH, 
+																						   rsgis::math::RSGISMathTwoVariableFunction *functionHV,
+																						   rsgis::math::RSGISMathTwoVariableFunction *functionVV,
 																						   double *minMaxIntervalA,
 																						   double *minMaxIntervalB,
 																						   double minEnergy,
@@ -772,8 +772,8 @@ namespace rsgis {namespace radar{
 			}
 		}
 		
-		RSGISVectors vectorUtils;
-		RSGISMatrices matrixUtils;
+		rsgis::math::RSGISVectors vectorUtils;
+		rsgis::math::RSGISMatrices matrixUtils;
 		
 		unsigned int numItt = 0;
 		double temp = startTemp;
@@ -812,8 +812,8 @@ namespace rsgis {namespace radar{
 		currentParError[nPar] = 99999;
 		bestParError[nPar] = 99999;
 		
-		RSGISFunction2Var3DataLeastSquares *leastSquares;
-		leastSquares = new RSGISFunction2Var3DataLeastSquares(this->functionHH, this->functionHV, this->functionVV, gsl_vector_get(inData, 0), gsl_vector_get(inData, 1), gsl_vector_get(inData, 2)); 
+		rsgis::math::RSGISFunction2Var3DataLeastSquares *leastSquares;
+		leastSquares = new rsgis::math::RSGISFunction2Var3DataLeastSquares(this->functionHH, this->functionHV, this->functionVV, gsl_vector_get(inData, 0), gsl_vector_get(inData, 1), gsl_vector_get(inData, 2)); 
 		
 		/* Set maximum number of temperature runs
 		 Divide by runsStep * runsTemp * 2 so temperature will be reduced in maximum number of itterations
@@ -1045,9 +1045,9 @@ namespace rsgis {namespace radar{
 	}
 	
 	RSGISEstimationSimulatedAnnealing2Var3DataWithAP::RSGISEstimationSimulatedAnnealing2Var3DataWithAP(
-																									   RSGISMathTwoVariableFunction *functionHH, 
-																									   RSGISMathTwoVariableFunction *functionHV,
-																									   RSGISMathTwoVariableFunction *functionVV,
+																									   rsgis::math::RSGISMathTwoVariableFunction *functionHH, 
+																									   rsgis::math::RSGISMathTwoVariableFunction *functionHV,
+																									   rsgis::math::RSGISMathTwoVariableFunction *functionVV,
 																									   double *minMaxIntervalA,
 																									   double *minMaxIntervalB,
 																									   double minEnergy,
@@ -1067,7 +1067,7 @@ namespace rsgis {namespace radar{
 		 this->cooling = 0.85; // Cooling factor
 		 this->minEnergy = minEnergy; // Set the target energy
 		 this->maxItt = 100000; // Maximum number of itterations*/
-		RSGISMatrices matrixUtils;
+		rsgis::math::RSGISMatrices matrixUtils;
 		
 		this->startTemp = startTemp;
 		this->runsStep = runsStep; // Number of runs at each step size
@@ -1117,8 +1117,8 @@ namespace rsgis {namespace radar{
 			}
 		}
 		
-		RSGISVectors vectorUtils;
-		RSGISMatrices matrixUtils;
+		rsgis::math::RSGISVectors vectorUtils;
+		rsgis::math::RSGISMatrices matrixUtils;
 		
 		unsigned int numItt = 0;
 		double temp = startTemp;
@@ -1157,8 +1157,8 @@ namespace rsgis {namespace radar{
 		currentParError[nPar] = 99999;
 		bestParError[nPar] = 99999;
 		
-		RSGISFunction2Var3DataPreconditionedLeastSquares *leastSquares;
-		leastSquares = new RSGISFunction2Var3DataPreconditionedLeastSquares(this->functionHH, this->functionHV, this->functionVV, gsl_vector_get(inData, 0), gsl_vector_get(inData, 1), gsl_vector_get(inData, 2), gsl_vector_get(this->aPrioriPar, 0), gsl_vector_get(this->aPrioriPar, 1), this->invCovMatrixP, this->invCovMatrixD);
+		rsgis::math::RSGISFunction2Var3DataPreconditionedLeastSquares *leastSquares;
+		leastSquares = new rsgis::math::RSGISFunction2Var3DataPreconditionedLeastSquares(this->functionHH, this->functionHV, this->functionVV, gsl_vector_get(inData, 0), gsl_vector_get(inData, 1), gsl_vector_get(inData, 2), gsl_vector_get(this->aPrioriPar, 0), gsl_vector_get(this->aPrioriPar, 1), this->invCovMatrixP, this->invCovMatrixD);
 		
 		/* Set maximum number of temperature runs
 		 Divide by runsStep * runsTemp * 2 so temperature will be reduced in maximum number of itterations
@@ -1426,9 +1426,9 @@ namespace rsgis {namespace radar{
 	}
 	
 	RSGISEstimationSimulatedAnnealing3Var3DataWithAP::RSGISEstimationSimulatedAnnealing3Var3DataWithAP(
-																									   RSGISMathThreeVariableFunction *functionHH, 
-																									   RSGISMathThreeVariableFunction *functionHV,
-																									   RSGISMathThreeVariableFunction *functionVV,
+																									   rsgis::math::RSGISMathThreeVariableFunction *functionHH, 
+																									   rsgis::math::RSGISMathThreeVariableFunction *functionHV,
+																									   rsgis::math::RSGISMathThreeVariableFunction *functionVV,
 																									   double *minMaxIntervalA,
 																									   double *minMaxIntervalB,
 																									   double *minMaxIntervalC,
@@ -1510,8 +1510,8 @@ namespace rsgis {namespace radar{
 		 outTxtFile.open("/Users/danclewley/Documents/Research/PhD/Inversion/AIRSAR/PBX/WithDielectric/SensitivityAnalysis/SAConvTests/SAIttTest.csv");
 		 outTxtFile << "itt,bestHErr,CurrHErr,bestDErr,CurrDErr,bestEpsErr,CurrEpsErr" << endl;*/
 		
-		RSGISVectors vectorUtils;
-		RSGISMatrices matrixUtils;
+		rsgis::math::RSGISVectors vectorUtils;
+		rsgis::math::RSGISMatrices matrixUtils;
 		
 		unsigned int numItt = 0;
 		double temp = startTemp;
@@ -1554,8 +1554,8 @@ namespace rsgis {namespace radar{
 		currentParError[nPar] = 99999;
 		bestParError[nPar] = 99999;
 		
-		RSGISFunction3Var3DataPreconditionedLeastSquares *leastSquares;
-		leastSquares = new RSGISFunction3Var3DataPreconditionedLeastSquares(this->functionHH, this->functionHV, this->functionVV, gsl_vector_get(inData, 0), gsl_vector_get(inData, 1), gsl_vector_get(inData, 2), gsl_vector_get(this->aPrioriPar, 0), gsl_vector_get(this->aPrioriPar, 1), gsl_vector_get(this->aPrioriPar, 2), this->invCovMatrixP, this->invCovMatrixD);
+		rsgis::math::RSGISFunction3Var3DataPreconditionedLeastSquares *leastSquares;
+		leastSquares = new rsgis::math::RSGISFunction3Var3DataPreconditionedLeastSquares(this->functionHH, this->functionHV, this->functionVV, gsl_vector_get(inData, 0), gsl_vector_get(inData, 1), gsl_vector_get(inData, 2), gsl_vector_get(this->aPrioriPar, 0), gsl_vector_get(this->aPrioriPar, 1), gsl_vector_get(this->aPrioriPar, 2), this->invCovMatrixP, this->invCovMatrixD);
 		
 		/* Set maximum number of temperature runs
 		 Divide by runsStep * runsTemp * nPar so temperature will be reduced in maximum number of itterations
@@ -1796,10 +1796,10 @@ namespace rsgis {namespace radar{
 	}
 	
 	RSGISEstimationSimulatedAnnealing3Var4DataWithAP::RSGISEstimationSimulatedAnnealing3Var4DataWithAP(
-																									   RSGISMathThreeVariableFunction *function1, 
-																									   RSGISMathThreeVariableFunction *function2, 
-																									   RSGISMathThreeVariableFunction *function3, 
-																									   RSGISMathThreeVariableFunction *function4, 
+																									   rsgis::math::RSGISMathThreeVariableFunction *function1, 
+																									   rsgis::math::RSGISMathThreeVariableFunction *function2, 
+																									   rsgis::math::RSGISMathThreeVariableFunction *function3, 
+																									   rsgis::math::RSGISMathThreeVariableFunction *function4, 
 																									   double *minMaxIntervalA,
 																									   double *minMaxIntervalB,
 																									   double *minMaxIntervalC,
@@ -1885,8 +1885,8 @@ namespace rsgis {namespace radar{
 		 outTxtFile.open("/Users/danclewley/Documents/Research/PhD/Inversion/AIRSAR/PBX/WithDielectric/SensitivityAnalysis/SAConvTests/SAPath.csv");
 		 outTxtFile << "itt,height,dens,dielectric,lSq" << endl;*/
 		
-		RSGISVectors vectorUtils;
-		RSGISMatrices matrixUtils;
+		rsgis::math::RSGISVectors vectorUtils;
+		rsgis::math::RSGISMatrices matrixUtils;
 		
 		unsigned int numItt = 0;
 		double temp = startTemp;
@@ -1929,8 +1929,8 @@ namespace rsgis {namespace radar{
 		currentParError[nPar] = 99999;
 		bestParError[nPar] = 99999;
 		
-		RSGISFunction3Var4DataPreconditionedLeastSquares *leastSquares;
-		leastSquares = new RSGISFunction3Var4DataPreconditionedLeastSquares(this->function1, this->function2, this->function3, this->function4, gsl_vector_get(inData, 0), gsl_vector_get(inData, 1), gsl_vector_get(inData, 2), gsl_vector_get(inData, 3), gsl_vector_get(this->aPrioriPar, 0), gsl_vector_get(this->aPrioriPar, 1), gsl_vector_get(this->aPrioriPar, 2), this->invCovMatrixP, this->invCovMatrixD);
+		rsgis::math::RSGISFunction3Var4DataPreconditionedLeastSquares *leastSquares;
+		leastSquares = new rsgis::math::RSGISFunction3Var4DataPreconditionedLeastSquares(this->function1, this->function2, this->function3, this->function4, gsl_vector_get(inData, 0), gsl_vector_get(inData, 1), gsl_vector_get(inData, 2), gsl_vector_get(inData, 3), gsl_vector_get(this->aPrioriPar, 0), gsl_vector_get(this->aPrioriPar, 1), gsl_vector_get(this->aPrioriPar, 2), this->invCovMatrixP, this->invCovMatrixD);
 		
 		/*for(double height = minMaxIntervalA[0]; height < minMaxIntervalA[1]; height = height + minMaxIntervalA[2])
 		 {
@@ -2202,7 +2202,7 @@ namespace rsgis {namespace radar{
 		gsl_matrix_free(invCovMatrixP);
 	}
     
-    RSGISEstimationSimulatedAnnealingWithAP::RSGISEstimationSimulatedAnnealingWithAP(vector <RSGISMathNVariableFunction*> *allFunctions,
+    RSGISEstimationSimulatedAnnealingWithAP::RSGISEstimationSimulatedAnnealingWithAP(vector <rsgis::math::RSGISMathNVariableFunction*> *allFunctions,
                                                                            double **minMaxIntervalAll,
                                                                            double minEnergy,
                                                                            double startTemp,
@@ -2293,8 +2293,8 @@ namespace rsgis {namespace radar{
          outTxtFile.open("/Users/danclewley/Documents/Research/USC/Inversion/AIRSAR/CP/SensitivityAnalysis/SAConvTests/SAIttTest.csv");
          outTxtFile << "itt,bestHErr,CurrHErr,bestDErr,CurrDErr,bestEpsErr,CurrEpsErr" << endl;*/
         
-        RSGISVectors vectorUtils;
-        RSGISMatrices matrixUtils;
+        rsgis::math::RSGISVectors vectorUtils;
+        rsgis::math::RSGISMatrices matrixUtils;
         
         unsigned int numItt = 0;
         double temp = startTemp;
@@ -2513,8 +2513,8 @@ namespace rsgis {namespace radar{
         
         /** L(X) = 1/2 { || f(X) - d0 || ^2 + || X - Xap || ^2 } */
         
-        RSGISMatrices matrixUtils;
-        RSGISVectors vectorUtils;
+        rsgis::math::RSGISMatrices matrixUtils;
+        rsgis::math::RSGISVectors vectorUtils;
         
         double dataDiff = 0;
         double valueDiff = 0;

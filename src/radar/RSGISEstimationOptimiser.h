@@ -26,9 +26,6 @@
 
 namespace rsgis {namespace radar{
     
-    using namespace std;
-    using namespace rsgis::math;
-    
 	enum estOptimizerType
 	{
 		conjugateGradient,

@@ -24,7 +24,7 @@
 
 namespace rsgis {namespace radar{
 	
-	RSGISEstimationExhaustiveSearch2Var2Data::RSGISEstimationExhaustiveSearch2Var2Data(RSGISMathTwoVariableFunction *functionHH, RSGISMathTwoVariableFunction *functionHV, double *minMaxIntervalA, double *minMaxIntervalB)
+	RSGISEstimationExhaustiveSearch2Var2Data::RSGISEstimationExhaustiveSearch2Var2Data(rsgis::math::RSGISMathTwoVariableFunction *functionHH, rsgis::math::RSGISMathTwoVariableFunction *functionHV, double *minMaxIntervalA, double *minMaxIntervalB)
 	{
 		this->functionHH = functionHH;
 		this->functionHV = functionHV;
@@ -33,8 +33,8 @@ namespace rsgis {namespace radar{
 	}
 	int RSGISEstimationExhaustiveSearch2Var2Data::minimise(gsl_vector *inData, gsl_vector *initialPar, gsl_vector *outParError)
 	{		
-		RSGISVectors vectorUtils;
-		RSGISMatrices matrixUtils;
+		rsgis::math::RSGISVectors vectorUtils;
+		rsgis::math::RSGISMatrices matrixUtils;
 		
 		unsigned int nPar = 2;
 		
@@ -45,11 +45,11 @@ namespace rsgis {namespace radar{
 		bestParError[nPar] = +numeric_limits<double>::infinity();//+INFINITY;
 		currentError = +numeric_limits<double>::infinity();//+INFINITY;
 		
-		RSGISFunction2Var2DataLeastSquares *leastSquares;
-		//cout << "*********************************************************" << endl;
-		//cout << "HH = " <<  gsl_vector_get(inData, 0) << " HV = " <<  gsl_vector_get(inData, 1) << endl;
+		rsgis::math::RSGISMathTwoVariableFunction *leastSquares;
+		//std::cout << "*********************************************************" << std::endl;
+		//std::cout << "HH = " <<  gsl_vector_get(inData, 0) << " HV = " <<  gsl_vector_get(inData, 1) << std::endl;
 		
-		leastSquares = new RSGISFunction2Var2DataLeastSquares(functionHH, functionHV, gsl_vector_get(inData, 0), gsl_vector_get(inData, 1)); 
+		leastSquares = new rsgis::math::RSGISFunction2Var2DataLeastSquares(functionHH, functionHV, gsl_vector_get(inData, 0), gsl_vector_get(inData, 1)); 
 		
 		double h = minMaxIntervalA[0];
 		while (h < minMaxIntervalA[1]) 
@@ -58,8 +58,8 @@ namespace rsgis {namespace radar{
 			while(d < minMaxIntervalB[1]) 
 			{
 				currentError =  leastSquares->calcFunction(h, d);
-				//cout << "Predict HH " << functionHH->calcFunction(h, d) << " Predict HV " << functionHV->calcFunction(h, d) << endl;
-				//cout << "current Error = " << currentError << endl;
+				//std::cout << "Predict HH " << functionHH->calcFunction(h, d) << " Predict HV " << functionHV->calcFunction(h, d) << std::endl;
+				//std::cout << "current Error = " << currentError << std::endl;
 				if (currentError < bestParError[2])
 				{
 					bestParError[0] = h;
@@ -76,7 +76,7 @@ namespace rsgis {namespace radar{
 			gsl_vector_set(outParError, j, bestParError[j]);
 		}
 			
-		//cout << "*********************************************************" << endl;		
+		//std::cout << "*********************************************************" << std::endl;		
 		
 		// Tidy
 		delete[] bestParError;
@@ -90,7 +90,7 @@ namespace rsgis {namespace radar{
 	{
 	}
 	
-	RSGISEstimationExhaustiveSearch2Var2DataExportPoints::RSGISEstimationExhaustiveSearch2Var2DataExportPoints(RSGISMathTwoVariableFunction *functionHH, RSGISMathTwoVariableFunction *functionHV, double *minMaxIntervalA, double *minMaxIntervalB, string outFilenameBase)
+	RSGISEstimationExhaustiveSearch2Var2DataExportPoints::RSGISEstimationExhaustiveSearch2Var2DataExportPoints(rsgis::math::RSGISMathTwoVariableFunction *functionHH, rsgis::math::RSGISMathTwoVariableFunction *functionHV, double *minMaxIntervalA, double *minMaxIntervalB, string outFilenameBase)
 	{
 		this->functionHH = functionHH;
 		this->functionHV = functionHV;
@@ -101,9 +101,9 @@ namespace rsgis {namespace radar{
 	}
 	int RSGISEstimationExhaustiveSearch2Var2DataExportPoints::minimise(gsl_vector *inData, gsl_vector *initialPar, gsl_vector *outParError)
 	{		
-		RSGISVectors vectorUtils;
-		RSGISMatrices matrixUtils;
-		RSGISMathsUtils mathUtils;
+		rsgis::math::RSGISVectors vectorUtils;
+		rsgis::math::RSGISMatrices matrixUtils;
+		rsgis::math::RSGISMathsUtils mathUtils;
 		
 		// Update number of runs for minimiser
 		this->nMinimiseRuns++;
@@ -125,9 +125,9 @@ namespace rsgis {namespace radar{
 		bestParError[nPar] = +numeric_limits<double>::infinity();//+INFINITY;
 		currentError = +numeric_limits<double>::infinity();//+INFINITY;
 		
-		RSGISFunction2Var2DataLeastSquares *leastSquares;
+		rsgis::math::RSGISMathTwoVariableFunction *leastSquares;
 		
-		leastSquares = new RSGISFunction2Var2DataLeastSquares(functionHH, functionHV, gsl_vector_get(inData, 0), gsl_vector_get(inData, 1)); 
+		leastSquares = new rsgis::math::RSGISFunction2Var2DataLeastSquares(functionHH, functionHV, gsl_vector_get(inData, 0), gsl_vector_get(inData, 1)); 
 		
 		unsigned int i = 0;
 		
@@ -161,7 +161,7 @@ namespace rsgis {namespace radar{
 
 		string filename = this->outFilenameBase + mathUtils.inttostring(nMinimiseRuns);
 		
-		RSGISExportForPlotting::getInstance()->exportSurface(filename, aList, bList, lstSqList, i);
+        rsgis::utils::RSGISExportForPlotting::getInstance()->exportSurface(filename, aList, bList, lstSqList, i);
 		
 		// Tidy
 		delete[] aList;
@@ -178,13 +178,13 @@ namespace rsgis {namespace radar{
 	{
 	}
 
-	RSGISEstimationExhaustiveSearch2Var2DataWithAP::RSGISEstimationExhaustiveSearch2Var2DataWithAP(RSGISMathTwoVariableFunction *functionHH, RSGISMathTwoVariableFunction *functionHV,
+	RSGISEstimationExhaustiveSearch2Var2DataWithAP::RSGISEstimationExhaustiveSearch2Var2DataWithAP(rsgis::math::RSGISMathTwoVariableFunction *functionHH, rsgis::math::RSGISMathTwoVariableFunction *functionHV,
 																								   gsl_matrix *covMatrixP, 
 																								   gsl_matrix *invCovMatrixD,
 																								   gsl_vector *aPrioriPar,
 																								   double *minMaxIntervalA, double *minMaxIntervalB)
 	{
-		RSGISMatrices matrixUtils;
+		rsgis::math::RSGISMatrices matrixUtils;
 		this->functionHH = functionHH;
 		this->functionHV = functionHV;
 		this->minMaxIntervalA = minMaxIntervalA;
@@ -196,12 +196,12 @@ namespace rsgis {namespace radar{
 		this->invCovMatrixP = gsl_matrix_alloc(2,2);
 		matrixUtils.inv2x2GSLMatrix(covMatrixP, this->invCovMatrixP);
 		
-		RSGISVectors vectorUtils;
+		rsgis::math::RSGISVectors vectorUtils;
 	}
 	int RSGISEstimationExhaustiveSearch2Var2DataWithAP::minimise(gsl_vector *inData, gsl_vector *initialPar, gsl_vector *outParError)
 	{		
-		RSGISVectors vectorUtils;
-		RSGISMatrices matrixUtils;
+		rsgis::math::RSGISVectors vectorUtils;
+		rsgis::math::RSGISMatrices matrixUtils;
 		
 		unsigned int nPar = 2;
 		
@@ -212,8 +212,8 @@ namespace rsgis {namespace radar{
 		bestParError[nPar] = +numeric_limits<double>::infinity();//+INFINITY;
 		currentError = +numeric_limits<double>::infinity();//+INFINITY;
 		
-		RSGISFunction2Var2DataPreconditionedLeastSquares *leastSquares;
-		leastSquares = new RSGISFunction2Var2DataPreconditionedLeastSquares(functionHH, functionHV, gsl_vector_get(inData, 0), gsl_vector_get(inData, 1), gsl_vector_get(this->aPrioriPar, 0), gsl_vector_get(this->aPrioriPar, 1), this->invCovMatrixP, this->invCovMatrixD);
+		rsgis::math::RSGISFunction2Var2DataPreconditionedLeastSquares *leastSquares;
+		leastSquares = new rsgis::math::RSGISFunction2Var2DataPreconditionedLeastSquares(functionHH, functionHV, gsl_vector_get(inData, 0), gsl_vector_get(inData, 1), gsl_vector_get(this->aPrioriPar, 0), gsl_vector_get(this->aPrioriPar, 1), this->invCovMatrixP, this->invCovMatrixD);
 		
 		double h = minMaxIntervalA[0];
 		while (h < minMaxIntervalA[1]) 
@@ -223,8 +223,8 @@ namespace rsgis {namespace radar{
 			{
 				currentError =  leastSquares->calcFunction(h, d);
 				
-				//cout << "Predict HH " << functionHH->calcFunction(h, d) << " Predict HV " << functionHV->calcFunction(h, d) << endl;
-				//cout << "current Error = " << currentError << endl;
+				//std::cout << "Predict HH " << functionHH->calcFunction(h, d) << " Predict HV " << functionHV->calcFunction(h, d) << std::endl;
+				//std::cout << "current Error = " << currentError << std::endl;
 				if (currentError < bestParError[2])
 				{
 					bestParError[0] = h;
@@ -241,7 +241,7 @@ namespace rsgis {namespace radar{
 			gsl_vector_set(outParError, j, bestParError[j]);
 		}
 		
-		//cout << "*********************************************************" << endl;		
+		//std::cout << "*********************************************************" << std::endl;		
 		
 		// Tidy
 		delete[] bestParError;
@@ -256,7 +256,7 @@ namespace rsgis {namespace radar{
 		gsl_matrix_free(invCovMatrixP);
 	}
 	
-	RSGISEstimationExhaustiveSearch2Var3Data::RSGISEstimationExhaustiveSearch2Var3Data(RSGISMathTwoVariableFunction *function1, RSGISMathTwoVariableFunction *function2, RSGISMathTwoVariableFunction *function3, double *minMaxIntervalA, double *minMaxIntervalB)
+	RSGISEstimationExhaustiveSearch2Var3Data::RSGISEstimationExhaustiveSearch2Var3Data(rsgis::math::RSGISMathTwoVariableFunction *function1, rsgis::math::RSGISMathTwoVariableFunction *function2, rsgis::math::RSGISMathTwoVariableFunction *function3, double *minMaxIntervalA, double *minMaxIntervalB)
 	{
 		this->function1 = function1;
 		this->function2 = function2;
@@ -266,8 +266,8 @@ namespace rsgis {namespace radar{
 	}
 	int RSGISEstimationExhaustiveSearch2Var3Data::minimise(gsl_vector *inData, gsl_vector *initialPar, gsl_vector *outParError)
 	{		
-		RSGISVectors vectorUtils;
-		RSGISMatrices matrixUtils;
+		rsgis::math::RSGISVectors vectorUtils;
+		rsgis::math::RSGISMatrices matrixUtils;
 		
 		unsigned int nPar = 2;
 		
@@ -278,8 +278,8 @@ namespace rsgis {namespace radar{
 		bestParError[nPar] = +numeric_limits<double>::infinity();//+INFINITY;
 		currentError = +numeric_limits<double>::infinity();//+INFINITY;
 		
-		RSGISFunction2Var3DataLeastSquares *leastSquares;
-		leastSquares = new RSGISFunction2Var3DataLeastSquares(function1, function2, function3, gsl_vector_get(inData, 0), gsl_vector_get(inData, 1), gsl_vector_get(inData, 2)); 
+		rsgis::math::RSGISFunction2Var3DataLeastSquares *leastSquares;
+		leastSquares = new rsgis::math::RSGISFunction2Var3DataLeastSquares(function1, function2, function3, gsl_vector_get(inData, 0), gsl_vector_get(inData, 1), gsl_vector_get(inData, 2)); 
 		
 		double h = minMaxIntervalA[0];
 		while (h < minMaxIntervalA[1]) 
@@ -316,7 +316,7 @@ namespace rsgis {namespace radar{
 	{
 	}
 	
-	RSGISEstimationExhaustiveSearch2Var3DataExportPoints::RSGISEstimationExhaustiveSearch2Var3DataExportPoints(RSGISMathTwoVariableFunction *function1, RSGISMathTwoVariableFunction *function2, RSGISMathTwoVariableFunction *function3, double *minMaxIntervalA, double *minMaxIntervalB, string outFilenameBase)
+	RSGISEstimationExhaustiveSearch2Var3DataExportPoints::RSGISEstimationExhaustiveSearch2Var3DataExportPoints(rsgis::math::RSGISMathTwoVariableFunction *function1, rsgis::math::RSGISMathTwoVariableFunction *function2, rsgis::math::RSGISMathTwoVariableFunction *function3, double *minMaxIntervalA, double *minMaxIntervalB, string outFilenameBase)
 	{
 		this->function1 = function1;
 		this->function2 = function2;
@@ -328,9 +328,9 @@ namespace rsgis {namespace radar{
 	}
 	int RSGISEstimationExhaustiveSearch2Var3DataExportPoints::minimise(gsl_vector *inData, gsl_vector *initialPar, gsl_vector *outParError)
 	{		
-		RSGISVectors vectorUtils;
-		RSGISMatrices matrixUtils;
-		RSGISMathsUtils mathUtils;
+		rsgis::math::RSGISVectors vectorUtils;
+		rsgis::math::RSGISMatrices matrixUtils;
+		rsgis::math::RSGISMathsUtils mathUtils;
 		
 		// Update number of runs for minimiser
 		this->nMinimiseRuns++;
@@ -352,8 +352,8 @@ namespace rsgis {namespace radar{
 		bestParError[nPar] = +numeric_limits<double>::infinity();//+INFINITY;
 		currentError = +numeric_limits<double>::infinity();//+INFINITY;
 		
-		RSGISFunction2Var3DataLeastSquares *leastSquares;
-		leastSquares = new RSGISFunction2Var3DataLeastSquares(function1, function2, function3, gsl_vector_get(inData, 0), gsl_vector_get(inData, 1), gsl_vector_get(inData, 2)); 
+		rsgis::math::RSGISFunction2Var3DataLeastSquares *leastSquares;
+		leastSquares = new rsgis::math::RSGISFunction2Var3DataLeastSquares(function1, function2, function3, gsl_vector_get(inData, 0), gsl_vector_get(inData, 1), gsl_vector_get(inData, 2)); 
 		
 		unsigned int i = 0;
 		
@@ -387,7 +387,7 @@ namespace rsgis {namespace radar{
 		
 		string filename = this->outFilenameBase + mathUtils.inttostring(nMinimiseRuns);
 		
-		RSGISExportForPlotting::getInstance()->exportSurface(filename, aList, bList, lstSqList, i);
+        rsgis::utils::RSGISExportForPlotting::getInstance()->exportSurface(filename, aList, bList, lstSqList, i);
 		
 		// Tidy
 		delete[] aList;
@@ -404,7 +404,7 @@ namespace rsgis {namespace radar{
 	{
 	}
 	
-	RSGISEstimationExhaustiveSearchWithGSLOptimiser2Var2Data::RSGISEstimationExhaustiveSearchWithGSLOptimiser2Var2Data(RSGISMathTwoVariableFunction *functionHH, RSGISMathTwoVariableFunction *functionHV, double *minMaxIntervalA, double *minMaxIntervalB)
+	RSGISEstimationExhaustiveSearchWithGSLOptimiser2Var2Data::RSGISEstimationExhaustiveSearchWithGSLOptimiser2Var2Data(rsgis::math::RSGISMathTwoVariableFunction *functionHH, rsgis::math::RSGISMathTwoVariableFunction *functionHV, double *minMaxIntervalA, double *minMaxIntervalB)
 	{
 		this->functionHH = functionHH;
 		this->functionHV = functionHV;
@@ -413,14 +413,14 @@ namespace rsgis {namespace radar{
 	}
 	int RSGISEstimationExhaustiveSearchWithGSLOptimiser2Var2Data::minimise(gsl_vector *inData, gsl_vector *initialPar, gsl_vector *outParError)
 	{		
-		RSGISVectors vectorUtils;
-		RSGISMatrices matrixUtils;
+		rsgis::math::RSGISVectors vectorUtils;
+		rsgis::math::RSGISMatrices matrixUtils;
 		
 		unsigned int nPar = 2;
 		double leastSquaresThreashold = 500;
 		
-		RSGISFunctionEstimationLeastSquares *leastSquares;
-		leastSquares = new RSGISFunctionEstimationLeastSquares(functionHH, functionHV, gsl_vector_get(inData, 0), gsl_vector_get(inData, 1)); 
+		rsgis::math::RSGISFunctionEstimationLeastSquares *leastSquares;
+		leastSquares = new rsgis::math::RSGISFunctionEstimationLeastSquares(functionHH, functionHV, gsl_vector_get(inData, 0), gsl_vector_get(inData, 1)); 
 		
 		RSGISEstimationGSLOptimiser *optimiser;
 		optimiser = new RSGISEstimationGSLOptimiser();

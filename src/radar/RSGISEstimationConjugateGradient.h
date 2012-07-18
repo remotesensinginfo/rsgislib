@@ -40,9 +40,6 @@
 
 namespace rsgis {namespace radar{
     
-    using namespace std;
-    using namespace rsgis::math;
-    
 	/** There are three classes for conjugate gradient.
 	 * the first 'RSGISEstimationConjugateGradient' is the old implementation for polynomials.
 	 * many parameters are hardcoded.
@@ -155,13 +152,13 @@ namespace rsgis {namespace radar{
 	class RSGISEstimationConjugateGradient2Var2Data : public RSGISEstimationOptimiser
 	{
 		/**
-		 Preconditioned conjugate gradient optimiser, takes two 'RSGISMathTwoVariableFunction' as input.
+		 Preconditioned conjugate gradient optimiser, takes two 'rsgis::math::RSGISMathTwoVariableFunction' as input.
 		 The functions must contain partial derivatives with respect to x and y.
 		 For polynomial functions 'RSGISEstimationConjugateGradient2DPoly2Channel' is quicker
 		 */
 	public:
-		RSGISEstimationConjugateGradient2Var2Data(RSGISMathTwoVariableFunction *functionA, 
-												  RSGISMathTwoVariableFunction *functionB,  
+		RSGISEstimationConjugateGradient2Var2Data(rsgis::math::RSGISMathTwoVariableFunction *functionA, 
+												  rsgis::math::RSGISMathTwoVariableFunction *functionB,  
 												  gsl_vector *aPrioriPar,
 												  gsl_matrix *covMatrixP, 
 												  gsl_matrix *invCovMatrixD, 
@@ -174,8 +171,8 @@ namespace rsgis {namespace radar{
 		virtual void printOptimiser(){cout << "Conjugate gradient - 2 Var 2 Data" << endl;};
 		~RSGISEstimationConjugateGradient2Var2Data();
 	private:
-		RSGISMathTwoVariableFunction *functionA; 
-		RSGISMathTwoVariableFunction *functionB;
+		rsgis::math::RSGISMathTwoVariableFunction *functionA; 
+		rsgis::math::RSGISMathTwoVariableFunction *functionB;
 		gsl_vector *aPrioriPar; // a priori estimates
 		gsl_matrix *covMatrixP; // Covarence matrix for a priori estimates
 		gsl_matrix *covMatrixPScale; // Covarence matrix for a priori estimates
@@ -188,14 +185,14 @@ namespace rsgis {namespace radar{
 	class RSGISEstimationConjugateGradient2Var3Data : public RSGISEstimationOptimiser
 	{
 		/**
-		 Preconditioned conjugate gradient optimiser, takes three 'RSGISMathTwoVariableFunction' as input.
+		 Preconditioned conjugate gradient optimiser, takes three 'rsgis::math::RSGISMathTwoVariableFunction' as input.
 		 The functions must contain partial derivatives with respect to x and y.
 		 For polynomial functions 'RSGISEstimationConjugateGradient2DPoly3Channel' is quicker
 		 */
 	public:
-		RSGISEstimationConjugateGradient2Var3Data(RSGISMathTwoVariableFunction *functionA, 
-												  RSGISMathTwoVariableFunction *functionB,
-												  RSGISMathTwoVariableFunction *functionC,
+		RSGISEstimationConjugateGradient2Var3Data(rsgis::math::RSGISMathTwoVariableFunction *functionA, 
+												  rsgis::math::RSGISMathTwoVariableFunction *functionB,
+												  rsgis::math::RSGISMathTwoVariableFunction *functionC,
 												  gsl_vector *aPrioriPar,
 												  gsl_matrix *covMatrixP, 
 												  gsl_matrix *invCovMatrixD, 
@@ -208,9 +205,9 @@ namespace rsgis {namespace radar{
 		virtual void printOptimiser(){cout << "Conjugate gradient - 2 Var 3 Data" << endl;};
 		~RSGISEstimationConjugateGradient2Var3Data();
 	private:
-		RSGISMathTwoVariableFunction *functionA; 
-		RSGISMathTwoVariableFunction *functionB;
-		RSGISMathTwoVariableFunction *functionC;
+		rsgis::math::RSGISMathTwoVariableFunction *functionA; 
+		rsgis::math::RSGISMathTwoVariableFunction *functionB;
+		rsgis::math::RSGISMathTwoVariableFunction *functionC;
 		gsl_vector *aPrioriPar; // a priori estimates
 		gsl_matrix *covMatrixP; // Covarence matrix for a priori estimates
 		gsl_matrix *covMatrixPScale; // Covarence matrix for a priori estimates
@@ -223,8 +220,8 @@ namespace rsgis {namespace radar{
 	class RSGISEstimationConjugateGradient2Var2DataWithRestarts : public RSGISEstimationOptimiser
 	{
 	public:
-		RSGISEstimationConjugateGradient2Var2DataWithRestarts(RSGISMathTwoVariableFunction *functionA, 
-															  RSGISMathTwoVariableFunction *functionB,
+		RSGISEstimationConjugateGradient2Var2DataWithRestarts(rsgis::math::RSGISMathTwoVariableFunction *functionA, 
+															  rsgis::math::RSGISMathTwoVariableFunction *functionB,
 															  double *minMaxIntervalA,
 															  double *minMaxIntervalB,
 															  gsl_vector *aPrioriPar,
@@ -240,8 +237,8 @@ namespace rsgis {namespace radar{
 		virtual void printOptimiser(){cout << "Conjugate gradient - 2 Var 2 Data, with Restarts" << endl;};
 		~RSGISEstimationConjugateGradient2Var2DataWithRestarts();
 	private:
-		RSGISMathTwoVariableFunction *functionA;
-		RSGISMathTwoVariableFunction *functionB;
+		rsgis::math::RSGISMathTwoVariableFunction *functionA;
+		rsgis::math::RSGISMathTwoVariableFunction *functionB;
 		double *minMaxIntervalA;
 		double *minMaxIntervalB;
 		gsl_vector *aPrioriPar;
@@ -257,9 +254,9 @@ namespace rsgis {namespace radar{
 	class RSGISEstimationConjugateGradient2Var3DataWithRestarts : public RSGISEstimationOptimiser
 	{
 	public:
-		RSGISEstimationConjugateGradient2Var3DataWithRestarts(RSGISMathTwoVariableFunction *functionA, 
-															  RSGISMathTwoVariableFunction *functionB,
-															  RSGISMathTwoVariableFunction *functionC,
+		RSGISEstimationConjugateGradient2Var3DataWithRestarts(rsgis::math::RSGISMathTwoVariableFunction *functionA, 
+															  rsgis::math::RSGISMathTwoVariableFunction *functionB,
+															  rsgis::math::RSGISMathTwoVariableFunction *functionC,
 															  double *minMaxIntervalA,
 															  double *minMaxIntervalB,
 															  gsl_vector *aPrioriPar,
@@ -275,9 +272,9 @@ namespace rsgis {namespace radar{
 		virtual void printOptimiser(){cout << "Conjugate gradient - 2 Var 3 Data, with Restarts" << endl;};
 		~RSGISEstimationConjugateGradient2Var3DataWithRestarts();
 	private:
-		RSGISMathTwoVariableFunction *functionA;
-		RSGISMathTwoVariableFunction *functionB;
-		RSGISMathTwoVariableFunction *functionC;
+		rsgis::math::RSGISMathTwoVariableFunction *functionA;
+		rsgis::math::RSGISMathTwoVariableFunction *functionB;
+		rsgis::math::RSGISMathTwoVariableFunction *functionC;
 		double *minMaxIntervalA;
 		double *minMaxIntervalB;
 		gsl_vector *aPrioriPar;
@@ -369,10 +366,10 @@ namespace rsgis {namespace radar{
 	{
 		// Takes two distrobutions and sampels from them to form the start point for CG.
 	public:
-		RSGISEstimationConjugateGradient2Var2DataDistro(RSGISMathTwoVariableFunction *functionA, 
-													    RSGISMathTwoVariableFunction *functionB,
-													    RSGISProbDistro *distroA,
-													    RSGISProbDistro *distroB,
+		RSGISEstimationConjugateGradient2Var2DataDistro(rsgis::math::RSGISMathTwoVariableFunction *functionA, 
+													    rsgis::math::RSGISMathTwoVariableFunction *functionB,
+													    rsgis::math::RSGISProbDistro *distroA,
+													    rsgis::math::RSGISProbDistro *distroB,
 													    double *minMaxIntervalA,
 													    double *minMaxIntervalB,
 														gsl_vector *aPrioriPar,
@@ -388,10 +385,10 @@ namespace rsgis {namespace radar{
 		virtual void printOptimiser(){cout << "Conjugate gradient - 2 Var 2 Data, with restarts from distrobution" << endl;};
 		~RSGISEstimationConjugateGradient2Var2DataDistro();
 	private:
-		RSGISMathTwoVariableFunction *functionA;
-		RSGISMathTwoVariableFunction *functionB;
-		RSGISProbDistro *distroA;
-		RSGISProbDistro *distroB;
+		rsgis::math::RSGISMathTwoVariableFunction *functionA;
+		rsgis::math::RSGISMathTwoVariableFunction *functionB;
+		rsgis::math::RSGISProbDistro *distroA;
+		rsgis::math::RSGISProbDistro *distroB;
 		double *minMaxIntervalA;
 		double *minMaxIntervalB;
 		gsl_vector *aPrioriPar;

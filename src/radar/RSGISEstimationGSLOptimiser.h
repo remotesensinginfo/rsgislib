@@ -37,9 +37,6 @@
 #include "radar/RSGISEstimationOptimiser.h"
 
 namespace rsgis {namespace radar{
-    
-    using namespace std;
-    using namespace rsgis::math;
 	
 	enum gslOptimizer 
 	{
@@ -60,11 +57,11 @@ namespace rsgis {namespace radar{
 		int minimise(gsl_vector *inData, gsl_vector *initialPar, gsl_vector *outParError);
 		virtual void modifyAPriori(gsl_vector *newAPrioriPar){};
 		virtual estOptimizerType getOptimiserType(){return unknown;}; 
-		virtual void printOptimiser(){cout << "GSL Optimiser" << endl;};
+		virtual void printOptimiser(){std::cout << "GSL Optimiser" << std::endl;};
 		~RSGISEstimationGSLOptimiser();
 	private:
-		RSGISMathTwoVariableFunction *functionHH;
-		RSGISMathTwoVariableFunction *functionHV;
+		rsgis::math::RSGISMathTwoVariableFunction *functionHH;
+		rsgis::math::RSGISMathTwoVariableFunction *functionHV;
 		gsl_vector *inData;
 	};
 	
@@ -75,11 +72,11 @@ namespace rsgis {namespace radar{
 		int minimise(gsl_vector *inData, gsl_vector *initialPar, gsl_vector *outParError);
 		virtual void modifyAPriori(gsl_vector *newAPrioriPar){};
 		virtual estOptimizerType getOptimiserType(){return unknown;}; 
-		virtual void printOptimiser(){cout << "GSL Optimiser - no gradients" << endl;};
+		virtual void printOptimiser(){std::cout << "GSL Optimiser - no gradients" << std::endl;};
 		~RSGISEstimationGSLOptimiserNoGradient();
 	private:
-		RSGISMathTwoVariableFunction *functionHH;
-		RSGISMathTwoVariableFunction *functionHV;
+		rsgis::math::RSGISMathTwoVariableFunction *functionHH;
+		rsgis::math::RSGISMathTwoVariableFunction *functionHV;
 		gsl_vector *inData;
 	};
 	

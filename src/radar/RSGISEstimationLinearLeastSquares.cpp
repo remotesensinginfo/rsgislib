@@ -45,7 +45,7 @@ namespace rsgis {namespace radar{
 	}
 	int RSGISEstimationLinearLeastSquares::minimise(gsl_vector *inData, gsl_vector *initialPar, gsl_vector *outParError)
 	{
-		RSGISLinearFit linFit;
+		rsgis::math::RSGISLinearFit linFit;
 		gsl_vector *x;
 		gsl_vector *b;
 		x = gsl_vector_alloc(initialPar->size);
@@ -99,7 +99,7 @@ namespace rsgis {namespace radar{
 		/* Similar to liniear least squares but attempts to linierize a non-linear equation by taking a prior for
 		   one of the values */
 		
-		RSGISLinearFit linFit;
+		rsgis::math::RSGISLinearFit linFit;
 		gsl_vector *x;
 		gsl_vector *b;
 		x = gsl_vector_alloc(initialPar->size);
@@ -169,7 +169,7 @@ namespace rsgis {namespace radar{
 		/* Similar to liniear least squares but attempts to linierize a non-linear equation by taking a prior for
 		 one of the values */
 		
-		RSGISLinearFit linFit;
+		rsgis::math::RSGISLinearFit linFit;
 		gsl_vector *x;
 		gsl_vector *b;
 		x = gsl_vector_alloc(initialPar->size);

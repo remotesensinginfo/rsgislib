@@ -25,7 +25,7 @@
 
 namespace rsgis{namespace radar{
 	
-	RSGISDefaultSplitBiomassFunction::RSGISDefaultSplitBiomassFunction(double coefAGT, double coefBGT, double coefALT, double coefBLT, double split) : RSGISMathFunction()
+	RSGISDefaultSplitBiomassFunction::RSGISDefaultSplitBiomassFunction(double coefAGT, double coefBGT, double coefALT, double coefBLT, double split) : rsgis::math::RSGISMathFunction()
 	{
 		this->coefAGT = coefAGT;
 		this->coefBGT = coefBGT;
@@ -38,15 +38,15 @@ namespace rsgis{namespace radar{
 		double biomassAbove = pow(10, (coefAGT + (coefBGT * split)));
 		if(int(biomassBelow) != int(biomassAbove))
 		{
-			cout << "The equations produce different estimates for biomass at the split, an average will be used" << endl;
-			cout << "Lower Biomass = " << biomassBelow << ", Upper Biomass = " << biomassAbove << endl;
+			std::cout << "The equations produce different estimates for biomass at the split, an average will be used" << std::endl;
+			std::cout << "Lower Biomass = " << biomassBelow << ", Upper Biomass = " << biomassAbove << std::endl;
 		}
 		this->bioSplit = (biomassBelow + biomassAbove) / 2;
-		cout << "Using split of: " << bioSplit << " Mg/ha" << endl;
+		std::cout << "Using split of: " << bioSplit << " Mg/ha" << std::endl;
 		
 	}
 	
-	double RSGISDefaultSplitBiomassFunction::calcFunction(double value) throw(RSGISMathException)
+	double RSGISDefaultSplitBiomassFunction::calcFunction(double value) throw(rsgis::math::RSGISMathException)
 	{
 		double gamma = 0;
 		if(value <= 0)
@@ -63,7 +63,7 @@ namespace rsgis{namespace radar{
 			gamma = (log10(value) - coefAGT ) / coefBGT;
 		}
 		
-		//cout << "Biomass = " << value << " Backscatter = " << gamma << endl;
+		//std::cout << "Biomass = " << value << " Backscatter = " << gamma << std::endl;
 		return gamma;
 	}
 	

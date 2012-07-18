@@ -33,11 +33,9 @@ namespace rsgis
 {
 	namespace radar
 	{
-        using namespace std;
-        using namespace rsgis::math;
         
 		/// Function for calculating gamma0 for a given value of biomass.
-		class RSGISDefaultSplitBiomassFunction : public RSGISMathFunction
+		class RSGISDefaultSplitBiomassFunction : public rsgis::math::RSGISMathFunction
 			{
 				
 				/*
@@ -61,10 +59,10 @@ namespace rsgis
 				 */ 
 			public:
 				RSGISDefaultSplitBiomassFunction(double coefAGT, double coefBGT, double coefALT, double coefBLT, double split);
-				virtual double calcFunction(double value) throw(RSGISMathException);
-				virtual double dX(double value) throw(RSGISMathException){throw RSGISMathException("Not implemented");};
-				virtual int numCoefficients() throw(RSGISMathException){return 5;};
-				virtual void updateCoefficents(double *newCoefficents) throw(RSGISMathException){throw RSGISMathException("Not implemented");};
+				virtual double calcFunction(double value) throw(rsgis::math::RSGISMathException);
+				virtual double dX(double value) throw(rsgis::math::RSGISMathException){throw rsgis::math::RSGISMathException("Not implemented");};
+				virtual int numCoefficients() throw(rsgis::math::RSGISMathException){return 5;};
+				virtual void updateCoefficents(double *newCoefficents) throw(rsgis::math::RSGISMathException){throw rsgis::math::RSGISMathException("Not implemented");};
 				~RSGISDefaultSplitBiomassFunction();
 			protected:
 				double coefAGT;

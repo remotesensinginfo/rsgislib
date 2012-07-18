@@ -33,9 +33,7 @@
 namespace rsgis
 {
 	namespace radar
-	{
-        using namespace std;
-        
+	{        
 		class RSGISSoilDielectricMixingModel
 			{
 			/**
