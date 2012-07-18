@@ -14382,12 +14382,12 @@ void RSGISExeEstimationAlgorithm::runAlgorithm() throw(RSGISException)
 			GDALAllRegister();
 			OGRRegisterAll();
 			
-			RSGISFileUtils fileUtils;
-			RSGISVectorUtils vecUtils;
-			RSGISImageUtils imgUtils;
+			rsgis::utils::RSGISFileUtils fileUtils;
+            rsgis::vec::RSGISVectorUtils vecUtils;
+			rsgis::img::RSGISImageUtils imgUtils;
 			
-			RSGISProcessVector *processVector = NULL;
-			RSGISProcessOGRFeature *processFeature = NULL;
+			rsgis::vec::RSGISProcessVector *processVector = NULL;
+			rsgis::vec::RSGISProcessOGRFeature *processFeature = NULL;
 			
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputObjPolys);
 			
@@ -14515,7 +14515,7 @@ void RSGISExeEstimationAlgorithm::runAlgorithm() throw(RSGISException)
 					{
 						cout << "NOT IMPLEMENTED YET - PROCEDING WITHOUT OBJECT BASED AP INFORMATION" << endl;
 						processFeature = new RSGISObjectBasedEstimationRasterPolygon(inputImageDS, outputImageDS, inputRasterFeaturesDS, this->initialParClass, this->estSlowOptimiserClass, this->estFastOptimiserClass, this->parameters, this->minMaxValuesClass, this->classField, this->useClass);
-						processVector = new RSGISProcessVector(processFeature);
+						processVector = new rsgis::vec::RSGISProcessVector(processFeature);
 						if (this->createOutSHP) 
 						{
 							processVector->processVectors(inputSHPLayer, outputSHPLayer, this->copyAttributes, true, false);
@@ -14530,7 +14530,7 @@ void RSGISExeEstimationAlgorithm::runAlgorithm() throw(RSGISException)
 					else 
 					{
 						processFeature = new RSGISObjectBasedEstimationRasterPolygon(inputImageDS, outputImageDS, inputRasterFeaturesDS, this->initialParClass, this->estSlowOptimiserClass, this->estFastOptimiserClass, this->parameters, this->minMaxValuesClass, this->classField, this->useClass);
-						processVector = new RSGISProcessVector(processFeature);
+						processVector = new rsgis::vec::RSGISProcessVector(processFeature);
 						if (this->createOutSHP) 
 						{
 							processVector->processVectors(inputSHPLayer, outputSHPLayer, this->copyAttributes, true, false);
@@ -14549,7 +14549,7 @@ void RSGISExeEstimationAlgorithm::runAlgorithm() throw(RSGISException)
 					if (objAP)
 					{
 						processFeature = new RSGISObjectBasedEstimationObjectAP(inputImageDS, outputImageDS, this->initialParClass, this->estSlowOptimiserClass, this->estFastOptimiserClass, this->parameters, this->objAPParField, this->minMaxValuesClass, this->classField, this->useClass);
-						processVector = new RSGISProcessVector(processFeature);
+						processVector = new rsgis::vec::RSGISProcessVector(processFeature);
 						if (this->createOutSHP) 
 						{
 							processVector->processVectors(inputSHPLayer, outputSHPLayer, this->copyAttributes, true, false);
@@ -14564,7 +14564,7 @@ void RSGISExeEstimationAlgorithm::runAlgorithm() throw(RSGISException)
 					else 
 					{
 						processFeature = new RSGISObjectBasedEstimation(inputImageDS, outputImageDS, this->initialParClass, this->estSlowOptimiserClass, this->estFastOptimiserClass, this->parameters, this->minMaxValuesClass, this->classField, this->useClass);
-						processVector = new RSGISProcessVector(processFeature);
+						processVector = new rsgis::vec::RSGISProcessVector(processFeature);
 						if (this->createOutSHP) 
 						{
 							processVector->processVectors(inputSHPLayer, outputSHPLayer, this->copyAttributes, true, false);

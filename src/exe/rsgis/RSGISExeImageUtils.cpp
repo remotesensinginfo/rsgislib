@@ -208,7 +208,7 @@ void RSGISExeImageUtils::retrieveParameters(xercesc::DOMElement *argElement) thr
 		}
 		xercesc::XMLString::release(&outputXMLStr);
 		
-		DOMNodeList *classNodesList = argElement->getElementsByTagName(xercesc::XMLString::transcode("rsgis:colour"));
+		xercesc::DOMNodeList *classNodesList = argElement->getElementsByTagName(xercesc::XMLString::transcode("rsgis:colour"));
 		this->numClasses = classNodesList->getLength();		
 		
 		std::cout << "Found " << this->numClasses << " Classes \n";
@@ -356,7 +356,7 @@ void RSGISExeImageUtils::retrieveParameters(xercesc::DOMElement *argElement) thr
 		}
 		xercesc::XMLString::release(&outputXMLStr);
 		
-		DOMNodeList *classNodesList = argElement->getElementsByTagName(xercesc::XMLString::transcode("rsgis:colour"));
+		xercesc::DOMNodeList *classNodesList = argElement->getElementsByTagName(xercesc::XMLString::transcode("rsgis:colour"));
 		this->numClasses = classNodesList->getLength();		
 		
 		std::cout << "Found " << this->numClasses << " Classes \n";
@@ -646,7 +646,7 @@ void RSGISExeImageUtils::retrieveParameters(xercesc::DOMElement *argElement) thr
 		{
 			xercesc::DOMElement *imageElement = NULL;
 			
-			DOMNodeList *imagesList = argElement->getElementsByTagName(rsgisimageXMLStr);
+			xercesc::DOMNodeList *imagesList = argElement->getElementsByTagName(rsgisimageXMLStr);
 			this->numImages = imagesList->getLength();
 			this->inputImages = new std::string[numImages];
 			
@@ -742,7 +742,7 @@ void RSGISExeImageUtils::retrieveParameters(xercesc::DOMElement *argElement) thr
 		{
 			xercesc::DOMElement *imageElement = NULL;
 			
-			DOMNodeList *imagesList = argElement->getElementsByTagName(rsgisimageXMLStr);
+			xercesc::DOMNodeList *imagesList = argElement->getElementsByTagName(rsgisimageXMLStr);
 			this->numImages = imagesList->getLength();
 			this->inputImages = new std::string[numImages];
 			
@@ -1201,7 +1201,7 @@ void RSGISExeImageUtils::retrieveParameters(xercesc::DOMElement *argElement) thr
 		{
 			xercesc::DOMElement *imageElement = NULL;
 			
-			DOMNodeList *imagesList = argElement->getElementsByTagName(rsgisimageXMLStr);
+			xercesc::DOMNodeList *imagesList = argElement->getElementsByTagName(rsgisimageXMLStr);
 			this->numImages = imagesList->getLength();
 			this->inputImages = new std::string[numImages];
 			
@@ -3086,8 +3086,8 @@ void RSGISExeImageUtils::runAlgorithm() throw(rsgis::RSGISException)
                         throw RSGISException("No input files were found.");
                     }
                     
-                    sortedTIFs = new SortedGenericList<rsgis::utils::RSGISDefiniensWorkspaceFileName>(numTIFs, numTIFs/2);
-                    sortedCSVs = new SortedGenericList<rsgis::utils::RSGISDefiniensWorkspaceFileName>(numCSVs, numCSVs/2);
+                    sortedTIFs = new rsgis::datastruct::SortedGenericList<rsgis::utils::RSGISDefiniensWorkspaceFileName>(numTIFs, numTIFs/2);
+                    sortedCSVs = new rsgis::datastruct::SortedGenericList<rsgis::utils::RSGISDefiniensWorkspaceFileName>(numCSVs, numCSVs/2);
                     
                     for(int i = 0; i < numTIFs; i++)
                     {

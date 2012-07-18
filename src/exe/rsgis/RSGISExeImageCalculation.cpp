@@ -1105,7 +1105,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 	{		
 		this->option = RSGISExeImageCalculation::apply2VarFunction;
 		
-		RSGISMatrices matrixUtils;
+		rsgis::math::RSGISMatrices matrixUtils;
 		
 		XMLCh *imageXMLStr = xercesc::XMLString::transcode("input");
 		if(argElement->hasAttribute(imageXMLStr))
@@ -1155,7 +1155,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 			}
 			xercesc::XMLString::release(&coefficients);
 			
-			this->twoVarFunction = (RSGISMathTwoVariableFunction *) new RSGISFunction2DPoly(coeffMatrix);
+			this->twoVarFunction = (rsgis::math::RSGISMathTwoVariableFunction *) new rsgis::math::RSGISFunction2DPoly(coeffMatrix);
 		}
 		else 
 		{
@@ -1168,7 +1168,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 	{		
 		this->option = RSGISExeImageCalculation::apply3VarFunction;
 		
-		RSGISMatrices matrixUtils;
+		rsgis::math::RSGISMatrices matrixUtils;
 		
 		XMLCh *imageXMLStr = xercesc::XMLString::transcode("input");
 		if(argElement->hasAttribute(imageXMLStr))
@@ -1281,7 +1281,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 			}
 			xercesc::XMLString::release(&polyOrderZStr);
 			
-			this->threeVarFunction = (RSGISMathThreeVariableFunction *) new RSGISFunction3DPoly(coeffMatrix, polyOrderX, polyOrderY, polyOrderZ);
+			this->threeVarFunction = (rsgis::math::RSGISMathThreeVariableFunction *) new rsgis::math::RSGISFunction3DPoly(coeffMatrix, polyOrderX, polyOrderY, polyOrderZ);
 		}
 		else 
 		{
@@ -2523,7 +2523,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 			GDALDataset **datasetsA = NULL;
 			GDALDataset **datasetsB = NULL;
 			
-			RSGISMatrices matrixUtils;
+			rsgis::math::RSGISMatrices matrixUtils;
 			
 			rsgis::img::RSGISCalcImageSingle *calcImgSingle = NULL;
 			rsgis::img::RSGISCalcCovariance *calcCovar = NULL;
@@ -2533,9 +2533,9 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 			rsgis::img::RSGISCalcMeanVectorIndividual *calcMean = NULL;
 			rsgis::img::RSGISCalcImageMatrix *calcImgMatrixMean = NULL;
 			
-			Matrix *meanAMatrix = NULL;
-			Matrix *meanBMatrix = NULL;
-			Matrix *covarianceMatrix = NULL;
+			rsgis::math::Matrix *meanAMatrix = NULL;
+			rsgis::math::Matrix *meanBMatrix = NULL;
+			rsgis::math::Matrix *covarianceMatrix = NULL;
 			
 			try
 			{
@@ -2817,7 +2817,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 					totalNumRasterBands += numRasterBands;
 				}	
 				
-				value_type *inVals = new value_type[this->numVars];
+                mu::value_type *inVals = new mu::value_type[this->numVars];
 				for(int i = 0; i < this->numVars; ++i)
 				{
 					inVals[i] = 0;
@@ -2851,7 +2851,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 			{
 				throw e;
 			}
-			catch (ParserError &e) 
+			catch (mu::ParserError &e) 
 			{
 				string message = std::string("ERROR: ") + std::string(e.GetMsg()) + std::string(":\t \'") + std::string(e.GetExpr()) +string("\'");
 				throw rsgis::RSGISException(message);
@@ -3012,7 +3012,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 			{
 				throw e;
 			}
-			catch (ParserError &e) 
+			catch (mu::ParserError &e) 
 			{
 				string message = std::string("ERROR: ") + std::string(e.GetMsg()) + std::string(":\t \'") + std::string(e.GetExpr()) +string("\'");
 				throw rsgis::RSGISException(message);
