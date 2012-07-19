@@ -140,7 +140,7 @@ namespace rsgis{namespace vec{
 					throw rsgis::img:: RSGISImageCalcException("The band attributes do not match the image.");
 				}
 				// Calculates the minimum of the two input image bands
-				if(!std::isnan(attributes[i]->bands[j]+1))
+				if(!boost::math::isnan(attributes[i]->bands[j]+1))
                 {
 					if(first)
 					{
@@ -335,7 +335,7 @@ namespace rsgis{namespace vec{
 					throw rsgis::img:: RSGISImageCalcException("The band attributes do not match the image.");
 				}
 				// Calculates the minimum of the two input image bands
-				if(!std::isnan(attributes[i]->bands[j]))
+				if(!boost::math::isnan(attributes[i]->bands[j]))
                 {
 					if(first)
 					{
@@ -433,7 +433,7 @@ namespace rsgis{namespace vec{
 					throw rsgis::img:: RSGISImageCalcException("The band attributes do not match the image.");
 				}
 				// Calculates the minimum of the two input image bands
-				if(!std::isnan(attributes[i]->bands[j]))
+				if(!boost::math::isnan(attributes[i]->bands[j]))
                 {
 					if(first)
 					{
@@ -622,7 +622,7 @@ namespace rsgis{namespace vec{
 					throw rsgis::img:: RSGISImageCalcException("The band attributes do not match the image.");
 				}
 				// Calculates the minimum of the two input image bands
-				if(!std::isnan(attributes[i]->bands[j]))
+				if(!boost::math::isnan(attributes[i]->bands[j]))
                 {
 					if(first)
 					{

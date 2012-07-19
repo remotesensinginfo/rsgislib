@@ -1389,7 +1389,7 @@ namespace rsgis{namespace radar{
 	{
 		for(int i = 0; i < this->numBands; i++) // Loop through bands
 		{
-			if ((std::isnan(bandValuesImage[i]) == false) && (bandValuesImage[i] != 0.0) && (bandValuesImage[i] > -100)) 
+			if ((boost::math::isnan(bandValuesImage[i]) == false) && (bandValuesImage[i] != 0.0) && (bandValuesImage[i] > -100)) 
 			{
 				pixelVals[i]->push_back(bandValuesImage[i]);
 			}
@@ -1400,7 +1400,7 @@ namespace rsgis{namespace radar{
 	{
 		for(int i = 0; i < this->numBands - 1;  i++) // Loop through bands
 		{
-			if ((std::isnan(bandValuesImage[i+1]) == false) && (bandValuesImage[i+1] != 0.0) && (bandValuesImage[i+1] > -100))
+			if ((boost::math::isnan(bandValuesImage[i+1]) == false) && (bandValuesImage[i+1] != 0.0) && (bandValuesImage[i+1] > -100))
 			{
 				pixelVals[i]->push_back(bandValuesImage[i+1]);
 			}

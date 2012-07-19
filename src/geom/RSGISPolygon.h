@@ -26,6 +26,7 @@
 #include <iostream>
 #include <string>
 #include <list>
+#include <math.h>
 
 #include "geom/RSGIS2DPoint.h"
 
@@ -36,6 +37,8 @@
 
 #include "geos/geom/CoordinateSequence.h"
 #include "geos/geom/LineString.h"
+
+#include <boost/math/special_functions/fpclassify.hpp>
 
 namespace rsgis{namespace geom{
 	

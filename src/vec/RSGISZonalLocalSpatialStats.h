@@ -45,6 +45,8 @@
 #include "geos/geom/Envelope.h"
 #include "geos/geom/GeometryFactory.h"
 
+#include <boost/math/special_functions/fpclassify.hpp>
+
 namespace rsgis{namespace vec{
 	
 	class RSGISZonalLSSMeanVar : public RSGISProcessOGRFeature

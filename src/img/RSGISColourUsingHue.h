@@ -32,6 +32,8 @@
 #include "img/RSGISImageBandException.h"
 #include "img/RSGISImageCalcException.h"
 
+#include <boost/math/special_functions/fpclassify.hpp>
+
 namespace rsgis { namespace img {
 	
 	

@@ -452,7 +452,7 @@ namespace rsgis{namespace calib{
             
             //std::cout << "output value = " << outputValue << std::endl << std::endl;
             
-            if(std::isnan(outputValue))
+            if(boost::math::isnan(outputValue))
             {
                 outputValue = sunZenith;
             }
@@ -559,7 +559,7 @@ namespace rsgis{namespace calib{
             
             //std::cout << "output value = " << incidenceAngle << std::endl << std::endl;
             
-            if(std::isnan(outputValue))
+            if(boost::math::isnan(outputValue))
             {
                 outputValue = 0;
             }
@@ -664,7 +664,7 @@ namespace rsgis{namespace calib{
             
             incidenceAngle = acos((pA*rA)+(pB*rB)+(pC*rC)) * radiansToDegrees;
             
-            if(std::isnan(incidenceAngle))
+            if(boost::math::isnan(incidenceAngle))
             {
                 incidenceAngle = sunZenith;
             }
@@ -676,7 +676,7 @@ namespace rsgis{namespace calib{
             
             existanceAngle = acos((pA*rA)+(pB*rB)+(pC*rC)) * radiansToDegrees;
             
-            if(std::isnan(existanceAngle))
+            if(boost::math::isnan(existanceAngle))
             {
                 existanceAngle = 0;
             }            

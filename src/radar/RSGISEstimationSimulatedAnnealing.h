@@ -36,6 +36,8 @@
 #include "math/RSGISProbDistro.h"
 #include "radar/RSGISEstimationOptimiser.h"
 
+#include <boost/math/special_functions/fpclassify.hpp>
+
 namespace rsgis {namespace radar{
     
 	class RSGISEstimationSimulatedAnnealing2Var2Data : public RSGISEstimationOptimiser
