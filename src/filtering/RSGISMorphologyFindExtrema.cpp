@@ -54,7 +54,7 @@ namespace rsgis{namespace filter{
         delete findMinima;
 	}
     
-    void RSGISImageMorphologyFindExtrema::findMinimaAll(GDALDataset **datasets, string outputImage, rsgis::math::Matrix *matrixOperator, RSGISMinimaOutputs outputType, bool allowEquals) throw(rsgis::img::RSGISImageCalcException, rsgis::img::RSGISImageBandException)
+    void RSGISImageMorphologyFindExtrema::findMinimaAll(GDALDataset **datasets, std::string outputImage, rsgis::math::Matrix *matrixOperator, RSGISMinimaOutputs outputType, bool allowEquals) throw(rsgis::img::RSGISImageCalcException, rsgis::img::RSGISImageBandException)
 	{
         if(matrixOperator->n != matrixOperator->m)
         {

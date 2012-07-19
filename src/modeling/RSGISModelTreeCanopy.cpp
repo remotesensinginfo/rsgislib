@@ -33,7 +33,7 @@ namespace rsgis { namespace modeling{
 		// Read in model parameters from input vector
 		if (modelPar->size() !=10)	
 		{
-			cout << "Not enough input parameters! " << endl;
+			std::cout << "Not enough input parameters! " << std::endl;
 		}
 		else 
 		{
@@ -781,7 +781,7 @@ namespace rsgis { namespace modeling{
 		}
 		catch (rsgis::geom::RSGISGeometryException) 
 		{
-			cout << "\tNot Enough Coordinates to create convex hull!" << endl;
+			std::cout << "\tNot Enough Coordinates to create convex hull!" << std::endl;
 		}
 		
 		delete coordinates;

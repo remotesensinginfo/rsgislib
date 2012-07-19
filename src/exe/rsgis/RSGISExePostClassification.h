@@ -123,7 +123,7 @@ class RSGISExePostClassification : public RSGISAlgorithmParameters
 
 		struct EdgeLengthPair
 		{
-			string classname;
+			std::string classname;
 			float lengththreshold;
 		};
 
@@ -132,26 +132,26 @@ class RSGISExePostClassification : public RSGISAlgorithmParameters
 		virtual void retrieveParameters(DOMElement *argElement) throw(RSGISXMLArgumentsException);
 		virtual void runAlgorithm() throw(RSGISException);
 		virtual void printParameters();
-		virtual string getDescription();
-		virtual string getXMLSchema();
+		virtual std::string getDescription();
+		virtual std::string getXMLSchema();
 		virtual void help();
 		~RSGISExePostClassification();
 	protected:
-		void buildClusterDataStructure(vector<RSGISClusterData*> *clusters, RSGISPolygonData **dataClusters, int numClusters, list<RSGIS2DPoint*> *inClusterPolygons, list<RSGIS2DPoint*> *dataOrigPolys) throw(RSGISException);
+		void buildClusterDataStructure(std::vector<RSGISClusterData*> *clusters, RSGISPolygonData **dataClusters, int numClusters, std::list<RSGIS2DPoint*> *inClusterPolygons, std::list<RSGIS2DPoint*> *dataOrigPolys) throw(RSGISException);
 		options option;
-		string inputVector;
-		string inputVectorLarge;
-		string inputVectorSmall;
-		string inputVector_clusters;
-		string inputVector_polys;
-		string inputVector_orig;
-		string outputVector;
-		string outputLargeVector;
-		string outputSmallVector;
-		string classStr;
-		string intValueAtt;
-		string labelsVector;
-		string classAttribute;
+		std::string inputVector;
+		std::string inputVectorLarge;
+		std::string inputVectorSmall;
+		std::string inputVector_clusters;
+		std::string inputVector_polys;
+		std::string inputVector_orig;
+		std::string outputVector;
+		std::string outputLargeVector;
+		std::string outputSmallVector;
+		std::string classStr;
+		std::string intValueAtt;
+		std::string labelsVector;
+		std::string classAttribute;
 		float numStdDevthreshold;
 		bool force;
 		float resolution;
@@ -163,7 +163,7 @@ class RSGISExePostClassification : public RSGISAlgorithmParameters
 		float gamma;
 		float delta;
 		int maxNumIterations;
-		vector<EdgeLengthPair*> *classEdgeLengths;
+		std::vector<EdgeLengthPair*> *classEdgeLengths;
 		polygonizer polygonizertype;
 		clusterer clusterertype;
 

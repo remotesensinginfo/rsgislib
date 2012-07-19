@@ -31,7 +31,7 @@ namespace rsgis { namespace img {
         
     }
     
-    void RSGISRelabelPixelValuesFromLUT::relabelPixelValues(GDALDataset *inData, string outputFile, string matrixLUTFile, string imageFormat)throw(RSGISImageCalcException)
+    void RSGISRelabelPixelValuesFromLUT::relabelPixelValues(GDALDataset *inData, std::string outputFile, std::string matrixLUTFile, std::string imageFormat)throw(RSGISImageCalcException)
     {
         try
         {

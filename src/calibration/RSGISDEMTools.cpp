@@ -107,7 +107,7 @@ namespace rsgis{namespace calib{
         if (dx == 0 && dy == 0)
         {
             /* Flat area */
-            aspect = numeric_limits<double>::signaling_NaN();
+            aspect = std::numeric_limits<double>::signaling_NaN();
         }
         
         if (aspect < 0)
@@ -177,7 +177,7 @@ namespace rsgis{namespace calib{
         if (dxAspect == 0 && dyAspect == 0)
         {
             /* Flat area */
-            aspect = numeric_limits<double>::signaling_NaN();
+            aspect = std::numeric_limits<double>::signaling_NaN();
         }
         
         if (aspect < 0)
@@ -419,7 +419,7 @@ namespace rsgis{namespace calib{
             if (dxAspect == 0 && dyAspect == 0)
             {
                 /* Flat area */
-                aspect = numeric_limits<double>::signaling_NaN();
+                aspect = std::numeric_limits<double>::signaling_NaN();
             }
             
             if (aspect < 0)
@@ -452,7 +452,7 @@ namespace rsgis{namespace calib{
             
             //std::cout << "output value = " << outputValue << std::endl << std::endl;
             
-            if(isnan(outputValue))
+            if(std::isnan(outputValue))
             {
                 outputValue = sunZenith;
             }
@@ -526,7 +526,7 @@ namespace rsgis{namespace calib{
             if (dxAspect == 0 && dyAspect == 0)
             {
                 /* Flat area */
-                aspect = numeric_limits<double>::signaling_NaN();
+                aspect = std::numeric_limits<double>::signaling_NaN();
             }
             
             if (aspect < 0)
@@ -559,7 +559,7 @@ namespace rsgis{namespace calib{
             
             //std::cout << "output value = " << incidenceAngle << std::endl << std::endl;
             
-            if(isnan(outputValue))
+            if(std::isnan(outputValue))
             {
                 outputValue = 0;
             }
@@ -637,7 +637,7 @@ namespace rsgis{namespace calib{
             if (dxAspect == 0 && dyAspect == 0)
             {
                 /* Flat area */
-                aspect = numeric_limits<double>::signaling_NaN();
+                aspect = std::numeric_limits<double>::signaling_NaN();
             }
             
             if (aspect < 0)
@@ -664,7 +664,7 @@ namespace rsgis{namespace calib{
             
             incidenceAngle = acos((pA*rA)+(pB*rB)+(pC*rC)) * radiansToDegrees;
             
-            if(isnan(incidenceAngle))
+            if(std::isnan(incidenceAngle))
             {
                 incidenceAngle = sunZenith;
             }
@@ -676,7 +676,7 @@ namespace rsgis{namespace calib{
             
             existanceAngle = acos((pA*rA)+(pB*rB)+(pC*rC)) * radiansToDegrees;
             
-            if(isnan(existanceAngle))
+            if(std::isnan(existanceAngle))
             {
                 existanceAngle = 0;
             }            

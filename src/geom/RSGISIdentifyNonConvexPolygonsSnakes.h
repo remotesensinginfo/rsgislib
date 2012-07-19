@@ -103,7 +103,7 @@ namespace rsgis{namespace geom{
 	class RSGISSnakeNonConvexLineProjGlobalOptimisationFunction : public rsgis::math::RSGISGlobalOptimisationFunction
 		{
 		public:
-			RSGISSnakeNonConvexLineProjGlobalOptimisationFunction(GDALDataset *image, double alpha, double beta, double gamma, double delta, vector<geos::geom::LineSegment*> *lines);
+			RSGISSnakeNonConvexLineProjGlobalOptimisationFunction(GDALDataset *image, double alpha, double beta, double gamma, double delta, std::vector<geos::geom::LineSegment*> *lines);
 			virtual double calcValue(std::vector<geos::geom::Coordinate*> *coords) throw(rsgis::math::RSGISOptimisationException);
 			virtual ~RSGISSnakeNonConvexLineProjGlobalOptimisationFunction();
 		protected:

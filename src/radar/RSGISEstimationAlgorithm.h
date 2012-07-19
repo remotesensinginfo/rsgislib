@@ -366,10 +366,10 @@ namespace rsgis
 			 */
 		public: 
 			RSGISEstimationAlgorithmDualPolMultiSpeciesClassification(int numOutputBands, 
-																				vector <gsl_vector*> *initialPar,
-																				vector <RSGISEstimationOptimiser*> *estOptimiser, 
+																				std::vector<gsl_vector*> *initialPar,
+																				std::vector<RSGISEstimationOptimiser*> *estOptimiser, 
 																				estParameters parameters,
-																				vector<rsgis::utils::treeSpecies> *species);
+																				std::vector<rsgis::utils::treeSpecies> *species);
 			virtual void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException);
 			virtual void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
 			virtual void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
@@ -379,10 +379,10 @@ namespace rsgis
 			virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};													
 			~RSGISEstimationAlgorithmDualPolMultiSpeciesClassification();
 		protected:
-			vector<gsl_vector*> *initialPar;
+			std::vector<gsl_vector*> *initialPar;
 			estParameters parameters;
-			vector<rsgis::utils::treeSpecies> *species;
-			vector<RSGISEstimationOptimiser*> *estOptimiser;
+			std::vector<rsgis::utils::treeSpecies> *species;
+			std::vector<RSGISEstimationOptimiser*> *estOptimiser;
 		};
 		
 		class RSGISEstimationAlgorithmGenerateSimulatedData2Var2Data : public rsgis::img::RSGISCalcImageValue

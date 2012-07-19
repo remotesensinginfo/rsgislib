@@ -42,8 +42,8 @@ namespace rsgis {namespace radar{
 		double currentError;
 
 		// Set energy;
-		bestParError[nPar] = +numeric_limits<double>::infinity();//+INFINITY;
-		currentError = +numeric_limits<double>::infinity();//+INFINITY;
+		bestParError[nPar] = + std::numeric_limits<double>::infinity();//+INFINITY;
+		currentError = + std::numeric_limits<double>::infinity();//+INFINITY;
 		
 		rsgis::math::RSGISMathTwoVariableFunction *leastSquares;
 		//std::cout << "*********************************************************" << std::endl;
@@ -90,7 +90,7 @@ namespace rsgis {namespace radar{
 	{
 	}
 	
-	RSGISEstimationExhaustiveSearch2Var2DataExportPoints::RSGISEstimationExhaustiveSearch2Var2DataExportPoints(rsgis::math::RSGISMathTwoVariableFunction *functionHH, rsgis::math::RSGISMathTwoVariableFunction *functionHV, double *minMaxIntervalA, double *minMaxIntervalB, string outFilenameBase)
+	RSGISEstimationExhaustiveSearch2Var2DataExportPoints::RSGISEstimationExhaustiveSearch2Var2DataExportPoints(rsgis::math::RSGISMathTwoVariableFunction *functionHH, rsgis::math::RSGISMathTwoVariableFunction *functionHV, double *minMaxIntervalA, double *minMaxIntervalB, std::string outFilenameBase)
 	{
 		this->functionHH = functionHH;
 		this->functionHV = functionHV;
@@ -122,8 +122,8 @@ namespace rsgis {namespace radar{
 		double currentError;
 		
 		// Set energy;
-		bestParError[nPar] = +numeric_limits<double>::infinity();//+INFINITY;
-		currentError = +numeric_limits<double>::infinity();//+INFINITY;
+		bestParError[nPar] = + std::numeric_limits<double>::infinity();//+INFINITY;
+		currentError = + std::numeric_limits<double>::infinity();//+INFINITY;
 		
 		rsgis::math::RSGISMathTwoVariableFunction *leastSquares;
 		
@@ -159,7 +159,7 @@ namespace rsgis {namespace radar{
 			gsl_vector_set(outParError, j, bestParError[j]);
 		}
 
-		string filename = this->outFilenameBase + mathUtils.inttostring(nMinimiseRuns);
+		std::string filename = this->outFilenameBase + mathUtils.inttostring(nMinimiseRuns);
 		
         rsgis::utils::RSGISExportForPlotting::getInstance()->exportSurface(filename, aList, bList, lstSqList, i);
 		
@@ -209,8 +209,8 @@ namespace rsgis {namespace radar{
 		double currentError;
 		
 		// Set energy;
-		bestParError[nPar] = +numeric_limits<double>::infinity();//+INFINITY;
-		currentError = +numeric_limits<double>::infinity();//+INFINITY;
+		bestParError[nPar] = + std::numeric_limits<double>::infinity();//+INFINITY;
+		currentError = + std::numeric_limits<double>::infinity();//+INFINITY;
 		
 		rsgis::math::RSGISFunction2Var2DataPreconditionedLeastSquares *leastSquares;
 		leastSquares = new rsgis::math::RSGISFunction2Var2DataPreconditionedLeastSquares(functionHH, functionHV, gsl_vector_get(inData, 0), gsl_vector_get(inData, 1), gsl_vector_get(this->aPrioriPar, 0), gsl_vector_get(this->aPrioriPar, 1), this->invCovMatrixP, this->invCovMatrixD);
@@ -275,8 +275,8 @@ namespace rsgis {namespace radar{
 		double currentError;
 		
 		// Set energy;
-		bestParError[nPar] = +numeric_limits<double>::infinity();//+INFINITY;
-		currentError = +numeric_limits<double>::infinity();//+INFINITY;
+		bestParError[nPar] = + std::numeric_limits<double>::infinity();//+INFINITY;
+		currentError = + std::numeric_limits<double>::infinity();//+INFINITY;
 		
 		rsgis::math::RSGISFunction2Var3DataLeastSquares *leastSquares;
 		leastSquares = new rsgis::math::RSGISFunction2Var3DataLeastSquares(function1, function2, function3, gsl_vector_get(inData, 0), gsl_vector_get(inData, 1), gsl_vector_get(inData, 2)); 
@@ -316,7 +316,7 @@ namespace rsgis {namespace radar{
 	{
 	}
 	
-	RSGISEstimationExhaustiveSearch2Var3DataExportPoints::RSGISEstimationExhaustiveSearch2Var3DataExportPoints(rsgis::math::RSGISMathTwoVariableFunction *function1, rsgis::math::RSGISMathTwoVariableFunction *function2, rsgis::math::RSGISMathTwoVariableFunction *function3, double *minMaxIntervalA, double *minMaxIntervalB, string outFilenameBase)
+	RSGISEstimationExhaustiveSearch2Var3DataExportPoints::RSGISEstimationExhaustiveSearch2Var3DataExportPoints(rsgis::math::RSGISMathTwoVariableFunction *function1, rsgis::math::RSGISMathTwoVariableFunction *function2, rsgis::math::RSGISMathTwoVariableFunction *function3, double *minMaxIntervalA, double *minMaxIntervalB, std::string outFilenameBase)
 	{
 		this->function1 = function1;
 		this->function2 = function2;
@@ -349,8 +349,8 @@ namespace rsgis {namespace radar{
 		double currentError;
 		
 		// Set energy;
-		bestParError[nPar] = +numeric_limits<double>::infinity();//+INFINITY;
-		currentError = +numeric_limits<double>::infinity();//+INFINITY;
+		bestParError[nPar] = + std::numeric_limits<double>::infinity();//+INFINITY;
+		currentError = + std::numeric_limits<double>::infinity();//+INFINITY;
 		
 		rsgis::math::RSGISFunction2Var3DataLeastSquares *leastSquares;
 		leastSquares = new rsgis::math::RSGISFunction2Var3DataLeastSquares(function1, function2, function3, gsl_vector_get(inData, 0), gsl_vector_get(inData, 1), gsl_vector_get(inData, 2)); 
@@ -385,7 +385,7 @@ namespace rsgis {namespace radar{
 			gsl_vector_set(outParError, j, bestParError[j]);
 		}
 		
-		string filename = this->outFilenameBase + mathUtils.inttostring(nMinimiseRuns);
+		std::string filename = this->outFilenameBase + mathUtils.inttostring(nMinimiseRuns);
 		
         rsgis::utils::RSGISExportForPlotting::getInstance()->exportSurface(filename, aList, bList, lstSqList, i);
 		

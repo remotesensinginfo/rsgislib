@@ -53,15 +53,6 @@
 #include "geos/geom/CoordinateArraySequence.h"
 #include "geos/geom/PrecisionModel.h"
 
-/*
-using namespace std;
-using namespace geos::geom;
-using namespace rsgis::utils;
-using boost::numeric_cast;
-using boost::numeric::bad_numeric_cast;
-using boost::numeric::positive_overflow;
-using boost::numeric::negative_overflow;
-*/
 namespace rsgis 
 {
 	namespace img

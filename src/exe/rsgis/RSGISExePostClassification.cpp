@@ -128,7 +128,7 @@ void RSGISExePostClassification::retrieveParameters(DOMElement *argElement) thro
 			if(argElement->hasAttribute(inputlargeXMLStr))
 			{
 				char *charValue = XMLString::transcode(argElement->getAttribute(inputlargeXMLStr));
-				this->inputVectorLarge = string(charValue);
+				this->inputVectorLarge = std::string(charValue);
 				XMLString::release(&charValue);
 			}
 			else
@@ -141,7 +141,7 @@ void RSGISExePostClassification::retrieveParameters(DOMElement *argElement) thro
 			if(argElement->hasAttribute(inputsmallXMLStr))
 			{
 				char *charValue = XMLString::transcode(argElement->getAttribute(inputsmallXMLStr));
-				this->inputVectorSmall = string(charValue);
+				this->inputVectorSmall = std::string(charValue);
 				XMLString::release(&charValue);
 			}
 			else
@@ -156,7 +156,7 @@ void RSGISExePostClassification::retrieveParameters(DOMElement *argElement) thro
 			if(argElement->hasAttribute(vectorXMLStr))
 			{
 				char *charValue = XMLString::transcode(argElement->getAttribute(vectorXMLStr));
-				this->inputVector_clusters = string(charValue);
+				this->inputVector_clusters = std::string(charValue);
 				XMLString::release(&charValue);
 			}
 			else
@@ -169,7 +169,7 @@ void RSGISExePostClassification::retrieveParameters(DOMElement *argElement) thro
 			if(argElement->hasAttribute(vectorXMLStr))
 			{
 				char *charValue = XMLString::transcode(argElement->getAttribute(vectorXMLStr));
-				this->inputVector_polys = string(charValue);
+				this->inputVector_polys = std::string(charValue);
 				XMLString::release(&charValue);
 			}
 			else
@@ -182,7 +182,7 @@ void RSGISExePostClassification::retrieveParameters(DOMElement *argElement) thro
 			if(argElement->hasAttribute(vectorXMLStr))
 			{
 				char *charValue = XMLString::transcode(argElement->getAttribute(vectorXMLStr));
-				this->inputVector_orig = string(charValue);
+				this->inputVector_orig = std::string(charValue);
 				XMLString::release(&charValue);
 			}
 			else
@@ -197,7 +197,7 @@ void RSGISExePostClassification::retrieveParameters(DOMElement *argElement) thro
 			if(argElement->hasAttribute(vectorXMLStr))
 			{
 				char *charValue = XMLString::transcode(argElement->getAttribute(vectorXMLStr));
-				this->inputVector = string(charValue);
+				this->inputVector = std::string(charValue);
 				XMLString::release(&charValue);
 			}
 			else
@@ -210,7 +210,7 @@ void RSGISExePostClassification::retrieveParameters(DOMElement *argElement) thro
 			if(argElement->hasAttribute(labelsXMLStr))
 			{
 				char *charValue = XMLString::transcode(argElement->getAttribute(labelsXMLStr));
-				this->labelsVector = string(charValue);
+				this->labelsVector = std::string(charValue);
 				XMLString::release(&charValue);
 			}
 			else
@@ -226,7 +226,7 @@ void RSGISExePostClassification::retrieveParameters(DOMElement *argElement) thro
 			if(argElement->hasAttribute(vectorXMLStr))
 			{
 				char *charValue = XMLString::transcode(argElement->getAttribute(vectorXMLStr));
-				this->inputVector = string(charValue);
+				this->inputVector = std::string(charValue);
 				XMLString::release(&charValue);
 			}
 			else
@@ -266,7 +266,7 @@ void RSGISExePostClassification::retrieveParameters(DOMElement *argElement) thro
 			if(argElement->hasAttribute(outputXMLStr))
 			{
 				char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
-				this->outputVector = string(charValue);
+				this->outputVector = std::string(charValue);
 				XMLString::release(&charValue);
 			}
 			else
@@ -292,7 +292,7 @@ void RSGISExePostClassification::retrieveParameters(DOMElement *argElement) thro
 						if(clustererElement->hasAttribute(lengthXMLStr))
 						{
 							char *charValue = XMLString::transcode(clustererElement->getAttribute(lengthXMLStr));
-							this->edgelengththreshold = mathUtils.strtofloat(string(charValue));
+							this->edgelengththreshold = mathUtils.strtofloat(std::string(charValue));
 							XMLString::release(&charValue);
 						}
 						else
@@ -316,7 +316,7 @@ void RSGISExePostClassification::retrieveParameters(DOMElement *argElement) thro
 								if(edgelengthElement->hasAttribute(classnameXMLStr))
 								{
 									char *charValue = XMLString::transcode(edgelengthElement->getAttribute(classnameXMLStr));
-									edgeLengthPair->classname = string(charValue);
+									edgeLengthPair->classname = std::string(charValue);
 									XMLString::release(&charValue);
 								}
 								else
@@ -329,7 +329,7 @@ void RSGISExePostClassification::retrieveParameters(DOMElement *argElement) thro
 								if(edgelengthElement->hasAttribute(lengthXMLStr))
 								{
 									char *charValue = XMLString::transcode(edgelengthElement->getAttribute(lengthXMLStr));
-									edgeLengthPair->lengththreshold = mathUtils.strtofloat(string(charValue));
+									edgeLengthPair->lengththreshold = mathUtils.strtofloat(std::string(charValue));
 									XMLString::release(&charValue);
 								}
 								else
@@ -350,7 +350,7 @@ void RSGISExePostClassification::retrieveParameters(DOMElement *argElement) thro
 						if(clustererElement->hasAttribute(stddevXMLStr))
 						{
 							char *charValue = XMLString::transcode(clustererElement->getAttribute(stddevXMLStr));
-							this->numStdDevthreshold = mathUtils.strtofloat(string(charValue));
+							this->numStdDevthreshold = mathUtils.strtofloat(std::string(charValue));
 							XMLString::release(&charValue);
 						}
 						else
@@ -363,7 +363,7 @@ void RSGISExePostClassification::retrieveParameters(DOMElement *argElement) thro
 						if(clustererElement->hasAttribute(maxedgelengthXMLStr))
 						{
 							char *charValue = XMLString::transcode(clustererElement->getAttribute(maxedgelengthXMLStr));
-							this->maxEdgeLength = mathUtils.strtofloat(string(charValue));
+							this->maxEdgeLength = mathUtils.strtofloat(std::string(charValue));
 							XMLString::release(&charValue);
 						}
 						else
@@ -400,7 +400,7 @@ void RSGISExePostClassification::retrieveParameters(DOMElement *argElement) thro
 				if(argElement->hasAttribute(classXMLStr))
 				{
 					char *charValue = XMLString::transcode(argElement->getAttribute(classXMLStr));
-					this->classStr = string(charValue);
+					this->classStr = std::string(charValue);
 					XMLString::release(&charValue);
 				}
 				else
@@ -431,7 +431,7 @@ void RSGISExePostClassification::retrieveParameters(DOMElement *argElement) thro
 							if(polygonizerElement->hasAttribute(resolutionXMLStr))
 							{
 								char *charValue = XMLString::transcode(polygonizerElement->getAttribute(resolutionXMLStr));
-								this->resolution = mathUtils.strtofloat(string(charValue));
+								this->resolution = mathUtils.strtofloat(std::string(charValue));
 								XMLString::release(&charValue);
 							}
 							else
@@ -469,7 +469,7 @@ void RSGISExePostClassification::retrieveParameters(DOMElement *argElement) thro
 							if(polygonizerElement->hasAttribute(resolutionXMLStr))
 							{
 								char *charValue = XMLString::transcode(polygonizerElement->getAttribute(resolutionXMLStr));
-								this->resolution = mathUtils.strtofloat(string(charValue));
+								this->resolution = mathUtils.strtofloat(std::string(charValue));
 								XMLString::release(&charValue);
 							}
 							else
@@ -482,7 +482,7 @@ void RSGISExePostClassification::retrieveParameters(DOMElement *argElement) thro
 							if(polygonizerElement->hasAttribute(alphaXMLStr))
 							{
 								char *charValue = XMLString::transcode(polygonizerElement->getAttribute(alphaXMLStr));
-								this->alpha = mathUtils.strtofloat(string(charValue));
+								this->alpha = mathUtils.strtofloat(std::string(charValue));
 								XMLString::release(&charValue);
 							}
 							else
@@ -495,7 +495,7 @@ void RSGISExePostClassification::retrieveParameters(DOMElement *argElement) thro
 							if(polygonizerElement->hasAttribute(betaXMLStr))
 							{
 								char *charValue = XMLString::transcode(polygonizerElement->getAttribute(betaXMLStr));
-								this->beta = mathUtils.strtofloat(string(charValue));
+								this->beta = mathUtils.strtofloat(std::string(charValue));
 								XMLString::release(&charValue);
 							}
 							else
@@ -508,7 +508,7 @@ void RSGISExePostClassification::retrieveParameters(DOMElement *argElement) thro
 							if(polygonizerElement->hasAttribute(gammaXMLStr))
 							{
 								char *charValue = XMLString::transcode(polygonizerElement->getAttribute(gammaXMLStr));
-								this->gamma = mathUtils.strtofloat(string(charValue));
+								this->gamma = mathUtils.strtofloat(std::string(charValue));
 								XMLString::release(&charValue);
 							}
 							else
@@ -522,7 +522,7 @@ void RSGISExePostClassification::retrieveParameters(DOMElement *argElement) thro
 							if(polygonizerElement->hasAttribute(deltaXMLStr))
 							{
 								char *charValue = XMLString::transcode(polygonizerElement->getAttribute(deltaXMLStr));
-								this->delta = mathUtils.strtofloat(string(charValue));
+								this->delta = mathUtils.strtofloat(std::string(charValue));
 								XMLString::release(&charValue);
 							}
 							else
@@ -535,7 +535,7 @@ void RSGISExePostClassification::retrieveParameters(DOMElement *argElement) thro
 							if(polygonizerElement->hasAttribute(maxNumIterationsXMLStr))
 							{
 								char *charValue = XMLString::transcode(polygonizerElement->getAttribute(maxNumIterationsXMLStr));
-								this->maxNumIterations = mathUtils.strtoint(string(charValue));
+								this->maxNumIterations = mathUtils.strtoint(std::string(charValue));
 								XMLString::release(&charValue);
 							}
 							else
@@ -575,7 +575,7 @@ void RSGISExePostClassification::retrieveParameters(DOMElement *argElement) thro
 					if(argElement->hasAttribute(classXMLStr))
 					{
 						char *charValue = XMLString::transcode(argElement->getAttribute(classXMLStr));
-						this->classStr = string(charValue);
+						this->classStr = std::string(charValue);
 						XMLString::release(&charValue);
 					}
 					else
@@ -598,7 +598,7 @@ void RSGISExePostClassification::retrieveParameters(DOMElement *argElement) thro
 			if(argElement->hasAttribute(outputLargeXMLStr))
 			{
 				char *charValue = XMLString::transcode(argElement->getAttribute(outputLargeXMLStr));
-				this->outputLargeVector = string(charValue);
+				this->outputLargeVector = std::string(charValue);
 				XMLString::release(&charValue);
 			}
 			else
@@ -611,7 +611,7 @@ void RSGISExePostClassification::retrieveParameters(DOMElement *argElement) thro
 			if(argElement->hasAttribute(outputSmallXMLStr))
 			{
 				char *charValue = XMLString::transcode(argElement->getAttribute(outputSmallXMLStr));
-				this->outputSmallVector = string(charValue);
+				this->outputSmallVector = std::string(charValue);
 				XMLString::release(&charValue);
 			}
 			else
@@ -624,7 +624,7 @@ void RSGISExePostClassification::retrieveParameters(DOMElement *argElement) thro
 			if(argElement->hasAttribute(largethreshold1XMLStr))
 			{
 				char *charValue = XMLString::transcode(argElement->getAttribute(largethreshold1XMLStr));
-				this->largeThreshold1 = mathUtils.strtofloat(string(charValue));
+				this->largeThreshold1 = mathUtils.strtofloat(std::string(charValue));
 				XMLString::release(&charValue);
 			}
 			else
@@ -637,7 +637,7 @@ void RSGISExePostClassification::retrieveParameters(DOMElement *argElement) thro
 			if(argElement->hasAttribute(propPolyArea1XMLStr))
 			{
 				char *charValue = XMLString::transcode(argElement->getAttribute(propPolyArea1XMLStr));
-				this->propPolyArea1 = mathUtils.strtofloat(string(charValue));
+				this->propPolyArea1 = mathUtils.strtofloat(std::string(charValue));
 				XMLString::release(&charValue);
 			}
 			else
@@ -650,7 +650,7 @@ void RSGISExePostClassification::retrieveParameters(DOMElement *argElement) thro
 			if(argElement->hasAttribute(largethreshold2XMLStr))
 			{
 				char *charValue = XMLString::transcode(argElement->getAttribute(largethreshold2XMLStr));
-				this->largeThreshold2 = mathUtils.strtofloat(string(charValue));
+				this->largeThreshold2 = mathUtils.strtofloat(std::string(charValue));
 				XMLString::release(&charValue);
 			}
 			else
@@ -663,7 +663,7 @@ void RSGISExePostClassification::retrieveParameters(DOMElement *argElement) thro
 			if(argElement->hasAttribute(propPolyArea2XMLStr))
 			{
 				char *charValue = XMLString::transcode(argElement->getAttribute(propPolyArea2XMLStr));
-				this->propPolyArea2 = mathUtils.strtofloat(string(charValue));
+				this->propPolyArea2 = mathUtils.strtofloat(std::string(charValue));
 				XMLString::release(&charValue);
 			}
 			else
@@ -680,7 +680,7 @@ void RSGISExePostClassification::retrieveParameters(DOMElement *argElement) thro
 			if(argElement->hasAttribute(outputXMLStr))
 			{
 				char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
-				this->outputVector = string(charValue);
+				this->outputVector = std::string(charValue);
 				XMLString::release(&charValue);
 			}
 			else
@@ -715,7 +715,7 @@ void RSGISExePostClassification::retrieveParameters(DOMElement *argElement) thro
 			if(argElement->hasAttribute(largethresholdXMLStr))
 			{
 				char *charValue = XMLString::transcode(argElement->getAttribute(largethresholdXMLStr));
-				this->largeThreshold = mathUtils.strtofloat(string(charValue));
+				this->largeThreshold = mathUtils.strtofloat(std::string(charValue));
 				XMLString::release(&charValue);
 			}
 			else
@@ -728,7 +728,7 @@ void RSGISExePostClassification::retrieveParameters(DOMElement *argElement) thro
 			if(argElement->hasAttribute(intersectRatioXMLStr))
 			{
 				char *charValue = XMLString::transcode(argElement->getAttribute(intersectRatioXMLStr));
-				this->intersectRatio = mathUtils.strtofloat(string(charValue));
+				this->intersectRatio = mathUtils.strtofloat(std::string(charValue));
 				XMLString::release(&charValue);
 			}
 			else
@@ -745,7 +745,7 @@ void RSGISExePostClassification::retrieveParameters(DOMElement *argElement) thro
 			if(argElement->hasAttribute(outputXMLStr))
 			{
 				char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
-				this->outputVector = string(charValue);
+				this->outputVector = std::string(charValue);
 				XMLString::release(&charValue);
 			}
 			else
@@ -820,7 +820,7 @@ void RSGISExePostClassification::retrieveParameters(DOMElement *argElement) thro
 			if(argElement->hasAttribute(bufferXMLStr))
 			{
 				char *charValue = XMLString::transcode(argElement->getAttribute(bufferXMLStr));
-				this->buffer = mathUtils.strtofloat(string(charValue));
+				this->buffer = mathUtils.strtofloat(std::string(charValue));
 				XMLString::release(&charValue);
 			}
 			else
@@ -837,7 +837,7 @@ void RSGISExePostClassification::retrieveParameters(DOMElement *argElement) thro
 			if(argElement->hasAttribute(outputLargeXMLStr))
 			{
 				char *charValue = XMLString::transcode(argElement->getAttribute(outputLargeXMLStr));
-				this->outputLargeVector = string(charValue);
+				this->outputLargeVector = std::string(charValue);
 				XMLString::release(&charValue);
 			}
 			else
@@ -850,7 +850,7 @@ void RSGISExePostClassification::retrieveParameters(DOMElement *argElement) thro
 			if(argElement->hasAttribute(outputSmallXMLStr))
 			{
 				char *charValue = XMLString::transcode(argElement->getAttribute(outputSmallXMLStr));
-				this->outputSmallVector = string(charValue);
+				this->outputSmallVector = std::string(charValue);
 				XMLString::release(&charValue);
 			}
 			else
@@ -885,7 +885,7 @@ void RSGISExePostClassification::retrieveParameters(DOMElement *argElement) thro
 			if(argElement->hasAttribute(overlapXMLStr))
 			{
 				char *charValue = XMLString::transcode(argElement->getAttribute(overlapXMLStr));
-				this->overlapThreshold = mathUtils.strtofloat(string(charValue));
+				this->overlapThreshold = mathUtils.strtofloat(std::string(charValue));
 				XMLString::release(&charValue);
 			}
 			else
@@ -902,7 +902,7 @@ void RSGISExePostClassification::retrieveParameters(DOMElement *argElement) thro
 			if(argElement->hasAttribute(outputLargeXMLStr))
 			{
 				char *charValue = XMLString::transcode(argElement->getAttribute(outputLargeXMLStr));
-				this->outputLargeVector = string(charValue);
+				this->outputLargeVector = std::string(charValue);
 				XMLString::release(&charValue);
 			}
 			else
@@ -915,7 +915,7 @@ void RSGISExePostClassification::retrieveParameters(DOMElement *argElement) thro
 			if(argElement->hasAttribute(outputSmallXMLStr))
 			{
 				char *charValue = XMLString::transcode(argElement->getAttribute(outputSmallXMLStr));
-				this->outputSmallVector = string(charValue);
+				this->outputSmallVector = std::string(charValue);
 				XMLString::release(&charValue);
 			}
 			else
@@ -950,7 +950,7 @@ void RSGISExePostClassification::retrieveParameters(DOMElement *argElement) thro
 			if(argElement->hasAttribute(overlapXMLStr))
 			{
 				char *charValue = XMLString::transcode(argElement->getAttribute(overlapXMLStr));
-				this->overlapThreshold = mathUtils.strtofloat(string(charValue));
+				this->overlapThreshold = mathUtils.strtofloat(std::string(charValue));
 				XMLString::release(&charValue);
 			}
 			else
@@ -963,7 +963,7 @@ void RSGISExePostClassification::retrieveParameters(DOMElement *argElement) thro
 			if(argElement->hasAttribute(largethresholdXMLStr))
 			{
 				char *charValue = XMLString::transcode(argElement->getAttribute(largethresholdXMLStr));
-				this->largeThreshold = mathUtils.strtofloat(string(charValue));
+				this->largeThreshold = mathUtils.strtofloat(std::string(charValue));
 				XMLString::release(&charValue);
 			}
 			else
@@ -976,7 +976,7 @@ void RSGISExePostClassification::retrieveParameters(DOMElement *argElement) thro
 			if(argElement->hasAttribute(intersectRatioXMLStr))
 			{
 				char *charValue = XMLString::transcode(argElement->getAttribute(intersectRatioXMLStr));
-				this->intersectRatio = mathUtils.strtofloat(string(charValue));
+				this->intersectRatio = mathUtils.strtofloat(std::string(charValue));
 				XMLString::release(&charValue);
 			}
 			else
@@ -993,7 +993,7 @@ void RSGISExePostClassification::retrieveParameters(DOMElement *argElement) thro
 			if(argElement->hasAttribute(outputXMLStr))
 			{
 				char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
-				this->outputVector = string(charValue);
+				this->outputVector = std::string(charValue);
 				XMLString::release(&charValue);
 			}
 			else
@@ -1028,7 +1028,7 @@ void RSGISExePostClassification::retrieveParameters(DOMElement *argElement) thro
 			if(argElement->hasAttribute(maxlengthXMLStr))
 			{
 				char *charValue = XMLString::transcode(argElement->getAttribute(maxlengthXMLStr));
-				this->maxlength = mathUtils.strtofloat(string(charValue));
+				this->maxlength = mathUtils.strtofloat(std::string(charValue));
 				XMLString::release(&charValue);
 			}
 			else
@@ -1053,7 +1053,7 @@ void RSGISExePostClassification::retrieveParameters(DOMElement *argElement) thro
 						if(polygonizerElement->hasAttribute(resolutionXMLStr))
 						{
 							char *charValue = XMLString::transcode(polygonizerElement->getAttribute(resolutionXMLStr));
-							this->resolution = mathUtils.strtofloat(string(charValue));
+							this->resolution = mathUtils.strtofloat(std::string(charValue));
 							XMLString::release(&charValue);
 						}
 						else
@@ -1087,7 +1087,7 @@ void RSGISExePostClassification::retrieveParameters(DOMElement *argElement) thro
 						if(polygonizerElement->hasAttribute(resolutionXMLStr))
 						{
 							char *charValue = XMLString::transcode(polygonizerElement->getAttribute(resolutionXMLStr));
-							this->resolution = mathUtils.strtofloat(string(charValue));
+							this->resolution = mathUtils.strtofloat(std::string(charValue));
 							XMLString::release(&charValue);
 						}
 						else
@@ -1100,7 +1100,7 @@ void RSGISExePostClassification::retrieveParameters(DOMElement *argElement) thro
 						if(polygonizerElement->hasAttribute(alphaXMLStr))
 						{
 							char *charValue = XMLString::transcode(polygonizerElement->getAttribute(alphaXMLStr));
-							this->alpha = mathUtils.strtofloat(string(charValue));
+							this->alpha = mathUtils.strtofloat(std::string(charValue));
 							XMLString::release(&charValue);
 						}
 						else
@@ -1113,7 +1113,7 @@ void RSGISExePostClassification::retrieveParameters(DOMElement *argElement) thro
 						if(polygonizerElement->hasAttribute(betaXMLStr))
 						{
 							char *charValue = XMLString::transcode(polygonizerElement->getAttribute(betaXMLStr));
-							this->beta = mathUtils.strtofloat(string(charValue));
+							this->beta = mathUtils.strtofloat(std::string(charValue));
 							XMLString::release(&charValue);
 						}
 						else
@@ -1126,7 +1126,7 @@ void RSGISExePostClassification::retrieveParameters(DOMElement *argElement) thro
 						if(polygonizerElement->hasAttribute(gammaXMLStr))
 						{
 							char *charValue = XMLString::transcode(polygonizerElement->getAttribute(gammaXMLStr));
-							this->gamma = mathUtils.strtofloat(string(charValue));
+							this->gamma = mathUtils.strtofloat(std::string(charValue));
 							XMLString::release(&charValue);
 						}
 						else
@@ -1140,7 +1140,7 @@ void RSGISExePostClassification::retrieveParameters(DOMElement *argElement) thro
 						if(polygonizerElement->hasAttribute(deltaXMLStr))
 						{
 							char *charValue = XMLString::transcode(polygonizerElement->getAttribute(deltaXMLStr));
-							this->delta = mathUtils.strtofloat(string(charValue));
+							this->delta = mathUtils.strtofloat(std::string(charValue));
 							XMLString::release(&charValue);
 						}
 						else
@@ -1153,7 +1153,7 @@ void RSGISExePostClassification::retrieveParameters(DOMElement *argElement) thro
 						if(polygonizerElement->hasAttribute(maxNumIterationsXMLStr))
 						{
 							char *charValue = XMLString::transcode(polygonizerElement->getAttribute(maxNumIterationsXMLStr));
-							this->maxNumIterations = mathUtils.strtoint(string(charValue));
+							this->maxNumIterations = mathUtils.strtoint(std::string(charValue));
 							XMLString::release(&charValue);
 						}
 						else
@@ -1192,7 +1192,7 @@ void RSGISExePostClassification::retrieveParameters(DOMElement *argElement) thro
 			if(argElement->hasAttribute(outputXMLStr))
 			{
 				char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
-				this->outputVector = string(charValue);
+				this->outputVector = std::string(charValue);
 				XMLString::release(&charValue);
 			}
 			else
@@ -1239,7 +1239,7 @@ void RSGISExePostClassification::retrieveParameters(DOMElement *argElement) thro
 						if(polygonizerElement->hasAttribute(resolutionXMLStr))
 						{
 							char *charValue = XMLString::transcode(polygonizerElement->getAttribute(resolutionXMLStr));
-							this->resolution = mathUtils.strtofloat(string(charValue));
+							this->resolution = mathUtils.strtofloat(std::string(charValue));
 							XMLString::release(&charValue);
 						}
 						else
@@ -1265,7 +1265,7 @@ void RSGISExePostClassification::retrieveParameters(DOMElement *argElement) thro
 						if(polygonizerElement->hasAttribute(resolutionXMLStr))
 						{
 							char *charValue = XMLString::transcode(polygonizerElement->getAttribute(resolutionXMLStr));
-							this->resolution = mathUtils.strtofloat(string(charValue));
+							this->resolution = mathUtils.strtofloat(std::string(charValue));
 							XMLString::release(&charValue);
 						}
 						else
@@ -1278,7 +1278,7 @@ void RSGISExePostClassification::retrieveParameters(DOMElement *argElement) thro
 						if(polygonizerElement->hasAttribute(alphaXMLStr))
 						{
 							char *charValue = XMLString::transcode(polygonizerElement->getAttribute(alphaXMLStr));
-							this->alpha = mathUtils.strtofloat(string(charValue));
+							this->alpha = mathUtils.strtofloat(std::string(charValue));
 							XMLString::release(&charValue);
 						}
 						else
@@ -1291,7 +1291,7 @@ void RSGISExePostClassification::retrieveParameters(DOMElement *argElement) thro
 						if(polygonizerElement->hasAttribute(betaXMLStr))
 						{
 							char *charValue = XMLString::transcode(polygonizerElement->getAttribute(betaXMLStr));
-							this->beta = mathUtils.strtofloat(string(charValue));
+							this->beta = mathUtils.strtofloat(std::string(charValue));
 							XMLString::release(&charValue);
 						}
 						else
@@ -1304,7 +1304,7 @@ void RSGISExePostClassification::retrieveParameters(DOMElement *argElement) thro
 						if(polygonizerElement->hasAttribute(gammaXMLStr))
 						{
 							char *charValue = XMLString::transcode(polygonizerElement->getAttribute(gammaXMLStr));
-							this->gamma = mathUtils.strtofloat(string(charValue));
+							this->gamma = mathUtils.strtofloat(std::string(charValue));
 							XMLString::release(&charValue);
 						}
 						else
@@ -1318,7 +1318,7 @@ void RSGISExePostClassification::retrieveParameters(DOMElement *argElement) thro
 						if(polygonizerElement->hasAttribute(deltaXMLStr))
 						{
 							char *charValue = XMLString::transcode(polygonizerElement->getAttribute(deltaXMLStr));
-							this->delta = mathUtils.strtofloat(string(charValue));
+							this->delta = mathUtils.strtofloat(std::string(charValue));
 							XMLString::release(&charValue);
 						}
 						else
@@ -1331,7 +1331,7 @@ void RSGISExePostClassification::retrieveParameters(DOMElement *argElement) thro
 						if(polygonizerElement->hasAttribute(maxNumIterationsXMLStr))
 						{
 							char *charValue = XMLString::transcode(polygonizerElement->getAttribute(maxNumIterationsXMLStr));
-							this->maxNumIterations = mathUtils.strtoint(string(charValue));
+							this->maxNumIterations = mathUtils.strtoint(std::string(charValue));
 							XMLString::release(&charValue);
 						}
 						else
@@ -1370,7 +1370,7 @@ void RSGISExePostClassification::retrieveParameters(DOMElement *argElement) thro
 			if(argElement->hasAttribute(outputXMLStr))
 			{
 				char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
-				this->outputVector = string(charValue);
+				this->outputVector = std::string(charValue);
 				XMLString::release(&charValue);
 			}
 			else
@@ -1383,7 +1383,7 @@ void RSGISExePostClassification::retrieveParameters(DOMElement *argElement) thro
 			if(argElement->hasAttribute(classXMLStr))
 			{
 				char *charValue = XMLString::transcode(argElement->getAttribute(classXMLStr));
-				this->classStr = string(charValue);
+				this->classStr = std::string(charValue);
 				XMLString::release(&charValue);
 			}
 			else
@@ -1396,7 +1396,7 @@ void RSGISExePostClassification::retrieveParameters(DOMElement *argElement) thro
 			if(argElement->hasAttribute(valueattrXMLStr))
 			{
 				char *charValue = XMLString::transcode(argElement->getAttribute(valueattrXMLStr));
-				this->intValueAtt = string(charValue);
+				this->intValueAtt = std::string(charValue);
 				XMLString::release(&charValue);
 			}
 			else
@@ -1414,7 +1414,7 @@ void RSGISExePostClassification::retrieveParameters(DOMElement *argElement) thro
 			if(argElement->hasAttribute(outputXMLStr))
 			{
 				char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
-				this->outputVector = string(charValue);
+				this->outputVector = std::string(charValue);
 				XMLString::release(&charValue);
 			}
 			else
@@ -1427,7 +1427,7 @@ void RSGISExePostClassification::retrieveParameters(DOMElement *argElement) thro
 			if(argElement->hasAttribute(classXMLStr))
 			{
 				char *charValue = XMLString::transcode(argElement->getAttribute(classXMLStr));
-				this->classAttribute = string(charValue);
+				this->classAttribute = std::string(charValue);
 				XMLString::release(&charValue);
 			}
 			else
@@ -1466,7 +1466,7 @@ void RSGISExePostClassification::retrieveParameters(DOMElement *argElement) thro
 		}
 		else
 		{
-			string message = string("The option (") + string(XMLString::transcode(optionXML)) + string(") is not known: RSGISExePostClassification.");
+			std::string message = std::string("The option (") + std::string(XMLString::transcode(optionXML)) + std::string(") is not known: RSGISExePostClassification.");
 			throw RSGISXMLArgumentsException(message.c_str());
 		}
 	}
@@ -1518,56 +1518,56 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 	{
 		if((option == RSGISExePostClassification::cluster) | (option == RSGISExePostClassification::clusterpolygonize))
 		{
-			cout << "Cluster all polygons.\n";
-			cout << "Input Shapefile = " << this->inputVector << endl;
-			cout << "Output Shapefile = " << this->outputVector << endl;
+			std::cout << "Cluster all polygons.\n";
+			std::cout << "Input Shapefile = " << this->inputVector << std::endl;
+			std::cout << "Output Shapefile = " << this->outputVector << std::endl;
 			
 			if(clusterertype == edgestddev)
 			{
-				cout << "The edge standard deviation cluster will be used\n";
-				cout << "Std Dev Threshold = " << this->numStdDevthreshold << endl;
-				cout << "Maximum Edge Length Threshold = " << this->maxEdgeLength << endl;
+				std::cout << "The edge standard deviation cluster will be used\n";
+				std::cout << "Std Dev Threshold = " << this->numStdDevthreshold << std::endl;
+				std::cout << "Maximum Edge Length Threshold = " << this->maxEdgeLength << std::endl;
 			}
 			else if(clusterertype == edgelength)
 			{
-				cout << "The maximum edge length cluster will be used\n";
-				cout << "Edge length threshold = " << edgelengththreshold << endl;
+				std::cout << "The maximum edge length cluster will be used\n";
+				std::cout << "Edge length threshold = " << edgelengththreshold << std::endl;
 			}
 			if(option == RSGISExePostClassification::clusterpolygonize)
 			{
 				if(polygonizertype == lineproj)
 				{
-					cout << "The line projection polygonizer will be used\n";
-					cout << "Resolution = " << this->resolution << endl;
+					std::cout << "The line projection polygonizer will be used\n";
+					std::cout << "Resolution = " << this->resolution << std::endl;
 				}
 				else if(polygonizertype == delaunay2)
 				{
-					cout << "The delaunay1 polygonizer will be used\n";
+					std::cout << "The delaunay1 polygonizer will be used\n";
 				}
 				else if(polygonizertype == delaunay1)
 				{
-					cout << "The delaunay2 polygonizer will be used\n";
+					std::cout << "The delaunay2 polygonizer will be used\n";
 				}
 				else if(polygonizertype == convexhull)
 				{
-					cout << "The convex hull polygonizer will be used\n";
+					std::cout << "The convex hull polygonizer will be used\n";
 				}
 				else if(polygonizertype == multipoly)
 				{
-					cout << "The multi-polygon polygonizer will be used\n";
+					std::cout << "The multi-polygon polygonizer will be used\n";
 				}
 				else if(polygonizertype == polys)
 				{
-					cout << "The polygons polygonizer will be used\n";
+					std::cout << "The polygons polygonizer will be used\n";
 				}
 				else if(polygonizertype == snakes)
 				{
-					cout << "The snakes polygonizer will be used\n";
-					cout << "Resolution = " << this->resolution << endl;
-					cout << "Alpha = " << this->alpha << endl;
-					cout << "Beta = " << this->beta << endl;
-					cout << "Gamma = " << this->gamma << endl;
-					cout << "Delta = " << this->delta << endl;
+					std::cout << "The snakes polygonizer will be used\n";
+					std::cout << "Resolution = " << this->resolution << std::endl;
+					std::cout << "Alpha = " << this->alpha << std::endl;
+					std::cout << "Beta = " << this->beta << std::endl;
+					std::cout << "Gamma = " << this->gamma << std::endl;
+					std::cout << "Delta = " << this->delta << std::endl;
 				}
 			}
 			
@@ -1577,7 +1577,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 			RSGISVectorUtils vecUtils;
 			RSGISGeometry geomUtils;
 			
-			string SHPFileInLayer = vecUtils.getLayerName(inputVector);
+			std::string SHPFileInLayer = vecUtils.getLayerName(inputVector);
 			
 			OGRDataSource *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
@@ -1588,7 +1588,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 			
 			std::vector<RSGIS2DPoint*> *data = new std::vector<RSGIS2DPoint*>();
 			RSGISSpatialClustererInterface *clusterer = NULL;
-			cout.precision(7);
+			std::cout.precision(7);
 			try
 			{
 				/////////////////////////////////////
@@ -1599,13 +1599,13 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				inputSHPDS = OGRSFDriverRegistrar::Open(inputVector.c_str(), FALSE);
 				if(inputSHPDS == NULL)
 				{
-					string message = string("Could not open vector file ") + inputVector;
+					std::string message = std::string("Could not open vector file ") + inputVector;
 					throw RSGISFileException(message.c_str());
 				}
 				inputSHPLayer = inputSHPDS->GetLayerByName(SHPFileInLayer.c_str());
 				if(inputSHPLayer == NULL)
 				{
-					string message = string("Could not open vector layer ") + SHPFileInLayer;
+					std::string message = std::string("Could not open vector layer ") + SHPFileInLayer;
 					throw RSGISFileException(message.c_str());
 				}
 				spatialRef = inputSHPLayer->GetSpatialRef();	
@@ -1613,7 +1613,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				processFeature = new RSGISPolygonReader(data);
 				processVector = new RSGISProcessVector(processFeature);
 				
-				cout << "Read input Shapefile\n";
+				std::cout << "Read input Shapefile\n";
 				processVector->processVectorsNoOutput(inputSHPLayer, false);
 				
 				delete processVector;
@@ -1656,7 +1656,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				}
 				else if(option == RSGISExePostClassification::clusterpolygonize)
 				{
-					cout << "Calculating Output Polygons\n";
+					std::cout << "Calculating Output Polygons\n";
 					if(polygonizertype == lineproj)
 					{
 						RSGISIdentifyNonConvexPolygonsLineProject *identifyNonConvexLineProj = new RSGISIdentifyNonConvexPolygonsLineProject(resolution);
@@ -1793,27 +1793,27 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 		else if((option == RSGISExePostClassification::clusterclass) | (option == RSGISExePostClassification::clusterclasspolygonize))
 		{
 
-			cout << "Cluster input polygons by class\n";
-			cout << "Input Shapefile = " << this->inputVector << endl;
-			cout << "Output Shapefile = " << this->outputVector << endl;
+			std::cout << "Cluster input polygons by class\n";
+			std::cout << "Input Shapefile = " << this->inputVector << std::endl;
+			std::cout << "Output Shapefile = " << this->outputVector << std::endl;
 			
 			if(clusterertype == edgestddev)
 			{
-				cout << "The edge standard deviation cluster will be used\n";
-				cout << "Std Dev Threshold = " << this->numStdDevthreshold << endl;
-				cout << "Maximum Edge Length Threshold = " << this->maxEdgeLength << endl;
+				std::cout << "The edge standard deviation cluster will be used\n";
+				std::cout << "Std Dev Threshold = " << this->numStdDevthreshold << std::endl;
+				std::cout << "Maximum Edge Length Threshold = " << this->maxEdgeLength << std::endl;
 			}
 			else if(clusterertype == edgelength)
 			{
-				cout << "The maximum edge length cluster will be used\n";
-				cout << "Edge length threshold = " << edgelengththreshold << endl;
+				std::cout << "The maximum edge length cluster will be used\n";
+				std::cout << "Edge length threshold = " << edgelengththreshold << std::endl;
 				if(classEdgeLengths != NULL)
 				{
-					cout << "Per class thresholds: \n";
+					std::cout << "Per class thresholds: \n";
 					std::vector<EdgeLengthPair*>::iterator iterEdgePairs;
 					for(iterEdgePairs = classEdgeLengths->begin(); iterEdgePairs != classEdgeLengths->end(); ++iterEdgePairs)
 					{
-						cout << (*iterEdgePairs)->classname << " = " << (*iterEdgePairs)->lengththreshold << endl;
+						std::cout << (*iterEdgePairs)->classname << " = " << (*iterEdgePairs)->lengththreshold << std::endl;
 					}
 				}
 			}
@@ -1822,37 +1822,37 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				
 				if(polygonizertype == lineproj)
 				{
-					cout << "The line projection polygonizer will be used\n";
-					cout << "Resolution = " << this->resolution << endl;
+					std::cout << "The line projection polygonizer will be used\n";
+					std::cout << "Resolution = " << this->resolution << std::endl;
 				}
 				else if(polygonizertype == delaunay1)
 				{
-					cout << "The delaunay1 polygonizer will be used\n";
+					std::cout << "The delaunay1 polygonizer will be used\n";
 				}
 				else if(polygonizertype == delaunay2)
 				{
-					cout << "The delaunay2 polygonizer will be used\n";
+					std::cout << "The delaunay2 polygonizer will be used\n";
 				}
 				else if(polygonizertype == convexhull)
 				{
-					cout << "The convex hull polygonizer will be used\n";
+					std::cout << "The convex hull polygonizer will be used\n";
 				}
 				else if(polygonizertype == multipoly)
 				{
-					cout << "The multi-polygon polygonizer will be used\n";
+					std::cout << "The multi-polygon polygonizer will be used\n";
 				}
 				else if(polygonizertype == polys)
 				{
-					cout << "The polygons polygonizer will be used\n";
+					std::cout << "The polygons polygonizer will be used\n";
 				}
 				else if(polygonizertype == snakes)
 				{
-					cout << "The snakes polygonizer will be used\n";
-					cout << "Resolution = " << this->resolution << endl;
-					cout << "Alpha = " << this->alpha << endl;
-					cout << "Beta = " << this->beta << endl;
-					cout << "Gamma = " << this->gamma << endl;
-					cout << "Delta = " << this->delta << endl;
+					std::cout << "The snakes polygonizer will be used\n";
+					std::cout << "Resolution = " << this->resolution << std::endl;
+					std::cout << "Alpha = " << this->alpha << std::endl;
+					std::cout << "Beta = " << this->beta << std::endl;
+					std::cout << "Gamma = " << this->gamma << std::endl;
+					std::cout << "Delta = " << this->delta << std::endl;
 				}
 			}
 			
@@ -1862,7 +1862,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 			RSGISVectorUtils vecUtils;
 			RSGISGeometry geomUtils;
 			
-			string SHPFileInLayer = vecUtils.getLayerName(inputVector);
+			std::string SHPFileInLayer = vecUtils.getLayerName(inputVector);
 			
 			OGRDataSource *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
@@ -1873,7 +1873,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 			
 			std::list<RSGIS2DPoint*> *data = new std::list<RSGIS2DPoint*>();
 			RSGISSpatialClustererInterface *clusterer = NULL;
-			cout.precision(7);
+			std::cout.precision(7);
 			try
 			{
 				/////////////////////////////////////
@@ -1884,13 +1884,13 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				inputSHPDS = OGRSFDriverRegistrar::Open(inputVector.c_str(), FALSE);
 				if(inputSHPDS == NULL)
 				{
-					string message = string("Could not open vector file ") + inputVector;
+					std::string message = std::string("Could not open vector file ") + inputVector;
 					throw RSGISFileException(message.c_str());
 				}
 				inputSHPLayer = inputSHPDS->GetLayerByName(SHPFileInLayer.c_str());
 				if(inputSHPLayer == NULL)
 				{
-					string message = string("Could not open vector layer ") + SHPFileInLayer;
+					std::string message = std::string("Could not open vector layer ") + SHPFileInLayer;
 					throw RSGISFileException(message.c_str());
 				}
 				spatialRef = inputSHPLayer->GetSpatialRef();
@@ -1898,7 +1898,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				processFeature = new RSGISClassificationPolygonReader(this->classStr, data);
 				processVector = new RSGISProcessVector(processFeature);
 				
-				cout << "Read input Shapefile\n";
+				std::cout << "Read input Shapefile\n";
 				processVector->processVectorsNoOutput(inputSHPLayer, false);
 				
 				delete processVector;
@@ -1918,9 +1918,9 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				
 				// Sort data by class.
 				bool classesContains = false;
-				std::vector<string> classes;
+				std::vector<std::string> classes;
 				std::list<RSGIS2DPoint*>::iterator iterData;
-				std::vector<string>::iterator iterClasses;
+				std::vector<std::string>::iterator iterClasses;
 				RSGISClassificationPolygon *classPoly;
 				for(iterData = data->begin(); iterData != data->end(); ++iterData)
 				{
@@ -1940,10 +1940,10 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 					}
 				}
 				
-				cout << "There are " << classes.size() << " classes within the input.\n";
+				std::cout << "There are " << classes.size() << " classes within the input.\n";
 				
 				std::vector<RSGIS2DPoint*> **dataPerClass = new std::vector<RSGIS2DPoint*>*[classes.size()];
-				string className = "";
+				std::string className = "";
 				for(unsigned int i = 0; i < classes.size(); ++i)
 				{
 					dataPerClass[i] = new std::vector<RSGIS2DPoint*>();
@@ -1966,7 +1966,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				
 				for(unsigned int i = 0; i < classes.size(); ++i)
 				{					
-					cout << i << ": " << classes.at(i) << " has " << dataPerClass[i]->size() << " nodes." << endl;
+					std::cout << i << ": " << classes.at(i) << " has " << dataPerClass[i]->size() << " nodes." << std::endl;
 				}
 				
 				if(clusterertype == edgestddev)
@@ -2015,13 +2015,13 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 					totalNumClusters += numClusters[i];
 				}
 				
-				cout << "Total Number of Clusters = " << totalNumClusters << endl;
+				std::cout << "Total Number of Clusters = " << totalNumClusters << std::endl;
 				
-				std::vector<string> *textColsNames = new std::vector<string>();
+				std::vector<std::string> *textColsNames = new std::vector<std::string>();
 				textColsNames->push_back("ClustClass");
-				std::vector<string> **textColsData = new std::vector<string>*[1];
-				textColsData[0] = new std::vector<string>();
-				std::vector<string> *numericColsNames = new std::vector<string>();
+				std::vector<std::string> **textColsData = new std::vector<std::string>*[1];
+				textColsData[0] = new std::vector<std::string>();
+				std::vector<std::string> *numericColsNames = new std::vector<std::string>();
 				numericColsNames->push_back("Area");
 				numericColsNames->push_back("PolysArea");
 				numericColsNames->push_back("ProPolysAr");
@@ -2065,7 +2065,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				}
 				else if(option == RSGISExePostClassification::clusterclasspolygonize)
 				{					
-					cout << "Calculating Output Polygons\n";
+					std::cout << "Calculating Output Polygons\n";
 					if(polygonizertype == lineproj)
 					{
 						RSGISIdentifyNonConvexPolygonsLineProject *identifyNonConvexLineProj = new RSGISIdentifyNonConvexPolygonsLineProject(resolution);
@@ -2276,24 +2276,24 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 		}
 		else if(option == RSGISExePostClassification::splitlargesmall)
 		{
-			cout << "Split the input into small and large polygons.\n";
-			cout << "Input Shapefile = " << this->inputVector << endl;
-			cout << "Output Large Shapefile = " << this->outputLargeVector << endl;
-			cout << "Output Small Shapefile = " << this->outputSmallVector << endl;
-			cout << "Area Threshold 1 = " << this->largeThreshold1 << endl;
-			cout << "Proportional Polygon Area Threshold 1 = " << this->propPolyArea1 << endl;
-			cout << "Overlap Threshold = " << this->overlapThreshold << endl;
-			cout << "Area Threshold 2 = " << this->largeThreshold2 << endl;
-			cout << "Proportional Polygon Area Threshold 2 = " << this->propPolyArea2 << endl;
+			std::cout << "Split the input into small and large polygons.\n";
+			std::cout << "Input Shapefile = " << this->inputVector << std::endl;
+			std::cout << "Output Large Shapefile = " << this->outputLargeVector << std::endl;
+			std::cout << "Output Small Shapefile = " << this->outputSmallVector << std::endl;
+			std::cout << "Area Threshold 1 = " << this->largeThreshold1 << std::endl;
+			std::cout << "Proportional Polygon Area Threshold 1 = " << this->propPolyArea1 << std::endl;
+			std::cout << "Overlap Threshold = " << this->overlapThreshold << std::endl;
+			std::cout << "Area Threshold 2 = " << this->largeThreshold2 << std::endl;
+			std::cout << "Proportional Polygon Area Threshold 2 = " << this->propPolyArea2 << std::endl;
 			OGRRegisterAll();
 			
 			RSGISFileUtils fileUtils;
 			RSGISVectorUtils vecUtils;
 			RSGISVectorIO vecIO;
 			
-			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
-			string SHPFileOutLayerLarge = vecUtils.getLayerName(this->outputLargeVector);
-			string SHPFileOutLayerSmall = vecUtils.getLayerName(this->outputSmallVector);
+			std::string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
+			std::string SHPFileOutLayerLarge = vecUtils.getLayerName(this->outputLargeVector);
+			std::string SHPFileOutLayerSmall = vecUtils.getLayerName(this->outputSmallVector);
 			
 			OGRDataSource *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
@@ -2305,7 +2305,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 
 			OGRSpatialReference* inputSpatialRef = NULL;
 			
-			string outputDIR = "";
+			std::string outputDIR = "";
 			try
 			{
 				outputDIR = fileUtils.getFileDirectoryPath(this->outputLargeVector);
@@ -2344,13 +2344,13 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				inputSHPDS = OGRSFDriverRegistrar::Open(this->inputVector.c_str(), FALSE);
 				if(inputSHPDS == NULL)
 				{
-					string message = string("Could not open vector file ") + this->inputVector;
+					std::string message = std::string("Could not open vector file ") + this->inputVector;
 					throw RSGISFileException(message.c_str());
 				}
 				inputSHPLayer = inputSHPDS->GetLayerByName(SHPFileInLayer.c_str());
 				if(inputSHPLayer == NULL)
 				{
-					string message = string("Could not open vector layer ") + SHPFileInLayer;
+					std::string message = std::string("Could not open vector layer ") + SHPFileInLayer;
 					throw RSGISFileException(message.c_str());
 				}
 				inputSpatialRef = inputSHPLayer->GetSpatialRef();	
@@ -2374,13 +2374,13 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				outputSHPDSLarge = shpFiledriver->CreateDataSource(this->outputLargeVector.c_str(), NULL);
 				if( outputSHPDSLarge == NULL )
 				{
-					string message = string("Could not create vector file ") + this->outputLargeVector;
+					std::string message = std::string("Could not create vector file ") + this->outputLargeVector;
 					throw RSGISVectorOutputException(message);
 				}
 				outputSHPLayerLarge = outputSHPDSLarge->CreateLayer(SHPFileOutLayerLarge.c_str(), inputSpatialRef, geometryType, NULL );
 				if( outputSHPLayerLarge == NULL )
 				{
-					string message = string("Could not create vector layer ") + SHPFileOutLayerLarge;
+					std::string message = std::string("Could not create vector layer ") + SHPFileOutLayerLarge;
 					throw RSGISVectorOutputException(message.c_str());
 				}
 				
@@ -2392,13 +2392,13 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				outputSHPDSSmall = shpFiledriver->CreateDataSource(this->outputSmallVector.c_str(), NULL);
 				if( outputSHPDSSmall == NULL )
 				{
-					string message = string("Could not create vector file ") + this->outputSmallVector;
+					std::string message = std::string("Could not create vector file ") + this->outputSmallVector;
 					throw RSGISVectorOutputException(message.c_str());
 				}
 				outputSHPLayerSmall = outputSHPDSSmall->CreateLayer(SHPFileOutLayerSmall.c_str(), inputSpatialRef, geometryType, NULL );
 				if( outputSHPLayerSmall == NULL )
 				{
-					string message = string("Could not create vector layer ") + SHPFileOutLayerSmall;
+					std::string message = std::string("Could not create vector layer ") + SHPFileOutLayerSmall;
 					throw RSGISVectorOutputException(message.c_str());
 				}
 				
@@ -2461,7 +2461,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 							overlap = 1;
 						}
 						
-						//cout << "Overlap = " << overlap << endl;
+						//std::cout << "Overlap = " << overlap << std::endl;
 						if(overlap < overlapThreshold)
 						{
 							largePolysData->push_back(tmpPoly);
@@ -2487,10 +2487,10 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 					totalAreaProp += tmpPoly->getProTotalAr();
 				}
 				
-				cout << "Large Polygons account for " << totalAreaProp*100 << " % of the total area in the scene\n";
+				std::cout << "Large Polygons account for " << totalAreaProp*100 << " % of the total area in the scene\n";
 				
-				cout << "There are " << largePolysData->size() << " large polygons\n";
-				cout << "There are " << smallPolysData->size() << " small polygons\n";
+				std::cout << "There are " << largePolysData->size() << " large polygons\n";
+				std::cout << "There are " << smallPolysData->size() << " small polygons\n";
 				
 				if(largePolysData->size() > 0)
 				{
@@ -2525,11 +2525,11 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 		}
 		else if(option == RSGISExePostClassification::mergelargepolygons)
 		{
-			cout << "Merge the large polygons and remove overlaps\n";
-			cout << "Input Shapefile = " << this->inputVector << endl;
-			cout << "Output Shapefile = " << this->outputVector << endl;
-			cout << "Large Polygon Threshold = " << this->largeThreshold << endl;
-			cout << "Intersect Ratio Threshold = " << this->intersectRatio << endl;
+			std::cout << "Merge the large polygons and remove overlaps\n";
+			std::cout << "Input Shapefile = " << this->inputVector << std::endl;
+			std::cout << "Output Shapefile = " << this->outputVector << std::endl;
+			std::cout << "Large Polygon Threshold = " << this->largeThreshold << std::endl;
+			std::cout << "Intersect Ratio Threshold = " << this->intersectRatio << std::endl;
 			
 			OGRRegisterAll();
 			
@@ -2537,15 +2537,15 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 			RSGISVectorUtils vecUtils;
 			RSGISVectorIO vecIO;
 			
-			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
-			string SHPFileOutLayer = vecUtils.getLayerName(this->outputVector);
+			std::string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
+			std::string SHPFileOutLayer = vecUtils.getLayerName(this->outputVector);
 			
 			OGRDataSource *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
 			
 			OGRSpatialReference* inputSpatialRef = NULL;
 			
-			string outputDIR = "";
+			std::string outputDIR = "";
 			try
 			{
 				outputDIR = fileUtils.getFileDirectoryPath(this->outputVector);
@@ -2570,20 +2570,20 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				inputSHPDS = OGRSFDriverRegistrar::Open(this->inputVector.c_str(), FALSE);
 				if(inputSHPDS == NULL)
 				{
-					string message = string("Could not open vector file ") + this->inputVector;
+					std::string message = std::string("Could not open vector file ") + this->inputVector;
 					throw RSGISFileException(message.c_str());
 				}
 				inputSHPLayer = inputSHPDS->GetLayerByName(SHPFileInLayer.c_str());
 				if(inputSHPLayer == NULL)
 				{
-					string message = string("Could not open vector layer ") + SHPFileInLayer;
+					std::string message = std::string("Could not open vector layer ") + SHPFileInLayer;
 					throw RSGISFileException(message.c_str());
 				}
 				inputSpatialRef = inputSHPLayer->GetSpatialRef();	
 								
 				int numFeatures = inputSHPLayer->GetFeatureCount(true);
 								
-				cout << "There are " << numFeatures << " large polygons\n";
+				std::cout << "There are " << numFeatures << " large polygons\n";
 								
 				RSGISPolygonData **data = new RSGISPolygonData*[numFeatures];
 				for(int i = 0; i < numFeatures; ++i)
@@ -2661,7 +2661,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 							poly2 = *iterPolys2;
 							if((poly1 != poly2) && (poly1->overlaps(poly2)))
 							{
-								//cout << "Overlap found == TRUE!\n";
+								//std::cout << "Overlap found == TRUE!\n";
 							    overlapFound = true;
 								break;
 							}
@@ -2679,19 +2679,19 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 						
 						if(overlapFound)
 						{
-							//cout << "Overlap found\n";
+							//std::cout << "Overlap found\n";
 							intersect = geomUtils.getIntersection(((geos::geom::Geometry*)poly1), ((geos::geom::Geometry*)poly2));
 							
-							//cout << "Intersect Geom Type = " << intersect->getGeometryType() << endl;
+							//std::cout << "Intersect Geom Type = " << intersect->getGeometryType() << std::endl;
 							
 							intersectArea = intersect->getArea();
 							geom1IntersectRatio = intersectArea/poly1->getArea();
 							geom2IntersectRatio = intersectArea/poly2->getArea();
-							//cout << "geom1IntersectRatio = " << geom1IntersectRatio << endl;
-							//cout << "geom2IntersectRatio = " << geom2IntersectRatio << endl;
+							//std::cout << "geom1IntersectRatio = " << geom1IntersectRatio << std::endl;
+							//std::cout << "geom2IntersectRatio = " << geom2IntersectRatio << std::endl;
 							if((geom1IntersectRatio >= this->intersectRatio) | (geom2IntersectRatio >= this->intersectRatio))
 							{
-								//cout << "Merge poly1 and poly2\n";
+								//std::cout << "Merge poly1 and poly2\n";
 								delete intersect;
 								
 								polyUnion = geomUtils.polygonUnion(poly1, poly2);
@@ -2709,16 +2709,16 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 							}
 							else
 							{
-								//cout << "Resolve intersect\n";
+								//std::cout << "Resolve intersect\n";
 								
 								mergeSmall = false;
 								
 								geom1 = geomUtils.getDifference(poly1, poly2);
 								geom2 = geomUtils.getDifference(poly2, poly1);
 								
-								//cout << "geom1 has " << geom1->getNumGeometries() << " geometries.\n";
-								//cout << "geom2 has " << geom2->getNumGeometries() << " geometries.\n";
-								//cout << "intersect has " << intersect->getNumGeometries() << " geometries.\n";
+								//std::cout << "geom1 has " << geom1->getNumGeometries() << " geometries.\n";
+								//std::cout << "geom2 has " << geom2->getNumGeometries() << " geometries.\n";
+								//std::cout << "intersect has " << intersect->getNumGeometries() << " geometries.\n";
 								
 								geomUtils.retrievePolygons(geom1, tmpPolys1);
 								geomUtils.retrievePolygons(geom2, tmpPolys2);
@@ -2727,9 +2727,9 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 								delete geom2;
 								delete intersect;
 								
-								//cout << "geom1 has " << tmpPolys1->size() << " polygons.\n";
-								//cout << "geom2 has " << tmpPolys2->size() << " polygons.\n";
-								//cout << "intersect has " << tmpPolysIntersect->size() << " polygons.\n";
+								//std::cout << "geom1 has " << tmpPolys1->size() << " polygons.\n";
+								//std::cout << "geom2 has " << tmpPolys2->size() << " polygons.\n";
+								//std::cout << "intersect has " << tmpPolysIntersect->size() << " polygons.\n";
 								
 								largePolys1Count = 0;
 								for(iterPolys = tmpPolys1->begin(); iterPolys != tmpPolys1->end(); )
@@ -2789,17 +2789,17 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 									}
 								}
 								
-								//cout << "geom1 has " << largePolys1Count << " remaining large polygons\n";
-								//cout << "geom2 has " << largePolys2Count << " remaining large polygons\n";
-								//cout << "Intersect has " << largePolysIntersectCount << " remaining large polygons\n";
+								//std::cout << "geom1 has " << largePolys1Count << " remaining large polygons\n";
+								//std::cout << "geom2 has " << largePolys2Count << " remaining large polygons\n";
+								//std::cout << "Intersect has " << largePolysIntersectCount << " remaining large polygons\n";
 								
 								totalLargePolys = largePolys1Count + largePolys2Count;
 								
-								//cout << "total Large Polygons = " << totalLargePolys << endl;
+								//std::cout << "total Large Polygons = " << totalLargePolys << std::endl;
 								
 								if((largePolys1Count >= 1) & (largePolys2Count >= 1))
 								{
-									//cout << "((largePolys1Count >= 1) & (largePolys2Count >= 1))" << endl;
+									//std::cout << "((largePolys1Count >= 1) & (largePolys2Count >= 1))" << std::endl;
 									
 									// GET ALL LARGE POLYGONS AND MERGE ALL SMALL PARTS (difference and intersect).
 									for(iterPolys = tmpPolys1->begin(); iterPolys != tmpPolys1->end(); ++iterPolys)
@@ -2851,7 +2851,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 								}
 								else if(largePolys1Count > 1)
 								{
-									//cout << "(largePolys1Count > 1)" << endl;
+									//std::cout << "(largePolys1Count > 1)" << std::endl;
 									
 									// GET LARGE POLYGONS + ORIGINAL poly2 and merge poly1 difference small bits
 									for(iterPolys = tmpPolys1->begin(); iterPolys != tmpPolys1->end(); ++iterPolys)
@@ -2891,7 +2891,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 								}
 								else if(largePolys2Count > 1)
 								{
-									//cout << "(largePolys2Count > 1)" << endl;
+									//std::cout << "(largePolys2Count > 1)" << std::endl;
 									// Get large polygons + orig poly1 and merge poly2 difference small bits
 									for(iterPolys = tmpPolys2->begin(); iterPolys != tmpPolys2->end(); ++iterPolys)
 									{
@@ -2931,7 +2931,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 								}
 								else if(totalLargePolys <= 1)
 								{
-									//cout << "(totalLargePolys <= 1)" << endl;
+									//std::cout << "(totalLargePolys <= 1)" << std::endl;
 									// MERGE THE TWO POLYGONS
 									polyUnion = geomUtils.polygonUnion(poly1, poly2);
 									polyUnionBuffer = dynamic_cast<geos::geom::Polygon*>(polyUnion->buffer(0));
@@ -2972,7 +2972,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 								}
 								else
 								{
-									//cout << "ELSE\n";
+									//std::cout << "ELSE\n";
 									// GET ALL LARGE POLYGONS AND MERGE ALL SMALL PARTS (difference and intersect).
 									for(iterPolys = tmpPolys1->begin(); iterPolys != tmpPolys1->end(); ++iterPolys)
 									{
@@ -3028,18 +3028,18 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 									vecIO.exportGEOSPolygons2SHP("/Users/pete/Temp/Clustering/polygons/large_polys.shp", force, tmpPolysLarge, inputSpatialRef);
 									vecIO.exportGEOSPolygons2SHP("/Users/pete/Temp/Clustering/polygons/small_polys.shp", force, tmpPolysSmall, inputSpatialRef);
 									
-									cout << "mergeSmall\n";
-									cout << "Number Large Polygons = " << tmpPolysLarge->size() << endl;
-									cout << "Number Small Polygons = " << tmpPolysSmall->size() << endl;
+									std::cout << "mergeSmall\n";
+									std::cout << "Number Large Polygons = " << tmpPolysLarge->size() << std::endl;
+									std::cout << "Number Small Polygons = " << tmpPolysSmall->size() << std::endl;
 									 */
 									change2 = true;
 									while(change2)
 									{
 										change2 = false;
-										//cout << "iterate \n";
+										//std::cout << "iterate \n";
 										for(iterPolysSmall = tmpPolysSmall->begin(); iterPolysSmall != tmpPolysSmall->end(); )
 										{
-											//cout << "iterate2\n";
+											//std::cout << "iterate2\n";
 											polyTmp1 = *iterPolysSmall;
 											
 											relBorder = 0;
@@ -3051,7 +3051,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 											{
 												polyTmp2 = *iterPolys;
 												relBorder = geomUtils.calcRelativeBorder(polyTmp1, polyTmp2);
-												//cout << "Rel Border = " << relBorder << endl;
+												//std::cout << "Rel Border = " << relBorder << std::endl;
 												if(first)
 												{
 													maxRelBorder = relBorder;
@@ -3065,7 +3065,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 												}
 											}
 											
-											//cout << "maxRelBorder = " << maxRelBorder << endl;
+											//std::cout << "maxRelBorder = " << maxRelBorder << std::endl;
 											
 											if(maxRelBorder > 0)
 											{
@@ -3081,7 +3081,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 											}
 											else
 											{
-												//cout << "++iterPolysSmall\n";
+												//std::cout << "++iterPolysSmall\n";
 												++iterPolysSmall;
 											}
 										}
@@ -3096,7 +3096,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 									tmpPolysLarge->erase(iterPolys);
 								}
 								
-								//string filename = string("/Users/pete/Temp/Clustering/polygons/polys_") + mathsUtils.inttostring(count++) + string(".shp");
+								//std::string filename = std::string("/Users/pete/Temp/Clustering/polygons/polys_") + mathsUtils.inttostd::string(count++) + std::string(".shp");
 								//vecIO.exportGEOSPolygons2SHP(filename, force, polys, inputSpatialRef);
 								
 								geom1 = NULL;
@@ -3109,7 +3109,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 						}
 						else if(poly1withinpoly2)
 						{
-							//cout << "Polygon 1 within polygon 2\n";
+							//std::cout << "Polygon 1 within polygon 2\n";
 							polys->erase(remove(polys->begin(), polys->end(), poly1));
 							delete poly1;
 							poly2 = NULL;
@@ -3119,7 +3119,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 						}
 						else if(poly2withinpoly1)
 						{
-							//cout << "Polygon 2 within polygon 1\n";
+							//std::cout << "Polygon 2 within polygon 1\n";
 							polys->erase(remove(polys->begin(), polys->end(), poly2));
 							poly1 = NULL;
 							delete poly2;
@@ -3129,7 +3129,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 						}
 						else
 						{
-							//cout << "No overlap\n";
+							//std::cout << "No overlap\n";
 							++iterPolys1;
 						}
 					}					
@@ -3172,31 +3172,31 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 		}
 		else if(option == RSGISExePostClassification::morphology)
 		{
-			cout << "Undertake morphology on the input polygons\n";
-			cout << "Input Shapefile = " << this->inputVector << endl;
-			cout << "Output Shapefile = " << this->outputVector << endl;
+			std::cout << "Undertake morphology on the input polygons\n";
+			std::cout << "Input Shapefile = " << this->inputVector << std::endl;
+			std::cout << "Output Shapefile = " << this->outputVector << std::endl;
 			if(morphologyType == closing)
 			{
-				cout << "Undertaking a morphological closing\n";
+				std::cout << "Undertaking a morphological closing\n";
 			}
 			else if(morphologyType == opening)
 			{
-				cout << "Undertaking a morphological opening\n";
+				std::cout << "Undertaking a morphological opening\n";
 			}
 			else if(morphologyType == dilation)
 			{
-				cout << "Undertaking a morphological dilation\n";
+				std::cout << "Undertaking a morphological dilation\n";
 			}
 			else if(morphologyType == erosion)
 			{
-				cout << "Undertaking a morphological erosion\n";
+				std::cout << "Undertaking a morphological erosion\n";
 			}
 			else
 			{
-				cout << "ERROR: Unknown morphological operation\n";
+				std::cout << "ERROR: Unknown morphological operation\n";
 			}
 			
-			cout << "Buffer = " << buffer << endl;
+			std::cout << "Buffer = " << buffer << std::endl;
 			
 			OGRRegisterAll();
 			
@@ -3204,8 +3204,8 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 			RSGISVectorUtils vecUtils;
 			RSGISVectorIO vecIO;
 			
-			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
-			string SHPFileOutLayer = vecUtils.getLayerName(this->outputVector);
+			std::string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
+			std::string SHPFileOutLayer = vecUtils.getLayerName(this->outputVector);
 			
 			OGRDataSource *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
@@ -3215,7 +3215,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 			
 			OGRSpatialReference* inputSpatialRef = NULL;
 			
-			string outputDIR = "";
+			std::string outputDIR = "";
 			try
 			{
 				outputDIR = fileUtils.getFileDirectoryPath(this->outputVector);
@@ -3240,13 +3240,13 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				inputSHPDS = OGRSFDriverRegistrar::Open(this->inputVector.c_str(), FALSE);
 				if(inputSHPDS == NULL)
 				{
-					string message = string("Could not open vector file ") + this->inputVector;
+					std::string message = std::string("Could not open vector file ") + this->inputVector;
 					throw RSGISFileException(message.c_str());
 				}
 				inputSHPLayer = inputSHPDS->GetLayerByName(SHPFileInLayer.c_str());
 				if(inputSHPLayer == NULL)
 				{
-					string message = string("Could not open vector layer ") + SHPFileInLayer;
+					std::string message = std::string("Could not open vector layer ") + SHPFileInLayer;
 					throw RSGISFileException(message.c_str());
 				}
 				inputSpatialRef = inputSHPLayer->GetSpatialRef();	
@@ -3270,13 +3270,13 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				outputSHPDS = shpFiledriver->CreateDataSource(this->outputVector.c_str(), NULL);
 				if( outputSHPDS == NULL )
 				{
-					string message = string("Could not create vector file ") + this->outputVector;
+					std::string message = std::string("Could not create vector file ") + this->outputVector;
 					throw RSGISVectorOutputException(message);
 				}
 				outputSHPLayer = outputSHPDS->CreateLayer(SHPFileOutLayer.c_str(), inputSpatialRef, geometryType, NULL );
 				if( outputSHPLayer == NULL )
 				{
-					string message = string("Could not create vector layer ") + SHPFileOutLayer;
+					std::string message = std::string("Could not create vector layer ") + SHPFileOutLayer;
 					throw RSGISVectorOutputException(message.c_str());
 				}
 				
@@ -3375,12 +3375,12 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 		}
 		else if(option == RSGISExePostClassification::removesmallwithinlarge)
 		{
-			cout << "Remove any small polygons that are contained within a large polygon.\n";
-			cout << "Input Shapefile (Large Polygons) = " << this->inputVectorLarge << endl;
-			cout << "Input Shapefile (Small Polygons) = " << this->inputVectorSmall << endl;
-			cout << "Output Large Shapefile = " << this->outputLargeVector << endl;
-			cout << "Output Small Shapefile = " << this->outputSmallVector << endl;
-			cout << "Overlap Threshold = " << this->overlapThreshold << endl;
+			std::cout << "Remove any small polygons that are contained within a large polygon.\n";
+			std::cout << "Input Shapefile (Large Polygons) = " << this->inputVectorLarge << std::endl;
+			std::cout << "Input Shapefile (Small Polygons) = " << this->inputVectorSmall << std::endl;
+			std::cout << "Output Large Shapefile = " << this->outputLargeVector << std::endl;
+			std::cout << "Output Small Shapefile = " << this->outputSmallVector << std::endl;
+			std::cout << "Overlap Threshold = " << this->overlapThreshold << std::endl;
 			
 			OGRRegisterAll();
 			
@@ -3389,9 +3389,9 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 			RSGISVectorIO vecIO;
 			RSGISGeometry geomUtils;
 			
-			string SHPFileInLayerLarge = vecUtils.getLayerName(this->inputVectorLarge);
-			string SHPFileInLayerSmall = vecUtils.getLayerName(this->inputVectorSmall);
-			string SHPFileOutLayerSmall = vecUtils.getLayerName(this->outputSmallVector);
+			std::string SHPFileInLayerLarge = vecUtils.getLayerName(this->inputVectorLarge);
+			std::string SHPFileInLayerSmall = vecUtils.getLayerName(this->inputVectorSmall);
+			std::string SHPFileOutLayerSmall = vecUtils.getLayerName(this->outputSmallVector);
 			
 			OGRDataSource *inputSHPDSLarge = NULL;
 			OGRLayer *inputSHPLayerLarge = NULL;
@@ -3406,7 +3406,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 			RSGISProcessVector *processVector = NULL;
 			RSGISProcessOGRFeature *processFeature = NULL;	
 			
-			string outputDIR = "";
+			std::string outputDIR = "";
 			try
 			{
 				outputDIR = fileUtils.getFileDirectoryPath(this->outputSmallVector);
@@ -3432,13 +3432,13 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				inputSHPDSLarge = OGRSFDriverRegistrar::Open(this->inputVectorLarge.c_str(), FALSE);
 				if(inputSHPDSLarge == NULL)
 				{
-					string message = string("Could not open vector file ") + this->inputVectorLarge;
+					std::string message = std::string("Could not open vector file ") + this->inputVectorLarge;
 					throw RSGISFileException(message.c_str());
 				}
 				inputSHPLayerLarge = inputSHPDSLarge->GetLayerByName(SHPFileInLayerLarge.c_str());
 				if(inputSHPLayerLarge == NULL)
 				{
-					string message = string("Could not open vector layer ") + SHPFileInLayerLarge;
+					std::string message = std::string("Could not open vector layer ") + SHPFileInLayerLarge;
 					throw RSGISFileException(message.c_str());
 				}
 				
@@ -3450,13 +3450,13 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				inputSHPDSSmall = OGRSFDriverRegistrar::Open(this->inputVectorSmall.c_str(), FALSE);
 				if(inputSHPDSSmall == NULL)
 				{
-					string message = string("Could not open vector file ") + this->inputVectorSmall;
+					std::string message = std::string("Could not open vector file ") + this->inputVectorSmall;
 					throw RSGISFileException(message.c_str());
 				}
 				inputSHPLayerSmall = inputSHPDSSmall->GetLayerByName(SHPFileInLayerSmall.c_str());
 				if(inputSHPLayerSmall == NULL)
 				{
-					string message = string("Could not open vector layer ") + SHPFileInLayerSmall;
+					std::string message = std::string("Could not open vector layer ") + SHPFileInLayerSmall;
 					throw RSGISFileException(message.c_str());
 				}
 				inputSpatialRef = inputSHPLayerSmall->GetSpatialRef();	
@@ -3481,13 +3481,13 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				outputSHPDSSmall = shpFiledriver->CreateDataSource(this->outputSmallVector.c_str(), NULL);
 				if( outputSHPDSSmall == NULL )
 				{
-					string message = string("Could not create vector file ") + this->outputSmallVector;
+					std::string message = std::string("Could not create vector file ") + this->outputSmallVector;
 					throw RSGISVectorOutputException(message.c_str());
 				}
 				outputSHPLayerSmall = outputSHPDSSmall->CreateLayer(SHPFileOutLayerSmall.c_str(), inputSpatialRef, geometryType, NULL );
 				if( outputSHPLayerSmall == NULL )
 				{
-					string message = string("Could not create vector layer ") + SHPFileOutLayerSmall;
+					std::string message = std::string("Could not create vector layer ") + SHPFileOutLayerSmall;
 					throw RSGISVectorOutputException(message.c_str());
 				}	
 				
@@ -3499,13 +3499,13 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 					data[i] = new RSGISClusteredClassificationPolygon();
 				}
 				
-				cout << "Read inputted small polygons\n";
+				std::cout << "Read inputted small polygons\n";
 				vecIO.readPolygons(inputSHPLayerSmall, data, numFeatures);
 				
 				std::vector<RSGISPolygonData*> *smallPolys = new std::vector<RSGISPolygonData*>();
 				for(int i = 0; i < numFeatures; ++i)
 				{
-					//cout << data[i]->getPolygon()->toText() << endl;
+					//std::cout << data[i]->getPolygon()->toText() << std::endl;
 					smallPolys->push_back(data[i]);
 				}
 				
@@ -3513,15 +3513,15 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				processFeature = new RSGISGEOSPolygonReader(largePolys);
 				processVector = new RSGISProcessVector(processFeature);
 				
-				cout << "Read inputted large polygons\n";
+				std::cout << "Read inputted large polygons\n";
 				processVector->processVectorsNoOutput(inputSHPLayerLarge, false);
 				
 				delete processVector;
 				delete processFeature;
 				
 				
-				cout << "There are " << largePolys->size() << " large polygons\n";
-				cout << "There are " << smallPolys->size() << " small polygons\n";
+				std::cout << "There are " << largePolys->size() << " large polygons\n";
+				std::cout << "There are " << smallPolys->size() << " small polygons\n";
 				
 				//float overlapthreshold = 0.66;
 				
@@ -3545,7 +3545,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				
 				int feedback = numFeatures/10;
 				int i = 0;
-				cout << "Started" << endl;
+				std::cout << "Started" << std::endl;
 					
 				while(change)
 				{
@@ -3556,7 +3556,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 						{
 							if((i % feedback) == 0)
 							{
-								cout  <<  "." << flush;
+								std::cout  <<  "." << std::flush;
 							}
 						}	
 						
@@ -3626,9 +3626,9 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 					}
 				}
 				
-				cout << " Complete.\n";
+				std::cout << " Complete.\n";
 				
-				cout << "Output Polygons:\n";
+				std::cout << "Output Polygons:\n";
 				vecIO.exportPolygons2Shp(outputSHPLayerSmall, smallPolys);
 				vecIO.exportGEOSPolygons2SHP(this->outputLargeVector, force, largePolys, inputSpatialRef);
 				
@@ -3672,14 +3672,14 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 		}
 		else if(option == RSGISExePostClassification::mergesmallandlarge)
 		{
-			cout << "Merge the small and large polygons together where possible.\n";
-			cout << "Input Shapefile (Large Polygons) = " << this->inputVectorLarge << endl;
-			cout << "Input Shapefile (Small Polygons) = " << this->inputVectorSmall << endl;
-			cout << "Output Large Shapefile = " << this->outputLargeVector << endl;
-			cout << "Output Small Shapefile = " << this->outputSmallVector << endl;
-			cout << "Large Polygon Threshold = " << this->largeThreshold << endl;
-			cout << "Intersect Ratio Threshold = " << this->intersectRatio << endl;
-			cout << "Overlap Threshold = " << this->overlapThreshold << endl;
+			std::cout << "Merge the small and large polygons together where possible.\n";
+			std::cout << "Input Shapefile (Large Polygons) = " << this->inputVectorLarge << std::endl;
+			std::cout << "Input Shapefile (Small Polygons) = " << this->inputVectorSmall << std::endl;
+			std::cout << "Output Large Shapefile = " << this->outputLargeVector << std::endl;
+			std::cout << "Output Small Shapefile = " << this->outputSmallVector << std::endl;
+			std::cout << "Large Polygon Threshold = " << this->largeThreshold << std::endl;
+			std::cout << "Intersect Ratio Threshold = " << this->intersectRatio << std::endl;
+			std::cout << "Overlap Threshold = " << this->overlapThreshold << std::endl;
 			
 			OGRRegisterAll();
 			
@@ -3688,8 +3688,8 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 			RSGISVectorIO vecIO;
 			RSGISGeometry geomUtils;
 			
-			string SHPFileInLayerLarge = vecUtils.getLayerName(this->inputVectorLarge);
-			string SHPFileInLayerSmall = vecUtils.getLayerName(this->inputVectorSmall);
+			std::string SHPFileInLayerLarge = vecUtils.getLayerName(this->inputVectorLarge);
+			std::string SHPFileInLayerSmall = vecUtils.getLayerName(this->inputVectorSmall);
 			
 			OGRDataSource *inputSHPDSLarge = NULL;
 			OGRLayer *inputSHPLayerLarge = NULL;
@@ -3710,13 +3710,13 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				inputSHPDSLarge = OGRSFDriverRegistrar::Open(this->inputVectorLarge.c_str(), FALSE);
 				if(inputSHPDSLarge == NULL)
 				{
-					string message = string("Could not open vector file ") + this->inputVectorLarge;
+					std::string message = std::string("Could not open vector file ") + this->inputVectorLarge;
 					throw RSGISFileException(message.c_str());
 				}
 				inputSHPLayerLarge = inputSHPDSLarge->GetLayerByName(SHPFileInLayerLarge.c_str());
 				if(inputSHPLayerLarge == NULL)
 				{
-					string message = string("Could not open vector layer ") + SHPFileInLayerLarge;
+					std::string message = std::string("Could not open vector layer ") + SHPFileInLayerLarge;
 					throw RSGISFileException(message.c_str());
 				}
 				
@@ -3728,13 +3728,13 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				inputSHPDSSmall = OGRSFDriverRegistrar::Open(this->inputVectorSmall.c_str(), FALSE);
 				if(inputSHPDSSmall == NULL)
 				{
-					string message = string("Could not open vector file ") + this->inputVectorSmall;
+					std::string message = std::string("Could not open vector file ") + this->inputVectorSmall;
 					throw RSGISFileException(message.c_str());
 				}
 				inputSHPLayerSmall = inputSHPDSSmall->GetLayerByName(SHPFileInLayerSmall.c_str());
 				if(inputSHPLayerSmall == NULL)
 				{
-					string message = string("Could not open vector layer ") + SHPFileInLayerSmall;
+					std::string message = std::string("Could not open vector layer ") + SHPFileInLayerSmall;
 					throw RSGISFileException(message.c_str());
 				}
 				inputSpatialRef = inputSHPLayerSmall->GetSpatialRef();	
@@ -3743,7 +3743,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				processFeature = new RSGISGEOSPolygonReader(largePolys);
 				processVector = new RSGISProcessVector(processFeature);
 				
-				cout << "Read inputted large polygons\n";
+				std::cout << "Read inputted large polygons\n";
 				processVector->processVectorsNoOutput(inputSHPLayerLarge, false);
 				
 				delete processVector;
@@ -3753,14 +3753,14 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				processFeature = new RSGISGEOSPolygonReader(smallPolys);
 				processVector = new RSGISProcessVector(processFeature);
 				
-				cout << "Read inputted small polygons\n";
+				std::cout << "Read inputted small polygons\n";
 				processVector->processVectorsNoOutput(inputSHPLayerSmall, false);
 				
 				delete processVector;
 				delete processFeature;
 				
-				cout << "There are " << largePolys->size() << " large polygons\n";
-				cout << "There are " << smallPolys->size() << " small polygons\n";
+				std::cout << "There are " << largePolys->size() << " large polygons\n";
+				std::cout << "There are " << smallPolys->size() << " small polygons\n";
 								
 				std::vector<geos::geom::Polygon*>::iterator iterLargePolys;
 				std::vector<geos::geom::Polygon*>::iterator iterSmallPolys;
@@ -3839,7 +3839,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 							poly2 = *iterPolys2;
 							if((poly1 != poly2) && (poly1->overlaps(poly2)))
 							{
-								//cout << "Overlap found == TRUE!\n";
+								//std::cout << "Overlap found == TRUE!\n";
 							    overlapFound = true;
 								break;
 							}
@@ -3857,19 +3857,19 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 						
 						if(overlapFound)
 						{
-							//cout << "Overlap found\n";
+							//std::cout << "Overlap found\n";
 							intersect = geomUtils.getIntersection(((geos::geom::Geometry*)poly1), ((geos::geom::Geometry*)poly2));
 							
-							//cout << "Intersect Geom Type = " << intersect->getGeometryType() << endl;
+							//std::cout << "Intersect Geom Type = " << intersect->getGeometryType() << std::endl;
 							
 							intersectArea = intersect->getArea();
 							geom1IntersectRatio = intersectArea/poly1->getArea();
 							geom2IntersectRatio = intersectArea/poly2->getArea();
-							//cout << "geom1IntersectRatio = " << geom1IntersectRatio << endl;
-							//cout << "geom2IntersectRatio = " << geom2IntersectRatio << endl;
+							//std::cout << "geom1IntersectRatio = " << geom1IntersectRatio << std::endl;
+							//std::cout << "geom2IntersectRatio = " << geom2IntersectRatio << std::endl;
 							if((geom1IntersectRatio >= this->intersectRatio) | (geom2IntersectRatio >= this->intersectRatio))
 							{
-								//cout << "Merge poly1 and poly2\n";
+								//std::cout << "Merge poly1 and poly2\n";
 								delete intersect;
 								
 								polyUnion = geomUtils.polygonUnion(poly1, poly2);
@@ -3887,16 +3887,16 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 							}
 							else
 							{
-								//cout << "Resolve intersect\n";
+								//std::cout << "Resolve intersect\n";
 								
 								mergeSmall = false;
 								
 								geom1 = geomUtils.getDifference(poly1, poly2);
 								geom2 = geomUtils.getDifference(poly2, poly1);
 								
-								//cout << "geom1 has " << geom1->getNumGeometries() << " geometries.\n";
-								//cout << "geom2 has " << geom2->getNumGeometries() << " geometries.\n";
-								//cout << "intersect has " << intersect->getNumGeometries() << " geometries.\n";
+								//std::cout << "geom1 has " << geom1->getNumGeometries() << " geometries.\n";
+								//std::cout << "geom2 has " << geom2->getNumGeometries() << " geometries.\n";
+								//std::cout << "intersect has " << intersect->getNumGeometries() << " geometries.\n";
 								
 								geomUtils.retrievePolygons(geom1, tmpPolys1);
 								geomUtils.retrievePolygons(geom2, tmpPolys2);
@@ -3905,9 +3905,9 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 								delete geom2;
 								delete intersect;
 								
-								//cout << "geom1 has " << tmpPolys1->size() << " polygons.\n";
-								//cout << "geom2 has " << tmpPolys2->size() << " polygons.\n";
-								//cout << "intersect has " << tmpPolysIntersect->size() << " polygons.\n";
+								//std::cout << "geom1 has " << tmpPolys1->size() << " polygons.\n";
+								//std::cout << "geom2 has " << tmpPolys2->size() << " polygons.\n";
+								//std::cout << "intersect has " << tmpPolysIntersect->size() << " polygons.\n";
 								
 								largePolys1Count = 0;
 								for(iterPolys = tmpPolys1->begin(); iterPolys != tmpPolys1->end(); )
@@ -3967,17 +3967,17 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 									}
 								}
 								
-								//cout << "geom1 has " << largePolys1Count << " remaining large polygons\n";
-								//cout << "geom2 has " << largePolys2Count << " remaining large polygons\n";
-								//cout << "Intersect has " << largePolysIntersectCount << " remaining large polygons\n";
+								//std::cout << "geom1 has " << largePolys1Count << " remaining large polygons\n";
+								//std::cout << "geom2 has " << largePolys2Count << " remaining large polygons\n";
+								//std::cout << "Intersect has " << largePolysIntersectCount << " remaining large polygons\n";
 								
 								totalLargePolys = largePolys1Count + largePolys2Count;
 								
-								//cout << "total Large Polygons = " << totalLargePolys << endl;
+								//std::cout << "total Large Polygons = " << totalLargePolys << std::endl;
 								
 								if((largePolys1Count >= 1) & (largePolys2Count >= 1))
 								{
-									//cout << "((largePolys1Count >= 1) & (largePolys2Count >= 1))" << endl;
+									//std::cout << "((largePolys1Count >= 1) & (largePolys2Count >= 1))" << std::endl;
 									
 									// GET ALL LARGE POLYGONS AND MERGE ALL SMALL PARTS (difference and intersect).
 									for(iterPolys = tmpPolys1->begin(); iterPolys != tmpPolys1->end(); ++iterPolys)
@@ -4029,7 +4029,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 								}
 								else if(largePolys1Count > 1)
 								{
-									//cout << "(largePolys1Count > 1)" << endl;
+									//std::cout << "(largePolys1Count > 1)" << std::endl;
 									
 									// GET LARGE POLYGONS + ORIGINAL poly2 and merge poly1 difference small bits
 									for(iterPolys = tmpPolys1->begin(); iterPolys != tmpPolys1->end(); ++iterPolys)
@@ -4069,7 +4069,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 								}
 								else if(largePolys2Count > 1)
 								{
-									//cout << "(largePolys2Count > 1)" << endl;
+									//std::cout << "(largePolys2Count > 1)" << std::endl;
 									// Get large polygons + orig poly1 and merge poly2 difference small bits
 									for(iterPolys = tmpPolys2->begin(); iterPolys != tmpPolys2->end(); ++iterPolys)
 									{
@@ -4109,7 +4109,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 								}
 								else if(totalLargePolys <= 1)
 								{
-									//cout << "(totalLargePolys <= 1)" << endl;
+									//std::cout << "(totalLargePolys <= 1)" << std::endl;
 									// MERGE THE TWO POLYGONS
 									polyUnion = geomUtils.polygonUnion(poly1, poly2);
 									polyUnionBuffer = dynamic_cast<geos::geom::Polygon*>(polyUnion->buffer(0));
@@ -4150,7 +4150,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 								}
 								else
 								{
-									//cout << "ELSE\n";
+									//std::cout << "ELSE\n";
 									// GET ALL LARGE POLYGONS AND MERGE ALL SMALL PARTS (difference and intersect).
 									for(iterPolys = tmpPolys1->begin(); iterPolys != tmpPolys1->end(); ++iterPolys)
 									{
@@ -4206,18 +4206,18 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 									vecIO.exportGEOSPolygons2SHP("/Users/pete/Temp/Clustering/polygons/large_polys.shp", force, tmpPolysLarge, inputSpatialRef);
 									vecIO.exportGEOSPolygons2SHP("/Users/pete/Temp/Clustering/polygons/small_polys.shp", force, tmpPolysSmall, inputSpatialRef);
 									
-									cout << "mergeSmall\n";
-									cout << "Number Large Polygons = " << tmpPolysLarge->size() << endl;
-									cout << "Number Small Polygons = " << tmpPolysSmall->size() << endl;
+									std::cout << "mergeSmall\n";
+									std::cout << "Number Large Polygons = " << tmpPolysLarge->size() << std::endl;
+									std::cout << "Number Small Polygons = " << tmpPolysSmall->size() << std::endl;
 									 */
 									change2 = true;
 									while(change2)
 									{
 										change2 = false;
-										//cout << "iterate \n";
+										//std::cout << "iterate \n";
 										for(iterPolysSmall = tmpPolysSmall->begin(); iterPolysSmall != tmpPolysSmall->end(); )
 										{
-											//cout << "iterate2\n";
+											//std::cout << "iterate2\n";
 											polyTmp1 = *iterPolysSmall;
 											
 											relBorder = 0;
@@ -4229,7 +4229,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 											{
 												polyTmp2 = *iterPolys;
 												relBorder = geomUtils.calcRelativeBorder(polyTmp1, polyTmp2);
-												//cout << "Rel Border = " << relBorder << endl;
+												//std::cout << "Rel Border = " << relBorder << std::endl;
 												if(first)
 												{
 													maxRelBorder = relBorder;
@@ -4243,7 +4243,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 												}
 											}
 											
-											//cout << "maxRelBorder = " << maxRelBorder << endl;
+											//std::cout << "maxRelBorder = " << maxRelBorder << std::endl;
 											
 											if(maxRelBorder > 0)
 											{
@@ -4259,7 +4259,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 											}
 											else
 											{
-												//cout << "++iterPolysSmall\n";
+												//std::cout << "++iterPolysSmall\n";
 												++iterPolysSmall;
 											}
 										}
@@ -4274,7 +4274,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 									tmpPolysLarge->erase(iterPolys);
 								}
 								
-								//string filename = string("/Users/pete/Temp/Clustering/polygons/polys_") + mathsUtils.inttostring(count++) + string(".shp");
+								//std::string filename = std::string("/Users/pete/Temp/Clustering/polygons/polys_") + mathsUtils.inttostd::string(count++) + std::string(".shp");
 								//vecIO.exportGEOSPolygons2SHP(filename, force, polys, inputSpatialRef);
 								
 								geom1 = NULL;
@@ -4287,7 +4287,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 						}
 						else if(poly1withinpoly2)
 						{
-							//cout << "Polygon 2 within polygon 1\n";
+							//std::cout << "Polygon 2 within polygon 1\n";
 							largePolys->erase(remove(largePolys->begin(), largePolys->end(), poly1));
 							delete poly1;
 							poly2 = NULL;
@@ -4297,7 +4297,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 						}
 						else if(poly2withinpoly1)
 						{
-							//cout << "Polygon 2 within polygon 1\n";
+							//std::cout << "Polygon 2 within polygon 1\n";
 							largePolys->erase(remove(largePolys->begin(), largePolys->end(), poly2));
 							poly1 = NULL;
 							delete poly2;
@@ -4307,7 +4307,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 						}
 						else
 						{
-							//cout << "No overlap\n";
+							//std::cout << "No overlap\n";
 							++iterPolys1;
 						}
 					}					
@@ -4346,7 +4346,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				int numFeatures = smallPolys->size();
 				int feedback = numFeatures/10;
 				int i = 0;
-				cout << "Started" << endl;
+				std::cout << "Started" << std::endl;
 					
 				while(change)
 				{
@@ -4357,7 +4357,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 						{
 							if((i % feedback) == 0)
 							{
-								cout  <<  "." << flush;
+								std::cout  <<  "." << std::flush;
 							}
 						}	
 						
@@ -4426,9 +4426,9 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 					}
 				}
 				
-				cout << " Complete.\n";
+				std::cout << " Complete.\n";
 								
-				cout << "Output Polygons:\n";
+				std::cout << "Output Polygons:\n";
 				vecIO.exportGEOSPolygons2SHP(this->outputSmallVector, force, smallPolys, inputSpatialRef);
 				vecIO.exportGEOSPolygons2SHP(this->outputLargeVector, force, largePolys, inputSpatialRef);
 				
@@ -4462,33 +4462,33 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 		}
 		else if(option == RSGISExePostClassification::clusterremainingsmall)
 		{
-			cout << "Cluster remaining smaller polygons without crossing any existing large polygons\n";
-			cout << "Input Shapefile (Large Polygons) = " << this->inputVectorLarge << endl;
-			cout << "Input Shapefile (Small Polygons) = " << this->inputVectorSmall << endl;
-			cout << "Output Shapefile = " << this->outputVector << endl;
-			cout << "Max Length = " << this->maxlength << endl;
+			std::cout << "Cluster remaining smaller polygons without crossing any existing large polygons\n";
+			std::cout << "Input Shapefile (Large Polygons) = " << this->inputVectorLarge << std::endl;
+			std::cout << "Input Shapefile (Small Polygons) = " << this->inputVectorSmall << std::endl;
+			std::cout << "Output Shapefile = " << this->outputVector << std::endl;
+			std::cout << "Max Length = " << this->maxlength << std::endl;
 			
 			if(polygonizertype == lineproj)
 			{
-				cout << "The line projection polygonizer will be used\n";
-				cout << "Resolution = " << this->resolution << endl;
+				std::cout << "The line projection polygonizer will be used\n";
+				std::cout << "Resolution = " << this->resolution << std::endl;
 			}
 			else if(polygonizertype == delaunay1)
 			{
-				cout << "The delaunay1 polygonizer will be used\n";
+				std::cout << "The delaunay1 polygonizer will be used\n";
 			}
 			else if(polygonizertype == convexhull)
 			{
-				cout << "The convex hull polygonizer will be used\n";
+				std::cout << "The convex hull polygonizer will be used\n";
 			}
 			else if(polygonizertype == snakes)
 			{
-				cout << "The snakes polygonizer will be used\n";
-				cout << "Resolution = " << this->resolution << endl;
-				cout << "Alpha = " << this->alpha << endl;
-				cout << "Beta = " << this->beta << endl;
-				cout << "Gamma = " << this->gamma << endl;
-				cout << "Delta = " << this->delta << endl;
+				std::cout << "The snakes polygonizer will be used\n";
+				std::cout << "Resolution = " << this->resolution << std::endl;
+				std::cout << "Alpha = " << this->alpha << std::endl;
+				std::cout << "Beta = " << this->beta << std::endl;
+				std::cout << "Gamma = " << this->gamma << std::endl;
+				std::cout << "Delta = " << this->delta << std::endl;
 			}
 			
 			OGRRegisterAll();
@@ -4499,8 +4499,8 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 			RSGISGeometry geomUtils;
 			RSGISMathsUtils mathsUtils;
 			
-			string SHPFileInLayerLarge = vecUtils.getLayerName(this->inputVectorLarge);
-			string SHPFileInLayerSmall = vecUtils.getLayerName(this->inputVectorSmall);
+			std::string SHPFileInLayerLarge = vecUtils.getLayerName(this->inputVectorLarge);
+			std::string SHPFileInLayerSmall = vecUtils.getLayerName(this->inputVectorSmall);
 			
 			OGRDataSource *inputSHPDSLarge = NULL;
 			OGRLayer *inputSHPLayerLarge = NULL;
@@ -4521,13 +4521,13 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				inputSHPDSLarge = OGRSFDriverRegistrar::Open(this->inputVectorLarge.c_str(), FALSE);
 				if(inputSHPDSLarge == NULL)
 				{
-					string message = string("Could not open vector file ") + this->inputVectorLarge;
+					std::string message = std::string("Could not open vector file ") + this->inputVectorLarge;
 					throw RSGISFileException(message.c_str());
 				}
 				inputSHPLayerLarge = inputSHPDSLarge->GetLayerByName(SHPFileInLayerLarge.c_str());
 				if(inputSHPLayerLarge == NULL)
 				{
-					string message = string("Could not open vector layer ") + SHPFileInLayerLarge;
+					std::string message = std::string("Could not open vector layer ") + SHPFileInLayerLarge;
 					throw RSGISFileException(message.c_str());
 				}
 				
@@ -4539,13 +4539,13 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				inputSHPDSSmall = OGRSFDriverRegistrar::Open(this->inputVectorSmall.c_str(), FALSE);
 				if(inputSHPDSSmall == NULL)
 				{
-					string message = string("Could not open vector file ") + this->inputVectorSmall;
+					std::string message = std::string("Could not open vector file ") + this->inputVectorSmall;
 					throw RSGISFileException(message.c_str());
 				}
 				inputSHPLayerSmall = inputSHPDSSmall->GetLayerByName(SHPFileInLayerSmall.c_str());
 				if(inputSHPLayerSmall == NULL)
 				{
-					string message = string("Could not open vector layer ") + SHPFileInLayerSmall;
+					std::string message = std::string("Could not open vector layer ") + SHPFileInLayerSmall;
 					throw RSGISFileException(message.c_str());
 				}
 				inputSpatialRef = inputSHPLayerSmall->GetSpatialRef();	
@@ -4554,7 +4554,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				processFeature = new RSGISGEOSPolygonReader(largePolys);
 				processVector = new RSGISProcessVector(processFeature);
 				
-				cout << "Read inputted large polygons\n";
+				std::cout << "Read inputted large polygons\n";
 				processVector->processVectorsNoOutput(inputSHPLayerLarge, false);
 				
 				delete processVector;
@@ -4564,14 +4564,14 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				processFeature = new RSGISGEOSPolygonReader(smallPolys);
 				processVector = new RSGISProcessVector(processFeature);
 				
-				cout << "Read inputted small polygons\n";
+				std::cout << "Read inputted small polygons\n";
 				processVector->processVectorsNoOutput(inputSHPLayerSmall, false);
 				
 				delete processVector;
 				delete processFeature;
 				
-				cout << "There are " << largePolys->size() << " large polygons\n";
-				cout << "There are " << smallPolys->size() << " small polygons\n";
+				std::cout << "There are " << largePolys->size() << " large polygons\n";
+				std::cout << "There are " << smallPolys->size() << " small polygons\n";
 				
 				
 				//polygonizertype = lineproj;
@@ -4594,7 +4594,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				
 				int i = 0;
 				
-				cout << "Started (Merge fast method) ." << flush;
+				std::cout << "Started (Merge fast method) ." << std::flush;
 				
 				while(change)
 				{
@@ -4606,7 +4606,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 						
 						if( i % 10 == 0)
 						{
-							cout << "." << flush;
+							std::cout << "." << std::flush;
 						}
 												
 						for(iterSmallPolys2 = smallPolys->begin(); iterSmallPolys2 != smallPolys->end(); ++iterSmallPolys2)
@@ -4666,13 +4666,13 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 					}
 					
 				}
-				cout << ". Complete\n" << flush;
+				std::cout << ". Complete\n" << std::flush;
 				
 				geomUtils.performMorphologicalOperation(smallPolys, closing, 5, 30);
 				
 				geomUtils.mergeTouchingPolygons(smallPolys);
 				
-				cout << "Output polygons to shapefile:\n";
+				std::cout << "Output polygons to shapefile:\n";
 				vecIO.exportGEOSPolygons2SHP(this->outputVector, force, smallPolys, inputSpatialRef);
 				
 				for(iterLargePolys = largePolys->begin(); iterLargePolys != largePolys->end(); )
@@ -4706,32 +4706,32 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 		}
 		else if(option == RSGISExePostClassification::mergesmall2nearestlarge)
 		{
-			cout << "Merge all the small polygons to their nearest large polygon.\n";
-			cout << "Input Shapefile (Large Polygons) = " << this->inputVectorLarge << endl;
-			cout << "Input Shapefile (Small Polygons) = " << this->inputVectorSmall << endl;
-			cout << "Output Shapefile = " << this->outputVector << endl;
+			std::cout << "Merge all the small polygons to their nearest large polygon.\n";
+			std::cout << "Input Shapefile (Large Polygons) = " << this->inputVectorLarge << std::endl;
+			std::cout << "Input Shapefile (Small Polygons) = " << this->inputVectorSmall << std::endl;
+			std::cout << "Output Shapefile = " << this->outputVector << std::endl;
 
 			if(polygonizertype == lineproj)
 			{
-				cout << "The line projection polygonizer will be used\n";
-				cout << "Resolution = " << this->resolution << endl;
+				std::cout << "The line projection polygonizer will be used\n";
+				std::cout << "Resolution = " << this->resolution << std::endl;
 			}
 			else if(polygonizertype == delaunay1)
 			{
-				cout << "The delaunay1 polygonizer will be used\n";
+				std::cout << "The delaunay1 polygonizer will be used\n";
 			}
 			else if(polygonizertype == convexhull)
 			{
-				cout << "The convex hull polygonizer will be used\n";
+				std::cout << "The convex hull polygonizer will be used\n";
 			}
 			else if(polygonizertype == snakes)
 			{
-				cout << "The snakes polygonizer will be used\n";
-				cout << "Resolution = " << this->resolution << endl;
-				cout << "Alpha = " << this->alpha << endl;
-				cout << "Beta = " << this->beta << endl;
-				cout << "Gamma = " << this->gamma << endl;
-				cout << "Delta = " << this->delta << endl;
+				std::cout << "The snakes polygonizer will be used\n";
+				std::cout << "Resolution = " << this->resolution << std::endl;
+				std::cout << "Alpha = " << this->alpha << std::endl;
+				std::cout << "Beta = " << this->beta << std::endl;
+				std::cout << "Gamma = " << this->gamma << std::endl;
+				std::cout << "Delta = " << this->delta << std::endl;
 			}
 			
 			OGRRegisterAll();
@@ -4742,8 +4742,8 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 			RSGISGeometry geomUtils;
 			RSGISMathsUtils mathsUtils;
 			
-			string SHPFileInLayerLarge = vecUtils.getLayerName(this->inputVectorLarge);
-			string SHPFileInLayerSmall = vecUtils.getLayerName(this->inputVectorSmall);
+			std::string SHPFileInLayerLarge = vecUtils.getLayerName(this->inputVectorLarge);
+			std::string SHPFileInLayerSmall = vecUtils.getLayerName(this->inputVectorSmall);
 			
 			OGRDataSource *inputSHPDSLarge = NULL;
 			OGRLayer *inputSHPLayerLarge = NULL;
@@ -4764,13 +4764,13 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				inputSHPDSLarge = OGRSFDriverRegistrar::Open(this->inputVectorLarge.c_str(), FALSE);
 				if(inputSHPDSLarge == NULL)
 				{
-					string message = string("Could not open vector file ") + this->inputVectorLarge;
+					std::string message = std::string("Could not open vector file ") + this->inputVectorLarge;
 					throw RSGISFileException(message.c_str());
 				}
 				inputSHPLayerLarge = inputSHPDSLarge->GetLayerByName(SHPFileInLayerLarge.c_str());
 				if(inputSHPLayerLarge == NULL)
 				{
-					string message = string("Could not open vector layer ") + SHPFileInLayerLarge;
+					std::string message = std::string("Could not open vector layer ") + SHPFileInLayerLarge;
 					throw RSGISFileException(message.c_str());
 				}
 				
@@ -4782,13 +4782,13 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				inputSHPDSSmall = OGRSFDriverRegistrar::Open(this->inputVectorSmall.c_str(), FALSE);
 				if(inputSHPDSSmall == NULL)
 				{
-					string message = string("Could not open vector file ") + this->inputVectorSmall;
+					std::string message = std::string("Could not open vector file ") + this->inputVectorSmall;
 					throw RSGISFileException(message.c_str());
 				}
 				inputSHPLayerSmall = inputSHPDSSmall->GetLayerByName(SHPFileInLayerSmall.c_str());
 				if(inputSHPLayerSmall == NULL)
 				{
-					string message = string("Could not open vector layer ") + SHPFileInLayerSmall;
+					std::string message = std::string("Could not open vector layer ") + SHPFileInLayerSmall;
 					throw RSGISFileException(message.c_str());
 				}
 				inputSpatialRef = inputSHPLayerSmall->GetSpatialRef();	
@@ -4797,7 +4797,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				processFeature = new RSGISGEOSPolygonReader(largePolys);
 				processVector = new RSGISProcessVector(processFeature);
 				
-				cout << "Read inputted large polygons\n";
+				std::cout << "Read inputted large polygons\n";
 				processVector->processVectorsNoOutput(inputSHPLayerLarge, false);
 				
 				delete processVector;
@@ -4807,14 +4807,14 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				processFeature = new RSGISGEOSPolygonReader(smallPolys);
 				processVector = new RSGISProcessVector(processFeature);
 				
-				cout << "Read inputted small polygons\n";
+				std::cout << "Read inputted small polygons\n";
 				processVector->processVectorsNoOutput(inputSHPLayerSmall, false);
 				
 				delete processVector;
 				delete processFeature;
 				
-				cout << "There are " << largePolys->size() << " large polygons\n";
-				cout << "There are " << smallPolys->size() << " small polygons\n";
+				std::cout << "There are " << largePolys->size() << " large polygons\n";
+				std::cout << "There are " << smallPolys->size() << " small polygons\n";
 				
 				
 				//polygonizertype = lineproj;
@@ -4888,10 +4888,10 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 					
 					for(unsigned int i = 0; i < largePolys->size(); ++i)
 					{
-						cout << "Processing Large Polygon " << i;
+						std::cout << "Processing Large Polygon " << i;
 						if(toMerge[i]->size() > 1)
 						{
-							cout << " is to be merged with " << toMerge[i]->size()-1 << " polygons\n";
+							std::cout << " is to be merged with " << toMerge[i]->size()-1 << " polygons\n";
 							if(polygonizertype == lineproj)
 							{
 								RSGISIdentifyNonConvexPolygonsLineProject *identifyNonConvexLineProj = new RSGISIdentifyNonConvexPolygonsLineProject(resolution);
@@ -4922,7 +4922,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 						}
 						else
 						{
-							cout << " is not to be merged\n";
+							std::cout << " is not to be merged\n";
 							newLargePolys->push_back(toMerge[i]->at(0));
 						}
 					}
@@ -4936,7 +4936,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 					
 					//geomUtils.performMorphologicalOperation(newLargePolys, closing, 2, 6);
 					
-					cout << "Output polygons to shapefile:\n";
+					std::cout << "Output polygons to shapefile:\n";
 					vecIO.exportGEOSPolygons2SHP(this->outputVector, force, newLargePolys, inputSpatialRef);
 					
 					for(iterLargePolys = newLargePolys->begin(); iterLargePolys != newLargePolys->end(); )
@@ -4948,7 +4948,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				}
 				else
 				{
-					cout << "Output polygons to shapefile:\n";
+					std::cout << "Output polygons to shapefile:\n";
 					vecIO.exportGEOSPolygons2SHP(this->outputVector, force, largePolys, inputSpatialRef);
 				}
 												
@@ -4982,11 +4982,11 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 		}		
 		else if(option == RSGISExePostClassification::mergepolygons)
 		{
-			cout << "Merge the polygons outputted from the cluster process to produce a single output.\n";
-			cout << "Input Cluster Polygons Shapefile = " << this->inputVector_clusters << endl;
-			cout << "Input Cluster Individual Polygons Shapefile = " << this->inputVector_polys << endl;
-			cout << "Input Original Polygons Shapefile = " << this->inputVector_orig << endl;
-			cout << "Output Shapefile = " << this->outputVector << endl;
+			std::cout << "Merge the polygons outputted from the cluster process to produce a single output.\n";
+			std::cout << "Input Cluster Polygons Shapefile = " << this->inputVector_clusters << std::endl;
+			std::cout << "Input Cluster Individual Polygons Shapefile = " << this->inputVector_polys << std::endl;
+			std::cout << "Input Original Polygons Shapefile = " << this->inputVector_orig << std::endl;
+			std::cout << "Output Shapefile = " << this->outputVector << std::endl;
 			
 			OGRRegisterAll();
 			
@@ -4994,11 +4994,11 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 			RSGISVectorUtils vecUtils;
 			RSGISVectorIO vecIO;
 			
-			string SHPFileInLayer_Clusters = vecUtils.getLayerName(this->inputVector_clusters);
-			string SHPFileInLayer_Polys = vecUtils.getLayerName(this->inputVector_polys);
-			string SHPFileInLayer_Orig = vecUtils.getLayerName(this->inputVector_orig);
+			std::string SHPFileInLayer_Clusters = vecUtils.getLayerName(this->inputVector_clusters);
+			std::string SHPFileInLayer_Polys = vecUtils.getLayerName(this->inputVector_polys);
+			std::string SHPFileInLayer_Orig = vecUtils.getLayerName(this->inputVector_orig);
 			
-			string SHPFileOutLayer = vecUtils.getLayerName(this->outputVector);
+			std::string SHPFileOutLayer = vecUtils.getLayerName(this->outputVector);
 			
 			OGRDataSource *inputSHPDS_Clusters = NULL;
 			OGRLayer *inputSHPLayer_Clusters = NULL;
@@ -5012,7 +5012,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 			
 			OGRSpatialReference* inputSpatialRef = NULL;
 			
-			string outputDIR = "";
+			std::string outputDIR = "";
 			try
 			{
 				outputDIR = fileUtils.getFileDirectoryPath(this->outputVector);
@@ -5037,13 +5037,13 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				inputSHPDS_Clusters = OGRSFDriverRegistrar::Open(this->inputVector_clusters.c_str(), FALSE);
 				if(inputSHPDS_Clusters == NULL)
 				{
-					string message = string("Could not open vector file ") + this->inputVector_clusters;
+					std::string message = std::string("Could not open vector file ") + this->inputVector_clusters;
 					throw RSGISFileException(message.c_str());
 				}
 				inputSHPLayer_Clusters = inputSHPDS_Clusters->GetLayerByName(SHPFileInLayer_Clusters.c_str());
 				if(inputSHPLayer_Clusters == NULL)
 				{
-					string message = string("Could not open vector layer ") + SHPFileInLayer_Clusters;
+					std::string message = std::string("Could not open vector layer ") + SHPFileInLayer_Clusters;
 					throw RSGISFileException(message.c_str());
 				}
 				inputSpatialRef = inputSHPLayer_Clusters->GetSpatialRef();	
@@ -5061,13 +5061,13 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				inputSHPDS_Poly = OGRSFDriverRegistrar::Open(this->inputVector_polys.c_str(), FALSE);
 				if(inputSHPDS_Poly == NULL)
 				{
-					string message = string("Could not open vector file ") + this->inputVector_polys;
+					std::string message = std::string("Could not open vector file ") + this->inputVector_polys;
 					throw RSGISFileException(message.c_str());
 				}
 				inputSHPLayer_Poly = inputSHPDS_Poly->GetLayerByName(SHPFileInLayer_Polys.c_str());
 				if(inputSHPLayer_Poly == NULL)
 				{
-					string message = string("Could not open vector layer ") + SHPFileInLayer_Polys;
+					std::string message = std::string("Could not open vector layer ") + SHPFileInLayer_Polys;
 					throw RSGISFileException(message.c_str());
 				}
 				
@@ -5079,13 +5079,13 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				inputSHPDS_Orig = OGRSFDriverRegistrar::Open(this->inputVector_orig.c_str(), FALSE);
 				if(inputSHPDS_Orig == NULL)
 				{
-					string message = string("Could not open vector file ") + this->inputVector_orig;
+					std::string message = std::string("Could not open vector file ") + this->inputVector_orig;
 					throw RSGISFileException(message.c_str());
 				}
 				inputSHPLayer_Orig = inputSHPDS_Orig->GetLayerByName(SHPFileInLayer_Orig.c_str());
 				if(inputSHPLayer_Orig == NULL)
 				{
-					string message = string("Could not open vector layer ") + SHPFileInLayer_Orig;
+					std::string message = std::string("Could not open vector layer ") + SHPFileInLayer_Orig;
 					throw RSGISFileException(message.c_str());
 				}				
 				
@@ -5103,13 +5103,13 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				outputSHPDS = shpFiledriver->CreateDataSource(this->outputVector.c_str(), NULL);
 				if( outputSHPDS == NULL )
 				{
-					string message = string("Could not create vector file ") + this->outputVector;
+					std::string message = std::string("Could not create vector file ") + this->outputVector;
 					throw RSGISVectorOutputException(message);
 				}
 				outputSHPLayer = outputSHPDS->CreateLayer(SHPFileOutLayer.c_str(), inputSpatialRef, geometryType, NULL );
 				if( outputSHPLayer == NULL )
 				{
-					string message = string("Could not create vector layer ") + SHPFileOutLayer;
+					std::string message = std::string("Could not create vector layer ") + SHPFileOutLayer;
 					throw RSGISVectorOutputException(message.c_str());
 				}
 				
@@ -5122,7 +5122,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 					dataClusters[i] = new RSGISClusteredClassificationPolygon();
 				}
 				
-				cout << "Read input cluster polygons\n";
+				std::cout << "Read input cluster polygons\n";
 				vecIO.readPolygons(inputSHPLayer_Clusters, dataClusters, numFeatures);
 				
 				// Reading input multi-polygon clusters
@@ -5131,7 +5131,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				RSGISIntValuePolygonReader *processFeatureIntValueReader = new RSGISIntValuePolygonReader(intValueAtt, clusterPolygons);
 				RSGISProcessVector *processVector = new RSGISProcessVector(processFeatureIntValueReader);
 				
-				cout << "Read input individual cluster polygons\n";
+				std::cout << "Read input individual cluster polygons\n";
 				processVector->processVectorsNoOutput(inputSHPLayer_Poly, false);
 				
 				delete processVector;
@@ -5143,7 +5143,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				RSGISClassificationPolygonReader *processFeatureClassPolyReader = new RSGISClassificationPolygonReader(this->classStr, dataOrigPolys);
 				processVector = new RSGISProcessVector(processFeatureClassPolyReader);
 				
-				cout << "Read input original polygons\n";
+				std::cout << "Read input original polygons\n";
 				processVector->processVectorsNoOutput(inputSHPLayer_Orig, false);
 				
 				delete processVector;
@@ -5159,20 +5159,20 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				for(iterClusterData = clusters->begin(); iterClusterData != clusters->end(); ++iterClusterData)
 				{
 					cluster = *iterClusterData;
-					cout << count << ") Cluster - " << cluster->getArea() << " sqm and has " << cluster->getAllIntersect()->size() << " intersecting crowns with " << cluster->getClusterPolys()->size() << " crowns creating the cluster\n";
+					std::cout << count << ") Cluster - " << cluster->getArea() << " sqm and has " << cluster->getAllIntersect()->size() << " intersecting crowns with " << cluster->getClusterPolys()->size() << " crowns creating the cluster\n";
 					++count;
 				}
 				
 				
 				
-				/*string polygonName = "_Cluster.shp";
-				string clusterPolysName = "_ClusterPolys.shp";
-				string intersectingPolysName = "_IntersectPolys.shp";
-				string outputDIR = "/Users/pete/Temp/Clustering/test/output_dir/";
+				/*std::string polygonName = "_Cluster.shp";
+				std::string clusterPolysName = "_ClusterPolys.shp";
+				std::string intersectingPolysName = "_IntersectPolys.shp";
+				std::string outputDIR = "/Users/pete/Temp/Clustering/test/output_dir/";
 				
-				string polyOutputPath = "";
-				string clusterPolysOutPath = "";
-				string intersectPolysOutPath = "";
+				std::string polyOutputPath = "";
+				std::string clusterPolysOutPath = "";
+				std::string intersectPolysOutPath = "";
 				
 				std::vector<RSGISClassificationPolygon*>::iterator iterClassPolys;
 				std::vector<RSGISClassificationPolygon*> *intersectPolys = NULL;
@@ -5184,9 +5184,9 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				{
 					cluster = clusters->at(i);
 					
-					polyOutputPath = outputDIR + mathsUtils.inttostring(i) + polygonName;
-					clusterPolysOutPath = outputDIR + mathsUtils.inttostring(i) + clusterPolysName;
-					intersectPolysOutPath = outputDIR + mathsUtils.inttostring(i) + intersectingPolysName;
+					polyOutputPath = outputDIR + mathsUtils.inttostd::string(i) + polygonName;
+					clusterPolysOutPath = outputDIR + mathsUtils.inttostd::string(i) + clusterPolysName;
+					intersectPolysOutPath = outputDIR + mathsUtils.inttostd::string(i) + intersectingPolysName;
 					
 					outputPolys->push_back(cluster->getPolygon());
 					vecIO.exportGEOSPolygons2SHP(polyOutputPath, true, outputPolys, inputSpatialRef);
@@ -5257,22 +5257,22 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 		}
 		else if(option == RSGISExePostClassification::labelpolys)
 		{
-			cout << "Label polygons with summaries of small polygons.\n";
-			cout << "Input Vector = " << this->inputVector << endl;
-			cout << "Input Label Vector = " << this->labelsVector << endl;
-			cout << "Labels Attribute = " << this->classAttribute << endl;
-			cout << "Output Shapefile = " << this->outputVector << endl;
+			std::cout << "Label polygons with summaries of small polygons.\n";
+			std::cout << "Input Vector = " << this->inputVector << std::endl;
+			std::cout << "Input Label Vector = " << this->labelsVector << std::endl;
+			std::cout << "Labels Attribute = " << this->classAttribute << std::endl;
+			std::cout << "Output Shapefile = " << this->outputVector << std::endl;
 			if(dominant == speciesCount)
 			{
-				cout << "Dominant class defined by object count\n";
+				std::cout << "Dominant class defined by object count\n";
 			}
 			else if(dominant == speciesArea)
 			{
-				cout << "Dominant class defind by object area\n";
+				std::cout << "Dominant class defind by object area\n";
 			}
 			else
 			{
-				cout << "Dominant class calculation is unknown - this may result in an error!!\n";
+				std::cout << "Dominant class calculation is unknown - this may result in an error!!\n";
 			}
 			
 			OGRRegisterAll();
@@ -5280,9 +5280,9 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 			RSGISFileUtils fileUtils;
 			RSGISVectorUtils vecUtils;
 			
-			string SHPFileInLabelLayer = vecUtils.getLayerName(this->labelsVector);
-			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
-			string SHPFileOutLayer = vecUtils.getLayerName(this->outputVector);
+			std::string SHPFileInLabelLayer = vecUtils.getLayerName(this->labelsVector);
+			std::string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
+			std::string SHPFileOutLayer = vecUtils.getLayerName(this->outputVector);
 			
 			OGRDataSource *inputLabelsSHPDS = NULL;
 			OGRLayer *inputLabelsSHPLayer = NULL;
@@ -5297,7 +5297,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 			RSGISProcessVector *processVector = NULL;
 			RSGISProcessOGRFeature *processFeature = NULL;
 			
-			string outputDIR = "";
+			std::string outputDIR = "";
 			try
 			{
 				outputDIR = fileUtils.getFileDirectoryPath(this->outputVector);
@@ -5322,13 +5322,13 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				inputLabelsSHPDS = OGRSFDriverRegistrar::Open(this->labelsVector.c_str(), FALSE);
 				if(inputLabelsSHPDS == NULL)
 				{
-					string message = string("Could not open vector file ") + this->labelsVector;
+					std::string message = std::string("Could not open vector file ") + this->labelsVector;
 					throw RSGISFileException(message.c_str());
 				}
 				inputLabelsSHPLayer = inputLabelsSHPDS->GetLayerByName(SHPFileInLabelLayer.c_str());
 				if(inputLabelsSHPLayer == NULL)
 				{
-					string message = string("Could not open vector layer ") + SHPFileInLabelLayer;
+					std::string message = std::string("Could not open vector layer ") + SHPFileInLabelLayer;
 					throw RSGISFileException(message.c_str());
 				}
 
@@ -5340,13 +5340,13 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				inputSHPDS = OGRSFDriverRegistrar::Open(this->inputVector.c_str(), FALSE);
 				if(inputSHPDS == NULL)
 				{
-					string message = string("Could not open vector file ") + this->inputVector;
+					std::string message = std::string("Could not open vector file ") + this->inputVector;
 					throw RSGISFileException(message.c_str());
 				}
 				inputSHPLayer = inputSHPDS->GetLayerByName(SHPFileInLayer.c_str());
 				if(inputSHPLayer == NULL)
 				{
-					string message = string("Could not open vector layer ") + SHPFileInLayer;
+					std::string message = std::string("Could not open vector layer ") + SHPFileInLayer;
 					throw RSGISFileException(message.c_str());
 				}
 				inputSpatialRef = inputSHPLayer->GetSpatialRef();	
@@ -5366,13 +5366,13 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				outputSHPDS = shpFiledriver->CreateDataSource(this->outputVector.c_str(), NULL);
 				if( outputSHPDS == NULL )
 				{
-					string message = string("Could not create vector file ") + this->outputVector;
+					std::string message = std::string("Could not create vector file ") + this->outputVector;
 					throw RSGISVectorOutputException(message.c_str());
 				}
 				outputSHPLayer = outputSHPDS->CreateLayer(SHPFileOutLayer.c_str(), inputSpatialRef, inFeatureDefn->GetGeomType(), NULL );
 				if( outputSHPLayer == NULL )
 				{
-					string message = string("Could not create vector layer ") + SHPFileOutLayer;
+					std::string message = std::string("Could not create vector layer ") + SHPFileOutLayer;
 					throw RSGISVectorOutputException(message.c_str());
 				}
 				
@@ -5391,7 +5391,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				RSGISVectorIO vecIO;
 				vecIO.readPolygons(inputLabelsSHPLayer, labelsData, numFeatures);
 				RSGISClassPolygon **labelsClassData = new RSGISClassPolygon*[numFeatures];
-				cout << "Number of tree crowns = " << numFeatures << endl;
+				std::cout << "Number of tree crowns = " << numFeatures << std::endl;
 				for(unsigned long i = 0; i < numFeatures; ++i)
 				{
 					labelsClassData[i] = (RSGISClassPolygon*)(labelsData[i]);
@@ -5426,7 +5426,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 		}
 		else
 		{
-			cout << "Options not recognised\n";
+			std::cout << "Options not recognised\n";
 		}
 		delete RSGISGEOSFactoryGenerator::getInstance();
 	}
@@ -5439,376 +5439,376 @@ void RSGISExePostClassification::printParameters()
 	{
 		if(option == RSGISExePostClassification::cluster)
 		{
-			cout << "Cluster all polygons but does not polygonize the output\n";
-			cout << "Input Shapefile = " << this->inputVector << endl;
-			cout << "Output Shapefile = " << this->outputVector << endl;
+			std::cout << "Cluster all polygons but does not polygonize the output\n";
+			std::cout << "Input Shapefile = " << this->inputVector << std::endl;
+			std::cout << "Output Shapefile = " << this->outputVector << std::endl;
 			
 			if(clusterertype == edgestddev)
 			{
-				cout << "The edge standard deviation cluster will be used\n";
-				cout << "Std Dev Threshold = " << this->numStdDevthreshold << endl;
-				cout << "Maximum Edge Length Threshold = " << this->maxEdgeLength << endl;
+				std::cout << "The edge standard deviation cluster will be used\n";
+				std::cout << "Std Dev Threshold = " << this->numStdDevthreshold << std::endl;
+				std::cout << "Maximum Edge Length Threshold = " << this->maxEdgeLength << std::endl;
 			}
 			else if(clusterertype == edgelength)
 			{
-				cout << "The maximum edge length cluster will be used\n";
-				cout << "Edge length threshold = " << edgelengththreshold << endl;
+				std::cout << "The maximum edge length cluster will be used\n";
+				std::cout << "Edge length threshold = " << edgelengththreshold << std::endl;
 			}
 		}
 		else if(option == RSGISExePostClassification::clusterclass)
 		{
-			cout << "Cluster input polygons by class but does not polygonize the output\n";
-			cout << "Input Shapefile = " << this->inputVector << endl;
-			cout << "Output Shapefile = " << this->outputVector << endl;
+			std::cout << "Cluster input polygons by class but does not polygonize the output\n";
+			std::cout << "Input Shapefile = " << this->inputVector << std::endl;
+			std::cout << "Output Shapefile = " << this->outputVector << std::endl;
 			
 			if(clusterertype == edgestddev)
 			{
-				cout << "The edge standard deviation cluster will be used\n";
-				cout << "Std Dev Threshold = " << this->numStdDevthreshold << endl;
-				cout << "Maximum Edge Length Threshold = " << this->maxEdgeLength << endl;
+				std::cout << "The edge standard deviation cluster will be used\n";
+				std::cout << "Std Dev Threshold = " << this->numStdDevthreshold << std::endl;
+				std::cout << "Maximum Edge Length Threshold = " << this->maxEdgeLength << std::endl;
 			}
 			else if(clusterertype == edgelength)
 			{
-				cout << "The maximum edge length cluster will be used\n";
-				cout << "Edge length threshold = " << edgelengththreshold << endl;
+				std::cout << "The maximum edge length cluster will be used\n";
+				std::cout << "Edge length threshold = " << edgelengththreshold << std::endl;
 				if(classEdgeLengths != NULL)
 				{
-					cout << "Per class thresholds: \n";
+					std::cout << "Per class thresholds: \n";
 					std::vector<EdgeLengthPair*>::iterator iterEdgePairs;
 					for(iterEdgePairs = classEdgeLengths->begin(); iterEdgePairs != classEdgeLengths->end(); ++iterEdgePairs)
 					{
-						cout << (*iterEdgePairs)->classname << " = " << (*iterEdgePairs)->lengththreshold << endl;
+						std::cout << (*iterEdgePairs)->classname << " = " << (*iterEdgePairs)->lengththreshold << std::endl;
 					}
 				}
 			}
 		}
 		else if(option == RSGISExePostClassification::clusterpolygonize)
 		{
-			cout << "Cluster all polygons and polygonize the output\n";
-			cout << "Input Shapefile = " << this->inputVector << endl;
-			cout << "Output Shapefile = " << this->outputVector << endl;
+			std::cout << "Cluster all polygons and polygonize the output\n";
+			std::cout << "Input Shapefile = " << this->inputVector << std::endl;
+			std::cout << "Output Shapefile = " << this->outputVector << std::endl;
 			
 			if(clusterertype == edgestddev)
 			{
-				cout << "The edge standard deviation cluster will be used\n";
-				cout << "Std Dev Threshold = " << this->numStdDevthreshold << endl;
-				cout << "Maximum Edge Length Threshold = " << this->maxEdgeLength << endl;
+				std::cout << "The edge standard deviation cluster will be used\n";
+				std::cout << "Std Dev Threshold = " << this->numStdDevthreshold << std::endl;
+				std::cout << "Maximum Edge Length Threshold = " << this->maxEdgeLength << std::endl;
 			}
 			else if(clusterertype == edgelength)
 			{
-				cout << "The maximum edge length cluster will be used\n";
-				cout << "Edge length threshold = " << edgelengththreshold << endl;
+				std::cout << "The maximum edge length cluster will be used\n";
+				std::cout << "Edge length threshold = " << edgelengththreshold << std::endl;
 			}
 			
 			if(polygonizertype == lineproj)
 			{
-				cout << "The line projection polygonizer will be used\n";
-				cout << "Resolution = " << this->resolution << endl;
+				std::cout << "The line projection polygonizer will be used\n";
+				std::cout << "Resolution = " << this->resolution << std::endl;
 			}
 			else if(polygonizertype == delaunay1)
 			{
-				cout << "The delaunay1 polygonizer will be used\n";
+				std::cout << "The delaunay1 polygonizer will be used\n";
 			}
 			else if(polygonizertype == delaunay2)
 			{
-				cout << "The delaunay2 polygonizer will be used\n";
+				std::cout << "The delaunay2 polygonizer will be used\n";
 			}
 			else if(polygonizertype == convexhull)
 			{
-				cout << "The convex hull polygonizer will be used\n";
+				std::cout << "The convex hull polygonizer will be used\n";
 			}
 			else if(polygonizertype == multipoly)
 			{
-				cout << "The multi-polygon polygonizer will be used\n";
+				std::cout << "The multi-polygon polygonizer will be used\n";
 			}
 			else if(polygonizertype == polys)
 			{
-				cout << "The polygons polygonizer will be used\n";
+				std::cout << "The polygons polygonizer will be used\n";
 			}
 			else if(polygonizertype == snakes)
 			{
-				cout << "The snakes polygonizer will be used\n";
-				cout << "Resolution = " << this->resolution << endl;
-				cout << "Alpha = " << this->alpha << endl;
-				cout << "Beta = " << this->beta << endl;
-				cout << "Gamma = " << this->gamma << endl;
-				cout << "Delta = " << this->delta << endl;
+				std::cout << "The snakes polygonizer will be used\n";
+				std::cout << "Resolution = " << this->resolution << std::endl;
+				std::cout << "Alpha = " << this->alpha << std::endl;
+				std::cout << "Beta = " << this->beta << std::endl;
+				std::cout << "Gamma = " << this->gamma << std::endl;
+				std::cout << "Delta = " << this->delta << std::endl;
 			}
 		}
 		else if(option == RSGISExePostClassification::clusterclasspolygonize)
 		{
-			cout << "Cluster polygons by class and polygonize the output\n";
-			cout << "Input Shapefile = " << this->inputVector << endl;
-			cout << "Output Shapefile = " << this->outputVector << endl;
+			std::cout << "Cluster polygons by class and polygonize the output\n";
+			std::cout << "Input Shapefile = " << this->inputVector << std::endl;
+			std::cout << "Output Shapefile = " << this->outputVector << std::endl;
 			
 			if(clusterertype == edgestddev)
 			{
-				cout << "The edge standard deviation cluster will be used\n";
-				cout << "Std Dev Threshold = " << this->numStdDevthreshold << endl;
-				cout << "Maximum Edge Length Threshold = " << this->maxEdgeLength << endl;
+				std::cout << "The edge standard deviation cluster will be used\n";
+				std::cout << "Std Dev Threshold = " << this->numStdDevthreshold << std::endl;
+				std::cout << "Maximum Edge Length Threshold = " << this->maxEdgeLength << std::endl;
 			}
 			else if(clusterertype == edgelength)
 			{
-				cout << "The maximum edge length cluster will be used\n";
-				cout << "Edge length threshold = " << edgelengththreshold << endl;
+				std::cout << "The maximum edge length cluster will be used\n";
+				std::cout << "Edge length threshold = " << edgelengththreshold << std::endl;
 				if(classEdgeLengths != NULL)
 				{
-					cout << "Per class thresholds: \n";
+					std::cout << "Per class thresholds: \n";
 					std::vector<EdgeLengthPair*>::iterator iterEdgePairs;
 					for(iterEdgePairs = classEdgeLengths->begin(); iterEdgePairs != classEdgeLengths->end(); ++iterEdgePairs)
 					{
-						cout << (*iterEdgePairs)->classname << " = " << (*iterEdgePairs)->lengththreshold << endl;
+						std::cout << (*iterEdgePairs)->classname << " = " << (*iterEdgePairs)->lengththreshold << std::endl;
 					}
 				}
 			}
 			
 			if(polygonizertype == lineproj)
 			{
-				cout << "The line projection polygonizer will be used\n";
-				cout << "Resolution = " << this->resolution << endl;
+				std::cout << "The line projection polygonizer will be used\n";
+				std::cout << "Resolution = " << this->resolution << std::endl;
 			}
 			else if(polygonizertype == delaunay1)
 			{
-				cout << "The delaunay1 polygonizer will be used\n";
+				std::cout << "The delaunay1 polygonizer will be used\n";
 			}
 			else if(polygonizertype == delaunay2)
 			{
-				cout << "The delaunay2 polygonizer will be used\n";
+				std::cout << "The delaunay2 polygonizer will be used\n";
 			}
 			else if(polygonizertype == convexhull)
 			{
-				cout << "The convex hull polygonizer will be used\n";
+				std::cout << "The convex hull polygonizer will be used\n";
 			}
 			else if(polygonizertype == multipoly)
 			{
-				cout << "The multi-polygon polygonizer will be used\n";
+				std::cout << "The multi-polygon polygonizer will be used\n";
 			}
 			else if(polygonizertype == polys)
 			{
-				cout << "The polygons polygonizer will be used\n";
+				std::cout << "The polygons polygonizer will be used\n";
 			}
 			else if(polygonizertype == snakes)
 			{
-				cout << "The snakes polygonizer will be used\n";
-				cout << "Resolution = " << this->resolution << endl;
-				cout << "Alpha = " << this->alpha << endl;
-				cout << "Beta = " << this->beta << endl;
-				cout << "Gamma = " << this->gamma << endl;
-				cout << "Delta = " << this->delta << endl;
+				std::cout << "The snakes polygonizer will be used\n";
+				std::cout << "Resolution = " << this->resolution << std::endl;
+				std::cout << "Alpha = " << this->alpha << std::endl;
+				std::cout << "Beta = " << this->beta << std::endl;
+				std::cout << "Gamma = " << this->gamma << std::endl;
+				std::cout << "Delta = " << this->delta << std::endl;
 			}
 		}
 		else if(option == RSGISExePostClassification::splitlargesmall)
 		{
-			cout << "Split the large and small polygons\n";
-			cout << "Input Shapefile = " << this->inputVector << endl;
-			cout << "Output Large Shapefile = " << this->outputLargeVector << endl;
-			cout << "Output Small Shapefile = " << this->outputSmallVector << endl;
-			cout << "Area Threshold 1 = " << this->largeThreshold1 << endl;
-			cout << "Proportional Polygon Area Threshold 1 = " << this->propPolyArea1 << endl;
-			cout << "Overlap Threshold = " << this->overlapThreshold << endl;
-			cout << "Area Threshold 2 = " << this->largeThreshold2 << endl;
-			cout << "Proportional Polygon Area Threshold 2 = " << this->propPolyArea2 << endl;
+			std::cout << "Split the large and small polygons\n";
+			std::cout << "Input Shapefile = " << this->inputVector << std::endl;
+			std::cout << "Output Large Shapefile = " << this->outputLargeVector << std::endl;
+			std::cout << "Output Small Shapefile = " << this->outputSmallVector << std::endl;
+			std::cout << "Area Threshold 1 = " << this->largeThreshold1 << std::endl;
+			std::cout << "Proportional Polygon Area Threshold 1 = " << this->propPolyArea1 << std::endl;
+			std::cout << "Overlap Threshold = " << this->overlapThreshold << std::endl;
+			std::cout << "Area Threshold 2 = " << this->largeThreshold2 << std::endl;
+			std::cout << "Proportional Polygon Area Threshold 2 = " << this->propPolyArea2 << std::endl;
 		}
 		else if(option == RSGISExePostClassification::mergelargepolygons)
 		{
-			cout << "Merge the large polygons and remove overlaps\n";
-			cout << "Input Shapefile = " << this->inputVector << endl;
-			cout << "Output Shapefile = " << this->outputVector << endl;
-			cout << "Large Polygon Threshold = " << this->largeThreshold << endl;
-			cout << "Intersect Ratio Threshold = " << this->intersectRatio << endl;
+			std::cout << "Merge the large polygons and remove overlaps\n";
+			std::cout << "Input Shapefile = " << this->inputVector << std::endl;
+			std::cout << "Output Shapefile = " << this->outputVector << std::endl;
+			std::cout << "Large Polygon Threshold = " << this->largeThreshold << std::endl;
+			std::cout << "Intersect Ratio Threshold = " << this->intersectRatio << std::endl;
 		}
 		else if(option == RSGISExePostClassification::morphology)
 		{
-			cout << "Undertake morphology on the input polygons\n";
-			cout << "Input Shapefile = " << this->inputVector << endl;
-			cout << "Output Shapefile = " << this->outputVector << endl;
-			cout << "Buffer = " << this->buffer << endl;
+			std::cout << "Undertake morphology on the input polygons\n";
+			std::cout << "Input Shapefile = " << this->inputVector << std::endl;
+			std::cout << "Output Shapefile = " << this->outputVector << std::endl;
+			std::cout << "Buffer = " << this->buffer << std::endl;
 			if(morphologyType == closing)
 			{
-				cout << "Undertaking a morphological closing\n";
+				std::cout << "Undertaking a morphological closing\n";
 			}
 			else if(morphologyType == opening)
 			{
-				cout << "Undertaking a morphological opening\n";
+				std::cout << "Undertaking a morphological opening\n";
 			}
 			else if(morphologyType == dilation)
 			{
-				cout << "Undertaking a morphological dilation\n";
+				std::cout << "Undertaking a morphological dilation\n";
 			}
 			else if(morphologyType == erosion)
 			{
-				cout << "Undertaking a morphological erosion\n";
+				std::cout << "Undertaking a morphological erosion\n";
 			}
 			else
 			{
-				cout << "ERROR: Unknown morphological operation\n";
+				std::cout << "ERROR: Unknown morphological operation\n";
 			}
 		}
 		else if(option == RSGISExePostClassification::removesmallwithinlarge)
 		{
-			cout << "Remove any small polygons that are contained within a large polygon.\n";
-			cout << "Input Shapefile (Large Polygons) = " << this->inputVectorLarge << endl;
-			cout << "Input Shapefile (Small Polygons) = " << this->inputVectorSmall << endl;
-			cout << "Output Large Shapefile = " << this->outputLargeVector << endl;
-			cout << "Output Small Shapefile = " << this->outputSmallVector << endl;
-			cout << "Overlap Threshold = " << this->overlapThreshold << endl;
+			std::cout << "Remove any small polygons that are contained within a large polygon.\n";
+			std::cout << "Input Shapefile (Large Polygons) = " << this->inputVectorLarge << std::endl;
+			std::cout << "Input Shapefile (Small Polygons) = " << this->inputVectorSmall << std::endl;
+			std::cout << "Output Large Shapefile = " << this->outputLargeVector << std::endl;
+			std::cout << "Output Small Shapefile = " << this->outputSmallVector << std::endl;
+			std::cout << "Overlap Threshold = " << this->overlapThreshold << std::endl;
 		}
 		else if(option == RSGISExePostClassification::mergesmallandlarge)
 		{
-			cout << "Merge the small and large polygons together where possible.\n";
-			cout << "Input Shapefile (Large Polygons) = " << this->inputVectorLarge << endl;
-			cout << "Input Shapefile (Small Polygons) = " << this->inputVectorSmall << endl;
-			cout << "Output Large Shapefile = " << this->outputLargeVector << endl;
-			cout << "Output Small Shapefile = " << this->outputSmallVector << endl;
-			cout << "Large Polygon Threshold = " << this->largeThreshold << endl;
-			cout << "Intersect Ratio Threshold = " << this->intersectRatio << endl;
-			cout << "Overlap Threshold = " << this->overlapThreshold << endl;
+			std::cout << "Merge the small and large polygons together where possible.\n";
+			std::cout << "Input Shapefile (Large Polygons) = " << this->inputVectorLarge << std::endl;
+			std::cout << "Input Shapefile (Small Polygons) = " << this->inputVectorSmall << std::endl;
+			std::cout << "Output Large Shapefile = " << this->outputLargeVector << std::endl;
+			std::cout << "Output Small Shapefile = " << this->outputSmallVector << std::endl;
+			std::cout << "Large Polygon Threshold = " << this->largeThreshold << std::endl;
+			std::cout << "Intersect Ratio Threshold = " << this->intersectRatio << std::endl;
+			std::cout << "Overlap Threshold = " << this->overlapThreshold << std::endl;
 		}
 		else if(option == RSGISExePostClassification::clusterremainingsmall)
 		{
-			cout << "Cluster remaining smaller polygons without crossing any existing large polygons\n";
-			cout << "Input Shapefile (Large Polygons) = " << this->inputVectorLarge << endl;
-			cout << "Input Shapefile (Small Polygons) = " << this->inputVectorSmall << endl;
-			cout << "Output Shapefile = " << this->outputVector << endl;
-			cout << "Max Length = " << this->maxlength << endl;
+			std::cout << "Cluster remaining smaller polygons without crossing any existing large polygons\n";
+			std::cout << "Input Shapefile (Large Polygons) = " << this->inputVectorLarge << std::endl;
+			std::cout << "Input Shapefile (Small Polygons) = " << this->inputVectorSmall << std::endl;
+			std::cout << "Output Shapefile = " << this->outputVector << std::endl;
+			std::cout << "Max Length = " << this->maxlength << std::endl;
 			
 			if(polygonizertype == lineproj)
 			{
-				cout << "The line projection polygonizer will be used\n";
-				cout << "Resolution = " << this->resolution << endl;
+				std::cout << "The line projection polygonizer will be used\n";
+				std::cout << "Resolution = " << this->resolution << std::endl;
 			}
 			else if(polygonizertype == delaunay1)
 			{
-				cout << "The delaunay1 polygonizer will be used\n";
+				std::cout << "The delaunay1 polygonizer will be used\n";
 			}
 			else if(polygonizertype == convexhull)
 			{
-				cout << "The convex hull polygonizer will be used\n";
+				std::cout << "The convex hull polygonizer will be used\n";
 			}
 			else if(polygonizertype == snakes)
 			{
-				cout << "The snakes polygonizer will be used\n";
-				cout << "Resolution = " << this->resolution << endl;
-				cout << "Alpha = " << this->alpha << endl;
-				cout << "Beta = " << this->beta << endl;
-				cout << "Gamma = " << this->gamma << endl;
-				cout << "Delta = " << this->delta << endl;
+				std::cout << "The snakes polygonizer will be used\n";
+				std::cout << "Resolution = " << this->resolution << std::endl;
+				std::cout << "Alpha = " << this->alpha << std::endl;
+				std::cout << "Beta = " << this->beta << std::endl;
+				std::cout << "Gamma = " << this->gamma << std::endl;
+				std::cout << "Delta = " << this->delta << std::endl;
 			}
 		}
 		else if(option == RSGISExePostClassification::mergesmall2nearestlarge)
 		{
-			cout << "Merge all the small polygons to their nearest large polygon.\n";
-			cout << "Input Shapefile (Large Polygons) = " << this->inputVectorLarge << endl;
-			cout << "Input Shapefile (Small Polygons) = " << this->inputVectorSmall << endl;
-			cout << "Output Shapefile = " << this->outputVector << endl;
+			std::cout << "Merge all the small polygons to their nearest large polygon.\n";
+			std::cout << "Input Shapefile (Large Polygons) = " << this->inputVectorLarge << std::endl;
+			std::cout << "Input Shapefile (Small Polygons) = " << this->inputVectorSmall << std::endl;
+			std::cout << "Output Shapefile = " << this->outputVector << std::endl;
 			
 			if(polygonizertype == lineproj)
 			{
-				cout << "The line projection polygonizer will be used\n";
-				cout << "Resolution = " << this->resolution << endl;
+				std::cout << "The line projection polygonizer will be used\n";
+				std::cout << "Resolution = " << this->resolution << std::endl;
 			}
 			else if(polygonizertype == delaunay1)
 			{
-				cout << "The delaunay1 polygonizer will be used\n";
+				std::cout << "The delaunay1 polygonizer will be used\n";
 			}
 			else if(polygonizertype == convexhull)
 			{
-				cout << "The convex hull polygonizer will be used\n";
+				std::cout << "The convex hull polygonizer will be used\n";
 			}
 			else if(polygonizertype == snakes)
 			{
-				cout << "The snakes polygonizer will be used\n";
-				cout << "Resolution = " << this->resolution << endl;
-				cout << "Alpha = " << this->alpha << endl;
-				cout << "Beta = " << this->beta << endl;
-				cout << "Gamma = " << this->gamma << endl;
-				cout << "Delta = " << this->delta << endl;
+				std::cout << "The snakes polygonizer will be used\n";
+				std::cout << "Resolution = " << this->resolution << std::endl;
+				std::cout << "Alpha = " << this->alpha << std::endl;
+				std::cout << "Beta = " << this->beta << std::endl;
+				std::cout << "Gamma = " << this->gamma << std::endl;
+				std::cout << "Delta = " << this->delta << std::endl;
 			}
 		}
 		else if(option == RSGISExePostClassification::mergepolygons)
 		{
-			cout << "Merge the polygons outputted from the cluster process to produce a single output.\n";
-			cout << "Input Cluster Polygons Shapefile = " << this->inputVector_clusters << endl;
-			cout << "Input Cluster Individual Polygons Shapefile = " << this->inputVector_polys << endl;
-			cout << "Input Original Polygons Shapefile = " << this->inputVector_orig << endl;
-			cout << "Output Shapefile = " << this->outputVector << endl;
+			std::cout << "Merge the polygons outputted from the cluster process to produce a single output.\n";
+			std::cout << "Input Cluster Polygons Shapefile = " << this->inputVector_clusters << std::endl;
+			std::cout << "Input Cluster Individual Polygons Shapefile = " << this->inputVector_polys << std::endl;
+			std::cout << "Input Original Polygons Shapefile = " << this->inputVector_orig << std::endl;
+			std::cout << "Output Shapefile = " << this->outputVector << std::endl;
 		}
 		else if(option == RSGISExePostClassification::labelpolys)
 		{
-			cout << "Label polygons with summaries of small polygons.\n";
-			cout << "Input Vector = " << this->inputVector << endl;
-			cout << "Input Label Vector = " << this->labelsVector << endl;
-			cout << "Labels Attribute = " << this->classAttribute << endl;
-			cout << "Output Shapefile = " << this->outputVector << endl;
+			std::cout << "Label polygons with summaries of small polygons.\n";
+			std::cout << "Input Vector = " << this->inputVector << std::endl;
+			std::cout << "Input Label Vector = " << this->labelsVector << std::endl;
+			std::cout << "Labels Attribute = " << this->classAttribute << std::endl;
+			std::cout << "Output Shapefile = " << this->outputVector << std::endl;
 			if(dominant == speciesCount)
 			{
-				cout << "Dominant class defined by object count\n";
+				std::cout << "Dominant class defined by object count\n";
 			}
 			else if(dominant == speciesArea)
 			{
-				cout << "Dominant class defind by object area\n";
+				std::cout << "Dominant class defind by object area\n";
 			}
 			else
 			{
-				cout << "Dominant class calculation is unknown - this may result in an error!!\n";
+				std::cout << "Dominant class calculation is unknown - this may result in an error!!\n";
 			}
 		}
 		else
 		{
-			cout << "Options not recognised\n";
+			std::cout << "Options not recognised\n";
 		}
 	}
 	else
 	{
-		cout << "The parameters have yet to be parsed\n";
+		std::cout << "The parameters have yet to be parsed\n";
 	}
 }
 
 void RSGISExePostClassification::help()
 {
-    cout << "<rsgis:commands xmlns:rsgis=\"http://www.rsgislib.org/xml/\">" << endl;
-	cout << "\t<rsgis:command algor=\"postclassification\" option=\"cluster\" input=\"vector.shp\" output=\"vector_out.shp\" force=\"yes | no\">\n";
-	cout << "\t\t<rsgis:clusterer algor=\"edgestddev | edgelength\" length=\"float\" stddev=\"float\" maxedgelength=\"float\" >\n";
-	cout << "\t\t\t<rsgis:edgelength classname=\"string\" length=\"float\" />\n";
-	cout << "\t\t</rsgis:clusterer>\n";
-	cout << "\t</rsgis:command>\n";
-	cout << "\t<rsgis:command algor=\"postclassification\" option=\"clusterclass\" input=\"vector.shp\" class=\"string\" output=\"vector_out.shp\" force=\"yes | no\">\n";
-	cout << "\t\t<rsgis:clusterer algor=\"edgestddev | edgelength\" length=\"float\" stddev=\"float\" maxedgelength=\"float\" >\n";
-	cout << "\t\t\t<rsgis:edgelength classname=\"string\" length=\"float\" />\n";
-	cout << "\t\t</rsgis:clusterer>\n";
-	cout << "\t</rsgis:command>\n";
-	cout << "\t<rsgis:command algor=\"postclassification\" option=\"clusterpolygonize\" input=\"vector.shp\" output=\"vector_out.shp\" force=\"yes | no\">\n";
-	cout << "\t\t<rsgis:clusterer algor=\"edgestddev | edgelength\" length=\"float\" stddev=\"float\" maxedgelength=\"float\" >\n";
-	cout << "\t\t\t<rsgis:edgelength classname=\"string\" length=\"float\" />\n";
-	cout << "\t\t</rsgis:clusterer>\n";
-	cout << "\t\t<rsgis:polygonizer algor=\"lineproj | delaunay1 | delaunay2 | convexhull | multipoly | snakes | polys\" resolution=\"float\" alpha=\"float\" beta=\"float\" gamma=\"float\" delta=\"float\"/>\n";
-	cout << "\t</rsgis:command>\n";
-	cout << "\t<rsgis:command algor=\"postclassification\" option=\"clusterclasspolygonize\" input=\"vector.shp\" class=\"string\" output=\"vector_out.shp\" force=\"yes | no\">\n";
-	cout << "\t\t<rsgis:clusterer algor=\"edgestddev | edgelength\" length=\"float\" stddev=\"float\" maxedgelength=\"float\" >\n";
-	cout << "\t\t\t<rsgis:edgelength classname=\"string\" length=\"float\" />\n";
-	cout << "\t\t</rsgis:clusterer>\n";
-	cout << "\t\t<rsgis:polygonizer algor=\"lineproj | delaunay1 | delaunay2 | convexhull | multipoly | snakes | polys\" resolution=\"float\" alpha=\"float\" beta=\"float\" gamma=\"float\" delta=\"float\"/>\n";
-	cout << "\t</rsgis:command>\n";
-	cout << "\t<rsgis:command algor=\"postclassification\" option=\"splitlargesmall\" input=\"vector.shp\" outputlarge=\"vector_out.shp\" outputsmall=\"vector_out.shp\" force=\"yes | no\" largethreshold1=\"float\" proppolyarea1=\"float\" overlapthreshold=\"float\" largethreshold2=\"float\" proppolyarea2=\"float\"  />\n";
-	cout << "\t<rsgis:command algor=\"postclassification\" option=\"morphology\" type=\"closing | opening | dilation | erosion\" input=\"vector.shp\" output=\"vector_out.shp\" force=\"yes | no\" buffer=\"float\" />\n";
-	cout << "\t<rsgis:command algor=\"postclassification\" option=\"mergelargepolygons\" input=\"vector.shp\" output=\"vector_out.shp\" force=\"yes | no\" largethreshold=\"float\" intersectratio=\"float\" />\n";
-	cout << "\t<rsgis:command algor=\"postclassification\" option=\"removesmallwithinlarge\" inputlarge=\"vector_large.shp\" inputsmall=\"vector_small.shp\" outputlarge=\"vector_out.shp\" outputsmall=\"vector_out.shp\" force=\"yes | no\" overlapthreshold=\"float\"/>\n";
-	cout << "\t<rsgis:command algor=\"postclassification\" option=\"mergesmallandlarge\" inputlarge=\"vector_large.shp\" inputsmall=\"vector_small.shp\" outputlarge=\"vector_out.shp\" outputsmall=\"vector_out.shp\" force=\"yes | no\" largethreshold=\"float\" intersectratio=\"float\" overlapthreshold=\"float\" />\n";
-	cout << "\t<rsgis:command algor=\"postclassification\" option=\"clusterremainingsmall\" inputlarge=\"vector_large.shp\" inputsmall=\"vector_small.shp\" output=\"vector_out.shp\" force=\"yes | no\" maxlength=\"float\" >\n";
-	cout << "\t\t<rsgis:polygonizer algor=\"lineproj | delaunay1 | convexhull | snakes\" resolution=\"float\" alpha=\"float\" beta=\"float\" gamma=\"float\" delta=\"float\"/>\n";
-	cout << "\t</rsgis:command>\n";
-	cout << "\t<rsgis:command algor=\"postclassification\" option=\"mergesmall2nearestlarge\" inputlarge=\"vector_large.shp\" inputsmall=\"vector_small.shp\" output=\"vector_out.shp\" force=\"yes | no\" >\n";
-	cout << "\t\t<rsgis:polygonizer algor=\"lineproj | delaunay1 | convexhull | snakes\" resolution=\"float\" alpha=\"float\" beta=\"float\" gamma=\"float\" delta=\"float\"/>\n";
-	cout << "\t</rsgis:command>\n";
-	cout << "</rsgis:commands>\n";
+    std::cout << "<rsgis:commands xmlns:rsgis=\"http://www.rsgislib.org/xml/\">" << std::endl;
+	std::cout << "\t<rsgis:command algor=\"postclassification\" option=\"cluster\" input=\"vector.shp\" output=\"vector_out.shp\" force=\"yes | no\">\n";
+	std::cout << "\t\t<rsgis:clusterer algor=\"edgestddev | edgelength\" length=\"float\" stddev=\"float\" maxedgelength=\"float\" >\n";
+	std::cout << "\t\t\t<rsgis:edgelength classname=\"std::string\" length=\"float\" />\n";
+	std::cout << "\t\t</rsgis:clusterer>\n";
+	std::cout << "\t</rsgis:command>\n";
+	std::cout << "\t<rsgis:command algor=\"postclassification\" option=\"clusterclass\" input=\"vector.shp\" class=\"std::string\" output=\"vector_out.shp\" force=\"yes | no\">\n";
+	std::cout << "\t\t<rsgis:clusterer algor=\"edgestddev | edgelength\" length=\"float\" stddev=\"float\" maxedgelength=\"float\" >\n";
+	std::cout << "\t\t\t<rsgis:edgelength classname=\"std::string\" length=\"float\" />\n";
+	std::cout << "\t\t</rsgis:clusterer>\n";
+	std::cout << "\t</rsgis:command>\n";
+	std::cout << "\t<rsgis:command algor=\"postclassification\" option=\"clusterpolygonize\" input=\"vector.shp\" output=\"vector_out.shp\" force=\"yes | no\">\n";
+	std::cout << "\t\t<rsgis:clusterer algor=\"edgestddev | edgelength\" length=\"float\" stddev=\"float\" maxedgelength=\"float\" >\n";
+	std::cout << "\t\t\t<rsgis:edgelength classname=\"std::string\" length=\"float\" />\n";
+	std::cout << "\t\t</rsgis:clusterer>\n";
+	std::cout << "\t\t<rsgis:polygonizer algor=\"lineproj | delaunay1 | delaunay2 | convexhull | multipoly | snakes | polys\" resolution=\"float\" alpha=\"float\" beta=\"float\" gamma=\"float\" delta=\"float\"/>\n";
+	std::cout << "\t</rsgis:command>\n";
+	std::cout << "\t<rsgis:command algor=\"postclassification\" option=\"clusterclasspolygonize\" input=\"vector.shp\" class=\"std::string\" output=\"vector_out.shp\" force=\"yes | no\">\n";
+	std::cout << "\t\t<rsgis:clusterer algor=\"edgestddev | edgelength\" length=\"float\" stddev=\"float\" maxedgelength=\"float\" >\n";
+	std::cout << "\t\t\t<rsgis:edgelength classname=\"std::string\" length=\"float\" />\n";
+	std::cout << "\t\t</rsgis:clusterer>\n";
+	std::cout << "\t\t<rsgis:polygonizer algor=\"lineproj | delaunay1 | delaunay2 | convexhull | multipoly | snakes | polys\" resolution=\"float\" alpha=\"float\" beta=\"float\" gamma=\"float\" delta=\"float\"/>\n";
+	std::cout << "\t</rsgis:command>\n";
+	std::cout << "\t<rsgis:command algor=\"postclassification\" option=\"splitlargesmall\" input=\"vector.shp\" outputlarge=\"vector_out.shp\" outputsmall=\"vector_out.shp\" force=\"yes | no\" largethreshold1=\"float\" proppolyarea1=\"float\" overlapthreshold=\"float\" largethreshold2=\"float\" proppolyarea2=\"float\"  />\n";
+	std::cout << "\t<rsgis:command algor=\"postclassification\" option=\"morphology\" type=\"closing | opening | dilation | erosion\" input=\"vector.shp\" output=\"vector_out.shp\" force=\"yes | no\" buffer=\"float\" />\n";
+	std::cout << "\t<rsgis:command algor=\"postclassification\" option=\"mergelargepolygons\" input=\"vector.shp\" output=\"vector_out.shp\" force=\"yes | no\" largethreshold=\"float\" intersectratio=\"float\" />\n";
+	std::cout << "\t<rsgis:command algor=\"postclassification\" option=\"removesmallwithinlarge\" inputlarge=\"vector_large.shp\" inputsmall=\"vector_small.shp\" outputlarge=\"vector_out.shp\" outputsmall=\"vector_out.shp\" force=\"yes | no\" overlapthreshold=\"float\"/>\n";
+	std::cout << "\t<rsgis:command algor=\"postclassification\" option=\"mergesmallandlarge\" inputlarge=\"vector_large.shp\" inputsmall=\"vector_small.shp\" outputlarge=\"vector_out.shp\" outputsmall=\"vector_out.shp\" force=\"yes | no\" largethreshold=\"float\" intersectratio=\"float\" overlapthreshold=\"float\" />\n";
+	std::cout << "\t<rsgis:command algor=\"postclassification\" option=\"clusterremainingsmall\" inputlarge=\"vector_large.shp\" inputsmall=\"vector_small.shp\" output=\"vector_out.shp\" force=\"yes | no\" maxlength=\"float\" >\n";
+	std::cout << "\t\t<rsgis:polygonizer algor=\"lineproj | delaunay1 | convexhull | snakes\" resolution=\"float\" alpha=\"float\" beta=\"float\" gamma=\"float\" delta=\"float\"/>\n";
+	std::cout << "\t</rsgis:command>\n";
+	std::cout << "\t<rsgis:command algor=\"postclassification\" option=\"mergesmall2nearestlarge\" inputlarge=\"vector_large.shp\" inputsmall=\"vector_small.shp\" output=\"vector_out.shp\" force=\"yes | no\" >\n";
+	std::cout << "\t\t<rsgis:polygonizer algor=\"lineproj | delaunay1 | convexhull | snakes\" resolution=\"float\" alpha=\"float\" beta=\"float\" gamma=\"float\" delta=\"float\"/>\n";
+	std::cout << "\t</rsgis:command>\n";
+	std::cout << "</rsgis:commands>\n";
 }
 
-string RSGISExePostClassification::getDescription()
+std::string RSGISExePostClassification::getDescription()
 {
 	return "Utilities for manipulating a classification.";
 }
 
-string RSGISExePostClassification::getXMLSchema()
+std::string RSGISExePostClassification::getXMLSchema()
 {
 	return "NOT DONE!";
 }
@@ -5842,17 +5842,17 @@ void RSGISExePostClassification::buildClusterDataStructure(std::vector<RSGISClus
 		
 		//int countIndividuals = 0;
 		
-		cout << "There are " << numClusters << " clusters\n";
+		std::cout << "There are " << numClusters << " clusters\n";
 		
 		for(int i = 0; i < numClusters; ++i)
 		{
-			cout << "Cluster " << i << endl;
+			std::cout << "Cluster " << i << std::endl;
 			poly = dataClusters[i]->getPolygon();
 			
 			/*
-			cout << "Morphological 0 on retrieved polygons\n";
+			std::cout << "Morphological 0 on retrieved polygons\n";
 			geomUtils.performMorphologicalOperation(polys, closing, 0, 30);
-			cout << "Completed Morphological 0 on polygons\n";
+			std::cout << "Completed Morphological 0 on polygons\n";
 			 */
 			
 			/*
@@ -5869,7 +5869,7 @@ void RSGISExePostClassification::buildClusterDataStructure(std::vector<RSGISClus
 			//countIndividuals = 0;
 			for(iterIndividuals = individuals->begin(); iterIndividuals != individuals->end(); ++iterIndividuals)
 			{
-				//cout << "Individual " << countIndividuals << endl;
+				//std::cout << "Individual " << countIndividuals << std::endl;
 				
 				try 
 				{
@@ -5878,7 +5878,7 @@ void RSGISExePostClassification::buildClusterDataStructure(std::vector<RSGISClus
 					   (poly->contains((*iterIndividuals)->getPolygon())))*/
 					if(poly->contains((*iterIndividuals)->getPolygon()))
 					{
-						//cout << countIndividuals <<  ") poly overlap\n";
+						//std::cout << countIndividuals <<  ") poly overlap\n";
 						for(iterInClusterPolys = inClusterPolys->begin(); iterInClusterPolys != inClusterPolys->end(); ++iterInClusterPolys)
 						{
 							if((*iterInClusterPolys)->getValue() == i)
@@ -5887,7 +5887,7 @@ void RSGISExePostClassification::buildClusterDataStructure(std::vector<RSGISClus
 								{
 									if(((*iterInClusterPolys)->getPolygon())->equalsExact((*iterIndividuals)->getPolygon(), 1))
 									{
-										//cout << "polygons equal\n";
+										//std::cout << "polygons equal\n";
 										clusterPolygons->push_back(*iterIndividuals);
 									}
 								}

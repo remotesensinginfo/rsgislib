@@ -37,7 +37,7 @@ namespace rsgis{ namespace classifier{
 		return classToReturn->classID;
 	}
 	
-	string RSGISNearestNeighbourClassifier::getClassName(float *variables, int numVars) throw(RSGISClassificationException)
+	std::string RSGISNearestNeighbourClassifier::getClassName(float *variables, int numVars) throw(RSGISClassificationException)
 	{
 		ClassData *classToReturn = this->findClass(variables, numVars);
 		return classToReturn->className;

@@ -51,7 +51,7 @@ namespace rsgis{namespace rastergis{
     {
     public:
         RSGISKNNATTable();
-        void initKNN(RSGISAttributeTable *attTable, string trainField, string classField, bool limitToClass, int classVal, unsigned int k, float distThreshold, rsgis::math::rsgisdistmetrics distMetric, std::vector<string> *attributeNames)throw(RSGISAttributeTableException);
+        void initKNN(RSGISAttributeTable *attTable, std::string trainField, std::string classField, bool limitToClass, int classVal, unsigned int k, float distThreshold, rsgis::math::rsgisdistmetrics distMetric, std::vector<std::string> *attributeNames)throw(RSGISAttributeTableException);
         virtual void performKNN()throw(RSGISAttributeTableException)=0;
         virtual ~RSGISKNNATTable();
     protected:
@@ -61,11 +61,11 @@ namespace rsgis{namespace rastergis{
         double calcCovariance(RSGISAttribute *a, RSGISAttribute *b, double aMean, double bMean) throw(rsgis::math::RSGISMathException);
         bool initialised;
         RSGISAttributeTable *attTable;
-        string trainField;
+        std::string trainField;
         unsigned int trainFieldIdx;
         RSGISAttributeDataType trainFieldDT;
         bool limitToClass;
-        string classField;
+        std::string classField;
         int classVal;
         unsigned int classFieldIdx;
         RSGISAttributeDataType classFieldDT;
@@ -84,12 +84,12 @@ namespace rsgis{namespace rastergis{
     class RSGISKNNATTableExtrapolation : public RSGISKNNATTable
     {
     public:
-        RSGISKNNATTableExtrapolation(string valField);
+        RSGISKNNATTableExtrapolation(std::string valField);
         void performKNN()throw(RSGISAttributeTableException);
         ~RSGISKNNATTableExtrapolation();
     protected:
         double calcNewVal(unsigned int k, float distThreshold, rsgis::math::rsgisdistmetrics distMetric, std::vector<double> *knownVals, std::vector< std::vector<double>* > *knownData, std::vector<double> *unknownData) throw(rsgis::math::RSGISMathException);
-        string valField;
+        std::string valField;
         unsigned int valFieldIdx;
         RSGISAttributeDataType valFieldDT;
     };

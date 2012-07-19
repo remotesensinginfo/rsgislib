@@ -136,7 +136,7 @@ namespace rsgis {namespace math{
 		vectorUtils.printGSLVector(x); 
 		std::cout << " chisq = " << chisq << std::endl;
 		std::cout << "----------------------------------------------------------------------------" << std::endl;
-		std::cout << endl;
+		std::cout << std::endl;
 		
 		// Clean up
 		gsl_multifit_linear_free(workspace);

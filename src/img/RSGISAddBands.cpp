@@ -420,7 +420,7 @@ namespace rsgis{namespace img{
 			
 			int feedback = height/10;
 			int feedbackCounter = 0;
-			std::cout << "Started" << flush;
+			std::cout << "Started" << std::flush;
 			// Loop images to process data
 			for(int i = 0; i < height; i++)
 			{
@@ -428,7 +428,7 @@ namespace rsgis{namespace img{
 				
 				if((i % feedback) == 0)
 				{
-					std::cout << ".." << feedbackCounter << ".." << flush;
+					std::cout << ".." << feedbackCounter << ".." << std::flush;
 					feedbackCounter = feedbackCounter + 10;
 				}
 				

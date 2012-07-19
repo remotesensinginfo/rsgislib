@@ -36,7 +36,7 @@ namespace rsgis{namespace img{
 		this->lowerLimit = lowerLimit;
 		this->deltatype = deltatype;
 		baysianStats = new rsgis::math::RSGISBaysianStatsPrior(function, probDistro, variance, interval, minVal, maxVal, upperLimit, lowerLimit, deltatype);
-		cout << "Delta type " << deltatype << endl;
+		std::cout << "Delta type " << deltatype << std::endl;
 	}
 	
 	void RSGISImageCalcValueBaysianPrior::calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException)

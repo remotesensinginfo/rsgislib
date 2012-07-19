@@ -95,17 +95,17 @@ namespace rsgis{namespace img{
             
 			imgUtils.getImagesExtent(inputImages, numDS, &width, &height, transformation);
 			
-			cout << "Create new image [" << width << "," << height << "] with projection: \n" << projection << endl;
+			std::cout << "Create new image [" << width << "," << height << "] with projection: \n" << projection << std::endl;
 			
 			outputDataset = imgUtils.createBlankImage(outputImage, transformation, width, height, numberBands, projection, background, bandnames);
 			
 			// COPY IMAGE DATA INTO THE BLANK IMAGE
 			
-			cout << "Started (total " << numDS << ") ." << flush;
+			std::cout << "Started (total " << numDS << ") ." << std::flush;
 			
 			for(int i = 0; i < numDS; i++)
 			{
-				cout << "." << i << "." << flush;
+				std::cout << "." << i << "." << std::flush;
                 
                 dataset = (GDALDataset *) GDALOpenShared(inputImages[i].c_str(), GA_ReadOnly);
                 if(dataset == NULL)
@@ -138,7 +138,7 @@ namespace rsgis{namespace img{
 				delete imgData;
                 GDALClose(dataset);
 			}
-			cout << ".complete\n";
+			std::cout << ".complete\n";
 		}
 		catch(RSGISImageBandException e)
 		{
@@ -230,17 +230,17 @@ namespace rsgis{namespace img{
 			
 			imgUtils.getImagesExtent(inputImages, numDS, &width, &height, transformation);
 			
-			cout << "Create new image [" << width << "," << height << "] with projection: \n" << projection << endl;
+			std::cout << "Create new image [" << width << "," << height << "] with projection: \n" << projection << std::endl;
 			
 			outputDataset = imgUtils.createBlankImage(outputImage, transformation, width, height, numberBands, projection, background, bandnames);
 			
 			// COPY IMAGE DATA INTO THE BLANK IMAGE
 			
-			cout << "Started (total " << numDS << ") ." << flush;
+			std::cout << "Started (total " << numDS << ") ." << std::flush;
 			
 			for(int i = 0; i < numDS; i++)
 			{
-				cout << "." << i << "." << flush;
+				std::cout << "." << i << "." << std::flush;
                 
                 dataset = (GDALDataset *) GDALOpenShared(inputImages[i].c_str(), GA_ReadOnly);
                 if(dataset == NULL)
@@ -275,7 +275,7 @@ namespace rsgis{namespace img{
 						
 							inputBand->RasterIO(GF_Read, x, y, 1, 1, imgData[n-1], 1, 1, GDT_Float32, 0, 0);
 						}
-						//cout << "Skip Val = " << skipVal << " imgData[n][0] = " << imgData[skipBand][0] << endl;
+						//std::cout << "Skip Val = " << skipVal << " imgData[n][0] = " << imgData[skipBand][0] << std::endl;
 						if(imgData[skipBand][0] == skipVal) // Check for skip value in band 1
 						{
 							skip = true;
@@ -299,7 +299,7 @@ namespace rsgis{namespace img{
 
                 GDALClose(dataset);
 			}
-			cout << ".complete\n";
+			std::cout << ".complete\n";
 		}
 		catch(RSGISImageBandException e)
 		{
@@ -392,17 +392,17 @@ namespace rsgis{namespace img{
 			
 			imgUtils.getImagesExtent(inputImages, numDS, &width, &height, transformation);
 			
-			cout << "Create new image [" << width << "," << height << "] with projection: \n" << projection << endl;
+			std::cout << "Create new image [" << width << "," << height << "] with projection: \n" << projection << std::endl;
 			
 			outputDataset = imgUtils.createBlankImage(outputImage, transformation, width, height, numberBands, projection, background, bandnames);
 			
 			// COPY IMAGE DATA INTO THE BLANK IMAGE
 			
-			cout << "Started (total " << numDS << ") ." << flush;
+			std::cout << "Started (total " << numDS << ") ." << std::flush;
 			
 			for(int i = 0; i < numDS; i++)
 			{
-				cout << "." << i << "." << flush;
+				std::cout << "." << i << "." << std::flush;
                 
                 dataset = (GDALDataset *) GDALOpenShared(inputImages[i].c_str(), GA_ReadOnly);
                 if(dataset == NULL)
@@ -436,7 +436,7 @@ namespace rsgis{namespace img{
 							inputBand = dataset->GetRasterBand(n);
 							inputBand->RasterIO(GF_Read, x, y, 1, 1, imgData[n-1], 1, 1, GDT_Float32, 0, 0);
 						}
-						//cout << "Skip Val = " << skipVal << " imgData[n][0] = " << imgData[skipBand][0] << endl;
+						//std::cout << "Skip Val = " << skipVal << " imgData[n][0] = " << imgData[skipBand][0] << std::endl;
 						if((imgData[threashBand][0] > skipLowerThreash) && (imgData[threashBand][0] < skipUpperThreash)) // Check if pixel is outside threasholds
 						{
 							skip = true;
@@ -458,7 +458,7 @@ namespace rsgis{namespace img{
 				}
                 GDALClose(dataset);
 			}
-			cout << ".complete\n";
+			std::cout << ".complete\n";
 		}
 		catch(RSGISImageBandException e)
 		{
@@ -538,7 +538,7 @@ namespace rsgis{namespace img{
                     {
                         if(((*iterBands) <= 0) | ((*iterBands) > dataset->GetRasterCount()))
                         {
-                            cerr << "Band = " << *iterBands << endl;
+                            std::cerr << "Band = " << *iterBands << std::endl;
                             std::string message = std::string("Band is not within the input dataset ") + inputImages[i];
                             throw RSGISImageException(message.c_str());
                         }
@@ -565,30 +565,30 @@ namespace rsgis{namespace img{
 			double imgExtentX = transformation[0] + (width * transformation[1]);
 			double imgExtentY = transformation[3] + (height * transformation[5]);
 			
-			/*cout << "Transformation[0] = " << transformation[0] << endl;
-			cout << "Transformation[1] = " << transformation[1] << endl;
-			cout << "Transformation[2] = " << transformation[2] << endl;
-			cout << "Transformation[3] = " << transformation[3] << endl;
-			cout << "Transformation[4] = " << transformation[4] << endl;
-			cout << "Transformation[5] = " << transformation[5] << endl;
+			/*std::cout << "Transformation[0] = " << transformation[0] << std::endl;
+			std::cout << "Transformation[1] = " << transformation[1] << std::endl;
+			std::cout << "Transformation[2] = " << transformation[2] << std::endl;
+			std::cout << "Transformation[3] = " << transformation[3] << std::endl;
+			std::cout << "Transformation[4] = " << transformation[4] << std::endl;
+			std::cout << "Transformation[5] = " << transformation[5] << std::endl;
 			
-			cout << "baseTransform[0] = " << baseTransform[0] << endl;
-			cout << "baseTransform[1] = " << baseTransform[1] << endl;
-			cout << "baseTransform[2] = " << baseTransform[2] << endl;
-			cout << "baseTransform[3] = " << baseTransform[3] << endl;
-			cout << "baseTransform[4] = " << baseTransform[4] << endl;
-			cout << "baseTransform[5] = " << baseTransform[5] << endl;
+			std::cout << "baseTransform[0] = " << baseTransform[0] << std::endl;
+			std::cout << "baseTransform[1] = " << baseTransform[1] << std::endl;
+			std::cout << "baseTransform[2] = " << baseTransform[2] << std::endl;
+			std::cout << "baseTransform[3] = " << baseTransform[3] << std::endl;
+			std::cout << "baseTransform[4] = " << baseTransform[4] << std::endl;
+			std::cout << "baseTransform[5] = " << baseTransform[5] << std::endl;
 			
-			cout << "baseImage->GetRasterXSize() = " << baseImage->GetRasterXSize() << endl;
-			cout << "baseImage->GetRasterYSize() = " << baseImage->GetRasterYSize() << endl;
+			std::cout << "baseImage->GetRasterXSize() = " << baseImage->GetRasterXSize() << std::endl;
+			std::cout << "baseImage->GetRasterYSize() = " << baseImage->GetRasterYSize() << std::endl;
 			
-			cout << "height = " << height << endl;
-			cout << "Width = " << width << endl;
+			std::cout << "height = " << height << std::endl;
+			std::cout << "Width = " << width << std::endl;
 			
-			cout << "baseExtentX = " << baseExtentX << endl;
-			cout << "baseExtentY = " << baseExtentY << endl;
-			cout << "imgExtentX = " << imgExtentX << endl;
-			cout << "imgExtentY = " << imgExtentY << endl;*/
+			std::cout << "baseExtentX = " << baseExtentX << std::endl;
+			std::cout << "baseExtentY = " << baseExtentY << std::endl;
+			std::cout << "imgExtentX = " << imgExtentX << std::endl;
+			std::cout << "imgExtentY = " << imgExtentY << std::endl;*/
 			
 			// Check datasets fit within the base image.
 			if(transformation[0] < baseTransform[0])
@@ -611,11 +611,11 @@ namespace rsgis{namespace img{
 			height = baseImage->GetRasterYSize();
 			width = baseImage->GetRasterXSize();
 			
-			cout << "Started (total " << numDS << ") ." << flush;
+			std::cout << "Started (total " << numDS << ") ." << std::flush;
 			
 			for(int i = 0; i < numDS; i++)
 			{
-				cout << "." << i << "." << flush;
+				std::cout << "." << i << "." << std::flush;
                 dataset = (GDALDataset *) GDALOpenShared(inputImages[i].c_str(), GA_ReadOnly);
                 if(dataset == NULL)
                 {
@@ -675,7 +675,7 @@ namespace rsgis{namespace img{
 				delete imgData;
                 GDALClose(dataset);
 			}
-			cout << ".complete\n";
+			std::cout << ".complete\n";
 		}
 		catch(RSGISImageBandException e)
 		{

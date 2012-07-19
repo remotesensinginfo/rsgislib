@@ -26,9 +26,7 @@
 #include "RSGISException.h"
 
 namespace rsgis
-{
-    using namespace std;
-    
+{    
 	class RSGISInputStreamException : public RSGISException
 		{
 		public:

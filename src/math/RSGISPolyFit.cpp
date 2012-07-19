@@ -73,12 +73,12 @@ namespace rsgis {namespace math {
 		
 		
 		/*
-		cout << "----------------------------------------------------------------------------" << endl;
-		cout << "coefficients are : ";
+		std::cout << "----------------------------------------------------------------------------" << std::endl;
+		std::cout << "coefficients are : ";
 		vectorUtils.printGSLVector(outCoefficients); 
-		cout << " chisq = " << chisq << endl;
-		cout << "----------------------------------------------------------------------------" << endl;
-		cout << endl;
+		std::cout << " chisq = " << chisq << std::endl;
+		std::cout << "----------------------------------------------------------------------------" << std::endl;
+		std::cout << std::endl;
 		*/
 		
 		// Clean up
@@ -230,7 +230,7 @@ namespace rsgis {namespace math {
 				yPredicted = yPredicted + coeffXPow;
 			}
 			
-			//cout << "measured = " << yMeasured << " predicted = " << yPredicted << endl;
+			//std::cout << "measured = " << yMeasured << " predicted = " << yPredicted << std::endl;
 			
 			gsl_matrix_set(measuredVpredictted, i, 0, yMeasured);
 			gsl_matrix_set(measuredVpredictted, i, 1, yPredicted);
@@ -288,7 +288,7 @@ namespace rsgis {namespace math {
 		{
 			// Populate matrix
 			indexY = y * numX;
-			//cout << "solving set " << y + 1 << "...." << endl;
+			//std::cout << "solving set " << y + 1 << "...." << std::endl;
 			double yelement = gsl_matrix_get(inData, indexY, 1);
 			gsl_vector_set(indVar2, y, yelement); // Add y values to indVar2 vector
 			
@@ -306,7 +306,7 @@ namespace rsgis {namespace math {
 				}
 			}
 			
-			//cout << "Starting to solve " << endl;
+			//std::cout << "Starting to solve " << std::endl;
 			
 			// Solve
 			gsl_multifit_linear_workspace *workspace;
@@ -315,7 +315,7 @@ namespace rsgis {namespace math {
 			double chisq;
 			cov = gsl_matrix_alloc(orderX, orderX);
 			gsl_multifit_linear(indVarPow, depVar, tempAcoeff, cov, &chisq, workspace); // Perform least squares fit
-			//cout << "solved!" << endl;
+			//std::cout << "solved!" << std::endl;
 			//vectorUtils.printGSLVector(tempAcoeff);
 			
 			// Add coefficents to Matrix
@@ -393,7 +393,7 @@ namespace rsgis {namespace math {
 			}
 			
 			// ChiSq
-			//cout << "chisq = "<< chisq << endl;
+			//std::cout << "chisq = "<< chisq << std::endl;
 			errorB = errorB + chisq;
 			gsl_matrix_set(bCoeff, i, orderY, chisq);
 		}
@@ -403,7 +403,7 @@ namespace rsgis {namespace math {
 		std::cout << " Average ChiSq = " << errorB << std::endl;
 		std::cout << "-----------------------------" << std::endl;
 		std::cout << std::endl;
-		//cout << "Coefficients are : " << endl;
+		//std::cout << "Coefficients are : " << std::endl;
 		//matrixUtils.printGSLMatrix(bCoeff);
 		
 		// Clean up
@@ -451,7 +451,7 @@ namespace rsgis {namespace math {
 				zPredicted = zPredicted + acoeffXPow;
 			}
 			
-			//cout << "measured = " << yMeasured << " predicted = " << yPredicted << endl;
+			//std::cout << "measured = " << yMeasured << " predicted = " << yPredicted << std::endl;
 			
 			gsl_matrix_set(measuredVpredictted, i, 0, zMeasured);
 			gsl_matrix_set(measuredVpredictted, i, 1, zPredicted);
@@ -491,7 +491,7 @@ namespace rsgis {namespace math {
 		RSGISMatrices matrixUtils;
 		RSGISVectors vectorUtils;
 		
-		cout << "Order X, Y, Z = " << orderX << ", " << orderY << ", " << orderZ << endl;
+		std::cout << "Order X, Y, Z = " << orderX << ", " << orderY << ", " << orderZ << std::endl;
 		
 		gsl_matrix *aCoeff, *bCoeff, *cCoeff, *indVarXPow;
 		
@@ -556,11 +556,11 @@ namespace rsgis {namespace math {
 					}
 				}
 				
-				/*cout << "indVarX = " << endl;
+				/*std::cout << "indVarX = " << std::endl;
 				 matrixUtils.printGSLMatrix(indVarXPow);
-				 cout << "depVarX = " << endl;
+				 std::cout << "depVarX = " << std::endl;
 				 vectorUtils.printGSLVector(depVarX);
-				 cout << endl;*/
+				 std::cout << std::endl;*/
 				
 				// Solve
 				gsl_multifit_linear_workspace *workspace;
@@ -569,7 +569,7 @@ namespace rsgis {namespace math {
 				double chisq;
 				cov = gsl_matrix_alloc(orderX, orderX);
 				gsl_multifit_linear(indVarXPow, depVarX, tempAcoeff, cov, &chisq, workspace); // Perform least squares fit
-				//cout << "a Coeff = " << endl;
+				//std::cout << "a Coeff = " << std::endl;
 				//vectorUtils.printGSLVector(tempAcoeff);
 				
 				// Add coefficents to Matrix
@@ -580,7 +580,7 @@ namespace rsgis {namespace math {
 				}
 				// ChiSq
 				gsl_matrix_set(aCoeff, y, orderX, chisq);
-				//cout << "chiSq for first set of fits  = " << chisq << endl;
+				//std::cout << "chiSq for first set of fits  = " << chisq << std::endl;
 				errorA = errorA + chisq;
 			}
 			
@@ -603,7 +603,7 @@ namespace rsgis {namespace math {
 			// Loop through fits
 			for(int i = 0; i < orderX; i++)
 			{
-				//cout << "Adding b coefficients for z = " << z << ", x order = " << i << "...";
+				//std::cout << "Adding b coefficients for z = " << z << ", x order = " << i << "...";
 				for(int j = 0; j < numY; j++)
 				{
 					double melement = gsl_matrix_get(aCoeff, j, i);
@@ -611,11 +611,11 @@ namespace rsgis {namespace math {
 				}
 				
 				/*
-				 cout << "indVarY = " << endl;
+				 std::cout << "indVarY = " << std::endl;
 				 vectorUtils.printGSLVector(indVarY);
-				 cout << "depVarY = " << endl;
+				 std::cout << "depVarY = " << std::endl;
 				 vectorUtils.printGSLVector(depVarY);
-				 cout << endl;
+				 std::cout << std::endl;
 				 */
 				
 				// Solve
@@ -632,14 +632,14 @@ namespace rsgis {namespace math {
 				for(int k = 0; k < orderY; k++)
 				{
 					double coeffElement = gsl_vector_get(tempBcoeff, k);
-					//cout << "..a" << i + (z * orderX) << "-" << k;
+					//std::cout << "..a" << i + (z * orderX) << "-" << k;
 					gsl_matrix_set(bCoeff, i + (z * orderX), k, coeffElement);
 					//gsl_matrix_set(bCoeff, cInd, k, coeffElement);
 
-					//cout << "b";
+					//std::cout << "b";
 				}
 				// ChiSq
-				//cout << "..Added OK." << endl;
+				//std::cout << "..Added OK." << std::endl;
 				errorB = errorB + chisq;
 				gsl_matrix_set(bCoeff, i + (z * orderX), orderY, chisq);
 				//gsl_matrix_set(bCoeff, cInd, orderY, chisq);
@@ -650,22 +650,22 @@ namespace rsgis {namespace math {
 		errorA = errorA / (numY * numZ); // Calculate average ChiSq
 		errorB = errorB / (orderY * numZ); // Calculate average ChiSq	
 		
-		cout << "----------------------------------------------" << endl;
-		cout << "First and second set of fits complete " << endl;
-		cout << " Average ChiSq for first set of fits = " << errorA << endl;
-		cout << " Average ChiSq for second set of fits = " << errorB << endl;
+		std::cout << "----------------------------------------------" << std::endl;
+		std::cout << "First and second set of fits complete " << std::endl;
+		std::cout << " Average ChiSq for first set of fits = " << errorA << std::endl;
+		std::cout << " Average ChiSq for second set of fits = " << errorB << std::endl;
 		
 		
-		 /*cout << "==============================================================" << endl;
+		 /*std::cout << "==============================================================" << std::endl;
 		 matrixUtils.printGSLMatrix(bCoeff);
-		 cout << "==============================================================" << endl;*/
+		 std::cout << "==============================================================" << std::endl;*/
 		 
 		
-		/*cout << "indVarZ = " << endl;
+		/*std::cout << "indVarZ = " << std::endl;
 		 vectorUtils.printGSLVector(indVarZ);
-		 cout << "coeffB = " << endl;
+		 std::cout << "coeffB = " << std::endl;
 		 matrixUtils.printGSLMatrix(bCoeff);
-		 cout << endl;*/
+		 std::cout << std::endl;*/
 		
 		/***************************************************
 		 * PERFORM THIRD SET OF FITS                       
@@ -696,7 +696,7 @@ namespace rsgis {namespace math {
 			}
 		}
 		
-		/*cout << "IndVar: ";
+		/*std::cout << "IndVar: ";
 		vectorUtils.printGSLVector(indVarZ);*/
 		
 		// Loop through fits
@@ -714,9 +714,9 @@ namespace rsgis {namespace math {
 				}
 				
 				
-				 /*cout << "IndVar " << endl;
+				 /*std::cout << "IndVar " << std::endl;
 				 vectorUtils.printGSLVector(indVarZ);
-				 cout << "DepVar_" << a <<  "-" << i << ": ";
+				 std::cout << "DepVar_" << a <<  "-" << i << ": ";
 				 vectorUtils.printGSLVector(depVarZ);*/
 							
 				// Solve
@@ -737,7 +737,7 @@ namespace rsgis {namespace math {
 				}
 				
 				// ChiSq
-				//cout << "chisq = "<< chisq << endl;
+				//std::cout << "chisq = "<< chisq << std::endl;
 				errorC = errorC + chisq;
 				gsl_matrix_set(cCoeff, c, orderZ, chisq);
 				c++;
@@ -745,10 +745,10 @@ namespace rsgis {namespace math {
 		}
 		
 		errorC = errorC / c; // Calculate average ChiSq
-		cout << "Third set of fits complete " << endl;
-		cout << " Average ChiSq for third set of fits = " << errorC << endl;
-		cout << "----------------------------------------------" << endl;
-		cout << endl;
+		std::cout << "Third set of fits complete " << std::endl;
+		std::cout << " Average ChiSq for third set of fits = " << errorC << std::endl;
+		std::cout << "----------------------------------------------" << std::endl;
+		std::cout << std::endl;
 		
 		// Clean up
 		
@@ -802,16 +802,16 @@ namespace rsgis {namespace math {
 				for(int y = 0; y < orderY; y++)
 				{
 					cCoeffPowZ = 0.0;
-					//cout << "cCoeff = ";
+					//std::cout << "cCoeff = ";
 					for(int z = 0; z < orderZ; z++)
 					{     
 						zPow = pow(zVal, z);
 						cCoeff = gsl_matrix_get(coefficients, c, z);
 						//cCoeff = gsl_matrix_get(coefficients, y + (x * orderX), z);
-						//cout << cCoeff;
+						//std::cout << cCoeff;
 						cCoeffPowZ = cCoeffPowZ + (cCoeff * zPow);
 					}
-					//cout << "c = " << c << endl;
+					//std::cout << "c = " << c << std::endl;
 					c++; // Itterate through lines in coefficients file
 					yPow = pow(yVal, y); // y^n;
 					bcoeffPowY = bcoeffPowY + (cCoeffPowZ * yPow); // c_n * y^n
@@ -820,7 +820,7 @@ namespace rsgis {namespace math {
 				fPredicted = fPredicted + (bcoeffPowY * xPow);
 			}
 			
-			//cout << "measured = " << fMeasured << " predicted = " << fPredicted << endl;
+			//std::cout << "measured = " << fMeasured << " predicted = " << fPredicted << std::endl;
 			
 			gsl_matrix_set(measuredVpredictted, i, 0, fMeasured);
 			gsl_matrix_set(measuredVpredictted, i, 1, fPredicted);
@@ -869,9 +869,9 @@ namespace rsgis {namespace math {
 		
 		double rSq = (ssXY * ssXY ) / (ssXX * ssYY);
 		
-		cout << "**************************" << endl;
-		cout << "  R squared = " << rSq << endl;
-		cout << "**************************" << endl;
+		std::cout << "**************************" << std::endl;
+		std::cout << "  R squared = " << rSq << std::endl;
+		std::cout << "**************************" << std::endl;
 	}
 	
 	double RSGISPolyFit::calcRSquaredGSLMatrixQuiet(gsl_matrix *dataXY)
@@ -927,9 +927,9 @@ namespace rsgis {namespace math {
 		
 		double rmse = sqrt(sqMean);
 		
-		cout << "**************************" << endl;
-		cout << "  RMSE = " << rmse << endl;
-		cout << "**************************" << endl;
+		std::cout << "**************************" << std::endl;
+		std::cout << "  RMSE = " << rmse << std::endl;
+		std::cout << "**************************" << std::endl;
 	}
 	
 	void RSGISPolyFit::calcMeanErrorGSLMatrix(gsl_matrix *dataXY)
@@ -944,9 +944,9 @@ namespace rsgis {namespace math {
 		
 		double meanError = sum / double(dataXY->size1);
 		
-		cout << "**************************" << endl;
-		cout << "  Mean Error = " << meanError << endl;
-		cout << "**************************" << endl;
+		std::cout << "**************************" << std::endl;
+		std::cout << "  Mean Error = " << meanError << std::endl;
+		std::cout << "**************************" << std::endl;
 	}
 	
 	double RSGISPolyFit::calcRMSErrorGSLMatrixQuiet(gsl_matrix *dataXY)

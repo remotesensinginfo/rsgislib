@@ -102,7 +102,7 @@ namespace rsgis{namespace reg{
 				tmpTiePt->yRef = overlap->refYStart + startYOff + (i*gap);
 				tmpTiePt->xFloat = overlap->floatXStart + startXOff + (j*gap);
 				tmpTiePt->yFloat = overlap->floatYStart + startYOff + (i*gap);
-				tmpTiePt->metricVal = numeric_limits<double>::signaling_NaN();//NAN;
+				tmpTiePt->metricVal = std::numeric_limits<double>::signaling_NaN();//NAN;
 				tmpTiePt->xShift = 0;
 				tmpTiePt->yShift = 0;
 				

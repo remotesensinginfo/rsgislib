@@ -46,9 +46,9 @@ namespace rsgis{namespace filter{
 			void addFilter(RSGISImageFilter *filter);
 			RSGISImageFilter* getFilter(int i);
 			int getNumFilters();
-			void executeFilters(GDALDataset **datasets, int numDS, string outImageBase) throw(rsgis::RSGISImageException);
-			void exectuteFilter(int i, GDALDataset **datasets, int numDS, string outImageBase) throw(rsgis::RSGISImageException);
-			void exportFilterBankImages(string imagebase);
+			void executeFilters(GDALDataset **datasets, int numDS, std::string outImageBase) throw(rsgis::RSGISImageException);
+			void exectuteFilter(int i, GDALDataset **datasets, int numDS, std::string outImageBase) throw(rsgis::RSGISImageException);
+			void exportFilterBankImages(std::string imagebase);
 			void createLeungMalikFilterBank() throw(rsgis::RSGISImageException);
 			~RSGISFilterBank();
 		protected:

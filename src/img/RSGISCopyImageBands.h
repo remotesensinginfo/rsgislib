@@ -40,7 +40,7 @@ namespace rsgis{namespace img{
 		{
 		public:
 			RSGISCopyImageBands();
-			GDALDataset* outputImageBands(GDALDataset *inputDS, string outputFile, int *outBands, int numOutBands, string outputProj="", bool useInProj=true) throw(RSGISImageCalcException,RSGISImageBandException, RSGISImageException);
+			GDALDataset* outputImageBands(GDALDataset *inputDS, std::string outputFile, int *outBands, int numOutBands, std::string outputProj="", bool useInProj=true) throw(RSGISImageCalcException,RSGISImageBandException, RSGISImageException);
 		};
 	
 	

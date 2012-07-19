@@ -237,7 +237,7 @@ namespace rsgis{namespace math{
 		double diffB = dataB - functionB->calcFunction(valueX, valueY);
 		double diffC = dataC - functionC->calcFunction(valueX, valueY);
 		
-		//cout << diffA << ", " << diffB << ", " << diffC << endl;
+		//std::cout << diffA << ", " << diffB << ", " << diffC << std::endl;
 		
 		return pow(diffA, 2) + pow(diffB, 2) + pow(diffC, 2);
 	}
@@ -287,7 +287,7 @@ namespace rsgis{namespace math{
 		double diffD = vectorUtils.dotProductVectorVectorGSL(tempA, deltaD);
 		
 		// || X - Xap || ^2 
-		//cout << "\tdiffX1 = " << diffX1 << " diffX2 = " << diffX2 << endl;
+		//std::cout << "\tdiffX1 = " << diffX1 << " diffX2 = " << diffX2 << std::endl;
 		double diffX = 0;
 		if (useAP) 
 		{
@@ -302,8 +302,8 @@ namespace rsgis{namespace math{
 			diffX = vectorUtils.dotProductVectorVectorGSL(tempA, deltaX);
 		}
 		
-		//cout << "\tdiffD = " << diffD << endl;
-		//cout << "\tdiffX = " << diffX << endl;
+		//std::cout << "\tdiffD = " << diffD << std::endl;
+		//std::cout << "\tdiffX = " << diffX << std::endl;
 		
 		return (diffD + diffX) / 2;
 	}
@@ -375,7 +375,7 @@ namespace rsgis{namespace math{
 		double returnVal = (diffD + diffX) / 2.0;
 		if(returnVal < 0)
 		{
-			cout << "Negative!" << endl;
+			std::cout << "Negative!" << std::endl;
 			returnVal = 999999;
 		}
 		return returnVal;
@@ -454,15 +454,15 @@ namespace rsgis{namespace math{
 
 		/*if (diffX < 0)
 		{
-			cout << "Negative AP!" << endl;
-			cout << "tempA: ";
+			std::cout << "Negative AP!" << std::endl;
+			std::cout << "tempA: ";
 			vectorUtils.printGSLVector(tempA);
-			cout << "deltaX:";
+			std::cout << "deltaX:";
 			vectorUtils.printGSLVector(deltaX);
 		}
 		if (diffD < 0) 
 		{
-			cout << "Negative D!" << endl;
+			std::cout << "Negative D!" << std::endl;
 		}*/
 			
 		return (diffD + diffX) / 2;
@@ -722,7 +722,7 @@ namespace rsgis{namespace math{
 			}
 			xPow = pow(valueX, x); // dielectric^n;
 			aCoeffPowX = aCoeffPowX + (bcoeffPowY * xPow);
-			//cout << "HH - b_" << x << " = " << bcoeffPowY << endl;
+			//std::cout << "HH - b_" << x << " = " << bcoeffPowY << std::endl;
 		}
 		outVal = aCoeffPowX;
         
@@ -780,7 +780,7 @@ namespace rsgis{namespace math{
 			aCoeffPowXdX = aCoeffPowXdX + (bcoeffPowY * dxPow);
 			aCoeffPowXdY = aCoeffPowXdY + (bcoeffPowYdY * xPow);
 			aCoeffPowXdZ = aCoeffPowXdZ + (bcoeffPowYdZ * xPow);
-			//cout << "HH - b_" << x << " = " << bcoeffPowY << endl;
+			//std::cout << "HH - b_" << x << " = " << bcoeffPowY << std::endl;
 		}
 		outValdX = aCoeffPowXdX;
 		
@@ -838,7 +838,7 @@ namespace rsgis{namespace math{
 			aCoeffPowXdX = aCoeffPowXdX + (bcoeffPowY * dxPow);
 			aCoeffPowXdY = aCoeffPowXdY + (bcoeffPowYdY * xPow);
 			aCoeffPowXdZ = aCoeffPowXdZ + (bcoeffPowYdZ * xPow);
-			//cout << "HH - b_" << x << " = " << bcoeffPowY << endl;
+			//std::cout << "HH - b_" << x << " = " << bcoeffPowY << std::endl;
 		}
 		outValdY = aCoeffPowXdY;
 		return outValdY;
@@ -895,7 +895,7 @@ namespace rsgis{namespace math{
 			aCoeffPowXdX = aCoeffPowXdX + (bcoeffPowY * dxPow);
 			aCoeffPowXdY = aCoeffPowXdY + (bcoeffPowYdY * xPow);
 			aCoeffPowXdZ = aCoeffPowXdZ + (bcoeffPowYdZ * xPow);
-			//cout << "HH - b_" << x << " = " << bcoeffPowY << endl;
+			//std::cout << "HH - b_" << x << " = " << bcoeffPowY << std::endl;
 		}
 		outValdZ = aCoeffPowXdZ;
 		return outValdZ;
@@ -905,14 +905,14 @@ namespace rsgis{namespace math{
 		gsl_matrix_free(this->coefficients);
 	}
     
-	RSGISFunctionNDPoly::RSGISFunctionNDPoly(gsl_matrix *inCoefficients, vector <int> *polyOrders)
+	RSGISFunctionNDPoly::RSGISFunctionNDPoly(gsl_matrix *inCoefficients, std::vector<int> *polyOrders)
 	{
 		this->coefficients = gsl_matrix_alloc(inCoefficients->size1, inCoefficients->size2);
 		gsl_matrix_memcpy(this->coefficients, inCoefficients);
         this->polyOrders = polyOrders;
         this->numVar = polyOrders->size();
 	}
-	double RSGISFunctionNDPoly::calcFunction(vector <double> *values) throw(RSGISMathException)
+	double RSGISFunctionNDPoly::calcFunction(std::vector<double> *values) throw(RSGISMathException)
 	{		
 		double outVal = 0.0;
         if(values->size() != this->numVar)
@@ -971,7 +971,7 @@ namespace rsgis{namespace math{
                 }
                 xPow = pow(values->at(0), x); // dielectric^n;
                 aCoeffPowX = aCoeffPowX + (bcoeffPowY * xPow);
-                //cout << "HH - b_" << x << " = " << bcoeffPowY << endl;
+                //std::cout << "HH - b_" << x << " = " << bcoeffPowY << std::endl;
             }
             outVal = aCoeffPowX;
         }
@@ -1030,7 +1030,7 @@ namespace rsgis{namespace math{
 		}
 		catch (mu::ParserError &e) // Catch muParser error
 		{
-			std::string message = string("ERROR: ") + std::string(e.GetMsg()) + std::string(":\t \'") + std::string(e.GetExpr()) + std::string("\'");
+			std::string message = std::string("ERROR: ") + std::string(e.GetMsg()) + std::string(":\t \'") + std::string(e.GetExpr()) + std::string("\'");
 			throw RSGISMathException(message);
 		}
 		
@@ -1124,7 +1124,7 @@ namespace rsgis{namespace math{
 			}
 			catch (mu::ParserError &e) // Catch muParser error
 			{
-				std::string message = string("ERROR: ") + std::string(e.GetMsg()) + std::string(":\t \'") + std::string(e.GetExpr()) + std::string("\'");
+				std::string message = std::string("ERROR: ") + std::string(e.GetMsg()) + std::string(":\t \'") + std::string(e.GetExpr()) + std::string("\'");
 				throw RSGISMathException(message);
 			}
 		}

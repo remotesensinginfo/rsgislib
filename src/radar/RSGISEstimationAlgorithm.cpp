@@ -2025,7 +2025,7 @@ namespace rsgis {namespace radar
 			inSigma0dB = gsl_vector_alloc(numBands);
 		
 			// Check for no data (image borders)
-			if(bandValues[1] < -100 || isnan(bandValues[1]))
+			if(bandValues[1] < -100 || std::isnan(bandValues[1]))
 			{
 				for(int i = 0; i < numOutputBands; i++)
 				{
@@ -2090,7 +2090,7 @@ namespace rsgis {namespace radar
 						}
 					}
 					
-					if ((error > 1) | (isnan(height)) | (isnan(density))) // If error is greater than 1, hasn't converged, write out a priori par (if available) or initial par.
+					if ((error > 1) | (std::isnan(height)) | (std::isnan(density))) // If error is greater than 1, hasn't converged, write out a priori par (if available) or initial par.
 					{
 						try 
 						{
@@ -2111,13 +2111,13 @@ namespace rsgis {namespace radar
 					double biomass = ((tMass*(density*10000)))/1000000;
 					
 					// Write out
-					if (isnan(height)){output[0] = 0;}
+					if (std::isnan(height)){output[0] = 0;}
 					else{output[0] = height;}
-					if (isnan(density)){output[1] = 0;}
+					if (std::isnan(density)){output[1] = 0;}
 					else{output[1] = density;}
-					if (isnan(biomass)){output[2] = 0;}
+					if (std::isnan(biomass)){output[2] = 0;}
 					else{output[2] = biomass;}
-					if (isnan(error)){output[3] = 0;}
+					if (std::isnan(error)){output[3] = 0;}
 					else{output[3] = error;}
 										
 					
@@ -2192,13 +2192,13 @@ namespace rsgis {namespace radar
 					double biomass = ((tMass*(density*10000)))/1000000;
 					
 					// Write out
-					if (isnan(cDepth)){output[0] = 0;}
+					if (std::isnan(cDepth)){output[0] = 0;}
 					else{output[0] = cDepth;}
-					if (isnan(density)){output[1] = 0;}
+					if (std::isnan(density)){output[1] = 0;}
 					else{output[1] = density;}
-					if (isnan(biomass)){output[2] = 0;}
+					if (std::isnan(biomass)){output[2] = 0;}
 					else{output[2] = biomass;}
-					if (isnan(error)){output[3] = 0;}
+					if (std::isnan(error)){output[3] = 0;}
 					else{output[3] = error;}
 					
 				}
@@ -2272,13 +2272,13 @@ namespace rsgis {namespace radar
 					}
 					
 					// Write out
-					if (isnan(height)){output[0] = 0;}
+					if (std::isnan(height)){output[0] = 0;}
 					else{output[0] = height;}
-					if (isnan(density)){output[1] = 0;}
+					if (std::isnan(density)){output[1] = 0;}
 					else{output[1] = density;}
-					if (isnan(dielectric)){output[2] = 0;}
+					if (std::isnan(dielectric)){output[2] = 0;}
 					else{output[2] = dielectric;}
-					if (isnan(error)){output[4] = 0;}
+					if (std::isnan(error)){output[4] = 0;}
 					else{output[4] = error;}
 					output[3] = 9999;
 				}
@@ -2569,7 +2569,7 @@ namespace rsgis {namespace radar
 			inSigma0dB = gsl_vector_alloc(numBands - nPar); // Number of input bands - nPar bands (a priori estimates)
 			
 			// Check for no data (image borders)
-			if(bandValues[3] < -100 || isnan(bandValues[1]))
+			if(bandValues[3] < -100 || std::isnan(bandValues[1]))
 			{
 				for(int i = 0; i < numOutputBands; i++)
 				{
@@ -2965,10 +2965,10 @@ namespace rsgis {namespace radar
 		 * initial estimates					     *
 		 *********************************************/
 		RSGISEstimationAlgorithmDualPolMultiSpeciesClassification::RSGISEstimationAlgorithmDualPolMultiSpeciesClassification(int numOutputBands, 
-																															 vector <gsl_vector*> *initialPar,
-																															 vector <RSGISEstimationOptimiser*> *estOptimiser, 
+																															 std::vector <gsl_vector*> *initialPar,
+																															 std::vector <RSGISEstimationOptimiser*> *estOptimiser, 
 																															 estParameters parameters,
-																															 vector<rsgis::utils::treeSpecies> *species
+																															 std::vector<rsgis::utils::treeSpecies> *species
 																															  ) : RSGISCalcImageValue(numOutputBands)
 		{
 			this->initialPar = initialPar;

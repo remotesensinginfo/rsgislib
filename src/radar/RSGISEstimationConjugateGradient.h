@@ -73,7 +73,7 @@ namespace rsgis {namespace radar{
 		int minimise(gsl_vector *inData, gsl_vector *initialPar, gsl_vector *outParError);
 		void modifyAPriori(gsl_vector *newAPrioriPar){};
 		virtual estOptimizerType getOptimiserType(){return conjugateGradient;};
-		virtual void printOptimiser(){cout << "Conjugate gradient (Polynomial) - 2 Var 2 Data" << endl;};
+		virtual void printOptimiser(){std::cout << "Conjugate gradient (Polynomial) - 2 Var 2 Data" << std::endl;};
 		~RSGISEstimationConjugateGradient2DPoly2Channel();
 	private:
 		gsl_matrix *coeffHH;
@@ -98,7 +98,7 @@ namespace rsgis {namespace radar{
 		void modifyAPriori(gsl_vector *newAPrioriPar){this->aPrioriPar = newAPrioriPar;}
 		gsl_vector* getAPrioriPar(){return this->aPrioriPar;};
 		virtual estOptimizerType getOptimiserType(){return conjugateGradient;};
-		virtual void printOptimiser(){cout << "Conjugate gradient (Polynomial) - 3 Var 3 Data" << endl;};
+		virtual void printOptimiser(){std::cout << "Conjugate gradient (Polynomial) - 3 Var 3 Data" << std::endl;};
 		~RSGISEstimationConjugateGradient3DPoly3Channel();
 	private:
 		gsl_matrix *coeffHH;
@@ -128,7 +128,7 @@ namespace rsgis {namespace radar{
 		void modifyAPriori(gsl_vector *newAPrioriPar){this->aPrioriPar = newAPrioriPar;}
 		gsl_vector* getAPrioriPar(){return this->aPrioriPar;};
 		virtual estOptimizerType getOptimiserType(){return conjugateGradient;};
-		virtual void printOptimiser(){cout << "Conjugate gradient (Polynomial) - 3 Var 4 Data" << endl;};
+		virtual void printOptimiser(){std::cout << "Conjugate gradient (Polynomial) - 3 Var 4 Data" << std::endl;};
 		~RSGISEstimationConjugateGradient3DPoly4Channel();
 	private:
 		gsl_matrix *coeffA;
@@ -168,7 +168,7 @@ namespace rsgis {namespace radar{
 		void modifyAPriori(gsl_vector *newAPrioriPar){this->aPrioriPar = newAPrioriPar;};
 		gsl_vector* getAPrioriPar(){return this->aPrioriPar;};
 		virtual estOptimizerType getOptimiserType(){return conjugateGradient;}; 
-		virtual void printOptimiser(){cout << "Conjugate gradient - 2 Var 2 Data" << endl;};
+		virtual void printOptimiser(){std::cout << "Conjugate gradient - 2 Var 2 Data" << std::endl;};
 		~RSGISEstimationConjugateGradient2Var2Data();
 	private:
 		rsgis::math::RSGISMathTwoVariableFunction *functionA; 
@@ -202,7 +202,7 @@ namespace rsgis {namespace radar{
 		void modifyAPriori(gsl_vector *newAPrioriPar){this->aPrioriPar = newAPrioriPar;};
 		gsl_vector* getAPrioriPar(){return this->aPrioriPar;};
 		virtual estOptimizerType getOptimiserType(){return conjugateGradient;}; 
-		virtual void printOptimiser(){cout << "Conjugate gradient - 2 Var 3 Data" << endl;};
+		virtual void printOptimiser(){std::cout << "Conjugate gradient - 2 Var 3 Data" << std::endl;};
 		~RSGISEstimationConjugateGradient2Var3Data();
 	private:
 		rsgis::math::RSGISMathTwoVariableFunction *functionA; 
@@ -234,7 +234,7 @@ namespace rsgis {namespace radar{
 		void modifyAPriori(gsl_vector *newAPrioriPar){this->conjGradOpt->modifyAPriori(newAPrioriPar);this->aPrioriPar = newAPrioriPar;};
 		gsl_vector* getAPrioriPar(){return this->aPrioriPar;};
 		virtual estOptimizerType getOptimiserType(){return conjugateGradient;}; 
-		virtual void printOptimiser(){cout << "Conjugate gradient - 2 Var 2 Data, with Restarts" << endl;};
+		virtual void printOptimiser(){std::cout << "Conjugate gradient - 2 Var 2 Data, with Restarts" << std::endl;};
 		~RSGISEstimationConjugateGradient2Var2DataWithRestarts();
 	private:
 		rsgis::math::RSGISMathTwoVariableFunction *functionA;
@@ -269,7 +269,7 @@ namespace rsgis {namespace radar{
 		void modifyAPriori(gsl_vector *newAPrioriPar){this->conjGradOpt->modifyAPriori(newAPrioriPar);this->aPrioriPar = newAPrioriPar;};
 		gsl_vector* getAPrioriPar(){return this->aPrioriPar;};
 		virtual estOptimizerType getOptimiserType(){return conjugateGradient;}; 
-		virtual void printOptimiser(){cout << "Conjugate gradient - 2 Var 3 Data, with Restarts" << endl;};
+		virtual void printOptimiser(){std::cout << "Conjugate gradient - 2 Var 3 Data, with Restarts" << std::endl;};
 		~RSGISEstimationConjugateGradient2Var3DataWithRestarts();
 	private:
 		rsgis::math::RSGISMathTwoVariableFunction *functionA;
@@ -305,7 +305,7 @@ namespace rsgis {namespace radar{
 		void modifyAPriori(gsl_vector *newAPrioriPar){this->conjGradOpt->modifyAPriori(newAPrioriPar);this->aPrioriPar = newAPrioriPar;};
 		gsl_vector* getAPrioriPar(){return this->aPrioriPar;};
 		virtual estOptimizerType getOptimiserType(){return conjugateGradient;}; 
-		virtual void printOptimiser(){cout << "Conjugate gradient - 3 Var 3 Data, with Restarts" << endl;};
+		virtual void printOptimiser(){std::cout << "Conjugate gradient - 3 Var 3 Data, with Restarts" << std::endl;};
 		~RSGISEstimationConjugateGradient3Var3DataWithRestarts();
 	private:
 		gsl_matrix *coeffHH;
@@ -342,7 +342,7 @@ namespace rsgis {namespace radar{
 		void modifyAPriori(gsl_vector *newAPrioriPar){this->conjGradOpt->modifyAPriori(newAPrioriPar);this->aPrioriPar = newAPrioriPar;};
 		gsl_vector* getAPrioriPar(){return this->aPrioriPar;};
 		virtual estOptimizerType getOptimiserType(){return conjugateGradient;}; 
-		virtual void printOptimiser(){cout << "Conjugate gradient - 3 Var 4 Data, with Restarts" << endl;};
+		virtual void printOptimiser(){std::cout << "Conjugate gradient - 3 Var 4 Data, with Restarts" << std::endl;};
 		~RSGISEstimationConjugateGradient3Var4DataWithRestarts();
 	private:
 		gsl_matrix *coeffA;
@@ -382,7 +382,7 @@ namespace rsgis {namespace radar{
 		void modifyAPriori(gsl_vector *newAPrioriPar){this->conjGradOpt->modifyAPriori(newAPrioriPar);};
 		gsl_vector* getAPrioriPar(){return this->aPrioriPar;};
 		virtual estOptimizerType getOptimiserType(){return conjugateGradient;}; 
-		virtual void printOptimiser(){cout << "Conjugate gradient - 2 Var 2 Data, with restarts from distrobution" << endl;};
+		virtual void printOptimiser(){std::cout << "Conjugate gradient - 2 Var 2 Data, with restarts from distrobution" << std::endl;};
 		~RSGISEstimationConjugateGradient2Var2DataDistro();
 	private:
 		rsgis::math::RSGISMathTwoVariableFunction *functionA;

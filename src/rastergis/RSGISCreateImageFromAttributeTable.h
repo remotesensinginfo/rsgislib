@@ -61,7 +61,7 @@ namespace rsgis{namespace rastergis{
     class RSGISCreateImageFromAttributeTableCalcImg : public rsgis::img::RSGISCalcImageValue
     {
     public: 
-        RSGISCreateImageFromAttributeTableCalcImg(int numberOutBands, RSGISAttributeTable *attTable, pair<RSGISAttributeDataType, unsigned int> *attBands);
+        RSGISCreateImageFromAttributeTableCalcImg(int numberOutBands, RSGISAttributeTable *attTable, std::pair<RSGISAttributeDataType, unsigned int> *attBands);
         void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException);
         void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
         void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};

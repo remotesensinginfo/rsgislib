@@ -82,7 +82,7 @@ namespace rsgis{namespace filter{
 		double outputValue = 0;
 		int numberElements = winSize * winSize;
 		int median = floor(((float)numberElements)/2.0);
-		vector<float> sortedList;
+		std::vector<float> sortedList;
         sortedList.reserve(numberElements);
 		
 		for(int i = 0; i < numBands; i++)

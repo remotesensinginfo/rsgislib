@@ -25,7 +25,7 @@
 
 namespace rsgis { namespace img {
 
-	RSGISStretchImage::RSGISStretchImage(GDALDataset *inputImage, string outputImage, bool ignoreZeros, string imageFormat, GDALDataType outDataType): inputImage(NULL), outputImage(""), ignoreZeros(true)
+	RSGISStretchImage::RSGISStretchImage(GDALDataset *inputImage, std::string outputImage, bool ignoreZeros, std::string imageFormat, GDALDataType outDataType): inputImage(NULL), outputImage(""), ignoreZeros(true)
 	{
 		this->inputImage = inputImage;
 		this->outputImage = outputImage;

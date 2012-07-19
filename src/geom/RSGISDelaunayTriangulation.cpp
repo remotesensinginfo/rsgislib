@@ -65,19 +65,19 @@ namespace rsgis{namespace geom{
 		int feedback = data->size()/10;
 		int feedbackCounter = 0;
 		
-		cout << "Started" << flush;
+		std::cout << "Started" << std::flush;
 		std::list<RSGIS2DPoint*>::iterator iterData;
 		for(iterData = data->begin(); iterData != data->end(); ++iterData)
 		{
 			if((i % feedback) == 0)
 			{
-				cout << ".." << feedbackCounter << ".." << flush;
+				std::cout << ".." << feedbackCounter << ".." << std::flush;
 				feedbackCounter = feedbackCounter + 10;
 			}
 			this->addVertex(*iterData);
 			++i;
 		}
-		cout << " Complete.\n";
+		std::cout << " Complete.\n";
 		this->finaliseTriangulation();
 	}
 	
@@ -99,19 +99,19 @@ namespace rsgis{namespace geom{
 		int feedback = data->size()/10;
 		int feedbackCounter = 0;
 		
-		cout << "Started" << flush;
+		std::cout << "Started" << std::flush;
 		std::vector<RSGIS2DPoint*>::iterator iterData;
 		for(iterData = data->begin(); iterData != data->end(); ++iterData)
 		{
 			if((data->size() > 10) && ((i % feedback) == 0))
 			{
-				cout << ".." << feedbackCounter << ".." << flush;
+				std::cout << ".." << feedbackCounter << ".." << std::flush;
 				feedbackCounter = feedbackCounter + 10;
 			}
 			this->addVertex(*iterData);
 			++i;
 		}
-		cout << " Complete.\n";
+		std::cout << " Complete.\n";
 		this->finaliseTriangulation();
 	}
 	
@@ -122,16 +122,16 @@ namespace rsgis{namespace geom{
 		int feedback = data->size()/10;
 		int feedbackCounter = 0;
 		
-		cout << "Started (" << data->size() << " nodes)" << flush;
+		std::cout << "Started (" << data->size() << " nodes)" << std::flush;
 		std::list<RSGIS2DPoint*>::iterator iterData;
 		for(iterData = data->begin(); iterData != data->end(); ++iterData)
 		{
 			if((data->size() > 10) && ((i % feedback) == 0))
 			{
-				cout << ".." << feedbackCounter << ".." << flush;
+				std::cout << ".." << feedbackCounter << ".." << std::flush;
 				feedbackCounter = feedbackCounter + 10;
 			}
-			//cout << "Adding " << i << endl;
+			//std::cout << "Adding " << i << std::endl;
 			//string filename = string("triangles_before_") + mathsUtils.inttostring(i);
 			//this->plotTriangulationAsEdges(filename);
 			this->addVertex(*iterData);
@@ -139,7 +139,7 @@ namespace rsgis{namespace geom{
 			//this->plotTriangulationAsEdges(filename);
 			++i;
 		}
-		cout << " Complete.\n";
+		std::cout << " Complete.\n";
 	}
 	
 	void RSGISDelaunayTriangulation::addVertex(RSGIS2DPoint *pt) throw(RSGISGeometryException)
@@ -185,10 +185,10 @@ namespace rsgis{namespace geom{
 				std::list<RSGIS2DPoint*> *pts = this->getPtsClockwise(tmpTriangles, pt);
 				std::list<RSGIS2DPoint*>::iterator iterPTS;
 				/*
-				cout << "PT: " << *pt << endl;
+				std::cout << "PT: " << *pt << std::endl;
 				for(iterPTS = pts->begin(); iterPTS != pts->end(); ++iterPTS)
 				{
-					cout << **iterPTS << endl;
+					std::cout << **iterPTS << std::endl;
 				}
 				*/
 				bool first = true;
@@ -402,7 +402,7 @@ namespace rsgis{namespace geom{
 				}
 				else
 				{
-					//cout << "finding location in list to add point\n";
+					//std::cout << "finding location in list to add point\n";
 					angleBaseListPt = geomUtils.calcAngle(pt, tmpPt);
 					ptAdded = false;
 					for(iterPTS = pts->begin(); iterPTS != pts->end(); iterPTS++)
@@ -434,7 +434,7 @@ namespace rsgis{namespace geom{
 		return pts;
 	}
 	
-	void RSGISDelaunayTriangulation::plotTriangulationAsEdges(string filename)
+	void RSGISDelaunayTriangulation::plotTriangulationAsEdges(std::string filename)
 	{
 		std::list<geos::geom::LineSegment> *lines = new std::list<geos::geom::LineSegment>();
 		std::list<RSGISTriangle*>::iterator iterTriangles;

@@ -38,7 +38,7 @@ namespace rsgis{namespace geom{
 			std::list<RSGIS2DPoint*> **outputClusters = NULL;
 			if(data->size() > 1)
 			{
-				cout << "Construct Delaunay Triangulation\n";
+				std::cout << "Construct Delaunay Triangulation\n";
 				RSGISDelaunayTriangulation *tri = new RSGISDelaunayTriangulation(data);
 				ClusterGraph *cg = this->constructGraph(tri, data);
 				this->constructMinimumSpanningTree(cg);
@@ -112,8 +112,8 @@ namespace rsgis{namespace geom{
 			else if(data->size() == 1)
 			{
 				*numclusters = 1;
-				outputClusters = new list<RSGIS2DPoint*>*[1];
-				outputClusters[0] = new list<RSGIS2DPoint*>();
+				outputClusters = new std::list<RSGIS2DPoint*>*[1];
+				outputClusters[0] = new std::list<RSGIS2DPoint*>();
 				outputClusters[0]->push_back(data->at(0));
 			}
 			else 
@@ -150,7 +150,7 @@ namespace rsgis{namespace geom{
 		ClusterGraph *cg = new ClusterGraph(data->size());
 		
 		// Add edges
-		cout << "Adding Edges to Graph - may take some time ... ";
+		std::cout << "Adding Edges to Graph - may take some time ... ";
 		bool edge1Present = false;
 		bool edge2Present = false;
 		bool edge3Present = false;
@@ -195,7 +195,7 @@ namespace rsgis{namespace geom{
 			edge2Present = false;
 			edge3Present = false;
 		}
-		cout << " Complete.\n";
+		std::cout << " Complete.\n";
 		return cg;
 	}
 
@@ -206,7 +206,7 @@ namespace rsgis{namespace geom{
 		boost::kruskal_minimum_spanning_tree(*cg, std::back_inserter(mst));
 		
 		// Remove edges not within the spanning tree
-		cout << "Remove Edges not within the minimum spanning tree\n";
+		std::cout << "Remove Edges not within the minimum spanning tree\n";
 		bool mstTreeEdge = false;
         std::vector<boost::graph_traits<ClusterGraph>::edge_descriptor>::iterator iterMST;
 		boost::graph_traits<ClusterGraph>::edge_iterator edgeIter, e_end;
@@ -215,12 +215,12 @@ namespace rsgis{namespace geom{
 		int feedback = num_edges(*cg)/10;
 		int feedbackCounter = 0;
 		
-		cout << "Started" << flush;		
+		std::cout << "Started" << std::flush;		
 		for (boost::tie(edgeIter, e_end) = boost::edges(*cg); edgeIter != e_end; )
 		{
 			if((boost::num_edges(*cg) > 10) && ((i % feedback) == 0))
 			{
-				cout << ".." << feedbackCounter << ".." << flush;
+				std::cout << ".." << feedbackCounter << ".." << std::flush;
 				feedbackCounter = feedbackCounter + 10;
 			}
 			
@@ -243,7 +243,7 @@ namespace rsgis{namespace geom{
 
 			i++;
 		}
-		cout << " Complete.\n";
+		std::cout << " Complete.\n";
 	}
 	
 	RSGISMinSpanTreeClustererStdDevThreshold::~RSGISMinSpanTreeClustererStdDevThreshold()

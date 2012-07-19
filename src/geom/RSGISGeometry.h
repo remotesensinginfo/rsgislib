@@ -57,7 +57,7 @@
 
 namespace rsgis{namespace geom{
 
-	struct SortCoordinates : binary_function< geos::geom::Coordinate, geos::geom::Coordinate, bool >
+	struct SortCoordinates : std::binary_function< geos::geom::Coordinate, geos::geom::Coordinate, bool >
 	{
 		const geos::geom::Coordinate coord;
 		SortCoordinates( const geos::geom::Coordinate& coord_ ): coord( coord_ ) { }
@@ -165,7 +165,7 @@ namespace rsgis{namespace geom{
 		geos::geom::Polygon* insertIntersectNodes(geos::geom::Polygon *poly, geos::geom::Polygon *intersect) throw(RSGISGeometryException);
 		double minDistanceBetweenPoints(geos::geom::Polygon *poly) throw(RSGISGeometryException);
 		geos::geom::Polygon* snapToXYGrid(geos::geom::Polygon *poly, double tolerance, bool calcTolerance, geos::geom::Envelope *env) throw(RSGISGeometryException);
-		void printPolygonCoords2File(geos::geom::Polygon *poly, string filename);
+		void printPolygonCoords2File(geos::geom::Polygon *poly, std::string filename);
 		void retrievePolygons(geos::geom::Geometry *geom, std::vector<geos::geom::Polygon*> *polygons) throw(RSGISGeometryException);
 		void retrieveLines(geos::geom::Geometry *geom, std::vector<geos::geom::LineString*> *lines) throw(RSGISGeometryException);
 		void performMorphologicalOperation(std::vector<geos::geom::Polygon*> *polygons, Morphology morphology, float buffer, int curveSegments) throw(RSGISGeometryException);

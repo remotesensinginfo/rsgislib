@@ -64,18 +64,15 @@
 #include "RSGISExeRasterGIS.h"
 #include "RSGISExeImageMorphology.h"
 
-using namespace std;
-//using namespace rsgis;
-
 class Control
 	{
 	public:
 		Control() throw(rsgis::RSGISException);
-		void runXML(string xmlFile);
-		void printParameters(string xmlFile);
+		void runXML(std::string xmlFile);
+		void printParameters(std::string xmlFile);
 		void listAlgorithms();
-        void createBlankXMLFile(string xmlFile);
-		void help(string algor);
+        void createBlankXMLFile(std::string xmlFile);
+		void help(std::string algor);
 		void help();
         void versionInfo();
 		~Control();
@@ -85,14 +82,14 @@ class Control
 	};
 
 
-Control::Control() throw(RSGISException)
+Control::Control() throw(rsgis::RSGISException)
 {
 	this->setUpAlgorithmFactory();
 }
 
 void Control::setUpAlgorithmFactory() throw(rsgis::RSGISException)
 {
-	vector<rsgis::RSGISAlgorithmParameters*> *algorParams = new vector<rsgis::RSGISAlgorithmParameters*>();
+	std::vector<rsgis::RSGISAlgorithmParameters*> *algorParams = new std::vector<rsgis::RSGISAlgorithmParameters*>();
 
 	algorParams->push_back(new rsgisexe::RSGISExeImageUtils());
 	algorParams->push_back(new rsgisexe::RSGISExeStackBands());
@@ -124,7 +121,7 @@ void Control::setUpAlgorithmFactory() throw(rsgis::RSGISException)
 	factory = new rsgis::RSGISAlgorParamsFactory(algorParams);
 }
 
-void Control::runXML(string xmlFile)
+void Control::runXML(std::string xmlFile)
 {
     rsgis::utils::RSGISFileUtils fileUtils;
 	rsgis::RSGISAlgorithmParameters **algorParams = NULL;
@@ -132,7 +129,7 @@ void Control::runXML(string xmlFile)
 	time_t rawStartTime = 0;
 	struct tm *timeInfo = 0;
 	time_t rawFinishTime = 0;
-	string formatedTime = "";
+	std::string formatedTime = "";
 	double timeDiff = 0;
 	try
 	{
@@ -143,44 +140,44 @@ void Control::runXML(string xmlFile)
 			algorParams = parseXMLArguments.parseArguments(&numCommands, factory);
 			if (numCommands == 1)
 			{
-				cout << "There is " << numCommands << " command to be run:\n";
+				std::cout << "There is " << numCommands << " command to be run:\n";
 			}
 			else
 			{
-				cout << "There are " << numCommands << " commands to be run:\n";
+				std::cout << "There are " << numCommands << " commands to be run:\n";
 			}
 			for(int i = 0; i < numCommands; i++)
 			{
 				time(&rawStartTime);
 				timeInfo = localtime(&rawStartTime);
-				formatedTime = string(asctime(timeInfo));
+				formatedTime = std::string(asctime(timeInfo));
 				formatedTime = formatedTime.substr(0, (formatedTime.length()-1));
 
-				cout << "\n[" << i + 1 << "/" << numCommands <<"] Running Command: " << algorParams[i]->getAlgorithm() << " (Start Time: " << formatedTime << ") " << "..." << endl;
+				std::cout << "\n[" << i + 1 << "/" << numCommands <<"] Running Command: " << algorParams[i]->getAlgorithm() << " (Start Time: " << formatedTime << ") " << "..." << std::endl;
 				algorParams[i]->runAlgorithm();
 
-				cout << "Algorithm Completed in " << flush;
+				std::cout << "Algorithm Completed in " << std::flush;
 				time(&rawFinishTime);
 				timeDiff = difftime (rawFinishTime,rawStartTime);
 				if (timeDiff == 0)
 				{
-					cout << "less than a second\n";
+					std::cout << "less than a second\n";
 				}
 				else if(timeDiff > 60)
 				{
 					timeDiff = timeDiff/60;
-					cout << timeDiff << " minutes\n";
+					std::cout << timeDiff << " minutes\n";
 				}
 				else
 				{
-					cout << timeDiff << " seconds\n";
+					std::cout << timeDiff << " seconds\n";
 				}
 			}
 			time(&rawFinishTime);
 			timeInfo = localtime(&rawFinishTime);
-			formatedTime = string(asctime(timeInfo));
+			formatedTime = std::string(asctime(timeInfo));
 			formatedTime = formatedTime.substr(0, (formatedTime.length()-1));
-			cout << "Finished (Time: " << formatedTime << ")\n";
+			std::cout << "Finished (Time: " << formatedTime << ")\n";
 
 			//if(timeInfo != NULL)
 			//{
@@ -197,21 +194,21 @@ void Control::runXML(string xmlFile)
 	{
 		time(&rawStartTime);
 		timeInfo = localtime(&rawStartTime);
-		formatedTime = string(asctime(timeInfo));
+		formatedTime = std::string(asctime(timeInfo));
 		formatedTime = formatedTime.substr(0, (formatedTime.length()-1));
 
-		cerr << "ERROR: " << e.what() << endl;
-		cerr << "Error Occurred on " << formatedTime << "\n";
+		std::cerr << "ERROR: " << e.what() << std::endl;
+		std::cerr << "Error Occurred on " << formatedTime << "\n";
 	}
 	catch(rsgis::RSGISException &e)
 	{
 		time(&rawStartTime);
 		timeInfo = localtime(&rawStartTime);
-		formatedTime = string(asctime(timeInfo));
+		formatedTime = std::string(asctime(timeInfo));
 		formatedTime = formatedTime.substr(0, (formatedTime.length()-1));
 
-		cerr << "ERROR: " << e.what() << endl;
-		cerr << "Error Occurred on " << formatedTime << "\n";
+		std::cerr << "ERROR: " << e.what() << std::endl;
+		std::cerr << "Error Occurred on " << formatedTime << "\n";
 	}
 
 
@@ -226,7 +223,7 @@ void Control::runXML(string xmlFile)
 	}
 }
 
-void Control::printParameters(string xmlFile)
+void Control::printParameters(std::string xmlFile)
 {
     rsgis::utils::RSGISFileUtils fileUtils;
     rsgis::RSGISAlgorithmParameters **algorParams = NULL;
@@ -237,21 +234,21 @@ void Control::printParameters(string xmlFile)
 		{
             rsgis::RSGISParseXMLArguments parseXMLArguments = rsgis::RSGISParseXMLArguments(xmlFile);
 			algorParams = parseXMLArguments.parseArguments(&numCommands, factory);
-			cout << "There are " << numCommands << " commands to be printed:\n";
+			std::cout << "There are " << numCommands << " commands to be printed:\n";
 			for(int i = 0; i < numCommands; i++)
 			{
 				algorParams[i]->printParameters();
 			}
-			cout << "Finished\n";
+			std::cout << "Finished\n";
 		}
 		else
 		{
-			cerr << "ERROR: Input XML file is not present or accessable\n";
+			std::cerr << "ERROR: Input XML file is not present or accessable\n";
 		}
 	}
 	catch(rsgis::RSGISException& e)
 	{
-		cerr << "ERROR: " << e.what() << endl;
+		std::cerr << "ERROR: " << e.what() << std::endl;
 	}
 
 	if(algorParams != NULL)
@@ -266,20 +263,20 @@ void Control::printParameters(string xmlFile)
 
 void Control::listAlgorithms()
 {
-	string *algorithms = NULL;
+	std::string *algorithms = NULL;
 	int numAlgorithms = 0;
 	try
 	{
 		algorithms = factory->availableAlgorithms(&numAlgorithms);
-		cout << "There are " << numAlgorithms << " available:\n";
+		std::cout << "There are " << numAlgorithms << " available:\n";
 		for(int i = 0; i < numAlgorithms; i++)
 		{
-			cout << i << ": " << algorithms[i] << endl;
+			std::cout << i << ": " << algorithms[i] << std::endl;
 		}
 	}
 	catch(rsgis::RSGISException& e)
 	{
-		cerr << "ERROR: " << e.what() << endl;
+		std::cerr << "ERROR: " << e.what() << std::endl;
 	}
 
 	if(algorithms != NULL)
@@ -288,7 +285,7 @@ void Control::listAlgorithms()
 	}
 }
 
-void Control::createBlankXMLFile(string xmlFile)
+void Control::createBlankXMLFile(std::string xmlFile)
 {
     try
     {
@@ -297,18 +294,18 @@ void Control::createBlankXMLFile(string xmlFile)
         
         time(&rawStartTime);
         timeInfo = localtime(&rawStartTime);
-        string formatedTime = string(asctime(timeInfo));
+        std::string formatedTime = std::string(asctime(timeInfo));
         formatedTime = formatedTime.substr(0, (formatedTime.length()-1));
         char buffer [80];
         strftime (buffer,80,"%Y",timeInfo);
-        string year = string(buffer);
+        std::string year = std::string(buffer);
         
-        string newFileText = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n";
+        std::string newFileText = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n";
 		newFileText += "<!--\n";
 		newFileText += "    Description:\n";
 		newFileText += "        XML File for execution within RSGISLib\n";
-		newFileText += string("    Created by **ME** on ") + formatedTime + string(".\n");
-		newFileText += string("    Copyright (c) ") + year + string(" **Organisation**. All rights reserved.\n");
+		newFileText += std::string("    Created by **ME** on ") + formatedTime + std::string(".\n");
+		newFileText += std::string("    Copyright (c) ") + year + std::string(" **Organisation**. All rights reserved.\n");
 		newFileText += "-->\n\n";
 		newFileText += "<rsgis:commands xmlns:rsgis=\"http://www.rsgislib.org/xml/\">\n";
 		newFileText += "\n    <!-- ENTER YOUR XML HERE -->\n\n";
@@ -318,15 +315,15 @@ void Control::createBlankXMLFile(string xmlFile)
         rsgis::utils::RSGISTextUtils textUtils;
         textUtils.writeStringToFile(xmlFile, newFileText);
         
-        cout << xmlFile << " has been created\n";
+        std::cout << xmlFile << " has been created\n";
     }
     catch(rsgis::RSGISException& e)
 	{
-		cerr << "ERROR: " << e.what() << endl;
+		std::cerr << "ERROR: " << e.what() << std::endl;
 	}
 }
 
-void Control::help(string algor)
+void Control::help(std::string algor)
 {
     rsgis::RSGISAlgorithmParameters *algorParams;
 	try
@@ -338,12 +335,12 @@ void Control::help(string algor)
 		}
 		else
 		{
-			cout << "Algorithm \"" << algor	<< "\" cannot be found\n";
+			std::cout << "Algorithm \"" << algor	<< "\" cannot be found\n";
 		}
 	}
 	catch(rsgis::RSGISException& e)
 	{
-		cerr << "ERROR: " << e.what() << endl;
+		std::cerr << "ERROR: " << e.what() << std::endl;
 	}
 
 	if(algorParams != NULL)
@@ -354,38 +351,38 @@ void Control::help(string algor)
 
 void Control::help()
 {
-	cout << "RSGISLib, version " << RSGISLIB_PACKAGE_VERSION << endl;
-	cout << "usage: rsgisexe [-h] [-l] [-h algorithm] [-p xml file] [-x xml file]\n\n";
-	cout << "-h - Prints this messgae\n";
-	cout << "-l - List available algorithms\n";
-	cout << "-h algorithm - Print help for the algorithm specified\n";
-    cout << "-b xml file - Creates a blank rsgislib xml file to be populated with commands\n";
-	cout << "-p xml file - Parses and prints the parameters for the xml file specified\n";
-	cout << "-x xml file - Executes the application with the algorithms and parameters specified\n";
-    cout << "-v - Prints the version information for the software\n";
-	cout << "Bugs are to be reported on the trac or directly to " << RSGISLIB_PACKAGE_BUGREPORT << endl << endl;
+	std::cout << "RSGISLib, version " << RSGISLIB_PACKAGE_VERSION << std::endl;
+	std::cout << "usage: rsgisexe [-h] [-l] [-h algorithm] [-p xml file] [-x xml file]\n\n";
+	std::cout << "-h - Prints this messgae\n";
+	std::cout << "-l - List available algorithms\n";
+	std::cout << "-h algorithm - Print help for the algorithm specified\n";
+    std::cout << "-b xml file - Creates a blank rsgislib xml file to be populated with commands\n";
+	std::cout << "-p xml file - Parses and prints the parameters for the xml file specified\n";
+	std::cout << "-x xml file - Executes the application with the algorithms and parameters specified\n";
+    std::cout << "-v - Prints the version information for the software\n";
+	std::cout << "Bugs are to be reported on the trac or directly to " << RSGISLIB_PACKAGE_BUGREPORT << std::endl << std::endl;
 }
 
 void Control::versionInfo()
 {
-    cout << "You are using Mercurial version " << RSGISLIB_HG_COMMIT << endl << endl;
+    std::cout << "You are using Mercurial version " << RSGISLIB_HG_COMMIT << std::endl << std::endl;
     
-    cout << "With library versions:\n";
-    cout << "Calibration Library Version: " << RSGISLIB_CALIBRATION_VERSION << endl;
-    cout << "Classify Library Version: " << RSGISLIB_CLASSIFY_VERSION << endl;
-    cout << "Common Library Version: " << RSGISLIB_COMMONS_VERSION << endl;
-    cout << "Data Structures Library Version: " << RSGISLIB_DATASTRUCT_VERSION << endl;
-    cout << "Filtering Library Version: " << RSGISLIB_FILTERING_VERSION << endl;
-    cout << "Geometry Library Version: " << RSGISLIB_GEOM_VERSION << endl;
-    cout << "Imaging Library Version: " << RSGISLIB_IMG_VERSION << endl;
-    cout << "Maths Library Version: " << RSGISLIB_MATHS_VERSION << endl;
-    cout << "Modeling Library Version: " << RSGISLIB_MODELING_VERSION << endl;
-    cout << "Radar Library Version: " << RSGISLIB_RADAR_VERSION << endl;
-    cout << "Raster GIS Library Version: " << RSGISLIB_RASTERGIS_VERSION << endl;
-    cout << "Registration Library Version: " << RSGISLIB_REGISTRATION_VERSION << endl;
-    cout << "Segmentation Library Version: " << RSGISLIB_SEGMENTATION_VERSION << endl;
-    cout << "Utilities Library Version: " << RSGISLIB_UTILS_VERSION << endl;
-    cout << "Vector Library Version: " << RSGISLIB_VECTOR_VERSION << endl;
+    std::cout << "With library versions:\n";
+    std::cout << "Calibration Library Version: " << RSGISLIB_CALIBRATION_VERSION << std::endl;
+    std::cout << "Classify Library Version: " << RSGISLIB_CLASSIFY_VERSION << std::endl;
+    std::cout << "Common Library Version: " << RSGISLIB_COMMONS_VERSION << std::endl;
+    std::cout << "Data Structures Library Version: " << RSGISLIB_DATASTRUCT_VERSION << std::endl;
+    std::cout << "Filtering Library Version: " << RSGISLIB_FILTERING_VERSION << std::endl;
+    std::cout << "Geometry Library Version: " << RSGISLIB_GEOM_VERSION << std::endl;
+    std::cout << "Imaging Library Version: " << RSGISLIB_IMG_VERSION << std::endl;
+    std::cout << "Maths Library Version: " << RSGISLIB_MATHS_VERSION << std::endl;
+    std::cout << "Modeling Library Version: " << RSGISLIB_MODELING_VERSION << std::endl;
+    std::cout << "Radar Library Version: " << RSGISLIB_RADAR_VERSION << std::endl;
+    std::cout << "Raster GIS Library Version: " << RSGISLIB_RASTERGIS_VERSION << std::endl;
+    std::cout << "Registration Library Version: " << RSGISLIB_REGISTRATION_VERSION << std::endl;
+    std::cout << "Segmentation Library Version: " << RSGISLIB_SEGMENTATION_VERSION << std::endl;
+    std::cout << "Utilities Library Version: " << RSGISLIB_UTILS_VERSION << std::endl;
+    std::cout << "Vector Library Version: " << RSGISLIB_VECTOR_VERSION << std::endl;
 }
 
 Control::~Control()
@@ -395,11 +392,11 @@ Control::~Control()
 
 int main(int argc, char **argv)
 {
-	cout << RSGISLIB_PACKAGE_STRING << " Copyright (C) " << RSGISLIB_COPYRIGHT_YEAR << "  Peter Bunting and Daniel Clewley\n";
-    cout << "This program comes with ABSOLUTELY NO WARRANTY.\n";
-    cout << "This is free software, and you are welcome to redistribute it\n";
-    cout << "under certain conditions; See website (http://www.rsgislib.org).\n";
-	cout << "Bugs are to be reported on the trac or directly to " << RSGISLIB_PACKAGE_BUGREPORT << endl << endl;
+	std::cout << RSGISLIB_PACKAGE_STRING << " Copyright (C) " << RSGISLIB_COPYRIGHT_YEAR << "  Peter Bunting and Daniel Clewley\n";
+    std::cout << "This program comes with ABSOLUTELY NO WARRANTY.\n";
+    std::cout << "This is free software, and you are welcome to redistribute it\n";
+    std::cout << "under certain conditions; See website (http://www.rsgislib.org).\n";
+	std::cout << "Bugs are to be reported on the trac or directly to " << RSGISLIB_PACKAGE_BUGREPORT << std::endl << std::endl;
 
 	Control *ctrl = NULL;
 
@@ -412,9 +409,9 @@ int main(int argc, char **argv)
 
 			cmdParser->parseArguments(argc, argv);
 
-			if(cmdParser->argumentPresent(string("-h")))
+			if(cmdParser->argumentPresent(std::string("-h")))
 			{
-				argpair *arghelp = cmdParser->findArgument(string("-h"));
+				rsgis::argpair *arghelp = cmdParser->findArgument(std::string("-h"));
 				if(arghelp == NULL)
 				{
 					ctrl->help();
@@ -429,16 +426,16 @@ int main(int argc, char **argv)
 				}
 				delete arghelp;
 			}
-			else if(cmdParser->argumentPresent(string("-l")))
+			else if(cmdParser->argumentPresent(std::string("-l")))
 			{
 				ctrl->listAlgorithms();
 			}
-			else if(cmdParser->argumentPresent(string("-x")))
+			else if(cmdParser->argumentPresent(std::string("-x")))
 			{
-				argpair *argXML = cmdParser->findArgument(string("-x"));
+				rsgis::argpair *argXML = cmdParser->findArgument(std::string("-x"));
 				if(argXML == NULL)
 				{
-					throw RSGISCommandLineException("An XML file needs to be provided");
+					throw rsgis::RSGISCommandLineException("An XML file needs to be provided");
 				}
 				else if(argXML->numVals == 1)
 				{
@@ -450,12 +447,12 @@ int main(int argc, char **argv)
 				}
 				delete argXML;
 			}
-			else if(cmdParser->argumentPresent(string("-p")))
+			else if(cmdParser->argumentPresent(std::string("-p")))
 			{
-				argpair *argXML = cmdParser->findArgument(string("-p"));
+				rsgis::argpair *argXML = cmdParser->findArgument(std::string("-p"));
 				if(argXML == NULL)
 				{
-					throw RSGISCommandLineException("An XML file needs to be provided");
+					throw rsgis::RSGISCommandLineException("An XML file needs to be provided");
 				}
 				else if(argXML->numVals == 1)
 				{
@@ -467,12 +464,12 @@ int main(int argc, char **argv)
 				}
 				delete argXML;
 			}
-            else if(cmdParser->argumentPresent(string("-b")))
+            else if(cmdParser->argumentPresent(std::string("-b")))
 			{
-				argpair *argXML = cmdParser->findArgument(string("-b"));
+				rsgis::argpair *argXML = cmdParser->findArgument(std::string("-b"));
 				if(argXML == NULL)
 				{
-					throw RSGISCommandLineException("An XML file needs to be provided");
+					throw rsgis::RSGISCommandLineException("An XML file needs to be provided");
 				}
 				else if(argXML->numVals == 1)
 				{
@@ -484,7 +481,7 @@ int main(int argc, char **argv)
 				}
 				delete argXML;
 			}
-            else if(cmdParser->argumentPresent(string("-v")))
+            else if(cmdParser->argumentPresent(std::string("-v")))
 			{
                 ctrl->versionInfo();
             }
@@ -502,12 +499,12 @@ int main(int argc, char **argv)
 	}
 	catch(rsgis::RSGISCommandLineException& e)
 	{
-		cerr << "ERROR: " << e.what() << endl;
+		std::cerr << "ERROR: " << e.what() << std::endl;
 		ctrl->help();
 	}
 	catch(rsgis::RSGISException& e)
 	{
-		cerr << "ERROR: " << e.what() << endl;
+		std::cerr << "ERROR: " << e.what() << std::endl;
 	}
 
 

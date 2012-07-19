@@ -93,7 +93,7 @@ namespace rsgis{namespace calib{
             {
                 if(imageBands[i]+bandOffset > numBands)
                 {
-                    cout << "Image band: " << imageBands[i] << endl;
+                    std::cout << "Image band: " << imageBands[i] << std::endl;
                     throw rsgis::img::RSGISImageCalcException("Image band is not within image.");
                 }
                 tmpVal=aX[i][elv]*bandValues[imageBands[i]+bandOffset]-bX[i][elv];

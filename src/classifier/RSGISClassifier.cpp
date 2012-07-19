@@ -40,7 +40,7 @@ namespace rsgis{ namespace classifier{
 	{
 		for(int i = 0; i < numClasses; i++)
 		{
-			cout << "Class " << trainingData[i]->className << " has ID " << trainingData[i]->classID << endl;
+            std::cout << "Class " << trainingData[i]->className << " has ID " << trainingData[i]->classID << std::endl;
 		}
 	}
 	

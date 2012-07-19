@@ -54,9 +54,9 @@ namespace rsgis{namespace reg{
 		void initRegistration()throw(RSGISRegistrationException);
 		void executeRegistration()throw(RSGISRegistrationException);
 		void finaliseRegistration()throw(RSGISRegistrationException);
-		void exportTiePointsENVIImage2Map(string filepath)throw(RSGISRegistrationException);
-		void exportTiePointsENVIImage2Image(string filepath)throw(RSGISRegistrationException);
-		void exportTiePointsRSGISImage2Map(string filepath)throw(RSGISRegistrationException);
+		void exportTiePointsENVIImage2Map(std::string filepath)throw(RSGISRegistrationException);
+		void exportTiePointsENVIImage2Image(std::string filepath)throw(RSGISRegistrationException);
+		void exportTiePointsRSGISImage2Map(std::string filepath)throw(RSGISRegistrationException);
 		~RSGISSingleConnectLayerImageRegistration();
 	private:
 		std::list<TiePointInSingleLayer*> *tiePoints;

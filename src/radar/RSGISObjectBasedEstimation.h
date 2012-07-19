@@ -59,7 +59,7 @@ namespace rsgis{namespace radar{
 	class RSGISObjectBasedEstimation : public rsgis::vec::RSGISProcessOGRFeature
 	{
 	public:
-		RSGISObjectBasedEstimation(GDALDataset *inputImage, GDALDataset *outputImage, std::vector<gsl_vector*> *initialPar, std::vector<RSGISEstimationOptimiser*> *slowOptimiser, std::vector<RSGISEstimationOptimiser*> *fastOptimiser, estParameters parameters, double ***minMaxVals = NULL, string classHeading = "", bool useClass = false);
+		RSGISObjectBasedEstimation(GDALDataset *inputImage, GDALDataset *outputImage, std::vector<gsl_vector*> *initialPar, std::vector<RSGISEstimationOptimiser*> *slowOptimiser, std::vector<RSGISEstimationOptimiser*> *fastOptimiser, estParameters parameters, double ***minMaxVals = NULL, std::string classHeading = "", bool useClass = false);
 		virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid)throw(RSGISVectorException);
 		virtual void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid)throw(RSGISVectorException);
 		virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(rsgis::vec::RSGISVectorOutputException);
@@ -93,7 +93,7 @@ namespace rsgis{namespace radar{
     class RSGISObjectBasedEstimationObjectAP : public rsgis::vec::RSGISProcessOGRFeature
 	{
 	public:
-		RSGISObjectBasedEstimationObjectAP(GDALDataset *inputImage, GDALDataset *outputImage, vector <gsl_vector*> *initialPar, vector <RSGISEstimationOptimiser*> *slowOptimiser, vector <RSGISEstimationOptimiser*> *fastOptimiser, estParameters parameters, string *apParField, double ***minMaxVals = NULL, string classHeading = "", bool useClass = false);
+		RSGISObjectBasedEstimationObjectAP(GDALDataset *inputImage, GDALDataset *outputImage, std::vector<gsl_vector*> *initialPar, std::vector<RSGISEstimationOptimiser*> *slowOptimiser, std::vector<RSGISEstimationOptimiser*> *fastOptimiser, estParameters parameters, std::string *apParField, double ***minMaxVals = NULL, std::string classHeading = "", bool useClass = false);
 		virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid)throw(RSGISVectorException);
         virtual void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid)throw(RSGISVectorException);
 		virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(rsgis::vec::RSGISVectorOutputException);
@@ -110,9 +110,9 @@ namespace rsgis{namespace radar{
 		rsgis::img::RSGISCalcImageSingleValue *getValues;
 		rsgis::img::RSGISCalcImageSingle *calcImageSingle;
 		rsgis::img::RSGISCalcImage *calcImage;
-		std::vector <gsl_vector*> *initialPar;
-		std::vector <RSGISEstimationOptimiser*> *slowOptimiser;
-		std::vector <RSGISEstimationOptimiser*> *fastOptimiser;
+		std::vector<gsl_vector*> *initialPar;
+		std::vector<RSGISEstimationOptimiser*> *slowOptimiser;
+		std::vector<RSGISEstimationOptimiser*> *fastOptimiser;
 		RSGISEstimationOptimiser *slowOptimiserSingle;
 		RSGISEstimationOptimiser *fastOptimiserSingle;
 		gsl_vector *initialParSingle;
@@ -131,7 +131,7 @@ namespace rsgis{namespace radar{
 	class RSGISObjectBasedEstimationRasterPolygon : public rsgis::vec::RSGISProcessOGRFeature
 	{
 	public:
-		RSGISObjectBasedEstimationRasterPolygon(GDALDataset *inputImage, GDALDataset *outputImage,  GDALDataset *rasterFeatures, vector <gsl_vector*> *initialPar, vector <RSGISEstimationOptimiser*> *slowOptimiser, vector <RSGISEstimationOptimiser*> *fastOptimiser, estParameters parameters, double ***minMaxVals = NULL, string classHeading = "", bool useClass = false);
+		RSGISObjectBasedEstimationRasterPolygon(GDALDataset *inputImage, GDALDataset *outputImage,  GDALDataset *rasterFeatures, std::vector<gsl_vector*> *initialPar, std::vector<RSGISEstimationOptimiser*> *slowOptimiser, std::vector<RSGISEstimationOptimiser*> *fastOptimiser, estParameters parameters, double ***minMaxVals = NULL, std::string classHeading = "", bool useClass = false);
 		virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
 		virtual void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid)throw(RSGISVectorException);
 		virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(rsgis::vec::RSGISVectorOutputException);
@@ -149,9 +149,9 @@ namespace rsgis{namespace radar{
 		rsgis::img::RSGISCalcImageSingle *calcImageSingle;
 		rsgis::img::RSGISCalcImageValue *invValues;
 		rsgis::img::RSGISCalcImage *calcImage;
-		std::vector <gsl_vector*> *initialPar;
-		std::vector <RSGISEstimationOptimiser*> *slowOptimiser;
-		std::vector <RSGISEstimationOptimiser*> *fastOptimiser;
+		std::vector<gsl_vector*> *initialPar;
+		std::vector<RSGISEstimationOptimiser*> *slowOptimiser;
+		std::vector<RSGISEstimationOptimiser*> *fastOptimiser;
 		RSGISEstimationOptimiser *slowOptimiserSingle;
 		RSGISEstimationOptimiser *fastOptimiserSingle;
 		gsl_vector *initialParSingle;

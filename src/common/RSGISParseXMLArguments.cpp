@@ -90,8 +90,8 @@ namespace rsgis
 			{
 				argElement = static_cast<xercesc::DOMElement*>(argumentsList->item(i));
 				algorNameChar = xercesc::XMLString::transcode(argElement->getAttribute(algorXMLStr));
-				algorNameStr = string(algorNameChar);
-				cout << "Algorithm = " << algorNameStr << endl;
+				algorNameStr = std::string(algorNameChar);
+                std::cout << "Algorithm = " << algorNameStr << std::endl;
 				
 				args[i] = algorFactory->getAlgorithmParamterObj(algorNameStr);
 				xercesc::XMLString::release(&algorNameChar);

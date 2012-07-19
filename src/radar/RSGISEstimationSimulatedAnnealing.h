@@ -300,7 +300,7 @@ namespace rsgis {namespace radar{
     {
         /// Simulated Annealing to use in Estimation algorithm
     public:
-        RSGISEstimationSimulatedAnnealingWithAP(vector<rsgis::math::RSGISMathNVariableFunction*> *allFunctions,
+        RSGISEstimationSimulatedAnnealingWithAP(std::vector<rsgis::math::RSGISMathNVariableFunction*> *allFunctions,
                                                 double **minMaxIntervalAll,
                                                 double minEnergy,
                                                 double startTemp,
@@ -316,7 +316,7 @@ namespace rsgis {namespace radar{
         gsl_vector* getAPrioriPar(){return this->aPrioriPar;};
         virtual estOptimizerType getOptimiserType(){return simulatedAnnealing;}; 
         virtual void printOptimiser(){std::cout << "Simulated Annealing - 3 Var 3 Data (with a Priori)" << std::endl;};
-        double calcLeastSquares(vector <double> *values);
+        double calcLeastSquares(std::vector<double> *values);
         ~RSGISEstimationSimulatedAnnealingWithAP();
     private:
         double startTemp;
@@ -330,7 +330,7 @@ namespace rsgis {namespace radar{
         unsigned int maxItt; // Maximum number of itterations
         double *initialStepSize;
         gsl_rng *randgsl;
-        vector <rsgis::math::RSGISMathNVariableFunction*> *allFunctions;
+        std::vector <rsgis::math::RSGISMathNVariableFunction*> *allFunctions;
         gsl_matrix *covMatrixP;
         gsl_matrix *invCovMatrixD;
         gsl_matrix *invCovMatrixP;

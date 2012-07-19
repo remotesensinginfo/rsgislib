@@ -54,7 +54,7 @@ namespace rsgis{namespace filter{
         delete gradImage;
 	}
     
-    void RSGISImageMorphologyGradient::calcGradientImageAll(GDALDataset **datasets, string outputImage, rsgis::math::Matrix *matrixOperator) throw(rsgis::img::RSGISImageCalcException, rsgis::img::RSGISImageBandException)
+    void RSGISImageMorphologyGradient::calcGradientImageAll(GDALDataset **datasets, std::string outputImage, rsgis::math::Matrix *matrixOperator) throw(rsgis::img::RSGISImageCalcException, rsgis::img::RSGISImageBandException)
 	{
         if(matrixOperator->n != matrixOperator->m)
         {

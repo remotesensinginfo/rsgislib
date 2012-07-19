@@ -1389,7 +1389,7 @@ namespace rsgis {namespace radar
 			gsl_vector_set(estimatedPar, 2, initialHeight);
 			
 			// Set initial error
-			gsl_vector_set(outParError, nPar, +numeric_limits<double>::infinity());//+INFINITY);
+			gsl_vector_set(outParError, nPar, + std::numeric_limits<double>::infinity());//+INFINITY);
 			
 			// Calculate Sigma Squared (used to calculate error)
 			double sigmaSq = 0.0;
@@ -1596,7 +1596,7 @@ namespace rsgis {namespace radar
 				error = error / sigmaSq;
 				
 				//std::cout << "error = " << error << ", prev error = " << prevError << ", diff = " << abs(prevError - error) << std::endl;
-				if((error < minError) | (abs(prevError - error) < 10e-10) | isnan(error))
+				if((error < minError) | (abs(prevError - error) < 10e-10) | std::isnan(error))
 				{
 					for(int i = 0; i < nPar; i++)
 					{
@@ -1833,7 +1833,7 @@ namespace rsgis {namespace radar
 			gsl_vector_set(estimatedPar, 2, initialHeight);
 			
 			// Set initial error
-			gsl_vector_set(outParError, nPar, +numeric_limits<double>::infinity());//+INFINITY);
+			gsl_vector_set(outParError, nPar, + std::numeric_limits<double>::infinity());//+INFINITY);
 			
 			// Calculate Sigma Squared (used to calculate error)
 			double sigmaSq = 0.0;
@@ -2090,7 +2090,7 @@ namespace rsgis {namespace radar
 				}
 				error = error / sigmaSq;
 				
-				if((error < minError) | (abs(prevError - error) < 10e-10)| isnan(error)) //((error < 10e-5) && (error / prevError > 0.8) | isnan(error))
+				if((error < minError) | (abs(prevError - error) < 10e-10)| std::isnan(error)) //((error < 10e-5) && (error / prevError > 0.8) | isnan(error))
 				{
 					for(int i = 0; i < nPar; i++)
 					{
@@ -2379,7 +2379,7 @@ namespace rsgis {namespace radar
 				}
 				error = error / (pow(gsl_vector_get(inSigma0dB, 0),2)+pow(gsl_vector_get(inSigma0dB, 1),2));
 								
-				if((error < minError) | (abs(prevError - error) < 10e-10) | isnan(error))
+				if((error < minError) | (abs(prevError - error) < 10e-10) | std::isnan(error))
 				{
 					
 					for(int i = 0; i < nPar; i++)
@@ -2388,7 +2388,7 @@ namespace rsgis {namespace radar
 					}
 					gsl_vector_set(outParError, nPar, error);
 					
-					if(isnan(error)){gsl_vector_set(outParError, nPar,9999);}
+					if(std::isnan(error)){gsl_vector_set(outParError, nPar,9999);}
 					
 					gsl_vector_free(estimatedPar);
 					gsl_vector_free(predicted);
@@ -2631,7 +2631,7 @@ namespace rsgis {namespace radar
 				//std::cout << "sigmaSq = " << sigmaSq << std::endl;
 				//error = sqrt(predictSq / sigmaSq); // Square Root [Sum(Predicted Squared) / Sum(Measured Squared)]
 
-				if((error < minError) | (abs(prevError - error) < 10e-10) | isnan(error))
+				if((error < minError) | (abs(prevError - error) < 10e-10) | std::isnan(error))
 				{
 					for(int i = 0; i < nPar; i++)
 					{
