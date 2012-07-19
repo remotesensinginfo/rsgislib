@@ -25,20 +25,13 @@
 #define RSGISPointData_H
 
 #include <iostream>
-#include <string>
-#include <vector>
 #include "ogrsf_frmts.h"
-#include "geos/geom/GeometryFactory.h"
-#include "geos/geom/Coordinate.h"
+
 #include "geos/geom/Point.h"
-#include "geos/geom/Geometry.h"
+
 #include "vec/RSGISVectorUtils.h"
 #include "vec/RSGISPolygonData.h"
 #include "vec/RSGISVectorOutputException.h"
-
-using namespace std;
-using namespace geos::geom;
-using namespace geos;
 
 namespace rsgis{namespace vec{
 	
@@ -53,11 +46,11 @@ namespace rsgis{namespace vec{
 			virtual void populateFeature(OGRFeature *feature, OGRFeatureDefn *featDefn)=0;
 			double distance(RSGISPolygonData *data);
 			double distance(RSGISPointData *data);
-			Point* getPoint();
-			void setPoint(Point *point);
+			geos::geom::Point* getPoint();
+			void setPoint(geos::geom::Point *point);
 			virtual ~RSGISPointData();
 		protected:
-			Point *pointGeom;
+			geos::geom::Point *pointGeom;
 		};
 }}
 

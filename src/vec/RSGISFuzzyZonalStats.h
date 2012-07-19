@@ -41,17 +41,12 @@
 
 #include "geos/geom/Envelope.h"
 
-using namespace std;
-using namespace rsgis;
-using namespace rsgis::img;
-using namespace geos::geom;
-
 namespace rsgis{namespace vec{
 	
 	struct FuzzyAttributes
 	{
-		string name;
-		string fuzzyClass;
+		std::string name;
+		std::string fuzzyClass;
 		int index;
 		int numBands;
 		int *bands;
@@ -59,20 +54,20 @@ namespace rsgis{namespace vec{
 	
 	struct FuzzyClassSet
 	{
-		string name;
+		std::string name;
 		int index;
 		int count;
 	};
 	
-	class RSGISCalcFuzzyZonalStatsFromRasterPolygon : public RSGISCalcImageSingleValue
+	class RSGISCalcFuzzyZonalStatsFromRasterPolygon : public rsgis::img::RSGISCalcImageSingleValue
 		{
 		public: 
 			RSGISCalcFuzzyZonalStatsFromRasterPolygon(int numOutputValues, FuzzyAttributes **attributes, int numAttributes, float binsize, float hardThreshold);
-			void calcImageValue(float *bandValuesImageA, float *bandValuesImageB, int numBands, int bandA, int bandB) throw(RSGISImageCalcException);
-			void calcImageValue(float *bandValuesImage, int numBands, int band) throw(RSGISImageCalcException);
-			void calcImageValue(float *bandValuesImage, int numBands, Envelope *extent) throw(RSGISImageCalcException);
-			void calcImageValue(float *bandValuesImage, double interceptArea, int numBands, Polygon *poly, Point *pt) throw(RSGISImageCalcException);
-			double* getOutputValues()  throw(RSGISImageCalcException);
+			void calcImageValue(float *bandValuesImageA, float *bandValuesImageB, int numBands, int bandA, int bandB) throw(rsgis::img::RSGISImageCalcException);
+			void calcImageValue(float *bandValuesImage, int numBands, int band) throw(rsgis::img::RSGISImageCalcException);
+			void calcImageValue(float *bandValuesImage, int numBands, geos::geom::Envelope *extent) throw(rsgis::img::RSGISImageCalcException);
+			void calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt) throw(rsgis::img::RSGISImageCalcException);
+			double* getOutputValues()  throw(rsgis::img::RSGISImageCalcException);
 			void reset();
 			void updateAttributes(FuzzyAttributes **attributes, int numAttributes, bool hard);
 			~RSGISCalcFuzzyZonalStatsFromRasterPolygon();
@@ -93,9 +88,9 @@ namespace rsgis{namespace vec{
 	class RSGISFuzzyZonalStats : public RSGISProcessOGRFeature
 		{
 		public:
-			RSGISFuzzyZonalStats(GDALDataset *image, GDALDataset *rasterFeatures, FuzzyAttributes** attributes, int numAttributes, float binSize, float threshold, bool outPxlCount, string classattribute);
-			virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, Envelope *env, long fid) throw(RSGISVectorException);
-			virtual void processFeature(OGRFeature *feature, Envelope *env, long fid) throw(RSGISVectorException);
+			RSGISFuzzyZonalStats(GDALDataset *image, GDALDataset *rasterFeatures, FuzzyAttributes** attributes, int numAttributes, float binSize, float threshold, bool outPxlCount, std::string classattribute);
+			virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
+			virtual void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
 			virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException);
 			virtual ~RSGISFuzzyZonalStats();
 		protected:
@@ -103,7 +98,7 @@ namespace rsgis{namespace vec{
 			GDALDataset **datasets;
 			FuzzyAttributes** attributes;
 			
-			vector<FuzzyClassSet*> *classSets;
+            std::vector<FuzzyClassSet*> *classSets;
 			FuzzyAttributes*** groupedAttributes;
 			int *groupedIndexes;
 			bool foundHard;
@@ -115,8 +110,8 @@ namespace rsgis{namespace vec{
 			float binSize;
 			float threshold;
 			bool outPxlCount;
-			string classattribute;
-			RSGISCalcImageSingle *calcImage;
+			std::string classattribute;
+            rsgis::img::RSGISCalcImageSingle *calcImage;
 			RSGISCalcFuzzyZonalStatsFromRasterPolygon *calcValue;
 		};
 	

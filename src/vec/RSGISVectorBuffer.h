@@ -40,11 +40,6 @@
 
 #include "geos/geom/Coordinate.h"
 
-using namespace std;
-using namespace rsgis;
-using namespace rsgis::math;
-using namespace geos::geom;
-
 namespace rsgis{namespace vec{
 	
 	class RSGISVectorBuffer : public RSGISProcessOGRGeometry

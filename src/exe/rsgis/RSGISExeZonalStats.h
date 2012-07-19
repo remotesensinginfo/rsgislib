@@ -134,7 +134,7 @@ class RSGISExeZonalStats : public RSGISAlgorithmParameters
         bool ignoreProjection;
 		bool copyAttributes;
 		bool dB;
-		pixelInPolyOption method;
+        rsgis::img::pixelInPolyOption method;
 		outTXTform outtxt;
 		bool outputToText;
 		bool calcZonalAllBands;

@@ -34,8 +34,11 @@
 
 #include "vec/RSGISVectorZonalException.h"
 #include "vec/RSGISVectorIO.h"
+
 #include "vec/RSGISProcessOGRFeature.h"
+
 #include "math/RSGISMatrices.h"
+
 #include "img/RSGISCalcImage.h"
 #include "img/RSGISCalcImageValue.h"
 #include "img/RSGISPixelInPoly.h"
@@ -43,33 +46,28 @@
 #include "geos/geom/Envelope.h"
 #include "geos/geom/Coordinate.h"
 
-using namespace std;
-using namespace rsgis::img;
-using namespace geos::geom;
-using namespace rsgis::math;
-
 namespace rsgis{namespace vec{    
     
 	class RSGISExtractEndMembers2Matrix
 	{
 	public:
 		RSGISExtractEndMembers2Matrix();
-		void extractColumnPerPolygon2Matrix(GDALDataset *dataset, OGRLayer *vecLayer, string outputMatrix, pixelInPolyOption pixelPolyOption)throw(RSGISVectorZonalException);
+		void extractColumnPerPolygon2Matrix(GDALDataset *dataset, OGRLayer *vecLayer, std::string outputMatrix, rsgis::img::pixelInPolyOption pixelPolyOption)throw(RSGISVectorZonalException);
 		~RSGISExtractEndMembers2Matrix();
 	};
     
     
-    class RSGISCalcSumValues : public RSGISCalcImageValue
+    class RSGISCalcSumValues : public rsgis::img::RSGISCalcImageValue
     {
     public: 
         RSGISCalcSumValues(float *sumVals, unsigned int *countVals, unsigned int numSumVals);
-        void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException);
-        void calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
-        bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException);
+        void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+        bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
         ~RSGISCalcSumValues();
     protected:
         float *sumVals;
@@ -81,15 +79,15 @@ namespace rsgis{namespace vec{
     class RSGISExtractSumPixelValues
     {
     public:
-        RSGISExtractSumPixelValues(unsigned int numImageBands, RSGISCalcSumValues *valueCalc, GDALDataset **datasets, int numDS, pixelInPolyOption pixelPolyOption);
-        void processFeature(OGRFeature *feature, OGRPolygon *poly, Envelope *env, long fid) throw(RSGISVectorException);
+        RSGISExtractSumPixelValues(unsigned int numImageBands, RSGISCalcSumValues *valueCalc, GDALDataset **datasets, int numDS, rsgis::img::pixelInPolyOption pixelPolyOption);
+        void processFeature(OGRFeature *feature, OGRPolygon *poly, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
         ~RSGISExtractSumPixelValues();
     protected:
         unsigned int numImageBands;
         RSGISCalcSumValues *valueCalc;
         GDALDataset **datasets;
         int numDS;
-        pixelInPolyOption pixelPolyOption;
+        rsgis::img::pixelInPolyOption pixelPolyOption;
     };
     
     

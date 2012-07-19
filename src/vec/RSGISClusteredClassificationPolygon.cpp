@@ -48,22 +48,22 @@ namespace rsgis{namespace vec{
 		this->polygonType = data->polygonType;
 		if(this->polygonType)
 		{
-			this->polygonGeom = dynamic_cast<Polygon*>(data->polygonGeom->clone());
+			this->polygonGeom = dynamic_cast<geos::geom::Polygon*>(data->polygonGeom->clone());
 		}
 		else
 		{
-			this->multiPolygonGeom = dynamic_cast<MultiPolygon*>(data->multiPolygonGeom->clone());
+			this->multiPolygonGeom = dynamic_cast<geos::geom::MultiPolygon*>(data->multiPolygonGeom->clone());
 		}
-		this->envelope = new Envelope(*data->envelope);
+		this->envelope = new geos::geom::Envelope(*data->envelope);
 	}
 	
 	void RSGISClusteredClassificationPolygon::readAttribtues(OGRFeature *feature, OGRFeatureDefn *featDefn)
 	{
-		RSGISMathsUtils mathUtils;
+        rsgis::math::RSGISMathsUtils mathUtils;
 		
 		// Read the class attribute
 		OGRFieldDefn *fieldDef = NULL;
-		string columnName = "";
+		std::string columnName = "";
 		int fieldCount = featDefn->GetFieldCount();
 		for(int i = 0; i < fieldCount; i++)
 		{
@@ -71,27 +71,27 @@ namespace rsgis{namespace vec{
 			columnName = fieldDef->GetNameRef();
 			if(columnName == "ClustClass")
 			{
-				this->clusterClass = string(feature->GetFieldAsString(i));
+				this->clusterClass = std::string(feature->GetFieldAsString(i));
 			}
 			else if(columnName == "Area")
 			{
-				this->area = mathUtils.strtofloat(string(feature->GetFieldAsString(i)));
+				this->area = mathUtils.strtofloat(std::string(feature->GetFieldAsString(i)));
 			}
 			else if(columnName == "PolysArea")
 			{
-				this->polysArea = mathUtils.strtofloat(string(feature->GetFieldAsString(i)));
+				this->polysArea = mathUtils.strtofloat(std::string(feature->GetFieldAsString(i)));
 			}
 			else if(columnName == "ProPolysAr")
 			{
-				this->proPolysArea = mathUtils.strtofloat(string(feature->GetFieldAsString(i)));
+				this->proPolysArea = mathUtils.strtofloat(std::string(feature->GetFieldAsString(i)));
 			}
 			else if(columnName == "ProTotalAr")
 			{
-				this->proTotalArea = mathUtils.strtofloat(string(feature->GetFieldAsString(i)));
+				this->proTotalArea = mathUtils.strtofloat(std::string(feature->GetFieldAsString(i)));
 			}
 			else if(columnName == "EdgeThres")
 			{
-				this->edgeThreshold = mathUtils.strtofloat(string(feature->GetFieldAsString(i)));
+				this->edgeThreshold = mathUtils.strtofloat(std::string(feature->GetFieldAsString(i)));
 			}
 		}
 	}
@@ -214,12 +214,12 @@ namespace rsgis{namespace vec{
 		return this->edgeThreshold;
 	}
 	
-	void RSGISClusteredClassificationPolygon::setClusterClass(string name)
+	void RSGISClusteredClassificationPolygon::setClusterClass(std::string name)
 	{
 		this->clusterClass = name;
 	}
 	
-	string RSGISClusteredClassificationPolygon::getClusterClass()
+	std::string RSGISClusteredClassificationPolygon::getClusterClass()
 	{
 		return this->clusterClass;
 	}

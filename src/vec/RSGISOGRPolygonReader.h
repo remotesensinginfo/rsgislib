@@ -36,20 +36,18 @@
 #include "vec/RSGISProcessOGRFeature.h"
 #include "vec/RSGISVectorUtils.h"
 
-using namespace std;
-
 namespace rsgis{namespace vec{
 	
 	class RSGISOGRPolygonReader : public RSGISProcessOGRFeature
 	{
 	public:
-		RSGISOGRPolygonReader(vector<OGRPolygon*> *polygons);
-		void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, Envelope *env, long fid) throw(RSGISVectorException);
-		void processFeature(OGRFeature *feature, Envelope *env, long fid) throw(RSGISVectorException);
+		RSGISOGRPolygonReader(std::vector<OGRPolygon*> *polygons);
+		void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
+		void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
 		void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException);
 		~RSGISOGRPolygonReader();
 	protected:
-		vector<OGRPolygon*> *polygons;
+        std::vector<OGRPolygon*> *polygons;
 	};
 }}
 

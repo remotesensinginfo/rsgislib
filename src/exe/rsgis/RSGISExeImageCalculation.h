@@ -90,7 +90,7 @@
 
 namespace rsgisexe{
 
-class RSGISExeImageCalculation : public RSGISAlgorithmParameters
+    class RSGISExeImageCalculation : public rsgis::RSGISAlgorithmParameters
 	{
 	public:
 		
@@ -135,7 +135,7 @@ class RSGISExeImageCalculation : public RSGISAlgorithmParameters
 		RSGISExeImageCalculation();
 		virtual rsgis::RSGISAlgorithmParameters* getInstance();
 		virtual void retrieveParameters(xercesc::DOMElement *argElement) throw(rsgis::RSGISXMLArgumentsException);
-		virtual void runAlgorithm() throw(RSGISException);
+		virtual void runAlgorithm() throw(rsgis::RSGISException);
 		virtual void printParameters();
 		virtual std::string getDescription();
 		virtual std::string getXMLSchema();

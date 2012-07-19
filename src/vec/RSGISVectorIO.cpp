@@ -47,7 +47,7 @@ namespace rsgis{namespace vec{
 			int counter = 0;
 			int feedback = int((double(featureCount)/10) + 0.5);
 			int feedbackCounter = 0;
-			cout << "Started" << flush;
+			std::cout << "Started" << std::flush;
 			vector->ResetReading();
 			while( (feature = vector->GetNextFeature()) != NULL )
 			{
@@ -55,13 +55,13 @@ namespace rsgis{namespace vec{
 				{
 					if((counter % feedback) == 0)
 					{
-						cout << ".." << feedbackCounter << ".." << flush;
+						std::cout << ".." << feedbackCounter << ".." << std::flush;
 						feedbackCounter = feedbackCounter + 10;
 					}
 				}
 				else
 				{
-					cout << ".." << counter << ".." << flush;
+					std::cout << ".." << counter << ".." << std::flush;
 				}
 				
 				geometry = feature->GetGeometryRef();
@@ -76,10 +76,10 @@ namespace rsgis{namespace vec{
 					throw RSGISVectorException("Unsupport data type.");
 				}
 				counter++;
-				//cout << "Outputted " << counter << " of " << numFeatures << " features\n";
+				//std::cout << "Outputted " << counter << " of " << numFeatures << " features\n";
 				OGRFeature::DestroyFeature( feature );
 			}
-			cout << " Complete.\n";
+			std::cout << " Complete.\n";
 		}
 		catch(RSGISException &e)
 		{
@@ -105,7 +105,7 @@ namespace rsgis{namespace vec{
 			int counter = 0;
 			int feedback = int((double(featureCount)/10) + 0.5);
 			int feedbackCounter = 0;
-			cout << "Started" << flush;
+			std::cout << "Started" << std::flush;
 			vector->ResetReading();
 			while( (feature = vector->GetNextFeature()) != NULL )
 			{
@@ -113,13 +113,13 @@ namespace rsgis{namespace vec{
 				{
 					if((counter % feedback) == 0)
 					{
-						cout << ".." << feedbackCounter << ".." << flush;
+						std::cout << ".." << feedbackCounter << ".." << std::flush;
 						feedbackCounter = feedbackCounter + 10;
 					}
 				}
 				else
 				{
-					cout << ".." << counter << ".." << flush;
+					std::cout << ".." << counter << ".." << std::flush;
 				}
 				
 				geometry = feature->GetGeometryRef();
@@ -139,16 +139,16 @@ namespace rsgis{namespace vec{
 					}
 					else
 					{
-						string message = string("Unsupport data type: ") + string(geometry->getGeometryName());
+						std::string message = std::string("Unsupport data type: ") + std::string(geometry->getGeometryName());
 						throw RSGISVectorException(message);
 					}
 					counter++;
 				}
 				
-				//cout << "Outputted " << counter << " of " << numFeatures << " features\n";
+				//std::cout << "Outputted " << counter << " of " << numFeatures << " features\n";
 				OGRFeature::DestroyFeature( feature );
 			}
-			cout << " Complete.\n";
+			std::cout << " Complete.\n";
 		}
 		catch(RSGISException &e)
 		{
@@ -156,10 +156,10 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISVectorIO::readOGRLineString2GEOSLinsSegment(OGRLineString *inLine, vector <LineSegment> *outLines)
+	void RSGISVectorIO::readOGRLineString2GEOSLinsSegment(OGRLineString *inLine, vector <geos::geom::LineSegment> *outLines)
 	{
 		int dimension = inLine->getDimension();
-		cout << "Dimension = " << dimension << endl;
+		std::cout << "Dimension = " << dimension << std::endl;
 	}
 	
 	void RSGISVectorIO::exportPoints2Shp(OGRLayer *outputSHP, RSGISPointData **data, int numFeatures) throw(RSGISVectorOutputException)
@@ -179,20 +179,20 @@ namespace rsgis{namespace vec{
 			int counter = 0;
 			int feedback = numFeatures/10;
 			int feedbackCounter = 0;
-			cout << "Started" << flush;
+			std::cout << "Started" << std::flush;
 			for(int i = 0; i < numFeatures; i++)
 			{
 				if(numFeatures > 10)
 				{
 					if((counter % feedback) == 0)
 					{
-						cout << ".." << feedbackCounter << ".." << flush;
+						std::cout << ".." << feedbackCounter << ".." << std::flush;
 						feedbackCounter = feedbackCounter + 10;
 					}
 				}
 				else
 				{
-					cout << ".." << counter << ".." << flush;
+					std::cout << ".." << counter << ".." << std::flush;
 				}			
 				
 				featureOutput = OGRFeature::CreateFeature(outputDefn);
@@ -206,9 +206,9 @@ namespace rsgis{namespace vec{
 				OGRFeature::DestroyFeature(featureOutput);
 				
 				counter++;
-				//cout << "Outputted " << counter << " of " << numFeatures << " features\n";
+				//std::cout << "Outputted " << counter << " of " << numFeatures << " features\n";
 			}
-			cout << " Complete.\n";
+			std::cout << " Complete.\n";
 		}
 		catch(RSGISException &e)
 		{
@@ -233,20 +233,20 @@ namespace rsgis{namespace vec{
 			int counter = 0;
 			int feedback = numFeatures/10;
 			int feedbackCounter = 0;
-			cout << "Started" << flush;
+			std::cout << "Started" << std::flush;
 			for(int i = 0; i < numFeatures; i++)
 			{
 				if(numFeatures > 10)
 				{
 					if((counter % feedback) == 0)
 					{
-						cout << ".." << feedbackCounter << ".." << flush;
+						std::cout << ".." << feedbackCounter << ".." << std::flush;
 						feedbackCounter = feedbackCounter + 10;
 					}
 				}
 				else
 				{
-					cout << ".." << counter << ".." << flush;
+					std::cout << ".." << counter << ".." << std::flush;
 				}			
 				
 				featureOutput = OGRFeature::CreateFeature(outputDefn);
@@ -260,9 +260,9 @@ namespace rsgis{namespace vec{
 				OGRFeature::DestroyFeature(featureOutput);
 				
 				counter++;
-				//cout << "Outputted " << counter << " of " << numFeatures << " features\n";
+				//std::cout << "Outputted " << counter << " of " << numFeatures << " features\n";
 			}
-			cout << " Complete.\n";
+			std::cout << " Complete.\n";
 		}
 		catch(RSGISException &e)
 		{
@@ -270,7 +270,7 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISVectorIO::exportPolygons2Shp(OGRLayer *outputSHP, vector<RSGISPolygonData*> *data) throw(RSGISVectorOutputException)
+	void RSGISVectorIO::exportPolygons2Shp(OGRLayer *outputSHP, std::vector<RSGISPolygonData*> *data) throw(RSGISVectorOutputException)
 	{
 		try
 		{
@@ -286,20 +286,20 @@ namespace rsgis{namespace vec{
 			
 			int feedback = data->size()/10;
 			int feedbackCounter = 0;
-			cout << "Started" << flush;
+			std::cout << "Started" << std::flush;
 			for(unsigned int i = 0; i < data->size(); ++i)
 			{
 				if(data->size() > 10)
 				{
 					if((i % feedback) == 0)
 					{
-						cout << ".." << feedbackCounter << ".." << flush;
+						std::cout << ".." << feedbackCounter << ".." << std::flush;
 						feedbackCounter = feedbackCounter + 10;
 					}
 				}
 				else
 				{
-					cout << ".." << i << ".." << flush;
+					std::cout << ".." << i << ".." << std::flush;
 				}			
 				
 				featureOutput = OGRFeature::CreateFeature(outputDefn);
@@ -311,9 +311,9 @@ namespace rsgis{namespace vec{
 					throw RSGISVectorOutputException("Failed to write feature to the output shapefile.");
 				}
 				OGRFeature::DestroyFeature(featureOutput);
-				//cout << "Outputted " << i << " of " << data->size() << " features\n";
+				//std::cout << "Outputted " << i << " of " << data->size() << " features\n";
 			}
-			cout << " Complete.\n";
+			std::cout << " Complete.\n";
 		}
 		catch(RSGISException &e)
 		{
@@ -321,7 +321,7 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISVectorIO::exportGEOSPolygons2SHP(string outputFile, Polygon **polys, int numFeatures) throw(RSGISVectorOutputException)
+	void RSGISVectorIO::exportGEOSPolygons2SHP(std::string outputFile, geos::geom::Polygon **polys, int numFeatures) throw(RSGISVectorOutputException)
 	{
 		try
 		{
@@ -345,14 +345,14 @@ namespace rsgis{namespace vec{
 			outputSHPDS = shpFiledriver->CreateDataSource(outputFile.c_str(), NULL);
 			if( outputSHPDS == NULL )
 			{
-				string message = string("Could not create vector file ") + outputFile;
+				std::string message = std::string("Could not create vector file ") + outputFile;
 				throw RSGISVectorOutputException(message.c_str());
 			}
-			string SHPFileOutLayer = vecUtils.getLayerName(outputFile);
+			std::string SHPFileOutLayer = vecUtils.getLayerName(outputFile);
 			outputSHPLayer = outputSHPDS->CreateLayer(SHPFileOutLayer.c_str(), NULL, wkbPolygon, NULL );
 			if( outputSHPLayer == NULL )
 			{
-				string message = string("Could not create vector layer ") + SHPFileOutLayer;
+				std::string message = std::string("Could not create vector layer ") + SHPFileOutLayer;
 				throw RSGISVectorOutputException(message.c_str());
 			}
 					
@@ -377,21 +377,21 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISVectorIO::exportGEOSPolygons2SHP(string outputFile, bool deleteIfPresent, vector<Polygon*> *polys) throw(RSGISVectorOutputException)
+	void RSGISVectorIO::exportGEOSPolygons2SHP(std::string outputFile, bool deleteIfPresent, std::vector<geos::geom::Polygon*> *polys) throw(RSGISVectorOutputException)
 	{
 		try
 		{
 			OGRRegisterAll();
 			RSGISVectorUtils vecUtils;
-			RSGISFileUtils fileUtils;
+			rsgis::utils::RSGISFileUtils fileUtils;
 			
 			/////////////////////////////////////
 			//
 			// Check whether file already present.
 			//
 			/////////////////////////////////////
-			string SHPFileOutLayer = vecUtils.getLayerName(outputFile);
-			string outputDIR = fileUtils.getFileDirectoryPath(outputFile);
+			std::string SHPFileOutLayer = vecUtils.getLayerName(outputFile);
+			std::string outputDIR = fileUtils.getFileDirectoryPath(outputFile);
 			
 			if(vecUtils.checkDIR4SHP(outputDIR, SHPFileOutLayer))
 			{
@@ -423,14 +423,14 @@ namespace rsgis{namespace vec{
 			outputSHPDS = shpFiledriver->CreateDataSource(outputFile.c_str(), NULL);
 			if( outputSHPDS == NULL )
 			{
-				string message = string("Could not create vector file ") + outputFile;
+				std::string message = std::string("Could not create vector file ") + outputFile;
 				throw RSGISVectorOutputException(message.c_str());
 			}
 
 			outputSHPLayer = outputSHPDS->CreateLayer(SHPFileOutLayer.c_str(), NULL, wkbPolygon, NULL );
 			if( outputSHPLayer == NULL )
 			{
-				string message = string("Could not create vector layer ") + SHPFileOutLayer;
+				std::string message = std::string("Could not create vector layer ") + SHPFileOutLayer;
 				throw RSGISVectorOutputException(message.c_str());
 			}
 			
@@ -438,7 +438,7 @@ namespace rsgis{namespace vec{
 			OGRFeature *featureOutput = NULL;
 			
 			// Write Polygons to file
-			vector<Polygon*>::iterator iterPolys;
+			std::vector<geos::geom::Polygon*>::iterator iterPolys;
 			for(iterPolys = polys->begin(); iterPolys != polys->end(); iterPolys++)
 			{
 				if((*iterPolys) != NULL)
@@ -461,7 +461,7 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISVectorIO::exportGEOSPolygons2SHP(string outputFile, bool deleteIfPresent, vector<Polygon*> *polys, vector<PlotPoly*> *polyDetails) throw(RSGISVectorOutputException)
+	void RSGISVectorIO::exportGEOSPolygons2SHP(std::string outputFile, bool deleteIfPresent, std::vector<geos::geom::Polygon*> *polys, std::vector<rsgis::utils::PlotPoly*> *polyDetails) throw(RSGISVectorOutputException)
 	{
 		try
 		{
@@ -472,15 +472,15 @@ namespace rsgis{namespace vec{
 			
 			OGRRegisterAll();
 			RSGISVectorUtils vecUtils;
-			RSGISFileUtils fileUtils;
+			rsgis::utils::RSGISFileUtils fileUtils;
 			
 			/////////////////////////////////////
 			//
 			// Check whether file already present.
 			//
 			/////////////////////////////////////
-			string SHPFileOutLayer = vecUtils.getLayerName(outputFile);
-			string outputDIR = fileUtils.getFileDirectoryPath(outputFile);
+			std::string SHPFileOutLayer = vecUtils.getLayerName(outputFile);
+			std::string outputDIR = fileUtils.getFileDirectoryPath(outputFile);
 			
 			if(vecUtils.checkDIR4SHP(outputDIR, SHPFileOutLayer))
 			{
@@ -511,14 +511,14 @@ namespace rsgis{namespace vec{
 			outputSHPDS = shpFiledriver->CreateDataSource(outputFile.c_str(), NULL);
 			if( outputSHPDS == NULL )
 			{
-				string message = string("Could not create vector file ") + outputFile;
+				std::string message = std::string("Could not create vector file ") + outputFile;
 				throw RSGISVectorOutputException(message.c_str());
 			}
 			
 			outputSHPLayer = outputSHPDS->CreateLayer(SHPFileOutLayer.c_str(), NULL, wkbPolygon, NULL );
 			if( outputSHPLayer == NULL )
 			{
-				string message = string("Could not create vector layer ") + SHPFileOutLayer;
+				std::string message = std::string("Could not create vector layer ") + SHPFileOutLayer;
 				throw RSGISVectorOutputException(message.c_str());
 			}
 			
@@ -621,11 +621,10 @@ namespace rsgis{namespace vec{
 			OGRFeatureDefn *outputDefn = outputSHPLayer->GetLayerDefn();
 			OGRFeature *featureOutput = NULL;
 			
-			Polygon *poly = NULL;
-			PlotPoly *polyAtts = NULL;
+			geos::geom::Polygon *poly = NULL;
+            rsgis::utils::PlotPoly *polyAtts = NULL;
 			
 			// Write Polygons to file
-			//for(iterPolys = polys->begin(); iterPolys != polys->end(); iterPolys++)
 			for(unsigned int i = 0; i < polys->size(); ++i)
 			{
 				poly = polys->at(i);
@@ -664,7 +663,7 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISVectorIO::exportGEOSPolygons2SHP(string outputFile, bool deleteIfPresent, vector<Polygon*> *polys, vector<ImageFootPrintPoly*> *polyDetails) throw(RSGISVectorOutputException)
+	void RSGISVectorIO::exportGEOSPolygons2SHP(std::string outputFile, bool deleteIfPresent, std::vector<geos::geom::Polygon*> *polys, std::vector<rsgis::utils::ImageFootPrintPoly*> *polyDetails) throw(RSGISVectorOutputException)
 	{
 		// Takes vector of GEOS polygons and vector of ImageFootPrintPolys (used for attributes)
 		try
@@ -676,15 +675,15 @@ namespace rsgis{namespace vec{
 			
 			OGRRegisterAll();
 			RSGISVectorUtils vecUtils;
-			RSGISFileUtils fileUtils;
+            rsgis::utils::RSGISFileUtils fileUtils;
 			
 			/////////////////////////////////////
 			//
 			// Check whether file already present.
 			//
 			/////////////////////////////////////
-			string SHPFileOutLayer = vecUtils.getLayerName(outputFile);
-			string outputDIR = fileUtils.getFileDirectoryPath(outputFile);
+			std::string SHPFileOutLayer = vecUtils.getLayerName(outputFile);
+			std::string outputDIR = fileUtils.getFileDirectoryPath(outputFile);
 			
 			if(vecUtils.checkDIR4SHP(outputDIR, SHPFileOutLayer))
 			{
@@ -715,14 +714,14 @@ namespace rsgis{namespace vec{
 			outputSHPDS = shpFiledriver->CreateDataSource(outputFile.c_str(), NULL);
 			if( outputSHPDS == NULL )
 			{
-				string message = string("Could not create vector file ") + outputFile;
+				std::string message = std::string("Could not create vector file ") + outputFile;
 				throw RSGISVectorOutputException(message.c_str());
 			}
 			
 			outputSHPLayer = outputSHPDS->CreateLayer(SHPFileOutLayer.c_str(), NULL, wkbPolygon, NULL );
 			if( outputSHPLayer == NULL )
 			{
-				string message = string("Could not create vector layer ") + SHPFileOutLayer;
+				std::string message = std::string("Could not create vector layer ") + SHPFileOutLayer;
 				throw RSGISVectorOutputException(message.c_str());
 			}
 			
@@ -741,11 +740,10 @@ namespace rsgis{namespace vec{
 			OGRFeatureDefn *outputDefn = outputSHPLayer->GetLayerDefn();
 			OGRFeature *featureOutput = NULL;
 			
-			Polygon *poly = NULL;
-			ImageFootPrintPoly *polyAtts = NULL;
+            geos::geom::Polygon *poly = NULL;
+            rsgis::utils::ImageFootPrintPoly *polyAtts = NULL;
 			
 			// Write Polygons to file
-			//for(iterPolys = polys->begin(); iterPolys != polys->end(); iterPolys++)
 			for(unsigned int i = 0; i < polys->size(); ++i)
 			{
 				poly = polys->at(i);
@@ -771,21 +769,21 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISVectorIO::exportGEOSPolygons2SHP(string outputFile, bool deleteIfPresent, vector<Polygon*> *polys, OGRSpatialReference* spatialRef) throw(RSGISVectorOutputException)
+	void RSGISVectorIO::exportGEOSPolygons2SHP(std::string outputFile, bool deleteIfPresent, std::vector<geos::geom::Polygon*> *polys, OGRSpatialReference* spatialRef) throw(RSGISVectorOutputException)
 	{
 		try
 		{
 			OGRRegisterAll();
 			RSGISVectorUtils vecUtils;
-			RSGISFileUtils fileUtils;
+			rsgis::utils::RSGISFileUtils fileUtils;
 			
 			/////////////////////////////////////
 			//
 			// Check whether file already present.
 			//
 			/////////////////////////////////////
-			string SHPFileOutLayer = vecUtils.getLayerName(outputFile);
-			string outputDIR = fileUtils.getFileDirectoryPath(outputFile);
+			std::string SHPFileOutLayer = vecUtils.getLayerName(outputFile);
+			std::string outputDIR = fileUtils.getFileDirectoryPath(outputFile);
 			
 			if(vecUtils.checkDIR4SHP(outputDIR, SHPFileOutLayer))
 			{
@@ -798,7 +796,6 @@ namespace rsgis{namespace vec{
 					throw RSGISException("Shapefile already exists, either delete or select force.");
 				}
 			}
-			
 			
 			OGRSFDriver *shpFiledriver = NULL;
 			OGRDataSource *outputSHPDS = NULL;
@@ -817,14 +814,14 @@ namespace rsgis{namespace vec{
 			outputSHPDS = shpFiledriver->CreateDataSource(outputFile.c_str(), NULL);
 			if( outputSHPDS == NULL )
 			{
-				string message = string("Could not create vector file ") + outputFile;
+				std::string message = std::string("Could not create vector file ") + outputFile;
 				throw RSGISVectorOutputException(message.c_str());
 			}
 			
 			outputSHPLayer = outputSHPDS->CreateLayer(SHPFileOutLayer.c_str(), spatialRef, wkbPolygon, NULL );
 			if( outputSHPLayer == NULL )
 			{
-				string message = string("Could not create vector layer ") + SHPFileOutLayer;
+				std::string message = std::string("Could not create vector layer ") + SHPFileOutLayer;
 				throw RSGISVectorOutputException(message.c_str());
 			}
 			
@@ -834,7 +831,7 @@ namespace rsgis{namespace vec{
 			// Write Polygons to file
 			if(polys->size() > 0)
 			{
-				vector<Polygon*>::iterator iterPolys;
+				std::vector<geos::geom::Polygon*>::iterator iterPolys;
 				for(iterPolys = polys->begin(); iterPolys != polys->end(); iterPolys++)
 				{
                     if((*iterPolys) != NULL)
@@ -859,21 +856,21 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISVectorIO::exportGEOSPolygons2SHP(string outputFile, bool deleteIfPresent, vector<Polygon*> *polys, OGRSpatialReference* spatialRef, string attribute, string attributeVal) throw(RSGISVectorOutputException)
+	void RSGISVectorIO::exportGEOSPolygons2SHP(std::string outputFile, bool deleteIfPresent, std::vector<geos::geom::Polygon*> *polys, OGRSpatialReference* spatialRef, std::string attribute, std::string attributeVal) throw(RSGISVectorOutputException)
 	{
 		try
 		{
 			OGRRegisterAll();
 			RSGISVectorUtils vecUtils;
-			RSGISFileUtils fileUtils;
+			rsgis::utils::RSGISFileUtils fileUtils;
 			
 			/////////////////////////////////////
 			//
 			// Check whether file already present.
 			//
 			/////////////////////////////////////
-			string SHPFileOutLayer = vecUtils.getLayerName(outputFile);
-			string outputDIR = fileUtils.getFileDirectoryPath(outputFile);
+			std::string SHPFileOutLayer = vecUtils.getLayerName(outputFile);
+			std::string outputDIR = fileUtils.getFileDirectoryPath(outputFile);
 			
 			if(vecUtils.checkDIR4SHP(outputDIR, SHPFileOutLayer))
 			{
@@ -905,14 +902,14 @@ namespace rsgis{namespace vec{
 			outputSHPDS = shpFiledriver->CreateDataSource(outputFile.c_str(), NULL);
 			if( outputSHPDS == NULL )
 			{
-				string message = string("Could not create vector file ") + outputFile;
+				std::string message = std::string("Could not create vector file ") + outputFile;
 				throw RSGISVectorOutputException(message.c_str());
 			}
 			
 			outputSHPLayer = outputSHPDS->CreateLayer(SHPFileOutLayer.c_str(), spatialRef, wkbPolygon, NULL );
 			if( outputSHPLayer == NULL )
 			{
-				string message = string("Could not create vector layer ") + SHPFileOutLayer;
+				std::string message = std::string("Could not create vector layer ") + SHPFileOutLayer;
 				throw RSGISVectorOutputException(message.c_str());
 			}
 			
@@ -920,7 +917,7 @@ namespace rsgis{namespace vec{
 			shpField.SetPrecision(4);
 			if(outputSHPLayer->CreateField( &shpField ) != OGRERR_NONE )
 			{
-				string message = string("Creating shapefile field " ) + attribute + string(" has failed");
+				std::string message = std::string("Creating shapefile field " ) + attribute + std::string(" has failed");
 				throw RSGISVectorOutputException(message);
 			}
 			
@@ -930,7 +927,7 @@ namespace rsgis{namespace vec{
 			// Write Polygons to file
 			if(polys->size() > 0)
 			{
-				vector<Polygon*>::iterator iterPolys;
+				std::vector<geos::geom::Polygon*>::iterator iterPolys;
 				for(iterPolys = polys->begin(); iterPolys != polys->end(); iterPolys++)
 				{
                     if((*iterPolys) != NULL)
@@ -956,21 +953,21 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISVectorIO::exportGEOSPolygons2SHP(string outputFile, bool deleteIfPresent, list<Polygon*> *polys, OGRSpatialReference* spatialRef) throw(RSGISVectorOutputException)
+	void RSGISVectorIO::exportGEOSPolygons2SHP(std::string outputFile, bool deleteIfPresent, std::list<geos::geom::Polygon*> *polys, OGRSpatialReference* spatialRef) throw(RSGISVectorOutputException)
 	{
 		try
 		{
 			OGRRegisterAll();
 			RSGISVectorUtils vecUtils;
-			RSGISFileUtils fileUtils;
+			rsgis::utils::RSGISFileUtils fileUtils;
 			
 			/////////////////////////////////////
 			//
 			// Check whether file already present.
 			//
 			/////////////////////////////////////
-			string SHPFileOutLayer = vecUtils.getLayerName(outputFile);
-			string outputDIR = fileUtils.getFileDirectoryPath(outputFile);
+			std::string SHPFileOutLayer = vecUtils.getLayerName(outputFile);
+			std::string outputDIR = fileUtils.getFileDirectoryPath(outputFile);
 			
 			if(vecUtils.checkDIR4SHP(outputDIR, SHPFileOutLayer))
 			{
@@ -983,7 +980,6 @@ namespace rsgis{namespace vec{
 					throw RSGISException("Shapefile already exists, either delete or select force.");
 				}
 			}
-			
 			
 			OGRSFDriver *shpFiledriver = NULL;
 			OGRDataSource *outputSHPDS = NULL;
@@ -1002,14 +998,14 @@ namespace rsgis{namespace vec{
 			outputSHPDS = shpFiledriver->CreateDataSource(outputFile.c_str(), NULL);
 			if( outputSHPDS == NULL )
 			{
-				string message = string("Could not create vector file ") + outputFile;
+				std::string message = std::string("Could not create vector file ") + outputFile;
 				throw RSGISVectorOutputException(message.c_str());
 			}
 			
 			outputSHPLayer = outputSHPDS->CreateLayer(SHPFileOutLayer.c_str(), spatialRef, wkbPolygon, NULL );
 			if( outputSHPLayer == NULL )
 			{
-				string message = string("Could not create vector layer ") + SHPFileOutLayer;
+				std::string message = std::string("Could not create vector layer ") + SHPFileOutLayer;
 				throw RSGISVectorOutputException(message.c_str());
 			}
 			
@@ -1017,7 +1013,7 @@ namespace rsgis{namespace vec{
 			OGRFeature *featureOutput = NULL;
 			
 			// Write Polygons to file
-			list<Polygon*>::iterator iterPolys;
+			std::list<geos::geom::Polygon*>::iterator iterPolys;
 			for(iterPolys = polys->begin(); iterPolys != polys->end(); iterPolys++)
 			{
                 if((*iterPolys) != NULL)
@@ -1040,21 +1036,21 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISVectorIO::exportGEOSCoordinates2SHP(string outputFile, bool deleteIfPresent, vector<Coordinate*> *coords) throw(RSGISVectorOutputException)
+	void RSGISVectorIO::exportGEOSCoordinates2SHP(std::string outputFile, bool deleteIfPresent, std::vector<geos::geom::Coordinate*> *coords) throw(RSGISVectorOutputException)
 	{
 		try
 		{
 			OGRRegisterAll();
 			RSGISVectorUtils vecUtils;
-			RSGISFileUtils fileUtils;
+			rsgis::utils::RSGISFileUtils fileUtils;
 			
 			/////////////////////////////////////
 			//
 			// Check whether file already present.
 			//
 			/////////////////////////////////////
-			string SHPFileOutLayer = vecUtils.getLayerName(outputFile);
-			string outputDIR = fileUtils.getFileDirectoryPath(outputFile);
+			std::string SHPFileOutLayer = vecUtils.getLayerName(outputFile);
+			std::string outputDIR = fileUtils.getFileDirectoryPath(outputFile);
 			
 			if(vecUtils.checkDIR4SHP(outputDIR, SHPFileOutLayer))
 			{
@@ -1067,7 +1063,6 @@ namespace rsgis{namespace vec{
 					throw RSGISException("Shapefile already exists, either delete or select force.");
 				}
 			}
-			
 			
 			OGRSFDriver *shpFiledriver = NULL;
 			OGRDataSource *outputSHPDS = NULL;
@@ -1086,14 +1081,14 @@ namespace rsgis{namespace vec{
 			outputSHPDS = shpFiledriver->CreateDataSource(outputFile.c_str(), NULL);
 			if( outputSHPDS == NULL )
 			{
-				string message = string("Could not create vector file ") + outputFile;
+				std::string message = std::string("Could not create vector file ") + outputFile;
 				throw RSGISVectorOutputException(message.c_str());
 			}
 			
 			outputSHPLayer = outputSHPDS->CreateLayer(SHPFileOutLayer.c_str(), NULL, wkbPoint, NULL );
 			if( outputSHPLayer == NULL )
 			{
-				string message = string("Could not create vector layer ") + SHPFileOutLayer;
+				std::string message = std::string("Could not create vector layer ") + SHPFileOutLayer;
 				throw RSGISVectorOutputException(message.c_str());
 			}
 			
@@ -1101,7 +1096,7 @@ namespace rsgis{namespace vec{
 			OGRFeature *featureOutput = NULL;
 			
 			// Write Polygons to file
-			vector<Coordinate*>::iterator iterCoords;
+			std::vector<geos::geom::Coordinate*>::iterator iterCoords;
 			for(iterCoords = coords->begin(); iterCoords != coords->end(); iterCoords++)
 			{
 				featureOutput = OGRFeature::CreateFeature(outputDefn);
@@ -1121,21 +1116,21 @@ namespace rsgis{namespace vec{
 		}	
 	}
 	
-	void RSGISVectorIO::exportGEOSLineStrings2SHP(string outputFile, bool deleteIfPresent, vector<LineString*> *lines) throw(RSGISVectorOutputException)
+	void RSGISVectorIO::exportGEOSLineStrings2SHP(std::string outputFile, bool deleteIfPresent, std::vector<geos::geom::LineString*> *lines) throw(RSGISVectorOutputException)
 	{
 		try
 		{
 			OGRRegisterAll();
 			RSGISVectorUtils vecUtils;
-			RSGISFileUtils fileUtils;
+			rsgis::utils::RSGISFileUtils fileUtils;
 			
 			/////////////////////////////////////
 			//
 			// Check whether file already present.
 			//
 			/////////////////////////////////////
-			string SHPFileOutLayer = vecUtils.getLayerName(outputFile);
-			string outputDIR = fileUtils.getFileDirectoryPath(outputFile);
+			std::string SHPFileOutLayer = vecUtils.getLayerName(outputFile);
+			std::string outputDIR = fileUtils.getFileDirectoryPath(outputFile);
 			
 			if(vecUtils.checkDIR4SHP(outputDIR, SHPFileOutLayer))
 			{
@@ -1148,7 +1143,6 @@ namespace rsgis{namespace vec{
 					throw RSGISException("Shapefile already exists, either delete or select force.");
 				}
 			}
-			
 			
 			OGRSFDriver *shpFiledriver = NULL;
 			OGRDataSource *outputSHPDS = NULL;
@@ -1167,14 +1161,14 @@ namespace rsgis{namespace vec{
 			outputSHPDS = shpFiledriver->CreateDataSource(outputFile.c_str(), NULL);
 			if( outputSHPDS == NULL )
 			{
-				string message = string("Could not create vector file ") + outputFile;
+				std::string message = std::string("Could not create vector file ") + outputFile;
 				throw RSGISVectorOutputException(message.c_str());
 			}
 			
 			outputSHPLayer = outputSHPDS->CreateLayer(SHPFileOutLayer.c_str(), NULL, wkbLineString, NULL );
 			if( outputSHPLayer == NULL )
 			{
-				string message = string("Could not create vector layer ") + SHPFileOutLayer;
+				std::string message = std::string("Could not create vector layer ") + SHPFileOutLayer;
 				throw RSGISVectorOutputException(message.c_str());
 			}
 			
@@ -1182,7 +1176,7 @@ namespace rsgis{namespace vec{
 			OGRFeature *featureOutput = NULL;
 			
 			// Write Polygons to file
-			vector<LineString*>::iterator iterlines;
+			std::vector<geos::geom::LineString*>::iterator iterlines;
 			for(iterlines = lines->begin(); iterlines != lines->end(); iterlines++)
 			{
 				featureOutput = OGRFeature::CreateFeature(outputDefn);
@@ -1202,19 +1196,19 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISVectorIO::exportRSGISPolygonsClusters2SHP(list<RSGIS2DPoint*> **clusters, int numClusters, string outputFile, bool force, RSGISIdentifyNonConvexPolygons *createPolygon)
+	void RSGISVectorIO::exportRSGISPolygonsClusters2SHP(std::list<rsgis::geom::RSGIS2DPoint*> **clusters, int numClusters, std::string outputFile, bool force, rsgis::geom::RSGISIdentifyNonConvexPolygons *createPolygon)
 	{
-		RSGISGeometry geomUtils;
-		RSGISPolygon *poly = NULL;
-		list<RSGIS2DPoint*>::iterator iterPts;
-		vector<Polygon*> *clusterPolygons = NULL;
-		vector<Polygon*> *polys = new vector<Polygon*>();
+        rsgis::geom::RSGISGeometry geomUtils;
+		rsgis::geom::RSGISPolygon *poly = NULL;
+		std::list<rsgis::geom::RSGIS2DPoint*>::iterator iterPts;
+		std::vector<geos::geom::Polygon*> *clusterPolygons = NULL;
+		std::vector<geos::geom::Polygon*> *polys = new std::vector<geos::geom::Polygon*>();
 		for(int n = 0; n < numClusters; n++)
 		{
-			clusterPolygons = new vector<Polygon*>();
+			clusterPolygons = new std::vector<geos::geom::Polygon*>();
 			for(iterPts = clusters[n]->begin(); iterPts != clusters[n]->end(); iterPts++)
 			{
-				poly = (RSGISPolygon*) (*iterPts);
+				poly = (rsgis::geom::RSGISPolygon*) (*iterPts);
 				clusterPolygons->push_back(poly->getPolygon());
 			}
 			polys->push_back(createPolygon->retrievePolygon(clusterPolygons));
@@ -1227,7 +1221,7 @@ namespace rsgis{namespace vec{
 		delete polys;
 	}
 	
-	void RSGISVectorIO::exportLinesAsShp(string outputFile, list<double> *x1, list<double> *y1, list<double> *x2, list<double> *y2, bool force) throw(RSGISVectorOutputException)
+	void RSGISVectorIO::exportLinesAsShp(std::string outputFile, std::list<double> *x1, std::list<double> *y1, std::list<double> *x2, std::list<double> *y2, bool force) throw(RSGISVectorOutputException)
 	{
 		int x1Size = x1->size();
 		int y1Size = y1->size();
@@ -1241,15 +1235,15 @@ namespace rsgis{namespace vec{
 				
 		OGRRegisterAll();
 		RSGISVectorUtils vecUtils;
-		RSGISFileUtils fileUtils;
+		rsgis::utils::RSGISFileUtils fileUtils;
 		
 		/////////////////////////////////////
 		//
 		// Check whether file already present.
 		//
 		/////////////////////////////////////
-		string SHPFileOutLayer = vecUtils.getLayerName(outputFile);
-		string outputDIR = fileUtils.getFileDirectoryPath(outputFile);
+		std::string SHPFileOutLayer = vecUtils.getLayerName(outputFile);
+		std::string outputDIR = fileUtils.getFileDirectoryPath(outputFile);
 		
 		if(vecUtils.checkDIR4SHP(outputDIR, SHPFileOutLayer))
 		{
@@ -1262,7 +1256,6 @@ namespace rsgis{namespace vec{
 				throw RSGISException("Shapefile already exists, either delete or select force.");
 			}
 		}
-		
 		
 		OGRSFDriver *shpFiledriver = NULL;
 		OGRDataSource *outputSHPDS = NULL;
@@ -1281,26 +1274,24 @@ namespace rsgis{namespace vec{
 		outputSHPDS = shpFiledriver->CreateDataSource(outputFile.c_str(), NULL);
 		if( outputSHPDS == NULL )
 		{
-			string message = string("Could not create vector file ") + outputFile;
+			std::string message = std::string("Could not create vector file ") + outputFile;
 			throw RSGISVectorOutputException(message.c_str());
 		}
 		
 		outputSHPLayer = outputSHPDS->CreateLayer(SHPFileOutLayer.c_str(), NULL, wkbLineString, NULL );
 		if( outputSHPLayer == NULL )
 		{
-			string message = string("Could not create vector layer ") + SHPFileOutLayer;
+			std::string message = std::string("Could not create vector layer ") + SHPFileOutLayer;
 			throw RSGISVectorOutputException(message.c_str());
 		}
 		
 		OGRFeatureDefn *outputDefn = outputSHPLayer->GetLayerDefn();
 		OGRFeature *featureOutput = NULL;
 		
-		
-		list<double>::iterator iterX1;
-		list<double>::iterator iterY1;
-		list<double>::iterator iterX2;
-		list<double>::iterator iterY2;
-		
+		std::list<double>::iterator iterX1;
+		std::list<double>::iterator iterY1;
+		std::list<double>::iterator iterX2;
+		std::list<double>::iterator iterY2;
 		
 		iterX1 = x1->begin();
 		iterY1 = y1->begin();
@@ -1330,21 +1321,21 @@ namespace rsgis{namespace vec{
 		OGRDataSource::DestroyDataSource(outputSHPDS);
 	}
 	
-	void RSGISVectorIO::exportGEOSPolygonClusters2SHP(string outputFile, bool deleteIfPresent, list<Polygon*> **polygons, int numClusters, OGRSpatialReference* spatialRef) throw(RSGISVectorOutputException)
+	void RSGISVectorIO::exportGEOSPolygonClusters2SHP(std::string outputFile, bool deleteIfPresent, std::list<geos::geom::Polygon*> **polygons, int numClusters, OGRSpatialReference* spatialRef) throw(RSGISVectorOutputException)
 	{
 		try
 		{
 			OGRRegisterAll();
 			RSGISVectorUtils vecUtils;
-			RSGISFileUtils fileUtils;
+			rsgis::utils::RSGISFileUtils fileUtils;
 			
 			/////////////////////////////////////
 			//
 			// Check whether file already present.
 			//
 			/////////////////////////////////////
-			string SHPFileOutLayer = vecUtils.getLayerName(outputFile);
-			string outputDIR = fileUtils.getFileDirectoryPath(outputFile);
+			std::string SHPFileOutLayer = vecUtils.getLayerName(outputFile);
+			std::string outputDIR = fileUtils.getFileDirectoryPath(outputFile);
 			
 			if(vecUtils.checkDIR4SHP(outputDIR, SHPFileOutLayer))
 			{
@@ -1376,14 +1367,14 @@ namespace rsgis{namespace vec{
 			outputSHPDS = shpFiledriver->CreateDataSource(outputFile.c_str(), NULL);
 			if( outputSHPDS == NULL )
 			{
-				string message = string("Could not create vector file ") + outputFile;
+				std::string message = std::string("Could not create vector file ") + outputFile;
 				throw RSGISVectorOutputException(message.c_str());
 			}
 			
 			outputSHPLayer = outputSHPDS->CreateLayer(SHPFileOutLayer.c_str(), spatialRef, wkbPolygon, NULL );
 			if( outputSHPLayer == NULL )
 			{
-				string message = string("Could not create vector layer ") + SHPFileOutLayer;
+				std::string message = std::string("Could not create vector layer ") + SHPFileOutLayer;
 				throw RSGISVectorOutputException(message.c_str());
 			}
 			
@@ -1394,12 +1385,11 @@ namespace rsgis{namespace vec{
 				throw RSGISVectorOutputException("Creating shapefile field cluster has failed");
 			}
 			
-			
 			OGRFeatureDefn *outputDefn = outputSHPLayer->GetLayerDefn();
 			OGRFeature *featureOutput = NULL;
 			
 			// Write Polygons to file
-			list<Polygon*>::iterator iterPolys;
+			std::list<geos::geom::Polygon*>::iterator iterPolys;
 			for(int i = 0; i < numClusters; ++i)
 			{
 				for(iterPolys = polygons[i]->begin(); iterPolys != polygons[i]->end(); ++iterPolys)
@@ -1423,21 +1413,21 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISVectorIO::exportGEOSMultiPolygonClusters2SHP(string outputFile, bool deleteIfPresent, list<Polygon*> **polygons, int numClusters, OGRSpatialReference* spatialRef) throw(RSGISVectorOutputException)
+	void RSGISVectorIO::exportGEOSMultiPolygonClusters2SHP(std::string outputFile, bool deleteIfPresent, std::list<geos::geom::Polygon*> **polygons, int numClusters, OGRSpatialReference* spatialRef) throw(RSGISVectorOutputException)
 	{
 		try
 		{
 			OGRRegisterAll();
 			RSGISVectorUtils vecUtils;
-			RSGISFileUtils fileUtils;
+			rsgis::utils::RSGISFileUtils fileUtils;
 			
 			/////////////////////////////////////
 			//
 			// Check whether file already present.
 			//
 			/////////////////////////////////////
-			string SHPFileOutLayer = vecUtils.getLayerName(outputFile);
-			string outputDIR = fileUtils.getFileDirectoryPath(outputFile);
+			std::string SHPFileOutLayer = vecUtils.getLayerName(outputFile);
+			std::string outputDIR = fileUtils.getFileDirectoryPath(outputFile);
 			
 			if(vecUtils.checkDIR4SHP(outputDIR, SHPFileOutLayer))
 			{
@@ -1469,14 +1459,14 @@ namespace rsgis{namespace vec{
 			outputSHPDS = shpFiledriver->CreateDataSource(outputFile.c_str(), NULL);
 			if( outputSHPDS == NULL )
 			{
-				string message = string("Could not create vector file ") + outputFile;
+				std::string message = std::string("Could not create vector file ") + outputFile;
 				throw RSGISVectorOutputException(message.c_str());
 			}
 			
 			outputSHPLayer = outputSHPDS->CreateLayer(SHPFileOutLayer.c_str(), spatialRef, wkbMultiPolygon, NULL );
 			if( outputSHPLayer == NULL )
 			{
-				string message = string("Could not create vector layer ") + SHPFileOutLayer;
+				std::string message = std::string("Could not create vector layer ") + SHPFileOutLayer;
 				throw RSGISVectorOutputException(message.c_str());
 			}
 			
@@ -1491,7 +1481,7 @@ namespace rsgis{namespace vec{
 			OGRFeature *featureOutput = NULL;
 			
 			// Write Polygons to file
-			list<Polygon*>::iterator iterPolys;
+			std::list<geos::geom::Polygon*>::iterator iterPolys;
 			for(int i = 0; i < numClusters; ++i)
 			{
 				featureOutput = OGRFeature::CreateFeature(outputDefn);
@@ -1512,32 +1502,28 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISVectorIO::exportGEOSPolygons2SHP(string outputFile, bool deleteIfPresent, vector<Polygon*> *polys, OGRSpatialReference* spatialRef, vector<string> *numericColsName, vector<string> *textColsName, vector<float> **numericColsData, vector<string> **textColsData) throw(RSGISVectorOutputException)
+	void RSGISVectorIO::exportGEOSPolygons2SHP(std::string outputFile, bool deleteIfPresent, std::vector<geos::geom::Polygon*> *polys, OGRSpatialReference* spatialRef, std::vector<std::string> *numericColsName, std::vector<std::string> *textColsName, std::vector<float> **numericColsData, std::vector<std::string> **textColsData) throw(RSGISVectorOutputException)
 	{
 		try
 		{
 			OGRRegisterAll();
 			RSGISVectorUtils vecUtils;
-			RSGISFileUtils fileUtils;
-			
-			//cout << "Number of Polygons = " << polys->size() << endl;
-			
+			rsgis::utils::RSGISFileUtils fileUtils;
+						
 			for(unsigned int i = 0; i < numericColsName->size(); ++i)
 			{
-				//cout << numericColsName->at(i) << " has size " << numericColsData[i]->size() << endl;
 				if(numericColsData[i]->size() != polys->size())
 				{
-					string message = string("Numeric attribute ") + numericColsName->at(i) + string(" values have not been provided for all polygons.");
+					std::string message = std::string("Numeric attribute ") + numericColsName->at(i) + std::string(" values have not been provided for all polygons.");
 					throw RSGISException(message);
 				}
 			}
 			
 			for(unsigned int i = 0; i < textColsName->size(); ++i)
 			{
-				//cout << textColsName->at(i) << " has size " << textColsData[i]->size() << endl;
 				if(textColsData[i]->size() != polys->size())
 				{
-					string message = string("Text attribute ") + textColsName->at(i) + string(" values have not been provided for all polygons.");
+					std::string message = std::string("Text attribute ") + textColsName->at(i) + std::string(" values have not been provided for all polygons.");
 					throw RSGISException(message);
 				}
 			}
@@ -1547,8 +1533,8 @@ namespace rsgis{namespace vec{
 			// Check whether file already present.
 			//
 			/////////////////////////////////////
-			string SHPFileOutLayer = vecUtils.getLayerName(outputFile);
-			string outputDIR = fileUtils.getFileDirectoryPath(outputFile);
+			std::string SHPFileOutLayer = vecUtils.getLayerName(outputFile);
+			std::string outputDIR = fileUtils.getFileDirectoryPath(outputFile);
 			
 			if(vecUtils.checkDIR4SHP(outputDIR, SHPFileOutLayer))
 			{
@@ -1580,25 +1566,25 @@ namespace rsgis{namespace vec{
 			outputSHPDS = shpFiledriver->CreateDataSource(outputFile.c_str(), NULL);
 			if( outputSHPDS == NULL )
 			{
-				string message = string("Could not create vector file ") + outputFile;
+				std::string message = std::string("Could not create vector file ") + outputFile;
 				throw RSGISVectorOutputException(message.c_str());
 			}
 			
 			outputSHPLayer = outputSHPDS->CreateLayer(SHPFileOutLayer.c_str(), spatialRef, wkbPolygon, NULL );
 			if( outputSHPLayer == NULL )
 			{
-				string message = string("Could not create vector layer ") + SHPFileOutLayer;
+				std::string message = std::string("Could not create vector layer ") + SHPFileOutLayer;
 				throw RSGISVectorOutputException(message.c_str());
 			}
 			
-			vector<string>::iterator iterColNames;
+			std::vector<std::string>::iterator iterColNames;
 			for(iterColNames = numericColsName->begin(); iterColNames != numericColsName->end(); ++iterColNames)
 			{
 				OGRFieldDefn shpField((*iterColNames).c_str(), OFTReal);
 				shpField.SetPrecision(4);
 				if(outputSHPLayer->CreateField( &shpField ) != OGRERR_NONE )
 				{
-					string message = string("Creating shapefile field " ) + *iterColNames + string(" has failed");
+					std::string message = std::string("Creating shapefile field " ) + *iterColNames + std::string(" has failed");
 					throw RSGISVectorOutputException(message);
 				}
 			}
@@ -1608,7 +1594,7 @@ namespace rsgis{namespace vec{
 				shpField.SetWidth(50);
 				if(outputSHPLayer->CreateField( &shpField ) != OGRERR_NONE )
 				{
-					string message = string("Creating shapefile field " ) + *iterColNames + string(" has failed");
+					std::string message = std::string("Creating shapefile field " ) + *iterColNames + std::string(" has failed");
 					throw RSGISVectorOutputException(message);
 				}
 			}
@@ -1617,7 +1603,7 @@ namespace rsgis{namespace vec{
 			OGRFeature *featureOutput = NULL;
 			
 			// Write Polygons to file
-			vector<Polygon*>::iterator iterPolys;
+			std::vector<geos::geom::Polygon*>::iterator iterPolys;
 			OGRPolygon *poly;
 			for(unsigned int i = 0; i < polys->size(); ++i)
 			{
@@ -1648,7 +1634,7 @@ namespace rsgis{namespace vec{
 	}
 
 	
-	void RSGISVectorIO::exportPolygons2Layer(OGRLayer *outLayer, list<OGRPolygon*> *polys) throw(RSGISVectorOutputException)
+	void RSGISVectorIO::exportPolygons2Layer(OGRLayer *outLayer, std::list<OGRPolygon*> *polys) throw(RSGISVectorOutputException)
 	{
 		try
 		{			
@@ -1656,7 +1642,7 @@ namespace rsgis{namespace vec{
 			OGRFeature *featureOutput = NULL;
 			
 			// Write Polygons to file
-			list<OGRPolygon*>::iterator iterPolys;
+			std::list<OGRPolygon*>::iterator iterPolys;
 			for(iterPolys = polys->begin(); iterPolys != polys->end(); iterPolys++)
 			{
 				featureOutput = OGRFeature::CreateFeature(outputDefn);

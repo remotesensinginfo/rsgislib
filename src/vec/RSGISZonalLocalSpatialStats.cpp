@@ -25,7 +25,7 @@
 
 namespace rsgis{namespace vec{
 
-	RSGISZonalLSSMeanVar::RSGISZonalLSSMeanVar(GDALDataset *image, MeanAttributes** attributes, int numAttributes, bool outPxlCount, int winSize, double offsetSize, pixelInPolyOption method)
+	RSGISZonalLSSMeanVar::RSGISZonalLSSMeanVar(GDALDataset *image, MeanAttributes** attributes, int numAttributes, bool outPxlCount, int winSize, double offsetSize, rsgis::img::pixelInPolyOption method)
 	{
 		this->datasets = new GDALDataset*[1];
 		this->datasets[0] = image;
@@ -51,11 +51,11 @@ namespace rsgis{namespace vec{
 		calcValueSurrounding = new RSGISCalcZonalMeanFromPolygon(dataSize, attributes, numAttributes);
 		//calcValueCentre = new RSGISCalcZonalWeightedMeanStatsPoly(dataSize, attributes, numAttributes); // Use weighted mean
 		//calcValueSurrounding = new RSGISCalcZonalWeightedMeanStatsPoly(dataSize, attributes, numAttributes); - Use weighed mean
-		calcImageCentre = new RSGISCalcImageSingle(calcValueCentre);
-		calcImageSurrounding = new RSGISCalcImageSingle(calcValueSurrounding);
+		calcImageCentre = new rsgis::img::RSGISCalcImageSingle(calcValueCentre);
+		calcImageSurrounding = new rsgis::img::RSGISCalcImageSingle(calcValueSurrounding);
 	}
 	
-	void RSGISZonalLSSMeanVar::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISZonalLSSMeanVar::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
 	{
 		try
 		{
@@ -65,7 +65,7 @@ namespace rsgis{namespace vec{
 			calcValueSurrounding->reset(); // Reset counter for surrounding areas.
 			
 			OGRPolygon *inOGRPoly;
-			Polygon *poly;
+            geos::geom::Polygon *poly;
 			inOGRPoly = (OGRPolygon *) inFeature->GetGeometryRef();
 			poly = vecUtils.convertOGRPolygon2GEOSPolygon(inOGRPoly);
 			
@@ -90,8 +90,8 @@ namespace rsgis{namespace vec{
 					else 
 					{
 						OGRPolygon *offsetOGRPoly;
-						Polygon *offsetPoly;
-						Envelope *offsetEnv;
+						geos::geom::Polygon *offsetPoly;
+						geos::geom::Envelope *offsetEnv;
 						offsetOGRPoly = vecUtils.moveOGRPolygon(inOGRPoly, x * offsetSize, y * offsetSize, 0);
 						offsetPoly = vecUtils.convertOGRPolygon2GEOSPolygon(offsetOGRPoly);
 						offsetEnv = vecUtils.getEnvelope(offsetOGRPoly);
@@ -202,7 +202,7 @@ namespace rsgis{namespace vec{
 	}
 	
 	
-	RSGISCalcZonalLSSMeanVar::RSGISCalcZonalLSSMeanVar(int numOutputValues, MeanAttributes **attributes, int numAttributes) : RSGISCalcImageSingleValue(numOutputValues)
+	RSGISCalcZonalLSSMeanVar::RSGISCalcZonalLSSMeanVar(int numOutputValues, MeanAttributes **attributes, int numAttributes) : rsgis::img::RSGISCalcImageSingleValue(numOutputValues)
 	{
 		this->attributes = attributes; 
 		this->numAttributes = numAttributes;
@@ -213,7 +213,7 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISCalcZonalLSSMeanVar::calcImageValue(float *bandValuesImage, double interceptArea, int numBands, Polygon *poly, Point *pt) throw(RSGISImageCalcException)
+	void RSGISCalcZonalLSSMeanVar::calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt) throw(rsgis::img::RSGISImageCalcException)
 	{
 		float min = 0;
 		bool first = true;
@@ -227,7 +227,7 @@ namespace rsgis{namespace vec{
 			{
 				if((attributes[i]->bands[j] > numBands) | (attributes[i]->bands[j] < 0))
 				{
-					throw RSGISImageCalcException("The band attributes do not match the image.");
+					throw rsgis::img::RSGISImageCalcException("The band attributes do not match the image.");
 				}
 				// Calculates the minimum of the two input image bands
 				if(!isnan(attributes[i]->bands[j]))
@@ -262,7 +262,7 @@ namespace rsgis{namespace vec{
 		totalPxl++;
 	}
 	
-	double* RSGISCalcZonalLSSMeanVar::getOutputValues() throw(RSGISImageCalcException)
+	double* RSGISCalcZonalLSSMeanVar::getOutputValues() throw(rsgis::img::RSGISImageCalcException)
 	{
 		//double *outputData = new double[this->numOutputValues];
 		outputValues[0] = this->totalPxl;

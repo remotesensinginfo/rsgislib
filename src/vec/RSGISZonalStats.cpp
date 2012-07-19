@@ -39,7 +39,7 @@ namespace rsgis{namespace vec{
 		OGRFeatureDefn *featDefn = vector->GetLayerDefn();
 		int fieldCount = featDefn->GetFieldCount();
 		int numFeatures = vector->GetFeatureCount();
-		cout << "Number of features = " << numFeatures << endl;
+		std::cout << "Number of features = " << numFeatures << std::endl;
 		
 		imagestats **featureStats = new imagestats*[numFeatures];
 		for(int i = 0; i < numFeatures; i++)
@@ -60,24 +60,24 @@ namespace rsgis{namespace vec{
 		{
 			/*if(numFeatures < 20)
 			 {
-			 cout << "Calculation of stats for " << counter << " of " << numFeatures << " have been completed\n";
+			 std::cout << "Calculation of stats for " << counter << " of " << numFeatures << " have been completed\n";
 			 }
 			 else if(counter % feedback == 0)
 			 {*/
-			cout << "Calculation of stats for " << counter << " of " << numFeatures << " have been completed\n";
+			std::cout << "Calculation of stats for " << counter << " of " << numFeatures << " have been completed\n";
 			//}
 			polyGeometry = polyFeature->GetGeometryRef();
 			if( polyGeometry != NULL && wkbFlatten(polyGeometry->getGeometryType()) == wkbPolygon )
 			{
-				cout << "Found polygon - Now casting\n";
+				std::cout << "Found polygon - Now casting\n";
 				polygon = (OGRPolygon *) polyGeometry;
-				cout << "Casted Polygon\n";
-				cout << "Polygon: " << polygon << endl;
+				std::cout << "Casted Polygon\n";
+				std::cout << "Polygon: " << polygon << std::endl;
 				this->calcImageStats(image, polygon, featureStats[counter]);
 			} 
 			else if( polyGeometry != NULL && wkbFlatten(polyGeometry->getGeometryType()) == wkbMultiPolygon )
 			{
-				cout << "Ignoring feature as multi polygon\n";
+				std::cout << "Ignoring feature as multi polygon\n";
 			}
 			OGRFeature::DestroyFeature( polyFeature );
 			counter++;
@@ -102,7 +102,7 @@ namespace rsgis{namespace vec{
 		
 		for(int i = 0; i < numFeatures; i++)
 		{
-			cout << "Polygon " << (i+1) << " of " << numFeatures << endl;
+			std::cout << "Polygon " << (i+1) << " of " << numFeatures << std::endl;
 			//data[i]->printGeometry();
 			poly = (RSGISZonalPolygons *) data[i];
 			this->calcImageStats(image, poly);
@@ -111,11 +111,11 @@ namespace rsgis{namespace vec{
 		vecIO->exportPolygons2Shp(outputSHPLayer, data, numFeatures);
 	}
 	
-	void ZonalStats::zonalStatsRaster(GDALDataset *image, GDALDataset *rasterFeatures, OGRLayer *inputLayer, OGRLayer *outputLayer, bool **toCalc) throw(RSGISImageCalcException, RSGISImageBandException, RSGISVectorOutputException)
+	void ZonalStats::zonalStatsRaster(GDALDataset *image, GDALDataset *rasterFeatures, OGRLayer *inputLayer, OGRLayer *outputLayer, bool **toCalc) throw(rsgis::img::RSGISImageCalcException, rsgis::img::RSGISImageBandException, RSGISVectorOutputException)
 	{
 		int numFeatures = inputLayer->GetFeatureCount();
 		int numAttributes = image->GetRasterCount();
-		RSGISCalcImage *calcImg = NULL;
+		rsgis::img::RSGISCalcImage *calcImg = NULL;
 		RSGISCalcZonalStatsFromRaster *rasterZonalCalc = NULL;
 		imagestats **featureStats = NULL;
 		OGRFeatureDefn *featDefn = NULL;
@@ -143,7 +143,7 @@ namespace rsgis{namespace vec{
 			datasets[1] = image;
 			
 			rasterZonalCalc = new RSGISCalcZonalStatsFromRaster(0, featureStats, numAttributes, numFeatures, false);
-			calcImg = new RSGISCalcImage(rasterZonalCalc, "", true);
+			calcImg = new rsgis::img::RSGISCalcImage(rasterZonalCalc, "", true);
 			calcImg->calcImage(datasets, numDS);
 			for(int i = 0; i < numFeatures; i++)
 			{
@@ -166,7 +166,7 @@ namespace rsgis{namespace vec{
 			int fieldCount = featDefn->GetFieldCount();
 			this->outputData2SHP(inputLayer, outputLayer, fieldCount, toCalc, numAttributes, featureStats);
 		}
-		catch(RSGISImageCalcException e)
+		catch(rsgis::img::RSGISImageCalcException e)
 		{
 			if(calcImg != NULL)
 			{
@@ -191,7 +191,7 @@ namespace rsgis{namespace vec{
 			}
 			throw e;
 		}
-		catch(RSGISImageBandException e)
+		catch(rsgis::img::RSGISImageBandException e)
 		{
 			if(calcImg != NULL)
 			{
@@ -265,15 +265,15 @@ namespace rsgis{namespace vec{
 		}
 	}
 		
-	void ZonalStats::zonalStatsRaster2txt(GDALDataset *image, GDALDataset *rasterFeatures, OGRLayer *inputLayer, string outputTxt, bool **toCalc) throw(RSGISImageCalcException, RSGISImageBandException)
+	void ZonalStats::zonalStatsRaster2txt(GDALDataset *image, GDALDataset *rasterFeatures, OGRLayer *inputLayer, std::string outputTxt, bool **toCalc) throw(rsgis::img::RSGISImageCalcException, rsgis::img::RSGISImageBandException)
 	{
 		int numFeatures = inputLayer->GetFeatureCount();
 		int numAttributes = image->GetRasterCount();
 		
-		cout << "Input vector has " << numFeatures << " features.\n";
-		cout << "Image has " << numAttributes << " bands (output attributes)\n";
+		std::cout << "Input vector has " << numFeatures << " features.\n";
+		std::cout << "Image has " << numAttributes << " bands (output attributes)\n";
 		
-		RSGISCalcImage *calcImg = NULL;
+		rsgis::img::RSGISCalcImage *calcImg = NULL;
 		RSGISCalcZonalStatsFromRaster *rasterZonalCalc = NULL;
 		imagestats **featureStats = NULL;
 		
@@ -298,20 +298,20 @@ namespace rsgis{namespace vec{
 			datasets[1] = image;
 			
 			rasterZonalCalc = new RSGISCalcZonalStatsFromRaster(0, featureStats, numAttributes, numFeatures, false);
-			calcImg = new RSGISCalcImage(rasterZonalCalc, "", true);
-			cout << "Calc stats part 1\n";
+			calcImg = new rsgis::img::RSGISCalcImage(rasterZonalCalc, "", true);
+			std::cout << "Calc stats part 1\n";
 			calcImg->calcImage(datasets, numDS);
 			for(int i = 0; i < numFeatures; i++)
 			{
-				//cout << i << ",";
+				//std::cout << i << ",";
 				for(int j = 0; j < numAttributes; j++)
 				{
 					featureStats[i][j].mean = featureStats[i][j].meanSum/featureStats[i][j].n;
-					//cout << featureStats[i][j].mean << ",";
+					//std::cout << featureStats[i][j].mean << ",";
 				}
-				//cout << endl;
+				//std::cout << std::endl;
 			}
-			/*cout << "Calc stats part 2\n";
+			/*std::cout << "Calc stats part 2\n";
 			 rasterZonalCalc->setStdDev(true);
 			 calcImg->calcImage(datasets, numDS);
 			 for(int i = 0; i < numFeatures; i++)
@@ -324,7 +324,7 @@ namespace rsgis{namespace vec{
 			delete[] datasets;
 			this->outputData2Text(outputTxt, toCalc, featureStats, numFeatures, numAttributes);
 		}
-		catch(RSGISImageCalcException e)
+		catch(rsgis::img::RSGISImageCalcException e)
 		{
 			if(calcImg != NULL)
 			{
@@ -345,7 +345,7 @@ namespace rsgis{namespace vec{
 			}
 			throw e;
 		}
-		catch(RSGISImageBandException e)
+		catch(rsgis::img::RSGISImageBandException e)
 		{
 			if(calcImg != NULL)
 			{
@@ -399,7 +399,7 @@ namespace rsgis{namespace vec{
 		{
 			if( outputSHPLayer->CreateField( featDefn->GetFieldDefn(i) ) != OGRERR_NONE )
 			{
-				string errorMessage = string("Creating ") + string(featDefn->GetFieldDefn(i)->GetNameRef()) + string(" field failed.");
+				std::string errorMessage = std::string("Creating ") + std::string(featDefn->GetFieldDefn(i)->GetNameRef()) + std::string(" field failed.");
 				throw RSGISVectorOutputException(errorMessage.c_str());
 			}
 		}
@@ -420,7 +420,7 @@ namespace rsgis{namespace vec{
 				shpField.SetPrecision(10);
 				if( outputSHPLayer->CreateField( &shpField ) != OGRERR_NONE )
 				{
-					string message = string("Creating shapefile field") + string(colname) + string(" has failed");
+					std::string message = std::string("Creating shapefile field") + std::string(colname) + std::string(" has failed");
 					throw RSGISVectorOutputException(message.c_str());
 				}
 			}
@@ -432,7 +432,7 @@ namespace rsgis{namespace vec{
 				shpField.SetPrecision(10);
 				if( outputSHPLayer->CreateField( &shpField ) != OGRERR_NONE )
 				{
-					string message = string("Creating shapefile field") + string(colname) + string(" has failed");
+					std::string message = std::string("Creating shapefile field") + std::string(colname) + std::string(" has failed");
 					throw RSGISVectorOutputException(message.c_str());
 				}
 			}
@@ -444,7 +444,7 @@ namespace rsgis{namespace vec{
 				shpField.SetPrecision(10);
 				if( outputSHPLayer->CreateField( &shpField ) != OGRERR_NONE )
 				{
-					string message = string("Creating shapefile field") + string(colname) + string(" has failed");
+					std::string message = std::string("Creating shapefile field") + std::string(colname) + std::string(" has failed");
 					throw RSGISVectorOutputException(message.c_str());
 				}
 			}
@@ -456,7 +456,7 @@ namespace rsgis{namespace vec{
 				shpField.SetPrecision(10);
 				if( outputSHPLayer->CreateField( &shpField ) != OGRERR_NONE )
 				{
-					string message = string("Creating shapefile field") + string(colname) + string(" has failed");
+					std::string message = std::string("Creating shapefile field") + std::string(colname) + std::string(" has failed");
 					throw RSGISVectorOutputException(message.c_str());
 				}
 			}
@@ -470,7 +470,7 @@ namespace rsgis{namespace vec{
 		{
 			if( outputSHPLayer->CreateField( inLayerDef->GetFieldDefn(i) ) != OGRERR_NONE )
 			{
-				string message = string("Creating ") + string(inLayerDef->GetFieldDefn(i)->GetNameRef()) + string(" field failed.");
+				std::string message = std::string("Creating ") + std::string(inLayerDef->GetFieldDefn(i)->GetNameRef()) + std::string(" field failed.");
 				throw RSGISVectorOutputException(message.c_str());
 			}
 		}
@@ -479,13 +479,13 @@ namespace rsgis{namespace vec{
 		{
 			if(attributes[i]->name.length() > 10)
 			{
-				cout << attributes[i]->name << " will be truncated to \'" << attributes[i]->name.substr(0, 10) << "\'\n";
+				std::cout << attributes[i]->name << " will be truncated to \'" << attributes[i]->name.substr(0, 10) << "\'\n";
 			}
 			OGRFieldDefn shpField(attributes[i]->name.c_str(), OFTReal);
 			shpField.SetPrecision(10);
 			if( outputSHPLayer->CreateField( &shpField ) != OGRERR_NONE )
 			{
-				string message = string("Creating shapefile field ") + attributes[i]->name + string(" has failed");
+				std::string message = std::string("Creating shapefile field ") + attributes[i]->name + std::string(" has failed");
 				throw RSGISVectorOutputException(message.c_str());
 			}
 		}
@@ -494,7 +494,7 @@ namespace rsgis{namespace vec{
 		shpField.SetPrecision(10);
 		if( outputSHPLayer->CreateField( &shpField ) != OGRERR_NONE )
 		{
-			string message = string("Creating shapefile field \'NumPxls\' has failed");
+			std::string message = std::string("Creating shapefile field \'NumPxls\' has failed");
 			throw RSGISVectorOutputException(message.c_str());
 		}
 	}
@@ -516,7 +516,7 @@ namespace rsgis{namespace vec{
 			featureOutput = OGRFeature::CreateFeature(outputDefn);
 			if(counter % feedback == 0)
 			{
-				cout << "Outputted " << counter << " of " << numFeatures << " features\n";
+				std::cout << "Outputted " << counter << " of " << numFeatures << " features\n";
 			}
 			geometry = feature->GetGeometryRef();
 			if( geometry != NULL && wkbFlatten(geometry->getGeometryType()) == wkbPolygon )
@@ -556,37 +556,37 @@ namespace rsgis{namespace vec{
 			
 			for(int i = 0; i < numBands; i++)
 			{
-				//cout << "band " << i << " stats = [" << stats[counter][i].mean << ", " << stats[counter][i].max << ", " << stats[counter][i].min << ", " << stats[counter][i].stddev << "]" << "\n";
+				//std::cout << "band " << i << " stats = [" << stats[counter][i].mean << ", " << stats[counter][i].max << ", " << stats[counter][i].min << ", " << stats[counter][i].stddev << "]" << "\n";
 				if(toCalc[i][0])
 				{
 					char colname[8];
 					sprintf(colname, "mean_%d", i);
 					featureOutput->SetField(outputDefn->GetFieldIndex(colname), stats[counter][i].mean);
-					//cout << "column index " << colname << " = " << outputDefn->GetFieldIndex(colname) << endl;
+					//std::cout << "column index " << colname << " = " << outputDefn->GetFieldIndex(colname) << std::endl;
 				}
 				if(toCalc[i][1])
 				{
 					char colname[7];
 					sprintf(colname, "max_%d", i);
 					featureOutput->SetField(outputDefn->GetFieldIndex(colname), stats[counter][i].max);
-					//cout << "column index " << colname << " = " << outputDefn->GetFieldIndex(colname) << endl;
+					//std::cout << "column index " << colname << " = " << outputDefn->GetFieldIndex(colname) << std::endl;
 				}
 				if(toCalc[i][2])
 				{
 					char colname[7];
 					sprintf(colname, "min_%d", i);
 					featureOutput->SetField(outputDefn->GetFieldIndex(colname), stats[counter][i].min);
-					//cout << "column index " << colname << " = " << outputDefn->GetFieldIndex(colname) << endl;
+					//std::cout << "column index " << colname << " = " << outputDefn->GetFieldIndex(colname) << std::endl;
 				}
 				if(toCalc[i][3])
 				{
 					char colname[10];
 					sprintf(colname, "stddev_%d", i);
 					featureOutput->SetField(outputDefn->GetFieldIndex(colname), stats[counter][i].stddev);
-					//cout << "column index " << colname << " = " << outputDefn->GetFieldIndex(colname) << endl;
+					//std::cout << "column index " << colname << " = " << outputDefn->GetFieldIndex(colname) << std::endl;
 				}
 			}
-			//cout << endl;
+			//std::cout << std::endl;
 			
 			if( outputSHPLayer->CreateFeature(featureOutput) != OGRERR_NONE )
 			{
@@ -600,12 +600,12 @@ namespace rsgis{namespace vec{
 	
 	void ZonalStats::calcImageStats(GDALDataset *image, RSGISZonalPolygons *polygon) throw(RSGISVectorZonalException)
 	{
-		cout.precision(15);
-		Envelope *envelope = NULL;
+		std::cout.precision(15);
+		geos::geom::Envelope *envelope = NULL;
 		GDALRasterBand *imageBand;
 		double *transformation = NULL;
 		float *imgData = NULL;
-		Coordinate *coord = NULL;
+		geos::geom::Coordinate *coord = NULL;
 		
 		int imgXSize = 0;
 		int imgYSize = 0;
@@ -635,7 +635,7 @@ namespace rsgis{namespace vec{
 		try
 		{
 			envelope = polygon->getBBox();
-			//cout << "Env: " << envelope->toString() << endl;
+			//std::cout << "Env: " << envelope->toString() << std::endl;
 			
 			transformation = new double[6];
 			image->GetGeoTransform(transformation);
@@ -654,9 +654,9 @@ namespace rsgis{namespace vec{
 			if((envelope->getMinX() < imgTLX) | (envelope->getMaxY() > imgTLY)
 			   | (envelope->getMaxX() > imgBRX) | (envelope->getMinY() < imgBRY))
 			{
-				cout.precision(12);
-				cout << "Polygon = [" << envelope->getMinX() << "," << envelope->getMaxY() << "][" << envelope->getMaxX() << "," << envelope->getMinY() << "]\n";
-				cout << "Image = [" << imgTLX << "," << imgTLY << "][" << imgBRX << "," << imgBRY << "]\n";
+				std::cout.precision(12);
+				std::cout << "Polygon = [" << envelope->getMinX() << "," << envelope->getMaxY() << "][" << envelope->getMaxX() << "," << envelope->getMinY() << "]\n";
+				std::cout << "Image = [" << imgTLX << "," << imgTLY << "][" << imgBRX << "," << imgBRY << "]\n";
 				throw RSGISVectorZonalException("Vector does not within the raster");
 			}
 			
@@ -669,14 +669,14 @@ namespace rsgis{namespace vec{
 			
 			imgData = (float *) CPLMalloc(sizeof(float)*imgXSize);
 			
-			//cout << "[" << polyTLPxlY << "," << endYPxl << "]" << endl;
-			//cout << "[" << polyTLPxlX << "," << endXPxl << "]" << endl;
+			//std::cout << "[" << polyTLPxlY << "," << endYPxl << "]" << std::endl;
+			//std::cout << "[" << polyTLPxlX << "," << endXPxl << "]" << std::endl;
 			
-			coord = new Coordinate(0, 0, 0);
+			coord = new geos::geom::Coordinate(0, 0, 0);
 			
 			for(int n = 0; n < image->GetRasterCount(); n++)
 			{
-				cout << "Band " << (n+1) << " of " << image->GetRasterCount() << endl;
+				std::cout << "Band " << (n+1) << " of " << image->GetRasterCount() << std::endl;
 				imageBand = image->GetRasterBand(n+1);
 				first = true;
 				numPxls = 0;
@@ -724,9 +724,9 @@ namespace rsgis{namespace vec{
 				polygon->setMax(maxPxl, n);
 				polygon->setMin(minPxl, n);
 				
-				//cout << "Mean = " << polygon->getMean()[n] << endl;
-				//cout << "Max = " << polygon->getMax()[n] << endl;
-				//cout << "Min = " << polygon->getMin()[n] << endl;
+				//std::cout << "Mean = " << polygon->getMean()[n] << std::endl;
+				//std::cout << "Max = " << polygon->getMax()[n] << std::endl;
+				//std::cout << "Min = " << polygon->getMin()[n] << std::endl;
 				
 				if(polygon->calcStdDev(n))
 				{
@@ -747,7 +747,7 @@ namespace rsgis{namespace vec{
 					}
 					
 					polygon->setStdDev(sqrt(meanDiffSqSum/numPxls), n);
-					//cout << "Std Dev = " << polygon->getStdDev()[n] << endl;
+					//std::cout << "Std Dev = " << polygon->getStdDev()[n] << std::endl;
 				}
 				else
 				{
@@ -867,7 +867,7 @@ namespace rsgis{namespace vec{
 			
 			for(int n = 0; n < image->GetRasterCount(); n++)
 			{
-				cout << "Band " << (n+1) << " of " << image->GetRasterCount() << endl;
+				std::cout << "Band " << (n+1) << " of " << image->GetRasterCount() << std::endl;
 				imageBand = image->GetRasterBand(n+1);
 				first = true;
 				numPxls = 0;
@@ -877,12 +877,12 @@ namespace rsgis{namespace vec{
 				meanDiff = 0;
 				meanDiffSqSum = 0;
 				
-				cout << "[" << polyTLPxlY << "," << endYPxl << "]" << endl;
-				cout << "[" << polyTLPxlX << "," << endXPxl << "]" << endl;
+				std::cout << "[" << polyTLPxlY << "," << endYPxl << "]" << std::endl;
+				std::cout << "[" << polyTLPxlX << "," << endXPxl << "]" << std::endl;
 				
 				for(int i = polyTLPxlY; i <= endYPxl; i++)
 				{
-					//cout << "i = " << i << endl;
+					//std::cout << "i = " << i << std::endl;
 					imageBand->RasterIO(GF_Read, 0, i, imgXSize, 1, imgData, imgXSize, 1, GDT_Float32, 0, 0);
 					for(int j = polyTLPxlX; j <=endXPxl; j++)
 					{
@@ -917,9 +917,9 @@ namespace rsgis{namespace vec{
 				stats[n].max = maxPxl;
 				stats[n].min = minPxl;
 				
-				cout << "Mean = " << stats[n].mean << endl;
-				cout << "Max = " << stats[n].max << endl;
-				cout << "Min = " << stats[n].min << endl;
+				std::cout << "Mean = " << stats[n].mean << std::endl;
+				std::cout << "Max = " << stats[n].max << std::endl;
+				std::cout << "Min = " << stats[n].min << std::endl;
 				
 				/*for(int i = polyTLPxlY; i <= endYPxl; i++)
 				 {
@@ -938,7 +938,7 @@ namespace rsgis{namespace vec{
 				 }
 				 }
 				 stats[n].stddev = sqrt(meanDiffSqSum/numPxls);
-				 cout << "Std Dev = " << stats[n].stddev << endl;*/
+				 std::cout << "Std Dev = " << stats[n].stddev << std::endl;*/
 				stats[n].stddev = 0;
 			}
 			
@@ -990,14 +990,14 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void ZonalStats::outputData2Text(string outputTxt, bool **toCalc, imagestats **stats, int numFeatures, int numAttributes) throw(RSGISTextException)
+	void ZonalStats::outputData2Text(std::string outputTxt, bool **toCalc, imagestats **stats, int numFeatures, int numAttributes) throw(rsgis::utils::RSGISTextException)
 	{
 		ofstream outputTxtFile(outputTxt.c_str());
 		try
 		{
 			if(!outputTxtFile.is_open())
 			{
-				throw RSGISTextException("Text file did not open!");
+				throw rsgis::utils::RSGISTextException("Text file did not open!");
 			}
 			
 			outputTxtFile << "Feature";
@@ -1005,7 +1005,7 @@ namespace rsgis{namespace vec{
 			{
 				outputTxtFile << ",mean_" << i << ",max_" << i << ",min_" << i << "stddev_" << i;
 			}
-			outputTxtFile << endl;
+			outputTxtFile << std::endl;
 			
 			for(int n = 0; n < numFeatures; n++)
 			{
@@ -1049,12 +1049,12 @@ namespace rsgis{namespace vec{
 						outputTxtFile << ",";
 					}
 				}	
-				outputTxtFile << endl;
+				outputTxtFile << std::endl;
 			}
 			outputTxtFile.flush();
 			outputTxtFile.close();
 		}
-		catch(RSGISTextException e)
+		catch(rsgis::utils::RSGISTextException e)
 		{
 			if(outputTxtFile.is_open())
 			{
@@ -1070,7 +1070,7 @@ namespace rsgis{namespace vec{
 		
 	}
 	
-	RSGISCalcZonalStatsFromRaster::RSGISCalcZonalStatsFromRaster(int numberOutBands, imagestats **stats, int numInBands, int numFeatures, bool stddev) : RSGISCalcImageValue(numberOutBands)
+	RSGISCalcZonalStatsFromRaster::RSGISCalcZonalStatsFromRaster(int numberOutBands, imagestats **stats, int numInBands, int numFeatures, bool stddev) : rsgis::img::RSGISCalcImageValue(numberOutBands)
 	{
 		this->stats = stats;
 		this->numInBands = numInBands;
@@ -1078,32 +1078,32 @@ namespace rsgis{namespace vec{
 		this->stddev = stddev;
 	}
 	
-	void RSGISCalcZonalStatsFromRaster::calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException)
+	void RSGISCalcZonalStatsFromRaster::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
 	{
-		throw RSGISImageCalcException("No Implemented.");
+		throw rsgis::img::RSGISImageCalcException("No Implemented.");
 	}
 	
-	void RSGISCalcZonalStatsFromRaster::calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException)
+	void RSGISCalcZonalStatsFromRaster::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException)
 	{
-		throw RSGISImageCalcException("Not Implemented");
+		throw rsgis::img::RSGISImageCalcException("Not Implemented");
 	}
 	
-	void RSGISCalcZonalStatsFromRaster::calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException)
+	void RSGISCalcZonalStatsFromRaster::calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException)
 	{
-		throw RSGISImageCalcException("No Implemented.");
+		throw rsgis::img::RSGISImageCalcException("No Implemented.");
 	}
 	
-	void RSGISCalcZonalStatsFromRaster::calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException)
+	void RSGISCalcZonalStatsFromRaster::calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException)
 	{
 		if((numBands-1) != numInBands)
 		{
-			throw RSGISImageCalcException("Number of input bands does not match!");
+			throw rsgis::img::RSGISImageCalcException("Number of input bands does not match!");
 		}
 		
 		int feature = bandValues[0];
 		if(feature > numFeatures)
 		{
-			throw RSGISImageCalcException("There were not enough features defined for the pixel values");
+			throw rsgis::img::RSGISImageCalcException("There were not enough features defined for the pixel values");
 		}
 		
 		if(feature != -1)
@@ -1150,14 +1150,14 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISCalcZonalStatsFromRaster::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException)
+	void RSGISCalcZonalStatsFromRaster::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
 	{
-		throw RSGISImageCalcException("Not implemented");
+		throw rsgis::img::RSGISImageCalcException("Not implemented");
 	}
 	
-	bool RSGISCalcZonalStatsFromRaster::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException)
+	bool RSGISCalcZonalStatsFromRaster::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
 	{
-		throw RSGISImageCalcException("Not implemented");
+		throw rsgis::img::RSGISImageCalcException("Not implemented");
 	}
 	
 	void RSGISCalcZonalStatsFromRaster::setStdDev(bool stddev)
@@ -1170,7 +1170,7 @@ namespace rsgis{namespace vec{
 		
 	}
 	
-	RSGISZonalStats::RSGISZonalStats(GDALDataset *image, GDALDataset *rasterFeatures, ZonalAttributes** attributes, int numAttributes, bool outPxlCount, string outZonalFileName)
+	RSGISZonalStats::RSGISZonalStats(GDALDataset *image, GDALDataset *rasterFeatures, ZonalAttributes** attributes, int numAttributes, bool outPxlCount, std::string outZonalFileName)
 	{
 		this->datasets = new GDALDataset*[2];
 		this->datasets[0] = rasterFeatures;
@@ -1184,7 +1184,7 @@ namespace rsgis{namespace vec{
 		this->data = new double[dataSize];
 		
 		calcValue = new RSGISCalcZonalStatsFromRasterPolygon(dataSize, attributes, numAttributes);
-		calcImage = new RSGISCalcImageSingle(calcValue);
+		calcImage = new rsgis::img::RSGISCalcImageSingle(calcValue);
 		
 		if (outZonalFileName != "") 
 		{
@@ -1194,7 +1194,7 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISZonalStats::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISZonalStats::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
 	{
 		try
 		{
@@ -1206,14 +1206,14 @@ namespace rsgis{namespace vec{
 			
             for(int i = 0; i < numAttributes; i++)
 			{
-				string attMin = attributes[i]->name + string("Min");
-				string attMax = attributes[i]->name + string("Max");
-				string attAvg = attributes[i]->name + string("Avg");
-				string attStd = attributes[i]->name + string("Std");
-				string attMde = attributes[i]->name + string("Mde");
-				string attPix = attributes[i]->name + string("Pix");
+				std::string attMin = attributes[i]->name + std::string("Min");
+				std::string attMax = attributes[i]->name + std::string("Max");
+				std::string attAvg = attributes[i]->name + std::string("Avg");
+				std::string attStd = attributes[i]->name + std::string("Std");
+				std::string attMde = attributes[i]->name + std::string("Mde");
+				std::string attPix = attributes[i]->name + std::string("Pix");
 				
-				//cout << "mean = " << this->data[3] << " count = " << this->data[5] << endl;
+				//std::cout << "mean = " << this->data[3] << " count = " << this->data[5] << std::endl;
 				
 				int offset = (6 * i) + 1; // Offset by total number of stats + 1 for count
 				
@@ -1255,7 +1255,7 @@ namespace rsgis{namespace vec{
 		
 	}
 	
-	void RSGISZonalStats::processFeature(OGRFeature *feature, Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISZonalStats::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
 	{
 		
 		if(!outZonalFile.is_open())
@@ -1277,12 +1277,12 @@ namespace rsgis{namespace vec{
 				for(int i = 0; i < numAttributes; i++)
 				{
 					
-					string attMin = attributes[i]->name + string("Min");
-					string attMax = attributes[i]->name + string("Max");
-					string attAvg = attributes[i]->name + string("Avg");
-                    string attStd = attributes[i]->name + string("Std");
-					string attMde = attributes[i]->name + string("Mde");
-					string attPix = attributes[i]->name + string("Pix");
+					std::string attMin = attributes[i]->name + std::string("Min");
+					std::string attMax = attributes[i]->name + std::string("Max");
+					std::string attAvg = attributes[i]->name + std::string("Avg");
+                    std::string attStd = attributes[i]->name + std::string("Std");
+					std::string attMde = attributes[i]->name + std::string("Mde");
+					std::string attPix = attributes[i]->name + std::string("Pix");
 					
 					if (attributes[i]->outMin) 
 					{
@@ -1373,16 +1373,16 @@ namespace rsgis{namespace vec{
 			// Create names for fields
 			if(attributes[i]->name.length() > 7)
 			{
-				cout << attributes[i]->name << " will be truncated to \'" << attributes[i]->name.substr(0, 7) << "\'\n";
+				std::cout << attributes[i]->name << " will be truncated to \'" << attributes[i]->name.substr(0, 7) << "\'\n";
 				attributes[i]->name = attributes[i]->name.substr(0, 7);
 			}
 			
-			string attMin = attributes[i]->name + string("Min");
-			string attMax = attributes[i]->name + string("Max");
-			string attAvg = attributes[i]->name + string("Avg");
-			string attStd = attributes[i]->name + string("Std");
-            string attMde = attributes[i]->name + string("Mde");
-			string attPix = attributes[i]->name + string("Pix");
+			std::string attMin = attributes[i]->name + std::string("Min");
+			std::string attMax = attributes[i]->name + std::string("Max");
+			std::string attAvg = attributes[i]->name + std::string("Avg");
+			std::string attStd = attributes[i]->name + std::string("Std");
+            std::string attMde = attributes[i]->name + std::string("Mde");
+			std::string attPix = attributes[i]->name + std::string("Pix");
 			
 			if(attributes[i]->outMin)
 			{
@@ -1390,7 +1390,7 @@ namespace rsgis{namespace vec{
 				shpField.SetPrecision(10);
 				if( outputLayer->CreateField( &shpField ) != OGRERR_NONE )
 				{
-					string message = string("Creating shapefile field \'Min\' has failed");
+					std::string message = std::string("Creating shapefile field \'Min\' has failed");
 					throw RSGISVectorOutputException(message.c_str());
 				}
 			}
@@ -1401,7 +1401,7 @@ namespace rsgis{namespace vec{
 				shpField.SetPrecision(10);
 				if( outputLayer->CreateField( &shpField ) != OGRERR_NONE )
 				{
-					string message = string("Creating shapefile field \'Max\' has failed");
+					std::string message = std::string("Creating shapefile field \'Max\' has failed");
 					throw RSGISVectorOutputException(message.c_str());
 				}
 			}
@@ -1412,7 +1412,7 @@ namespace rsgis{namespace vec{
 				shpField.SetPrecision(10);
 				if( outputLayer->CreateField( &shpField ) != OGRERR_NONE )
 				{
-					string message = string("Creating shapefile field \'Mean\' has failed");
+					std::string message = std::string("Creating shapefile field \'Mean\' has failed");
 					throw RSGISVectorOutputException(message.c_str());
 				}
 			}
@@ -1423,7 +1423,7 @@ namespace rsgis{namespace vec{
 				shpField.SetPrecision(10);
 				if( outputLayer->CreateField( &shpField ) != OGRERR_NONE )
 				{
-					string message = string("Creating shapefile field \'StDev\' has failed");
+					std::string message = std::string("Creating shapefile field \'StDev\' has failed");
 					throw RSGISVectorOutputException(message.c_str());
 				}
 			}
@@ -1433,7 +1433,7 @@ namespace rsgis{namespace vec{
 				shpField.SetPrecision(0);
 				if( outputLayer->CreateField( &shpField ) != OGRERR_NONE )
 				{
-					string message = string("Creating shapefile field \'IntMode\' has failed");
+					std::string message = std::string("Creating shapefile field \'IntMode\' has failed");
 					throw RSGISVectorOutputException(message.c_str());
 				}
 			}
@@ -1443,7 +1443,7 @@ namespace rsgis{namespace vec{
 				shpField.SetPrecision(10);
 				if( outputLayer->CreateField( &shpField ) != OGRERR_NONE )
 				{
-					string message = string("Creating shapefile field \'Count\' has failed");
+					std::string message = std::string("Creating shapefile field \'Count\' has failed");
 					throw RSGISVectorOutputException(message.c_str());
 				}
 			}
@@ -1455,7 +1455,7 @@ namespace rsgis{namespace vec{
 			shpField.SetPrecision(10);
 			if( outputLayer->CreateField( &shpField ) != OGRERR_NONE )
 			{
-				string message = string("Creating shapefile field \'TotalPxls\' has failed");
+				std::string message = std::string("Creating shapefile field \'TotalPxls\' has failed");
 				throw RSGISVectorOutputException(message.c_str());
 			}
 		}
@@ -1471,19 +1471,19 @@ namespace rsgis{namespace vec{
 	}
 	
 	
-	RSGISCalcZonalStatsFromRasterPolygon::RSGISCalcZonalStatsFromRasterPolygon(int numOutputValues, ZonalAttributes **attributes, int numAttributes) : RSGISCalcImageSingleValue(numOutputValues)
+	RSGISCalcZonalStatsFromRasterPolygon::RSGISCalcZonalStatsFromRasterPolygon(int numOutputValues, ZonalAttributes **attributes, int numAttributes) : rsgis::img::RSGISCalcImageSingleValue(numOutputValues)
 	{
 		this->attributes = attributes;
 		this->numAttributes = numAttributes;
-		this->values = new vector<double>*[numAttributes];
+		this->values = new std::vector<double>*[numAttributes];
 		
 		for (int i = 0; i < numAttributes; i++) 
 		{
-			values[i] = new vector <double>();
+			values[i] = new std::vector<double>();
 		}
 	}
 	
-	void RSGISCalcZonalStatsFromRasterPolygon::calcImageValue(float *bandValuesImage, int numBands, int band) throw(RSGISImageCalcException)
+	void RSGISCalcZonalStatsFromRasterPolygon::calcImageValue(float *bandValuesImage, int numBands, int band) throw(rsgis::img::RSGISImageCalcException)
 	{
 		for(int i = 0; i < this->numAttributes; i++)
 		{
@@ -1493,10 +1493,10 @@ namespace rsgis{namespace vec{
 			
 			for(int j = 0; j < attributes[i]->numBands; j++)
 			{
-				//cout << "Number of bands = " << numBands << endl;
+				//std::cout << "Number of bands = " << numBands << std::endl;
 				if((attributes[i]->bands[j] > numBands) | (attributes[i]->bands[j] < 0))
 				{
-					throw RSGISImageCalcException("The band attributes do not match the image.");
+					throw rsgis::img::RSGISImageCalcException("The band attributes do not match the image.");
 				}
 				// Calculates the minimum of the two input image bands
 				if(!isnan(attributes[i]->bands[j]+1))
@@ -1532,7 +1532,7 @@ namespace rsgis{namespace vec{
 		totalPxl++;
 	}
 	
-	double* RSGISCalcZonalStatsFromRasterPolygon::getOutputValues() throw(RSGISImageCalcException)
+	double* RSGISCalcZonalStatsFromRasterPolygon::getOutputValues() throw(rsgis::img::RSGISImageCalcException)
 	{
 		/* Calculte statistics and save to data array
 		 *  Array is in the form:
@@ -1592,7 +1592,7 @@ namespace rsgis{namespace vec{
 			outputValues[offset+1] = maxVal;
 			outputValues[offset+5] = values[i]->size();
 			
-			//cout << "values[i]->size() " << values[i]->size() << endl;
+			//std::cout << "values[i]->size() " << values[i]->size() << std::endl;
 			
 			// Calculate mean
 			if((sum != 0) && (values[i]->size() != 0))
@@ -1629,7 +1629,7 @@ namespace rsgis{namespace vec{
             {
                 if(values[i]->size() > 0)
                 {
-                    vector <int> *valuesInt = new vector <int>();
+                    std::vector<int> *valuesInt = new std::vector<int>();
                     
                     for (unsigned int j = 0; j < values[i]->size(); j++) 
                     {
@@ -1690,7 +1690,7 @@ namespace rsgis{namespace vec{
 	}
 	
 	
-	RSGISZonalStatsPoly::RSGISZonalStatsPoly(GDALDataset *image, ZonalAttributes** attributes, int numAttributes, bool outPxlCount, pixelInPolyOption method, string outZonalFileName)
+	RSGISZonalStatsPoly::RSGISZonalStatsPoly(GDALDataset *image, ZonalAttributes** attributes, int numAttributes, bool outPxlCount, rsgis::img::pixelInPolyOption method, std::string outZonalFileName)
 	{
 		this->datasets = new GDALDataset*[1];
 		this->datasets[0] = image;
@@ -1704,7 +1704,7 @@ namespace rsgis{namespace vec{
 		this->data = new double[dataSize];
 		
 		calcValue = new RSGISCalcZonalStatsFromPolygon(dataSize, attributes, numAttributes);
-		calcImage = new RSGISCalcImageSingle(calcValue);
+		calcImage = new rsgis::img::RSGISCalcImageSingle(calcValue);
 		
 		if (outZonalFileName != "")
 		{
@@ -1714,7 +1714,7 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISZonalStatsPoly::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISZonalStatsPoly::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
 	{
 		try
 		{
@@ -1722,7 +1722,7 @@ namespace rsgis{namespace vec{
 			calcValue->reset();
 			
 			OGRPolygon *inOGRPoly;
-			Polygon *poly;
+			geos::geom::Polygon *poly;
 			inOGRPoly = (OGRPolygon *) inFeature->GetGeometryRef();
 			poly = vecUtils.convertOGRPolygon2GEOSPolygon(inOGRPoly);
 			
@@ -1732,14 +1732,14 @@ namespace rsgis{namespace vec{
 			
 			for(int i = 0; i < numAttributes; i++)
 			{
-				string attMin = attributes[i]->name + string("Min");
-				string attMax = attributes[i]->name + string("Max");
-				string attAvg = attributes[i]->name + string("Avg");
-				string attStd = attributes[i]->name + string("Std");
-				string attMde = attributes[i]->name + string("Mde");
-				string attPix = attributes[i]->name + string("Pix");
+				std::string attMin = attributes[i]->name + std::string("Min");
+				std::string attMax = attributes[i]->name + std::string("Max");
+				std::string attAvg = attributes[i]->name + std::string("Avg");
+				std::string attStd = attributes[i]->name + std::string("Std");
+				std::string attMde = attributes[i]->name + std::string("Mde");
+				std::string attPix = attributes[i]->name + std::string("Pix");
 				
-				//cout << "mean = " << this->data[3] << " count = " << this->data[5] << endl;
+				//std::cout << "mean = " << this->data[3] << " count = " << this->data[5] << std::endl;
 				
 				int offset = (6 * i) + 1; // Offset by total number of stats + 1 for count
 				
@@ -1781,7 +1781,7 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISZonalStatsPoly::processFeature(OGRFeature *feature, Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISZonalStatsPoly::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
 	{
 		// Zonal stats - output to text file.
 		if(!outZonalFile.is_open())
@@ -1794,7 +1794,7 @@ namespace rsgis{namespace vec{
 			calcValue->reset();
 			
 			OGRPolygon *inOGRPoly;
-			Polygon *poly;
+			geos::geom::Polygon *poly;
 			inOGRPoly = (OGRPolygon *) feature->GetGeometryRef();
 			poly = vecUtils.convertOGRPolygon2GEOSPolygon(inOGRPoly);
 			
@@ -1807,12 +1807,12 @@ namespace rsgis{namespace vec{
 				for(int i = 0; i < numAttributes; i++)
 				{
 					
-					string attMin = attributes[i]->name + string("Min");
-					string attMax = attributes[i]->name + string("Max");
-					string attAvg = attributes[i]->name + string("Avg");
-                    string attStd = attributes[i]->name + string("Std");
-					string attMde = attributes[i]->name + string("Mde");
-					string attPix = attributes[i]->name + string("Pix");
+					std::string attMin = attributes[i]->name + std::string("Min");
+					std::string attMax = attributes[i]->name + std::string("Max");
+					std::string attAvg = attributes[i]->name + std::string("Avg");
+                    std::string attStd = attributes[i]->name + std::string("Std");
+					std::string attMde = attributes[i]->name + std::string("Mde");
+					std::string attPix = attributes[i]->name + std::string("Pix");
 					
 					if (attributes[i]->outMin) 
 					{
@@ -1903,16 +1903,16 @@ namespace rsgis{namespace vec{
 			// Create names for fields
 			if(attributes[i]->name.length() > 7)
 			{
-				cout << attributes[i]->name << " will be truncated to \'" << attributes[i]->name.substr(0, 7) << "\'\n";
+				std::cout << attributes[i]->name << " will be truncated to \'" << attributes[i]->name.substr(0, 7) << "\'\n";
 				attributes[i]->name = attributes[i]->name.substr(0, 7);
 			}
 			
-			string attMin = attributes[i]->name + string("Min");
-			string attMax = attributes[i]->name + string("Max");
-			string attAvg = attributes[i]->name + string("Avg");
-			string attStd = attributes[i]->name + string("Std");
-            string attMde = attributes[i]->name + string("Mde");
-			string attPix = attributes[i]->name + string("Pix");
+			std::string attMin = attributes[i]->name + std::string("Min");
+			std::string attMax = attributes[i]->name + std::string("Max");
+			std::string attAvg = attributes[i]->name + std::string("Avg");
+			std::string attStd = attributes[i]->name + std::string("Std");
+            std::string attMde = attributes[i]->name + std::string("Mde");
+			std::string attPix = attributes[i]->name + std::string("Pix");
 			
 			if(attributes[i]->outMin)
 			{
@@ -1920,7 +1920,7 @@ namespace rsgis{namespace vec{
 				shpField.SetPrecision(10);
 				if( outputLayer->CreateField( &shpField ) != OGRERR_NONE )
 				{
-					string message = string("Creating shapefile field \'Min\' has failed");
+					std::string message = std::string("Creating shapefile field \'Min\' has failed");
 					throw RSGISVectorOutputException(message.c_str());
 				}
 			}
@@ -1931,7 +1931,7 @@ namespace rsgis{namespace vec{
 				shpField.SetPrecision(10);
 				if( outputLayer->CreateField( &shpField ) != OGRERR_NONE )
 				{
-					string message = string("Creating shapefile field \'Max\' has failed");
+					std::string message = std::string("Creating shapefile field \'Max\' has failed");
 					throw RSGISVectorOutputException(message.c_str());
 				}
 			}
@@ -1942,7 +1942,7 @@ namespace rsgis{namespace vec{
 				shpField.SetPrecision(10);
 				if( outputLayer->CreateField( &shpField ) != OGRERR_NONE )
 				{
-					string message = string("Creating shapefile field \'Mean\' has failed");
+					std::string message = std::string("Creating shapefile field \'Mean\' has failed");
 					throw RSGISVectorOutputException(message.c_str());
 				}
 			}
@@ -1953,7 +1953,7 @@ namespace rsgis{namespace vec{
 				shpField.SetPrecision(10);
 				if( outputLayer->CreateField( &shpField ) != OGRERR_NONE )
 				{
-					string message = string("Creating shapefile field \'StDev\' has failed");
+					std::string message = std::string("Creating shapefile field \'StDev\' has failed");
 					throw RSGISVectorOutputException(message.c_str());
 				}
 			}
@@ -1963,7 +1963,7 @@ namespace rsgis{namespace vec{
 				shpField.SetPrecision(0);
 				if( outputLayer->CreateField( &shpField ) != OGRERR_NONE )
 				{
-					string message = string("Creating shapefile field \'IntMode\' has failed");
+					std::string message = std::string("Creating shapefile field \'IntMode\' has failed");
 					throw RSGISVectorOutputException(message.c_str());
 				}
 			}
@@ -1973,7 +1973,7 @@ namespace rsgis{namespace vec{
 				shpField.SetPrecision(10);
 				if( outputLayer->CreateField( &shpField ) != OGRERR_NONE )
 				{
-					string message = string("Creating shapefile field \'Count\' has failed");
+					std::string message = std::string("Creating shapefile field \'Count\' has failed");
 					throw RSGISVectorOutputException(message.c_str());
 				}
 			}
@@ -1985,7 +1985,7 @@ namespace rsgis{namespace vec{
 			shpField.SetPrecision(10);
 			if( outputLayer->CreateField( &shpField ) != OGRERR_NONE )
 			{
-				string message = string("Creating shapefile field \'TotalPxls\' has failed");
+				std::string message = std::string("Creating shapefile field \'TotalPxls\' has failed");
 				throw RSGISVectorOutputException(message.c_str());
 			}
 		}
@@ -2005,19 +2005,19 @@ namespace rsgis{namespace vec{
 	}
 	
 	
-	RSGISCalcZonalStatsFromPolygon::RSGISCalcZonalStatsFromPolygon(int numOutputValues, ZonalAttributes **attributes, int numAttributes) : RSGISCalcImageSingleValue(numOutputValues)
+	RSGISCalcZonalStatsFromPolygon::RSGISCalcZonalStatsFromPolygon(int numOutputValues, ZonalAttributes **attributes, int numAttributes) : rsgis::img::RSGISCalcImageSingleValue(numOutputValues)
 	{
 		this->attributes = attributes;
 		this->numAttributes = numAttributes;
-		this->values = new vector<double>*[numAttributes];
+		this->values = new std::vector<double>*[numAttributes];
 		
 		for (int i = 0; i < numAttributes; i++) 
 		{
-			values[i] = new vector <double>();
+			values[i] = new std::vector<double>();
 		}
 	}
 	
-	void RSGISCalcZonalStatsFromPolygon::calcImageValue(float *bandValuesImage, double interceptArea, int numBands, Polygon *poly, Point *pt) throw(RSGISImageCalcException)
+	void RSGISCalcZonalStatsFromPolygon::calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt) throw(rsgis::img::RSGISImageCalcException)
 	{ 
 		for(int i = 0; i < this->numAttributes; i++)
 		{
@@ -2027,10 +2027,10 @@ namespace rsgis{namespace vec{
 			
 			for(int j = 0; j < attributes[i]->numBands; j++)
 			{
-				//cout << "Number of bands = " << numBands << endl;
+				//std::cout << "Number of bands = " << numBands << std::endl;
 				if((attributes[i]->bands[j] > numBands) | (attributes[i]->bands[j] < 0))
 				{
-					throw RSGISImageCalcException("The band attributes do not match the image.");
+					throw rsgis::img::RSGISImageCalcException("The band attributes do not match the image.");
 				}
 				// Calculates the minimum of the two input image bands
                 if(!isnan(attributes[i]->bands[j]))
@@ -2066,7 +2066,7 @@ namespace rsgis{namespace vec{
 		totalPxl++;
 	}
 	
-	double* RSGISCalcZonalStatsFromPolygon::getOutputValues() throw(RSGISImageCalcException)
+	double* RSGISCalcZonalStatsFromPolygon::getOutputValues() throw(rsgis::img::RSGISImageCalcException)
 	{
 		/* Calculte statistics and save to data array
 		 *  Array is in the form:
@@ -2126,7 +2126,7 @@ namespace rsgis{namespace vec{
 			outputValues[offset+1] = maxVal;
 			outputValues[offset+5] = values[i]->size();
 			
-			//cout << "values[i]->size() " << values[i]->size() << endl;
+			//std::cout << "values[i]->size() " << values[i]->size() << std::endl;
 			
 			// Calculate mean
 			if((sum != 0) && (values[i]->size() != 0))
@@ -2163,7 +2163,7 @@ namespace rsgis{namespace vec{
             {
                 if(values[i]->size() > 0)
                 {
-                    vector <int> *valuesInt = new vector <int>();
+                    std::vector<int> *valuesInt = new std::vector<int>();
                     
                     for (unsigned int j = 0; j < values[i]->size(); j++) 
                     {

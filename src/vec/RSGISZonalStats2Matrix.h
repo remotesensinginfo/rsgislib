@@ -36,8 +36,10 @@
 #include "vec/RSGISVectorZonalException.h"
 #include "vec/RSGISPolygonData.h"
 #include "vec/RSGISVectorIO.h"
+
 #include "math/RSGISMatrices.h"
 #include "math/RSGISMathsUtils.h"
+
 #include "vec/RSGISClassPolygon.h"
 #include "img/RSGISPolygonPixelCount.h"
 #include "img/RSGISCalcImageSingle.h"
@@ -50,17 +52,12 @@
 #include "geos/geom/Envelope.h"
 #include "geos/geom/Coordinate.h"
 
-using namespace std;
-using namespace rsgis::img;
-using namespace geos::geom;
-using namespace rsgis::math;
-
 namespace rsgis{namespace vec{
 		
 	struct ClassVariables
 	{
 		string name;
-		Matrix *matrix;
+        rsgis::math::Matrix *matrix;
 		int numPxls;
 	};
 	
@@ -68,8 +65,8 @@ namespace rsgis{namespace vec{
 	{
 	public:
 		RSGISZonalStats2Matrix();
-		ClassVariables** findPixelStats(GDALDataset **image, int numImgs, OGRLayer *shpfile, string classAttribute, int *numMatrices, pixelInPolyOption method);
-		Matrix** findPixelsForImageBand(GDALDataset **image, int numImgs, OGRLayer *shpfile, int *numMatrices, int band);
+		ClassVariables** findPixelStats(GDALDataset **image, int numImgs, OGRLayer *shpfile, string classAttribute, int *numMatrices, rsgis::img::pixelInPolyOption method);
+		rsgis::math::Matrix** findPixelsForImageBand(GDALDataset **image, int numImgs, OGRLayer *shpfile, int *numMatrices, int band);
 		~RSGISZonalStats2Matrix();
 	};
 }}

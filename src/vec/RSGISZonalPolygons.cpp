@@ -53,7 +53,7 @@ namespace rsgis{namespace vec{
 				shpField.SetPrecision(10);
 				if( outputSHPLayer->CreateField( &shpField ) != OGRERR_NONE )
 				{
-					string message = string("Creating shapefile field") + string(colname) + string(" has failed");
+					std::string message = std::string("Creating shapefile field") + std::string(colname) + std::string(" has failed");
 					throw RSGISVectorOutputException(message.c_str());
 				}
 			}
@@ -65,7 +65,7 @@ namespace rsgis{namespace vec{
 				shpField.SetPrecision(10);
 				if( outputSHPLayer->CreateField( &shpField ) != OGRERR_NONE )
 				{
-					string message = string("Creating shapefile field") + string(colname) + string(" has failed");
+					std::string message = std::string("Creating shapefile field") + std::string(colname) + std::string(" has failed");
 					throw RSGISVectorOutputException(message.c_str());
 				}
 			}
@@ -77,7 +77,7 @@ namespace rsgis{namespace vec{
 				shpField.SetPrecision(10);
 				if( outputSHPLayer->CreateField( &shpField ) != OGRERR_NONE )
 				{
-					string message = string("Creating shapefile field") + string(colname) + string(" has failed");
+					std::string message = std::string("Creating shapefile field") + std::string(colname) + std::string(" has failed");
 					throw RSGISVectorOutputException(message.c_str());
 				}
 			}
@@ -89,7 +89,7 @@ namespace rsgis{namespace vec{
 				shpField.SetPrecision(10);
 				if( outputSHPLayer->CreateField( &shpField ) != OGRERR_NONE )
 				{
-					string message = string("Creating shapefile field") + string(colname) + string(" has failed");
+					std::string message = std::string("Creating shapefile field") + std::string(colname) + std::string(" has failed");
 					throw RSGISVectorOutputException(message.c_str());
 				}
 			}

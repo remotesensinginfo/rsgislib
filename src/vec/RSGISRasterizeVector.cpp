@@ -28,18 +28,18 @@ namespace rsgis{namespace vec{
 
 	RSGISRasterizeVector::RSGISRasterizeVector()
 	{
-		this->method = pixelContainsPolyCenter;
+		this->method = rsgis::img::pixelContainsPolyCenter;
 	}
 	
-	GDALDataset* RSGISRasterizeVector::createDataset(GDALDriver *gdalDriver, OGRLayer *layer, string filename, float resolution, float constVal) throw(RSGISImageException)
+	GDALDataset* RSGISRasterizeVector::createDataset(GDALDriver *gdalDriver, OGRLayer *layer, std::string filename, float resolution, float constVal) throw(RSGISImageException)
 	{
 		RSGISVectorUtils vecUtils;
 		
 		OGRFeature *feature = NULL;
 		OGRGeometry *geometry = NULL;
 		
-		Envelope *env = new Envelope();
-		Envelope *tmpEnv = NULL;
+		geos::geom::Envelope *env = new geos::geom::Envelope();
+		geos::geom::Envelope *tmpEnv = NULL;
 		
 		layer->ResetReading();
 		while( (feature = layer->GetNextFeature()) != NULL )
@@ -56,7 +56,7 @@ namespace rsgis{namespace vec{
 		int imageWidth = (int) ((env->getWidth()/resolution)+1);
 		int imageHeight = (int) ((env->getHeight()/resolution)+1);
 		
-		cout << "Creating an Image: [" << imageWidth << "," << imageHeight << "]\n";
+		std::cout << "Creating an Image: [" << imageWidth << "," << imageHeight << "]\n";
 	
 		GDALDataset *imageDS = gdalDriver->Create(filename.c_str(), imageWidth, imageHeight, 1, GDT_Float32, gdalDriver->GetMetadata());
 		
@@ -98,13 +98,13 @@ namespace rsgis{namespace vec{
 		return imageDS;
 	}
 	
-	GDALDataset* RSGISRasterizeVector::createDataset(GDALDriver *gdalDriver, vector<Polygon*> *polys, string filename, float resolution, OGRSpatialReference *spatialRef, float constVal) throw(RSGISImageException)
+	GDALDataset* RSGISRasterizeVector::createDataset(GDALDriver *gdalDriver, std::vector<geos::geom::Polygon*> *polys, std::string filename, float resolution, OGRSpatialReference *spatialRef, float constVal) throw(RSGISImageException)
 	{
 		RSGISVectorUtils vecUtils;
 		
-		Geometry *geom = vecUtils.createGeomCollection(polys);
+		geos::geom::Geometry *geom = vecUtils.createGeomCollection(polys);
 		
-		Envelope *env = vecUtils.getEnvelope(geom);
+		geos::geom::Envelope *env = vecUtils.getEnvelope(geom);
 		
 		int imageWidth = (int) ((env->getWidth()/resolution)+0.5)+5;
 		int imageHeight = (int) ((env->getHeight()/resolution)+0.5)+5;
@@ -147,7 +147,7 @@ namespace rsgis{namespace vec{
 		return imageDS;
 	}
 
-	void RSGISRasterizeVector::rasterizeLayer(OGRLayer *layer, GDALDataset *image, string attribute, pixelInPolyOption method) throw(RSGISVectorException)
+	void RSGISRasterizeVector::rasterizeLayer(OGRLayer *layer, GDALDataset *image, std::string attribute, rsgis::img::pixelInPolyOption method) throw(RSGISVectorException)
 	{
 		this->method = method;
 		
@@ -158,13 +158,13 @@ namespace rsgis{namespace vec{
 			OGRFeature *feature = NULL;
 			OGRGeometry *geometry = NULL;
 			
-			Envelope *envImage = new Envelope();
+			geos::geom::Envelope *envImage = new geos::geom::Envelope();
 			double *gdalTranslation = new double[6];
 			image->GetGeoTransform(gdalTranslation);
 			envImage->init(gdalTranslation[0], (gdalTranslation[0]+(image->GetRasterXSize()*gdalTranslation[1])), (gdalTranslation[3]-image->GetRasterYSize()*gdalTranslation[1]), gdalTranslation[3]);
 			delete[] gdalTranslation;
 			
-			Envelope *env = NULL;
+			geos::geom::Envelope *env = NULL;
 			
 			bool useFID = false;
 			int fieldIdx = -1;
@@ -180,7 +180,7 @@ namespace rsgis{namespace vec{
 				fieldIdx = featureDefn->GetFieldIndex(attribute.c_str());
 				if(fieldIdx < 0)
 				{
-					string message = "This layer does not contain a field with the name \'" + attribute + "\'";
+					std::string message = "This layer does not contain a field with the name \'" + attribute + "\'";
 					throw RSGISVectorException(message.c_str());
 				}
 			}
@@ -194,14 +194,14 @@ namespace rsgis{namespace vec{
 			int feedbackCounter = 0;
 			int i = 0;
 			int notRasterized = 0; // Count for number of polygons not rasterized.
-			cout << "Started" << flush;
+			std::cout << "Started" << std::flush;
 			
 			layer->ResetReading();
 			while( (feature = layer->GetNextFeature()) != NULL )
 			{
 				if((numFeatures >= 10) && ((i % feedback) == 0))
 				{
-					cout << ".." << feedbackCounter << ".." << flush;
+					std::cout << ".." << feedbackCounter << ".." << std::flush;
 					feedbackCounter = feedbackCounter + 10;
 				}
 				++i;
@@ -219,13 +219,13 @@ namespace rsgis{namespace vec{
 					pxlValue = feature->GetFieldAsDouble(fieldIdx);
 				}
 				
-				//cout << "Pixel Value = " << pxlValue << endl;
+				//std::cout << "Pixel Value = " << pxlValue << std::endl;
 				
-				/*cout << "Image Size = " << envImage->getWidth() << " x " << envImage->getHeight() << endl;
-				cout << "Polygon Envelope Size = " << env->getWidth() << " x " << env->getHeight() << endl;
+				/*std::cout << "Image Size = " << envImage->getWidth() << " x " << envImage->getHeight() << std::endl;
+				std::cout << "Polygon Envelope Size = " << env->getWidth() << " x " << env->getHeight() << std::endl;
 				
-				cout << "Image X = " << envImage->getMinX() << " Image Y = " << envImage->getMinY() << endl;
-				cout << "Polygon X = " << env->getMinX() << " Polygon Y = " << env->getMinY() << endl;*/
+				std::cout << "Image X = " << envImage->getMinX() << " Image Y = " << envImage->getMinY() << std::endl;
+				std::cout << "Polygon X = " << env->getMinX() << " Polygon Y = " << env->getMinY() << std::endl;*/
 				
 				
 				if(envImage->contains(env))
@@ -238,17 +238,17 @@ namespace rsgis{namespace vec{
 				}
 				else
 				{
-					//cout << "NOT INSIDE IMAGE\n";
+					//std::cout << "NOT INSIDE IMAGE\n";
 					notRasterized++;
 				}
 				
 				delete env;
 				OGRFeature::DestroyFeature(feature);
 			}
-			cout << " Complete.\n";
+			std::cout << " Complete.\n";
 			if(notRasterized > 0)
 			{
-				cout << "WARNING " << notRasterized << " polygons were not rasterised.\n" << endl;
+				std::cout << "WARNING " << notRasterized << " polygons were not rasterised.\n" << std::endl;
 			}
 		}
 		catch(RSGISVectorException &e)
@@ -257,12 +257,12 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISRasterizeVector::rasterizeLayer(Geometry *geom, GDALDataset *image, bool useFID, float constVal, pixelInPolyOption method) throw(RSGISVectorException)
+	void RSGISRasterizeVector::rasterizeLayer(geos::geom::Geometry *geom, GDALDataset *image, bool useFID, float constVal, rsgis::img::pixelInPolyOption method) throw(RSGISVectorException)
 	{
 		this->method = method;
 		try
 		{
-			Envelope *envImage = new Envelope();
+			geos::geom::Envelope *envImage = new geos::geom::Envelope();
 			double *gdalTranslation = new double[6];
 			double resolution = gdalTranslation[1];
 			image->GetGeoTransform(gdalTranslation);
@@ -276,11 +276,11 @@ namespace rsgis{namespace vec{
 			float *inData = (float *) CPLMalloc(sizeof(float)*imgWidth);
 			float *outData = (float *) CPLMalloc(sizeof(float)*imgWidth);
 			
-			PrecisionModel *pm = new PrecisionModel();
-			GeometryFactory *geomFactory = new GeometryFactory(pm);
+			geos::geom::PrecisionModel *pm = new geos::geom::PrecisionModel();
+			geos::geom::GeometryFactory *geomFactory = new geos::geom::GeometryFactory(pm);
 			
-			Coordinate coord;
-			Point *pt = NULL;
+			geos::geom::Coordinate coord;
+			geos::geom::Point *pt = NULL;
 			
 			double pxlMinX = envImage->getMinX();
 			double pxlMaxY = envImage->getMaxY();
@@ -294,14 +294,14 @@ namespace rsgis{namespace vec{
 			
 			if(imgHeight >= 10)
 			{
-				cout << "Started" << flush;
+				std::cout << "Started" << std::flush;
 			}
 			
 			for(unsigned int i = 0; i < imgHeight; ++i)
 			{
 				if((imgHeight >= 10) && ((i % feedback) == 0))
 				{
-					cout << ".." << feedbackCounter << ".." << flush;
+					std::cout << ".." << feedbackCounter << ".." << std::flush;
 					feedbackCounter = feedbackCounter + 10;
 				}
 				
@@ -313,7 +313,7 @@ namespace rsgis{namespace vec{
 				{
 					pxlX = pxlMinX + halfPxlWidth;
 					pxlY = pxlMaxY - halfPxlWidth;
-					coord = Coordinate(pxlX, pxlY, 0);
+					coord = geos::geom::Coordinate(pxlX, pxlY, 0);
 					
 					pt = geomFactory->createPoint(coord);
 					
@@ -337,7 +337,7 @@ namespace rsgis{namespace vec{
 			}
 			if(imgHeight >= 10)
 			{
-				cout << " Complete.\n";
+				std::cout << " Complete.\n";
 			}
 			
 			delete[] inData;
@@ -352,7 +352,7 @@ namespace rsgis{namespace vec{
 		}
 	}
 
-	int RSGISRasterizeVector::editPixels(GDALDataset *image, float pixelValue, Envelope *env, OGRGeometry *geom) throw(RSGISImageException)
+	int RSGISRasterizeVector::editPixels(GDALDataset *image, float pixelValue, geos::geom::Envelope *env, OGRGeometry *geom) throw(RSGISImageException)
 	{
 		long pixelsEdited = 0; // Count for number of pixels edited
 		
@@ -360,7 +360,7 @@ namespace rsgis{namespace vec{
 		{
 			//env = vecUtils.getEnvelopePixelBuffer(geom, resolution);
 			
-			Envelope *envImage = new Envelope();
+			geos::geom::Envelope *envImage = new geos::geom::Envelope();
 			double *gdalTranslation = new double[6];
 			image->GetGeoTransform(gdalTranslation);
 			envImage->init(gdalTranslation[0], (gdalTranslation[0]+(image->GetRasterXSize()*gdalTranslation[1])), (gdalTranslation[3]-image->GetRasterYSize()*gdalTranslation[1]), gdalTranslation[3]);
@@ -385,7 +385,7 @@ namespace rsgis{namespace vec{
 				height = (int)((env->getHeight()/resolution)+0.5);
 			}
 
-			//cout << "Start: [" << startXPxl << "," << startYPxl << "]\t Width = " << width << " Height = " << height << endl;
+			//std::cout << "Start: [" << startXPxl << "," << startYPxl << "]\t Width = " << width << " Height = " << height << std::endl;
 			
 			GDALRasterBand *imageBand = image->GetRasterBand(1);
 			float *inData = (float *) CPLMalloc(sizeof(float)*width);
@@ -399,8 +399,8 @@ namespace rsgis{namespace vec{
 			OGRLinearRing *ring = NULL;
 			OGRPolygon *poly = NULL;
 			
-			RSGISPixelInPoly *pixelInPoly = NULL;
-			pixelInPoly = new RSGISPixelInPoly(method);
+            rsgis::img::RSGISPixelInPoly *pixelInPoly = NULL;
+			pixelInPoly = new rsgis::img::RSGISPixelInPoly(method);
 			
 			for(int i = 0; i < height; ++i)
 			{
@@ -417,7 +417,7 @@ namespace rsgis{namespace vec{
 				for(int j = 0; j < width; ++j)
 				{
 					
-					if (method == polyContainsPixelCenter) 
+					if (method == rsgis::img::polyContainsPixelCenter) 
 					{
 						// For pixelContainsPolyCenter, quicker to calculate here.
 						OGRPoint *centerPoint = NULL;
@@ -463,7 +463,7 @@ namespace rsgis{namespace vec{
 						delete poly;
 					}
 					
-					//cout << endl;
+					//std::cout << std::endl;
 									
 					pxlXMin += resolution;
 					pxlXMax += resolution;
@@ -506,7 +506,7 @@ namespace rsgis{namespace vec{
 			int width = (int)((env->getWidth()/resolution)+0.5);
 			int height = (int)((env->getHeight()/resolution)+0.5);
 			
-			//cout << "Start: [" << startXPxl << "," << startYPxl << "]\t Width = " << width << " Height = " << height << endl;
+			//std::cout << "Start: [" << startXPxl << "," << startYPxl << "]\t Width = " << width << " Height = " << height << std::endl;
 			
 			GDALRasterBand *imageBand = image->GetRasterBand(1);
 			float *inData = (float *) CPLMalloc(sizeof(float)*width);

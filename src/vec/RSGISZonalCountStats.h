@@ -41,11 +41,6 @@
 
 #include "geos/geom/Envelope.h"
 
-using namespace std;
-using namespace rsgis;
-using namespace rsgis::img;
-using namespace geos::geom;
-
 namespace rsgis{namespace vec{
 	
 	struct CountAttributes
@@ -56,13 +51,12 @@ namespace rsgis{namespace vec{
 		float *thresholds;
 	};
 	
-	
 	class RSGISZonalCountStats : public RSGISProcessOGRFeature
 		{
 		public:
 			RSGISZonalCountStats(GDALDataset *image, GDALDataset *rasterFeatures, CountAttributes** attributes, int numAttributes, bool outPxlCount, bool outEmptyCount);
-			virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, Envelope *env, long fid) throw(RSGISVectorException);
-			virtual void processFeature(OGRFeature *feature, Envelope *env, long fid) throw(RSGISVectorException);
+			virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
+			virtual void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
 			virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException);
 			virtual ~RSGISZonalCountStats();
 		protected:
@@ -73,20 +67,20 @@ namespace rsgis{namespace vec{
 			double *data;
 			bool outPxlCount;
 			bool outEmptyCount;
-			RSGISCalcImageSingle *calcImage;
-			RSGISCalcImageSingleValue *calcValue;
+            rsgis::img::RSGISCalcImageSingle *calcImage;
+			rsgis::img::RSGISCalcImageSingleValue *calcValue;
 		};
 	
 	
-	class RSGISCalcZonalCountFromRasterPolygon : public RSGISCalcImageSingleValue
+	class RSGISCalcZonalCountFromRasterPolygon : public rsgis::img::RSGISCalcImageSingleValue
 		{
 		public: 
 			RSGISCalcZonalCountFromRasterPolygon(int numOutputValues, CountAttributes **attributes, int numAttributes);
-			void calcImageValue(float *bandValuesImageA, float *bandValuesImageB, int numBands, int bandA, int bandB) throw(RSGISImageCalcException);
-			void calcImageValue(float *bandValuesImage, int numBands, int band) throw(RSGISImageCalcException);
-			void calcImageValue(float *bandValuesImage, int numBands, Envelope *extent) throw(RSGISImageCalcException);
-			void calcImageValue(float *bandValuesImage, double interceptArea, int numBands, Polygon *poly, Point *pt) throw(RSGISImageCalcException);
-			double* getOutputValues() throw(RSGISImageCalcException);
+			void calcImageValue(float *bandValuesImageA, float *bandValuesImageB, int numBands, int bandA, int bandB) throw(rsgis::img::RSGISImageCalcException);
+			void calcImageValue(float *bandValuesImage, int numBands, int band) throw(rsgis::img::RSGISImageCalcException);
+			void calcImageValue(float *bandValuesImage, int numBands, geos::geom::Envelope *extent) throw(rsgis::img::RSGISImageCalcException);
+			void calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt) throw(rsgis::img::RSGISImageCalcException);
+			double* getOutputValues() throw(rsgis::img::RSGISImageCalcException);
 			void reset();
 			~RSGISCalcZonalCountFromRasterPolygon();
 		protected:

@@ -26,7 +26,7 @@
 
 namespace rsgis{namespace vec{
 	
-	RSGISVectorZonalStatsPtxtOut::RSGISVectorZonalStatsPtxtOut(GDALDataset *image, RSGISExportForPlottingIncremental *plotter, int bX, int bY, int bZ, int bC ) throw(RSGISVectorException)
+	RSGISVectorZonalStatsPtxtOut::RSGISVectorZonalStatsPtxtOut(GDALDataset *image, rsgis::utils::RSGISExportForPlottingIncremental *plotter, int bX, int bY, int bZ, int bC ) throw(RSGISVectorException)
 	{
 		this->plotter = plotter;
 		this->bX = bX;
@@ -41,7 +41,7 @@ namespace rsgis{namespace vec{
 			bands[i] = image->GetRasterBand(i+1);
 		}
 		
-		if(plotter->getPlotType() == scatter2d)
+		if(plotter->getPlotType() == rsgis::utils::scatter2d)
 		{
 			if(bX < 0 | bY < 0)
 			{
@@ -53,7 +53,7 @@ namespace rsgis{namespace vec{
 				throw RSGISVectorException("Either bX or bY are greater than the number of image bands");
 			}
 		}
-		else if(plotter->getPlotType() == cscatter2d)
+		else if(plotter->getPlotType() == rsgis::utils::cscatter2d)
 		{
 			if(bX < 0 | bY < 0 | bC < 0)
 			{
@@ -65,7 +65,7 @@ namespace rsgis{namespace vec{
 				throw RSGISVectorException("Either bX or bY or bC are greater than the number of image bands");
 			}
 		}
-		else if(plotter->getPlotType() == scatter3d)
+		else if(plotter->getPlotType() == rsgis::utils::scatter3d)
 		{
 			if(bX < 0 | bY < 0 | bZ < 0)
 			{
@@ -77,7 +77,7 @@ namespace rsgis{namespace vec{
 				throw RSGISVectorException("Either bX or bY or bZ are greater than the number of image bands");
 			}
 		}
-		else if(plotter->getPlotType() == cscatter3d)
+		else if(plotter->getPlotType() == rsgis::utils::cscatter3d)
 		{
 			if(bX < 0 | bY < 0 | bZ < 0 | bC < 0)
 			{
@@ -104,7 +104,7 @@ namespace rsgis{namespace vec{
 			double xMax = geoTransform[0] + (image->GetRasterXSize() * geoTransform[1]);
 			double yMin = geoTransform[3] + (image->GetRasterYSize() * geoTransform[5]);
 			
-			imageExtent = new Envelope(xMin, xMax, yMin, yMax);
+			imageExtent = new geos::geom::Envelope(xMin, xMax, yMin, yMax);
 			
 			imgRes = geoTransform[1];
 						
@@ -113,7 +113,7 @@ namespace rsgis{namespace vec{
 		
 	}
 	
-	void RSGISVectorZonalStatsPtxtOut::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISVectorZonalStatsPtxtOut::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
 	{
 		OGRGeometry *geometry = inFeature->GetGeometryRef();
 		if( geometry != NULL && wkbFlatten(geometry->getGeometryType()) == wkbPolygon )
@@ -143,19 +143,19 @@ namespace rsgis{namespace vec{
 				
 				float *values = this->getPixelColumns(xPxl, yPxl);
 				
-				if(plotter->getPlotType() == scatter2d)
+				if(plotter->getPlotType() == rsgis::utils::scatter2d)
 				{
 					plotter->writeScatter2DLine(values[bX], values[bY]);
 				}
-				else if(plotter->getPlotType() == cscatter2d)
+				else if(plotter->getPlotType() == rsgis::utils::cscatter2d)
 				{
 					plotter->writeCScatter2DLine(values[bX], values[bY], values[bC]);
 				}
-				else if(plotter->getPlotType() == scatter3d)
+				else if(plotter->getPlotType() == rsgis::utils::scatter3d)
 				{
 					plotter->writeScatter3DLine(values[bX], values[bY], values[bZ]);
 				}
-				else if(plotter->getPlotType() == cscatter3d)
+				else if(plotter->getPlotType() == rsgis::utils::cscatter3d)
 				{
 					plotter->writeCScatter3DLine(values[bX], values[bY], values[bZ], values[bC]);
 				}
@@ -166,7 +166,7 @@ namespace rsgis{namespace vec{
 			}
 			else 
 			{
-				cout << "WARNING: Point not within image\n";
+                std::cout << "WARNING: Point not within image\n";
 			}
 		}	
 		else if( geometry != NULL && wkbFlatten(geometry->getGeometryType()) == wkbLineString )
@@ -176,7 +176,7 @@ namespace rsgis{namespace vec{
 		}
 		else if(geometry != NULL)
 		{
-			string message = string("Unsupport data type: ") + string(geometry->getGeometryName());
+            std::string message = std::string("Unsupport data type: ") + std::string(geometry->getGeometryName());
 			throw RSGISVectorException(message);
 		}
 		else 
@@ -185,7 +185,7 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISVectorZonalStatsPtxtOut::processFeature(OGRFeature *feature, Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISVectorZonalStatsPtxtOut::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
 	{
 		throw RSGISVectorException("Not implemented");
 	}

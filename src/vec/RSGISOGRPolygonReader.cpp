@@ -25,17 +25,17 @@
 
 namespace rsgis{namespace vec{
 	
-	RSGISOGRPolygonReader::RSGISOGRPolygonReader(vector<OGRPolygon*> *polygons)
+	RSGISOGRPolygonReader::RSGISOGRPolygonReader(std::vector<OGRPolygon*> *polygons)
 	{
 		this->polygons = polygons;
 	}
 	
-	void RSGISOGRPolygonReader::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISOGRPolygonReader::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
 	{
 		throw RSGISVectorException("Not implemented..");
 	}
 	
-	void RSGISOGRPolygonReader::processFeature(OGRFeature *feature, Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISOGRPolygonReader::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
 	{
 		OGRwkbGeometryType geometryType = feature->GetGeometryRef()->getGeometryType();
 		
@@ -47,7 +47,7 @@ namespace rsgis{namespace vec{
 		} 
 		else
 		{
-			string message = string("Unsupport data type: ") + string(feature->GetGeometryRef()->getGeometryName());
+			std::string message = std::string("Unsupport data type: ") + std::string(feature->GetGeometryRef()->getGeometryName());
 			throw RSGISVectorException(message);
 		}
 	}

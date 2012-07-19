@@ -37,22 +37,18 @@
 
 #include "geos/geom/Envelope.h"
 
-using namespace std;
-using namespace rsgis;
-using namespace geos::geom;
-
 namespace rsgis{namespace vec{
 	
 	class RSGISConvertToASCII : public RSGISProcessOGRFeature
 		{
 		public:
-			RSGISConvertToASCII(string outputTextFile);
-			void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, Envelope *env, long fid) throw(RSGISVectorException);
-			void processFeature(OGRFeature *feature, Envelope *env, long fid) throw(RSGISVectorException);
+			RSGISConvertToASCII(std::string outputTextFile);
+			void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
+			void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
 			void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException);
 			~RSGISConvertToASCII();
 		protected:
-			string outputTextFile;
+            std::string outputTextFile;
 			ofstream outTxtFile;
 			OGRFeatureDefn *featureDefn;
 			OGRGeometry *geometry;

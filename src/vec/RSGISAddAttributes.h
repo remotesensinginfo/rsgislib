@@ -35,16 +35,12 @@
 #include "vec/RSGISProcessOGRFeature.h"
 	
 #include "geos/geom/Envelope.h"
-	
-using namespace std;
-using namespace rsgis;
-using namespace geos::geom;
 
 namespace rsgis{namespace vec{
 	
 	struct Attribute
 	{
-		string name;
+        std::string name;
 		OGRFieldType type;
 	};
 	
@@ -52,8 +48,8 @@ namespace rsgis{namespace vec{
 		{
 		public:
 			RSGISAddAttributes(Attribute **attributes, int numAttributes);
-			virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, Envelope *env, long fid) throw(RSGISVectorException);
-			virtual void processFeature(OGRFeature *feature, Envelope *env, long fid) throw(RSGISVectorException);
+			virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(rsgis::RSGISVectorException);
+			virtual void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(rsgis::RSGISVectorException);
 			virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException);
 			virtual ~RSGISAddAttributes();
 		protected:

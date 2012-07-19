@@ -36,24 +36,20 @@
 
 #include "geos/geom/Envelope.h"
 
-using namespace std;
-using namespace rsgis;
-using namespace geos::geom;
-
 namespace rsgis{namespace vec{
 	
 	class RSGISVectorAttributeFindReplace : public RSGISProcessOGRFeature
 		{
 		public:
-			RSGISVectorAttributeFindReplace(string attribute, string find, string replace);
-			virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, Envelope *env, long fid) throw(RSGISVectorException);
-			virtual void processFeature(OGRFeature *feature, Envelope *env, long fid) throw(RSGISVectorException);
+			RSGISVectorAttributeFindReplace(std::string attribute, std::string find, std::string replace);
+			virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
+			virtual void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
 			virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException);
 			virtual ~RSGISVectorAttributeFindReplace();
 		protected:
-			string attribute;
-			string find;
-			string replace;
+			std::string attribute;
+			std::string find;
+			std::string replace;
 		};
 }}
 

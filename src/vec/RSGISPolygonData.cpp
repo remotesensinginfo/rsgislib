@@ -28,8 +28,8 @@ namespace rsgis{namespace vec{
 	RSGISPolygonData::RSGISPolygonData()
 	{
 		polygonType = true;
-		multiPolygonGeom = RSGISGEOSFactoryGenerator::getInstance()->getFactory()->createMultiPolygon();
-		polygonGeom = RSGISGEOSFactoryGenerator::getInstance()->getFactory()->createPolygon();
+		multiPolygonGeom = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory()->createMultiPolygon();
+		polygonGeom = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory()->createPolygon();
 		envelope = NULL;
 	}
 	
@@ -40,7 +40,7 @@ namespace rsgis{namespace vec{
 		
 		if(polygonGeom != NULL)
 		{
-			RSGISGEOSFactoryGenerator::getInstance()->getFactory()->destroyGeometry(polygonGeom);
+			rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory()->destroyGeometry(polygonGeom);
 		}
 		
 		polygonGeom = vecUtils.convertOGRPolygon2GEOSPolygon(polygon);
@@ -54,7 +54,7 @@ namespace rsgis{namespace vec{
 		
 		if(multiPolygonGeom != NULL)
 		{
-			RSGISGEOSFactoryGenerator::getInstance()->getFactory()->destroyGeometry(multiPolygonGeom);
+			rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory()->destroyGeometry(multiPolygonGeom);
 		}
 		
 		multiPolygonGeom = vecUtils.convertOGRMultiPolygonGEOSMultiPolygon(multipolygon);
@@ -63,8 +63,8 @@ namespace rsgis{namespace vec{
 	
 	double RSGISPolygonData::distance(RSGISPolygonData *data)
 	{
-		Geometry *thisGeom = NULL;
-		Geometry *dataGeom = NULL;
+        geos::geom::Geometry *thisGeom = NULL;
+		geos::geom::Geometry *dataGeom = NULL;
 		if(this->polygonType)
 		{
 			thisGeom = this->polygonGeom;
@@ -90,18 +90,18 @@ namespace rsgis{namespace vec{
 	{
 		if(polygonType)
 		{
-			cout << polygonGeom->toString() << endl;
+			std::cout << polygonGeom->toString() << std::endl;
 		}
 		else
 		{
-			cout << multiPolygonGeom->toString() << endl;
+			std::cout << multiPolygonGeom->toString() << std::endl;
 		}
 	}
 	
-	bool RSGISPolygonData::contains(Coordinate *coord)
+	bool RSGISPolygonData::contains(geos::geom::Coordinate *coord)
 	{
 		RSGISVectorUtils vecUtils;
-		Geometry *geom = (Geometry *) vecUtils.createPoint(coord);
+		geos::geom::Geometry *geom = (geos::geom::Geometry *) vecUtils.createPoint(coord);
 		
 		bool contains = false;
 		if(polygonType)
@@ -116,7 +116,7 @@ namespace rsgis{namespace vec{
 		return contains;
 	}
 
-	bool RSGISPolygonData::contains(Geometry *geom)
+	bool RSGISPolygonData::contains(geos::geom::Geometry *geom)
 	{
 		bool contains = false;
 		if(polygonType)
@@ -130,26 +130,26 @@ namespace rsgis{namespace vec{
 		return contains;
 	}
 	
-	Envelope* RSGISPolygonData::getBBox()
+	geos::geom::Envelope* RSGISPolygonData::getBBox()
 	{
 		return envelope;
 	}
 	
-	Polygon* RSGISPolygonData::getPolygon()
+	geos::geom::Polygon* RSGISPolygonData::getPolygon()
 	{
 		return polygonGeom;
 	}
 	
-	void RSGISPolygonData::setPolygon(Polygon *polygon)
+	void RSGISPolygonData::setPolygon(geos::geom::Polygon *polygon)
 	{
 		polygonType = true;
 		
 		if(polygonGeom != NULL)
 		{
-			RSGISGEOSFactoryGenerator::getInstance()->getFactory()->destroyGeometry(polygonGeom);
+			rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory()->destroyGeometry(polygonGeom);
 		}
 		
-		this->polygonGeom = dynamic_cast<Polygon*>(RSGISGEOSFactoryGenerator::getInstance()->getFactory()->createGeometry(polygon));
+		this->polygonGeom = dynamic_cast<geos::geom::Polygon*>(rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory()->createGeometry(polygon));
 		
 		//this->polygonGeom = (Polygon*) polygon->clone();
 		RSGISVectorUtils vecUtils;
@@ -157,7 +157,7 @@ namespace rsgis{namespace vec{
 		envelope = vecUtils.getEnvelope(polygonGeom);
 	}
 	
-	Geometry* RSGISPolygonData::getGeometry()
+	geos::geom::Geometry* RSGISPolygonData::getGeometry()
 	{
 		if(polygonType)
 		{
@@ -171,11 +171,11 @@ namespace rsgis{namespace vec{
 		delete envelope;
 		if(polygonGeom != NULL)
 		{
-			RSGISGEOSFactoryGenerator::getInstance()->getFactory()->destroyGeometry(polygonGeom);
+			rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory()->destroyGeometry(polygonGeom);
 		}
 		if(multiPolygonGeom != NULL)
 		{
-			RSGISGEOSFactoryGenerator::getInstance()->getFactory()->destroyGeometry(multiPolygonGeom);
+			rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory()->destroyGeometry(multiPolygonGeom);
 		}
 	}
 

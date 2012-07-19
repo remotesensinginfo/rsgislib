@@ -27,19 +27,19 @@
 
 namespace rsgis{namespace vec{
 	
-	RSGISIntValuePolygonReader::RSGISIntValuePolygonReader(string valueattribute, list<RSGIS2DPoint*> *data)
+	RSGISIntValuePolygonReader::RSGISIntValuePolygonReader(std::string valueattribute, std::list<rsgis::geom::RSGIS2DPoint*> *data)
 	{
 		this->valueattribute = valueattribute;
 		vecUtils = new RSGISVectorUtils();
 		this->data = data;
 	}
 	
-	void RSGISIntValuePolygonReader::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISIntValuePolygonReader::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
 	{
 		throw RSGISVectorException("Not implemented..");
 	}
 	
-	void RSGISIntValuePolygonReader::processFeature(OGRFeature *feature, Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISIntValuePolygonReader::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
 	{
 		//cout << "FID: " << fid << endl;
 		// Set up the Species Polygon object and add to Delunay triangulation.
@@ -52,7 +52,7 @@ namespace rsgis{namespace vec{
 		int valueattributeIdx = featureDefn->GetFieldIndex(this->valueattribute.c_str());
 		if(valueattributeIdx < 0)
 		{
-			string message = "This layer does not contain a field with the name \'" + this->valueattribute + "\'";
+			std::string message = "This layer does not contain a field with the name \'" + this->valueattribute + "\'";
 			throw RSGISVectorException(message.c_str());
 		}
 		int value = feature->GetFieldAsInteger(valueattributeIdx);
@@ -62,7 +62,7 @@ namespace rsgis{namespace vec{
 			RSGISIntValuePolygon *tmpValuePoly = new RSGISIntValuePolygon();
 			tmpValuePoly->setValue(value);
 			OGRPolygon *polygon = (OGRPolygon *) feature->GetGeometryRef();
-			Polygon *geosPoly = vecUtils->convertOGRPolygon2GEOSPolygon(polygon);
+			geos::geom::Polygon *geosPoly = vecUtils->convertOGRPolygon2GEOSPolygon(polygon);
 			tmpValuePoly->setPolygon(geosPoly);
 			data->push_back(tmpValuePoly);
 		} 
@@ -70,13 +70,13 @@ namespace rsgis{namespace vec{
 		{
 			RSGISIntValuePolygon *tmpValuePoly = NULL;
 			
-			RSGISGeometry geomUtils;
+            rsgis::geom::RSGISGeometry geomUtils;
 			OGRMultiPolygon *mPolygon = (OGRMultiPolygon *) feature->GetGeometryRef();
 			//cout << polygon->exportToGML() << endl;
-			MultiPolygon *mGEOSPolygon = vecUtils->convertOGRMultiPolygonGEOSMultiPolygon(mPolygon);
-			vector<Polygon*> *polys = new vector<Polygon*>();
+			geos::geom::MultiPolygon *mGEOSPolygon = vecUtils->convertOGRMultiPolygonGEOSMultiPolygon(mPolygon);
+            std::vector<geos::geom::Polygon*> *polys = new std::vector<geos::geom::Polygon*>();
 			geomUtils.retrievePolygons(mGEOSPolygon, polys);
-			vector<Polygon*>::iterator iterPolys = polys->begin();
+            std::vector<geos::geom::Polygon*>::iterator iterPolys = polys->begin();
 			while(iterPolys != polys->end())
 			{
 				tmpValuePoly = new RSGISIntValuePolygon();
@@ -89,7 +89,7 @@ namespace rsgis{namespace vec{
 		} 
 		else
 		{
-			string message = string("Unsupport data type: ") + string(feature->GetGeometryRef()->getGeometryName());
+			std::string message = std::string("Unsupport data type: ") + std::string(feature->GetGeometryRef()->getGeometryName());
 			throw RSGISVectorException(message);
 		}
 		

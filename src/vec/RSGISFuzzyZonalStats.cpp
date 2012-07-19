@@ -25,7 +25,7 @@
 
 namespace rsgis{namespace vec{
 	
-	RSGISFuzzyZonalStats::RSGISFuzzyZonalStats(GDALDataset *image, GDALDataset *rasterFeatures, FuzzyAttributes** attributes, int numAttributes, float binSize, float threshold, bool outPxlCount, string classattribute)
+	RSGISFuzzyZonalStats::RSGISFuzzyZonalStats(GDALDataset *image, GDALDataset *rasterFeatures, FuzzyAttributes** attributes, int numAttributes, float binSize, float threshold, bool outPxlCount, std::string classattribute)
 	{
 		this->datasets = new GDALDataset*[2];
 		this->datasets[0] = rasterFeatures;
@@ -37,19 +37,19 @@ namespace rsgis{namespace vec{
 		this->binSize = binSize;
 		this->classattribute = classattribute;
 		
-		cout << "numAttributes = " << numAttributes << endl;
+		std::cout << "numAttributes = " << numAttributes << std::endl;
 		
 		dataSize = numAttributes + 1; // 0 Pxl Count // 1 ..  n Attribute data
 		data = new double[dataSize];
-		cout << "Data Size: " << dataSize << endl;
+		std::cout << "Data Size: " << dataSize << std::endl;
 		
 		calcValue = new RSGISCalcFuzzyZonalStatsFromRasterPolygon(dataSize, attributes, numAttributes, binSize, threshold);
-		calcImage = new RSGISCalcImageSingle(calcValue);
+		calcImage = new rsgis::img::RSGISCalcImageSingle(calcValue);
 		
 		this->setupFuzzyAttributes();
 	}
 	
-	void RSGISFuzzyZonalStats::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISFuzzyZonalStats::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
 	{
 		try
 		{
@@ -62,11 +62,11 @@ namespace rsgis{namespace vec{
 			int classFieldIndex = featureDefn->GetFieldIndex(classattribute.c_str());
 			if(classFieldIndex < 0)
 			{
-				string message = "This layer does not contain a field with the name \'" + classattribute + "\'";
+				std::string message = "This layer does not contain a field with the name \'" + classattribute + "\'";
 				throw RSGISVectorException(message.c_str());
 			}
 			
-			string featureClassGroup = string(inFeature->GetFieldAsString(classFieldIndex));
+			std::string featureClassGroup = std::string(inFeature->GetFieldAsString(classFieldIndex));
 
 			bool contained = false;
 			for(unsigned int n = 0; n < classSets->size(); n++)
@@ -93,7 +93,7 @@ namespace rsgis{namespace vec{
 				}
 				else
 				{
-					string message = "Hard not defined and unknown feature found: " + featureClassGroup;
+					std::string message = "Hard not defined and unknown feature found: " + featureClassGroup;
 					throw RSGISVectorException(message.c_str());
 				}
 			}
@@ -120,26 +120,26 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISFuzzyZonalStats::processFeature(OGRFeature *feature, Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISFuzzyZonalStats::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
 	{
 		throw RSGISVectorException("Not Implemented");
 	}
 	
 	void RSGISFuzzyZonalStats::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException)
 	{
-		cout << "(dataSize-1) = " << (dataSize-1) << endl;
+		std::cout << "(dataSize-1) = " << (dataSize-1) << std::endl;
 		for(int i = 0; i < (dataSize-1); i++)
 		{
 			if(attributes[i]->name.length() > 10)
 			{
-				cout << attributes[i]->name << " will be truncated to \'" << attributes[i]->name.substr(0, 10) << "\'\n";
+				std::cout << attributes[i]->name << " will be truncated to \'" << attributes[i]->name.substr(0, 10) << "\'\n";
 				attributes[i]->name = attributes[i]->name.substr(0, 10);
 			}
 			OGRFieldDefn shpField(attributes[i]->name.c_str(), OFTReal);
 			shpField.SetPrecision(10);
 			if(outputLayer->CreateField( &shpField ) != OGRERR_NONE )
 			{
-				string message = string("Creating shapefile field ") + attributes[i]->name + string(" has failed");
+				std::string message = std::string("Creating shapefile field ") + attributes[i]->name + std::string(" has failed");
 				throw RSGISVectorOutputException(message.c_str());
 			}
 		}
@@ -150,7 +150,7 @@ namespace rsgis{namespace vec{
 			shpField.SetPrecision(10);
 			if( outputLayer->CreateField( &shpField ) != OGRERR_NONE )
 			{
-				string message = string("Creating shapefile field \'TotalPxls\' has failed");
+				std::string message = std::string("Creating shapefile field \'TotalPxls\' has failed");
 				throw RSGISVectorOutputException(message.c_str());
 			}
 		}
@@ -159,11 +159,11 @@ namespace rsgis{namespace vec{
 	
 	void RSGISFuzzyZonalStats::setupFuzzyAttributes()
 	{
-		classSets = new vector<FuzzyClassSet*>();
+		classSets = new std::vector<FuzzyClassSet*>();
 			
 		int groupIdx = 0;
 		
-		string featureClassGroup = "";
+		std::string featureClassGroup = "";
 		
 		bool first = true;
 		bool contained = false;
@@ -204,10 +204,10 @@ namespace rsgis{namespace vec{
 			}
 		}
 		foundHard = false;
-		cout << "The following class groups have been found: \n";
+		std::cout << "The following class groups have been found: \n";
 		for(unsigned int i = 0; i < classSets->size(); i++)
 		{
-			cout << i << ": " << classSets->at(i)->name << " index = " << classSets->at(i)->index << " count = " << classSets->at(i)->count << endl;
+			std::cout << i << ": " << classSets->at(i)->name << " index = " << classSets->at(i)->index << " count = " << classSets->at(i)->count << std::endl;
 			if(classSets->at(i)->name == "Hard")
 			{
 				hardGroupIndex = i;
@@ -216,11 +216,11 @@ namespace rsgis{namespace vec{
 		}
 		if(!foundHard)
 		{
-			cout << "No \'Hard\' group found, therefore if are any unknown groups objects an error will be thrown.\n";
+			std::cout << "No \'Hard\' group found, therefore if are any unknown groups objects an error will be thrown.\n";
 		}
 		else
 		{
-			cout << "\'Hard\' group found, all unknown groups objects will be asigned to this.\n";
+			std::cout << "\'Hard\' group found, all unknown groups objects will be asigned to this.\n";
 		}
 		
 		groupedAttributes = new FuzzyAttributes**[classSets->size()];
@@ -254,10 +254,10 @@ namespace rsgis{namespace vec{
 		
 		for(unsigned int i = 0; i < classSets->size(); i++)
 		{
-			cout << " *** " << classSets->at(i)->name << " *** \n";
+			std::cout << " *** " << classSets->at(i)->name << " *** \n";
 			for(int j = 0; j < classSets->at(i)->count; j++)
 			{
-				cout << j << ") " << groupedAttributes[i][j]->name << " - " << groupedAttributes[i][j]->fuzzyClass << endl;
+				std::cout << j << ") " << groupedAttributes[i][j]->name << " - " << groupedAttributes[i][j]->fuzzyClass << std::endl;
 			}
 		}
 	}
@@ -271,7 +271,7 @@ namespace rsgis{namespace vec{
 		delete[] groupedAttributes;
 
 		FuzzyClassSet *tmpFuzzySet = NULL;
-		vector<FuzzyClassSet*>::iterator iter;
+		std::vector<FuzzyClassSet*>::iterator iter;
     		for( iter = classSets->begin(); iter != classSets->end(); iter++ ) 
 		{
 			tmpFuzzySet = *iter;
@@ -291,7 +291,7 @@ namespace rsgis{namespace vec{
 	}
 	
 	
-	RSGISCalcFuzzyZonalStatsFromRasterPolygon::RSGISCalcFuzzyZonalStatsFromRasterPolygon(int numOutputValues, FuzzyAttributes **attributes, int numAttributes, float binsize, float hardThreshold) : RSGISCalcImageSingleValue(numOutputValues)
+	RSGISCalcFuzzyZonalStatsFromRasterPolygon::RSGISCalcFuzzyZonalStatsFromRasterPolygon(int numOutputValues, FuzzyAttributes **attributes, int numAttributes, float binsize, float hardThreshold) : rsgis::img::RSGISCalcImageSingleValue(numOutputValues)
 	{
 		this->attributes = attributes;
 		this->numAttributes = numAttributes;
@@ -311,7 +311,7 @@ namespace rsgis{namespace vec{
 		}
 		this->numBins = count;
 		
-		cout << "Number of Bins = " << this->numBins << endl;
+		std::cout << "Number of Bins = " << this->numBins << std::endl;
 		
 		value = lowerValue;
 		this->binRange = new float[numBins+1];
@@ -324,7 +324,7 @@ namespace rsgis{namespace vec{
 		
 		for(int i = 0; i < numBins; i++)
 		{
-			cout << i << ")\t" << binRange[i] << " - " << binRange[i+1] << endl;
+			std::cout << i << ")\t" << binRange[i] << " - " << binRange[i+1] << std::endl;
 		}
 		
 		histograms = new int*[(this->numOutputValues-1)];
@@ -338,12 +338,12 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISCalcFuzzyZonalStatsFromRasterPolygon::calcImageValue(float *bandValuesImageA, float *bandValuesImageB, int numBands, int bandA, int bandB) throw(RSGISImageCalcException)
+	void RSGISCalcFuzzyZonalStatsFromRasterPolygon::calcImageValue(float *bandValuesImageA, float *bandValuesImageB, int numBands, int bandA, int bandB) throw(rsgis::img::RSGISImageCalcException)
 	{
-		throw RSGISImageCalcException("Not implemented");
+		throw rsgis::img::RSGISImageCalcException("Not implemented");
 	}
 	
-	void RSGISCalcFuzzyZonalStatsFromRasterPolygon::calcImageValue(float *bandValuesImage, int numBands, int band) throw(RSGISImageCalcException)
+	void RSGISCalcFuzzyZonalStatsFromRasterPolygon::calcImageValue(float *bandValuesImage, int numBands, int band) throw(rsgis::img::RSGISImageCalcException)
 	{
 		float min = 0;
 		int histogramBin = 0;
@@ -359,7 +359,7 @@ namespace rsgis{namespace vec{
 			{
 				if(attributes[i]->bands[j] > (numBands-1) | attributes[i]->bands[j] < 0)
 				{
-					throw RSGISImageCalcException("The band attributes do not match the image.");
+					throw rsgis::img::RSGISImageCalcException("The band attributes do not match the image.");
 				}
 				if(first)
 				{
@@ -385,7 +385,7 @@ namespace rsgis{namespace vec{
 			}
 			if(!histogramBinFound)
 			{
-				throw RSGISImageCalcException("Value outside histogram range (0 - 1)");
+				throw rsgis::img::RSGISImageCalcException("Value outside histogram range (0 - 1)");
 			}
 			
 			histograms[attributes[i]->index][histogramBin]++;
@@ -393,17 +393,17 @@ namespace rsgis{namespace vec{
 		numPxls++;
 	}
 	
-	void RSGISCalcFuzzyZonalStatsFromRasterPolygon::calcImageValue(float *bandValuesImage, int numBands, Envelope *extent) throw(RSGISImageCalcException)
+	void RSGISCalcFuzzyZonalStatsFromRasterPolygon::calcImageValue(float *bandValuesImage, int numBands, geos::geom::Envelope *extent) throw(rsgis::img::RSGISImageCalcException)
 	{
-		throw RSGISImageCalcException("Not implemented");
+		throw rsgis::img::RSGISImageCalcException("Not implemented");
 	}
 	
-	void RSGISCalcFuzzyZonalStatsFromRasterPolygon::calcImageValue(float *bandValuesImage, double interceptArea, int numBands, Polygon *poly, Point *pt) throw(RSGISImageCalcException)
+	void RSGISCalcFuzzyZonalStatsFromRasterPolygon::calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt) throw(rsgis::img::RSGISImageCalcException)
 	{
-		throw RSGISImageCalcException("Not implemented");
+		throw rsgis::img::RSGISImageCalcException("Not implemented");
 	}
 	
-	double* RSGISCalcFuzzyZonalStatsFromRasterPolygon::getOutputValues() throw(RSGISImageCalcException)
+	double* RSGISCalcFuzzyZonalStatsFromRasterPolygon::getOutputValues() throw(rsgis::img::RSGISImageCalcException)
 	{
 		for(int i = 0; i < this->numOutputValues; i++)
 		{
@@ -414,10 +414,10 @@ namespace rsgis{namespace vec{
 		{
 			if((attributes[i]->index+1) < 0 | (attributes[i]->index+1) >= this->numOutputValues)
 			{
-				throw RSGISImageCalcException("Attribute index not within range.");
+				throw rsgis::img::RSGISImageCalcException("Attribute index not within range.");
 			}
 			
-			//cout << attributes[i]->name << ": [" << attributes[i]->index+1 << "] ";
+			//std::cout << attributes[i]->name << ": [" << attributes[i]->index+1 << "] ";
 			outputValues[attributes[i]->index+1] = this->calcHistogramCentre(histograms[attributes[i]->index]);
 			if(hard)
 			{
@@ -457,15 +457,15 @@ namespace rsgis{namespace vec{
 		float *normHist = new float[numBins];
 		float value = 0;
 
-		//cout << "Histogram: ";
+		//std::cout << "Histogram: ";
 		for(int i = 0; i < numBins; i++)
 		{
 			binValue[i] = value;
 			normHist[i] = ((float)histogram[i])/numPxls;
-			//cout << normHist[i] << " ";
+			//std::cout << normHist[i] << " ";
 			value = value + 0.1;
 		}
-		//cout << endl;
+		//std::cout << std::endl;
 		
 		float min = 0;
 		float minValue = 0;
@@ -487,18 +487,18 @@ namespace rsgis{namespace vec{
 				if(binValue[j] <= stepValue)
 				{
 					distance = (stepValue - binValue[j]);
-					//cout << "Lower: " << binValue[j] << ", " << stepValue << " Distance = " << distance << endl;
+					//std::cout << "Lower: " << binValue[j] << ", " << stepValue << " Distance = " << distance << std::endl;
 					lowerWeight += distance * normHist[j];
 				}
 				else
 				{
 					distance = (binValue[j] - stepValue);
-					//cout << "Upper: " << binValue[j] << ", " << stepValue << " Distance = " << distance << endl;
+					//std::cout << "Upper: " << binValue[j] << ", " << stepValue << " Distance = " << distance << std::endl;
 					upperWeight += distance * normHist[j];
 				}
 			}
 			balance = (lowerWeight - upperWeight) * (lowerWeight - upperWeight);
-			//cout << stepValue << ":\t" << balance << endl;
+			//std::cout << stepValue << ":\t" << balance << std::endl;
 			if( i == 0)
 			{
 				min = balance;
@@ -518,7 +518,7 @@ namespace rsgis{namespace vec{
 		delete[] binValue;
 		delete[] normHist;
 		
-		//cout << " - MIN VALUE = " << minValue << endl;
+		//std::cout << " - MIN VALUE = " << minValue << std::endl;
 		
 		return minValue;
 	}

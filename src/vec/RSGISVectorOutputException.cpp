@@ -37,7 +37,7 @@ namespace rsgis {namespace vec{
 		
 	}
 	
-	RSGISVectorOutputException::RSGISVectorOutputException(string message) : RSGISVectorException(message)
+	RSGISVectorOutputException::RSGISVectorOutputException(std::string message) : RSGISVectorException(message)
 	{
 		
 	}

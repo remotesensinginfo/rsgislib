@@ -241,18 +241,18 @@ namespace rsgis{namespace vec{
 	*/
 	
 	
-	RSGISIdentifyTopLayerAttributes::RSGISIdentifyTopLayerAttributes(string *attributes, int numAttributes, int numTop, rsgissummarytype summary)
+	RSGISIdentifyTopLayerAttributes::RSGISIdentifyTopLayerAttributes(string *attributes, int numAttributes, int numTop, rsgis::math::rsgissummarytype summary)
 	{
 		this->attributes = attributes;
 		this->numAttributes = numAttributes;
 		this->numTop = numTop;
 		this->summary = summary;
-		this->sortedAttributes = new SortedGenericList<RSGISFloatAttribute>(numAttributes, numAttributes/2);
+		this->sortedAttributes = new rsgis::datastruct::SortedGenericList<RSGISFloatAttribute>(numAttributes, numAttributes/2);
 	}
 	
-	void RSGISIdentifyTopLayerAttributes::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISIdentifyTopLayerAttributes::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
 	{
-		RSGISMathsUtils mathUtils;
+        rsgis::math::RSGISMathsUtils mathUtils;
 		this->sortedAttributes->clearListDelete();
 		
 		OGRFeatureDefn *inFeatureDefn = inFeature->GetDefnRef();
@@ -305,14 +305,14 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISIdentifyTopLayerAttributes::processFeature(OGRFeature *feature, Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISIdentifyTopLayerAttributes::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
 	{
 		throw RSGISVectorException("Not Implemented");
 	}
 	
 	void RSGISIdentifyTopLayerAttributes::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException)
 	{
-		RSGISMathsUtils mathUtils;
+        rsgis::math::RSGISMathsUtils mathUtils;
 		string name = "";
 		for(int i = 0; i < numTop; i++)
 		{

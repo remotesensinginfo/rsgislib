@@ -163,7 +163,7 @@ void RSGISExeImageUtils::retrieveParameters(xercesc::DOMElement *argElement) thr
         }
         else
         {
-            cerr << "Data type not recognised, defaulting to 32 bit float.";
+            std::cerr << "Data type not recognised, defaulting to 32 bit float.";
             this->outDataType = GDT_Float32;
         }
         
@@ -466,8 +466,8 @@ void RSGISExeImageUtils::retrieveParameters(xercesc::DOMElement *argElement) thr
 		this->option = RSGISExeImageUtils::mosaic;
 		this->mosaicSkipVals = false;
 		this->mosaicSkipThreash = false;
-		this->skipLowerThreash = -numeric_limits<double>::infinity();
-		this->skipUpperThreash = +numeric_limits<double>::infinity();
+		this->skipLowerThreash = -std::numeric_limits<double>::infinity();
+		this->skipUpperThreash = +std::numeric_limits<double>::infinity();
 		this->skipBand = 0;
 		
 		XMLCh *outputXMLStr = xercesc::XMLString::transcode("output");
@@ -609,7 +609,7 @@ void RSGISExeImageUtils::retrieveParameters(xercesc::DOMElement *argElement) thr
 			}
 			else
 			{
-				cerr << "Proj not reconized therefore defaulting to image.";
+				std::cerr << "Proj not reconized therefore defaulting to image.";
 				this->projFromImage = true;
 				this->proj = "";
 			}
@@ -626,11 +626,11 @@ void RSGISExeImageUtils::retrieveParameters(xercesc::DOMElement *argElement) thr
 		if(argElement->hasAttribute(dirXMLStr))
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(dirXMLStr));
-			string dirStr = std::string(charValue);
+            std::string dirStr = std::string(charValue);
 			xercesc::XMLString::release(&charValue);
 			
 			charValue = xercesc::XMLString::transcode(argElement->getAttribute(extXMLStr));
-			string extStr = std::string(charValue);
+			std::string extStr = std::string(charValue);
 			xercesc::XMLString::release(&charValue);
 			
 			try
@@ -692,18 +692,18 @@ void RSGISExeImageUtils::retrieveParameters(xercesc::DOMElement *argElement) thr
 		if(argElement->hasAttribute(bandsXMLStr))
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(bandsXMLStr));
-			string bandsList = std::string(charValue);
+			std::string bandsList = std::string(charValue);
 			xercesc::XMLString::release(&charValue);
             
-            vector<string> *tokens = new vector<string>();
+            std::vector<std::string> *tokens = new std::vector<std::string>();
             textUtils.tokenizeString(bandsList, ',', tokens, true, true);
-            for(vector<string>::iterator iterTokens = tokens->begin(); iterTokens != tokens->end(); ++iterTokens)
+            for(std::vector<std::string>::iterator iterTokens = tokens->begin(); iterTokens != tokens->end(); ++iterTokens)
             {
                 try 
                 {
                     bands.push_back(mathUtils.strtoint(*iterTokens));
                 } 
-                catch (RSGISMathException &e) 
+                catch (rsgis::math::RSGISMathException &e) 
                 {
                     std::cout << "Warning: " << *iterTokens << " is not an integer!\n";
                 }
@@ -722,11 +722,11 @@ void RSGISExeImageUtils::retrieveParameters(xercesc::DOMElement *argElement) thr
 		if(argElement->hasAttribute(dirXMLStr))
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(dirXMLStr));
-			string dirStr = std::string(charValue);
+			std::string dirStr = std::string(charValue);
 			xercesc::XMLString::release(&charValue);
 			
 			charValue = xercesc::XMLString::transcode(argElement->getAttribute(extXMLStr));
-			string extStr = std::string(charValue);
+			std::string extStr = std::string(charValue);
 			xercesc::XMLString::release(&charValue);
 			
 			try
@@ -1611,7 +1611,7 @@ void RSGISExeImageUtils::retrieveParameters(xercesc::DOMElement *argElement) thr
 		}
 		else
 		{
-			cerr << "No \'ignorezeros\' attribute was provided so defaulting to ignore zeros.\n";
+			std::cerr << "No \'ignorezeros\' attribute was provided so defaulting to ignore zeros.\n";
             this->ignoreZeros = true;
 		}
 		xercesc::XMLString::release(&ignoreZerosXMLStr);
@@ -1791,7 +1791,7 @@ void RSGISExeImageUtils::retrieveParameters(xercesc::DOMElement *argElement) thr
 		if(argElement->hasAttribute(typeXMLStr))
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(typeXMLStr));
-			string typeStr = std::string(charValue);
+			std::string typeStr = std::string(charValue);
 			if (typeStr == "percentGaussianNoise") 
 			{
 				this->noise = rsgis::img::percentGaussianNoise;
@@ -2133,7 +2133,7 @@ void RSGISExeImageUtils::retrieveParameters(xercesc::DOMElement *argElement) thr
 		}
 		else
 		{
-			cerr << "WARNING: No \'inmemory\' attribute was provided so processing from disk - this could be slow!\n";
+			std::cerr << "WARNING: No \'inmemory\' attribute was provided so processing from disk - this could be slow!\n";
             this->processInMemory = false;
 		}
 		xercesc::XMLString::release(&inMemoryXMLStr);
@@ -2164,7 +2164,7 @@ void RSGISExeImageUtils::retrieveParameters(xercesc::DOMElement *argElement) thr
 			}
 			else
 			{
-				cerr << "Proj not reconized therefore defaulting to image.";
+				std::cerr << "Proj not reconized therefore defaulting to image.";
 				this->projFromImage = true;
 				this->proj = "";
 			}
@@ -2224,7 +2224,7 @@ void RSGISExeImageUtils::retrieveParameters(xercesc::DOMElement *argElement) thr
 		if(argElement->hasAttribute(typeXMLStr))
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(typeXMLStr));
-			string typeStr = std::string(charValue);
+			std::string typeStr = std::string(charValue);
 			if (typeStr == "mean") 
 			{
 				this->outCompStat = rsgis::img::compositeMean;
@@ -2379,7 +2379,7 @@ void RSGISExeImageUtils::retrieveParameters(xercesc::DOMElement *argElement) thr
 		if(argElement->hasAttribute(pyramidsXMLStr))
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(pyramidsXMLStr));
-			string typeStr = std::string(charValue);
+			std::string typeStr = std::string(charValue);
 			if(typeStr == "yes") 
 			{
 				this->calcImgPyramids = true;
@@ -2598,7 +2598,7 @@ void RSGISExeImageUtils::retrieveParameters(xercesc::DOMElement *argElement) thr
 	}
 	else
 	{
-		string message = std::string("The option (") + std::string(xercesc::XMLString::transcode(optionXML)) + std::string(") is not known: RSGISExeImageUtils.");
+		std::string message = std::string("The option (") + std::string(xercesc::XMLString::transcode(optionXML)) + std::string(") is not known: RSGISExeImageUtils.");
 		throw rsgis::RSGISXMLArgumentsException(message.c_str());
 	}
 	
@@ -2650,7 +2650,7 @@ void RSGISExeImageUtils::runAlgorithm() throw(rsgis::RSGISException)
 {
 	if(!parsed)
 	{
-		throw RSGISException("Before running the parameters much be retrieved");
+		throw rsgis::RSGISException("Before running the parameters much be retrieved");
 	}
 	else
 	{
@@ -2670,8 +2670,8 @@ void RSGISExeImageUtils::runAlgorithm() throw(rsgis::RSGISException)
 				datasets[0] = (GDALDataset *) GDALOpenShared(this->inputImage.c_str(), GA_ReadOnly);
 				if(datasets[0] == NULL)
 				{
-					string message = std::string("Could not open image ") + this->inputImage;
-					throw RSGISImageException(message.c_str());
+					std::string message = std::string("Could not open image ") + this->inputImage;
+					throw rsgis::RSGISImageException(message.c_str());
 				}
 				numBands = datasets[0]->GetRasterCount();
 				
@@ -2725,8 +2725,8 @@ void RSGISExeImageUtils::runAlgorithm() throw(rsgis::RSGISException)
 				datasets[0] = (GDALDataset *) GDALOpenShared(this->inputImage.c_str(), GA_ReadOnly);
 				if(datasets[0] == NULL)
 				{
-					string message = std::string("Could not open image ") + this->inputImage;
-					throw RSGISImageException(message.c_str());
+					std::string message = std::string("Could not open image ") + this->inputImage;
+					throw rsgis::RSGISImageException(message.c_str());
 				}
 				numBands = datasets[0]->GetRasterCount();
 				
@@ -2795,7 +2795,7 @@ void RSGISExeImageUtils::runAlgorithm() throw(rsgis::RSGISException)
             std::cout << "Include images into a larger image\n";
             if(bandsDefined)
             {
-                for(vector<int>::iterator iterBands = bands.begin(); iterBands != bands.end(); ++iterBands)
+                for(std::vector<int>::iterator iterBands = bands.begin(); iterBands != bands.end(); ++iterBands)
                 {
                     std::cout << "Band " << *iterBands << std::endl;
                 }
@@ -2809,8 +2809,8 @@ void RSGISExeImageUtils::runAlgorithm() throw(rsgis::RSGISException)
 				baseDS = (GDALDataset *) GDALOpenShared(this->inputImage.c_str(), GA_Update);
 				if(baseDS == NULL)
 				{
-					string message = std::string("Could not open image ") + this->inputImage;
-					throw RSGISImageException(message.c_str());
+					std::string message = std::string("Could not open image ") + this->inputImage;
+					throw rsgis::RSGISImageException(message.c_str());
 				}
 				
 				mosaic.includeDatasets(baseDS, this->inputImages, this->numImages, this->bands, this->bandsDefined);
@@ -2842,10 +2842,10 @@ void RSGISExeImageUtils::runAlgorithm() throw(rsgis::RSGISException)
 			rsgis::vec::RSGISImageTileVector **data = NULL;
 			rsgis::vec::RSGISVectorUtils vecUtils;
 			
-			string vectorLayerName = vecUtils.getLayerName(this->inputVector);
+			std::string vectorLayerName = vecUtils.getLayerName(this->inputVector);
 			int numImageBands = 0;
 			int numFeatures = 0;
-			string outputFilePath;
+			std::string outputFilePath;
 			
 			try
 			{
@@ -2855,8 +2855,8 @@ void RSGISExeImageUtils::runAlgorithm() throw(rsgis::RSGISException)
 				dataset[0] = (GDALDataset *) GDALOpenShared(this->inputImage.c_str(), GA_ReadOnly);
 				if(dataset[0] == NULL)
 				{
-					string message = std::string("Could not open image ") + this->inputImage;
-					throw RSGISImageException(message.c_str());
+					std::string message = std::string("Could not open image ") + this->inputImage;
+					throw rsgis::RSGISImageException(message.c_str());
 				}
 				numImageBands = dataset[0]->GetRasterCount();
 				std::cout << "Raster Band Count = " << numImageBands << std::endl;
@@ -2865,14 +2865,14 @@ void RSGISExeImageUtils::runAlgorithm() throw(rsgis::RSGISException)
 				inputVecDS = OGRSFDriverRegistrar::Open(this->inputVector.c_str(), FALSE);
 				if(inputVecDS == NULL)
 				{
-					string message = std::string("Could not open vector file ") + this->inputVector;
-					throw RSGISFileException(message.c_str());
+					std::string message = std::string("Could not open vector file ") + this->inputVector;
+					throw rsgis::RSGISFileException(message.c_str());
 				}
 				inputVecLayer = inputVecDS->GetLayerByName(vectorLayerName.c_str());
 				if(inputVecLayer == NULL)
 				{
-					string message = std::string("Could not open vector layer ") + vectorLayerName;
-					throw RSGISFileException(message.c_str());
+					std::string message = std::string("Could not open vector layer ") + vectorLayerName;
+					throw rsgis::RSGISFileException(message.c_str());
 				}
 				
 				// READ IN SHAPEFILE
@@ -2911,15 +2911,15 @@ void RSGISExeImageUtils::runAlgorithm() throw(rsgis::RSGISException)
                         ++failCount;
                         if(failCount <= 100)
                         {
-                            cerr << "RSGISException caught: " << e.what() << std::endl;
-                            cerr << "Check output path exists and is writable and all polygons in shapefile:" << std::endl;
-                            cerr << " " << this->inputVector << std::endl;
-                            cerr << "Are completely within:" << std::endl;
-                            cerr << " " << this->inputImage << std::endl;
+                            std::cerr << "RSGISException caught: " << e.what() << std::endl;
+                            std::cerr << "Check output path exists and is writable and all polygons in shapefile:" << std::endl;
+                            std::cerr << " " << this->inputVector << std::endl;
+                            std::cerr << "Are completely within:" << std::endl;
+                            std::cerr << " " << this->inputImage << std::endl;
                         }
                         else
                         {
-                            cerr << "Over 100 exceptions have been caught, exiting" << std::endl;
+                            std::cerr << "Over 100 exceptions have been caught, exiting" << std::endl;
                             throw e;
                         }
                     }
@@ -2935,7 +2935,7 @@ void RSGISExeImageUtils::runAlgorithm() throw(rsgis::RSGISException)
 			}
 			catch(rsgis::RSGISException e)
 			{
-				cerr << "RSGISException caught: " << e.what() << std::endl;
+				std::cerr << "RSGISException caught: " << e.what() << std::endl;
 			}
 		}
 		else if(option == RSGISExeImageUtils::mask)
@@ -2950,16 +2950,16 @@ void RSGISExeImageUtils::runAlgorithm() throw(rsgis::RSGISException)
 				dataset = (GDALDataset *) GDALOpenShared(this->inputImage.c_str(), GA_ReadOnly);
 				if(dataset == NULL)
 				{
-					string message = std::string("Could not open image ") + this->inputImage;
-					throw RSGISImageException(message.c_str());
+					std::string message = std::string("Could not open image ") + this->inputImage;
+					throw rsgis::RSGISImageException(message.c_str());
 				}
 				
 				std::cout << this->imageMask << std::endl;
 				mask = (GDALDataset *) GDALOpenShared(this->imageMask.c_str(), GA_ReadOnly);
 				if(mask == NULL)
 				{
-					string message = std::string("Could not open image ") + this->imageMask;
-					throw RSGISImageException(message.c_str());
+					std::string message = std::string("Could not open image ") + this->imageMask;
+					throw rsgis::RSGISImageException(message.c_str());
 				}
 				
 				maskImage = new rsgis::img::RSGISMaskImage();
@@ -3016,7 +3016,7 @@ void RSGISExeImageUtils::runAlgorithm() throw(rsgis::RSGISException)
 				}
 				else
 				{
-					throw RSGISException("Interpolator Option Not Reconised");
+					throw rsgis::RSGISException("Interpolator Option Not Reconised");
 				}
 				
 				interpolation = new rsgis::img::RSGISImageInterpolation(interpolator);
@@ -3025,8 +3025,8 @@ void RSGISExeImageUtils::runAlgorithm() throw(rsgis::RSGISException)
 				inDataset = (GDALDataset *) GDALOpenShared(this->inputImage.c_str(), GA_ReadOnly);
 				if(inDataset == NULL)
 				{
-					string message = std::string("Could not open image ") + this->inputImage;
-					throw RSGISImageException(message.c_str());
+					std::string message = std::string("Could not open image ") + this->inputImage;
+					throw rsgis::RSGISImageException(message.c_str());
 				}
 				
 				interpolation->findOutputResolution(inDataset, this->resampleScale, &xOutResolution, &yOutResolution);
@@ -3078,12 +3078,12 @@ void RSGISExeImageUtils::runAlgorithm() throw(rsgis::RSGISException)
                     
                     if(numTIFs != numCSVs)
                     {
-                        throw RSGISException("number of TIFs and CSV files found do not match.");
+                        throw rsgis::RSGISException("number of TIFs and CSV files found do not match.");
                     }
                     
                     if(numTIFs == 0)
                     {
-                        throw RSGISException("No input files were found.");
+                        throw rsgis::RSGISException("No input files were found.");
                     }
                     
                     sortedTIFs = new rsgis::datastruct::SortedGenericList<rsgis::utils::RSGISDefiniensWorkspaceFileName>(numTIFs, numTIFs/2);
@@ -3225,8 +3225,8 @@ void RSGISExeImageUtils::runAlgorithm() throw(rsgis::RSGISException)
 				inDataset = (GDALDataset *) GDALOpenShared(this->inputImage.c_str(), GA_ReadOnly);
 				if(inDataset == NULL)
 				{
-					string message = std::string("Could not open image ") + this->inputImage;
-					throw RSGISImageException(message.c_str());
+					std::string message = std::string("Could not open image ") + this->inputImage;
+					throw rsgis::RSGISImageException(message.c_str());
 				}
 				
 				const char *wtkSpatialRef = inDataset->GetProjectionRef();
@@ -3259,8 +3259,8 @@ void RSGISExeImageUtils::runAlgorithm() throw(rsgis::RSGISException)
 				inDataset = (GDALDataset *) GDALOpenShared(this->inputImage.c_str(), GA_ReadOnly);
 				if(inDataset == NULL)
 				{
-					string message = std::string("Could not open image ") + this->inputImage;
-					throw RSGISImageException(message.c_str());
+					std::string message = std::string("Could not open image ") + this->inputImage;
+					throw rsgis::RSGISImageException(message.c_str());
 				}
 				
 				const char *wtkSpatialRef = inDataset->GetProjectionRef();
@@ -3303,13 +3303,13 @@ void RSGISExeImageUtils::runAlgorithm() throw(rsgis::RSGISException)
 					datasets[i] = (GDALDataset *) GDALOpenShared(this->inputImages[i].c_str(), GA_ReadOnly);
 					if(datasets[i] == NULL)
 					{
-						string message = std::string("Could not open image ") + this->inputImages[i];
-						throw RSGISImageException(message.c_str());
+						std::string message = std::string("Could not open image ") + this->inputImages[i];
+						throw rsgis::RSGISImageException(message.c_str());
 					}
 				}
 					
-				RSGISExportForPlottingIncremental *plotter = new RSGISExportForPlottingIncremental();
-				plotter->openFile(this->outputFile, scatter2d);
+                rsgis::utils::RSGISExportForPlottingIncremental *plotter = new rsgis::utils::RSGISExportForPlottingIncremental();
+				plotter->openFile(this->outputFile, rsgis::utils::scatter2d);
 				export2DScatter = new rsgis::img::RSGISExport2DScatterPTxt(plotter, imgBand1, imgBand2);
 				calcImage = new rsgis::img::RSGISCalcImage(export2DScatter, "", true);
 				
@@ -3349,7 +3349,7 @@ void RSGISExeImageUtils::runAlgorithm() throw(rsgis::RSGISException)
 			
 			GDALAllRegister();
 			
-			RSGISVectors vectorUtils;
+            rsgis::math::RSGISVectors vectorUtils;
 			
 			GDALDataset **datasets = NULL;
 			
@@ -3360,18 +3360,18 @@ void RSGISExeImageUtils::runAlgorithm() throw(rsgis::RSGISException)
 			{
 				if(order > window)
 				{
-					throw RSGISException("The window size needs to be at least as large as the order");
+					throw rsgis::RSGISException("The window size needs to be at least as large as the order");
 				}
 				
 				datasets = new GDALDataset*[1];
 				datasets[0] = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_ReadOnly);
 				if(datasets[0] == NULL)
 				{
-					string message = std::string("Could not open image ") + this->inputImage;
-					throw RSGISImageException(message.c_str());
+					std::string message = std::string("Could not open image ") + this->inputImage;
+					throw rsgis::RSGISImageException(message.c_str());
 				}
 				
-				Vector *bandValues = vectorUtils.readVectorFromTxt(this->bandFloatValuesVector);
+				rsgis::math::Vector *bandValues = vectorUtils.readVectorFromTxt(this->bandFloatValuesVector);
 				
 				std::cout << "Input Image band values:\n";
 				vectorUtils.printVector(bandValues);
@@ -3406,7 +3406,7 @@ void RSGISExeImageUtils::runAlgorithm() throw(rsgis::RSGISException)
 			
 			GDALAllRegister();
 			
-			RSGISMatrices matixUtils;
+            rsgis::math::RSGISMatrices matixUtils;
 			
 			GDALDataset **datasets = NULL;
 			
@@ -3419,11 +3419,11 @@ void RSGISExeImageUtils::runAlgorithm() throw(rsgis::RSGISException)
 				datasets[0] = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_ReadOnly);
 				if(datasets[0] == NULL)
 				{
-					string message = std::string("Could not open image ") + this->inputImage;
-					throw RSGISImageException(message.c_str());
+					std::string message = std::string("Could not open image ") + this->inputImage;
+					throw rsgis::RSGISImageException(message.c_str());
 				}
 				
-				Matrix *bandValues = matixUtils.readMatrixFromTxt(this->inMatrixfile);
+				rsgis::math::Matrix *bandValues = matixUtils.readMatrixFromTxt(this->inMatrixfile);
 		
 				int numInBands = datasets[0]->GetRasterCount();
 				
@@ -3469,7 +3469,7 @@ void RSGISExeImageUtils::runAlgorithm() throw(rsgis::RSGISException)
 				transformation[4] = 0;
 				transformation[5] = resolution * (-1);
 				
-				string projection = "";
+				std::string projection = "";
 				if(proj != "")
 				{
 					OGRSpatialReference ogrSpatial = OGRSpatialReference();
@@ -3488,11 +3488,11 @@ void RSGISExeImageUtils::runAlgorithm() throw(rsgis::RSGISException)
 			}
 			catch(rsgis::img::RSGISImageBandException &e)
 			{
-				throw RSGISException(e.what());
+				throw rsgis::RSGISException(e.what());
 			}
 			catch (rsgis::RSGISImageException &e) 
 			{
-				throw RSGISException(e.what());
+				throw rsgis::RSGISException(e.what());
 			}
 		}
 		else if(option == RSGISExeImageUtils::stretch)
@@ -3530,7 +3530,7 @@ void RSGISExeImageUtils::runAlgorithm() throw(rsgis::RSGISException)
 			}
 			else
 			{
-				throw RSGISException("Stretch is not recognised.");
+				throw rsgis::RSGISException("Stretch is not recognised.");
 			}
             if(this->ignoreZeros)
             {
@@ -3547,8 +3547,8 @@ void RSGISExeImageUtils::runAlgorithm() throw(rsgis::RSGISException)
 				inDataset = (GDALDataset *) GDALOpenShared(this->inputImage.c_str(), GA_ReadOnly);
 				if(inDataset == NULL)
 				{
-					string message = std::string("Could not open image ") + this->inputImage;
-					throw RSGISImageException(message.c_str());
+					std::string message = std::string("Could not open image ") + this->inputImage;
+					throw rsgis::RSGISImageException(message.c_str());
 				}
 
 				stretchImg = new rsgis::img::RSGISStretchImage(inDataset, this->outputImage, this->ignoreZeros, this->imageFormat, this->outDataType);
@@ -3582,7 +3582,7 @@ void RSGISExeImageUtils::runAlgorithm() throw(rsgis::RSGISException)
 				}
 				else
 				{
-					throw RSGISException("Stretch is not recognised.");
+					throw rsgis::RSGISException("Stretch is not recognised.");
 				}
 				
 				GDALClose(inDataset);
@@ -3617,13 +3617,13 @@ void RSGISExeImageUtils::runAlgorithm() throw(rsgis::RSGISException)
 				datasets[0] = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_ReadOnly);
 				if(datasets[0] == NULL)
 				{
-					string message = std::string("Could not open image ") + this->inputImage;
-					throw RSGISImageException(message.c_str());
+					std::string message = std::string("Could not open image ") + this->inputImage;
+					throw rsgis::RSGISImageException(message.c_str());
 				}
 				
 				if(this->imgBand1 >= datasets[0]->GetRasterCount())
 				{
-					throw RSGISImageException("Insufficient number of bands in the input image for select band.");
+					throw rsgis::RSGISImageException("Insufficient number of bands in the input image for select band.");
 				}
 				
 				calcImageValue = new rsgis::img::RSGISColourUsingHue(3, this->imgBand1, this->lowerRangeValue, this->upperRangeValue, this->nodataValue);
@@ -3672,8 +3672,8 @@ void RSGISExeImageUtils::runAlgorithm() throw(rsgis::RSGISException)
 				datasets[0] = (GDALDataset *) GDALOpenShared(this->inputImage.c_str(), GA_ReadOnly);
 				if(datasets[0] == NULL)
 				{
-					string message = std::string("Could not open image ") + this->inputImage;
-					throw RSGISImageException(message.c_str());
+					std::string message = std::string("Could not open image ") + this->inputImage;
+					throw rsgis::RSGISImageException(message.c_str());
 				}
 			}
 			catch(rsgis::RSGISException& e)
@@ -3758,7 +3758,7 @@ void RSGISExeImageUtils::runAlgorithm() throw(rsgis::RSGISException)
             
 			rsgis::vec::RSGISVectorUtils vecUtils;
 			
-			string vectorLayerName = vecUtils.getLayerName(this->inputVector);
+			std::string vectorLayerName = vecUtils.getLayerName(this->inputVector);
 			int numImageBands = 0;
 			
 			try
@@ -3769,8 +3769,8 @@ void RSGISExeImageUtils::runAlgorithm() throw(rsgis::RSGISException)
 				dataset[0] = (GDALDataset *) GDALOpenShared(this->inputImage.c_str(), GA_ReadOnly);
 				if(dataset[0] == NULL)
 				{
-					string message = std::string("Could not open image ") + this->inputImage;
-					throw RSGISImageException(message.c_str());
+					std::string message = std::string("Could not open image ") + this->inputImage;
+					throw rsgis::RSGISImageException(message.c_str());
 				}
 				numImageBands = dataset[0]->GetRasterCount();
 				std::cout << "Raster Band Count = " << numImageBands << std::endl;
@@ -3779,18 +3779,18 @@ void RSGISExeImageUtils::runAlgorithm() throw(rsgis::RSGISException)
 				inputVecDS = OGRSFDriverRegistrar::Open(this->inputVector.c_str(), FALSE);
 				if(inputVecDS == NULL)
 				{
-					string message = std::string("Could not open vector file ") + this->inputVector;
-					throw RSGISFileException(message.c_str());
+					std::string message = std::string("Could not open vector file ") + this->inputVector;
+					throw rsgis::RSGISFileException(message.c_str());
 				}
 				inputVecLayer = inputVecDS->GetLayerByName(vectorLayerName.c_str());
 				if(inputVecLayer == NULL)
 				{
-					string message = std::string("Could not open vector layer ") + vectorLayerName;
-					throw RSGISFileException(message.c_str());
+					std::string message = std::string("Could not open vector layer ") + vectorLayerName;
+					throw rsgis::RSGISFileException(message.c_str());
 				}
                 OGREnvelope ogrExtent;
                 inputVecLayer->GetExtent(&ogrExtent);
-                Envelope extent = Envelope(ogrExtent.MinX, ogrExtent.MaxX, ogrExtent.MinY, ogrExtent.MaxY);
+                geos::geom::Envelope extent = geos::geom::Envelope(ogrExtent.MinX, ogrExtent.MaxX, ogrExtent.MinY, ogrExtent.MaxY);
 				
 				copyImage = new rsgis::img::RSGISCopyImage(numImageBands);
 				calcImage = new rsgis::img::RSGISCalcImage(copyImage, "", true);
@@ -3840,8 +3840,8 @@ void RSGISExeImageUtils::runAlgorithm() throw(rsgis::RSGISException)
 				dataset[0] = (GDALDataset *) GDALOpenShared(this->inputImage.c_str(), GA_ReadOnly);
 				if(dataset[0] == NULL)
 				{
-					string message = std::string("Could not open image ") + this->inputImage;
-					throw RSGISImageException(message.c_str());
+					std::string message = std::string("Could not open image ") + this->inputImage;
+					throw rsgis::RSGISImageException(message.c_str());
 				}
 				numImageBands = dataset[0]->GetRasterCount();
 				std::cout << "Raster Band Count = " << numImageBands << std::endl;
@@ -3850,14 +3850,14 @@ void RSGISExeImageUtils::runAlgorithm() throw(rsgis::RSGISException)
 				inputVecDS = OGRSFDriverRegistrar::Open(this->inputVector.c_str(), FALSE);
 				if(inputVecDS == NULL)
 				{
-					string message = std::string("Could not open vector file ") + this->inputVector;
-					throw RSGISFileException(message.c_str());
+					std::string message = std::string("Could not open vector file ") + this->inputVector;
+					throw rsgis::RSGISFileException(message.c_str());
 				}
 				inputVecLayer = inputVecDS->GetLayerByName(vectorLayerName.c_str());
 				if(inputVecLayer == NULL)
 				{
-					string message = std::string("Could not open vector layer ") + vectorLayerName;
-					throw RSGISFileException(message.c_str());
+					std::string message = std::string("Could not open vector layer ") + vectorLayerName;
+					throw rsgis::RSGISFileException(message.c_str());
 				}
 				
 				// READ IN SHAPEFILE
@@ -3895,15 +3895,15 @@ void RSGISExeImageUtils::runAlgorithm() throw(rsgis::RSGISException)
                         ++failCount;
                         if(failCount <= 100)
                         {
-                            cerr << "RSGISException caught: " << e.what() << std::endl;
-                            cerr << "Check output path exists and is writable and all polygons in shapefile:" << std::endl;
-                            cerr << " " << this->inputVector << std::endl;
-                            cerr << "Are completely within:" << std::endl;
-                            cerr << " " << this->inputImage << std::endl;
+                            std::cerr << "RSGISException caught: " << e.what() << std::endl;
+                            std::cerr << "Check output path exists and is writable and all polygons in shapefile:" << std::endl;
+                            std::cerr << " " << this->inputVector << std::endl;
+                            std::cerr << "Are completely within:" << std::endl;
+                            std::cerr << " " << this->inputImage << std::endl;
                         }
                         else
                         {
-                            cerr << "Over 100 exceptions have been caught, exiting" << std::endl;
+                            std::cerr << "Over 100 exceptions have been caught, exiting" << std::endl;
                             throw e;
                         }
                     }
@@ -3919,7 +3919,7 @@ void RSGISExeImageUtils::runAlgorithm() throw(rsgis::RSGISException)
 			}
 			catch(rsgis::RSGISException e)
 			{
-				cerr << "RSGISException caught: " << e.what() << std::endl;
+				std::cerr << "RSGISException caught: " << e.what() << std::endl;
 			}
 		}
 		else if(option == RSGISExeImageUtils::pansharpen)
@@ -3933,8 +3933,8 @@ void RSGISExeImageUtils::runAlgorithm() throw(rsgis::RSGISException)
 			datasets[0] = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_ReadOnly);
 			if(datasets[0] == NULL)
 			{
-				string message = std::string("Could not open image ") + this->inputImage;
-				throw RSGISImageException(message.c_str());
+				std::string message = std::string("Could not open image ") + this->inputImage;
+				throw rsgis::RSGISImageException(message.c_str());
 			}
 			
 			int numRasterBands = datasets[0]->GetRasterCount();
@@ -3992,8 +3992,8 @@ void RSGISExeImageUtils::runAlgorithm() throw(rsgis::RSGISException)
 			dataset = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_ReadOnly);
 			if(dataset == NULL)
 			{
-				string message = std::string("Could not open image ") + this->inputImage;
-				throw RSGISImageException(message.c_str());
+				std::string message = std::string("Could not open image ") + this->inputImage;
+				throw rsgis::RSGISImageException(message.c_str());
 			}
             
             rsgis::img::RSGISImageUtils imageUtils;
@@ -4001,7 +4001,7 @@ void RSGISExeImageUtils::runAlgorithm() throw(rsgis::RSGISException)
             {
                 imageUtils.createImageSlices(dataset, outputImage);
             } 
-            catch (RSGISImageException &e) 
+            catch (rsgis::RSGISImageException &e) 
             {
                 throw e;
             }
@@ -4021,8 +4021,8 @@ void RSGISExeImageUtils::runAlgorithm() throw(rsgis::RSGISException)
 			inDataset = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_ReadOnly);
 			if(inDataset == NULL)
 			{
-				string message = std::string("Could not open image ") + this->inputImage;
-				throw RSGISImageException(message.c_str());
+				std::string message = std::string("Could not open image ") + this->inputImage;
+				throw rsgis::RSGISImageException(message.c_str());
 			}
             
             /*
@@ -4078,8 +4078,8 @@ void RSGISExeImageUtils::runAlgorithm() throw(rsgis::RSGISException)
 			datasets[0] = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_ReadOnly);
 			if(datasets[0] == NULL)
 			{
-				string message = std::string("Could not open image ") + this->inputImage;
-				throw RSGISImageException(message.c_str());
+				std::string message = std::string("Could not open image ") + this->inputImage;
+				throw rsgis::RSGISImageException(message.c_str());
 			}
 			
 			int numRasterBands = datasets[0]->GetRasterCount();
@@ -4115,7 +4115,7 @@ void RSGISExeImageUtils::runAlgorithm() throw(rsgis::RSGISException)
                 if(inDataset == NULL)
                 {
                     std::string message = std::string("Could not open image ") + this->inputImage;
-                    throw RSGISImageException(message.c_str());
+                    throw rsgis::RSGISImageException(message.c_str());
                 }
                 
                 rsgis::img::RSGISRelabelPixelValuesFromLUT relabelPixels;
@@ -4144,7 +4144,7 @@ void RSGISExeImageUtils::runAlgorithm() throw(rsgis::RSGISException)
                 if(inDataset == NULL)
                 {
                     std::string message = std::string("Could not open image ") + this->inputImage;
-                    throw RSGISImageException(message.c_str());
+                    throw rsgis::RSGISImageException(message.c_str());
                 }
                 
                 rsgis::utils::RSGISTextUtils textUtils;
@@ -4181,7 +4181,7 @@ void RSGISExeImageUtils::runAlgorithm() throw(rsgis::RSGISException)
                 if(inDataset == NULL)
                 {
                     std::string message = std::string("Could not open image ") + this->inputImage;
-                    throw RSGISImageException(message.c_str());
+                    throw rsgis::RSGISImageException(message.c_str());
                 }
                 
                 rsgis::img::RSGISPopWithStats popWithStats;
@@ -4213,7 +4213,7 @@ void RSGISExeImageUtils::runAlgorithm() throw(rsgis::RSGISException)
                 if(inDataset == NULL)
                 {
                     std::string message = std::string("Could not open image ") + this->inputImage;
-                    throw RSGISImageException(message.c_str());
+                    throw rsgis::RSGISImageException(message.c_str());
                 }
                 
                 rsgis::img::RSGISImageUtils imgUtils;
@@ -4256,7 +4256,7 @@ void RSGISExeImageUtils::runAlgorithm() throw(rsgis::RSGISException)
                 if(inDataset == NULL)
                 {
                     std::string message = std::string("Could not open image ") + this->inputImage;
-                    throw RSGISImageException(message.c_str());
+                    throw rsgis::RSGISImageException(message.c_str());
                 }
                 
                 double *trans = new double[6];
@@ -4490,7 +4490,7 @@ void RSGISExeImageUtils::printParameters()
 			}
 			else
 			{
-				throw RSGISException("Stretch is not recognised.");
+				throw rsgis::RSGISException("Stretch is not recognised.");
 			}
             
             if(this->ignoreZeros)
@@ -4669,12 +4669,12 @@ void RSGISExeImageUtils::help()
 	std::cout << "</rsgis:commands>\n";
 }
 
-string RSGISExeImageUtils::getDescription()
+std::string RSGISExeImageUtils::getDescription()
 {
 	return "Image utilities.";
 }
 
-string RSGISExeImageUtils::getXMLSchema()
+std::string RSGISExeImageUtils::getXMLSchema()
 {
 	return "NOT DONE!";
 }

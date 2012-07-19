@@ -46,24 +46,20 @@
 
 #include "geos/geom/Envelope.h"
 
-using namespace std;
-using namespace rsgis::geom;
-using namespace geos::geom;
-
 namespace rsgis{namespace vec{
 	
 	class RSGIS2DScatterPlotVariables : public RSGISProcessOGRFeature
 	{
 	public:
-		RSGIS2DScatterPlotVariables(RSGISExportForPlottingIncremental *plotter, string col1, string col2);
-		virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, Envelope *env, long fid) throw(RSGISVectorException);
-		virtual void processFeature(OGRFeature *feature, Envelope *env, long fid) throw(RSGISVectorException);
+		RSGIS2DScatterPlotVariables(rsgis::utils::RSGISExportForPlottingIncremental *plotter, std::string col1, std::string col2);
+		virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
+		virtual void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
 		virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException);
 		virtual ~RSGIS2DScatterPlotVariables();
 	protected:
-		RSGISExportForPlottingIncremental *plotter;
-		string col1;
-		string col2;
+        rsgis::utils::RSGISExportForPlottingIncremental *plotter;
+		std::string col1;
+		std::string col2;
 	};
 }}
 

@@ -50,43 +50,40 @@
 #include "utils/RSGISGEOSFactoryGenerator.h"
 #include "utils/RSGISFileUtils.h"
 
-using namespace std;
-using namespace geos::geom;
-using namespace rsgis::utils;
-using namespace rsgis;
-
 namespace rsgis{namespace vec{
+    
 	class RSGISVectorUtils
 		{
 		public:
-			string getLayerName(string filepath);
-			LineString* convertOGRLineString2GEOSLineString(OGRLineString *line);
-			OGRLineString* convertGEOSLineString2OGRLineString(LineString *line);
-			LinearRing* convertOGRLinearRing2GEOSLinearRing(OGRLinearRing *ring);
-			OGRLinearRing* convertGEOSLineString2OGRLinearRing(LineString *line);
-			Polygon* convertOGRPolygon2GEOSPolygon(OGRPolygon *poly);
-			MultiPolygon* convertOGRMultiPolygonGEOSMultiPolygon(OGRMultiPolygon *mPoly);
-			Point* convertOGRPoint2GEOSPoint(OGRPoint *point);
-			OGRPolygon* convertGEOSPolygon2OGRPolygon(Polygon *poly);
-			OGRMultiPolygon* convertGEOSMultiPolygon2OGRMultiPolygon(MultiPolygon *mPoly);
-			OGRMultiPolygon* convertGEOSPolygons2OGRMultiPolygon(list<Polygon*> *polys);
-			MultiPolygon* convertGEOSPolygons2GEOSMultiPolygon(vector<Polygon*> *polys);
-			OGRPoint* convertGEOSPoint2OGRPoint(Point *point);
-			OGRPoint* convertGEOSCoordinate2OGRPoint(Coordinate *coord);
-			Envelope* getEnvelope(Geometry *geom);
-			Envelope* getEnvelope(OGRGeometry *geom);
-			Envelope* getEnvelopePixelBuffer(OGRGeometry *geom, double imageRes);
-			Point* createPoint(Coordinate *coord);
-			bool checkDIR4SHP(string dir, string shp) throw(RSGISVectorException);
-			void deleteSHP(string dir, string shp) throw(RSGISVectorException);
-			GeometryCollection* createGeomCollection(vector<Polygon*> *polys) throw(RSGISVectorException);
-			Polygon* createPolygon(double tlX, double tlY, double brX, double brY) throw(RSGISVectorException);
+			std::string getLayerName(std::string filepath);
+            geos::geom::LineString* convertOGRLineString2GEOSLineString(OGRLineString *line);
+			OGRLineString* convertGEOSLineString2OGRLineString(geos::geom::LineString *line);
+			geos::geom::LinearRing* convertOGRLinearRing2GEOSLinearRing(OGRLinearRing *ring);
+			OGRLinearRing* convertGEOSLineString2OGRLinearRing(geos::geom::LineString *line);
+			geos::geom::Polygon* convertOGRPolygon2GEOSPolygon(OGRPolygon *poly);
+			geos::geom::MultiPolygon* convertOGRMultiPolygonGEOSMultiPolygon(OGRMultiPolygon *mPoly);
+			geos::geom::Point* convertOGRPoint2GEOSPoint(OGRPoint *point);
+			OGRPolygon* convertGEOSPolygon2OGRPolygon(geos::geom::Polygon *poly);
+			OGRMultiPolygon* convertGEOSMultiPolygon2OGRMultiPolygon(geos::geom::MultiPolygon *mPoly);
+			OGRMultiPolygon* convertGEOSPolygons2OGRMultiPolygon(std::list<geos::geom::Polygon*> *polys);
+			geos::geom::MultiPolygon* convertGEOSPolygons2GEOSMultiPolygon(std::vector<geos::geom::Polygon*> *polys);
+			OGRPoint* convertGEOSPoint2OGRPoint(geos::geom::Point *point);
+			OGRPoint* convertGEOSCoordinate2OGRPoint(geos::geom::Coordinate *coord);
+			geos::geom::Envelope* getEnvelope(geos::geom::Geometry *geom);
+			geos::geom::Envelope* getEnvelope(OGRGeometry *geom);
+			geos::geom::Envelope* getEnvelopePixelBuffer(OGRGeometry *geom, double imageRes);
+			geos::geom::Point* createPoint(geos::geom::Coordinate *coord);
+			bool checkDIR4SHP(std::string dir, std::string shp) throw(RSGISVectorException);
+			void deleteSHP(std::string dir, std::string shp) throw(RSGISVectorException);
+			geos::geom::GeometryCollection* createGeomCollection(std::vector<geos::geom::Polygon*> *polys) throw(RSGISVectorException);
+			geos::geom::Polygon* createPolygon(double tlX, double tlY, double brX, double brY) throw(RSGISVectorException);
 			OGRPolygon* createOGRPolygon(double tlX, double tlY, double brX, double brY) throw(RSGISVectorException);
 			OGRPolygon* checkCloseOGRPolygon(OGRPolygon *poly) throw(RSGISVectorException);
 			OGRPolygon* removeHolesOGRPolygon(OGRPolygon *poly) throw(RSGISVectorException);
 			OGRPolygon* moveOGRPolygon(OGRPolygon *poly, double shiftX, double shiftY, double shiftZ) throw(RSGISVectorException);
-			vector<string>* findUniqueVals(OGRLayer *layer, string attribute) throw(RSGISVectorException);
+			std::vector<std::string>* findUniqueVals(OGRLayer *layer, std::string attribute) throw(RSGISVectorException);
 		};
+    
 }}
 
 #endif

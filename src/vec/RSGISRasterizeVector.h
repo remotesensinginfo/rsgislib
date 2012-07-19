@@ -46,26 +46,21 @@
 #include "geos/geom/GeometryFactory.h"
 #include "geos/geom/PrecisionModel.h"
 
-using namespace std;
-using namespace rsgis;
-using namespace rsgis::img;
-using namespace geos::geom;
-
 namespace rsgis{namespace vec{
 		
 	class RSGISRasterizeVector
 		{
 		public:
 			RSGISRasterizeVector();
-			GDALDataset* createDataset(GDALDriver *gdalDriver, OGRLayer *layer, string filename, float resolution, float constVal) throw(RSGISImageException);
-			GDALDataset* createDataset(GDALDriver *gdalDriver, vector<Polygon*> *polys, string filename, float resolution, OGRSpatialReference *spatialRef, float constVal) throw(RSGISImageException);
-			void rasterizeLayer(OGRLayer *layer, GDALDataset *image, string attribute, pixelInPolyOption method) throw(RSGISVectorException);
-			void rasterizeLayer(Geometry *geom, GDALDataset *image, bool useFID, float constVal, pixelInPolyOption method) throw(RSGISVectorException);
-			int editPixels(GDALDataset *image, float pixelValue, Envelope *env, OGRGeometry *geom) throw(RSGISImageException);
+			GDALDataset* createDataset(GDALDriver *gdalDriver, OGRLayer *layer, std::string filename, float resolution, float constVal) throw(RSGISImageException);
+			GDALDataset* createDataset(GDALDriver *gdalDriver, std::vector<geos::geom::Polygon*> *polys, std::string filename, float resolution, OGRSpatialReference *spatialRef, float constVal) throw(RSGISImageException);
+			void rasterizeLayer(OGRLayer *layer, GDALDataset *image, string attribute, rsgis::img::pixelInPolyOption method) throw(RSGISVectorException);
+			void rasterizeLayer(geos::geom::Geometry *geom, GDALDataset *image, bool useFID, float constVal, rsgis::img::pixelInPolyOption method) throw(RSGISVectorException);
+			int editPixels(GDALDataset *image, float pixelValue, geos::geom::Envelope *env, OGRGeometry *geom) throw(RSGISImageException);
 			//void editPixels(GDALDataset *image, float pixelValue, Envelope *env, Geometry *geom) throw(RSGISImageException);
 			~RSGISRasterizeVector();
 		private:
-			pixelInPolyOption method;
+            rsgis::img::pixelInPolyOption method;
 		};
 }}
 

@@ -352,7 +352,7 @@ namespace rsgis { namespace modeling{
 		
 		
 	}
-	void RSGISModelTree::addVegTransConvexHull(RSGISTransect *transect, unsigned int centerX, unsigned int centerY, unsigned int sizeX, unsigned int sizeY, std::vector<Polygon*> *canopyPolys)
+	void RSGISModelTree::addVegTransConvexHull(RSGISTransect *transect, unsigned int centerX, unsigned int centerY, unsigned int sizeX, unsigned int sizeY, std::vector<geos::geom::Polygon*> *canopyPolys)
 	{
 		double pi = 3.1415926536;
 		

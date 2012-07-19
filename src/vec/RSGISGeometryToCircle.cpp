@@ -25,18 +25,18 @@
 
 namespace rsgis{namespace vec{
 	
-	RSGISGeometryToCircle::RSGISGeometryToCircle(float resolution, string areaAttribute, string radiusAttribute, float radiusInValue)
+	RSGISGeometryToCircle::RSGISGeometryToCircle(float resolution, std::string areaAttribute, std::string radiusAttribute, float radiusInValue)
 	{
 		this->resolution = resolution;
 		this->areaAttribute = areaAttribute;
 		this->radiusAttribute = radiusAttribute;
 		this->radiusInValue = radiusInValue;
 		
-		this->geomUtils = new RSGISGeometry();
+		this->geomUtils = new rsgis::geom::RSGISGeometry();
 		this->vecUtils = new RSGISVectorUtils();
 	}
 	
-	void RSGISGeometryToCircle::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISGeometryToCircle::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
 	{
 		OGRwkbGeometryType geometryType = inFeature->GetGeometryRef()->getGeometryType();
 		OGRFeatureDefn *inFeatureDefn = inFeature->GetDefnRef();
@@ -80,8 +80,8 @@ namespace rsgis{namespace vec{
 		else if( geometryType == wkbMultiPolygon )
 		{
 			OGRMultiPolygon *multiPolygon = (OGRMultiPolygon *) inFeature->GetGeometryRef();
-			MultiPolygon *geosMultiPolygon = vecUtils->convertOGRMultiPolygonGEOSMultiPolygon(multiPolygon);
-			Point *point = geosMultiPolygon->getCentroid();
+			geos::geom::MultiPolygon *geosMultiPolygon = vecUtils->convertOGRMultiPolygonGEOSMultiPolygon(multiPolygon);
+			geos::geom::Point *point = geosMultiPolygon->getCentroid();
 			xCentre = point->getX();
 			yCentre = point->getY();
 			delete point;
@@ -90,7 +90,7 @@ namespace rsgis{namespace vec{
 		else if( geometryType == wkbPoint )
 		{
 			OGRPoint *point = (OGRPoint *) inFeature->GetGeometryRef();
-			//cout << "Point: " << point->exportToGML() << endl;
+			//std::cout << "Point: " << point->exportToGML() << std::endl;
 			xCentre = point->getX();
 			yCentre = point->getY();
 		}	
@@ -159,26 +159,26 @@ namespace rsgis{namespace vec{
 		
 		if(((boost::math::isinf)(xCentre)) | ((boost::math::isinf)(yCentre)) | ((boost::math::isnan)(xCentre)) | ((boost::math::isnan)(yCentre)))
 		{
-			cout << "Centre [" << xCentre << "," << yCentre << "]: " << radiusValue << endl;
+			std::cout << "Centre [" << xCentre << "," << yCentre << "]: " << radiusValue << std::endl;
 			throw RSGISVectorException("Invalid number for circle centre.");
 		}
 		
 		// create circle and set output geom
 		try 
 		{
-			Polygon *geosPolygon = geomUtils->createCircle(xCentre, yCentre, radiusValue, this->resolution);
-			//cout << "Circle: " << geosPolygon->toText() << endl;
+			geos::geom::Polygon *geosPolygon = geomUtils->createCircle(xCentre, yCentre, radiusValue, this->resolution);
+			//std::cout << "Circle: " << geosPolygon->toText() << std::endl;
 			OGRPolygon *ogrPolygon = vecUtils->convertGEOSPolygon2OGRPolygon(geosPolygon);
 			outFeature->SetGeometry(ogrPolygon);
 		}
-		catch (RSGISGeometryException &e) 
+		catch (rsgis::geom::RSGISGeometryException &e) 
 		{
 			throw RSGISVectorException(e.what());
 		}
 		
 	}
 	
-	void RSGISGeometryToCircle::processFeature(OGRFeature *feature, Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISGeometryToCircle::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
 	{
 		throw RSGISVectorException("Not Implemented");
 	}

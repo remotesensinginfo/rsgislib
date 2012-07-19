@@ -38,12 +38,6 @@
 
 #include "vec/RSGISVectorUtils.h"
 
-
-using namespace std;
-using namespace rsgis;
-using namespace geos::geom;
-using namespace geos::util;
-
 namespace rsgis{namespace vec{
 	
 	class RSGISRemoveContainedPolygons

@@ -26,7 +26,7 @@
 
 #include <iostream>
 #include <string>
-#include <list>
+#include <vector>
 
 #include "ogrsf_frmts.h"
 
@@ -41,23 +41,19 @@
 
 #include "geos/geom/Envelope.h"
 
-using namespace std;
-using namespace rsgis::geom;
-using namespace geos::geom;
-
 namespace rsgis{namespace vec{
 	
 	class RSGISGEOSPolygonReader : public RSGISProcessOGRFeature
 		{
 		public:
-			RSGISGEOSPolygonReader(vector<Polygon*> *polygons);
-			virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, Envelope *env, long fid) throw(RSGISVectorException);
-			virtual void processFeature(OGRFeature *feature, Envelope *env, long fid) throw(RSGISVectorException);
+			RSGISGEOSPolygonReader(std::vector<geos::geom::Polygon*> *polygons);
+			virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
+			virtual void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
 			virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException);
 			virtual ~RSGISGEOSPolygonReader();
 		protected:
 			RSGISVectorUtils *vecUtils;
-			vector<Polygon*> *polygons;
+            std::vector<geos::geom::Polygon*> *polygons;
 		};
 }}
 

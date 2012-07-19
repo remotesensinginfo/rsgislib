@@ -39,17 +39,12 @@
 
 #include "geos/geom/Coordinate.h"
 
-using namespace std;
-using namespace rsgis;
-using namespace rsgis::math;
-using namespace geos::geom;
-
 namespace rsgis{namespace vec{
 	
 	class RSGISGeometryRotateAroundFixedPoint : public RSGISProcessOGRGeometry
 		{
 		public:
-			RSGISGeometryRotateAroundFixedPoint(Coordinate *fixedPt, float angle);
+			RSGISGeometryRotateAroundFixedPoint(geos::geom::Coordinate *fixedPt, float angle);
 			virtual void processGeometry(OGRPolygon *polygon) throw(RSGISVectorException);
 			virtual void processGeometry(OGRMultiPolygon *multiPolygon) throw(RSGISVectorException);
 			virtual void processGeometry(OGRPoint *point) throw(RSGISVectorException);
@@ -57,7 +52,7 @@ namespace rsgis{namespace vec{
 			virtual OGRPolygon* processGeometry(OGRGeometry *geom) throw(RSGISVectorException);
 			virtual ~RSGISGeometryRotateAroundFixedPoint();
 		protected:
-			Coordinate *fixedPt;
+			geos::geom::Coordinate *fixedPt;
 			float angle;
 		};
 }}

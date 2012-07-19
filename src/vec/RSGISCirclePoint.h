@@ -26,21 +26,18 @@
 
 #include <iostream>
 #include <string>
+
 #include "vec/RSGISPointData.h"
 #include "vec/RSGISVectorUtils.h"
-#include "math/RSGISMathsUtils.h"
 
-using namespace std;
-using namespace geos::geom;
-using namespace geos;
-using namespace rsgis::math;
+#include "math/RSGISMathsUtils.h"
 
 namespace rsgis{namespace vec{
 	
 	class RSGISCirclePoint : public RSGISPointData
 		{
 		public:
-			RSGISCirclePoint(string radiusAttribute, string areaAttribute, string heightAttribute);
+			RSGISCirclePoint(std::string radiusAttribute, std::string areaAttribute, std::string heightAttribute);
 			virtual void readAttribtues(OGRFeature *feature, OGRFeatureDefn *featDefn);
 			virtual void createLayerDefinition(OGRLayer *outputSHPLayer)throw(RSGISVectorOutputException);
 			virtual void populateFeature(OGRFeature *feature, OGRFeatureDefn *featDefn);

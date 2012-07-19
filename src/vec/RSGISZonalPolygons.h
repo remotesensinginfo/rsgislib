@@ -26,12 +26,9 @@
 
 #include <iostream>
 #include <string>
+
 #include "vec/RSGISPolygonData.h"
 #include "vec/RSGISVectorUtils.h"
-
-using namespace std;
-using namespace geos::geom;
-using namespace geos;
 
 namespace rsgis{namespace vec{
 	

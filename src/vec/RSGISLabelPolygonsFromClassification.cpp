@@ -32,7 +32,7 @@ namespace rsgis{namespace vec{
 		this->dominant = dominant;
 	}
 	
-	void RSGISLabelPolygonsFromClassification::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISLabelPolygonsFromClassification::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
 	{
 		RSGISVectorUtils vecUtils;
 		OGRFeatureDefn *outFeatureDefn = outFeature->GetDefnRef();
@@ -42,12 +42,12 @@ namespace rsgis{namespace vec{
 		{
 			//cout << "Starting polygon " << fid << endl;
 			OGRPolygon *ogrPolygon = (OGRPolygon *) inFeature->GetGeometryRef()->clone();
-			Polygon *poly = vecUtils.convertOGRPolygon2GEOSPolygon(ogrPolygon);
+			geos::geom::Polygon *poly = vecUtils.convertOGRPolygon2GEOSPolygon(ogrPolygon);
 			
-			vector<string> speciesNames = vector<string>();
-			vector<int> speciesCount = vector<int>();
-			vector<float> speciesArea = vector<float>();
-			vector<string>::iterator iterSpecies;
+			std::vector<std::string> speciesNames = std::vector<std::string>();
+			std::vector<int> speciesCount = std::vector<int>();
+			std::vector<float> speciesArea = std::vector<float>();
+			std::vector<std::string>::iterator iterSpecies;
 			bool found = false;
 			int count = 0;
 			int speciesIndex = 0;
@@ -216,8 +216,8 @@ namespace rsgis{namespace vec{
 			double areaRunTotal = 0;
 			if(dominant == rsgis::vec::speciesCount)
 			{
-				string domSPStr = "";
-				string domSPLTStr = "";
+				std::string domSPStr = "";
+				std::string domSPLTStr = "";
 				
 				if(firstCount != -1)
 				{
@@ -262,8 +262,8 @@ namespace rsgis{namespace vec{
 			else if(dominant == rsgis::vec::speciesArea)
 			{
 				
-				string domSPStr = "";
-				string domSPLTStr = "";
+				std::string domSPStr = "";
+				std::string domSPLTStr = "";
 				
 				if(firstArea != -1)
 				{
@@ -315,13 +315,13 @@ namespace rsgis{namespace vec{
 		} 
 		else
 		{
-			string message = string("Unsupport data type: ") + string(inFeature->GetGeometryRef()->getGeometryName());
+			std::string message = std::string("Unsupport data type: ") + std::string(inFeature->GetGeometryRef()->getGeometryName());
 			throw RSGISVectorException(message);
 		}
 		
 	}
 	
-	void RSGISLabelPolygonsFromClassification::processFeature(OGRFeature *feature, Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISLabelPolygonsFromClassification::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
 	{
 		throw RSGISVectorException("Not implemented..");
 	}
@@ -373,7 +373,7 @@ namespace rsgis{namespace vec{
 		shpFieldCDomSP1.SetPrecision(10);
 		if( outputLayer->CreateField( &shpFieldCDomSP1 ) != OGRERR_NONE )
 		{
-			string message = string("Creating shapefile field \'CDOMSP1\' has failed");
+			std::string message = std::string("Creating shapefile field \'CDOMSP1\' has failed");
 			throw RSGISVectorOutputException(message.c_str());
 		}
 		
@@ -381,7 +381,7 @@ namespace rsgis{namespace vec{
 		shpFieldCDomSP2.SetPrecision(10);
 		if( outputLayer->CreateField( &shpFieldCDomSP2 ) != OGRERR_NONE )
 		{
-			string message = string("Creating shapefile field \'CDOMSP2\' has failed");
+			std::string message = std::string("Creating shapefile field \'CDOMSP2\' has failed");
 			throw RSGISVectorOutputException(message.c_str());
 		}
 		
@@ -389,7 +389,7 @@ namespace rsgis{namespace vec{
 		shpFieldCDomSP3.SetPrecision(10);
 		if( outputLayer->CreateField( &shpFieldCDomSP3 ) != OGRERR_NONE )
 		{
-			string message = string("Creating shapefile field \'CDOMSP3\' has failed");
+			std::string message = std::string("Creating shapefile field \'CDOMSP3\' has failed");
 			throw RSGISVectorOutputException(message.c_str());
 		}
 		
@@ -401,7 +401,7 @@ namespace rsgis{namespace vec{
 		shpFieldADomSP1.SetPrecision(10);
 		if( outputLayer->CreateField( &shpFieldADomSP1 ) != OGRERR_NONE )
 		{
-			string message = string("Creating shapefile field \'ADOMSP1\' has failed");
+			std::string message = std::string("Creating shapefile field \'ADOMSP1\' has failed");
 			throw RSGISVectorOutputException(message.c_str());
 		}
 		
@@ -409,7 +409,7 @@ namespace rsgis{namespace vec{
 		shpFieldADomSP2.SetPrecision(10);
 		if( outputLayer->CreateField( &shpFieldADomSP2 ) != OGRERR_NONE )
 		{
-			string message = string("Creating shapefile field \'ADOMSP2\' has failed");
+			std::string message = std::string("Creating shapefile field \'ADOMSP2\' has failed");
 			throw RSGISVectorOutputException(message.c_str());
 		}
 		
@@ -417,7 +417,7 @@ namespace rsgis{namespace vec{
 		shpFieldADomSP3.SetPrecision(10);
 		if( outputLayer->CreateField( &shpFieldADomSP3 ) != OGRERR_NONE )
 		{
-			string message = string("Creating shapefile field \'ADOMSP3\' has failed");
+			std::string message = std::string("Creating shapefile field \'ADOMSP3\' has failed");
 			throw RSGISVectorOutputException(message.c_str());
 		}
 		
@@ -426,7 +426,7 @@ namespace rsgis{namespace vec{
 		shpFieldAREA.SetPrecision(10);
 		if( outputLayer->CreateField( &shpFieldAREA ) != OGRERR_NONE )
 		{
-			string message = string("Creating shapefile field \'AREA\' has failed");
+			std::string message = std::string("Creating shapefile field \'AREA\' has failed");
 			throw RSGISVectorOutputException(message.c_str());
 		}
 		

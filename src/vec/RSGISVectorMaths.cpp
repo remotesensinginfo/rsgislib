@@ -25,14 +25,14 @@
 
 namespace rsgis{namespace vec{
 	
-	RSGISVectorMaths::RSGISVectorMaths(VariableFields **variables, int numVariables, string mathsExpression, string outHeading)
+	RSGISVectorMaths::RSGISVectorMaths(VariableFields **variables, int numVariables, std::string mathsExpression, std::string outHeading)
 	{
 		this->variables = variables;
 		this->numVariables = numVariables;
 		this->outHeading = outHeading;
 		
-		muParser = new Parser();
-		this->inVals = new value_type[numVariables];
+		muParser = new mu::Parser();
+		this->inVals = new mu::value_type[numVariables];
 		for(int i = 0; i < numVariables; ++i)
 		{
 			muParser->DefineVar(_T(variables[i]->name.c_str()), &inVals[i]);
@@ -40,7 +40,7 @@ namespace rsgis{namespace vec{
 		muParser->SetExpr(mathsExpression.c_str());
 	}
 	
-	void RSGISVectorMaths::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISVectorMaths::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
 	{
 		try 
 		{
@@ -51,7 +51,7 @@ namespace rsgis{namespace vec{
 				int fieldIdx = inFeatureDefn->GetFieldIndex(this->variables[i]->fieldName.c_str());
 				inVals[i] = inFeature->GetFieldAsDouble(fieldIdx);
 			}
-			value_type result = 0;
+            mu::value_type result = 0;
 			result = muParser->Eval();
 			
 			// Save out Variables
@@ -60,9 +60,9 @@ namespace rsgis{namespace vec{
 			
 			
 		}
-		catch (ParserError &e) 
+		catch (mu::ParserError &e) 
 		{
-			string message = string("ERROR: ") + string(e.GetMsg()) + string(":\t \'") + string(e.GetExpr()) +string("\'");
+			std::string message = std::string("ERROR: ") + std::string(e.GetMsg()) + std::string(":\t \'") + std::string(e.GetExpr()) +std::string("\'");
 			throw RSGISVectorException(message);
 		}
 		
@@ -72,7 +72,7 @@ namespace rsgis{namespace vec{
 	{
 		if(this->outHeading.length() > 10)
 		{
-			cout << this->outHeading << " will be truncated to \'" << this->outHeading.substr(0, 10) << "\'\n";
+            std::cout << this->outHeading << " will be truncated to \'" << this->outHeading.substr(0, 10) << "\'\n";
 			this->outHeading = this->outHeading.substr(0, 10);
 		}
 		
@@ -80,7 +80,7 @@ namespace rsgis{namespace vec{
 		shpField.SetPrecision(10);
 		if( outputLayer->CreateField( &shpField ) != OGRERR_NONE )
 		{
-			string message = string("Creating output field has failed");
+			std::string message = std::string("Creating output field has failed");
 			throw RSGISVectorOutputException(message.c_str());
 		}
 	}

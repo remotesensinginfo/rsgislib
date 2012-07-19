@@ -34,22 +34,19 @@
 
 #include "common/RSGISVectorException.h"
 
-using namespace std;
-using namespace rsgis;
-
 namespace rsgis{namespace vec{
 	
 	struct sqlclass
 	{
-		string name;
-		string sql;
+        std::string name;
+		std::string sql;
 	};
 	
 	class RSGISVectorSQLClassification
 		{
 		public:
 			RSGISVectorSQLClassification();
-			void classifyVector(OGRDataSource *source, OGRLayer *inputLayer, sqlclass **rules, int numRules, string classAttribute) throw(RSGISVectorException);
+			void classifyVector(OGRDataSource *source, OGRLayer *inputLayer, sqlclass **rules, int numRules, std::string classAttribute) throw(RSGISVectorException);
 			~RSGISVectorSQLClassification();
 		};
 }}

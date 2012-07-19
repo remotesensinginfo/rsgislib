@@ -30,7 +30,7 @@ namespace rsgis{ namespace classifier{
 		
 	}
 
-	ClassData* RSGISClassificationUtils::convertROIs2ClassData(enviroi *enviroi, int id)
+	ClassData* RSGISClassificationUtils::convertROIs2ClassData(rsgis::utils::enviroi *enviroi, int id)
 	{
         rsgis::math::RSGISMatrices matrixUtils;
 		ClassData *classData = new ClassData();

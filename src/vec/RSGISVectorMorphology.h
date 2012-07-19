@@ -39,16 +39,12 @@
 
 #include "geos/geom/Envelope.h"
 
-using namespace std;
-using namespace rsgis::geom;
-using namespace geos::geom;
-
 namespace rsgis{namespace vec{
 	
 	class RSGISVectorMorphology : public RSGISProcessOGRGeometry
 		{
 		public:
-			RSGISVectorMorphology(float buffer, Morphology morphologytype);
+			RSGISVectorMorphology(float buffer, rsgis::geom::Morphology morphologytype);
 			virtual void processGeometry(OGRPolygon *polygon) throw(RSGISVectorException);
 			virtual void processGeometry(OGRMultiPolygon *multiPolygon) throw(RSGISVectorException);
 			virtual void processGeometry(OGRPoint *point) throw(RSGISVectorException);
@@ -57,7 +53,7 @@ namespace rsgis{namespace vec{
 			virtual ~RSGISVectorMorphology();
 		protected:
 			float buffer;
-			Morphology morphologytype;
+			rsgis::geom::Morphology morphologytype;
 		};
 }}
 

@@ -41,19 +41,14 @@
 
 #include "geos/geom/Envelope.h"
 
-using namespace std;
-using namespace rsgis;
-using namespace rsgis::img;
-using namespace geos::geom;
-
 namespace rsgis{namespace vec{
 	
 	class RSGISPixelAreaCountInPolygon : public RSGISProcessOGRFeature
 		{
 		public:
 			RSGISPixelAreaCountInPolygon(GDALDataset *rasterFeatures);
-			virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, Envelope *env, long fid) throw(RSGISVectorException);
-			virtual void processFeature(OGRFeature *feature, Envelope *env, long fid) throw(RSGISVectorException);
+			virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
+			virtual void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
 			virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException);
 			virtual ~RSGISPixelAreaCountInPolygon();
 		protected:
@@ -61,20 +56,20 @@ namespace rsgis{namespace vec{
 			int dataSize;
 			double *data;
 			double pxlresolution;
-			RSGISCalcImageSingle *calcImage;
-			RSGISCalcImageSingleValue *calcValue;
+			rsgis::img::RSGISCalcImageSingle *calcImage;
+			rsgis::img::RSGISCalcImageSingleValue *calcValue;
 		};
 	
 	
-	class RSGISCalcPixelCountFromRasterPolygon : public RSGISCalcImageSingleValue
+	class RSGISCalcPixelCountFromRasterPolygon : public rsgis::img::RSGISCalcImageSingleValue
 		{
 		public: 
 			RSGISCalcPixelCountFromRasterPolygon(int numOutputValues);
-			void calcImageValue(float *bandValuesImageA, float *bandValuesImageB, int numBands, int bandA, int bandB) throw(RSGISImageCalcException);
-			void calcImageValue(float *bandValuesImage, int numBands, int band) throw(RSGISImageCalcException);
-			void calcImageValue(float *bandValuesImage, int numBands, Envelope *extent) throw(RSGISImageCalcException);
-			void calcImageValue(float *bandValuesImage, double interceptArea, int numBands, Polygon *poly, Point *pt) throw(RSGISImageCalcException);
-			double* getOutputValues() throw(RSGISImageCalcException);
+			void calcImageValue(float *bandValuesImageA, float *bandValuesImageB, int numBands, int bandA, int bandB) throw(rsgis::img::RSGISImageCalcException);
+			void calcImageValue(float *bandValuesImage, int numBands, int band) throw(rsgis::img::RSGISImageCalcException);
+			void calcImageValue(float *bandValuesImage, int numBands, geos::geom::Envelope *extent) throw(rsgis::img::RSGISImageCalcException);
+			void calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt) throw(rsgis::img::RSGISImageCalcException);
+			double* getOutputValues() throw(rsgis::img::RSGISImageCalcException);
 			void reset();
 			~RSGISCalcPixelCountFromRasterPolygon();
 		protected:

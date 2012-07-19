@@ -494,28 +494,28 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			char *charValue = XMLString::transcode(argElement->getAttribute(methodXMLStr));
 			string methodStr = string(charValue);
 			// Polygon completely contains pixel
-			if(methodStr == "polyContainsPixel"){this->method = polyContainsPixel;}
+			if(methodStr == "polyContainsPixel"){this->method = rsgis::img::polyContainsPixel;}
 			// Pixel center is within the polygon
-			else if(methodStr == "polyContainsPixelCenter") {this->method = polyContainsPixelCenter;}
+			else if(methodStr == "polyContainsPixelCenter") {this->method = rsgis::img::polyContainsPixelCenter;}
 			// Polygon overlaps the pixel
-			else if(methodStr == "polyOverlapsPixel"){this->method = polyOverlapsPixel;}
+			else if(methodStr == "polyOverlapsPixel"){this->method = rsgis::img::polyOverlapsPixel;}
 			// Polygon overlaps or contains the pixel
-			else if(methodStr == "polyOverlapsOrContainsPixel"){this->method = polyOverlapsOrContainsPixel;}
+			else if(methodStr == "polyOverlapsOrContainsPixel"){this->method = rsgis::img::polyOverlapsOrContainsPixel;}
 			// Pixel contains the polygon
-			else if(methodStr == "pixelContainsPoly"){this->method = pixelContainsPoly;}
+			else if(methodStr == "pixelContainsPoly"){this->method = rsgis::img::pixelContainsPoly;}
 			// Polygon center is within pixel
-			else if(methodStr == "pixelContainsPolyCenter"){this->method = pixelContainsPolyCenter;}
+			else if(methodStr == "pixelContainsPolyCenter"){this->method = rsgis::img::pixelContainsPolyCenter;}
 			// The method is chosen based on relative areas of pixel and polygon.
-			else if(methodStr == "adaptive"){this->method = adaptive;}
+			else if(methodStr == "adaptive"){this->method = rsgis::img::adaptive;}
 			// Everything within the polygons envelope is chosen (for debugging)
-			else if(methodStr == "envelope"){this->method = envelope;}
+			else if(methodStr == "envelope"){this->method = rsgis::img::envelope;}
 			// Set to default value if not recognised.
-			else {cout << "\tMethod not recognised, using default of \'polyContainsPixelCenter\'." << endl;this->method = polyContainsPixelCenter;}
+			else {cout << "\tMethod not recognised, using default of \'polyContainsPixelCenter\'." << endl;this->method = rsgis::img::polyContainsPixelCenter;}
 			XMLString::release(&charValue);
 		}
 		else
 		{
-			this->method = polyContainsPixelCenter;
+			this->method = rsgis::img::polyContainsPixelCenter;
 		}
 		XMLString::release(&methodXMLStr);
 		
@@ -575,29 +575,29 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			char *charValue = XMLString::transcode(argElement->getAttribute(methodXMLStr));
 			string methodStr = string(charValue);
 			// Polygon completely contains pixel
-			if(methodStr == "polyContainsPixel"){this->method = polyContainsPixel;}
+			if(methodStr == "polyContainsPixel"){this->method = rsgis::img::polyContainsPixel;}
 			// Pixel center is within the polygon
-			else if(methodStr == "polyContainsPixelCenter") {this->method = polyContainsPixelCenter;}
+			else if(methodStr == "polyContainsPixelCenter") {this->method = rsgis::img::polyContainsPixelCenter;}
 			// Polygon overlaps the pixel
-			else if(methodStr == "polyOverlapsPixel"){this->method = polyOverlapsPixel;}
+			else if(methodStr == "polyOverlapsPixel"){this->method = rsgis::img::polyOverlapsPixel;}
 			// Polygon overlaps or contains the pixel
-			else if(methodStr == "polyOverlapsOrContainsPixel"){this->method = polyOverlapsOrContainsPixel;}
+			else if(methodStr == "polyOverlapsOrContainsPixel"){this->method = rsgis::img::polyOverlapsOrContainsPixel;}
 			// Pixel contains the polygon
-			else if(methodStr == "pixelContainsPoly"){this->method = pixelContainsPoly;}
+			else if(methodStr == "pixelContainsPoly"){this->method = rsgis::img::pixelContainsPoly;}
 			// Polygon center is within pixel
-			else if(methodStr == "pixelContainsPolyCenter"){this->method = pixelContainsPolyCenter;}
+			else if(methodStr == "pixelContainsPolyCenter"){this->method = rsgis::img::pixelContainsPolyCenter;}
 			// The method is chosen based on relative areas of pixel and polygon.
-			else if(methodStr == "adaptive"){this->method = adaptive;}
+			else if(methodStr == "adaptive"){this->method = rsgis::img::adaptive;}
 			// Everything within the polygons envelope is chosen (for debugging)
-			else if(methodStr == "envelope"){this->method = envelope;}
+			else if(methodStr == "envelope"){this->method = rsgis::img::envelope;}
 			// Set to default value if not recognised.
-			else {cerr << "\tMethod not recognised, using default of \'polyContainsPixelCenter\'." << endl;this->method = polyContainsPixelCenter;}
+			else {cerr << "\tMethod not recognised, using default of \'polyContainsPixelCenter\'." << endl;this->method = rsgis::img::polyContainsPixelCenter;}
 			XMLString::release(&charValue);
 		}
 		else
 		{
 			cerr << "\tMethod not recognised, using default of \'polyContainsPixelCenter\'." << endl;
-			this->method = polyContainsPixelCenter;
+			this->method = rsgis::img::polyContainsPixelCenter;
 		}
 		XMLString::release(&methodXMLStr);
 	}
@@ -875,23 +875,23 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 				char *charValue = XMLString::transcode(argElement->getAttribute(methodXMLStr));
 				string methodStr = string(charValue);
 				// Polygon completely contains pixel
-				if(methodStr == "polyContainsPixel"){this->method = polyContainsPixel;}
+				if(methodStr == "polyContainsPixel"){this->method = rsgis::img::polyContainsPixel;}
 				// Pixel center is within the polygon
-				else if(methodStr == "polyContainsPixelCenter") {this->method = polyContainsPixelCenter;}
+				else if(methodStr == "polyContainsPixelCenter") {this->method = rsgis::img::polyContainsPixelCenter;}
 				// Polygon overlaps the pixel
-				else if(methodStr == "polyOverlapsPixel"){this->method = polyOverlapsPixel;}
+				else if(methodStr == "polyOverlapsPixel"){this->method = rsgis::img::polyOverlapsPixel;}
 				// Polygon overlaps or contains the pixel
-				else if(methodStr == "polyOverlapsOrContainsPixel"){this->method = polyOverlapsOrContainsPixel;}
+				else if(methodStr == "polyOverlapsOrContainsPixel"){this->method = rsgis::img::polyOverlapsOrContainsPixel;}
 				// Pixel contains the polygon
-				else if(methodStr == "pixelContainsPoly"){this->method = pixelContainsPoly;}
+				else if(methodStr == "pixelContainsPoly"){this->method = rsgis::img::pixelContainsPoly;}
 				// Polygon center is within pixel
-				else if(methodStr == "pixelContainsPolyCenter"){this->method = pixelContainsPolyCenter;}
+				else if(methodStr == "pixelContainsPolyCenter"){this->method = rsgis::img::pixelContainsPolyCenter;}
 				// The method is chosen based on relative areas of pixel and polygon.
-				else if(methodStr == "adaptive"){this->method = adaptive;}
+				else if(methodStr == "adaptive"){this->method = rsgis::img::adaptive;}
 				// Everything within the polygons envelope is chosen (for debugging)
-				else if(methodStr == "envelope"){this->method = envelope;}
+				else if(methodStr == "envelope"){this->method = rsgis::img::envelope;}
 				// Set to default value if not recognised.
-				else {cout << "\tMethod not recognised, using default of \'polyContainsPixelCenter\'." << endl;this->method = polyContainsPixelCenter;}
+				else {cout << "\tMethod not recognised, using default of \'polyContainsPixelCenter\'." << endl;this->method = rsgis::img::polyContainsPixelCenter;}
 				XMLString::release(&charValue);
 			}
 		}
@@ -900,7 +900,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			if (useRasPoly == false) 
 			{
 				cout << "\tMethod not recognised, using default of \'polyContainsPixelCenter\'." << endl;
-				this->method = polyContainsPixelCenter;
+				this->method = rsgis::img::polyContainsPixelCenter;
 			}
 		}
 		XMLString::release(&methodXMLStr);
@@ -1365,23 +1365,23 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 				char *charValue = XMLString::transcode(argElement->getAttribute(methodXMLStr));
 				string methodStr = string(charValue);
 				// Polygon completely contains pixel
-				if(methodStr == "polyContainsPixel"){this->method = polyContainsPixel;}
+				if(methodStr == "polyContainsPixel"){this->method = rsgis::img::polyContainsPixel;}
 				// Pixel center is within the polygon
-				else if(methodStr == "polyContainsPixelCenter") {this->method = polyContainsPixelCenter;}
+				else if(methodStr == "polyContainsPixelCenter") {this->method = rsgis::img::polyContainsPixelCenter;}
 				// Polygon overlaps the pixel
-				else if(methodStr == "polyOverlapsPixel"){this->method = polyOverlapsPixel;}
+				else if(methodStr == "polyOverlapsPixel"){this->method = rsgis::img::polyOverlapsPixel;}
 				// Polygon overlaps or contains the pixel
-				else if(methodStr == "polyOverlapsOrContainsPixel"){this->method = polyOverlapsOrContainsPixel;}
+				else if(methodStr == "polyOverlapsOrContainsPixel"){this->method = rsgis::img::polyOverlapsOrContainsPixel;}
 				// Pixel contains the polygon
-				else if(methodStr == "pixelContainsPoly"){this->method = pixelContainsPoly;}
+				else if(methodStr == "pixelContainsPoly"){this->method = rsgis::img::pixelContainsPoly;}
 				// Polygon center is within pixel
-				else if(methodStr == "pixelContainsPolyCenter"){this->method = pixelContainsPolyCenter;}
+				else if(methodStr == "pixelContainsPolyCenter"){this->method = rsgis::img::pixelContainsPolyCenter;}
 				// The method is chosen based on relative areas of pixel and polygon.
-				else if(methodStr == "adaptive"){this->method = adaptive;}
+				else if(methodStr == "adaptive"){this->method = rsgis::img::adaptive;}
 				// Everything within the polygons envelope is chosen (for debugging)
-				else if(methodStr == "envelope"){this->method = envelope;}
+				else if(methodStr == "envelope"){this->method = rsgis::img::envelope;}
 				// Set to default value if not recognised.
-				else {cout << "\tMethod not recognised, using default of \'polyContainsPixelCenter\'." << endl;this->method = polyContainsPixelCenter;}
+				else {cout << "\tMethod not recognised, using default of \'polyContainsPixelCenter\'." << endl;this->method = rsgis::img::polyContainsPixelCenter;}
 				XMLString::release(&charValue);
 			}
 		}
@@ -1390,7 +1390,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			if (useRasPoly == false) 
 			{
 				cout << "\tMethod not recognised, using default of \'polyContainsPixelCenter\'." << endl;
-				this->method = polyContainsPixelCenter;
+				this->method = rsgis::img::polyContainsPixelCenter;
 			}
 		}
 		XMLString::release(&methodXMLStr);
@@ -1632,29 +1632,29 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			char *charValue = XMLString::transcode(argElement->getAttribute(methodXMLStr));
 			string methodStr = string(charValue);
 			// Polygon completely contains pixel
-			if(methodStr == "polyContainsPixel"){this->method = polyContainsPixel;}
+			if(methodStr == "polyContainsPixel"){this->method = rsgis::img::polyContainsPixel;}
 			// Pixel center is within the polygon
-			else if(methodStr == "polyContainsPixelCenter") {this->method = polyContainsPixelCenter;}
+			else if(methodStr == "polyContainsPixelCenter") {this->method = rsgis::img::polyContainsPixelCenter;}
 			// Polygon overlaps the pixel
-			else if(methodStr == "polyOverlapsPixel"){this->method = polyOverlapsPixel;}
+			else if(methodStr == "polyOverlapsPixel"){this->method = rsgis::img::polyOverlapsPixel;}
 			// Polygon overlaps or contains the pixel
-			else if(methodStr == "polyOverlapsOrContainsPixel"){this->method = polyOverlapsOrContainsPixel;}
+			else if(methodStr == "polyOverlapsOrContainsPixel"){this->method = rsgis::img::polyOverlapsOrContainsPixel;}
 			// Pixel contains the polygon
-			else if(methodStr == "pixelContainsPoly"){this->method = pixelContainsPoly;}
+			else if(methodStr == "pixelContainsPoly"){this->method = rsgis::img::pixelContainsPoly;}
 			// Polygon center is within pixel
-			else if(methodStr == "pixelContainsPolyCenter"){this->method = pixelContainsPolyCenter;}
+			else if(methodStr == "pixelContainsPolyCenter"){this->method = rsgis::img::pixelContainsPolyCenter;}
 			// The method is chosen based on relative areas of pixel and polygon.
-			else if(methodStr == "adaptive"){this->method = adaptive;}
+			else if(methodStr == "adaptive"){this->method = rsgis::img::adaptive;}
 			// Everything within the polygons envelope is chosen (for debugging)
-			else if(methodStr == "envelope"){this->method = envelope;}
+			else if(methodStr == "envelope"){this->method = rsgis::img::envelope;}
 			// Set to default value if not recognised.
-			else {cout << "\tMethod not recognised, using default of \'polyContainsPixelCenter\'." << endl;this->method = polyContainsPixelCenter;}
+			else {cout << "\tMethod not recognised, using default of \'polyContainsPixelCenter\'." << endl;this->method = rsgis::img::polyContainsPixelCenter;}
 			XMLString::release(&charValue);
 		}
 		else
 		{
 			cerr << "\tMethod not recognised, using default of \'polyContainsPixelCenter\'." << endl;
-			this->method = polyContainsPixelCenter;
+			this->method = rsgis::img::polyContainsPixelCenter;
 		}
 		XMLString::release(&methodXMLStr);
 		
@@ -2482,29 +2482,29 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			char *charValue = XMLString::transcode(argElement->getAttribute(methodXMLStr));
 			string methodStr = string(charValue);
 			// Polygon completely contains pixel
-			if(methodStr == "polyContainsPixel"){this->method = polyContainsPixel;}
+			if(methodStr == "polyContainsPixel"){this->method = rsgis::img::polyContainsPixel;}
 			// Pixel center is within the polygon
-			else if(methodStr == "polyContainsPixelCenter") {this->method = polyContainsPixelCenter;}
+			else if(methodStr == "polyContainsPixelCenter") {this->method = rsgis::img::polyContainsPixelCenter;}
 			// Polygon overlaps the pixel
-			else if(methodStr == "polyOverlapsPixel"){this->method = polyOverlapsPixel;}
+			else if(methodStr == "polyOverlapsPixel"){this->method = rsgis::img::polyOverlapsPixel;}
 			// Polygon overlaps or contains the pixel
-			else if(methodStr == "polyOverlapsOrContainsPixel"){this->method = polyOverlapsOrContainsPixel;}
+			else if(methodStr == "polyOverlapsOrContainsPixel"){this->method = rsgis::img::polyOverlapsOrContainsPixel;}
 			// Pixel contains the polygon
-			else if(methodStr == "pixelContainsPoly"){this->method = pixelContainsPoly;}
+			else if(methodStr == "pixelContainsPoly"){this->method = rsgis::img::pixelContainsPoly;}
 			// Polygon center is within pixel
-			else if(methodStr == "pixelContainsPolyCenter"){this->method = pixelContainsPolyCenter;}
+			else if(methodStr == "pixelContainsPolyCenter"){this->method = rsgis::img::pixelContainsPolyCenter;}
 			// The method is chosen based on relative areas of pixel and polygon.
-			else if(methodStr == "adaptive"){this->method = adaptive;}
+			else if(methodStr == "adaptive"){this->method = rsgis::img::adaptive;}
 			// Everything within the polygons envelope is chosen (for debugging)
-			else if(methodStr == "envelope"){this->method = envelope;}
+			else if(methodStr == "envelope"){this->method = rsgis::img::envelope;}
 			// Set to default value if not recognised.
-			else {cerr << "\tMethod not recognised, using default of \'polyContainsPixelCenter\'." << endl;this->method = polyContainsPixelCenter;}
+			else {cerr << "\tMethod not recognised, using default of \'polyContainsPixelCenter\'." << endl;this->method = rsgis::img::polyContainsPixelCenter;}
 			XMLString::release(&charValue);
 		}
 		else
 		{
 			cerr << "\tMethod not recognised, using default of \'polyContainsPixelCenter\'." << endl;
-			this->method = polyContainsPixelCenter;
+			this->method = rsgis::img::polyContainsPixelCenter;
 		}
 		XMLString::release(&methodXMLStr);
 	}

@@ -45,19 +45,14 @@
 
 #include "geos/geom/Envelope.h"
 
-using namespace std;
-using namespace geos::geom;
-using namespace rsgis::math;
-using namespace rsgis::utils;
-
 namespace rsgis{namespace vec{
 	
 	class RSGISVectorZonalStatsPtxtOut : public RSGISProcessOGRFeature
 	{
 	public:
-		RSGISVectorZonalStatsPtxtOut(GDALDataset *image, RSGISExportForPlottingIncremental *plotter, int bX, int bY, int bZ, int bC ) throw(RSGISVectorException);
-		virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, Envelope *env, long fid) throw(RSGISVectorException);
-		virtual void processFeature(OGRFeature *feature, Envelope *env, long fid) throw(RSGISVectorException);
+		RSGISVectorZonalStatsPtxtOut(GDALDataset *image, rsgis::utils::RSGISExportForPlottingIncremental *plotter, int bX, int bY, int bZ, int bC ) throw(RSGISVectorException);
+		virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
+		virtual void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
 		virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException);
 		float* getPixelColumns(int xPxl, int yPxl);
 		virtual ~RSGISVectorZonalStatsPtxtOut();
@@ -65,10 +60,10 @@ namespace rsgis{namespace vec{
 		GDALDataset *image;
 		GDALRasterBand **bands;
 		int numImgBands;
-		Envelope *imageExtent;
+		geos::geom::Envelope *imageExtent;
 		double imgRes;
 		float *pxlValues;
-		RSGISExportForPlottingIncremental *plotter;
+        rsgis::utils::RSGISExportForPlottingIncremental *plotter;
 		int bX;
 		int bY;
 		int bZ;

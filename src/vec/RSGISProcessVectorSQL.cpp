@@ -32,11 +32,11 @@ namespace rsgis{namespace vec{
 		this->processFeatures = processFeatures;
 	}
 	
-	void RSGISProcessVectorSQL::processVectors(OGRDataSource *inputDS, OGRLayer *outputLayer, bool copyData, bool outVertical, string sql) throw(RSGISVectorOutputException,RSGISVectorException)
+	void RSGISProcessVectorSQL::processVectors(OGRDataSource *inputDS, OGRLayer *outputLayer, bool copyData, bool outVertical, std::string sql) throw(RSGISVectorOutputException,RSGISVectorException)
 	{
 		RSGISVectorUtils vecUtils;
 		
-		Envelope *env = NULL;
+		geos::geom::Envelope *env = NULL;
 		OGRGeometry *geometry = NULL;
 		
 		OGRFeature *inFeature = NULL;
@@ -67,7 +67,7 @@ namespace rsgis{namespace vec{
 			
 			int numFeatures = inputLayer->GetFeatureCount(TRUE);
 			
-            cout << numFeatures << " features where selected.\n";
+            std::cout << numFeatures << " features where selected.\n";
             
 			bool nullGeometry = false;
 			
@@ -84,11 +84,11 @@ namespace rsgis{namespace vec{
 			{
 				if(outVertical)
 				{
-					cout << "Started, " << numFeatures << " features to process.\n";
+					std::cout << "Started, " << numFeatures << " features to process.\n";
 				}
 				else
 				{
-					cout << "Started" << flush;
+					std::cout << "Started" << std::flush;
 				}				
 			}			
 			inputLayer->ResetReading();
@@ -98,11 +98,11 @@ namespace rsgis{namespace vec{
 				{
 					if(outVertical)
 					{
-						cout << feedbackCounter << "% Done" << endl;
+						std::cout << feedbackCounter << "% Done" << std::endl;
 					}
 					else
 					{
-						cout << ".." << feedbackCounter << ".." << flush;
+						std::cout << ".." << feedbackCounter << ".." << std::flush;
 					}
 					
 					feedbackCounter = feedbackCounter + 10;
@@ -141,13 +141,13 @@ namespace rsgis{namespace vec{
 				}
 				else if(geometry != NULL)
 				{
-					string message = string("Unsupport data type: ") + string(geometry->getGeometryName());
+					std::string message = std::string("Unsupport data type: ") + std::string(geometry->getGeometryName());
 					throw RSGISVectorException(message);
 				}
 				else 
 				{
 					nullGeometry = true;
-					cout << "WARNING: NULL Geometry Present within input file - IGNORED\n";
+					std::cout << "WARNING: NULL Geometry Present within input file - IGNORED\n";
 				}
 				
 				if(!nullGeometry)
@@ -176,7 +176,7 @@ namespace rsgis{namespace vec{
 			}
 			if(toFeedback)
 			{
-				cout << " Complete.\n";
+				std::cout << " Complete.\n";
 			}
 		}
 		catch(RSGISVectorOutputException& e)
@@ -189,11 +189,11 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISProcessVectorSQL::processVectors(OGRDataSource *inputDS, bool outVertical, string sql) throw(RSGISVectorOutputException,RSGISVectorException)
+	void RSGISProcessVectorSQL::processVectors(OGRDataSource *inputDS, bool outVertical, std::string sql) throw(RSGISVectorOutputException,RSGISVectorException)
 	{
 		RSGISVectorUtils vecUtils;
 		
-		Envelope *env = NULL;
+		geos::geom::Envelope *env = NULL;
 		OGRGeometry *geometry = NULL;
 		
 		OGRFeature *inFeature = NULL;
@@ -229,11 +229,11 @@ namespace rsgis{namespace vec{
 			{
 				if(outVertical)
 				{
-					cout << "Started, " << numFeatures << " features to process.\n";
+					std::cout << "Started, " << numFeatures << " features to process.\n";
 				}
 				else
 				{
-					cout << "Started" << flush;
+					std::cout << "Started" << std::flush;
 				}				
 			}
 			
@@ -244,11 +244,11 @@ namespace rsgis{namespace vec{
 				{
 					if(outVertical)
 					{
-						cout << feedbackCounter << "% Done" << endl;
+						std::cout << feedbackCounter << "% Done" << std::endl;
 					}
 					else
 					{
-						cout << ".." << feedbackCounter << ".." << flush;
+						std::cout << ".." << feedbackCounter << ".." << std::flush;
 					}
 					
 					feedbackCounter = feedbackCounter + 10;
@@ -281,18 +281,18 @@ namespace rsgis{namespace vec{
 				}
 				else if(geometry != NULL)
 				{
-					string message = string("Unsupport data type: ") + string(geometry->getGeometryName());
+					std::string message = std::string("Unsupport data type: ") + std::string(geometry->getGeometryName());
 					throw RSGISVectorException(message);
 				}
 				else 
 				{
 					nullGeometry = true;
-					cout << "WARNING: NULL Geometry Present within input file - IGNORED\n";
+					std::cout << "WARNING: NULL Geometry Present within input file - IGNORED\n";
 				}
 				
 				if(!nullGeometry)
 				{
-					//cout << " FID = " << fid << " " << env->toString() << endl ;
+					//std::cout << " FID = " << fid << " " << env->toString() << std::endl ;
 					
 					processFeatures->processFeature(inFeature, env, fid);
 					
@@ -309,7 +309,7 @@ namespace rsgis{namespace vec{
 			}
 			if(toFeedback)
 			{
-				cout << " Complete.\n";
+				std::cout << " Complete.\n";
 			}
 		}
 		catch(RSGISVectorOutputException& e)
@@ -322,11 +322,11 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISProcessVectorSQL::processVectorsNoOutput(OGRDataSource *inputDS, bool outVertical, string sql) throw(RSGISVectorOutputException,RSGISVectorException)
+	void RSGISProcessVectorSQL::processVectorsNoOutput(OGRDataSource *inputDS, bool outVertical, std::string sql) throw(RSGISVectorOutputException,RSGISVectorException)
 	{
 		RSGISVectorUtils vecUtils;
 		
-		Envelope *env = NULL;
+		geos::geom::Envelope *env = NULL;
 		OGRGeometry *geometry = NULL;
 		
 		OGRFeature *inFeature = NULL;
@@ -361,11 +361,11 @@ namespace rsgis{namespace vec{
 			{
 				if(outVertical)
 				{
-					cout << "Started, " << numFeatures << " features to process.\n";
+					std::cout << "Started, " << numFeatures << " features to process.\n";
 				}
 				else
 				{
-					cout << "Started" << flush;
+					std::cout << "Started" << std::flush;
 				}
 			}
 			
@@ -377,11 +377,11 @@ namespace rsgis{namespace vec{
 				{
 					if(outVertical)
 					{
-						cout << feedbackCounter << "% Done" << endl;
+						std::cout << feedbackCounter << "% Done" << std::endl;
 					}
 					else
 					{
-						cout << ".." << feedbackCounter << ".." << flush;
+						std::cout << ".." << feedbackCounter << ".." << std::flush;
 					}
 					
 					feedbackCounter = feedbackCounter + 10;
@@ -414,13 +414,13 @@ namespace rsgis{namespace vec{
 				}
 				else if(geometry != NULL)
 				{
-					string message = string("Unsupport data type: ") + string(geometry->getGeometryName());
+					std::string message = std::string("Unsupport data type: ") + std::string(geometry->getGeometryName());
 					throw RSGISVectorException(message);
 				}
 				else 
 				{
 					nullGeometry = true;
-					cout << "WARNING: NULL Geometry Present within input file - IGNORED\n";
+					std::cout << "WARNING: NULL Geometry Present within input file - IGNORED\n";
 				}
 				
 				if(!nullGeometry)
@@ -435,7 +435,7 @@ namespace rsgis{namespace vec{
 			}
 			if(toFeedback)
 			{
-				cout << " Complete.\n";
+				std::cout << " Complete.\n";
 			}			
 		}
 		catch(RSGISVectorOutputException& e)
@@ -455,7 +455,7 @@ namespace rsgis{namespace vec{
 		{
 			if( outputSHPLayer->CreateField( inFeatureDefn->GetFieldDefn(i) ) != OGRERR_NONE )
 			{
-				string message = string("Creating ") + string(inFeatureDefn->GetFieldDefn(i)->GetNameRef()) + string(" field has failed.");
+				std::string message = std::string("Creating ") + std::string(inFeatureDefn->GetFieldDefn(i)->GetNameRef()) + std::string(" field has failed.");
 				throw RSGISVectorOutputException(message.c_str());
 			}
 		}

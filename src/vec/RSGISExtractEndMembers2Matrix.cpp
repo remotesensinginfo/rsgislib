@@ -31,11 +31,11 @@ namespace rsgis{namespace vec{
         
     }
 		
-    void RSGISExtractEndMembers2Matrix::extractColumnPerPolygon2Matrix(GDALDataset *dataset, OGRLayer *vecLayer, string outputMatrix, pixelInPolyOption pixelPolyOption)throw(RSGISVectorZonalException)
+    void RSGISExtractEndMembers2Matrix::extractColumnPerPolygon2Matrix(GDALDataset *dataset, OGRLayer *vecLayer, string outputMatrix, rsgis::img::pixelInPolyOption pixelPolyOption)throw(RSGISVectorZonalException)
     {
         try
         {
-            RSGISMatrices matrixUtils;
+            rsgis::math::RSGISMatrices matrixUtils;
             GDALDataset **datasets = new GDALDataset*[1];
             datasets[0] = dataset;
             unsigned int numImageBands = dataset->GetRasterCount();
@@ -52,7 +52,7 @@ namespace rsgis{namespace vec{
             
             unsigned int numFeatures = vecLayer->GetFeatureCount(TRUE);
             
-            Matrix *endMembers = matrixUtils.createMatrix(numImageBands, numFeatures);
+            rsgis::math::Matrix *endMembers = matrixUtils.createMatrix(numImageBands, numFeatures);
             for(unsigned int i = 0; i < numFeatures; ++i)
             {
                 for(unsigned int j = 0; j < numImageBands; ++j)
@@ -64,7 +64,7 @@ namespace rsgis{namespace vec{
             RSGISVectorUtils vecUtils;
             OGRPolygon *polygon = NULL;
             OGRGeometry *geometry = NULL;
-            Envelope *env = NULL;            
+            geos::geom::Envelope *env = NULL;            
             OGRFeature *inFeature = NULL;
             long fid = 0;
             bool nullGeometry;
@@ -73,7 +73,7 @@ namespace rsgis{namespace vec{
             while( (inFeature = vecLayer->GetNextFeature()) != NULL )
 			{
 				fid = inFeature->GetFID();
-                cout << "Extracting Data for feature " << fid << endl;
+                std::cout << "Extracting Data for feature " << fid << std::endl;
 				
 				// Get Geometry.
 				nullGeometry = false;
@@ -86,7 +86,7 @@ namespace rsgis{namespace vec{
 				else 
 				{
 					nullGeometry = true;
-					cout << "WARNING: NULL Geometry Present within input file - IGNORED\n";
+					std::cout << "WARNING: NULL Geometry Present within input file - IGNORED\n";
 				}
 				
 				if(!nullGeometry)
@@ -95,7 +95,7 @@ namespace rsgis{namespace vec{
                     
                     for(unsigned int j = 0; j < numImageBands; ++j)
                     {
-                        //cout << "Idx = " << (j*numFeatures)+featureCount << " = " << sumVals[j] << " from " << countVals << " pixels." << endl;
+                        //std::cout << "Idx = " << (j*numFeatures)+featureCount << " = " << sumVals[j] << " from " << countVals << " pixels." << std::endl;
                         endMembers->matrix[(j*numFeatures)+featureCount] = sumVals[j]/countVals;
                         sumVals[j] = 0;
                     }
@@ -129,7 +129,7 @@ namespace rsgis{namespace vec{
     
     
     
-    RSGISExtractSumPixelValues::RSGISExtractSumPixelValues(unsigned int numImageBands, RSGISCalcSumValues *valueCalc, GDALDataset **datasets, int numDS, pixelInPolyOption pixelPolyOption)
+    RSGISExtractSumPixelValues::RSGISExtractSumPixelValues(unsigned int numImageBands, RSGISCalcSumValues *valueCalc, GDALDataset **datasets, int numDS, rsgis::img::pixelInPolyOption pixelPolyOption)
     {
         this->numImageBands = numImageBands;
         this->valueCalc = valueCalc;
@@ -138,13 +138,13 @@ namespace rsgis{namespace vec{
         this->pixelPolyOption = pixelPolyOption;
     }
     
-    void RSGISExtractSumPixelValues::processFeature(OGRFeature *feature, OGRPolygon *poly, Envelope *env, long fid) throw(RSGISVectorException)
+    void RSGISExtractSumPixelValues::processFeature(OGRFeature *feature, OGRPolygon *poly, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
     {
         try
         {
             RSGISVectorUtils vecUtils;
-            RSGISCalcImage calcImage(valueCalc);
-            Polygon *geosPoly = vecUtils.convertOGRPolygon2GEOSPolygon(poly);
+            rsgis::img::RSGISCalcImage calcImage(valueCalc);
+            geos::geom::Polygon *geosPoly = vecUtils.convertOGRPolygon2GEOSPolygon(poly);
             calcImage.calcImageWithinPolygonExtent(this->datasets, this->numDS, env, geosPoly, this->pixelPolyOption);
             delete geosPoly;
         }
@@ -161,25 +161,25 @@ namespace rsgis{namespace vec{
     
     
     
-    RSGISCalcSumValues::RSGISCalcSumValues(float *sumVals, unsigned int *countVals, unsigned int numSumVals):RSGISCalcImageValue(0)
+    RSGISCalcSumValues::RSGISCalcSumValues(float *sumVals, unsigned int *countVals, unsigned int numSumVals):rsgis::img::RSGISCalcImageValue(0)
     {
         this->sumVals = sumVals;
         this->countVals = countVals;
         this->numSumVals = numSumVals;
     }
     
-    void RSGISCalcSumValues::calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException)
+    void RSGISCalcSumValues::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException)
     {
         if(numSumVals != ((unsigned int) numBands))
         {
-            throw RSGISImageCalcException("Number of expected bands and the number of bands inputted are not the same.");
+            throw rsgis::img::RSGISImageCalcException("Number of expected bands and the number of bands inputted are not the same.");
         }
         
         for(int i = 0; i < numBands; ++i)
         {
-            //cout << "\t Value (" << i+1 << "): " << bandValues[i] << endl;
+            //std::cout << "\t Value (" << i+1 << "): " << bandValues[i] << std::endl;
             sumVals[i] = sumVals[i] + bandValues[i];
-            //cout << "\tSum (" << i+1 << "): " << sumVals[i] << endl;
+            //std::cout << "\tSum (" << i+1 << "): " << sumVals[i] << std::endl;
         }
         ++(*countVals);
     }

@@ -25,19 +25,19 @@
 
 namespace rsgis{namespace vec{
 	
-	RSGISConvertToASCII::RSGISConvertToASCII(string outputTextFile)
+	RSGISConvertToASCII::RSGISConvertToASCII(std::string outputTextFile)
 	{
 		this->outputTextFile = outputTextFile;
 		
 		outTxtFile.open(outputTextFile.c_str(), ios::out | ios::trunc);
 	}
 	
-	void RSGISConvertToASCII::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISConvertToASCII::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
 	{
 		throw RSGISVectorException("Not implemented..");
 	}
 	
-	void RSGISConvertToASCII::processFeature(OGRFeature *feature, Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISConvertToASCII::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
 	{
 		if(outTxtFile.is_open())
 		{
@@ -62,7 +62,7 @@ namespace rsgis{namespace vec{
 				}
 				outTxtFile << feature->GetFieldAsString(featureDefn->GetFieldIndex(featureDefn->GetFieldDefn(i)->GetNameRef()));
 			}
-			outTxtFile << endl;
+			outTxtFile << std::endl;
 			outTxtFile.flush();
 			//cout << "FID = " << fid << endl;
 		}

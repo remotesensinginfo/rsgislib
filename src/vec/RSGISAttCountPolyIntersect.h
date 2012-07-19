@@ -45,56 +45,48 @@
 #include "geos/geom/Coordinate.h"
 #include "geos/geom/Polygon.h"
 
-using namespace std;
-using namespace rsgis;
-using namespace rsgis::utils;
-using namespace rsgis::rastergis;
-using namespace rsgis::img;
-using namespace geos::geom;
-using namespace rsgis::math;
-
 namespace rsgis{namespace vec{    
     
 	class RSGISAttCountPolyIntersect
 	{
 	public:
 		RSGISAttCountPolyIntersect();
-        void countPolysIntersections(RSGISAttributeTable *attTable, GDALDataset *clumps, OGRLayer *polys, string field, pixelInPolyOption pixelPolyOption)throw(RSGISAttributeTableException);
-        void countPolysIntersections(RSGISAttributeTable *attTable, GDALDataset *clumps, vector<OGRPolygon*> *polys, string field, pixelInPolyOption pixelPolyOption)throw(RSGISAttributeTableException);
-		void countPolyIntersections(RSGISAttributeTable *attTable, GDALDataset *clumps, OGRPolygon *ogrPoly, unsigned int fieldIdx, pixelInPolyOption pixelPolyOption)throw(RSGISAttributeTableException);
+        void countPolysIntersections(rsgis::rastergis::RSGISAttributeTable *attTable, GDALDataset *clumps, OGRLayer *polys, std::string field, rsgis::img::pixelInPolyOption pixelPolyOption)throw(RSGISAttributeTableException);
+        void countPolysIntersections(rsgis::rastergis::RSGISAttributeTable *attTable, GDALDataset *clumps, vector<OGRPolygon*> *polys, std::string field, rsgis::img::pixelInPolyOption pixelPolyOption)throw(RSGISAttributeTableException);
+		void countPolyIntersections(rsgis::rastergis::RSGISAttributeTable *attTable, GDALDataset *clumps, OGRPolygon *ogrPoly, unsigned int fieldIdx, rsgis::img::pixelInPolyOption pixelPolyOption)throw(RSGISAttributeTableException);
         ~RSGISAttCountPolyIntersect();
 	};
     
     
-    class RSGISCalcValueCountInAttTable : public RSGISCalcImageValue
+    class RSGISCalcValueCountInAttTable : public rsgis::img::RSGISCalcImageValue
     {
     public: 
-        RSGISCalcValueCountInAttTable(RSGISAttributeTable *attTable, unsigned int fieldIdx);
-        void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException);
-        void calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
-        bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
+        RSGISCalcValueCountInAttTable(rsgis::rastergis::RSGISAttributeTable *attTable, unsigned int fieldIdx);
+        void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException);
+        void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+        bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
         ~RSGISCalcValueCountInAttTable();
     protected:
-        RSGISAttributeTable *attTable;
+        rsgis::rastergis::RSGISAttributeTable *attTable;
         unsigned int fieldIdx;
     };
     
     class RSGISPopulateAttTableForPolygonIntersect
     {
     public:
-        RSGISPopulateAttTableForPolygonIntersect(RSGISCalcValueCountInAttTable *valueCalc, GDALDataset **datasets, int numDS, pixelInPolyOption pixelPolyOption);
-        void processFeature(OGRFeature *feature, OGRPolygon *poly, Envelope *env, long fid) throw(RSGISVectorException);
+        RSGISPopulateAttTableForPolygonIntersect(RSGISCalcValueCountInAttTable *valueCalc, GDALDataset **datasets, int numDS, rsgis::img::pixelInPolyOption pixelPolyOption);
+        void processFeature(OGRFeature *feature, OGRPolygon *poly, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
         ~RSGISPopulateAttTableForPolygonIntersect();
     protected:
         unsigned int numImageBands;
         RSGISCalcValueCountInAttTable *valueCalc;
         GDALDataset **datasets;
         int numDS;
-        pixelInPolyOption pixelPolyOption;
+        rsgis::img::pixelInPolyOption pixelPolyOption;
     };
     
 

@@ -30,33 +30,28 @@
 #include "vec/RSGISProcessOGRFeature.h"
 #include "muParser.h"
 
-
-using namespace std;
-using namespace rsgis;
-using namespace mu;
-
 namespace rsgis{namespace vec{
 	
 	struct VariableFields 
 	{
-		string name;
-		string fieldName;
+        std::string name;
+        std::string fieldName;
 	};
 	
 	class RSGISVectorMaths : public RSGISProcessOGRFeature
 	{
 	public:
-		RSGISVectorMaths(VariableFields **variables, int numVariables, string mathsExpression, string outHeading);
-		virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, Envelope *env, long fid) throw(RSGISVectorException);
-		virtual void processFeature(OGRFeature *feature, Envelope *env, long fid) throw(RSGISVectorException){throw RSGISVectorException("Not Implemented");};
+		RSGISVectorMaths(VariableFields **variables, int numVariables, std::string mathsExpression, std::string outHeading);
+		virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
+		virtual void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException){throw RSGISVectorException("Not Implemented");};
 		virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException);
 		~RSGISVectorMaths();
 	private:
 		VariableFields **variables;
 		int numVariables;
-		Parser *muParser;
-		value_type *inVals;
-		string outHeading;
+        mu::Parser *muParser;
+        mu::value_type *inVals;
+        std::string outHeading;
 	};
 }}
 

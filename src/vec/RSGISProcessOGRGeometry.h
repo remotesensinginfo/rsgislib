@@ -26,16 +26,12 @@
 #define RSGISProcessOGRGeometry_H
 
 #include <iostream>
-#include <string>
 
 #include "ogrsf_frmts.h"
 
 #include "common/RSGISVectorException.h"
 
 #include "vec/RSGISVectorOutputException.h"
-
-using namespace std;
-using namespace rsgis;
 
 namespace rsgis{namespace vec{
 	

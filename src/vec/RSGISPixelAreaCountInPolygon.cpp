@@ -35,16 +35,16 @@ namespace rsgis{namespace vec{
 		pxlresolution = transformation[1];
 		delete[] transformation;
 		
-		cout << "Pixel resolution = " << pxlresolution << endl;
+		std::cout << "Pixel resolution = " << pxlresolution << std::endl;
 		
 		dataSize = 1; // 0 Pxl Count
 		data = new double[dataSize];
 		
 		calcValue = new RSGISCalcPixelCountFromRasterPolygon(dataSize);
-		calcImage = new RSGISCalcImageSingle(calcValue);
+		calcImage = new rsgis::img::RSGISCalcImageSingle(calcValue);
 	}
 	
-	void RSGISPixelAreaCountInPolygon::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISPixelAreaCountInPolygon::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
 	{
 		calcValue->reset();
 		calcImage->calcImageWithinRasterPolygon(datasets, 1, data, env, fid, true);
@@ -54,7 +54,7 @@ namespace rsgis{namespace vec{
 		outFeature->SetField(outFeatureDefn->GetFieldIndex("Area"), (data[0]*pxlresolution));
 	}
 	
-	void RSGISPixelAreaCountInPolygon::processFeature(OGRFeature *feature, Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISPixelAreaCountInPolygon::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
 	{
 		throw RSGISVectorException("Not Implemented");
 	}
@@ -65,7 +65,7 @@ namespace rsgis{namespace vec{
 		shpField_totalpxl.SetPrecision(10);
 		if( outputLayer->CreateField( &shpField_totalpxl ) != OGRERR_NONE )
 		{
-			string message = string("Creating shapefile field \'TotalPxls\' has failed");
+			std::string message = std::string("Creating shapefile field \'TotalPxls\' has failed");
 			throw RSGISVectorOutputException(message.c_str());
 		}
 		
@@ -73,7 +73,7 @@ namespace rsgis{namespace vec{
 		shpField_area.SetPrecision(10);
 		if( outputLayer->CreateField( &shpField_area ) != OGRERR_NONE )
 		{
-			string message = string("Creating shapefile field \'Area\' has failed");
+			std::string message = std::string("Creating shapefile field \'Area\' has failed");
 			throw RSGISVectorOutputException(message.c_str());
 		}
 	}
@@ -89,32 +89,32 @@ namespace rsgis{namespace vec{
 	
 	
 	
-	RSGISCalcPixelCountFromRasterPolygon::RSGISCalcPixelCountFromRasterPolygon(int numOutputValues) : RSGISCalcImageSingleValue(numOutputValues)
+	RSGISCalcPixelCountFromRasterPolygon::RSGISCalcPixelCountFromRasterPolygon(int numOutputValues) : rsgis::img::RSGISCalcImageSingleValue(numOutputValues)
 	{
 		this->totalPxl = 0;
 	}
 	
-	void RSGISCalcPixelCountFromRasterPolygon::calcImageValue(float *bandValuesImageA, float *bandValuesImageB, int numBands, int bandA, int bandB) throw(RSGISImageCalcException)
+	void RSGISCalcPixelCountFromRasterPolygon::calcImageValue(float *bandValuesImageA, float *bandValuesImageB, int numBands, int bandA, int bandB) throw(rsgis::img::RSGISImageCalcException)
 	{
-		throw RSGISImageCalcException("Not Implemented");
+		throw rsgis::img::RSGISImageCalcException("Not Implemented");
 	}
 	
-	void RSGISCalcPixelCountFromRasterPolygon::calcImageValue(float *bandValuesImage, int numBands, int band) throw(RSGISImageCalcException)
+	void RSGISCalcPixelCountFromRasterPolygon::calcImageValue(float *bandValuesImage, int numBands, int band) throw(rsgis::img::RSGISImageCalcException)
 	{
 		totalPxl++;
 	}
 	
-	void RSGISCalcPixelCountFromRasterPolygon::calcImageValue(float *bandValuesImage, int numBands, Envelope *extent) throw(RSGISImageCalcException)
+	void RSGISCalcPixelCountFromRasterPolygon::calcImageValue(float *bandValuesImage, int numBands, geos::geom::Envelope *extent) throw(rsgis::img::RSGISImageCalcException)
 	{
-		throw RSGISImageCalcException("Not Implemented");
+		throw rsgis::img::RSGISImageCalcException("Not Implemented");
 	}
 	
-	void RSGISCalcPixelCountFromRasterPolygon::calcImageValue(float *bandValuesImage, double interceptArea, int numBands, Polygon *poly, Point *pt) throw(RSGISImageCalcException)
+	void RSGISCalcPixelCountFromRasterPolygon::calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt) throw(rsgis::img::RSGISImageCalcException)
 	{
-		throw RSGISImageCalcException("Not Implemented");
+		throw rsgis::img::RSGISImageCalcException("Not Implemented");
 	}
 	
-	double* RSGISCalcPixelCountFromRasterPolygon::getOutputValues() throw(RSGISImageCalcException)
+	double* RSGISCalcPixelCountFromRasterPolygon::getOutputValues() throw(rsgis::img::RSGISImageCalcException)
 	{
 		outputValues[0] = this->totalPxl;
 		

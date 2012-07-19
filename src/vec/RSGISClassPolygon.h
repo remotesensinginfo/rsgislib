@@ -26,36 +26,33 @@
 
 #include <iostream>
 #include <string>
+
 #include "vec/RSGISPolygonData.h"
 #include "vec/RSGISVectorUtils.h"
-#include "math/RSGISMatrices.h"
 
-using namespace std;
-using namespace geos::geom;
-using namespace geos;
-using namespace rsgis::math;
+#include "math/RSGISMatrices.h"
 
 namespace rsgis{namespace vec{
 	
 	class RSGISClassPolygon : public RSGISPolygonData
 		{
 		public:
-			RSGISClassPolygon(string classAttribute);
+			RSGISClassPolygon(std::string classAttribute);
 			virtual void readAttribtues(OGRFeature *feature, OGRFeatureDefn *featDefn);
 			virtual void createLayerDefinition(OGRLayer *outputSHPLayer)throw(RSGISVectorOutputException);
 			virtual void populateFeature(OGRFeature *feature, OGRFeatureDefn *featDefn);
 			string getClassName();
 			void setClassName(string name);
 			void setNumPixels(int numPxls);
-			void setPixelValues(Matrix *pxlValues);
-			Matrix* getPixelValues();
+			void setPixelValues(rsgis::math::Matrix *pxlValues);
+            rsgis::math::Matrix* getPixelValues();
 			int getNumPixels();
 			~RSGISClassPolygon();
 		protected:
-			string className;
-			string classAttribute;
+            std::string className;
+            std::string classAttribute;
 			int numPxls;
-			Matrix *pxlValues;
+            rsgis::math::Matrix *pxlValues;
 		};
 }}
 

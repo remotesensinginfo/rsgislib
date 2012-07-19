@@ -45,32 +45,26 @@
 
 #include "geos/geom/Envelope.h"
 
-using namespace std;
-using namespace rsgis;
-using namespace rsgis::img;
-using namespace rsgis::math;
-using namespace geos::geom;
-
 namespace rsgis{namespace vec{
 	
 	class RSGISPopulateTopPowerSet : public RSGISProcessOGRFeature
 		{
 		public:
 			RSGISPopulateTopPowerSet(GDALDataset *image, GDALDataset *rasterFeatures, CountAttributes** attributes, int numAttributes, int nTop);
-			virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, Envelope *env, long fid) throw(RSGISVectorException);
-			virtual void processFeature(OGRFeature *feature, Envelope *env, long fid) throw(RSGISVectorException);
+			virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
+			virtual void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
 			virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException);
 			virtual ~RSGISPopulateTopPowerSet();
 		protected:
-			void identifyPowerSet(CountAttributes** allAttributes, int numAttributes, string *topAttributeNames, int numTop, CountAttributes** powerSetAttributes, int numPSAttributes) throw(RSGISMathException,RSGISVectorException);
+			void identifyPowerSet(CountAttributes** allAttributes, int numAttributes, std::string *topAttributeNames, int numTop, CountAttributes** powerSetAttributes, int numPSAttributes) throw(rsgis::math::RSGISMathException,RSGISVectorException);
 			GDALDataset **datasets;
 			CountAttributes** attributes;
 			int numAttributes;
 			int dataSize;
 			int nTop;
 			double *data;
-			RSGISCalcImageSingle *calcImage;
-			RSGISCalcImageSingleValue *calcValue;
+            rsgis::img::RSGISCalcImageSingle *calcImage;
+			rsgis::img::RSGISCalcImageSingleValue *calcValue;
 		};
 }}
 

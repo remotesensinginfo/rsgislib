@@ -30,24 +30,24 @@ namespace rsgis{namespace vec{
 		
 	}
 	
-	ClassVariables** RSGISZonalStats2Matrix::findPixelStats(GDALDataset **image, int numImgs, OGRLayer *vecLayer, string classAttribute, int *numMatrices, pixelInPolyOption method)
+	ClassVariables** RSGISZonalStats2Matrix::findPixelStats(GDALDataset **image, int numImgs, OGRLayer *vecLayer, string classAttribute, int *numMatrices, rsgis::img::pixelInPolyOption method)
 	{		
-		RSGISCalcImageSingleValue *polyPxlCount = NULL;
+        rsgis::img::RSGISCalcImageSingleValue *polyPxlCount = NULL;
 		ClassVariables **classVars = NULL;
-		RSGISCalcImageSingle *calcImageValue;
-		RSGISCalcImageSingleValue *polyMatrix = NULL;
-		RSGISCalcImageSingle *calcPolyMatrix = NULL;
+		rsgis::img::RSGISCalcImageSingle *calcImageValue;
+		rsgis::img::RSGISCalcImageSingleValue *polyMatrix = NULL;
+		rsgis::img::RSGISCalcImageSingle *calcPolyMatrix = NULL;
 
-		Matrix *matrix = NULL;
+		rsgis::math::Matrix *matrix = NULL;
 		int *matrixPter = NULL;
 		RSGISPolygonData **polyData = NULL;
 		RSGISClassPolygon **data = NULL;
 		
-		vector<string> *classNames = new vector<string>();
+		std::vector<string> *classNames = new std::vector<string>();
 		double *numPxls = new double[1];
 		
 		RSGISVectorIO vecIO;
-		RSGISMatrices matrixUtils;
+		rsgis::math::RSGISMatrices matrixUtils;
 		
 		int numVariables = 0;
 		int numFeatures = 0;
@@ -105,8 +105,8 @@ namespace rsgis{namespace vec{
 			
 			// Count the number of pixels within each polygon
 			cout << "Count the number of pixels within each polygon\n";
-			polyPxlCount = new RSGISPolygonPixelCount(1);
-			calcImageValue = new RSGISCalcImageSingle(polyPxlCount);
+			polyPxlCount = new rsgis::img::RSGISPolygonPixelCount(1);
+			calcImageValue = new rsgis::img::RSGISCalcImageSingle(polyPxlCount);
 			for(int i = 0; i < numFeatures; i++)
 			{
 				polyPxlCount->reset();
@@ -125,13 +125,13 @@ namespace rsgis{namespace vec{
 			cout << "Populate the matrices of each polygon.\n";
 			for(int i = 0; i < numFeatures; i++)
 			{
-				polyMatrix = new RSGISPopulateMatrix(numVariables, data[i]->getNumPixels());
-				calcPolyMatrix = new RSGISCalcImageSingle(polyMatrix);
+				polyMatrix = new rsgis::img::RSGISPopulateMatrix(numVariables, data[i]->getNumPixels());
+				calcPolyMatrix = new rsgis::img::RSGISCalcImageSingle(polyMatrix);
 				//cout << "Feature " << i << endl;
 				//cout << "Populate matrix\n";
-				calcPolyMatrix->calcImageWithinPolygon(image, numImgs, numPxls, data[i]->getBBox(), data[i]->getPolygon(), false, polyContainsPixelCenter);
+				calcPolyMatrix->calcImageWithinPolygon(image, numImgs, numPxls, data[i]->getBBox(), data[i]->getPolygon(), false, rsgis::img::polyContainsPixelCenter);
 				//cout << "Get Matrix\n";
-				matrix = dynamic_cast<RSGISPopulateMatrix*>(polyMatrix)->getMatrix();
+				matrix = dynamic_cast<rsgis::img::RSGISPopulateMatrix*>(polyMatrix)->getMatrix();
 				//cout << "set matrix to polygon\n";
 				data[i]->setPixelValues(matrix);
 				//cout << "Delete\n";
@@ -235,7 +235,7 @@ namespace rsgis{namespace vec{
 			
 			throw e;
 		}
-		catch(RSGISImageCalcException e)
+		catch(rsgis::img::RSGISImageCalcException e)
 		{
 			if(calcImageValue != NULL)
 			{
@@ -271,7 +271,7 @@ namespace rsgis{namespace vec{
 			
 			throw e;
 		}
-		catch(RSGISImageBandException e)
+		catch(rsgis::img::RSGISImageBandException e)
 		{
 			if(calcImageValue != NULL)
 			{
@@ -380,17 +380,17 @@ namespace rsgis{namespace vec{
 		return classVars;
 	}
 	
-	Matrix** RSGISZonalStats2Matrix::findPixelsForImageBand(GDALDataset **image, int numImgs, OGRLayer *shpfile, int *numMatrices, int band)
+	rsgis::math::Matrix** RSGISZonalStats2Matrix::findPixelsForImageBand(GDALDataset **image, int numImgs, OGRLayer *shpfile, int *numMatrices, int band)
 	{
-		Matrix **matrices = NULL;
-		RSGISCalcImageSingleValue *polyMatrix = NULL;
-		RSGISCalcImageSingle *calcPolyMatrix = NULL;
-		Matrix *matrix = NULL;
+		rsgis::math::Matrix **matrices = NULL;
+		rsgis::img::RSGISCalcImageSingleValue *polyMatrix = NULL;
+		rsgis::img::RSGISCalcImageSingle *calcPolyMatrix = NULL;
+		rsgis::math::Matrix *matrix = NULL;
 		RSGISPolygonData **polyData;
 		
 		RSGISVectorIO vecIO;
-		RSGISMatrices matrixUtils;
-		RSGISImageUtils imgUtils;
+		rsgis::math::RSGISMatrices matrixUtils;
+		rsgis::img::RSGISImageUtils imgUtils;
 		
 		int width = 0;
 		int height = 0;
@@ -415,17 +415,17 @@ namespace rsgis{namespace vec{
 			}
 			vecIO.readPolygons(shpfile, polyData, numFeatures);
 			
-			matrices = new Matrix*[numFeatures];
+			matrices = new rsgis::math::Matrix*[numFeatures];
 			
 			// Create a matrix for each polygon
 			cout << "Populate the matrices of each polygon.\n";
 			for(int i = 0; i < numFeatures; i++)
 			{
 				imgUtils.getImageOverlap(image, numImgs, &width, &height, polyData[i]->getBBox());
-				polyMatrix = new RSGISImageBand2Matrix(1, band, width, height);
-				calcPolyMatrix = new RSGISCalcImageSingle(polyMatrix);
-				calcPolyMatrix->calcImageWithinPolygon(image, numImgs, outputValue, polyData[i]->getBBox(), polyData[i]->getPolygon(), false, polyContainsPixelCenter);
-				matrix = dynamic_cast<RSGISImageBand2Matrix*>(polyMatrix)->getMatrix();
+				polyMatrix = new rsgis::img::RSGISImageBand2Matrix(1, band, width, height);
+				calcPolyMatrix = new rsgis::img::RSGISCalcImageSingle(polyMatrix);
+				calcPolyMatrix->calcImageWithinPolygon(image, numImgs, outputValue, polyData[i]->getBBox(), polyData[i]->getPolygon(), false, rsgis::img::polyContainsPixelCenter);
+				matrix = dynamic_cast<rsgis::img::RSGISImageBand2Matrix*>(polyMatrix)->getMatrix();
 				matrices[i] = matrixUtils.copyMatrix(matrix);
 				delete polyMatrix;
 				delete calcPolyMatrix;
@@ -454,7 +454,7 @@ namespace rsgis{namespace vec{
 			}
 			throw e;
 		}
-		catch(RSGISImageBandException e)
+		catch(rsgis::img::RSGISImageBandException e)
 		{
 			if(polyData != NULL)
 			{

@@ -40,19 +40,15 @@
 
 #include "geos/geom/Envelope.h"
 
-using namespace std;
-using namespace rsgis;
-using namespace geos::geom;
-
 namespace rsgis{namespace vec{
 	
 	class RSGISProcessVectorSQL
 	{
 	public:
 		RSGISProcessVectorSQL(RSGISProcessOGRFeature *processFeatures);
-		void processVectors(OGRDataSource *inputDS, OGRLayer *outputLayer, bool copyData, bool outVertical, string sql) throw(RSGISVectorOutputException,RSGISVectorException);
-		void processVectors(OGRDataSource *inputDS, bool outVertical, string sql) throw(RSGISVectorOutputException,RSGISVectorException);
-		void processVectorsNoOutput(OGRDataSource *inputDS, bool outVertical, string sql) throw(RSGISVectorOutputException,RSGISVectorException);
+		void processVectors(OGRDataSource *inputDS, OGRLayer *outputLayer, bool copyData, bool outVertical, std::string sql) throw(RSGISVectorOutputException,RSGISVectorException);
+		void processVectors(OGRDataSource *inputDS, bool outVertical, std::string sql) throw(RSGISVectorOutputException,RSGISVectorException);
+		void processVectorsNoOutput(OGRDataSource *inputDS, bool outVertical, std::string sql) throw(RSGISVectorOutputException,RSGISVectorException);
 		~RSGISProcessVectorSQL();
 	protected:
 		void copyFeatureDefn(OGRLayer *outputSHPLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException);

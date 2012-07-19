@@ -39,10 +39,10 @@ namespace rsgis{namespace vec{
 		data = new double[dataSize];
 		
 		calcValue = new RSGISCalcZonalMeanFromRasterPolygon(dataSize, attributes, numAttributes);
-		calcImage = new RSGISCalcImageSingle(calcValue);
+		calcImage = new rsgis::img:: RSGISCalcImageSingle(calcValue);
 	}
 	
-	void RSGISZonalMeanStats::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISZonalMeanStats::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
 	{
 		try
 		{
@@ -109,7 +109,7 @@ namespace rsgis{namespace vec{
 	}
 	
 	
-	RSGISCalcZonalMeanFromRasterPolygon::RSGISCalcZonalMeanFromRasterPolygon(int numOutputValues, MeanAttributes **attributes, int numAttributes) : RSGISCalcImageSingleValue(numOutputValues)
+	RSGISCalcZonalMeanFromRasterPolygon::RSGISCalcZonalMeanFromRasterPolygon(int numOutputValues, MeanAttributes **attributes, int numAttributes) : rsgis::img:: RSGISCalcImageSingleValue(numOutputValues)
 	{
 		this->attributes = attributes;
 		this->numAttributes = numAttributes;
@@ -122,7 +122,7 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISCalcZonalMeanFromRasterPolygon::calcImageValue(float *bandValuesImage, int numBands, int band) throw(RSGISImageCalcException)
+	void RSGISCalcZonalMeanFromRasterPolygon::calcImageValue(float *bandValuesImage, int numBands, int band) throw(rsgis::img:: RSGISImageCalcException)
 	{
 		float min = 0;
 		bool first = true;
@@ -137,7 +137,7 @@ namespace rsgis{namespace vec{
 				//cout << "Number of bands = " << numBands << endl;
 				if((attributes[i]->bands[j] > numBands) | (attributes[i]->bands[j] < 0))
 				{
-					throw RSGISImageCalcException("The band attributes do not match the image.");
+					throw rsgis::img:: RSGISImageCalcException("The band attributes do not match the image.");
 				}
 				// Calculates the minimum of the two input image bands
 				if(!isnan(attributes[i]->bands[j]+1))
@@ -173,7 +173,7 @@ namespace rsgis{namespace vec{
 		totalPxl++;
 	}
 	
-	double* RSGISCalcZonalMeanFromRasterPolygon::getOutputValues() throw(RSGISImageCalcException)
+	double* RSGISCalcZonalMeanFromRasterPolygon::getOutputValues() throw(rsgis::img:: RSGISImageCalcException)
 	{
 		//double *outputData = new double[this->numOutputValues];
 		outputValues[0] = this->totalPxl;
@@ -208,7 +208,7 @@ namespace rsgis{namespace vec{
 	}
 	
 	
-	RSGISZonalMeanStatsPoly::RSGISZonalMeanStatsPoly(GDALDataset *image, MeanAttributes** attributes, int numAttributes, bool outPxlCount, pixelInPolyOption method, bool dB)
+	RSGISZonalMeanStatsPoly::RSGISZonalMeanStatsPoly(GDALDataset *image, MeanAttributes** attributes, int numAttributes, bool outPxlCount, rsgis::img::pixelInPolyOption method, bool dB)
 	{
 		this->datasets = new GDALDataset*[1];
 		this->datasets[0] = image;
@@ -228,10 +228,10 @@ namespace rsgis{namespace vec{
 		{
 			calcValue = new RSGISCalcZonalMeanFromPolygon(dataSize, attributes, numAttributes);
 		}
-		calcImage = new RSGISCalcImageSingle(calcValue);
+		calcImage = new rsgis::img::RSGISCalcImageSingle(calcValue);
 	}
 	
-	void RSGISZonalMeanStatsPoly::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISZonalMeanStatsPoly::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
 	{
 		try
 		{
@@ -240,7 +240,7 @@ namespace rsgis{namespace vec{
 			calcValue->reset();
 			
 			OGRPolygon *inOGRPoly;
-			Polygon *poly;
+			geos::geom::Polygon *poly;
 			inOGRPoly = (OGRPolygon *) inFeature->GetGeometryRef();
 			poly = vecUtils.convertOGRPolygon2GEOSPolygon(inOGRPoly);
 			
@@ -305,7 +305,7 @@ namespace rsgis{namespace vec{
 	}
 	
 	
-	RSGISCalcZonalMeanFromPolygon::RSGISCalcZonalMeanFromPolygon(int numOutputValues, MeanAttributes **attributes, int numAttributes) : RSGISCalcImageSingleValue(numOutputValues)
+	RSGISCalcZonalMeanFromPolygon::RSGISCalcZonalMeanFromPolygon(int numOutputValues, MeanAttributes **attributes, int numAttributes) : rsgis::img:: RSGISCalcImageSingleValue(numOutputValues)
 	{
 		this->attributes = attributes; 
 		this->numAttributes = numAttributes;
@@ -318,7 +318,7 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISCalcZonalMeanFromPolygon::calcImageValue(float *bandValuesImage, double interceptArea, int numBands, Polygon *poly, Point *pt) throw(RSGISImageCalcException)
+	void RSGISCalcZonalMeanFromPolygon::calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt) throw(rsgis::img:: RSGISImageCalcException)
 	{
 		float min = 0;
 		bool first = true;
@@ -332,7 +332,7 @@ namespace rsgis{namespace vec{
 			{
 				if((attributes[i]->bands[j] > numBands) | (attributes[i]->bands[j] < 0))
 				{
-					throw RSGISImageCalcException("The band attributes do not match the image.");
+					throw rsgis::img:: RSGISImageCalcException("The band attributes do not match the image.");
 				}
 				// Calculates the minimum of the two input image bands
 				if(!isnan(attributes[i]->bands[j]))
@@ -368,7 +368,7 @@ namespace rsgis{namespace vec{
 		totalPxl++;
 	}
 	
-	double* RSGISCalcZonalMeanFromPolygon::getOutputValues() throw(RSGISImageCalcException)
+	double* RSGISCalcZonalMeanFromPolygon::getOutputValues() throw(rsgis::img:: RSGISImageCalcException)
 	{
 		//double *outputData = new double[this->numOutputValues];
 		outputValues[0] = this->totalPxl;
@@ -403,7 +403,7 @@ namespace rsgis{namespace vec{
 		delete[] pxlCount;
 	}
 	
-	RSGISCalcZonalMeanFromPolygondB::RSGISCalcZonalMeanFromPolygondB(int numOutputValues, MeanAttributes **attributes, int numAttributes) : RSGISCalcImageSingleValue(numOutputValues)
+	RSGISCalcZonalMeanFromPolygondB::RSGISCalcZonalMeanFromPolygondB(int numOutputValues, MeanAttributes **attributes, int numAttributes) : rsgis::img:: RSGISCalcImageSingleValue(numOutputValues)
 	{
 		this->attributes = attributes; 
 		this->numAttributes = numAttributes;
@@ -416,7 +416,7 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISCalcZonalMeanFromPolygondB::calcImageValue(float *bandValuesImage, double interceptArea, int numBands, Polygon *poly, Point *pt) throw(RSGISImageCalcException)
+	void RSGISCalcZonalMeanFromPolygondB::calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt) throw(rsgis::img:: RSGISImageCalcException)
 	{
 		float min = 0;
 		bool first = true;
@@ -430,7 +430,7 @@ namespace rsgis{namespace vec{
 			{
 				if((attributes[i]->bands[j] > numBands) | (attributes[i]->bands[j] < 0))
 				{
-					throw RSGISImageCalcException("The band attributes do not match the image.");
+					throw rsgis::img:: RSGISImageCalcException("The band attributes do not match the image.");
 				}
 				// Calculates the minimum of the two input image bands
 				if(!isnan(attributes[i]->bands[j]))
@@ -466,7 +466,7 @@ namespace rsgis{namespace vec{
 		totalPxl++;
 	}
 	
-	double* RSGISCalcZonalMeanFromPolygondB::getOutputValues() throw(RSGISImageCalcException)
+	double* RSGISCalcZonalMeanFromPolygondB::getOutputValues() throw(rsgis::img:: RSGISImageCalcException)
 	{
 		//double *outputData = new double[this->numOutputValues];
 		outputValues[0] = this->totalPxl;
@@ -513,10 +513,10 @@ namespace rsgis{namespace vec{
 		data = new double[dataSize];
 		
 		calcValue = new RSGISCalcZonalWeightedMeanStatsPoly(dataSize, attributes, numAttributes);
-		calcImage = new RSGISCalcImageSingle(calcValue);
+		calcImage = new rsgis::img:: RSGISCalcImageSingle(calcValue);
 	}
 	
-	void RSGISZonalWeightedMeanStatsPoly::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISZonalWeightedMeanStatsPoly::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
 	{
 		try
 		{
@@ -524,12 +524,12 @@ namespace rsgis{namespace vec{
 			calcValue->reset();
 			
 			OGRPolygon *inOGRPoly;
-			Polygon *poly;
+			geos::geom::Polygon *poly;
 			
 			inOGRPoly = (OGRPolygon *) inFeature->GetGeometryRef();
 			poly = vecUtils.convertOGRPolygon2GEOSPolygon(inOGRPoly);
 			
-			calcImage->calcImageWithinPolygon(datasets, 1, data, env, poly, true, pixelAreaInPoly);
+			calcImage->calcImageWithinPolygon(datasets, 1, data, env, poly, true, rsgis::img::pixelAreaInPoly);
 			
 			OGRFeatureDefn *outFeatureDefn = outFeature->GetDefnRef();
 			int count = 0;
@@ -591,7 +591,7 @@ namespace rsgis{namespace vec{
 	}
 	
 	
-	RSGISCalcZonalWeightedMeanStatsPoly::RSGISCalcZonalWeightedMeanStatsPoly(int numOutputValues, MeanAttributes **attributes, int numAttributes) : RSGISCalcImageSingleValue(numOutputValues)
+	RSGISCalcZonalWeightedMeanStatsPoly::RSGISCalcZonalWeightedMeanStatsPoly(int numOutputValues, MeanAttributes **attributes, int numAttributes) : rsgis::img:: RSGISCalcImageSingleValue(numOutputValues)
 	{
 		this->attributes = attributes; 
 		this->numAttributes = numAttributes;
@@ -604,7 +604,7 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISCalcZonalWeightedMeanStatsPoly::calcImageValue(float *bandValuesImage, double interceptArea, int numBands, Polygon *poly, Point *pt) throw(RSGISImageCalcException)
+	void RSGISCalcZonalWeightedMeanStatsPoly::calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt) throw(rsgis::img:: RSGISImageCalcException)
 	{
 		double weightedVal = 0;
 		bool found = false;
@@ -619,7 +619,7 @@ namespace rsgis{namespace vec{
 				//cout << "Number of bands = " << numBands << endl;
 				if((attributes[i]->bands[j] > numBands) | (attributes[i]->bands[j] < 0))
 				{
-					throw RSGISImageCalcException("The band attributes do not match the image.");
+					throw rsgis::img:: RSGISImageCalcException("The band attributes do not match the image.");
 				}
 				// Calculates the minimum of the two input image bands
 				if(!isnan(attributes[i]->bands[j]))
@@ -656,7 +656,7 @@ namespace rsgis{namespace vec{
 		totalPxl++;
 	}
 	
-	double* RSGISCalcZonalWeightedMeanStatsPoly::getOutputValues() throw(RSGISImageCalcException)
+	double* RSGISCalcZonalWeightedMeanStatsPoly::getOutputValues() throw(rsgis::img:: RSGISImageCalcException)
 	{
 		//double *outputData = new double[this->numOutputValues];
 		outputValues[0] = this->totalPxl;

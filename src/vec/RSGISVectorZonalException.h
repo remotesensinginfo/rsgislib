@@ -26,19 +26,16 @@
 
 #include "common/RSGISVectorException.h"
 
-using namespace rsgis;
-using namespace std;
-
 namespace rsgis 
 {
 	namespace vec
 	{
-		class RSGISVectorZonalException : public RSGISVectorException
+		class RSGISVectorZonalException : public rsgis::RSGISVectorException
 			{
 			public:
 				RSGISVectorZonalException();
 				RSGISVectorZonalException(const char* message);
-				RSGISVectorZonalException(string message);
+				RSGISVectorZonalException(std::string message);
 			};
 	}
 }

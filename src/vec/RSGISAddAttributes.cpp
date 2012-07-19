@@ -33,12 +33,12 @@ namespace rsgis{namespace vec{
 		this->numAttributes = numAttributes;
 	}
 		
-	void RSGISAddAttributes::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISAddAttributes::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
 	{
-		
+        // Do nothing - just adding column.
 	}
 	
-	void RSGISAddAttributes::processFeature(OGRFeature *feature, Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISAddAttributes::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
 	{
 		throw RSGISVectorException("Not implemented..");
 	}
@@ -50,7 +50,7 @@ namespace rsgis{namespace vec{
 			OGRFieldDefn shpField(attributes[i]->name.c_str(), attributes[i]->type);
 			if( outputLayer->CreateField( &shpField ) != OGRERR_NONE )
 			{
-				string message = string("Creating vector field") + attributes[i]->name + string(" has failed");
+				std::string message = std::string("Creating vector field") + attributes[i]->name + std::string(" has failed");
 				throw RSGISVectorOutputException(message.c_str());
 			}
 		}

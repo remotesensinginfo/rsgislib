@@ -76,14 +76,14 @@ namespace rsgis{namespace radar{
 		
 	}
 	
-	void RSGISObjectBasedEstimation::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISObjectBasedEstimation::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
 	{
 		try 
 		{
 			// GET DATA
 			rsgis::vec::RSGISVectorUtils vecUtils;
 			OGRPolygon *inOGRPoly;
-			Polygon *poly;
+			geos::geom::Polygon *poly;
 			inOGRPoly = (OGRPolygon *) inFeature->GetGeometryRef();			
 			poly = vecUtils.convertOGRPolygon2GEOSPolygon(inOGRPoly);
 			rsgis::img::RSGISCalcImageValue *invValuesObj;
@@ -246,14 +246,14 @@ namespace rsgis{namespace radar{
 		
 	}	
 	
-	void RSGISObjectBasedEstimation::processFeature(OGRFeature *inFeature, Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISObjectBasedEstimation::processFeature(OGRFeature *inFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
 	{
 		try 
 		{
 			// GET DATA
 			rsgis::vec::RSGISVectorUtils vecUtils;
 			OGRPolygon *inOGRPoly;
-			Polygon *poly;
+			geos::geom::Polygon *poly;
 			rsgis::img::RSGISCalcImageValue *invValuesObj;
 			rsgis::img::RSGISCalcImageValue *invValues;
 			inOGRPoly = (OGRPolygon *) inFeature->GetGeometryRef();			
@@ -496,14 +496,14 @@ namespace rsgis{namespace radar{
 		
 	}
 	
-	void RSGISObjectBasedEstimationObjectAP::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISObjectBasedEstimationObjectAP::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
 	{
 		try 
 		{
 			// GET DATA
 			rsgis::vec::RSGISVectorUtils vecUtils;
 			OGRPolygon *inOGRPoly;
-			Polygon *poly;
+			geos::geom::Polygon *poly;
 			rsgis::img::RSGISCalcImageValue *invValuesObj;
 			rsgis::img::RSGISCalcImageValue *invValues;
 			
@@ -681,14 +681,14 @@ namespace rsgis{namespace radar{
 		
 	}	
 	
-	void RSGISObjectBasedEstimationObjectAP::processFeature(OGRFeature *inFeature, Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISObjectBasedEstimationObjectAP::processFeature(OGRFeature *inFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
 	{
 		try 
 		{
 			// GET DATA
 			rsgis::vec::RSGISVectorUtils vecUtils;
 			OGRPolygon *inOGRPoly;
-			Polygon *poly;
+			geos::geom::Polygon *poly;
 			rsgis::img::RSGISCalcImageValue *invValuesObj;
 			rsgis::img::RSGISCalcImageValue *invValues;
 			
@@ -992,7 +992,7 @@ namespace rsgis{namespace radar{
 		
 	}
 	
-	void RSGISObjectBasedEstimationRasterPolygon::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISObjectBasedEstimationRasterPolygon::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
 	{
 		
         try
@@ -1000,7 +1000,7 @@ namespace rsgis{namespace radar{
             // GET DATA
             rsgis::vec::RSGISVectorUtils vecUtils;
             OGRPolygon *inOGRPoly;
-            Polygon *poly;
+            geos::geom::Polygon *poly;
             inOGRPoly = (OGRPolygon *) inFeature->GetGeometryRef();			
             poly = vecUtils.convertOGRPolygon2GEOSPolygon(inOGRPoly);
             rsgis::img::RSGISCalcImageValue *invValuesObj;
@@ -1164,7 +1164,7 @@ namespace rsgis{namespace radar{
 		
 	}	
 	
-	void RSGISObjectBasedEstimationRasterPolygon::processFeature(OGRFeature *inFeature, Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISObjectBasedEstimationRasterPolygon::processFeature(OGRFeature *inFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
 	{
         
         try
@@ -1172,7 +1172,7 @@ namespace rsgis{namespace radar{
             // GET DATA
             rsgis::vec::RSGISVectorUtils vecUtils;
             OGRPolygon *inOGRPoly;
-            Polygon *poly;
+            geos::geom::Polygon *poly;
             inOGRPoly = (OGRPolygon *) inFeature->GetGeometryRef();			
             poly = vecUtils.convertOGRPolygon2GEOSPolygon(inOGRPoly);
             rsgis::img::RSGISCalcImageValue *invValuesObj;

@@ -26,7 +26,7 @@
 namespace rsgis{namespace vec{
 	
 	
-	RSGISClassPolygon::RSGISClassPolygon(string classAttribute)  : RSGISPolygonData()
+	RSGISClassPolygon::RSGISClassPolygon(std::string classAttribute)  : RSGISPolygonData()
 	{
 		this->classAttribute = classAttribute;
 	}
@@ -35,7 +35,7 @@ namespace rsgis{namespace vec{
 	{
 		// Read the class attribute
 		OGRFieldDefn *fieldDef = NULL;
-		string columnName;
+		std::string columnName;
 		int fieldCount = featDefn->GetFieldCount();
 		for(int i = 0; i < fieldCount; i++)
 		{
@@ -43,7 +43,7 @@ namespace rsgis{namespace vec{
 			columnName = fieldDef->GetNameRef();
 			if(columnName == this->classAttribute)
 			{
-				this->className = string(feature->GetFieldAsString(i));
+				this->className = std::string(feature->GetFieldAsString(i));
 			}
 		}
 		
@@ -81,12 +81,12 @@ namespace rsgis{namespace vec{
 		feature->SetField(featDefn->GetFieldIndex("class"), className.c_str());
 	}
 	
-	string RSGISClassPolygon::getClassName()
+	std::string RSGISClassPolygon::getClassName()
 	{
 		return this->className;
 	}
 	
-	void RSGISClassPolygon::setClassName(string name)
+	void RSGISClassPolygon::setClassName(std::string name)
 	{
 		this->className = name;
 	}
@@ -101,9 +101,9 @@ namespace rsgis{namespace vec{
 		return numPxls;
 	}
 	
-	void RSGISClassPolygon::setPixelValues(Matrix *pxlValues)
+	void RSGISClassPolygon::setPixelValues(rsgis::math::Matrix *pxlValues)
 	{
-		RSGISMatrices matrixUtils;
+        rsgis::math::RSGISMatrices matrixUtils;
 		this->pxlValues = matrixUtils.createMatrix(pxlValues->n, pxlValues->m);
 		int numElements = (pxlValues->n * pxlValues->m);
 		for(int i = 0; i < numElements; i++)
@@ -112,7 +112,7 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	Matrix* RSGISClassPolygon::getPixelValues()
+	rsgis::math::Matrix* RSGISClassPolygon::getPixelValues()
 	{
 		return pxlValues;
 	}

@@ -26,30 +26,25 @@
 
 #include <iostream>
 #include <string>
+
 #include "vec/RSGISPolygonData.h"
 #include "vec/RSGISVectorUtils.h"
-#include "math/RSGISMatrices.h"
-
-using namespace std;
-using namespace geos::geom;
-using namespace geos;
-using namespace rsgis::math;
 
 namespace rsgis{namespace vec{
 	
 	class RSGISImageTileVector : public RSGISPolygonData
 		{
 		public:
-			RSGISImageTileVector(string filenameAttribute);
+			RSGISImageTileVector(std::string filenameAttribute);
 			virtual void readAttribtues(OGRFeature *feature, OGRFeatureDefn *featDefn);
 			virtual void createLayerDefinition(OGRLayer *outputSHPLayer)throw(RSGISVectorOutputException);
 			virtual void populateFeature(OGRFeature *feature, OGRFeatureDefn *featDefn);
-			string getFileName();
-			void setFileName(string name);
+            std::string getFileName();
+			void setFileName(std::string name);
 			virtual ~RSGISImageTileVector();
 		protected:
-			string filename;
-			string filenameAttribute;
+            std::string filename;
+            std::string filenameAttribute;
 		};
 }}
 

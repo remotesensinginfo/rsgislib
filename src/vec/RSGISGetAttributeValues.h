@@ -38,22 +38,19 @@
 
 #include "geos/geom/Envelope.h"
 
-using namespace std;
-using namespace geos::geom;
-
 namespace rsgis{namespace vec{
 	
 	class RSGISGetAttributeValues : public RSGISProcessOGRFeature
 		{
 		public:
-			RSGISGetAttributeValues(list<double> *values, string attribute);
-			virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, Envelope *env, long fid) throw(RSGISVectorException);
-			virtual void processFeature(OGRFeature *feature, Envelope *env, long fid) throw(RSGISVectorException);
+			RSGISGetAttributeValues(std::list<double> *values, std::string attribute);
+			virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
+			virtual void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
 			virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException);
 			virtual ~RSGISGetAttributeValues();
 		protected:
-			list<double> *values;
-			string attribute;
+            std::list<double> *values;
+            std::string attribute;
 		};
 }}
 

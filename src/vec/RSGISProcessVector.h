@@ -40,10 +40,6 @@
 
 #include "geos/geom/Envelope.h"
 
-using namespace std;
-using namespace rsgis;
-using namespace geos::geom;
-
 namespace rsgis{namespace vec{
 	
 	class RSGISProcessVector

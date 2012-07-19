@@ -48,17 +48,17 @@ namespace rsgis{namespace vec{
 	
 	void RSGISPointData::printGeometry()
 	{
-		cout << pointGeom->toString() << endl;
+		std::cout << pointGeom->toString() << std::endl;
 	}
 	
-	Point* RSGISPointData::getPoint()
+	geos::geom::Point* RSGISPointData::getPoint()
 	{
 		return pointGeom;
 	}
 	
-	void RSGISPointData::setPoint(Point *point)
+	void RSGISPointData::setPoint(geos::geom::Point *point)
 	{
-		this->pointGeom = dynamic_cast<Point*>(point->clone());
+		this->pointGeom = dynamic_cast<geos::geom::Point*>(point->clone());
 	}
 	
 	RSGISPointData::~RSGISPointData()

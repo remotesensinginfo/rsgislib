@@ -25,7 +25,7 @@
 
 namespace rsgisexe{
 
-RSGISExeTransectModel::RSGISExeTransectModel() : RSGISAlgorithmParameters()
+    RSGISExeTransectModel::RSGISExeTransectModel() : rsgis::RSGISAlgorithmParameters()
 {
 	this->algorithm = "transectModel";
 	this->option = RSGISExeTransectModel::none;
@@ -36,12 +36,12 @@ RSGISExeTransectModel::RSGISExeTransectModel() : RSGISAlgorithmParameters()
 	
 }
 
-RSGISAlgorithmParameters* RSGISExeTransectModel::getInstance()
+    rsgis::RSGISAlgorithmParameters* RSGISExeTransectModel::getInstance()
 {
 	return new RSGISExeTransectModel();
 }
 
-void RSGISExeTransectModel::retrieveParameters(DOMElement *argElement) throw(RSGISXMLArgumentsException)
+    void RSGISExeTransectModel::retrieveParameters(DOMElement *argElement) throw(rsgis::RSGISXMLArgumentsException)
 {
 	/******************************
 	 * READ IN VARIABLES FROM XML * 
@@ -67,7 +67,7 @@ void RSGISExeTransectModel::retrieveParameters(DOMElement *argElement) throw(RSG
 	const XMLCh *algorNameEle = argElement->getAttribute(XMLString::transcode("algor"));
 	if(!XMLString::equals(algorName, algorNameEle))
 	{
-		throw RSGISXMLArgumentsException("The algorithm name is incorrect.");
+		throw rsgis::RSGISXMLArgumentsException("The algorithm name is incorrect.");
 	}
 	
 	const XMLCh *optionStr = argElement->getAttribute(XMLString::transcode("option"));
@@ -85,7 +85,7 @@ void RSGISExeTransectModel::retrieveParameters(DOMElement *argElement) throw(RSG
 		}
 		else
 		{
-			throw RSGISXMLArgumentsException("No value provided for transect width");
+			throw rsgis::RSGISXMLArgumentsException("No value provided for transect width");
 		}
 		XMLString::release(&transectWidthCh);
 		
@@ -100,7 +100,7 @@ void RSGISExeTransectModel::retrieveParameters(DOMElement *argElement) throw(RSG
 		}
 		else
 		{
-			throw RSGISXMLArgumentsException("No value provided for transect lenght");
+			throw rsgis::RSGISXMLArgumentsException("No value provided for transect lenght");
 		}
 		XMLString::release(&transectLenghtCh);
 		
@@ -115,7 +115,7 @@ void RSGISExeTransectModel::retrieveParameters(DOMElement *argElement) throw(RSG
 		}
 		else
 		{
-			throw RSGISXMLArgumentsException("No value provided for transect height");
+			throw rsgis::RSGISXMLArgumentsException("No value provided for transect height");
 		}
 		XMLString::release(&transectHeightCh);
 		
@@ -130,7 +130,7 @@ void RSGISExeTransectModel::retrieveParameters(DOMElement *argElement) throw(RSG
 		}
 		else
 		{
-			throw RSGISXMLArgumentsException("No value provided for transect res");
+			throw rsgis::RSGISXMLArgumentsException("No value provided for transect res");
 		}
 		XMLString::release(&transectResCh);
 		
@@ -161,7 +161,7 @@ void RSGISExeTransectModel::retrieveParameters(DOMElement *argElement) throw(RSG
 		}
 		else
 		{
-			throw RSGISXMLArgumentsException("No value provided for number of trees");
+			throw rsgis::RSGISXMLArgumentsException("No value provided for number of trees");
 		}
 		XMLString::release(&nTreesCh);
 		
@@ -176,7 +176,7 @@ void RSGISExeTransectModel::retrieveParameters(DOMElement *argElement) throw(RSG
 		}
 		else
 		{
-			throw RSGISXMLArgumentsException("No value provided for tree height");
+			throw rsgis::RSGISXMLArgumentsException("No value provided for tree height");
 		}
 		XMLString::release(&nTreesCh);
 		
@@ -188,7 +188,7 @@ void RSGISExeTransectModel::retrieveParameters(DOMElement *argElement) throw(RSG
 		}
 		else
 		{
-			throw RSGISXMLArgumentsException("Species not recognised");
+			throw rsgis::RSGISXMLArgumentsException("Species not recognised");
 		}
 		
 		// Check for output to image
@@ -330,7 +330,7 @@ void RSGISExeTransectModel::retrieveParameters(DOMElement *argElement) throw(RSG
 		}
 		else
 		{
-			throw RSGISXMLArgumentsException("No value provided for transect width");
+			throw rsgis::RSGISXMLArgumentsException("No value provided for transect width");
 		}
 		XMLString::release(&transectWidthCh);
 		
@@ -345,7 +345,7 @@ void RSGISExeTransectModel::retrieveParameters(DOMElement *argElement) throw(RSG
 		}
 		else
 		{
-			throw RSGISXMLArgumentsException("No value provided for transect lenght");
+			throw rsgis::RSGISXMLArgumentsException("No value provided for transect lenght");
 		}
 		XMLString::release(&transectLenghtCh);
 		
@@ -360,7 +360,7 @@ void RSGISExeTransectModel::retrieveParameters(DOMElement *argElement) throw(RSG
 		}
 		else
 		{
-			throw RSGISXMLArgumentsException("No value provided for transect height");
+			throw rsgis::RSGISXMLArgumentsException("No value provided for transect height");
 		}
 		XMLString::release(&transectHeightCh);
 		
@@ -375,7 +375,7 @@ void RSGISExeTransectModel::retrieveParameters(DOMElement *argElement) throw(RSG
 		}
 		else
 		{
-			throw RSGISXMLArgumentsException("No value provided for transect res");
+			throw rsgis::RSGISXMLArgumentsException("No value provided for transect res");
 		}
 		XMLString::release(&transectResCh);
 		
@@ -406,7 +406,7 @@ void RSGISExeTransectModel::retrieveParameters(DOMElement *argElement) throw(RSG
 		}
 		else
 		{
-			throw RSGISXMLArgumentsException("No value provided for number of trees");
+			throw rsgis::RSGISXMLArgumentsException("No value provided for number of trees");
 		}
 		XMLString::release(&nTreesCh);
 		
@@ -421,7 +421,7 @@ void RSGISExeTransectModel::retrieveParameters(DOMElement *argElement) throw(RSG
 		}
 		else
 		{
-			throw RSGISXMLArgumentsException("No value provided for tree height");
+			throw rsgis::RSGISXMLArgumentsException("No value provided for tree height");
 		}
 		XMLString::release(&nTreesCh);
 		
@@ -433,7 +433,7 @@ void RSGISExeTransectModel::retrieveParameters(DOMElement *argElement) throw(RSG
 		}
 		else
 		{
-			throw RSGISXMLArgumentsException("Species not recognised");
+			throw rsgis::RSGISXMLArgumentsException("Species not recognised");
 		}
 		
 		// Check for output to image
@@ -574,7 +574,7 @@ void RSGISExeTransectModel::retrieveParameters(DOMElement *argElement) throw(RSG
 		}
 		else
 		{
-			throw RSGISXMLArgumentsException("No value provided for transect width");
+			throw rsgis::RSGISXMLArgumentsException("No value provided for transect width");
 		}
 		XMLString::release(&transectWidthCh);
 		
@@ -589,7 +589,7 @@ void RSGISExeTransectModel::retrieveParameters(DOMElement *argElement) throw(RSG
 		}
 		else
 		{
-			throw RSGISXMLArgumentsException("No value provided for transect lenght");
+			throw rsgis::RSGISXMLArgumentsException("No value provided for transect lenght");
 		}
 		XMLString::release(&transectLenghtCh);
 		
@@ -604,7 +604,7 @@ void RSGISExeTransectModel::retrieveParameters(DOMElement *argElement) throw(RSG
 		}
 		else
 		{
-			throw RSGISXMLArgumentsException("No value provided for transect height");
+			throw rsgis::RSGISXMLArgumentsException("No value provided for transect height");
 		}
 		XMLString::release(&transectHeightCh);
 		
@@ -619,7 +619,7 @@ void RSGISExeTransectModel::retrieveParameters(DOMElement *argElement) throw(RSG
 		}
 		else
 		{
-			throw RSGISXMLArgumentsException("No value provided for transect res");
+			throw rsgis::RSGISXMLArgumentsException("No value provided for transect res");
 		}
 		XMLString::release(&transectResCh);
 		
@@ -650,7 +650,7 @@ void RSGISExeTransectModel::retrieveParameters(DOMElement *argElement) throw(RSG
 		}
 		else
 		{
-			throw RSGISXMLArgumentsException("No value provided for number of trees");
+			throw rsgis::RSGISXMLArgumentsException("No value provided for number of trees");
 		}
 		XMLString::release(&nTreesCh);
 		
@@ -669,7 +669,7 @@ void RSGISExeTransectModel::retrieveParameters(DOMElement *argElement) throw(RSG
 		}
 		else
 		{
-			throw RSGISXMLArgumentsException("No value provided for tree height");
+			throw rsgis::RSGISXMLArgumentsException("No value provided for tree height");
 		}
 		XMLString::release(&nTreesCh);
 		
@@ -681,7 +681,7 @@ void RSGISExeTransectModel::retrieveParameters(DOMElement *argElement) throw(RSG
 		}
 		else
 		{
-			throw RSGISXMLArgumentsException("Species not recognised");
+			throw rsgis::RSGISXMLArgumentsException("Species not recognised");
 		}
 		
 		// Check for output to image
@@ -823,7 +823,7 @@ void RSGISExeTransectModel::retrieveParameters(DOMElement *argElement) throw(RSG
 		}
 		else
 		{
-			throw RSGISXMLArgumentsException("No value provided for transect width");
+			throw rsgis::RSGISXMLArgumentsException("No value provided for transect width");
 		}
 		XMLString::release(&transectWidthCh);
 		
@@ -838,7 +838,7 @@ void RSGISExeTransectModel::retrieveParameters(DOMElement *argElement) throw(RSG
 		}
 		else
 		{
-			throw RSGISXMLArgumentsException("No value provided for transect lenght");
+			throw rsgis::RSGISXMLArgumentsException("No value provided for transect lenght");
 		}
 		XMLString::release(&transectLenghtCh);
 		
@@ -853,7 +853,7 @@ void RSGISExeTransectModel::retrieveParameters(DOMElement *argElement) throw(RSG
 		}
 		else
 		{
-			throw RSGISXMLArgumentsException("No value provided for transect height");
+			throw rsgis::RSGISXMLArgumentsException("No value provided for transect height");
 		}
 		XMLString::release(&transectHeightCh);
 		
@@ -868,7 +868,7 @@ void RSGISExeTransectModel::retrieveParameters(DOMElement *argElement) throw(RSG
 		}
 		else
 		{
-			throw RSGISXMLArgumentsException("No value provided for transect res");
+			throw rsgis::RSGISXMLArgumentsException("No value provided for transect res");
 		}
 		XMLString::release(&transectResCh);
 		
@@ -899,7 +899,7 @@ void RSGISExeTransectModel::retrieveParameters(DOMElement *argElement) throw(RSG
 		}
 		else
 		{
-			throw RSGISXMLArgumentsException("No value provided for number of trees");
+			throw rsgis::RSGISXMLArgumentsException("No value provided for number of trees");
 		}
 		XMLString::release(&nTreesCh);
 		
@@ -918,7 +918,7 @@ void RSGISExeTransectModel::retrieveParameters(DOMElement *argElement) throw(RSG
 		}
 		else
 		{
-			throw RSGISXMLArgumentsException("No value provided for tree height");
+			throw rsgis::RSGISXMLArgumentsException("No value provided for tree height");
 		}
 		XMLString::release(&nTreesCh);
 		
@@ -930,7 +930,7 @@ void RSGISExeTransectModel::retrieveParameters(DOMElement *argElement) throw(RSG
 		}
 		else
 		{
-			throw RSGISXMLArgumentsException("Species not recognised");
+			throw rsgis::RSGISXMLArgumentsException("Species not recognised");
 		}
 		
 		// Check for output to image
@@ -1075,7 +1075,7 @@ void RSGISExeTransectModel::retrieveParameters(DOMElement *argElement) throw(RSG
 		}
 		else
 		{
-			throw RSGISXMLArgumentsException("Input parameter file not provided..");
+			throw rsgis::RSGISXMLArgumentsException("Input parameter file not provided..");
 		}
 		XMLString::release(&inputXMLStr);
 		
@@ -1089,7 +1089,7 @@ void RSGISExeTransectModel::retrieveParameters(DOMElement *argElement) throw(RSG
 		}
 		else
 		{
-			throw RSGISXMLArgumentsException("Output file not provided..");
+			throw rsgis::RSGISXMLArgumentsException("Output file not provided..");
 		}
 		XMLString::release(&outputXMLStr);
 		
@@ -1101,7 +1101,7 @@ void RSGISExeTransectModel::retrieveParameters(DOMElement *argElement) throw(RSG
 		}
 		else
 		{
-			throw RSGISXMLArgumentsException("Species not recognised");
+			throw rsgis::RSGISXMLArgumentsException("Species not recognised");
 		}
 		
 		// Get number of runs for FPC
@@ -1197,7 +1197,7 @@ void RSGISExeTransectModel::retrieveParameters(DOMElement *argElement) throw(RSG
 		}
 		else
 		{
-			throw RSGISXMLArgumentsException("Input parameter file not provided..");
+			throw rsgis::RSGISXMLArgumentsException("Input parameter file not provided..");
 		}
 		XMLString::release(&inputXMLStr);
 		
@@ -1211,7 +1211,7 @@ void RSGISExeTransectModel::retrieveParameters(DOMElement *argElement) throw(RSG
 		}
 		else
 		{
-			throw RSGISXMLArgumentsException("Output file not provided..");
+			throw rsgis::RSGISXMLArgumentsException("Output file not provided..");
 		}
 		XMLString::release(&outputXMLStr);
 		
@@ -1223,7 +1223,7 @@ void RSGISExeTransectModel::retrieveParameters(DOMElement *argElement) throw(RSG
 		}
 		else
 		{
-			throw RSGISXMLArgumentsException("Species not recognised");
+			throw rsgis::RSGISXMLArgumentsException("Species not recognised");
 		}
 		
 		// Get number of runs for FPC
@@ -1312,7 +1312,7 @@ void RSGISExeTransectModel::retrieveParameters(DOMElement *argElement) throw(RSG
 	}
 	else // Throw exception if none of the options above.
 	{
-		throw RSGISXMLArgumentsException("Option not recognised");
+		throw rsgis::RSGISXMLArgumentsException("Option not recognised");
 	}
 
 	parsed = true;
@@ -1329,11 +1329,11 @@ void RSGISExeTransectModel::retrieveParameters(DOMElement *argElement) throw(RSG
 	XMLString::release(&speciesAHaropohylla);
 }
 
-void RSGISExeTransectModel::runAlgorithm() throw(RSGISException)
+void RSGISExeTransectModel::runAlgorithm() throw(rsgis::RSGISException)
 {
 	if(!parsed)
 	{
-		throw RSGISException("Before running the parameters much be retrieved");
+		throw rsgis::RSGISException("Before running the parameters much be retrieved");
 	}
 	else
 	{
@@ -1357,7 +1357,7 @@ void RSGISExeTransectModel::runAlgorithm() throw(RSGISException)
 			rsgis::math::RSGISProbDistNeymanTypeA *posDistroX = NULL; // Set up stem position offset distrobution
 			rsgis::math::RSGISProbDistNeymanTypeA *posDistroY = NULL; // Set up stem position offset distrobution
 			
-			vector <double> *modelPar = new vector<double>; // Set up vector to hold model parameters
+			vector <double> *modelPar = new std::vector<double>; // Set up vector to hold model parameters
 			
 			// Set up tree distrobutions
 			rsgis::math::RSGISProbDistNeymanTypeA *leafPosHDistro = NULL;
@@ -1425,7 +1425,7 @@ void RSGISExeTransectModel::runAlgorithm() throw(RSGISException)
 			}
 			else 
 			{
-				throw RSGISXMLArgumentsException("Species not recognised");
+				throw rsgis::RSGISXMLArgumentsException("Species not recognised");
 			}
 			
 			/*
@@ -1445,7 +1445,7 @@ void RSGISExeTransectModel::runAlgorithm() throw(RSGISException)
 			RSGISModelTransect *transectModel = NULL;
 			transectModel = new RSGISModelTransect(transect);
 			
-			vector<Polygon*> *canopyPolys = new vector<Polygon*>;
+			std::vector<geos::geom::Polygon*> *canopyPolys = new std::vector<geos::geom::Polygon*>;
 			
 			if (exportVector == true || calcCC == true) 
 			{
@@ -1528,7 +1528,7 @@ void RSGISExeTransectModel::runAlgorithm() throw(RSGISException)
 			rsgis::math::RSGISProbDistNeymanTypeA *stemDistro = NULL; // Set up stem distro
 			rsgis::math::RSGISPsudoRandDistroUniformInt *posDistroX = NULL; // Set up stem position offset distrobution
 			rsgis::math::RSGISPsudoRandDistroUniformInt *posDistroY = NULL; // Set up stem position offset distrobution
-			vector <double> *modelPar = new vector<double>; // Set up vector to hold model parameters
+			vector <double> *modelPar = new std::vector<double>; // Set up vector to hold model parameters
 			
 			// Set up tree distrobutions
 			rsgis::math::RSGISPsudoRandDistroGaussian *leafPosHDistro = NULL;
@@ -1597,7 +1597,7 @@ void RSGISExeTransectModel::runAlgorithm() throw(RSGISException)
 			}
 			else 
 			{
-				throw RSGISXMLArgumentsException("Species not recognised");
+				throw rsgis::RSGISXMLArgumentsException("Species not recognised");
 			}
 			
 			/*
@@ -1617,7 +1617,7 @@ void RSGISExeTransectModel::runAlgorithm() throw(RSGISException)
 			RSGISModelTransect *transectModel = NULL;
 			transectModel = new RSGISModelTransect(transect);
 			
-			vector<Polygon*> *canopyPolys = new vector<Polygon*>;
+			std::vector<geos::geom::Polygon*> *canopyPolys = new std::vector<geos::geom::Polygon*>;
 			
 			if (exportVector == true || calcCC == true) 
 			{
@@ -1701,7 +1701,7 @@ void RSGISExeTransectModel::runAlgorithm() throw(RSGISException)
 			rsgis::math::RSGISProbDistNeymanTypeA *stemDistro = NULL; // Set up stem distro
 			rsgis::math::RSGISProbDistNeymanTypeA *posDistroX = NULL; // Set up stem position offset distrobution
 			rsgis::math::RSGISProbDistNeymanTypeA *posDistroY = NULL; // Set up stem position offset distrobution
-			vector <double> *modelPar = new vector<double>; // Set up vector to hold model parameters
+			vector <double> *modelPar = new std::vector<double>; // Set up vector to hold model parameters
 			
 			// Set up tree distrobutions
 			rsgis::math::RSGISProbDistNeymanTypeA *leafPosHDistro = NULL;
@@ -1775,7 +1775,7 @@ void RSGISExeTransectModel::runAlgorithm() throw(RSGISException)
 			}
 			else 
 			{
-				throw RSGISXMLArgumentsException("Species not recognised");
+				throw rsgis::RSGISXMLArgumentsException("Species not recognised");
 			}
 			
 			cout << "Stem height = " << modelPar->at(0) << endl;
@@ -1797,7 +1797,7 @@ void RSGISExeTransectModel::runAlgorithm() throw(RSGISException)
 			RSGISModelTransect *transectModel = NULL;
 			transectModel = new RSGISModelTransect(transect);
 			
-			vector<Polygon*> *canopyPolys = new vector<Polygon*>;
+			std::vector<geos::geom::Polygon*> *canopyPolys = new std::vector<geos::geom::Polygon*>;
 			
 			if (exportVector == true || calcCC == true) 
 			{
@@ -1880,7 +1880,7 @@ void RSGISExeTransectModel::runAlgorithm() throw(RSGISException)
 			rsgis::math::RSGISProbDistNeymanTypeA *stemDistro = NULL; // Set up stem distro
 			rsgis::math::RSGISPsudoRandDistroUniformInt *posDistroX = NULL; // Set up stem position offset distrobution
 			rsgis::math::RSGISPsudoRandDistroUniformInt *posDistroY = NULL; // Set up stem position offset distrobution
-			vector <double> *modelPar = new vector<double>; // Set up vector to hold model parameters
+			vector <double> *modelPar = new std::vector<double>; // Set up vector to hold model parameters
 			
 			// Set up tree distrobutions
 			rsgis::math::RSGISPsudoRandDistroGaussian *leafPosHDistro = NULL;
@@ -1956,7 +1956,7 @@ void RSGISExeTransectModel::runAlgorithm() throw(RSGISException)
 			
 			else 
 			{
-				throw RSGISXMLArgumentsException("Species not recognised");
+				throw rsgis::RSGISXMLArgumentsException("Species not recognised");
 			}
 			
 			/*
@@ -1979,7 +1979,7 @@ void RSGISExeTransectModel::runAlgorithm() throw(RSGISException)
 			RSGISModelTransect *transectModel = NULL;
 			transectModel = new RSGISModelTransect(transect);
 			
-			vector<Polygon*> *canopyPolys = new vector<Polygon*>;
+			std::vector<geos::geom::Polygon*> *canopyPolys = new std::vector<geos::geom::Polygon*>;
 			
 			if (exportVector == true || calcCC == true) 
 			{
@@ -2059,7 +2059,7 @@ void RSGISExeTransectModel::runAlgorithm() throw(RSGISException)
 			gsl_matrix *inPar = matrixUtils.readGSLMatrixFromGridTxt(this->inputFile);
 			if(inPar->size2 != 15)
 			{
-				throw RSGISException("The correct number of parameters was not provided");
+				throw rsgis::RSGISException("The correct number of parameters was not provided");
 			}
 			
 			rsgis::math::Matrix *outPar = matrixUtils.createMatrix(inPar->size1, 10);
@@ -2147,7 +2147,7 @@ void RSGISExeTransectModel::runAlgorithm() throw(RSGISException)
 				rsgis::math::RSGISProbDistNeymanTypeA *stemDistro = NULL; // Set up stem distro
 				rsgis::math::RSGISProbDistNeymanTypeA *posDistroX = NULL; // Set up stem position offset distrobution
 				rsgis::math::RSGISProbDistNeymanTypeA *posDistroY = NULL; // Set up stem position offset distrobution
-				vector <double> *modelPar = new vector<double>; // Set up vector to hold model parameters
+				vector <double> *modelPar = new std::vector<double>; // Set up vector to hold model parameters
 				
 				// Set up tree distrobutions
 				rsgis::math::RSGISProbDistNeymanTypeA *leafPosHDistro = NULL;
@@ -2247,7 +2247,7 @@ void RSGISExeTransectModel::runAlgorithm() throw(RSGISException)
 				}
 				else 
 				{
-					throw RSGISXMLArgumentsException("Species not recognised");
+					throw rsgis::RSGISXMLArgumentsException("Species not recognised");
 				}
 				
 				/*
@@ -2278,7 +2278,7 @@ void RSGISExeTransectModel::runAlgorithm() throw(RSGISException)
 					transect->setZero();
 					transectModel = new RSGISModelTransect(transect);
 					
-					vector<Polygon*> *canopyPolys = new vector<Polygon*>;
+					std::vector<geos::geom::Polygon*> *canopyPolys = new std::vector<geos::geom::Polygon*>;
 					
 					transectModel->createConvexHull(canopyPolys);
 					
@@ -2399,7 +2399,7 @@ void RSGISExeTransectModel::runAlgorithm() throw(RSGISException)
 			gsl_matrix *inPar = matrixUtils.readGSLMatrixFromGridTxt(this->inputFile);
 			if(inPar->size2 != 15)
 			{
-				throw RSGISException("The correct number of parameters was not provided");
+				throw rsgis::RSGISException("The correct number of parameters was not provided");
 			}
 			
 			rsgis::math::Matrix *outPar = matrixUtils.createMatrix(inPar->size1, 9);
@@ -2471,7 +2471,7 @@ void RSGISExeTransectModel::runAlgorithm() throw(RSGISException)
 				rsgis::math::RSGISPsudoRandDistNeymanTypeA *stemDistro = NULL; // Set up stem distro
 				rsgis::math::RSGISPsudoRandDistroGaussian *posDistroX = NULL; // Set up stem position offset distrobution
 				rsgis::math::RSGISPsudoRandDistroGaussian *posDistroY = NULL; // Set up stem position offset distrobution
-				vector <double> *modelPar = new vector<double>; // Set up vector to hold model parameters
+				vector <double> *modelPar = new std::vector<double>; // Set up vector to hold model parameters
 				
 				// Set up tree distrobutions
 				rsgis::math::RSGISPsudoRandDistroGaussian *leafPosHDistro = NULL;
@@ -2543,7 +2543,7 @@ void RSGISExeTransectModel::runAlgorithm() throw(RSGISException)
 				}
 				else 
 				{
-					throw RSGISXMLArgumentsException("Species not recognised");
+					throw rsgis::RSGISXMLArgumentsException("Species not recognised");
 				}
 				
 				/*
@@ -2573,7 +2573,7 @@ void RSGISExeTransectModel::runAlgorithm() throw(RSGISException)
 					transect->setZero();
 					transectModel = new RSGISModelTransect(transect);
 					
-					vector<Polygon*> *canopyPolys = new vector<Polygon*>;
+					std::vector<geos::geom::Polygon*> *canopyPolys = new std::vector<geos::geom::Polygon*>;
 					
 					transectModel->createConvexHull(canopyPolys);
 					
@@ -2694,7 +2694,7 @@ void RSGISExeTransectModel::runAlgorithm() throw(RSGISException)
 			
 			if(inPar->size2 != 42)
 			{
-				throw RSGISException("The correct number of parameters was not provided");
+				throw rsgis::RSGISException("The correct number of parameters was not provided");
 			}
 						
 			RSGISTransect *transect = NULL;
@@ -2725,7 +2725,7 @@ void RSGISExeTransectModel::runAlgorithm() throw(RSGISException)
 				double largeBranchDensity = (gsl_matrix_get(inPar, i, 12)  * canopyDepth*this->transectWidth*this->transectLenght) / nTrees  ; // Number of large branches
 				double largeBranchAngle = gsl_matrix_get(inPar, i, 14); // Angle of small branches, in incidence plane
 				
-				vector <double> *modelPar = new vector<double>; // Set up vector to hold model parameters
+				vector <double> *modelPar = new std::vector<double>; // Set up vector to hold model parameters
 				
 				modelPar->push_back(stemHeight);
 				modelPar->push_back(stemRadius);
@@ -2817,7 +2817,7 @@ void RSGISExeTransectModel::runAlgorithm() throw(RSGISException)
 					transect->setZero();
 					transectModel = new RSGISModelTransect(transect);
 					
-					vector<Polygon*> *canopyPolys = new vector<Polygon*>;
+					std::vector<geos::geom::Polygon*> *canopyPolys = new std::vector<geos::geom::Polygon*>;
 					
 					transectModel->createConvexHull(canopyPolys);
 					
@@ -2910,7 +2910,7 @@ void RSGISExeTransectModel::runAlgorithm() throw(RSGISException)
 		}
 		else 
 		{
-			throw RSGISXMLArgumentsException("Option not recognised");
+			throw rsgis::RSGISXMLArgumentsException("Option not recognised");
 		}
 
 	}

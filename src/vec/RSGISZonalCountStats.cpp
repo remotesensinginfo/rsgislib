@@ -39,10 +39,10 @@ namespace rsgis{namespace vec{
 		data = new double[dataSize];
 		
 		calcValue = new RSGISCalcZonalCountFromRasterPolygon(dataSize, attributes, numAttributes);
-		calcImage = new RSGISCalcImageSingle(calcValue);
+		calcImage = new rsgis::img::RSGISCalcImageSingle(calcValue);
 	}
 	
-	void RSGISZonalCountStats::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISZonalCountStats::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
 	{
 		try
 		{
@@ -73,7 +73,7 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISZonalCountStats::processFeature(OGRFeature *feature, Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISZonalCountStats::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
 	{
 		throw RSGISVectorException("Not Implemented");
 	}
@@ -137,7 +137,7 @@ namespace rsgis{namespace vec{
 	
 	
 	
-	RSGISCalcZonalCountFromRasterPolygon::RSGISCalcZonalCountFromRasterPolygon(int numOutputValues, CountAttributes **attributes, int numAttributes) : RSGISCalcImageSingleValue(numOutputValues)
+	RSGISCalcZonalCountFromRasterPolygon::RSGISCalcZonalCountFromRasterPolygon(int numOutputValues, CountAttributes **attributes, int numAttributes) : rsgis::img::RSGISCalcImageSingleValue(numOutputValues)
 	{
 		this->attributes = attributes;
 		this->numAttributes = numAttributes;
@@ -150,12 +150,12 @@ namespace rsgis{namespace vec{
 		this->totalPxl = 0;
 	}
 	
-	void RSGISCalcZonalCountFromRasterPolygon::calcImageValue(float *bandValuesImageA, float *bandValuesImageB, int numBands, int bandA, int bandB) throw(RSGISImageCalcException)
+	void RSGISCalcZonalCountFromRasterPolygon::calcImageValue(float *bandValuesImageA, float *bandValuesImageB, int numBands, int bandA, int bandB) throw(rsgis::img::RSGISImageCalcException)
 	{
-		throw RSGISImageCalcException("Not Implemented");
+		throw rsgis::img::RSGISImageCalcException("Not Implemented");
 	}
 	
-	void RSGISCalcZonalCountFromRasterPolygon::calcImageValue(float *bandValuesImage, int numBands, int band) throw(RSGISImageCalcException)
+	void RSGISCalcZonalCountFromRasterPolygon::calcImageValue(float *bandValuesImage, int numBands, int band) throw(rsgis::img::RSGISImageCalcException)
 	{
 		float min = 0;
 		bool first = true;
@@ -170,7 +170,7 @@ namespace rsgis{namespace vec{
 			{
 				if(attributes[i]->bands[j] > (numBands-1) | attributes[i]->bands[j] < 0)
 				{
-					throw RSGISImageCalcException("The band attributes do not match the image.");
+					throw rsgis::img::RSGISImageCalcException("The band attributes do not match the image.");
 				}
 				
 				if(first)
@@ -208,17 +208,17 @@ namespace rsgis{namespace vec{
 		totalPxl++;
 	}
 	
-	void RSGISCalcZonalCountFromRasterPolygon::calcImageValue(float *bandValuesImage, int numBands, Envelope *extent) throw(RSGISImageCalcException)
+	void RSGISCalcZonalCountFromRasterPolygon::calcImageValue(float *bandValuesImage, int numBands, geos::geom::Envelope *extent) throw(rsgis::img::RSGISImageCalcException)
 	{
-		throw RSGISImageCalcException("Not Implemented");
+		throw rsgis::img::RSGISImageCalcException("Not Implemented");
 	}
 	
-	void RSGISCalcZonalCountFromRasterPolygon::calcImageValue(float *bandValuesImage, double interceptArea, int numBands, Polygon *poly, Point *pt) throw(RSGISImageCalcException)
+	void RSGISCalcZonalCountFromRasterPolygon::calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt) throw(rsgis::img::RSGISImageCalcException)
 	{
-		throw RSGISImageCalcException("Not Implemented");
+		throw rsgis::img::RSGISImageCalcException("Not Implemented");
 	}
 	
-	double* RSGISCalcZonalCountFromRasterPolygon::getOutputValues() throw(RSGISImageCalcException)
+	double* RSGISCalcZonalCountFromRasterPolygon::getOutputValues() throw(rsgis::img::RSGISImageCalcException)
 	{
 		//double *outputData = new double[this->numOutputValues];
 		outputValues[0] = this->totalPxl;
