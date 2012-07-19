@@ -39,7 +39,7 @@ namespace rsgis { namespace img {
 	{
 		
 		float inValue = bandValues[imageBand];
-        if(std::isnan(inValue))
+        if(boost::math::isnan(inValue))
         {
             output[0] = 0;
 			output[1] = 0;

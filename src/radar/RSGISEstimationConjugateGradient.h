@@ -38,6 +38,8 @@
 #include "math/RSGISFunctions.h"
 #include "radar/RSGISEstimationOptimiser.h"
 
+#include <boost/math/special_functions/fpclassify.hpp>
+
 namespace rsgis {namespace radar{
     
 	/** There are three classes for conjugate gradient.

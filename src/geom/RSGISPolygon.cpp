@@ -42,14 +42,14 @@ namespace rsgis{namespace geom{
 		//std::cout << "Centroid = [" << this->point->x << "," << this->point->y << "]" << std::endl;
 		
 		
-		if(std::isnan(this->point->x) | std::isnan(this->point->y))
+		if(boost::math::isnan(this->point->x) | boost::math::isnan(this->point->y))
 		{
-			if(std::isnan(this->point->x))
+			if(boost::math::isnan(this->point->x))
 			{
 				std::cout << "X has value NaN\n";
 			}
 			
-			if(std::isnan(this->point->y))
+			if(boost::math::isnan(this->point->y))
 			{
 				std::cout << "Y has value NaN\n";
 			}

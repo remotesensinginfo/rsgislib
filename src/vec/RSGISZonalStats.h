@@ -55,6 +55,8 @@
 #include "geos/geom/MultiPolygon.h"
 #include "geos/geom/Coordinate.h"
 
+#include <boost/math/special_functions/fpclassify.hpp>
+
 namespace rsgis 
 {
 	namespace vec

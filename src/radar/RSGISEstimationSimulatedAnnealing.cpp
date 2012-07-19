@@ -74,7 +74,7 @@ namespace rsgis {namespace radar{
 		unsigned int nData = 2;
 		for(unsigned int i = 0;i < nData; i++)
 		{
-			if (std::isnan(gsl_vector_get(inData, i))) 
+			if (boost::math::isnan(gsl_vector_get(inData, i))) 
 			{
 				for(unsigned int j = 0; j < nPar; j++) 
 				{
@@ -376,7 +376,7 @@ namespace rsgis {namespace radar{
 		unsigned int nData = 2;
 		for(unsigned int i = 0;i < nData; i++)
 		{
-			if (std::isnan(gsl_vector_get(inData, i))) 
+			if (boost::math::isnan(gsl_vector_get(inData, i))) 
 			{
 				for(unsigned int j = 0; j < nPar; j++) 
 				{
@@ -761,7 +761,7 @@ namespace rsgis {namespace radar{
 		unsigned int nData = 3;
 		for(unsigned int i = 0;i < nData; i++)
 		{
-			if (std::isnan(gsl_vector_get(inData, i))) 
+			if (boost::math::isnan(gsl_vector_get(inData, i))) 
 			{
 				for(unsigned int j = 0; j < nPar; j++) 
 				{
@@ -1106,7 +1106,7 @@ namespace rsgis {namespace radar{
 		unsigned int nData = 3;
 		for(unsigned int i = 0;i < nData; i++)
 		{
-			if (std::isnan(gsl_vector_get(inData, i))) 
+			if (boost::math::isnan(gsl_vector_get(inData, i))) 
 			{
 				for(unsigned int j = 0; j < nPar; j++) 
 				{
@@ -1494,7 +1494,7 @@ namespace rsgis {namespace radar{
 		unsigned int nData = 3;
 		for(unsigned int i = 0;i < nData; i++)
 		{
-			if (std::isnan(gsl_vector_get(inData, i))) 
+			if (boost::math::isnan(gsl_vector_get(inData, i))) 
 			{
 				for(unsigned int j = 0; j < nPar; j++) 
 				{
@@ -1865,7 +1865,7 @@ namespace rsgis {namespace radar{
 		unsigned int nData = 4;
 		for(unsigned int i = 0;i < nData; i++)
 		{
-			if (std::isnan(gsl_vector_get(inData, i))) 
+			if (boost::math::isnan(gsl_vector_get(inData, i))) 
 			{
 				for(unsigned int j = 0; j < nPar; j++) 
 				{
@@ -2277,7 +2277,7 @@ namespace rsgis {namespace radar{
         // Check for no-data
         for(unsigned int i = 0;i < this->nData; i++)
         {
-            if (std::isnan(gsl_vector_get(inData, i))) 
+            if (boost::math::isnan(gsl_vector_get(inData, i))) 
             {
                 for(unsigned int j = 0; j < this->nPar; j++) 
                 {

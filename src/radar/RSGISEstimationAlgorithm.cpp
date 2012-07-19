@@ -2025,7 +2025,7 @@ namespace rsgis {namespace radar
 			inSigma0dB = gsl_vector_alloc(numBands);
 		
 			// Check for no data (image borders)
-			if(bandValues[1] < -100 || std::isnan(bandValues[1]))
+			if(bandValues[1] < -100 || boost::math::isnan(bandValues[1]))
 			{
 				for(int i = 0; i < numOutputBands; i++)
 				{
@@ -2090,7 +2090,7 @@ namespace rsgis {namespace radar
 						}
 					}
 					
-					if ((error > 1) | (std::isnan(height)) | (std::isnan(density))) // If error is greater than 1, hasn't converged, write out a priori par (if available) or initial par.
+					if ((error > 1) | (boost::math::isnan(height)) | (boost::math::isnan(density))) // If error is greater than 1, hasn't converged, write out a priori par (if available) or initial par.
 					{
 						try 
 						{
@@ -2111,13 +2111,13 @@ namespace rsgis {namespace radar
 					double biomass = ((tMass*(density*10000)))/1000000;
 					
 					// Write out
-					if (std::isnan(height)){output[0] = 0;}
+					if (boost::math::isnan(height)){output[0] = 0;}
 					else{output[0] = height;}
-					if (std::isnan(density)){output[1] = 0;}
+					if (boost::math::isnan(density)){output[1] = 0;}
 					else{output[1] = density;}
-					if (std::isnan(biomass)){output[2] = 0;}
+					if (boost::math::isnan(biomass)){output[2] = 0;}
 					else{output[2] = biomass;}
-					if (std::isnan(error)){output[3] = 0;}
+					if (boost::math::isnan(error)){output[3] = 0;}
 					else{output[3] = error;}
 										
 					
@@ -2192,13 +2192,13 @@ namespace rsgis {namespace radar
 					double biomass = ((tMass*(density*10000)))/1000000;
 					
 					// Write out
-					if (std::isnan(cDepth)){output[0] = 0;}
+					if (boost::math::isnan(cDepth)){output[0] = 0;}
 					else{output[0] = cDepth;}
-					if (std::isnan(density)){output[1] = 0;}
+					if (boost::math::isnan(density)){output[1] = 0;}
 					else{output[1] = density;}
-					if (std::isnan(biomass)){output[2] = 0;}
+					if (boost::math::isnan(biomass)){output[2] = 0;}
 					else{output[2] = biomass;}
-					if (std::isnan(error)){output[3] = 0;}
+					if (boost::math::isnan(error)){output[3] = 0;}
 					else{output[3] = error;}
 					
 				}
@@ -2272,13 +2272,13 @@ namespace rsgis {namespace radar
 					}
 					
 					// Write out
-					if (std::isnan(height)){output[0] = 0;}
+					if (boost::math::isnan(height)){output[0] = 0;}
 					else{output[0] = height;}
-					if (std::isnan(density)){output[1] = 0;}
+					if (boost::math::isnan(density)){output[1] = 0;}
 					else{output[1] = density;}
-					if (std::isnan(dielectric)){output[2] = 0;}
+					if (boost::math::isnan(dielectric)){output[2] = 0;}
 					else{output[2] = dielectric;}
-					if (std::isnan(error)){output[4] = 0;}
+					if (boost::math::isnan(error)){output[4] = 0;}
 					else{output[4] = error;}
 					output[3] = 9999;
 				}
@@ -2569,7 +2569,7 @@ namespace rsgis {namespace radar
 			inSigma0dB = gsl_vector_alloc(numBands - nPar); // Number of input bands - nPar bands (a priori estimates)
 			
 			// Check for no data (image borders)
-			if(bandValues[3] < -100 || std::isnan(bandValues[1]))
+			if(bandValues[3] < -100 || boost::math::isnan(bandValues[1]))
 			{
 				for(int i = 0; i < numOutputBands; i++)
 				{

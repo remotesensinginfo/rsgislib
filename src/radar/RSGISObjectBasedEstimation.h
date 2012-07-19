@@ -54,6 +54,8 @@
 #include "radar/RSGISEstimationParameters.h"
 #include "radar/RSGISEstimationConjugateGradient.h"
 
+#include <boost/math/special_functions/fpclassify.hpp>
+
 namespace rsgis{namespace radar{
 	
 	class RSGISObjectBasedEstimation : public rsgis::vec::RSGISProcessOGRFeature
