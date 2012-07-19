@@ -43,7 +43,7 @@ namespace rsgis{namespace vec{
 		// Calculate the centre coordinates
 		if( geometryType == wkbPolygon )
 		{
-			vector<geos::geom::Geometry*> *polys = new vector<geos::geom::Geometry*>();
+			std::vector<geos::geom::Geometry*> *polys = new std::vector<geos::geom::Geometry*>();
 			OGRPolygon *polygon = (OGRPolygon *) feature->GetGeometryRef();
 			polys->push_back(vecUtils->convertOGRPolygon2GEOSPolygon(polygon));
 			geos::geom::MultiPolygon *mGEOSPolygon = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory()->createMultiPolygon(polys);

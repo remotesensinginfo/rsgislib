@@ -992,7 +992,7 @@ namespace rsgis{namespace vec{
 	
 	void ZonalStats::outputData2Text(std::string outputTxt, bool **toCalc, imagestats **stats, int numFeatures, int numAttributes) throw(rsgis::utils::RSGISTextException)
 	{
-		ofstream outputTxtFile(outputTxt.c_str());
+		std::ofstream outputTxtFile(outputTxt.c_str());
 		try
 		{
 			if(!outputTxtFile.is_open())
@@ -1499,7 +1499,7 @@ namespace rsgis{namespace vec{
 					throw rsgis::img::RSGISImageCalcException("The band attributes do not match the image.");
 				}
 				// Calculates the minimum of the two input image bands
-				if(!isnan(attributes[i]->bands[j]+1))
+				if(!std::isnan(attributes[i]->bands[j]+1))
                 {
 					if(first)
 					{
@@ -2033,7 +2033,7 @@ namespace rsgis{namespace vec{
 					throw rsgis::img::RSGISImageCalcException("The band attributes do not match the image.");
 				}
 				// Calculates the minimum of the two input image bands
-                if(!isnan(attributes[i]->bands[j]))
+                if(!std::isnan(attributes[i]->bands[j]))
                 {
                     if(first)
                     {

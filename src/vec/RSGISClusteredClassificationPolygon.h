@@ -52,8 +52,8 @@ namespace rsgis{namespace vec{
 			float getProTotalAr();
 			void setEdgeThreshold(float edgeThreshold);
 			float getEdgeThreshold();
-			void setClusterClass(string name);
-			string getClusterClass();
+			void setClusterClass(std::string name);
+			std::string getClusterClass();
 			~RSGISClusteredClassificationPolygon();
 		protected:
 			float area;
@@ -61,7 +61,7 @@ namespace rsgis{namespace vec{
 			float proPolysArea;
 			float proTotalArea;
 			float edgeThreshold;
-			string clusterClass;
+			std::string clusterClass;
 		};
 }}
 

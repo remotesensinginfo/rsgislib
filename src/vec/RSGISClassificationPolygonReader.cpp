@@ -73,9 +73,9 @@ namespace rsgis{namespace vec{
 			OGRMultiPolygon *mPolygon = (OGRMultiPolygon *) feature->GetGeometryRef();
 			//cout << polygon->exportToGML() << endl;
 			geos::geom::MultiPolygon *mGEOSPolygon = vecUtils->convertOGRMultiPolygonGEOSMultiPolygon(mPolygon);
-			vector<geos::geom::Polygon*> *polys = new vector<geos::geom::Polygon*>();
+			std::vector<geos::geom::Polygon*> *polys = new std::vector<geos::geom::Polygon*>();
 			geomUtils.retrievePolygons(mGEOSPolygon, polys);
-			vector<geos::geom::Polygon*>::iterator iterPolys = polys->begin();
+			std::vector<geos::geom::Polygon*>::iterator iterPolys = polys->begin();
 			while(iterPolys != polys->end())
 			{
 				tmpSpeciesPoly = new RSGISClassificationPolygon();

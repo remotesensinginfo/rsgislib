@@ -29,7 +29,7 @@ namespace rsgis{namespace vec{
 	{
 		this->outputTextFile = outputTextFile;
 		
-		outTxtFile.open(outputTextFile.c_str(), ios::out | ios::trunc);
+		outTxtFile.open(outputTextFile.c_str(), std::ios::out | std::ios::trunc);
 	}
 	
 	void RSGISConvertToASCII::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)

@@ -666,7 +666,7 @@ namespace rsgis{namespace math{
                 
                 if(stats->calcMedian)
                 {                        
-                    sort(data->begin(), data->end());
+                    std::sort(data->begin(), data->end());
                     stats->median = gsl_stats_median_from_sorted_data(&(*data)[0], 1, data->size());
                 }
             }

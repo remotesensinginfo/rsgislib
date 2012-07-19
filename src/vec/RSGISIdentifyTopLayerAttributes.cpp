@@ -31,7 +31,7 @@ namespace rsgis{namespace vec{
 		
 	}
 	
-	void RSGISIdentifyTopLayerAttributes::computeTopLayerAttributes(OGRLayer *inputLayer, OGRLayer *outputLayer, string *attributes, int numAttributes, int numTop, summarytype summary) throw(RSGISVectorException)
+	void RSGISIdentifyTopLayerAttributes::computeTopLayerAttributes(OGRLayer *inputLayer, OGRLayer *outputLayer, std::string *attributes, int numAttributes, int numTop, summarytype summary) throw(RSGISVectorException)
 	{
 		RSGISMathsUtils mathUtils;
 
@@ -43,7 +43,7 @@ namespace rsgis{namespace vec{
 			fieldIdx = layerDef->GetFieldIndex(attributes[i].c_str());
 			if(fieldIdx < 0)
 			{
-				string message = "This layer does not contain a field with the name \'" + attributes[i] + "\'";
+				std::string message = "This layer does not contain a field with the name \'" + attributes[i] + "\'";
 				throw RSGISVectorException(message.c_str());
 			}
 		}
@@ -65,7 +65,7 @@ namespace rsgis{namespace vec{
 		double value = 0;
 		double sum = 0;
 		
-		string name = "";
+		std::string name = "";
 		
 		try
 		{
@@ -80,32 +80,32 @@ namespace rsgis{namespace vec{
 			int feedback = numFeatures/10;
 			int feedbackCounter = 0;
 			int i = 0;
-			cout << "Started " << flush;
+			std::cout << "Started " << std::flush;
 			
 			inputLayer->ResetReading();
 			while( (inFeature = inputLayer->GetNextFeature()) != NULL )
 			{
 				if((i % feedback) == 0)
 				{
-					cout << ".." << feedbackCounter << ".." << flush;
+					std::cout << ".." << feedbackCounter << ".." << std::flush;
 					feedbackCounter = feedbackCounter + 10;
 				}
 				
 				fid = inFeature->GetFID();
-				//cout << " .. " << fid << " .. " ;
+				//std::cout << " .. " << fid << " .. " ;
 				
 				outFeature = OGRFeature::CreateFeature(outputDefn);
 				// Get Geometry.
 				geometry = inFeature->GetGeometryRef();
 				if( geometry != NULL && wkbFlatten(geometry->getGeometryType()) == wkbPolygon )
 				{
-					//cout << "Polygon";
+					//std::cout << "Polygon";
 					polygon = (OGRPolygon *) geometry;
 					outFeature->SetGeometry(polygon);
 				} 
 				else if( geometry != NULL && wkbFlatten(geometry->getGeometryType()) == wkbMultiPolygon )
 				{
-					//cout << "MultiPolygon";
+					//std::cout << "MultiPolygon";
 					multiPolygon = (OGRMultiPolygon *) geometry;
 					outFeature->SetGeometry(multiPolygon);
 				}
@@ -133,9 +133,9 @@ namespace rsgis{namespace vec{
 				}
 				
 				
-				//cout << "\nTOP: " << sortedAttributes->getAt(0)->getName().c_str() << endl;
+				//std::cout << "\nTOP: " << sortedAttributes->getAt(0)->getName().c_str() << std::endl;
 				//sortedAttributes->printAsc();
-				//cout << endl;
+				//std::cout << std::endl;
 				 
 				
 				// Write top columns.
@@ -177,7 +177,7 @@ namespace rsgis{namespace vec{
 				OGRFeature::DestroyFeature(outFeature);
 				i++;
 			}
-			cout << " Complete.\n";
+			std::cout << " Complete.\n";
 		}
 		catch(RSGISVectorOutputException e)
 		{
@@ -193,7 +193,7 @@ namespace rsgis{namespace vec{
 		//Add new columns
 		
 		RSGISMathsUtils mathUtils;
-		string name = "";
+		std::string name = "";
 		for(int i = 0; i < numTop; i++)
 		{
 			name = "Top_" + mathUtils.inttostring(i+1);
@@ -201,7 +201,7 @@ namespace rsgis{namespace vec{
 			shpField.SetWidth(10);
 			if( outputSHPLayer->CreateField( &shpField ) != OGRERR_NONE )
 			{
-				string message = string("Creating shapefile field") + name + string(" has failed");
+				std::string message = std::string("Creating shapefile field") + name + std::string(" has failed");
 				throw RSGISVectorOutputException(message.c_str());
 			}
 		}
@@ -215,7 +215,7 @@ namespace rsgis{namespace vec{
 				shpField.SetPrecision(10);
 				if( outputSHPLayer->CreateField( &shpField ) != OGRERR_NONE )
 				{
-					string message = string("Creating shapefile field") + name + string(" has failed");
+					std::string message = std::string("Creating shapefile field") + name + std::string(" has failed");
 					throw RSGISVectorOutputException(message.c_str());
 				}
 			}
@@ -228,7 +228,7 @@ namespace rsgis{namespace vec{
 		{
 			if( outputSHPLayer->CreateField( inLayerDef->GetFieldDefn(i) ) != OGRERR_NONE )
 			{
-				string message = string("Creating ") + string(inLayerDef->GetFieldDefn(i)->GetNameRef()) + string(" field failed.");
+				std::string message = std::string("Creating ") + std::string(inLayerDef->GetFieldDefn(i)->GetNameRef()) + std::string(" field failed.");
 				throw RSGISVectorOutputException(message.c_str());
 			}
 		}
@@ -241,7 +241,7 @@ namespace rsgis{namespace vec{
 	*/
 	
 	
-	RSGISIdentifyTopLayerAttributes::RSGISIdentifyTopLayerAttributes(string *attributes, int numAttributes, int numTop, rsgis::math::rsgissummarytype summary)
+	RSGISIdentifyTopLayerAttributes::RSGISIdentifyTopLayerAttributes(std::string *attributes, int numAttributes, int numTop, rsgis::math::rsgissummarytype summary)
 	{
 		this->attributes = attributes;
 		this->numAttributes = numAttributes;
@@ -268,11 +268,11 @@ namespace rsgis{namespace vec{
 		}
 		
 		
-		//cout << "\nTOP: " << sortedAttributes->getAt(0)->getName().c_str() << endl;
+		//std::cout << "\nTOP: " << sortedAttributes->getAt(0)->getName().c_str() << std::endl;
 		//sortedAttributes->printAsc();
-		//cout << endl;
+		//std::cout << std::endl;
 		
-		string name = "";
+		std::string name = "";
 		
 		// Write top columns.
 		for(int j = 0; j < numTop; j++)
@@ -313,7 +313,7 @@ namespace rsgis{namespace vec{
 	void RSGISIdentifyTopLayerAttributes::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException)
 	{
         rsgis::math::RSGISMathsUtils mathUtils;
-		string name = "";
+		std::string name = "";
 		for(int i = 0; i < numTop; i++)
 		{
 			name = "Top_" + mathUtils.inttostring(i+1);
@@ -321,7 +321,7 @@ namespace rsgis{namespace vec{
 			shpField.SetWidth(10);
 			if( outputLayer->CreateField( &shpField ) != OGRERR_NONE )
 			{
-				string message = string("Creating shapefile field") + name + string(" has failed");
+				std::string message = std::string("Creating shapefile field") + name + std::string(" has failed");
 				throw RSGISVectorOutputException(message.c_str());
 			}
 		}
@@ -335,7 +335,7 @@ namespace rsgis{namespace vec{
 				shpField.SetPrecision(10);
 				if( outputLayer->CreateField( &shpField ) != OGRERR_NONE )
 				{
-					string message = string("Creating shapefile field") + name + string(" has failed");
+					std::string message = std::string("Creating shapefile field") + name + std::string(" has failed");
 					throw RSGISVectorOutputException(message.c_str());
 				}
 			}
@@ -348,13 +348,13 @@ namespace rsgis{namespace vec{
 	}
 	
 	
-	RSGISFloatAttribute::RSGISFloatAttribute(string name, double value)
+	RSGISFloatAttribute::RSGISFloatAttribute(std::string name, double value)
 	{
 		this->name = name;
 		this->value = value;
 	}
 	
-	string RSGISFloatAttribute::getName() const
+	std::string RSGISFloatAttribute::getName() const
 	{
 		return this->name;
 	}
@@ -364,13 +364,13 @@ namespace rsgis{namespace vec{
 		return this->value;
 	}
 	
-	ostream& operator<<(ostream& ostr, const RSGISFloatAttribute& attribute)
+	std::ostream& operator<<(std::ostream& ostr, const RSGISFloatAttribute& attribute)
 	{
 		ostr << attribute.getName() << " = " << attribute.getValue();
 		return ostr;
 	}
 	
-	ostream& RSGISFloatAttribute::operator<<(ostream& ostr)
+	std::ostream& RSGISFloatAttribute::operator<<(std::ostream& ostr)
 	{
 		ostr << this->name << " = " << this->value;
 		return ostr;

@@ -31,14 +31,14 @@ namespace rsgis{namespace vec{
 		
 	}
 	
-	Polygon* RSGISVectorProcessing::bufferPolygon(Polygon *polygon, double distance)
+    geos::geom::Polygon* RSGISVectorProcessing::bufferPolygon(geos::geom::Polygon *polygon, double distance)
 	{
-		return dynamic_cast<Polygon*>(polygon->buffer(distance));
+		return dynamic_cast<geos::geom::Polygon*>(polygon->buffer(distance));
 	}
 	
 	void RSGISVectorProcessing::generateCircles(RSGISCirclePoint **points, RSGISCirclePolygon **circles, int numFeatures, float resolution)
 	{
-		RSGISGeometry geomUtils;
+        rsgis::geom::RSGISGeometry geomUtils;
 		
 		for(int i = 0; i < numFeatures; i++)
 		{
@@ -56,17 +56,17 @@ namespace rsgis{namespace vec{
 		
 		int fieldCount = layerDef->GetFieldCount();
 		
-		cout << "Shapefile Fields (" << fieldCount << ")\n";
-		cout << "----------------------\n";
+		std::cout << "Shapefile Fields (" << fieldCount << ")\n";
+		std::cout << "----------------------\n";
 		
 		for(int i = 0; i < fieldCount; i++)
 		{
 			field = layerDef->GetFieldDefn(i);
-			cout << i << ":\t\'" << field->GetNameRef() << "\' - " << field->GetFieldTypeName(field->GetType()) << endl;
+			std::cout << i << ":\t\'" << field->GetNameRef() << "\' - " << field->GetFieldTypeName(field->GetType()) << std::endl;
 		}
 	}
 	
-	void RSGISVectorProcessing::printAttribute(OGRLayer *inputLayer, string attribute)
+	void RSGISVectorProcessing::printAttribute(OGRLayer *inputLayer, std::string attribute)
 	{
 		OGRFeature *feature = NULL;
 		const char* fieldValue = NULL;
@@ -75,10 +75,10 @@ namespace rsgis{namespace vec{
 		int fieldIdx = layerDef->GetFieldIndex(attribute.c_str());
 		if(fieldIdx < 0)
 		{
-			string message = "This layer does not contain a field with the name \'" + attribute + "\'";
+			std::string message = "This layer does not contain a field with the name \'" + attribute + "\'";
 			throw RSGISVectorException(message.c_str());
 		}
-		cout << "Field index = " << fieldIdx << endl;
+		std::cout << "Field index = " << fieldIdx << std::endl;
 		
 		int i = 0;
 		
@@ -86,18 +86,18 @@ namespace rsgis{namespace vec{
 		while( (feature = inputLayer->GetNextFeature()) != NULL )
 		{
 			fieldValue = feature->GetFieldAsString(fieldIdx);
-			cout << i << ": " << fieldValue << endl;
+			std::cout << i << ": " << fieldValue << std::endl;
 			i++; 
 		}
 	}
 	
-	void RSGISVectorProcessing::splitFeatures(OGRLayer *inputLayer, string outputBase, bool force)
+	void RSGISVectorProcessing::splitFeatures(OGRLayer *inputLayer, std::string outputBase, bool force)
 	{
-		string outputFileName = "";
+		std::string outputFileName = "";
 		
-		RSGISFileUtils fileUtils;
+        rsgis::utils::RSGISFileUtils fileUtils;
 		RSGISVectorUtils vecUtils;
-		RSGISMathsUtils mathsUtils;
+        rsgis::math::RSGISMathsUtils mathsUtils;
 		
 		OGRFeature *inFeature = NULL;
 		OGRFeatureDefn *inFeatureDefn = NULL;
@@ -107,9 +107,9 @@ namespace rsgis{namespace vec{
 		OGRSpatialReference* inputSpatialRef = NULL;
 		
 		long fid = 0;
-		string outputDIR = "";
-		string outputVector = "";
-		string SHPFileOutLayer = "";
+		std::string outputDIR = "";
+		std::string outputVector = "";
+		std::string SHPFileOutLayer = "";
 		try
 		{
 			inFeatureDefn = inputLayer->GetLayerDefn();
@@ -120,14 +120,14 @@ namespace rsgis{namespace vec{
 			int feedback = numFeatures/10;
 			int feedbackCounter = 0;
 			int i = 0;
-			cout << "Started, " << numFeatures << " features to process.\n";
+			std::cout << "Started, " << numFeatures << " features to process.\n";
 			
 			inputLayer->ResetReading();
 			while( (inFeature = inputLayer->GetNextFeature()) != NULL )
 			{
 				if(numFeatures >= 10 && (i % feedback) == 0)
 				{
-					cout << feedbackCounter << "% Done" << endl;
+					std::cout << feedbackCounter << "% Done" << std::endl;
 					
 					feedbackCounter = feedbackCounter + 10;
 				}
@@ -171,13 +171,13 @@ namespace rsgis{namespace vec{
 				outputSHPDS = shpFiledriver->CreateDataSource(outputVector.c_str(), NULL);
 				if( outputSHPDS == NULL )
 				{
-					string message = string("Could not create vector file ") + outputVector;
+					std::string message = std::string("Could not create vector file ") + outputVector;
 					throw RSGISVectorOutputException(message.c_str());
 				}
 				outputSHPLayer = outputSHPDS->CreateLayer(SHPFileOutLayer.c_str(), inputSpatialRef, inFeatureDefn->GetGeomType(), NULL );
 				if( outputSHPLayer == NULL )
 				{
-					string message = string("Could not create vector layer ") + SHPFileOutLayer;
+					std::string message = std::string("Could not create vector layer ") + SHPFileOutLayer;
 					throw RSGISVectorOutputException(message.c_str());
 				}
 				
@@ -190,7 +190,7 @@ namespace rsgis{namespace vec{
 				OGRDataSource::DestroyDataSource(outputSHPDS);
 				i++;
 			}
-			cout << " Complete.\n";
+			std::cout << " Complete.\n";
 			
 		}
 		catch(RSGISVectorOutputException& e)
@@ -203,10 +203,10 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISVectorProcessing::createPlotPolygons(vector<PlotPoly*> *polyDetails, string output, bool force) throw(RSGISVectorException)
+	void RSGISVectorProcessing::createPlotPolygons(std::vector<rsgis::utils::PlotPoly*> *polyDetails, std::string output, bool force) throw(RSGISVectorException)
 	{
-		RSGISMathsUtils mathUtils;
-		RSGISPlotPolygonsCSVParse parse;
+        rsgis::math::RSGISMathsUtils mathUtils;
+        rsgis::utils::RSGISPlotPolygonsCSVParse parse;
 		
 		double diffXC = 0;
 		double diffYC = 0;
@@ -222,18 +222,18 @@ namespace rsgis{namespace vec{
 		double topCentreX = 0;
 		double topCentreY = 0;
 		
-		GeometryFactory *geomFactory = RSGISGEOSFactoryGenerator::getInstance()->getFactory();
+        geos::geom::GeometryFactory *geomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
 		
-		LinearRing *ring = NULL;
+		geos::geom::LinearRing *ring = NULL;
 		
-		vector<Polygon*> *polys = new vector<Polygon*>();
+        std::vector<geos::geom::Polygon*> *polys = new std::vector<geos::geom::Polygon*>();
 		
-		CoordinateSequence *coords = NULL;
+		geos::geom::CoordinateSequence *coords = NULL;
 		
-		vector<PlotPoly*>::iterator iterPolyDetails;
+		std::vector<rsgis::utils::PlotPoly*>::iterator iterPolyDetails;
 		for(iterPolyDetails = polyDetails->begin(); iterPolyDetails != polyDetails->end(); ++iterPolyDetails)
 		{
-			//cout << parse.formatedString(*iterPolyDetails) << endl;
+			//std::cout << parse.formatedString(*iterPolyDetails) << std::endl;
 			
 			radOrien = mathUtils.degreesToRadians((*iterPolyDetails)->orientation);
 			radOrienP90 = mathUtils.degreesToRadians(((*iterPolyDetails)->orientation + 90));
@@ -253,13 +253,13 @@ namespace rsgis{namespace vec{
 			topCentreX = (*iterPolyDetails)->eastings + diffXC;
 			topCentreY = (*iterPolyDetails)->northings + diffYC;
 			
-			coords = new CoordinateArraySequence();
+			coords = new geos::geom::CoordinateArraySequence();
 			
-			coords->add(Coordinate(((*iterPolyDetails)->eastings + diffXR), ((*iterPolyDetails)->northings + diffYR)));
-			coords->add(Coordinate((topCentreX + diffXR),(topCentreY + diffYR)));
-			coords->add(Coordinate((topCentreX + diffXL),(topCentreY + diffYL)));
-			coords->add(Coordinate(((*iterPolyDetails)->eastings + diffXL), ((*iterPolyDetails)->northings + diffYL)));
-			coords->add(Coordinate(((*iterPolyDetails)->eastings + diffXR), ((*iterPolyDetails)->northings + diffYR)));
+			coords->add(geos::geom::Coordinate(((*iterPolyDetails)->eastings + diffXR), ((*iterPolyDetails)->northings + diffYR)));
+			coords->add(geos::geom::Coordinate((topCentreX + diffXR),(topCentreY + diffYR)));
+			coords->add(geos::geom::Coordinate((topCentreX + diffXL),(topCentreY + diffYL)));
+			coords->add(geos::geom::Coordinate(((*iterPolyDetails)->eastings + diffXL), ((*iterPolyDetails)->northings + diffYL)));
+			coords->add(geos::geom::Coordinate(((*iterPolyDetails)->eastings + diffXR), ((*iterPolyDetails)->northings + diffYR)));
 			
 			ring = geomFactory->createLinearRing(coords);
 			
@@ -269,7 +269,7 @@ namespace rsgis{namespace vec{
 		RSGISVectorIO vecIO;
 		vecIO.exportGEOSPolygons2SHP(output, force, polys, polyDetails);
 		
-		vector<Polygon*>::iterator iterPolys;
+        std::vector<geos::geom::Polygon*>::iterator iterPolys;
 		for(iterPolys = polys->begin(); iterPolys != polys->end(); )
 		{
 			geomFactory->destroyGeometry(*iterPolys);
@@ -277,32 +277,32 @@ namespace rsgis{namespace vec{
 		}
 		delete polys;
 		
-		delete RSGISGEOSFactoryGenerator::getInstance();
+		delete rsgis::utils::RSGISGEOSFactoryGenerator::getInstance();
 	}
 	
-	void RSGISVectorProcessing::createImageFootprintPolygons(vector<ImageFootPrintPoly*> *polyDetails, string output, bool force) throw(RSGISVectorException)
+	void RSGISVectorProcessing::createImageFootprintPolygons(std::vector<rsgis::utils::ImageFootPrintPoly*> *polyDetails, std::string output, bool force) throw(RSGISVectorException)
 	{
-		RSGISMathsUtils mathUtils;
+        rsgis::math::RSGISMathsUtils mathUtils;
 		
-		GeometryFactory *geomFactory = RSGISGEOSFactoryGenerator::getInstance()->getFactory();
+		geos::geom::GeometryFactory *geomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
 		
-		LinearRing *ring = NULL;
+		geos::geom::LinearRing *ring = NULL;
 		
-		vector<Polygon*> *polys = new vector<Polygon*>();
+        std::vector<geos::geom::Polygon*> *polys = new std::vector<geos::geom::Polygon*>();
 		
-		CoordinateSequence *coords = NULL;
+		geos::geom::CoordinateSequence *coords = NULL;
 		
-		vector<ImageFootPrintPoly*>::iterator iterPolyDetails;
+        std::vector<rsgis::utils::ImageFootPrintPoly*>::iterator iterPolyDetails;
 		for(iterPolyDetails = polyDetails->begin(); iterPolyDetails != polyDetails->end(); ++iterPolyDetails)
 		{
 			
-			coords = new CoordinateArraySequence();
+			coords = new geos::geom::CoordinateArraySequence();
 			
-			coords->add(Coordinate(((*iterPolyDetails)->ulE),((*iterPolyDetails)->ulN)));
-			coords->add(Coordinate(((*iterPolyDetails)->urE),((*iterPolyDetails)->urN)));
-			coords->add(Coordinate(((*iterPolyDetails)->lrE),((*iterPolyDetails)->lrN)));
-			coords->add(Coordinate(((*iterPolyDetails)->llE),((*iterPolyDetails)->llN)));
-			coords->add(Coordinate(((*iterPolyDetails)->ulE),((*iterPolyDetails)->ulN)));
+			coords->add(geos::geom::Coordinate(((*iterPolyDetails)->ulE),((*iterPolyDetails)->ulN)));
+			coords->add(geos::geom::Coordinate(((*iterPolyDetails)->urE),((*iterPolyDetails)->urN)));
+			coords->add(geos::geom::Coordinate(((*iterPolyDetails)->lrE),((*iterPolyDetails)->lrN)));
+			coords->add(geos::geom::Coordinate(((*iterPolyDetails)->llE),((*iterPolyDetails)->llN)));
+			coords->add(geos::geom::Coordinate(((*iterPolyDetails)->ulE),((*iterPolyDetails)->ulN)));
 			
 			ring = geomFactory->createLinearRing(coords);
 			
@@ -312,7 +312,7 @@ namespace rsgis{namespace vec{
 		RSGISVectorIO vecIO;
 		vecIO.exportGEOSPolygons2SHP(output, force, polys, polyDetails);
 		
-		vector<Polygon*>::iterator iterPolys;
+        std::vector<geos::geom::Polygon*>::iterator iterPolys;
 		for(iterPolys = polys->begin(); iterPolys != polys->end(); )
 		{
 			geomFactory->destroyGeometry(*iterPolys);
@@ -320,13 +320,13 @@ namespace rsgis{namespace vec{
 		}
 		delete polys;
 		
-		delete RSGISGEOSFactoryGenerator::getInstance();
+		delete rsgis::utils::RSGISGEOSFactoryGenerator::getInstance();
 	}
 	
-	void RSGISVectorProcessing::createGrid(string outputShapefile, OGRSpatialReference* spatialRef, bool deleteIfPresent, double xTLStart, double yTLStart, double resolutionX, double resolutionY, double width, double height) throw(RSGISVectorException)
+	void RSGISVectorProcessing::createGrid(std::string outputShapefile, OGRSpatialReference* spatialRef, bool deleteIfPresent, double xTLStart, double yTLStart, double resolutionX, double resolutionY, double width, double height) throw(RSGISVectorException)
 	{
-		GeometryFactory* geosGeomFactory = RSGISGEOSFactoryGenerator::getInstance()->getFactory();
-		vector<Polygon*> *polys = new vector<Polygon*>();
+		geos::geom::GeometryFactory* geosGeomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
+        std::vector<geos::geom::Polygon*> *polys = new std::vector<geos::geom::Polygon*>();
 		
 		unsigned int numXCells = width/resolutionX;
 		unsigned int numYCells = height/resolutionY;
@@ -343,15 +343,15 @@ namespace rsgis{namespace vec{
 			
 			for(unsigned int j = 0; j < numXCells; ++j)
 			{
-				vector<Coordinate> *coords = new vector<Coordinate>();
-				coords->push_back(Coordinate(tlX, tlY, 0));
-				coords->push_back(Coordinate(brX, tlY, 0));
-				coords->push_back(Coordinate(brX, brY, 0));
-				coords->push_back(Coordinate(tlX, brY, 0));
-				coords->push_back(Coordinate(tlX, tlY, 0));
+                std::vector<geos::geom::Coordinate> *coords = new std::vector<geos::geom::Coordinate>();
+				coords->push_back(geos::geom::Coordinate(tlX, tlY, 0));
+				coords->push_back(geos::geom::Coordinate(brX, tlY, 0));
+				coords->push_back(geos::geom::Coordinate(brX, brY, 0));
+				coords->push_back(geos::geom::Coordinate(tlX, brY, 0));
+				coords->push_back(geos::geom::Coordinate(tlX, tlY, 0));
 				
-				CoordinateArraySequence *coordSeq = new CoordinateArraySequence(coords);
-				LinearRing *linearRingShell = new LinearRing(coordSeq, geosGeomFactory);
+				geos::geom::CoordinateArraySequence *coordSeq = new geos::geom::CoordinateArraySequence(coords);
+				geos::geom::LinearRing *linearRingShell = new geos::geom::LinearRing(coordSeq, geosGeomFactory);
 				
 				polys->push_back(geosGeomFactory->createPolygon(linearRingShell, NULL));
 				
@@ -367,7 +367,7 @@ namespace rsgis{namespace vec{
 		RSGISVectorIO vecIO;
 		vecIO.exportGEOSPolygons2SHP(outputShapefile, deleteIfPresent, polys, spatialRef);
 		
-		vector<Polygon*>::iterator iterPolys;
+        std::vector<geos::geom::Polygon*>::iterator iterPolys;
 		for(iterPolys = polys->begin(); iterPolys != polys->end(); )
 		{
 			geosGeomFactory->destroyGeometry(*iterPolys);
@@ -376,10 +376,10 @@ namespace rsgis{namespace vec{
 		delete polys;
 		
 		
-		delete RSGISGEOSFactoryGenerator::getInstance();
+		delete rsgis::utils::RSGISGEOSFactoryGenerator::getInstance();
 	}
     
-    float RSGISVectorProcessing::calcMeanMinDistance(vector<OGRGeometry*> *geometries) throw(RSGISVectorException)
+    float RSGISVectorProcessing::calcMeanMinDistance(std::vector<OGRGeometry*> *geometries) throw(RSGISVectorException)
     {
         float meanMinDistance = 0;
         try
@@ -391,11 +391,11 @@ namespace rsgis{namespace vec{
                 double minDist = 0;
                 double distance = 0;
                 bool firstGeom = true;
-                for(vector<OGRGeometry*>::iterator iterGeomsOuter = geometries->begin(); iterGeomsOuter != geometries->end(); ++iterGeomsOuter)
+                for(std::vector<OGRGeometry*>::iterator iterGeomsOuter = geometries->begin(); iterGeomsOuter != geometries->end(); ++iterGeomsOuter)
                 {
                     minDist = 0;
                     firstGeom = true;
-                    for(vector<OGRGeometry*>::iterator iterGeomsInner = geometries->begin(); iterGeomsInner != geometries->end(); ++iterGeomsInner)
+                    for(std::vector<OGRGeometry*>::iterator iterGeomsInner = geometries->begin(); iterGeomsInner != geometries->end(); ++iterGeomsInner)
                     {
                         if(!(*iterGeomsOuter)->Equals(*iterGeomsInner))
                         {

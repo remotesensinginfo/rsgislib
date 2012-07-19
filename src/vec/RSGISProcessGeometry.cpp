@@ -144,7 +144,7 @@ namespace rsgis{namespace vec{
 		}
 		catch(RSGISVectorException& e)
 		{
-			throw RSGISVectorException(string(e.what()).c_str());
+			throw RSGISVectorException(std::string(e.what()).c_str());
 		}
 	}
 	
@@ -243,7 +243,7 @@ namespace rsgis{namespace vec{
 		}
 		catch(RSGISVectorException& e)
 		{
-			throw RSGISVectorException(string(e.what()).c_str());
+			throw RSGISVectorException(std::string(e.what()).c_str());
 		}
 	}
 	
@@ -254,7 +254,7 @@ namespace rsgis{namespace vec{
 		{
 			if( outputSHPLayer->CreateField( inFeatureDefn->GetFieldDefn(i) ) != OGRERR_NONE )
 			{
-				string message = string("Creating ") + string(inFeatureDefn->GetFieldDefn(i)->GetNameRef()) + string(" field has failed.");
+				std::string message = std::string("Creating ") + std::string(inFeatureDefn->GetFieldDefn(i)->GetNameRef()) + std::string(" field has failed.");
 				throw RSGISVectorOutputException(message.c_str());
 			}
 		}

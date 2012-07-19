@@ -45,12 +45,12 @@ namespace rsgis{namespace segment{
     {
     public:
         RSGISRegionGrowAttributeTable();
-        void growClassRegionsUsingThresholds(rsgis::rastergis::RSGISAttributeTable *attTable, GDALDataset *clumps, vector<rsgis::rastergis::RSGISIfStatement*> *statements, std::string classAttName, int classAttVal)throw(rsgis::RSGISAttributeTableException,rsgis::RSGISImageException);
+        void growClassRegionsUsingThresholds(rsgis::rastergis::RSGISAttributeTable *attTable, GDALDataset *clumps, std::vector<rsgis::rastergis::RSGISIfStatement*> *statements, std::string classAttName, int classAttVal)throw(rsgis::RSGISAttributeTableException,rsgis::RSGISImageException);
         ~RSGISRegionGrowAttributeTable();
     private:
         bool** createMask(rsgis::rastergis::RSGISAttributeTable *attTable, GDALDataset *clumps, unsigned int *width, unsigned int *height, unsigned int classFieldIdx, int classVal);
         void updateMask(bool **mask, rsgis::rastergis::RSGISAttributeTable *attTable, GDALDataset *clumps, unsigned int width, unsigned int height, unsigned int classFieldIdx, int classVal);
-        void getConnectedClumps(list<unsigned int> *connectedClumps, rsgis::rastergis::RSGISAttributeTable *attTable, GDALDataset *clumps, bool **mask, unsigned int width, unsigned int height);
+        void getConnectedClumps(std::list<unsigned int> *connectedClumps, rsgis::rastergis::RSGISAttributeTable *attTable, GDALDataset *clumps, bool **mask, unsigned int width, unsigned int height);
     };
     
 }}

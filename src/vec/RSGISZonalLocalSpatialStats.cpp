@@ -32,7 +32,7 @@ namespace rsgis{namespace vec{
 		this->attributes = attributes;
 		this->numAttributes = numAttributes;
 		this->outPxlCount = outPxlCount;
-		this->attributesVar = new string[numAttributes];
+		this->attributesVar = new std::string[numAttributes];
 		this->method = method;
 		
 		dataSize = numAttributes + 1; // 0 Pxl Count // 1 ..  n Attribute data
@@ -122,7 +122,7 @@ namespace rsgis{namespace vec{
 				double varSum = 0;
 				for (int j = 0; j < numOffsets; j++) // Loop through averages at each polygon offset
 				{
-					//cout << "Centre average = " << averages[i] << " surrounding averge = " << offsetAverages[j][i] << endl;
+					//std::cout << "Centre average = " << averages[i] << " surrounding averge = " << offsetAverages[j][i] << std::endl;
 					varSum = varSum + pow(offsetAverages[j][i] - tempAverage[i],2); // (xi - x')^2
 				}
 				outputVar[i] = varSum / numOffsets;
@@ -156,23 +156,23 @@ namespace rsgis{namespace vec{
 		{
 			if(attributes[i]->name.length() > 7)
 			{
-				cout << attributes[i]->name << " will be truncated to \'" << attributes[i]->name.substr(0, 7) << "\'\n";
+				std::cout << attributes[i]->name << " will be truncated to \'" << attributes[i]->name.substr(0, 7) << "\'\n";
 				attributes[i]->name = attributes[i]->name.substr(0, 7);
 			}
 			OGRFieldDefn shpField(attributes[i]->name.c_str(), OFTReal);
 			shpField.SetPrecision(10);
 			if(outputLayer->CreateField( &shpField ) != OGRERR_NONE )
 			{
-				string message = string("Creating shapefile field ") + attributes[i]->name + string(" has failed");
+				std::string message = std::string("Creating shapefile field ") + attributes[i]->name + std::string(" has failed");
 				throw RSGISVectorOutputException(message.c_str());
 			}
 			// Create field for variance on mean
-			attributesVar[i] = attributes[i]->name + string("Var");
+			attributesVar[i] = attributes[i]->name + std::string("Var");
 			OGRFieldDefn shpVarField(attributesVar[i].c_str(), OFTReal);
 			shpVarField.SetPrecision(10);
 			if(outputLayer->CreateField( &shpVarField) != OGRERR_NONE )
 			{
-				string message = string("Creating shapefile field ") + attributesVar[i] + string(" has failed");
+				std::string message = std::string("Creating shapefile field ") + attributesVar[i] + std::string(" has failed");
 				throw RSGISVectorOutputException(message.c_str());
 			}
 		}
@@ -183,7 +183,7 @@ namespace rsgis{namespace vec{
 			shpField.SetPrecision(10);
 			if( outputLayer->CreateField( &shpField ) != OGRERR_NONE )
 			{
-				string message = string("Creating shapefile field \'TotalPxls\' has failed");
+				std::string message = std::string("Creating shapefile field \'TotalPxls\' has failed");
 				throw RSGISVectorOutputException(message.c_str());
 			}
 		}
@@ -230,7 +230,7 @@ namespace rsgis{namespace vec{
 					throw rsgis::img::RSGISImageCalcException("The band attributes do not match the image.");
 				}
 				// Calculates the minimum of the two input image bands
-				if(!isnan(attributes[i]->bands[j]))
+				if(!std::isnan(attributes[i]->bands[j]))
                 {
 					if(first)
 					{

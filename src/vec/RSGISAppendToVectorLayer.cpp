@@ -73,7 +73,7 @@ namespace rsgis{namespace vec{
 				} 
 				else 
 				{
-					cout << inFeatureDefn->GetName() << ": Feature " << fid << ": Geometry was NULL so feature ignored." << endl;
+					std::cout << inFeatureDefn->GetName() << ": Feature " << fid << ": Geometry was NULL so feature ignored." << std::endl;
 				}
 				OGRFeature::DestroyFeature(inFeature);
 			}
@@ -91,7 +91,7 @@ namespace rsgis{namespace vec{
 		{
 			if( outputSHPLayer->CreateField( inFeatureDefn->GetFieldDefn(i) ) != OGRERR_NONE )
 			{
-				string message = string("Creating ") + string(inFeatureDefn->GetFieldDefn(i)->GetNameRef()) + string(" field has failed.");
+				std::string message = std::string("Creating ") + std::string(inFeatureDefn->GetFieldDefn(i)->GetNameRef()) + std::string(" field has failed.");
 				throw RSGISVectorOutputException(message.c_str());
 			}
 		}

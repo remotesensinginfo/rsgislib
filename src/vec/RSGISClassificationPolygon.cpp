@@ -30,12 +30,12 @@ namespace rsgis{namespace vec{
 		
 	}
 	
-	void RSGISClassificationPolygon::setClassification(string classification)
+	void RSGISClassificationPolygon::setClassification(std::string classification)
 	{
 		this->classification = classification;
 	}
 	
-	string RSGISClassificationPolygon::getClassification()
+	std::string RSGISClassificationPolygon::getClassification()
 	{
 		return this->classification;
 	}

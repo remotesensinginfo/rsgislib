@@ -60,7 +60,7 @@ namespace rsgis{namespace vec{
 		shpField.SetPrecision(10);
 		if( outputLayer->CreateField( &shpField ) != OGRERR_NONE )
 		{
-			string message = string("Creating shapefile field \'Area\' has failed");
+			std::string message = std::string("Creating shapefile field \'Area\' has failed");
 			throw RSGISVectorOutputException(message.c_str());
 		}
 	}

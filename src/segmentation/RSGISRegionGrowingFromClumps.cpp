@@ -39,7 +39,7 @@ namespace rsgis{namespace segment{
         
         unsigned long clumpIdx = 0;
         
-        ofstream outTextFile;
+        std::ofstream outTextFile;
         outTextFile.open (outputText.c_str());
         
         for(std::vector<ImgSeeds>::iterator iterSeeds = seedPxls->begin(); iterSeeds != seedPxls->end(); ++iterSeeds)
@@ -47,7 +47,7 @@ namespace rsgis{namespace segment{
             if(((*iterSeeds).xPxl < width) & ((*iterSeeds).yPxl < height))
             {
                 clumpBand->RasterIO(GF_Read, (*iterSeeds).xPxl, (*iterSeeds).yPxl, 1, 1, &clumpIdx, 1, 1, GDT_UInt32, 0, 0);
-                outTextFile << clumpIdx << "," << (*iterSeeds).seedID << endl;
+                outTextFile << clumpIdx << "," << (*iterSeeds).seedID << std::endl;
             }
             else
             {
@@ -141,7 +141,7 @@ namespace rsgis{namespace segment{
         GDALRasterBand *clumpBand = clumps->GetRasterBand(1);
         GDALRasterBand *outBand = output->GetRasterBand(1);
         
-        cout << "Building Clump Table\n";
+        std::cout << "Building Clump Table\n";
         unsigned long maxClumpIdx = 0;
         for(unsigned int i = 0; i < height; ++i)
         {
@@ -257,10 +257,10 @@ namespace rsgis{namespace segment{
         std::list<unsigned long> *pClumpIds = NULL;
         std::list<unsigned long> *cClumpIds = NULL;
         
-        cout << "Processing seeds\n";
+        std::cout << "Processing seeds\n";
         for(std::vector<ClumpSeed>::iterator iterSeeds = seeds->begin(); iterSeeds != seeds->end(); ++iterSeeds)
         {
-            cout << "Processing seed " << (*iterSeeds).seedID << endl;
+            std::cout << "Processing seed " << (*iterSeeds).seedID << std::endl;
             pClumpIds = new std::list<unsigned long>();
             pRegion = this->growRegion(initThreshold, maxIterations, clumpTab, numSpecBands, (*iterSeeds).clumpID, (*iterSeeds).seedID, pClumpIds);
             
@@ -283,7 +283,7 @@ namespace rsgis{namespace segment{
                     {
                         percentInAreaInc = (((double)cRegion->pxls->size()) - ((double)pRegion->pxls->size()))/((double)cRegion->pxls->size());
                         
-                        //cout << "percentInAreaInc = " << percentInAreaInc << endl;
+                        //std::cout << "percentInAreaInc = " << percentInAreaInc << std::endl;
                         
                         if(percentInAreaInc > 0.9)
                         {
@@ -337,7 +337,7 @@ namespace rsgis{namespace segment{
         }
         
         // Output the grown seed to the output image.
-        cout << "Writing output to image\n";
+        std::cout << "Writing output to image\n";
         for(unsigned int i = 0; i < height; ++i)
         {
             clumpBand->RasterIO(GF_Read, 0, i, width, 1, clumpIdxs, width, 1, GDT_UInt32, 0, 0);
@@ -731,7 +731,7 @@ namespace rsgis{namespace segment{
                 if((((float)sum)/numVals) > percentThresholds[n])
                 {
                     specThresholds[n] = minVals[n] + i;
-                    cout << "Band " << n+1 << " threshold = " << specThresholds[n] << endl;
+                    std::cout << "Band " << n+1 << " threshold = " << specThresholds[n] << std::endl;
                     break;
                 }
             }
@@ -1000,7 +1000,7 @@ namespace rsgis{namespace segment{
                 if((((float)sum)/numVals) > percentThresholds[n])
                 {
                     specThresholds[n] = minVals[n] + i;
-                    cout << "Band " << n+1 << " threshold = " << specThresholds[n] << endl;
+                    std::cout << "Band " << n+1 << " threshold = " << specThresholds[n] << std::endl;
                     break;
                 }
             }
@@ -1037,12 +1037,12 @@ namespace rsgis{namespace segment{
         outClumpsIds.sort();
         outClumpsIds.unique();
         
-        ofstream outTxtFile;
+        std::ofstream outTxtFile;
         outTxtFile.open(outputFile.c_str());
         unsigned long seedID = 1;
         for(std::list<unsigned long>::iterator iterClumps = outClumpsIds.begin(); iterClumps != outClumpsIds.end(); ++iterClumps)
         {
-            outTxtFile << *iterClumps << "," << seedID++ << endl;
+            outTxtFile << *iterClumps << "," << seedID++ << std::endl;
         }
         outTxtFile.flush();
         outTxtFile.close();
@@ -1375,7 +1375,7 @@ namespace rsgis{namespace segment{
                 {
                     sort(allValsVec.begin(), allValsVec.end());
                     float percentileVal = gsl_stats_quantile_from_sorted_data(&allValsVec[0], 1, allValsVec.size(), 0.75);
-                    //cout << "percentileVal = " << percentileVal << endl;
+                    //std::cout << "percentileVal = " << percentileVal << std::endl;
                     first = true;
                     for(std::list<unsigned long>::iterator iterClump = largeClumpTab->at(i)->begin(); iterClump != largeClumpTab->at(i)->end(); ++iterClump)
                     {
@@ -1392,7 +1392,7 @@ namespace rsgis{namespace segment{
                         }
                         meanVal = meanVal / numSpecBands;
                         distVal = sqrt((meanVal - percentileVal)*(meanVal - percentileVal));
-                        //cout << "\t" << *iterClump << " has mean value " << meanVal << " Percentile Value = " << percentileVal << endl;
+                        //std::cout << "\t" << *iterClump << " has mean value " << meanVal << " Percentile Value = " << percentileVal << std::endl;
                         if(first)
                         {
                             tmpMeanVal = distVal;
@@ -1410,7 +1410,7 @@ namespace rsgis{namespace segment{
                 {
                     sort(allValsVec.begin(), allValsVec.end());
                     float percentileVal = gsl_stats_quantile_from_sorted_data(&allValsVec[0], 1, allValsVec.size(), 0.95);
-                    //cout << "percentileVal = " << percentileVal << endl;
+                    //std::cout << "percentileVal = " << percentileVal << std::endl;
                     first = true;
                     for(std::list<unsigned long>::iterator iterClump = largeClumpTab->at(i)->begin(); iterClump != largeClumpTab->at(i)->end(); ++iterClump)
                     {
@@ -1427,7 +1427,7 @@ namespace rsgis{namespace segment{
                         }
                         meanVal = meanVal / numSpecBands;
                         distVal = sqrt((meanVal - percentileVal)*(meanVal - percentileVal));
-                        //cout << "\t" << *iterClump << " has mean value " << meanVal << " Percentile Value = " << percentileVal << endl;
+                        //std::cout << "\t" << *iterClump << " has mean value " << meanVal << " Percentile Value = " << percentileVal << std::endl;
                         if(first)
                         {
                             tmpMeanVal = distVal;
@@ -1442,7 +1442,7 @@ namespace rsgis{namespace segment{
                     }
                 }
                 
-                //cout << "sClump = " << sClump << endl;
+                //std::cout << "sClump = " << sClump << std::endl;
                 outClumps.push_back(sClump);
             }
         }
@@ -1783,7 +1783,7 @@ namespace rsgis{namespace segment{
                 {
                     sort(allValsVec.begin(), allValsVec.end());
                     float percentileVal = gsl_stats_quantile_from_sorted_data(&allValsVec[0], 1, allValsVec.size(), 0.75);
-                    //cout << "percentileVal = " << percentileVal << endl;
+                    //std::cout << "percentileVal = " << percentileVal << std::endl;
                     first = true;
                     for(std::list<unsigned long>::iterator iterClump = largeClumpTab->at(i)->begin(); iterClump != largeClumpTab->at(i)->end(); ++iterClump)
                     {
@@ -1800,7 +1800,7 @@ namespace rsgis{namespace segment{
                         }
                         meanVal = meanVal / numSpecBands;
                         distVal = sqrt((meanVal - percentileVal)*(meanVal - percentileVal));
-                        //cout << "\t" << *iterClump << " has mean value " << meanVal << " Percentile Value = " << percentileVal << endl;
+                        //std::cout << "\t" << *iterClump << " has mean value " << meanVal << " Percentile Value = " << percentileVal << std::endl;
                         if(first)
                         {
                             tmpMeanVal = distVal;
@@ -1818,7 +1818,7 @@ namespace rsgis{namespace segment{
                 {
                     sort(allValsVec.begin(), allValsVec.end());
                     float percentileVal = gsl_stats_quantile_from_sorted_data(&allValsVec[0], 1, allValsVec.size(), 0.95);
-                    //cout << "percentileVal = " << percentileVal << endl;
+                    //std::cout << "percentileVal = " << percentileVal << std::endl;
                     first = true;
                     for(std::list<unsigned long>::iterator iterClump = largeClumpTab->at(i)->begin(); iterClump != largeClumpTab->at(i)->end(); ++iterClump)
                     {
@@ -1835,7 +1835,7 @@ namespace rsgis{namespace segment{
                         }
                         meanVal = meanVal / numSpecBands;
                         distVal = sqrt((meanVal - percentileVal)*(meanVal - percentileVal));
-                        //cout << "\t" << *iterClump << " has mean value " << meanVal << " Percentile Value = " << percentileVal << endl;
+                        //std::cout << "\t" << *iterClump << " has mean value " << meanVal << " Percentile Value = " << percentileVal << std::endl;
                         if(first)
                         {
                             tmpMeanVal = distVal;
@@ -1850,17 +1850,17 @@ namespace rsgis{namespace segment{
                     }
                 }
                 
-                //cout << "sClump = " << sClump << endl;
+                //std::cout << "sClump = " << sClump << std::endl;
                 outClumps.push_back(sClump);
             }
         }
         
-        ofstream outTxtFile;
+        std::ofstream outTxtFile;
         outTxtFile.open(outputFile.c_str());
         unsigned long seedID = 1;
         for(std::list<unsigned long>::iterator iterClumps = outClumps.begin(); iterClumps != outClumps.end(); ++iterClumps)
         {
-            outTxtFile << *iterClumps << "," << seedID++ << endl;
+            outTxtFile << *iterClumps << "," << seedID++ << std::endl;
         }
         outTxtFile.flush();
         outTxtFile.close();

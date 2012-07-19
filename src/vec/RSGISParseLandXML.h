@@ -61,7 +61,7 @@ namespace rsgis { namespace vec {
 		{
 		public:
 			RSGISParseLandXML();
-			void getLandXMLLine(string xmlFile, std::vector<geos::geom::LineSegment*> *outLines); 
+			void getLandXMLLine(std::string xmlFile, std::vector<geos::geom::LineSegment*> *outLines); 
 			~RSGISParseLandXML();
 		protected:
             std::string xmlFile;

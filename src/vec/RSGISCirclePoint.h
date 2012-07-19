@@ -49,9 +49,9 @@ namespace rsgis{namespace vec{
 			float getRadius();
 			~RSGISCirclePoint();
 		protected:
-			string radiusAttribute;
-			string areaAttribute;
-			string heightAttribute;
+            std::string radiusAttribute;
+			std::string areaAttribute;
+			std::string heightAttribute;
 			float radius;
 			float area;
 			float height;

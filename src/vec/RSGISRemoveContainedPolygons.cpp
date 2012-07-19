@@ -133,7 +133,7 @@ namespace rsgis{namespace vec{
 		return numOutputted;
 	}
 	
-	long unsigned RSGISRemoveContainedPolygons::removeContainedPolygons(OGRLayer *input, OGRLayer *output, vector<OGRPolygon*> *inputPolys)throw(RSGISVectorException)
+	long unsigned RSGISRemoveContainedPolygons::removeContainedPolygons(OGRLayer *input, OGRLayer *output, std::vector<OGRPolygon*> *inputPolys)throw(RSGISVectorException)
 	{
 		OGRFeature *inFeature = NULL;
 		OGRFeature *outFeature = NULL;
@@ -147,7 +147,7 @@ namespace rsgis{namespace vec{
 		unsigned long currentFID = 0;
 		unsigned long numOutputted = 0;
 		
-		vector<OGRPolygon*>::iterator iterPolys;
+		std::vector<OGRPolygon*>::iterator iterPolys;
 		
 		try
 		{
@@ -224,7 +224,7 @@ namespace rsgis{namespace vec{
 		{
 			if( outputSHPLayer->CreateField( inFeatureDefn->GetFieldDefn(i) ) != OGRERR_NONE )
 			{
-				string message = string("Creating ") + string(inFeatureDefn->GetFieldDefn(i)->GetNameRef()) + string(" field has failed.");
+				std::string message = std::string("Creating ") + std::string(inFeatureDefn->GetFieldDefn(i)->GetNameRef()) + std::string(" field has failed.");
 				throw RSGISVectorOutputException(message.c_str());
 			}
 		}

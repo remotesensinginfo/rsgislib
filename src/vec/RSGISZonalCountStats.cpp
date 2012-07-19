@@ -84,14 +84,14 @@ namespace rsgis{namespace vec{
 		{
 			if(attributes[i]->name.length() > 10)
 			{
-				cout << attributes[i]->name << " will be truncated to \'" << attributes[i]->name.substr(0, 10) << "\'\n";
+                std::cout << attributes[i]->name << " will be truncated to \'" << attributes[i]->name.substr(0, 10) << "\'\n";
 				attributes[i]->name = attributes[i]->name.substr(0, 10);
 			}
 			OGRFieldDefn shpField(attributes[i]->name.c_str(), OFTReal);
 			shpField.SetPrecision(10);
 			if(outputLayer->CreateField( &shpField ) != OGRERR_NONE )
 			{
-				string message = string("Creating shapefile field ") + attributes[i]->name + string(" has failed");
+				std::string message = std::string("Creating shapefile field ") + attributes[i]->name + std::string(" has failed");
 				throw RSGISVectorOutputException(message.c_str());
 			}
 		}
@@ -102,7 +102,7 @@ namespace rsgis{namespace vec{
 			shpField.SetPrecision(10);
 			if( outputLayer->CreateField( &shpField ) != OGRERR_NONE )
 			{
-				string message = string("Creating shapefile field \'TotalPxls\' has failed");
+				std::string message = std::string("Creating shapefile field \'TotalPxls\' has failed");
 				throw RSGISVectorOutputException(message.c_str());
 			}
 		}
@@ -113,7 +113,7 @@ namespace rsgis{namespace vec{
 			shpField.SetPrecision(10);
 			if( outputLayer->CreateField( &shpField ) != OGRERR_NONE )
 			{
-				string message = string("Creating shapefile field \'EmptyPxls\' has failed");
+				std::string message = std::string("Creating shapefile field \'EmptyPxls\' has failed");
 				throw RSGISVectorOutputException(message.c_str());
 			}
 		}

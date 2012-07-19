@@ -132,12 +132,12 @@ namespace rsgis{namespace segment{
         std::cout << "There are " << clumpTable->size() << " clumps. " << smallClumps.size() << " are too small\n";
         
         rsgis::img::PxlLoc tLoc;
-        list<unsigned long> neighbours;
+        std::list<unsigned long> neighbours;
         unsigned long closestNeighbour = 0;
         bool firstNeighbourTested = true;
         float closestNeighbourDist = 0;
         
-        std::cout << "Eliminating Small Clumps." << endl;
+        std::cout << "Eliminating Small Clumps." << std::endl;
         long smallClumpsCounter = 0;
         while(smallClumps.size() > 0)
         {
@@ -197,7 +197,7 @@ namespace rsgis{namespace segment{
                 
                 // Decide on which neighbour to measure with.
                 firstNeighbourTested = true;
-                for(list<unsigned long>::iterator iterClumps = neighbours.begin(); iterClumps != neighbours.end(); ++iterClumps)
+                for(std::list<unsigned long>::iterator iterClumps = neighbours.begin(); iterClumps != neighbours.end(); ++iterClumps)
                 {
                     /*for(unsigned int b = 0; b < numSpecBands; ++b)
                     {

@@ -54,7 +54,7 @@ namespace rsgis{ namespace utils{
 				std::vector<std::string>::iterator iterTokens;
 				std::vector<std::string> *tokens = new std::vector<std::string>();
 				ImageFootPrintPoly *poly = NULL;
-				inputCSVFile.seekg(ios_base::beg);
+				inputCSVFile.seekg(std::ios_base::beg);
 				
 				int polyFID = 0;
 				

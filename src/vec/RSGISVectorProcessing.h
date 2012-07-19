@@ -44,27 +44,21 @@
 #include "utils/RSGISImageFootprintPolygonsCSVParse.h"
 #include "utils/RSGISGEOSFactoryGenerator.h"
 
-using namespace std;
-using namespace geos::geom;
-using namespace rsgis::geom;
-using namespace rsgis::math;
-using namespace rsgis::utils;
-
 namespace rsgis{namespace vec{
 	
 	class RSGISVectorProcessing
 		{
 		public:
 			RSGISVectorProcessing();
-			Polygon* bufferPolygon(Polygon *polygon, double distance);
+            geos::geom::Polygon* bufferPolygon(geos::geom::Polygon *polygon, double distance);
 			void generateCircles(RSGISCirclePoint **points, RSGISCirclePolygon **circles, int numFeatures, float resolution);
 			void listAttributes(OGRLayer *inputSHPLayer);
-			void printAttribute(OGRLayer *inputLayer, string attribute);
-			void splitFeatures(OGRLayer *inputLayer, string outputBase, bool force);
-			void createPlotPolygons(vector<PlotPoly*> *polyDetails, string output, bool force) throw(RSGISVectorException);
-			void createImageFootprintPolygons(vector<ImageFootPrintPoly*> *polyDetails, string output, bool force) throw(RSGISVectorException);
-			void createGrid(string outputShapefile, OGRSpatialReference* spatialRef, bool deleteIfPresent, double xTLStart, double yTLStart, double resolutionX, double resolutionY, double width, double height) throw(RSGISVectorException);
-            float calcMeanMinDistance(vector<OGRGeometry*> *geometries) throw(RSGISVectorException);
+			void printAttribute(OGRLayer *inputLayer, std::string attribute);
+			void splitFeatures(OGRLayer *inputLayer, std::string outputBase, bool force);
+			void createPlotPolygons(std::vector<rsgis::utils::PlotPoly*> *polyDetails, std::string output, bool force) throw(RSGISVectorException);
+			void createImageFootprintPolygons(std::vector<rsgis::utils::ImageFootPrintPoly*> *polyDetails, std::string output, bool force) throw(RSGISVectorException);
+			void createGrid(std::string outputShapefile, OGRSpatialReference* spatialRef, bool deleteIfPresent, double xTLStart, double yTLStart, double resolutionX, double resolutionY, double width, double height) throw(RSGISVectorException);
+            float calcMeanMinDistance(std::vector<OGRGeometry*> *geometries) throw(RSGISVectorException);
             ~RSGISVectorProcessing();
 		};
 }}

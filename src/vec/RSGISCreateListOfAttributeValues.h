@@ -42,14 +42,14 @@ namespace rsgis{namespace vec{
 	class RSGISCreateListOfAttributeValues : public RSGISProcessOGRFeature
 	{
 	public:
-		RSGISCreateListOfAttributeValues(vector<string> *attributes,string attribute);
+		RSGISCreateListOfAttributeValues(std::vector<std::string> *attributes,std::string attribute);
 		virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
 		virtual void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
 		virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException);
 		virtual ~RSGISCreateListOfAttributeValues();
 	private:
-		string attribute;
-		vector<string> *attributes;
+		std::string attribute;
+		std::vector<std::string> *attributes;
 	};
 }}
 

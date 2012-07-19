@@ -49,7 +49,7 @@ namespace rsgis{namespace vec{
 			~RSGISConvertToASCII();
 		protected:
             std::string outputTextFile;
-			ofstream outTxtFile;
+			std::ofstream outTxtFile;
 			OGRFeatureDefn *featureDefn;
 			OGRGeometry *geometry;
 			OGRPoint *point;

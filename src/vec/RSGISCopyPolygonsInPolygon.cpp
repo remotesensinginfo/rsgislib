@@ -55,12 +55,12 @@ namespace rsgis{namespace vec{
 			
 			unsigned long numFeatures = input->GetFeatureCount(true);
 			
-			cout << "There are " << numFeatures << " to process\n";
+			std::cout << "There are " << numFeatures << " to process\n";
 			
 			//unsigned long feedback = numFeatures/10;
 			//unsigned long feedbackCounter = 0;
 			//unsigned long i = 0;
-			//cout << "Started" << flush;
+			//std::cout << "Started" << std::flush;
 			
 			input->ResetReading();
 			while( (inFeature = input->GetNextFeature()) != NULL )
@@ -68,7 +68,7 @@ namespace rsgis{namespace vec{
 				// Feedback counter (prints progress to screen)
 				/*if((numFeatures >= 10) && ((i % feedback) == 0))
 				{
-					cout << ".." << feedbackCounter << ".." << flush;
+					std::cout << ".." << feedbackCounter << ".." << std::flush;
 					feedbackCounter = feedbackCounter + 10;
 				}
 				++i;
@@ -76,7 +76,7 @@ namespace rsgis{namespace vec{
 				
 				fid = inFeature->GetFID();
 				
-				//cout << "FID = " << fid << endl;
+				//std::cout << "FID = " << fid << std::endl;
 				
 				// Get Geometry.
 				polyOK = false;
@@ -116,7 +116,7 @@ namespace rsgis{namespace vec{
 		{
 			if( outputSHPLayer->CreateField( inFeatureDefn->GetFieldDefn(i) ) != OGRERR_NONE )
 			{
-				string message = string("Creating ") + string(inFeatureDefn->GetFieldDefn(i)->GetNameRef()) + string(" field has failed.");
+				std::string message = std::string("Creating ") + std::string(inFeatureDefn->GetFieldDefn(i)->GetNameRef()) + std::string(" field has failed.");
 				throw RSGISVectorOutputException(message.c_str());
 			}
 		}
