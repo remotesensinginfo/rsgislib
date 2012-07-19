@@ -2698,8 +2698,8 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 								polyUnionBuffer = dynamic_cast<geos::geom::Polygon*>(polyUnion->buffer(0));
 								delete polyUnion;
 								
-								polys->erase(remove(polys->begin(), polys->end(), poly1));
-								polys->erase(remove(polys->begin(), polys->end(), poly2));
+								polys->erase(std::remove(polys->begin(), polys->end(), poly1));
+								polys->erase(std::remove(polys->begin(), polys->end(), poly2));
 								delete poly1;
 								delete poly2;
 								
@@ -2842,8 +2842,8 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 									tmpPolys2->clear();
 									tmpPolysIntersect->clear();
 									
-									polys->erase(remove(polys->begin(), polys->end(), poly1));
-									polys->erase(remove(polys->begin(), polys->end(), poly2));
+									polys->erase(std::remove(polys->begin(), polys->end(), poly1));
+									polys->erase(std::remove(polys->begin(), polys->end(), poly2));
 									delete poly1;
 									delete poly2;
 									
@@ -2883,8 +2883,8 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 									tmpPolys2->clear();
 									tmpPolysIntersect->clear();
 									
-									polys->erase(remove(polys->begin(), polys->end(), poly1));
-									polys->erase(remove(polys->begin(), polys->end(), poly2));
+									polys->erase(std::remove(polys->begin(), polys->end(), poly1));
+									polys->erase(std::remove(polys->begin(), polys->end(), poly2));
 									delete poly1;
 									
 									mergeSmall = true;
@@ -2923,8 +2923,8 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 									tmpPolys2->clear();
 									tmpPolysIntersect->clear();
 									
-									polys->erase(remove(polys->begin(), polys->end(), poly1));
-									polys->erase(remove(polys->begin(), polys->end(), poly2));
+									polys->erase(std::remove(polys->begin(), polys->end(), poly1));
+									polys->erase(std::remove(polys->begin(), polys->end(), poly2));
 									delete poly2;
 									
 									mergeSmall = true;
@@ -2937,8 +2937,8 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 									polyUnionBuffer = dynamic_cast<geos::geom::Polygon*>(polyUnion->buffer(0));
 									delete polyUnion;
 									
-									polys->erase(remove(polys->begin(), polys->end(), poly1));
-									polys->erase(remove(polys->begin(), polys->end(), poly2));
+									polys->erase(std::remove(polys->begin(), polys->end(), poly1));
+									polys->erase(std::remove(polys->begin(), polys->end(), poly2));
 									delete poly1;
 									delete poly2;
 									
@@ -3014,8 +3014,8 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 										tmpPolys2->clear();
 										tmpPolysIntersect->clear();
 										
-										polys->erase(remove(polys->begin(), polys->end(), poly1));
-										polys->erase(remove(polys->begin(), polys->end(), poly2));
+										polys->erase(std::remove(polys->begin(), polys->end(), poly1));
+										polys->erase(std::remove(polys->begin(), polys->end(), poly2));
 										delete poly1;
 										delete poly2;
 										
@@ -3072,7 +3072,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 												polyUnion = geomUtils.polygonUnion(polyTmp1, maxRelBorderPoly);
 												polyUnionBuffer = dynamic_cast<geos::geom::Polygon*>(polyUnion->buffer(0));
 												delete polyUnion;
-												tmpPolysLarge->erase(remove(tmpPolysLarge->begin(), tmpPolysLarge->end(), maxRelBorderPoly));
+												tmpPolysLarge->erase(std::remove(tmpPolysLarge->begin(), tmpPolysLarge->end(), maxRelBorderPoly));
 												tmpPolysLarge->push_back(polyUnionBuffer);
 												delete maxRelBorderPoly;
 												delete *iterPolysSmall;
@@ -3110,7 +3110,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 						else if(poly1withinpoly2)
 						{
 							//std::cout << "Polygon 1 within polygon 2\n";
-							polys->erase(remove(polys->begin(), polys->end(), poly1));
+							polys->erase(std::remove(polys->begin(), polys->end(), poly1));
 							delete poly1;
 							poly2 = NULL;
 							iterPolys1 = polys->begin();
@@ -3120,7 +3120,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 						else if(poly2withinpoly1)
 						{
 							//std::cout << "Polygon 2 within polygon 1\n";
-							polys->erase(remove(polys->begin(), polys->end(), poly2));
+							polys->erase(std::remove(polys->begin(), polys->end(), poly2));
 							poly1 = NULL;
 							delete poly2;
 							iterPolys1 = polys->begin();
@@ -3605,7 +3605,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 									delete intersect;
 								}
 								
-								largePolys->erase(remove(largePolys->begin(), largePolys->end(), maxIntersect));
+								largePolys->erase(std::remove(largePolys->begin(), largePolys->end(), maxIntersect));
 								unionPoly = geomUtils.polygonUnion(maxIntersect, smallPoly);
 								delete maxIntersect;
 								largePolys->push_back(unionPoly);
@@ -3876,8 +3876,8 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 								polyUnionBuffer = dynamic_cast<geos::geom::Polygon*>(polyUnion->buffer(0));
 								delete polyUnion;
 								
-								largePolys->erase(remove(largePolys->begin(), largePolys->end(), poly1));
-								largePolys->erase(remove(largePolys->begin(), largePolys->end(), poly2));
+								largePolys->erase(std::remove(largePolys->begin(), largePolys->end(), poly1));
+								largePolys->erase(std::remove(largePolys->begin(), largePolys->end(), poly2));
 								delete poly1;
 								delete poly2;
 								
@@ -4020,8 +4020,8 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 									tmpPolys2->clear();
 									tmpPolysIntersect->clear();
 									
-									largePolys->erase(remove(largePolys->begin(), largePolys->end(), poly1));
-									largePolys->erase(remove(largePolys->begin(), largePolys->end(), poly2));
+									largePolys->erase(std::remove(largePolys->begin(), largePolys->end(), poly1));
+									largePolys->erase(std::remove(largePolys->begin(), largePolys->end(), poly2));
 									delete poly1;
 									delete poly2;
 									
@@ -4061,8 +4061,8 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 									tmpPolys2->clear();
 									tmpPolysIntersect->clear();
 									
-									largePolys->erase(remove(largePolys->begin(), largePolys->end(), poly1));
-									largePolys->erase(remove(largePolys->begin(), largePolys->end(), poly2));
+									largePolys->erase(std::remove(largePolys->begin(), largePolys->end(), poly1));
+									largePolys->erase(std::remove(largePolys->begin(), largePolys->end(), poly2));
 									delete poly1;
 									
 									mergeSmall = true;
@@ -4101,8 +4101,8 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 									tmpPolys2->clear();
 									tmpPolysIntersect->clear();
 									
-									largePolys->erase(remove(largePolys->begin(), largePolys->end(), poly1));
-									largePolys->erase(remove(largePolys->begin(), largePolys->end(), poly2));
+									largePolys->erase(std::remove(largePolys->begin(), largePolys->end(), poly1));
+									largePolys->erase(std::remove(largePolys->begin(), largePolys->end(), poly2));
 									delete poly2;
 									
 									mergeSmall = true;
@@ -4115,8 +4115,8 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 									polyUnionBuffer = dynamic_cast<geos::geom::Polygon*>(polyUnion->buffer(0));
 									delete polyUnion;
 									
-									largePolys->erase(remove(largePolys->begin(), largePolys->end(), poly1));
-									largePolys->erase(remove(largePolys->begin(), largePolys->end(), poly2));
+									largePolys->erase(std::remove(largePolys->begin(), largePolys->end(), poly1));
+									largePolys->erase(std::remove(largePolys->begin(), largePolys->end(), poly2));
 									delete poly1;
 									delete poly2;
 									
@@ -4192,8 +4192,8 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 										tmpPolys2->clear();
 										tmpPolysIntersect->clear();
 										
-										largePolys->erase(remove(largePolys->begin(), largePolys->end(), poly1));
-										largePolys->erase(remove(largePolys->begin(), largePolys->end(), poly2));
+										largePolys->erase(std::remove(largePolys->begin(), largePolys->end(), poly1));
+										largePolys->erase(std::remove(largePolys->begin(), largePolys->end(), poly2));
 										delete poly1;
 										delete poly2;
 										
@@ -4250,7 +4250,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 												polyUnion = geomUtils.polygonUnion(polyTmp1, maxRelBorderPoly);
 												polyUnionBuffer = dynamic_cast<geos::geom::Polygon*>(polyUnion->buffer(0));
 												delete polyUnion;
-												tmpPolysLarge->erase(remove(tmpPolysLarge->begin(), tmpPolysLarge->end(), maxRelBorderPoly));
+												tmpPolysLarge->erase(std::remove(tmpPolysLarge->begin(), tmpPolysLarge->end(), maxRelBorderPoly));
 												tmpPolysLarge->push_back(polyUnionBuffer);
 												delete maxRelBorderPoly;
 												delete *iterPolysSmall;
@@ -4288,7 +4288,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 						else if(poly1withinpoly2)
 						{
 							//std::cout << "Polygon 2 within polygon 1\n";
-							largePolys->erase(remove(largePolys->begin(), largePolys->end(), poly1));
+							largePolys->erase(std::remove(largePolys->begin(), largePolys->end(), poly1));
 							delete poly1;
 							poly2 = NULL;
 							iterPolys1 = largePolys->begin();
@@ -4298,7 +4298,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 						else if(poly2withinpoly1)
 						{
 							//std::cout << "Polygon 2 within polygon 1\n";
-							largePolys->erase(remove(largePolys->begin(), largePolys->end(), poly2));
+							largePolys->erase(std::remove(largePolys->begin(), largePolys->end(), poly2));
 							poly1 = NULL;
 							delete poly2;
 							iterPolys1 = largePolys->begin();
@@ -4404,7 +4404,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 									delete intersect;
 								}
 								
-								largePolys->erase(remove(largePolys->begin(), largePolys->end(), maxIntersect));
+								largePolys->erase(std::remove(largePolys->begin(), largePolys->end(), maxIntersect));
 								unionPoly = geomUtils.polygonUnion(maxIntersect, smallPoly);
 								delete maxIntersect;
 								largePolys->push_back(unionPoly);
@@ -4649,7 +4649,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 							
 							for(iterSmallPolys2 = toMerge->begin(); iterSmallPolys2 != toMerge->end(); )
 							{
-								smallPolys->erase(remove(smallPolys->begin(), smallPolys->end(), *iterSmallPolys2));
+								smallPolys->erase(std::remove(smallPolys->begin(), smallPolys->end(), *iterSmallPolys2));
 								delete *iterSmallPolys2;
 								toMerge->erase(iterSmallPolys2);
 							}

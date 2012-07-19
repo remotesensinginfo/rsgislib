@@ -1065,21 +1065,21 @@ namespace rsgis{namespace geom{
 						if(areaError)
 						{
 							change = true;
-							smallPolygons->erase(remove(smallPolygons->begin(), smallPolygons->end(), areaErrorPolygon));
+							smallPolygons->erase(std::remove(smallPolygons->begin(), smallPolygons->end(), areaErrorPolygon));
 							delete areaErrorPolygon;
 							iterPolys++;
 						}
 						else if(contains)
 						{
 							change = true;
-							smallPolygons->erase(remove(smallPolygons->begin(), smallPolygons->end(), containedPolygon));
+							smallPolygons->erase(std::remove(smallPolygons->begin(), smallPolygons->end(), containedPolygon));
 							delete containedPolygon;
 							iterPolys++;
 						}
 						else if(overlap)
 						{
 							change = true;
-							smallPolygons->erase(remove(smallPolygons->begin(), smallPolygons->end(), overlapPolygon));
+							smallPolygons->erase(std::remove(smallPolygons->begin(), smallPolygons->end(), overlapPolygon));
 							polygons->erase(iterPolys);
 							geos::geom::Polygon *newPoly = this->mergePolygons(poly, overlapPolygon, nonconvexoutline);
 							polygons->push_back(newPoly);
@@ -1203,7 +1203,7 @@ namespace rsgis{namespace geom{
 					if(maxRelBorder > relBorderThreshold)
 					{
 						change = true;
-						polygons->erase(remove(polygons->begin(), polygons->end(), maxRelBorderPoly));
+						polygons->erase(std::remove(polygons->begin(), polygons->end(), maxRelBorderPoly));
 						polygonsToMerge->erase(iterPolysToMerge);
 						geos::geom::Polygon *newPoly = this->mergePolygons(poly, maxRelBorderPoly, nonconvexoutline);
 						polygons->push_back(newPoly);
@@ -1707,18 +1707,18 @@ namespace rsgis{namespace geom{
 					
 					if(areaError)
 					{
-						polygons->erase(remove(polygons->begin(), polygons->end(), polygon2));
+						polygons->erase(std::remove(polygons->begin(), polygons->end(), polygon2));
 						delete polygon2;
 					}
 					else if(polygon1Contains)
 					{
 						if(polygon2->getArea() < dissolveThreshold)
 						{
-							polygons->erase(remove(polygons->begin(), polygons->end(), polygon2));
+							polygons->erase(std::remove(polygons->begin(), polygons->end(), polygon2));
 						}
 						else
 						{
-							polygons->erase(remove(polygons->begin(), polygons->end(), polygon1));
+							polygons->erase(std::remove(polygons->begin(), polygons->end(), polygon1));
 							geos::geom::Polygon *newPoly = this->createHole(polygon1, polygon2);
 							polygons->push_back(newPoly);
 						}
@@ -1728,11 +1728,11 @@ namespace rsgis{namespace geom{
 					{
 						if(polygon1->getArea() < dissolveThreshold)
 						{
-							polygons->erase(remove(polygons->begin(), polygons->end(), polygon1));
+							polygons->erase(std::remove(polygons->begin(), polygons->end(), polygon1));
 						}
 						else
 						{
-							polygons->erase(remove(polygons->begin(), polygons->end(), polygon2));
+							polygons->erase(std::remove(polygons->begin(), polygons->end(), polygon2));
 							geos::geom::Polygon *newPoly = this->createHole(polygon2, polygon1);
 							polygons->push_back(newPoly);
 						}
@@ -1740,8 +1740,8 @@ namespace rsgis{namespace geom{
 					}
 					else if(intersects)
 					{
-						polygons->erase(remove(polygons->begin(), polygons->end(), polygon1));
-						polygons->erase(remove(polygons->begin(), polygons->end(), polygon2));
+						polygons->erase(std::remove(polygons->begin(), polygons->end(), polygon1));
+						polygons->erase(std::remove(polygons->begin(), polygons->end(), polygon2));
 						
 						geos::geom::Geometry *geomIntersection = NULL;
 						geos::geom::Geometry *geomDifference1to2 = NULL;
@@ -3876,7 +3876,7 @@ namespace rsgis{namespace geom{
 					{
 						poly = this->polygonUnion(poly1, poly2);
 						polys->erase(iterPolys1);
-						polys->erase(remove(polys->begin(), polys->end(), poly2));
+						polys->erase(std::remove(polys->begin(), polys->end(), poly2));
 						delete poly1;
 						delete poly2;
 						polys->push_back(poly);
@@ -3982,7 +3982,7 @@ namespace rsgis{namespace geom{
 						
 						poly = this->polygonUnion(poly1, poly2);
 						polys->erase(iterPolys1);
-						polys->erase(remove(polys->begin(), polys->end(), poly2));
+						polys->erase(std::remove(polys->begin(), polys->end(), poly2));
 						delete poly1;
 						delete poly2;
 						polys->push_back(poly);
@@ -4042,7 +4042,7 @@ namespace rsgis{namespace geom{
 					{
 						poly = this->polygonUnion(poly1, poly2);
 						polys->erase(iterPolys1);
-						polys->erase(remove(polys->begin(), polys->end(), poly2));
+						polys->erase(std::remove(polys->begin(), polys->end(), poly2));
 						delete poly1;
 						delete poly2;
 						polys->push_back(poly);
@@ -4293,7 +4293,7 @@ namespace rsgis{namespace geom{
 					{
 						poly = this->polygonUnion(poly1, poly2);
 						polys->erase(iterPolys1);
-						polys->erase(remove(polys->begin(), polys->end(), poly2));
+						polys->erase(std::remove(polys->begin(), polys->end(), poly2));
 						delete poly1;
 						delete poly2;
 						polys->push_back(poly);

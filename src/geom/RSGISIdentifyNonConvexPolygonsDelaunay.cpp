@@ -583,7 +583,7 @@ namespace rsgis{namespace geom{
 			if(polys->size() == 1)
 			{
 				outPoly = polys->at(0);
-				polys->erase(remove(polys->begin(), polys->end(), outPoly));
+				polys->erase(std::remove(polys->begin(), polys->end(), outPoly));
 			}
 			else if(polys->size() == 0)
 			{
@@ -621,7 +621,7 @@ namespace rsgis{namespace geom{
 				if( maxPolyAreaValue/totalarea > 0.9)
 				{
 					outPoly = maxAreaPoly;
-					polys->erase(remove(polys->begin(), polys->end(), outPoly));
+					polys->erase(std::remove(polys->begin(), polys->end(), outPoly));
 				}
 				else if(tryAgain)
 				{
@@ -649,7 +649,7 @@ namespace rsgis{namespace geom{
 				else
 				{
 					outPoly = maxAreaPoly;
-					polys->erase(remove(polys->begin(), polys->end(), outPoly));
+					polys->erase(std::remove(polys->begin(), polys->end(), outPoly));
 				}
 			}
 			
