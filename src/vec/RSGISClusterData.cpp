@@ -340,7 +340,7 @@ namespace rsgis{namespace vec{
 			proportions.push_back(classesInfo[i].proportion);
 		}
 		
-		sort(proportions.begin(), proportions.end());
+        std::sort(proportions.begin(), proportions.end());
 		
 		for(unsigned int i = 0; i < proportions.size(); ++i)
 		{

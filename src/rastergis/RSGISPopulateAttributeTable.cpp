@@ -654,7 +654,7 @@ namespace rsgis{namespace rastergis{
                                         
                     if((*iterBands)->calcMedian)
                     {                        
-                        sort(clumpData[bandCount]->at(i).begin(), clumpData[bandCount]->at(i).end());
+                        std::sort(clumpData[bandCount]->at(i).begin(), clumpData[bandCount]->at(i).end());
                         median = gsl_stats_median_from_sorted_data(&(clumpData[bandCount]->at(i))[0], 1, clumpData[bandCount]->at(i).size());
                         feat->floatFields->at((*iterBands)->medianIdx) = median;
                     }
@@ -1465,7 +1465,7 @@ namespace rsgis{namespace rastergis{
                     
                     if((*iterBands)->calcMedian)
                     {                        
-                        sort(clumpData[bandCount]->at(i).begin(), clumpData[bandCount]->at(i).end());
+                        std::sort(clumpData[bandCount]->at(i).begin(), clumpData[bandCount]->at(i).end());
                         median = gsl_stats_median_from_sorted_data(&(clumpData[bandCount]->at(i))[0], 1, clumpData[bandCount]->at(i).size());
                         feat->floatFields->at((*iterBands)->medianIdx) = median;
                     }
@@ -2057,7 +2057,7 @@ namespace rsgis{namespace rastergis{
                     
                     if((*iterBands)->calcMedian)
                     {                        
-                        sort(clumpData[bandCount]->at(i).begin(), clumpData[bandCount]->at(i).end());
+                        std::sort(clumpData[bandCount]->at(i).begin(), clumpData[bandCount]->at(i).end());
                         median = gsl_stats_median_from_sorted_data(&(clumpData[bandCount]->at(i))[0], 1, clumpData[bandCount]->at(i).size());
                         feat->floatFields->at((*iterBands)->medianIdx) = median;
                     }
@@ -2930,7 +2930,7 @@ namespace rsgis{namespace rastergis{
                 
                 if(imageStats->calcMedian)
                 {                        
-                    sort(clumpData[i]->begin(), clumpData[i]->end());
+                    std::sort(clumpData[i]->begin(), clumpData[i]->end());
                     median = gsl_stats_median_from_sorted_data(&(*clumpData[i])[0], 1, clumpData[i]->size());
                     feat->floatFields->at(imageStats->medianIdx) = median;
                 }
@@ -3276,7 +3276,7 @@ namespace rsgis{namespace rastergis{
                 
                 if(imageStats->calcMedian)
                 {                        
-                    sort(clumpData[i]->begin(), clumpData[i]->end());
+                    std::sort(clumpData[i]->begin(), clumpData[i]->end());
                     median = gsl_stats_median_from_sorted_data(&(*clumpData[i])[0], 1, clumpData[i]->size());
                     feat->floatFields->at(imageStats->medianIdx) = median;
                 }
