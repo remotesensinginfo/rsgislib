@@ -1636,7 +1636,7 @@ namespace rsgis{namespace vec{
                         valuesInt->push_back(int(values[i]->at(j)));
                     }
                     
-                    sort(valuesInt->begin(), valuesInt->end());
+                    std::sort(valuesInt->begin(), valuesInt->end());
                     
                     unsigned int maxCount = 0;
                     unsigned int currentCount = 0;
@@ -2170,7 +2170,7 @@ namespace rsgis{namespace vec{
                         valuesInt->push_back(int(values[i]->at(j)));
                     }
                     
-                    sort(valuesInt->begin(), valuesInt->end());
+                    std::sort(valuesInt->begin(), valuesInt->end());
                     
                     unsigned int maxCount = 0;
                     unsigned int currentCount = 0;

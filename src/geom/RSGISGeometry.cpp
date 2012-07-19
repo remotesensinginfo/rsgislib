@@ -596,7 +596,7 @@ namespace rsgis{namespace geom{
 	geos::geom::Polygon* RSGISGeometry::findConvexHull(std::vector<geos::geom::Coordinate> *coordinates) throw(RSGISGeometryException)
 	{
 		geos::geom::Polygon *poly = NULL;
-		sort(coordinates->begin(), coordinates->end(), SortCoordinates(geos::geom::Coordinate(0,0,0)));
+		std::sort(coordinates->begin(), coordinates->end(), SortCoordinates(geos::geom::Coordinate(0,0,0)));
 
 		if(coordinates->size() > 2)
 		{

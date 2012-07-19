@@ -1373,7 +1373,7 @@ namespace rsgis{namespace segment{
                 }
                 else if(selection == percent75th)
                 {
-                    sort(allValsVec.begin(), allValsVec.end());
+                    std::sort(allValsVec.begin(), allValsVec.end());
                     float percentileVal = gsl_stats_quantile_from_sorted_data(&allValsVec[0], 1, allValsVec.size(), 0.75);
                     //std::cout << "percentileVal = " << percentileVal << std::endl;
                     first = true;
@@ -1408,7 +1408,7 @@ namespace rsgis{namespace segment{
                 }
                 else if(selection == percent95th)
                 {
-                    sort(allValsVec.begin(), allValsVec.end());
+                    std::sort(allValsVec.begin(), allValsVec.end());
                     float percentileVal = gsl_stats_quantile_from_sorted_data(&allValsVec[0], 1, allValsVec.size(), 0.95);
                     //std::cout << "percentileVal = " << percentileVal << std::endl;
                     first = true;
@@ -1781,7 +1781,7 @@ namespace rsgis{namespace segment{
                 }
                 else if(selection == percent75th)
                 {
-                    sort(allValsVec.begin(), allValsVec.end());
+                    std::sort(allValsVec.begin(), allValsVec.end());
                     float percentileVal = gsl_stats_quantile_from_sorted_data(&allValsVec[0], 1, allValsVec.size(), 0.75);
                     //std::cout << "percentileVal = " << percentileVal << std::endl;
                     first = true;
@@ -1816,7 +1816,7 @@ namespace rsgis{namespace segment{
                 }
                 else if(selection == percent95th)
                 {
-                    sort(allValsVec.begin(), allValsVec.end());
+                    std::sort(allValsVec.begin(), allValsVec.end());
                     float percentileVal = gsl_stats_quantile_from_sorted_data(&allValsVec[0], 1, allValsVec.size(), 0.95);
                     //std::cout << "percentileVal = " << percentileVal << std::endl;
                     first = true;

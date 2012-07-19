@@ -97,7 +97,7 @@ namespace rsgis{namespace filter{
 			}
 			//sortedList->printAsc();
 			//std::cout << "Median = " << *sortedList->getAt(median) << std::endl;
-            sort(sortedList.begin(), sortedList.end());
+            std::sort(sortedList.begin(), sortedList.end());
 			output[i] = sortedList[median];
 			sortedList.clear();
 		}		
