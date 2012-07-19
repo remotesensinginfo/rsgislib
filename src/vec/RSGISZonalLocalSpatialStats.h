@@ -58,7 +58,7 @@ namespace rsgis{namespace vec{
 	protected:
 		GDALDataset **datasets;
 		MeanAttributes** attributes;
-		string *attributesVar;
+		std::string *attributesVar;
 		int numAttributes;
 		int dataSize;
 		int looksX;

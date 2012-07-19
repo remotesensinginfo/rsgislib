@@ -48,7 +48,7 @@ namespace rsgis{namespace vec{
 	
 	struct MeanAttributes
 	{
-		string name;
+		std::string name;
 		int numBands;
 		int *bands;
 		float *minThreasholds;

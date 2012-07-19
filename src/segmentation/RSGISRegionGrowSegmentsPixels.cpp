@@ -66,11 +66,11 @@ namespace rsgis{namespace segment{
     
     void RSGISRegionGrowSegmentsPixels::performRegionGrowing(std::vector<RSGISRegionGrowPxlSeeds> *seeds, float threshold)throw(rsgis::img::RSGISImageCalcException)
     {
-        cout << "There are " << seeds->size() << " seeds to process\n";
+        std::cout << "There are " << seeds->size() << " seeds to process\n";
         unsigned int seedCounter = 1;
         for(std::vector<RSGISRegionGrowPxlSeeds>::iterator iterSeed = seeds->begin(); iterSeed != seeds->end(); ++iterSeed)
         {
-            cout << "Processing seed " << seedCounter++ << endl;
+            std::cout << "Processing seed " << seedCounter++ << std::endl;
             try 
             {
                 for(unsigned int i = 0; i < height; ++i)
@@ -91,11 +91,11 @@ namespace rsgis{namespace segment{
     
     void RSGISRegionGrowSegmentsPixels::performRegionGrowing(std::vector<RSGISRegionGrowPxlSeeds> *seeds, float initThreshold, float thresholdIncrements, float maxThreshold, unsigned int maxIterations)throw(rsgis::img::RSGISImageCalcException)
     {
-        cout << "There are " << seeds->size() << " seeds to process\n";
+        std::cout << "There are " << seeds->size() << " seeds to process\n";
         unsigned int seedCounter = 1;
         for(std::vector<RSGISRegionGrowPxlSeeds>::iterator iterSeed = seeds->begin(); iterSeed != seeds->end(); ++iterSeed)
         {
-            cout << "Processing seed " << seedCounter++ << endl;
+            std::cout << "Processing seed " << seedCounter++ << std::endl;
             try 
             {
                 this->growSeed(&(*iterSeed), initThreshold, thresholdIncrements, maxThreshold, maxIterations);
@@ -136,14 +136,14 @@ namespace rsgis{namespace segment{
         rsgis::img::PxlLoc pxl;
         while(searchPxls.size() > 0)
         {
-            //cout << "searchPxls.size() = " << searchPxls.size() << endl;
+            //std::cout << "searchPxls.size() = " << searchPxls.size() << std::endl;
             pxl = searchPxls.front();
             searchPxls.pop_front();
             
             // RIGHT
             if(pxl.xPos+1 < width)
             {
-                //cout << "RIGHT\n";
+                //std::cout << "RIGHT\n";
                 if(!mask[pxl.yPos][pxl.xPos+1])
                 {
                     mask[pxl.yPos][pxl.xPos+1] = true;
@@ -152,10 +152,10 @@ namespace rsgis{namespace segment{
                         spectralBands[n]->RasterIO(GF_Read, pxl.xPos+1, pxl.yPos, 1, 1, &specCPxlVals[n], 1, 1, GDT_Float32, 0, 0);
                     }
                     distance = this->eucDistance(specPxlMeanVals, specCPxlVals, numSpecBands);
-                    //cout << "\tDistance = " << distance << endl;
+                    //std::cout << "\tDistance = " << distance << std::endl;
                     if(distance < threshold)
                     {
-                        //cout << "\t\tWithin region\n";
+                        //std::cout << "\t\tWithin region\n";
                         outBand->RasterIO(GF_Write, pxl.xPos+1, pxl.yPos, 1, 1, &seed->fid, 1, 1, GDT_UInt32, 0, 0);
                         searchPxls.push_back(rsgis::img::PxlLoc(pxl.xPos+1, pxl.yPos));
                     }
@@ -164,7 +164,7 @@ namespace rsgis{namespace segment{
             //LEFT
             if(pxl.xPos > 0)
             {
-                //cout << "LEFT\n";
+                //std::cout << "LEFT\n";
                 if(!mask[pxl.yPos][pxl.xPos-1])
                 {
                     mask[pxl.yPos][pxl.xPos-1] = true;
@@ -173,10 +173,10 @@ namespace rsgis{namespace segment{
                         spectralBands[n]->RasterIO(GF_Read, pxl.xPos-1, pxl.yPos, 1, 1, &specCPxlVals[n], 1, 1, GDT_Float32, 0, 0);
                     }
                     distance = this->eucDistance(specPxlMeanVals, specCPxlVals, numSpecBands);
-                    //cout << "\tDistance = " << distance << endl;
+                    //std::cout << "\tDistance = " << distance << std::endl;
                     if(distance < threshold)
                     {
-                        //cout << "\t\tWithin region\n";
+                        //std::cout << "\t\tWithin region\n";
                         outBand->RasterIO(GF_Write, pxl.xPos-1, pxl.yPos, 1, 1, &seed->fid, 1, 1, GDT_UInt32, 0, 0);
                         searchPxls.push_back(rsgis::img::PxlLoc(pxl.xPos-1, pxl.yPos));
                     }
@@ -185,7 +185,7 @@ namespace rsgis{namespace segment{
             // UP
             if(pxl.yPos+1 < height)
             {
-                //cout << "UP\n";
+                //std::cout << "UP\n";
                 if(!mask[pxl.yPos+1][pxl.xPos])
                 {
                     mask[pxl.yPos+1][pxl.xPos] = true;
@@ -194,10 +194,10 @@ namespace rsgis{namespace segment{
                         spectralBands[n]->RasterIO(GF_Read, pxl.xPos, pxl.yPos+1, 1, 1, &specCPxlVals[n], 1, 1, GDT_Float32, 0, 0);
                     }
                     distance = this->eucDistance(specPxlMeanVals, specCPxlVals, numSpecBands);
-                    //cout << "\tDistance = " << distance << endl;
+                    //std::cout << "\tDistance = " << distance << std::endl;
                     if(distance < threshold)
                     {
-                        //cout << "\t\tWithin region\n";
+                        //std::cout << "\t\tWithin region\n";
                         outBand->RasterIO(GF_Write, pxl.xPos, pxl.yPos+1, 1, 1, &seed->fid, 1, 1, GDT_UInt32, 0, 0);
                         searchPxls.push_back(rsgis::img::PxlLoc(pxl.xPos, pxl.yPos+1));
                     }
@@ -206,7 +206,7 @@ namespace rsgis{namespace segment{
             // DOWN
             if(pxl.yPos > 0)
             {
-                //cout << "DOWN\n";
+                //std::cout << "DOWN\n";
                 if(!mask[pxl.yPos-1][pxl.xPos])
                 {
                     mask[pxl.yPos-1][pxl.xPos] = true;
@@ -215,10 +215,10 @@ namespace rsgis{namespace segment{
                         spectralBands[n]->RasterIO(GF_Read, pxl.xPos, pxl.yPos-1, 1, 1, &specCPxlVals[n], 1, 1, GDT_Float32, 0, 0);
                     }
                     distance = this->eucDistance(specPxlMeanVals, specCPxlVals, numSpecBands);
-                    //cout << "\tDistance = " << distance << endl;
+                    //std::cout << "\tDistance = " << distance << std::endl;
                     if(distance < threshold)
                     {
-                        //cout << "\t\tWithin region\n";
+                        //std::cout << "\t\tWithin region\n";
                         outBand->RasterIO(GF_Write, pxl.xPos, pxl.yPos-1, 1, 1, &seed->fid, 1, 1, GDT_UInt32, 0, 0);
                         searchPxls.push_back(rsgis::img::PxlLoc(pxl.xPos, pxl.yPos-1));
                     }
@@ -280,14 +280,14 @@ namespace rsgis{namespace segment{
             
             while(searchPxls.size() > 0)
             {
-                //cout << "searchPxls.size() = " << searchPxls.size() << endl;
+                //std::cout << "searchPxls.size() = " << searchPxls.size() << std::endl;
                 pxl = searchPxls.front();
                 searchPxls.pop_front();
                 
                 // RIGHT
                 if(pxl.xPos+1 < width)
                 {
-                    //cout << "RIGHT\n";
+                    //std::cout << "RIGHT\n";
                     if(!mask[pxl.yPos][pxl.xPos+1])
                     {
                         mask[pxl.yPos][pxl.xPos+1] = true;
@@ -296,10 +296,10 @@ namespace rsgis{namespace segment{
                             spectralBands[n]->RasterIO(GF_Read, pxl.xPos+1, pxl.yPos, 1, 1, &specCPxlVals[n], 1, 1, GDT_Float32, 0, 0);
                         }
                         distance = this->eucDistance(specPxlMeanVals, specCPxlVals, numSpecBands);
-                        //cout << "\tDistance = " << distance << endl;
+                        //std::cout << "\tDistance = " << distance << std::endl;
                         if(distance < threshold)
                         {
-                            //cout << "\t\tWithin region\n";
+                            //std::cout << "\t\tWithin region\n";
                             searchPxls.push_back(rsgis::img::PxlLoc(pxl.xPos+1, pxl.yPos));
                             ++numPxlsInClump;
                             for(unsigned int n = 0; n < numSpecBands; ++n)
@@ -313,7 +313,7 @@ namespace rsgis{namespace segment{
                 //LEFT
                 if(pxl.xPos > 0)
                 {
-                    //cout << "LEFT\n";
+                    //std::cout << "LEFT\n";
                     if(!mask[pxl.yPos][pxl.xPos-1])
                     {
                         mask[pxl.yPos][pxl.xPos-1] = true;
@@ -322,10 +322,10 @@ namespace rsgis{namespace segment{
                             spectralBands[n]->RasterIO(GF_Read, pxl.xPos-1, pxl.yPos, 1, 1, &specCPxlVals[n], 1, 1, GDT_Float32, 0, 0);
                         }
                         distance = this->eucDistance(specPxlMeanVals, specCPxlVals, numSpecBands);
-                        //cout << "\tDistance = " << distance << endl;
+                        //std::cout << "\tDistance = " << distance << std::endl;
                         if(distance < threshold)
                         {
-                            //cout << "\t\tWithin region\n";
+                            //std::cout << "\t\tWithin region\n";
                             searchPxls.push_back(rsgis::img::PxlLoc(pxl.xPos-1, pxl.yPos));
                             ++numPxlsInClump;
                             for(unsigned int n = 0; n < numSpecBands; ++n)
@@ -339,7 +339,7 @@ namespace rsgis{namespace segment{
                 // UP
                 if(pxl.yPos+1 < height)
                 {
-                    //cout << "UP\n";
+                    //std::cout << "UP\n";
                     if(!mask[pxl.yPos+1][pxl.xPos])
                     {
                         mask[pxl.yPos+1][pxl.xPos] = true;
@@ -348,10 +348,10 @@ namespace rsgis{namespace segment{
                             spectralBands[n]->RasterIO(GF_Read, pxl.xPos, pxl.yPos+1, 1, 1, &specCPxlVals[n], 1, 1, GDT_Float32, 0, 0);
                         }
                         distance = this->eucDistance(specPxlMeanVals, specCPxlVals, numSpecBands);
-                        //cout << "\tDistance = " << distance << endl;
+                        //std::cout << "\tDistance = " << distance << std::endl;
                         if(distance < threshold)
                         {
-                            //cout << "\t\tWithin region\n";
+                            //std::cout << "\t\tWithin region\n";
                             searchPxls.push_back(rsgis::img::PxlLoc(pxl.xPos, pxl.yPos+1));
                             ++numPxlsInClump;
                             for(unsigned int n = 0; n < numSpecBands; ++n)
@@ -365,7 +365,7 @@ namespace rsgis{namespace segment{
                 // DOWN
                 if(pxl.yPos > 0)
                 {
-                    //cout << "DOWN\n";
+                    //std::cout << "DOWN\n";
                     if(!mask[pxl.yPos-1][pxl.xPos])
                     {
                         mask[pxl.yPos-1][pxl.xPos] = true;
@@ -374,10 +374,10 @@ namespace rsgis{namespace segment{
                             spectralBands[n]->RasterIO(GF_Read, pxl.xPos, pxl.yPos-1, 1, 1, &specCPxlVals[n], 1, 1, GDT_Float32, 0, 0);
                         }
                         distance = this->eucDistance(specPxlMeanVals, specCPxlVals, numSpecBands);
-                        //cout << "\tDistance = " << distance << endl;
+                        //std::cout << "\tDistance = " << distance << std::endl;
                         if(distance < threshold)
                         {
-                            //cout << "\t\tWithin region\n";
+                            //std::cout << "\t\tWithin region\n";
                             searchPxls.push_back(rsgis::img::PxlLoc(pxl.xPos, pxl.yPos-1));
                             ++numPxlsInClump;
                             for(unsigned int n = 0; n < numSpecBands; ++n)
@@ -396,7 +396,7 @@ namespace rsgis{namespace segment{
                 }
             }
             
-            //cout << "Iteration " << m << " has threshold " << threshold << " resulting in clump of size " << numPxlsInClump << endl;
+            //std::cout << "Iteration " << m << " has threshold " << threshold << " resulting in clump of size " << numPxlsInClump << std::endl;
             
             if(m == 0)
             {
@@ -405,7 +405,7 @@ namespace rsgis{namespace segment{
             else
             {
                 sizeChangeRatio = ((float)(numPxlsInClump - prevNumPxlsInClump))/numPxlsInClump;
-                //cout << "Ratio Size increase = " << sizeChangeRatio << endl;
+                //std::cout << "Ratio Size increase = " << sizeChangeRatio << std::endl;
                 if(sizeChangeRatio > 0.85)
                 {
                     thresholdFound = true;
@@ -446,14 +446,14 @@ namespace rsgis{namespace segment{
             
             while(searchPxls.size() > 0)
             {
-                //cout << "searchPxls.size() = " << searchPxls.size() << endl;
+                //std::cout << "searchPxls.size() = " << searchPxls.size() << std::endl;
                 pxl = searchPxls.front();
                 searchPxls.pop_front();
                 
                 // RIGHT
                 if(pxl.xPos+1 < width)
                 {
-                    //cout << "RIGHT\n";
+                    //std::cout << "RIGHT\n";
                     if(!mask[pxl.yPos][pxl.xPos+1])
                     {
                         mask[pxl.yPos][pxl.xPos+1] = true;
@@ -462,10 +462,10 @@ namespace rsgis{namespace segment{
                             spectralBands[n]->RasterIO(GF_Read, pxl.xPos+1, pxl.yPos, 1, 1, &specCPxlVals[n], 1, 1, GDT_Float32, 0, 0);
                         }
                         distance = this->eucDistance(specPxlMeanVals, specCPxlVals, numSpecBands);
-                        //cout << "\tDistance = " << distance << endl;
+                        //std::cout << "\tDistance = " << distance << std::endl;
                         if(distance < threshold)
                         {
-                            //cout << "\t\tWithin region\n";
+                            //std::cout << "\t\tWithin region\n";
                             outBand->RasterIO(GF_Write, pxl.xPos+1, pxl.yPos, 1, 1, &seed->fid, 1, 1, GDT_UInt32, 0, 0);
                             searchPxls.push_back(rsgis::img::PxlLoc(pxl.xPos+1, pxl.yPos));
                             ++numPxlsInClump;
@@ -480,7 +480,7 @@ namespace rsgis{namespace segment{
                 //LEFT
                 if(pxl.xPos > 0)
                 {
-                    //cout << "LEFT\n";
+                    //std::cout << "LEFT\n";
                     if(!mask[pxl.yPos][pxl.xPos-1])
                     {
                         mask[pxl.yPos][pxl.xPos-1] = true;
@@ -489,10 +489,10 @@ namespace rsgis{namespace segment{
                             spectralBands[n]->RasterIO(GF_Read, pxl.xPos-1, pxl.yPos, 1, 1, &specCPxlVals[n], 1, 1, GDT_Float32, 0, 0);
                         }
                         distance = this->eucDistance(specPxlMeanVals, specCPxlVals, numSpecBands);
-                        //cout << "\tDistance = " << distance << endl;
+                        //std::cout << "\tDistance = " << distance << std::endl;
                         if(distance < threshold)
                         {
-                            //cout << "\t\tWithin region\n";
+                            //std::cout << "\t\tWithin region\n";
                             outBand->RasterIO(GF_Write, pxl.xPos-1, pxl.yPos, 1, 1, &seed->fid, 1, 1, GDT_UInt32, 0, 0);
                             searchPxls.push_back(rsgis::img::PxlLoc(pxl.xPos-1, pxl.yPos));
                             ++numPxlsInClump;
@@ -507,7 +507,7 @@ namespace rsgis{namespace segment{
                 // UP
                 if(pxl.yPos+1 < height)
                 {
-                    //cout << "UP\n";
+                    //std::cout << "UP\n";
                     if(!mask[pxl.yPos+1][pxl.xPos])
                     {
                         mask[pxl.yPos+1][pxl.xPos] = true;
@@ -516,10 +516,10 @@ namespace rsgis{namespace segment{
                             spectralBands[n]->RasterIO(GF_Read, pxl.xPos, pxl.yPos+1, 1, 1, &specCPxlVals[n], 1, 1, GDT_Float32, 0, 0);
                         }
                         distance = this->eucDistance(specPxlMeanVals, specCPxlVals, numSpecBands);
-                        //cout << "\tDistance = " << distance << endl;
+                        //std::cout << "\tDistance = " << distance << std::endl;
                         if(distance < threshold)
                         {
-                            //cout << "\t\tWithin region\n";
+                            //std::cout << "\t\tWithin region\n";
                             outBand->RasterIO(GF_Write, pxl.xPos, pxl.yPos+1, 1, 1, &seed->fid, 1, 1, GDT_UInt32, 0, 0);
                             searchPxls.push_back(rsgis::img::PxlLoc(pxl.xPos, pxl.yPos+1));
                             ++numPxlsInClump;
@@ -534,7 +534,7 @@ namespace rsgis{namespace segment{
                 // DOWN
                 if(pxl.yPos > 0)
                 {
-                    //cout << "DOWN\n";
+                    //std::cout << "DOWN\n";
                     if(!mask[pxl.yPos-1][pxl.xPos])
                     {
                         mask[pxl.yPos-1][pxl.xPos] = true;
@@ -543,10 +543,10 @@ namespace rsgis{namespace segment{
                             spectralBands[n]->RasterIO(GF_Read, pxl.xPos, pxl.yPos-1, 1, 1, &specCPxlVals[n], 1, 1, GDT_Float32, 0, 0);
                         }
                         distance = this->eucDistance(specPxlMeanVals, specCPxlVals, numSpecBands);
-                        //cout << "\tDistance = " << distance << endl;
+                        //std::cout << "\tDistance = " << distance << std::endl;
                         if(distance < threshold)
                         {
-                            //cout << "\t\tWithin region\n";
+                            //std::cout << "\t\tWithin region\n";
                             outBand->RasterIO(GF_Write, pxl.xPos, pxl.yPos-1, 1, 1, &seed->fid, 1, 1, GDT_UInt32, 0, 0);
                             searchPxls.push_back(rsgis::img::PxlLoc(pxl.xPos, pxl.yPos-1));
                             ++numPxlsInClump;
@@ -718,16 +718,16 @@ namespace rsgis{namespace segment{
                 subClumpWidth = subClump->maxPxlX - subClump->minPxlX;
                 subClumpHeight = subClump->maxPxlY - subClump->minPxlY;
                 /*
-                cout << "subClumpWidth = " << subClumpWidth << endl;
-                cout << "subClumpHeight = " << subClumpHeight << endl;
+                std::cout << "subClumpWidth = " << subClumpWidth << std::endl;
+                std::cout << "subClumpHeight = " << subClumpHeight << std::endl;
                 
-                cout << "X: [" << subClump->minPxlX << "," << subClump->maxPxlX << "]\n";
-                cout << "Y: [" << subClump->minPxlY << "," << subClump->maxPxlY << "]\n";
+                std::cout << "X: [" << subClump->minPxlX << "," << subClump->maxPxlX << "]\n";
+                std::cout << "Y: [" << subClump->minPxlY << "," << subClump->maxPxlY << "]\n";
                 
-                cout << "Sub Clumps:\n";
+                std::cout << "Sub Clumps:\n";
                 for(std::list<unsigned int>::iterator iterIdx = subClump->subclumps.begin(); iterIdx != subClump->subclumps.end(); ++iterIdx)
                 {
-                    cout << "\t" << (*iterIdx)+1 << endl;
+                    std::cout << "\t" << (*iterIdx)+1 << std::endl;
                 }
                 */
                 for(unsigned int n = 0; n < numSpecBands; ++n)
@@ -747,10 +747,10 @@ namespace rsgis{namespace segment{
                     
                     for(unsigned int x = 0; x < subClumpWidth; ++x)
                     {
-                        //cout << clumpIdxs[x] << endl;
+                        //std::cout << clumpIdxs[x] << std::endl;
                         for(std::list<unsigned int>::iterator iterIdx = subClump->subclumps.begin(); iterIdx != subClump->subclumps.end(); ++iterIdx)
                         {
-                            //cout << "\t" << (*iterIdx)+1 << endl;
+                            //std::cout << "\t" << (*iterIdx)+1 << std::endl;
                             if(((*iterIdx)+1) == clumpIdxs[x])
                             {
                                 brightnessVal = 0;
@@ -758,13 +758,13 @@ namespace rsgis{namespace segment{
                                 {
                                     brightnessVal += spectralValues[n][x];
                                 }
-                                //cout << "brightnessVal = " << brightnessVal << endl;
+                                //std::cout << "brightnessVal = " << brightnessVal << std::endl;
                                 brightnessVals.push_back(brightnessVal);
                                 break;
                             }
                         }
                     }
-                    //cout << endl;
+                    //std::cout << std::endl;
                 }
                 
                 if(brightnessVals.size() == 0)
@@ -775,12 +775,12 @@ namespace rsgis{namespace segment{
                 
                 seedIdx = floor(brightnessVals.size() * 0.95);
                 
-                //cout << "Seed Idx: " << seedIdx << endl;
+                //std::cout << "Seed Idx: " << seedIdx << std::endl;
                 
                 counter = 0;
                 for(std::list<float>::iterator iterBright = brightnessVals.begin(); iterBright != brightnessVals.end(); ++iterBright)
                 {
-                    //cout << "(*iterBright) = " << *iterBright << endl;
+                    //std::cout << "(*iterBright) = " << *iterBright << std::endl;
                     if(counter == seedIdx)
                     {
                         brightnessSeedVal = *iterBright;
@@ -795,7 +795,7 @@ namespace rsgis{namespace segment{
                     throw rsgis::img::RSGISImageCalcException("Did not find a seed.");
                 }
                 
-                //cout << "brightnessSeedVal = " << brightnessSeedVal << endl;
+                //std::cout << "brightnessSeedVal = " << brightnessSeedVal << std::endl;
                 
                 first = true;
                 for(unsigned int y = subClump->minPxlY; y < subClump->maxPxlY; ++y)
@@ -838,7 +838,7 @@ namespace rsgis{namespace segment{
                     }                                        
                 }
                 
-                //cout << "Pushing back: [" << cSeed.xPxl << "," << cSeed.yPxl << "]\n";
+                //std::cout << "Pushing back: [" << cSeed.xPxl << "," << cSeed.yPxl << "]\n";
                 
                 seeds->push_back(RSGISRegionGrowPxlSeeds(seedCount++, cSeed.xPxl, cSeed.yPxl));
                 

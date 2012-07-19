@@ -56,7 +56,7 @@ namespace rsgis{namespace vec{
 		
 	struct ClassVariables
 	{
-		string name;
+		std::string name;
         rsgis::math::Matrix *matrix;
 		int numPxls;
 	};
@@ -65,7 +65,7 @@ namespace rsgis{namespace vec{
 	{
 	public:
 		RSGISZonalStats2Matrix();
-		ClassVariables** findPixelStats(GDALDataset **image, int numImgs, OGRLayer *shpfile, string classAttribute, int *numMatrices, rsgis::img::pixelInPolyOption method);
+		ClassVariables** findPixelStats(GDALDataset **image, int numImgs, OGRLayer *shpfile, std::string classAttribute, int *numMatrices, rsgis::img::pixelInPolyOption method);
 		rsgis::math::Matrix** findPixelsForImageBand(GDALDataset **image, int numImgs, OGRLayer *shpfile, int *numMatrices, int band);
 		~RSGISZonalStats2Matrix();
 	};

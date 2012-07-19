@@ -85,7 +85,7 @@ namespace rsgis{namespace vec{
         }
     }
     
-    void RSGISAttCountPolyIntersect::countPolysIntersections(rsgis::rastergis::RSGISAttributeTable *attTable, GDALDataset *clumps, vector<OGRPolygon*> *polys, std::string field, rsgis::img::pixelInPolyOption pixelPolyOption)throw(rsgis::RSGISAttributeTableException)
+    void RSGISAttCountPolyIntersect::countPolysIntersections(rsgis::rastergis::RSGISAttributeTable *attTable, GDALDataset *clumps, std::vector<OGRPolygon*> *polys, std::string field, rsgis::img::pixelInPolyOption pixelPolyOption)throw(rsgis::RSGISAttributeTableException)
     {
         try
         {
@@ -100,7 +100,7 @@ namespace rsgis{namespace vec{
             
             unsigned int fieldIdx = attTable->getFieldIndex(field);
             
-            for(vector<OGRPolygon*>::iterator iterPolys = polys->begin(); iterPolys != polys->end(); ++iterPolys)
+            for(std::vector<OGRPolygon*>::iterator iterPolys = polys->begin(); iterPolys != polys->end(); ++iterPolys)
             {
                 this->countPolyIntersections(attTable, clumps, *iterPolys, fieldIdx, pixelPolyOption);
             }

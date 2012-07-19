@@ -45,7 +45,7 @@ namespace rsgis{namespace vec{
 	
 	struct CountAttributes
 	{
-		string name;
+        std::string name;
 		int numBands;
 		int *bands;
 		float *thresholds;

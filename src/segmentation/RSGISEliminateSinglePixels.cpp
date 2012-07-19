@@ -64,7 +64,7 @@ namespace rsgis{namespace segment{
                 singlesCount = this->findSinglePixels(outData, tmpData, noDataVal, noDataValProvided);
                 if(singlesCount > 0)
                 {
-                    cout << "There are " << singlesCount << " single pixels within the image\n";
+                    std::cout << "There are " << singlesCount << " single pixels within the image\n";
                     if(!eliminateSinglePixels(inSpecData, outData, tmpData, outData, noDataVal, noDataValProvided))
                     {
                         singlesRemoved = true;
@@ -77,7 +77,7 @@ namespace rsgis{namespace segment{
                     break;
                 }
             }
-            cout << "Complete, all connected single pixels have been removed\n";
+            std::cout << "Complete, all connected single pixels have been removed\n";
             
             GDALClose(outData);
             
@@ -113,12 +113,12 @@ namespace rsgis{namespace segment{
             
             int feedback = height/10;
             int feedbackCounter = 0;
-            cout << "Started" << flush;
+            std::cout << "Started" << std::flush;
             for(unsigned int i = 0; i < height; ++i)
             {
                 if((i % feedback) == 0)
                 {
-                    cout << "." << feedbackCounter << "." << flush;
+                    std::cout << "." << feedbackCounter << "." << std::flush;
                     feedbackCounter = feedbackCounter + 10;
                 }
                 if(i == 0)
@@ -350,7 +350,7 @@ namespace rsgis{namespace segment{
                 
                 tmpBand->RasterIO(GF_Write, 0, i, width, 1, outData, width, 1, GDT_UInt32, 0, 0);
             }
-            cout << ". Complete\n";
+            std::cout << ". Complete\n";
             
             delete[] inData[0];
             delete[] inData[1];
@@ -410,12 +410,12 @@ namespace rsgis{namespace segment{
             
             int feedback = height/10;
             int feedbackCounter = 0;
-            cout << "Started" << flush;
+            std::cout << "Started" << std::flush;
             for(unsigned int i = 0; i < height; ++i)
             {
                 if((i % feedback) == 0)
                 {
-                    cout << "." << feedbackCounter << "." << flush;
+                    std::cout << "." << feedbackCounter << "." << std::flush;
                     feedbackCounter = feedbackCounter + 10;
                 }
                 if(i == 0)
@@ -1045,7 +1045,7 @@ namespace rsgis{namespace segment{
                 
                 outBand->RasterIO(GF_Write, 0, i, width, 1, outData, width, 1, GDT_UInt32, 0, 0);
             }
-            cout << ". Complete\n";
+            std::cout << ". Complete\n";
             
             delete[] inData[0];
             delete[] inData[1];
@@ -1087,7 +1087,7 @@ namespace rsgis{namespace segment{
         {
             dist = sqrt(dist/numBands);
         }
-        //cout << dist << endl;
+        //std::cout << dist << std::endl;
         return dist;
     }
         

@@ -156,7 +156,7 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISVectorIO::readOGRLineString2GEOSLinsSegment(OGRLineString *inLine, vector <geos::geom::LineSegment> *outLines)
+	void RSGISVectorIO::readOGRLineString2GEOSLinsSegment(OGRLineString *inLine, std::vector<geos::geom::LineSegment> *outLines)
 	{
 		int dimension = inLine->getDimension();
 		std::cout << "Dimension = " << dimension << std::endl;

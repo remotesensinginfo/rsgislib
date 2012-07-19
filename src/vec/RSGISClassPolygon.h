@@ -41,8 +41,8 @@ namespace rsgis{namespace vec{
 			virtual void readAttribtues(OGRFeature *feature, OGRFeatureDefn *featDefn);
 			virtual void createLayerDefinition(OGRLayer *outputSHPLayer)throw(RSGISVectorOutputException);
 			virtual void populateFeature(OGRFeature *feature, OGRFeatureDefn *featDefn);
-			string getClassName();
-			void setClassName(string name);
+			std::string getClassName();
+			void setClassName(std::string name);
 			void setNumPixels(int numPxls);
 			void setPixelValues(rsgis::math::Matrix *pxlValues);
             rsgis::math::Matrix* getPixelValues();

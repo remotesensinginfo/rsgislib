@@ -78,15 +78,15 @@ namespace rsgis{namespace segment{
         }
         
         ImgClumpRGB *cClump;
-        vector<ImgClumpRGB*> *clumpTab = NULL;
+        std::vector<ImgClumpRGB*> *clumpTab = NULL;
         if(importLUT)
         {
-            cout << "Importing Colours LUT\n";
+            std::cout << "Importing Colours LUT\n";
             clumpTab = this->importLUTFromFile(inputLUTFile);
         }
         else
         {
-            clumpTab = new vector<ImgClumpRGB*>();
+            clumpTab = new std::vector<ImgClumpRGB*>();
             clumpTab->reserve(maxClumpIdx);
             srand ( time(NULL) );
             for(unsigned int i = 0; i < maxClumpIdx; ++i)
@@ -136,22 +136,22 @@ namespace rsgis{namespace segment{
         delete[] clrGVals;
         delete[] clrBVals;
         
-        for(vector<ImgClumpRGB*>::iterator iterClumps = clumpTab->begin(); iterClumps != clumpTab->end(); ++iterClumps)
+        for(std::vector<ImgClumpRGB*>::iterator iterClumps = clumpTab->begin(); iterClumps != clumpTab->end(); ++iterClumps)
         {
             delete *iterClumps;
         }
         delete clumpTab;
     }
     
-    vector<ImgClumpRGB*>* RSGISRandomColourClumps::importLUTFromFile(std::string inFile) throw(rsgis::utils::RSGISTextException)
+    std::vector<ImgClumpRGB*>* RSGISRandomColourClumps::importLUTFromFile(std::string inFile) throw(rsgis::utils::RSGISTextException)
     {
-        vector<ImgClumpRGB*> *clumpTab = new vector<ImgClumpRGB*>();
+        std::vector<ImgClumpRGB*> *clumpTab = new std::vector<ImgClumpRGB*>();
         try 
         {
             rsgis::utils::RSGISTextUtils txtUtils;
             size_t numLines = txtUtils.countLines(inFile);
             clumpTab->reserve(numLines);
-            vector<std::string> *tokens = new vector<std::string>();
+            std::vector<std::string> *tokens = new std::vector<std::string>();
             std::string line = "";
             size_t count = 1;
             ImgClumpRGB *cRGB = NULL;
@@ -165,7 +165,7 @@ namespace rsgis{namespace segment{
                     txtUtils.tokenizeString(line, ',', tokens, true, true);
                     if(tokens->size() != 3)
                     {
-                        cout << "Line: " << line << endl;
+                        std::cout << "Line: " << line << std::endl;
                         throw rsgis::utils::RSGISTextException("Line must has 3 tokens");
                     }
                     cRGB = new ImgClumpRGB(count++);
@@ -186,18 +186,18 @@ namespace rsgis{namespace segment{
         return clumpTab;
     }
     
-    void RSGISRandomColourClumps::exportLUT2File(std::string outFile, vector<ImgClumpRGB*> *clumpTab) throw(rsgis::utils::RSGISTextException)
+    void RSGISRandomColourClumps::exportLUT2File(std::string outFile, std::vector<ImgClumpRGB*> *clumpTab) throw(rsgis::utils::RSGISTextException)
     {
         try 
         {
-            ofstream outTxtFile;
-            outTxtFile.open(outFile.c_str(), ios::out | ios::trunc);
+            std::ofstream outTxtFile;
+            outTxtFile.open(outFile.c_str(), std::ios::out | std::ios::trunc);
             
             if(outTxtFile.is_open())
             {
-                for(vector<ImgClumpRGB*>::iterator iterClumps = clumpTab->begin(); iterClumps != clumpTab->end(); ++iterClumps)
+                for(std::vector<ImgClumpRGB*>::iterator iterClumps = clumpTab->begin(); iterClumps != clumpTab->end(); ++iterClumps)
                 {
-                    outTxtFile << (*iterClumps)->red << "," << (*iterClumps)->green << "," << (*iterClumps)->blue << endl;
+                    outTxtFile << (*iterClumps)->red << "," << (*iterClumps)->green << "," << (*iterClumps)->blue << std::endl;
                 }
                 outTxtFile.flush();
                 outTxtFile.close();

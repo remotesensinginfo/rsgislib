@@ -46,11 +46,11 @@ namespace rsgis{namespace vec{
 	class RSGISFloatAttribute
 		{
 		public:
-			RSGISFloatAttribute(string name, double value);
-			string getName() const;
+			RSGISFloatAttribute(std::string name, double value);
+			std::string getName() const;
 			double getValue() const;
-			friend ostream& operator<<(ostream& ostr, const RSGISFloatAttribute& attribute);
-			ostream& operator<<(ostream& ostr);
+			friend std::ostream& operator<<(std::ostream& ostr, const RSGISFloatAttribute& attribute);
+			std::ostream& operator<<(std::ostream& ostr);
 			bool operator==(RSGISFloatAttribute attribute) const;
 			bool operator!=(RSGISFloatAttribute attribute) const;
 			bool operator>(RSGISFloatAttribute attribute) const;
@@ -59,20 +59,20 @@ namespace rsgis{namespace vec{
 			bool operator<=(RSGISFloatAttribute attribute) const;
 			~RSGISFloatAttribute();
 		private:
-			string name;
+			std::string name;
 			double value;
 		};
 	
 	class RSGISIdentifyTopLayerAttributes : public RSGISProcessOGRFeature
 		{
 		public:
-			RSGISIdentifyTopLayerAttributes(string *attributes, int numAttributes, int numTop, rsgis::math::rsgissummarytype summary);
+			RSGISIdentifyTopLayerAttributes(std::string *attributes, int numAttributes, int numTop, rsgis::math::rsgissummarytype summary);
 			virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
 			virtual void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
 			virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException);
 			virtual ~RSGISIdentifyTopLayerAttributes();
 		protected:
-			string *attributes;
+			std::string *attributes;
 			int numAttributes;
 			int numTop;
             rsgis::math::rsgissummarytype summary;

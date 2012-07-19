@@ -176,7 +176,7 @@ namespace rsgis{namespace vec{
 	
 	OGRPolygon* RSGISVectorUtils::convertGEOSPolygon2OGRPolygon(geos::geom::Polygon *poly)
 	{
-		//cout << "Poly area = " << poly->getArea() << endl;
+		//std::cout << "Poly area = " << poly->getArea() << std::endl;
 		
 		OGRPolygon *ogrPoly = new OGRPolygon();
 		
@@ -336,7 +336,7 @@ namespace rsgis{namespace vec{
 		}
 		catch(RSGISException e)
 		{
-			cout << e.what() << endl;
+			std::cout << e.what() << std::endl;
 			throw RSGISVectorException(e.what());
 		}
 		delete[] dirList;
@@ -355,62 +355,62 @@ namespace rsgis{namespace vec{
 			dirList = fileUtils.getFilesInDIRWithName(dir, shp, &numFiles);
 			if(numFiles > 0)
 			{
-				cout << "Deleting shapefile...\n";
+				std::cout << "Deleting shapefile...\n";
 				for(int i = 0; i < numFiles; i++)
 				{
 					if(fileUtils.getExtension(dirList[i]) == ".shp")
 					{
-						cout << dirList[i];
+						std::cout << dirList[i];
 						if( remove( dirList[i].c_str() ) != 0 )
 						{
 							throw RSGISException("Could not delete file.");
 						}
-						cout << " deleted\n";
+						std::cout << " deleted\n";
 					}
 					else if(fileUtils.getExtension(dirList[i]) == ".shx")
 					{
-						cout << dirList[i];
+						std::cout << dirList[i];
 						if( remove( dirList[i].c_str() ) != 0 )
 						{
 							throw RSGISException("Could not delete file.");
 						}
-						cout << " deleted\n";
+						std::cout << " deleted\n";
 					}
 					else if(fileUtils.getExtension(dirList[i]) == ".sbx")
 					{
-						cout << dirList[i];
+						std::cout << dirList[i];
 						if( remove( dirList[i].c_str() ) != 0 )
 						{
 							throw RSGISException("Could not delete file.");
 						}
-						cout << " deleted\n";
+						std::cout << " deleted\n";
 					}
 					else if(fileUtils.getExtension(dirList[i]) == ".sbn")
 					{
-						cout << dirList[i];
+						std::cout << dirList[i];
 						if( remove( dirList[i].c_str() ) != 0 )
 						{
 							throw RSGISException("Could not delete file.");
 						}
-						cout << " deleted\n";
+						std::cout << " deleted\n";
 					}
 					else if(fileUtils.getExtension(dirList[i]) == ".dbf")
 					{
-						cout << dirList[i];
+						std::cout << dirList[i];
 						if( remove( dirList[i].c_str() ) != 0 )
 						{
 							throw RSGISException("Could not delete file.");
 						}
-						cout << " deleted\n";
+						std::cout << " deleted\n";
 					}
 					else if(fileUtils.getExtension(dirList[i]) == ".prj")
 					{
-						cout << dirList[i];
+						std::cout << dirList[i];
 						if( remove( dirList[i].c_str() ) != 0 )
 						{
 							throw RSGISException("Could not delete file.");
 						}
-						cout << " deleted\n";
+						std::cout << " deleted\n";
 					}
 					
 				}

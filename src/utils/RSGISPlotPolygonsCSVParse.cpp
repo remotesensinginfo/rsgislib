@@ -54,7 +54,7 @@ namespace rsgis{ namespace utils{
 				std::vector<std::string>::iterator iterTokens;
 				std::vector<std::string> *tokens = new std::vector<std::string>();
 				PlotPoly *poly = NULL;
-				inputCSVFile.seekg(ios_base::beg);
+				inputCSVFile.seekg(std::ios_base::beg);
 				while(!inputCSVFile.eof())
 				{
 					getline(inputCSVFile, strLine);

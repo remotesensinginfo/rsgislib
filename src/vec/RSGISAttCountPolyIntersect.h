@@ -52,7 +52,7 @@ namespace rsgis{namespace vec{
 	public:
 		RSGISAttCountPolyIntersect();
         void countPolysIntersections(rsgis::rastergis::RSGISAttributeTable *attTable, GDALDataset *clumps, OGRLayer *polys, std::string field, rsgis::img::pixelInPolyOption pixelPolyOption)throw(RSGISAttributeTableException);
-        void countPolysIntersections(rsgis::rastergis::RSGISAttributeTable *attTable, GDALDataset *clumps, vector<OGRPolygon*> *polys, std::string field, rsgis::img::pixelInPolyOption pixelPolyOption)throw(RSGISAttributeTableException);
+        void countPolysIntersections(rsgis::rastergis::RSGISAttributeTable *attTable, GDALDataset *clumps, std::vector<OGRPolygon*> *polys, std::string field, rsgis::img::pixelInPolyOption pixelPolyOption)throw(RSGISAttributeTableException);
 		void countPolyIntersections(rsgis::rastergis::RSGISAttributeTable *attTable, GDALDataset *clumps, OGRPolygon *ogrPoly, unsigned int fieldIdx, rsgis::img::pixelInPolyOption pixelPolyOption)throw(RSGISAttributeTableException);
         ~RSGISAttCountPolyIntersect();
 	};

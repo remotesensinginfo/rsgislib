@@ -33,12 +33,12 @@ namespace rsgis{namespace vec{
 	
 	void RSGISPrintFIDs::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
 	{
-		cout << "FID: " << fid << endl;
+		std::cout << "FID: " << fid << std::endl;
 	}
 	
 	void RSGISPrintFIDs::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
 	{
-		cout << "FID: " << fid << endl;
+		std::cout << "FID: " << fid << std::endl;
 	}
 	
 	void RSGISPrintFIDs::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException)

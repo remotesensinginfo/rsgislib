@@ -44,7 +44,7 @@ namespace rsgis{namespace utils{
 		bool openFile(std::string file, PlotTypes inType) throw(rsgis::RSGISOutputStreamException);
 		void writeFrequency2DLine(double value) throw(rsgis::RSGISOutputStreamException);
 		void writeFrequency3DLine(double value1, double value2) throw(rsgis::RSGISOutputStreamException);
-		void writeScatterNDLine(vector<double> *vals) throw(rsgis::RSGISOutputStreamException);
+		void writeScatterNDLine(std::vector<double> *vals) throw(rsgis::RSGISOutputStreamException);
 		void writeScatter2DLine(double x, double y) throw(rsgis::RSGISOutputStreamException);
 		void writeScatter3DLine(double x, double y, double z) throw(rsgis::RSGISOutputStreamException);
 		void writeCScatter2DLine(double x, double y, double c) throw(rsgis::RSGISOutputStreamException);

@@ -36,7 +36,7 @@ namespace rsgis{namespace utils{
 	bool RSGISExportForPlottingIncremental::openFile(std::string file, PlotTypes inType) throw(rsgis::RSGISOutputStreamException)
 	{
 		outputFileStream = new std::ofstream();
-		outputFileStream->open(file.c_str(), ios::out | ios::trunc);
+		outputFileStream->open(file.c_str(), std::ios::out | std::ios::trunc);
 		
 		if(!outputFileStream->is_open())
 		{
@@ -160,7 +160,7 @@ namespace rsgis{namespace utils{
 		(*outputFileStream) << value1 << "," << value2 << std::endl;	
 	}
 
-	void RSGISExportForPlottingIncremental::writeScatterNDLine(vector<double> *vals) throw(rsgis::RSGISOutputStreamException)
+	void RSGISExportForPlottingIncremental::writeScatterNDLine(std::vector<double> *vals) throw(rsgis::RSGISOutputStreamException)
 	{
 		if(!open)
 		{
@@ -172,7 +172,7 @@ namespace rsgis{namespace utils{
 		}
 		
 		bool first = true;
-		vector<double>::iterator iterVals;
+        std::vector<double>::iterator iterVals;
 		for(iterVals = vals->begin(); iterVals != vals->end(); ++iterVals)
 		{
 			if(first)

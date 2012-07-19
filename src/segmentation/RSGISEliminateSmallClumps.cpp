@@ -131,7 +131,7 @@ namespace rsgis{namespace segment{
         std::cout << "There are " << clumpTable->size() << " clumps. " << smallClumps.size() << " are too small\n";
         
         rsgis::img::PxlLoc tLoc;
-        list<unsigned long> neighbours;
+        std::list<unsigned long> neighbours;
         unsigned long closestNeighbour = 0;
         bool firstNeighbourTested = true;
         float closestNeighbourDist = 0;
@@ -151,7 +151,7 @@ namespace rsgis{namespace segment{
             // Check that the clump was not selected for a merging already and therefore over minimum size...
             if((cClump->active) & (cClump->pxls->size() < minClumpSize))
             {
-                // Get list of neighbours.
+                // Get std::list of neighbours.
                 neighbours.clear();
                 for(std::vector<rsgis::img::PxlLoc>::iterator iterPxls = cClump->pxls->begin(); iterPxls != cClump->pxls->end(); ++iterPxls)
                 {
@@ -197,7 +197,7 @@ namespace rsgis{namespace segment{
                 
                 // Decide on which neighbour to measure with.
                 firstNeighbourTested = true;
-                for(list<unsigned long>::iterator iterClumps = neighbours.begin(); iterClumps != neighbours.end(); ++iterClumps)
+                for(std::list<unsigned long>::iterator iterClumps = neighbours.begin(); iterClumps != neighbours.end(); ++iterClumps)
                 {
                     for(unsigned int b = 0; b < numSpecBands; ++b)
                     {
@@ -359,7 +359,7 @@ namespace rsgis{namespace segment{
         }
         
         std::deque<rsgis::img::ImgClump*> smallClumps;
-        std::vector< pair<rsgis::img::ImgClump*, rsgis::img::ImgClump*> > mergeLookupTab;
+        std::vector< std::pair<rsgis::img::ImgClump*, rsgis::img::ImgClump*> > mergeLookupTab;
         
         std::cout << "Calculate Initial Clump Means\n";
         for(unsigned int i = 0; i < height; ++i)
@@ -393,7 +393,7 @@ namespace rsgis{namespace segment{
         std::cout << "There are " << clumpTable->size() << " clumps.\n";
         
         rsgis::img::PxlLoc tLoc;
-        list<unsigned long> neighbours;
+        std::list<unsigned long> neighbours;
         unsigned long closestNeighbour = 0;
         bool firstNeighbourTested = true;
         float closestNeighbourDist = 0;
@@ -425,7 +425,7 @@ namespace rsgis{namespace segment{
                 // Check that the clump was not selected for a merging already and therefore over minimum size...
                 if((cClump->active) & (cClump->pxls->size() < minClumpSize))
                 {
-                    // Get list of neighbours.
+                    // Get std::list of neighbours.
                     neighbours.clear();
                     for(std::vector<rsgis::img::PxlLoc>::iterator iterPxls = cClump->pxls->begin(); iterPxls != cClump->pxls->end(); ++iterPxls)
                     {
@@ -471,7 +471,7 @@ namespace rsgis{namespace segment{
                     
                     // Decide on which neighbour to measure with.
                     firstNeighbourTested = true;
-                    for(list<unsigned long>::iterator iterClumps = neighbours.begin(); iterClumps != neighbours.end(); ++iterClumps)
+                    for(std::list<unsigned long>::iterator iterClumps = neighbours.begin(); iterClumps != neighbours.end(); ++iterClumps)
                     {
                         if(clumpTable->at((*iterClumps)-1)->pxls->size() > cClump->pxls->size())
                         {
@@ -510,7 +510,7 @@ namespace rsgis{namespace segment{
                         {
                             // PUT INTO LOOK UP TABLE TO BE APPLIED AFTERWARDS.
                             tClump = clumpTable->at(closestNeighbour-1);
-                            pair<rsgis::img::ImgClump*, rsgis::img::ImgClump*> pair2Merge = pair<rsgis::img::ImgClump*, rsgis::img::ImgClump*>(cClump, tClump);
+                            std::pair<rsgis::img::ImgClump*, rsgis::img::ImgClump*> pair2Merge = std::pair<rsgis::img::ImgClump*, rsgis::img::ImgClump*>(cClump, tClump);
                             mergeLookupTab.push_back(pair2Merge);
                         }
                     }
@@ -521,7 +521,7 @@ namespace rsgis{namespace segment{
             }
             
             // Update Clump Table
-            pair<rsgis::img::ImgClump*, rsgis::img::ImgClump*> pair2Merge;
+            std::pair<rsgis::img::ImgClump*, rsgis::img::ImgClump*> pair2Merge;
             for(size_t idx = 0; idx < mergeLookupTab.size(); ++idx)
             {
                 pair2Merge = mergeLookupTab.at(idx);
@@ -640,7 +640,7 @@ namespace rsgis{namespace segment{
         }
         
         std::deque<unsigned int> smallClumps;
-        std::vector< pair<unsigned int, unsigned int> > mergeLookupTab;
+        std::vector< std::pair<unsigned int, unsigned int> > mergeLookupTab;
         
         std::cout << "Calculate Initial Clump Means\n";
         for(unsigned int i = 0; i < height; ++i)
@@ -667,7 +667,7 @@ namespace rsgis{namespace segment{
         std::cout << "There are " << maxClumpIdx << " clumps.\n";
         
         rsgis::img::PxlLoc tLoc;
-        list<unsigned int> neighbours;
+        std::list<unsigned int> neighbours;
         unsigned int closestNeighbour = 0;
         bool firstNeighbourTested = true;
         float closestNeighbourDist = 0;
@@ -702,7 +702,7 @@ namespace rsgis{namespace segment{
                 // Check that the clump was not selected for a merging already and therefore over minimum size...
                 if((clumpTable[cClumpIdx]->active) & (clumpTable[cClumpIdx]->pxls->size() < minClumpSize))
                 {
-                    // Get list of neighbours.
+                    // Get std::list of neighbours.
                     neighbours.clear();
                     for(std::vector<rsgis::img::PxlLoc>::iterator iterPxls = clumpTable[cClumpIdx]->pxls->begin(); iterPxls != clumpTable[cClumpIdx]->pxls->end(); ++iterPxls)
                     {
@@ -748,7 +748,7 @@ namespace rsgis{namespace segment{
                     
                     // Decide on which neighbour to measure with.
                     firstNeighbourTested = true;
-                    for(list<unsigned int>::iterator iterClumps = neighbours.begin(); iterClumps != neighbours.end(); ++iterClumps)
+                    for(std::list<unsigned int>::iterator iterClumps = neighbours.begin(); iterClumps != neighbours.end(); ++iterClumps)
                     {
                         if(clumpTable[(*iterClumps)-1]->pxls->size() > clumpTable[cClumpIdx]->pxls->size())
                         {
@@ -789,7 +789,7 @@ namespace rsgis{namespace segment{
                         {
                             // PUT INTO LOOK UP TABLE TO BE APPLIED AFTERWARDS.
                             tClump = clumpTable[closestNeighbour-1];
-                            pair<unsigned int, unsigned int> pair2Merge = pair<unsigned int, unsigned int>(cClumpIdx, tClump->clumpID-1);
+                            std::pair<unsigned int, unsigned int> pair2Merge = std::pair<unsigned int, unsigned int>(cClumpIdx, tClump->clumpID-1);
                             mergeLookupTab.push_back(pair2Merge);
                         }
                     }
@@ -799,7 +799,7 @@ namespace rsgis{namespace segment{
             }
             
             // Update Clump Table
-            pair<unsigned int, unsigned int> pair2Merge;
+            std::pair<unsigned int, unsigned int> pair2Merge;
             for(size_t idx = 0; idx < mergeLookupTab.size(); ++idx)
             {
                 pair2Merge = mergeLookupTab.at(idx);
@@ -1083,7 +1083,7 @@ namespace rsgis{namespace segment{
             rsgis::rastergis::RSGISFeature* pFeat = NULL; // parent
             rsgis::rastergis::RSGISFeature* mFeat = NULL; // child to be merged
             bool alreadyNeighbour = false;
-            for(std::vector<pair<size_t, size_t> >::iterator iterPairs = eliminationPairs->begin(); iterPairs != eliminationPairs->end(); ++iterPairs)
+            for(std::vector<std::pair<size_t, size_t> >::iterator iterPairs = eliminationPairs->begin(); iterPairs != eliminationPairs->end(); ++iterPairs)
             {
                 pFeat = attTable->getFeature((*iterPairs).first);
                 attTable->holdFID((*iterPairs).first);

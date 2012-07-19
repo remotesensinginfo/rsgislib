@@ -58,19 +58,19 @@ namespace rsgis{namespace vec{
 			
 			unsigned long numFeatures = input->GetFeatureCount(true);
 			
-			cout << "There are " << numFeatures << " to process\n";
+			std::cout << "There are " << numFeatures << " to process\n";
 			
 			unsigned long feedback = numFeatures/10;
 			unsigned long feedbackCounter = 0;
 			unsigned long i = 0;
-			cout << "Started" << flush;
+			std::cout << "Started" << std::flush;
 			
 			input->ResetReading();
 			while( (inFeature = input->GetNextFeature()) != NULL )
 			{
 				if((numFeatures >= 10) && ((i % feedback) == 0))
 				{
-					cout << ".." << feedbackCounter << ".." << flush;
+					std::cout << ".." << feedbackCounter << ".." << std::flush;
 					feedbackCounter = feedbackCounter + 10;
 				}
 				++i;
@@ -92,7 +92,7 @@ namespace rsgis{namespace vec{
 					}
 					catch (RSGISVectorException &e) 
 					{
-						cout << fid << ": " << e.what() << endl;
+						std::cout << fid << ": " << e.what() << std::endl;
 						polyOK = false;
 					}
 					
@@ -100,7 +100,7 @@ namespace rsgis{namespace vec{
 				else 
 				{
 					nullGeometry = true;
-					cout << fid << ": Geometry was either the incorrect type or NULL." << endl;
+					std::cout << fid << ": Geometry was either the incorrect type or NULL." << std::endl;
 				}
 				
 				if(polyOK && !nullGeometry)
@@ -120,18 +120,18 @@ namespace rsgis{namespace vec{
 				}
 				else 
 				{
-					cout << fid << ": Geometry is either NULL or not a polygon\n";
+					std::cout << fid << ": Geometry is either NULL or not a polygon\n";
 				}
 
 				OGRFeature::DestroyFeature(inFeature);
 			}
-			cout << " Complete.\n";
+			std::cout << " Complete.\n";
 			
-			cout << numOutputted << " Polygons have been outputted from the " << numFeatures << " in the input file.\n";
-			cout << (numFeatures-numOutputted) << " features have been dropped during this process\n";
+			std::cout << numOutputted << " Polygons have been outputted from the " << numFeatures << " in the input file.\n";
+			std::cout << (numFeatures-numOutputted) << " features have been dropped during this process\n";
 			if(numOutputted != numFeatures)
 			{
-				cout << "** It is recommend that you check the output file before using for further processing ** \n";
+				std::cout << "** It is recommend that you check the output file before using for further processing ** \n";
 			}
 		}
 		catch(RSGISVectorException &e)
@@ -147,7 +147,7 @@ namespace rsgis{namespace vec{
 		{
 			if( outputSHPLayer->CreateField( inFeatureDefn->GetFieldDefn(i) ) != OGRERR_NONE )
 			{
-				string message = string("Creating ") + string(inFeatureDefn->GetFieldDefn(i)->GetNameRef()) + string(" field has failed.");
+				std::string message = std::string("Creating ") + std::string(inFeatureDefn->GetFieldDefn(i)->GetNameRef()) + std::string(" field has failed.");
 				throw RSGISVectorOutputException(message.c_str());
 			}
 		}

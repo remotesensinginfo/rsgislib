@@ -97,7 +97,7 @@ namespace rsgis{namespace vec{
 				} 
 				else 
 				{
-					cout << fid << ": Geometry was either the incorrect type or NULL." << endl;
+					std::cout << fid << ": Geometry was either the incorrect type or NULL." << std::endl;
 				}
 				OGRFeature::DestroyFeature(inFeature);
 			}
@@ -116,7 +116,7 @@ namespace rsgis{namespace vec{
 		{
 			if( outputSHPLayer->CreateField( inFeatureDefn->GetFieldDefn(i) ) != OGRERR_NONE )
 			{
-				string message = string("Creating ") + string(inFeatureDefn->GetFieldDefn(i)->GetNameRef()) + string(" field has failed.");
+				std::string message = std::string("Creating ") + std::string(inFeatureDefn->GetFieldDefn(i)->GetNameRef()) + std::string(" field has failed.");
 				throw RSGISVectorOutputException(message.c_str());
 			}
 		}

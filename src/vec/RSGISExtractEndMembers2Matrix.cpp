@@ -31,7 +31,7 @@ namespace rsgis{namespace vec{
         
     }
 		
-    void RSGISExtractEndMembers2Matrix::extractColumnPerPolygon2Matrix(GDALDataset *dataset, OGRLayer *vecLayer, string outputMatrix, rsgis::img::pixelInPolyOption pixelPolyOption)throw(RSGISVectorZonalException)
+    void RSGISExtractEndMembers2Matrix::extractColumnPerPolygon2Matrix(GDALDataset *dataset, OGRLayer *vecLayer, std::string outputMatrix, rsgis::img::pixelInPolyOption pixelPolyOption)throw(RSGISVectorZonalException)
     {
         try
         {

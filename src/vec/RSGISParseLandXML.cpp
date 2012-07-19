@@ -97,7 +97,7 @@ namespace rsgis { namespace vec {
 				 * and split them by spaces, using the Boost tokenizer
 				 */
 				
-				vector <double> *tempCoord = new vector<double>(); // Set up tempory vector to hold the coordinates
+				std::vector <double> *tempCoord = new std::vector<double>(); // Set up tempory vector to hold the coordinates
 				startCoord = NULL;
 				endCoord = NULL;
 				argNode = static_cast<xercesc::DOMElement*>(linesList->item(i));
