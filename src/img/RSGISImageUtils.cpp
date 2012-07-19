@@ -1284,7 +1284,7 @@ namespace rsgis{namespace img{
 			}
 			
 			// Create textfile
-			ofstream outFile(outputText.c_str(), ios::out | ios::trunc);
+			std::ofstream outFile(outputText.c_str(), std::ios::out | std::ios::trunc);
 			
 			if(!outFile.is_open())
 			{
@@ -2900,7 +2900,7 @@ namespace rsgis{namespace img{
     {
         
         // Open text file for writing
-        ofstream outKML;
+        std::ofstream outKML;
         outKML.open(outKMLFile.c_str());
         
         GDALAllRegister();

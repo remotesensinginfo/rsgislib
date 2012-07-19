@@ -24,7 +24,7 @@
 
 namespace rsgis{namespace filter{
 
-	RSGISImageKernelFilter::RSGISImageKernelFilter(int numberOutBands, int size, string filenameEnding, ImageFilter *filter) : RSGISImageFilter(numberOutBands, size, filenameEnding)
+	RSGISImageKernelFilter::RSGISImageKernelFilter(int numberOutBands, int size, std::string filenameEnding, ImageFilter *filter) : RSGISImageFilter(numberOutBands, size, filenameEnding)
 	{
 		this->filter = filter;
 	}
@@ -57,7 +57,7 @@ namespace rsgis{namespace filter{
 		throw rsgis::img::RSGISImageCalcException("Not implemented");
 	}
 
-	void RSGISImageKernelFilter::exportAsImage(string filename) throw(RSGISImageFilterException)
+	void RSGISImageKernelFilter::exportAsImage(std::string filename) throw(RSGISImageFilterException)
 	{
 		GDALAllRegister();
 		GDALDataset *outputImageDS = NULL;

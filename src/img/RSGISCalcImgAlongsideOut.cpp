@@ -78,7 +78,7 @@ namespace rsgis{namespace img{
             unsigned int iterCount = 0;
             unsigned long numChanges = 0;
             
-            cout << "Started Iteration " << iterCount << " " << flush;
+            std::cout << "Started Iteration " << iterCount << " " << std::flush;
             
             for(unsigned int n = 0; n < numBands; n++)
             {
@@ -94,7 +94,7 @@ namespace rsgis{namespace img{
             {                    
                 if((y % feedback) == 0)
                 {
-                    cout << ".." << feedbackCounter << ".." << flush;
+                    std::cout << ".." << feedbackCounter << ".." << std::flush;
                     feedbackCounter = feedbackCounter + 10;
                 }
                 
@@ -124,15 +124,15 @@ namespace rsgis{namespace img{
                         }
                     }
                     
-                    //cout << "x = " << x << endl;
+                    //std::cout << "x = " << x << std::endl;
                     //int numBands, float *dataCol, float **rowAbove, float **rowBelow, float *left, float *right
                     if(this->calc->calcValue(true, numBands, dataColumn, rowAbove, rowBelow, leftPxl, rightPxl))
                     {
-                        //cout << "CHANGE!!\n";
+                        //std::cout << "CHANGE!!\n";
                         change = true;
                         ++numChanges;
                     }
-                    //cout << endl;
+                    //std::cout << std::endl;
                     
                     for(unsigned int n = 0; n < numBands; ++n)
                     {
@@ -149,7 +149,7 @@ namespace rsgis{namespace img{
                     }
                 }
             }
-            cout << " Complete. = " << numChanges << " value changes." << endl;
+            std::cout << " Complete. = " << numChanges << " value changes." << std::endl;
             
             numChanges = 0;
             ++iterCount;
@@ -158,7 +158,7 @@ namespace rsgis{namespace img{
             {
                 change = false;
                 feedbackCounter = 0;
-                cout << "Started Iteration " << iterCount << " " << flush;
+                std::cout << "Started Iteration " << iterCount << " " << std::flush;
                 
                 for(unsigned int n = 0; n < numBands; n++)
                 {
@@ -174,7 +174,7 @@ namespace rsgis{namespace img{
                 {                    
                     if((y % feedback) == 0)
                     {
-                        cout << ".." << feedbackCounter << ".." << flush;
+                        std::cout << ".." << feedbackCounter << ".." << std::flush;
                         feedbackCounter = feedbackCounter + 10;
                     }
                     
@@ -239,7 +239,7 @@ namespace rsgis{namespace img{
                         }
                     }
                 }
-                cout << " Complete. = " << numChanges << " value changes." << endl;
+                std::cout << " Complete. = " << numChanges << " value changes." << std::endl;
   
                 ++iterCount;
                 numChanges = 0;

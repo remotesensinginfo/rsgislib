@@ -37,14 +37,14 @@ namespace rsgis{ namespace classifier{
     
 	struct ClassData
 	{
-		string className;
+		std::string className;
 		int classID;
         rsgis::math::Matrix *data;
 	};
 	
 	struct ClusterCentre
 	{
-		string className;
+		std::string className;
 		int classID;
 		rsgis::math::Vector *data;
 		unsigned int numVals;
@@ -52,7 +52,7 @@ namespace rsgis{ namespace classifier{
 	
 	struct ClusterCentreISO
 	{
-		string className;
+		std::string className;
 		int classID;
 		rsgis::math::Vector *data;
 		rsgis::math::Vector *stddev;
@@ -66,7 +66,7 @@ namespace rsgis{ namespace classifier{
 	public:
 		RSGISClassifier(ClassData **trainingData, int numClasses) throw(RSGISClassificationException);
 		virtual int getClassID(float *variables, int numVars) throw(RSGISClassificationException) = 0;
-		virtual string getClassName(float *variables, int numVars) throw(RSGISClassificationException) = 0;
+		virtual std::string getClassName(float *variables, int numVars) throw(RSGISClassificationException) = 0;
 		int getNumVariables();
 		void printClassIDs();
 		virtual ~RSGISClassifier();

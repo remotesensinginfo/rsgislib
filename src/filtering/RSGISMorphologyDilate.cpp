@@ -29,7 +29,7 @@ namespace rsgis{namespace filter{
 
 	}
 
-	void RSGISImageMorphologyDilate::dilateImage(GDALDataset **datasets, string outputImage,rsgis::math::Matrix *matrixOperator) throw(rsgis::img::RSGISImageCalcException, rsgis::img::RSGISImageBandException)
+	void RSGISImageMorphologyDilate::dilateImage(GDALDataset **datasets, std::string outputImage,rsgis::math::Matrix *matrixOperator) throw(rsgis::img::RSGISImageCalcException, rsgis::img::RSGISImageBandException)
 	{
         if(matrixOperator->n != matrixOperator->m)
         {
@@ -54,7 +54,7 @@ namespace rsgis{namespace filter{
         delete dilateImage;
 	}
     
-    void RSGISImageMorphologyDilate::dilateImageAll(GDALDataset **datasets, string outputImage,rsgis::math::Matrix*matrixOperator) throw(rsgis::img::RSGISImageCalcException, rsgis::img::RSGISImageBandException)
+    void RSGISImageMorphologyDilate::dilateImageAll(GDALDataset **datasets, std::string outputImage,rsgis::math::Matrix*matrixOperator) throw(rsgis::img::RSGISImageCalcException, rsgis::img::RSGISImageBandException)
 	{
         if(matrixOperator->n != matrixOperator->m)
         {

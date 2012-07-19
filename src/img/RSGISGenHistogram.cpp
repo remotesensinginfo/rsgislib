@@ -30,7 +30,7 @@ namespace rsgis { namespace img {
         
     }
     
-    void RSGISGenHistogram::genHistogram(GDALDataset **datasets, unsigned int numDS, string outputFile, unsigned int imgBand, double imgMin, double imgMax, float maskValue, float binWidth)throw(RSGISImageCalcException)
+    void RSGISGenHistogram::genHistogram(GDALDataset **datasets, unsigned int numDS, std::string outputFile, unsigned int imgBand, double imgMin, double imgMax, float maskValue, float binWidth)throw(RSGISImageCalcException)
     {
         try 
         {

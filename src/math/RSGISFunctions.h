@@ -380,16 +380,16 @@ namespace rsgis{namespace math{
 		 *   The function and differentials are calculated seperately.
 		 */
 	public: 
-		RSGISFunctionNDPoly(gsl_matrix *inCoefficients, vector <int> *polyOrders);
-		virtual double calcFunction(vector <double> *values) throw(RSGISMathException);
+		RSGISFunctionNDPoly(gsl_matrix *inCoefficients, std::vector<int> *polyOrders);
+		virtual double calcFunction(std::vector<double> *values) throw(RSGISMathException);
 		virtual int numCoefficients() throw(RSGISMathException);
         virtual int numVariables() throw(RSGISMathException);
 		virtual void updateCoefficents(double *newCoefficents) throw(RSGISMathException){throw RSGISMathException("Not implemented");};
 		virtual ~RSGISFunctionNDPoly();
 	private:
 		gsl_matrix *coefficients;
-		vector <int> *polyOrders;
-        vector <double> *values;
+		std::vector<int> *polyOrders;
+        std::vector<double> *values;
         int numVar;
 	};
     

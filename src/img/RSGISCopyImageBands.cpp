@@ -29,7 +29,7 @@ namespace rsgis{namespace img{
 		
 	}
 	
-	GDALDataset* RSGISCopyImageBands::outputImageBands(GDALDataset *inputDS, string outputFile, int *outBands, int numOutBands, string outputProj, bool useInProj) throw(RSGISImageCalcException,RSGISImageBandException,RSGISImageException)
+	GDALDataset* RSGISCopyImageBands::outputImageBands(GDALDataset *inputDS, std::string outputFile, int *outBands, int numOutBands, std::string outputProj, bool useInProj) throw(RSGISImageCalcException,RSGISImageBandException,RSGISImageException)
 	{
 		RSGISIdentifyImageValues *copyImageValues = NULL;
 		RSGISCalcImage *calcImage = NULL;
@@ -37,7 +37,7 @@ namespace rsgis{namespace img{
 		
 		try
 		{
-			cout << "Copying Image Data ";
+			std::cout << "Copying Image Data ";
 			datasets = new GDALDataset*[1];
 			datasets[0] = inputDS;
 			

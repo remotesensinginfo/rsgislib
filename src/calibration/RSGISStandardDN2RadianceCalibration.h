@@ -38,7 +38,7 @@ namespace rsgis{namespace calib{
     
 	struct LandsatRadianceGainsOffsets
     {
-        string bandName;
+        std::string bandName;
         unsigned int band;
         float lMax;
         float lMin;
@@ -48,14 +48,14 @@ namespace rsgis{namespace calib{
     
     struct SPOTRadianceGainsOffsets
     {
-        string bandName;
+        std::string bandName;
         unsigned int band;
         float gain;
     };
     
     struct IkonosRadianceGainsOffsets
     {
-        string bandName;
+        std::string bandName;
         unsigned int band;
         float calCoef;
         float bandwidth;
@@ -63,14 +63,14 @@ namespace rsgis{namespace calib{
     
     struct ASTERRadianceGainsOffsets
     {
-        string bandName;
+        std::string bandName;
         unsigned int band;
         float unitConCoef;
     };
     
     struct IRSRadianceGainsOffsets
     {
-        string bandName;
+        std::string bandName;
         unsigned int band;
         float lMax;
         float lMin;
@@ -80,7 +80,7 @@ namespace rsgis{namespace calib{
     
     struct Quickbird16bitRadianceGainsOffsets
     {
-        string bandName;
+        std::string bandName;
         unsigned int band;
         float calFactor;
         float bandIntegrate;
@@ -88,7 +88,7 @@ namespace rsgis{namespace calib{
     
     struct Quickbird8bitRadianceGainsOffsets
     {
-        string bandName;
+        std::string bandName;
         unsigned int band;
         float calFactor;
         float bandIntegrate;
@@ -97,7 +97,7 @@ namespace rsgis{namespace calib{
     
     struct WorldView2RadianceGainsOffsets
     {
-        string bandName;
+        std::string bandName;
         unsigned int band;
         float calFactor;
         float bandIntegrate;

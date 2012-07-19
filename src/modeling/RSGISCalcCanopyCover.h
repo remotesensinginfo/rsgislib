@@ -48,7 +48,7 @@ namespace rsgis { namespace modeling {
 	public:
 		RSGISCalcCanopyCover(RSGISTransect *transect, std::vector<geos::geom::Polygon*> *canopyPoly);
 		double calcCanopyCover();
-		void exportCanopyPoly(string outFile);
+		void exportCanopyPoly(std::string outFile);
 		~RSGISCalcCanopyCover();
 	private:
 		RSGISTransect *transect;

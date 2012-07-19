@@ -608,14 +608,14 @@ namespace rsgis{namespace geom{
 
 			if(imgHeight >= 10)
 			{
-				std::cout << "Started" << flush;
+				std::cout << "Started" << std::flush;
 			}
 			
 			for(unsigned int i = 0; i < imgHeight; ++i)
 			{
 				if((imgHeight >= 10) && ((i % feedback) == 0))
 				{
-					std::cout << ".." << feedbackCounter << ".." << flush;
+					std::cout << ".." << feedbackCounter << ".." << std::flush;
 					feedbackCounter = feedbackCounter + 10;
 				}
 						
@@ -696,14 +696,14 @@ namespace rsgis{namespace geom{
 			
 			if(imgHeight >= 10)
 			{
-				std::cout << "Started" << flush;
+				std::cout << "Started" << std::flush;
 			}
 			
 			for(unsigned int i = 0; i < imgHeight; ++i)
 			{
 				if((imgHeight >= 10) && ((i % feedback) == 0))
 				{
-					std::cout << ".." << feedbackCounter << ".." << flush;
+					std::cout << ".." << feedbackCounter << ".." << std::flush;
 					feedbackCounter = feedbackCounter + 10;
 				}
 				
@@ -843,7 +843,7 @@ namespace rsgis{namespace geom{
 			
 			int feedback = height/10;
 			int feedbackCounter = 0;
-			std::cout << "Started" << flush;
+			std::cout << "Started" << std::flush;
 			// Loop images to process data
 			for(int i = 0; i < height; i++)
 			{
@@ -851,7 +851,7 @@ namespace rsgis{namespace geom{
 				
 				if((i % feedback) == 0)
 				{
-					std::cout << ".." << feedbackCounter << ".." << flush;
+					std::cout << ".." << feedbackCounter << ".." << std::flush;
 					feedbackCounter = feedbackCounter + 10;
 				}
 				

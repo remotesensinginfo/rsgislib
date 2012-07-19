@@ -67,9 +67,9 @@ namespace rsgis{namespace math{
 		
 		for(int j = 0; j < vector->n; j++)
 		{
-			cout << vector->vector[index++] << " ";
+			std::cout << vector->vector[index++] << " ";
 		}
-		cout << endl;
+		std::cout << std::endl;
 	}
 	
 	void RSGISVectors::printGSLVector(gsl_vector *vector)
@@ -77,20 +77,20 @@ namespace rsgis{namespace math{
 		for(unsigned int j = 0; j < vector->size; j++)
 		{
 			double outm = gsl_vector_get(vector, j); 
-			cout << outm << " " ;
+			std::cout << outm << " " ;
 		}
-		cout << endl;		
+		std::cout << std::endl;		
 	}
 	
 	void RSGISVectors::saveVector2GridTxt(Vector *vector, std::string filepath) throw(RSGISVectorsException,RSGISOutputStreamException)
 	{
 		std::string outputFilename = filepath + std::string(".gmtxt");
 		std::ofstream outTxtFile;
-		outTxtFile.open(outputFilename.c_str(), ios::out | ios::trunc);
+		outTxtFile.open(outputFilename.c_str(), std::ios::out | std::ios::trunc);
 		
 		if(outTxtFile.is_open())
 		{
-			outTxtFile << "n=" << vector->n << endl;
+			outTxtFile << "n=" << vector->n << std::endl;
 			
 			int totalElements = vector->n;
 			int lastElement = totalElements-1;
@@ -98,7 +98,7 @@ namespace rsgis{namespace math{
 			{
 				if(i %  vector->n == 0)
 				{
-					outTxtFile << endl;
+					outTxtFile << std::endl;
 				}
 				if(i == lastElement)
 				{
@@ -123,7 +123,7 @@ namespace rsgis{namespace math{
 	{
 		std::string outputFilename = filepath + std::string(".mtxt");
 		std::ofstream outTxtFile;
-		outTxtFile.open(outputFilename.c_str(), ios::out | ios::trunc);
+		outTxtFile.open(outputFilename.c_str(), std::ios::out | std::ios::trunc);
 		
 		if(outTxtFile.is_open())
 		{
@@ -183,7 +183,7 @@ namespace rsgis{namespace math{
 			int number;
 			float value;
 			int lineCounter = 0;
-			inputVector.seekg(ios_base::beg);
+			inputVector.seekg(std::ios_base::beg);
 			while(!inputVector.eof())
 			{
 				getline(inputVector, strLine, '\n');
@@ -267,7 +267,7 @@ namespace rsgis{namespace math{
 			float value;
 			int lineCounter = 0;
 			bool first = true;
-			inputVector.seekg(ios_base::beg);
+			inputVector.seekg(std::ios_base::beg);
 			while(!inputVector.eof())
 			{
 				getline(inputVector, strLine, '\n');
@@ -290,7 +290,7 @@ namespace rsgis{namespace math{
 						}
 						else 
 						{
-							wholeline = wholeline + string(",") + strLine;
+							wholeline = wholeline + std::string(",") + strLine;
 						}
 					}
 					lineCounter++;
@@ -340,9 +340,9 @@ namespace rsgis{namespace math{
 	{
 		Vector *rsgisVector;
 		gsl_vector *gslVector;
-		//cout << "reading" << endl;
+		//std::cout << "reading" << std::endl;
 		rsgisVector = this->readVectorFromTxt(filepath);
-		//cout << "read" << endl;
+		//std::cout << "read" << std::endl;
 		gslVector = this->convertRSGIS2GSLVector(rsgisVector);
 		this->freeVector(rsgisVector);
 		return gslVector;
@@ -369,7 +369,7 @@ namespace rsgis{namespace math{
 			double velement = inVector->vector[index++];
 			gsl_vector_set(convertedVector,j,velement);
 		}
-		//cout << endl;
+		//std::cout << std::endl;
 		
 		return convertedVector;
 	}

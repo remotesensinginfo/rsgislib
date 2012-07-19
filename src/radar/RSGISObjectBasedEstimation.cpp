@@ -25,7 +25,7 @@
 
 namespace rsgis{namespace radar{
 	
-	RSGISObjectBasedEstimation::RSGISObjectBasedEstimation(GDALDataset *inputImage, GDALDataset *outputImage, vector <gsl_vector*> *initialPar, vector <RSGISEstimationOptimiser*> *slowOptimiser, vector <RSGISEstimationOptimiser*> *fastOptimiser, estParameters parameters, double ***minMaxVals, std::string classHeading, bool useClass)
+	RSGISObjectBasedEstimation::RSGISObjectBasedEstimation(GDALDataset *inputImage, GDALDataset *outputImage, std::vector<gsl_vector*> *initialPar, std::vector<RSGISEstimationOptimiser*> *slowOptimiser, std::vector<RSGISEstimationOptimiser*> *fastOptimiser, estParameters parameters, double ***minMaxVals, std::string classHeading, bool useClass)
 	{
 		this->datasetsIO = new GDALDataset*[2];
 		this->datasetsInput = new GDALDataset*[1];
@@ -57,7 +57,7 @@ namespace rsgis{namespace radar{
 		}
 		
 		this->numOutputBands = numOutputPar + 2; // Extra bands for biomass and error
-		this->pixelVals = new vector<float>*[numBands];
+		this->pixelVals = new std::vector<float>*[numBands];
 
 		// Calc image to get values (for initial inversion)
 		this->getValues = new RSGISObjectBasedEstimationGetObjVals(pixelVals, numBands);
@@ -448,7 +448,7 @@ namespace rsgis{namespace radar{
 		delete calcImageSingle;
 	}
     
-    RSGISObjectBasedEstimationObjectAP::RSGISObjectBasedEstimationObjectAP(GDALDataset *inputImage, GDALDataset *outputImage, vector <gsl_vector*> *initialPar, vector <RSGISEstimationOptimiser*> *slowOptimiser, vector <RSGISEstimationOptimiser*> *fastOptimiser, estParameters parameters, std::string *apParField, double ***minMaxVals, std::string classHeading, bool useClass)
+    RSGISObjectBasedEstimationObjectAP::RSGISObjectBasedEstimationObjectAP(GDALDataset *inputImage, GDALDataset *outputImage, std::vector<gsl_vector*> *initialPar, std::vector<RSGISEstimationOptimiser*> *slowOptimiser, std::vector<RSGISEstimationOptimiser*> *fastOptimiser, estParameters parameters, std::string *apParField, double ***minMaxVals, std::string classHeading, bool useClass)
 	{
 		this->datasetsIO = new GDALDataset*[2];
 		this->datasetsInput = new GDALDataset*[1];
@@ -479,7 +479,7 @@ namespace rsgis{namespace radar{
 			throw RSGISException("Parameters not recognised");
 		}
 		this->numOutputBands = numOutputPar + 2; // Extra bands for biomass and error
-		this->pixelVals = new vector<float>*[numBands];
+		this->pixelVals = new std::vector<float>*[numBands];
         
 		// Calc image to get values (for initial inversion)
 		this->getValues = new RSGISObjectBasedEstimationGetObjVals(pixelVals, numBands);
@@ -938,7 +938,7 @@ namespace rsgis{namespace radar{
 		delete calcImageSingle;
 	}
 	
-	RSGISObjectBasedEstimationRasterPolygon::RSGISObjectBasedEstimationRasterPolygon(GDALDataset *inputImage, GDALDataset *outputImage,  GDALDataset *rasterFeatures, vector <gsl_vector*> *initialPar, vector <RSGISEstimationOptimiser*> *slowOptimiser, vector <RSGISEstimationOptimiser*> *fastOptimiser, estParameters parameters, double ***minMaxVals, std::string classHeading, bool useClass)
+	RSGISObjectBasedEstimationRasterPolygon::RSGISObjectBasedEstimationRasterPolygon(GDALDataset *inputImage, GDALDataset *outputImage,  GDALDataset *rasterFeatures, std::vector<gsl_vector*> *initialPar, std::vector<RSGISEstimationOptimiser*> *slowOptimiser, std::vector<RSGISEstimationOptimiser*> *fastOptimiser, estParameters parameters, double ***minMaxVals, std::string classHeading, bool useClass)
 	{
 		this->datasetsIO = new GDALDataset*[3];
 		this->datasetsInput = new GDALDataset*[2];
@@ -952,7 +952,7 @@ namespace rsgis{namespace radar{
 		this->numBands = inputImage->GetRasterCount();		
 		this->numOutputPar = 2;
 		this->numOutputBands = numOutputPar + 2; // Extra bands for biomass and error
-		this->pixelVals = new vector<float>*[numBands];
+		this->pixelVals = new std::vector<float>*[numBands];
 		this->objectSamplesPercent = 0.1; // Percent of pixels in object to use with slow optimisers.
 		this->parameters = parameters;
 		this->initialPar = initialPar;
@@ -973,7 +973,7 @@ namespace rsgis{namespace radar{
 		}
 		
 		this->numOutputBands = numOutputPar + 2; // Extra bands for biomass and error
-		this->pixelVals = new vector<float>*[numBands];
+		this->pixelVals = new std::vector<float>*[numBands];
         
 		// Calc image to get values (for initial inversion)
 		this->getValues = new RSGISObjectBasedEstimationGetObjVals(pixelVals, numBands);
@@ -1374,14 +1374,14 @@ namespace rsgis{namespace radar{
 		delete calcImageSingle;
 	}
 	
-	RSGISObjectBasedEstimationGetObjVals::RSGISObjectBasedEstimationGetObjVals(vector<float> **pixelVals, int numBands) : RSGISCalcImageSingleValue(numOutputValues)
+	RSGISObjectBasedEstimationGetObjVals::RSGISObjectBasedEstimationGetObjVals(std::vector<float> **pixelVals, int numBands) : RSGISCalcImageSingleValue(numOutputValues)
 	{
 		this->pixelVals = pixelVals;
 		this->numBands = numBands;
 		
 		for(int i = 0; i < numBands; i++) 
 		{
-			this->pixelVals[i] = new vector <float>();
+			this->pixelVals[i] = new std::vector<float>();
 		}
 	}
 	
@@ -1389,7 +1389,7 @@ namespace rsgis{namespace radar{
 	{
 		for(int i = 0; i < this->numBands; i++) // Loop through bands
 		{
-			if ((isnan(bandValuesImage[i]) == false) && (bandValuesImage[i] != 0.0) && (bandValuesImage[i] > -100)) 
+			if ((std::isnan(bandValuesImage[i]) == false) && (bandValuesImage[i] != 0.0) && (bandValuesImage[i] > -100)) 
 			{
 				pixelVals[i]->push_back(bandValuesImage[i]);
 			}
@@ -1400,7 +1400,7 @@ namespace rsgis{namespace radar{
 	{
 		for(int i = 0; i < this->numBands - 1;  i++) // Loop through bands
 		{
-			if ((isnan(bandValuesImage[i+1]) == false) && (bandValuesImage[i+1] != 0.0) && (bandValuesImage[i+1] > -100))
+			if ((std::isnan(bandValuesImage[i+1]) == false) && (bandValuesImage[i+1] != 0.0) && (bandValuesImage[i+1] > -100))
 			{
 				pixelVals[i]->push_back(bandValuesImage[i+1]);
 			}

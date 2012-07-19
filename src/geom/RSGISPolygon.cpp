@@ -39,32 +39,32 @@ namespace rsgis{namespace geom{
 		this->poly = poly;
 		this->point = new geos::geom::Coordinate();
 		this->poly->getCentroid(*this->point);
-		//cout << "Centroid = [" << this->point->x << "," << this->point->y << "]" << endl;
+		//std::cout << "Centroid = [" << this->point->x << "," << this->point->y << "]" << std::endl;
 		
 		
-		if(isnan(this->point->x) | isnan(this->point->y))
+		if(std::isnan(this->point->x) | std::isnan(this->point->y))
 		{
-			if(isnan(this->point->x))
+			if(std::isnan(this->point->x))
 			{
-				cout << "X has value NaN\n";
+				std::cout << "X has value NaN\n";
 			}
 			
-			if(isnan(this->point->y))
+			if(std::isnan(this->point->y))
 			{
-				cout << "Y has value NaN\n";
+				std::cout << "Y has value NaN\n";
 			}
 			
 			const geos::geom::LineString *lineStringPoly = poly->getExteriorRing();
 			const geos::geom::CoordinateSequence *coorSeq = lineStringPoly->getCoordinatesRO();
 			int numPts = coorSeq->getSize();
-			cout << "Polygon has " << poly->getNumPoints() << " points\n"; 
-			cout << "CoordinateSequence has " << numPts << " points\n"; 
+			std::cout << "Polygon has " << poly->getNumPoints() << " points\n"; 
+			std::cout << "CoordinateSequence has " << numPts << " points\n"; 
 			
 			geos::geom::Coordinate coord;
 			for(int i = 0; i < numPts; i++)
 			{
 				coorSeq->getAt(i, coord);
-				cout << i << ": [" << coord.x << "," << coord.y << "," << coord.z << "]\n";
+				std::cout << i << ": [" << coord.x << "," << coord.y << "," << coord.z << "]\n";
 			}
 		}
 	}

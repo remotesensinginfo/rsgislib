@@ -24,6 +24,7 @@
 #define RSGISImageKernelFilter_H
 
 #include <iostream>
+#include <string>
 
 #include "common/RSGISImageException.h"
 
@@ -39,10 +40,10 @@ namespace rsgis{namespace filter{
 	class RSGISImageKernelFilter : public RSGISImageFilter
 		{
 		public: 
-			RSGISImageKernelFilter(int numberOutBands, int size, string filenameEnding, ImageFilter *filter);
+			RSGISImageKernelFilter(int numberOutBands, int size, std::string filenameEnding, ImageFilter *filter);
 			virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException);
 			virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException);
-			virtual void exportAsImage(string filename) throw(RSGISImageFilterException);
+			virtual void exportAsImage(std::string filename) throw(RSGISImageFilterException);
 			~RSGISImageKernelFilter();
 		protected:
 			ImageFilter *filter;

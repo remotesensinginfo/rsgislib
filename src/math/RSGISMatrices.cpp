@@ -328,7 +328,7 @@ namespace rsgis{namespace math{
 				{
 					row = (i * matrix1->n) + n;
 					col = (n * matrix2->n) + j;
-					//cout << "row = " << row << " col = " << col << endl;
+					//cout << "row = " << row << " col = " << col << std::endl;
 					value += matrix1->matrix[row] * matrix2->matrix[col];
 				}
 				newMatrix->matrix[index] = value;
@@ -398,12 +398,12 @@ namespace rsgis{namespace math{
 	{
 		std::string outputFilename = filepath + std::string(".gmtxt");
 		std::ofstream outTxtFile;
-		outTxtFile.open(outputFilename.c_str(), ios::out | ios::trunc);
+		outTxtFile.open(outputFilename.c_str(), std::ios::out | std::ios::trunc);
 		
 		if(outTxtFile.is_open())
 		{
-			outTxtFile << "m=" << matrix->m << endl;
-			outTxtFile << "n=" << matrix->n << endl;
+			outTxtFile << "m=" << matrix->m << std::endl;
+			outTxtFile << "n=" << matrix->n << std::endl;
 			
 			int totalElements = matrix->n * matrix->m;
 			int lastElement = totalElements-1;
@@ -411,7 +411,7 @@ namespace rsgis{namespace math{
 			{
 				if((i+1) %  matrix->m == 0)
 				{
-					outTxtFile << matrix->matrix[i] << endl;
+					outTxtFile << matrix->matrix[i] << std::endl;
 				}
 				else if(i == lastElement)
 				{
@@ -436,7 +436,7 @@ namespace rsgis{namespace math{
 	{
 		std::string outputFilename = filepath + std::string(".csv");
 		std::ofstream outTxtFile;
-		outTxtFile.open(outputFilename.c_str(), ios::out | ios::trunc);
+		outTxtFile.open(outputFilename.c_str(), std::ios::out | std::ios::trunc);
 		
 		if(outTxtFile.is_open())
 		{			
@@ -446,7 +446,7 @@ namespace rsgis{namespace math{
 			{
 				if(i %  matrix->m == 0)
 				{
-					outTxtFile << endl;
+					outTxtFile << std::endl;
 				}
 				if(i == lastElement)
 				{
@@ -479,12 +479,12 @@ namespace rsgis{namespace math{
 	{
 		std::string outputFilename = filepath + std::string(".mtxt");
 		std::ofstream outTxtFile;
-		outTxtFile.open(outputFilename.c_str(), ios::out | ios::trunc);
+		outTxtFile.open(outputFilename.c_str(), std::ios::out | std::ios::trunc);
 		
 		if(outTxtFile.is_open())
 		{
-			outTxtFile << "m=" << matrix->m << endl;
-			outTxtFile << "n=" << matrix->n << endl;
+			outTxtFile << "m=" << matrix->m << std::endl;
+			outTxtFile << "n=" << matrix->n << std::endl;
 			
 			int totalElements = matrix->n * matrix->m;
 			int lastElement = totalElements-1;
@@ -532,10 +532,10 @@ namespace rsgis{namespace math{
 	void RSGISMatrices::saveGSLMatrix2GridTxt(gsl_matrix *gslMatrix, std::string filepath) throw(RSGISMatricesException,RSGISOutputStreamException)
 	{
 		Matrix *rsgisMatrix;
-		//cout << "gsl matrix" << endl;
+		//cout << "gsl matrix" << std::endl;
 		//this->printGSLMatrix(gslMatrix);
 		rsgisMatrix = this->convertGSL2RSGISMatrix(gslMatrix);
-		//cout << "converted matrix" << endl;
+		//cout << "converted matrix" << std::endl;
 		//this->printMatrix(rsgisMatrix);
 		this->saveMatrix2GridTxt(rsgisMatrix, filepath);
 		this->freeMatrix(rsgisMatrix);
@@ -552,8 +552,8 @@ namespace rsgis{namespace math{
 	void RSGISMatrices::saveMatrix2Binary(Matrix *matrix, std::string filepath) throw(RSGISMatricesException,RSGISOutputStreamException)
 	{
 		std::ofstream matrixOutput;
-		std::string matrixFilepath = filepath + string(".mtx");
-		matrixOutput.open(matrixFilepath.c_str(), ios::out | ios::trunc | ios::binary);
+		std::string matrixFilepath = filepath + std::string(".mtx");
+		matrixOutput.open(matrixFilepath.c_str(), std::ios::out | std::ios::trunc | std::ios::binary);
 		if(!matrixOutput.is_open())
 		{
 			throw RSGISOutputStreamException("Could not open output stream for Matrix output.");
@@ -588,7 +588,7 @@ namespace rsgis{namespace math{
 			int number;
 			float value;
 			int lineCounter = 0;
-			inputMatrix.seekg(ios_base::beg);
+			inputMatrix.seekg(std::ios_base::beg);
 			while(!inputMatrix.eof())
 			{
 				getline(inputMatrix, strLine, '\n');
@@ -683,7 +683,7 @@ namespace rsgis{namespace math{
 			float value;
 			int lineCounter = 0;
 			bool first = true;
-			inputMatrix.seekg(ios_base::beg);
+			inputMatrix.seekg(std::ios_base::beg);
 			while(!inputMatrix.eof())
 			{
 				getline(inputMatrix, strLine, '\n');
@@ -695,7 +695,7 @@ namespace rsgis{namespace math{
 						word = strLine.substr(2);
 						number = strtol(word.c_str(), NULL, 10);
 						matrix->m = number;
-						//cout << "columns = " << number << endl;
+						//cout << "columns = " << number << std::endl;
 					}
 					else if(lineCounter == 1)
 					{
@@ -703,7 +703,7 @@ namespace rsgis{namespace math{
 						word = strLine.substr(2);
 						number = strtol(word.c_str(), NULL, 10);
 						matrix->n = number;
-						//cout << "rows = " << number << endl;
+						//cout << "rows = " << number << std::endl;
 					}
 					else 
 					{
@@ -714,7 +714,7 @@ namespace rsgis{namespace math{
 						}
 						else 
 						{
-							wholeline = wholeline + string(",") + strLine;
+							wholeline = wholeline + std::string(",") + strLine;
 						}
 					}
 					lineCounter++;
@@ -766,15 +766,15 @@ namespace rsgis{namespace math{
 		Matrix *matrix = new Matrix();
 		std::string matrixFilepath = filepath + std::string(".mtx");
 		std::ifstream matrixInput;
-		matrixInput.open(matrixFilepath.c_str(), ios::in | ios::binary);
+		matrixInput.open(matrixFilepath.c_str(), std::ios::in | std::ios::binary);
 		if(!matrixInput.is_open())
 		{
 			throw RSGISInputStreamException("Could not open matrix binary file.");
 		}
 		
-		matrixInput.seekg (0, ios::end);
+		matrixInput.seekg (0, std::ios::end);
 		long end = matrixInput.tellg();
-		matrixInput.seekg (0, ios::beg);
+		matrixInput.seekg (0, std::ios::beg);
 		int matrixSizeFile = (end/16) - 2;
 		
 		matrixInput.read((char *) &matrix->m, 4);
@@ -856,7 +856,7 @@ namespace rsgis{namespace math{
 			{
 				index = (j*matrix->n)+i;
 				eigenvectors->matrix[index] = gsl_vector_get(&evec_i.vector, j);
-				//cout << gsl_vector_get(&evec_i.vector, j) << endl;
+				//cout << gsl_vector_get(&evec_i.vector, j) << std::endl;
 			}
 		}
 		
@@ -971,7 +971,7 @@ namespace rsgis{namespace math{
         {
             for(int j = 0; j < matrix->n; ++j)
             {
-                //cout << matrix->matrix[(j*matrix->m)+i] << " / " << normalisingVals[i] << " = " << matrix->matrix[(j*matrix->m)+i]/normalisingVals[i] << endl;
+                //cout << matrix->matrix[(j*matrix->m)+i] << " / " << normalisingVals[i] << " = " << matrix->matrix[(j*matrix->m)+i]/normalisingVals[i] << std::endl;
                 outMatrix->matrix[(j*matrix->m)+i] = matrix->matrix[(j*matrix->m)+i]/normalisingVals[i];
             }            
         }
@@ -1038,7 +1038,7 @@ namespace rsgis{namespace math{
 			
 			for(int i = 0; i < length; i++)
 			{
-				//cout << "[" << column << "," << row << "]: " << xDupCount <<  " out = " << outCounter << " in = " << inCounter << endl;
+				//cout << "[" << column << "," << row << "]: " << xDupCount <<  " out = " << outCounter << " in = " << inCounter << std::endl;
 				
 				outMatrix->matrix[outCounter++] = matrix->matrix[inCounter++];
 				
@@ -1087,8 +1087,8 @@ namespace rsgis{namespace math{
 		/// Converts RSGIS matrix to a GSL matrix
 		Matrix *convertedMatrix = this->createMatrix(matrix->size1, matrix->size2);		
 		int index = 0;
-		//cout << "rows = " << matrix->size1 << endl;
-		//cout << "colums = " << matrix->size2 << endl;
+		//cout << "rows = " << matrix->size1 << std::endl;
+		//cout << "colums = " << matrix->size2 << std::endl;
 
 		for(unsigned int i = 0; i < matrix->size1; i++) // Loop through rows
 		{

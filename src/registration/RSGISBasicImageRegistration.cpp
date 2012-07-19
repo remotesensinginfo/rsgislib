@@ -98,7 +98,7 @@ namespace rsgis{namespace reg{
 				tmpTiePt->yFloat = overlap->floatYStart + startYOff + (i*gap);
 				tmpTiePt->xShift = 0;
 				tmpTiePt->yShift = 0;
-				tmpTiePt->metricVal = numeric_limits<double>::signaling_NaN();//NAN;
+				tmpTiePt->metricVal = std::numeric_limits<double>::signaling_NaN();//NAN;
 				
 				// Add tie points to list
 				tiePoints->push_back(tmpTiePt);
@@ -132,7 +132,7 @@ namespace rsgis{namespace reg{
 			giveFeedback = true;
 		}
 		
-		std::cout << "Started ." << flush;
+		std::cout << "Started ." << std::flush;
 		
 		float xShift = 0;
 		float yShift = 0;
@@ -142,7 +142,7 @@ namespace rsgis{namespace reg{
 		{
 			if(giveFeedback && ((counter % feedback) == 0))
 			{
-				std::cout << "." << feedbackVal << "." << flush;
+				std::cout << "." << feedbackVal << "." << std::flush;
 				feedbackVal += 10;
 			}
 			

@@ -81,7 +81,7 @@ namespace rsgis{namespace reg{
         rsgis::utils::RSGISTextUtils textUtils;
         rsgis::math::RSGISMathsUtils mathUtils;
 		
-		ifstream gcpFile;
+		std::ifstream gcpFile;
 		gcpFile.open(gcpFilePath.c_str());
 		if(gcpFile.is_open())
 		{
@@ -502,7 +502,7 @@ namespace rsgis{namespace reg{
 						// ignore... - set output as NaN
 						for(unsigned int n = 0; n < numBands; n++)
 						{
-							outDataColumn[n] = numeric_limits<double>::signaling_NaN();//NAN;
+							outDataColumn[n] = std::numeric_limits<double>::signaling_NaN();//NAN;
 						}
 					}
 					

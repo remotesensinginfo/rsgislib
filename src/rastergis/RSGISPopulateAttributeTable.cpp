@@ -44,7 +44,7 @@ namespace rsgis{namespace rastergis{
         {
             // Calc max clump value = number of clumps.
             unsigned long long numClumps = this->calcMaxValue(datasets[0]);
-            cout << "There are " << numClumps << " in the input dataset\n";
+            std::cout << "There are " << numClumps << " in the input dataset\n";
             
             unsigned int numRasterBands = 0;
             for(int i = 1; i < numDatasets; ++i)
@@ -53,15 +53,15 @@ namespace rsgis{namespace rastergis{
             }
             
             // Generate Attribute table
-            cout << "Creating blank attribute table\n";
-            vector<pair<std::string, RSGISAttributeDataType> > *fields = new vector<pair<std::string, RSGISAttributeDataType> >();
-            fields->push_back(pair<std::string, RSGISAttributeDataType>(attrPrefix + std::string("_pxlcount"), rsgis_int));
+            std::cout << "Creating blank attribute table\n";
+            std::vector<std::pair<std::string, RSGISAttributeDataType> > *fields = new std::vector<std::pair<std::string, RSGISAttributeDataType> >();
+            fields->push_back(std::pair<std::string, RSGISAttributeDataType>(attrPrefix + std::string("_pxlcount"), rsgis_int));
             
             std::string fieldName = "";
             for(unsigned int i = 0; i < numRasterBands; ++i)
             {
                 fieldName = attrPrefix + std::string("_b") + mathUtils.uinttostring(i+1);
-                fields->push_back(pair<std::string, RSGISAttributeDataType>(fieldName, rsgis_float));
+                fields->push_back(std::pair<std::string, RSGISAttributeDataType>(fieldName, rsgis_float));
             }
             attTable = new RSGISAttributeTableMem(numClumps, fields);
             
@@ -76,14 +76,14 @@ namespace rsgis{namespace rastergis{
             }
             
             // Populate the attribute table.
-            cout << "Populating the attribute table with sum and count values\n";
+            std::cout << "Populating the attribute table with sum and count values\n";
             RSGISPopulateAttributeTableBandMeansCalcImg *popTabMeans = new RSGISPopulateAttributeTableBandMeansCalcImg(attTable, attrPrefix, pxlCountIdx, bandMeanIdxs, numRasterBands);
             rsgis::img::RSGISCalcImage calcImage(popTabMeans);
             calcImage.calcImage(datasets, numDatasets);
             delete popTabMeans;
             
             // Calculate mean values.
-            cout << "Calc mean values\n";
+            std::cout << "Calc mean values\n";
             long pxlCount = 0;
             double sumVal = 0;
             std::string pxlCountName = attrPrefix + std::string("_pxlcount");
@@ -91,14 +91,14 @@ namespace rsgis{namespace rastergis{
             {
                 RSGISFeature *feat = attTable->getFeature(i);
                 pxlCount = feat->intFields->at(pxlCountIdx);
-                //cout << i << " has " << pxlCount << " pixel count\n";
+                //std::cout << i << " has " << pxlCount << " pixel count\n";
                 if(pxlCount != 0)
                 {
                     for(unsigned int j = 0; j < numRasterBands; ++j)
                     {
                         sumVal = feat->floatFields->at(bandMeanIdxs[j]);
                         feat->floatFields->at(bandMeanIdxs[j]) = sumVal/pxlCount;
-                        //cout << "\tBand: " << j+1 << " has mean = " << feat->floatFields->at(bandMeanIdxs[j]) << endl;
+                        //std::cout << "\tBand: " << j+1 << " has mean = " << feat->floatFields->at(bandMeanIdxs[j]) << std::endl;
                     }
                 }
             }
@@ -218,7 +218,7 @@ namespace rsgis{namespace rastergis{
             }
             catch(RSGISAttributeTableException &e)
             {
-                cout << "clumpIdx = " << clumpIdx << endl;
+                std::cout << "clumpIdx = " << clumpIdx << std::endl;
                 throw rsgis::img::RSGISImageCalcException(e.what());
             }
         }        
@@ -236,7 +236,7 @@ namespace rsgis{namespace rastergis{
         
     }
     
-    void RSGISPopulateAttributeTableBandWithSumAndMeans::populateWithBandStatistics(RSGISAttributeTable *attTable, GDALDataset **datasets, int numDatasets, vector<RSGISBandAttStats*> *bandStats) throw(rsgis::img::RSGISImageCalcException, RSGISAttributeTableException)
+    void RSGISPopulateAttributeTableBandWithSumAndMeans::populateWithBandStatistics(RSGISAttributeTable *attTable, GDALDataset **datasets, int numDatasets, std::vector<RSGISBandAttStats*> *bandStats) throw(rsgis::img::RSGISImageCalcException, RSGISAttributeTableException)
     {
         if(numDatasets != 2)
         {
@@ -255,7 +255,7 @@ namespace rsgis{namespace rastergis{
                 throw rsgis::img::RSGISImageCalcException("More band stats were requested than bands in the file.");
             }
                         
-            for(vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
+            for(std::vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
             {
                 if((*iterBands)->band == 0)
                 {
@@ -274,7 +274,7 @@ namespace rsgis{namespace rastergis{
                         {
                             throw RSGISAttributeTableException("All outputs must be of type float.");
                         }
-                        cerr << "Warning. Reusing field \'" << (*iterBands)->meanField << "\'\n";
+                        std::cerr << "Warning. Reusing field \'" << (*iterBands)->meanField << "\'\n";
                     }
                     else
                     {
@@ -291,7 +291,7 @@ namespace rsgis{namespace rastergis{
                         {
                             throw RSGISAttributeTableException("All outputs must be of type float.");
                         }
-                        cerr << "Warning. Reusing field \'" << (*iterBands)->sumField << "\'\n";
+                        std::cerr << "Warning. Reusing field \'" << (*iterBands)->sumField << "\'\n";
                     }
                     else
                     {
@@ -311,16 +311,16 @@ namespace rsgis{namespace rastergis{
             }
             size_t pxlCountIdx = attTable->getFieldIndex("pxlcount");
             
-            //cout << "pxlCountIdx = " << pxlCountIdx << endl;
+            //std::cout << "pxlCountIdx = " << pxlCountIdx << std::endl;
             
             size_t fieldCount = bandStats->size();
-            //cout << "field count = " << fieldCount << endl;
+            //std::cout << "field count = " << fieldCount << std::endl;
             size_t *bandIdxs = new size_t[fieldCount];
             size_t idx = 0;
-            for(vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
+            for(std::vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
             {
                 bandIdxs[idx] = (*iterBands)->band;
-                //cout << "bandIdxs[" << idx << "]: " << bandIdxs[idx] << endl;
+                //std::cout << "bandIdxs[" << idx << "]: " << bandIdxs[idx] << std::endl;
                 ++idx;
             }
             
@@ -345,19 +345,19 @@ namespace rsgis{namespace rastergis{
             size_t j = 0;
             int feedback = attTable->getSize()/10;
 			int feedbackCounter = 0;
-            cout << "Writing to attribute table\n";
-			cout << "Started" << flush;
+            std::cout << "Writing to attribute table\n";
+			std::cout << "Started" << std::flush;
             for(attTable->start(); attTable->end(); ++(*attTable))
             {
-                //cout << "Processing: " << (*(*attTable))->fid << endl;
+                //std::cout << "Processing: " << (*(*attTable))->fid << std::endl;
                 if((idx % feedback) == 0)
 				{
-					cout << "." << feedbackCounter << "." << flush;
+					std::cout << "." << feedbackCounter << "." << std::flush;
 					feedbackCounter = feedbackCounter + 10;
 				}
                 (*(*attTable))->intFields->at(pxlCountIdx) = pxlCount[idx];
                 j = 0;
-                for(vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
+                for(std::vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
                 {
                     if((*iterBands)->calcMean)
                     {
@@ -372,7 +372,7 @@ namespace rsgis{namespace rastergis{
                 delete[] sumVals[idx];
                 ++idx;
             }
-            cout << " Complete.\n";
+            std::cout << " Complete.\n";
             
             delete[] sumVals;
             delete[] pxlCount;
@@ -400,7 +400,7 @@ namespace rsgis{namespace rastergis{
         
     }
         
-    void RSGISPopulateAttributeTableBandStats::populateWithBandStatisticsInMem(RSGISAttributeTable *attTable, GDALDataset **datasets, int numDatasets, vector<RSGISBandAttStats*> *bandStats) throw(rsgis::img::RSGISImageCalcException, RSGISAttributeTableException)
+    void RSGISPopulateAttributeTableBandStats::populateWithBandStatisticsInMem(RSGISAttributeTable *attTable, GDALDataset **datasets, int numDatasets, std::vector<RSGISBandAttStats*> *bandStats) throw(rsgis::img::RSGISImageCalcException, RSGISAttributeTableException)
     {
         if(numDatasets != 2)
         {
@@ -435,11 +435,11 @@ namespace rsgis{namespace rastergis{
             
             if(!usePxlCount)
             {
-                cerr << "Warning: \'pxlcount\' field is not available\n";
+                std::cerr << "Warning: \'pxlcount\' field is not available\n";
             }
             
             unsigned int bandCount = 0;
-            for(vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
+            for(std::vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
             {
                 if((*iterBands)->band == 0)
                 {
@@ -460,7 +460,7 @@ namespace rsgis{namespace rastergis{
                         {
                             throw RSGISAttributeTableException("All outputs must be of type float.");
                         }
-                        cerr << "Warning. Reusing field \'" << (*iterBands)->minField << "\'\n";
+                        std::cerr << "Warning. Reusing field \'" << (*iterBands)->minField << "\'\n";
                     }
                     else
                     {
@@ -477,7 +477,7 @@ namespace rsgis{namespace rastergis{
                         {
                             throw RSGISAttributeTableException("All outputs must be of type float.");
                         }
-                        cerr << "Warning. Reusing field \'" << (*iterBands)->maxField << "\'\n";
+                        std::cerr << "Warning. Reusing field \'" << (*iterBands)->maxField << "\'\n";
                     }
                     else
                     {
@@ -494,7 +494,7 @@ namespace rsgis{namespace rastergis{
                         {
                             throw RSGISAttributeTableException("All outputs must be of type float.");
                         }
-                        cerr << "Warning. Reusing field \'" << (*iterBands)->meanField << "\'\n";
+                        std::cerr << "Warning. Reusing field \'" << (*iterBands)->meanField << "\'\n";
                     }
                     else
                     {
@@ -511,7 +511,7 @@ namespace rsgis{namespace rastergis{
                         {
                             throw RSGISAttributeTableException("All outputs must be of type float.");
                         }
-                        cerr << "Warning. Reusing field \'" << (*iterBands)->sumField << "\'\n";
+                        std::cerr << "Warning. Reusing field \'" << (*iterBands)->sumField << "\'\n";
                     }
                     else
                     {
@@ -528,7 +528,7 @@ namespace rsgis{namespace rastergis{
                         {
                             throw RSGISAttributeTableException("All outputs must be of type float.");
                         }
-                        cerr << "Warning. Reusing field \'" << (*iterBands)->stdDevField << "\'\n";
+                        std::cerr << "Warning. Reusing field \'" << (*iterBands)->stdDevField << "\'\n";
                     }
                     else
                     {
@@ -545,7 +545,7 @@ namespace rsgis{namespace rastergis{
                         {
                             throw RSGISAttributeTableException("All outputs must be of type float.");
                         }
-                        cerr << "Warning. Reusing field \'" << (*iterBands)->medianField << "\'\n";
+                        std::cerr << "Warning. Reusing field \'" << (*iterBands)->medianField << "\'\n";
                     }
                     else
                     {
@@ -556,10 +556,10 @@ namespace rsgis{namespace rastergis{
             }
                         
             RSGISFeature *feat;
-            vector<vector<double> > **clumpData = new vector<vector<double> >*[numDataBands];
+            std::vector<std::vector<double> > **clumpData = new std::vector<std::vector<double> >*[numDataBands];
             for(unsigned int n = 0; n < numDataBands; ++n)
             {
-                clumpData[n] = new vector<vector<double> >();
+                clumpData[n] = new std::vector<std::vector<double> >();
                 clumpData[n]->reserve(attTable->getSize());
             }
                 
@@ -568,7 +568,7 @@ namespace rsgis{namespace rastergis{
                 feat = attTable->getFeature(i);
                 for(unsigned int n = 0; n < numDataBands; ++n)
                 {
-                    clumpData[n]->push_back(vector<double>());
+                    clumpData[n]->push_back(std::vector<double>());
                     if(usePxlCount)
                     {
                         clumpData[n]->at(i).reserve(feat->intFields->at(pxlCountIdx));
@@ -591,20 +591,20 @@ namespace rsgis{namespace rastergis{
             
             int feedback = attTable->getSize()/10;
 			int feedbackCounter = 0;
-			cout << "Started" << flush;
+			std::cout << "Started" << std::flush;
             // Calculate Statistics for each feature.
             for(unsigned long long i  = 0; i < attTable->getSize(); ++i)
             {
                 if((i % feedback) == 0)
 				{
-					cout << ".." << feedbackCounter << ".." << flush;
+					std::cout << ".." << feedbackCounter << ".." << std::flush;
 					feedbackCounter = feedbackCounter + 10;
 				}
                 
                 feat = attTable->getFeature(i);
                 
                 bandCount = 0;
-                for(vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
+                for(std::vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
                 {   
                     if((*iterBands)->calcMin & (*iterBands)->calcMax)
                     {
@@ -634,7 +634,7 @@ namespace rsgis{namespace rastergis{
                     {
                         mean = gsl_stats_mean (&(clumpData[bandCount]->at(i))[0], 1, clumpData[bandCount]->at(i).size());
                         feat->floatFields->at((*iterBands)->meanIdx) = mean;
-                        //cout << feat->fid << " mean value = " << feat->floatFields->at((*iterBands)->meanIdx) << "\tPixel Count: " << clumpData[bandCount]->at(i).size()  << endl;
+                        //std::cout << feat->fid << " mean value = " << feat->floatFields->at((*iterBands)->meanIdx) << "\tPixel Count: " << clumpData[bandCount]->at(i).size()  << std::endl;
                     }
                     else if(!(*iterBands)->calcMean & (*iterBands)->calcStdDev)
                     {
@@ -645,7 +645,7 @@ namespace rsgis{namespace rastergis{
                     if((*iterBands)->calcSum)
                     {
                         sum = 0;
-                        for(vector<double>::iterator iterVals = clumpData[bandCount]->at(i).begin(); iterVals != clumpData[bandCount]->at(i).end(); ++iterVals)
+                        for(std::vector<double>::iterator iterVals = clumpData[bandCount]->at(i).begin(); iterVals != clumpData[bandCount]->at(i).end(); ++iterVals)
                         {
                             sum += *iterVals;
                         }
@@ -663,7 +663,7 @@ namespace rsgis{namespace rastergis{
                 }
                 
             }
-            cout << " Complete.\n";
+            std::cout << " Complete.\n";
             
             delete[] dataBandIdxs;
             for(unsigned int n = 0; n < numDataBands; ++n)
@@ -683,7 +683,7 @@ namespace rsgis{namespace rastergis{
 
     }
     
-    void RSGISPopulateAttributeTableBandStats::populateWithBandStatisticsWithinAtt(RSGISAttributeTable *attTable, GDALDataset **datasets, int numDatasets, vector<RSGISBandAttStats*> *bandStats) throw(rsgis::img::RSGISImageCalcException, RSGISAttributeTableException)
+    void RSGISPopulateAttributeTableBandStats::populateWithBandStatisticsWithinAtt(RSGISAttributeTable *attTable, GDALDataset **datasets, int numDatasets, std::vector<RSGISBandAttStats*> *bandStats) throw(rsgis::img::RSGISImageCalcException, RSGISAttributeTableException)
     {
         if(numDatasets != 2)
         {
@@ -724,7 +724,7 @@ namespace rsgis{namespace rastergis{
                         
             bool meanCalc = false;
             bool stdDevCalc = false;
-            for(vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
+            for(std::vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
             {
                 if((*iterBands)->band == 0)
                 {
@@ -743,7 +743,7 @@ namespace rsgis{namespace rastergis{
                         {
                             throw RSGISAttributeTableException("All outputs must be of type float.");
                         }
-                        cerr << "Warning. Reusing field \'" << (*iterBands)->minField << "\'\n";
+                        std::cerr << "Warning. Reusing field \'" << (*iterBands)->minField << "\'\n";
                     }
                     else
                     {
@@ -760,7 +760,7 @@ namespace rsgis{namespace rastergis{
                         {
                             throw RSGISAttributeTableException("All outputs must be of type float.");
                         }
-                        cerr << "Warning. Reusing field \'" << (*iterBands)->maxField << "\'\n";
+                        std::cerr << "Warning. Reusing field \'" << (*iterBands)->maxField << "\'\n";
                     }
                     else
                     {
@@ -778,7 +778,7 @@ namespace rsgis{namespace rastergis{
                         {
                             throw RSGISAttributeTableException("All outputs must be of type float.");
                         }
-                        cerr << "Warning. Reusing field \'" << (*iterBands)->meanField << "\'\n";
+                        std::cerr << "Warning. Reusing field \'" << (*iterBands)->meanField << "\'\n";
                     }
                     else
                     {
@@ -795,7 +795,7 @@ namespace rsgis{namespace rastergis{
                         {
                             throw RSGISAttributeTableException("All outputs must be of type float.");
                         }
-                        cerr << "Warning. Reusing field \'" << (*iterBands)->sumField << "\'\n";
+                        std::cerr << "Warning. Reusing field \'" << (*iterBands)->sumField << "\'\n";
                     }
                     else
                     {
@@ -813,7 +813,7 @@ namespace rsgis{namespace rastergis{
                         {
                             throw RSGISAttributeTableException("All outputs must be of type float.");
                         }
-                        cerr << "Warning. Reusing field \'" << (*iterBands)->stdDevField << "\'\n";
+                        std::cerr << "Warning. Reusing field \'" << (*iterBands)->stdDevField << "\'\n";
                     }
                     else
                     {
@@ -824,7 +824,7 @@ namespace rsgis{namespace rastergis{
                 
                 if((*iterBands)->calcMedian)
                 {
-                    cout << "WARNING: Cannot calculate median value (" << (*iterBands)->medianField << ") when processing within attribute table\n";
+                    std::cout << "WARNING: Cannot calculate median value (" << (*iterBands)->medianField << ") when processing within attribute table\n";
                 }                
             }
             
@@ -841,19 +841,19 @@ namespace rsgis{namespace rastergis{
                 int feedback = attTable->getSize()/10;
                 int feedbackCounter = 0;
                 double pxlCount = 0;
-                cout << "Started (Calc Mean): " << flush;
+                std::cout << "Started (Calc Mean): " << std::flush;
                 // Calculate Statistics for each feature.
                 for(unsigned long long i  = 0; i < attTable->getSize(); ++i)
                 {
                     if((i % feedback) == 0)
                     {
-                        cout << "." << feedbackCounter << "." << flush;
+                        std::cout << "." << feedbackCounter << "." << std::flush;
                         feedbackCounter = feedbackCounter + 10;
                     }
                     
                     feat = attTable->getFeature(i);
                     pxlCount = feat->intFields->at(pxlCountIdx);
-                    for(vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
+                    for(std::vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
                     {   
                         if((*iterBands)->calcMean)
                         {
@@ -862,7 +862,7 @@ namespace rsgis{namespace rastergis{
                     }
                     
                 }
-                cout << " Complete.\n";
+                std::cout << " Complete.\n";
                 
                 if(stdDevCalc)
                 {
@@ -875,19 +875,19 @@ namespace rsgis{namespace rastergis{
                     delete calcAttStats;
                     
                     feedbackCounter = 0;
-                    cout << "Started (Calc StdDev): " << flush;
+                    std::cout << "Started (Calc StdDev): " << std::flush;
                     // Calculate Statistics for each feature.
                     for(unsigned long long i  = 0; i < attTable->getSize(); ++i)
                     {
                         if((i % feedback) == 0)
                         {
-                            cout << "." << feedbackCounter << "." << flush;
+                            std::cout << "." << feedbackCounter << "." << std::flush;
                             feedbackCounter = feedbackCounter + 10;
                         }
                         
                         feat = attTable->getFeature(i);
                         pxlCount = feat->intFields->at(pxlCountIdx);
-                        for(vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
+                        for(std::vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
                         {   
                             if((*iterBands)->calcStdDev)
                             {
@@ -896,7 +896,7 @@ namespace rsgis{namespace rastergis{
                         }
                         
                     }
-                    cout << " Complete.\n";
+                    std::cout << " Complete.\n";
                 }
             }            
         } 
@@ -923,7 +923,7 @@ namespace rsgis{namespace rastergis{
         
     }
     
-    void RSGISPopulateAttributeTableBandThresholdedStats::populateWithBandStatisticsWithinAtt(RSGISAttributeTable *attTable, GDALDataset **datasets, int numDatasets, vector<RSGISBandAttStats*> *bandStats) throw(rsgis::img::RSGISImageCalcException, RSGISAttributeTableException)
+    void RSGISPopulateAttributeTableBandThresholdedStats::populateWithBandStatisticsWithinAtt(RSGISAttributeTable *attTable, GDALDataset **datasets, int numDatasets, std::vector<RSGISBandAttStats*> *bandStats) throw(rsgis::img::RSGISImageCalcException, RSGISAttributeTableException)
     {
         if(numDatasets != 2)
         {
@@ -954,7 +954,7 @@ namespace rsgis{namespace rastergis{
                         
             bool meanCalc = false;
             bool stdDevCalc = false;
-            for(vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
+            for(std::vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
             {
                 if((*iterBands)->band == 0)
                 {
@@ -971,7 +971,7 @@ namespace rsgis{namespace rastergis{
                     {
                         throw RSGISAttributeTableException("Count field must be of type int.");
                     }
-                    cerr << "Warning. Reusing field \'" << (*iterBands)->countField << "\'\n";
+                    std::cerr << "Warning. Reusing field \'" << (*iterBands)->countField << "\'\n";
                 }
                 else
                 {
@@ -987,7 +987,7 @@ namespace rsgis{namespace rastergis{
                         {
                             throw RSGISAttributeTableException("All outputs must be of type float.");
                         }
-                        cerr << "Warning. Reusing field \'" << (*iterBands)->minField << "\'\n";
+                        std::cerr << "Warning. Reusing field \'" << (*iterBands)->minField << "\'\n";
                     }
                     else
                     {
@@ -1004,7 +1004,7 @@ namespace rsgis{namespace rastergis{
                         {
                             throw RSGISAttributeTableException("All outputs must be of type float.");
                         }
-                        cerr << "Warning. Reusing field \'" << (*iterBands)->maxField << "\'\n";
+                        std::cerr << "Warning. Reusing field \'" << (*iterBands)->maxField << "\'\n";
                     }
                     else
                     {
@@ -1022,7 +1022,7 @@ namespace rsgis{namespace rastergis{
                         {
                             throw RSGISAttributeTableException("All outputs must be of type float.");
                         }
-                        cerr << "Warning. Reusing field \'" << (*iterBands)->meanField << "\'\n";
+                        std::cerr << "Warning. Reusing field \'" << (*iterBands)->meanField << "\'\n";
                     }
                     else
                     {
@@ -1039,7 +1039,7 @@ namespace rsgis{namespace rastergis{
                         {
                             throw RSGISAttributeTableException("All outputs must be of type float.");
                         }
-                        cerr << "Warning. Reusing field \'" << (*iterBands)->sumField << "\'\n";
+                        std::cerr << "Warning. Reusing field \'" << (*iterBands)->sumField << "\'\n";
                     }
                     else
                     {
@@ -1057,7 +1057,7 @@ namespace rsgis{namespace rastergis{
                         {
                             throw RSGISAttributeTableException("All outputs must be of type float.");
                         }
-                        cerr << "Warning. Reusing field \'" << (*iterBands)->stdDevField << "\'\n";
+                        std::cerr << "Warning. Reusing field \'" << (*iterBands)->stdDevField << "\'\n";
                     }
                     else
                     {
@@ -1068,7 +1068,7 @@ namespace rsgis{namespace rastergis{
                 
                 if((*iterBands)->calcMedian)
                 {
-                    cout << "WARNING: Cannot calculate median value (" << (*iterBands)->medianField << ") when processing within attribute table\n";
+                    std::cout << "WARNING: Cannot calculate median value (" << (*iterBands)->medianField << ") when processing within attribute table\n";
                 }                
             }
                         
@@ -1086,7 +1086,7 @@ namespace rsgis{namespace rastergis{
                 int feedback = attTable->getSize()/10;
                 int feedbackCounter = 0;
                 double pxlCount = 0;
-                cout << "Started (Calc Mean): " << flush;
+                std::cout << "Started (Calc Mean): " << std::flush;
                 // Calculate Statistics for each feature.
                 //for(unsigned long long i  = 0; i < attTable->getSize(); ++i)
                 size_t i = 0;
@@ -1094,12 +1094,12 @@ namespace rsgis{namespace rastergis{
                 {
                     if((i % feedback) == 0)
                     {
-                        cout << "." << feedbackCounter << "." << flush;
+                        std::cout << "." << feedbackCounter << "." << std::flush;
                         feedbackCounter = feedbackCounter + 10;
                     }
                     
                     feat = *(*attTable);
-                    for(vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
+                    for(std::vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
                     {   
                         if((*iterBands)->calcMean)
                         {
@@ -1116,7 +1116,7 @@ namespace rsgis{namespace rastergis{
                     }
                     ++i;
                 }
-                cout << " Complete.\n";
+                std::cout << " Complete.\n";
                 
                 if(stdDevCalc)
                 {
@@ -1129,7 +1129,7 @@ namespace rsgis{namespace rastergis{
                     delete calcAttStats;
                     
                     feedbackCounter = 0;
-                    cout << "Started (Calc StdDev): " << flush;
+                    std::cout << "Started (Calc StdDev): " << std::flush;
                     // Calculate Statistics for each feature.
                     //for(unsigned long long i  = 0; i < attTable->getSize(); ++i)
                     size_t i = 0;
@@ -1137,12 +1137,12 @@ namespace rsgis{namespace rastergis{
                     {
                         if((i % feedback) == 0)
                         {
-                            cout << "." << feedbackCounter << "." << flush;
+                            std::cout << "." << feedbackCounter << "." << std::flush;
                             feedbackCounter = feedbackCounter + 10;
                         }
                         
                         feat = *(*attTable);
-                        for(vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
+                        for(std::vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
                         {   
                             if((*iterBands)->calcStdDev)
                             {
@@ -1159,7 +1159,7 @@ namespace rsgis{namespace rastergis{
                         }
                         ++i;
                     }
-                    cout << " Complete.\n";
+                    std::cout << " Complete.\n";
                 }
             }            
         } 
@@ -1175,7 +1175,7 @@ namespace rsgis{namespace rastergis{
         {
             throw rsgis::img::RSGISImageCalcException(e.what());
         }
-        catch (exception &e) 
+        catch (std::exception &e) 
         {
             throw rsgis::img::RSGISImageCalcException(e.what());
         }
@@ -1196,7 +1196,7 @@ namespace rsgis{namespace rastergis{
         
     }
     
-    void RSGISPopulateAttributeTableBandStatsMeanLit::populateWithBandStatisticsInMem(RSGISAttributeTable *attTable, GDALDataset **datasets, int numDatasets, vector<RSGISBandAttStats*> *bandStats, unsigned int meanLitBand, std::string meanLitField, bool useMeanLitValAbove) throw(rsgis::img::RSGISImageCalcException, RSGISAttributeTableException)
+    void RSGISPopulateAttributeTableBandStatsMeanLit::populateWithBandStatisticsInMem(RSGISAttributeTable *attTable, GDALDataset **datasets, int numDatasets, std::vector<RSGISBandAttStats*> *bandStats, unsigned int meanLitBand, std::string meanLitField, bool useMeanLitValAbove) throw(rsgis::img::RSGISImageCalcException, RSGISAttributeTableException)
     {
         if(numDatasets != 3)
         {
@@ -1247,11 +1247,11 @@ namespace rsgis{namespace rastergis{
             
             if(!usePxlCount)
             {
-                cerr << "Warning: \'pxlcount\' field is not available\n";
+                std::cerr << "Warning: \'pxlcount\' field is not available\n";
             }
             
             unsigned int bandCount = 0;
-            for(vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
+            for(std::vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
             {
                 if((*iterBands)->band == 0)
                 {
@@ -1272,7 +1272,7 @@ namespace rsgis{namespace rastergis{
                         {
                             throw RSGISAttributeTableException("All outputs must be of type float.");
                         }
-                        cerr << "Warning. Reusing field \'" << (*iterBands)->minField << "\'\n";
+                        std::cerr << "Warning. Reusing field \'" << (*iterBands)->minField << "\'\n";
                     }
                     else
                     {
@@ -1289,7 +1289,7 @@ namespace rsgis{namespace rastergis{
                         {
                             throw RSGISAttributeTableException("All outputs must be of type float.");
                         }
-                        cerr << "Warning. Reusing field \'" << (*iterBands)->maxField << "\'\n";
+                        std::cerr << "Warning. Reusing field \'" << (*iterBands)->maxField << "\'\n";
                     }
                     else
                     {
@@ -1306,7 +1306,7 @@ namespace rsgis{namespace rastergis{
                         {
                             throw RSGISAttributeTableException("All outputs must be of type float.");
                         }
-                        cerr << "Warning. Reusing field \'" << (*iterBands)->meanField << "\'\n";
+                        std::cerr << "Warning. Reusing field \'" << (*iterBands)->meanField << "\'\n";
                     }
                     else
                     {
@@ -1323,7 +1323,7 @@ namespace rsgis{namespace rastergis{
                         {
                             throw RSGISAttributeTableException("All outputs must be of type float.");
                         }
-                        cerr << "Warning. Reusing field \'" << (*iterBands)->sumField << "\'\n";
+                        std::cerr << "Warning. Reusing field \'" << (*iterBands)->sumField << "\'\n";
                     }
                     else
                     {
@@ -1340,7 +1340,7 @@ namespace rsgis{namespace rastergis{
                         {
                             throw RSGISAttributeTableException("All outputs must be of type float.");
                         }
-                        cerr << "Warning. Reusing field \'" << (*iterBands)->stdDevField << "\'\n";
+                        std::cerr << "Warning. Reusing field \'" << (*iterBands)->stdDevField << "\'\n";
                     }
                     else
                     {
@@ -1357,7 +1357,7 @@ namespace rsgis{namespace rastergis{
                         {
                             throw RSGISAttributeTableException("All outputs must be of type float.");
                         }
-                        cerr << "Warning. Reusing field \'" << (*iterBands)->medianField << "\'\n";
+                        std::cerr << "Warning. Reusing field \'" << (*iterBands)->medianField << "\'\n";
                     }
                     else
                     {
@@ -1368,10 +1368,10 @@ namespace rsgis{namespace rastergis{
             }
             
             RSGISFeature *feat;
-            vector<vector<double> > **clumpData = new vector<vector<double> >*[numDataBands];
+            std::vector<std::vector<double> > **clumpData = new std::vector<std::vector<double> >*[numDataBands];
             for(unsigned int n = 0; n < numDataBands; ++n)
             {
-                clumpData[n] = new vector<vector<double> >();
+                clumpData[n] = new std::vector<std::vector<double> >();
                 clumpData[n]->reserve(attTable->getSize());
             }
             
@@ -1380,7 +1380,7 @@ namespace rsgis{namespace rastergis{
                 feat = attTable->getFeature(i);
                 for(unsigned int n = 0; n < numDataBands; ++n)
                 {
-                    clumpData[n]->push_back(vector<double>());
+                    clumpData[n]->push_back(std::vector<double>());
                     if(usePxlCount)
                     {
                         clumpData[n]->at(i).reserve(feat->intFields->at(pxlCountIdx));
@@ -1403,20 +1403,20 @@ namespace rsgis{namespace rastergis{
             
             int feedback = attTable->getSize()/10;
 			int feedbackCounter = 0;
-			cout << "Started" << flush;
+			std::cout << "Started" << std::flush;
             // Calculate Statistics for each feature.
             for(unsigned long long i  = 0; i < attTable->getSize(); ++i)
             {
                 if((i % feedback) == 0)
 				{
-					cout << ".." << feedbackCounter << ".." << flush;
+					std::cout << ".." << feedbackCounter << ".." << std::flush;
 					feedbackCounter = feedbackCounter + 10;
 				}
                 
                 feat = attTable->getFeature(i);
                 
                 bandCount = 0;
-                for(vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
+                for(std::vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
                 {   
                     if((*iterBands)->calcMin & (*iterBands)->calcMax)
                     {
@@ -1456,7 +1456,7 @@ namespace rsgis{namespace rastergis{
                     if((*iterBands)->calcSum)
                     {
                         sum = 0;
-                        for(vector<double>::iterator iterVals = clumpData[bandCount]->at(i).begin(); iterVals != clumpData[bandCount]->at(i).end(); ++iterVals)
+                        for(std::vector<double>::iterator iterVals = clumpData[bandCount]->at(i).begin(); iterVals != clumpData[bandCount]->at(i).end(); ++iterVals)
                         {
                             sum += *iterVals;
                         }
@@ -1474,7 +1474,7 @@ namespace rsgis{namespace rastergis{
                 }
                 
             }
-            cout << " Complete.\n";
+            std::cout << " Complete.\n";
             
             delete[] dataBandIdxs;
             for(unsigned int n = 0; n < numDataBands; ++n)
@@ -1493,7 +1493,7 @@ namespace rsgis{namespace rastergis{
         }
     }
     
-    void RSGISPopulateAttributeTableBandStatsMeanLit::populateWithBandStatisticsWithinAtt(RSGISAttributeTable *attTable, GDALDataset **datasets, int numDatasets, vector<RSGISBandAttStats*> *bandStats, unsigned int meanLitBand, std::string meanLitField, bool useMeanLitValAbove) throw(rsgis::img::RSGISImageCalcException, RSGISAttributeTableException)
+    void RSGISPopulateAttributeTableBandStatsMeanLit::populateWithBandStatisticsWithinAtt(RSGISAttributeTable *attTable, GDALDataset **datasets, int numDatasets, std::vector<RSGISBandAttStats*> *bandStats, unsigned int meanLitBand, std::string meanLitField, bool useMeanLitValAbove) throw(rsgis::img::RSGISImageCalcException, RSGISAttributeTableException)
     {
         if(numDatasets != 3)
         {
@@ -1550,7 +1550,7 @@ namespace rsgis{namespace rastergis{
                         
             bool meanCalc = false;
             bool stdDevCalc = false;
-            for(vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
+            for(std::vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
             {
                 if((*iterBands)->band == 0)
                 {
@@ -1569,7 +1569,7 @@ namespace rsgis{namespace rastergis{
                         {
                             throw RSGISAttributeTableException("All outputs must be of type float.");
                         }
-                        cerr << "Warning. Reusing field \'" << (*iterBands)->minField << "\'\n";
+                        std::cerr << "Warning. Reusing field \'" << (*iterBands)->minField << "\'\n";
                     }
                     else
                     {
@@ -1586,7 +1586,7 @@ namespace rsgis{namespace rastergis{
                         {
                             throw RSGISAttributeTableException("All outputs must be of type float.");
                         }
-                        cerr << "Warning. Reusing field \'" << (*iterBands)->maxField << "\'\n";
+                        std::cerr << "Warning. Reusing field \'" << (*iterBands)->maxField << "\'\n";
                     }
                     else
                     {
@@ -1604,7 +1604,7 @@ namespace rsgis{namespace rastergis{
                         {
                             throw RSGISAttributeTableException("All outputs must be of type float.");
                         }
-                        cerr << "Warning. Reusing field \'" << (*iterBands)->meanField << "\'\n";
+                        std::cerr << "Warning. Reusing field \'" << (*iterBands)->meanField << "\'\n";
                     }
                     else
                     {
@@ -1621,7 +1621,7 @@ namespace rsgis{namespace rastergis{
                         {
                             throw RSGISAttributeTableException("All outputs must be of type float.");
                         }
-                        cerr << "Warning. Reusing field \'" << (*iterBands)->sumField << "\'\n";
+                        std::cerr << "Warning. Reusing field \'" << (*iterBands)->sumField << "\'\n";
                     }
                     else
                     {
@@ -1639,7 +1639,7 @@ namespace rsgis{namespace rastergis{
                         {
                             throw RSGISAttributeTableException("All outputs must be of type float.");
                         }
-                        cerr << "Warning. Reusing field \'" << (*iterBands)->stdDevField << "\'\n";
+                        std::cerr << "Warning. Reusing field \'" << (*iterBands)->stdDevField << "\'\n";
                     }
                     else
                     {
@@ -1650,7 +1650,7 @@ namespace rsgis{namespace rastergis{
                 
                 if((*iterBands)->calcMedian)
                 {
-                    cout << "WARNING: Cannot calculate median value (" << (*iterBands)->medianField << ") when processing within attribute table\n";
+                    std::cout << "WARNING: Cannot calculate median value (" << (*iterBands)->medianField << ") when processing within attribute table\n";
                 }
             }
             
@@ -1668,19 +1668,19 @@ namespace rsgis{namespace rastergis{
                 int feedback = attTable->getSize()/10;
                 int feedbackCounter = 0;
                 double pxlCount = 0;
-                cout << "Started (Calc Mean): " << flush;
+                std::cout << "Started (Calc Mean): " << std::flush;
                 // Calculate Statistics for each feature.
                 for(unsigned long long i  = 0; i < attTable->getSize(); ++i)
                 {
                     if((i % feedback) == 0)
                     {
-                        cout << "." << feedbackCounter << "." << flush;
+                        std::cout << "." << feedbackCounter << "." << std::flush;
                         feedbackCounter = feedbackCounter + 10;
                     }
                     
                     feat = attTable->getFeature(i);
                     pxlCount = feat->intFields->at(pxlCountIdx);
-                    for(vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
+                    for(std::vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
                     {   
                         if((*iterBands)->calcMean)
                         {
@@ -1689,7 +1689,7 @@ namespace rsgis{namespace rastergis{
                     }
                     
                 }
-                cout << " Complete.\n";
+                std::cout << " Complete.\n";
                 
                 if(stdDevCalc)
                 {
@@ -1702,19 +1702,19 @@ namespace rsgis{namespace rastergis{
                     delete calcAttStats;
                     
                     feedbackCounter = 0;
-                    cout << "Started (Calc StdDev): " << flush;
+                    std::cout << "Started (Calc StdDev): " << std::flush;
                     // Calculate Statistics for each feature.
                     for(unsigned long long i  = 0; i < attTable->getSize(); ++i)
                     {
                         if((i % feedback) == 0)
                         {
-                            cout << "." << feedbackCounter << "." << flush;
+                            std::cout << "." << feedbackCounter << "." << std::flush;
                             feedbackCounter = feedbackCounter + 10;
                         }
                         
                         feat = attTable->getFeature(i);
                         pxlCount = feat->intFields->at(pxlCountIdx);
-                        for(vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
+                        for(std::vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
                         {   
                             if((*iterBands)->calcStdDev)
                             {
@@ -1723,7 +1723,7 @@ namespace rsgis{namespace rastergis{
                         }
                         
                     }
-                    cout << " Complete.\n";
+                    std::cout << " Complete.\n";
                 }
             } 
             
@@ -1751,7 +1751,7 @@ namespace rsgis{namespace rastergis{
         
     }
     
-    void RSGISPopulateAttributeTableBandStatsMeanLitBands::populateWithBandStatisticsInMem(RSGISAttributeTable *attTable, GDALDataset **datasets, int numDatasets, vector<RSGISBandAttStatsMeanLit*> *bandStats) throw(rsgis::img::RSGISImageCalcException, RSGISAttributeTableException)
+    void RSGISPopulateAttributeTableBandStatsMeanLitBands::populateWithBandStatisticsInMem(RSGISAttributeTable *attTable, GDALDataset **datasets, int numDatasets, std::vector<RSGISBandAttStatsMeanLit*> *bandStats) throw(rsgis::img::RSGISImageCalcException, RSGISAttributeTableException)
     {
         if(numDatasets != 2)
         {
@@ -1786,11 +1786,11 @@ namespace rsgis{namespace rastergis{
             
             if(!usePxlCount)
             {
-                cerr << "Warning: \'pxlcount\' field is not available\n";
+                std::cerr << "Warning: \'pxlcount\' field is not available\n";
             }
             
             unsigned int bandCount = 0;
-            for(vector<RSGISBandAttStatsMeanLit*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
+            for(std::vector<RSGISBandAttStatsMeanLit*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
             {
                 if((*iterBands)->band == 0)
                 {
@@ -1822,7 +1822,7 @@ namespace rsgis{namespace rastergis{
                         {
                             throw RSGISAttributeTableException("All outputs must be of type float.");
                         }
-                        cerr << "Warning. Reusing field \'" << (*iterBands)->minField << "\'\n";
+                        std::cerr << "Warning. Reusing field \'" << (*iterBands)->minField << "\'\n";
                     }
                     else
                     {
@@ -1839,7 +1839,7 @@ namespace rsgis{namespace rastergis{
                         {
                             throw RSGISAttributeTableException("All outputs must be of type float.");
                         }
-                        cerr << "Warning. Reusing field \'" << (*iterBands)->maxField << "\'\n";
+                        std::cerr << "Warning. Reusing field \'" << (*iterBands)->maxField << "\'\n";
                     }
                     else
                     {
@@ -1856,7 +1856,7 @@ namespace rsgis{namespace rastergis{
                         {
                             throw RSGISAttributeTableException("All outputs must be of type float.");
                         }
-                        cerr << "Warning. Reusing field \'" << (*iterBands)->meanField << "\'\n";
+                        std::cerr << "Warning. Reusing field \'" << (*iterBands)->meanField << "\'\n";
                     }
                     else
                     {
@@ -1873,7 +1873,7 @@ namespace rsgis{namespace rastergis{
                         {
                             throw RSGISAttributeTableException("All outputs must be of type float.");
                         }
-                        cerr << "Warning. Reusing field \'" << (*iterBands)->sumField << "\'\n";
+                        std::cerr << "Warning. Reusing field \'" << (*iterBands)->sumField << "\'\n";
                     }
                     else
                     {
@@ -1890,7 +1890,7 @@ namespace rsgis{namespace rastergis{
                         {
                             throw RSGISAttributeTableException("All outputs must be of type float.");
                         }
-                        cerr << "Warning. Reusing field \'" << (*iterBands)->stdDevField << "\'\n";
+                        std::cerr << "Warning. Reusing field \'" << (*iterBands)->stdDevField << "\'\n";
                     }
                     else
                     {
@@ -1907,7 +1907,7 @@ namespace rsgis{namespace rastergis{
                         {
                             throw RSGISAttributeTableException("All outputs must be of type float.");
                         }
-                        cerr << "Warning. Reusing field \'" << (*iterBands)->medianField << "\'\n";
+                        std::cerr << "Warning. Reusing field \'" << (*iterBands)->medianField << "\'\n";
                     }
                     else
                     {
@@ -1918,10 +1918,10 @@ namespace rsgis{namespace rastergis{
             }
             
             RSGISFeature *feat;
-            vector<vector<double> > **clumpData = new vector<vector<double> >*[numDataBands];
+            std::vector<std::vector<double> > **clumpData = new std::vector<std::vector<double> >*[numDataBands];
             for(unsigned int n = 0; n < numDataBands; ++n)
             {
-                clumpData[n] = new vector<vector<double> >();
+                clumpData[n] = new std::vector<std::vector<double> >();
                 clumpData[n]->reserve(attTable->getSize());
             }
             
@@ -1930,7 +1930,7 @@ namespace rsgis{namespace rastergis{
                 feat = attTable->getFeature(i);
                 for(unsigned int n = 0; n < numDataBands; ++n)
                 {
-                    clumpData[n]->push_back(vector<double>());
+                    clumpData[n]->push_back(std::vector<double>());
                     if(usePxlCount)
                     {
                         clumpData[n]->at(i).reserve(feat->intFields->at(pxlCountIdx));
@@ -1954,20 +1954,20 @@ namespace rsgis{namespace rastergis{
             
             int feedback = attTable->getSize()/10;
 			int feedbackCounter = 0;
-			cout << "Started" << flush;
+			std::cout << "Started" << std::flush;
             // Calculate Statistics for each feature.
             for(unsigned long long i  = 0; i < attTable->getSize(); ++i)
             {
                 if((i % feedback) == 0)
 				{
-					cout << ".." << feedbackCounter << ".." << flush;
+					std::cout << ".." << feedbackCounter << ".." << std::flush;
 					feedbackCounter = feedbackCounter + 10;
 				}
                 
                 feat = attTable->getFeature(i);
                 
                 bandCount = 0;
-                for(vector<RSGISBandAttStatsMeanLit*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
+                for(std::vector<RSGISBandAttStatsMeanLit*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
                 {   
                     
                     if((*iterBands)->fieldDT == rsgis_int)
@@ -1983,7 +1983,7 @@ namespace rsgis{namespace rastergis{
                         throw rsgis::img::RSGISImageCalcException("Threshold values must come from either an integer or floating point field.");
                     }
                     
-                    for(vector<double>::iterator iterVals = clumpData[bandCount]->at(i).begin(); iterVals != clumpData[bandCount]->at(i).end(); )
+                    for(std::vector<double>::iterator iterVals = clumpData[bandCount]->at(i).begin(); iterVals != clumpData[bandCount]->at(i).end(); )
                     {
                         if((*iterBands)->useUpperVals)
                         {
@@ -2048,7 +2048,7 @@ namespace rsgis{namespace rastergis{
                     if((*iterBands)->calcSum)
                     {
                         sum = 0;
-                        for(vector<double>::iterator iterVals = clumpData[bandCount]->at(i).begin(); iterVals != clumpData[bandCount]->at(i).end(); ++iterVals)
+                        for(std::vector<double>::iterator iterVals = clumpData[bandCount]->at(i).begin(); iterVals != clumpData[bandCount]->at(i).end(); ++iterVals)
                         {
                             sum += *iterVals;
                         }
@@ -2066,7 +2066,7 @@ namespace rsgis{namespace rastergis{
                 }
                 
             }
-            cout << " Complete.\n";
+            std::cout << " Complete.\n";
             
             delete[] dataBandIdxs;
             for(unsigned int n = 0; n < numDataBands; ++n)
@@ -2091,7 +2091,7 @@ namespace rsgis{namespace rastergis{
     }
 
     
-    RSGISGetPixelValuesForClumps::RSGISGetPixelValuesForClumps(vector<vector<double> > **clumpData, unsigned int numDataBands, unsigned int *dataBandIdxs):rsgis::img::RSGISCalcImageValue(0)
+    RSGISGetPixelValuesForClumps::RSGISGetPixelValuesForClumps(std::vector<std::vector<double> > **clumpData, unsigned int numDataBands, unsigned int *dataBandIdxs):rsgis::img::RSGISCalcImageValue(0)
     {
         this->clumpData = clumpData;
         this->numDataBands = numDataBands;
@@ -2137,7 +2137,7 @@ namespace rsgis{namespace rastergis{
             }
             catch(RSGISAttributeTableException &e)
             {
-                cout << "clumpIdx = " << clumpIdx << endl;
+                std::cout << "clumpIdx = " << clumpIdx << std::endl;
                 throw rsgis::img::RSGISImageCalcException(e.what());
             }
         } 
@@ -2149,7 +2149,7 @@ namespace rsgis{namespace rastergis{
     }
     
     
-    RSGISCalcClumpStatsWithinAtt::RSGISCalcClumpStatsWithinAtt(RSGISAttributeTable *attTable, vector<RSGISBandAttStats*> *bandStats, bool calcStdDev, unsigned int pxlCountIdx, unsigned int firstFieldIdx):rsgis::img::RSGISCalcImageValue(0)
+    RSGISCalcClumpStatsWithinAtt::RSGISCalcClumpStatsWithinAtt(RSGISAttributeTable *attTable, std::vector<RSGISBandAttStats*> *bandStats, bool calcStdDev, unsigned int pxlCountIdx, unsigned int firstFieldIdx):rsgis::img::RSGISCalcImageValue(0)
     {
         this->attTable = attTable;
         this->bandStats = bandStats;
@@ -2182,7 +2182,7 @@ namespace rsgis{namespace rastergis{
                 if(feat->boolFields->at(firstFieldIdx))
                 {
                     bool nanPresent = false;
-                    for(vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
+                    for(std::vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
                     {
                         if(boost::math::isnan(bandValues[(*iterBands)->band]))
                         {
@@ -2193,7 +2193,7 @@ namespace rsgis{namespace rastergis{
                     if(!nanPresent)
                     {
                         feat->intFields->at(pxlCountIdx) = 1;
-                        for(vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
+                        for(std::vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
                         {
                             bandVal = bandValues[(*iterBands)->band];
                             if(this->calcStdDev)
@@ -2230,7 +2230,7 @@ namespace rsgis{namespace rastergis{
                 else
                 {
                     bool nanPresent = false;
-                    for(vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
+                    for(std::vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
                     {
                         if(boost::math::isnan(bandValues[(*iterBands)->band]))
                         {
@@ -2242,7 +2242,7 @@ namespace rsgis{namespace rastergis{
                     {
                         feat->intFields->at(pxlCountIdx) += 1;
                         
-                        for(vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
+                        for(std::vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
                         {
                             bandVal = bandValues[(*iterBands)->band];
                             if(this->calcStdDev)
@@ -2283,7 +2283,7 @@ namespace rsgis{namespace rastergis{
             }
             catch(RSGISAttributeTableException &e)
             {
-                cout << "clumpIdx = " << clumpIdx << endl;
+                std::cout << "clumpIdx = " << clumpIdx << std::endl;
                 throw rsgis::img::RSGISImageCalcException(e.what());
             }
         } 
@@ -2296,7 +2296,7 @@ namespace rsgis{namespace rastergis{
     
     
     
-    RSGISCalcClumpThresholdedStatsWithinAtt::RSGISCalcClumpThresholdedStatsWithinAtt(RSGISAttributeTable *attTable, vector<RSGISBandAttStats*> *bandStats, bool calcStdDev, unsigned int firstFieldIdx):rsgis::img::RSGISCalcImageValue(0)
+    RSGISCalcClumpThresholdedStatsWithinAtt::RSGISCalcClumpThresholdedStatsWithinAtt(RSGISAttributeTable *attTable, std::vector<RSGISBandAttStats*> *bandStats, bool calcStdDev, unsigned int firstFieldIdx):rsgis::img::RSGISCalcImageValue(0)
     {
         this->attTable = attTable;
         this->bandStats = bandStats;
@@ -2327,7 +2327,7 @@ namespace rsgis{namespace rastergis{
                 RSGISFeature *feat = attTable->getFeature(clumpIdx);
                 if(feat->boolFields->at(firstFieldIdx))
                 {
-                    for(vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
+                    for(std::vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
                     {
                         bandVal = bandValues[(*iterBands)->band];
                         if((!boost::math::isnan(bandVal)) && (bandVal > (*iterBands)->threshold))
@@ -2367,7 +2367,7 @@ namespace rsgis{namespace rastergis{
                 }
                 else
                 {
-                    for(vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
+                    for(std::vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
                     {
                         bandVal = bandValues[(*iterBands)->band];
                         if((!boost::math::isnan(bandVal)) && (bandVal > (*iterBands)->threshold))
@@ -2412,7 +2412,7 @@ namespace rsgis{namespace rastergis{
             }
             catch(RSGISAttributeTableException &e)
             {
-                cout << "clumpIdx = " << clumpIdx << endl;
+                std::cout << "clumpIdx = " << clumpIdx << std::endl;
                 throw rsgis::img::RSGISImageCalcException(e.what());
             }
         } 
@@ -2426,7 +2426,7 @@ namespace rsgis{namespace rastergis{
     
     
     
-    RSGISGetPixelValuesForClumpsMeanLit::RSGISGetPixelValuesForClumpsMeanLit(RSGISAttributeTable *attTable, vector<vector<double> > **clumpData, unsigned int numDataBands, unsigned int *dataBandIdxs, unsigned int meanLitBand, unsigned int meanLitFieldIdx, RSGISAttributeDataType meanLitFieldDT, bool useMeanLitValAbove):rsgis::img::RSGISCalcImageValue(0)
+    RSGISGetPixelValuesForClumpsMeanLit::RSGISGetPixelValuesForClumpsMeanLit(RSGISAttributeTable *attTable, std::vector<std::vector<double> > **clumpData, unsigned int numDataBands, unsigned int *dataBandIdxs, unsigned int meanLitBand, unsigned int meanLitFieldIdx, RSGISAttributeDataType meanLitFieldDT, bool useMeanLitValAbove):rsgis::img::RSGISCalcImageValue(0)
     {
         this->attTable = attTable;
         this->clumpData = clumpData;
@@ -2505,7 +2505,7 @@ namespace rsgis{namespace rastergis{
             }
             catch(RSGISAttributeTableException &e)
             {
-                cout << "clumpIdx = " << clumpIdx << endl;
+                std::cout << "clumpIdx = " << clumpIdx << std::endl;
                 throw rsgis::img::RSGISImageCalcException(e.what());
             }
         } 
@@ -2516,7 +2516,7 @@ namespace rsgis{namespace rastergis{
         
     }
     
-    RSGISClumpsMeanLitStatsWithinAtt::RSGISClumpsMeanLitStatsWithinAtt(RSGISAttributeTable *attTable, vector<RSGISBandAttStats*> *bandStats, bool calcStdDev, unsigned int pxlCountIdx, unsigned int firstFieldIdx, unsigned int meanLitBand, unsigned int meanLitFieldIdx, RSGISAttributeDataType meanLitFieldDT, bool useMeanLitValAbove):rsgis::img::RSGISCalcImageValue(0)
+    RSGISClumpsMeanLitStatsWithinAtt::RSGISClumpsMeanLitStatsWithinAtt(RSGISAttributeTable *attTable, std::vector<RSGISBandAttStats*> *bandStats, bool calcStdDev, unsigned int pxlCountIdx, unsigned int firstFieldIdx, unsigned int meanLitBand, unsigned int meanLitFieldIdx, RSGISAttributeDataType meanLitFieldDT, bool useMeanLitValAbove):rsgis::img::RSGISCalcImageValue(0)
     {
         this->attTable = attTable;
         this->bandStats = bandStats;
@@ -2581,7 +2581,7 @@ namespace rsgis{namespace rastergis{
                     if(feat->boolFields->at(firstFieldIdx))
                     {
                         bool nanPresent = false;
-                        for(vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
+                        for(std::vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
                         {
                             if(boost::math::isnan(bandValues[(*iterBands)->band]))
                             {
@@ -2592,7 +2592,7 @@ namespace rsgis{namespace rastergis{
                         if(!nanPresent)
                         {
                             feat->intFields->at(pxlCountIdx) = 1;
-                            for(vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
+                            for(std::vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
                             {
                                 bandVal = bandValues[(*iterBands)->band];
                                 if(this->calcStdDev)
@@ -2629,7 +2629,7 @@ namespace rsgis{namespace rastergis{
                     else
                     {
                         bool nanPresent = false;
-                        for(vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
+                        for(std::vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
                         {
                             if(boost::math::isnan(bandValues[(*iterBands)->band]))
                             {
@@ -2641,7 +2641,7 @@ namespace rsgis{namespace rastergis{
                         {
                             feat->intFields->at(pxlCountIdx) += 1;
                             
-                            for(vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
+                            for(std::vector<RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
                             {
                                 bandVal = bandValues[(*iterBands)->band];
                                 if(this->calcStdDev)
@@ -2683,7 +2683,7 @@ namespace rsgis{namespace rastergis{
             }
             catch(RSGISAttributeTableException &e)
             {
-                cout << "clumpIdx = " << clumpIdx << endl;
+                std::cout << "clumpIdx = " << clumpIdx << std::endl;
                 throw rsgis::img::RSGISImageCalcException(e.what());
             }
         } 
@@ -2729,7 +2729,7 @@ namespace rsgis{namespace rastergis{
             
             if(!usePxlCount)
             {
-                cerr << "Warning: \'pxlcount\' field is not available\n";
+                std::cerr << "Warning: \'pxlcount\' field is not available\n";
             }
             
             if(imageStats->calcMin)
@@ -2740,7 +2740,7 @@ namespace rsgis{namespace rastergis{
                     {
                         throw RSGISAttributeTableException("All outputs must be of type float.");
                     }
-                    cerr << "Warning. Reusing field \'" << imageStats->minField << "\'\n";
+                    std::cerr << "Warning. Reusing field \'" << imageStats->minField << "\'\n";
                 }
                 else
                 {
@@ -2757,7 +2757,7 @@ namespace rsgis{namespace rastergis{
                     {
                         throw RSGISAttributeTableException("All outputs must be of type float.");
                     }
-                    cerr << "Warning. Reusing field \'" << imageStats->maxField << "\'\n";
+                    std::cerr << "Warning. Reusing field \'" << imageStats->maxField << "\'\n";
                 }
                 else
                 {
@@ -2774,7 +2774,7 @@ namespace rsgis{namespace rastergis{
                     {
                         throw RSGISAttributeTableException("All outputs must be of type float.");
                     }
-                    cerr << "Warning. Reusing field \'" << imageStats->meanField << "\'\n";
+                    std::cerr << "Warning. Reusing field \'" << imageStats->meanField << "\'\n";
                 }
                 else
                 {
@@ -2791,7 +2791,7 @@ namespace rsgis{namespace rastergis{
                     {
                         throw RSGISAttributeTableException("All outputs must be of type float.");
                     }
-                    cerr << "Warning. Reusing field \'" << imageStats->sumField << "\'\n";
+                    std::cerr << "Warning. Reusing field \'" << imageStats->sumField << "\'\n";
                 }
                 else
                 {
@@ -2808,7 +2808,7 @@ namespace rsgis{namespace rastergis{
                     {
                         throw RSGISAttributeTableException("All outputs must be of type float.");
                     }
-                    cerr << "Warning. Reusing field \'" << imageStats->stdDevField << "\'\n";
+                    std::cerr << "Warning. Reusing field \'" << imageStats->stdDevField << "\'\n";
                 }
                 else
                 {
@@ -2825,7 +2825,7 @@ namespace rsgis{namespace rastergis{
                     {
                         throw RSGISAttributeTableException("All outputs must be of type float.");
                     }
-                    cerr << "Warning. Reusing field \'" << imageStats->medianField << "\'\n";
+                    std::cerr << "Warning. Reusing field \'" << imageStats->medianField << "\'\n";
                 }
                 else
                 {
@@ -2835,12 +2835,12 @@ namespace rsgis{namespace rastergis{
             } 
             
             RSGISFeature *feat;
-            vector<double> **clumpData = new vector<double>*[attTable->getSize()];
+            std::vector<double> **clumpData = new std::vector<double>*[attTable->getSize()];
             
             for(unsigned long long i  = 0; i < attTable->getSize(); ++i)
             {
                 feat = attTable->getFeature(i);
-                clumpData[i] = new vector<double>();
+                clumpData[i] = new std::vector<double>();
                 if(usePxlCount)
                 {
                     clumpData[i]->reserve(feat->intFields->at(pxlCountIdx)*numImageBands);
@@ -2867,18 +2867,18 @@ namespace rsgis{namespace rastergis{
             }
             int feedback = attTable->getSize()/10;
 			int feedbackCounter = 0;
-			cout << "Started" << flush;
+			std::cout << "Started" << std::flush;
             // Calculate Statistics for each feature.
             for(unsigned long long i  = 0; i < attTable->getSize(); ++i)
             {
                 if(showCountFeedback && (i % feedback) == 0)
 				{
-					cout << ".." << feedbackCounter << ".." << flush;
+					std::cout << ".." << feedbackCounter << ".." << std::flush;
 					feedbackCounter = feedbackCounter + 10;
 				}
                 else if(!showCountFeedback)
                 {
-                    cout << ".." << i << ".." << flush;
+                    std::cout << ".." << i << ".." << std::flush;
                 }
                 
                 feat = attTable->getFeature(i);
@@ -2921,7 +2921,7 @@ namespace rsgis{namespace rastergis{
                 if(imageStats->calcSum)
                 {
                     sum = 0;
-                    for(vector<double>::iterator iterVals = clumpData[i]->begin(); iterVals != clumpData[i]->end(); ++iterVals)
+                    for(std::vector<double>::iterator iterVals = clumpData[i]->begin(); iterVals != clumpData[i]->end(); ++iterVals)
                     {
                         sum += *iterVals;
                     }
@@ -2936,7 +2936,7 @@ namespace rsgis{namespace rastergis{
                 }
                 
             }
-            cout << " Complete.\n";
+            std::cout << " Complete.\n";
             
             for(unsigned int n = 0; n < attTable->getSize(); ++n)
             {
@@ -2961,7 +2961,7 @@ namespace rsgis{namespace rastergis{
     }
     
     
-    RSGISGetAllBandPixelValuesForClumps::RSGISGetAllBandPixelValuesForClumps(vector<double> **clumpData, float noDataVal, bool noDataValDefined):rsgis::img::RSGISCalcImageValue(0)
+    RSGISGetAllBandPixelValuesForClumps::RSGISGetAllBandPixelValuesForClumps(std::vector<double> **clumpData, float noDataVal, bool noDataValDefined):rsgis::img::RSGISCalcImageValue(0)
     {
         this->clumpData = clumpData;
         this->noDataVal = noDataVal;
@@ -3017,7 +3017,7 @@ namespace rsgis{namespace rastergis{
             }
             catch(RSGISAttributeTableException &e)
             {
-                cout << "clumpIdx = " << clumpIdx << endl;
+                std::cout << "clumpIdx = " << clumpIdx << std::endl;
                 throw rsgis::img::RSGISImageCalcException(e.what());
             }
         } 
@@ -3040,7 +3040,7 @@ namespace rsgis{namespace rastergis{
         
     }
     
-    void RSGISCalcAttTableWithinSegmentPixelDistStats::populateWithImageStatistics(RSGISAttributeTable *attTable, GDALDataset **datasets, int numDatasets, vector<RSGISBandAttName*> *bands, RSGISBandAttStats *imageStats) throw(rsgis::img::RSGISImageCalcException, RSGISAttributeTableException)
+    void RSGISCalcAttTableWithinSegmentPixelDistStats::populateWithImageStatistics(RSGISAttributeTable *attTable, GDALDataset **datasets, int numDatasets, std::vector<RSGISBandAttName*> *bands, RSGISBandAttStats *imageStats) throw(rsgis::img::RSGISImageCalcException, RSGISAttributeTableException)
     {
         if(numDatasets != 2)
         {
@@ -3069,11 +3069,11 @@ namespace rsgis{namespace rastergis{
             
             if(!usePxlCount)
             {
-                cerr << "Warning: \'pxlcount\' field is not available\n";
+                std::cerr << "Warning: \'pxlcount\' field is not available\n";
             }
             
             
-            for(vector<RSGISBandAttName*>::iterator iterBands = bands->begin(); iterBands != bands->end(); ++iterBands)
+            for(std::vector<RSGISBandAttName*>::iterator iterBands = bands->begin(); iterBands != bands->end(); ++iterBands)
             {
                 if(!attTable->hasAttribute((*iterBands)->attName))
                 {
@@ -3095,7 +3095,7 @@ namespace rsgis{namespace rastergis{
                     {
                         throw RSGISAttributeTableException("All outputs must be of type float.");
                     }
-                    cerr << "Warning. Reusing field \'" << imageStats->minField << "\'\n";
+                    std::cerr << "Warning. Reusing field \'" << imageStats->minField << "\'\n";
                 }
                 else
                 {
@@ -3112,7 +3112,7 @@ namespace rsgis{namespace rastergis{
                     {
                         throw RSGISAttributeTableException("All outputs must be of type float.");
                     }
-                    cerr << "Warning. Reusing field \'" << imageStats->maxField << "\'\n";
+                    std::cerr << "Warning. Reusing field \'" << imageStats->maxField << "\'\n";
                 }
                 else
                 {
@@ -3129,7 +3129,7 @@ namespace rsgis{namespace rastergis{
                     {
                         throw RSGISAttributeTableException("All outputs must be of type float.");
                     }
-                    cerr << "Warning. Reusing field \'" << imageStats->meanField << "\'\n";
+                    std::cerr << "Warning. Reusing field \'" << imageStats->meanField << "\'\n";
                 }
                 else
                 {
@@ -3146,7 +3146,7 @@ namespace rsgis{namespace rastergis{
                     {
                         throw RSGISAttributeTableException("All outputs must be of type float.");
                     }
-                    cerr << "Warning. Reusing field \'" << imageStats->sumField << "\'\n";
+                    std::cerr << "Warning. Reusing field \'" << imageStats->sumField << "\'\n";
                 }
                 else
                 {
@@ -3163,7 +3163,7 @@ namespace rsgis{namespace rastergis{
                     {
                         throw RSGISAttributeTableException("All outputs must be of type float.");
                     }
-                    cerr << "Warning. Reusing field \'" << imageStats->stdDevField << "\'\n";
+                    std::cerr << "Warning. Reusing field \'" << imageStats->stdDevField << "\'\n";
                 }
                 else
                 {
@@ -3180,7 +3180,7 @@ namespace rsgis{namespace rastergis{
                     {
                         throw RSGISAttributeTableException("All outputs must be of type float.");
                     }
-                    cerr << "Warning. Reusing field \'" << imageStats->medianField << "\'\n";
+                    std::cerr << "Warning. Reusing field \'" << imageStats->medianField << "\'\n";
                 }
                 else
                 {
@@ -3190,12 +3190,12 @@ namespace rsgis{namespace rastergis{
             } 
             
             RSGISFeature *feat;
-            vector<double> **clumpData = new vector<double>*[attTable->getSize()];
+            std::vector<double> **clumpData = new std::vector<double>*[attTable->getSize()];
             
             for(unsigned long long i  = 0; i < attTable->getSize(); ++i)
             {
                 feat = attTable->getFeature(i);
-                clumpData[i] = new vector<double>();
+                clumpData[i] = new std::vector<double>();
                 if(usePxlCount)
                 {
                     clumpData[i]->reserve(feat->intFields->at(pxlCountIdx)*numImageBands);
@@ -3217,13 +3217,13 @@ namespace rsgis{namespace rastergis{
             
             int feedback = attTable->getSize()/10;
 			int feedbackCounter = 0;
-			cout << "Started" << flush;
+			std::cout << "Started" << std::flush;
             // Calculate Statistics for each feature.
             for(unsigned long long i  = 0; i < attTable->getSize(); ++i)
             {
                 if((i % feedback) == 0)
 				{
-					cout << ".." << feedbackCounter << ".." << flush;
+					std::cout << ".." << feedbackCounter << ".." << std::flush;
 					feedbackCounter = feedbackCounter + 10;
 				}
                 
@@ -3267,7 +3267,7 @@ namespace rsgis{namespace rastergis{
                 if(imageStats->calcSum)
                 {
                     sum = 0;
-                    for(vector<double>::iterator iterVals = clumpData[i]->begin(); iterVals != clumpData[i]->end(); ++iterVals)
+                    for(std::vector<double>::iterator iterVals = clumpData[i]->begin(); iterVals != clumpData[i]->end(); ++iterVals)
                     {
                         sum += *iterVals;
                     }
@@ -3282,7 +3282,7 @@ namespace rsgis{namespace rastergis{
                 }
                 
             }
-            cout << " Complete.\n";
+            std::cout << " Complete.\n";
             
             for(unsigned int n = 0; n < attTable->getSize(); ++n)
             {
@@ -3308,7 +3308,7 @@ namespace rsgis{namespace rastergis{
     
     
 
-    RSGISCalcEucDistWithSegments::RSGISCalcEucDistWithSegments(RSGISAttributeTable *attTable, vector<double> **clumpData, vector<RSGISBandAttName*> *bands):rsgis::img::RSGISCalcImageValue(0)
+    RSGISCalcEucDistWithSegments::RSGISCalcEucDistWithSegments(RSGISAttributeTable *attTable, std::vector<double> **clumpData, std::vector<RSGISBandAttName*> *bands):rsgis::img::RSGISCalcImageValue(0)
     {
         this->attTable = attTable;
         this->clumpData = clumpData;
@@ -3338,7 +3338,7 @@ namespace rsgis{namespace rastergis{
                 
                 double val = 0;
                 double meanVal = 0;
-                for(vector<RSGISBandAttName*>::iterator iterBands = this->bands->begin(); iterBands != this->bands->end(); ++iterBands)
+                for(std::vector<RSGISBandAttName*>::iterator iterBands = this->bands->begin(); iterBands != this->bands->end(); ++iterBands)
                 {
                     if((*iterBands)->fieldDT == rsgis_int)
                     {
@@ -3360,7 +3360,7 @@ namespace rsgis{namespace rastergis{
             }
             catch(RSGISAttributeTableException &e)
             {
-                cout << "clumpIdx = " << clumpIdx << endl;
+                std::cout << "clumpIdx = " << clumpIdx << std::endl;
                 throw rsgis::img::RSGISImageCalcException(e.what());
             }
         }

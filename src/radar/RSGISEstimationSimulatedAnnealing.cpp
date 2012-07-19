@@ -74,7 +74,7 @@ namespace rsgis {namespace radar{
 		unsigned int nData = 2;
 		for(unsigned int i = 0;i < nData; i++)
 		{
-			if (isnan(gsl_vector_get(inData, i))) 
+			if (std::isnan(gsl_vector_get(inData, i))) 
 			{
 				for(unsigned int j = 0; j < nPar; j++) 
 				{
@@ -376,7 +376,7 @@ namespace rsgis {namespace radar{
 		unsigned int nData = 2;
 		for(unsigned int i = 0;i < nData; i++)
 		{
-			if (isnan(gsl_vector_get(inData, i))) 
+			if (std::isnan(gsl_vector_get(inData, i))) 
 			{
 				for(unsigned int j = 0; j < nPar; j++) 
 				{
@@ -761,7 +761,7 @@ namespace rsgis {namespace radar{
 		unsigned int nData = 3;
 		for(unsigned int i = 0;i < nData; i++)
 		{
-			if (isnan(gsl_vector_get(inData, i))) 
+			if (std::isnan(gsl_vector_get(inData, i))) 
 			{
 				for(unsigned int j = 0; j < nPar; j++) 
 				{
@@ -1106,7 +1106,7 @@ namespace rsgis {namespace radar{
 		unsigned int nData = 3;
 		for(unsigned int i = 0;i < nData; i++)
 		{
-			if (isnan(gsl_vector_get(inData, i))) 
+			if (std::isnan(gsl_vector_get(inData, i))) 
 			{
 				for(unsigned int j = 0; j < nPar; j++) 
 				{
@@ -1494,7 +1494,7 @@ namespace rsgis {namespace radar{
 		unsigned int nData = 3;
 		for(unsigned int i = 0;i < nData; i++)
 		{
-			if (isnan(gsl_vector_get(inData, i))) 
+			if (std::isnan(gsl_vector_get(inData, i))) 
 			{
 				for(unsigned int j = 0; j < nPar; j++) 
 				{
@@ -1865,7 +1865,7 @@ namespace rsgis {namespace radar{
 		unsigned int nData = 4;
 		for(unsigned int i = 0;i < nData; i++)
 		{
-			if (isnan(gsl_vector_get(inData, i))) 
+			if (std::isnan(gsl_vector_get(inData, i))) 
 			{
 				for(unsigned int j = 0; j < nPar; j++) 
 				{
@@ -2202,7 +2202,7 @@ namespace rsgis {namespace radar{
 		gsl_matrix_free(invCovMatrixP);
 	}
     
-    RSGISEstimationSimulatedAnnealingWithAP::RSGISEstimationSimulatedAnnealingWithAP(vector <rsgis::math::RSGISMathNVariableFunction*> *allFunctions,
+    RSGISEstimationSimulatedAnnealingWithAP::RSGISEstimationSimulatedAnnealingWithAP(std::vector<rsgis::math::RSGISMathNVariableFunction*> *allFunctions,
                                                                            double **minMaxIntervalAll,
                                                                            double minEnergy,
                                                                            double startTemp,
@@ -2277,7 +2277,7 @@ namespace rsgis {namespace radar{
         // Check for no-data
         for(unsigned int i = 0;i < this->nData; i++)
         {
-            if (isnan(gsl_vector_get(inData, i))) 
+            if (std::isnan(gsl_vector_get(inData, i))) 
             {
                 for(unsigned int j = 0; j < this->nPar; j++) 
                 {
@@ -2307,9 +2307,9 @@ namespace rsgis {namespace radar{
             dataPow = dataPow + pow(gsl_vector_get(inData, d),2);
         }
         
-        vector <double> *currentParError = new vector <double>();
-        vector <double> *bestParError = new vector <double>();
-        vector <double> *testPar = new vector <double>();
+        std::vector<double> *currentParError = new std::vector<double>();
+        std::vector<double> *bestParError = new std::vector<double>();
+        std::vector<double> *testPar = new std::vector<double>();
         double *accepted = new double[this->nPar];
         double *stepSize = new double[this->nPar];
         
@@ -2508,7 +2508,7 @@ namespace rsgis {namespace radar{
         return 0;
         
     }
-    double RSGISEstimationSimulatedAnnealingWithAP::calcLeastSquares(vector <double> *values)
+    double RSGISEstimationSimulatedAnnealingWithAP::calcLeastSquares(std::vector<double> *values)
     {
         
         /** L(X) = 1/2 { || f(X) - d0 || ^2 + || X - Xap || ^2 } */

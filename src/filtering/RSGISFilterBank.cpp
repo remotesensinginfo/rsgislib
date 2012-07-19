@@ -45,7 +45,7 @@ namespace rsgis{namespace filter{
 		return this->filters->size();
 	}
 	
-	void RSGISFilterBank::executeFilters(GDALDataset **datasets, int numDS, string outImageBase) throw(rsgis::RSGISImageException)
+	void RSGISFilterBank::executeFilters(GDALDataset **datasets, int numDS, std::string outImageBase) throw(rsgis::RSGISImageException)
 	{
 		try
 		{
@@ -56,11 +56,11 @@ namespace rsgis{namespace filter{
 			}
 			
 			int size = this->filters->size();
-			string filename = "";
+			std::string filename = "";
 			for(int i = 0; i < size; i++)
 			{
-				cout << "Executing filter " << (i+1) << " of " << size << endl;
-				filename = outImageBase + string("_") + this->filters->at(i)->getFileNameEnding() + string(".env");
+				std::cout << "Executing filter " << (i+1) << " of " << size << std::endl;
+				filename = outImageBase + std::string("_") + this->filters->at(i)->getFileNameEnding() + std::string(".env");
 				dynamic_cast<rsgis::img::RSGISCalcImageValue*>(this->filters->at(i))->setNumOutBands(numOutBands);
 				this->filters->at(i)->runFilter(datasets, numDS, filename);
 			}
@@ -71,11 +71,11 @@ namespace rsgis{namespace filter{
 		}
 	}
 	
-	void RSGISFilterBank::exectuteFilter(int i, GDALDataset **datasets, int numDS, string outImageBase) throw(rsgis::RSGISImageException)
+	void RSGISFilterBank::exectuteFilter(int i, GDALDataset **datasets, int numDS, std::string outImageBase) throw(rsgis::RSGISImageException)
 	{
 		try
 		{
-			string filename = outImageBase + this->filters->at(i)->getFileNameEnding();
+			std::string filename = outImageBase + this->filters->at(i)->getFileNameEnding();
 			this->filters->at(i)->runFilter(datasets, numDS, filename);
 		}
 		catch(rsgis::RSGISImageException e)
@@ -84,10 +84,10 @@ namespace rsgis{namespace filter{
 		}
 	}
 	
-	void RSGISFilterBank::exportFilterBankImages(string imagebase)
+	void RSGISFilterBank::exportFilterBankImages(std::string imagebase)
 	{
 		int size = this->filters->size();
-		string filename = "";
+		std::string filename = "";
 		for(int i = 0; i < size; i++)
 		{
 			filename = imagebase + this->filters->at(i)->getFileNameEnding();
@@ -102,8 +102,8 @@ namespace rsgis{namespace filter{
 		float stddevY = 0;
 		float angle = 0;
 		int size = 51;
-		string fileEnding = "";
-		string angleStr = "";
+		std::string fileEnding = "";
+		std::string angleStr = "";
 		RSGISGenerateFilter *genFilter = NULL;
 		RSGISImageFilter *filter = NULL;
 		ImageFilter *filterKernal = NULL;

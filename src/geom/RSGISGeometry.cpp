@@ -1018,7 +1018,7 @@ namespace rsgis{namespace geom{
 			bool contains = false;
 			bool areaError = false;
 			int count = 0;
-			std::cout << "Merging neighboring polygons, this may take some time: \nStarted .." << flush;
+			std::cout << "Merging neighboring polygons, this may take some time: \nStarted .." << std::flush;
 			while(change)
 			{
 				change = false;
@@ -1027,7 +1027,7 @@ namespace rsgis{namespace geom{
 				{
 					if(count % 20 == 0)
 					{
-						std::cout << "." << flush;
+						std::cout << "." << std::flush;
 					}
 					poly = *iterPolys;
 					if(poly->getArea() < 0.1)
@@ -1165,10 +1165,10 @@ namespace rsgis{namespace geom{
 			float maxRelBorder = 0;
 			bool change = true;
 			bool first = true;
-			std::cout << "Merging neighboring polygons, this may take some time: \nStarted .." << flush;
+			std::cout << "Merging neighboring polygons, this may take some time: \nStarted .." << std::flush;
 			while(change)
 			{
-				std::cout << ".." << flush;
+				std::cout << ".." << std::flush;
 				relBorder = 0;
 				maxRelBorder = 0;
 				change = false;
@@ -1180,7 +1180,7 @@ namespace rsgis{namespace geom{
 					std::cout << "Number to polygons = " << polygons->size() << " and number to merge = " << polygonsToMerge->size() << std::endl;
 					for(iterPolys = polygons->begin(); iterPolys != polygons->end(); ++iterPolys)
 					{
-						std::cout << count << flush;
+						std::cout << count << std::flush;
 						++count;
 						std::cout << "1 area = " << poly->getArea() << " 2 area = " << (*iterPolys)->getArea() << std::endl;
 						relBorder = this->calcRelativeBorder(poly, *iterPolys);
@@ -1335,7 +1335,7 @@ namespace rsgis{namespace geom{
 						
 						if(polys->size() == 0)
 						{
-							string message = string("Union of polygons did not produce a polygon: ") + string(geom->getGeometryType()) + string(" - could not resolve.");
+							std::string message = std::string("Union of polygons did not produce a polygon: ") + std::string(geom->getGeometryType()) + std::string(" - could not resolve.");
 							throw RSGISGeometryException(message.c_str());
 						}
 						else if(polys->size() == 1)
@@ -1651,12 +1651,12 @@ namespace rsgis{namespace geom{
 			bool polygon2Contains = false;
 			bool areaError = false;
 			int count = 0;
-			std::cout << "Started ." << flush;
+			std::cout << "Started ." << std::flush;
 			for(iterPolys = polygons->begin(); iterPolys != polygons->end(); )
 			{
 				if((count % 20) == 0)
 				{
-					std::cout << "." << flush;
+					std::cout << "." << std::flush;
 				}
 				count++;
 				
@@ -1820,7 +1820,7 @@ namespace rsgis{namespace geom{
 																		
 									if(poly1Vec->size() > 1)
 									{
-										string message = string("too many polygons... (polygon1): ") + mathUtils.inttostring(poly1Vec->size());
+										std::string message = std::string("too many polygons... (polygon1): ") + mathUtils.inttostring(poly1Vec->size());
 										throw RSGISGeometryException(message);
 									}
 									else
@@ -1830,7 +1830,7 @@ namespace rsgis{namespace geom{
 									
 									if(poly2Vec->size() > 1)
 									{
-										string message = string("too many polygons... (polygon2): ") + mathUtils.inttostring(poly2Vec->size());
+										std::string message = std::string("too many polygons... (polygon2): ") + mathUtils.inttostring(poly2Vec->size());
 										throw RSGISGeometryException(message);
 									}
 									else
@@ -2009,7 +2009,7 @@ namespace rsgis{namespace geom{
 									
 									if(poly1Vec->size() > 1)
 									{
-										string message = string("too many polygons... (polygon1): ") + mathUtils.inttostring(poly1Vec->size());
+										std::string message = std::string("too many polygons... (polygon1): ") + mathUtils.inttostring(poly1Vec->size());
 										//geomExport.exportGEOSPolygons2SHP("/Users/pete/Temp/Clustering/errors/poly1Vec.shp", true, poly1Vec);
 										throw RSGISGeometryException(message);
 									}
@@ -2020,7 +2020,7 @@ namespace rsgis{namespace geom{
 									
 									if(poly2Vec->size() > 1)
 									{
-										string message = string("too many polygons... (polygon2): ") + mathUtils.inttostring(poly2Vec->size());
+										std::string message = std::string("too many polygons... (polygon2): ") + mathUtils.inttostring(poly2Vec->size());
 										throw RSGISGeometryException(message);
 									}
 									else
@@ -2368,10 +2368,10 @@ namespace rsgis{namespace geom{
 		return polygon;
 	}
 	
-	void RSGISGeometry::printPolygonCoords2File(geos::geom::Polygon *poly, string filename)
+	void RSGISGeometry::printPolygonCoords2File(geos::geom::Polygon *poly, std::string filename)
 	{
-		ofstream outTxtFile;
-		outTxtFile.open(filename.c_str(), ios::out | ios::trunc);
+        std::ofstream outTxtFile;
+		outTxtFile.open(filename.c_str(), std::ios::out | std::ios::trunc);
 		
 		if(outTxtFile.is_open())
 		{
@@ -3513,7 +3513,7 @@ namespace rsgis{namespace geom{
 						
 						if(polys->size() == 0)
 						{
-							string message = string("Union of polygons did not produce a polygon: ") + string(geom->getGeometryType()) + string(" - could not resolve.");
+							std::string message = std::string("Union of polygons did not produce a polygon: ") + std::string(geom->getGeometryType()) + std::string(" - could not resolve.");
 							throw RSGISGeometryException(message.c_str());
 						}
 						else if(polys->size() == 1)
@@ -3532,7 +3532,7 @@ namespace rsgis{namespace geom{
 							}
 							delete polys;
 							
-							string message = string("Union of polygons produced multiple polygon: ") + string(geom->getGeometryType()) + string(" - could not resolve.");
+							std::string message = std::string("Union of polygons produced multiple polygon: ") + std::string(geom->getGeometryType()) + std::string(" - could not resolve.");
 							throw RSGISGeometryException(message.c_str());
 						}
 						polys->clear();
@@ -3848,7 +3848,7 @@ namespace rsgis{namespace geom{
 			std::cout << "There are " << polys->size() << " polygons to merge\n";
 			int feedback = 0;
 			bool change = true;
-			std::cout << "Started " << flush;
+			std::cout << "Started " << std::flush;
 			while(change)
 			{
 				change = false;
@@ -3856,7 +3856,7 @@ namespace rsgis{namespace geom{
 				{
 					if(feedback == 100)
 					{
-						std::cout << "." << flush;
+						std::cout << "." << std::flush;
 						feedback = 0;
 					}
 					++feedback;
@@ -3937,7 +3937,7 @@ namespace rsgis{namespace geom{
 				giveFeedback = false;
 			}
 			bool change = true;
-			std::cout << "Started " << flush;
+			std::cout << "Started " << std::flush;
 			while(change)
 			{
 				change = false;
@@ -3945,7 +3945,7 @@ namespace rsgis{namespace geom{
 				{
 					if((giveFeedback) && (feedbackCounter > feedback))
 					{
-						std::cout << "." << polys->size() << "." << flush;
+						std::cout << "." << polys->size() << "." << std::flush;
 						feedbackCounter = 0;
 					}
 					
@@ -4020,7 +4020,7 @@ namespace rsgis{namespace geom{
 			bool merge = false;
 			//std::cout << "There are " << polys->size() << " polygons to merge\n";
 			bool change = true;
-			//std::cout << "Started " << flush;
+			//std::cout << "Started " << std::flush;
 			while(change)
 			{
 				change = false;
@@ -4138,7 +4138,7 @@ namespace rsgis{namespace geom{
 				linesequal = false;
 			}
 		}
-		catch(exception &e)
+		catch(std::exception &e)
 		{
 			std::cout << "WARNING: " << e.what() << std::endl;
 			linesequal = false;
@@ -4261,7 +4261,7 @@ namespace rsgis{namespace geom{
 			std::cout << "There are " << polys->size() << " polygons to merge\n";
 			int feedback = 0;
 			bool change = true;
-			std::cout << "Started " << flush;
+			std::cout << "Started " << std::flush;
 			while(change)
 			{
 				change = false;
@@ -4269,7 +4269,7 @@ namespace rsgis{namespace geom{
 				{
 					if(feedback == 100)
 					{
-						std::cout << "." << flush;
+						std::cout << "." << std::flush;
 						feedback = 0;
 					}
 					++feedback;
@@ -4724,7 +4724,7 @@ namespace rsgis{namespace geom{
         {
             throw e;
         }
-        catch (exception &e) 
+        catch (std::exception &e) 
         {
             throw RSGISGeometryException(e.what());
         }
@@ -4763,7 +4763,7 @@ namespace rsgis{namespace geom{
         {
             throw e;
         }
-        catch (exception &e) 
+        catch (std::exception &e) 
         {
             throw RSGISGeometryException(e.what());
         }

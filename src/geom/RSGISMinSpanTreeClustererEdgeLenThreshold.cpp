@@ -57,10 +57,10 @@ namespace rsgis{namespace geom{
             std::vector<int> component(boost::num_vertices(*cg));
 			int num_comp = boost::connected_components(*cg, boost::make_iterator_property_map(component.begin(), boost::get(boost::vertex_index, *cg)));
 			
-            std::list<RSGIS2DPoint*> **outputClusters = new list<RSGIS2DPoint*>*[num_comp];
+            std::list<RSGIS2DPoint*> **outputClusters = new std::list<RSGIS2DPoint*>*[num_comp];
 			for(int i = 0; i < num_comp; i++)
 			{
-				outputClusters[i] = new list<RSGIS2DPoint*>();
+				outputClusters[i] = new std::list<RSGIS2DPoint*>();
 			}
 			
 			if(data->size() != component.size())

@@ -32,7 +32,7 @@ namespace rsgis { namespace img {
 		this->outputFile = outputFile;
 		this->delimiter = delimiter;
 		this->proj4 = proj4;
-		this->data = new vector<XYZData*>();
+		this->data = new std::vector<XYZData*>();
 		this->bbox = new double[4];
 		this->xyOrder = xyOrder;
 		this->resolution = resolution;
@@ -88,7 +88,7 @@ namespace rsgis { namespace img {
 			
 			std::cout << "TL [" << TLX << ", " << TLY << "]\n";
 			
-			vector<XYZData*>::iterator iterData;
+			std::vector<XYZData*>::iterator iterData;
 			for(iterData = data->begin(); iterData != data->end(); ++iterData)
 			{
 				xPxl = floor(((*iterData)->x - TLX) / resolution);
@@ -151,7 +151,7 @@ namespace rsgis { namespace img {
 			data->reserve(numLines);
 
 			std::string line = "";
-			vector<std::string> *lineTokens = new vector<std::string>();
+			std::vector<std::string> *lineTokens = new std::vector<std::string>();
 			XYZData *dataItem = NULL;
 			lineReader.openFile(inputFile);
 			while(!lineReader.endOfFile())

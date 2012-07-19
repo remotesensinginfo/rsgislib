@@ -29,7 +29,7 @@ namespace rsgis{namespace filter{
     }
     
     // Closing - Input Image
-    void RSGISImageMorphologyTopHat::performBlackTopHat(GDALDataset *dataset, string outputImage, string tempImage, bool useMemory, rsgis::math::Matrix *matrixOperator) throw(rsgis::img::RSGISImageCalcException, rsgis::img::RSGISImageBandException)
+    void RSGISImageMorphologyTopHat::performBlackTopHat(GDALDataset *dataset, std::string outputImage, std::string tempImage, bool useMemory, rsgis::math::Matrix *matrixOperator) throw(rsgis::img::RSGISImageCalcException, rsgis::img::RSGISImageBandException)
     {
         try 
         {
@@ -98,7 +98,7 @@ namespace rsgis{namespace filter{
     }
     
     // Input Image - Opening
-    void RSGISImageMorphologyTopHat::performWhiteTopHat(GDALDataset *dataset, string outputImage, string tempImage, bool useMemory, rsgis::math::Matrix *matrixOperator) throw(rsgis::img::RSGISImageCalcException, rsgis::img::RSGISImageBandException)
+    void RSGISImageMorphologyTopHat::performWhiteTopHat(GDALDataset *dataset, std::string outputImage, std::string tempImage, bool useMemory, rsgis::math::Matrix *matrixOperator) throw(rsgis::img::RSGISImageCalcException, rsgis::img::RSGISImageBandException)
     {
         try 
         {

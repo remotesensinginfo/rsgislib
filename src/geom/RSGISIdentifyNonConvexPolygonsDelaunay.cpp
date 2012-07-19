@@ -52,7 +52,7 @@ namespace rsgis{namespace geom{
 			}
 			
 			pts->sort(greater<RSGIS2DPoint*>());
-			cout << "Number of points before removing duplicates = " << pts->size() << endl;
+			std::cout << "Number of points before removing duplicates = " << pts->size() << std::endl;
 			bool first = true;
 			RSGIS2DPoint *pt_previous = NULL;
 			for(iterPts = pts->begin(); iterPts != pts->end(); iterPts++)
@@ -72,7 +72,7 @@ namespace rsgis{namespace geom{
 				}
 			}
 			
-			cout << "Number of points after removing duplicates = " << pts->size() << endl;
+			std::cout << "Number of points after removing duplicates = " << pts->size() << std::endl;
 			
 			int numPts = pts->size();
 			float *x = new float[numPts];
@@ -90,7 +90,7 @@ namespace rsgis{namespace geom{
 			
 			//RSGISExportForPlotting::getInstance()->export2DColourScatter("polygon_points_sorted", x, y, c, numPts);
 			
-			cout << "Create Delaunay Triangulation\n";
+			std::cout << "Create Delaunay Triangulation\n";
 			RSGISDelaunayTriangulation *delaunayTriangulation = new RSGISDelaunayTriangulation(pts);
 			delaunayTriangulation->plotTriangulationAsEdges("triangulation");
 			
@@ -133,24 +133,24 @@ namespace rsgis{namespace geom{
 			}
 			
 			// Loop through clusters and send to function to have polygon produced.
-			cout << "Merging Triangles to create polygons:\n";
+			std::cout << "Merging Triangles to create polygons:\n";
 			for(int i = 0; i < numClusters; i++)
 			{
 				string triangulationPlotString = string("triangulation_") + mathUtils.inttostring(i);
 				
 				this->plotTriangulationAsEdges(triangulationPlotString, clusterTriangles[i]);
 				
-				cout << "Cluster " << i << " .. (" << triangulationPlotString << ")\n";
+				std::cout << "Cluster " << i << " .. (" << triangulationPlotString << ")\n";
 				try
 				{
 					polys->push_back(this->findPolygonFromTriangles(clusterTriangles[i], polysClusters[i], i));
 				}
 				catch(RSGISGeometryException e)
 				{
-					cout << "ERROR OCCURED!!: " << e.what() << " IGNORING!" << endl;
+					std::cout << "ERROR OCCURED!!: " << e.what() << " IGNORING!" << std::endl;
 				}
 				polysClusters[i]->clear();
-				cout << " Complete\n";
+				std::cout << " Complete\n";
 			}
 			delete[] polysClusters;
 		}
@@ -295,7 +295,7 @@ namespace rsgis{namespace geom{
 				pts_edge_all->push_back(*iterPTS);
 			}
 			
-			cout << "Create delaunay triangulation\n";
+			std::cout << "Create delaunay triangulation\n";
 			RSGISTriangle *boundTriangle = geomUtils.findBoundingTriangle(pts_edge);
 			RSGISDelaunayTriangulation *delaunayTriangulation = new RSGISDelaunayTriangulation(boundTriangle);
 			delaunayTriangulation->createDelaunayTriangulation(pts_edge);
@@ -442,7 +442,7 @@ namespace rsgis{namespace geom{
 				pts_edge_all->push_back(*iterPTS);
 			}
 			
-			cout << "Create delaunay triangulation\n";
+			std::cout << "Create delaunay triangulation\n";
 			RSGISTriangle *boundTriangle = geomUtils.findBoundingTriangle(pts_edge);
 			RSGISDelaunayTriangulation *delaunayTriangulation = new RSGISDelaunayTriangulation(boundTriangle);
 			delaunayTriangulation->createDelaunayTriangulation(pts_edge);
@@ -493,10 +493,10 @@ namespace rsgis{namespace geom{
 		std::vector<geos::geom::Polygon*> *polys = new std::vector<geos::geom::Polygon*>();
 		try
 		{
-			cout << "Create delaunay triangulation\n";
+			std::cout << "Create delaunay triangulation\n";
 			RSGISDelaunayTriangulation *delaunayTriangulation = new RSGISDelaunayTriangulation(pts);
 			
-			cout << "Remove triangles across class/cluster border\n";
+			std::cout << "Remove triangles across class/cluster border\n";
 			std::list<RSGISTriangle*> *triangulation = delaunayTriangulation->getTriangulation();
 			std::list<RSGISTriangle*>::iterator iterTri;
 			RSGISTriangle *tri = NULL;
@@ -533,7 +533,7 @@ namespace rsgis{namespace geom{
 				}
 			}
 			
-			cout << "Merging Triangles to create polygons:\n";
+			std::cout << "Merging Triangles to create polygons:\n";
 			for(int i = 0; i < numClusters; i++)
 			{
 				try
@@ -545,7 +545,7 @@ namespace rsgis{namespace geom{
 				}
 				catch(RSGISGeometryException e)
 				{
-					cout << "ERROR OCCURED!!: " << e.what() << " IGNORING!" << endl;
+					std::cout << "ERROR OCCURED!!: " << e.what() << " IGNORING!" << std::endl;
 				}
 			}			
 		}
@@ -631,12 +631,12 @@ namespace rsgis{namespace geom{
 					}
 					catch(RSGISGeometryException &e)
 					{
-						string message = string("WARNING: polys->size() = ") + mathUtils.inttostring(polys->size());
+                        std::string message = std::string("WARNING: polys->size() = ") + mathUtils.inttostring(polys->size());
 						
 						for(iterPolys = polys->begin(); iterPolys != polys->end(); )
 						{
 							area = (*iterPolys)->getArea();
-							//cout << "Polygon has area " << area << " which is " << area/totalarea << " of the total area " << totalarea << endl;
+							//std::cout << "Polygon has area " << area << " which is " << area/totalarea << " of the total area " << totalarea << std::endl;
 							delete *iterPolys;
 							polys->erase(iterPolys);
 						}
@@ -669,7 +669,7 @@ namespace rsgis{namespace geom{
 		return outPoly;
 	}
 	
-	void RSGISIdentifyNonConvexPolygonsDelaunay::plotTriangulationAsEdges(string filename, std::list<RSGISTriangle*> *triangleList)
+	void RSGISIdentifyNonConvexPolygonsDelaunay::plotTriangulationAsEdges(std::string filename, std::list<RSGISTriangle*> *triangleList)
 	{
 		std::list<geos::geom::LineSegment> *lines = new std::list<geos::geom::LineSegment>();
 		std::list<RSGISTriangle*>::iterator iterTriangles;

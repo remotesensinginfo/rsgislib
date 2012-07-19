@@ -105,7 +105,7 @@ namespace rsgis{namespace rastergis{
                     }
                     else if(attBands[i].first == rsgis_float)
                     {
-                        //cout << "clumpIdx = " << clumpIdx << " band[" << i << "]:\t" << feat->floatFields->at(attBands[i].second) << endl;
+                        //std::cout << "clumpIdx = " << clumpIdx << " band[" << i << "]:\t" << feat->floatFields->at(attBands[i].second) << std::endl;
                         output[i] = feat->floatFields->at(attBands[i].second);
                     }
                     else
@@ -118,12 +118,12 @@ namespace rsgis{namespace rastergis{
             }
             catch(RSGISAttributeTableException &e)
             {
-                cout << "clumpIdx = " << clumpIdx << endl;
+                std::cout << "clumpIdx = " << clumpIdx << std::endl;
                 throw rsgis::img::RSGISImageCalcException(e.what());
             }
             catch(rsgis::img::RSGISImageCalcException &e)
             {
-                cout << "clumpIdx = " << clumpIdx << endl;
+                std::cout << "clumpIdx = " << clumpIdx << std::endl;
                 throw e;
             }
         }
@@ -224,12 +224,12 @@ namespace rsgis{namespace rastergis{
                     }
                     catch(RSGISAttributeTableException &e)
                     {
-                        cout << "clumpIdx = " << clumpIdxs[j] << endl;
+                        std::cout << "clumpIdx = " << clumpIdxs[j] << std::endl;
                         throw RSGISImageException(e.what());
                     }
                     catch(RSGISImageException &e)
                     {
-                        cout << "clumpIdx = " << clumpIdxs[j] << endl;
+                        std::cout << "clumpIdx = " << clumpIdxs[j] << std::endl;
                         throw e;
                     }
                 }

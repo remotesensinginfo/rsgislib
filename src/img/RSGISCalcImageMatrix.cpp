@@ -74,8 +74,8 @@ namespace rsgis{namespace img{
 				//matrix[i] = new double[numInBandsDSB];
 				for(int j = 0; j < numInBandsDSB; j++)
 				{
-					cout << "Matrix[" << i << "][" << j << "]: ";
-					cout.flush();
+					std::cout << "Matrix[" << i << "][" << j << "]: ";
+					std::cout.flush();
 					//calcImageSingleValue->setBandB(j);
 					calcImageSingleValue->reset();
 					this->calcImage->calcImage(datasetsA, datasetsB, numDS, outputValue, i, j);
@@ -88,9 +88,9 @@ namespace rsgis{namespace img{
 			{
 				for(int j = 0; j < outputMatrix->n; j++)
 				{
-					cout << outputMatrix->matrix[counter++] << ", ";
+					std::cout << outputMatrix->matrix[counter++] << ", ";
 				}
-				cout << endl;
+				std::cout << std::endl;
 			}
 		
 			/*
@@ -101,12 +101,12 @@ namespace rsgis{namespace img{
 		}
 		catch(RSGISImageCalcException e)
 		{
-			cout << e.what() << endl;
+			std::cout << e.what() << std::endl;
 			throw e;
 		}
 		catch(RSGISImageBandException e)
 		{
-			cout << e.what() << endl;
+			std::cout << e.what() << std::endl;
 			throw e;
 		}
 		
@@ -154,9 +154,9 @@ namespace rsgis{namespace img{
 			{
 				for(int j = 0; j < outputMatrix->n; j++)
 				{
-					cout << outputMatrix->matrix[counter++] << ", ";
+					std::cout << outputMatrix->matrix[counter++] << ", ";
 				}
-				cout << endl;
+				std::cout << std::endl;
 			}
 			
 			/*
@@ -168,12 +168,12 @@ namespace rsgis{namespace img{
 		}
 		catch(RSGISImageCalcException e)
 		{
-			cout << e.what() << endl;
+			std::cout << e.what() << std::endl;
 			throw e;
 		}
 		catch(RSGISImageBandException e)
 		{
-			cout << e.what() << endl;
+			std::cout << e.what() << std::endl;
 			throw e;
 		}
 		return outputMatrix;

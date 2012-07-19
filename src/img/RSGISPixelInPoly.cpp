@@ -37,11 +37,11 @@ namespace rsgis{namespace img {
 		// Check geometry
 		if (poly->IsEmpty()) 
 		{
-			cout << "Polygon is empty" << endl;
+			std::cout << "Polygon is empty" << std::endl;
 		}
 		if (pixel->IsEmpty())
 		{
-			cout << "Pixel is empty" << endl;
+			std::cout << "Pixel is empty" << std::endl;
 		}
 		
 		if(method == polyContainsPixel) // Polygon completely contains pixel

@@ -29,7 +29,7 @@ namespace rsgis { namespace classifier {
 	RSGISSpectralCorrelationMapperRule::RSGISSpectralCorrelationMapperRule(int numOutBands, gsl_matrix *refSpectra) : RSGISCalcImageValue(numOutBands)
 	{
 		this->refSpectra = refSpectra;
-		cout << "Number of Refference Spectra = " << refSpectra->size2 << endl;
+		std::cout << "Number of Refference Spectra = " << refSpectra->size2 << std::endl;
 		this->imageSpecArray = new double[refSpectra->size1];
 	}
 	void RSGISSpectralCorrelationMapperRule::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)

@@ -407,7 +407,7 @@ namespace rsgis{namespace reg{
 			}
 			else
 			{
-				tiePt->metricVal = numeric_limits<double>::signaling_NaN();//NAN;
+				tiePt->metricVal = std::numeric_limits<double>::signaling_NaN();//NAN;
 				distanceMoved = 0;
 				*moveInX = 0;
 				*moveInY = 0;
@@ -796,7 +796,7 @@ namespace rsgis{namespace reg{
 		}
 		
 		outPtsFile.precision(12);
-		outPtsFile << fixed;
+		outPtsFile << std::fixed;
 		
 		outPtsFile << "; ENVI Image to Map GCP File\n";
 		outPtsFile << "; projection info = ... \n";
@@ -829,7 +829,7 @@ namespace rsgis{namespace reg{
 		}
 		
 		outPtsFile.precision(12);
-		outPtsFile << fixed;
+		outPtsFile << std::fixed;
 		
 		outPtsFile << "; ENVI Image to Image GCP File\n";
 		outPtsFile << "; base file: ... \n";
@@ -862,7 +862,7 @@ namespace rsgis{namespace reg{
 		}
 		
 		outPtsFile.precision(12);
-		outPtsFile << fixed;
+		outPtsFile << std::fixed;
 		
 		outPtsFile << "# RSGISLib Image to Map GCP File\n";
 		outPtsFile << "# Reference Map (E,N), Floating Image (x,y)\n";

@@ -37,17 +37,13 @@
 
 #include "math/RSGISMatrices.h"
 
-using namespace rsgis;
-using namespace rsgis::math;
-using namespace rsgis::img;
-
 namespace rsgis{namespace filter{
     
     class RSGISImageMorphologyOpening
     {
     public:
         RSGISImageMorphologyOpening();
-        void performOpening(GDALDataset *dataset, string outputImage, string tempImage, bool useMemory, Matrix *matrixOperator, unsigned int numIterations) throw(RSGISImageCalcException, RSGISImageBandException);
+        void performOpening(GDALDataset *dataset, std::string outputImage, std::string tempImage, bool useMemory, rsgis::math::Matrix *matrixOperator, unsigned int numIterations) throw(rsgis::img::RSGISImageCalcException, rsgis::img::RSGISImageBandException);
         ~RSGISImageMorphologyOpening();
     };
     

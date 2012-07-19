@@ -45,7 +45,7 @@ namespace rsgis{ namespace classifier{
 		{
 			this->numDatasets = 1;
 			datasets = new GDALDataset*[1];
-			cout << this->inputImageFile << endl;
+			std::cout << this->inputImageFile << std::endl;
 			datasets[0] = (GDALDataset *) GDALOpenShared(this->inputImageFile.c_str(), GA_ReadOnly);
 			if(datasets[0] == NULL)
 			{
@@ -95,7 +95,7 @@ namespace rsgis{ namespace classifier{
 		
 		
 		// Allocate K cluster centers
-		clusterCentres = new vector<ClusterCentreISO*>();
+		clusterCentres = new std::vector<ClusterCentreISO*>();
 		ClusterCentreISO *tmpCluster = NULL;
 		for(unsigned int i = 0; i < numClusters; ++i)
 		{
@@ -112,15 +112,15 @@ namespace rsgis{ namespace classifier{
 		
 		
 		// Print init cluster centres
-		vector<ClusterCentreISO*>::iterator iterCentres;
+		std::vector<ClusterCentreISO*>::iterator iterCentres;
 		for(iterCentres = clusterCentres->begin(); iterCentres != clusterCentres->end(); ++iterCentres)
 		{
-			cout << "Cluster " << (*iterCentres)->classID << ": ";
+			std::cout << "Cluster " << (*iterCentres)->classID << ": ";
 			for(unsigned int j = 0; j < numImageBands; ++j)
 			{
-				cout << (*iterCentres)->data->vector[j] << ", ";
+				std::cout << (*iterCentres)->data->vector[j] << ", ";
 			}
-			cout << endl;
+			std::cout << std::endl;
 		}
 		
 		// Free stats from memory
@@ -143,7 +143,7 @@ namespace rsgis{ namespace classifier{
 		{
 			this->numDatasets = 1;
 			datasets = new GDALDataset*[1];
-			cout << this->inputImageFile << endl;
+			std::cout << this->inputImageFile << std::endl;
 			datasets[0] = (GDALDataset *) GDALOpenShared(this->inputImageFile.c_str(), GA_ReadOnly);
 			if(datasets[0] == NULL)
 			{
@@ -192,7 +192,7 @@ namespace rsgis{ namespace classifier{
 		}
 		
 		// Allocate K cluster centers
-		clusterCentres = new vector<ClusterCentreISO*>();
+		clusterCentres = new std::vector<ClusterCentreISO*>();
 		ClusterCentreISO *tmpCluster = NULL;
 		for(unsigned int i = 0; i < numClusters; ++i)
 		{
@@ -208,7 +208,7 @@ namespace rsgis{ namespace classifier{
 		
 		// Define Cluster centres
 		boost::mt19937 randomGen;
-		vector<ClusterCentreISO*>::iterator iterCentres;
+		std::vector<ClusterCentreISO*>::iterator iterCentres;
 		for(unsigned int i = 0; i < numImageBands; ++i)
 		{
 			boost::uniform_int<> randomDist(stats[i]->min, stats[i]->max);
@@ -224,12 +224,12 @@ namespace rsgis{ namespace classifier{
 		{
 			for(iterCentres = clusterCentres->begin(); iterCentres != clusterCentres->end(); ++iterCentres)
 			{
-				cout << "Cluster " << (*iterCentres)->classID << ": ";
+				std::cout << "Cluster " << (*iterCentres)->classID << ": ";
 				for(unsigned int j = 0; j < numImageBands; ++j)
 				{
-					cout << (*iterCentres)->data->vector[j] << ", ";
+					std::cout << (*iterCentres)->data->vector[j] << ", ";
 				}
-				cout << endl;
+				std::cout << std::endl;
 			}
 		}
 		
@@ -255,19 +255,19 @@ namespace rsgis{ namespace classifier{
 				rsgis::img::RSGISCalcImage *calcImageClusterCentres = new rsgis::img::RSGISCalcImage(calcClusterCentre, "", true);
 				rsgis::img::RSGISCalcImage *calcImageClusterStddevs = new rsgis::img::RSGISCalcImage(calcClusterStdDevs, "", true);
 				
-				vector<ClusterCentreISO*> *newClusterCentres = NULL;
+				std::vector<ClusterCentreISO*> *newClusterCentres = NULL;
 				double centreMoveDistanceSum = 0;
 				double centreMoveDistance = 0;
 				double averageDistance = 0;
 				bool continueIterating = true;
 				unsigned int iterNum = 0;
-				vector<ClusterCentreISO*>::iterator iterCentres;
-				vector<ClusterCentreISO*>::iterator iterCentres2;
-				vector<ClusterCentreISO*>::iterator iterNewCentres;
+				std::vector<ClusterCentreISO*>::iterator iterCentres;
+				std::vector<ClusterCentreISO*>::iterator iterCentres2;
+				std::vector<ClusterCentreISO*>::iterator iterNewCentres;
 				
 				while(continueIterating & (iterNum < maxIterations))
 				{
-					cout << "Iteration " << iterNum << ":\t" << endl;
+					std::cout << "Iteration " << iterNum << ":\t" << std::endl;
 					centreMoveDistanceSum = 0;
 					centreMoveDistance = 0;
 					averageDistance = 0;
@@ -282,7 +282,7 @@ namespace rsgis{ namespace classifier{
 					{
 						if(printinfo)
 						{
-							cout << "Cluster " << (*iterNewCentres)->classID << " has " << (*iterNewCentres)->numVals << " associated\n";
+							std::cout << "Cluster " << (*iterNewCentres)->classID << " has " << (*iterNewCentres)->numVals << " associated\n";
 						}
 						for(unsigned int j = 0; j < this->numImageBands; ++j)
 						{
@@ -303,7 +303,7 @@ namespace rsgis{ namespace classifier{
 					}
 					centreMoveDistance = centreMoveDistanceSum/clusterCentres->size();
 					
-					cout << "Distance Moved = " << centreMoveDistance << " from " << newClusterCentres->size() << " clusters." << endl;
+					std::cout << "Distance Moved = " << centreMoveDistance << " from " << newClusterCentres->size() << " clusters." << std::endl;
 					
 					if(centreMoveDistance < terminalThreshold)
 					{
@@ -362,14 +362,14 @@ namespace rsgis{ namespace classifier{
 						{
 							if(printinfo)
 							{
-								cout << "Checking " << (*iterCentres)->classID << endl;
+								std::cout << "Checking " << (*iterCentres)->classID << std::endl;
 							}
 							for(iterCentres2 = clusterCentres->begin(); iterCentres2 != clusterCentres->end(); ++iterCentres2)
 							{
 								distance = vecUtils.euclideanDistance((*iterCentres2)->data, (*iterCentres)->data);
 								if(printinfo)
 								{
-									cout << "\tAgainst " << (*iterCentres2)->classID << " distance = " << distance << endl;
+									std::cout << "\tAgainst " << (*iterCentres2)->classID << " distance = " << distance << std::endl;
 								}
 								if((distance != 0) & (distance < minDistanceBetweenCentres))
 								{
@@ -397,7 +397,7 @@ namespace rsgis{ namespace classifier{
 						averageDistance = calcClusterCentre->getAverageDistance();
 						if(printinfo)
 						{
-							cout << "Overall Average distance = " << averageDistance << endl;
+							std::cout << "Overall Average distance = " << averageDistance << std::endl;
 						}
 
 						for(iterCentres = clusterCentres->begin(); iterCentres != clusterCentres->end(); ++iterCentres)
@@ -405,7 +405,7 @@ namespace rsgis{ namespace classifier{
 							(*iterCentres)->split = false;
 							if(printinfo)
 							{
-								cout << "Checking " << (*iterCentres)->classID << " Avg Dist = " << (*iterCentres)->avgDist << endl;
+								std::cout << "Checking " << (*iterCentres)->classID << " Avg Dist = " << (*iterCentres)->avgDist << std::endl;
 							}
 
 							if((*iterCentres)->avgDist > (averageDistance*propOverAvgDist))
@@ -418,7 +418,7 @@ namespace rsgis{ namespace classifier{
 								{
 									if(printinfo)
 									{
-										cout << "\tStddev band " << i << " = " << (*iterCentres)->stddev->vector[i] << endl;
+										std::cout << "\tStddev band " << i << " = " << (*iterCentres)->stddev->vector[i] << std::endl;
 									}
 									if((*iterCentres)->stddev->vector[i] > stddevThres)
 									{
@@ -473,7 +473,7 @@ namespace rsgis{ namespace classifier{
 						
 						if(printinfo)
 						{
-							cout << "Num cluster centres in new cluster centres  = " << newClusterCentres->size() << endl;
+							std::cout << "Num cluster centres in new cluster centres  = " << newClusterCentres->size() << std::endl;
 						}
 						
 						newClusterCentres = NULL;
@@ -486,12 +486,12 @@ namespace rsgis{ namespace classifier{
 					{
 						for(iterCentres = clusterCentres->begin(); iterCentres != clusterCentres->end(); ++iterCentres)
 						{
-							cout << "Cluster " << (*iterCentres)->classID << ": ";
+							std::cout << "Cluster " << (*iterCentres)->classID << ": ";
 							for(unsigned int j = 0; j < numImageBands; ++j)
 							{
-								cout << (*iterCentres)->data->vector[j] << ", ";
+								std::cout << (*iterCentres)->data->vector[j] << ", ";
 							}
-							cout << endl;
+							std::cout << std::endl;
 						}
 					}
 					++iterNum;
@@ -518,13 +518,13 @@ namespace rsgis{ namespace classifier{
 		if(hasInitClusterCentres)
 		{
 			int i = 0;
-			vector<ClusterCentreISO*>::iterator iterCentres;
+			std::vector<ClusterCentreISO*>::iterator iterCentres;
 			for(iterCentres = clusterCentres->begin(); iterCentres != clusterCentres->end(); ++iterCentres)
 			{
 				(*iterCentres)->classID = i++;
 			}
 			
-			cout << clusterCentres->size() << " clusters have been identified." << endl;
+			std::cout << clusterCentres->size() << " clusters have been identified." << std::endl;
 			
 			RSGISApplyISODATAClassifierCalcImageVal *applyClass = new RSGISApplyISODATAClassifierCalcImageVal(1, this->clusterCentres);
             rsgis::img::RSGISCalcImage *calcImage = new rsgis::img::RSGISCalcImage(applyClass, "", true);
@@ -544,7 +544,7 @@ namespace rsgis{ namespace classifier{
 		if(hasInitClusterCentres)
 		{
 			rsgis::math::RSGISVectors vecUtils;
-			vector<ClusterCentreISO*>::iterator iterCentres;
+			std::vector<ClusterCentreISO*>::iterator iterCentres;
 			for(iterCentres = clusterCentres->begin(); iterCentres != clusterCentres->end(); )
 			{
 				vecUtils.freeVector((*iterCentres)->data);
@@ -563,15 +563,15 @@ namespace rsgis{ namespace classifier{
 	}
 	
 	
-	RSGISISODATACalcPixelClusterCalcImageVal::RSGISISODATACalcPixelClusterCalcImageVal(int numOutBands, vector<ClusterCentreISO*> *clusterCentres, unsigned int numImageBands) : RSGISCalcImageValue(numOutBands)
+	RSGISISODATACalcPixelClusterCalcImageVal::RSGISISODATACalcPixelClusterCalcImageVal(int numOutBands, std::vector<ClusterCentreISO*> *clusterCentres, unsigned int numImageBands) : RSGISCalcImageValue(numOutBands)
 	{
 		this->clusterCentres = clusterCentres;
 		this->numImageBands = numImageBands;
 		
 		rsgis::math::RSGISVectors vecUtils;
-		newClusterCentres = new vector<ClusterCentreISO*>();
+		newClusterCentres = new std::vector<ClusterCentreISO*>();
 		ClusterCentreISO *tmpCluster = NULL;
-		vector<ClusterCentreISO*>::iterator iterCentres;
+		std::vector<ClusterCentreISO*>::iterator iterCentres;
 		for(iterCentres = clusterCentres->begin(); iterCentres != clusterCentres->end(); ++iterCentres)
 		{
 			tmpCluster = new ClusterCentreISO();
@@ -596,7 +596,7 @@ namespace rsgis{ namespace classifier{
 		bool first = true;
 		double sum = 0;
 		double distance = 0;
-		vector<ClusterCentreISO*>::iterator iterCentres;
+		std::vector<ClusterCentreISO*>::iterator iterCentres;
 		for(iterCentres = clusterCentres->begin(); iterCentres != clusterCentres->end(); ++iterCentres)
 		{
 			sum = 0;
@@ -619,7 +619,7 @@ namespace rsgis{ namespace classifier{
 			}
 		}
 		
-		//cout << "Pixel assocaited with cluster " << minClusterCentre->classID << endl;
+		//std::cout << "Pixel assocaited with cluster " << minClusterCentre->classID << std::endl;
 		
 		// add to sum for next centre
 		for(iterCentres = newClusterCentres->begin(); iterCentres != newClusterCentres->end(); ++iterCentres)
@@ -640,17 +640,17 @@ namespace rsgis{ namespace classifier{
 		++numVals;
 	}
 	
-	vector<ClusterCentreISO*>* RSGISISODATACalcPixelClusterCalcImageVal::getNewClusterCentres()
+	std::vector<ClusterCentreISO*>* RSGISISODATACalcPixelClusterCalcImageVal::getNewClusterCentres()
 	{
 		return newClusterCentres;
 	}
 	
-	void RSGISISODATACalcPixelClusterCalcImageVal::reset(vector<ClusterCentreISO*> *clusterCentres)
+	void RSGISISODATACalcPixelClusterCalcImageVal::reset(std::vector<ClusterCentreISO*> *clusterCentres)
 	{
 		rsgis::math::RSGISVectors vecUtils;
 		this->clusterCentres = clusterCentres;
 
-		vector<ClusterCentreISO*>::iterator iterCentres;
+		std::vector<ClusterCentreISO*>::iterator iterCentres;
 		for(iterCentres = newClusterCentres->begin(); iterCentres != newClusterCentres->end(); )
 		{
 			vecUtils.freeVector((*iterCentres)->data);
@@ -660,7 +660,7 @@ namespace rsgis{ namespace classifier{
 		}
 		delete newClusterCentres;
 		
-		newClusterCentres = new vector<ClusterCentreISO*>();
+		newClusterCentres = new std::vector<ClusterCentreISO*>();
 		ClusterCentreISO *tmpCluster = NULL;
 		for(iterCentres = clusterCentres->begin(); iterCentres != clusterCentres->end(); ++iterCentres)
 		{
@@ -686,7 +686,7 @@ namespace rsgis{ namespace classifier{
 	RSGISISODATACalcPixelClusterCalcImageVal::~RSGISISODATACalcPixelClusterCalcImageVal()
 	{
 		rsgis::math::RSGISVectors vecUtils;
-		vector<ClusterCentreISO*>::iterator iterCentres;
+		std::vector<ClusterCentreISO*>::iterator iterCentres;
 		for(iterCentres = newClusterCentres->begin(); iterCentres != newClusterCentres->end(); )
 		{
 			vecUtils.freeVector((*iterCentres)->data);
@@ -697,7 +697,7 @@ namespace rsgis{ namespace classifier{
 		delete newClusterCentres;		
 	}
 	
-	RSGISISODATACalcPixelClusterStdDevCalcImageVal::RSGISISODATACalcPixelClusterStdDevCalcImageVal(int numOutBands, vector<ClusterCentreISO*> *clusterCentres, unsigned int numImageBands) : RSGISCalcImageValue(numOutBands)
+	RSGISISODATACalcPixelClusterStdDevCalcImageVal::RSGISISODATACalcPixelClusterStdDevCalcImageVal(int numOutBands, std::vector<ClusterCentreISO*> *clusterCentres, unsigned int numImageBands) : RSGISCalcImageValue(numOutBands)
 	{
 		this->clusterCentres = clusterCentres;
 		this->numImageBands = numImageBands;
@@ -711,7 +711,7 @@ namespace rsgis{ namespace classifier{
 		bool first = true;
 		double sum = 0;
 		double distance = 0;
-		vector<ClusterCentreISO*>::iterator iterCentres;
+		std::vector<ClusterCentreISO*>::iterator iterCentres;
 		for(iterCentres = clusterCentres->begin(); iterCentres != clusterCentres->end(); ++iterCentres)
 		{
 			sum = 0;
@@ -734,7 +734,7 @@ namespace rsgis{ namespace classifier{
 			}
 		}
 		
-		//cout << "Pixel assocaited with cluster " << minClusterCentre->classID << endl;
+		//std::cout << "Pixel assocaited with cluster " << minClusterCentre->classID << std::endl;
 		
 		// add to sum for next centre
 		for(int i = 0; i < numBands; ++i)
@@ -743,7 +743,7 @@ namespace rsgis{ namespace classifier{
 		}
 	}
 	
-	void RSGISISODATACalcPixelClusterStdDevCalcImageVal::reset(vector<ClusterCentreISO*> *clusterCentres)
+	void RSGISISODATACalcPixelClusterStdDevCalcImageVal::reset(std::vector<ClusterCentreISO*> *clusterCentres)
 	{
 		this->clusterCentres = clusterCentres;
 	}
@@ -753,7 +753,7 @@ namespace rsgis{ namespace classifier{
 
 	}
 	
-	RSGISApplyISODATAClassifierCalcImageVal::RSGISApplyISODATAClassifierCalcImageVal(int numOutBands,  vector<ClusterCentreISO*> *clusterCentres) : RSGISCalcImageValue(numOutBands)
+	RSGISApplyISODATAClassifierCalcImageVal::RSGISApplyISODATAClassifierCalcImageVal(int numOutBands,  std::vector<ClusterCentreISO*> *clusterCentres) : RSGISCalcImageValue(numOutBands)
 	{
 		this->clusterCentres = clusterCentres;
 	}
@@ -765,7 +765,7 @@ namespace rsgis{ namespace classifier{
 		bool first = true;
 		double sum = 0;
 		double distance = 0;
-		vector<ClusterCentreISO*>::iterator iterCentres;
+		std::vector<ClusterCentreISO*>::iterator iterCentres;
 		for(iterCentres = clusterCentres->begin(); iterCentres != clusterCentres->end(); ++iterCentres)
 		{
 			sum = 0;

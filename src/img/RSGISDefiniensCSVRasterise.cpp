@@ -60,7 +60,7 @@ namespace rsgis{namespace img{
 						std::cout << "Tile " << sortedCSVs->getAt(i)->getTile() << " has " << numFeatures << " features for " << numObjects << " objects\n";
 						if(numFeatures != numFeaturesFirst)
 						{
-							string message = "File " + sortedCSVs->getAt(i)->getFileNameWithPath() + " has a different number of features (attributes)";
+							std::string message = "File " + sortedCSVs->getAt(i)->getFileNameWithPath() + " has a different number of features (attributes)";
 							throw rsgis::RSGISImageException(message.c_str());
 						}
 					}
@@ -142,8 +142,8 @@ namespace rsgis{namespace img{
 		{
 			// Count the number of objects.
 			int lineNum = 0;
-			string firstLine;
-			string strLine;
+			std::string firstLine;
+			std::string strLine;
 			bool first = true;
 			
 			while(!csvFile.eof())
@@ -180,7 +180,7 @@ namespace rsgis{namespace img{
 		}
 		else
 		{
-			string message = std::string("Could not open file: ") + csvFilepath->getFileNameWithPath();
+			std::string message = std::string("Could not open file: ") + csvFilepath->getFileNameWithPath();
 			throw rsgis::RSGISFileException(message.c_str());
 		}
 	}
@@ -194,8 +194,8 @@ namespace rsgis{namespace img{
 		{
 			// Count the number of objects.
 			int lineNum = 0;
-			string firstLine;
-			string strLine;
+			std::string firstLine;
+			std::string strLine;
 			bool first = true;
 			
 			while(!csvFile.eof())
@@ -232,7 +232,7 @@ namespace rsgis{namespace img{
 		}
 		else
 		{
-			string message = std::string("Could not open file: ") + csvInFile;
+			std::string message = std::string("Could not open file: ") + csvInFile;
 			throw rsgis::RSGISFileException(message.c_str());
 		}
 	}
@@ -248,7 +248,7 @@ namespace rsgis{namespace img{
 			int lineNum = 0;
 			int objNum = 0;
 			bool first = true;
-			string strLine;
+			std::string strLine;
 			
 			std::cout.precision(11);
 			while(!csvFile.eof())
@@ -272,7 +272,7 @@ namespace rsgis{namespace img{
 		}
 		else
 		{
-			string message = std::string("Could not open file: ") + csvFilepath->getFileNameWithPath();
+			std::string message = std::string("Could not open file: ") + csvFilepath->getFileNameWithPath();
 			throw rsgis::RSGISFileException(message.c_str());
 		}
 	}
@@ -288,7 +288,7 @@ namespace rsgis{namespace img{
 			int lineNum = 0;
 			int objNum = 0;
 			bool first = true;
-			string strLine;
+			std::string strLine;
 			
 			//std::cout.precision(11);
 			while(!csvFile.eof())
@@ -312,7 +312,7 @@ namespace rsgis{namespace img{
 		}
 		else
 		{
-			string message = std::string("Could not open file: ") + csvInFile;
+			std::string message = std::string("Could not open file: ") + csvInFile;
 			throw rsgis::RSGISFileException(message.c_str());
 		}
 	}
@@ -372,14 +372,14 @@ namespace rsgis{namespace img{
 		
 		GDALDataset **dataset = new GDALDataset*[1];
 		ImageStats **imageStats = NULL;
-		string outputImageFilePath = "";
+		std::string outputImageFilePath = "";
 		int inputBands = 0;
 		try
 		{
 			dataset[0] = (GDALDataset *) GDALOpenShared(tifFilepath->getFileNameWithPath().c_str(), GA_ReadOnly);
 			if(dataset == NULL)
 			{
-				string message = std::string("Could not open image ") + tifFilepath->getFileNameWithPath();
+				std::string message = std::string("Could not open image ") + tifFilepath->getFileNameWithPath();
 				throw rsgis::RSGISImageException(message.c_str());
 			}
 			
@@ -443,14 +443,14 @@ namespace rsgis{namespace img{
 		
 		GDALDataset **dataset = new GDALDataset*[1];
 		ImageStats **imageStats = NULL;
-		string outputImageFilePath = "";
+		std::string outputImageFilePath = "";
 		int inputBands = 0;
 		try
 		{
 			dataset[0] = (GDALDataset *) GDALOpenShared(tifFilepath.c_str(), GA_ReadOnly);
 			if(dataset == NULL)
 			{
-				string message = std::string("Could not open image ") + tifFilepath;
+				std::string message = std::string("Could not open image ") + tifFilepath;
 				throw rsgis::RSGISImageException(message.c_str());
 			}
 			

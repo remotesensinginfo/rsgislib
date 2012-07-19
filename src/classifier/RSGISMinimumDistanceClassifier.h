@@ -42,7 +42,7 @@ namespace rsgis{ namespace classifier{
 		public:
 			RSGISMinimumDistanceClassifier(ClassData **trainingData, int numClasses, MinDistCentreType centreType)  throw(RSGISClassificationException);
 			virtual int getClassID(float *variables, int numVars) throw(RSGISClassificationException);
-			virtual string getClassName(float *variables, int numVars) throw(RSGISClassificationException);
+			virtual std::string getClassName(float *variables, int numVars) throw(RSGISClassificationException);
 			~RSGISMinimumDistanceClassifier();
 		protected:
 			void calcClusterCentres() throw(RSGISClassificationException);

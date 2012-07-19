@@ -164,7 +164,7 @@ namespace rsgis{namespace math{
     
     std::string RSGISMathsUtils::uinttostring(unsigned int number)throw(RSGISMathException)
 	{
-		string outValue = "";
+        std::string outValue = "";
 		try
         {
             outValue = boost::lexical_cast<std::string>(number);
@@ -622,7 +622,7 @@ namespace rsgis{namespace math{
         matrices.freeMatrix(outputs);
     }
     
-    void RSGISMathsUtils::generateStats(vector<double> *data, RSGISStatsSummary *stats) throw(RSGISMathException)
+    void RSGISMathsUtils::generateStats(std::vector<double> *data, RSGISStatsSummary *stats) throw(RSGISMathException)
     {
         try
         {
@@ -658,7 +658,7 @@ namespace rsgis{namespace math{
                 if(stats->calcSum)
                 {
                     stats->sum = 0;
-                    for(vector<double>::iterator iterVals = data->begin(); iterVals != data->end(); ++iterVals)
+                    for(std::vector<double>::iterator iterVals = data->begin(); iterVals != data->end(); ++iterVals)
                     {
                         stats->sum += *iterVals;
                     }

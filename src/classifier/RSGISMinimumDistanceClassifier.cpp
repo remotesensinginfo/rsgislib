@@ -35,7 +35,7 @@ namespace rsgis{ namespace classifier{
 		return this->findClass(variables, numVars)->classID;
 	}
 	
-	string RSGISMinimumDistanceClassifier::getClassName(float *variables, int numVars) throw(RSGISClassificationException)
+	std::string RSGISMinimumDistanceClassifier::getClassName(float *variables, int numVars) throw(RSGISClassificationException)
 	{
 		return this->findClass(variables, numVars)->className;
 	}
@@ -112,10 +112,10 @@ namespace rsgis{ namespace classifier{
 			throw RSGISClassificationException("Centre type is not defined");
 		}
 		
-		cout << "CLUSTER CENTRES:\n";
+		std::cout << "CLUSTER CENTRES:\n";
 		for(int i = 0; i < numClasses; i++)
 		{
-			cout << "Cluster " << clusterCentres[i].className << ":\t";
+			std::cout << "Cluster " << clusterCentres[i].className << ":\t";
 			matrixUtils.printMatrix(clusterCentres[i].data);
 		}
 		

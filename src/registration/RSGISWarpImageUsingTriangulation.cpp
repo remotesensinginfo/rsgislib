@@ -46,7 +46,7 @@ namespace rsgis{namespace reg{
                 K::Point_2 cgalPt((*iterGCPs)->eastings(),(*iterGCPs)->northings());
                 dt->insert(cgalPt);
                 
-                values->insert(make_pair(cgalPt, (*iterGCPs)));
+                values->insert(std::make_pair(cgalPt, (*iterGCPs)));
             }
         }
         catch(RSGISImageWarpException &e)
@@ -162,7 +162,7 @@ namespace rsgis{namespace reg{
 		delete normTriPts;
     }
 	
-	list<RSGISGCPImg2MapNode*>* RSGISWarpImageUsingTriangulation::normGCPs(list<const RSGISGCPImg2MapNode*> *gcps, double eastings, double northings)
+	std::list<RSGISGCPImg2MapNode*>* RSGISWarpImageUsingTriangulation::normGCPs(std::list<const RSGISGCPImg2MapNode*> *gcps, double eastings, double northings)
 	{
         std::list<RSGISGCPImg2MapNode*> *normTriPts = new std::list<RSGISGCPImg2MapNode*>();
 		
@@ -181,7 +181,7 @@ namespace rsgis{namespace reg{
 		return normTriPts;
 	}
 	
-	void RSGISWarpImageUsingTriangulation::fitPlane2XPoints(list<RSGISGCPImg2MapNode*> *normPts, double *a, double *b, double *c) throw(RSGISImageWarpException)
+	void RSGISWarpImageUsingTriangulation::fitPlane2XPoints(std::list<RSGISGCPImg2MapNode*> *normPts, double *a, double *b, double *c) throw(RSGISImageWarpException)
 	{
 		rsgis::math::RSGISMatrices matrices;
 		
@@ -247,7 +247,7 @@ namespace rsgis{namespace reg{
 		}
 	}
 	
-	void RSGISWarpImageUsingTriangulation::fitPlane2YPoints(list<RSGISGCPImg2MapNode*> *normPts, double *a, double *b, double *c) throw(RSGISImageWarpException)
+	void RSGISWarpImageUsingTriangulation::fitPlane2YPoints(std::list<RSGISGCPImg2MapNode*> *normPts, double *a, double *b, double *c) throw(RSGISImageWarpException)
 	{
 		rsgis::math::RSGISMatrices matrices;
 		

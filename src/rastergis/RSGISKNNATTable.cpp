@@ -115,12 +115,12 @@ namespace rsgis{namespace rastergis{
             unsigned int rowCount = 0;
             unsigned long feedback = attTable->getSize()/10;
             int feedbackCounter = 0;
-            std::cout << "Started" << flush;
+            std::cout << "Started" << std::flush;
             for(this->attTable->start(); this->attTable->end(); ++(*this->attTable))
             {
                 if((rowCount % feedback) == 0)
                 {
-                    std::cout << "." << feedbackCounter << "." << flush;
+                    std::cout << "." << feedbackCounter << "." << std::flush;
                     feedbackCounter = feedbackCounter + 10;
                 }
                 if((*(*this->attTable))->boolFields->at(this->trainFieldIdx))
@@ -197,7 +197,7 @@ namespace rsgis{namespace rastergis{
     
     double RSGISKNNATTable::calcDist(rsgis::math::rsgisdistmetrics distMetric, std::vector<double> *vals1, std::vector<double> *vals2) throw(rsgis::math::RSGISMathException)
     {
-        double dist = numeric_limits<double>::signaling_NaN();
+        double dist = std::numeric_limits<double>::signaling_NaN();
         try 
         {
             if(vals1->size() != vals2->size())
@@ -435,12 +435,12 @@ namespace rsgis{namespace rastergis{
             unsigned int rowCount = 0;
             unsigned long feedback = attTable->getSize()/10;
 			int feedbackCounter = 0;
-			std::cout << "Started" << flush;
+			std::cout << "Started" << std::flush;
             for(this->attTable->start(); this->attTable->end(); ++(*this->attTable))
             {
                 if((rowCount % feedback) == 0)
 				{
-					std::cout << "." << feedbackCounter << "." << flush;
+					std::cout << "." << feedbackCounter << "." << std::flush;
 					feedbackCounter = feedbackCounter + 10;
 				}
                 if((*(*this->attTable))->boolFields->at(this->trainFieldIdx))
@@ -460,12 +460,12 @@ namespace rsgis{namespace rastergis{
 			feedbackCounter = 0;
             std::vector<double> *data = new std::vector<double>();
             data->reserve(attributes.size());
-			std::cout << "Started" << flush;
+			std::cout << "Started" << std::flush;
             for(attTable->start(); attTable->end(); ++(*attTable))
             {
                 if((idx % feedback) == 0)
 				{
-					std::cout << "." << feedbackCounter << "." << flush;
+					std::cout << "." << feedbackCounter << "." << std::flush;
 					feedbackCounter = feedbackCounter + 10;
 				}
                 if(!(*(*attTable))->boolFields->at(trainFieldIdx))
@@ -518,7 +518,7 @@ namespace rsgis{namespace rastergis{
                 throw rsgis::math::RSGISMathException("Known data and value arrays need to be of the same length.");
             }
             
-            std::vector< pair<size_t, double> > neighbours;
+            std::vector< std::pair<size_t, double> > neighbours;
             double cDistThreshold = 0;
             double maxDist = 0;
             bool maxDistFirst = true;
@@ -531,7 +531,7 @@ namespace rsgis{namespace rastergis{
                 
                 if(neighbours.size() < k)
                 {
-                    neighbours.push_back(pair<size_t, double>(i,dist));
+                    neighbours.push_back(std::pair<size_t, double>(i,dist));
                     if(first)
                     {
                         cDistThreshold = dist;
@@ -546,7 +546,7 @@ namespace rsgis{namespace rastergis{
                 {
                     maxDistFirst = true;
                     maxDist = 0;
-                    for(std::vector< pair<size_t, double> >::iterator iterNeighbours = neighbours.begin(); iterNeighbours != neighbours.end(); ++iterNeighbours)
+                    for(std::vector< std::pair<size_t, double> >::iterator iterNeighbours = neighbours.begin(); iterNeighbours != neighbours.end(); ++iterNeighbours)
                     {
                         if((*iterNeighbours).second == cDistThreshold)
                         {
@@ -571,7 +571,7 @@ namespace rsgis{namespace rastergis{
             
             //std::cout << "\nNeighbours:\n";
             double sumDist = 0;
-            for(std::vector< pair<size_t, double> >::iterator iterNeighbours = neighbours.begin(); iterNeighbours != neighbours.end(); ++iterNeighbours)
+            for(std::vector< std::pair<size_t, double> >::iterator iterNeighbours = neighbours.begin(); iterNeighbours != neighbours.end(); ++iterNeighbours)
             {
                 //std::cout << "\t" << (*iterNeighbours).first << " = " << (*iterNeighbours).second << ": Data = " << knownVals->at((*iterNeighbours).first) << std::endl;
                 sumDist += (*iterNeighbours).second;
@@ -579,7 +579,7 @@ namespace rsgis{namespace rastergis{
             //std::cout << "Total Distance = " << sumDist << std::endl;
             
             outVal = 0;
-            for(std::vector< pair<size_t, double> >::iterator iterNeighbours = neighbours.begin(); iterNeighbours != neighbours.end(); ++iterNeighbours)
+            for(std::vector< std::pair<size_t, double> >::iterator iterNeighbours = neighbours.begin(); iterNeighbours != neighbours.end(); ++iterNeighbours)
             {
                 outVal += knownLocalVals->at((*iterNeighbours).first) * ((*iterNeighbours).second/sumDist);
             }

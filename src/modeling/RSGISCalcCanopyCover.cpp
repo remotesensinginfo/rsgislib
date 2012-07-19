@@ -56,7 +56,7 @@ namespace rsgis { namespace modeling {
 				
 		return canopyCover;
 	}
-	void RSGISCalcCanopyCover::exportCanopyPoly(string outFile)
+	void RSGISCalcCanopyCover::exportCanopyPoly(std::string outFile)
 	{
 		rsgis::vec::RSGISVectorIO vectorIO;
 		// Write to shapefile

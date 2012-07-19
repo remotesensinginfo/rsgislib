@@ -128,9 +128,9 @@ namespace rsgis{namespace reg{
 		virtual void initRegistration()throw(RSGISRegistrationException)=0;
 		virtual void executeRegistration()throw(RSGISRegistrationException)=0;
 		virtual void finaliseRegistration()throw(RSGISRegistrationException)=0;
-		virtual void exportTiePointsENVIImage2Map(string filepath)throw(RSGISRegistrationException)=0;
-		virtual void exportTiePointsENVIImage2Image(string filepath)throw(RSGISRegistrationException)=0;
-		virtual void exportTiePointsRSGISImage2Map(string filepath)throw(RSGISRegistrationException)=0;
+		virtual void exportTiePointsENVIImage2Map(std::string filepath)throw(RSGISRegistrationException)=0;
+		virtual void exportTiePointsENVIImage2Image(std::string filepath)throw(RSGISRegistrationException)=0;
+		virtual void exportTiePointsRSGISImage2Map(std::string filepath)throw(RSGISRegistrationException)=0;
 		virtual ~RSGISImageRegistration();
 	protected:
 		void findOverlap()throw(RSGISRegistrationException);

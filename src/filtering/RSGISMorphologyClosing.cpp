@@ -30,16 +30,16 @@ namespace rsgis{namespace filter{
         
     }
     
-    void RSGISImageMorphologyClosing::performClosing(GDALDataset *dataset, string outputImage, string tempImage, bool useMemory, Matrix *matrixOperator, unsigned int numIterations) throw(RSGISImageCalcException, RSGISImageBandException)
+    void RSGISImageMorphologyClosing::performClosing(GDALDataset *dataset, std::string outputImage, std::string tempImage, bool useMemory, rsgis::math::Matrix *matrixOperator, unsigned int numIterations) throw(rsgis::img::RSGISImageCalcException, rsgis::img::RSGISImageBandException)
     {
         try 
         {
             if(matrixOperator->n != matrixOperator->m)
             {
-                throw RSGISImageCalcException("Morphological operator must be a square matrix.");
+                throw rsgis::img::RSGISImageCalcException("Morphological operator must be a square matrix.");
             }
             
-            RSGISImageUtils imgUtils;
+            rsgis::img::RSGISImageUtils imgUtils;
             GDALDataset *outDataset = NULL;
             GDALDataset *tmpDataset = NULL;
             GDALDataset **tmpGDALDataArray = new GDALDataset*[1];
@@ -58,10 +58,10 @@ namespace rsgis{namespace filter{
             imgUtils.zerosFloatGDALDataset(tmpDataset);
             
             
-            RSGISCalcImageValue *imgErode = new RSGISMorphologyErode(dataset->GetRasterCount(), matrixOperator);
-            RSGISCalcImage calcImageErode(imgErode);
-            RSGISCalcImageValue *imgDilate = new RSGISMorphologyDilate(dataset->GetRasterCount(), matrixOperator);
-            RSGISCalcImage calcImageDilate(imgDilate);
+            rsgis::img::RSGISCalcImageValue *imgErode = new RSGISMorphologyErode(dataset->GetRasterCount(), matrixOperator);
+            rsgis::img:: RSGISCalcImage calcImageErode(imgErode);
+            rsgis::img::RSGISCalcImageValue *imgDilate = new RSGISMorphologyDilate(dataset->GetRasterCount(), matrixOperator);
+            rsgis::img::RSGISCalcImage calcImageDilate(imgDilate);
             
             tmpGDALDataArray[0] = dataset;
             for(unsigned int i = 0; i < numIterations; ++i)
@@ -84,17 +84,17 @@ namespace rsgis{namespace filter{
             GDALClose(outDataset);
             GDALClose(tmpDataset);
         } 
-        catch (RSGISImageCalcException &e) 
+        catch (rsgis::img::RSGISImageCalcException &e) 
         {
             throw e;
         }
-        catch (RSGISImageBandException &e) 
+        catch (rsgis::img::RSGISImageBandException &e) 
         {
             throw e;
         }
         catch (RSGISImageException &e) 
         {
-            throw RSGISImageCalcException(e.what());
+            throw rsgis::img::RSGISImageCalcException(e.what());
         }
     }
     

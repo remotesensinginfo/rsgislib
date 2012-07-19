@@ -44,7 +44,7 @@ namespace rsgis{ namespace classifier{
 		{
 			this->numDatasets = 1;
 			datasets = new GDALDataset*[1];
-			cout << this->inputImageFile << endl;
+			std::cout << this->inputImageFile << std::endl;
 			datasets[0] = (GDALDataset *) GDALOpenShared(this->inputImageFile.c_str(), GA_ReadOnly);
 			if(datasets[0] == NULL)
 			{
@@ -139,12 +139,12 @@ namespace rsgis{ namespace classifier{
 		/*
 		for(unsigned int i = 0; i < numClusters; ++i)
 		{
-			cout << "Cluster " << i << ": ";
+			std::cout << "Cluster " << i << ": ";
 			for(unsigned int j = 0; j < numImageBands; ++j)
 			{
-				cout << clusterCentres[i]->data->vector[j] << ", ";
+				std::cout << clusterCentres[i]->data->vector[j] << ", ";
 			}
-			cout << endl;
+			std::cout << std::endl;
 		}
 		 */
 		
@@ -169,7 +169,7 @@ namespace rsgis{ namespace classifier{
 		{
 			this->numDatasets = 1;
 			datasets = new GDALDataset*[1];
-			cout << this->inputImageFile << endl;
+			std::cout << this->inputImageFile << std::endl;
 			datasets[0] = (GDALDataset *) GDALOpenShared(this->inputImageFile.c_str(), GA_ReadOnly);
 			if(datasets[0] == NULL)
 			{
@@ -244,12 +244,12 @@ namespace rsgis{ namespace classifier{
 		{
 			for(unsigned int i = 0; i < numClusters; ++i)
 			{
-				cout << "Cluster " << i << ": ";
+				std::cout << "Cluster " << i << ": ";
 				for(unsigned int j = 0; j < numImageBands; ++j)
 				{
-					cout << clusterCentres[i]->data->vector[j] << ", ";
+					std::cout << clusterCentres[i]->data->vector[j] << ", ";
 				}
-				cout << endl;
+				std::cout << std::endl;
 			}
 		}
 		
@@ -282,7 +282,7 @@ namespace rsgis{ namespace classifier{
 				
 				while(continueIterating & (iterNum < maxIterations))
 				{
-					cout << "Iteration " << iterNum << ":\t" << flush;
+					std::cout << "Iteration " << iterNum << ":\t" << std::flush;
 					centreMoveDistanceSum = 0;
 					centreMoveDistance = 0;
 					
@@ -328,15 +328,15 @@ namespace rsgis{ namespace classifier{
 					{
 						for(unsigned int i = 0; i < numClusters; ++i)
 						{
-							cout << "Cluster " << i << ": ";
+							std::cout << "Cluster " << i << ": ";
 							for(unsigned int j = 0; j < numImageBands; ++j)
 							{
-								cout << clusterCentres[i]->data->vector[j] << ", ";
+								std::cout << clusterCentres[i]->data->vector[j] << ", ";
 							}
-							cout << endl;
+							std::cout << std::endl;
 						}
 					}
-					cout << "Distance Moved = " << centreMoveDistance << endl;
+					std::cout << "Distance Moved = " << centreMoveDistance << std::endl;
 					
 					
 					if(centreMoveDistance < terminalThreshold)

@@ -250,13 +250,13 @@ namespace rsgis{ namespace img{
 		catch (const xercesc::XMLException& e) 
 		{
 			char *message = xercesc::XMLString::transcode(e.getMessage());
-			string outMessage =  std::string("XMLException : ") + std::string(message);
+			std::string outMessage =  std::string("XMLException : ") + std::string(message);
 			throw RSGISParseColourException(outMessage.c_str());
 		}
 		catch (const xercesc::DOMException& e) 
 		{
 			char *message = xercesc::XMLString::transcode(e.getMessage());
-			string outMessage =  std::string("DOMException : ") + std::string(message);
+			std::string outMessage =  std::string("DOMException : ") + std::string(message);
 			throw RSGISParseColourException(outMessage.c_str());
 		}
 		catch(RSGISInputStreamException e)
