@@ -42,7 +42,7 @@ namespace rsgis { namespace modeling{
 		virtual void createVeg(){};
 		virtual void addVegTrans(RSGISTransect *transect, unsigned int centerX, unsigned int centerY, unsigned int sizeX, unsigned int sizeY);
 		virtual void addVegTransConvexHull(RSGISTransect *transect, unsigned int centerX, unsigned int centerY, 
-										   unsigned int sizeX, unsigned int sizeY, std::vector<Polygon*> *canopyPolys);
+										   unsigned int sizeX, unsigned int sizeY, std::vector<geos::geom::Polygon*> *canopyPolys);
 		virtual ~RSGISModelTree();
 	private:
 		double stemHeight, stemRadius, canopyDepth;

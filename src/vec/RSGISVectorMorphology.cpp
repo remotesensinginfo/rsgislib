@@ -26,7 +26,7 @@
 
 namespace rsgis{namespace vec{
 	
-	RSGISVectorMorphology::RSGISVectorMorphology(float buffer, Morphology morphologytype)
+	RSGISVectorMorphology::RSGISVectorMorphology(float buffer, rsgis::geom::Morphology morphologytype)
 	{
 		this->buffer = buffer;
 		this->morphologytype = morphologytype;
@@ -55,23 +55,23 @@ namespace rsgis{namespace vec{
 	OGRPolygon* RSGISVectorMorphology::processGeometry(OGRGeometry *geom) throw(RSGISVectorException)
 	{
 		OGRPolygon *polygon = NULL;
-		if(morphologytype == closing)
+		if(morphologytype == rsgis::geom::closing)
 		{
 			OGRGeometry *geom1 = geom->Buffer(this->buffer, 30);
 			polygon = (OGRPolygon *) geom1->Buffer((this->buffer*(-1)), 30);
 			delete geom1;
 		}
-		else if(morphologytype == opening)
+		else if(morphologytype == rsgis::geom::opening)
 		{
 			OGRGeometry *geom1 = geom->Buffer((this->buffer*(-1)), 30);
 			polygon = (OGRPolygon *) geom1->Buffer(this->buffer, 30);
 			delete geom1;
 		}
-		else if(morphologytype == dilation)
+		else if(morphologytype == rsgis::geom::dilation)
 		{
 			polygon = (OGRPolygon *) geom->Buffer(this->buffer, 30);
 		}
-		else if(morphologytype == erosion)
+		else if(morphologytype == rsgis::geom::erosion)
 		{
 			polygon = (OGRPolygon *) geom->Buffer((this->buffer*(-1)), 30);
 		}

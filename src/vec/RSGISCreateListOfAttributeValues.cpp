@@ -25,29 +25,29 @@
 
 namespace rsgis{namespace vec{
 	
-	RSGISCreateListOfAttributeValues::RSGISCreateListOfAttributeValues(vector<string> *attributes, string attribute)
+	RSGISCreateListOfAttributeValues::RSGISCreateListOfAttributeValues(std::vector<std::string> *attributes, std::string attribute)
 	{
 		this->attribute = attribute;
 		this->attributes = attributes;
 	}
 		
-	void RSGISCreateListOfAttributeValues::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISCreateListOfAttributeValues::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
 	{
 		throw RSGISVectorException("Not Implemented...");
 	}
 	
-	void RSGISCreateListOfAttributeValues::processFeature(OGRFeature *feature, Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISCreateListOfAttributeValues::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
 	{
 		OGRFeatureDefn *featureDefn = feature->GetDefnRef();
 		int fieldIdx = featureDefn->GetFieldIndex(attribute.c_str());		
 		if(fieldIdx < 0)
 		{
-			string message = "This layer does not contain a field with the name \'" + attribute + "\'";
+			std::string message = "This layer does not contain a field with the name \'" + attribute + "\'";
 			throw RSGISVectorException(message.c_str());
 		}
-		string value = feature->GetFieldAsString(fieldIdx);
+		std::string value = feature->GetFieldAsString(fieldIdx);
 		
-		vector<string>::iterator iterAttr;
+		std::vector<std::string>::iterator iterAttr;
 		bool present = false;
 		for(iterAttr = attributes->begin(); iterAttr != attributes->end(); ++iterAttr)
 		{

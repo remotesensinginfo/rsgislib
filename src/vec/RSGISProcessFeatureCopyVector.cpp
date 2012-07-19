@@ -30,12 +30,12 @@ namespace rsgis{namespace vec{
 		
 	}
 	
-	void RSGISProcessFeatureCopyVector::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISProcessFeatureCopyVector::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
 	{
 		// Nothing to do - just copying the data.
 	}
 	
-	void RSGISProcessFeatureCopyVector::processFeature(OGRFeature *feature, Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISProcessFeatureCopyVector::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
 	{
 		throw RSGISVectorException("Not implemented..");
 	}

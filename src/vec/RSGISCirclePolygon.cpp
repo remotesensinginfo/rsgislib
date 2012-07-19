@@ -26,7 +26,7 @@
 
 namespace rsgis{namespace vec{
 	
-	RSGISCirclePolygon::RSGISCirclePolygon(string radiusAttribute, string areaAttribute, string heightAttribute)
+	RSGISCirclePolygon::RSGISCirclePolygon(std::string radiusAttribute, std::string areaAttribute, std::string heightAttribute)
 	{
 		this->radiusAttribute = radiusAttribute;
 		this->areaAttribute = areaAttribute;
@@ -35,10 +35,10 @@ namespace rsgis{namespace vec{
 	
 	void RSGISCirclePolygon::readAttribtues(OGRFeature *feature, OGRFeatureDefn *featDefn)
 	{
-		RSGISMathsUtils mathsUtils;
+        rsgis::math::RSGISMathsUtils mathsUtils;
 		// Read the class attribute
 		OGRFieldDefn *fieldDef = NULL;
-		string columnName;
+		std::string columnName;
 		int fieldCount = featDefn->GetFieldCount();
 		for(int i = 0; i < fieldCount; i++)
 		{
@@ -46,15 +46,15 @@ namespace rsgis{namespace vec{
 			columnName = fieldDef->GetNameRef();
 			if(columnName == this->areaAttribute)
 			{
-				this->area = mathsUtils.strtofloat(string(feature->GetFieldAsString(i)));
+				this->area = mathsUtils.strtofloat(std::string(feature->GetFieldAsString(i)));
 			}
 			else if(columnName == this->heightAttribute)
 			{
-				this->height = mathsUtils.strtofloat(string(feature->GetFieldAsString(i)));
+				this->height = mathsUtils.strtofloat(std::string(feature->GetFieldAsString(i)));
 			}
 			else if(columnName == this->radiusAttribute)
 			{
-				this->radius = mathsUtils.strtofloat(string(feature->GetFieldAsString(i)));
+				this->radius = mathsUtils.strtofloat(std::string(feature->GetFieldAsString(i)));
 			}
 		}
 		

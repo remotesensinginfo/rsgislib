@@ -41,12 +41,6 @@
 
 #include "geos/geom/Envelope.h"
 
-using namespace std;
-using namespace rsgis;
-using namespace rsgis::math;
-using namespace rsgis::datastruct;
-using namespace geos::geom;
-
 namespace rsgis{namespace vec{
 	
 	class RSGISFloatAttribute
@@ -72,17 +66,17 @@ namespace rsgis{namespace vec{
 	class RSGISIdentifyTopLayerAttributes : public RSGISProcessOGRFeature
 		{
 		public:
-			RSGISIdentifyTopLayerAttributes(string *attributes, int numAttributes, int numTop, rsgissummarytype summary);
-			virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, Envelope *env, long fid) throw(RSGISVectorException);
-			virtual void processFeature(OGRFeature *feature, Envelope *env, long fid) throw(RSGISVectorException);
+			RSGISIdentifyTopLayerAttributes(string *attributes, int numAttributes, int numTop, rsgis::math::rsgissummarytype summary);
+			virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
+			virtual void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
 			virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException);
 			virtual ~RSGISIdentifyTopLayerAttributes();
 		protected:
 			string *attributes;
 			int numAttributes;
 			int numTop;
-			rsgissummarytype summary;
-			SortedGenericList<RSGISFloatAttribute> *sortedAttributes;
+            rsgis::math::rsgissummarytype summary;
+            rsgis::datastruct::SortedGenericList<RSGISFloatAttribute> *sortedAttributes;
 		};
 
 	

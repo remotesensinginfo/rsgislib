@@ -35,7 +35,7 @@ namespace rsgis{ namespace modeling  {
 		// TO DO: Add check to ensure array will fit into memory.
 	}
 	
-	void RSGISModelTransect::createConvexHull(vector<Polygon*> *canopyPoly)
+	void RSGISModelTransect::createConvexHull(std::vector<geos::geom::Polygon*> *canopyPoly)
 	{
 		this->canopyPoly = canopyPoly;
 		this->convexHull = true;

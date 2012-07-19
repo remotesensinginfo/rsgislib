@@ -42,18 +42,14 @@
 
 #include "geos/geom/Envelope.h"
 
-using namespace std;
-using namespace geos::geom;
-using namespace rsgis::math;
-
 namespace rsgis{namespace vec{
 	
 	class RSGISVectorZonalStats : public RSGISProcessOGRFeature
 	{
 	public:
 		RSGISVectorZonalStats(GDALDataset *image);
-		virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, Envelope *env, long fid) throw(RSGISVectorException);
-		virtual void processFeature(OGRFeature *feature, Envelope *env, long fid) throw(RSGISVectorException);
+		virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
+		virtual void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
 		virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException);
 		float* getPixelColumns(int xPxl, int yPxl);
 		virtual ~RSGISVectorZonalStats();
@@ -61,7 +57,7 @@ namespace rsgis{namespace vec{
 		GDALDataset *image;
 		GDALRasterBand **bands;
 		int numImgBands;
-		Envelope *imageExtent;
+		geos::geom::Envelope *imageExtent;
 		double imgRes;
 		float *pxlValues;
 	};

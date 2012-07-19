@@ -75,7 +75,7 @@ namespace rsgis { namespace modeling{
 							 rsgis::math::RSGISProbDistro *largeBranchPosHDistro, rsgis::math::RSGISProbDistro *largeBranchPosVDistro, rsgis::math::RSGISProbDistro *largeBranchThetaDistro, rsgis::math::RSGISProbDistro *largeBranchPhiDistro);
 		virtual void createVeg(){};
 		virtual void addVegTrans(RSGISTransect *transect, unsigned int centerX, unsigned int centerY, unsigned int sizeX, unsigned int sizeY);
-		virtual void addVegTransConvexHull(RSGISTransect *transect, unsigned int centerX, unsigned int centerY, unsigned int sizeX, unsigned int sizeY, std::vector<Polygon*> *canopyPolys);
+		virtual void addVegTransConvexHull(RSGISTransect *transect, unsigned int centerX, unsigned int centerY, unsigned int sizeX, unsigned int sizeY, std::vector<geos::geom::Polygon*> *canopyPolys);
 		virtual ~RSGISModelTreeCanopy();
 	private:
 		double leafLenght, leafWidth, leafThickness, leafDensity;

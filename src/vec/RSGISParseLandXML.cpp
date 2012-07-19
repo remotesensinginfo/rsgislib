@@ -29,18 +29,18 @@ namespace rsgis { namespace vec {
 	{
 	}
 	
-	void RSGISParseLandXML::getLandXMLLine(string xmlFile, vector<LineSegment*> *outLines)
+	void RSGISParseLandXML::getLandXMLLine(std::string xmlFile, std::vector<geos::geom::LineSegment*> *outLines)
 	{
 		this->xmlFile = xmlFile;
 		XMLCh tempStr[100];
-		DOMImplementation *impl = NULL;
-		DOMLSParser* parser = NULL;
-		ErrorHandler* errHandler = NULL;
-		DOMDocument *doc = NULL;
-		DOMElement *rootElement = NULL;
-		DOMNodeList *linesList = NULL;
+        xercesc::DOMImplementation *impl = NULL;
+		xercesc::DOMLSParser* parser = NULL;
+		xercesc::ErrorHandler* errHandler = NULL;
+		xercesc::DOMDocument *doc = NULL;
+		xercesc::DOMElement *rootElement = NULL;
+		xercesc::DOMNodeList *linesList = NULL;
 		//DOMNodeList *singlelineList = NULL;
-		DOMNode *argNode = NULL;
+		xercesc::DOMNode *argNode = NULL;
 		//DOMNode *lineStartNode = NULL;
 		//DOMNode *lineEndNode = NULL;
 		XMLCh *landXMLRootTag = NULL;
@@ -48,40 +48,40 @@ namespace rsgis { namespace vec {
 		XMLCh *lineTag = NULL;
 		XMLCh *lineStartTag = NULL;
 		XMLCh *lineEndTag = NULL;
-		string lineStart = "";
-		Coordinate *startCoord;
-		Coordinate *endCoord;
+		std::string lineStart = "";
+        geos::geom::Coordinate *startCoord;
+        geos::geom::Coordinate *endCoord;
 		int numLines = 0;
 		
 		try
 		{
-			XMLPlatformUtils::Initialize();
-			RSGISMathsUtils mathUtils;
-			landXMLRootTag = XMLString::transcode("LandXML"); // LandXML root tag
-			coordGeomTag = XMLString::transcode("CoordGeom"); // Coordinate Geometry Tag
-			lineTag = XMLString::transcode("Line"); // Line Tag
-			lineStartTag = XMLString::transcode("Start"); // Start of line Tag
-			lineEndTag = XMLString::transcode("End"); // End of line Tag
+			xercesc::XMLPlatformUtils::Initialize();
+            rsgis::math::RSGISMathsUtils mathUtils;
+			landXMLRootTag = xercesc::XMLString::transcode("LandXML"); // LandXML root tag
+			coordGeomTag = xercesc::XMLString::transcode("CoordGeom"); // Coordinate Geometry Tag
+			lineTag = xercesc::XMLString::transcode("Line"); // Line Tag
+			lineStartTag = xercesc::XMLString::transcode("Start"); // Start of line Tag
+			lineEndTag = xercesc::XMLString::transcode("End"); // End of line Tag
 			
-			XMLString::transcode("LS", tempStr, 99);
-			impl = DOMImplementationRegistry::getDOMImplementation(tempStr);
+			xercesc::XMLString::transcode("LS", tempStr, 99);
+			impl = xercesc::DOMImplementationRegistry::getDOMImplementation(tempStr);
 			if(impl == NULL)
 			{
 				throw RSGISXMLArgumentsException("DOMImplementation is NULL");
 			}
 			
 			// Create Parser
-			parser = ((DOMImplementationLS*)impl)->createLSParser(DOMImplementationLS::MODE_SYNCHRONOUS, 0);
-			errHandler = (ErrorHandler*) new HandlerBase();
-			parser->getDomConfig()->setParameter(XMLUni::fgDOMErrorHandler, errHandler);
+			parser = ((xercesc::DOMImplementationLS*)impl)->createLSParser(xercesc::DOMImplementationLS::MODE_SYNCHRONOUS, 0);
+			errHandler = (xercesc::ErrorHandler*) new xercesc::HandlerBase();
+			parser->getDomConfig()->setParameter(xercesc::XMLUni::fgDOMErrorHandler, errHandler);
 			
 			// Open Document
 			doc = parser->parseURI(xmlFile.c_str());	
 			
 			// Get the Root element
 			rootElement = doc->getDocumentElement();
-			//cout << "Root Element: " << XMLString::transcode(rootElement->getTagName()) << endl;
-			if(!XMLString::equals(rootElement->getTagName(), landXMLRootTag))
+			//std::cout << "Root Element: " << XMLString::transcode(rootElement->getTagName()) << std::endl;
+			if(!xercesc::XMLString::equals(rootElement->getTagName(), landXMLRootTag))
 			{
 				throw RSGISXMLArgumentsException("XML file not in valid LandXML format");
 			}
@@ -89,7 +89,7 @@ namespace rsgis { namespace vec {
 			linesList =  rootElement->getElementsByTagName(lineTag);
 			numLines = linesList->getLength();
 			
-			cout << "The file contains " << numLines << " lines" << endl;
+			std::cout << "The file contains " << numLines << " lines" << std::endl;
 			
 			for(int i = 0; i < numLines; i++)
 			{
@@ -100,17 +100,17 @@ namespace rsgis { namespace vec {
 				vector <double> *tempCoord = new vector<double>(); // Set up tempory vector to hold the coordinates
 				startCoord = NULL;
 				endCoord = NULL;
-				argNode = static_cast<DOMElement*>(linesList->item(i));
+				argNode = static_cast<xercesc::DOMElement*>(linesList->item(i));
 				
 				// Get all text elements between <Line> and </Line> tag
-				char *charValue = XMLString::transcode(argNode->getTextContent());
-				string lineStr = string(charValue);
-				XMLString::release(&charValue);
+				char *charValue = xercesc::XMLString::transcode(argNode->getTextContent());
+                std::string lineStr = std::string(charValue);
+				xercesc::XMLString::release(&charValue);
 				
 				// Split segments based on space's and new lines using boost
 				typedef boost::tokenizer<boost::char_separator<char> > 
 				tokenizer;
-				char_separator<char> sep(" ", "\n");
+				boost::char_separator<char> sep(" ", "\n");
 				tokenizer tokens(lineStr, sep);
 				int j = 0;
 				for (tokenizer::iterator tok_iter = tokens.begin(); tok_iter != tokens.end(); ++tok_iter) 
@@ -118,47 +118,47 @@ namespace rsgis { namespace vec {
 					
 					if(*tok_iter != "\n") // If split segment is not a new line tag
 					{
-						//cout << "j = " << j << endl;
-						//cout << "xml " << *tok_iter << endl;
+						//std::cout << "j = " << j << std::endl;
+						//std::cout << "xml " << *tok_iter << std::endl;
 						double test = mathUtils.strtodouble(*tok_iter);
 						tempCoord->push_back(test); // Store coordinates to array when read in
-						//cout << "double " << tempCoord->at(j) << endl;
+						//std::cout << "double " << tempCoord->at(j) << std::endl;
 						j = j + 1; // Advance itterater if coordinate (and not blank line)
 					}
 				}
 				// Create geos coordinate for start and end of line
-				startCoord = new Coordinate(tempCoord->at(0), tempCoord->at(1), tempCoord->at(2));
-				endCoord = new Coordinate(tempCoord->at(3), tempCoord->at(4), tempCoord->at(5));
+				startCoord = new geos::geom::Coordinate(tempCoord->at(0), tempCoord->at(1), tempCoord->at(2));
+				endCoord = new geos::geom::Coordinate(tempCoord->at(3), tempCoord->at(4), tempCoord->at(5));
 				
 				// Construct geos line segment from coordinates
-				outLines->push_back(new LineSegment(*startCoord, *endCoord));
+				outLines->push_back(new geos::geom::LineSegment(*startCoord, *endCoord));
 
 				delete tempCoord; // Delete tempory coordinates
 			}
 			
 			// Tidy up
-			cout << "XML File saved as geos line segments" << endl;
+			std::cout << "XML File saved as geos line segments" << std::endl;
 			
 			parser->release();
 			delete errHandler;
-			XMLString::release(&coordGeomTag);
-			XMLString::release(&landXMLRootTag);
-			XMLString::release(&lineTag);
-			XMLPlatformUtils::Terminate();
+			xercesc::XMLString::release(&coordGeomTag);
+			xercesc::XMLString::release(&landXMLRootTag);
+			xercesc::XMLString::release(&lineTag);
+			xercesc::XMLPlatformUtils::Terminate();
 			
 		}
-		catch (const XMLException& e) 
+		catch (const xercesc::XMLException& e) 
 		{
 			parser->release();
-			char *message = XMLString::transcode(e.getMessage());
-			string outMessage =  string("XMLException : ") + string(message);
+			char *message = xercesc::XMLString::transcode(e.getMessage());
+			std::string outMessage =  std::string("XMLException : ") + std::string(message);
 			throw RSGISXMLArgumentsException(outMessage.c_str());
 		}
-		catch (const DOMException& e) 
+		catch (const xercesc::DOMException& e) 
 		{
 			parser->release();
-			char *message = XMLString::transcode(e.getMessage());
-			string outMessage =  string("DOMException : ") + string(message);
+			char *message = xercesc::XMLString::transcode(e.getMessage());
+			std::string outMessage =  std::string("DOMException : ") + std::string(message);
 			throw RSGISXMLArgumentsException(outMessage.c_str());
 		}
 		catch(RSGISXMLArgumentsException &e)

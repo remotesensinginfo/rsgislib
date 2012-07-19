@@ -27,23 +27,11 @@
 #include <iostream>
 #include <string>
 
-#include "geom/RSGIS2DPoint.h"
 #include "geom/RSGISPolygon.h"
-
-#include "math/RSGISMathsUtils.h"
-
-#include "geos/geom/Point.h"
-#include "geos/geom/Polygon.h"
-#include "geos/geom/CoordinateSequence.h"
-#include "geos/geom/LineString.h"
-
-using namespace std;
-using namespace geos::geom;
-using namespace rsgis::geom;
 
 namespace rsgis{namespace vec{
 	
-	class RSGISIntValuePolygon : public RSGISPolygon
+	class RSGISIntValuePolygon : public rsgis::geom::RSGISPolygon
 	{
 	public:
 		RSGISIntValuePolygon();

@@ -24,7 +24,7 @@
 
 namespace rsgisexe{
 
-RSGISExeImageCalculation::RSGISExeImageCalculation() : RSGISAlgorithmParameters()
+RSGISExeImageCalculation::RSGISExeImageCalculation() : rsgis::RSGISAlgorithmParameters()
 {
 	this->algorithm = "imagecalc";
 	this->option = RSGISExeImageCalculation::none;
@@ -149,7 +149,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
         }
         else
         {
-            cerr << "Data type not recognised, defaulting to 32 bit float.";
+            std::cerr << "Data type not recognised, defaulting to 32 bit float.";
             this->outDataType = GDT_Float32;
         }
         
@@ -264,7 +264,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 		if(argElement->hasAttribute(outminXMLStr))
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outminXMLStr));
-			this->outMin = mathUtils.strtodouble(string(charValue));
+			this->outMin = mathUtils.strtodouble(std::string(charValue));
 			xercesc::XMLString::release(&charValue);
 		}
 		else
@@ -277,7 +277,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 		if(argElement->hasAttribute(outmaxXMLStr))
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outmaxXMLStr));
-			this->outMax = mathUtils.strtodouble(string(charValue));
+			this->outMax = mathUtils.strtodouble(std::string(charValue));
 			xercesc::XMLString::release(&charValue);
 		}
 		else
@@ -291,11 +291,11 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 		if(argElement->hasAttribute(inmaxXMLStr) & argElement->hasAttribute(inminXMLStr))
 		{
             char *charValue1 = xercesc::XMLString::transcode(argElement->getAttribute(inmaxXMLStr));
-			this->inMin = mathUtils.strtodouble(string(charValue1));
+			this->inMin = mathUtils.strtodouble(std::string(charValue1));
 			xercesc::XMLString::release(&charValue1);
             
             char *charValue2 = xercesc::XMLString::transcode(argElement->getAttribute(inminXMLStr));
-			this->inMax = mathUtils.strtodouble(string(charValue2));
+			this->inMax = mathUtils.strtodouble(std::string(charValue2));
 			xercesc::XMLString::release(&charValue2);
             
 			this->calcInMinMax = false;
@@ -492,7 +492,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 		if(argElement->hasAttribute(componentsXMLStr))
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(componentsXMLStr));
-			this->numComponents = mathUtils.strtoint(string(charValue));
+			this->numComponents = mathUtils.strtoint(std::string(charValue));
 			xercesc::XMLString::release(&charValue);
 		}
 		else
@@ -586,15 +586,15 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 		else if(argElement->hasAttribute(expressionFileXMLStr)) // Get expression from text file
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(expressionFileXMLStr));
-			string inputExprFileName = std::string(charValue);
+            std::string inputExprFileName = std::string(charValue);
             std::string muExpression = "";
-			ifstream inputExprFile;
+			std::ifstream inputExprFile;
 			inputExprFile.open(inputExprFileName.c_str());
 			if(!inputExprFile.is_open())
 			{
 				throw rsgis::RSGISXMLArgumentsException("Could not open input expression file.");
 			}
-			string strLine;
+			std::string strLine;
 			while(!inputExprFile.eof())
 			{
 				getline(inputExprFile, strLine, '\n');
@@ -672,7 +672,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 			if(varElement->hasAttribute(varBandXMLStr))
 			{
 				char *charValue = xercesc::XMLString::transcode(varElement->getAttribute(varBandXMLStr));
-				this->variables[i].bandNum = mathUtils.strtoint(string(charValue));
+				this->variables[i].bandNum = mathUtils.strtoint(std::string(charValue));
 				xercesc::XMLString::release(&charValue);
 			}
 			else
@@ -717,7 +717,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 		if(argElement->hasAttribute(thresholdXMLStr))
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(thresholdXMLStr));
-			this->threshold = mathUtils.strtofloat(string(charValue));
+			this->threshold = mathUtils.strtofloat(std::string(charValue));
 			xercesc::XMLString::release(&charValue);
 		}
 		else
@@ -730,7 +730,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 		if(argElement->hasAttribute(valueXMLStr))
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(valueXMLStr));
-			this->value = mathUtils.strtofloat(string(charValue));
+			this->value = mathUtils.strtofloat(std::string(charValue));
 			xercesc::XMLString::release(&charValue);
 		}
 		else
@@ -837,15 +837,15 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 		else if(argElement->hasAttribute(expressionFileXMLStr)) // Get expression from text file
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(expressionFileXMLStr));
-			string inputExprFileName = std::string(charValue);
+			std::string inputExprFileName = std::string(charValue);
             std::string muExpression = "";
-			ifstream inputExprFile;
+			std::ifstream inputExprFile;
 			inputExprFile.open(inputExprFileName.c_str());
 			if(!inputExprFile.is_open())
 			{
 				throw rsgis::RSGISXMLArgumentsException("Could not open input expression file.");
 			}
-			string strLine;
+			std::string strLine;
 			while(!inputExprFile.eof())
 			{
 				getline(inputExprFile, strLine, '\n');
@@ -898,7 +898,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 		if(argElement->hasAttribute(upperXMLStr))
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(upperXMLStr));
-			this->upper = mathUtils.strtofloat(string(charValue));
+			this->upper = mathUtils.strtofloat(std::string(charValue));
 			xercesc::XMLString::release(&charValue);
 		}
 		else
@@ -911,7 +911,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 		if(argElement->hasAttribute(lowerXMLStr))
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(lowerXMLStr));
-			this->lower = mathUtils.strtofloat(string(charValue));
+			this->lower = mathUtils.strtofloat(std::string(charValue));
 			xercesc::XMLString::release(&charValue);
 		}
 		else
@@ -952,7 +952,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 			if(imgElement->hasAttribute(imgBandXMLStr))
 			{
 				char *charValue = xercesc::XMLString::transcode(imgElement->getAttribute(imgBandXMLStr));
-				this->imageBands[i] = mathUtils.strtoint(string(charValue))-1;
+				this->imageBands[i] = mathUtils.strtoint(std::string(charValue))-1;
 				xercesc::XMLString::release(&charValue);
 			}
 			else
@@ -965,7 +965,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 			if(imgElement->hasAttribute(imgTimeXMLStr))
 			{
 				char *charValue = xercesc::XMLString::transcode(imgElement->getAttribute(imgTimeXMLStr));
-				this->imageTimes[i] = mathUtils.strtofloat(string(charValue));
+				this->imageTimes[i] = mathUtils.strtofloat(std::string(charValue));
 				xercesc::XMLString::release(&charValue);
 			}
 			else
@@ -1009,7 +1009,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 		if(argElement->hasAttribute(upperXMLStr))
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(upperXMLStr));
-			this->upper = mathUtils.strtofloat(string(charValue));
+			this->upper = mathUtils.strtofloat(std::string(charValue));
 			xercesc::XMLString::release(&charValue);
 		}
 		else
@@ -1022,7 +1022,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 		if(argElement->hasAttribute(lowerXMLStr))
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(lowerXMLStr));
-			this->lower = mathUtils.strtofloat(string(charValue));
+			this->lower = mathUtils.strtofloat(std::string(charValue));
 			xercesc::XMLString::release(&charValue);
 		}
 		else
@@ -1066,7 +1066,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 		if(argElement->hasAttribute(bandAXMLStr)) 
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(bandAXMLStr));
-			this->inputBandA = mathUtils.strtoint(string(charValue)) - 1;
+			this->inputBandA = mathUtils.strtoint(std::string(charValue)) - 1;
 			if (this->inputBandA < 0) 
 			{
 				std::cout << "\tBand numbering starts at 1, assuming first band for image A" << std::endl;
@@ -1085,7 +1085,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 		if(argElement->hasAttribute(bandBXMLStr)) 
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(bandBXMLStr));
-			this->inputBandB = mathUtils.strtoint(string(charValue)) - 1;
+			this->inputBandB = mathUtils.strtoint(std::string(charValue)) - 1;
 			if (this->inputBandB < 0) 
 			{
 				std::cout << "\tBand numbering starts at 1, assuming first band for image B" << std::endl;
@@ -1145,7 +1145,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 			if(argElement->hasAttribute(coefficients))
 			{
 				char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(coefficients));
-				string coeffFile = std::string(charValue);
+				std::string coeffFile = std::string(charValue);
 				this->coeffMatrix = matrixUtils.readGSLMatrixFromTxt(coeffFile);
 				xercesc::XMLString::release(&charValue);
 			}
@@ -1208,7 +1208,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 			if(argElement->hasAttribute(coefficients))
 			{
 				char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(coefficients));
-				string coeffFile = std::string(charValue);
+				std::string coeffFile = std::string(charValue);
 				this->coeffMatrix = matrixUtils.readGSLMatrixFromTxt(coeffFile);
 				xercesc::XMLString::release(&charValue);
 			}
@@ -1223,7 +1223,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 			if(argElement->hasAttribute(polyOrderStr))
 			{
 				char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(polyOrderStr));
-				int orderInt = mathUtils.strtoint(string(charValue));
+				int orderInt = mathUtils.strtoint(std::string(charValue));
 				std::cout << "\tusing same order polynomial for both sets of fits, use \'polyOrderX\', \'polyOrderY\' and \'polyOrderZ\' to set seperately" << std::endl;
 				sameOrderBothFits = true;
 				this->polyOrderX = orderInt + 1;
@@ -1236,7 +1236,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 			if(argElement->hasAttribute(polyOrderXStr))
 			{
 				char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(polyOrderXStr));
-				int orderInt = mathUtils.strtoint(string(charValue));
+				int orderInt = mathUtils.strtoint(std::string(charValue));
 				this->polyOrderX = orderInt + 1;
 				xercesc::XMLString::release(&charValue);
 			}
@@ -1252,7 +1252,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 			if(argElement->hasAttribute(polyOrderYStr))
 			{
 				char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(polyOrderYStr));
-				int orderInt = mathUtils.strtoint(string(charValue));
+				int orderInt = mathUtils.strtoint(std::string(charValue));
 				this->polyOrderY = orderInt + 1;
 				xercesc::XMLString::release(&charValue);
 			}
@@ -1268,7 +1268,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 			if(argElement->hasAttribute(polyOrderZStr))
 			{
 				char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(polyOrderZStr));
-				int orderInt = mathUtils.strtoint(string(charValue));
+				int orderInt = mathUtils.strtoint(std::string(charValue));
 				this->polyOrderZ = orderInt + 1;
 				xercesc::XMLString::release(&charValue);
 			}
@@ -1324,7 +1324,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 		if(argElement->hasAttribute(resolutionXMLStr))
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(resolutionXMLStr));
-			this->imgResolution = mathUtils.strtofloat(string(charValue));
+			this->imgResolution = mathUtils.strtofloat(std::string(charValue));
 			xercesc::XMLString::release(&charValue);
 		}
 		else
@@ -1382,7 +1382,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 		}
 		else
 		{
-			cerr << "No \'ignorezeros\' attribute was provided so defaulting to ignore zeros.\n";
+			std::cerr << "No \'ignorezeros\' attribute was provided so defaulting to ignore zeros.\n";
             this->ignoreZeros = true;
 		}
 		xercesc::XMLString::release(&ignoreZerosXMLStr);
@@ -1436,7 +1436,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 		}
 		else
 		{
-			cerr << "No \'ignorezeros\' attribute was provided so defaulting to ignore zeros.\n";
+			std::cerr << "No \'ignorezeros\' attribute was provided so defaulting to ignore zeros.\n";
             this->ignoreZeros = true;
 		}
 		xercesc::XMLString::release(&ignoreZerosXMLStr);
@@ -1490,7 +1490,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 		if(argElement->hasAttribute(gainXMLStr))
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(gainXMLStr));
-			this->lsumGain = mathUtils.strtofloat(string(charValue));
+			this->lsumGain = mathUtils.strtofloat(std::string(charValue));
 			xercesc::XMLString::release(&charValue);
 		}
 		else
@@ -1503,7 +1503,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 		if(argElement->hasAttribute(offsetXMLStr))
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(offsetXMLStr));
-			this->lsumOffset = mathUtils.strtofloat(string(charValue));
+			this->lsumOffset = mathUtils.strtofloat(std::string(charValue));
 			xercesc::XMLString::release(&charValue);
 		}
 		else
@@ -1560,7 +1560,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 		if(argElement->hasAttribute(stepXMLStr))
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(stepXMLStr));
-			this->stepResolution = mathUtils.strtofloat(string(charValue));
+			this->stepResolution = mathUtils.strtofloat(std::string(charValue));
 			xercesc::XMLString::release(&charValue);
 		}
 		else
@@ -1573,7 +1573,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 		if(argElement->hasAttribute(gainXMLStr))
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(gainXMLStr));
-			this->lsumGain = mathUtils.strtofloat(string(charValue));
+			this->lsumGain = mathUtils.strtofloat(std::string(charValue));
 			xercesc::XMLString::release(&charValue);
 		}
 		else
@@ -1586,7 +1586,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 		if(argElement->hasAttribute(offsetXMLStr))
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(offsetXMLStr));
-			this->lsumOffset = mathUtils.strtofloat(string(charValue));
+			this->lsumOffset = mathUtils.strtofloat(std::string(charValue));
 			xercesc::XMLString::release(&charValue);
 		}
 		else
@@ -1643,7 +1643,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 		if(argElement->hasAttribute(weightXMLStr))
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(weightXMLStr));
-			this->lsumWeight = mathUtils.strtofloat(string(charValue));
+			this->lsumWeight = mathUtils.strtofloat(std::string(charValue));
 			xercesc::XMLString::release(&charValue);
 		}
 		else
@@ -1656,7 +1656,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 		if(argElement->hasAttribute(gainXMLStr))
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(gainXMLStr));
-			this->lsumGain = mathUtils.strtofloat(string(charValue));
+			this->lsumGain = mathUtils.strtofloat(std::string(charValue));
 			xercesc::XMLString::release(&charValue);
 		}
 		else
@@ -1669,7 +1669,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 		if(argElement->hasAttribute(offsetXMLStr))
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(offsetXMLStr));
-			this->lsumOffset = mathUtils.strtofloat(string(charValue));
+			this->lsumOffset = mathUtils.strtofloat(std::string(charValue));
 			xercesc::XMLString::release(&charValue);
 		}
 		else
@@ -1726,7 +1726,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 		if(argElement->hasAttribute(weightXMLStr))
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(weightXMLStr));
-			this->lsumWeight = mathUtils.strtofloat(string(charValue));
+			this->lsumWeight = mathUtils.strtofloat(std::string(charValue));
 			xercesc::XMLString::release(&charValue);
 		}
 		else
@@ -1739,7 +1739,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 		if(argElement->hasAttribute(gainXMLStr))
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(gainXMLStr));
-			this->lsumGain = mathUtils.strtofloat(string(charValue));
+			this->lsumGain = mathUtils.strtofloat(std::string(charValue));
 			xercesc::XMLString::release(&charValue);
 		}
 		else
@@ -1752,7 +1752,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 		if(argElement->hasAttribute(offsetXMLStr))
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(offsetXMLStr));
-			this->lsumOffset = mathUtils.strtofloat(string(charValue));
+			this->lsumOffset = mathUtils.strtofloat(std::string(charValue));
 			xercesc::XMLString::release(&charValue);
 		}
 		else
@@ -1795,7 +1795,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 		if(argElement->hasAttribute(numClustersXMLStr))
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(numClustersXMLStr));
-			this->numClusters = mathUtils.strtounsignedint(string(charValue));
+			this->numClusters = mathUtils.strtounsignedint(std::string(charValue));
 			xercesc::XMLString::release(&charValue);
 		}
 		else
@@ -1809,7 +1809,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 		if(argElement->hasAttribute(maxIterationsXMLStr))
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(maxIterationsXMLStr));
-			this->maxNumIterations = mathUtils.strtounsignedint(string(charValue));
+			this->maxNumIterations = mathUtils.strtounsignedint(std::string(charValue));
 			xercesc::XMLString::release(&charValue);
 		}
 		else
@@ -1823,7 +1823,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 		if(argElement->hasAttribute(degreeOfChangeXMLStr))
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(degreeOfChangeXMLStr));
-			this->degreeOfChange = mathUtils.strtofloat(string(charValue))/100;
+			this->degreeOfChange = mathUtils.strtofloat(std::string(charValue))/100;
 			xercesc::XMLString::release(&charValue);
 		}
 		else
@@ -1836,10 +1836,10 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 		if(argElement->hasAttribute(subsampleXMLStr))
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(subsampleXMLStr));
-			this->subSample = mathUtils.strtounsignedint(string(charValue));
+			this->subSample = mathUtils.strtounsignedint(std::string(charValue));
             if(this->subSample == 0)
             {
-                cerr << "Warning: SubSample must have a value of at least 1. Value updated to 1.\n";
+                std::cerr << "Warning: SubSample must have a value of at least 1. Value updated to 1.\n";
                 this->subSample = 1;
             }
 			xercesc::XMLString::release(&charValue);
@@ -1888,7 +1888,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 			else
 			{
 				this->initClusterMethod = rsgis::math::init_random;
-                cerr << "The initial cluster method was not reconised so random method is being used\n";
+                std::cerr << "The initial cluster method was not reconised so random method is being used\n";
 			}
 			xercesc::XMLString::release(&randomStr);
             xercesc::XMLString::release(&diagonalRangeStr);
@@ -1923,7 +1923,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 		else
 		{
 			this->ignoreZeros = true;
-            cerr << "Ignoring zeros options not specified by default zero will be ignored.\n";
+            std::cerr << "Ignoring zeros options not specified by default zero will be ignored.\n";
 		}
 		xercesc::XMLString::release(&ignoreZerosXMLStr);
 	}
@@ -1961,7 +1961,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 		if(argElement->hasAttribute(numClustersXMLStr))
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(numClustersXMLStr));
-			this->numClusters = mathUtils.strtounsignedint(string(charValue));
+			this->numClusters = mathUtils.strtounsignedint(std::string(charValue));
 			xercesc::XMLString::release(&charValue);
 		}
 		else
@@ -1974,7 +1974,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 		if(argElement->hasAttribute(maxIterationsXMLStr))
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(maxIterationsXMLStr));
-			this->maxNumIterations = mathUtils.strtounsignedint(string(charValue));
+			this->maxNumIterations = mathUtils.strtounsignedint(std::string(charValue));
 			xercesc::XMLString::release(&charValue);
 		}
 		else
@@ -1988,7 +1988,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 		if(argElement->hasAttribute(degreeOfChangeXMLStr))
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(degreeOfChangeXMLStr));
-			this->degreeOfChange = mathUtils.strtofloat(string(charValue))/100;
+			this->degreeOfChange = mathUtils.strtofloat(std::string(charValue))/100;
 			xercesc::XMLString::release(&charValue);
 		}
 		else
@@ -2001,10 +2001,10 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 		if(argElement->hasAttribute(subsampleXMLStr))
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(subsampleXMLStr));
-			this->subSample = mathUtils.strtounsignedint(string(charValue));
+			this->subSample = mathUtils.strtounsignedint(std::string(charValue));
             if(this->subSample == 0)
             {
-                cerr << "Warning: SubSample must have a value of at least 1. Value updated to 1.\n";
+                std::cerr << "Warning: SubSample must have a value of at least 1. Value updated to 1.\n";
                 this->subSample = 1;
             }
 			xercesc::XMLString::release(&charValue);
@@ -2053,7 +2053,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 			else
 			{
 				this->initClusterMethod = rsgis::math::init_random;
-                cerr << "The initial cluster method was not reconised so random method is being used\n";
+                std::cerr << "The initial cluster method was not reconised so random method is being used\n";
 			}
 			xercesc::XMLString::release(&randomStr);
             xercesc::XMLString::release(&diagonalRangeStr);
@@ -2088,7 +2088,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 		else
 		{
 			this->ignoreZeros = true;
-            cerr << "Ignoring zeros options not specified by default zero will be ignored.\n";
+            std::cerr << "Ignoring zeros options not specified by default zero will be ignored.\n";
 		}
 		xercesc::XMLString::release(&ignoreZerosXMLStr);
                 
@@ -2096,7 +2096,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 		if(argElement->hasAttribute(minNumXMLStr))
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(minNumXMLStr));
-			this->minNumFeatures = mathUtils.strtounsignedint(string(charValue));
+			this->minNumFeatures = mathUtils.strtounsignedint(std::string(charValue));
 			xercesc::XMLString::release(&charValue);
 		}
 		else
@@ -2109,7 +2109,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 		if(argElement->hasAttribute(minDistXMLStr))
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(minDistXMLStr));
-			this->minDistBetweenClusters = mathUtils.strtofloat(string(charValue));
+			this->minDistBetweenClusters = mathUtils.strtofloat(std::string(charValue));
 			xercesc::XMLString::release(&charValue);
 		}
 		else
@@ -2122,7 +2122,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 		if(argElement->hasAttribute(maxStdDevXMLStr))
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(maxStdDevXMLStr));
-			this->maxStdDev = mathUtils.strtofloat(string(charValue));
+			this->maxStdDev = mathUtils.strtofloat(std::string(charValue));
 			xercesc::XMLString::release(&charValue);
 		}
 		else
@@ -2135,7 +2135,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 		if(argElement->hasAttribute(minNumClustersXMLStr))
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(minNumClustersXMLStr));
-			this->minNumClusters = mathUtils.strtounsignedint(string(charValue));
+			this->minNumClusters = mathUtils.strtounsignedint(std::string(charValue));
 			xercesc::XMLString::release(&charValue);
 		}
 		else
@@ -2149,7 +2149,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 		if(argElement->hasAttribute(editStartXMLStr))
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(editStartXMLStr));
-			this->startIteration = mathUtils.strtounsignedint(string(charValue));
+			this->startIteration = mathUtils.strtounsignedint(std::string(charValue));
 			xercesc::XMLString::release(&charValue);
 		}
 		else
@@ -2162,7 +2162,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 		if(argElement->hasAttribute(editEndXMLStr))
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(editEndXMLStr));
-			this->endIteration = mathUtils.strtounsignedint(string(charValue));
+			this->endIteration = mathUtils.strtounsignedint(std::string(charValue));
 			xercesc::XMLString::release(&charValue);
 		}
 		else
@@ -2205,7 +2205,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 		if(argElement->hasAttribute(valueXMLStr))
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(valueXMLStr));
-			this->imgValue = mathUtils.strtofloat(string(charValue));
+			this->imgValue = mathUtils.strtofloat(std::string(charValue));
 			xercesc::XMLString::release(&charValue);
 		}
 		else
@@ -2218,7 +2218,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 		if(argElement->hasAttribute(trueOutXMLStr))
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(trueOutXMLStr));
-			this->outputTrueVal = mathUtils.strtofloat(string(charValue));
+			this->outputTrueVal = mathUtils.strtofloat(std::string(charValue));
 			xercesc::XMLString::release(&charValue);
 		}
 		else
@@ -2231,7 +2231,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 		if(argElement->hasAttribute(falseOutXMLStr))
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(falseOutXMLStr));
-			this->outputFalseVal = mathUtils.strtofloat(string(charValue));
+			this->outputFalseVal = mathUtils.strtofloat(std::string(charValue));
 			xercesc::XMLString::release(&charValue);
 		}
 		else
@@ -2287,7 +2287,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 		if(argElement->hasAttribute(valueXMLStr))
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(valueXMLStr));
-			this->imgValue = mathUtils.strtofloat(string(charValue));
+			this->imgValue = mathUtils.strtofloat(std::string(charValue));
 			xercesc::XMLString::release(&charValue);
 		}
 		else
@@ -2300,7 +2300,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 		if(argElement->hasAttribute(bandXMLStr))
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(bandXMLStr));
-			this->imgBand = mathUtils.strtounsignedint(string(charValue));
+			this->imgBand = mathUtils.strtounsignedint(std::string(charValue));
 			xercesc::XMLString::release(&charValue);
 		}
 		else
@@ -2315,7 +2315,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 		if(argElement->hasAttribute(minXMLStr))
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(minXMLStr));
-			this->inMin = mathUtils.strtoint(string(charValue));
+			this->inMin = mathUtils.strtoint(std::string(charValue));
 			xercesc::XMLString::release(&charValue);
 		}
 		else
@@ -2329,7 +2329,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 		if(argElement->hasAttribute(maxXMLStr))
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(maxXMLStr));
-			this->inMax = mathUtils.strtoint(string(charValue));
+			this->inMax = mathUtils.strtoint(std::string(charValue));
 			xercesc::XMLString::release(&charValue);
 		}
 		else
@@ -2343,7 +2343,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 		if(argElement->hasAttribute(widthXMLStr))
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(widthXMLStr));
-			this->binWidth = mathUtils.strtodouble(string(charValue));
+			this->binWidth = mathUtils.strtodouble(std::string(charValue));
 			xercesc::XMLString::release(&charValue);
 		}
 		else
@@ -2355,7 +2355,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
     }
 	else
 	{
-		string message = std::string("The option (") + std::string(xercesc::XMLString::transcode(optionXML)) + std::string(") is not known: RSGISExeImageCalculation.");
+		std::string message = std::string("The option (") + std::string(xercesc::XMLString::transcode(optionXML)) + std::string(") is not known: RSGISExeImageCalculation.");
 		throw rsgis::RSGISXMLArgumentsException(message.c_str());
 	}
 	
@@ -2420,7 +2420,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 					dataset = (GDALDataset *) GDALOpen(this->inputImages[i].c_str(), GA_ReadOnly);
 					if(dataset == NULL)
 					{
-						string message = std::string("Could not open image ") + this->inputImages[i];
+						std::string message = std::string("Could not open image ") + this->inputImages[i];
 						throw rsgis::RSGISImageException(message.c_str());
 					}
 					
@@ -2488,7 +2488,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 				datasetsA[0] = (GDALDataset *) GDALOpenShared(this->inputImageA.c_str(), GA_ReadOnly);
 				if(datasetsA[0] == NULL)
 				{
-					string message = std::string("Could not open image ") + this->inputImageA;
+					std::string message = std::string("Could not open image ") + this->inputImageA;
 					throw rsgis::RSGISImageException(message.c_str());
 				}
 				
@@ -2498,7 +2498,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 				datasetsB[0] = (GDALDataset *) GDALOpenShared(this->inputImageB.c_str(), GA_ReadOnly);
 				if(datasetsB[0] == NULL)
 				{
-					string message = std::string("Could not open image ") + this->inputImageB;
+					std::string message = std::string("Could not open image ") + this->inputImageB;
 					throw rsgis::RSGISImageException(message.c_str());
 				}
 				
@@ -2544,7 +2544,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 				datasetsA[0] = (GDALDataset *) GDALOpenShared(this->inputImageA.c_str(), GA_ReadOnly);
 				if(datasetsA[0] == NULL)
 				{
-					string message = std::string("Could not open image ") + this->inputImageA;
+					std::string message = std::string("Could not open image ") + this->inputImageA;
 					throw rsgis::RSGISImageException(message.c_str());
 				}
 				
@@ -2553,7 +2553,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 				datasetsB[0] = (GDALDataset *) GDALOpenShared(this->inputImageB.c_str(), GA_ReadOnly);
 				if(datasetsB[0] == NULL)
 				{
-					string message = std::string("Could not open image ") + this->inputImageB;
+					std::string message = std::string("Could not open image ") + this->inputImageB;
 					throw rsgis::RSGISImageException(message.c_str());
 				}
 				
@@ -2643,7 +2643,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 				datasets[0] = (GDALDataset *) GDALOpenShared(this->inputImage.c_str(), GA_ReadOnly);
 				if(datasets[0] == NULL)
 				{
-					string message = std::string("Could not open image ") + this->inputImage;
+					std::string message = std::string("Could not open image ") + this->inputImage;
 					throw rsgis::RSGISImageException(message.c_str());
 				}
 				
@@ -2697,7 +2697,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 				datasets[0] = (GDALDataset *) GDALOpenShared(this->inputImage.c_str(), GA_ReadOnly);
 				if(datasets[0] == NULL)
 				{
-					string message = std::string("Could not open image ") + this->inputImage;
+					std::string message = std::string("Could not open image ") + this->inputImage;
 					throw rsgis::RSGISImageException(message.c_str());
 				}
 				
@@ -2747,7 +2747,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 				datasets[0] = (GDALDataset *) GDALOpenShared(this->inputImage.c_str(), GA_ReadOnly);
 				if(datasets[0] == NULL)
 				{
-					string message = std::string("Could not open image ") + this->inputImage;
+					std::string message = std::string("Could not open image ") + this->inputImage;
 					throw rsgis::RSGISImageException(message.c_str());
 				}
 				
@@ -2776,7 +2776,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 				std::cout << i << ")\t name = " << variables[i].name << " image = " << variables[i].image << " band = " << variables[i].bandNum << std::endl;
 			}
 			
-			string *outBandName = new std::string[1];
+			std::string *outBandName = new std::string[1];
 			outBandName[0] = this->mathsExpression;
 
 			GDALAllRegister();
@@ -2799,7 +2799,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 					datasets[i] = (GDALDataset *) GDALOpen(this->variables[i].image.c_str(), GA_ReadOnly);
 					if(datasets[i] == NULL)
 					{
-						string message = std::string("Could not open image ") + this->variables[i].image;
+						std::string message = std::string("Could not open image ") + this->variables[i].image;
 						throw rsgis::RSGISImageException(message.c_str());
 					}
 					
@@ -2853,7 +2853,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 			}
 			catch (mu::ParserError &e) 
 			{
-				string message = std::string("ERROR: ") + std::string(e.GetMsg()) + std::string(":\t \'") + std::string(e.GetExpr()) +string("\'");
+				std::string message = std::string("ERROR: ") + std::string(e.GetMsg()) + std::string(":\t \'") + std::string(e.GetExpr()) + std::string("\'");
 				throw rsgis::RSGISException(message);
 			}
 			
@@ -2879,7 +2879,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 				datasets[0] = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_ReadOnly);
 				if(datasets[0] == NULL)
 				{
-					string message = std::string("Could not open image ") + this->inputImage;
+					std::string message = std::string("Could not open image ") + this->inputImage;
 					throw rsgis::RSGISImageException(message.c_str());
 				}
 				
@@ -2922,7 +2922,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 				datasets[0] = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_ReadOnly);
 				if(datasets[0] == NULL)
 				{
-					string message = std::string("Could not open image ") + this->inputImage;
+					std::string message = std::string("Could not open image ") + this->inputImage;
 					throw rsgis::RSGISImageException(message.c_str());
 				}
 				
@@ -2985,7 +2985,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 				datasets[0] = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_ReadOnly);
 				if(datasets[0] == NULL)
 				{
-					string message = std::string("Could not open image ") + this->inputImage;
+					std::string message = std::string("Could not open image ") + this->inputImage;
 					throw rsgis::RSGISImageException(message.c_str());
 				}
 				
@@ -3014,7 +3014,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 			}
 			catch (mu::ParserError &e) 
 			{
-				string message = std::string("ERROR: ") + std::string(e.GetMsg()) + std::string(":\t \'") + std::string(e.GetExpr()) +string("\'");
+				std::string message = std::string("ERROR: ") + std::string(e.GetMsg()) + std::string(":\t \'") + std::string(e.GetExpr()) + std::string("\'");
 				throw rsgis::RSGISException(message);
 			}			
 		}
@@ -3045,7 +3045,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 					datasets[i] = (GDALDataset *) GDALOpen(this->inputImages[i].c_str(), GA_ReadOnly);
 					if(datasets[i] == NULL)
 					{
-						string message = std::string("Could not open image ") + this->inputImages[i];
+						std::string message = std::string("Could not open image ") + this->inputImages[i];
 						throw rsgis::RSGISImageException(message.c_str());
 					}
 					
@@ -3119,7 +3119,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 				datasets[0] = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_ReadOnly);
 				if(datasets[0] == NULL)
 				{
-					string message = std::string("Could not open image ") + this->inputImage;
+					std::string message = std::string("Could not open image ") + this->inputImage;
 					throw rsgis::RSGISImageException(message.c_str());
 				}
 				
@@ -3158,7 +3158,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 				datasetsA[0] = (GDALDataset *) GDALOpenShared(this->inputImageA.c_str(), GA_ReadOnly);
 				if(datasetsA[0] == NULL)
 				{
-					string message = std::string("Could not open image ") + this->inputImageA;
+					std::string message = std::string("Could not open image ") + this->inputImageA;
 					throw rsgis::RSGISImageException(message.c_str());
 				}
 				
@@ -3168,7 +3168,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 				datasetsB[0] = (GDALDataset *) GDALOpenShared(this->inputImageB.c_str(), GA_ReadOnly);
 				if(datasetsB[0] == NULL)
 				{
-					string message = std::string("Could not open image ") + this->inputImageB;
+					std::string message = std::string("Could not open image ") + this->inputImageB;
 					throw rsgis::RSGISImageException(message.c_str());
 				}
 				
@@ -3211,7 +3211,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 				datasets[0] = (GDALDataset *) GDALOpenShared(this->inputImage.c_str(), GA_ReadOnly);
 				if(datasets[0] == NULL)
 				{
-					string message = std::string("Could not open image ") + this->inputImage;
+					std::string message = std::string("Could not open image ") + this->inputImage;
 					throw rsgis::RSGISImageException(message.c_str());
 				}
 			}
@@ -3252,7 +3252,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 				datasets[0] = (GDALDataset *) GDALOpenShared(this->inputImage.c_str(), GA_ReadOnly);
 				if(datasets[0] == NULL)
 				{
-					string message = std::string("Could not open image ") + this->inputImage;
+					std::string message = std::string("Could not open image ") + this->inputImage;
 					throw rsgis::RSGISImageException(message.c_str());
 				}
 			}
@@ -3310,14 +3310,14 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 				inputSHPDS = OGRSFDriverRegistrar::Open(this->inputVector.c_str(), FALSE);
 				if(inputSHPDS == NULL)
 				{
-					string message = std::string("Could not open vector file ") + this->inputVector;
-					throw RSGISFileException(message.c_str());
+					std::string message = std::string("Could not open vector file ") + this->inputVector;
+					throw rsgis::RSGISFileException(message.c_str());
 				}
 				inputSHPLayer = inputSHPDS->GetLayerByName(SHPFileInLayer.c_str());
 				if(inputSHPLayer == NULL)
 				{
-					string message = std::string("Could not open vector layer ") + SHPFileInLayer;
-					throw RSGISFileException(message.c_str());
+					std::string message = std::string("Could not open vector layer ") + SHPFileInLayer;
+					throw rsgis::RSGISFileException(message.c_str());
 				}
                 inputSpatialRef = inputSHPLayer->GetSpatialRef();
                 char **wktString = new char*[1];
@@ -3326,10 +3326,10 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
                 OGRFree(wktString);
                 OGREnvelope ogrExtent;
                 inputSHPLayer->GetExtent(&ogrExtent);
-                Envelope extent = Envelope(ogrExtent.MinX, ogrExtent.MaxX, ogrExtent.MinY, ogrExtent.MaxY);
+                geos::geom::Envelope extent = geos::geom::Envelope(ogrExtent.MinX, ogrExtent.MaxX, ogrExtent.MinY, ogrExtent.MaxY);
 				
                 // Get Geometries into memory
-                vector<OGRGeometry*> *ogrGeoms = new vector<OGRGeometry*>();
+                std::vector<OGRGeometry*> *ogrGeoms = new std::vector<OGRGeometry*>();
                 rsgis::vec::RSGISGetOGRGeometries *getOGRGeoms = new rsgis::vec::RSGISGetOGRGeometries(ogrGeoms);
                 rsgis::vec::RSGISProcessVector processVector = rsgis::vec::RSGISProcessVector(getOGRGeoms);
                 processVector.processVectorsNoOutput(inputSHPLayer, false);
@@ -3337,7 +3337,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
                 
                 // Create Geometry Collection
                 OGRGeometryCollection *geomCollectionOrig = new OGRGeometryCollection();
-                for(vector<OGRGeometry*>::iterator iterGeoms = ogrGeoms->begin(); iterGeoms != ogrGeoms->end(); ++iterGeoms)
+                for(std::vector<OGRGeometry*>::iterator iterGeoms = ogrGeoms->begin(); iterGeoms != ogrGeoms->end(); ++iterGeoms)
                 {
                     geomCollectionOrig->addGeometryDirectly(*iterGeoms);
                 }
@@ -3388,7 +3388,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 				datasets[0] = (GDALDataset *) GDALOpenShared(this->inputImage.c_str(), GA_ReadOnly);
 				if(datasets[0] == NULL)
 				{
-					string message = std::string("Could not open image ") + this->inputImage;
+					std::string message = std::string("Could not open image ") + this->inputImage;
 					throw rsgis::RSGISImageException(message.c_str());
 				}
                 
@@ -3406,7 +3406,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 				
                 calcImgStats.calcImageStatistics(datasets, 1, stats, numImageBands, true, this->ignoreZeros);
                 
-                ofstream outTxtFile;
+                std::ofstream outTxtFile;
                 outTxtFile.open(outputFile.c_str());
                 outTxtFile.precision(15);
                 outTxtFile << "Min,Max,Mean,StdDev,Sum\n";
@@ -3448,7 +3448,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 				datasets[0] = (GDALDataset *) GDALOpenShared(this->inputImage.c_str(), GA_ReadOnly);
 				if(datasets[0] == NULL)
 				{
-					string message = std::string("Could not open image ") + this->inputImage;
+					std::string message = std::string("Could not open image ") + this->inputImage;
 					throw rsgis::RSGISImageException(message.c_str());
 				}
                 
@@ -3461,7 +3461,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 				
                 calcImgStats.calcImageStatistics(datasets, 1, stats, true, this->ignoreZeros);
                 
-                ofstream outTxtFile;
+                std::ofstream outTxtFile;
                 outTxtFile.open(outputFile.c_str());
                 outTxtFile.precision(15);
                 outTxtFile << "Min,Max,Mean,StdDev,Sum\n";
@@ -3497,7 +3497,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 				datasets[0] = (GDALDataset *) GDALOpenShared(this->inputImage.c_str(), GA_ReadOnly);
 				if(datasets[0] == NULL)
 				{
-					string message = std::string("Could not open image ") + this->inputImage;
+					std::string message = std::string("Could not open image ") + this->inputImage;
 					throw rsgis::RSGISImageException(message.c_str());
 				}
                 
@@ -3531,7 +3531,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 				datasets[0] = (GDALDataset *) GDALOpenShared(this->inputImage.c_str(), GA_ReadOnly);
 				if(datasets[0] == NULL)
 				{
-					string message = std::string("Could not open image ") + this->inputImage;
+					std::string message = std::string("Could not open image ") + this->inputImage;
 					throw rsgis::RSGISImageException(message.c_str());
 				}
                 
@@ -3565,7 +3565,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 				datasets[0] = (GDALDataset *) GDALOpenShared(this->inputImage.c_str(), GA_ReadOnly);
 				if(datasets[0] == NULL)
 				{
-					string message = std::string("Could not open image ") + this->inputImage;
+					std::string message = std::string("Could not open image ") + this->inputImage;
 					throw rsgis::RSGISImageException(message.c_str());
 				}
                 
@@ -3599,7 +3599,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 				datasets[0] = (GDALDataset *) GDALOpenShared(this->inputImage.c_str(), GA_ReadOnly);
 				if(datasets[0] == NULL)
 				{
-					string message = std::string("Could not open image ") + this->inputImage;
+					std::string message = std::string("Could not open image ") + this->inputImage;
 					throw rsgis::RSGISImageException(message.c_str());
 				}
                 
@@ -3632,7 +3632,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 				dataset = (GDALDataset *) GDALOpenShared(this->inputImage.c_str(), GA_ReadOnly);
 				if(dataset == NULL)
 				{
-					string message = std::string("Could not open image ") + this->inputImage;
+					std::string message = std::string("Could not open image ") + this->inputImage;
 					throw rsgis::RSGISImageException(message.c_str());
 				}
                 
@@ -3670,7 +3670,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 				dataset = (GDALDataset *) GDALOpenShared(this->inputImage.c_str(), GA_ReadOnly);
 				if(dataset == NULL)
 				{
-					string message = std::string("Could not open image ") + this->inputImage;
+					std::string message = std::string("Could not open image ") + this->inputImage;
 					throw rsgis::RSGISImageException(message.c_str());
 				}
                 
@@ -3700,7 +3700,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 				datasets[0] = (GDALDataset *) GDALOpenShared(this->inputImage.c_str(), GA_ReadOnly);
 				if(datasets[0] == NULL)
 				{
-					string message = std::string("Could not open image ") + this->inputImage;
+					std::string message = std::string("Could not open image ") + this->inputImage;
 					throw rsgis::RSGISImageException(message.c_str());
 				}
                 
@@ -3744,14 +3744,14 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
                 datasets[0] = (GDALDataset *) GDALOpenShared(this->imageMask.c_str(), GA_ReadOnly);
 				if(datasets[0] == NULL)
 				{
-					string message = std::string("Could not open image ") + this->imageMask;
+					std::string message = std::string("Could not open image ") + this->imageMask;
 					throw rsgis::RSGISImageException(message.c_str());
 				}
                 
                 datasets[1] = (GDALDataset *) GDALOpenShared(this->inputImage.c_str(), GA_ReadOnly);
 				if(datasets[1] == NULL)
 				{
-					string message = std::string("Could not open image ") + this->inputImage;
+					std::string message = std::string("Could not open image ") + this->inputImage;
 					throw rsgis::RSGISImageException(message.c_str());
 				}
                 
@@ -4106,12 +4106,12 @@ void RSGISExeImageCalculation::help()
     std::cout << "</rsgis:commands>\n";
 }
 
-string RSGISExeImageCalculation::getDescription()
+std::string RSGISExeImageCalculation::getDescription()
 {
 	return "Interface for performing various image based calculations.";
 }
 
-string RSGISExeImageCalculation::getXMLSchema()
+std::string RSGISExeImageCalculation::getXMLSchema()
 {
 	return "NOT DONE!";
 }

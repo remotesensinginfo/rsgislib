@@ -26,18 +26,18 @@
 
 namespace rsgis {namespace vec{
 	
-	RSGISVectorZonalException::RSGISVectorZonalException() : RSGISVectorException("A RSGISVectorZonalException has been created..")
+	RSGISVectorZonalException::RSGISVectorZonalException() : rsgis::RSGISVectorException("A RSGISVectorZonalException has been created..")
 	{
 
 	}
 	
 	
-	RSGISVectorZonalException::RSGISVectorZonalException(const char* message) : RSGISVectorException(message)
+	RSGISVectorZonalException::RSGISVectorZonalException(const char* message) : rsgis::RSGISVectorException(message)
 	{
 		
 	}
 	
-	RSGISVectorZonalException::RSGISVectorZonalException(string message) : RSGISVectorException(message)
+	RSGISVectorZonalException::RSGISVectorZonalException(std::string message) : rsgis::RSGISVectorException(message)
 	{
 		
 	}

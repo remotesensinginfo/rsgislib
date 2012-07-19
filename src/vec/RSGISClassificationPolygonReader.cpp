@@ -26,19 +26,19 @@
 
 namespace rsgis{namespace vec{
 	
-	RSGISClassificationPolygonReader::RSGISClassificationPolygonReader(string classattribute, list<RSGIS2DPoint*> *data)
+	RSGISClassificationPolygonReader::RSGISClassificationPolygonReader(std::string classattribute, std::list<rsgis::geom::RSGIS2DPoint*> *data)
 	{
 		this->classattribute = classattribute;
 		vecUtils = new RSGISVectorUtils();
 		this->data = data;
 	}
 	
-	void RSGISClassificationPolygonReader::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISClassificationPolygonReader::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
 	{
 		throw RSGISVectorException("Not implemented..");
 	}
 	
-	void RSGISClassificationPolygonReader::processFeature(OGRFeature *feature, Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISClassificationPolygonReader::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
 	{
 		//cout << "FID: " << fid << endl;
 		// Set up the Species Polygon object and add to Delunay triangulation.
@@ -51,17 +51,17 @@ namespace rsgis{namespace vec{
 		int classattributeIdx = featureDefn->GetFieldIndex(this->classattribute.c_str());
 		if(classattributeIdx < 0)
 		{
-			string message = "This layer does not contain a field with the name \'" + this->classattribute + "\'";
+			std::string message = "This layer does not contain a field with the name \'" + this->classattribute + "\'";
 			throw RSGISVectorException(message.c_str());
 		}
-		string classValue = string(feature->GetFieldAsString(classattributeIdx));
+		std::string classValue = std::string(feature->GetFieldAsString(classattributeIdx));
 		
 		if( geometryType == wkbPolygon )
 		{
 			RSGISClassificationPolygon *tmpSpeciesPoly = new RSGISClassificationPolygon();
 			tmpSpeciesPoly->setClassification(classValue);
 			OGRPolygon *polygon = (OGRPolygon *) feature->GetGeometryRef();
-			Polygon *geosPoly = vecUtils->convertOGRPolygon2GEOSPolygon(polygon);
+			geos::geom::Polygon *geosPoly = vecUtils->convertOGRPolygon2GEOSPolygon(polygon);
 			tmpSpeciesPoly->setPolygon(geosPoly);
 			data->push_back(tmpSpeciesPoly);
 		} 
@@ -69,13 +69,13 @@ namespace rsgis{namespace vec{
 		{
 			RSGISClassificationPolygon *tmpSpeciesPoly = NULL;
 			
-			RSGISGeometry geomUtils;
+            rsgis::geom::RSGISGeometry geomUtils;
 			OGRMultiPolygon *mPolygon = (OGRMultiPolygon *) feature->GetGeometryRef();
 			//cout << polygon->exportToGML() << endl;
-			MultiPolygon *mGEOSPolygon = vecUtils->convertOGRMultiPolygonGEOSMultiPolygon(mPolygon);
-			vector<Polygon*> *polys = new vector<Polygon*>();
+			geos::geom::MultiPolygon *mGEOSPolygon = vecUtils->convertOGRMultiPolygonGEOSMultiPolygon(mPolygon);
+			vector<geos::geom::Polygon*> *polys = new vector<geos::geom::Polygon*>();
 			geomUtils.retrievePolygons(mGEOSPolygon, polys);
-			vector<Polygon*>::iterator iterPolys = polys->begin();
+			vector<geos::geom::Polygon*>::iterator iterPolys = polys->begin();
 			while(iterPolys != polys->end())
 			{
 				tmpSpeciesPoly = new RSGISClassificationPolygon();
@@ -88,7 +88,7 @@ namespace rsgis{namespace vec{
 		} 
 		else
 		{
-			string message = string("Unsupport data type: ") + string(feature->GetGeometryRef()->getGeometryName());
+			std::string message = std::string("Unsupport data type: ") + std::string(feature->GetGeometryRef()->getGeometryName());
 			throw RSGISVectorException(message);
 		}
 		

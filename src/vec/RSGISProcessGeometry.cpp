@@ -61,11 +61,11 @@ namespace rsgis{namespace vec{
 			int i = 0;
 			if(outVertical)
 			{
-				cout << "Started, " << numFeatures << " features to process.\n";
+				std::cout << "Started, " << numFeatures << " features to process.\n";
 			}
 			else
 			{
-				cout << "Started" << flush;
+				std::cout << "Started" << std::flush;
 			}
 			
 			inputLayer->ResetReading();
@@ -75,11 +75,11 @@ namespace rsgis{namespace vec{
 				{
 					if(outVertical)
 					{
-						cout << feedbackCounter << "% Done" << endl;
+						std::cout << feedbackCounter << "% Done" << std::endl;
 					}
 					else
 					{
-						cout << ".." << feedbackCounter << ".." << flush;
+						std::cout << ".." << feedbackCounter << ".." << std::flush;
 					}
 					
 					feedbackCounter = feedbackCounter + 10;
@@ -135,7 +135,7 @@ namespace rsgis{namespace vec{
 				OGRFeature::DestroyFeature(outFeature);
 				i++;
 			}
-			cout << " Complete.\n";
+			std::cout << " Complete.\n";
 			
 		}
 		catch(RSGISVectorOutputException& e)
@@ -178,11 +178,11 @@ namespace rsgis{namespace vec{
 			int i = 0;
 			if(outVertical)
 			{
-				cout << "Started, " << numFeatures << " features to process.\n";
+				std::cout << "Started, " << numFeatures << " features to process.\n";
 			}
 			else
 			{
-				cout << "Started" << flush;
+				std::cout << "Started" << std::flush;
 			}
 			
 			inputLayer->ResetReading();
@@ -192,11 +192,11 @@ namespace rsgis{namespace vec{
 				{
 					if(outVertical)
 					{
-						cout << feedbackCounter << "% Done" << endl;
+						std::cout << feedbackCounter << "% Done" << std::endl;
 					}
 					else
 					{
-						cout << ".." << feedbackCounter << ".." << flush;
+						std::cout << ".." << feedbackCounter << ".." << std::flush;
 					}
 				 
 					feedbackCounter = feedbackCounter + 10;
@@ -234,7 +234,7 @@ namespace rsgis{namespace vec{
 				OGRFeature::DestroyFeature(outFeature);
 				i++;
 			}
-			cout << " Complete.\n";
+			std::cout << " Complete.\n";
 			
 		}
 		catch(RSGISVectorOutputException& e)

@@ -26,26 +26,26 @@
 
 namespace rsgis{namespace vec{
 	
-	RSGIS2DScatterPlotVariables::RSGIS2DScatterPlotVariables(RSGISExportForPlottingIncremental *plotter, string col1, string col2)
+	RSGIS2DScatterPlotVariables::RSGIS2DScatterPlotVariables(rsgis::utils::RSGISExportForPlottingIncremental *plotter, std::string col1, std::string col2)
 	{
 		this->plotter = plotter;
 		this->col1 = col1;
 		this->col2 = col2;
 	}
 	
-	void RSGIS2DScatterPlotVariables::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGIS2DScatterPlotVariables::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
 	{
 		throw RSGISVectorException("Not implemented..");
 	}
 	
-	void RSGIS2DScatterPlotVariables::processFeature(OGRFeature *feature, Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGIS2DScatterPlotVariables::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
 	{
 		OGRFeatureDefn *featureDefn = feature->GetDefnRef();
 		
 		int col1attributeIdx = featureDefn->GetFieldIndex(this->col1.c_str());
 		if(col1attributeIdx < 0)
 		{
-			string message = "This layer does not contain a field with the name \'" + this->col1 + "\'";
+			std::string message = "This layer does not contain a field with the name \'" + this->col1 + "\'";
 			throw RSGISVectorException(message.c_str());
 		}
 		double valueCol1 = feature->GetFieldAsDouble(col1attributeIdx);
@@ -53,7 +53,7 @@ namespace rsgis{namespace vec{
 		int col2attributeIdx = featureDefn->GetFieldIndex(this->col2.c_str());
 		if(col2attributeIdx < 0)
 		{
-			string message = "This layer does not contain a field with the name \'" + this->col2 + "\'";
+			std::string message = "This layer does not contain a field with the name \'" + this->col2 + "\'";
 			throw RSGISVectorException(message.c_str());
 		}
 		double valueCol2 = feature->GetFieldAsDouble(col2attributeIdx);

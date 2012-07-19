@@ -35,16 +35,11 @@
 
 #include "math/RSGISMathsUtils.h"
 
-using namespace std;
-using namespace geos::geom;
-using namespace geos;
-using namespace rsgis::math;
-
 namespace rsgis{namespace vec{
 	
 	struct ClassInfo
 	{
-		string name;
+		std::string name;
 		float proportion;
 		double totalArea;
 	};
@@ -53,7 +48,7 @@ namespace rsgis{namespace vec{
 	{
 	public:
 		RSGISClusterData();
-		RSGISClusterData(Polygon *poly, vector<RSGISClassificationPolygon*> *clusterPolys, vector<RSGISClassificationPolygon*> *allIntersect);
+		RSGISClusterData(geos::geom::Polygon *poly, std::vector<RSGISClassificationPolygon*> *clusterPolys, std::vector<RSGISClassificationPolygon*> *allIntersect);
 		virtual void readAttribtues(OGRFeature *feature, OGRFeatureDefn *featDefn);
 		virtual void createLayerDefinition(OGRLayer *outputSHPLayer)throw(RSGISVectorOutputException);
 		virtual void populateFeature(OGRFeature *feature, OGRFeatureDefn *featDefn);
@@ -62,19 +57,19 @@ namespace rsgis{namespace vec{
 		float getAllPolyArea();
 		float getPropClusterPolyArea();
 		float getPropAllPolyArea();
-		vector<ClassInfo>* getClassListCluster();
-		vector<ClassInfo>* getClassListAll();
-		vector<RSGISClassificationPolygon*>* getClusterPolys();
-		vector<RSGISClassificationPolygon*>* getAllIntersect();
-		string getDominateClassCluster();
-		string getDominateClassAll();
+		std::vector<ClassInfo>* getClassListCluster();
+		std::vector<ClassInfo>* getClassListAll();
+		std::vector<RSGISClassificationPolygon*>* getClusterPolys();
+		std::vector<RSGISClassificationPolygon*>* getAllIntersect();
+		std::string getDominateClassCluster();
+		std::string getDominateClassAll();
 		~RSGISClusterData();
 	protected:
-		void findClassInfo(vector<RSGISClassificationPolygon*> *polys, vector<ClassInfo> *classList);
-		vector<RSGISClassificationPolygon*> *clusterPolys;
-		vector<RSGISClassificationPolygon*> *allIntersect;
-		vector<ClassInfo> *classListCluster;
-		vector<ClassInfo> *classListAll;
+		void findClassInfo(std::vector<RSGISClassificationPolygon*> *polys, std::vector<ClassInfo> *classList);
+		std::vector<RSGISClassificationPolygon*> *clusterPolys;
+		std::vector<RSGISClassificationPolygon*> *allIntersect;
+		std::vector<ClassInfo> *classListCluster;
+		std::vector<ClassInfo> *classListAll;
 		float area;
 		float clusterPolyArea;
 		float allPolyArea;

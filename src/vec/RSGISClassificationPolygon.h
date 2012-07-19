@@ -27,31 +27,19 @@
 #include <iostream>
 #include <string>
 
-#include "geom/RSGIS2DPoint.h"
 #include "geom/RSGISPolygon.h"
-
-#include "math/RSGISMathsUtils.h"
-
-#include "geos/geom/Point.h"
-#include "geos/geom/Polygon.h"
-#include "geos/geom/CoordinateSequence.h"
-#include "geos/geom/LineString.h"
-
-using namespace std;
-using namespace geos::geom;
-using namespace rsgis::geom;
 
 namespace rsgis{namespace vec{
 	
-	class RSGISClassificationPolygon : public RSGISPolygon
+	class RSGISClassificationPolygon : public rsgis::geom::RSGISPolygon
 		{
 		public:
 			RSGISClassificationPolygon();
-			virtual void setClassification(string classification);
-			virtual string getClassification();
+			virtual void setClassification(std::string classification);
+			virtual std::string getClassification();
 			virtual ~RSGISClassificationPolygon();
 		protected:
-			string classification;
+			std::string classification;
 		};
 }}
 

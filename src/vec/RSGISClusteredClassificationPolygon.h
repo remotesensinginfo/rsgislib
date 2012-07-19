@@ -32,11 +32,6 @@
 
 #include "math/RSGISMathsUtils.h"
 
-using namespace std;
-using namespace geos::geom;
-using namespace geos;
-using namespace rsgis::math;
-
 namespace rsgis{namespace vec{
 	
 	class RSGISClusteredClassificationPolygon : public RSGISPolygonData

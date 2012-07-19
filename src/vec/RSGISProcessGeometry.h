@@ -39,9 +39,6 @@
 #include "vec/RSGISProcessOGRGeometry.h"
 #include "vec/RSGISVectorUtils.h"
 
-using namespace std;
-using namespace rsgis;
-
 namespace rsgis{namespace vec{
 	
 	class RSGISProcessGeometry

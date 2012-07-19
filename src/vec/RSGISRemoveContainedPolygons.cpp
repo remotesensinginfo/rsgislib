@@ -87,15 +87,15 @@ namespace rsgis{namespace vec{
 										break;
 									}
 								}
-								catch (TopologyException &e) 
+								catch (geos::util::TopologyException &e) 
 								{
-									cout << "WARNING: " << e.what() << endl;
+									std::cout << "WARNING: " << e.what() << std::endl;
 								}
 								
 							}
 							else 
 							{
-								cout << "Tmp Geometry is NULL - IGNORING...\n";
+								std::cout << "Tmp Geometry is NULL - IGNORING...\n";
 							}
 						}
 						OGRFeature::DestroyFeature(tmpFeature);
@@ -122,7 +122,7 @@ namespace rsgis{namespace vec{
 				}
 				else 
 				{
-					cout << "Current Geometry is NULL - IGNORING...\n";
+					std::cout << "Current Geometry is NULL - IGNORING...\n";
 				}
 			}
 		}
@@ -179,9 +179,9 @@ namespace rsgis{namespace vec{
 								break;
 							}
 						}
-						catch (TopologyException &e) 
+						catch (geos::util::TopologyException &e) 
 						{
-							cout << "WARNING: " << e.what() << endl;
+							std::cout << "WARNING: " << e.what() << std::endl;
 						}
 					}
 					
@@ -206,7 +206,7 @@ namespace rsgis{namespace vec{
 				}
 				else 
 				{
-					cout << "Current Geometry is NULL - IGNORING...\n";
+					std::cout << "Current Geometry is NULL - IGNORING...\n";
 				}
 			}
 		}

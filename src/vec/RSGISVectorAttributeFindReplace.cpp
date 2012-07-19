@@ -26,29 +26,29 @@
 namespace rsgis{namespace vec{
 	
 	
-	RSGISVectorAttributeFindReplace::RSGISVectorAttributeFindReplace(string attribute, string find, string replace)
+	RSGISVectorAttributeFindReplace::RSGISVectorAttributeFindReplace(std::string attribute, std::string find, std::string replace)
 	{
 		this->attribute = attribute;
 		this->find = find;
 		this->replace = replace;
 	}
 	
-	void RSGISVectorAttributeFindReplace::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISVectorAttributeFindReplace::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
 	{
 		throw RSGISVectorException("Not implemented..");
 	}
 	
-	void RSGISVectorAttributeFindReplace::processFeature(OGRFeature *feature, Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISVectorAttributeFindReplace::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
 	{
 		OGRFeatureDefn *featureDefn = feature->GetDefnRef();
 		int fieldIdx = featureDefn->GetFieldIndex(attribute.c_str());
 		if(fieldIdx < 0)
 		{
-			string message = "This layer does not contain a field with the name \'" + attribute + "\'";
+			std::string message = "This layer does not contain a field with the name \'" + attribute + "\'";
 			throw RSGISVectorException(message.c_str());
 		}
 		
-		if(string(feature->GetFieldAsString(fieldIdx)) == find)
+		if(std::string(feature->GetFieldAsString(fieldIdx)) == find)
 		{
 			feature->SetField(fieldIdx, replace.c_str());
 		}

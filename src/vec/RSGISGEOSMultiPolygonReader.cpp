@@ -25,40 +25,40 @@
 
 namespace rsgis{namespace vec{
 	
-	RSGISGEOSMultiPolygonReader::RSGISGEOSMultiPolygonReader(vector<MultiPolygon*> *mPolygons)
+	RSGISGEOSMultiPolygonReader::RSGISGEOSMultiPolygonReader(std::vector<geos::geom::MultiPolygon*> *mPolygons)
 	{
 		vecUtils = new RSGISVectorUtils();
 		this->mPolygons = mPolygons;
 	}
 	
-	void RSGISGEOSMultiPolygonReader::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISGEOSMultiPolygonReader::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
 	{
 		throw RSGISVectorException("Not implemented..");
 	}
 	
-	void RSGISGEOSMultiPolygonReader::processFeature(OGRFeature *feature, Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISGEOSMultiPolygonReader::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
 	{
 		OGRwkbGeometryType geometryType = feature->GetGeometryRef()->getGeometryType();
 		
 		// Calculate the centre coordinates
 		if( geometryType == wkbPolygon )
 		{
-			vector<Geometry*> *polys = new vector<Geometry*>();
+			vector<geos::geom::Geometry*> *polys = new vector<geos::geom::Geometry*>();
 			OGRPolygon *polygon = (OGRPolygon *) feature->GetGeometryRef();
 			polys->push_back(vecUtils->convertOGRPolygon2GEOSPolygon(polygon));
-			MultiPolygon *mGEOSPolygon = RSGISGEOSFactoryGenerator::getInstance()->getFactory()->createMultiPolygon(polys);
+			geos::geom::MultiPolygon *mGEOSPolygon = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory()->createMultiPolygon(polys);
 			mPolygons->push_back(mGEOSPolygon);
 		} 
 		else if( geometryType == wkbMultiPolygon )
 		{
-			RSGISGeometry geomUtils;
+            rsgis::geom::RSGISGeometry geomUtils;
 			OGRMultiPolygon *mPolygon = (OGRMultiPolygon *) feature->GetGeometryRef();
-			MultiPolygon *mGEOSPolygon = vecUtils->convertOGRMultiPolygonGEOSMultiPolygon(mPolygon);
+			geos::geom::MultiPolygon *mGEOSPolygon = vecUtils->convertOGRMultiPolygonGEOSMultiPolygon(mPolygon);
 			mPolygons->push_back(mGEOSPolygon);
 		} 
 		else
 		{
-			string message = string("Unsupport data type: ") + string(feature->GetGeometryRef()->getGeometryName());
+			std::string message = std::string("Unsupport data type: ") + std::string(feature->GetGeometryRef()->getGeometryName());
 			throw RSGISVectorException(message);
 		}
 	}

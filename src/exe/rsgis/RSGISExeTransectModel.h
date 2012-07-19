@@ -53,7 +53,7 @@ using namespace xercesc;
 using namespace rsgis::utils;
 using namespace rsgis::modeling;
 
-class RSGISExeTransectModel : public RSGISAlgorithmParameters
+    class RSGISExeTransectModel : public rsgis::RSGISAlgorithmParameters
 {
 	/**
 	 * Code for creating a model transect which may be exported as an image and / or point cloud and / or<br>
@@ -84,9 +84,9 @@ class RSGISExeTransectModel : public RSGISAlgorithmParameters
 	
 public:
 	RSGISExeTransectModel();
-	virtual RSGISAlgorithmParameters* getInstance();
-	virtual void retrieveParameters(DOMElement *argElement) throw(RSGISXMLArgumentsException);
-	virtual void runAlgorithm() throw(RSGISException);
+	virtual rsgis::RSGISAlgorithmParameters* getInstance();
+	virtual void retrieveParameters(DOMElement *argElement) throw(rsgis::RSGISXMLArgumentsException);
+	virtual void runAlgorithm() throw(rsgis::RSGISException);
 	virtual void printParameters();
 	virtual string getDescription();
 	virtual string getXMLSchema();

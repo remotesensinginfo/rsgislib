@@ -44,11 +44,6 @@
 
 #include "utils/RSGISGEOSFactoryGenerator.h"
 
-using namespace std;
-using namespace rsgis::utils;
-using namespace geos::geom;
-using namespace geos;
-
 namespace rsgis{namespace vec{
 	
 	class RSGISPolygonData
@@ -62,18 +57,18 @@ namespace rsgis{namespace vec{
 			virtual void createLayerDefinition(OGRLayer *layer)throw(RSGISVectorOutputException)=0;
 			virtual void populateFeature(OGRFeature *feature, OGRFeatureDefn *featDefn)=0;
 			double distance(RSGISPolygonData *data);
-			bool contains(Coordinate *coord);
-			bool contains(Geometry *geom);
-			Envelope* getBBox();
-			Polygon* getPolygon();
-			void setPolygon(Polygon *polygon);
-			Geometry* getGeometry();
+			bool contains(geos::geom::Coordinate *coord);
+			bool contains(geos::geom::Geometry *geom);
+			geos::geom::Envelope* getBBox();
+			geos::geom::Polygon* getPolygon();
+			void setPolygon(geos::geom::Polygon *polygon);
+			geos::geom::Geometry* getGeometry();
 			virtual ~RSGISPolygonData();
 		protected:
 			bool polygonType;
-			MultiPolygon *multiPolygonGeom;
-			Polygon *polygonGeom;
-			Envelope *envelope;
+			geos::geom::MultiPolygon *multiPolygonGeom;
+			geos::geom::Polygon *polygonGeom;
+			geos::geom::Envelope *envelope;
 		};
 }}
 

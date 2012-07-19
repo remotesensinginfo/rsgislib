@@ -336,7 +336,7 @@ namespace rsgis { namespace modeling{
 		double largeBranchTheta = 0;
 		double largeBranchPhi = 0;
 		
-		std::vector<Coordinate> *coordinates = new std::vector<Coordinate>;
+		std::vector<geos::geom::Coordinate> *coordinates = new std::vector<geos::geom::Coordinate>;
 		
 		double transectRes = transect->getRes();
 		
@@ -529,7 +529,7 @@ namespace rsgis { namespace modeling{
 							{
 								if (leafStartY > 0 && leafStartY < transect->getLenth()) 
 								{
-									coordinates->push_back(Coordinate(leafStartX, leafStartY, leafStartZ));
+									coordinates->push_back(geos::geom::Coordinate(leafStartX, leafStartY, leafStartZ));
 								}
 								
 							}
@@ -554,7 +554,7 @@ namespace rsgis { namespace modeling{
 									{
 										if (yLeaf > 0 && yLeaf < transect->getLenth()) 
 										{
-											coordinates->push_back(Coordinate(xLeaf, yLeaf, zLeaf));
+											coordinates->push_back(geos::geom::Coordinate(xLeaf, yLeaf, zLeaf));
 										}
 										
 									}
@@ -726,7 +726,7 @@ namespace rsgis { namespace modeling{
 									if (leafStartY > 0 && leafStartY < transect->getLenth()) 
 									{
 										
-										coordinates->push_back(Coordinate(leafStartX, leafStartY, leafStartZ));
+										coordinates->push_back(geos::geom::Coordinate(leafStartX, leafStartY, leafStartZ));
 									}
 									
 								}
@@ -751,7 +751,7 @@ namespace rsgis { namespace modeling{
 										{
 											if (yLeaf > 0 && yLeaf < transect->getLenth()) 
 											{
-												coordinates->push_back(Coordinate(xLeaf, yLeaf, zLeaf));
+												coordinates->push_back(geos::geom::Coordinate(xLeaf, yLeaf, zLeaf));
 											}
 											
 										}
@@ -774,12 +774,12 @@ namespace rsgis { namespace modeling{
 		/*************************
 		 * CALCULATE CONVEX HULL *
 		 *************************/
-		RSGISGeometry geometry;
+        rsgis::geom::RSGISGeometry geometry;
 		try 
 		{
 			canopyPolys->push_back(geometry.findConvexHull(coordinates));
 		}
-		catch (RSGISGeometryException) 
+		catch (rsgis::geom::RSGISGeometryException) 
 		{
 			cout << "\tNot Enough Coordinates to create convex hull!" << endl;
 		}

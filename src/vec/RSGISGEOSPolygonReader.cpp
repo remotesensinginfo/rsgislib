@@ -25,18 +25,18 @@
 
 namespace rsgis{namespace vec{
 	
-	RSGISGEOSPolygonReader::RSGISGEOSPolygonReader(vector<Polygon*> *polygons)
+	RSGISGEOSPolygonReader::RSGISGEOSPolygonReader(std::vector<geos::geom::Polygon*> *polygons)
 	{
 		vecUtils = new RSGISVectorUtils();
 		this->polygons = polygons;
 	}
 	
-	void RSGISGEOSPolygonReader::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISGEOSPolygonReader::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
 	{
 		throw RSGISVectorException("Not implemented..");
 	}
 	
-	void RSGISGEOSPolygonReader::processFeature(OGRFeature *feature, Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISGEOSPolygonReader::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
 	{
 		OGRwkbGeometryType geometryType = feature->GetGeometryRef()->getGeometryType();
 		
@@ -48,15 +48,15 @@ namespace rsgis{namespace vec{
 		} 
 		else if( geometryType == wkbMultiPolygon )
 		{
-			RSGISGeometry geomUtils;
+            rsgis::geom::RSGISGeometry geomUtils;
 			OGRMultiPolygon *mPolygon = (OGRMultiPolygon *) feature->GetGeometryRef();
 			//cout << polygon->exportToGML() << endl;
-			MultiPolygon *mGEOSPolygon = vecUtils->convertOGRMultiPolygonGEOSMultiPolygon(mPolygon);
+			geos::geom::MultiPolygon *mGEOSPolygon = vecUtils->convertOGRMultiPolygonGEOSMultiPolygon(mPolygon);
 			geomUtils.retrievePolygons(mGEOSPolygon, polygons);
 		} 
 		else
 		{
-			string message = string("Unsupport data type: ") + string(feature->GetGeometryRef()->getGeometryName());
+            std::string message = std::string("Unsupport data type: ") + std::string(feature->GetGeometryRef()->getGeometryName());
 			throw RSGISVectorException(message);
 		}
 	}

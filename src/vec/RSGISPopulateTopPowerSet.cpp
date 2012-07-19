@@ -35,31 +35,31 @@ namespace rsgis{namespace vec{
 		this->nTop = nTop;
 	}
 	
-	void RSGISPopulateTopPowerSet::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISPopulateTopPowerSet::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
 	{
-		RSGISMathsUtils mathUtils;
+        rsgis::math::RSGISMathsUtils mathUtils;
 		
 		OGRFeatureDefn *featureDefn = inFeature->GetDefnRef();
 		OGRFeatureDefn *outFeatureDefn = outFeature->GetDefnRef();
 		
-		string *topAttributes = NULL;
+		std::string *topAttributes = NULL;
 		CountAttributes **powerSetAttributes = NULL;
 		
-		string nullStr = "NULL";
-		string name = "";
-		string fieldValue = "";
+		std::string nullStr = "NULL";
+		std::string name = "";
+		std::string fieldValue = "";
 		int numPowerSetAttributes = 0;
 		int value = 0;
 		int numTopValues = 0;
 		
 		try
 		{
-			//cout << "fid: " << fid << ": \n";
+			//std::cout << "fid: " << fid << ": \n";
 			
 			for(int j = 0; j < nTop; j++)
 			{
 				name = "Top_" + mathUtils.inttostring(j+1);
-				fieldValue = string(inFeature->GetFieldAsString(featureDefn->GetFieldIndex(name.c_str())));
+				fieldValue = std::string(inFeature->GetFieldAsString(featureDefn->GetFieldIndex(name.c_str())));
 				if(fieldValue != nullStr)
 				{
 					numTopValues++;
@@ -70,19 +70,19 @@ namespace rsgis{namespace vec{
 				}
 			}
 			
-			//cout << "numTopValues = " << numTopValues << endl;
+			//std::cout << "numTopValues = " << numTopValues << std::endl;
 
 			
 			
 			if(numTopValues > 0)
 			{
 				
-				topAttributes = new string[numTopValues];
+				topAttributes = new std::string[numTopValues];
 				for(int j = 0; j < numTopValues; j++)
 				{
 					name = "Top_" + mathUtils.inttostring(j+1);
-					topAttributes[j] = string(inFeature->GetFieldAsString(featureDefn->GetFieldIndex(name.c_str())));
-					//cout << "Attribute " << j+1 << ": " << topAttributes[j] << " = " << string(inFeature->GetFieldAsString(featureDefn->GetFieldIndex(topAttributes[j].c_str()))) << endl;
+					topAttributes[j] = std::string(inFeature->GetFieldAsString(featureDefn->GetFieldIndex(name.c_str())));
+					//std::cout << "Attribute " << j+1 << ": " << topAttributes[j] << " = " << std::string(inFeature->GetFieldAsString(featureDefn->GetFieldIndex(topAttributes[j].c_str()))) << std::endl;
 					
 				}
 				
@@ -101,29 +101,29 @@ namespace rsgis{namespace vec{
 				}
 				powerSetAttributes = new CountAttributes*[numPowerSetAttributes];
 				
-				//cout << "Number of Power Set Attributes = " << numPowerSetAttributes << endl;
+				//std::cout << "Number of Power Set Attributes = " << numPowerSetAttributes << std::endl;
 				
-				//cout << "identifying powerset\n";
+				//std::cout << "identifying powerset\n";
 				this->identifyPowerSet(attributes, numAttributes, topAttributes, numTopValues, powerSetAttributes, numPowerSetAttributes);
-				//cout << "identified powerset\n";
+				//std::cout << "identified powerset\n";
 				
 				/*
 				for(int j = 0; j < numPowerSetAttributes; j++)
 				{
-					cout << j << ": " << flush;
-					cout << powerSetAttributes[j]->name << ": [";
+					std::cout << j << ": " << std::flush;
+					std::cout << powerSetAttributes[j]->name << ": [";
 					for(int k = 0; k < powerSetAttributes[j]->numBands; k++)
 					{
 						if(k == 0)
 						{
-							cout << powerSetAttributes[j]->bands[k] << "(" << powerSetAttributes[j]->thresholds[k] << ")";
+							std::cout << powerSetAttributes[j]->bands[k] << "(" << powerSetAttributes[j]->thresholds[k] << ")";
 						}
 						else
 						{
-							cout << " " << powerSetAttributes[j]->bands[k] << "(" << powerSetAttributes[j]->thresholds[k] << ")";
+							std::cout << " " << powerSetAttributes[j]->bands[k] << "(" << powerSetAttributes[j]->thresholds[k] << ")";
 						}
 					}
-					cout << "]\n";
+					std::cout << "]\n";
 				}
 				*/
 				
@@ -131,13 +131,13 @@ namespace rsgis{namespace vec{
 				data = new double[dataSize];
 				
 				calcValue = new RSGISCalcZonalCountFromRasterPolygon(dataSize, powerSetAttributes, numPowerSetAttributes);
-				calcImage = new RSGISCalcImageSingle(calcValue);
+				calcImage = new rsgis::img::RSGISCalcImageSingle(calcValue);
 				
 				// Calculate Stats HERE!!
 				//calcValue->reset();
 				calcImage->calcImageWithinRasterPolygon(datasets, 2, data, env, fid, true);
 				
-				//cout << "Number of Pixels = " << data[0] << endl;
+				//std::cout << "Number of Pixels = " << data[0] << std::endl;
 				
 				int count = 1;
 				for(int j = 0; j < numPowerSetAttributes; j++)
@@ -145,7 +145,7 @@ namespace rsgis{namespace vec{
 					name = "PS_" + mathUtils.inttostring(count) + "_Desc";
 					outFeature->SetField(outFeatureDefn->GetFieldIndex(name.c_str()), powerSetAttributes[j]->name.c_str());
 					
-					//cout << "name = " << name << " output: " << powerSetAttributes[j]->name.c_str() << " = " << data[j+2] << endl;
+					//std::cout << "name = " << name << " output: " << powerSetAttributes[j]->name.c_str() << " = " << data[j+2] << std::endl;
 					
 					name = "PS_" + mathUtils.inttostring(count) + "_Sum";
 					outFeature->SetField(outFeatureDefn->GetFieldIndex(name.c_str()), data[j+2]);
@@ -156,7 +156,7 @@ namespace rsgis{namespace vec{
 				name = "PS_" + mathUtils.inttostring(count) + "_Desc";
 				outFeature->SetField(outFeatureDefn->GetFieldIndex(name.c_str()), "Empty");
 				
-				//cout << "name = " << name << " output: Empty = " << data[1] << endl;
+				//std::cout << "name = " << name << " output: Empty = " << data[1] << std::endl;
 				
 				name = "PS_" + mathUtils.inttostring(count) + "_Sum";
 				outFeature->SetField(outFeatureDefn->GetFieldIndex(name.c_str()), (data[1]));
@@ -173,11 +173,11 @@ namespace rsgis{namespace vec{
 					delete powerSetAttributes[i];
 				}
 				delete[] powerSetAttributes;
-				//cout << endl;
+				//std::cout << std::endl;
 			}
 			else
 			{
-				//cout << "No Top attributes.. continuing...\n";
+				//std::cout << "No Top attributes.. continuing...\n";
 				
 				//ELSE PROVIDE PIXEL COUNT AS EMPTY SET....
 				
@@ -185,14 +185,14 @@ namespace rsgis{namespace vec{
 				data = new double[dataSize];
 				
 				calcValue = new RSGISCalcPixelCountFromRasterPolygon(dataSize);
-				calcImage = new RSGISCalcImageSingle(calcValue);
+				calcImage = new rsgis::img::RSGISCalcImageSingle(calcValue);
 				
 				calcImage->calcImageWithinRasterPolygon(datasets, 2, data, env, fid, true);
 				
 				name = "PS_1_Desc";
 				outFeature->SetField(outFeatureDefn->GetFieldIndex(name.c_str()), "Empty");
 				
-				//cout << "name = " << name << " output: " << powerSetAttributes[j]->name.c_str() << " = " << data[j+2] << endl;
+				//std::cout << "name = " << name << " output: " << powerSetAttributes[j]->name.c_str() << " = " << data[j+2] << std::endl;
 				
 				name = "PS_1_Sum";
 				outFeature->SetField(outFeatureDefn->GetFieldIndex(name.c_str()), data[0]);
@@ -203,9 +203,9 @@ namespace rsgis{namespace vec{
 			}
 
 		}
-		catch(RSGISMathException& e)
+		catch(rsgis::math::RSGISMathException& e)
 		{
-			throw RSGISVectorException(string(e.what()).c_str());
+			throw RSGISVectorException(std::string(e.what()).c_str());
 		}
 		catch(RSGISVectorException& e)
 		{
@@ -213,15 +213,15 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISPopulateTopPowerSet::processFeature(OGRFeature *feature, Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISPopulateTopPowerSet::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
 	{
 		throw RSGISVectorException("Not Implemented");
 	}
 	
 	void RSGISPopulateTopPowerSet::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException)
 	{
-		RSGISMathsUtils mathUtils;
-		string name = "";
+        rsgis::math::RSGISMathsUtils mathUtils;
+		std::string name = "";
 		
 		int numPowerSetAttributes = 2;
 		
@@ -243,7 +243,7 @@ namespace rsgis{namespace vec{
 			
 		}
 		
-		cout << "numPowerSetAttributes: " << numPowerSetAttributes << endl;
+		std::cout << "numPowerSetAttributes: " << numPowerSetAttributes << std::endl;
 		
 		for(int i = 0; i < numPowerSetAttributes; i++)
 		{
@@ -252,7 +252,7 @@ namespace rsgis{namespace vec{
 			shpField.SetWidth(100);
 			if( outputLayer->CreateField( &shpField ) != OGRERR_NONE )
 			{
-				string message = string("Creating shapefile field") + name + string(" has failed");
+				std::string message = std::string("Creating shapefile field") + name + std::string(" has failed");
 				throw RSGISVectorOutputException(message.c_str());
 			}
 			
@@ -261,15 +261,15 @@ namespace rsgis{namespace vec{
 			shpFieldSummary.SetPrecision(10);
 			if( outputLayer->CreateField( &shpFieldSummary ) != OGRERR_NONE )
 			{
-				string message = string("Creating shapefile field") + name + string(" has failed");
+				std::string message = std::string("Creating shapefile field") + name + std::string(" has failed");
 				throw RSGISVectorOutputException(message.c_str());
 			}
 		}
 	}
 	
-	void RSGISPopulateTopPowerSet::identifyPowerSet(CountAttributes** allAttributes, int numAttributes, string *topAttributeNames, int numTop, CountAttributes** powerSetAttributes, int numPSAttributes) throw(RSGISMathException,RSGISVectorException)
+	void RSGISPopulateTopPowerSet::identifyPowerSet(CountAttributes** allAttributes, int numAttributes, std::string *topAttributeNames, int numTop, CountAttributes** powerSetAttributes, int numPSAttributes) throw(rsgis::math::RSGISMathException,RSGISVectorException)
 	{
-		RSGISMathsUtils mathUtils;
+        rsgis::math::RSGISMathsUtils mathUtils;
 		int **indexes = NULL;
 		int *numIndexes = NULL;
 		int numSets = 0;
@@ -279,13 +279,13 @@ namespace rsgis{namespace vec{
 		bool found = false;
 		CountAttributes **topAttributes = NULL;
 		
-		string name;
+		std::string name;
 		
 		try
 		{
 			if(numTop == 0)
 			{
-				throw RSGISMathException("Number of top attributes equals zero, cannot create powerset.");
+				throw rsgis::math::RSGISMathException("Number of top attributes equals zero, cannot create powerset.");
 			}
 			else if(numTop == 1)
 			{
@@ -303,11 +303,11 @@ namespace rsgis{namespace vec{
 			
 			topAttributes = new CountAttributes*[numTop];
 			
-			//cout << "number of sets = " << numSets << endl;
+			//std::cout << "number of sets = " << numSets << std::endl;
 			
 			if(numSets != numPSAttributes)
 			{
-				throw RSGISMathException("Inconsistance in the number of sets defined.");
+				throw rsgis::math::RSGISMathException("Inconsistance in the number of sets defined.");
 			}
 			
 			for(int i = 0; i < numTop; i++)
@@ -324,7 +324,7 @@ namespace rsgis{namespace vec{
 				}
 				if(!found)
 				{
-					string message = "Attribute \'" + topAttributeNames[i] + "\' was not found in list.";
+					std::string message = "Attribute \'" + topAttributeNames[i] + "\' was not found in list.";
 					throw RSGISVectorException(message.c_str());
 				}
 			}
@@ -373,7 +373,7 @@ namespace rsgis{namespace vec{
 			}
 			
 		}
-		catch(RSGISMathException& e)
+		catch(rsgis::math::RSGISMathException& e)
 		{
 			throw e;
 		}

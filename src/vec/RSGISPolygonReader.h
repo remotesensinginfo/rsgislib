@@ -41,25 +41,21 @@
 
 #include "geos/geom/Envelope.h"
 
-using namespace std;
-using namespace rsgis::geom;
-using namespace geos::geom;
-
 namespace rsgis{namespace vec{
 	
 	class RSGISPolygonReader : public RSGISProcessOGRFeature
 		{
 		public:
-			RSGISPolygonReader(list<RSGIS2DPoint*> *data);
-			RSGISPolygonReader(vector<RSGIS2DPoint*> *data);
-			virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, Envelope *env, long fid) throw(RSGISVectorException);
-			virtual void processFeature(OGRFeature *feature, Envelope *env, long fid) throw(RSGISVectorException);
+			RSGISPolygonReader(std::list<rsgis::geom::RSGIS2DPoint*> *data);
+			RSGISPolygonReader(std::vector<rsgis::geom::RSGIS2DPoint*> *data);
+			virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
+			virtual void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
 			virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException);
 			virtual ~RSGISPolygonReader();
 		protected:
 			RSGISVectorUtils *vecUtils;
-			list<RSGIS2DPoint*> *dataList;
-			vector<RSGIS2DPoint*> *dataVector;
+            std::list<rsgis::geom::RSGIS2DPoint*> *dataList;
+            std::vector<rsgis::geom::RSGIS2DPoint*> *dataVector;
 			bool listtype;
 		};
 }}

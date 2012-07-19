@@ -304,7 +304,7 @@ void RSGISExePostClassification::retrieveParameters(DOMElement *argElement) thro
 						DOMNodeList *edgelengthNodesList = argElement->getElementsByTagName(edgelengthtagXMLStr);
 						if(edgelengthNodesList->getLength() > 0)
 						{
-							classEdgeLengths = new vector<EdgeLengthPair*>();
+							classEdgeLengths = new std::vector<EdgeLengthPair*>();
 							DOMElement *edgelengthElement = NULL; 
 							EdgeLengthPair *edgeLengthPair = NULL;
 							for(unsigned int i = 0; i < edgelengthNodesList->getLength(); ++i)
@@ -1586,7 +1586,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 			RSGISProcessVector *processVector = NULL;
 			RSGISProcessOGRFeature *processFeature = NULL;
 			
-			vector<RSGIS2DPoint*> *data = new vector<RSGIS2DPoint*>();
+			std::vector<RSGIS2DPoint*> *data = new std::vector<RSGIS2DPoint*>();
 			RSGISSpatialClustererInterface *clusterer = NULL;
 			cout.precision(7);
 			try
@@ -1634,14 +1634,14 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				
 				int numClusters = 0;
 				double edgeRemoveThrershold = 0;
-				list<RSGIS2DPoint*> **clusteredData = clusterer->clusterData(data, &numClusters, &edgeRemoveThrershold);
+				std::list<RSGIS2DPoint*> **clusteredData = clusterer->clusterData(data, &numClusters, &edgeRemoveThrershold);
 				
-				list<Polygon*> **polygons = new list<Polygon*>*[numClusters];
-				list<RSGIS2DPoint*>::iterator iter2DPts;
+				std::list<geos::geom::Polygon*> **polygons = new std::list<geos::geom::Polygon*>*[numClusters];
+				std::list<RSGIS2DPoint*>::iterator iter2DPts;
 				RSGISPolygon *tmpRSGISPoly;
 				for(int i = 0; i < numClusters; ++i)
 				{
-					polygons[i] = new list<Polygon*>();
+					polygons[i] = new std::list<geos::geom::Polygon*>();
 					for(iter2DPts = clusteredData[i]->begin(); iter2DPts != clusteredData[i]->end(); ++iter2DPts)
 					{
 						tmpRSGISPoly = (RSGISPolygon*) *iter2DPts;
@@ -1660,10 +1660,10 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 					if(polygonizertype == lineproj)
 					{
 						RSGISIdentifyNonConvexPolygonsLineProject *identifyNonConvexLineProj = new RSGISIdentifyNonConvexPolygonsLineProject(resolution);
-						vector<Polygon*> *nonConvexPolys = identifyNonConvexLineProj->retrievePolygons(polygons, numClusters);
+						std::vector<geos::geom::Polygon*> *nonConvexPolys = identifyNonConvexLineProj->retrievePolygons(polygons, numClusters);
 						RSGISVectorIO vecIO;
 						vecIO.exportGEOSPolygons2SHP(this->outputVector, this->force, nonConvexPolys, spatialRef);
-						vector<Polygon*>::iterator iterOutPolys;
+						std::vector<geos::geom::Polygon*>::iterator iterOutPolys;
 						for(iterOutPolys = nonConvexPolys->begin(); iterOutPolys != nonConvexPolys->end(); )
 						{
 							delete *iterOutPolys;
@@ -1675,7 +1675,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 					else if(polygonizertype == delaunay1)
 					{
 						RSGISIdentifyNonConvexPolygonsDelaunay *identifyNonConvexDelaunay = new RSGISIdentifyNonConvexPolygonsDelaunay();
-						vector<Polygon*> *nonConvexPolys = new vector<Polygon*>();
+						std::vector<geos::geom::Polygon*> *nonConvexPolys = new std::vector<geos::geom::Polygon*>();
 						
 						for(int i = 0; i < numClusters; ++i)
 						{
@@ -1686,7 +1686,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 						}						
 						RSGISVectorIO vecIO;
 						vecIO.exportGEOSPolygons2SHP(this->outputVector, this->force, nonConvexPolys, spatialRef);
-						vector<Polygon*>::iterator iterOutPolys;
+						std::vector<geos::geom::Polygon*>::iterator iterOutPolys;
 						for(iterOutPolys = nonConvexPolys->begin(); iterOutPolys != nonConvexPolys->end(); )
 						{
 							delete *iterOutPolys;
@@ -1698,11 +1698,11 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 					else if(polygonizertype == delaunay2)
 					{
 						RSGISIdentifyNonConvexPolygonsDelaunay *identifyNonConvexDelaunay = new RSGISIdentifyNonConvexPolygonsDelaunay();
-						vector<Polygon*> *nonConvexPolys = identifyNonConvexDelaunay->retrievePolygons(polygons, numClusters);
+						std::vector<geos::geom::Polygon*> *nonConvexPolys = identifyNonConvexDelaunay->retrievePolygons(polygons, numClusters);
 						
 						RSGISVectorIO vecIO;
 						vecIO.exportGEOSPolygons2SHP(this->outputVector, this->force, nonConvexPolys, spatialRef);
-						vector<Polygon*>::iterator iterOutPolys;
+						std::vector<geos::geom::Polygon*>::iterator iterOutPolys;
 						for(iterOutPolys = nonConvexPolys->begin(); iterOutPolys != nonConvexPolys->end(); )
 						{
 							delete *iterOutPolys;
@@ -1713,7 +1713,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 					}
 					else if(polygonizertype == convexhull)
 					{
-						vector<Polygon*> *convexhulls = new vector<Polygon*>();
+						std::vector<geos::geom::Polygon*> *convexhulls = new std::vector<geos::geom::Polygon*>();
 						for(int i = 0; i < numClusters; ++i)
 						{
 							if(polygons[i]->size() > 0)
@@ -1723,7 +1723,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 						}
 						RSGISVectorIO vecIO;
 						vecIO.exportGEOSPolygons2SHP(this->outputVector, this->force, convexhulls, spatialRef);
-						vector<Polygon*>::iterator iterOutPolys;
+						std::vector<geos::geom::Polygon*>::iterator iterOutPolys;
 						for(iterOutPolys = convexhulls->begin(); iterOutPolys != convexhulls->end(); )
 						{
 							delete *iterOutPolys;
@@ -1744,11 +1744,11 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 					else if(polygonizertype == snakes)
 					{
 						RSGISIdentifyNonConvexPolygonsSnakes *identifyNonConvexSnakes = new RSGISIdentifyNonConvexPolygonsSnakes(resolution, spatialRef, alpha, beta, gamma, delta, maxNumIterations);
-						vector<Polygon*> *nonConvexPolys = identifyNonConvexSnakes->retrievePolygons(polygons, numClusters);
+						std::vector<geos::geom::Polygon*> *nonConvexPolys = identifyNonConvexSnakes->retrievePolygons(polygons, numClusters);
 						
 						RSGISVectorIO vecIO;
 						vecIO.exportGEOSPolygons2SHP(this->outputVector, this->force, nonConvexPolys, spatialRef);
-						vector<Polygon*>::iterator iterOutPolys;
+						std::vector<geos::geom::Polygon*>::iterator iterOutPolys;
 						for(iterOutPolys = nonConvexPolys->begin(); iterOutPolys != nonConvexPolys->end(); )
 						{
 							delete *iterOutPolys;
@@ -1763,7 +1763,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 					}
 				}				
 				
-				list<Polygon*>::iterator iterPolys; 
+				std::list<geos::geom::Polygon*>::iterator iterPolys; 
 				for(int i = 0; i < numClusters; ++i)
 				{
 					for(iter2DPts = clusteredData[i]->begin(); iter2DPts != clusteredData[i]->end(); ++iter2DPts)
@@ -1810,7 +1810,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				if(classEdgeLengths != NULL)
 				{
 					cout << "Per class thresholds: \n";
-					vector<EdgeLengthPair*>::iterator iterEdgePairs;
+					std::vector<EdgeLengthPair*>::iterator iterEdgePairs;
 					for(iterEdgePairs = classEdgeLengths->begin(); iterEdgePairs != classEdgeLengths->end(); ++iterEdgePairs)
 					{
 						cout << (*iterEdgePairs)->classname << " = " << (*iterEdgePairs)->lengththreshold << endl;
@@ -1871,7 +1871,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 			RSGISProcessVector *processVector = NULL;
 			RSGISProcessOGRFeature *processFeature = NULL;
 			
-			list<RSGIS2DPoint*> *data = new list<RSGIS2DPoint*>();
+			std::list<RSGIS2DPoint*> *data = new std::list<RSGIS2DPoint*>();
 			RSGISSpatialClustererInterface *clusterer = NULL;
 			cout.precision(7);
 			try
@@ -1904,13 +1904,13 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				delete processVector;
 				delete processFeature;
 				
-				vector<Polygon*> *allPolys = new vector<Polygon*>();
-				list<RSGIS2DPoint*>::iterator iterPts;
+				std::vector<geos::geom::Polygon*> *allPolys = new std::vector<geos::geom::Polygon*>();
+				std::list<RSGIS2DPoint*>::iterator iterPts;
 				for(iterPts = data->begin(); iterPts != data->end(); ++iterPts)
 				{
 					allPolys->push_back(((RSGISPolygon*)*iterPts)->getPolygon());
 				}
-				Polygon *convexhullAll = geomUtils.findConvexHull(allPolys);
+				geos::geom::Polygon *convexhullAll = geomUtils.findConvexHull(allPolys);
 				allPolys->clear();
 				delete allPolys;
 				double totalArea = convexhullAll->getArea();
@@ -1918,9 +1918,9 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				
 				// Sort data by class.
 				bool classesContains = false;
-				vector<string> classes;
-				list<RSGIS2DPoint*>::iterator iterData;
-				vector<string>::iterator iterClasses;
+				std::vector<string> classes;
+				std::list<RSGIS2DPoint*>::iterator iterData;
+				std::vector<string>::iterator iterClasses;
 				RSGISClassificationPolygon *classPoly;
 				for(iterData = data->begin(); iterData != data->end(); ++iterData)
 				{
@@ -1942,11 +1942,11 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				
 				cout << "There are " << classes.size() << " classes within the input.\n";
 				
-				vector<RSGIS2DPoint*> **dataPerClass = new vector<RSGIS2DPoint*>*[classes.size()];
+				std::vector<RSGIS2DPoint*> **dataPerClass = new std::vector<RSGIS2DPoint*>*[classes.size()];
 				string className = "";
 				for(unsigned int i = 0; i < classes.size(); ++i)
 				{
-					dataPerClass[i] = new vector<RSGIS2DPoint*>();
+					dataPerClass[i] = new std::vector<RSGIS2DPoint*>();
 					className = classes.at(i);
 					for(iterData = data->begin(); iterData != data->end(); )//++iterData)
 					{	
@@ -1982,10 +1982,10 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 					throw RSGISException("Clusterer is not defined");
 				}
 				
-				list<RSGIS2DPoint*> ***clusters = new list<RSGIS2DPoint*>**[classes.size()];
+				std::list<RSGIS2DPoint*> ***clusters = new std::list<RSGIS2DPoint*>**[classes.size()];
 				int *numClusters = new int[classes.size()];
 				double *edgeRemovalThreshold = new double[classes.size()];
-				vector<EdgeLengthPair*>::iterator iterEdgePairs;
+				std::vector<EdgeLengthPair*>::iterator iterEdgePairs;
 				bool found = false;
 				for(unsigned int i = 0; i < classes.size(); ++i)
 				{
@@ -2017,24 +2017,24 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				
 				cout << "Total Number of Clusters = " << totalNumClusters << endl;
 				
-				vector<string> *textColsNames = new vector<string>();
+				std::vector<string> *textColsNames = new std::vector<string>();
 				textColsNames->push_back("ClustClass");
-				vector<string> **textColsData = new vector<string>*[1];
-				textColsData[0] = new vector<string>();
-				vector<string> *numericColsNames = new vector<string>();
+				std::vector<string> **textColsData = new std::vector<string>*[1];
+				textColsData[0] = new std::vector<string>();
+				std::vector<string> *numericColsNames = new std::vector<string>();
 				numericColsNames->push_back("Area");
 				numericColsNames->push_back("PolysArea");
 				numericColsNames->push_back("ProPolysAr");
 				numericColsNames->push_back("ProTotalAr");
 				numericColsNames->push_back("EdgeThres");
-				vector<float> **numericColsData = new vector<float>*[5];
-				numericColsData[0] = new vector<float>();
-				numericColsData[1] = new vector<float>();
-				numericColsData[2] = new vector<float>();
-				numericColsData[3] = new vector<float>();
-				numericColsData[4] = new vector<float>();
+				std::vector<float> **numericColsData = new std::vector<float>*[5];
+				numericColsData[0] = new std::vector<float>();
+				numericColsData[1] = new std::vector<float>();
+				numericColsData[2] = new std::vector<float>();
+				numericColsData[3] = new std::vector<float>();
+				numericColsData[4] = new std::vector<float>();
 				
-				list<Polygon*> **polygons = new list<Polygon*>*[totalNumClusters];
+				std::list<geos::geom::Polygon*> **polygons = new std::list<geos::geom::Polygon*>*[totalNumClusters];
 				int count = 0;
 				double crownArea = 0;
 				RSGISPolygon *poly = NULL;
@@ -2042,7 +2042,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				{
 					for(int j = 0; j <  numClusters[i]; ++j)
 					{
-						polygons[count] = new list<Polygon*>();
+						polygons[count] = new std::list<geos::geom::Polygon*>();
 						crownArea = 0;
 						for(iterPts = clusters[i][j]->begin(); iterPts != clusters[i][j]->end(); ++iterPts)
 						{
@@ -2069,7 +2069,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 					if(polygonizertype == lineproj)
 					{
 						RSGISIdentifyNonConvexPolygonsLineProject *identifyNonConvexLineProj = new RSGISIdentifyNonConvexPolygonsLineProject(resolution);
-						vector<Polygon*> *nonConvexPolys = identifyNonConvexLineProj->retrievePolygons(polygons, totalNumClusters);
+						std::vector<geos::geom::Polygon*> *nonConvexPolys = identifyNonConvexLineProj->retrievePolygons(polygons, totalNumClusters);
 						
 						float area = 0;
 						for(unsigned int i = 0; i < nonConvexPolys->size(); ++i)
@@ -2082,7 +2082,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 						
 						RSGISVectorIO vecIO;
 						vecIO.exportGEOSPolygons2SHP(this->outputVector, this->force, nonConvexPolys, spatialRef, numericColsNames, textColsNames, numericColsData, textColsData);
-						vector<Polygon*>::iterator iterOutPolys;
+						std::vector<geos::geom::Polygon*>::iterator iterOutPolys;
 						for(iterOutPolys = nonConvexPolys->begin(); iterOutPolys != nonConvexPolys->end(); )
 						{
 							delete *iterOutPolys;
@@ -2094,9 +2094,9 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 					else if(polygonizertype == delaunay1)
 					{
 						RSGISIdentifyNonConvexPolygonsDelaunay *identifyNonConvexDelaunay = new RSGISIdentifyNonConvexPolygonsDelaunay();
-						vector<Polygon*> *nonConvexPolys = new vector<Polygon*>();
+						std::vector<geos::geom::Polygon*> *nonConvexPolys = new std::vector<geos::geom::Polygon*>();
 						
-						Polygon *poly;
+						geos::geom::Polygon *poly;
 						float area = 0;
 						for(int i = 0; i < totalNumClusters; ++i)
 						{
@@ -2109,7 +2109,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 						}						
 						RSGISVectorIO vecIO;
 						vecIO.exportGEOSPolygons2SHP(this->outputVector, this->force, nonConvexPolys, spatialRef, numericColsNames, textColsNames, numericColsData, textColsData);
-						vector<Polygon*>::iterator iterOutPolys;
+						std::vector<geos::geom::Polygon*>::iterator iterOutPolys;
 						for(iterOutPolys = nonConvexPolys->begin(); iterOutPolys != nonConvexPolys->end(); )
 						{
 							delete *iterOutPolys;
@@ -2121,7 +2121,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 					else if(polygonizertype == delaunay2)
 					{
 						RSGISIdentifyNonConvexPolygonsDelaunay *identifyNonConvexDelaunay = new RSGISIdentifyNonConvexPolygonsDelaunay();
-						vector<Polygon*> *nonConvexPolys = identifyNonConvexDelaunay->retrievePolygons(polygons, totalNumClusters);
+						std::vector<geos::geom::Polygon*> *nonConvexPolys = identifyNonConvexDelaunay->retrievePolygons(polygons, totalNumClusters);
 						float area = 0;
 						for(unsigned int i = 0; i < nonConvexPolys->size(); ++i)
 						{
@@ -2133,7 +2133,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 						
 						RSGISVectorIO vecIO;
 						vecIO.exportGEOSPolygons2SHP(this->outputVector, this->force, nonConvexPolys, spatialRef, numericColsNames, textColsNames, numericColsData, textColsData);
-						vector<Polygon*>::iterator iterOutPolys;
+						std::vector<geos::geom::Polygon*>::iterator iterOutPolys;
 						for(iterOutPolys = nonConvexPolys->begin(); iterOutPolys != nonConvexPolys->end(); )
 						{
 							delete *iterOutPolys;
@@ -2144,9 +2144,9 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 					}
 					else if(polygonizertype == convexhull)
 					{
-						vector<Polygon*> *convexhulls = new vector<Polygon*>();
+						std::vector<geos::geom::Polygon*> *convexhulls = new std::vector<geos::geom::Polygon*>();
 						
-						Polygon *poly;
+						geos::geom::Polygon *poly;
 						float area = 0;
 						for(int i = 0; i < totalNumClusters; ++i)
 						{
@@ -2160,7 +2160,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 						RSGISVectorIO vecIO;
 						vecIO.exportGEOSPolygons2SHP(this->outputVector, this->force, convexhulls, spatialRef, numericColsNames, textColsNames, numericColsData, textColsData);
 
-						vector<Polygon*>::iterator iterOutPolys;
+						std::vector<geos::geom::Polygon*>::iterator iterOutPolys;
 						for(iterOutPolys = convexhulls->begin(); iterOutPolys != convexhulls->end(); )
 						{
 							delete *iterOutPolys;
@@ -2181,7 +2181,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 					else if(polygonizertype == snakes)
 					{
 						RSGISIdentifyNonConvexPolygonsSnakes *identifyNonConvexSnakes = new RSGISIdentifyNonConvexPolygonsSnakes(resolution, spatialRef, alpha, beta, gamma, delta, maxNumIterations);
-						vector<Polygon*> *nonConvexPolys = identifyNonConvexSnakes->retrievePolygons(polygons, totalNumClusters);
+						std::vector<geos::geom::Polygon*> *nonConvexPolys = identifyNonConvexSnakes->retrievePolygons(polygons, totalNumClusters);
 						float area = 0;
 						for(unsigned int i = 0; i < nonConvexPolys->size(); ++i)
 						{
@@ -2193,7 +2193,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 						
 						RSGISVectorIO vecIO;
 						vecIO.exportGEOSPolygons2SHP(this->outputVector, this->force, nonConvexPolys, spatialRef, numericColsNames, textColsNames, numericColsData, textColsData);
-						vector<Polygon*>::iterator iterOutPolys;
+						std::vector<geos::geom::Polygon*>::iterator iterOutPolys;
 						for(iterOutPolys = nonConvexPolys->begin(); iterOutPolys != nonConvexPolys->end(); )
 						{
 							delete *iterOutPolys;
@@ -2412,9 +2412,9 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				vecIO.readPolygons(inputSHPLayer, data, numFeatures);
 				
 				RSGISGeometry geomUtils;
-				vector<Polygon*> *largePolys = new vector<Polygon*>();
-				vector<RSGISPolygonData*> *largePolysData = new vector<RSGISPolygonData*>();
-				vector<RSGISPolygonData*> *smallPolysData = new vector<RSGISPolygonData*>();
+				std::vector<geos::geom::Polygon*> *largePolys = new std::vector<geos::geom::Polygon*>();
+				std::vector<RSGISPolygonData*> *largePolysData = new std::vector<RSGISPolygonData*>();
+				std::vector<RSGISPolygonData*> *smallPolysData = new std::vector<RSGISPolygonData*>();
 				RSGISClusteredClassificationPolygon *tmpPoly = NULL;
 				for(int i = 0; i < numFeatures; ++i)
 				{
@@ -2429,7 +2429,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 					}
 				}
 				
-				vector<RSGISPolygonData*>::iterator iterPolys;
+				std::vector<RSGISPolygonData*>::iterator iterPolys;
 				for(iterPolys = largePolysData->begin(); iterPolys != largePolysData->end(); ++iterPolys)
 				{
 					largePolys->push_back((*iterPolys)->getPolygon());
@@ -2480,7 +2480,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				
 				
 				float totalAreaProp = 0;
-				vector<RSGISPolygonData*>::iterator iterData;
+				std::vector<RSGISPolygonData*>::iterator iterData;
 				for(iterData = largePolysData->begin(); iterData != largePolysData->end(); ++iterData)
 				{
 					tmpPoly = (RSGISClusteredClassificationPolygon*) *iterData;
@@ -2593,10 +2593,10 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				
 				vecIO.readPolygons(inputSHPLayer, data, numFeatures);
 								
-				vector<Polygon*> *polys = new vector<Polygon*>();
+				std::vector<geos::geom::Polygon*> *polys = new std::vector<geos::geom::Polygon*>();
 				for(int i = 0; i < numFeatures; ++i)
 				{
-					polys->push_back((dynamic_cast<Polygon*>(data[i]->getPolygon()->clone())));
+					polys->push_back((dynamic_cast<geos::geom::Polygon*>(data[i]->getPolygon()->clone())));
 					delete data[i];
 				}
 				delete[] data;
@@ -2626,27 +2626,27 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				int totalLargePolys = 0;
 				//int count = 0;
 				
-				Polygon *poly1 = NULL;
-				Polygon *poly2 = NULL;
-				Polygon *polyUnion = NULL;
-				Polygon *polyUnionBuffer = NULL;
-				Polygon *polyTmp1 = NULL;
-				Polygon *polyTmp2 = NULL;
-				Polygon *maxRelBorderPoly = NULL;
-				Geometry *geom1 = NULL;
-				Geometry *geom2 = NULL;
-				Geometry *intersect = NULL;
+				geos::geom::Polygon *poly1 = NULL;
+				geos::geom::Polygon *poly2 = NULL;
+				geos::geom::Polygon *polyUnion = NULL;
+				geos::geom::Polygon *polyUnionBuffer = NULL;
+				geos::geom::Polygon *polyTmp1 = NULL;
+				geos::geom::Polygon *polyTmp2 = NULL;
+				geos::geom::Polygon *maxRelBorderPoly = NULL;
+				geos::geom::Geometry *geom1 = NULL;
+				geos::geom::Geometry *geom2 = NULL;
+				geos::geom::Geometry *intersect = NULL;
 				
-				vector<Polygon*> *tmpPolysLarge = new vector<Polygon*>();
-				vector<Polygon*> *tmpPolysSmall = new vector<Polygon*>();
-				vector<Polygon*> *tmpPolys1 = new vector<Polygon*>();
-				vector<Polygon*> *tmpPolys2 = new vector<Polygon*>();
-				vector<Polygon*> *tmpPolysIntersect = new vector<Polygon*>();
+				std::vector<geos::geom::Polygon*> *tmpPolysLarge = new std::vector<geos::geom::Polygon*>();
+				std::vector<geos::geom::Polygon*> *tmpPolysSmall = new std::vector<geos::geom::Polygon*>();
+				std::vector<geos::geom::Polygon*> *tmpPolys1 = new std::vector<geos::geom::Polygon*>();
+				std::vector<geos::geom::Polygon*> *tmpPolys2 = new std::vector<geos::geom::Polygon*>();
+				std::vector<geos::geom::Polygon*> *tmpPolysIntersect = new std::vector<geos::geom::Polygon*>();
 				
-				vector<Polygon*>::iterator iterPolysSmall;
-				vector<Polygon*>::iterator iterPolys;
-				vector<Polygon*>::iterator iterPolys1;
-				vector<Polygon*>::iterator iterPolys2;
+				std::vector<geos::geom::Polygon*>::iterator iterPolysSmall;
+				std::vector<geos::geom::Polygon*>::iterator iterPolys;
+				std::vector<geos::geom::Polygon*>::iterator iterPolys1;
+				std::vector<geos::geom::Polygon*>::iterator iterPolys2;
 				while(change)
 				{
 					change = false;
@@ -2680,7 +2680,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 						if(overlapFound)
 						{
 							//cout << "Overlap found\n";
-							intersect = geomUtils.getIntersection(((Geometry*)poly1), ((Geometry*)poly2));
+							intersect = geomUtils.getIntersection(((geos::geom::Geometry*)poly1), ((geos::geom::Geometry*)poly2));
 							
 							//cout << "Intersect Geom Type = " << intersect->getGeometryType() << endl;
 							
@@ -2695,7 +2695,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 								delete intersect;
 								
 								polyUnion = geomUtils.polygonUnion(poly1, poly2);
-								polyUnionBuffer = dynamic_cast<Polygon*>(polyUnion->buffer(0));
+								polyUnionBuffer = dynamic_cast<geos::geom::Polygon*>(polyUnion->buffer(0));
 								delete polyUnion;
 								
 								polys->erase(remove(polys->begin(), polys->end(), poly1));
@@ -2934,7 +2934,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 									//cout << "(totalLargePolys <= 1)" << endl;
 									// MERGE THE TWO POLYGONS
 									polyUnion = geomUtils.polygonUnion(poly1, poly2);
-									polyUnionBuffer = dynamic_cast<Polygon*>(polyUnion->buffer(0));
+									polyUnionBuffer = dynamic_cast<geos::geom::Polygon*>(polyUnion->buffer(0));
 									delete polyUnion;
 									
 									polys->erase(remove(polys->begin(), polys->end(), poly1));
@@ -3070,7 +3070,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 											if(maxRelBorder > 0)
 											{
 												polyUnion = geomUtils.polygonUnion(polyTmp1, maxRelBorderPoly);
-												polyUnionBuffer = dynamic_cast<Polygon*>(polyUnion->buffer(0));
+												polyUnionBuffer = dynamic_cast<geos::geom::Polygon*>(polyUnion->buffer(0));
 												delete polyUnion;
 												tmpPolysLarge->erase(remove(tmpPolysLarge->begin(), tmpPolysLarge->end(), maxRelBorderPoly));
 												tmpPolysLarge->push_back(polyUnionBuffer);
@@ -3289,7 +3289,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				
 				vecIO.readPolygons(inputSHPLayer, data, numFeatures);
 				
-				vector<RSGISPolygonData*> *polys = new vector<RSGISPolygonData*>();
+				std::vector<RSGISPolygonData*> *polys = new std::vector<RSGISPolygonData*>();
 				for(int i = 0; i < numFeatures; ++i)
 				{
 					polys->push_back(data[i]);
@@ -3297,16 +3297,16 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				delete[] data;
 				
 				RSGISGeometry geomUtils;
-				vector<Polygon*>::iterator iterPolys;
-				vector<RSGISPolygonData*>::iterator iterClusterPolys;
+				std::vector<geos::geom::Polygon*>::iterator iterPolys;
+				std::vector<RSGISPolygonData*>::iterator iterClusterPolys;
 				RSGISClusteredClassificationPolygon *tmpPoly = NULL;
-				vector<Polygon*> *tmpPolys = new vector<Polygon*>();
-				vector<RSGISPolygonData*> *polysNew = new vector<RSGISPolygonData*>();
+				std::vector<geos::geom::Polygon*> *tmpPolys = new std::vector<geos::geom::Polygon*>();
+				std::vector<RSGISPolygonData*> *polysNew = new std::vector<RSGISPolygonData*>();
 				for(iterClusterPolys = polys->begin(); iterClusterPolys != polys->end(); )
 				{
 					tmpPoly = (RSGISClusteredClassificationPolygon*) *iterClusterPolys;
 					
-					tmpPolys->push_back((dynamic_cast<Polygon*>(tmpPoly->getPolygon()->clone())));
+					tmpPolys->push_back((dynamic_cast<geos::geom::Polygon*>(tmpPoly->getPolygon()->clone())));
 					geomUtils.performMorphologicalOperation(tmpPolys, morphologyType, buffer, 30);
 					if(tmpPolys->size() == 1)
 					{
@@ -3502,14 +3502,14 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				cout << "Read inputted small polygons\n";
 				vecIO.readPolygons(inputSHPLayerSmall, data, numFeatures);
 				
-				vector<RSGISPolygonData*> *smallPolys = new vector<RSGISPolygonData*>();
+				std::vector<RSGISPolygonData*> *smallPolys = new std::vector<RSGISPolygonData*>();
 				for(int i = 0; i < numFeatures; ++i)
 				{
 					//cout << data[i]->getPolygon()->toText() << endl;
 					smallPolys->push_back(data[i]);
 				}
 				
-				vector<Polygon*> *largePolys = new vector<Polygon*>();
+				std::vector<geos::geom::Polygon*> *largePolys = new std::vector<geos::geom::Polygon*>();
 				processFeature = new RSGISGEOSPolygonReader(largePolys);
 				processVector = new RSGISProcessVector(processFeature);
 				
@@ -3525,7 +3525,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				
 				//float overlapthreshold = 0.66;
 				
-				MultiPolygon *mPolyLarge = vecUtils.convertGEOSPolygons2GEOSMultiPolygon(largePolys);
+                geos::geom::MultiPolygon *mPolyLarge = vecUtils.convertGEOSPolygons2GEOSMultiPolygon(largePolys);
 				
 				float intersectArea = 0;
 				float mPolyLargeIntersectArRatio = 0;
@@ -3534,14 +3534,14 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				bool first = true;
 				bool change = true;
 				
-				vector<RSGISPolygonData*>::iterator iterSmallPolys;
-				vector<Polygon*>::iterator iterLargePolys;
+				std::vector<RSGISPolygonData*>::iterator iterSmallPolys;
+				std::vector<geos::geom::Polygon*>::iterator iterLargePolys;
 				
-				Geometry *intersect = NULL;
+				geos::geom::Geometry *intersect = NULL;
 				
-				Polygon *smallPoly = NULL;
-				Polygon *maxIntersect = NULL;
-				Polygon *unionPoly = NULL;
+				geos::geom::Polygon *smallPoly = NULL;
+				geos::geom::Polygon *maxIntersect = NULL;
+				geos::geom::Polygon *unionPoly = NULL;
 				
 				int feedback = numFeatures/10;
 				int i = 0;
@@ -3575,7 +3575,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 						}
 						else if(smallPoly->intersects(mPolyLarge))
 						{
-							intersect = geomUtils.getIntersection(((Geometry*)smallPoly), ((Geometry*)mPolyLarge));
+							intersect = geomUtils.getIntersection(((geos::geom::Geometry*)smallPoly), ((geos::geom::Geometry*)mPolyLarge));
 							intersectArea = intersect->getArea();
 							delete intersect;
 							mPolyLargeIntersectArRatio = intersectArea/smallPoly->getArea();
@@ -3589,7 +3589,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 								first = true;
 								for(iterLargePolys = largePolys->begin(); iterLargePolys != largePolys->end(); ++iterLargePolys)
 								{
-									intersect = geomUtils.getIntersection(((Geometry*)smallPoly), ((Geometry*)*iterLargePolys));
+									intersect = geomUtils.getIntersection(((geos::geom::Geometry*)smallPoly), ((geos::geom::Geometry*)*iterLargePolys));
 									intersectArea = intersect->getArea();
 									if(first)
 									{
@@ -3739,7 +3739,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				}
 				inputSpatialRef = inputSHPLayerSmall->GetSpatialRef();	
 				
-				vector<Polygon*> *largePolys = new vector<Polygon*>();
+				std::vector<geos::geom::Polygon*> *largePolys = new std::vector<geos::geom::Polygon*>();
 				processFeature = new RSGISGEOSPolygonReader(largePolys);
 				processVector = new RSGISProcessVector(processFeature);
 				
@@ -3749,7 +3749,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				delete processVector;
 				delete processFeature;
 				
-				vector<Polygon*> *smallPolys = new vector<Polygon*>();
+				std::vector<geos::geom::Polygon*> *smallPolys = new std::vector<geos::geom::Polygon*>();
 				processFeature = new RSGISGEOSPolygonReader(smallPolys);
 				processVector = new RSGISProcessVector(processFeature);
 				
@@ -3762,8 +3762,8 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				cout << "There are " << largePolys->size() << " large polygons\n";
 				cout << "There are " << smallPolys->size() << " small polygons\n";
 								
-				vector<Polygon*>::iterator iterLargePolys;
-				vector<Polygon*>::iterator iterSmallPolys;
+				std::vector<geos::geom::Polygon*>::iterator iterLargePolys;
+				std::vector<geos::geom::Polygon*>::iterator iterSmallPolys;
 				
 				//float largePolyThreshold = 10000;
 				//float overlapthreshold = 0;
@@ -3803,27 +3803,27 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				int totalLargePolys = 0;
 				//int count = 0;
 				
-				Polygon *poly1 = NULL;
-				Polygon *poly2 = NULL;
-				Polygon *polyUnion = NULL;
-				Polygon *polyUnionBuffer = NULL;
-				Polygon *polyTmp1 = NULL;
-				Polygon *polyTmp2 = NULL;
-				Polygon *maxRelBorderPoly = NULL;
-				Geometry *geom1 = NULL;
-				Geometry *geom2 = NULL;
-				Geometry *intersect = NULL;
+				geos::geom::Polygon *poly1 = NULL;
+				geos::geom::Polygon *poly2 = NULL;
+				geos::geom::Polygon *polyUnion = NULL;
+				geos::geom::Polygon *polyUnionBuffer = NULL;
+				geos::geom::Polygon *polyTmp1 = NULL;
+				geos::geom::Polygon *polyTmp2 = NULL;
+				geos::geom::Polygon *maxRelBorderPoly = NULL;
+				geos::geom::Geometry *geom1 = NULL;
+				geos::geom::Geometry *geom2 = NULL;
+				geos::geom::Geometry *intersect = NULL;
 				
-				vector<Polygon*> *tmpPolysLarge = new vector<Polygon*>();
-				vector<Polygon*> *tmpPolysSmall = new vector<Polygon*>();
-				vector<Polygon*> *tmpPolys1 = new vector<Polygon*>();
-				vector<Polygon*> *tmpPolys2 = new vector<Polygon*>();
-				vector<Polygon*> *tmpPolysIntersect = new vector<Polygon*>();
+				std::vector<geos::geom::Polygon*> *tmpPolysLarge = new std::vector<geos::geom::Polygon*>();
+				std::vector<geos::geom::Polygon*> *tmpPolysSmall = new std::vector<geos::geom::Polygon*>();
+				std::vector<geos::geom::Polygon*> *tmpPolys1 = new std::vector<geos::geom::Polygon*>();
+				std::vector<geos::geom::Polygon*> *tmpPolys2 = new std::vector<geos::geom::Polygon*>();
+				std::vector<geos::geom::Polygon*> *tmpPolysIntersect = new std::vector<geos::geom::Polygon*>();
 				
-				vector<Polygon*>::iterator iterPolysSmall;
-				vector<Polygon*>::iterator iterPolys;
-				vector<Polygon*>::iterator iterPolys1;
-				vector<Polygon*>::iterator iterPolys2;
+				std::vector<geos::geom::Polygon*>::iterator iterPolysSmall;
+				std::vector<geos::geom::Polygon*>::iterator iterPolys;
+				std::vector<geos::geom::Polygon*>::iterator iterPolys1;
+				std::vector<geos::geom::Polygon*>::iterator iterPolys2;
 								
 				while(change)
 				{
@@ -3858,7 +3858,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 						if(overlapFound)
 						{
 							//cout << "Overlap found\n";
-							intersect = geomUtils.getIntersection(((Geometry*)poly1), ((Geometry*)poly2));
+							intersect = geomUtils.getIntersection(((geos::geom::Geometry*)poly1), ((geos::geom::Geometry*)poly2));
 							
 							//cout << "Intersect Geom Type = " << intersect->getGeometryType() << endl;
 							
@@ -3873,7 +3873,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 								delete intersect;
 								
 								polyUnion = geomUtils.polygonUnion(poly1, poly2);
-								polyUnionBuffer = dynamic_cast<Polygon*>(polyUnion->buffer(0));
+								polyUnionBuffer = dynamic_cast<geos::geom::Polygon*>(polyUnion->buffer(0));
 								delete polyUnion;
 								
 								largePolys->erase(remove(largePolys->begin(), largePolys->end(), poly1));
@@ -4112,7 +4112,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 									//cout << "(totalLargePolys <= 1)" << endl;
 									// MERGE THE TWO POLYGONS
 									polyUnion = geomUtils.polygonUnion(poly1, poly2);
-									polyUnionBuffer = dynamic_cast<Polygon*>(polyUnion->buffer(0));
+									polyUnionBuffer = dynamic_cast<geos::geom::Polygon*>(polyUnion->buffer(0));
 									delete polyUnion;
 									
 									largePolys->erase(remove(largePolys->begin(), largePolys->end(), poly1));
@@ -4248,7 +4248,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 											if(maxRelBorder > 0)
 											{
 												polyUnion = geomUtils.polygonUnion(polyTmp1, maxRelBorderPoly);
-												polyUnionBuffer = dynamic_cast<Polygon*>(polyUnion->buffer(0));
+												polyUnionBuffer = dynamic_cast<geos::geom::Polygon*>(polyUnion->buffer(0));
 												delete polyUnion;
 												tmpPolysLarge->erase(remove(tmpPolysLarge->begin(), tmpPolysLarge->end(), maxRelBorderPoly));
 												tmpPolysLarge->push_back(polyUnionBuffer);
@@ -4328,20 +4328,20 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				tmpPolysIntersect->clear();
 				delete tmpPolysIntersect;
 				
-				MultiPolygon *mPolyLarge = vecUtils.convertGEOSPolygons2GEOSMultiPolygon(largePolys);
+                geos::geom::MultiPolygon *mPolyLarge = vecUtils.convertGEOSPolygons2GEOSMultiPolygon(largePolys);
 				
 				intersectArea = 0;
 				float mPolyLargeIntersectArRatio = 0;
 				float maxIntersectArea = 0;
 				
-				//vector<Polygon*>::iterator iterSmallPolys;
-				//vector<Polygon*>::iterator iterLargePolys;
+				//std::vector<geos::geom::Polygon*>::iterator iterSmallPolys;
+				//std::vector<geos::geom::Polygon*>::iterator iterLargePolys;
 				
 				intersect = NULL;
 				
-				Polygon *smallPoly = NULL;
-				Polygon *maxIntersect = NULL;
-				Polygon *unionPoly = NULL;
+				geos::geom::Polygon *smallPoly = NULL;
+				geos::geom::Polygon *maxIntersect = NULL;
+				geos::geom::Polygon *unionPoly = NULL;
 				
 				int numFeatures = smallPolys->size();
 				int feedback = numFeatures/10;
@@ -4373,7 +4373,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 						}
 						else if(smallPoly->intersects(mPolyLarge))
 						{
-							intersect = geomUtils.getIntersection(((Geometry*)smallPoly), ((Geometry*)mPolyLarge));
+							intersect = geomUtils.getIntersection(((geos::geom::Geometry*)smallPoly), ((geos::geom::Geometry*)mPolyLarge));
 							intersectArea = intersect->getArea();
 							delete intersect;
 							mPolyLargeIntersectArRatio = intersectArea/smallPoly->getArea();
@@ -4388,7 +4388,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 								first = true;
 								for(iterLargePolys = largePolys->begin(); iterLargePolys != largePolys->end(); ++iterLargePolys)
 								{
-									intersect = geomUtils.getIntersection(((Geometry*)smallPoly), ((Geometry*)*iterLargePolys));
+									intersect = geomUtils.getIntersection(((geos::geom::Geometry*)smallPoly), ((geos::geom::Geometry*)*iterLargePolys));
 									intersectArea = intersect->getArea();
 									if(first)
 									{
@@ -4550,7 +4550,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				}
 				inputSpatialRef = inputSHPLayerSmall->GetSpatialRef();	
 				
-				vector<Polygon*> *largePolys = new vector<Polygon*>();
+				std::vector<geos::geom::Polygon*> *largePolys = new std::vector<geos::geom::Polygon*>();
 				processFeature = new RSGISGEOSPolygonReader(largePolys);
 				processVector = new RSGISProcessVector(processFeature);
 				
@@ -4560,7 +4560,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				delete processVector;
 				delete processFeature;
 				
-				vector<Polygon*> *smallPolys = new vector<Polygon*>();
+				std::vector<geos::geom::Polygon*> *smallPolys = new std::vector<geos::geom::Polygon*>();
 				processFeature = new RSGISGEOSPolygonReader(smallPolys);
 				processVector = new RSGISProcessVector(processFeature);
 				
@@ -4579,16 +4579,16 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				//float maxLength = 150;
 				
 				
-				vector<Polygon*>::iterator iterLargePolys;
-				vector<Polygon*>::iterator iterSmallPolys;
-				vector<Polygon*>::iterator iterSmallPolys2;
+				std::vector<geos::geom::Polygon*>::iterator iterLargePolys;
+				std::vector<geos::geom::Polygon*>::iterator iterSmallPolys;
+				std::vector<geos::geom::Polygon*>::iterator iterSmallPolys2;
 								
 				// Implement clusterer... 
-				MultiPolygon *mPolyLarge = vecUtils.convertGEOSPolygons2GEOSMultiPolygon(largePolys);
+				geos::geom::MultiPolygon *mPolyLarge = vecUtils.convertGEOSPolygons2GEOSMultiPolygon(largePolys);
 				
-				Polygon *smallPoly = NULL;
-				Polygon *newPoly = NULL;
-				vector<Polygon*> *toMerge = new vector<Polygon*>();
+				geos::geom::Polygon *smallPoly = NULL;
+				geos::geom::Polygon *newPoly = NULL;
+				std::vector<geos::geom::Polygon*> *toMerge = new std::vector<geos::geom::Polygon*>();
 				
 				bool change = true;
 				
@@ -4793,7 +4793,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				}
 				inputSpatialRef = inputSHPLayerSmall->GetSpatialRef();	
 				
-				vector<Polygon*> *largePolys = new vector<Polygon*>();
+				std::vector<geos::geom::Polygon*> *largePolys = new std::vector<geos::geom::Polygon*>();
 				processFeature = new RSGISGEOSPolygonReader(largePolys);
 				processVector = new RSGISProcessVector(processFeature);
 				
@@ -4803,7 +4803,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				delete processVector;
 				delete processFeature;
 				
-				vector<Polygon*> *smallPolys = new vector<Polygon*>();
+				std::vector<geos::geom::Polygon*> *smallPolys = new std::vector<geos::geom::Polygon*>();
 				processFeature = new RSGISGEOSPolygonReader(smallPolys);
 				processVector = new RSGISProcessVector(processFeature);
 				
@@ -4820,29 +4820,29 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				//polygonizertype = lineproj;
 				//resolution = 0.5;				
 				
-				vector<Polygon*>::iterator iterLargePolys;
-				vector<Polygon*>::iterator iterSmallPolys;
+				std::vector<geos::geom::Polygon*>::iterator iterLargePolys;
+				std::vector<geos::geom::Polygon*>::iterator iterSmallPolys;
 				
-				Polygon *smallPoly = NULL;
+				geos::geom::Polygon *smallPoly = NULL;
 				
-				vector<Polygon*> *newLargePolys = new vector<Polygon*>();
+				std::vector<geos::geom::Polygon*> *newLargePolys = new std::vector<geos::geom::Polygon*>();
 				
 				//int index = 0;
 				int minIndex = 0;
 				
 				float minDistance = 0;
 				float distance = 0;
-				Polygon *tmpLargePoly = NULL;
+				geos::geom::Polygon *tmpLargePoly = NULL;
 				
 				bool first = true;
 				bool intersected = false;
 				
 				if(smallPolys->size() > 0)
 				{
-					vector<Polygon*> **toMerge = new vector<Polygon*>*[largePolys->size()];
+					std::vector<geos::geom::Polygon*> **toMerge = new std::vector<geos::geom::Polygon*>*[largePolys->size()];
 					for(unsigned int i = 0; i < largePolys->size(); ++i)
 					{
-						toMerge[i] =  new vector<Polygon*>();
+						toMerge[i] =  new std::vector<geos::geom::Polygon*>();
 						toMerge[i]->push_back(largePolys->at(i));
 					}
 					
@@ -5127,7 +5127,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				
 				// Reading input multi-polygon clusters
 				
-				list<RSGIS2DPoint*> *clusterPolygons = new list<RSGIS2DPoint*>();
+				std::list<RSGIS2DPoint*> *clusterPolygons = new std::list<RSGIS2DPoint*>();
 				RSGISIntValuePolygonReader *processFeatureIntValueReader = new RSGISIntValuePolygonReader(intValueAtt, clusterPolygons);
 				RSGISProcessVector *processVector = new RSGISProcessVector(processFeatureIntValueReader);
 				
@@ -5139,7 +5139,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				
 				// Reading original cluster polygons.
 				
-				list<RSGIS2DPoint*> *dataOrigPolys = new list<RSGIS2DPoint*>();
+				std::list<RSGIS2DPoint*> *dataOrigPolys = new std::list<RSGIS2DPoint*>();
 				RSGISClassificationPolygonReader *processFeatureClassPolyReader = new RSGISClassificationPolygonReader(this->classStr, dataOrigPolys);
 				processVector = new RSGISProcessVector(processFeatureClassPolyReader);
 				
@@ -5150,10 +5150,10 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				delete processFeatureClassPolyReader;
 				
 				
-				vector<RSGISClusterData*> *clusters = new vector<RSGISClusterData*>();
+				std::vector<RSGISClusterData*> *clusters = new std::vector<RSGISClusterData*>();
 				this->buildClusterDataStructure(clusters, dataClusters, numFeatures, clusterPolygons, dataOrigPolys);
 				
-				vector<RSGISClusterData*>::iterator iterClusterData;
+				std::vector<RSGISClusterData*>::iterator iterClusterData;
 				RSGISClusterData *cluster = NULL;
 				int count = 0;
 				for(iterClusterData = clusters->begin(); iterClusterData != clusters->end(); ++iterClusterData)
@@ -5174,10 +5174,10 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				string clusterPolysOutPath = "";
 				string intersectPolysOutPath = "";
 				
-				vector<RSGISClassificationPolygon*>::iterator iterClassPolys;
-				vector<RSGISClassificationPolygon*> *intersectPolys = NULL;
-				vector<RSGISClassificationPolygon*> *clusterPolys = NULL;
-				vector<Polygon*> *outputPolys = new vector<Polygon*>();
+				std::vector<RSGISClassificationPolygon*>::iterator iterClassPolys;
+				std::vector<RSGISClassificationPolygon*> *intersectPolys = NULL;
+				std::vector<RSGISClassificationPolygon*> *clusterPolys = NULL;
+				std::vector<geos::geom::Polygon*> *outputPolys = new std::vector<geos::geom::Polygon*>();
 				RSGISVectorIO vecIO;
 				
 				for(unsigned int i = 0; i < clusters->size(); ++i)
@@ -5217,7 +5217,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				}
 				delete[] dataClusters;
 				
-				list<RSGIS2DPoint*>::iterator iterInClusterPolys;
+				std::list<RSGIS2DPoint*>::iterator iterInClusterPolys;
 				for(iterInClusterPolys = clusterPolygons->begin(); iterInClusterPolys != clusterPolygons->end(); )//++iterOrigData)
 				{
 					delete ((RSGISIntValuePolygon*)(*iterInClusterPolys));
@@ -5226,7 +5226,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				delete clusterPolygons;
 				
 				
-				list<RSGIS2DPoint*>::iterator iterOrigData;
+				std::list<RSGIS2DPoint*>::iterator iterOrigData;
 				for(iterOrigData = dataOrigPolys->begin(); iterOrigData != dataOrigPolys->end(); )//++iterOrigData)
 				{
 					delete ((RSGISClassificationPolygon*)(*iterOrigData));
@@ -5234,7 +5234,7 @@ void RSGISExePostClassification::runAlgorithm() throw(RSGISException)
 				}
 				delete dataOrigPolys;
 				
-				//vector<RSGISClusterData*>::iterator iterClusterData;
+				//std::vector<RSGISClusterData*>::iterator iterClusterData;
 				for(iterClusterData = clusters->begin(); iterClusterData != clusters->end(); )
 				{
 					delete *iterClusterData;
@@ -5474,7 +5474,7 @@ void RSGISExePostClassification::printParameters()
 				if(classEdgeLengths != NULL)
 				{
 					cout << "Per class thresholds: \n";
-					vector<EdgeLengthPair*>::iterator iterEdgePairs;
+					std::vector<EdgeLengthPair*>::iterator iterEdgePairs;
 					for(iterEdgePairs = classEdgeLengths->begin(); iterEdgePairs != classEdgeLengths->end(); ++iterEdgePairs)
 					{
 						cout << (*iterEdgePairs)->classname << " = " << (*iterEdgePairs)->lengththreshold << endl;
@@ -5554,7 +5554,7 @@ void RSGISExePostClassification::printParameters()
 				if(classEdgeLengths != NULL)
 				{
 					cout << "Per class thresholds: \n";
-					vector<EdgeLengthPair*>::iterator iterEdgePairs;
+					std::vector<EdgeLengthPair*>::iterator iterEdgePairs;
 					for(iterEdgePairs = classEdgeLengths->begin(); iterEdgePairs != classEdgeLengths->end(); ++iterEdgePairs)
 					{
 						cout << (*iterEdgePairs)->classname << " = " << (*iterEdgePairs)->lengththreshold << endl;
@@ -5813,28 +5813,28 @@ string RSGISExePostClassification::getXMLSchema()
 	return "NOT DONE!";
 }
 
-void RSGISExePostClassification::buildClusterDataStructure(vector<RSGISClusterData*> *clusters, RSGISPolygonData **dataClusters, int numClusters, list<RSGIS2DPoint*> *inClusterPolygons, list<RSGIS2DPoint*> *dataOrigPolys) throw(RSGISException)
+void RSGISExePostClassification::buildClusterDataStructure(std::vector<RSGISClusterData*> *clusters, RSGISPolygonData **dataClusters, int numClusters, std::list<RSGIS2DPoint*> *inClusterPolygons, std::list<RSGIS2DPoint*> *dataOrigPolys) throw(RSGISException)
 {
 	try 
 	{
 		RSGISGeometry geomUtils;
 		
-		vector<RSGISClassificationPolygon*>* clusterPolygons = NULL;
-		vector<RSGISClassificationPolygon*>* allIntersect = NULL;
-		Polygon *poly = NULL;
+		std::vector<RSGISClassificationPolygon*>* clusterPolygons = NULL;
+		std::vector<RSGISClassificationPolygon*>* allIntersect = NULL;
+		geos::geom::Polygon *poly = NULL;
 		RSGISClusterData *cluster = NULL;
 		
-		vector<RSGISClassificationPolygon*>::iterator iterIndividuals;
-		vector<RSGISClassificationPolygon*> *individuals = new vector<RSGISClassificationPolygon*>();
-		list<RSGIS2DPoint*>::iterator iterClassPolys;
+		std::vector<RSGISClassificationPolygon*>::iterator iterIndividuals;
+		std::vector<RSGISClassificationPolygon*> *individuals = new std::vector<RSGISClassificationPolygon*>();
+		std::list<RSGIS2DPoint*>::iterator iterClassPolys;
 		for(iterClassPolys = dataOrigPolys->begin(); iterClassPolys != dataOrigPolys->end(); ++iterClassPolys)
 		{
 			individuals->push_back(((RSGISClassificationPolygon*)(*iterClassPolys)));
 		}
 		
-		vector<RSGISIntValuePolygon*>::iterator iterInClusterPolys;
-		vector<RSGISIntValuePolygon*> *inClusterPolys = new vector<RSGISIntValuePolygon*>();
-		list<RSGIS2DPoint*>::iterator iterInClusterPolys1;
+		std::vector<RSGISIntValuePolygon*>::iterator iterInClusterPolys;
+		std::vector<RSGISIntValuePolygon*> *inClusterPolys = new std::vector<RSGISIntValuePolygon*>();
+		std::list<RSGIS2DPoint*>::iterator iterInClusterPolys1;
 		for(iterInClusterPolys1 = inClusterPolygons->begin(); iterInClusterPolys1 != inClusterPolygons->end(); ++iterInClusterPolys1)
 		{
 			inClusterPolys->push_back(((RSGISIntValuePolygon*)(*iterInClusterPolys1)));
@@ -5856,7 +5856,7 @@ void RSGISExePostClassification::buildClusterDataStructure(vector<RSGISClusterDa
 			 */
 			
 			/*
-			vector<Polygon*> *outPolys = new vector<Polygon*>();
+			std::vector<geos::geom::Polygon*> *outPolys = new std::vector<geos::geom::Polygon*>();
 			outPolys->push_back(poly);
 			RSGISVectorIO vecIO;
 			vecIO.exportGEOSPolygons2SHP("/Users/pete/Temp/Clustering/polygons/polys1.shp", true, outPolys);
@@ -5864,8 +5864,8 @@ void RSGISExePostClassification::buildClusterDataStructure(vector<RSGISClusterDa
 			//return 0;
 			*/
 			
-			clusterPolygons = new vector<RSGISClassificationPolygon*>();
-			allIntersect = new vector<RSGISClassificationPolygon*>();
+			clusterPolygons = new std::vector<RSGISClassificationPolygon*>();
+			allIntersect = new std::vector<RSGISClassificationPolygon*>();
 			//countIndividuals = 0;
 			for(iterIndividuals = individuals->begin(); iterIndividuals != individuals->end(); ++iterIndividuals)
 			{
@@ -5894,7 +5894,7 @@ void RSGISExePostClassification::buildClusterDataStructure(vector<RSGISClusterDa
 								catch (geos::util::TopologyException &e) 
 								{
 									
-									vector<Polygon*> *outPolys = new vector<Polygon*>();
+									std::vector<geos::geom::Polygon*> *outPolys = new std::vector<geos::geom::Polygon*>();
 									outPolys->push_back(poly);
 									outPolys->push_back((*iterIndividuals)->getPolygon());
 									RSGISVectorIO vecIO;
@@ -5912,7 +5912,7 @@ void RSGISExePostClassification::buildClusterDataStructure(vector<RSGISClusterDa
 				catch (geos::util::TopologyException &e) 
 				{
 					/*
-					vector<Polygon*> *outPolys = new vector<Polygon*>();
+					std::vector<geos::geom::Polygon*> *outPolys = new std::vector<geos::geom::Polygon*>();
 					outPolys->push_back(poly);
 					outPolys->push_back((*iterIndividuals)->getPolygon());
 					RSGISVectorIO vecIO;
@@ -5932,7 +5932,7 @@ void RSGISExePostClassification::buildClusterDataStructure(vector<RSGISClusterDa
 			{
 				RSGISVectorIO vecIO;
 				
-				vector<Polygon*> *outPolys = new vector<Polygon*>();
+				std::vector<geos::geom::Polygon*> *outPolys = new std::vector<geos::geom::Polygon*>();
 				for(iterIndividuals = allIntersect->begin(); iterIndividuals != allIntersect->end(); ++iterIndividuals)
 				{
 					outPolys->push_back((*iterIndividuals)->getPolygon());
@@ -5965,7 +5965,7 @@ RSGISExePostClassification::~RSGISExePostClassification()
 {
 	if(classEdgeLengths != NULL)
 	{
-		vector<EdgeLengthPair*>::iterator iterEdgePairs;
+		std::vector<EdgeLengthPair*>::iterator iterEdgePairs;
 		for(iterEdgePairs = classEdgeLengths->begin(); iterEdgePairs != classEdgeLengths->end(); )
 		{
 			delete *iterEdgePairs;

@@ -31,7 +31,7 @@ namespace rsgis{namespace vec{
 		
 	}
 	
-	void RSGISVectorSQLClassification::classifyVector(OGRDataSource *source, OGRLayer *inputLayer, sqlclass **rules, int numRules, string classAttribute) throw(RSGISVectorException)
+	void RSGISVectorSQLClassification::classifyVector(OGRDataSource *source, OGRLayer *inputLayer, sqlclass **rules, int numRules, std::string classAttribute) throw(RSGISVectorException)
 	{
 		// Check layer - output feature is present.
 		OGRFeatureDefn *layerDef = inputLayer->GetLayerDefn();
@@ -40,66 +40,66 @@ namespace rsgis{namespace vec{
 		fieldIdx = layerDef->GetFieldIndex(classAttribute.c_str());
 		if(fieldIdx < 0)
 		{
-			string message = "This layer does not contain a field with the name \'" + classAttribute + "\'";
+			std::string message = "This layer does not contain a field with the name \'" + classAttribute + "\'";
 			throw RSGISVectorException(message.c_str());
 		}
 		
 		OGRFieldDefn *fieldDef = layerDef->GetFieldDefn(fieldIdx);
 		if(fieldDef->GetType() != OFTString)
 		{
-			string message =  classAttribute + " attribute needs to be of type string.";
+			std::string message =  classAttribute + " attribute needs to be of type string.";
 			throw RSGISVectorException(message.c_str());
 		}
 		
-		cout << "Running Query - Results saved to memory\n";
+		std::cout << "Running Query - Results saved to memory\n";
 		// Execute Rules.
 		int fid = 0;
 		OGRFeature *queryFeature = NULL;
 		int numFeatures = inputLayer->GetFeatureCount(TRUE);
 		int queryFeatureCount = 0;
-		string *classification = new string[numFeatures];
+		std::string *classification = new std::string[numFeatures];
 		OGRLayer *resultsSet = NULL;
 		for(int i = 0; i < numRules; i++)
 		{
-			cout << i << ") Executing: " << rules[i]->name << " - " << rules[i]->sql << flush; 
+			std::cout << i << ") Executing: " << rules[i]->name << " - " << rules[i]->sql << std::flush; 
 			resultsSet = source->ExecuteSQL(rules[i]->sql.c_str(), NULL, "generic");
-			cout << " - Finished Query - " << flush;
+			std::cout << " - Finished Query - " << std::flush;
 			
 			if(resultsSet != NULL)
 			{
 				queryFeatureCount = resultsSet->GetFeatureCount(true);
 				if(queryFeatureCount > 0)
 				{
-					cout << "Updating " << queryFeatureCount << " classnames ... " << flush;
+					std::cout << "Updating " << queryFeatureCount << " classnames ... " << std::flush;
 					resultsSet->ResetReading();
 
 					while( (queryFeature = resultsSet->GetNextFeature()) != NULL )
 					{
 						fid = queryFeature->GetFID();
-						//cout << "\nUpdating " << fid;
+						//std::cout << "\nUpdating " << fid;
 						classification[fid] = rules[i]->name;
 						OGRFeature::DestroyFeature(queryFeature);
 					}
 				}
 				else
 				{
-					cout << " ** No Features identified ** " << flush;
+					std::cout << " ** No Features identified ** " << std::flush;
 				}
 				source->ReleaseResultSet(resultsSet);
 			}
 			else
 			{
-				cout << " ** No Features identified ** " << flush;
+				std::cout << " ** No Features identified ** " << std::flush;
 			}
-			cout << "Done\n";
+			std::cout << "Done\n";
 		}
 		
-		cout << "Update layer on disk\n";
+		std::cout << "Update layer on disk\n";
 		// Update OGR Layer
 		int feedback = numFeatures/10;
 		int feedbackCounter = 0;
 		int i = 0;
-		cout << "Started" << flush;
+		std::cout << "Started" << std::flush;
 
 		OGRFeature *feature = NULL;
 		inputLayer->ResetReading();
@@ -107,13 +107,13 @@ namespace rsgis{namespace vec{
 		{
 			if((i % feedback) == 0)
 			{
-				cout << ".." << feedbackCounter << ".." << flush;
+				std::cout << ".." << feedbackCounter << ".." << std::flush;
 				feedbackCounter = feedbackCounter + 10;
 			}
 			
 			fid = feature->GetFID();
 			
-			//cout << "Updating " << fid << " with classname " << classification[fid] << endl;
+			//std::cout << "Updating " << fid << " with classname " << classification[fid] << std::endl;
 			
 			feature->SetField(fieldIdx, classification[fid].c_str());
 			if( inputLayer->SetFeature(feature) != OGRERR_NONE )
@@ -124,7 +124,7 @@ namespace rsgis{namespace vec{
 			OGRFeature::DestroyFeature(feature);
 			i++;
 		}
-		cout << " Complete.\n";
+		std::cout << " Complete.\n";
 		
 		delete[] classification;
 	}

@@ -43,10 +43,6 @@
 #include "geos/geom/Envelope.h"
 #include "geos/geom/Polygon.h"
 
-using namespace std;
-using namespace rsgis::geom;
-using namespace geos::geom;
-
 namespace rsgis{namespace vec{
 	
 	enum dominantspecies
@@ -60,8 +56,8 @@ namespace rsgis{namespace vec{
 	{
 	public:
 		RSGISLabelPolygonsFromClassification(RSGISClassPolygon **labelsClassData, unsigned long numFeatures, dominantspecies dominant);
-		virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, Envelope *env, long fid) throw(RSGISVectorException);
-		virtual void processFeature(OGRFeature *feature, Envelope *env, long fid) throw(RSGISVectorException);
+		virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
+		virtual void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
 		virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException);
 		virtual ~RSGISLabelPolygonsFromClassification();
 	protected:

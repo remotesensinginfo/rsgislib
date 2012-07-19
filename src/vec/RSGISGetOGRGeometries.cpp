@@ -26,17 +26,17 @@
 namespace rsgis{namespace vec{
 	
 
-    RSGISGetOGRGeometries::RSGISGetOGRGeometries(vector<OGRGeometry*> *geometries):RSGISProcessOGRFeature()
+    RSGISGetOGRGeometries::RSGISGetOGRGeometries(std::vector<OGRGeometry*> *geometries):RSGISProcessOGRFeature()
     {
         this->geometries = geometries;
     }
     
-	void RSGISGetOGRGeometries::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISGetOGRGeometries::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
     {
         throw RSGISVectorException("Not implemented..");
     }
     
-	void RSGISGetOGRGeometries::processFeature(OGRFeature *feature, Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISGetOGRGeometries::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
     {
         geometries->push_back(feature->GetGeometryRef()->clone());
     }

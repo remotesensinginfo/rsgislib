@@ -26,7 +26,7 @@
 namespace rsgis{namespace vec{
 	
 	
-	RSGISImageTileVector::RSGISImageTileVector(string filenameAttribute)  : RSGISPolygonData()
+	RSGISImageTileVector::RSGISImageTileVector(std::string filenameAttribute)  : RSGISPolygonData()
 	{
 		this->filenameAttribute = filenameAttribute;
 	}
@@ -35,7 +35,7 @@ namespace rsgis{namespace vec{
 	{
 		// Read the class attribute
 		OGRFieldDefn *fieldDef = NULL;
-		string columnName;
+		std::string columnName;
 		int fieldCount = featDefn->GetFieldCount();
 		for(int i = 0; i < fieldCount; i++)
 		{
@@ -43,7 +43,7 @@ namespace rsgis{namespace vec{
 			columnName = fieldDef->GetNameRef();
 			if(columnName == this->filenameAttribute)
 			{
-				this->filename = string(feature->GetFieldAsString(i));
+				this->filename = std::string(feature->GetFieldAsString(i));
 			}
 		}
 		
@@ -82,12 +82,12 @@ namespace rsgis{namespace vec{
 		feature->SetField(featDefn->GetFieldIndex("filename"), filename.c_str());
 	}
 	
-	string RSGISImageTileVector::getFileName()
+	std::string RSGISImageTileVector::getFileName()
 	{
 		return this->filename;
 	}
 	
-	void RSGISImageTileVector::setFileName(string name)
+	void RSGISImageTileVector::setFileName(std::string name)
 	{
 		this->filename = name;
 	}

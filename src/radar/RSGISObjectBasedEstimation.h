@@ -94,8 +94,8 @@ namespace rsgis{namespace radar{
 	{
 	public:
 		RSGISObjectBasedEstimationObjectAP(GDALDataset *inputImage, GDALDataset *outputImage, vector <gsl_vector*> *initialPar, vector <RSGISEstimationOptimiser*> *slowOptimiser, vector <RSGISEstimationOptimiser*> *fastOptimiser, estParameters parameters, string *apParField, double ***minMaxVals = NULL, string classHeading = "", bool useClass = false);
-		virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, Envelope *env, long fid)throw(RSGISVectorException);
-        virtual void processFeature(OGRFeature *feature, Envelope *env, long fid)throw(RSGISVectorException);
+		virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid)throw(RSGISVectorException);
+        virtual void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid)throw(RSGISVectorException);
 		virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(rsgis::vec::RSGISVectorOutputException);
 		virtual ~RSGISObjectBasedEstimationObjectAP();
 	protected:
@@ -132,8 +132,8 @@ namespace rsgis{namespace radar{
 	{
 	public:
 		RSGISObjectBasedEstimationRasterPolygon(GDALDataset *inputImage, GDALDataset *outputImage,  GDALDataset *rasterFeatures, vector <gsl_vector*> *initialPar, vector <RSGISEstimationOptimiser*> *slowOptimiser, vector <RSGISEstimationOptimiser*> *fastOptimiser, estParameters parameters, double ***minMaxVals = NULL, string classHeading = "", bool useClass = false);
-		virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, Envelope *env, long fid) throw(RSGISVectorException);
-		virtual void processFeature(OGRFeature *feature, Envelope *env, long fid)throw(RSGISVectorException);
+		virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
+		virtual void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid)throw(RSGISVectorException);
 		virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(rsgis::vec::RSGISVectorOutputException);
 		virtual ~RSGISObjectBasedEstimationRasterPolygon();
 	protected:
@@ -169,8 +169,8 @@ namespace rsgis{namespace radar{
 		RSGISObjectBasedEstimationGetObjVals(std::vector<float> **pixelVals, int numBands);
 		void calcImageValue(float *bandValuesImageA, float *bandValuesImageB, int numBands, int bandA, int bandB) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not Implemented");};
 		void calcImageValue(float *bandValuesImage, int numBands, int band) throw(rsgis::img::RSGISImageCalcException);
-		void calcImageValue(float *bandValuesImage, int numBands, Envelope *extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not Implemented");};
-		void calcImageValue(float *bandValuesImage, double interceptArea, int numBands, Polygon *poly, Point *pt) throw(rsgis::img::RSGISImageCalcException);
+		void calcImageValue(float *bandValuesImage, int numBands, geos::geom::Envelope *extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not Implemented");};
+		void calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt) throw(rsgis::img::RSGISImageCalcException);
 		double* getOutputValues() throw(rsgis::img::RSGISImageCalcException);
 		void reset();
 		~RSGISObjectBasedEstimationGetObjVals();

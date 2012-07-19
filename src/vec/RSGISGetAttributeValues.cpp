@@ -25,24 +25,24 @@
 
 namespace rsgis{namespace vec{
 	
-	RSGISGetAttributeValues::RSGISGetAttributeValues(list<double> *values, string attribute)
+	RSGISGetAttributeValues::RSGISGetAttributeValues(std::list<double> *values, std::string attribute)
 	{
 		this->values = values;
 		this->attribute = attribute;
 	}
 	
-	void RSGISGetAttributeValues::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISGetAttributeValues::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
 	{
 		throw RSGISVectorException("Not implemented..");
 	}
 	
-	void RSGISGetAttributeValues::processFeature(OGRFeature *feature, Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISGetAttributeValues::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
 	{
 		OGRFeatureDefn *featureDefn = feature->GetDefnRef();
 		int fieldIdx = featureDefn->GetFieldIndex(attribute.c_str());
 		if(fieldIdx < 0)
 		{
-			string message = "This layer does not contain a field with the name \'" + attribute + "\'";
+            std::string message = "This layer does not contain a field with the name \'" + attribute + "\'";
 			throw RSGISVectorException(message.c_str());
 		}
 		

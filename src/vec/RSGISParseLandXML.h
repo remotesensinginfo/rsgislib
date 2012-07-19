@@ -46,7 +46,7 @@
 #include "geos/geom/Coordinate.h"
 #include "geos/geom/LineSegment.h"
 
-#include<boost/tokenizer.hpp>
+#include <boost/tokenizer.hpp>
 
 #include "common/RSGISAlgorithmParameters.h"
 #include "common/RSGISXMLArgumentsException.h"
@@ -55,22 +55,16 @@
 #include "common/RSGISXMLArgumentsException.h"
 #include "math/RSGISMathsUtils.h"
 
-using namespace std;
-using namespace xercesc;
-using namespace boost;
-using namespace geos::geom;
-using namespace rsgis::math;
-
 namespace rsgis { namespace vec {
 
 	class RSGISParseLandXML
 		{
 		public:
 			RSGISParseLandXML();
-			void getLandXMLLine(string xmlFile, vector<LineSegment*> *outLines); 
+			void getLandXMLLine(string xmlFile, std::vector<geos::geom::LineSegment*> *outLines); 
 			~RSGISParseLandXML();
 		protected:
-			string xmlFile;
+            std::string xmlFile;
 		};
 }}
 

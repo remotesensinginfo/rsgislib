@@ -26,9 +26,6 @@
 
 #include "common/RSGISVectorException.h"
 
-using namespace rsgis;
-using namespace std;
-
 namespace rsgis 
 {
 	namespace vec
@@ -38,7 +35,7 @@ namespace rsgis
 			public:
 				RSGISVectorOutputException();
 				RSGISVectorOutputException(const char* message);
-				RSGISVectorOutputException(string message);
+				RSGISVectorOutputException(std::string message);
 			};
 	}
 }

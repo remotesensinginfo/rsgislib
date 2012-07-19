@@ -26,7 +26,7 @@
 
 namespace rsgis{namespace vec{
 	
-	string RSGISVectorUtils::getLayerName(string filepath)
+	std::string RSGISVectorUtils::getLayerName(std::string filepath)
 	{
 		int strSize = filepath.size();
 		int lastSlash = 0;
@@ -37,7 +37,7 @@ namespace rsgis{namespace vec{
 				lastSlash = i;
 			}
 		}
-		string filename = filepath.substr(lastSlash+1);
+		std::string filename = filepath.substr(lastSlash+1);
 		
 		strSize = filename.size();
 		int lastpt = 0;
@@ -49,25 +49,25 @@ namespace rsgis{namespace vec{
 			}
 		}
 		
-		string layerName = filename.substr(0, lastpt);
+		std::string layerName = filename.substr(0, lastpt);
 		return layerName;		
 	}
 	
 	
-	LineString* RSGISVectorUtils::convertOGRLineString2GEOSLineString(OGRLineString *line)
+	geos::geom::LineString* RSGISVectorUtils::convertOGRLineString2GEOSLineString(OGRLineString *line)
 	{
 		int numPoints = line->getNumPoints();
 		OGRPoint *point = new OGRPoint();
-		vector<Coordinate> *coords = new vector<Coordinate>();
+		std::vector<geos::geom::Coordinate> *coords = new std::vector<geos::geom::Coordinate>();
 		for(int i = 0; i < numPoints; i++)
 		{
 			line->getPoint(i, point);
-			coords->push_back(Coordinate(point->getX(), point->getY(), point->getZ()));
+			coords->push_back(geos::geom::Coordinate(point->getX(), point->getY(), point->getZ()));
 		}
 		
-		CoordinateArraySequence *coordSeq = new CoordinateArraySequence(coords);
-		GeometryFactory* geosGeomFactory = RSGISGEOSFactoryGenerator::getInstance()->getFactory();
-		LineString *lineString = geosGeomFactory->createLineString(coordSeq);
+		geos::geom::CoordinateArraySequence *coordSeq = new geos::geom::CoordinateArraySequence(coords);
+		geos::geom::GeometryFactory* geosGeomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
+		geos::geom::LineString *lineString = geosGeomFactory->createLineString(coordSeq);
 		
 		delete point;
 		delete geosGeomFactory;
@@ -75,12 +75,12 @@ namespace rsgis{namespace vec{
 		
 	}
 	
-	OGRLineString* RSGISVectorUtils::convertGEOSLineString2OGRLineString(LineString *line)
+	OGRLineString* RSGISVectorUtils::convertGEOSLineString2OGRLineString(geos::geom::LineString *line)
 	{
 		OGRLineString *OGRLine = new OGRLineString();
 		
-		CoordinateSequence *coordSeq = line->getCoordinates();
-		Coordinate coord;
+		geos::geom::CoordinateSequence *coordSeq = line->getCoordinates();
+		geos::geom::Coordinate coord;
 		int numCoords = coordSeq->getSize();
 		for(int i = 0; i < numCoords; i++)
 		{
@@ -91,33 +91,33 @@ namespace rsgis{namespace vec{
 		return OGRLine;
 	}
 	
-	LinearRing* RSGISVectorUtils::convertOGRLinearRing2GEOSLinearRing(OGRLinearRing *ring)
+	geos::geom::LinearRing* RSGISVectorUtils::convertOGRLinearRing2GEOSLinearRing(OGRLinearRing *ring)
 	{
 		int numPoints = ring->getNumPoints();
 		OGRPoint *point = new OGRPoint();
-		vector<Coordinate> *coords = new vector<Coordinate>();
+		std::vector<geos::geom::Coordinate> *coords = new std::vector<geos::geom::Coordinate>();
 		for(int i = 0; i < numPoints; i++)
 		{
 			ring->getPoint(i, point);
-			Coordinate coord = Coordinate(point->getX(), point->getY(), point->getZ());
+			geos::geom::Coordinate coord = geos::geom::Coordinate(point->getX(), point->getY(), point->getZ());
 			coords->push_back(coord);
 		}
 		
-		CoordinateArraySequence *coordSeq = new CoordinateArraySequence(coords);
+		geos::geom::CoordinateArraySequence *coordSeq = new geos::geom::CoordinateArraySequence(coords);
 		
-		GeometryFactory* geosGeomFactory = RSGISGEOSFactoryGenerator::getInstance()->getFactory();
-		LinearRing *linearRingShell = new LinearRing(coordSeq, geosGeomFactory);
+		geos::geom::GeometryFactory* geosGeomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
+		geos::geom::LinearRing *linearRingShell = new geos::geom::LinearRing(coordSeq, geosGeomFactory);
 
 		delete point;
 		return linearRingShell;
 	}
 	
-	OGRLinearRing* RSGISVectorUtils::convertGEOSLineString2OGRLinearRing(LineString *line)
+	OGRLinearRing* RSGISVectorUtils::convertGEOSLineString2OGRLinearRing(geos::geom::LineString *line)
 	{
 		OGRLinearRing *ring = new OGRLinearRing();
-		const CoordinateSequence *coords = line->getCoordinatesRO();
+		const geos::geom::CoordinateSequence *coords = line->getCoordinatesRO();
 		int numCoords = coords->getSize();
-		Coordinate coord;
+		geos::geom::Coordinate coord;
 		for(int i = 0; i < numCoords; i++)
 		{
 			coord = coords->getAt(i);
@@ -126,31 +126,31 @@ namespace rsgis{namespace vec{
 		return ring;
 	}
 	
-	Polygon* RSGISVectorUtils::convertOGRPolygon2GEOSPolygon(OGRPolygon *poly)
+	geos::geom::Polygon* RSGISVectorUtils::convertOGRPolygon2GEOSPolygon(OGRPolygon *poly)
 	{
 		/// Converts OGR Polygon into a GEOS Polygon
-		GeometryFactory* geosGeomFactory = RSGISGEOSFactoryGenerator::getInstance()->getFactory();
+		geos::geom::GeometryFactory* geosGeomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
 		OGRLinearRing *exteriorRing = poly->getExteriorRing();
-		LinearRing *linearRingShell = this->convertOGRLinearRing2GEOSLinearRing(exteriorRing);
+		geos::geom::LinearRing *linearRingShell = this->convertOGRLinearRing2GEOSLinearRing(exteriorRing);
 		
-		vector<Geometry*> *geomHoles = new vector<Geometry*>();
+		std::vector<geos::geom::Geometry*> *geomHoles = new std::vector<geos::geom::Geometry*>();
 		int numHoles = poly->getNumInteriorRings();
 		for(int i = 0; i < numHoles; i++)
 		{
 			geomHoles->push_back(this->convertOGRLinearRing2GEOSLinearRing(poly->getInteriorRing(i)));
 		}
-		Polygon *polygonGeom = geosGeomFactory->createPolygon(linearRingShell, geomHoles); 
+		geos::geom::Polygon *polygonGeom = geosGeomFactory->createPolygon(linearRingShell, geomHoles); 
 		
 		return polygonGeom;
 	}
 	
-	MultiPolygon* RSGISVectorUtils::convertOGRMultiPolygonGEOSMultiPolygon(OGRMultiPolygon *mPoly)
+	geos::geom::MultiPolygon* RSGISVectorUtils::convertOGRMultiPolygonGEOSMultiPolygon(OGRMultiPolygon *mPoly)
 	{
-		GeometryFactory* geosGeomFactory = RSGISGEOSFactoryGenerator::getInstance()->getFactory();
+		geos::geom::GeometryFactory* geosGeomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
 		
 		OGRGeometry *tmpGeom = NULL;
 		OGRPolygon *tmpPolygon = NULL;
-		vector<Geometry*> *geoms = new vector<Geometry*>();
+		std::vector<geos::geom::Geometry*> *geoms = new std::vector<geos::geom::Geometry*>();
 		int numGeometries = mPoly->getNumGeometries();
 		for(int i = 0; i < numGeometries; i++)
 		{
@@ -161,38 +161,38 @@ namespace rsgis{namespace vec{
 				geoms->push_back(this->convertOGRPolygon2GEOSPolygon(tmpPolygon));
 			}
 		}
-		MultiPolygon *mPolyGeom = geosGeomFactory->createMultiPolygon(geoms);
+		geos::geom::MultiPolygon *mPolyGeom = geosGeomFactory->createMultiPolygon(geoms);
 
 		return mPolyGeom;
 	}
 	
-	Point* RSGISVectorUtils::convertOGRPoint2GEOSPoint(OGRPoint *point)
+	geos::geom::Point* RSGISVectorUtils::convertOGRPoint2GEOSPoint(OGRPoint *point)
 	{
-		GeometryFactory* geosGeomFactory = RSGISGEOSFactoryGenerator::getInstance()->getFactory();
-		Coordinate *coord = new Coordinate(point->getX(), point->getY(), point->getZ());
+		geos::geom::GeometryFactory* geosGeomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
+		geos::geom::Coordinate *coord = new geos::geom::Coordinate(point->getX(), point->getY(), point->getZ());
 		
 		return geosGeomFactory->createPoint(*coord);
 	}
 	
-	OGRPolygon* RSGISVectorUtils::convertGEOSPolygon2OGRPolygon(Polygon *poly)
+	OGRPolygon* RSGISVectorUtils::convertGEOSPolygon2OGRPolygon(geos::geom::Polygon *poly)
 	{
 		//cout << "Poly area = " << poly->getArea() << endl;
 		
 		OGRPolygon *ogrPoly = new OGRPolygon();
 		
 		// Add outer ring!
-		const LineString *exteriorRing = poly->getExteriorRing();
-		OGRLinearRing *ogrRing = this->convertGEOSLineString2OGRLinearRing(const_cast<LineString *>(exteriorRing));
+		const geos::geom::LineString *exteriorRing = poly->getExteriorRing();
+		OGRLinearRing *ogrRing = this->convertGEOSLineString2OGRLinearRing(const_cast<geos::geom::LineString *>(exteriorRing));
 		ogrPoly->addRing(ogrRing);
 		delete ogrRing;
 		
 		int numInternalRings = poly->getNumInteriorRing();
 		
-		LineString *innerRing = NULL;
+		geos::geom::LineString *innerRing = NULL;
 		
 		for(int i = 0; i < numInternalRings; i++)
 		{
-			innerRing = const_cast<LineString *>(poly->getInteriorRingN(i));
+			innerRing = const_cast<geos::geom::LineString *>(poly->getInteriorRingN(i));
 			ogrRing = this->convertGEOSLineString2OGRLinearRing(innerRing);
 			ogrPoly->addRing(ogrRing);
 			delete ogrRing;
@@ -201,30 +201,30 @@ namespace rsgis{namespace vec{
 		return ogrPoly;
 	}
 	
-	OGRMultiPolygon* RSGISVectorUtils::convertGEOSMultiPolygon2OGRMultiPolygon(MultiPolygon *mPoly)
+	OGRMultiPolygon* RSGISVectorUtils::convertGEOSMultiPolygon2OGRMultiPolygon(geos::geom::MultiPolygon *mPoly)
 	{
 		OGRMultiPolygon *ogrMPoly = new OGRMultiPolygon();
 		int numGeometries = mPoly->getNumGeometries();
 		
-		Geometry *geom = NULL;
-		Polygon *poly = NULL;
+		geos::geom::Geometry *geom = NULL;
+		geos::geom::Polygon *poly = NULL;
 		
 		for(int i = 0; i < numGeometries; i++)
 		{
-			geom = const_cast<Geometry *>(mPoly->getGeometryN(i));
-			if(geom->getGeometryType() == string("Polygon"))
+			geom = const_cast<geos::geom::Geometry *>(mPoly->getGeometryN(i));
+			if(geom->getGeometryType() == std::string("Polygon"))
 			{
-				poly = dynamic_cast<Polygon*>(geom);
+				poly = dynamic_cast<geos::geom::Polygon*>(geom);
 				ogrMPoly->addGeometryDirectly(this->convertGEOSPolygon2OGRPolygon(poly));
 			}
 		}
 		return ogrMPoly;
 	}
 	
-	OGRMultiPolygon* RSGISVectorUtils::convertGEOSPolygons2OGRMultiPolygon(list<Polygon*> *polys)
+	OGRMultiPolygon* RSGISVectorUtils::convertGEOSPolygons2OGRMultiPolygon(std::list<geos::geom::Polygon*> *polys)
 	{
 		OGRMultiPolygon *ogrMPoly = new OGRMultiPolygon();
-		list<Polygon*>::iterator iterPolys;
+		std::list<geos::geom::Polygon*>::iterator iterPolys;
 		for(iterPolys = polys->begin(); iterPolys != polys->end(); ++iterPolys)
 		{
 			ogrMPoly->addGeometryDirectly(this->convertGEOSPolygon2OGRPolygon(*iterPolys));
@@ -233,12 +233,12 @@ namespace rsgis{namespace vec{
 		return ogrMPoly;
 	}
 	
-	MultiPolygon* RSGISVectorUtils::convertGEOSPolygons2GEOSMultiPolygon(vector<Polygon*> *polys)
+	geos::geom::MultiPolygon* RSGISVectorUtils::convertGEOSPolygons2GEOSMultiPolygon(std::vector<geos::geom::Polygon*> *polys)
 	{
-		GeometryFactory* geosGeomFactory = RSGISGEOSFactoryGenerator::getInstance()->getFactory();
+		geos::geom::GeometryFactory* geosGeomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
 		
-		vector<Geometry*> *geoms = new vector<Geometry*>();
-		vector<Polygon*>::iterator iterPolys;
+		std::vector<geos::geom::Geometry*> *geoms = new std::vector<geos::geom::Geometry*>();
+		std::vector<geos::geom::Polygon*>::iterator iterPolys;
 		for(iterPolys = polys->begin(); iterPolys != polys->end(); ++iterPolys)
 		{
 			geoms->push_back((*iterPolys)->clone());
@@ -247,17 +247,17 @@ namespace rsgis{namespace vec{
 		return geosGeomFactory->createMultiPolygon(geoms);
 	}
 	
-	OGRPoint* RSGISVectorUtils::convertGEOSPoint2OGRPoint(Point *point)
+	OGRPoint* RSGISVectorUtils::convertGEOSPoint2OGRPoint(geos::geom::Point *point)
 	{
 		OGRPoint *outPoint = new OGRPoint();
-		const Coordinate *coord = point->getCoordinate();
+		const geos::geom::Coordinate *coord = point->getCoordinate();
 		outPoint->setX(coord->x);
 		outPoint->setY(coord->y);
 		outPoint->setZ(coord->z);
 		return outPoint;
 	}
 	
-	OGRPoint* RSGISVectorUtils::convertGEOSCoordinate2OGRPoint(Coordinate *coord)
+	OGRPoint* RSGISVectorUtils::convertGEOSCoordinate2OGRPoint(geos::geom::Coordinate *coord)
 	{
 		OGRPoint *outPoint = new OGRPoint();
 		outPoint->setX(coord->x);
@@ -266,10 +266,10 @@ namespace rsgis{namespace vec{
 		return outPoint;
 	}
 	
-	Envelope* RSGISVectorUtils::getEnvelope(Geometry *geom)
+	geos::geom::Envelope* RSGISVectorUtils::getEnvelope(geos::geom::Geometry *geom)
 	{
-		Envelope *env = new Envelope();
-		CoordinateSequence *coordSeq = geom->getCoordinates();
+		geos::geom::Envelope *env = new geos::geom::Envelope();
+		geos::geom::CoordinateSequence *coordSeq = geom->getCoordinates();
 
 		int numPts = coordSeq->getSize();
 		for(int i = 0; i < numPts; i++)
@@ -281,17 +281,17 @@ namespace rsgis{namespace vec{
 		return env;
 	}
 	
-	Envelope* RSGISVectorUtils::getEnvelope(OGRGeometry *geom)
+	geos::geom::Envelope* RSGISVectorUtils::getEnvelope(OGRGeometry *geom)
 	{
 		OGREnvelope *ogrEnv = new OGREnvelope();
 		geom->getEnvelope(ogrEnv);
 		
-		Envelope *env = new Envelope(ogrEnv->MinX, ogrEnv->MaxX, ogrEnv->MinY, ogrEnv->MaxY);
+		geos::geom::Envelope *env = new geos::geom::Envelope(ogrEnv->MinX, ogrEnv->MaxX, ogrEnv->MinY, ogrEnv->MaxY);
 		delete ogrEnv;
 		return env;
 	}
 	
-	Envelope* RSGISVectorUtils::getEnvelopePixelBuffer(OGRGeometry *geom, double imageRes)
+	geos::geom::Envelope* RSGISVectorUtils::getEnvelopePixelBuffer(OGRGeometry *geom, double imageRes)
 	{
 		/// Gets the envelope of an OGRGeometry buffered by one pixel.
 		/* When rasterising small polygons, getEnvelope can return an envelope that is smaller than a pixel.
@@ -302,21 +302,21 @@ namespace rsgis{namespace vec{
 		
 		double buffer = imageRes / 2;
 		
-		Envelope *env = new Envelope(ogrEnv->MinX - buffer, ogrEnv->MaxX + buffer, ogrEnv->MinY - buffer, ogrEnv->MaxY + buffer);
+		geos::geom::Envelope *env = new geos::geom::Envelope(ogrEnv->MinX - buffer, ogrEnv->MaxX + buffer, ogrEnv->MinY - buffer, ogrEnv->MaxY + buffer);
 		delete ogrEnv;
 		return env;
 	}
 	
-	Point* RSGISVectorUtils::createPoint(Coordinate *coord)
+	geos::geom::Point* RSGISVectorUtils::createPoint(geos::geom::Coordinate *coord)
 	{
-		GeometryFactory* geosGeomFactory = RSGISGEOSFactoryGenerator::getInstance()->getFactory();
+		geos::geom::GeometryFactory* geosGeomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
 		return geosGeomFactory->createPoint(*coord);
 	}
 	
-	bool RSGISVectorUtils::checkDIR4SHP(string dir, string shp) throw(RSGISVectorException)
+	bool RSGISVectorUtils::checkDIR4SHP(std::string dir, std::string shp) throw(RSGISVectorException)
 	{
-		RSGISFileUtils fileUtils;
-		string *dirList = NULL;
+        rsgis::utils::RSGISFileUtils fileUtils;
+		std::string *dirList = NULL;
 		int numFiles = 0;
 		bool returnVal = false;
 		
@@ -344,10 +344,10 @@ namespace rsgis{namespace vec{
 		return returnVal;
 	}
 	
-	void RSGISVectorUtils::deleteSHP(string dir, string shp) throw(RSGISVectorException)
+	void RSGISVectorUtils::deleteSHP(std::string dir, std::string shp) throw(RSGISVectorException)
 	{
-		RSGISFileUtils fileUtils;
-		string *dirList = NULL;
+        rsgis::utils::RSGISFileUtils fileUtils;
+		std::string *dirList = NULL;
 		int numFiles = 0;
 		
 		try
@@ -424,19 +424,19 @@ namespace rsgis{namespace vec{
 	}
 
 	
-	GeometryCollection* RSGISVectorUtils::createGeomCollection(vector<Polygon*> *polys) throw(RSGISVectorException)
+	geos::geom::GeometryCollection* RSGISVectorUtils::createGeomCollection(std::vector<geos::geom::Polygon*> *polys) throw(RSGISVectorException)
 	{
-		GeometryCollection *geom = NULL;
+		geos::geom::GeometryCollection *geom = NULL;
 		try
 		{
-			vector<Geometry*> *geoms = new vector<Geometry*>();
-			vector<Polygon*>::iterator iterPolys;
+			std::vector<geos::geom::Geometry*> *geoms = new std::vector<geos::geom::Geometry*>();
+			std::vector<geos::geom::Polygon*>::iterator iterPolys;
 			for(iterPolys = polys->begin(); iterPolys != polys->end(); ++iterPolys)
 			{
 				geoms->push_back((*iterPolys)->clone());
 			}
 			
-			GeometryFactory* geosGeomFactory = RSGISGEOSFactoryGenerator::getInstance()->getFactory();
+			geos::geom::GeometryFactory* geosGeomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
 			geom = geosGeomFactory->createGeometryCollection(geoms);
 		}
 		catch(RSGISVectorException &e)
@@ -447,21 +447,21 @@ namespace rsgis{namespace vec{
 		return geom;
 	}
 	
-	Polygon* RSGISVectorUtils::createPolygon(double tlX, double tlY, double brX, double brY) throw(RSGISVectorException)
+	geos::geom::Polygon* RSGISVectorUtils::createPolygon(double tlX, double tlY, double brX, double brY) throw(RSGISVectorException)
 	{
-		GeometryFactory* geosGeomFactory = RSGISGEOSFactoryGenerator::getInstance()->getFactory();
+		geos::geom::GeometryFactory* geosGeomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
 		
-		vector<Coordinate> *coords = new vector<Coordinate>();
-		coords->push_back(Coordinate(tlX, tlY, 0));
-		coords->push_back(Coordinate(brX, tlY, 0));
-		coords->push_back(Coordinate(brX, brY, 0));
-		coords->push_back(Coordinate(tlX, brY, 0));
-		coords->push_back(Coordinate(tlX, tlY, 0));
+		std::vector<geos::geom::Coordinate> *coords = new std::vector<geos::geom::Coordinate>();
+		coords->push_back(geos::geom::Coordinate(tlX, tlY, 0));
+		coords->push_back(geos::geom::Coordinate(brX, tlY, 0));
+		coords->push_back(geos::geom::Coordinate(brX, brY, 0));
+		coords->push_back(geos::geom::Coordinate(tlX, brY, 0));
+		coords->push_back(geos::geom::Coordinate(tlX, tlY, 0));
 		
-		CoordinateArraySequence *coordSeq = new CoordinateArraySequence(coords);
-		LinearRing *linearRingShell = new LinearRing(coordSeq, geosGeomFactory);
+		geos::geom::CoordinateArraySequence *coordSeq = new geos::geom::CoordinateArraySequence(coords);
+		geos::geom::LinearRing *linearRingShell = new geos::geom::LinearRing(coordSeq, geosGeomFactory);
 		
-		Polygon *polygonGeom = geosGeomFactory->createPolygon(linearRingShell, NULL); 
+		geos::geom::Polygon *polygonGeom = geosGeomFactory->createPolygon(linearRingShell, NULL); 
 		
 		return polygonGeom;
 		
@@ -594,10 +594,10 @@ namespace rsgis{namespace vec{
 		return ogrPoly;
 	}
 	
-	vector<string>* RSGISVectorUtils::findUniqueVals(OGRLayer *layer, string attribute) throw(RSGISVectorException)
+	std::vector<std::string>* RSGISVectorUtils::findUniqueVals(OGRLayer *layer, std::string attribute) throw(RSGISVectorException)
 	{
-		vector<string>::iterator iterVals;
-		vector<string> *values = new vector<string>();
+		std::vector<std::string>::iterator iterVals;
+		std::vector<std::string> *values = new std::vector<std::string>();
 
 		OGRFeature *feature = NULL;
 		OGRFeatureDefn *featureDefn = layer->GetLayerDefn();
@@ -607,7 +607,7 @@ namespace rsgis{namespace vec{
 		layer->ResetReading();
 		while( (feature = layer->GetNextFeature()) != NULL )
 		{			
-			string attrVal = feature->GetFieldAsString(featureDefn->GetFieldIndex(attribute.c_str()));
+			std::string attrVal = feature->GetFieldAsString(featureDefn->GetFieldIndex(attribute.c_str()));
 			
 			found = false;
 			for(iterVals = values->begin(); iterVals != values->end(); ++iterVals)

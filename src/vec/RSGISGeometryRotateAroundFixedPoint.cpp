@@ -25,7 +25,7 @@
 
 namespace rsgis{namespace vec{
 	
-	RSGISGeometryRotateAroundFixedPoint::RSGISGeometryRotateAroundFixedPoint(Coordinate *fixedPt, float angle)
+	RSGISGeometryRotateAroundFixedPoint::RSGISGeometryRotateAroundFixedPoint(geos::geom::Coordinate *fixedPt, float angle)
 	{
 		this->fixedPt = fixedPt;
 		this->angle = angle;
@@ -43,55 +43,55 @@ namespace rsgis{namespace vec{
 	
 	void RSGISGeometryRotateAroundFixedPoint::processGeometry(OGRPoint *point) throw(RSGISVectorException)
 	{
-		RSGISMathsUtils mathUtils;
-		cout.precision(10);
-		//cout << "point called\n";
+        rsgis::math::RSGISMathsUtils mathUtils;
+		std::cout.precision(10);
+		//std::cout << "point called\n";
 		
 		double normPtx = point->getX() - fixedPt->x;
 		double normPty = point->getY() - fixedPt->y;
-		//cout << "NormPTx: " << normPtx << endl;
-		//cout << "NormPTy: " << normPty << endl;
+		//std::cout << "NormPTx: " << normPtx << std::endl;
+		//std::cout << "NormPTy: " << normPty << std::endl;
 				
 		if(normPtx != 0 | normPty != 0)
 		{
 			double distanceX = normPtx * normPtx;
 			double distanceY = normPty * normPty;
 			
-			//cout << "distanceX: " << distanceX << endl;
-			//cout << "distanceY: " << distanceY << endl;
+			//std::cout << "distanceX: " << distanceX << std::endl;
+			//std::cout << "distanceY: " << distanceY << std::endl;
 			
 			double radius = sqrt((distanceX + distanceY));
-			//cout << "radius = " << radius << endl;
+			//std::cout << "radius = " << radius << std::endl;
 			
 			double inAngle = acos(normPtx/radius);
-			//cout << "inAngle = " << mathUtils.radiansToDegrees(inAngle) << endl;
+			//std::cout << "inAngle = " << mathUtils.radiansToDegrees(inAngle) << std::endl;
 			
 			if(normPty < 0) 
 			{
 				inAngle = (M_PI*2) - inAngle;
 			}
 			
-			//cout << "inAngle = " << mathUtils.radiansToDegrees(inAngle) << endl;
+			//std::cout << "inAngle = " << mathUtils.radiansToDegrees(inAngle) << std::endl;
 			
 			double outAngle = inAngle + angle;
-			//cout << "Output Angle: " << outAngle << endl;
+			//std::cout << "Output Angle: " << outAngle << std::endl;
 			
 			double circleX = radius * cos(outAngle);
 			double circleY = radius * sin(outAngle);
 			
-			//cout << mathUtils.radiansToDegrees(outAngle) << "," << circleX << "," << circleY << "\n";
+			//std::cout << mathUtils.radiansToDegrees(outAngle) << "," << circleX << "," << circleY << "\n";
 			
 			double outX = fixedPt->x + circleX;
 			double outY = fixedPt->y + circleY;
-			//cout << outX << "," << outY << "\n";
+			//std::cout << outX << "," << outY << "\n";
 
 			point->setX(outX);
 			point->setY(outY);
 		}
 		/*else
 		{
-			cout << "No change\n";
-			cout << "output: [" << point->getX() << "," << point->getY() << "]\n";
+			std::cout << "No change\n";
+			std::cout << "output: [" << point->getX() << "," << point->getY() << "]\n";
 		}*/
 	}
 	

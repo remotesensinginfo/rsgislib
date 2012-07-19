@@ -31,7 +31,7 @@ namespace rsgis{namespace vec{
         
     }
     
-    void RSGISAttCountPolyIntersect::countPolysIntersections(RSGISAttributeTable *attTable, GDALDataset *clumps, OGRLayer *polys, string field, pixelInPolyOption pixelPolyOption)throw(RSGISAttributeTableException)
+    void RSGISAttCountPolyIntersect::countPolysIntersections(rsgis::rastergis::RSGISAttributeTable *attTable, GDALDataset *clumps, OGRLayer *polys, std::string field, rsgis::img::pixelInPolyOption pixelPolyOption)throw(rsgis::RSGISAttributeTableException)
     {
         try
         {
@@ -45,9 +45,9 @@ namespace rsgis{namespace vec{
             {
                 attTable->addAttIntField(field, 0);
             }
-            if(attTable->getDataType(field) != rsgis_int)
+            if(attTable->getDataType(field) != rsgis::rastergis::rsgis_int)
             {
-                throw RSGISAttributeTableException("The field provided must be an integer type.");
+                throw rsgis::RSGISAttributeTableException("The field provided must be an integer type.");
             }
             
             unsigned int fieldIdx = attTable->getFieldIndex(field);
@@ -55,7 +55,7 @@ namespace rsgis{namespace vec{
             while( (inFeature = polys->GetNextFeature()) != NULL )
 			{
 				fid = inFeature->GetFID();
-                cout << "Extracting Data for feature " << fid << endl;
+                std::cout << "Extracting Data for feature " << fid << std::endl;
 				
 				// Get Geometry.
 				nullGeometry = false;
@@ -68,7 +68,7 @@ namespace rsgis{namespace vec{
 				else 
 				{
 					nullGeometry = true;
-					cout << "WARNING: NULL Geometry Present within input file - IGNORED\n";
+                    std::cout << "WARNING: NULL Geometry Present within input file - IGNORED\n";
 				}
 				
 				if(!nullGeometry)
@@ -81,11 +81,11 @@ namespace rsgis{namespace vec{
         }
         catch(RSGISException &e)
         {
-            throw RSGISAttributeTableException(e.what());
+            throw rsgis::RSGISAttributeTableException(e.what());
         }
     }
     
-    void RSGISAttCountPolyIntersect::countPolysIntersections(RSGISAttributeTable *attTable, GDALDataset *clumps, vector<OGRPolygon*> *polys, string field, pixelInPolyOption pixelPolyOption)throw(RSGISAttributeTableException)
+    void RSGISAttCountPolyIntersect::countPolysIntersections(rsgis::rastergis::RSGISAttributeTable *attTable, GDALDataset *clumps, vector<OGRPolygon*> *polys, std::string field, rsgis::img::pixelInPolyOption pixelPolyOption)throw(rsgis::RSGISAttributeTableException)
     {
         try
         {
@@ -93,9 +93,9 @@ namespace rsgis{namespace vec{
             {
                 attTable->addAttIntField(field, 0);
             }
-            if(attTable->getDataType(field) != rsgis_int)
+            if(attTable->getDataType(field) != rsgis::rastergis::rsgis_int)
             {
-                throw RSGISAttributeTableException("The field provided must be an integer type.");
+                throw rsgis::RSGISAttributeTableException("The field provided must be an integer type.");
             }
             
             unsigned int fieldIdx = attTable->getFieldIndex(field);
@@ -107,18 +107,18 @@ namespace rsgis{namespace vec{
         }
         catch(RSGISException &e)
         {
-            throw RSGISAttributeTableException(e.what());
+            throw rsgis::RSGISAttributeTableException(e.what());
         }
     }
     
-    void RSGISAttCountPolyIntersect::countPolyIntersections(RSGISAttributeTable *attTable, GDALDataset *clumps, OGRPolygon *ogrPoly, unsigned int field, pixelInPolyOption pixelPolyOption)throw(RSGISAttributeTableException)
+    void RSGISAttCountPolyIntersect::countPolyIntersections(rsgis::rastergis::RSGISAttributeTable *attTable, GDALDataset *clumps, OGRPolygon *ogrPoly, unsigned int field, rsgis::img::pixelInPolyOption pixelPolyOption)throw(rsgis::RSGISAttributeTableException)
     {
         try
         {
             RSGISVectorUtils vecUtils;
             GDALDataset **datasets = new GDALDataset*[1];
             datasets[0] = clumps;
-            Envelope *env = vecUtils.getEnvelope(ogrPoly);
+            geos::geom::Envelope *env = vecUtils.getEnvelope(ogrPoly);
             
             RSGISCalcValueCountInAttTable calcVal(attTable, field);
             RSGISPopulateAttTableForPolygonIntersect popAttTab(&calcVal, datasets, 1, pixelPolyOption);
@@ -129,7 +129,7 @@ namespace rsgis{namespace vec{
         }
         catch(RSGISException &e)
         {
-            throw RSGISAttributeTableException(e.what());
+            throw rsgis::RSGISAttributeTableException(e.what());
         }
     }
     
@@ -141,7 +141,7 @@ namespace rsgis{namespace vec{
 
     
     
-    RSGISPopulateAttTableForPolygonIntersect::RSGISPopulateAttTableForPolygonIntersect(RSGISCalcValueCountInAttTable *valueCalc, GDALDataset **datasets, int numDS, pixelInPolyOption pixelPolyOption)
+    RSGISPopulateAttTableForPolygonIntersect::RSGISPopulateAttTableForPolygonIntersect(RSGISCalcValueCountInAttTable *valueCalc, GDALDataset **datasets, int numDS, rsgis::img::pixelInPolyOption pixelPolyOption)
     {
         this->numImageBands = numImageBands;
         this->valueCalc = valueCalc;
@@ -150,13 +150,13 @@ namespace rsgis{namespace vec{
         this->pixelPolyOption = pixelPolyOption;
     }
     
-    void RSGISPopulateAttTableForPolygonIntersect::processFeature(OGRFeature *feature, OGRPolygon *poly, Envelope *env, long fid) throw(RSGISVectorException)
+    void RSGISPopulateAttTableForPolygonIntersect::processFeature(OGRFeature *feature, OGRPolygon *poly, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
     {
         try
         {
             RSGISVectorUtils vecUtils;
-            RSGISCalcImage calcImage(valueCalc);
-            Polygon *geosPoly = vecUtils.convertOGRPolygon2GEOSPolygon(poly);
+            rsgis::img::RSGISCalcImage calcImage(valueCalc);
+            geos::geom::Polygon *geosPoly = vecUtils.convertOGRPolygon2GEOSPolygon(poly);
             calcImage.calcImageWithinPolygonExtent(this->datasets, this->numDS, env, geosPoly, this->pixelPolyOption);
             delete geosPoly;
         }
@@ -173,13 +173,13 @@ namespace rsgis{namespace vec{
     
      
      
-    RSGISCalcValueCountInAttTable::RSGISCalcValueCountInAttTable(RSGISAttributeTable *attTable, unsigned int fieldIdx):RSGISCalcImageValue(0)
+    RSGISCalcValueCountInAttTable::RSGISCalcValueCountInAttTable(rsgis::rastergis::RSGISAttributeTable *attTable, unsigned int fieldIdx):RSGISCalcImageValue(0)
     {
         this->attTable = attTable;
         this->fieldIdx = fieldIdx;
     }
     
-    void RSGISCalcValueCountInAttTable::calcImageValue(float *bandValues, int numBands, Envelope extent) throw(RSGISImageCalcException)
+    void RSGISCalcValueCountInAttTable::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException)
     {        
         if(bandValues[0] > 0)
         {
@@ -190,7 +190,7 @@ namespace rsgis{namespace vec{
             }
             catch(boost::bad_lexical_cast &e)
             {
-                throw RSGISImageCalcException(e.what());
+                throw rsgis::img::RSGISImageCalcException(e.what());
             }
             
             ++attTable->getFeature(clumpIdx)->intFields->at(fieldIdx);

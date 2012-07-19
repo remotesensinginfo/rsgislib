@@ -32,8 +32,8 @@ namespace rsgis{namespace vec{
 	{
 		this->clusterPolys = NULL;
 		this->allIntersect = NULL;
-		this->classListCluster = new vector<ClassInfo>();
-		this->classListAll = new vector<ClassInfo>();
+		this->classListCluster = new std::vector<ClassInfo>();
+		this->classListAll = new std::vector<ClassInfo>();
 		this->area = 0;
 		this->clusterPolyArea = 0;
 		this->allPolyArea = 0;
@@ -41,7 +41,7 @@ namespace rsgis{namespace vec{
 		this->propAllPolyArea = 0;
 	}
 	
-	RSGISClusterData::RSGISClusterData(Polygon *poly, vector<RSGISClassificationPolygon*> *clusterPolys, vector<RSGISClassificationPolygon*> *allIntersect)
+	RSGISClusterData::RSGISClusterData(geos::geom::Polygon *poly, std::vector<RSGISClassificationPolygon*> *clusterPolys, std::vector<RSGISClassificationPolygon*> *allIntersect)
 	{
 		this->clusterPolys = clusterPolys;
 		this->allIntersect = allIntersect;
@@ -54,7 +54,7 @@ namespace rsgis{namespace vec{
 		this->propClusterPolyArea = 0;
 		this->propAllPolyArea = 0;
 		
-		vector<RSGISClassificationPolygon*>::iterator iterClassPolys;
+		std::vector<RSGISClassificationPolygon*>::iterator iterClassPolys;
 		for(iterClassPolys = clusterPolys->begin(); iterClassPolys != clusterPolys->end(); ++iterClassPolys)
 		{
 			this->clusterPolyArea = this->clusterPolyArea + (*iterClassPolys)->getPolygon()->getArea();
@@ -68,23 +68,23 @@ namespace rsgis{namespace vec{
 		this->propClusterPolyArea = this->clusterPolyArea / this->area;
 		this->propAllPolyArea = this->allPolyArea / this->area;
 		
-		this->classListCluster = new vector<ClassInfo>();
-		this->classListAll = new vector<ClassInfo>();
+		this->classListCluster = new std::vector<ClassInfo>();
+		this->classListAll = new std::vector<ClassInfo>();
 		
 		this->findClassInfo(clusterPolys, classListCluster);
 		this->findClassInfo(allIntersect, classListAll);
 		
-		vector<ClassInfo>::iterator iterClassInfo;
-		cout << "Cluster Crowns Info (" << classListCluster->size() << "):\n";
+		std::vector<ClassInfo>::iterator iterClassInfo;
+		std::cout << "Cluster Crowns Info (" << classListCluster->size() << "):\n";
 		for(iterClassInfo = classListCluster->begin(); iterClassInfo != classListCluster->end(); ++iterClassInfo)
 		{
-			cout << (*iterClassInfo).name << ": " << (*iterClassInfo).proportion << endl;
+			std::cout << (*iterClassInfo).name << ": " << (*iterClassInfo).proportion << std::endl;
 		}
 		
-		cout << "All intersecting Crowns Info (" << classListAll->size() << "):\n";
+		std::cout << "All intersecting Crowns Info (" << classListAll->size() << "):\n";
 		for(iterClassInfo = classListAll->begin(); iterClassInfo != classListAll->end(); ++iterClassInfo)
 		{
-			cout << (*iterClassInfo).name << ": " << (*iterClassInfo).proportion << endl;
+			std::cout << (*iterClassInfo).name << ": " << (*iterClassInfo).proportion << std::endl;
 		}
 
 				
@@ -96,7 +96,7 @@ namespace rsgis{namespace vec{
 		
 		// Read the class attribute
 		OGRFieldDefn *fieldDef = NULL;
-		string columnName = "";
+		std::string columnName = "";
 		int fieldCount = featDefn->GetFieldCount();
 		for(int i = 0; i < fieldCount; i++)
 		{
@@ -104,27 +104,27 @@ namespace rsgis{namespace vec{
 			columnName = fieldDef->GetNameRef();
 			if(columnName == "ClustClass")
 			{
-				this->clusterClass = string(feature->GetFieldAsString(i));
+				this->clusterClass = std::string(feature->GetFieldAsString(i));
 			}
 			else if(columnName == "Area")
 			{
-				this->area = mathUtils.strtofloat(string(feature->GetFieldAsString(i)));
+				this->area = mathUtils.strtofloat(std::string(feature->GetFieldAsString(i)));
 			}
 			else if(columnName == "PolysArea")
 			{
-				this->polysArea = mathUtils.strtofloat(string(feature->GetFieldAsString(i)));
+				this->polysArea = mathUtils.strtofloat(std::string(feature->GetFieldAsString(i)));
 			}
 			else if(columnName == "ProPolysAr")
 			{
-				this->proPolysArea = mathUtils.strtofloat(string(feature->GetFieldAsString(i)));
+				this->proPolysArea = mathUtils.strtofloat(std::string(feature->GetFieldAsString(i)));
 			}
 			else if(columnName == "ProTotalAr")
 			{
-				this->proTotalArea = mathUtils.strtofloat(string(feature->GetFieldAsString(i)));
+				this->proTotalArea = mathUtils.strtofloat(std::string(feature->GetFieldAsString(i)));
 			}
 			else if(columnName == "EdgeThres")
 			{
-				this->edgeThreshold = mathUtils.strtofloat(string(feature->GetFieldAsString(i)));
+				this->edgeThreshold = mathUtils.strtofloat(std::string(feature->GetFieldAsString(i)));
 			}
 		}
 		 */
@@ -227,30 +227,30 @@ namespace rsgis{namespace vec{
 		return this->propAllPolyArea;
 	}
 	
-	vector<ClassInfo>* RSGISClusterData::getClassListCluster()
+	std::vector<ClassInfo>* RSGISClusterData::getClassListCluster()
 	{
 		return classListCluster;
 	}
 
 	
-	vector<ClassInfo>* RSGISClusterData::getClassListAll()
+	std::vector<ClassInfo>* RSGISClusterData::getClassListAll()
 	{
 		return classListAll;
 	}
 
-	vector<RSGISClassificationPolygon*>* RSGISClusterData::getClusterPolys()
+	std::vector<RSGISClassificationPolygon*>* RSGISClusterData::getClusterPolys()
 	{
 		return clusterPolys;
 	}
 	
-	vector<RSGISClassificationPolygon*>* RSGISClusterData::getAllIntersect()
+	std::vector<RSGISClassificationPolygon*>* RSGISClusterData::getAllIntersect()
 	{
 		return allIntersect;
 	}
 	
-	string RSGISClusterData::getDominateClassCluster()
+	std::string RSGISClusterData::getDominateClassCluster()
 	{
-		string dominate;
+		std::string dominate;
 		if(classListCluster->size() >= 1)
 		{
 			dominate = classListCluster->front().name;
@@ -262,9 +262,9 @@ namespace rsgis{namespace vec{
 		return dominate;
 	}
 	
-	string RSGISClusterData::getDominateClassAll()
+	std::string RSGISClusterData::getDominateClassAll()
 	{
-		string dominate;
+		std::string dominate;
 		if(classListAll->size() >= 1)
 		{
 			dominate = classListAll->front().name;
@@ -276,12 +276,12 @@ namespace rsgis{namespace vec{
 		return dominate;
 	}
 	
-	void RSGISClusterData::findClassInfo(vector<RSGISClassificationPolygon*> *polys, vector<ClassInfo> *classList)
+	void RSGISClusterData::findClassInfo(std::vector<RSGISClassificationPolygon*> *polys, std::vector<ClassInfo> *classList)
 	{
-		vector<RSGISClassificationPolygon*>::iterator iterClassPolys;
-		vector<string> *classes = new vector<string>();
-		vector<string>::iterator iterClassNames;
-		string name = "";
+		std::vector<RSGISClassificationPolygon*>::iterator iterClassPolys;
+		std::vector<std::string> *classes = new std::vector<std::string>();
+		std::vector<std::string>::iterator iterClassNames;
+		std::string name = "";
 		bool found = false;
 		for(iterClassPolys = polys->begin(); iterClassPolys != polys->end(); ++iterClassPolys)
 		{
@@ -333,7 +333,7 @@ namespace rsgis{namespace vec{
 			totalPolyArea += (*iterClassPolys)->getPolygon()->getArea();
 		}
 		
-		vector<float> proportions;
+		std::vector<float> proportions;
 		for(unsigned int i = 0; i < classes->size(); ++i)
 		{
 			classesInfo[i].proportion = classesInfo[i].totalArea / totalPolyArea;

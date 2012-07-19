@@ -26,12 +26,10 @@
 
 #include <iostream>
 #include <string>
-#include "geom/RSGISGeometry.h"
-#include "common/RSGISVectorException.h"
 
-using namespace std;
-using namespace rsgis::geom;
-using namespace rsgis;
+#include "geom/RSGISGeometry.h"
+
+#include "common/RSGISVectorException.h"
 
 namespace rsgis{namespace vec{
 	
@@ -39,7 +37,7 @@ namespace rsgis{namespace vec{
 		{
 		public:
 			RSGISPointsInterpolator(){};
-			virtual void calcValue(point3D *pts, int numPoints, point2D *pt, double *outVal) throw(RSGISVectorException) = 0;
+			virtual void calcValue(rsgis::geom::point3D *pts, int numPoints, rsgis::geom::point2D *pt, double *outVal) throw(RSGISVectorException) = 0;
 			virtual ~RSGISPointsInterpolator(){};
 		};
 	
@@ -47,7 +45,7 @@ namespace rsgis{namespace vec{
 		{
 		public:
 			RSGISInverseWeightedDistanceInterpolator(double power);
-			virtual void calcValue(point3D *pts, int numPoints, point2D *pt, double *outVal) throw(RSGISVectorException);
+			virtual void calcValue(rsgis::geom::point3D *pts, int numPoints, rsgis::geom::point2D *pt, double *outVal) throw(RSGISVectorException);
 			virtual ~RSGISInverseWeightedDistanceInterpolator();
 		protected:
 			double power;
