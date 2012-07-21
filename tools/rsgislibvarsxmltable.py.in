@@ -62,12 +62,17 @@ class RSGISLibXMLVariablesTable (object):
         # Read input file into array
         inVarTable = np.genfromtxt(variables ,delimiter=',',skiprows=headerrows)
         
-        for j in range(inVarTable.shape[0]):
-            for i in range(inVarTable.shape[1]):
+        j = inVarTable.shape[0] - 1
+        
+        while j >= 0:
+            i = inVarTable.shape[1] - 1
+            while i >= 0:
                 inVar = str(inVarTable[j,i])
                 symbolReplace = str("$VAR") + str(i) + "_" + str(j)
                 print "Replacing: ", symbolReplace, " with ", inVar
                 xmloutlineWithVarValues = xmloutlineWithVarValues.replace(symbolReplace, inVar, xmloutlineWithVarValues.count(symbolReplace))
+                i = i - 1
+            j = j - 1
         
         outputXMLFile.write(xmloutlineWithVarValues)
 
