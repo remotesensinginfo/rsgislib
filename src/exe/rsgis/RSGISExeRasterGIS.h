@@ -183,6 +183,7 @@ protected:
     rsgisdistmetrics distMetric;
     bool noDataValDefined;
     float noDataVal;
+    bool outputImagePathProvide;
 };
     
 }
