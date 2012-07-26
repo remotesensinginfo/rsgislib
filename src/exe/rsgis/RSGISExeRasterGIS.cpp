@@ -1248,25 +1248,30 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
             char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
             this->outputFile = string(charValue);
             XMLString::release(&charValue);
+            
+            XMLCh *formatXMLStr = XMLString::transcode("format");
+            if(argElement->hasAttribute(formatXMLStr))
+            {
+                char *charValue = XMLString::transcode(argElement->getAttribute(formatXMLStr));
+                this->imageFormat = string(charValue);
+                XMLString::release(&charValue);
+            }
+            else
+            {
+                std::cerr << "No \'format\' attribute was provided. Defaulting to use KEA\n";
+                this->imageFormat = "KEA";
+            }
+            XMLString::release(&formatXMLStr);
+            
+            outputImagePathProvide = true;
         }
         else
         {
-            throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+            outputImagePathProvide = false;
         }
         XMLString::release(&outputXMLStr);
         
-        XMLCh *formatXMLStr = XMLString::transcode("format");
-        if(argElement->hasAttribute(formatXMLStr))
-        {
-            char *charValue = XMLString::transcode(argElement->getAttribute(formatXMLStr));
-            this->imageFormat = string(charValue);
-            XMLString::release(&charValue);
-        }
-        else
-        {
-            throw RSGISXMLArgumentsException("No \'format\' attribute was provided.");
-        }
-        XMLString::release(&formatXMLStr);
+        
         
         
     }
@@ -4119,23 +4124,47 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
             cout << "Export an attribute table to a GDAL Dataset with a raster attribute table\n";
             cout << "Clump Image: " << this->clumpsImage << endl;
             cout << "Table: " << this->attTableFile << endl;
-            cout << "Output File: " << this->outputFile << endl;
-            cout << "Format: " << this->imageFormat << endl;
+            if(outputImagePathProvide)
+            {
+                cout << "Output File: " << this->outputFile << endl;
+                cout << "Format: " << this->imageFormat << endl;
+            }
+            else
+            {
+                cout << "Appending attribute table to input image\n";
+            }
             
             GDALAllRegister();
             try
             {
-                GDALDataset *clumpsDataset = (GDALDataset *) GDALOpenShared(this->clumpsImage.c_str(), GA_ReadOnly);
-                if(clumpsDataset == NULL)
-                {
-                    string message = string("Could not open image ") + this->clumpsImage;
-                    throw RSGISImageException(message.c_str());
-                }
                 
-                cout << "Copy Raster Dataset.\n";
-                RSGISImageUtils imageUtils;
-                GDALDataset *outRATDataset = imageUtils.createCopy(clumpsDataset, this->outputFile, this->imageFormat, GDT_UInt32);
-                imageUtils.copyUIntGDALDataset(clumpsDataset, outRATDataset);
+                GDALDataset *outRATDataset = NULL;
+                
+                if(outputImagePathProvide)
+                {
+                    GDALDataset *clumpsDataset = (GDALDataset *) GDALOpen(this->clumpsImage.c_str(), GA_ReadOnly);
+                    if(clumpsDataset == NULL)
+                    {
+                        string message = string("Could not open image ") + this->clumpsImage;
+                        throw RSGISImageException(message.c_str());
+                    }
+                    
+                    cout << "Copy Raster Dataset.\n";
+                    RSGISImageUtils imageUtils;
+                    outRATDataset = imageUtils.createCopy(clumpsDataset, this->outputFile, this->imageFormat, GDT_UInt32);
+                    imageUtils.copyUIntGDALDataset(clumpsDataset, outRATDataset);
+                    
+                    GDALClose(clumpsDataset);
+                }
+                else
+                {
+                    outRATDataset = (GDALDataset *) GDALOpen(this->clumpsImage.c_str(), GA_Update);
+                    if(outRATDataset == NULL)
+                    {
+                        string message = string("Could not open image ") + this->clumpsImage;
+                        throw RSGISImageException(message.c_str());
+                    }
+                }
                 
                 cout << "Import attribute table\n";
                 RSGISAttributeTable *attTable = NULL;
@@ -4158,7 +4187,7 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
                 cout << "Finished\n";
                 delete attTable;
                 
-                GDALClose(clumpsDataset);
+                
                 GDALClose(outRATDataset);
             }
             catch(RSGISException &e)
@@ -5717,8 +5746,15 @@ void RSGISExeRasterGIS::printParameters()
             cout << "Export an attribute table to a GDAL Dataset with a raster attribute table\n";
             cout << "Clump Image: " << this->clumpsImage << endl;
             cout << "Table: " << this->attTableFile << endl;
-            cout << "Output File: " << this->outputFile << endl;
-            cout << "Format: " << this->imageFormat << endl;
+            if(outputImagePathProvide)
+            {
+                cout << "Output File: " << this->outputFile << endl;
+                cout << "Format: " << this->imageFormat << endl;
+            }
+            else
+            {
+                cout << "Appending attribute table to input image\n";
+            }
         }
         else if(this->option == RSGISExeRasterGIS::popattributestatsallbands)
         {

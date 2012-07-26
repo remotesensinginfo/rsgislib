@@ -299,7 +299,7 @@
         <rsgis:attribute variable="string" name="string" />
     </rsgis:command>
     <!-- A command export an attribute table to a GDAL Dataset with a raster attribute table -->
-    <rsgis:command algor="rastergis" option="export2gdal" clumps="clumps.env" table="input.att" output="output.img" format="GDAL Format" />
+    <rsgis:command algor="rastergis" option="export2gdal" clumps="clumps.env" table="input.att" [output="output.img" format="GDAL Format"] />
     <!-- A command to populate an attribute table with statistics from an image across all image bands-->
     <rsgis:command algor="rastergis" option="popattributestatsallbands" input="image.env" clumps="clumps.env" table="input.att" tableout="output.att" [nodata="float"] [min="field"] [max="field"] [mean="field"] [sum="field"] [stddev="field"] [median="field"] />
     <!-- A command to create summary statistics for a field in the attribute table -->
