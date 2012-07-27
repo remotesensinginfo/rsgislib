@@ -377,6 +377,21 @@ namespace rsgis{namespace utils{
         }
 		return outValue;
 	}
+    
+    size_t RSGISTextUtils::strtosizet(std::string inValue)throw(RSGISTextException)
+    {
+        size_t outValue = 0;
+		try
+        {
+            outValue = boost::lexical_cast<size_t>(inValue);
+        }
+        catch(boost::bad_lexical_cast &e)
+        {
+            std::string message = std::string("Trying to convert \"") + inValue + std::string("\" - ") + std::string(e.what());
+            throw RSGISTextException(message);
+        }
+		return outValue;
+    }
 	
 	std::string RSGISTextUtils::doubletostring(double number) throw(RSGISTextException)
 	{
@@ -517,6 +532,20 @@ namespace rsgis{namespace utils{
         }
 		return outValue;
 	}
+    
+    std::string RSGISTextUtils::sizettostring(size_t number)throw(RSGISTextException)
+    {
+        std::string outValue = "";
+		try
+        {
+            outValue = boost::lexical_cast<std::string>(number);
+        }
+        catch(boost::bad_lexical_cast &e)
+        {
+            throw RSGISTextException(e.what());
+        }
+		return outValue;
+    }
 		
 	RSGISTextUtils::~RSGISTextUtils()
 	{
