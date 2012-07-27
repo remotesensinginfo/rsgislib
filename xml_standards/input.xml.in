@@ -373,8 +373,18 @@
 	
 	<!-- A copy an attribute table from an existing GDAL datasets and add it to another layer -->
     <rsgis:command algor="rastergis" option="copyGDALATT" table="input.kea" image="output.kea" />
-	
-	
+	<!-- Attribute the clumps with their mean eastings and northings -->
+	<rsgis:command algor="rastergis" option="spatiallocation" image="image.kea" eastings="field name" northings="field name" />
+	<!-- Calculate the euclidean distance from feature -->
+	<rsgis:command algor="rastergis" option="eucdistfromfeat" image="image.kea" feature="uint" outfield="field name" >
+		<rsgis:field name="string" />
+        <rsgis:field name="string" />
+        <rsgis:field name="string" />
+    </rsgis:command>
+
+
+
+
 
 
 
@@ -413,6 +423,10 @@
     <rsgis:command algor="classification" option="isodata" image="string" output="string" numclusters="int" initalgor="random | kpp" maxiterations="int" clustermove="float" minnumbervals="int" mindistbetweencluster="float" maxstddev="float" propAvgDist="float" printinfo="yes | no"/>
     <!-- A command to convert a shapefile's attributes to a spectral library (mtxt) -->
     <rsgis:command algor="classification" option="createspeclib" vector="string" output="file.mtxt" group="yes | no" classattribute="string" valueattributes="string,string,string,string,...,string" />
+
+
+
+
 
 
 
@@ -513,6 +527,10 @@
 
 
 
+
+
+
+
     <!-- A command to normalise an input image to output image pixel values to a given range (the input minimum and maximum as derived from the image) -->
     <rsgis:command algor="imagecalc" option="normalise" image="image.env" output="image_out.env" outmin="double" outmax="double" />
     <!-- A command to normalise an input image to output image pixel values to a given range from the provided input minimum and maximum pixel values. -->
@@ -576,6 +594,10 @@
     <rsgis:command algor="imagecalc" option="allbandsequalto" image="image.env" output="image_out.env" format="GDAL Format" value="float" trueout="float" falseout="float" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
 	<!-- A command to generate a histogram for a region of an image given a mask. If min and max values are not provided the image extremes will be calculated -->
     <rsgis:command algor="imagecalc" option="histogram" image="image.env" output="image_out.txt" mask="mask.env" value="int" band="int" [min="float" max="float"] [width="float"] />
+	
+	
+	
+	
 	
 
 
@@ -650,6 +672,10 @@
               <rsgis:elevation elevationUpper="float" ax="float" bx="float" cx="float"  />
         </rsgls:band>
     </rsgis:command>
+
+
+
+
 
     <!-- A command to calculate the slope of an elevation surface -->
     <rsgis:command algor="elevation" option="slope" input="image.env" output="out_image.env" [band="int"] [outtype="radians|degrees"] />
