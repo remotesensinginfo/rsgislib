@@ -115,7 +115,7 @@ void Control::setUpAlgorithmFactory() throw(rsgis::RSGISException)
 	algorParams->push_back(new rsgisexe::RSGISExeZonalStats());
     algorParams->push_back(new rsgisexe::RSGISExeImageCalibration());
     algorParams->push_back(new rsgisexe::RSGISExeElevationDataTools());
-    algorParams->push_back(new rsgisexe::RSGISExeRasterGIS());
+    algorParams->push_back(new rsgisexe::RSGISExeRasterGIS_old());
     algorParams->push_back(new rsgisexe::RSGISExeImageMorphology());
 
 	factory = new rsgis::RSGISAlgorParamsFactory(algorParams);

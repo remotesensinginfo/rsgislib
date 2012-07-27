@@ -1,5 +1,5 @@
 /*
- *  RSGISExeRasterGIS.h
+ *  RSGISExeRasterGIS_old.h
  *  RSGIS_LIB
  *
  *  Created by Pete Bunting on 15/02/2012.
@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef RSGISExeRasterGIS_H
-#define RSGISExeRasterGIS_H
+#ifndef RSGISExeRasterGIS_old_H
+#define RSGISExeRasterGIS_old_H
 
 #include <string>
 #include <iostream>
@@ -77,7 +77,7 @@ using namespace rsgis::vec;
 using namespace rsgis::rastergis;
 using namespace rsgis::segment;
 
-class RSGISExeRasterGIS : public RSGISAlgorithmParameters
+class RSGISExeRasterGIS_old : public RSGISAlgorithmParameters
 {
 public:
     
@@ -122,7 +122,7 @@ public:
         rsgis_append
     };
     
-    RSGISExeRasterGIS();
+    RSGISExeRasterGIS_old();
     virtual RSGISAlgorithmParameters* getInstance();
     virtual void retrieveParameters(DOMElement *argElement) throw(RSGISXMLArgumentsException);
     virtual void runAlgorithm() throw(RSGISException);
@@ -130,7 +130,7 @@ public:
     virtual string getDescription();
     virtual string getXMLSchema();
     virtual void help();
-    ~RSGISExeRasterGIS();
+    ~RSGISExeRasterGIS_old();
 protected:
     options option;
     string inputImage;
