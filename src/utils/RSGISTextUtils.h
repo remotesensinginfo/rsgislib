@@ -63,6 +63,7 @@ namespace rsgis{namespace utils{
 			int_fast16_t strto16bitInt(std::string inValue)throw(RSGISTextException);
 			int_fast32_t strto32bitInt(std::string inValue)throw(RSGISTextException);
 			int_fast64_t strto64bitInt(std::string inValue)throw(RSGISTextException);
+            size_t strtosizet(std::string inValue)throw(RSGISTextException);
 			
 			std::string doubletostring(double number)throw(RSGISTextException);
 			std::string floattostring(float number)throw(RSGISTextException);
@@ -76,6 +77,7 @@ namespace rsgis{namespace utils{
 			std::string int16bittostring(int_fast16_t number)throw(RSGISTextException);
 			std::string int32bittostring(int_fast32_t number)throw(RSGISTextException);
 			std::string int64bittostring(int_fast64_t number)throw(RSGISTextException);
+            std::string sizettostring(size_t number)throw(RSGISTextException);
 			
 			~RSGISTextUtils();
 		};
