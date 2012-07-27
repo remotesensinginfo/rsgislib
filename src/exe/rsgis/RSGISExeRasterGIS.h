@@ -38,8 +38,6 @@
 #include "utils/RSGISTextUtils.h"
 #include "utils/RSGISFileUtils.h"
 
-#include "math/RSGISMathsUtils.h"
-
 #include "gdal_priv.h"
 #include "ogrsf_frmts.h"
 #include "ogr_api.h"
@@ -56,7 +54,9 @@ namespace rsgisexe{
         enum options 
         {
             none,
-            copyGDALATT
+            copyGDALATT,
+            spatiallocation,
+            eucdistfromfeat
         };
         
         RSGISExeRasterGIS();
@@ -72,6 +72,12 @@ namespace rsgisexe{
         options option;
         std::string inputImage;
         std::string clumpsImage;
+        std::string outputField;
+        std::string northingsField;
+        std::string eastingsField;
+        std::vector<std::string> fields;
+        size_t fid;
+        
     };
     
 }
