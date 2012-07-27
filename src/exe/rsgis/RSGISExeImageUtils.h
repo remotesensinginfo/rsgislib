@@ -4,7 +4,7 @@
  *
  *  Created by Pete Bunting on 11/12/2008.
  *  Copyright 2008 RSGISLib.
- * 
+ *
  *  RSGISLib is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -28,6 +28,8 @@
 #include <limits>
 
 #include <boost/lexical_cast.hpp>
+
+#include "geos/geom/Envelope.h"
 
 #include "common/RSGISException.h"
 #include "common/RSGISXMLArgumentsException.h"
@@ -94,8 +96,8 @@ using namespace rsgis::datastruct;
 class RSGISExeImageUtils : public RSGISAlgorithmParameters
 	{
 	public:
-		
-		enum options 
+
+		enum options
 		{
 			none,
 			colour,
@@ -130,7 +132,7 @@ class RSGISExeImageUtils : public RSGISAlgorithmParameters
             createcopy,
             createKMLFile
 		};
-		
+
 		enum interpolators
 		{
 			cubic,
@@ -139,7 +141,7 @@ class RSGISExeImageUtils : public RSGISAlgorithmParameters
 			nn,
 			trangular
 		};
-		
+
 		enum stretches
 		{
 			linearMinMax,
@@ -150,7 +152,7 @@ class RSGISExeImageUtils : public RSGISAlgorithmParameters
 			logarithmic,
 			powerLaw
 		};
-		
+
 		RSGISExeImageUtils();
 		virtual RSGISAlgorithmParameters* getInstance();
 		virtual void retrieveParameters(DOMElement *argElement) throw(RSGISXMLArgumentsException);
