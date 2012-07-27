@@ -1,5 +1,5 @@
 /*
- *  RSGISExeRasterGIS.h
+ *  RSGISExeRasterGIS_old.h
  *  RSGIS_LIB
  *
  *  Created by Pete Bunting on 15/02/2012.
@@ -20,23 +20,23 @@
  *
  */
 
-#include "RSGISExeRasterGIS.h"
+#include "RSGISExeRasterGIS_old.h"
 
 namespace rsgisexe{
 
-RSGISExeRasterGIS::RSGISExeRasterGIS() : RSGISAlgorithmParameters()
+RSGISExeRasterGIS_old::RSGISExeRasterGIS_old() : RSGISAlgorithmParameters()
 {
 	this->algorithm = "rastergis_old";
 	
-	this->option = RSGISExeRasterGIS::none;
+	this->option = RSGISExeRasterGIS_old::none;
 }
 
-RSGISAlgorithmParameters* RSGISExeRasterGIS::getInstance()
+RSGISAlgorithmParameters* RSGISExeRasterGIS_old::getInstance()
 {
-	return new RSGISExeRasterGIS();
+	return new RSGISExeRasterGIS_old();
 }
 
-void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXMLArgumentsException)
+void RSGISExeRasterGIS_old::retrieveParameters(DOMElement *argElement) throw(RSGISXMLArgumentsException)
 {	
 	RSGISMathsUtils mathUtils;
     RSGISTextUtils textUtils;
@@ -111,7 +111,7 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
 	const XMLCh *optionXML = argElement->getAttribute(optionXMLStr);
 	if(XMLString::equals(optionCreateAttributeTable, optionXML))
     {
-        this->option = RSGISExeRasterGIS::createattributetable;
+        this->option = RSGISExeRasterGIS_old::createattributetable;
         
         XMLCh *clumpsXMLStr = XMLString::transcode("clumps");
         if(argElement->hasAttribute(clumpsXMLStr))
@@ -141,7 +141,7 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
     }
     else if(XMLString::equals(optionPopAttributeMean, optionXML))
 	{		
-		this->option = RSGISExeRasterGIS::popattributemean;
+		this->option = RSGISExeRasterGIS_old::popattributemean;
 		
 		XMLCh *inputXMLStr = XMLString::transcode("input");
         if(argElement->hasAttribute(inputXMLStr))
@@ -197,7 +197,7 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
 	}
     else if(XMLString::equals(optionExportTable2Img, optionXML))
 	{		
-		this->option = RSGISExeRasterGIS::exporttable2img;
+		this->option = RSGISExeRasterGIS_old::exporttable2img;
         
         XMLCh *clumpsXMLStr = XMLString::transcode("clumps");
         if(argElement->hasAttribute(clumpsXMLStr))
@@ -290,7 +290,7 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
 	}
     else if(XMLString::equals(optionBoolClassTable, optionXML))
 	{		
-		this->option = RSGISExeRasterGIS::boolclasstable;
+		this->option = RSGISExeRasterGIS_old::boolclasstable;
         
         XMLCh *tableXMLStr = XMLString::transcode("table");
         if(argElement->hasAttribute(tableXMLStr))
@@ -331,7 +331,7 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
 	}
     else if(XMLString::equals(optionAddFields, optionXML))
     {
-        this->option = RSGISExeRasterGIS::addfields;
+        this->option = RSGISExeRasterGIS_old::addfields;
         
         XMLCh *tableXMLStr = XMLString::transcode("table");
         if(argElement->hasAttribute(tableXMLStr))
@@ -429,7 +429,7 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
     }
 	else if(XMLString::equals(optionRegionGrowThres, optionXML))
     {
-        this->option = RSGISExeRasterGIS::regiongrowthres;
+        this->option = RSGISExeRasterGIS_old::regiongrowthres;
         
         XMLCh *clumpsXMLStr = XMLString::transcode("clumps");
         if(argElement->hasAttribute(clumpsXMLStr))
@@ -508,7 +508,7 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
     }
     else if(XMLString::equals(optionFindMajority, optionXML))
     {
-        this->option = RSGISExeRasterGIS::findmajority;
+        this->option = RSGISExeRasterGIS_old::findmajority;
         
         XMLCh *catagoriesXMLStr = XMLString::transcode("catagories");
         if(argElement->hasAttribute(catagoriesXMLStr))
@@ -607,7 +607,7 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
     }
     else if(XMLString::equals(optionCountPolyIntersects, optionXML))
     {
-        this->option = RSGISExeRasterGIS::countpolyintersects;
+        this->option = RSGISExeRasterGIS_old::countpolyintersects;
         
         XMLCh *vectorXMLStr = XMLString::transcode("vector");
         if(argElement->hasAttribute(vectorXMLStr))
@@ -710,7 +710,7 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
     }
     else if(XMLString::equals(optionCalcAttributes, optionXML))
     {
-        this->option = RSGISExeRasterGIS::calcattributes;
+        this->option = RSGISExeRasterGIS_old::calcattributes;
         
         XMLCh *tableXMLStr = XMLString::transcode("table");
         if(argElement->hasAttribute(tableXMLStr))
@@ -859,7 +859,7 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
     }
     else if(XMLString::equals(optionPopAttributeStatsInMem, optionXML))
     {
-        this->option = RSGISExeRasterGIS::popattributestatsinmem;
+        this->option = RSGISExeRasterGIS_old::popattributestatsinmem;
         XMLCh *inputXMLStr = XMLString::transcode("input");
         if(argElement->hasAttribute(inputXMLStr))
         {
@@ -1044,7 +1044,7 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
     }
     else if(XMLString::equals(optionPopAttributeStats, optionXML))
     {
-        this->option = RSGISExeRasterGIS::popattributestats;
+        this->option = RSGISExeRasterGIS_old::popattributestats;
         XMLCh *inputXMLStr = XMLString::transcode("input");
         if(argElement->hasAttribute(inputXMLStr))
         {
@@ -1214,7 +1214,7 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
     }
     else if(XMLString::equals(optionExport2GDAL, optionXML))
     {
-        this->option = RSGISExeRasterGIS::export2gdal;
+        this->option = RSGISExeRasterGIS_old::export2gdal;
         
         XMLCh *clumpsXMLStr = XMLString::transcode("clumps");
         if(argElement->hasAttribute(clumpsXMLStr))
@@ -1278,7 +1278,7 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
     }
     else if(XMLString::equals(optionPopAttributeStatsAllBands, optionXML))
     {
-        this->option = RSGISExeRasterGIS::popattributestatsallbands;
+        this->option = RSGISExeRasterGIS_old::popattributestatsallbands;
         XMLCh *inputXMLStr = XMLString::transcode("input");
         if(argElement->hasAttribute(inputXMLStr))
         {
@@ -1443,7 +1443,7 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
     }
     else if(XMLString::equals(optionSummariseField, optionXML))
     {
-        this->option = RSGISExeRasterGIS::summarisefield;
+        this->option = RSGISExeRasterGIS_old::summarisefield;
                         
         XMLCh *tableXMLStr = XMLString::transcode("table");
         if(argElement->hasAttribute(tableXMLStr))
@@ -1558,7 +1558,7 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
     }
     else if(XMLString::equals(optionFindNeighbours, optionXML))
     {
-        this->option = RSGISExeRasterGIS::findneighbours;
+        this->option = RSGISExeRasterGIS_old::findneighbours;
         
         XMLCh *clumpsXMLStr = XMLString::transcode("clumps");
         if(argElement->hasAttribute(clumpsXMLStr))
@@ -1629,7 +1629,7 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
     }
     else if(XMLString::equals(optionMeanEucDist2Neighbours, optionXML))
     {
-        this->option = RSGISExeRasterGIS::meaneucdist2neighbours;
+        this->option = RSGISExeRasterGIS_old::meaneucdist2neighbours;
         
         XMLCh *tableXMLStr = XMLString::transcode("table");
         if(argElement->hasAttribute(tableXMLStr))
@@ -1744,7 +1744,7 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
     }
     else if(XMLString::equals(optionCalcIntraPxlEucDist, optionXML))
     {
-        this->option = RSGISExeRasterGIS::calcintrapxleucdist;
+        this->option = RSGISExeRasterGIS_old::calcintrapxleucdist;
         
         XMLCh *inputXMLStr = XMLString::transcode("input");
         if(argElement->hasAttribute(inputXMLStr))
@@ -1946,7 +1946,7 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
     }
     else if(XMLString::equals(optionMeanLitBandsPopAttributeStats, optionXML))
     {
-        this->option = RSGISExeRasterGIS::meanlitbandspopattributestats;
+        this->option = RSGISExeRasterGIS_old::meanlitbandspopattributestats;
         XMLCh *inputXMLStr = XMLString::transcode("input");
         if(argElement->hasAttribute(inputXMLStr))
         {
@@ -2170,7 +2170,7 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
     }
     else if(XMLString::equals(optionMeanLitPopAttributeStatsInMem, optionXML))
     {
-        this->option = RSGISExeRasterGIS::meanlitpopattributestatsinmem;
+        this->option = RSGISExeRasterGIS_old::meanlitpopattributestatsinmem;
         XMLCh *inputXMLStr = XMLString::transcode("input");
         if(argElement->hasAttribute(inputXMLStr))
         {
@@ -2414,7 +2414,7 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
     }
     else if(XMLString::equals(optionMeanLitPopAttributeStats, optionXML))
     {
-        this->option = RSGISExeRasterGIS::meanlitpopattributestats;
+        this->option = RSGISExeRasterGIS_old::meanlitpopattributestats;
         XMLCh *inputXMLStr = XMLString::transcode("input");
         if(argElement->hasAttribute(inputXMLStr))
         {
@@ -2643,7 +2643,7 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
     }
     else if(XMLString::equals(optionExportField2ASCII, optionXML))
     {
-        this->option = RSGISExeRasterGIS::exportfield2ascii;
+        this->option = RSGISExeRasterGIS_old::exportfield2ascii;
         
         XMLCh *tableXMLStr = XMLString::transcode("table");
         if(argElement->hasAttribute(tableXMLStr))
@@ -2686,7 +2686,7 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
     }
     else if(XMLString::equals(optionExport2HDF, optionXML))
     {
-        this->option = RSGISExeRasterGIS::export2hdf;
+        this->option = RSGISExeRasterGIS_old::export2hdf;
         
         XMLCh *tableXMLStr = XMLString::transcode("table");
         if(argElement->hasAttribute(tableXMLStr))
@@ -2717,7 +2717,7 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
     }
     else if(XMLString::equals(optionExport2ASCII, optionXML))
     {
-        this->option = RSGISExeRasterGIS::export2ascii;
+        this->option = RSGISExeRasterGIS_old::export2ascii;
         
         XMLCh *tableXMLStr = XMLString::transcode("table");
         if(argElement->hasAttribute(tableXMLStr))
@@ -2748,7 +2748,7 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
     }
     else if(XMLString::equals(optionPopMeanSumAttributes, optionXML))
     {
-        this->option = RSGISExeRasterGIS::popmeansumattributes;
+        this->option = RSGISExeRasterGIS_old::popmeansumattributes;
         XMLCh *inputXMLStr = XMLString::transcode("input");
         if(argElement->hasAttribute(inputXMLStr))
         {
@@ -2876,7 +2876,7 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
     }
     else if(XMLString::equals(optionPrintAttSummary, optionXML))
     {
-        this->option = RSGISExeRasterGIS::printattsummary;
+        this->option = RSGISExeRasterGIS_old::printattsummary;
         
         XMLCh *tableXMLStr = XMLString::transcode("table");
         if(argElement->hasAttribute(tableXMLStr))
@@ -2893,7 +2893,7 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
     }
     else if(XMLString::equals(optionExportSize, optionXML))
     {
-        this->option = RSGISExeRasterGIS::exportsize;
+        this->option = RSGISExeRasterGIS_old::exportsize;
         
         XMLCh *tableXMLStr = XMLString::transcode("table");
         if(argElement->hasAttribute(tableXMLStr))
@@ -2949,7 +2949,7 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
     }
     else if(XMLString::equals(optionPopAttributeStatsThresholded, optionXML))
     {
-        this->option = RSGISExeRasterGIS::popattributestatsthresholded;
+        this->option = RSGISExeRasterGIS_old::popattributestatsthresholded;
         XMLCh *inputXMLStr = XMLString::transcode("input");
         if(argElement->hasAttribute(inputXMLStr))
         {
@@ -3146,7 +3146,7 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
     }
     else if(XMLString::equals(optionKNNExtrapolate, optionXML))
     {
-        this->option = RSGISExeRasterGIS::knnextrapolate;
+        this->option = RSGISExeRasterGIS_old::knnextrapolate;
         
         XMLCh *tableXMLStr = XMLString::transcode("table");
         if(argElement->hasAttribute(tableXMLStr))
@@ -3324,7 +3324,7 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
     }
     else if(XMLString::equals(optionPopBoolField, optionXML))
 	{		
-		this->option = RSGISExeRasterGIS::popboolfield;
+		this->option = RSGISExeRasterGIS_old::popboolfield;
         
         XMLCh *tableXMLStr = XMLString::transcode("table");
         if(argElement->hasAttribute(tableXMLStr))
@@ -3365,7 +3365,7 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
 	}
     else if(XMLString::equals(optionCopyGDALATT, optionXML))
 	{		
-		this->option = RSGISExeRasterGIS::copyGDALATT;
+		this->option = RSGISExeRasterGIS_old::copyGDALATT;
         
         XMLCh *tableXMLStr = XMLString::transcode("table");
         if(argElement->hasAttribute(tableXMLStr))
@@ -3397,7 +3397,7 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
 	}
     else
 	{
-		string message = string("The option (") + string(XMLString::transcode(optionXML)) + string(") is not known: RSGISExeRasterGIS.");
+		string message = string("The option (") + string(XMLString::transcode(optionXML)) + string(") is not known: RSGISExeRasterGIS_old.");
 		throw RSGISXMLArgumentsException(message.c_str());
 	}
 	
@@ -3441,7 +3441,7 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
     XMLString::release(&optionRSGISString);
 }
 
-void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
+void RSGISExeRasterGIS_old::runAlgorithm() throw(RSGISException)
 {
 	if(!parsed)
 	{
@@ -3449,7 +3449,7 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
 	}
 	else
 	{
-		if(this->option == RSGISExeRasterGIS::createattributetable)
+		if(this->option == RSGISExeRasterGIS_old::createattributetable)
 		{
             cout << "A command to create a new attribute table with pixel counts\n";
             cout << "Clump Image: " << this->clumpsImage << endl;
@@ -3488,7 +3488,7 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
                 throw e;
             }	
 		}
-        else if(this->option == RSGISExeRasterGIS::popattributemean)
+        else if(this->option == RSGISExeRasterGIS_old::popattributemean)
 		{
             cout << "A command to create a new attribute table and populate it with the image means\n";
 			cout << "Input Image: " << this->inputImage << endl;
@@ -3533,7 +3533,7 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
                 throw e;
             }	
 		}
-        else if(this->option == RSGISExeRasterGIS::exporttable2img)
+        else if(this->option == RSGISExeRasterGIS_old::exporttable2img)
         {
             cout << "A command to create an image populated with values from an attribute table.\n";
             cout << "Clump Image: " << this->clumpsImage << endl;
@@ -3583,7 +3583,7 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
             }
             
         }
-        else if(this->option == RSGISExeRasterGIS::boolclasstable)
+        else if(this->option == RSGISExeRasterGIS_old::boolclasstable)
         {
             cout << "A command to apply boolean statements to the attribute table (i.e., for classification)\n";
             cout << "Input Table: " << this->attTableFile << endl;
@@ -3637,7 +3637,7 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
                 throw e;
             }
         }
-        else if(this->option == RSGISExeRasterGIS::addfields)
+        else if(this->option == RSGISExeRasterGIS_old::addfields)
         {
             cout << "A command to add new fields to the attribute table\n";
             cout << "Input Table: " << this->attTableFile << endl;
@@ -3699,7 +3699,7 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
                 throw e;
             }
         }
-        else if(this->option == RSGISExeRasterGIS::regiongrowthres)
+        else if(this->option == RSGISExeRasterGIS_old::regiongrowthres)
         {
             cout << "A command to region grow regions of the dataset using threshold\n";
             cout << "Clumps Image: " << this->clumpsImage << endl;
@@ -3758,7 +3758,7 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
                 throw e;
             }
         }
-        else if(this->option == RSGISExeRasterGIS::findmajority)
+        else if(this->option == RSGISExeRasterGIS_old::findmajority)
         {
             cout << "A command to find the majority category intersecting with each clump\n";
             cout << "Categories Image: " << this->catagoriesImage << endl;
@@ -3822,7 +3822,7 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
                 throw e;
             }
         }
-        else if(this->option == RSGISExeRasterGIS::countpolyintersects)
+        else if(this->option == RSGISExeRasterGIS_old::countpolyintersects)
         {
             cout << "A command to populate the attribute table with the number of pixels in the clumps image which intersect with the polygon.\n";
             cout << "Clumps Image: " << this->clumpsImage << endl;
@@ -3897,7 +3897,7 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
                 throw e;
             }
         }
-        else if(this->option == RSGISExeRasterGIS::calcattributes)
+        else if(this->option == RSGISExeRasterGIS_old::calcattributes)
         {
             cout << "A command to calculate an attribute from other attributes\n";
             cout << "Input Table: " << this->attTableFile << endl;
@@ -3953,7 +3953,7 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
                 throw e;
             }
         }
-        else if(this->option == RSGISExeRasterGIS::popattributestatsinmem)
+        else if(this->option == RSGISExeRasterGIS_old::popattributestatsinmem)
         {
             cout << "A command to populate an attribute table with statistics from an image.\n";
             cout << "Input Image: " << this->inputImage << endl;
@@ -4047,7 +4047,7 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
                 throw e;
             }            
         }
-        else if(this->option == RSGISExeRasterGIS::popattributestats)
+        else if(this->option == RSGISExeRasterGIS_old::popattributestats)
         {
             cout << "A command to populate an attribute table with statistics from an image in a memory efficient manor.\n";
             cout << "Input Image: " << this->inputImage << endl;
@@ -4153,7 +4153,7 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
                 throw e;
             }            
         }
-        else if(this->option == RSGISExeRasterGIS::export2gdal)
+        else if(this->option == RSGISExeRasterGIS_old::export2gdal)
 		{
             cout << "Export an attribute table to a GDAL Dataset with a raster attribute table\n";
             cout << "Clump Image: " << this->clumpsImage << endl;
@@ -4229,7 +4229,7 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
                 throw e;
             }	
 		}
-        else if(this->option == RSGISExeRasterGIS::popattributestatsallbands)
+        else if(this->option == RSGISExeRasterGIS_old::popattributestatsallbands)
         {
             cout << "A command to populate an attribute table with statistics from an image.\n";
             cout << "Input Image: " << this->inputImage << endl;
@@ -4317,7 +4317,7 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
                 throw e;
             }            
         }
-        else if(this->option == RSGISExeRasterGIS::summarisefield)
+        else if(this->option == RSGISExeRasterGIS_old::summarisefield)
         {
             cout << "A command to summarise an attribute from with the table.\n";
             cout << "Input Table: " << this->attTableFile << endl;
@@ -4411,7 +4411,7 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
                 throw e;
             }            
         }
-        else if(this->option == RSGISExeRasterGIS::findneighbours)
+        else if(this->option == RSGISExeRasterGIS_old::findneighbours)
         {
             cout << "A command to find the neighbours of the clumps and save as a neighbours file.\n";
             cout << "Clump Image: " << this->clumpsImage << endl;
@@ -4488,7 +4488,7 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
                 throw e;
             }
         }
-        else if(this->option == RSGISExeRasterGIS::meaneucdist2neighbours)
+        else if(this->option == RSGISExeRasterGIS_old::meaneucdist2neighbours)
         {
             cout << "A command to find mean euclidean distance to neighbours\n";
             cout << "Table: " << this->attTableFile << endl;
@@ -4548,7 +4548,7 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
                 throw e;
             }
         }
-        else if(this->option == RSGISExeRasterGIS::calcintrapxleucdist)
+        else if(this->option == RSGISExeRasterGIS_old::calcintrapxleucdist)
         {
             cout << "A command to calculate the euclidean distance to individual pixels within a segment.\n";
             cout << "Input Image: " << this->inputImage << endl;
@@ -4636,7 +4636,7 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
                 throw e;
             }            
         }
-        else if(this->option == RSGISExeRasterGIS::meanlitbandspopattributestats)
+        else if(this->option == RSGISExeRasterGIS_old::meanlitbandspopattributestats)
         {
             cout << "A command to populate an attribute table with statistics from an image where a segment value either above or below is used.\n";
             cout << "Input Image: " << this->inputImage << endl;
@@ -4730,7 +4730,7 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
                 throw e;
             }            
         }
-        else if(this->option == RSGISExeRasterGIS::meanlitpopattributestatsinmem)
+        else if(this->option == RSGISExeRasterGIS_old::meanlitpopattributestatsinmem)
         {
             cout << "A command to populate an attribute table with mean-lit statistics from an image.\n";
             cout << "Input Image: " << this->inputImage << endl;
@@ -4843,7 +4843,7 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
                 throw e;
             }            
         }
-        else if(this->option == RSGISExeRasterGIS::meanlitpopattributestats)
+        else if(this->option == RSGISExeRasterGIS_old::meanlitpopattributestats)
         {
             cout << "A command to populate an attribute table with mean-lit statistics from an image in a memory efficient manor.\n";
             cout << "Input Image: " << this->inputImage << endl;
@@ -4951,7 +4951,7 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
                 throw e;
             }            
         }
-        else if(this->option == RSGISExeRasterGIS::exportfield2ascii)
+        else if(this->option == RSGISExeRasterGIS_old::exportfield2ascii)
         {
             cout << "A command to export an attribute table column as a single ASCII table\n";
             cout << "Table: " << this->attTableFile << endl;
@@ -5098,7 +5098,7 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
                 throw e;
             }
         }
-        else if(this->option == RSGISExeRasterGIS::export2hdf)
+        else if(this->option == RSGISExeRasterGIS_old::export2hdf)
         {
             cout << "A command to export an attribute table to a hdf file.\n";
             cout << "Input Table: " << this->attTableFile << endl;
@@ -5132,7 +5132,7 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
                 throw e;
             } 
         }
-        else if(this->option == RSGISExeRasterGIS::export2ascii)
+        else if(this->option == RSGISExeRasterGIS_old::export2ascii)
         {
             cout << "A command to export an attribute table to a ascii file.\n";
             cout << "Input Table: " << this->attTableFile << endl;
@@ -5166,7 +5166,7 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
                 throw e;
             } 
         }
-        else if(this->option == RSGISExeRasterGIS::popmeansumattributes)
+        else if(this->option == RSGISExeRasterGIS_old::popmeansumattributes)
         {
             cout << "A command to populate an attribute table with sum and mean values from an image in a memory efficient and fast manor.\n";
             cout << "Input Image: " << this->inputImage << endl;
@@ -5258,7 +5258,7 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
                 throw e;
             }            
         }
-        else if(this->option == RSGISExeRasterGIS::printattsummary)
+        else if(this->option == RSGISExeRasterGIS_old::printattsummary)
         {
             cout << "A command to print a summary of an attribute table.\n";
             cout << "Input table: " << this->attTableFile << endl;
@@ -5285,7 +5285,7 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
                 throw e;
             } 
         }
-        else if(this->option == RSGISExeRasterGIS::exportsize)
+        else if(this->option == RSGISExeRasterGIS_old::exportsize)
         {
             cout << "A command to export the attribute table size and output to the text file.\n";
             cout << "Input table: " << this->attTableFile << endl;
@@ -5353,7 +5353,7 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
                 throw e;
             } 
         }
-        else if(this->option == RSGISExeRasterGIS::popattributestatsthresholded)
+        else if(this->option == RSGISExeRasterGIS_old::popattributestatsthresholded)
         {
             cout << "A command to populate an attribute table with statistics from an image in a memory efficient manor where a threshold is defined per band and only values above that threshold are valid.\n";
             cout << "Input Image: " << this->inputImage << endl;
@@ -5462,7 +5462,7 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
                 throw e;
             }            
         }
-        else if(this->option == RSGISExeRasterGIS::knnextrapolate)
+        else if(this->option == RSGISExeRasterGIS_old::knnextrapolate)
         {
             cout.precision(12);
             cout << "A command to extrapolate values for field in the attribute table using a KNN approach\n";
@@ -5540,7 +5540,7 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
                 throw e;
             }
         }
-        else if(this->option == RSGISExeRasterGIS::popboolfield)
+        else if(this->option == RSGISExeRasterGIS_old::popboolfield)
         {
             cout << "A command to populate a bool field within the attribute table\n";
             cout << "Input Table: " << this->attTableFile << endl;
@@ -5601,7 +5601,7 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
                 throw e;
             }
         }
-        else if(this->option == RSGISExeRasterGIS::copyGDALATT)
+        else if(this->option == RSGISExeRasterGIS_old::copyGDALATT)
 		{
             cout << "Export an attribute table to a GDAL Dataset with a raster attribute table\n";
             cout << "Input Table: " << this->inputImage << endl;
@@ -5641,22 +5641,22 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
 		}
 		else
 		{
-			cout << "The option is not recognised: RSGISExeRasterGIS\n";
+			cout << "The option is not recognised: RSGISExeRasterGIS_old\n";
 		}
 	}
 }
 
-void RSGISExeRasterGIS::printParameters()
+void RSGISExeRasterGIS_old::printParameters()
 {
 	if(parsed)
 	{
-        if(this->option == RSGISExeRasterGIS::createattributetable)
+        if(this->option == RSGISExeRasterGIS_old::createattributetable)
         {
             cout << "A command to create a new attribute table with pixel counts\n";
             cout << "Clump Image: " << this->clumpsImage << endl;
             cout << "Output File: " << this->outputFile << endl;
         }
-		else if(this->option == RSGISExeRasterGIS::popattributemean)
+		else if(this->option == RSGISExeRasterGIS_old::popattributemean)
 		{
             cout << "A command to create a new attribute table and populate it with the image means\n";
 			cout << "Input Image: " << this->inputImage << endl;
@@ -5664,7 +5664,7 @@ void RSGISExeRasterGIS::printParameters()
             cout << "Output File: " << this->outputFile << endl;
             cout << "Attribute Prefix: " << this->attprefix << endl;
         }
-        else if(this->option == RSGISExeRasterGIS::exporttable2img)
+        else if(this->option == RSGISExeRasterGIS_old::exporttable2img)
         {
             cout << "A command to create an image populated with values from an attribute table.\n";
             cout << "Clump Image: " << this->clumpsImage << endl;
@@ -5675,13 +5675,13 @@ void RSGISExeRasterGIS::printParameters()
                 cout << "Band " << (*iterBands).first << " will be attribute " << (*iterBands).second << endl;
             }
         }
-        else if(this->option == RSGISExeRasterGIS::boolclasstable)
+        else if(this->option == RSGISExeRasterGIS_old::boolclasstable)
         {
             cout << "A command to apply boolean statements to the attribute table (i.e., for classification)\n";
             cout << "Input Table: " << this->attTableFile << endl;
             cout << "Output Table: " << this->outAttTableFile << endl;
         }
-        else if(this->option == RSGISExeRasterGIS::addfields)
+        else if(this->option == RSGISExeRasterGIS_old::addfields)
         {
             cout << "A command add new fields to the attribute table\n";
             cout << "Input Table: " << this->attTableFile << endl;
@@ -5702,7 +5702,7 @@ void RSGISExeRasterGIS::printParameters()
             }
             cout << endl;
         }
-        else if(this->option == RSGISExeRasterGIS::findmajority)
+        else if(this->option == RSGISExeRasterGIS_old::findmajority)
         {
             cout << "A command to find the majority category intersecting with each clump\n";
             cout << "Categories Image: " << this->catagoriesImage << endl;
@@ -5713,7 +5713,7 @@ void RSGISExeRasterGIS::printParameters()
             cout << "Majority Category Field : " << this->majorityCatField << endl;
             cout << "Majority Ratio Field : " << this->majorityRatioField << endl;
         }
-        else if(this->option == RSGISExeRasterGIS::countpolyintersects)
+        else if(this->option == RSGISExeRasterGIS_old::countpolyintersects)
         {
             cout << "A command to populate the attribute table with the number of pixels in the clumps image which intersect with the polygon.\n";
             cout << "Clumps Image: " << this->clumpsImage << endl;
@@ -5722,7 +5722,7 @@ void RSGISExeRasterGIS::printParameters()
             cout << "Field: " << this->attField << endl;
             cout << "Shapefile: " << this->inputVector << endl;
         }
-        else if(this->option == RSGISExeRasterGIS::calcattributes)
+        else if(this->option == RSGISExeRasterGIS_old::calcattributes)
         {
             cout << "A command to calculate an attribute from other attributes\n";
             cout << "Input Table: " << this->attTableFile << endl;
@@ -5730,7 +5730,7 @@ void RSGISExeRasterGIS::printParameters()
             cout << "Expression: " << this->mathsExpression << endl;
             cout << "Field: " << this->attField << endl;
         }
-        else if(this->option == RSGISExeRasterGIS::popattributestatsinmem)
+        else if(this->option == RSGISExeRasterGIS_old::popattributestatsinmem)
         {
             cout << "A command to populate an attribute table with statistics from an image.\n";
             cout << "Input Image: " << this->inputImage << endl;
@@ -5774,7 +5774,7 @@ void RSGISExeRasterGIS::printParameters()
                 cout << endl;
             }
         }
-        else if(this->option == RSGISExeRasterGIS::popattributestats)
+        else if(this->option == RSGISExeRasterGIS_old::popattributestats)
         {
             cout << "A command to populate an attribute table with statistics from an image in a memory efficient manor.\n";
             cout << "Input Image: " << this->inputImage << endl;
@@ -5813,7 +5813,7 @@ void RSGISExeRasterGIS::printParameters()
                 cout << endl;
             }
         }
-        else if(this->option == RSGISExeRasterGIS::export2gdal)
+        else if(this->option == RSGISExeRasterGIS_old::export2gdal)
 		{
             cout << "Export an attribute table to a GDAL Dataset with a raster attribute table\n";
             cout << "Clump Image: " << this->clumpsImage << endl;
@@ -5828,7 +5828,7 @@ void RSGISExeRasterGIS::printParameters()
                 cout << "Appending attribute table to input image\n";
             }
         }
-        else if(this->option == RSGISExeRasterGIS::popattributestatsallbands)
+        else if(this->option == RSGISExeRasterGIS_old::popattributestatsallbands)
         {
             cout << "A command to populate an attribute table with statistics from an image.\n";
             cout << "Input Image: " << this->inputImage << endl;
@@ -5862,13 +5862,13 @@ void RSGISExeRasterGIS::printParameters()
             }
             cout << endl;
         }
-        else if(this->option == RSGISExeRasterGIS::findneighbours)
+        else if(this->option == RSGISExeRasterGIS_old::findneighbours)
         {
             cout << "A command to find the neighbours of the clumps and save as a neighbours file.\n";
             cout << "Clump Image: " << this->clumpsImage << endl;
             cout << "Output File: " << this->outputFile << endl;
         }
-        else if(this->option == RSGISExeRasterGIS::meaneucdist2neighbours)
+        else if(this->option == RSGISExeRasterGIS_old::meaneucdist2neighbours)
         {
             cout << "A command to find mean euclidean distance to neighbours\n";
             cout << "Table: " << this->attTableFile << endl;
@@ -5881,7 +5881,7 @@ void RSGISExeRasterGIS::printParameters()
                 cout << "\t" << *iterNames << endl;
             }
         }
-        else if(this->option == RSGISExeRasterGIS::calcintrapxleucdist)
+        else if(this->option == RSGISExeRasterGIS_old::calcintrapxleucdist)
         {
             cout << "A command to calculate the euclidean distance to individual pixels within a segment.\n";
             cout << "Input Image: " << this->inputImage << endl;
@@ -5919,7 +5919,7 @@ void RSGISExeRasterGIS::printParameters()
                 cout << "Band " << (*iterBands)->band << ": " << (*iterBands)->attName << endl;
             }
         }
-        else if(this->option == RSGISExeRasterGIS::meanlitbandspopattributestats)
+        else if(this->option == RSGISExeRasterGIS_old::meanlitbandspopattributestats)
         {
             cout << "A command to populate an attribute table with statistics from an image where a segment value either above or below is used.\n";
             cout << "Input Image: " << this->inputImage << endl;
@@ -5963,7 +5963,7 @@ void RSGISExeRasterGIS::printParameters()
                 cout << endl;
             }
         }
-        else if(this->option == RSGISExeRasterGIS::meanlitpopattributestatsinmem)
+        else if(this->option == RSGISExeRasterGIS_old::meanlitpopattributestatsinmem)
         {
             cout << "A command to populate an attribute table with mean-lit statistics from an image.\n";
             cout << "Input Image: " << this->inputImage << endl;
@@ -6017,7 +6017,7 @@ void RSGISExeRasterGIS::printParameters()
                 cout << endl;
             }
         }
-        else if(this->option == RSGISExeRasterGIS::meanlitpopattributestats)
+        else if(this->option == RSGISExeRasterGIS_old::meanlitpopattributestats)
         {
             cout << "A command to populate an attribute table with mean-lit statistics from an image in a memory efficient manor.\n";
             cout << "Input Image: " << this->inputImage << endl;
@@ -6066,25 +6066,25 @@ void RSGISExeRasterGIS::printParameters()
                 cout << endl;
             }
         }
-        else if(this->option == RSGISExeRasterGIS::meanlitpopattributestats)
+        else if(this->option == RSGISExeRasterGIS_old::meanlitpopattributestats)
         {
             cout << "A command to export an attribute table to a hdf file.\n";
             cout << "Input Table: " << this->attTableFile << endl;
             cout << "Output Table: " << this->outAttTableFile << endl;
         }
-        else if(this->option == RSGISExeRasterGIS::export2hdf)
+        else if(this->option == RSGISExeRasterGIS_old::export2hdf)
         {
             cout << "A command to export an attribute table to a hdf file.\n";
             cout << "Input Table: " << this->attTableFile << endl;
             cout << "Output Table: " << this->outAttTableFile << endl;
         }
-        else if(this->option == RSGISExeRasterGIS::export2ascii)
+        else if(this->option == RSGISExeRasterGIS_old::export2ascii)
         {
             cout << "A command to export an attribute table to a ascii file.\n";
             cout << "Input Table: " << this->attTableFile << endl;
             cout << "Output Table: " << this->outAttTableFile << endl;
         }
-        else if(this->option == RSGISExeRasterGIS::popmeansumattributes)
+        else if(this->option == RSGISExeRasterGIS_old::popmeansumattributes)
         {
             cout << "A command to populate an attribute table with sum and mean values from an image in a memory efficient and fast manor.\n";
             cout << "Input Image: " << this->inputImage << endl;
@@ -6116,12 +6116,12 @@ void RSGISExeRasterGIS::printParameters()
                 cout << endl;
             }
         }
-        else if(this->option == RSGISExeRasterGIS::printattsummary)
+        else if(this->option == RSGISExeRasterGIS_old::printattsummary)
         {
             cout << "A command to print a summary of an attribute table.\n";
             cout << "Input Image: " << this->inputImage << endl;
         }
-        else if(this->option == RSGISExeRasterGIS::exportsize)
+        else if(this->option == RSGISExeRasterGIS_old::exportsize)
         {
             cout << "A command to export the attribute table size and output to the text file.\n";
             cout << "Input table: " << this->attTableFile << endl;
@@ -6139,7 +6139,7 @@ void RSGISExeRasterGIS::printParameters()
                 throw RSGISException("Output type is not recognised.");
             }
         }
-        else if(this->option == RSGISExeRasterGIS::knnextrapolate)
+        else if(this->option == RSGISExeRasterGIS_old::knnextrapolate)
         {
             cout << "A command to extrapolate values for field in the attribute table using a KNN approach\n";
             cout << "Table: " << this->attTableFile << endl;
@@ -6173,7 +6173,7 @@ void RSGISExeRasterGIS::printParameters()
                 cout << "\t" << *iterNames << endl;
             }
         }
-        else if(this->option == RSGISExeRasterGIS::popboolfield)
+        else if(this->option == RSGISExeRasterGIS_old::popboolfield)
         {
             cout << "A command to populate a bool field within the attribute table\n";
             cout << "Input Table: " << this->attTableFile << endl;
@@ -6194,42 +6194,42 @@ void RSGISExeRasterGIS::printParameters()
 }
 
 
-void RSGISExeRasterGIS::help()
+void RSGISExeRasterGIS_old::help()
 {
 	cout << "<rsgis:commands xmlns:rsgis=\"http://www.rsgislib.org/xml/\">" << endl;
     cout << "<!-- A command to create a new attribute table with pixel counts -->" << endl;
-    cout << "<rsgis:command algor=\"rastergis\" option=\"createattributetable\" clumps=\"clumps.env\" output=\"output.att\" />" << endl;
+    cout << "<rsgis:command algor=\"rastergis_old\" option=\"createattributetable\" clumps=\"clumps.env\" output=\"output.att\" />" << endl;
     cout << "<!-- A command to populate an attribute table with statistics from an image -->" << endl;
-    cout << "<rsgis:command algor=\"rastergis\" option=\"popattributestats\" input=\"image.env\" clumps=\"clumps.env\" table=\"input.att\" tableout=\"output.att\" >" << endl;
+    cout << "<rsgis:command algor=\"rastergis_old\" option=\"popattributestats\" input=\"image.env\" clumps=\"clumps.env\" table=\"input.att\" tableout=\"output.att\" >" << endl;
     cout << "    <rsgis:band band=\"int\" [min=\"field\"] [max=\"field\"] [mean=\"field\"] [sum=\"field\"] [stddev=\"field\"] [median=\"field\"] />" << endl;
     cout << "    <rsgis:band band=\"int\" [min=\"field\"] [max=\"field\"] [mean=\"field\"] [sum=\"field\"] [stddev=\"field\"] [median=\"field\"] />" << endl;
     cout << "    <rsgis:band band=\"int\" [min=\"field\"] [max=\"field\"] [mean=\"field\"] [sum=\"field\"] [stddev=\"field\"] [median=\"field\"] />" << endl;
     cout << "    <rsgis:band band=\"int\" [min=\"field\"] [max=\"field\"] [mean=\"field\"] [sum=\"field\"] [stddev=\"field\"] [median=\"field\"] />" << endl;
     cout << "</rsgis:command>" << endl;
     cout << "<!-- A command to populate an attribute table with statistics from an image where a segment value either above or below is used -->" << endl;
-    cout << "<rsgis:command algor=\"rastergis\" option=\"meanlitbandspopattributestats\" input=\"image.env\" clumps=\"clumps.env\" table=\"input.att\" tableout=\"output.att\" >" << endl;
+    cout << "<rsgis:command algor=\"rastergis_old\" option=\"meanlitbandspopattributestats\" input=\"image.env\" clumps=\"clumps.env\" table=\"input.att\" tableout=\"output.att\" >" << endl;
     cout << "    <rsgis:band band=\"int\" field=\"string\" type=\"below | above\" [min=\"field\"] [max=\"field\"] [mean=\"field\"] [sum=\"field\"] [stddev=\"field\"] [median=\"field\"] />" << endl;
     cout << "    <rsgis:band band=\"int\" field=\"string\" type=\"below | above\" [min=\"field\"] [max=\"field\"] [mean=\"field\"] [sum=\"field\"] [stddev=\"field\"] [median=\"field\"] />" << endl;
     cout << "    <rsgis:band band=\"int\" field=\"string\" type=\"below | above\" [min=\"field\"] [max=\"field\"] [mean=\"field\"] [sum=\"field\"] [stddev=\"field\"] [median=\"field\"] />" << endl;
     cout << "    <rsgis:band band=\"int\" field=\"string\" type=\"below | above\" [min=\"field\"] [max=\"field\"] [mean=\"field\"] [sum=\"field\"] [stddev=\"field\"] [median=\"field\"] />" << endl;
     cout << "</rsgis:command>" << endl;
     cout << "<!-- A command to populate an attribute table with statistics from an image where a segment value either above or below is used -->" << endl;
-    cout << "<rsgis:command algor=\"rastergis\" option=\"meanlitpopattributestats\" input=\"image.env\" clumps=\"clumps.env\" table=\"input.att\" tableout=\"output.att\" field=\"meanlit\" meanlitimage=\"image.env\" meanlitband=\"int\" meanlittype=\"below | above\" >" << endl;
+    cout << "<rsgis:command algor=\"rastergis_old\" option=\"meanlitpopattributestats\" input=\"image.env\" clumps=\"clumps.env\" table=\"input.att\" tableout=\"output.att\" field=\"meanlit\" meanlitimage=\"image.env\" meanlitband=\"int\" meanlittype=\"below | above\" >" << endl;
     cout << "    <rsgis:band band=\"int\" [min=\"field\"] [max=\"field\"] [mean=\"field\"] [sum=\"field\"] [stddev=\"field\"] [median=\"field\"] />" << endl;
     cout << "    <rsgis:band band=\"int\" [min=\"field\"] [max=\"field\"] [mean=\"field\"] [sum=\"field\"] [stddev=\"field\"] [median=\"field\"] />" << endl;
     cout << "    <rsgis:band band=\"int\" [min=\"field\"] [max=\"field\"] [mean=\"field\"] [sum=\"field\"] [stddev=\"field\"] [median=\"field\"] />" << endl;
     cout << "    <rsgis:band band=\"int\" [min=\"field\"] [max=\"field\"] [mean=\"field\"] [sum=\"field\"] [stddev=\"field\"] [median=\"field\"] />" << endl;
     cout << "</rsgis:command>" << endl;
     cout << "<!-- A command to populate attribute table with mean image values -->" << endl;
-    cout << "<rsgis:command algor=\"rastergis\" option=\"popattributemean\" input=\"image.env\" clumps=\"clumps.env\" output=\"output.att\" prefix=\"string\" />" << endl;
+    cout << "<rsgis:command algor=\"rastergis_old\" option=\"popattributemean\" input=\"image.env\" clumps=\"clumps.env\" output=\"output.att\" prefix=\"string\" />" << endl;
     cout << "<!-- A command to export table attributes to an image -->" << endl;
-    cout << "<rsgis:command algor=\"rastergis\" option=\"exporttable2img\" clumps=\"clumps.env\" table=\"table.att\" output=\"image.env\" format=\"GDAL Format\" >" << endl;
+    cout << "<rsgis:command algor=\"rastergis_old\" option=\"exporttable2img\" clumps=\"clumps.env\" table=\"table.att\" output=\"image.env\" format=\"GDAL Format\" >" << endl;
     cout << "    <rsgis:band attribute=\"name\" />" << endl;
     cout << "    <rsgis:band attribute=\"name\" />" << endl;
     cout << "    <rsgis:band attribute=\"name\" />" << endl;
     cout << "</rsgis:command>" << endl;
     cout << "<!-- A command to classify the attribute table using boolean logic  -->" << endl;
-    cout << "<rsgis:command algor=\"rastergis\" option=\"boolclasstable\" table=\"input.att\" tableout=\"output.att\" >" << endl;
+    cout << "<rsgis:command algor=\"rastergis_old\" option=\"boolclasstable\" table=\"input.att\" tableout=\"output.att\" >" << endl;
     cout << "    <rsgis:if field=\"string\" value=\"number\">" << endl;
     cout << "        <rsgis:exp type=\"and\"></rsgis:exp>" << endl;
     cout << "        <rsgis:exp type=\"or\"></rsgis:exp>" << endl;
@@ -6254,13 +6254,13 @@ void RSGISExeRasterGIS::help()
     cout << "    <rsgis:else [field=\"string\" value=\"number\"] />" << endl;
     cout << "</rsgis:command>" << endl;
     cout << "<!-- A command to add attributes to an attribute fields to the table -->" << endl;
-    cout << "<rsgis:command algor=\"rastergis\" option=\"addfields\" table=\"input.att\" tableout=\"output.att\" >" << endl;
+    cout << "<rsgis:command algor=\"rastergis_old\" option=\"addfields\" table=\"input.att\" tableout=\"output.att\" >" << endl;
     cout << "    <rsgis:attribute name=\"string\" datatype=\"rsgis_bool | rsgis_int | rsgis_float | rsgis_string\" />" << endl;
     cout << "    <rsgis:attribute name=\"string\" datatype=\"rsgis_bool | rsgis_int | rsgis_float | rsgis_string\" />" << endl;
     cout << "    <rsgis:attribute name=\"string\" datatype=\"rsgis_bool | rsgis_int | rsgis_float | rsgis_string\" />" << endl;
     cout << "</rsgis:command>" << endl;
     cout << "<!-- A command to region grow regions of the dataset using threshold -->" << endl;
-    cout << "<rsgis:command algor=\"rastergis\" option=\"regiongrowthres\" clumps=\"clumps.env\" table=\"input.att\" tableout=\"output.att\" class=\"attribute_name\" classval=\"int\" >" << endl;
+    cout << "<rsgis:command algor=\"rastergis_old\" option=\"regiongrowthres\" clumps=\"clumps.env\" table=\"input.att\" tableout=\"output.att\" class=\"attribute_name\" classval=\"int\" >" << endl;
     cout << "    <rsgis:if field=\"string\" value=\"number\">" << endl;
     cout << "        <rsgis:exp type=\"and\"></rsgis:exp>" << endl;
     cout << "        <rsgis:exp type=\"or\"></rsgis:exp>" << endl;
@@ -6285,31 +6285,31 @@ void RSGISExeRasterGIS::help()
     cout << "    <rsgis:else [field=\"string\" value=\"number\"] />" << endl;
     cout << "</rsgis:command>" << endl;
     cout << "<!-- A command to find the majority category intersecting with each clump -->" << endl;
-    cout << "<rsgis:command algor=\"rastergis\" option=\"findmajority\" catagories=\"image.env\" clumps=\"clumps.env\" table=\"input.att\" tableout=\"output.att\" pxlareafield=\"attribute_name\" majoritycatfield=\"attribute_name\" majorityratiofield=\"attribute_name\" />" << endl;
+    cout << "<rsgis:command algor=\"rastergis_old\" option=\"findmajority\" catagories=\"image.env\" clumps=\"clumps.env\" table=\"input.att\" tableout=\"output.att\" pxlareafield=\"attribute_name\" majoritycatfield=\"attribute_name\" majorityratiofield=\"attribute_name\" />" << endl;
     cout << "<!-- A command to populate the attribute table with the number of pixels in the clumps image which intersect with the polygon -->" << endl;
-    cout << "<rsgis:command algor=\"rastergis\" option=\"countpolyintersects\" vector=\"polys.shp\" clumps=\"clumps.env\" table=\"input.att\" tableout=\"output.att\" field=\"attribute_name\" method=\"polyContainsPixel | polyContainsPixelCenter | polyOverlapsPixel | polyOverlapsOrContainsPixel | pixelContainsPoly | pixelContainsPolyCenter | adaptive | envelope\" />" << endl;
+    cout << "<rsgis:command algor=\"rastergis_old\" option=\"countpolyintersects\" vector=\"polys.shp\" clumps=\"clumps.env\" table=\"input.att\" tableout=\"output.att\" field=\"attribute_name\" method=\"polyContainsPixel | polyContainsPixelCenter | polyOverlapsPixel | polyOverlapsOrContainsPixel | pixelContainsPoly | pixelContainsPolyCenter | adaptive | envelope\" />" << endl;
     cout << "<!-- A command to calculate an attribute from other attributes -->" << endl;
-    cout << "<rsgis:command algor=\"rastergis\" option=\"calcattributes\" table=\"input.att\" tableout=\"output.att\" field=\"attribute_name\" datatype=\"rsgis_int | rsgis_float\" [expression=\"MU Parser Expression\" | expressionfile=\"file.txt\"] >" << endl;
+    cout << "<rsgis:command algor=\"rastergis_old\" option=\"calcattributes\" table=\"input.att\" tableout=\"output.att\" field=\"attribute_name\" datatype=\"rsgis_int | rsgis_float\" [expression=\"MU Parser Expression\" | expressionfile=\"file.txt\"] >" << endl;
     cout << "    <rsgis:attribute variable=\"string\" name=\"string\" />" << endl;
     cout << "    <rsgis:attribute variable=\"string\" name=\"string\" />" << endl;
     cout << "    <rsgis:attribute variable=\"string\" name=\"string\" />" << endl;
     cout << "</rsgis:command>" << endl;
     cout << "<!-- A command export an attribute table to a GDAL Dataset with a raster attribute table -->" << endl;
-    cout << "<rsgis:command algor=\"rastergis\" option=\"export2gdal\" clumps=\"clumps.env\" table=\"input.att\" output=\"output.img\" format=\"GDAL Format\" />" << endl;
+    cout << "<rsgis:command algor=\"rastergis_old\" option=\"export2gdal\" clumps=\"clumps.env\" table=\"input.att\" output=\"output.img\" format=\"GDAL Format\" />" << endl;
     cout << "<!-- A command to populate an attribute table with statistics from an image across all image bands-->" << endl;
-    cout << "<rsgis:command algor=\"rastergis\" option=\"popattributestatsallbands\" input=\"image.env\" clumps=\"clumps.env\" table=\"input.att\" tableout=\"output.att\" [min=\"field\"] [max=\"field\"] [mean=\"field\"] [sum=\"field\"] [stddev=\"field\"] [median=\"field\"] />" << endl;
+    cout << "<rsgis:command algor=\"rastergis_old\" option=\"popattributestatsallbands\" input=\"image.env\" clumps=\"clumps.env\" table=\"input.att\" tableout=\"output.att\" [min=\"field\"] [max=\"field\"] [mean=\"field\"] [sum=\"field\"] [stddev=\"field\"] [median=\"field\"] />" << endl;
     cout << "<!-- A command to create summary statistics for a field in the attribute table -->" << endl;
-    cout << "<rsgis:command algor=\"rastergis\" option=\"summarisefield\" table=\"input.att\" output=\"output.txt\" field=\"attribute_name\" [min=\"yes\"] [max=\"yes\"] [mean=\"yes\"] [sum=\"yes\"] [stddev=\"yes\"] [median=\"yes\"] />" << endl;
+    cout << "<rsgis:command algor=\"rastergis_old\" option=\"summarisefield\" table=\"input.att\" output=\"output.txt\" field=\"attribute_name\" [min=\"yes\"] [max=\"yes\"] [mean=\"yes\"] [sum=\"yes\"] [stddev=\"yes\"] [median=\"yes\"] />" << endl;
     cout << "<!-- A command to find the neighbours of the clumps and save as a neighbours file. -->" << endl;
-    cout << "<rsgis:command algor=\"rastergis\" option=\"findneighbours\" clumps=\"clumps.env\" output=\"neighbours.cnf\" />" << endl;
+    cout << "<rsgis:command algor=\"rastergis_old\" option=\"findneighbours\" clumps=\"clumps.env\" output=\"neighbours.cnf\" />" << endl;
     cout << "<!-- A command to find mean euclidean distance to neighbours -->" << endl;
-    cout << "<rsgis:command algor=\"rastergis\" option=\"meaneucdist2neighbours\" table=\"input.att\" neighbours=\"neighbours.cnf\" tableout=\"output.att\" meanfield=\"attribute_name\" maxfield=\"attribute_name\" minfield=\"attribute_name\" >" << endl;
+    cout << "<rsgis:command algor=\"rastergis_old\" option=\"meaneucdist2neighbours\" table=\"input.att\" neighbours=\"neighbours.cnf\" tableout=\"output.att\" meanfield=\"attribute_name\" maxfield=\"attribute_name\" minfield=\"attribute_name\" >" << endl;
     cout << "    <rsgis:attribute name=\"string\" />" << endl;
     cout << "    <rsgis:attribute name=\"string\" />" << endl;
     cout << "    <rsgis:attribute name=\"string\" />" << endl;
     cout << "</rsgis:command>" << endl;
     cout << "<!-- A command to calculate the euclidean distance to individual pixels within a segment -->" << endl;
-    cout << "<rsgis:command algor=\"rastergis\" option=\"calcintrapxleucdist\" input=\"image.env\" clumps=\"clumps.env\" table=\"input.att\" tableout=\"output.att\" [min=\"field\"] [max=\"field\"] [mean=\"field\"] [sum=\"field\"] [stddev=\"field\"] [median=\"field\"] >" << endl;
+    cout << "<rsgis:command algor=\"rastergis_old\" option=\"calcintrapxleucdist\" input=\"image.env\" clumps=\"clumps.env\" table=\"input.att\" tableout=\"output.att\" [min=\"field\"] [max=\"field\"] [mean=\"field\"] [sum=\"field\"] [stddev=\"field\"] [median=\"field\"] >" << endl;
     cout << "    <rsgis:band band=\"int\" name=\"string\" />" << endl;
     cout << "    <rsgis:band band=\"int\" name=\"string\" />" << endl;
     cout << "    <rsgis:band band=\"int\" name=\"string\" />" << endl;
@@ -6318,17 +6318,17 @@ void RSGISExeRasterGIS::help()
     cout << "</rsgis:commands>" << endl;
 }
 
-string RSGISExeRasterGIS::getDescription()
+string RSGISExeRasterGIS_old::getDescription()
 {
 	return "An interface to the available raster GIS functionality.";
 }
 
-string RSGISExeRasterGIS::getXMLSchema()
+string RSGISExeRasterGIS_old::getXMLSchema()
 {
 	return "NOT DONE!";
 }
 
-RSGISExeRasterGIS::~RSGISExeRasterGIS()
+RSGISExeRasterGIS_old::~RSGISExeRasterGIS_old()
 {
 	
 }
