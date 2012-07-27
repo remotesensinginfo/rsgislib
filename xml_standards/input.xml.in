@@ -360,7 +360,8 @@
         </rsgis:if>
 		<rsgis:else />
     </rsgis:command>
-
+	<!-- A copy an attribute table from an existing GDAL datasets and add it to another layer -->
+    <rsgis:command algor="rastergis" option="copyGDALATT" table="input.kea" image="output.kea" />
 
 
 

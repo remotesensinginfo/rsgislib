@@ -112,7 +112,8 @@ public:
         exportsize,
         popattributestatsthresholded,
         knnextrapolate,
-        popboolfield
+        popboolfield,
+        copyGDALATT
     };
     
     enum outFileTypeAddition 

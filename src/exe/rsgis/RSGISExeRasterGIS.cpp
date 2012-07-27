@@ -73,6 +73,7 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
     XMLCh *optionPopAttributeStatsThresholded = XMLString::transcode("popattributestatsthresholded");
     XMLCh *optionKNNExtrapolate = XMLString::transcode("knnextrapolate");
     XMLCh *optionPopBoolField = XMLString::transcode("popboolfield");
+    XMLCh *optionCopyGDALATT = XMLString::transcode("copyGDALATT");
             
     XMLCh *optionRSGISBool = XMLString::transcode("rsgis_bool");
     XMLCh *optionRSGISInt = XMLString::transcode("rsgis_int");
@@ -3362,6 +3363,38 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
             throw RSGISXMLArgumentsException(e.what());
         }
 	}
+    else if(XMLString::equals(optionCopyGDALATT, optionXML))
+	{		
+		this->option = RSGISExeRasterGIS::copyGDALATT;
+        
+        XMLCh *tableXMLStr = XMLString::transcode("table");
+        if(argElement->hasAttribute(tableXMLStr))
+        {
+            char *charValue = XMLString::transcode(argElement->getAttribute(tableXMLStr));
+            this->inputImage = string(charValue);
+            XMLString::release(&charValue);
+        }
+        else
+        {
+            throw RSGISXMLArgumentsException("No \'table\' attribute was provided.");
+        }
+        XMLString::release(&tableXMLStr);
+        
+        
+        XMLCh *imageXMLStr = XMLString::transcode("image");
+        if(argElement->hasAttribute(imageXMLStr))
+        {
+            char *charValue = XMLString::transcode(argElement->getAttribute(imageXMLStr));
+            this->clumpsImage = string(charValue);
+            this->attInMemory = true;
+            XMLString::release(&charValue);
+        }
+        else
+        {
+            throw RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+        }
+        XMLString::release(&imageXMLStr);
+	}
     else
 	{
 		string message = string("The option (") + string(XMLString::transcode(optionXML)) + string(") is not known: RSGISExeRasterGIS.");
@@ -3400,6 +3433,7 @@ void RSGISExeRasterGIS::retrieveParameters(DOMElement *argElement) throw(RSGISXM
     XMLString::release(&optionPopAttributeStatsThresholded);
     XMLString::release(&optionKNNExtrapolate);
     XMLString::release(&optionPopBoolField);
+    XMLString::release(&optionCopyGDALATT);
     
     XMLString::release(&optionRSGISBool);
     XMLString::release(&optionRSGISInt);
@@ -4142,7 +4176,7 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
                 
                 if(outputImagePathProvide)
                 {
-                    GDALDataset *clumpsDataset = (GDALDataset *) GDALOpen(this->clumpsImage.c_str(), GA_ReadOnly);
+                    GDALDataset *clumpsDataset = (GDALDataset *) GDALOpen   (this->clumpsImage.c_str(), GA_ReadOnly);
                     if(clumpsDataset == NULL)
                     {
                         string message = string("Could not open image ") + this->clumpsImage;
@@ -5567,6 +5601,44 @@ void RSGISExeRasterGIS::runAlgorithm() throw(RSGISException)
                 throw e;
             }
         }
+        else if(this->option == RSGISExeRasterGIS::copyGDALATT)
+		{
+            cout << "Export an attribute table to a GDAL Dataset with a raster attribute table\n";
+            cout << "Input Table: " << this->inputImage << endl;
+            cout << "Output Image: " << this->clumpsImage << endl;
+
+            
+            GDALAllRegister();
+            try
+            {
+                GDALDataset *inputDataset = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_ReadOnly);
+                if(inputDataset == NULL)
+                {
+                    string message = string("Could not open image ") + this->inputImage;
+                    throw RSGISImageException(message.c_str());
+                }
+                
+                GDALDataset *outRATDataset = (GDALDataset *) GDALOpen(this->clumpsImage.c_str(), GA_Update);
+                if(outRATDataset == NULL)
+                {
+                    string message = string("Could not open image ") + this->clumpsImage;
+                    throw RSGISImageException(message.c_str());
+                }
+                
+                cout << "Import attribute table\n";
+                const GDALRasterAttributeTable *gdalAtt = inputDataset->GetRasterBand(1)->GetDefaultRAT();
+                
+                cout << "Adding RAT\n";
+                outRATDataset->GetRasterBand(1)->SetDefaultRAT(gdalAtt);
+                
+                GDALClose(inputDataset);
+                GDALClose(outRATDataset);
+            }
+            catch(RSGISException &e)
+            {
+                throw e;
+            }	
+		}
 		else
 		{
 			cout << "The option is not recognised: RSGISExeRasterGIS\n";
