@@ -1109,6 +1109,8 @@ set(EXE_RSGISEXE_CPP
 	${RSGIS_SRC_EXE_DIR}/RSGISExeRasterGIS_old.h
 	${RSGIS_SRC_EXE_DIR}/RSGISExeImageMorphology.cpp
 	${RSGIS_SRC_EXE_DIR}/RSGISExeImageMorphology.h
+	${RSGIS_SRC_EXE_DIR}/RSGISExeRasterGIS.cpp
+	${RSGIS_SRC_EXE_DIR}/RSGISExeRasterGIS.h
 	${RSGIS_SRC_EXE_DIR}/main.cpp)
 
 ###############################################################################
