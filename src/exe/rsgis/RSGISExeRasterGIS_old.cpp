@@ -6320,7 +6320,7 @@ void RSGISExeRasterGIS_old::help()
 
 string RSGISExeRasterGIS_old::getDescription()
 {
-	return "An interface to the available raster GIS functionality.";
+	return "DEPRECATED!! An interface to the available raster GIS functionality.";
 }
 
 string RSGISExeRasterGIS_old::getXMLSchema()
