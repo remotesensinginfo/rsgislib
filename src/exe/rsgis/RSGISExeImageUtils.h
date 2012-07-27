@@ -4,7 +4,7 @@
  *
  *  Created by Pete Bunting on 11/12/2008.
  *  Copyright 2008 RSGISLib.
- * 
+ *
  *  RSGISLib is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -26,6 +26,10 @@
 #include <string>
 #include <iostream>
 #include <limits>
+
+#include <boost/lexical_cast.hpp>
+
+#include "geos/geom/Envelope.h"
 
 #include "common/RSGISException.h"
 #include "common/RSGISXMLArgumentsException.h"
@@ -80,11 +84,20 @@
 
 namespace rsgisexe{
 
-class RSGISExeImageUtils : public rsgis::RSGISAlgorithmParameters
+using namespace std;
+using namespace xercesc;
+using namespace rsgis;
+using namespace rsgis::math;
+using namespace rsgis::img;
+using namespace rsgis::utils;
+using namespace rsgis::vec;
+using namespace rsgis::datastruct;
+
+class RSGISExeImageUtils : public RSGISAlgorithmParameters
 	{
 	public:
-		
-		enum options 
+
+		enum options
 		{
 			none,
 			colour,
@@ -110,16 +123,16 @@ class RSGISExeImageUtils : public rsgis::RSGISAlgorithmParameters
 			pansharpen,
             colourimagebands,
             createslices,
+            createtiles,
             clump,
             imageComposite,
             relabel,
             assignproj,
             popimgstats,
             createcopy,
-            createKMLFile,
-            assignspatialinfo
+            createKMLFile
 		};
-		
+
 		enum interpolators
 		{
 			cubic,
@@ -128,7 +141,7 @@ class RSGISExeImageUtils : public rsgis::RSGISAlgorithmParameters
 			nn,
 			trangular
 		};
-		
+
 		enum stretches
 		{
 			linearMinMax,
@@ -139,36 +152,36 @@ class RSGISExeImageUtils : public rsgis::RSGISAlgorithmParameters
 			logarithmic,
 			powerLaw
 		};
-		
+
 		RSGISExeImageUtils();
-		virtual rsgis::RSGISAlgorithmParameters* getInstance();
-		virtual void retrieveParameters(xercesc::DOMElement *argElement) throw(rsgis::RSGISXMLArgumentsException);
-		virtual void runAlgorithm() throw(rsgis::RSGISException);
+		virtual RSGISAlgorithmParameters* getInstance();
+		virtual void retrieveParameters(DOMElement *argElement) throw(RSGISXMLArgumentsException);
+		virtual void runAlgorithm() throw(RSGISException);
 		virtual void printParameters();
-		virtual std::string getDescription();
-		virtual std::string getXMLSchema();
+		virtual string getDescription();
+		virtual string getXMLSchema();
 		virtual void help();
 		~RSGISExeImageUtils();
 	protected:
 		options option;
 		interpolators interpolator;
 		stretches stretchType;
-		std::string inputImage;
-		std::string outputImage;
-		std::string *inputImages;
-		std::string inputVector;
-        std::string inputCSV;
-		std::string outputFile;
-		std::string filenameAttribute;
-		std::string imageMask;
-		std::string inputDIR;
-		std::string outputDIR;
-		std::string inMatrixfile;
-		std::string proj;
-        std::string projFile;
-        std::string imageFormat;
-        std::string lutMatrixFile;
-        rsgis::img::ClassColour **classColour;
+		string inputImage;
+		string outputImage;
+		string *inputImages;
+		string inputVector;
+        string inputCSV;
+		string outputFile;
+		string filenameAttribute;
+		string imageMask;
+		string inputDIR;
+		string outputDIR;
+		string inMatrixfile;
+		string proj;
+        string projFile;
+        string imageFormat;
+        string lutMatrixFile;
+		ClassColour **classColour;
 		float nodataValue;
 		float skipValue;
 		float skipUpperThreash;
@@ -182,7 +195,7 @@ class RSGISExeImageUtils : public rsgis::RSGISAlgorithmParameters
 		bool projFromImage;
 		int imgBand1;
 		int imgBand2;
-		std::string bandFloatValuesVector;
+		string bandFloatValuesVector;
 		int order;
 		int window;
 		int height;
@@ -194,8 +207,6 @@ class RSGISExeImageUtils : public rsgis::RSGISAlgorithmParameters
 		float resolution;
 		float xRes;
 		float yRes;
-        float xRot;
-		float yRot;
 		float percent;
 		float stddev;
 		float power;
@@ -203,20 +214,20 @@ class RSGISExeImageUtils : public rsgis::RSGISAlgorithmParameters
 		float upperRangeValue;
 		bool mosaicSkipVals;
 		bool mosaicSkipThreash;
-		rsgis::img::noiseType noise;
+		noiseType noise;
 		float scale;
         bool definiensTiles;
 		int panWinSize;
         bool processInMemory;
         unsigned int compositeBands;
-        rsgis::img::compositeStat outCompStat;
+        compositeStat outCompStat;
         bool ignoreZeros;
         GDALDataType outDataType;
         bool calcImgPyramids;
         bool useIgnoreVal;
         bool bandsDefined;
-        std::vector<int> bands;
-        std::string outKMLFile;
+        vector<int> bands;
+        string outKMLFile;
 	};
 }
 #endif
