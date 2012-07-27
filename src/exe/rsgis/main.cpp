@@ -61,7 +61,7 @@
 #include "RSGISExeImageRegistration.h"
 #include "RSGISExeImageCalibration.h"
 #include "RSGISExeElevationDataTools.h"
-#include "RSGISExeRasterGIS.h"
+#include "RSGISExeRasterGIS_old.h"
 #include "RSGISExeImageMorphology.h"
 
 class Control

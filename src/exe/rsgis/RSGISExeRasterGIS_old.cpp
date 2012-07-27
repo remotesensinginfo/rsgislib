@@ -26,7 +26,7 @@ namespace rsgisexe{
 
 RSGISExeRasterGIS::RSGISExeRasterGIS() : RSGISAlgorithmParameters()
 {
-	this->algorithm = "rastergis";
+	this->algorithm = "rastergis_old";
 	
 	this->option = RSGISExeRasterGIS::none;
 }
