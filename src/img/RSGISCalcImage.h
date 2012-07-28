@@ -62,7 +62,6 @@ namespace rsgis
 				void calcImageWindowData(GDALDataset **datasets, int numDS, std::string outputImage, int windowSize, std::string gdalFormat="ENVI") throw(RSGISImageCalcException,RSGISImageBandException);
                 void calcImageWindowData(GDALDataset **datasets, int numDS, GDALDataset *outputImageDS, int windowSize) throw(RSGISImageCalcException,RSGISImageBandException);
                 void calcImageWindowDataExtent(GDALDataset **datasets, int numDS, std::string outputImage, int windowSize, std::string gdalFormat="ENVI") throw(RSGISImageCalcException,RSGISImageBandException);
-				void calcImageWindowDataLoop(GDALDataset **datasets, int numDS, std::string outputImage, int windowSize, std::string gdalFormat="ENVI") throw(RSGISImageCalcException,RSGISImageBandException);	
 				void calcImageWithinPolygon(GDALDataset **datasets, int numDS, std::string outputImage, geos::geom::Envelope *env, geos::geom::Polygon *poly, float nodata, pixelInPolyOption pixelPolyOption, std::string gdalFormat="ENVI") throw(RSGISImageCalcException,RSGISImageBandException);
 				void calcImageWithinPolygon(GDALDataset **datasets, int numDS, geos::geom::Envelope *env, geos::geom::Polygon *poly, pixelInPolyOption pixelPolyOption) throw(RSGISImageCalcException,RSGISImageBandException);
                 void calcImageWithinPolygonExtent(GDALDataset **datasets, int numDS, geos::geom::Envelope *env, geos::geom::Polygon *poly, pixelInPolyOption pixelPolyOption) throw(RSGISImageCalcException,RSGISImageBandException);

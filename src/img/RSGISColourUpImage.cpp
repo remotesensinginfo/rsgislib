@@ -66,31 +66,6 @@ namespace rsgis{ namespace img{
 		}
 	}
 	
-	void RSGISColourUpImage::calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException)
-	{
-		throw RSGISImageCalcException("Not Implemented");
-	}
-	
-	void RSGISColourUpImage::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(RSGISImageCalcException)
-	{
-		throw RSGISImageCalcException("Not Implemented");
-	}
-	
-	void RSGISColourUpImage::calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(RSGISImageCalcException)
-	{
-		throw RSGISImageCalcException("Not Implemented");
-	}
-	
-	void RSGISColourUpImage::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException)
-	{
-		throw RSGISImageCalcException("Not Implemented");
-	}
-
-	bool RSGISColourUpImage::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException)
-	{
-		throw RSGISImageCalcException("Not Implemented");
-	}
-	
 	RSGISColourUpImage::~RSGISColourUpImage()
 	{
 		
@@ -128,31 +103,6 @@ namespace rsgis{ namespace img{
 				break;
 			}
 		}
-	}
-	
-	void RSGISColourUpImageBand::calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException)
-	{
-		throw RSGISImageCalcException("Not Implemented");
-	}
-	
-	void RSGISColourUpImageBand::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(RSGISImageCalcException)
-	{
-		throw RSGISImageCalcException("Not Implemented");
-	}
-	
-	void RSGISColourUpImageBand::calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(RSGISImageCalcException)
-	{
-		throw RSGISImageCalcException("Not Implemented");
-	}
-	
-	void RSGISColourUpImageBand::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException)
-	{
-		throw RSGISImageCalcException("Not Implemented");
-	}
-    
-	bool RSGISColourUpImageBand::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException)
-	{
-		throw RSGISImageCalcException("Not Implemented");
 	}
 	
 	RSGISColourUpImageBand::~RSGISColourUpImageBand()
