@@ -651,6 +651,8 @@ set(LIB_RADAR_INVERSION_CPP
 # Files within the registration Library.
 set(LIB_RASTERGIS_H
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISAttributeTable.h
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISAttributeTableMem.h
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISAttributeTableHDF.h
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISAttributeTableNeighbours.h
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISCreateNewAttributeTable.h
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISPopulateAttributeTable.h
@@ -659,7 +661,9 @@ set(LIB_RASTERGIS_H
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindClumpNeighbours.h
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindClumpCategoryMajority.h
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindMeanDist2Neighbours.h 
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISKNNATTable.h )
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISKNNATTable.h
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISCalcClusterLocation.h
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISCalcEucDistanceInAttTable.h )
 	
 set(LIB_RASTERGIS_CPP
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISAttributeTable.cpp
@@ -685,7 +689,11 @@ set(LIB_RASTERGIS_CPP
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindMeanDist2Neighbours.cpp
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindMeanDist2Neighbours.h
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISKNNATTable.cpp
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISKNNATTable.h )
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISKNNATTable.h 
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISCalcClusterLocation.cpp
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISCalcClusterLocation.h
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISCalcEucDistanceInAttTable.cpp
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISCalcEucDistanceInAttTable.h )
 ###############################################################################
 
 ###############################################################################
