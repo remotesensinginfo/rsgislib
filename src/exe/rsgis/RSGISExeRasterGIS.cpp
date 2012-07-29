@@ -275,6 +275,26 @@ namespace rsgisexe{
                 std::cout << "Eastings Field: " << this->eastingsField << std::endl;
                 std::cout << "Northings Field: " << this->northingsField << std::endl;
                 
+                try
+                {
+                    GDALAllRegister();
+                    
+                    GDALDataset *inputDataset = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_Update);
+                    if(inputDataset == NULL)
+                    {
+                        std::string message = std::string("Could not open image ") + this->inputImage;
+                        throw rsgis::RSGISImageException(message.c_str());
+                    }
+                    
+                    rsgis::rastergis::RSGISCalcClusterLocation calcLoc;
+                    calcLoc.populateAttWithClumpLocation(inputDataset, eastingsField, northingsField);
+                    
+                    GDALClose(inputDataset);
+                }
+                catch(rsgis::RSGISException &e)
+                {
+                    throw e;
+                }
                 
             }
             else if(this->option == RSGISExeRasterGIS::eucdistfromfeat)
@@ -289,7 +309,26 @@ namespace rsgisexe{
                     std::cout << "\tField: " << (*iterFields) << std::endl;
                 }
                 
+                try
+                {
+                    GDALAllRegister();
+                    
+                    GDALDataset *inputDataset = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_Update);
+                    if(inputDataset == NULL)
+                    {
+                        std::string message = std::string("Could not open image ") + this->inputImage;
+                        throw rsgis::RSGISImageException(message.c_str());
+                    }
                 
+                    rsgis::rastergis::RSGISCalcEucDistanceInAttTable calcDist;
+                    calcDist.calcEucDist(inputDataset, this->fid, this->outputField, this->fields);
+                    
+                    GDALClose(inputDataset);
+                }
+                catch(rsgis::RSGISException &e)
+                {
+                    throw e;
+                }
                 
             }
             else

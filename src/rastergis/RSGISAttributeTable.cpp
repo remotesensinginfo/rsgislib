@@ -1383,9 +1383,9 @@ namespace rsgis{namespace rastergis{
                 }
             }
             
-            rasterAtt->SetRowCount(this->getSize());
+            rasterAtt->SetRowCount(this->getSize()+1);
             
-            size_t rowCounter = 0;
+            size_t rowCounter = 1;
             for(this->start(); this->end(); ++(*this))
             {
                 rasterAtt->SetValue(rowCounter, fidRATIdx, ((int)(*(*this))->fid+1));

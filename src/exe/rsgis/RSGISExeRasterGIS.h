@@ -38,6 +38,9 @@
 #include "utils/RSGISTextUtils.h"
 #include "utils/RSGISFileUtils.h"
 
+#include "rastergis/RSGISCalcClusterLocation.h"
+#include "rastergis/RSGISCalcEucDistanceInAttTable.h"
+
 #include "gdal_priv.h"
 #include "ogrsf_frmts.h"
 #include "ogr_api.h"
