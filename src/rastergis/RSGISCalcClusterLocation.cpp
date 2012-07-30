@@ -37,12 +37,11 @@ namespace rsgis{namespace rastergis{
             
             int numRows = attTable->GetRowCount();
             
-            if(numRows == 0)
-            {
-                double minVal = 0;
-                double maxVal = 0;
-                dataset->GetRasterBand(1)->GetStatistics(false, true, &minVal, &maxVal, NULL, NULL);
-                
+            double maxVal = 0;
+            dataset->GetRasterBand(1)->GetStatistics(false, true, NULL, &maxVal, NULL, NULL);
+            
+            if(maxVal > numRows)
+            {                
                 attTable->SetRowCount(maxVal+1);
             }
             
@@ -123,6 +122,7 @@ namespace rsgis{namespace rastergis{
             }
             
             dataset->GetRasterBand(1)->SetDefaultRAT(attTable);
+            dataset->GetRasterBand(1)->SetMetadataItem("LAYER_TYPE", "thematic");
             delete attTable;
         }
         catch(RSGISException &e)

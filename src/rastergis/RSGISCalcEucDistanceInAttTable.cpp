@@ -41,7 +41,7 @@ namespace rsgis{namespace rastergis{
         {
             rsgis::RSGISAttributeTableException("There is no attribute table present.");
         }
-        
+                
         int numColumns = attTable->GetColumnCount();
         int outColIdx = 0;
         bool *foundIdx = new bool[inColumns.size()];
@@ -117,6 +117,7 @@ namespace rsgis{namespace rastergis{
         }
         
         dataset->GetRasterBand(1)->SetDefaultRAT(attTable);
+        dataset->GetRasterBand(1)->SetMetadataItem("LAYER_TYPE", "thematic");
     }
     
     double RSGISCalcEucDistanceInAttTable::getEuclideanDistance(std::vector<double> vals1, std::vector<double> vals2)throw(rsgis::math::RSGISMathException)

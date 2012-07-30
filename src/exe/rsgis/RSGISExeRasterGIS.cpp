@@ -345,6 +345,7 @@ namespace rsgisexe{
                     
                     std::cout << "Adding RAT\n";
                     outRATDataset->GetRasterBand(1)->SetDefaultRAT(gdalAtt);
+                    outRATDataset->GetRasterBand(1)->SetMetadataItem("LAYER_TYPE", "thematic");
                     
                     GDALClose(inputDataset);
                     GDALClose(outRATDataset);
