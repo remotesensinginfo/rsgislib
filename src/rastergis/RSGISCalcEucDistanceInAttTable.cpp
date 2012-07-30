@@ -62,7 +62,6 @@ namespace rsgis{namespace rastergis{
             {
                 if(!foundOutCol && (std::string(attTable->GetNameOfCol(i)) == outColumn))
                 {
-                    std::cout << "Out col found = " << i << std::endl;
                     foundOutCol = true;
                     outColIdx = i;
                 }

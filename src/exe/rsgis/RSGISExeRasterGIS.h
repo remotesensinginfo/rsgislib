@@ -40,6 +40,7 @@
 
 #include "rastergis/RSGISCalcClusterLocation.h"
 #include "rastergis/RSGISCalcEucDistanceInAttTable.h"
+#include "rastergis/RSGISFindTopNWithinDist.h"
 
 #include "gdal_priv.h"
 #include "ogrsf_frmts.h"
@@ -59,7 +60,8 @@ namespace rsgisexe{
             none,
             copyGDALATT,
             spatiallocation,
-            eucdistfromfeat
+            eucdistfromfeat,
+            findtopn
         };
         
         RSGISExeRasterGIS();
@@ -78,8 +80,12 @@ namespace rsgisexe{
         std::string outputField;
         std::string northingsField;
         std::string eastingsField;
+        std::string spatialDistField;
+        std::string distanceField;
         std::vector<std::string> fields;
         size_t fid;
+        unsigned int nFeatures;
+        float distThreshold;
         
     };
     

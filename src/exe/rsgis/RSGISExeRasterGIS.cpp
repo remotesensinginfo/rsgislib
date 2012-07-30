@@ -47,6 +47,7 @@ namespace rsgisexe{
         XMLCh *optionCopyGDALATT = xercesc::XMLString::transcode("copyGDALATT");
         XMLCh *optionSpatialLocation = xercesc::XMLString::transcode("spatiallocation");
         XMLCh *optionEucDistFromFeat = xercesc::XMLString::transcode("eucdistfromfeat");
+        XMLCh *optionFindTopN = xercesc::XMLString::transcode("findtopn");
         
         
         const XMLCh *algorNameEle = argElement->getAttribute(algorXMLStr);
@@ -206,6 +207,90 @@ namespace rsgisexe{
                 xercesc::XMLString::release(&nameXMLStr);
             }  
         }
+        else if(xercesc::XMLString::equals(optionFindTopN, optionXML))
+        {		
+            this->option = RSGISExeRasterGIS::findtopn;
+            
+            XMLCh *imageXMLStr = xercesc::XMLString::transcode("image");
+            if(argElement->hasAttribute(imageXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(imageXMLStr));
+                this->inputImage = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&imageXMLStr);
+            
+            XMLCh *spatialDistXMLStr = xercesc::XMLString::transcode("spatialdist");
+            if(argElement->hasAttribute(spatialDistXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(spatialDistXMLStr));
+                this->spatialDistField = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'spatialdist\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&spatialDistXMLStr);
+
+            
+            XMLCh *metricDistXMLStr = xercesc::XMLString::transcode("metricdist");
+            if(argElement->hasAttribute(metricDistXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(metricDistXMLStr));
+                this->distanceField = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'metricdist\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&metricDistXMLStr);
+            
+            XMLCh *outFieldXMLStr = xercesc::XMLString::transcode("outfield");
+            if(argElement->hasAttribute(outFieldXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outFieldXMLStr));
+                this->outputField = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'outfield\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&outFieldXMLStr);
+            
+            XMLCh *distThresholdXMLStr = xercesc::XMLString::transcode("distthreshold");
+            if(argElement->hasAttribute(distThresholdXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(distThresholdXMLStr));
+                this->distThreshold = textUtils.strtofloat(std::string(charValue));
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'distthreshold\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&distThresholdXMLStr);
+            
+            XMLCh *nXMLStr = xercesc::XMLString::transcode("n");
+            if(argElement->hasAttribute(nXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(nXMLStr));
+                this->nFeatures = textUtils.strto16bitUInt(std::string(charValue));
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'n\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&nXMLStr);
+             
+        }
         else
         {
             std::string message = std::string("The option (") + std::string(xercesc::XMLString::transcode(optionXML)) + std::string(") is not known: RSGISExeRasterGIS.");
@@ -219,6 +304,7 @@ namespace rsgisexe{
         xercesc::XMLString::release(&optionXMLStr);
         xercesc::XMLString::release(&optionCopyGDALATT);
         xercesc::XMLString::release(&optionSpatialLocation);
+        xercesc::XMLString::release(&optionFindTopN);
         
     }
     
@@ -322,6 +408,38 @@ namespace rsgisexe{
                 
                     rsgis::rastergis::RSGISCalcEucDistanceInAttTable calcDist;
                     calcDist.calcEucDist(inputDataset, this->fid, this->outputField, this->fields);
+                    
+                    GDALClose(inputDataset);
+                }
+                catch(rsgis::RSGISException &e)
+                {
+                    throw e;
+                }
+                
+            }
+            else if(this->option == RSGISExeRasterGIS::findtopn)
+            {
+                std::cout << "Calculate the top N features within a given spatial distance.\n";
+                std::cout << "Input Image: " << this->inputImage << std::endl;
+                std::cout << "Distance Field: " << this->distanceField << std::endl;
+                std::cout << "Spatial Dist. Field: " << this->spatialDistField << std::endl;
+                std::cout << "Output Field: " << this->outputField << std::endl;
+                std::cout << "Distance threshold: " << this->distThreshold << std::endl;
+                std::cout << "N: " << this->nFeatures << std::endl;
+                
+                try
+                {
+                    GDALAllRegister();
+                    
+                    GDALDataset *inputDataset = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_Update);
+                    if(inputDataset == NULL)
+                    {
+                        std::string message = std::string("Could not open image ") + this->inputImage;
+                        throw rsgis::RSGISImageException(message.c_str());
+                    }
+                    
+                    rsgis::rastergis::RSGISFindTopNWithinDist calcTopN;
+                    calcTopN.calcMinDistTopN(inputDataset, this->spatialDistField, this->distanceField, this->outputField, this->nFeatures, this->distThreshold);
                     
                     GDALClose(inputDataset);
                 }
