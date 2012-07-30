@@ -132,6 +132,7 @@ namespace rsgis{namespace rastergis{
             }
             
             dataset->GetRasterBand(1)->SetDefaultRAT(attTable);
+            dataset->GetRasterBand(1)->SetMetadataItem("LAYER_TYPE", "thematic");
         }
         catch (rsgis::RSGISAttributeTableException &e)
         {
