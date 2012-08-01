@@ -1582,7 +1582,6 @@ namespace rsgis {namespace radar
 					gsl_vector_set(dPredictMeas, i, predictMeasElement);
 				}
 
-				double prevError = error;
 				error = 0.0;
 
 				// CALCULATE ERROR
@@ -1594,7 +1593,7 @@ namespace rsgis {namespace radar
 				error = error / sigmaSq;
 
 				//std::cout << "error = " << error << ", prev error = " << prevError << ", diff = " << abs(prevError - error) << std::endl;
-				if((error < minError) | (abs(prevError - error) < 10e-10) | boost::math::isnan(error))
+				if((error < minError) | (boost::math::isnan(error)))
 				{
 					for(int i = 0; i < nPar; i++)
 					{
@@ -2077,7 +2076,6 @@ namespace rsgis {namespace radar
 					gsl_vector_set(dPredictMeas, i, predictMeasElement);
 				}
 
-				double prevError = error;
 				error = 0.0;
 
 				// CALCULATE ERROR
@@ -2088,7 +2086,7 @@ namespace rsgis {namespace radar
 				}
 				error = error / sigmaSq;
 
-				if((error < minError) | (abs(prevError - error) < 10e-10)| boost::math::isnan(error)) //((error < 10e-5) && (error / prevError > 0.8) | isnan(error))
+				if((error < minError) | (boost::math::isnan(error))) //((error < 10e-5) && (error / prevError > 0.8) | isnan(error))
 				{
 					for(int i = 0; i < nPar; i++)
 					{
@@ -2175,7 +2173,7 @@ namespace rsgis {namespace radar
 
 				}
 
-				/*
+                /*
 				 std::cout << "Itteration " << itt << std::endl;
 				 std::cout << "Predicted Sigma0: ";
 				 vectorUtils.printGSLVector(predicted);
@@ -2190,7 +2188,7 @@ namespace rsgis {namespace radar
 				 vectorUtils.printGSLVector(gamma);
 				 std::cout << "alpha:" << alpha << std::endl;
 				 std::cout << "==============================" << std::endl;
-			    */
+                */
 
 			}
 
