@@ -41,6 +41,7 @@
 #include "rastergis/RSGISCalcClusterLocation.h"
 #include "rastergis/RSGISCalcEucDistanceInAttTable.h"
 #include "rastergis/RSGISFindTopNWithinDist.h"
+#include "rastergis/RSGISRasterAttUtils.h"
 
 #include "gdal_priv.h"
 #include "ogrsf_frmts.h"
@@ -61,7 +62,8 @@ namespace rsgisexe{
             copyGDALATT,
             spatiallocation,
             eucdistfromfeat,
-            findtopn
+            findtopn,
+            copyGDALATTColumns
         };
         
         RSGISExeRasterGIS();

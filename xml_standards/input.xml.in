@@ -371,8 +371,14 @@
 	
 	
 	
-	<!-- A copy an attribute table from an existing GDAL datasets and add it to another layer -->
+	<!-- Copy an attribute table from an existing GDAL datasets and add it to another layer -->
     <rsgis:command algor="rastergis" option="copyGDALATT" table="input.kea" image="output.kea" />
+	<!-- Copy specified attribute table columns from one file to another -->
+	<rsgis:command algor="rastergis" option="copyGDALATTColumns" table="input.kea" image="output.kea" >
+		<rsgis:field name="string" />
+        <rsgis:field name="string" />
+        <rsgis:field name="string" />
+    </rsgis:command>
 	<!-- Attribute the clumps with their mean eastings and northings -->
 	<rsgis:command algor="rastergis" option="spatiallocation" image="image.kea" eastings="field name" northings="field name" />
 	<!-- Calculate the euclidean distance from feature -->
