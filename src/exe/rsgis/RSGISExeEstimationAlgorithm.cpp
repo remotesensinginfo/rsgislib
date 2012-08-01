@@ -7932,7 +7932,7 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
 				}
 				else if(XMLString::equals(methodAssignAP, methodStr))
 				{
-					cout << "\tUsing Values from objects (assign))" << endl;
+					cout << "\tUsing Values from objects (assign)" << endl;
 
 					this->estFastOptimiserClass->push_back(new RSGISEstimationAssignAP());
 				}
@@ -9846,7 +9846,7 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
 				}
 				else if(XMLString::equals(methodAssignAP, methodStr))
 				{
-					cout << "\tUsing Values from objects (assign))" << endl;
+					cout << "\tUsing Values from objects (assign)" << endl;
 
 					this->estFastOptimiserClass->push_back(new RSGISEstimationAssignAP());
 				}
@@ -10919,7 +10919,7 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
                 }
                 else if(XMLString::equals(methodAssignAP, methodStr))
 				{
-					cout << "\tUsing Values from objects (assign))" << endl;
+					cout << "\tUsing Values from objects (assign)" << endl;
 
 					this->estFastOptimiserClass->push_back(new rsgis::radar::RSGISEstimationAssignAP());
 				}
@@ -14097,7 +14097,7 @@ void RSGISExeEstimationAlgorithm::runAlgorithm() throw(RSGISException)
 			try
 			{
 				cout << "Starting estimation" <<endl;
-				if (option == RSGISExeEstimationAlgorithm::dualPolSingleSpeciesPixAP | option == RSGISExeEstimationAlgorithm::fullPolSingleSpeciesPixAP)
+				if ((option == RSGISExeEstimationAlgorithm::dualPolSingleSpeciesPixAP) | (option == RSGISExeEstimationAlgorithm::fullPolSingleSpeciesPixAP))
 				{
 					RSGISEstimationAlgorithmSingleSpeciesPixAP *estimation = NULL;
 					if (useDefaultMinMax)

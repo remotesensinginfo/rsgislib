@@ -65,6 +65,7 @@ namespace rsgis{namespace radar{
 
 		if (!useClass)
 		{
+			std::cout << "Not using parameters" << std::endl;
 			this->slowOptimiserSingle = this->slowOptimiser->at(0);
 			this->fastOptimiserSingle = this->fastOptimiser->at(0);
 			this->initialParSingle = this->initialPar->at(0);
@@ -96,8 +97,6 @@ namespace rsgis{namespace radar{
 			unsigned int estClass = 0;
 			OGRFeatureDefn *inFeatureDefn = inFeature->GetDefnRef();
 
-            std::cout << "HERE" << std::endl;
-
 			if (useClass)
 			{
 				int fieldIdx = inFeatureDefn->GetFieldIndex(this->classHeading.c_str());
@@ -108,11 +107,6 @@ namespace rsgis{namespace radar{
 					std::cout << "Class number greater than number classes parameterised for. Using last available class.\n";
 					estClass = this->slowOptimiser->size() - 1;
 				}
-
-                std::cout << "Class: " << estClass << std::endl;
-                std::cout << "Slow optimisers: " << this->slowOptimiser->size() << std::endl;
-                std::cout << "Fast optimisers: " << this->fastOptimiser->size() << std::endl;
-                std::cout << "Parameters: " << this->initialPar->size() << std::endl;
 
                 this->slowOptimiserSingle = this->slowOptimiser->at(estClass);
 				this->fastOptimiserSingle = this->fastOptimiser->at(estClass);
@@ -452,9 +446,9 @@ namespace rsgis{namespace radar{
 
 	RSGISObjectBasedEstimation::~RSGISObjectBasedEstimation()
 	{
-		delete[] pixelVals;
 		delete getValues;
 		delete calcImageSingle;
+		delete[] pixelVals;
 	}
 
     RSGISObjectBasedEstimationObjectAP::RSGISObjectBasedEstimationObjectAP(GDALDataset *inputImage, GDALDataset *outputImage, std::vector<gsl_vector*> *initialPar, std::vector<RSGISEstimationOptimiser*> *slowOptimiser, std::vector<RSGISEstimationOptimiser*> *fastOptimiser, estParameters parameters, std::string *apParField, double ***minMaxVals, std::string classHeading, bool useClass)
@@ -942,9 +936,9 @@ namespace rsgis{namespace radar{
 
 	RSGISObjectBasedEstimationObjectAP::~RSGISObjectBasedEstimationObjectAP()
 	{
-		delete[] pixelVals;
 		delete getValues;
 		delete calcImageSingle;
+		delete[] pixelVals;
 	}
 
 	RSGISObjectBasedEstimationRasterPolygon::RSGISObjectBasedEstimationRasterPolygon(GDALDataset *inputImage, GDALDataset *outputImage,  GDALDataset *rasterFeatures, std::vector<gsl_vector*> *initialPar, std::vector<RSGISEstimationOptimiser*> *slowOptimiser, std::vector<RSGISEstimationOptimiser*> *fastOptimiser, estParameters parameters, double ***minMaxVals, std::string classHeading, bool useClass)
@@ -1378,9 +1372,9 @@ namespace rsgis{namespace radar{
 
 	RSGISObjectBasedEstimationRasterPolygon::~RSGISObjectBasedEstimationRasterPolygon()
 	{
-		delete[] pixelVals;
 		delete getValues;
 		delete calcImageSingle;
+		delete[] pixelVals;
 	}
 
 	RSGISObjectBasedEstimationGetObjVals::RSGISObjectBasedEstimationGetObjVals(std::vector<float> **pixelVals, int numBands) : RSGISCalcImageSingleValue(numOutputValues)
@@ -1391,7 +1385,7 @@ namespace rsgis{namespace radar{
 		for(int i = 0; i < numBands; i++)
 		{
 			this->pixelVals[i] = new std::vector<float>();
-		}
+        }
 	}
 
 	void RSGISObjectBasedEstimationGetObjVals::calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt) throw(rsgis::img::RSGISImageCalcException)

@@ -5,7 +5,7 @@
  *  Created by Daniel Clewley on 25/11/2010.
  *  Copyright 2010 RSGISLib. All rights reserved.
  *  This file is part of RSGISLib.
- * 
+ *
  *  RSGISLib is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -57,7 +57,7 @@
 #include <boost/math/special_functions/fpclassify.hpp>
 
 namespace rsgis{namespace radar{
-	
+
 	class RSGISObjectBasedEstimation : public rsgis::vec::RSGISProcessOGRFeature
 	{
 	public:
@@ -81,17 +81,17 @@ namespace rsgis{namespace radar{
 		std::vector<gsl_vector*> *initialPar;
 		std::vector<RSGISEstimationOptimiser*> *slowOptimiser;
         std::vector<RSGISEstimationOptimiser*> *fastOptimiser;
-		RSGISEstimationOptimiser *slowOptimiserSingle;
-		RSGISEstimationOptimiser *fastOptimiserSingle;
+		rsgis::radar::RSGISEstimationOptimiser *slowOptimiserSingle;
+		rsgis::radar::RSGISEstimationOptimiser *fastOptimiserSingle;
 		gsl_vector *initialParSingle;
 		estParameters parameters;
 		std::string classHeading;
 		bool useClass; // Use multiple classes
 		bool useDefaultMinMax; // Pass in minimum and maximum values to estimation algorithm or use default
 		double ***minMaxVals; // Minimum and maximum values for parameters
-		
+
 	};
-    
+
     class RSGISObjectBasedEstimationObjectAP : public rsgis::vec::RSGISProcessOGRFeature
 	{
 	public:
@@ -115,8 +115,8 @@ namespace rsgis{namespace radar{
 		std::vector<gsl_vector*> *initialPar;
 		std::vector<RSGISEstimationOptimiser*> *slowOptimiser;
 		std::vector<RSGISEstimationOptimiser*> *fastOptimiser;
-		RSGISEstimationOptimiser *slowOptimiserSingle;
-		RSGISEstimationOptimiser *fastOptimiserSingle;
+		rsgis::radar::RSGISEstimationOptimiser *slowOptimiserSingle;
+		rsgis::radar::RSGISEstimationOptimiser *fastOptimiserSingle;
 		gsl_vector *initialParSingle;
 		estParameters parameters;
 		std::string classHeading;
@@ -129,7 +129,7 @@ namespace rsgis{namespace radar{
         rsgis::math::RSGISMathTwoVariableFunction *functionA;
         rsgis::math::RSGISMathTwoVariableFunction *functionB;
 	};
-	
+
 	class RSGISObjectBasedEstimationRasterPolygon : public rsgis::vec::RSGISProcessOGRFeature
 	{
 	public:
@@ -154,8 +154,8 @@ namespace rsgis{namespace radar{
 		std::vector<gsl_vector*> *initialPar;
 		std::vector<RSGISEstimationOptimiser*> *slowOptimiser;
 		std::vector<RSGISEstimationOptimiser*> *fastOptimiser;
-		RSGISEstimationOptimiser *slowOptimiserSingle;
-		RSGISEstimationOptimiser *fastOptimiserSingle;
+		rsgis::radar::RSGISEstimationOptimiser *slowOptimiserSingle;
+		rsgis::radar::RSGISEstimationOptimiser *fastOptimiserSingle;
 		gsl_vector *initialParSingle;
 		estParameters parameters;
 		std::string classHeading;
@@ -163,11 +163,11 @@ namespace rsgis{namespace radar{
 		bool useDefaultMinMax; // Pass in minimum and maximum values to estimation algorithm or use default
 		double ***minMaxVals; // Minimum and maximum values for parameters
 	};
-	
+
 	class RSGISObjectBasedEstimationGetObjVals : public rsgis::img::RSGISCalcImageSingleValue
 	{
 		/// Loops though bands and loads pixel values to vectors
-	public: 
+	public:
 		RSGISObjectBasedEstimationGetObjVals(std::vector<float> **pixelVals, int numBands);
 		void calcImageValue(float *bandValuesImageA, float *bandValuesImageB, int numBands, int bandA, int bandB) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not Implemented");};
 		void calcImageValue(float *bandValuesImage, int numBands, int band) throw(rsgis::img::RSGISImageCalcException);
@@ -180,8 +180,8 @@ namespace rsgis{namespace radar{
 		std::vector<float> **pixelVals;
 		int numBands;
 	};
-	
-	
+
+
 	class RSGISEstimationAssignAP : public RSGISEstimationOptimiser
 	{
 		/// Assign output vector to initial parameters
@@ -190,12 +190,12 @@ namespace rsgis{namespace radar{
 		RSGISEstimationAssignAP(){};
 		virtual int minimise(gsl_vector *inData, gsl_vector *initialPar, gsl_vector *outParError);
 		virtual void modifyAPriori(gsl_vector *newAPrioriPar){};
-		virtual estOptimizerType getOptimiserType(){return assignAP;}; 
+		virtual estOptimizerType getOptimiserType(){return assignAP;};
 		virtual void printOptimiser(){std::cout << "Assign" << std::endl;};
 		~RSGISEstimationAssignAP(){};
 	private:
 	};
-	
+
 }}
 
 #endif
