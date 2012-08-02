@@ -720,7 +720,7 @@
 
 
     <!-- A command to filter an input image using the range of implemented image filters (which form a filter bank) -->
-    <rsgis:command algor="imagefilter" option="filter" image="image.env" output="output_image_base" >
+    <rsgis:command algor="imagefilter" option="filter" image="image.env" output="output_image_base" format="GDAL Format"  extension="string" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" >
         <rsgis:filter size="int" type="GaussianSmooth" fileending="gausmooth" stddevX="float" stddevY="float" angle="int"/>
         <rsgis:filter size="int" type="Gaussian1st" fileending="gau1st" stddevX="float" stddevY="float" angle="int"/>
         <rsgis:filter size="int" type="Gaussian2nd" fileending="gau2nd" stddevX="float" stddevY="float" angle="int"/>
@@ -739,9 +739,9 @@
         <rsgis:filter size="int" type="Lee" fileending="lee" nLooks="int" />
     </rsgis:command>
     <!-- A command to filter an input image using a predefined filter band -->
-    <rsgis:command algor="imagefilter" option="filter" image="image.env" output="output_image_base" filterbank="LM"/>
+    <rsgis:command algor="imagefilter" option="filter" image="image.env" output="output_image_base" filterbank="LM" format="GDAL Format" extension="string" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
     <!-- A command to export each filter as an image for visualisation -->
-    <rsgis:command algor="imagefilter" option="exportfilterbank" output="output_image_base" >
+    <rsgis:command algor="imagefilter" option="exportfilterbank" output="output_image_base" format="GDAL Format" extension="string" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" >
         <rsgis:filter size="int" type="GaussianSmooth" fileending="gausmooth" stddevX="float" stddevY="float" angle="int"/>
         <rsgis:filter size="int" type="Gaussian1st" fileending="gau1st" stddevX="float" stddevY="float" angle="int"/>
         <rsgis:filter size="int" type="Gaussian2nd" fileending="gau2nd" stddevX="float" stddevY="float" angle="int"/>
@@ -759,7 +759,7 @@
         <rsgis:filter size="int" type="Kuwahara" fileending="kuwahara" />
     </rsgis:command>
     <!-- A command to export each filter (within a predefined bank) as an image for visualisation -->
-    <rsgis:command algor="imagefilter" option="exportfilterbank" output="output_image_base" filterbank="LM"/>
+    <rsgis:command algor="imagefilter" option="exportfilterbank" output="output_image_base" filterbank="LM" format="GDAL Format" extension="string" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
 
 
 
