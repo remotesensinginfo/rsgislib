@@ -46,7 +46,7 @@ namespace rsgis{namespace filter{
 		{
 		public: 
 			RSGISImageFilter(int numberOutBands, int size, std::string filenameEnding);
-			void runFilter(GDALDataset **datasets, int numDS, std::string outputImage) throw(rsgis::RSGISImageException);
+			void runFilter(GDALDataset **datasets, int numDS, std::string outputImage, std::string gdalFormat, GDALDataType outDataType) throw(rsgis::RSGISImageException);
 			virtual rsgis::img::RSGISCalcImage* getCalcImage()throw(rsgis::RSGISImageException);
 			virtual void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException);
 			virtual void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException);

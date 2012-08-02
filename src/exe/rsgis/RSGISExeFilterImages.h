@@ -50,14 +50,7 @@
 
 namespace rsgisexe{
 
-using namespace std;
-using namespace xercesc;
-using namespace rsgis;
-using namespace rsgis::img;
-using namespace rsgis::math;
-using namespace rsgis::filter;
-
-class RSGISExeFilterImages : public RSGISAlgorithmParameters
+class RSGISExeFilterImages : public rsgis::RSGISAlgorithmParameters
 	{
 	public:
 		
@@ -69,19 +62,22 @@ class RSGISExeFilterImages : public RSGISAlgorithmParameters
 		};
 		
 		RSGISExeFilterImages();
-		virtual RSGISAlgorithmParameters* getInstance();
-		virtual void retrieveParameters(DOMElement *argElement) throw(RSGISXMLArgumentsException);
-		virtual void runAlgorithm() throw(RSGISException);
+		virtual rsgis::RSGISAlgorithmParameters* getInstance();
+		virtual void retrieveParameters(xercesc::DOMElement *argElement) throw(rsgis::RSGISXMLArgumentsException);
+		virtual void runAlgorithm() throw(rsgis::RSGISException);
 		virtual void printParameters();
-		virtual string getDescription();
-		virtual string getXMLSchema();
+		virtual std::string getDescription();
+		virtual std::string getXMLSchema();
 		virtual void help();
 		~RSGISExeFilterImages();
 	protected:
 		options option;
-		string inputImage;
-		string outputImageBase;
-		RSGISFilterBank *filterBank;
+		std::string inputImage;
+		std::string outputImageBase;
+		rsgis::filter::RSGISFilterBank *filterBank;
+        std::string imageFormat;
+        std::string imageExt;
+        GDALDataType outDataType;
 	};
 }
 
