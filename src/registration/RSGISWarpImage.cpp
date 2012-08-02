@@ -242,34 +242,16 @@ namespace rsgis{namespace reg{
 			float inImgRes = gdalTransformation[1];
 			
 			outputImageDS->GetGeoTransform(gdalTransformation);
-			
+            
 			double outTLX = gdalTransformation[0];
 			double outTLY = gdalTransformation[3];
 			//double outBRX = outTLX + (outputImageDS->GetRasterXSize() * gdalTransformation[1]);
 			//double outBRY = outTLY + (outputImageDS->GetRasterYSize() * gdalTransformation[5]);
 
 			delete gdalTransformation;
-			/*
-			if(outTLX < inTLX)
-			{
-				throw RSGISImageWarpException("Output image is outside input image, TLX");
-			}
-			
-			if(outBRX > inBRX)
-			{
-				throw RSGISImageWarpException("Output image is outside input image, BRX");
-			}
-			
-			if(outTLY > inTLY)
-			{
-				throw RSGISImageWarpException("Output image is outside input image, TLY");
-			}
-			
-			if(outBRY < inBRY)
-			{
-				throw RSGISImageWarpException("Output image is outside input image, BRY");
-			}
-			*/
+            
+            unsigned int inWidth = inputImageDS->GetRasterXSize();
+			unsigned int inHeight = inputImageDS->GetRasterYSize();
 			unsigned int outWidth = outputImageDS->GetRasterXSize();
 			unsigned int outHeight = outputImageDS->GetRasterYSize();
 			
@@ -299,6 +281,7 @@ namespace rsgis{namespace reg{
 			int feedback = outHeight/10;
 			int feedbackCounter = 0;
 			std::cout << "Started ." << std::flush;
+
 			for(unsigned int i = 0; i < outHeight; ++i)
 			{
 				if((outHeight > 10) && ((i % feedback) == 0))
@@ -313,7 +296,8 @@ namespace rsgis{namespace reg{
 					{
 						this->findNearestPixel(currentEastings, currentNorthings, &xPxl, &yPxl, inImgRes);
                         
-						if((xPxl < outWidth) && (yPxl < outHeight))
+                        // Check xPxl and yPxl are within input image.
+						if((xPxl < inWidth) && (yPxl < inHeight))
                         {
                             this->interpolator->calcValue(inputImageDS, outDataColumn, numBands, currentEastings, currentNorthings, xPxl, yPxl, inImgRes, outImgRes);
                         }
