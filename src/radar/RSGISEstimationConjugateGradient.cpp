@@ -1691,7 +1691,6 @@ namespace rsgis {namespace radar
 				 matrixUtils.printGSLMatrix(frechet);
 				 std::cout << "==============================" << std::endl;
                 */
-
 			}
 
 			/*
@@ -3065,7 +3064,7 @@ namespace rsgis {namespace radar
 			if (gsl_vector_get(currentParError, 3) < gsl_vector_get(outParError, 3)) // Check if resuduals are lower
 			{
 				// Check within limits of equation
-				if ((gsl_vector_get(currentParError, 0) > minMaxIntervalA[0]) && (gsl_vector_get(currentParError, 0) < minMaxIntervalA[1]) && (gsl_vector_get(currentParError, 1) > minMaxIntervalB[0]) && (gsl_vector_get(currentParError, 1) < minMaxIntervalB[1])  && (gsl_vector_get(currentParError, 2) > minMaxIntervalC[0]) && (gsl_vector_get(currentParError, 2) < minMaxIntervalC[1]))
+				if ((gsl_vector_get(currentParError, 0) > minMaxIntervalA[0]) && (gsl_vector_get(currentParError, 0) < minMaxIntervalA[1]) && (gsl_vector_get(currentParError, 1) > minMaxIntervalB[0]) && (gsl_vector_get(currentParError, 1) < minMaxIntervalB[1])  && (gsl_vector_get(currentParError, 2) > minMaxIntervalC[0]) && (gsl_vector_get(currentParError, 2) < minMaxIntervalC[1])  && (gsl_vector_get(currentParError, 2) > minMaxIntervalC[0]) && (gsl_vector_get(currentParError, 2) < minMaxIntervalC[1]))
 				{
                     std::cout << gsl_vector_get(outParError, 3) << std::endl;
 					// If new values are better than current best, update
@@ -3100,6 +3099,7 @@ namespace rsgis {namespace radar
 
 						if (gsl_vector_get(currentParError, 3) < gsl_vector_get(outParError, 3)) // Check if resuduals are lower
 						{
+
 							// Check within limits of equation
 							if ((gsl_vector_get(currentParError, 0) > minMaxIntervalA[0]) && (gsl_vector_get(currentParError, 0) < minMaxIntervalA[1]) && (gsl_vector_get(currentParError, 1) > minMaxIntervalB[0]) && (gsl_vector_get(currentParError, 1) < minMaxIntervalB[1])  && (gsl_vector_get(currentParError, 2) > minMaxIntervalC[0]) && (gsl_vector_get(currentParError, 2) < minMaxIntervalC[1]))
 							{
@@ -3129,13 +3129,13 @@ namespace rsgis {namespace radar
 
 			conjGradOpt->minimise(inData, testInitialPar, currentParError);
 
-			if (gsl_vector_get(currentParError, 2) < gsl_vector_get(outParError, 2)) // If new values are better than current best, update
+			if (gsl_vector_get(currentParError, 3) < gsl_vector_get(outParError, 3)) // If new values are better than current best, update
 			{
-				if ((gsl_vector_get(currentParError, 0) > minMaxIntervalA[0]) && (gsl_vector_get(currentParError, 0) < minMaxIntervalA[1]) && (gsl_vector_get(currentParError, 1) > minMaxIntervalB[0]) && (gsl_vector_get(currentParError, 1) < minMaxIntervalB[1]))
+				if ((gsl_vector_get(currentParError, 0) > minMaxIntervalA[0]) && (gsl_vector_get(currentParError, 0) < minMaxIntervalA[1]) && (gsl_vector_get(currentParError, 1) > minMaxIntervalB[0]) && (gsl_vector_get(currentParError, 1) < minMaxIntervalB[1]) && (gsl_vector_get(currentParError, 2) > minMaxIntervalC[0]) && (gsl_vector_get(currentParError, 2) < minMaxIntervalC[1]))
 				{
 					gsl_vector_memcpy(outParError, currentParError);
 
-					if (gsl_vector_get(outParError, 2) < minError)
+					if (gsl_vector_get(outParError, 3) < minError)
 					{
 						// free memory and terminate if target error is reached.
 						gsl_vector_free(currentParError);
