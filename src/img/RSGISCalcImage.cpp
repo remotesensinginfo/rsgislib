@@ -2740,7 +2740,7 @@ namespace rsgis{namespace img{
 	}
 	
 	/* Keeps returning a window of data based upon the supplied windowSize until all finished*/
-	void RSGISCalcImage::calcImageWindowData(GDALDataset **datasets, int numDS, std::string outputImage, int windowSize, std::string gdalFormat) throw(RSGISImageCalcException,RSGISImageBandException)
+	void RSGISCalcImage::calcImageWindowData(GDALDataset **datasets, int numDS, std::string outputImage, int windowSize, std::string gdalFormat, GDALDataType gdalDataType) throw(RSGISImageCalcException,RSGISImageBandException)
 	{
 		GDALAllRegister();
 		RSGISImageUtils imgUtils;
@@ -2795,7 +2795,7 @@ namespace rsgis{namespace img{
 			}
 			//std::cout << "New image width = " << width << " height = " << height << std::endl;
             
-			outputImageDS = gdalDriver->Create(outputImage.c_str(), width, height, this->numOutBands, GDT_Float32, NULL);
+			outputImageDS = gdalDriver->Create(outputImage.c_str(), width, height, this->numOutBands, gdalDataType, NULL);
 			
 			if(outputImageDS == NULL)
 			{
