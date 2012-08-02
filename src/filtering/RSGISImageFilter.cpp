@@ -30,12 +30,12 @@ namespace rsgis{namespace filter{
 		this->filenameEnding = filenameEnding;
 	}
 	
-	void RSGISImageFilter::runFilter(GDALDataset **datasets, int numDS, std::string outputImage) throw(rsgis::RSGISImageException)
+	void RSGISImageFilter::runFilter(GDALDataset **datasets, int numDS, std::string outputImage, std::string gdalFormat, GDALDataType outDataType) throw(rsgis::RSGISImageException)
 	{
 		rsgis::img::RSGISCalcImage* calcImage = this->getCalcImage();
 		try
 		{
-			calcImage->calcImageWindowData(datasets, numDS, outputImage, this->size);
+			calcImage->calcImageWindowData(datasets, numDS, outputImage, this->size, gdalFormat, outDataType);
 			delete calcImage;
 		}
 		catch(RSGISImageException e)

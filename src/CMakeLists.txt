@@ -664,7 +664,8 @@ set(LIB_RASTERGIS_H
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISKNNATTable.h
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISCalcClusterLocation.h
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISCalcEucDistanceInAttTable.h
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindTopNWithinDist.h )
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindTopNWithinDist.h
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISRasterAttUtils.h )
 	
 set(LIB_RASTERGIS_CPP
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISAttributeTable.cpp
@@ -696,7 +697,9 @@ set(LIB_RASTERGIS_CPP
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISCalcEucDistanceInAttTable.cpp
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISCalcEucDistanceInAttTable.h
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindTopNWithinDist.cpp
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindTopNWithinDist.h )
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindTopNWithinDist.h
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISRasterAttUtils.cpp
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISRasterAttUtils.h )
 ###############################################################################
 
 ###############################################################################
