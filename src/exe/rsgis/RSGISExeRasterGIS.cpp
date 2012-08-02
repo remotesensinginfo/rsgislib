@@ -48,6 +48,7 @@ namespace rsgisexe{
         XMLCh *optionSpatialLocation = xercesc::XMLString::transcode("spatiallocation");
         XMLCh *optionEucDistFromFeat = xercesc::XMLString::transcode("eucdistfromfeat");
         XMLCh *optionFindTopN = xercesc::XMLString::transcode("findtopn");
+        XMLCh *optionCopyGDALATTColumns = xercesc::XMLString::transcode("copyGDALATTColumns");
         
         
         const XMLCh *algorNameEle = argElement->getAttribute(algorXMLStr);
@@ -291,6 +292,70 @@ namespace rsgisexe{
             xercesc::XMLString::release(&nXMLStr);
              
         }
+        else if(xercesc::XMLString::equals(optionCopyGDALATTColumns, optionXML))
+        {		
+            this->option = RSGISExeRasterGIS::copyGDALATTColumns;
+            
+            XMLCh *tableXMLStr = xercesc::XMLString::transcode("table");
+            if(argElement->hasAttribute(tableXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(tableXMLStr));
+                this->inputImage = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'table\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&tableXMLStr);
+            
+            
+            XMLCh *imageXMLStr = xercesc::XMLString::transcode("image");
+            if(argElement->hasAttribute(imageXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(imageXMLStr));
+                this->clumpsImage = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&imageXMLStr);
+            
+            XMLCh *rsgisFieldXMLStr = xercesc::XMLString::transcode("rsgis:field");
+            xercesc::DOMNodeList *fieldNodesList = argElement->getElementsByTagName(rsgisFieldXMLStr);
+            unsigned int numFieldTags = fieldNodesList->getLength();
+            
+            std::cout << "Found " << numFieldTags << " field tags" << std::endl;
+            
+            if(numFieldTags == 0)
+            {
+                throw rsgis::RSGISXMLArgumentsException("No field tags have been provided, at least 1 is required.");
+            }
+            
+            fields.reserve(numFieldTags);
+            
+            xercesc::DOMElement *attElement = NULL;
+            std::string fieldName = "";
+            for(int i = 0; i < numFieldTags; i++)
+            {
+                attElement = static_cast<xercesc::DOMElement*>(fieldNodesList->item(i));
+                
+                XMLCh *nameXMLStr = xercesc::XMLString::transcode("name");
+                if(attElement->hasAttribute(nameXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(attElement->getAttribute(nameXMLStr));
+                    fields.push_back(std::string(charValue));
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'name\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&nameXMLStr);
+            }
+        }
         else
         {
             std::string message = std::string("The option (") + std::string(xercesc::XMLString::transcode(optionXML)) + std::string(") is not known: RSGISExeRasterGIS.");
@@ -305,7 +370,7 @@ namespace rsgisexe{
         xercesc::XMLString::release(&optionCopyGDALATT);
         xercesc::XMLString::release(&optionSpatialLocation);
         xercesc::XMLString::release(&optionFindTopN);
-        
+        xercesc::XMLString::release(&optionCopyGDALATTColumns);
     }
     
     void RSGISExeRasterGIS::runAlgorithm() throw(rsgis::RSGISException)
@@ -449,6 +514,48 @@ namespace rsgisexe{
                     throw e;
                 }
                 
+            }
+            else if(this->option == RSGISExeRasterGIS::copyGDALATTColumns)
+            {
+                std::cout << "Copy specified attribute table columns from one file to another\n";
+                std::cout << "Input Table: " << this->inputImage << std::endl;
+                std::cout << "Output Image: " << this->clumpsImage << std::endl;
+                std::cout << "Fields to be copied:\n";
+                for(std::vector<std::string>::iterator iterFields = fields.begin(); iterFields != fields.end(); ++iterFields)
+                {
+                    std::cout << "\tField: " << (*iterFields) << std::endl;
+                }
+                
+                
+                GDALAllRegister();
+                try
+                {
+                    GDALDataset *inputDataset = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_ReadOnly);
+                    if(inputDataset == NULL)
+                    {
+                        std::string message = std::string("Could not open image ") + this->inputImage;
+                        throw rsgis::RSGISImageException(message.c_str());
+                    }
+                    
+                    GDALDataset *outRATDataset = (GDALDataset *) GDALOpen(this->clumpsImage.c_str(), GA_Update);
+                    if(outRATDataset == NULL)
+                    {
+                        std::string message = std::string("Could not open image ") + this->clumpsImage;
+                        throw rsgis::RSGISImageException(message.c_str());
+                    }
+                    
+                    rsgis::rastergis::RSGISRasterAttUtils attUtils;
+                    attUtils.copyAttColumns(inputDataset, outRATDataset, fields);
+                    
+                    outRATDataset->GetRasterBand(1)->SetMetadataItem("LAYER_TYPE", "thematic");
+                    
+                    GDALClose(inputDataset);
+                    GDALClose(outRATDataset);
+                }
+                catch(rsgis::RSGISException &e)
+                {
+                    throw e;
+                }	
             }
             else
             {
