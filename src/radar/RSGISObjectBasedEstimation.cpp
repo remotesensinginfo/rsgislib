@@ -173,6 +173,8 @@ namespace rsgis{namespace radar{
 				//std::cout << "inData[" << i << "] = " << inData[i] << std::endl;
 			}
 
+            //std::cout << "In data = " << inData[0] << ", " << inData[1] << ", " << inData[2] << std::endl;
+
 			invValuesObj->calcImageValue(inData, this->numBands, outData);
 
 			// Get averages for each band.
@@ -181,8 +183,11 @@ namespace rsgis{namespace radar{
 			for(unsigned int i = 0; i < this->numOutputPar; i++)
 			{
 				gsl_vector_set(localPar, i, outData[i]);
+				//std::cout << "outData[" << i << "] = " << outData[i] << std::endl;
 			}
 
+            //std::cout << "outData[" << 3 << "] = " << outData[3] << std::endl;
+            //std::cout << "outData[" << 4 << "] = " << outData[4] << std::endl;
 			//std::cout << "object height = " << gsl_vector_get(localPar, 0) << ", object density = " << gsl_vector_get(localPar, 1) << std::endl;
 
 			// SAVE PARAMETERS TO OUTPUT SHAPEFILE
@@ -1020,9 +1025,11 @@ namespace rsgis{namespace radar{
                 int fieldIdx = inFeatureDefn->GetFieldIndex(this->classHeading.c_str());
                 estClass = inFeature->GetFieldAsInteger(fieldIdx) - 1;
 
+                std::cout << "estClass = " << estClass << std::endl;
+
                 if (estClass >= this->slowOptimiser->size())
                 {
-                    std::cout << "Class number greater than number classes parameterised for. Using last available class.\n";
+                    //std::cout << "Class number greater than number classes parameterised for. Using last available class.\n";
                     estClass = this->slowOptimiser->size() - 1;
                 }
                 this->slowOptimiserSingle = this->slowOptimiser->at(estClass);
@@ -1359,6 +1366,37 @@ namespace rsgis{namespace radar{
 			OGRFieldDefn shpField3("objError", OFTReal);
 			shpField3.SetPrecision(10);
 			if( outputLayer->CreateField( &shpField3 ) != OGRERR_NONE )
+			{
+				std::string message = std::string("Creating shapefile field \'objError\' has failed");
+				throw rsgis::vec::RSGISVectorOutputException(message.c_str());
+			}
+		}
+        else if(this->parameters == dielectricDensityHeight)
+		{
+			OGRFieldDefn shpField1("objHeight", OFTReal);
+			shpField1.SetPrecision(10);
+			if( outputLayer->CreateField( &shpField1 ) != OGRERR_NONE )
+			{
+				std::string message = std::string("Creating shapefile field \'objHeight\' has failed");
+				throw rsgis::vec::RSGISVectorOutputException(message.c_str());
+			}
+			OGRFieldDefn shpField2("objDens", OFTReal);
+			shpField2.SetPrecision(10);
+			if( outputLayer->CreateField( &shpField2 ) != OGRERR_NONE )
+			{
+				std::string message = std::string("Creating shapefile field \'objHeight\' has failed");
+				throw rsgis::vec::RSGISVectorOutputException(message.c_str());
+			}
+			OGRFieldDefn shpField3("objEps", OFTReal);
+			shpField3.SetPrecision(10);
+			if( outputLayer->CreateField( &shpField3 ) != OGRERR_NONE )
+			{
+				std::string message = std::string("Creating shapefile field \'objEps\' has failed");
+				throw rsgis::vec::RSGISVectorOutputException(message.c_str());
+			}
+			OGRFieldDefn shpField4("objError", OFTReal);
+			shpField4.SetPrecision(10);
+			if( outputLayer->CreateField( &shpField4 ) != OGRERR_NONE )
 			{
 				std::string message = std::string("Creating shapefile field \'objError\' has failed");
 				throw rsgis::vec::RSGISVectorOutputException(message.c_str());

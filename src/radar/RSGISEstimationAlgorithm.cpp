@@ -2025,7 +2025,7 @@ namespace rsgis {namespace radar
 			inSigma0dB = gsl_vector_alloc(numBands);
 
 			// Check for no data (image borders)
-			if(bandValues[1] < -100 || boost::math::isnan(bandValues[1]))
+			if((bandValues[1] < -100) | (boost::math::isnan(bandValues[1])))
 			{
 				for(int i = 0; i < numOutputBands; i++)
 				{
@@ -2047,48 +2047,6 @@ namespace rsgis {namespace radar
 					double height = gsl_vector_get(outPar, 0);
 					double density = gsl_vector_get(outPar, 1);
 					double error = gsl_vector_get(outPar, 2);
-
-					// Set parameters to limits of equation
-					if (useDefaultMinMax)
-					{
-						if(height < 1.5)
-						{
-							height = 0;
-						}
-						if (height > 20)
-						{
-							height = 20;
-						}
-						if(density > 2)
-						{
-							density = 2;
-						}
-						if(density < 0)
-						{
-							density = 0;
-						}
-					}
-					else
-					{
-						if(height < this->minMaxVals[0][0])
-						{
-							height = 0;
-							density = 0;
-						}
-						if (height > this->minMaxVals[0][1])
-						{
-							height = this->minMaxVals[0][1];
-						}
-						if(density < this->minMaxVals[1][0])
-						{
-							height = 0;
-							density = 0;
-						}
-						if(density > this->minMaxVals[1][1])
-						{
-							density = this->minMaxVals[1][1];
-						}
-					}
 
 					if ((error > 1) | (boost::math::isnan(height)) | (boost::math::isnan(density))) // If error is greater than 1, hasn't converged, write out a priori par (if available) or initial par.
 					{
@@ -2119,8 +2077,6 @@ namespace rsgis {namespace radar
 					else{output[2] = biomass;}
 					if (boost::math::isnan(error)){output[3] = 0;}
 					else{output[3] = error;}
-
-
 				}
 				else if(parameters == cDepthDensity)  // Retrieve Canopy Depth and Stem densty
 				{
@@ -2130,46 +2086,6 @@ namespace rsgis {namespace radar
 					double cDepth = gsl_vector_get(outPar, 0);
 					double density = gsl_vector_get(outPar, 1);
 					double error = gsl_vector_get(outPar, 2);
-
-					// Set parameters to limits of equation
-					if (useDefaultMinMax)
-					{
-						if(cDepth > 3)
-						{
-							cDepth = 3;
-						}
-						else if(cDepth < 0.25)
-						{
-						 cDepth = 0;
-						}
-						if(density > 2)
-						{
-							density = 2;
-						}
-						else if(density < 0.1)
-						{
-							density = 0;
-						}
-					}
-					else
-					{
-						if(cDepth < this->minMaxVals[0][0])
-						{
-							cDepth = 0;
-						}
-						if (cDepth > this->minMaxVals[0][1])
-						{
-							cDepth = this->minMaxVals[0][1];
-						}
-						if(density < this->minMaxVals[1][0])
-						{
-							density = 0;
-						}
-						if(density > this->minMaxVals[1][1])
-						{
-							density = this->minMaxVals[1][1];
-						}
-					}
 
 					if (error > 1) // If error is greater than 1, hasn't converged, write out a priori par (if available) or initial par.
 					{
@@ -2212,64 +2128,6 @@ namespace rsgis {namespace radar
 					double density = gsl_vector_get(outPar, 1);
 					double dielectric = gsl_vector_get(outPar, 2);
 					double error = gsl_vector_get(outPar, 3);
-
-					// Set parameters to limits of equation
-					if (useDefaultMinMax)
-					{
-						if(height < 1.5)
-						{
-							height = 0;
-						}
-						if (height > 20)
-						{
-							height = 20;
-						}
-						if(density > 2)
-						{
-							density = 2;
-						}
-						if(density < 0)
-						{
-							density = 0;
-						}
-						if(dielectric > 80)
-						{
-							dielectric = 80;
-						}
-						if(density < 5)
-						{
-							dielectric = 5;
-						}
-					}
-					else
-					{
-						if(height < this->minMaxVals[0][0])
-						{
-							height = 0;
-							density = 0;
-						}
-						if (height > this->minMaxVals[0][1])
-						{
-							height = this->minMaxVals[0][1];
-						}
-						if(density < this->minMaxVals[1][0])
-						{
-							height = 0;
-							density = 0;
-						}
-						if(density > this->minMaxVals[1][1])
-						{
-							density = this->minMaxVals[1][1];
-						}
-						if(dielectric < this->minMaxVals[2][0])
-						{
-							dielectric = this->minMaxVals[2][0];
-						}
-						if(dielectric > this->minMaxVals[2][1])
-						{
-							dielectric = this->minMaxVals[2][1];
-						}
-					}
 
 					// Write out
 					if (boost::math::isnan(height)){output[0] = 0;}
