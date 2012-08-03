@@ -43,6 +43,7 @@
 #include "rastergis/RSGISFindTopNWithinDist.h"
 #include "rastergis/RSGISRasterAttUtils.h"
 #include "rastergis/RSGISCalcClumpStats.h"
+#include "rastergis/RSGISFindClumpCatagoryStats.h"
 
 #include "gdal_priv.h"
 #include "ogrsf_frmts.h"
@@ -65,7 +66,8 @@ namespace rsgisexe{
             eucdistfromfeat,
             findtopn,
             copyGDALATTColumns,
-            popattributestats
+            popattributestats,
+            popcategoryproportions
         };
         
         RSGISExeRasterGIS();
@@ -81,17 +83,22 @@ namespace rsgisexe{
         options option;
         std::string inputImage;
         std::string clumpsImage;
+        std::string categoriesImage;
         std::string outputField;
         std::string northingsField;
         std::string eastingsField;
         std::string spatialDistField;
         std::string distanceField;
+        std::string outColsName;
+        std::string majorityColName;
+        std::string majClassNameField;
+        std::string classNameField;
         std::vector<std::string> fields;
         size_t fid;
         unsigned int nFeatures;
         float distThreshold;
         std::vector<rsgis::rastergis::RSGISBandAttStats*> *bandStats;
-        
+        bool copyClassNames;
     };
     
 }
