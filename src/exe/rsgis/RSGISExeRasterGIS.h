@@ -42,6 +42,7 @@
 #include "rastergis/RSGISCalcEucDistanceInAttTable.h"
 #include "rastergis/RSGISFindTopNWithinDist.h"
 #include "rastergis/RSGISRasterAttUtils.h"
+#include "rastergis/RSGISCalcClumpStats.h"
 
 #include "gdal_priv.h"
 #include "ogrsf_frmts.h"
@@ -63,7 +64,8 @@ namespace rsgisexe{
             spatiallocation,
             eucdistfromfeat,
             findtopn,
-            copyGDALATTColumns
+            copyGDALATTColumns,
+            popattributestats
         };
         
         RSGISExeRasterGIS();
@@ -88,6 +90,7 @@ namespace rsgisexe{
         size_t fid;
         unsigned int nFeatures;
         float distThreshold;
+        std::vector<rsgis::rastergis::RSGISBandAttStats*> *bandStats;
         
     };
     
