@@ -76,57 +76,57 @@
         </rsgis:attribute>
     </rsgis:command>
     <!-- Calculates zonal statistics for image pixels, falling between minimum and maximum threasholds. Statistics may be calculated for all bands in image using default names (b1, b2 etc.) or selected bands with user specified names. -->
-    <rsgis:command algor="zonalstats" option="pixelstats" image="image.env"   vector="polys.shp" raster="polys.env" output="output.shp" method="polyContainsPixel | polyContainsPixelCenter | polyOverlapsPixel | polyOverlapsOrContainsPixel | pixelContainsPoly | pixelContainsPolyCenter | adaptive | envelope" force="yes | no" ignoreProjection="yes | no" copyAttributes="yes | no" pxlcount="yes | no" mean="yes | no " min="yes | no" max="yes | no " stddev="yes | no" mode="yes | no" count="yes | no" minThreshold="float" maxThreashold="float" >
+    <rsgis:command algor="zonalstats" option="pixelstats" image="image.env"   vector="polys.shp" raster="polys.env" output="output.shp" method="polyContainsPixel | polyContainsPixelCenter | polyOverlapsPixel | polyOverlapsOrContainsPixel | pixelContainsPoly | pixelContainsPolyCenter | adaptive | envelope" force="yes | no" ignoreProjection="yes | no" copyAttributes="yes | no" pxlcount="yes | no" mean="yes | no " min="yes | no" max="yes | no " stddev="yes | no" mode="yes | no" count="yes | no" minThreshold="float" maxThreshold="float" >
         <rsgis:attribute name="attribute_name" mean="yes | no " min="yes | no" max="yes | no " stddev="yes | no" mode="yes | no"  count="yes | no">
-            <rsgis:band band="int" minThreshold="float" maxThreashold="float" />
+            <rsgis:band band="int" minThreshold="float" maxThreshold="float" />
         </rsgis:attribute>
         <rsgis:attribute name="attribute_name" mean="yes | no " min="yes | no" max="yes | no " stddev="yes | no" mode="yes | no"  count="yes | no">
-            <rsgis:band band="int" minThreshold="float" maxThreashold="float" />
+            <rsgis:band band="int" minThreshold="float" maxThreshold="float" />
         </rsgis:attribute>
     </rsgis:command>
     <!-- A command to ... -->
-    <rsgis:command algor="zonalstats" option="pixelstats" image="image.env"   vector="polys.shp" raster="polys.env" outputCSV="output.csv" method="polyContainsPixel | polyContainsPixelCenter | polyOverlapsPixel | polyOverlapsOrContainsPixel | pixelContainsPoly | pixelContainsPolyCenter | adaptive | envelope" ignoreProjection="yes | no" pxlcount="yes | no" mean="yes | no " min="yes | no" max="yes | no " stddev="yes | no" mode="yes | no"  count="yes | no" minThreshold="float" maxThreashold="float" >
+    <rsgis:command algor="zonalstats" option="pixelstats" image="image.env"   vector="polys.shp" raster="polys.env" outputCSV="output.csv" method="polyContainsPixel | polyContainsPixelCenter | polyOverlapsPixel | polyOverlapsOrContainsPixel | pixelContainsPoly | pixelContainsPolyCenter | adaptive | envelope" ignoreProjection="yes | no" pxlcount="yes | no" mean="yes | no " min="yes | no" max="yes | no " stddev="yes | no" mode="yes | no"  count="yes | no" minThreshold="float" maxThreshold="float" >
         <rsgis:attribute name="attribute_name" mean="yes | no " min="yes | no" max="yes | no " stddev="yes | no" mode="yes | no"  count="yes | no">
-            <rsgis:band band="int" minThreshold="float" maxThreashold="float" />
+            <rsgis:band band="int" minThreshold="float" maxThreshold="float" />
         </rsgis:attribute>
         <rsgis:attribute name="attribute_name" mean="yes | no " min="yes | no" max="yes | no " stddev="yes | no" mode="yes | no"  count="yes | no">
-            <rsgis:band band="int" minThreshold="float" maxThreashold="float" />
+            <rsgis:band band="int" minThreshold="float" maxThreshold="float" />
         </rsgis:attribute>
     </rsgis:command>
     <!-- Calculates pixel mean-->
     <rsgis:command algor="zonalstats" option="pixelmean" image="image.env" raster="polys.env" method="polyContainsPixel | polyContainsPixelCenter | polyOverlapsPixel | polyOverlapsOrContainsPixel | pixelContainsPoly | pixelContainsPolyCenter | adaptive | envelope" vector="polys.shp" output="output.shp" force="yes | no" pxlcount="yes | no" dB="yes | no">
         <rsgis:attribute name="attribute_name" >
-            <rsgis:band band="int" minThreshold="float" maxThreashold="float" />
+            <rsgis:band band="int" minThreshold="float" maxThreshold="float" />
         </rsgis:attribute>
         <rsgis:attribute name="attribute_name" >
-            <rsgis:band band="int" minThreshold="float" maxThreashold="float" />
+            <rsgis:band band="int" minThreshold="float" maxThreshold="float" />
         </rsgis:attribute>
         <rsgis:attribute name="attribute_name" >
-            <rsgis:band band="int" minThreshold="float" maxThreashold="float" />
+            <rsgis:band band="int" minThreshold="float" maxThreshold="float" />
         </rsgis:attribute>
     </rsgis:command>
     <!-- Calculates weighted mean based on percentage of pixel falling within polygon -->
     <rsgis:command algor="zonalstats" option="pixelWeightedMean" image="image.env" vector="polys.shp" output="output.shp" force="yes | no" pxlcount="yes | no">
         <rsgis:attribute name="attribute_name" >
-            <rsgis:band band="int" minThreshold="float" maxThreashold="float" />
+            <rsgis:band band="int" minThreshold="float" maxThreshold="float" />
         </rsgis:attribute>
         <rsgis:attribute name="attribute_name" >
-            <rsgis:band band="int" minThreshold="float" maxThreashold="float" />
+            <rsgis:band band="int" minThreshold="float" maxThreshold="float" />
         </rsgis:attribute>
         <rsgis:attribute name="attribute_name" >
-            <rsgis:band band="int" minThreshold="float" maxThreashold="float"/>
+            <rsgis:band band="int" minThreshold="float" maxThreshold="float"/>
         </rsgis:attribute>
     </rsgis:command>
     <!-- Calculates mean and variance on the mean for window around polygon -->
     <rsgis:command algor="zonalstats" option="pixelmeanLSSVar" image="image.env" vector="polys.shp" method="polyContainsPixel | polyContainsPixelCenter | polyOverlapsPixel | polyOverlapsOrContainsPixel | pixelContainsPoly | pixelContainsPolyCenter | adaptive | envelope" output="output.shp" windowSize="int" offsetSize="float" force="yes | no" pxlcount="yes | no">
         <rsgis:attribute name="attribute_name" >
-            <rsgis:band band="int" minThreshold="float" maxThreashold="float" />
+            <rsgis:band band="int" minThreshold="float" maxThreshold="float" />
         </rsgis:attribute>
         <rsgis:attribute name="attribute_name" >
-            <rsgis:band band="int" minThreshold="float" maxThreashold="float" />
+            <rsgis:band band="int" minThreshold="float" maxThreshold="float" />
         </rsgis:attribute>
         <rsgis:attribute name="attribute_name" >
-            <rsgis:band band="int" minThreshold="float" maxThreashold="float"/>
+            <rsgis:band band="int" minThreshold="float" maxThreshold="float"/>
         </rsgis:attribute>
     </rsgis:command>
     <!-- TODO -->
