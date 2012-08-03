@@ -387,7 +387,13 @@
         <rsgis:field name="string" />
         <rsgis:field name="string" />
     </rsgis:command>
-
+	<!-- A command to populate an attribute table with statistics from an image -->
+	<rsgis:command algor="rastergis" option="popattributestats" input="image.env" clumps="clumps.env" >
+        <rsgis:band band="int" [min="field"] [max="field"] [mean="field"] [sum="field"] [stddev="field"] />
+        <rsgis:band band="int" [min="field"] [max="field"] [mean="field"] [sum="field"] [stddev="field"] />
+        <rsgis:band band="int" [min="field"] [max="field"] [mean="field"] [sum="field"] [stddev="field"] />
+        <rsgis:band band="int" [min="field"] [max="field"] [mean="field"] [sum="field"] [stddev="field"] />
+    </rsgis:command>
 
 
 
