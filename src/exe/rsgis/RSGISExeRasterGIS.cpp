@@ -50,6 +50,7 @@ namespace rsgisexe{
         XMLCh *optionFindTopN = xercesc::XMLString::transcode("findtopn");
         XMLCh *optionCopyGDALATTColumns = xercesc::XMLString::transcode("copyGDALATTColumns");
         XMLCh *optionPopAttributeStats = xercesc::XMLString::transcode("popattributestats");
+        XMLCh *optionPopCategoryProportions = xercesc::XMLString::transcode("popcategoryproportions");
         
         
         const XMLCh *algorNameEle = argElement->getAttribute(algorXMLStr);
@@ -497,6 +498,93 @@ namespace rsgisexe{
             xercesc::XMLString::release(&rsgisBandXMLStr);
             
         }
+        else if(xercesc::XMLString::equals(optionPopCategoryProportions, optionXML))
+        {
+            this->option = RSGISExeRasterGIS::popcategoryproportions;
+            
+            XMLCh *clumpsXMLStr = xercesc::XMLString::transcode("clumps");
+            if(argElement->hasAttribute(clumpsXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(clumpsXMLStr));
+                this->clumpsImage = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'clumps\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&clumpsXMLStr);
+            
+            
+            XMLCh *categoriesXMLStr = xercesc::XMLString::transcode("categories");
+            if(argElement->hasAttribute(categoriesXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(categoriesXMLStr));
+                this->categoriesImage = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'categories\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&categoriesXMLStr);
+            
+            XMLCh *outColsXMLStr = xercesc::XMLString::transcode("outcols");
+            if(argElement->hasAttribute(outColsXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outColsXMLStr));
+                this->outColsName = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'outcols\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&outColsXMLStr);
+            
+            XMLCh *majorityXMLStr = xercesc::XMLString::transcode("majority");
+            if(argElement->hasAttribute(majorityXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(majorityXMLStr));
+                this->majorityColName = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'majority\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&majorityXMLStr);
+            
+            this->copyClassNames = false;
+            XMLCh *majClassNameXMLStr = xercesc::XMLString::transcode("majclassname");
+            if(argElement->hasAttribute(majClassNameXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(majClassNameXMLStr));
+                this->majClassNameField = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+                
+                XMLCh *classNameXMLStr = xercesc::XMLString::transcode("classname");
+                if(argElement->hasAttribute(classNameXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(classNameXMLStr));
+                    this->classNameField = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'classname\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&classNameXMLStr);
+                
+                this->copyClassNames = true;
+            }
+            else
+            {
+                this->copyClassNames = false;
+            }
+            xercesc::XMLString::release(&majClassNameXMLStr);
+            
+        }
         else
         {
             std::string message = std::string("The option (") + std::string(xercesc::XMLString::transcode(optionXML)) + std::string(") is not known: RSGISExeRasterGIS.");
@@ -513,6 +601,7 @@ namespace rsgisexe{
         xercesc::XMLString::release(&optionFindTopN);
         xercesc::XMLString::release(&optionCopyGDALATTColumns);
         xercesc::XMLString::release(&optionPopAttributeStats);
+        xercesc::XMLString::release(&optionPopCategoryProportions);
     }
     
     void RSGISExeRasterGIS::runAlgorithm() throw(rsgis::RSGISException)
@@ -771,6 +860,54 @@ namespace rsgisexe{
                 } 
                 catch (rsgis::RSGISException &e) 
                 {
+                    throw e;
+                }
+            }
+            else if(this->option == RSGISExeRasterGIS::popcategoryproportions)
+            {
+                std::cout << "A command to populate an attribute table with the proportions of the categories overlapping the clumps\n";
+                std::cout << "Clump Image: " << this->clumpsImage << std::endl;
+                std::cout << "Categories Image: " << this->categoriesImage << std::endl;
+                std::cout << "Output Column: " << this->outColsName << std::endl;
+                std::cout << "Majority Column: " << this->majorityColName << std::endl;
+                if(this->copyClassNames)
+                {
+                    std::cout << "Majority Column Name: " << this->majClassNameField << std::endl;
+                    std::cout << "Class name column: " << this->classNameField << std::endl;
+                }
+                
+                try 
+                {
+                    GDALAllRegister();
+                    
+                    GDALDataset *clumpsDataset = (GDALDataset *) GDALOpenShared(this->clumpsImage.c_str(), GA_Update);
+                    if(clumpsDataset == NULL)
+                    {
+                        std::string message = std::string("Could not open image ") + this->clumpsImage;
+                        throw rsgis::RSGISImageException(message.c_str());
+                    }
+                    GDALDataset *catsDataset = (GDALDataset *) GDALOpenShared(this->categoriesImage.c_str(), GA_ReadOnly);
+                    if(catsDataset == NULL)
+                    {
+                        std::string message = std::string("Could not open image ") + this->categoriesImage;
+                        throw rsgis::RSGISImageException(message.c_str());
+                    }
+                    
+                    rsgis::rastergis::RSGISFindClumpCatagoryStats findClumpStats;
+                    findClumpStats.calcCatergoriesOverlaps(clumpsDataset, catsDataset, this->outColsName, this->majorityColName, this->copyClassNames, this->majClassNameField, this->classNameField);                    
+                    
+                    clumpsDataset->GetRasterBand(1)->SetMetadataItem("LAYER_TYPE", "thematic");
+                    
+                    GDALClose(clumpsDataset);
+                    GDALClose(catsDataset);
+                }
+                catch (rsgis::RSGISAttributeTableException &e) 
+                {
+                    throw e;
+                }
+                catch (rsgis::RSGISException &e) 
+                {
+                    std::cout << e.what() << std::endl;
                     throw e;
                 }
             }

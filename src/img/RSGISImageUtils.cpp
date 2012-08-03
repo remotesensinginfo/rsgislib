@@ -133,14 +133,22 @@ namespace rsgis{namespace img{
 					}
 				}
 			}
+            
+            
             			
 			if(maxX - minX <= 0)
 			{
+                std::cout.precision(12);
+                std::cout << "X = [" << minX << "," << maxX << "]\n";
+                std::cout << "Y = [" << minY << "," << maxY << "]\n";
 				throw RSGISImageBandException("Images do not overlap in the X axis");
 			}
 			
 			if(maxY - minY <= 0)
 			{
+                std::cout.precision(12);
+                std::cout << "X = [" << minX << "," << maxX << "]\n";
+                std::cout << "Y = [" << minY << "," << maxY << "]\n";
 				throw RSGISImageBandException("Images do not overlap in the Y axis");
 			}
 			
