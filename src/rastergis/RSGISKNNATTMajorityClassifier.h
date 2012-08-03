@@ -1,5 +1,5 @@
 /*
- *  RSGISRasterAttUtils.h
+ *  RSGISKNNATTMajorityClassifier.h
  *  RSGIS_LIB
  *
  *  Created by Pete Bunting on 01/08/2012.
@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef RSGISRasterAttUtils_H
-#define RSGISRasterAttUtils_H
+#ifndef RSGISKNNATTMajorityClassifier_H
+#define RSGISKNNATTMajorityClassifier_H
 
 #include <iostream>
 #include <string>
@@ -32,20 +32,24 @@
 
 #include "common/RSGISAttributeTableException.h"
 
+#include "math/RSGISMathException.h"
+
 #include <boost/numeric/conversion/cast.hpp>
 #include <boost/lexical_cast.hpp>
 
 namespace rsgis{namespace rastergis{
 	
-    class RSGISRasterAttUtils
+    class RSGISKNNATTMajorityClassifier
     {
     public:
-        RSGISRasterAttUtils();
-        void copyAttColumns(GDALDataset *inImage, GDALDataset *outImage, std::vector<std::string> fields) throw(RSGISAttributeTableException);
-        ~RSGISRasterAttUtils();
+        RSGISKNNATTMajorityClassifier();
+        
+        ~RSGISKNNATTMajorityClassifier();
     };
 	
 }}
 
 #endif
+
+
 

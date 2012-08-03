@@ -1,5 +1,5 @@
 /*
- *  RSGISRasterAttUtils.h
+ *  RSGISKNNATTMajorityClassifier.cpp
  *  RSGIS_LIB
  *
  *  Created by Pete Bunting on 01/08/2012.
@@ -20,32 +20,27 @@
  *
  */
 
-#ifndef RSGISRasterAttUtils_H
-#define RSGISRasterAttUtils_H
-
-#include <iostream>
-#include <string>
-#include <math.h>
-
-#include "gdal_priv.h"
-#include "gdal_rat.h"
-
-#include "common/RSGISAttributeTableException.h"
-
-#include <boost/numeric/conversion/cast.hpp>
-#include <boost/lexical_cast.hpp>
+#include "RSGISKNNATTMajorityClassifier.h"
 
 namespace rsgis{namespace rastergis{
 	
-    class RSGISRasterAttUtils
+
+    RSGISKNNATTMajorityClassifier::RSGISKNNATTMajorityClassifier()
     {
-    public:
-        RSGISRasterAttUtils();
-        void copyAttColumns(GDALDataset *inImage, GDALDataset *outImage, std::vector<std::string> fields) throw(RSGISAttributeTableException);
-        ~RSGISRasterAttUtils();
-    };
+        
+    }
+    
+    
+    
+    
+    RSGISKNNATTMajorityClassifier::~RSGISKNNATTMajorityClassifier()
+    {
+        
+    }
 	
 }}
 
-#endif
+
+
+
 

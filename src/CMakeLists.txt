@@ -665,7 +665,10 @@ set(LIB_RASTERGIS_H
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISCalcClusterLocation.h
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISCalcEucDistanceInAttTable.h
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindTopNWithinDist.h
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISRasterAttUtils.h )
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISRasterAttUtils.h
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISKNNATTMajorityClassifier.h
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISCalcClumpStats.h
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindClumpCatagoryStats.h )
 	
 set(LIB_RASTERGIS_CPP
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISAttributeTable.cpp
@@ -699,7 +702,13 @@ set(LIB_RASTERGIS_CPP
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindTopNWithinDist.cpp
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindTopNWithinDist.h
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISRasterAttUtils.cpp
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISRasterAttUtils.h )
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISRasterAttUtils.h
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISKNNATTMajorityClassifier.cpp
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISKNNATTMajorityClassifier.h
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISCalcClumpStats.cpp
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISCalcClumpStats.h
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindClumpCatagoryStats.cpp
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindClumpCatagoryStats.h )
 ###############################################################################
 
 ###############################################################################

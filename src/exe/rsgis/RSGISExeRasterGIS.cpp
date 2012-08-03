@@ -49,6 +49,7 @@ namespace rsgisexe{
         XMLCh *optionEucDistFromFeat = xercesc::XMLString::transcode("eucdistfromfeat");
         XMLCh *optionFindTopN = xercesc::XMLString::transcode("findtopn");
         XMLCh *optionCopyGDALATTColumns = xercesc::XMLString::transcode("copyGDALATTColumns");
+        XMLCh *optionPopAttributeStats = xercesc::XMLString::transcode("popattributestats");
         
         
         const XMLCh *algorNameEle = argElement->getAttribute(algorXMLStr);
@@ -356,6 +357,146 @@ namespace rsgisexe{
                 xercesc::XMLString::release(&nameXMLStr);
             }
         }
+        else if(xercesc::XMLString::equals(optionPopAttributeStats, optionXML))
+        {
+            this->option = RSGISExeRasterGIS::popattributestats;
+            XMLCh *inputXMLStr = xercesc::XMLString::transcode("input");
+            if(argElement->hasAttribute(inputXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(inputXMLStr));
+                this->inputImage = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'input\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&inputXMLStr);
+            
+            XMLCh *clumpsXMLStr = xercesc::XMLString::transcode("clumps");
+            if(argElement->hasAttribute(clumpsXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(clumpsXMLStr));
+                this->clumpsImage = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'clumps\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&clumpsXMLStr);
+            
+            XMLCh *rsgisBandXMLStr = xercesc::XMLString::transcode("rsgis:band");
+            xercesc::DOMNodeList *bandNodesList = argElement->getElementsByTagName(rsgisBandXMLStr);
+            unsigned int numBands = bandNodesList->getLength();
+            
+            std::cout << "Found " << numBands << " Attributes" << std::endl;
+            
+            bandStats = new std::vector<rsgis::rastergis::RSGISBandAttStats*>();
+            bandStats->reserve(numBands);
+            
+            rsgis::rastergis::RSGISBandAttStats *bandStat = NULL;
+            xercesc::DOMElement *bandElement = NULL;
+            for(int i = 0; i < numBands; i++)
+            {
+                bandElement = static_cast<xercesc::DOMElement*>(bandNodesList->item(i));
+                
+                bandStat = new rsgis::rastergis::RSGISBandAttStats();
+                
+                XMLCh *bandXMLStr = xercesc::XMLString::transcode("band");
+                if(bandElement->hasAttribute(bandXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(bandXMLStr));
+                    bandStat->band = textUtils.strto32bitUInt(std::string(charValue));
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'band\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&bandXMLStr);
+                
+                XMLCh *minXMLStr = xercesc::XMLString::transcode("min");
+                if(bandElement->hasAttribute(minXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(minXMLStr));
+                    bandStat->minField = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                    
+                    bandStat->calcMin = true;
+                }
+                else
+                {
+                    bandStat->calcMin = false;
+                }
+                xercesc::XMLString::release(&minXMLStr);
+                
+                XMLCh *maxXMLStr = xercesc::XMLString::transcode("max");
+                if(bandElement->hasAttribute(maxXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(maxXMLStr));
+                    bandStat->maxField = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                    
+                    bandStat->calcMax = true;
+                }
+                else
+                {
+                    bandStat->calcMax = false;
+                }
+                xercesc::XMLString::release(&maxXMLStr);
+                
+                XMLCh *meanXMLStr = xercesc::XMLString::transcode("mean");
+                if(bandElement->hasAttribute(meanXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(meanXMLStr));
+                    bandStat->meanField = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                    
+                    bandStat->calcMean = true;
+                }
+                else
+                {
+                    bandStat->calcMean = false;
+                }
+                xercesc::XMLString::release(&meanXMLStr);
+                
+                XMLCh *stdDevXMLStr = xercesc::XMLString::transcode("stddev");
+                if(bandElement->hasAttribute(stdDevXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(stdDevXMLStr));
+                    bandStat->stdDevField = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                    
+                    bandStat->calcStdDev = true;
+                }
+                else
+                {
+                    bandStat->calcStdDev = false;
+                }
+                xercesc::XMLString::release(&stdDevXMLStr);
+                
+                XMLCh *sumXMLStr = xercesc::XMLString::transcode("sum");
+                if(bandElement->hasAttribute(sumXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(sumXMLStr));
+                    bandStat->sumField = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                    
+                    bandStat->calcSum = true;
+                }
+                else
+                {
+                    bandStat->calcSum = false;
+                }
+                xercesc::XMLString::release(&sumXMLStr);
+                
+                bandStat->calcMedian = false;
+                bandStats->push_back(bandStat);
+            }
+            xercesc::XMLString::release(&rsgisBandXMLStr);
+            
+        }
         else
         {
             std::string message = std::string("The option (") + std::string(xercesc::XMLString::transcode(optionXML)) + std::string(") is not known: RSGISExeRasterGIS.");
@@ -371,6 +512,7 @@ namespace rsgisexe{
         xercesc::XMLString::release(&optionSpatialLocation);
         xercesc::XMLString::release(&optionFindTopN);
         xercesc::XMLString::release(&optionCopyGDALATTColumns);
+        xercesc::XMLString::release(&optionPopAttributeStats);
     }
     
     void RSGISExeRasterGIS::runAlgorithm() throw(rsgis::RSGISException)
@@ -557,6 +699,81 @@ namespace rsgisexe{
                     throw e;
                 }	
             }
+            else if(this->option == RSGISExeRasterGIS::popattributestats)
+            {
+                std::cout << "A command to populate an attribute table with statistics from an image in a memory efficient manor.\n";
+                std::cout << "Input Image: " << this->inputImage << std::endl;
+                std::cout << "Clump Image: " << this->clumpsImage << std::endl;
+                std::cout << "Statistics to be calculated:\n";
+                for(std::vector<rsgis::rastergis::RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
+                {
+                    std::cout << "Band " << (*iterBands)->band << ": ";
+                    if((*iterBands)->calcMin)
+                    {
+                        std::cout << "MIN (" << (*iterBands)->minField << ") ";
+                    }
+                    
+                    if((*iterBands)->calcMax)
+                    {
+                        std::cout << "MAX (" << (*iterBands)->maxField << ") ";
+                    }
+                    
+                    if((*iterBands)->calcMean)
+                    {
+                        std::cout << "MEAN (" << (*iterBands)->meanField << ") ";
+                    }
+                    
+                    if((*iterBands)->calcSum)
+                    {
+                        std::cout << "SUM (" << (*iterBands)->sumField << ") ";
+                    }
+                    
+                    if((*iterBands)->calcStdDev)
+                    {
+                        std::cout << "STDDEV (" << (*iterBands)->stdDevField << ") ";
+                    }
+                    
+                    std::cout << std::endl;
+                    
+                    (*iterBands)->countIdxDef = false;
+                    (*iterBands)->minIdxDef = false;
+                    (*iterBands)->maxIdxDef = false;
+                    (*iterBands)->meanIdxDef = false;
+                    (*iterBands)->sumIdxDef = false;
+                    (*iterBands)->stdDevIdxDef = false;
+                    (*iterBands)->medianIdxDef = false;
+                }
+                
+                try 
+                {
+                    GDALAllRegister();
+                    
+                    GDALDataset *clumpsDataset = (GDALDataset *) GDALOpenShared(this->clumpsImage.c_str(), GA_Update);
+                    if(clumpsDataset == NULL)
+                    {
+                        std::string message = std::string("Could not open image ") + this->clumpsImage;
+                        throw rsgis::RSGISImageException(message.c_str());
+                    }
+                    GDALDataset *imageDataset = (GDALDataset *) GDALOpenShared(this->inputImage.c_str(), GA_ReadOnly);
+                    if(imageDataset == NULL)
+                    {
+                        std::string message = std::string("Could not open image ") + this->inputImage;
+                        throw rsgis::RSGISImageException(message.c_str());
+                    }
+                    
+                    rsgis::rastergis::RSGISCalcClumpStats clumpStats;
+                    clumpStats.calcImageClumpStatistic(clumpsDataset, imageDataset, bandStats);
+                    
+                    clumpsDataset->GetRasterBand(1)->SetMetadataItem("LAYER_TYPE", "thematic");
+                    
+                    GDALClose(clumpsDataset);
+                    GDALClose(imageDataset);
+                } 
+                catch (rsgis::RSGISException &e) 
+                {
+                    throw e;
+                }
+            }
             else
             {
                 throw rsgis::RSGISException("The option is not recognised: RSGISExeRasterGIS");
@@ -591,6 +808,43 @@ namespace rsgisexe{
                 for(std::vector<std::string>::iterator iterFields = fields.begin(); iterFields != fields.end(); ++iterFields)
                 {
                     std::cout << "\tField: " << (*iterFields) << std::endl;
+                }
+            }
+            else if(this->option == RSGISExeRasterGIS::popattributestats)
+            {
+                std::cout << "A command to populate an attribute table with statistics from an image in a memory efficient manor.\n";
+                std::cout << "Input Image: " << this->inputImage << std::endl;
+                std::cout << "Clump Image: " << this->clumpsImage << std::endl;
+                std::cout << "Statistics to be calculated:\n";
+                for(std::vector<rsgis::rastergis::RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
+                {
+                    std::cout << "Band " << (*iterBands)->band << ": ";
+                    if((*iterBands)->calcMin)
+                    {
+                        std::cout << "MIN (" << (*iterBands)->minField << ") ";
+                    }
+                    
+                    if((*iterBands)->calcMax)
+                    {
+                        std::cout << "MAX (" << (*iterBands)->maxField << ") ";
+                    }
+                    
+                    if((*iterBands)->calcMean)
+                    {
+                        std::cout << "MEAN (" << (*iterBands)->meanField << ") ";
+                    }
+                    
+                    if((*iterBands)->calcSum)
+                    {
+                        std::cout << "SUM (" << (*iterBands)->sumField << ") ";
+                    }
+                    
+                    if((*iterBands)->calcStdDev)
+                    {
+                        std::cout << "STDDEV (" << (*iterBands)->stdDevField << ") ";
+                    }
+                    
+                    std::cout << std::endl;
                 }
             }
             else

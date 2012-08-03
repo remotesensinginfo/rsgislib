@@ -36,6 +36,7 @@
 
 #include "rastergis/RSGISAttributeTable.h"
 #include "rastergis/RSGISAttributeTableMem.h"
+#include "rastergis/RSGISCalcClumpStats.h"
 
 #include "math/RSGISMathsUtils.h"
 
@@ -50,33 +51,6 @@
 #include <boost/cstdint.hpp>
 
 namespace rsgis{namespace rastergis{
-    
-    struct RSGISBandAttStats
-    {
-        unsigned int band;
-        float threshold;
-        bool calcCount;
-        std::string countField;
-        unsigned int countIdx;
-        bool calcMin;
-        std::string minField;
-        unsigned int minIdx;
-        bool calcMax;
-        std::string maxField;
-        unsigned int maxIdx;
-        bool calcMean;
-        std::string meanField;
-        unsigned int meanIdx;
-        bool calcStdDev;
-        std::string stdDevField;
-        unsigned int stdDevIdx;
-        bool calcMedian;
-        std::string medianField;
-        unsigned int medianIdx;
-        bool calcSum;
-        std::string sumField;
-        unsigned int sumIdx;
-    };
     
     struct RSGISBandAttStatsMeanLit
     {
