@@ -2048,7 +2048,7 @@ namespace rsgis {namespace radar
 					double density = gsl_vector_get(outPar, 1);
 					double error = gsl_vector_get(outPar, 2);
 
-					if ((error > 1) | (boost::math::isnan(height)) | (boost::math::isnan(density))) // If error is greater than 1, hasn't converged, write out a priori par (if available) or initial par.
+					if ((boost::math::isnan(height)) | (boost::math::isnan(density))) 
 					{
 						try
 						{
