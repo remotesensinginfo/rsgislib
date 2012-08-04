@@ -964,6 +964,7 @@ namespace rsgis{namespace radar{
 		this->objectSamplesPercent = 0.1; // Percent of pixels in object to use with slow optimisers.
 		this->parameters = parameters;
 		this->initialPar = initialPar;
+		this->classHeading = classHeading;
 		this->minMaxVals = minMaxVals;
 		this->useDefaultMinMax = true;
 
@@ -998,6 +999,8 @@ namespace rsgis{namespace radar{
 			this->useDefaultMinMax = false; // If minimum and maximum values are passed in use these insead
 		}
 
+        std::cout << "Parameters read in OK" << std::endl;
+
 	}
 
 	void RSGISObjectBasedEstimationRasterPolygon::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
@@ -1024,8 +1027,6 @@ namespace rsgis{namespace radar{
             {
                 int fieldIdx = inFeatureDefn->GetFieldIndex(this->classHeading.c_str());
                 estClass = inFeature->GetFieldAsInteger(fieldIdx) - 1;
-
-                std::cout << "estClass = " << estClass << std::endl;
 
                 if (estClass >= this->slowOptimiser->size())
                 {
@@ -1080,6 +1081,7 @@ namespace rsgis{namespace radar{
                     {
                         inData[i] = inData[i] + pixelVals[i]->at(r);
                     }
+
                 }
             }
 
@@ -1093,8 +1095,6 @@ namespace rsgis{namespace radar{
                 {
                     inData[i] = inData[i] / pixelVals[i]->size();
                 }
-
-                //std::cout << "inData[" << i << "] = " << inData[i] << std::endl;
             }
 
             invValuesObj->calcImageValue(inData, this->numBands, outData);
@@ -1106,8 +1106,6 @@ namespace rsgis{namespace radar{
             {
                 gsl_vector_set(localPar, i, outData[i]);
             }
-
-            //std::cout << "object height = " << gsl_vector_get(localPar, 0) << ", object density = " << gsl_vector_get(localPar, 1) << std::endl;
 
             // SAVE PARAMETERS TO OUTPUT SHAPEFILE
             OGRFeatureDefn *outFeatureDefn = outFeature->GetDefnRef();
@@ -1439,11 +1437,11 @@ namespace rsgis{namespace radar{
 
 	void RSGISObjectBasedEstimationGetObjVals::calcImageValue(float *bandValuesImage, int numBands, int band) throw(rsgis::img::RSGISImageCalcException)
 	{
-		for(int i = 0; i < this->numBands - 1;  i++) // Loop through bands
+		for(int i = 1; i < this->numBands + 1;  i++) // Loop through bands
 		{
-			if ((boost::math::isnan(bandValuesImage[i+1]) == false) && (bandValuesImage[i+1] != 0.0) && (bandValuesImage[i+1] > -100))
+			if ((boost::math::isnan(bandValuesImage[i]) == false) && (bandValuesImage[i] != 0.0) && (bandValuesImage[i] > -100))
 			{
-				pixelVals[i]->push_back(bandValuesImage[i+1]);
+				pixelVals[i-1]->push_back(bandValuesImage[i]);
 			}
 		}
 	}

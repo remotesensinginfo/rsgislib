@@ -2224,7 +2224,7 @@ namespace rsgis {namespace radar{
         this->allFunctions = allFunctions;
         
         this->minMaxIntervalAll = minMaxIntervalAll; // minA, maxA, minStepSizeA
-        
+       
         this->nPar = allFunctions->at(0)->numVariables();
         this->nData = invCovMatrixD->size1;
         
@@ -2383,11 +2383,10 @@ namespace rsgis {namespace radar{
                         
                         if (withinLimits) 
                         {							
-                            double prevEnergy = currentParError->at(this->nPar);
+							double prevEnergy = currentParError->at(this->nPar);
                             // Calculate energy
                             newEnergy = this->calcLeastSquares(testPar);
                             double error = newEnergy;
-                            
                             if(newEnergy < currentParError->at(this->nPar)) // If new energy is lower accept
                             {
                                 // Calculate rel error (Test)
@@ -2493,7 +2492,7 @@ namespace rsgis {namespace radar{
         // Set output to best value
         for (unsigned int j = 0; j < this->nPar + 1; j++) 
         {
-            gsl_vector_set(outParError, j, bestParError->at(j));
+			gsl_vector_set(outParError, j, bestParError->at(j));
         }
         
         // Tidy
