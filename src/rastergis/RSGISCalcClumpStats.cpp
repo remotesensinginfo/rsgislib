@@ -31,196 +31,224 @@ namespace rsgis{namespace rastergis{
     
     void RSGISCalcClumpStats::calcImageClumpStatistic(GDALDataset *clumpDS, GDALDataset *imageDS, std::vector<rsgis::rastergis::RSGISBandAttStats*> *bandStats) throw(rsgis::RSGISAttributeTableException)
     {
-        // Get Attribute table
-        GDALRasterAttributeTable *attTable = new GDALRasterAttributeTable(*clumpDS->GetRasterBand(1)->GetDefaultRAT());
-        
-        // Make sure it is long enough and extend if required.
-        int numRows = attTable->GetRowCount();
-        
-        double maxVal = 0;
-        clumpDS->GetRasterBand(1)->GetStatistics(false, true, NULL, &maxVal, NULL, NULL);
-        
-        if(maxVal > numRows)
-        {                
-            attTable->SetRowCount(maxVal+1);
-        }
-        
-        // Check whether a standard deviation is to be created (requires second iteration of image).
-        bool calcStdDevs = false;
-        for(std::vector<rsgis::rastergis::RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
+        try
         {
-            if(((*iterBands)->calcStdDev) & (!(*iterBands)->calcMean))
+            // Get Attribute table
+            const GDALRasterAttributeTable *attTableTmp = clumpDS->GetRasterBand(1)->GetDefaultRAT();
+            GDALRasterAttributeTable *attTable = NULL;
+            if(attTableTmp != NULL)
             {
-                throw rsgis::RSGISAttributeTableException("If the standard deviation is required to be calculated then the mean must also be calculated.");
-            }
-            else if((*iterBands)->calcStdDev)
-            {
-                calcStdDevs = true;
-            }
-        }
-        
-        // Check whether columns already exist and if not create them.
-        int numColumns = attTable->GetColumnCount();
-        std::string colName = "";
-        bool foundPxlCount = false;
-        int pxlCountIdx = 0;
-        for(int i = 0; i < numColumns; ++i)
-        {
-            colName = std::string(attTable->GetNameOfCol(i));
-            if(colName == "PxlCount")
-            {
-                pxlCountIdx = i;
-                foundPxlCount = true;
+                attTable = new GDALRasterAttributeTable(*attTableTmp);
             }
             else
             {
-                for(std::vector<rsgis::rastergis::RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
-                {
-                    if(((*iterBands)->calcMin) && (colName == (*iterBands)->minField))
-                    {
-                        (*iterBands)->minIdx = i;
-                        (*iterBands)->minIdxDef = true;
-                    }
-                    else if(((*iterBands)->calcMax) && (colName == (*iterBands)->maxField))
-                    {
-                        (*iterBands)->maxIdx = i;
-                        (*iterBands)->maxIdxDef = true;
-                    }
-                    else if(((*iterBands)->calcMean) && (colName == (*iterBands)->meanField))
-                    {
-                        (*iterBands)->meanIdx = i;
-                        (*iterBands)->meanIdxDef = true;
-                    }
-                    else if(((*iterBands)->calcStdDev) && (colName == (*iterBands)->stdDevField))
-                    {
-                        (*iterBands)->stdDevIdx = i;
-                        (*iterBands)->stdDevIdxDef = true;
-                    }
-                    else if(((*iterBands)->calcSum) && (colName == (*iterBands)->sumField))
-                    {
-                        (*iterBands)->sumIdx = i;
-                        (*iterBands)->sumIdxDef = true;
-                    }
-                }
+                attTable = new GDALRasterAttributeTable();
             }
-        }
-        
-        if(!foundPxlCount)
-        {
-            attTable->CreateColumn("PxlCount", GFT_Integer, GFU_PixelCount);
-            pxlCountIdx = numColumns++;
-        }
-        
-        for(std::vector<rsgis::rastergis::RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
-        {
-            if(((*iterBands)->calcMin) && (!(*iterBands)->minIdxDef))
-            {
-                attTable->CreateColumn((*iterBands)->minField.c_str(), GFT_Real, GFU_Generic);
-                (*iterBands)->minIdx = numColumns++;
-                (*iterBands)->minIdxDef = true;
+            
+            // Make sure it is long enough and extend if required.
+            int numRows = attTable->GetRowCount();
+            
+            double maxVal = 0;
+            clumpDS->GetRasterBand(1)->GetStatistics(false, true, NULL, &maxVal, NULL, NULL);
+            
+            if(maxVal > numRows)
+            {                
+                attTable->SetRowCount(maxVal+1);
             }
-            if(((*iterBands)->calcMax) && (!(*iterBands)->maxIdxDef))
-            {
-                attTable->CreateColumn((*iterBands)->maxField.c_str(), GFT_Real, GFU_Generic);
-                (*iterBands)->maxIdx = numColumns++;
-                (*iterBands)->maxIdxDef = true;
-            }
-            if(((*iterBands)->calcMean) && (!(*iterBands)->meanIdxDef))
-            {
-                attTable->CreateColumn((*iterBands)->meanField.c_str(), GFT_Real, GFU_Generic);
-                (*iterBands)->meanIdx = numColumns++;
-                (*iterBands)->meanIdxDef = true;
-            }
-            if(((*iterBands)->calcStdDev) && (!(*iterBands)->stdDevIdxDef))
-            {
-                attTable->CreateColumn((*iterBands)->stdDevField.c_str(), GFT_Real, GFU_Generic);
-                (*iterBands)->stdDevIdx = numColumns++;
-                (*iterBands)->stdDevIdxDef = true;
-            }
-            if(((*iterBands)->calcSum) && (!(*iterBands)->sumIdxDef))
-            {
-                attTable->CreateColumn((*iterBands)->sumField.c_str(), GFT_Real, GFU_Generic);
-                (*iterBands)->sumIdx = numColumns++;
-                (*iterBands)->sumIdxDef = true;
-            }
-        }
-        
-        // Calculate statistics
-        bool *firstVal = new bool[numRows];
-        for(int i = 0; i < numRows; ++i)
-        {
-            firstVal[i] = true;
-        }
-        
-        // Get Image Values
-        GDALDataset **datasets = new GDALDataset*[2];
-        datasets[0] = clumpDS;
-        datasets[1] = imageDS;
-        
-        RSGISCalcClusterPxlValueStats *calcImgValStats = new RSGISCalcClusterPxlValueStats(attTable, pxlCountIdx, bandStats, firstVal);
-        rsgis::img::RSGISCalcImage calcImageStats(calcImgValStats);
-        calcImageStats.calcImage(datasets, 2);
-        delete calcImgValStats;
-        
-        for(int i = 0; i < numRows; ++i)
-        {
+            
+            // Check whether a standard deviation is to be created (requires second iteration of image).
+            bool calcStdDevs = false;
             for(std::vector<rsgis::rastergis::RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
             {
-                if((*iterBands)->calcMean)
+                if(((*iterBands)->calcStdDev) & (!(*iterBands)->calcMean))
                 {
-                    if(attTable->GetValueAsInt(i, pxlCountIdx) == 0)
+                    throw rsgis::RSGISAttributeTableException("If the standard deviation is required to be calculated then the mean must also be calculated.");
+                }
+                else if((*iterBands)->calcStdDev)
+                {
+                    calcStdDevs = true;
+                }
+            }
+            
+            // Check whether columns already exist and if not create them.
+            int numColumns = attTable->GetColumnCount();
+            std::string colName = "";
+            bool foundPxlCount = false;
+            int pxlCountIdx = 0;
+            for(int i = 0; i < numColumns; ++i)
+            {
+                colName = std::string(attTable->GetNameOfCol(i));
+                if(colName == "PxlCount")
+                {
+                    pxlCountIdx = i;
+                    foundPxlCount = true;
+                }
+                else
+                {
+                    for(std::vector<rsgis::rastergis::RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
                     {
-                        attTable->SetValue(i, (*iterBands)->meanIdx, 0);
-                    }
-                    else
-                    {
-                        attTable->SetValue(i, 
-                                           (*iterBands)->meanIdx, 
-                                           attTable->GetValueAsDouble(i, (*iterBands)->meanIdx)/attTable->GetValueAsDouble(i, pxlCountIdx)
-                                           );
+                        if(((*iterBands)->calcMin) && (colName == (*iterBands)->minField))
+                        {
+                            (*iterBands)->minIdx = i;
+                            (*iterBands)->minIdxDef = true;
+                        }
+                        else if(((*iterBands)->calcMax) && (colName == (*iterBands)->maxField))
+                        {
+                            (*iterBands)->maxIdx = i;
+                            (*iterBands)->maxIdxDef = true;
+                        }
+                        else if(((*iterBands)->calcMean) && (colName == (*iterBands)->meanField))
+                        {
+                            (*iterBands)->meanIdx = i;
+                            (*iterBands)->meanIdxDef = true;
+                        }
+                        else if(((*iterBands)->calcStdDev) && (colName == (*iterBands)->stdDevField))
+                        {
+                            (*iterBands)->stdDevIdx = i;
+                            (*iterBands)->stdDevIdxDef = true;
+                        }
+                        else if(((*iterBands)->calcSum) && (colName == (*iterBands)->sumField))
+                        {
+                            (*iterBands)->sumIdx = i;
+                            (*iterBands)->sumIdxDef = true;
+                        }
                     }
                 }
             }
-        }
-        
-        if(calcStdDevs)
-        {
+            
+            if(!foundPxlCount)
+            {
+                attTable->CreateColumn("PxlCount", GFT_Integer, GFU_PixelCount);
+                pxlCountIdx = numColumns++;
+            }
+            
+            for(std::vector<rsgis::rastergis::RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
+            {
+                if(((*iterBands)->calcMin) && (!(*iterBands)->minIdxDef))
+                {
+                    attTable->CreateColumn((*iterBands)->minField.c_str(), GFT_Real, GFU_Generic);
+                    (*iterBands)->minIdx = numColumns++;
+                    (*iterBands)->minIdxDef = true;
+                }
+                if(((*iterBands)->calcMax) && (!(*iterBands)->maxIdxDef))
+                {
+                    attTable->CreateColumn((*iterBands)->maxField.c_str(), GFT_Real, GFU_Generic);
+                    (*iterBands)->maxIdx = numColumns++;
+                    (*iterBands)->maxIdxDef = true;
+                }
+                if(((*iterBands)->calcMean) && (!(*iterBands)->meanIdxDef))
+                {
+                    attTable->CreateColumn((*iterBands)->meanField.c_str(), GFT_Real, GFU_Generic);
+                    (*iterBands)->meanIdx = numColumns++;
+                    (*iterBands)->meanIdxDef = true;
+                }
+                if(((*iterBands)->calcStdDev) && (!(*iterBands)->stdDevIdxDef))
+                {
+                    attTable->CreateColumn((*iterBands)->stdDevField.c_str(), GFT_Real, GFU_Generic);
+                    (*iterBands)->stdDevIdx = numColumns++;
+                    (*iterBands)->stdDevIdxDef = true;
+                }
+                if(((*iterBands)->calcSum) && (!(*iterBands)->sumIdxDef))
+                {
+                    attTable->CreateColumn((*iterBands)->sumField.c_str(), GFT_Real, GFU_Generic);
+                    (*iterBands)->sumIdx = numColumns++;
+                    (*iterBands)->sumIdxDef = true;
+                }
+            }
+            
+            // Calculate statistics
+            bool *firstVal = new bool[numRows];
             for(int i = 0; i < numRows; ++i)
             {
                 firstVal[i] = true;
             }
             
             // Get Image Values
-            RSGISCalcClusterPxlValueStdDev *calcImgValStdDev = new RSGISCalcClusterPxlValueStdDev(attTable, bandStats, firstVal);
-            rsgis::img::RSGISCalcImage calcImageStdDev(calcImgValStdDev);
-            calcImageStdDev.calcImage(datasets, 2);
-            delete calcImgValStdDev;
+            GDALDataset **datasets = new GDALDataset*[2];
+            datasets[0] = clumpDS;
+            datasets[1] = imageDS;
+            
+            RSGISCalcClusterPxlValueStats *calcImgValStats = new RSGISCalcClusterPxlValueStats(attTable, pxlCountIdx, bandStats, firstVal);
+            rsgis::img::RSGISCalcImage calcImageStats(calcImgValStats);
+            calcImageStats.calcImage(datasets, 2);
+            delete calcImgValStats;
             
             for(int i = 0; i < numRows; ++i)
             {
                 for(std::vector<rsgis::rastergis::RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
                 {
-                    if((*iterBands)->calcStdDev)
+                    if((*iterBands)->calcMean)
                     {
                         if(attTable->GetValueAsInt(i, pxlCountIdx) == 0)
                         {
-                            attTable->SetValue(i, (*iterBands)->stdDevIdx, 0);
+                            attTable->SetValue(i, (*iterBands)->meanIdx, 0);
                         }
                         else
                         {
                             attTable->SetValue(i, 
-                                               (*iterBands)->stdDevIdx, 
-                                               sqrt(attTable->GetValueAsDouble(i, (*iterBands)->stdDevIdx)/attTable->GetValueAsDouble(i, pxlCountIdx))
+                                               (*iterBands)->meanIdx, 
+                                               attTable->GetValueAsDouble(i, (*iterBands)->meanIdx)/attTable->GetValueAsDouble(i, pxlCountIdx)
                                                );
                         }
                     }
                 }
             }
+            
+            if(calcStdDevs)
+            {
+                for(int i = 0; i < numRows; ++i)
+                {
+                    firstVal[i] = true;
+                }
+                
+                // Get Image Values
+                RSGISCalcClusterPxlValueStdDev *calcImgValStdDev = new RSGISCalcClusterPxlValueStdDev(attTable, bandStats, firstVal);
+                rsgis::img::RSGISCalcImage calcImageStdDev(calcImgValStdDev);
+                calcImageStdDev.calcImage(datasets, 2);
+                delete calcImgValStdDev;
+                
+                for(int i = 0; i < numRows; ++i)
+                {
+                    for(std::vector<rsgis::rastergis::RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
+                    {
+                        if((*iterBands)->calcStdDev)
+                        {
+                            if(attTable->GetValueAsInt(i, pxlCountIdx) == 0)
+                            {
+                                attTable->SetValue(i, (*iterBands)->stdDevIdx, 0);
+                            }
+                            else
+                            {
+                                attTable->SetValue(i, 
+                                                   (*iterBands)->stdDevIdx, 
+                                                   sqrt(attTable->GetValueAsDouble(i, (*iterBands)->stdDevIdx)/attTable->GetValueAsDouble(i, pxlCountIdx))
+                                                   );
+                            }
+                        }
+                    }
+                }
+            }
+            
+            delete[] datasets;
+            
+            clumpDS->GetRasterBand(1)->SetDefaultRAT(attTable);
         }
-        
-        delete[] datasets;
-        
-        clumpDS->GetRasterBand(1)->SetDefaultRAT(attTable);
+        catch(rsgis::img::RSGISImageBandException &e)
+        {
+            throw rsgis::RSGISAttributeTableException(e.what());
+        }
+        catch(rsgis::img::RSGISImageCalcException &e)
+        {
+            throw rsgis::RSGISAttributeTableException(e.what());
+        }
+        catch(rsgis::RSGISImageException &e)
+        {
+            throw rsgis::RSGISAttributeTableException(e.what());
+        }
+        catch(rsgis::RSGISException &e)
+        {
+            throw rsgis::RSGISAttributeTableException(e.what());
+        }
     }
         
     RSGISCalcClumpStats::~RSGISCalcClumpStats()
@@ -242,6 +270,7 @@ namespace rsgis{namespace rastergis{
     
     void RSGISCalcClusterPxlValueStats::calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException)
     {
+        //std::cout << "bandValues[0] = " << bandValues[0] << std::endl;
         if(bandValues[0] > 0)
         {
             size_t fid = boost::lexical_cast<size_t>(bandValues[0]);

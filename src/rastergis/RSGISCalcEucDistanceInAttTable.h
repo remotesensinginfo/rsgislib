@@ -46,7 +46,7 @@ namespace rsgis{namespace rastergis{
         void calcEucDist(GDALDataset *dataset, size_t fid, std::string outColumn, std::vector<std::string> inColumns)throw(rsgis::RSGISAttributeTableException);
         ~RSGISCalcEucDistanceInAttTable();
     protected:
-        double getEuclideanDistance(std::vector<double> vals1, std::vector<double> vals2)throw(rsgis::math::RSGISMathException);
+        inline double getEuclideanDistance(std::vector<double> vals1, std::vector<double> vals2)throw(rsgis::math::RSGISMathException);
     };
 	
 }}

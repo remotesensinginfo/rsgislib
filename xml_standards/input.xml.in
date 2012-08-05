@@ -387,6 +387,8 @@
         <rsgis:field name="string" />
         <rsgis:field name="string" />
     </rsgis:command>
+	<!-- A command to calculate the top N features within a given spatial distance -->
+	<rsgis:command algor="rastergis" option="findtopn" image="image.kea" spatialdist="string" metricdist="string" n="int" distthreshold="float" outfield="string" />
 	<!-- A command to populate an attribute table with statistics from an image -->
 	<rsgis:command algor="rastergis" option="popattributestats" clumps="clumps.env" input="image.env" >
         <rsgis:band band="int" [min="field"] [max="field"] [mean="field"] [sum="field"] [stddev="field"] />
@@ -396,8 +398,14 @@
     </rsgis:command>
 	<!-- A command to populate an attribute table with the proportions of the categories overlapping the clumps -->
 	<rsgis:command algor="rastergis" option="popcategoryproportions" clumps="clumps.env" categories="image.env" outcols="string" majority="column name" [majclassname="string" classname="string"] />
-
-
+	<!-- A command to copy the colours from classified data to clumps -->
+	<rsgis:command algor="rastergis" option="copycatcolours" clumps="clumps.env" categories="image.env" classfield="string" />
+	<!-- A command to classify segments using KNN majority classification -->
+	<rsgis:command algor="rastergis" option="knnmajorityclassifier" image="image.kea" inclassfield="string" outclassfield="string" eastings="string" northings="string" n="int" distthreshold="float" >
+		<rsgis:field name="string" />
+        <rsgis:field name="string" />
+        <rsgis:field name="string" />
+    </rsgis:command>
 
 
 

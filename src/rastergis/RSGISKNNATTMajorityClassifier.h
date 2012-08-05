@@ -34,6 +34,8 @@
 
 #include "math/RSGISMathException.h"
 
+#include "rastergis/RSGISFindTopNWithinDist.h"
+
 #include <boost/numeric/conversion/cast.hpp>
 #include <boost/lexical_cast.hpp>
 
@@ -43,8 +45,11 @@ namespace rsgis{namespace rastergis{
     {
     public:
         RSGISKNNATTMajorityClassifier();
-        
+        void applyKNNClassifier(GDALDataset *image, std::string inClassCol, std::string outClassCol, std::string eastingsCol, std::string northingsCol, std::vector<std::string> inColumns, unsigned int nFeatures, float distThreshold) throw(rsgis::RSGISAttributeTableException);
         ~RSGISKNNATTMajorityClassifier();
+    protected:
+        inline double getEuclideanDistance(std::vector<double> *vals1, std::vector<double> *vals2)throw(rsgis::math::RSGISMathException);
+        inline int findMajorityClass(GDALRasterAttributeTable *attTable, size_t fid, int classIdx, int eastingsIdx, int northingsIdx, int *infoColIdxs, size_t numCols, unsigned int nFeatures, float distThreshold) throw(rsgis::RSGISAttributeTableException);
     };
 	
 }}

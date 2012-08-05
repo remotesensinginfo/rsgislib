@@ -42,6 +42,7 @@ namespace rsgis{namespace rastergis{
     public:
         RSGISRasterAttUtils();
         void copyAttColumns(GDALDataset *inImage, GDALDataset *outImage, std::vector<std::string> fields) throw(RSGISAttributeTableException);
+        void copyColourForCats(GDALDataset *catsImage, GDALDataset *classImage, std::string classField) throw(RSGISAttributeTableException);
         ~RSGISRasterAttUtils();
     };
 	

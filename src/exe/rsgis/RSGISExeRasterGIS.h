@@ -44,6 +44,7 @@
 #include "rastergis/RSGISRasterAttUtils.h"
 #include "rastergis/RSGISCalcClumpStats.h"
 #include "rastergis/RSGISFindClumpCatagoryStats.h"
+#include "rastergis/RSGISKNNATTMajorityClassifier.h"
 
 #include "gdal_priv.h"
 #include "ogrsf_frmts.h"
@@ -67,7 +68,9 @@ namespace rsgisexe{
             findtopn,
             copyGDALATTColumns,
             popattributestats,
-            popcategoryproportions
+            popcategoryproportions,
+            copycatcolours,
+            knnmajorityclassifier
         };
         
         RSGISExeRasterGIS();
@@ -93,6 +96,9 @@ namespace rsgisexe{
         std::string majorityColName;
         std::string majClassNameField;
         std::string classNameField;
+        std::string inClassNameField;
+        std::string outClassNameField;
+        std::string classField;
         std::vector<std::string> fields;
         size_t fid;
         unsigned int nFeatures;
