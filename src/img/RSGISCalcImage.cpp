@@ -1263,7 +1263,7 @@ namespace rsgis{namespace img{
 			int feedbackCounter = 0;
 			std::cout << "Started" << std::flush;
 			// Loop images to process data
-			for(int i = 0; i < height; i++)
+			for(int i = 0; i < height; ++i)
 			{
 				//std::cout << i << " of " << height << std::endl;
 				if((i % feedback) == 0)
@@ -1272,18 +1272,24 @@ namespace rsgis{namespace img{
 					feedbackCounter = feedbackCounter + 10;
 				}
 				
-				for(int n = 0; n < numInBands; n++)
+				for(int n = 0; n < numInBands; ++n)
 				{
+                    //std::cout << "i = " << i << std::endl;
+                    //std::cout << "bandOffsets[" << n << "][0] = " << bandOffsets[n][0] << std::endl;
+                    //std::cout << "bandOffsets[" << n << "][1] = " << bandOffsets[n][1] << std::endl;
 					inputRasterBands[n]->RasterIO(GF_Read, bandOffsets[n][0], (bandOffsets[n][1]+i), width, 1, inputData[n], width, 1, GDT_Float32, 0, 0);
 				}
+                //std::cout << "Data is read\n";
  				for(int j = 0; j < width; j++)
 				{
+                    //std::cout << j << "," << std::flush;
 					for(int n = 0; n < numInBands; n++)
 					{
 						inDataColumn[n] = inputData[n][j];
 					}
 					this->calc->calcImageValue(inDataColumn, numInBands);
 				}
+                //std::cout << std::endl;
 			}
 			std::cout << " Complete.\n";
 		}

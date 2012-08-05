@@ -51,6 +51,8 @@ namespace rsgisexe{
         XMLCh *optionCopyGDALATTColumns = xercesc::XMLString::transcode("copyGDALATTColumns");
         XMLCh *optionPopAttributeStats = xercesc::XMLString::transcode("popattributestats");
         XMLCh *optionPopCategoryProportions = xercesc::XMLString::transcode("popcategoryproportions");
+        XMLCh *optionCopyCatColours = xercesc::XMLString::transcode("copycatcolours");
+        XMLCh *optionKNNMajorityClassifier = xercesc::XMLString::transcode("knnmajorityclassifier");
         
         
         const XMLCh *algorNameEle = argElement->getAttribute(algorXMLStr);
@@ -585,6 +587,178 @@ namespace rsgisexe{
             xercesc::XMLString::release(&majClassNameXMLStr);
             
         }
+        else if(xercesc::XMLString::equals(optionCopyCatColours, optionXML))
+        {
+            this->option = RSGISExeRasterGIS::copycatcolours;
+            
+            XMLCh *clumpsXMLStr = xercesc::XMLString::transcode("clumps");
+            if(argElement->hasAttribute(clumpsXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(clumpsXMLStr));
+                this->clumpsImage = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'clumps\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&clumpsXMLStr);
+            
+            
+            XMLCh *categoriesXMLStr = xercesc::XMLString::transcode("categories");
+            if(argElement->hasAttribute(categoriesXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(categoriesXMLStr));
+                this->categoriesImage = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'categories\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&categoriesXMLStr);
+            
+            XMLCh *classFieldXMLStr = xercesc::XMLString::transcode("classfield");
+            if(argElement->hasAttribute(classFieldXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(classFieldXMLStr));
+                this->classField = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'classfield\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&classFieldXMLStr);
+        }
+        else if(xercesc::XMLString::equals(optionKNNMajorityClassifier, optionXML))
+        {
+            this->option = RSGISExeRasterGIS::knnmajorityclassifier;
+            
+            XMLCh *imageXMLStr = xercesc::XMLString::transcode("image");
+            if(argElement->hasAttribute(imageXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(imageXMLStr));
+                this->inputImage = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&imageXMLStr);
+            
+            XMLCh *inClassFieldXMLStr = xercesc::XMLString::transcode("inclassfield");
+            if(argElement->hasAttribute(inClassFieldXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(inClassFieldXMLStr));
+                this->inClassNameField = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'inclassfield\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&inClassFieldXMLStr);
+            
+            XMLCh *outClassFieldXMLStr = xercesc::XMLString::transcode("outclassfield");
+            if(argElement->hasAttribute(outClassFieldXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outClassFieldXMLStr));
+                this->outClassNameField = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'outclassfield\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&outClassFieldXMLStr);
+            
+            XMLCh *eastingsXMLStr = xercesc::XMLString::transcode("eastings");
+            if(argElement->hasAttribute(eastingsXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(eastingsXMLStr));
+                this->eastingsField = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'eastings\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&eastingsXMLStr);
+            
+            XMLCh *northingsXMLStr = xercesc::XMLString::transcode("northings");
+            if(argElement->hasAttribute(northingsXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(northingsXMLStr));
+                this->northingsField = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'northings\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&northingsXMLStr);
+            
+            XMLCh *distThresholdXMLStr = xercesc::XMLString::transcode("distthreshold");
+            if(argElement->hasAttribute(distThresholdXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(distThresholdXMLStr));
+                this->distThreshold = textUtils.strtofloat(std::string(charValue));
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'distthreshold\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&distThresholdXMLStr);
+            
+            XMLCh *nXMLStr = xercesc::XMLString::transcode("n");
+            if(argElement->hasAttribute(nXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(nXMLStr));
+                this->nFeatures = textUtils.strto16bitUInt(std::string(charValue));
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'n\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&nXMLStr);
+            
+            XMLCh *rsgisFieldXMLStr = xercesc::XMLString::transcode("rsgis:field");
+            xercesc::DOMNodeList *fieldNodesList = argElement->getElementsByTagName(rsgisFieldXMLStr);
+            unsigned int numFieldTags = fieldNodesList->getLength();
+            
+            std::cout << "Found " << numFieldTags << " field tags" << std::endl;
+            
+            if(numFieldTags == 0)
+            {
+                throw rsgis::RSGISXMLArgumentsException("No field tags have been provided, at least 1 is required.");
+            }
+            
+            fields.reserve(numFieldTags);
+            
+            xercesc::DOMElement *attElement = NULL;
+            std::string fieldName = "";
+            for(int i = 0; i < numFieldTags; i++)
+            {
+                attElement = static_cast<xercesc::DOMElement*>(fieldNodesList->item(i));
+                
+                XMLCh *nameXMLStr = xercesc::XMLString::transcode("name");
+                if(attElement->hasAttribute(nameXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(attElement->getAttribute(nameXMLStr));
+                    fields.push_back(std::string(charValue));
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'name\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&nameXMLStr);
+            } 
+        }
         else
         {
             std::string message = std::string("The option (") + std::string(xercesc::XMLString::transcode(optionXML)) + std::string(") is not known: RSGISExeRasterGIS.");
@@ -602,6 +776,8 @@ namespace rsgisexe{
         xercesc::XMLString::release(&optionCopyGDALATTColumns);
         xercesc::XMLString::release(&optionPopAttributeStats);
         xercesc::XMLString::release(&optionPopCategoryProportions);
+        xercesc::XMLString::release(&optionCopyCatColours);
+        xercesc::XMLString::release(&optionKNNMajorityClassifier);
     }
     
     void RSGISExeRasterGIS::runAlgorithm() throw(rsgis::RSGISException)
@@ -911,6 +1087,85 @@ namespace rsgisexe{
                     throw e;
                 }
             }
+            else if(this->option == RSGISExeRasterGIS::copycatcolours)
+            {
+                std::cout << "A command to copy the colours from classified data to clumps\n";
+                std::cout << "Clump Image: " << this->clumpsImage << std::endl;
+                std::cout << "Categories Image: " << this->categoriesImage << std::endl;
+                std::cout << "Class Field: " << this->classField << std::endl;
+                
+                try 
+                {
+                    GDALAllRegister();
+                    
+                    GDALDataset *clumpsDataset = (GDALDataset *) GDALOpenShared(this->clumpsImage.c_str(), GA_Update);
+                    if(clumpsDataset == NULL)
+                    {
+                        std::string message = std::string("Could not open image ") + this->clumpsImage;
+                        throw rsgis::RSGISImageException(message.c_str());
+                    }
+                    GDALDataset *catsDataset = (GDALDataset *) GDALOpenShared(this->categoriesImage.c_str(), GA_ReadOnly);
+                    if(catsDataset == NULL)
+                    {
+                        std::string message = std::string("Could not open image ") + this->categoriesImage;
+                        throw rsgis::RSGISImageException(message.c_str());
+                    }
+                    
+                    rsgis::rastergis::RSGISRasterAttUtils attUtils;
+                    attUtils.copyColourForCats(clumpsDataset, catsDataset, this->classField);
+                    
+                    clumpsDataset->GetRasterBand(1)->SetMetadataItem("LAYER_TYPE", "thematic");
+                    
+                    GDALClose(clumpsDataset);
+                    GDALClose(catsDataset);
+                }
+                catch (rsgis::RSGISAttributeTableException &e) 
+                {
+                    throw e;
+                }
+                catch (rsgis::RSGISException &e) 
+                {
+                    std::cout << e.what() << std::endl;
+                    throw e;
+                }
+            }
+            else if(this->option == RSGISExeRasterGIS::knnmajorityclassifier)
+            {
+                std::cout << "A command to classify segments using KNN majority classification.\n";
+                std::cout << "Input Image: " << this->inputImage << std::endl;
+                std::cout << "Input Class Field: " << this->inClassNameField << std::endl;
+                std::cout << "Output Class Field: " << this->outClassNameField << std::endl;
+                std::cout << "Distance threshold: " << this->distThreshold << std::endl;
+                std::cout << "N: " << this->nFeatures << std::endl;
+                std::cout << "Eastings Field: " << this->eastingsField << std::endl;
+                std::cout << "Northings Field: " << this->northingsField << std::endl;
+                std::cout << "Distance calculated using:\n";
+                for(std::vector<std::string>::iterator iterFields = fields.begin(); iterFields != fields.end(); ++iterFields)
+                {
+                    std::cout << "\tField: " << (*iterFields) << std::endl;
+                }
+                
+                try
+                {
+                    GDALAllRegister();
+                    
+                    GDALDataset *inputDataset = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_Update);
+                    if(inputDataset == NULL)
+                    {
+                        std::string message = std::string("Could not open image ") + this->inputImage;
+                        throw rsgis::RSGISImageException(message.c_str());
+                    }
+                    
+                    rsgis::rastergis::RSGISKNNATTMajorityClassifier knnMajorityClass;
+                    knnMajorityClass.applyKNNClassifier(inputDataset, this->inClassNameField, this->outClassNameField, this->eastingsField, this->northingsField, this->fields, this->nFeatures, this->distThreshold);
+                    
+                    GDALClose(inputDataset);
+                }
+                catch(rsgis::RSGISException &e)
+                {
+                    throw e;
+                }
+            }
             else
             {
                 throw rsgis::RSGISException("The option is not recognised: RSGISExeRasterGIS");
@@ -947,6 +1202,16 @@ namespace rsgisexe{
                     std::cout << "\tField: " << (*iterFields) << std::endl;
                 }
             }
+            else if(this->option == RSGISExeRasterGIS::findtopn)
+            {
+                std::cout << "Calculate the top N features within a given spatial distance.\n";
+                std::cout << "Input Image: " << this->inputImage << std::endl;
+                std::cout << "Distance Field: " << this->distanceField << std::endl;
+                std::cout << "Spatial Dist. Field: " << this->spatialDistField << std::endl;
+                std::cout << "Output Field: " << this->outputField << std::endl;
+                std::cout << "Distance threshold: " << this->distThreshold << std::endl;
+                std::cout << "N: " << this->nFeatures << std::endl;
+            }
             else if(this->option == RSGISExeRasterGIS::popattributestats)
             {
                 std::cout << "A command to populate an attribute table with statistics from an image in a memory efficient manor.\n";
@@ -982,6 +1247,42 @@ namespace rsgisexe{
                     }
                     
                     std::cout << std::endl;
+                }
+            }
+            else if(this->option == RSGISExeRasterGIS::popcategoryproportions)
+            {
+                std::cout << "A command to populate an attribute table with the proportions of the categories overlapping the clumps\n";
+                std::cout << "Clump Image: " << this->clumpsImage << std::endl;
+                std::cout << "Categories Image: " << this->categoriesImage << std::endl;
+                std::cout << "Output Column: " << this->outColsName << std::endl;
+                std::cout << "Majority Column: " << this->majorityColName << std::endl;
+                if(this->copyClassNames)
+                {
+                    std::cout << "Majority Column Name: " << this->majClassNameField << std::endl;
+                    std::cout << "Class name column: " << this->classNameField << std::endl;
+                }
+            }
+            else if(this->option == RSGISExeRasterGIS::copycatcolours)
+            {
+                std::cout << "A command to copy the colours from classified data to clumps\n";
+                std::cout << "Clump Image: " << this->clumpsImage << std::endl;
+                std::cout << "Categories Image: " << this->categoriesImage << std::endl;
+                std::cout << "Class Field: " << this->classField << std::endl;
+            }
+            else if(this->option == RSGISExeRasterGIS::knnmajorityclassifier)
+            {
+                std::cout << "A command to classify segments using KNN majority classification.\n";
+                std::cout << "Input Image: " << this->inputImage << std::endl;
+                std::cout << "Input Class Field: " << this->inClassNameField << std::endl;
+                std::cout << "Output Class Field: " << this->outClassNameField << std::endl;
+                std::cout << "Distance threshold: " << this->distThreshold << std::endl;
+                std::cout << "N: " << this->nFeatures << std::endl;
+                std::cout << "Eastings Field: " << this->eastingsField << std::endl;
+                std::cout << "Northings Field: " << this->northingsField << std::endl;
+                std::cout << "Distance calculated using:\n";
+                for(std::vector<std::string>::iterator iterFields = fields.begin(); iterFields != fields.end(); ++iterFields)
+                {
+                    std::cout << "\tField: " << (*iterFields) << std::endl;
                 }
             }
             else
