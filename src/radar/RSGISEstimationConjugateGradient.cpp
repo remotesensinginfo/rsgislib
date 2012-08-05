@@ -1693,7 +1693,7 @@ namespace rsgis {namespace radar
                 */
 			}
 
-			/*
+            /*
 			 std::cout << "Predicted Sigma0: ";
 			 vectorUtils.printGSLVector(predicted);
 			 std::cout << "Measured Sigma0: ";
@@ -1701,9 +1701,7 @@ namespace rsgis {namespace radar
 			 std::cout << "Predicted Parameters: ";
 			 vectorUtils.printGSLVector(outParError);
 			 std::cout << "==============================" << std::endl;
-			*/
-
-
+            */
 			// FREE MATRICES
 			gsl_vector_free(estimatedPar);
 			gsl_matrix_free(frechet);

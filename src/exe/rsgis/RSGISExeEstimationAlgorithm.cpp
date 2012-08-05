@@ -7934,7 +7934,7 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
 				{
 					cout << "\tUsing Values from objects (assign)" << endl;
 
-					this->estFastOptimiserClass->push_back(new RSGISEstimationAssignAP());
+					this->estFastOptimiserClass->push_back(new rsgis::radar::RSGISEstimationAssignAP());
 				}
 				else
 				{
@@ -8268,13 +8268,12 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
 				}
 				else if (XMLString::equals(function2DPoly,functionStr))
 				{
-					gsl_matrix *coeffHH;
 					XMLCh *inCoeffHH = XMLString::transcode("coefficientsHH"); // Coefficients
 					if(slowOptimiserElement->hasAttribute(inCoeffHH))
 					{
 						char *charValue = XMLString::transcode(slowOptimiserElement->getAttribute(inCoeffHH));
 						string inCoeffHHFileName = string(charValue);
-						coeffHH = matrixUtils.readGSLMatrixFromTxt(inCoeffHHFileName);
+						this->coeffHH = matrixUtils.readGSLMatrixFromTxt(inCoeffHHFileName);
 						XMLString::release(&charValue);
 					}
 					else
@@ -8283,13 +8282,12 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
 					}
 					XMLString::release(&inCoeffHH);
 
-					gsl_matrix *coeffHV;
 					XMLCh *inCoeffHV = XMLString::transcode("coefficientsHV"); // Coefficients
 					if(slowOptimiserElement->hasAttribute(inCoeffHV))
 					{
 						char *charValue = XMLString::transcode(slowOptimiserElement->getAttribute(inCoeffHV));
 						string inCoeffHVFileName = string(charValue);
-						coeffHV = matrixUtils.readGSLMatrixFromTxt(inCoeffHVFileName);
+						this->coeffHV = matrixUtils.readGSLMatrixFromTxt(inCoeffHVFileName);
 						XMLString::release(&charValue);
 					}
 					else
@@ -8298,13 +8296,12 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
 					}
 					XMLString::release(&inCoeffHV);
 
-					gsl_matrix *coeffVV;
 					XMLCh *inCoeffVV = XMLString::transcode("coefficientsVV"); // Coefficients
 					if(slowOptimiserElement->hasAttribute(inCoeffVV))
 					{
 						char *charValue = XMLString::transcode(slowOptimiserElement->getAttribute(inCoeffVV));
 						string inCoeffVVFileName = string(charValue);
-						coeffVV = matrixUtils.readGSLMatrixFromTxt(inCoeffVVFileName);
+						this->coeffVV = matrixUtils.readGSLMatrixFromTxt(inCoeffVVFileName);
 						XMLString::release(&charValue);
 					}
 					else
@@ -8317,9 +8314,9 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
 					RSGISFunction2DPoly *functionPolyHV;
 					RSGISFunction2DPoly *functionPolyVV;
 
-					functionPolyHH = new RSGISFunction2DPoly(coeffHH);
-					functionPolyHV = new RSGISFunction2DPoly(coeffHV);
-					functionPolyVV = new RSGISFunction2DPoly(coeffVV);
+					functionPolyHH = new RSGISFunction2DPoly(this->coeffHH);
+					functionPolyHV = new RSGISFunction2DPoly(this->coeffHV);
+					functionPolyVV = new RSGISFunction2DPoly(this->coeffVV);
 
 					this->functionHH = (RSGISMathTwoVariableFunction *) functionPolyHH;
 					this->functionHV = (RSGISMathTwoVariableFunction *) functionPolyHV;
@@ -8932,21 +8929,21 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
                     }
 
                     vector <int> *polyOrdersHH = new vector <int>();
-                    polyOrdersHH->push_back(coeffHH->size1);
-                    polyOrdersHH->push_back(coeffHH->size2 - 1);
+                    polyOrdersHH->push_back(this->coeffHH->size1);
+                    polyOrdersHH->push_back(this->coeffHH->size2 - 1);
 
                     vector <int> *polyOrdersHV = new vector <int>();
-                    polyOrdersHV->push_back(coeffHV->size1);
-                    polyOrdersHV->push_back(coeffHV->size2 - 1);
+                    polyOrdersHV->push_back(this->coeffHV->size1);
+                    polyOrdersHV->push_back(this->coeffHV->size2 - 1);
 
                     vector <int> *polyOrdersVV = new vector <int>();
-                    polyOrdersVV->push_back(coeffVV->size1);
-                    polyOrdersVV->push_back(coeffVV->size2 - 1);
+                    polyOrdersVV->push_back(this->coeffVV->size1);
+                    polyOrdersVV->push_back(this->coeffVV->size2 - 1);
 
                     vector <RSGISMathNVariableFunction*> *functionsAll = new vector <RSGISMathNVariableFunction*>;
-                    functionsAll->push_back(new RSGISFunctionNDPoly(coeffHH, polyOrdersHH));
-                    functionsAll->push_back(new RSGISFunctionNDPoly(coeffHV, polyOrdersHV));
-                    functionsAll->push_back(new RSGISFunctionNDPoly(coeffVV, polyOrdersVV));
+                    functionsAll->push_back(new RSGISFunctionNDPoly(this->coeffHH, polyOrdersHH));
+                    functionsAll->push_back(new RSGISFunctionNDPoly(this->coeffHV, polyOrdersHV));
+                    functionsAll->push_back(new RSGISFunctionNDPoly(this->coeffVV, polyOrdersVV));
 
                     this->estSlowOptimiserClass->push_back(new RSGISEstimationSimulatedAnnealingWithAP(functionsAll, minMaxStepAll, minEnergy, startTemp, runsStep, runsTemp, cooling, ittmax, covMatrixP, invCovMatrixD, this->initialParClass->at(i)));
 
