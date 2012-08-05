@@ -155,7 +155,7 @@ namespace rsgis{namespace rastergis{
                 
                 selectedClass = this->findMajorityClass(attTable, i, inClassColIdx, eastColIdx, northColIdx, colIdxs, inColumns.size(), nFeatures, distThreshold);
                 attTable->SetValue(i, outClassColIdx, selectedClass);
-                std::cout << "i = " << i << " = " << selectedClass << ":\t" << attTable->GetValueAsInt(i, inClassColIdx) << std::endl;
+                //std::cout << "i = " << i << " = " << selectedClass << ":\t" << attTable->GetValueAsInt(i, inClassColIdx) << std::endl;
                 
             }
             std::cout << ".Completed\n";
