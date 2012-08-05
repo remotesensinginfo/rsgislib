@@ -31,7 +31,6 @@ namespace rsgis{namespace rastergis{
     
     void RSGISRasterAttUtils::copyAttColumns(GDALDataset *inImage, GDALDataset *outImage, std::vector<std::string> fields) throw(RSGISAttributeTableException)
     {
-        
         try 
         {
             std::cout << "Import attribute tables to memory.\n";
@@ -164,9 +163,200 @@ namespace rsgis{namespace rastergis{
         catch (RSGISAttributeTableException &e)
         {
             throw e;
+        }        
+    }
+    
+    void RSGISRasterAttUtils::copyColourForCats(GDALDataset *catsImage, GDALDataset *classImage, std::string classField) throw(RSGISAttributeTableException)
+    {
+        try 
+        {
+            std::cout << "Import attribute tables to memory.\n";
+            const GDALRasterAttributeTable *gdalAttIn = catsImage->GetRasterBand(1)->GetDefaultRAT();
+            GDALRasterAttributeTable *gdalAttClumps = NULL;//new GDALRasterAttributeTable(*outImage->GetRasterBand(1)->GetDefaultRAT());
+            const GDALRasterAttributeTable *gdalAttClasses = classImage->GetRasterBand(1)->GetDefaultRAT();
+            
+            if((gdalAttIn == NULL) || (gdalAttIn->GetRowCount() == 0))
+            {
+                throw rsgis::RSGISAttributeTableException("The clumps image does not have an attribute table.");
+            }
+            else
+            {
+                gdalAttClumps = new GDALRasterAttributeTable(*gdalAttIn);
+            }
+            
+            if((gdalAttClasses == NULL) || (gdalAttClasses->GetRowCount() == 0))
+            {
+                throw rsgis::RSGISAttributeTableException("The classes image does not have an attribute table.");
+            }
+            
+            std::cout << "Find field column indexes and created columns were required.\n";
+            bool foundClassIdx = false;
+            int classIdx = 0;
+            bool inRedFound = false;
+            int inRedIdx = 0;
+            bool inGreenFound = false;
+            int inGreenIdx = 0;
+            bool inBlueFound = false;
+            int inBlueIdx = 0;
+            bool inAlphaFound = false;
+            int inAlphaIdx = 0;
+            
+            bool outRedFound = false;
+            int outRedIdx = 0;
+            bool outGreenFound = false;
+            int outGreenIdx = 0;
+            bool outBlueFound = false;
+            int outBlueIdx = 0;
+            bool outAlphaFound = false;
+            int outAlphaIdx = 0;
+            
+            
+            if(gdalAttIn->GetRowCount() == 0)
+            {
+                rsgis::RSGISAttributeTableException("There are no columns in the input attribute table.");
+            }
+            else
+            {
+                for(int i = 0; i < gdalAttClasses->GetColumnCount(); ++i)
+                {
+                    if(!inRedFound && (std::string(gdalAttClasses->GetNameOfCol(i)) == "Red"))
+                    {
+                        inRedIdx = i;
+                        inRedFound = true;
+                    }
+                    else if(!inGreenFound && (std::string(gdalAttClasses->GetNameOfCol(i)) == "Green"))
+                    {
+                        inGreenIdx = i;
+                        inGreenFound = true;
+                    }
+                    else if(!inBlueFound && (std::string(gdalAttClasses->GetNameOfCol(i)) == "Blue"))
+                    {
+                        inBlueIdx = i;
+                        inBlueFound = true;
+                    }
+                    else if(!inAlphaFound && (std::string(gdalAttClasses->GetNameOfCol(i)) == "Alpha"))
+                    {
+                        inAlphaIdx = i;
+                        inAlphaFound = true;
+                    }
+                }
+                
+                if(!inRedFound)
+                {
+                    throw rsgis::RSGISAttributeTableException("A \'Red\' column was not within the input classes table.");
+                }
+                
+                if(!inGreenFound)
+                {
+                    throw rsgis::RSGISAttributeTableException("A \'Green\' column was not within the input classes table.");
+                }
+                
+                if(!inBlueFound)
+                {
+                    throw rsgis::RSGISAttributeTableException("A \'Blue\' column was not within the input classes table.");
+                }
+                
+                if(!inAlphaFound)
+                {
+                    throw rsgis::RSGISAttributeTableException("A \'Alpha\' column was not within the input classes table.");
+                }
+                
+                
+                for(int i = 0; i < gdalAttClumps->GetColumnCount(); ++i)
+                {
+                    if(!foundClassIdx && (std::string(gdalAttClumps->GetNameOfCol(i)) == classField))
+                    {
+                        classIdx = i;
+                        foundClassIdx = true;
+                    }
+                    else if(!outRedFound && (std::string(gdalAttClumps->GetNameOfCol(i)) == "Red"))
+                    {
+                        outRedIdx = i;
+                        outRedFound = true;
+                    }
+                    else if(!outGreenFound && (std::string(gdalAttClumps->GetNameOfCol(i)) == "Green"))
+                    {
+                        outGreenIdx = i;
+                        outGreenFound = true;
+                    }
+                    else if(!outBlueFound && (std::string(gdalAttClumps->GetNameOfCol(i)) == "Blue"))
+                    {
+                        outBlueIdx = i;
+                        outBlueFound = true;
+                    }
+                    else if(!outAlphaFound && (std::string(gdalAttClumps->GetNameOfCol(i)) == "Alpha"))
+                    {
+                        outAlphaIdx = i;
+                        outAlphaFound = true;
+                    }
+                } 
+                
+                if(!foundClassIdx)
+                {
+                    throw rsgis::RSGISAttributeTableException("The class field column was not within the category table.");
+                }
+                
+                if(!outRedFound)
+                {
+                    gdalAttClumps->CreateColumn("Red", GFT_Integer, GFU_Red);
+                    outRedFound = true;
+                    outRedIdx = gdalAttClumps->GetColumnCount()-1;
+                }
+                
+                if(!outGreenFound)
+                {
+                    gdalAttClumps->CreateColumn("Green", GFT_Integer, GFU_Green);
+                    outGreenFound = true;
+                    outGreenIdx = gdalAttClumps->GetColumnCount()-1;
+                }
+                
+                if(!outBlueFound)
+                {
+                    gdalAttClumps->CreateColumn("Blue", GFT_Integer, GFU_Blue);
+                    outBlueFound = true;
+                    outBlueIdx = gdalAttClumps->GetColumnCount()-1;
+                }
+                
+                if(!outAlphaFound)
+                {
+                    gdalAttClumps->CreateColumn("Alpha", GFT_Integer, GFU_Alpha);
+                    outAlphaFound = true;
+                    outAlphaIdx = gdalAttClumps->GetColumnCount()-1;
+                }
+                
+                
+                
+            }
+            
+            int classID = 0;
+            int redVal = 0;
+            int greenVal = 0;
+            int blueVal = 0;
+            int alphaVal = 0;
+            std::cout << "Copying the colours across\n";
+            for(int i = 0; i < gdalAttClumps->GetRowCount(); ++i)
+            {
+                classID = gdalAttClumps->GetValueAsInt(i, classIdx);
+                redVal = gdalAttClasses->GetValueAsInt(classID, inRedIdx);
+                greenVal = gdalAttClasses->GetValueAsInt(classID, inGreenIdx);
+                blueVal = gdalAttClasses->GetValueAsInt(classID, inBlueIdx);
+                alphaVal = gdalAttClasses->GetValueAsInt(classID, inAlphaIdx);
+                
+                gdalAttClumps->SetValue(i, outRedIdx, redVal);
+                gdalAttClumps->SetValue(i, outGreenIdx, greenVal);
+                gdalAttClumps->SetValue(i, outBlueIdx, blueVal);
+                gdalAttClumps->SetValue(i, outAlphaIdx, alphaVal);
+            }
+                 
+            std::cout << "Adding RAT to output file.\n";
+            catsImage->GetRasterBand(1)->SetDefaultRAT(gdalAttClumps);
+            
+            
         }
-        
-        
+        catch (RSGISAttributeTableException &e)
+        {
+            throw e;
+        }
     }
     
     
