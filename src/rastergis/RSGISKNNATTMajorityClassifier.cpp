@@ -161,7 +161,7 @@ namespace rsgis{namespace rastergis{
             std::cout << ".Completed\n";
             
             
-            //image->GetRasterBand(1)->SetDefaultRAT(attTable);
+            image->GetRasterBand(1)->SetDefaultRAT(attTable);
         }
         catch(rsgis::RSGISAttributeTableException &e)
         {
