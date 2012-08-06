@@ -53,6 +53,7 @@ namespace rsgisexe{
         XMLCh *optionPopCategoryProportions = xercesc::XMLString::transcode("popcategoryproportions");
         XMLCh *optionCopyCatColours = xercesc::XMLString::transcode("copycatcolours");
         XMLCh *optionKNNMajorityClassifier = xercesc::XMLString::transcode("knnmajorityclassifier");
+        XMLCh *optionPopAttributePercentile = xercesc::XMLString::transcode("popattributepercentile");
         
         
         const XMLCh *algorNameEle = argElement->getAttribute(algorXMLStr);
@@ -759,6 +760,96 @@ namespace rsgisexe{
                 xercesc::XMLString::release(&nameXMLStr);
             } 
         }
+        else if(xercesc::XMLString::equals(optionPopAttributePercentile, optionXML))
+        {
+            this->option = RSGISExeRasterGIS::popattributepercentile;
+            XMLCh *inputXMLStr = xercesc::XMLString::transcode("input");
+            if(argElement->hasAttribute(inputXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(inputXMLStr));
+                this->inputImage = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'input\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&inputXMLStr);
+            
+            XMLCh *clumpsXMLStr = xercesc::XMLString::transcode("clumps");
+            if(argElement->hasAttribute(clumpsXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(clumpsXMLStr));
+                this->clumpsImage = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'clumps\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&clumpsXMLStr);
+            
+            XMLCh *rsgisBandXMLStr = xercesc::XMLString::transcode("rsgis:band");
+            xercesc::DOMNodeList *bandNodesList = argElement->getElementsByTagName(rsgisBandXMLStr);
+            unsigned int numBands = bandNodesList->getLength();
+            
+            std::cout << "Found " << numBands << " Attributes" << std::endl;
+            
+            bandPercentiles = new std::vector<rsgis::rastergis::RSGISBandAttPercentiles*>();
+            bandPercentiles->reserve(numBands);
+            
+            rsgis::rastergis::RSGISBandAttPercentiles *bandPercentile = NULL;
+            xercesc::DOMElement *bandElement = NULL;
+            for(int i = 0; i < numBands; i++)
+            {
+                bandElement = static_cast<xercesc::DOMElement*>(bandNodesList->item(i));
+                
+                bandPercentile = new rsgis::rastergis::RSGISBandAttPercentiles();
+                
+                XMLCh *bandXMLStr = xercesc::XMLString::transcode("band");
+                if(bandElement->hasAttribute(bandXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(bandXMLStr));
+                    bandPercentile->band = textUtils.strto32bitUInt(std::string(charValue));
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'band\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&bandXMLStr);
+                
+                XMLCh *nameXMLStr = xercesc::XMLString::transcode("name");
+                if(bandElement->hasAttribute(nameXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(nameXMLStr));
+                    bandPercentile->fieldName = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);                    
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'name\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&nameXMLStr);
+                
+                XMLCh *percentileXMLStr = xercesc::XMLString::transcode("percentile");
+                if(bandElement->hasAttribute(percentileXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(percentileXMLStr));
+                    bandPercentile->percentile = textUtils.strto32bitUInt(std::string(charValue));
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'percentile\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&percentileXMLStr);
+                
+                bandPercentiles->push_back(bandPercentile);
+            }
+            xercesc::XMLString::release(&rsgisBandXMLStr);
+            
+        }
         else
         {
             std::string message = std::string("The option (") + std::string(xercesc::XMLString::transcode(optionXML)) + std::string(") is not known: RSGISExeRasterGIS.");
@@ -778,6 +869,7 @@ namespace rsgisexe{
         xercesc::XMLString::release(&optionPopCategoryProportions);
         xercesc::XMLString::release(&optionCopyCatColours);
         xercesc::XMLString::release(&optionKNNMajorityClassifier);
+        xercesc::XMLString::release(&optionPopAttributePercentile);
     }
     
     void RSGISExeRasterGIS::runAlgorithm() throw(rsgis::RSGISException)
@@ -1162,6 +1254,49 @@ namespace rsgisexe{
                     GDALClose(inputDataset);
                 }
                 catch(rsgis::RSGISException &e)
+                {
+                    throw e;
+                }
+            }
+            else if(this->option == RSGISExeRasterGIS::popattributepercentile)
+            {
+                std::cout << "A command to populate an attribute table with percentiles from the clumps within an image.\n";
+                std::cout << "Input Image: " << this->inputImage << std::endl;
+                std::cout << "Clump Image: " << this->clumpsImage << std::endl;
+                std::cout << "Percentiles to be calculated:\n";
+                for(std::vector<rsgis::rastergis::RSGISBandAttPercentiles*>::iterator iterBands = bandPercentiles->begin(); iterBands != bandPercentiles->end(); ++iterBands)
+                {
+                    std::cout << "Band " << (*iterBands)->band << ": " << (*iterBands)->fieldName << " percentile " << (*iterBands)->percentile << std::endl;
+
+                    (*iterBands)->fieldIdxDef = false;
+                }
+                
+                try 
+                {
+                    GDALAllRegister();
+                    
+                    GDALDataset *clumpsDataset = (GDALDataset *) GDALOpenShared(this->clumpsImage.c_str(), GA_Update);
+                    if(clumpsDataset == NULL)
+                    {
+                        std::string message = std::string("Could not open image ") + this->clumpsImage;
+                        throw rsgis::RSGISImageException(message.c_str());
+                    }
+                    GDALDataset *imageDataset = (GDALDataset *) GDALOpenShared(this->inputImage.c_str(), GA_ReadOnly);
+                    if(imageDataset == NULL)
+                    {
+                        std::string message = std::string("Could not open image ") + this->inputImage;
+                        throw rsgis::RSGISImageException(message.c_str());
+                    }
+                    
+                    rsgis::rastergis::RSGISCalcClumpStats clumpStats;
+                    clumpStats.calcImageClumpPercentiles(clumpsDataset, imageDataset, bandPercentiles);
+                    
+                    clumpsDataset->GetRasterBand(1)->SetMetadataItem("LAYER_TYPE", "thematic");
+                    
+                    GDALClose(clumpsDataset);
+                    GDALClose(imageDataset);
+                } 
+                catch (rsgis::RSGISException &e) 
                 {
                     throw e;
                 }
