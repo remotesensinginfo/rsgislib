@@ -143,7 +143,7 @@ namespace rsgis{namespace rastergis{
             std::cout << "Iterating through columns to classify...\n";
             int selectedClass = 0;
             unsigned int feedbackStep = numRows/10;
-            unsigned int feedback = 0;
+            unsigned int feedback = 10;
             std::cout << "Started..0." << std::flush;
             for(int i = 1; i < numRows; ++i)
             {

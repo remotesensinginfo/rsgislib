@@ -26,6 +26,7 @@
 #include <iostream>
 #include <string>
 #include <math.h>
+#include <algorithm>
 
 #include "gdal_priv.h"
 #include "gdal_rat.h"
@@ -40,6 +41,8 @@
 
 #include <boost/numeric/conversion/cast.hpp>
 #include <boost/lexical_cast.hpp>
+
+#include "gsl/gsl_statistics_double.h"
 
 namespace rsgis{namespace rastergis{
 	
@@ -77,12 +80,22 @@ namespace rsgis{namespace rastergis{
         bool sumIdxDef;
     };
     
+    struct RSGISBandAttPercentiles
+    {
+        unsigned int band;
+        unsigned int percentile;
+        std::string fieldName;
+        unsigned int fieldIdx;
+        bool fieldIdxDef;
+    };
+    
     
     class RSGISCalcClumpStats
     {
     public:
         RSGISCalcClumpStats();
         void calcImageClumpStatistic(GDALDataset *clumpDS, GDALDataset *imageDS, std::vector<rsgis::rastergis::RSGISBandAttStats*> *bandStats) throw(rsgis::RSGISAttributeTableException);
+        void calcImageClumpPercentiles(GDALDataset *clumpDS, GDALDataset *imageDS, std::vector<rsgis::rastergis::RSGISBandAttPercentiles*> *bandPercentiles) throw(rsgis::RSGISAttributeTableException);
         ~RSGISCalcClumpStats();
     };
     
@@ -122,6 +135,22 @@ namespace rsgis{namespace rastergis{
         GDALRasterAttributeTable *attTable;
         std::vector<rsgis::rastergis::RSGISBandAttStats*> *bandStats;
         bool *firstVal;
+	};
+    
+    class RSGISPopDataWithClusterPxlValue : public rsgis::img::RSGISCalcImageValue
+	{
+	public: 
+		RSGISPopDataWithClusterPxlValue(std::vector<double> ***data);
+		void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+		void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException);
+		void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+		void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+		void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+		bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+		~RSGISPopDataWithClusterPxlValue();
+    private:
+        std::vector<double> ***data;
 	};
 	
 }}

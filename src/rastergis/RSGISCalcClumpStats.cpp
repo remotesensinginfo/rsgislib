@@ -251,6 +251,117 @@ namespace rsgis{namespace rastergis{
             throw rsgis::RSGISAttributeTableException(e.what());
         }
     }
+    
+    void RSGISCalcClumpStats::calcImageClumpPercentiles(GDALDataset *clumpDS, GDALDataset *imageDS, std::vector<rsgis::rastergis::RSGISBandAttPercentiles*> *bandPercentiles) throw(rsgis::RSGISAttributeTableException)
+    {
+        try
+        {
+            // Get Attribute table
+            const GDALRasterAttributeTable *attTableTmp = clumpDS->GetRasterBand(1)->GetDefaultRAT();
+            GDALRasterAttributeTable *attTable = NULL;
+            if(attTableTmp != NULL)
+            {
+                attTable = new GDALRasterAttributeTable(*attTableTmp);
+            }
+            else
+            {
+                attTable = new GDALRasterAttributeTable();
+            }
+            
+            // Make sure it is long enough and extend if required.
+            int numRows = attTable->GetRowCount();
+            int numImageBands = imageDS->GetRasterCount();
+            
+            double maxVal = 0;
+            clumpDS->GetRasterBand(1)->GetStatistics(false, true, NULL, &maxVal, NULL, NULL);
+            
+            if(maxVal > numRows)
+            {                
+                attTable->SetRowCount(maxVal+1);
+            }
+            numRows = attTable->GetRowCount();
+            
+            
+            int numColumns = attTable->GetColumnCount();
+            std::string colName = "";
+            for(int i = 0; i < numColumns; ++i)
+            {
+                colName = std::string(attTable->GetNameOfCol(i));
+                for(std::vector<rsgis::rastergis::RSGISBandAttPercentiles*>::iterator iterBands = bandPercentiles->begin(); iterBands != bandPercentiles->end(); ++iterBands)
+                {
+                    if((!(*iterBands)->fieldIdxDef) && (colName == (*iterBands)->fieldName))
+                    {
+                        (*iterBands)->fieldIdx = i;
+                        (*iterBands)->fieldIdxDef = true;
+                    }
+                }
+            }
+            
+            for(std::vector<rsgis::rastergis::RSGISBandAttPercentiles*>::iterator iterBands = bandPercentiles->begin(); iterBands != bandPercentiles->end(); ++iterBands)
+            {
+                if(!(*iterBands)->fieldIdxDef)
+                {
+                    attTable->CreateColumn((*iterBands)->fieldName.c_str(), GFT_Real, GFU_Generic);
+                    (*iterBands)->fieldIdx = numColumns++;
+                    (*iterBands)->fieldIdxDef = true;
+                }
+            }
+            
+            std::vector<double> ***data = new std::vector<double>**[numRows];
+            for(size_t i = 0; i < numRows; ++i)
+            {
+                data[i] = new std::vector<double>*[numImageBands];
+                for(size_t j = 0; j < numImageBands; ++j)
+                {
+                    data[i][j] = new std::vector<double>();
+                }
+            }
+            
+            GDALDataset **datasets = new GDALDataset*[2];
+            datasets[0] = clumpDS;
+            datasets[1] = imageDS;
+            
+            RSGISPopDataWithClusterPxlValue *calcImgValStats = new RSGISPopDataWithClusterPxlValue(data);
+            rsgis::img::RSGISCalcImage calcImageStats(calcImgValStats);
+            calcImageStats.calcImage(datasets, 2);
+            delete calcImgValStats;
+            delete[] datasets;
+                        
+            for(size_t i = 0; i < numRows; ++i)
+            {
+                for(std::vector<rsgis::rastergis::RSGISBandAttPercentiles*>::iterator iterBands = bandPercentiles->begin(); iterBands != bandPercentiles->end(); ++iterBands)
+                {
+                    std::sort(data[i][(*iterBands)->band-1]->begin(), data[i][(*iterBands)->band-1]->end());
+                    attTable->SetValue(i, (*iterBands)->fieldIdx, gsl_stats_quantile_from_sorted_data(&(*data[i][(*iterBands)->band-1])[0], 1, data[i][(*iterBands)->band-1]->size(), ((double)(*iterBands)->percentile)/100.0));
+                }
+                
+                for(size_t j = 0; j < numImageBands; ++j)
+                {
+                    delete data[i][j];
+                }
+                delete[] data[i];
+            }
+            delete[] data;
+            
+            clumpDS->GetRasterBand(1)->SetDefaultRAT(attTable);
+        }
+        catch(rsgis::img::RSGISImageBandException &e)
+        {
+            throw rsgis::RSGISAttributeTableException(e.what());
+        }
+        catch(rsgis::img::RSGISImageCalcException &e)
+        {
+            throw rsgis::RSGISAttributeTableException(e.what());
+        }
+        catch(rsgis::RSGISImageException &e)
+        {
+            throw rsgis::RSGISAttributeTableException(e.what());
+        }
+        catch(rsgis::RSGISException &e)
+        {
+            throw rsgis::RSGISAttributeTableException(e.what());
+        }
+    }
         
     RSGISCalcClumpStats::~RSGISCalcClumpStats()
     {
@@ -384,6 +495,29 @@ namespace rsgis{namespace rastergis{
     }
     
     RSGISCalcClusterPxlValueStdDev::~RSGISCalcClusterPxlValueStdDev()
+    {
+        
+    }
+    
+    
+    RSGISPopDataWithClusterPxlValue::RSGISPopDataWithClusterPxlValue(std::vector<double> ***data) : rsgis::img::RSGISCalcImageValue(0)
+    {
+        this->data = data;
+    }
+    
+    void RSGISPopDataWithClusterPxlValue::calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException)
+    {
+        if(bandValues[0] > 0)
+        {
+            size_t fid = boost::lexical_cast<size_t>(bandValues[0]);
+            for(int i = 1; i < numBands; ++i)
+            {
+                data[fid][i-1]->push_back(bandValues[i]);
+            }
+        }
+    }
+    
+    RSGISPopDataWithClusterPxlValue::~RSGISPopDataWithClusterPxlValue()
     {
         
     }

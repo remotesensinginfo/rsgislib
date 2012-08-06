@@ -70,7 +70,8 @@ namespace rsgisexe{
             popattributestats,
             popcategoryproportions,
             copycatcolours,
-            knnmajorityclassifier
+            knnmajorityclassifier,
+            popattributepercentile
         };
         
         RSGISExeRasterGIS();
@@ -104,6 +105,7 @@ namespace rsgisexe{
         unsigned int nFeatures;
         float distThreshold;
         std::vector<rsgis::rastergis::RSGISBandAttStats*> *bandStats;
+        std::vector<rsgis::rastergis::RSGISBandAttPercentiles*> *bandPercentiles;
         bool copyClassNames;
     };
     
