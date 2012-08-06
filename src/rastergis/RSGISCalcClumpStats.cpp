@@ -55,6 +55,7 @@ namespace rsgis{namespace rastergis{
             {                
                 attTable->SetRowCount(maxVal+1);
             }
+            numRows = attTable->GetRowCount();
             
             // Check whether a standard deviation is to be created (requires second iteration of image).
             bool calcStdDevs = false;
@@ -274,6 +275,7 @@ namespace rsgis{namespace rastergis{
         if(bandValues[0] > 0)
         {
             size_t fid = boost::lexical_cast<size_t>(bandValues[0]);
+            //std::cout << "FID: " << fid << std::endl;
             for(std::vector<rsgis::rastergis::RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
             {
                 if((*iterBands)->calcMin)
