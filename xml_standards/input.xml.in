@@ -396,6 +396,12 @@
         <rsgis:band band="int" [min="field"] [max="field"] [mean="field"] [sum="field"] [stddev="field"] />
         <rsgis:band band="int" [min="field"] [max="field"] [mean="field"] [sum="field"] [stddev="field"] />
     </rsgis:command>
+	<!-- A command to populate an attribute table with percentiles from the clumps within an image -->
+	<rsgis:command algor="rastergis" option="popattributepercentile" clumps="clumps.env" input="image.env" >
+        <rsgis:band band="int" name="field" percentile="int" />
+        <rsgis:band band="int" name="field" percentile="int" />
+		<rsgis:band band="int" name="field" percentile="int" />
+    </rsgis:command>
 	<!-- A command to populate an attribute table with the proportions of the categories overlapping the clumps -->
 	<rsgis:command algor="rastergis" option="popcategoryproportions" clumps="clumps.env" categories="image.env" outcols="string" majority="column name" [majclassname="string" classname="string"] />
 	<!-- A command to copy the colours from classified data to clumps -->
