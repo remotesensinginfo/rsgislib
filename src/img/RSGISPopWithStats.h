@@ -28,6 +28,7 @@
 #ifndef RSGISPopWithStats_H
 #define RSGISPopWithStats_H
 
+#include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
 
