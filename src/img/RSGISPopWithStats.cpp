@@ -64,7 +64,7 @@ namespace rsgis { namespace img {
             pszType = "NEAREST";
         }
 
-        handle->BuildOverviews( pszType, nOverviews, nLevels, 0, NULL, NULL, NULL );
+        handle->BuildOverviews( pszType, nOverviews, nLevels, 0, NULL, StatsTextProgress, NULL );
     }
 
     void RSGISPopWithStats::getRangeMean(float *pData,int size,float &min,float &max,float &mean, bool ignore, float ignoreVal)
@@ -175,8 +175,15 @@ namespace rsgis { namespace img {
 
         nSampleRate = 1;
         
-        dfScale = nBuckets / (dfMax - dfMin);
-
+        if(dfMin == 0)
+        {
+            dfScale = nBuckets / (dfMax + 1);
+        }
+        else
+        {
+            dfScale = nBuckets / (dfMax - dfMin);
+        }
+        
         /* -------------------------------------------------------------------- */
         /*      Read the blocks, and add to histogram.                          */
         /* -------------------------------------------------------------------- */
@@ -325,50 +332,34 @@ namespace rsgis { namespace img {
 
     void RSGISPopWithStats::calcPopStats( GDALDataset *hHandle, bool bIgnore, float fIgnoreVal, bool bPyramid )
     {
-        int band, xsize, ysize, osize,nlevel;
+        int band;//, xsize, ysize, osize,nlevel;
         GDALRasterBand *hBand;
         char szTemp[64];
-        float *pSample;
-        bool bIgnoreTmp = bIgnore;
+        std::string histoType;
+        std::string histoTypeDirect = "direct";
+        std::string histoTypeLinear = "linear";
 
         /* we calculate a single overview to speed up the calculation of stats */
 
         int nBands = hHandle->GetRasterCount();
         for( band = 0; band < nBands; band++ )
         {
+            std::cout << "Processing band " << band+1 << " of " << nBands << std::endl;
             /*    fprintf( stderr, "Band = %d\n", band + 1);*/
 
             hBand = hHandle->GetRasterBand( band + 1 );
+
             
-            if(strcmp( hBand->GetMetadataItem( "LAYER_TYPE", "" ), "thematic" ) == 0)
+            if( bIgnore )
             {
-                std::cout << "Layer type is thematic\n";
-                bIgnore = false;
+                hBand->SetNoDataValue( fIgnoreVal );
+                sprintf( szTemp, "%f", fIgnoreVal );
+                GDALSetMetadataItem( hBand, "STATISTICS_EXCLUDEDVALUES", szTemp, NULL );
             }
-            else
-            {
-                bIgnore = bIgnoreTmp;
-            }
-
-            /* we use the largest overview that will still result in */
-            /* at least CONTIN_STATS_MIN_LIMIT                       */
-            /* samples... */
-
-            xsize = hBand->GetXSize();
-            ysize = hBand->GetYSize();
-            osize = xsize * ysize;
-            nlevel = (int) floor(sqrtf(osize/CONTIN_STATS_MIN_LIMIT));
-            if(nlevel == 0) 
-            {
-                nlevel = 1;
-            }
-
-            // sub sample the bands for stats
-            pSample = getSubSampledImage( hBand, nlevel, &osize );
-
+            
             /* Find min, Max and mean */ 
-            float fmin=0, fmax=0, fMean;
-            getRangeMean(pSample, osize, fmin, fmax, fMean, bIgnore, fIgnoreVal );
+            double fmin=0, fmax=0, fMean=0, fStdDev=0;
+            hBand->ComputeStatistics(false, &fmin, &fmax, &fMean, &fStdDev, StatsTextProgress, NULL);
 
             /* Write Statistics */
             sprintf( szTemp, "%f", fmin );
@@ -380,7 +371,6 @@ namespace rsgis { namespace img {
             sprintf( szTemp, "%f", fMean );
             hBand->SetMetadataItem( "STATISTICS_MEAN", szTemp, NULL );
 
-            float fStdDev =  getStdDev(pSample, osize, fMean, bIgnore, fIgnoreVal );
             sprintf( szTemp, "%f", fStdDev );
             hBand->SetMetadataItem( "STATISTICS_STDDEV", szTemp, NULL );
 
@@ -388,37 +378,62 @@ namespace rsgis { namespace img {
             /* is only one value in it                              */
             fmin = fmin == fmax ? fmin - 1e-05 : fmin;
 
-            /*fprintf( stderr, "doing histo\n" );*/
-
             /* Calc the histogram */
             int *pHisto;
             int nHistBuckets;
-            float histmin = 0, histmax = 0;
+            float histmin = 0, histmax = 0, histminTmp = 0, histmaxTmp = 0;
             if( hBand->GetRasterDataType() == GDT_Byte )
             {
                 /* if it is 8 bit just do a histo on the lot so we don't get rounding errors */ 
                 nHistBuckets = 256;
                 histmin = 0;
                 histmax = 255;
+                histminTmp = -0.5;
+                histmaxTmp = 255.5;
+                sprintf( szTemp, "%f", fStdDev );
+                histoType = histoTypeDirect;
             }
             else if(strcmp( hBand->GetMetadataItem( "LAYER_TYPE", "" ), "thematic" ) == 0)
             {
-                nHistBuckets = ceil(fmax);
+                nHistBuckets = ceil(fmax)+1;
                 histmin = 0;
                 histmax = ceil(fmax);
-                //std::cout << "nHistBuckets = " << nHistBuckets << std::endl;
+                histminTmp = -0.5;
+                histmaxTmp = histmax + 0.5;
+                histoType = histoTypeDirect;
             }
             else
             {
-                nHistBuckets = HISTO_NBINS;
+                int range = (ceil(fmax) - floor(fmin));
                 histmin = fmin;
                 histmax = fmax;
+                if(range <= HISTO_NBINS)
+                {
+                    nHistBuckets = range;
+                    histoType = histoTypeDirect;
+                    
+                    histminTmp = histmin - 0.5;
+                    histmaxTmp = histmax + 0.5;
+                }
+                else
+                {
+                    nHistBuckets = HISTO_NBINS;
+                    histoType = histoTypeLinear;
+                    histminTmp = histmin;
+                    histmaxTmp = histmax;
+                }
             }
             pHisto = (int*)calloc(nHistBuckets, sizeof(int));
-            this->getHistogramIgnore( hBand, histmin, histmax, nHistBuckets, pHisto, FALSE, bIgnore, fIgnoreVal );
+            if(bIgnore)
+            {
+                this->getHistogramIgnore(hBand, histminTmp, histmaxTmp, nHistBuckets, pHisto, false, bIgnore, fIgnoreVal);
+            }
+            else
+            {
+                hBand->GetHistogram(histminTmp, histmaxTmp, nHistBuckets, pHisto, true, false, StatsTextProgress, NULL);
+            }
             
             int histoStrLen = nHistBuckets * 8;
-            
             char *szHistoString = new char[histoStrLen];
             szHistoString[0] = '\0';
 
@@ -488,7 +503,7 @@ namespace rsgis { namespace img {
             }
             else
             {
-                sprintf( szTemp, "%f", fmin );
+                sprintf( szTemp, "%f", histmin );
             }
             GDALSetMetadataItem( hBand, "STATISTICS_HISTOMIN", szTemp, NULL );
 
@@ -498,7 +513,7 @@ namespace rsgis { namespace img {
             }
             else
             {
-                sprintf( szTemp, "%f", fmax );
+                sprintf( szTemp, "%f", histmax );
             }
             GDALSetMetadataItem( hBand, "STATISTICS_HISTOMAX", szTemp, NULL );
 
@@ -512,25 +527,13 @@ namespace rsgis { namespace img {
             ie Linear for floats, and direct for integer types
             This means Raster Attribute Dialog gets displayed
             correctly in Imagine */
-            if( ( hBand->GetRasterDataType() == GDT_Float32 ) || ( hBand->GetRasterDataType() == GDT_Float64 ) )
-            {
-                GDALSetMetadataItem( hBand, "STATISTICS_HISTOBINFUNCTION", "linear", NULL );
-            }
-            else
-            {
-                GDALSetMetadataItem( hBand, "STATISTICS_HISTOBINFUNCTION", "direct", NULL );
-            }
-
-            if( bIgnore )
-            {
-                hBand->SetNoDataValue( fIgnoreVal );
-            }
+            GDALSetMetadataItem( hBand, "STATISTICS_HISTOBINFUNCTION", histoType.c_str(), NULL );
 
             free( pHisto );
-            free( pSample );
         }
         if( bPyramid )
         {
+            std::cout << "Building Pyramids:\n";
             this->addpyramid(hHandle);
         }
     }
