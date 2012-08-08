@@ -345,10 +345,8 @@ namespace rsgis { namespace img {
         for( band = 0; band < nBands; band++ )
         {
             std::cout << "Processing band " << band+1 << " of " << nBands << std::endl;
-            /*    fprintf( stderr, "Band = %d\n", band + 1);*/
-
+            
             hBand = hHandle->GetRasterBand( band + 1 );
-
             
             if( bIgnore )
             {
@@ -360,6 +358,7 @@ namespace rsgis { namespace img {
             /* Find min, Max and mean */ 
             double fmin=0, fmax=0, fMean=0, fStdDev=0;
             hBand->ComputeStatistics(false, &fmin, &fmax, &fMean, &fStdDev, StatsTextProgress, NULL);
+            std::cout << std::endl;
 
             /* Write Statistics */
             sprintf( szTemp, "%f", fmin );
@@ -431,6 +430,7 @@ namespace rsgis { namespace img {
             else
             {
                 hBand->GetHistogram(histminTmp, histmaxTmp, nHistBuckets, pHisto, true, false, StatsTextProgress, NULL);
+                std::cout << std::endl;
             }
             
             int histoStrLen = nHistBuckets * 8;
