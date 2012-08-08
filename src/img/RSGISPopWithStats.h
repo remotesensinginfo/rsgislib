@@ -38,6 +38,17 @@
 
 namespace rsgis { namespace img {
     
+    inline int StatsTextProgress( double dfComplete, const char *pszMessage, void *pData)
+    {
+        if( pszMessage != NULL )
+            printf( "%d%% complete: %s\n", (int) (dfComplete*100), pszMessage );
+        else
+            printf( "%d%% complete.\n", (int) (dfComplete*100) );
+        
+        return TRUE;
+    };
+    
+    
     class RSGISPopWithStats
     {
     public:
@@ -48,8 +59,8 @@ namespace rsgis { namespace img {
         void getHistogramIgnore( GDALRasterBand *pBand, double dfMin, double dfMax, int nBuckets, int *panHistogram, int bIncludeOutOfRange, bool bIgnore, float fIgnore );
         void calcPopStats( GDALDataset *hHandle, bool bIgnore, float fIgnoreVal, bool bPyramid );
     private:
-        static const int HISTO_NBINS = 255;
-        static const int CONTIN_STATS_MIN_LIMIT = 1000000;
+        static const int HISTO_NBINS = 256;
+        //static const int CONTIN_STATS_MIN_LIMIT = 1000000;
         static const int MINOVERVIEWDIM = 33;
     };
 }}
