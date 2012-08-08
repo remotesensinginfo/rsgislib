@@ -41,9 +41,9 @@ namespace rsgis { namespace img {
     inline int StatsTextProgress( double dfComplete, const char *pszMessage, void *pData)
     {
         if( pszMessage != NULL )
-            printf( "%d%% complete: %s\n", (int) (dfComplete*100), pszMessage );
+            printf( "%d%% complete: %s\r", (int) (dfComplete*100), pszMessage );
         else
-            printf( "%d%% complete.\n", (int) (dfComplete*100) );
+            printf( "%d%% complete.\r", (int) (dfComplete*100) );
         
         return TRUE;
     };
