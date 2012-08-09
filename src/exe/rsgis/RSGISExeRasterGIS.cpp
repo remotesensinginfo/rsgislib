@@ -701,6 +701,19 @@ namespace rsgisexe{
             }
             xercesc::XMLString::release(&northingsXMLStr);
             
+            XMLCh *areaXMLStr = xercesc::XMLString::transcode("area");
+            if(argElement->hasAttribute(areaXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(areaXMLStr));
+                this->areaField = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'area\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&areaXMLStr);
+            
             XMLCh *distThresholdXMLStr = xercesc::XMLString::transcode("distthreshold");
             if(argElement->hasAttribute(distThresholdXMLStr))
             {
@@ -726,6 +739,36 @@ namespace rsgisexe{
                 throw rsgis::RSGISXMLArgumentsException("No \'n\' attribute was provided.");
             }
             xercesc::XMLString::release(&nXMLStr);
+            
+            
+            XMLCh *majMethodXMLStr = xercesc::XMLString::transcode("majoritymethod");
+            if(argElement->hasAttribute(nXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(majMethodXMLStr));
+                std::string majMethodStr = std::string(charValue);
+                if(majMethodStr == "standardKNN")
+                {
+                    this->majMethod = rsgis::rastergis::stdMajority;
+                }
+                else if(majMethodStr == "weightedKNN")
+                {
+                    this->majMethod = rsgis::rastergis::weightedMajority;
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("Majority method is not recognised, options are \'standardKNN\' or \'weightedKNN\'.");
+                }
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'majoritymethod\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&majMethodXMLStr);
+            
+            
+            
+            
             
             XMLCh *rsgisFieldXMLStr = xercesc::XMLString::transcode("rsgis:field");
             xercesc::DOMNodeList *fieldNodesList = argElement->getElementsByTagName(rsgisFieldXMLStr);
@@ -1231,10 +1274,19 @@ namespace rsgisexe{
                 std::cout << "N: " << this->nFeatures << std::endl;
                 std::cout << "Eastings Field: " << this->eastingsField << std::endl;
                 std::cout << "Northings Field: " << this->northingsField << std::endl;
+                std::cout << "Area Field: " << this->areaField << std::endl;
                 std::cout << "Distance calculated using:\n";
                 for(std::vector<std::string>::iterator iterFields = fields.begin(); iterFields != fields.end(); ++iterFields)
                 {
                     std::cout << "\tField: " << (*iterFields) << std::endl;
+                }
+                if(this->majMethod == rsgis::rastergis::stdMajority)
+                {
+                    std::cout << "Using standard majority method\n";
+                }
+                else if(this->majMethod == rsgis::rastergis::stdMajority)
+                {
+                    std::cout << "Using standard majority method\n";
                 }
                 
                 try
@@ -1249,7 +1301,7 @@ namespace rsgisexe{
                     }
                     
                     rsgis::rastergis::RSGISKNNATTMajorityClassifier knnMajorityClass;
-                    knnMajorityClass.applyKNNClassifier(inputDataset, this->inClassNameField, this->outClassNameField, this->eastingsField, this->northingsField, this->fields, this->nFeatures, this->distThreshold);
+                    knnMajorityClass.applyKNNClassifier(inputDataset, this->inClassNameField, this->outClassNameField, this->eastingsField, this->northingsField, this->areaField, this->fields, this->nFeatures, this->distThreshold, this->majMethod);
                     
                     GDALClose(inputDataset);
                 }
@@ -1414,10 +1466,19 @@ namespace rsgisexe{
                 std::cout << "N: " << this->nFeatures << std::endl;
                 std::cout << "Eastings Field: " << this->eastingsField << std::endl;
                 std::cout << "Northings Field: " << this->northingsField << std::endl;
+                std::cout << "Area Field: " << this->areaField << std::endl;
                 std::cout << "Distance calculated using:\n";
                 for(std::vector<std::string>::iterator iterFields = fields.begin(); iterFields != fields.end(); ++iterFields)
                 {
                     std::cout << "\tField: " << (*iterFields) << std::endl;
+                }
+                if(this->majMethod == rsgis::rastergis::stdMajority)
+                {
+                    std::cout << "Using standard majority method\n";
+                }
+                else if(this->majMethod == rsgis::rastergis::stdMajority)
+                {
+                    std::cout << "Using standard majority method\n";
                 }
             }
             else
