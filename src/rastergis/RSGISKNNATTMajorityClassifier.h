@@ -41,15 +41,23 @@
 
 namespace rsgis{namespace rastergis{
 	
+    enum ClassMajorityMethod
+    {
+        stdMajority,
+        weightedMajority
+    };
+    
     class RSGISKNNATTMajorityClassifier
     {
     public:
         RSGISKNNATTMajorityClassifier();
-        void applyKNNClassifier(GDALDataset *image, std::string inClassCol, std::string outClassCol, std::string eastingsCol, std::string northingsCol, std::vector<std::string> inColumns, unsigned int nFeatures, float distThreshold) throw(rsgis::RSGISAttributeTableException);
+        void applyKNNClassifier(GDALDataset *image, std::string inClassCol, std::string outClassCol, std::string eastingsCol, std::string northingsCol, std::string areaCol, std::vector<std::string> inColumns, unsigned int nFeatures, float distThreshold, ClassMajorityMethod majMethod) throw(rsgis::RSGISAttributeTableException);
         ~RSGISKNNATTMajorityClassifier();
     protected:
         inline double getEuclideanDistance(std::vector<double> *vals1, std::vector<double> *vals2)throw(rsgis::math::RSGISMathException);
-        inline int findMajorityClass(GDALRasterAttributeTable *attTable, size_t fid, int classIdx, int eastingsIdx, int northingsIdx, int *infoColIdxs, size_t numCols, unsigned int nFeatures, float distThreshold) throw(rsgis::RSGISAttributeTableException);
+        inline double weightedDistance(double dist, double area);
+        inline int findMajorityClassStandard(GDALRasterAttributeTable *attTable, size_t fid, int classIdx, int eastingsIdx, int northingsIdx, int *infoColIdxs, size_t numCols, unsigned int nFeatures, float distThreshold) throw(rsgis::RSGISAttributeTableException);
+        inline int findMajorityClassWeighted(GDALRasterAttributeTable *attTable, size_t fid, int classIdx, int eastingsIdx, int northingsIdx, int areaIdx, int *infoColIdxs, size_t numCols, unsigned int nFeatures, float distThreshold) throw(rsgis::RSGISAttributeTableException);
     };
 	
 }}

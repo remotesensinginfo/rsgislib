@@ -407,11 +407,15 @@
 	<!-- A command to copy the colours from classified data to clumps -->
 	<rsgis:command algor="rastergis" option="copycatcolours" clumps="clumps.env" categories="image.env" classfield="string" />
 	<!-- A command to classify segments using KNN majority classification -->
-	<rsgis:command algor="rastergis" option="knnmajorityclassifier" image="image.kea" inclassfield="string" outclassfield="string" eastings="string" northings="string" n="int" distthreshold="float" >
+	<rsgis:command algor="rastergis" option="knnmajorityclassifier" image="image.kea" inclassfield="string" outclassfield="string" eastings="string" northings="string" n="int" area="string" distthreshold="float" majoritymethod="standardKNN | weightedKNN" >
 		<rsgis:field name="string" />
         <rsgis:field name="string" />
         <rsgis:field name="string" />
     </rsgis:command>
+
+
+
+
 
 
 

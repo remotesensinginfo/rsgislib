@@ -99,6 +99,7 @@ namespace rsgisexe{
         std::string classNameField;
         std::string inClassNameField;
         std::string outClassNameField;
+        std::string areaField;
         std::string classField;
         std::vector<std::string> fields;
         size_t fid;
@@ -107,6 +108,7 @@ namespace rsgisexe{
         std::vector<rsgis::rastergis::RSGISBandAttStats*> *bandStats;
         std::vector<rsgis::rastergis::RSGISBandAttPercentiles*> *bandPercentiles;
         bool copyClassNames;
+        rsgis::rastergis::ClassMajorityMethod majMethod;
     };
     
 }
