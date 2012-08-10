@@ -742,7 +742,7 @@ namespace rsgisexe{
             
             
             XMLCh *majMethodXMLStr = xercesc::XMLString::transcode("majoritymethod");
-            if(argElement->hasAttribute(nXMLStr))
+            if(argElement->hasAttribute(majMethodXMLStr))
             {
                 char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(majMethodXMLStr));
                 std::string majMethodStr = std::string(charValue);
