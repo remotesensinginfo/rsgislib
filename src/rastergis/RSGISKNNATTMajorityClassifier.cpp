@@ -425,6 +425,7 @@ namespace rsgis{namespace rastergis{
             }
             
             size_t maxVal = maxClassIDVal+1;
+            //std::cout << "maxVal = " << maxVal << std::endl;
             double area = 0;
             double *freq = new double[maxVal];
             for(size_t i = 0; i < maxVal; ++i)
@@ -452,6 +453,7 @@ namespace rsgis{namespace rastergis{
             first = true;
             for(size_t i = 0; i < maxVal; ++i)
             {
+                //std::cout << i << "(" << freq[i] << ") " << std::flush;
                 if(first)
                 {
                     if(freq[i] > 0)
@@ -468,6 +470,7 @@ namespace rsgis{namespace rastergis{
                 }
             }
             delete[] freq;
+            //std::cout << std::endl;
             
         }
         catch (rsgis::RSGISException &e)
@@ -500,7 +503,23 @@ namespace rsgis{namespace rastergis{
     
     double RSGISKNNATTMajorityClassifier::getWeightedDistance(double dist, double area)
     {
-        return exp(pow((dist*(-1)),(2/0.3333)))*area;
+        /*
+        double tmp1 = dist;
+        std::cout << "tmp1 = " << tmp1 << std::endl;
+        double tmp2 = 2;///(1.0/3.0);
+        std::cout << "tmp2 = " << tmp2 << std::endl;
+        double tmp3 = pow(tmp1, tmp2)/3;
+        std::cout << "tmp3 = " << tmp3 << std::endl;
+        double tmp4 = exp(tmp3*(-1));
+        std::cout << "tmp4 = " << tmp4 << std::endl;
+        double tmp5 = tmp4 * area;
+        std::cout << "tmp5 = " << tmp5 << std::endl << std::endl;
+        return tmp5;
+        */
+        
+        //std::cout << "dist = " << dist << ":\t" << exp((pow(dist, 2)/3)*(-1)) * area << std::endl;
+        
+        return exp((pow(dist, 2)/3)*(-1)) * area;
     }
     
     
