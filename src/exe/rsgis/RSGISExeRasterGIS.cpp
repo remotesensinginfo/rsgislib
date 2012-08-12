@@ -753,6 +753,19 @@ namespace rsgisexe{
             }
             xercesc::XMLString::release(&nXMLStr);
             
+            XMLCh *weightAXMLStr = xercesc::XMLString::transcode("weighta");
+            if(argElement->hasAttribute(weightAXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(weightAXMLStr));
+                this->weightA = textUtils.strtofloat(std::string(charValue));
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                this->weightA = 3;
+            }
+            xercesc::XMLString::release(&weightAXMLStr);    
+            
             
             XMLCh *majMethodXMLStr = xercesc::XMLString::transcode("majoritymethod");
             if(argElement->hasAttribute(majMethodXMLStr))
@@ -1349,6 +1362,7 @@ namespace rsgisexe{
                 std::cout << "Northings Field: " << this->northingsField << std::endl;
                 std::cout << "Area Field: " << this->areaField << std::endl;
                 std::cout << "Weight Field: " << this->majWeightField << std::endl;
+                std::cout << "Weight A: " << this->weightA << std::endl;
                 std::cout << "Distance calculated using:\n";
                 for(std::vector<std::string>::iterator iterFields = fields.begin(); iterFields != fields.end(); ++iterFields)
                 {
@@ -1375,7 +1389,7 @@ namespace rsgisexe{
                     }
                     
                     rsgis::rastergis::RSGISKNNATTMajorityClassifier knnMajorityClass;
-                    knnMajorityClass.applyKNNClassifier(inputDataset, this->inClassNameField, this->outClassNameField, this->eastingsField, this->northingsField, this->areaField, this->majWeightField, this->fields, this->nFeatures, this->distThreshold, this->majMethod);
+                    knnMajorityClass.applyKNNClassifier(inputDataset, this->inClassNameField, this->outClassNameField, this->eastingsField, this->northingsField, this->areaField, this->majWeightField, this->fields, this->nFeatures, this->distThreshold, this->weightA, this->majMethod);
                     
                     GDALClose(inputDataset);
                 }
@@ -1574,6 +1588,7 @@ namespace rsgisexe{
                 std::cout << "Northings Field: " << this->northingsField << std::endl;
                 std::cout << "Area Field: " << this->areaField << std::endl;
                 std::cout << "Weight Field: " << this->majWeightField << std::endl;
+                std::cout << "Weight A: " << this->weightA << std::endl;
                 std::cout << "Distance calculated using:\n";
                 for(std::vector<std::string>::iterator iterFields = fields.begin(); iterFields != fields.end(); ++iterFields)
                 {
