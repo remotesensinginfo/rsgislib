@@ -412,7 +412,12 @@
         <rsgis:field name="string" />
         <rsgis:field name="string" />
     </rsgis:command>
-
+	<!-- A command to export columns from a GDAL RAT to ascii -->
+    <rsgis:command algor="rastergis" option="export2ascii" table="input.kea" output="output.txt" >
+		<rsgis:field name="string" />
+        <rsgis:field name="string" />
+        <rsgis:field name="string" />
+    </rsgis:command>
 
 
 

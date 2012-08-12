@@ -47,6 +47,11 @@ namespace rsgis{namespace rastergis{
                 gdalAttOut = new GDALRasterAttributeTable(*gdalAttOutTmp);
             }
             
+            if(gdalAttIn == NULL)
+            {
+                rsgis::RSGISAttributeTableException("The input image does not have an attribute table.");
+            }
+            
             if(gdalAttIn->GetRowCount() > gdalAttOut->GetRowCount())
             {
                 gdalAttOut->SetRowCount(gdalAttIn->GetRowCount());
@@ -359,6 +364,125 @@ namespace rsgis{namespace rastergis{
         }
     }
     
+    void RSGISRasterAttUtils::exportColumns2ASCII(GDALDataset *inImage, std::string outputFile, std::vector<std::string> fields) throw(RSGISAttributeTableException)
+    {
+        try
+        {
+            std::cout << "Import attribute table to memory.\n";
+            const GDALRasterAttributeTable *gdalAttIn = inImage->GetRasterBand(1)->GetDefaultRAT();
+            
+            if(gdalAttIn == NULL)
+            {
+                rsgis::RSGISAttributeTableException("The input image does not have an attribute table.");
+            }
+            
+            std::cout << "Find field column indexes in RAT.\n";
+            bool *foundInIdx = new bool[fields.size()];
+            int *colInIdxs = new int[fields.size()];
+            for(size_t i = 0; i < fields.size(); ++i)
+            {
+                foundInIdx[i] = false;
+                colInIdxs[i] = 0;
+            }
+            
+            if(gdalAttIn->GetRowCount() == 0)
+            {
+                rsgis::RSGISAttributeTableException("There are no columns in the input attribute table.");
+            }
+            else
+            {
+                for(int i = 0; i < gdalAttIn->GetColumnCount(); ++i)
+                {
+                    for(size_t j = 0; j < fields.size(); ++j)
+                    {
+                        if(!foundInIdx[j] && (std::string(gdalAttIn->GetNameOfCol(i)) == fields.at(j)))
+                        {
+                            colInIdxs[j] = i;
+                            foundInIdx[j] = true;
+                        }
+                    }
+                }
+                
+                for(size_t j = 0; j < fields.size(); ++j)
+                {
+                    if(!foundInIdx[j])
+                    {
+                        std::string message = std::string("Column ") + fields.at(j) + std::string(" is not within the input attribute table.");
+                        throw rsgis::RSGISAttributeTableException(message);
+                    }
+                }                
+            }
+            
+            std::cout << "Copying columns to the ASCII file.\n";
+            std::ofstream outFile;
+            outFile.open(outputFile.c_str());
+            if(outFile.is_open())
+            {
+                outFile.precision(12);
+                
+                for(size_t j = 0; j < fields.size(); ++j)
+                {
+                    if(j != 0)
+                    {
+                        outFile << ",";
+                    }
+                    outFile << gdalAttIn->GetNameOfCol(colInIdxs[j]);
+                }
+                outFile << std::endl;
+                
+                size_t numRows = gdalAttIn->GetRowCount();
+                unsigned int feedbackStep = numRows/10;
+                unsigned int feedback = 0;
+                std::cout << "Started." << std::flush;
+                for(int i = 0; i < numRows; ++i)
+                {
+                    if((numRows > 20) && (i % feedbackStep == 0))
+                    {
+                        std::cout << "." << feedback << "." << std::flush;
+                        feedback += 10;
+                    }
+                    
+                    for(size_t j = 0; j < fields.size(); ++j)
+                    {
+                        if(j != 0)
+                        {
+                            outFile << ",";
+                        }
+                        if(gdalAttIn->GetTypeOfCol(colInIdxs[j]) == GFT_Integer)
+                        {
+                            outFile << gdalAttIn->GetValueAsInt(i, colInIdxs[j]);
+                        }
+                        else if(gdalAttIn->GetTypeOfCol(colInIdxs[j]) == GFT_Real)
+                        {
+                            outFile << floor((gdalAttIn->GetValueAsDouble(i, colInIdxs[j]) * 1000)+0.5) / 1000;
+                        }
+                        else if(gdalAttIn->GetTypeOfCol(colInIdxs[j]) == GFT_String)
+                        {
+                            outFile << "\"" << gdalAttIn->GetValueAsString(i, colInIdxs[j]) << "\"" ;
+                        }
+                        else
+                        {
+                            throw rsgis::RSGISAttributeTableException("Column data type was not recognised.");
+                        }                        
+                    }
+                    outFile << std::endl;
+                }
+                std::cout << ".Completed\n";
+                outFile.flush();
+                outFile.close();
+            }
+            else
+            {
+                rsgis::RSGISAttributeTableException("Could not open the specified output ASCII file.");
+            }
+            
+            
+        }
+        catch (rsgis::RSGISAttributeTableException &e)
+        {
+            throw e;
+        }
+    }
     
     RSGISRasterAttUtils::~RSGISRasterAttUtils()
     {
