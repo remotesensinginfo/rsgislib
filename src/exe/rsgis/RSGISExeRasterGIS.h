@@ -112,6 +112,7 @@ namespace rsgisexe{
         std::vector<rsgis::rastergis::RSGISBandAttPercentiles*> *bandPercentiles;
         bool copyClassNames;
         rsgis::rastergis::ClassMajorityMethod majMethod;
+        float weightA;
     };
     
 }
