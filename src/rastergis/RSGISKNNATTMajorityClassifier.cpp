@@ -30,7 +30,7 @@ namespace rsgis{namespace rastergis{
         
     }
     
-    void RSGISKNNATTMajorityClassifier::applyKNNClassifier(GDALDataset *image, std::string inClassCol, std::string outClassCol, std::string eastingsCol, std::string northingsCol, std::string areaCol, std::vector<std::string> inColumns, unsigned int nFeatures, float distThreshold, ClassMajorityMethod majMethod) throw(rsgis::RSGISAttributeTableException)
+    void RSGISKNNATTMajorityClassifier::applyKNNClassifier(GDALDataset *image, std::string inClassCol, std::string outClassCol, std::string eastingsCol, std::string northingsCol, std::string areaCol, std::string majWeightCol, std::vector<std::string> inColumns, unsigned int nFeatures, float distThreshold, ClassMajorityMethod majMethod) throw(rsgis::RSGISAttributeTableException)
     {
         try
         {
@@ -61,6 +61,8 @@ namespace rsgis{namespace rastergis{
             // Get the column indexes and create output column if not present.
             int areaColIdx = 0;
             bool areaColFound = false;
+            int majWeightColIdx = 0;
+            bool majWeightColFound = false;
             int inClassColIdx = 0;
             bool inClassColFound = false;
             int outClassColIdx = 0;
@@ -83,6 +85,11 @@ namespace rsgis{namespace rastergis{
                 {
                     areaColFound = true;
                     areaColIdx = i;
+                }
+                else if(!majWeightColFound && (std::string(attTable->GetNameOfCol(i)) == majWeightCol))
+                {
+                    majWeightColFound = true;
+                    majWeightColIdx = i;
                 }
                 else if(!inClassColFound && (std::string(attTable->GetNameOfCol(i)) == inClassCol))
                 {
@@ -123,6 +130,12 @@ namespace rsgis{namespace rastergis{
                 outClassColIdx = numColumns++;
             }
             
+            if(!majWeightColFound)
+            {
+                attTable->CreateColumn(majWeightCol.c_str(), GFT_Real, GFU_Generic);
+                majWeightColIdx = numColumns++;
+            }
+            
             if(!areaColFound)
             {
                 throw rsgis::RSGISAttributeTableException("Could not find the area column.");
@@ -153,7 +166,7 @@ namespace rsgis{namespace rastergis{
             }
             
             std::cout << "Iterating through columns to classify...\n";
-            int selectedClass = 0;
+            std::pair<int, double> selectedClass;
             unsigned int feedbackStep = numRows/10;
             unsigned int feedback = 10;
             std::cout << "Started..0." << std::flush;
@@ -177,7 +190,8 @@ namespace rsgis{namespace rastergis{
                 {
                     throw rsgis::RSGISAttributeTableException("Majority methods is not recognised.");
                 }
-                attTable->SetValue(i, outClassColIdx, selectedClass);
+                attTable->SetValue(i, outClassColIdx, selectedClass.first);
+                attTable->SetValue(i, majWeightColIdx, selectedClass.second);
                 //std::cout << "i = " << i << " = " << selectedClass << ":\t" << attTable->GetValueAsInt(i, inClassColIdx) << std::endl;
                 
             }
@@ -197,9 +211,10 @@ namespace rsgis{namespace rastergis{
         
     }
     
-    int RSGISKNNATTMajorityClassifier::findMajorityClassStandard(GDALRasterAttributeTable *attTable, size_t fid, int classIdx, int eastingsIdx, int northingsIdx, int *infoColIdxs, size_t numCols, unsigned int nFeatures, float distThreshold) throw(rsgis::RSGISAttributeTableException)
+    std::pair<int, double> RSGISKNNATTMajorityClassifier::findMajorityClassStandard(GDALRasterAttributeTable *attTable, size_t fid, int classIdx, int eastingsIdx, int northingsIdx, int *infoColIdxs, size_t numCols, unsigned int nFeatures, float distThreshold) throw(rsgis::RSGISAttributeTableException)
     {
         int classID = -1;
+        size_t maxFreq = 0;
         
         try 
         {
@@ -289,7 +304,6 @@ namespace rsgis{namespace rastergis{
                 ++freq[*iterItems];
             }
             
-            size_t maxFreq = 0;
             bool first = true;
             for(size_t i = 0; i < maxVal; ++i)
             {
@@ -316,12 +330,13 @@ namespace rsgis{namespace rastergis{
             throw rsgis::RSGISAttributeTableException(e.what());
         }
         
-        return classID;
+        return std::pair<int, double>(classID, ((double)maxFreq));
     }
     
-    int RSGISKNNATTMajorityClassifier::findMajorityClassWeighted(GDALRasterAttributeTable *attTable, size_t fid, int classIdx, int eastingsIdx, int northingsIdx, int areaIdx, int *infoColIdxs, size_t numCols, unsigned int nFeatures, float distThreshold) throw(rsgis::RSGISAttributeTableException)
+    std::pair<int, double> RSGISKNNATTMajorityClassifier::findMajorityClassWeighted(GDALRasterAttributeTable *attTable, size_t fid, int classIdx, int eastingsIdx, int northingsIdx, int areaIdx, int *infoColIdxs, size_t numCols, unsigned int nFeatures, float distThreshold) throw(rsgis::RSGISAttributeTableException)
     {
         int classID = -1;
+        double maxFreq = 0;
         
         try 
         {
@@ -345,7 +360,6 @@ namespace rsgis{namespace rastergis{
             bool foundPos = false;
             size_t numRows = attTable->GetRowCount();
             double infoDist = 0;
-            double area = 0;
             double eucSpatDist = 0;
             for(size_t n = 1; n < numRows; ++n)
             {
@@ -363,8 +377,6 @@ namespace rsgis{namespace rastergis{
                             vals2->push_back(attTable->GetValueAsDouble(n, infoColIdxs[m]));
                         }
                         infoDist = this->getEuclideanDistance(fidValsInfo, vals2);
-                        area = attTable->GetValueAsDouble(n, areaIdx);
-                        infoDist = this->weightedDistance(infoDist, area);
                         
                         foundPos = false;
                         for(std::list<DistItem>::iterator iterItems = topNItems.begin(); iterItems != topNItems.end(); ++iterItems)
@@ -397,26 +409,32 @@ namespace rsgis{namespace rastergis{
             delete vals2;
             
             // Find the majority class ID.
-            std::list<size_t> classIDs;
+            std::list<std::pair<size_t, size_t> > classIDs;
             for(std::list<DistItem>::iterator iterItems = topNItems.begin(); iterItems != topNItems.end(); ++iterItems)
             {
-                classIDs.push_back(attTable->GetValueAsInt((*iterItems).fid, classIdx));
+                classIDs.push_back(std::pair<size_t, size_t>((*iterItems).fid, attTable->GetValueAsInt((*iterItems).fid, classIdx)));
             }
             classIDs.sort();
             
-            size_t maxVal = classIDs.back()+1;
-            
-            size_t *freq = new size_t[maxVal];
+            size_t maxVal = classIDs.back().second+1;
+            double area = 0;
+            double *freq = new double[maxVal];
             for(size_t i = 0; i < maxVal; ++i)
             {
                 freq[i] = 0;
             }
-            for(std::list<size_t>::iterator iterItems = classIDs.begin(); iterItems != classIDs.end(); ++iterItems)
+            for(std::list<std::pair<size_t, size_t> >::iterator iterItems = classIDs.begin(); iterItems != classIDs.end(); ++iterItems)
             {
-                ++freq[*iterItems];
+                vals2->push_back(attTable->GetValueAsDouble((*iterItems).first, eastingsIdx));
+                vals2->push_back(attTable->GetValueAsDouble((*iterItems).first, northingsIdx));
+                
+                eucSpatDist = this->getEuclideanDistance(fidValsSpatial, vals2)/1000;
+                area = attTable->GetValueAsDouble((*iterItems).first, areaIdx);
+                
+                freq[(*iterItems).second] += this->weightedDistance(eucSpatDist, area);
             }
             
-            size_t maxFreq = 0;
+            
             bool first = true;
             for(size_t i = 0; i < maxVal; ++i)
             {
@@ -443,7 +461,7 @@ namespace rsgis{namespace rastergis{
             throw rsgis::RSGISAttributeTableException(e.what());
         }
         
-        return classID;
+        return std::pair<int, double>(classID, maxFreq);
     }
     
     double RSGISKNNATTMajorityClassifier::getEuclideanDistance(std::vector<double> *vals1, std::vector<double> *vals2)throw(rsgis::math::RSGISMathException)

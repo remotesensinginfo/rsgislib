@@ -213,7 +213,7 @@ namespace rsgis{namespace rastergis{
             bool *first = new bool[numRows];
             for(size_t i = 0; i < numRows; ++i)
             {
-                first[i] = false;
+                first[i] = true;
                 for(std::map<size_t,CategoryField>::iterator iterCats = cats->begin(); iterCats != cats->end(); ++iterCats)
                 {
                     attTable->SetValue(i, (*iterCats).second.fieldIdx, 0.0);
