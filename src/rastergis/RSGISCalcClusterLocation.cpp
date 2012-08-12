@@ -51,7 +51,7 @@ namespace rsgis{namespace rastergis{
             int northColIdx = 0;
             if(numColumns == 0)
             {
-                attTable->CreateColumn ("Count", GFT_Integer, GFU_PixelCount);
+                attTable->CreateColumn ("PxlCount", GFT_Integer, GFU_PixelCount);
                 countColIdx = 0;
                 attTable->CreateColumn(eastColumn.c_str(), GFT_Real, GFU_Generic);
                 eastColIdx = 1;
@@ -65,7 +65,7 @@ namespace rsgis{namespace rastergis{
                 bool foundNorthings = 0;
                 for(int i = 0; i < numColumns; ++i)
                 {
-                    if(!foundCount && (std::string(attTable->GetNameOfCol(i)) == std::string("Count")))
+                    if(!foundCount && (std::string(attTable->GetNameOfCol(i)) == std::string("PxlCount")))
                     {
                         foundCount = true;
                         countColIdx = i;
@@ -84,7 +84,7 @@ namespace rsgis{namespace rastergis{
                 
                 if(!foundCount)
                 {
-                     attTable->CreateColumn ("Count", GFT_Integer, GFU_PixelCount);
+                     attTable->CreateColumn ("PxlCount", GFT_Integer, GFU_PixelCount);
                     countColIdx = numColumns++;
                 }
                 

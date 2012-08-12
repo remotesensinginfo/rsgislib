@@ -714,6 +714,19 @@ namespace rsgisexe{
             }
             xercesc::XMLString::release(&areaXMLStr);
             
+            XMLCh *weightFieldXMLStr = xercesc::XMLString::transcode("weightfield");
+            if(argElement->hasAttribute(weightFieldXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(weightFieldXMLStr));
+                this->majWeightField = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'weightfield\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&weightFieldXMLStr);
+            
             XMLCh *distThresholdXMLStr = xercesc::XMLString::transcode("distthreshold");
             if(argElement->hasAttribute(distThresholdXMLStr))
             {
@@ -1275,6 +1288,7 @@ namespace rsgisexe{
                 std::cout << "Eastings Field: " << this->eastingsField << std::endl;
                 std::cout << "Northings Field: " << this->northingsField << std::endl;
                 std::cout << "Area Field: " << this->areaField << std::endl;
+                std::cout << "Weight Field: " << this->majWeightField << std::endl;
                 std::cout << "Distance calculated using:\n";
                 for(std::vector<std::string>::iterator iterFields = fields.begin(); iterFields != fields.end(); ++iterFields)
                 {
@@ -1301,7 +1315,7 @@ namespace rsgisexe{
                     }
                     
                     rsgis::rastergis::RSGISKNNATTMajorityClassifier knnMajorityClass;
-                    knnMajorityClass.applyKNNClassifier(inputDataset, this->inClassNameField, this->outClassNameField, this->eastingsField, this->northingsField, this->areaField, this->fields, this->nFeatures, this->distThreshold, this->majMethod);
+                    knnMajorityClass.applyKNNClassifier(inputDataset, this->inClassNameField, this->outClassNameField, this->eastingsField, this->northingsField, this->areaField, this->majWeightField, this->fields, this->nFeatures, this->distThreshold, this->majMethod);
                     
                     GDALClose(inputDataset);
                 }
@@ -1467,6 +1481,7 @@ namespace rsgisexe{
                 std::cout << "Eastings Field: " << this->eastingsField << std::endl;
                 std::cout << "Northings Field: " << this->northingsField << std::endl;
                 std::cout << "Area Field: " << this->areaField << std::endl;
+                std::cout << "Weight Field: " << this->majWeightField << std::endl;
                 std::cout << "Distance calculated using:\n";
                 for(std::vector<std::string>::iterator iterFields = fields.begin(); iterFields != fields.end(); ++iterFields)
                 {
@@ -1479,6 +1494,17 @@ namespace rsgisexe{
                 else if(this->majMethod == rsgis::rastergis::stdMajority)
                 {
                     std::cout << "Using standard majority method\n";
+                }
+            }
+            else if(this->option == RSGISExeRasterGIS::popattributepercentile)
+            {
+                std::cout << "A command to populate an attribute table with percentiles from the clumps within an image.\n";
+                std::cout << "Input Image: " << this->inputImage << std::endl;
+                std::cout << "Clump Image: " << this->clumpsImage << std::endl;
+                std::cout << "Percentiles to be calculated:\n";
+                for(std::vector<rsgis::rastergis::RSGISBandAttPercentiles*>::iterator iterBands = bandPercentiles->begin(); iterBands != bandPercentiles->end(); ++iterBands)
+                {
+                    std::cout << "Band " << (*iterBands)->band << ": " << (*iterBands)->fieldName << " percentile " << (*iterBands)->percentile << std::endl;
                 }
             }
             else

@@ -101,6 +101,7 @@ namespace rsgisexe{
         std::string outClassNameField;
         std::string areaField;
         std::string classField;
+        std::string majWeightField;
         std::vector<std::string> fields;
         size_t fid;
         unsigned int nFeatures;
