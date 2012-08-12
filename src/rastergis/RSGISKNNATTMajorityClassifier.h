@@ -55,7 +55,7 @@ namespace rsgis{namespace rastergis{
         ~RSGISKNNATTMajorityClassifier();
     protected:
         inline double getEuclideanDistance(std::vector<double> *vals1, std::vector<double> *vals2)throw(rsgis::math::RSGISMathException);
-        inline double weightedDistance(double dist, double area);
+        inline double getWeightedDistance(double dist, double area);
         inline std::pair<int, double> findMajorityClassStandard(GDALRasterAttributeTable *attTable, size_t fid, int classIdx, int eastingsIdx, int northingsIdx, int *infoColIdxs, size_t numCols, unsigned int nFeatures, float distThreshold) throw(rsgis::RSGISAttributeTableException);
         inline std::pair<int, double> findMajorityClassWeighted(GDALRasterAttributeTable *attTable, size_t fid, int classIdx, int eastingsIdx, int northingsIdx, int areaIdx, int *infoColIdxs, size_t numCols, unsigned int nFeatures, float distThreshold) throw(rsgis::RSGISAttributeTableException);
     };

@@ -403,11 +403,7 @@ namespace rsgis{namespace rastergis{
                     vals2->clear();
                 }
             }
-            
-            delete fidValsSpatial;
-            delete fidValsInfo;
-            delete vals2;
-            
+                        
             // Find the majority class ID.
             std::list<std::pair<size_t, size_t> > classIDs;
             for(std::list<DistItem>::iterator iterItems = topNItems.begin(); iterItems != topNItems.end(); ++iterItems)
@@ -431,8 +427,14 @@ namespace rsgis{namespace rastergis{
                 eucSpatDist = this->getEuclideanDistance(fidValsSpatial, vals2)/1000;
                 area = attTable->GetValueAsDouble((*iterItems).first, areaIdx);
                 
-                freq[(*iterItems).second] += this->weightedDistance(eucSpatDist, area);
+                freq[(*iterItems).second] += this->getWeightedDistance(eucSpatDist, area);
+                
+                vals2->clear();
             }
+            
+            delete fidValsSpatial;
+            delete fidValsInfo;
+            delete vals2;
             
             
             bool first = true;
@@ -484,7 +486,7 @@ namespace rsgis{namespace rastergis{
         return sqrt(dist/((double)numVals));
     }
     
-    double RSGISKNNATTMajorityClassifier::weightedDistance(double dist, double area)
+    double RSGISKNNATTMajorityClassifier::getWeightedDistance(double dist, double area)
     {
         return exp(pow((dist*(-1)),(2/0.3333)))*area;
     }
