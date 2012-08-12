@@ -24,6 +24,7 @@
 #define RSGISRasterAttUtils_H
 
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <math.h>
 
@@ -43,6 +44,7 @@ namespace rsgis{namespace rastergis{
         RSGISRasterAttUtils();
         void copyAttColumns(GDALDataset *inImage, GDALDataset *outImage, std::vector<std::string> fields) throw(RSGISAttributeTableException);
         void copyColourForCats(GDALDataset *catsImage, GDALDataset *classImage, std::string classField) throw(RSGISAttributeTableException);
+        void exportColumns2ASCII(GDALDataset *inImage, std::string outputFile, std::vector<std::string> fields) throw(RSGISAttributeTableException);
         ~RSGISRasterAttUtils();
     };
 	

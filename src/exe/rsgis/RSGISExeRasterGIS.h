@@ -71,7 +71,8 @@ namespace rsgisexe{
             popcategoryproportions,
             copycatcolours,
             knnmajorityclassifier,
-            popattributepercentile
+            popattributepercentile,
+            export2ascii
         };
         
         RSGISExeRasterGIS();
@@ -87,6 +88,7 @@ namespace rsgisexe{
         options option;
         std::string inputImage;
         std::string clumpsImage;
+        std::string outputFile;
         std::string categoriesImage;
         std::string outputField;
         std::string northingsField;

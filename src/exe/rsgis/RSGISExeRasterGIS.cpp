@@ -54,7 +54,7 @@ namespace rsgisexe{
         XMLCh *optionCopyCatColours = xercesc::XMLString::transcode("copycatcolours");
         XMLCh *optionKNNMajorityClassifier = xercesc::XMLString::transcode("knnmajorityclassifier");
         XMLCh *optionPopAttributePercentile = xercesc::XMLString::transcode("popattributepercentile");
-        
+        XMLCh *optionExport2ASCII = xercesc::XMLString::transcode("export2ascii");
         
         const XMLCh *algorNameEle = argElement->getAttribute(algorXMLStr);
         if(!xercesc::XMLString::equals(algorName, algorNameEle))
@@ -779,10 +779,6 @@ namespace rsgisexe{
             }
             xercesc::XMLString::release(&majMethodXMLStr);
             
-            
-            
-            
-            
             XMLCh *rsgisFieldXMLStr = xercesc::XMLString::transcode("rsgis:field");
             xercesc::DOMNodeList *fieldNodesList = argElement->getElementsByTagName(rsgisFieldXMLStr);
             unsigned int numFieldTags = fieldNodesList->getLength();
@@ -906,6 +902,69 @@ namespace rsgisexe{
             xercesc::XMLString::release(&rsgisBandXMLStr);
             
         }
+        else if(xercesc::XMLString::equals(optionExport2ASCII, optionXML))
+        {
+            this->option = RSGISExeRasterGIS::export2ascii;
+            
+            XMLCh *tableXMLStr = xercesc::XMLString::transcode("table");
+            if(argElement->hasAttribute(tableXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(tableXMLStr));
+                this->inputImage = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'table\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&tableXMLStr);
+            
+            XMLCh *outputXMLStr = xercesc::XMLString::transcode("output");
+            if(argElement->hasAttribute(outputXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outputXMLStr));
+                this->outputFile = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&outputXMLStr);
+                        
+            XMLCh *rsgisFieldXMLStr = xercesc::XMLString::transcode("rsgis:field");
+            xercesc::DOMNodeList *fieldNodesList = argElement->getElementsByTagName(rsgisFieldXMLStr);
+            unsigned int numFieldTags = fieldNodesList->getLength();
+            
+            std::cout << "Found " << numFieldTags << " field tags" << std::endl;
+            
+            if(numFieldTags == 0)
+            {
+                throw rsgis::RSGISXMLArgumentsException("No field tags have been provided, at least 1 is required.");
+            }
+            
+            fields.reserve(numFieldTags);
+            
+            xercesc::DOMElement *attElement = NULL;
+            std::string fieldName = "";
+            for(int i = 0; i < numFieldTags; i++)
+            {
+                attElement = static_cast<xercesc::DOMElement*>(fieldNodesList->item(i));
+                
+                XMLCh *nameXMLStr = xercesc::XMLString::transcode("name");
+                if(attElement->hasAttribute(nameXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(attElement->getAttribute(nameXMLStr));
+                    fields.push_back(std::string(charValue));
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'name\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&nameXMLStr);
+            }
+        }
         else
         {
             std::string message = std::string("The option (") + std::string(xercesc::XMLString::transcode(optionXML)) + std::string(") is not known: RSGISExeRasterGIS.");
@@ -926,6 +985,7 @@ namespace rsgisexe{
         xercesc::XMLString::release(&optionCopyCatColours);
         xercesc::XMLString::release(&optionKNNMajorityClassifier);
         xercesc::XMLString::release(&optionPopAttributePercentile);
+        xercesc::XMLString::release(&optionExport2ASCII);
     }
     
     void RSGISExeRasterGIS::runAlgorithm() throw(rsgis::RSGISException)
@@ -1367,6 +1427,38 @@ namespace rsgisexe{
                     throw e;
                 }
             }
+            else if(this->option == RSGISExeRasterGIS::export2ascii)
+            {
+                std::cout << "A command to export columns from a GDAL RAT to ascii.\n";
+                std::cout << "Input Image: " << this->inputImage << std::endl;
+                std::cout << "Output File: " << this->outputFile << std::endl;
+                std::cout << "Fields:\n";
+                for(std::vector<std::string>::iterator iterFields = fields.begin(); iterFields != fields.end(); ++iterFields)
+                {
+                    std::cout << "\tField: " << (*iterFields) << std::endl;
+                }
+                
+                try
+                {
+                    GDALAllRegister();
+                    
+                    GDALDataset *inputDataset = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_Update);
+                    if(inputDataset == NULL)
+                    {
+                        std::string message = std::string("Could not open image ") + this->inputImage;
+                        throw rsgis::RSGISImageException(message.c_str());
+                    }
+                    
+                    rsgis::rastergis::RSGISRasterAttUtils attUtils;
+                    attUtils.exportColumns2ASCII(inputDataset, this->outputFile, this->fields);
+                    
+                    GDALClose(inputDataset);
+                }
+                catch(rsgis::RSGISException &e)
+                {
+                    throw e;
+                }
+            }
             else
             {
                 throw rsgis::RSGISException("The option is not recognised: RSGISExeRasterGIS");
@@ -1505,6 +1597,17 @@ namespace rsgisexe{
                 for(std::vector<rsgis::rastergis::RSGISBandAttPercentiles*>::iterator iterBands = bandPercentiles->begin(); iterBands != bandPercentiles->end(); ++iterBands)
                 {
                     std::cout << "Band " << (*iterBands)->band << ": " << (*iterBands)->fieldName << " percentile " << (*iterBands)->percentile << std::endl;
+                }
+            }
+            else if(this->option == RSGISExeRasterGIS::export2ascii)
+            {
+                std::cout << "A command to export columns from a GDAL RAT to ascii.\n";
+                std::cout << "Input Image: " << this->inputImage << std::endl;
+                std::cout << "Output File: " << this->outputFile << std::endl;
+                std::cout << "Fields:\n";
+                for(std::vector<std::string>::iterator iterFields = fields.begin(); iterFields != fields.end(); ++iterFields)
+                {
+                    std::cout << "\tField: " << (*iterFields) << std::endl;
                 }
             }
             else
