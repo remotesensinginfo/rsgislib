@@ -406,13 +406,25 @@ namespace rsgis{namespace rastergis{
                         
             // Find the majority class ID.
             std::list<std::pair<size_t, size_t> > classIDs;
+            size_t tmpClassID = 0;
+            size_t maxClassIDVal = 0;
+            bool first = true;
             for(std::list<DistItem>::iterator iterItems = topNItems.begin(); iterItems != topNItems.end(); ++iterItems)
             {
-                classIDs.push_back(std::pair<size_t, size_t>((*iterItems).fid, attTable->GetValueAsInt((*iterItems).fid, classIdx)));
+                tmpClassID = attTable->GetValueAsInt((*iterItems).fid, classIdx);
+                classIDs.push_back(std::pair<size_t, size_t>((*iterItems).fid, tmpClassID));
+                if(first)
+                {
+                    maxClassIDVal = tmpClassID;
+                    first = false;
+                }
+                else if(tmpClassID > maxClassIDVal)
+                {
+                    maxClassIDVal = tmpClassID;
+                }
             }
-            classIDs.sort();
             
-            size_t maxVal = classIDs.back().second+1;
+            size_t maxVal = maxClassIDVal+1;
             double area = 0;
             double *freq = new double[maxVal];
             for(size_t i = 0; i < maxVal; ++i)
@@ -437,7 +449,7 @@ namespace rsgis{namespace rastergis{
             delete vals2;
             
             
-            bool first = true;
+            first = true;
             for(size_t i = 0; i < maxVal; ++i)
             {
                 if(first)
