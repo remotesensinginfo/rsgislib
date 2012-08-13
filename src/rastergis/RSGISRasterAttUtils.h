@@ -35,6 +35,8 @@
 
 #include "common/RSGISAttributeTableException.h"
 
+#include "utils/RSGISColour.h"
+
 #include <boost/numeric/conversion/cast.hpp>
 #include <boost/lexical_cast.hpp>
 
@@ -48,6 +50,7 @@ namespace rsgis{namespace rastergis{
         void copyColourForCats(GDALDataset *catsImage, GDALDataset *classImage, std::string classField) throw(RSGISAttributeTableException);
         void exportColumns2ASCII(GDALDataset *inImage, std::string outputFile, std::vector<std::string> fields) throw(RSGISAttributeTableException);
         void translateClasses(GDALDataset *inImage, std::string classInField, std::string classOutField, std::map<size_t, size_t> classPairs) throw(RSGISAttributeTableException);
+        void applyClassColours(GDALDataset *inImage, std::string classInField, std::map<size_t, rsgis::utils::RSGISColourInt> classColoursPairs) throw(RSGISAttributeTableException);
         ~RSGISRasterAttUtils();
     };
 	

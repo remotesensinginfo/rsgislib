@@ -424,6 +424,12 @@
         <rsgis:class inid="int" outid="int" />
 		<rsgis:class inid="int" outid="int" />
     </rsgis:command>
+	<!-- A command to set a colour table for a set of classes within the attribute table. -->
+    <rsgis:command algor="rastergis" option="colourclasses" table="input.kea" classfield="string" >
+		<rsgis:class id="int" r="int" g="int" b="int" a="int" />
+        <rsgis:class id="int" r="int" g="int" b="int" a="int" />
+		<rsgis:class id="int" r="int" g="int" b="int" a="int" />
+    </rsgis:command>
 	
 
 
