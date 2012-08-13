@@ -418,6 +418,13 @@
         <rsgis:field name="string" />
         <rsgis:field name="string" />
     </rsgis:command>
+	<!-- A command to translate a set of classes to another -->
+    <rsgis:command algor="rastergis" option="classtranslate" table="input.kea" infield="string" outfield="string" >
+		<rsgis:class inid="int" outid="int" />
+        <rsgis:class inid="int" outid="int" />
+		<rsgis:class inid="int" outid="int" />
+    </rsgis:command>
+	
 
 
 

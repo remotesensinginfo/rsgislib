@@ -72,7 +72,8 @@ namespace rsgisexe{
             copycatcolours,
             knnmajorityclassifier,
             popattributepercentile,
-            export2ascii
+            export2ascii,
+            classtranslate
         };
         
         RSGISExeRasterGIS();
@@ -103,6 +104,8 @@ namespace rsgisexe{
         std::string outClassNameField;
         std::string areaField;
         std::string classField;
+        std::string classInField;
+        std::string classOutField;
         std::string majWeightField;
         std::vector<std::string> fields;
         size_t fid;
@@ -113,6 +116,7 @@ namespace rsgisexe{
         bool copyClassNames;
         rsgis::rastergis::ClassMajorityMethod majMethod;
         float weightA;
+        std::map<size_t, size_t> classPairs;
     };
     
 }
