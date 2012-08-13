@@ -55,6 +55,7 @@ namespace rsgisexe{
         XMLCh *optionKNNMajorityClassifier = xercesc::XMLString::transcode("knnmajorityclassifier");
         XMLCh *optionPopAttributePercentile = xercesc::XMLString::transcode("popattributepercentile");
         XMLCh *optionExport2ASCII = xercesc::XMLString::transcode("export2ascii");
+        XMLCh *optionClassTranslate = xercesc::XMLString::transcode("classtranslate");
         
         const XMLCh *algorNameEle = argElement->getAttribute(algorXMLStr);
         if(!xercesc::XMLString::equals(algorName, algorNameEle))
@@ -978,6 +979,96 @@ namespace rsgisexe{
                 xercesc::XMLString::release(&nameXMLStr);
             }
         }
+        else if(xercesc::XMLString::equals(optionClassTranslate, optionXML))
+        {
+            this->option = RSGISExeRasterGIS::classtranslate;
+            
+            XMLCh *tableXMLStr = xercesc::XMLString::transcode("table");
+            if(argElement->hasAttribute(tableXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(tableXMLStr));
+                this->inputImage = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'table\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&tableXMLStr);
+            
+            XMLCh *inFieldXMLStr = xercesc::XMLString::transcode("infield");
+            if(argElement->hasAttribute(inFieldXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(inFieldXMLStr));
+                this->classInField = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'infield\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&inFieldXMLStr);
+            
+            XMLCh *outFieldXMLStr = xercesc::XMLString::transcode("outfield");
+            if(argElement->hasAttribute(outFieldXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outFieldXMLStr));
+                this->classOutField = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'outfield\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&outFieldXMLStr);
+            
+            XMLCh *rsgisClassXMLStr = xercesc::XMLString::transcode("rsgis:class");
+            xercesc::DOMNodeList *classNodesList = argElement->getElementsByTagName(rsgisClassXMLStr);
+            unsigned int numClassTags = classNodesList->getLength();
+            
+            std::cout << "Found " << numClassTags << " class tags" << std::endl;
+            
+            if(numClassTags == 0)
+            {
+                throw rsgis::RSGISXMLArgumentsException("No class tags have been provided, at least 1 is required.");
+            }
+            
+            xercesc::DOMElement *attElement = NULL;
+            size_t inClassId = 0;
+            size_t outClassId = 0;
+            for(int i = 0; i < numClassTags; i++)
+            {
+                attElement = static_cast<xercesc::DOMElement*>(classNodesList->item(i));
+                
+                XMLCh *inIDXMLStr = xercesc::XMLString::transcode("inid");
+                if(attElement->hasAttribute(inIDXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(attElement->getAttribute(inIDXMLStr));
+                    inClassId = textUtils.strtosizet(std::string(charValue));
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'inid\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&inIDXMLStr);
+                
+                XMLCh *outIDXMLStr = xercesc::XMLString::transcode("outid");
+                if(attElement->hasAttribute(outIDXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(attElement->getAttribute(outIDXMLStr));
+                    outClassId = textUtils.strtosizet(std::string(charValue));
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'outid\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&outIDXMLStr);
+                
+                classPairs.insert(std::pair<size_t, size_t>(inClassId, outClassId));
+            }
+        }
         else
         {
             std::string message = std::string("The option (") + std::string(xercesc::XMLString::transcode(optionXML)) + std::string(") is not known: RSGISExeRasterGIS.");
@@ -999,6 +1090,7 @@ namespace rsgisexe{
         xercesc::XMLString::release(&optionKNNMajorityClassifier);
         xercesc::XMLString::release(&optionPopAttributePercentile);
         xercesc::XMLString::release(&optionExport2ASCII);
+        xercesc::XMLString::release(&optionClassTranslate);
     }
     
     void RSGISExeRasterGIS::runAlgorithm() throw(rsgis::RSGISException)
@@ -1473,6 +1565,39 @@ namespace rsgisexe{
                     throw e;
                 }
             }
+            else if(this->option == RSGISExeRasterGIS::classtranslate)
+            {
+                std::cout << "A command to translate a set of classes to another\n";
+                std::cout << "Input Image: " << this->inputImage << std::endl;
+                std::cout << "Input Field: " << this->classInField << std::endl;
+                std::cout << "Output Field: " << this->classOutField << std::endl;
+                std::cout << "Class Pairs:\n";
+                for(std::map<size_t, size_t>::iterator iterClass = classPairs.begin(); iterClass != classPairs.end(); ++iterClass)
+                {
+                    std::cout << "\tClass " << (*iterClass).first << " = " << (*iterClass).second << std::endl;
+                }
+                
+                try
+                {
+                    GDALAllRegister();
+                    
+                    GDALDataset *inputDataset = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_Update);
+                    if(inputDataset == NULL)
+                    {
+                        std::string message = std::string("Could not open image ") + this->inputImage;
+                        throw rsgis::RSGISImageException(message.c_str());
+                    }
+                    
+                    rsgis::rastergis::RSGISRasterAttUtils attUtils;
+                    attUtils.translateClasses(inputDataset, this->classInField, this->classOutField, this->classPairs);
+                    
+                    GDALClose(inputDataset);
+                }
+                catch(rsgis::RSGISException &e)
+                {
+                    throw e;
+                }
+            }
             else
             {
                 throw rsgis::RSGISException("The option is not recognised: RSGISExeRasterGIS");
@@ -1623,6 +1748,18 @@ namespace rsgisexe{
                 for(std::vector<std::string>::iterator iterFields = fields.begin(); iterFields != fields.end(); ++iterFields)
                 {
                     std::cout << "\tField: " << (*iterFields) << std::endl;
+                }
+            }
+            else if(this->option == RSGISExeRasterGIS::classtranslate)
+            {
+                std::cout << "A command to translate a set of classes to another\n";
+                std::cout << "Input Image: " << this->inputImage << std::endl;
+                std::cout << "Input Field: " << this->classInField << std::endl;
+                std::cout << "Output Field: " << this->classOutField << std::endl;
+                std::cout << "Class Pairs:\n";
+                for(std::map<size_t, size_t>::iterator iterClass = classPairs.begin(); iterClass != classPairs.end(); ++iterClass)
+                {
+                    std::cout << "\tClass " << (*iterClass).first << " = " << (*iterClass).second << std::endl;
                 }
             }
             else

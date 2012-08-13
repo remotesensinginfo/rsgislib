@@ -484,6 +484,108 @@ namespace rsgis{namespace rastergis{
         }
     }
     
+    
+    void RSGISRasterAttUtils::translateClasses(GDALDataset *inImage, std::string classInField, std::string classOutField, std::map<size_t, size_t> classPairs) throw(RSGISAttributeTableException)
+    {
+        try
+        {
+            std::cout << "Import attribute table to memory.\n";
+            const GDALRasterAttributeTable *gdalAttInTmp = inImage->GetRasterBand(1)->GetDefaultRAT();
+            GDALRasterAttributeTable *gdalAttIn = NULL;
+            
+            if((gdalAttInTmp == NULL) || (gdalAttInTmp->GetRowCount() == 0))
+            {
+                throw rsgis::RSGISAttributeTableException("The clumps image does not have an attribute table.");
+            }
+            else
+            {
+                gdalAttIn = new GDALRasterAttributeTable(*gdalAttInTmp);
+            }
+            
+            
+            
+            std::cout << "Find field column indexes in RAT.\n";
+            bool foundInClassIdx = false;
+            int colInClassIdx = 0;
+            bool foundOutClassIdx = false;
+            int colOutClassIdx = 0;
+            
+            if(gdalAttIn->GetRowCount() == 0)
+            {
+                rsgis::RSGISAttributeTableException("There are no columns in the input attribute table.");
+            }
+            else
+            {
+                for(int i = 0; i < gdalAttIn->GetColumnCount(); ++i)
+                {
+                    if(!foundInClassIdx && (std::string(gdalAttIn->GetNameOfCol(i)) == classInField))
+                    {
+                        colInClassIdx = i;
+                        foundInClassIdx = true;
+                    }
+                    else if(!foundOutClassIdx && (std::string(gdalAttIn->GetNameOfCol(i)) == classOutField))
+                    {
+                        colOutClassIdx = i;
+                        foundOutClassIdx = true;
+                    }
+                }
+                
+                if(!foundInClassIdx)
+                {
+                    std::string message = std::string("Column ") + classInField + std::string(" is not within the input attribute table.");
+                    throw rsgis::RSGISAttributeTableException(message);
+                }
+                
+                if(!foundOutClassIdx)
+                {
+                    gdalAttIn->CreateColumn(classOutField.c_str(), GFT_Integer, GFU_Generic);
+                    foundOutClassIdx = true;
+                    colOutClassIdx = gdalAttIn->GetColumnCount()-1;
+                }
+            }
+            
+            std::cout << "Translating class IDs.\n";
+            size_t numRows = gdalAttIn->GetRowCount();
+            size_t inClassID = 0;
+            int outClassID = 0;
+            unsigned int feedbackStep = numRows/10;
+            unsigned int feedback = 0;
+            std::cout << "Started." << std::flush;
+            for(int i = 0; i < numRows; ++i)
+            {
+                if((numRows > 20) && (i % feedbackStep == 0))
+                {
+                    std::cout << "." << feedback << "." << std::flush;
+                    feedback += 10;
+                }
+                
+                inClassID = gdalAttIn->GetValueAsInt(i, colInClassIdx);
+                
+                std::map<size_t, size_t>::iterator iterClass = classPairs.find(inClassID);
+                if(iterClass == classPairs.end())
+                {
+                    outClassID = -1;
+                }
+                else
+                {
+                    outClassID = (int)(*iterClass).second;
+                }
+                
+                gdalAttIn->SetValue(i, colOutClassIdx, outClassID);
+                
+            }
+            std::cout << ".Completed\n";
+            
+            std::cout << "Adding RAT to output file.\n";
+            inImage->GetRasterBand(1)->SetDefaultRAT(gdalAttIn);
+            
+        }
+        catch (rsgis::RSGISAttributeTableException &e)
+        {
+            throw e;
+        }
+    }
+    
     RSGISRasterAttUtils::~RSGISRasterAttUtils()
     {
         
