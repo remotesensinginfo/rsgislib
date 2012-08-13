@@ -25,10 +25,12 @@
 
 namespace rsgis { namespace img {
 
-	RSGISStretchImage::RSGISStretchImage(GDALDataset *inputImage, std::string outputImage, bool ignoreZeros, std::string imageFormat, GDALDataType outDataType): inputImage(NULL), outputImage(""), ignoreZeros(true)
+	RSGISStretchImage::RSGISStretchImage(GDALDataset *inputImage, std::string outputImage,  bool outStats, std::string outStatsFile, bool ignoreZeros, std::string imageFormat, GDALDataType outDataType): inputImage(NULL), outputImage(""), ignoreZeros(true)
 	{
 		this->inputImage = inputImage;
 		this->outputImage = outputImage;
+        this->outStats = outStats;
+        this->outStatsFile = outStatsFile;
         this->ignoreZeros = ignoreZeros;
         this->imageFormat = imageFormat;
         this->outDataType = outDataType;
@@ -64,13 +66,36 @@ namespace rsgis { namespace img {
 			calcImageStats = new RSGISImageStatistics();
 			calcImageStats->calcImageStatistics(datasets, 1, stats, numBands, false, ignoreZeros);
 			
+            std::ofstream outTxtFile;
+            if(this->outStats)
+            {
+                outTxtFile.open(this->outStatsFile.c_str());
+                if(!outTxtFile.is_open())
+                {
+                    throw RSGISImageCalcException("Output file for the statistics could not be opened.");
+                }
+                outTxtFile << "#linear\n";
+                outTxtFile << "#band,img_min,img_max,out_min,out_max\n";
+            }
+            
 			for(int i = 0; i < numBands; i++)
 			{
 				imageMin[i] = stats[i]->min;
 				imageMax[i] = stats[i]->max;
 				outMax[i] = 255;
 				outMin[i] = 0;
+                
+                if(this->outStats)
+                {
+                    outTxtFile << i+1 << "," << imageMin[i] << "," << imageMax[i] << "," << outMin[i] << "," << outMax[i] << std::endl;
+                }
 			}
+            
+            if(this->outStats)
+            {
+                outTxtFile.flush();
+                outTxtFile.close();
+            }
 			
 			for(int i = 0; i < numBands; i++)
 			{
@@ -149,6 +174,18 @@ namespace rsgis { namespace img {
 			double onePercentUpper = 0;
 			double onePercentLower = 0;
 			
+            std::ofstream outTxtFile;
+            if(this->outStats)
+            {
+                outTxtFile.open(this->outStatsFile.c_str());
+                if(!outTxtFile.is_open())
+                {
+                    throw RSGISImageCalcException("Output file for the statistics could not be opened.");
+                }
+                outTxtFile << "#percent\n";
+                outTxtFile << "#band,img_min,img_max,out_min,out_max\n";
+            }
+            
 			for(int i = 0; i < numBands; i++)
 			{				
 				onePercent = (stats[i]->max - stats[i]->min)/100;
@@ -164,7 +201,18 @@ namespace rsgis { namespace img {
 				imageMax[i] = stats[i]->max - (onePercentUpper * percent);
 				outMax[i] = 255;
 				outMin[i] = 0;
+                
+                if(this->outStats)
+                {
+                    outTxtFile << i+1 << "," << imageMin[i] << "," << imageMax[i] << "," << outMin[i] << "," << outMax[i] << std::endl;
+                }
 			}
+            
+            if(this->outStats)
+            {
+                outTxtFile.flush();
+                outTxtFile.close();
+            }
 			
 			for(int i = 0; i < numBands; i++)
 			{
@@ -240,6 +288,18 @@ namespace rsgis { namespace img {
 			calcImageStats = new RSGISImageStatistics();
 			calcImageStats->calcImageStatistics(datasets, 1, stats, numBands, true, ignoreZeros);
 			
+            std::ofstream outTxtFile;
+            if(this->outStats)
+            {
+                outTxtFile.open(this->outStatsFile.c_str());
+                if(!outTxtFile.is_open())
+                {
+                    throw RSGISImageCalcException("Output file for the statistics could not be opened.");
+                }
+                outTxtFile << "#stddev\n";
+                outTxtFile << "#band,img_min,img_max,out_min,out_max\n";
+            }
+            
 			for(int i = 0; i < numBands; i++)
 			{				
 				imageMin[i] = stats[i]->mean - (stats[i]->stddev * stddev);
@@ -258,7 +318,18 @@ namespace rsgis { namespace img {
                 
 				outMax[i] = 255;
 				outMin[i] = 0;
+                
+                if(this->outStats)
+                {
+                    outTxtFile << i+1 << "," << imageMin[i] << "," << imageMax[i] << "," << outMin[i] << "," << outMax[i] << std::endl;
+                }
 			}
+            
+            if(this->outStats)
+            {
+                outTxtFile.flush();
+                outTxtFile.close();
+            }
 			
 			for(int i = 0; i < numBands; i++)
 			{
@@ -341,6 +412,18 @@ namespace rsgis { namespace img {
 			calcImageStats = new RSGISImageStatistics();
 			calcImageStats->calcImageStatistics(datasets, 1, stats, numBands, true, function, ignoreZeros);
 			
+            std::ofstream outTxtFile;
+            if(this->outStats)
+            {
+                outTxtFile.open(this->outStatsFile.c_str());
+                if(!outTxtFile.is_open())
+                {
+                    throw RSGISImageCalcException("Output file for the statistics could not be opened.");
+                }
+                outTxtFile << "#exp\n";
+                outTxtFile << "#band,img_min,img_max,out_min,out_max\n";
+            }
+            
 			for(int i = 0; i < numBands; i++)
 			{				
 				imageMin[i] = stats[i]->mean - (stats[i]->stddev * 2);
@@ -355,7 +438,18 @@ namespace rsgis { namespace img {
                 }
 				outMax[i] = 255;
 				outMin[i] = 0;
+                
+                if(this->outStats)
+                {
+                    outTxtFile << i+1 << "," << imageMin[i] << "," << imageMax[i] << "," << outMin[i] << "," << outMax[i] << std::endl;
+                }
 			}
+            
+            if(this->outStats)
+            {
+                outTxtFile.flush();
+                outTxtFile.close();
+            }
 			
 			for(int i = 0; i < numBands; i++)
 			{
@@ -434,6 +528,18 @@ namespace rsgis { namespace img {
 			calcImageStats = new RSGISImageStatistics();
 			calcImageStats->calcImageStatistics(datasets, 1, stats, numBands, true, function, ignoreZeros);
 			
+            std::ofstream outTxtFile;
+            if(this->outStats)
+            {
+                outTxtFile.open(this->outStatsFile.c_str());
+                if(!outTxtFile.is_open())
+                {
+                    throw RSGISImageCalcException("Output file for the statistics could not be opened.");
+                }
+                outTxtFile << "#log\n";
+                outTxtFile << "#band,img_min,img_max,out_min,out_max\n";
+            }
+            
 			for(int i = 0; i < numBands; i++)
 			{				
 				imageMin[i] = stats[i]->mean - (stats[i]->stddev * 2);
@@ -448,7 +554,18 @@ namespace rsgis { namespace img {
                 }
 				outMax[i] = 255;
 				outMin[i] = 0;
+                
+                if(this->outStats)
+                {
+                    outTxtFile << i+1 << "," << imageMin[i] << "," << imageMax[i] << "," << outMin[i] << "," << outMax[i] << std::endl;
+                }
 			}
+            
+            if(this->outStats)
+            {
+                outTxtFile.flush();
+                outTxtFile.close();
+            }
 			
 			for(int i = 0; i < numBands; i++)
 			{
@@ -527,6 +644,18 @@ namespace rsgis { namespace img {
 			calcImageStats = new RSGISImageStatistics();
 			calcImageStats->calcImageStatistics(datasets, 1, stats, numBands, true, function, ignoreZeros);
 			
+            std::ofstream outTxtFile;
+            if(this->outStats)
+            {
+                outTxtFile.open(this->outStatsFile.c_str());
+                if(!outTxtFile.is_open())
+                {
+                    throw RSGISImageCalcException("Output file for the statistics could not be opened.");
+                }
+                outTxtFile << "#powerlaw\n";
+                outTxtFile << "#band,img_min,img_max,out_min,out_max\n";
+            }
+            
 			for(int i = 0; i < numBands; i++)
 			{				
 				imageMin[i] = stats[i]->mean - (stats[i]->stddev * 2);
@@ -542,6 +671,12 @@ namespace rsgis { namespace img {
 				outMax[i] = 255;
 				outMin[i] = 0;
 			}
+            
+            if(this->outStats)
+            {
+                outTxtFile.flush();
+                outTxtFile.close();
+            }
 			
 			for(int i = 0; i < numBands; i++)
 			{

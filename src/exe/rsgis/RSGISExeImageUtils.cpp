@@ -1495,6 +1495,21 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
 		}
 		XMLString::release(&outputXMLStr);
+        
+        this->outStatsFile = false;
+        XMLCh *outputStatsXMLStr = XMLString::transcode("stats");
+		if(argElement->hasAttribute(outputStatsXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(outputStatsXMLStr));
+			this->outputFile = string(charValue);
+            this->outStatsFile = true;
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			this->outStatsFile = false;
+		}
+		XMLString::release(&outputStatsXMLStr);
 
 
 		XMLCh *stretchLinearMinMax = XMLString::transcode("LinearMinMax");
@@ -3459,6 +3474,10 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
 			cout << "Apply an enhancement stretch to the an input image - usually for visualisation\n";
 			cout << "Input Image: " << this->inputImage << endl;
 			cout << "Output Image: " << this->outputImage << endl;
+            if(this->outStatsFile)
+            {
+                cout << "Output Stats File: " << this->outputFile << endl;
+            }
 			if(stretchType == linearMinMax)
 			{
 				cout << "Linear Min-Max stretch\n";
@@ -3510,7 +3529,7 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
 					throw RSGISImageException(message.c_str());
 				}
 
-				stretchImg = new RSGISStretchImage(inDataset, this->outputImage, this->ignoreZeros, this->imageFormat, this->outDataType);
+				stretchImg = new RSGISStretchImage(inDataset, this->outputImage, this->outStatsFile, this->outputFile, this->ignoreZeros, this->imageFormat, this->outDataType);
 				if(stretchType == linearMinMax)
 				{
 					stretchImg->executeLinearMinMaxStretch();
