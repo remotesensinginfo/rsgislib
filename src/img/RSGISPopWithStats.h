@@ -31,6 +31,7 @@
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
+#include <ctime>
 
 #include "gdal.h"
 #include "cpl_string.h"
