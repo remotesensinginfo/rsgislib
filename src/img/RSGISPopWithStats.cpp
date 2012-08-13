@@ -538,7 +538,7 @@ namespace rsgis { namespace img {
                     clrTab = new GDALColorTable();
                     GDALColorEntry *clr = NULL;
                     srand(time(NULL));
-                    for(size_t i = 0; i < histmax; ++i)
+                    for(size_t i = 0; i < nHistBuckets; ++i)
                     {
                         clr = new GDALColorEntry();
                         clr->c1 = rand() % 255 + 1;

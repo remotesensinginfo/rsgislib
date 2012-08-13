@@ -61,7 +61,6 @@ namespace rsgis { namespace img {
         void calcPopStats( GDALDataset *hHandle, bool bIgnore, float fIgnoreVal, bool bPyramid );
     private:
         static const int HISTO_NBINS = 256;
-        //static const int CONTIN_STATS_MIN_LIMIT = 1000000;
         static const int MINOVERVIEWDIM = 33;
     };
 }}
