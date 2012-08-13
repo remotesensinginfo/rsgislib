@@ -228,6 +228,7 @@ class RSGISExeImageUtils : public RSGISAlgorithmParameters
         bool bandsDefined;
         vector<int> bands;
         string outKMLFile;
+        bool outStatsFile;
 	};
 }
 #endif
