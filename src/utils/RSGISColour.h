@@ -45,6 +45,23 @@ namespace rsgis{namespace utils{
 			double blue;
 			double alpha;
 		};
+    
+    class RSGISColourInt
+    {
+    public:
+        RSGISColourInt();
+        RSGISColourInt(int r, int g, int b, int a);
+        int getRed();
+        int getGreen();
+        int getBlue();
+        int getAlpha();
+        ~RSGISColourInt();
+    protected:
+        int red;
+        int green;
+        int blue;
+        int alpha;
+    };
 }}
 
 #endif

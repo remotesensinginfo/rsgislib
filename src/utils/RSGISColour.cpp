@@ -65,5 +65,48 @@ namespace rsgis{namespace utils{
 	{
 		
 	}
+    
+    
+    RSGISColourInt::RSGISColourInt()
+	{
+		this->red = 0;
+		this->green = 0;
+		this->blue = 0;
+		this->alpha = 0;
+	}
+	
+	RSGISColourInt::RSGISColourInt(int r, int g, int b, int a)
+	{
+		this->red = r;
+		this->green = g;
+		this->blue = b;
+		this->alpha = a;
+	}
+	
+	int RSGISColourInt::getRed()
+	{
+		return red;
+	}
+	
+	int RSGISColourInt::getGreen()
+	{
+		return green;
+	}
+	
+	int RSGISColourInt::getBlue()
+	{
+		return blue;
+	}
+	
+	int RSGISColourInt::getAlpha()
+	{
+		return alpha;
+	}
+	
+	RSGISColourInt::~RSGISColourInt()
+	{
+		
+	}
+    
 }}
 

@@ -56,6 +56,7 @@ namespace rsgisexe{
         XMLCh *optionPopAttributePercentile = xercesc::XMLString::transcode("popattributepercentile");
         XMLCh *optionExport2ASCII = xercesc::XMLString::transcode("export2ascii");
         XMLCh *optionClassTranslate = xercesc::XMLString::transcode("classtranslate");
+        XMLCh *optionColourClasses = xercesc::XMLString::transcode("colourclasses");
         
         const XMLCh *algorNameEle = argElement->getAttribute(algorXMLStr);
         if(!xercesc::XMLString::equals(algorName, algorNameEle))
@@ -1069,6 +1070,126 @@ namespace rsgisexe{
                 classPairs.insert(std::pair<size_t, size_t>(inClassId, outClassId));
             }
         }
+        else if(xercesc::XMLString::equals(optionColourClasses, optionXML))
+        {
+            this->option = RSGISExeRasterGIS::colourclasses;
+            
+            XMLCh *tableXMLStr = xercesc::XMLString::transcode("table");
+            if(argElement->hasAttribute(tableXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(tableXMLStr));
+                this->inputImage = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'table\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&tableXMLStr);
+            
+            XMLCh *classFieldXMLStr = xercesc::XMLString::transcode("classfield");
+            if(argElement->hasAttribute(classFieldXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(classFieldXMLStr));
+                this->classInField = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'classfield\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&classFieldXMLStr);
+            
+            
+            XMLCh *rsgisClassXMLStr = xercesc::XMLString::transcode("rsgis:class");
+            xercesc::DOMNodeList *classNodesList = argElement->getElementsByTagName(rsgisClassXMLStr);
+            unsigned int numClassTags = classNodesList->getLength();
+            
+            std::cout << "Found " << numClassTags << " class tags" << std::endl;
+            
+            if(numClassTags == 0)
+            {
+                throw rsgis::RSGISXMLArgumentsException("No class tags have been provided, at least 1 is required.");
+            }
+            
+            xercesc::DOMElement *attElement = NULL;
+            size_t classId = 0;
+            int red = 0;
+            int green = 0;
+            int blue = 0;
+            int alpha = 0;
+            for(int i = 0; i < numClassTags; i++)
+            {
+                attElement = static_cast<xercesc::DOMElement*>(classNodesList->item(i));
+                
+                XMLCh *idXMLStr = xercesc::XMLString::transcode("id");
+                if(attElement->hasAttribute(idXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(attElement->getAttribute(idXMLStr));
+                    classId = textUtils.strtosizet(std::string(charValue));
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'id\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&idXMLStr);
+                
+                XMLCh *redXMLStr = xercesc::XMLString::transcode("r");
+                if(attElement->hasAttribute(redXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(attElement->getAttribute(redXMLStr));
+                    red = textUtils.strto32bitInt(std::string(charValue));
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'r\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&redXMLStr);
+                
+                XMLCh *greenXMLStr = xercesc::XMLString::transcode("g");
+                if(attElement->hasAttribute(greenXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(attElement->getAttribute(greenXMLStr));
+                    green = textUtils.strto32bitInt(std::string(charValue));
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'g\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&greenXMLStr);
+                
+                XMLCh *blueXMLStr = xercesc::XMLString::transcode("b");
+                if(attElement->hasAttribute(blueXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(attElement->getAttribute(blueXMLStr));
+                    blue = textUtils.strto32bitInt(std::string(charValue));
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'b\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&blueXMLStr);
+                
+                XMLCh *alphaXMLStr = xercesc::XMLString::transcode("a");
+                if(attElement->hasAttribute(alphaXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(attElement->getAttribute(alphaXMLStr));
+                    alpha = textUtils.strto32bitInt(std::string(charValue));
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'a\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&alphaXMLStr);
+                
+                classColourPairs.insert(std::pair<size_t, rsgis::utils::RSGISColourInt>(classId, rsgis::utils::RSGISColourInt(red, green, blue, alpha)));
+            }
+        }
         else
         {
             std::string message = std::string("The option (") + std::string(xercesc::XMLString::transcode(optionXML)) + std::string(") is not known: RSGISExeRasterGIS.");
@@ -1091,6 +1212,7 @@ namespace rsgisexe{
         xercesc::XMLString::release(&optionPopAttributePercentile);
         xercesc::XMLString::release(&optionExport2ASCII);
         xercesc::XMLString::release(&optionClassTranslate);
+        xercesc::XMLString::release(&optionColourClasses);
     }
     
     void RSGISExeRasterGIS::runAlgorithm() throw(rsgis::RSGISException)
@@ -1590,6 +1712,38 @@ namespace rsgisexe{
                     
                     rsgis::rastergis::RSGISRasterAttUtils attUtils;
                     attUtils.translateClasses(inputDataset, this->classInField, this->classOutField, this->classPairs);
+                    
+                    GDALClose(inputDataset);
+                }
+                catch(rsgis::RSGISException &e)
+                {
+                    throw e;
+                }
+            }
+            else if(this->option == RSGISExeRasterGIS::colourclasses)
+            {
+                std::cout << "A command to set a colour table for a set of classes within the attribute table.\n";
+                std::cout << "Input Image: " << this->inputImage << std::endl;
+                std::cout << "Input Class Field: " << this->classInField << std::endl;
+                std::cout << "Class Colour Pairs:\n";
+                for(std::map<size_t, rsgis::utils::RSGISColourInt>::iterator iterClass = classColourPairs.begin(); iterClass != classColourPairs.end(); ++iterClass)
+                {
+                    std::cout << "\tClass " << (*iterClass).first << " = [" << (*iterClass).second.getRed() << "," << (*iterClass).second.getGreen() << "," << (*iterClass).second.getBlue() << "," << (*iterClass).second.getAlpha() << "]" << std::endl;
+                }
+                
+                try
+                {
+                    GDALAllRegister();
+                    
+                    GDALDataset *inputDataset = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_Update);
+                    if(inputDataset == NULL)
+                    {
+                        std::string message = std::string("Could not open image ") + this->inputImage;
+                        throw rsgis::RSGISImageException(message.c_str());
+                    }
+                    
+                    rsgis::rastergis::RSGISRasterAttUtils attUtils;
+                    attUtils.applyClassColours(inputDataset, this->classInField, this->classColourPairs);
                     
                     GDALClose(inputDataset);
                 }

@@ -37,6 +37,7 @@
 
 #include "utils/RSGISTextUtils.h"
 #include "utils/RSGISFileUtils.h"
+#include "utils/RSGISColour.h"
 
 #include "rastergis/RSGISCalcClusterLocation.h"
 #include "rastergis/RSGISCalcEucDistanceInAttTable.h"
@@ -73,7 +74,8 @@ namespace rsgisexe{
             knnmajorityclassifier,
             popattributepercentile,
             export2ascii,
-            classtranslate
+            classtranslate,
+            colourclasses
         };
         
         RSGISExeRasterGIS();
@@ -117,6 +119,7 @@ namespace rsgisexe{
         rsgis::rastergis::ClassMajorityMethod majMethod;
         float weightA;
         std::map<size_t, size_t> classPairs;
+        std::map<size_t, rsgis::utils::RSGISColourInt> classColourPairs;
     };
     
 }
