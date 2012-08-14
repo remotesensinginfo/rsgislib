@@ -34,6 +34,7 @@
 #include "img/RSGISCalcImage.h"
 #include "img/RSGISProjectionStrings.h"
 #include "img/RSGISImageUtils.h"
+#include "img/RSGISStretchImage.h"
 
 #include "segmentation/RSGISSpecGroupSegmentation.h"
 #include "segmentation/RSGISGenMeanSegImage.h"
@@ -120,6 +121,8 @@ class RSGISExeSegment : public RSGISAlgorithmParameters
         string tempTable;
         string tempImage;
         string proj;
+        string stretchStatsFile;
+        bool stretchStatsAvail;
         unsigned int minClumpSize;
         float specThreshold;
         float initRegionGrowthreshold;

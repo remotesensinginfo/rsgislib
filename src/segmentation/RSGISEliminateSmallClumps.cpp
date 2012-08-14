@@ -293,7 +293,7 @@ namespace rsgis{namespace segment{
         delete[] spectralVals;
     }
     
-    void RSGISEliminateSmallClumps::stepwiseEliminateSmallClumps(GDALDataset *spectral, GDALDataset *clumps, unsigned int minClumpSize, float specThreshold) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISEliminateSmallClumps::stepwiseEliminateSmallClumps(GDALDataset *spectral, GDALDataset *clumps, unsigned int minClumpSize, float specThreshold, std::vector<rsgis::img::BandSpecThresholdStats> *bandStretchStats, bool bandStatsAvail) throw(rsgis::img::RSGISImageCalcException)
     {
         if(spectral->GetRasterXSize() != clumps->GetRasterXSize())
         {
@@ -307,6 +307,23 @@ namespace rsgis{namespace segment{
         unsigned int width = spectral->GetRasterXSize();
         unsigned int height = spectral->GetRasterYSize();
         unsigned int numSpecBands = spectral->GetRasterCount();
+        
+        double *stretch2reflOffs = NULL;
+        double *stretch2reflGains = NULL;
+        if(bandStatsAvail && (numSpecBands != bandStretchStats->size()))
+        {
+            throw rsgis::img::RSGISImageCalcException("The number of image bands and the number band statistics are not the same.");
+        }
+        else if(bandStatsAvail)
+        {
+            stretch2reflOffs = new double[numSpecBands];
+            stretch2reflGains = new double[numSpecBands];
+            for(unsigned int i = 0; i < numSpecBands; ++i)
+            {
+                stretch2reflOffs[i] = bandStretchStats->at(i).origMin;
+                stretch2reflGains[i] = (bandStretchStats->at(i).origMax - bandStretchStats->at(i).origMin) / (bandStretchStats->at(i).imgMax - bandStretchStats->at(i).imgMin);
+            }
+        }
         
         unsigned int *clumpIdxs = new unsigned int[width];
         float **spectralVals = new float*[numSpecBands];
@@ -501,23 +518,37 @@ namespace rsgis{namespace segment{
                         }
                     }
                     
-                    //std::cout << "For " << cClump->clumpID << "(size = " << cClump->pxls->size() << ") the closest neighbour is " << closestNeighbour << " with distance " << closestNeighbourDist << std::endl;
-                    
                     // Perform Merge
                     if(!firstNeighbourTested)
                     {
+                        if(bandStatsAvail)
+                        {
+                            for(unsigned int b = 0; b < numSpecBands; ++b)
+                            {
+                                if(b == 0)
+                                {
+                                    distance = ((stretch2reflOffs[b]+(cClump->meanVals[b]*stretch2reflGains[b])) - (stretch2reflOffs[b]+(clumpTable->at(closestNeighbour-1)->meanVals[b]*stretch2reflGains[b])))*((stretch2reflOffs[b]+(cClump->meanVals[b]*stretch2reflGains[b])) - (stretch2reflOffs[b]+(clumpTable->at(closestNeighbour-1)->meanVals[b]*stretch2reflGains[b])));
+                                }
+                                else
+                                {
+                                    distance += ((stretch2reflOffs[b]+(cClump->meanVals[b]*stretch2reflGains[b])) - (stretch2reflOffs[b]+(clumpTable->at(closestNeighbour-1)->meanVals[b]*stretch2reflGains[b])))*((stretch2reflOffs[b]+(cClump->meanVals[b]*stretch2reflGains[b])) - (stretch2reflOffs[b]+(clumpTable->at(closestNeighbour-1)->meanVals[b]*stretch2reflGains[b])));
+                                }
+                            }
+                            closestNeighbourDist = sqrt(distance);
+                        }
+                        
+                        //std::cout << "For " << cClump->clumpID << "(size = " << cClump->pxls->size() << ") the closest neighbour is " << closestNeighbour << " with distance " << closestNeighbourDist << std::endl;
+                        
                         if(closestNeighbourDist < specThreshold)
                         {
                             // PUT INTO LOOK UP TABLE TO BE APPLIED AFTERWARDS.
                             tClump = clumpTable->at(closestNeighbour-1);
                             std::pair<rsgis::img::ImgClump*, rsgis::img::ImgClump*> pair2Merge = std::pair<rsgis::img::ImgClump*, rsgis::img::ImgClump*>(cClump, tClump);
                             mergeLookupTab.push_back(pair2Merge);
+                            ++smallClumpsCounter;
                         }
                     }
-                        
                 }
-                
-                ++smallClumpsCounter;
             }
             
             // Update Clump Table
@@ -547,9 +578,9 @@ namespace rsgis{namespace segment{
                 pair2Merge.first->active = false;
             }
             std::cout << "Eliminated " << smallClumpsCounter << " small clumps\n";
-        }
-        std::cout << "Finshed Elimination. " << smallClumpsCounter << " small clumps eliminated\n";
-        
+            smallClumps.clear();
+            smallClumpsCounter = 0;
+        }        
         
         
         for(std::vector<rsgis::img::ImgClump*>::iterator iterClumps = clumpTable->begin(); iterClumps != clumpTable->end(); ++iterClumps)
@@ -567,6 +598,12 @@ namespace rsgis{namespace segment{
         }
         delete clumpTable;
         
+        if(bandStatsAvail)
+        {
+            delete[] stretch2reflOffs;
+            delete[] stretch2reflGains;
+        }
+        
         delete[] spectralBands;
         
         delete[] clumpIdxs;
@@ -577,7 +614,7 @@ namespace rsgis{namespace segment{
         delete[] spectralVals;
     }
     
-    void RSGISEliminateSmallClumps::stepwiseEliminateSmallClumpsNoMean(GDALDataset *spectral, GDALDataset *clumps, unsigned int minClumpSize, float specThreshold) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISEliminateSmallClumps::stepwiseEliminateSmallClumpsNoMean(GDALDataset *spectral, GDALDataset *clumps, unsigned int minClumpSize, float specThreshold, std::vector<rsgis::img::BandSpecThresholdStats> *bandStretchStats, bool bandStatsAvail) throw(rsgis::img::RSGISImageCalcException)
     {
         if(spectral->GetRasterXSize() != clumps->GetRasterXSize())
         {
