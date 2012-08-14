@@ -577,7 +577,7 @@ namespace rsgis{namespace segment{
                 delete pair2Merge.first->pxls;
                 pair2Merge.first->active = false;
             }
-            std::cout << "Eliminated " << smallClumpsCounter << " small clumps\n";
+            std::cout << "Eliminated " << smallClumpsCounter << " small clumps\n\n";
             smallClumps.clear();
             smallClumpsCounter = 0;
         }        
@@ -892,7 +892,7 @@ namespace rsgis{namespace segment{
         delete[] spectralVals;
     }
     
-    void RSGISEliminateSmallClumps::stepwiseEliminateSmallClumpsWithAtt(GDALDataset *spectral, GDALDataset *clumps, std::string outputImageFile, std::string imageFormat, bool useImageProj, std::string proj, rsgis::rastergis::RSGISAttributeTable *attTable, unsigned int minClumpSize, float specThreshold, bool outputWithConsecutiveFIDs) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISEliminateSmallClumps::stepwiseEliminateSmallClumpsWithAtt(GDALDataset *spectral, GDALDataset *clumps, std::string outputImageFile, std::string imageFormat, bool useImageProj, std::string proj, rsgis::rastergis::RSGISAttributeTable *attTable, unsigned int minClumpSize, float specThreshold, bool outputWithConsecutiveFIDs, std::vector<rsgis::img::BandSpecThresholdStats> *bandStretchStats, bool bandStatsAvail) throw(rsgis::img::RSGISImageCalcException)
     {
         try
         {
@@ -902,6 +902,24 @@ namespace rsgis{namespace segment{
             datasets[1] = spectral;
             
             unsigned int numBands = spectral->GetRasterCount();
+            double *stretch2reflOffs = NULL;
+            double *stretch2reflGains = NULL;
+            if(bandStatsAvail && (numBands != bandStretchStats->size()))
+            {
+                throw rsgis::img::RSGISImageCalcException("The number of image bands and the number band statistics are not the same.");
+            }
+            else if(bandStatsAvail)
+            {
+                stretch2reflOffs = new double[numBands];
+                stretch2reflGains = new double[numBands];
+                for(unsigned int i = 0; i < numBands; ++i)
+                {
+                    stretch2reflOffs[i] = bandStretchStats->at(i).origMin;
+                    stretch2reflGains[i] = (bandStretchStats->at(i).origMax - bandStretchStats->at(i).origMin) / (bandStretchStats->at(i).imgMax - bandStretchStats->at(i).imgMin);
+                }
+            }
+            
+            
             std::vector<rsgis::rastergis::RSGISBandAttStats*> *bandStats = new std::vector<rsgis::rastergis::RSGISBandAttStats*>();
             bandStats->reserve(numBands);
             rsgis::rastergis::RSGISBandAttStats *tmpBand = NULL;
@@ -1006,7 +1024,7 @@ namespace rsgis{namespace segment{
             
             std::vector<std::pair<size_t, size_t> > *eliminationPairs = new std::vector<std::pair<size_t, size_t> >();
             
-            rsgis::rastergis::RSGISProcessFeature *processFeature = new RSGISEliminateFeature(eliminatedFieldIdx, mergedToFIDIdx, specThreshold, pxlCountIdx, bandStats, eliminationPairs);
+            rsgis::rastergis::RSGISProcessFeature *processFeature = new RSGISEliminateFeature(eliminatedFieldIdx, mergedToFIDIdx, specThreshold, pxlCountIdx, bandStats, eliminationPairs, bandStatsAvail, stretch2reflOffs, stretch2reflGains);
             
             if(attTable->attInMemory())
             {
@@ -1073,6 +1091,12 @@ namespace rsgis{namespace segment{
             calcImage.calcImage(datasets, 1, outputImageFile, false, NULL, imageFormat, GDT_Float32);
             delete applyOutFIDs;
             delete[] datasets;
+            
+            if(bandStatsAvail)
+            {
+                delete[] stretch2reflOffs;
+                delete[] stretch2reflGains;
+            }
         }
         catch(RSGISAttributeTableException &e)
         {
@@ -1224,7 +1248,7 @@ namespace rsgis{namespace segment{
     
     
     
-    RSGISEliminateFeature::RSGISEliminateFeature(unsigned int eliminatedFieldIdx, unsigned int mergedToFIDIdx, float specThreshold, unsigned int pxlCountIdx, std::vector<rsgis::rastergis::RSGISBandAttStats*> *bandStats, std::vector<std::pair<unsigned long, unsigned long> > *eliminationPairs):RSGISProcessFeature()
+    RSGISEliminateFeature::RSGISEliminateFeature(unsigned int eliminatedFieldIdx, unsigned int mergedToFIDIdx, float specThreshold, unsigned int pxlCountIdx, std::vector<rsgis::rastergis::RSGISBandAttStats*> *bandStats, std::vector<std::pair<unsigned long, unsigned long> > *eliminationPairs, bool bandStatsAvail, double *stretch2reflOffs, double *stretch2reflGains):RSGISProcessFeature()
     {
         this->eliminatedFieldIdx = eliminatedFieldIdx;
         this->mergedToFIDIdx = mergedToFIDIdx;
@@ -1232,6 +1256,9 @@ namespace rsgis{namespace segment{
         this->pxlCountIdx = pxlCountIdx;
         this->bandStats = bandStats;
         this->eliminationPairs = eliminationPairs;
+        this->bandStatsAvail = bandStatsAvail;
+        this->stretch2reflOffs = stretch2reflOffs;
+        this->stretch2reflGains = stretch2reflGains;
     }
     
     void RSGISEliminateFeature::processFeature(rsgis::rastergis::RSGISFeature *feat, rsgis::rastergis::RSGISAttributeTable *attTable)throw(RSGISAttributeTableException)
@@ -1255,6 +1282,7 @@ namespace rsgis{namespace segment{
                 if(nFeat->intFields->at(pxlCountIdx) > feat->intFields->at(pxlCountIdx))
                 {
                     distance = this->calcDistance(feat, nFeat, bandStats);
+                                        
                     if(first)
                     {
                         minDist = distance;
@@ -1270,6 +1298,13 @@ namespace rsgis{namespace segment{
             }
             if(!first)
             {
+                if(this->bandStatsAvail)
+                {
+                    //std::cout << minFID << " Min Dist (Before) = " << minDist << std::endl;
+                    minDist = this->calcDistanceGainAndOff(feat, attTable->getFeature(minFID), bandStats);
+                    //std::cout << minFID << " Min Dist (After) = " << minDist << std::endl;
+                }
+                
                 if(minDist < specThreshold)
                 {
                     eliminationPairs->push_back(std::pair<size_t, size_t>(minFID, ((unsigned long) feat->fid)));
@@ -1295,6 +1330,39 @@ namespace rsgis{namespace segment{
                 mean2 = feat2->floatFields->at((*iterBands)->sumIdx) / feat2->intFields->at(pxlCountIdx);
                 dist += pow((mean1 - mean2), 2);
                 //dist += pow(feat1->floatFields->at((*iterBands)->meanIdx) - feat2->floatFields->at((*iterBands)->meanIdx), 2);
+            }
+            
+            if(dist != 0)
+            {
+                dist = sqrt(dist);
+            }
+        }
+        catch (RSGISAttributeTableException &e) 
+        {
+            throw e;
+        }
+        return dist;
+    }
+    
+    double RSGISEliminateFeature::calcDistanceGainAndOff(rsgis::rastergis::RSGISFeature *feat1, rsgis::rastergis::RSGISFeature *feat2, std::vector<rsgis::rastergis::RSGISBandAttStats*> *bandStats)throw(rsgis::RSGISAttributeTableException)
+    {
+        double dist = 0;
+        double mean1 = 0;
+        double mean2 = 0;
+        try
+        {
+            unsigned int i = 0;
+            for(std::vector<rsgis::rastergis::RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
+            {
+                mean1 = feat1->floatFields->at((*iterBands)->sumIdx) / feat1->intFields->at(pxlCountIdx);
+                mean2 = feat2->floatFields->at((*iterBands)->sumIdx) / feat2->intFields->at(pxlCountIdx);
+                
+                mean1 = this->stretch2reflOffs[i] + (mean1 * this->stretch2reflGains[i]);
+                mean2 = this->stretch2reflOffs[i] + (mean2 * this->stretch2reflGains[i]);
+                
+                dist += pow((mean1 - mean2), 2);
+                //dist += pow(feat1->floatFields->at((*iterBands)->meanIdx) - feat2->floatFields->at((*iterBands)->meanIdx), 2);
+                ++i;
             }
             
             if(dist != 0)

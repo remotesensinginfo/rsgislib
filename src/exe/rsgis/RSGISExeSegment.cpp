@@ -2875,6 +2875,21 @@ void RSGISExeSegment::retrieveParameters(DOMElement *argElement) throw(RSGISXMLA
 		}
 		XMLString::release(&outputXMLStr);
         
+        stretchStatsAvail = false;
+        XMLCh *stretchStatsXMLStr = XMLString::transcode("stretchstats");
+		if(argElement->hasAttribute(stretchStatsXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(stretchStatsXMLStr));
+			this->stretchStatsFile = string(charValue);
+			XMLString::release(&charValue);
+            stretchStatsAvail = true;
+		}
+		else
+		{
+			stretchStatsAvail = false;
+		}
+		XMLString::release(&stretchStatsXMLStr);
+        
         XMLCh *tmpTableXMLStr = XMLString::transcode("tmptable");
 		if(argElement->hasAttribute(tmpTableXMLStr))
 		{
@@ -3497,7 +3512,6 @@ void RSGISExeSegment::runAlgorithm() throw(RSGISException)
             RSGISImageUtils imgUtils;
                         
             std::vector<BandSpecThresholdStats> *bandStretchStats = NULL;
-            
             if(this->stretchStatsAvail)
             {
                 bandStretchStats = rsgis::img::RSGISStretchImage::readBandSpecThresholds(stretchStatsFile);
@@ -3544,6 +3558,11 @@ void RSGISExeSegment::runAlgorithm() throw(RSGISException)
                 GDALClose(outDataset);
                 GDALClose(spectralDataset);
                 GDALClose(clumpsDataset);
+            }
+            
+            if(this->stretchStatsAvail)
+            {
+                delete bandStretchStats;
             }
             
             // Tidy up
@@ -4580,6 +4599,10 @@ void RSGISExeSegment::runAlgorithm() throw(RSGISException)
         cout << "Input Image: " << this->inputImage << endl;
         cout << "Clump Image: " << this->clumpsImage << endl;
         cout << "Output Image: " << this->outputImage << endl;
+        if(this->stretchStatsAvail)
+        {
+            cout << "Statistics File: " << this->stretchStatsFile << endl;
+        }
         if(!this->processInMemory)
         {
             cout << "Temp Table: " << this->tempTable << endl;
@@ -4608,6 +4631,12 @@ void RSGISExeSegment::runAlgorithm() throw(RSGISException)
                 string message = string("Could not open image ") + this->clumpsImage;
                 throw RSGISImageException(message.c_str());
             }
+            
+            std::vector<BandSpecThresholdStats> *bandStretchStats = NULL;
+            if(this->stretchStatsAvail)
+            {
+                bandStretchStats = rsgis::img::RSGISStretchImage::readBandSpecThresholds(stretchStatsFile);
+            }
                         
             cout << "Create Attribute Table\n";
             rsgis::rastergis::RSGISCreateNewAttributeTable createAtt;
@@ -4623,9 +4652,14 @@ void RSGISExeSegment::runAlgorithm() throw(RSGISException)
             
             cout << "Eliminating Clumps\n";
             RSGISEliminateSmallClumps eliminate;
-            eliminate.stepwiseEliminateSmallClumpsWithAtt(spectralDataset, clumpsDataset, this->outputImage, this->imageFormat, this->projFromImage, this->proj, attTable, minClumpSize, specThreshold, outputWithConsecutiveFIDs);
-            
+            eliminate.stepwiseEliminateSmallClumpsWithAtt(spectralDataset, clumpsDataset, this->outputImage, this->imageFormat, this->projFromImage, this->proj, attTable, minClumpSize, specThreshold, outputWithConsecutiveFIDs, bandStretchStats, this->stretchStatsAvail);
+                        
             // Tidy up
+            if(this->stretchStatsAvail)
+            {
+                delete bandStretchStats;
+            }
+            
             delete attTable;
             GDALClose(spectralDataset);
             GDALClose(clumpsDataset);
