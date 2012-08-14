@@ -511,6 +511,21 @@ void RSGISExeSegment::retrieveParameters(DOMElement *argElement) throw(RSGISXMLA
 		}
 		XMLString::release(&outputXMLStr);
         
+        stretchStatsAvail = false;
+        XMLCh *stretchStatsXMLStr = XMLString::transcode("stretchstats");
+		if(argElement->hasAttribute(stretchStatsXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(stretchStatsXMLStr));
+			this->stretchStatsFile = string(charValue);
+			XMLString::release(&charValue);
+            stretchStatsAvail = true;
+		}
+		else
+		{
+			stretchStatsAvail = false;
+		}
+		XMLString::release(&stretchStatsXMLStr);
+        
         XMLCh *specThresholdXMLStr = XMLString::transcode("maxspectraldist");
 		if(argElement->hasAttribute(specThresholdXMLStr))
 		{
@@ -3439,6 +3454,10 @@ void RSGISExeSegment::runAlgorithm() throw(RSGISException)
         cout << "Input Image: " << this->inputImage << endl;
         cout << "Clump Image: " << this->clumpsImage << endl;
         cout << "Output Image: " << this->outputImage << endl;
+        if(this->stretchStatsAvail)
+        {
+            cout << "Statistics File: " << this->stretchStatsFile << endl;
+        }
         if(processInMemory)
         {
             cout << "Processing to be undertaken in Memory\n";
@@ -3476,6 +3495,13 @@ void RSGISExeSegment::runAlgorithm() throw(RSGISException)
             }
             
             RSGISImageUtils imgUtils;
+                        
+            std::vector<BandSpecThresholdStats> *bandStretchStats = NULL;
+            
+            if(this->stretchStatsAvail)
+            {
+                bandStretchStats = rsgis::img::RSGISStretchImage::readBandSpecThresholds(stretchStatsFile);
+            }
             
             GDALDataset *spectralDataset = NULL;
             GDALDataset *clumpsDataset = NULL;
@@ -3503,11 +3529,11 @@ void RSGISExeSegment::runAlgorithm() throw(RSGISException)
             RSGISEliminateSmallClumps eliminate;
             if(this->storeMean)
             {
-                eliminate.stepwiseEliminateSmallClumps(spectralDataset, resultDataset, minClumpSize, specThreshold);
+                eliminate.stepwiseEliminateSmallClumps(spectralDataset, resultDataset, minClumpSize, specThreshold, bandStretchStats, this->stretchStatsAvail);
             }
             else
             {
-                eliminate.stepwiseEliminateSmallClumpsNoMean(spectralDataset, resultDataset, minClumpSize, specThreshold);
+                eliminate.stepwiseEliminateSmallClumpsNoMean(spectralDataset, resultDataset, minClumpSize, specThreshold, bandStretchStats, this->stretchStatsAvail);
             }
             
             if(this->processInMemory)
