@@ -57,7 +57,7 @@ namespace rsgis{namespace segment{
         void eliminateSmallClumps(GDALDataset *spectral, GDALDataset *clumps, unsigned int minClumpSize, float specThreshold) throw(rsgis::img::RSGISImageCalcException);
         void stepwiseEliminateSmallClumps(GDALDataset *spectral, GDALDataset *clumps, unsigned int minClumpSize, float specThreshold, std::vector<rsgis::img::BandSpecThresholdStats> *bandStretchStats, bool bandStatsAvail) throw(rsgis::img::RSGISImageCalcException);
         void stepwiseEliminateSmallClumpsNoMean(GDALDataset *spectral, GDALDataset *clumps, unsigned int minClumpSize, float specThreshold, std::vector<rsgis::img::BandSpecThresholdStats> *bandStretchStats, bool bandStatsAvail) throw(rsgis::img::RSGISImageCalcException);
-        void stepwiseEliminateSmallClumpsWithAtt(GDALDataset *spectral, GDALDataset *clumps, std::string outputImageFile, std::string imageFormat, bool useImageProj, std::string proj, rsgis::rastergis::RSGISAttributeTable *attTable, unsigned int minClumpSize, float specThreshold, bool outputWithConsecutiveFIDs) throw(rsgis::img::RSGISImageCalcException);
+        void stepwiseEliminateSmallClumpsWithAtt(GDALDataset *spectral, GDALDataset *clumps, std::string outputImageFile, std::string imageFormat, bool useImageProj, std::string proj, rsgis::rastergis::RSGISAttributeTable *attTable, unsigned int minClumpSize, float specThreshold, bool outputWithConsecutiveFIDs, std::vector<rsgis::img::BandSpecThresholdStats> *bandStretchStats, bool bandStatsAvail) throw(rsgis::img::RSGISImageCalcException);
         ~RSGISEliminateSmallClumps();
     protected:
         void defineOutputFID(rsgis::rastergis::RSGISAttributeTable *attTable, rsgis::rastergis::RSGISFeature *feat, unsigned int eliminatedFieldIdx, unsigned int mergedToFIDIdx, unsigned int outFIDIdx, unsigned int outFIDSetFieldIdx) throw(rsgis::RSGISAttributeTableException);
@@ -68,11 +68,12 @@ namespace rsgis{namespace segment{
     class RSGISEliminateFeature : public rsgis::rastergis::RSGISProcessFeature
     {
     public:
-        RSGISEliminateFeature(unsigned int eliminatedFieldIdx, unsigned int mergedToFIDIdx, float specThreshold, unsigned int pxlCountIdx, std::vector<rsgis::rastergis::RSGISBandAttStats*> *bandStats, std::vector<std::pair<unsigned long, unsigned long> > *eliminationPairs);
+        RSGISEliminateFeature(unsigned int eliminatedFieldIdx, unsigned int mergedToFIDIdx, float specThreshold, unsigned int pxlCountIdx, std::vector<rsgis::rastergis::RSGISBandAttStats*> *bandStats, std::vector<std::pair<unsigned long, unsigned long> > *eliminationPairs, bool bandStatsAvail, double *stretch2reflOffs, double *stretch2reflGains);
         void processFeature(rsgis::rastergis::RSGISFeature *feat, rsgis::rastergis::RSGISAttributeTable *attTable)throw(rsgis::RSGISAttributeTableException);
         ~RSGISEliminateFeature();
     protected:
         double calcDistance(rsgis::rastergis::RSGISFeature *feat1, rsgis::rastergis::RSGISFeature *feat2, std::vector<rsgis::rastergis::RSGISBandAttStats*> *bandStats)throw(rsgis::RSGISAttributeTableException);
+        double calcDistanceGainAndOff(rsgis::rastergis::RSGISFeature *feat1, rsgis::rastergis::RSGISFeature *feat2, std::vector<rsgis::rastergis::RSGISBandAttStats*> *bandStats)throw(rsgis::RSGISAttributeTableException);
         rsgis::rastergis::RSGISFeature* getEliminatedNeighbour(rsgis::rastergis::RSGISFeature *feat, rsgis::rastergis::RSGISAttributeTable *attTable)throw(rsgis::RSGISAttributeTableException); 
         unsigned int eliminatedFieldIdx;
         unsigned int mergedToFIDIdx;
@@ -80,6 +81,9 @@ namespace rsgis{namespace segment{
         unsigned int pxlCountIdx;
         std::vector<rsgis::rastergis::RSGISBandAttStats*> *bandStats;
         std::vector<std::pair<unsigned long, unsigned long> > *eliminationPairs;
+        bool bandStatsAvail;
+        double *stretch2reflOffs;
+        double *stretch2reflGains;
     };
     
     
