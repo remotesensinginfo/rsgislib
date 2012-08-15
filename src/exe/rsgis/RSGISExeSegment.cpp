@@ -3565,6 +3565,8 @@ void RSGISExeSegment::runAlgorithm() throw(RSGISException)
                 delete bandStretchStats;
             }
             
+            resultDataset->GetRasterBand(1)->SetMetadataItem("LAYER_TYPE", "thematic");
+            
             // Tidy up
             GDALClose(inDataset);
             GDALClose(inClumpDataset);
@@ -3624,6 +3626,8 @@ void RSGISExeSegment::runAlgorithm() throw(RSGISException)
                 GDALClose(outDataset);
                 GDALClose(catagoryDataset);
             }
+            
+            resultDataset->GetRasterBand(1)->SetMetadataItem("LAYER_TYPE", "thematic");
             
             // Tidy up
             GDALClose(inDataset);
@@ -4660,6 +4664,8 @@ void RSGISExeSegment::runAlgorithm() throw(RSGISException)
                 delete bandStretchStats;
             }
             
+            clumpsDataset->GetRasterBand(1)->SetMetadataItem("LAYER_TYPE", "thematic");
+            
             delete attTable;
             GDALClose(spectralDataset);
             GDALClose(clumpsDataset);
@@ -4720,6 +4726,8 @@ void RSGISExeSegment::runAlgorithm() throw(RSGISException)
             cout << "Eliminating Individual Pixels\n";
             RSGISEliminateSinglePixels eliminate;
             eliminate.eliminate(spectralDataset, clumpsDataset, pixelMaskDataset, this->outputImage, 0, this->ignoreZeros, this->projFromImage, this->proj, this->imageFormat);
+            
+            clumpsDataset->GetRasterBand(1)->SetMetadataItem("LAYER_TYPE", "thematic");
             
             // Tidy up
             GDALClose(spectralDataset);
