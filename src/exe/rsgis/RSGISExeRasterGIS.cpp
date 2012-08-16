@@ -57,6 +57,7 @@ namespace rsgisexe{
         XMLCh *optionExport2ASCII = xercesc::XMLString::transcode("export2ascii");
         XMLCh *optionClassTranslate = xercesc::XMLString::transcode("classtranslate");
         XMLCh *optionColourClasses = xercesc::XMLString::transcode("colourclasses");
+        XMLCh *optionGenColourTab = xercesc::XMLString::transcode("gencolourtab");
         
         const XMLCh *algorNameEle = argElement->getAttribute(algorXMLStr);
         if(!xercesc::XMLString::equals(algorName, algorNameEle))
@@ -1190,6 +1191,75 @@ namespace rsgisexe{
                 classColourPairs.insert(std::pair<size_t, rsgis::utils::RSGISColourInt>(classId, rsgis::utils::RSGISColourInt(red, green, blue, alpha)));
             }
         }
+        else if(xercesc::XMLString::equals(optionGenColourTab, optionXML))
+        {
+            this->option = RSGISExeRasterGIS::gencolourtab;
+            
+            XMLCh *tableXMLStr = xercesc::XMLString::transcode("table");
+            if(argElement->hasAttribute(tableXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(tableXMLStr));
+                this->clumpsImage = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'table\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&tableXMLStr);
+            
+            XMLCh *inputXMLStr = xercesc::XMLString::transcode("input");
+            if(argElement->hasAttribute(inputXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(inputXMLStr));
+                this->inputImage = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'input\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&inputXMLStr);
+                        
+            XMLCh *redXMLStr = xercesc::XMLString::transcode("red");
+            if(argElement->hasAttribute(redXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(redXMLStr));
+                this->redBand = textUtils.strto32bitInt(std::string(charValue));
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'red\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&redXMLStr);
+            
+            XMLCh *greenXMLStr = xercesc::XMLString::transcode("green");
+            if(argElement->hasAttribute(greenXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(greenXMLStr));
+                this->greenBand = textUtils.strto32bitInt(std::string(charValue));
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'green\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&greenXMLStr);
+            
+            XMLCh *blueXMLStr = xercesc::XMLString::transcode("blue");
+            if(argElement->hasAttribute(blueXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(blueXMLStr));
+                this->blueBand = textUtils.strto32bitInt(std::string(charValue));
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'blue\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&blueXMLStr);
+        }
         else
         {
             std::string message = std::string("The option (") + std::string(xercesc::XMLString::transcode(optionXML)) + std::string(") is not known: RSGISExeRasterGIS.");
@@ -1213,6 +1283,7 @@ namespace rsgisexe{
         xercesc::XMLString::release(&optionExport2ASCII);
         xercesc::XMLString::release(&optionClassTranslate);
         xercesc::XMLString::release(&optionColourClasses);
+        xercesc::XMLString::release(&optionGenColourTab);
     }
     
     void RSGISExeRasterGIS::runAlgorithm() throw(rsgis::RSGISException)
@@ -1752,6 +1823,46 @@ namespace rsgisexe{
                     throw e;
                 }
             }
+            else if(this->option == RSGISExeRasterGIS::gencolourtab)
+            {
+                std::cout << "A command to generate a colour table using an input image.";
+                std::cout << "Clump Image: " << this->clumpsImage << std::endl;
+                std::cout << "Input Image: " << this->inputImage << std::endl;
+                std::cout << "Red: " << this->redBand <<std::endl;
+                std::cout << "Green: " << this->greenBand <<std::endl;
+                std::cout << "Blue: " << this->blueBand <<std::endl;
+                
+                try
+                {
+                    GDALAllRegister();
+                    
+                    GDALDataset *inputDataset = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_Update);
+                    if(inputDataset == NULL)
+                    {
+                        std::string message = std::string("Could not open image ") + this->inputImage;
+                        throw rsgis::RSGISImageException(message.c_str());
+                    }
+                    
+                    GDALDataset *clumpsDataset = (GDALDataset *) GDALOpenShared(this->clumpsImage.c_str(), GA_Update);
+                    if(clumpsDataset == NULL)
+                    {
+                        std::string message = std::string("Could not open image ") + this->clumpsImage;
+                        throw rsgis::RSGISImageException(message.c_str());
+                    }
+                    
+                    rsgis::rastergis::RSGISCalcClumpStats clumpStats;
+                    clumpStats.populateColourTable(clumpsDataset, inputDataset, this->redBand, this->greenBand, this->blueBand);
+                    
+                    clumpsDataset->GetRasterBand(1)->SetMetadataItem("LAYER_TYPE", "thematic");
+                    
+                    GDALClose(inputDataset);
+                    GDALClose(clumpsDataset);
+                }
+                catch (rsgis::RSGISException &e)
+                {
+                    throw e;
+                }
+            }
             else
             {
                 throw rsgis::RSGISException("The option is not recognised: RSGISExeRasterGIS");
@@ -1915,6 +2026,15 @@ namespace rsgisexe{
                 {
                     std::cout << "\tClass " << (*iterClass).first << " = " << (*iterClass).second << std::endl;
                 }
+            }
+            else if(this->option == RSGISExeRasterGIS::gencolourtab)
+            {
+                std::cout << "A command to generate a colour table using an input image.";
+                std::cout << "Clump Image: " << this->clumpsImage << std::endl;
+                std::cout << "Input Image: " << this->inputImage << std::endl;
+                std::cout << "Red: " << this->redBand <<std::endl;
+                std::cout << "Green: " << this->greenBand <<std::endl;
+                std::cout << "Blue: " << this->blueBand <<std::endl;
             }
             else
             {

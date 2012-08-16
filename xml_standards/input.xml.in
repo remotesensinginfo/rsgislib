@@ -430,7 +430,8 @@
         <rsgis:class id="int" r="int" g="int" b="int" a="int" />
 		<rsgis:class id="int" r="int" g="int" b="int" a="int" />
     </rsgis:command>
-	
+	<!-- A command to populate a colour table from an input image -->
+	<rsgis:command algor="rastergis" option="gencolourtab" table="clumps.env" input="image.env" red="int band" green="int band" blue="int band" />
 
 
 

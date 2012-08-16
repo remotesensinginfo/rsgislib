@@ -75,7 +75,8 @@ namespace rsgisexe{
             popattributepercentile,
             export2ascii,
             classtranslate,
-            colourclasses
+            colourclasses,
+            gencolourtab
         };
         
         RSGISExeRasterGIS();
@@ -120,6 +121,9 @@ namespace rsgisexe{
         float weightA;
         std::map<size_t, size_t> classPairs;
         std::map<size_t, rsgis::utils::RSGISColourInt> classColourPairs;
+        unsigned int redBand;
+        unsigned int greenBand;
+        unsigned int blueBand;
     };
     
 }
