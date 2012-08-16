@@ -362,6 +362,104 @@ namespace rsgis{namespace rastergis{
             throw rsgis::RSGISAttributeTableException(e.what());
         }
     }
+    
+    void RSGISCalcClumpStats::populateColourTable(GDALDataset *clumpDS, GDALDataset *imageDS, unsigned int red, unsigned int green, unsigned int blue) throw(rsgis::RSGISAttributeTableException)
+    {
+        try
+        {
+            unsigned int numBands = imageDS->GetRasterCount();
+            if(red > numBands)
+            {
+                throw rsgis::RSGISAttributeTableException("The red band is not within the image.");
+            }
+            if(green > numBands)
+            {
+                throw rsgis::RSGISAttributeTableException("The green band is not within the image.");
+            }
+            if(blue > numBands)
+            {
+                throw rsgis::RSGISAttributeTableException("The blue band is not within the image.");
+            }
+            
+            double maxVal = 0;
+            clumpDS->GetRasterBand(1)->GetStatistics(false, true, NULL, &maxVal, NULL, NULL);
+            
+            size_t numClumps = boost::lexical_cast<size_t>(maxVal)+1;
+            
+            size_t *redVals = new size_t[numClumps];
+            size_t *greenVals = new size_t[numClumps];
+            size_t *blueVals = new size_t[numClumps];
+            size_t *count = new size_t[numClumps];
+            
+            for(size_t i = 0; i < numClumps; ++i)
+            {
+                redVals[i] = 0;
+                greenVals[i] = 0;
+                blueVals[i] = 0;
+                count[i] = 0;
+            }
+            
+            GDALDataset **datasets = new GDALDataset*[2];
+            datasets[0] = clumpDS;
+            datasets[1] = imageDS;
+            
+            RSGISGetColourTableValues *calcImgValStats = new RSGISGetColourTableValues(redVals, greenVals, blueVals, count, red, green, blue);
+            rsgis::img::RSGISCalcImage calcImageStats(calcImgValStats);
+            calcImageStats.calcImage(datasets, 2);
+            delete calcImgValStats;
+            delete[] datasets;
+            
+            
+            GDALColorTable *clrTab = clumpDS->GetRasterBand(1)->GetColorTable();
+            bool newClrTab = false;
+            if(clrTab == NULL)
+            {
+                clrTab = new GDALColorTable();
+                newClrTab = true;
+            }
+            GDALColorEntry *clr = NULL;
+            for(size_t i = 0; i < numClumps; ++i)
+            {
+                clr = new GDALColorEntry();
+                if(count[i] > 0)
+                {
+                    clr->c1 = redVals[i]/count[i];
+                    clr->c2 = greenVals[i]/count[i];
+                    clr->c3 = blueVals[i]/count[i];
+                }
+                else
+                {
+                    clr->c1 = 0;
+                    clr->c2 = 0;
+                    clr->c3 = 0;
+                }
+                clr->c4 = 255;
+                clrTab->SetColorEntry(i, clr);
+            }
+            clumpDS->GetRasterBand(1)->SetColorTable(clrTab);
+            if(newClrTab)
+            {
+                delete clrTab;
+            }
+            
+        }
+        catch(rsgis::img::RSGISImageBandException &e)
+        {
+            throw rsgis::RSGISAttributeTableException(e.what());
+        }
+        catch(rsgis::img::RSGISImageCalcException &e)
+        {
+            throw rsgis::RSGISAttributeTableException(e.what());
+        }
+        catch(rsgis::RSGISImageException &e)
+        {
+            throw rsgis::RSGISAttributeTableException(e.what());
+        }
+        catch(rsgis::RSGISException &e)
+        {
+            throw rsgis::RSGISAttributeTableException(e.what());
+        }
+    }
         
     RSGISCalcClumpStats::~RSGISCalcClumpStats()
     {
@@ -522,6 +620,35 @@ namespace rsgis{namespace rastergis{
         
     }
     
+    
+    
+    RSGISGetColourTableValues::RSGISGetColourTableValues(size_t *redSum, size_t *greenSum, size_t *blueSum, size_t *countVals, unsigned int redIdx, unsigned int greenIdx, unsigned int blueIdx) : rsgis::img::RSGISCalcImageValue(0)
+    {
+        this->redSum = redSum;
+        this->greenSum = greenSum;
+        this->blueSum = blueSum;
+        this->countVals = countVals;
+        this->redIdx = redIdx;
+        this->greenIdx = greenIdx;
+        this->blueIdx = blueIdx;
+    }
+		
+    void RSGISGetColourTableValues::calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException)
+    {
+        if(bandValues[0] > 0)
+        {
+            size_t fid = boost::lexical_cast<size_t>(bandValues[0]);
+            redSum[fid] += bandValues[redIdx];
+            greenSum[fid] += bandValues[greenIdx];
+            blueSum[fid] += bandValues[blueIdx];
+            ++countVals[fid];
+        }
+    }
+    
+    RSGISGetColourTableValues::~RSGISGetColourTableValues()
+    {
+        
+    }
     
     
 	

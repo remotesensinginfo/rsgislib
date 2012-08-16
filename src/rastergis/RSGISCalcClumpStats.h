@@ -96,6 +96,7 @@ namespace rsgis{namespace rastergis{
         RSGISCalcClumpStats();
         void calcImageClumpStatistic(GDALDataset *clumpDS, GDALDataset *imageDS, std::vector<rsgis::rastergis::RSGISBandAttStats*> *bandStats) throw(rsgis::RSGISAttributeTableException);
         void calcImageClumpPercentiles(GDALDataset *clumpDS, GDALDataset *imageDS, std::vector<rsgis::rastergis::RSGISBandAttPercentiles*> *bandPercentiles) throw(rsgis::RSGISAttributeTableException);
+        void populateColourTable(GDALDataset *clumpDS, GDALDataset *imageDS, unsigned int red, unsigned int green, unsigned int blue) throw(rsgis::RSGISAttributeTableException);
         ~RSGISCalcClumpStats();
     };
     
@@ -151,6 +152,29 @@ namespace rsgis{namespace rastergis{
 		~RSGISPopDataWithClusterPxlValue();
     private:
         std::vector<double> ***data;
+	};
+    
+    
+    class RSGISGetColourTableValues : public rsgis::img::RSGISCalcImageValue
+	{
+	public: 
+		RSGISGetColourTableValues(size_t *redSum, size_t *greenSum, size_t *blueSum, size_t *countVals, unsigned int redIdx, unsigned int greenIdx, unsigned int blueIdx);
+		void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+		void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException);
+		void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+		void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+		void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+		bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+		~RSGISGetColourTableValues();
+    private:
+        size_t *redSum;
+        size_t *blueSum;
+        size_t *greenSum;
+        size_t *countVals;
+        unsigned int redIdx;
+        unsigned int greenIdx;
+        unsigned int blueIdx;
 	};
 	
 }}
