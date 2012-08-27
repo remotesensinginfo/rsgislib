@@ -573,7 +573,12 @@
     <rsgis:command algor="imageutils" option="createKMLFile" image="image.png" outKMLFile="string"/>
 	<!-- A command to assign and update an image with specific spatial location -->
     <rsgis:command algor="imageutils" option="assignspatialinfo" image="image.env" tlx="double" tly="double" resX="double" resY="double" [rotX="double"] [rotY="double"] />
-
+	<!-- A command to define a band colour usage -->
+    <rsgis:command algor="imageutils" option="bandcolourusage" image="string" >
+        <rsgis:band band="int" usage="palette | greyscale | red | green | blue | alpha" />
+		<rsgis:band band="int" usage="palette | greyscale | red | green | blue | alpha" />
+		<rsgis:band band="int" usage="palette | greyscale | red | green | blue | alpha" />
+    </rsgis:command>
 
 
 
