@@ -102,6 +102,7 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
     XMLCh *optionCreateCopy = XMLString::transcode("createcopy");
     XMLCh *optionCreateKMLFile = XMLString::transcode("createKMLFile");
     XMLCh *optionCreateTiles = XMLString::transcode("createtiles");
+    XMLCh *optionBandColourUsage = XMLString::transcode("bandcolourusage");
 
 	const XMLCh *algorNameEle = argElement->getAttribute(algorXMLStr);
 	if(!XMLString::equals(algorName, algorNameEle))
@@ -2570,6 +2571,96 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 		XMLString::release(&heightXMLStr);
 
     }
+    else if (XMLString::equals(optionBandColourUsage, optionXML))
+	{
+		this->option = RSGISExeImageUtils::bandcolourusage;
+        
+		XMLCh *imageXMLStr = XMLString::transcode("image");
+		if(argElement->hasAttribute(imageXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(imageXMLStr));
+			this->inputImage = string(charValue);
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+		}
+		XMLString::release(&imageXMLStr);
+        
+        DOMElement *bandElement = NULL;
+        XMLCh *rsgisBandXMLStr = XMLString::transcode("rsgis:band");
+        XMLCh *bandXMLStr = XMLString::transcode("band");
+        XMLCh *usageXMLStr = XMLString::transcode("usage");
+        
+        DOMNodeList *bandsList = argElement->getElementsByTagName(rsgisBandXMLStr);
+        unsigned int numBandsSpecified = bandsList->getLength();
+        this->bandClrUses.reserve(numBandsSpecified);
+        
+        
+        unsigned int bandNo = 0;
+        GDALColorInterp gdalClrInterp = GCI_GrayIndex;
+        string clrInterp = "";
+        for(int i = 0; i < numBandsSpecified; i++)
+        {
+            bandElement = static_cast<DOMElement*>(bandsList->item(i));
+            
+            if(bandElement->hasAttribute(bandXMLStr))
+            {
+                char *charValue = XMLString::transcode(bandElement->getAttribute(bandXMLStr));
+                bandNo = mathUtils.strtounsignedint(string(charValue));
+                XMLString::release(&charValue);
+            }
+            else
+            {
+                throw RSGISXMLArgumentsException("No \'band\' attribute was provided.");
+            }
+            
+            if(bandElement->hasAttribute(usageXMLStr))
+            {
+                char *charValue = XMLString::transcode(bandElement->getAttribute(usageXMLStr));
+                clrInterp = string(charValue);
+                if(clrInterp == "palette")
+                {
+                    gdalClrInterp = GCI_PaletteIndex;
+                }
+                else if(clrInterp == "grayscale")
+                {
+                    gdalClrInterp = GCI_GrayIndex;
+                }
+                else if(clrInterp == "red")
+                {
+                    gdalClrInterp = GCI_RedBand;
+                }
+                else if(clrInterp == "green")
+                {
+                    gdalClrInterp = GCI_GreenBand;
+                }
+                else if(clrInterp == "blue")
+                {
+                    gdalClrInterp = GCI_BlueBand;
+                }
+                else if(clrInterp == "alpha")
+                {
+                    gdalClrInterp = GCI_AlphaBand;
+                }
+                else
+                {
+                    throw RSGISXMLArgumentsException("Usage was not recognised.");
+                }
+                XMLString::release(&charValue);
+            }
+            else
+            {
+                throw RSGISXMLArgumentsException("No \'usage\' attribute was provided.");
+            }
+            
+            bandClrUses.push_back(std::pair<unsigned int, GDALColorInterp>(bandNo, gdalClrInterp));
+        }
+        XMLString::release(&bandXMLStr);
+        XMLString::release(&rsgisBandXMLStr);
+        XMLString::release(&usageXMLStr);
+	}
 	else
 	{
 		string message = string("The option (") + string(XMLString::transcode(optionXML)) + string(") is not known: RSGISExeImageUtils.");
@@ -2616,6 +2707,7 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 	XMLString::release(&optionCreateCopy);
     XMLString::release(&optionCreateKMLFile);
     XMLString::release(&optionCreateTiles);
+    XMLString::release(&optionBandColourUsage);
 
 	parsed = true;
 }
@@ -4330,11 +4422,73 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
             cout << "three band image, readable by GoogleEarth" << endl;
             imgUtils.createKMLText(this->inputImage, this->outKMLFile);
 		}
+        else if(option == RSGISExeImageUtils::bandcolourusage)
+        {
+            cout << "Defining the colour usage parameter on the image bands\n";
+            cout << "Image: " << this->inputImage << std::endl;
+            
+            GDALAllRegister();
+            GDALDataset *inDataset = NULL;
+            inDataset = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_Update);
+            if(inDataset == NULL)
+            {
+                string message = string("Could not open image ") + this->inputImage;
+                throw RSGISImageException(message.c_str());
+            }
+            
+            unsigned int numBandsInDS = inDataset->GetRasterCount();
+            
+            for(std::vector<std::pair<unsigned int, GDALColorInterp> >::iterator iterUsages = bandClrUses.begin(); iterUsages != bandClrUses.end(); ++iterUsages)
+            {
+                cout << "Band " << (*iterUsages).first;
+                if((*iterUsages).second == GCI_GrayIndex)
+                {
+                    cout << " Greyscale usage\n"; 
+                }
+                else if((*iterUsages).second == GCI_PaletteIndex)
+                {
+                    cout << " Paletted usage\n"; 
+                }
+                else if((*iterUsages).second == GCI_RedBand)
+                {
+                    cout << " Red usage\n"; 
+                }
+                else if((*iterUsages).second == GCI_GreenBand)
+                {
+                    cout << " Green usage\n"; 
+                }
+                else if((*iterUsages).second == GCI_BlueBand)
+                {
+                    cout << " Blue usage\n"; 
+                }
+                else if((*iterUsages).second == GCI_AlphaBand)
+                {
+                    cout << " Alpha usage\n"; 
+                }
+                else
+                {
+                    throw RSGISImageException("Band usage is unknown...");
+                }
+                
+                if((*iterUsages).first == 0)
+                {
+                    throw RSGISImageException("Band not within the image - indexing starts at 1.");
+                }
+                else if((*iterUsages).first > numBandsInDS)
+                {
+                    throw RSGISImageException("Band not within the image - too many bands referenced.");
+                }
+                
+                inDataset->GetRasterBand((*iterUsages).first)->SetColorInterpretation((*iterUsages).second);
+            }
+            
+            GDALClose(inDataset);
+            GDALDestroyDriverManager();
+        }
 		else
 		{
 			cout << "Options not recognised\n";
 		}
-
 	}
 }
 
@@ -4614,6 +4768,39 @@ void RSGISExeImageUtils::printParameters()
             cout << "Data Value: " << this->dataValue << endl;
             cout << "Num Image Bands: " << this->numBands << endl;
             cout << "Image format: " << this->imageFormat << endl;
+        }
+        else if(option == RSGISExeImageUtils::bandcolourusage)
+        {
+            cout << "Defining the colour usage parameter on the image bands\n";
+            cout << "Image: " << this->inputImage << std::endl;
+            for(std::vector<std::pair<unsigned int, GDALColorInterp> >::iterator iterUsages = bandClrUses.begin(); iterUsages != bandClrUses.end(); ++iterUsages)
+            {
+                cout << "Band " << (*iterUsages).first;
+                if((*iterUsages).second == GCI_GrayIndex)
+                {
+                    cout << " Greyscale usage\n"; 
+                }
+                else if((*iterUsages).second == GCI_PaletteIndex)
+                {
+                    cout << " Paletted usage\n"; 
+                }
+                else if((*iterUsages).second == GCI_RedBand)
+                {
+                    cout << " Red usage\n"; 
+                }
+                else if((*iterUsages).second == GCI_GreenBand)
+                {
+                    cout << " Green usage\n"; 
+                }
+                else if((*iterUsages).second == GCI_BlueBand)
+                {
+                    cout << " Blue usage\n"; 
+                }
+                else if((*iterUsages).second == GCI_AlphaBand)
+                {
+                    cout << " Alpha usage\n"; 
+                }
+            }
         }
 		else
 		{
