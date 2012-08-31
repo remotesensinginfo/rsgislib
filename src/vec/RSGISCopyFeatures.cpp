@@ -52,6 +52,42 @@ namespace rsgis{namespace vec{
 	{
 		
 	}
+    
+    
+    
+    
+    RSGISCopyFeaturesAddFIDCol::RSGISCopyFeaturesAddFIDCol()
+	{
+		fidCount = 1;
+        fieldIdx = 0;
+	}
+	
+	void RSGISCopyFeaturesAddFIDCol::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+	{        
+		outFeature->SetField(fieldIdx, fidCount);
+        ++fidCount;
+	}
+	
+	void RSGISCopyFeaturesAddFIDCol::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+	{
+		
+		
+	}
+	
+	void RSGISCopyFeaturesAddFIDCol::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException)
+	{
+		if( outputLayer->CreateField( new OGRFieldDefn("FID", OFTInteger)) != OGRERR_NONE )
+        {
+            throw RSGISVectorOutputException("Creating FID field has failed.");
+        }
+        
+        fieldIdx = outputLayer->GetLayerDefn()->GetFieldIndex("FID");
+	}
+	
+	RSGISCopyFeaturesAddFIDCol::~RSGISCopyFeaturesAddFIDCol()
+	{
+		
+	}
 }}
 
 

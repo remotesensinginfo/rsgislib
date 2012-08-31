@@ -128,6 +128,7 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
     XMLCh *optionCalcMeanMinDist = XMLString::transcode("calcmeanmindist");
     XMLCh *optionCopyAssignProj = XMLString::transcode("copyassignproj");
     XMLCh *optionPrintWKT = XMLString::transcode("printwkt");
+    XMLCh *optionAddFIDCol = XMLString::transcode("addfidcol");
 	
 	XMLCh *optionGenerateGrid = XMLString::transcode("generategrid");
 	XMLCh *optionGenerateImageGrid = XMLString::transcode("generateimagegrid");
@@ -4151,6 +4152,55 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No input file has been provided.");
 		}
     }
+    else if (XMLString::equals(optionAddFIDCol, optionXML))
+    {
+        this->option = RSGISExeVectorUtils::addfidcol;
+        
+        if(!singlevector)
+		{
+			throw RSGISXMLArgumentsException("This algorithm requires only a single vector input.");
+		}
+		
+		if(noInputProvide)
+		{
+			throw RSGISXMLArgumentsException("No input file has been provided.");
+		}
+        
+        XMLCh *outputXMLStr = XMLString::transcode("output");
+		if(argElement->hasAttribute(outputXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
+			this->outputVector = string(charValue);
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+		}
+		XMLString::release(&outputXMLStr);
+        
+        XMLCh *forceXMLStr = XMLString::transcode("force");
+		if(argElement->hasAttribute(forceXMLStr))
+		{
+			XMLCh *yesStr = XMLString::transcode("yes");
+			const XMLCh *forceValue = argElement->getAttribute(forceXMLStr);
+			
+			if(XMLString::equals(forceValue, yesStr))
+			{
+				this->force = true;
+			}
+			else
+			{
+				this->force = false;
+			}
+			XMLString::release(&yesStr);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'force\' attribute was provided.");
+		}
+		XMLString::release(&forceXMLStr);
+    }
 	else
 	{
 		string message = string("The option (") + string(XMLString::transcode(optionXML)) + string(") is not known: RSGISExeVectorUtils.");
@@ -4220,6 +4270,7 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
     XMLString::release(&optionCalcMeanMinDist);
     XMLString::release(&optionCopyAssignProj);
     XMLString::release(&optionPrintWKT);
+    XMLString::release(&optionAddFIDCol);
 }
 
 void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
@@ -9466,6 +9517,103 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
                 throw e;
             }
         }
+        else if(option == RSGISExeVectorUtils::addfidcol)
+        {
+            cout << "Copy the data and add a FID column\n";
+            cout << "Input Vector: " << this->inputVector << endl;
+            cout << "Output Vector: " << this->outputVector << endl;
+            
+            try 
+            {
+                OGRRegisterAll();
+                                
+                RSGISFileUtils fileUtils;
+                RSGISVectorUtils vecUtils;
+                
+                OGRDataSource *inputSHPDS = NULL;
+                OGRLayer *inputSHPLayer = NULL;
+                OGRSFDriver *shpFiledriver = NULL;
+                OGRDataSource *outputSHPDS = NULL;
+                OGRLayer *outputSHPLayer = NULL;
+                OGRFeatureDefn *inFeatureDefn = NULL;
+                
+                string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
+                string SHPFileOutLayer = vecUtils.getLayerName(this->outputVector);
+                
+                string outputDIR = fileUtils.getFileDirectoryPath(this->outputVector);
+				
+				if(vecUtils.checkDIR4SHP(outputDIR, SHPFileOutLayer))
+				{
+					if(this->force)
+					{
+						vecUtils.deleteSHP(outputDIR, SHPFileOutLayer);
+					}
+					else
+					{
+						throw RSGISException("Shapefile already exists, either delete or select force.");
+					}
+				}
+				
+				/////////////////////////////////////
+				//
+				// Open Input Shapfile.
+				//
+				/////////////////////////////////////
+				inputSHPDS = OGRSFDriverRegistrar::Open(this->inputVector.c_str(), FALSE);
+				if(inputSHPDS == NULL)
+				{
+					string message = string("Could not open vector file ") + this->inputVector;
+					throw RSGISFileException(message.c_str());
+				}
+				inputSHPLayer = inputSHPDS->GetLayerByName(SHPFileInLayer.c_str());
+				if(inputSHPLayer == NULL)
+				{
+					string message = string("Could not open vector layer ") + SHPFileInLayer;
+					throw RSGISFileException(message.c_str());
+				}
+				inFeatureDefn = inputSHPLayer->GetLayerDefn();
+                OGRwkbGeometryType wktGeomType = inputSHPLayer->GetGeomType();				
+                OGRSpatialReference *outSpatialRef = inputSHPLayer->GetSpatialRef();
+                
+				/////////////////////////////////////
+				//
+				// Create Output Shapfile.
+				//
+				/////////////////////////////////////
+				const char *pszDriverName = "ESRI Shapefile";
+				shpFiledriver = OGRSFDriverRegistrar::GetRegistrar()->GetDriverByName(pszDriverName );
+				if( shpFiledriver == NULL )
+				{
+					throw RSGISVectorOutputException("SHP driver not available.");
+				}
+				outputSHPDS = shpFiledriver->CreateDataSource(this->outputVector.c_str(), NULL);
+				if( outputSHPDS == NULL )
+				{
+					string message = string("Could not create vector file ") + this->outputVector;
+					throw RSGISVectorOutputException(message.c_str());
+				}
+				outputSHPLayer = outputSHPDS->CreateLayer(SHPFileOutLayer.c_str(), outSpatialRef, wktGeomType, NULL );
+				if( outputSHPLayer == NULL )
+				{
+					string message = string("Could not create vector layer ") + SHPFileOutLayer;
+					throw RSGISVectorOutputException(message.c_str());
+				}
+                
+                RSGISCopyFeaturesAddFIDCol *copyFeatures = new RSGISCopyFeaturesAddFIDCol();
+                RSGISProcessVector *processVector = new RSGISProcessVector(copyFeatures);
+				processVector->processVectors(inputSHPLayer, outputSHPLayer, true, true, false);
+                
+                delete copyFeatures;
+                delete processVector;
+                
+                OGRDataSource::DestroyDataSource(inputSHPDS);
+                OGRDataSource::DestroyDataSource(outputSHPDS);
+            } 
+            catch (RSGISException &e) 
+            {
+                throw e;
+            }
+        }
 		else
 		{
 			cout << "Options not recognised\n";
@@ -9960,6 +10108,17 @@ void RSGISExeVectorUtils::printParameters()
             cout << "Input Vector: " << this->inputVector << endl;
             cout << "Output Vector: " << this->outputVector << endl;
             cout << "Projection File: " << this->projFile << endl;
+        }
+        else if(option == RSGISExeVectorUtils::printwkt)
+        {
+            cout << "Printing WKT string for vector layer\n";
+            cout << "Input Vector: " << this->inputVector << endl;
+        }
+        else if(option == RSGISExeVectorUtils::addfidcol)
+        {
+            cout << "Copy the data and add a FID column\n";
+            cout << "Input Vector: " << this->inputVector << endl;
+            cout << "Output Vector: " << this->outputVector << endl;
         }
 		else
 		{

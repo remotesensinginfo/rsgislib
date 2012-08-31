@@ -186,7 +186,8 @@ class RSGISExeVectorUtils : public RSGISAlgorithmParameters
             select,
             calcmeanmindist,
             copyassignproj,
-            printwkt
+            printwkt,
+            addfidcol
 		};
 		
 		RSGISExeVectorUtils();
