@@ -58,6 +58,7 @@ namespace rsgisexe{
         XMLCh *optionClassTranslate = xercesc::XMLString::transcode("classtranslate");
         XMLCh *optionColourClasses = xercesc::XMLString::transcode("colourclasses");
         XMLCh *optionGenColourTab = xercesc::XMLString::transcode("gencolourtab");
+        XMLCh *optionExportCols2Raster = xercesc::XMLString::transcode("exportcols2raster");
         
         const XMLCh *algorNameEle = argElement->getAttribute(algorXMLStr);
         if(!xercesc::XMLString::equals(algorName, algorNameEle))
@@ -1260,6 +1261,138 @@ namespace rsgisexe{
             }
             xercesc::XMLString::release(&blueXMLStr);
         }
+        else if(xercesc::XMLString::equals(optionExportCols2Raster, optionXML))
+        {
+            this->option = RSGISExeRasterGIS::exportcols2raster;
+            
+            XMLCh *clumpsXMLStr = xercesc::XMLString::transcode("clumps");
+            if(argElement->hasAttribute(clumpsXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(clumpsXMLStr));
+                this->inputImage = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'clumps\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&clumpsXMLStr);
+            
+            XMLCh *outputXMLStr = xercesc::XMLString::transcode("output");
+            if(argElement->hasAttribute(outputXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outputXMLStr));
+                this->outputFile = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&outputXMLStr);
+            
+            // Set output image fomat (defaults to KEA)
+            this->imageFormat = "KEA";
+            XMLCh *formatXMLStr = xercesc::XMLString::transcode("format");
+            if(argElement->hasAttribute(formatXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(formatXMLStr));
+                this->imageFormat = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            xercesc::XMLString::release(&formatXMLStr);
+            
+            
+            this->outDataType = GDT_Float32;
+            XMLCh *datatypeXMLStr = xercesc::XMLString::transcode("datatype");
+            if(argElement->hasAttribute(datatypeXMLStr))
+            {
+                XMLCh *dtByte = xercesc::XMLString::transcode("Byte");
+                XMLCh *dtUInt16 = xercesc::XMLString::transcode("UInt16");
+                XMLCh *dtInt16 = xercesc::XMLString::transcode("Int16");
+                XMLCh *dtUInt32 = xercesc::XMLString::transcode("UInt32");
+                XMLCh *dtInt32 = xercesc::XMLString::transcode("Int32");
+                XMLCh *dtFloat32 = xercesc::XMLString::transcode("Float32");
+                XMLCh *dtFloat64 = xercesc::XMLString::transcode("Float64");
+                
+                const XMLCh *dtXMLValue = argElement->getAttribute(datatypeXMLStr);
+                if(xercesc::XMLString::equals(dtByte, dtXMLValue))
+                {
+                    this->outDataType = GDT_Byte;
+                }
+                else if(xercesc::XMLString::equals(dtUInt16, dtXMLValue))
+                {
+                    this->outDataType = GDT_UInt16;
+                }
+                else if(xercesc::XMLString::equals(dtInt16, dtXMLValue))
+                {
+                    this->outDataType = GDT_Int16;
+                }
+                else if(xercesc::XMLString::equals(dtUInt32, dtXMLValue))
+                {
+                    this->outDataType = GDT_UInt32;
+                }
+                else if(xercesc::XMLString::equals(dtInt32, dtXMLValue))
+                {
+                    this->outDataType = GDT_Int32;
+                }
+                else if(xercesc::XMLString::equals(dtFloat32, dtXMLValue))
+                {
+                    this->outDataType = GDT_Float32;
+                }
+                else if(xercesc::XMLString::equals(dtFloat64, dtXMLValue))
+                {
+                    this->outDataType = GDT_Float64;
+                }
+                else
+                {
+                    std::cerr << "Data type not recognised, defaulting to 32 bit float.";
+                    this->outDataType = GDT_Float32;
+                }
+                
+                xercesc::XMLString::release(&dtByte);
+                xercesc::XMLString::release(&dtUInt16);
+                xercesc::XMLString::release(&dtInt16);
+                xercesc::XMLString::release(&dtUInt32);
+                xercesc::XMLString::release(&dtInt32);
+                xercesc::XMLString::release(&dtFloat32);
+                xercesc::XMLString::release(&dtFloat64);
+            }
+            xercesc::XMLString::release(&datatypeXMLStr);
+            
+            XMLCh *rsgisFieldXMLStr = xercesc::XMLString::transcode("rsgis:field");
+            xercesc::DOMNodeList *fieldNodesList = argElement->getElementsByTagName(rsgisFieldXMLStr);
+            unsigned int numFieldTags = fieldNodesList->getLength();
+            
+            std::cout << "Found " << numFieldTags << " field tags" << std::endl;
+            
+            if(numFieldTags == 0)
+            {
+                throw rsgis::RSGISXMLArgumentsException("No field tags have been provided, at least 1 is required.");
+            }
+            
+            fields.reserve(numFieldTags);
+            
+            xercesc::DOMElement *attElement = NULL;
+            std::string fieldName = "";
+            for(int i = 0; i < numFieldTags; i++)
+            {
+                attElement = static_cast<xercesc::DOMElement*>(fieldNodesList->item(i));
+                
+                XMLCh *nameXMLStr = xercesc::XMLString::transcode("name");
+                if(attElement->hasAttribute(nameXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(attElement->getAttribute(nameXMLStr));
+                    fields.push_back(std::string(charValue));
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'name\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&nameXMLStr);
+            }
+        }
         else
         {
             std::string message = std::string("The option (") + std::string(xercesc::XMLString::transcode(optionXML)) + std::string(") is not known: RSGISExeRasterGIS.");
@@ -1284,6 +1417,7 @@ namespace rsgisexe{
         xercesc::XMLString::release(&optionClassTranslate);
         xercesc::XMLString::release(&optionColourClasses);
         xercesc::XMLString::release(&optionGenColourTab);
+        xercesc::XMLString::release(&optionExportCols2Raster);
     }
     
     void RSGISExeRasterGIS::runAlgorithm() throw(rsgis::RSGISException)
@@ -1859,6 +1993,50 @@ namespace rsgisexe{
                     GDALClose(clumpsDataset);
                 }
                 catch (rsgis::RSGISException &e)
+                {
+                    throw e;
+                }
+            }
+            else if(this->option == RSGISExeRasterGIS::exportcols2raster)
+            {
+                std::cout << "A command to export columns to a raster\n";
+                std::cout << "Input Image: " << this->inputImage << std::endl;
+                std::cout << "Output Format: " << this->imageFormat << std::endl;
+                std::cout << "Output File: " << this->outputFile << std::endl;
+                std::cout << "Fields:\n";
+                for(std::vector<std::string>::iterator iterFields = fields.begin(); iterFields != fields.end(); ++iterFields)
+                {
+                    std::cout << "\tField: " << (*iterFields) << std::endl;
+                }
+                
+                try
+                {
+                    GDALAllRegister();
+                    
+                    GDALDataset *inputDataset = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_Update);
+                    if(inputDataset == NULL)
+                    {
+                        std::string message = std::string("Could not open image ") + this->inputImage;
+                        throw rsgis::RSGISImageException(message.c_str());
+                    }
+                    
+                    rsgis::rastergis::RSGISRasterAttUtils attUtils;
+                    const GDALRasterAttributeTable *gdalATT = inputDataset->GetRasterBand(1)->GetDefaultRAT();
+                    
+                    std::vector<unsigned int> *colIdxs = new std::vector<unsigned int>();
+                    for(std::vector<std::string>::iterator iterFields = fields.begin(); iterFields != fields.end(); ++iterFields)
+                    {
+                        colIdxs->push_back(attUtils.findColumnIndex(gdalATT, *iterFields));
+                    }
+                    
+                    rsgis::rastergis::RSGISExportColumns2ImageCalcImage *calcImageVal = new rsgis::rastergis::RSGISExportColumns2ImageCalcImage(fields.size(), gdalATT, colIdxs);
+                    rsgis::img::RSGISCalcImage calcImage(calcImageVal);
+                    calcImage.calcImage(&inputDataset, 1, this->outputFile, true, fields.data(), this->imageFormat, outDataType);
+                    delete calcImageVal;
+                    
+                    GDALClose(inputDataset);
+                }
+                catch(rsgis::RSGISException &e)
                 {
                     throw e;
                 }

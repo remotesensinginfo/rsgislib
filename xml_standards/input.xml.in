@@ -432,7 +432,12 @@
     </rsgis:command>
 	<!-- A command to populate a colour table from an input image -->
 	<rsgis:command algor="rastergis" option="gencolourtab" table="clumps.env" input="image.env" red="int band" green="int band" blue="int band" />
-
+	<!-- A command to export columns to a GDAL raster -->
+    <rsgis:command algor="rastergis" option="exportcols2raster" clumps="input.kea" output="image_out.env" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" >
+		<rsgis:field name="string" />
+        <rsgis:field name="string" />
+        <rsgis:field name="string" />
+    </rsgis:command>
 
 
 
