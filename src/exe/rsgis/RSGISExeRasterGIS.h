@@ -46,6 +46,7 @@
 #include "rastergis/RSGISCalcClumpStats.h"
 #include "rastergis/RSGISFindClumpCatagoryStats.h"
 #include "rastergis/RSGISKNNATTMajorityClassifier.h"
+#include "rastergis/RSGISExportColumns2Image.h"
 
 #include "gdal_priv.h"
 #include "ogrsf_frmts.h"
@@ -76,7 +77,8 @@ namespace rsgisexe{
             export2ascii,
             classtranslate,
             colourclasses,
-            gencolourtab
+            gencolourtab,
+            exportcols2raster
         };
         
         RSGISExeRasterGIS();
@@ -110,6 +112,7 @@ namespace rsgisexe{
         std::string classInField;
         std::string classOutField;
         std::string majWeightField;
+        std::string imageFormat;
         std::vector<std::string> fields;
         size_t fid;
         unsigned int nFeatures;
@@ -124,6 +127,7 @@ namespace rsgisexe{
         unsigned int redBand;
         unsigned int greenBand;
         unsigned int blueBand;
+        GDALDataType outDataType;
     };
     
 }

@@ -731,6 +731,30 @@ namespace rsgis{namespace rastergis{
         
     }
     
+    unsigned int RSGISRasterAttUtils::findColumnIndex(const GDALRasterAttributeTable *gdalATT, std::string colName) throw(RSGISAttributeTableException)
+    {
+        int numColumns = gdalATT->GetColumnCount();
+        bool foundCol = false;
+        unsigned int colIdx = 0;
+        for(int i = 0; i < numColumns; ++i)
+        {
+            if(std::string(gdalATT->GetNameOfCol(i)) == colName)
+            {
+                foundCol = true;
+                colIdx = i;
+                break;
+            }
+        }
+        
+        if(!foundCol)
+        {
+            std::string message = std::string("The column ") + colName + std::string(" could not be found.");
+            throw RSGISAttributeTableException(message);
+        }
+        
+        return colIdx;
+    }
+    
     RSGISRasterAttUtils::~RSGISRasterAttUtils()
     {
         
