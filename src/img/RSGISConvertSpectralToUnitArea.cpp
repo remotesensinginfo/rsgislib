@@ -51,7 +51,7 @@ namespace rsgis{namespace img{
 		
 		for(int i = 0; i < numBands; ++i)
 		{
-			if(isnan(bandValues[i]))
+			if(std::isnan(bandValues[i]))
 			{
 				bandValues[i] = 0;
 			}

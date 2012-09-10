@@ -26,7 +26,7 @@ set (PROJECT_TOOLS_DIR tools)
 set (PROJECT_XML_DIR xml_standards)
 
 # The version number.
-set (RSGISLIB_HG_COMMIT 225)
+set (RSGISLIB_HG_COMMIT 226)
 set (RSGISLIB_VERSION_MAJOR 2)
 set (RSGISLIB_VERSION_MINOR 0)
 set (RSGISLIB_VERSION_PATCH 0)
@@ -155,6 +155,9 @@ set(RSGISLIB_WITH_DOCUMENTS TRUE CACHE BOOL "Choose if RSGISLib documentation sh
 
 set(GSL_INCLUDE_DIR /usr/local/include CACHE PATH "Include PATH for GSL")
 set(GSL_LIB_PATH /usr/local/lib CACHE PATH "Library PATH for GSL")
+
+set(GDAL_INCLUDE_DIR /usr/local/include CACHE PATH "Include PATH for GDAL")
+set(GDAL_LIB_PATH /usr/local/lib CACHE PATH "Library PATH for GDAL")
 
 set(GEOS_INCLUDE_DIR /usr/local/include CACHE PATH "Include PATH for GEOS")
 set(GEOS_LIB_PATH /usr/local/lib CACHE PATH "Library PATH for GEOS")
@@ -285,10 +288,8 @@ ELSEIF(NOT Boost_FOUND)
   MESSAGE(FATAL_ERROR "Unable to find correct Boost version. Did you set BOOST_ROOT?")
 ENDIF()
 
-find_package( GDAL 1.6.0 REQUIRED )
-if (GDAL_FOUND)
-	include_directories (${GDAL_INCLUDE_DIR})
-endif(GDAL_FOUND)
+include_directories(${GDAL_INCLUDE_DIR})
+set(GDAL_LIBRARIES -L${GDAL_LIB_PATH} -lgdal)
 
 include_directories(${GEOS_INCLUDE_DIR})
 set(GEOS_LIBRARIES -L${GEOS_LIB_PATH} -lgeos)
