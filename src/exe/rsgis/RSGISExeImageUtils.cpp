@@ -103,6 +103,7 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
     XMLCh *optionCreateKMLFile = XMLString::transcode("createKMLFile");
     XMLCh *optionCreateTiles = XMLString::transcode("createtiles");
     XMLCh *optionBandColourUsage = XMLString::transcode("bandcolourusage");
+    XMLCh *optionAssignSpatialInfo = XMLString::transcode("assignspatialinfo");
 
 	const XMLCh *algorNameEle = argElement->getAttribute(algorXMLStr);
 	if(!XMLString::equals(algorName, algorNameEle))
@@ -2661,6 +2662,101 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
         XMLString::release(&rsgisBandXMLStr);
         XMLString::release(&usageXMLStr);
 	}
+    else if (XMLString::equals(optionAssignSpatialInfo, optionXML))
+	{
+		this->option = RSGISExeImageUtils::assignspatialinfo;
+        
+		XMLCh *imageXMLStr = XMLString::transcode("image");
+		if(argElement->hasAttribute(imageXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(imageXMLStr));
+			this->inputImage = string(charValue);
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+		}
+		XMLString::release(&imageXMLStr);
+        
+        XMLCh *tlxXMLStr = XMLString::transcode("tlx");
+		if(argElement->hasAttribute(tlxXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(tlxXMLStr));
+			this->tlx = mathUtils.strtodouble(string(charValue));
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'tlx\' attribute was provided.");
+		}
+		XMLString::release(&tlxXMLStr);
+        
+        XMLCh *tlyXMLStr = XMLString::transcode("tly");
+		if(argElement->hasAttribute(tlyXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(tlyXMLStr));
+			this->tly = mathUtils.strtodouble(string(charValue));
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'tly\' attribute was provided.");
+		}
+		XMLString::release(&tlyXMLStr);
+        
+        XMLCh *resXXMLStr = XMLString::transcode("resX");
+		if(argElement->hasAttribute(resXXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(resXXMLStr));
+			this->resX = mathUtils.strtodouble(string(charValue));
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'resX\' attribute was provided.");
+		}
+		XMLString::release(&resXXMLStr);
+        
+        XMLCh *resYXMLStr = XMLString::transcode("resY");
+		if(argElement->hasAttribute(resYXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(resYXMLStr));
+			this->resY = mathUtils.strtodouble(string(charValue));
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'resY\' attribute was provided.");
+		}
+		XMLString::release(&resYXMLStr);
+        
+        XMLCh *rotXXMLStr = XMLString::transcode("rotX");
+		if(argElement->hasAttribute(rotXXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(rotXXMLStr));
+			this->rotX = mathUtils.strtodouble(string(charValue));
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'rotX\' attribute was provided.");
+		}
+		XMLString::release(&rotXXMLStr);
+        
+        XMLCh *rotYXMLStr = XMLString::transcode("rotY");
+		if(argElement->hasAttribute(rotYXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(rotYXMLStr));
+			this->rotY = mathUtils.strtodouble(string(charValue));
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'rotY\' attribute was provided.");
+		}
+		XMLString::release(&rotYXMLStr);
+	}
 	else
 	{
 		string message = string("The option (") + string(XMLString::transcode(optionXML)) + string(") is not known: RSGISExeImageUtils.");
@@ -2708,6 +2804,7 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
     XMLString::release(&optionCreateKMLFile);
     XMLString::release(&optionCreateTiles);
     XMLString::release(&optionBandColourUsage);
+    XMLString::release(&optionAssignSpatialInfo);
 
 	parsed = true;
 }
@@ -4485,6 +4582,39 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
             GDALClose(inDataset);
             GDALDestroyDriverManager();
         }
+        else if(option == RSGISExeImageUtils::assignspatialinfo)
+        {
+            cout << "Assign and update image spatial header info\n";
+            cout << "Image: " << this->inputImage << endl;
+            cout << "TL: [" << this->tlx << "," << this->tly << "]" << endl;
+            cout << "Res: [" << this->resX << "," << this->resY << "]" << endl;
+            cout << "Rot: [" << this->rotX << "," << this->rotY << "]" << endl;
+            
+            try
+            {
+                GDALAllRegister();
+                GDALDataset *inDataset = NULL;
+                inDataset = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_Update);
+                if(inDataset == NULL)
+                {
+                    string message = string("Could not open image ") + this->inputImage;
+                    throw RSGISImageException(message.c_str());
+                }
+                
+                double *trans = new double[6];
+                
+                inDataset->SetGeoTransform(trans);
+                
+                delete trans;
+                
+                GDALClose(inDataset);
+                GDALDestroyDriverManager();
+            }
+            catch (RSGISException &e)
+            {
+                throw e;
+            }
+        }
 		else
 		{
 			cout << "Options not recognised\n";
@@ -4801,6 +4931,14 @@ void RSGISExeImageUtils::printParameters()
                     cout << " Alpha usage\n"; 
                 }
             }
+        }
+        else if(option == RSGISExeImageUtils::assignspatialinfo)
+        {
+            cout << "Assign and update image spatial header info\n";
+            cout << "Image: " << this->inputImage << endl;
+            cout << "TL: [" << this->tlx << "," << this->tly << "]" << endl;
+            cout << "Res: [" << this->resX << "," << this->resY << "]" << endl;
+            cout << "Rot: [" << this->rotX << "," << this->rotY << "]" << endl;
         }
 		else
 		{

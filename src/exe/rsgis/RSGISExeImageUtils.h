@@ -131,7 +131,8 @@ class RSGISExeImageUtils : public RSGISAlgorithmParameters
             popimgstats,
             createcopy,
             createKMLFile,
-            bandcolourusage
+            bandcolourusage,
+            assignspatialinfo
 		};
 
 		enum interpolators
@@ -231,6 +232,12 @@ class RSGISExeImageUtils : public RSGISAlgorithmParameters
         string outKMLFile;
         bool outStatsFile;
         std::vector<std::pair<unsigned int, GDALColorInterp> > bandClrUses;
+        double tlx;
+        double tly;
+        double resX;
+        double resY;
+        double rotX;
+        double rotY;
 	};
 }
 #endif
