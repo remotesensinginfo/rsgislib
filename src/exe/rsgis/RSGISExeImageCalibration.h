@@ -111,6 +111,7 @@ protected:
     int numValues;
 	unsigned int numElevation;
 	string imageFormat;
+    GDALDataType outDataType;
 };
 
 }
