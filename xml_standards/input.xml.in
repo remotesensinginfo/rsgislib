@@ -716,13 +716,13 @@
         <rsgis:band [sensorband="string" | irradiance="float"] />
     </rsgis:command>
     <!-- A command to convert from at sensor radiance to surface reflectance using coefficients provided by 6S -->
-    <rsgis:command algor="imagecalibration" option="apply6s" input="image_in.env" output="image_out.env" scaleFactor="float" format="GDAL Format" >
+    <rsgis:command algor="imagecalibration" option="apply6s" input="image_in.env" output="image_out.env" scaleFactor="float" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" >
         <rsgis:band band="int" ax="float" bx="float" cx="float" />
         <rsgis:band band="int" ax="float" bx="float" cx="float" />
         <rsgis:band band="int" ax="float" bx="float" cx="float" />
     </rsgis:command>
     <!-- -->
-    <rsgis:command algor="imagecalibration" option="apply6s" input="image_in.env" output="image_out.env" format="GDAL Format" scaleFactor="float" inputDEM="in_dem.env">
+    <rsgis:command algor="imagecalibration" option="apply6s" input="image_in.env" output="image_out.env" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" scaleFactor="float" inputDEM="in_dem.env">
         <rsgis:band band="int" >
               <rsgis:elevation elevationUpper="float" ax="float" bx="float" cx="float"  />
               <rsgis:elevation elevationUpper="float" ax="float" bx="float" cx="float"  />
