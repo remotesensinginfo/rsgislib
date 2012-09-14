@@ -69,6 +69,62 @@ void RSGISExeImageCalibration::retrieveParameters(DOMElement *argElement) throw(
 			XMLString::release(&charValue);
 		}
 		XMLString::release(&formatXMLStr);
+        
+        this->outDataType = GDT_Float32;
+        XMLCh *datatypeXMLStr = xercesc::XMLString::transcode("datatype");
+        if(argElement->hasAttribute(datatypeXMLStr))
+        {
+            XMLCh *dtByte = xercesc::XMLString::transcode("Byte");
+            XMLCh *dtUInt16 = xercesc::XMLString::transcode("UInt16");
+            XMLCh *dtInt16 = xercesc::XMLString::transcode("Int16");
+            XMLCh *dtUInt32 = xercesc::XMLString::transcode("UInt32");
+            XMLCh *dtInt32 = xercesc::XMLString::transcode("Int32");
+            XMLCh *dtFloat32 = xercesc::XMLString::transcode("Float32");
+            XMLCh *dtFloat64 = xercesc::XMLString::transcode("Float64");
+            
+            const XMLCh *dtXMLValue = argElement->getAttribute(datatypeXMLStr);
+            if(xercesc::XMLString::equals(dtByte, dtXMLValue))
+            {
+                this->outDataType = GDT_Byte;
+            }
+            else if(xercesc::XMLString::equals(dtUInt16, dtXMLValue))
+            {
+                this->outDataType = GDT_UInt16;
+            }
+            else if(xercesc::XMLString::equals(dtInt16, dtXMLValue))
+            {
+                this->outDataType = GDT_Int16;
+            }
+            else if(xercesc::XMLString::equals(dtUInt32, dtXMLValue))
+            {
+                this->outDataType = GDT_UInt32;
+            }
+            else if(xercesc::XMLString::equals(dtInt32, dtXMLValue))
+            {
+                this->outDataType = GDT_Int32;
+            }
+            else if(xercesc::XMLString::equals(dtFloat32, dtXMLValue))
+            {
+                this->outDataType = GDT_Float32;
+            }
+            else if(xercesc::XMLString::equals(dtFloat64, dtXMLValue))
+            {
+                this->outDataType = GDT_Float64;
+            }
+            else
+            {
+                this->outDataType = GDT_Float32;
+            }
+            
+            xercesc::XMLString::release(&dtByte);
+            xercesc::XMLString::release(&dtUInt16);
+            xercesc::XMLString::release(&dtInt16);
+            xercesc::XMLString::release(&dtUInt32);
+            xercesc::XMLString::release(&dtInt32);
+            xercesc::XMLString::release(&dtFloat32);
+            xercesc::XMLString::release(&dtFloat64);
+        }
+        xercesc::XMLString::release(&datatypeXMLStr);
 		
 		const XMLCh *optionXML = argElement->getAttribute(optionXMLStr);
 		if(XMLString::equals(optionLandsatRadCal, optionXML))
@@ -2910,8 +2966,15 @@ void RSGISExeImageCalibration::runAlgorithm() throw(RSGISException)
 			cout << "Input Image: " << this->inputImage << endl;
             cout << "Output Image: " << this->outputImage << endl;
             cout << "Scale Factor: " << this->scaleFactor << endl;
-			if(this->useTopo6S){cout << "Coefficients (for first elevation threashold):" << endl;}
-			else{cout << "Coefficients:" << endl;}
+            cout << "Num Elevations: " << this->numElevation << endl;
+			if(this->useTopo6S)
+            {
+                cout << "Coefficients (for first elevation threashold):" << endl;
+            }
+			else
+            {
+                cout << "Coefficients:" << endl;
+            }
             for(int i = 0; i < numValues; ++i)
 			{
 				cout << " Band " <<  this->imageBands[i]+1 << ": " << "ax = " <<this->aX[i][0] << ", bx = " << this->bX[i][0] << ", cx = " << this->cX[i][0] << endl;
@@ -2988,7 +3051,7 @@ void RSGISExeImageCalibration::runAlgorithm() throw(RSGISException)
 				apply6SCoefficients = new RSGISApply6SCoefficients(this->numValues, this->imageBands, this->aX, this->bX, this->cX, this->numValues, this->elevationThreash, this->numElevation, this->scaleFactor);
 				
 				calcImage = new RSGISCalcImage(apply6SCoefficients, "", true);
-				calcImage->calcImage(datasets, nDatasets, this->outputImage);
+				calcImage->calcImage(datasets, nDatasets, this->outputImage, false, NULL, this->imageFormat, this->outDataType);
 				
 				
 				GDALClose(datasets[0]);

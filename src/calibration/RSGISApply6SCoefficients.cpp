@@ -28,6 +28,7 @@ namespace rsgis{namespace calib{
     RSGISApply6SCoefficients::RSGISApply6SCoefficients(int numberOutBands, unsigned int *imageBands, float **aX, float **bX, float **cX, int numValues, float *elevationThreash, int numElevation, float scaleFactor):rsgis::img::RSGISCalcImageValue(numberOutBands)
     {
         this->useTopo6S = true;
+        this->bandOffset = 1;
 		this->imageBands = imageBands;
         this->aX = aX;
         this->bX = bX;
@@ -36,11 +37,10 @@ namespace rsgis{namespace calib{
         this->numValues = numValues;
         this->scaleFactor = scaleFactor;
 		this->numElevation = numElevation;
-        this->bandOffset = 0;
-		if (numElevation == 0) 
+		if (numElevation == 0)
 		{
 			this->useTopo6S = false;
-            bandOffset = 1;
+            this->bandOffset = 0;
 		}
     }
     
@@ -55,7 +55,7 @@ namespace rsgis{namespace calib{
         {
             throw rsgis::img::RSGISImageCalcException("The number of input values needs to be equal to or less than the number of input image bands.");
         }
-        
+                
         double tmpVal = 0;
 		
 		unsigned int elv = 0;
@@ -84,7 +84,10 @@ namespace rsgis{namespace calib{
                 {
                     for (unsigned int d = 1; d < numElevation; ++d) 
                     {
-                        if((elevationInt >= this->elevationThreash[d - 1]) && (elevationInt < this->elevationThreash[d])){elv = d;}
+                        if((elevationInt >= this->elevationThreash[d - 1]) && (elevationInt < this->elevationThreash[d]))
+                        {
+                            elv = d;
+                        }
                     }
                 }
             }
@@ -96,6 +99,7 @@ namespace rsgis{namespace calib{
                     std::cout << "Image band: " << imageBands[i] << std::endl;
                     throw rsgis::img::RSGISImageCalcException("Image band is not within image.");
                 }
+                
                 tmpVal=aX[i][elv]*bandValues[imageBands[i]+bandOffset]-bX[i][elv];
                 output[i] = (tmpVal/(1.0+cX[i][elv]*tmpVal))*this->scaleFactor;
             }
