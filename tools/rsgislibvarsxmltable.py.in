@@ -99,7 +99,7 @@ class CmdArgs:
     p = optparse.OptionParser()
     p.add_option("-i","--input", dest="inputxml", default=None, help="Input XML template")
     p.add_option("-o","--output", dest="outputxml", default=None, help="Output XML file")
-    p.add_option("-t","--table", action="append", dest="variables", default=None, help="Table containing input variables to replace $VARx_y where x, y are the row and colum indexes in the input table (e.g., $VAR0_0, $VAR1_1 ... $VARn_m).")
+    p.add_option("-t","--table", action="append", dest="variables", default=None, help="Table containing input variables to replace $VARcol_row where col and row are the colum and row indexes in the input table (e.g., $VAR0_0, $VAR1_1 ... $VARn_m).")
     p.add_option("-r","--headerrows", action="append", dest="headerrows", default=None, help="Number of header rows to skip in input table")
 
     (options, args) = p.parse_args()
