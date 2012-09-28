@@ -25,13 +25,14 @@
 
 namespace rsgis { namespace img {
 
-	RSGISStretchImage::RSGISStretchImage(GDALDataset *inputImage, std::string outputImage,  bool outStats, std::string outStatsFile, bool ignoreZeros, std::string imageFormat, GDALDataType outDataType): inputImage(NULL), outputImage(""), ignoreZeros(true)
+	RSGISStretchImage::RSGISStretchImage(GDALDataset *inputImage, std::string outputImage,  bool outStats, std::string outStatsFile, bool ignoreZeros, bool onePassSD, std::string imageFormat, GDALDataType outDataType): inputImage(NULL), outputImage(""), ignoreZeros(true)
 	{
 		this->inputImage = inputImage;
 		this->outputImage = outputImage;
         this->outStats = outStats;
         this->outStatsFile = outStatsFile;
         this->ignoreZeros = ignoreZeros;
+        this->onePassSD = onePassSD;
         this->imageFormat = imageFormat;
         this->outDataType = outDataType;
 	}
@@ -64,7 +65,8 @@ namespace rsgis { namespace img {
 				stats[i] = new ImageStats();
 			}
 			calcImageStats = new RSGISImageStatistics();
-			calcImageStats->calcImageStatistics(datasets, 1, stats, numBands, false, ignoreZeros);
+            
+			calcImageStats->calcImageStatistics(datasets, 1, stats, numBands, false, ignoreZeros, onePassSD);
 			
             std::ofstream outTxtFile;
             if(this->outStats)
@@ -168,7 +170,7 @@ namespace rsgis { namespace img {
 				stats[i] = new ImageStats();
 			}
 			calcImageStats = new RSGISImageStatistics();
-			calcImageStats->calcImageStatistics(datasets, 1, stats, numBands, false, ignoreZeros);
+			calcImageStats->calcImageStatistics(datasets, 1, stats, numBands, false, ignoreZeros, onePassSD);
 			
 			double onePercent = 0;
 			double onePercentUpper = 0;
@@ -286,7 +288,7 @@ namespace rsgis { namespace img {
 				stats[i] = new ImageStats();
 			}
 			calcImageStats = new RSGISImageStatistics();
-			calcImageStats->calcImageStatistics(datasets, 1, stats, numBands, true, ignoreZeros);
+			calcImageStats->calcImageStatistics(datasets, 1, stats, numBands, true, ignoreZeros, onePassSD);
 			
             std::ofstream outTxtFile;
             if(this->outStats)
@@ -410,7 +412,7 @@ namespace rsgis { namespace img {
 				stats[i] = new ImageStats();
 			}
 			calcImageStats = new RSGISImageStatistics();
-			calcImageStats->calcImageStatistics(datasets, 1, stats, numBands, true, function, ignoreZeros);
+			calcImageStats->calcImageStatistics(datasets, 1, stats, numBands, true, function, ignoreZeros, onePassSD);
 			
             std::ofstream outTxtFile;
             if(this->outStats)
@@ -526,7 +528,7 @@ namespace rsgis { namespace img {
 				stats[i] = new ImageStats();
 			}
 			calcImageStats = new RSGISImageStatistics();
-			calcImageStats->calcImageStatistics(datasets, 1, stats, numBands, true, function, ignoreZeros);
+			calcImageStats->calcImageStatistics(datasets, 1, stats, numBands, true, function, ignoreZeros, onePassSD);
 			
             std::ofstream outTxtFile;
             if(this->outStats)
@@ -642,7 +644,7 @@ namespace rsgis { namespace img {
 				stats[i] = new ImageStats();
 			}
 			calcImageStats = new RSGISImageStatistics();
-			calcImageStats->calcImageStatistics(datasets, 1, stats, numBands, true, function, ignoreZeros);
+			calcImageStats->calcImageStatistics(datasets, 1, stats, numBands, true, function, ignoreZeros, onePassSD);
 			
             std::ofstream outTxtFile;
             if(this->outStats)

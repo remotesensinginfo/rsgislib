@@ -547,7 +547,7 @@
     <!-- A command to generate new image with a default value -->
     <rsgis:command algor="imageutils" option="createimage" output="image_out.env" numbands="int" width="int" height="int" resolution="float" eastings="double" northings="double" proj4="string" value="float"/>
     <!-- A command to apply an enhancement stretch an images pixel values to a range of 0 to 255 - normally used for visualisation -->
-    <rsgis:command algor="imageutils" option="stretch" image="image.env" output="image_out.env" [stats="filepath.txt"] format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" ignorezeros="yes | no" stretch="LinearMinMax | LinearPercent | LinearStdDev | Histogram | Exponential | Logarithmic | PowerLaw" percent="float - only LinearPercent" stddev="float - only LinearStdDev" power="float - only PowerLaw"/>
+    <rsgis:command algor="imageutils" option="stretch" image="image.env" output="image_out.env" [stats="filepath.txt"] format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" ignorezeros="yes | no" stretch="LinearMinMax | LinearPercent | LinearStdDev | Histogram | Exponential | Logarithmic | PowerLaw" percent="float - only LinearPercent" stddev="float - only LinearStdDev" onePassSD="yes | no" power="float - only PowerLaw"/>
     <!-- A command to colour to generate a colour image, using the Hue of a HSV transformation, for a particular input image band -->
     <rsgis:command algor="imageutils" option="huecolour" image="image.env" output="image_out.env" band="int" lowvalue="float" highvalue="float" background="float" />
     <!-- A command to remove / define spatial reference to nothing and size set to pixel size -->

@@ -29,20 +29,23 @@ namespace rsgis{namespace img{
 		
 	}
 	
-	void RSGISImageStatistics::calcImageStatistics(GDALDataset **datasets, int numDS, ImageStats **stats, int numInputBands, bool stddev, bool ignoreZeros)throw(RSGISImageCalcException,RSGISImageBandException)
+	void RSGISImageStatistics::calcImageStatistics(GDALDataset **datasets, int numDS, ImageStats **stats, int numInputBands, bool stddev, bool ignoreZeros, bool onePassSD)throw(RSGISImageCalcException,RSGISImageBandException)
 	{
 		RSGISCalcImageStatistics *calcImageStats = NULL;
 		RSGISCalcImage *calcImg = NULL;
 		try
 		{
-			calcImageStats = new RSGISCalcImageStatistics(0, numInputBands, false, NULL, ignoreZeros);
+			calcImageStats = new RSGISCalcImageStatistics(0, numInputBands, false, NULL, ignoreZeros, onePassSD);
 			calcImg = new RSGISCalcImage(calcImageStats, "", true);
-			calcImg->calcImage(datasets, numDS);
 			
-			if(stddev)
+            if(stddev && onePassSD){calcImageStats->calcStdDev();}
+            
+            calcImg->calcImage(datasets, numDS);
+			
+			if(stddev && !onePassSD)
 			{
 				calcImageStats->calcStdDev();
-				calcImg->calcImage(datasets, numDS);
+                calcImg->calcImage(datasets, numDS);
 			}
 			
 			calcImageStats->getImageStats(stats, numInputBands);
@@ -82,7 +85,7 @@ namespace rsgis{namespace img{
 		}
 	}
 	
-	void RSGISImageStatistics::calcImageStatistics(GDALDataset **datasets, int numDS, ImageStats **stats, int numInputBands, bool stddev, rsgis::math::RSGISMathFunction *func, bool ignoreZeros)throw(RSGISImageCalcException,RSGISImageBandException)
+	void RSGISImageStatistics::calcImageStatistics(GDALDataset **datasets, int numDS, ImageStats **stats, int numInputBands, bool stddev, rsgis::math::RSGISMathFunction *func, bool ignoreZeros, bool onePassSD)throw(RSGISImageCalcException,RSGISImageBandException)
 	{
 		RSGISCalcImageStatistics *calcImageStats = NULL;
 		RSGISCalcImage *calcImg = NULL;
@@ -90,12 +93,14 @@ namespace rsgis{namespace img{
 		{
 			calcImageStats = new RSGISCalcImageStatistics(0, numInputBands, false, func, ignoreZeros);
 			calcImg = new RSGISCalcImage(calcImageStats, "", true);
-			calcImg->calcImage(datasets, numDS);
+            if(stddev && onePassSD){calcImageStats->calcStdDev();}
+            
+            calcImg->calcImage(datasets, numDS);
 			
-			if(stddev)
+			if(stddev && !onePassSD)
 			{
 				calcImageStats->calcStdDev();
-				calcImg->calcImage(datasets, numDS);
+                calcImg->calcImage(datasets, numDS);
 			}
 			
 			calcImageStats->getImageStats(stats, numInputBands);
@@ -135,7 +140,7 @@ namespace rsgis{namespace img{
 		}
 	}
     
-    void RSGISImageStatistics::calcImageStatistics(GDALDataset **datasets, int numDS, ImageStats *stats, bool stddev, bool ignoreZeros)throw(RSGISImageCalcException,RSGISImageBandException)
+    void RSGISImageStatistics::calcImageStatistics(GDALDataset **datasets, int numDS, ImageStats *stats, bool stddev, bool ignoreZeros, bool onePassSD)throw(RSGISImageCalcException,RSGISImageBandException)
 	{
 		RSGISCalcImageStatisticsAllBands *calcImageStats = NULL;
 		RSGISCalcImage *calcImg = NULL;
@@ -143,12 +148,14 @@ namespace rsgis{namespace img{
 		{
 			calcImageStats = new RSGISCalcImageStatisticsAllBands(0, false, NULL, ignoreZeros);
 			calcImg = new RSGISCalcImage(calcImageStats, "", true);
-			calcImg->calcImage(datasets, numDS);
+            if(stddev && onePassSD){calcImageStats->calcStdDev();}
+            
+            calcImg->calcImage(datasets, numDS);
 			
-			if(stddev)
+			if(stddev && !onePassSD)
 			{
 				calcImageStats->calcStdDev();
-				calcImg->calcImage(datasets, numDS);
+                calcImg->calcImage(datasets, numDS);
 			}
 			
 			calcImageStats->getImageStats(stats);
@@ -193,14 +200,16 @@ namespace rsgis{namespace img{
     
     
     
-	RSGISCalcImageStatistics::RSGISCalcImageStatistics(int numberOutBands, int numInputBands, bool calcSD, rsgis::math::RSGISMathFunction *func, bool ignoreZeros) : RSGISCalcImageValue(numberOutBands)
+	RSGISCalcImageStatistics::RSGISCalcImageStatistics(int numberOutBands, int numInputBands, bool calcSD, rsgis::math::RSGISMathFunction *func, bool ignoreZeros, bool onePassSD) : RSGISCalcImageValue(numberOutBands)
 	{
         this->ignoreZeros = ignoreZeros;
+        this->onePassSD = onePassSD;
 		this->calcSD = calcSD;
 		this->numInputBands = numInputBands;
 		this->calcMean = false;
 		this->mean = new double[numInputBands];
 		this->meanSum = new double[numInputBands];
+        this->sumSq = new double[numInputBands];
 		this->min = new double[numInputBands];
 		this->max = new double[numInputBands];
 		this->sumDiffZ = new double[numInputBands];
@@ -212,6 +221,7 @@ namespace rsgis{namespace img{
         {
             mean[i] = 0;
             meanSum[i] = 0;
+            sumSq[i] = 0;
             min[i] = 0;
             max[i] = 0;
             sumDiffZ[i] = 0;
@@ -254,8 +264,49 @@ namespace rsgis{namespace img{
 				}
 			}
 			
-			
-			if(calcSD)
+            if(!calcSD || (calcSD && onePassSD)) // If not calculating SD or calculating SD with a single pass calculate mean, min + max
+			{
+				calcMean = true;
+                
+                for(int i = 0; i < numBands; i++)
+                {
+                    if(firstMean[i])
+                    {
+                        if(!(ignoreZeros & (bandValues[i] == 0)))
+                        {
+                            meanSum[i] = bandValues[i];
+                            min[i] = bandValues[i];
+                            max[i] = bandValues[i];
+                            ++n[i];
+                            firstMean[i] = false;
+                        }
+                    }
+                    else
+                    {
+                        if(!(ignoreZeros & (bandValues[i] == 0)))
+                        {
+                            meanSum[i] = meanSum[i] + bandValues[i];
+                            if(bandValues[i] < min[i])
+                            {
+                                min[i] = bandValues[i];
+                            }
+                            if(bandValues[i] > max[i])
+                            {
+                                max[i] = bandValues[i];
+                            }
+                            ++n[i];
+                        }
+                    }
+                    
+                    if(calcSD && onePassSD)
+                    {                        
+                        sumSq[i] = sumSq[i] + bandValues[i]*bandValues[i];
+                    }
+                        
+                }
+			}
+            
+			else
 			{
 				if(!calcMean)
 				{
@@ -284,41 +335,6 @@ namespace rsgis{namespace img{
                     }
                 }
 			}
-			else
-			{
-				calcMean = true;
-                
-                for(int i = 0; i < numBands; i++)
-                {
-                    if(firstMean[i])
-                    {
-                        if(!(ignoreZeros & (bandValues[i] == 0)))
-                        {
-                            meanSum[i] = bandValues[i];
-                            min[i] = bandValues[i];
-                            max[i] = bandValues[i];
-                            ++n[i];
-                            firstMean[i] = false;
-                        } 
-                    }
-                    else
-                    {
-                        if(!(ignoreZeros & (bandValues[i] == 0)))
-                        {
-                            meanSum[i] = meanSum[i] + bandValues[i];
-                            if(bandValues[i] < min[i])
-                            {
-                                min[i] = bandValues[i];
-                            }
-                            if(bandValues[i] > max[i])
-                            {
-                                max[i] = bandValues[i];
-                            }
-                            ++n[i];
-                        }
-                    }
-                }
-			}
 		}
 	}
 	
@@ -337,7 +353,15 @@ namespace rsgis{namespace img{
             inStats[i]->sum = meanSum[i];
             if(calcSD)
             {
-                inStats[i]->stddev = sqrt(sumDiffZ[i]/n[i]);
+                if (onePassSD)
+                {
+                    double var = (sumSq[i] - ( (meanSum[i]*meanSum[i]) /n[i] ) )/ n[i];
+                    inStats[i]->stddev = sqrt(var);
+                }
+                else
+                {
+                    inStats[i]->stddev = sqrt(sumDiffZ[i]/n[i]);
+                }
             }
             else
             {
