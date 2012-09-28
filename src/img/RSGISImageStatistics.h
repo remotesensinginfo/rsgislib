@@ -53,16 +53,16 @@ namespace rsgis{namespace img{
     {
     public: 
         RSGISImageStatistics();
-        void calcImageStatistics(GDALDataset **datasets, int numDS, ImageStats **stats, int numInputBands, bool stddev, bool ignoreZeros=false)throw(RSGISImageCalcException,RSGISImageBandException);
-        void calcImageStatistics(GDALDataset **datasets, int numDS, ImageStats **stats, int numInputBands, bool stddev, rsgis::math::RSGISMathFunction *func, bool ignoreZeros=false)throw(RSGISImageCalcException,RSGISImageBandException);
-        void calcImageStatistics(GDALDataset **datasets, int numDS, ImageStats *stats, bool stddev, bool ignoreZeros=false)throw(RSGISImageCalcException,RSGISImageBandException);
+        void calcImageStatistics(GDALDataset **datasets, int numDS, ImageStats **stats, int numInputBands, bool stddev, bool ignoreZeros=false, bool onePassSD=false)throw(RSGISImageCalcException,RSGISImageBandException);
+        void calcImageStatistics(GDALDataset **datasets, int numDS, ImageStats **stats, int numInputBands, bool stddev, rsgis::math::RSGISMathFunction *func, bool ignoreZeros=false, bool onePassSD=false)throw(RSGISImageCalcException,RSGISImageBandException);
+        void calcImageStatistics(GDALDataset **datasets, int numDS, ImageStats *stats, bool stddev, bool ignoreZeros=false, bool onePassSD=false)throw(RSGISImageCalcException,RSGISImageBandException);
     };
 	
 	
 	class RSGISCalcImageStatistics : public RSGISCalcImageValue
     {
     public: 
-        RSGISCalcImageStatistics(int numberOutBands, int numInputBands, bool calcSD, rsgis::math::RSGISMathFunction *func, bool ignoreZeros);
+        RSGISCalcImageStatistics(int numberOutBands, int numInputBands, bool calcSD, rsgis::math::RSGISMathFunction *func, bool ignoreZeros, bool onePassSD = false);
         void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
         void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException);
         void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
@@ -75,6 +75,7 @@ namespace rsgis{namespace img{
         ~RSGISCalcImageStatistics();
     protected:
         bool ignoreZeros;
+        bool onePassSD;
         bool calcSD;
         int numInputBands;
         bool *firstMean;
@@ -83,6 +84,7 @@ namespace rsgis{namespace img{
         unsigned long *n;
         double *mean;
         double *meanSum;
+        double *sumSq;
         double *min;
         double *max;
         double *sumDiffZ;

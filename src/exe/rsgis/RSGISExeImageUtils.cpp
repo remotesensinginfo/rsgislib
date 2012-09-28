@@ -1626,12 +1626,22 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			}
 			XMLString::release(&noStr);
 		}
-		else
+        XMLCh *onePassSDXMLStr = XMLString::transcode("onePassSD");
+		if(argElement->hasAttribute(onePassSDXMLStr))
 		{
-			cerr << "No \'ignorezeros\' attribute was provided so defaulting to ignore zeros.\n";
-            this->ignoreZeros = true;
+            XMLCh *yesStr = XMLString::transcode("yes");
+			const XMLCh *onePassValue = argElement->getAttribute(onePassSDXMLStr);
+			if(XMLString::equals(onePassValue, yesStr))
+			{
+                this->onePassSD = true;
+			}
+			else
+			{
+				this->onePassSD = false;
+			}
+			XMLString::release(&yesStr);
 		}
-		XMLString::release(&ignoreZerosXMLStr);
+		XMLString::release(&onePassSDXMLStr);
 
 	}
 	else if (XMLString::equals(optionHueColour, optionXML))
@@ -3703,7 +3713,10 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
             {
                 cout << "Ignoring Zeros\n";
             }
-
+            if(this->onePassSD)
+            {
+                std::cout << "Calculating SD in one pass\n";
+            }
 
 			try
 			{
@@ -3718,7 +3731,7 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
 					throw RSGISImageException(message.c_str());
 				}
 
-				stretchImg = new RSGISStretchImage(inDataset, this->outputImage, this->outStatsFile, this->outputFile, this->ignoreZeros, this->imageFormat, this->outDataType);
+				stretchImg = new RSGISStretchImage(inDataset, this->outputImage, this->outStatsFile, this->outputFile, this->ignoreZeros, this->onePassSD, this->imageFormat, this->outDataType);
 				if(stretchType == linearMinMax)
 				{
 					stretchImg->executeLinearMinMaxStretch();

@@ -224,6 +224,7 @@ class RSGISExeImageUtils : public RSGISAlgorithmParameters
         unsigned int compositeBands;
         compositeStat outCompStat;
         bool ignoreZeros;
+        bool onePassSD;
         GDALDataType outDataType;
         bool calcImgPyramids;
         bool useIgnoreVal;
