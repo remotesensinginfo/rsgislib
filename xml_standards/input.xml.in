@@ -430,6 +430,12 @@
         <rsgis:class id="int" r="int" g="int" b="int" a="int" />
 		<rsgis:class id="int" r="int" g="int" b="int" a="int" />
     </rsgis:command>
+	<!-- A command to set a colour table for a set of classes (string column) within the attribute table. -->
+    <rsgis:command algor="rastergis" option="colourstrclasses" table="input.kea" classfield="string" >
+		<rsgis:class name="string" r="int" g="int" b="int" a="int" />
+        <rsgis:class name="string" r="int" g="int" b="int" a="int" />
+		<rsgis:class name="string" r="int" g="int" b="int" a="int" />
+    </rsgis:command>
 	<!-- A command to populate a colour table from an input image -->
 	<rsgis:command algor="rastergis" option="gencolourtab" table="clumps.env" input="image.env" red="int band" green="int band" blue="int band" />
 	<!-- A command to export columns to a GDAL raster -->
@@ -438,7 +444,8 @@
         <rsgis:field name="string" />
         <rsgis:field name="string" />
     </rsgis:command>
-
+	<!-- A command to find the majority for class (string - field) from one set of objects to another set objects -->
+	<rsgis:command algor="rastergis" option="strclassmajority" base="image.kea" baseclass="column" info="image.kea" infoclass="column" />
 
 
 
