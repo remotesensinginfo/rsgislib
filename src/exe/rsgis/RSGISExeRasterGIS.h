@@ -47,6 +47,7 @@
 #include "rastergis/RSGISFindClumpCatagoryStats.h"
 #include "rastergis/RSGISKNNATTMajorityClassifier.h"
 #include "rastergis/RSGISExportColumns2Image.h"
+#include "rastergis/RSGISFindInfoBetweenLayers.h"
 
 #include "gdal_priv.h"
 #include "ogrsf_frmts.h"
@@ -77,8 +78,10 @@ namespace rsgisexe{
             export2ascii,
             classtranslate,
             colourclasses,
+            colourstrclasses,
             gencolourtab,
-            exportcols2raster
+            exportcols2raster,
+            strclassmajority
         };
         
         RSGISExeRasterGIS();
@@ -114,6 +117,10 @@ namespace rsgisexe{
         std::string majWeightField;
         std::string imageFormat;
         std::vector<std::string> fields;
+        std::string baseSegment;
+        std::string infoSegment;
+        std::string baseClassCol;
+        std::string infoClassCol;
         size_t fid;
         unsigned int nFeatures;
         float distThreshold;
@@ -124,6 +131,7 @@ namespace rsgisexe{
         float weightA;
         std::map<size_t, size_t> classPairs;
         std::map<size_t, rsgis::utils::RSGISColourInt> classColourPairs;
+        std::map<std::string, rsgis::utils::RSGISColourInt> classStrColourPairs;
         unsigned int redBand;
         unsigned int greenBand;
         unsigned int blueBand;
