@@ -239,6 +239,7 @@ class RSGISExeImageUtils : public RSGISAlgorithmParameters
         double resY;
         double rotX;
         double rotY;
+        string outFileExtension;
 	};
 }
 #endif
