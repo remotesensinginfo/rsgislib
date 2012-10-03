@@ -527,7 +527,7 @@
     <!-- A command to include a set of input images from a directory into an existing image -->
     <rsgis:command algor="imageutils" option="include" image="base_image.env" dir="directory" ext="file_extension" bands="b1,b2,b3,...,bn" />
     <!-- A command to cut an image to an input shapefile where each polygon geometry will created a new output image representing the region within the polygon -->
-    <rsgis:command algor="imageutils" option="cut2polys" image="image.env" output="image_out_base" vector="vector.shp" outfilename="attribute" nodata="float" />
+    <rsgis:command algor="imageutils" option="cut2polys" image="image.env" output="image_out_base" vector="vector.shp" outfilename="attribute" nodata="float" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64"/>
     <!-- A command to mask the input image with a second 'mask' image -->
     <rsgis:command algor="imageutils" option="mask" image="image.env" mask="mask.env" output="image_out.env" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" maskvalue="float" />
     <!-- A command resample an input image to another resolution -->
@@ -564,11 +564,13 @@
     <!-- A command to subset an image to the same extent as a shapefile -->
     <rsgis:command algor="imageutils" option="subset" image="image.env" output="output_img.env" vector="vector.shp" />
     <!-- A command to subset an image to polygons within shapefile -->
-    <rsgis:command algor="imageutils" option="subset2polys" image="image.env" output="image_out_base" vector="vector.shp" outfilename="attribute" />
+    <rsgis:command algor="imageutils" option="subset2polys" image="image.env" output="image_out_base" vector="vector.shp" outfilename="attribute" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64"/>
     <!-- A command to pan sharpen an image, takes stack of multispectral image (resampled to pan resolution) and panchromatic image -->
     <rsgis:command algor="imageutils" option="pansharpen" image="ms_pan_img.env" output="ps_image.env" />
     <!-- A command to generate a set of slices from a multi-band image -->
     <rsgis:command algor="imageutils" option="createslices" image="image.env" output="image_out_base" />
+    <!-- A command to generate tiles from an input image-->
+    <rsgis:command algor="imageutils" option="createtiles" image="image.env" output="image_out_base" width="int" height="int" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64"/>
     <!-- A command to clump an image for a given pixel values -->
     <rsgis:command algor="imageutils" option="clump" image="image.env" output="image_out.env" format="GDAL Format" inmemory="yes | no" proj="OSGB | NZ2000 | NZ1949 | IMAGE" />
     <!-- A command to create a composite image from a multi-band input image -->

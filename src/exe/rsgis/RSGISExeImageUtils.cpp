@@ -122,6 +122,16 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 	}
 	XMLString::release(&formatXMLStr);
 
+    // Get extension for out image format (only required for multiple output images)
+    // TODO: Add in getting extension from GDAL driver
+    if(this->imageFormat == "ENVI"){this->outFileExtension = "env";}
+    else if(this->imageFormat == "KEA"){this->outFileExtension = "kea";}
+    else if(this->imageFormat == "GTiff"){this->outFileExtension = "tif";}
+    else if(this->imageFormat == "HFA"){this->outFileExtension = "img";}
+    else if(this->imageFormat == "PNG"){this->outFileExtension = "png";}
+    else if(this->imageFormat == "AAIGrid"){this->outFileExtension = "asc";}
+    else{std::cout << "Extension not known for file format, using \".env\"" << std::endl;}
+    
     this->outDataType = GDT_Float32;
 	XMLCh *datatypeXMLStr = XMLString::transcode("datatype");
 	if(argElement->hasAttribute(datatypeXMLStr))
@@ -3073,11 +3083,11 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
 
 				for(int i = 0; i < numFeatures; i++)
 				{
-					outputFilePath = this->outputImage + data[i]->getFileName() + ".env";
+					outputFilePath = this->outputImage + data[i]->getFileName() + "." + this->outFileExtension;
 					cout << i << ": " << outputFilePath << endl;
                     try
                     {
-                        calcImage->calcImageWithinPolygon(dataset, 1, outputFilePath, data[i]->getBBox(), data[i]->getPolygon(), this->nodataValue, polyContainsPixelCenter);
+                        calcImage->calcImageWithinPolygon(dataset, 1, outputFilePath, data[i]->getBBox(), data[i]->getPolygon(), this->nodataValue, polyContainsPixelCenter,this->imageFormat, this->outDataType);
                     }
                     catch (RSGISImageBandException e)
                     {
@@ -4064,11 +4074,11 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
 				unsigned int failCount = 0;
 				for(int i = 0; i < numFeatures; i++)
 				{
-					outputFilePath = this->outputImage + data[i]->getFileName() + ".env";
+					outputFilePath = this->outputImage + data[i]->getFileName() + "." + this->outFileExtension;
 					cout << i << ": " << outputFilePath << endl;
                     try
                     {
-                        calcImage->calcImageInEnv(dataset, 1, outputFilePath, data[i]->getBBox());
+                        calcImage->calcImageInEnv(dataset, 1, outputFilePath, data[i]->getBBox(), false, NULL, this->imageFormat, this->outDataType);
                     }
                     catch (RSGISImageBandException e)
                     {
@@ -4338,6 +4348,8 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
 
                 double tileWidthMapUnits = this->width * pixelXRes;
                 double tileHeighMapUnits = this->height * pixelYRes;
+                
+                std::cout << "Tile size (map units): " << tileWidthMapUnits << " X " << sqrt(tileHeighMapUnits*tileHeighMapUnits) << std::endl;
 
                 double xStart = 0;
                 double yStart = 0;
@@ -4353,26 +4365,27 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
                         xEnd = maxX;
                     }
 
-                    for(yStart = minY; yStart < maxY; yStart+=tileWidthMapUnits)
+                    for(yStart = maxY; yStart > minY; yStart+=tileHeighMapUnits)
                     {
                         yEnd = yStart + tileHeighMapUnits;
-                        if(yEnd > maxY) // Check tile will fit within image
+                        if(yEnd < minY) // Check tile will fit within image
                         {
-                            yEnd = maxY;
+                            yEnd = minY;
                         }
+                        
                         tileEnvelopes->push_back(new geos::geom::Envelope(xStart, xEnd, yStart, yEnd));
                     }
                 }
 
                 copyImage = new RSGISCopyImage(numImageBands);
 				calcImage = new RSGISCalcImage(copyImage, "", true);
-
+ 
 				for(unsigned int i = 0; i < tileEnvelopes->size(); ++i)
 				{
-					outputFilePath = this->outputImage + "_tile" + boost::lexical_cast<std::string>(i) + ".env";
+					outputFilePath = this->outputImage + "_tile" + boost::lexical_cast<std::string>(i) + "." + this->outFileExtension;
                     try
                     {
-                        calcImage->calcImageInEnv(dataset, 1, outputFilePath, tileEnvelopes->at(i));
+                        calcImage->calcImageInEnv(dataset, 1, outputFilePath, tileEnvelopes->at(i), false, NULL, this->imageFormat, this->outDataType);
                     }
                     catch (RSGISImageBandException e)
                     {

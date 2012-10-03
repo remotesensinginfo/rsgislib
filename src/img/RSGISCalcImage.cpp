@@ -1431,7 +1431,7 @@ namespace rsgis{namespace img{
 
 	}
     
-    void RSGISCalcImage::calcImageInEnv(GDALDataset **datasets, int numDS, std::string outputImage, geos::geom::Envelope *env, bool setOutNames, std::string *bandNames, std::string gdalFormat) throw(RSGISImageCalcException,RSGISImageBandException)
+    void RSGISCalcImage::calcImageInEnv(GDALDataset **datasets, int numDS, std::string outputImage, geos::geom::Envelope *env, bool setOutNames, std::string *bandNames, std::string gdalFormat, GDALDataType gdalDataType) throw(RSGISImageCalcException,RSGISImageBandException)
 	{
 		GDALAllRegister();
 		RSGISImageUtils imgUtils;
@@ -1475,7 +1475,7 @@ namespace rsgis{namespace img{
 			}
 			std::cout << "New image width = " << width << " height = " << height << " bands = " << this->numOutBands << std::endl;
 
-			outputImageDS = gdalDriver->Create(outputImage.c_str(), width, height, this->numOutBands, GDT_Float32, NULL);
+			outputImageDS = gdalDriver->Create(outputImage.c_str(), width, height, this->numOutBands, gdalDataType, NULL);
 			
 			if(outputImageDS == NULL)
 			{
@@ -3955,7 +3955,7 @@ namespace rsgis{namespace img{
 		GDALClose(outputImageDS);
 	}
 	
-	void RSGISCalcImage::calcImageWithinPolygon(GDALDataset **datasets, int numDS, std::string outputImage, geos::geom::Envelope *env, geos::geom::Polygon *poly, float nodata, pixelInPolyOption pixelPolyOption, std::string gdalFormat) throw(RSGISImageCalcException,RSGISImageBandException)
+	void RSGISCalcImage::calcImageWithinPolygon(GDALDataset **datasets, int numDS, std::string outputImage, geos::geom::Envelope *env, geos::geom::Polygon *poly, float nodata, pixelInPolyOption pixelPolyOption, std::string gdalFormat,  GDALDataType gdalDataType) throw(RSGISImageCalcException,RSGISImageBandException)
 	{
 		GDALAllRegister();
 		RSGISImageUtils imgUtils;
@@ -4006,7 +4006,7 @@ namespace rsgis{namespace img{
 			}
 			//std::cout << "New image width = " << width << " height = " << height << std::endl;
 
-			outputImageDS = gdalDriver->Create(outputImage.c_str(), width, height, this->numOutBands, GDT_Float32, NULL);
+			outputImageDS = gdalDriver->Create(outputImage.c_str(), width, height, this->numOutBands, gdalDataType, NULL);
 			
 			if(outputImageDS == NULL)
 			{
