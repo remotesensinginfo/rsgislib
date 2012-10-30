@@ -48,6 +48,7 @@ namespace rsgisexe{
         XMLCh *optionSpatialLocation = xercesc::XMLString::transcode("spatiallocation");
         XMLCh *optionEucDistFromFeat = xercesc::XMLString::transcode("eucdistfromfeat");
         XMLCh *optionFindTopN = xercesc::XMLString::transcode("findtopn");
+        XMLCh *optionFindSpecClose = xercesc::XMLString::transcode("findspecclose");
         XMLCh *optionCopyGDALATTColumns = xercesc::XMLString::transcode("copyGDALATTColumns");
         XMLCh *optionPopAttributeStats = xercesc::XMLString::transcode("popattributestats");
         XMLCh *optionPopCategoryProportions = xercesc::XMLString::transcode("popcategoryproportions");
@@ -303,6 +304,90 @@ namespace rsgisexe{
             }
             xercesc::XMLString::release(&nXMLStr);
              
+        }
+        else if(xercesc::XMLString::equals(optionFindSpecClose, optionXML))
+        {
+            this->option = RSGISExeRasterGIS::findspecclose;
+            
+            XMLCh *imageXMLStr = xercesc::XMLString::transcode("image");
+            if(argElement->hasAttribute(imageXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(imageXMLStr));
+                this->inputImage = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&imageXMLStr);
+            
+            XMLCh *spatialDistXMLStr = xercesc::XMLString::transcode("spatialdist");
+            if(argElement->hasAttribute(spatialDistXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(spatialDistXMLStr));
+                this->spatialDistField = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'spatialdist\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&spatialDistXMLStr);
+            
+            
+            XMLCh *metricDistXMLStr = xercesc::XMLString::transcode("metricdist");
+            if(argElement->hasAttribute(metricDistXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(metricDistXMLStr));
+                this->distanceField = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'metricdist\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&metricDistXMLStr);
+            
+            XMLCh *outFieldXMLStr = xercesc::XMLString::transcode("outfield");
+            if(argElement->hasAttribute(outFieldXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outFieldXMLStr));
+                this->outputField = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'outfield\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&outFieldXMLStr);
+            
+            XMLCh *specDistThresholdXMLStr = xercesc::XMLString::transcode("specdistthreshold");
+            if(argElement->hasAttribute(specDistThresholdXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(specDistThresholdXMLStr));
+                this->specDistThreshold = textUtils.strtofloat(std::string(charValue));
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'specdistthreshold\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&specDistThresholdXMLStr);
+            
+            XMLCh *spatDistThresholdXMLStr = xercesc::XMLString::transcode("spatdistthreshold");
+            if(argElement->hasAttribute(spatDistThresholdXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(spatDistThresholdXMLStr));
+                this->distThreshold = textUtils.strtofloat(std::string(charValue));
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'spatdistthreshold\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&spatDistThresholdXMLStr);
+            
         }
         else if(xercesc::XMLString::equals(optionCopyGDALATTColumns, optionXML))
         {		
@@ -1589,6 +1674,7 @@ namespace rsgisexe{
         xercesc::XMLString::release(&optionCopyGDALATT);
         xercesc::XMLString::release(&optionSpatialLocation);
         xercesc::XMLString::release(&optionFindTopN);
+        xercesc::XMLString::release(&optionFindSpecClose);
         xercesc::XMLString::release(&optionCopyGDALATTColumns);
         xercesc::XMLString::release(&optionPopAttributeStats);
         xercesc::XMLString::release(&optionPopCategoryProportions);
@@ -1737,6 +1823,38 @@ namespace rsgisexe{
                     
                     rsgis::rastergis::RSGISFindTopNWithinDist calcTopN;
                     calcTopN.calcMinDistTopN(inputDataset, this->spatialDistField, this->distanceField, this->outputField, this->nFeatures, this->distThreshold);
+                    
+                    GDALClose(inputDataset);
+                }
+                catch(rsgis::RSGISException &e)
+                {
+                    throw e;
+                }
+                
+            }
+            else if(this->option == RSGISExeRasterGIS::findspecclose)
+            {
+                std::cout << "Calculate the features within a given spatial and spectral distance.\n";
+                std::cout << "Input Image: " << this->inputImage << std::endl;
+                std::cout << "Distance Field: " << this->distanceField << std::endl;
+                std::cout << "Spatial Dist. Field: " << this->spatialDistField << std::endl;
+                std::cout << "Output Field: " << this->outputField << std::endl;
+                std::cout << "Spatial Distance threshold: " << this->distThreshold << std::endl;
+                std::cout << "Spectral Distance threshold: " << this->specDistThreshold << std::endl;
+                
+                try
+                {
+                    GDALAllRegister();
+                    
+                    GDALDataset *inputDataset = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_Update);
+                    if(inputDataset == NULL)
+                    {
+                        std::string message = std::string("Could not open image ") + this->inputImage;
+                        throw rsgis::RSGISImageException(message.c_str());
+                    }
+                    
+                    rsgis::rastergis::RSGISFindClosestSpecSpatialFeats findFeats;
+                    findFeats.calcFeatsWithinSpatSpecThresholds(inputDataset, this->spatialDistField, this->distanceField, this->outputField, this->specDistThreshold, this->distThreshold);
                     
                     GDALClose(inputDataset);
                 }
@@ -2339,6 +2457,16 @@ namespace rsgisexe{
                 std::cout << "Output Field: " << this->outputField << std::endl;
                 std::cout << "Distance threshold: " << this->distThreshold << std::endl;
                 std::cout << "N: " << this->nFeatures << std::endl;
+            }
+            else if(this->option == RSGISExeRasterGIS::findspecclose)
+            {
+                std::cout << "Calculate the features within a given spatial and spectral distance.\n";
+                std::cout << "Input Image: " << this->inputImage << std::endl;
+                std::cout << "Distance Field: " << this->distanceField << std::endl;
+                std::cout << "Spatial Dist. Field: " << this->spatialDistField << std::endl;
+                std::cout << "Output Field: " << this->outputField << std::endl;
+                std::cout << "Spatial Distance threshold: " << this->distThreshold << std::endl;
+                std::cout << "Spectral Distance threshold: " << this->specDistThreshold << std::endl;
             }
             else if(this->option == RSGISExeRasterGIS::popattributestats)
             {

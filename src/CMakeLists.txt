@@ -670,7 +670,8 @@ set(LIB_RASTERGIS_H
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISCalcClumpStats.h
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindClumpCatagoryStats.h
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISExportColumns2Image.h
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindInfoBetweenLayers.h )
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindInfoBetweenLayers.h
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindClosestSpecSpatialFeats.h )
 	
 set(LIB_RASTERGIS_CPP
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISAttributeTable.cpp
@@ -714,7 +715,9 @@ set(LIB_RASTERGIS_CPP
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISExportColumns2Image.cpp
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISExportColumns2Image.h
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindInfoBetweenLayers.cpp
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindInfoBetweenLayers.h )
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindInfoBetweenLayers.h
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindClosestSpecSpatialFeats.cpp
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindClosestSpecSpatialFeats.h )
 ###############################################################################
 
 ###############################################################################
