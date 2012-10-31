@@ -47,7 +47,11 @@ namespace rsgis{namespace rastergis{
     public:
         RSGISFindClosestSpecSpatialFeats();
         void calcFeatsWithinSpatSpecThresholds(GDALDataset *dataset, std::string spatDistCol, std::string distCol, std::string outColumn, float specDistThreshold, float spatDistThreshold)throw(rsgis::RSGISAttributeTableException);
+        void applyMajorityClassifier(GDALDataset *image, std::string inClassCol, std::string outClassCol, std::string trainingSelectCol, std::string eastingsCol, std::string northingsCol, std::string areaCol, std::string majWeightCol, std::vector<std::string> inColumns, float spatDistThreshold, float specDistThreshold) throw(rsgis::RSGISAttributeTableException);
         ~RSGISFindClosestSpecSpatialFeats();
+    protected:
+        inline double getEuclideanDistance(std::vector<double> *vals1, std::vector<double> *vals2)throw(rsgis::math::RSGISMathException);
+        inline std::pair<int, double> findMajorityClassStandard(GDALRasterAttributeTable *attTable, size_t fid, int classIdx, int trainingSelectColIdx, int eastingsIdx, int northingsIdx, int *infoColIdxs, size_t numCols, float spatDistThreshold, float specDistThreshold) throw(rsgis::RSGISAttributeTableException);
     };
 	
 }}

@@ -448,7 +448,12 @@
     </rsgis:command>
 	<!-- A command to find the majority for class (string - field) from one set of objects to another set objects -->
 	<rsgis:command algor="rastergis" option="strclassmajority" base="image.kea" baseclass="column" info="image.kea" infoclass="column" />
-
+	<!-- A command to classify segments using a spectral distance majority classification -->
+	<rsgis:command algor="rastergis" option="specdistmajorityclassifier" image="image.kea" inclassfield="string" outclassfield="string" eastings="string" northings="string" area="string" specdistthreshold="float" spatdistthreshold="float" weightfield="string" >
+		<rsgis:field name="string" />
+        <rsgis:field name="string" />
+        <rsgis:field name="string" />
+    </rsgis:command>
 
 
 
