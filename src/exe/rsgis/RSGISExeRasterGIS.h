@@ -83,7 +83,8 @@ namespace rsgisexe{
             gencolourtab,
             exportcols2raster,
             strclassmajority,
-            findspecclose
+            findspecclose,
+            specdistmajorityclassifier
         };
         
         RSGISExeRasterGIS();
@@ -123,6 +124,7 @@ namespace rsgisexe{
         std::string infoSegment;
         std::string baseClassCol;
         std::string infoClassCol;
+        std::string trainingSelectCol;
         size_t fid;
         unsigned int nFeatures;
         float specDistThreshold;

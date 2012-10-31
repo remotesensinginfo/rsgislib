@@ -62,7 +62,7 @@ namespace rsgisexe{
         XMLCh *optionGenColourTab = xercesc::XMLString::transcode("gencolourtab");
         XMLCh *optionExportCols2Raster = xercesc::XMLString::transcode("exportcols2raster");
         XMLCh *optionStrClassMajority = xercesc::XMLString::transcode("strclassmajority");
-        
+        XMLCh *optionSpecDistMajorityClassifier = xercesc::XMLString::transcode("specdistmajorityclassifier");
         
         const XMLCh *algorNameEle = argElement->getAttribute(algorXMLStr);
         if(!xercesc::XMLString::equals(algorName, algorNameEle))
@@ -766,6 +766,19 @@ namespace rsgisexe{
                 throw rsgis::RSGISXMLArgumentsException("No \'outclassfield\' attribute was provided.");
             }
             xercesc::XMLString::release(&outClassFieldXMLStr);
+            
+            XMLCh *trainingColXMLStr = xercesc::XMLString::transcode("trainingcol");
+            if(argElement->hasAttribute(trainingColXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(trainingColXMLStr));
+                this->trainingSelectCol = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'trainingcol\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&trainingColXMLStr);
             
             XMLCh *eastingsXMLStr = xercesc::XMLString::transcode("eastings");
             if(argElement->hasAttribute(eastingsXMLStr))
@@ -1660,6 +1673,174 @@ namespace rsgisexe{
             xercesc::XMLString::release(&infoClassXMLStr);
             
         }
+        else if(xercesc::XMLString::equals(optionSpecDistMajorityClassifier, optionXML))
+        {
+            this->option = RSGISExeRasterGIS::specdistmajorityclassifier;
+            
+            XMLCh *imageXMLStr = xercesc::XMLString::transcode("image");
+            if(argElement->hasAttribute(imageXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(imageXMLStr));
+                this->inputImage = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&imageXMLStr);
+            
+            XMLCh *inClassFieldXMLStr = xercesc::XMLString::transcode("inclassfield");
+            if(argElement->hasAttribute(inClassFieldXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(inClassFieldXMLStr));
+                this->inClassNameField = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'inclassfield\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&inClassFieldXMLStr);
+            
+            XMLCh *outClassFieldXMLStr = xercesc::XMLString::transcode("outclassfield");
+            if(argElement->hasAttribute(outClassFieldXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outClassFieldXMLStr));
+                this->outClassNameField = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'outclassfield\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&outClassFieldXMLStr);
+            
+            XMLCh *trainingColXMLStr = xercesc::XMLString::transcode("trainingcol");
+            if(argElement->hasAttribute(trainingColXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(trainingColXMLStr));
+                this->trainingSelectCol = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'trainingcol\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&trainingColXMLStr);
+            
+            XMLCh *eastingsXMLStr = xercesc::XMLString::transcode("eastings");
+            if(argElement->hasAttribute(eastingsXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(eastingsXMLStr));
+                this->eastingsField = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'eastings\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&eastingsXMLStr);
+            
+            XMLCh *northingsXMLStr = xercesc::XMLString::transcode("northings");
+            if(argElement->hasAttribute(northingsXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(northingsXMLStr));
+                this->northingsField = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'northings\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&northingsXMLStr);
+            
+            XMLCh *areaXMLStr = xercesc::XMLString::transcode("area");
+            if(argElement->hasAttribute(areaXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(areaXMLStr));
+                this->areaField = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'area\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&areaXMLStr);
+            
+            XMLCh *weightFieldXMLStr = xercesc::XMLString::transcode("weightfield");
+            if(argElement->hasAttribute(weightFieldXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(weightFieldXMLStr));
+                this->majWeightField = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'weightfield\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&weightFieldXMLStr);
+            
+            XMLCh *specDistThresholdXMLStr = xercesc::XMLString::transcode("specdistthreshold");
+            if(argElement->hasAttribute(specDistThresholdXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(specDistThresholdXMLStr));
+                this->specDistThreshold = textUtils.strtofloat(std::string(charValue));
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'specdistthreshold\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&specDistThresholdXMLStr);
+            
+            XMLCh *spatDistThresholdXMLStr = xercesc::XMLString::transcode("spatdistthreshold");
+            if(argElement->hasAttribute(spatDistThresholdXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(spatDistThresholdXMLStr));
+                this->distThreshold = textUtils.strtofloat(std::string(charValue));
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'spatdistthreshold\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&spatDistThresholdXMLStr);
+            
+            
+            XMLCh *rsgisFieldXMLStr = xercesc::XMLString::transcode("rsgis:field");
+            xercesc::DOMNodeList *fieldNodesList = argElement->getElementsByTagName(rsgisFieldXMLStr);
+            unsigned int numFieldTags = fieldNodesList->getLength();
+            
+            std::cout << "Found " << numFieldTags << " field tags" << std::endl;
+            
+            if(numFieldTags == 0)
+            {
+                throw rsgis::RSGISXMLArgumentsException("No field tags have been provided, at least 1 is required.");
+            }
+            
+            fields.reserve(numFieldTags);
+            
+            xercesc::DOMElement *attElement = NULL;
+            std::string fieldName = "";
+            for(int i = 0; i < numFieldTags; i++)
+            {
+                attElement = static_cast<xercesc::DOMElement*>(fieldNodesList->item(i));
+                
+                XMLCh *nameXMLStr = xercesc::XMLString::transcode("name");
+                if(attElement->hasAttribute(nameXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(attElement->getAttribute(nameXMLStr));
+                    fields.push_back(std::string(charValue));
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'name\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&nameXMLStr);
+            }
+        }
         else
         {
             std::string message = std::string("The option (") + std::string(xercesc::XMLString::transcode(optionXML)) + std::string(") is not known: RSGISExeRasterGIS.");
@@ -1688,6 +1869,7 @@ namespace rsgisexe{
         xercesc::XMLString::release(&optionGenColourTab);
         xercesc::XMLString::release(&optionExportCols2Raster);
         xercesc::XMLString::release(&optionStrClassMajority);
+        xercesc::XMLString::release(&optionSpecDistMajorityClassifier);
     }
     
     void RSGISExeRasterGIS::runAlgorithm() throw(rsgis::RSGISException)
@@ -2077,6 +2259,7 @@ namespace rsgisexe{
                 std::cout << "Input Image: " << this->inputImage << std::endl;
                 std::cout << "Input Class Field: " << this->inClassNameField << std::endl;
                 std::cout << "Output Class Field: " << this->outClassNameField << std::endl;
+                std::cout << "Selected Training: " << this->trainingSelectCol << std::endl;
                 std::cout << "Distance threshold: " << this->distThreshold << std::endl;
                 std::cout << "N: " << this->nFeatures << std::endl;
                 std::cout << "Eastings Field: " << this->eastingsField << std::endl;
@@ -2110,7 +2293,7 @@ namespace rsgisexe{
                     }
                     
                     rsgis::rastergis::RSGISKNNATTMajorityClassifier knnMajorityClass;
-                    knnMajorityClass.applyKNNClassifier(inputDataset, this->inClassNameField, this->outClassNameField, this->eastingsField, this->northingsField, this->areaField, this->majWeightField, this->fields, this->nFeatures, this->distThreshold, this->weightA, this->majMethod);
+                    knnMajorityClass.applyKNNClassifier(inputDataset, this->inClassNameField, this->outClassNameField, this->trainingSelectCol, this->eastingsField, this->northingsField, this->areaField, this->majWeightField, this->fields, this->nFeatures, this->distThreshold, this->weightA, this->majMethod);
                     
                     GDALClose(inputDataset);
                 }
@@ -2406,6 +2589,45 @@ namespace rsgisexe{
                     
                     GDALClose(baseSegDataset);
                     GDALClose(infoSegDataset);
+                }
+                catch(rsgis::RSGISException &e)
+                {
+                    throw e;
+                }
+            }
+            else if(this->option == RSGISExeRasterGIS::specdistmajorityclassifier)
+            {
+                std::cout << "A command to classify segments using a spectral distance majority classification.\n";
+                std::cout << "Input Image: " << this->inputImage << std::endl;
+                std::cout << "Input Class Field: " << this->inClassNameField << std::endl;
+                std::cout << "Output Class Field: " << this->outClassNameField << std::endl;
+                std::cout << "Selected Training: " << this->trainingSelectCol << std::endl;
+                std::cout << "Spectral Distance threshold: " << this->specDistThreshold << std::endl;
+                std::cout << "Spatial Distance threshold: " << this->distThreshold << std::endl;
+                std::cout << "Eastings Field: " << this->eastingsField << std::endl;
+                std::cout << "Northings Field: " << this->northingsField << std::endl;
+                std::cout << "Area Field: " << this->areaField << std::endl;
+                std::cout << "Distance calculated using:\n";
+                for(std::vector<std::string>::iterator iterFields = fields.begin(); iterFields != fields.end(); ++iterFields)
+                {
+                    std::cout << "\tField: " << (*iterFields) << std::endl;
+                }
+                
+                try
+                {
+                    GDALAllRegister();
+                    
+                    GDALDataset *inputDataset = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_Update);
+                    if(inputDataset == NULL)
+                    {
+                        std::string message = std::string("Could not open image ") + this->inputImage;
+                        throw rsgis::RSGISImageException(message.c_str());
+                    }
+                    
+                    rsgis::rastergis::RSGISFindClosestSpecSpatialFeats findFeats;
+                    findFeats.applyMajorityClassifier(inputDataset, this->inClassNameField, this->outClassNameField, this->trainingSelectCol, this->eastingsField, this->northingsField, this->areaField, this->majWeightField, this->fields, this->distThreshold, this->specDistThreshold);
+                    
+                    GDALClose(inputDataset);
                 }
                 catch(rsgis::RSGISException &e)
                 {
