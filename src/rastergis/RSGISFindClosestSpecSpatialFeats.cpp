@@ -396,39 +396,47 @@ namespace rsgis{namespace rastergis{
             {
                 classIDs.push_back(attTable->GetValueAsInt((*iterItems).fid, classIdx));
             }
-            classIDs.sort();
-            
-            size_t maxVal = classIDs.back()+1;
-            
-            size_t *freq = new size_t[maxVal];
-            for(size_t i = 0; i < maxVal; ++i)
+            if(classIDs.size() > 0)
             {
-                freq[i] = 0;
-            }
-            for(std::list<size_t>::iterator iterItems = classIDs.begin(); iterItems != classIDs.end(); ++iterItems)
-            {
-                ++freq[*iterItems];
-            }
-            
-            bool first = true;
-            for(size_t i = 0; i < maxVal; ++i)
-            {
-                if(first)
+                classIDs.sort();
+                
+                size_t maxVal = classIDs.back()+1;
+                
+                size_t *freq = new size_t[maxVal];
+                for(size_t i = 0; i < maxVal; ++i)
                 {
-                    if(freq[i] > 0)
+                    freq[i] = 0;
+                }
+                for(std::list<size_t>::iterator iterItems = classIDs.begin(); iterItems != classIDs.end(); ++iterItems)
+                {
+                    ++freq[*iterItems];
+                }
+                
+                bool first = true;
+                for(size_t i = 0; i < maxVal; ++i)
+                {
+                    if(first)
+                    {
+                        if(freq[i] > 0)
+                        {
+                            maxFreq = freq[i];
+                            classID = i;
+                            first = false;
+                        }
+                    }
+                    else if(freq[i] > maxFreq)
                     {
                         maxFreq = freq[i];
                         classID = i;
-                        first = false;
                     }
                 }
-                else if(freq[i] > maxFreq)
-                {
-                    maxFreq = freq[i];
-                    classID = i;
-                }
+                delete[] freq;
             }
-            delete[] freq;
+            else
+            {
+                classID = -1;
+                maxFreq = 0;
+            }
             
         }
         catch (rsgis::RSGISException &e)
@@ -509,39 +517,47 @@ namespace rsgis{namespace rastergis{
             {
                 classIDs.push_back(attTable->GetValueAsInt((*iterItems).fid, classIdx));
             }
-            classIDs.sort();
-            
-            size_t maxVal = classIDs.back()+1;
-            
-            size_t *freq = new size_t[maxVal];
-            for(size_t i = 0; i < maxVal; ++i)
+            if(classIDs.size() > 0)
             {
-                freq[i] = 0;
-            }
-            for(std::list<size_t>::iterator iterItems = classIDs.begin(); iterItems != classIDs.end(); ++iterItems)
-            {
-                ++freq[*iterItems];
-            }
-            
-            bool first = true;
-            for(size_t i = 0; i < maxVal; ++i)
-            {
-                if(first)
+                classIDs.sort();
+                
+                size_t maxVal = classIDs.back()+1;
+                
+                size_t *freq = new size_t[maxVal];
+                for(size_t i = 0; i < maxVal; ++i)
                 {
-                    if(freq[i] > 0)
+                    freq[i] = 0;
+                }
+                for(std::list<size_t>::iterator iterItems = classIDs.begin(); iterItems != classIDs.end(); ++iterItems)
+                {
+                    ++freq[*iterItems];
+                }
+                
+                bool first = true;
+                for(size_t i = 0; i < maxVal; ++i)
+                {
+                    if(first)
+                    {
+                        if(freq[i] > 0)
+                        {
+                            maxFreq = freq[i];
+                            classID = i;
+                            first = false;
+                        }
+                    }
+                    else if(freq[i] > maxFreq)
                     {
                         maxFreq = freq[i];
                         classID = i;
-                        first = false;
                     }
                 }
-                else if(freq[i] > maxFreq)
-                {
-                    maxFreq = freq[i];
-                    classID = i;
-                }
+                delete[] freq;
             }
-            delete[] freq;
+            else
+            {
+                classID = -1;
+                maxFreq = 0;
+            }
             
         }
         catch (rsgis::RSGISException &e)

@@ -304,39 +304,48 @@ namespace rsgis{namespace rastergis{
             {
                 classIDs.push_back(attTable->GetValueAsInt((*iterItems).fid, classIdx));
             }
-            classIDs.sort();
-                        
-            size_t maxVal = classIDs.back()+1;
             
-            size_t *freq = new size_t[maxVal];
-            for(size_t i = 0; i < maxVal; ++i)
+            if(classIDs.size() > 0)
             {
-                freq[i] = 0;
-            }
-            for(std::list<size_t>::iterator iterItems = classIDs.begin(); iterItems != classIDs.end(); ++iterItems)
-            {
-                ++freq[*iterItems];
-            }
-            
-            bool first = true;
-            for(size_t i = 0; i < maxVal; ++i)
-            {
-                if(first)
+                classIDs.sort();
+                
+                size_t maxVal = classIDs.back()+1;
+                
+                size_t *freq = new size_t[maxVal];
+                for(size_t i = 0; i < maxVal; ++i)
                 {
-                    if(freq[i] > 0)
+                    freq[i] = 0;
+                }
+                for(std::list<size_t>::iterator iterItems = classIDs.begin(); iterItems != classIDs.end(); ++iterItems)
+                {
+                    ++freq[*iterItems];
+                }
+                
+                bool first = true;
+                for(size_t i = 0; i < maxVal; ++i)
+                {
+                    if(first)
+                    {
+                        if(freq[i] > 0)
+                        {
+                            maxFreq = freq[i];
+                            classID = i;
+                            first = false;
+                        }
+                    }
+                    else if(freq[i] > maxFreq)
                     {
                         maxFreq = freq[i];
                         classID = i;
-                        first = false;
                     }
                 }
-                else if(freq[i] > maxFreq)
-                {
-                    maxFreq = freq[i];
-                    classID = i;
-                }
+                delete[] freq;
             }
-            delete[] freq;
+            else
+            {
+                classID = -1;
+                maxFreq = 0;
+            }
             
         }
         catch (rsgis::RSGISException &e)
@@ -440,61 +449,68 @@ namespace rsgis{namespace rastergis{
                 }
             }
             
-            size_t maxVal = maxClassIDVal+1;
-            //std::cout << "maxVal = " << maxVal << std::endl;
-            double area = 0;
-            double *freq = new double[maxVal];
-            for(size_t i = 0; i < maxVal; ++i)
+            if(classIDs.size() > 0)
             {
-                freq[i] = 0;
-            }
-            for(std::list<std::pair<size_t, size_t> >::iterator iterItems = classIDs.begin(); iterItems != classIDs.end(); ++iterItems)
-            {
-                vals2->push_back(attTable->GetValueAsDouble((*iterItems).first, eastingsIdx));
-                vals2->push_back(attTable->GetValueAsDouble((*iterItems).first, northingsIdx));
-                
-                eucSpatDist = this->getEuclideanDistance(fidValsSpatial, vals2)/1000;
-                area = attTable->GetValueAsDouble((*iterItems).first, areaIdx);
-                
-                freq[(*iterItems).second] += this->getWeightedDistance(eucSpatDist, area, weightA);
-                
-                vals2->clear();
-            }
-            
-            delete fidValsSpatial;
-            delete fidValsInfo;
-            delete vals2;
-            
-            
-            first = true;
-            for(size_t i = 0; i < maxVal; ++i)
-            {
-                //std::cout << i << "(" << freq[i] << ") " << std::flush;
-                if(first)
+                size_t maxVal = maxClassIDVal+1;
+                //std::cout << "maxVal = " << maxVal << std::endl;
+                double area = 0;
+                double *freq = new double[maxVal];
+                for(size_t i = 0; i < maxVal; ++i)
                 {
-                    if(freq[i] > 0)
+                    freq[i] = 0;
+                }
+                for(std::list<std::pair<size_t, size_t> >::iterator iterItems = classIDs.begin(); iterItems != classIDs.end(); ++iterItems)
+                {
+                    vals2->push_back(attTable->GetValueAsDouble((*iterItems).first, eastingsIdx));
+                    vals2->push_back(attTable->GetValueAsDouble((*iterItems).first, northingsIdx));
+                    
+                    eucSpatDist = this->getEuclideanDistance(fidValsSpatial, vals2)/1000;
+                    area = attTable->GetValueAsDouble((*iterItems).first, areaIdx);
+                    
+                    freq[(*iterItems).second] += this->getWeightedDistance(eucSpatDist, area, weightA);
+                    
+                    vals2->clear();
+                }
+                
+                delete fidValsSpatial;
+                delete fidValsInfo;
+                delete vals2;
+                
+                
+                first = true;
+                for(size_t i = 0; i < maxVal; ++i)
+                {
+                    //std::cout << i << "(" << freq[i] << ") " << std::flush;
+                    if(first)
+                    {
+                        if(freq[i] > 0)
+                        {
+                            maxFreq = freq[i];
+                            classID = i;
+                            first = false;
+                        }
+                    }
+                    else if(freq[i] > maxFreq)
                     {
                         maxFreq = freq[i];
                         classID = i;
-                        first = false;
                     }
                 }
-                else if(freq[i] > maxFreq)
-                {
-                    maxFreq = freq[i];
-                    classID = i;
-                }
+                delete[] freq;
+                //std::cout << std::endl;
             }
-            delete[] freq;
-            //std::cout << std::endl;
-            
+            else
+            {
+                classID = -1;
+                maxFreq = 0;
+            }
         }
         catch (rsgis::RSGISException &e)
         {
             throw rsgis::RSGISAttributeTableException(e.what());
         }
         
-        return std::pair<int, double>(classID, maxFreq);
+        return std::pair<int, double>(classID, ((double)maxFreq));
     }
     
     double RSGISKNNATTMajorityClassifier::getEuclideanDistance(std::vector<double> *vals1, std::vector<double> *vals2)throw(rsgis::math::RSGISMathException)
