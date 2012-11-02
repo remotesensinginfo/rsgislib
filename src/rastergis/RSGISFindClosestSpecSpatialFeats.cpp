@@ -122,7 +122,7 @@ namespace rsgis{namespace rastergis{
         }
     }
     
-    void RSGISFindClosestSpecSpatialFeats::applyMajorityClassifier(GDALDataset *image, std::string inClassCol, std::string outClassCol, std::string trainingSelectCol, std::string eastingsCol, std::string northingsCol, std::string areaCol, std::string majWeightCol, std::vector<std::string> inColumns, float spatDistThreshold, float specDistThreshold) throw(rsgis::RSGISAttributeTableException)
+    void RSGISFindClosestSpecSpatialFeats::applyMajorityClassifier(GDALDataset *image, std::string inClassCol, std::string outClassCol, std::string trainingSelectCol, std::string eastingsCol, std::string northingsCol, std::string areaCol, std::string majWeightCol, std::vector<std::string> inColumns, float spatDistThreshold, float specDistThreshold, SpectralDistanceMethod distMethod, float specThresOriginDist) throw(rsgis::RSGISAttributeTableException)
     {
         try
         {
@@ -282,7 +282,14 @@ namespace rsgis{namespace rastergis{
                     feedback += 10;
                 }
                 
-                selectedClass = this->findMajorityClassStandard(attTable, i, inClassColIdx, trainingSelectColIdx, eastColIdx, northColIdx, colIdxs, inColumns.size(), spatDistThreshold, specDistThreshold);
+                if(distMethod == stdEucSpecDist)
+                {
+                    selectedClass = this->findMajorityClassStandard(attTable, i, inClassColIdx, trainingSelectColIdx, eastColIdx, northColIdx, colIdxs, inColumns.size(), spatDistThreshold, specDistThreshold);
+                }
+                else if(distMethod == originWeightedEuc)
+                {
+                    selectedClass = this->findMajorityClassOriginSpecDist(attTable, i, inClassColIdx, trainingSelectColIdx, eastColIdx, northColIdx, colIdxs, inColumns.size(), spatDistThreshold, specDistThreshold, specThresOriginDist);
+                }
                 
                 attTable->SetValue(i, outClassColIdx, selectedClass.first);
                 attTable->SetValue(i, majWeightColIdx, selectedClass.second);
@@ -369,6 +376,119 @@ namespace rsgis{namespace rastergis{
                         infoDist = this->getEuclideanDistance(fidValsInfo, vals2);
                         
                         if(infoDist < specDistThreshold)
+                        {
+                            classSegments.push_back(DistItem(n, infoDist));
+                        }
+                        
+                        
+                    }
+                    vals2->clear();
+                }
+            }
+            
+            delete fidValsSpatial;
+            delete fidValsInfo;
+            delete vals2;
+            
+            // Find the majority class ID.
+            std::list<size_t> classIDs;
+            for(std::list<DistItem>::iterator iterItems = classSegments.begin(); iterItems != classSegments.end(); ++iterItems)
+            {
+                classIDs.push_back(attTable->GetValueAsInt((*iterItems).fid, classIdx));
+            }
+            classIDs.sort();
+            
+            size_t maxVal = classIDs.back()+1;
+            
+            size_t *freq = new size_t[maxVal];
+            for(size_t i = 0; i < maxVal; ++i)
+            {
+                freq[i] = 0;
+            }
+            for(std::list<size_t>::iterator iterItems = classIDs.begin(); iterItems != classIDs.end(); ++iterItems)
+            {
+                ++freq[*iterItems];
+            }
+            
+            bool first = true;
+            for(size_t i = 0; i < maxVal; ++i)
+            {
+                if(first)
+                {
+                    if(freq[i] > 0)
+                    {
+                        maxFreq = freq[i];
+                        classID = i;
+                        first = false;
+                    }
+                }
+                else if(freq[i] > maxFreq)
+                {
+                    maxFreq = freq[i];
+                    classID = i;
+                }
+            }
+            delete[] freq;
+            
+        }
+        catch (rsgis::RSGISException &e)
+        {
+            throw rsgis::RSGISAttributeTableException(e.what());
+        }
+        
+        return std::pair<int, double>(classID, ((double)maxFreq));
+    }
+    
+    std::pair<int, double> RSGISFindClosestSpecSpatialFeats::findMajorityClassOriginSpecDist(GDALRasterAttributeTable *attTable, size_t fid, int classIdx, int trainingSelectColIdx, int eastingsIdx, int northingsIdx, int *infoColIdxs, size_t numCols, float spatDistThreshold, float specDistThreshold, float specThresOriginDist) throw(rsgis::RSGISAttributeTableException)
+    {
+        int classID = -1;
+        size_t maxFreq = 0;
+        
+        try
+        {
+            std::vector<double> *fidValsSpatial = new std::vector<double>();
+            fidValsSpatial->reserve(2);
+            std::vector<double> *fidValsInfo = new std::vector<double>();
+            fidValsInfo->reserve(numCols);
+            std::vector<double> *vals2 = new std::vector<double>();
+            vals2->reserve(numCols);
+            std::list<DistItem> classSegments;
+            
+            fidValsSpatial->push_back(attTable->GetValueAsDouble(fid, eastingsIdx));
+            fidValsSpatial->push_back(attTable->GetValueAsDouble(fid, northingsIdx));
+            
+            for(size_t k = 0; k < numCols; ++k)
+            {
+                fidValsInfo->push_back(attTable->GetValueAsDouble(fid, infoColIdxs[k]));
+                vals2->push_back(0);
+            }
+            
+            
+            float specDistThresholdCalcd = (specDistThreshold/specThresOriginDist)*this->getEuclideanDistance(fidValsInfo, vals2);
+            vals2->clear();
+            
+            // Find all segments with distance thresholds
+            size_t numRows = attTable->GetRowCount();
+            int training = 0;
+            double infoDist = 0;
+            for(size_t n = 1; n < numRows; ++n)
+            {
+                if(n != fid)
+                {
+                    training = attTable->GetValueAsInt(n, trainingSelectColIdx);
+                    vals2->push_back(attTable->GetValueAsDouble(n, eastingsIdx));
+                    vals2->push_back(attTable->GetValueAsDouble(n, northingsIdx));
+                    
+                    if((training == 1) && (this->getEuclideanDistance(fidValsSpatial, vals2) < spatDistThreshold))
+                    {
+                        vals2->clear();
+                        for(size_t m = 0; m < numCols; ++m)
+                        {
+                            vals2->push_back(attTable->GetValueAsDouble(n, infoColIdxs[m]));
+                        }
+                        infoDist = this->getEuclideanDistance(fidValsInfo, vals2);
+                        
+                        if(infoDist < specDistThresholdCalcd)
                         {
                             classSegments.push_back(DistItem(n, infoDist));
                         }
