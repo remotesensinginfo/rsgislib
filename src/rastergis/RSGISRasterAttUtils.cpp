@@ -342,15 +342,18 @@ namespace rsgis{namespace rastergis{
             for(int i = 0; i < gdalAttClumps->GetRowCount(); ++i)
             {
                 classID = gdalAttClumps->GetValueAsInt(i, classIdx);
-                redVal = gdalAttClasses->GetValueAsInt(classID, inRedIdx);
-                greenVal = gdalAttClasses->GetValueAsInt(classID, inGreenIdx);
-                blueVal = gdalAttClasses->GetValueAsInt(classID, inBlueIdx);
-                alphaVal = gdalAttClasses->GetValueAsInt(classID, inAlphaIdx);
-                
-                gdalAttClumps->SetValue(i, outRedIdx, redVal);
-                gdalAttClumps->SetValue(i, outGreenIdx, greenVal);
-                gdalAttClumps->SetValue(i, outBlueIdx, blueVal);
-                gdalAttClumps->SetValue(i, outAlphaIdx, alphaVal);
+                if(classID >= 0)
+                {
+                    redVal = gdalAttClasses->GetValueAsInt(classID, inRedIdx);
+                    greenVal = gdalAttClasses->GetValueAsInt(classID, inGreenIdx);
+                    blueVal = gdalAttClasses->GetValueAsInt(classID, inBlueIdx);
+                    alphaVal = gdalAttClasses->GetValueAsInt(classID, inAlphaIdx);
+                    
+                    gdalAttClumps->SetValue(i, outRedIdx, redVal);
+                    gdalAttClumps->SetValue(i, outGreenIdx, greenVal);
+                    gdalAttClumps->SetValue(i, outBlueIdx, blueVal);
+                    gdalAttClumps->SetValue(i, outAlphaIdx, alphaVal);
+                }
             }
                  
             std::cout << "Adding RAT to output file.\n";
