@@ -1807,6 +1807,43 @@ namespace rsgisexe{
             }
             xercesc::XMLString::release(&spatDistThresholdXMLStr);
             
+            XMLCh *thresOriginDistXMLStr = xercesc::XMLString::transcode("thresorigindist");
+            if(argElement->hasAttribute(thresOriginDistXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(thresOriginDistXMLStr));
+                this->specThresOriginDist = textUtils.strtofloat(std::string(charValue));
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                this->specThresOriginDist = 100;
+            }
+            xercesc::XMLString::release(&thresOriginDistXMLStr);
+            
+            XMLCh *majMethodXMLStr = xercesc::XMLString::transcode("specdistmethod");
+            if(argElement->hasAttribute(majMethodXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(majMethodXMLStr));
+                std::string distMethodStr = std::string(charValue);
+                if(distMethodStr == "euclidean")
+                {
+                    this->distThresMethod = rsgis::rastergis::stdEucSpecDist;
+                }
+                else if(distMethodStr == "origineucweighted")
+                {
+                    this->distThresMethod = rsgis::rastergis::originWeightedEuc;
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("Distance method is not recognised, options are \'euclidean\' or \'origineucweighted\'.");
+                }
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'majoritymethod\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&majMethodXMLStr);
             
             XMLCh *rsgisFieldXMLStr = xercesc::XMLString::transcode("rsgis:field");
             xercesc::DOMNodeList *fieldNodesList = argElement->getElementsByTagName(rsgisFieldXMLStr);
@@ -2607,6 +2644,15 @@ namespace rsgisexe{
                 std::cout << "Eastings Field: " << this->eastingsField << std::endl;
                 std::cout << "Northings Field: " << this->northingsField << std::endl;
                 std::cout << "Area Field: " << this->areaField << std::endl;
+                std::cout << "Spectral Origin Distance: " << this->specThresOriginDist << std::endl;
+                if(this->distThresMethod == rsgis::rastergis::stdEucSpecDist)
+                {
+                    std::cout << "Standard Euclidean Distance..." << std::endl;
+                }
+                else if(this->distThresMethod == rsgis::rastergis::stdEucSpecDist)
+                {
+                    std::cout << "Standard Euclidean Distance..." << std::endl;
+                }
                 std::cout << "Distance calculated using:\n";
                 for(std::vector<std::string>::iterator iterFields = fields.begin(); iterFields != fields.end(); ++iterFields)
                 {
@@ -2625,7 +2671,7 @@ namespace rsgisexe{
                     }
                     
                     rsgis::rastergis::RSGISFindClosestSpecSpatialFeats findFeats;
-                    findFeats.applyMajorityClassifier(inputDataset, this->inClassNameField, this->outClassNameField, this->trainingSelectCol, this->eastingsField, this->northingsField, this->areaField, this->majWeightField, this->fields, this->distThreshold, this->specDistThreshold);
+                    findFeats.applyMajorityClassifier(inputDataset, this->inClassNameField, this->outClassNameField, this->trainingSelectCol, this->eastingsField, this->northingsField, this->areaField, this->majWeightField, this->fields, this->distThreshold, this->specDistThreshold, this->distThresMethod, this->specThresOriginDist);
                     
                     GDALClose(inputDataset);
                 }

@@ -141,6 +141,8 @@ namespace rsgisexe{
         unsigned int greenBand;
         unsigned int blueBand;
         GDALDataType outDataType;
+        rsgis::rastergis::SpectralDistanceMethod distThresMethod;
+        float specThresOriginDist;
     };
     
 }
