@@ -73,6 +73,12 @@ namespace rsgis{namespace math{
         rsgis_mutualinfo
     };
     
+    enum rsgissort
+    {
+        rsgis_ascending = 1,
+        rsgis_descending = 2
+    };
+    
     struct RSGISStatsSummary
     {
         bool calcMin;
