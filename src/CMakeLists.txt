@@ -488,7 +488,8 @@ set(LIB_MATH_H
 	${RSGIS_SRC_MATH_DIR}/RSGISFunctions.h 
 	${RSGIS_SRC_MATH_DIR}/RSGISLinearFit.h 
 	${RSGIS_SRC_MATH_DIR}/RSGISNonLinearFit.h
-	${RSGIS_SRC_MATH_DIR}/RSGISClustering.h)
+	${RSGIS_SRC_MATH_DIR}/RSGISClustering.h 
+	${RSGIS_SRC_MATH_DIR}/RSGISMaximumLikelihood.h )
 	
 set(LIB_MATH_CPP
 	${RSGIS_SRC_MATH_DIR}/RSGISMathException.cpp 
@@ -553,7 +554,9 @@ set(LIB_MATH_CPP
 	${RSGIS_SRC_MATH_DIR}/RSGISClustering.cpp
 	${RSGIS_SRC_MATH_DIR}/RSGISClustering.h
 	${RSGIS_SRC_MATH_DIR}/RSGISnnls.cpp 
-	${RSGIS_SRC_MATH_DIR}/RSGISnnls.h )
+	${RSGIS_SRC_MATH_DIR}/RSGISnnls.h
+	${RSGIS_SRC_MATH_DIR}/RSGISMaximumLikelihood.cpp
+	${RSGIS_SRC_MATH_DIR}/RSGISMaximumLikelihood.h )
 ###############################################################################
 
 ###############################################################################
