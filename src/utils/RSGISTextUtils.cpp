@@ -188,6 +188,7 @@ namespace rsgis{namespace utils{
 				boost::algorithm::trim(strLine);
 				wholeFile += strLine;
 				strLine = "";
+                lineEnding = false;
 			}
 			else 
 			{
@@ -238,6 +239,7 @@ namespace rsgis{namespace utils{
 				boost::algorithm::trim(strLine);
 				wholeFile.push_back(strLine);
 				strLine = "";
+                lineEnding = false;
 			}
 			else
 			{

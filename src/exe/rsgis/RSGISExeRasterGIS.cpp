@@ -1970,7 +1970,7 @@ namespace rsgisexe{
                     this->priorsMethod = rsgis::rastergis::rsgis_userdefined;
                     try
                     {
-                        textUtils.readFileToStringVector(priorsMethodStr);
+                        this->priorStrs = textUtils.readFileToStringVector(priorsMethodStr);
                     }
                     catch(rsgis::utils::RSGISTextException &e)
                     {
@@ -2859,7 +2859,7 @@ namespace rsgisexe{
                         {
                             throw rsgis::RSGISException(e.what());
                         }
-                        
+                        ++idx;
                     }
                 }
                 
