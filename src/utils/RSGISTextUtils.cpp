@@ -195,13 +195,64 @@ namespace rsgis{namespace utils{
 			}
 			
 			lastch = ch;
-			inputFileStream.get(ch);      
+			inputFileStream.get(ch);
 		}
+        boost::algorithm::trim(strLine);
 		wholeFile += strLine;
 		inputFileStream.close();
 		
 		return wholeFile;
 	}
+    
+    std::vector<std::string> RSGISTextUtils::readFileToStringVector(std::string input) throw(RSGISTextException)
+    {
+        std::vector<std::string> wholeFile;
+		std::ifstream inputFileStream;
+		inputFileStream.open(input.c_str(), std::ios_base::in);
+		if(!inputFileStream.is_open())
+		{
+			throw RSGISTextException("File could not be opened.");
+		}
+		
+		std::string strLine = "";
+		bool lineEnding = false;
+		char ch, lastch;
+		inputFileStream.get(ch);
+		while (!inputFileStream.eof())
+		{
+			if ((ch == 0x0a) && (lastch == 0x0d))
+			{
+				lineEnding = true; // Windows Line Ending
+			}
+			else if ((lastch == 0x0d) && (ch != 0x0a))
+			{
+				lineEnding = true; // Mac Line Ending
+			}
+			else if (ch == 0x0a)
+			{
+				lineEnding = true; // UNIX Line Ending
+			}
+			
+			if(lineEnding)
+			{
+				boost::algorithm::trim(strLine);
+				wholeFile.push_back(strLine);
+				strLine = "";
+			}
+			else
+			{
+				strLine += ch;
+			}
+			
+			lastch = ch;
+			inputFileStream.get(ch);
+		}
+		boost::algorithm::trim(strLine);
+        wholeFile.push_back(strLine);
+		inputFileStream.close();
+		
+		return wholeFile;
+    }
     
     void RSGISTextUtils::writeStringToFile(std::string file, std::string output) throw(RSGISTextException)
     {

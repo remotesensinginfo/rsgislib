@@ -455,7 +455,7 @@
         <rsgis:field name="string" />
     </rsgis:command>
 	<!-- A command to classify segments using a global maximum likelihood classifier -->
-	<rsgis:command algor="rastergis" option="maxlikelihoodclassifier" image="image.kea" inclassfield="string" outclassfield="string" trainingcol="string" >
+	<rsgis:command algor="rastergis" option="maxlikelihoodclassifier" image="image.kea" inclassfield="string" outclassfield="string" trainingcol="string" area="string" [priors="file.txt | equal | area | samples"] >
 		<rsgis:field name="string" />
         <rsgis:field name="string" />
         <rsgis:field name="string" />

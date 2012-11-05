@@ -49,6 +49,7 @@ namespace rsgis{namespace utils{
 			std::string removeNewLine(std::string line);
 			
 			std::string readFileToString(std::string input) throw(RSGISTextException);
+            std::vector<std::string> readFileToStringVector(std::string input) throw(RSGISTextException);
             void writeStringToFile(std::string file, std::string output) throw(RSGISTextException);
 			
 			double strtodouble(std::string inValue)throw(RSGISTextException);

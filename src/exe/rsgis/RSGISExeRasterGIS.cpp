@@ -1936,7 +1936,55 @@ namespace rsgisexe{
             }
             xercesc::XMLString::release(&trainingColXMLStr);
             
-           
+            XMLCh *areaXMLStr = xercesc::XMLString::transcode("area");
+            if(argElement->hasAttribute(areaXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(areaXMLStr));
+                this->areaField = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'area\' attribute was provided.");
+            }
+            
+            XMLCh *priorsXMLStr = xercesc::XMLString::transcode("priors");
+            if(argElement->hasAttribute(priorsXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(priorsXMLStr));
+                std::string priorsMethodStr = std::string(charValue);
+                if(priorsMethodStr == "equal")
+                {
+                    this->priorsMethod = rsgis::rastergis::rsgis_equal;
+                }
+                else if(priorsMethodStr == "area")
+                {
+                    this->priorsMethod = rsgis::rastergis::rsgis_area;
+                }
+                else if(priorsMethodStr == "samples")
+                {
+                    this->priorsMethod = rsgis::rastergis::rsgis_samples;
+                }
+                else
+                {
+                    this->priorsMethod = rsgis::rastergis::rsgis_userdefined;
+                    try
+                    {
+                        textUtils.readFileToStringVector(priorsMethodStr);
+                    }
+                    catch(rsgis::utils::RSGISTextException &e)
+                    {
+                        throw rsgis::RSGISXMLArgumentsException("Error reading priors files. Options are equal | area | samples | file.txt");
+                    }
+                }
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'priors\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&priorsXMLStr);
+            
             
             XMLCh *rsgisFieldXMLStr = xercesc::XMLString::transcode("rsgis:field");
             xercesc::DOMNodeList *fieldNodesList = argElement->getElementsByTagName(rsgisFieldXMLStr);
@@ -2781,6 +2829,40 @@ namespace rsgisexe{
                 std::cout << "Input Class Field: " << this->inClassNameField << std::endl;
                 std::cout << "Output Class Field: " << this->outClassNameField << std::endl;
                 std::cout << "Selected Training: " << this->trainingSelectCol << std::endl;
+                std::cout << "Area Field: " << this->areaField << std::endl;
+                std::vector<float> priors;
+                if(this->priorsMethod == rsgis::rastergis::rsgis_samples)
+                {
+                    std::cout << "Priors calculated using number of samples.\n";
+                }
+                else if(this->priorsMethod == rsgis::rastergis::rsgis_area)
+                {
+                    std::cout << "Priors calculated using area of samples.\n";
+                }
+                else if(this->priorsMethod == rsgis::rastergis::rsgis_equal)
+                {
+                    std::cout << "Priors will all be equal.\n";
+                }
+                else if(this->priorsMethod == rsgis::rastergis::rsgis_userdefined)
+                {
+                    std::cout << "Priors have been defined by the user as: \n";
+                    int idx = 1;
+                    rsgis::utils::RSGISTextUtils textUtils;
+                    for(std::vector<std::string>::iterator iterStrs = this->priorStrs.begin(); iterStrs != this->priorStrs.end(); ++iterStrs)
+                    {
+                        std::cout << "\t" << idx << ": " << *iterStrs << std::endl;
+                        try
+                        {
+                            priors.push_back(textUtils.strtofloat(*iterStrs));
+                        }
+                        catch (rsgis::utils::RSGISTextException &e)
+                        {
+                            throw rsgis::RSGISException(e.what());
+                        }
+                        
+                    }
+                }
+                
                 std::cout << "Using Features:\n";
                 for(std::vector<std::string>::iterator iterFields = fields.begin(); iterFields != fields.end(); ++iterFields)
                 {
@@ -2799,7 +2881,7 @@ namespace rsgisexe{
                     }
                     
                     rsgis::rastergis::RSGISMaxLikelihoodRATClassification mlRat;
-                    mlRat.applyMLClassifier(inputDataset, this->inClassNameField, this->outClassNameField, this->trainingSelectCol, this->fields);
+                    mlRat.applyMLClassifier(inputDataset, this->inClassNameField, this->outClassNameField, this->trainingSelectCol, this->areaField, this->fields, this->priorsMethod, priors);
                     
                     GDALClose(inputDataset);
                 }
