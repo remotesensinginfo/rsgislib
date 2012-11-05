@@ -44,19 +44,46 @@ namespace rsgis {namespace math{
     
     typedef struct MaximumLikelihood
     {
-        int nclasses; /*number of classes*/
-        int *classes; /*array of the class names*/
-        int *npoints_for_class; /*number of examples contained in each class*/
-        int d; /*number of predictor variables*/
-        double **mean; /*for each class, the mean value of the examples stored
-                        in an array of length nvars*/
-        double ***covar; /*for each class, the covariance matrix of the esamples
-                          stored in a matrix of dimension nvars x nvars*/
-        double ***inv_covar; /*for each class, the inverse of the covariance matrix
-                              stored in a matrix of dimension nvars x nvars*/
-        double *priors; /* prior probabilities of each class*/
-        double *det; /*for each class, the determinant of the inverse of the
-                      covariance matrix*/
+        /**
+         * number of classes
+         */
+        int nclasses;
+        /**
+         * array of the class names
+         */
+        int *classes;
+        /** 
+         * number of examples contained in each class
+         */
+        int *npoints_for_class; 
+        /** 
+         * number of predictor variables
+         */
+        int d;
+        /** 
+         * for each class, the mean value of the examples stored
+         * in an array of length nvars
+         */
+        double **mean;
+        /** 
+         * for each class, the covariance matrix of the esamples
+         * stored in a matrix of dimension nvars x nvars
+         */
+        double ***covar;
+        /** 
+         * for each class, the inverse of the covariance matrix
+         * stored in a matrix of dimension nvars x nvars
+         */
+        double ***inv_covar;
+        /** 
+         * prior probabilities of each class
+         */
+        double *priors;
+        /**
+         * for each class, the determinant of the inverse of the
+         * covariance matrix
+         */
+        double *det;
     } MaximumLikelihood;
 
 
