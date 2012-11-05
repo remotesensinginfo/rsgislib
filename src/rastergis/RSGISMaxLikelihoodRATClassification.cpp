@@ -30,7 +30,7 @@ namespace rsgis{namespace rastergis{
         
     }
     
-    void RSGISMaxLikelihoodRATClassification::applyMLClassifier(GDALDataset *image, std::string inClassCol, std::string outClassCol, std::string trainingSelectCol, std::vector<std::string> inColumns) throw(rsgis::RSGISAttributeTableException)
+    void RSGISMaxLikelihoodRATClassification::applyMLClassifier(GDALDataset *image, std::string inClassCol, std::string outClassCol, std::string trainingSelectCol, std::string areaCol, std::vector<std::string> inColumns, rsgismlpriors priorsMethod, std::vector<float> defPriors) throw(rsgis::RSGISAttributeTableException)
     {
         try
         {
@@ -66,6 +66,8 @@ namespace rsgis{namespace rastergis{
             bool trainingSelectColFound = false;
             int outClassColIdx = 0;
             bool outClassColFound = false;
+            int areaColIdx = 0;
+            bool areaColFound = false;
             bool *foundIdx = new bool[inColumns.size()];
             int *colIdxs = new int[inColumns.size()];
             for(size_t i = 0; i < inColumns.size(); ++i)
@@ -91,6 +93,11 @@ namespace rsgis{namespace rastergis{
                     outClassColFound = true;
                     outClassColIdx = i;
                 }
+                else if(!areaColFound && (std::string(attTable->GetNameOfCol(i)) == areaCol))
+                {
+                    areaColFound = true;
+                    areaColIdx = i;
+                }
                 else
                 {
                     for(size_t j = 0; j < inColumns.size(); ++j)
@@ -114,6 +121,11 @@ namespace rsgis{namespace rastergis{
                 throw rsgis::RSGISAttributeTableException("Could not find the selected for training column.");
             }
             
+            if(!areaColFound)
+            {
+                throw rsgis::RSGISAttributeTableException("Could not find the area column.");
+            }
+            
             if(!outClassColFound)
             {
                 attTable->CreateColumn(outClassCol.c_str(), GFT_Integer, GFU_Generic);
@@ -128,6 +140,7 @@ namespace rsgis{namespace rastergis{
                     throw rsgis::RSGISAttributeTableException(message);
                 }
             }
+            delete[] foundIdx;
             
             int numTrainingSamples = 0;
             std::list<int> classes;
@@ -152,16 +165,54 @@ namespace rsgis{namespace rastergis{
             mlStruct->d = inColumns.size();
             
             unsigned int idx = 0;
+            std::vector<std::string> outColPostNames;
+            rsgis::math::RSGISMathsUtils mathUtils;
+            std::string colName = "";
             for(std::list<int>::iterator iterClasses = classes.begin(); iterClasses != classes.end(); ++iterClasses)
             {
                 std::cout << "Class " << *iterClasses << std::endl;
                 mlStruct->classes[idx] = *iterClasses;
+                colName = outClassCol + std::string("_") + mathUtils.inttostring(*iterClasses);
+                outColPostNames.push_back(colName);
                 ++idx;
             }
+            
+            
+            bool *foundOutPostIdx = new bool[mlStruct->nclasses];
+            int *colOutPostIdxs = new int[mlStruct->nclasses];
+            for(size_t i = 0; i < mlStruct->nclasses; ++i)
+            {
+                foundOutPostIdx[i] = false;
+                colOutPostIdxs[i] = 0;
+            }
+            
+            for(int i = 0; i < numColumns; ++i)
+            {
+                for(size_t j = 0; j < mlStruct->nclasses; ++j)
+                {
+                    if(!foundOutPostIdx[j] && (std::string(attTable->GetNameOfCol(i)) == outColPostNames.at(j)))
+                    {
+                        colOutPostIdxs[j] = i;
+                        foundOutPostIdx[j] = true;
+                    }
+                }
+            }
+            
+            for(size_t j = 0; j < mlStruct->nclasses; ++j)
+            {
+                if(!foundOutPostIdx[j])
+                {
+                    attTable->CreateColumn(outColPostNames.at(j).c_str(), GFT_Real, GFU_Generic);
+                    colOutPostIdxs[j] = numColumns++;
+                }
+            }
+            delete[] foundOutPostIdx;
             
             std::cout << "Training the ML classifier\n";
             int *mlClasses = new int[numTrainingSamples];
             double **samples = new double*[numTrainingSamples];
+            double *samplesArea = new double[numTrainingSamples];
+            double totalArea = 0;
             idx = 0;
             for(size_t i = 1; i < numRows; ++i)
             {
@@ -169,6 +220,8 @@ namespace rsgis{namespace rastergis{
                 if((attTable->GetValueAsInt(i, trainingSelectColIdx) == 1) & (classID > 0))
                 {
                     mlClasses[idx] = classID;
+                    samplesArea[idx] = attTable->GetValueAsDouble(i, areaColIdx);
+                    totalArea += samplesArea[idx];
                     samples[idx] = new double[inColumns.size()];
                     for(size_t j = 0; j < inColumns.size(); ++j)
                     {
@@ -181,6 +234,36 @@ namespace rsgis{namespace rastergis{
             rsgis::math::RSGISMaximumLikelihood mlObj;
             
             mlObj.compute_ml(mlStruct, numTrainingSamples, inColumns.size(), samples, mlClasses);
+            
+            for(int i = 0; i < mlStruct->nclasses; ++i)
+            {
+                if(priorsMethod == rsgis_equal)
+                {
+                    mlStruct->priors[i] = 1.0 / ((float)(mlStruct->nclasses));
+                }
+                else if(priorsMethod == rsgis_samples)
+                {
+                    // Do nothing this is the library default...
+                }
+                else if(priorsMethod == rsgis_area)
+                {
+                    double classAreaTotal = 0;
+                    for(int n = 0; n < numTrainingSamples; ++n)
+                    {
+                        if(mlClasses[n] == mlStruct->classes[i])
+                        {
+                            classAreaTotal += samplesArea[n];
+                        }
+                    }
+                    mlStruct->priors[i] = classAreaTotal / totalArea;
+                }
+                else if(priorsMethod == rsgis_userdefined)
+                {
+                    mlStruct->priors[i] = defPriors.at(i);
+                }
+                std::cout << "Class " << mlStruct->classes[i] << " has prior " << mlStruct->priors[i] << std::endl;
+            }
+            
             
             double *data = new double[inColumns.size()];
             double *posteriorProbs = new double[inColumns.size()];
@@ -205,6 +288,14 @@ namespace rsgis{namespace rastergis{
                     }
                     
                     classID = mlObj.predict_ml(mlStruct, data, &posteriorProbs);
+                    
+                    //std::cout << i << ")\n";
+                    for(int j = 0; j < mlStruct->nclasses; ++j)
+                    {
+                        //std::cout << "\tClass " << mlStruct->classes[j] << " has Posterior "<< posteriorProbs[j] << std::endl;
+                        attTable->SetValue(i, colOutPostIdxs[j], posteriorProbs[j]);
+                    }
+                    
                 }
                 attTable->SetValue(i, outClassColIdx, classID);
             }
@@ -220,6 +311,9 @@ namespace rsgis{namespace rastergis{
             delete[] samples;
             delete[] data;
             delete[] posteriorProbs;
+            delete[] colOutPostIdxs;
+            delete[] colIdxs;
+            delete[] samplesArea;
         }
         catch(rsgis::RSGISAttributeTableException &e)
         {

@@ -42,11 +42,19 @@
 
 namespace rsgis{namespace rastergis{
     
+    enum rsgismlpriors
+    {
+        rsgis_samples,
+        rsgis_area,
+        rsgis_equal,
+        rsgis_userdefined
+    };
+    
     class RSGISMaxLikelihoodRATClassification
     {
     public:
         RSGISMaxLikelihoodRATClassification();
-        void applyMLClassifier(GDALDataset *image, std::string inClassCol, std::string outClassCol, std::string trainingSelectCol, std::vector<std::string> inColumns) throw(rsgis::RSGISAttributeTableException);
+        void applyMLClassifier(GDALDataset *image, std::string inClassCol, std::string outClassCol, std::string trainingSelectCol, std::string areaCol, std::vector<std::string> inColumns, rsgismlpriors priorsMethod, std::vector<float> defPriors) throw(rsgis::RSGISAttributeTableException);
         ~RSGISMaxLikelihoodRATClassification();
     };
 	

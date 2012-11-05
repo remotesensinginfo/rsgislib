@@ -145,6 +145,8 @@ namespace rsgisexe{
         GDALDataType outDataType;
         rsgis::rastergis::SpectralDistanceMethod distThresMethod;
         float specThresOriginDist;
+        rsgis::rastergis::rsgismlpriors priorsMethod;
+        std::vector<std::string> priorStrs;
     };
     
 }
