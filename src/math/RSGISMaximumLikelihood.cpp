@@ -69,6 +69,7 @@ namespace rsgis {namespace math{
         {
             for(i=0; i<ml->nclasses; i++)
             {
+                //std::cout << "ml->classes[" << i << "]: " << ml->classes[i] << std::endl;
                 if(ml->classes[i] != i+1)
                 {
                     fprintf(stderr,"compute_ml: for %d-class classification classes must be 1,...,%d\n",ml->nclasses,ml->nclasses);
@@ -76,7 +77,6 @@ namespace rsgis {namespace math{
                 }
             }
         }
-    
         
         if(!(ml->npoints_for_class=ivector(ml->nclasses)))
         {

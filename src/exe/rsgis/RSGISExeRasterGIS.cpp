@@ -64,6 +64,8 @@ namespace rsgisexe{
         XMLCh *optionStrClassMajority = xercesc::XMLString::transcode("strclassmajority");
         XMLCh *optionSpecDistMajorityClassifier = xercesc::XMLString::transcode("specdistmajorityclassifier");
         
+        XMLCh *optionMaxLikelihoodClassifier = xercesc::XMLString::transcode("maxlikelihoodclassifier");
+        
         const XMLCh *algorNameEle = argElement->getAttribute(algorXMLStr);
         if(!xercesc::XMLString::equals(algorName, algorNameEle))
         {
@@ -1878,6 +1880,97 @@ namespace rsgisexe{
                 xercesc::XMLString::release(&nameXMLStr);
             }
         }
+        else if(xercesc::XMLString::equals(optionMaxLikelihoodClassifier, optionXML))
+        {
+            this->option = RSGISExeRasterGIS::maxlikelihoodclassifier;
+            
+            XMLCh *imageXMLStr = xercesc::XMLString::transcode("image");
+            if(argElement->hasAttribute(imageXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(imageXMLStr));
+                this->inputImage = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&imageXMLStr);
+            
+            XMLCh *inClassFieldXMLStr = xercesc::XMLString::transcode("inclassfield");
+            if(argElement->hasAttribute(inClassFieldXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(inClassFieldXMLStr));
+                this->inClassNameField = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'inclassfield\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&inClassFieldXMLStr);
+            
+            XMLCh *outClassFieldXMLStr = xercesc::XMLString::transcode("outclassfield");
+            if(argElement->hasAttribute(outClassFieldXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outClassFieldXMLStr));
+                this->outClassNameField = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'outclassfield\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&outClassFieldXMLStr);
+            
+            XMLCh *trainingColXMLStr = xercesc::XMLString::transcode("trainingcol");
+            if(argElement->hasAttribute(trainingColXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(trainingColXMLStr));
+                this->trainingSelectCol = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'trainingcol\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&trainingColXMLStr);
+            
+           
+            
+            XMLCh *rsgisFieldXMLStr = xercesc::XMLString::transcode("rsgis:field");
+            xercesc::DOMNodeList *fieldNodesList = argElement->getElementsByTagName(rsgisFieldXMLStr);
+            unsigned int numFieldTags = fieldNodesList->getLength();
+            
+            std::cout << "Found " << numFieldTags << " field tags" << std::endl;
+            
+            if(numFieldTags == 0)
+            {
+                throw rsgis::RSGISXMLArgumentsException("No field tags have been provided, at least 1 is required.");
+            }
+            
+            fields.reserve(numFieldTags);
+            
+            xercesc::DOMElement *attElement = NULL;
+            std::string fieldName = "";
+            for(int i = 0; i < numFieldTags; i++)
+            {
+                attElement = static_cast<xercesc::DOMElement*>(fieldNodesList->item(i));
+                
+                XMLCh *nameXMLStr = xercesc::XMLString::transcode("name");
+                if(attElement->hasAttribute(nameXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(attElement->getAttribute(nameXMLStr));
+                    fields.push_back(std::string(charValue));
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'name\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&nameXMLStr);
+            }
+        }
         else
         {
             std::string message = std::string("The option (") + std::string(xercesc::XMLString::transcode(optionXML)) + std::string(") is not known: RSGISExeRasterGIS.");
@@ -1907,6 +2000,7 @@ namespace rsgisexe{
         xercesc::XMLString::release(&optionExportCols2Raster);
         xercesc::XMLString::release(&optionStrClassMajority);
         xercesc::XMLString::release(&optionSpecDistMajorityClassifier);
+        xercesc::XMLString::release(&optionMaxLikelihoodClassifier);
     }
     
     void RSGISExeRasterGIS::runAlgorithm() throw(rsgis::RSGISException)
@@ -2680,6 +2774,40 @@ namespace rsgisexe{
                     throw e;
                 }
             }
+            else if(this->option == RSGISExeRasterGIS::maxlikelihoodclassifier)
+            {
+                std::cout << "A command to classify segments using a spectral distance majority classification.\n";
+                std::cout << "Input Image: " << this->inputImage << std::endl;
+                std::cout << "Input Class Field: " << this->inClassNameField << std::endl;
+                std::cout << "Output Class Field: " << this->outClassNameField << std::endl;
+                std::cout << "Selected Training: " << this->trainingSelectCol << std::endl;
+                std::cout << "Using Features:\n";
+                for(std::vector<std::string>::iterator iterFields = fields.begin(); iterFields != fields.end(); ++iterFields)
+                {
+                    std::cout << "\tField: " << (*iterFields) << std::endl;
+                }
+                
+                try
+                {
+                    GDALAllRegister();
+                    
+                    GDALDataset *inputDataset = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_Update);
+                    if(inputDataset == NULL)
+                    {
+                        std::string message = std::string("Could not open image ") + this->inputImage;
+                        throw rsgis::RSGISImageException(message.c_str());
+                    }
+                    
+                    rsgis::rastergis::RSGISMaxLikelihoodRATClassification mlRat;
+                    mlRat.applyMLClassifier(inputDataset, this->inClassNameField, this->outClassNameField, this->trainingSelectCol, this->fields);
+                    
+                    GDALClose(inputDataset);
+                }
+                catch(rsgis::RSGISException &e)
+                {
+                    throw e;
+                }
+            }
             else
             {
                 throw rsgis::RSGISException("The option is not recognised: RSGISExeRasterGIS");
@@ -2892,6 +3020,19 @@ namespace rsgisexe{
                 std::cout << "Output Format: " << this->imageFormat << std::endl;
                 std::cout << "Output File: " << this->outputFile << std::endl;
                 std::cout << "Fields:\n";
+                for(std::vector<std::string>::iterator iterFields = fields.begin(); iterFields != fields.end(); ++iterFields)
+                {
+                    std::cout << "\tField: " << (*iterFields) << std::endl;
+                }
+            }
+            else if(this->option == RSGISExeRasterGIS::maxlikelihoodclassifier)
+            {
+                std::cout << "A command to classify segments using a spectral distance majority classification.\n";
+                std::cout << "Input Image: " << this->inputImage << std::endl;
+                std::cout << "Input Class Field: " << this->inClassNameField << std::endl;
+                std::cout << "Output Class Field: " << this->outClassNameField << std::endl;
+                std::cout << "Selected Training: " << this->trainingSelectCol << std::endl;
+                std::cout << "Using Features:\n";
                 for(std::vector<std::string>::iterator iterFields = fields.begin(); iterFields != fields.end(); ++iterFields)
                 {
                     std::cout << "\tField: " << (*iterFields) << std::endl;

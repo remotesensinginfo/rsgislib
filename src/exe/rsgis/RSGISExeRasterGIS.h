@@ -49,6 +49,7 @@
 #include "rastergis/RSGISExportColumns2Image.h"
 #include "rastergis/RSGISFindInfoBetweenLayers.h"
 #include "rastergis/RSGISFindClosestSpecSpatialFeats.h"
+#include "rastergis/RSGISMaxLikelihoodRATClassification.h"
 
 #include "gdal_priv.h"
 #include "ogrsf_frmts.h"
@@ -84,7 +85,8 @@ namespace rsgisexe{
             exportcols2raster,
             strclassmajority,
             findspecclose,
-            specdistmajorityclassifier
+            specdistmajorityclassifier,
+            maxlikelihoodclassifier
         };
         
         RSGISExeRasterGIS();
