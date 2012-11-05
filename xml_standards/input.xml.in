@@ -389,6 +389,8 @@
     </rsgis:command>
 	<!-- A command to calculate the top N features within a given spatial distance -->
 	<rsgis:command algor="rastergis" option="findtopn" image="image.kea" spatialdist="string" metricdist="string" n="int" distthreshold="float" outfield="string" />
+	<!-- A command to calculate the features within a given spatial and spectral distance -->
+	<rsgis:command algor="rastergis" option="findspecclose" image="image.kea" spatialdist="string" metricdist="string" specdistthreshold="float" spatdistthreshold="float" outfield="string" />
 	<!-- A command to populate an attribute table with statistics from an image -->
 	<rsgis:command algor="rastergis" option="popattributestats" clumps="clumps.env" input="image.env" >
         <rsgis:band band="int" [min="field"] [max="field"] [mean="field"] [sum="field"] [stddev="field"] />
@@ -446,7 +448,12 @@
     </rsgis:command>
 	<!-- A command to find the majority for class (string - field) from one set of objects to another set objects -->
 	<rsgis:command algor="rastergis" option="strclassmajority" base="image.kea" baseclass="column" info="image.kea" infoclass="column" />
-
+	<!-- A command to classify segments using a spectral distance majority classification -->
+	<rsgis:command algor="rastergis" option="specdistmajorityclassifier" image="image.kea" inclassfield="string" outclassfield="string" eastings="string" northings="string" area="string" specdistthreshold="float" spatdistthreshold="float" weightfield="string" specdistmethod="euclidean | origineucweighted" [thresorigindist="float"] >
+		<rsgis:field name="string" />
+        <rsgis:field name="string" />
+        <rsgis:field name="string" />
+    </rsgis:command>
 
 
 

@@ -48,6 +48,7 @@
 #include "rastergis/RSGISKNNATTMajorityClassifier.h"
 #include "rastergis/RSGISExportColumns2Image.h"
 #include "rastergis/RSGISFindInfoBetweenLayers.h"
+#include "rastergis/RSGISFindClosestSpecSpatialFeats.h"
 
 #include "gdal_priv.h"
 #include "ogrsf_frmts.h"
@@ -81,7 +82,9 @@ namespace rsgisexe{
             colourstrclasses,
             gencolourtab,
             exportcols2raster,
-            strclassmajority
+            strclassmajority,
+            findspecclose,
+            specdistmajorityclassifier
         };
         
         RSGISExeRasterGIS();
@@ -121,8 +124,10 @@ namespace rsgisexe{
         std::string infoSegment;
         std::string baseClassCol;
         std::string infoClassCol;
+        std::string trainingSelectCol;
         size_t fid;
         unsigned int nFeatures;
+        float specDistThreshold;
         float distThreshold;
         std::vector<rsgis::rastergis::RSGISBandAttStats*> *bandStats;
         std::vector<rsgis::rastergis::RSGISBandAttPercentiles*> *bandPercentiles;
@@ -136,6 +141,8 @@ namespace rsgisexe{
         unsigned int greenBand;
         unsigned int blueBand;
         GDALDataType outDataType;
+        rsgis::rastergis::SpectralDistanceMethod distThresMethod;
+        float specThresOriginDist;
     };
     
 }
