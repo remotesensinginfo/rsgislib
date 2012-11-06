@@ -86,7 +86,8 @@ namespace rsgisexe{
             strclassmajority,
             findspecclose,
             specdistmajorityclassifier,
-            maxlikelihoodclassifier
+            maxlikelihoodclassifier,
+            maxlikelihoodclassifierlocalpriors
         };
         
         RSGISExeRasterGIS();
