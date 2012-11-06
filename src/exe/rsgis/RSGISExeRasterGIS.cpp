@@ -2101,6 +2101,19 @@ namespace rsgisexe{
             }
             xercesc::XMLString::release(&northingsXMLStr);
             
+            XMLCh *areaXMLStr = xercesc::XMLString::transcode("area");
+            if(argElement->hasAttribute(areaXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(areaXMLStr));
+                this->areaField = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'area\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&areaXMLStr);
+            
             XMLCh *spatialRadiusXMLStr = xercesc::XMLString::transcode("spatialradius");
             if(argElement->hasAttribute(spatialRadiusXMLStr))
             {
@@ -3029,6 +3042,7 @@ namespace rsgisexe{
                 std::cout << "Selected Training: " << this->trainingSelectCol << std::endl;
                 std::cout << "Eastings Field: " << this->eastingsField << std::endl;
                 std::cout << "Northings Field: " << this->northingsField << std::endl;
+                std::cout << "Area Field: " << this->areaField << std::endl;
                 std::cout << "Search Radius: " << this->distThreshold << std::endl;
                 std::cout << "Using Features:\n";
                 for(std::vector<std::string>::iterator iterFields = fields.begin(); iterFields != fields.end(); ++iterFields)
@@ -3048,7 +3062,7 @@ namespace rsgisexe{
                     }
                     
                     rsgis::rastergis::RSGISMaxLikelihoodRATClassification mlRat;
-                    mlRat.applyMLClassifierLocalPriors(inputDataset, this->inClassNameField, this->outClassNameField, this->trainingSelectCol, this->fields, this->eastingsField, this->northingsField, this->distThreshold);
+                    mlRat.applyMLClassifierLocalPriors(inputDataset, this->inClassNameField, this->outClassNameField, this->trainingSelectCol, this->areaField, this->fields, this->eastingsField, this->northingsField, this->distThreshold);
                     
                     GDALClose(inputDataset);
                 }

@@ -325,7 +325,7 @@ namespace rsgis{namespace rastergis{
         }
     }
     
-    void RSGISMaxLikelihoodRATClassification::applyMLClassifierLocalPriors(GDALDataset *image, std::string inClassCol, std::string outClassCol, std::string trainingSelectCol, std::vector<std::string> inColumns, std::string eastingsCol, std::string northingsCol, float searchRadius) throw(rsgis::RSGISAttributeTableException)
+    void RSGISMaxLikelihoodRATClassification::applyMLClassifierLocalPriors(GDALDataset *image, std::string inClassCol, std::string outClassCol, std::string trainingSelectCol, std::string areaCol, std::vector<std::string> inColumns, std::string eastingsCol, std::string northingsCol, float searchRadius) throw(rsgis::RSGISAttributeTableException)
     {
         try
         {
@@ -354,7 +354,6 @@ namespace rsgis{namespace rastergis{
             
             
             // Get the column indexes and create output column if not present.
-            
             int inClassColIdx = 0;
             bool inClassColFound = false;
             int trainingSelectColIdx = 0;
@@ -365,6 +364,8 @@ namespace rsgis{namespace rastergis{
             bool eastColFound = false;
             int northColIdx = 0;
             bool northColFound = false;
+            int areaColIdx = 0;
+            bool areaColFound = false;
             bool *foundIdx = new bool[inColumns.size()];
             int *colIdxs = new int[inColumns.size()];
             for(size_t i = 0; i < inColumns.size(); ++i)
@@ -400,6 +401,11 @@ namespace rsgis{namespace rastergis{
                     northColFound = true;
                     northColIdx = i;
                 }
+                else if(!areaColFound && (std::string(attTable->GetNameOfCol(i)) == areaCol))
+                {
+                    areaColFound = true;
+                    areaColIdx = i;
+                }
                 else
                 {
                     for(size_t j = 0; j < inColumns.size(); ++j)
@@ -431,6 +437,11 @@ namespace rsgis{namespace rastergis{
             if(!northColFound)
             {
                 throw rsgis::RSGISAttributeTableException("Could not find the northings column.");
+            }
+            
+            if(!areaColFound)
+            {
+                throw rsgis::RSGISAttributeTableException("Could not find the area column.");
             }
             
             if(!outClassColFound)
@@ -578,7 +589,7 @@ namespace rsgis{namespace rastergis{
                 if(attTable->GetValueAsInt(i, inClassColIdx) > 0)
                 {
                     // Find local priors...
-                    this->getLocalPriors(mlStruct, attTable, i, trainingSelectColIdx, eastColIdx, northColIdx, inClassColIdx, searchRadius);
+                    this->getLocalPriors(mlStruct, attTable, i, trainingSelectColIdx, eastColIdx, northColIdx, inClassColIdx, areaColIdx, searchRadius);
                     
                     for(size_t j = 0; j < inColumns.size(); ++j)
                     {
@@ -641,7 +652,7 @@ namespace rsgis{namespace rastergis{
         return sqrt(dist/((double)numVals));
     }
     
-    void RSGISMaxLikelihoodRATClassification::getLocalPriors(rsgis::math::MaximumLikelihood *mlStruct, GDALRasterAttributeTable *attTable, size_t fid, int trainingSelectColIdx, int eastingsIdx, int northingsIdx, int classColIdx, float spatialRadius)throw(rsgis::RSGISAttributeTableException)
+    void RSGISMaxLikelihoodRATClassification::getLocalPriors(rsgis::math::MaximumLikelihood *mlStruct, GDALRasterAttributeTable *attTable, size_t fid, int trainingSelectColIdx, int eastingsIdx, int northingsIdx, int classColIdx, int areaColIdx, float spatialRadius)throw(rsgis::RSGISAttributeTableException)
     {
         try
         {
@@ -653,7 +664,7 @@ namespace rsgis{namespace rastergis{
             fidValsSpatial.push_back(attTable->GetValueAsDouble(fid, eastingsIdx));
             fidValsSpatial.push_back(attTable->GetValueAsDouble(fid, northingsIdx));
             
-            unsigned long *classCounts = new unsigned long[mlStruct->nclasses];
+            double *classCounts = new double[mlStruct->nclasses];
             for(unsigned int i = 0; i < mlStruct->nclasses; ++i)
             {
                 classCounts[i] = 0;
@@ -662,6 +673,7 @@ namespace rsgis{namespace rastergis{
             // Find all segments within distance threshold
             size_t numRows = attTable->GetRowCount();
             int classVal = 0;
+            double segArea = 0;
             bool classFound = false;
             int classFoundIdx = 0;
             for(size_t n = 1; n < numRows; ++n)
@@ -690,7 +702,8 @@ namespace rsgis{namespace rastergis{
                             
                             if(classFound)
                             {
-                                classCounts[classFoundIdx] += 1;
+                                segArea = attTable->GetValueAsDouble(n, areaColIdx);
+                                classCounts[classFoundIdx] += segArea;
                             }
                             else
                             {
@@ -712,7 +725,7 @@ namespace rsgis{namespace rastergis{
             
             for(unsigned int i = 0; i < mlStruct->nclasses; ++i)
             {
-                mlStruct->priors[i] = ((float)classCounts[i])/totalSegCount;
+                mlStruct->priors[i] = classCounts[i]/totalSegCount;
             }
             delete[] classCounts;
             
