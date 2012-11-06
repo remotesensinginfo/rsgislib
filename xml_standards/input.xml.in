@@ -930,7 +930,7 @@
     <!-- A command which labels image pixels with the id of the nearest cluster centre -->
     <rsgis:command algor="segmentation" option="labelsfromclusters" image="image.env" output="image_out.env" clusters="matrix.gmtxt" ignorezeros="yes | no" format="GDAL Format" proj="OSGB | NZ2000 | NZ1949 | IMAGE" />
     <!-- A command which creates in image with a unique id for each pixel -->
-    <rsgis:command algor="segmentation" option="labelsfromcpixels" image="image.env" output="image_out.env" ignorezeros="yes | no" format="GDAL Format" proj="OSGB | NZ2000 | NZ1949 | IMAGE" />
+    <rsgis:command algor="segmentation" option="labelsfrompixels" image="image.env" output="image_out.env" ignorezeros="yes | no" format="GDAL Format" proj="OSGB | NZ2000 | NZ1949 | IMAGE" />
     <!-- A command which iteratively removes single pixel labelled neighbours into spectrally closest large group -->
     <rsgis:command algor="segmentation" option="elimsinglepxls" image="image.env" clumps="image.env" [temp="image.env"] output="image_out.env" ignorezeros="yes | no" format="GDAL Format" proj="OSGB | NZ2000 | NZ1949 | IMAGE" />
     <!-- A command to grow regions from seeds up to a given distance in spectral space. -->
