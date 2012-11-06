@@ -325,6 +325,404 @@ namespace rsgis{namespace rastergis{
         }
     }
     
+    void RSGISMaxLikelihoodRATClassification::applyMLClassifierLocalPriors(GDALDataset *image, std::string inClassCol, std::string outClassCol, std::string trainingSelectCol, std::vector<std::string> inColumns, std::string eastingsCol, std::string northingsCol, float searchRadius) throw(rsgis::RSGISAttributeTableException)
+    {
+        try
+        {
+            const GDALRasterAttributeTable *attTableTmp = image->GetRasterBand(1)->GetDefaultRAT();
+            GDALRasterAttributeTable *attTable = NULL;
+            if(attTableTmp != NULL)
+            {
+                attTable = new GDALRasterAttributeTable(*attTableTmp);
+            }
+            else
+            {
+                attTable = new GDALRasterAttributeTable();
+            }
+            int numRows = attTable->GetRowCount();
+            int numColumns = attTable->GetColumnCount();
+            
+            if(numRows == 0)
+            {
+                throw rsgis::RSGISAttributeTableException("The attribute table does not have any rows.");
+            }
+            
+            if(numColumns == 0)
+            {
+                throw rsgis::RSGISAttributeTableException("The attribute table does not have any column.");
+            }
+            
+            
+            // Get the column indexes and create output column if not present.
+            
+            int inClassColIdx = 0;
+            bool inClassColFound = false;
+            int trainingSelectColIdx = 0;
+            bool trainingSelectColFound = false;
+            int outClassColIdx = 0;
+            bool outClassColFound = false;
+            int eastColIdx = 0;
+            bool eastColFound = false;
+            int northColIdx = 0;
+            bool northColFound = false;
+            bool *foundIdx = new bool[inColumns.size()];
+            int *colIdxs = new int[inColumns.size()];
+            for(size_t i = 0; i < inColumns.size(); ++i)
+            {
+                foundIdx[i] = false;
+                colIdxs[i] = 0;
+            }
+            
+            for(int i = 0; i < numColumns; ++i)
+            {
+                if(!inClassColFound && (std::string(attTable->GetNameOfCol(i)) == inClassCol))
+                {
+                    inClassColFound = true;
+                    inClassColIdx = i;
+                }
+                else if(!trainingSelectColFound && (std::string(attTable->GetNameOfCol(i)) == trainingSelectCol))
+                {
+                    trainingSelectColFound = true;
+                    trainingSelectColIdx = i;
+                }
+                else if(!outClassColFound && (std::string(attTable->GetNameOfCol(i)) == outClassCol))
+                {
+                    outClassColFound = true;
+                    outClassColIdx = i;
+                }
+                else if(!eastColFound && (std::string(attTable->GetNameOfCol(i)) == eastingsCol))
+                {
+                    eastColFound = true;
+                    eastColIdx = i;
+                }
+                else if(!northColFound && (std::string(attTable->GetNameOfCol(i)) == northingsCol))
+                {
+                    northColFound = true;
+                    northColIdx = i;
+                }
+                else
+                {
+                    for(size_t j = 0; j < inColumns.size(); ++j)
+                    {
+                        if(!foundIdx[j] && (std::string(attTable->GetNameOfCol(i)) == inColumns.at(j)))
+                        {
+                            colIdxs[j] = i;
+                            foundIdx[j] = true;
+                        }
+                    }
+                }
+            }
+            
+            if(!inClassColFound)
+            {
+                throw rsgis::RSGISAttributeTableException("Could not find the input class column.");
+            }
+            
+            if(!trainingSelectColFound)
+            {
+                throw rsgis::RSGISAttributeTableException("Could not find the selected for training column.");
+            }
+            
+            if(!eastColFound)
+            {
+                throw rsgis::RSGISAttributeTableException("Could not find the eastings column.");
+            }
+            
+            if(!northColFound)
+            {
+                throw rsgis::RSGISAttributeTableException("Could not find the northings column.");
+            }
+            
+            if(!outClassColFound)
+            {
+                attTable->CreateColumn(outClassCol.c_str(), GFT_Integer, GFU_Generic);
+                outClassColIdx = numColumns++;
+            }
+            
+            for(size_t j = 0; j < inColumns.size(); ++j)
+            {
+                if(!foundIdx[j])
+                {
+                    std::string message = std::string("Column ") + inColumns.at(j) + std::string(" is not within the attribute table.");
+                    throw rsgis::RSGISAttributeTableException(message);
+                }
+            }
+            delete[] foundIdx;
+            
+            int numTrainingSamples = 0;
+            std::list<int> classes;
+            int classID = 0;
+            std::cout << "Finding the classes...\n";
+            for(size_t i = 1; i < numRows; ++i)
+            {
+                classID = attTable->GetValueAsInt(i, inClassColIdx);
+                if((attTable->GetValueAsInt(i, trainingSelectColIdx) == 1) & (classID > 0))
+                {
+                    classes.push_back(classID);
+                    ++numTrainingSamples;
+                }
+            }
+            
+            classes.sort();
+            classes.unique();
+            
+            rsgis::math::MaximumLikelihood *mlStruct = new rsgis::math::MaximumLikelihood();
+            mlStruct->nclasses = classes.size();
+            mlStruct->classes = new int[mlStruct->nclasses];
+            mlStruct->d = inColumns.size();
+            
+            unsigned int idx = 0;
+            std::vector<std::string> outColPostNames;
+            std::vector<std::string> outColPriorNames;
+            rsgis::math::RSGISMathsUtils mathUtils;
+            std::string colName = "";
+            for(std::list<int>::iterator iterClasses = classes.begin(); iterClasses != classes.end(); ++iterClasses)
+            {
+                std::cout << "Class " << *iterClasses << std::endl;
+                mlStruct->classes[idx] = *iterClasses;
+                colName = outClassCol + std::string("Po_") + mathUtils.inttostring(*iterClasses);
+                outColPostNames.push_back(colName);
+                colName = outClassCol + std::string("Pr_") + mathUtils.inttostring(*iterClasses);
+                outColPriorNames.push_back(colName);
+                ++idx;
+            }
+            
+            bool *foundOutPostIdx = new bool[mlStruct->nclasses];
+            int *colOutPostIdxs = new int[mlStruct->nclasses];
+            for(size_t i = 0; i < mlStruct->nclasses; ++i)
+            {
+                foundOutPostIdx[i] = false;
+                colOutPostIdxs[i] = 0;
+            }
+            
+            bool *foundOutPriorIdx = new bool[mlStruct->nclasses];
+            int *colOutPriorIdxs = new int[mlStruct->nclasses];
+            for(size_t i = 0; i < mlStruct->nclasses; ++i)
+            {
+                foundOutPriorIdx[i] = false;
+                colOutPriorIdxs[i] = 0;
+            }
+            
+            for(int i = 0; i < numColumns; ++i)
+            {
+                for(size_t j = 0; j < mlStruct->nclasses; ++j)
+                {
+                    if(!foundOutPostIdx[j] && (std::string(attTable->GetNameOfCol(i)) == outColPostNames.at(j)))
+                    {
+                        colOutPostIdxs[j] = i;
+                        foundOutPostIdx[j] = true;
+                    }
+                    else if(!foundOutPriorIdx[j] && (std::string(attTable->GetNameOfCol(i)) == outColPriorNames.at(j)))
+                    {
+                        colOutPriorIdxs[j] = i;
+                        foundOutPriorIdx[j] = true;
+                    }
+                }
+            }
+            
+            for(size_t j = 0; j < mlStruct->nclasses; ++j)
+            {
+                if(!foundOutPostIdx[j])
+                {
+                    attTable->CreateColumn(outColPostNames.at(j).c_str(), GFT_Real, GFU_Generic);
+                    colOutPostIdxs[j] = numColumns++;
+                }
+                
+                if(!foundOutPriorIdx[j])
+                {
+                    attTable->CreateColumn(outColPriorNames.at(j).c_str(), GFT_Real, GFU_Generic);
+                    colOutPriorIdxs[j] = numColumns++;
+                }
+            }
+            delete[] foundOutPostIdx;
+            delete[] foundOutPriorIdx;
+            
+            std::cout << "Training the ML classifier\n";
+            int *mlClasses = new int[numTrainingSamples];
+            double **samples = new double*[numTrainingSamples];
+            idx = 0;
+            for(size_t i = 1; i < numRows; ++i)
+            {
+                classID = attTable->GetValueAsInt(i, inClassColIdx);
+                if((attTable->GetValueAsInt(i, trainingSelectColIdx) == 1) & (classID > 0))
+                {
+                    mlClasses[idx] = classID;
+                    samples[idx] = new double[inColumns.size()];
+                    for(size_t j = 0; j < inColumns.size(); ++j)
+                    {
+                        samples[idx][j] = attTable->GetValueAsDouble(i, colIdxs[j]);
+                    }
+                    ++idx;
+                }
+            }
+            
+            rsgis::math::RSGISMaximumLikelihood mlObj;
+            
+            mlObj.compute_ml(mlStruct, numTrainingSamples, inColumns.size(), samples, mlClasses);
+            
+            double *data = new double[inColumns.size()];
+            double *posteriorProbs = new double[inColumns.size()];
+            
+            std::cout << "Iterating through columns to classify...\n";
+            unsigned int feedbackStep = numRows/10;
+            unsigned int feedback = 10;
+            std::cout << "Started..0." << std::flush;
+            for(int i = 1; i < numRows; ++i)
+            {
+                if( (numRows > 20) && (i % feedbackStep == 0))
+                {
+                    std::cout << "." << feedback << "." << std::flush;
+                    feedback += 10;
+                }
+                classID = 0;
+                if(attTable->GetValueAsInt(i, inClassColIdx) > 0)
+                {
+                    // Find local priors...
+                    this->getLocalPriors(mlStruct, attTable, i, trainingSelectColIdx, eastColIdx, northColIdx, inClassColIdx, searchRadius);
+                    
+                    for(size_t j = 0; j < inColumns.size(); ++j)
+                    {
+                        data[j] = attTable->GetValueAsDouble(i, colIdxs[j]);
+                    }
+                    
+                    classID = mlObj.predict_ml(mlStruct, data, &posteriorProbs);
+                    
+                    for(int j = 0; j < mlStruct->nclasses; ++j)
+                    {
+                        attTable->SetValue(i, colOutPostIdxs[j], posteriorProbs[j]);
+                        attTable->SetValue(i, colOutPriorIdxs[j], mlStruct->priors[j]);
+                    }                    
+                }
+                attTable->SetValue(i, outClassColIdx, classID);
+            }
+            std::cout << ".Completed\n";
+            
+            image->GetRasterBand(1)->SetDefaultRAT(attTable);
+            
+            delete[] mlClasses;
+            for(int i = 0; i < numTrainingSamples; ++i)
+            {
+                delete[] samples[i];
+            }
+            delete[] samples;
+            delete[] data;
+            delete[] posteriorProbs;
+            delete[] colOutPostIdxs;
+            delete[] colOutPriorIdxs;
+            delete[] colIdxs;
+        }
+        catch(rsgis::RSGISAttributeTableException &e)
+        {
+            throw e;
+        }
+        catch(rsgis::RSGISException &e)
+        {
+            throw rsgis::RSGISAttributeTableException(e.what());
+        }
+    }
+    
+    double RSGISMaxLikelihoodRATClassification::getEuclideanDistance(std::vector<double> *vals1, std::vector<double> *vals2)throw(rsgis::math::RSGISMathException)
+    {
+        double dist = 0;
+        
+        if(vals1->size() != vals2->size())
+        {
+            std::cout << "vals1->size() = " << vals1->size() << std::endl;
+            std::cout << "vals2->size() = " << vals2->size() << std::endl;
+            throw rsgis::math::RSGISMathException("Value vectors are different sizes.");
+        }
+        
+        size_t numVals = vals1->size();
+        for(size_t i = 0; i < numVals; ++i)
+        {
+            dist += pow((vals1->at(i)-vals2->at(i)), 2);
+        }
+        
+        return sqrt(dist/((double)numVals));
+    }
+    
+    void RSGISMaxLikelihoodRATClassification::getLocalPriors(rsgis::math::MaximumLikelihood *mlStruct, GDALRasterAttributeTable *attTable, size_t fid, int trainingSelectColIdx, int eastingsIdx, int northingsIdx, int classColIdx, float spatialRadius)throw(rsgis::RSGISAttributeTableException)
+    {
+        try
+        {
+            std::vector<double> fidValsSpatial;
+            fidValsSpatial.reserve(2);
+            std::vector<double> cValsSpatial;
+            cValsSpatial.reserve(2);
+            
+            fidValsSpatial.push_back(attTable->GetValueAsDouble(fid, eastingsIdx));
+            fidValsSpatial.push_back(attTable->GetValueAsDouble(fid, northingsIdx));
+            
+            unsigned long *classCounts = new unsigned long[mlStruct->nclasses];
+            for(unsigned int i = 0; i < mlStruct->nclasses; ++i)
+            {
+                classCounts[i] = 0;
+            }
+            
+            // Find all segments within distance threshold
+            size_t numRows = attTable->GetRowCount();
+            int classVal = 0;
+            bool classFound = false;
+            int classFoundIdx = 0;
+            for(size_t n = 1; n < numRows; ++n)
+            {
+                if((n != fid) && (attTable->GetValueAsInt(n, trainingSelectColIdx) == 1))
+                {
+                    cValsSpatial.push_back(attTable->GetValueAsDouble(n, eastingsIdx));
+                    cValsSpatial.push_back(attTable->GetValueAsDouble(n, northingsIdx));
+                    
+                    if(this->getEuclideanDistance(&fidValsSpatial, &cValsSpatial) < spatialRadius)
+                    {
+                        classVal = attTable->GetValueAsInt(n, classColIdx);
+                        if(classVal > 0)
+                        {
+                            classFound = false;
+                            classFoundIdx = 0;
+                            for(unsigned int i = 0; i < mlStruct->nclasses; ++i)
+                            {
+                                if(classVal == mlStruct->classes[i])
+                                {
+                                    classFound = true;
+                                    classFoundIdx = i;
+                                    break;
+                                }
+                            }
+                            
+                            if(classFound)
+                            {
+                                classCounts[classFoundIdx] += 1;
+                            }
+                            else
+                            {
+                                std::cout << "classVal = " << classVal << std::endl;
+                                throw rsgis::RSGISAttributeTableException("Class found which wasn't in the classes list.");
+                            }
+                        }
+                        
+                    }
+                    cValsSpatial.clear();
+                }
+            }
+            
+            double totalSegCount = 0;
+            for(unsigned int i = 0; i < mlStruct->nclasses; ++i)
+            {
+                totalSegCount += classCounts[i];
+            }
+            
+            for(unsigned int i = 0; i < mlStruct->nclasses; ++i)
+            {
+                mlStruct->priors[i] = ((float)classCounts[i])/totalSegCount;
+            }
+            delete[] classCounts;
+            
+        }
+        catch (rsgis::RSGISException &e)
+        {
+            throw rsgis::RSGISAttributeTableException(e.what());
+        }
+    }
+    
     RSGISMaxLikelihoodRATClassification::~RSGISMaxLikelihoodRATClassification()
     {
         

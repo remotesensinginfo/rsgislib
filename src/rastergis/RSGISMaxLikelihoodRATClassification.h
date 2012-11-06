@@ -55,7 +55,11 @@ namespace rsgis{namespace rastergis{
     public:
         RSGISMaxLikelihoodRATClassification();
         void applyMLClassifier(GDALDataset *image, std::string inClassCol, std::string outClassCol, std::string trainingSelectCol, std::string areaCol, std::vector<std::string> inColumns, rsgismlpriors priorsMethod, std::vector<float> defPriors) throw(rsgis::RSGISAttributeTableException);
+        void applyMLClassifierLocalPriors(GDALDataset *image, std::string inClassCol, std::string outClassCol, std::string trainingSelectCol, std::vector<std::string> inColumns, std::string eastingsCol, std::string northingsCol, float searchRadius) throw(rsgis::RSGISAttributeTableException);
         ~RSGISMaxLikelihoodRATClassification();
+    protected:
+        inline double getEuclideanDistance(std::vector<double> *vals1, std::vector<double> *vals2)throw(rsgis::math::RSGISMathException);
+        inline void getLocalPriors(rsgis::math::MaximumLikelihood *mlStruct, GDALRasterAttributeTable *attTable, size_t fid, int trainingSelectColIdx, int eastingsIdx, int northingsIdx, int classColIdx, float spatialRadius)throw(rsgis::RSGISAttributeTableException);
     };
 	
 }}
