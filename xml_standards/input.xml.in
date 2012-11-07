@@ -738,7 +738,7 @@
         <rsgis:band name="string" image="image3" band="int" [sensorband="string" | calfactor="float" bandintegrate="float" ] />
     </rsgis:command>
     <!-- A command to convert from at sensor radiance to above atmosphere reflectance -->
-    <rsgis:command algor="imagecalibration" option="topatmosrefl" input="image_in.env" output="image_out.env" format="GDAL Format" scaleFactor="float" [julianday="int" | day="int" month="int" year="int"] [zenith="float" | elevation="float"] >
+    <rsgis:command algor="imagecalibration" option="topatmosrefl" input="image_in.env" output="image_out.env" format="GDAL Format" scaleFactor="float" [julianday="int" | day="int" month="int" year="int"] [zenith="float" | elevation="float"] format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" scaleFactor="float" >
         <rsgis:band [sensorband="string" | irradiance="float"] />
         <rsgis:band [sensorband="string" | irradiance="float"] />
         <rsgis:band [sensorband="string" | irradiance="float"] />
