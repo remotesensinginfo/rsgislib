@@ -2128,6 +2128,65 @@ namespace rsgisexe{
             xercesc::XMLString::release(&spatialRadiusXMLStr);
             
             
+            XMLCh *weightAXMLStr = xercesc::XMLString::transcode("weighta");
+            if(argElement->hasAttribute(weightAXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(weightAXMLStr));
+                this->weightA = textUtils.strtofloat(std::string(charValue));
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                this->weightA = 3;
+            }
+            xercesc::XMLString::release(&weightAXMLStr);
+            
+            XMLCh *majMethodXMLStr = xercesc::XMLString::transcode("majoritymethod");
+            if(argElement->hasAttribute(majMethodXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(majMethodXMLStr));
+                std::string majMethodStr = std::string(charValue);
+                if(majMethodStr == "area")
+                {
+                    this->priorsMethod = rsgis::rastergis::rsgis_area;
+                }
+                else if(majMethodStr == "weighted")
+                {
+                    this->priorsMethod = rsgis::rastergis::rsgis_weighted;
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("Majority method is not recognised, options are \'area\' or \'weighted\'.");
+                }
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'majoritymethod\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&majMethodXMLStr);
+            
+            XMLCh *noZeroPriorsXMLStr = xercesc::XMLString::transcode("nozeropriors");
+            if(argElement->hasAttribute(noZeroPriorsXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(noZeroPriorsXMLStr));
+                std::string noZeroPriorsStr = std::string(charValue);
+                if(noZeroPriorsStr == "yes")
+                {
+                    this->allowZeroPriors = true;
+                }
+                else
+                {
+                    this->allowZeroPriors = false;
+                }
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'nozeropriors\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&noZeroPriorsXMLStr);
+            
             XMLCh *rsgisFieldXMLStr = xercesc::XMLString::transcode("rsgis:field");
             xercesc::DOMNodeList *fieldNodesList = argElement->getElementsByTagName(rsgisFieldXMLStr);
             unsigned int numFieldTags = fieldNodesList->getLength();
@@ -3044,6 +3103,23 @@ namespace rsgisexe{
                 std::cout << "Northings Field: " << this->northingsField << std::endl;
                 std::cout << "Area Field: " << this->areaField << std::endl;
                 std::cout << "Search Radius: " << this->distThreshold << std::endl;
+                if(this->priorsMethod == rsgis::rastergis::rsgis_area)
+                {
+                    std::cout << "Local priors will be calculated using the area of all segments within radius\n";
+                }
+                else if(this->priorsMethod == rsgis::rastergis::rsgis_weighted)
+                {
+                    std::cout << "Local priors will be calculated using the weighted area of all segments within radius\n";
+                    std::cout << "Weight: " << this->weightA << std::endl;
+                }
+                if(this->allowZeroPriors)
+                {
+                    std::cout << "Zero priors will be allowed\n";
+                }
+                else
+                {
+                    std::cout << "Zero priors will not be allowed\n";
+                }
                 std::cout << "Using Features:\n";
                 for(std::vector<std::string>::iterator iterFields = fields.begin(); iterFields != fields.end(); ++iterFields)
                 {
@@ -3062,7 +3138,7 @@ namespace rsgisexe{
                     }
                     
                     rsgis::rastergis::RSGISMaxLikelihoodRATClassification mlRat;
-                    mlRat.applyMLClassifierLocalPriors(inputDataset, this->inClassNameField, this->outClassNameField, this->trainingSelectCol, this->areaField, this->fields, this->eastingsField, this->northingsField, this->distThreshold);
+                    mlRat.applyMLClassifierLocalPriors(inputDataset, this->inClassNameField, this->outClassNameField, this->trainingSelectCol, this->areaField, this->fields, this->eastingsField, this->northingsField, this->distThreshold, this->priorsMethod, this->weightA, this->allowZeroPriors);
                     
                     GDALClose(inputDataset);
                 }
