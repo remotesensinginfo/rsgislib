@@ -461,11 +461,15 @@
         <rsgis:field name="string" />
     </rsgis:command>
 	<!-- A command to classify segments using maximum likelihood classifier with local priors -->
-	<rsgis:command algor="rastergis" option="maxlikelihoodclassifierlocalpriors" image="image.kea" inclassfield="string" outclassfield="string" trainingcol="string" area="string" eastings="string" northings="string" spatialradius="float" >
+	<rsgis:command algor="rastergis" option="maxlikelihoodclassifierlocalpriors" image="image.kea" inclassfield="string" outclassfield="string" trainingcol="string" area="string" eastings="string" northings="string" spatialradius="float" nozeropriors="yes | no" majoritymethod="area | weighted" [weighta="float"] >
 		<rsgis:field name="string" />
         <rsgis:field name="string" />
         <rsgis:field name="string" />
     </rsgis:command>
+
+
+
+
 
 
 
