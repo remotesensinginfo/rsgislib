@@ -711,7 +711,20 @@ namespace rsgis{namespace rastergis{
                                 }
                                 else if(priorsMethod == rsgis::rastergis::rsgis_weighted)
                                 {
-                                    classCounts[classFoundIdx] += exp((pow(dist, 2)/weightA)*(-1)) * segArea;
+                                    /*
+                                    std::cout << "weightA = " << weightA << std::endl;
+                                    double tmp1 = dist/1000;
+                                    std::cout << "tmp1 = " << tmp1 << std::endl;
+                                    double tmp2 = 2;///(1.0/3.0);
+                                    std::cout << "tmp2 = " << tmp2 << std::endl;
+                                    double tmp3 = pow(tmp1, tmp2)/weightA;
+                                    std::cout << "tmp3 = " << tmp3 << std::endl;
+                                    double tmp4 = exp(tmp3*(-1));
+                                    std::cout << "tmp4 = " << tmp4 << std::endl;
+                                    double tmp5 = tmp4 * segArea;
+                                    std::cout << "tmp5 = " << tmp5 << std::endl << std::endl;
+                                    */
+                                    classCounts[classFoundIdx] += exp((pow((dist/1000), 2)/weightA)*(-1)) * segArea;
                                 }
                                 
                             }
