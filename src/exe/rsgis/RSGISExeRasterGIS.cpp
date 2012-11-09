@@ -2922,15 +2922,20 @@ namespace rsgisexe{
                     const GDALRasterAttributeTable *gdalATT = inputDataset->GetRasterBand(1)->GetDefaultRAT();
                     
                     std::vector<unsigned int> *colIdxs = new std::vector<unsigned int>();
+                    std::string *bandNames = new std::string[fields.size()];
+                    unsigned int i = 0;
                     for(std::vector<std::string>::iterator iterFields = fields.begin(); iterFields != fields.end(); ++iterFields)
                     {
+                        bandNames[i] = *iterFields;
                         colIdxs->push_back(attUtils.findColumnIndex(gdalATT, *iterFields));
+                        ++i;
                     }
                     
                     rsgis::rastergis::RSGISExportColumns2ImageCalcImage *calcImageVal = new rsgis::rastergis::RSGISExportColumns2ImageCalcImage(fields.size(), gdalATT, colIdxs);
                     rsgis::img::RSGISCalcImage calcImage(calcImageVal);
-                    calcImage.calcImage(&inputDataset, 1, this->outputFile, true, fields.data(), this->imageFormat, outDataType);
+                    calcImage.calcImage(&inputDataset, 1, this->outputFile, true, bandNames, this->imageFormat, outDataType);
                     delete calcImageVal;
+                    delete[] bandNames;
                     
                     GDALClose(inputDataset);
                 }
