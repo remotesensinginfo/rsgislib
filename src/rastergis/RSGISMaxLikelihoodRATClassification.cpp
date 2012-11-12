@@ -325,7 +325,7 @@ namespace rsgis{namespace rastergis{
         }
     }
     
-    void RSGISMaxLikelihoodRATClassification::applyMLClassifierLocalPriors(GDALDataset *image, std::string inClassCol, std::string outClassCol, std::string trainingSelectCol, std::string areaCol, std::vector<std::string> inColumns, std::string eastingsCol, std::string northingsCol, float searchRadius) throw(rsgis::RSGISAttributeTableException)
+    void RSGISMaxLikelihoodRATClassification::applyMLClassifierLocalPriors(GDALDataset *image, std::string inClassCol, std::string outClassCol, std::string trainingSelectCol, std::string areaCol, std::vector<std::string> inColumns, std::string eastingsCol, std::string northingsCol, float searchRadius, rsgismlpriors priorsMethod, float weightA, bool allowZeroPriors) throw(rsgis::RSGISAttributeTableException)
     {
         try
         {
@@ -589,7 +589,7 @@ namespace rsgis{namespace rastergis{
                 if(attTable->GetValueAsInt(i, inClassColIdx) > 0)
                 {
                     // Find local priors...
-                    this->getLocalPriors(mlStruct, attTable, i, trainingSelectColIdx, eastColIdx, northColIdx, inClassColIdx, areaColIdx, searchRadius);
+                    this->getLocalPriors(mlStruct, attTable, i, trainingSelectColIdx, eastColIdx, northColIdx, inClassColIdx, areaColIdx, searchRadius, allowZeroPriors, priorsMethod, weightA);
                     
                     for(size_t j = 0; j < inColumns.size(); ++j)
                     {
@@ -652,7 +652,7 @@ namespace rsgis{namespace rastergis{
         return sqrt(dist/((double)numVals));
     }
     
-    void RSGISMaxLikelihoodRATClassification::getLocalPriors(rsgis::math::MaximumLikelihood *mlStruct, GDALRasterAttributeTable *attTable, size_t fid, int trainingSelectColIdx, int eastingsIdx, int northingsIdx, int classColIdx, int areaColIdx, float spatialRadius)throw(rsgis::RSGISAttributeTableException)
+    void RSGISMaxLikelihoodRATClassification::getLocalPriors(rsgis::math::MaximumLikelihood *mlStruct, GDALRasterAttributeTable *attTable, size_t fid, int trainingSelectColIdx, int eastingsIdx, int northingsIdx, int classColIdx, int areaColIdx, float spatialRadius, bool allowZeroPriors, rsgismlpriors priorsMethod, float weightA)throw(rsgis::RSGISAttributeTableException)
     {
         try
         {
@@ -674,6 +674,7 @@ namespace rsgis{namespace rastergis{
             size_t numRows = attTable->GetRowCount();
             int classVal = 0;
             double segArea = 0;
+            double dist = 0;
             bool classFound = false;
             int classFoundIdx = 0;
             for(size_t n = 1; n < numRows; ++n)
@@ -683,7 +684,8 @@ namespace rsgis{namespace rastergis{
                     cValsSpatial.push_back(attTable->GetValueAsDouble(n, eastingsIdx));
                     cValsSpatial.push_back(attTable->GetValueAsDouble(n, northingsIdx));
                     
-                    if(this->getEuclideanDistance(&fidValsSpatial, &cValsSpatial) < spatialRadius)
+                    dist = this->getEuclideanDistance(&fidValsSpatial, &cValsSpatial);
+                    if(dist < spatialRadius)
                     {
                         classVal = attTable->GetValueAsInt(n, classColIdx);
                         if(classVal > 0)
@@ -703,7 +705,28 @@ namespace rsgis{namespace rastergis{
                             if(classFound)
                             {
                                 segArea = attTable->GetValueAsDouble(n, areaColIdx);
-                                classCounts[classFoundIdx] += segArea;
+                                if(priorsMethod == rsgis::rastergis::rsgis_area)
+                                {
+                                    classCounts[classFoundIdx] += segArea;
+                                }
+                                else if(priorsMethod == rsgis::rastergis::rsgis_weighted)
+                                {
+                                    /*
+                                    std::cout << "weightA = " << weightA << std::endl;
+                                    double tmp1 = dist/1000;
+                                    std::cout << "tmp1 = " << tmp1 << std::endl;
+                                    double tmp2 = 2;///(1.0/3.0);
+                                    std::cout << "tmp2 = " << tmp2 << std::endl;
+                                    double tmp3 = pow(tmp1, tmp2)/weightA;
+                                    std::cout << "tmp3 = " << tmp3 << std::endl;
+                                    double tmp4 = exp(tmp3*(-1));
+                                    std::cout << "tmp4 = " << tmp4 << std::endl;
+                                    double tmp5 = tmp4 * segArea;
+                                    std::cout << "tmp5 = " << tmp5 << std::endl << std::endl;
+                                    */
+                                    classCounts[classFoundIdx] += exp((pow((dist/1000), 2)/weightA)*(-1)) * segArea;
+                                }
+                                
                             }
                             else
                             {
@@ -728,6 +751,60 @@ namespace rsgis{namespace rastergis{
                 mlStruct->priors[i] = classCounts[i]/totalSegCount;
             }
             delete[] classCounts;
+            
+            if(!allowZeroPriors)
+            {
+                float minVal = 0;
+                bool first = true;
+                bool foundZero = false;
+                for(unsigned int i = 0; i < mlStruct->nclasses; ++i)
+                {
+                    if(mlStruct->priors[i] < 0.001)
+                    {
+                        foundZero = true;
+                    }
+                    else
+                    {
+                        if(first)
+                        {
+                            minVal = mlStruct->priors[i];
+                            first = false;
+                        }
+                        else if(mlStruct->priors[i] < minVal)
+                        {
+                            minVal = mlStruct->priors[i];
+                        }
+                    }
+                }
+                
+                if(foundZero)
+                {
+                    float minPrior = 0.0;
+                    if(minVal > (1.0/((float)mlStruct->nclasses)))
+                    {
+                        minPrior = 1.0/((float)mlStruct->nclasses);
+                    }
+                    else
+                    {
+                        minPrior = minVal;
+                    }
+                    float sumPriors = 0;
+                    
+                    for(unsigned int i = 0; i < mlStruct->nclasses; ++i)
+                    {
+                        if(mlStruct->priors[i] < 0.001)
+                        {
+                            mlStruct->priors[i] = minPrior;
+                        }
+                        sumPriors += mlStruct->priors[i];
+                    }
+                    
+                    for(unsigned int i = 0; i < mlStruct->nclasses; ++i)
+                    {
+                        mlStruct->priors[i] = mlStruct->priors[i]/sumPriors;
+                    }
+                }
+            }
             
         }
         catch (rsgis::RSGISException &e)

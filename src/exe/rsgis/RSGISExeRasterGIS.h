@@ -148,6 +148,7 @@ namespace rsgisexe{
         float specThresOriginDist;
         rsgis::rastergis::rsgismlpriors priorsMethod;
         std::vector<std::string> priorStrs;
+        bool allowZeroPriors;
     };
     
 }
