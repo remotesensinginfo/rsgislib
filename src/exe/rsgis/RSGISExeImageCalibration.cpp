@@ -2945,7 +2945,7 @@ void RSGISExeImageCalibration::runAlgorithm() throw(RSGISException)
 				calcTopAtmosRefl = new RSGISCalculateTopOfAtmosphereReflectance(numRasterBands, solarIrradiance, solarDistance, (solarZenith*(M_PI/180)), this->scaleFactor);
 				
 				calcImage = new RSGISCalcImage(calcTopAtmosRefl, "", true);
-				calcImage->calcImage(datasets, 1, this->outputImage);
+				calcImage->calcImage(datasets, 1, this->outputImage, false, NULL, this->imageFormat, this->outDataType);
 				
 				
 				GDALClose(datasets[0]);
