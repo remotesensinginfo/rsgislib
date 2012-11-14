@@ -986,6 +986,7 @@ namespace rsgis{namespace img{
 			xSize[i] = datasets[i]->GetRasterXSize();
 			ySize[i] = datasets[i]->GetRasterYSize();
 			//std::cout << "TL [" << transformations[i][0] << "," << transformations[i][3] << "]\n";
+            //std::cout << "Res [" << transformations[i][1] << "," << transformations[i][5] << "]\n";
 		}
 		double rotateX = 0;
 		double rotateY = 0;
@@ -1166,6 +1167,7 @@ namespace rsgis{namespace img{
 			xSize[i] = datasets[i]->GetRasterXSize();
 			ySize[i] = datasets[i]->GetRasterYSize();
 			//std::cout << "TL [" << transformations[i][0] << "," << transformations[i][3] << "]\n";
+            //std::cout << "Res [" << transformations[i][1] << "," << transformations[i][5] << "]\n";
 			//std::cout << "Size: [" << xSize[i] << "," << ySize[i] << "]\n";
 		}
 		double rotateX = 0;
@@ -1324,6 +1326,10 @@ namespace rsgis{namespace img{
 			dataset->GetGeoTransform(transformations[i]);
 			xSize[i] = dataset->GetRasterXSize();
 			ySize[i] = dataset->GetRasterYSize();
+            
+            //std::cout << "TL [" << transformations[i][0] << "," << transformations[i][3] << "]\n";
+            //std::cout << "Res [" << transformations[i][1] << "," << transformations[i][5] << "]\n";
+			//std::cout << "Size: [" << xSize[i] << "," << ySize[i] << "]\n";
 			
             GDALClose(dataset);
 		}
@@ -1555,7 +1561,7 @@ namespace rsgis{namespace img{
 		}
 	}
 	
-	GDALDataset* RSGISImageUtils::createBlankImage(std::string imageFile, double *transformation, int xSize, int ySize, int numBands, std::string projection, float value, std::string gdalFormat) throw(RSGISImageException, RSGISImageBandException)
+	GDALDataset* RSGISImageUtils::createBlankImage(std::string imageFile, double *transformation, int xSize, int ySize, int numBands, std::string projection, float value, std::string gdalFormat, GDALDataType imgDataType) throw(RSGISImageException, RSGISImageBandException)
 	{
 		GDALAllRegister();
 		GDALDriver *poDriver = NULL;
@@ -1592,7 +1598,7 @@ namespace rsgis{namespace img{
 			
 			// Create new file. 
 			// Set unsupported options to NULL
-			outputImage = poDriver->Create(imageFile.c_str(), xSize, ySize, numBands, GDT_Float32, NULL);
+			outputImage = poDriver->Create(imageFile.c_str(), xSize, ySize, numBands, imgDataType, NULL);
 			
 			if(outputImage == NULL)
 			{
@@ -1655,7 +1661,7 @@ namespace rsgis{namespace img{
 		return outputImage;
 	}
     
-    GDALDataset* RSGISImageUtils::createBlankImage(std::string imageFile, double *transformation, int xSize, int ySize, int numBands, std::string projection, float value, std::vector<std::string> bandNames, std::string gdalFormat) throw(RSGISImageException, RSGISImageBandException)
+    GDALDataset* RSGISImageUtils::createBlankImage(std::string imageFile, double *transformation, int xSize, int ySize, int numBands, std::string projection, float value, std::vector<std::string> bandNames, std::string gdalFormat, GDALDataType imgDataType) throw(RSGISImageException, RSGISImageBandException)
     {
         GDALAllRegister();
 		GDALDriver *poDriver = NULL;
@@ -1691,7 +1697,7 @@ namespace rsgis{namespace img{
 			}
 			
 			// Create new file. 
-			outputImage = poDriver->Create(imageFile.c_str(), xSize, ySize, numBands, GDT_Float32, NULL);
+			outputImage = poDriver->Create(imageFile.c_str(), xSize, ySize, numBands, imgDataType, NULL);
 			if(outputImage == NULL)
 			{
 				throw RSGISImageException("Image could not be created.");
@@ -1754,7 +1760,7 @@ namespace rsgis{namespace img{
 		return outputImage;
     }
 	
-	GDALDataset* RSGISImageUtils::createBlankImage(std::string imageFile, geos::geom::Envelope extent, double resolution, int numBands, std::string projection, float value, std::string gdalFormat) throw(RSGISImageException, RSGISImageBandException)
+	GDALDataset* RSGISImageUtils::createBlankImage(std::string imageFile, geos::geom::Envelope extent, double resolution, int numBands, std::string projection, float value, std::string gdalFormat, GDALDataType imgDataType) throw(RSGISImageException, RSGISImageBandException)
 	{
 		GDALAllRegister();
 		GDALDriver *poDriver = NULL;
@@ -1804,7 +1810,7 @@ namespace rsgis{namespace img{
 			}
 			
 			// Create new file.
-			outputImage = poDriver->Create(imageFile.c_str(), xSize, ySize, numBands, GDT_Float32, NULL);
+			outputImage = poDriver->Create(imageFile.c_str(), xSize, ySize, numBands, imgDataType, NULL);
 			
 			if(outputImage == NULL)
 			{

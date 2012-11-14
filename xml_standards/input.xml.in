@@ -9,6 +9,10 @@
         <rsgis:image name="band(s) name" file="image4" />
     </rsgis:command>
 
+
+
+
+
     <!-- Deprecated - A command which produces the FFT image from an input image-->
     <rsgis:command algor="fftutils" option="fftimage" image="image.env" output="image_out.env" band="1" />
     <!-- Deprecated - A command which calculates the angle of the image features from an extracted mtxt file-->
@@ -20,8 +24,14 @@
     <!-- Deprecated - A command which calculates the image shift-->
     <rsgis:command algor="fftutils" option="shiftfftw" image="image.env" output="image_out.env" />
 
+
+
+
     <!-- Deprecated - A command to generate a image for testing algorithms. -->
     <rsgis:command algor="testimages" option="rowmajornumbered" output="image_out.env" width="int" height="int" />
+
+
+
 
     <!-- A command which calculates the eigenvectors for an input matrix -->
     <rsgis:command algor="mathsutils" option="eigenvectors" matrix="matrix.mtxt" eigen="out_matrix.mtxt" />
@@ -33,6 +43,12 @@
     <rsgis:command algor="mathsutils" option="matrix2image" matrix="matrix.mtxt" output="out_image.env" />
     <!-- TODO -->
     <rsgis:command algor="mathsutils" option="duplicatematrix" matrix="matrix.mtxt" output="out_matrix.mtxt" xdup="int" ydup="int" />
+
+
+
+
+
+
 
     <!-- Fits a one dimensional polynomial equation, save coefficients out a 'mtxt' -->
     <rsgis:command algor="fitting" option="oneDimensionalPolyfit" input="infile"
@@ -47,6 +63,13 @@
     <rsgis:command algor="fitting" option="threeDimensionalPolyfit" input="infile" output="outfile" polyOrder="polyOrder" numX="numX" numY="numY" numZ="numZ" />
     <!-- Tests the fit of a three dimensional polynomial equation and print r squared value, input and predicted values are saved in 'ptxt' format -->
     <rsgis:command algor="fitting" option="threeDimensionalPolyTest" input="infile" inCoeff="inCoefficients" output="outname (name only no path or extension)" polyOrder="polyOrder" />
+
+
+
+
+
+
+
 
     <!-- Deprecated: A command to undertake zonal stats to calculate te min, max, mean, std dev for a polygon -->
     <rsgis:command algor="zonalstats" option="polygons2shp" image="image.env" vector="polys.shp" output="output.shp" mean="yes" max="yes" min="yes" stddev="yes" force="yes | no" />
@@ -532,14 +555,14 @@
         <rsgis:colour name="class_name_3" id="int" lower="double" upper="double" red="int" green="int" blue="int" />
     </rsgis:command>
     <!-- A command to mosaic a set of input images to generate a single output image -->
-    <rsgis:command algor="imageutils" option="mosaic" output="image_out.env" nodata="float=0" skipValue="float (optional)" skipLowerThreash="float (optional)" skipUpperThreash="float (optional)"  proj="OSGB | NZ2000 | NZ1949 | IMAGE" setSkipBand="1" >
+    <rsgis:command algor="imageutils" option="mosaic" output="image_out.env" nodata="float=0" skipValue="float (optional)" skipLowerThreash="float (optional)" skipUpperThreash="float (optional)"  proj="OSGB | NZ2000 | NZ1949 | IMAGE" setSkipBand="1" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" >
         <rsgis:image file="image1" />
         <rsgis:image file="image2" />
         <rsgis:image file="image3" />
         <rsgis:image file="image4" />
     </rsgis:command>
     <!-- A command to mosaic a set of input images from a directory to generate a single output image -->
-    <rsgis:command algor="imageutils" option="mosaic" dir="directory" ext="file_extension" output="image_out.env" nodata="float=0" skipValue="float (optional)" skipLowerThreash="float (optional)" skipUpperThreash="float (optional)"  proj="OSGB | NZ2000 | NZ1949 | IMAGE" />
+    <rsgis:command algor="imageutils" option="mosaic" dir="directory" ext="file_extension" output="image_out.env" nodata="float=0" skipValue="float (optional)" skipLowerThreash="float (optional)" skipUpperThreash="float (optional)"  proj="OSGB | NZ2000 | NZ1949 | IMAGE" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
     <!-- A command to include a set of input images into an existing image -->
     <rsgis:command algor="imageutils" option="include" image="base_image.env" bands="b1,b2,b3,...,bn" >
         <rsgis:image file="image1" />

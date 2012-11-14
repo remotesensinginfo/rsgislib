@@ -2948,21 +2948,34 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
 		}
 		else if(option == RSGISExeImageUtils::mosaic)
 		{
+            if(this->numImages < 1)
+            {
+                throw RSGISException("No input images have been provided.");
+            }
 			cout << "Mosaicing Images\n";
+            cout << "Number of Images = " << this->numImages << endl;
+            cout << "Input Images: \n";
+            for(int i = 0; i < this->numImages; ++i)
+            {
+                cout << i << ": " << inputImages[i] << endl;
+            }
 			RSGISImageMosaic mosaic;
 			try
 			{
 				if (this->mosaicSkipVals)
 				{
-					mosaic.mosaicSkipVals(inputImages, this->numImages, this->outputImage, this->nodataValue, this->skipValue, this->projFromImage, this->proj, this->skipBand);
+                    cout << "With Skip Values\n";
+					mosaic.mosaicSkipVals(inputImages, this->numImages, this->outputImage, this->nodataValue, this->skipValue, this->projFromImage, this->proj, this->skipBand, this->imageFormat, this->outDataType);
 				}
 				else if (this->mosaicSkipThreash)
 				{
-					mosaic.mosaicSkipThreash(inputImages, this->numImages, this->outputImage, this->nodataValue, this->skipLowerThreash, this->skipUpperThreash, this->projFromImage, this->proj, this->skipBand);
+                    cout << "With Skip Threshold\n";
+					mosaic.mosaicSkipThreash(inputImages, this->numImages, this->outputImage, this->nodataValue, this->skipLowerThreash, this->skipUpperThreash, this->projFromImage, this->proj, this->skipBand, this->imageFormat, this->outDataType);
 				}
 				else
 				{
-					mosaic.mosaic(inputImages, this->numImages, this->outputImage, this->nodataValue, this->projFromImage, this->proj);
+                    cout << "Just Mosaic\n";
+					mosaic.mosaic(inputImages, this->numImages, this->outputImage, this->nodataValue, this->projFromImage, this->proj, this->imageFormat, this->outDataType);
 				}
 
 				delete[] inputImages;
