@@ -132,6 +132,8 @@ class RSGISExeClassification : public RSGISAlgorithmParameters
 		bool printinfo;
 		bool groupSamples;
 		std::vector<std::string> *valueAttributes;
+		bool savekmeansCentres;
+		string outkmeansCentresFileName;
 	};
 }
 #endif

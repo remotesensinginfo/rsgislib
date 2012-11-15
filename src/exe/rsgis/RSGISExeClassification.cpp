@@ -508,6 +508,8 @@ void RSGISExeClassification::retrieveParameters(DOMElement *argElement) throw(RS
 	else if(XMLString::equals(optionKMeans, optionXML))
 	{
 		this->option = RSGISExeClassification::kmeans;
+		this->printinfo = false; // Set default to don't print info
+		this->savekmeansCentres = false; // Set default to don't export centres;
 		
 		XMLCh *imageXMLStr = XMLString::transcode("image");
 		if(argElement->hasAttribute(imageXMLStr))
@@ -609,6 +611,7 @@ void RSGISExeClassification::retrieveParameters(DOMElement *argElement) throw(RS
 		}
 		XMLString::release(&clusterMoveXMLStr);
 		
+
 		XMLCh *printInfoXMLStr = XMLString::transcode("printinfo");
 		if(argElement->hasAttribute(printInfoXMLStr))
 		{
@@ -625,13 +628,22 @@ void RSGISExeClassification::retrieveParameters(DOMElement *argElement) throw(RS
 			}
 			XMLString::release(&yesStr);
 		}
+		XMLString::release(&printInfoXMLStr);
+
+		XMLCh *centresXMLStr = XMLString::transcode("centres");
+		if(argElement->hasAttribute(centresXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(centresXMLStr));
+			this->outkmeansCentresFileName = string(charValue);
+			this->savekmeansCentres = true;
+			XMLString::release(&charValue);
+		}
 		else
 		{
-			throw RSGISXMLArgumentsException("No \'printinfo\' attribute was provided.");
+			this->outkmeansCentresFileName = "";
 		}
-		XMLString::release(&printInfoXMLStr);
-		
-		
+		XMLString::release(&centresXMLStr);
+
 	}
 	else if(XMLString::equals(optionISOData, optionXML))
 	{
@@ -1328,6 +1340,7 @@ void RSGISExeClassification::runAlgorithm() throw(RSGISException)
 			cout << "Number of clusters = " << this->numClusters << endl;
 			cout << "Distance Movement Threshold = " << this->clusterMoveThreshold << endl;
 			cout << "Max. Number of Iterations = " << this->maxNumIterations << endl;
+			if(this->savekmeansCentres){cout << "Saving centres to: " << this->outkmeansCentresFileName << endl;}
 			if(initAlgor == randomInit)
 			{
 				cout << "The cluster centres will be initialised with random values\n";
@@ -1360,7 +1373,7 @@ void RSGISExeClassification::runAlgorithm() throw(RSGISException)
 					throw RSGISException("The initialisation algorithm has not been defined");
 				}
 				cout << "Find cluster centres\n";
-				kMeansClassifier->calcClusterCentres(clusterMoveThreshold, maxNumIterations);
+				kMeansClassifier->calcClusterCentres(this->clusterMoveThreshold, this->maxNumIterations, this->savekmeansCentres, this->outkmeansCentresFileName);
 				cout << "Generate output Image\n";
 				kMeansClassifier->generateOutputImage(this->outputImage);
 				

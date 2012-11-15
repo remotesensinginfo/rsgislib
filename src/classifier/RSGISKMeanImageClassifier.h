@@ -54,7 +54,7 @@ namespace rsgis{ namespace classifier{
 		RSGISKMeansClassifier(std::string inputImageFile, bool printinfo);
 		void initClusterCentresRandom(unsigned int numClusters)throw(RSGISClassificationException);
 		void initClusterCentresKpp(unsigned int numClusters)throw(RSGISClassificationException);
-		void calcClusterCentres(double terminalThreshold, unsigned int maxIterations)throw(RSGISClassificationException);
+		void calcClusterCentres(double terminalThreshold, unsigned int maxIterations, bool saveCentres = false, std::string outCentresFileName = "")throw(RSGISClassificationException);
 		void generateOutputImage(std::string outputImageFile)throw(RSGISClassificationException);
 		~RSGISKMeansClassifier();
 	protected:

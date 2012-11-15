@@ -503,7 +503,7 @@
     <!-- A command to generate a single classification using the rule image where the maximum value is identified and used to assign the final classification - where the maximum value is below the threshold no classification will be assigned -->
     <rsgis:command algor="classification" option="cumulativeAreaClassify" ruleImage="ruleImage.env" output="image_out.env" threshold="float"/>
     <!-- A command to undertake a K-Means classification of an image for a given number of classes (clusters) -->
-    <rsgis:command algor="classification" option="kmeans" image="string" output="string" numclusters="int" initalgor="random | kpp" maxiterations="int" clustermove="float" printinfo="yes | no"/>
+    <rsgis:command algor="classification" option="kmeans" image="string" output="string" numclusters="int" initalgor="random | kpp" maxiterations="int" clustermove="float" printinfo="yes | no" centres="centres.csv" />
     <!-- A command to undertake a ISOData classification of an image for a given number of classes (clusters) -->
     <rsgis:command algor="classification" option="isodata" image="string" output="string" numclusters="int" initalgor="random | kpp" maxiterations="int" clustermove="float" minnumbervals="int" mindistbetweencluster="float" maxstddev="float" propAvgDist="float" printinfo="yes | no"/>
     <!-- A command to convert a shapefile's attributes to a spectral library (mtxt) -->
