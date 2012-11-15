@@ -263,11 +263,12 @@ namespace rsgis{ namespace classifier{
 		hasInitClusterCentres = true;
 	}
 	
-	void RSGISKMeansClassifier::calcClusterCentres(double terminalThreshold, unsigned int maxIterations) throw(RSGISClassificationException)
+	void RSGISKMeansClassifier::calcClusterCentres(double terminalThreshold, unsigned int maxIterations, bool saveCentres, std::string outCentresFileName) throw(RSGISClassificationException)
 	{
 		if(hasInitClusterCentres)
 		{
 			rsgis::math::RSGISVectors vecUtils;
+			rsgis::math::RSGISMathsUtils mathsUtil;
 			try 
 			{
 				RSGISKMeanCalcPixelClusterCalcImageVal *calcClusterCentre = new RSGISKMeanCalcPixelClusterCalcImageVal(0, this->clusterCentres, this->numClusters, this->numImageBands);
@@ -347,6 +348,37 @@ namespace rsgis{ namespace classifier{
 					++iterNum;
 				}
 				
+				if(saveCentres)
+				{
+			        // Open text file
+					std::ofstream outCentresFile;
+					outCentresFile.open(outCentresFileName.c_str());
+
+					// Write header file
+					outCentresFile << "Cluster,";
+					for(unsigned int j = 0; j < (numImageBands - 1); ++j)
+					{
+						std::string bandNumberStr = mathsUtil.inttostring(j + 1).c_str();
+						outCentresFile << "b" + bandNumberStr << ",";
+					}
+					std::string bandNumberStr = mathsUtil.inttostring(numImageBands).c_str();
+					outCentresFile << "b" + bandNumberStr;
+					outCentresFile << std::endl;
+
+					// Write out centres
+					for(unsigned int i = 0; i < numClusters; ++i)
+					{
+						outCentresFile << i << ",";
+						for(unsigned int j = 0; j < (numImageBands - 1); ++j)
+						{
+							outCentresFile << clusterCentres[i]->data->vector[j] << ",";
+						}
+						outCentresFile << clusterCentres[i]->data->vector[numImageBands-1];
+						outCentresFile << std::endl;
+					}
+					outCentresFile.flush();
+					outCentresFile.close();
+				}
 				
 								
 				delete calcClusterCentre;
