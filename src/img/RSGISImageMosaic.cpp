@@ -34,7 +34,7 @@ namespace rsgis{namespace img{
 		
 	}
 	
-	void RSGISImageMosaic::mosaic(std::string *inputImages, int numDS, std::string outputImage, float background, bool projFromImage, std::string proj) throw(RSGISImageException)
+	void RSGISImageMosaic::mosaic(std::string *inputImages, int numDS, std::string outputImage, float background, bool projFromImage, std::string proj, std::string format, GDALDataType imgDataType) throw(RSGISImageException)
 	{
 		RSGISImageUtils imgUtils;
         GDALAllRegister();
@@ -97,7 +97,7 @@ namespace rsgis{namespace img{
 			
 			std::cout << "Create new image [" << width << "," << height << "] with projection: \n" << projection << std::endl;
 			
-			outputDataset = imgUtils.createBlankImage(outputImage, transformation, width, height, numberBands, projection, background, bandnames);
+			outputDataset = imgUtils.createBlankImage(outputImage, transformation, width, height, numberBands, projection, background, bandnames, format, imgDataType);
 			
 			// COPY IMAGE DATA INTO THE BLANK IMAGE
 			
@@ -105,7 +105,7 @@ namespace rsgis{namespace img{
 			
 			for(int i = 0; i < numDS; i++)
 			{
-				std::cout << "." << i << "." << std::flush;
+				std::cout << "." << i+1 << "." << std::flush;
                 
                 dataset = (GDALDataset *) GDALOpenShared(inputImages[i].c_str(), GA_ReadOnly);
                 if(dataset == NULL)
@@ -169,7 +169,7 @@ namespace rsgis{namespace img{
         GDALDestroyDriverManager();
 	}
 	
-	void RSGISImageMosaic::mosaicSkipVals(std::string *inputImages, int numDS, std::string outputImage, float background, float skipVal, bool projFromImage, std::string proj, unsigned int skipBand) throw(RSGISImageException)
+	void RSGISImageMosaic::mosaicSkipVals(std::string *inputImages, int numDS, std::string outputImage, float background, float skipVal, bool projFromImage, std::string proj, unsigned int skipBand, std::string format, GDALDataType imgDataType) throw(RSGISImageException)
 	{
 		RSGISImageUtils imgUtils;
         GDALAllRegister();
@@ -232,7 +232,7 @@ namespace rsgis{namespace img{
 			
 			std::cout << "Create new image [" << width << "," << height << "] with projection: \n" << projection << std::endl;
 			
-			outputDataset = imgUtils.createBlankImage(outputImage, transformation, width, height, numberBands, projection, background, bandnames);
+			outputDataset = imgUtils.createBlankImage(outputImage, transformation, width, height, numberBands, projection, background, bandnames, format, imgDataType);
 			
 			// COPY IMAGE DATA INTO THE BLANK IMAGE
 			
@@ -331,7 +331,7 @@ namespace rsgis{namespace img{
         GDALDestroyDriverManager();
 	}
 	
-	void RSGISImageMosaic::mosaicSkipThreash(std::string *inputImages, int numDS, std::string outputImage, float background, float skipLowerThreash, float skipUpperThreash, bool projFromImage, std::string proj, unsigned int threashBand) throw(RSGISImageException)
+	void RSGISImageMosaic::mosaicSkipThreash(std::string *inputImages, int numDS, std::string outputImage, float background, float skipLowerThreash, float skipUpperThreash, bool projFromImage, std::string proj, unsigned int threashBand, std::string format, GDALDataType imgDataType) throw(RSGISImageException)
 	{
 		RSGISImageUtils imgUtils;
         GDALAllRegister();
@@ -394,7 +394,7 @@ namespace rsgis{namespace img{
 			
 			std::cout << "Create new image [" << width << "," << height << "] with projection: \n" << projection << std::endl;
 			
-			outputDataset = imgUtils.createBlankImage(outputImage, transformation, width, height, numberBands, projection, background, bandnames);
+			outputDataset = imgUtils.createBlankImage(outputImage, transformation, width, height, numberBands, projection, background, bandnames, format, imgDataType);
 			
 			// COPY IMAGE DATA INTO THE BLANK IMAGE
 			

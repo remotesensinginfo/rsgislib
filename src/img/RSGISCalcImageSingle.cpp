@@ -553,6 +553,8 @@ namespace rsgis{namespace img{
 	
 	void RSGISCalcImageSingle::calcImageWithinPolygon(GDALDataset **datasets, int numDS, double *outputValue, geos::geom::Envelope *env, geos::geom::Polygon *poly, bool output, pixelInPolyOption pixelPolyOption) throw(RSGISImageCalcException,RSGISImageBandException)
 	{
+        //std::cout.precision(12);
+        //std::cout << "[" << env->getMinX() << "," << env->getMinY() << "," << env->getMaxX() << "," << env->getMaxY() << "]\n";
 		GDALAllRegister();
 		RSGISImageUtils imgUtils;
 		double *gdalTranslation = NULL;

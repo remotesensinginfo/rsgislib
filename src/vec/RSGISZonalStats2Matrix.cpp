@@ -109,6 +109,7 @@ namespace rsgis{namespace vec{
 			calcImageValue = new rsgis::img::RSGISCalcImageSingle(polyPxlCount);
 			for(int i = 0; i < numFeatures; i++)
 			{
+                //std::cout << i << std::endl;
 				polyPxlCount->reset();
 				calcImageValue->calcImageWithinPolygon(image, numImgs, numPxls, data[i]->getBBox(), data[i]->getPolygon(), true, method);
 				data[i]->setNumPixels(ceil(numPxls[0]));
