@@ -2590,6 +2590,19 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'height\' attribute was provided.");
 		}
 		XMLString::release(&heightXMLStr);
+        
+        XMLCh *overlapXMLStr = XMLString::transcode("overlap");
+		if(argElement->hasAttribute(overlapXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(overlapXMLStr));
+			this->tileOverlap = mathUtils.strtoint(string(charValue));
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			this->tileOverlap = 0;
+		}
+		XMLString::release(&overlapXMLStr);
 
     }
     else if (XMLString::equals(optionBandColourUsage, optionXML))
@@ -4347,7 +4360,7 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
                 int width = 0;
 
                 imgUtils.getImageOverlap(dataset, numDS, dsOffsets, &width, &height, gdalTransform);
-
+               
                 double pixelXRes = gdalTransform[1];
                 double pixelYRes = gdalTransform[5];
 
@@ -4361,6 +4374,8 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
 
                 double tileWidthMapUnits = this->width * pixelXRes;
                 double tileHeighMapUnits = this->height * pixelYRes;
+                double tileXOverlapMapUnits = this->tileOverlap * pixelXRes;
+                double tileYOverlapMapUnits = this->tileOverlap * pixelYRes;
                 
                 std::cout << "Tile size (map units): " << tileWidthMapUnits << " X " << sqrt(tileHeighMapUnits*tileHeighMapUnits) << std::endl;
 
@@ -4368,22 +4383,37 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
                 double yStart = 0;
                 double yEnd = 0;
                 double xEnd = 0;
-
+                double xStartOverlap = 0;
+                double yStartOverlap = 0;
+                double xEndOverlap = 0;
+                double yEndOverlap = 0;
 
                 for(xStart = minX; xStart < maxX; xStart+=tileWidthMapUnits)
                 {
                     xEnd = xStart + tileWidthMapUnits;
-                    if(xEnd > maxX) // Check tile will fit within image
+                    xStartOverlap = xStart - tileXOverlapMapUnits;
+                    xEndOverlap = xEnd + tileXOverlapMapUnits;
+                    if(xStartOverlap < minX) // Check tile will fit within image
                     {
-                        xEnd = maxX;
+                        xStartOverlap = minX;
                     }
-
+                    if(xEndOverlap > maxX) // Check tile will fit within image
+                    {
+                        xEndOverlap = maxX;
+                    }
+                    
                     for(yStart = maxY; yStart > minY; yStart+=tileHeighMapUnits)
                     {
                         yEnd = yStart + tileHeighMapUnits;
-                        if(yEnd < minY) // Check tile will fit within image
+                        yStartOverlap = yStart - tileYOverlapMapUnits;
+                        yEndOverlap = yEnd + tileYOverlapMapUnits;
+                        if(yStartOverlap < minY) // Check tile will fit within image
                         {
-                            yEnd = minY;
+                            yStartOverlap = minY;
+                        }
+                        if(yEndOverlap > maxY) // Check tile will fit within image
+                        {
+                            yEndOverlap = maxY;
                         }
                         
                         tileEnvelopes->push_back(new geos::geom::Envelope(xStart, xEnd, yStart, yEnd));

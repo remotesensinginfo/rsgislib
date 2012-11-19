@@ -240,6 +240,7 @@ class RSGISExeImageUtils : public RSGISAlgorithmParameters
         double rotX;
         double rotY;
         string outFileExtension;
+        unsigned int tileOverlap;
 	};
 }
 #endif
