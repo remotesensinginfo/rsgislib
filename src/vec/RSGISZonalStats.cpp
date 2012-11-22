@@ -1631,7 +1631,7 @@ namespace rsgis{namespace vec{
                 {
                     std::vector<int> *valuesInt = new std::vector<int>();
                     
-                    for (unsigned int j = 0; j < values[i]->size(); j++) 
+                    for (unsigned int j = 0; j < values[i]->size(); j++)
                     {
                         valuesInt->push_back(int(values[i]->at(j)));
                     }
@@ -1643,7 +1643,7 @@ namespace rsgis{namespace vec{
                     unsigned int currentNumber = valuesInt->at(0);
                     unsigned int modeVal = valuesInt->at(0);
                     
-                    for (unsigned int j = 1; j < valuesInt->size(); ++j) 
+                    for (unsigned int j = 0; j < valuesInt->size(); ++j)
                     {
                         if(valuesInt->at(j) == currentNumber)
                         {
@@ -1661,15 +1661,20 @@ namespace rsgis{namespace vec{
                         }
                     }
                     
+                    // Check for last number
+                    if(currentCount > maxCount) // Update mode (if more)
+                    {
+                        modeVal = valuesInt->back();
+                    }
+                    
                     outputValues[offset+4] = modeVal;
                     
-                    delete valuesInt;                    
+                    delete valuesInt;
                 }
                 else{outputValues[offset+4] = 0;}
             }
             else{outputValues[offset+4] = 0;}
 		}
-        
 		
 		return outputValues;
 		
@@ -1712,7 +1717,8 @@ namespace rsgis{namespace vec{
 			this->outZonalFile.open(outZonalFileName.c_str());
 			this->firstLine = true;
 		}
-	}
+        
+    }
 	
 	void RSGISZonalStatsPoly::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
 	{
@@ -1725,12 +1731,12 @@ namespace rsgis{namespace vec{
 			geos::geom::Polygon *poly;
 			inOGRPoly = (OGRPolygon *) inFeature->GetGeometryRef();
 			poly = vecUtils.convertOGRPolygon2GEOSPolygon(inOGRPoly);
-			
+
 			calcImage->calcImageWithinPolygon(datasets, 1, this->data, env, poly, true, method);
 			
 			OGRFeatureDefn *outFeatureDefn = outFeature->GetDefnRef();
 			
-			for(int i = 0; i < numAttributes; i++)
+			for(int i = 0; i < numAttributes; i++)  
 			{
 				std::string attMin = attributes[i]->name + std::string("Min");
 				std::string attMax = attributes[i]->name + std::string("Max");
@@ -1739,10 +1745,10 @@ namespace rsgis{namespace vec{
 				std::string attMde = attributes[i]->name + std::string("Mde");
 				std::string attPix = attributes[i]->name + std::string("Pix");
 				
-				//std::cout << "mean = " << this->data[3] << " count = " << this->data[5] << std::endl;
+				//std::cout << "mean = " << this->data[3] << " count = " << this->data[6] << " mode = " << this->data[5] << std::endl;
 				
 				int offset = (6 * i) + 1; // Offset by total number of stats + 1 for count
-				
+				          
 				if (attributes[i]->outMin) 
 				{
 					outFeature->SetField(outFeatureDefn->GetFieldIndex(attMin.c_str()), this->data[offset]);
@@ -2159,6 +2165,7 @@ namespace rsgis{namespace vec{
 				outputValues[offset+2] = 0;
 				outputValues[offset+3] = 0;
 			}
+            
             if(attributes[i]->outMode) // Calculate integer mode
             {
                 if(values[i]->size() > 0)
@@ -2177,7 +2184,7 @@ namespace rsgis{namespace vec{
                     unsigned int currentNumber = valuesInt->at(0);
                     unsigned int modeVal = valuesInt->at(0);
                     
-                    for (unsigned int j = 1; j < valuesInt->size(); ++j) 
+                    for (unsigned int j = 0; j < valuesInt->size(); ++j)
                     {
                         if(valuesInt->at(j) == currentNumber)
                         {
@@ -2193,6 +2200,12 @@ namespace rsgis{namespace vec{
                             currentCount = 1; // Reset count (include 1 for current number
                             currentNumber = valuesInt->at(j);
                         }
+                    }
+                    
+                    // Check for last number
+                    if(currentCount > maxCount) // Update mode (if more)
+                    {
+                        modeVal = valuesInt->back();
                     }
                     
                     outputValues[offset+4] = modeVal;
