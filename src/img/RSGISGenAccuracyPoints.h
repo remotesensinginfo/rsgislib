@@ -27,6 +27,9 @@
 #include <fstream>
 #include <string>
 #include <list>
+#include <vector>
+#include <map>
+#include <utility>
 
 #include "gdal_priv.h"
 #include "gdal_rat.h"
