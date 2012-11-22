@@ -68,6 +68,7 @@
 #include "img/RSGISImageComposite.h"
 #include "img/RSGISRelabelPixelValuesFromLUT.h"
 #include "img/RSGISPopWithStats.h"
+#include "img/RSGISGenAccuracyPoints.h"
 
 #include "vec/RSGISImageTileVector.h"
 #include "vec/RSGISVectorOutputException.h"
@@ -132,7 +133,8 @@ class RSGISExeImageUtils : public RSGISAlgorithmParameters
             createcopy,
             createKMLFile,
             bandcolourusage,
-            assignspatialinfo
+            assignspatialinfo,
+            genassesspoints
 		};
 
 		enum interpolators
@@ -173,6 +175,7 @@ class RSGISExeImageUtils : public RSGISAlgorithmParameters
 		string *inputImages;
 		string inputVector;
         string inputCSV;
+        string inputDEM;
 		string outputFile;
 		string filenameAttribute;
 		string imageMask;
@@ -183,6 +186,7 @@ class RSGISExeImageUtils : public RSGISAlgorithmParameters
         string projFile;
         string imageFormat;
         string lutMatrixFile;
+        string classColumnName;
 		ClassColour **classColour;
 		float nodataValue;
 		float skipValue;
@@ -241,6 +245,10 @@ class RSGISExeImageUtils : public RSGISAlgorithmParameters
         double rotY;
         string outFileExtension;
         unsigned int tileOverlap;
+        bool demProvided;
+        AccPtsType accuracyPtsType;
+        unsigned int numPoints;
+        unsigned int seed;
 	};
 }
 #endif
