@@ -94,7 +94,7 @@ namespace rsgis{namespace img{
     protected:
         float findPixelVal(GDALDataset *image, unsigned int band, double eastings, double northings, double tlX, double tlY, double xRes, double yRes, unsigned int xSize, unsigned int ySize) throw(rsgis::RSGISImageException);
         std::string findClassVal(GDALDataset *image, unsigned int band, GDALRasterAttributeTable *attTable, unsigned int classNameColIdx, unsigned int xPxl, unsigned int yPxl) throw(rsgis::RSGISImageException);
-        std::list<std::string>* findUniqueClasses(GDALRasterAttributeTable *attTable, unsigned int classNameColIdx) throw(rsgis::RSGISImageException);
+        std::list<std::string>* findUniqueClasses(GDALRasterAttributeTable *attTable, unsigned int classNameColIdx, int histoColIdx) throw(rsgis::RSGISImageException);
     };
 		
 }}

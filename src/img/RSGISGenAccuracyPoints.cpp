@@ -261,6 +261,9 @@ namespace rsgis{namespace img{
             int inClassColIdx = 0;
             bool inClassColFound = false;
             
+            int histoColIdx = 0;
+            bool histoColFound = false;
+            
             for(int i = 0; i < numColumns; ++i)
             {
                 if(!inClassColFound && (std::string(attTable->GetNameOfCol(i)) == classColName))
@@ -268,11 +271,21 @@ namespace rsgis{namespace img{
                     inClassColFound = true;
                     inClassColIdx = i;
                 }
+                else if(!histoColFound && (std::string(attTable->GetNameOfCol(i)) == "Histogram"))
+                {
+                    histoColFound = true;
+                    histoColIdx = i;
+                }
             }
             
             if(!inClassColFound)
             {
                 throw rsgis::RSGISImageException("Could not find the input class column.");
+            }
+            
+            if(!histoColFound)
+            {
+                throw rsgis::RSGISImageException("Could not find the Histogram column.");
             }
             
             double tlX = 0;
@@ -319,7 +332,7 @@ namespace rsgis{namespace img{
             }
             delete[] trans;
             
-            std::list<std::string> *classes = this->findUniqueClasses(attTable, inClassColIdx);
+            std::list<std::string> *classes = this->findUniqueClasses(attTable, inClassColIdx, histoColIdx);
             
             std::vector<std::vector<RSGISAccPoint*> > *accClassPts = new std::vector<std::vector<RSGISAccPoint*> >();
             std::map<std::string, size_t> classesLookUp;
@@ -360,7 +373,7 @@ namespace rsgis{namespace img{
                 
                 xPxl = rand() % imgSizeX;
                 yPxl = rand() % imgSizeY;
-                
+                                
                 eastings = tlX + (((double)xPxl)*xRes);
                 northings = tlY - (((double)yPxl)*yRes);
                                 
@@ -543,41 +556,45 @@ namespace rsgis{namespace img{
         return className;
     }
     
-    std::list<std::string>* RSGISGenAccuracyPoints::findUniqueClasses(GDALRasterAttributeTable *attTable, unsigned int classNameColIdx) throw(rsgis::RSGISImageException)
+    std::list<std::string>* RSGISGenAccuracyPoints::findUniqueClasses(GDALRasterAttributeTable *attTable, unsigned int classNameColIdx, int histoColIdx) throw(rsgis::RSGISImageException)
     {
         std::list<std::string> *classes = new std::list<std::string>();
         
         std::string className = "";
         bool foundClassName = false;
+        long histVal = 0;
         for(unsigned long i = 1; i < attTable->GetRowCount(); ++i)
         {
-            className = boost::trim_all_copy(std::string(attTable->GetValueAsString(i, classNameColIdx)));
-            foundClassName = false;
-            
-            if(className != "")
+            histVal = attTable->GetValueAsInt(i, histoColIdx);
+            if(histVal > 0)
             {
-                if(classes->empty())
+                className = boost::trim_all_copy(std::string(attTable->GetValueAsString(i, classNameColIdx)));
+                foundClassName = false;
+                
+                if(className != "")
                 {
-                    classes->push_back(className);
-                }
-                else
-                {
-                    for(std::list<std::string>::iterator iterClasses = classes->begin(); iterClasses != classes->end(); ++iterClasses)
-                    {
-                        if(*iterClasses == className)
-                        {
-                            foundClassName = true;
-                            break;
-                        }
-                    }
-                    
-                    if(!foundClassName)
+                    if(classes->empty())
                     {
                         classes->push_back(className);
                     }
+                    else
+                    {
+                        for(std::list<std::string>::iterator iterClasses = classes->begin(); iterClasses != classes->end(); ++iterClasses)
+                        {
+                            if(*iterClasses == className)
+                            {
+                                foundClassName = true;
+                                break;
+                            }
+                        }
+                        
+                        if(!foundClassName)
+                        {
+                            classes->push_back(className);
+                        }
+                    }
                 }
             }
-            
         }
         
         classes->sort(rsgis::utils::compareStringNoCase);
