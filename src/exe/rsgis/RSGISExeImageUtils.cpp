@@ -104,6 +104,7 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
     XMLCh *optionCreateTiles = XMLString::transcode("createtiles");
     XMLCh *optionBandColourUsage = XMLString::transcode("bandcolourusage");
     XMLCh *optionAssignSpatialInfo = XMLString::transcode("assignspatialinfo");
+    XMLCh *optionGenAssessPoints = XMLString::transcode("genassesspoints");
 
 	const XMLCh *algorNameEle = argElement->getAttribute(algorXMLStr);
 	if(!XMLString::equals(algorName, algorNameEle))
@@ -2777,6 +2778,115 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 		}
 		XMLString::release(&rotYXMLStr);
 	}
+    else if (XMLString::equals(optionGenAssessPoints, optionXML))
+	{
+		this->option = RSGISExeImageUtils::genassesspoints;
+        
+		XMLCh *imageXMLStr = XMLString::transcode("image");
+		if(argElement->hasAttribute(imageXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(imageXMLStr));
+			this->inputImage = string(charValue);
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+		}
+		XMLString::release(&imageXMLStr);
+        
+        XMLCh *demXMLStr = XMLString::transcode("dem");
+		if(argElement->hasAttribute(demXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(demXMLStr));
+			this->inputDEM = string(charValue);
+            this->demProvided = true;
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			this->demProvided = false;
+		}
+		XMLString::release(&demXMLStr);
+        
+        XMLCh *outputXMLStr = XMLString::transcode("output");
+		if(argElement->hasAttribute(outputXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
+			this->outputFile = string(charValue);
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+		}
+		XMLString::release(&outputXMLStr);
+        
+        XMLCh *classColumnXMLStr = XMLString::transcode("classcolumn");
+		if(argElement->hasAttribute(classColumnXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(classColumnXMLStr));
+			this->classColumnName = string(charValue);
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'classcolumn\' attribute was provided.");
+		}
+		XMLString::release(&classColumnXMLStr);
+        
+        
+        XMLCh *typeXMLStr = XMLString::transcode("type");
+		if(argElement->hasAttribute(typeXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(typeXMLStr));
+            string typeString = string(charValue);
+			if(typeString == "random")
+            {
+                this->accuracyPtsType = rsgis_randompts;
+            }
+            else if(typeString == "stratified")
+            {
+                this->accuracyPtsType = rsgis_stratifiedpts;
+            }
+            else
+            {
+                throw RSGISXMLArgumentsException("The \'type\' attribute must be either \'random\' or \'stratified\'.");
+            }
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'type\' attribute was provided.");
+		}
+		XMLString::release(&typeXMLStr);
+        
+        XMLCh *nStr = XMLString::transcode("n");
+		if(argElement->hasAttribute(nStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(nStr));
+			this->numPoints = mathUtils.strtounsignedint(string(charValue));
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'n\' attribute was provided.");
+		}
+		XMLString::release(&nStr);
+        
+        XMLCh *seedStr = XMLString::transcode("seed");
+		if(argElement->hasAttribute(seedStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(seedStr));
+			this->seed = mathUtils.strtounsignedint(string(charValue));
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'seed\' attribute was provided.");
+		}
+		XMLString::release(&seedStr);        
+	}
 	else
 	{
 		string message = string("The option (") + string(XMLString::transcode(optionXML)) + string(") is not known: RSGISExeImageUtils.");
@@ -2825,6 +2935,7 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
     XMLString::release(&optionCreateTiles);
     XMLString::release(&optionBandColourUsage);
     XMLString::release(&optionAssignSpatialInfo);
+    XMLString::release(&optionGenAssessPoints);
 
 	parsed = true;
 }
@@ -4654,6 +4765,67 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
                 throw e;
             }
         }
+        else if(option == RSGISExeImageUtils::genassesspoints)
+        {
+            cout << "Generating random points for accuracy assessment.\n";
+            cout << "Input File: " << this->inputImage << endl;
+            cout << "Classification Column: " << this->classColumnName << endl;
+            cout << "Output File: " << this->outputFile << endl;
+            if(demProvided)
+            {
+                cout << "DEM: " << this->inputDEM << endl;
+            }
+            else
+            {
+                cout << "A DEM was not provided therefore Elevations values will be 0.\n";
+            }
+            if(accuracyPtsType == rsgis_randompts)
+            {
+                cout << "Generating " << this->numPoints << " random points across the image.\n";
+            }
+            else if(accuracyPtsType ==  rsgis_stratifiedpts)
+            {
+                cout << "Generating " << this->numPoints << " stratified random points per class.\n";
+            }
+            cout << "Random generator seed: " << this->seed << endl;
+            
+            GDALAllRegister();
+            GDALDataset *inDataset = NULL;
+            GDALDataset *inDEMDataset = NULL;
+            inDataset = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_ReadOnly);
+            if(inDataset == NULL)
+            {
+                string message = string("Could not open image ") + this->inputImage;
+                throw RSGISImageException(message.c_str());
+            }
+            
+            if(demProvided)
+            {
+                inDEMDataset = (GDALDataset *) GDALOpen(this->inputDEM.c_str(), GA_ReadOnly);
+                if(inDEMDataset == NULL)
+                {
+                    string message = string("Could not open image ") + this->inputDEM;
+                    throw RSGISImageException(message.c_str());
+                }
+            }
+            
+            RSGISGenAccuracyPoints mapAcc;
+            
+            if(accuracyPtsType == rsgis_randompts)
+            {
+                mapAcc.generateRandomPoints(inDataset, inDEMDataset, this->demProvided, this->outputFile, this->classColumnName, this->numPoints, this->seed);
+            }
+            else if(accuracyPtsType ==  rsgis_stratifiedpts)
+            {
+                mapAcc.generateStratifiedRandomPoints(inDataset, inDEMDataset, this->demProvided, this->outputFile, this->classColumnName, this->numPoints, this->seed);
+            }
+            
+            
+            GDALClose(inDataset);
+            GDALClose(inDEMDataset);
+            GDALDestroyDriverManager();
+            
+        }
 		else
 		{
 			cout << "Options not recognised\n";
@@ -4978,6 +5150,30 @@ void RSGISExeImageUtils::printParameters()
             cout << "TL: [" << this->tlx << "," << this->tly << "]" << endl;
             cout << "Res: [" << this->resX << "," << this->resY << "]" << endl;
             cout << "Rot: [" << this->rotX << "," << this->rotY << "]" << endl;
+        }
+        else if(option == RSGISExeImageUtils::genassesspoints)
+        {
+            cout << "Generating random points for accuracy assessment.\n";
+            cout << "Input File: " << this->inputImage << endl;
+            cout << "Classification Column: " << this->classColumnName << endl;
+            cout << "Output File: " << this->outputFile << endl;
+            if(demProvided)
+            {
+                cout << "DEM: " << this->inputDEM << endl;
+            }
+            else
+            {
+                cout << "A DEM was not provided therefore Elevations values will be 0.\n";
+            }
+            if(accuracyPtsType == rsgis_randompts)
+            {
+                cout << "Generating " << this->numPoints << " random points across the image.\n";
+            }
+            else if(accuracyPtsType ==  rsgis_stratifiedpts)
+            {
+                cout << "Generating " << this->numPoints << " stratified random points per class.\n";
+            }
+            cout << "Random generator seed: " << this->seed << endl;
         }
 		else
 		{
