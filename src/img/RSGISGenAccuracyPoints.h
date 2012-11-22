@@ -34,6 +34,8 @@
 #include "common/RSGISImageException.h"
 #include "utils/RSGISTextUtils.h"
 
+#include <boost/algorithm/string/trim_all.hpp>
+
 namespace rsgis{namespace img{
 	
     enum AccPtsType
