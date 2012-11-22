@@ -322,11 +322,15 @@ namespace rsgis{namespace img{
             std::list<std::string> *classes = this->findUniqueClasses(attTable, inClassColIdx);
             
             std::vector<std::vector<RSGISAccPoint*> > *accClassPts = new std::vector<std::vector<RSGISAccPoint*> >();
+            std::map<std::string, size_t> classesLookUp;
             
+            size_t idx = 0;
             for(std::list<std::string>::iterator iterClasses = classes->begin(); iterClasses != classes->end(); ++iterClasses)
             {
                 std::cout << "Class: \'" <<  *iterClasses << "\'" << std::endl;
                 accClassPts->push_back(std::vector<RSGISAccPoint*>());
+                classesLookUp.insert(std::pair<std::string, size_t>(*iterClasses, idx));
+                ++idx;
             }
             
             
@@ -338,13 +342,13 @@ namespace rsgis{namespace img{
             double northings = 0;
             float demVal = 0;
             std::string classVal = "";
-            bool foundClassName = false;
+            std::map<std::string, size_t>::iterator iterMap;
             
             RSGISAccPoint *tmpAccPt = NULL;
             
             unsigned long totalNumPtsRequired = classes->size() * numPts;
             unsigned long ptsCount = 0;
-            size_t idx = 0;
+            
             
             std::cout << "Number of points to be generated: " << totalNumPtsRequired << std::endl;
             
@@ -359,48 +363,38 @@ namespace rsgis{namespace img{
                 
                 eastings = tlX + (((double)xPxl)*xRes);
                 northings = tlY - (((double)yPxl)*yRes);
-                
-                if(demProvided)
-                {
-                    try
-                    {
-                        demVal = findPixelVal(inputDEM, 1, eastings, northings, demTlX, demTlY, demXRes, demYRes, demSizeX, demSizeY);
-                    }
-                    catch (rsgis::RSGISImageException &e)
-                    {
-                        demVal = -99999;
-                    }
-                }
-                else
-                {
-                    demVal = 0;
-                }
-                
+                                
                 try
                 {
                     classVal = findClassVal(inputImage, 1, attTable, inClassColIdx, xPxl, yPxl);
+                                       
+                    iterMap = classesLookUp.find(classVal);
                     
-                    idx = 0;
-                    foundClassName = false;
-                    for(std::list<std::string>::iterator iterClasses = classes->begin(); iterClasses != classes->end(); ++iterClasses)
-                    {
-                        if((*iterClasses) == classVal)
-                        {
-                            foundClassName = true;
-                            break;
-                        }
-                        else
-                        {
-                            ++idx;
-                        }
-                    }
-                    
-                    if(!foundClassName)
+                    if(iterMap == classesLookUp.end())
                     {
                         rsgis::RSGISImageException("Class name was not found!");
                     }
-                    else if(accClassPts->at(idx).size() < numPts)
+                    
+                    idx = iterMap->second;
+                    
+                    if(accClassPts->at(idx).size() < numPts)
                     {
+                        if(demProvided)
+                        {
+                            try
+                            {
+                                demVal = findPixelVal(inputDEM, 1, eastings, northings, demTlX, demTlY, demXRes, demYRes, demSizeX, demSizeY);
+                            }
+                            catch (rsgis::RSGISImageException &e)
+                            {
+                                demVal = -99999;
+                            }
+                        }
+                        else
+                        {
+                            demVal = 0;
+                        }
+                        
                         tmpAccPt = new RSGISAccPoint();
                         tmpAccPt->ptID = ptsCount+1;
                         tmpAccPt->eastings = eastings;
