@@ -639,7 +639,8 @@
 		<rsgis:band band="int" usage="palette | greyscale | red | green | blue | alpha" />
 		<rsgis:band band="int" usage="palette | greyscale | red | green | blue | alpha" />
     </rsgis:command>
-
+	<!-- A command to generate random points for accuracy assessment, n is either the total number of points for random or the number of points stratified within each class -->
+    <rsgis:command algor="imageutils" option="genassesspoints" image="image.env" [dem="image.env"] output="file.dat" classcolumn="string" seed="int" type="random | stratified" n="int; total number for random or number within each class for stratified" />
 
 
 

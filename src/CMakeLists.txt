@@ -321,6 +321,7 @@ set(LIB_IMG_H
 	${RSGIS_SRC_IMG_DIR}/RSGISRelabelPixelValuesFromLUT.h
 	${RSGIS_SRC_IMG_DIR}/RSGISPopWithStats.h
 	${RSGIS_SRC_IMG_DIR}/RSGISGenHistogram.h
+	${RSGIS_SRC_IMG_DIR}/RSGISGenAccuracyPoints.h
 	)
 	
 set(LIB_IMG_CPP
@@ -449,6 +450,8 @@ set(LIB_IMG_CPP
 	${RSGIS_SRC_IMG_DIR}/RSGISPopWithStats.h
 	${RSGIS_SRC_IMG_DIR}/RSGISGenHistogram.cpp
 	${RSGIS_SRC_IMG_DIR}/RSGISGenHistogram.h
+	${RSGIS_SRC_IMG_DIR}/RSGISGenAccuracyPoints.cpp
+	${RSGIS_SRC_IMG_DIR}/RSGISGenAccuracyPoints.h
 	)
 ###############################################################################
 
