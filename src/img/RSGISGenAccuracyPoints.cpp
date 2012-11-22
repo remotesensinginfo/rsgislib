@@ -544,7 +544,7 @@ namespace rsgis{namespace img{
             throw rsgis::RSGISImageException("Row is not available.");
         }
         
-        std::string className = std::string(attTable->GetValueAsString(val, classNameColIdx));
+        std::string className = boost::trim_all_copy(std::string(attTable->GetValueAsString(val, classNameColIdx)));
         
         return className;
     }
@@ -557,27 +557,30 @@ namespace rsgis{namespace img{
         bool foundClassName = false;
         for(unsigned long i = 1; i < attTable->GetRowCount(); ++i)
         {
-            className = attTable->GetValueAsString(i, classNameColIdx);
+            className = boost::trim_all_copy(std::string(attTable->GetValueAsString(i, classNameColIdx)));
             foundClassName = false;
             
-            if(classes->empty())
+            if(className != "")
             {
-                classes->push_back(className);
-            }
-            else
-            {
-                for(std::list<std::string>::iterator iterClasses = classes->begin(); iterClasses != classes->end(); ++iterClasses)
-                {
-                    if(*iterClasses == className)
-                    {
-                        foundClassName = true;
-                        break;
-                    }
-                }
-                
-                if(!foundClassName)
+                if(classes->empty())
                 {
                     classes->push_back(className);
+                }
+                else
+                {
+                    for(std::list<std::string>::iterator iterClasses = classes->begin(); iterClasses != classes->end(); ++iterClasses)
+                    {
+                        if(*iterClasses == className)
+                        {
+                            foundClassName = true;
+                            break;
+                        }
+                    }
+                    
+                    if(!foundClassName)
+                    {
+                        classes->push_back(className);
+                    }
                 }
             }
             
