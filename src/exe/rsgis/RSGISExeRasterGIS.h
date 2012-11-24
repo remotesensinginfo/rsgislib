@@ -50,6 +50,7 @@
 #include "rastergis/RSGISFindInfoBetweenLayers.h"
 #include "rastergis/RSGISFindClosestSpecSpatialFeats.h"
 #include "rastergis/RSGISMaxLikelihoodRATClassification.h"
+#include "rastergis/RSGISClassMask.h"
 
 #include "gdal_priv.h"
 #include "ogrsf_frmts.h"
@@ -87,7 +88,8 @@ namespace rsgisexe{
             findspecclose,
             specdistmajorityclassifier,
             maxlikelihoodclassifier,
-            maxlikelihoodclassifierlocalpriors
+            maxlikelihoodclassifierlocalpriors,
+            classmask
         };
         
         RSGISExeRasterGIS();
@@ -128,6 +130,7 @@ namespace rsgisexe{
         std::string baseClassCol;
         std::string infoClassCol;
         std::string trainingSelectCol;
+        std::string className;
         size_t fid;
         unsigned int nFeatures;
         float specDistThreshold;

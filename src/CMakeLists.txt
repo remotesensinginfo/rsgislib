@@ -678,7 +678,8 @@ set(LIB_RASTERGIS_H
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISExportColumns2Image.h
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindInfoBetweenLayers.h
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindClosestSpecSpatialFeats.h
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISMaxLikelihoodRATClassification.h )
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISMaxLikelihoodRATClassification.h
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISClassMask.h )
 	
 set(LIB_RASTERGIS_CPP
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISAttributeTable.cpp
@@ -726,7 +727,9 @@ set(LIB_RASTERGIS_CPP
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindClosestSpecSpatialFeats.cpp
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindClosestSpecSpatialFeats.h
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISMaxLikelihoodRATClassification.cpp
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISMaxLikelihoodRATClassification.h )
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISMaxLikelihoodRATClassification.h
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISClassMask.cpp
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISClassMask.h )
 ###############################################################################
 
 ###############################################################################

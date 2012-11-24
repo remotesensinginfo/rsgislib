@@ -105,6 +105,7 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
     XMLCh *optionBandColourUsage = XMLString::transcode("bandcolourusage");
     XMLCh *optionAssignSpatialInfo = XMLString::transcode("assignspatialinfo");
     XMLCh *optionGenAssessPoints = XMLString::transcode("genassesspoints");
+    XMLCh *optionUniquePxlClumps = XMLString::transcode("uniquepxlclumps");
 
 	const XMLCh *algorNameEle = argElement->getAttribute(algorXMLStr);
 	if(!XMLString::equals(algorName, algorNameEle))
@@ -2900,6 +2901,64 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 		}
 		XMLString::release(&seedStr);        
 	}
+    else if (XMLString::equals(optionUniquePxlClumps, optionXML))
+	{
+		this->option = RSGISExeImageUtils::uniquepxlclumps;
+        
+		XMLCh *imageXMLStr = XMLString::transcode("image");
+		if(argElement->hasAttribute(imageXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(imageXMLStr));
+			this->inputImage = string(charValue);
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+		}
+		XMLString::release(&imageXMLStr);
+        
+        
+		XMLCh *outputXMLStr = XMLString::transcode("output");
+		if(argElement->hasAttribute(outputXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
+			this->outputImage = string(charValue);
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+		}
+		XMLString::release(&outputXMLStr);
+        
+        noDataValDefined = false;
+        XMLCh *noDataValXMLStr = XMLString::transcode("nodata");
+		if(argElement->hasAttribute(noDataValXMLStr))
+		{
+            XMLCh *NaNStr = XMLString::transcode("NaN");
+			const XMLCh *dataValue = argElement->getAttribute(noDataValXMLStr);
+			if(XMLString::equals(dataValue, NaNStr))
+			{
+                const char *val = "NaN";
+				this->dataValue = nan(val);
+			}
+			else
+			{
+				char *charValue = XMLString::transcode(argElement->getAttribute(noDataValXMLStr));
+                this->nodataValue = mathUtils.strtofloat(string(charValue));
+                XMLString::release(&charValue);
+			}
+			XMLString::release(&NaNStr);
+            noDataValDefined = true;
+		}
+		else
+		{
+			noDataValDefined = false;
+		}
+		XMLString::release(&noDataValXMLStr);
+        
+	}
 	else
 	{
 		string message = string("The option (") + string(XMLString::transcode(optionXML)) + string(") is not known: RSGISExeImageUtils.");
@@ -4854,6 +4913,56 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
             GDALClose(inDataset);
             GDALClose(inDEMDataset);
             GDALDestroyDriverManager();
+            
+        }
+        else if(option == RSGISExeImageUtils::uniquepxlclumps)
+        {
+            cout << "Create an image where each pixel is a unique \'clump\' \n";
+            cout << "Image: " << this->inputImage << endl;
+            cout << "Output: " << this->outputImage << endl;
+            if(noDataValDefined)
+            {
+                cout << "Data Value: " << this->nodataValue << endl;
+            }
+            else
+            {
+                cout << "A no data value has not been defined\n";
+            }
+            cout << "Image format: " << this->imageFormat << endl;
+            
+            GDALAllRegister();
+                       
+			GDALDataset **datasets = NULL;
+            
+			RSGISCalcImage *calcImage = NULL;
+			RSGISCalcImageValue *calcImageValue = NULL;
+            
+			try
+			{
+                datasets = new GDALDataset*[1];
+				datasets[0] = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_ReadOnly);
+				if(datasets[0] == NULL)
+				{
+					string message = string("Could not open image ") + this->inputImage;
+					throw RSGISImageException(message.c_str());
+				}
+                
+				calcImageValue = new RSGISUniquePixelClumps(this->noDataValDefined, this->nodataValue);
+				calcImage = new RSGISCalcImage(calcImageValue, "", true);
+                
+				calcImage->calcImage(datasets, 1, this->outputImage, false, NULL, this->imageFormat, GDT_UInt32);
+                
+				delete calcImage;
+				delete calcImageValue;
+                                
+				GDALClose(datasets[0]);
+				delete[] datasets;
+			}
+			catch(RSGISException& e)
+			{
+				throw e;
+			}
+			GDALDestroyDriverManager();
             
         }
 		else
