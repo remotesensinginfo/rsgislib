@@ -134,7 +134,8 @@ class RSGISExeImageUtils : public RSGISAlgorithmParameters
             createKMLFile,
             bandcolourusage,
             assignspatialinfo,
-            genassesspoints
+            genassesspoints,
+            uniquepxlclumps
 		};
 
 		enum interpolators
@@ -249,6 +250,7 @@ class RSGISExeImageUtils : public RSGISAlgorithmParameters
         AccPtsType accuracyPtsType;
         unsigned int numPoints;
         unsigned int seed;
+        bool noDataValDefined;
 	};
 }
 #endif

@@ -65,6 +65,7 @@ namespace rsgisexe{
         XMLCh *optionSpecDistMajorityClassifier = xercesc::XMLString::transcode("specdistmajorityclassifier");
         XMLCh *optionMaxLikelihoodClassifier = xercesc::XMLString::transcode("maxlikelihoodclassifier");
         XMLCh *optionMaxLikelihoodClassifierLocalPriors = xercesc::XMLString::transcode("maxlikelihoodclassifierlocalpriors");
+        XMLCh *optionClassMask = xercesc::XMLString::transcode("classmask");
         
         const XMLCh *algorNameEle = argElement->getAttribute(algorXMLStr);
         if(!xercesc::XMLString::equals(algorName, algorNameEle))
@@ -2220,6 +2221,133 @@ namespace rsgisexe{
                 xercesc::XMLString::release(&nameXMLStr);
             }
         }
+        else if(xercesc::XMLString::equals(optionClassMask, optionXML))
+        {
+            this->option = RSGISExeRasterGIS::classmask;
+            
+            XMLCh *clumpsXMLStr = xercesc::XMLString::transcode("clumps");
+            if(argElement->hasAttribute(clumpsXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(clumpsXMLStr));
+                this->inputImage = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'clumps\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&clumpsXMLStr);
+            
+            XMLCh *outputXMLStr = xercesc::XMLString::transcode("output");
+            if(argElement->hasAttribute(outputXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outputXMLStr));
+                this->outputFile = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&outputXMLStr);
+            
+            // Set output image fomat (defaults to KEA)
+            this->imageFormat = "KEA";
+            XMLCh *formatXMLStr = xercesc::XMLString::transcode("format");
+            if(argElement->hasAttribute(formatXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(formatXMLStr));
+                this->imageFormat = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            xercesc::XMLString::release(&formatXMLStr);
+            
+            
+            this->outDataType = GDT_Byte;
+            XMLCh *datatypeXMLStr = xercesc::XMLString::transcode("datatype");
+            if(argElement->hasAttribute(datatypeXMLStr))
+            {
+                XMLCh *dtByte = xercesc::XMLString::transcode("Byte");
+                XMLCh *dtUInt16 = xercesc::XMLString::transcode("UInt16");
+                XMLCh *dtInt16 = xercesc::XMLString::transcode("Int16");
+                XMLCh *dtUInt32 = xercesc::XMLString::transcode("UInt32");
+                XMLCh *dtInt32 = xercesc::XMLString::transcode("Int32");
+                XMLCh *dtFloat32 = xercesc::XMLString::transcode("Float32");
+                XMLCh *dtFloat64 = xercesc::XMLString::transcode("Float64");
+                
+                const XMLCh *dtXMLValue = argElement->getAttribute(datatypeXMLStr);
+                if(xercesc::XMLString::equals(dtByte, dtXMLValue))
+                {
+                    this->outDataType = GDT_Byte;
+                }
+                else if(xercesc::XMLString::equals(dtUInt16, dtXMLValue))
+                {
+                    this->outDataType = GDT_UInt16;
+                }
+                else if(xercesc::XMLString::equals(dtInt16, dtXMLValue))
+                {
+                    this->outDataType = GDT_Int16;
+                }
+                else if(xercesc::XMLString::equals(dtUInt32, dtXMLValue))
+                {
+                    this->outDataType = GDT_UInt32;
+                }
+                else if(xercesc::XMLString::equals(dtInt32, dtXMLValue))
+                {
+                    this->outDataType = GDT_Int32;
+                }
+                else if(xercesc::XMLString::equals(dtFloat32, dtXMLValue))
+                {
+                    this->outDataType = GDT_Float32;
+                }
+                else if(xercesc::XMLString::equals(dtFloat64, dtXMLValue))
+                {
+                    this->outDataType = GDT_Float64;
+                }
+                else
+                {
+                    std::cerr << "Data type not recognised, defaulting to 32 bit float.";
+                    this->outDataType = GDT_Byte;
+                }
+                
+                xercesc::XMLString::release(&dtByte);
+                xercesc::XMLString::release(&dtUInt16);
+                xercesc::XMLString::release(&dtInt16);
+                xercesc::XMLString::release(&dtUInt32);
+                xercesc::XMLString::release(&dtInt32);
+                xercesc::XMLString::release(&dtFloat32);
+                xercesc::XMLString::release(&dtFloat64);
+            }
+            xercesc::XMLString::release(&datatypeXMLStr);
+            
+            XMLCh *classColumnXMLStr = xercesc::XMLString::transcode("classcolumn");
+            if(argElement->hasAttribute(classColumnXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(classColumnXMLStr));
+                this->classField = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'classcolumn\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&classColumnXMLStr);
+            
+            XMLCh *classXMLStr = xercesc::XMLString::transcode("class");
+            if(argElement->hasAttribute(classXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(classXMLStr));
+                this->className = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'class\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&classXMLStr);
+            
+            
+        }
         else
         {
             std::string message = std::string("The option (") + std::string(xercesc::XMLString::transcode(optionXML)) + std::string(") is not known: RSGISExeRasterGIS.");
@@ -2251,6 +2379,7 @@ namespace rsgisexe{
         xercesc::XMLString::release(&optionSpecDistMajorityClassifier);
         xercesc::XMLString::release(&optionMaxLikelihoodClassifier);
         xercesc::XMLString::release(&optionMaxLikelihoodClassifierLocalPriors);
+        xercesc::XMLString::release(&optionClassMask);
     }
     
     void RSGISExeRasterGIS::runAlgorithm() throw(rsgis::RSGISException)
@@ -3152,6 +3281,46 @@ namespace rsgisexe{
                     throw e;
                 }
             }
+            else if(this->option == RSGISExeRasterGIS::classmask)
+            {
+                std::cout << "A command to generate a mask for paraticular class\n";
+                std::cout << "Input Image: " << this->inputImage << std::endl;
+                std::cout << "Class Column: " << this->classField << std::endl;
+                std::cout << "Class Name: " << this->className << std::endl;
+                std::cout << "Output Format: " << this->imageFormat << std::endl;
+                std::cout << "Output File: " << this->outputFile << std::endl;                
+                
+                try
+                {
+                    GDALAllRegister();
+                    
+                    GDALDataset *inputDataset = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_Update);
+                    if(inputDataset == NULL)
+                    {
+                        std::string message = std::string("Could not open image ") + this->inputImage;
+                        throw rsgis::RSGISImageException(message.c_str());
+                    }
+                    
+                    rsgis::rastergis::RSGISRasterAttUtils attUtils;
+                    const GDALRasterAttributeTable *gdalATT = inputDataset->GetRasterBand(1)->GetDefaultRAT();
+                    
+                    unsigned int colIdx = attUtils.findColumnIndex(gdalATT, classField);
+                    std::string *bandNames = new std::string[1];
+                    bandNames[0] = std::string("MASK - ") + this->className;                    
+                   
+                    rsgis::rastergis::RSGISClassMask *calcImageVal = new rsgis::rastergis::RSGISClassMask(gdalATT, colIdx, className);
+                    rsgis::img::RSGISCalcImage calcImage(calcImageVal);
+                    calcImage.calcImage(&inputDataset, 1, this->outputFile, true, bandNames, this->imageFormat, outDataType);
+                    delete calcImageVal;
+                    delete[] bandNames;
+                    
+                    GDALClose(inputDataset);
+                }
+                catch(rsgis::RSGISException &e)
+                {
+                    throw e;
+                }
+            }
             else
             {
                 throw rsgis::RSGISException("The option is not recognised: RSGISExeRasterGIS");
@@ -3397,6 +3566,15 @@ namespace rsgisexe{
                 {
                     std::cout << "\tField: " << (*iterFields) << std::endl;
                 }
+            }
+            else if(this->option == RSGISExeRasterGIS::classmask)
+            {
+                std::cout << "A command to generate a mask for paraticular class\n";
+                std::cout << "Input Image: " << this->inputImage << std::endl;
+                std::cout << "Class Column: " << this->classField << std::endl;
+                std::cout << "Class Name: " << this->className << std::endl;
+                std::cout << "Output Format: " << this->imageFormat << std::endl;
+                std::cout << "Output File: " << this->outputFile << std::endl;
             }
             else
             {
