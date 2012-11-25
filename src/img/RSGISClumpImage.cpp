@@ -94,6 +94,44 @@ namespace rsgis{namespace img{
         
         return valChange;
     }
-
+    
+    
+    RSGISUniquePixelClumps::RSGISUniquePixelClumps(bool noDataDefined, float noDataVal) : RSGISCalcImageValue(1)
+    {
+        this->noDataDefined = noDataDefined;
+        this->noDataVal = noDataVal;
+        nextPixelVal = 1;
+    }
+    
+    void RSGISUniquePixelClumps::calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException)
+    {
+        bool validData = true;
+        if(noDataDefined)
+        {
+            for(unsigned int i = 0; i < numBands; ++i)
+            {
+                if(bandValues[i] == noDataVal)
+                {
+                    validData = false;
+                    break;
+                }
+            }
+        }
+        
+        if(validData)
+        {
+            output[0] = nextPixelVal++;
+        }
+        else
+        {
+            output[0] = 0;
+        }
+    }
+    
+    RSGISUniquePixelClumps::~RSGISUniquePixelClumps()
+    {
+        
+    }
+    
 }}
 
