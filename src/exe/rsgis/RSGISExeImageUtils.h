@@ -244,6 +244,12 @@ class RSGISExeImageUtils : public RSGISAlgorithmParameters
         double resY;
         double rotX;
         double rotY;
+        bool tlxDef;
+        bool tlyDef;
+        bool resXDef;
+        bool resYDef;
+        bool rotXDef;
+        bool rotYDef;
         string outFileExtension;
         unsigned int tileOverlap;
         bool demProvided;
