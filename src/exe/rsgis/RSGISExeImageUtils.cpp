@@ -2720,10 +2720,11 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			char *charValue = XMLString::transcode(argElement->getAttribute(tlxXMLStr));
 			this->tlx = mathUtils.strtodouble(string(charValue));
 			XMLString::release(&charValue);
+            this->tlxDef = true;
 		}
 		else
 		{
-			throw RSGISXMLArgumentsException("No \'tlx\' attribute was provided.");
+			this->tlxDef = false;
 		}
 		XMLString::release(&tlxXMLStr);
         
@@ -2733,10 +2734,11 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			char *charValue = XMLString::transcode(argElement->getAttribute(tlyXMLStr));
 			this->tly = mathUtils.strtodouble(string(charValue));
 			XMLString::release(&charValue);
+            this->tlyDef = true;
 		}
 		else
 		{
-			throw RSGISXMLArgumentsException("No \'tly\' attribute was provided.");
+			this->tlyDef = false;
 		}
 		XMLString::release(&tlyXMLStr);
         
@@ -2746,10 +2748,11 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			char *charValue = XMLString::transcode(argElement->getAttribute(resXXMLStr));
 			this->resX = mathUtils.strtodouble(string(charValue));
 			XMLString::release(&charValue);
+            this->resXDef = true;
 		}
 		else
 		{
-			throw RSGISXMLArgumentsException("No \'resX\' attribute was provided.");
+			this->resXDef = false;
 		}
 		XMLString::release(&resXXMLStr);
         
@@ -2759,10 +2762,11 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			char *charValue = XMLString::transcode(argElement->getAttribute(resYXMLStr));
 			this->resY = mathUtils.strtodouble(string(charValue));
 			XMLString::release(&charValue);
+            this->resYDef = true;
 		}
 		else
 		{
-			throw RSGISXMLArgumentsException("No \'resY\' attribute was provided.");
+			this->resYDef = false;
 		}
 		XMLString::release(&resYXMLStr);
         
@@ -2772,10 +2776,11 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			char *charValue = XMLString::transcode(argElement->getAttribute(rotXXMLStr));
 			this->rotX = mathUtils.strtodouble(string(charValue));
 			XMLString::release(&charValue);
+            this->rotXDef = true;
 		}
 		else
 		{
-			throw RSGISXMLArgumentsException("No \'rotX\' attribute was provided.");
+			this->rotXDef = false;
 		}
 		XMLString::release(&rotXXMLStr);
         
@@ -2785,10 +2790,11 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			char *charValue = XMLString::transcode(argElement->getAttribute(rotYXMLStr));
 			this->rotY = mathUtils.strtodouble(string(charValue));
 			XMLString::release(&charValue);
+            this->rotYDef = true;
 		}
 		else
 		{
-			throw RSGISXMLArgumentsException("No \'rotY\' attribute was provided.");
+			this->rotYDef = false;
 		}
 		XMLString::release(&rotYXMLStr);
 	}
@@ -4823,11 +4829,33 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
         }
         else if(option == RSGISExeImageUtils::assignspatialinfo)
         {
+            cout.precision(12);
             cout << "Assign and update image spatial header info\n";
             cout << "Image: " << this->inputImage << endl;
-            cout << "TL: [" << this->tlx << "," << this->tly << "]" << endl;
-            cout << "Res: [" << this->resX << "," << this->resY << "]" << endl;
-            cout << "Rot: [" << this->rotX << "," << this->rotY << "]" << endl;
+            if(this->tlxDef)
+            {
+                cout << "TLX: " << this->tlx << std::endl;
+            }
+            if(this->tlyDef)
+            {
+                cout << "TLY: " << this->tly << std::endl;
+            }
+            if(this->resXDef)
+            {
+                cout << "Res X: " << this->resX << std::endl;
+            }
+            if(this->resYDef)
+            {
+                cout << "Res Y: " << this->resY << std::endl;
+            }
+            if(this->rotXDef)
+            {
+                cout << "Rot X: " << this->rotX << std::endl;
+            }
+            if(this->rotYDef)
+            {
+                cout << "Rot Y: " << this->rotY << std::endl;
+            }
             
             try
             {
@@ -4841,12 +4869,41 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
                 }
                 
                 double *trans = new double[6];
+                inDataset->GetGeoTransform(trans);
+                
+                if(this->tlxDef)
+                {
+                    trans[0] = this->tlx;
+                }
+                if(this->tlyDef)
+                {
+                    trans[3] = this->tly;
+                }
+                if(this->resXDef)
+                {
+                    trans[1] = this->resX;
+                }
+                if(this->resYDef)
+                {
+                    trans[5] = this->resY;
+                }
+                if(this->rotXDef)
+                {
+                    trans[2] = this->rotX;
+                }
+                if(this->rotYDef)
+                {
+                    trans[4] = this->rotY;
+                }
+                
+                cout << "TL: [" << trans[0] << "," << trans[3] << "]" << endl;
+                cout << "RES: [" << trans[1] << "," << trans[5] << "]" << endl;
+                cout << "ROT: [" << trans[2] << "," << trans[4] << "]" << endl;
                 
                 inDataset->SetGeoTransform(trans);
                 
-                delete trans;
-                
                 GDALClose(inDataset);
+                delete trans;
                 GDALDestroyDriverManager();
             }
             catch (RSGISException &e)
@@ -5286,9 +5343,30 @@ void RSGISExeImageUtils::printParameters()
         {
             cout << "Assign and update image spatial header info\n";
             cout << "Image: " << this->inputImage << endl;
-            cout << "TL: [" << this->tlx << "," << this->tly << "]" << endl;
-            cout << "Res: [" << this->resX << "," << this->resY << "]" << endl;
-            cout << "Rot: [" << this->rotX << "," << this->rotY << "]" << endl;
+            if(this->tlxDef)
+            {
+                cout << "TLX: " << this->tlx << std::endl;
+            }
+            if(this->tlyDef)
+            {
+                cout << "TLY: " << this->tly << std::endl;
+            }
+            if(this->resXDef)
+            {
+                cout << "Res X: " << this->resX << std::endl;
+            }
+            if(this->resYDef)
+            {
+                cout << "Res Y: " << this->resY << std::endl;
+            }
+            if(this->rotXDef)
+            {
+                cout << "Rot X: " << this->rotX << std::endl;
+            }
+            if(this->rotYDef)
+            {
+                cout << "Rot Y: " << this->rotY << std::endl;
+            }
         }
         else if(option == RSGISExeImageUtils::genassesspoints)
         {
