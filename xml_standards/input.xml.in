@@ -493,9 +493,8 @@
         <rsgis:field name="string" />
         <rsgis:field name="string" />
     </rsgis:command>
-
-
-
+	<!-- A command to create a binary mask for a class -->
+	<rsgis:command algor="rastergis" option="classmask" clumps="image.kea" classcolumn="column" class="string" output="image.kea" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
 
 
 
@@ -636,15 +635,17 @@
     <!-- A command to create a KML text file for an existing image -->
     <rsgis:command algor="imageutils" option="createKMLFile" image="image.png" outKMLFile="string"/>
 	<!-- A command to assign and update an image with specific spatial location -->
-    <rsgis:command algor="imageutils" option="assignspatialinfo" image="image.env" tlx="double" tly="double" resX="double" resY="double" [rotX="double"] [rotY="double"] />
+    <rsgis:command algor="imageutils" option="assignspatialinfo" image="image.env" [tlx="double"] [tly="double"] [resX="double"] [resY="double"] [rotX="double"] [rotY="double"] />
 	<!-- A command to define a band colour usage -->
     <rsgis:command algor="imageutils" option="bandcolourusage" image="string" >
         <rsgis:band band="int" usage="palette | greyscale | red | green | blue | alpha" />
 		<rsgis:band band="int" usage="palette | greyscale | red | green | blue | alpha" />
 		<rsgis:band band="int" usage="palette | greyscale | red | green | blue | alpha" />
     </rsgis:command>
-
-
+	<!-- A command to generate random points for accuracy assessment, n is either the total number of points for random or the number of points stratified within each class -->
+    <rsgis:command algor="imageutils" option="genassesspoints" image="image.env" [dem="image.env"] output="file.dat" classcolumn="string" seed="int" type="random | stratified" n="int; total number for random or number within each class for stratified" />
+	<!-- A command to create an image where each pixel is a unique 'clump' -->
+    <rsgis:command algor="imageutils" option="uniquepxlclumps" image="image.env" output="image_out.env" [nodata="float"] format="GDAL Format"  />
 
 
 

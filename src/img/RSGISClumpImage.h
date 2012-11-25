@@ -33,6 +33,7 @@
 #include "img/RSGISImageCalcException.h"
 #include "img/RSGISImageUtils.h"
 #include "img/RSGISCalcImgAlongsideOut.h"
+#include "img/RSGISCalcImageValue.h"
 
 namespace rsgis 
 {
@@ -45,10 +46,29 @@ namespace rsgis
             {
                 this->clumpCounter = 1;
             };
-            virtual bool calcValue(bool firstIter, unsigned int numBands, unsigned int *dataCol, unsigned int **rowAbove, unsigned int **rowBelow, unsigned int *left, unsigned int *right)throw(RSGISImageCalcException);
+            bool calcValue(bool firstIter, unsigned int numBands, unsigned int *dataCol, unsigned int **rowAbove, unsigned int **rowBelow, unsigned int *left, unsigned int *right)throw(RSGISImageCalcException);
             ~RSGISClumpImage(){};
         private:
             long clumpCounter;
+        };
+        
+        
+        class RSGISUniquePixelClumps : public RSGISCalcImageValue
+        {
+        public:
+            RSGISUniquePixelClumps(bool noDataDefined, float noDataVal);
+            void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException);
+            void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+            void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+            void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+            void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+            void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+            bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+            ~RSGISUniquePixelClumps();
+        private:
+            bool noDataDefined;
+            float noDataVal;
+            size_t nextPixelVal;
         };
 	}
 }
