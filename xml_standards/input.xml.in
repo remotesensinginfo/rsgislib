@@ -98,7 +98,9 @@
             <rsgis:band band="int" threshold="float" />
         </rsgis:attribute>
     </rsgis:command>
-    <!-- Calculates zonal statistics for image pixels, falling between minimum and maximum threasholds. Statistics may be calculated for all bands in image using default names (b1, b2 etc.) or selected bands with user specified names. -->
+        <!-- Calculates zonal statistics for image pixels, falling between minimum and maximum threasholds. Statistics are calculated for all bands in image using default names (b1, b2 etc.) -->
+    <rsgis:command algor="zonalstats" option="pixelstats" image="image.env"   vector="polys.shp" raster="polys.env" output="output.shp" method="polyContainsPixel | polyContainsPixelCenter | polyOverlapsPixel | polyOverlapsOrContainsPixel | pixelContainsPoly | pixelContainsPolyCenter | adaptive | envelope" force="yes | no" ignoreProjection="yes | no" copyAttributes="yes | no" pxlcount="yes | no" mean="yes | no " min="yes | no" max="yes | no " stddev="yes | no" mode="yes | no" count="yes | no" minThreshold="float" maxThreshold="float" />
+    <!-- Calculates zonal statistics for image pixels, falling between minimum and maximum threasholds. Statistics may be calculated for selected bands with user specified names, statistics specified for each attribute override common statistics -->
     <rsgis:command algor="zonalstats" option="pixelstats" image="image.env"   vector="polys.shp" raster="polys.env" output="output.shp" method="polyContainsPixel | polyContainsPixelCenter | polyOverlapsPixel | polyOverlapsOrContainsPixel | pixelContainsPoly | pixelContainsPolyCenter | adaptive | envelope" force="yes | no" ignoreProjection="yes | no" copyAttributes="yes | no" pxlcount="yes | no" mean="yes | no " min="yes | no" max="yes | no " stddev="yes | no" mode="yes | no" count="yes | no" minThreshold="float" maxThreshold="float" >
         <rsgis:attribute name="attribute_name" mean="yes | no " min="yes | no" max="yes | no " stddev="yes | no" mode="yes | no"  count="yes | no">
             <rsgis:band band="int" minThreshold="float" maxThreshold="float" />
@@ -107,7 +109,9 @@
             <rsgis:band band="int" minThreshold="float" maxThreshold="float" />
         </rsgis:attribute>
     </rsgis:command>
-    <!-- A command to ... -->
+        <!-- Calculates zonal statistics for image pixels, falling between minimum and maximum threasholds. Statistics are calculated for all bands in image using default names (b1, b2 etc.) Output saved to CSV -->
+    <rsgis:command algor="zonalstats" option="pixelstats" image="image.env"   vector="polys.shp" raster="polys.env" output="output.shp" method="polyContainsPixel | polyContainsPixelCenter | polyOverlapsPixel | polyOverlapsOrContainsPixel | pixelContainsPoly | pixelContainsPolyCenter | adaptive | envelope" ignoreProjection="yes | no" pxlcount="yes | no" mean="yes | no " min="yes | no" max="yes | no " stddev="yes | no" mode="yes | no" count="yes | no" minThreshold="float" maxThreshold="float" />
+    <!-- Calculates zonal statistics for image pixels, falling between minimum and maximum threasholds. Statistics may be calculated for selected bands with user specified names, statistics specified for each attribute override common statistics. Output saved to CSV -->
     <rsgis:command algor="zonalstats" option="pixelstats" image="image.env"   vector="polys.shp" raster="polys.env" outputCSV="output.csv" method="polyContainsPixel | polyContainsPixelCenter | polyOverlapsPixel | polyOverlapsOrContainsPixel | pixelContainsPoly | pixelContainsPolyCenter | adaptive | envelope" ignoreProjection="yes | no" pxlcount="yes | no" mean="yes | no " min="yes | no" max="yes | no " stddev="yes | no" mode="yes | no"  count="yes | no" minThreshold="float" maxThreshold="float" >
         <rsgis:attribute name="attribute_name" mean="yes | no " min="yes | no" max="yes | no " stddev="yes | no" mode="yes | no"  count="yes | no">
             <rsgis:band band="int" minThreshold="float" maxThreshold="float" />
