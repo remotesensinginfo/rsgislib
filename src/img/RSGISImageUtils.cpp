@@ -366,7 +366,7 @@ namespace rsgis{namespace img{
 			gdalTransform[3] = maxY;
 			gdalTransform[4] = rotateY;
 			gdalTransform[5] = pixelYRes;
-			
+            
 			*width = floor(((maxX - minX)/pixelXRes));
 			*height = floor(((maxY - minY)/pixelYResPos));
 			
@@ -378,7 +378,7 @@ namespace rsgis{namespace img{
 				diffX = minX - transformations[i][0];
 				diffY = transformations[i][3] - maxY;
 				
-				if(diffX != 0)
+				if((diffX < -0.0001) & (diffX > 0.0001))
 				{
 					dsOffsets[i][0] = ceil(diffX/pixelXRes);
 				}
@@ -387,7 +387,7 @@ namespace rsgis{namespace img{
 					dsOffsets[i][0] = 0;
 				}
 				
-				if(diffY != 0)
+				if((diffY < -0.0001) & (diffY > 0.0001))
 				{
 					dsOffsets[i][1] = ceil(diffY/pixelYResPos);
 				}
