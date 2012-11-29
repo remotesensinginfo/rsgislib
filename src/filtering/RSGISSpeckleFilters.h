@@ -39,11 +39,14 @@ namespace rsgis{namespace filter{
         /**
          
          Lee (1980) filter. Implemented for multiplicative noise, as described in Lopes et. al. (1990).
-         nLooks reffers to the equivilent number of looks and is passed in as a filter parameter. 
+         nLooks is to the equivalent number of looks and is passed in as a filter parameter.
          
          J. Lee, 1980, “Digital Image-Enhancement and Noise Filtering by Use of Local Statistics,” IEEE Transactions on Pattern Analysis and Machine Intelligence, vol. 2, no. 2, pp. 165–168
-         A. Lopes, R. Touzi, and E. Nezry, 1990, “Adaptive speckle filters and scene heterogeneity,” IEEE Transactions on Geoscience and Remote Sensing, vol. 28, no. 6, pp. 992–1000
          
+         The implementation of the algorithm is as described:
+
+         http://resources.arcgis.com/en/help/main/10.1/index.html#/Speckle_function/009t000001z7000000/
+
          */
         
     public: 
