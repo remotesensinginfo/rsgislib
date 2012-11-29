@@ -355,7 +355,7 @@ void Control::help()
 {
 	std::cout << "RSGISLib, version " << RSGISLIB_PACKAGE_VERSION << std::endl;
 	std::cout << "usage: rsgisexe [-h] [-l] [-h algorithm] [-p xml file] [-x xml file]\n\n";
-	std::cout << "-h - Prints this messgae\n";
+	std::cout << "-h - Prints this message\n";
 	std::cout << "-l - List available algorithms\n";
 	std::cout << "-h algorithm - Print help for the algorithm specified\n";
     std::cout << "-b xml file - Creates a blank rsgislib xml file to be populated with commands\n";
