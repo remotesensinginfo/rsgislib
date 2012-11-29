@@ -635,7 +635,7 @@ void RSGISExeImageCalibration::retrieveParameters(DOMElement *argElement) throw(
                 
                 
                 boost::gregorian::date d(year,month,day);
-                julianDay = d.day_of_year();
+                julianDay = d.julian_day();
             }
             XMLString::release(&julianDayXMLStr);
             
