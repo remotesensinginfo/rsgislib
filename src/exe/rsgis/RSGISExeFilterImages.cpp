@@ -79,7 +79,7 @@ void RSGISExeFilterImages::retrieveParameters(xercesc::DOMElement *argElement) t
     xercesc::XMLString::release(&outputXMLStr);
     
         
-    // Set output image fomat (defaults to ENVI)
+    // Set output image fomat (defaults to KEA)
 	this->imageFormat = "KEA";
 	XMLCh *formatXMLStr = xercesc::XMLString::transcode("format");
 	if(argElement->hasAttribute(formatXMLStr))
@@ -90,7 +90,7 @@ void RSGISExeFilterImages::retrieveParameters(xercesc::DOMElement *argElement) t
 	}
 	xercesc::XMLString::release(&formatXMLStr);
     
-    // Set output image fomat (defaults to ENVI)
+    // Set output image fomat (defaults to KEA)
 	this->imageExt = "kea";
 	XMLCh *extensionXMLStr = xercesc::XMLString::transcode("extension");
 	if(argElement->hasAttribute(extensionXMLStr))

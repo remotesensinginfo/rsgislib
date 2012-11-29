@@ -38,9 +38,9 @@ namespace rsgis{namespace filter{
         float iVal = 0;
         float iMean = 0;
         float iVar = 0;
-        float w = 0;
-      	float cU = 0;
-		float cI = 0;
+      	float cU = sqrt(1. / this->nLooks); // Noise variation coefficient;
+		float nNoiseMean = 1; // Mean multiplicative noise
+		float k = 0;
 
         for(int i = 0; i < numBands; i++)
         {
@@ -81,13 +81,10 @@ namespace rsgis{namespace filter{
             
             iVar = iVar / numVal;
             
-            cU = sqrt(1. / this->nLooks);
-            cI = sqrt(iVar) / iMean;
-			//cout << "cU = " << cU << ", cI = " << cI << "cU / CI = " << (cU*cU) / (cI*cI) << endl;
-			w = 1. - ((cU*cU) / (cI*cI)); // Adaptive filtering coefficient
-			outI = iVal*w + iMean * (1 -  w); // m
-			output[i] = outI;
-            //cout << "w = " << w << ", In = " << iVal << ", out = " << outI << endl;
+            k = (nNoiseMean * iVar) / (iMean*iMean*cU + nNoiseMean*nNoiseMean*iVar);
+            outI = iMean + k*(iVal - nNoiseMean + iMean);
+            output[i] = outI;
+            //std::cout << "w = " << w << ", In = " << iVal << ", out = " << outI << std::endl;
         }
 	}
 	
