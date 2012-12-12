@@ -42,6 +42,13 @@ namespace rsgis{namespace rastergis{
                 output[i] = attTable->GetValueAsDouble(fid, colIdxs->at(i));
             }
         }
+        else
+        {
+            for(size_t i = 0; i < colIdxs->size(); ++i)
+            {
+                output[i] = 0;
+            }
+        }
     }
 
 }}
