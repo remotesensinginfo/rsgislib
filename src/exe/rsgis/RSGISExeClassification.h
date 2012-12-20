@@ -24,7 +24,10 @@
 #define RSGISExeClassification_H
 
 #include <string>
+#include <limits>
 #include <vector>
+#include <map>
+#include <utility>
 #include <iostream>
 #include <gsl/gsl_matrix.h>
 
@@ -35,6 +38,7 @@
 #include "common/RSGISFileException.h"
 
 #include "utils/RSGISTextUtils.h"
+#include "utils/RSGISColour.h"
 
 #include "math/RSGISMathsUtils.h"
 #include "math/RSGISMatrices.h"
@@ -87,7 +91,8 @@ class RSGISExeClassification : public RSGISAlgorithmParameters
 			cumulativeAreaClassify,
 			kmeans,
 			isodata,
-			createspeclib
+			createspeclib,
+            addcolourtable
 		};
 		
 		enum UnsupervisedInit
@@ -134,6 +139,8 @@ class RSGISExeClassification : public RSGISAlgorithmParameters
 		std::vector<std::string> *valueAttributes;
 		bool savekmeansCentres;
 		string outkmeansCentresFileName;
+        std::vector<std::pair<int, rsgis::utils::RSGISColourInt> > classColourPairs;
+        unsigned int imageBand;
 	};
 }
 #endif

@@ -534,7 +534,12 @@
     <rsgis:command algor="classification" option="isodata" image="string" output="string" numclusters="int" initalgor="random | kpp" maxiterations="int" clustermove="float" minnumbervals="int" mindistbetweencluster="float" maxstddev="float" propAvgDist="float" printinfo="yes | no"/>
     <!-- A command to convert a shapefile's attributes to a spectral library (mtxt) -->
     <rsgis:command algor="classification" option="createspeclib" vector="string" output="file.mtxt" group="yes | no" classattribute="string" valueattributes="string,string,string,string,...,string" />
-
+	<!-- A command to add a colour table to an image file - normally for visualisation of a classification. -->
+    <rsgis:command algor="classification" option="addcolourtable" image="input.kea" band="int" >
+		<rsgis:class value="int" r="int" g="int" b="int" a="int" />
+        <rsgis:class value="int" r="int" g="int" b="int" a="int" />
+		<rsgis:class value="int" r="int" g="int" b="int" a="int" />
+    </rsgis:command>
 
 
 
