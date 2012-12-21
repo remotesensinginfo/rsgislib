@@ -499,7 +499,6 @@
 
 
 
-
     <!-- A command to undertake a nearest neighbour classification of the input image (using the matrices as the input training data) -->
     <rsgis:command algor="classification" option="nn" image="image.env" output="image_out.env">
         <rsgis:class name="1" id="1" matrix="matrix1.mtxt" />
@@ -540,7 +539,6 @@
         <rsgis:class value="int" r="int" g="int" b="int" a="int" />
 		<rsgis:class value="int" r="int" g="int" b="int" a="int" />
     </rsgis:command>
-
 
 
 
@@ -976,7 +974,12 @@
     <rsgis:command algor="segmentation" option="growregionspixelsauto" image="image.env" output="image_out.env" seeds="seedsfile.txt" initthreshold="float" thresholdincrements="float" maxthreshold="float" maxiterations="int" format="GDAL Format" inmemory="yes | no" proj="OSGB | NZ2000 | NZ1949 | IMAGE" />
     <!-- A command to find spectral categories using a defined subdivision and number of levels -->
     <rsgis:command algor="segmentation" option="spectraldiv" image="image.env" output="image_out.env" subdivision="int" nodata="unsigned int" format="GDAL Format" proj="OSGB | NZ2000 | NZ1949 | IMAGE" />
-
+	<!-- A command to combine segmentations, creating a single segmentation -->
+    <rsgis:command algor="segmentation" option="unionsegments" output="image_out.kea" format="GDAL Format" nodata="unsigned int" >
+		<rsgis:image file="string" />
+        <rsgis:image file="string" />
+		<rsgis:image file="string" />
+    </rsgis:command>
 
 
 
