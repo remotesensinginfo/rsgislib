@@ -62,15 +62,7 @@
 
 namespace rsgisexe{
 
-using namespace std;
-using namespace xercesc;
-using namespace rsgis;
-using namespace rsgis::img;
-using namespace rsgis::utils;
-using namespace rsgis::math;
-using namespace rsgis::segment;
-
-class RSGISExeSegment : public RSGISAlgorithmParameters
+    class RSGISExeSegment : public rsgis::RSGISAlgorithmParameters
 	{
 	public:
 		enum options 
@@ -97,31 +89,32 @@ class RSGISExeSegment : public RSGISAlgorithmParameters
             growregionspixels,
             spectraldiv,
             stepwiseelimination,
-            elimsinglepxls
+            elimsinglepxls,
+            unionsegments
 		};
 		RSGISExeSegment();
-		virtual RSGISAlgorithmParameters* getInstance();
-		virtual void retrieveParameters(DOMElement *argElement) throw(RSGISXMLArgumentsException);
-		virtual void runAlgorithm() throw(RSGISException);
+		virtual rsgis::RSGISAlgorithmParameters* getInstance();
+		virtual void retrieveParameters(xercesc::DOMElement *argElement) throw(rsgis::RSGISXMLArgumentsException);
+		virtual void runAlgorithm() throw(rsgis::RSGISException);
 		virtual void printParameters();
-		virtual string getDescription();
-		virtual string getXMLSchema();
+		virtual std::string getDescription();
+		virtual std::string getXMLSchema();
 		virtual void help();
 		~RSGISExeSegment();
 	protected:
 		options option;
-		string inputImage;
-        string clumpsImage;
-        string largeClumpsImage;
-		string outputImage;
-        string imageFormat;
-        string outputTextFile;
-        string seedsTextFile;
-        string clustersMatrix;
-        string tempTable;
-        string tempImage;
-        string proj;
-        string stretchStatsFile;
+		std::string inputImage;
+        std::string clumpsImage;
+        std::string largeClumpsImage;
+		std::string outputImage;
+        std::string imageFormat;
+        std::string outputTextFile;
+        std::string seedsTextFile;
+        std::string clustersMatrix;
+        std::string tempTable;
+        std::string tempImage;
+        std::string proj;
+        std::string stretchStatsFile;
         bool stretchStatsAvail;
         unsigned int minClumpSize;
         float specThreshold;
@@ -131,20 +124,20 @@ class RSGISExeSegment : public RSGISAlgorithmParameters
         unsigned int maxRegionGrowiterations;
         bool processInMemory;
         bool projFromImage;
-        vector<ImgSeeds> *seedPxls;
-        vector<BandThreshold> *bandThresholds;
+        std::vector<rsgis::segment::ImgSeeds> *seedPxls;
+        std::vector<rsgis::segment::BandThreshold> *bandThresholds;
         unsigned int noDataVal;
         bool noDataValProvided;
-        RSGISSelectClumps::ClumpSelection selectionMethod;
+        rsgis::segment::RSGISSelectClumps::ClumpSelection selectionMethod;
         bool ignoreZeros;
-        vector<RSGISRegionGrowPxlSeeds> *regionGrowingPxlSeeds;
+        std::vector<rsgis::segment::RSGISRegionGrowPxlSeeds> *regionGrowingPxlSeeds;
         unsigned int subDivision;
         unsigned int levels;
         bool outputWithConsecutiveFIDs;
         unsigned int cacheSize;
-        string importLUTFile;
+        std::string importLUTFile;
         bool importLUT;
-        string exportLUTFile;
+        std::string exportLUTFile;
         bool exportLUT;
         bool storeMean;
 	};
