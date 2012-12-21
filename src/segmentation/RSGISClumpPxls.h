@@ -40,7 +40,11 @@ namespace rsgis{namespace segment{
     public:
         RSGISClumpPxls();
         void performClump(GDALDataset *catagories, GDALDataset *clumps, bool noDataValProvided, unsigned int noDataVal) throw(rsgis::img::RSGISImageCalcException);
+        void performMultiBandClump(std::vector<GDALDataset*> *catagories, std::string clumpsOutputPath, std::string outFormat, bool noDataValProvided, unsigned int noDataVal) throw(rsgis::img::RSGISImageCalcException);
         ~RSGISClumpPxls();
+    protected:
+        inline bool allValueEqual(unsigned int *vals, unsigned int numVals, unsigned int equalVal);
+        inline bool allValueEqual(unsigned int *vals1, unsigned int *vals2, unsigned int numVals);
     };
     
     class RSGISRelabelClumps

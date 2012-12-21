@@ -115,6 +115,7 @@ namespace rsgisexe{
         std::string tempImage;
         std::string proj;
         std::string stretchStatsFile;
+        std::vector<std::string> inputImagePaths;
         bool stretchStatsAvail;
         unsigned int minClumpSize;
         float specThreshold;

@@ -59,7 +59,7 @@ namespace rsgis{namespace img{
 		try
 		{
 			for(int i = 0; i < numDS; i++)
-			{                
+			{
                 if(transformations[i] == NULL)
                 {
                     throw RSGISImageBandException("No projection transformation has been provided..");
@@ -93,7 +93,7 @@ namespace rsgis{namespace img{
 					first = false;
 				}
 				else
-				{                    
+				{
 					if(transformations[i][1] != pixelXRes & transformations[i][5] != pixelYRes)
 					{
 						throw RSGISImageBandException("Not all image bands have the same resolution..");
@@ -134,21 +134,13 @@ namespace rsgis{namespace img{
 				}
 			}
             
-            
-            			
 			if(maxX - minX <= 0)
 			{
-                std::cout.precision(12);
-                std::cout << "X = [" << minX << "," << maxX << "]\n";
-                std::cout << "Y = [" << minY << "," << maxY << "]\n";
 				throw RSGISImageBandException("Images do not overlap in the X axis");
 			}
 			
 			if(maxY - minY <= 0)
 			{
-                std::cout.precision(12);
-                std::cout << "X = [" << minX << "," << maxX << "]\n";
-                std::cout << "Y = [" << minY << "," << maxY << "]\n";
 				throw RSGISImageBandException("Images do not overlap in the Y axis");
 			}
 			
@@ -158,7 +150,7 @@ namespace rsgis{namespace img{
 			gdalTransform[3] = maxY;
 			gdalTransform[4] = rotateY;
 			gdalTransform[5] = pixelYRes;
-			
+            
 			*width = floor(((maxX - minX)/pixelXRes));
 			*height = floor(((maxY - minY)/pixelYResPos));
 			
@@ -170,7 +162,7 @@ namespace rsgis{namespace img{
 				diffX = minX - transformations[i][0];
 				diffY = transformations[i][3] - maxY;
 				
-				if(diffX != 0)
+				if(!((diffX > -0.0001) & (diffX < 0.0001)))
 				{
 					dsOffsets[i][0] = ceil(diffX/pixelXRes);
 				}
@@ -179,7 +171,7 @@ namespace rsgis{namespace img{
 					dsOffsets[i][0] = 0;
 				}
 				
-				if(diffY != 0)
+				if(!((diffY > -0.0001) & (diffY < 0.0001)))
 				{
 					dsOffsets[i][1] = ceil(diffY/pixelYResPos);
 				}
@@ -228,7 +220,200 @@ namespace rsgis{namespace img{
 			delete[] ySize;
 		}
 	}
-	
+    
+    void RSGISImageUtils::getImageOverlap(std::vector<GDALDataset*> *datasets, int **dsOffsets, int *width, int *height, double *gdalTransform) throw(RSGISImageBandException)
+	{
+        unsigned int numDS = datasets->size();
+		double **transformations = new double*[numDS];
+		int *xSize = new int[numDS];
+		int *ySize = new int[numDS];
+		for(int i = 0; i < numDS; i++)
+		{
+			transformations[i] = new double[6];
+			datasets->at(i)->GetGeoTransform(transformations[i]);
+			xSize[i] = datasets->at(i)->GetRasterXSize();
+			ySize[i] = datasets->at(i)->GetRasterYSize();
+			//std::cout << "TL [" << transformations[i][0] << "," << transformations[i][3] << "]\n";
+		}
+		double rotateX = 0;
+		double rotateY = 0;
+		double pixelXRes = 0;
+		double pixelYRes = 0;
+		double pixelYResPos = 0;
+		double minX = 0;
+		double maxX = 0;
+		double tmpMaxX = 0;
+		double minY = 0;
+		double tmpMinY = 0;
+		double maxY = 0;
+		bool first = true;
+		const char *proj = NULL;
+		
+		try
+		{
+			for(int i = 0; i < numDS; i++)
+			{
+                if(transformations[i] == NULL)
+                {
+                    throw RSGISImageBandException("No projection transformation has been provided..");
+                }
+                
+				if(first)
+				{
+					pixelXRes = transformations[i][1];
+					pixelYRes = transformations[i][5];
+					
+					rotateX = transformations[i][2];
+					rotateY = transformations[i][4];
+					
+					if(pixelYRes < 0)
+					{
+						pixelYResPos = pixelYRes * (-1);
+					}
+					else
+					{
+						pixelYResPos = pixelYRes;
+					}
+					
+					minX = transformations[i][0];
+					maxY = transformations[i][3];
+					
+					maxX = minX + (xSize[i] * pixelXRes);
+					minY = maxY - (ySize[i] * pixelYResPos);
+					
+					proj = datasets->at(i)->GetProjectionRef(); // Get projection of first band in image
+					
+					first = false;
+				}
+				else
+				{
+					if(transformations[i][1] != pixelXRes & transformations[i][5] != pixelYRes)
+					{
+						throw RSGISImageBandException("Not all image bands have the same resolution..");
+					}
+					
+					if(transformations[i][2] != rotateX & transformations[i][4] != rotateY)
+					{
+						throw RSGISImageBandException("Not all image bands have the same rotation..");
+					}
+					
+					if(std::string(datasets->at(i)->GetProjectionRef()) != std::string(proj))
+					{
+						std::cout << "Not all image bands have the same projection" << std::endl;
+					}
+                    
+					if(transformations[i][0] > minX)
+					{
+						minX = transformations[i][0];
+					}
+					
+					if(transformations[i][3] < maxY)
+					{
+						maxY = transformations[i][3];
+					}
+					
+					tmpMaxX = transformations[i][0] + (xSize[i] * pixelXRes);
+					tmpMinY = transformations[i][3] - (ySize[i] * pixelYResPos);
+					
+					if(tmpMaxX < maxX)
+					{
+						maxX = tmpMaxX;
+					}
+					
+					if(tmpMinY > minY)
+					{
+						minY = tmpMinY;
+					}
+				}
+			}
+            
+			if(maxX - minX <= 0)
+			{
+				throw RSGISImageBandException("Images do not overlap in the X axis");
+			}
+			
+			if(maxY - minY <= 0)
+			{
+				throw RSGISImageBandException("Images do not overlap in the Y axis");
+			}
+			
+			gdalTransform[0] = minX;
+			gdalTransform[1] = pixelXRes;
+			gdalTransform[2] = rotateX;
+			gdalTransform[3] = maxY;
+			gdalTransform[4] = rotateY;
+			gdalTransform[5] = pixelYRes;
+            
+			*width = floor(((maxX - minX)/pixelXRes));
+			*height = floor(((maxY - minY)/pixelYResPos));
+			
+			double diffX = 0;
+			double diffY = 0;
+			
+			for(int i = 0; i < numDS; i++)
+			{
+				diffX = minX - transformations[i][0];
+				diffY = transformations[i][3] - maxY;
+				
+				if(!((diffX > -0.0001) & (diffX < 0.0001)))
+				{
+					dsOffsets[i][0] = ceil(diffX/pixelXRes);
+				}
+				else
+				{
+					dsOffsets[i][0] = 0;
+				}
+				
+				if(!((diffY > -0.0001) & (diffY < 0.0001)))
+				{
+					dsOffsets[i][1] = ceil(diffY/pixelYResPos);
+				}
+				else
+				{
+					dsOffsets[i][1] = 0;
+				}
+			}
+			
+		}
+		catch(RSGISImageBandException& e)
+		{
+			if(transformations != NULL)
+			{
+				for(int i = 0; i < numDS; i++)
+				{
+					delete[] transformations[i];
+				}
+				delete[] transformations;
+			}
+			if(xSize != NULL)
+			{
+				delete[] xSize;
+			}
+			if(ySize != NULL)
+			{
+				delete[] ySize;
+			}
+			throw e;
+		}
+		
+		if(transformations != NULL)
+		{
+			for(int i = 0; i < numDS; i++)
+			{
+				delete[] transformations[i];
+			}
+			delete[] transformations;
+		}
+		if(xSize != NULL)
+		{
+			delete[] xSize;
+		}
+		if(ySize != NULL)
+		{
+			delete[] ySize;
+		}
+	}
+    
     void RSGISImageUtils::getImageOverlap(GDALDataset **datasets, int numDS,  int **dsOffsets, int *width, int *height, double *gdalTransform, int *maxBlockX, int *maxBlockY) throw(RSGISImageBandException)
 	{
 		double **transformations = new double*[numDS];
@@ -378,7 +563,7 @@ namespace rsgis{namespace img{
 				diffX = minX - transformations[i][0];
 				diffY = transformations[i][3] - maxY;
 				
-				if((diffX < -0.0001) & (diffX > 0.0001))
+				if(!((diffX > -0.0001) & (diffX < 0.0001)))
 				{
 					dsOffsets[i][0] = ceil(diffX/pixelXRes);
 				}
@@ -387,7 +572,216 @@ namespace rsgis{namespace img{
 					dsOffsets[i][0] = 0;
 				}
 				
-				if((diffY < -0.0001) & (diffY > 0.0001))
+				if(!((diffY > -0.0001) & (diffY < 0.0001)))
+				{
+					dsOffsets[i][1] = ceil(diffY/pixelYResPos);
+				}
+				else
+				{
+					dsOffsets[i][1] = 0;
+				}
+			}
+			
+		}
+		catch(RSGISImageBandException& e)
+		{
+			if(transformations != NULL)
+			{
+				for(int i = 0; i < numDS; i++)
+				{
+					delete[] transformations[i];
+				}
+				delete[] transformations;
+			}
+			if(xSize != NULL)
+			{
+				delete[] xSize;
+			}
+			if(ySize != NULL)
+			{
+				delete[] ySize;
+			}
+			throw e;
+		}
+		
+		if(transformations != NULL)
+		{
+			for(int i = 0; i < numDS; i++)
+			{
+				delete[] transformations[i];
+			}
+			delete[] transformations;
+		}
+		if(xSize != NULL)
+		{
+			delete[] xSize;
+		}
+		if(ySize != NULL)
+		{
+			delete[] ySize;
+		}
+	}
+    
+    void RSGISImageUtils::getImageOverlap(std::vector<GDALDataset*> *datasets,  int **dsOffsets, int *width, int *height, double *gdalTransform, int *maxBlockX, int *maxBlockY) throw(RSGISImageBandException)
+	{
+        unsigned int numDS = datasets->size();
+		double **transformations = new double*[numDS];
+		int *xSize = new int[numDS];
+		int *ySize = new int[numDS];
+        int *xBlockSize = new int[numDS];
+		int *yBlockSize = new int[numDS];
+		for(int i = 0; i < numDS; i++)
+		{
+			transformations[i] = new double[6];
+			datasets->at(i)->GetGeoTransform(transformations[i]);
+			xSize[i] = datasets->at(i)->GetRasterXSize();
+			ySize[i] = datasets->at(i)->GetRasterYSize();
+            datasets->at(i)->GetRasterBand(1)->GetBlockSize(&xBlockSize[i], &yBlockSize[i]);
+			//std::cout << "TL [" << transformations[i][0] << "," << transformations[i][3] << "]\n";
+		}
+		double rotateX = 0;
+		double rotateY = 0;
+		double pixelXRes = 0;
+		double pixelYRes = 0;
+		double pixelYResPos = 0;
+		double minX = 0;
+		double maxX = 0;
+		double tmpMaxX = 0;
+		double minY = 0;
+		double tmpMinY = 0;
+		double maxY = 0;
+		bool first = true;
+		const char *proj = NULL;
+		
+		try
+		{
+			for(int i = 0; i < numDS; i++)
+			{
+                if(transformations[i] == NULL)
+                {
+                    throw RSGISImageBandException("No projection transformation has been provided..");
+                }
+                
+				if(first)
+				{
+                    *maxBlockX = xBlockSize[i];
+                    *maxBlockY = yBlockSize[i];
+                    
+					pixelXRes = transformations[i][1];
+					pixelYRes = transformations[i][5];
+					
+					rotateX = transformations[i][2];
+					rotateY = transformations[i][4];
+					
+					if(pixelYRes < 0)
+					{
+						pixelYResPos = pixelYRes * (-1);
+					}
+					else
+					{
+						pixelYResPos = pixelYRes;
+					}
+					
+					minX = transformations[i][0];
+					maxY = transformations[i][3];
+					
+					maxX = minX + (xSize[i] * pixelXRes);
+					minY = maxY - (ySize[i] * pixelYResPos);
+					
+					proj = datasets->at(i)->GetProjectionRef(); // Get projection of first band in image
+					
+					first = false;
+				}
+				else
+				{
+					if(transformations[i][1] != pixelXRes & transformations[i][5] != pixelYRes)
+					{
+						throw RSGISImageBandException("Not all image bands have the same resolution..");
+					}
+					
+					if(transformations[i][2] != rotateX & transformations[i][4] != rotateY)
+					{
+						throw RSGISImageBandException("Not all image bands have the same rotation..");
+					}
+					
+					if(std::string(datasets->at(i)->GetProjectionRef()) != std::string(proj))
+					{
+						std::cout << "Not all image bands have the same projection" << std::endl;
+					}
+                    
+					if(transformations[i][0] > minX)
+					{
+						minX = transformations[i][0];
+					}
+					
+					if(transformations[i][3] < maxY)
+					{
+						maxY = transformations[i][3];
+					}
+					
+					tmpMaxX = transformations[i][0] + (xSize[i] * pixelXRes);
+					tmpMinY = transformations[i][3] - (ySize[i] * pixelYResPos);
+					
+					if(tmpMaxX < maxX)
+					{
+						maxX = tmpMaxX;
+					}
+					
+					if(tmpMinY > minY)
+					{
+						minY = tmpMinY;
+					}
+                    
+                    if(xBlockSize[i] > (*maxBlockX))
+                    {
+                        *maxBlockX = xBlockSize[i];
+                    }
+                    
+                    if(yBlockSize[i] > (*maxBlockY))
+                    {
+                        *maxBlockY = yBlockSize[i];
+                    }
+				}
+			}
+            
+			if(maxX - minX <= 0)
+			{
+				throw RSGISImageBandException("Images do not overlap in the X axis");
+			}
+			
+			if(maxY - minY <= 0)
+			{
+				throw RSGISImageBandException("Images do not overlap in the Y axis");
+			}
+			
+			gdalTransform[0] = minX;
+			gdalTransform[1] = pixelXRes;
+			gdalTransform[2] = rotateX;
+			gdalTransform[3] = maxY;
+			gdalTransform[4] = rotateY;
+			gdalTransform[5] = pixelYRes;
+            
+			*width = floor(((maxX - minX)/pixelXRes));
+			*height = floor(((maxY - minY)/pixelYResPos));
+			
+			double diffX = 0;
+			double diffY = 0;
+			
+			for(int i = 0; i < numDS; i++)
+			{
+				diffX = minX - transformations[i][0];
+				diffY = transformations[i][3] - maxY;
+				
+				if(!((diffX > -0.0001) & (diffX < 0.0001)))
+				{
+					dsOffsets[i][0] = ceil(diffX/pixelXRes);
+				}
+				else
+				{
+					dsOffsets[i][0] = 0;
+				}
+				
+				if(!((diffY > -0.0001) & (diffY < 0.0001)))
 				{
 					dsOffsets[i][1] = ceil(diffY/pixelYResPos);
 				}

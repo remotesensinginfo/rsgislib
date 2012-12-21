@@ -66,6 +66,7 @@ void RSGISExeSegment::retrieveParameters(xercesc::DOMElement *argElement) throw(
     XMLCh *optionSpectralDiv = xercesc::XMLString::transcode("spectraldiv");
     XMLCh *optionStepwiseElimination = xercesc::XMLString::transcode("stepwiseelimination");
     XMLCh *optionElimSinglePxls = xercesc::XMLString::transcode("elimsinglepxls");
+    XMLCh *optionUnionSegments = xercesc::XMLString::transcode("unionsegments");
     
     XMLCh *projImage = xercesc::XMLString::transcode("IMAGE");
 	XMLCh *projOSGB = xercesc::XMLString::transcode("OSGB");
@@ -3148,6 +3149,82 @@ void RSGISExeSegment::retrieveParameters(xercesc::DOMElement *argElement) throw(
 		}
 		xercesc::XMLString::release(&projXMLStr);
     }
+    else if(xercesc::XMLString::equals(optionUnionSegments, optionXML))
+    {
+        this->option = RSGISExeSegment::unionsegments;
+		        
+		XMLCh *outputXMLStr = xercesc::XMLString::transcode("output");
+		if(argElement->hasAttribute(outputXMLStr))
+		{
+			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outputXMLStr));
+			this->outputImage = std::string(charValue);
+			xercesc::XMLString::release(&charValue);
+		}
+		else
+		{
+			throw rsgis::RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+		}
+		xercesc::XMLString::release(&outputXMLStr);
+        
+        XMLCh *formatXMLStr = xercesc::XMLString::transcode("format");
+		if(argElement->hasAttribute(formatXMLStr))
+		{
+			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(formatXMLStr));
+			this->imageFormat = std::string(charValue);
+			xercesc::XMLString::release(&charValue);
+		}
+		else
+		{
+			this->imageFormat = "ENVI";
+		}
+		xercesc::XMLString::release(&formatXMLStr);
+        
+        XMLCh *noDataXMLStr = xercesc::XMLString::transcode("nodata");
+		if(argElement->hasAttribute(noDataXMLStr))
+		{
+			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(noDataXMLStr));
+			this->noDataVal = mathUtils.strtounsignedint(std::string(charValue));
+			xercesc::XMLString::release(&charValue);
+            this->noDataValProvided = true;
+		}
+        else
+        {
+            this->noDataValProvided = false;
+        }
+		xercesc::XMLString::release(&noDataXMLStr);
+        
+        XMLCh *rsgisImageXMLStr = xercesc::XMLString::transcode("rsgis:image");
+        xercesc::DOMNodeList *imageNodesList = argElement->getElementsByTagName(rsgisImageXMLStr);
+		unsigned int numImages = imageNodesList->getLength();
+		if(numImages > 0)
+		{
+            inputImagePaths.reserve(numImages);
+			xercesc::DOMElement *imageElement = NULL;
+            
+			for(unsigned int i = 0; i < numImages; i++)
+			{
+				imageElement = static_cast<xercesc::DOMElement*>(imageNodesList->item(i));
+				
+				XMLCh *fileXMLStr = xercesc::XMLString::transcode("file");
+				if(imageElement->hasAttribute(fileXMLStr))
+				{
+					char *charValue = xercesc::XMLString::transcode(imageElement->getAttribute(fileXMLStr));
+					inputImagePaths.push_back(std::string(charValue));
+					xercesc::XMLString::release(&charValue);
+				}
+				else
+				{
+					throw rsgis::RSGISXMLArgumentsException("No \'file\' attribute was provided for seed.");
+				}
+				xercesc::XMLString::release(&fileXMLStr);
+			}
+		}
+		else
+		{
+			throw rsgis::RSGISXMLArgumentsException("No attributes \'rsgis:image\' tags were provided.");
+		}
+        xercesc::XMLString::release(&rsgisImageXMLStr);
+    }
     else
     {
         std::string message = std::string("The option (") + std::string(xercesc::XMLString::transcode(optionXML)) + std::string(") is not known: RSGISExeSegment.");
@@ -3179,6 +3256,7 @@ void RSGISExeSegment::retrieveParameters(xercesc::DOMElement *argElement) throw(
     xercesc::XMLString::release(&optionSpectralDiv);
     xercesc::XMLString::release(&optionStepwiseElimination);
     xercesc::XMLString::release(&optionElimSinglePxls);
+    xercesc::XMLString::release(&optionUnionSegments);
     
     xercesc::XMLString::release(&projImage);
 	xercesc::XMLString::release(&projOSGB);
@@ -4740,6 +4818,56 @@ void RSGISExeSegment::runAlgorithm() throw(rsgis::RSGISException)
             throw e;
         }
     }
+    else if(option == RSGISExeSegment::unionsegments)
+    {
+        std::cout << "Combine segmentations creating a single segmentation through an union\n";
+        std::cout << "Output File: " << this->outputImage << std::endl;
+        std::cout << "Output Format: " << this->imageFormat << std::endl;
+        if(noDataValProvided)
+        {
+            std::cout << "No Data: " << this->noDataVal << std::endl;
+        }
+        else
+        {
+            std::cout << "A no data value was not provided\n";
+        }
+        std::cout << "Input Images: \n";
+        for(std::vector<std::string>::iterator iterFiles = inputImagePaths.begin(); iterFiles != inputImagePaths.end(); ++iterFiles)
+        {
+            std::cout << "\t" << *iterFiles << std::endl;
+        }
+        
+        try
+        {
+            GDALAllRegister();
+            std::vector<GDALDataset*> *images = new std::vector<GDALDataset*>();
+            images->reserve(inputImagePaths.size());
+            for(std::vector<std::string>::iterator iterFiles = inputImagePaths.begin(); iterFiles != inputImagePaths.end(); ++iterFiles)
+            {
+                GDALDataset *tmp = (GDALDataset *) GDALOpen((*iterFiles).c_str(), GA_ReadOnly);
+                if(tmp == NULL)
+                {
+                    std::string message = std::string("Could not open image ") + (*iterFiles);
+                    throw rsgis::RSGISImageException(message.c_str());
+                }
+                images->push_back(tmp);
+            }
+            
+            rsgis::segment::RSGISClumpPxls clumpPxls;
+            clumpPxls.performMultiBandClump(images, this->outputImage, this->imageFormat, this->noDataValProvided, this->noDataVal);
+                        
+            for(std::vector<GDALDataset*>::iterator iterImages = images->begin(); iterImages != images->end(); ++iterImages)
+            {
+                GDALClose(*iterImages);
+            }
+            delete images;
+            
+        }
+        catch (rsgis::RSGISException &e)
+        {
+            throw e;
+        }
+    }
     else
     {
         std::cout << "RSGISExeSegment: Options not recognised\n";
@@ -5048,6 +5176,25 @@ void RSGISExeSegment::printParameters()
         if(this->ignoreZeros)
         {
             std::cout << "Ignoring pixels with a value of zero in clumps file\n";
+        }
+    }
+    else if(option == RSGISExeSegment::unionsegments)
+    {
+        std::cout << "Combine segmentations creating a single segmentation through an union\n";
+        std::cout << "Output File: " << this->outputImage << std::endl;
+        std::cout << "Output Format: " << this->imageFormat << std::endl;
+        if(noDataValProvided)
+        {
+            std::cout << "No Data: " << this->noDataVal << std::endl;
+        }
+        else
+        {
+            std::cout << "A no data value was not provided\n";
+        }
+        std::cout << "Input Images: \n";
+        for(std::vector<std::string>::iterator iterFiles = inputImagePaths.begin(); iterFiles != inputImagePaths.end(); ++iterFiles)
+        {
+            std::cout << "\t" << *iterFiles << std::endl;
         }
     }
     else

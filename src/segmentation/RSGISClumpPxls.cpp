@@ -179,7 +179,293 @@ namespace rsgis{namespace segment{
         }
         std::cout << " Complete (Generated " << clumpIdx-1 << " clumps).\n";
     }
+    
+    void RSGISClumpPxls::performMultiBandClump(std::vector<GDALDataset*> *catagories, std::string clumpsOutputPath, std::string outFormat, bool noDataValProvided, unsigned int noDataVal) throw(rsgis::img::RSGISImageCalcException)
+    {
+        try
+        {
+            rsgis::img::RSGISImageUtils imgUtils;
+            
+            unsigned int numDS = catagories->size();
+            int **dsOffsets = new int*[numDS];
+            for(unsigned int i = 0; i < numDS; ++i)
+            {
+                dsOffsets[i] = new int[2];
+            }
+            int width = 0;
+            int height = 0;
+            double *gdalTransform = new double[6];
+            
+            imgUtils.getImageOverlap(catagories, dsOffsets, &width, &height, gdalTransform);
+            
+            GDALDriver *gdalDriver = GetGDALDriverManager()->GetDriverByName(outFormat.c_str());
+			if(gdalDriver == NULL)
+			{                
+                delete[] gdalTransform;
+                for(unsigned int i = 0; i < numDS; ++i)
+                {
+                    delete[] dsOffsets[i];
+                }
+                delete[] dsOffsets;
+                
+                throw rsgis::img::RSGISImageBandException("Requested GDAL driver does not exists..");
+			}
+			std::cout << "New image width = " << width << " height = " << height << std::endl;
+            
+            GDALDataset *clumpsDS = gdalDriver->Create(clumpsOutputPath.c_str(), width, height, 1, GDT_UInt32, NULL);
+			
+			if(clumpsDS == NULL)
+			{
+                delete[] gdalTransform;
+                for(unsigned int i = 0; i < numDS; ++i)
+                {
+                    delete[] dsOffsets[i];
+                }
+                delete[] dsOffsets;
+                
+                throw rsgis::img::RSGISImageBandException("Output image could not be created. Check filepath.");
+			}
+			clumpsDS->SetGeoTransform(gdalTransform);
+			clumpsDS->SetProjection(catagories->at(0)->GetProjectionRef());
+            imgUtils.zerosUIntGDALDataset(clumpsDS);
+            
+            // Count number of image bands
+			unsigned int numInBands = 0;
+            for(int i = 0; i < numDS; i++)
+			{
+				numInBands += catagories->at(i)->GetRasterCount();
+			}
+            
+            // Get Image Input Bands
+			int **bandOffsets = new int*[numInBands];
+			GDALRasterBand **catBands = new GDALRasterBand*[numInBands];
+			int counter = 0;
+			for(int i = 0; i < numDS; i++)
+			{
+				for(int j = 0; j < catagories->at(i)->GetRasterCount(); j++)
+				{
+					catBands[counter] = catagories->at(i)->GetRasterBand(j+1);
+					bandOffsets[counter] = new int[2];
+					bandOffsets[counter][0] = dsOffsets[i][0];
+					bandOffsets[counter][1] = dsOffsets[i][1];
+					//std::cout << counter << ") dataset " << i << " band " << j << " offset [" << bandOffsets[counter][0] << "," << bandOffsets[counter][1] << "]\n";
+					counter++;
+				}
+			}
+            
+            //Get Image Output Band
+			GDALRasterBand *clumpBand = clumpsDS->GetRasterBand(1);
+            clumpBand->SetDescription("Clumps");
+                        
+            unsigned long clumpIdx = 1;
+            std::vector<rsgis::img::PxlLoc> clumpPxls;
+            std::queue<rsgis::img::PxlLoc> clumpSearchPxls;
+            unsigned int *catPxlVals = new unsigned int[numInBands];
+            unsigned int *catCPxlVals = new unsigned int[numInBands];
+            
+            unsigned int uiPxlVal = 0;
+            
+            int feedback = height/10;
+            int feedbackCounter = 0;
+            std::cout << "Started" << std::flush;
+            for(unsigned int i = 0; i < height; ++i)
+            {
+                if((i % feedback) == 0)
+                {
+                    std::cout << "." << feedbackCounter << "." << std::flush;
+                    feedbackCounter = feedbackCounter + 10;
+                }
+                
+                for(unsigned int j = 0; j < width; ++j)
+                {
+                    //std::cout << "Processing Pixel [" << j << "," << i << "]\n";
+                    // Get pixel value from clump image for (j,i)
+                    clumpBand->RasterIO(GF_Read, j, i, 1, 1, &uiPxlVal, 1, 1, GDT_UInt32, 0, 0);
+                    
+                    // if value is zero create new clump
+                    if(uiPxlVal == 0)
+                    {
+                        for(unsigned int n = 0; n < numInBands; ++n)
+                        {
+                            catBands[n]->RasterIO(GF_Read, bandOffsets[n][0]+j, bandOffsets[n][1]+i, 1, 1, &catPxlVals[n], 1, 1, GDT_UInt32, 0, 0);
+                        }
+                        if((!noDataValProvided) | (noDataValProvided & (!this->allValueEqual(catPxlVals, numInBands, noDataVal))))
+                        {
+                            // Make sure all lists are empty.
+                            clumpPxls.clear();
+                            if(!clumpSearchPxls.empty())
+                            {
+                                while(clumpSearchPxls.size() > 0)
+                                {
+                                    clumpSearchPxls.pop();
+                                }
+                            }
+                            
+                            clumpPxls.push_back(rsgis::img::PxlLoc(j, i));
+                            clumpSearchPxls.push(rsgis::img::PxlLoc(j, i));
+                            clumpBand->RasterIO(GF_Write, j, i, 1, 1, &clumpIdx, 1, 1, GDT_UInt32, 0, 0);
+                            
+                            // Add neigbouring pixels to clump.
+                            // If no more pixels to add then stop.
+                            while(clumpSearchPxls.size() > 0)
+                            {
+                                rsgis::img::PxlLoc pxl = clumpSearchPxls.front();
+                                clumpSearchPxls.pop();
+                                
+                                //std::cout << "\tSearch Size = " << clumpSearchPxls.size() << std::endl;
+                                //std::cout << "\t\tProcessing [" << pxl.xPos << "," << pxl.yPos << "]\n";
+                                
+                                // Above
+                                if(((long)pxl.yPos)-1 >= 0)
+                                {
+                                    clumpBand->RasterIO(GF_Read, pxl.xPos, pxl.yPos-1, 1, 1, &uiPxlVal, 1, 1, GDT_UInt32, 0, 0);
+                                    if(uiPxlVal == 0)
+                                    {
+                                        //catagoryBand->RasterIO(GF_Read, pxl.xPos, pxl.yPos-1, 1, 1, &catCPxlVal, 1, 1, GDT_UInt32, 0, 0);
+                                        
+                                        for(unsigned int n = 0; n < numInBands; ++n)
+                                        {
+                                            catBands[n]->RasterIO(GF_Read, bandOffsets[n][0]+pxl.xPos, bandOffsets[n][1]+(pxl.yPos-1), 1, 1, &catCPxlVals[n], 1, 1, GDT_UInt32, 0, 0);
+                                        }
+                                        
+                                        if(this->allValueEqual(catPxlVals, catCPxlVals, numInBands))
+                                        {
+                                            clumpPxls.push_back(rsgis::img::PxlLoc(pxl.xPos, pxl.yPos-1));
+                                            clumpSearchPxls.push(rsgis::img::PxlLoc(pxl.xPos, pxl.yPos-1));
+                                            clumpBand->RasterIO(GF_Write, pxl.xPos, pxl.yPos-1, 1, 1, &clumpIdx, 1, 1, GDT_UInt32, 0, 0);
+                                        }
+                                    }
+                                }
+                                // Below
+                                if((pxl.yPos+1) < height)
+                                {
+                                    clumpBand->RasterIO(GF_Read, pxl.xPos, pxl.yPos+1, 1, 1, &uiPxlVal, 1, 1, GDT_UInt32, 0, 0);
+                                    if(uiPxlVal == 0)
+                                    {
+                                        //catagoryBand->RasterIO(GF_Read, pxl.xPos, pxl.yPos+1, 1, 1, &catCPxlVal, 1, 1, GDT_UInt32, 0, 0);
+                                        
+                                        for(unsigned int n = 0; n < numInBands; ++n)
+                                        {
+                                            catBands[n]->RasterIO(GF_Read, bandOffsets[n][0]+pxl.xPos, bandOffsets[n][1]+(pxl.yPos+1), 1, 1, &catCPxlVals[n], 1, 1, GDT_UInt32, 0, 0);
+                                        }
+                                        
+                                        if(this->allValueEqual(catPxlVals, catCPxlVals, numInBands))
+                                        {
+                                            clumpPxls.push_back(rsgis::img::PxlLoc(pxl.xPos, pxl.yPos+1));
+                                            clumpSearchPxls.push(rsgis::img::PxlLoc(pxl.xPos, pxl.yPos+1));
+                                            clumpBand->RasterIO(GF_Write, pxl.xPos, pxl.yPos+1, 1, 1, &clumpIdx, 1, 1, GDT_UInt32, 0, 0);
+                                        }
+                                    }
+                                    
+                                }
+                                // Left
+                                if(((long)pxl.xPos)-1 >= 0)
+                                {
+                                    clumpBand->RasterIO(GF_Read, pxl.xPos-1, pxl.yPos, 1, 1, &uiPxlVal, 1, 1, GDT_UInt32, 0, 0);
+                                    if(uiPxlVal == 0)
+                                    {
+                                        //catagoryBand->RasterIO(GF_Read, pxl.xPos-1, pxl.yPos, 1, 1, &catCPxlVal, 1, 1, GDT_UInt32, 0, 0);
+                                        
+                                        for(unsigned int n = 0; n < numInBands; ++n)
+                                        {
+                                            catBands[n]->RasterIO(GF_Read, bandOffsets[n][0]+(pxl.xPos-1), bandOffsets[n][1]+pxl.yPos, 1, 1, &catCPxlVals[n], 1, 1, GDT_UInt32, 0, 0);
+                                        }
+                                        
+                                        if(this->allValueEqual(catPxlVals, catCPxlVals, numInBands))
+                                        {
+                                            clumpPxls.push_back(rsgis::img::PxlLoc(pxl.xPos-1, pxl.yPos));
+                                            clumpSearchPxls.push(rsgis::img::PxlLoc(pxl.xPos-1, pxl.yPos));
+                                            clumpBand->RasterIO(GF_Write, pxl.xPos-1, pxl.yPos, 1, 1, &clumpIdx, 1, 1, GDT_UInt32, 0, 0);
+                                        }
+                                    }
+                                }
+                                // Right
+                                if((pxl.xPos+1) < width)
+                                {
+                                    clumpBand->RasterIO(GF_Read, pxl.xPos+1, pxl.yPos, 1, 1, &uiPxlVal, 1, 1, GDT_UInt32, 0, 0);
+                                    if(uiPxlVal == 0)
+                                    {
+                                        //catagoryBand->RasterIO(GF_Read, pxl.xPos+1, pxl.yPos, 1, 1, &catCPxlVal, 1, 1, GDT_UInt32, 0, 0);
+                                        
+                                        for(unsigned int n = 0; n < numInBands; ++n)
+                                        {
+                                            catBands[n]->RasterIO(GF_Read, bandOffsets[n][0]+(pxl.xPos+1), bandOffsets[n][1]+pxl.yPos, 1, 1, &catCPxlVals[n], 1, 1, GDT_UInt32, 0, 0);
+                                        }
+                                        
+                                        if(this->allValueEqual(catPxlVals, catCPxlVals, numInBands))
+                                        {
+                                            clumpPxls.push_back(rsgis::img::PxlLoc(pxl.xPos+1, pxl.yPos));
+                                            clumpSearchPxls.push(rsgis::img::PxlLoc(pxl.xPos+1, pxl.yPos));
+                                            clumpBand->RasterIO(GF_Write, pxl.xPos+1, pxl.yPos, 1, 1, &clumpIdx, 1, 1, GDT_UInt32, 0, 0);
+                                        }
+                                    }
+                                }
+                            }
+                            
+                            clumpIdx++;
+                        }
+                    }
+                }
+            }
+            std::cout << " Complete (Generated " << clumpIdx-1 << " clumps).\n";
+            
+            clumpBand->SetMetadataItem("LAYER_TYPE", "thematic");
+            GDALClose(clumpsDS);
+            
+            delete[] catPxlVals;
+            delete[] catCPxlVals;
+            
+            delete[] catBands;
+            for(unsigned int i = 0; i < numInBands; ++i)
+            {
+                delete[] bandOffsets[i];
+            }
+            
+            delete[] gdalTransform;
+            for(unsigned int i = 0; i < numDS; ++i)
+            {
+                delete[] dsOffsets[i];
+            }
+            delete[] dsOffsets;
+        }
+        catch (rsgis::img::RSGISImageCalcException &e)
+        {
+            throw e;
+        }
+        catch (rsgis::RSGISException &e)
+        {
+            throw rsgis::img::RSGISImageCalcException(e.what());
+        }
+    }
+    
+    bool RSGISClumpPxls::allValueEqual(unsigned int *vals, unsigned int numVals, unsigned int equalVal)
+    {
+        for(unsigned int i = 0; i < numVals; ++i)
+        {
+            if(vals[i] != equalVal)
+            {
+                return false;
+            }
+        }
         
+        return true;
+    }
+    
+    
+    bool RSGISClumpPxls::allValueEqual(unsigned int *vals1, unsigned int *vals2, unsigned int numVals)
+    {
+        for(unsigned int i = 0; i < numVals; ++i)
+        {
+            if(vals1[i] != vals2[i])
+            {
+                return false;
+            }
+        }
+        
+        return true;
+    }
+    
+    
     RSGISClumpPxls::~RSGISClumpPxls()
     {
         
