@@ -430,6 +430,306 @@ namespace rsgis{namespace reg{
 		
 		return distanceMoved;
 	}
+    
+    float RSGISImageRegistration::findTiePointLocation(TiePoint *tiePt, unsigned int windowSize, unsigned int searchArea, RSGISImageSimilarityMetric *metric, unsigned int subPixelResolution, float *moveInX, float *moveInY) throw(RSGISRegistrationException)
+	{
+		float distanceMoved = 0;
+		
+		if(!overlapDefined)
+		{
+			throw RSGISRegistrationException("The overlap needs to be defined before tie location can be defined.");
+		}
+		
+		rsgis::img::RSGISImageUtils imgUtils;
+		try
+		{
+			// Setup overlapping region variables.
+			int **dsOffsets = new int*[2];
+			dsOffsets[0] = new int[2];
+			dsOffsets[1] = new int[2];
+			int overlapWidth = 0;
+			int overlapHeight = 0;
+			double *overlapTransform = new double[6];
+			
+			double windowXWidth = (((double)windowSize)*overlap->xRes);
+			double windowYHeight = (((double)windowSize)*overlap->yRes);
+			
+			geos::geom::Envelope *env = new geos::geom::Envelope();
+			env->init((tiePt->eastings - windowXWidth),
+					  (tiePt->eastings + windowXWidth + overlap->xRes),
+					  (tiePt->northings - windowYHeight),
+					  (tiePt->northings + windowYHeight + +overlap->yRes));
+			
+			unsigned int numSearchPoints = (searchArea*2)+1;
+			float **imageSimilarity = new float*[numSearchPoints];
+			for(unsigned int i = 0; i < numSearchPoints; ++i)
+			{
+				imageSimilarity[i] = new float[numSearchPoints];
+			}
+			
+			int xShiftStart = searchArea * (-1);
+			int yShiftStart = searchArea * (-1);
+			int xShiftEnd = searchArea;
+			int yShiftEnd = searchArea;
+			
+			float **refDataBlock = NULL;
+			float **floatDataBlock = NULL;
+			unsigned int numRefDataVals = 0;
+			unsigned int numFloatDataVals = 0;
+			
+			bool first = true;
+			double currentMetricVal = 0;
+			double metricVal = 0;
+			int currentShiftX = 0;
+			int currentShiftY = 0;
+			
+			unsigned int xIdx = 0;
+			unsigned int yIdx = 0;
+			unsigned int currentXIdx = 0;
+			unsigned int currentYIdx = 0;
+			
+			for(int yShift = yShiftStart; yShift <= yShiftEnd; ++yShift)
+			{
+				xIdx = 0;
+				for(int xShift = xShiftStart; xShift <= xShiftEnd; ++xShift)
+				{
+					//std::cout << "Shift = [" << xShift << "," << yShift << "]\n";
+					//std::cout << "Shift = [" << (((float)xShift)+tiePt->xShift) << "," << (((float)yShift)+tiePt->yShift) << "]\n";
+					try
+					{
+						this->getImageOverlapWithFloatShift((((float)xShift)+tiePt->xShift), (((float)yShift)+tiePt->yShift), dsOffsets, &overlapWidth, &overlapHeight, overlapTransform, env);
+						
+						//std::cout << "Overlap Width = " << overlapWidth << std::endl;
+						//std::cout << "Overlap Height = " << overlapHeight << std::endl;
+						//std::cout << "Reference Offset = [" << dsOffsets[0][0] << "," << dsOffsets[0][1] << "]\n";
+						//std::cout << "Floating Offset = [" << dsOffsets[1][0] << "," << dsOffsets[1][1] << "]\n";
+						
+						if((overlapWidth > 0) & (overlapHeight > 0))
+						{
+							numRefDataVals = 0;
+							numFloatDataVals = 0;
+							
+							refDataBlock = imgUtils.getImageDataBlock(referenceIMG, dsOffsets[0], overlapWidth, overlapHeight, &numRefDataVals);
+							floatDataBlock = imgUtils.getImageDataBlock(floatingIMG, dsOffsets[1], overlapWidth, overlapHeight, &numFloatDataVals);
+							
+							if(numRefDataVals != numFloatDataVals)
+							{
+								throw RSGISRegistrationException("The number of data values read from the images does not match.");
+							}
+							
+							metricVal = metric->calcValue(refDataBlock, floatDataBlock, numRefDataVals, overlap->numRefBands);
+							
+							imageSimilarity[yIdx][xIdx] = metricVal;
+							
+							//std::cout << "Metric = " << metricVal << std::endl;
+							if(!((boost::math::isnan)(metricVal)))
+							{
+								if(first)
+								{
+									currentMetricVal = metricVal;
+									currentShiftX = xShift;
+									currentShiftY = yShift;
+									currentXIdx = xIdx;
+									currentYIdx = yIdx;
+									first = false;
+								}
+								else if(metric->findMin() & (metricVal < currentMetricVal))
+								{
+									currentMetricVal = metricVal;
+									currentShiftX = xShift;
+									currentShiftY = yShift;
+									currentXIdx = xIdx;
+									currentYIdx = yIdx;
+								}
+								else if(!metric->findMin() & (metricVal > currentMetricVal))
+								{
+									currentMetricVal = metricVal;
+									currentShiftX = xShift;
+									currentShiftY = yShift;
+									currentXIdx = xIdx;
+									currentYIdx = yIdx;
+								}
+							}
+							
+							for(unsigned int i = 0; i < overlap->numRefBands; ++i)
+							{
+								delete[] refDataBlock[i];
+								delete[] floatDataBlock[i];
+							}
+							delete[] refDataBlock;
+							delete[] floatDataBlock;
+						}
+					}
+					catch (RSGISRegistrationException &e)
+					{
+						// ignore
+						std::cerr << "Tie Point = [" << tiePt->xRef << "," << tiePt->yRef << "]\n";
+						std::cerr << "Shift = [" << (xShift+tiePt->xShift) << "," << (yShift+tiePt->yShift) << "]\n";
+						std::cerr << "WARNING: " << e.what() << std::endl;
+					}
+					xIdx++;
+				}
+				++yIdx;
+			}
+			
+			//std::cout << "Initial shift[" << tiePt->xShift << "," << tiePt->yShift << "] Move tie points with shift [" << currentShiftX << "," << currentShiftY << "] with value " << currentMetricVal << std::endl;
+			/*
+             for(unsigned int i = 0; i < numSearchPoints; ++i)
+             {
+             for(unsigned int j = 0; j < numSearchPoints; ++j)
+             {
+             if(j == 0)
+             {
+             std::cout << imageSimilarity[i][j];
+             }
+             else
+             {
+             std::cout << "," << imageSimilarity[i][j];
+             }
+             }
+             std::cout << std::endl;
+             }
+			 */
+			
+			float subPixelXShift = 0;
+			float subPixelYShift = 0;
+			float subPixelXMetric = currentMetricVal;
+			float subPixelYMetric = currentMetricVal;
+			
+			rsgis::math::RSGISPolyFit polyFit;
+			
+			//std::cout << "Current Index = [" << currentXIdx << "," << currentYIdx << "]\n";
+            
+			// Find subpixel component
+			if(searchArea == 1)
+			{
+				// 2nd Order Poly
+				//std::cout << "Finding 2nd order subpixel component\n";
+				
+				// Find subpixel X
+				if((currentXIdx != 0) & (currentXIdx != (numSearchPoints-1)))
+				{
+					gsl_matrix *inputDataMatrix = gsl_matrix_alloc(3,2);
+					gsl_matrix_set (inputDataMatrix, 0, 0, -1);
+					gsl_matrix_set (inputDataMatrix, 0, 1, imageSimilarity[currentYIdx][currentXIdx-1]);
+					gsl_matrix_set (inputDataMatrix, 1, 0, 0);
+					gsl_matrix_set (inputDataMatrix, 1, 1, imageSimilarity[currentYIdx][currentXIdx]);
+					gsl_matrix_set (inputDataMatrix, 2, 0, 1);
+					gsl_matrix_set (inputDataMatrix, 2, 1, imageSimilarity[currentYIdx][currentXIdx+1]);
+					
+					unsigned int order = 3; // 2nd Order - starts at zero.
+					gsl_vector *coefficients = polyFit.PolyfitOneDimensionQuiet(order, inputDataMatrix);
+					
+					subPixelXShift = findExtreme(metric->findMin(), coefficients, order, -1, 1, subPixelResolution, &subPixelXMetric);
+					
+					gsl_matrix_free(inputDataMatrix);
+				}
+                
+				// Find subpixel Y
+				if((currentYIdx != 0) & (currentYIdx != (numSearchPoints-1)))
+				{
+					gsl_matrix *inputDataMatrix = gsl_matrix_alloc(3,2);
+					gsl_matrix_set (inputDataMatrix, 0, 0, -1);
+					gsl_matrix_set (inputDataMatrix, 0, 1, imageSimilarity[currentYIdx-1][currentXIdx]);
+					gsl_matrix_set (inputDataMatrix, 1, 0, 0);
+					gsl_matrix_set (inputDataMatrix, 1, 1, imageSimilarity[currentYIdx][currentXIdx]);
+					gsl_matrix_set (inputDataMatrix, 2, 0, 1);
+					gsl_matrix_set (inputDataMatrix, 2, 1, imageSimilarity[currentYIdx+1][currentXIdx]);
+					
+					unsigned int order = 3; // 2nd Order - starts at zero.
+					gsl_vector *coefficients = polyFit.PolyfitOneDimensionQuiet(order, inputDataMatrix);
+					
+					subPixelYShift = findExtreme(metric->findMin(), coefficients, order, -1, 1, subPixelResolution, &subPixelYMetric);
+					
+					gsl_matrix_free(inputDataMatrix);
+				}
+			}
+			else
+			{
+				//std::cout << "Finding 4th order subpixel component\n";
+				// 4th Order Poly
+				if((currentXIdx > 1) & (currentXIdx < (numSearchPoints-2)))
+				{
+					//std::cout << "for X\n";
+					gsl_matrix *inputDataMatrix = gsl_matrix_alloc(5,2);
+					gsl_matrix_set (inputDataMatrix, 0, 0, -2);
+					gsl_matrix_set (inputDataMatrix, 0, 1, imageSimilarity[currentYIdx][currentXIdx-2]);
+					gsl_matrix_set (inputDataMatrix, 1, 0, -1);
+					gsl_matrix_set (inputDataMatrix, 1, 1, imageSimilarity[currentYIdx][currentXIdx-1]);
+					gsl_matrix_set (inputDataMatrix, 2, 0, 0);
+					gsl_matrix_set (inputDataMatrix, 2, 1, imageSimilarity[currentYIdx][currentXIdx]);
+					gsl_matrix_set (inputDataMatrix, 3, 0, 1);
+					gsl_matrix_set (inputDataMatrix, 3, 1, imageSimilarity[currentYIdx][currentXIdx+1]);
+					gsl_matrix_set (inputDataMatrix, 4, 0, 2);
+					gsl_matrix_set (inputDataMatrix, 4, 1, imageSimilarity[currentYIdx][currentXIdx+2]);
+					
+					unsigned int order = 5; // 4th Order - starts at zero.
+					gsl_vector *coefficients = polyFit.PolyfitOneDimensionQuiet(order, inputDataMatrix);
+					
+					subPixelXShift = findExtreme(metric->findMin(), coefficients, order, -1, 1, subPixelResolution, &subPixelXMetric);
+					
+					gsl_matrix_free(inputDataMatrix);
+					gsl_vector_free(coefficients);
+				}
+				
+				if((currentYIdx > 1) & (currentYIdx < (numSearchPoints-2)))
+				{
+					//std::cout << "for Y\n";
+					gsl_matrix *inputDataMatrix = gsl_matrix_alloc(5,2);
+					gsl_matrix_set (inputDataMatrix, 0, 0, -2);
+					gsl_matrix_set (inputDataMatrix, 0, 1, imageSimilarity[currentYIdx-2][currentXIdx]);
+					gsl_matrix_set (inputDataMatrix, 1, 0, -1);
+					gsl_matrix_set (inputDataMatrix, 1, 1, imageSimilarity[currentYIdx-1][currentXIdx]);
+					gsl_matrix_set (inputDataMatrix, 2, 0, 0);
+					gsl_matrix_set (inputDataMatrix, 2, 1, imageSimilarity[currentYIdx][currentXIdx]);
+					gsl_matrix_set (inputDataMatrix, 3, 0, 1);
+					gsl_matrix_set (inputDataMatrix, 3, 1, imageSimilarity[currentYIdx+1][currentXIdx]);
+					gsl_matrix_set (inputDataMatrix, 4, 0, 2);
+					gsl_matrix_set (inputDataMatrix, 4, 1, imageSimilarity[currentYIdx+2][currentXIdx]);
+					
+					unsigned int order = 5; // 4th Order - starts at zero.
+					gsl_vector *coefficients = polyFit.PolyfitOneDimensionQuiet(order, inputDataMatrix);
+					
+					subPixelYShift = findExtreme(metric->findMin(), coefficients, order, -1, 1, subPixelResolution, &subPixelYMetric);
+					
+					gsl_matrix_free(inputDataMatrix);
+					gsl_vector_free(coefficients);
+				}
+				
+			}
+			
+			//std::cout << "Sub pixel component = [" << subPixelXShift << "," << subPixelYShift << "]\n";
+			//std::cout << "Extrema values = [" << subPixelXMetric << "," << subPixelYMetric << "]\n";
+			
+			currentMetricVal = (subPixelXMetric + subPixelYMetric)/2;
+			
+			float finalXShift = (((float)currentShiftX) + subPixelXShift);
+			float finalYShift = (((float)currentShiftY) + subPixelYShift);
+			
+			distanceMoved = sqrt(((finalXShift*finalXShift)+(finalYShift*finalYShift))/2);
+			*moveInX = finalXShift;
+			*moveInY = finalYShift;
+			
+			tiePt->xShift += finalXShift;
+            tiePt->yShift += finalYShift;
+            tiePt->metricVal = currentMetricVal;
+			
+			delete[] overlapTransform;
+			delete[] dsOffsets[0];
+			delete[] dsOffsets[1];
+			delete[] dsOffsets;
+		}
+		catch (rsgis::img::RSGISImageBandException &e)
+		{
+			throw RSGISRegistrationException(e.what());
+		}
+		catch (RSGISRegistrationException &e) 
+		{
+			throw e;
+		}
+		
+		return distanceMoved;
+	}
 	
 	float RSGISImageRegistration::findExtreme(bool findMin, gsl_vector *coefficients, unsigned int order, float minRange, float maxRange, unsigned int resolution, float *extremeVal)
 	{

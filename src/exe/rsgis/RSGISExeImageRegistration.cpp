@@ -818,6 +818,19 @@ void RSGISExeImageRegistration::retrieveParameters(xercesc::DOMElement *argEleme
 				throw rsgis::RSGISXMLArgumentsException("No \'output\' attribute was provided.");
 			}
 			xercesc::XMLString::release(&outputXMLStr);
+            
+            XMLCh *outImageFormatXMLStr = xercesc::XMLString::transcode("format");
+			if(argElement->hasAttribute(outImageFormatXMLStr))
+			{
+				char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outImageFormatXMLStr));
+				this->outImageFormat = std::string(charValue);
+				xercesc::XMLString::release(&charValue);
+			}
+			else
+			{
+				this->outImageFormat = "ENVI";
+			}
+			xercesc::XMLString::release(&outImageFormatXMLStr);
 			
 			XMLCh *metricXMLStr = xercesc::XMLString::transcode("metric");
 			if(argElement->hasAttribute(metricXMLStr))
@@ -1306,6 +1319,95 @@ void RSGISExeImageRegistration::runAlgorithm() throw(rsgis::RSGISException)
 				throw e;
 			}
 			GDALDestroyDriverManager();
+		}
+        else if(this->option == RSGISExeImageRegistration::pxlshift)
+		{
+			std::cout << "A registration algorithm which attempts to register every pixel in the image.\n";
+			std::cout << "Reference Image: " << this->inputReferenceImage << std::endl;
+			std::cout << "Floating Image: " << this->inputFloatingmage << std::endl;
+			std::cout << "Output Image: " << this->outputImage << std::endl;
+            std::cout << "Output Format: " << this->outImageFormat << std::endl;
+			if(metricType == euclidean)
+			{
+				std::cout << "The Euclidean similarity metric will be used\n";
+			}
+			else if(metricType == sqdiff)
+			{
+				std::cout << "The Squared Difference similarity metric will be used\n";
+			}
+			else if(metricType == manhatten)
+			{
+				std::cout << "The Manhatten (taxi cab) similarity metric will be used\n";
+			}
+			else if(metricType == correlation)
+			{
+				std::cout << "The Correlation Coefficent similarity metric will be used\n";
+			}
+			else
+			{
+				throw rsgis::RSGISException("Similarity Metric Unknown");
+			}
+			std::cout << "Window Size = " << windowSize << std::endl;
+			std::cout << "Search area = " << searchArea << std::endl;
+			std::cout << "Sub pixel resolution = " << subPixelResolution << std::endl;
+            
+			try
+			{
+				GDALAllRegister();
+				GDALDataset *inRefDataset = NULL;
+				GDALDataset *inFloatDataset = NULL;
+				
+				inRefDataset = (GDALDataset *) GDALOpenShared(inputReferenceImage.c_str(), GA_ReadOnly);
+				if(inRefDataset == NULL)
+				{
+					std::string message = std::string("Could not open image ") + inputReferenceImage;
+					throw rsgis::RSGISException(message.c_str());
+				}
+				
+				inFloatDataset = (GDALDataset *) GDALOpenShared(inputFloatingmage.c_str(), GA_ReadOnly);
+				if(inFloatDataset == NULL)
+				{
+					std::string message = std::string("Could not open image ") + inputFloatingmage;
+					throw rsgis::RSGISException(message.c_str());
+				}
+				
+				rsgis::reg::RSGISImageSimilarityMetric *similarityMetric = NULL;
+				if(metricType == euclidean)
+				{
+					similarityMetric = new rsgis::reg::RSGISEuclideanSimilarityMetric();
+				}
+				else if(metricType == sqdiff)
+				{
+					similarityMetric = new rsgis::reg::RSGISSquaredDifferenceSimilarityMetric();
+				}
+				else if(metricType == manhatten)
+				{
+					similarityMetric = new rsgis::reg::RSGISManhattanSimilarityMetric();
+				}
+				else if(metricType == correlation)
+				{
+					similarityMetric = new rsgis::reg::RSGISCorrelationSimilarityMetric();
+				}
+				
+				rsgis::reg::RSGISImageRegistration *regImgs = new rsgis::reg::RSGISImagePixelRegistration(inRefDataset, inFloatDataset, this->outputImage, this->outImageFormat, windowSize, searchArea, similarityMetric, subPixelResolution);
+                
+				regImgs->runCompleteRegistration();				
+				
+				delete similarityMetric;
+				delete regImgs;
+				
+				GDALClose(inRefDataset);
+				GDALClose(inFloatDataset);
+				GDALDestroyDriverManager();
+			}
+			catch(rsgis::RSGISRegistrationException &e)
+			{
+				throw rsgis::RSGISException(e.what());
+			}
+			catch(rsgis::RSGISException& e)
+			{
+				throw e;
+			}
 		}
 		else
 		{

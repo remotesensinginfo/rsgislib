@@ -1343,7 +1343,8 @@
     <rsgis:command algor="registration" option="polywarp" gcps="string" image="string" output="string" projection="file.wkt" resolution="float" format="string" polyOrder="int" transform="yes | no" />
     <!-- A command to warp an input image using a set of ground control points using a triangulation -->
     <rsgis:command algor="registration" option="triangularwarp" gcps="string" image="string" output="string" projection="file.wkt" resolution="float" format="string" transform="yes | no" />
-
+	<!-- A command for doing a per pixel image matching where a 3 band image is outputted with the X Shift, Y Shift and Metric value -->
+	<rsgis:command algor="registration" option="pxlshift" reference="image" floating="image" output="image" format="string" metric="euclidean|sqdiff|manhatten|correlation" window="int" search="int" subpixelresolution="int"/>
 
 
 

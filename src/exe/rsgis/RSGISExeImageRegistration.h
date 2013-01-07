@@ -41,6 +41,7 @@
 #include "registration/RSGISWarpImageInterpolator.h"
 #include "registration/RSGISWarpImageUsingTriangulation.h"
 #include "registration/RSGISPolynomialImageWarp.h"
+#include "registration/RSGISImagePixelRegistration.h"
 
 #include "utils/RSGISFileUtils.h"
 #include "utils/RSGISTextUtils.h"
