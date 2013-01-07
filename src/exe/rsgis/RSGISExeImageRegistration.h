@@ -53,79 +53,73 @@
 
 namespace rsgisexe{
 
-using namespace std;
-using namespace xercesc;
-using namespace rsgis;
-using namespace rsgis::reg;
-using namespace rsgis::utils;
-using namespace rsgis::math;
-
-class RSGISExeImageRegistration : public RSGISAlgorithmParameters
-{
-public:
-	enum options 
-	{
-		none,
-		basic,
-		singlelayer,
-		triangularwarp,
-		nnwarp,
-        polywarp
-	};
-	
-	enum OutputType
-	{
-		undefinedOutput,
-		envi_img2img,
-		envi_img2map,
-		rsgis_img2map
-	};
-	
-	enum SimilarityMetric 
-	{
-		undefinedMetric,
-		euclidean,
-		sqdiff,
-		manhatten,
-		correlation
-	};
-	
-	RSGISExeImageRegistration();
-	virtual RSGISAlgorithmParameters* getInstance();
-	virtual void retrieveParameters(DOMElement *argElement) throw(RSGISXMLArgumentsException);
-	virtual void runAlgorithm() throw(RSGISException);
-	virtual void printParameters();
-	virtual string getDescription();
-	virtual string getXMLSchema();
-	virtual void help();
-	~RSGISExeImageRegistration();
-protected:
-	options option;
-	string inputImage;
-	string outputImage;
-	string inputGCPs;
-	string inputReferenceImage;
-	string inputFloatingmage;
-	string outputGCPFile;
-	string projFile;
-    string outImageFormat;
-	OutputType outputType;
-	SimilarityMetric metricType;
-	unsigned int gcpGap;
-	unsigned int windowSize;
-	unsigned int searchArea;
-	float metricThreshold;
-	float stdDevRefThreshold;
-	float stdDevFloatThreshold;
-	unsigned int subPixelResolution;
-	float distanceThreshold;
-	unsigned int maxNumIterations;
-	float moveChangeThreshold;
-	float pSmoothness;
-	float resolution;
-    int polyOrder;
-    bool genTransformImage;
-};
+    class RSGISExeImageRegistration : public rsgis::RSGISAlgorithmParameters
+    {
+    public:
+        enum options 
+        {
+            none,
+            basic,
+            singlelayer,
+            triangularwarp,
+            nnwarp,
+            polywarp,
+            pxlshift
+        };
+        
+        enum OutputType
+        {
+            undefinedOutput,
+            envi_img2img,
+            envi_img2map,
+            rsgis_img2map
+        };
+        
+        enum SimilarityMetric 
+        {
+            undefinedMetric,
+            euclidean,
+            sqdiff,
+            manhatten,
+            correlation
+        };
+        
+        RSGISExeImageRegistration();
+        virtual rsgis::RSGISAlgorithmParameters* getInstance();
+        virtual void retrieveParameters(xercesc::DOMElement *argElement) throw(rsgis::RSGISXMLArgumentsException);
+        virtual void runAlgorithm() throw(rsgis::RSGISException);
+        virtual void printParameters();
+        virtual std::string getDescription();
+        virtual std::string getXMLSchema();
+        virtual void help();
+        ~RSGISExeImageRegistration();
+    protected:
+        options option;
+        std::string inputImage;
+        std::string outputImage;
+        std::string inputGCPs;
+        std::string inputReferenceImage;
+        std::string inputFloatingmage;
+        std::string outputGCPFile;
+        std::string projFile;
+        std::string outImageFormat;
+        OutputType outputType;
+        SimilarityMetric metricType;
+        unsigned int gcpGap;
+        unsigned int windowSize;
+        unsigned int searchArea;
+        float metricThreshold;
+        float stdDevRefThreshold;
+        float stdDevFloatThreshold;
+        unsigned int subPixelResolution;
+        float distanceThreshold;
+        unsigned int maxNumIterations;
+        float moveChangeThreshold;
+        float pSmoothness;
+        float resolution;
+        int polyOrder;
+        bool genTransformImage;
+    };
 }
 
 #endif

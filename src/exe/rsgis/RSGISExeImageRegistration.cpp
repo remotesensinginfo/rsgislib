@@ -29,610 +29,611 @@ RSGISExeImageRegistration::RSGISExeImageRegistration() : RSGISAlgorithmParameter
 	this->algorithm = "registration";
 }
 
-RSGISAlgorithmParameters* RSGISExeImageRegistration::getInstance()
+    rsgis::RSGISAlgorithmParameters* RSGISExeImageRegistration::getInstance()
 {
 	return new RSGISExeImageRegistration();
 }
 
-void RSGISExeImageRegistration::retrieveParameters(DOMElement *argElement) throw(RSGISXMLArgumentsException)
+void RSGISExeImageRegistration::retrieveParameters(xercesc::DOMElement *argElement) throw(rsgis::RSGISXMLArgumentsException)
 {
-	RSGISMathsUtils mathUtils;	
-	XMLCh *algorName = XMLString::transcode(this->algorithm.c_str());
-	XMLCh *algorXMLStr = XMLString::transcode("algor");
-	XMLCh *optionXMLStr = XMLString::transcode("option");
-	XMLCh *optionBasic = XMLString::transcode("basic");
-	XMLCh *optionSingleLayer = XMLString::transcode("singlelayer");
-	XMLCh *optionTriangularWarp = XMLString::transcode("triangularwarp");
-	XMLCh *optionNNWarp = XMLString::transcode("nnwarp");
-    XMLCh *optionPolyWarp = XMLString::transcode("polywarp");
+	rsgis::math::RSGISMathsUtils mathUtils;
+	XMLCh *algorName = xercesc::XMLString::transcode(this->algorithm.c_str());
+	XMLCh *algorXMLStr = xercesc::XMLString::transcode("algor");
+	XMLCh *optionXMLStr = xercesc::XMLString::transcode("option");
+	XMLCh *optionBasic = xercesc::XMLString::transcode("basic");
+	XMLCh *optionSingleLayer = xercesc::XMLString::transcode("singlelayer");
+	XMLCh *optionTriangularWarp = xercesc::XMLString::transcode("triangularwarp");
+	XMLCh *optionNNWarp = xercesc::XMLString::transcode("nnwarp");
+    XMLCh *optionPolyWarp = xercesc::XMLString::transcode("polywarp");
+    XMLCh *optionPxlShift = xercesc::XMLString::transcode("pxlshift");
 	
 	try
 	{
 		const XMLCh *algorNameEle = argElement->getAttribute(algorXMLStr);
-		if(!XMLString::equals(algorName, algorNameEle))
+		if(!xercesc::XMLString::equals(algorName, algorNameEle))
 		{
-			throw RSGISXMLArgumentsException("The algorithm name is incorrect.");
+			throw rsgis::RSGISXMLArgumentsException("The algorithm name is incorrect.");
 		}
 		
 		
 		const XMLCh *optionXML = argElement->getAttribute(optionXMLStr);
-		if(XMLString::equals(optionBasic, optionXML))
+		if(xercesc::XMLString::equals(optionBasic, optionXML))
 		{
 			this->option = RSGISExeImageRegistration::basic;
 			
-			XMLCh *referenceXMLStr = XMLString::transcode("reference");
+			XMLCh *referenceXMLStr = xercesc::XMLString::transcode("reference");
 			if(argElement->hasAttribute(referenceXMLStr))
 			{
-				char *charValue = XMLString::transcode(argElement->getAttribute(referenceXMLStr));
-				this->inputReferenceImage = string(charValue);
-				XMLString::release(&charValue);
+				char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(referenceXMLStr));
+				this->inputReferenceImage = std::string(charValue);
+				xercesc::XMLString::release(&charValue);
 			}
 			else
 			{
-				throw RSGISXMLArgumentsException("No \'reference\' attribute was provided.");
+				throw rsgis::RSGISXMLArgumentsException("No \'reference\' attribute was provided.");
 			}
-			XMLString::release(&referenceXMLStr);
+			xercesc::XMLString::release(&referenceXMLStr);
 			
-			XMLCh *floatingXMLStr = XMLString::transcode("floating");
+			XMLCh *floatingXMLStr = xercesc::XMLString::transcode("floating");
 			if(argElement->hasAttribute(floatingXMLStr))
 			{
-				char *charValue = XMLString::transcode(argElement->getAttribute(floatingXMLStr));
-				this->inputFloatingmage = string(charValue);
-				XMLString::release(&charValue);
+				char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(floatingXMLStr));
+				this->inputFloatingmage = std::string(charValue);
+				xercesc::XMLString::release(&charValue);
 			}
 			else
 			{
-				throw RSGISXMLArgumentsException("No \'floating\' attribute was provided.");
+				throw rsgis::RSGISXMLArgumentsException("No \'floating\' attribute was provided.");
 			}
-			XMLString::release(&floatingXMLStr);
+			xercesc::XMLString::release(&floatingXMLStr);
 			
 			
-			XMLCh *outputXMLStr = XMLString::transcode("output");
+			XMLCh *outputXMLStr = xercesc::XMLString::transcode("output");
 			if(argElement->hasAttribute(outputXMLStr))
 			{
-				char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
-				this->outputGCPFile = string(charValue);
-				XMLString::release(&charValue);
+				char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outputXMLStr));
+				this->outputGCPFile = std::string(charValue);
+				xercesc::XMLString::release(&charValue);
 			}
 			else
 			{
-				throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+				throw rsgis::RSGISXMLArgumentsException("No \'output\' attribute was provided.");
 			}
-			XMLString::release(&outputXMLStr);
+			xercesc::XMLString::release(&outputXMLStr);
 			
 			
-			XMLCh *outputTypeXMLStr = XMLString::transcode("outputType");
+			XMLCh *outputTypeXMLStr = xercesc::XMLString::transcode("outputType");
 			if(argElement->hasAttribute(outputTypeXMLStr))
 			{
-				XMLCh *envImg2ImgStr = XMLString::transcode("envi_img2img");
-				XMLCh *enviImg2MapStr = XMLString::transcode("envi_img2map");
-				XMLCh *rsgisImg2MapStr = XMLString::transcode("rsgis_img2map");
+				XMLCh *envImg2ImgStr = xercesc::XMLString::transcode("envi_img2img");
+				XMLCh *enviImg2MapStr = xercesc::XMLString::transcode("envi_img2map");
+				XMLCh *rsgisImg2MapStr = xercesc::XMLString::transcode("rsgis_img2map");
 				
 				const XMLCh *outTypeValue = argElement->getAttribute(outputTypeXMLStr);
 				
-				if(XMLString::equals(outTypeValue, envImg2ImgStr))
+				if(xercesc::XMLString::equals(outTypeValue, envImg2ImgStr))
 				{
 					this->outputType = RSGISExeImageRegistration::envi_img2img;
 				}
-				else if(XMLString::equals(outTypeValue, enviImg2MapStr))
+				else if(xercesc::XMLString::equals(outTypeValue, enviImg2MapStr))
 				{
 					this->outputType = RSGISExeImageRegistration::envi_img2map;
 				}
-				else if(XMLString::equals(outTypeValue, rsgisImg2MapStr))
+				else if(xercesc::XMLString::equals(outTypeValue, rsgisImg2MapStr))
 				{
 					this->outputType = RSGISExeImageRegistration::rsgis_img2map;
 				}
 				else
 				{
 					this->outputType = RSGISExeImageRegistration::undefinedOutput;
-					throw RSGISXMLArgumentsException("The \'outputType\' attribute needs to have one of the following values envi_img2img | envi_img2map | gdal.");
+					throw rsgis::RSGISXMLArgumentsException("The \'outputType\' attribute needs to have one of the following values envi_img2img | envi_img2map | gdal.");
 				}
-				XMLString::release(&envImg2ImgStr);
-				XMLString::release(&enviImg2MapStr);
-				XMLString::release(&rsgisImg2MapStr);
+				xercesc::XMLString::release(&envImg2ImgStr);
+				xercesc::XMLString::release(&enviImg2MapStr);
+				xercesc::XMLString::release(&rsgisImg2MapStr);
 			}
 			else
 			{
-				throw RSGISXMLArgumentsException("No \'outputType\' attribute was provided.");
+				throw rsgis::RSGISXMLArgumentsException("No \'outputType\' attribute was provided.");
 			}
-			XMLString::release(&outputTypeXMLStr);
+			xercesc::XMLString::release(&outputTypeXMLStr);
 			
 			
-			XMLCh *metricXMLStr = XMLString::transcode("metric");
+			XMLCh *metricXMLStr = xercesc::XMLString::transcode("metric");
 			if(argElement->hasAttribute(metricXMLStr))
 			{
-				XMLCh *euclideanStr = XMLString::transcode("euclidean");
-				XMLCh *sqdiffStr = XMLString::transcode("sqdiff");
-				XMLCh *manhattenStr = XMLString::transcode("manhatten");
-				XMLCh *correlationStr = XMLString::transcode("correlation");
+				XMLCh *euclideanStr = xercesc::XMLString::transcode("euclidean");
+				XMLCh *sqdiffStr = xercesc::XMLString::transcode("sqdiff");
+				XMLCh *manhattenStr = xercesc::XMLString::transcode("manhatten");
+				XMLCh *correlationStr = xercesc::XMLString::transcode("correlation");
 				
 				const XMLCh *metricValue = argElement->getAttribute(metricXMLStr);
 				
-				if(XMLString::equals(metricValue, euclideanStr))
+				if(xercesc::XMLString::equals(metricValue, euclideanStr))
 				{
 					this->metricType = RSGISExeImageRegistration::euclidean;
 				}
-				else if(XMLString::equals(metricValue, sqdiffStr))
+				else if(xercesc::XMLString::equals(metricValue, sqdiffStr))
 				{
 					this->metricType = RSGISExeImageRegistration::sqdiff;
 				}
-				else if(XMLString::equals(metricValue, manhattenStr))
+				else if(xercesc::XMLString::equals(metricValue, manhattenStr))
 				{
 					this->metricType = RSGISExeImageRegistration::manhatten;
 				}
-				else if(XMLString::equals(metricValue, correlationStr))
+				else if(xercesc::XMLString::equals(metricValue, correlationStr))
 				{
 					this->metricType = RSGISExeImageRegistration::correlation;
 				}
 				else
 				{
 					this->metricType = RSGISExeImageRegistration::undefinedMetric;
-					throw RSGISXMLArgumentsException("The \'metric\' attribute needs to have one of the following values euclidean | sqdiff | manhatten | correlation.");
+					throw rsgis::RSGISXMLArgumentsException("The \'metric\' attribute needs to have one of the following values euclidean | sqdiff | manhatten | correlation.");
 				}
-				XMLString::release(&euclideanStr);
-				XMLString::release(&sqdiffStr);
-				XMLString::release(&manhattenStr);
-				XMLString::release(&correlationStr);
+				xercesc::XMLString::release(&euclideanStr);
+				xercesc::XMLString::release(&sqdiffStr);
+				xercesc::XMLString::release(&manhattenStr);
+				xercesc::XMLString::release(&correlationStr);
 			}
 			else
 			{
-				throw RSGISXMLArgumentsException("No \'metric\' attribute was provided.");
+				throw rsgis::RSGISXMLArgumentsException("No \'metric\' attribute was provided.");
 			}
-			XMLString::release(&metricXMLStr);
+			xercesc::XMLString::release(&metricXMLStr);
 			
 			
-			XMLCh *pixelGapXMLStr = XMLString::transcode("pixelgap");
+			XMLCh *pixelGapXMLStr = xercesc::XMLString::transcode("pixelgap");
 			if(argElement->hasAttribute(pixelGapXMLStr))
 			{
-				char *charValue = XMLString::transcode(argElement->getAttribute(pixelGapXMLStr));
-				this->gcpGap = mathUtils.strtoint(string(charValue));
-				XMLString::release(&charValue);
+				char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(pixelGapXMLStr));
+				this->gcpGap = mathUtils.strtoint(std::string(charValue));
+				xercesc::XMLString::release(&charValue);
 			}
 			else
 			{
-				throw RSGISXMLArgumentsException("No \'pixelgap\' attribute was provided.");
+				throw rsgis::RSGISXMLArgumentsException("No \'pixelgap\' attribute was provided.");
 			}
-			XMLString::release(&pixelGapXMLStr);
+			xercesc::XMLString::release(&pixelGapXMLStr);
 			
-			XMLCh *windowXMLStr = XMLString::transcode("window");
+			XMLCh *windowXMLStr = xercesc::XMLString::transcode("window");
 			if(argElement->hasAttribute(windowXMLStr))
 			{
-				char *charValue = XMLString::transcode(argElement->getAttribute(windowXMLStr));
-				this->windowSize = mathUtils.strtoint(string(charValue));
-				XMLString::release(&charValue);
+				char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(windowXMLStr));
+				this->windowSize = mathUtils.strtoint(std::string(charValue));
+				xercesc::XMLString::release(&charValue);
 			}
 			else
 			{
-				throw RSGISXMLArgumentsException("No \'window\' attribute was provided.");
+				throw rsgis::RSGISXMLArgumentsException("No \'window\' attribute was provided.");
 			}
-			XMLString::release(&windowXMLStr);
+			xercesc::XMLString::release(&windowXMLStr);
 			
-			XMLCh *searchXMLStr = XMLString::transcode("search");
+			XMLCh *searchXMLStr = xercesc::XMLString::transcode("search");
 			if(argElement->hasAttribute(searchXMLStr))
 			{
-				char *charValue = XMLString::transcode(argElement->getAttribute(searchXMLStr));
-				this->searchArea = mathUtils.strtoint(string(charValue));
-				XMLString::release(&charValue);
+				char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(searchXMLStr));
+				this->searchArea = mathUtils.strtoint(std::string(charValue));
+				xercesc::XMLString::release(&charValue);
 			}
 			else
 			{
-				throw RSGISXMLArgumentsException("No \'search\' attribute was provided.");
+				throw rsgis::RSGISXMLArgumentsException("No \'search\' attribute was provided.");
 			}
-			XMLString::release(&searchXMLStr);
+			xercesc::XMLString::release(&searchXMLStr);
 			
 			
-			XMLCh *thresholdXMLStr = XMLString::transcode("threshold");
+			XMLCh *thresholdXMLStr = xercesc::XMLString::transcode("threshold");
 			if(argElement->hasAttribute(thresholdXMLStr))
 			{
-				char *charValue = XMLString::transcode(argElement->getAttribute(thresholdXMLStr));
-				this->metricThreshold = mathUtils.strtofloat(string(charValue));
-				XMLString::release(&charValue);
+				char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(thresholdXMLStr));
+				this->metricThreshold = mathUtils.strtofloat(std::string(charValue));
+				xercesc::XMLString::release(&charValue);
 			}
 			else
 			{
-				throw RSGISXMLArgumentsException("No \'threshold\' attribute was provided.");
+				throw rsgis::RSGISXMLArgumentsException("No \'threshold\' attribute was provided.");
 			}
-			XMLString::release(&thresholdXMLStr);
+			xercesc::XMLString::release(&thresholdXMLStr);
 			
-			XMLCh *stddevRefXMLStr = XMLString::transcode("stddevRef");
+			XMLCh *stddevRefXMLStr = xercesc::XMLString::transcode("stddevRef");
 			if(argElement->hasAttribute(stddevRefXMLStr))
 			{
-				char *charValue = XMLString::transcode(argElement->getAttribute(stddevRefXMLStr));
-				this->stdDevRefThreshold = mathUtils.strtofloat(string(charValue));
-				XMLString::release(&charValue);
+				char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(stddevRefXMLStr));
+				this->stdDevRefThreshold = mathUtils.strtofloat(std::string(charValue));
+				xercesc::XMLString::release(&charValue);
 			}
 			else
 			{
-				throw RSGISXMLArgumentsException("No \'stddevRef\' attribute was provided.");
+				throw rsgis::RSGISXMLArgumentsException("No \'stddevRef\' attribute was provided.");
 			}
-			XMLString::release(&stddevRefXMLStr);
+			xercesc::XMLString::release(&stddevRefXMLStr);
 			
-			XMLCh *stddevFloatXMLStr = XMLString::transcode("stddevFloat");
+			XMLCh *stddevFloatXMLStr = xercesc::XMLString::transcode("stddevFloat");
 			if(argElement->hasAttribute(stddevFloatXMLStr))
 			{
-				char *charValue = XMLString::transcode(argElement->getAttribute(stddevFloatXMLStr));
-				this->stdDevFloatThreshold = mathUtils.strtofloat(string(charValue));
-				XMLString::release(&charValue);
+				char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(stddevFloatXMLStr));
+				this->stdDevFloatThreshold = mathUtils.strtofloat(std::string(charValue));
+				xercesc::XMLString::release(&charValue);
 			}
 			else
 			{
-				throw RSGISXMLArgumentsException("No \'stddevFloat\' attribute was provided.");
+				throw rsgis::RSGISXMLArgumentsException("No \'stddevFloat\' attribute was provided.");
 			}
-			XMLString::release(&stddevFloatXMLStr);
+			xercesc::XMLString::release(&stddevFloatXMLStr);
 			
-			XMLCh *subPixelResXMLStr = XMLString::transcode("subpixelresolution");
+			XMLCh *subPixelResXMLStr = xercesc::XMLString::transcode("subpixelresolution");
 			if(argElement->hasAttribute(subPixelResXMLStr))
 			{
-				char *charValue = XMLString::transcode(argElement->getAttribute(subPixelResXMLStr));
-				this->subPixelResolution = mathUtils.strtoint(string(charValue));
-				XMLString::release(&charValue);
+				char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(subPixelResXMLStr));
+				this->subPixelResolution = mathUtils.strtoint(std::string(charValue));
+				xercesc::XMLString::release(&charValue);
 			}
 			else
 			{
-				throw RSGISXMLArgumentsException("No \'subpixelresolution\' attribute was provided.");
+				throw rsgis::RSGISXMLArgumentsException("No \'subpixelresolution\' attribute was provided.");
 			}
-			XMLString::release(&subPixelResXMLStr);
+			xercesc::XMLString::release(&subPixelResXMLStr);
 		}
-		else if(XMLString::equals(optionSingleLayer, optionXML))
+		else if(xercesc::XMLString::equals(optionSingleLayer, optionXML))
 		{
 			this->option = RSGISExeImageRegistration::singlelayer;
 			
-			XMLCh *referenceXMLStr = XMLString::transcode("reference");
+			XMLCh *referenceXMLStr = xercesc::XMLString::transcode("reference");
 			if(argElement->hasAttribute(referenceXMLStr))
 			{
-				char *charValue = XMLString::transcode(argElement->getAttribute(referenceXMLStr));
-				this->inputReferenceImage = string(charValue);
-				XMLString::release(&charValue);
+				char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(referenceXMLStr));
+				this->inputReferenceImage = std::string(charValue);
+				xercesc::XMLString::release(&charValue);
 			}
 			else
 			{
-				throw RSGISXMLArgumentsException("No \'reference\' attribute was provided.");
+				throw rsgis::RSGISXMLArgumentsException("No \'reference\' attribute was provided.");
 			}
-			XMLString::release(&referenceXMLStr);
+			xercesc::XMLString::release(&referenceXMLStr);
 			
-			XMLCh *floatingXMLStr = XMLString::transcode("floating");
+			XMLCh *floatingXMLStr = xercesc::XMLString::transcode("floating");
 			if(argElement->hasAttribute(floatingXMLStr))
 			{
-				char *charValue = XMLString::transcode(argElement->getAttribute(floatingXMLStr));
-				this->inputFloatingmage = string(charValue);
-				XMLString::release(&charValue);
+				char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(floatingXMLStr));
+				this->inputFloatingmage = std::string(charValue);
+				xercesc::XMLString::release(&charValue);
 			}
 			else
 			{
-				throw RSGISXMLArgumentsException("No \'floating\' attribute was provided.");
+				throw rsgis::RSGISXMLArgumentsException("No \'floating\' attribute was provided.");
 			}
-			XMLString::release(&floatingXMLStr);
+			xercesc::XMLString::release(&floatingXMLStr);
 			
 			
-			XMLCh *outputXMLStr = XMLString::transcode("output");
+			XMLCh *outputXMLStr = xercesc::XMLString::transcode("output");
 			if(argElement->hasAttribute(outputXMLStr))
 			{
-				char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
-				this->outputGCPFile = string(charValue);
-				XMLString::release(&charValue);
+				char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outputXMLStr));
+				this->outputGCPFile = std::string(charValue);
+				xercesc::XMLString::release(&charValue);
 			}
 			else
 			{
-				throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+				throw rsgis::RSGISXMLArgumentsException("No \'output\' attribute was provided.");
 			}
-			XMLString::release(&outputXMLStr);
+			xercesc::XMLString::release(&outputXMLStr);
 			
 			
-			XMLCh *outputTypeXMLStr = XMLString::transcode("outputType");
+			XMLCh *outputTypeXMLStr = xercesc::XMLString::transcode("outputType");
 			if(argElement->hasAttribute(outputTypeXMLStr))
 			{
-				XMLCh *envImg2ImgStr = XMLString::transcode("envi_img2img");
-				XMLCh *enviImg2MapStr = XMLString::transcode("envi_img2map");
-				XMLCh *rsgisImg2MapStr = XMLString::transcode("rsgis_img2map");
+				XMLCh *envImg2ImgStr = xercesc::XMLString::transcode("envi_img2img");
+				XMLCh *enviImg2MapStr = xercesc::XMLString::transcode("envi_img2map");
+				XMLCh *rsgisImg2MapStr = xercesc::XMLString::transcode("rsgis_img2map");
 				
 				const XMLCh *outTypeValue = argElement->getAttribute(outputTypeXMLStr);
 				
-				if(XMLString::equals(outTypeValue, envImg2ImgStr))
+				if(xercesc::XMLString::equals(outTypeValue, envImg2ImgStr))
 				{
 					this->outputType = RSGISExeImageRegistration::envi_img2img;
 				}
-				else if(XMLString::equals(outTypeValue, enviImg2MapStr))
+				else if(xercesc::XMLString::equals(outTypeValue, enviImg2MapStr))
 				{
 					this->outputType = RSGISExeImageRegistration::envi_img2map;
 				}
-				else if(XMLString::equals(outTypeValue, rsgisImg2MapStr))
+				else if(xercesc::XMLString::equals(outTypeValue, rsgisImg2MapStr))
 				{
 					this->outputType = RSGISExeImageRegistration::rsgis_img2map;
 				}
 				else
 				{
 					this->outputType = RSGISExeImageRegistration::undefinedOutput;
-					throw RSGISXMLArgumentsException("The \'outputType\' attribute needs to have one of the following values envi_img2img | envi_img2map | gdal.");
+					throw rsgis::RSGISXMLArgumentsException("The \'outputType\' attribute needs to have one of the following values envi_img2img | envi_img2map | gdal.");
 				}
-				XMLString::release(&envImg2ImgStr);
-				XMLString::release(&enviImg2MapStr);
-				XMLString::release(&rsgisImg2MapStr);
+				xercesc::XMLString::release(&envImg2ImgStr);
+				xercesc::XMLString::release(&enviImg2MapStr);
+				xercesc::XMLString::release(&rsgisImg2MapStr);
 			}
 			else
 			{
-				throw RSGISXMLArgumentsException("No \'outputType\' attribute was provided.");
+				throw rsgis::RSGISXMLArgumentsException("No \'outputType\' attribute was provided.");
 			}
-			XMLString::release(&outputTypeXMLStr);
+			xercesc::XMLString::release(&outputTypeXMLStr);
 			
 			
-			XMLCh *metricXMLStr = XMLString::transcode("metric");
+			XMLCh *metricXMLStr = xercesc::XMLString::transcode("metric");
 			if(argElement->hasAttribute(metricXMLStr))
 			{
-				XMLCh *euclideanStr = XMLString::transcode("euclidean");
-				XMLCh *sqdiffStr = XMLString::transcode("sqdiff");
-				XMLCh *manhattenStr = XMLString::transcode("manhatten");
-				XMLCh *correlationStr = XMLString::transcode("correlation");
+				XMLCh *euclideanStr = xercesc::XMLString::transcode("euclidean");
+				XMLCh *sqdiffStr = xercesc::XMLString::transcode("sqdiff");
+				XMLCh *manhattenStr = xercesc::XMLString::transcode("manhatten");
+				XMLCh *correlationStr = xercesc::XMLString::transcode("correlation");
 				
 				const XMLCh *metricValue = argElement->getAttribute(metricXMLStr);
 				
-				if(XMLString::equals(metricValue, euclideanStr))
+				if(xercesc::XMLString::equals(metricValue, euclideanStr))
 				{
 					this->metricType = RSGISExeImageRegistration::euclidean;
 				}
-				else if(XMLString::equals(metricValue, sqdiffStr))
+				else if(xercesc::XMLString::equals(metricValue, sqdiffStr))
 				{
 					this->metricType = RSGISExeImageRegistration::sqdiff;
 				}
-				else if(XMLString::equals(metricValue, manhattenStr))
+				else if(xercesc::XMLString::equals(metricValue, manhattenStr))
 				{
 					this->metricType = RSGISExeImageRegistration::manhatten;
 				}
-				else if(XMLString::equals(metricValue, correlationStr))
+				else if(xercesc::XMLString::equals(metricValue, correlationStr))
 				{
 					this->metricType = RSGISExeImageRegistration::correlation;
 				}
 				else
 				{
 					this->metricType = RSGISExeImageRegistration::undefinedMetric;
-					throw RSGISXMLArgumentsException("The \'metric\' attribute needs to have one of the following values euclidean | sqdiff | manhatten | correlation.");
+					throw rsgis::RSGISXMLArgumentsException("The \'metric\' attribute needs to have one of the following values euclidean | sqdiff | manhatten | correlation.");
 				}
-				XMLString::release(&euclideanStr);
-				XMLString::release(&sqdiffStr);
-				XMLString::release(&manhattenStr);
-				XMLString::release(&correlationStr);
+				xercesc::XMLString::release(&euclideanStr);
+				xercesc::XMLString::release(&sqdiffStr);
+				xercesc::XMLString::release(&manhattenStr);
+				xercesc::XMLString::release(&correlationStr);
 			}
 			else
 			{
-				throw RSGISXMLArgumentsException("No \'metric\' attribute was provided.");
+				throw rsgis::RSGISXMLArgumentsException("No \'metric\' attribute was provided.");
 			}
-			XMLString::release(&metricXMLStr);
+			xercesc::XMLString::release(&metricXMLStr);
 			
 			
-			XMLCh *pixelGapXMLStr = XMLString::transcode("pixelgap");
+			XMLCh *pixelGapXMLStr = xercesc::XMLString::transcode("pixelgap");
 			if(argElement->hasAttribute(pixelGapXMLStr))
 			{
-				char *charValue = XMLString::transcode(argElement->getAttribute(pixelGapXMLStr));
-				this->gcpGap = mathUtils.strtoint(string(charValue));
-				XMLString::release(&charValue);
+				char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(pixelGapXMLStr));
+				this->gcpGap = mathUtils.strtoint(std::string(charValue));
+				xercesc::XMLString::release(&charValue);
 			}
 			else
 			{
-				throw RSGISXMLArgumentsException("No \'pixelgap\' attribute was provided.");
+				throw rsgis::RSGISXMLArgumentsException("No \'pixelgap\' attribute was provided.");
 			}
-			XMLString::release(&pixelGapXMLStr);
+			xercesc::XMLString::release(&pixelGapXMLStr);
 			
-			XMLCh *windowXMLStr = XMLString::transcode("window");
+			XMLCh *windowXMLStr = xercesc::XMLString::transcode("window");
 			if(argElement->hasAttribute(windowXMLStr))
 			{
-				char *charValue = XMLString::transcode(argElement->getAttribute(windowXMLStr));
-				this->windowSize = mathUtils.strtoint(string(charValue));
-				XMLString::release(&charValue);
+				char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(windowXMLStr));
+				this->windowSize = mathUtils.strtoint(std::string(charValue));
+				xercesc::XMLString::release(&charValue);
 			}
 			else
 			{
-				throw RSGISXMLArgumentsException("No \'window\' attribute was provided.");
+				throw rsgis::RSGISXMLArgumentsException("No \'window\' attribute was provided.");
 			}
-			XMLString::release(&windowXMLStr);
+			xercesc::XMLString::release(&windowXMLStr);
 			
-			XMLCh *searchXMLStr = XMLString::transcode("search");
+			XMLCh *searchXMLStr = xercesc::XMLString::transcode("search");
 			if(argElement->hasAttribute(searchXMLStr))
 			{
-				char *charValue = XMLString::transcode(argElement->getAttribute(searchXMLStr));
-				this->searchArea = mathUtils.strtoint(string(charValue));
-				XMLString::release(&charValue);
+				char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(searchXMLStr));
+				this->searchArea = mathUtils.strtoint(std::string(charValue));
+				xercesc::XMLString::release(&charValue);
 			}
 			else
 			{
-				throw RSGISXMLArgumentsException("No \'search\' attribute was provided.");
+				throw rsgis::RSGISXMLArgumentsException("No \'search\' attribute was provided.");
 			}
-			XMLString::release(&searchXMLStr);
+			xercesc::XMLString::release(&searchXMLStr);
 			
 			
-			XMLCh *thresholdXMLStr = XMLString::transcode("threshold");
+			XMLCh *thresholdXMLStr = xercesc::XMLString::transcode("threshold");
 			if(argElement->hasAttribute(thresholdXMLStr))
 			{
-				char *charValue = XMLString::transcode(argElement->getAttribute(thresholdXMLStr));
-				this->metricThreshold = mathUtils.strtofloat(string(charValue));
-				XMLString::release(&charValue);
+				char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(thresholdXMLStr));
+				this->metricThreshold = mathUtils.strtofloat(std::string(charValue));
+				xercesc::XMLString::release(&charValue);
 			}
 			else
 			{
-				throw RSGISXMLArgumentsException("No \'threshold\' attribute was provided.");
+				throw rsgis::RSGISXMLArgumentsException("No \'threshold\' attribute was provided.");
 			}
-			XMLString::release(&thresholdXMLStr);
+			xercesc::XMLString::release(&thresholdXMLStr);
 			
-			XMLCh *stddevRefXMLStr = XMLString::transcode("stddevRef");
+			XMLCh *stddevRefXMLStr = xercesc::XMLString::transcode("stddevRef");
 			if(argElement->hasAttribute(stddevRefXMLStr))
 			{
-				char *charValue = XMLString::transcode(argElement->getAttribute(stddevRefXMLStr));
-				this->stdDevRefThreshold = mathUtils.strtofloat(string(charValue));
-				XMLString::release(&charValue);
+				char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(stddevRefXMLStr));
+				this->stdDevRefThreshold = mathUtils.strtofloat(std::string(charValue));
+				xercesc::XMLString::release(&charValue);
 			}
 			else
 			{
-				throw RSGISXMLArgumentsException("No \'stddevRef\' attribute was provided.");
+				throw rsgis::RSGISXMLArgumentsException("No \'stddevRef\' attribute was provided.");
 			}
-			XMLString::release(&stddevRefXMLStr);
+			xercesc::XMLString::release(&stddevRefXMLStr);
 			
-			XMLCh *stddevFloatXMLStr = XMLString::transcode("stddevFloat");
+			XMLCh *stddevFloatXMLStr = xercesc::XMLString::transcode("stddevFloat");
 			if(argElement->hasAttribute(stddevFloatXMLStr))
 			{
-				char *charValue = XMLString::transcode(argElement->getAttribute(stddevFloatXMLStr));
-				this->stdDevFloatThreshold = mathUtils.strtofloat(string(charValue));
-				XMLString::release(&charValue);
+				char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(stddevFloatXMLStr));
+				this->stdDevFloatThreshold = mathUtils.strtofloat(std::string(charValue));
+				xercesc::XMLString::release(&charValue);
 			}
 			else
 			{
-				throw RSGISXMLArgumentsException("No \'stddevFloat\' attribute was provided.");
+				throw rsgis::RSGISXMLArgumentsException("No \'stddevFloat\' attribute was provided.");
 			}
-			XMLString::release(&stddevFloatXMLStr);
+			xercesc::XMLString::release(&stddevFloatXMLStr);
 			
-			XMLCh *subPixelResXMLStr = XMLString::transcode("subpixelresolution");
+			XMLCh *subPixelResXMLStr = xercesc::XMLString::transcode("subpixelresolution");
 			if(argElement->hasAttribute(subPixelResXMLStr))
 			{
-				char *charValue = XMLString::transcode(argElement->getAttribute(subPixelResXMLStr));
-				this->subPixelResolution = mathUtils.strtoint(string(charValue));
-				XMLString::release(&charValue);
+				char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(subPixelResXMLStr));
+				this->subPixelResolution = mathUtils.strtoint(std::string(charValue));
+				xercesc::XMLString::release(&charValue);
 			}
 			else
 			{
-				throw RSGISXMLArgumentsException("No \'subpixelresolution\' attribute was provided.");
+				throw rsgis::RSGISXMLArgumentsException("No \'subpixelresolution\' attribute was provided.");
 			}
-			XMLString::release(&subPixelResXMLStr);
+			xercesc::XMLString::release(&subPixelResXMLStr);
 			
 			
-			XMLCh *distanceThresholdXMLStr = XMLString::transcode("distanceThreshold");
+			XMLCh *distanceThresholdXMLStr = xercesc::XMLString::transcode("distanceThreshold");
 			if(argElement->hasAttribute(distanceThresholdXMLStr))
 			{
-				char *charValue = XMLString::transcode(argElement->getAttribute(distanceThresholdXMLStr));
-				this->distanceThreshold = mathUtils.strtofloat(string(charValue));
-				XMLString::release(&charValue);
+				char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(distanceThresholdXMLStr));
+				this->distanceThreshold = mathUtils.strtofloat(std::string(charValue));
+				xercesc::XMLString::release(&charValue);
 			}
 			else
 			{
-				throw RSGISXMLArgumentsException("No \'distanceThreshold\' attribute was provided.");
+				throw rsgis::RSGISXMLArgumentsException("No \'distanceThreshold\' attribute was provided.");
 			}
-			XMLString::release(&distanceThresholdXMLStr);
+			xercesc::XMLString::release(&distanceThresholdXMLStr);
 			
 			
-			XMLCh *maxIterationsXMLStr = XMLString::transcode("maxiterations");
+			XMLCh *maxIterationsXMLStr = xercesc::XMLString::transcode("maxiterations");
 			if(argElement->hasAttribute(maxIterationsXMLStr))
 			{
-				char *charValue = XMLString::transcode(argElement->getAttribute(maxIterationsXMLStr));
-				this->maxNumIterations = mathUtils.strtoint(string(charValue));
-				XMLString::release(&charValue);
+				char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(maxIterationsXMLStr));
+				this->maxNumIterations = mathUtils.strtoint(std::string(charValue));
+				xercesc::XMLString::release(&charValue);
 			}
 			else
 			{
-				throw RSGISXMLArgumentsException("No \'maxiterations\' attribute was provided.");
+				throw rsgis::RSGISXMLArgumentsException("No \'maxiterations\' attribute was provided.");
 			}
-			XMLString::release(&maxIterationsXMLStr);
+			xercesc::XMLString::release(&maxIterationsXMLStr);
 			
-			XMLCh *moveChangeThresholdXMLStr = XMLString::transcode("movementThreshold");
+			XMLCh *moveChangeThresholdXMLStr = xercesc::XMLString::transcode("movementThreshold");
 			if(argElement->hasAttribute(moveChangeThresholdXMLStr))
 			{
-				char *charValue = XMLString::transcode(argElement->getAttribute(moveChangeThresholdXMLStr));
-				this->moveChangeThreshold = mathUtils.strtofloat(string(charValue));
-				XMLString::release(&charValue);
+				char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(moveChangeThresholdXMLStr));
+				this->moveChangeThreshold = mathUtils.strtofloat(std::string(charValue));
+				xercesc::XMLString::release(&charValue);
 			}
 			else
 			{
-				throw RSGISXMLArgumentsException("No \'movementThreshold\' attribute was provided.");
+				throw rsgis::RSGISXMLArgumentsException("No \'movementThreshold\' attribute was provided.");
 			}
-			XMLString::release(&moveChangeThresholdXMLStr);
+			xercesc::XMLString::release(&moveChangeThresholdXMLStr);
 
 			
-			XMLCh *pSmoothnessXMLStr = XMLString::transcode("pSmoothness");
+			XMLCh *pSmoothnessXMLStr = xercesc::XMLString::transcode("pSmoothness");
 			if(argElement->hasAttribute(pSmoothnessXMLStr))
 			{
-				char *charValue = XMLString::transcode(argElement->getAttribute(pSmoothnessXMLStr));
-				this->pSmoothness = mathUtils.strtofloat(string(charValue));
-				XMLString::release(&charValue);
+				char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(pSmoothnessXMLStr));
+				this->pSmoothness = mathUtils.strtofloat(std::string(charValue));
+				xercesc::XMLString::release(&charValue);
 			}
 			else
 			{
-				throw RSGISXMLArgumentsException("No \'pSmoothness\' attribute was provided.");
+				throw rsgis::RSGISXMLArgumentsException("No \'pSmoothness\' attribute was provided.");
 			}
-			XMLString::release(&pSmoothnessXMLStr);
+			xercesc::XMLString::release(&pSmoothnessXMLStr);
 			
 		}
-		else if(XMLString::equals(optionTriangularWarp, optionXML))
+		else if(xercesc::XMLString::equals(optionTriangularWarp, optionXML))
 		{
 			this->option = triangularwarp;
 			
-			XMLCh *gcpsXMLStr = XMLString::transcode("gcps");
+			XMLCh *gcpsXMLStr = xercesc::XMLString::transcode("gcps");
 			if(argElement->hasAttribute(gcpsXMLStr))
 			{
-				char *charValue = XMLString::transcode(argElement->getAttribute(gcpsXMLStr));
-				this->inputGCPs = string(charValue);
-				XMLString::release(&charValue);
+				char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(gcpsXMLStr));
+				this->inputGCPs = std::string(charValue);
+				xercesc::XMLString::release(&charValue);
 			}
 			else
 			{
-				throw RSGISXMLArgumentsException("No \'gcps\' attribute was provided.");
+				throw rsgis::RSGISXMLArgumentsException("No \'gcps\' attribute was provided.");
 			}
-			XMLString::release(&gcpsXMLStr);
+			xercesc::XMLString::release(&gcpsXMLStr);
 
-			XMLCh *imageXMLStr = XMLString::transcode("image");
+			XMLCh *imageXMLStr = xercesc::XMLString::transcode("image");
 			if(argElement->hasAttribute(imageXMLStr))
 			{
-				char *charValue = XMLString::transcode(argElement->getAttribute(imageXMLStr));
-				this->inputImage = string(charValue);
-				XMLString::release(&charValue);
+				char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(imageXMLStr));
+				this->inputImage = std::string(charValue);
+				xercesc::XMLString::release(&charValue);
 			}
 			else
 			{
-				throw RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+				throw rsgis::RSGISXMLArgumentsException("No \'image\' attribute was provided.");
 			}
-			XMLString::release(&imageXMLStr);
+			xercesc::XMLString::release(&imageXMLStr);
 			
-			XMLCh *outputImageXMLStr = XMLString::transcode("output");
+			XMLCh *outputImageXMLStr = xercesc::XMLString::transcode("output");
 			if(argElement->hasAttribute(outputImageXMLStr))
 			{
-				char *charValue = XMLString::transcode(argElement->getAttribute(outputImageXMLStr));
-				this->outputImage = string(charValue);
-				XMLString::release(&charValue);
+				char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outputImageXMLStr));
+				this->outputImage = std::string(charValue);
+				xercesc::XMLString::release(&charValue);
 			}
 			else
 			{
-				throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+				throw rsgis::RSGISXMLArgumentsException("No \'output\' attribute was provided.");
 			}
-			XMLString::release(&outputImageXMLStr);
+			xercesc::XMLString::release(&outputImageXMLStr);
 
-			XMLCh *projectionXMLStr = XMLString::transcode("projection");
+			XMLCh *projectionXMLStr = xercesc::XMLString::transcode("projection");
 			if(argElement->hasAttribute(projectionXMLStr))
 			{
-				char *charValue = XMLString::transcode(argElement->getAttribute(projectionXMLStr));
-				this->projFile = string(charValue);
-				XMLString::release(&charValue);
+				char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(projectionXMLStr));
+				this->projFile = std::string(charValue);
+				xercesc::XMLString::release(&charValue);
 			}
 			else
 			{
-				throw RSGISXMLArgumentsException("No \'projection\' attribute was provided.");
+				throw rsgis::RSGISXMLArgumentsException("No \'projection\' attribute was provided.");
 			}
-			XMLString::release(&projectionXMLStr);
+			xercesc::XMLString::release(&projectionXMLStr);
 			
-			XMLCh *resolutionXMLStr = XMLString::transcode("resolution");
+			XMLCh *resolutionXMLStr = xercesc::XMLString::transcode("resolution");
 			if(argElement->hasAttribute(resolutionXMLStr))
 			{
-				char *charValue = XMLString::transcode(argElement->getAttribute(resolutionXMLStr));
-				this->resolution = mathUtils.strtofloat(string(charValue));
-				XMLString::release(&charValue);
+				char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(resolutionXMLStr));
+				this->resolution = mathUtils.strtofloat(std::string(charValue));
+				xercesc::XMLString::release(&charValue);
 			}
 			else
 			{
-				throw RSGISXMLArgumentsException("No \'resolution\' attribute was provided.");
+				throw rsgis::RSGISXMLArgumentsException("No \'resolution\' attribute was provided.");
 			}
-			XMLString::release(&resolutionXMLStr);
+			xercesc::XMLString::release(&resolutionXMLStr);
 			
-			XMLCh *outImageFormatXMLStr = XMLString::transcode("format");
+			XMLCh *outImageFormatXMLStr = xercesc::XMLString::transcode("format");
 			if(argElement->hasAttribute(outImageFormatXMLStr))
 			{
-				char *charValue = XMLString::transcode(argElement->getAttribute(outImageFormatXMLStr));
-				this->outImageFormat = string(charValue);
-				XMLString::release(&charValue);
+				char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outImageFormatXMLStr));
+				this->outImageFormat = std::string(charValue);
+				xercesc::XMLString::release(&charValue);
 			}
 			else
 			{
 				this->outImageFormat = "ENVI";
 			}
-			XMLString::release(&outImageFormatXMLStr);
+			xercesc::XMLString::release(&outImageFormatXMLStr);
             
-            XMLCh *outTransformXMLStr = XMLString::transcode("transform");
+            XMLCh *outTransformXMLStr = xercesc::XMLString::transcode("transform");
 			if(argElement->hasAttribute(outTransformXMLStr))
 			{
-				char *charValue = XMLString::transcode(argElement->getAttribute(outTransformXMLStr));
-				string outTransform = string(charValue);
+				char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outTransformXMLStr));
+				std::string outTransform = std::string(charValue);
                 if(outTransform == "yes")
                 {
                     this->genTransformImage = true;
@@ -641,122 +642,122 @@ void RSGISExeImageRegistration::retrieveParameters(DOMElement *argElement) throw
                 {
                     this->genTransformImage = false;
                 }
-				XMLString::release(&charValue);
+				xercesc::XMLString::release(&charValue);
 			}
 			else
 			{
 				this->genTransformImage = false;
 			}
-			XMLString::release(&outTransformXMLStr);
+			xercesc::XMLString::release(&outTransformXMLStr);
 			
 		}
-		else if((XMLString::equals(optionNNWarp, optionXML)) | (XMLString::equals(optionPolyWarp, optionXML)))
+		else if((xercesc::XMLString::equals(optionNNWarp, optionXML)) | (xercesc::XMLString::equals(optionPolyWarp, optionXML)))
 		{
-			if(XMLString::equals(optionNNWarp, optionXML)){this->option = nnwarp;}
+			if(xercesc::XMLString::equals(optionNNWarp, optionXML)){this->option = nnwarp;}
             else{this->option = polywarp;}
 			
-			XMLCh *gcpsXMLStr = XMLString::transcode("gcps");
+			XMLCh *gcpsXMLStr = xercesc::XMLString::transcode("gcps");
 			if(argElement->hasAttribute(gcpsXMLStr))
 			{
-				char *charValue = XMLString::transcode(argElement->getAttribute(gcpsXMLStr));
-				this->inputGCPs = string(charValue);
-				XMLString::release(&charValue);
+				char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(gcpsXMLStr));
+				this->inputGCPs = std::string(charValue);
+				xercesc::XMLString::release(&charValue);
 			}
 			else
 			{
-				throw RSGISXMLArgumentsException("No \'gcps\' attribute was provided.");
+				throw rsgis::RSGISXMLArgumentsException("No \'gcps\' attribute was provided.");
 			}
-			XMLString::release(&gcpsXMLStr);
+			xercesc::XMLString::release(&gcpsXMLStr);
 			
-			XMLCh *imageXMLStr = XMLString::transcode("image");
+			XMLCh *imageXMLStr = xercesc::XMLString::transcode("image");
 			if(argElement->hasAttribute(imageXMLStr))
 			{
-				char *charValue = XMLString::transcode(argElement->getAttribute(imageXMLStr));
-				this->inputImage = string(charValue);
-				XMLString::release(&charValue);
+				char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(imageXMLStr));
+				this->inputImage = std::string(charValue);
+				xercesc::XMLString::release(&charValue);
 			}
 			else
 			{
-				throw RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+				throw rsgis::RSGISXMLArgumentsException("No \'image\' attribute was provided.");
 			}
-			XMLString::release(&imageXMLStr);
+			xercesc::XMLString::release(&imageXMLStr);
 			
-			XMLCh *outputImageXMLStr = XMLString::transcode("output");
+			XMLCh *outputImageXMLStr = xercesc::XMLString::transcode("output");
 			if(argElement->hasAttribute(outputImageXMLStr))
 			{
-				char *charValue = XMLString::transcode(argElement->getAttribute(outputImageXMLStr));
-				this->outputImage = string(charValue);
-				XMLString::release(&charValue);
+				char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outputImageXMLStr));
+				this->outputImage = std::string(charValue);
+				xercesc::XMLString::release(&charValue);
 			}
 			else
 			{
-				throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+				throw rsgis::RSGISXMLArgumentsException("No \'output\' attribute was provided.");
 			}
-			XMLString::release(&outputImageXMLStr);
+			xercesc::XMLString::release(&outputImageXMLStr);
 			
-			XMLCh *projectionXMLStr = XMLString::transcode("projection");
+			XMLCh *projectionXMLStr = xercesc::XMLString::transcode("projection");
 			if(argElement->hasAttribute(projectionXMLStr))
 			{
-				char *charValue = XMLString::transcode(argElement->getAttribute(projectionXMLStr));
-				this->projFile = string(charValue);
-				XMLString::release(&charValue);
+				char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(projectionXMLStr));
+				this->projFile = std::string(charValue);
+				xercesc::XMLString::release(&charValue);
 			}
 			else
 			{
-				throw RSGISXMLArgumentsException("No \'projection\' attribute was provided.");
+				throw rsgis::RSGISXMLArgumentsException("No \'projection\' attribute was provided.");
 			}
-			XMLString::release(&projectionXMLStr);
+			xercesc::XMLString::release(&projectionXMLStr);
 			
-			XMLCh *resolutionXMLStr = XMLString::transcode("resolution");
+			XMLCh *resolutionXMLStr = xercesc::XMLString::transcode("resolution");
 			if(argElement->hasAttribute(resolutionXMLStr))
 			{
-				char *charValue = XMLString::transcode(argElement->getAttribute(resolutionXMLStr));
-				this->resolution = mathUtils.strtofloat(string(charValue));
-				XMLString::release(&charValue);
+				char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(resolutionXMLStr));
+				this->resolution = mathUtils.strtofloat(std::string(charValue));
+				xercesc::XMLString::release(&charValue);
 			}
 			else
 			{
-				throw RSGISXMLArgumentsException("No \'resolution\' attribute was provided.");
+				throw rsgis::RSGISXMLArgumentsException("No \'resolution\' attribute was provided.");
 			}
-			XMLString::release(&resolutionXMLStr);
+			xercesc::XMLString::release(&resolutionXMLStr);
 			
 			
-            XMLCh *outImageFormatXMLStr = XMLString::transcode("format");
+            XMLCh *outImageFormatXMLStr = xercesc::XMLString::transcode("format");
 			if(argElement->hasAttribute(outImageFormatXMLStr))
 			{
-				char *charValue = XMLString::transcode(argElement->getAttribute(outImageFormatXMLStr));
-				this->outImageFormat = string(charValue);
-				XMLString::release(&charValue);
+				char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outImageFormatXMLStr));
+				this->outImageFormat = std::string(charValue);
+				xercesc::XMLString::release(&charValue);
 			}
 			else
 			{
 				this->outImageFormat = "ENVI";
 			}
-			XMLString::release(&outImageFormatXMLStr);
+			xercesc::XMLString::release(&outImageFormatXMLStr);
             
             if(this->option == polywarp) // Get polynominal order for polynominal warp
             {
-                XMLCh *polyOrderStr = XMLString::transcode("polyOrder"); // Polynomial Order
+                XMLCh *polyOrderStr = xercesc::XMLString::transcode("polyOrder"); // Polynomial Order
                 if(argElement->hasAttribute(polyOrderStr))
                 {
-                    char *charValue = XMLString::transcode(argElement->getAttribute(polyOrderStr));
-                    this->polyOrder = mathUtils.strtoint(string(charValue));
-                    XMLString::release(&charValue);
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(polyOrderStr));
+                    this->polyOrder = mathUtils.strtoint(std::string(charValue));
+                    xercesc::XMLString::release(&charValue);
                 }
                 else
                 {
-                    throw RSGISXMLArgumentsException("No value provided for polynomial order");
+                    throw rsgis::RSGISXMLArgumentsException("No value provided for polynomial order");
                 }
-                XMLString::release(&polyOrderStr);
+                xercesc::XMLString::release(&polyOrderStr);
             }
             
             
             
-            XMLCh *outTransformXMLStr = XMLString::transcode("transform");
+            XMLCh *outTransformXMLStr = xercesc::XMLString::transcode("transform");
 			if(argElement->hasAttribute(outTransformXMLStr))
 			{
-				char *charValue = XMLString::transcode(argElement->getAttribute(outTransformXMLStr));
-				string outTransform = string(charValue);
+				char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outTransformXMLStr));
+				std::string outTransform = std::string(charValue);
                 if(outTransform == "yes")
                 {
                     this->genTransformImage = true;
@@ -765,97 +766,223 @@ void RSGISExeImageRegistration::retrieveParameters(DOMElement *argElement) throw
                 {
                     this->genTransformImage = false;
                 }
-				XMLString::release(&charValue);
+				xercesc::XMLString::release(&charValue);
 			}
 			else
 			{
 				this->genTransformImage = false;
 			}
-			XMLString::release(&outTransformXMLStr);
+			xercesc::XMLString::release(&outTransformXMLStr);
 			
+		}
+        else if(xercesc::XMLString::equals(optionPxlShift, optionXML))
+		{
+			this->option = RSGISExeImageRegistration::pxlshift;
+			
+			XMLCh *referenceXMLStr = xercesc::XMLString::transcode("reference");
+			if(argElement->hasAttribute(referenceXMLStr))
+			{
+				char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(referenceXMLStr));
+				this->inputReferenceImage = std::string(charValue);
+				xercesc::XMLString::release(&charValue);
+			}
+			else
+			{
+				throw rsgis::RSGISXMLArgumentsException("No \'reference\' attribute was provided.");
+			}
+			xercesc::XMLString::release(&referenceXMLStr);
+			
+			XMLCh *floatingXMLStr = xercesc::XMLString::transcode("floating");
+			if(argElement->hasAttribute(floatingXMLStr))
+			{
+				char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(floatingXMLStr));
+				this->inputFloatingmage = std::string(charValue);
+				xercesc::XMLString::release(&charValue);
+			}
+			else
+			{
+				throw rsgis::RSGISXMLArgumentsException("No \'floating\' attribute was provided.");
+			}
+			xercesc::XMLString::release(&floatingXMLStr);
+			
+			
+			XMLCh *outputXMLStr = xercesc::XMLString::transcode("output");
+			if(argElement->hasAttribute(outputXMLStr))
+			{
+				char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outputXMLStr));
+				this->outputImage = std::string(charValue);
+				xercesc::XMLString::release(&charValue);
+			}
+			else
+			{
+				throw rsgis::RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+			}
+			xercesc::XMLString::release(&outputXMLStr);
+			
+			XMLCh *metricXMLStr = xercesc::XMLString::transcode("metric");
+			if(argElement->hasAttribute(metricXMLStr))
+			{
+				XMLCh *euclideanStr = xercesc::XMLString::transcode("euclidean");
+				XMLCh *sqdiffStr = xercesc::XMLString::transcode("sqdiff");
+				XMLCh *manhattenStr = xercesc::XMLString::transcode("manhatten");
+				XMLCh *correlationStr = xercesc::XMLString::transcode("correlation");
+				
+				const XMLCh *metricValue = argElement->getAttribute(metricXMLStr);
+				
+				if(xercesc::XMLString::equals(metricValue, euclideanStr))
+				{
+					this->metricType = RSGISExeImageRegistration::euclidean;
+				}
+				else if(xercesc::XMLString::equals(metricValue, sqdiffStr))
+				{
+					this->metricType = RSGISExeImageRegistration::sqdiff;
+				}
+				else if(xercesc::XMLString::equals(metricValue, manhattenStr))
+				{
+					this->metricType = RSGISExeImageRegistration::manhatten;
+				}
+				else if(xercesc::XMLString::equals(metricValue, correlationStr))
+				{
+					this->metricType = RSGISExeImageRegistration::correlation;
+				}
+				else
+				{
+					this->metricType = RSGISExeImageRegistration::undefinedMetric;
+					throw rsgis::RSGISXMLArgumentsException("The \'metric\' attribute needs to have one of the following values euclidean | sqdiff | manhatten | correlation.");
+				}
+				xercesc::XMLString::release(&euclideanStr);
+				xercesc::XMLString::release(&sqdiffStr);
+				xercesc::XMLString::release(&manhattenStr);
+				xercesc::XMLString::release(&correlationStr);
+			}
+			else
+			{
+				throw rsgis::RSGISXMLArgumentsException("No \'metric\' attribute was provided.");
+			}
+			xercesc::XMLString::release(&metricXMLStr);
+			
+			XMLCh *windowXMLStr = xercesc::XMLString::transcode("window");
+			if(argElement->hasAttribute(windowXMLStr))
+			{
+				char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(windowXMLStr));
+				this->windowSize = mathUtils.strtoint(std::string(charValue));
+				xercesc::XMLString::release(&charValue);
+			}
+			else
+			{
+				throw rsgis::RSGISXMLArgumentsException("No \'window\' attribute was provided.");
+			}
+			xercesc::XMLString::release(&windowXMLStr);
+			
+			XMLCh *searchXMLStr = xercesc::XMLString::transcode("search");
+			if(argElement->hasAttribute(searchXMLStr))
+			{
+				char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(searchXMLStr));
+				this->searchArea = mathUtils.strtoint(std::string(charValue));
+				xercesc::XMLString::release(&charValue);
+			}
+			else
+			{
+				throw rsgis::RSGISXMLArgumentsException("No \'search\' attribute was provided.");
+			}
+			xercesc::XMLString::release(&searchXMLStr);
+			
+			XMLCh *subPixelResXMLStr = xercesc::XMLString::transcode("subpixelresolution");
+			if(argElement->hasAttribute(subPixelResXMLStr))
+			{
+				char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(subPixelResXMLStr));
+				this->subPixelResolution = mathUtils.strtoint(std::string(charValue));
+				xercesc::XMLString::release(&charValue);
+			}
+			else
+			{
+				throw rsgis::RSGISXMLArgumentsException("No \'subpixelresolution\' attribute was provided.");
+			}
+			xercesc::XMLString::release(&subPixelResXMLStr);
 		}
 		else 
 		{
-			string message = "RSGISExeImageRegistration did not recognise option " + string(XMLString::transcode(optionXML));
-			throw RSGISXMLArgumentsException(message);
+			std::string message = "RSGISExeImageRegistration did not recognise option " + std::string(xercesc::XMLString::transcode(optionXML));
+			throw rsgis::RSGISXMLArgumentsException(message);
 		}
 
 	}
-	catch(RSGISXMLArgumentsException &e)
+	catch(rsgis::RSGISXMLArgumentsException &e)
 	{
 		throw e;
 	}
 	
-	XMLString::release(&algorName);
-	XMLString::release(&algorXMLStr);
-	XMLString::release(&optionXMLStr);
-	XMLString::release(&optionBasic);
-	XMLString::release(&optionSingleLayer);
-	XMLString::release(&optionTriangularWarp);
-	XMLString::release(&optionNNWarp);
-    XMLString::release(&optionPolyWarp);
+	xercesc::XMLString::release(&algorName);
+	xercesc::XMLString::release(&algorXMLStr);
+	xercesc::XMLString::release(&optionXMLStr);
+	xercesc::XMLString::release(&optionBasic);
+	xercesc::XMLString::release(&optionSingleLayer);
+	xercesc::XMLString::release(&optionTriangularWarp);
+	xercesc::XMLString::release(&optionNNWarp);
+    xercesc::XMLString::release(&optionPolyWarp);
+    xercesc::XMLString::release(&optionPxlShift);
 	
 	parsed = true; // if all successful, it is parsed
 }
 
-void RSGISExeImageRegistration::runAlgorithm() throw(RSGISException)
+void RSGISExeImageRegistration::runAlgorithm() throw(rsgis::RSGISException)
 {
-	cout.precision(10);
+	std::cout.precision(10);
 	
 	if(!parsed)
 	{
-		throw RSGISException("Before running the parameters must be retrieved");
+		throw rsgis::RSGISException("Before running the parameters must be retrieved");
 	}
 	else
 	{
 		if(this->option == RSGISExeImageRegistration::basic)
 		{
-			cout << "A basic registration algorithm which simply loops throught a set of tie points and moves them using the selected metric\n";
-			cout << "Reference Image: " << this->inputReferenceImage << endl;
-			cout << "Floating Image: " << this->inputFloatingmage << endl;
-			cout << "Output GCP File: " << this->outputGCPFile << endl;
+			std::cout << "A basic registration algorithm which simply loops throught a set of tie points and moves them using the selected metric\n";
+			std::cout << "Reference Image: " << this->inputReferenceImage << std::endl;
+			std::cout << "Floating Image: " << this->inputFloatingmage << std::endl;
+			std::cout << "Output GCP File: " << this->outputGCPFile << std::endl;
 			if(outputType == envi_img2img)
 			{
-				cout << "Output in image to image GCPs for ENVI\n";
+				std::cout << "Output in image to image GCPs for ENVI\n";
 			}
 			else if(outputType == envi_img2map)
 			{
-				cout << "Output in image to map GCPs for ENVI\n";
+				std::cout << "Output in image to map GCPs for ENVI\n";
 			}
 			else if(outputType == rsgis_img2map)
 			{
-				cout << "Output GCPs for RSGIS image to map\n";
+				std::cout << "Output GCPs for RSGIS image to map\n";
 			}
 			else 
 			{
-				throw RSGISException("Output format Unknown");
+				throw rsgis::RSGISException("Output format Unknown");
 			}
 			if(metricType == euclidean)
 			{
-				cout << "The Euclidean similarity metric will be used\n";
+				std::cout << "The Euclidean similarity metric will be used\n";
 			}
 			else if(metricType == sqdiff)
 			{
-				cout << "The Squared Difference similarity metric will be used\n";
+				std::cout << "The Squared Difference similarity metric will be used\n";
 			}
 			else if(metricType == manhatten)
 			{
-				cout << "The Manhatten (taxi cab) similarity metric will be used\n";
+				std::cout << "The Manhatten (taxi cab) similarity metric will be used\n";
 			}
 			else if(metricType == correlation)
 			{
-				cout << "The Correlation Coefficent similarity metric will be used\n";
+				std::cout << "The Correlation Coefficent similarity metric will be used\n";
 			}
 			else 
 			{
-				throw RSGISException("Similarity Metric Unknown");
+				throw rsgis::RSGISException("Similarity Metric Unknown");
 			}
-			cout << "Window Size = " << windowSize << endl;
-			cout << "Search area = " << searchArea << endl;
-			cout << "Metric Threshold = " << metricThreshold << endl;
-			cout << "Std Dev reference threshold = " << stdDevRefThreshold << endl;
-			cout << "Std Dev floating threshold = " << stdDevFloatThreshold << endl;
-			cout << "Sub pixel resolution = " << subPixelResolution << endl;
+			std::cout << "Window Size = " << windowSize << std::endl;
+			std::cout << "Search area = " << searchArea << std::endl;
+			std::cout << "Metric Threshold = " << metricThreshold << std::endl;
+			std::cout << "Std Dev reference threshold = " << stdDevRefThreshold << std::endl;
+			std::cout << "Std Dev floating threshold = " << stdDevFloatThreshold << std::endl;
+			std::cout << "Sub pixel resolution = " << subPixelResolution << std::endl;
 
 			try
 			{
@@ -866,37 +993,37 @@ void RSGISExeImageRegistration::runAlgorithm() throw(RSGISException)
 				inRefDataset = (GDALDataset *) GDALOpenShared(inputReferenceImage.c_str(), GA_ReadOnly);
 				if(inRefDataset == NULL)
 				{
-					string message = string("Could not open image ") + inputReferenceImage;
-					throw RSGISException(message.c_str());
+					std::string message = std::string("Could not open image ") + inputReferenceImage;
+					throw rsgis::RSGISException(message.c_str());
 				}
 				
 				inFloatDataset = (GDALDataset *) GDALOpenShared(inputFloatingmage.c_str(), GA_ReadOnly);
 				if(inFloatDataset == NULL)
 				{
-					string message = string("Could not open image ") + inputFloatingmage;
-					throw RSGISException(message.c_str());
+					std::string message = std::string("Could not open image ") + inputFloatingmage;
+					throw rsgis::RSGISException(message.c_str());
 				}
 				
-				RSGISImageSimilarityMetric *similarityMetric = NULL;
+				rsgis::reg::RSGISImageSimilarityMetric *similarityMetric = NULL;
 				if(metricType == euclidean)
 				{
-					similarityMetric = new RSGISEuclideanSimilarityMetric();
+					similarityMetric = new rsgis::reg::RSGISEuclideanSimilarityMetric();
 				}
 				else if(metricType == sqdiff)
 				{
-					similarityMetric = new RSGISSquaredDifferenceSimilarityMetric();		
+					similarityMetric = new rsgis::reg::RSGISSquaredDifferenceSimilarityMetric();		
 				}
 				else if(metricType == manhatten)
 				{
-					similarityMetric = new RSGISManhattanSimilarityMetric();		
+					similarityMetric = new rsgis::reg::RSGISManhattanSimilarityMetric();		
 				}
 				else if(metricType == correlation)
 				{
-					similarityMetric = new RSGISCorrelationSimilarityMetric();		
+					similarityMetric = new rsgis::reg::RSGISCorrelationSimilarityMetric();		
 				}
 				
 				
-				RSGISImageRegistration *regImgs = new RSGISBasicImageRegistration(inRefDataset, inFloatDataset, gcpGap, metricThreshold, windowSize, searchArea, similarityMetric, stdDevRefThreshold, stdDevFloatThreshold, subPixelResolution);
+				rsgis::reg::RSGISImageRegistration *regImgs = new rsgis::reg::RSGISBasicImageRegistration(inRefDataset, inFloatDataset, gcpGap, metricThreshold, windowSize, searchArea, similarityMetric, stdDevRefThreshold, stdDevFloatThreshold, subPixelResolution);
 
 				regImgs->runCompleteRegistration();
 				
@@ -920,68 +1047,68 @@ void RSGISExeImageRegistration::runAlgorithm() throw(RSGISException)
 				GDALClose(inFloatDataset);
 				GDALDestroyDriverManager();
 			}
-			catch(RSGISRegistrationException &e)
+			catch(rsgis::RSGISRegistrationException &e)
 			{
-				throw RSGISException(e.what());
+				throw rsgis::RSGISException(e.what());
 			}
-			catch(RSGISException& e)
+			catch(rsgis::RSGISException& e)
 			{
 				throw e;
 			}
 		}
 		else if(this->option == RSGISExeImageRegistration::singlelayer)
 		{
-			cout << "A registration algorithm which representings a single layer of tie\n";
-			cout << "points which are connected within a given distance and updated as the neighbouring tie points are moved.\n";
-			cout << "Reference Image: " << this->inputReferenceImage << endl;
-			cout << "Floating Image: " << this->inputFloatingmage << endl;
-			cout << "Output GCP File: " << this->outputGCPFile << endl;
+			std::cout << "A registration algorithm which representings a single layer of tie\n";
+			std::cout << "points which are connected within a given distance and updated as the neighbouring tie points are moved.\n";
+			std::cout << "Reference Image: " << this->inputReferenceImage << std::endl;
+			std::cout << "Floating Image: " << this->inputFloatingmage << std::endl;
+			std::cout << "Output GCP File: " << this->outputGCPFile << std::endl;
 			if(outputType == envi_img2img)
 			{
-				cout << "Output in image to image GCPs for ENVI\n";
+				std::cout << "Output in image to image GCPs for ENVI\n";
 			}
 			else if(outputType == envi_img2map)
 			{
-				cout << "Output in image to map GCPs for ENVI\n";
+				std::cout << "Output in image to map GCPs for ENVI\n";
 			}
 			else if(outputType == rsgis_img2map)
 			{
-				cout << "Output GCPs for RSGIS image to map\n";
+				std::cout << "Output GCPs for RSGIS image to map\n";
 			}
 			else 
 			{
-				throw RSGISException("Output format Unknown");
+				throw rsgis::RSGISException("Output format Unknown");
 			}
 			if(metricType == euclidean)
 			{
-				cout << "The Euclidean similarity metric will be used\n";
+				std::cout << "The Euclidean similarity metric will be used\n";
 			}
 			else if(metricType == sqdiff)
 			{
-				cout << "The Squared Difference similarity metric will be used\n";
+				std::cout << "The Squared Difference similarity metric will be used\n";
 			}
 			else if(metricType == manhatten)
 			{
-				cout << "The Manhatten (taxi cab) similarity metric will be used\n";
+				std::cout << "The Manhatten (taxi cab) similarity metric will be used\n";
 			}
 			else if(metricType == correlation)
 			{
-				cout << "The Correlation Coefficent similarity metric will be used\n";
+				std::cout << "The Correlation Coefficent similarity metric will be used\n";
 			}
 			else 
 			{
-				throw RSGISException("Similarity Metric Unknown");
+				throw rsgis::RSGISException("Similarity Metric Unknown");
 			}
-			cout << "Window Size = " << windowSize << endl;
-			cout << "Search area = " << searchArea << endl;
-			cout << "Metric Threshold = " << metricThreshold << endl;
-			cout << "Std Dev reference threshold = " << stdDevRefThreshold << endl;
-			cout << "Std Dev floating threshold = " << stdDevFloatThreshold << endl;
-			cout << "Sub pixel resolution = " << subPixelResolution << endl;
-			cout << "Distance threshold = " << distanceThreshold << endl;
-			cout << "Max. number of iterations = " << maxNumIterations << endl;
-			cout << "Movement Threshold = " << moveChangeThreshold << endl;
-			cout << "p Smoothness = " << pSmoothness << endl;
+			std::cout << "Window Size = " << windowSize << std::endl;
+			std::cout << "Search area = " << searchArea << std::endl;
+			std::cout << "Metric Threshold = " << metricThreshold << std::endl;
+			std::cout << "Std Dev reference threshold = " << stdDevRefThreshold << std::endl;
+			std::cout << "Std Dev floating threshold = " << stdDevFloatThreshold << std::endl;
+			std::cout << "Sub pixel resolution = " << subPixelResolution << std::endl;
+			std::cout << "Distance threshold = " << distanceThreshold << std::endl;
+			std::cout << "Max. number of iterations = " << maxNumIterations << std::endl;
+			std::cout << "Movement Threshold = " << moveChangeThreshold << std::endl;
+			std::cout << "p Smoothness = " << pSmoothness << std::endl;
 			
 			try
 			{
@@ -992,37 +1119,37 @@ void RSGISExeImageRegistration::runAlgorithm() throw(RSGISException)
 				inRefDataset = (GDALDataset *) GDALOpenShared(inputReferenceImage.c_str(), GA_ReadOnly);
 				if(inRefDataset == NULL)
 				{
-					string message = string("Could not open image ") + inputReferenceImage;
-					throw RSGISException(message.c_str());
+					std::string message = std::string("Could not open image ") + inputReferenceImage;
+					throw rsgis::RSGISException(message.c_str());
 				}
 				
 				inFloatDataset = (GDALDataset *) GDALOpenShared(inputFloatingmage.c_str(), GA_ReadOnly);
 				if(inFloatDataset == NULL)
 				{
-					string message = string("Could not open image ") + inputFloatingmage;
-					throw RSGISException(message.c_str());
+					std::string message = std::string("Could not open image ") + inputFloatingmage;
+					throw rsgis::RSGISException(message.c_str());
 				}
 				
-				RSGISImageSimilarityMetric *similarityMetric = NULL;
+				rsgis::reg::RSGISImageSimilarityMetric *similarityMetric = NULL;
 				if(metricType == euclidean)
 				{
-					similarityMetric = new RSGISEuclideanSimilarityMetric();
+					similarityMetric = new rsgis::reg::RSGISEuclideanSimilarityMetric();
 				}
 				else if(metricType == sqdiff)
 				{
-					similarityMetric = new RSGISSquaredDifferenceSimilarityMetric();		
+					similarityMetric = new rsgis::reg::RSGISSquaredDifferenceSimilarityMetric();		
 				}
 				else if(metricType == manhatten)
 				{
-					similarityMetric = new RSGISManhattanSimilarityMetric();		
+					similarityMetric = new rsgis::reg::RSGISManhattanSimilarityMetric();		
 				}
 				else if(metricType == correlation)
 				{
-					similarityMetric = new RSGISCorrelationSimilarityMetric();		
+					similarityMetric = new rsgis::reg::RSGISCorrelationSimilarityMetric();		
 				}
 				
 				
-				RSGISImageRegistration *regImgs = new RSGISSingleConnectLayerImageRegistration(inRefDataset, inFloatDataset, gcpGap, metricThreshold, windowSize, searchArea, similarityMetric, stdDevRefThreshold, stdDevFloatThreshold, subPixelResolution, distanceThreshold, maxNumIterations, moveChangeThreshold, pSmoothness);
+				rsgis::reg::RSGISImageRegistration *regImgs = new rsgis::reg::RSGISSingleConnectLayerImageRegistration(inRefDataset, inFloatDataset, gcpGap, metricThreshold, windowSize, searchArea, similarityMetric, stdDevRefThreshold, stdDevFloatThreshold, subPixelResolution, distanceThreshold, maxNumIterations, moveChangeThreshold, pSmoothness);
 				
 				regImgs->runCompleteRegistration();
 				
@@ -1046,39 +1173,39 @@ void RSGISExeImageRegistration::runAlgorithm() throw(RSGISException)
 				GDALClose(inFloatDataset);
 				GDALDestroyDriverManager();
 			}
-			catch(RSGISRegistrationException &e)
+			catch(rsgis::RSGISRegistrationException &e)
 			{
-				throw RSGISException(e.what());
+				throw rsgis::RSGISException(e.what());
 			}
-			catch(RSGISException& e)
+			catch(rsgis::RSGISException& e)
 			{
 				throw e;
 			}			
 		}
 		else if(this->option == RSGISExeImageRegistration::triangularwarp)
 		{
-			cout << "Warp an image image using a set of image to map ground control points using a triangulation\n";
-			cout << "GCPs: " << this->inputGCPs << endl;
-			cout << "Image: " << this->inputImage << endl;
-			cout << "Output Image: " << this->outputImage << endl;
-			cout << "Projection: " << this->projFile << endl;
-			cout << "Output Resolution: " << this->resolution << endl;
-            cout << "Output Image format: " << this->outImageFormat << endl;
+			std::cout << "Warp an image image using a set of image to map ground control points using a triangulation\n";
+			std::cout << "GCPs: " << this->inputGCPs << std::endl;
+			std::cout << "Image: " << this->inputImage << std::endl;
+			std::cout << "Output Image: " << this->outputImage << std::endl;
+			std::cout << "Projection: " << this->projFile << std::endl;
+			std::cout << "Output Resolution: " << this->resolution << std::endl;
+            std::cout << "Output Image format: " << this->outImageFormat << std::endl;
 			
 			GDALAllRegister();
-			RSGISWarpImage *warp = NULL;
-			RSGISWarpImageInterpolator *interpolator = new RSGISWarpImageNNInterpolator();
+			rsgis::reg::RSGISWarpImage *warp = NULL;
+			rsgis::reg::RSGISWarpImageInterpolator *interpolator = new rsgis::reg::RSGISWarpImageNNInterpolator();
 			
 			try 
 			{
-				string projWKTStr = "";
+				std::string projWKTStr = "";
                 if(this->projFile != "")
                 {
-                    RSGISTextUtils textUtils;
+                    rsgis::utils::RSGISTextUtils textUtils;
                     projWKTStr = textUtils.readFileToString(this->projFile);
                 }
                 
-				warp = new RSGISWarpImageUsingTriangulation(this->inputImage, this->outputImage, projWKTStr, this->inputGCPs, this->resolution, interpolator, this->outImageFormat);
+				warp = new rsgis::reg::RSGISWarpImageUsingTriangulation(this->inputImage, this->outputImage, projWKTStr, this->inputGCPs, this->resolution, interpolator, this->outImageFormat);
 				if(this->genTransformImage)
                 {
                     warp->generateTransformImage();
@@ -1089,7 +1216,7 @@ void RSGISExeImageRegistration::runAlgorithm() throw(RSGISException)
                 }
 				delete warp;
 			}
-			catch (RSGISException &e) 
+			catch (rsgis::RSGISException &e) 
 			{
 				throw e;
 			}
@@ -1097,28 +1224,28 @@ void RSGISExeImageRegistration::runAlgorithm() throw(RSGISException)
 		}
 		else if(this->option == RSGISExeImageRegistration::nnwarp)
 		{
-			cout << "Warp an image using a set of image to map ground control points using a NN algorithm\n";
-			cout << "GCPs: " << this->inputGCPs << endl;
-			cout << "Image: " << this->inputImage << endl;
-			cout << "Output Image: " << this->outputImage << endl;
-			cout << "Projection: " << this->projFile << endl;
-			cout << "Output Resolution: " << this->resolution << endl;
-            cout << "Output Image format: " << this->outImageFormat << endl;
+			std::cout << "Warp an image using a set of image to map ground control points using a NN algorithm\n";
+			std::cout << "GCPs: " << this->inputGCPs << std::endl;
+			std::cout << "Image: " << this->inputImage << std::endl;
+			std::cout << "Output Image: " << this->outputImage << std::endl;
+			std::cout << "Projection: " << this->projFile << std::endl;
+			std::cout << "Output Resolution: " << this->resolution << std::endl;
+            std::cout << "Output Image format: " << this->outImageFormat << std::endl;
 			
 			GDALAllRegister();
-			RSGISWarpImage *warp = NULL;
-			RSGISWarpImageInterpolator *interpolator = new RSGISWarpImageNNInterpolator();
+			rsgis::reg::RSGISWarpImage *warp = NULL;
+			rsgis::reg::RSGISWarpImageInterpolator *interpolator = new rsgis::reg::RSGISWarpImageNNInterpolator();
 			
 			try 
 			{
-                string projWKTStr = "";
+                std::string projWKTStr = "";
                 if(this->projFile != "")
                 {
-                    RSGISTextUtils textUtils;
+                    rsgis::utils::RSGISTextUtils textUtils;
                     projWKTStr = textUtils.readFileToString(this->projFile);
                 }
                 
-				warp = new RSGISBasicNNGCPImageWarp(this->inputImage, this->outputImage, projWKTStr, this->inputGCPs, this->resolution, interpolator, this->outImageFormat);
+				warp = new rsgis::reg::RSGISBasicNNGCPImageWarp(this->inputImage, this->outputImage, projWKTStr, this->inputGCPs, this->resolution, interpolator, this->outImageFormat);
 				if(this->genTransformImage)
                 {
                     warp->generateTransformImage();
@@ -1129,7 +1256,7 @@ void RSGISExeImageRegistration::runAlgorithm() throw(RSGISException)
                 }
 				delete warp;
 			}
-			catch (RSGISException &e) 
+			catch (rsgis::RSGISException &e) 
 			{
 				throw e;
 			}
@@ -1137,33 +1264,33 @@ void RSGISExeImageRegistration::runAlgorithm() throw(RSGISException)
 		}
 		else if(this->option == RSGISExeImageRegistration::polywarp)
 		{
-			cout << "Warp an image using a set of image to map ground control points using a "; 
-            if (this->polyOrder == 1) {cout << "1st order polynominal" << endl;}
-            if (this->polyOrder == 2) {cout << "2nd order polynominal" << endl;}
-            if (this->polyOrder == 3) {cout << "3rd order polynominal" << endl;}
-            else {cout << this->polyOrder << "th order polynominal" << endl;}
+			std::cout << "Warp an image using a set of image to map ground control points using a "; 
+            if (this->polyOrder == 1) {std::cout << "1st order polynominal" << std::endl;}
+            if (this->polyOrder == 2) {std::cout << "2nd order polynominal" << std::endl;}
+            if (this->polyOrder == 3) {std::cout << "3rd order polynominal" << std::endl;}
+            else {std::cout << this->polyOrder << "th order polynominal" << std::endl;}
             
-			cout << "GCPs: " << this->inputGCPs << endl;
-			cout << "Image: " << this->inputImage << endl;
-			cout << "Output Image: " << this->outputImage << endl;
-			cout << "Projection: " << this->projFile << endl;
-			cout << "Output Resolution: " << this->resolution << endl;
-            cout << "Output Image format: " << this->outImageFormat << endl;
+			std::cout << "GCPs: " << this->inputGCPs << std::endl;
+			std::cout << "Image: " << this->inputImage << std::endl;
+			std::cout << "Output Image: " << this->outputImage << std::endl;
+			std::cout << "Projection: " << this->projFile << std::endl;
+			std::cout << "Output Resolution: " << this->resolution << std::endl;
+            std::cout << "Output Image format: " << this->outImageFormat << std::endl;
 			
 			GDALAllRegister();
-			RSGISWarpImage *warp = NULL;
-			RSGISWarpImageInterpolator *interpolator = new RSGISWarpImageNNInterpolator();
+			rsgis::reg::RSGISWarpImage *warp = NULL;
+			rsgis::reg::RSGISWarpImageInterpolator *interpolator = new rsgis::reg::RSGISWarpImageNNInterpolator();
 			
 			try 
 			{
-                string projWKTStr = "";
+                std::string projWKTStr = "";
                 if(this->projFile != "")
                 {
-                    RSGISTextUtils textUtils;
+                    rsgis::utils::RSGISTextUtils textUtils;
                     projWKTStr = textUtils.readFileToString(this->projFile);
                 }
                 
-				warp = new RSGISPolynomialImageWarp(this->inputImage, this->outputImage, projWKTStr, this->inputGCPs, this->resolution, interpolator, this->polyOrder, this->outImageFormat);
+				warp = new rsgis::reg::RSGISPolynomialImageWarp(this->inputImage, this->outputImage, projWKTStr, this->inputGCPs, this->resolution, interpolator, this->polyOrder, this->outImageFormat);
 				if(this->genTransformImage)
                 {
                     warp->generateTransformImage();
@@ -1174,7 +1301,7 @@ void RSGISExeImageRegistration::runAlgorithm() throw(RSGISException)
                 }
 				delete warp;
 			}
-			catch (RSGISException &e) 
+			catch (rsgis::RSGISException &e) 
 			{
 				throw e;
 			}
@@ -1182,7 +1309,7 @@ void RSGISExeImageRegistration::runAlgorithm() throw(RSGISException)
 		}
 		else
 		{
-			throw RSGISException("RSGISExeImageRegistration does not know this option");
+			throw rsgis::RSGISException("RSGISExeImageRegistration does not know this option");
 		}
 		
 	}
@@ -1195,152 +1322,152 @@ void RSGISExeImageRegistration::printParameters()
 	{
 		if(this->option == RSGISExeImageRegistration::basic)
 		{
-			cout << "A basic registration algorithm which simply loops throught a set of tie points and moves them using the selected metric\n";
-			cout << "Reference Image: " << this->inputReferenceImage << endl;
-			cout << "Floating Image: " << this->inputFloatingmage << endl;
-			cout << "Output GCP File: " << this->outputGCPFile << endl;
+			std::cout << "A basic registration algorithm which simply loops throught a set of tie points and moves them using the selected metric\n";
+			std::cout << "Reference Image: " << this->inputReferenceImage << std::endl;
+			std::cout << "Floating Image: " << this->inputFloatingmage << std::endl;
+			std::cout << "Output GCP File: " << this->outputGCPFile << std::endl;
 			if(outputType == envi_img2img)
 			{
-				cout << "Output in image to image GCPs for ENVI\n";
+				std::cout << "Output in image to image GCPs for ENVI\n";
 			}
 			else if(outputType == envi_img2img)
 			{
-				cout << "Output in image to map GCPs for ENVI\n";
+				std::cout << "Output in image to map GCPs for ENVI\n";
 			}
 			else if(outputType == envi_img2img)
 			{
-				cout << "Output GCPs for GDAL\n";
+				std::cout << "Output GCPs for GDAL\n";
 			}
 			else 
 			{
-				cout << "Format unknown\n";
+				std::cout << "Format unknown\n";
 			}
 			if(metricType == euclidean)
 			{
-				cout << "The Euclidean similarity metric will be used\n";
+				std::cout << "The Euclidean similarity metric will be used\n";
 			}
 			else if(metricType == sqdiff)
 			{
-				cout << "The Squared Difference similarity metric will be used\n";
+				std::cout << "The Squared Difference similarity metric will be used\n";
 			}
 			else if(metricType == manhatten)
 			{
-				cout << "The Manhatten (taxi cab) similarity metric will be used\n";
+				std::cout << "The Manhatten (taxi cab) similarity metric will be used\n";
 			}
 			else if(metricType == correlation)
 			{
-				cout << "The Correlation Coefficent similarity metric will be used\n";
+				std::cout << "The Correlation Coefficent similarity metric will be used\n";
 			}
 			else 
 			{
-				cout << "Metric unknown\n";
+				std::cout << "Metric unknown\n";
 			}
-			cout << "Window Size = " << windowSize << endl;
-			cout << "Search area = " << searchArea << endl;
-			cout << "Metric Threshold = " << metricThreshold << endl;
-			cout << "Std Dev reference threshold = " << stdDevRefThreshold << endl;
-			cout << "Std Dev floating threshold = " << stdDevFloatThreshold << endl;
-			cout << "Sub pixel resolution = " << subPixelResolution << endl;
+			std::cout << "Window Size = " << windowSize << std::endl;
+			std::cout << "Search area = " << searchArea << std::endl;
+			std::cout << "Metric Threshold = " << metricThreshold << std::endl;
+			std::cout << "Std Dev reference threshold = " << stdDevRefThreshold << std::endl;
+			std::cout << "Std Dev floating threshold = " << stdDevFloatThreshold << std::endl;
+			std::cout << "Sub pixel resolution = " << subPixelResolution << std::endl;
 		}
 		else if(this->option == RSGISExeImageRegistration::singlelayer)
 		{
-			cout << "A registration algorithm which representings a single layer of tie\n";
-			cout << "points which are connected within a given distance and updated as the neighbouring tie points are moved.\n";
-			cout << "Reference Image: " << this->inputReferenceImage << endl;
-			cout << "Floating Image: " << this->inputFloatingmage << endl;
-			cout << "Output GCP File: " << this->outputGCPFile << endl;
+			std::cout << "A registration algorithm which representings a single layer of tie\n";
+			std::cout << "points which are connected within a given distance and updated as the neighbouring tie points are moved.\n";
+			std::cout << "Reference Image: " << this->inputReferenceImage << std::endl;
+			std::cout << "Floating Image: " << this->inputFloatingmage << std::endl;
+			std::cout << "Output GCP File: " << this->outputGCPFile << std::endl;
 			if(outputType == envi_img2img)
 			{
-				cout << "Output in image to image GCPs for ENVI\n";
+				std::cout << "Output in image to image GCPs for ENVI\n";
 			}
 			else if(outputType == envi_img2map)
 			{
-				cout << "Output in image to map GCPs for ENVI\n";
+				std::cout << "Output in image to map GCPs for ENVI\n";
 			}
 			else if(outputType == rsgis_img2map)
 			{
-				cout << "Output GCPs for RSGIS image to Map\n";
+				std::cout << "Output GCPs for RSGIS image to Map\n";
 			}
 			else 
 			{
-				throw RSGISException("Output format Unknown");
+				throw rsgis::RSGISException("Output format Unknown");
 			}
 			if(metricType == euclidean)
 			{
-				cout << "The Euclidean similarity metric will be used\n";
+				std::cout << "The Euclidean similarity metric will be used\n";
 			}
 			else if(metricType == sqdiff)
 			{
-				cout << "The Squared Difference similarity metric will be used\n";
+				std::cout << "The Squared Difference similarity metric will be used\n";
 			}
 			else if(metricType == manhatten)
 			{
-				cout << "The Manhatten (taxi cab) similarity metric will be used\n";
+				std::cout << "The Manhatten (taxi cab) similarity metric will be used\n";
 			}
 			else if(metricType == correlation)
 			{
-				cout << "The Correlation Coefficent similarity metric will be used\n";
+				std::cout << "The Correlation Coefficent similarity metric will be used\n";
 			}
 			else 
 			{
-				throw RSGISException("Similarity Metric Unknown");
+				throw rsgis::RSGISException("Similarity Metric Unknown");
 			}
-			cout << "Window Size = " << windowSize << endl;
-			cout << "Search area = " << searchArea << endl;
-			cout << "Metric Threshold = " << metricThreshold << endl;
-			cout << "Std Dev reference threshold = " << stdDevRefThreshold << endl;
-			cout << "Std Dev floating threshold = " << stdDevFloatThreshold << endl;
-			cout << "Sub pixel resolution = " << subPixelResolution << endl;
-			cout << "Distance threshold = " << distanceThreshold << endl;
-			cout << "Max. number of iterations = " << maxNumIterations << endl;
-			cout << "Movement Threshold = " << moveChangeThreshold << endl;
-			cout << "p Smoothness = " << pSmoothness << endl;
+			std::cout << "Window Size = " << windowSize << std::endl;
+			std::cout << "Search area = " << searchArea << std::endl;
+			std::cout << "Metric Threshold = " << metricThreshold << std::endl;
+			std::cout << "Std Dev reference threshold = " << stdDevRefThreshold << std::endl;
+			std::cout << "Std Dev floating threshold = " << stdDevFloatThreshold << std::endl;
+			std::cout << "Sub pixel resolution = " << subPixelResolution << std::endl;
+			std::cout << "Distance threshold = " << distanceThreshold << std::endl;
+			std::cout << "Max. number of iterations = " << maxNumIterations << std::endl;
+			std::cout << "Movement Threshold = " << moveChangeThreshold << std::endl;
+			std::cout << "p Smoothness = " << pSmoothness << std::endl;
 		}
 		else if(this->option == RSGISExeImageRegistration::triangularwarp)
 		{
-			cout << "Warp an image using a set of image to map ground control points using a triangulation\n";
-			cout << "GCPs: " << this->inputGCPs << endl;
-			cout << "Image: " << this->inputImage << endl;
-			cout << "Output Image: " << this->outputImage << endl;
-			cout << "Projection: " << this->projFile << endl;
-			cout << "Output Resolution: " << this->resolution << endl;
-            cout << "Output Image format: " << this->outImageFormat << endl;
+			std::cout << "Warp an image using a set of image to map ground control points using a triangulation\n";
+			std::cout << "GCPs: " << this->inputGCPs << std::endl;
+			std::cout << "Image: " << this->inputImage << std::endl;
+			std::cout << "Output Image: " << this->outputImage << std::endl;
+			std::cout << "Projection: " << this->projFile << std::endl;
+			std::cout << "Output Resolution: " << this->resolution << std::endl;
+            std::cout << "Output Image format: " << this->outImageFormat << std::endl;
 		}
 		else if(this->option == RSGISExeImageRegistration::nnwarp)
 		{
-			cout << "Warp an image using a set of image to map ground control points using a NN algorithm\n";
-			cout << "GCPs: " << this->inputGCPs << endl;
-			cout << "Image: " << this->inputImage << endl;
-			cout << "Output Image: " << this->outputImage << endl;
-			cout << "Projection: " << this->projFile << endl;
-			cout << "Output Resolution: " << this->resolution << endl;
-            cout << "Output Image format: " << this->outImageFormat << endl;
+			std::cout << "Warp an image using a set of image to map ground control points using a NN algorithm\n";
+			std::cout << "GCPs: " << this->inputGCPs << std::endl;
+			std::cout << "Image: " << this->inputImage << std::endl;
+			std::cout << "Output Image: " << this->outputImage << std::endl;
+			std::cout << "Projection: " << this->projFile << std::endl;
+			std::cout << "Output Resolution: " << this->resolution << std::endl;
+            std::cout << "Output Image format: " << this->outImageFormat << std::endl;
 		}
 		else
 		{
-			throw RSGISException("RSGISExeImageRegistration does not know this option");
+			throw rsgis::RSGISException("RSGISExeImageRegistration does not know this option");
 		}
 		
 	}
 	else
 	{
-		throw RSGISException("The parameters have yet to be parsed");
+		throw rsgis::RSGISException("The parameters have yet to be parsed");
 	}
 }
 
 void RSGISExeImageRegistration::help()
 {
-	cout << "<rsgis:commands>\n";
+	std::cout << "<rsgis:commands>\n";
 	
-	cout << "</rsgis:commands>\n";
+	std::cout << "</rsgis:commands>\n";
 }
 
-string RSGISExeImageRegistration::getDescription()
+std::string RSGISExeImageRegistration::getDescription()
 {
 	return "Provides a set of tools for automatically generating ground control points (GCPs) from image data.";
 }
 
-string RSGISExeImageRegistration::getXMLSchema()
+std::string RSGISExeImageRegistration::getXMLSchema()
 {
 	return "NOT PROVIDED!";
 }
