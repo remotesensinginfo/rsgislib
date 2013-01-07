@@ -539,6 +539,8 @@
         <rsgis:class value="int" r="int" g="int" b="int" a="int" />
 		<rsgis:class value="int" r="int" g="int" b="int" a="int" />
     </rsgis:command>
+	<!-- A command to run a majority filter to eliminate single pixels from with a classification  -->
+    <rsgis:command algor="classification" option="elimsinglepxls" image="image.kea" output="image.kea" connectivity="4 | 8" ignorezeros="yes | no" format="GDAL Format" />
 
 
 

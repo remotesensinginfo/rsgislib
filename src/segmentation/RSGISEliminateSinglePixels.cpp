@@ -92,7 +92,6 @@ namespace rsgis{namespace segment{
         }
     }
     
-    
     unsigned long RSGISEliminateSinglePixels::findSinglePixels(GDALDataset *inClumpsData, GDALDataset *tmpData, float noDataVal, bool noDataValProvided) throw(rsgis::img::RSGISImageCalcException)
     {
         unsigned long countSingles = 0;
