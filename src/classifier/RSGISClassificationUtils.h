@@ -40,6 +40,11 @@
 
 #include "classifier/RSGISClassifier.h"
 
+#include "img/RSGISImageUtils.h"
+#include "img/RSGISImageCalcException.h"
+
+#include "datastruct/SortedGenericList.cpp"
+
 #include <xercesc/dom/DOM.hpp>
 #include <xercesc/parsers/XercesDOMParser.hpp>
 #include <xercesc/sax/HandlerBase.hpp>
@@ -51,7 +56,7 @@
 #include "ogr_api.h"
 
 namespace rsgis{ namespace classifier{
-    
+        
 	class RSGISClassificationUtils
 		{
 		public:
@@ -61,6 +66,20 @@ namespace rsgis{ namespace classifier{
 			void convertShapeFile2SpecLib(std::string vector, std::string outputFile, std::string classAttribute, std::vector<std::string> *attributes, bool group) throw(RSGISClassificationException);
 			~RSGISClassificationUtils();
 		};
+    
+    class RSGISEliminateSingleClassPixels
+    {
+    public:
+        RSGISEliminateSingleClassPixels();
+        void eliminate(GDALDataset *inImageData, GDALDataset *tmpData, std::string outputImage, float noDataVal, bool noDataValProvided, std::string format, rsgis::img::RSGISRasterConnectivity filterConnectivity)throw(rsgis::img::RSGISImageCalcException);
+        ~RSGISEliminateSingleClassPixels();
+    private:
+        unsigned long findSinglePixelsConnect4(GDALDataset *inImageData, GDALDataset *tmpData, float noDataVal, bool noDataValProvided) throw(rsgis::img::RSGISImageCalcException);
+        bool eliminateSinglePixelsConnect4(GDALDataset *inImageData, GDALDataset *tmpData, GDALDataset *outDataset, float noDataVal, bool noDataValProvided) throw(rsgis::img::RSGISImageCalcException);
+        unsigned long findSinglePixelsConnect8(GDALDataset *inImageData, GDALDataset *tmpData, float noDataVal, bool noDataValProvided) throw(rsgis::img::RSGISImageCalcException);
+        bool eliminateSinglePixelsConnect8(GDALDataset *inImageData, GDALDataset *tmpData, GDALDataset *outDataset, float noDataVal, bool noDataValProvided) throw(rsgis::img::RSGISImageCalcException);
+        unsigned int findMostCommonVal(std::vector<unsigned int> values);
+    };
 	
 }}
 

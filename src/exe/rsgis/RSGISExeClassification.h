@@ -54,6 +54,7 @@
 #include "classifier/RSGISClassificationUtils.h"
 
 #include "img/RSGISCalcImage.h"
+#include "img/RSGISImageUtils.h"
 
 #include "vec/RSGISVectorSQLClassification.h"
 #include "vec/RSGISVectorUtils.h"
@@ -66,15 +67,7 @@
 
 namespace rsgisexe{
 
-using namespace std;
-using namespace xercesc;
-using namespace rsgis;
-using namespace rsgis::math;
-using namespace rsgis::classifier;
-using namespace rsgis::utils;
-using namespace rsgis::vec;
-
-class RSGISExeClassification : public RSGISAlgorithmParameters
+class RSGISExeClassification : public rsgis::RSGISAlgorithmParameters
 	{
 	public:
 		
@@ -92,7 +85,8 @@ class RSGISExeClassification : public RSGISAlgorithmParameters
 			kmeans,
 			isodata,
 			createspeclib,
-            addcolourtable
+            addcolourtable,
+            elimsinglepxls
 		};
 		
 		enum UnsupervisedInit
@@ -103,29 +97,30 @@ class RSGISExeClassification : public RSGISAlgorithmParameters
 		};
 		
 		RSGISExeClassification();
-		virtual RSGISAlgorithmParameters* getInstance();
-		virtual void retrieveParameters(DOMElement *argElement) throw(RSGISXMLArgumentsException);
-		virtual void runAlgorithm() throw(RSGISException);
+		virtual rsgis::RSGISAlgorithmParameters* getInstance();
+		virtual void retrieveParameters(xercesc::DOMElement *argElement) throw(rsgis::RSGISXMLArgumentsException);
+		virtual void runAlgorithm() throw(rsgis::RSGISException);
 		virtual void printParameters();
-		virtual string getDescription();
-		virtual string getXMLSchema();
+		virtual std::string getDescription();
+		virtual std::string getXMLSchema();
 		virtual void help();
 		~RSGISExeClassification();
 	protected:
 		options option;
-		string inputImage;
-		string outputImage;
-		string outputFile;
-		string vector;
-		string classAttribute;
-		string ruleImage;
-		ClassData **trainingData;
-		sqlclass **rules;
+		std::string inputImage;
+		std::string outputImage;
+		std::string outputFile;
+		std::string vector;
+		std::string classAttribute;
+		std::string ruleImage;
+        std::string imageFormat;
+		rsgis::classifier::ClassData **trainingData;
+        rsgis::vec::sqlclass **rules;
 		int numClasses;
 		gsl_matrix *specLib;
 		double threshold;
-		string inMatrixfile;
-		string inMatrixSpecLibStr;
+		std::string inMatrixfile;
+		std::string inMatrixSpecLibStr;
 		UnsupervisedInit initAlgor;
 		unsigned int numClusters;
 		unsigned int maxNumIterations;
@@ -138,9 +133,11 @@ class RSGISExeClassification : public RSGISAlgorithmParameters
 		bool groupSamples;
 		std::vector<std::string> *valueAttributes;
 		bool savekmeansCentres;
-		string outkmeansCentresFileName;
+		std::string outkmeansCentresFileName;
         std::vector<std::pair<int, rsgis::utils::RSGISColourInt> > classColourPairs;
         unsigned int imageBand;
+        rsgis::img::RSGISRasterConnectivity filterConnectivity;
+        bool ignoreZeros;
 	};
 }
 #endif

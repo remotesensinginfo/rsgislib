@@ -49,6 +49,12 @@ namespace rsgis
 {
 	namespace img
 	{
+        enum RSGISRasterConnectivity
+        {
+            rsgis_4connect,
+            rsgis_8connect
+        };
+        
         struct ImagePixelValuePt
         {
             geos::geom::Coordinate *pt;

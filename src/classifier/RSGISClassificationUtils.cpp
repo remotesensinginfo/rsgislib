@@ -299,6 +299,1572 @@ namespace rsgis{ namespace classifier{
 	{
 		
 	}
+    
+    
+    RSGISEliminateSingleClassPixels::RSGISEliminateSingleClassPixels()
+    {
+        
+    }
+    
+    void RSGISEliminateSingleClassPixels::eliminate(GDALDataset *inImageData, GDALDataset *tmpData, std::string outputImage, float noDataVal, bool noDataValProvided, std::string format, rsgis::img::RSGISRasterConnectivity filterConnectivity)throw(rsgis::img::RSGISImageCalcException)
+    {
+        try
+        {
+            // Check images have the same size!
+            if(inImageData->GetRasterXSize() != tmpData->GetRasterXSize())
+            {
+                throw rsgis::img::RSGISImageCalcException("Widths are not the same (spectral and temp)");
+            }
+            if(inImageData->GetRasterYSize() != tmpData->GetRasterYSize())
+            {
+                throw rsgis::img::RSGISImageCalcException("Heights are not the same (spectral and temp)");
+            }
+            
+            GDALDataset *outData = NULL;
+            rsgis::img::RSGISImageUtils imgUtils;
+            outData = imgUtils.createCopy(inImageData, outputImage, format, inImageData->GetRasterBand(1)->GetRasterDataType());
+            imgUtils.copyUIntGDALDataset(inImageData, outData);
+            
+            unsigned long singlesCount = 0;
+            bool singlesRemoved = false;
+            
+            while(!singlesRemoved)
+            {
+                if(filterConnectivity == rsgis::img::rsgis_4connect)
+                {
+                    singlesCount = this->findSinglePixelsConnect4(outData, tmpData, noDataVal, noDataValProvided);
+                }
+                else if(filterConnectivity == rsgis::img::rsgis_8connect)
+                {
+                    singlesCount = this->findSinglePixelsConnect8(outData, tmpData, noDataVal, noDataValProvided);
+                }
+                else
+                {
+                    throw rsgis::img::RSGISImageCalcException("Connectivity not recoginised (Only 4 or 8 are valid inputs)");
+                }
+                
+                if(singlesCount > 0)
+                {
+                    std::cout << "There are " << singlesCount << " single pixels within the image\n";
+                    if(filterConnectivity == rsgis::img::rsgis_4connect)
+                    {
+                        if(!eliminateSinglePixelsConnect4(outData, tmpData, outData, noDataVal, noDataValProvided))
+                        {
+                            singlesRemoved = true;
+                            break;
+                        }
+                    }
+                    else//if(filterConnectivity == rsgis::img::rsgis_8connect)
+                    {
+                        if(!eliminateSinglePixelsConnect8(outData, tmpData, outData, noDataVal, noDataValProvided))
+                        {
+                            singlesRemoved = true;
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    singlesRemoved = true;
+                    break;
+                }
+            }
+            std::cout << "Complete, all connected single pixels have been removed\n";
+            
+            GDALClose(outData);
+            
+        }
+        catch(rsgis::img::RSGISImageCalcException &e)
+        {
+            throw e;
+        }
+        catch(RSGISImageException &e)
+        {
+            throw rsgis::img::RSGISImageCalcException(e.what());
+        }
+    }
+    
+    unsigned long RSGISEliminateSingleClassPixels::findSinglePixelsConnect4(GDALDataset *inImageData, GDALDataset *tmpData, float noDataVal, bool noDataValProvided) throw(rsgis::img::RSGISImageCalcException)
+    {
+        unsigned long countSingles = 0;
+        try
+        {
+            unsigned int width = inImageData->GetRasterXSize();
+            unsigned int height = inImageData->GetRasterYSize();
+            
+            GDALRasterBand *clumpBand = inImageData->GetRasterBand(1);
+            GDALRasterBand *tmpBand = tmpData->GetRasterBand(1);
+            
+            unsigned int **inData = new unsigned int*[3];
+            inData[0] = new unsigned int[width];
+            inData[1] = new unsigned int[width];
+            inData[2] = new unsigned int[width];
+            unsigned int *outData = new unsigned int[width];
+            bool notSingle = false;
+            
+            int feedback = height/10;
+            int feedbackCounter = 0;
+            std::cout << "Started" << std::flush;
+            for(unsigned int i = 0; i < height; ++i)
+            {
+                if((i % feedback) == 0)
+                {
+                    std::cout << "." << feedbackCounter << "." << std::flush;
+                    feedbackCounter = feedbackCounter + 10;
+                }
+                if(i == 0)
+                {
+                    clumpBand->RasterIO(GF_Read, 0, i, width, 1, inData[1], width, 1, GDT_UInt32, 0, 0);
+                    clumpBand->RasterIO(GF_Read, 0, i+1, width, 1, inData[2], width, 1, GDT_UInt32, 0, 0);
+                    for(unsigned int j = 0; j < width; ++j)
+                    {
+                        notSingle = false;
+                        if((noDataValProvided & (inData[1][j] != noDataVal)) | !noDataValProvided)
+                        {
+                            if(j == 0)
+                            {
+                                //right
+                                if((j < width-1) && (inData[1][j+1] == inData[1][j]))
+                                {
+                                    notSingle = true;
+                                }
+                                //bottom
+                                else if(inData[2][j] == inData[1][j])
+                                {
+                                    notSingle = true;
+                                }
+                            }
+                            else if(j == (width-1))
+                            {
+                                //left
+                                if((j > 0) && (inData[1][j-1] == inData[1][j]))
+                                {
+                                    notSingle = true;
+                                }
+                                //bottom
+                                else if(inData[2][j] == inData[1][j])
+                                {
+                                    notSingle = true;
+                                }
+                            }
+                            else
+                            {
+                                //left
+                                if((j > 0) && (inData[1][j-1] == inData[1][j]))
+                                {
+                                    notSingle = true;
+                                }
+                                //right
+                                else if((j < width-1) && (inData[1][j+1] == inData[1][j]))
+                                {
+                                    notSingle = true;
+                                }
+                                //bottom
+                                else if(inData[2][j] == inData[1][j])
+                                {
+                                    notSingle = true;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            notSingle = true;
+                        }
+                        
+                        if(notSingle)
+                        {
+                            outData[j] = 0;
+                        }
+                        else
+                        {
+                            outData[j] = 1;
+                            ++countSingles;
+                        }
+                    }
+                }
+                else if(i == (height-1))
+                {
+                    clumpBand->RasterIO(GF_Read, 0, i-1, width, 1, inData[0], width, 1, GDT_UInt32, 0, 0);
+                    clumpBand->RasterIO(GF_Read, 0, i, width, 1, inData[1], width, 1, GDT_UInt32, 0, 0);
+                    for(unsigned int j = 0; j < width; ++j)
+                    {
+                        notSingle = false;
+                        if((noDataValProvided & (inData[1][j] != noDataVal)) | !noDataValProvided)
+                        {
+                            if(j == 0)
+                            {
+                                //top
+                                if(inData[0][j] == inData[1][j])
+                                {
+                                    notSingle = true;
+                                }
+                                //right
+                                else if((j < width-1) && (inData[1][j+1] == inData[1][j]))
+                                {
+                                    notSingle = true;
+                                }
+                            }
+                            else if(j == (width-1))
+                            {
+                                //top
+                                if(inData[0][j] == inData[1][j])
+                                {
+                                    notSingle = true;
+                                }
+                                //left
+                                else if((j > 0) && (inData[1][j-1] == inData[1][j]))
+                                {
+                                    notSingle = true;
+                                }
+                            }
+                            else
+                            {
+                                //top
+                                if(inData[0][j] == inData[1][j])
+                                {
+                                    notSingle = true;
+                                }
+                                //left
+                                else if((j > 0) && (inData[1][j-1] == inData[1][j]))
+                                {
+                                    notSingle = true;
+                                }
+                                //right
+                                else if((j < width-1) && (inData[1][j+1] == inData[1][j]))
+                                {
+                                    notSingle = true;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            notSingle = true;
+                        }
+                        
+                        if(notSingle)
+                        {
+                            outData[j] = 0;
+                        }
+                        else
+                        {
+                            outData[j] = 1;
+                            ++countSingles;
+                        }
+                    }
+                }
+                else
+                {
+                    clumpBand->RasterIO(GF_Read, 0, i-1, width, 1, inData[0], width, 1, GDT_UInt32, 0, 0);
+                    clumpBand->RasterIO(GF_Read, 0, i, width, 1, inData[1], width, 1, GDT_UInt32, 0, 0);
+                    clumpBand->RasterIO(GF_Read, 0, i+1, width, 1, inData[2], width, 1, GDT_UInt32, 0, 0);
+                    for(unsigned int j = 0; j < width; ++j)
+                    {
+                        notSingle = false;
+                        if((noDataValProvided & (inData[1][j] != noDataVal)) | !noDataValProvided)
+                        {
+                            if(j == 0)
+                            {
+                                //top
+                                if(inData[0][j] == inData[1][j])
+                                {
+                                    notSingle = true;
+                                }
+                                //right
+                                else if((j < width-1) && (inData[1][j+1] == inData[1][j]))
+                                {
+                                    notSingle = true;
+                                }
+                                //bottom
+                                else if(inData[2][j] == inData[1][j])
+                                {
+                                    notSingle = true;
+                                }
+                            }
+                            else if(j == (width-1))
+                            {
+                                //top
+                                if(inData[0][j] == inData[1][j])
+                                {
+                                    notSingle = true;
+                                }
+                                //left
+                                else if((j > 0) && (inData[1][j-1] == inData[1][j]))
+                                {
+                                    notSingle = true;
+                                }
+                                //bottom
+                                else if(inData[2][j] == inData[1][j])
+                                {
+                                    notSingle = true;
+                                }
+                            }
+                            else
+                            {
+                                //top
+                                if(inData[0][j] == inData[1][j])
+                                {
+                                    notSingle = true;
+                                }
+                                //left
+                                else if((j > 0) && (inData[1][j-1] == inData[1][j]))
+                                {
+                                    notSingle = true;
+                                }
+                                //right
+                                else if((j < width-1) && (inData[1][j+1] == inData[1][j]))
+                                {
+                                    notSingle = true;
+                                }
+                                //bottom
+                                else if(inData[2][j] == inData[1][j])
+                                {
+                                    notSingle = true;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            notSingle = true;
+                        }
+                        
+                        if(notSingle)
+                        {
+                            outData[j] = 0;
+                        }
+                        else
+                        {
+                            outData[j] = 1;
+                            ++countSingles;
+                        }
+                    }
+                }
+                
+                tmpBand->RasterIO(GF_Write, 0, i, width, 1, outData, width, 1, GDT_UInt32, 0, 0);
+            }
+            std::cout << ". Complete\n";
+            
+            delete[] inData[0];
+            delete[] inData[1];
+            delete[] inData[2];
+            delete[] inData;
+            delete[] outData;
+        }
+        catch (rsgis::img::RSGISImageCalcException &e)
+        {
+            throw e;
+        }
+        
+        return countSingles;
+    }
+    
+    bool RSGISEliminateSingleClassPixels::eliminateSinglePixelsConnect4(GDALDataset *inImageData, GDALDataset *tmpData, GDALDataset *outDataset, float noDataVal, bool noDataValProvided) throw(rsgis::img::RSGISImageCalcException)
+    {
+        bool hasChangeOccured = false;
+        try
+        {
+            unsigned int width = inImageData->GetRasterXSize();
+            unsigned int height = inImageData->GetRasterYSize();
+            
+            GDALRasterBand *clumpBand = inImageData->GetRasterBand(1);
+            GDALRasterBand *singlePxlBand = tmpData->GetRasterBand(1);
+            GDALRasterBand *outBand = outDataset->GetRasterBand(1);
+            
+            unsigned int **inData = new unsigned int*[3];
+            inData[0] = new unsigned int[width];
+            inData[1] = new unsigned int[width];
+            inData[2] = new unsigned int[width];
+            
+            unsigned int **singlePxl = new unsigned int*[3];
+            singlePxl[0] = new unsigned int[width];
+            singlePxl[1] = new unsigned int[width];
+            singlePxl[2] = new unsigned int[width];
+            
+            rsgis::datastruct::SortedGenericList<unsigned int> *sortedList = new rsgis::datastruct::SortedGenericList<unsigned int>();
+            
+            unsigned int *outData = new unsigned int[width];
+            
+            int feedback = height/10;
+            int feedbackCounter = 0;
+            std::cout << "Started" << std::flush;
+            for(unsigned int i = 0; i < height; ++i)
+            {
+                if((i % feedback) == 0)
+                {
+                    std::cout << "." << feedbackCounter << "." << std::flush;
+                    feedbackCounter = feedbackCounter + 10;
+                }
+                if(i == 0)
+                {
+                    clumpBand->RasterIO(GF_Read, 0, i, width, 1, inData[1], width, 1, GDT_UInt32, 0, 0);
+                    clumpBand->RasterIO(GF_Read, 0, i+1, width, 1, inData[2], width, 1, GDT_UInt32, 0, 0);
+                    singlePxlBand->RasterIO(GF_Read, 0, i, width, 1, singlePxl[1], width, 1, GDT_UInt32, 0, 0);
+                    singlePxlBand->RasterIO(GF_Read, 0, i+1, width, 1, singlePxl[2], width, 1, GDT_UInt32, 0, 0);
+                    
+                    for(unsigned int j = 0; j < width; ++j)
+                    {
+                        if((noDataValProvided & (inData[1][j] != noDataVal)) | !noDataValProvided)
+                        {
+                            if(singlePxl[1][j] == 1)
+                            {
+                                if(j == 0)
+                                {
+                                    //right
+                                    if((j < width-1) && (singlePxl[1][j+1] == 0))
+                                    {
+                                        sortedList->add(&inData[1][j+1]);
+                                    }
+                                    //bottom
+                                    if(singlePxl[2][j] == 0)
+                                    {
+                                        sortedList->add(&inData[2][j]);
+                                    }
+                                    
+                                    if(sortedList->getSize() <= 1)
+                                    {
+                                        outData[j] = inData[1][j];
+                                    }
+                                    else
+                                    {
+                                        outData[j] = *sortedList->getMostCommonValue();
+                                        hasChangeOccured = true;
+                                    }
+                                    sortedList->clearList();
+                                }
+                                else if(j == (width-1))
+                                {
+                                    //left
+                                    if((j > 0) && (singlePxl[1][j-1] == 0))
+                                    {
+                                        sortedList->add(&inData[1][j-1]);
+                                    }
+                                    //bottom
+                                    if(singlePxl[2][j] == 0)
+                                    {
+                                        sortedList->add(&inData[2][j]);
+                                    }
+                                    
+                                    if(sortedList->getSize() <= 1)
+                                    {
+                                        outData[j] = inData[1][j];
+                                    }
+                                    else
+                                    {
+                                        outData[j] = *sortedList->getMostCommonValue();
+                                        hasChangeOccured = true;
+                                    }
+                                    sortedList->clearList();
+                                }
+                                else
+                                {
+                                    //left
+                                    if((j > 0) && (singlePxl[1][j-1] == 0))
+                                    {
+                                        sortedList->add(&inData[1][j-1]);
+                                    }
+                                    //right
+                                    if((j < width-1) && (singlePxl[1][j+1] == 0))
+                                    {
+                                        sortedList->add(&inData[1][j+1]);
+                                    }
+                                    //bottom
+                                    if(singlePxl[2][j] == 0)
+                                    {
+                                        sortedList->add(&inData[2][j]);
+                                    }
+                                    
+                                    if(sortedList->getSize() <= 1)
+                                    {
+                                        outData[j] = inData[1][j];
+                                    }
+                                    else
+                                    {
+                                        outData[j] = *sortedList->getMostCommonValue();
+                                        hasChangeOccured = true;
+                                    }
+                                    sortedList->clearList();
+                                }
+                            }
+                            else
+                            {
+                                outData[j] = inData[1][j];
+                            }
+                        }
+                        else
+                        {
+                            outData[j] = inData[1][j];
+                        }
+                    }
+                    
+                }
+                else if(i == (height-1))
+                {
+                    clumpBand->RasterIO(GF_Read, 0, i-1, width, 1, inData[0], width, 1, GDT_UInt32, 0, 0);
+                    clumpBand->RasterIO(GF_Read, 0, i, width, 1, inData[1], width, 1, GDT_UInt32, 0, 0);
+                    singlePxlBand->RasterIO(GF_Read, 0, i-1, width, 1, singlePxl[0], width, 1, GDT_UInt32, 0, 0);
+                    singlePxlBand->RasterIO(GF_Read, 0, i, width, 1, singlePxl[1], width, 1, GDT_UInt32, 0, 0);
+                    
+                    for(unsigned int j = 0; j < width; ++j)
+                    {
+                        if((noDataValProvided & (inData[1][j] != noDataVal)) | !noDataValProvided)
+                        {
+                            if(singlePxl[1][j] == 1)
+                            {
+                                if(j == 0)
+                                {
+                                    //top
+                                    if(singlePxl[0][j] == 0)
+                                    {
+                                        sortedList->add(&inData[0][j]);
+                                    }
+                                    //right
+                                    if((j < width-1) && (singlePxl[1][j+1] == 0))
+                                    {
+                                        sortedList->add(&inData[1][j+1]);
+                                    }
+                                    
+                                    if(sortedList->getSize() <= 1)
+                                    {
+                                        outData[j] = inData[1][j];
+                                    }
+                                    else
+                                    {
+                                        outData[j] = *sortedList->getMostCommonValue();
+                                        hasChangeOccured = true;
+                                    }
+                                    sortedList->clearList();
+                                }
+                                else if(j == (width-1))
+                                {
+                                    //top
+                                    if(singlePxl[0][j] == 0)
+                                    {
+                                        sortedList->add(&inData[0][j]);
+                                    }
+                                    //left
+                                    if((j > 0) && (singlePxl[1][j-1] == 0))
+                                    {
+                                        sortedList->add(&inData[1][j-1]);
+                                    }
+                                    
+                                    if(sortedList->getSize() <= 1)
+                                    {
+                                        outData[j] = inData[1][j];
+                                    }
+                                    else
+                                    {
+                                        outData[j] = *sortedList->getMostCommonValue();
+                                        hasChangeOccured = true;
+                                    }
+                                    sortedList->clearList();
+                                }
+                                else
+                                {
+                                    //top
+                                    if(singlePxl[0][j] == 0)
+                                    {
+                                        sortedList->add(&inData[0][j]);
+                                    }
+                                    //left
+                                    if((j > 0) && (singlePxl[1][j-1] == 0))
+                                    {
+                                        sortedList->add(&inData[1][j-1]);
+                                    }
+                                    //right
+                                    if((j < width-1) && (singlePxl[1][j+1] == 0))
+                                    {
+                                        sortedList->add(&inData[1][j+1]);
+                                    }
+                                    
+                                    if(sortedList->getSize() <= 1)
+                                    {
+                                        outData[j] = inData[1][j];
+                                    }
+                                    else
+                                    {
+                                        outData[j] = *sortedList->getMostCommonValue();
+                                        hasChangeOccured = true;
+                                    }
+                                    sortedList->clearList();
+                                }
+                            }
+                            else
+                            {
+                                outData[j] = inData[1][j];
+                            }
+                        }
+                        else
+                        {
+                            outData[j] = inData[1][j];
+                        }
+                    }
+                }
+                else
+                {
+                    clumpBand->RasterIO(GF_Read, 0, i-1, width, 1, inData[0], width, 1, GDT_UInt32, 0, 0);
+                    clumpBand->RasterIO(GF_Read, 0, i, width, 1, inData[1], width, 1, GDT_UInt32, 0, 0);
+                    clumpBand->RasterIO(GF_Read, 0, i+1, width, 1, inData[2], width, 1, GDT_UInt32, 0, 0);
+                    singlePxlBand->RasterIO(GF_Read, 0, i-1, width, 1, singlePxl[0], width, 1, GDT_UInt32, 0, 0);
+                    singlePxlBand->RasterIO(GF_Read, 0, i, width, 1, singlePxl[1], width, 1, GDT_UInt32, 0, 0);
+                    singlePxlBand->RasterIO(GF_Read, 0, i+1, width, 1, singlePxl[2], width, 1, GDT_UInt32, 0, 0);
+                    
+                    for(unsigned int j = 0; j < width; ++j)
+                    {
+                        if((noDataValProvided & (inData[1][j] != noDataVal)) | !noDataValProvided)
+                        {
+                            if(singlePxl[1][j] == 1)
+                            {
+                                if(j == 0)
+                                {
+                                    //top
+                                    if(singlePxl[0][j] == 0)
+                                    {
+                                        sortedList->add(&inData[0][j]);
+                                    }
+                                    //right
+                                    if((j < width-1) && (singlePxl[1][j+1] == 0))
+                                    {
+                                        sortedList->add(&inData[1][j+1]);
+                                    }
+                                    //bottom
+                                    if(singlePxl[2][j] == 0)
+                                    {
+                                        sortedList->add(&inData[2][j]);
+                                    }
+                                    
+                                    if(sortedList->getSize() <= 1)
+                                    {
+                                        outData[j] = inData[1][j];
+                                    }
+                                    else
+                                    {
+                                        outData[j] = *sortedList->getMostCommonValue();
+                                        hasChangeOccured = true;
+                                    }
+                                    sortedList->clearList();
+                                }
+                                else if(j == (width-1))
+                                {
+                                    //top
+                                    if(singlePxl[0][j] == 0)
+                                    {
+                                        sortedList->add(&inData[0][j]);
+                                    }
+                                    //left
+                                    if((j > 0) && (singlePxl[1][j-1] == 0))
+                                    {
+                                        sortedList->add(&inData[1][j-1]);
+                                    }
+                                    //bottom
+                                    if(singlePxl[2][j] == 0)
+                                    {
+                                        sortedList->add(&inData[2][j]);
+                                    }
+                                    
+                                    if(sortedList->getSize() <= 1)
+                                    {
+                                        outData[j] = inData[1][j];
+                                    }
+                                    else
+                                    {
+                                        outData[j] = *sortedList->getMostCommonValue();
+                                        hasChangeOccured = true;
+                                    }
+                                    sortedList->clearList();
+                                }
+                                else
+                                {
+                                    //top
+                                    if(singlePxl[0][j] == 0)
+                                    {
+                                        sortedList->add(&inData[0][j]);
+                                    }
+                                    //left
+                                    if((j > 0) && (singlePxl[1][j-1] == 0))
+                                    {
+                                        sortedList->add(&inData[1][j-1]);
+                                    }
+                                    //right
+                                    if((j < width-1) && (singlePxl[1][j+1] == 0))
+                                    {
+                                        sortedList->add(&inData[1][j+1]);
+                                    }
+                                    //bottom
+                                    if(singlePxl[2][j] == 0)
+                                    {
+                                        sortedList->add(&inData[2][j]);
+                                    }
+                                    
+                                    if(sortedList->getSize() <= 1)
+                                    {
+                                        outData[j] = inData[1][j];
+                                    }
+                                    else
+                                    {
+                                        outData[j] = *sortedList->getMostCommonValue();
+                                        hasChangeOccured = true;
+                                    }
+                                    sortedList->clearList();
+                                }
+                            }
+                            else
+                            {
+                                outData[j] = inData[1][j];
+                            }
+                        }
+                        else
+                        {
+                            outData[j] = inData[1][j];
+                        }
+                    }
+                }
+                
+                outBand->RasterIO(GF_Write, 0, i, width, 1, outData, width, 1, GDT_UInt32, 0, 0);
+            }
+            std::cout << ". Complete\n";
+            
+            delete sortedList;
+            delete[] inData[0];
+            delete[] inData[1];
+            delete[] inData[2];
+            delete[] inData;
+            delete[] singlePxl[0];
+            delete[] singlePxl[1];
+            delete[] singlePxl[2];
+            delete[] singlePxl;
+            delete[] outData;
+        }
+        catch (rsgis::img::RSGISImageCalcException &e)
+        {
+            throw e;
+        }
+        return hasChangeOccured;
+    }
+    
+    unsigned long RSGISEliminateSingleClassPixels::findSinglePixelsConnect8(GDALDataset *inImageData, GDALDataset *tmpData, float noDataVal, bool noDataValProvided) throw(rsgis::img::RSGISImageCalcException)
+    {
+        unsigned long countSingles = 0;
+        try
+        {
+            unsigned int width = inImageData->GetRasterXSize();
+            unsigned int height = inImageData->GetRasterYSize();
+            
+            GDALRasterBand *clumpBand = inImageData->GetRasterBand(1);
+            GDALRasterBand *tmpBand = tmpData->GetRasterBand(1);
+            
+            unsigned int **inData = new unsigned int*[3];
+            inData[0] = new unsigned int[width];
+            inData[1] = new unsigned int[width];
+            inData[2] = new unsigned int[width];
+            unsigned int *outData = new unsigned int[width];
+            bool notSingle = false;
+            
+            int feedback = height/10;
+            int feedbackCounter = 0;
+            std::cout << "Started" << std::flush;
+            for(unsigned int i = 0; i < height; ++i)
+            {
+                if((i % feedback) == 0)
+                {
+                    std::cout << "." << feedbackCounter << "." << std::flush;
+                    feedbackCounter = feedbackCounter + 10;
+                }
+                if(i == 0)
+                {
+                    clumpBand->RasterIO(GF_Read, 0, i, width, 1, inData[1], width, 1, GDT_UInt32, 0, 0);
+                    clumpBand->RasterIO(GF_Read, 0, i+1, width, 1, inData[2], width, 1, GDT_UInt32, 0, 0);
+                    for(unsigned int j = 0; j < width; ++j)
+                    {
+                        notSingle = false;
+                        if((noDataValProvided & (inData[1][j] != noDataVal)) | !noDataValProvided)
+                        {
+                            if(j == 0)
+                            {
+                                //right
+                                if((j < width-1) && (inData[1][j+1] == inData[1][j]))
+                                {
+                                    notSingle = true;
+                                }
+                                //bottom
+                                else if(inData[2][j] == inData[1][j])
+                                {
+                                    notSingle = true;
+                                }
+                                //bottom right
+                                else if((j < width-1) && (inData[2][j+1] == inData[1][j]))
+                                {
+                                    notSingle = true;
+                                }
+                            }
+                            else if(j == (width-1))
+                            {
+                                //left
+                                if((j > 0) && (inData[1][j-1] == inData[1][j]))
+                                {
+                                    notSingle = true;
+                                }
+                                //bottom
+                                else if(inData[2][j] == inData[1][j])
+                                {
+                                    notSingle = true;
+                                }
+                                //bottom left
+                                else if((j > 0) && (inData[2][j-1] == inData[1][j]))
+                                {
+                                    notSingle = true;
+                                }
+                            }
+                            else
+                            {
+                                //left
+                                if((j > 0) && (inData[1][j-1] == inData[1][j]))
+                                {
+                                    notSingle = true;
+                                }
+                                //right
+                                else if((j < width-1) && (inData[1][j+1] == inData[1][j]))
+                                {
+                                    notSingle = true;
+                                }
+                                //bottom left
+                                else if((j > 0) && (inData[2][j-1] == inData[1][j]))
+                                {
+                                    notSingle = true;
+                                }
+                                //bottom
+                                else if(inData[2][j] == inData[1][j])
+                                {
+                                    notSingle = true;
+                                }
+                                //bottom right
+                                else if((j < width-1) && (inData[2][j+1] == inData[1][j]))
+                                {
+                                    notSingle = true;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            notSingle = true;
+                        }
+                        
+                        if(notSingle)
+                        {
+                            outData[j] = 0;
+                        }
+                        else
+                        {
+                            outData[j] = 1;
+                            ++countSingles;
+                        }
+                    }
+                }
+                else if(i == (height-1))
+                {
+                    clumpBand->RasterIO(GF_Read, 0, i-1, width, 1, inData[0], width, 1, GDT_UInt32, 0, 0);
+                    clumpBand->RasterIO(GF_Read, 0, i, width, 1, inData[1], width, 1, GDT_UInt32, 0, 0);
+                    for(unsigned int j = 0; j < width; ++j)
+                    {
+                        notSingle = false;
+                        if((noDataValProvided & (inData[1][j] != noDataVal)) | !noDataValProvided)
+                        {
+                            if(j == 0)
+                            {
+                                //top
+                                if(inData[0][j] == inData[1][j])
+                                {
+                                    notSingle = true;
+                                }
+                                //top right
+                                else if((j < width-1) && (inData[0][j+1] == inData[1][j]))
+                                {
+                                    notSingle = true;
+                                }
+                                //right
+                                else if((j < width-1) && (inData[1][j+1] == inData[1][j]))
+                                {
+                                    notSingle = true;
+                                }
+                            }
+                            else if(j == (width-1))
+                            {
+                                //top
+                                if(inData[0][j] == inData[1][j])
+                                {
+                                    notSingle = true;
+                                }
+                                //top left
+                                else if((j > 0) && (inData[0][j-1] == inData[1][j]))
+                                {
+                                    notSingle = true;
+                                }
+                                //left
+                                else if((j > 0) && (inData[1][j-1] == inData[1][j]))
+                                {
+                                    notSingle = true;
+                                }
+                            }
+                            else
+                            {
+                                //top left
+                                if((j > 0) && (inData[0][j-1] == inData[1][j]))
+                                {
+                                    notSingle = true;
+                                }
+                                //top
+                                else if(inData[0][j] == inData[1][j])
+                                {
+                                    notSingle = true;
+                                }
+                                //top right
+                                else if((j < width-1) && (inData[0][j+1] == inData[1][j]))
+                                {
+                                    notSingle = true;
+                                }
+                                //left
+                                else if((j > 0) && (inData[1][j-1] == inData[1][j]))
+                                {
+                                    notSingle = true;
+                                }
+                                //right
+                                else if((j < width-1) && (inData[1][j+1] == inData[1][j]))
+                                {
+                                    notSingle = true;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            notSingle = true;
+                        }
+                        
+                        if(notSingle)
+                        {
+                            outData[j] = 0;
+                        }
+                        else
+                        {
+                            outData[j] = 1;
+                            ++countSingles;
+                        }
+                    }
+                }
+                else
+                {
+                    clumpBand->RasterIO(GF_Read, 0, i-1, width, 1, inData[0], width, 1, GDT_UInt32, 0, 0);
+                    clumpBand->RasterIO(GF_Read, 0, i, width, 1, inData[1], width, 1, GDT_UInt32, 0, 0);
+                    clumpBand->RasterIO(GF_Read, 0, i+1, width, 1, inData[2], width, 1, GDT_UInt32, 0, 0);
+                    for(unsigned int j = 0; j < width; ++j)
+                    {
+                        notSingle = false;
+                        if((noDataValProvided & (inData[1][j] != noDataVal)) | !noDataValProvided)
+                        {
+                            if(j == 0)
+                            {
+                                //top
+                                if(inData[0][j] == inData[1][j])
+                                {
+                                    notSingle = true;
+                                }
+                                //top right
+                                else if((j < width-1) && (inData[0][j+1] == inData[1][j]))
+                                {
+                                    notSingle = true;
+                                }
+                                //right
+                                else if((j < width-1) && (inData[1][j+1] == inData[1][j]))
+                                {
+                                    notSingle = true;
+                                }
+                                //bottom
+                                else if(inData[2][j] == inData[1][j])
+                                {
+                                    notSingle = true;
+                                }
+                                //bottom right
+                                else if((j < width-1) && (inData[2][j+1] == inData[1][j]))
+                                {
+                                    notSingle = true;
+                                }
+                            }
+                            else if(j == (width-1))
+                            {
+                                //top
+                                if(inData[0][j] == inData[1][j])
+                                {
+                                    notSingle = true;
+                                }
+                                //top left
+                                else if((j > 0) && (inData[0][j-1] == inData[1][j]))
+                                {
+                                    notSingle = true;
+                                }
+                                //left
+                                else if((j > 0) && (inData[1][j-1] == inData[1][j]))
+                                {
+                                    notSingle = true;
+                                }
+                                //bottom
+                                else if(inData[2][j] == inData[1][j])
+                                {
+                                    notSingle = true;
+                                }
+                                //bottom left
+                                else if((j > 0) && (inData[2][j] == inData[1][j]))
+                                {
+                                    notSingle = true;
+                                }
+                            }
+                            else
+                            {
+                                //top left
+                                if((j > 0) && (inData[0][j-1] == inData[1][j]))
+                                {
+                                    notSingle = true;
+                                }
+                                //top
+                                else if(inData[0][j] == inData[1][j])
+                                {
+                                    notSingle = true;
+                                }
+                                //top right
+                                else if((j < width-1) && (inData[0][j+1] == inData[1][j]))
+                                {
+                                    notSingle = true;
+                                }
+                                //left
+                                else if((j > 0) && (inData[1][j-1] == inData[1][j]))
+                                {
+                                    notSingle = true;
+                                }
+                                //right
+                                else if((j < width-1) && (inData[1][j+1] == inData[1][j]))
+                                {
+                                    notSingle = true;
+                                }
+                                //bottom left
+                                else if((j > 0) && (inData[2][j] == inData[1][j]))
+                                {
+                                    notSingle = true;
+                                }
+                                //bottom
+                                else if(inData[2][j] == inData[1][j])
+                                {
+                                    notSingle = true;
+                                }
+                                //bottom right
+                                else if((j < width-1) && (inData[2][j+1] == inData[1][j]))
+                                {
+                                    notSingle = true;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            notSingle = true;
+                        }
+                        
+                        if(notSingle)
+                        {
+                            outData[j] = 0;
+                        }
+                        else
+                        {
+                            outData[j] = 1;
+                            ++countSingles;
+                        }
+                    }
+                }
+                
+                tmpBand->RasterIO(GF_Write, 0, i, width, 1, outData, width, 1, GDT_UInt32, 0, 0);
+            }
+            std::cout << ". Complete\n";
+            
+            delete[] inData[0];
+            delete[] inData[1];
+            delete[] inData[2];
+            delete[] inData;
+            delete[] outData;
+        }
+        catch (rsgis::img::RSGISImageCalcException &e)
+        {
+            throw e;
+        }
+        
+        return countSingles;
+    }
+    
+    bool RSGISEliminateSingleClassPixels::eliminateSinglePixelsConnect8(GDALDataset *inImageData, GDALDataset *tmpData, GDALDataset *outDataset, float noDataVal, bool noDataValProvided) throw(rsgis::img::RSGISImageCalcException)
+    {
+        bool hasChangeOccured = false;
+        try
+        {
+            unsigned int width = inImageData->GetRasterXSize();
+            unsigned int height = inImageData->GetRasterYSize();
+            
+            GDALRasterBand *clumpBand = inImageData->GetRasterBand(1);
+            GDALRasterBand *singlePxlBand = tmpData->GetRasterBand(1);
+            GDALRasterBand *outBand = outDataset->GetRasterBand(1);
+            
+            unsigned int **inData = new unsigned int*[3];
+            inData[0] = new unsigned int[width];
+            inData[1] = new unsigned int[width];
+            inData[2] = new unsigned int[width];
+            
+            unsigned int **singlePxl = new unsigned int*[3];
+            singlePxl[0] = new unsigned int[width];
+            singlePxl[1] = new unsigned int[width];
+            singlePxl[2] = new unsigned int[width];
+            
+            rsgis::datastruct::SortedGenericList<unsigned int> *sortedList = new rsgis::datastruct::SortedGenericList<unsigned int>();
+            
+            unsigned int *outData = new unsigned int[width];
+            
+            int feedback = height/10;
+            int feedbackCounter = 0;
+            std::cout << "Started" << std::flush;
+            for(unsigned int i = 0; i < height; ++i)
+            {
+                if((i % feedback) == 0)
+                {
+                    std::cout << "." << feedbackCounter << "." << std::flush;
+                    feedbackCounter = feedbackCounter + 10;
+                }
+                if(i == 0)
+                {
+                    clumpBand->RasterIO(GF_Read, 0, i, width, 1, inData[1], width, 1, GDT_UInt32, 0, 0);
+                    clumpBand->RasterIO(GF_Read, 0, i+1, width, 1, inData[2], width, 1, GDT_UInt32, 0, 0);
+                    singlePxlBand->RasterIO(GF_Read, 0, i, width, 1, singlePxl[1], width, 1, GDT_UInt32, 0, 0);
+                    singlePxlBand->RasterIO(GF_Read, 0, i+1, width, 1, singlePxl[2], width, 1, GDT_UInt32, 0, 0);
+                    
+                    for(unsigned int j = 0; j < width; ++j)
+                    {
+                        if((noDataValProvided & (inData[1][j] != noDataVal)) | !noDataValProvided)
+                        {
+                            if(singlePxl[1][j] == 1)
+                            {
+                                if(j == 0)
+                                {
+                                    //right
+                                    if((j < width-1) && (singlePxl[1][j+1] == 0))
+                                    {
+                                        sortedList->add(&inData[1][j+1]);
+                                    }
+                                    //bottom
+                                    else if(singlePxl[2][j] == 0)
+                                    {
+                                        sortedList->add(&inData[2][j]);
+                                    }
+                                    //bottom right
+                                    else if((j < width-1) && (singlePxl[2][j+1] == 0))
+                                    {
+                                        sortedList->add(&inData[2][j+1]);
+                                    }
+                                    
+                                    if(sortedList->getSize() <= 1)
+                                    {
+                                        outData[j] = inData[1][j];
+                                    }
+                                    else
+                                    {
+                                        outData[j] = *sortedList->getMostCommonValue();
+                                        hasChangeOccured = true;
+                                    }
+                                    sortedList->clearList();
+                                }
+                                else if(j == (width-1))
+                                {
+                                    //left
+                                    if((j > 0) && (singlePxl[1][j-1] == 0))
+                                    {
+                                        sortedList->add(&inData[1][j-1]);
+                                    }
+                                    //bottom left 
+                                    else if((j > 0) && (singlePxl[2][j-1] == 0))
+                                    {
+                                        sortedList->add(&inData[2][j-1]);
+                                    }
+                                    //bottom
+                                    else if(singlePxl[2][j] == 0)
+                                    {
+                                        sortedList->add(&inData[2][j]);
+                                    }
+                                    
+                                    if(sortedList->getSize() <= 1)
+                                    {
+                                        outData[j] = inData[1][j];
+                                    }
+                                    else
+                                    {
+                                        outData[j] = *sortedList->getMostCommonValue();
+                                        hasChangeOccured = true;
+                                    }
+                                    sortedList->clearList();
+                                }
+                                else
+                                {
+                                    //left
+                                    if((j > 0) && (singlePxl[1][j-1] == 0))
+                                    {
+                                        sortedList->add(&inData[1][j-1]);
+                                    }
+                                    //right
+                                    else if((j < width-1) && (singlePxl[1][j+1] == 0))
+                                    {
+                                        sortedList->add(&inData[1][j+1]);
+                                    }
+                                    //bottom left
+                                    else if((j > 0) && (singlePxl[2][j-1] == 0))
+                                    {
+                                        sortedList->add(&inData[2][j-1]);
+                                    }
+                                    //bottom
+                                    else if(singlePxl[2][j] == 0)
+                                    {
+                                        sortedList->add(&inData[2][j]);
+                                    }
+                                    //bottom right
+                                    else if((j < width-1) && (singlePxl[2][j+1] == 0))
+                                    {
+                                        sortedList->add(&inData[2][j+1]);
+                                    }
+                                    
+                                    if(sortedList->getSize() <= 1)
+                                    {
+                                        outData[j] = inData[1][j];
+                                    }
+                                    else
+                                    {
+                                        outData[j] = *sortedList->getMostCommonValue();
+                                        hasChangeOccured = true;
+                                    }
+                                    sortedList->clearList();
+                                }
+                            }
+                            else
+                            {
+                                outData[j] = inData[1][j];
+                            }
+                        }
+                        else
+                        {
+                            outData[j] = inData[1][j];
+                        }
+                    }
+                    
+                }
+                else if(i == (height-1))
+                {
+                    clumpBand->RasterIO(GF_Read, 0, i-1, width, 1, inData[0], width, 1, GDT_UInt32, 0, 0);
+                    clumpBand->RasterIO(GF_Read, 0, i, width, 1, inData[1], width, 1, GDT_UInt32, 0, 0);
+                    singlePxlBand->RasterIO(GF_Read, 0, i-1, width, 1, singlePxl[0], width, 1, GDT_UInt32, 0, 0);
+                    singlePxlBand->RasterIO(GF_Read, 0, i, width, 1, singlePxl[1], width, 1, GDT_UInt32, 0, 0);
+                    
+                    for(unsigned int j = 0; j < width; ++j)
+                    {
+                        if((noDataValProvided & (inData[1][j] != noDataVal)) | !noDataValProvided)
+                        {
+                            if(singlePxl[1][j] == 1)
+                            {
+                                if(j == 0)
+                                {
+                                    //top
+                                    if(singlePxl[0][j] == 0)
+                                    {
+                                        sortedList->add(&inData[0][j]);
+                                    }
+                                    //top right
+                                    if((j < width-1) && (singlePxl[0][j+1] == 0))
+                                    {
+                                        sortedList->add(&inData[0][j+1]);
+                                    }
+                                    //right
+                                    else if((j < width-1) && (singlePxl[1][j+1] == 0))
+                                    {
+                                        sortedList->add(&inData[1][j+1]);
+                                    }
+                                    
+                                    if(sortedList->getSize() <= 1)
+                                    {
+                                        outData[j] = inData[1][j];
+                                    }
+                                    else
+                                    {
+                                        outData[j] = *sortedList->getMostCommonValue();
+                                        hasChangeOccured = true;
+                                    }
+                                    sortedList->clearList();
+                                }
+                                else if(j == (width-1))
+                                {
+                                    //top left
+                                    if((j > 0) && (singlePxl[0][j-1] == 0))
+                                    {
+                                        sortedList->add(&inData[0][j-1]);
+                                    }
+                                    //top
+                                    else if(singlePxl[0][j] == 0)
+                                    {
+                                        sortedList->add(&inData[0][j]);
+                                    }
+                                    //left
+                                    else if((j > 0) && (singlePxl[1][j-1] == 0))
+                                    {
+                                        sortedList->add(&inData[1][j-1]);
+                                    }
+                                    
+                                    if(sortedList->getSize() <= 1)
+                                    {
+                                        outData[j] = inData[1][j];
+                                    }
+                                    else
+                                    {
+                                        outData[j] = *sortedList->getMostCommonValue();
+                                        hasChangeOccured = true;
+                                    }
+                                    sortedList->clearList();
+                                }
+                                else
+                                {
+                                    //top left
+                                    if((j > 0) && (singlePxl[0][j-1] == 0))
+                                    {
+                                        sortedList->add(&inData[0][j-1]);
+                                    }
+                                    //top
+                                    else if(singlePxl[0][j] == 0)
+                                    {
+                                        sortedList->add(&inData[0][j]);
+                                    }
+                                    //top right
+                                    if((j < width-1) && (singlePxl[0][j+1] == 0))
+                                    {
+                                        sortedList->add(&inData[0][j+1]);
+                                    }
+                                    //left
+                                    else if((j > 0) && (singlePxl[1][j-1] == 0))
+                                    {
+                                        sortedList->add(&inData[1][j-1]);
+                                    }
+                                    //right
+                                    else if((j < width-1) && (singlePxl[1][j+1] == 0))
+                                    {
+                                        sortedList->add(&inData[1][j+1]);
+                                    }
+                                    
+                                    if(sortedList->getSize() <= 1)
+                                    {
+                                        outData[j] = inData[1][j];
+                                    }
+                                    else
+                                    {
+                                        outData[j] = *sortedList->getMostCommonValue();
+                                        hasChangeOccured = true;
+                                    }
+                                    sortedList->clearList();
+                                }
+                            }
+                            else
+                            {
+                                outData[j] = inData[1][j];
+                            }
+                        }
+                        else
+                        {
+                            outData[j] = inData[1][j];
+                        }
+                    }
+                }
+                else
+                {
+                    clumpBand->RasterIO(GF_Read, 0, i-1, width, 1, inData[0], width, 1, GDT_UInt32, 0, 0);
+                    clumpBand->RasterIO(GF_Read, 0, i, width, 1, inData[1], width, 1, GDT_UInt32, 0, 0);
+                    clumpBand->RasterIO(GF_Read, 0, i+1, width, 1, inData[2], width, 1, GDT_UInt32, 0, 0);
+                    singlePxlBand->RasterIO(GF_Read, 0, i-1, width, 1, singlePxl[0], width, 1, GDT_UInt32, 0, 0);
+                    singlePxlBand->RasterIO(GF_Read, 0, i, width, 1, singlePxl[1], width, 1, GDT_UInt32, 0, 0);
+                    singlePxlBand->RasterIO(GF_Read, 0, i+1, width, 1, singlePxl[2], width, 1, GDT_UInt32, 0, 0);
+                    
+                    for(unsigned int j = 0; j < width; ++j)
+                    {
+                        if((noDataValProvided & (inData[1][j] != noDataVal)) | !noDataValProvided)
+                        {
+                            if(singlePxl[1][j] == 1)
+                            {
+                                if(j == 0)
+                                {
+                                    //top
+                                    if(singlePxl[0][j] == 0)
+                                    {
+                                        sortedList->add(&inData[0][j]);
+                                    }
+                                    //top right
+                                    else if((j < width-1) && (singlePxl[0][j+1] == 0))
+                                    {
+                                        sortedList->add(&inData[0][j+1]);
+                                    }
+                                    //right
+                                    else if((j < width-1) && (singlePxl[1][j+1] == 0))
+                                    {
+                                        sortedList->add(&inData[1][j+1]);
+                                    }
+                                    //bottom
+                                    else if(singlePxl[2][j] == 0)
+                                    {
+                                        sortedList->add(&inData[2][j]);
+                                    }
+                                    //bottom right
+                                    else if(singlePxl[2][j+1] == 0)
+                                    {
+                                        sortedList->add(&inData[2][j+1]);
+                                    }
+                                    
+                                    if(sortedList->getSize() <= 1)
+                                    {
+                                        outData[j] = inData[1][j];
+                                    }
+                                    else
+                                    {
+                                        outData[j] = *sortedList->getMostCommonValue();
+                                        hasChangeOccured = true;
+                                    }
+                                    sortedList->clearList();
+                                }
+                                else if(j == (width-1))
+                                {
+                                    //top left
+                                    if((j > 0) && (singlePxl[0][j-1] == 0))
+                                    {
+                                        sortedList->add(&inData[0][j-1]);
+                                    }
+                                    //top
+                                    else if(singlePxl[0][j] == 0)
+                                    {
+                                        sortedList->add(&inData[0][j]);
+                                    }
+                                    //left
+                                    else if((j > 0) && (singlePxl[1][j-1] == 0))
+                                    {
+                                        sortedList->add(&inData[1][j-1]);
+                                    }
+                                    //bottom left
+                                    else if((j > 0) && (singlePxl[2][j-1] == 0))
+                                    {
+                                        sortedList->add(&inData[2][j-1]);
+                                    }
+                                    //bottom
+                                    else if(singlePxl[2][j] == 0)
+                                    {
+                                        sortedList->add(&inData[2][j]);
+                                    }
+                                    
+                                    if(sortedList->getSize() <= 1)
+                                    {
+                                        outData[j] = inData[1][j];
+                                    }
+                                    else
+                                    {
+                                        outData[j] = *sortedList->getMostCommonValue();
+                                        hasChangeOccured = true;
+                                    }
+                                    sortedList->clearList();
+                                }
+                                else
+                                {
+                                    //top left
+                                    if((j > 0) && (singlePxl[0][j-1] == 0))
+                                    {
+                                        sortedList->add(&inData[0][j-1]);
+                                    }
+                                    //top
+                                    else if(singlePxl[0][j] == 0)
+                                    {
+                                        sortedList->add(&inData[0][j]);
+                                    }
+                                    //top right
+                                    else if((j < width-1) && (singlePxl[0][j+1] == 0))
+                                    {
+                                        sortedList->add(&inData[0][j+1]);
+                                    }
+                                    //left
+                                    else if((j > 0) && (singlePxl[1][j-1] == 0))
+                                    {
+                                        sortedList->add(&inData[1][j-1]);
+                                    }
+                                    //right
+                                    else if((j < width-1) && (singlePxl[1][j+1] == 0))
+                                    {
+                                        sortedList->add(&inData[1][j+1]);
+                                    }
+                                    //bottom left
+                                    else if((j > 0) && (singlePxl[2][j-1] == 0))
+                                    {
+                                        sortedList->add(&inData[2][j-1]);
+                                    }
+                                    //bottom
+                                    else if(singlePxl[2][j] == 0)
+                                    {
+                                        sortedList->add(&inData[2][j]);
+                                    }
+                                    //bottom right
+                                    else if(singlePxl[2][j+1] == 0)
+                                    {
+                                        sortedList->add(&inData[2][j+1]);
+                                    }
+                                    
+                                    if(sortedList->getSize() <= 1)
+                                    {
+                                        outData[j] = inData[1][j];
+                                    }
+                                    else
+                                    {
+                                        outData[j] = *sortedList->getMostCommonValue();
+                                        hasChangeOccured = true;
+                                    }
+                                    sortedList->clearList();
+                                }
+                            }
+                            else
+                            {
+                                outData[j] = inData[1][j];
+                            }
+                        }
+                        else
+                        {
+                            outData[j] = inData[1][j];
+                        }
+                    }
+                }
+                
+                outBand->RasterIO(GF_Write, 0, i, width, 1, outData, width, 1, GDT_UInt32, 0, 0);
+            }
+            std::cout << ". Complete\n";
+            
+            delete sortedList;
+            delete[] inData[0];
+            delete[] inData[1];
+            delete[] inData[2];
+            delete[] inData;
+            delete[] singlePxl[0];
+            delete[] singlePxl[1];
+            delete[] singlePxl[2];
+            delete[] singlePxl;
+            delete[] outData;
+        }
+        catch (rsgis::img::RSGISImageCalcException &e)
+        {
+            throw e;
+        }
+        return hasChangeOccured;
+    }
+    
+    unsigned int RSGISEliminateSingleClassPixels::findMostCommonVal(std::vector<unsigned int> values)
+    {
+        return 0;
+    }
+    
+    RSGISEliminateSingleClassPixels::~RSGISEliminateSingleClassPixels()
+    {
+        
+    }
 
 }}
 
