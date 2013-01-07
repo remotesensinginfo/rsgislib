@@ -746,7 +746,8 @@ set(LIB_REGISTRATION_H
 	${RSGIS_SRC_REGISTRATION_DIR}/RSGISWarpImage.h 
 	${RSGIS_SRC_REGISTRATION_DIR}/RSGISWarpImageUsingTriangulation.h 
 	${RSGIS_SRC_REGISTRATION_DIR}/RSGISBasicNNGCPImageWarp.h
-	${RSGIS_SRC_REGISTRATION_DIR}/RSGISPolynomialImageWarp.h)
+	${RSGIS_SRC_REGISTRATION_DIR}/RSGISPolynomialImageWarp.h
+	${RSGIS_SRC_REGISTRATION_DIR}/RSGISImagePixelRegistration.h)
 	
 set(LIB_REGISTRATION_CPP
 	${RSGIS_SRC_REGISTRATION_DIR}/RSGISImageWarpException.cpp 
@@ -771,7 +772,9 @@ set(LIB_REGISTRATION_CPP
 	${RSGIS_SRC_REGISTRATION_DIR}/RSGISBasicNNGCPImageWarp.cpp 
 	${RSGIS_SRC_REGISTRATION_DIR}/RSGISBasicNNGCPImageWarp.h
 	${RSGIS_SRC_REGISTRATION_DIR}/RSGISPolynomialImageWarp.cpp
-	${RSGIS_SRC_REGISTRATION_DIR}/RSGISPolynomialImageWarp.h)
+	${RSGIS_SRC_REGISTRATION_DIR}/RSGISPolynomialImageWarp.h
+	${RSGIS_SRC_REGISTRATION_DIR}/RSGISImagePixelRegistration.cpp
+	${RSGIS_SRC_REGISTRATION_DIR}/RSGISImagePixelRegistration.h)
 ###############################################################################
 
 ###############################################################################
