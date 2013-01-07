@@ -2727,6 +2727,73 @@ namespace rsgis{namespace img{
 		
 		return outVals;
 	}
+    
+    std::vector<double>* RSGISImageUtils::getImageBandValues(GDALDataset *dataset, unsigned int band, bool noDataValDefined, float noDataVal)throw(RSGISImageException)
+    {
+        std::vector<double> *imgVals = new std::vector<double>();
+        try
+        {
+            unsigned int width = dataset->GetRasterXSize();
+            unsigned int height = dataset->GetRasterYSize();
+            imgVals->reserve(width*height);
+            GDALRasterBand *gdalBand = dataset->GetRasterBand(band);
+            int blockSizeX = 0;
+            int blockSizeY = 0;
+            gdalBand->GetBlockSize(&blockSizeX, &blockSizeY);
+            unsigned int bufSize = width*blockSizeY;
+            float *imgData = new float[bufSize];
+            
+            int numBlocks = floor(height/blockSizeY);
+            unsigned int numRowsRemaining = height - (numBlocks*blockSizeY);
+            
+            int yOff = 0;
+            for(unsigned int n = 0; n < numBlocks; ++n)
+            {
+                gdalBand->RasterIO(GF_Read, 0, yOff, width, blockSizeY, imgData, width, blockSizeY, GDT_Float32, 0, 0);
+                
+                for(unsigned int i = 0; i < bufSize; ++i)
+                {
+                    if(noDataValDefined && (imgData[i] != noDataVal))
+                    {
+                        imgVals->push_back(imgData[i]);
+                    }
+                }
+                
+                yOff += blockSizeY;
+            }            
+            
+            if(numRowsRemaining > 0)
+            {
+                bufSize = width*numRowsRemaining;
+                
+                gdalBand->RasterIO(GF_Read, 0, yOff, width, numRowsRemaining, imgData, width, numRowsRemaining, GDT_Float32, 0, 0);
+                
+                for(unsigned int i = 0; i < bufSize; ++i)
+                {
+                    if(noDataValDefined && (imgData[i] != noDataVal))
+                    {
+                        imgVals->push_back(imgData[i]);
+                    }
+                }
+            }
+            
+            delete[] imgData;
+        }
+        catch (RSGISImageException *e)
+        {
+            throw e;
+        }
+        catch (rsgis::RSGISException &e)
+        {
+            throw rsgis::RSGISImageException(e.what());
+        }
+        catch (std::exception &e)
+        {
+            throw rsgis::RSGISImageException(e.what());
+        }
+        
+        return imgVals;
+    }
 	
 	void RSGISImageUtils::copyImageRemoveSpatialReference(std::string inputImage, std::string outputImage)throw(RSGISImageException)
 	{
