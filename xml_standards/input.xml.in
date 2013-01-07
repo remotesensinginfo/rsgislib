@@ -719,6 +719,8 @@
     <rsgis:command algor="imagecalc" option="allbandsequalto" image="image.env" output="image_out.env" format="GDAL Format" value="float" trueout="float" falseout="float" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
 	<!-- A command to generate a histogram for a region of an image given a mask. If min and max values are not provided the image extremes will be calculated -->
     <rsgis:command algor="imagecalc" option="histogram" image="image.env" output="image_out.txt" mask="mask.env" value="int" band="int" [min="float" max="float"] [width="float"] />
+	<!-- A command to calculate image band percentiles. -->
+    <rsgis:command algor="imagecalc" option="bandpercentile" image="image.env" output="image_out.mtxt" percentile="float 0-1" nodata="float" />
 	
 	
 	

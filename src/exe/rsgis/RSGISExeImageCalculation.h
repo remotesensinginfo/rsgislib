@@ -122,7 +122,8 @@ namespace rsgisexe{
             kmeanscentres,
             isodatacentres,
             allbandsequalto,
-            histogram
+            histogram,
+            bandpercentile
 		};
 		
 		struct VariableStruct
@@ -208,6 +209,9 @@ namespace rsgisexe{
         float lsumGain;
         float lsumOffset;
         unsigned int imgBand;
+        float percentile;
+        float noDataValue;
+        bool noDataValueSpecified;
 	};
 }
 #endif

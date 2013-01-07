@@ -532,5 +532,75 @@ namespace rsgis{namespace img{
 	{
 		
 	}
+    
+    
+    
+    RSGISImagePercentiles::RSGISImagePercentiles()
+    {
+        
+    }
+    
+    rsgis::math::Matrix* RSGISImagePercentiles::getPercentilesForAllBands(GDALDataset* dataset, float percentile, float noDataVal, bool noDataDefined)throw(rsgis::RSGISImageException)
+    {
+        rsgis::math::RSGISMatrices matrixUtils;
+        rsgis::math::Matrix *outPercentiles = NULL;
+        try
+        {
+            unsigned numImageBands = dataset->GetRasterCount();
+            outPercentiles = matrixUtils.createMatrix(numImageBands, 1);
+            for(unsigned int n = 0; n < numImageBands; ++n)
+            {
+                std::cout << "\tCalculating Percentile " << percentile << " of band " << n+1 << std::flush;
+                outPercentiles->matrix[n] = this->getPercentile(dataset, n+1, percentile, noDataVal, noDataDefined);
+                std::cout << " = " << outPercentiles->matrix[n] << std::endl;
+            }
+        }
+        catch (rsgis::RSGISImageException &e)
+        {
+            throw e;
+        }
+        catch (rsgis::RSGISException &e)
+        {
+            throw rsgis::RSGISImageException(e.what());
+        }
+        catch (std::exception &e)
+        {
+            throw rsgis::RSGISImageException(e.what());
+        }
+        
+        return outPercentiles;
+    }
+    
+    double RSGISImagePercentiles::getPercentile(GDALDataset *dataset, unsigned int band, float percentile, float noDataVal, bool noDataDefined)throw(rsgis::RSGISImageException)
+    {
+        double percentileVal = 0.0;
+        try
+        {
+            RSGISImageUtils imageUtils;
+            std::vector<double> *dataVals = imageUtils.getImageBandValues(dataset, band, noDataDefined, noDataVal);
+            std::sort(dataVals->begin(), dataVals->end());            
+            percentileVal = gsl_stats_quantile_from_sorted_data(&(*dataVals)[0], 1, dataVals->size(), percentile);
+            delete dataVals;
+        }
+        catch (rsgis::RSGISImageException &e)
+        {
+            throw e;
+        }
+        catch (rsgis::RSGISException &e)
+        {
+            throw rsgis::RSGISImageException(e.what());
+        }
+        catch (std::exception &e)
+        {
+            throw rsgis::RSGISImageException(e.what());
+        }
+        
+        return percentileVal;
+    }
+    
+    RSGISImagePercentiles::~RSGISImagePercentiles()
+    {
+        
+    }
 	
 }}

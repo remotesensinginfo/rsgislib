@@ -35,6 +35,9 @@
 #include "img/RSGISCalcImage.h"
 
 #include "math/RSGISMathFunction.h"
+#include "math/RSGISMatrices.h"
+
+#include "gsl/gsl_statistics_double.h"
 
 #include <boost/math/special_functions/fpclassify.hpp>
 
@@ -122,6 +125,15 @@ namespace rsgis{namespace img{
         double diffZ;
         rsgis::math::RSGISMathFunction *func;
         
+    };
+    
+    class RSGISImagePercentiles
+    {
+    public:
+        RSGISImagePercentiles();
+        rsgis::math::Matrix* getPercentilesForAllBands(GDALDataset* dataset, float percentile, float noDataVal, bool noDataDefined)throw(rsgis::RSGISImageException);
+        double getPercentile(GDALDataset *dataset, unsigned int band, float percentile, float noDataVal, bool noDataDefined)throw(rsgis::RSGISImageException);
+        ~RSGISImagePercentiles();
     };
 	
 }}

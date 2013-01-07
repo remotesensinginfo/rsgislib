@@ -87,6 +87,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
     XMLCh *optionISODataCentres = xercesc::XMLString::transcode("isodatacentres");
     XMLCh *optionAllBandsEqualTo = xercesc::XMLString::transcode("allbandsequalto");
     XMLCh *optionHistogram = xercesc::XMLString::transcode("histogram");
+    XMLCh *optionBandPercentile = xercesc::XMLString::transcode("bandpercentile");
 
 	const XMLCh *algorNameEle = argElement->getAttribute(xercesc::XMLString::transcode("algor"));
 	if(!xercesc::XMLString::equals(algorName, algorNameEle))
@@ -2353,6 +2354,68 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 		}
 		xercesc::XMLString::release(&widthXMLStr);
     }
+    else if(xercesc::XMLString::equals(optionBandPercentile, optionXML))
+    {
+        this->option = RSGISExeImageCalculation::bandpercentile;
+		
+        XMLCh *imageXMLStr = xercesc::XMLString::transcode("image");
+		if(argElement->hasAttribute(imageXMLStr))
+		{
+			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(imageXMLStr));
+			this->inputImage = std::string(charValue);
+			xercesc::XMLString::release(&charValue);
+		}
+		else
+		{
+			throw rsgis::RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+		}
+		xercesc::XMLString::release(&imageXMLStr);
+        
+        XMLCh *outputXMLStr = xercesc::XMLString::transcode("output");
+		if(argElement->hasAttribute(outputXMLStr))
+		{
+			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outputXMLStr));
+			this->outputFile = std::string(charValue);
+			xercesc::XMLString::release(&charValue);
+		}
+		else
+		{
+			throw rsgis::RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+		}
+		xercesc::XMLString::release(&outputXMLStr);
+        
+        this->noDataValueSpecified = false;
+        XMLCh *valueXMLStr = xercesc::XMLString::transcode("nodata");
+		if(argElement->hasAttribute(valueXMLStr))
+		{
+			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(valueXMLStr));
+			this->noDataValue = mathUtils.strtofloat(std::string(charValue));
+            this->noDataValueSpecified = true;
+			xercesc::XMLString::release(&charValue);
+		}
+		else
+		{
+			this->noDataValueSpecified = false;
+		}
+		xercesc::XMLString::release(&valueXMLStr);
+        
+        XMLCh *percentileXMLStr = xercesc::XMLString::transcode("percentile");
+		if(argElement->hasAttribute(percentileXMLStr))
+		{
+			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(percentileXMLStr));
+			this->percentile = mathUtils.strtofloat(std::string(charValue));
+            if((percentile < 0) | (percentile > 1))
+            {
+                throw rsgis::RSGISXMLArgumentsException("The percentile value needs to be between 0 and 1.");
+            }
+			xercesc::XMLString::release(&charValue);
+		}
+		else
+		{
+            throw rsgis::RSGISXMLArgumentsException("No \'percentile\' attribute was provided.");
+		}
+		xercesc::XMLString::release(&percentileXMLStr);
+    }
 	else
 	{
 		std::string message = std::string("The option (") + std::string(xercesc::XMLString::transcode(optionXML)) + std::string(") is not known: RSGISExeImageCalculation.");
@@ -2385,6 +2448,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
     xercesc::XMLString::release(&optionISODataCentres);
     xercesc::XMLString::release(&optionAllBandsEqualTo);
     xercesc::XMLString::release(&optionHistogram);
+    xercesc::XMLString::release(&optionBandPercentile);
 
 	parsed = true;
 }
@@ -3791,6 +3855,42 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
                 GDALClose(datasets[0]);
                 GDALClose(datasets[1]);
                 delete[] datasets;
+			}
+			catch(rsgis::RSGISException e)
+			{
+				throw e;
+			}
+        }
+        else if(option == RSGISExeImageCalculation::bandpercentile)
+        {
+            std::cout << "Calculate image band percentiles\n";
+            std::cout << "Input Image: " << this->inputImage << std::endl;
+            std::cout << "Output File: " << this->outputFile << ".mtxt\n";
+            std::cout << "Percentile: " << this->percentile << std::endl;
+            if(noDataValueSpecified)
+            {
+                std::cout << "No Data Value: " << this->noDataValue << std::endl;
+            }
+            
+            try
+			{
+                GDALAllRegister();
+                GDALDataset *imageDataset = (GDALDataset *) GDALOpenShared(this->inputImage.c_str(), GA_ReadOnly);
+				if(imageDataset == NULL)
+				{
+					std::string message = std::string("Could not open image ") + this->inputImage;
+					throw rsgis::RSGISImageException(message.c_str());
+				}
+                
+                rsgis::math::RSGISMatrices matrixUtils;
+                rsgis::img::RSGISImagePercentiles calcPercentiles;
+                
+                rsgis::math::Matrix *bandPercentiles = calcPercentiles.getPercentilesForAllBands(imageDataset, this->percentile, this->noDataValue, this->noDataValueSpecified);
+                
+                matrixUtils.saveMatrix2GridTxt(bandPercentiles, this->outputFile);
+                matrixUtils.freeMatrix(bandPercentiles);
+                
+                GDALClose(imageDataset);
 			}
 			catch(rsgis::RSGISException e)
 			{

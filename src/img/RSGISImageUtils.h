@@ -154,7 +154,8 @@ namespace rsgis
 				void exportImageStackWithMask(std::string *inputImages, std::string *outputImages, std::string imageMask, std::string outputFormat, int numImages, float maskValue)  throw(RSGISImageException, RSGISImageBandException);
 				void convertImageFileFormat(std::string inputImage, std::string outputImage, std::string outputImageFormat, bool projFromImage=false, std::string wktProjStr="");
 				float** getImageDataBlock(GDALDataset *dataset, int *dsOffsets, unsigned int width, unsigned int height, unsigned int *numVals);
-				void copyImageRemoveSpatialReference(std::string inputImage, std::string outputImage)throw(RSGISImageException);
+                std::vector<double>* getImageBandValues(GDALDataset *dataset, unsigned int band, bool noDataValDefined, float noDataVal)throw(RSGISImageException);
+                void copyImageRemoveSpatialReference(std::string inputImage, std::string outputImage)throw(RSGISImageException);
 				void copyImageDefiningSpatialReference(std::string inputImage, std::string outputImage, std::string proj, double tlX, double tlY, float xRes, float yRes)throw(RSGISImageException);
                 void createImageSlices(GDALDataset *dataset, std::string outputImageBase) throw(RSGISImageException);
                 void copyFloatGDALDataset(GDALDataset *inData, GDALDataset *outData) throw(RSGISImageException);
