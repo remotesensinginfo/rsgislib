@@ -2003,13 +2003,9 @@ namespace rsgis {namespace radar
 			this->minMaxVals = minMaxVals;
 			this->useDefaultMinMax = true; // Initialise at true
 
-			if (this->minMaxVals != NULL)
+			if (this->minMaxVals == NULL)
 			{
-				this->useDefaultMinMax = false; // If minimum and maximum values are passed in use these insead
-				if (this->parameters > general) // For general parameters must specify minimum and maximum values.
-				{
-					throw RSGISException("Must specify min / max values for general parameters");
-				}
+				throw RSGISException("Must specify min / max values.");
 			}
 
 		}
@@ -2048,6 +2044,8 @@ namespace rsgis {namespace radar
 					double density = gsl_vector_get(outPar, 1);
 					double error = gsl_vector_get(outPar, 2);
 
+
+
 					if ((boost::math::isnan(height)) | (boost::math::isnan(density))) 
 					{
 						try
@@ -2063,7 +2061,13 @@ namespace rsgis {namespace radar
 
 					}
 
-					// Calculate Biomass
+                    // Set to limits of min/max values
+                    if (height < this->minMaxVals[0][0]){height = this->minMaxVals[0][0];}
+                    if (height > this->minMaxVals[0][1]){height = this->minMaxVals[0][1];}
+                    if (density < this->minMaxVals[1][0]){density = this->minMaxVals[1][0];}
+                    if (density > this->minMaxVals[1][1]){density = this->minMaxVals[1][1];}
+					
+                    // Calculate Biomass
 					double heightcm = height * 100;
 					double tMass = allometric.calculateTotalBiomassHeight(heightcm, species);
 					double biomass = ((tMass*(density*10000)))/1000000;
@@ -2102,7 +2106,13 @@ namespace rsgis {namespace radar
 
 					}
 
-					// Calculate Biomass
+                    // Set to limits of min/max values
+                    if (cDepth < this->minMaxVals[0][0]){cDepth = this->minMaxVals[0][0];}
+                    if (cDepth > this->minMaxVals[0][1]){cDepth = this->minMaxVals[0][1];}
+                    if (density < this->minMaxVals[1][0]){density = this->minMaxVals[1][0];}
+                    if (density > this->minMaxVals[1][1]){density = this->minMaxVals[1][1];}
+					
+                    // Calculate Biomass
 					height = cDepth * 240; // convert to cm
 					double tMass = allometric.calculateTotalBiomassHeight(height, species);
 					double biomass = ((tMass*(density*10000)))/1000000;
@@ -2129,7 +2139,17 @@ namespace rsgis {namespace radar
 					double dielectric = gsl_vector_get(outPar, 2);
 					double error = gsl_vector_get(outPar, 3);
 
-					// Write out
+
+    
+                    // Set to limits of min/max values
+                    if (height < this->minMaxVals[0][0]){height = this->minMaxVals[0][0];}
+                    if (height > this->minMaxVals[0][1]){height = this->minMaxVals[0][1];}
+                    if (density < this->minMaxVals[1][0]){density = this->minMaxVals[1][0];}
+                    if (density > this->minMaxVals[1][1]){density = this->minMaxVals[1][1];}
+                    if (dielectric < this->minMaxVals[2][0]){dielectric = this->minMaxVals[2][0];}
+                    if (dielectric > this->minMaxVals[2][1]){dielectric = this->minMaxVals[2][1];}
+					
+                    // Write out
 					if (boost::math::isnan(height)){output[0] = 0;}
 					else{output[0] = height;}
 					if (boost::math::isnan(density)){output[1] = 0;}

@@ -5220,7 +5220,7 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
 				// Add to min / max values for inversion
 				if (!this->useDefaultMinMax)
 				{
-					this->minMaxValues = new double*[3];
+                    this->minMaxValues = new double*[3];
 					this->minMaxValues[0] = new double[2];
 					this->minMaxValues[1] = new double[2];
 					this->minMaxValues[2] = new double[2];
@@ -10245,7 +10245,6 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
                     {
                         char *charValue = XMLString::transcode(slowOptimiserElement->getAttribute(minDielectricStr));
                         minMaxStepAll[2][0] = mathUtils.strtodouble(string(charValue));
-                        this->useDefaultMinMax = false;
                         XMLString::release(&charValue);
                     }
                     else
@@ -10259,7 +10258,6 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
                     {
                         char *charValue = XMLString::transcode(slowOptimiserElement->getAttribute(maxDielectricStr));
                         minMaxStepAll[2][1] = mathUtils.strtodouble(string(charValue));
-                        this->useDefaultMinMax = false;
                         XMLString::release(&charValue);
                     }
                     else
@@ -10273,7 +10271,6 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
                     {
                         char *charValue = XMLString::transcode(slowOptimiserElement->getAttribute(dielectricStepStr));
                         minMaxStepAll[2][2] = mathUtils.strtodouble(string(charValue));
-                        this->useDefaultMinMax = false;
                         XMLString::release(&charValue);
                     }
                     else
@@ -10427,20 +10424,22 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
 
                         this->estSlowOptimiserClass->push_back(new RSGISEstimationSimulatedAnnealingWithAP(functionsAll, minMaxStepAll, minEnergy, startTemp, runsStep, runsTemp, cooling, ittmax, covMatrixP, invCovMatrixD, this->initialPar));
 
-                        this->minMaxValuesClass[i] = new double*[3];
-                        this->minMaxValuesClass[i][0] = new double[2];
-                        this->minMaxValuesClass[i][1] = new double[2];
-                        this->minMaxValuesClass[i][2] = new double[2];
-
-                        this->minMaxValuesClass[i][0][0] = minMaxStepAll[0][0];
-                        this->minMaxValuesClass[i][0][1] = minMaxStepAll[0][1];
-                        this->minMaxValuesClass[i][1][0] = minMaxStepAll[1][0];
-                        this->minMaxValuesClass[i][1][1] = minMaxStepAll[1][1];
-                        this->minMaxValuesClass[i][2][0] = minMaxStepAll[2][0];
-                        this->minMaxValuesClass[i][2][1] = minMaxStepAll[2][1];
-
-
+                       
                     }
+                    
+                    // Set minimum and maximum values
+                    this->minMaxValuesClass[i] = new double*[3];
+                    this->minMaxValuesClass[i][0] = new double[2];
+                    this->minMaxValuesClass[i][1] = new double[2];
+                    this->minMaxValuesClass[i][2] = new double[2];
+
+                    this->minMaxValuesClass[i][0][0] = minMaxStepAll[0][0];
+                    this->minMaxValuesClass[i][0][1] = minMaxStepAll[0][1];
+                    this->minMaxValuesClass[i][1][0] = minMaxStepAll[1][0];
+                    this->minMaxValuesClass[i][1][1] = minMaxStepAll[1][1];
+                    this->minMaxValuesClass[i][2][0] = minMaxStepAll[2][0];
+                    this->minMaxValuesClass[i][2][1] = minMaxStepAll[2][1];
+
 
                 }
 
@@ -14517,6 +14516,7 @@ void RSGISExeEstimationAlgorithm::runAlgorithm() throw(RSGISException)
 				if (useDefaultMinMax)
 				{
 					this->minMaxValuesClass = NULL;
+                    std::cout << "Using default min/max values for parameters" << std::endl;
 				}
 
 				// Perform Inversion
@@ -14574,7 +14574,8 @@ void RSGISExeEstimationAlgorithm::runAlgorithm() throw(RSGISException)
 					}
 					else
 					{
-						processFeature = new rsgis::radar::RSGISObjectBasedEstimation(inputImageDS, outputImageDS, this->initialParClass, this->estSlowOptimiserClass, this->estFastOptimiserClass, this->parameters, this->minMaxValuesClass, this->classField, this->useClass);
+						
+                        processFeature = new rsgis::radar::RSGISObjectBasedEstimation(inputImageDS, outputImageDS, this->initialParClass, this->estSlowOptimiserClass, this->estFastOptimiserClass, this->parameters, this->minMaxValuesClass, this->classField, this->useClass);
 						processVector = new rsgis::vec::RSGISProcessVector(processFeature);
 						if (this->createOutSHP)
 						{
