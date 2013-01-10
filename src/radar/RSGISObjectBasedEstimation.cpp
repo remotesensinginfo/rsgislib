@@ -73,6 +73,7 @@ namespace rsgis{namespace radar{
 		if (this->minMaxVals != NULL)
 		{
 			this->useDefaultMinMax = false; // If minimum and maximum values are passed in use these insead
+            std::cout << "Not using default min/max values" << std::endl;
 		}
 
 		std::cout << "Parameters read in OK" << std::endl;
@@ -120,7 +121,7 @@ namespace rsgis{namespace radar{
 			}
 			else
 			{
-				invValuesObj = new RSGISEstimationAlgorithmSingleSpecies(this->numOutputBands, this->initialParSingle, this->slowOptimiserSingle, this->parameters, this->minMaxVals[estClass]);
+                invValuesObj = new RSGISEstimationAlgorithmSingleSpecies(this->numOutputBands, this->initialParSingle, this->slowOptimiserSingle, this->parameters, this->minMaxVals[estClass]);
 			}
 
 			float *outData = new float[numOutputBands]; // Create array large enough to hold all output bands (more than parameters)
