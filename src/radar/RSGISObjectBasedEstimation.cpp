@@ -214,26 +214,33 @@ namespace rsgis{namespace radar{
 			}
 
 			// PARAMETERISE OPIMISER USING VALUES FROM DATA
-			// Update optimser if error low enought
-
-			if ( outData[this->numOutputBands - 1] < 0.1 )
-			{
-				this->fastOptimiserSingle->modifyAPriori(localPar);
-			}
-			else
-			{
-				this->fastOptimiserSingle->modifyAPriori(this->initialParSingle);
-			}
-
-			// RUN INVERISION ON ALL PIXELS IN OBJECT
-			if (this->useDefaultMinMax)
-			{
-				invValues = new RSGISEstimationAlgorithmSingleSpecies(this->numOutputBands, localPar, this->fastOptimiserSingle, this->parameters);
-			}
-			else
-			{
-				invValues = new RSGISEstimationAlgorithmSingleSpecies(this->numOutputBands, localPar, this->fastOptimiserSingle, this->parameters, this->minMaxVals[estClass]);
-			}
+			// Update optimser if error low enough
+            if ( outData[this->numOutputBands - 1] < 1e-8)
+            {
+                this->fastOptimiserSingle->modifyAPriori(localPar);
+                // RUN INVERISION ON ALL PIXELS IN OBJECT
+                if (this->useDefaultMinMax)
+                {
+                    invValues = new RSGISEstimationAlgorithmSingleSpecies(this->numOutputBands, localPar, this->fastOptimiserSingle, this->parameters);
+                }
+                else
+                {
+                    invValues = new RSGISEstimationAlgorithmSingleSpecies(this->numOutputBands, localPar, this->fastOptimiserSingle, this->parameters, this->minMaxVals[estClass]);
+                }
+            }
+            else
+            {
+                this->fastOptimiserSingle->modifyAPriori(this->initialParSingle);
+                // RUN INVERISION ON ALL PIXELS IN OBJECT
+                if (this->useDefaultMinMax)
+                {
+                    invValues = new RSGISEstimationAlgorithmSingleSpecies(this->numOutputBands, this->initialParSingle, this->fastOptimiserSingle, this->parameters);
+                }
+                else
+                {
+                    invValues = new RSGISEstimationAlgorithmSingleSpecies(this->numOutputBands, this->initialParSingle, this->fastOptimiserSingle, this->parameters, this->minMaxVals[estClass]);
+                }
+            }
 
 			calcImage = new rsgis::img::RSGISCalcImage(invValues, "", true);
 			calcImage->calcImageWithinPolygon(this->datasetsIO, 2, env, poly, rsgis::img::polyContainsPixelCenter);
@@ -327,24 +334,33 @@ namespace rsgis{namespace radar{
 
 			// PARAMETERISE OPIMISER USING VALUES FROM DATA
 			// Update optimser
-			if ( outData[this->numOutputBands - 1] < 0.1 )
-			{
-				this->fastOptimiserSingle->modifyAPriori(localPar);
-			}
-			else
-			{
-				this->fastOptimiserSingle->modifyAPriori(this->initialParSingle);
-			}
+            if ( outData[this->numOutputBands - 1] < 1e-8)
+            {
+                this->fastOptimiserSingle->modifyAPriori(localPar);
+                // RUN INVERISION ON ALL PIXELS IN OBJECT
+                if (this->useDefaultMinMax)
+                {
+                    invValues = new RSGISEstimationAlgorithmSingleSpecies(this->numOutputBands, localPar, this->fastOptimiserSingle, this->parameters);
+                }
+                else
+                {
+                    invValues = new RSGISEstimationAlgorithmSingleSpecies(this->numOutputBands, localPar, this->fastOptimiserSingle, this->parameters, this->minMaxVals[estClass]);
+                }
+            }
+            else
+            {
+                this->fastOptimiserSingle->modifyAPriori(this->initialParSingle);
+                // RUN INVERISION ON ALL PIXELS IN OBJECT
+                if (this->useDefaultMinMax)
+                {
+                    invValues = new RSGISEstimationAlgorithmSingleSpecies(this->numOutputBands, this->initialParSingle, this->fastOptimiserSingle, this->parameters);
+                }
+                else
+                {
+                    invValues = new RSGISEstimationAlgorithmSingleSpecies(this->numOutputBands, this->initialParSingle, this->fastOptimiserSingle, this->parameters, this->minMaxVals[estClass]);
+                }
+            }
 
-			// RUN INVERISION ON ALL PIXELS IN OBJECT
-			if (this->useDefaultMinMax)
-			{
-				invValues = new RSGISEstimationAlgorithmSingleSpecies(this->numOutputBands, localPar, this->fastOptimiserSingle, this->parameters);
-			}
-			else
-			{
-				invValues = new RSGISEstimationAlgorithmSingleSpecies(this->numOutputBands, localPar, this->fastOptimiserSingle, this->parameters, this->minMaxVals[estClass]);
-			}
 			calcImage = new rsgis::img::RSGISCalcImage(invValues, "", true);
 			calcImage->calcImageWithinPolygon(this->datasetsIO, 2, env, poly, rsgis::img::polyContainsPixelCenter);
 
@@ -652,24 +668,32 @@ namespace rsgis{namespace radar{
 
 			// PARAMETERISE OPIMISER USING VALUES FROM DATA
 			// Update optimser
-			if ( outData[this->numOutputBands - 1] < 0.1 )
-			{
-				this->fastOptimiserSingle->modifyAPriori(localPar);
-			}
-			else
-			{
-				this->fastOptimiserSingle->modifyAPriori(this->initialParSingle);
-			}
-
-			// RUN INVERISION ON ALL PIXELS IN OBJECT
-			if (this->useDefaultMinMax)
-			{
-				invValues = new RSGISEstimationAlgorithmSingleSpecies(this->numOutputBands, localPar, this->fastOptimiserSingle, this->parameters);
-			}
-			else
-			{
-				invValues = new RSGISEstimationAlgorithmSingleSpecies(this->numOutputBands, localPar, this->fastOptimiserSingle, this->parameters, this->minMaxVals[estClass]);
-			}
+            if ( outData[this->numOutputBands - 1] < 1e-8)
+            {
+                this->fastOptimiserSingle->modifyAPriori(localPar);
+                // RUN INVERISION ON ALL PIXELS IN OBJECT
+                if (this->useDefaultMinMax)
+                {
+                    invValues = new RSGISEstimationAlgorithmSingleSpecies(this->numOutputBands, localPar, this->fastOptimiserSingle, this->parameters);
+                }
+                else
+                {
+                    invValues = new RSGISEstimationAlgorithmSingleSpecies(this->numOutputBands, localPar, this->fastOptimiserSingle, this->parameters, this->minMaxVals[estClass]);
+                }
+            }
+            else
+            {
+                this->fastOptimiserSingle->modifyAPriori(this->initialParSingle);
+                // RUN INVERISION ON ALL PIXELS IN OBJECT
+                if (this->useDefaultMinMax)
+                {
+                    invValues = new RSGISEstimationAlgorithmSingleSpecies(this->numOutputBands, this->initialParSingle, this->fastOptimiserSingle, this->parameters);
+                }
+                else
+                {
+                    invValues = new RSGISEstimationAlgorithmSingleSpecies(this->numOutputBands, this->initialParSingle, this->fastOptimiserSingle, this->parameters, this->minMaxVals[estClass]);
+                }
+            }
 
 			calcImage = new rsgis::img::RSGISCalcImage(invValues, "", true);
 			calcImage->calcImageWithinPolygon(this->datasetsIO, 2, env, poly, rsgis::img::polyContainsPixelCenter);
@@ -815,24 +839,33 @@ namespace rsgis{namespace radar{
 
 			// PARAMETERISE OPIMISER USING VALUES FROM DATA
 			// Update optimser
-			if ( outData[this->numOutputBands - 1] < 0.1 )
-			{
-				this->fastOptimiserSingle->modifyAPriori(localPar);
-			}
-			else
-			{
-				this->fastOptimiserSingle->modifyAPriori(this->initialParSingle);
-			}
+            if ( outData[this->numOutputBands - 1] < 1e-8)
+            {
+                this->fastOptimiserSingle->modifyAPriori(localPar);
+                // RUN INVERISION ON ALL PIXELS IN OBJECT
+                if (this->useDefaultMinMax)
+                {
+                    invValues = new RSGISEstimationAlgorithmSingleSpecies(this->numOutputBands, localPar, this->fastOptimiserSingle, this->parameters);
+                }
+                else
+                {
+                    invValues = new RSGISEstimationAlgorithmSingleSpecies(this->numOutputBands, localPar, this->fastOptimiserSingle, this->parameters, this->minMaxVals[estClass]);
+                }
+            }
+            else
+            {
+                this->fastOptimiserSingle->modifyAPriori(this->initialParSingle);
+                // RUN INVERISION ON ALL PIXELS IN OBJECT
+                if (this->useDefaultMinMax)
+                {
+                    invValues = new RSGISEstimationAlgorithmSingleSpecies(this->numOutputBands, this->initialParSingle, this->fastOptimiserSingle, this->parameters);
+                }
+                else
+                {
+                    invValues = new RSGISEstimationAlgorithmSingleSpecies(this->numOutputBands, this->initialParSingle, this->fastOptimiserSingle, this->parameters, this->minMaxVals[estClass]);
+                }
+            }
 
-			// RUN INVERISION ON ALL PIXELS IN OBJECT
-			if (this->useDefaultMinMax)
-			{
-				invValues = new RSGISEstimationAlgorithmSingleSpecies(this->numOutputBands, localPar, this->fastOptimiserSingle, this->parameters);
-			}
-			else
-			{
-				invValues = new RSGISEstimationAlgorithmSingleSpecies(this->numOutputBands, localPar, this->fastOptimiserSingle, this->parameters, this->minMaxVals[estClass]);
-			}
 
 			calcImage = new rsgis::img::RSGISCalcImage(invValues, "", true);
 			calcImage->calcImageWithinPolygon(this->datasetsIO, 2, env, poly, rsgis::img::polyContainsPixelCenter);
@@ -1132,25 +1165,34 @@ namespace rsgis{namespace radar{
 
             // PARAMETERISE OPIMISER USING VALUES FROM DATA
             // Update optimser if error low enought
-
-            if ( outData[this->numOutputBands - 1] < 0.1 )
+            if ( outData[this->numOutputBands - 1] < 1e-8)
             {
                 this->fastOptimiserSingle->modifyAPriori(localPar);
+                // RUN INVERISION ON ALL PIXELS IN OBJECT
+                if (this->useDefaultMinMax)
+                {
+                    invValues = new RSGISEstimationAlgorithmSingleSpecies(this->numOutputBands, localPar, this->fastOptimiserSingle, this->parameters);
+                }
+                else
+                {
+                    invValues = new RSGISEstimationAlgorithmSingleSpecies(this->numOutputBands, localPar, this->fastOptimiserSingle, this->parameters, this->minMaxVals[estClass]);
+                }
             }
             else
             {
                 this->fastOptimiserSingle->modifyAPriori(this->initialParSingle);
+                // RUN INVERISION ON ALL PIXELS IN OBJECT
+                if (this->useDefaultMinMax)
+                {
+                    invValues = new RSGISEstimationAlgorithmSingleSpecies(this->numOutputBands, this->initialParSingle, this->fastOptimiserSingle, this->parameters);
+                }
+                else
+                {
+                    invValues = new RSGISEstimationAlgorithmSingleSpecies(this->numOutputBands, this->initialParSingle, this->fastOptimiserSingle, this->parameters, this->minMaxVals[estClass]);
+                }
             }
 
-            // RUN INVERISION ON ALL PIXELS IN OBJECT
-            if (this->useDefaultMinMax)
-            {
-                invValues = new RSGISEstimationAlgorithmSingleSpecies(this->numOutputBands, localPar, this->fastOptimiserSingle, this->parameters);
-            }
-            else
-            {
-                invValues = new RSGISEstimationAlgorithmSingleSpecies(this->numOutputBands, localPar, this->fastOptimiserSingle, this->parameters, this->minMaxVals[estClass]);
-            }
+
 
             calcImage = new rsgis::img::RSGISCalcImage(invValues, "", true);
             calcImage->calcImageWithinRasterPolygon(this->datasetsIO, 3, env, fid);
@@ -1280,24 +1322,31 @@ namespace rsgis{namespace radar{
 
             // PARAMETERISE OPIMISER USING VALUES FROM DATA
             // Update optimser if error low enought
-
-            if ( outData[this->numOutputBands - 1] < 0.1 )
+            if ( outData[this->numOutputBands - 1] < 1e-8)
             {
                 this->fastOptimiserSingle->modifyAPriori(localPar);
+                // RUN INVERISION ON ALL PIXELS IN OBJECT
+                if (this->useDefaultMinMax)
+                {
+                    invValues = new RSGISEstimationAlgorithmSingleSpecies(this->numOutputBands, localPar, this->fastOptimiserSingle, this->parameters);
+                }
+                else
+                {
+                    invValues = new RSGISEstimationAlgorithmSingleSpecies(this->numOutputBands, localPar, this->fastOptimiserSingle, this->parameters, this->minMaxVals[estClass]);
+                }
             }
             else
             {
                 this->fastOptimiserSingle->modifyAPriori(this->initialParSingle);
-            }
-
-            // RUN INVERISION ON ALL PIXELS IN OBJECT
-            if (this->useDefaultMinMax)
-            {
-                invValues = new RSGISEstimationAlgorithmSingleSpecies(this->numOutputBands, localPar, this->fastOptimiserSingle, this->parameters);
-            }
-            else
-            {
-                invValues = new RSGISEstimationAlgorithmSingleSpecies(this->numOutputBands, localPar, this->fastOptimiserSingle, this->parameters, this->minMaxVals[estClass]);
+                // RUN INVERISION ON ALL PIXELS IN OBJECT
+                if (this->useDefaultMinMax)
+                {
+                    invValues = new RSGISEstimationAlgorithmSingleSpecies(this->numOutputBands, this->initialParSingle, this->fastOptimiserSingle, this->parameters);
+                }
+                else
+                {
+                    invValues = new RSGISEstimationAlgorithmSingleSpecies(this->numOutputBands, this->initialParSingle, this->fastOptimiserSingle, this->parameters, this->minMaxVals[estClass]);
+                }
             }
 
             calcImage = new rsgis::img::RSGISCalcImage(invValues, "", true);
