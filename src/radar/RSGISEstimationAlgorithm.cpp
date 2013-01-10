@@ -2079,7 +2079,7 @@ namespace rsgis {namespace radar
 					else{output[1] = density;}
 					if (boost::math::isnan(biomass)){output[2] = 0;}
 					else{output[2] = biomass;}
-					if (boost::math::isnan(error)){output[3] = 0;}
+					if (boost::math::isnan(error)){output[3] = 9999;}
 					else{output[3] = error;}
 				}
 				else if(parameters == cDepthDensity)  // Retrieve Canopy Depth and Stem densty
@@ -2124,7 +2124,7 @@ namespace rsgis {namespace radar
 					else{output[1] = density;}
 					if (boost::math::isnan(biomass)){output[2] = 0;}
 					else{output[2] = biomass;}
-					if (boost::math::isnan(error)){output[3] = 0;}
+					if (boost::math::isnan(error)){output[3] = 9999;}
 					else{output[3] = error;}
 
 				}
@@ -2156,7 +2156,7 @@ namespace rsgis {namespace radar
 					else{output[1] = density;}
 					if (boost::math::isnan(dielectric)){output[2] = 0;}
 					else{output[2] = dielectric;}
-					if (boost::math::isnan(error)){output[4] = 0;}
+					if (boost::math::isnan(error)){output[4] = 9999;}
 					else{output[4] = error;}
 					output[3] = 9999;
 				}
