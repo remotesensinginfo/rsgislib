@@ -3064,7 +3064,7 @@ namespace rsgis {namespace radar
 				// Check within limits of equation
 				if ((gsl_vector_get(currentParError, 0) > minMaxIntervalA[0]) && (gsl_vector_get(currentParError, 0) < minMaxIntervalA[1]) && (gsl_vector_get(currentParError, 1) > minMaxIntervalB[0]) && (gsl_vector_get(currentParError, 1) < minMaxIntervalB[1])  && (gsl_vector_get(currentParError, 2) > minMaxIntervalC[0]) && (gsl_vector_get(currentParError, 2) < minMaxIntervalC[1])  && (gsl_vector_get(currentParError, 2) > minMaxIntervalC[0]) && (gsl_vector_get(currentParError, 2) < minMaxIntervalC[1]))
 				{
-                    std::cout << gsl_vector_get(outParError, 3) << std::endl;
+                    //std::cout << gsl_vector_get(outParError, 3) << std::endl;
 					// If new values are better than current best, update
 					gsl_vector_memcpy(outParError, currentParError);
 
