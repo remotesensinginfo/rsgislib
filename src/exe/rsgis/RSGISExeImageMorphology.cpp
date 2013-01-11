@@ -41,948 +41,962 @@ void RSGISExeImageMorphology::retrieveParameters(DOMElement *argElement) throw(R
 	RSGISFileUtils fileUtils;
 	RSGISMathsUtils mathUtils;
     RSGISMatrices matrixUtils;
-    
-    XMLCh *algorName = XMLString::transcode(this->algorithm.c_str());
-	XMLCh *algorXMLStr = XMLString::transcode("algor");
-	XMLCh *optionXMLStr = XMLString::transcode("option");
-	XMLCh *optionDilate = XMLString::transcode("dilate");
-	XMLCh *optionErode = XMLString::transcode("erode");
-    XMLCh *optionGradient = XMLString::transcode("gradient");
-    XMLCh *optionDilateAll = XMLString::transcode("dilateall");
-	XMLCh *optionErodeAll = XMLString::transcode("erodeall");
-    XMLCh *optionGradientAll = XMLString::transcode("gradientall");
-    XMLCh *optionLocalMinima = XMLString::transcode("localminima");
-    XMLCh *optionLocalMinimaAll = XMLString::transcode("localminimaall");
-    XMLCh *optionClosing = XMLString::transcode("closing");
-    XMLCh *optionOpening = XMLString::transcode("opening");
-    XMLCh *optionWhiteTopHat = XMLString::transcode("whitetophat");
-    XMLCh *optionBlackTopHat = XMLString::transcode("blacktophat");
-    
-    const XMLCh *algorNameEle = argElement->getAttribute(algorXMLStr);
-	if(!XMLString::equals(algorName, algorNameEle))
-	{
-		throw RSGISXMLArgumentsException("The algorithm name is incorrect.");
-	}
-	
-	const XMLCh *optionXML = argElement->getAttribute(optionXMLStr);
-	if(XMLString::equals(optionDilate, optionXML))
-	{		
-		this->option = RSGISExeImageMorphology::dilate;
-		
-		XMLCh *imageXMLStr = XMLString::transcode("image");
-		if(argElement->hasAttribute(imageXMLStr))
-		{
-			char *charValue = XMLString::transcode(argElement->getAttribute(imageXMLStr));
-			this->inputImage = string(charValue);
-			XMLString::release(&charValue);
-		}
-		else
-		{
-			throw RSGISXMLArgumentsException("No \'image\' attribute was provided.");
-		}
-		XMLString::release(&imageXMLStr);
-		
-		XMLCh *outputXMLStr = XMLString::transcode("output");
-		if(argElement->hasAttribute(outputXMLStr))
-		{
-			char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
-			this->outputImage = string(charValue);
-			XMLString::release(&charValue);
-		}
-		else
-		{
-			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
-		}
-		XMLString::release(&outputXMLStr);
-        
-        XMLCh *operatorXMLStr = XMLString::transcode("operator");
-		if(argElement->hasAttribute(operatorXMLStr))
-		{
-			char *charValue = XMLString::transcode(argElement->getAttribute(operatorXMLStr));
-            this->matrixOperator = matrixUtils.readMatrixFromGridTxt(string(charValue));
-			XMLString::release(&charValue);
-		}
-        else
-        {
-            XMLCh *elementSizeXMLStr = XMLString::transcode("elementsize");
-            if(argElement->hasAttribute(elementSizeXMLStr))
-            {
-                char *charValue = XMLString::transcode(argElement->getAttribute(elementSizeXMLStr));
-                unsigned int size = mathUtils.strtounsignedint(string(charValue));
-                this->matrixOperator = matrixUtils.createMatrix(size, size);
-                matrixUtils.setValues(this->matrixOperator, 1);
-                XMLString::release(&charValue);
-            }
-            else
-            {
-                cout << "WARNING: Neither elementsize or operator were defined to defaulting to 3x3 square operator.\n";
-                this->matrixOperator = matrixUtils.createMatrix(3, 3);
-                matrixUtils.setValues(this->matrixOperator, 1);
-            }
-            XMLString::release(&elementSizeXMLStr);
-        }
-		XMLString::release(&operatorXMLStr);
-    }
-    else if(XMLString::equals(optionErode, optionXML))
-	{		
-		this->option = RSGISExeImageMorphology::erode;
-		
-		XMLCh *imageXMLStr = XMLString::transcode("image");
-		if(argElement->hasAttribute(imageXMLStr))
-		{
-			char *charValue = XMLString::transcode(argElement->getAttribute(imageXMLStr));
-			this->inputImage = string(charValue);
-			XMLString::release(&charValue);
-		}
-		else
-		{
-			throw RSGISXMLArgumentsException("No \'image\' attribute was provided.");
-		}
-		XMLString::release(&imageXMLStr);
-		
-		XMLCh *outputXMLStr = XMLString::transcode("output");
-		if(argElement->hasAttribute(outputXMLStr))
-		{
-			char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
-			this->outputImage = string(charValue);
-			XMLString::release(&charValue);
-		}
-		else
-		{
-			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
-		}
-		XMLString::release(&outputXMLStr);
-        
-        XMLCh *operatorXMLStr = XMLString::transcode("operator");
-		if(argElement->hasAttribute(operatorXMLStr))
-		{
-			char *charValue = XMLString::transcode(argElement->getAttribute(operatorXMLStr));
-            this->matrixOperator = matrixUtils.readMatrixFromGridTxt(string(charValue));
-			XMLString::release(&charValue);
-		}
-        else
-        {
-            XMLCh *elementSizeXMLStr = XMLString::transcode("elementsize");
-            if(argElement->hasAttribute(elementSizeXMLStr))
-            {
-                char *charValue = XMLString::transcode(argElement->getAttribute(elementSizeXMLStr));
-                unsigned int size = mathUtils.strtounsignedint(string(charValue));
-                this->matrixOperator = matrixUtils.createMatrix(size, size);
-                matrixUtils.setValues(this->matrixOperator, 1);
-                XMLString::release(&charValue);
-            }
-            else
-            {
-                cout << "WARNING: Neither elementsize or operator were defined to defaulting to 3x3 square operator.\n";
-                this->matrixOperator = matrixUtils.createMatrix(3, 3);
-                matrixUtils.setValues(this->matrixOperator, 1);
-            }
-            XMLString::release(&elementSizeXMLStr);
-        }
-		XMLString::release(&operatorXMLStr);
-    }
-    else if(XMLString::equals(optionGradient, optionXML))
-	{		
-		this->option = RSGISExeImageMorphology::gradient;
-		
-		XMLCh *imageXMLStr = XMLString::transcode("image");
-		if(argElement->hasAttribute(imageXMLStr))
-		{
-			char *charValue = XMLString::transcode(argElement->getAttribute(imageXMLStr));
-			this->inputImage = string(charValue);
-			XMLString::release(&charValue);
-		}
-		else
-		{
-			throw RSGISXMLArgumentsException("No \'image\' attribute was provided.");
-		}
-		XMLString::release(&imageXMLStr);
-		
-		XMLCh *outputXMLStr = XMLString::transcode("output");
-		if(argElement->hasAttribute(outputXMLStr))
-		{
-			char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
-			this->outputImage = string(charValue);
-			XMLString::release(&charValue);
-		}
-		else
-		{
-			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
-		}
-		XMLString::release(&outputXMLStr);
-        
-        XMLCh *operatorXMLStr = XMLString::transcode("operator");
-		if(argElement->hasAttribute(operatorXMLStr))
-		{
-			char *charValue = XMLString::transcode(argElement->getAttribute(operatorXMLStr));
-            this->matrixOperator = matrixUtils.readMatrixFromGridTxt(string(charValue));
-			XMLString::release(&charValue);
-		}
-        else
-        {
-            XMLCh *elementSizeXMLStr = XMLString::transcode("elementsize");
-            if(argElement->hasAttribute(elementSizeXMLStr))
-            {
-                char *charValue = XMLString::transcode(argElement->getAttribute(elementSizeXMLStr));
-                unsigned int size = mathUtils.strtounsignedint(string(charValue));
-                this->matrixOperator = matrixUtils.createMatrix(size, size);
-                matrixUtils.setValues(this->matrixOperator, 1);
-                XMLString::release(&charValue);
-            }
-            else
-            {
-                cout << "WARNING: Neither elementsize or operator were defined to defaulting to 3x3 square operator.\n";
-                this->matrixOperator = matrixUtils.createMatrix(3, 3);
-                matrixUtils.setValues(this->matrixOperator, 1);
-            }
-            XMLString::release(&elementSizeXMLStr);
-        }
-		XMLString::release(&operatorXMLStr);
-    }
-    else if(XMLString::equals(optionDilateAll, optionXML))
-	{		
-		this->option = RSGISExeImageMorphology::dilateall;
-		
-		XMLCh *imageXMLStr = XMLString::transcode("image");
-		if(argElement->hasAttribute(imageXMLStr))
-		{
-			char *charValue = XMLString::transcode(argElement->getAttribute(imageXMLStr));
-			this->inputImage = string(charValue);
-			XMLString::release(&charValue);
-		}
-		else
-		{
-			throw RSGISXMLArgumentsException("No \'image\' attribute was provided.");
-		}
-		XMLString::release(&imageXMLStr);
-		
-		XMLCh *outputXMLStr = XMLString::transcode("output");
-		if(argElement->hasAttribute(outputXMLStr))
-		{
-			char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
-			this->outputImage = string(charValue);
-			XMLString::release(&charValue);
-		}
-		else
-		{
-			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
-		}
-		XMLString::release(&outputXMLStr);
-        
-        XMLCh *operatorXMLStr = XMLString::transcode("operator");
-		if(argElement->hasAttribute(operatorXMLStr))
-		{
-			char *charValue = XMLString::transcode(argElement->getAttribute(operatorXMLStr));
-            this->matrixOperator = matrixUtils.readMatrixFromGridTxt(string(charValue));
-			XMLString::release(&charValue);
-		}
-        else
-        {
-            XMLCh *elementSizeXMLStr = XMLString::transcode("elementsize");
-            if(argElement->hasAttribute(elementSizeXMLStr))
-            {
-                char *charValue = XMLString::transcode(argElement->getAttribute(elementSizeXMLStr));
-                unsigned int size = mathUtils.strtounsignedint(string(charValue));
-                this->matrixOperator = matrixUtils.createMatrix(size, size);
-                matrixUtils.setValues(this->matrixOperator, 1);
-                XMLString::release(&charValue);
-            }
-            else
-            {
-                cout << "WARNING: Neither elementsize or operator were defined to defaulting to 3x3 square operator.\n";
-                this->matrixOperator = matrixUtils.createMatrix(3, 3);
-                matrixUtils.setValues(this->matrixOperator, 1);
-            }
-            XMLString::release(&elementSizeXMLStr);
-        }
-		XMLString::release(&operatorXMLStr);
-    }
-    else if(XMLString::equals(optionErodeAll, optionXML))
-	{		
-		this->option = RSGISExeImageMorphology::erodeall;
-		
-		XMLCh *imageXMLStr = XMLString::transcode("image");
-		if(argElement->hasAttribute(imageXMLStr))
-		{
-			char *charValue = XMLString::transcode(argElement->getAttribute(imageXMLStr));
-			this->inputImage = string(charValue);
-			XMLString::release(&charValue);
-		}
-		else
-		{
-			throw RSGISXMLArgumentsException("No \'image\' attribute was provided.");
-		}
-		XMLString::release(&imageXMLStr);
-		
-		XMLCh *outputXMLStr = XMLString::transcode("output");
-		if(argElement->hasAttribute(outputXMLStr))
-		{
-			char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
-			this->outputImage = string(charValue);
-			XMLString::release(&charValue);
-		}
-		else
-		{
-			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
-		}
-		XMLString::release(&outputXMLStr);
-        
-        XMLCh *operatorXMLStr = XMLString::transcode("operator");
-		if(argElement->hasAttribute(operatorXMLStr))
-		{
-			char *charValue = XMLString::transcode(argElement->getAttribute(operatorXMLStr));
-            this->matrixOperator = matrixUtils.readMatrixFromGridTxt(string(charValue));
-			XMLString::release(&charValue);
-		}
-        else
-        {
-            XMLCh *elementSizeXMLStr = XMLString::transcode("elementsize");
-            if(argElement->hasAttribute(elementSizeXMLStr))
-            {
-                char *charValue = XMLString::transcode(argElement->getAttribute(elementSizeXMLStr));
-                unsigned int size = mathUtils.strtounsignedint(string(charValue));
-                this->matrixOperator = matrixUtils.createMatrix(size, size);
-                matrixUtils.setValues(this->matrixOperator, 1);
-                XMLString::release(&charValue);
-            }
-            else
-            {
-                cout << "WARNING: Neither elementsize or operator were defined to defaulting to 3x3 square operator.\n";
-                this->matrixOperator = matrixUtils.createMatrix(3, 3);
-                matrixUtils.setValues(this->matrixOperator, 1);
-            }
-            XMLString::release(&elementSizeXMLStr);
-        }
-		XMLString::release(&operatorXMLStr);
-    }
-    else if(XMLString::equals(optionGradientAll, optionXML))
-	{		
-		this->option = RSGISExeImageMorphology::gradientall;
-		
-		XMLCh *imageXMLStr = XMLString::transcode("image");
-		if(argElement->hasAttribute(imageXMLStr))
-		{
-			char *charValue = XMLString::transcode(argElement->getAttribute(imageXMLStr));
-			this->inputImage = string(charValue);
-			XMLString::release(&charValue);
-		}
-		else
-		{
-			throw RSGISXMLArgumentsException("No \'image\' attribute was provided.");
-		}
-		XMLString::release(&imageXMLStr);
-		
-		XMLCh *outputXMLStr = XMLString::transcode("output");
-		if(argElement->hasAttribute(outputXMLStr))
-		{
-			char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
-			this->outputImage = string(charValue);
-			XMLString::release(&charValue);
-		}
-		else
-		{
-			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
-		}
-		XMLString::release(&outputXMLStr);
-        
-        XMLCh *operatorXMLStr = XMLString::transcode("operator");
-		if(argElement->hasAttribute(operatorXMLStr))
-		{
-			char *charValue = XMLString::transcode(argElement->getAttribute(operatorXMLStr));
-            this->matrixOperator = matrixUtils.readMatrixFromGridTxt(string(charValue));
-			XMLString::release(&charValue);
-		}
-        else
-        {
-            XMLCh *elementSizeXMLStr = XMLString::transcode("elementsize");
-            if(argElement->hasAttribute(elementSizeXMLStr))
-            {
-                char *charValue = XMLString::transcode(argElement->getAttribute(elementSizeXMLStr));
-                unsigned int size = mathUtils.strtounsignedint(string(charValue));
-                this->matrixOperator = matrixUtils.createMatrix(size, size);
-                matrixUtils.setValues(this->matrixOperator, 1);
-                XMLString::release(&charValue);
-            }
-            else
-            {
-                cout << "WARNING: Neither elementsize or operator were defined to defaulting to 3x3 square operator.\n";
-                this->matrixOperator = matrixUtils.createMatrix(3, 3);
-                matrixUtils.setValues(this->matrixOperator, 1);
-            }
-            XMLString::release(&elementSizeXMLStr);
-        }
-		XMLString::release(&operatorXMLStr);
-    }
-    else if(XMLString::equals(optionLocalMinima, optionXML))
-	{		
-		this->option = RSGISExeImageMorphology::localminima;
-		
-		XMLCh *imageXMLStr = XMLString::transcode("image");
-		if(argElement->hasAttribute(imageXMLStr))
-		{
-			char *charValue = XMLString::transcode(argElement->getAttribute(imageXMLStr));
-			this->inputImage = string(charValue);
-			XMLString::release(&charValue);
-		}
-		else
-		{
-			throw RSGISXMLArgumentsException("No \'image\' attribute was provided.");
-		}
-		XMLString::release(&imageXMLStr);
-		
-		XMLCh *outputXMLStr = XMLString::transcode("output");
-		if(argElement->hasAttribute(outputXMLStr))
-		{
-			char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
-			this->outputImage = string(charValue);
-			XMLString::release(&charValue);
-		}
-		else
-		{
-			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
-		}
-		XMLString::release(&outputXMLStr);
-        
-        XMLCh *operatorXMLStr = XMLString::transcode("operator");
-		if(argElement->hasAttribute(operatorXMLStr))
-		{
-			char *charValue = XMLString::transcode(argElement->getAttribute(operatorXMLStr));
-            this->matrixOperator = matrixUtils.readMatrixFromGridTxt(string(charValue));
-			XMLString::release(&charValue);
-		}
-        else
-        {
-            XMLCh *elementSizeXMLStr = XMLString::transcode("elementsize");
-            if(argElement->hasAttribute(elementSizeXMLStr))
-            {
-                char *charValue = XMLString::transcode(argElement->getAttribute(elementSizeXMLStr));
-                unsigned int size = mathUtils.strtounsignedint(string(charValue));
-                this->matrixOperator = matrixUtils.createMatrix(size, size);
-                matrixUtils.setValues(this->matrixOperator, 1);
-                XMLString::release(&charValue);
-            }
-            else
-            {
-                cout << "WARNING: Neither elementsize or operator were defined to defaulting to 3x3 square operator.\n";
-                this->matrixOperator = matrixUtils.createMatrix(3, 3);
-                matrixUtils.setValues(this->matrixOperator, 1);
-            }
-            XMLString::release(&elementSizeXMLStr);
-        }
-		XMLString::release(&operatorXMLStr);
-        
-        
-        XMLCh *allowEqualsXMLStr = XMLString::transcode("allowequals");
-		if(argElement->hasAttribute(allowEqualsXMLStr))
-		{
-			XMLCh *yesStr = XMLString::transcode("yes");
-			const XMLCh *allowValue = argElement->getAttribute(allowEqualsXMLStr);
-			
-			if(XMLString::equals(allowValue, yesStr))
-			{
-				this->allowEquals = true;
-			}
-			else
-			{
-				this->allowEquals = false;
-			}
-			XMLString::release(&yesStr);
-		}
-		else
-		{
-            cout << "WARNING. Using default, equal values not allowed.\n";
-			this->allowEquals = false;
-		}
-		XMLString::release(&allowEqualsXMLStr);
-        
-        
-        XMLCh *numberingXMLStr = XMLString::transcode("numbering");
-		if(argElement->hasAttribute(numberingXMLStr))
-		{
-			XMLCh *binaryStr = XMLString::transcode("binary");
-            XMLCh *sequentialStr = XMLString::transcode("sequential");
-			const XMLCh *numberingValue = argElement->getAttribute(numberingXMLStr);
-			
-			if(XMLString::equals(numberingValue, binaryStr))
-			{
-				this->minOutType = RSGISImageMorphologyFindExtrema::binary;
-			}
-            else if(XMLString::equals(numberingValue, sequentialStr))
-			{
-				this->minOutType = RSGISImageMorphologyFindExtrema::sequential;
-			}
-			else
-			{
-				throw RSGISXMLArgumentsException("Numbering output unknown (binary | sequential).");
-			}
-			XMLString::release(&binaryStr);
-            XMLString::release(&sequentialStr);
-		}
-		else
-		{
-            cout << "WARNING. Using default, generating a binary output.\n";
-			this->minOutType = RSGISImageMorphologyFindExtrema::binary;
-		}
-		XMLString::release(&numberingXMLStr);
-        
-        
-    }
-    else if(XMLString::equals(optionLocalMinimaAll, optionXML))
-	{		
-		this->option = RSGISExeImageMorphology::localminimaall;
-		
-		XMLCh *imageXMLStr = XMLString::transcode("image");
-		if(argElement->hasAttribute(imageXMLStr))
-		{
-			char *charValue = XMLString::transcode(argElement->getAttribute(imageXMLStr));
-			this->inputImage = string(charValue);
-			XMLString::release(&charValue);
-		}
-		else
-		{
-			throw RSGISXMLArgumentsException("No \'image\' attribute was provided.");
-		}
-		XMLString::release(&imageXMLStr);
-		
-		XMLCh *outputXMLStr = XMLString::transcode("output");
-		if(argElement->hasAttribute(outputXMLStr))
-		{
-			char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
-			this->outputImage = string(charValue);
-			XMLString::release(&charValue);
-		}
-		else
-		{
-			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
-		}
-		XMLString::release(&outputXMLStr);
-        
-        XMLCh *operatorXMLStr = XMLString::transcode("operator");
-		if(argElement->hasAttribute(operatorXMLStr))
-		{
-			char *charValue = XMLString::transcode(argElement->getAttribute(operatorXMLStr));
-            this->matrixOperator = matrixUtils.readMatrixFromGridTxt(string(charValue));
-			XMLString::release(&charValue);
-		}
-        else
-        {
-            XMLCh *elementSizeXMLStr = XMLString::transcode("elementsize");
-            if(argElement->hasAttribute(elementSizeXMLStr))
-            {
-                char *charValue = XMLString::transcode(argElement->getAttribute(elementSizeXMLStr));
-                unsigned int size = mathUtils.strtounsignedint(string(charValue));
-                this->matrixOperator = matrixUtils.createMatrix(size, size);
-                matrixUtils.setValues(this->matrixOperator, 1);
-                XMLString::release(&charValue);
-            }
-            else
-            {
-                cout << "WARNING: Neither elementsize or operator were defined to defaulting to 3x3 square operator.\n";
-                this->matrixOperator = matrixUtils.createMatrix(3, 3);
-                matrixUtils.setValues(this->matrixOperator, 1);
-            }
-            XMLString::release(&elementSizeXMLStr);
-        }
-		XMLString::release(&operatorXMLStr);
-        
-        XMLCh *allowEqualsXMLStr = XMLString::transcode("allowequals");
-		if(argElement->hasAttribute(allowEqualsXMLStr))
-		{
-			XMLCh *yesStr = XMLString::transcode("yes");
-			const XMLCh *allowValue = argElement->getAttribute(allowEqualsXMLStr);
-			
-			if(XMLString::equals(allowValue, yesStr))
-			{
-				this->allowEquals = true;
-			}
-			else
-			{
-				this->allowEquals = false;
-			}
-			XMLString::release(&yesStr);
-		}
-		else
-		{
-            cout << "WARNING. Using default, equal values not allowed.\n";
-			this->allowEquals = false;
-		}
-		XMLString::release(&allowEqualsXMLStr);
-        
-        
-        XMLCh *numberingXMLStr = XMLString::transcode("numbering");
-		if(argElement->hasAttribute(numberingXMLStr))
-		{
-			XMLCh *binaryStr = XMLString::transcode("binary");
-            XMLCh *sequentialStr = XMLString::transcode("sequential");
-			const XMLCh *numberingValue = argElement->getAttribute(numberingXMLStr);
-			
-			if(XMLString::equals(numberingValue, binaryStr))
-			{
-				this->minOutType = RSGISImageMorphologyFindExtrema::binary;
-			}
-            else if(XMLString::equals(numberingValue, sequentialStr))
-			{
-				this->minOutType = RSGISImageMorphologyFindExtrema::sequential;
-			}
-			else
-			{
-				throw RSGISXMLArgumentsException("Numbering output unknown (binary | sequential).");
-			}
-			XMLString::release(&binaryStr);
-            XMLString::release(&sequentialStr);
-		}
-		else
-		{
-            cout << "WARNING. Using default, generating a binary output.\n";
-			this->minOutType = RSGISImageMorphologyFindExtrema::binary;
-		}
-		XMLString::release(&numberingXMLStr);
-    }
-    else if(XMLString::equals(optionClosing, optionXML))
-	{		
-		this->option = RSGISExeImageMorphology::closing;
-		
-		XMLCh *imageXMLStr = XMLString::transcode("image");
-		if(argElement->hasAttribute(imageXMLStr))
-		{
-			char *charValue = XMLString::transcode(argElement->getAttribute(imageXMLStr));
-			this->inputImage = string(charValue);
-			XMLString::release(&charValue);
-		}
-		else
-		{
-			throw RSGISXMLArgumentsException("No \'image\' attribute was provided.");
-		}
-		XMLString::release(&imageXMLStr);
-		
-		XMLCh *outputXMLStr = XMLString::transcode("output");
-		if(argElement->hasAttribute(outputXMLStr))
-		{
-			char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
-			this->outputImage = string(charValue);
-			XMLString::release(&charValue);
-		}
-		else
-		{
-			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
-		}
-		XMLString::release(&outputXMLStr);
-        
-        XMLCh *tempImgXMLStr = XMLString::transcode("temp");
-		if(argElement->hasAttribute(tempImgXMLStr))
-		{
-			char *charValue = XMLString::transcode(argElement->getAttribute(tempImgXMLStr));
-			this->tempImage = string(charValue);
-			XMLString::release(&charValue);
-            this->useMemory = false;
-		}
-		else
-		{
-            cout << "Using memory for processing\n";
-            this->tempImage = "";
-			this->useMemory = true;
-		}
-		XMLString::release(&tempImgXMLStr);
-        
-        XMLCh *iterationsXMLStr = XMLString::transcode("iterations");
-        if(argElement->hasAttribute(iterationsXMLStr))
-        {
-            char *charValue = XMLString::transcode(argElement->getAttribute(iterationsXMLStr));
-            this->numIterations = mathUtils.strtounsignedint(string(charValue));
-            XMLString::release(&charValue);
-        }
-        else
-        {
-            cout << "The number of iterations was not specified, default is 1\n";
-            this->numIterations = 1;
-        }
-        XMLString::release(&iterationsXMLStr);
-        
-        XMLCh *operatorXMLStr = XMLString::transcode("operator");
-		if(argElement->hasAttribute(operatorXMLStr))
-		{
-			char *charValue = XMLString::transcode(argElement->getAttribute(operatorXMLStr));
-            this->matrixOperator = matrixUtils.readMatrixFromGridTxt(string(charValue));
-			XMLString::release(&charValue);
-		}
-        else
-        {
-            XMLCh *elementSizeXMLStr = XMLString::transcode("elementsize");
-            if(argElement->hasAttribute(elementSizeXMLStr))
-            {
-                char *charValue = XMLString::transcode(argElement->getAttribute(elementSizeXMLStr));
-                unsigned int size = mathUtils.strtounsignedint(string(charValue));
-                this->matrixOperator = matrixUtils.createMatrix(size, size);
-                matrixUtils.setValues(this->matrixOperator, 1);
-                XMLString::release(&charValue);
-            }
-            else
-            {
-                cout << "WARNING: Neither elementsize or operator were defined to defaulting to 3x3 square operator.\n";
-                this->matrixOperator = matrixUtils.createMatrix(3, 3);
-                matrixUtils.setValues(this->matrixOperator, 1);
-            }
-            XMLString::release(&elementSizeXMLStr);
-        }
-		XMLString::release(&operatorXMLStr);
-    }
-    else if(XMLString::equals(optionOpening, optionXML))
-	{		
-		this->option = RSGISExeImageMorphology::opening;
-		
-		XMLCh *imageXMLStr = XMLString::transcode("image");
-		if(argElement->hasAttribute(imageXMLStr))
-		{
-			char *charValue = XMLString::transcode(argElement->getAttribute(imageXMLStr));
-			this->inputImage = string(charValue);
-			XMLString::release(&charValue);
-		}
-		else
-		{
-			throw RSGISXMLArgumentsException("No \'image\' attribute was provided.");
-		}
-		XMLString::release(&imageXMLStr);
-		
-		XMLCh *outputXMLStr = XMLString::transcode("output");
-		if(argElement->hasAttribute(outputXMLStr))
-		{
-			char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
-			this->outputImage = string(charValue);
-			XMLString::release(&charValue);
-		}
-		else
-		{
-			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
-		}
-		XMLString::release(&outputXMLStr);
-        
-        XMLCh *tempImgXMLStr = XMLString::transcode("temp");
-		if(argElement->hasAttribute(tempImgXMLStr))
-		{
-			char *charValue = XMLString::transcode(argElement->getAttribute(tempImgXMLStr));
-			this->tempImage = string(charValue);
-			XMLString::release(&charValue);
-            this->useMemory = false;
-		}
-		else
-		{
-            cout << "Using memory for processing\n";
-            this->tempImage = "";
-			this->useMemory = true;
-		}
-		XMLString::release(&tempImgXMLStr);
-        
-        XMLCh *iterationsXMLStr = XMLString::transcode("iterations");
-        if(argElement->hasAttribute(iterationsXMLStr))
-        {
-            char *charValue = XMLString::transcode(argElement->getAttribute(iterationsXMLStr));
-            this->numIterations = mathUtils.strtounsignedint(string(charValue));
-            XMLString::release(&charValue);
-        }
-        else
-        {
-            cout << "The number of iterations was not specified, default is 1\n";
-            this->numIterations = 1;
-        }
-        XMLString::release(&iterationsXMLStr);
-        
-        XMLCh *operatorXMLStr = XMLString::transcode("operator");
-		if(argElement->hasAttribute(operatorXMLStr))
-		{
-			char *charValue = XMLString::transcode(argElement->getAttribute(operatorXMLStr));
-            this->matrixOperator = matrixUtils.readMatrixFromGridTxt(string(charValue));
-			XMLString::release(&charValue);
-		}
-        else
-        {
-            XMLCh *elementSizeXMLStr = XMLString::transcode("elementsize");
-            if(argElement->hasAttribute(elementSizeXMLStr))
-            {
-                char *charValue = XMLString::transcode(argElement->getAttribute(elementSizeXMLStr));
-                unsigned int size = mathUtils.strtounsignedint(string(charValue));
-                this->matrixOperator = matrixUtils.createMatrix(size, size);
-                matrixUtils.setValues(this->matrixOperator, 1);
-                XMLString::release(&charValue);
-            }
-            else
-            {
-                cout << "WARNING: Neither elementsize or operator were defined to defaulting to 3x3 square operator.\n";
-                this->matrixOperator = matrixUtils.createMatrix(3, 3);
-                matrixUtils.setValues(this->matrixOperator, 1);
-            }
-            XMLString::release(&elementSizeXMLStr);
-        }
-		XMLString::release(&operatorXMLStr);
-    }
-    else if(XMLString::equals(optionBlackTopHat, optionXML))
-	{		
-		this->option = RSGISExeImageMorphology::blacktophat;
-		
-		XMLCh *imageXMLStr = XMLString::transcode("image");
-		if(argElement->hasAttribute(imageXMLStr))
-		{
-			char *charValue = XMLString::transcode(argElement->getAttribute(imageXMLStr));
-			this->inputImage = string(charValue);
-			XMLString::release(&charValue);
-		}
-		else
-		{
-			throw RSGISXMLArgumentsException("No \'image\' attribute was provided.");
-		}
-		XMLString::release(&imageXMLStr);
-		
-		XMLCh *outputXMLStr = XMLString::transcode("output");
-		if(argElement->hasAttribute(outputXMLStr))
-		{
-			char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
-			this->outputImage = string(charValue);
-			XMLString::release(&charValue);
-		}
-		else
-		{
-			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
-		}
-		XMLString::release(&outputXMLStr);
-        
-        XMLCh *tempImgXMLStr = XMLString::transcode("temp");
-		if(argElement->hasAttribute(tempImgXMLStr))
-		{
-			char *charValue = XMLString::transcode(argElement->getAttribute(tempImgXMLStr));
-			this->tempImage = string(charValue);
-			XMLString::release(&charValue);
-            this->useMemory = false;
-		}
-		else
-		{
-            cout << "Using memory for processing\n";
-            this->tempImage = "";
-			this->useMemory = true;
-		}
-		XMLString::release(&tempImgXMLStr);
-        
-        XMLCh *operatorXMLStr = XMLString::transcode("operator");
-		if(argElement->hasAttribute(operatorXMLStr))
-		{
-			char *charValue = XMLString::transcode(argElement->getAttribute(operatorXMLStr));
-            this->matrixOperator = matrixUtils.readMatrixFromGridTxt(string(charValue));
-			XMLString::release(&charValue);
-		}
-        else
-        {
-            XMLCh *elementSizeXMLStr = XMLString::transcode("elementsize");
-            if(argElement->hasAttribute(elementSizeXMLStr))
-            {
-                char *charValue = XMLString::transcode(argElement->getAttribute(elementSizeXMLStr));
-                unsigned int size = mathUtils.strtounsignedint(string(charValue));
-                this->matrixOperator = matrixUtils.createMatrix(size, size);
-                matrixUtils.setValues(this->matrixOperator, 1);
-                XMLString::release(&charValue);
-            }
-            else
-            {
-                cout << "WARNING: Neither elementsize or operator were defined to defaulting to 3x3 square operator.\n";
-                this->matrixOperator = matrixUtils.createMatrix(3, 3);
-                matrixUtils.setValues(this->matrixOperator, 1);
-            }
-            XMLString::release(&elementSizeXMLStr);
-        }
-		XMLString::release(&operatorXMLStr);
-    }
-    else if(XMLString::equals(optionWhiteTopHat, optionXML))
-	{		
-		this->option = RSGISExeImageMorphology::whitetophat;
-		
-		XMLCh *imageXMLStr = XMLString::transcode("image");
-		if(argElement->hasAttribute(imageXMLStr))
-		{
-			char *charValue = XMLString::transcode(argElement->getAttribute(imageXMLStr));
-			this->inputImage = string(charValue);
-			XMLString::release(&charValue);
-		}
-		else
-		{
-			throw RSGISXMLArgumentsException("No \'image\' attribute was provided.");
-		}
-		XMLString::release(&imageXMLStr);
-		
-		XMLCh *outputXMLStr = XMLString::transcode("output");
-		if(argElement->hasAttribute(outputXMLStr))
-		{
-			char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
-			this->outputImage = string(charValue);
-			XMLString::release(&charValue);
-		}
-		else
-		{
-			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
-		}
-		XMLString::release(&outputXMLStr);
-        
-        XMLCh *tempImgXMLStr = XMLString::transcode("temp");
-		if(argElement->hasAttribute(tempImgXMLStr))
-		{
-			char *charValue = XMLString::transcode(argElement->getAttribute(tempImgXMLStr));
-			this->tempImage = string(charValue);
-			XMLString::release(&charValue);
-            this->useMemory = false;
-		}
-		else
-		{
-            cout << "Using memory for processing\n";
-            this->tempImage = "";
-			this->useMemory = true;
-		}
-		XMLString::release(&tempImgXMLStr);
-        
-        XMLCh *operatorXMLStr = XMLString::transcode("operator");
-		if(argElement->hasAttribute(operatorXMLStr))
-		{
-			char *charValue = XMLString::transcode(argElement->getAttribute(operatorXMLStr));
-            this->matrixOperator = matrixUtils.readMatrixFromGridTxt(string(charValue));
-			XMLString::release(&charValue);
-		}
-        else
-        {
-            XMLCh *elementSizeXMLStr = XMLString::transcode("elementsize");
-            if(argElement->hasAttribute(elementSizeXMLStr))
-            {
-                char *charValue = XMLString::transcode(argElement->getAttribute(elementSizeXMLStr));
-                unsigned int size = mathUtils.strtounsignedint(string(charValue));
-                this->matrixOperator = matrixUtils.createMatrix(size, size);
-                matrixUtils.setValues(this->matrixOperator, 1);
-                XMLString::release(&charValue);
-            }
-            else
-            {
-                cout << "WARNING: Neither elementsize or operator were defined to defaulting to 3x3 square operator.\n";
-                this->matrixOperator = matrixUtils.createMatrix(3, 3);
-                matrixUtils.setValues(this->matrixOperator, 1);
-            }
-            XMLString::release(&elementSizeXMLStr);
-        }
-		XMLString::release(&operatorXMLStr);
-    }
-    else
+    try
     {
-        string message = string("The option (") + string(XMLString::transcode(optionXML)) + string(") is not known: RSGISExeImageMorphology.");
-		throw RSGISXMLArgumentsException(message.c_str());
+        XMLCh *algorName = XMLString::transcode(this->algorithm.c_str());
+        XMLCh *algorXMLStr = XMLString::transcode("algor");
+        XMLCh *optionXMLStr = XMLString::transcode("option");
+        XMLCh *optionDilate = XMLString::transcode("dilate");
+        XMLCh *optionErode = XMLString::transcode("erode");
+        XMLCh *optionGradient = XMLString::transcode("gradient");
+        XMLCh *optionDilateAll = XMLString::transcode("dilateall");
+        XMLCh *optionErodeAll = XMLString::transcode("erodeall");
+        XMLCh *optionGradientAll = XMLString::transcode("gradientall");
+        XMLCh *optionLocalMinima = XMLString::transcode("localminima");
+        XMLCh *optionLocalMinimaAll = XMLString::transcode("localminimaall");
+        XMLCh *optionClosing = XMLString::transcode("closing");
+        XMLCh *optionOpening = XMLString::transcode("opening");
+        XMLCh *optionWhiteTopHat = XMLString::transcode("whitetophat");
+        XMLCh *optionBlackTopHat = XMLString::transcode("blacktophat");
+        
+        const XMLCh *algorNameEle = argElement->getAttribute(algorXMLStr);
+        if(!XMLString::equals(algorName, algorNameEle))
+        {
+            throw RSGISXMLArgumentsException("The algorithm name is incorrect.");
+        }
+        
+        const XMLCh *optionXML = argElement->getAttribute(optionXMLStr);
+        if(XMLString::equals(optionDilate, optionXML))
+        {		
+            this->option = RSGISExeImageMorphology::dilate;
+            
+            XMLCh *imageXMLStr = XMLString::transcode("image");
+            if(argElement->hasAttribute(imageXMLStr))
+            {
+                char *charValue = XMLString::transcode(argElement->getAttribute(imageXMLStr));
+                this->inputImage = string(charValue);
+                XMLString::release(&charValue);
+            }
+            else
+            {
+                throw RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+            }
+            XMLString::release(&imageXMLStr);
+            
+            XMLCh *outputXMLStr = XMLString::transcode("output");
+            if(argElement->hasAttribute(outputXMLStr))
+            {
+                char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
+                this->outputImage = string(charValue);
+                XMLString::release(&charValue);
+            }
+            else
+            {
+                throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+            }
+            XMLString::release(&outputXMLStr);
+            
+            XMLCh *operatorXMLStr = XMLString::transcode("operator");
+            if(argElement->hasAttribute(operatorXMLStr))
+            {
+                char *charValue = XMLString::transcode(argElement->getAttribute(operatorXMLStr));
+                this->matrixOperator = matrixUtils.readMatrixFromGridTxt(string(charValue));
+                XMLString::release(&charValue);
+            }
+            else
+            {
+                XMLCh *elementSizeXMLStr = XMLString::transcode("elementsize");
+                if(argElement->hasAttribute(elementSizeXMLStr))
+                {
+                    char *charValue = XMLString::transcode(argElement->getAttribute(elementSizeXMLStr));
+                    unsigned int size = mathUtils.strtounsignedint(string(charValue));
+                    this->matrixOperator = matrixUtils.createMatrix(size, size);
+                    matrixUtils.setValues(this->matrixOperator, 1);
+                    XMLString::release(&charValue);
+                }
+                else
+                {
+                    cout << "WARNING: Neither elementsize or operator were defined to defaulting to 3x3 square operator.\n";
+                    this->matrixOperator = matrixUtils.createMatrix(3, 3);
+                    matrixUtils.setValues(this->matrixOperator, 1);
+                }
+                XMLString::release(&elementSizeXMLStr);
+            }
+            XMLString::release(&operatorXMLStr);
+        }
+        else if(XMLString::equals(optionErode, optionXML))
+        {		
+            this->option = RSGISExeImageMorphology::erode;
+            
+            XMLCh *imageXMLStr = XMLString::transcode("image");
+            if(argElement->hasAttribute(imageXMLStr))
+            {
+                char *charValue = XMLString::transcode(argElement->getAttribute(imageXMLStr));
+                this->inputImage = string(charValue);
+                XMLString::release(&charValue);
+            }
+            else
+            {
+                throw RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+            }
+            XMLString::release(&imageXMLStr);
+            
+            XMLCh *outputXMLStr = XMLString::transcode("output");
+            if(argElement->hasAttribute(outputXMLStr))
+            {
+                char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
+                this->outputImage = string(charValue);
+                XMLString::release(&charValue);
+            }
+            else
+            {
+                throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+            }
+            XMLString::release(&outputXMLStr);
+            
+            XMLCh *operatorXMLStr = XMLString::transcode("operator");
+            if(argElement->hasAttribute(operatorXMLStr))
+            {
+                char *charValue = XMLString::transcode(argElement->getAttribute(operatorXMLStr));
+                this->matrixOperator = matrixUtils.readMatrixFromGridTxt(string(charValue));
+                XMLString::release(&charValue);
+            }
+            else
+            {
+                XMLCh *elementSizeXMLStr = XMLString::transcode("elementsize");
+                if(argElement->hasAttribute(elementSizeXMLStr))
+                {
+                    char *charValue = XMLString::transcode(argElement->getAttribute(elementSizeXMLStr));
+                    unsigned int size = mathUtils.strtounsignedint(string(charValue));
+                    this->matrixOperator = matrixUtils.createMatrix(size, size);
+                    matrixUtils.setValues(this->matrixOperator, 1);
+                    XMLString::release(&charValue);
+                }
+                else
+                {
+                    cout << "WARNING: Neither elementsize or operator were defined to defaulting to 3x3 square operator.\n";
+                    this->matrixOperator = matrixUtils.createMatrix(3, 3);
+                    matrixUtils.setValues(this->matrixOperator, 1);
+                }
+                XMLString::release(&elementSizeXMLStr);
+            }
+            XMLString::release(&operatorXMLStr);
+        }
+        else if(XMLString::equals(optionGradient, optionXML))
+        {		
+            this->option = RSGISExeImageMorphology::gradient;
+            
+            XMLCh *imageXMLStr = XMLString::transcode("image");
+            if(argElement->hasAttribute(imageXMLStr))
+            {
+                char *charValue = XMLString::transcode(argElement->getAttribute(imageXMLStr));
+                this->inputImage = string(charValue);
+                XMLString::release(&charValue);
+            }
+            else
+            {
+                throw RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+            }
+            XMLString::release(&imageXMLStr);
+            
+            XMLCh *outputXMLStr = XMLString::transcode("output");
+            if(argElement->hasAttribute(outputXMLStr))
+            {
+                char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
+                this->outputImage = string(charValue);
+                XMLString::release(&charValue);
+            }
+            else
+            {
+                throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+            }
+            XMLString::release(&outputXMLStr);
+            
+            XMLCh *operatorXMLStr = XMLString::transcode("operator");
+            if(argElement->hasAttribute(operatorXMLStr))
+            {
+                char *charValue = XMLString::transcode(argElement->getAttribute(operatorXMLStr));
+                this->matrixOperator = matrixUtils.readMatrixFromGridTxt(string(charValue));
+                XMLString::release(&charValue);
+            }
+            else
+            {
+                XMLCh *elementSizeXMLStr = XMLString::transcode("elementsize");
+                if(argElement->hasAttribute(elementSizeXMLStr))
+                {
+                    char *charValue = XMLString::transcode(argElement->getAttribute(elementSizeXMLStr));
+                    unsigned int size = mathUtils.strtounsignedint(string(charValue));
+                    this->matrixOperator = matrixUtils.createMatrix(size, size);
+                    matrixUtils.setValues(this->matrixOperator, 1);
+                    XMLString::release(&charValue);
+                }
+                else
+                {
+                    cout << "WARNING: Neither elementsize or operator were defined to defaulting to 3x3 square operator.\n";
+                    this->matrixOperator = matrixUtils.createMatrix(3, 3);
+                    matrixUtils.setValues(this->matrixOperator, 1);
+                }
+                XMLString::release(&elementSizeXMLStr);
+            }
+            XMLString::release(&operatorXMLStr);
+        }
+        else if(XMLString::equals(optionDilateAll, optionXML))
+        {		
+            this->option = RSGISExeImageMorphology::dilateall;
+            
+            XMLCh *imageXMLStr = XMLString::transcode("image");
+            if(argElement->hasAttribute(imageXMLStr))
+            {
+                char *charValue = XMLString::transcode(argElement->getAttribute(imageXMLStr));
+                this->inputImage = string(charValue);
+                XMLString::release(&charValue);
+            }
+            else
+            {
+                throw RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+            }
+            XMLString::release(&imageXMLStr);
+            
+            XMLCh *outputXMLStr = XMLString::transcode("output");
+            if(argElement->hasAttribute(outputXMLStr))
+            {
+                char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
+                this->outputImage = string(charValue);
+                XMLString::release(&charValue);
+            }
+            else
+            {
+                throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+            }
+            XMLString::release(&outputXMLStr);
+            
+            XMLCh *operatorXMLStr = XMLString::transcode("operator");
+            if(argElement->hasAttribute(operatorXMLStr))
+            {
+                char *charValue = XMLString::transcode(argElement->getAttribute(operatorXMLStr));
+                this->matrixOperator = matrixUtils.readMatrixFromGridTxt(string(charValue));
+                XMLString::release(&charValue);
+            }
+            else
+            {
+                XMLCh *elementSizeXMLStr = XMLString::transcode("elementsize");
+                if(argElement->hasAttribute(elementSizeXMLStr))
+                {
+                    char *charValue = XMLString::transcode(argElement->getAttribute(elementSizeXMLStr));
+                    unsigned int size = mathUtils.strtounsignedint(string(charValue));
+                    this->matrixOperator = matrixUtils.createMatrix(size, size);
+                    matrixUtils.setValues(this->matrixOperator, 1);
+                    XMLString::release(&charValue);
+                }
+                else
+                {
+                    cout << "WARNING: Neither elementsize or operator were defined to defaulting to 3x3 square operator.\n";
+                    this->matrixOperator = matrixUtils.createMatrix(3, 3);
+                    matrixUtils.setValues(this->matrixOperator, 1);
+                }
+                XMLString::release(&elementSizeXMLStr);
+            }
+            XMLString::release(&operatorXMLStr);
+        }
+        else if(XMLString::equals(optionErodeAll, optionXML))
+        {		
+            this->option = RSGISExeImageMorphology::erodeall;
+            
+            XMLCh *imageXMLStr = XMLString::transcode("image");
+            if(argElement->hasAttribute(imageXMLStr))
+            {
+                char *charValue = XMLString::transcode(argElement->getAttribute(imageXMLStr));
+                this->inputImage = string(charValue);
+                XMLString::release(&charValue);
+            }
+            else
+            {
+                throw RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+            }
+            XMLString::release(&imageXMLStr);
+            
+            XMLCh *outputXMLStr = XMLString::transcode("output");
+            if(argElement->hasAttribute(outputXMLStr))
+            {
+                char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
+                this->outputImage = string(charValue);
+                XMLString::release(&charValue);
+            }
+            else
+            {
+                throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+            }
+            XMLString::release(&outputXMLStr);
+            
+            XMLCh *operatorXMLStr = XMLString::transcode("operator");
+            if(argElement->hasAttribute(operatorXMLStr))
+            {
+                char *charValue = XMLString::transcode(argElement->getAttribute(operatorXMLStr));
+                this->matrixOperator = matrixUtils.readMatrixFromGridTxt(string(charValue));
+                XMLString::release(&charValue);
+            }
+            else
+            {
+                XMLCh *elementSizeXMLStr = XMLString::transcode("elementsize");
+                if(argElement->hasAttribute(elementSizeXMLStr))
+                {
+                    char *charValue = XMLString::transcode(argElement->getAttribute(elementSizeXMLStr));
+                    unsigned int size = mathUtils.strtounsignedint(string(charValue));
+                    this->matrixOperator = matrixUtils.createMatrix(size, size);
+                    matrixUtils.setValues(this->matrixOperator, 1);
+                    XMLString::release(&charValue);
+                }
+                else
+                {
+                    cout << "WARNING: Neither elementsize or operator were defined to defaulting to 3x3 square operator.\n";
+                    this->matrixOperator = matrixUtils.createMatrix(3, 3);
+                    matrixUtils.setValues(this->matrixOperator, 1);
+                }
+                XMLString::release(&elementSizeXMLStr);
+            }
+            XMLString::release(&operatorXMLStr);
+        }
+        else if(XMLString::equals(optionGradientAll, optionXML))
+        {		
+            this->option = RSGISExeImageMorphology::gradientall;
+            
+            XMLCh *imageXMLStr = XMLString::transcode("image");
+            if(argElement->hasAttribute(imageXMLStr))
+            {
+                char *charValue = XMLString::transcode(argElement->getAttribute(imageXMLStr));
+                this->inputImage = string(charValue);
+                XMLString::release(&charValue);
+            }
+            else
+            {
+                throw RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+            }
+            XMLString::release(&imageXMLStr);
+            
+            XMLCh *outputXMLStr = XMLString::transcode("output");
+            if(argElement->hasAttribute(outputXMLStr))
+            {
+                char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
+                this->outputImage = string(charValue);
+                XMLString::release(&charValue);
+            }
+            else
+            {
+                throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+            }
+            XMLString::release(&outputXMLStr);
+            
+            XMLCh *operatorXMLStr = XMLString::transcode("operator");
+            if(argElement->hasAttribute(operatorXMLStr))
+            {
+                char *charValue = XMLString::transcode(argElement->getAttribute(operatorXMLStr));
+                this->matrixOperator = matrixUtils.readMatrixFromGridTxt(string(charValue));
+                XMLString::release(&charValue);
+            }
+            else
+            {
+                XMLCh *elementSizeXMLStr = XMLString::transcode("elementsize");
+                if(argElement->hasAttribute(elementSizeXMLStr))
+                {
+                    char *charValue = XMLString::transcode(argElement->getAttribute(elementSizeXMLStr));
+                    unsigned int size = mathUtils.strtounsignedint(string(charValue));
+                    this->matrixOperator = matrixUtils.createMatrix(size, size);
+                    matrixUtils.setValues(this->matrixOperator, 1);
+                    XMLString::release(&charValue);
+                }
+                else
+                {
+                    cout << "WARNING: Neither elementsize or operator were defined to defaulting to 3x3 square operator.\n";
+                    this->matrixOperator = matrixUtils.createMatrix(3, 3);
+                    matrixUtils.setValues(this->matrixOperator, 1);
+                }
+                XMLString::release(&elementSizeXMLStr);
+            }
+            XMLString::release(&operatorXMLStr);
+        }
+        else if(XMLString::equals(optionLocalMinima, optionXML))
+        {		
+            this->option = RSGISExeImageMorphology::localminima;
+            
+            XMLCh *imageXMLStr = XMLString::transcode("image");
+            if(argElement->hasAttribute(imageXMLStr))
+            {
+                char *charValue = XMLString::transcode(argElement->getAttribute(imageXMLStr));
+                this->inputImage = string(charValue);
+                XMLString::release(&charValue);
+            }
+            else
+            {
+                throw RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+            }
+            XMLString::release(&imageXMLStr);
+            
+            XMLCh *outputXMLStr = XMLString::transcode("output");
+            if(argElement->hasAttribute(outputXMLStr))
+            {
+                char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
+                this->outputImage = string(charValue);
+                XMLString::release(&charValue);
+            }
+            else
+            {
+                throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+            }
+            XMLString::release(&outputXMLStr);
+            
+            XMLCh *operatorXMLStr = XMLString::transcode("operator");
+            if(argElement->hasAttribute(operatorXMLStr))
+            {
+                char *charValue = XMLString::transcode(argElement->getAttribute(operatorXMLStr));
+                this->matrixOperator = matrixUtils.readMatrixFromGridTxt(string(charValue));
+                XMLString::release(&charValue);
+            }
+            else
+            {
+                XMLCh *elementSizeXMLStr = XMLString::transcode("elementsize");
+                if(argElement->hasAttribute(elementSizeXMLStr))
+                {
+                    char *charValue = XMLString::transcode(argElement->getAttribute(elementSizeXMLStr));
+                    unsigned int size = mathUtils.strtounsignedint(string(charValue));
+                    this->matrixOperator = matrixUtils.createMatrix(size, size);
+                    matrixUtils.setValues(this->matrixOperator, 1);
+                    XMLString::release(&charValue);
+                }
+                else
+                {
+                    cout << "WARNING: Neither elementsize or operator were defined to defaulting to 3x3 square operator.\n";
+                    this->matrixOperator = matrixUtils.createMatrix(3, 3);
+                    matrixUtils.setValues(this->matrixOperator, 1);
+                }
+                XMLString::release(&elementSizeXMLStr);
+            }
+            XMLString::release(&operatorXMLStr);
+            
+            
+            XMLCh *allowEqualsXMLStr = XMLString::transcode("allowequals");
+            if(argElement->hasAttribute(allowEqualsXMLStr))
+            {
+                XMLCh *yesStr = XMLString::transcode("yes");
+                const XMLCh *allowValue = argElement->getAttribute(allowEqualsXMLStr);
+                
+                if(XMLString::equals(allowValue, yesStr))
+                {
+                    this->allowEquals = true;
+                }
+                else
+                {
+                    this->allowEquals = false;
+                }
+                XMLString::release(&yesStr);
+            }
+            else
+            {
+                cout << "WARNING. Using default, equal values not allowed.\n";
+                this->allowEquals = false;
+            }
+            XMLString::release(&allowEqualsXMLStr);
+            
+            
+            XMLCh *numberingXMLStr = XMLString::transcode("numbering");
+            if(argElement->hasAttribute(numberingXMLStr))
+            {
+                XMLCh *binaryStr = XMLString::transcode("binary");
+                XMLCh *sequentialStr = XMLString::transcode("sequential");
+                const XMLCh *numberingValue = argElement->getAttribute(numberingXMLStr);
+                
+                if(XMLString::equals(numberingValue, binaryStr))
+                {
+                    this->minOutType = RSGISImageMorphologyFindExtrema::binary;
+                }
+                else if(XMLString::equals(numberingValue, sequentialStr))
+                {
+                    this->minOutType = RSGISImageMorphologyFindExtrema::sequential;
+                }
+                else
+                {
+                    throw RSGISXMLArgumentsException("Numbering output unknown (binary | sequential).");
+                }
+                XMLString::release(&binaryStr);
+                XMLString::release(&sequentialStr);
+            }
+            else
+            {
+                cout << "WARNING. Using default, generating a binary output.\n";
+                this->minOutType = RSGISImageMorphologyFindExtrema::binary;
+            }
+            XMLString::release(&numberingXMLStr);
+            
+            
+        }
+        else if(XMLString::equals(optionLocalMinimaAll, optionXML))
+        {		
+            this->option = RSGISExeImageMorphology::localminimaall;
+            
+            XMLCh *imageXMLStr = XMLString::transcode("image");
+            if(argElement->hasAttribute(imageXMLStr))
+            {
+                char *charValue = XMLString::transcode(argElement->getAttribute(imageXMLStr));
+                this->inputImage = string(charValue);
+                XMLString::release(&charValue);
+            }
+            else
+            {
+                throw RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+            }
+            XMLString::release(&imageXMLStr);
+            
+            XMLCh *outputXMLStr = XMLString::transcode("output");
+            if(argElement->hasAttribute(outputXMLStr))
+            {
+                char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
+                this->outputImage = string(charValue);
+                XMLString::release(&charValue);
+            }
+            else
+            {
+                throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+            }
+            XMLString::release(&outputXMLStr);
+            
+            XMLCh *operatorXMLStr = XMLString::transcode("operator");
+            if(argElement->hasAttribute(operatorXMLStr))
+            {
+                char *charValue = XMLString::transcode(argElement->getAttribute(operatorXMLStr));
+                this->matrixOperator = matrixUtils.readMatrixFromGridTxt(string(charValue));
+                XMLString::release(&charValue);
+            }
+            else
+            {
+                XMLCh *elementSizeXMLStr = XMLString::transcode("elementsize");
+                if(argElement->hasAttribute(elementSizeXMLStr))
+                {
+                    char *charValue = XMLString::transcode(argElement->getAttribute(elementSizeXMLStr));
+                    unsigned int size = mathUtils.strtounsignedint(string(charValue));
+                    this->matrixOperator = matrixUtils.createMatrix(size, size);
+                    matrixUtils.setValues(this->matrixOperator, 1);
+                    XMLString::release(&charValue);
+                }
+                else
+                {
+                    cout << "WARNING: Neither elementsize or operator were defined to defaulting to 3x3 square operator.\n";
+                    this->matrixOperator = matrixUtils.createMatrix(3, 3);
+                    matrixUtils.setValues(this->matrixOperator, 1);
+                }
+                XMLString::release(&elementSizeXMLStr);
+            }
+            XMLString::release(&operatorXMLStr);
+            
+            XMLCh *allowEqualsXMLStr = XMLString::transcode("allowequals");
+            if(argElement->hasAttribute(allowEqualsXMLStr))
+            {
+                XMLCh *yesStr = XMLString::transcode("yes");
+                const XMLCh *allowValue = argElement->getAttribute(allowEqualsXMLStr);
+                
+                if(XMLString::equals(allowValue, yesStr))
+                {
+                    this->allowEquals = true;
+                }
+                else
+                {
+                    this->allowEquals = false;
+                }
+                XMLString::release(&yesStr);
+            }
+            else
+            {
+                cout << "WARNING. Using default, equal values not allowed.\n";
+                this->allowEquals = false;
+            }
+            XMLString::release(&allowEqualsXMLStr);
+            
+            
+            XMLCh *numberingXMLStr = XMLString::transcode("numbering");
+            if(argElement->hasAttribute(numberingXMLStr))
+            {
+                XMLCh *binaryStr = XMLString::transcode("binary");
+                XMLCh *sequentialStr = XMLString::transcode("sequential");
+                const XMLCh *numberingValue = argElement->getAttribute(numberingXMLStr);
+                
+                if(XMLString::equals(numberingValue, binaryStr))
+                {
+                    this->minOutType = RSGISImageMorphologyFindExtrema::binary;
+                }
+                else if(XMLString::equals(numberingValue, sequentialStr))
+                {
+                    this->minOutType = RSGISImageMorphologyFindExtrema::sequential;
+                }
+                else
+                {
+                    throw RSGISXMLArgumentsException("Numbering output unknown (binary | sequential).");
+                }
+                XMLString::release(&binaryStr);
+                XMLString::release(&sequentialStr);
+            }
+            else
+            {
+                cout << "WARNING. Using default, generating a binary output.\n";
+                this->minOutType = RSGISImageMorphologyFindExtrema::binary;
+            }
+            XMLString::release(&numberingXMLStr);
+        }
+        else if(XMLString::equals(optionClosing, optionXML))
+        {		
+            this->option = RSGISExeImageMorphology::closing;
+            
+            XMLCh *imageXMLStr = XMLString::transcode("image");
+            if(argElement->hasAttribute(imageXMLStr))
+            {
+                char *charValue = XMLString::transcode(argElement->getAttribute(imageXMLStr));
+                this->inputImage = string(charValue);
+                XMLString::release(&charValue);
+            }
+            else
+            {
+                throw RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+            }
+            XMLString::release(&imageXMLStr);
+            
+            XMLCh *outputXMLStr = XMLString::transcode("output");
+            if(argElement->hasAttribute(outputXMLStr))
+            {
+                char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
+                this->outputImage = string(charValue);
+                XMLString::release(&charValue);
+            }
+            else
+            {
+                throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+            }
+            XMLString::release(&outputXMLStr);
+            
+            XMLCh *tempImgXMLStr = XMLString::transcode("temp");
+            if(argElement->hasAttribute(tempImgXMLStr))
+            {
+                char *charValue = XMLString::transcode(argElement->getAttribute(tempImgXMLStr));
+                this->tempImage = string(charValue);
+                XMLString::release(&charValue);
+                this->useMemory = false;
+            }
+            else
+            {
+                cout << "Using memory for processing\n";
+                this->tempImage = "";
+                this->useMemory = true;
+            }
+            XMLString::release(&tempImgXMLStr);
+            
+            XMLCh *iterationsXMLStr = XMLString::transcode("iterations");
+            if(argElement->hasAttribute(iterationsXMLStr))
+            {
+                char *charValue = XMLString::transcode(argElement->getAttribute(iterationsXMLStr));
+                this->numIterations = mathUtils.strtounsignedint(string(charValue));
+                XMLString::release(&charValue);
+            }
+            else
+            {
+                cout << "The number of iterations was not specified, default is 1\n";
+                this->numIterations = 1;
+            }
+            XMLString::release(&iterationsXMLStr);
+            
+            XMLCh *operatorXMLStr = XMLString::transcode("operator");
+            if(argElement->hasAttribute(operatorXMLStr))
+            {
+                char *charValue = XMLString::transcode(argElement->getAttribute(operatorXMLStr));
+                this->matrixOperator = matrixUtils.readMatrixFromGridTxt(string(charValue));
+                XMLString::release(&charValue);
+            }
+            else
+            {
+                XMLCh *elementSizeXMLStr = XMLString::transcode("elementsize");
+                if(argElement->hasAttribute(elementSizeXMLStr))
+                {
+                    char *charValue = XMLString::transcode(argElement->getAttribute(elementSizeXMLStr));
+                    unsigned int size = mathUtils.strtounsignedint(string(charValue));
+                    this->matrixOperator = matrixUtils.createMatrix(size, size);
+                    matrixUtils.setValues(this->matrixOperator, 1);
+                    XMLString::release(&charValue);
+                }
+                else
+                {
+                    cout << "WARNING: Neither elementsize or operator were defined to defaulting to 3x3 square operator.\n";
+                    this->matrixOperator = matrixUtils.createMatrix(3, 3);
+                    matrixUtils.setValues(this->matrixOperator, 1);
+                }
+                XMLString::release(&elementSizeXMLStr);
+            }
+            XMLString::release(&operatorXMLStr);
+        }
+        else if(XMLString::equals(optionOpening, optionXML))
+        {		
+            this->option = RSGISExeImageMorphology::opening;
+            
+            XMLCh *imageXMLStr = XMLString::transcode("image");
+            if(argElement->hasAttribute(imageXMLStr))
+            {
+                char *charValue = XMLString::transcode(argElement->getAttribute(imageXMLStr));
+                this->inputImage = string(charValue);
+                XMLString::release(&charValue);
+            }
+            else
+            {
+                throw RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+            }
+            XMLString::release(&imageXMLStr);
+            
+            XMLCh *outputXMLStr = XMLString::transcode("output");
+            if(argElement->hasAttribute(outputXMLStr))
+            {
+                char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
+                this->outputImage = string(charValue);
+                XMLString::release(&charValue);
+            }
+            else
+            {
+                throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+            }
+            XMLString::release(&outputXMLStr);
+            
+            XMLCh *tempImgXMLStr = XMLString::transcode("temp");
+            if(argElement->hasAttribute(tempImgXMLStr))
+            {
+                char *charValue = XMLString::transcode(argElement->getAttribute(tempImgXMLStr));
+                this->tempImage = string(charValue);
+                XMLString::release(&charValue);
+                this->useMemory = false;
+            }
+            else
+            {
+                cout << "Using memory for processing\n";
+                this->tempImage = "";
+                this->useMemory = true;
+            }
+            XMLString::release(&tempImgXMLStr);
+            
+            XMLCh *iterationsXMLStr = XMLString::transcode("iterations");
+            if(argElement->hasAttribute(iterationsXMLStr))
+            {
+                char *charValue = XMLString::transcode(argElement->getAttribute(iterationsXMLStr));
+                this->numIterations = mathUtils.strtounsignedint(string(charValue));
+                XMLString::release(&charValue);
+            }
+            else
+            {
+                cout << "The number of iterations was not specified, default is 1\n";
+                this->numIterations = 1;
+            }
+            XMLString::release(&iterationsXMLStr);
+            
+            XMLCh *operatorXMLStr = XMLString::transcode("operator");
+            if(argElement->hasAttribute(operatorXMLStr))
+            {
+                char *charValue = XMLString::transcode(argElement->getAttribute(operatorXMLStr));
+                this->matrixOperator = matrixUtils.readMatrixFromGridTxt(string(charValue));
+                XMLString::release(&charValue);
+            }
+            else
+            {
+                XMLCh *elementSizeXMLStr = XMLString::transcode("elementsize");
+                if(argElement->hasAttribute(elementSizeXMLStr))
+                {
+                    char *charValue = XMLString::transcode(argElement->getAttribute(elementSizeXMLStr));
+                    unsigned int size = mathUtils.strtounsignedint(string(charValue));
+                    this->matrixOperator = matrixUtils.createMatrix(size, size);
+                    matrixUtils.setValues(this->matrixOperator, 1);
+                    XMLString::release(&charValue);
+                }
+                else
+                {
+                    cout << "WARNING: Neither elementsize or operator were defined to defaulting to 3x3 square operator.\n";
+                    this->matrixOperator = matrixUtils.createMatrix(3, 3);
+                    matrixUtils.setValues(this->matrixOperator, 1);
+                }
+                XMLString::release(&elementSizeXMLStr);
+            }
+            XMLString::release(&operatorXMLStr);
+        }
+        else if(XMLString::equals(optionBlackTopHat, optionXML))
+        {		
+            this->option = RSGISExeImageMorphology::blacktophat;
+            
+            XMLCh *imageXMLStr = XMLString::transcode("image");
+            if(argElement->hasAttribute(imageXMLStr))
+            {
+                char *charValue = XMLString::transcode(argElement->getAttribute(imageXMLStr));
+                this->inputImage = string(charValue);
+                XMLString::release(&charValue);
+            }
+            else
+            {
+                throw RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+            }
+            XMLString::release(&imageXMLStr);
+            
+            XMLCh *outputXMLStr = XMLString::transcode("output");
+            if(argElement->hasAttribute(outputXMLStr))
+            {
+                char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
+                this->outputImage = string(charValue);
+                XMLString::release(&charValue);
+            }
+            else
+            {
+                throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+            }
+            XMLString::release(&outputXMLStr);
+            
+            XMLCh *tempImgXMLStr = XMLString::transcode("temp");
+            if(argElement->hasAttribute(tempImgXMLStr))
+            {
+                char *charValue = XMLString::transcode(argElement->getAttribute(tempImgXMLStr));
+                this->tempImage = string(charValue);
+                XMLString::release(&charValue);
+                this->useMemory = false;
+            }
+            else
+            {
+                cout << "Using memory for processing\n";
+                this->tempImage = "";
+                this->useMemory = true;
+            }
+            XMLString::release(&tempImgXMLStr);
+            
+            XMLCh *operatorXMLStr = XMLString::transcode("operator");
+            if(argElement->hasAttribute(operatorXMLStr))
+            {
+                char *charValue = XMLString::transcode(argElement->getAttribute(operatorXMLStr));
+                this->matrixOperator = matrixUtils.readMatrixFromGridTxt(string(charValue));
+                XMLString::release(&charValue);
+            }
+            else
+            {
+                XMLCh *elementSizeXMLStr = XMLString::transcode("elementsize");
+                if(argElement->hasAttribute(elementSizeXMLStr))
+                {
+                    char *charValue = XMLString::transcode(argElement->getAttribute(elementSizeXMLStr));
+                    unsigned int size = mathUtils.strtounsignedint(string(charValue));
+                    this->matrixOperator = matrixUtils.createMatrix(size, size);
+                    matrixUtils.setValues(this->matrixOperator, 1);
+                    XMLString::release(&charValue);
+                }
+                else
+                {
+                    cout << "WARNING: Neither elementsize or operator were defined to defaulting to 3x3 square operator.\n";
+                    this->matrixOperator = matrixUtils.createMatrix(3, 3);
+                    matrixUtils.setValues(this->matrixOperator, 1);
+                }
+                XMLString::release(&elementSizeXMLStr);
+            }
+            XMLString::release(&operatorXMLStr);
+        }
+        else if(XMLString::equals(optionWhiteTopHat, optionXML))
+        {		
+            this->option = RSGISExeImageMorphology::whitetophat;
+            
+            XMLCh *imageXMLStr = XMLString::transcode("image");
+            if(argElement->hasAttribute(imageXMLStr))
+            {
+                char *charValue = XMLString::transcode(argElement->getAttribute(imageXMLStr));
+                this->inputImage = string(charValue);
+                XMLString::release(&charValue);
+            }
+            else
+            {
+                throw RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+            }
+            XMLString::release(&imageXMLStr);
+            
+            XMLCh *outputXMLStr = XMLString::transcode("output");
+            if(argElement->hasAttribute(outputXMLStr))
+            {
+                char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
+                this->outputImage = string(charValue);
+                XMLString::release(&charValue);
+            }
+            else
+            {
+                throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+            }
+            XMLString::release(&outputXMLStr);
+            
+            XMLCh *tempImgXMLStr = XMLString::transcode("temp");
+            if(argElement->hasAttribute(tempImgXMLStr))
+            {
+                char *charValue = XMLString::transcode(argElement->getAttribute(tempImgXMLStr));
+                this->tempImage = string(charValue);
+                XMLString::release(&charValue);
+                this->useMemory = false;
+            }
+            else
+            {
+                cout << "Using memory for processing\n";
+                this->tempImage = "";
+                this->useMemory = true;
+            }
+            XMLString::release(&tempImgXMLStr);
+            
+            XMLCh *operatorXMLStr = XMLString::transcode("operator");
+            if(argElement->hasAttribute(operatorXMLStr))
+            {
+                char *charValue = XMLString::transcode(argElement->getAttribute(operatorXMLStr));
+                this->matrixOperator = matrixUtils.readMatrixFromGridTxt(string(charValue));
+                XMLString::release(&charValue);
+            }
+            else
+            {
+                XMLCh *elementSizeXMLStr = XMLString::transcode("elementsize");
+                if(argElement->hasAttribute(elementSizeXMLStr))
+                {
+                    char *charValue = XMLString::transcode(argElement->getAttribute(elementSizeXMLStr));
+                    unsigned int size = mathUtils.strtounsignedint(string(charValue));
+                    this->matrixOperator = matrixUtils.createMatrix(size, size);
+                    matrixUtils.setValues(this->matrixOperator, 1);
+                    XMLString::release(&charValue);
+                }
+                else
+                {
+                    cout << "WARNING: Neither elementsize or operator were defined to defaulting to 3x3 square operator.\n";
+                    this->matrixOperator = matrixUtils.createMatrix(3, 3);
+                    matrixUtils.setValues(this->matrixOperator, 1);
+                }
+                XMLString::release(&elementSizeXMLStr);
+            }
+            XMLString::release(&operatorXMLStr);
+        }
+        else
+        {
+            string message = string("The option (") + string(XMLString::transcode(optionXML)) + string(") is not known: RSGISExeImageMorphology.");
+            throw RSGISXMLArgumentsException(message.c_str());
+        }
+        
+        XMLString::release(&algorName);
+        XMLString::release(&algorXMLStr);
+        XMLString::release(&optionXMLStr);
+        XMLString::release(&optionDilate);
+        XMLString::release(&optionErode);
+        XMLString::release(&optionGradient);
+        XMLString::release(&optionDilateAll);
+        XMLString::release(&optionErodeAll);
+        XMLString::release(&optionGradientAll);
+        XMLString::release(&optionLocalMinima);
+        XMLString::release(&optionLocalMinimaAll);
+        XMLString::release(&optionClosing);
+        XMLString::release(&optionOpening);
+        XMLString::release(&optionBlackTopHat);
+        XMLString::release(&optionWhiteTopHat);
     }
-    
-    XMLString::release(&algorName);
-	XMLString::release(&algorXMLStr);
-	XMLString::release(&optionXMLStr);
-	XMLString::release(&optionDilate);
-	XMLString::release(&optionErode);
-    XMLString::release(&optionGradient);
-    XMLString::release(&optionDilateAll);
-	XMLString::release(&optionErodeAll);
-    XMLString::release(&optionGradientAll);
-    XMLString::release(&optionLocalMinima);
-    XMLString::release(&optionLocalMinimaAll);
-    XMLString::release(&optionClosing);
-    XMLString::release(&optionOpening);
-    XMLString::release(&optionBlackTopHat);
-    XMLString::release(&optionWhiteTopHat);
+    catch(RSGISXMLArgumentsException &e)
+    {
+        throw e;
+    }
+    catch(RSGISException &e)
+    {
+        throw RSGISXMLArgumentsException(e.what());
+    }
+    catch(std::exception &e)
+    {
+        throw RSGISXMLArgumentsException(e.what());
+    }
 	
 	parsed = true;
 }
