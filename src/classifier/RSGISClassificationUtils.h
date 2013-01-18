@@ -58,14 +58,14 @@
 namespace rsgis{ namespace classifier{
         
 	class RSGISClassificationUtils
-		{
-		public:
-			RSGISClassificationUtils();
-			ClassData* convertROIs2ClassData(rsgis::utils::enviroi *enviroi, int id);
-			ClassData** parseClassificationInputFile(std::string inputFile, int *numClasses) throw(RSGISClassificationException, rsgis::RSGISInputStreamException, rsgis::math::RSGISMatricesException);
-			void convertShapeFile2SpecLib(std::string vector, std::string outputFile, std::string classAttribute, std::vector<std::string> *attributes, bool group) throw(RSGISClassificationException);
-			~RSGISClassificationUtils();
-		};
+    {
+    public:
+        RSGISClassificationUtils();
+        ClassData* convertROIs2ClassData(rsgis::utils::enviroi *enviroi, int id);
+        ClassData** parseClassificationInputFile(std::string inputFile, int *numClasses) throw(RSGISClassificationException, rsgis::RSGISInputStreamException, rsgis::math::RSGISMatricesException);
+        void convertShapeFile2SpecLib(std::string vector, std::string outputFile, std::string classAttribute, std::vector<std::string> *attributes, bool group) throw(RSGISClassificationException);
+        ~RSGISClassificationUtils();
+    };
     
     class RSGISEliminateSingleClassPixels
     {
