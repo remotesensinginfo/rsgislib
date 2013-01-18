@@ -622,7 +622,7 @@
     <!-- A command to subset an image to the same extent as a shapefile -->
     <rsgis:command algor="imageutils" option="subset" image="image.env" output="output_img.env" vector="vector.shp" />
     <!-- A command to subset an image to polygons within shapefile -->
-    <rsgis:command algor="imageutils" option="subset2polys" image="image.env" output="image_out_base" vector="vector.shp" outfilename="attribute" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64"/>
+    <rsgis:command algor="imageutils" option="subset2polys" image="image.env" output="image_out_base" vector="vector.shp" outfilename="attribute" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" extension="env | kea | tif | etc"/>
     <!-- A command to pan sharpen an image, takes stack of multispectral image (resampled to pan resolution) and panchromatic image -->
     <rsgis:command algor="imageutils" option="pansharpen" image="ms_pan_img.env" output="ps_image.env" />
     <!-- A command to generate a set of slices from a multi-band image -->

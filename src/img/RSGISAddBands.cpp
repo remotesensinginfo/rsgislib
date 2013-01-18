@@ -330,6 +330,7 @@ namespace rsgis{namespace img{
         GDALClose(outputImage);
     }
 	
+    /*
 	void RSGISAddBands::stackImages(GDALDataset **datasets, int numDS, std::string outputImage, std::string *imageBandNames, bool skipPixels, float skipValue, float noDataValue, std::string gdalFormat, GDALDataType gdalDataType) throw(RSGISImageBandException)
 	{
 		bool useBandNames = false;
@@ -351,7 +352,9 @@ namespace rsgis{namespace img{
 		int height = 0;
 		int width = 0;
 		int numInBands = 0;
-		
+		int maxBlockX;
+        int maxBlockY;
+        
 		float **inputData = NULL;
 		
 		GDALDataset *outputImageDS = NULL;
@@ -362,7 +365,7 @@ namespace rsgis{namespace img{
 		try
 		{
 			// Find image overlap
-			imgUtils.getImageOverlap(datasets, numDS, dsOffsets, &width, &height, gdalTranslation);
+			imgUtils.getImageOverlap(datasets, numDS, dsOffsets, &width, &height, gdalTranslation, &maxBlockX, &maxBlockY);
 			
 			// Count number of image bands
 			for(int i = 0; i < numDS; i++)
@@ -400,16 +403,33 @@ namespace rsgis{namespace img{
 				}
 			}
 			
+            int maxOutBlockX;
+            int maxOutBlockY;
+            
 			//Get Image Output Bands
 			outputRasterBands = new GDALRasterBand*[numInBands];
 			for(int i = 0; i < numInBands; i++)
 			{
 				outputRasterBands[i] = outputImageDS->GetRasterBand(i+1);
+                if(i == 0)
+                {
+                    outputRasterBands[i]->GetBlockSize(&maxOutBlockX, &maxOutBlockY);
+                }
 				if (useBandNames) // Set band name (if being used)
 				{
 					outputRasterBands[i]->SetDescription(bandNames[i].c_str());
 				}
 			}
+            
+            if(maxOutBlockX > maxBlockX)
+            {
+                maxBlockX = maxOutBlockX;
+            }
+            
+            if(maxOutBlockY > maxBlockY)
+            {
+                maxBlockY = maxOutBlockY;
+            }
 			
 			// Allocate memory
 			inputData = new float*[numInBands];
@@ -553,6 +573,334 @@ namespace rsgis{namespace img{
 			delete[] outputRasterBands;
 		}
 	}
+    */
+    
+    void RSGISAddBands::stackImages(GDALDataset **datasets, int numDS, std::string outputImage, std::string *imageBandNames, bool skipPixels, float skipValue, float noDataValue, std::string gdalFormat, GDALDataType gdalDataType) throw(RSGISImageBandException)
+    {
+        GDALAllRegister();
+		RSGISImageUtils imgUtils;
+        rsgis::math::RSGISMathsUtils mathUtils;
+		double *gdalTranslation = new double[6];
+		int **dsOffsets = new int*[numDS];
+		for(int i = 0; i < numDS; i++)
+		{
+			dsOffsets[i] = new int[2];
+		}
+		int **bandOffsets = NULL;
+		int height = 0;
+		int width = 0;
+		int numInBands = 0;
+        int xBlockSize = 0;
+        int yBlockSize = 0;
+		
+		float **inputData = NULL;
+		float *inDataColumn = NULL;
+		
+		GDALDataset *outputImageDS = NULL;
+		GDALRasterBand **inputRasterBands = NULL;
+		GDALRasterBand **outputRasterBands = NULL;
+		GDALDriver *gdalDriver = NULL;
+        
+        try
+		{
+			// Find image overlap
+			imgUtils.getImageOverlap(datasets, numDS, dsOffsets, &width, &height, gdalTranslation, &xBlockSize, &yBlockSize);
+            
+			// Count number of image bands
+			for(int i = 0; i < numDS; i++)
+			{
+				numInBands += datasets[i]->GetRasterCount();
+			}
+            
+			// Create new Image
+			gdalDriver = GetGDALDriverManager()->GetDriverByName(gdalFormat.c_str());
+			if(gdalDriver == NULL)
+			{
+				throw RSGISImageBandException("Requested GDAL driver does not exists..");
+			}
+			std::cout << "New image width = " << width << " height = " << height << " bands = " << numInBands << std::endl;
+			
+			outputImageDS = gdalDriver->Create(outputImage.c_str(), width, height, numInBands, gdalDataType, NULL);
+			
+			if(outputImageDS == NULL)
+			{
+				throw RSGISImageBandException("Output image could not be created. Check filepath.");
+			}
+			outputImageDS->SetGeoTransform(gdalTranslation);
+			outputImageDS->SetProjection(datasets[0]->GetProjectionRef());
+            
+			// Get Image Input Bands
+			bandOffsets = new int*[numInBands];
+			inputRasterBands = new GDALRasterBand*[numInBands];
+            std::string *bandNames = new std::string[numInBands];
+			int counter = 0;
+			for(int i = 0; i < numDS; i++)
+			{
+				for(int j = 0; j < datasets[i]->GetRasterCount(); j++)
+				{
+					inputRasterBands[counter] = datasets[i]->GetRasterBand(j+1);
+					bandOffsets[counter] = new int[2];
+					bandOffsets[counter][0] = dsOffsets[i][0];
+					bandOffsets[counter][1] = dsOffsets[i][1];
+                    bandNames[counter] = inputRasterBands[counter]->GetDescription();
+                    if(bandNames[counter] == "")
+                    {
+                        bandNames[counter] = std::string("Band ") + mathUtils.inttostring(i+1);
+                    }
+					//std::cout << counter << ") dataset " << i << " band " << j << " offset [" << bandOffsets[counter][0] << "," << bandOffsets[counter][1] << "]\n";
+					counter++;
+				}
+			}
+            
+			//Get Image Output Bands
+			outputRasterBands = new GDALRasterBand*[numInBands];
+			for(int i = 0; i < numInBands; i++)
+			{
+				outputRasterBands[i] = outputImageDS->GetRasterBand(i+1);
+				outputRasterBands[i]->SetDescription(bandNames[i].c_str());
+			}
+            int outXBlockSize = 0;
+            int outYBlockSize = 0;
+            outputRasterBands[0]->GetBlockSize (&outXBlockSize, &outYBlockSize);
+            
+            if(outYBlockSize > yBlockSize)
+            {
+                yBlockSize = outYBlockSize;
+            }
+            std::cout << "Max. block size: " << yBlockSize << std::endl;
+            
+			// Allocate memory
+			inputData = new float*[numInBands];
+			for(int i = 0; i < numInBands; i++)
+			{
+				inputData[i] = (float *) CPLMalloc(sizeof(float)*(width*yBlockSize));
+			}
+            
+            int nYBlocks = height / yBlockSize;
+            int remainRows = height - (nYBlocks * yBlockSize);
+            int rowOffset = 0;
+            
+			int feedback = height/10;
+			int feedbackCounter = 0;
+			std::cout << "Started" << std::flush;
+			// Loop images to process data
+			for(int i = 0; i < nYBlocks; i++)
+			{
+				//std::cout << i << " of " << nYBlocks << std::endl;
+                
+				for(int n = 0; n < numInBands; n++)
+				{
+                    rowOffset = bandOffsets[n][1] + (yBlockSize * i);
+					inputRasterBands[n]->RasterIO(GF_Read, bandOffsets[n][0], rowOffset, width, yBlockSize, inputData[n], width, yBlockSize, GDT_Float32, 0, 0);
+				}
+                
+                for(int m = 0; m < yBlockSize; ++m)
+                {
+                    if((((i*yBlockSize)+m) % feedback) == 0)
+                    {
+                        std::cout << "." << feedbackCounter << "." << std::flush;
+                        feedbackCounter = feedbackCounter + 10;
+                    }
+                    
+                    if(skipPixels) // If skipping pixels, look through input values and check for skip value in any of the bands.
+                    {
+                        for(int j = 0; j < width; j++)
+                        {
+                            bool dataPixel = true;
+                            
+                            int n = 0;
+                            while((n < numInBands) && dataPixel)
+                            {
+                                if(inputData[n][j] == skipValue)
+                                {
+                                    for(int n = 0; n < numInBands; n++)
+                                    {
+                                        inputData[n][j] = noDataValue;
+                                    }
+                                    
+                                    dataPixel = false;
+                                }
+                                ++n;
+                            }
+                        }
+                    }
+                    
+                }
+				
+				for(int n = 0; n < numInBands; n++)
+				{
+                    rowOffset = yBlockSize * i;
+					outputRasterBands[n]->RasterIO(GF_Write, 0, rowOffset, width, yBlockSize, inputData[n], width, yBlockSize, GDT_Float32, 0, 0);
+				}
+			}
+            
+            if(remainRows > 0)
+            {
+                for(int n = 0; n < numInBands; n++)
+				{
+                    rowOffset = bandOffsets[n][1] + (yBlockSize * nYBlocks);
+					inputRasterBands[n]->RasterIO(GF_Read, bandOffsets[n][0], rowOffset, width, remainRows, inputData[n], width, remainRows, GDT_Float32, 0, 0);
+				}
+                
+                for(int m = 0; m < remainRows; ++m)
+                {
+                    if((((nYBlocks*yBlockSize)+m) % feedback) == 0)
+                    {
+                        std::cout << "." << feedbackCounter << "." << std::flush;
+                        feedbackCounter = feedbackCounter + 10;
+                    }
+                    
+                    if(skipPixels) // If skipping pixels, look through input values and check for skip value in any of the bands.
+                    {
+                        for(int j = 0; j < width; j++)
+                        {
+                            bool dataPixel = true;
+                            
+                            int n = 0;
+                            while((n < numInBands) && dataPixel)
+                            {
+                                if(inputData[n][j] == skipValue)
+                                {
+                                    for(int n = 0; n < numInBands; n++)
+                                    {
+                                        inputData[n][j] = noDataValue;
+                                    }
+                                    
+                                    dataPixel = false;
+                                }
+                                ++n;
+                            }
+                        }
+                    }
+                }
+				
+				for(int n = 0; n < numInBands; n++)
+				{
+                    rowOffset = (yBlockSize * nYBlocks);
+					outputRasterBands[n]->RasterIO(GF_Write, 0, rowOffset, width, remainRows, inputData[n], width, remainRows, GDT_Float32, 0, 0);
+				}
+            }
+			std::cout << " Complete.\n";
+		}
+		catch(RSGISImageBandException& e)
+		{			
+			if(gdalTranslation != NULL)
+			{
+				delete[] gdalTranslation;
+			}
+			
+			if(dsOffsets != NULL)
+			{
+				for(int i = 0; i < numDS; i++)
+				{
+					if(dsOffsets[i] != NULL)
+					{
+						delete[] dsOffsets[i];
+					}
+				}
+				delete[] dsOffsets;
+			}
+			
+			if(bandOffsets != NULL)
+			{
+				for(int i = 0; i < numInBands; i++)
+				{
+					if(bandOffsets[i] != NULL)
+					{
+						delete[] bandOffsets[i];
+					}
+				}
+				delete[] bandOffsets;
+			}
+			
+			if(inputData != NULL)
+			{
+				for(int i = 0; i < numInBands; i++)
+				{
+					if(inputData[i] != NULL)
+					{
+						delete[] inputData[i];
+					}
+				}
+				delete[] inputData;
+			}
+			
+			if(inDataColumn != NULL)
+			{
+				delete[] inDataColumn;
+			}
+			
+			if(inputRasterBands != NULL)
+			{
+				delete[] inputRasterBands;
+			}
+			
+			if(outputRasterBands != NULL)
+			{
+				delete[] outputRasterBands;
+			}
+			throw e;
+		}
+		
+		GDALClose(outputImageDS);
+		
+		if(gdalTranslation != NULL)
+		{
+			delete[] gdalTranslation;
+		}
+		
+		if(dsOffsets != NULL)
+		{
+			for(int i = 0; i < numDS; i++)
+			{
+				if(dsOffsets[i] != NULL)
+				{
+					delete[] dsOffsets[i];
+				}
+			}
+			delete[] dsOffsets;
+		}
+		
+		if(bandOffsets != NULL)
+		{
+			for(int i = 0; i < numInBands; i++)
+			{
+				if(bandOffsets[i] != NULL)
+				{
+					delete[] bandOffsets[i];
+				}
+			}
+			delete[] bandOffsets;
+		}
+		
+		if(inputData != NULL)
+		{
+			for(int i = 0; i < numInBands; i++)
+			{
+				if(inputData[i] != NULL)
+				{
+					CPLFree(inputData[i]);
+				}
+			}
+			delete[] inputData;
+		}
+		
+		if(inDataColumn != NULL)
+		{
+			delete[] inDataColumn;
+		}
+		
+		if(inputRasterBands != NULL)
+		{
+			delete[] inputRasterBands;
+		}
+		
+		if(outputRasterBands != NULL)
+		{
+			delete[] outputRasterBands;
+		}
+    }
+    
     
     RSGISAddBands::~RSGISAddBands()
     {
