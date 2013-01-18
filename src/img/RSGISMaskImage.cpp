@@ -29,7 +29,7 @@ namespace rsgis{namespace img{
 		
 	}
 	
-	void RSGISMaskImage::maskImage(GDALDataset *dataset, GDALDataset *mask, std::string outputImage, std::string imageFormat, GDALDataType outDataType, double outputValue)throw(RSGISImageCalcException,RSGISImageBandException)
+	void RSGISMaskImage::maskImage(GDALDataset *dataset, GDALDataset *mask, std::string outputImage, std::string imageFormat, GDALDataType outDataType, double outputValue, double maskValue)throw(RSGISImageCalcException,RSGISImageBandException)
 	{
 		GDALDataset **datasets = NULL;
 		RSGISCalcImage *calcImg = NULL;
@@ -41,7 +41,7 @@ namespace rsgis{namespace img{
 			datasets[0] = mask;
 			datasets[1] = dataset;
 			
-			applyMask = new RSGISApplyImageMask(dataset->GetRasterCount(), outputValue);
+			applyMask = new RSGISApplyImageMask(dataset->GetRasterCount(), outputValue, maskValue);
 			calcImg = new RSGISCalcImage(applyMask, "", true);
 			calcImg->calcImage(datasets, numDS, outputImage, false, NULL, imageFormat, outDataType);
 			
@@ -93,14 +93,15 @@ namespace rsgis{namespace img{
 		}
 	}
 	
-	RSGISApplyImageMask::RSGISApplyImageMask(int numberOutBands, double outputValue) : RSGISCalcImageValue(numberOutBands)
+	RSGISApplyImageMask::RSGISApplyImageMask(int numberOutBands, double outputValue, double maskValue) : RSGISCalcImageValue(numberOutBands)
 	{
 		this->outputValue = outputValue;
+        this->maskValue = maskValue;
 	}
 	
 	void RSGISApplyImageMask::calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException)
 	{
-		if(bandValues[0] == 0)
+		if(bandValues[0] == maskValue)
 		{
 			for(int i = 0; i < numOutBands; i++)
 			{

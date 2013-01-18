@@ -911,10 +911,23 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 		}
 		XMLString::release(&outputXMLStr);
 
-		XMLCh *maskvalueXMLStr = XMLString::transcode("maskvalue");
-		if(argElement->hasAttribute(maskvalueXMLStr))
+        XMLCh *outputValueXMLStr = XMLString::transcode("outputvalue");
+		if(argElement->hasAttribute(outputValueXMLStr))
 		{
-			char *charValue = XMLString::transcode(argElement->getAttribute(maskvalueXMLStr));
+			char *charValue = XMLString::transcode(argElement->getAttribute(outputValueXMLStr));
+			this->outValue = mathUtils.strtofloat(string(charValue));
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'outputvalue\' attribute was provided.");
+		}
+		XMLString::release(&outputValueXMLStr);
+        
+		XMLCh *maskValueXMLStr = XMLString::transcode("maskvalue");
+		if(argElement->hasAttribute(maskValueXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(maskValueXMLStr));
 			this->maskValue = mathUtils.strtofloat(string(charValue));
 			XMLString::release(&charValue);
 		}
@@ -922,7 +935,7 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 		{
 			throw RSGISXMLArgumentsException("No \'maskvalue\' attribute was provided.");
 		}
-		XMLString::release(&maskvalueXMLStr);
+		XMLString::release(&maskValueXMLStr);
 
 	}
 	else if (XMLString::equals(optionResample, optionXML))
@@ -3325,6 +3338,15 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
 		}
 		else if(option == RSGISExeImageUtils::mask)
 		{
+            std::cout << "A command to mask an input image\n";
+            std::cout << "Input Image: " << this->inputImage << std::endl;
+            std::cout << "Mask Image: " << this->imageMask << std::endl;
+            std::cout << "Output Image: " << this->outputImage << std::endl;
+            std::cout << "Image Format: " << this->imageFormat << std::endl;
+            std::cout << "Output Data Type: " << this->outDataType << std::endl;
+            std::cout << "Output value: " << this->outValue << std::endl;
+            std::cout << "Mask value: " << this->maskValue << std::endl;
+            
 			GDALAllRegister();
 			RSGISMaskImage *maskImage = NULL;
 			GDALDataset *dataset = NULL;
@@ -3348,7 +3370,7 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
 				}
 
 				maskImage = new RSGISMaskImage();
-				maskImage->maskImage(dataset, mask, this->outputImage, this->imageFormat, this->outDataType, this->nodataValue);
+				maskImage->maskImage(dataset, mask, this->outputImage, this->imageFormat, this->outDataType, this->outValue, this->maskValue);
 
 				GDALClose(dataset);
 				GDALClose(mask);
