@@ -587,7 +587,7 @@
     <!-- A command to cut an image to an input shapefile where each polygon geometry will created a new output image representing the region within the polygon -->
     <rsgis:command algor="imageutils" option="cut2polys" image="image.env" output="image_out_base" vector="vector.shp" outfilename="attribute" nodata="float" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64"/>
     <!-- A command to mask the input image with a second 'mask' image -->
-    <rsgis:command algor="imageutils" option="mask" image="image.env" mask="mask.env" output="image_out.env" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" maskvalue="float" />
+    <rsgis:command algor="imageutils" option="mask" image="image.env" mask="mask.env" output="image_out.env" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" outputvalue="float" maskvalue="float" />
     <!-- A command resample an input image to another resolution -->
     <rsgis:command algor="imageutils" option="resample" image="image.env" output="image_out.env" scale="float" interpolation="Cubic | BilinearArea | BilinearPoint | NN | Triangular" />
     <!-- TODO A command to create a multiband raster image, based on thematic rasters exported from Definiens. The values for each band are held in a csv file (exported with raster image from Definiens -->

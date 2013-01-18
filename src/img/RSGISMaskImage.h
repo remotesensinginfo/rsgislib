@@ -38,13 +38,13 @@ namespace rsgis{namespace img{
 		{
 		public: 
 			RSGISMaskImage();
-			void maskImage(GDALDataset *dataset, GDALDataset *mask, std::string outputImage, std::string imageFormat, GDALDataType outDataType, double outputValue)throw(RSGISImageCalcException,RSGISImageBandException);
+			void maskImage(GDALDataset *dataset, GDALDataset *mask, std::string outputImage, std::string imageFormat, GDALDataType outDataType, double outputValue, double maskValue)throw(RSGISImageCalcException,RSGISImageBandException);
 		};
 	
 	class RSGISApplyImageMask : public RSGISCalcImageValue
 		{
 		public: 
-			RSGISApplyImageMask(int numberOutBands, double outputValue);
+			RSGISApplyImageMask(int numberOutBands, double outputValue, double maskValue);
 			void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException);
 			void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException);
 			void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(RSGISImageCalcException);
@@ -55,6 +55,7 @@ namespace rsgis{namespace img{
 			~RSGISApplyImageMask();
 		protected:
 			double outputValue;
+            double maskValue;
 		};
 	
 }}
