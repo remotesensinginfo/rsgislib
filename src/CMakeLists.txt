@@ -50,8 +50,8 @@ set(LIB_CLASSIFY_H
 	${RSGIS_SRC_CLASSIFY_DIR}/RSGISSpectralCorrelationMapper.h 
 	${RSGIS_SRC_CLASSIFY_DIR}/RSGISCumulativeAreaClassifier.h 
 	${RSGIS_SRC_CLASSIFY_DIR}/RSGISKMeanImageClassifier.h 
-	${RSGIS_SRC_CLASSIFY_DIR}/RSGISISODATAImageClassifier.cpp 
-	${RSGIS_SRC_CLASSIFY_DIR}/RSGISISODATAImageClassifier.h)
+	${RSGIS_SRC_CLASSIFY_DIR}/RSGISISODATAImageClassifier.h
+	${RSGIS_SRC_CLASSIFY_DIR}/RSGISRATClassificationUtils.h)
 	
 set(LIB_CLASSIFY_CPP
 	${RSGIS_SRC_CLASSIFY_DIR}/RSGISClassifier.cpp 
@@ -71,7 +71,9 @@ set(LIB_CLASSIFY_CPP
 	${RSGIS_SRC_CLASSIFY_DIR}/RSGISKMeanImageClassifier.cpp 
 	${RSGIS_SRC_CLASSIFY_DIR}/RSGISKMeanImageClassifier.h 
 	${RSGIS_SRC_CLASSIFY_DIR}/RSGISISODATAImageClassifier.cpp 
-	${RSGIS_SRC_CLASSIFY_DIR}/RSGISISODATAImageClassifier.h)
+	${RSGIS_SRC_CLASSIFY_DIR}/RSGISISODATAImageClassifier.h
+	${RSGIS_SRC_CLASSIFY_DIR}/RSGISRATClassificationUtils.cpp
+	${RSGIS_SRC_CLASSIFY_DIR}/RSGISRATClassificationUtils.h)
 ###############################################################################
 
 ###############################################################################

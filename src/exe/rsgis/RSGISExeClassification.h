@@ -52,6 +52,7 @@
 #include "classifier/RSGISKMeanImageClassifier.h"
 #include "classifier/RSGISISODATAImageClassifier.h"
 #include "classifier/RSGISClassificationUtils.h"
+#include "classifier/RSGISRATClassificationUtils.h"
 
 #include "img/RSGISCalcImage.h"
 #include "img/RSGISImageUtils.h"
@@ -86,7 +87,9 @@ class RSGISExeClassification : public rsgis::RSGISAlgorithmParameters
 			isodata,
 			createspeclib,
             addcolourtable,
-            elimsinglepxls
+            elimsinglepxls,
+            collapseclasses,
+            colour3bands
 		};
 		
 		enum UnsupervisedInit
@@ -114,6 +117,7 @@ class RSGISExeClassification : public rsgis::RSGISAlgorithmParameters
 		std::string classAttribute;
 		std::string ruleImage;
         std::string imageFormat;
+        std::string classNameCol;
 		rsgis::classifier::ClassData **trainingData;
         rsgis::vec::sqlclass **rules;
 		int numClasses;

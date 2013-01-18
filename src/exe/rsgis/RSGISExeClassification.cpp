@@ -65,6 +65,8 @@ void RSGISExeClassification::retrieveParameters(xercesc::DOMElement *argElement)
 	XMLCh *optionCreateSpecLib = xercesc::XMLString::transcode("createspeclib");
     XMLCh *optionAddColourTable = xercesc::XMLString::transcode("addcolourtable");
     XMLCh *optionElimSinglePxls = xercesc::XMLString::transcode("elimsinglepxls");
+    XMLCh *optionCollapseClasses = xercesc::XMLString::transcode("collapseclasses");
+    XMLCh *optionColour3Bands = xercesc::XMLString::transcode("colour3bands");
 	
 	const XMLCh *algorNameEle = argElement->getAttribute(algorXMLStr);
 	if(!xercesc::XMLString::equals(algorName, algorNameEle))
@@ -1131,6 +1133,107 @@ void RSGISExeClassification::retrieveParameters(xercesc::DOMElement *argElement)
 		xercesc::XMLString::release(&formatXMLStr);
         
 	}
+    else if(xercesc::XMLString::equals(optionCollapseClasses, optionXML))
+	{
+		this->option = RSGISExeClassification::collapseclasses;
+		
+		XMLCh *imageXMLStr = xercesc::XMLString::transcode("image");
+        if(argElement->hasAttribute(imageXMLStr))
+        {
+            char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(imageXMLStr));
+            this->inputImage = std::string(charValue);
+            xercesc::XMLString::release(&charValue);
+        }
+        else
+        {
+            throw rsgis::RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+        }
+        xercesc::XMLString::release(&imageXMLStr);
+		
+		XMLCh *outputXMLStr = xercesc::XMLString::transcode("output");
+		if(argElement->hasAttribute(outputXMLStr))
+		{
+			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outputXMLStr));
+			this->outputImage = std::string(charValue);
+			xercesc::XMLString::release(&charValue);
+		}
+		else
+		{
+			throw rsgis::RSGISXMLArgumentsException("No \'output\' image was provided.");
+		}
+		xercesc::XMLString::release(&outputXMLStr);
+        
+        XMLCh *formatXMLStr = xercesc::XMLString::transcode("format");
+		if(argElement->hasAttribute(formatXMLStr))
+		{
+			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(formatXMLStr));
+			this->imageFormat = std::string(charValue);
+			xercesc::XMLString::release(&charValue);
+		}
+		else
+		{
+			this->imageFormat = "ENVI";
+		}
+		xercesc::XMLString::release(&formatXMLStr);
+        
+        XMLCh *classnamesXMLStr = xercesc::XMLString::transcode("classnames");
+		if(argElement->hasAttribute(classnamesXMLStr))
+		{
+			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(classnamesXMLStr));
+			this->classNameCol = std::string(charValue);
+			xercesc::XMLString::release(&charValue);
+		}
+		else
+		{
+			throw rsgis::RSGISXMLArgumentsException("No \'classnames\' image was provided.");
+		}
+		xercesc::XMLString::release(&classnamesXMLStr);
+        
+	}
+    else if(xercesc::XMLString::equals(optionColour3Bands, optionXML))
+	{
+		this->option = RSGISExeClassification::colour3bands;
+		
+		XMLCh *imageXMLStr = xercesc::XMLString::transcode("image");
+        if(argElement->hasAttribute(imageXMLStr))
+        {
+            char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(imageXMLStr));
+            this->inputImage = std::string(charValue);
+            xercesc::XMLString::release(&charValue);
+        }
+        else
+        {
+            throw rsgis::RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+        }
+        xercesc::XMLString::release(&imageXMLStr);
+		
+		XMLCh *outputXMLStr = xercesc::XMLString::transcode("output");
+		if(argElement->hasAttribute(outputXMLStr))
+		{
+			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outputXMLStr));
+			this->outputImage = std::string(charValue);
+			xercesc::XMLString::release(&charValue);
+		}
+		else
+		{
+			throw rsgis::RSGISXMLArgumentsException("No \'output\' image was provided.");
+		}
+		xercesc::XMLString::release(&outputXMLStr);
+        
+        XMLCh *formatXMLStr = xercesc::XMLString::transcode("format");
+		if(argElement->hasAttribute(formatXMLStr))
+		{
+			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(formatXMLStr));
+			this->imageFormat = std::string(charValue);
+			xercesc::XMLString::release(&charValue);
+		}
+		else
+		{
+			this->imageFormat = "ENVI";
+		}
+		xercesc::XMLString::release(&formatXMLStr);
+        
+	}
 	else
 	{
 		std::string message = std::string("The option (") + std::string(xercesc::XMLString::transcode(optionXML)) + std::string(") is not known: RSGISExeClassification.");
@@ -1152,6 +1255,11 @@ void RSGISExeClassification::retrieveParameters(xercesc::DOMElement *argElement)
 	xercesc::XMLString::release(&optionKMeans);
 	xercesc::XMLString::release(&optionISOData);
 	xercesc::XMLString::release(&optionCreateSpecLib);
+    xercesc::XMLString::release(&optionAddColourTable);
+    xercesc::XMLString::release(&optionElimSinglePxls);
+    xercesc::XMLString::release(&optionCollapseClasses);
+    xercesc::XMLString::release(&optionColour3Bands);
+    
 	parsed = true;
 }
 
@@ -1692,6 +1800,9 @@ void RSGISExeClassification::runAlgorithm() throw(rsgis::RSGISException)
 		}
         else if(option == RSGISExeClassification::addcolourtable)
         {
+            std::cout << "Add a colour table to the image\n";
+            std::cout << "Image: " << this->inputImage << std::endl;
+            
             GDALAllRegister();
 			GDALDataset *imgDataset = NULL;
             
@@ -1775,6 +1886,93 @@ void RSGISExeClassification::runAlgorithm() throw(rsgis::RSGISException)
                 GDALDestroyDriverManager();
             } 
             catch (rsgis::RSGISException &e) 
+            {
+                throw e;
+            }
+            
+        }
+        else if(option == RSGISExeClassification::collapseclasses)
+        {
+            std::cout << "A command to collapse the segmentation classification to a just a classification\n";
+            std::cout << "Input Image: " << this->inputImage << std::endl;
+            std::cout << "Output Image: " << this->outputImage << std::endl;
+            std::cout << "Output Image format: " << this->imageFormat << std::endl;
+            std::cout << "Class names column: " << this->classNameCol << std::endl;
+            
+            try
+            {
+                rsgis::img::RSGISImageUtils imgUtils;
+                
+                std::cout << "Opening an image\n";
+                GDALAllRegister();
+                GDALDataset *imageDataset = NULL;
+                imageDataset = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_ReadOnly);
+                if(imageDataset == NULL)
+                {
+                    std::string message = std::string("Could not open image ") + this->inputImage;
+                    throw rsgis::RSGISImageException(message.c_str());
+                }
+                
+                rsgis::classifier::RSGISCollapseSegmentsClassification collapseSegments;
+                collapseSegments.collapseClassification(imageDataset, this->classNameCol, this->outputImage, this->imageFormat);
+                
+                // Tidy up
+                GDALClose(imageDataset);
+                GDALDestroyDriverManager();
+            }
+            catch (rsgis::RSGISException &e)
+            {
+                throw e;
+            }
+            
+        }
+        else if(option == RSGISExeClassification::colour3bands)
+        {
+            std::cout << "Convert the colour table to a 3 band RGB image\n";
+            std::cout << "Input Image: " << this->inputImage << std::endl;
+            std::cout << "Output Image: " << this->outputImage << std::endl;
+            std::cout << "Output Image format: " << this->imageFormat << std::endl;
+            
+            try
+            {
+                std::cout << "Openning input image.\n";
+                rsgis::img::RSGISImageUtils imgUtils;
+                
+                GDALAllRegister();
+                GDALDataset **imageDataset = new GDALDataset*[1];
+                imageDataset[0] = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_ReadOnly);
+                if(imageDataset[0] == NULL)
+                {
+                    std::string message = std::string("Could not open image ") + this->inputImage;
+                    throw rsgis::RSGISImageException(message.c_str());
+                }
+                
+                std::cout << "Reading colour table\n";
+                GDALColorTable *clrTab = imageDataset[0]->GetRasterBand(1)->GetColorTable();
+                /*
+                for(int i = 0; i < clrTab->GetColorEntryCount(); ++i)
+                {
+                    const GDALColorEntry *clr = clrTab->GetColorEntry(i);
+                    std::cout << i << ": [" <<  clr->c1 << "," << clr->c2 << "," << clr->c3 << "]\n";
+                }
+                */
+                std::string *bandNames = new std::string[3];
+                bandNames[0] = "Red";
+                bandNames[1] = "Green";
+                bandNames[2] = "Blue";
+                
+                std::cout << "Applying to the image\n";
+                rsgis::classifier::RSGISColourImageFromClassRAT *clrAsRGB = new rsgis::classifier::RSGISColourImageFromClassRAT(clrTab);
+                rsgis::img::RSGISCalcImage calcImg = rsgis::img::RSGISCalcImage(clrAsRGB, "", true);
+				calcImg.calcImage(imageDataset, 1, this->outputImage, true, bandNames, this->imageFormat, GDT_Byte);
+                delete[] bandNames;
+                
+                // Tidy up
+                GDALClose(imageDataset[0]);
+                delete[] imageDataset;
+                GDALDestroyDriverManager();
+            }
+            catch (rsgis::RSGISException &e)
             {
                 throw e;
             }
@@ -1941,6 +2139,19 @@ void RSGISExeClassification::printParameters()
             {
                 std::cout << "Ignoring 0 as a no data value\n";
             }
+        }
+        else if(option == RSGISExeClassification::collapseclasses)
+        {
+            std::cout << "Input Image: " << this->inputImage << std::endl;
+            std::cout << "Output Image: " << this->outputImage << std::endl;
+            std::cout << "Output Image format: " << this->imageFormat << std::endl;
+            std::cout << "Class names column: " << this->classNameCol << std::endl;
+        }
+        else if(option == RSGISExeClassification::colour3bands)
+        {
+            std::cout << "Input Image: " << this->inputImage << std::endl;
+            std::cout << "Output Image: " << this->outputImage << std::endl;
+            std::cout << "Output Image format: " << this->imageFormat << std::endl;
         }
 		else
 		{
