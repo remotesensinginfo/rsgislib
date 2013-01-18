@@ -32,6 +32,8 @@
 #include "img/RSGISImageBandException.h"
 #include "img/RSGISImageUtils.h"
 
+#include "math/RSGISMathsUtils.h"
+
 namespace rsgis 
 {
 	namespace img

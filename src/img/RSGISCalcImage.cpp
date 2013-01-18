@@ -1459,7 +1459,7 @@ namespace rsgis{namespace img{
 		try
 		{
 			// Find image overlap
-			imgUtils.getImageOverlap(datasets, numDS, dsOffsets, &width, &height, gdalTranslation, env);
+			imgUtils.getImageOverlapCut2Env(datasets, numDS, dsOffsets, &width, &height, gdalTranslation, env);
             
 			// Count number of image bands
 			for(int i = 0; i < numDS; i++)

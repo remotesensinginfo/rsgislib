@@ -125,14 +125,27 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 	XMLString::release(&formatXMLStr);
 
     // Get extension for out image format (only required for multiple output images)
-    // TODO: Add in getting extension from GDAL driver
-    if(this->imageFormat == "ENVI"){this->outFileExtension = "env";}
-    else if(this->imageFormat == "KEA"){this->outFileExtension = "kea";}
-    else if(this->imageFormat == "GTiff"){this->outFileExtension = "tif";}
-    else if(this->imageFormat == "HFA"){this->outFileExtension = "img";}
-    else if(this->imageFormat == "PNG"){this->outFileExtension = "png";}
-    else if(this->imageFormat == "AAIGrid"){this->outFileExtension = "asc";}
-    else{std::cout << "Extension not known for file format, using \".env\"" << std::endl;}
+    XMLCh *formatExtXMLStr = XMLString::transcode("extension");
+	if(argElement->hasAttribute(formatExtXMLStr))
+	{
+		char *charValue = XMLString::transcode(argElement->getAttribute(formatExtXMLStr));
+		this->outFileExtension = string(charValue);
+		XMLString::release(&charValue);
+	}
+    else
+    {
+        this->outFileExtension = "env";
+        if(this->imageFormat == "ENVI"){this->outFileExtension = "env";}
+        else if(this->imageFormat == "KEA"){this->outFileExtension = "kea";}
+        else if(this->imageFormat == "GTiff"){this->outFileExtension = "tif";}
+        else if(this->imageFormat == "HFA"){this->outFileExtension = "img";}
+        else if(this->imageFormat == "PNG"){this->outFileExtension = "png";}
+        else if(this->imageFormat == "AAIGrid"){this->outFileExtension = "asc";}
+        else{std::cout << "Extension not known for file format, using \".env\"" << std::endl;}
+    }
+	XMLString::release(&formatExtXMLStr);
+    
+    
     
     this->outDataType = GDT_Float32;
 	XMLCh *datatypeXMLStr = XMLString::transcode("datatype");
