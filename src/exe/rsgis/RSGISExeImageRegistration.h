@@ -73,7 +73,8 @@ namespace rsgisexe{
             undefinedOutput,
             envi_img2img,
             envi_img2map,
-            rsgis_img2map
+            rsgis_img2map,
+            rsgis_mapoffs
         };
         
         enum SimilarityMetric 

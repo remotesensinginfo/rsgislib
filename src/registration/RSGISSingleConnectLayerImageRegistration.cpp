@@ -354,6 +354,18 @@ namespace rsgis{namespace reg{
 		this->exportTiePointsRSGISImage2MapImpl(filepath, tmpTiePts);
 		delete tmpTiePts;
 	}
+    
+    void RSGISSingleConnectLayerImageRegistration::exportTiePointsRSGISMapOffs(std::string filepath)throw(RSGISRegistrationException)
+    {
+        std::list<TiePoint*> *tmpTiePts = new std::list<TiePoint*>();
+		std::list<TiePointInSingleLayer*>::iterator iterTiePts;
+		for(iterTiePts = tiePoints->begin(); iterTiePts != tiePoints->end(); ++iterTiePts)
+		{
+			tmpTiePts->push_back((*iterTiePts)->tiePt);
+		}
+		this->exportTiePointsRSGISMapOffsImpl(filepath, tmpTiePts);
+		delete tmpTiePts;
+    }
 	
 	RSGISSingleConnectLayerImageRegistration::~RSGISSingleConnectLayerImageRegistration()
 	{
