@@ -131,6 +131,7 @@ namespace rsgis{namespace reg{
 		virtual void exportTiePointsENVIImage2Map(std::string filepath)throw(RSGISRegistrationException)=0;
 		virtual void exportTiePointsENVIImage2Image(std::string filepath)throw(RSGISRegistrationException)=0;
 		virtual void exportTiePointsRSGISImage2Map(std::string filepath)throw(RSGISRegistrationException)=0;
+        virtual void exportTiePointsRSGISMapOffs(std::string filepath)throw(RSGISRegistrationException)=0;
 		virtual ~RSGISImageRegistration();
 	protected:
 		void findOverlap()throw(RSGISRegistrationException);
@@ -144,6 +145,7 @@ namespace rsgis{namespace reg{
 		void exportTiePointsENVIImage2MapImpl(std::string filepath, std::list<TiePoint*> *tiePts)throw(RSGISRegistrationException);
 		void exportTiePointsENVIImage2ImageImpl(std::string filepath, std::list<TiePoint*> *tiePts)throw(RSGISRegistrationException);
 		void exportTiePointsRSGISImage2MapImpl(std::string filepath, std::list<TiePoint*> *tiePts)throw(RSGISRegistrationException);
+        void exportTiePointsRSGISMapOffsImpl(std::string filepath, std::list<TiePoint*> *tiePts)throw(RSGISRegistrationException);
 		GDALDataset *referenceIMG;
 		GDALDataset *floatingIMG;
 		OverlapRegion* overlap;

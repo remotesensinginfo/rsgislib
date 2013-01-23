@@ -225,6 +225,11 @@ namespace rsgis{namespace reg{
 	{
 		this->exportTiePointsRSGISImage2MapImpl(filepath, tiePoints);
 	}
+    
+    void RSGISBasicImageRegistration::exportTiePointsRSGISMapOffs(std::string filepath)throw(RSGISRegistrationException)
+    {
+        this->exportTiePointsRSGISMapOffsImpl(filepath, tiePoints);
+    }
 	
 	RSGISBasicImageRegistration::~RSGISBasicImageRegistration()
 	{

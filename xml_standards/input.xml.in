@@ -1338,9 +1338,9 @@
 
 
     <!-- A command for automatically generating a set of ground control points between a pair of images - A basic algorithm with a single iteration and movement of gcps-->
-    <rsgis:command algor="registration" option="basic" reference="image" floating="image" output="gcps.txt" outputType="envi_img2img|envi_img2map|rsgis_img2map" metric="euclidean|sqdiff|manhatten|correlation" pixelgap="int" window="int" search="int" threshold="float" stddevRef="float" stddevFloat="float" subpixelresolution="int"/>
+    <rsgis:command algor="registration" option="basic" reference="image" floating="image" output="gcps.txt" outputType="envi_img2img|envi_img2map|rsgis_img2map|rsgis_mapoffs" metric="euclidean|sqdiff|manhatten|correlation" pixelgap="int" window="int" search="int" threshold="float" stddevRef="float" stddevFloat="float" subpixelresolution="int"/>
     <!-- A command for automatically generating a set of ground control points between a pair of images - An algorithm with a single layer of connected gcps which used IDW to shift neighbouring gcps within a distance threshold -->
-    <rsgis:command algor="registration" option="singlelayer" reference="image" floating="image" output="gcps.txt" outputType="envi_img2img|envi_img2map|rsgis_img2map" metric="euclidean|sqdiff|manhatten|correlation" pixelgap="int" window="int" search="int" threshold="float" stddevRef="float" stddevFloat="float" subpixelresolution="int" distanceThreshold="float" maxiterations="int" movementThreshold="float" pSmoothness="float"/>
+    <rsgis:command algor="registration" option="singlelayer" reference="image" floating="image" output="gcps.txt" outputType="envi_img2img|envi_img2map|rsgis_img2map|rsgis_mapoffs" metric="euclidean|sqdiff|manhatten|correlation" pixelgap="int" window="int" search="int" threshold="float" stddevRef="float" stddevFloat="float" subpixelresolution="int" distanceThreshold="float" maxiterations="int" movementThreshold="float" pSmoothness="float"/>
     <!-- A command to warp an input image using a set of ground control points using a nearest neighbour algorithm -->
     <rsgis:command algor="registration" option="nnwarp" gcps="string" image="string" output="string" projection="file.wkt" resolution="float" format="string" transform="yes | no" />
     <!-- A command to warp an input image using a set of ground control points using a polynomial -->

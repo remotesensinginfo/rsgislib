@@ -108,6 +108,7 @@ void RSGISExeImageRegistration::retrieveParameters(xercesc::DOMElement *argEleme
 				XMLCh *envImg2ImgStr = xercesc::XMLString::transcode("envi_img2img");
 				XMLCh *enviImg2MapStr = xercesc::XMLString::transcode("envi_img2map");
 				XMLCh *rsgisImg2MapStr = xercesc::XMLString::transcode("rsgis_img2map");
+                XMLCh *rsgisMapOffsStr = xercesc::XMLString::transcode("rsgis_mapoffs");
 				
 				const XMLCh *outTypeValue = argElement->getAttribute(outputTypeXMLStr);
 				
@@ -122,6 +123,10 @@ void RSGISExeImageRegistration::retrieveParameters(xercesc::DOMElement *argEleme
 				else if(xercesc::XMLString::equals(outTypeValue, rsgisImg2MapStr))
 				{
 					this->outputType = RSGISExeImageRegistration::rsgis_img2map;
+				}
+                else if(xercesc::XMLString::equals(outTypeValue, rsgisMapOffsStr))
+				{
+					this->outputType = RSGISExeImageRegistration::rsgis_mapoffs;
 				}
 				else
 				{
@@ -325,6 +330,7 @@ void RSGISExeImageRegistration::retrieveParameters(xercesc::DOMElement *argEleme
 				XMLCh *envImg2ImgStr = xercesc::XMLString::transcode("envi_img2img");
 				XMLCh *enviImg2MapStr = xercesc::XMLString::transcode("envi_img2map");
 				XMLCh *rsgisImg2MapStr = xercesc::XMLString::transcode("rsgis_img2map");
+                XMLCh *rsgisMapOffsStr = xercesc::XMLString::transcode("rsgis_mapoffs");
 				
 				const XMLCh *outTypeValue = argElement->getAttribute(outputTypeXMLStr);
 				
@@ -339,6 +345,10 @@ void RSGISExeImageRegistration::retrieveParameters(xercesc::DOMElement *argEleme
 				else if(xercesc::XMLString::equals(outTypeValue, rsgisImg2MapStr))
 				{
 					this->outputType = RSGISExeImageRegistration::rsgis_img2map;
+				}
+                else if(xercesc::XMLString::equals(outTypeValue, rsgisMapOffsStr))
+				{
+					this->outputType = RSGISExeImageRegistration::rsgis_mapoffs;
 				}
 				else
 				{
@@ -966,6 +976,10 @@ void RSGISExeImageRegistration::runAlgorithm() throw(rsgis::RSGISException)
 			{
 				std::cout << "Output GCPs for RSGIS image to map\n";
 			}
+            else if(outputType == rsgis_mapoffs)
+			{
+				std::cout << "Output GCPs for RSGIS map offsets\n";
+			}
 			else 
 			{
 				throw rsgis::RSGISException("Output format Unknown");
@@ -1088,6 +1102,10 @@ void RSGISExeImageRegistration::runAlgorithm() throw(rsgis::RSGISException)
 			{
 				std::cout << "Output GCPs for RSGIS image to map\n";
 			}
+            else if(outputType == rsgis_mapoffs)
+			{
+				std::cout << "Output GCPs for RSGIS map offsets\n";
+			}
 			else 
 			{
 				throw rsgis::RSGISException("Output format Unknown");
@@ -1175,6 +1193,10 @@ void RSGISExeImageRegistration::runAlgorithm() throw(rsgis::RSGISException)
 					regImgs->exportTiePointsENVIImage2Map(this->outputGCPFile);
 				}
 				else if(outputType == rsgis_img2map)
+				{
+					regImgs->exportTiePointsRSGISImage2Map(this->outputGCPFile);
+				}
+                else if(outputType == rsgis_mapoffs)
 				{
 					regImgs->exportTiePointsRSGISImage2Map(this->outputGCPFile);
 				}
@@ -1432,17 +1454,21 @@ void RSGISExeImageRegistration::printParameters()
 			{
 				std::cout << "Output in image to image GCPs for ENVI\n";
 			}
-			else if(outputType == envi_img2img)
+			else if(outputType == envi_img2map)
 			{
 				std::cout << "Output in image to map GCPs for ENVI\n";
 			}
-			else if(outputType == envi_img2img)
+			else if(outputType == rsgis_img2map)
 			{
-				std::cout << "Output GCPs for GDAL\n";
+				std::cout << "Output GCPs for RSGIS image to map\n";
 			}
-			else 
+            else if(outputType == rsgis_mapoffs)
 			{
-				std::cout << "Format unknown\n";
+				std::cout << "Output GCPs for RSGIS map offsets\n";
+			}
+			else
+			{
+				throw rsgis::RSGISException("Output format Unknown");
 			}
 			if(metricType == euclidean)
 			{
@@ -1488,9 +1514,13 @@ void RSGISExeImageRegistration::printParameters()
 			}
 			else if(outputType == rsgis_img2map)
 			{
-				std::cout << "Output GCPs for RSGIS image to Map\n";
+				std::cout << "Output GCPs for RSGIS image to map\n";
 			}
-			else 
+            else if(outputType == rsgis_mapoffs)
+			{
+				std::cout << "Output GCPs for RSGIS map offsets\n";
+			}
+			else
 			{
 				throw rsgis::RSGISException("Output format Unknown");
 			}

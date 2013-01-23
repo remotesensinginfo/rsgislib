@@ -1183,6 +1183,39 @@ namespace rsgis{namespace reg{
 		outPtsFile.flush();
 		outPtsFile.close();
 	}
+    
+    void RSGISImageRegistration::exportTiePointsRSGISMapOffsImpl(std::string filepath, std::list<TiePoint*> *tiePts)throw(RSGISRegistrationException)
+    {
+        std::ofstream outPtsFile(filepath.c_str(), std::ios::out | std::ios::trunc);
+		
+		if(!outPtsFile.is_open())
+		{
+			std::string message = std::string("Could not open tie points file: ") + filepath;
+			throw RSGISRegistrationException(message);
+		}
+		
+		outPtsFile.precision(12);
+		outPtsFile << std::fixed;
+		
+		outPtsFile << "# RSGISLib Map offsets GCP File\n";
+		outPtsFile << "# Eastings, Northings, Offset to correct location for floating image (E,N)\n";
+		outPtsFile << "#\n";
+		
+		std::cout << tiePts->size() << " tie points to be exported\n";
+		
+		std::list<TiePoint*>::iterator iterTiePts;
+		for(iterTiePts = tiePts->begin(); iterTiePts != tiePts->end(); ++iterTiePts)
+		{
+			outPtsFile << (*iterTiePts)->eastings << "," << (*iterTiePts)->northings << "," << (*iterTiePts)->xShift << "," << (*iterTiePts)->yShift << std::endl;
+		}
+		
+		outPtsFile << "# End Of File\n";
+		
+		std::cout << "Export Complete\n";
+		
+		outPtsFile.flush();
+		outPtsFile.close();
+    }
 	
 	RSGISImageRegistration::~RSGISImageRegistration()
 	{

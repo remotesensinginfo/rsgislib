@@ -227,6 +227,11 @@ namespace rsgis{namespace reg{
         throw RSGISRegistrationException("Tie point export is not implemented.");
     }
     
+    void RSGISImagePixelRegistration::exportTiePointsRSGISMapOffs(std::string filepath)throw(RSGISRegistrationException)
+    {
+        throw RSGISRegistrationException("Tie point export is not implemented.");
+    }
+    
     RSGISImagePixelRegistration::~RSGISImagePixelRegistration()
     {
         
