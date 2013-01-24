@@ -253,89 +253,103 @@ namespace rsgis{namespace img{
                 allBandsZero = false;
             }
 		}
-		
-		if(!foundNan | !(ignoreZeros & allBandsZero))
-		{
-			if(func != NULL)
-			{
-				for(int i = 0; i < numBands; i++)
-				{
-					bandValues[i] = func->calcFunction(bandValues[i]);
-				}
-			}
-			
-            if(!calcSD || (calcSD && onePassSD)) // If not calculating SD or calculating SD with a single pass calculate mean, min + max
-			{
-				calcMean = true;
-                
-                for(int i = 0; i < numBands; i++)
+        /*
+        if(foundNan)
+        {
+            std::cout << "******** FOUND NAN ********\n";
+        }
+		*/
+        if(!foundNan)
+        {
+            if(!(ignoreZeros & allBandsZero))
+            {
+                if(func != NULL)
                 {
-                    if(firstMean[i])
+                    for(int i = 0; i < numBands; i++)
                     {
-                        if(!(ignoreZeros & (bandValues[i] == 0)))
-                        {
-                            meanSum[i] = bandValues[i];
-                            min[i] = bandValues[i];
-                            max[i] = bandValues[i];
-                            ++n[i];
-                            firstMean[i] = false;
-                        }
+                        bandValues[i] = func->calcFunction(bandValues[i]);
                     }
-                    else
+                }
+                
+                if(!calcSD || (calcSD && onePassSD)) // If not calculating SD or calculating SD with a single pass calculate mean, min + max
+                {
+                    calcMean = true;
+                    
+                    for(int i = 0; i < numBands; i++)
                     {
-                        if(!(ignoreZeros & (bandValues[i] == 0)))
+                        if(firstMean[i])
                         {
-                            meanSum[i] = meanSum[i] + bandValues[i];
-                            if(bandValues[i] < min[i])
+                            if(!(ignoreZeros & (bandValues[i] == 0)))
                             {
+                                meanSum[i] = bandValues[i];
                                 min[i] = bandValues[i];
-                            }
-                            if(bandValues[i] > max[i])
-                            {
                                 max[i] = bandValues[i];
+                                ++n[i];
+                                firstMean[i] = false;
                             }
-                            ++n[i];
                         }
+                        else
+                        {
+                            if(!(ignoreZeros & (bandValues[i] == 0)))
+                            {
+                                meanSum[i] = meanSum[i] + bandValues[i];
+                                if(bandValues[i] < min[i])
+                                {
+                                    min[i] = bandValues[i];
+                                }
+                                if(bandValues[i] > max[i])
+                                {
+                                    max[i] = bandValues[i];
+                                }
+                                ++n[i];
+                            }
+                        }
+                        
+                        if(calcSD && onePassSD)
+                        {                        
+                            sumSq[i] = sumSq[i] + bandValues[i]*bandValues[i];
+                        }
+                            
+                    }
+                }
+                else
+                {
+                    if(!calcMean)
+                    {
+                        throw RSGISImageCalcException("The standard deviation cannot be calculated before the mean.");
                     }
                     
-                    if(calcSD && onePassSD)
-                    {                        
-                        sumSq[i] = sumSq[i] + bandValues[i]*bandValues[i];
-                    }
-                        
-                }
-			}
-            
-			else
-			{
-				if(!calcMean)
-				{
-					throw RSGISImageCalcException("The standard deviation cannot be calculated before the mean.");
-				}
-                
-                for(int i = 0; i < numBands; i++)
-                {
-                    if(firstSD[i])
+                    for(int i = 0; i < numBands; i++)
                     {
-                        if(!(ignoreZeros & (bandValues[i] == 0)))
+                        if(firstSD[i])
                         {
-                            mean[i] = meanSum[i]/n[i];
-                            diffZ = mean[i] - bandValues[i];
-                            sumDiffZ[i] = (diffZ * diffZ);
-                            firstSD[i] = false;
-                        } 
-                    }
-                    else
-                    {
-                        if(!(ignoreZeros & (bandValues[i] == 0)))
+                            if(!(ignoreZeros & (bandValues[i] == 0)))
+                            {
+                                mean[i] = meanSum[i]/n[i];
+                                diffZ = mean[i] - bandValues[i];
+                                sumDiffZ[i] = (diffZ * diffZ);
+                                firstSD[i] = false;
+                            } 
+                        }
+                        else
                         {
-                            diffZ = mean[i] - bandValues[i];
-                            sumDiffZ[i] = sumDiffZ[i] + (diffZ * diffZ);
+                            if(!(ignoreZeros & (bandValues[i] == 0)))
+                            {
+                                diffZ = mean[i] - bandValues[i];
+                                sumDiffZ[i] = sumDiffZ[i] + (diffZ * diffZ);
+                            }
                         }
                     }
                 }
-			}
-		}
+            }
+        }
+        /*
+        for(int i = 0; i < numBands; i++)
+        {
+            std::cout << "Stats band " << i+1 << ": (Value: " << bandValues[i] << ") [Mean = " << meanSum[i] << "] [Min = " << min[i] << "] [Max = " << max[i] << "] [n = " << n[i] << "] [sumSq = " << sumSq[i] << "]\n";
+        }
+        std::cout << std::endl;
+         */
 	}
 	
 	void RSGISCalcImageStatistics::getImageStats(ImageStats** inStats, int numInputBands) throw(RSGISImageCalcException)
@@ -428,82 +442,85 @@ namespace rsgis{namespace img{
             }
 		}
 		
-		if(!foundNan | !(ignoreZeros & allBandsZero))
-		{
-			if(func != NULL)
-			{
-				for(int i = 0; i < numBands; i++)
-				{
-					bandValues[i] = func->calcFunction(bandValues[i]);
-				}
-			}
-			
-			
-			if(calcSD)
-			{
-				if(!calcMean)
-				{
-					throw RSGISImageCalcException("The standard deviation cannot be calculated before the mean.");
-				}
-                
-                for(int i = 0; i < numBands; i++)
+        if(!foundNan)
+        {
+            if(!(ignoreZeros & allBandsZero))
+            {
+                if(func != NULL)
                 {
-                    if(firstSD)
+                    for(int i = 0; i < numBands; i++)
                     {
-                        if(!(ignoreZeros & (bandValues[i] == 0)))
-                        {
-                            mean = meanSum/n;
-                            diffZ = mean - bandValues[i];
-                            sumDiffZ = (diffZ * diffZ);
-                            firstSD = false;
-                        } 
+                        bandValues[i] = func->calcFunction(bandValues[i]);
                     }
-                    else
+                }
+                
+                
+                if(calcSD)
+                {
+                    if(!calcMean)
                     {
-                        if(!(ignoreZeros & (bandValues[i] == 0)))
+                        throw RSGISImageCalcException("The standard deviation cannot be calculated before the mean.");
+                    }
+                    
+                    for(int i = 0; i < numBands; i++)
+                    {
+                        if(firstSD)
                         {
-                            diffZ = mean - bandValues[i];
-                            sumDiffZ = sumDiffZ + (diffZ * diffZ);
+                            if(!(ignoreZeros & (bandValues[i] == 0)))
+                            {
+                                mean = meanSum/n;
+                                diffZ = mean - bandValues[i];
+                                sumDiffZ = (diffZ * diffZ);
+                                firstSD = false;
+                            } 
+                        }
+                        else
+                        {
+                            if(!(ignoreZeros & (bandValues[i] == 0)))
+                            {
+                                diffZ = mean - bandValues[i];
+                                sumDiffZ = sumDiffZ + (diffZ * diffZ);
+                            }
                         }
                     }
                 }
-			}
-			else
-			{
-				calcMean = true;
-                
-                for(int i = 0; i < numBands; i++)
+                else
                 {
-                    if(firstMean)
+                    calcMean = true;
+                    
+                    for(int i = 0; i < numBands; i++)
                     {
-                        if(!(ignoreZeros & (bandValues[i] == 0)))
+                        if(firstMean)
                         {
-                            meanSum = bandValues[i];
-                            min = bandValues[i];
-                            max = bandValues[i];
-                            ++n;
-                            firstMean = false;
-                        } 
-                    }
-                    else
-                    {
-                        if(!(ignoreZeros & (bandValues[i] == 0)))
-                        {
-                            meanSum = meanSum + bandValues[i];
-                            if(bandValues[i] < min)
+                            if(!(ignoreZeros & (bandValues[i] == 0)))
                             {
+                                meanSum = bandValues[i];
                                 min = bandValues[i];
-                            }
-                            if(bandValues[i] > max)
-                            {
                                 max = bandValues[i];
+                                ++n;
+                                firstMean = false;
+                            } 
+                        }
+                        else
+                        {
+                            if(!(ignoreZeros & (bandValues[i] == 0)))
+                            {
+                                meanSum = meanSum + bandValues[i];
+                                if(bandValues[i] < min)
+                                {
+                                    min = bandValues[i];
+                                }
+                                if(bandValues[i] > max)
+                                {
+                                    max = bandValues[i];
+                                }
+                                ++n;
                             }
-                            ++n;
                         }
                     }
                 }
-			}
-		}
+            }
+        }
 	}
 	
     
