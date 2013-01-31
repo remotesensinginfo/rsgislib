@@ -327,7 +327,7 @@ void Control::createBlankXMLFile(std::string xmlFile)
 
 void Control::help(std::string algor)
 {
-    rsgis::RSGISAlgorithmParameters *algorParams;
+    rsgis::RSGISAlgorithmParameters *algorParams = NULL;
 	try
 	{
 		algorParams = factory->getAlgorithmParamterObj(algor);
