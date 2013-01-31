@@ -2624,7 +2624,8 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 		{
 			char *charValue = XMLString::transcode(argElement->getAttribute(overlapXMLStr));
 			this->tileOverlap = mathUtils.strtoint(string(charValue));
-			XMLString::release(&charValue);
+            std::cout << " Using overlap of " << this->tileOverlap << " pixels" << std::endl;
+            XMLString::release(&charValue);
 		}
 		else
 		{
@@ -4556,7 +4557,6 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
 				numImageBands = dataset[0]->GetRasterCount();
 				cout << "Raster Band Count = " << numImageBands << endl;
 
-
                 // Set up envlopes for image tiles
                 vector<geos::geom::Envelope*> *tileEnvelopes = new vector<geos::geom::Envelope*>;
 
@@ -4581,14 +4581,10 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
                 double maxX = minX + (width * pixelXRes);
                 double minY = maxY - (height * abs(pixelYRes));
 
-                //new Envelope(ogrEnv->MinX - buffer, ogrEnv->MaxX + buffer, ogrEnv->MinY - buffer, ogrEnv->MaxY + buffer);
-
                 double tileWidthMapUnits = this->width * pixelXRes;
-                double tileHeighMapUnits = this->height * pixelYRes;
+                double tileHeighMapUnits = this->height * abs(pixelYRes); // Max y resolution positive (makes things simpler)
                 double tileXOverlapMapUnits = this->tileOverlap * pixelXRes;
-                double tileYOverlapMapUnits = this->tileOverlap * pixelYRes;
-                
-                std::cout << "Tile size (map units): " << tileWidthMapUnits << " X " << sqrt(tileHeighMapUnits*tileHeighMapUnits) << std::endl;
+                double tileYOverlapMapUnits = this->tileOverlap * abs(pixelYRes);
 
                 double xStart = 0;
                 double yStart = 0;
@@ -4599,6 +4595,7 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
                 double xEndOverlap = 0;
                 double yEndOverlap = 0;
 
+                // Start at top left corner and work down (minX, maxY) 
                 for(xStart = minX; xStart < maxX; xStart+=tileWidthMapUnits)
                 {
                     xEnd = xStart + tileWidthMapUnits;
@@ -4613,21 +4610,22 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
                         xEndOverlap = maxX;
                     }
                     
-                    for(yStart = maxY; yStart > minY; yStart+=tileHeighMapUnits)
+                    for(yStart = maxY; yStart > minY; yStart-=tileHeighMapUnits)
                     {
-                        yEnd = yStart + tileHeighMapUnits;
-                        yStartOverlap = yStart - tileYOverlapMapUnits;
-                        yEndOverlap = yEnd + tileYOverlapMapUnits;
-                        if(yStartOverlap < minY) // Check tile will fit within image
+                        yEnd = yStart - tileHeighMapUnits;
+                        
+                        yStartOverlap = yStart + tileYOverlapMapUnits;
+                        yEndOverlap = yEnd - tileYOverlapMapUnits;
+                        if(yStartOverlap > maxY) // Check tile will fit within image
                         {
-                            yStartOverlap = minY;
+                            yStartOverlap = maxY;
                         }
-                        if(yEndOverlap > maxY) // Check tile will fit within image
+                        if(yEndOverlap < minY) // Check tile will fit within image
                         {
-                            yEndOverlap = maxY;
+                            yEndOverlap = minY;
                         }
                         
-                        tileEnvelopes->push_back(new geos::geom::Envelope(xStart, xEnd, yStart, yEnd));
+                        tileEnvelopes->push_back(new geos::geom::Envelope(xStartOverlap, xEndOverlap, yStartOverlap, yEndOverlap));
                     }
                 }
 
@@ -4636,7 +4634,8 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
  
 				for(unsigned int i = 0; i < tileEnvelopes->size(); ++i)
 				{
-					outputFilePath = this->outputImage + "_tile" + boost::lexical_cast<std::string>(i) + "." + this->outFileExtension;
+                    std::cout << "Tile " << i+1 << "/" << tileEnvelopes->size() << std::endl;
+                    outputFilePath = this->outputImage + "_tile" + boost::lexical_cast<std::string>(i) + "." + this->outFileExtension;
                     try
                     {
                         calcImage->calcImageInEnv(dataset, 1, outputFilePath, tileEnvelopes->at(i), false, NULL, this->imageFormat, this->outDataType);
@@ -4644,7 +4643,7 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
                     catch (RSGISImageBandException e)
                     {
                         cerr << "Error" << endl;
-                        //throw e;
+                        throw e;
                     }
 				}
 
