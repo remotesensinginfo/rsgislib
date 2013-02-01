@@ -93,6 +93,8 @@ protected:
     float viewAzimuth;
     int slopeOutputType;
     float maxElevHeight;
+    string imageFormat;
+    GDALDataType outDataType;
 };
     
 }
