@@ -58,6 +58,74 @@ void RSGISExeElevationDataTools::retrieveParameters(DOMElement *argElement) thro
 			throw RSGISXMLArgumentsException("The algorithm name is incorrect.");
 		}
 		
+	    // Set output image fomat (defaults to ENVI)
+		this->imageFormat = "ENVI";
+		XMLCh *formatXMLStr = XMLString::transcode("format");
+		if(argElement->hasAttribute(formatXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(formatXMLStr));
+			this->imageFormat = string(charValue);
+			XMLString::release(&charValue);
+		}
+		XMLString::release(&formatXMLStr);
+
+	    this->outDataType = GDT_Float32;
+		XMLCh *datatypeXMLStr = XMLString::transcode("datatype");
+		if(argElement->hasAttribute(datatypeXMLStr))
+		{
+	        XMLCh *dtByte = XMLString::transcode("Byte");
+	        XMLCh *dtUInt16 = XMLString::transcode("UInt16");
+	        XMLCh *dtInt16 = XMLString::transcode("Int16");
+	        XMLCh *dtUInt32 = XMLString::transcode("UInt32");
+	        XMLCh *dtInt32 = XMLString::transcode("Int32");
+	        XMLCh *dtFloat32 = XMLString::transcode("Float32");
+	        XMLCh *dtFloat64 = XMLString::transcode("Float64");
+
+	        const XMLCh *dtXMLValue = argElement->getAttribute(datatypeXMLStr);
+	        if(XMLString::equals(dtByte, dtXMLValue))
+	        {
+	            this->outDataType = GDT_Byte;
+	        }
+	        else if(XMLString::equals(dtUInt16, dtXMLValue))
+	        {
+	            this->outDataType = GDT_UInt16;
+	        }
+	        else if(XMLString::equals(dtInt16, dtXMLValue))
+	        {
+	            this->outDataType = GDT_Int16;
+	        }
+	        else if(XMLString::equals(dtUInt32, dtXMLValue))
+	        {
+	            this->outDataType = GDT_UInt32;
+	        }
+	        else if(XMLString::equals(dtInt32, dtXMLValue))
+	        {
+	            this->outDataType = GDT_Int32;
+	        }
+	        else if(XMLString::equals(dtFloat32, dtXMLValue))
+	        {
+	            this->outDataType = GDT_Float32;
+	        }
+	        else if(XMLString::equals(dtFloat64, dtXMLValue))
+	        {
+	            this->outDataType = GDT_Float64;
+	        }
+	        else
+	        {
+	            cerr << "Data type not recognised, defaulting to 32 bit float.";
+	            this->outDataType = GDT_Float32;
+	        }
+
+	        XMLString::release(&dtByte);
+	        XMLString::release(&dtUInt16);
+	        XMLString::release(&dtInt16);
+	        XMLString::release(&dtUInt32);
+	        XMLString::release(&dtInt32);
+	        XMLString::release(&dtFloat32);
+	        XMLString::release(&dtFloat64);
+		}
+		XMLString::release(&datatypeXMLStr);
+
 		const XMLCh *optionXML = argElement->getAttribute(optionXMLStr);
 		if(XMLString::equals(optionSlope, optionXML))
 		{
@@ -681,7 +749,7 @@ void RSGISExeElevationDataTools::runAlgorithm() throw(RSGISException)
 				calcSlope = new RSGISCalcSlope(1, imageBand, imageEWRes, imageNSRes, slopeOutputType);
 				
 				calcImage = new RSGISCalcImage(calcSlope, "", true);
-				calcImage->calcImageWindowData(datasets, 1, this->outputImage, 3);
+				calcImage->calcImageWindowData(datasets, 1, this->outputImage, 3, this->imageFormat, this->outDataType);
 
 				
 				GDALClose(datasets[0]);
@@ -743,7 +811,7 @@ void RSGISExeElevationDataTools::runAlgorithm() throw(RSGISException)
 				calcAspect = new RSGISCalcAspect(1, imageBand, imageEWRes, imageNSRes);
 				
 				calcImage = new RSGISCalcImage(calcAspect, "", true);
-				calcImage->calcImageWindowData(datasets, 1, this->outputImage, 3);
+				calcImage->calcImageWindowData(datasets, 1, this->outputImage, 3, this->imageFormat, this->outDataType);
                 
 				
 				GDALClose(datasets[0]);
@@ -805,7 +873,7 @@ void RSGISExeElevationDataTools::runAlgorithm() throw(RSGISException)
 				calcSlopeAspect = new RSGISCalcSlopeAspect(2, imageBand, imageEWRes, imageNSRes);
 				
 				calcImage = new RSGISCalcImage(calcSlopeAspect, "", true);
-				calcImage->calcImageWindowData(datasets, 1, this->outputImage, 3);
+				calcImage->calcImageWindowData(datasets, 1, this->outputImage, 3, this->imageFormat, this->outDataType);
                 
 				
 				GDALClose(datasets[0]);
@@ -869,7 +937,7 @@ void RSGISExeElevationDataTools::runAlgorithm() throw(RSGISException)
 				calcHillShade = new RSGISCalcHillShade(1, imageBand, imageEWRes, imageNSRes, solarZenith, solarAzimuth);
 				
 				calcImage = new RSGISCalcImage(calcHillShade, "", true);
-				calcImage->calcImageWindowData(datasets, 1, this->outputImage, 3);
+				calcImage->calcImageWindowData(datasets, 1, this->outputImage, 3, this->imageFormat, this->outDataType);
                 
 				
 				GDALClose(datasets[0]);
@@ -945,7 +1013,7 @@ void RSGISExeElevationDataTools::runAlgorithm() throw(RSGISException)
 				calcMaskShadow = new RSGISCalcShadowBinaryMask(1, datasets[0], imageBand, imageEWRes, imageNSRes, solarZenith, solarAzimuth, maxElevHeight);
 				
 				calcImage = new RSGISCalcImage(calcMaskShadow, "", true);
-				calcImage->calcImageExtent(datasets, 1, outputImage);
+				calcImage->calcImageExtent(datasets, 1, outputImage, this->imageFormat);
 				
 				GDALClose(datasets[0]);
 				delete[] datasets;
@@ -1008,7 +1076,7 @@ void RSGISExeElevationDataTools::runAlgorithm() throw(RSGISException)
 				calcIncidence = new RSGISCalcRayIncidentAngle(1, imageBand, imageEWRes, imageNSRes, solarZenith, solarAzimuth);
 				
 				calcImage = new RSGISCalcImage(calcIncidence, "", true);
-				calcImage->calcImageWindowData(datasets, 1, this->outputImage, 3);
+				calcImage->calcImageWindowData(datasets, 1, this->outputImage, 3, this->imageFormat, this->outDataType);
 				
 				GDALClose(datasets[0]);
 				delete[] datasets;
