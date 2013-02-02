@@ -537,25 +537,6 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			this->outtxt = csv;
 		}
 		XMLString::release(&outTXTStr);
-        
-        // Check if output should be transposed, so each band is in a seperate column instead of a seperate row.
-        XMLCh *transposeXMLStr = XMLString::transcode("transpose");
-        this->transposeOutput = false;
-		if(argElement->hasAttribute(transposeXMLStr))
-		{
-			XMLCh *yesStr = XMLString::transcode("yes");
-			const XMLCh *transposeValue = argElement->getAttribute(transposeXMLStr);
-			if(XMLString::equals(transposeValue, yesStr))
-			{
-				this->transposeOutput = true;
-			}
-			else
-			{
-				this->transposeOutput = false;
-			}
-			XMLString::release(&yesStr);
-		}
-        XMLString::release(&transposeXMLStr);
 		
 	}
     else if(XMLString::equals(optionVariablesToMatrix, optionXML))
@@ -2969,73 +2950,103 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 		}
 		else if(this->option == RSGISExeZonalStats::pixelVals2txt)
 		{
-			cout << "pixelVals2txt\n";
+            std::cout << "Pixel values to CSV \n";
+            std::cout << "Input Image: " << this->inputImage << std::endl;
+            std::cout << "Input Vector: " << this->inputVecPolys << std::endl;
+            
 			GDALAllRegister();
 			OGRRegisterAll();
-			
+			RSGISMathsUtils mathsUtil;
+			RSGISFileUtils fileUtils;
 			RSGISVectorUtils vecUtils;
+			
+			RSGISProcessVector *processVector = NULL;
+			RSGISProcessOGRFeature *processFeature = NULL;
+			
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVecPolys);
 			
-			GDALDataset **images = NULL;
-			OGRDataSource *inputVecDS = NULL;
-			OGRLayer *inputVecLayer = NULL;
+			GDALDataset *inputImageDS = NULL;
+			OGRDataSource *inputSHPDS = NULL;
+			OGRLayer *inputSHPLayer = NULL;
+			OGRSpatialReference* inputSpatialRef = NULL;
 			
-			RSGISZonalStats2Matrix zonalStats;
-			ClassVariables **classVars = NULL;
-			int numMatricies = 0;	
+			string outputDIR = "";
 			
 			try
 			{
-				// Open Image
-				images = new GDALDataset*[1];
-				images[0] = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_ReadOnly);
-				if(images[0] == NULL)
+				
+				/////////////////////////////////////
+				//
+				// Open Input Image.
+				//
+				/////////////////////////////////////
+                
+				inputImageDS = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_ReadOnly);
+				if(inputImageDS == NULL)
 				{
 					string message = string("Could not open image ") + this->inputImage;
 					throw RSGISException(message.c_str());
 				}
 				
-				// Open vector
-				inputVecDS = OGRSFDriverRegistrar::Open(this->inputVecPolys.c_str(), FALSE);
-				if(inputVecDS == NULL)
+				/////////////////////////////////////
+				//
+				// Open Input Shapfile.
+				//
+				/////////////////////////////////////
+				inputSHPDS = OGRSFDriverRegistrar::Open(this->inputVecPolys.c_str(), FALSE);
+				if(inputSHPDS == NULL)
 				{
 					string message = string("Could not open vector file ") + this->inputVecPolys;
 					throw RSGISException(message.c_str());
 				}
-				inputVecLayer = inputVecDS->GetLayerByName(SHPFileInLayer.c_str());
-				if(inputVecLayer == NULL)
+				inputSHPLayer = inputSHPDS->GetLayerByName(SHPFileInLayer.c_str());
+				if(inputSHPLayer == NULL)
 				{
 					string message = string("Could not open vector layer ") + SHPFileInLayer;
 					throw RSGISException(message.c_str());
 				}
 				
-				classVars = zonalStats.findPixelStats(images, 1, inputVecLayer, this->polyAttribute, &numMatricies, method);
-				RSGISMatrices matrixUtils;
-				string filepath = "";
-				for(int i = 0; i < numMatricies; i++)
-				{
-					filepath = this->outputMatrix + classVars[i]->name;
-					cout << "Saving .. " << filepath << endl;
-                    // Check if matrix should be transposed
-                    if(this->transposeOutput)
-                    {
-                        Matrix *outMatrix = matrixUtils.transpose(classVars[i]->matrix);
-                        matrixUtils.saveMatrix2txtOptions(outMatrix, filepath, this->outtxt);
-                    }
-                    else{matrixUtils.saveMatrix2txtOptions(classVars[i]->matrix, filepath, this->outtxt);}
+				inputSpatialRef = inputSHPLayer->GetSpatialRef();
+                
+                // Check the projection is the same for shapefile and image
+                if(!this->ignoreProjection)
+                {
+                    const char *pszWKTImg = inputImageDS->GetProjectionRef();
+                    char **pszWKTShp = new char*[1];
+                    inputSpatialRef->exportToWkt(pszWKTShp);
                     
-				}
+                    if((string(pszWKTImg) != string(pszWKTShp[0])))
+                    {
+                        cerr << "WARNING: Shapefile and image are not the same projection!\n\tImage is: " + string(pszWKTImg) + "\n\tShapefile is: " + string(pszWKTShp[0]) << "\n...Continuing anyway" << endl;
+                    }
+                    OGRFree(pszWKTShp);
+                }
+                                
+                processFeature = new RSGISPixelVals22Txt(inputImageDS, this->outputMatrix, this->polyAttribute, this->outtxt, this->method);
+				processVector = new RSGISProcessVector(processFeature);
+
+				processVector->processVectorsNoOutput(inputSHPLayer, true);
+
+				
+				// TIDY
+				GDALClose(inputImageDS); // Close input image
+				cout << "Image closed OK" << endl;
+				OGRDataSource::DestroyDataSource(inputSHPDS); // Close inputshape
+				cout << "in shp closed OK" << endl;
+
+				delete processVector;
+				delete processFeature;
+				
+				//OGRCleanupAll();
+				GDALDestroyDriverManager();
 			}
-			catch(RSGISException e)
+			catch (RSGISException& e) 
 			{
 				throw e;
 			}
-			
-			GDALClose(images[0]);
-			OGRDataSource::DestroyDataSource(inputVecDS);
-			
-			//OGRCleanupAll();
-			GDALDestroyDriverManager();
+            
+            
+            
 		}
         else if(this->option == RSGISExeZonalStats::varibles2matrix)
 		{

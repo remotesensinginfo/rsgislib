@@ -1183,7 +1183,7 @@ namespace rsgis{namespace vec{
 		
 		this->data = new double[dataSize];
 		
-		calcValue = new RSGISCalcZonalStatsFromRasterPolygon(dataSize, attributes, numAttributes);
+		calcValue = new RSGISCalcZonalStatsFromPolygon(dataSize, attributes, numAttributes);
 		calcImage = new rsgis::img::RSGISCalcImageSingle(calcValue);
 		
 		if (outZonalFileName != "") 
@@ -1499,7 +1499,7 @@ namespace rsgis{namespace vec{
 					throw rsgis::img::RSGISImageCalcException("The band attributes do not match the image.");
 				}
 				// Calculates the minimum of the two input image bands
-				if(!boost::math::isnan(attributes[i]->bands[j]+1))
+				if(!boost::math::isnan(bandValuesImage[attributes[i]->bands[j]+1]))
                 {
 					if(first)
 					{
@@ -2039,7 +2039,7 @@ namespace rsgis{namespace vec{
 					throw rsgis::img::RSGISImageCalcException("The band attributes do not match the image.");
 				}
 				// Calculates the minimum of the two input image bands
-                if(!boost::math::isnan(attributes[i]->bands[j]))
+                if(!boost::math::isnan(bandValuesImage[attributes[i]->bands[j]]))
                 {
                     if(first)
                     {
@@ -2221,7 +2221,7 @@ namespace rsgis{namespace vec{
 		return outputValues;
 		
 	}
-	
+    
 	void RSGISCalcZonalStatsFromPolygon::reset()
 	{
 		for(int i = 0; i < numAttributes; i++)

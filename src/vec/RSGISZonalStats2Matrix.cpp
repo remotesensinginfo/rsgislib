@@ -506,4 +506,164 @@ namespace rsgis{namespace vec{
 	{
 		
 	}
+    
+    RSGISPixelVals22Txt::RSGISPixelVals22Txt(GDALDataset *image, std::string outFileBase, std::string outNameHeading, math::outTXTform outType, rsgis::img::pixelInPolyOption method)
+	{
+		this->nImageBands = image->GetRasterCount(); // Get number of image bands
+        this->datasets = new GDALDataset*[1];
+		this->datasets[0] = image;
+		this->method = method; // Set method for calculating pixel in polygon.
+		this->outFileBase = outFileBase; // Set up base for out file.
+        this->outType = outType; // Set up type for output data.
+        this->data = new double[nImageBands]; // Set up array (not used here, but needed by image calc)
+        this->outNameHeading = outNameHeading;
+        // Set up structure for pixel values
+        this->pixelValues = new std::vector<double>*[this->nImageBands];
+		
+		for (int i = 0; i < this->nImageBands; i++)
+		{
+			this->pixelValues[i] = new std::vector<double>();
+		}
+        
+        // Set up calc image
+		calcValue = new RSGISCalcPixelValsFromPolygon(this->pixelValues, this->nImageBands);
+		calcImage = new rsgis::img::RSGISCalcImageSingle(calcValue);
+        
+		
+    }
+	
+	void RSGISPixelVals22Txt::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+	{
+		// Zonal stats - output to text file.
+		try
+		{
+			RSGISVectorUtils vecUtils;
+			calcValue->reset(); // Reset values
+            
+            OGRPolygon *inOGRPoly;
+			geos::geom::Polygon *poly;
+			inOGRPoly = (OGRPolygon *) feature->GetGeometryRef();
+			poly = vecUtils.convertOGRPolygon2GEOSPolygon(inOGRPoly);
+            
+            // Get name from attribute table (unless FID, or it doesn't exist)
+            std::string outPolyName = "";
+            if(this->outNameHeading == "FID")
+            {
+                outPolyName = boost::lexical_cast<std::string>(fid);
+            }
+            else
+            {
+                OGRFeatureDefn *inFeatureDefn = feature->GetDefnRef();
+                unsigned int fieldIdx = inFeatureDefn->GetFieldIndex(this->outNameHeading.c_str());
+                if(fieldIdx > 0)
+                {
+                    outPolyName = feature->GetFieldAsString(fieldIdx);
+                }
+                else
+                {
+					std::string message = "This layer does not contain a field with the name \'" + this->outNameHeading + "\'\nTry using FID";
+					throw RSGISVectorException(message.c_str());
+                }
+            }
+			
+            // Populate vector with pixel values
+			calcImage->calcImageWithinPolygon(this->datasets, 1, this->data, env, poly, true, this->method);
+            
+            
+            // Write to text file
+            if(this->pixelValues[0]->size() > 0)
+            {
+                std::string outExt = ".csv";
+                if(this->outType == math::gtxt){outExt = ".gmtxt";}
+                else if(this->outType == math::mtxt){outExt = ".mtxt";}
+                
+                std::string outTextFilePoly = this->outFileBase + outPolyName + outExt;
+                std::cout << "Saving to: " << outTextFilePoly << std::endl;
+                std::ofstream outTxtFile;
+                
+                outTxtFile.open(outTextFilePoly.c_str(), std::ios::out | std::ios::trunc);
+                
+                if((this->outType == math::gtxt) | (this->outType == math::mtxt))
+                {
+                    outTxtFile << "m=" << this->nImageBands << std::endl;
+                    outTxtFile << "n=" << this->pixelValues[0]->size() << std::endl;
+                }
+                
+                for (unsigned int i = 0; i < this->pixelValues[0]->size(); ++i)
+                {
+                    for(unsigned int j = 0; j < this->nImageBands - 1; ++j)
+                    {
+                        outTxtFile << this->pixelValues[j]->at(i) << ",";
+                    }
+                    if ((this->outType == math::mtxt) && (i == this->pixelValues[0]->size()))
+                    {
+                        // If very last element write newline instead of comma.
+                        outTxtFile << this->pixelValues[this->nImageBands-1]->at(i) << std::endl;
+                    }
+                    else if(this->outType == math::mtxt)
+                    {
+                        // No newline for mtxt format.
+                        outTxtFile << this->pixelValues[this->nImageBands-1]->at(i) << ",";
+                    }
+                    else
+                    {
+                        // Write newline instead of comma for last row.
+                        outTxtFile << this->pixelValues[this->nImageBands-1]->at(i) << std::endl;
+                    }
+                }
+                
+                outTxtFile.flush();
+                outTxtFile.close();
+            }
+		}
+		
+		catch(RSGISException& e)
+		{
+			throw RSGISVectorException(e.what());
+		}
+	}
+	
+	RSGISPixelVals22Txt::~RSGISPixelVals22Txt()
+	{
+        delete this->calcValue;
+        delete this->calcImage;
+        delete this->data;
+        delete[] this->pixelValues;
+	}
+    
+    
+    RSGISCalcPixelValsFromPolygon::RSGISCalcPixelValsFromPolygon(std::vector<double> **pixelValues, unsigned int numInBands) : rsgis::img::RSGISCalcImageSingleValue(numOutputValues)
+	{
+        this->pixelValues = pixelValues;
+        this->numInBands = numInBands;
+	}
+	
+	void RSGISCalcPixelValsFromPolygon::calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt) throw(rsgis::img::RSGISImageCalcException)
+	{
+		for(int i = 0; i < this->numInBands; i++)
+		{
+            if(!boost::math::isnan(bandValuesImage[i]))
+            {
+                this->pixelValues[i]->push_back(bandValuesImage[i]);
+            }
+		}
+	}
+	
+	double* RSGISCalcPixelValsFromPolygon::getOutputValues() throw(rsgis::img::RSGISImageCalcException)
+	{
+		return outputValues;
+	}
+    
+	void RSGISCalcPixelValsFromPolygon::reset()
+	{
+		for(int i = 0; i < this->numInBands; i++)
+		{
+			this->pixelValues[i]->clear();
+		}
+	}
+	
+	RSGISCalcPixelValsFromPolygon::~RSGISCalcPixelValsFromPolygon()
+	{
+	}
+    
 }}
