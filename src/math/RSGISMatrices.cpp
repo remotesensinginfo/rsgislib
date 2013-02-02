@@ -444,17 +444,18 @@ namespace rsgis{namespace math{
 			int lastElement = totalElements-1;
 			for(int i = 0; i < totalElements; i++)
 			{
-				if(i %  matrix->m == 0)
+				if(i == 0) // Don't start firstline with comma or newline
+                {
+                    outTxtFile  << matrix->matrix[i];
+                }
+                else if((i %  matrix->m == 0)) // If start of line, begin with a new line.
 				{
-					outTxtFile << std::endl;
+					//outTxtFile << std::endl;
+                    outTxtFile  << std::endl << matrix->matrix[i];
 				}
-				if(i == lastElement)
+				else // Otherwise, begin with a comma
 				{
-					outTxtFile << matrix->matrix[i];
-				}
-				else
-				{
-					outTxtFile << matrix->matrix[i] << ",";
+					outTxtFile  << "," << matrix->matrix[i];
 				}
 			}
 			outTxtFile.flush();

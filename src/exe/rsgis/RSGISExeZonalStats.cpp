@@ -537,6 +537,25 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			this->outtxt = csv;
 		}
 		XMLString::release(&outTXTStr);
+        
+        // Check if output should be transposed, so each band is in a seperate column instead of a seperate row.
+        XMLCh *transposeXMLStr = XMLString::transcode("transpose");
+        this->transposeOutput = false;
+		if(argElement->hasAttribute(transposeXMLStr))
+		{
+			XMLCh *yesStr = XMLString::transcode("yes");
+			const XMLCh *transposeValue = argElement->getAttribute(transposeXMLStr);
+			if(XMLString::equals(transposeValue, yesStr))
+			{
+				this->transposeOutput = true;
+			}
+			else
+			{
+				this->transposeOutput = false;
+			}
+			XMLString::release(&yesStr);
+		}
+        XMLString::release(&transposeXMLStr);
 		
 	}
     else if(XMLString::equals(optionVariablesToMatrix, optionXML))
@@ -2997,7 +3016,14 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 				{
 					filepath = this->outputMatrix + classVars[i]->name;
 					cout << "Saving .. " << filepath << endl;
-					matrixUtils.saveMatrix2txtOptions(classVars[i]->matrix, filepath, this->outtxt);
+                    // Check if matrix should be transposed
+                    if(this->transposeOutput)
+                    {
+                        Matrix *outMatrix = matrixUtils.transpose(classVars[i]->matrix);
+                        matrixUtils.saveMatrix2txtOptions(outMatrix, filepath, this->outtxt);
+                    }
+                    else{matrixUtils.saveMatrix2txtOptions(classVars[i]->matrix, filepath, this->outtxt);}
+                    
 				}
 			}
 			catch(RSGISException e)
