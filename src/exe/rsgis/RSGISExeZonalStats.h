@@ -148,6 +148,7 @@ class RSGISExeZonalStats : public RSGISAlgorithmParameters
 		bool maxThreashAll;
 		double minThreashAllVal;
 		double maxThreashAllVal;
+        bool transposeOutput;
 	};
 }
 
