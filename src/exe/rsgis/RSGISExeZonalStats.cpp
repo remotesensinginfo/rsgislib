@@ -3029,14 +3029,14 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 
 				
 				// TIDY
-				GDALClose(inputImageDS); // Close input image
+				delete processFeature;
+                delete processVector;
+				
+                GDALClose(inputImageDS); // Close input image
 				cout << "Image closed OK" << endl;
 				OGRDataSource::DestroyDataSource(inputSHPDS); // Close inputshape
-				cout << "in shp closed OK" << endl;
-
-				delete processVector;
-				delete processFeature;
-				
+				cout << "Shapefile closed OK" << endl;
+                
 				//OGRCleanupAll();
 				GDALDestroyDriverManager();
 			}
