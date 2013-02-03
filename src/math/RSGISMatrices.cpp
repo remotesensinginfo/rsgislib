@@ -441,7 +441,6 @@ namespace rsgis{namespace math{
 		if(outTxtFile.is_open())
 		{			
 			int totalElements = matrix->n * matrix->m;
-			int lastElement = totalElements-1;
 			for(int i = 0; i < totalElements; i++)
 			{
 				if(i == 0) // Don't start firstline with comma or newline

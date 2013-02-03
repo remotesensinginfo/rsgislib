@@ -77,11 +77,11 @@
     <rsgis:command algor="zonalstats" option="rasterpolygons2shp" image="image.env" raster="polys.env" vector="polys.shp" output="output.shp" mean="yes" max="yes" min="yes" stddev="yes" />
     <!-- Deprecated: A command to undertake zonal stats to calculate the min, max, mean, std dev for a rasterised polygon with the output written to a text file -->
     <rsgis:command algor="zonalstats" option="rasterpolygons2txt" image="image.env" raster="polys.env" vector="polys.shp" output="output.txt" mean="yes" max="yes" min="yes" stddev="yes" />
-    <!-- A command to extract pixel values and save to a text file -->
-    <rsgis:command algor="zonalstats" option="pixelVals2txt" image="image.env" vector="polys.shp" output="output_base" attribute="classname" method="polyContainsPixel | polyContainsPixelCenter | polyOverlapsPixel | polyOverlapsOrContainsPixel | pixelContainsPoly | pixelContainsPolyCenter | adaptive | envelope" outTXT="mtxt | gtxt | csv" transpose="yes | no" />
+    <!-- A command to extract pixel values for all polygons in a shapefile and save to a text file for each polygon -->
+    <rsgis:command algor="zonalstats" option="pixelVals2txt" image="image.env" vector="polys.shp" output="output_base" attribute="classname" method="polyContainsPixel | polyContainsPixelCenter | polyOverlapsPixel | polyOverlapsOrContainsPixel | pixelContainsPoly | pixelContainsPolyCenter | adaptive | envelope" outTXT="mtxt | gtxt | csv" ignoreProjection="yes | no" />
     <!-- TODO A command to generate a matrix file for each polygon with the out -->
     <rsgis:command algor="zonalstats" option="variables2matrix" image="image.env" vector="polys.shp" output="output_base" attribute="classname" method="polyContainsPixel | polyContainsPixelCenter | polyOverlapsPixel | polyOverlapsOrContainsPixel | pixelContainsPoly | pixelContainsPolyCenter | adaptive | envelope" />
-    <!-- TODO A command to generate a matrix file for each polygon with the out -->
+    <!-- A command to extract all the pixel values falling within a polygon and save as a matrix -->
     <rsgis:command algor="zonalstats" option="image2matrix" image="image.env" vector="polys.shp" output="output.mtxt" band="int" />
     <!-- Deprecated TODO A command to -->
     <rsgis:command algor="zonalstats" option="pixelcount" image="image.env" raster="polys.env" vector="polys.shp" output="output.shp" force="yes | no" pxlcount="yes | no" emptyset="yes | no">
