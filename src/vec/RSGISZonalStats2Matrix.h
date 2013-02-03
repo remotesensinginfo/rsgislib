@@ -97,7 +97,7 @@ namespace rsgis{namespace vec{
         std::string outFileBase;
         std::string outNameHeading;
         math::outTXTform outType;
-        bool firstLine;
+        std::string outStatusText;
     };
     
     class RSGISCalcPixelValsFromPolygon : public rsgis::img::RSGISCalcImageSingleValue

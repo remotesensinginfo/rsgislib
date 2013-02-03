@@ -94,7 +94,7 @@ namespace rsgis{namespace vec{
 			inputLayer->ResetReading();
 			while( (inFeature = inputLayer->GetNextFeature()) != NULL )
 			{
-				if((numFeatures > 10) && (i % feedback) == 0)
+				if((numFeatures > 10) && ((i % feedback) == 0) && feedbackCounter <= 100)
 				{
 					if(outVertical)
 					{
@@ -222,7 +222,7 @@ namespace rsgis{namespace vec{
 			inputLayer->ResetReading();
 			while( (inFeature = inputLayer->GetNextFeature()) != NULL )
 			{
-				if((numFeatures > 10) && (i % feedback) == 0)
+				if((numFeatures > 10) && ((i % feedback) == 0) && feedbackCounter <= 100)
 				{
 					if(outVertical)
 					{
@@ -338,7 +338,7 @@ namespace rsgis{namespace vec{
 			inputLayer->ResetReading();
 			while( (inFeature = inputLayer->GetNextFeature()) != NULL )
 			{
-				if((numFeatures > 10) && (i % feedback) == 0)
+				if((numFeatures > 10) && ((i % feedback) == 0) && feedbackCounter <= 100)
 				{
 					if(outVertical)
 					{

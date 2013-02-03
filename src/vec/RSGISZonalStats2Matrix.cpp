@@ -517,6 +517,7 @@ namespace rsgis{namespace vec{
         this->outType = outType; // Set up type for output data.
         this->data = new double[nImageBands]; // Set up array (not used here, but needed by image calc)
         this->outNameHeading = outNameHeading;
+        this->outStatusText = "\n"; // Set up string for output text, print at end.
         // Set up structure for pixel values
         this->pixelValues = new std::vector<double>*[this->nImageBands];
 		
@@ -537,7 +538,7 @@ namespace rsgis{namespace vec{
 		// Zonal stats - output to text file.
 		try
 		{
-			RSGISVectorUtils vecUtils;
+            RSGISVectorUtils vecUtils;
 			calcValue->reset(); // Reset values
             
             OGRPolygon *inOGRPoly;
@@ -567,18 +568,22 @@ namespace rsgis{namespace vec{
             }
 			
             // Populate vector with pixel values
-			calcImage->calcImageWithinPolygon(this->datasets, 1, this->data, env, poly, true, this->method);
-            
+			calcImage->calcImageWithinPolygon(this->datasets, 1, this->data, env, poly, false, this->method);
+                        
             
             // Write to text file
-            if(this->pixelValues[0]->size() > 0)
+            if(this->pixelValues[0]->empty())
+            {
+                this->outStatusText =  this->outStatusText + "No pixels found for class: " + outPolyName + "\n";
+            }
+            else
             {
                 std::string outExt = ".csv";
                 if(this->outType == math::gtxt){outExt = ".gmtxt";}
                 else if(this->outType == math::mtxt){outExt = ".mtxt";}
                 
                 std::string outTextFilePoly = this->outFileBase + outPolyName + outExt;
-                std::cout << "Saving to: " << outTextFilePoly << std::endl;
+                this->outStatusText =  this->outStatusText + "Saved " + boost::lexical_cast<std::string>(this->pixelValues[0]->size()) + " pixels to: " + outTextFilePoly + "\n";
                 std::ofstream outTxtFile;
                 
                 outTxtFile.open(outTextFilePoly.c_str(), std::ios::out | std::ios::trunc);
@@ -588,6 +593,17 @@ namespace rsgis{namespace vec{
                     outTxtFile << "m=" << this->nImageBands << std::endl;
                     outTxtFile << "n=" << this->pixelValues[0]->size() << std::endl;
                 }
+                else
+                {
+                    // Write header row for CSV
+                    std::string outHeader = "";
+                    for(unsigned int j = 0; j < this->nImageBands - 1; ++j)
+					{
+                        outHeader += "b" + boost::lexical_cast<std::string>(j+1) + ",";
+                    }
+                    outHeader += "b" + boost::lexical_cast<std::string>(this->nImageBands);
+                    outTxtFile << outHeader << std::endl;
+                }
                 
                 for (unsigned int i = 0; i < this->pixelValues[0]->size(); ++i)
                 {
@@ -595,7 +611,7 @@ namespace rsgis{namespace vec{
                     {
                         outTxtFile << this->pixelValues[j]->at(i) << ",";
                     }
-                    if ((this->outType == math::mtxt) && (i == this->pixelValues[0]->size()))
+                    if ((this->outType == math::mtxt) && (i == this->pixelValues[0]->size()-1))
                     {
                         // If very last element write newline instead of comma.
                         outTxtFile << this->pixelValues[this->nImageBands-1]->at(i) << std::endl;
@@ -625,6 +641,8 @@ namespace rsgis{namespace vec{
 	
 	RSGISPixelVals22Txt::~RSGISPixelVals22Txt()
 	{
+        // Print information to screen when finished, so as not to intefere with processing status display.
+        std::cout << this->outStatusText << std::endl;
         delete this->calcValue;
         delete this->calcImage;
         delete this->data;
@@ -651,7 +669,7 @@ namespace rsgis{namespace vec{
 	
 	double* RSGISCalcPixelValsFromPolygon::getOutputValues() throw(rsgis::img::RSGISImageCalcException)
 	{
-		return outputValues;
+        return outputValues;
 	}
     
 	void RSGISCalcPixelValsFromPolygon::reset()
