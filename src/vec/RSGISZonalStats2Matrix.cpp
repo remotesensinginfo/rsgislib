@@ -650,7 +650,7 @@ namespace rsgis{namespace vec{
 	}
     
     
-    RSGISCalcPixelValsFromPolygon::RSGISCalcPixelValsFromPolygon(std::vector<double> **pixelValues, unsigned int numInBands) : rsgis::img::RSGISCalcImageSingleValue(numOutputValues)
+    RSGISCalcPixelValsFromPolygon::RSGISCalcPixelValsFromPolygon(std::vector<double> **pixelValues, unsigned int numInBands) : rsgis::img::RSGISCalcImageSingleValue(numInBands)
 	{
         this->pixelValues = pixelValues;
         this->numInBands = numInBands;

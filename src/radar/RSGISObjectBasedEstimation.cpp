@@ -1463,7 +1463,7 @@ namespace rsgis{namespace radar{
 		delete[] pixelVals;
 	}
 
-	RSGISObjectBasedEstimationGetObjVals::RSGISObjectBasedEstimationGetObjVals(std::vector<float> **pixelVals, int numBands) : RSGISCalcImageSingleValue(numOutputValues)
+	RSGISObjectBasedEstimationGetObjVals::RSGISObjectBasedEstimationGetObjVals(std::vector<float> **pixelVals, int numBands) : RSGISCalcImageSingleValue(numBands)
 	{
 		this->pixelVals = pixelVals;
 		this->numBands = numBands;
