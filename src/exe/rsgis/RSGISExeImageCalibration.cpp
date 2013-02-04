@@ -1126,7 +1126,27 @@ void RSGISExeImageCalibration::retrieveParameters(DOMElement *argElement) throw(
                     else if(sensorBand == "ASTER_SWIR_B9")
                     {
                         this->solarIrradiance[i] = 56.92;
-                    }                    
+                    }
+                    else if(sensorBand == "RapidEye_Blue")
+                    {
+                        this->solarIrradiance[i] = 1997.8;
+                    }
+                    else if(sensorBand == "RapidEye_Green")
+                    {
+                        this->solarIrradiance[i] = 1863.5;
+                    }
+                    else if(sensorBand == "RapidEye_Red")
+                    {
+                        this->solarIrradiance[i] = 1560.4;
+                    }
+                    else if(sensorBand == "RapidEye_RedEdge")
+                    {
+                        this->solarIrradiance[i] = 1395.0;
+                    }
+                    else if(sensorBand == "RapidEye_NIR")
+                    {
+                        this->solarIrradiance[i] = 1124.4;
+                    }
                     else
                     {
                         cout << "sensorBand = " << sensorBand << endl;
