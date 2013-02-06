@@ -205,10 +205,10 @@ namespace rsgis{namespace img{
                     rowOffset = bandOffsets[n][1] + (yBlockSize * nYBlocks);
 					inputRasterBands[n]->RasterIO(GF_Read, bandOffsets[n][0], rowOffset, width, remainRows, inputData[n], width, remainRows, GDT_Float32, 0, 0);
 				}
-                
+                                
                 for(int m = 0; m < remainRows; ++m)
                 {
-                    if((((nYBlocks*yBlockSize)+m) % feedback) == 0)
+                    if((nYBlocks > 0) && ((((nYBlocks*yBlockSize)+m) % feedback) == 0))
                     {
                         std::cout << "." << feedbackCounter << "." << std::flush;
                         feedbackCounter = feedbackCounter + 10;
