@@ -146,12 +146,12 @@ namespace rsgis{namespace img{
 				outputData[i] = (float *) CPLMalloc(sizeof(float)*(width*yBlockSize));
 			}
 			outDataColumn = new float[this->numOutBands];
-            
-            int nYBlocks = height / yBlockSize;
+                      
+            int nYBlocks = floor(((double)height) / ((double)yBlockSize));
             int remainRows = height - (nYBlocks * yBlockSize);
             int rowOffset = 0;
             
-			int feedback = height/10;
+			int feedback = height/10.0;
 			int feedbackCounter = 0;
 			std::cout << "Started" << std::flush;
 			// Loop images to process data
@@ -167,7 +167,7 @@ namespace rsgis{namespace img{
                 
                 for(int m = 0; m < yBlockSize; ++m)
                 {
-                    if((((i*yBlockSize)+m) % feedback) == 0)
+                    if((feedback != 0) && (((i*yBlockSize)+m) % feedback) == 0)
                     {
                         std::cout << "." << feedbackCounter << "." << std::flush;
                         feedbackCounter = feedbackCounter + 10;
@@ -208,7 +208,7 @@ namespace rsgis{namespace img{
                                 
                 for(int m = 0; m < remainRows; ++m)
                 {
-                    if((nYBlocks > 0) && ((((nYBlocks*yBlockSize)+m) % feedback) == 0))
+                    if((feedback != 0) && ((((nYBlocks*yBlockSize)+m) % feedback) == 0))
                     {
                         std::cout << "." << feedbackCounter << "." << std::flush;
                         feedbackCounter = feedbackCounter + 10;
@@ -592,7 +592,7 @@ namespace rsgis{namespace img{
                 
                 for(int m = 0; m < yBlockSize; ++m)
                 {
-                    if((((i*yBlockSize)+m) % feedback) == 0)
+                    if((feedback != 0) && ((((i*yBlockSize)+m) % feedback) == 0))
                     {
                         std::cout << "." << feedbackCounter << "." << std::flush;
                         feedbackCounter = feedbackCounter + 10;
@@ -633,7 +633,7 @@ namespace rsgis{namespace img{
                 
                 for(int m = 0; m < remainRows; ++m)
                 {
-                    if((((nYBlocks*yBlockSize)+m) % feedback) == 0)
+                    if((feedback != 0) && ((((nYBlocks*yBlockSize)+m) % feedback) == 0))
                     {
                         std::cout << "." << feedbackCounter << "." << std::flush;
                         feedbackCounter = feedbackCounter + 10;
@@ -972,7 +972,7 @@ namespace rsgis{namespace img{
                 
                 for(int m = 0; m < yBlockSize; ++m)
                 {
-                    if((((i*yBlockSize)+m) % feedback) == 0)
+                    if((feedback != 0) && ((((i*yBlockSize)+m) % feedback) == 0))
                     {
                         std::cout << "." << feedbackCounter << "." << std::flush;
                         feedbackCounter = feedbackCounter + 10;
@@ -1002,7 +1002,7 @@ namespace rsgis{namespace img{
                 
                 for(int m = 0; m < remainRows; ++m)
                 {
-                    if((((nYBlocks*yBlockSize)+m) % feedback) == 0)
+                    if((feedback != 0) && ((((nYBlocks*yBlockSize)+m) % feedback) == 0))
                     {
                         std::cout << "." << feedbackCounter << "." << std::flush;
                         feedbackCounter = feedbackCounter + 10;
