@@ -1138,8 +1138,8 @@
     <rsgis:command algor="vectorutils" option="copyassignproj" vector="vector.shp" output="string" projwkt="txt.wkt" force="yes | no" />
     <!-- A command to print the wkt projection string for a vector layer -->
     <rsgis:command algor="vectorutils" option="printwkt" vector="vector.shp" />
-	<!-- A command to add a column with a feature id, starting at 1 -->
-	<rsgis:command algor="vectorutils" option="addfidcol" vector="vector.shp" output="string" force="yes | no" />
+	<!-- A command to add a column with a feature id, starting at initial value -->
+	<rsgis:command algor="vectorutils" option="addfidcol" vector="vector.shp" output="string" init="unsigned int" force="yes | no" />
 
 
 
