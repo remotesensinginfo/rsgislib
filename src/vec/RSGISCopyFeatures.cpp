@@ -56,9 +56,9 @@ namespace rsgis{namespace vec{
     
     
     
-    RSGISCopyFeaturesAddFIDCol::RSGISCopyFeaturesAddFIDCol()
+    RSGISCopyFeaturesAddFIDCol::RSGISCopyFeaturesAddFIDCol(unsigned int initFID)
 	{
-		fidCount = 1;
+		fidCount = initFID;
         fieldIdx = 0;
 	}
 	

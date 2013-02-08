@@ -4200,6 +4200,20 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'force\' attribute was provided.");
 		}
 		XMLString::release(&forceXMLStr);
+        
+        
+        XMLCh *initXMLStr = XMLString::transcode("init");
+		if(argElement->hasAttribute(initXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(initXMLStr));
+			this->initFID = mathUtils.strtounsignedint(string(charValue));
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			this->initFID = 0;
+		}
+		XMLString::release(&initXMLStr);
     }
 	else
 	{
@@ -9522,6 +9536,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
             cout << "Copy the data and add a FID column\n";
             cout << "Input Vector: " << this->inputVector << endl;
             cout << "Output Vector: " << this->outputVector << endl;
+            cout << "Init Value: " << this->initFID << endl;
             
             try 
             {
@@ -9599,7 +9614,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					throw RSGISVectorOutputException(message.c_str());
 				}
                 
-                RSGISCopyFeaturesAddFIDCol *copyFeatures = new RSGISCopyFeaturesAddFIDCol();
+                RSGISCopyFeaturesAddFIDCol *copyFeatures = new RSGISCopyFeaturesAddFIDCol(initFID);
                 RSGISProcessVector *processVector = new RSGISProcessVector(copyFeatures);
 				processVector->processVectors(inputSHPLayer, outputSHPLayer, true, true, false);
                 

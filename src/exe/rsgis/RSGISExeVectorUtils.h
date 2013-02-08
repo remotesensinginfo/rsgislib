@@ -274,6 +274,7 @@ class RSGISExeVectorUtils : public RSGISAlgorithmParameters
         string sqlExpression;
         bool outTextFile;
         bool bufferValueInText;
+        unsigned int initFID;
 	};
 }
 #endif
