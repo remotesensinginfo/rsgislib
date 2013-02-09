@@ -969,6 +969,8 @@ set(LIB_VEC_UTILS_CPP
 	${RSGIS_SRC_VEC_DIR}/RSGISAppendToVectorLayer.h 
 	${RSGIS_SRC_VEC_DIR}/RSGISCalcPolygonArea.cpp 
 	${RSGIS_SRC_VEC_DIR}/RSGISCalcPolygonArea.h
+	${RSGIS_SRC_VEC_DIR}/RSGISCalcDistanceStats.cpp
+	${RSGIS_SRC_VEC_DIR}/RSGISCalcDistanceStats.h
 	${RSGIS_SRC_VEC_DIR}/RSGISClusterData.cpp 
 	${RSGIS_SRC_VEC_DIR}/RSGISClusterData.h 
 	${RSGIS_SRC_VEC_DIR}/RSGISClusteredClassificationPolygon.cpp

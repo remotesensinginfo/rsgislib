@@ -85,6 +85,7 @@
 #include "vec/RSGISDropSmallPolygons.h"
 #include "vec/RSGISVectorMaths.h"
 #include "vec/RSGISGetOGRGeometries.h"
+#include "vec/RSGISCalcDistanceStats.h"
 
 #include "geom/RSGISIdentifyNonConvexPolygons.h"
 #include "geom/RSGISIdentifyNonConvexPolygonsLineProject.h"
@@ -187,7 +188,8 @@ class RSGISExeVectorUtils : public RSGISAlgorithmParameters
             calcmeanmindist,
             copyassignproj,
             printwkt,
-            addfidcol
+            addfidcol,
+            mindist2polys
 		};
 		
 		RSGISExeVectorUtils();
