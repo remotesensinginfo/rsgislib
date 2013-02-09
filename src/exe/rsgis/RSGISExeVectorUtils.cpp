@@ -9805,10 +9805,13 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
                 std::vector<OGRGeometry*> *polys = new std::vector<OGRGeometry*>();
                 RSGISGetOGRGeometries *getPolys = new RSGISGetOGRGeometries(polys);
                 RSGISProcessVector *readVector = new RSGISProcessVector(getPolys);
-				readVector->processVectors(inputSHPLayer, false);
+				readVector->processVectorsNoOutput(inputPolysSHPLayer, false);
                 delete readVector;
                 delete getPolys;
                 
+                cout << "There are " << polys->size() << " geometries to which distances will be calulated\n";
+                
+                cout << "Calculate Distances\n";
                 RSGISCalcMinDists2Polys *calcMinDists = new RSGISCalcMinDists2Polys(polys);
                 RSGISProcessVector *processVector = new RSGISProcessVector(calcMinDists);
 				processVector->processVectors(inputSHPLayer, outputSHPLayer, true, true, false);
