@@ -1140,7 +1140,8 @@
     <rsgis:command algor="vectorutils" option="printwkt" vector="vector.shp" />
 	<!-- A command to add a column with a feature id, starting at initial value -->
 	<rsgis:command algor="vectorutils" option="addfidcol" vector="vector.shp" output="string" init="unsigned int" force="yes | no" />
-
+	<!-- A command to calculate the minimum distance to each polygon for each point -->
+	<rsgis:command algor="vectorutils" option="mindist2polys" vector="vector.shp" polygons="vector.shp" output="string" force="yes | no" />
 
 
 

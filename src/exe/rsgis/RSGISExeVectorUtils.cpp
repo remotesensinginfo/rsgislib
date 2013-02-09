@@ -129,6 +129,7 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
     XMLCh *optionCopyAssignProj = XMLString::transcode("copyassignproj");
     XMLCh *optionPrintWKT = XMLString::transcode("printwkt");
     XMLCh *optionAddFIDCol = XMLString::transcode("addfidcol");
+    XMLCh *optionMinDist2Polys = XMLString::transcode("mindist2polys");
 	
 	XMLCh *optionGenerateGrid = XMLString::transcode("generategrid");
 	XMLCh *optionGenerateImageGrid = XMLString::transcode("generateimagegrid");
@@ -4215,6 +4216,71 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 		}
 		XMLString::release(&initXMLStr);
     }
+    else if (XMLString::equals(optionMinDist2Polys, optionXML))
+    {
+        this->option = RSGISExeVectorUtils::mindist2polys;
+        
+        if(!singlevector)
+		{
+			throw RSGISXMLArgumentsException("This algorithm requires only a single vector input.");
+		}
+		
+		if(noInputProvide)
+		{
+			throw RSGISXMLArgumentsException("No input file has been provided.");
+		}
+        
+        XMLCh *polysXMLStr = XMLString::transcode("polygons");
+		if(argElement->hasAttribute(polysXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(polysXMLStr));
+			this->inputGeometry = string(charValue);
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'polygons\' attribute was provided.");
+		}
+		XMLString::release(&polysXMLStr);
+        
+        XMLCh *outputXMLStr = XMLString::transcode("output");
+		if(argElement->hasAttribute(outputXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
+			this->outputVector = string(charValue);
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+		}
+		XMLString::release(&outputXMLStr);
+        
+        XMLCh *forceXMLStr = XMLString::transcode("force");
+		if(argElement->hasAttribute(forceXMLStr))
+		{
+			XMLCh *yesStr = XMLString::transcode("yes");
+			const XMLCh *forceValue = argElement->getAttribute(forceXMLStr);
+			
+			if(XMLString::equals(forceValue, yesStr))
+			{
+				this->force = true;
+			}
+			else
+			{
+				this->force = false;
+			}
+			XMLString::release(&yesStr);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'force\' attribute was provided.");
+		}
+		XMLString::release(&forceXMLStr);
+        
+        
+        
+    }
 	else
 	{
 		string message = string("The option (") + string(XMLString::transcode(optionXML)) + string(") is not known: RSGISExeVectorUtils.");
@@ -4285,6 +4351,7 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
     XMLString::release(&optionCopyAssignProj);
     XMLString::release(&optionPrintWKT);
     XMLString::release(&optionAddFIDCol);
+    XMLString::release(&optionMinDist2Polys);
 }
 
 void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
@@ -4295,7 +4362,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 	}
 	else
 	{
-		cout.precision(9);
+		cout.precision(12);
 		if(option == RSGISExeVectorUtils::removeAttributes)
 		{
 			cout << "Copy geometry and remove attributes\n";
@@ -9629,6 +9696,142 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
                 throw e;
             }
         }
+        else if(option == RSGISExeVectorUtils::mindist2polys)
+        {
+            cout << "A command to calculate the minimum distance to each polygon for each point.\n";
+            cout << "Input Vector: " << this->inputVector << endl;
+            cout << "Polygons Vector: " << this->inputGeometry << endl;
+            cout << "Output Vector: " << this->outputVector << endl;
+            
+            try
+            {
+                OGRRegisterAll();
+                
+                RSGISFileUtils fileUtils;
+                RSGISVectorUtils vecUtils;
+                
+                OGRDataSource *inputSHPDS = NULL;
+                OGRLayer *inputSHPLayer = NULL;
+                OGRDataSource *inputPolysSHPDS = NULL;
+                OGRLayer *inputPolysSHPLayer = NULL;
+                OGRSFDriver *shpFiledriver = NULL;
+                OGRDataSource *outputSHPDS = NULL;
+                OGRLayer *outputSHPLayer = NULL;
+                OGRFeatureDefn *inFeatureDefn = NULL;
+                
+                string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
+                string SHPFileInPolysLayer = vecUtils.getLayerName(this->inputGeometry);
+                string SHPFileOutLayer = vecUtils.getLayerName(this->outputVector);
+                
+                string outputDIR = fileUtils.getFileDirectoryPath(this->outputVector);
+				
+				if(vecUtils.checkDIR4SHP(outputDIR, SHPFileOutLayer))
+				{
+					if(this->force)
+					{
+						vecUtils.deleteSHP(outputDIR, SHPFileOutLayer);
+					}
+					else
+					{
+						throw RSGISException("Shapefile already exists, either delete or select force.");
+					}
+				}
+				
+				/////////////////////////////////////
+				//
+				// Open Input Shapfile.
+				//
+				/////////////////////////////////////
+				inputSHPDS = OGRSFDriverRegistrar::Open(this->inputVector.c_str(), FALSE);
+				if(inputSHPDS == NULL)
+				{
+					string message = string("Could not open vector file ") + this->inputVector;
+					throw RSGISFileException(message.c_str());
+				}
+				inputSHPLayer = inputSHPDS->GetLayerByName(SHPFileInLayer.c_str());
+				if(inputSHPLayer == NULL)
+				{
+					string message = string("Could not open vector layer ") + SHPFileInLayer;
+					throw RSGISFileException(message.c_str());
+				}
+				inFeatureDefn = inputSHPLayer->GetLayerDefn();
+                OGRwkbGeometryType wktGeomType = inputSHPLayer->GetGeomType();
+                OGRSpatialReference *outSpatialRef = inputSHPLayer->GetSpatialRef();
+                
+                
+                /////////////////////////////////////
+				//
+				// Open Input Polygons Shapfile.
+				//
+				/////////////////////////////////////
+				inputPolysSHPDS = OGRSFDriverRegistrar::Open(this->inputGeometry.c_str(), FALSE);
+				if(inputPolysSHPDS == NULL)
+				{
+					string message = string("Could not open vector file ") + this->inputGeometry;
+					throw RSGISFileException(message.c_str());
+				}
+				inputPolysSHPLayer = inputPolysSHPDS->GetLayerByName(SHPFileInPolysLayer.c_str());
+				if(inputPolysSHPLayer == NULL)
+				{
+					string message = string("Could not open vector layer ") + SHPFileInPolysLayer;
+					throw RSGISFileException(message.c_str());
+				}
+                
+				/////////////////////////////////////
+				//
+				// Create Output Shapfile.
+				//
+				/////////////////////////////////////
+				const char *pszDriverName = "ESRI Shapefile";
+				shpFiledriver = OGRSFDriverRegistrar::GetRegistrar()->GetDriverByName(pszDriverName );
+				if( shpFiledriver == NULL )
+				{
+					throw RSGISVectorOutputException("SHP driver not available.");
+				}
+				outputSHPDS = shpFiledriver->CreateDataSource(this->outputVector.c_str(), NULL);
+				if( outputSHPDS == NULL )
+				{
+					string message = string("Could not create vector file ") + this->outputVector;
+					throw RSGISVectorOutputException(message.c_str());
+				}
+				outputSHPLayer = outputSHPDS->CreateLayer(SHPFileOutLayer.c_str(), outSpatialRef, wktGeomType, NULL );
+				if( outputSHPLayer == NULL )
+				{
+					string message = string("Could not create vector layer ") + SHPFileOutLayer;
+					throw RSGISVectorOutputException(message.c_str());
+				}
+                
+                cout << "Reading Polygons\n";
+                std::vector<OGRGeometry*> *polys = new std::vector<OGRGeometry*>();
+                RSGISGetOGRGeometries *getPolys = new RSGISGetOGRGeometries(polys);
+                RSGISProcessVector *readVector = new RSGISProcessVector(getPolys);
+				readVector->processVectors(inputSHPLayer, false);
+                delete readVector;
+                delete getPolys;
+                
+                RSGISCalcMinDists2Polys *calcMinDists = new RSGISCalcMinDists2Polys(polys);
+                RSGISProcessVector *processVector = new RSGISProcessVector(calcMinDists);
+				processVector->processVectors(inputSHPLayer, outputSHPLayer, true, true, false);
+                
+                delete calcMinDists;
+                delete processVector;
+                
+                for(std::vector<OGRGeometry*>::iterator iterGeoms = polys->begin(); iterGeoms != polys->end(); ++iterGeoms)
+                {
+                    delete *iterGeoms;
+                }
+                delete polys;
+                
+                OGRDataSource::DestroyDataSource(inputSHPDS);
+                OGRDataSource::DestroyDataSource(inputPolysSHPDS);
+                OGRDataSource::DestroyDataSource(outputSHPDS);
+            }
+            catch (RSGISException &e)
+            {
+                throw e;
+            }
+            
+        }
 		else
 		{
 			cout << "Options not recognised\n";
@@ -10133,6 +10336,13 @@ void RSGISExeVectorUtils::printParameters()
         {
             cout << "Copy the data and add a FID column\n";
             cout << "Input Vector: " << this->inputVector << endl;
+            cout << "Output Vector: " << this->outputVector << endl;
+        }
+        else if(option == RSGISExeVectorUtils::mindist2polys)
+        {
+            cout << "A command to calculate the minimum distance to each polygon for each point.\n";
+            cout << "Input Vector: " << this->inputVector << endl;
+            cout << "Polygons Vector: " << this->inputGeometry << endl;
             cout << "Output Vector: " << this->outputVector << endl;
         }
 		else
