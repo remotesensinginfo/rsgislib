@@ -1104,7 +1104,6 @@ namespace rsgis{namespace img{
 		}
 	}
 	
-	
 	RSGISCalcImageSingleValue* RSGISCalcImageSingle::getRSGISCalcImageSingleValue()
 	{
 		return this->valueCalc;

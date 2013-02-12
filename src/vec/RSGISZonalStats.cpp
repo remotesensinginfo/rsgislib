@@ -1080,17 +1080,17 @@ namespace rsgis{namespace vec{
 	
 	void RSGISCalcZonalStatsFromRaster::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
 	{
-		throw rsgis::img::RSGISImageCalcException("No Implemented.");
+		throw rsgis::img::RSGISImageCalcException("RSGISCalcZonalStatsFromRaster: No Implemented.");
 	}
 	
 	void RSGISCalcZonalStatsFromRaster::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException)
 	{
-		throw rsgis::img::RSGISImageCalcException("Not Implemented");
+		throw rsgis::img::RSGISImageCalcException("RSGISCalcZonalStatsFromRaster: Not Implemented");
 	}
 	
 	void RSGISCalcZonalStatsFromRaster::calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException)
 	{
-		throw rsgis::img::RSGISImageCalcException("No Implemented.");
+		throw rsgis::img::RSGISImageCalcException("RSGISCalcZonalStatsFromRaster: No Implemented.");
 	}
 	
 	void RSGISCalcZonalStatsFromRaster::calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException)
@@ -1183,7 +1183,8 @@ namespace rsgis{namespace vec{
 		
 		this->data = new double[dataSize];
 		
-		calcValue = new RSGISCalcZonalStatsFromPolygon(dataSize, attributes, numAttributes);
+        calcValue = new RSGISCalcZonalStatsFromRasterPolygon(dataSize, attributes, numAttributes);
+		//calcValue = new RSGISCalcZonalStatsFromPolygon(dataSize, attributes, numAttributes);
 		calcImage = new rsgis::img::RSGISCalcImageSingle(calcValue);
 		
 		if (outZonalFileName != "") 
@@ -1199,9 +1200,8 @@ namespace rsgis{namespace vec{
 		try
 		{
 			calcValue->reset();
-			
 			calcImage->calcImageWithinRasterPolygon(datasets, 2, data, env, fid, true);
-			
+            
 			OGRFeatureDefn *outFeatureDefn = outFeature->GetDefnRef();
 			
             for(int i = 0; i < numAttributes; i++)
@@ -2024,7 +2024,7 @@ namespace rsgis{namespace vec{
 	}
 	
 	void RSGISCalcZonalStatsFromPolygon::calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt) throw(rsgis::img::RSGISImageCalcException)
-	{ 
+	{
 		for(int i = 0; i < this->numAttributes; i++)
 		{
 			bool first = true;

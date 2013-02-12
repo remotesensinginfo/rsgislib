@@ -3431,6 +3431,8 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 						string message = string("Could not open image ") + this->inputRasPolys;
 						throw RSGISException(message.c_str());
 					}
+                    
+                    cout << "Using raster for point in polygon...\n";
 				}
 				
 				/////////////////////////////////////
