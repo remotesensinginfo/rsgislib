@@ -40,12 +40,17 @@ namespace rsgis{namespace img{
             pt.setX((extent.getMinX() + (extent.getMaxX() - extent.getMinX())/2));
             pt.setY((extent.getMinY() + (extent.getMaxY() - extent.getMinY())/2));
             
-            bandValues[0] = pt.Distance(geomCollection);
-            
             if(geomOrigCollection->Contains(&pt))
             {
                 bandValues[0]  *= (-1);
             }
+            else
+            {
+                bandValues[0] = pt.Distance(geomCollection);
+            }
+            
+            //std::cout << "Dist = " << bandValues[0] << std::endl;
+            
         } 
         catch (std::exception &e) 
         {

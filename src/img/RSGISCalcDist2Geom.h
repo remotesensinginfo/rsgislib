@@ -58,7 +58,6 @@ namespace rsgis{namespace img{
 		bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
 		~RSGISCalcDist2Geom();
 	private:
-		int numImages;
         OGRGeometryCollection *geomCollection;
         OGRGeometryCollection *geomOrigCollection;
 	};

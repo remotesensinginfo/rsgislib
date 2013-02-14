@@ -106,6 +106,7 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
     XMLCh *optionAssignSpatialInfo = XMLString::transcode("assignspatialinfo");
     XMLCh *optionGenAssessPoints = XMLString::transcode("genassesspoints");
     XMLCh *optionUniquePxlClumps = XMLString::transcode("uniquepxlclumps");
+    XMLCh *optionSubset2Image = XMLString::transcode("subset2img");
 
 	const XMLCh *algorNameEle = argElement->getAttribute(algorXMLStr);
 	if(!XMLString::equals(algorName, algorNameEle))
@@ -2992,6 +2993,50 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 		XMLString::release(&noDataValXMLStr);
         
 	}
+    else if (XMLString::equals(optionSubset2Image, optionXML))
+	{
+		this->option = RSGISExeImageUtils::subset2img;
+        
+		XMLCh *imageXMLStr = XMLString::transcode("image");
+		if(argElement->hasAttribute(imageXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(imageXMLStr));
+			this->inputImage = string(charValue);
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+		}
+		XMLString::release(&imageXMLStr);
+        
+		XMLCh *outputXMLStr = XMLString::transcode("output");
+		if(argElement->hasAttribute(outputXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
+			this->outputImage = string(charValue);
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+		}
+		XMLString::release(&outputXMLStr);
+        
+        
+		XMLCh *roiXMLStr = XMLString::transcode("roi");
+		if(argElement->hasAttribute(roiXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(roiXMLStr));
+			this->inputROIImage = string(charValue);
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'roi\' attribute was provided.");
+		}
+		XMLString::release(&roiXMLStr);
+	}
 	else
 	{
 		string message = string("The option (") + string(XMLString::transcode(optionXML)) + string(") is not known: RSGISExeImageUtils.");
@@ -3041,6 +3086,7 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
     XMLString::release(&optionBandColourUsage);
     XMLString::release(&optionAssignSpatialInfo);
     XMLString::release(&optionGenAssessPoints);
+    XMLString::release(&optionSubset2Image);
 
 	parsed = true;
 }
@@ -4222,7 +4268,7 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
 
 				copyImage = new RSGISCopyImage(numImageBands);
 				calcImage = new RSGISCalcImage(copyImage, "", true);
-                calcImage->calcImageInEnv(dataset, 1, outputImage, &extent);
+                calcImage->calcImageInEnv(dataset, 1, outputImage, &extent, false, NULL, imageFormat, outDataType);
 
 				GDALClose(dataset[0]);
 				delete[] dataset;
@@ -5056,6 +5102,66 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
 			GDALDestroyDriverManager();
             
         }
+        else if(option == RSGISExeImageUtils::subset2img)
+		{
+			cout << "Subset image to another image\n";
+			GDALAllRegister();
+			OGRRegisterAll();
+            
+			GDALDataset **dataset = NULL;
+            GDALDataset *roiDataset = NULL;
+            
+			RSGISCopyImage *copyImage = NULL;
+			RSGISCalcImage *calcImage = NULL;
+            
+			int numImageBands = 0;
+            
+			try
+			{
+				// Open Image
+				dataset = new GDALDataset*[1];
+				cout << this->inputImage << endl;
+				dataset[0] = (GDALDataset *) GDALOpenShared(this->inputImage.c_str(), GA_ReadOnly);
+				if(dataset[0] == NULL)
+				{
+					string message = string("Could not open image ") + this->inputImage;
+					throw RSGISImageException(message.c_str());
+				}
+				numImageBands = dataset[0]->GetRasterCount();
+				cout << "Raster Band Count = " << numImageBands << endl;
+                
+                roiDataset = (GDALDataset *) GDALOpenShared(this->inputROIImage.c_str(), GA_ReadOnly);
+				if(roiDataset == NULL)
+				{
+					string message = string("Could not open image ") + this->inputROIImage;
+					throw RSGISImageException(message.c_str());
+				}
+				
+                RSGISImageUtils imgUtils;
+                
+                OGREnvelope *ogrExtent = imgUtils.getSpatialExtent(roiDataset);
+                geos::geom::Envelope extent = geos::geom::Envelope(ogrExtent->MinX, ogrExtent->MaxX, ogrExtent->MinY, ogrExtent->MaxY);
+                
+                cout.precision(12);
+                cout << "BBOX [" << ogrExtent->MinX << "," << ogrExtent->MaxX << "][" << ogrExtent->MinY << "," << ogrExtent->MaxY << "]\n";
+                
+				copyImage = new RSGISCopyImage(numImageBands);
+				calcImage = new RSGISCalcImage(copyImage, "", true);
+                calcImage->calcImageInEnv(dataset, 1, outputImage, &extent, false, NULL, imageFormat, outDataType);
+                
+				GDALClose(dataset[0]);
+				delete[] dataset;
+                GDALClose(roiDataset);
+
+				GDALDestroyDriverManager();
+				delete calcImage;
+				delete copyImage;
+			}
+			catch(RSGISException e)
+			{
+				cout << "RSGISException caught: " << e.what() << endl;
+			}
+		}
 		else
 		{
 			cout << "Options not recognised\n";
