@@ -1872,6 +1872,33 @@ namespace rsgis{namespace img{
 		}
     }
     
+    OGREnvelope* RSGISImageUtils::getSpatialExtent(GDALDataset *dataset) throw(RSGISImageBandException)
+    {
+        OGREnvelope *env = new OGREnvelope();
+        try
+        {
+            double *gdalTranslation = new double[6];
+            dataset->GetGeoTransform(gdalTranslation);
+            
+            double minX = gdalTranslation[0];
+            double maxY = gdalTranslation[3];
+            double maxX = minX + (dataset->GetRasterXSize() * gdalTranslation[1]);
+            double minY = maxY + (dataset->GetRasterYSize() * gdalTranslation[5]);
+            
+            env->MinX = minX;
+            env->MaxX = maxX;
+            env->MinY = minY;
+            env->MaxY = maxY;
+        }
+        catch(RSGISImageBandException &e)
+        {
+            delete env;
+            throw e;
+        }
+        
+        return env;
+    }
+    
 	void RSGISImageUtils::exportImageToTextCol(GDALDataset *image, int band, std::string outputText)throw(RSGISImageBandException, RSGISOutputStreamException)
 	{
 		RSGISImageUtils imgUtils;

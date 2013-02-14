@@ -135,7 +135,8 @@ class RSGISExeImageUtils : public RSGISAlgorithmParameters
             bandcolourusage,
             assignspatialinfo,
             genassesspoints,
-            uniquepxlclumps
+            uniquepxlclumps,
+            subset2img
 		};
 
 		enum interpolators
@@ -188,6 +189,7 @@ class RSGISExeImageUtils : public RSGISAlgorithmParameters
         string imageFormat;
         string lutMatrixFile;
         string classColumnName;
+        string inputROIImage;
 		ClassColour **classColour;
 		float nodataValue;
 		float skipValue;

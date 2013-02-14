@@ -88,6 +88,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
     XMLCh *optionAllBandsEqualTo = xercesc::XMLString::transcode("allbandsequalto");
     XMLCh *optionHistogram = xercesc::XMLString::transcode("histogram");
     XMLCh *optionBandPercentile = xercesc::XMLString::transcode("bandpercentile");
+    XMLCh *optionImgDist2Geoms = xercesc::XMLString::transcode("imgdist2geoms");
 
 	const XMLCh *algorNameEle = argElement->getAttribute(xercesc::XMLString::transcode("algor"));
 	if(!xercesc::XMLString::equals(algorName, algorNameEle))
@@ -2416,6 +2417,49 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 		}
 		xercesc::XMLString::release(&percentileXMLStr);
     }
+    else if(xercesc::XMLString::equals(optionImgDist2Geoms, optionXML))
+	{
+		this->option = RSGISExeImageCalculation::imgdist2geoms;
+		
+        XMLCh *imageXMLStr = xercesc::XMLString::transcode("image");
+		if(argElement->hasAttribute(imageXMLStr))
+		{
+			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(imageXMLStr));
+			this->inputImage = std::string(charValue);
+			xercesc::XMLString::release(&charValue);
+		}
+		else
+		{
+			throw rsgis::RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+		}
+		xercesc::XMLString::release(&imageXMLStr);
+        
+        XMLCh *vectorXMLStr = xercesc::XMLString::transcode("vector");
+		if(argElement->hasAttribute(vectorXMLStr))
+		{
+			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(vectorXMLStr));
+			this->inputVector = std::string(charValue);
+			xercesc::XMLString::release(&charValue);
+		}
+		else
+		{
+			throw rsgis::RSGISXMLArgumentsException("No \'vector\' attribute was provided.");
+		}
+		xercesc::XMLString::release(&vectorXMLStr);
+        
+		XMLCh *outputXMLStr = xercesc::XMLString::transcode("output");
+		if(argElement->hasAttribute(outputXMLStr))
+		{
+			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outputXMLStr));
+			this->outputImage = std::string(charValue);
+			xercesc::XMLString::release(&charValue);
+		}
+		else
+		{
+			throw rsgis::RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+		}
+		xercesc::XMLString::release(&outputXMLStr);
+	}
 	else
 	{
 		std::string message = std::string("The option (") + std::string(xercesc::XMLString::transcode(optionXML)) + std::string(") is not known: RSGISExeImageCalculation.");
@@ -2449,6 +2493,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
     xercesc::XMLString::release(&optionAllBandsEqualTo);
     xercesc::XMLString::release(&optionHistogram);
     xercesc::XMLString::release(&optionBandPercentile);
+    xercesc::XMLString::release(&optionImgDist2Geoms);
 
 	parsed = true;
 }
@@ -3893,6 +3938,94 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
                 GDALClose(imageDataset);
 			}
 			catch(rsgis::RSGISException e)
+			{
+				throw e;
+			}
+        }
+        else if(option == RSGISExeImageCalculation::imgdist2geoms)
+        {
+            std::cout << "A command to calculate the distance to the nearest geometry for each pixel within an image.\n";
+            std::cout << "Input Image: " << inputImage << std::endl;
+            std::cout << "Input Vector: " << inputVector << std::endl;
+            std::cout << "Output Image: " << outputImage << std::endl;
+            
+            GDALAllRegister();
+            OGRRegisterAll();
+			
+			rsgis::utils::RSGISFileUtils fileUtils;
+			rsgis::vec::RSGISVectorUtils vecUtils;
+			
+            std::string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
+            
+			OGRDataSource *inputSHPDS = NULL;
+			OGRLayer *inputSHPLayer = NULL;
+			try
+			{
+				
+                GDALDataset *imgDataset = (GDALDataset *) GDALOpenShared(this->inputImage.c_str(), GA_ReadOnly);
+				if(imgDataset == NULL)
+				{
+					std::string message = std::string("Could not open image ") + this->inputImage;
+					throw rsgis::RSGISImageException(message.c_str());
+				}
+                
+                
+				/////////////////////////////////////
+				//
+				// Open Input Shapfile.
+				//
+				/////////////////////////////////////
+				inputSHPDS = OGRSFDriverRegistrar::Open(this->inputVector.c_str(), FALSE);
+				if(inputSHPDS == NULL)
+				{
+					std::string message = std::string("Could not open vector file ") + this->inputVector;
+					throw rsgis::RSGISFileException(message.c_str());
+				}
+				inputSHPLayer = inputSHPDS->GetLayerByName(SHPFileInLayer.c_str());
+				if(inputSHPLayer == NULL)
+				{
+					std::string message = std::string("Could not open vector layer ") + SHPFileInLayer;
+					throw rsgis::RSGISFileException(message.c_str());
+				}
+                
+				
+                // Get Geometries into memory
+                std::vector<OGRGeometry*> *ogrGeoms = new std::vector<OGRGeometry*>();
+                rsgis::vec::RSGISGetOGRGeometries *getOGRGeoms = new rsgis::vec::RSGISGetOGRGeometries(ogrGeoms);
+                rsgis::vec::RSGISProcessVector processVector = rsgis::vec::RSGISProcessVector(getOGRGeoms);
+                processVector.processVectorsNoOutput(inputSHPLayer, false);
+                delete getOGRGeoms;
+                
+                // Create Geometry Collection
+                OGRGeometryCollection *geomCollectionOrig = new OGRGeometryCollection();
+                for(std::vector<OGRGeometry*>::iterator iterGeoms = ogrGeoms->begin(); iterGeoms != ogrGeoms->end(); ++iterGeoms)
+                {
+                    geomCollectionOrig->addGeometryDirectly(*iterGeoms);
+                }
+                
+                OGRGeometryCollection *geomCollectionLines = new OGRGeometryCollection();
+                rsgis::geom::RSGISGeometry geomUtils;
+                geomUtils.convertGeometryCollection2Lines(geomCollectionOrig, geomCollectionLines);
+                
+                // Create blank image
+                rsgis::img::RSGISImageUtils imageUtils;
+                GDALDataset *outImage = imageUtils.createCopy(imgDataset, 1, this->outputImage, this->imageFormat, GDT_Float32);
+                //imageUtils.createBlankImage(this->outputImage, extent, this->imgResolution, 1, projection, 0);
+                
+                rsgis::img::RSGISCalcDist2Geom *dist2GeomCalcValue = new rsgis::img::RSGISCalcDist2Geom(1, geomCollectionLines, geomCollectionOrig);
+                rsgis::img::RSGISCalcEditImage *calcEditImage = new rsgis::img::RSGISCalcEditImage(dist2GeomCalcValue);
+                calcEditImage->calcImage(outImage);
+                
+                // Clean up memory.
+                delete geomCollectionOrig;
+                delete geomCollectionLines;
+                delete ogrGeoms;
+				OGRDataSource::DestroyDataSource(inputSHPDS);
+				OGRCleanupAll();
+                GDALClose(outImage);
+                GDALClose(imgDataset);
+			}
+			catch (rsgis::RSGISException e)
 			{
 				throw e;
 			}

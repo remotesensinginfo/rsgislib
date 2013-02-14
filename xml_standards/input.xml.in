@@ -620,7 +620,9 @@
     <!-- A command to add noise to an image -->
     <rsgis:command algor="imageutils" option="addnoise" type="randomNoise | percentGaussianNoise" scale="float" image="image.env" output="image_out.env"/>
     <!-- A command to subset an image to the same extent as a shapefile -->
-    <rsgis:command algor="imageutils" option="subset" image="image.env" output="output_img.env" vector="vector.shp" />
+    <rsgis:command algor="imageutils" option="subset" image="image.env" output="output_img.env" vector="vector.shp" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
+	<!-- A command to subset an image to the same extent as another image -->
+    <rsgis:command algor="imageutils" option="subset2img" image="image.env" output="output_img.env" roi="roi.env" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
     <!-- A command to subset an image to polygons within shapefile -->
     <rsgis:command algor="imageutils" option="subset2polys" image="image.env" output="image_out_base" vector="vector.shp" outfilename="attribute" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" extension="env | kea | tif | etc"/>
     <!-- A command to pan sharpen an image, takes stack of multispectral image (resampled to pan resolution) and panchromatic image -->
@@ -703,6 +705,8 @@
     <rsgis:command algor="imagecalc" option="countvalsincol" image="image.env" output="image_out.env" upper="float" lower="float" />
     <!-- A command to calculate the distance from each pixel to nearest geometry -->
     <rsgis:command algor="imagecalc" option="dist2geoms" vector="vector.shp" output="image_out.env" resolution="float" />
+	<!-- A command to calculate the distance from each pixel within the input image to nearest geometry -->
+    <rsgis:command algor="imagecalc" option="imgdist2geoms" image="image.env" vector="vector.shp" output="image_out.env" format="GDAL Format" />
     <!-- A command to calculate the statistics for the individual image bands -->
     <rsgis:command algor="imagecalc" option="imagebandstats" image="image.env" output="outfile.txt" ignorezeros="yes | no" />
     <!-- A command to calculate the statistics for the whole image across all bands -->

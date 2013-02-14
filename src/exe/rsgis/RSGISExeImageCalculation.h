@@ -123,7 +123,8 @@ namespace rsgisexe{
             isodatacentres,
             allbandsequalto,
             histogram,
-            bandpercentile
+            bandpercentile,
+            imgdist2geoms
 		};
 		
 		struct VariableStruct
