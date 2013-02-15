@@ -4010,7 +4010,6 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
                 // Create blank image
                 rsgis::img::RSGISImageUtils imageUtils;
                 GDALDataset *outImage = imageUtils.createCopy(imgDataset, 1, this->outputImage, this->imageFormat, GDT_Float32);
-                //imageUtils.createBlankImage(this->outputImage, extent, this->imgResolution, 1, projection, 0);
                 
                 rsgis::img::RSGISCalcDist2Geom *dist2GeomCalcValue = new rsgis::img::RSGISCalcDist2Geom(1, geomCollectionLines, geomCollectionOrig);
                 rsgis::img::RSGISCalcEditImage *calcEditImage = new rsgis::img::RSGISCalcEditImage(dist2GeomCalcValue);

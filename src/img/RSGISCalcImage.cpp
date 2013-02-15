@@ -2961,6 +2961,7 @@ namespace rsgis{namespace img{
 		GDALClose(outputImageDS);
 	}
     */
+    
     void RSGISCalcImage::calcImageWindowData(GDALDataset **datasets, int numDS, std::string outputImage, int windowSize, std::string gdalFormat, GDALDataType gdalDataType) throw(RSGISImageCalcException,RSGISImageBandException)
 	{
 		GDALAllRegister();
@@ -3960,6 +3961,7 @@ namespace rsgis{namespace img{
 		GDALClose(outputImageDS);
 	}
     
+    /*
     void RSGISCalcImage::calcImageWindowData(GDALDataset **datasets, int numDS, GDALDataset *outputImageDS, int windowSize) throw(RSGISImageCalcException,RSGISImageBandException)
 	{
 		RSGISImageUtils imgUtils;
@@ -4435,7 +4437,998 @@ namespace rsgis{namespace img{
 			delete[] zeros;
 		}		
 	}
+    */
     
+    void RSGISCalcImage::calcImageWindowData(GDALDataset **datasets, int numDS, GDALDataset *outputImageDS, int windowSize) throw(RSGISImageCalcException,RSGISImageBandException)
+	{
+		if(outputImageDS == NULL)
+        {
+            throw RSGISImageBandException("Output image is not valid.");
+        }
+        
+		RSGISImageUtils imgUtils;
+		double *gdalTranslation = new double[6];
+		int **dsOffsets = new int*[numDS];
+		for(int i = 0; i < numDS; i++)
+		{
+			dsOffsets[i] = new int[2];
+		}
+		int **bandOffsets = NULL;
+		int height = 0;
+		int width = 0;
+		int numInBands = 0;
+        int xBlockSize = 0;
+        int yBlockSize = 0;
+        size_t numPxlsInBlock = 0;
+		
+        float **inputDataUpper = NULL;
+		float **inputDataMain = NULL;
+        float **inputDataLower = NULL;
+		float **outputData = NULL;
+		float ***inDataBlock = NULL;
+		float *outDataColumn = NULL;
+		
+		GDALRasterBand **inputRasterBands = NULL;
+		GDALRasterBand **outputRasterBands = NULL;
+		
+		try
+		{
+			if(windowSize % 2 == 0)
+			{
+				throw RSGISImageCalcException("Window size needs to be an odd number (min = 3).");
+			}
+			else if(windowSize < 3)
+			{
+				throw RSGISImageCalcException("Window size needs to be 3 or greater and an odd number.");
+			}
+			int windowMid = floor(((float)windowSize)/2.0); // Starting at 0!! NOT 1 otherwise would be ceil.
+			
+            std::cout << "Window Size: " << windowSize << std::endl;
+            std::cout << "Window Mid: " << windowMid << std::endl;
+            
+			// Find image overlap
+            imgUtils.getImageOverlap(datasets, numDS, dsOffsets, &width, &height, gdalTranslation, &xBlockSize, &yBlockSize);
+			
+			// Count number of image bands
+			for(int i = 0; i < numDS; i++)
+			{
+				numInBands += datasets[i]->GetRasterCount();
+			}
+			
+			if(outputImageDS->GetRasterXSize() != width)
+            {
+                throw RSGISImageCalcException("Inputted dataset is not of the required width.");
+            }
+            
+            if(outputImageDS->GetRasterYSize() != height)
+            {
+                throw RSGISImageCalcException("Inputted dataset is not of the required height.");
+            }
+			
+            if(outputImageDS->GetRasterCount() != numOutBands)
+            {
+                throw RSGISImageCalcException("Inputted dataset does not have the required number of image bands.");
+            }
+            
+			// Get Image Input Bands
+			bandOffsets = new int*[numInBands];
+			inputRasterBands = new GDALRasterBand*[numInBands];
+			int counter = 0;
+			for(int i = 0; i < numDS; i++)
+			{
+				for(int j = 0; j < datasets[i]->GetRasterCount(); j++)
+				{
+					inputRasterBands[counter] = datasets[i]->GetRasterBand(j+1);
+					bandOffsets[counter] = new int[2];
+					bandOffsets[counter][0] = dsOffsets[i][0];
+					bandOffsets[counter][1] = dsOffsets[i][1];
+					//std::cout << counter << ") dataset " << i << " band " << j << " offset [" << bandOffsets[counter][0] << "," << bandOffsets[counter][1] << "]\n";
+					counter++;
+				}
+			}
+			
+			//Get Image Output Bands
+			outputRasterBands = new GDALRasterBand*[this->numOutBands];
+			for(int i = 0; i < this->numOutBands; i++)
+			{
+				outputRasterBands[i] = outputImageDS->GetRasterBand(i+1);
+			}
+            
+            int outXBlockSize = 0;
+            int outYBlockSize = 0;
+            outputRasterBands[0]->GetBlockSize (&outXBlockSize, &outYBlockSize);
+            
+            if(outYBlockSize > yBlockSize)
+            {
+                yBlockSize = outYBlockSize;
+            }
+            std::cout << "Max. block size: " << yBlockSize << std::endl;
+            
+            int numOfLines = yBlockSize;
+            if(yBlockSize < windowSize)
+            {
+                numOfLines = ceil(((float)windowSize)/((float)yBlockSize))*yBlockSize;
+            }
+            //std::cout << "Number of Lines: " << numOfLines << std::endl;
+            
+            //std::cout << "numInBands = " << numInBands << std::endl;
+            
+			// Allocate memory
+            numPxlsInBlock = width*numOfLines;
+			inputDataUpper = new float*[numInBands];
+			for(int i = 0; i < numInBands; i++)
+			{
+                inputDataUpper[i] = (float *) CPLMalloc(sizeof(float)*numPxlsInBlock);
+                for(int k = 0; k < numPxlsInBlock; k++)
+                {
+                    inputDataUpper[i][k] = 0;
+                }
+			}
+            
+            inputDataMain = new float*[numInBands];
+			for(int i = 0; i < numInBands; i++)
+			{
+                inputDataMain[i] = (float *) CPLMalloc(sizeof(float)*numPxlsInBlock);
+                for(int k = 0; k < numPxlsInBlock; k++)
+                {
+                    inputDataMain[i][k] = 0;
+                }
+			}
+            
+            inputDataLower = new float*[numInBands];
+			for(int i = 0; i < numInBands; i++)
+			{
+                inputDataLower[i] = (float *) CPLMalloc(sizeof(float)*numPxlsInBlock);
+                for(int k = 0; k < numPxlsInBlock; k++)
+                {
+                    inputDataLower[i][k] = 0;
+                }
+			}
+			
+			inDataBlock = new float**[numInBands];
+			for(int i = 0; i < numInBands; i++)
+			{
+				inDataBlock[i] = new float*[windowSize];
+				for(int j = 0; j < windowSize; j++)
+				{
+					inDataBlock[i][j] = new float[windowSize];
+				}
+			}
+			
+			outputData = new float*[this->numOutBands];
+			for(int i = 0; i < this->numOutBands; i++)
+			{
+				outputData[i] = (float *) CPLMalloc(sizeof(float)*numPxlsInBlock);
+			}
+			outDataColumn = new float[this->numOutBands];
+			
+            
+            //std::cout << "height: " << height << std::endl;
+            int nYBlocks = floor(((double)height) / ((double)numOfLines));
+            //std::cout << "nYBlocks: " << nYBlocks << std::endl;
+            int remainRows = height - (nYBlocks * numOfLines);
+            //std::cout << "remainRows: " << remainRows << std::endl;
+            int rowOffset = 0;
+            unsigned int line = 0;
+            long cLinePxl = 0;
+            long cPxl = 0;
+            long dLinePxls = 0;
+            int dWinX = 0;
+            int dWinY = 0;
+            
+            int feedback = height/10.0;
+			int feedbackCounter = 0;
+			std::cout << "Started" << std::flush;
+			
+            if(nYBlocks > 0)
+            {
+                for(int i = 0; i < nYBlocks; i++)
+                {
+                    //std::cout << "i: " << i << std::endl;
+                    if(i == 0)
+                    {
+                        // Set Upper Block with Zeros.
+                        for(int n = 0; n < numInBands; n++)
+                        {
+                            for(int k = 0; k < numPxlsInBlock; k++)
+                            {
+                                inputDataUpper[n][k] = 0;
+                            }
+                        }
+                        
+                        // Read Main Block
+                        for(int n = 0; n < numInBands; n++)
+                        {
+                            rowOffset = bandOffsets[n][1] + (numOfLines * i);
+                            //std::cout << "rowOffset: " << rowOffset << std::endl;
+                            //std::cout << "bandOffsets["<<n<<"][0]: " << bandOffsets[n][0] << std::endl;
+                            //std::cout << "width: " << width << std::endl;
+                            //std::cout << "numOfLines: " << numOfLines << std::endl;
+                            
+                            inputRasterBands[n]->RasterIO(GF_Read, bandOffsets[n][0], rowOffset, width, numOfLines, inputDataMain[n], width, numOfLines, GDT_Float32, 0, 0);
+                        }
+                        // Read Lower Block
+                        for(int n = 0; n < numInBands; n++)
+                        {
+                            rowOffset = bandOffsets[n][1] + (numOfLines * (i+1));
+                            //std::cout << "rowOffset: " << rowOffset << std::endl;
+                            //std::cout << "bandOffsets["<<n<<"][0]: " << bandOffsets[n][0] << std::endl;
+                            //std::cout << "width: " << width << std::endl;
+                            //std::cout << "numOfLines: " << numOfLines << std::endl;
+                            
+                            inputRasterBands[n]->RasterIO(GF_Read, bandOffsets[n][0], rowOffset, width, numOfLines, inputDataLower[n], width, numOfLines, GDT_Float32, 0, 0);
+                        }
+                    }
+                    else if(i == (nYBlocks-1))
+                    {
+                        // Shift Lower Block to Main Block
+                        for(int n = 0; n < numInBands; n++)
+                        {
+                            for(int k = 0; k < numPxlsInBlock; k++)
+                            {
+                                inputDataUpper[n][k] = inputDataMain[n][k];
+                            }
+                        }
+                        
+                        // Shift Lower Block to Main Block
+                        for(int n = 0; n < numInBands; n++)
+                        {
+                            for(int k = 0; k < numPxlsInBlock; k++)
+                            {
+                                inputDataMain[n][k] = inputDataLower[n][k];
+                            }
+                        }
+                        
+                        // Set Lower Block with Zeros.
+                        for(int n = 0; n < numInBands; n++)
+                        {
+                            if(remainRows > 0)
+                            {
+                                rowOffset = bandOffsets[n][1] + (numOfLines * (i+1));
+                                inputRasterBands[n]->RasterIO(GF_Read, bandOffsets[n][0], rowOffset, width, remainRows, inputDataLower[n], width, remainRows, GDT_Float32, 0, 0);
+                                for(int k = (remainRows*width); k < numPxlsInBlock; k++)
+                                {
+                                    inputDataLower[n][k] = 0;
+                                }
+                            }
+                            else
+                            {
+                                for(int k = 0; k < numPxlsInBlock; k++)
+                                {
+                                    inputDataLower[n][k] = 0;
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // Shift Lower Block to Main Block
+                        for(int n = 0; n < numInBands; n++)
+                        {
+                            for(int k = 0; k < numPxlsInBlock; k++)
+                            {
+                                inputDataUpper[n][k] = inputDataMain[n][k];
+                            }
+                        }
+                        
+                        // Shift Lower Block to Main Block
+                        for(int n = 0; n < numInBands; n++)
+                        {
+                            for(int k = 0; k < numPxlsInBlock; k++)
+                            {
+                                inputDataMain[n][k] = inputDataLower[n][k];
+                            }
+                        }
+                        
+                        // Read Lower Block
+                        for(int n = 0; n < numInBands; n++)
+                        {
+                            rowOffset = bandOffsets[n][1] + (numOfLines * (i+1));
+                            //std::cout << "rowOffset: " << rowOffset << std::endl;
+                            //std::cout << "bandOffsets["<<n<<"][0]: " << bandOffsets[n][0] << std::endl;
+                            //std::cout << "width: " << width << std::endl;
+                            //std::cout << "numOfLines: " << numOfLines << std::endl;
+                            
+                            inputRasterBands[n]->RasterIO(GF_Read, bandOffsets[n][0], rowOffset, width, numOfLines, inputDataLower[n], width, numOfLines, GDT_Float32, 0, 0);
+                        }
+                    }
+                    
+                    for(int m = 0; m < numOfLines; ++m)
+                    {
+                        line = (i*numOfLines)+m;
+                        //std::cout << "line = " << line << std::endl;
+                        if((feedback != 0) && (line % feedback) == 0)
+                        {
+                            std::cout << "." << feedbackCounter << "." << std::flush;
+                            feedbackCounter = feedbackCounter + 10;
+                        }
+                        
+                        cLinePxl = m*width;
+                        //std::cout << "cLine: " << cLinePxl << std::endl;
+                        
+                        for(int j = 0; j < width; j++)
+                        {
+                            cPxl = cLinePxl+j;
+                            if(m < windowMid)
+                            {
+                                //std::cout << "Need Upper\n";
+                                for(int y = 0; y < windowSize; y++)
+                                {
+                                    dWinY = y-windowMid;
+                                    dLinePxls = dWinY * width;
+                                    //std::cout << y << " Y  = " << dLinePxls << " Width = " << width << " (cPxl + dLinePxls) = " << (cPxl + dLinePxls) << " numPxlsInBlock = " << numPxlsInBlock << " (numPxlsInBlock+(cPxl+dLinePxls)) = " << (numPxlsInBlock+(cPxl+dLinePxls)) << std::endl;
+                                    
+                                    if((cPxl + dLinePxls) < 0)
+                                    {
+                                        for(int x = 0; x < windowSize; x++)
+                                        {
+                                            dWinX = x-windowMid;
+                                            
+                                            if((j+dWinX) < 0)
+                                            {
+                                                for(int n = 0; n < numInBands; n++)
+                                                {
+                                                    inDataBlock[n][y][x] = 0;
+                                                }
+                                            }
+                                            else if((j+dWinX) >= width)
+                                            {
+                                                for(int n = 0; n < numInBands; n++)
+                                                {
+                                                    inDataBlock[n][y][x] = 0;
+                                                }
+                                            }
+                                            else
+                                            {
+                                                for(int n = 0; n < numInBands; n++)
+                                                {
+                                                    inDataBlock[n][y][x] = inputDataUpper[n][(numPxlsInBlock+(cPxl+dLinePxls))+dWinX];
+                                                }
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        for(int x = 0; x < windowSize; x++)
+                                        {
+                                            dWinX = x-windowMid;
+                                            
+                                            if((j+dWinX) < 0)
+                                            {
+                                                for(int n = 0; n < numInBands; n++)
+                                                {
+                                                    inDataBlock[n][y][x] = 0;
+                                                }
+                                            }
+                                            else if((j+dWinX) >= width)
+                                            {
+                                                for(int n = 0; n < numInBands; n++)
+                                                {
+                                                    inDataBlock[n][y][x] = 0;
+                                                }
+                                            }
+                                            else
+                                            {
+                                                for(int n = 0; n < numInBands; n++)
+                                                {
+                                                    inDataBlock[n][y][x] = inputDataMain[n][(cPxl+dLinePxls)+dWinX];
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            else if(m > ((numOfLines-1)-windowMid))
+                            {
+                                //std::cout << "Need Lower\n";
+                                for(int y = 0; y < windowSize; y++)
+                                {
+                                    dWinY = y-windowMid;
+                                    dLinePxls = dWinY * width;
+                                    //std::cout << "j = " << j << " y = " << y << ": " << dLinePxls << " Width = " << width << " (cPxl + dLinePxls) = " << (cPxl + dLinePxls) << " numPxlsInBlock = " << numPxlsInBlock << " ((cPxl+dLinePxls)-numPxlsInBlock) = " << ((cPxl+dLinePxls)-numPxlsInBlock) << std::endl;
+                                    
+                                    if((cPxl + dLinePxls) >= numPxlsInBlock)
+                                    {
+                                        for(int x = 0; x < windowSize; x++)
+                                        {
+                                            dWinX = x-windowMid;
+                                            
+                                            if((j+dWinX) < 0)
+                                            {
+                                                for(int n = 0; n < numInBands; n++)
+                                                {
+                                                    inDataBlock[n][y][x] = 0;
+                                                }
+                                            }
+                                            else if((j+dWinX) >= width)
+                                            {
+                                                for(int n = 0; n < numInBands; n++)
+                                                {
+                                                    inDataBlock[n][y][x] = 0;
+                                                }
+                                            }
+                                            else
+                                            {
+                                                for(int n = 0; n < numInBands; n++)
+                                                {
+                                                    inDataBlock[n][y][x] = inputDataLower[n][((cPxl+dLinePxls)-numPxlsInBlock)+dWinX];
+                                                }
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        for(int x = 0; x < windowSize; x++)
+                                        {
+                                            dWinX = x-windowMid;
+                                            
+                                            if((j+dWinX) < 0)
+                                            {
+                                                for(int n = 0; n < numInBands; n++)
+                                                {
+                                                    inDataBlock[n][y][x] = 0;
+                                                }
+                                            }
+                                            else if((j+dWinX) >= width)
+                                            {
+                                                for(int n = 0; n < numInBands; n++)
+                                                {
+                                                    inDataBlock[n][y][x] = 0;
+                                                }
+                                            }
+                                            else
+                                            {
+                                                for(int n = 0; n < numInBands; n++)
+                                                {
+                                                    inDataBlock[n][y][x] = inputDataMain[n][(cPxl+dLinePxls)+dWinX];
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                //std::cout << "Within block\n";
+                                
+                                for(int y = 0; y < windowSize; y++)
+                                {
+                                    dWinY = y-windowMid;
+                                    dLinePxls = dWinY * width;
+                                    //std::cout << y << " Y  = " << dLinePxls << " Width = " << width << std::endl;
+                                    
+                                    for(int x = 0; x < windowSize; x++)
+                                    {
+                                        dWinX = x-windowMid;
+                                        
+                                        if((j+dWinX) < 0)
+                                        {
+                                            for(int n = 0; n < numInBands; n++)
+                                            {
+                                                inDataBlock[n][y][x] = 0;
+                                            }
+                                        }
+                                        else if((j+dWinX) >= width)
+                                        {
+                                            for(int n = 0; n < numInBands; n++)
+                                            {
+                                                inDataBlock[n][y][x] = 0;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            for(int n = 0; n < numInBands; n++)
+                                            {
+                                                inDataBlock[n][y][x] = inputDataMain[n][(cPxl+dLinePxls)+dWinX];
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            
+                            this->calc->calcImageValue(inDataBlock, numInBands, windowSize, outDataColumn);
+                            
+                            for(int n = 0; n < this->numOutBands; n++)
+                            {
+                                outputData[n][cPxl] = outDataColumn[n];
+                            }
+                        }
+                        
+                    }
+                    
+                    for(int n = 0; n < this->numOutBands; n++)
+                    {
+                        outputRasterBands[n]->RasterIO(GF_Write, 0, (numOfLines * i), width, numOfLines, outputData[n], width, numOfLines, GDT_Float32, 0, 0);
+                    }
+                }
+                
+                if(remainRows > 0)
+                {
+                    // Shift Lower Block to Main Block
+                    for(int n = 0; n < numInBands; n++)
+                    {
+                        for(int k = 0; k < numPxlsInBlock; k++)
+                        {
+                            inputDataUpper[n][k] = inputDataMain[n][k];
+                        }
+                    }
+                    
+                    // Shift Lower Block to Main Block
+                    for(int n = 0; n < numInBands; n++)
+                    {
+                        for(int k = 0; k < numPxlsInBlock; k++)
+                        {
+                            inputDataMain[n][k] = inputDataLower[n][k];
+                        }
+                    }
+                    
+                    // Read Lower Block
+                    for(int n = 0; n < numInBands; n++)
+                    {
+                        for(int k = 0; k < numPxlsInBlock; k++)
+                        {
+                            inputDataLower[n][k] = 0;
+                        }
+                    }
+                    
+                    for(int m = 0; m < remainRows; ++m)
+                    {
+                        line = (nYBlocks*numOfLines)+m;
+                        //std::cout << "line = " << line << std::endl;
+                        if((feedback != 0) && (line % feedback) == 0)
+                        {
+                            std::cout << "." << feedbackCounter << "." << std::flush;
+                            feedbackCounter = feedbackCounter + 10;
+                        }
+                        
+                        cLinePxl = m*width;
+                        //std::cout << "cLine: " << cLinePxl << std::endl;
+                        
+                        for(int j = 0; j < width; j++)
+                        {
+                            cPxl = cLinePxl+j;
+                            if(m < windowMid)
+                            {
+                                //std::cout << "Need Upper\n";
+                                for(int y = 0; y < windowSize; y++)
+                                {
+                                    dWinY = y-windowMid;
+                                    dLinePxls = dWinY * width;
+                                    //std::cout << y << " Y  = " << dLinePxls << " Width = " << width << " (cPxl + dLinePxls) = " << (cPxl + dLinePxls) << " numPxlsInBlock = " << numPxlsInBlock << " (numPxlsInBlock+(cPxl+dLinePxls)) = " << (numPxlsInBlock+(cPxl+dLinePxls)) << std::endl;
+                                    
+                                    if((cPxl + dLinePxls) < 0)
+                                    {
+                                        for(int x = 0; x < windowSize; x++)
+                                        {
+                                            dWinX = x-windowMid;
+                                            
+                                            if((j+dWinX) < 0)
+                                            {
+                                                for(int n = 0; n < numInBands; n++)
+                                                {
+                                                    inDataBlock[n][y][x] = 0;
+                                                }
+                                            }
+                                            else if((j+dWinX) >= width)
+                                            {
+                                                for(int n = 0; n < numInBands; n++)
+                                                {
+                                                    inDataBlock[n][y][x] = 0;
+                                                }
+                                            }
+                                            else
+                                            {
+                                                for(int n = 0; n < numInBands; n++)
+                                                {
+                                                    inDataBlock[n][y][x] = inputDataUpper[n][(numPxlsInBlock+(cPxl+dLinePxls))+dWinX];
+                                                }
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        for(int x = 0; x < windowSize; x++)
+                                        {
+                                            dWinX = x-windowMid;
+                                            
+                                            if((j+dWinX) < 0)
+                                            {
+                                                for(int n = 0; n < numInBands; n++)
+                                                {
+                                                    inDataBlock[n][y][x] = 0;
+                                                }
+                                            }
+                                            else if((j+dWinX) >= width)
+                                            {
+                                                for(int n = 0; n < numInBands; n++)
+                                                {
+                                                    inDataBlock[n][y][x] = 0;
+                                                }
+                                            }
+                                            else
+                                            {
+                                                for(int n = 0; n < numInBands; n++)
+                                                {
+                                                    inDataBlock[n][y][x] = inputDataMain[n][(cPxl+dLinePxls)+dWinX];
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            else if(m > ((numOfLines-1)-windowMid))
+                            {
+                                //std::cout << "Need Lower\n";
+                                for(int y = 0; y < windowSize; y++)
+                                {
+                                    dWinY = y-windowMid;
+                                    dLinePxls = dWinY * width;
+                                    //std::cout << "j = " << j << " y = " << y << ": " << dLinePxls << " Width = " << width << " (cPxl + dLinePxls) = " << (cPxl + dLinePxls) << " numPxlsInBlock = " << numPxlsInBlock << " ((cPxl+dLinePxls)-numPxlsInBlock) = " << ((cPxl+dLinePxls)-numPxlsInBlock) << std::endl;
+                                    
+                                    if((cPxl + dLinePxls) >= numPxlsInBlock)
+                                    {
+                                        for(int x = 0; x < windowSize; x++)
+                                        {
+                                            dWinX = x-windowMid;
+                                            
+                                            if((j+dWinX) < 0)
+                                            {
+                                                for(int n = 0; n < numInBands; n++)
+                                                {
+                                                    inDataBlock[n][y][x] = 0;
+                                                }
+                                            }
+                                            else if((j+dWinX) >= width)
+                                            {
+                                                for(int n = 0; n < numInBands; n++)
+                                                {
+                                                    inDataBlock[n][y][x] = 0;
+                                                }
+                                            }
+                                            else
+                                            {
+                                                for(int n = 0; n < numInBands; n++)
+                                                {
+                                                    inDataBlock[n][y][x] = inputDataLower[n][((cPxl+dLinePxls)-numPxlsInBlock)+dWinX];
+                                                }
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        for(int x = 0; x < windowSize; x++)
+                                        {
+                                            dWinX = x-windowMid;
+                                            
+                                            if((j+dWinX) < 0)
+                                            {
+                                                for(int n = 0; n < numInBands; n++)
+                                                {
+                                                    inDataBlock[n][y][x] = 0;
+                                                }
+                                            }
+                                            else if((j+dWinX) >= width)
+                                            {
+                                                for(int n = 0; n < numInBands; n++)
+                                                {
+                                                    inDataBlock[n][y][x] = 0;
+                                                }
+                                            }
+                                            else
+                                            {
+                                                for(int n = 0; n < numInBands; n++)
+                                                {
+                                                    inDataBlock[n][y][x] = inputDataMain[n][(cPxl+dLinePxls)+dWinX];
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                //std::cout << "Within block\n";
+                                
+                                for(int y = 0; y < windowSize; y++)
+                                {
+                                    dWinY = y-windowMid;
+                                    dLinePxls = dWinY * width;
+                                    //std::cout << y << " Y  = " << dLinePxls << " Width = " << width << std::endl;
+                                    
+                                    for(int x = 0; x < windowSize; x++)
+                                    {
+                                        dWinX = x-windowMid;
+                                        
+                                        if((j+dWinX) < 0)
+                                        {
+                                            for(int n = 0; n < numInBands; n++)
+                                            {
+                                                inDataBlock[n][y][x] = 0;
+                                            }
+                                        }
+                                        else if((j+dWinX) >= width)
+                                        {
+                                            for(int n = 0; n < numInBands; n++)
+                                            {
+                                                inDataBlock[n][y][x] = 0;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            for(int n = 0; n < numInBands; n++)
+                                            {
+                                                inDataBlock[n][y][x] = inputDataMain[n][(cPxl+dLinePxls)+dWinX];
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            
+                            this->calc->calcImageValue(inDataBlock, numInBands, windowSize, outDataColumn);
+                            
+                            for(int n = 0; n < this->numOutBands; n++)
+                            {
+                                outputData[n][cPxl] = outDataColumn[n];
+                            }
+                        }
+                    }
+                    
+                    for(int n = 0; n < this->numOutBands; n++)
+                    {
+                        outputRasterBands[n]->RasterIO(GF_Write, 0, (nYBlocks*numOfLines), width, remainRows, outputData[n], width, remainRows, GDT_Float32, 0, 0);
+                    }
+                }
+                
+            }
+            else
+            {
+                
+            }
+            
+            
+            std::cout << " Complete.\n";
+		}
+		catch(RSGISImageCalcException& e)
+		{
+			if(gdalTranslation != NULL)
+			{
+				delete[] gdalTranslation;
+			}
+			
+			if(dsOffsets != NULL)
+			{
+				for(int i = 0; i < numDS; i++)
+				{
+					delete dsOffsets[i];
+				}
+				delete[] dsOffsets;
+			}
+			
+			if(bandOffsets != NULL)
+			{
+				for(int i = 0; i < numInBands; i++)
+				{
+					delete bandOffsets[i];
+				}
+				delete[] bandOffsets;
+			}
+			
+			if(inputDataUpper != NULL)
+			{
+				for(int i = 0; i < numInBands; i++)
+				{
+					delete[] inputDataUpper[i];
+				}
+				delete[] inputDataUpper;
+			}
+            
+            if(inputDataMain != NULL)
+			{
+				for(int i = 0; i < numInBands; i++)
+				{
+					delete[] inputDataMain[i];
+				}
+				delete[] inputDataMain;
+			}
+            
+            if(inputDataLower != NULL)
+			{
+				for(int i = 0; i < numInBands; i++)
+				{
+					delete[] inputDataLower[i];
+				}
+				delete[] inputDataLower;
+			}
+			
+			if(inDataBlock != NULL)
+			{
+				for(int i = 0; i < numInBands; i++)
+				{
+					for(int j = 0; j < windowSize; j++)
+					{
+						delete[] inDataBlock[i][j];
+					}
+					delete[] inDataBlock[i];
+				}
+				delete[] inDataBlock;
+			}
+			
+			if(outputData != NULL)
+			{
+				for(int i = 0; i < numOutBands; i++)
+				{
+					delete outputData[i];
+				}
+				delete outputData;
+			}
+			
+			if(outDataColumn != NULL)
+			{
+				delete[] outDataColumn;
+			}
+            
+			throw e;
+		}
+		catch(RSGISImageBandException& e)
+		{
+			if(gdalTranslation != NULL)
+			{
+				delete[] gdalTranslation;
+			}
+			
+			if(dsOffsets != NULL)
+			{
+				for(int i = 0; i < numDS; i++)
+				{
+					delete dsOffsets[i];
+				}
+				delete[] dsOffsets;
+			}
+			
+			if(bandOffsets != NULL)
+			{
+				for(int i = 0; i < numInBands; i++)
+				{
+					delete bandOffsets[i];
+				}
+				delete[] bandOffsets;
+			}
+			
+			if(inputDataUpper != NULL)
+			{
+				for(int i = 0; i < numInBands; i++)
+				{
+					delete[] inputDataUpper[i];
+				}
+				delete[] inputDataUpper;
+			}
+            
+            if(inputDataMain != NULL)
+			{
+				for(int i = 0; i < numInBands; i++)
+				{
+					delete[] inputDataMain[i];
+				}
+				delete[] inputDataMain;
+			}
+            
+            if(inputDataLower != NULL)
+			{
+				for(int i = 0; i < numInBands; i++)
+				{
+					delete[] inputDataLower[i];
+				}
+				delete[] inputDataLower;
+			}
+			
+			if(inDataBlock != NULL)
+			{
+				for(int i = 0; i < numInBands; i++)
+				{
+					for(int j = 0; j < windowSize; j++)
+					{
+						delete[] inDataBlock[i][j];
+					}
+					delete[] inDataBlock[i];
+				}
+				delete[] inDataBlock;
+			}
+			
+			if(outputData != NULL)
+			{
+				for(int i = 0; i < numOutBands; i++)
+				{
+					delete outputData[i];
+				}
+				delete outputData;
+			}
+			
+			if(outDataColumn != NULL)
+			{
+				delete[] outDataColumn;
+			}
+			
+			throw e;
+		}
+		
+		if(gdalTranslation != NULL)
+		{
+			delete[] gdalTranslation;
+		}
+		
+		if(dsOffsets != NULL)
+		{
+			for(int i = 0; i < numDS; i++)
+			{
+				delete dsOffsets[i];
+			}
+			delete[] dsOffsets;
+		}
+		
+		if(bandOffsets != NULL)
+		{
+			for(int i = 0; i < numInBands; i++)
+			{
+				delete bandOffsets[i];
+			}
+			delete[] bandOffsets;
+		}
+		
+		if(inputDataUpper != NULL)
+        {
+            for(int i = 0; i < numInBands; i++)
+            {
+                delete[] inputDataUpper[i];
+            }
+            delete[] inputDataUpper;
+        }
+        
+        if(inputDataMain != NULL)
+        {
+            for(int i = 0; i < numInBands; i++)
+            {
+                delete[] inputDataMain[i];
+            }
+            delete[] inputDataMain;
+        }
+        
+        if(inputDataLower != NULL)
+        {
+            for(int i = 0; i < numInBands; i++)
+            {
+                delete[] inputDataLower[i];
+            }
+            delete[] inputDataLower;
+        }
+		
+		if(inDataBlock != NULL)
+		{
+			for(int i = 0; i < numInBands; i++)
+			{
+				for(int j = 0; j < windowSize; j++)
+				{
+					delete[] inDataBlock[i][j];
+				}
+				delete[] inDataBlock[i];
+			}
+			delete[] inDataBlock;
+		}
+		
+		if(outputData != NULL)
+		{
+			for(int i = 0; i < numOutBands; i++)
+			{
+				delete outputData[i];
+			}
+			delete outputData;
+		}
+		
+		if(outDataColumn != NULL)
+		{
+			delete[] outDataColumn;
+		}
+	}
+     
     /* Keeps returning a window of data based upon the supplied windowSize until all finished provides the extent on the central pixel (as envelope) at each iteration */
 	void RSGISCalcImage::calcImageWindowDataExtent(GDALDataset **datasets, int numDS, std::string outputImage, int windowSize, std::string gdalFormat) throw(RSGISImageCalcException,RSGISImageBandException)
 	{
