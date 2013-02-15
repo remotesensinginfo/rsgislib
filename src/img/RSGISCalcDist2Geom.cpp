@@ -36,9 +36,11 @@ namespace rsgis{namespace img{
     {
         try 
         {
+            
             OGRPoint pt;
             pt.setX((extent.getMinX() + (extent.getMaxX() - extent.getMinX())/2));
             pt.setY((extent.getMinY() + (extent.getMaxY() - extent.getMinY())/2));
+            
             
             if(geomOrigCollection->Contains(&pt))
             {
@@ -59,6 +61,27 @@ namespace rsgis{namespace img{
     }
     
     RSGISCalcDist2Geom::~RSGISCalcDist2Geom()
+    {
+        
+    }
+    
+    
+    RSGISCalcDistViaIterativeGrowth::RSGISCalcDistViaIterativeGrowth():RSGISCalcImageValue(1)
+    {
+        
+    }
+		
+    void RSGISCalcDistViaIterativeGrowth::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException)
+    {
+        int midPoint = floor(((float)winSize)/2.0);
+        
+        for(int n = 0; n < numBands; ++n)
+        {
+            output[n] = dataBlock[n][midPoint][midPoint];
+        }
+    }
+    
+    RSGISCalcDistViaIterativeGrowth::~RSGISCalcDistViaIterativeGrowth()
     {
         
     }
