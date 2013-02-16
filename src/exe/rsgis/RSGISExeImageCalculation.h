@@ -124,7 +124,8 @@ namespace rsgisexe{
             allbandsequalto,
             histogram,
             bandpercentile,
-            imgdist2geoms
+            imgdist2geoms,
+            imgcalcdist
 		};
 		
 		struct VariableStruct
