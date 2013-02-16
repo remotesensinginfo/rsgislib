@@ -66,19 +66,88 @@ namespace rsgis{namespace img{
     }
     
     
-    RSGISCalcDistViaIterativeGrowth::RSGISCalcDistViaIterativeGrowth():RSGISCalcImageValue(1)
+    RSGISCalcDistViaIterativeGrowth::RSGISCalcDistViaIterativeGrowth(double imgRes):RSGISCalcImageValue(1)
     {
-        
+        counter = 0;
+        change = false;
+        this->imgRes = imgRes;
+    }
+    
+    void RSGISCalcDistViaIterativeGrowth::calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException)
+    {
+        output[0] = bandValues[0] * imgRes;
     }
 		
     void RSGISCalcDistViaIterativeGrowth::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException)
     {
         int midPoint = floor(((float)winSize)/2.0);
-        
-        for(int n = 0; n < numBands; ++n)
+                
+        if(dataBlock[0][midPoint][midPoint] == -1)
         {
-            output[n] = dataBlock[n][midPoint][midPoint];
+            if(dataBlock[0][midPoint-1][midPoint-1] == counter)
+            {
+                output[0] = counter+1;
+                change = true;
+            }
+            else if(dataBlock[0][midPoint-1][midPoint] == counter)
+            {
+                output[0] = counter+1;
+                change = true;
+            }
+            else if(dataBlock[0][midPoint-1][midPoint+1] == counter)
+            {
+                output[0] = counter+1;
+                change = true;
+            }
+            else if(dataBlock[0][midPoint][midPoint-1] == counter)
+            {
+                output[0] = counter+1;
+                change = true;
+            }
+            else if(dataBlock[0][midPoint][midPoint+1] == counter)
+            {
+                output[0] = counter+1;
+                change = true;
+            }
+            else if(dataBlock[0][midPoint+1][midPoint-1] == counter)
+            {
+                output[0] = counter+1;
+                change = true;
+            }
+            else if(dataBlock[0][midPoint+1][midPoint] == counter)
+            {
+                output[0] = counter+1;
+                change = true;
+            }
+            else if(dataBlock[0][midPoint+1][midPoint+1] == counter)
+            {
+                output[0] = counter+1;
+                change = true;
+            }
+            else
+            {
+                output[0] = dataBlock[0][midPoint][midPoint];
+            }
         }
+        else
+        {
+            output[0] = dataBlock[0][midPoint][midPoint];
+        }        
+    }
+    
+    bool RSGISCalcDistViaIterativeGrowth::changeOccurred()
+    {
+        return change;
+    }
+    
+    void RSGISCalcDistViaIterativeGrowth::resetChange()
+    {
+        change = false;
+    }
+    
+    void RSGISCalcDistViaIterativeGrowth::incrementCounter()
+    {
+        ++counter;
     }
     
     RSGISCalcDistViaIterativeGrowth::~RSGISCalcDistViaIterativeGrowth()

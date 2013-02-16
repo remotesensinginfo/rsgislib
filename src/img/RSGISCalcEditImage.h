@@ -47,6 +47,7 @@ namespace rsgis
         public:
             RSGISCalcEditImage(RSGISCalcImageValue *valueCalc);
             void calcImage(GDALDataset *dataset) throw(RSGISImageCalcException,RSGISImageBandException);
+            void calcImageUseOut(GDALDataset *dataset) throw(RSGISImageCalcException,RSGISImageBandException);
             void calcImageWindowData(GDALDataset *dataset, int windowSize) throw(RSGISImageCalcException,RSGISImageBandException);
             ~RSGISCalcEditImage();
         private:

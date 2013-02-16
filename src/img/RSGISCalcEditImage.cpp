@@ -33,7 +33,6 @@ namespace rsgis
             
         void RSGISCalcEditImage::calcImage(GDALDataset *dataset) throw(RSGISImageCalcException,RSGISImageBandException)
         {
-            GDALAllRegister();
             RSGISImageUtils imgUtils;
             double *gdalTranslation = new double[6];
 
@@ -213,6 +212,273 @@ namespace rsgis
             }
         }
         
+        void RSGISCalcEditImage::calcImageUseOut(GDALDataset *dataset) throw(RSGISImageCalcException,RSGISImageBandException)
+        {
+            RSGISImageUtils imgUtils;
+            
+            int height = 0;
+            int width = 0;
+            int numBands = 0;
+            int xBlockSize = 0;
+            int yBlockSize = 0;
+            
+            float **inputData = NULL;
+            float **outputData = NULL;
+            float *inDataColumn = NULL;
+            float *outDataColumn = NULL;
+            
+            GDALRasterBand **rasterBands = NULL;
+            
+            try
+            {
+                width = dataset->GetRasterXSize();
+                height = dataset->GetRasterYSize();
+                numBands = dataset->GetRasterCount();
+                                
+                //Get Image Bands
+                rasterBands = new GDALRasterBand*[numBands];
+                for(int i = 0; i < numBands; i++)
+                {
+                    rasterBands[i] = dataset->GetRasterBand(i+1);
+                }
+
+                rasterBands[0]->GetBlockSize (&xBlockSize, &yBlockSize);
+                
+                std::cout << "Max. block size: " << yBlockSize << std::endl;
+                
+                // Allocate memory
+                inputData = new float*[numBands];
+                for(int i = 0; i < numBands; i++)
+                {
+                    inputData[i] = (float *) CPLMalloc(sizeof(float)*(width*yBlockSize));
+                }
+                inDataColumn = new float[numBands];
+                
+                outputData = new float*[numBands];
+                for(int i = 0; i < numBands; i++)
+                {
+                    outputData[i] = (float *) CPLMalloc(sizeof(float)*(width*yBlockSize));
+                }
+                outDataColumn = new float[numBands];
+                
+                int nYBlocks = floor(((double)height) / ((double)yBlockSize));
+                int remainRows = height - (nYBlocks * yBlockSize);
+                int rowOffset = 0;
+                
+                int feedback = height/10.0;
+                int feedbackCounter = 0;
+                std::cout << "Started" << std::flush;
+                // Loop images to process data
+                for(int i = 0; i < nYBlocks; i++)
+                {
+                    //std::cout << i << " of " << nYBlocks << std::endl;
+                    
+                    for(int n = 0; n < numBands; n++)
+                    {
+                        rowOffset = (yBlockSize * i);
+                        rasterBands[n]->RasterIO(GF_Read, 0, rowOffset, width, yBlockSize, inputData[n], width, yBlockSize, GDT_Float32, 0, 0);
+                    }
+                    
+                    for(int m = 0; m < yBlockSize; ++m)
+                    {
+                        if((feedback != 0) && (((i*yBlockSize)+m) % feedback) == 0)
+                        {
+                            std::cout << "." << feedbackCounter << "." << std::flush;
+                            feedbackCounter = feedbackCounter + 10;
+                        }
+                        
+                        
+                        for(int j = 0; j < width; j++)
+                        {
+                            for(int n = 0; n < numBands; n++)
+                            {
+                                inDataColumn[n] = inputData[n][(m*width)+j];
+                            }
+                            
+                            this->calc->calcImageValue(inDataColumn, numBands, outDataColumn);
+                            
+                            for(int n = 0; n < numBands; n++)
+                            {
+                                outputData[n][(m*width)+j] = outDataColumn[n];
+                            }
+                            
+                        }
+                    }
+                    
+                    for(int n = 0; n < numBands; n++)
+                    {
+                        rowOffset = yBlockSize * i;
+                        rasterBands[n]->RasterIO(GF_Write, 0, rowOffset, width, yBlockSize, outputData[n], width, yBlockSize, GDT_Float32, 0, 0);
+                    }
+                }
+                
+                if(remainRows > 0)
+                {
+                    for(int n = 0; n < numBands; n++)
+                    {
+                        rowOffset = (yBlockSize * nYBlocks);
+                        rasterBands[n]->RasterIO(GF_Read, 0, rowOffset, width, remainRows, inputData[n], width, remainRows, GDT_Float32, 0, 0);
+                    }
+                    
+                    for(int m = 0; m < remainRows; ++m)
+                    {
+                        if((feedback != 0) && ((((nYBlocks*yBlockSize)+m) % feedback) == 0))
+                        {
+                            std::cout << "." << feedbackCounter << "." << std::flush;
+                            feedbackCounter = feedbackCounter + 10;
+                        }
+                        
+                        for(int j = 0; j < width; j++)
+                        {
+                            for(int n = 0; n < numBands; n++)
+                            {
+                                inDataColumn[n] = inputData[n][(m*width)+j];
+                            }
+                            
+                            this->calc->calcImageValue(inDataColumn, numBands, outDataColumn);
+                            
+                            for(int n = 0; n < numBands; n++)
+                            {
+                                outputData[n][(m*width)+j] = outDataColumn[n];
+                            }
+                            
+                        }
+                    }
+                    
+                    for(int n = 0; n < numBands; n++)
+                    {
+                        rowOffset = (yBlockSize * nYBlocks);
+                        rasterBands[n]->RasterIO(GF_Write, 0, rowOffset, width, remainRows, outputData[n], width, remainRows, GDT_Float32, 0, 0);
+                    }
+                }
+                std::cout << " Complete.\n";
+            }
+            catch(RSGISImageCalcException& e)
+            {                
+                if(inputData != NULL)
+                {
+                    for(int i = 0; i < numBands; i++)
+                    {
+                        if(inputData[i] != NULL)
+                        {
+                            delete[] inputData[i];
+                        }
+                    }
+                    delete[] inputData;
+                }
+                
+                if(outputData != NULL)
+                {
+                    for(int i = 0; i < numBands; i++)
+                    {
+                        if(outputData[i] != NULL)
+                        {
+                            delete[] outputData[i];
+                        }
+                    }
+                    delete[] outputData;
+                }
+                
+                if(inDataColumn != NULL)
+                {
+                    delete[] inDataColumn;
+                }
+                
+                if(outDataColumn != NULL)
+                {
+                    delete[] outDataColumn;
+                }
+                
+                if(rasterBands != NULL)
+                {
+                    delete[] rasterBands;
+                }
+                throw e;
+            }
+            catch(RSGISImageBandException& e)
+            {
+                if(inputData != NULL)
+                {
+                    for(int i = 0; i < numBands; i++)
+                    {
+                        if(inputData[i] != NULL)
+                        {
+                            delete[] inputData[i];
+                        }
+                    }
+                    delete[] inputData;
+                }
+                
+                if(outputData != NULL)
+                {
+                    for(int i = 0; i < numBands; i++)
+                    {
+                        if(outputData[i] != NULL)
+                        {
+                            delete[] outputData[i];
+                        }
+                    }
+                    delete[] outputData;
+                }
+                
+                if(inDataColumn != NULL)
+                {
+                    delete[] inDataColumn;
+                }
+                
+                if(outDataColumn != NULL)
+                {
+                    delete[] outDataColumn;
+                }
+                
+                if(rasterBands != NULL)
+                {
+                    delete[] rasterBands;
+                }
+                
+                throw e;
+            }
+            
+            if(inputData != NULL)
+            {
+                for(int i = 0; i < numBands; i++)
+                {
+                    if(inputData[i] != NULL)
+                    {
+                        CPLFree(inputData[i]);
+                    }
+                }
+                delete[] inputData;
+            }
+            
+            if(outputData != NULL)
+            {
+                for(int i = 0; i < numBands; i++)
+                {
+                    if(outputData[i] != NULL)
+                    {
+                        CPLFree(outputData[i]);
+                    }
+                }
+                delete[] outputData;
+            }
+            
+            if(inDataColumn != NULL)
+            {
+                delete[] inDataColumn;
+            }
+            
+            if(outDataColumn != NULL)
+            {
+                delete[] outDataColumn;
+            }
+            
+            if(rasterBands != NULL)
+            {
+                delete[] rasterBands;
+            }
+        }
+        
         void RSGISCalcEditImage::calcImageWindowData(GDALDataset *dataset, int windowSize) throw(RSGISImageCalcException,RSGISImageBandException)
         {
             if(dataset == NULL)
@@ -249,8 +515,8 @@ namespace rsgis
                 }
                 int windowMid = floor(((float)windowSize)/2.0); // Starting at 0!! NOT 1 otherwise would be ceil.
                 
-                std::cout << "Window Size: " << windowSize << std::endl;
-                std::cout << "Window Mid: " << windowMid << std::endl;
+                //std::cout << "Window Size: " << windowSize << std::endl;
+                //std::cout << "Window Mid: " << windowMid << std::endl;
                 
                 numBands = dataset->GetRasterCount();
                 width = dataset->GetRasterXSize();
@@ -265,7 +531,7 @@ namespace rsgis
                 
                 rasterBands[0]->GetBlockSize (&xBlockSize, &yBlockSize);
                 
-                std::cout << "Max. block size: " << yBlockSize << std::endl;
+                //std::cout << "Max. block size: " << yBlockSize << std::endl;
                 
                 int numOfLines = yBlockSize;
                 if(yBlockSize < windowSize)
@@ -341,7 +607,7 @@ namespace rsgis
                 
                 int feedback = height/10.0;
                 int feedbackCounter = 0;
-                std::cout << "Started" << std::flush;
+                std::cout << "Started " << std::flush;
                 
                 if(nYBlocks > 0)
                 {

@@ -707,6 +707,8 @@
     <rsgis:command algor="imagecalc" option="dist2geoms" vector="vector.shp" output="image_out.env" resolution="float" />
 	<!-- A command to calculate the distance from each pixel within the input image to nearest geometry -->
     <rsgis:command algor="imagecalc" option="imgdist2geoms" image="image.env" vector="vector.shp" output="image_out.env" format="GDAL Format" />
+	<!-- A command to calculate the distance by growing from 0 pixel values, where all pixels to be calculated should have a value of -1 -->
+    <rsgis:command algor="imagecalc" option="imgcalcdist" image="image.env" output="image_out.env" format="GDAL Format" />
     <!-- A command to calculate the statistics for the individual image bands -->
     <rsgis:command algor="imagecalc" option="imagebandstats" image="image.env" output="outfile.txt" ignorezeros="yes | no" />
     <!-- A command to calculate the statistics for the whole image across all bands -->
