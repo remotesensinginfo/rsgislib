@@ -4095,7 +4095,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
                 {
                     std::cout << "Distance " << dist << ":\t" << std::flush;
                     calcDist->resetChange();
-                    calcEditImage->calcImageWindowData(outImage, 3);
+                    calcEditImage->calcImageWindowData(outImage, 3, -2);
                     change = calcDist->changeOccurred();
                     calcDist->incrementCounter();
                     dist += 1;
