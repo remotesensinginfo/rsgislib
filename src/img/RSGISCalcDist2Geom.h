@@ -78,7 +78,7 @@ namespace rsgis{namespace img{
         void incrementCounter();
 		~RSGISCalcDistViaIterativeGrowth();
     protected:
-        unsigned int counter;
+        float counter;
         bool change;
         double imgRes;
 	};

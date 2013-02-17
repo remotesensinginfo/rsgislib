@@ -4090,15 +4090,19 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
                 rsgis::img::RSGISCalcEditImage *calcEditImage = new rsgis::img::RSGISCalcEditImage(calcDist);
                 
                 bool change = true;
+                unsigned int dist = 1;
                 while(change)
                 {
+                    std::cout << "Distance " << dist << ":\t" << std::flush;
                     calcDist->resetChange();
                     calcEditImage->calcImageWindowData(outImage, 3);
                     change = calcDist->changeOccurred();
                     calcDist->incrementCounter();
+                    dist += 1;
                 }
                 
                 // Translate to distance...
+                std::cout << "Multiple by pixel size\n";
                 calcEditImage->calcImageUseOut(outImage);
                 
                 // Clean up memory.

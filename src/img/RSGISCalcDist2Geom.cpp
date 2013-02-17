@@ -84,44 +84,44 @@ namespace rsgis{namespace img{
                 
         if(dataBlock[0][midPoint][midPoint] == -1)
         {
-            if(dataBlock[0][midPoint-1][midPoint-1] == counter)
+            if((dataBlock[0][midPoint-1][midPoint-1] == counter) || (dataBlock[0][midPoint-1][midPoint-1] == counter+0.5))
+            {
+                output[0] = counter+1.5;
+                change = true;
+            }
+            else if((dataBlock[0][midPoint-1][midPoint] == counter) || (dataBlock[0][midPoint-1][midPoint] == counter+0.5))
             {
                 output[0] = counter+1;
                 change = true;
             }
-            else if(dataBlock[0][midPoint-1][midPoint] == counter)
+            else if((dataBlock[0][midPoint-1][midPoint+1] == counter) || (dataBlock[0][midPoint-1][midPoint+1] == counter+0.5))
+            {
+                output[0] = counter+1.5;
+                change = true;
+            }
+            else if((dataBlock[0][midPoint][midPoint-1] == counter) || (dataBlock[0][midPoint][midPoint-1] == counter+0.5))
             {
                 output[0] = counter+1;
                 change = true;
             }
-            else if(dataBlock[0][midPoint-1][midPoint+1] == counter)
+            else if((dataBlock[0][midPoint][midPoint+1] == counter) || (dataBlock[0][midPoint][midPoint+1] == counter+0.5))
             {
                 output[0] = counter+1;
                 change = true;
             }
-            else if(dataBlock[0][midPoint][midPoint-1] == counter)
+            else if((dataBlock[0][midPoint+1][midPoint-1] == counter) || (dataBlock[0][midPoint+1][midPoint-1] == counter+0.5))
+            {
+                output[0] = counter+1.5;
+                change = true;
+            }
+            else if((dataBlock[0][midPoint+1][midPoint] == counter) || (dataBlock[0][midPoint+1][midPoint] == counter+0.5))
             {
                 output[0] = counter+1;
                 change = true;
             }
-            else if(dataBlock[0][midPoint][midPoint+1] == counter)
+            else if((dataBlock[0][midPoint+1][midPoint+1] == counter) || (dataBlock[0][midPoint+1][midPoint+1] == counter+0.5))
             {
-                output[0] = counter+1;
-                change = true;
-            }
-            else if(dataBlock[0][midPoint+1][midPoint-1] == counter)
-            {
-                output[0] = counter+1;
-                change = true;
-            }
-            else if(dataBlock[0][midPoint+1][midPoint] == counter)
-            {
-                output[0] = counter+1;
-                change = true;
-            }
-            else if(dataBlock[0][midPoint+1][midPoint+1] == counter)
-            {
-                output[0] = counter+1;
+                output[0] = counter+1.5;
                 change = true;
             }
             else
@@ -147,7 +147,7 @@ namespace rsgis{namespace img{
     
     void RSGISCalcDistViaIterativeGrowth::incrementCounter()
     {
-        ++counter;
+        counter += 1;
     }
     
     RSGISCalcDistViaIterativeGrowth::~RSGISCalcDistViaIterativeGrowth()
