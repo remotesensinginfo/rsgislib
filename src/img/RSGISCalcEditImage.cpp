@@ -479,7 +479,7 @@ namespace rsgis
             }
         }
         
-        void RSGISCalcEditImage::calcImageWindowData(GDALDataset *dataset, int windowSize) throw(RSGISImageCalcException,RSGISImageBandException)
+        void RSGISCalcEditImage::calcImageWindowData(GDALDataset *dataset, int windowSize, float fillval) throw(RSGISImageCalcException,RSGISImageBandException)
         {
             if(dataset == NULL)
             {
@@ -621,7 +621,7 @@ namespace rsgis
                             {
                                 for(int k = 0; k < numPxlsInBlock; k++)
                                 {
-                                    inputDataUpper[n][k] = 0;
+                                    inputDataUpper[n][k] = fillval;
                                 }
                             }
                             
@@ -677,14 +677,14 @@ namespace rsgis
                                     rasterBands[n]->RasterIO(GF_Read, 0, rowOffset, width, remainRows, inputDataLower[n], width, remainRows, GDT_Float32, 0, 0);
                                     for(int k = (remainRows*width); k < numPxlsInBlock; k++)
                                     {
-                                        inputDataLower[n][k] = 0;
+                                        inputDataLower[n][k] = fillval;
                                     }
                                 }
                                 else
                                 {
                                     for(int k = 0; k < numPxlsInBlock; k++)
                                     {
-                                        inputDataLower[n][k] = 0;
+                                        inputDataLower[n][k] = fillval;
                                     }
                                 }
                             }
@@ -757,14 +757,14 @@ namespace rsgis
                                                 {
                                                     for(int n = 0; n < numBands; n++)
                                                     {
-                                                        inDataBlock[n][y][x] = 0;
+                                                        inDataBlock[n][y][x] = fillval;
                                                     }
                                                 }
                                                 else if((j+dWinX) >= width)
                                                 {
                                                     for(int n = 0; n < numBands; n++)
                                                     {
-                                                        inDataBlock[n][y][x] = 0;
+                                                        inDataBlock[n][y][x] = fillval;
                                                     }
                                                 }
                                                 else
@@ -786,14 +786,14 @@ namespace rsgis
                                                 {
                                                     for(int n = 0; n < numBands; n++)
                                                     {
-                                                        inDataBlock[n][y][x] = 0;
+                                                        inDataBlock[n][y][x] = fillval;
                                                     }
                                                 }
                                                 else if((j+dWinX) >= width)
                                                 {
                                                     for(int n = 0; n < numBands; n++)
                                                     {
-                                                        inDataBlock[n][y][x] = 0;
+                                                        inDataBlock[n][y][x] = fillval;
                                                     }
                                                 }
                                                 else
@@ -826,14 +826,14 @@ namespace rsgis
                                                 {
                                                     for(int n = 0; n < numBands; n++)
                                                     {
-                                                        inDataBlock[n][y][x] = 0;
+                                                        inDataBlock[n][y][x] = fillval;
                                                     }
                                                 }
                                                 else if((j+dWinX) >= width)
                                                 {
                                                     for(int n = 0; n < numBands; n++)
                                                     {
-                                                        inDataBlock[n][y][x] = 0;
+                                                        inDataBlock[n][y][x] = fillval;
                                                     }
                                                 }
                                                 else
@@ -855,14 +855,14 @@ namespace rsgis
                                                 {
                                                     for(int n = 0; n < numBands; n++)
                                                     {
-                                                        inDataBlock[n][y][x] = 0;
+                                                        inDataBlock[n][y][x] = fillval;
                                                     }
                                                 }
                                                 else if((j+dWinX) >= width)
                                                 {
                                                     for(int n = 0; n < numBands; n++)
                                                     {
-                                                        inDataBlock[n][y][x] = 0;
+                                                        inDataBlock[n][y][x] = fillval;
                                                     }
                                                 }
                                                 else
@@ -894,14 +894,14 @@ namespace rsgis
                                             {
                                                 for(int n = 0; n < numBands; n++)
                                                 {
-                                                    inDataBlock[n][y][x] = 0;
+                                                    inDataBlock[n][y][x] = fillval;
                                                 }
                                             }
                                             else if((j+dWinX) >= width)
                                             {
                                                 for(int n = 0; n < numBands; n++)
                                                 {
-                                                    inDataBlock[n][y][x] = 0;
+                                                    inDataBlock[n][y][x] = fillval;
                                                 }
                                             }
                                             else
@@ -956,7 +956,7 @@ namespace rsgis
                         {
                             for(int k = 0; k < numPxlsInBlock; k++)
                             {
-                                inputDataLower[n][k] = 0;
+                                inputDataLower[n][k] = fillval;
                             }
                         }
                         
@@ -995,14 +995,14 @@ namespace rsgis
                                                 {
                                                     for(int n = 0; n < numBands; n++)
                                                     {
-                                                        inDataBlock[n][y][x] = 0;
+                                                        inDataBlock[n][y][x] = fillval;
                                                     }
                                                 }
                                                 else if((j+dWinX) >= width)
                                                 {
                                                     for(int n = 0; n < numBands; n++)
                                                     {
-                                                        inDataBlock[n][y][x] = 0;
+                                                        inDataBlock[n][y][x] = fillval;
                                                     }
                                                 }
                                                 else
@@ -1024,14 +1024,14 @@ namespace rsgis
                                                 {
                                                     for(int n = 0; n < numBands; n++)
                                                     {
-                                                        inDataBlock[n][y][x] = 0;
+                                                        inDataBlock[n][y][x] = fillval;
                                                     }
                                                 }
                                                 else if((j+dWinX) >= width)
                                                 {
                                                     for(int n = 0; n < numBands; n++)
                                                     {
-                                                        inDataBlock[n][y][x] = 0;
+                                                        inDataBlock[n][y][x] = fillval;
                                                     }
                                                 }
                                                 else
@@ -1064,14 +1064,14 @@ namespace rsgis
                                                 {
                                                     for(int n = 0; n < numBands; n++)
                                                     {
-                                                        inDataBlock[n][y][x] = 0;
+                                                        inDataBlock[n][y][x] = fillval;
                                                     }
                                                 }
                                                 else if((j+dWinX) >= width)
                                                 {
                                                     for(int n = 0; n < numBands; n++)
                                                     {
-                                                        inDataBlock[n][y][x] = 0;
+                                                        inDataBlock[n][y][x] = fillval;
                                                     }
                                                 }
                                                 else
@@ -1093,14 +1093,14 @@ namespace rsgis
                                                 {
                                                     for(int n = 0; n < numBands; n++)
                                                     {
-                                                        inDataBlock[n][y][x] = 0;
+                                                        inDataBlock[n][y][x] = fillval;
                                                     }
                                                 }
                                                 else if((j+dWinX) >= width)
                                                 {
                                                     for(int n = 0; n < numBands; n++)
                                                     {
-                                                        inDataBlock[n][y][x] = 0;
+                                                        inDataBlock[n][y][x] = fillval;
                                                     }
                                                 }
                                                 else
@@ -1132,14 +1132,14 @@ namespace rsgis
                                             {
                                                 for(int n = 0; n < numBands; n++)
                                                 {
-                                                    inDataBlock[n][y][x] = 0;
+                                                    inDataBlock[n][y][x] = fillval;
                                                 }
                                             }
                                             else if((j+dWinX) >= width)
                                             {
                                                 for(int n = 0; n < numBands; n++)
                                                 {
-                                                    inDataBlock[n][y][x] = 0;
+                                                    inDataBlock[n][y][x] = fillval;
                                                 }
                                             }
                                             else
