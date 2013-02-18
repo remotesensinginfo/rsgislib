@@ -29,6 +29,7 @@
 #include <sstream>
 #include <math.h>
 #include <list>
+#include <limits>
 
 #include "gdal_priv.h"
 #include "ogrsf_frmts.h"
@@ -135,7 +136,7 @@ namespace rsgis
 		class RSGISImageUtils
 			{
 			public:
-				RSGISImageUtils();
+				RSGISImageUtils(double resDiffThresh = 0.0001);
 				void getImageOverlap(GDALDataset **datasets, int numDS, int **dsOffsets, int *width, int *height, double *gdalTransform) throw(RSGISImageBandException);
 				void getImageOverlap(std::vector<GDALDataset*> *datasets, int **dsOffsets, int *width, int *height, double *gdalTransform) throw(RSGISImageBandException);
                 void getImageOverlap(GDALDataset **datasets, int numDS, int **dsOffsets, int *width, int *height, double *gdalTransform, int *maxBlockX, int *maxBlockY) throw(RSGISImageBandException);
@@ -171,7 +172,10 @@ namespace rsgis
                 GDALDataset* createCopy(GDALDataset *inData, std::string outputFilePath, std::string outputFormat, GDALDataType eType, bool useImgProj=true, std::string proj="")throw(RSGISImageException);
                 GDALDataset* createCopy(GDALDataset *inData, unsigned int numBands, std::string outputFilePath, std::string outputFormat, GDALDataType eType, bool useImgProj=true, std::string proj="")throw(RSGISImageException);
                 void createKMLText(std::string inputImage, std::string outKMLFile) throw(RSGISImageBandException);
+                bool closeResTest(double baseRes, double targetRes);
                 ~RSGISImageUtils();
+			private:
+                double resDiffThresh; // Maximum difference between image resolutions (as a fraction).
 			};
 	}
 }
