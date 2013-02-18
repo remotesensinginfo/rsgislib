@@ -24,9 +24,9 @@
 
 namespace rsgis{namespace img{
 
-	RSGISImageUtils::RSGISImageUtils()
+	RSGISImageUtils::RSGISImageUtils(double resDiffThresh)
 	{
-		
+		 this->resDiffThresh = resDiffThresh;
 	}
 	
 	void RSGISImageUtils::getImageOverlap(GDALDataset **datasets, int numDS,  int **dsOffsets, int *width, int *height, double *gdalTransform) throw(RSGISImageBandException)
@@ -81,7 +81,7 @@ namespace rsgis{namespace img{
 					{
 						pixelYResPos = pixelYRes;
 					}
-					
+
 					minX = transformations[i][0];
 					maxY = transformations[i][3];
 					
@@ -94,7 +94,7 @@ namespace rsgis{namespace img{
 				}
 				else
 				{
-					if(transformations[i][1] != pixelXRes & transformations[i][5] != pixelYRes)
+					if((this->closeResTest(pixelXRes, transformations[i][1]) == false) | (this->closeResTest(pixelYRes, transformations[i][5]) == false))
 					{
 						throw RSGISImageBandException("Not all image bands have the same resolution..");
 					}
@@ -287,7 +287,7 @@ namespace rsgis{namespace img{
 				}
 				else
 				{
-					if(transformations[i][1] != pixelXRes & transformations[i][5] != pixelYRes)
+					if((this->closeResTest(pixelXRes, transformations[i][1]) == false) | (this->closeResTest(pixelYRes, transformations[i][5]) == false))
 					{
 						throw RSGISImageBandException("Not all image bands have the same resolution..");
 					}
@@ -485,7 +485,7 @@ namespace rsgis{namespace img{
 				}
 				else
 				{                    
-					if(transformations[i][1] != pixelXRes & transformations[i][5] != pixelYRes)
+					if((this->closeResTest(pixelXRes, transformations[i][1]) == false) | (this->closeResTest(pixelYRes, transformations[i][5]) == false))
 					{
 						throw RSGISImageBandException("Not all image bands have the same resolution..");
 					}
@@ -694,7 +694,7 @@ namespace rsgis{namespace img{
 				}
 				else
 				{
-					if(transformations[i][1] != pixelXRes & transformations[i][5] != pixelYRes)
+					if((this->closeResTest(pixelXRes, transformations[i][1]) == false) | (this->closeResTest(pixelYRes, transformations[i][5]) == false))
 					{
 						throw RSGISImageBandException("Not all image bands have the same resolution..");
 					}
@@ -894,7 +894,7 @@ namespace rsgis{namespace img{
 				}
 				else
 				{
-					if(transformations[i][1] != pixelXRes & transformations[i][5] != pixelYRes)
+					if((this->closeResTest(pixelXRes, transformations[i][1]) == false) | (this->closeResTest(pixelYRes, transformations[i][5]) == false))
 					{
 						throw RSGISImageBandException("Not all image bands have the same resolution..");
 					}
@@ -1200,7 +1200,7 @@ namespace rsgis{namespace img{
 				}
 				else
 				{
-					if(transformations[i][1] != pixelXRes & transformations[i][5] != pixelYRes)
+					if((this->closeResTest(pixelXRes, transformations[i][1]) == false) | (this->closeResTest(pixelYRes, transformations[i][5]) == false))
 					{
 						throw RSGISImageBandException("Not all image bands have the same resolution..");
 					}
@@ -1431,7 +1431,7 @@ namespace rsgis{namespace img{
 				}
 				else
 				{
-					if(transformations[i][1] != pixelXRes & transformations[i][5] != pixelYRes)
+					if((this->closeResTest(pixelXRes, transformations[i][1]) == false) | (this->closeResTest(pixelYRes, transformations[i][5]) == false))
 					{
 						throw RSGISImageBandException("Not all image bands have the same resolution..");
 					}
@@ -1611,7 +1611,7 @@ namespace rsgis{namespace img{
 				}
 				else
 				{
-					if(transformations[i][1] != pixelXRes & transformations[i][5] != pixelYRes)
+					if((this->closeResTest(pixelXRes, transformations[i][1]) == false) | (this->closeResTest(pixelYRes, transformations[i][5]) == false))
 					{
 						throw RSGISImageBandException("Not all image bands have the same resolution..");
 					}
@@ -1779,7 +1779,7 @@ namespace rsgis{namespace img{
 				}
 				else
 				{
-					if(transformations[i][1] != pixelXRes & transformations[i][5] != pixelYRes)
+					if((this->closeResTest(pixelXRes, transformations[i][1]) == false) | (this->closeResTest(pixelYRes, transformations[i][5]) == false))
 					{
 						throw RSGISImageBandException("Not all image bands have the same resolution..");
 					}
@@ -3669,6 +3669,25 @@ namespace rsgis{namespace img{
         
     }
 	
+    bool RSGISImageUtils::closeResTest(double baseRes, double targetRes)
+    {
+    	/** Calculates if two doubles are close to each other with the threshold
+    	 * defined in the class.
+    	 * - A two sided test is used rather than the absolute value to prevent
+    	 * 	 overflows.
+    	 */
+
+    	bool closeRes = true;
+    	double resDiff = baseRes - targetRes;
+    	double resDiffVal = this->resDiffThresh * baseRes;
+
+    	if((resDiff > 0) && (resDiff > resDiffVal)){closeRes = false;}
+    	else if((resDiff < 0) && (resDiff > -1.*resDiffVal)){closeRes = false;}
+
+    	return closeRes;
+
+    }
+
 	RSGISImageUtils::~RSGISImageUtils()
 	{
 		

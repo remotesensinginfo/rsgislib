@@ -34,19 +34,20 @@ namespace rsgis{namespace img{
     
     void img::RSGISAddBands::addBandToFile(GDALDataset *input, GDALDataset *toAdd, std::string *outputFile, int band) throw(RSGISImageBandException)
     {
-        double *inputTrans = new double[6];
+    	rsgis::img::RSGISImageUtils imgUtils;
+    	double *inputTrans = new double[6];
         input->GetGeoTransform(inputTrans);
         double *toAddTrans = new double[6];
         toAdd->GetGeoTransform(toAddTrans);
         
         std::cout << "Image Pixel resolutions: X: " <<  inputTrans[1] << " == " << toAddTrans[1] << " Y: " <<  inputTrans[5] << " == " << toAddTrans[5] << std::endl;
         
-        if( ((int)inputTrans[1]) != ((int)toAddTrans[1]))
+        if(imgUtils.closeResTest(inputTrans[1],toAddTrans[1]) == false)
         {
             throw RSGISImageBandException("X Pixel resolutions do not match.");
         }
         
-        if( ((int)inputTrans[5]) != ((int)toAddTrans[5]))
+        if(imgUtils.closeResTest(inputTrans[5],toAddTrans[5]) == false)
         {
             throw RSGISImageBandException("Y Pixel resolutions do not match.");
         }
@@ -154,7 +155,9 @@ namespace rsgis{namespace img{
     
     void RSGISAddBands::addMultipleBands(GDALDataset *input, GDALDataset **toAdd, std::string *outputFile, int *band, int numAddBands) throw(RSGISImageBandException)
     {
-        double *toAddTrans = NULL;
+    	rsgis::img::RSGISImageUtils imgUtils;
+
+    	double *toAddTrans = NULL;
         double *inputDimensions = NULL;
         double *toAddDimensions = NULL;
         float *imgData = NULL;
@@ -187,14 +190,14 @@ namespace rsgis{namespace img{
             toAddTrans = new double[6];
             toAdd[i]->GetGeoTransform(toAddTrans);
             
-            if( ((int)inputTrans[1]) != ((int)toAddTrans[1]))
+            if(imgUtils.closeResTest(inputTrans[1],toAddTrans[1]) == false)
             {
                 char buffer [255];
                 sprintf(buffer, "X Pixel resolutions do not match. Base %f and additional %f", inputTrans[1], toAddTrans[1]);
                 throw RSGISImageBandException(buffer);
             }
             
-            if( ((int)inputTrans[5]) != ((int)toAddTrans[5]))
+            if(imgUtils.closeResTest(inputTrans[5],toAddTrans[5]) == false)
             {
                 char buffer [255];
                 sprintf(buffer, "Y Pixel resolutions do not match. Base %f and additional %f", inputTrans[5], toAddTrans[5]);
