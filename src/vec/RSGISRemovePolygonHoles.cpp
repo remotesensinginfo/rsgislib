@@ -26,9 +26,10 @@
 namespace rsgis{namespace vec{
 	
 	
-	RSGISRemovePolygonHoles::RSGISRemovePolygonHoles()
+	RSGISRemovePolygonHoles::RSGISRemovePolygonHoles(float areaThreshold, bool areaThresholdUsed)
 	{
-		
+		this->areaThreshold = areaThreshold;
+        this->areaThresholdUsed = areaThresholdUsed;
 	}
 	
 	void RSGISRemovePolygonHoles::removeholes(OGRLayer *input, OGRLayer *output)throw(RSGISVectorException)
@@ -87,7 +88,14 @@ namespace rsgis{namespace vec{
 					
 					try 
 					{
-						nPolygon = vecUtils.removeHolesOGRPolygon(polygon);
+                        if(areaThresholdUsed)
+                        {
+                            nPolygon = vecUtils.removeHolesOGRPolygon(polygon, areaThreshold);
+                        }
+                        else
+                        {
+                            nPolygon = vecUtils.removeHolesOGRPolygon(polygon);
+                        }
 						polyOK = true;
 					}
 					catch (RSGISVectorException &e) 

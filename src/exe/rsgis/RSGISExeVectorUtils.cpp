@@ -3293,6 +3293,20 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'force\' attribute was provided.");
 		}
 		XMLString::release(&forceXMLStr);
+        
+        XMLCh *thresholdXMLStr = XMLString::transcode("threshold");
+		if(argElement->hasAttribute(thresholdXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(thresholdXMLStr));
+			this->threshold = mathUtils.strtofloat(string(charValue));
+            this->areaThresholdProvided = true;
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			this->areaThresholdProvided = false;
+		}
+		XMLString::release(&thresholdXMLStr);
 	}
 	else if(XMLString::equals(optionDropSmallPolys, optionXML))
 	{
@@ -8623,6 +8637,10 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 			cout << "Remove holes in polygons.\n";
 			cout << "Input Vector: " << this->inputVector << endl;
 			cout << "Output Vector: " << this->outputVector << endl;
+            if(this->areaThresholdProvided)
+            {
+                cout << "Area threshold: " << this->threshold << endl;
+            }
 			
 			OGRRegisterAll();
 			
@@ -8703,10 +8721,11 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					throw RSGISVectorOutputException(message.c_str());
 				}
 				
-				RSGISRemovePolygonHoles removePolyHolesObj;
+				
 				try 
 				{
-					removePolyHolesObj.removeholes(inputSHPLayer, outputSHPLayer);
+                    RSGISRemovePolygonHoles removePolyHolesObj = RSGISRemovePolygonHoles(this->threshold, this->areaThresholdProvided);
+                    removePolyHolesObj.removeholes(inputSHPLayer, outputSHPLayer);
 					
 					OGRDataSource::DestroyDataSource(inputSHPDS);
 					OGRDataSource::DestroyDataSource(outputSHPDS);

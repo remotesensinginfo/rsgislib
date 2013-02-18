@@ -39,12 +39,16 @@ namespace rsgis{namespace vec{
 	class RSGISRemovePolygonHoles
 	{
 	public:
-		RSGISRemovePolygonHoles();
+		RSGISRemovePolygonHoles(float areaThreshold=0, bool areaThresholdUsed=false);
 		void removeholes(OGRLayer *input, OGRLayer *output)throw(RSGISVectorException);
 		void copyFeatureDefn(OGRLayer *outputSHPLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException);
 		void copyFeatureData(OGRFeature *inFeature, OGRFeature *outFeature, OGRFeatureDefn *inFeatureDefn, OGRFeatureDefn *outFeatureDefn);
 		~RSGISRemovePolygonHoles();
+    protected:
+        float areaThreshold;
+        bool areaThresholdUsed;
 	};
+
 	
 }}
 
