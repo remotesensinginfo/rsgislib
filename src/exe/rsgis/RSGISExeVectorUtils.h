@@ -277,6 +277,7 @@ class RSGISExeVectorUtils : public RSGISAlgorithmParameters
         bool outTextFile;
         bool bufferValueInText;
         unsigned int initFID;
+        bool areaThresholdProvided;
 	};
 }
 #endif

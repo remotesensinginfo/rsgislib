@@ -815,22 +815,23 @@
 
 
     <!-- A command to calculate the slope of an elevation surface -->
-    <rsgis:command algor="elevation" option="slope" input="image.env" output="out_image.env" [band="int"] [outtype="radians|degrees"] />
+    <rsgis:command algor="elevation" option="slope" input="image.env" output="out_image.env" [band="int"] [outtype="radians|degrees"] format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
     <!-- A command to calculate the aspect of an elevation surface -->
-    <rsgis:command algor="elevation" option="aspect" input="image.env" output="out_image.env" [band="int"] />
+    <rsgis:command algor="elevation" option="aspect" input="image.env" output="out_image.env" [band="int"] format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
     <!-- A command to calculate the slope and aspect of an elevation surface -->
-    <rsgis:command algor="elevation" option="slopeaspect" input="image.env" output="out_image.env" [band="int"] />
+    <rsgis:command algor="elevation" option="slopeaspect" input="image.env" output="out_image.env" [band="int"] format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
     <!-- A command to calculate the hillshade of an elevation surface -->
-    <rsgis:command algor="elevation" option="hillshade" input="image.env" output="out_image.env" azimuth="float" zenith="float" [band="int"]  />
+    <rsgis:command algor="elevation" option="hillshade" input="image.env" output="out_image.env" azimuth="float" zenith="float" [band="int"] format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
     <!-- A command to calculate a mask for the regions of shadow from an elevation surface -->
-    <rsgis:command algor="elevation" option="shadowmask" input="image.env" output="out_image.env" azimuth="float" zenith="float" maxelevation="int" [band="int"]  />
+    <rsgis:command algor="elevation" option="shadowmask" input="image.env" output="out_image.env" azimuth="float" zenith="float" maxelevation="int" [band="int"] format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64"  />
     <!-- A command to calculate the incidence angle from a elevation surface and sun position -->
-    <rsgis:command algor="elevation" option="incidenceangle" input="image.env" output="out_image.env" azimuth="float" zenith="float" [band="int"]  />
+    <rsgis:command algor="elevation" option="incidenceangle" input="image.env" output="out_image.env" azimuth="float" zenith="float" [band="int"] format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
     <!-- A command to calculate the exitance angle from a elevation surface and viewer position -->
-    <rsgis:command algor="elevation" option="exitanceangle" input="image.env" output="out_image.env" azimuth="float" zenith="float" [band="int"]  />
+    <rsgis:command algor="elevation" option="exitanceangle" input="image.env" output="out_image.env" azimuth="float" zenith="float" [band="int"] format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
     <!-- A command to calculate the incidence and exitance angles from a elevation surface and sun and viewer positions -->
-    <rsgis:command algor="elevation" option="incidenceexitanceangles" input="image.env" output="out_image.env" solarAzimuth="float" solarZenith="float" viewAzimuth="float" viewZenith="float" [band="int"]  />
-
+    <rsgis:command algor="elevation" option="incidenceexitanceangles" input="image.env" output="out_image.env" solarAzimuth="float" solarZenith="float" viewAzimuth="float" viewZenith="float" [band="int"] format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
+	<!-- A command to fills the holes within a DEM, the input image should have the following bands: elevation, slope, aspect -->
+    <rsgis:command algor="elevation" option="fill" input="image.env" output="out_image.env" holesval="float" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
 
 
 
@@ -1118,7 +1119,7 @@
     <!-- TODO -->
     <rsgis:command algor="vectorutils" option="fixpolyextboundary" vector="vector.shp" output="vector_out.shp" force="yes | no" />
     <!-- TODO -->
-    <rsgis:command algor="vectorutils" option="removepolyholes" vector="vector.shp" output="vector_out.shp" force="yes | no" />
+    <rsgis:command algor="vectorutils" option="removepolyholes" vector="vector.shp" output="vector_out.shp" force="yes | no" [threshold="float"] />
     <!-- TODO -->
     <rsgis:command algor="vectorutils" option="dropsmallpolys" vector="vector.shp" output="vector_out.shp" force="yes | no" threshold="float" />
     <!-- TODO -->

@@ -566,6 +566,89 @@ namespace rsgis{namespace vec{
 		return ogrPoly;
 		
 	}
+    
+    OGRPolygon* RSGISVectorUtils::removeHolesOGRPolygon(OGRPolygon *poly, float areaThreshold) throw(RSGISVectorException)
+	{
+		OGRPolygon *ogrPoly = new OGRPolygon();
+		OGRLinearRing *ogrRing = new OGRLinearRing();
+		OGRLinearRing *exteriorRing = poly->getExteriorRing();
+		
+		int numPoints = exteriorRing->getNumPoints();
+		
+		if(numPoints < 4)
+		{
+			throw RSGISVectorException("Too few point, need to have at least 4 points to make a polygon.");
+		}
+		
+		OGRPoint *pt = new OGRPoint();
+		OGRPoint *pt0 = new OGRPoint();
+		for(int i = 0; i < numPoints; i++)
+		{
+			exteriorRing->getPoint(i, pt);
+			
+			if(i == 0)
+			{
+				pt0->setX(pt->getX());
+				pt0->setY(pt->getY());
+				pt0->setZ(pt->getZ());
+			}
+			ogrRing->addPoint(pt->getX(), pt->getY(), pt->getZ());
+		}
+		
+		if(pt != pt0)
+		{
+			ogrRing->addPoint(pt0->getX(), pt0->getY(), pt0->getZ());
+		}
+		ogrPoly->addRingDirectly(ogrRing);
+        
+        
+        if(poly->getNumInteriorRings() > 0)
+        {
+            const OGRLinearRing *tmpRing = NULL;
+            int numHoles = poly->getNumInteriorRings();
+            for(int n = 0; n < numHoles; ++n)
+            {
+                tmpRing = poly->getInteriorRing(n);
+                if(tmpRing->get_Area() > areaThreshold)
+                {
+                    OGRLinearRing *ogrIntRing = new OGRLinearRing();
+                    int numIntPoints = tmpRing->getNumPoints();
+                    
+                    if(numIntPoints < 4)
+                    {
+                        throw RSGISVectorException("Too few point, need to have at least 4 points to make a polygon.");
+                    }
+                    
+                    for(int i = 0; i < numIntPoints; i++)
+                    {
+                        tmpRing->getPoint(i, pt);
+                        
+                        if(i == 0)
+                        {
+                            pt0->setX(pt->getX());
+                            pt0->setY(pt->getY());
+                            pt0->setZ(pt->getZ());
+                        }
+                        ogrIntRing->addPoint(pt->getX(), pt->getY(), pt->getZ());
+                    }
+                    
+                    if(pt != pt0)
+                    {
+                        ogrIntRing->addPoint(pt0->getX(), pt0->getY(), pt0->getZ());
+                    }
+                    ogrPoly->addRingDirectly(ogrIntRing);
+                }
+            }
+        }
+        
+        
+        
+		delete pt;
+		delete pt0;
+				
+		return ogrPoly;
+		
+	}
 	
 	OGRPolygon* RSGISVectorUtils::moveOGRPolygon(OGRPolygon *poly, double shiftX, double shiftY, double shiftZ) throw(RSGISVectorException)
 	{
