@@ -694,6 +694,103 @@ namespace rsgis{namespace calib{
     {
         
     }
+    
+    
+    
+    
+    
+    
+    RSGISFillDEMHoles::RSGISFillDEMHoles(float holeValue, float nodata) : rsgis::img::RSGISCalcImageValue(3)
+    {
+        this->holeValue = holeValue;
+        this->nodata = nodata;
+    }
+		
+    void RSGISFillDEMHoles::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
+    {
+        if(numBands != numOutBands)
+        {
+            throw rsgis::img::RSGISImageCalcException("There should be 3 input and 3 output image bands.");
+        }
+        
+        int midPoint = floor(((float)winSize)/2.0);
+        
+        if(dataBlock[0][midPoint][midPoint] == this->holeValue)
+        {
+            
+        }
+        else
+        {
+            output[0] = dataBlock[0][midPoint][midPoint];
+            output[1] = dataBlock[1][midPoint][midPoint];
+            output[2] = dataBlock[2][midPoint][midPoint];
+        }
+        
+    }
+    
+    bool RSGISFillDEMHoles::changeOccurred()
+    {
+        return change;
+    }
+    
+    void RSGISFillDEMHoles::resetChange()
+    {
+        change = false;
+    }
+        
+    RSGISFillDEMHoles::~RSGISFillDEMHoles()
+    {
+        
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    RSGISInFillDerivedHoles::RSGISInFillDerivedHoles(float holeValue) : rsgis::img::RSGISCalcImageValue(1)
+    {
+        this->holeValue = holeValue;
+    }
+    
+    void RSGISInFillDerivedHoles::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
+    {
+        int midPoint = floor(((float)winSize)/2.0);
+        
+        bool foundNoData = false;
+        for(unsigned int i = 0; i < 3; ++i)
+        {
+            for(unsigned int j = 0; j < 3; ++j)
+            {
+                if(dataBlock[0][i][j] == this->holeValue)
+                {
+                    foundNoData = true;
+                    break;
+                }
+            }
+        }
+        
+        if(foundNoData)
+        {
+            output[0] = dataBlock[2][midPoint][midPoint];
+        }
+        else
+        {
+            output[0] = dataBlock[1][midPoint][midPoint];
+        }
+    }
+    
+    RSGISInFillDerivedHoles::~RSGISInFillDerivedHoles()
+    {
+        
+    }
+
+    
+    
+    
 	
 }}
 
