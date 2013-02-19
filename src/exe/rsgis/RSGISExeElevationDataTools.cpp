@@ -29,154 +29,155 @@ RSGISExeElevationDataTools::RSGISExeElevationDataTools() : RSGISAlgorithmParamet
 	this->algorithm = "elevation";
 }
 
-RSGISAlgorithmParameters* RSGISExeElevationDataTools::getInstance()
+rsgis::RSGISAlgorithmParameters* RSGISExeElevationDataTools::getInstance()
 {
 	return new RSGISExeElevationDataTools();
 }
 
-void RSGISExeElevationDataTools::retrieveParameters(DOMElement *argElement) throw(RSGISXMLArgumentsException)
+void RSGISExeElevationDataTools::retrieveParameters(xercesc::DOMElement *argElement) throw(rsgis::RSGISXMLArgumentsException)
 {
-    cout << "parsing within RSGISExeElevationDataTools\n";
-	RSGISMathsUtils mathUtils;	
-	XMLCh *algorName = XMLString::transcode(this->algorithm.c_str());
-	XMLCh *algorXMLStr = XMLString::transcode("algor");
-	XMLCh *optionXMLStr = XMLString::transcode("option");
-	XMLCh *optionSlope = XMLString::transcode("slope");
-    XMLCh *optionAspect = XMLString::transcode("aspect");
-    XMLCh *optionSlopeAspect = XMLString::transcode("slopeaspect");
-    XMLCh *optionHillShade = XMLString::transcode("hillshade");
-    XMLCh *optionShadowMask = XMLString::transcode("shadowmask");
-    XMLCh *optionIncidenceAngle = XMLString::transcode("incidenceangle");
-    XMLCh *optionExitanceAngle = XMLString::transcode("exitanceangle");
-    XMLCh *optionIncidenceExistanceAngles = XMLString::transcode("incidenceexitanceangles");    
+	rsgis::math::RSGISMathsUtils mathUtils;
+	XMLCh *algorName = xercesc::XMLString::transcode(this->algorithm.c_str());
+	XMLCh *algorXMLStr = xercesc::XMLString::transcode("algor");
+	XMLCh *optionXMLStr = xercesc::XMLString::transcode("option");
+	XMLCh *optionSlope = xercesc::XMLString::transcode("slope");
+    XMLCh *optionAspect = xercesc::XMLString::transcode("aspect");
+    XMLCh *optionSlopeAspect = xercesc::XMLString::transcode("slopeaspect");
+    XMLCh *optionHillShade = xercesc::XMLString::transcode("hillshade");
+    XMLCh *optionShadowMask = xercesc::XMLString::transcode("shadowmask");
+    XMLCh *optionIncidenceAngle = xercesc::XMLString::transcode("incidenceangle");
+    XMLCh *optionExitanceAngle = xercesc::XMLString::transcode("exitanceangle");
+    XMLCh *optionIncidenceExistanceAngles = xercesc::XMLString::transcode("incidenceexitanceangles");    
+    XMLCh *optionFill = xercesc::XMLString::transcode("fill");
+    XMLCh *optionInFillDLayers = xercesc::XMLString::transcode("infilldlayers");
     
 	try
 	{
 		const XMLCh *algorNameEle = argElement->getAttribute(algorXMLStr);
-		if(!XMLString::equals(algorName, algorNameEle))
+		if(!xercesc::XMLString::equals(algorName, algorNameEle))
 		{
-			throw RSGISXMLArgumentsException("The algorithm name is incorrect.");
+			throw rsgis::RSGISXMLArgumentsException("The algorithm name is incorrect.");
 		}
 		
 	    // Set output image fomat (defaults to ENVI)
 		this->imageFormat = "ENVI";
-		XMLCh *formatXMLStr = XMLString::transcode("format");
+		XMLCh *formatXMLStr = xercesc::XMLString::transcode("format");
 		if(argElement->hasAttribute(formatXMLStr))
 		{
-			char *charValue = XMLString::transcode(argElement->getAttribute(formatXMLStr));
-			this->imageFormat = string(charValue);
-			XMLString::release(&charValue);
+			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(formatXMLStr));
+			this->imageFormat = std::string(charValue);
+			xercesc::XMLString::release(&charValue);
 		}
-		XMLString::release(&formatXMLStr);
+		xercesc::XMLString::release(&formatXMLStr);
 
 	    this->outDataType = GDT_Float32;
-		XMLCh *datatypeXMLStr = XMLString::transcode("datatype");
+		XMLCh *datatypeXMLStr = xercesc::XMLString::transcode("datatype");
 		if(argElement->hasAttribute(datatypeXMLStr))
 		{
-	        XMLCh *dtByte = XMLString::transcode("Byte");
-	        XMLCh *dtUInt16 = XMLString::transcode("UInt16");
-	        XMLCh *dtInt16 = XMLString::transcode("Int16");
-	        XMLCh *dtUInt32 = XMLString::transcode("UInt32");
-	        XMLCh *dtInt32 = XMLString::transcode("Int32");
-	        XMLCh *dtFloat32 = XMLString::transcode("Float32");
-	        XMLCh *dtFloat64 = XMLString::transcode("Float64");
+	        XMLCh *dtByte = xercesc::XMLString::transcode("Byte");
+	        XMLCh *dtUInt16 = xercesc::XMLString::transcode("UInt16");
+	        XMLCh *dtInt16 = xercesc::XMLString::transcode("Int16");
+	        XMLCh *dtUInt32 = xercesc::XMLString::transcode("UInt32");
+	        XMLCh *dtInt32 = xercesc::XMLString::transcode("Int32");
+	        XMLCh *dtFloat32 = xercesc::XMLString::transcode("Float32");
+	        XMLCh *dtFloat64 = xercesc::XMLString::transcode("Float64");
 
 	        const XMLCh *dtXMLValue = argElement->getAttribute(datatypeXMLStr);
-	        if(XMLString::equals(dtByte, dtXMLValue))
+	        if(xercesc::XMLString::equals(dtByte, dtXMLValue))
 	        {
 	            this->outDataType = GDT_Byte;
 	        }
-	        else if(XMLString::equals(dtUInt16, dtXMLValue))
+	        else if(xercesc::XMLString::equals(dtUInt16, dtXMLValue))
 	        {
 	            this->outDataType = GDT_UInt16;
 	        }
-	        else if(XMLString::equals(dtInt16, dtXMLValue))
+	        else if(xercesc::XMLString::equals(dtInt16, dtXMLValue))
 	        {
 	            this->outDataType = GDT_Int16;
 	        }
-	        else if(XMLString::equals(dtUInt32, dtXMLValue))
+	        else if(xercesc::XMLString::equals(dtUInt32, dtXMLValue))
 	        {
 	            this->outDataType = GDT_UInt32;
 	        }
-	        else if(XMLString::equals(dtInt32, dtXMLValue))
+	        else if(xercesc::XMLString::equals(dtInt32, dtXMLValue))
 	        {
 	            this->outDataType = GDT_Int32;
 	        }
-	        else if(XMLString::equals(dtFloat32, dtXMLValue))
+	        else if(xercesc::XMLString::equals(dtFloat32, dtXMLValue))
 	        {
 	            this->outDataType = GDT_Float32;
 	        }
-	        else if(XMLString::equals(dtFloat64, dtXMLValue))
+	        else if(xercesc::XMLString::equals(dtFloat64, dtXMLValue))
 	        {
 	            this->outDataType = GDT_Float64;
 	        }
 	        else
 	        {
-	            cerr << "Data type not recognised, defaulting to 32 bit float.";
+	            std::cerr << "Data type not recognised, defaulting to 32 bit float.";
 	            this->outDataType = GDT_Float32;
 	        }
 
-	        XMLString::release(&dtByte);
-	        XMLString::release(&dtUInt16);
-	        XMLString::release(&dtInt16);
-	        XMLString::release(&dtUInt32);
-	        XMLString::release(&dtInt32);
-	        XMLString::release(&dtFloat32);
-	        XMLString::release(&dtFloat64);
+	        xercesc::XMLString::release(&dtByte);
+	        xercesc::XMLString::release(&dtUInt16);
+	        xercesc::XMLString::release(&dtInt16);
+	        xercesc::XMLString::release(&dtUInt32);
+	        xercesc::XMLString::release(&dtInt32);
+	        xercesc::XMLString::release(&dtFloat32);
+	        xercesc::XMLString::release(&dtFloat64);
 		}
-		XMLString::release(&datatypeXMLStr);
+		xercesc::XMLString::release(&datatypeXMLStr);
 
 		const XMLCh *optionXML = argElement->getAttribute(optionXMLStr);
-		if(XMLString::equals(optionSlope, optionXML))
+		if(xercesc::XMLString::equals(optionSlope, optionXML))
 		{
             this->option = slope;
             
-            XMLCh *inputXMLStr = XMLString::transcode("input");
+            XMLCh *inputXMLStr = xercesc::XMLString::transcode("input");
             if(argElement->hasAttribute(inputXMLStr))
             {
-                char *charValue = XMLString::transcode(argElement->getAttribute(inputXMLStr));
-                this->inputImage = string(charValue);
-                XMLString::release(&charValue);
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(inputXMLStr));
+                this->inputImage = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
             }
             else
             {
-                throw RSGISXMLArgumentsException("No \'input\' attribute was provided.");
+                throw rsgis::RSGISXMLArgumentsException("No \'input\' attribute was provided.");
             }
-            XMLString::release(&inputXMLStr);
+            xercesc::XMLString::release(&inputXMLStr);
             
-            XMLCh *outputXMLStr = XMLString::transcode("output");
+            XMLCh *outputXMLStr = xercesc::XMLString::transcode("output");
             if(argElement->hasAttribute(outputXMLStr))
             {
-                char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
-                this->outputImage = string(charValue);
-                XMLString::release(&charValue);
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outputXMLStr));
+                this->outputImage = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
             }
             else
             {
-                throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+                throw rsgis::RSGISXMLArgumentsException("No \'output\' attribute was provided.");
             }
-            XMLString::release(&outputXMLStr);
+            xercesc::XMLString::release(&outputXMLStr);
             
-            XMLCh *bandXMLStr = XMLString::transcode("band");
+            XMLCh *bandXMLStr = xercesc::XMLString::transcode("band");
             if(argElement->hasAttribute(bandXMLStr))
             {
-                char *charValue = XMLString::transcode(argElement->getAttribute(bandXMLStr));
-                imageBand = mathUtils.strtounsignedint(string(charValue))-1;
-                XMLString::release(&charValue);
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(bandXMLStr));
+                imageBand = mathUtils.strtounsignedint(std::string(charValue))-1;
+                xercesc::XMLString::release(&charValue);
             }
             else
             {
                 imageBand = 0;
             }
-            XMLString::release(&bandXMLStr);
+            xercesc::XMLString::release(&bandXMLStr);
             
-            XMLCh *outTypeXMLStr = XMLString::transcode("outtype");
+            XMLCh *outTypeXMLStr = xercesc::XMLString::transcode("outtype");
             if(argElement->hasAttribute(outTypeXMLStr))
             {
-                XMLCh *radiansStr = XMLString::transcode("radians");
+                XMLCh *radiansStr = xercesc::XMLString::transcode("radians");
                 const XMLCh *outTypeValue = argElement->getAttribute(outTypeXMLStr);
                 
-                if(XMLString::equals(outTypeValue, radiansStr))
+                if(xercesc::XMLString::equals(outTypeValue, radiansStr))
                 {
                     this->slopeOutputType = 1;
                 }
@@ -184,545 +185,677 @@ void RSGISExeElevationDataTools::retrieveParameters(DOMElement *argElement) thro
                 {
                     this->slopeOutputType = 0;
                 }
-                XMLString::release(&radiansStr);
+                xercesc::XMLString::release(&radiansStr);
             }
             else
             {
                 this->slopeOutputType = 0;
             }
-            XMLString::release(&outTypeXMLStr);
+            xercesc::XMLString::release(&outTypeXMLStr);
         }
-        else if(XMLString::equals(optionAspect, optionXML))
+        else if(xercesc::XMLString::equals(optionAspect, optionXML))
 		{
             this->option = aspect;
             
-            XMLCh *inputXMLStr = XMLString::transcode("input");
+            XMLCh *inputXMLStr = xercesc::XMLString::transcode("input");
             if(argElement->hasAttribute(inputXMLStr))
             {
-                char *charValue = XMLString::transcode(argElement->getAttribute(inputXMLStr));
-                this->inputImage = string(charValue);
-                XMLString::release(&charValue);
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(inputXMLStr));
+                this->inputImage = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
             }
             else
             {
-                throw RSGISXMLArgumentsException("No \'input\' attribute was provided.");
+                throw rsgis::RSGISXMLArgumentsException("No \'input\' attribute was provided.");
             }
-            XMLString::release(&inputXMLStr);
+            xercesc::XMLString::release(&inputXMLStr);
             
-            XMLCh *outputXMLStr = XMLString::transcode("output");
+            XMLCh *outputXMLStr = xercesc::XMLString::transcode("output");
             if(argElement->hasAttribute(outputXMLStr))
             {
-                char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
-                this->outputImage = string(charValue);
-                XMLString::release(&charValue);
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outputXMLStr));
+                this->outputImage = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
             }
             else
             {
-                throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+                throw rsgis::RSGISXMLArgumentsException("No \'output\' attribute was provided.");
             }
-            XMLString::release(&outputXMLStr);
+            xercesc::XMLString::release(&outputXMLStr);
             
-            XMLCh *bandXMLStr = XMLString::transcode("band");
+            XMLCh *bandXMLStr = xercesc::XMLString::transcode("band");
             if(argElement->hasAttribute(bandXMLStr))
             {
-                char *charValue = XMLString::transcode(argElement->getAttribute(bandXMLStr));
-                imageBand = mathUtils.strtounsignedint(string(charValue))-1;
-                XMLString::release(&charValue);
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(bandXMLStr));
+                imageBand = mathUtils.strtounsignedint(std::string(charValue))-1;
+                xercesc::XMLString::release(&charValue);
             }
             else
             {
                 imageBand = 0;
             }
-            XMLString::release(&bandXMLStr);
+            xercesc::XMLString::release(&bandXMLStr);
         }
-        else if(XMLString::equals(optionSlopeAspect, optionXML))
+        else if(xercesc::XMLString::equals(optionSlopeAspect, optionXML))
 		{
             this->option = slopeaspect;
             
-            XMLCh *inputXMLStr = XMLString::transcode("input");
+            XMLCh *inputXMLStr = xercesc::XMLString::transcode("input");
             if(argElement->hasAttribute(inputXMLStr))
             {
-                char *charValue = XMLString::transcode(argElement->getAttribute(inputXMLStr));
-                this->inputImage = string(charValue);
-                XMLString::release(&charValue);
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(inputXMLStr));
+                this->inputImage = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
             }
             else
             {
-                throw RSGISXMLArgumentsException("No \'input\' attribute was provided.");
+                throw rsgis::RSGISXMLArgumentsException("No \'input\' attribute was provided.");
             }
-            XMLString::release(&inputXMLStr);
+            xercesc::XMLString::release(&inputXMLStr);
             
-            XMLCh *outputXMLStr = XMLString::transcode("output");
+            XMLCh *outputXMLStr = xercesc::XMLString::transcode("output");
             if(argElement->hasAttribute(outputXMLStr))
             {
-                char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
-                this->outputImage = string(charValue);
-                XMLString::release(&charValue);
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outputXMLStr));
+                this->outputImage = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
             }
             else
             {
-                throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+                throw rsgis::RSGISXMLArgumentsException("No \'output\' attribute was provided.");
             }
-            XMLString::release(&outputXMLStr);
+            xercesc::XMLString::release(&outputXMLStr);
             
-            XMLCh *bandXMLStr = XMLString::transcode("band");
+            XMLCh *bandXMLStr = xercesc::XMLString::transcode("band");
             if(argElement->hasAttribute(bandXMLStr))
             {
-                char *charValue = XMLString::transcode(argElement->getAttribute(bandXMLStr));
-                imageBand = mathUtils.strtounsignedint(string(charValue))-1;
-                XMLString::release(&charValue);
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(bandXMLStr));
+                imageBand = mathUtils.strtounsignedint(std::string(charValue))-1;
+                xercesc::XMLString::release(&charValue);
             }
             else
             {
                 imageBand = 0;
             }
-            XMLString::release(&bandXMLStr);
+            xercesc::XMLString::release(&bandXMLStr);
         }
-        else if(XMLString::equals(optionHillShade, optionXML))
+        else if(xercesc::XMLString::equals(optionHillShade, optionXML))
 		{
             this->option = hillshade;
             
-            XMLCh *inputXMLStr = XMLString::transcode("input");
+            XMLCh *inputXMLStr = xercesc::XMLString::transcode("input");
             if(argElement->hasAttribute(inputXMLStr))
             {
-                char *charValue = XMLString::transcode(argElement->getAttribute(inputXMLStr));
-                this->inputImage = string(charValue);
-                XMLString::release(&charValue);
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(inputXMLStr));
+                this->inputImage = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
             }
             else
             {
-                throw RSGISXMLArgumentsException("No \'input\' attribute was provided.");
+                throw rsgis::RSGISXMLArgumentsException("No \'input\' attribute was provided.");
             }
-            XMLString::release(&inputXMLStr);
+            xercesc::XMLString::release(&inputXMLStr);
             
-            XMLCh *outputXMLStr = XMLString::transcode("output");
+            XMLCh *outputXMLStr = xercesc::XMLString::transcode("output");
             if(argElement->hasAttribute(outputXMLStr))
             {
-                char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
-                this->outputImage = string(charValue);
-                XMLString::release(&charValue);
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outputXMLStr));
+                this->outputImage = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
             }
             else
             {
-                throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+                throw rsgis::RSGISXMLArgumentsException("No \'output\' attribute was provided.");
             }
-            XMLString::release(&outputXMLStr);
+            xercesc::XMLString::release(&outputXMLStr);
             
-            XMLCh *bandXMLStr = XMLString::transcode("band");
+            XMLCh *bandXMLStr = xercesc::XMLString::transcode("band");
             if(argElement->hasAttribute(bandXMLStr))
             {
-                char *charValue = XMLString::transcode(argElement->getAttribute(bandXMLStr));
-                imageBand = mathUtils.strtounsignedint(string(charValue))-1;
-                XMLString::release(&charValue);
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(bandXMLStr));
+                imageBand = mathUtils.strtounsignedint(std::string(charValue))-1;
+                xercesc::XMLString::release(&charValue);
             }
             else
             {
                 imageBand = 0;
             }
-            XMLString::release(&bandXMLStr);
+            xercesc::XMLString::release(&bandXMLStr);
             
-            XMLCh *zenithXMLStr = XMLString::transcode("zenith");
+            XMLCh *zenithXMLStr = xercesc::XMLString::transcode("zenith");
             if(argElement->hasAttribute(zenithXMLStr))
             {
-                char *charValue = XMLString::transcode(argElement->getAttribute(zenithXMLStr));
-                this->solarZenith = mathUtils.strtofloat(string(charValue));
-                XMLString::release(&charValue);
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(zenithXMLStr));
+                this->solarZenith = mathUtils.strtofloat(std::string(charValue));
+                xercesc::XMLString::release(&charValue);
             }
             else
             {
                 this->solarZenith = 45;
             }
-            XMLString::release(&zenithXMLStr);
+            xercesc::XMLString::release(&zenithXMLStr);
             
-            XMLCh *azimuthXMLStr = XMLString::transcode("azimuth");
+            XMLCh *azimuthXMLStr = xercesc::XMLString::transcode("azimuth");
             if(argElement->hasAttribute(azimuthXMLStr))
             {
-                char *charValue = XMLString::transcode(argElement->getAttribute(azimuthXMLStr));
-                this->solarAzimuth = mathUtils.strtofloat(string(charValue));
-                XMLString::release(&charValue);
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(azimuthXMLStr));
+                this->solarAzimuth = mathUtils.strtofloat(std::string(charValue));
+                xercesc::XMLString::release(&charValue);
             }
             else
             {
                 this->solarAzimuth = 315;
             }
-            XMLString::release(&azimuthXMLStr);
+            xercesc::XMLString::release(&azimuthXMLStr);
         }
-        else if(XMLString::equals(optionShadowMask, optionXML))
+        else if(xercesc::XMLString::equals(optionShadowMask, optionXML))
 		{
             this->option = shadowmask;
             
-            XMLCh *inputXMLStr = XMLString::transcode("input");
+            XMLCh *inputXMLStr = xercesc::XMLString::transcode("input");
             if(argElement->hasAttribute(inputXMLStr))
             {
-                char *charValue = XMLString::transcode(argElement->getAttribute(inputXMLStr));
-                this->inputImage = string(charValue);
-                XMLString::release(&charValue);
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(inputXMLStr));
+                this->inputImage = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
             }
             else
             {
-                throw RSGISXMLArgumentsException("No \'input\' attribute was provided.");
+                throw rsgis::RSGISXMLArgumentsException("No \'input\' attribute was provided.");
             }
-            XMLString::release(&inputXMLStr);
+            xercesc::XMLString::release(&inputXMLStr);
             
-            XMLCh *outputXMLStr = XMLString::transcode("output");
+            XMLCh *outputXMLStr = xercesc::XMLString::transcode("output");
             if(argElement->hasAttribute(outputXMLStr))
             {
-                char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
-                this->outputImage = string(charValue);
-                XMLString::release(&charValue);
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outputXMLStr));
+                this->outputImage = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
             }
             else
             {
-                throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+                throw rsgis::RSGISXMLArgumentsException("No \'output\' attribute was provided.");
             }
-            XMLString::release(&outputXMLStr);
+            xercesc::XMLString::release(&outputXMLStr);
             
-            XMLCh *bandXMLStr = XMLString::transcode("band");
+            XMLCh *bandXMLStr = xercesc::XMLString::transcode("band");
             if(argElement->hasAttribute(bandXMLStr))
             {
-                char *charValue = XMLString::transcode(argElement->getAttribute(bandXMLStr));
-                imageBand = mathUtils.strtounsignedint(string(charValue));
-                XMLString::release(&charValue);
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(bandXMLStr));
+                imageBand = mathUtils.strtounsignedint(std::string(charValue));
+                xercesc::XMLString::release(&charValue);
             }
             else
             {
                 imageBand = 1;
             }
-            XMLString::release(&bandXMLStr);
+            xercesc::XMLString::release(&bandXMLStr);
             
-            XMLCh *zenithXMLStr = XMLString::transcode("zenith");
+            XMLCh *zenithXMLStr = xercesc::XMLString::transcode("zenith");
             if(argElement->hasAttribute(zenithXMLStr))
             {
-                char *charValue = XMLString::transcode(argElement->getAttribute(zenithXMLStr));
-                this->solarZenith = mathUtils.strtofloat(string(charValue));
-                XMLString::release(&charValue);
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(zenithXMLStr));
+                this->solarZenith = mathUtils.strtofloat(std::string(charValue));
+                xercesc::XMLString::release(&charValue);
             }
             else
             {
-                throw RSGISXMLArgumentsException("No \'zenith\' attribute was provided.");
+                throw rsgis::RSGISXMLArgumentsException("No \'zenith\' attribute was provided.");
             }
-            XMLString::release(&zenithXMLStr);
+            xercesc::XMLString::release(&zenithXMLStr);
             
-            XMLCh *azimuthXMLStr = XMLString::transcode("azimuth");
+            XMLCh *azimuthXMLStr = xercesc::XMLString::transcode("azimuth");
             if(argElement->hasAttribute(azimuthXMLStr))
             {
-                char *charValue = XMLString::transcode(argElement->getAttribute(azimuthXMLStr));
-                this->solarAzimuth = mathUtils.strtofloat(string(charValue));
-                XMLString::release(&charValue);
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(azimuthXMLStr));
+                this->solarAzimuth = mathUtils.strtofloat(std::string(charValue));
+                xercesc::XMLString::release(&charValue);
             }
             else
             {
-                throw RSGISXMLArgumentsException("No \'azimuth\' attribute was provided.");
+                throw rsgis::RSGISXMLArgumentsException("No \'azimuth\' attribute was provided.");
             }
-            XMLString::release(&azimuthXMLStr);
+            xercesc::XMLString::release(&azimuthXMLStr);
 
-            XMLCh *maxElevationXMLStr = XMLString::transcode("maxelevation");
+            XMLCh *maxElevationXMLStr = xercesc::XMLString::transcode("maxelevation");
             if(argElement->hasAttribute(maxElevationXMLStr))
             {
-                char *charValue = XMLString::transcode(argElement->getAttribute(maxElevationXMLStr));
-                this->maxElevHeight = mathUtils.strtofloat(string(charValue));
-                XMLString::release(&charValue);
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(maxElevationXMLStr));
+                this->maxElevHeight = mathUtils.strtofloat(std::string(charValue));
+                xercesc::XMLString::release(&charValue);
             }
             else
             {
-                cerr << "Warning: A default maximum elevation value of 4000 m is being used.";
+                std::cerr << "Warning: A default maximum elevation value of 4000 m is being used.";
                 this->maxElevHeight = 4000;
             }
-            XMLString::release(&maxElevationXMLStr);
+            xercesc::XMLString::release(&maxElevationXMLStr);
 
         }
-        else if(XMLString::equals(optionIncidenceAngle, optionXML))
+        else if(xercesc::XMLString::equals(optionIncidenceAngle, optionXML))
         {
             this->option = incidenceangle;
             
-            XMLCh *inputXMLStr = XMLString::transcode("input");
+            XMLCh *inputXMLStr = xercesc::XMLString::transcode("input");
             if(argElement->hasAttribute(inputXMLStr))
             {
-                char *charValue = XMLString::transcode(argElement->getAttribute(inputXMLStr));
-                this->inputImage = string(charValue);
-                XMLString::release(&charValue);
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(inputXMLStr));
+                this->inputImage = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
             }
             else
             {
-                throw RSGISXMLArgumentsException("No \'input\' attribute was provided.");
+                throw rsgis::RSGISXMLArgumentsException("No \'input\' attribute was provided.");
             }
-            XMLString::release(&inputXMLStr);
+            xercesc::XMLString::release(&inputXMLStr);
             
-            XMLCh *outputXMLStr = XMLString::transcode("output");
+            XMLCh *outputXMLStr = xercesc::XMLString::transcode("output");
             if(argElement->hasAttribute(outputXMLStr))
             {
-                char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
-                this->outputImage = string(charValue);
-                XMLString::release(&charValue);
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outputXMLStr));
+                this->outputImage = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
             }
             else
             {
-                throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+                throw rsgis::RSGISXMLArgumentsException("No \'output\' attribute was provided.");
             }
-            XMLString::release(&outputXMLStr);
+            xercesc::XMLString::release(&outputXMLStr);
             
-            XMLCh *bandXMLStr = XMLString::transcode("band");
+            XMLCh *bandXMLStr = xercesc::XMLString::transcode("band");
             if(argElement->hasAttribute(bandXMLStr))
             {
-                char *charValue = XMLString::transcode(argElement->getAttribute(bandXMLStr));
-                imageBand = mathUtils.strtounsignedint(string(charValue))-1;
-                XMLString::release(&charValue);
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(bandXMLStr));
+                imageBand = mathUtils.strtounsignedint(std::string(charValue))-1;
+                xercesc::XMLString::release(&charValue);
             }
             else
             {
                 imageBand = 0;
             }
-            XMLString::release(&bandXMLStr);
+            xercesc::XMLString::release(&bandXMLStr);
             
-            XMLCh *zenithXMLStr = XMLString::transcode("zenith");
+            XMLCh *zenithXMLStr = xercesc::XMLString::transcode("zenith");
             if(argElement->hasAttribute(zenithXMLStr))
             {
-                char *charValue = XMLString::transcode(argElement->getAttribute(zenithXMLStr));
-                this->solarZenith = mathUtils.strtofloat(string(charValue));
-                XMLString::release(&charValue);
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(zenithXMLStr));
+                this->solarZenith = mathUtils.strtofloat(std::string(charValue));
+                xercesc::XMLString::release(&charValue);
             }
             else
             {
-                throw RSGISXMLArgumentsException("No \'zenith\' attribute was provided.");
+                throw rsgis::RSGISXMLArgumentsException("No \'zenith\' attribute was provided.");
             }
-            XMLString::release(&zenithXMLStr);
+            xercesc::XMLString::release(&zenithXMLStr);
             
-            XMLCh *azimuthXMLStr = XMLString::transcode("azimuth");
+            XMLCh *azimuthXMLStr = xercesc::XMLString::transcode("azimuth");
             if(argElement->hasAttribute(azimuthXMLStr))
             {
-                char *charValue = XMLString::transcode(argElement->getAttribute(azimuthXMLStr));
-                this->solarAzimuth = mathUtils.strtofloat(string(charValue));
-                XMLString::release(&charValue);
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(azimuthXMLStr));
+                this->solarAzimuth = mathUtils.strtofloat(std::string(charValue));
+                xercesc::XMLString::release(&charValue);
             }
             else
             {
-                throw RSGISXMLArgumentsException("No \'azimuth\' attribute was provided.");
+                throw rsgis::RSGISXMLArgumentsException("No \'azimuth\' attribute was provided.");
             }
-            XMLString::release(&azimuthXMLStr);
+            xercesc::XMLString::release(&azimuthXMLStr);
         }
-        else if(XMLString::equals(optionExitanceAngle, optionXML))
+        else if(xercesc::XMLString::equals(optionExitanceAngle, optionXML))
         {
             this->option = exitanceangle;
             
-            XMLCh *inputXMLStr = XMLString::transcode("input");
+            XMLCh *inputXMLStr = xercesc::XMLString::transcode("input");
             if(argElement->hasAttribute(inputXMLStr))
             {
-                char *charValue = XMLString::transcode(argElement->getAttribute(inputXMLStr));
-                this->inputImage = string(charValue);
-                XMLString::release(&charValue);
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(inputXMLStr));
+                this->inputImage = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
             }
             else
             {
-                throw RSGISXMLArgumentsException("No \'input\' attribute was provided.");
+                throw rsgis::RSGISXMLArgumentsException("No \'input\' attribute was provided.");
             }
-            XMLString::release(&inputXMLStr);
+            xercesc::XMLString::release(&inputXMLStr);
             
-            XMLCh *outputXMLStr = XMLString::transcode("output");
+            XMLCh *outputXMLStr = xercesc::XMLString::transcode("output");
             if(argElement->hasAttribute(outputXMLStr))
             {
-                char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
-                this->outputImage = string(charValue);
-                XMLString::release(&charValue);
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outputXMLStr));
+                this->outputImage = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
             }
             else
             {
-                throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+                throw rsgis::RSGISXMLArgumentsException("No \'output\' attribute was provided.");
             }
-            XMLString::release(&outputXMLStr);
+            xercesc::XMLString::release(&outputXMLStr);
             
-            XMLCh *bandXMLStr = XMLString::transcode("band");
+            XMLCh *bandXMLStr = xercesc::XMLString::transcode("band");
             if(argElement->hasAttribute(bandXMLStr))
             {
-                char *charValue = XMLString::transcode(argElement->getAttribute(bandXMLStr));
-                imageBand = mathUtils.strtounsignedint(string(charValue))-1;
-                XMLString::release(&charValue);
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(bandXMLStr));
+                imageBand = mathUtils.strtounsignedint(std::string(charValue))-1;
+                xercesc::XMLString::release(&charValue);
             }
             else
             {
                 imageBand = 0;
             }
-            XMLString::release(&bandXMLStr);
+            xercesc::XMLString::release(&bandXMLStr);
             
-            XMLCh *zenithXMLStr = XMLString::transcode("zenith");
+            XMLCh *zenithXMLStr = xercesc::XMLString::transcode("zenith");
             if(argElement->hasAttribute(zenithXMLStr))
             {
-                char *charValue = XMLString::transcode(argElement->getAttribute(zenithXMLStr));
-                this->viewZenith = mathUtils.strtofloat(string(charValue));
-                XMLString::release(&charValue);
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(zenithXMLStr));
+                this->viewZenith = mathUtils.strtofloat(std::string(charValue));
+                xercesc::XMLString::release(&charValue);
             }
             else
             {
-                throw RSGISXMLArgumentsException("No \'zenith\' attribute was provided.");
+                throw rsgis::RSGISXMLArgumentsException("No \'zenith\' attribute was provided.");
             }
-            XMLString::release(&zenithXMLStr);
+            xercesc::XMLString::release(&zenithXMLStr);
             
-            XMLCh *azimuthXMLStr = XMLString::transcode("azimuth");
+            XMLCh *azimuthXMLStr = xercesc::XMLString::transcode("azimuth");
             if(argElement->hasAttribute(azimuthXMLStr))
             {
-                char *charValue = XMLString::transcode(argElement->getAttribute(azimuthXMLStr));
-                this->viewAzimuth = mathUtils.strtofloat(string(charValue));
-                XMLString::release(&charValue);
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(azimuthXMLStr));
+                this->viewAzimuth = mathUtils.strtofloat(std::string(charValue));
+                xercesc::XMLString::release(&charValue);
             }
             else
             {
-                throw RSGISXMLArgumentsException("No \'azimuth\' attribute was provided.");
+                throw rsgis::RSGISXMLArgumentsException("No \'azimuth\' attribute was provided.");
             }
-            XMLString::release(&azimuthXMLStr);
+            xercesc::XMLString::release(&azimuthXMLStr);
         }
-        else if(XMLString::equals(optionIncidenceExistanceAngles, optionXML))
+        else if(xercesc::XMLString::equals(optionIncidenceExistanceAngles, optionXML))
         {
             this->option = incidenceexistanceangles;
             
-            XMLCh *inputXMLStr = XMLString::transcode("input");
+            XMLCh *inputXMLStr = xercesc::XMLString::transcode("input");
             if(argElement->hasAttribute(inputXMLStr))
             {
-                char *charValue = XMLString::transcode(argElement->getAttribute(inputXMLStr));
-                this->inputImage = string(charValue);
-                XMLString::release(&charValue);
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(inputXMLStr));
+                this->inputImage = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
             }
             else
             {
-                throw RSGISXMLArgumentsException("No \'input\' attribute was provided.");
+                throw rsgis::RSGISXMLArgumentsException("No \'input\' attribute was provided.");
             }
-            XMLString::release(&inputXMLStr);
+            xercesc::XMLString::release(&inputXMLStr);
             
-            XMLCh *outputXMLStr = XMLString::transcode("output");
+            XMLCh *outputXMLStr = xercesc::XMLString::transcode("output");
             if(argElement->hasAttribute(outputXMLStr))
             {
-                char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
-                this->outputImage = string(charValue);
-                XMLString::release(&charValue);
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outputXMLStr));
+                this->outputImage = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
             }
             else
             {
-                throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+                throw rsgis::RSGISXMLArgumentsException("No \'output\' attribute was provided.");
             }
-            XMLString::release(&outputXMLStr);
+            xercesc::XMLString::release(&outputXMLStr);
             
-            XMLCh *bandXMLStr = XMLString::transcode("band");
+            XMLCh *bandXMLStr = xercesc::XMLString::transcode("band");
             if(argElement->hasAttribute(bandXMLStr))
             {
-                char *charValue = XMLString::transcode(argElement->getAttribute(bandXMLStr));
-                imageBand = mathUtils.strtounsignedint(string(charValue))-1;
-                XMLString::release(&charValue);
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(bandXMLStr));
+                imageBand = mathUtils.strtounsignedint(std::string(charValue))-1;
+                xercesc::XMLString::release(&charValue);
             }
             else
             {
                 imageBand = 0;
             }
-            XMLString::release(&bandXMLStr);
+            xercesc::XMLString::release(&bandXMLStr);
             
-            XMLCh *solarZenithXMLStr = XMLString::transcode("solarZenith");
+            XMLCh *solarZenithXMLStr = xercesc::XMLString::transcode("solarZenith");
             if(argElement->hasAttribute(solarZenithXMLStr))
             {
-                char *charValue = XMLString::transcode(argElement->getAttribute(solarZenithXMLStr));
-                this->solarZenith = mathUtils.strtofloat(string(charValue));
-                XMLString::release(&charValue);
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(solarZenithXMLStr));
+                this->solarZenith = mathUtils.strtofloat(std::string(charValue));
+                xercesc::XMLString::release(&charValue);
             }
             else
             {
-                throw RSGISXMLArgumentsException("No \'solarZenith\' attribute was provided.");
+                throw rsgis::RSGISXMLArgumentsException("No \'solarZenith\' attribute was provided.");
             }
-            XMLString::release(&solarZenithXMLStr);
+            xercesc::XMLString::release(&solarZenithXMLStr);
             
-            XMLCh *solarAzimuthXMLStr = XMLString::transcode("solarAzimuth");
+            XMLCh *solarAzimuthXMLStr = xercesc::XMLString::transcode("solarAzimuth");
             if(argElement->hasAttribute(solarAzimuthXMLStr))
             {
-                char *charValue = XMLString::transcode(argElement->getAttribute(solarAzimuthXMLStr));
-                this->solarAzimuth = mathUtils.strtofloat(string(charValue));
-                XMLString::release(&charValue);
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(solarAzimuthXMLStr));
+                this->solarAzimuth = mathUtils.strtofloat(std::string(charValue));
+                xercesc::XMLString::release(&charValue);
             }
             else
             {
-                throw RSGISXMLArgumentsException("No \'solarAzimuth\' attribute was provided.");
+                throw rsgis::RSGISXMLArgumentsException("No \'solarAzimuth\' attribute was provided.");
             }
-            XMLString::release(&solarAzimuthXMLStr);
+            xercesc::XMLString::release(&solarAzimuthXMLStr);
             
-            XMLCh *viewZenithXMLStr = XMLString::transcode("viewZenith");
+            XMLCh *viewZenithXMLStr = xercesc::XMLString::transcode("viewZenith");
             if(argElement->hasAttribute(viewZenithXMLStr))
             {
-                char *charValue = XMLString::transcode(argElement->getAttribute(viewZenithXMLStr));
-                this->viewZenith = mathUtils.strtofloat(string(charValue));
-                XMLString::release(&charValue);
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(viewZenithXMLStr));
+                this->viewZenith = mathUtils.strtofloat(std::string(charValue));
+                xercesc::XMLString::release(&charValue);
             }
             else
             {
-                throw RSGISXMLArgumentsException("No \'viewZenith\' attribute was provided.");
+                throw rsgis::RSGISXMLArgumentsException("No \'viewZenith\' attribute was provided.");
             }
-            XMLString::release(&viewZenithXMLStr);
+            xercesc::XMLString::release(&viewZenithXMLStr);
             
-            XMLCh *viewAzimuthXMLStr = XMLString::transcode("viewAzimuth");
+            XMLCh *viewAzimuthXMLStr = xercesc::XMLString::transcode("viewAzimuth");
             if(argElement->hasAttribute(viewAzimuthXMLStr))
             {
-                char *charValue = XMLString::transcode(argElement->getAttribute(viewAzimuthXMLStr));
-                this->viewAzimuth = mathUtils.strtofloat(string(charValue));
-                XMLString::release(&charValue);
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(viewAzimuthXMLStr));
+                this->viewAzimuth = mathUtils.strtofloat(std::string(charValue));
+                xercesc::XMLString::release(&charValue);
             }
             else
             {
-                throw RSGISXMLArgumentsException("No \'viewAzimuth\' attribute was provided.");
+                throw rsgis::RSGISXMLArgumentsException("No \'viewAzimuth\' attribute was provided.");
             }
-            XMLString::release(&viewAzimuthXMLStr);
+            xercesc::XMLString::release(&viewAzimuthXMLStr);
+        }
+        else if(xercesc::XMLString::equals(optionFill, optionXML))
+        {
+            this->option = fill;
+            
+            XMLCh *inputXMLStr = xercesc::XMLString::transcode("input");
+            if(argElement->hasAttribute(inputXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(inputXMLStr));
+                this->inputImage = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'input\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&inputXMLStr);
+            
+            XMLCh *outputXMLStr = xercesc::XMLString::transcode("output");
+            if(argElement->hasAttribute(outputXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outputXMLStr));
+                this->outputImage = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&outputXMLStr);
+            
+            XMLCh *holesValueXMLStr = xercesc::XMLString::transcode("holesval");
+            if(argElement->hasAttribute(holesValueXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(holesValueXMLStr));
+                this->holesValue = mathUtils.strtofloat(std::string(charValue));
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'holesval\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&holesValueXMLStr);
+            
+            
+            XMLCh *noDataValueXMLStr = xercesc::XMLString::transcode("nodata");
+            if(argElement->hasAttribute(noDataValueXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(noDataValueXMLStr));
+                this->noDataVal = mathUtils.strtofloat(std::string(charValue));
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'nodata\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&noDataValueXMLStr);
+            
+            
+        }
+        else if(xercesc::XMLString::equals(optionInFillDLayers, optionXML))
+        {
+            this->option = infilldlayers;
+            
+            XMLCh *inputBaseXMLStr = xercesc::XMLString::transcode("baseimage");
+            if(argElement->hasAttribute(inputBaseXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(inputBaseXMLStr));
+                this->inputImageBase = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'baseimage\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&inputBaseXMLStr);
+            
+            
+            XMLCh *inputInFillXMLStr = xercesc::XMLString::transcode("infillimage");
+            if(argElement->hasAttribute(inputInFillXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(inputInFillXMLStr));
+                this->inputImageInFill = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'infillimage\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&inputInFillXMLStr);
+            
+            XMLCh *inputDEMXMLStr = xercesc::XMLString::transcode("dem");
+            if(argElement->hasAttribute(inputDEMXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(inputDEMXMLStr));
+                this->inputDEM = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'dem\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&inputDEMXMLStr);
+            
+            XMLCh *outputXMLStr = xercesc::XMLString::transcode("output");
+            if(argElement->hasAttribute(outputXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outputXMLStr));
+                this->outputImage = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&outputXMLStr);
+            
+            XMLCh *holesValueXMLStr = xercesc::XMLString::transcode("holesval");
+            if(argElement->hasAttribute(holesValueXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(holesValueXMLStr));
+                this->holesValue = mathUtils.strtofloat(std::string(charValue));
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'holesval\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&holesValueXMLStr);
+            
         }
 		else 
 		{
-			string message = "RSGISExeElevationDataTools did not recognise option " + string(XMLString::transcode(optionXML));
-			throw RSGISXMLArgumentsException(message);
+			std::string message = "RSGISExeElevationDataTools did not recognise option " + std::string(xercesc::XMLString::transcode(optionXML));
+			throw rsgis::RSGISXMLArgumentsException(message);
 		}
         
 	}
-	catch(RSGISXMLArgumentsException &e)
+	catch(rsgis::RSGISXMLArgumentsException &e)
 	{
 		throw e;
 	}
 	
-	XMLString::release(&algorName);
-	XMLString::release(&algorXMLStr);
-	XMLString::release(&optionXMLStr);
-	XMLString::release(&optionSlope);
-    XMLString::release(&optionAspect);
-    XMLString::release(&optionSlopeAspect);
-    XMLString::release(&optionHillShade);
-    XMLString::release(&optionShadowMask);
-    XMLString::release(&optionIncidenceAngle);
-    XMLString::release(&optionExitanceAngle);
-    XMLString::release(&optionIncidenceExistanceAngles);
+	xercesc::XMLString::release(&algorName);
+	xercesc::XMLString::release(&algorXMLStr);
+	xercesc::XMLString::release(&optionXMLStr);
+	xercesc::XMLString::release(&optionSlope);
+    xercesc::XMLString::release(&optionAspect);
+    xercesc::XMLString::release(&optionSlopeAspect);
+    xercesc::XMLString::release(&optionHillShade);
+    xercesc::XMLString::release(&optionShadowMask);
+    xercesc::XMLString::release(&optionIncidenceAngle);
+    xercesc::XMLString::release(&optionExitanceAngle);
+    xercesc::XMLString::release(&optionIncidenceExistanceAngles);
+    xercesc::XMLString::release(&optionFill);
+    xercesc::XMLString::release(&optionInFillDLayers);
 	
 	parsed = true; // if all successful, it is parsed
 }
 
-void RSGISExeElevationDataTools::runAlgorithm() throw(RSGISException)
+void RSGISExeElevationDataTools::runAlgorithm() throw(rsgis::RSGISException)
 {
-	cout.precision(10);
+	std::cout.precision(10);
 	
 	if(!parsed)
 	{
-		throw RSGISException("Before running the parameters must be retrieved");
+		throw rsgis::RSGISException("Before running the parameters must be retrieved");
 	}
 	else
 	{
 		if(this->option == RSGISExeElevationDataTools::slope)
         {
-            cout << "This command calculates the slope from a DEM.\n";
-			cout << "Input Image: " << this->inputImage << endl;
-            cout << "Output Image: " << this->outputImage << endl;
-            cout << "Input Band: " << this->imageBand+1 << endl;
+            std::cout << "This command calculates the slope from a DEM.\n";
+			std::cout << "Input Image: " << this->inputImage << std::endl;
+            std::cout << "Output Image: " << this->outputImage << std::endl;
+            std::cout << "Input Band: " << this->imageBand+1 << std::endl;
             
             GDALAllRegister();
 			GDALDataset **datasets = NULL;
-			RSGISCalcSlope *calcSlope = NULL;
-			RSGISCalcImage *calcImage = NULL;
+			rsgis::calib::RSGISCalcSlope *calcSlope = NULL;
+			rsgis::img::RSGISCalcImage *calcImage = NULL;
 			
 			try
 			{
 				datasets = new GDALDataset*[1];
 				
-				cout << "Open " << this->inputImage << endl;
+				std::cout << "Open " << this->inputImage << std::endl;
 				datasets[0] = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_ReadOnly);
 				if(datasets[0] == NULL)
 				{
-					string message = string("Could not open image ") + this->inputImage;
-					throw RSGISImageException(message.c_str());
+					std::string message = std::string("Could not open image ") + this->inputImage;
+					throw rsgis::RSGISImageException(message.c_str());
 				}
 				
 				int numRasterBands = datasets[0]->GetRasterCount();
@@ -730,7 +863,7 @@ void RSGISExeElevationDataTools::runAlgorithm() throw(RSGISException)
                 {
                     GDALClose(datasets[0]);
                     delete[] datasets;
-                    throw RSGISException("The specified image band is not within the input image.");
+                    throw rsgis::RSGISException("The specified image band is not within the input image.");
                 }
                 
                 double *transformation = new double[6];
@@ -746,9 +879,9 @@ void RSGISExeElevationDataTools::runAlgorithm() throw(RSGISException)
                 
                 delete[] transformation;
                 
-				calcSlope = new RSGISCalcSlope(1, imageBand, imageEWRes, imageNSRes, slopeOutputType);
+				calcSlope = new rsgis::calib::RSGISCalcSlope(1, imageBand, imageEWRes, imageNSRes, slopeOutputType);
 				
-				calcImage = new RSGISCalcImage(calcSlope, "", true);
+				calcImage = new rsgis::img::RSGISCalcImage(calcSlope, "", true);
 				calcImage->calcImageWindowData(datasets, 1, this->outputImage, 3, this->imageFormat, this->outDataType);
 
 				
@@ -758,33 +891,33 @@ void RSGISExeElevationDataTools::runAlgorithm() throw(RSGISException)
 				delete calcSlope;
 				delete calcImage;
 			}
-			catch(RSGISException e)
+			catch(rsgis::RSGISException e)
 			{
 				throw e;
 			}
         }
         else if(this->option == RSGISExeElevationDataTools::aspect)
         {
-            cout << "This command calculates the aspect from a DEM.\n";
-			cout << "Input Image: " << this->inputImage << endl;
-            cout << "Output Image: " << this->outputImage << endl;
-            cout << "Input Band: " << this->imageBand+1 << endl;
+            std::cout << "This command calculates the aspect from a DEM.\n";
+			std::cout << "Input Image: " << this->inputImage << std::endl;
+            std::cout << "Output Image: " << this->outputImage << std::endl;
+            std::cout << "Input Band: " << this->imageBand+1 << std::endl;
             
             GDALAllRegister();
 			GDALDataset **datasets = NULL;
-			RSGISCalcAspect *calcAspect = NULL;
-			RSGISCalcImage *calcImage = NULL;
+			rsgis::calib::RSGISCalcAspect *calcAspect = NULL;
+			rsgis::img::RSGISCalcImage *calcImage = NULL;
 			
 			try
 			{
 				datasets = new GDALDataset*[1];
 				
-				cout << "Open " << this->inputImage << endl;
+				std::cout << "Open " << this->inputImage << std::endl;
 				datasets[0] = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_ReadOnly);
 				if(datasets[0] == NULL)
 				{
-					string message = string("Could not open image ") + this->inputImage;
-					throw RSGISImageException(message.c_str());
+					std::string message = std::string("Could not open image ") + this->inputImage;
+					throw rsgis::RSGISImageException(message.c_str());
 				}
 				
 				int numRasterBands = datasets[0]->GetRasterCount();
@@ -792,7 +925,7 @@ void RSGISExeElevationDataTools::runAlgorithm() throw(RSGISException)
                 {
                     GDALClose(datasets[0]);
                     delete[] datasets;
-                    throw RSGISException("The specified image band is not within the input image.");
+                    throw rsgis::RSGISException("The specified image band is not within the input image.");
                 }
                 
                 double *transformation = new double[6];
@@ -808,9 +941,9 @@ void RSGISExeElevationDataTools::runAlgorithm() throw(RSGISException)
                 
                 delete[] transformation;
                 
-				calcAspect = new RSGISCalcAspect(1, imageBand, imageEWRes, imageNSRes);
+				calcAspect = new rsgis::calib::RSGISCalcAspect(1, imageBand, imageEWRes, imageNSRes);
 				
-				calcImage = new RSGISCalcImage(calcAspect, "", true);
+				calcImage = new rsgis::img::RSGISCalcImage(calcAspect, "", true);
 				calcImage->calcImageWindowData(datasets, 1, this->outputImage, 3, this->imageFormat, this->outDataType);
                 
 				
@@ -820,33 +953,33 @@ void RSGISExeElevationDataTools::runAlgorithm() throw(RSGISException)
 				delete calcAspect;
 				delete calcImage;
 			}
-			catch(RSGISException e)
+			catch(rsgis::RSGISException e)
 			{
 				throw e;
 			}
         }
         else if(this->option == RSGISExeElevationDataTools::slopeaspect)
         {
-            cout << "This command calculates the slope and aspect from a DEM.\n";
-			cout << "Input Image: " << this->inputImage << endl;
-            cout << "Output Image: " << this->outputImage << endl;
-            cout << "Input Band: " << this->imageBand << endl;
+            std::cout << "This command calculates the slope and aspect from a DEM.\n";
+			std::cout << "Input Image: " << this->inputImage << std::endl;
+            std::cout << "Output Image: " << this->outputImage << std::endl;
+            std::cout << "Input Band: " << this->imageBand << std::endl;
             
             GDALAllRegister();
 			GDALDataset **datasets = NULL;
-			RSGISCalcSlopeAspect *calcSlopeAspect = NULL;
-			RSGISCalcImage *calcImage = NULL;
+			rsgis::calib::RSGISCalcSlopeAspect *calcSlopeAspect = NULL;
+			rsgis::img::RSGISCalcImage *calcImage = NULL;
 			
 			try
 			{
 				datasets = new GDALDataset*[1];
 				
-				cout << "Open " << this->inputImage << endl;
+				std::cout << "Open " << this->inputImage << std::endl;
 				datasets[0] = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_ReadOnly);
 				if(datasets[0] == NULL)
 				{
-					string message = string("Could not open image ") + this->inputImage;
-					throw RSGISImageException(message.c_str());
+					std::string message = std::string("Could not open image ") + this->inputImage;
+					throw rsgis::RSGISImageException(message.c_str());
 				}
 				
 				int numRasterBands = datasets[0]->GetRasterCount();
@@ -854,7 +987,7 @@ void RSGISExeElevationDataTools::runAlgorithm() throw(RSGISException)
                 {
                     GDALClose(datasets[0]);
                     delete[] datasets;
-                    throw RSGISException("The specified image band is not within the input image.");
+                    throw rsgis::RSGISException("The specified image band is not within the input image.");
                 }
                 
                 double *transformation = new double[6];
@@ -870,9 +1003,9 @@ void RSGISExeElevationDataTools::runAlgorithm() throw(RSGISException)
                 
                 delete[] transformation;
                 
-				calcSlopeAspect = new RSGISCalcSlopeAspect(2, imageBand, imageEWRes, imageNSRes);
+				calcSlopeAspect = new rsgis::calib::RSGISCalcSlopeAspect(2, imageBand, imageEWRes, imageNSRes);
 				
-				calcImage = new RSGISCalcImage(calcSlopeAspect, "", true);
+				calcImage = new rsgis::img::RSGISCalcImage(calcSlopeAspect, "", true);
 				calcImage->calcImageWindowData(datasets, 1, this->outputImage, 3, this->imageFormat, this->outDataType);
                 
 				
@@ -882,35 +1015,35 @@ void RSGISExeElevationDataTools::runAlgorithm() throw(RSGISException)
 				delete calcSlopeAspect;
 				delete calcImage;
 			}
-			catch(RSGISException e)
+			catch(rsgis::RSGISException e)
 			{
 				throw e;
 			}
         }
         else if(this->option == RSGISExeElevationDataTools::hillshade)
         {
-            cout << "This command generates a hill shade image from the DEM.\n";
-			cout << "Input Image: " << this->inputImage << endl;
-            cout << "Output Image: " << this->outputImage << endl;
-            cout << "Input Band: " << this->imageBand+1 << endl;
-            cout << "Solar Azimuth: " << this->solarAzimuth << endl;
-            cout << "Solar Zenith: " << this->solarZenith << endl;
+            std::cout << "This command generates a hill shade image from the DEM.\n";
+			std::cout << "Input Image: " << this->inputImage << std::endl;
+            std::cout << "Output Image: " << this->outputImage << std::endl;
+            std::cout << "Input Band: " << this->imageBand+1 << std::endl;
+            std::cout << "Solar Azimuth: " << this->solarAzimuth << std::endl;
+            std::cout << "Solar Zenith: " << this->solarZenith << std::endl;
             
             GDALAllRegister();
 			GDALDataset **datasets = NULL;
-			RSGISCalcHillShade *calcHillShade = NULL;
-			RSGISCalcImage *calcImage = NULL;
+			rsgis::calib::RSGISCalcHillShade *calcHillShade = NULL;
+			rsgis::img::RSGISCalcImage *calcImage = NULL;
 			
 			try
 			{
 				datasets = new GDALDataset*[1];
 				
-				cout << "Open " << this->inputImage << endl;
+				std::cout << "Open " << this->inputImage << std::endl;
 				datasets[0] = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_ReadOnly);
 				if(datasets[0] == NULL)
 				{
-					string message = string("Could not open image ") + this->inputImage;
-					throw RSGISImageException(message.c_str());
+					std::string message = std::string("Could not open image ") + this->inputImage;
+					throw rsgis::RSGISImageException(message.c_str());
 				}
 				
 				int numRasterBands = datasets[0]->GetRasterCount();
@@ -918,7 +1051,7 @@ void RSGISExeElevationDataTools::runAlgorithm() throw(RSGISException)
                 {
                     GDALClose(datasets[0]);
                     delete[] datasets;
-                    throw RSGISException("The specified image band is not within the input image.");
+                    throw rsgis::RSGISException("The specified image band is not within the input image.");
                 }
                 
                 double *transformation = new double[6];
@@ -934,9 +1067,9 @@ void RSGISExeElevationDataTools::runAlgorithm() throw(RSGISException)
                 
                 delete[] transformation;
                 
-				calcHillShade = new RSGISCalcHillShade(1, imageBand, imageEWRes, imageNSRes, solarZenith, solarAzimuth);
+				calcHillShade = new rsgis::calib::RSGISCalcHillShade(1, imageBand, imageEWRes, imageNSRes, solarZenith, solarAzimuth);
 				
-				calcImage = new RSGISCalcImage(calcHillShade, "", true);
+				calcImage = new rsgis::img::RSGISCalcImage(calcHillShade, "", true);
 				calcImage->calcImageWindowData(datasets, 1, this->outputImage, 3, this->imageFormat, this->outDataType);
                 
 				
@@ -946,47 +1079,47 @@ void RSGISExeElevationDataTools::runAlgorithm() throw(RSGISException)
 				delete calcHillShade;
 				delete calcImage;
 			}
-			catch(RSGISException e)
+			catch(rsgis::RSGISException e)
 			{
 				throw e;
 			}
         }
         else if(this->option == RSGISExeElevationDataTools::shadowmask)
         {
-            cout << "This command calculates a shadow mask from a DEM.\n";
-			cout << "Input Image: " << this->inputImage << endl;
-            cout << "Output Image: " << this->outputImage << endl;
-            cout << "Input Band: " << this->imageBand+1 << endl;
-            cout << "Solar Azimuth: " << this->solarAzimuth << endl;
-            cout << "Solar Zenith: " << this->solarZenith << endl;
+            std::cout << "This command calculates a shadow mask from a DEM.\n";
+			std::cout << "Input Image: " << this->inputImage << std::endl;
+            std::cout << "Output Image: " << this->outputImage << std::endl;
+            std::cout << "Input Band: " << this->imageBand+1 << std::endl;
+            std::cout << "Solar Azimuth: " << this->solarAzimuth << std::endl;
+            std::cout << "Solar Zenith: " << this->solarZenith << std::endl;
             
             GDALAllRegister();
 			GDALDataset **datasets = NULL;
-			RSGISCalcShadowBinaryMask *calcMaskShadow = NULL;
-			RSGISCalcImage *calcImage = NULL;
+			rsgis::calib::RSGISCalcShadowBinaryMask *calcMaskShadow = NULL;
+			rsgis::img::RSGISCalcImage *calcImage = NULL;
 			
 			try
 			{
                 if((this->solarZenith < 0) | (this->solarZenith > 90))
                 {
-                    throw RSGISException("The solar zenith should be between 0 and 90 degrees.");
+                    throw rsgis::RSGISException("The solar zenith should be between 0 and 90 degrees.");
                 }
                 
                 if((this->solarAzimuth < 0) | (this->solarAzimuth > 360))
                 {
-                    throw RSGISException("The solar azimuth should be between 0 and 360 degrees.");
+                    throw rsgis::RSGISException("The solar azimuth should be between 0 and 360 degrees.");
                 }
                 
                 this->solarZenith = 90 - this->solarZenith;
                 
 				datasets = new GDALDataset*[1];
 				
-				cout << "Open " << this->inputImage << endl;
+				std::cout << "Open " << this->inputImage << std::endl;
 				datasets[0] = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_ReadOnly);
 				if(datasets[0] == NULL)
 				{
-					string message = string("Could not open image ") + this->inputImage;
-					throw RSGISImageException(message.c_str());
+					std::string message = std::string("Could not open image ") + this->inputImage;
+					throw rsgis::RSGISImageException(message.c_str());
 				}
 				
 				int numRasterBands = datasets[0]->GetRasterCount();
@@ -994,7 +1127,7 @@ void RSGISExeElevationDataTools::runAlgorithm() throw(RSGISException)
                 {
                     GDALClose(datasets[0]);
                     delete[] datasets;
-                    throw RSGISException("The specified image band is not within the input image.");
+                    throw rsgis::RSGISException("The specified image band is not within the input image.");
                 }
                 
                 double *transformation = new double[6];
@@ -1010,9 +1143,9 @@ void RSGISExeElevationDataTools::runAlgorithm() throw(RSGISException)
                 
                 delete[] transformation;
                 
-				calcMaskShadow = new RSGISCalcShadowBinaryMask(1, datasets[0], imageBand, imageEWRes, imageNSRes, solarZenith, solarAzimuth, maxElevHeight);
+				calcMaskShadow = new rsgis::calib::RSGISCalcShadowBinaryMask(1, datasets[0], imageBand, imageEWRes, imageNSRes, solarZenith, solarAzimuth, maxElevHeight);
 				
-				calcImage = new RSGISCalcImage(calcMaskShadow, "", true);
+				calcImage = new rsgis::img::RSGISCalcImage(calcMaskShadow, "", true);
 				calcImage->calcImageExtent(datasets, 1, outputImage, this->imageFormat);
 				
 				GDALClose(datasets[0]);
@@ -1021,35 +1154,35 @@ void RSGISExeElevationDataTools::runAlgorithm() throw(RSGISException)
 				delete calcMaskShadow;
 				delete calcImage;
 			}
-			catch(RSGISException e)
+			catch(rsgis::RSGISException e)
 			{
 				throw e;
 			}
         }
         else if(this->option == RSGISExeElevationDataTools::incidenceangle)
         {
-            cout << "This command calculate the incidence angle of light (from the provided zenith and azimuth) from a DEM.\n";
-			cout << "Input Image: " << this->inputImage << endl;
-            cout << "Output Image: " << this->outputImage << endl;
-            cout << "Input Band: " << this->imageBand+1 << endl;
-            cout << "Solar Azimuth: " << this->solarAzimuth << endl;
-            cout << "Solar Zenith: " << this->solarZenith << endl;
+            std::cout << "This command calculate the incidence angle of light (from the provided zenith and azimuth) from a DEM.\n";
+			std::cout << "Input Image: " << this->inputImage << std::endl;
+            std::cout << "Output Image: " << this->outputImage << std::endl;
+            std::cout << "Input Band: " << this->imageBand+1 << std::endl;
+            std::cout << "Solar Azimuth: " << this->solarAzimuth << std::endl;
+            std::cout << "Solar Zenith: " << this->solarZenith << std::endl;
             
             GDALAllRegister();
 			GDALDataset **datasets = NULL;
-			RSGISCalcRayIncidentAngle *calcIncidence = NULL;
-			RSGISCalcImage *calcImage = NULL;
+			rsgis::calib::RSGISCalcRayIncidentAngle *calcIncidence = NULL;
+			rsgis::img::RSGISCalcImage *calcImage = NULL;
 			
 			try
 			{
 				datasets = new GDALDataset*[1];
 				
-				cout << "Open " << this->inputImage << endl;
+				std::cout << "Open " << this->inputImage << std::endl;
 				datasets[0] = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_ReadOnly);
 				if(datasets[0] == NULL)
 				{
-					string message = string("Could not open image ") + this->inputImage;
-					throw RSGISImageException(message.c_str());
+					std::string message = std::string("Could not open image ") + this->inputImage;
+					throw rsgis::RSGISImageException(message.c_str());
 				}
 				
 				int numRasterBands = datasets[0]->GetRasterCount();
@@ -1057,7 +1190,7 @@ void RSGISExeElevationDataTools::runAlgorithm() throw(RSGISException)
                 {
                     GDALClose(datasets[0]);
                     delete[] datasets;
-                    throw RSGISException("The specified image band is not within the input image.");
+                    throw rsgis::RSGISException("The specified image band is not within the input image.");
                 }
                 
                 double *transformation = new double[6];
@@ -1073,9 +1206,9 @@ void RSGISExeElevationDataTools::runAlgorithm() throw(RSGISException)
                 
                 delete[] transformation;
                 
-				calcIncidence = new RSGISCalcRayIncidentAngle(1, imageBand, imageEWRes, imageNSRes, solarZenith, solarAzimuth);
+				calcIncidence = new rsgis::calib::RSGISCalcRayIncidentAngle(1, imageBand, imageEWRes, imageNSRes, solarZenith, solarAzimuth);
 				
-				calcImage = new RSGISCalcImage(calcIncidence, "", true);
+				calcImage = new rsgis::img::RSGISCalcImage(calcIncidence, "", true);
 				calcImage->calcImageWindowData(datasets, 1, this->outputImage, 3, this->imageFormat, this->outDataType);
 				
 				GDALClose(datasets[0]);
@@ -1084,35 +1217,35 @@ void RSGISExeElevationDataTools::runAlgorithm() throw(RSGISException)
 				delete calcIncidence;
 				delete calcImage;
 			}
-			catch(RSGISException e)
+			catch(rsgis::RSGISException e)
 			{
 				throw e;
 			}
         }
         else if(this->option == RSGISExeElevationDataTools::exitanceangle)
         {
-            cout << "This command calculate the exitance angle of light (from the provided zenith and azimuth) from a DEM.\n";
-			cout << "Input Image: " << this->inputImage << endl;
-            cout << "Output Image: " << this->outputImage << endl;
-            cout << "Input Band: " << this->imageBand+1 << endl;
-            cout << "View Azimuth: " << this->viewAzimuth << endl;
-            cout << "View Zenith: " << this->viewZenith << endl;
+            std::cout << "This command calculate the exitance angle of light (from the provided zenith and azimuth) from a DEM.\n";
+			std::cout << "Input Image: " << this->inputImage << std::endl;
+            std::cout << "Output Image: " << this->outputImage << std::endl;
+            std::cout << "Input Band: " << this->imageBand+1 << std::endl;
+            std::cout << "View Azimuth: " << this->viewAzimuth << std::endl;
+            std::cout << "View Zenith: " << this->viewZenith << std::endl;
             
             GDALAllRegister();
 			GDALDataset **datasets = NULL;
-			RSGISCalcRayExitanceAngle *calcIncidence = NULL;
-			RSGISCalcImage *calcImage = NULL;
+			rsgis::calib::RSGISCalcRayExitanceAngle *calcIncidence = NULL;
+			rsgis::img::RSGISCalcImage *calcImage = NULL;
 			
 			try
 			{
 				datasets = new GDALDataset*[1];
 				
-				cout << "Open " << this->inputImage << endl;
+				std::cout << "Open " << this->inputImage << std::endl;
 				datasets[0] = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_ReadOnly);
 				if(datasets[0] == NULL)
 				{
-					string message = string("Could not open image ") + this->inputImage;
-					throw RSGISImageException(message.c_str());
+					std::string message = std::string("Could not open image ") + this->inputImage;
+					throw rsgis::RSGISImageException(message.c_str());
 				}
 				
 				int numRasterBands = datasets[0]->GetRasterCount();
@@ -1120,7 +1253,7 @@ void RSGISExeElevationDataTools::runAlgorithm() throw(RSGISException)
                 {
                     GDALClose(datasets[0]);
                     delete[] datasets;
-                    throw RSGISException("The specified image band is not within the input image.");
+                    throw rsgis::RSGISException("The specified image band is not within the input image.");
                 }
                 
                 double *transformation = new double[6];
@@ -1136,9 +1269,9 @@ void RSGISExeElevationDataTools::runAlgorithm() throw(RSGISException)
                 
                 delete[] transformation;
                 
-				calcIncidence = new RSGISCalcRayExitanceAngle(1, imageBand, imageEWRes, imageNSRes, solarZenith, solarAzimuth);
+				calcIncidence = new rsgis::calib::RSGISCalcRayExitanceAngle(1, imageBand, imageEWRes, imageNSRes, solarZenith, solarAzimuth);
 				
-				calcImage = new RSGISCalcImage(calcIncidence, "", true);
+				calcImage = new rsgis::img::RSGISCalcImage(calcIncidence, "", true);
 				calcImage->calcImageWindowData(datasets, 1, this->outputImage, 3);
 				
 				GDALClose(datasets[0]);
@@ -1147,37 +1280,37 @@ void RSGISExeElevationDataTools::runAlgorithm() throw(RSGISException)
 				delete calcIncidence;
 				delete calcImage;
 			}
-			catch(RSGISException e)
+			catch(rsgis::RSGISException e)
 			{
 				throw e;
 			}
         }
         else if(this->option == RSGISExeElevationDataTools::incidenceexistanceangles)
         {
-            cout << "This command calculate the incidence angle of light (from the provided zenith and azimuth) from a DEM.\n";
-			cout << "Input Image: " << this->inputImage << endl;
-            cout << "Output Image: " << this->outputImage << endl;
-            cout << "Input Band: " << this->imageBand+1 << endl;
-            cout << "Solar Azimuth: " << this->solarAzimuth << endl;
-            cout << "Solar Zenith: " << this->solarZenith << endl;
-            cout << "View Azimuth: " << this->viewAzimuth << endl;
-            cout << "View Zenith: " << this->viewZenith << endl;
+            std::cout << "This command calculate the incidence angle of light (from the provided zenith and azimuth) from a DEM.\n";
+			std::cout << "Input Image: " << this->inputImage << std::endl;
+            std::cout << "Output Image: " << this->outputImage << std::endl;
+            std::cout << "Input Band: " << this->imageBand+1 << std::endl;
+            std::cout << "Solar Azimuth: " << this->solarAzimuth << std::endl;
+            std::cout << "Solar Zenith: " << this->solarZenith << std::endl;
+            std::cout << "View Azimuth: " << this->viewAzimuth << std::endl;
+            std::cout << "View Zenith: " << this->viewZenith << std::endl;
             
             GDALAllRegister();
 			GDALDataset **datasets = NULL;
-			RSGISCalcRayIncidentAndExitanceAngles *calcIncidence = NULL;
-			RSGISCalcImage *calcImage = NULL;
+			rsgis::calib::RSGISCalcRayIncidentAndExitanceAngles *calcIncidence = NULL;
+			rsgis::img::RSGISCalcImage *calcImage = NULL;
 			
 			try
 			{
 				datasets = new GDALDataset*[1];
 				
-				cout << "Open " << this->inputImage << endl;
+				std::cout << "Open " << this->inputImage << std::endl;
 				datasets[0] = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_ReadOnly);
 				if(datasets[0] == NULL)
 				{
-					string message = string("Could not open image ") + this->inputImage;
-					throw RSGISImageException(message.c_str());
+					std::string message = std::string("Could not open image ") + this->inputImage;
+					throw rsgis::RSGISImageException(message.c_str());
 				}
 				
 				int numRasterBands = datasets[0]->GetRasterCount();
@@ -1185,7 +1318,7 @@ void RSGISExeElevationDataTools::runAlgorithm() throw(RSGISException)
                 {
                     GDALClose(datasets[0]);
                     delete[] datasets;
-                    throw RSGISException("The specified image band is not within the input image.");
+                    throw rsgis::RSGISException("The specified image band is not within the input image.");
                 }
                 
                 double *transformation = new double[6];
@@ -1201,9 +1334,9 @@ void RSGISExeElevationDataTools::runAlgorithm() throw(RSGISException)
                 
                 delete[] transformation;
                 
-				calcIncidence = new RSGISCalcRayIncidentAndExitanceAngles(2, imageBand, imageEWRes, imageNSRes, solarZenith, solarAzimuth, viewZenith, viewAzimuth);
+				calcIncidence = new rsgis::calib::RSGISCalcRayIncidentAndExitanceAngles(2, imageBand, imageEWRes, imageNSRes, solarZenith, solarAzimuth, viewZenith, viewAzimuth);
 				
-				calcImage = new RSGISCalcImage(calcIncidence, "", true);
+				calcImage = new rsgis::img::RSGISCalcImage(calcIncidence, "", true);
 				calcImage->calcImageWindowData(datasets, 1, this->outputImage, 3);
 				
 				GDALClose(datasets[0]);
@@ -1212,14 +1345,113 @@ void RSGISExeElevationDataTools::runAlgorithm() throw(RSGISException)
 				delete calcIncidence;
 				delete calcImage;
 			}
-			catch(RSGISException e)
+			catch(rsgis::RSGISException e)
+			{
+				throw e;
+			}
+        }
+        else if(this->option == RSGISExeElevationDataTools::fill)
+        {
+            std::cout << "This command fill the holes within a DEM.\n";
+			std::cout << "Input Image: " << this->inputImage << std::endl;
+            std::cout << "Output Image: " << this->outputImage << std::endl;
+            std::cout << "Holes Value: " << this->holesValue << std::endl;
+            std::cout << "No Data Value: " << this->noDataVal << std::endl;
+            
+            GDALAllRegister();
+			
+			try
+			{			
+				std::cout << "Open " << this->inputImage << std::endl;
+				GDALDataset *dataset = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_ReadOnly);
+				if(dataset == NULL)
+				{
+					std::string message = std::string("Could not open image ") + this->inputImage;
+					throw rsgis::RSGISImageException(message.c_str());
+				}
+				
+				// Copy the input image
+                rsgis::img::RSGISImageUtils imageUtils;
+                GDALDataset *outImage = imageUtils.createCopy(dataset, 1, this->outputImage, this->imageFormat, this->outDataType);
+                imageUtils.copyFloatGDALDataset(dataset, outImage);
+                
+                rsgis::calib::RSGISFillDEMHoles *calcFillHoles = new rsgis::calib::RSGISFillDEMHoles(this->holesValue, this->noDataVal);
+                rsgis::img::RSGISCalcEditImage calcEditImage = rsgis::img::RSGISCalcEditImage(calcFillHoles);
+                
+                bool change = true;
+                while(change)
+                {
+                    calcFillHoles->resetChange();
+                    calcEditImage.calcImageWindowData(outImage, 3, this->noDataVal);
+                    change = calcFillHoles->changeOccurred();
+                }
+
+                
+                // Clean up memory.
+                GDALClose(outImage);
+                GDALClose(dataset);
+                delete calcFillHoles;
+			}
+			catch(rsgis::RSGISException e)
+			{
+				throw e;
+			}
+        }
+        else if(this->option == RSGISExeElevationDataTools::infilldlayers)
+        {
+            std::cout << "This command in fill the holes within layers derived from a DEM (i.e., slope and aspect).\n";
+			std::cout << "Input Base Image: " << this->inputImageBase << std::endl;
+            std::cout << "Input In Fill Image: " << this->inputImageInFill << std::endl;
+            std::cout << "Input DEM: " << this->inputDEM << std::endl;
+            std::cout << "Output Image: " << this->outputImage << std::endl;
+            std::cout << "Holes Value: " << this->holesValue << std::endl;
+            
+            GDALAllRegister();
+			
+			try
+			{
+				std::cout << "Open " << this->inputImage << std::endl;
+				GDALDataset **datasets = new GDALDataset*[3];
+                datasets[0] = (GDALDataset *) GDALOpen(this->inputDEM.c_str(), GA_ReadOnly);
+				if(datasets[0] == NULL)
+				{
+					std::string message = std::string("Could not open image ") + this->inputDEM;
+					throw rsgis::RSGISImageException(message.c_str());
+				}
+                
+                datasets[1] = (GDALDataset *) GDALOpen(this->inputImageBase.c_str(), GA_ReadOnly);
+				if(datasets[1] == NULL)
+				{
+					std::string message = std::string("Could not open image ") + this->inputImageBase;
+					throw rsgis::RSGISImageException(message.c_str());
+				}
+                
+                datasets[2] = (GDALDataset *) GDALOpen(this->inputImageInFill.c_str(), GA_ReadOnly);
+				if(datasets[2] == NULL)
+				{
+					std::string message = std::string("Could not open image ") + this->inputImageInFill;
+					throw rsgis::RSGISImageException(message.c_str());
+				}
+				
+                rsgis::calib::RSGISInFillDerivedHoles *calcFillDHole = new rsgis::calib::RSGISInFillDerivedHoles(this->holesValue);
+                rsgis::img::RSGISCalcImage calcImage = rsgis::img::RSGISCalcImage(calcFillDHole, "", true);
+                calcImage.calcImageWindowData(datasets, 3, this->outputImage, 3, this->imageFormat, this->outDataType);
+                
+                // Clean up memory.
+                GDALClose(datasets[0]);
+                GDALClose(datasets[1]);
+                GDALClose(datasets[2]);
+                delete[] datasets;
+                delete calcFillDHole;
+			}
+			catch(rsgis::RSGISException e)
 			{
 				throw e;
 			}
         }
 		else
 		{
-			throw RSGISException("RSGISExeElevationDataTools does not know this option");
+			throw rsgis::RSGISException("RSGISExeElevationDataTools does not know this option");
 		}
 	}
 }
@@ -1227,118 +1459,135 @@ void RSGISExeElevationDataTools::runAlgorithm() throw(RSGISException)
 
 void RSGISExeElevationDataTools::printParameters()
 {
-	cout.precision(10);
+	std::cout.precision(10);
 	
 	if(!parsed)
 	{
-		throw RSGISException("Before running the parameters must be retrieved");
+		throw rsgis::RSGISException("Before running the parameters must be retrieved");
 	}
 	else
 	{
 		if(this->option == RSGISExeElevationDataTools::slope)
         {
-            cout << "This command calculates the slope from a DEM.\n";
-			cout << "Input Image: " << this->inputImage << endl;
-            cout << "Output Image: " << this->outputImage << endl;
-            cout << "Input Band: " << this->imageBand << endl;
+            std::cout << "This command calculates the slope from a DEM.\n";
+			std::cout << "Input Image: " << this->inputImage << std::endl;
+            std::cout << "Output Image: " << this->outputImage << std::endl;
+            std::cout << "Input Band: " << this->imageBand << std::endl;
         }
         else if(this->option == RSGISExeElevationDataTools::aspect)
         {
-            cout << "This command calculates the aspect from a DEM.\n";
-			cout << "Input Image: " << this->inputImage << endl;
-            cout << "Output Image: " << this->outputImage << endl;
-            cout << "Input Band: " << this->imageBand << endl;
+            std::cout << "This command calculates the aspect from a DEM.\n";
+			std::cout << "Input Image: " << this->inputImage << std::endl;
+            std::cout << "Output Image: " << this->outputImage << std::endl;
+            std::cout << "Input Band: " << this->imageBand << std::endl;
         }
         else if(this->option == RSGISExeElevationDataTools::slopeaspect)
         {
-            cout << "This command calculates the slope and aspect from a DEM.\n";
-			cout << "Input Image: " << this->inputImage << endl;
-            cout << "Output Image: " << this->outputImage << endl;
-            cout << "Input Band: " << this->imageBand << endl;
+            std::cout << "This command calculates the slope and aspect from a DEM.\n";
+			std::cout << "Input Image: " << this->inputImage << std::endl;
+            std::cout << "Output Image: " << this->outputImage << std::endl;
+            std::cout << "Input Band: " << this->imageBand << std::endl;
         }
         else if(this->option == RSGISExeElevationDataTools::hillshade)
         {
-            cout << "This command generates a hill shade imnage from the DEM.\n";
-			cout << "Input Image: " << this->inputImage << endl;
-            cout << "Output Image: " << this->outputImage << endl;
-            cout << "Input Band: " << this->imageBand << endl;
-            cout << "Solar Azimuth: " << this->solarAzimuth << endl;
-            cout << "Solar Zenith: " << this->solarZenith << endl;
+            std::cout << "This command generates a hill shade imnage from the DEM.\n";
+			std::cout << "Input Image: " << this->inputImage << std::endl;
+            std::cout << "Output Image: " << this->outputImage << std::endl;
+            std::cout << "Input Band: " << this->imageBand << std::endl;
+            std::cout << "Solar Azimuth: " << this->solarAzimuth << std::endl;
+            std::cout << "Solar Zenith: " << this->solarZenith << std::endl;
         }
         else if(this->option == RSGISExeElevationDataTools::shadowmask)
         {
-            cout << "This command calculates a shadow mask from a DEM.\n";
-			cout << "Input Image: " << this->inputImage << endl;
-            cout << "Output Image: " << this->outputImage << endl;
-            cout << "Input Band: " << this->imageBand << endl;
-            cout << "Solar Azimuth: " << this->solarAzimuth << endl;
-            cout << "Solar Zenith: " << this->solarZenith << endl;
+            std::cout << "This command calculates a shadow mask from a DEM.\n";
+			std::cout << "Input Image: " << this->inputImage << std::endl;
+            std::cout << "Output Image: " << this->outputImage << std::endl;
+            std::cout << "Input Band: " << this->imageBand << std::endl;
+            std::cout << "Solar Azimuth: " << this->solarAzimuth << std::endl;
+            std::cout << "Solar Zenith: " << this->solarZenith << std::endl;
         }
         else if(this->option == RSGISExeElevationDataTools::incidenceangle)
         {
-            cout << "This command calculate the incidence angle of light (from the provided zenith and azimuth) from a DEM.\n";
-			cout << "Input Image: " << this->inputImage << endl;
-            cout << "Output Image: " << this->outputImage << endl;
-            cout << "Input Band: " << this->imageBand+1 << endl;
-            cout << "Solar Azimuth: " << this->solarAzimuth << endl;
-            cout << "Solar Zenith: " << this->solarZenith << endl;
+            std::cout << "This command calculate the incidence angle of light (from the provided zenith and azimuth) from a DEM.\n";
+			std::cout << "Input Image: " << this->inputImage << std::endl;
+            std::cout << "Output Image: " << this->outputImage << std::endl;
+            std::cout << "Input Band: " << this->imageBand+1 << std::endl;
+            std::cout << "Solar Azimuth: " << this->solarAzimuth << std::endl;
+            std::cout << "Solar Zenith: " << this->solarZenith << std::endl;
         }
         else if(this->option == RSGISExeElevationDataTools::exitanceangle)
         {
-            cout << "This command calculate the exitance angle of light (from the provided zenith and azimuth) from a DEM.\n";
-			cout << "Input Image: " << this->inputImage << endl;
-            cout << "Output Image: " << this->outputImage << endl;
-            cout << "Input Band: " << this->imageBand+1 << endl;
-            cout << "View Azimuth: " << this->viewAzimuth << endl;
-            cout << "View Zenith: " << this->viewZenith << endl;
+            std::cout << "This command calculate the exitance angle of light (from the provided zenith and azimuth) from a DEM.\n";
+			std::cout << "Input Image: " << this->inputImage << std::endl;
+            std::cout << "Output Image: " << this->outputImage << std::endl;
+            std::cout << "Input Band: " << this->imageBand+1 << std::endl;
+            std::cout << "View Azimuth: " << this->viewAzimuth << std::endl;
+            std::cout << "View Zenith: " << this->viewZenith << std::endl;
         }
         else if(this->option == RSGISExeElevationDataTools::incidenceexistanceangles)
         {
-            cout << "This command calculate the incidence angle of light (from the provided zenith and azimuth) from a DEM.\n";
-			cout << "Input Image: " << this->inputImage << endl;
-            cout << "Output Image: " << this->outputImage << endl;
-            cout << "Input Band: " << this->imageBand+1 << endl;
-            cout << "Solar Azimuth: " << this->solarAzimuth << endl;
-            cout << "Solar Zenith: " << this->solarZenith << endl;
-            cout << "View Azimuth: " << this->viewAzimuth << endl;
-            cout << "View Zenith: " << this->viewZenith << endl;
+            std::cout << "This command calculate the incidence angle of light (from the provided zenith and azimuth) from a DEM.\n";
+			std::cout << "Input Image: " << this->inputImage << std::endl;
+            std::cout << "Output Image: " << this->outputImage << std::endl;
+            std::cout << "Input Band: " << this->imageBand+1 << std::endl;
+            std::cout << "Solar Azimuth: " << this->solarAzimuth << std::endl;
+            std::cout << "Solar Zenith: " << this->solarZenith << std::endl;
+            std::cout << "View Azimuth: " << this->viewAzimuth << std::endl;
+            std::cout << "View Zenith: " << this->viewZenith << std::endl;
+        }
+        else if(this->option == RSGISExeElevationDataTools::fill)
+        {
+            std::cout << "This command fill the holes within a DEM.\n";
+			std::cout << "Input Image: " << this->inputImage << std::endl;
+            std::cout << "Output Image: " << this->outputImage << std::endl;
+            std::cout << "Holes Value: " << this->holesValue << std::endl;
+            std::cout << "No Data Value: " << this->noDataVal << std::endl;
+        }
+        else if(this->option == RSGISExeElevationDataTools::infilldlayers)
+        {
+            std::cout << "This command in fill the holes within layers derived from a DEM (i.e., slope and aspect).\n";
+			std::cout << "Input Base Image: " << this->inputImageBase << std::endl;
+            std::cout << "Input In Fill Image: " << this->inputImageInFill << std::endl;
+            std::cout << "Input DEM: " << this->inputDEM << std::endl;
+            std::cout << "Output Image: " << this->outputImage << std::endl;
+            std::cout << "Holes Value: " << this->holesValue << std::endl;
         }
 		else
 		{
-			throw RSGISException("RSGISExeImageCalibration does not know this option");
+			throw rsgis::RSGISException("RSGISExeImageCalibration does not know this option");
 		}
 	}
 }
 
 void RSGISExeElevationDataTools::help()
 {
-    cout << "<rsgis:commands xmlns:rsgis=\"http://www.rsgislib.org/xml/\">" << endl;
-	cout << "<!-- A command to calculate the slope of an elevation surface -->" << endl;
-    cout << "<rsgis:command algor=\"elevation\" option=\"slope\" input=\"image.env\" output=\"out_image.env\" [band=\"int\"] [outtype=\"radians|degrees\"] />" << endl;
-    cout << "<!-- A command to calculate the aspect of an elevation surface -->" << endl;
-    cout << "<rsgis:command algor=\"elevation\" option=\"aspect\" input=\"image.env\" output=\"out_image.env\" [band=\"int\"] />" << endl;
-    cout << "<!-- A command to calculate the slope and aspect of an elevation surface -->" << endl;
-    cout << "<rsgis:command algor=\"elevation\" option=\"slopeaspect\" input=\"image.env\" output=\"out_image.env\" [band=\"int\"] />" << endl;
-    cout << "<!-- A command to calculate the hillshade of an elevation surface -->" << endl;
-    cout << "<rsgis:command algor=\"elevation\" option=\"hillshade\" input=\"image.env\" output=\"out_image.env\" azimuth=\"float\" zenith=\"float\" [band=\"int\"]  />" << endl;
-    cout << "<!-- A command to calculate a mask for the regions of shadow from an elevation surface -->" << endl;
-    cout << "<rsgis:command algor=\"elevation\" option=\"shadowmask\" input=\"image.env\" output=\"out_image.env\" azimuth=\"float\" zenith=\"float\" maxelevation=\"int\" [band=\"int\"]  />" << endl;
-    cout << "<!-- A command to calculate the incidence angle from a elevation surface and sun position -->" << endl;
-    cout << "<rsgis:command algor=\"elevation\" option=\"incidenceangle\" input=\"image.env\" output=\"out_image.env\" azimuth=\"float\" zenith=\"float\" [band=\"int\"]  />" << endl;
-    cout << "<!-- A command to calculate the exitance angle from a elevation surface and viewer position -->" << endl;
-    cout << "<rsgis:command algor=\"elevation\" option=\"exitanceangle\" input=\"image.env\" output=\"out_image.env\" azimuth=\"float\" zenith=\"float\" [band=\"int\"]  />" << endl;
-    cout << "<!-- A command to calculate the incidence and exitance angles from a elevation surface and sun and viewer positions -->" << endl;
-    cout << "<rsgis:command algor=\"elevation\" option=\"incidenceexitanceangles\" input=\"image.env\" output=\"out_image.env\" solarAzimuth=\"float\" solarZenith=\"float\" viewAzimuth=\"float\" viewZenith=\"float\" [band=\"int\"]  />" << endl;
+    std::cout << "<rsgis:commands xmlns:rsgis=\"http://www.rsgislib.org/xml/\">" << std::endl;
+	std::cout << "<!-- A command to calculate the slope of an elevation surface -->" << std::endl;
+    std::cout << "<rsgis:command algor=\"elevation\" option=\"slope\" input=\"image.env\" output=\"out_image.env\" [band=\"int\"] [outtype=\"radians|degrees\"] />" << std::endl;
+    std::cout << "<!-- A command to calculate the aspect of an elevation surface -->" << std::endl;
+    std::cout << "<rsgis:command algor=\"elevation\" option=\"aspect\" input=\"image.env\" output=\"out_image.env\" [band=\"int\"] />" << std::endl;
+    std::cout << "<!-- A command to calculate the slope and aspect of an elevation surface -->" << std::endl;
+    std::cout << "<rsgis:command algor=\"elevation\" option=\"slopeaspect\" input=\"image.env\" output=\"out_image.env\" [band=\"int\"] />" << std::endl;
+    std::cout << "<!-- A command to calculate the hillshade of an elevation surface -->" << std::endl;
+    std::cout << "<rsgis:command algor=\"elevation\" option=\"hillshade\" input=\"image.env\" output=\"out_image.env\" azimuth=\"float\" zenith=\"float\" [band=\"int\"]  />" << std::endl;
+    std::cout << "<!-- A command to calculate a mask for the regions of shadow from an elevation surface -->" << std::endl;
+    std::cout << "<rsgis:command algor=\"elevation\" option=\"shadowmask\" input=\"image.env\" output=\"out_image.env\" azimuth=\"float\" zenith=\"float\" maxelevation=\"int\" [band=\"int\"]  />" << std::endl;
+    std::cout << "<!-- A command to calculate the incidence angle from a elevation surface and sun position -->" << std::endl;
+    std::cout << "<rsgis:command algor=\"elevation\" option=\"incidenceangle\" input=\"image.env\" output=\"out_image.env\" azimuth=\"float\" zenith=\"float\" [band=\"int\"]  />" << std::endl;
+    std::cout << "<!-- A command to calculate the exitance angle from a elevation surface and viewer position -->" << std::endl;
+    std::cout << "<rsgis:command algor=\"elevation\" option=\"exitanceangle\" input=\"image.env\" output=\"out_image.env\" azimuth=\"float\" zenith=\"float\" [band=\"int\"]  />" << std::endl;
+    std::cout << "<!-- A command to calculate the incidence and exitance angles from a elevation surface and sun and viewer positions -->" << std::endl;
+    std::cout << "<rsgis:command algor=\"elevation\" option=\"incidenceexitanceangles\" input=\"image.env\" output=\"out_image.env\" solarAzimuth=\"float\" solarZenith=\"float\" viewAzimuth=\"float\" viewZenith=\"float\" [band=\"int\"]  />" << std::endl;
 
-	cout << "</rsgis:commands>\n";
+	std::cout << "</rsgis:commands>\n";
 }
 
-string RSGISExeElevationDataTools::getDescription()
+std::string RSGISExeElevationDataTools::getDescription()
 {
 	return "Provides a set of tools for processsing elevation (DEMs) data.";
 }
 
-string RSGISExeElevationDataTools::getXMLSchema()
+std::string RSGISExeElevationDataTools::getXMLSchema()
 {
 	return "NOT PROVIDED!";
 }

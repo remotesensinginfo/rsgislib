@@ -831,7 +831,10 @@
     <!-- A command to calculate the incidence and exitance angles from a elevation surface and sun and viewer positions -->
     <rsgis:command algor="elevation" option="incidenceexitanceangles" input="image.env" output="out_image.env" solarAzimuth="float" solarZenith="float" viewAzimuth="float" viewZenith="float" [band="int"] format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
 	<!-- A command to fills the holes within a DEM, the input image should have the following bands: elevation, slope, aspect -->
-    <rsgis:command algor="elevation" option="fill" input="image.env" output="out_image.env" holesval="float" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
+    <rsgis:command algor="elevation" option="fill" input="image.env" output="out_image.env" holesval="float" nodata="float" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
+
+	<!-- A command to fills the holes within a DEM derived slope or aspect layer from another layer derived from another source (before filling) -->
+    <rsgis:command algor="elevation" option="infilldlayers" baseimage="image.env" infillimage="image.env" dem="dem.env" output="out_image.env" holesval="float" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
 
 
 
@@ -995,6 +998,13 @@
         <rsgis:image file="string" />
 		<rsgis:image file="string" />
     </rsgis:command>
+
+
+
+
+
+
+
 
 
 
