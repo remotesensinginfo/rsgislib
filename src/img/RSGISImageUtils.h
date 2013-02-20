@@ -29,7 +29,6 @@
 #include <sstream>
 #include <math.h>
 #include <list>
-#include <limits>
 
 #include "gdal_priv.h"
 #include "ogrsf_frmts.h"
