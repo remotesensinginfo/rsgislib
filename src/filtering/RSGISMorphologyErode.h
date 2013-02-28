@@ -39,8 +39,8 @@ namespace rsgis{namespace filter{
     {
     public:
         RSGISImageMorphologyErode();
-        void erodeImage(GDALDataset **dataset, std::string outputImage, rsgis::math::Matrix *matrixOperator) throw(rsgis::img::RSGISImageCalcException, rsgis::img::RSGISImageBandException);
-        void erodeImageAll(GDALDataset **dataset, std::string outputImage, rsgis::math::Matrix *matrixOperator) throw(rsgis::img::RSGISImageCalcException, rsgis::img::RSGISImageBandException);
+        void erodeImage(GDALDataset **dataset, std::string outputImage, rsgis::math::Matrix *matrixOperator, std::string format, GDALDataType outDataType) throw(rsgis::img::RSGISImageCalcException, rsgis::img::RSGISImageBandException);
+        void erodeImageAll(GDALDataset **dataset, std::string outputImage, rsgis::math::Matrix *matrixOperator, std::string format, GDALDataType outDataType) throw(rsgis::img::RSGISImageCalcException, rsgis::img::RSGISImageBandException);
         ~RSGISImageMorphologyErode(){};
     };
     
