@@ -30,7 +30,7 @@ namespace rsgis{namespace filter{
         
     }
     
-    void RSGISImageMorphologyOpening::performOpening(GDALDataset *dataset, std::string outputImage, std::string tempImage, bool useMemory, rsgis::math::Matrix *matrixOperator, unsigned int numIterations) throw(rsgis::img::RSGISImageCalcException, rsgis::img::RSGISImageBandException)
+    void RSGISImageMorphologyOpening::performOpening(GDALDataset *dataset, std::string outputImage, std::string tempImage, bool useMemory, rsgis::math::Matrix *matrixOperator, unsigned int numIterations, std::string format, GDALDataType outDataType) throw(rsgis::img::RSGISImageCalcException, rsgis::img::RSGISImageBandException)
     {
         try 
         {
@@ -44,16 +44,16 @@ namespace rsgis{namespace filter{
             GDALDataset *tmpDataset = NULL;
             GDALDataset **tmpGDALDataArray = new GDALDataset*[1];
             
-            outDataset = imgUtils.createCopy(dataset, outputImage, "ENVI", GDT_Float32);
+            outDataset = imgUtils.createCopy(dataset, outputImage, format, outDataType);
             imgUtils.zerosFloatGDALDataset(outDataset);
             
             if(useMemory)
             {
-                tmpDataset = imgUtils.createCopy(dataset, tempImage, "MEM", GDT_Float32);
+                tmpDataset = imgUtils.createCopy(dataset, tempImage, "MEM", outDataType);
             }
             else
             {
-                tmpDataset = imgUtils.createCopy(dataset, tempImage, "ENVI", GDT_Float32);
+                tmpDataset = imgUtils.createCopy(dataset, tempImage, format, outDataType);
             }
             imgUtils.zerosFloatGDALDataset(tmpDataset);
             
