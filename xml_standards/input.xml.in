@@ -657,6 +657,8 @@
     <rsgis:command algor="imageutils" option="genassesspoints" image="image.env" [dem="image.env"] output="file.dat" classcolumn="string" seed="int" type="random | stratified" n="int; total number for random or number within each class for stratified" />
 	<!-- A command to create an image where each pixel is a unique 'clump' -->
     <rsgis:command algor="imageutils" option="uniquepxlclumps" image="image.env" output="image_out.env" [nodata="float"] format="GDAL Format"  />
+	<!-- A command to create a thematic image defining tiles for an image image -->
+    <rsgis:command algor="imageutils" option="defineimgtiles" image="image.env" output="image_out.env" tilesize="int" [nodata="float"] validpixelratio="float" format="GDAL Format"  />
 
 
 

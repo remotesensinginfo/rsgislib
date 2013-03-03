@@ -39,6 +39,8 @@
 #include "img/RSGISCalcImageValue.h"
 #include "img/RSGISCalcImage.h"
 
+#include "rastergis/RSGISRasterAttUtils.h"
+
 #include <boost/numeric/conversion/cast.hpp>
 #include <boost/lexical_cast.hpp>
 
@@ -97,6 +99,7 @@ namespace rsgis{namespace rastergis{
         void calcImageClumpStatistic(GDALDataset *clumpDS, GDALDataset *imageDS, std::vector<rsgis::rastergis::RSGISBandAttStats*> *bandStats) throw(rsgis::RSGISAttributeTableException);
         void calcImageClumpPercentiles(GDALDataset *clumpDS, GDALDataset *imageDS, std::vector<rsgis::rastergis::RSGISBandAttPercentiles*> *bandPercentiles) throw(rsgis::RSGISAttributeTableException);
         void populateColourTable(GDALDataset *clumpDS, GDALDataset *imageDS, unsigned int red, unsigned int green, unsigned int blue) throw(rsgis::RSGISAttributeTableException);
+        void calcValidPixelCount(GDALDataset *clumpDS, GDALDataset *imageDS, float noData, std::string validPixelCount) throw(rsgis::RSGISAttributeTableException);
         ~RSGISCalcClumpStats();
     };
     
@@ -175,6 +178,23 @@ namespace rsgis{namespace rastergis{
         unsigned int redIdx;
         unsigned int greenIdx;
         unsigned int blueIdx;
+	};
+    
+    class RSGISGetValidPxlCounts : public rsgis::img::RSGISCalcImageValue
+	{
+	public:
+		RSGISGetValidPxlCounts(size_t *validPxlCount, float noDataValue);
+		void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+		void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException);
+		void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+		void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+		void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+		bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+		~RSGISGetValidPxlCounts();
+    private:
+        size_t *validPxlCount;
+        float noDataValue;
 	};
 	
 }}
