@@ -107,6 +107,7 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
     XMLCh *optionGenAssessPoints = XMLString::transcode("genassesspoints");
     XMLCh *optionUniquePxlClumps = XMLString::transcode("uniquepxlclumps");
     XMLCh *optionSubset2Image = XMLString::transcode("subset2img");
+    XMLCh *optionDefineImgTiles = XMLString::transcode("defineimgtiles");
 
 	const XMLCh *algorNameEle = argElement->getAttribute(algorXMLStr);
 	if(!XMLString::equals(algorName, algorNameEle))
@@ -3037,6 +3038,91 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 		}
 		XMLString::release(&roiXMLStr);
 	}
+    else if (XMLString::equals(optionDefineImgTiles, optionXML))
+	{
+		this->option = RSGISExeImageUtils::defineimgtiles;
+        
+		XMLCh *imageXMLStr = XMLString::transcode("image");
+		if(argElement->hasAttribute(imageXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(imageXMLStr));
+			this->inputImage = string(charValue);
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+		}
+		XMLString::release(&imageXMLStr);
+        
+        
+		XMLCh *outputXMLStr = XMLString::transcode("output");
+		if(argElement->hasAttribute(outputXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
+			this->outputImage = string(charValue);
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+		}
+		XMLString::release(&outputXMLStr);
+        
+        noDataValDefined = false;
+        XMLCh *noDataValXMLStr = XMLString::transcode("nodata");
+		if(argElement->hasAttribute(noDataValXMLStr))
+		{
+            XMLCh *NaNStr = XMLString::transcode("NaN");
+			const XMLCh *dataValue = argElement->getAttribute(noDataValXMLStr);
+			if(XMLString::equals(dataValue, NaNStr))
+			{
+                const char *val = "NaN";
+				this->dataValue = nan(val);
+			}
+			else
+			{
+				char *charValue = XMLString::transcode(argElement->getAttribute(noDataValXMLStr));
+                this->nodataValue = mathUtils.strtofloat(string(charValue));
+                XMLString::release(&charValue);
+			}
+			XMLString::release(&NaNStr);
+            noDataValDefined = true;
+		}
+		else
+		{
+			noDataValDefined = false;
+		}
+		XMLString::release(&noDataValXMLStr);
+        
+        validPixelRatio = 0.0;
+        XMLCh *ratioXMLStr = XMLString::transcode("validpixelratio");
+		if(argElement->hasAttribute(ratioXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(ratioXMLStr));
+            this->validPixelRatio = mathUtils.strtofloat(string(charValue));
+            XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'validpixelratio\' attribute was provided.");
+		}
+		XMLString::release(&ratioXMLStr);
+        
+        XMLCh *tileSizeXMLStr = XMLString::transcode("tilesize");
+		if(argElement->hasAttribute(tileSizeXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(tileSizeXMLStr));
+            this->tileSizePxl = mathUtils.strtounsignedint(string(charValue));
+            XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'tilesize\' attribute was provided.");
+		}
+		XMLString::release(&tileSizeXMLStr);
+        
+	}
 	else
 	{
 		string message = string("The option (") + string(XMLString::transcode(optionXML)) + string(") is not known: RSGISExeImageUtils.");
@@ -3087,6 +3173,7 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
     XMLString::release(&optionAssignSpatialInfo);
     XMLString::release(&optionGenAssessPoints);
     XMLString::release(&optionSubset2Image);
+    XMLString::release(&optionDefineImgTiles);
 
 	parsed = true;
 }
@@ -5162,6 +5249,46 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
 				cout << "RSGISException caught: " << e.what() << endl;
 			}
 		}
+        else if(option == RSGISExeImageUtils::defineimgtiles)
+        {
+            cout << "Create an image where each pixel is a unique \'clump\' \n";
+            cout << "Image: " << this->inputImage << endl;
+            cout << "Output: " << this->outputImage << endl;
+            cout << "Tile Size: " << this->tileSizePxl << endl;
+            cout << "Valid Pixel Ratio: " << this->validPixelRatio << endl;
+            if(noDataValDefined)
+            {
+                cout << "Data Value: " << this->nodataValue << endl;
+            }
+            else
+            {
+                cout << "A no data value has not been defined\n";
+            }
+            cout << "Image format: " << this->imageFormat << endl;
+            
+            GDALAllRegister();
+            
+			try
+			{
+				GDALDataset *inDataset = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_ReadOnly);
+				if(inDataset == NULL)
+				{
+					string message = string("Could not open image ") + this->inputImage;
+					throw RSGISImageException(message.c_str());
+				}
+                
+                rsgis::rastergis::RSGISDefineImageTiles defImgTiles;
+                defImgTiles.defineTiles(inDataset, this->outputImage, this->imageFormat, this->tileSizePxl, this->validPixelRatio, this->nodataValue, noDataValDefined);
+                
+				GDALClose(inDataset);
+			}
+			catch(RSGISException& e)
+			{
+				throw e;
+			}
+			GDALDestroyDriverManager();
+            
+        }
 		else
 		{
 			cout << "Options not recognised\n";

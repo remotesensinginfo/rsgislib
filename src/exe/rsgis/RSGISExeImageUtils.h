@@ -76,6 +76,8 @@
 #include "vec/RSGISVectorUtils.h"
 #include "vec/RSGISPolygonData.h"
 
+#include "rastergis/RSGISDefineImageTiles.h"
+
 #include "gdal_priv.h"
 #include "ogrsf_frmts.h"
 #include "ogr_api.h"
@@ -136,7 +138,8 @@ class RSGISExeImageUtils : public RSGISAlgorithmParameters
             assignspatialinfo,
             genassesspoints,
             uniquepxlclumps,
-            subset2img
+            subset2img,
+            defineimgtiles
 		};
 
 		enum interpolators
@@ -259,6 +262,8 @@ class RSGISExeImageUtils : public RSGISAlgorithmParameters
         unsigned int numPoints;
         unsigned int seed;
         bool noDataValDefined;
+        float validPixelRatio;
+        unsigned int tileSizePxl;
 	};
 }
 #endif
