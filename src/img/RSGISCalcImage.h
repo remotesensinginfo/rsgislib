@@ -58,7 +58,7 @@ namespace rsgis
                 void calcImageBand(GDALDataset **datasets, int numDS, std::string outputImageBase, std::string gdalFormat="ENVI") throw(RSGISImageCalcException,RSGISImageBandException);
                 void calcImageInEnv(GDALDataset **datasets, int numDS, std::string outputImage, geos::geom::Envelope *env, bool setOutNames = false, std::string *bandNames = NULL, std::string gdalFormat="ENVI", GDALDataType gdalDataType=GDT_Float32) throw(RSGISImageCalcException,RSGISImageBandException);
 				void calcImageExtent(GDALDataset **datasets, int numDS) throw(RSGISImageCalcException,RSGISImageBandException);
-				void calcImageExtent(GDALDataset **datasets, int numDS, std::string outputImage, std::string gdalFormat="ENVI") throw(RSGISImageCalcException,RSGISImageBandException);
+				void calcImageExtent(GDALDataset **datasets, int numDS, std::string outputImage, std::string gdalFormat="ENVI", GDALDataType gdalDataType=GDT_Float32) throw(RSGISImageCalcException,RSGISImageBandException);
 				void calcImageWindowData(GDALDataset **datasets, int numDS, int windowSize) throw(RSGISImageCalcException,RSGISImageBandException);
                 void calcImageWindowData(GDALDataset **datasets, int numDS, std::string outputImage, int windowSize, std::string gdalFormat="ENVI", GDALDataType gdalDataType=GDT_Float32) throw(RSGISImageCalcException,RSGISImageBandException);
                 void calcImageWindowData(GDALDataset **datasets, int numDS, GDALDataset *outputImageDS, int windowSize) throw(RSGISImageCalcException,RSGISImageBandException);

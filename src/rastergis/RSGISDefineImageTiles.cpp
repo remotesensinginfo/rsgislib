@@ -42,7 +42,7 @@ namespace rsgis{namespace rastergis{
             // Populate with stats.
             std::cout << "Populate the image with basics stats\n";
             GDALDataset *outDataset = (GDALDataset *) GDALOpen(outputImage.c_str(), GA_Update);
-            if(inDataset == NULL)
+            if(outDataset == NULL)
             {
                 std::string message = std::string("Could not open image ") + outputImage;
                 throw RSGISImageException(message.c_str());
@@ -260,29 +260,120 @@ namespace rsgis{namespace rastergis{
             }
              */
             
+            
+                        
+            std::cout << "Number Consecutively" << std::endl;
+            
+            
+            size_t numRowsWithData = 1; // Zero is no data.
+            for(int i = 0; i < numRows; ++i)
+            {
+                if(validPxls[i] > 0)
+                {
+                    ++numRowsWithData;
+                }
+            }
+            
+            size_t *compressCFID = new size_t[numRows];
+            for(size_t i = 0; i < numRows; ++i)
+            {
+                compressCFID[i] = 0;
+            }
+            double *compressRatio = new double[numRowsWithData];
+            int *compressHisto = new int[numRowsWithData];
+            int *compressValidPixels = new int[numRowsWithData];
+            
+            size_t cIdx = 1;
+            compressRatio[0] = 0;
+            compressHisto[0] = 0;
+            compressValidPixels[0] = 0;
+            
+            for(size_t i = 0; i < numRows; ++i)
+            {
+                if(validPxls[i] > 0)
+                {
+                    compressCFID[i] = cIdx;
+                    for(size_t j = 0; j < numRows; ++j)
+                    {
+                        if(cFID[j] == cFID[i])
+                        {
+                            compressCFID[j] = cIdx;
+                        }
+                    }
+                    compressRatio[cIdx] = ratio[i];
+                    compressHisto[cIdx] = histo[i];
+                    compressValidPixels[cIdx] = validPxls[i];
+                    ++cIdx;
+                }
+            }
+            
+            
             std::cout << "Relabeling Tiles\n";
-            rsgis::img::RSGISCalcImageValue *calcImageValReLabel = new RSGISReLabelClumps(numRows, cFID);
+            rsgis::img::RSGISCalcImageValue *calcImageValReLabel = new RSGISReLabelClumps(numRows, compressCFID);
             rsgis::img::RSGISCalcEditImage calcImageReLabel = rsgis::img::RSGISCalcEditImage(calcImageValReLabel);
             calcImageReLabel.calcImageUseOut(outDataset);
             delete calcImageValReLabel;
             
-            
-            for(int i = 0; i < numRows; ++i)
+            std::cout << "Find Spatial Extent\n";
+            double **tileExtent = new double*[numRowsWithData];
+            bool *firstVals = new bool[numRowsWithData];
+            for(int i = 0; i < numRowsWithData; ++i)
             {
-                attTable->SetValue(i, colRatioIdx, ((double)ratio[i]));
-                attTable->SetValue(i, colHistoIdx, ((int)histo[i]));
-                attTable->SetValue(i, colValidPxlIdx, ((int)validPxls[i]));
+                tileExtent[i] = new double[4];
+                for(unsigned int j = 0; j < 4; ++j)
+                {
+                    tileExtent[i][j] = 0;
+                }
+                firstVals[i] = true;
             }
             
-            outDataset->GetRasterBand(1)->SetDefaultRAT(attTable);
+            rsgis::img::RSGISCalcImageValue *calcValExtent = new RSGISFindClumpExtent(numRows, tileExtent, firstVals);
+            rsgis::img::RSGISCalcImage calcExtent = rsgis::img::RSGISCalcImage(calcValExtent);
+            calcExtent.calcImageExtent(&outDataset, 1);
+            delete calcValExtent;
+            
+            
+            GDALRasterAttributeTable *attTableNew = new GDALRasterAttributeTable();
+            attTableNew->SetRowCount(numRowsWithData);
+            
+            colRatioIdx = attUtils.findColumnIndexOrCreate(attTableNew, "ValidPxlRatio", GFT_Integer);
+            colHistoIdx = attUtils.findColumnIndexOrCreate(attTableNew, "Histogram", GFT_Integer);
+            colValidPxlIdx = attUtils.findColumnIndexOrCreate(attTableNew, "NumValidPxls", GFT_Integer);
+            unsigned int colXMinIdx = attUtils.findColumnIndexOrCreate(attTableNew, "XMIN", GFT_Real);
+            unsigned int colXMaxIdx = attUtils.findColumnIndexOrCreate(attTableNew, "XMAX", GFT_Real);
+            unsigned int colYMinIdx = attUtils.findColumnIndexOrCreate(attTableNew, "YMIN", GFT_Real);
+            unsigned int colYMaxIdx = attUtils.findColumnIndexOrCreate(attTableNew, "YMAX", GFT_Real);
+            
+            for(int i = 0; i < numRowsWithData; ++i)
+            {
+                attTableNew->SetValue(i, colRatioIdx, compressRatio[i]);
+                attTableNew->SetValue(i, colHistoIdx, compressHisto[i]);
+                attTableNew->SetValue(i, colValidPxlIdx, compressValidPixels[i]);
+                attTableNew->SetValue(i, colXMinIdx, tileExtent[i][0]);
+                attTableNew->SetValue(i, colXMaxIdx, tileExtent[i][1]);
+                attTableNew->SetValue(i, colYMinIdx, tileExtent[i][2]);
+                attTableNew->SetValue(i, colYMaxIdx, tileExtent[i][3]);
+            }
+            
+            outDataset->GetRasterBand(1)->SetDefaultRAT(attTableNew);
             
             delete[] cFID;
             delete[] ratio;
             delete[] histo;
             delete[] validPxls;
             
-
+            delete[] compressCFID;
+            delete[] compressRatio;
+            delete[] compressHisto;
+            delete[] compressValidPixels;
+            
             delete[] neighbours;
+            delete[] firstVals;
+            for(int i = 0; i < numRowsWithData; ++i)
+            {
+                delete[] tileExtent[i];
+            }
+            delete[] tileExtent;
             
             GDALClose(outDataset);
         }
@@ -786,6 +877,61 @@ namespace rsgis{namespace rastergis{
     }
     
     RSGISReLabelClumps::~RSGISReLabelClumps()
+    {
+        
+    }
+    
+    
+    
+
+    RSGISFindClumpExtent::RSGISFindClumpExtent(size_t numRows, double **tileExtent, bool *firstVals) : rsgis::img::RSGISCalcImageValue(0)
+    {
+        this->numRows = numRows;
+        this->tileExtent = tileExtent;
+        this->firstVals = firstVals;
+    }
+    
+    void RSGISFindClumpExtent::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException)
+    {
+        if((bandValues[0] > 0) && (bandValues[0] < numRows))
+        {
+            size_t fid = boost::lexical_cast<size_t>(bandValues[0]);
+            
+            if(firstVals[fid])
+            {
+                tileExtent[fid][0] = extent.getMinX();
+                tileExtent[fid][1] = extent.getMaxX();
+                tileExtent[fid][2] = extent.getMinY();
+                tileExtent[fid][3] = extent.getMaxY();
+                firstVals[fid] = false;
+            }
+            else
+            {
+                if(extent.getMinX() < tileExtent[fid][0])
+                {
+                    tileExtent[fid][0] = extent.getMinX();
+                }
+                
+                if(extent.getMaxX() > tileExtent[fid][1])
+                {
+                    tileExtent[fid][1] = extent.getMaxX();
+                }
+                
+                if(extent.getMinY() < tileExtent[fid][2])
+                {
+                    tileExtent[fid][2] = extent.getMinY();
+                }
+                
+                if(extent.getMaxY() > tileExtent[fid][3])
+                {
+                    tileExtent[fid][3] = extent.getMaxY();
+                }
+            }
+            
+        }
+    }
+    
+    RSGISFindClumpExtent::~RSGISFindClumpExtent()
     {
         
     }
