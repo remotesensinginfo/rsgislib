@@ -280,5 +280,36 @@ namespace rsgis{namespace rastergis{
         
     }
     
+    
+    
+    
+    RSGISCutOutTile::RSGISCutOutTile(float noDataVal, unsigned int numOfBands):rsgis::img::RSGISCalcImageValue(numOfBands)
+    {
+        this->noDataVal = noDataVal;
+    }
+    
+    void RSGISCutOutTile::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
+    {
+        if(bandValues[0] > 0)
+        {
+            for(unsigned int i = 0; i < numOutBands; ++i)
+            {
+                output[i] = bandValues[i+1];
+            }
+        }
+        else
+        {
+            for(unsigned int i = 0; i < numOutBands; ++i)
+            {
+                output[i] = 0;
+            }
+        }
+    }
+    
+    RSGISCutOutTile::~RSGISCutOutTile()
+    {
+        
+    }
+    
 }}
 

@@ -142,7 +142,8 @@ class RSGISExeImageUtils : public RSGISAlgorithmParameters
             uniquepxlclumps,
             subset2img,
             defineimgtiles,
-            gentilemasks
+            gentilemasks,
+            cutouttile
 		};
 
 		enum interpolators
@@ -197,6 +198,7 @@ class RSGISExeImageUtils : public RSGISAlgorithmParameters
         string lutMatrixFile;
         string classColumnName;
         string inputROIImage;
+        string tileImage;
 		ClassColour **classColour;
 		float nodataValue;
 		float skipValue;

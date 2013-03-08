@@ -661,6 +661,8 @@
     <rsgis:command algor="imageutils" option="defineimgtiles" image="image.env" output="image_out.env" tilesize="int" [nodata="float"] validpixelratio="float" format="GDAL Format"  />
 	<!-- A command to create individual mask images for each tile with an optional overlap defined -->
 	<rsgis:command algor="imageutils" option="gentilemasks" image="image.env" outputbase="image_out.env" format="GDAL Format" extension="string" [overlap="float"] />
+	<!-- A command to extract and a region for the tile and apply a mask --> 
+	<rsgis:command algor="imageutils" option="cutouttile" image="image.env" tile="tile.env" output="image_out.env" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" nodataval="float" />
 
 
 
