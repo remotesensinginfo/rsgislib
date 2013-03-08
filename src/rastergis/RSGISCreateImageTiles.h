@@ -1,8 +1,8 @@
 /*
- *  RSGISDefineImageTiles.h
+ *  RSGISCreateImageTiles.h
  *  RSGIS_LIB
  *
- *  Created by Pete Bunting on 02/03/2013.
+ *  Created by Pete Bunting on 07/03/2013.
  *  Copyright 2013 RSGISLib.
  *
  *  RSGISLib is free software: you can redistribute it and/or modify
@@ -20,15 +20,13 @@
  *
  */
 
-#ifndef RSGISDefineImageTiles_H
-#define RSGISDefineImageTiles_H
+#ifndef RSGISCreateImageTiles_H
+#define RSGISCreateImageTiles_H
 
 #include <iostream>
-#include <fstream>
 #include <string>
-#include <map>
+#include <list>
 #include <vector>
-#include <math.h>
 
 #include "gdal_priv.h"
 #include "gdal_rat.h"
@@ -36,34 +34,32 @@
 #include "img/RSGISPopWithStats.h"
 #include "img/RSGISImageUtils.h"
 #include "img/RSGISCalcEditImage.h"
+#include "img/RSGISCalcImage.h"
 #include "img/RSGISCalcImageValue.h"
-
-#include "rastergis/RSGISCalcClumpStats.h"
-
-#include "common/RSGISAttributeTableException.h"
-#include "common/RSGISImageException.h"
 
 #include "rastergis/RSGISRasterAttUtils.h"
 
-#include <boost/numeric/conversion/cast.hpp>
-#include <boost/lexical_cast.hpp>
+#include "utils/RSGISTextUtils.h"
+
+#include "common/RSGISImageException.h"
+
+#include "geos/geom/Envelope.h"
 
 namespace rsgis{namespace rastergis{
-    
-    class RSGISDefineImageTiles
+
+    class RSGISCreateImageTileMasks
     {
     public:
-        RSGISDefineImageTiles();
-        void defineTiles(GDALDataset *inDataset, std::string outputImage, std::string imageFormat, unsigned int tileSizePxl, double validPxlRatio, double nodataValue, bool noDataValDefined) throw(RSGISImageException, RSGISAttributeTableException);
-        unsigned int defineImageTilesAsThematicImage(GDALDataset *inputImage, std::string outputImage, unsigned int tileSizePxls, std::string imageFormat) throw(RSGISImageException);
-        ~RSGISDefineImageTiles();
+        RSGISCreateImageTileMasks();
+        void createTileMasks(GDALDataset *image, std::string outputBase, std::string format, std::string ext, bool useOverlap, float overlap) throw(rsgis::RSGISImageException);
+        ~RSGISCreateImageTileMasks();
     };
     
     
-    class RSGISRemoveClumps : public rsgis::img::RSGISCalcImageValue
+    class RSGISDefineTileMask : public rsgis::img::RSGISCalcImageValue
 	{
 	public:
-		RSGISRemoveClumps(size_t numRows, double *ratioVals);
+		RSGISDefineTileMask();
 		void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException);
 		void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
 		void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
@@ -71,35 +67,41 @@ namespace rsgis{namespace rastergis{
 		void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
         void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
 		bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
-		~RSGISRemoveClumps();
+        void setTileVal(size_t tileVal);
+		~RSGISDefineTileMask();
     private:
-        size_t numRows;
-        double *ratioVals;
+        size_t tileVal;
 	};
     
     
-    class RSGISFindRecNeighbours : public rsgis::img::RSGISCalcImageValue
+    class RSGISGrowOverlapRingRegion : public rsgis::img::RSGISCalcImageValue
 	{
 	public:
-		RSGISFindRecNeighbours(size_t numRows, std::vector<size_t> *neighbours);
-		void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+		RSGISGrowOverlapRingRegion(unsigned int maxNumGrowthPixels);
+		void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException);
 		void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
 		void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
 		void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
 		void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException);
         void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
 		bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
-		~RSGISFindRecNeighbours();
-    private:
-        size_t numRows;
-        std::vector<size_t> *neighbours;
+        bool changeOccurred();
+        void resetChange();
+        void incrementCounter();
+        void reset();
+		~RSGISGrowOverlapRingRegion();
+    protected:
+        float counter;
+        bool change;
+        unsigned int maxNumGrowthPixels;
 	};
     
     
-    class RSGISReLabelClumps : public rsgis::img::RSGISCalcImageValue
+    
+    class RSGISCutOutTile : public rsgis::img::RSGISCalcImageValue
 	{
 	public:
-		RSGISReLabelClumps(size_t numRows, size_t *nFID);
+		RSGISCutOutTile(float noDataVal, unsigned int numOfBands);
 		void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException);
 		void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
 		void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
@@ -107,31 +109,15 @@ namespace rsgis{namespace rastergis{
 		void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
         void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
 		bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
-		~RSGISReLabelClumps();
+		~RSGISCutOutTile();
     private:
-        size_t numRows;
-        size_t *nFID;
+        float noDataVal;
 	};
     
-    
-    class RSGISFindClumpExtent : public rsgis::img::RSGISCalcImageValue
-	{
-	public:
-		RSGISFindClumpExtent(size_t numRows, double **tileExtent, bool *firstVals);
-		void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
-		void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
-		void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException);
-		void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
-		void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
-		bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
-		~RSGISFindClumpExtent();
-    private:
-        size_t numRows;
-        double **tileExtent;
-        bool *firstVals;
-	};
-
 }}
 
+
 #endif
+
+
+

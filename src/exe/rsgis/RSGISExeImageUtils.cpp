@@ -108,6 +108,8 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
     XMLCh *optionUniquePxlClumps = XMLString::transcode("uniquepxlclumps");
     XMLCh *optionSubset2Image = XMLString::transcode("subset2img");
     XMLCh *optionDefineImgTiles = XMLString::transcode("defineimgtiles");
+    XMLCh *optionGenTileMasks = XMLString::transcode("gentilemasks");
+    XMLCh *optionCutOutTile = XMLString::transcode("cutouttile");
 
 	const XMLCh *algorNameEle = argElement->getAttribute(algorXMLStr);
 	if(!XMLString::equals(algorName, algorNameEle))
@@ -3123,6 +3125,121 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 		XMLString::release(&tileSizeXMLStr);
         
 	}
+    else if (XMLString::equals(optionGenTileMasks, optionXML))
+	{
+		this->option = RSGISExeImageUtils::gentilemasks;
+        
+		XMLCh *imageXMLStr = XMLString::transcode("image");
+		if(argElement->hasAttribute(imageXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(imageXMLStr));
+			this->inputImage = string(charValue);
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+		}
+		XMLString::release(&imageXMLStr);
+        
+        
+		XMLCh *outputXMLStr = XMLString::transcode("outputbase");
+		if(argElement->hasAttribute(outputXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
+			this->outputImageBase = string(charValue);
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'outputbase\' attribute was provided.");
+		}
+		XMLString::release(&outputXMLStr);
+        
+        createAnOverlap = false;
+        XMLCh *overlapXMLStr = XMLString::transcode("overlap");
+		if(argElement->hasAttribute(overlapXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(overlapXMLStr));
+            this->overlap = mathUtils.strtofloat(string(charValue));
+            createAnOverlap = true;
+            XMLString::release(&charValue);
+		}
+		else
+		{
+            createAnOverlap = false;
+		}
+		XMLString::release(&overlapXMLStr);
+	}
+    else if (XMLString::equals(optionCutOutTile, optionXML))
+	{
+		this->option = RSGISExeImageUtils::cutouttile;
+        
+		XMLCh *imageXMLStr = XMLString::transcode("image");
+		if(argElement->hasAttribute(imageXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(imageXMLStr));
+			this->inputImage = string(charValue);
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+		}
+		XMLString::release(&imageXMLStr);
+        
+		XMLCh *outputXMLStr = XMLString::transcode("output");
+		if(argElement->hasAttribute(outputXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
+			this->outputImage = string(charValue);
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+		}
+		XMLString::release(&outputXMLStr);
+        
+        XMLCh *tileXMLStr = XMLString::transcode("tile");
+		if(argElement->hasAttribute(tileXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(tileXMLStr));
+			this->tileImage = string(charValue);
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'tile\' attribute was provided.");
+		}
+		XMLString::release(&tileXMLStr);
+        
+        
+        XMLCh *noDataValXMLStr = XMLString::transcode("nodataval");
+		if(argElement->hasAttribute(noDataValXMLStr))
+		{
+            XMLCh *NaNStr = XMLString::transcode("NaN");
+			const XMLCh *dataValue = argElement->getAttribute(noDataValXMLStr);
+			if(XMLString::equals(dataValue, NaNStr))
+			{
+                const char *val = "NaN";
+				this->dataValue = nan(val);
+			}
+			else
+			{
+				char *charValue = XMLString::transcode(argElement->getAttribute(noDataValXMLStr));
+                this->nodataValue = mathUtils.strtofloat(string(charValue));
+                XMLString::release(&charValue);
+			}
+			XMLString::release(&NaNStr);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'nodataval\' attribute was provided.");
+		}
+		XMLString::release(&noDataValXMLStr);
+        
+	}
 	else
 	{
 		string message = string("The option (") + string(XMLString::transcode(optionXML)) + string(") is not known: RSGISExeImageUtils.");
@@ -3174,7 +3291,9 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
     XMLString::release(&optionGenAssessPoints);
     XMLString::release(&optionSubset2Image);
     XMLString::release(&optionDefineImgTiles);
-
+    XMLString::release(&optionGenTileMasks);
+    XMLString::release(&optionCutOutTile);
+    
 	parsed = true;
 }
 
@@ -5289,6 +5408,92 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
 			GDALDestroyDriverManager();
             
         }
+        else if(option == RSGISExeImageUtils::gentilemasks)
+        {
+            cout << "create individual mask images for each tile with an optional overlap.\n";
+            cout << "Image: " << this->inputImage << endl;
+            cout << "Output Base: " << this->outputImageBase << endl;
+            if(this->createAnOverlap)
+            {
+                cout << "Overlap: " << this->overlap << endl;
+            }
+            else
+            {
+                cout << "No overlap is being used\n";
+            }
+            cout << "Image format: " << this->imageFormat << endl;
+            cout << "Image Extension: " << this->outFileExtension << endl;
+            
+            GDALAllRegister();
+            
+			try
+			{
+				GDALDataset *inDataset = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_ReadOnly);
+				if(inDataset == NULL)
+				{
+					string message = string("Could not open image ") + this->inputImage;
+					throw RSGISImageException(message.c_str());
+				}
+                
+                rsgis::rastergis::RSGISCreateImageTileMasks tileMasks;
+                tileMasks.createTileMasks(inDataset, this->outputImageBase, this->imageFormat, this->outFileExtension, this->createAnOverlap, this->overlap);
+                
+				GDALClose(inDataset);
+			}
+			catch(RSGISException& e)
+			{
+				throw e;
+			}
+			GDALDestroyDriverManager();
+            
+        }
+        else if(option == RSGISExeImageUtils::cutouttile)
+        {
+            cout << "A command to extract and a region for the tile and apply a mask.\n";
+            cout << "Image: " << this->inputImage << endl;
+            cout << "Output: " << this->outputImage << endl;
+            cout << "Tile: " << this->tileImage << endl;
+            cout << "Image format: " << this->imageFormat << endl;
+            cout << "No Data: " << this->nodataValue << endl;
+            
+            GDALAllRegister();
+            
+			try
+			{
+                GDALDataset **dataset = new GDALDataset*[2];
+				
+                dataset[0] = (GDALDataset *) GDALOpen(this->tileImage.c_str(), GA_ReadOnly);
+				if(dataset[0] == NULL)
+				{
+					string message = string("Could not open image ") + this->tileImage;
+					throw RSGISImageException(message.c_str());
+				}
+                                
+                dataset[1] = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_ReadOnly);
+				if(dataset[1] == NULL)
+				{
+					string message = string("Could not open image ") + this->inputImage;
+					throw RSGISImageException(message.c_str());
+				}
+                
+                rsgis::rastergis::RSGISCutOutTile *cutTiles = new rsgis::rastergis::RSGISCutOutTile(nodataValue, dataset[1]->GetRasterCount());
+                rsgis::img::RSGISCalcImage calcTile = rsgis::img::RSGISCalcImage(cutTiles);
+                
+                calcTile.calcImage(dataset, 2, this->outputImage, false, NULL, this->imageFormat, this->outDataType);
+                
+                delete cutTiles;
+                
+				GDALClose(dataset[0]);
+                GDALClose(dataset[1]);
+                delete[] dataset;
+			}
+			catch(RSGISException& e)
+			{
+				throw e;
+			}
+			GDALDestroyDriverManager();
+            
+        }
 		else
 		{
 			cout << "Options not recognised\n";
@@ -5658,6 +5863,39 @@ void RSGISExeImageUtils::printParameters()
                 cout << "Generating " << this->numPoints << " stratified random points per class.\n";
             }
             cout << "Random generator seed: " << this->seed << endl;
+        }
+        else if(option == RSGISExeImageUtils::defineimgtiles)
+        {
+            cout << "Create an image where each pixel is a unique \'clump\' \n";
+            cout << "Image: " << this->inputImage << endl;
+            cout << "Output: " << this->outputImage << endl;
+            cout << "Tile Size: " << this->tileSizePxl << endl;
+            cout << "Valid Pixel Ratio: " << this->validPixelRatio << endl;
+            if(noDataValDefined)
+            {
+                cout << "Data Value: " << this->nodataValue << endl;
+            }
+            else
+            {
+                cout << "A no data value has not been defined\n";
+            }
+            cout << "Image format: " << this->imageFormat << endl;
+        }
+        else if(option == RSGISExeImageUtils::gentilemasks)
+        {
+            cout << "create individual mask images for each tile with an optional overlap.\n";
+            cout << "Image: " << this->inputImage << endl;
+            cout << "Output Base: " << this->outputImageBase << endl;
+            if(this->createAnOverlap)
+            {
+                cout << "Overlap: " << this->overlap << endl;
+            }
+            else
+            {
+                cout << "No overlap is being used\n";
+            }
+            cout << "Image format: " << this->imageFormat << endl;
+            cout << "Image Extension: " << this->outFileExtension << endl;
         }
 		else
 		{

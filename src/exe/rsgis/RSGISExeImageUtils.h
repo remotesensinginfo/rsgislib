@@ -70,6 +70,7 @@
 #include "img/RSGISPopWithStats.h"
 #include "img/RSGISGenAccuracyPoints.h"
 
+
 #include "vec/RSGISImageTileVector.h"
 #include "vec/RSGISVectorOutputException.h"
 #include "vec/RSGISVectorIO.h"
@@ -77,6 +78,7 @@
 #include "vec/RSGISPolygonData.h"
 
 #include "rastergis/RSGISDefineImageTiles.h"
+#include "rastergis/RSGISCreateImageTiles.h"
 
 #include "gdal_priv.h"
 #include "ogrsf_frmts.h"
@@ -139,7 +141,9 @@ class RSGISExeImageUtils : public RSGISAlgorithmParameters
             genassesspoints,
             uniquepxlclumps,
             subset2img,
-            defineimgtiles
+            defineimgtiles,
+            gentilemasks,
+            cutouttile
 		};
 
 		enum interpolators
@@ -177,6 +181,7 @@ class RSGISExeImageUtils : public RSGISAlgorithmParameters
 		stretches stretchType;
 		string inputImage;
 		string outputImage;
+        string outputImageBase;
 		string *inputImages;
 		string inputVector;
         string inputCSV;
@@ -193,6 +198,7 @@ class RSGISExeImageUtils : public RSGISAlgorithmParameters
         string lutMatrixFile;
         string classColumnName;
         string inputROIImage;
+        string tileImage;
 		ClassColour **classColour;
 		float nodataValue;
 		float skipValue;
@@ -264,6 +270,8 @@ class RSGISExeImageUtils : public RSGISAlgorithmParameters
         bool noDataValDefined;
         float validPixelRatio;
         unsigned int tileSizePxl;
+        float overlap;
+        bool createAnOverlap;
 	};
 }
 #endif
