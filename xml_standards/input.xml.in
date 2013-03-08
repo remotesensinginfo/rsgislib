@@ -659,8 +659,8 @@
     <rsgis:command algor="imageutils" option="uniquepxlclumps" image="image.env" output="image_out.env" [nodata="float"] format="GDAL Format"  />
 	<!-- A command to create a thematic image defining tiles for an image image -->
     <rsgis:command algor="imageutils" option="defineimgtiles" image="image.env" output="image_out.env" tilesize="int" [nodata="float"] validpixelratio="float" format="GDAL Format"  />
-
-
+	<!-- A command to create individual mask images for each tile with an optional overlap defined -->
+	<rsgis:command algor="imageutils" option="gentilemasks" image="image.env" outputbase="image_out.env" format="GDAL Format" extension="string" [overlap="float"] />
 
 
 
