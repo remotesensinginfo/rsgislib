@@ -39,8 +39,8 @@ namespace rsgis{namespace filter{
     {
     public:
         RSGISImageMorphologyGradient();
-        void calcGradientImage(GDALDataset **dataset, std::string outputImage, rsgis::math::Matrix *matrixOperator) throw(rsgis::img::RSGISImageCalcException, rsgis::img::RSGISImageBandException);
-        void calcGradientImageAll(GDALDataset **dataset, std::string outputImage, rsgis::math::Matrix *matrixOperator) throw(rsgis::img::RSGISImageCalcException, rsgis::img::RSGISImageBandException);
+        void calcGradientImage(GDALDataset **dataset, std::string outputImage, rsgis::math::Matrix *matrixOperator, std::string format, GDALDataType outDataType) throw(rsgis::img::RSGISImageCalcException, rsgis::img::RSGISImageBandException);
+        void calcGradientImageAll(GDALDataset **dataset, std::string outputImage, rsgis::math::Matrix *matrixOperator, std::string format, GDALDataType outDataType) throw(rsgis::img::RSGISImageCalcException, rsgis::img::RSGISImageBandException);
         ~RSGISImageMorphologyGradient(){};
     };
     

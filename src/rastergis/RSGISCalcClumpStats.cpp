@@ -460,6 +460,90 @@ namespace rsgis{namespace rastergis{
             throw rsgis::RSGISAttributeTableException(e.what());
         }
     }
+    
+    void RSGISCalcClumpStats::calcValidPixelCount(GDALDataset *clumpDS, GDALDataset *imageDS, float noData, std::string validPixelCount) throw(rsgis::RSGISAttributeTableException)
+    {
+        try
+        {
+            // Get Attribute table
+            const GDALRasterAttributeTable *attTableTmp = clumpDS->GetRasterBand(1)->GetDefaultRAT();
+            GDALRasterAttributeTable *attTable = NULL;
+            if(attTableTmp != NULL)
+            {
+                attTable = new GDALRasterAttributeTable(*attTableTmp);
+            }
+            else
+            {
+                attTable = new GDALRasterAttributeTable();
+            }
+            
+            // Make sure it is long enough and extend if required.
+            int numRows = attTable->GetRowCount();
+            
+            double maxVal = 0;
+            clumpDS->GetRasterBand(1)->GetStatistics(false, true, NULL, &maxVal, NULL, NULL);
+            
+            if(maxVal > numRows)
+            {
+                attTable->SetRowCount(maxVal+1);
+            }
+            numRows = attTable->GetRowCount();
+            
+            size_t *validPxlCount = new size_t[numRows];
+            
+            for(size_t i = 0; i < numRows; ++i)
+            {
+                validPxlCount[i] = 0;
+            }
+            
+            GDALDataset **datasets = new GDALDataset*[2];
+            datasets[0] = clumpDS;
+            datasets[1] = imageDS;
+            
+            RSGISGetValidPxlCounts *calcImgValStats = new RSGISGetValidPxlCounts(validPxlCount, noData);
+            rsgis::img::RSGISCalcImage calcImageStats(calcImgValStats);
+            calcImageStats.calcImage(datasets, 2);
+            delete calcImgValStats;
+            delete[] datasets;
+            
+            RSGISRasterAttUtils attUtils;
+            unsigned int colIdx = attUtils.findColumnIndexOrCreate(attTable, validPixelCount, GFT_Integer);
+            unsigned int colRatioIdx = attUtils.findColumnIndexOrCreate(attTable, "ValidPxlRatio", GFT_Real);
+            unsigned int histColIdx = attUtils.findColumnIndex(attTable, "Histogram");
+            
+            for(size_t i = 0; i < numRows; ++i)
+            {
+                //std::cout << i << ":\t" << validPxlCount[i] << std::endl;
+                attTable->SetValue(i, colIdx, (int)validPxlCount[i]);
+                if(validPxlCount[i] > 0)
+                {
+                    attTable->SetValue(i, colRatioIdx, ((double)validPxlCount[i])/attTable->GetValueAsDouble(i, histColIdx));
+                }
+                else
+                {
+                    attTable->SetValue(i, colRatioIdx, 0.0);
+                }
+            }
+            
+            clumpDS->GetRasterBand(1)->SetDefaultRAT(attTable);
+        }
+        catch(rsgis::img::RSGISImageBandException &e)
+        {
+            throw rsgis::RSGISAttributeTableException(e.what());
+        }
+        catch(rsgis::img::RSGISImageCalcException &e)
+        {
+            throw rsgis::RSGISAttributeTableException(e.what());
+        }
+        catch(rsgis::RSGISImageException &e)
+        {
+            throw rsgis::RSGISAttributeTableException(e.what());
+        }
+        catch(rsgis::RSGISException &e)
+        {
+            throw rsgis::RSGISAttributeTableException(e.what());
+        }
+    }
         
     RSGISCalcClumpStats::~RSGISCalcClumpStats()
     {
@@ -650,6 +734,40 @@ namespace rsgis{namespace rastergis{
         
     }
     
+
+    RSGISGetValidPxlCounts::RSGISGetValidPxlCounts(size_t *validPxlCount, float noDataValue) : rsgis::img::RSGISCalcImageValue(0)
+    {
+        this->validPxlCount = validPxlCount;
+        this->noDataValue = noDataValue;
+    }
+    
+    void RSGISGetValidPxlCounts::calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException)
+    {
+        if(bandValues[0] > 0)
+        {
+            size_t fid = boost::lexical_cast<size_t>(bandValues[0]);
+            
+            bool validPxl = true;
+            for(int i = 0; i < numBands; ++i)
+            {
+                if(bandValues[i] == noDataValue)
+                {
+                    validPxl = false;
+                    break;
+                }
+            }
+            
+            if(validPxl)
+            {
+                ++validPxlCount[fid];
+            }
+        }
+    }
+    
+    RSGISGetValidPxlCounts::~RSGISGetValidPxlCounts()
+    {
+        
+    }
     
 	
 }}

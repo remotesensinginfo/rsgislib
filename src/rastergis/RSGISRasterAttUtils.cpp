@@ -902,6 +902,30 @@ namespace rsgis{namespace rastergis{
         return colIdx;
     }
     
+    unsigned int RSGISRasterAttUtils::findColumnIndexOrCreate(GDALRasterAttributeTable *gdalATT, std::string colName, GDALRATFieldType dType) throw(RSGISAttributeTableException)
+    {
+        int numColumns = gdalATT->GetColumnCount();
+        bool foundCol = false;
+        unsigned int colIdx = 0;
+        for(int i = 0; i < numColumns; ++i)
+        {
+            if(std::string(gdalATT->GetNameOfCol(i)) == colName)
+            {
+                foundCol = true;
+                colIdx = i;
+                break;
+            }
+        }
+        
+        if(!foundCol)
+        {
+            gdalATT->CreateColumn(colName.c_str(), dType, GFU_Generic);
+            colIdx = numColumns;
+        }
+        
+        return colIdx;
+    }
+    
     RSGISRasterAttUtils::~RSGISRasterAttUtils()
     {
         

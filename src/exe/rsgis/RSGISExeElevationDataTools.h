@@ -36,6 +36,7 @@
 #include "img/RSGISImageCalcException.h"
 #include "img/RSGISCalcImageValue.h"
 #include "img/RSGISCalcImage.h"
+#include "img/RSGISCalcEditImage.h"
 
 #include "utils/RSGISFileUtils.h"
 #include "utils/RSGISGEOSFactoryGenerator.h"
@@ -49,53 +50,52 @@
 
 namespace rsgisexe{
 
-using namespace std;
-using namespace xercesc;
-using namespace rsgis;
-using namespace rsgis::utils;
-using namespace rsgis::math;
-using namespace rsgis::img;
-using namespace rsgis::calib;
-
-class RSGISExeElevationDataTools : public RSGISAlgorithmParameters
-{
-public:
-	enum options 
-	{
-		none,
-        slope,
-        aspect,
-        slopeaspect,
-        hillshade,
-        shadowmask,
-        incidenceangle,
-        exitanceangle,
-        incidenceexistanceangles
+    class RSGISExeElevationDataTools : public rsgis::RSGISAlgorithmParameters
+    {
+    public:
+        enum options 
+        {
+            none,
+            slope,
+            aspect,
+            slopeaspect,
+            hillshade,
+            shadowmask,
+            incidenceangle,
+            exitanceangle,
+            incidenceexistanceangles,
+            fill,
+            infilldlayers
+        };
+        
+        RSGISExeElevationDataTools();
+        virtual rsgis::RSGISAlgorithmParameters* getInstance();
+        virtual void retrieveParameters(xercesc::DOMElement *argElement) throw(rsgis::RSGISXMLArgumentsException);
+        virtual void runAlgorithm() throw(rsgis::RSGISException);
+        virtual void printParameters();
+        virtual std::string getDescription();
+        virtual std::string getXMLSchema();
+        virtual void help();
+        ~RSGISExeElevationDataTools();
+    protected:
+        options option;
+        std::string outputImage;
+        std::string inputImage;
+        std::string inputImageBase;
+        std::string inputImageInFill;
+        std::string inputDEM;
+        unsigned int imageBand;
+        float solarZenith;
+        float solarAzimuth;
+        float viewZenith;
+        float viewAzimuth;
+        int slopeOutputType;
+        float maxElevHeight;
+        std::string imageFormat;
+        GDALDataType outDataType;
+        float holesValue;
+        float noDataVal;
     };
-	
-	RSGISExeElevationDataTools();
-	virtual RSGISAlgorithmParameters* getInstance();
-	virtual void retrieveParameters(DOMElement *argElement) throw(RSGISXMLArgumentsException);
-	virtual void runAlgorithm() throw(RSGISException);
-	virtual void printParameters();
-	virtual string getDescription();
-	virtual string getXMLSchema();
-	virtual void help();
-	~RSGISExeElevationDataTools();
-protected:
-	options option;
-    string outputImage;
-    string inputImage;
-    unsigned int imageBand;
-    float solarZenith;
-    float solarAzimuth;
-    float viewZenith;
-    float viewAzimuth;
-    int slopeOutputType;
-    float maxElevHeight;
-    string imageFormat;
-    GDALDataType outDataType;
-};
     
 }
 
