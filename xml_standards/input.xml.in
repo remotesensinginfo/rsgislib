@@ -657,8 +657,12 @@
     <rsgis:command algor="imageutils" option="genassesspoints" image="image.env" [dem="image.env"] output="file.dat" classcolumn="string" seed="int" type="random | stratified" n="int; total number for random or number within each class for stratified" />
 	<!-- A command to create an image where each pixel is a unique 'clump' -->
     <rsgis:command algor="imageutils" option="uniquepxlclumps" image="image.env" output="image_out.env" [nodata="float"] format="GDAL Format"  />
-
-
+	<!-- A command to create a thematic image defining tiles for an image image -->
+    <rsgis:command algor="imageutils" option="defineimgtiles" image="image.env" output="image_out.env" tilesize="int" [nodata="float"] validpixelratio="float" format="GDAL Format"  />
+	<!-- A command to create individual mask images for each tile with an optional overlap defined -->
+	<rsgis:command algor="imageutils" option="gentilemasks" image="image.env" outputbase="image_out.env" format="GDAL Format" extension="string" [overlap="float"] />
+	<!-- A command to extract and a region for the tile and apply a mask --> 
+	<rsgis:command algor="imageutils" option="cutouttile" image="image.env" tile="tile.env" output="image_out.env" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" nodataval="float" />
 
 
 
@@ -831,7 +835,10 @@
     <!-- A command to calculate the incidence and exitance angles from a elevation surface and sun and viewer positions -->
     <rsgis:command algor="elevation" option="incidenceexitanceangles" input="image.env" output="out_image.env" solarAzimuth="float" solarZenith="float" viewAzimuth="float" viewZenith="float" [band="int"] format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
 	<!-- A command to fills the holes within a DEM, the input image should have the following bands: elevation, slope, aspect -->
-    <rsgis:command algor="elevation" option="fill" input="image.env" output="out_image.env" holesval="float" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
+    <rsgis:command algor="elevation" option="fill" input="image.env" output="out_image.env" holesval="float" nodata="float" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
+
+	<!-- A command to fills the holes within a DEM derived slope or aspect layer from another layer derived from another source (before filling) -->
+    <rsgis:command algor="elevation" option="infilldlayers" baseimage="image.env" infillimage="image.env" dem="dem.env" output="out_image.env" holesval="float" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
 
 
 
@@ -901,29 +908,29 @@
 
 
     <!-- A command to apply a morphological dilation to an image -->
-    <rsgis:command algor="morphology" option="dilate" image="image.env" output="image_out.env" [operator="matrix.gmtxt" | elementsize="int"] />
+    <rsgis:command algor="morphology" option="dilate" image="image.env" output="image_out.env" [operator="matrix.gmtxt" | elementsize="int"] format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
     <!-- A command to apply a morphological erosion to an image -->
-    <rsgis:command algor="morphology" option="erode" image="image.env" output="image_out.env" [operator="matrix.gmtxt" | elementsize="int"] />
+    <rsgis:command algor="morphology" option="erode" image="image.env" output="image_out.env" [operator="matrix.gmtxt" | elementsize="int"] format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
     <!-- A command to apply a morphological gradient to an image -->
-    <rsgis:command algor="morphology" option="gradient" image="image.env" output="image_out.env" [operator="matrix.gmtxt" | elementsize="int"] />
+    <rsgis:command algor="morphology" option="gradient" image="image.env" output="image_out.env" [operator="matrix.gmtxt" | elementsize="int"] format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
     <!-- A command to apply a morphological dilation to all image bands to produce a single band output -->
-    <rsgis:command algor="morphology" option="dilateall" image="image.env" output="image_out.env" [operator="matrix.gmtxt" | elementsize="int"] />
+    <rsgis:command algor="morphology" option="dilateall" image="image.env" output="image_out.env" [operator="matrix.gmtxt" | elementsize="int"] format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
     <!-- A command to apply a morphological erosion to all image bands to produce a single band output -->
-    <rsgis:command algor="morphology" option="erodeall" image="image.env" output="image_out.env" [operator="matrix.gmtxt" | elementsize="int"] />
+    <rsgis:command algor="morphology" option="erodeall" image="image.env" output="image_out.env" [operator="matrix.gmtxt" | elementsize="int"] format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
     <!-- A command to apply a morphological gradient to all image bands to produce a single band output -->
-    <rsgis:command algor="morphology" option="gradientall" image="image.env" output="image_out.env" [operator="matrix.gmtxt" | elementsize="int"] />
+    <rsgis:command algor="morphology" option="gradientall" image="image.env" output="image_out.env" [operator="matrix.gmtxt" | elementsize="int"] format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
     <!-- A command to apply a filter to find local minima - used as input into a morphological watershed -->
-    <rsgis:command algor="morphology" option="localminima" image="image.env" output="image_out.env" [operator="matrix.gmtxt" | elementsize="int"] numbering="binary | sequential" allowequals="yes | no" />
+    <rsgis:command algor="morphology" option="localminima" image="image.env" output="image_out.env" [operator="matrix.gmtxt" | elementsize="int"] numbering="binary | sequential" allowequals="yes | no" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
     <!-- A command to apply a filter to find local minima using all image bands to produce a single band output - used as input into a morphological watershed -->
-    <rsgis:command algor="morphology" option="localminimaall" image="image.env" output="image_out.env" [operator="matrix.gmtxt" | elementsize="int"] numbering="binary | sequencial" allowequals="yes | no" />
+    <rsgis:command algor="morphology" option="localminimaall" image="image.env" output="image_out.env" [operator="matrix.gmtxt" | elementsize="int"] numbering="binary | sequencial" allowequals="yes | no" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
     <!-- A command to apply a morphological closing to an image (if temp image not provided processing will be done in memory) -->
-    <rsgis:command algor="morphology" option="closing" image="image.env" output="image_out.env" [temp="tmp_image.env"] [operator="matrix.gmtxt" | elementsize="int"] [iterations="int"] />
+    <rsgis:command algor="morphology" option="closing" image="image.env" output="image_out.env" [temp="tmp_image.env"] [operator="matrix.gmtxt" | elementsize="int"] [iterations="int"] format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
     <!-- A command to apply a morphological opening to an image (if temp image not provided processing will be done in memory) -->
-    <rsgis:command algor="morphology" option="opening" image="image.env" output="image_out.env" [temp="tmp_image.env"] [operator="matrix.gmtxt" | elementsize="int"] [iterations="int"] />
+    <rsgis:command algor="morphology" option="opening" image="image.env" output="image_out.env" [temp="tmp_image.env"] [operator="matrix.gmtxt" | elementsize="int"] [iterations="int"] format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
     <!-- A command to apply a morphological black top hat to an image (if temp image not provided processing will be done in memory) -->
-    <rsgis:command algor="morphology" option="blacktophat" image="image.env" output="image_out.env" [temp="tmp_image.env"] [operator="matrix.gmtxt" | elementsize="int"] [iterations="int"] />
+    <rsgis:command algor="morphology" option="blacktophat" image="image.env" output="image_out.env" [temp="tmp_image.env"] [operator="matrix.gmtxt" | elementsize="int"] [iterations="int"] format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
     <!-- A command to apply a morphological white top hat to an image (if temp image not provided processing will be done in memory) -->
-    <rsgis:command algor="morphology" option="whitetophat" image="image.env" output="image_out.env" [temp="tmp_image.env"] [operator="matrix.gmtxt" | elementsize="int"] [iterations="int"] />
+    <rsgis:command algor="morphology" option="whitetophat" image="image.env" output="image_out.env" [temp="tmp_image.env"] [operator="matrix.gmtxt" | elementsize="int"] [iterations="int"] format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
 
 
 
@@ -995,6 +1002,13 @@
         <rsgis:image file="string" />
 		<rsgis:image file="string" />
     </rsgis:command>
+
+
+
+
+
+
+
 
 
 

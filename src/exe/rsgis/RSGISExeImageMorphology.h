@@ -99,6 +99,8 @@ protected:
     RSGISImageMorphologyFindExtrema::RSGISMinimaOutputs minOutType;
     bool useMemory;
     unsigned int numIterations;
+    GDALDataType outDataType;
+    string imageFormat;
 };
     
 }

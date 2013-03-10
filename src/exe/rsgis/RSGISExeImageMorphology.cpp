@@ -59,11 +59,85 @@ void RSGISExeImageMorphology::retrieveParameters(DOMElement *argElement) throw(R
         XMLCh *optionWhiteTopHat = XMLString::transcode("whitetophat");
         XMLCh *optionBlackTopHat = XMLString::transcode("blacktophat");
         
+        
         const XMLCh *algorNameEle = argElement->getAttribute(algorXMLStr);
         if(!XMLString::equals(algorName, algorNameEle))
         {
             throw RSGISXMLArgumentsException("The algorithm name is incorrect.");
         }
+        
+        
+        // Set output image fomat (defaults to ENVI)
+        this->imageFormat = "ENVI";
+        XMLCh *formatXMLStr = XMLString::transcode("format");
+        if(argElement->hasAttribute(formatXMLStr))
+        {
+            char *charValue = XMLString::transcode(argElement->getAttribute(formatXMLStr));
+            this->imageFormat = string(charValue);
+            XMLString::release(&charValue);
+        }
+        XMLString::release(&formatXMLStr);
+        
+        this->outDataType = GDT_Float32;
+        XMLCh *datatypeXMLStr = XMLString::transcode("datatype");
+        if(argElement->hasAttribute(datatypeXMLStr))
+        {
+            XMLCh *dtByte = XMLString::transcode("Byte");
+            XMLCh *dtUInt16 = XMLString::transcode("UInt16");
+            XMLCh *dtInt16 = XMLString::transcode("Int16");
+            XMLCh *dtUInt32 = XMLString::transcode("UInt32");
+            XMLCh *dtInt32 = XMLString::transcode("Int32");
+            XMLCh *dtFloat32 = XMLString::transcode("Float32");
+            XMLCh *dtFloat64 = XMLString::transcode("Float64");
+            
+            const XMLCh *dtXMLValue = argElement->getAttribute(datatypeXMLStr);
+            if(XMLString::equals(dtByte, dtXMLValue))
+            {
+                this->outDataType = GDT_Byte;
+            }
+            else if(XMLString::equals(dtUInt16, dtXMLValue))
+            {
+                this->outDataType = GDT_UInt16;
+            }
+            else if(XMLString::equals(dtInt16, dtXMLValue))
+            {
+                this->outDataType = GDT_Int16;
+            }
+            else if(XMLString::equals(dtUInt32, dtXMLValue))
+            {
+                this->outDataType = GDT_UInt32;
+            }
+            else if(XMLString::equals(dtInt32, dtXMLValue))
+            {
+                this->outDataType = GDT_Int32;
+            }
+            else if(XMLString::equals(dtFloat32, dtXMLValue))
+            {
+                this->outDataType = GDT_Float32;
+            }
+            else if(XMLString::equals(dtFloat64, dtXMLValue))
+            {
+                this->outDataType = GDT_Float64;
+            }
+            else
+            {
+                cerr << "Data type not recognised, defaulting to 32 bit float.";
+                this->outDataType = GDT_Float32;
+            }
+            
+            XMLString::release(&dtByte);
+            XMLString::release(&dtUInt16);
+            XMLString::release(&dtInt16);
+            XMLString::release(&dtUInt32);
+            XMLString::release(&dtInt32);
+            XMLString::release(&dtFloat32);
+            XMLString::release(&dtFloat64);
+        }
+        XMLString::release(&datatypeXMLStr);
+        
+        
+        
+        
         
         const XMLCh *optionXML = argElement->getAttribute(optionXMLStr);
         if(XMLString::equals(optionDilate, optionXML))
@@ -1025,7 +1099,7 @@ void RSGISExeImageMorphology::runAlgorithm() throw(RSGISException)
             }
             
             RSGISImageMorphologyDilate newDilate;
-            newDilate.dilateImage(dataset, this->outputImage, this->matrixOperator);
+            newDilate.dilateImage(dataset, this->outputImage, this->matrixOperator, this->imageFormat, this->outDataType);
             
             GDALClose(dataset[0]);
             delete[] dataset;
@@ -1054,7 +1128,7 @@ void RSGISExeImageMorphology::runAlgorithm() throw(RSGISException)
             }
             
             RSGISImageMorphologyErode newErode;
-            newErode.erodeImage(dataset, this->outputImage, this->matrixOperator);
+            newErode.erodeImage(dataset, this->outputImage, this->matrixOperator, this->imageFormat, this->outDataType);
             
             GDALClose(dataset[0]);
             delete[] dataset;
@@ -1083,7 +1157,7 @@ void RSGISExeImageMorphology::runAlgorithm() throw(RSGISException)
             }
             
             RSGISImageMorphologyGradient newGradient;
-            newGradient.calcGradientImage(dataset, this->outputImage, this->matrixOperator);
+            newGradient.calcGradientImage(dataset, this->outputImage, this->matrixOperator, this->imageFormat, this->outDataType);
             
             GDALClose(dataset[0]);
             delete[] dataset;
@@ -1111,7 +1185,7 @@ void RSGISExeImageMorphology::runAlgorithm() throw(RSGISException)
             }
             
             RSGISImageMorphologyDilate newDilate;
-            newDilate.dilateImageAll(dataset, this->outputImage, this->matrixOperator);
+            newDilate.dilateImageAll(dataset, this->outputImage, this->matrixOperator, this->imageFormat, this->outDataType);
             
             GDALClose(dataset[0]);
             delete[] dataset;
@@ -1140,7 +1214,7 @@ void RSGISExeImageMorphology::runAlgorithm() throw(RSGISException)
             }
             
             RSGISImageMorphologyErode newErode;
-            newErode.erodeImageAll(dataset, this->outputImage, this->matrixOperator);
+            newErode.erodeImageAll(dataset, this->outputImage, this->matrixOperator, this->imageFormat, this->outDataType);
             
             GDALClose(dataset[0]);
             delete[] dataset;
@@ -1169,7 +1243,7 @@ void RSGISExeImageMorphology::runAlgorithm() throw(RSGISException)
             }
             
             RSGISImageMorphologyGradient newGradient;
-            newGradient.calcGradientImageAll(dataset, this->outputImage, this->matrixOperator);
+            newGradient.calcGradientImageAll(dataset, this->outputImage, this->matrixOperator, this->imageFormat, this->outDataType);
             
             GDALClose(dataset[0]);
             delete[] dataset;
@@ -1198,7 +1272,7 @@ void RSGISExeImageMorphology::runAlgorithm() throw(RSGISException)
             }
             
             RSGISImageMorphologyFindExtrema findExtrema;
-            findExtrema.findMinima(dataset, this->outputImage, this->matrixOperator, minOutType, allowEquals);
+            findExtrema.findMinima(dataset, this->outputImage, this->matrixOperator, minOutType, allowEquals, this->imageFormat, this->outDataType);
             
             GDALClose(dataset[0]);
             delete[] dataset;
@@ -1227,7 +1301,7 @@ void RSGISExeImageMorphology::runAlgorithm() throw(RSGISException)
             }
             
             RSGISImageMorphologyFindExtrema findExtrema;
-            findExtrema.findMinimaAll(dataset, this->outputImage, this->matrixOperator, minOutType, allowEquals);
+            findExtrema.findMinimaAll(dataset, this->outputImage, this->matrixOperator, minOutType, allowEquals, this->imageFormat, this->outDataType);
             
             GDALClose(dataset[0]);
             delete[] dataset;
@@ -1264,7 +1338,7 @@ void RSGISExeImageMorphology::runAlgorithm() throw(RSGISException)
             }
             
             RSGISImageMorphologyClosing morphClosing;
-            morphClosing.performClosing(dataset, this->outputImage, this->tempImage, this->useMemory, this->matrixOperator, this->numIterations);
+            morphClosing.performClosing(dataset, this->outputImage, this->tempImage, this->useMemory, this->matrixOperator, this->numIterations, this->imageFormat, this->outDataType);
             
             GDALClose(dataset);
         }
@@ -1300,7 +1374,7 @@ void RSGISExeImageMorphology::runAlgorithm() throw(RSGISException)
             }
             
             RSGISImageMorphologyOpening morphOpening;
-            morphOpening.performOpening(dataset, this->outputImage, this->tempImage, this->useMemory, this->matrixOperator, this->numIterations);
+            morphOpening.performOpening(dataset, this->outputImage, this->tempImage, this->useMemory, this->matrixOperator, this->numIterations, this->imageFormat, this->outDataType);
             
             GDALClose(dataset);
         }
@@ -1335,7 +1409,7 @@ void RSGISExeImageMorphology::runAlgorithm() throw(RSGISException)
             }
             
             RSGISImageMorphologyTopHat morphTopHat;
-            morphTopHat.performBlackTopHat(dataset, this->outputImage, this->tempImage, this->useMemory, this->matrixOperator);
+            morphTopHat.performBlackTopHat(dataset, this->outputImage, this->tempImage, this->useMemory, this->matrixOperator, this->imageFormat, this->outDataType);
         
             GDALClose(dataset);
         }
@@ -1370,7 +1444,7 @@ void RSGISExeImageMorphology::runAlgorithm() throw(RSGISException)
             }
             
             RSGISImageMorphologyTopHat morphTopHat;
-            morphTopHat.performWhiteTopHat(dataset, this->outputImage, this->tempImage, this->useMemory, this->matrixOperator);
+            morphTopHat.performWhiteTopHat(dataset, this->outputImage, this->tempImage, this->useMemory, this->matrixOperator, this->imageFormat, this->outDataType);
             
             GDALClose(dataset);
         }

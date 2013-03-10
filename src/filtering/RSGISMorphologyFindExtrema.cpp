@@ -29,7 +29,7 @@ namespace rsgis{namespace filter{
         
 	}
     
-    void RSGISImageMorphologyFindExtrema::findMinima(GDALDataset **datasets, std::string outputImage, rsgis::math::Matrix *matrixOperator, RSGISMinimaOutputs outputType, bool allowEquals) throw(rsgis::img::RSGISImageCalcException, rsgis::img::RSGISImageBandException)
+    void RSGISImageMorphologyFindExtrema::findMinima(GDALDataset **datasets, std::string outputImage, rsgis::math::Matrix *matrixOperator, RSGISMinimaOutputs outputType, bool allowEquals, std::string format, GDALDataType outDataType) throw(rsgis::img::RSGISImageCalcException, rsgis::img::RSGISImageBandException)
 	{
         if(matrixOperator->n != matrixOperator->m)
         {
@@ -41,7 +41,7 @@ namespace rsgis{namespace filter{
 		rsgis::img::RSGISCalcImage calcImg = rsgis::img::RSGISCalcImage(findMinima, "", true);
         try 
         {
-            calcImg.calcImageWindowData(datasets, 1, outputImage, matrixOperator->n);
+            calcImg.calcImageWindowData(datasets, 1, outputImage, matrixOperator->n, format, outDataType);
         }
         catch(rsgis::img::RSGISImageCalcException &e)
         {
@@ -54,7 +54,7 @@ namespace rsgis{namespace filter{
         delete findMinima;
 	}
     
-    void RSGISImageMorphologyFindExtrema::findMinimaAll(GDALDataset **datasets, std::string outputImage, rsgis::math::Matrix *matrixOperator, RSGISMinimaOutputs outputType, bool allowEquals) throw(rsgis::img::RSGISImageCalcException, rsgis::img::RSGISImageBandException)
+    void RSGISImageMorphologyFindExtrema::findMinimaAll(GDALDataset **datasets, std::string outputImage, rsgis::math::Matrix *matrixOperator, RSGISMinimaOutputs outputType, bool allowEquals, std::string format, GDALDataType outDataType) throw(rsgis::img::RSGISImageCalcException, rsgis::img::RSGISImageBandException)
 	{
         if(matrixOperator->n != matrixOperator->m)
         {
@@ -65,7 +65,7 @@ namespace rsgis{namespace filter{
 		rsgis::img::RSGISCalcImage calcImg = rsgis::img::RSGISCalcImage(findMinima, "", true);
         try 
         {
-            calcImg.calcImageWindowData(datasets, 1, outputImage, matrixOperator->n);
+            calcImg.calcImageWindowData(datasets, 1, outputImage, matrixOperator->n, format, outDataType);
         }
         catch(rsgis::img::RSGISImageCalcException &e)
         {

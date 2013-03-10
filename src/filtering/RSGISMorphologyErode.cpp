@@ -29,7 +29,7 @@ namespace rsgis{namespace filter{
 
 	}
 
-	void RSGISImageMorphologyErode::erodeImage(GDALDataset **datasets, std::string outputImage, rsgis::math::Matrix *matrixOperator) throw(rsgis::img::RSGISImageCalcException, rsgis::img::RSGISImageBandException)
+	void RSGISImageMorphologyErode::erodeImage(GDALDataset **datasets, std::string outputImage, rsgis::math::Matrix *matrixOperator, std::string format, GDALDataType outDataType) throw(rsgis::img::RSGISImageCalcException, rsgis::img::RSGISImageBandException)
 	{
         if(matrixOperator->n != matrixOperator->m)
         {
@@ -41,7 +41,7 @@ namespace rsgis{namespace filter{
 		rsgis::img::RSGISCalcImage calcImg = rsgis::img::RSGISCalcImage(erodeImage, "", true);
         try 
         {
-            calcImg.calcImageWindowData(datasets, 1, outputImage, matrixOperator->n);
+            calcImg.calcImageWindowData(datasets, 1, outputImage, matrixOperator->n, format, outDataType);
         }
         catch(rsgis::img::RSGISImageCalcException &e)
         {
@@ -54,7 +54,7 @@ namespace rsgis{namespace filter{
         delete erodeImage;
 	}
     
-    void RSGISImageMorphologyErode::erodeImageAll(GDALDataset **datasets, std::string outputImage, rsgis::math::Matrix *matrixOperator) throw(rsgis::img::RSGISImageCalcException, rsgis::img::RSGISImageBandException)
+    void RSGISImageMorphologyErode::erodeImageAll(GDALDataset **datasets, std::string outputImage, rsgis::math::Matrix *matrixOperator, std::string format, GDALDataType outDataType) throw(rsgis::img::RSGISImageCalcException, rsgis::img::RSGISImageBandException)
 	{
         if(matrixOperator->n != matrixOperator->m)
         {
@@ -65,7 +65,7 @@ namespace rsgis{namespace filter{
 		rsgis::img::RSGISCalcImage calcImg = rsgis::img::RSGISCalcImage(erodeImage, "", true);
         try 
         {
-            calcImg.calcImageWindowData(datasets, 1, outputImage, matrixOperator->n);
+            calcImg.calcImageWindowData(datasets, 1, outputImage, matrixOperator->n, format, outDataType);
         }
         catch(rsgis::img::RSGISImageCalcException &e)
         {
