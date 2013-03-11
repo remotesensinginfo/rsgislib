@@ -42,6 +42,7 @@
 #include "filtering/RSGISPrewittFilter.h"
 #include "filtering/RSGISStatsFilters.h"
 #include "filtering/RSGISSpeckleFilters.h"
+#include "filtering/RSGISNonLocalDenoising.h"
 
 #include <xercesc/dom/DOM.hpp>
 #include <xercesc/util/XMLString.hpp>
@@ -58,6 +59,7 @@ class RSGISExeFilterImages : public rsgis::RSGISAlgorithmParameters
 		{
 			none,
 			filter,
+            nldenoising,
 			exportfilterbank
 		};
 		
@@ -78,6 +80,8 @@ class RSGISExeFilterImages : public rsgis::RSGISAlgorithmParameters
         std::string imageFormat;
         std::string imageExt;
         GDALDataType outDataType;
+        double aPar;
+        double hPar;
 	};
 }
 
