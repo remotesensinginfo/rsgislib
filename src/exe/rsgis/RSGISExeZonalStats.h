@@ -143,6 +143,7 @@ class RSGISExeZonalStats : public RSGISAlgorithmParameters
 		bool meanAll;
 		bool stdDevAll;
         bool modeAll;
+        bool sumAll;
 		bool countAll;
 		bool minThreashAll;
 		bool maxThreashAll;
