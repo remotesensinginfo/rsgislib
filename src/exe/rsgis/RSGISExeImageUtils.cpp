@@ -3432,17 +3432,17 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
 			{
 				if (this->mosaicSkipVals)
 				{
-                    cout << "With Skip Values\n";
+                    std::cout << "Skipping pixel values = " << this->skipValue << " in band " << this->skipBand << std::endl;
 					mosaic.mosaicSkipVals(inputImages, this->numImages, this->outputImage, this->nodataValue, this->skipValue, this->projFromImage, this->proj, this->skipBand, this->imageFormat, this->outDataType);
 				}
 				else if (this->mosaicSkipThreash)
 				{
-                    cout << "With Skip Threshold\n";
+                    std::cout << "Skipping pixel values between " << this->skipLowerThreash << " and " << this->skipUpperThreash << " in band " << this->skipBand << std::endl;
 					mosaic.mosaicSkipThreash(inputImages, this->numImages, this->outputImage, this->nodataValue, this->skipLowerThreash, this->skipUpperThreash, this->projFromImage, this->proj, this->skipBand, this->imageFormat, this->outDataType);
 				}
 				else
 				{
-                    cout << "Just Mosaic\n";
+                    std::cout << "Simple mosaic (all pixels)" << std::endl;
 					mosaic.mosaic(inputImages, this->numImages, this->outputImage, this->nodataValue, this->projFromImage, this->proj, this->imageFormat, this->outDataType);
 				}
 
@@ -4870,11 +4870,11 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
                         yEndOverlap = yEnd - tileYOverlapMapUnits;
                         if(yStartOverlap > maxY) // Check tile will fit within image
                         {
-                            yStartOverlap = maxY;
+                            yStartOverlap = maxY+(0.5*abs(pixelYRes));
                         }
                         if(yEndOverlap < minY) // Check tile will fit within image
                         {
-                            yEndOverlap = minY;
+                            yEndOverlap = minY+(0.5*abs(pixelYRes));
                         }
                         
                         tileEnvelopes->push_back(new geos::geom::Envelope(xStartOverlap, xEndOverlap, yStartOverlap, yEndOverlap));
