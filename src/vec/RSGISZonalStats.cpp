@@ -1179,7 +1179,7 @@ namespace rsgis{namespace vec{
 		this->numAttributes = numAttributes;
 		this->outPxlCount = outPxlCount;
 		
-		int dataSize = (numAttributes * 6) + 1; // Create array large enough to hold min, max, mean and stdev for each attribute an number of pixels
+		int dataSize = (numAttributes * 7) + 1; // Create array large enough to hold min, max, mean and stdev for each attribute an number of pixels
 		
 		this->data = new double[dataSize];
 		
@@ -1211,11 +1211,12 @@ namespace rsgis{namespace vec{
 				std::string attAvg = attributes[i]->name + std::string("Avg");
 				std::string attStd = attributes[i]->name + std::string("Std");
 				std::string attMde = attributes[i]->name + std::string("Mde");
+                std::string attSum = attributes[i]->name + std::string("Sum");
 				std::string attPix = attributes[i]->name + std::string("Pix");
 				
 				//std::cout << "mean = " << this->data[3] << " count = " << this->data[5] << std::endl;
 				
-				int offset = (6 * i) + 1; // Offset by total number of stats + 1 for count
+				int offset = (7 * i) + 1; // Offset by total number of stats + 1 for count
 				
 				if (attributes[i]->outMin) 
 				{
@@ -1233,13 +1234,17 @@ namespace rsgis{namespace vec{
 				{
 					outFeature->SetField(outFeatureDefn->GetFieldIndex(attStd.c_str()), this->data[offset+3]);
 				}
-				if (attributes[i]->outMode) 
+				if (attributes[i]->outMode)
 				{
 					outFeature->SetField(outFeatureDefn->GetFieldIndex(attMde.c_str()), this->data[offset+4]);
 				}
-				if (attributes[i]->outCount) 
+                if (attributes[i]->outSum)
 				{
-					outFeature->SetField(outFeatureDefn->GetFieldIndex(attPix.c_str()), this->data[offset+5]);
+					outFeature->SetField(outFeatureDefn->GetFieldIndex(attSum.c_str()), this->data[offset+5]);
+				}
+				if (attributes[i]->outCount)
+				{
+					outFeature->SetField(outFeatureDefn->GetFieldIndex(attPix.c_str()), this->data[offset+6]);
 				}
 			}
 					
@@ -1282,6 +1287,7 @@ namespace rsgis{namespace vec{
 					std::string attAvg = attributes[i]->name + std::string("Avg");
                     std::string attStd = attributes[i]->name + std::string("Std");
 					std::string attMde = attributes[i]->name + std::string("Mde");
+                    std::string attSum = attributes[i]->name + std::string("Sum");
 					std::string attPix = attributes[i]->name + std::string("Pix");
 					
 					if (attributes[i]->outMin) 
@@ -1304,7 +1310,11 @@ namespace rsgis{namespace vec{
 					{
 						this->outZonalFile << "," << attMde;
 					}
-					if (attributes[i]->outCount) 
+                    if (attributes[i]->outSum)
+					{
+						this->outZonalFile << "," << attSum;
+					}
+					if (attributes[i]->outCount)
 					{
 						this->outZonalFile << "," << attPix;
 					}
@@ -1324,7 +1334,7 @@ namespace rsgis{namespace vec{
 			for(int i = 0; i < numAttributes; i++)
 			{
 				
-				int offset = (6 * i) + 1; // Offset by total number of stats + 1 for count
+				int offset = (7 * i) + 1; // Offset by total number of stats + 1 for count
 				
 				if (attributes[i]->outMin) 
 				{
@@ -1346,9 +1356,13 @@ namespace rsgis{namespace vec{
 				{
 					this->outZonalFile << "," << this->data[offset+4];
 				}
-				if (attributes[i]->outCount) 
+                if (attributes[i]->outSum)
 				{
 					this->outZonalFile << "," << this->data[offset+5];
+				}
+				if (attributes[i]->outCount)
+				{
+					this->outZonalFile << "," << this->data[offset+6];
 				}
 			}
 			if(outPxlCount)
@@ -1382,6 +1396,7 @@ namespace rsgis{namespace vec{
 			std::string attAvg = attributes[i]->name + std::string("Avg");
 			std::string attStd = attributes[i]->name + std::string("Std");
             std::string attMde = attributes[i]->name + std::string("Mde");
+            std::string attSum = attributes[i]->name + std::string("Sum");
 			std::string attPix = attributes[i]->name + std::string("Pix");
 			
 			if(attributes[i]->outMin)
@@ -1434,6 +1449,16 @@ namespace rsgis{namespace vec{
 				if( outputLayer->CreateField( &shpField ) != OGRERR_NONE )
 				{
 					std::string message = std::string("Creating shapefile field \'IntMode\' has failed");
+					throw RSGISVectorOutputException(message.c_str());
+				}
+			}
+            if(attributes[i]->outSum)
+			{
+				OGRFieldDefn shpField(attSum.c_str(), OFTReal);
+				shpField.SetPrecision(0);
+				if( outputLayer->CreateField( &shpField ) != OGRERR_NONE )
+				{
+					std::string message = std::string("Creating shapefile field \'outSum\' has failed");
 					throw RSGISVectorOutputException(message.c_str());
 				}
 			}
@@ -1542,12 +1567,14 @@ namespace rsgis{namespace vec{
 		 *	 mean attribute 1
 	     *	 stDev attribute 1
          *   mode attribute 1
+         *   sum attribute 1
 		 *   count attribute 1
 		 *   min attribute2
 		 *   max attribute 2
 		 *	 mean attribute 2
 	     *	 stDev attribute 2
          *   mode attribute 2
+         *   sum attribute 2
 		 *   count attribute 2
 		 *
 		 * This format is used to ensure compatibility with calc image
@@ -1564,20 +1591,20 @@ namespace rsgis{namespace vec{
 		
 		for(int i = 0; i < numAttributes; i++) // Loop through attributes
 		{
-			int offset = (6 * i) + 1; // Offset by total number of stats + 1 for count
+			int offset = (7 * i) + 1; // Offset by total number of stats + 1 for count
 			mean = 0;
 			sum = 0;
 			
-			for (unsigned int j = 0; j < values[i]->size(); j++) 
+			for (unsigned int j = 0; j < values[i]->size(); j++)
 			{
-				if (j == 0) 
+				if (j == 0)
 				{
 					pixVal = values[i]->at(j);
 					minVal = pixVal;
 					maxVal = pixVal;
 					sum = pixVal;
 				}
-				else 
+				else
 				{
 					pixVal = values[i]->at(j);
 					sum = sum + pixVal; // Add to sum
@@ -1590,8 +1617,9 @@ namespace rsgis{namespace vec{
 			// Add min to output data
 			outputValues[offset] = minVal;
 			outputValues[offset+1] = maxVal;
-			outputValues[offset+5] = values[i]->size();
-			
+			outputValues[offset+6] = values[i]->size();
+			outputValues[offset+5] = sum;
+            
 			//std::cout << "values[i]->size() " << values[i]->size() << std::endl;
 			
 			// Calculate mean
@@ -1604,7 +1632,7 @@ namespace rsgis{namespace vec{
 				// Calculate stdev
                 if(attributes[i]->outStDev)
                 {
-                    for (unsigned int j = 0; j < values[i]->size(); j++) 
+                    for (unsigned int j = 0; j < values[i]->size(); j++)
                     {
                         pixVal = values[i]->at(j);
                         sum = sum + ((pixVal - mean) * (pixVal - mean)); // (meanx - x)^2
@@ -1612,19 +1640,20 @@ namespace rsgis{namespace vec{
                     stDev = sqrt(sum / values[i]->size());
                     outputValues[offset+3] = stDev;
                 }
-                else 
+                else
                 {
                     outputValues[offset+3] = 0;
                 }
-
-
+                
+                
 			}
-			else 
+			else
 			{
 				// Set mean and standard deviation to zero
 				outputValues[offset+2] = 0;
 				outputValues[offset+3] = 0;
 			}
+            
             if(attributes[i]->outMode) // Calculate integer mode
             {
                 if(values[i]->size() > 0)
@@ -1674,6 +1703,7 @@ namespace rsgis{namespace vec{
                 else{outputValues[offset+4] = 0;}
             }
             else{outputValues[offset+4] = 0;}
+            
 		}
 		
 		return outputValues;
@@ -1704,7 +1734,7 @@ namespace rsgis{namespace vec{
 		this->outPxlCount = outPxlCount;
 		this->method = method;
 		
-		int dataSize = (numAttributes * 6) + 1; // Create array large enough to hold min, max, mean and stdev for each attribute an number of pixels
+		int dataSize = (numAttributes * 7) + 1; // Create array large enough to hold min, max, mean and stdev for each attribute an number of pixels
 		
 		this->data = new double[dataSize];
 		
@@ -1743,11 +1773,12 @@ namespace rsgis{namespace vec{
 				std::string attAvg = attributes[i]->name + std::string("Avg");
 				std::string attStd = attributes[i]->name + std::string("Std");
 				std::string attMde = attributes[i]->name + std::string("Mde");
+                std::string attSum = attributes[i]->name + std::string("Sum");
 				std::string attPix = attributes[i]->name + std::string("Pix");
 				
 				//std::cout << "mean = " << this->data[3] << " count = " << this->data[6] << " mode = " << this->data[5] << std::endl;
 				
-				int offset = (6 * i) + 1; // Offset by total number of stats + 1 for count
+				int offset = (7 * i) + 1; // Offset by total number of stats + 1 for count
 				          
 				if (attributes[i]->outMin) 
 				{
@@ -1769,9 +1800,13 @@ namespace rsgis{namespace vec{
 				{
 					outFeature->SetField(outFeatureDefn->GetFieldIndex(attMde.c_str()), this->data[offset+4]);
 				}
-				if (attributes[i]->outCount) 
+                if (attributes[i]->outSum)
 				{
-					outFeature->SetField(outFeatureDefn->GetFieldIndex(attPix.c_str()), this->data[offset+5]);
+					outFeature->SetField(outFeatureDefn->GetFieldIndex(attSum.c_str()), this->data[offset+5]);
+				}
+				if (attributes[i]->outCount)
+				{
+					outFeature->SetField(outFeatureDefn->GetFieldIndex(attPix.c_str()), this->data[offset+6]);
 				}
 			}
 			
@@ -1818,6 +1853,7 @@ namespace rsgis{namespace vec{
 					std::string attAvg = attributes[i]->name + std::string("Avg");
                     std::string attStd = attributes[i]->name + std::string("Std");
 					std::string attMde = attributes[i]->name + std::string("Mde");
+                    std::string attSum = attributes[i]->name + std::string("Sum");
 					std::string attPix = attributes[i]->name + std::string("Pix");
 					
 					if (attributes[i]->outMin) 
@@ -1840,7 +1876,11 @@ namespace rsgis{namespace vec{
 					{
 						this->outZonalFile << "," << attMde;
 					}
-					if (attributes[i]->outCount) 
+                    if (attributes[i]->outSum)
+					{
+						this->outZonalFile << "," << attSum;
+					}
+					if (attributes[i]->outCount)
 					{
 						this->outZonalFile << "," << attPix;
 					}
@@ -1860,7 +1900,7 @@ namespace rsgis{namespace vec{
 			for(int i = 0; i < numAttributes; i++)
 			{
 				
-				int offset = (6 * i) + 1; // Offset by total number of stats + 1 for count
+				int offset = (7 * i) + 1; // Offset by total number of stats + 1 for count
 				
 				if (attributes[i]->outMin) 
 				{
@@ -1882,9 +1922,13 @@ namespace rsgis{namespace vec{
 				{
 					this->outZonalFile << "," << this->data[offset+4];
 				}
-				if (attributes[i]->outCount) 
+                if (attributes[i]->outSum)
 				{
 					this->outZonalFile << "," << this->data[offset+5];
+				}
+				if (attributes[i]->outCount)
+				{
+					this->outZonalFile << "," << this->data[offset+6];
 				}
 			}
 			if(outPxlCount)
@@ -1918,6 +1962,7 @@ namespace rsgis{namespace vec{
 			std::string attAvg = attributes[i]->name + std::string("Avg");
 			std::string attStd = attributes[i]->name + std::string("Std");
             std::string attMde = attributes[i]->name + std::string("Mde");
+            std::string attSum = attributes[i]->name + std::string("Sum");
 			std::string attPix = attributes[i]->name + std::string("Pix");
 			
 			if(attributes[i]->outMin)
@@ -1966,6 +2011,16 @@ namespace rsgis{namespace vec{
             if(attributes[i]->outMode)
 			{
 				OGRFieldDefn shpField(attMde.c_str(), OFTReal);
+				shpField.SetPrecision(0);
+				if( outputLayer->CreateField( &shpField ) != OGRERR_NONE )
+				{
+					std::string message = std::string("Creating shapefile field \'IntMode\' has failed");
+					throw RSGISVectorOutputException(message.c_str());
+				}
+			}
+            if(attributes[i]->outSum)
+			{
+				OGRFieldDefn shpField(attSum.c_str(), OFTReal);
 				shpField.SetPrecision(0);
 				if( outputLayer->CreateField( &shpField ) != OGRERR_NONE )
 				{
@@ -2082,12 +2137,14 @@ namespace rsgis{namespace vec{
 		 *	 mean attribute 1
 	     *	 stDev attribute 1
          *   mode attribute 1
+         *   sum attribute 1
 		 *   count attribute 1
 		 *   min attribute2
 		 *   max attribute 2
 		 *	 mean attribute 2
 	     *	 stDev attribute 2
          *   mode attribute 2
+         *   sum attribute 2
 		 *   count attribute 2
 		 *
 		 * This format is used to ensure compatibility with calc image
@@ -2104,7 +2161,7 @@ namespace rsgis{namespace vec{
 		
 		for(int i = 0; i < numAttributes; i++) // Loop through attributes
 		{
-			int offset = (6 * i) + 1; // Offset by total number of stats + 1 for count
+			int offset = (7 * i) + 1; // Offset by total number of stats + 1 for count
 			mean = 0;
 			sum = 0;
 			
@@ -2130,8 +2187,9 @@ namespace rsgis{namespace vec{
 			// Add min to output data
 			outputValues[offset] = minVal;
 			outputValues[offset+1] = maxVal;
-			outputValues[offset+5] = values[i]->size();
-			
+			outputValues[offset+6] = values[i]->size();
+			outputValues[offset+5] = sum;
+            
 			//std::cout << "values[i]->size() " << values[i]->size() << std::endl;
 			
 			// Calculate mean

@@ -96,6 +96,7 @@ namespace rsgis
 			bool outStDev;
 			bool outCount;
             bool outMode;
+            bool outSum;
 			int *bands;
 			float *minThreasholds;
 			float *maxThreasholds;
@@ -171,14 +172,20 @@ namespace rsgis
 			/** Calculte statistics and save to data array
 			 *  Array is in the form:
 			 *	 totalPix
-			 *   min attribute1
-			 *   min attribute 2
-			 *   max attribute 1
-			 *   max attribute 2
-			 *	 mean attribute 1
-			 *   mean attribute 2
-			 *	 stDev attribute 1
-			 *	 stDev attribute 2
+             *   min attribute1
+             *   max attribute 1
+             *	 mean attribute 1
+             *	 stDev attribute 1
+             *   mode attribute 1
+             *   sum attribute 1
+             *   count attribute 1
+             *   min attribute2
+             *   max attribute 2
+             *	 mean attribute 2
+             *	 stDev attribute 2
+             *   mode attribute 2
+             *   sum attribute 2
+             *   count attribute 2
 			 *
 			 * This format is used to ensure compatibility with calc image
 			 */
@@ -231,14 +238,20 @@ namespace rsgis
 			/** Calculte statistics and save to data array
 			 *  Array is in the form:
 			 *	 totalPix
-			 *   min attribute1
-			 *   min attribute 2
-			 *   max attribute 1
-			 *   max attribute 2
-			 *	 mean attribute 1
-			 *   mean attribute 2
-			 *	 stDev attribute 1
-			 *	 stDev attribute 2
+             *   min attribute1
+             *   max attribute 1
+             *	 mean attribute 1
+             *	 stDev attribute 1
+             *   mode attribute 1
+             *   sum attribute 1
+             *   count attribute 1
+             *   min attribute2
+             *   max attribute 2
+             *	 mean attribute 2
+             *	 stDev attribute 2
+             *   mode attribute 2
+             *   sum attribute 2
+             *   count attribute 2
 			 *
 			 * This format is used to ensure compatibility with calc image
 			 */
