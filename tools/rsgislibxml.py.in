@@ -34,16 +34,22 @@
 # Version 1.2 - Added full file header to the outputted XML file
 # Version 1.3 - Changed to names rather than symbols in template
 #             - Defaults to single file, non-recursive
+# Version 1.4 - Updated to use argparse, interface now more consistent 
+#               with other tools. (Dan Clewley - 11/03/2013)
 #
 #############################################################################
 
 import os.path
 import sys
+import argparse
 from time import strftime
 
 class RSGISLibXML (object):
 
     def checkFileExtension(self, filename, extension):
+        # Add dot to start of extension if there isn't one.
+        if extension[0] != '.':
+            extension = '.' + extension
         foundExtension = False;
         filenamesplit = os.path.splitext(filename)
         fileExtension = filenamesplit[1].strip()
@@ -158,70 +164,77 @@ class RSGISLibXML (object):
         outputShellFile.close()
 
     def run(self):
-        numArgs = len(sys.argv)
-        if numArgs >= 6:
-            dir = sys.argv[1].strip()
-            extension = sys.argv[2].strip()
-            path = sys.argv[3].strip()
-            outfile = sys.argv[4].strip()
-            xmloutlineFile = sys.argv[5].strip()
-            if numArgs == 8:
-                recurse = sys.argv[6].strip()
-                outputtype = sys.argv[7].strip()
-            elif numArgs == 7:
-                print 'Need to specify both output_type and recurse options'
-            else:
-                print 'No output_type provided. Specify using.'
-                print ' --output_type=single or --output_type=multiple'
-                print 'Defaulting to single'
-                
-                print 'No recurse option provided. Specify using:'
-                print ' --recurse=yes or --recurse=no'
-                print 'Defaulting to no.'
-                    
-                recurse = '--output_type=single'
-                outputtype = '--recurse=no'
-                
-            filelist = list()
 
-            if(str(recurse) == '--recurse=yes'):
-                self.findFilesIterative(filelist, dir, extension)
-            elif(str(recurse) == '--recurse=no'):
-                self.findFiles(filelist, dir, extension)
+        # Print script info
+        self.scriptInfo()
 
-            if os.path.exists(xmloutlineFile):
-                xmloutline = self.readInputTemplate(xmloutlineFile)
-                if str(outputtype) == '--output_type=single':
-                    self.constructXMLFile(filelist, xmloutline, outfile, path)
-                    print 'Commands written to single XML file'
-                    print 'Run using:\n rsgisexe -x ' + outfile
-                elif str(outputtype) == '--output_type=multiple':
-                    self.constructMultipleXMLFiles(filelist, xmloutline, outfile, path)
-                    print 'Commands written to multiple XML files and shell script generated'
-                    print 'Run using:\n sh ' + outfile + '_exe_all.sh'
+        parser = argparse.ArgumentParser()
+        parser.add_argument("-i", "--input", dest="xmloutlineFile", type=str, help="Input XML template")
+        parser.add_argument("-o", "--output", type=str, dest="outfile", help="Output XML")
+        parser.add_argument("-p", "--path", type=str, dest="path", help="Path used to replace '$PATH' in XML template.")
+        parser.add_argument("-e", "--ext", type=str, dest="extension", help="File extension to search for.")
+        parser.add_argument("-d", "--dir", type=str, dest="dir", help="Directory to search for files with the extension specified by '-e'.")
+        parser.add_argument("-r", "--recurse", type=str, dest="recurse", default='no', help="Recurse into sub directorises within input directory (yes | no).")
+        parser.add_argument("-t", "--output_type", type=str, dest="outputtype", default='single', help="Output type:\n single - single XML file\n multiple - seperate XML file for each file found.")
 
-            else:
-                print 'Input File does not exist'
+        args = parser.parse_args()    
 
+        if args.xmloutlineFile is None:
+            print "Input XML template must be set."
+            parser.print_help()
+            sys.exit()
+            
+        if args.outfile is None:
+            print "Output XML must be set."
+            parser.print_help()
+            sys.exit()
 
+        if args.extension is None:
+            print "Extension must be set."
+            parser.print_help()
+            sys.exit()
+        
+        if args.dir is None:
+            print "Directory must be set."
+            parser.print_help()
+            sys.exit()
+        
+        if args.path is None:
+            print "WARNING: No path set, assuming the same as search directory:"
+            print args.dir
+            args.path = args.dir
+        
+        filelist = list()
+
+        if(args.recurse == 'yes'):
+            self.findFilesIterative(filelist, args.dir, args.extension)
+        elif(args.recurse == 'no'):
+            self.findFiles(filelist, args.dir, args.extension)
+
+        if os.path.exists(args.xmloutlineFile):
+            xmloutline = self.readInputTemplate(args.xmloutlineFile)
+            if args.outputtype == 'single':
+                # Check file has XML extension and add if not
+                if os.path.splitext(args.outfile)[1] != '.xml':
+                    args.outfile = args.outfile + '.xml'
+                self.constructXMLFile(filelist, xmloutline, args.outfile, args.path)
+                print 'Commands written to single XML file'
+                print 'Run using:\n rsgisexe -x ' + args.outfile
+            elif args.outputtype == 'multiple':
+                # Get rid of .xml extension if provided for outfile
+                args.outfile = args.outfile.replace('.xml','')
+                self.constructMultipleXMLFiles(filelist, xmloutline, args.outfile, args.path)
+                print 'Commands written to multiple XML files and shell script generated'
+                print 'Run using:\n sh ' + args.outfile + '_exe_all.sh'
 
         else:
-            self.help()
+            print 'Input File does not exist'
 
-    def help(self):
+
+    def scriptInfo(self):
         print 'rsgislibxml.py script generates the XML commands for the '
         print '@PACKAGE@ software library from a user defined template'
-        print 'Usage: python rsgislibxml.py <DIR> <EXT> <PATH> <OUTPUT> <TEMPLATE> --recurse=yes|no --output_type=single|multiple'
-        print '\t<DIR> - input directory of the files to be processed.'
-        print '\t<EXT> - file extension of the files of interest.'
-        print '\t<PATH> - path used for subsitution'
-        print '\t<OUTPUT> - the output xml file'
-        print '\t<TEMPLETE> - the xml template'
-        print '\t\t $FILEPATH - Replaced with full file path'
-        print '\t\t $FILENAME - Replaced with file name'
-        print '\t\t $PATH - Replaced with <PATH>'
-        print '\t --recurse - whether the input <DIR> should be iteratively recused for files ending <EXT>.'
-        print '\t --output_type - whether a single or multiple xml file(s) will be creates. If mutliple is selected a shell script to run all xml files will also be generated.'
+        print ''
         print '\nThis script was distributed with @RSGISLIB_PACKAGE_STRING@'
         print 'Copyright (C) @RSGISLIB_COPYRIGHT_YEAR@ Peter Bunting and Daniel Clewley'
         print 'For maintainance email @RSGISLIB_PACKAGE_BUGREPORT@'
