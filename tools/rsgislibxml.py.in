@@ -175,7 +175,7 @@ class RSGISLibXML (object):
         parser.add_argument("-e", "--ext", type=str, dest="extension", help="File extension to search for.")
         parser.add_argument("-d", "--dir", type=str, dest="dir", help="Directory to search for files with the extension specified by '-e'.")
         parser.add_argument("-r", "--recurse", type=str, dest="recurse", default='no', help="Recurse into sub directorises within input directory (yes | no).")
-        parser.add_argument("-t", "--output_type", type=str, dest="outputtype", default='single', help="Output type:\n single - single XML file\n multiple - seperate XML file for each file found.")
+        parser.add_argument("-t", "--output_type", type=str, dest="outputtype", default='single', help="Output type (single - single XML file | multiple - seperate XML file for each file found).")
 
         args = parser.parse_args()    
 
@@ -235,9 +235,15 @@ class RSGISLibXML (object):
         print 'rsgislibxml.py script generates the XML commands for the '
         print '@PACKAGE@ software library from a user defined template'
         print ''
-        print '\nThis script was distributed with @RSGISLIB_PACKAGE_STRING@'
+        print 'This script was distributed with @RSGISLIB_PACKAGE_STRING@'
         print 'Copyright (C) @RSGISLIB_COPYRIGHT_YEAR@ Peter Bunting and Daniel Clewley'
         print 'For maintainance email @RSGISLIB_PACKAGE_BUGREPORT@'
+        print ''
+        print 'Within XML Template (--input):'
+        print '\t$FILEPATH - Replaced with full file path'
+        print '\t$FILENAME - Replaced with file name'
+        print '\t$PATH - Replaced with path (--path)'
+        print ''
 
 if __name__ == '__main__':
     obj = RSGISLibXML()
