@@ -57,10 +57,6 @@ namespace rsgis {namespace math{
 				double calcMeanErrorGSLMatrixQuiet(gsl_matrix *dataXY);
 				~RSGISPolyFit();
 			private:
-				int order;
-				gsl_matrix inData;
-				int numX;
-				int numY;
  			};
 }}
 

@@ -34,8 +34,8 @@ namespace rsgis { namespace radar {
 		double h = gsl_vector_get(predictParams, 0);
 		double d = gsl_vector_get(predictParams, 1);
 		
-		std::string coeffHVFile = "/Users/danclewley/Documents/Research/PhD/Inversion/Coefficients/ALOS_24/Canopy/alos_24_cDepth_cDens_total_hv_coeff.mtxt";
-		std::string coeffFPCFile = "/Users/danclewley/Documents/Research/PhD/Inversion/Coefficients/ALOS_24/Canopy/alos_24_cDepth_cDens_fpc_coeff.mtxt";
+		std::string coeffHVFile = "";
+		std::string coeffFPCFile = "";
 		gsl_matrix *coeffHV = matrixUtils.readGSLMatrixFromTxt(coeffHVFile);
 		gsl_matrix *coeffFPC = matrixUtils.readGSLMatrixFromTxt(coeffFPCFile);
 

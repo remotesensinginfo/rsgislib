@@ -2244,7 +2244,6 @@ namespace rsgis {namespace radar
 			this->aPrioriPar = gsl_vector_alloc(2);
 			gsl_vector_memcpy(this->aPrioriPar, aPrioriPar);
 			this->covMatrixP = covMatrixP;
-			//this->covMatrixPScale = covMatrixP;
 			this->invCovMatrixD = invCovMatrixD;
 			this->ittmax = ittmax;
 			this->minError = minError;
@@ -2302,25 +2301,6 @@ namespace rsgis {namespace radar
 
 			// Set initial error to 1 (100%)
 			gsl_vector_set(outParError, nPar, 1);
-
-			// Calcualte aPriori matrix based on data.
-			/*gsl_matrix_set_zero(covMatrixP);
-
-			 height = gsl_vector_get(estimatedPar, 0);
-			 density = gsl_vector_get(estimatedPar, 1);
-
-			double sumSigma = (gsl_vector_get(inSigma0dB, 0)*gsl_vector_get(inSigma0dB, 0) + gsl_vector_get(inSigma0dB, 1)*gsl_vector_get(inSigma0dB, 1));
-            double pCov1 = sumSigma / (2*(height*height));
-            double pCov2 = pCov1 *  (height*height / density*density);
-
-			gsl_matrix_set(covMatrixP, 0, 0, gsl_matrix_get(covMatrixPScale, 0, 0)*pCov1);
-			gsl_matrix_set(covMatrixP, 1, 1, gsl_matrix_get(covMatrixPScale, 1, 1)*pCov2);
-
-			matrixUtils.inv2x2GSLMatrix(covMatrixP, this->invCovMatrixP);
-
-			std::cout << "covMatrixP" << std::endl;
-			matrixUtils.printGSLMatrix(covMatrixP);
-			*/
 
 			// START ITTERATING
 			for(int itt = 0; itt < ittmax;itt++)
