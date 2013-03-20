@@ -26,7 +26,7 @@ set (PROJECT_TOOLS_DIR tools)
 set (PROJECT_XML_DIR xml_standards)
 
 # The version number.
-set (RSGISLIB_HG_COMMIT 345)
+set (RSGISLIB_HG_COMMIT 354)
 set (RSGISLIB_VERSION_MAJOR 2)
 set (RSGISLIB_VERSION_MINOR 0)
 set (RSGISLIB_VERSION_PATCH 0)
@@ -183,6 +183,9 @@ set(GMP_LIB_PATH /usr/local/lib CACHE PATH "Library PATH for GMP")
 set(MPFR_INCLUDE_DIR /usr/local/include CACHE PATH "Include PATH for MPFR")
 set(MPFR_LIB_PATH /usr/local/lib CACHE PATH "Library PATH for MPFR")
 
+set(KEA_INCLUDE_DIR /usr/local/include CACHE PATH "Include PATH for KEA")
+set(KEA_LIB_PATH /usr/local/lib CACHE PATH "Library PATH for KEA")
+
 ###############################################################################
 
 ###############################################################################
@@ -317,6 +320,9 @@ set(GMP_LIBRARIES -L${GMP_LIB_PATH} -lgmp)
 
 include_directories(${MPFR_INCLUDE_DIR})
 set(MPFR_LIBRARIES -L${MPFR_LIB_PATH} -lmpfr)
+
+include_directories(${KEA_INCLUDE_DIR})
+set(KEA_LIBRARIES -L${KEA_LIB_PATH} -lkea)
 
 ###############################################################################
 
