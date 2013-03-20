@@ -167,7 +167,8 @@ set(LIB_FILTERING_H
 	${RSGIS_SRC_FILTERING_DIR}/RSGISMorphologyClosing.h
 	${RSGIS_SRC_FILTERING_DIR}/RSGISMorphologyOpening.h
 	${RSGIS_SRC_FILTERING_DIR}/RSGISMorphologyTopHat.h
-	${RSGIS_SRC_FILTERING_DIR}/RSGISSpeckleFilters.h)
+	${RSGIS_SRC_FILTERING_DIR}/RSGISSpeckleFilters.h
+	${RSGIS_SRC_FILTERING_DIR}/RSGISNonLocalDenoising.h)
 	
 set(LIB_FILTERING_CPP
 	${RSGIS_SRC_FILTERING_DIR}/RSGISCalcFilter.h
@@ -204,7 +205,10 @@ set(LIB_FILTERING_CPP
 	${RSGIS_SRC_FILTERING_DIR}/RSGISMorphologyOpening.cpp
 	${RSGIS_SRC_FILTERING_DIR}/RSGISMorphologyOpening.h
 	${RSGIS_SRC_FILTERING_DIR}/RSGISMorphologyTopHat.cpp
-	${RSGIS_SRC_FILTERING_DIR}/RSGISMorphologyTopHat.h )
+	${RSGIS_SRC_FILTERING_DIR}/RSGISMorphologyTopHat.h 
+	${RSGIS_SRC_FILTERING_DIR}/RSGISNonLocalDenoising.cpp
+	${RSGIS_SRC_FILTERING_DIR}/RSGISNonLocalDenoising.h)
+
 ###############################################################################
 
 ###############################################################################
