@@ -51,7 +51,7 @@ namespace rsgis{namespace rastergis{
     {
     public:
         RSGISCreateImageTileMasks();
-        void createTileMasks(GDALDataset *image, std::string outputBase, std::string format, std::string ext, bool useOverlap, float overlap) throw(rsgis::RSGISImageException);
+        void createTileMasks(GDALDataset *image, std::string outputBase, std::string format, std::string ext, bool useOverlap, float overlap, bool growOverlap) throw(rsgis::RSGISImageException);
         ~RSGISCreateImageTileMasks();
     };
     

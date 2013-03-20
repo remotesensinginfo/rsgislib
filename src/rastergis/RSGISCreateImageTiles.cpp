@@ -30,7 +30,7 @@ namespace rsgis{namespace rastergis{
         
     }
     
-    void RSGISCreateImageTileMasks::createTileMasks(GDALDataset *image, std::string outputBase, std::string format, std::string ext, bool useOverlap, float overlap) throw(rsgis::RSGISImageException)
+    void RSGISCreateImageTileMasks::createTileMasks(GDALDataset *image, std::string outputBase, std::string format, std::string ext, bool useOverlap, float overlap, bool growOverlap) throw(rsgis::RSGISImageException)
     {
         try
         {
@@ -113,7 +113,7 @@ namespace rsgis{namespace rastergis{
                         throw RSGISImageException(message.c_str());
                     }
                     
-                    if(useOverlap)
+                    if(useOverlap & growOverlap)
                     {
                         // Now grow the overlap region.
                         std::cout << "Grow the overlap region\n";

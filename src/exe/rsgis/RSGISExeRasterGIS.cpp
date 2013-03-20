@@ -66,6 +66,10 @@ namespace rsgisexe{
         XMLCh *optionMaxLikelihoodClassifier = xercesc::XMLString::transcode("maxlikelihoodclassifier");
         XMLCh *optionMaxLikelihoodClassifierLocalPriors = xercesc::XMLString::transcode("maxlikelihoodclassifierlocalpriors");
         XMLCh *optionClassMask = xercesc::XMLString::transcode("classmask");
+        XMLCh *optionFindNeighbours = xercesc::XMLString::transcode("findneighbours");
+        XMLCh *optionFindBoundaryPixels = xercesc::XMLString::transcode("findboundarypixels");
+        XMLCh *optionCalcBorderLength = xercesc::XMLString::transcode("calcborderlength");
+        XMLCh *optionCalcRelBorderLength = xercesc::XMLString::transcode("calcrelborderlength");
         
         const XMLCh *algorNameEle = argElement->getAttribute(algorXMLStr);
         if(!xercesc::XMLString::equals(algorName, algorNameEle))
@@ -2348,6 +2352,195 @@ namespace rsgisexe{
             
             
         }
+        else if(xercesc::XMLString::equals(optionFindNeighbours, optionXML))
+        {
+            this->option = RSGISExeRasterGIS::findneighbours;
+            
+            XMLCh *clumpsXMLStr = xercesc::XMLString::transcode("clumps");
+            if(argElement->hasAttribute(clumpsXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(clumpsXMLStr));
+                this->inputImage = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'clumps\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&clumpsXMLStr);
+            
+        }
+        else if(xercesc::XMLString::equals(optionFindBoundaryPixels, optionXML))
+        {
+            this->option = RSGISExeRasterGIS::findboundarypixels;
+            
+            XMLCh *clumpsXMLStr = xercesc::XMLString::transcode("clumps");
+            if(argElement->hasAttribute(clumpsXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(clumpsXMLStr));
+                this->inputImage = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'clumps\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&clumpsXMLStr);
+            
+            XMLCh *outputXMLStr = xercesc::XMLString::transcode("output");
+            if(argElement->hasAttribute(outputXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outputXMLStr));
+                this->outputFile = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&outputXMLStr);
+            
+            // Set output image fomat (defaults to KEA)
+            this->imageFormat = "KEA";
+            XMLCh *formatXMLStr = xercesc::XMLString::transcode("format");
+            if(argElement->hasAttribute(formatXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(formatXMLStr));
+                this->imageFormat = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            xercesc::XMLString::release(&formatXMLStr);
+        }
+        else if(xercesc::XMLString::equals(optionCalcBorderLength, optionXML))
+        {
+            this->option = RSGISExeRasterGIS::calcborderlength;
+            
+            XMLCh *clumpsXMLStr = xercesc::XMLString::transcode("clumps");
+            if(argElement->hasAttribute(clumpsXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(clumpsXMLStr));
+                this->inputImage = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'clumps\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&clumpsXMLStr);
+            
+            XMLCh *ignoreZeroEdgesXMLStr = xercesc::XMLString::transcode("ignorezeroedges");
+            if(argElement->hasAttribute(ignoreZeroEdgesXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(ignoreZeroEdgesXMLStr));
+                std::string ignoreZeroEdgesStr = std::string(charValue);
+                if(ignoreZeroEdgesStr == "yes")
+                {
+                    this->ignoreZeroEdges = true;
+                }
+                else
+                {
+                    this->ignoreZeroEdges = false;
+                }
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'ignorezeroedges\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&ignoreZeroEdgesXMLStr);
+            
+            XMLCh *colNameXMLStr = xercesc::XMLString::transcode("colname");
+            if(argElement->hasAttribute(colNameXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(colNameXMLStr));
+                this->outColsName = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'colname\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&colNameXMLStr);
+            
+        }
+        else if(xercesc::XMLString::equals(optionCalcRelBorderLength, optionXML))
+        {
+            this->option = RSGISExeRasterGIS::calcrelborder;
+            
+            XMLCh *clumpsXMLStr = xercesc::XMLString::transcode("clumps");
+            if(argElement->hasAttribute(clumpsXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(clumpsXMLStr));
+                this->inputImage = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'clumps\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&clumpsXMLStr);
+            
+            XMLCh *ignoreZeroEdgesXMLStr = xercesc::XMLString::transcode("ignorezeroedges");
+            if(argElement->hasAttribute(ignoreZeroEdgesXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(ignoreZeroEdgesXMLStr));
+                std::string ignoreZeroEdgesStr = std::string(charValue);
+                if(ignoreZeroEdgesStr == "yes")
+                {
+                    this->ignoreZeroEdges = true;
+                }
+                else
+                {
+                    this->ignoreZeroEdges = false;
+                }
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'ignorezeroedges\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&ignoreZeroEdgesXMLStr);
+            
+            XMLCh *colNameXMLStr = xercesc::XMLString::transcode("colname");
+            if(argElement->hasAttribute(colNameXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(colNameXMLStr));
+                this->outColsName = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'colname\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&colNameXMLStr);
+            
+            XMLCh *classColumnXMLStr = xercesc::XMLString::transcode("classcolumn");
+            if(argElement->hasAttribute(classColumnXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(classColumnXMLStr));
+                this->classNameField = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'classcolumn\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&classColumnXMLStr);
+            
+            XMLCh *classNameXMLStr = xercesc::XMLString::transcode("classname");
+            if(argElement->hasAttribute(classNameXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(classNameXMLStr));
+                this->className = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'classname\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&classNameXMLStr);
+            
+        }
         else
         {
             std::string message = std::string("The option (") + std::string(xercesc::XMLString::transcode(optionXML)) + std::string(") is not known: RSGISExeRasterGIS.");
@@ -2380,6 +2573,10 @@ namespace rsgisexe{
         xercesc::XMLString::release(&optionMaxLikelihoodClassifier);
         xercesc::XMLString::release(&optionMaxLikelihoodClassifierLocalPriors);
         xercesc::XMLString::release(&optionClassMask);
+        xercesc::XMLString::release(&optionFindNeighbours);
+        xercesc::XMLString::release(&optionFindBoundaryPixels);
+        xercesc::XMLString::release(&optionCalcBorderLength);
+        xercesc::XMLString::release(&optionCalcRelBorderLength);
     }
     
     void RSGISExeRasterGIS::runAlgorithm() throw(rsgis::RSGISException)
@@ -3321,6 +3518,134 @@ namespace rsgisexe{
                     throw e;
                 }
             }
+            else if(this->option == RSGISExeRasterGIS::findneighbours)
+            {
+                std::cout << "A command to find the clump neighbours.\n";
+                std::cout << "Input Image: " << this->inputImage << std::endl;
+                
+                try
+                {
+                    GDALAllRegister();
+                    
+                    GDALDataset *inputDataset = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_Update);
+                    if(inputDataset == NULL)
+                    {
+                        std::string message = std::string("Could not open image ") + this->inputImage;
+                        throw rsgis::RSGISImageException(message.c_str());
+                    }
+                    
+                    rsgis::rastergis::RSGISFindClumpNeighbours findNeighboursObj;
+                    findNeighboursObj.findNeighboursKEAImageCalc(inputDataset);
+                    
+                    GDALClose(inputDataset);
+                }
+                catch(rsgis::RSGISException &e)
+                {
+                    throw e;
+                }
+            }
+            else if(this->option == RSGISExeRasterGIS::findboundarypixels)
+            {
+                std::cout << "A command to identify the pixels on the boundary of the clumps.\n";
+                std::cout << "Input Image: " << this->inputImage << std::endl;
+                std::cout << "Output Image: " << this->outputFile << std::endl;
+                std::cout << "Output Image Format: " << this->imageFormat << std::endl;
+                
+                try
+                {
+                    GDALAllRegister();
+                    
+                    GDALDataset *inputDataset = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_Update);
+                    if(inputDataset == NULL)
+                    {
+                        std::string message = std::string("Could not open image ") + this->inputImage;
+                        throw rsgis::RSGISImageException(message.c_str());
+                    }
+                    
+                    rsgis::img::RSGISCalcImageValue *findBoundaries = new rsgis::rastergis::RSGISIdentifyBoundaryPixels();
+                    rsgis::img::RSGISCalcImage imgCalc = rsgis::img::RSGISCalcImage(findBoundaries);
+                    
+                    imgCalc.calcImageWindowData(&inputDataset, 1, this->outputFile, 3, this->imageFormat, GDT_Byte);
+                    
+                    GDALClose(inputDataset);
+                }
+                catch(rsgis::RSGISException &e)
+                {
+                    throw e;
+                }
+            }
+            else if(this->option == RSGISExeRasterGIS::calcborderlength)
+            {
+                std::cout << "A command to calculate the border length of the clumps.\n";
+                std::cout << "Input Image: " << this->inputImage << std::endl;
+                std::cout << "Output Column: " << this->outColsName << std::endl;
+                if(ignoreZeroEdges)
+                {
+                    std::cout << "Ignoring zero edges on clumps\n";
+                }
+                else
+                {
+                    std::cout << "Not ignoring zero edges on clumps\n";
+                }
+                
+                try
+                {
+                    GDALAllRegister();
+                    
+                    GDALDataset *inputDataset = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_Update);
+                    if(inputDataset == NULL)
+                    {
+                        std::string message = std::string("Could not open image ") + this->inputImage;
+                        throw rsgis::RSGISImageException(message.c_str());
+                    }
+                    
+                    rsgis::rastergis::RSGISClumpBorders clumpBorders;
+                    clumpBorders.calcClumpBorderLength(inputDataset, !ignoreZeroEdges, this->outColsName);
+                    
+                    GDALClose(inputDataset);
+                }
+                catch(rsgis::RSGISException &e)
+                {
+                    throw e;
+                }
+            }
+            else if(this->option == RSGISExeRasterGIS::calcrelborder)
+            {
+                std::cout << "A command to calculate the relative border length of the clumps to a class.\n";
+                std::cout << "Input Image: " << this->inputImage << std::endl;
+                std::cout << "Output Column: " << this->outColsName << std::endl;
+                std::cout << "Class Names Column: " << this->classNameField << std::endl;
+                std::cout << "Class Name: " << this->className << std::endl;
+                if(ignoreZeroEdges)
+                {
+                    std::cout << "Ignoring zero edges on clumps\n";
+                }
+                else
+                {
+                    std::cout << "Not ignoring zero edges on clumps\n";
+                }
+                
+                try
+                {
+                    GDALAllRegister();
+                    
+                    GDALDataset *inputDataset = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_Update);
+                    if(inputDataset == NULL)
+                    {
+                        std::string message = std::string("Could not open image ") + this->inputImage;
+                        throw rsgis::RSGISImageException(message.c_str());
+                    }
+                    
+                    rsgis::rastergis::RSGISClumpBorders clumpBorders;
+                    clumpBorders.calcClumpRelBorderLen2Class(inputDataset, !ignoreZeroEdges, this->outColsName, this->classNameField, this->className);
+                    
+                    GDALClose(inputDataset);
+                }
+                catch(rsgis::RSGISException &e)
+                {
+                    throw e;
+                }
+            }
             else
             {
                 throw rsgis::RSGISException("The option is not recognised: RSGISExeRasterGIS");
@@ -3575,6 +3900,41 @@ namespace rsgisexe{
                 std::cout << "Class Name: " << this->className << std::endl;
                 std::cout << "Output Format: " << this->imageFormat << std::endl;
                 std::cout << "Output File: " << this->outputFile << std::endl;
+            }
+            else if(this->option == RSGISExeRasterGIS::findneighbours)
+            {
+                std::cout << "A command to find the clump neighbours.\n";
+                std::cout << "Input Image: " << this->inputImage << std::endl;
+            }
+            else if(this->option == RSGISExeRasterGIS::calcborderlength)
+            {
+                std::cout << "A command to calculate the border length of the clumps.\n";
+                std::cout << "Input Image: " << this->inputImage << std::endl;
+                std::cout << "Output Column: " << this->outColsName << std::endl;
+                if(ignoreZeroEdges)
+                {
+                    std::cout << "Ignoring zero edges on clumps\n";
+                }
+                else
+                {
+                    std::cout << "Not ignoring zero edges on clumps\n";
+                }
+            }
+            else if(this->option == RSGISExeRasterGIS::calcrelborder)
+            {
+                std::cout << "A command to calculate the relative border length of the clumps to a class.\n";
+                std::cout << "Input Image: " << this->inputImage << std::endl;
+                std::cout << "Output Column: " << this->outColsName << std::endl;
+                std::cout << "Class Names Column: " << this->classNameField << std::endl;
+                std::cout << "Class Name: " << this->className << std::endl;
+                if(ignoreZeroEdges)
+                {
+                    std::cout << "Ignoring zero edges on clumps\n";
+                }
+                else
+                {
+                    std::cout << "Not ignoring zero edges on clumps\n";
+                }
             }
             else
             {

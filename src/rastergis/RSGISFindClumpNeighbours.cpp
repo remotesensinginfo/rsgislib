@@ -570,10 +570,550 @@ namespace rsgis{namespace rastergis{
             throw e;
         }
     }
+    
+    void RSGISFindClumpNeighbours::findNeighboursKEAImageCalc(GDALDataset *clumpImage) throw(rsgis::img::RSGISImageCalcException)
+    {
+        try
+        {
+            libkea::KEAImageIO *keaImgIO;
+            void *internalData = clumpImage->GetInternalHandle("");
+            if(internalData != NULL)
+            {
+                try
+                {
+                    keaImgIO = static_cast<libkea::KEAImageIO*>(internalData);
+                    
+                    if((keaImgIO == NULL) | (keaImgIO == 0))
+                    {
+                        throw rsgis::img::RSGISImageCalcException("Could not get hold of the internal KEA Image IO Object - was ");
+                    }
+                }
+                catch(boost::numeric::negative_overflow& e)
+                {
+                    throw rsgis::img::RSGISImageCalcException(e.what());
+                }
+                catch(boost::numeric::positive_overflow& e)
+                {
+                    throw rsgis::img::RSGISImageCalcException(e.what());
+                }
+                catch(boost::numeric::bad_numeric_cast& e)
+                {
+                    throw rsgis::img::RSGISImageCalcException(e.what());
+                }
+            }
+            else
+            {
+                throw rsgis::img::RSGISImageCalcException("Internal data on GDAL Dataset was NULL - check input file is KEA.");
+            }
+            
+            libkea::KEAAttributeTable *keaAtt = keaImgIO->getAttributeTable(libkea::kea_att_mem, 1);
+            size_t numRows = keaAtt->getSize();
+            
+            std::vector<std::list<size_t>* > *neighbours = new std::vector<std::list<size_t>* >();
+            neighbours->reserve(numRows);
+            for(size_t i = 0; i < numRows; ++i)
+            {
+                neighbours->push_back(new std::list<size_t>());
+            }
+            
+            
+            rsgis::img::RSGISCalcImageValue *findNeighbours = new RSGISFindNeighboursCalcImage(numRows, neighbours);
+            rsgis::img::RSGISCalcImage imgCalc = rsgis::img::RSGISCalcImage(findNeighbours);
+            
+            imgCalc.calcImageWindowData(&clumpImage, 1, 3);
+            
+            keaAtt->addAttIntField("NumNeighbours", 0, "");
+            size_t numNeighboursIdx = keaAtt->getFieldIndex("NumNeighbours");
+            
+            size_t clump = 0;
+            libkea::KEAATTFeature *attFeat = NULL;
+            for(std::vector<std::list<size_t>* >::iterator iterClumps = neighbours->begin(); iterClumps != neighbours->end(); ++iterClumps)
+            {
+                attFeat = keaAtt->getFeature(clump);
+                attFeat->neighbours->reserve((*iterClumps)->size());
+                attFeat->intFields->at(numNeighboursIdx) = (*iterClumps)->size();
+                //std::cout << "Clump " << clump << ":\t" << std::flush;
+                for(std::list<size_t>::iterator iterNeighs = (*iterClumps)->begin(); iterNeighs != (*iterClumps)->end(); ++iterNeighs)
+                {
+                    attFeat->neighbours->push_back((*iterNeighs));
+                    //std::cout << " " << (*iterNeighs);
+                }
+                //std::cout << std::endl;
+                ++clump;
+                delete *iterClumps;
+            }
+            delete neighbours;
+            
+            keaImgIO->setAttributeTable(keaAtt, 1);
+        }
+        catch (rsgis::img::RSGISImageCalcException &e)
+        {
+            throw e;
+        }
+        catch (rsgis::RSGISException &e)
+        {
+            throw rsgis::img::RSGISImageCalcException(e.what());
+        }
+        catch(libkea::KEAATTException &e)
+        {
+            throw rsgis::img::RSGISImageCalcException(e.what());
+        }
+        catch(libkea::KEAException &e)
+        {
+            throw rsgis::img::RSGISImageCalcException(e.what());
+        }
+        catch (std::exception &e)
+        {
+            throw rsgis::img::RSGISImageCalcException(e.what());
+        }
+    }
         
     RSGISFindClumpNeighbours::~RSGISFindClumpNeighbours()
     {
         
     }
+    
+    
+    
+    
+    RSGISFindNeighboursCalcImage::RSGISFindNeighboursCalcImage(size_t numRows, std::vector<std::list<size_t>* > *neighbours) : rsgis::img::RSGISCalcImageValue(0)
+    {
+        this->numRows = numRows;
+        this->neighbours = neighbours;
+    }
+    
+    void RSGISFindNeighboursCalcImage::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
+    {
+        try
+        {
+            int winHsize = ((winSize-1)/2);
+            
+            if(dataBlock[0][winHsize][winHsize] > 0)
+            {
+                size_t fid = 0;
+                try
+                {
+                    fid = boost::lexical_cast<size_t>(dataBlock[0][winHsize][winHsize]);
+                }
+                catch(boost::numeric::negative_overflow& e)
+                {
+                    std::cout << "dataBlock[0][winHsize][winHsize] = " << dataBlock[0][winHsize][winHsize] << std::endl;
+                    throw rsgis::img::RSGISImageCalcException(e.what());
+                }
+                catch(boost::numeric::positive_overflow& e)
+                {
+                    std::cout << "dataBlock[0][winHsize][winHsize] = " << dataBlock[0][winHsize][winHsize] << std::endl;
+                    throw rsgis::img::RSGISImageCalcException(e.what());
+                }
+                catch(boost::numeric::bad_numeric_cast& e)
+                {
+                    std::cout << "dataBlock[0][winHsize][winHsize] = " << dataBlock[0][winHsize][winHsize] << std::endl;
+                    throw rsgis::img::RSGISImageCalcException(e.what());
+                }
+
+                
+                
+                
+                
+                size_t fidLeft = 0;
+                try
+                {
+                    fidLeft = boost::lexical_cast<size_t>(dataBlock[0][winHsize][winHsize-1]);
+                }
+                catch(boost::numeric::negative_overflow& e)
+                {
+                    std::cout << "dataBlock[0][winHsize][winHsize-1] = " << dataBlock[0][winHsize][winHsize-1] << std::endl;
+                    throw rsgis::img::RSGISImageCalcException(e.what());
+                }
+                catch(boost::numeric::positive_overflow& e)
+                {
+                    std::cout << "dataBlock[0][winHsize][winHsize-1] = " << dataBlock[0][winHsize][winHsize-1] << std::endl;
+                    throw rsgis::img::RSGISImageCalcException(e.what());
+                }
+                catch(boost::numeric::bad_numeric_cast& e)
+                {
+                    std::cout << "dataBlock[0][winHsize][winHsize-1] = " << dataBlock[0][winHsize][winHsize-1] << std::endl;
+                    throw rsgis::img::RSGISImageCalcException(e.what());
+                }
+                
+                if((fidLeft != 0) && (fidLeft != fid))
+                {
+                    if(neighbours->at(fid)->size() == 0)
+                    {
+                        neighbours->at(fid)->push_back(fidLeft);
+                    }
+                    else
+                    {
+                        bool found = false;
+                        for(std::list<size_t>::iterator iterVal = neighbours->at(fid)->begin(); iterVal != neighbours->at(fid)->end(); ++iterVal)
+                        {
+                            if((*iterVal) == fidLeft)
+                            {
+                                found = true;
+                                break;
+                            }
+                        }
+                        
+                        if(!found)
+                        {
+                            neighbours->at(fid)->push_back(fidLeft);
+                        }
+                    }
+                }
+                
+                
+                
+                
+                
+                size_t fidUp = 0;
+                try
+                {
+                    fidUp = boost::lexical_cast<size_t>(dataBlock[0][winHsize+1][winHsize]);
+                }
+                catch(boost::numeric::negative_overflow& e)
+                {
+                    std::cout << "dataBlock[0][winHsize+1][winHsize] = " << dataBlock[0][winHsize+1][winHsize] << std::endl;
+                    throw rsgis::img::RSGISImageCalcException(e.what());
+                }
+                catch(boost::numeric::positive_overflow& e)
+                {
+                    std::cout << "dataBlock[0][winHsize+1][winHsize] = " << dataBlock[0][winHsize+1][winHsize] << std::endl;
+                    throw rsgis::img::RSGISImageCalcException(e.what());
+                }
+                catch(boost::numeric::bad_numeric_cast& e)
+                {
+                    std::cout << "dataBlock[0][winHsize+1][winHsize] = " << dataBlock[0][winHsize+1][winHsize] << std::endl;
+                    throw rsgis::img::RSGISImageCalcException(e.what());
+                }
+                
+                if((fidUp != 0) && (fidUp != fid))
+                {
+                    if(neighbours->at(fid)->size() == 0)
+                    {
+                        neighbours->at(fid)->push_back(fidUp);
+                    }
+                    else
+                    {
+                        bool found = false;
+                        for(std::list<size_t>::iterator iterVal = neighbours->at(fid)->begin(); iterVal != neighbours->at(fid)->end(); ++iterVal)
+                        {
+                            if((*iterVal) == fidUp)
+                            {
+                                found = true;
+                                break;
+                            }
+                        }
+                        
+                        if(!found)
+                        {
+                            neighbours->at(fid)->push_back(fidUp);
+                        }
+                    }
+                }
+                
+                
+                
+                
+                size_t fidRight = 0;
+                try
+                {
+                    fidRight = boost::lexical_cast<size_t>(dataBlock[0][winHsize][winHsize+1]);
+                }
+                catch(boost::numeric::negative_overflow& e)
+                {
+                    std::cout << "dataBlock[0][winHsize][winHsize+1] = " << dataBlock[0][winHsize][winHsize+1] << std::endl;
+                    throw rsgis::img::RSGISImageCalcException(e.what());
+                }
+                catch(boost::numeric::positive_overflow& e)
+                {
+                    std::cout << "dataBlock[0][winHsize][winHsize+1] = " << dataBlock[0][winHsize][winHsize+1] << std::endl;
+                    throw rsgis::img::RSGISImageCalcException(e.what());
+                }
+                catch(boost::numeric::bad_numeric_cast& e)
+                {
+                    std::cout << "dataBlock[0][winHsize][winHsize+1] = " << dataBlock[0][winHsize][winHsize+1] << std::endl;
+                    throw rsgis::img::RSGISImageCalcException(e.what());
+                }
+                
+                if((fidRight != 0) && (fidRight != fid))
+                {
+                    if(neighbours->at(fid)->size() == 0)
+                    {
+                        neighbours->at(fid)->push_back(fidRight);
+                    }
+                    else
+                    {
+                        bool found = false;
+                        for(std::list<size_t>::iterator iterVal = neighbours->at(fid)->begin(); iterVal != neighbours->at(fid)->end(); ++iterVal)
+                        {
+                            if((*iterVal) == fidRight)
+                            {
+                                found = true;
+                                break;
+                            }
+                        }
+                        
+                        if(!found)
+                        {
+                            neighbours->at(fid)->push_back(fidRight);
+                        }
+                    }
+                }
+                
+                
+                
+                
+                size_t fidDown = 0;
+                try
+                {
+                    fidDown = boost::lexical_cast<size_t>(dataBlock[0][winHsize-1][winHsize]);
+                }
+                catch(boost::numeric::negative_overflow& e)
+                {
+                    std::cout << "dataBlock[0][winHsize-1][winHsize] = " << dataBlock[0][winHsize-1][winHsize] << std::endl;
+                    throw rsgis::img::RSGISImageCalcException(e.what());
+                }
+                catch(boost::numeric::positive_overflow& e)
+                {
+                    std::cout << "dataBlock[0][winHsize-1][winHsize] = " << dataBlock[0][winHsize-1][winHsize] << std::endl;
+                    throw rsgis::img::RSGISImageCalcException(e.what());
+                }
+                catch(boost::numeric::bad_numeric_cast& e)
+                {
+                    std::cout << "dataBlock[0][winHsize-1][winHsize] = " << dataBlock[0][winHsize-1][winHsize] << std::endl;
+                    throw rsgis::img::RSGISImageCalcException(e.what());
+                }
+                
+                if((fidDown != 0) && (fidDown != fid))
+                {
+                    if(neighbours->at(fid)->size() == 0)
+                    {
+                        neighbours->at(fid)->push_back(fidDown);
+                    }
+                    else
+                    {
+                        bool found = false;
+                        for(std::list<size_t>::iterator iterVal = neighbours->at(fid)->begin(); iterVal != neighbours->at(fid)->end(); ++iterVal)
+                        {
+                            if((*iterVal) == fidDown)
+                            {
+                                found = true;
+                                break;
+                            }
+                        }
+                        
+                        if(!found)
+                        {
+                            neighbours->at(fid)->push_back(fidDown);
+                        }
+                    }
+                }
+            }
+        }
+        catch(rsgis::img::RSGISImageCalcException &e)
+        {
+            throw e;
+        }
+        catch(rsgis::RSGISException &e)
+        {
+            throw rsgis::img::RSGISImageCalcException(e.what());
+        }
+        catch(std::exception &e)
+        {
+            throw rsgis::img::RSGISImageCalcException(e.what());
+        }
+    }
+    
+    RSGISFindNeighboursCalcImage::~RSGISFindNeighboursCalcImage()
+    {
+        
+    }
+    
+    
+    
+    
+    
+    RSGISIdentifyBoundaryPixels::RSGISIdentifyBoundaryPixels() : rsgis::img::RSGISCalcImageValue(1)
+    {
+        
+    }
+    
+    void RSGISIdentifyBoundaryPixels::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
+    {
+        try
+        {
+            int winHsize = ((winSize-1)/2);
+            
+            if(dataBlock[0][winHsize][winHsize] > 0)
+            {
+                size_t fid = 0;
+                try
+                {
+                    fid = boost::lexical_cast<size_t>(dataBlock[0][winHsize][winHsize]);
+                }
+                catch(boost::numeric::negative_overflow& e)
+                {
+                    std::cout << "dataBlock[0][winHsize][winHsize] = " << dataBlock[0][winHsize][winHsize] << std::endl;
+                    throw rsgis::img::RSGISImageCalcException(e.what());
+                }
+                catch(boost::numeric::positive_overflow& e)
+                {
+                    std::cout << "dataBlock[0][winHsize][winHsize] = " << dataBlock[0][winHsize][winHsize] << std::endl;
+                    throw rsgis::img::RSGISImageCalcException(e.what());
+                }
+                catch(boost::numeric::bad_numeric_cast& e)
+                {
+                    std::cout << "dataBlock[0][winHsize][winHsize] = " << dataBlock[0][winHsize][winHsize] << std::endl;
+                    throw rsgis::img::RSGISImageCalcException(e.what());
+                }
+                
+                
+                
+                
+                
+                size_t fidLeft = 0;
+                bool fidEdge = false;
+                try
+                {
+                    fidLeft = boost::lexical_cast<size_t>(dataBlock[0][winHsize][winHsize-1]);
+                }
+                catch(boost::numeric::negative_overflow& e)
+                {
+                    std::cout << "dataBlock[0][winHsize][winHsize-1] = " << dataBlock[0][winHsize][winHsize-1] << std::endl;
+                    throw rsgis::img::RSGISImageCalcException(e.what());
+                }
+                catch(boost::numeric::positive_overflow& e)
+                {
+                    std::cout << "dataBlock[0][winHsize][winHsize-1] = " << dataBlock[0][winHsize][winHsize-1] << std::endl;
+                    throw rsgis::img::RSGISImageCalcException(e.what());
+                }
+                catch(boost::numeric::bad_numeric_cast& e)
+                {
+                    std::cout << "dataBlock[0][winHsize][winHsize-1] = " << dataBlock[0][winHsize][winHsize-1] << std::endl;
+                    throw rsgis::img::RSGISImageCalcException(e.what());
+                }
+                
+                if((fidLeft != 0) && (fidLeft != fid))
+                {
+                    fidEdge = true;
+                }
+                
+                size_t fidUp = 0;
+                try
+                {
+                    fidUp = boost::lexical_cast<size_t>(dataBlock[0][winHsize+1][winHsize]);
+                }
+                catch(boost::numeric::negative_overflow& e)
+                {
+                    std::cout << "dataBlock[0][winHsize+1][winHsize] = " << dataBlock[0][winHsize+1][winHsize] << std::endl;
+                    throw rsgis::img::RSGISImageCalcException(e.what());
+                }
+                catch(boost::numeric::positive_overflow& e)
+                {
+                    std::cout << "dataBlock[0][winHsize+1][winHsize] = " << dataBlock[0][winHsize+1][winHsize] << std::endl;
+                    throw rsgis::img::RSGISImageCalcException(e.what());
+                }
+                catch(boost::numeric::bad_numeric_cast& e)
+                {
+                    std::cout << "dataBlock[0][winHsize+1][winHsize] = " << dataBlock[0][winHsize+1][winHsize] << std::endl;
+                    throw rsgis::img::RSGISImageCalcException(e.what());
+                }
+                
+                if((fidUp != 0) && (fidUp != fid))
+                {
+                    fidEdge = true;
+                }
+                
+                
+                
+                
+                size_t fidRight = 0;
+                try
+                {
+                    fidRight = boost::lexical_cast<size_t>(dataBlock[0][winHsize][winHsize+1]);
+                }
+                catch(boost::numeric::negative_overflow& e)
+                {
+                    std::cout << "dataBlock[0][winHsize][winHsize+1] = " << dataBlock[0][winHsize][winHsize+1] << std::endl;
+                    throw rsgis::img::RSGISImageCalcException(e.what());
+                }
+                catch(boost::numeric::positive_overflow& e)
+                {
+                    std::cout << "dataBlock[0][winHsize][winHsize+1] = " << dataBlock[0][winHsize][winHsize+1] << std::endl;
+                    throw rsgis::img::RSGISImageCalcException(e.what());
+                }
+                catch(boost::numeric::bad_numeric_cast& e)
+                {
+                    std::cout << "dataBlock[0][winHsize][winHsize+1] = " << dataBlock[0][winHsize][winHsize+1] << std::endl;
+                    throw rsgis::img::RSGISImageCalcException(e.what());
+                }
+                
+                if((fidRight != 0) && (fidRight != fid))
+                {
+                    fidEdge = true;
+                }
+                
+                
+                
+                
+                size_t fidDown = 0;
+                try
+                {
+                    fidDown = boost::lexical_cast<size_t>(dataBlock[0][winHsize-1][winHsize]);
+                }
+                catch(boost::numeric::negative_overflow& e)
+                {
+                    std::cout << "dataBlock[0][winHsize-1][winHsize] = " << dataBlock[0][winHsize-1][winHsize] << std::endl;
+                    throw rsgis::img::RSGISImageCalcException(e.what());
+                }
+                catch(boost::numeric::positive_overflow& e)
+                {
+                    std::cout << "dataBlock[0][winHsize-1][winHsize] = " << dataBlock[0][winHsize-1][winHsize] << std::endl;
+                    throw rsgis::img::RSGISImageCalcException(e.what());
+                }
+                catch(boost::numeric::bad_numeric_cast& e)
+                {
+                    std::cout << "dataBlock[0][winHsize-1][winHsize] = " << dataBlock[0][winHsize-1][winHsize] << std::endl;
+                    throw rsgis::img::RSGISImageCalcException(e.what());
+                }
+                
+                if((fidDown != 0) && (fidDown != fid))
+                {
+                    fidEdge = true;
+                }
+                
+                if(fidEdge)
+                {
+                    output[0] = 1;
+                }
+                else
+                {
+                    output[0] = 0;
+                }
+            }
+            else
+            {
+                output[0] = 0;
+            }
+        }
+        catch(rsgis::img::RSGISImageCalcException &e)
+        {
+            throw e;
+        }
+        catch(rsgis::RSGISException &e)
+        {
+            throw rsgis::img::RSGISImageCalcException(e.what());
+        }
+        catch(std::exception &e)
+        {
+            throw rsgis::img::RSGISImageCalcException(e.what());
+        }
+    }
+    
+    RSGISIdentifyBoundaryPixels::~RSGISIdentifyBoundaryPixels()
+    {
+        
+    }
+    
     
 }}
