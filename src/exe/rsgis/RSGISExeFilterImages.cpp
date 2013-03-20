@@ -45,6 +45,7 @@ void RSGISExeFilterImages::retrieveParameters(xercesc::DOMElement *argElement) t
 	const XMLCh *algorName = xercesc::XMLString::transcode(this->algorithm.c_str());
 	const XMLCh *optionFilter = xercesc::XMLString::transcode("filter");
 	const XMLCh *optionExportFilterBank = xercesc::XMLString::transcode("exportfilterbank");
+    const XMLCh *optionNLDenoising = xercesc::XMLString::transcode("nldenoising");
 	
 	const XMLCh *algorNameEle = argElement->getAttribute(xercesc::XMLString::transcode("algor"));
 	if(!xercesc::XMLString::equals(algorName, algorNameEle))
@@ -505,6 +506,10 @@ void RSGISExeFilterImages::retrieveParameters(xercesc::DOMElement *argElement) t
     {		
         this->option = RSGISExeFilterImages::filter;
     }
+    else if(xercesc::XMLString::equals(optionNLDenoising, optionXML))
+    {
+        this->option = RSGISExeFilterImages::nldenoising;
+    }
     else if(xercesc::XMLString::equals(optionExportFilterBank, optionXML))
     {		
         this->option = RSGISExeFilterImages::exportfilterbank;
@@ -546,6 +551,36 @@ void RSGISExeFilterImages::runAlgorithm() throw(rsgis::RSGISException)
                 GDALClose(dataset[0]);
                 delete[] dataset;
                 delete filterBank;
+            }
+            catch(rsgis::RSGISException e)
+            {
+                throw e;
+            }
+        }
+        else if(option == RSGISExeFilterImages::nldenoising)
+        {
+            GDALAllRegister();
+            GDALDataset **dataset = NULL;
+            try
+            {
+                dataset = new GDALDataset*[1];
+                std::cout << this->inputImage << std::endl;
+                dataset[0] = (GDALDataset *) GDALOpenShared(this->inputImage.c_str(), GA_ReadOnly);
+                if(dataset[0] == NULL)
+                {
+                    std::string message = std::string("Could not open image ") + this->inputImage;
+                    throw rsgis::RSGISImageException(message.c_str());
+                }
+                
+                this->aPar = 2;
+                this->hPar = 2;
+                
+                rsgis::filter::RSGISApplyNonLocalDenoising *dnFilter = new rsgis::filter::RSGISApplyNonLocalDenoising();
+                dnFilter->ApplyFilter(dataset, 1, this->outputImageBase, 5, 256, this->aPar, this->hPar, this->imageFormat, this->outDataType);
+                
+                GDALClose(dataset[0]);
+                delete dnFilter;
+                delete[] dataset;
             }
             catch(rsgis::RSGISException e)
             {

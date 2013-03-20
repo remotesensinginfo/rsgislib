@@ -1052,7 +1052,12 @@ namespace rsgis{namespace reg{
 	
 	double RSGISImageRegistration::calcStdDev(float **data, unsigned int numVals, unsigned int numDims)
 	{
+		/** Calculate standard deviation for an image window considers only data with values > 0 and non NaN.
+		 *  Returns standard deviation or -1 if less than half the pixels have no data.
+		 */
 		unsigned int totalNumVals = numDims * numVals;
+		unsigned int dataVals = 0;
+		double stdDev = 0;
 		
 		double sum = 0;
 		
@@ -1060,29 +1065,40 @@ namespace rsgis{namespace reg{
 		{
 			for(unsigned int j = 0; j < numVals; ++j)
 			{
-				if(!((boost::math::isnan)(data[i][j])))
+				if((!((boost::math::isnan)(data[i][j]))) && (data[i][j] != 0))
 				{
 					sum += data[i][j];
+					dataVals+=1;
 				}
 			}
 		}
 		
-		double mean = sum/totalNumVals;
-
-		double sqDiff = 0;
-		
-		for(unsigned int i = 0; i < numDims; ++i)
+		// If less than half the values have no data, return -1,
+		// probably at an image edge so best to avoid.
+		if(((float) dataVals / (float) totalNumVals) < 0.5)
 		{
-			for(unsigned int j = 0; j < numVals; ++j)
+			stdDev = -1;
+		}
+		else
+		{
+			double mean = sum/dataVals;
+
+			double sqDiff = 0;
+
+			for(unsigned int i = 0; i < numDims; ++i)
 			{
-				if(!((boost::math::isnan)(data[i][j])))
+				for(unsigned int j = 0; j < numVals; ++j)
 				{
-					sqDiff += ((data[i][j] - mean) * (data[i][j] - mean));
+					if((!((boost::math::isnan)(data[i][j]))) && (data[i][j] != 0))
+					{
+						sqDiff += ((data[i][j] - mean) * (data[i][j] - mean));
+					}
 				}
 			}
+
+			stdDev = sqrt(sqDiff/dataVals);
 		}
-		
-		return sqrt(sqDiff/totalNumVals);
+		return stdDev;
 	}
 	
 	void RSGISImageRegistration::exportTiePointsENVIImage2MapImpl(std::string filepath, std::list<TiePoint*> *tiePts) throw(RSGISRegistrationException)

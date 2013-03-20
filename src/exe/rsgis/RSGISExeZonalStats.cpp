@@ -980,6 +980,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 		this->meanAll = false;
 		this->stdDevAll = false;
         this->modeAll = false;
+        this->sumAll = false;
 		this->countAll = false;
 		this->minThreashAll = false;
 		this->maxThreashAll = false;
@@ -1055,6 +1056,20 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			XMLString::release(&yesStr);
 		}
 		XMLString::release(&modeXMLStr);
+        
+        XMLCh *sumXMLStr = XMLString::transcode("sum");
+		if(argElement->hasAttribute(sumXMLStr))
+		{
+			XMLCh *yesStr = XMLString::transcode("yes");
+			const XMLCh *value = argElement->getAttribute(sumXMLStr);
+			
+			if(XMLString::equals(value, yesStr))
+			{
+				this->sumAll = true;
+			}
+			XMLString::release(&yesStr);
+		}
+		XMLString::release(&sumXMLStr);
 		
 		XMLCh *countXMLStr = XMLString::transcode("count");
 		if(argElement->hasAttribute(countXMLStr))
@@ -1128,6 +1143,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 				attributeZonalList[i]->outMean = meanAll;
 				attributeZonalList[i]->outStDev = stdDevAll;
 				attributeZonalList[i]->outMode = modeAll;
+                attributeZonalList[i]->outSum = sumAll;
 				attributeZonalList[i]->outCount = countAll;
 				
 				
@@ -1221,8 +1237,26 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 					}
 					XMLString::release(&yesStr);
 				}
-				XMLString::release(&modeXMLStr);	
+				XMLString::release(&modeXMLStr);
 				
+                XMLCh *sumXMLStr = XMLString::transcode("sum");
+				if(attributeElement->hasAttribute(sumXMLStr))
+				{
+					XMLCh *yesStr = XMLString::transcode("yes");
+					const XMLCh *value = attributeElement->getAttribute(sumXMLStr);
+					
+					if(XMLString::equals(value, yesStr))
+					{
+						attributeZonalList[i]->outSum = true;
+					}
+					else
+					{
+						attributeZonalList[i]->outSum = false;
+					}
+					XMLString::release(&yesStr);
+				}
+				XMLString::release(&sumXMLStr);
+                
 				XMLCh *countXMLStr = XMLString::transcode("count");
 				if(attributeElement->hasAttribute(countXMLStr))
 				{
@@ -1241,7 +1275,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 					XMLString::release(&yesStr);
 				}
 				XMLString::release(&countXMLStr);
-				
+
 				
 				DOMNodeList *bandNodesList = attributeElement->getElementsByTagName(rsgisbandXMLStr);
 				attributeZonalList[i]->numBands = bandNodesList->getLength();
@@ -3406,6 +3440,8 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 						attributeZonalList[i]->outMax = this->maxAll;
 						attributeZonalList[i]->outMean = this->meanAll;
 						attributeZonalList[i]->outStDev = this->stdDevAll;
+                        attributeZonalList[i]->outMode = this->modeAll;
+                        attributeZonalList[i]->outSum = this->sumAll;
 						attributeZonalList[i]->outCount = this->countAll;
 						attributeZonalList[i]->numBands = 1;
 						attributeZonalList[i]->bands = new int[1];
