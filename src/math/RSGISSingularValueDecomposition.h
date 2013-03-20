@@ -48,14 +48,9 @@ namespace rsgis
 				void SVDLinSolve(gsl_vector *outX, gsl_vector *inB);
 				~RSGISSingularValueDecomposition();
 			private:
-				int numcoefficients;
 				int svdCompute;
 				int svdSolve;
-				gsl_vector *outX;
-				Matrix *matrix;
 				gsl_matrix *inA;
-				gsl_matrix *outV;
-				gsl_vector *outS;
  			};
 	}
 }

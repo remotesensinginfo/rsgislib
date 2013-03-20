@@ -177,7 +177,6 @@ namespace rsgis {namespace radar{
 		rsgis::math::RSGISMathTwoVariableFunction *functionB;
 		gsl_vector *aPrioriPar; // a priori estimates
 		gsl_matrix *covMatrixP; // Covarence matrix for a priori estimates
-		gsl_matrix *covMatrixPScale; // Covarence matrix for a priori estimates
 		gsl_matrix *invCovMatrixP; // Inverse covarence matrix for prior estimates
 		gsl_matrix *invCovMatrixD; // Inverse covarence matrix for data
 		int ittmax;
@@ -212,7 +211,6 @@ namespace rsgis {namespace radar{
 		rsgis::math::RSGISMathTwoVariableFunction *functionC;
 		gsl_vector *aPrioriPar; // a priori estimates
 		gsl_matrix *covMatrixP; // Covarence matrix for a priori estimates
-		gsl_matrix *covMatrixPScale; // Covarence matrix for a priori estimates
 		gsl_matrix *invCovMatrixP; // Inverse covarence matrix for prior estimates
 		gsl_matrix *invCovMatrixD; // Inverse covarence matrix for data
 		int ittmax;
@@ -310,16 +308,12 @@ namespace rsgis {namespace radar{
 		virtual void printOptimiser(){std::cout << "Conjugate gradient - 3 Var 3 Data, with Restarts" << std::endl;};
 		~RSGISEstimationConjugateGradient3Var3DataWithRestarts();
 	private:
-		gsl_matrix *coeffHH;
-		gsl_matrix *coeffHV;
-		gsl_matrix *coeffVV;
 		double *minMaxIntervalA;
 		double *minMaxIntervalB;
 		double *minMaxIntervalC;
 		gsl_vector *aPrioriPar;
 		gsl_matrix *covMatrixP;
 		gsl_matrix *invCovMatrixD;
-		gsl_matrix *invCovMatrixP;
 		double minError;
 		int ittmax;
 		unsigned int nRestarts;
@@ -347,17 +341,12 @@ namespace rsgis {namespace radar{
 		virtual void printOptimiser(){std::cout << "Conjugate gradient - 3 Var 4 Data, with Restarts" << std::endl;};
 		~RSGISEstimationConjugateGradient3Var4DataWithRestarts();
 	private:
-		gsl_matrix *coeffA;
-		gsl_matrix *coeffB;
-		gsl_matrix *coeffC;
-		gsl_matrix *coeffD;
 		double *minMaxIntervalA;
 		double *minMaxIntervalB;
 		double *minMaxIntervalC;
 		gsl_vector *aPrioriPar;
 		gsl_matrix *covMatrixP;
 		gsl_matrix *invCovMatrixD;
-		gsl_matrix *invCovMatrixP;
 		double minError;
 		int ittmax;
 		unsigned int nRestarts;

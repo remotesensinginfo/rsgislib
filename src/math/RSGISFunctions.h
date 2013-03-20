@@ -110,7 +110,7 @@ namespace rsgis{namespace math{
  	{
 		/// (b0 + b1 y) + (c0 + c1 y) * x
 	public: 
-		RSGISFunctionLinXfLinY(double coeffB0, double coeffB1, double coeffC0, double c1);
+		RSGISFunctionLinXfLinY(double coeffB0, double coeffB1, double coeffC0, double coeffC1);
 		virtual double calcFunction(double valueX, double valueY) throw(RSGISMathException);
 		virtual double dX(double valueX, double valueY) throw(RSGISMathException);
 		virtual double dY(double valueX, double valueY) throw(RSGISMathException);
