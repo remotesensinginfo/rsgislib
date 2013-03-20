@@ -1,10 +1,10 @@
 /*
- *  RSGISFindClumpNeighbours.h
+ *  RSGISClumpBorders.h
  *  RSGIS_LIB
  *
- *  Created by Pete Bunting on 27/03/2012.
- *  Copyright 2012 RSGISLib.
- * 
+ *  Created by Pete Bunting on 20/03/2013.
+ *  Copyright 2013 RSGISLib.
+ *
  *  RSGISLib is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef RSGISFindClumpNeighbours_H
-#define RSGISFindClumpNeighbours_H
+#ifndef RSGISClumpBorders_H
+#define RSGISClumpBorders_H
 
 #include <iostream>
 #include <string>
@@ -35,8 +35,7 @@
 #include "rastergis/RSGISAttributeTable.h"
 #include "img/RSGISCalcImageValue.h"
 #include "img/RSGISCalcImage.h"
-
-#include "libkea/KEAImageIO.h"
+#include "rastergis/RSGISRasterAttUtils.h"
 
 #include "gdal_priv.h"
 #include "ogrsf_frmts.h"
@@ -44,40 +43,21 @@
 
 namespace rsgis{namespace rastergis{
     
-    class RSGISFindClumpNeighbours
+    class RSGISClumpBorders
     {
     public:
-        RSGISFindClumpNeighbours();
-        std::vector<std::list<size_t>* >* findNeighbours(GDALDataset *clumpImage) throw(rsgis::img::RSGISImageCalcException);
-        void findNeighbours(GDALDataset *clumpImage, RSGISAttributeTable *attTable) throw(rsgis::img::RSGISImageCalcException);
-        void findNeighboursInBlocks(GDALDataset *clumpImage, RSGISAttributeTable *attTable) throw(rsgis::img::RSGISImageCalcException);
-        void findNeighboursKEAImageCalc(GDALDataset *clumpImage) throw(rsgis::img::RSGISImageCalcException);
-        
-        ~RSGISFindClumpNeighbours();
-    protected:
-        inline void addNeighbourToFeature(RSGISFeature *feat, unsigned long long neighbourID)
-        {
-            bool foundID = false;
-            for(std::vector<boost::uint_fast32_t>::iterator iterNeigh = feat->neighbours->begin(); iterNeigh != feat->neighbours->end(); ++iterNeigh)
-            {
-                if((*iterNeigh) == neighbourID)
-                {
-                    foundID = true;
-                }
-            }
-            if(!foundID)
-            {
-                feat->neighbours->push_back(neighbourID);
-            }
-        };
+        RSGISClumpBorders();
+        void calcClumpBorderLength(GDALDataset *clumpImage, bool includeZeroEdges, std::string colName) throw(rsgis::img::RSGISImageCalcException);
+        void calcClumpRelBorderLen2Class(GDALDataset *clumpImage, bool includeZeroEdges, std::string colName, std::string classColName, std::string className) throw(rsgis::img::RSGISImageCalcException);
+        ~RSGISClumpBorders();
+
     };
     
     
-    
-    class RSGISFindNeighboursCalcImage : public rsgis::img::RSGISCalcImageValue
+    class RSGISCalcBorderLenInPixels : public rsgis::img::RSGISCalcImageValue
 	{
 	public:
-		RSGISFindNeighboursCalcImage(size_t numRows, std::vector<std::list<size_t>* > *neighbours);
+		RSGISCalcBorderLenInPixels(double *borderLen, size_t numRows, double xRes, double yRes, bool includeZeros=false);
 		void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
 		void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
 		void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
@@ -85,17 +65,20 @@ namespace rsgis{namespace rastergis{
 		void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException);
         void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
 		bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
-		~RSGISFindNeighboursCalcImage();
-    private:
+		~RSGISCalcBorderLenInPixels();
+    protected:
+        double *borderLen;
         size_t numRows;
-        std::vector<std::list<size_t>* > *neighbours;
+        bool includeZeros;
+        double xRes;
+        double yRes;
 	};
     
     
-    class RSGISIdentifyBoundaryPixels : public rsgis::img::RSGISCalcImageValue
+    class RSGISCalcBorderLenInPixelsWithClass : public rsgis::img::RSGISCalcImageValue
 	{
 	public:
-		RSGISIdentifyBoundaryPixels();
+		RSGISCalcBorderLenInPixelsWithClass(double *borderLen, double *classBorderLen, size_t numRows, double xRes, double yRes, std::string className, unsigned int classColIdx, const GDALRasterAttributeTable *attTable, bool includeZeros=false);
 		void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
 		void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
 		void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
@@ -103,7 +86,17 @@ namespace rsgis{namespace rastergis{
 		void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException);
         void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
 		bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
-		~RSGISIdentifyBoundaryPixels();
+		~RSGISCalcBorderLenInPixelsWithClass();
+    protected:
+        double *classBorderLen;
+        double *borderLen;
+        size_t numRows;
+        bool includeZeros;
+        double xRes;
+        double yRes;
+        std::string className;
+        const GDALRasterAttributeTable *attTable;
+        unsigned int classColIdx;
 	};
     
 }}

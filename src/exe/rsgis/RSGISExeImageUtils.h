@@ -272,6 +272,7 @@ class RSGISExeImageUtils : public RSGISAlgorithmParameters
         unsigned int tileSizePxl;
         float overlap;
         bool createAnOverlap;
+        bool growOverlap;
 	};
 }
 #endif

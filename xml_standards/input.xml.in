@@ -495,6 +495,14 @@
     </rsgis:command>
 	<!-- A command to create a binary mask for a class -->
 	<rsgis:command algor="rastergis" option="classmask" clumps="image.kea" classcolumn="column" class="string" output="image.kea" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
+	<!-- A command to find the clump neighbours and store within the KEA file - the clumps file must be a KEA file -->
+	<rsgis:command algor="rastergis" option="findneighbours" clumps="clumps.kea" />
+	<!-- A command to identify the pixels on the boundary of the clumps -->
+	<rsgis:command algor="rastergis" option="findboundarypixels" clumps="clumps.kea" output="image.env" format="GDAL Format" />
+	<!-- A command to calculate the border length of the clumps -->
+	<rsgis:command algor="rastergis" option="calcborderlength" clumps="clumps.kea" ignorezeroedges="yes | no" colname="string" />
+	<!-- A command to calculate the relative border length of the clumps to a class -->
+	<rsgis:command algor="rastergis" option="calcrelborderlength" clumps="clumps.kea" ignorezeroedges="yes | no" colname="string" classcolumn="string" classname="string" />
 
 
 
@@ -660,7 +668,7 @@
 	<!-- A command to create a thematic image defining tiles for an image image -->
     <rsgis:command algor="imageutils" option="defineimgtiles" image="image.env" output="image_out.env" tilesize="int" [nodata="float"] validpixelratio="float" format="GDAL Format"  />
 	<!-- A command to create individual mask images for each tile with an optional overlap defined -->
-	<rsgis:command algor="imageutils" option="gentilemasks" image="image.env" outputbase="image_out.env" format="GDAL Format" extension="string" [overlap="float"] />
+	<rsgis:command algor="imageutils" option="gentilemasks" image="image.env" outputbase="image_out.env" format="GDAL Format" extension="string" [overlap="float" growoverlap="yes|no"] />
 	<!-- A command to extract and a region for the tile and apply a mask --> 
 	<rsgis:command algor="imageutils" option="cutouttile" image="image.env" tile="tile.env" output="image_out.env" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" nodataval="float" />
 
@@ -791,7 +799,7 @@
         <rsgis:band name="string" image="image3" band="int" [sensorband="string" | calfactor="float" bandintegrate="float" ] />
     </rsgis:command>
     <!-- A command to convert from at sensor radiance to above atmosphere reflectance -->
-    <rsgis:command algor="imagecalibration" option="topatmosrefl" input="image_in.env" output="image_out.env" format="GDAL Format" scaleFactor="float" [julianday="int" | day="int" month="int" year="int"] [zenith="float" | elevation="float"] format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" scaleFactor="float" >
+    <rsgis:command algor="imagecalibration" option="topatmosrefl" input="image_in.env" output="image_out.env" [julianday="int" | day="int" month="int" year="int"] [zenith="float" | elevation="float"] format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" scaleFactor="float" >
         <rsgis:band [sensorband="string" | irradiance="float"] />
         <rsgis:band [sensorband="string" | irradiance="float"] />
         <rsgis:band [sensorband="string" | irradiance="float"] />

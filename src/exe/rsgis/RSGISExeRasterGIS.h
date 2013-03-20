@@ -51,6 +51,8 @@
 #include "rastergis/RSGISFindClosestSpecSpatialFeats.h"
 #include "rastergis/RSGISMaxLikelihoodRATClassification.h"
 #include "rastergis/RSGISClassMask.h"
+#include "rastergis/RSGISFindClumpNeighbours.h"
+#include "rastergis/RSGISClumpBorders.h"
 
 #include "gdal_priv.h"
 #include "ogrsf_frmts.h"
@@ -89,7 +91,11 @@ namespace rsgisexe{
             specdistmajorityclassifier,
             maxlikelihoodclassifier,
             maxlikelihoodclassifierlocalpriors,
-            classmask
+            classmask,
+            findneighbours,
+            findboundarypixels,
+            calcborderlength,
+            calcrelborder
         };
         
         RSGISExeRasterGIS();
@@ -152,6 +158,7 @@ namespace rsgisexe{
         rsgis::rastergis::rsgismlpriors priorsMethod;
         std::vector<std::string> priorStrs;
         bool allowZeroPriors;
+        bool ignoreZeroEdges;
     };
     
 }

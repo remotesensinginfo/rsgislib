@@ -3170,6 +3170,29 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
             createAnOverlap = false;
 		}
 		XMLString::release(&overlapXMLStr);
+        
+        
+        XMLCh *growOverlapXMLStr = XMLString::transcode("growoverlap");
+		if(argElement->hasAttribute(growOverlapXMLStr))
+		{
+			XMLCh *yesStr = XMLString::transcode("yes");
+			const XMLCh *strValue = argElement->getAttribute(growOverlapXMLStr);
+			
+			if(XMLString::equals(strValue, yesStr))
+			{
+				this->growOverlap = true;
+			}
+			else
+			{
+				this->growOverlap = false;
+			}
+			XMLString::release(&yesStr);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'growoverlap\' attribute was provided.");
+		}
+		XMLString::release(&growOverlapXMLStr);
 	}
     else if (XMLString::equals(optionCutOutTile, optionXML))
 	{
@@ -5436,7 +5459,7 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
 				}
                 
                 rsgis::rastergis::RSGISCreateImageTileMasks tileMasks;
-                tileMasks.createTileMasks(inDataset, this->outputImageBase, this->imageFormat, this->outFileExtension, this->createAnOverlap, this->overlap);
+                tileMasks.createTileMasks(inDataset, this->outputImageBase, this->imageFormat, this->outFileExtension, this->createAnOverlap, this->overlap, this->growOverlap);
                 
 				GDALClose(inDataset);
 			}
