@@ -27,6 +27,8 @@ namespace rsgis{namespace radar{
 
 	RSGISObjectBasedEstimation::RSGISObjectBasedEstimation(GDALDataset *inputImage, GDALDataset *outputImage, std::vector<gsl_vector*> *initialPar, std::vector<RSGISEstimationOptimiser*> *slowOptimiser, std::vector<RSGISEstimationOptimiser*> *fastOptimiser, estParameters parameters, double ***minMaxVals, std::string classHeading, bool useClass)
 	{
+		std::cout << "BEFORE HERE" << std::endl;
+
 		this->datasetsIO = new GDALDataset*[2];
 		this->datasetsInput = new GDALDataset*[1];
 		this->datasetsIO[0] = inputImage;
@@ -43,6 +45,8 @@ namespace rsgis{namespace radar{
 		this->minMaxVals = minMaxVals;
 		this->useDefaultMinMax = true;
 
+		std::cout << "HERE!" << std::endl;
+
 		if ((this->parameters == cDepthDensity) | (this->parameters == heightDensity)) // Set number of output parameters
 		{
 			this->numOutputPar = 2;
@@ -57,11 +61,11 @@ namespace rsgis{namespace radar{
 		}
 
 		this->numOutputBands = numOutputPar + 2; // Extra bands for biomass and error
-		this->pixelVals = new std::vector<float>*[numBands];
+		this->pixelVals = new std::vector<float>*[this->numBands];
 
 		// Calc image to get values (for initial inversion)
-		this->getValues = new RSGISObjectBasedEstimationGetObjVals(pixelVals, numBands);
-		this->calcImageSingle = new rsgis::img::RSGISCalcImageSingle(getValues);
+		this->getValues = new RSGISObjectBasedEstimationGetObjVals(this->pixelVals, this->numBands);
+		this->calcImageSingle = new rsgis::img::RSGISCalcImageSingle(this->getValues);
 
 		if (!useClass)
 		{
@@ -94,6 +98,8 @@ namespace rsgis{namespace radar{
 
 			getValues->reset();
 			calcImageSingle->calcImageWithinPolygon(this->datasetsInput, 1, NULL, env, poly, false, rsgis::img::polyContainsPixelCenter); // The pixel in poly method is hardcoded as 'polyContainsPixelCenter', no output is required
+
+			std::cout << "Got Pixel values" << std::endl;
 
 			unsigned int estClass = 0;
 			OGRFeatureDefn *inFeatureDefn = inFeature->GetDefnRef();
@@ -242,7 +248,7 @@ namespace rsgis{namespace radar{
                 }
             }
 
-			calcImage = new rsgis::img::RSGISCalcImage(invValues, "", true);
+            rsgis::img::RSGISCalcImage *calcImage = new rsgis::img::RSGISCalcImage(invValues, "", true);
 			calcImage->calcImageWithinPolygon(this->datasetsIO, 2, env, poly, rsgis::img::polyContainsPixelCenter);
 
 			// TIDY
@@ -266,6 +272,7 @@ namespace rsgis{namespace radar{
 	{
 		try
 		{
+			std::cout << "Processing feature" << std::endl;
 			// GET DATA
 			rsgis::vec::RSGISVectorUtils vecUtils;
 			OGRPolygon *inOGRPoly;
@@ -274,8 +281,11 @@ namespace rsgis{namespace radar{
 			rsgis::img::RSGISCalcImageValue *invValues;
 			inOGRPoly = (OGRPolygon *) inFeature->GetGeometryRef();
 			poly = vecUtils.convertOGRPolygon2GEOSPolygon(inOGRPoly);
+			std::cout << "Calling reset" << std::endl;
 			getValues->reset();
+			std::cout << "Running calc image" << std::endl;
 			calcImageSingle->calcImageWithinPolygon(this->datasetsInput, 1, NULL, env, poly, false, rsgis::img::polyContainsPixelCenter); // The pixel in poly method is hardcoded as 'polyContainsPixelCenter', no output is required
+			std::cout << "Ran Calc Image" << std::endl;
 
 			unsigned int estClass = 0;
 			OGRFeatureDefn *inFeatureDefn = inFeature->GetDefnRef();
@@ -361,7 +371,7 @@ namespace rsgis{namespace radar{
                 }
             }
 
-			calcImage = new rsgis::img::RSGISCalcImage(invValues, "", true);
+			rsgis::img::RSGISCalcImage *calcImage = new rsgis::img::RSGISCalcImage(invValues, "", true);
 			calcImage->calcImageWithinPolygon(this->datasetsIO, 2, env, poly, rsgis::img::polyContainsPixelCenter);
 
 			// TIDY
@@ -1043,11 +1053,6 @@ namespace rsgis{namespace radar{
         try
         {
             // GET DATA
-            rsgis::vec::RSGISVectorUtils vecUtils;
-            OGRPolygon *inOGRPoly;
-            geos::geom::Polygon *poly;
-            inOGRPoly = (OGRPolygon *) inFeature->GetGeometryRef();
-            poly = vecUtils.convertOGRPolygon2GEOSPolygon(inOGRPoly);
             rsgis::img::RSGISCalcImageValue *invValuesObj;
             rsgis::img::RSGISCalcImageValue *invValues;
 
@@ -1463,10 +1468,10 @@ namespace rsgis{namespace radar{
 		delete[] pixelVals;
 	}
 
-	RSGISObjectBasedEstimationGetObjVals::RSGISObjectBasedEstimationGetObjVals(std::vector<float> **pixelVals, int numBands) : RSGISCalcImageSingleValue(numBands)
+	RSGISObjectBasedEstimationGetObjVals::RSGISObjectBasedEstimationGetObjVals(std::vector<float> **pixelVals, int numBands) : rsgis::img::RSGISCalcImageSingleValue(numBands)
 	{
 		this->pixelVals = pixelVals;
-		this->numBands = numBands;
+		this->numInBands = numBands;
 
 		for(int i = 0; i < numBands; i++)
 		{
@@ -1476,22 +1481,22 @@ namespace rsgis{namespace radar{
 
 	void RSGISObjectBasedEstimationGetObjVals::calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt) throw(rsgis::img::RSGISImageCalcException)
 	{
-		for(int i = 0; i < this->numBands; i++) // Loop through bands
+		for(int i = 0; i < this->numInBands; i++) // Loop through bands
 		{
 			if ((boost::math::isnan(bandValuesImage[i]) == false) && (bandValuesImage[i] != 0.0) && (bandValuesImage[i] > -100))
 			{
-				pixelVals[i]->push_back(bandValuesImage[i]);
+				this->pixelVals[i]->push_back(bandValuesImage[i]);
 			}
 		}
 	}
 
 	void RSGISObjectBasedEstimationGetObjVals::calcImageValue(float *bandValuesImage, int numBands, int band) throw(rsgis::img::RSGISImageCalcException)
 	{
-		for(int i = 1; i < this->numBands + 1;  i++) // Loop through bands
+		for(int i = 1; i < this->numInBands + 1;  i++) // Loop through bands
 		{
 			if ((boost::math::isnan(bandValuesImage[i]) == false) && (bandValuesImage[i] != 0.0) && (bandValuesImage[i] > -100))
 			{
-				pixelVals[i-1]->push_back(bandValuesImage[i]);
+				this->pixelVals[i-1]->push_back(bandValuesImage[i]);
 			}
 		}
 	}
@@ -1503,15 +1508,15 @@ namespace rsgis{namespace radar{
 
 	void RSGISObjectBasedEstimationGetObjVals::reset()
 	{
-		for(int i = 0; i < numBands; i++)
+		for(int i = 0; i < this->numInBands; i++)
 		{
-			pixelVals[i]->clear();
+			this->pixelVals[i]->clear();
 		}
 	}
 
 	RSGISObjectBasedEstimationGetObjVals::~RSGISObjectBasedEstimationGetObjVals()
 	{
-		for(int i = 0; i < numBands; i++)
+		for(int i = 0; i < this->numInBands; i++)
 		{
 			pixelVals[i]->clear();
 		}
