@@ -14574,7 +14574,6 @@ void RSGISExeEstimationAlgorithm::runAlgorithm() throw(RSGISException)
 					}
 					else
 					{
-						
                         processFeature = new rsgis::radar::RSGISObjectBasedEstimation(inputImageDS, outputImageDS, this->initialParClass, this->estSlowOptimiserClass, this->estFastOptimiserClass, this->parameters, this->minMaxValuesClass, this->classField, this->useClass);
 						processVector = new rsgis::vec::RSGISProcessVector(processFeature);
 						if (this->createOutSHP)

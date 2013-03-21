@@ -77,7 +77,6 @@ namespace rsgis{namespace radar{
 		unsigned int numOutputBands;
         rsgis::img::RSGISCalcImageSingleValue *getValues;
 		rsgis::img::RSGISCalcImageSingle *calcImageSingle;
-		rsgis::img::RSGISCalcImage *calcImage;
 		std::vector<gsl_vector*> *initialPar;
 		std::vector<RSGISEstimationOptimiser*> *slowOptimiser;
         std::vector<RSGISEstimationOptimiser*> *fastOptimiser;
@@ -178,7 +177,7 @@ namespace rsgis{namespace radar{
 		~RSGISObjectBasedEstimationGetObjVals();
 	protected:
 		std::vector<float> **pixelVals;
-		int numBands;
+		int numInBands;
 	};
 
 
