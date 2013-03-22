@@ -27,8 +27,6 @@ namespace rsgis{namespace radar{
 
 	RSGISObjectBasedEstimation::RSGISObjectBasedEstimation(GDALDataset *inputImage, GDALDataset *outputImage, std::vector<gsl_vector*> *initialPar, std::vector<RSGISEstimationOptimiser*> *slowOptimiser, std::vector<RSGISEstimationOptimiser*> *fastOptimiser, estParameters parameters, double ***minMaxVals, std::string classHeading, bool useClass)
 	{
-		std::cout << "BEFORE HERE" << std::endl;
-
 		this->datasetsIO = new GDALDataset*[2];
 		this->datasetsInput = new GDALDataset*[1];
 		this->datasetsIO[0] = inputImage;
@@ -44,8 +42,6 @@ namespace rsgis{namespace radar{
 		this->useClass = useClass;
 		this->minMaxVals = minMaxVals;
 		this->useDefaultMinMax = true;
-
-		std::cout << "HERE!" << std::endl;
 
 		if ((this->parameters == cDepthDensity) | (this->parameters == heightDensity)) // Set number of output parameters
 		{
@@ -98,8 +94,6 @@ namespace rsgis{namespace radar{
 
 			getValues->reset();
 			calcImageSingle->calcImageWithinPolygon(this->datasetsInput, 1, NULL, env, poly, false, rsgis::img::polyContainsPixelCenter); // The pixel in poly method is hardcoded as 'polyContainsPixelCenter', no output is required
-
-			std::cout << "Got Pixel values" << std::endl;
 
 			unsigned int estClass = 0;
 			OGRFeatureDefn *inFeatureDefn = inFeature->GetDefnRef();
@@ -281,11 +275,9 @@ namespace rsgis{namespace radar{
 			rsgis::img::RSGISCalcImageValue *invValues;
 			inOGRPoly = (OGRPolygon *) inFeature->GetGeometryRef();
 			poly = vecUtils.convertOGRPolygon2GEOSPolygon(inOGRPoly);
-			std::cout << "Calling reset" << std::endl;
 			getValues->reset();
-			std::cout << "Running calc image" << std::endl;
+
 			calcImageSingle->calcImageWithinPolygon(this->datasetsInput, 1, NULL, env, poly, false, rsgis::img::polyContainsPixelCenter); // The pixel in poly method is hardcoded as 'polyContainsPixelCenter', no output is required
-			std::cout << "Ran Calc Image" << std::endl;
 
 			unsigned int estClass = 0;
 			OGRFeatureDefn *inFeatureDefn = inFeature->GetDefnRef();
