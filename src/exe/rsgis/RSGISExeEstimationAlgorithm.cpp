@@ -5261,6 +5261,7 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
 		this->classField = "";
 		this->useClass = false;
 		this->useDefaultMinMax = false;
+		this->objAP = false;
 
 		this->option = RSGISExeEstimationAlgorithm::dualPolObject;
 		this->nBands = 4;
@@ -7969,6 +7970,7 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
 		this->classField = "";
 		this->useClass = false;
 		this->useDefaultMinMax = false;
+		this->objAP = false;
 		this->nBands = 4;
 		this->option = RSGISExeEstimationAlgorithm::fullPolObject;
 
@@ -14522,7 +14524,7 @@ void RSGISExeEstimationAlgorithm::runAlgorithm() throw(RSGISException)
 				// Perform Inversion
 				if (this->useRasPoly)
 				{
-					if (objAP)
+					if (this->objAP)
 					{
 						cout << "NOT IMPLEMENTED YET - PROCEDING WITHOUT OBJECT BASED AP INFORMATION" << endl;
 						processFeature = new rsgis::radar::RSGISObjectBasedEstimationRasterPolygon(inputImageDS, outputImageDS, inputRasterFeaturesDS, this->initialParClass, this->estSlowOptimiserClass, this->estFastOptimiserClass, this->parameters, this->minMaxValuesClass, this->classField, this->useClass);
@@ -14557,7 +14559,7 @@ void RSGISExeEstimationAlgorithm::runAlgorithm() throw(RSGISException)
 				}
 				else
 				{
-					if (objAP)
+					if (this->objAP)
 					{
 						processFeature = new rsgis::radar::RSGISObjectBasedEstimationObjectAP(inputImageDS, outputImageDS, this->initialParClass, this->estSlowOptimiserClass, this->estFastOptimiserClass, this->parameters, this->objAPParField, this->minMaxValuesClass, this->classField, this->useClass);
 						processVector = new rsgis::vec::RSGISProcessVector(processFeature);
@@ -14574,7 +14576,7 @@ void RSGISExeEstimationAlgorithm::runAlgorithm() throw(RSGISException)
 					}
 					else
 					{
-                        processFeature = new rsgis::radar::RSGISObjectBasedEstimation(inputImageDS, outputImageDS, this->initialParClass, this->estSlowOptimiserClass, this->estFastOptimiserClass, this->parameters, this->minMaxValuesClass, this->classField, this->useClass);
+						processFeature = new rsgis::radar::RSGISObjectBasedEstimation(inputImageDS, outputImageDS, this->initialParClass, this->estSlowOptimiserClass, this->estFastOptimiserClass, this->parameters, this->minMaxValuesClass, this->classField, this->useClass);
 						processVector = new rsgis::vec::RSGISProcessVector(processFeature);
 						if (this->createOutSHP)
 						{
