@@ -360,7 +360,7 @@ namespace rsgis{namespace rastergis{
                     }
                     else if((*iterIndexes)->idx == rsgis_ellipticfit)
                     {
-                        
+                        throw rsgis::img::RSGISImageCalcException("Elliptic Fit not implemented.");
                     }
                     else if((*iterIndexes)->idx == rsgis_length)
                     {
@@ -389,19 +389,19 @@ namespace rsgis{namespace rastergis{
                     }
                     else if((*iterIndexes)->idx == rsgis_radiuslargestenclosedellipse)
                     {
-                        
+                        throw rsgis::img::RSGISImageCalcException("Largest enclosed ellipse not implemented.");
                     }
                     else if((*iterIndexes)->idx == rsgis_radiussmallestenclosedellipse)
                     {
-                        
+                        throw rsgis::img::RSGISImageCalcException("Smallest enclosed ellipse not implemented.");
                     }
                     else if((*iterIndexes)->idx == rsgis_rectangularfit)
                     {
-                        
+                        throw rsgis::img::RSGISImageCalcException("Rectangular Fit not implemented.");
                     }
                     else if((*iterIndexes)->idx == rsgis_roundness)
                     {
-                        
+                        throw rsgis::img::RSGISImageCalcException("Roundness not implemented.");
                     }
                     else if((*iterIndexes)->idx == rsgis_shapeindex)
                     {
