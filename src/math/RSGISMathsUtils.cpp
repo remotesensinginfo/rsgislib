@@ -703,6 +703,26 @@ namespace rsgis{namespace math{
             throw e;
         }
     }
+    
+    void RSGISMathsUtils::initStatsSummary(RSGISStatsSummary *stats)
+    {
+        if(stats != NULL)
+        {
+            stats->calcMin = false;
+            stats->calcMax = false;
+            stats->calcMean = false;
+            stats->calcStdDev = false;
+            stats->calcSum = false;
+            stats->calcMedian = false;
+            
+            stats->min = 0;
+            stats->max = 0;
+            stats->mean = 0;
+            stats->stdDev = 0;
+            stats->sum = 0;
+            stats->median = 0;
+        }
+    }
 
 }}
 

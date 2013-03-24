@@ -70,6 +70,7 @@ namespace rsgisexe{
         XMLCh *optionFindBoundaryPixels = xercesc::XMLString::transcode("findboundarypixels");
         XMLCh *optionCalcBorderLength = xercesc::XMLString::transcode("calcborderlength");
         XMLCh *optionCalcRelBorderLength = xercesc::XMLString::transcode("calcrelborderlength");
+        XMLCh *optionCalcShapeIndices = xercesc::XMLString::transcode("calcshapeindices");
         
         const XMLCh *algorNameEle = argElement->getAttribute(algorXMLStr);
         if(!xercesc::XMLString::equals(algorName, algorNameEle))
@@ -2541,6 +2542,76 @@ namespace rsgisexe{
             xercesc::XMLString::release(&classNameXMLStr);
             
         }
+        else if(xercesc::XMLString::equals(optionCalcShapeIndices, optionXML))
+        {
+            this->option = RSGISExeRasterGIS::calcshapeindices;
+            
+            XMLCh *clumpsXMLStr = xercesc::XMLString::transcode("clumps");
+            if(argElement->hasAttribute(clumpsXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(clumpsXMLStr));
+                this->inputImage = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'clumps\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&clumpsXMLStr);
+            
+            XMLCh *rsgisIndexXMLStr = xercesc::XMLString::transcode("rsgis:index");
+            xercesc::DOMNodeList *indexNodesList = argElement->getElementsByTagName(rsgisIndexXMLStr);
+            unsigned int numIndexTags = indexNodesList->getLength();
+            
+            std::cout << "Found " << numIndexTags << " index tags" << std::endl;
+            
+            if(numIndexTags == 0)
+            {
+                throw rsgis::RSGISXMLArgumentsException("No index tags have been provided, at least 1 is required.");
+            }
+            
+            shapeIndexes = new std::vector<rsgis::rastergis::RSGISShapeParam*>();
+            shapeIndexes->reserve(numIndexTags);
+            
+            rsgis::rastergis::RSGISShapeParam *index = NULL;
+            xercesc::DOMElement *attElement = NULL;
+            for(int i = 0; i < numIndexTags; i++)
+            {
+                attElement = static_cast<xercesc::DOMElement*>(indexNodesList->item(i));
+                
+                index = new rsgis::rastergis::RSGISShapeParam();
+                
+                
+                XMLCh *nameXMLStr = xercesc::XMLString::transcode("name");
+                if(attElement->hasAttribute(nameXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(attElement->getAttribute(nameXMLStr));
+                    index->idx = rsgis::rastergis::RSGISCalcClumpShapeParameters::getRSGISShapeIndex(std::string(charValue));
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'name\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&nameXMLStr);
+                
+                
+                XMLCh *columnXMLStr = xercesc::XMLString::transcode("column");
+                if(attElement->hasAttribute(columnXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(attElement->getAttribute(columnXMLStr));
+                    index->colName = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'column\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&columnXMLStr);
+                
+                shapeIndexes->push_back(index);
+            }
+        }
         else
         {
             std::string message = std::string("The option (") + std::string(xercesc::XMLString::transcode(optionXML)) + std::string(") is not known: RSGISExeRasterGIS.");
@@ -2577,6 +2648,7 @@ namespace rsgisexe{
         xercesc::XMLString::release(&optionFindBoundaryPixels);
         xercesc::XMLString::release(&optionCalcBorderLength);
         xercesc::XMLString::release(&optionCalcRelBorderLength);
+        xercesc::XMLString::release(&optionCalcShapeIndices);
     }
     
     void RSGISExeRasterGIS::runAlgorithm() throw(rsgis::RSGISException)
@@ -3646,6 +3718,44 @@ namespace rsgisexe{
                     throw e;
                 }
             }
+            else if(this->option == RSGISExeRasterGIS::calcshapeindices)
+            {
+                std::cout << "A command to calculate shape indices for clumps.\n";
+                std::cout << "Input Image: " << this->inputImage << std::endl;
+                for(std::vector<rsgis::rastergis::RSGISShapeParam*>::iterator iterIndexes = shapeIndexes->begin(); iterIndexes != shapeIndexes->end(); ++iterIndexes)
+                {
+                    std::cout << rsgis::rastergis::RSGISCalcClumpShapeParameters::getRSGISShapeIndexAsString((*iterIndexes)->idx) << " Index with output column name \'" << (*iterIndexes)->colName << "\'" << std::endl;
+                }
+                
+                try
+                {
+                    std::cout.precision(12);
+                    
+                    GDALAllRegister();
+                    
+                    GDALDataset *inputDataset = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_Update);
+                    if(inputDataset == NULL)
+                    {
+                        std::string message = std::string("Could not open image ") + this->inputImage;
+                        throw rsgis::RSGISImageException(message.c_str());
+                    }
+                    
+                    rsgis::rastergis::RSGISCalcClumpShapeParameters calcShapeParams;
+                    calcShapeParams.calcClumpShapeParams(inputDataset, shapeIndexes);
+                    
+                    for(std::vector<rsgis::rastergis::RSGISShapeParam*>::iterator iterIndexes = shapeIndexes->begin(); iterIndexes != shapeIndexes->end(); ++iterIndexes)
+                    {
+                        delete *iterIndexes;
+                    }
+                    delete shapeIndexes;
+                    
+                    GDALClose(inputDataset);
+                }
+                catch(rsgis::RSGISException &e)
+                {
+                    throw e;
+                }
+            }
             else
             {
                 throw rsgis::RSGISException("The option is not recognised: RSGISExeRasterGIS");
@@ -3934,6 +4044,15 @@ namespace rsgisexe{
                 else
                 {
                     std::cout << "Not ignoring zero edges on clumps\n";
+                }
+            }
+            else if(this->option == RSGISExeRasterGIS::calcshapeindices)
+            {
+                std::cout << "A command to calculate shape indices for clumps.\n";
+                std::cout << "Input Image: " << this->inputImage << std::endl;
+                for(std::vector<rsgis::rastergis::RSGISShapeParam*>::iterator iterIndexes = shapeIndexes->begin(); iterIndexes != shapeIndexes->end(); ++iterIndexes)
+                {
+                    std::cout << rsgis::rastergis::RSGISCalcClumpShapeParameters::getRSGISShapeIndexAsString((*iterIndexes)->idx) << " Index with output column name \'" << (*iterIndexes)->colName << "\'" << std::endl;
                 }
             }
             else
