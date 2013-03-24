@@ -688,7 +688,8 @@ set(LIB_RASTERGIS_H
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISClassMask.h
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISDefineImageTiles.h 
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISCreateImageTiles.h
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISClumpBorders.h )
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISClumpBorders.h
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISCalcClumpShapeParameters.h )
 	
 set(LIB_RASTERGIS_CPP
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISAttributeTable.cpp
@@ -744,7 +745,9 @@ set(LIB_RASTERGIS_CPP
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISCreateImageTiles.cpp
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISCreateImageTiles.h
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISClumpBorders.cpp
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISClumpBorders.h )
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISClumpBorders.h
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISCalcClumpShapeParameters.cpp
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISCalcClumpShapeParameters.h )
 ###############################################################################
 
 ###############################################################################

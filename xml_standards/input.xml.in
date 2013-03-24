@@ -503,6 +503,16 @@
 	<rsgis:command algor="rastergis" option="calcborderlength" clumps="clumps.kea" ignorezeroedges="yes | no" colname="string" />
 	<!-- A command to calculate the relative border length of the clumps to a class -->
 	<rsgis:command algor="rastergis" option="calcrelborderlength" clumps="clumps.kea" ignorezeroedges="yes | no" colname="string" classcolumn="string" classname="string" />
+	<!-- A command to calculate shape indices for clumps -->
+	<rsgis:command algor="rastergis" option="calcshapeindices" clumps="clumps.kea" >
+		<rsgis:index name="Area | Asymmetry | BorderIndex | BorderLength | Compactness| Density | EllipticFit | Length | LengthWidth | Width | MainDirection | RadiusLargestEnclosedEllipse | RadiusSmallestEnclosedEllipse | RectangularFit | Roundness | ShapeIndex" column="string" />
+        <rsgis:index name="Area | Asymmetry | BorderIndex | BorderLength | Compactness| Density | EllipticFit | Length | LengthWidth | Width | MainDirection | RadiusLargestEnclosedEllipse | RadiusSmallestEnclosedEllipse | RectangularFit | Roundness | ShapeIndex" column="string" />
+        <rsgis:index name="Area | Asymmetry | BorderIndex | BorderLength | Compactness| Density | EllipticFit | Length | LengthWidth | Width | MainDirection | RadiusLargestEnclosedEllipse | RadiusSmallestEnclosedEllipse | RectangularFit | Roundness | ShapeIndex" column="string" />
+    </rsgis:command>
+
+
+
+
 
 
 

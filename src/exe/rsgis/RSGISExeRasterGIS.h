@@ -53,6 +53,7 @@
 #include "rastergis/RSGISClassMask.h"
 #include "rastergis/RSGISFindClumpNeighbours.h"
 #include "rastergis/RSGISClumpBorders.h"
+#include "rastergis/RSGISCalcClumpShapeParameters.h"
 
 #include "gdal_priv.h"
 #include "ogrsf_frmts.h"
@@ -95,7 +96,8 @@ namespace rsgisexe{
             findneighbours,
             findboundarypixels,
             calcborderlength,
-            calcrelborder
+            calcrelborder,
+            calcshapeindices
         };
         
         RSGISExeRasterGIS();
@@ -159,6 +161,7 @@ namespace rsgisexe{
         std::vector<std::string> priorStrs;
         bool allowZeroPriors;
         bool ignoreZeroEdges;
+        std::vector<rsgis::rastergis::RSGISShapeParam*> *shapeIndexes;
     };
     
 }
