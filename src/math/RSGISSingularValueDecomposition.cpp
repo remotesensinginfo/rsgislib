@@ -38,7 +38,8 @@ namespace rsgis{namespace math{
 		
 		//cout << "A:" << endl;
 		matrixUtils.printGSLMatrix(inA);
-		
+		gsl_matrix *outV;
+        gsl_vector *outS;
 		outV = gsl_matrix_alloc (inA->size2, inA->size2);
 		outS = gsl_vector_alloc (inA->size2);
 		gsl_vector *out_work = gsl_vector_alloc (inA->size2);
@@ -53,6 +54,9 @@ namespace rsgis{namespace math{
 		matrixUtils.printGSLMatrix(outV);
 		cout << "S:" << endl;
 		vectorUtils.printGSLVector(outS);*/
+        
+        gsl_matrix_free(outV);
+		gsl_vector_free(outS);
 	}
 	
 	void RSGISSingularValueDecomposition::ComputeSVDrsgis(Matrix *matrix)
@@ -62,6 +66,8 @@ namespace rsgis{namespace math{
 		RSGISMatrices matrixUtils;
 		inA = matrixUtils.convertRSGIS2GSLMatrix(matrix); // Convert to gsl_matrix
 		
+        gsl_matrix *outV;
+        gsl_vector *outS;
 		outV = gsl_matrix_alloc (matrix->m, matrix->m);
 		outS = gsl_vector_alloc (matrix->m);
 		gsl_vector *out_work = gsl_vector_alloc (matrix->m);
@@ -80,6 +86,9 @@ namespace rsgis{namespace math{
 		vectorUtils.printGSLVector(outS);
 		
 		cout << "GSL matrix U is :" << inA->size1 << " x " << inA->size2 << endl;*/
+        
+        gsl_matrix_free(outV);
+		gsl_vector_free(outS);
 		
 	}
 	
@@ -91,14 +100,13 @@ namespace rsgis{namespace math{
 		 gsl_vector outX.
 		 */ 
 		//cout << "Starting lin solve.." << endl;
-		this->inA = inA;
-		this->outV = outV;
-		this->outS = outS;
-		RSGISVectors vectorUtils;
+        gsl_matrix *outV;
+        gsl_vector *outS;
+        outV = gsl_matrix_alloc (inA->size2, inA->size2);
+		outS = gsl_vector_alloc (inA->size2);
 		svdSolve = gsl_linalg_SV_solve (inA, outV, outS, inB, outX);
 		std::cout << "solved!" << std::endl;
 		std::cout << "coefficients are: ";
-		vectorUtils.printGSLVector(outX);
 		gsl_matrix_free(outV);
 		gsl_vector_free(outS);
 	}

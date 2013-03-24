@@ -78,8 +78,6 @@ namespace rsgis {namespace radar{
 	private:
 		gsl_matrix *a;
 		gsl_vector *offsets;
-		gsl_matrix *invCovMatrixP; 
-		gsl_matrix *invCovMatrixD;
 	};
 }}
 

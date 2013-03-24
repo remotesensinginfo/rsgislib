@@ -46,7 +46,7 @@ namespace rsgis {namespace radar{
 		bfgs2
 	};
 
-	double function(const gsl_vector *predictParams, void *parameters);
+	double function(const gsl_vector *predictParams, void *parameters, std::string coeffHVFile, std::string coeffFPCFile);
 	void dFunction(const gsl_vector *predictParams, void *parameters, gsl_vector *df);
 	void completeFunction(const gsl_vector *predictParams, void *parameters, double *f, gsl_vector *df);
 
@@ -59,10 +59,6 @@ namespace rsgis {namespace radar{
 		virtual estOptimizerType getOptimiserType(){return unknown;}; 
 		virtual void printOptimiser(){std::cout << "GSL Optimiser" << std::endl;};
 		~RSGISEstimationGSLOptimiser();
-	private:
-		rsgis::math::RSGISMathTwoVariableFunction *functionHH;
-		rsgis::math::RSGISMathTwoVariableFunction *functionHV;
-		gsl_vector *inData;
 	};
 	
 	class RSGISEstimationGSLOptimiserNoGradient : public RSGISEstimationOptimiser
@@ -74,10 +70,6 @@ namespace rsgis {namespace radar{
 		virtual estOptimizerType getOptimiserType(){return unknown;}; 
 		virtual void printOptimiser(){std::cout << "GSL Optimiser - no gradients" << std::endl;};
 		~RSGISEstimationGSLOptimiserNoGradient();
-	private:
-		rsgis::math::RSGISMathTwoVariableFunction *functionHH;
-		rsgis::math::RSGISMathTwoVariableFunction *functionHV;
-		gsl_vector *inData;
 	};
 	
 }}
