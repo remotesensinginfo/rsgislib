@@ -47,7 +47,6 @@ namespace rsgis { namespace classifier {
 		bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};												
 		~RSGISSpectralAngleMapperRule();
 	private:
-		int numOutBands;
 		double *imageSpecArray;
 		gsl_matrix *refSpectra;
 	};
@@ -65,7 +64,6 @@ namespace rsgis { namespace classifier {
 		bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};															
 		~RSGISSpectralAngleMapperED();
 	private:
-		int numOutBands;
 		gsl_matrix *refSpectra;
 	};
 	
@@ -83,7 +81,6 @@ namespace rsgis { namespace classifier {
 		bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};															
 		~RSGISSpectralAngleMapperClassifier();
 	private:
-		int numOutBands;
 		double threashold;
 	};
 	

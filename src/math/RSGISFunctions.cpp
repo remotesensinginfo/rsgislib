@@ -147,7 +147,7 @@ namespace rsgis{namespace math{
 		
 	}
 	
-	RSGISFunctionLinXfLinY::RSGISFunctionLinXfLinY(double coeffB0, double coeffB1, double coeffC0, double c1)
+	RSGISFunctionLinXfLinY::RSGISFunctionLinXfLinY(double coeffB0, double coeffB1, double coeffC0, double coeffC1)
 	{
 		this->coeffB0 = coeffB0;
 		this->coeffB1 = coeffB1;

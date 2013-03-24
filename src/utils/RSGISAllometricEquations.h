@@ -43,7 +43,6 @@ namespace rsgis{namespace utils{
             double calculateStemBiomassHeight(double height, treeSpecies species);
             ~RSGISAllometricEquations();
         private:
-            treeSpecies species;
         };
 }}
 
