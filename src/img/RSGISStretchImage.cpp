@@ -728,6 +728,325 @@ namespace rsgis { namespace img {
 	{
 		
 	}
+    
+    
+    
+    
+    
+    
+    RSGISStretchImageWithStats::RSGISStretchImageWithStats(GDALDataset *inputImage, std::string outputImage, std::string inStatsFile, std::string imageFormat, GDALDataType outDataType): inputImage(NULL), outputImage("")
+	{
+		this->inputImage = inputImage;
+		this->outputImage = outputImage;
+        this->inStatsFile = inStatsFile;
+        this->imageFormat = imageFormat;
+        this->outDataType = outDataType;
+	}
+	
+	void RSGISStretchImageWithStats::executeLinearMinMaxStretch() throw(RSGISImageCalcException)
+	{
+		GDALDataset **datasets = NULL;
+		RSGISCalcImage *calcImg = NULL;
+		RSGISLinearStretchImage *linearStretchImage = NULL;
+		double *imageMax = NULL;
+		double *imageMin = NULL;
+		double *outMax = NULL;
+		double *outMin = NULL;
+		try
+		{
+			int numBands = inputImage->GetRasterCount();
+			datasets = new GDALDataset*[1];
+			datasets[0] = inputImage;
+			
+			imageMax = new double[numBands];
+			imageMin = new double[numBands];
+			outMax = new double[numBands];
+			outMin = new double[numBands];
+			
+            std::vector<BandSpecThresholdStats> *stats = this->readBandSpecThresholds(this->inStatsFile);
+            
+			for(int i = 0; i < numBands; i++)
+			{
+				imageMin[i] = stats->at(i).origMin;
+				imageMax[i] = stats->at(i).origMax;
+				outMax[i] = stats->at(i).imgMax;
+				outMin[i] = stats->at(i).imgMin;
+                
+                std::cout << "Band[" << i+1 << "] Image Min = " << imageMin[i] << " Image Max = " << imageMax[i] << " Output Min = " << outMin[i] << " Output Max = " << outMax[i] << std::endl;
+			}
+            
+			delete stats;
+			
+			linearStretchImage = new RSGISLinearStretchImage(numBands, imageMax, imageMin, outMax, outMin);
+			calcImg = new RSGISCalcImage(linearStretchImage, "", true);
+			calcImg->calcImage(datasets, 1, outputImage, false, NULL, imageFormat, outDataType);
+			
+		}
+		catch(RSGISImageCalcException e)
+		{
+			if(datasets != NULL)
+			{
+				delete[] datasets;
+			}
+			throw e;
+		}
+		catch(RSGISImageBandException e)
+		{
+			if(datasets != NULL)
+			{
+				delete[] datasets;
+			}
+			throw RSGISImageCalcException(e.what());
+		}
+		
+		delete[] imageMax;
+		delete[] imageMin;
+		delete[] outMax;
+		delete[] outMin;
+		
+		delete linearStretchImage;
+		delete calcImg;
+		
+		if(datasets != NULL)
+		{
+			delete[] datasets;
+		}
+	}
+	
+	void RSGISStretchImageWithStats::executeHistogramStretch() throw(RSGISImageCalcException)
+	{
+		throw RSGISImageCalcException("Histogram Stretch is not implmented yet\n");
+	}
+	
+	void RSGISStretchImageWithStats::executeExponentialStretch() throw(RSGISImageCalcException)
+	{
+		GDALDataset **datasets = NULL;
+		RSGISCalcImage *calcImg = NULL;
+		RSGISFuncLinearStretchImage *stretchImage = NULL;
+		double *imageMax = NULL;
+		double *imageMin = NULL;
+		double *outMax = NULL;
+		double *outMin = NULL;
+		
+		rsgis::math::RSGISMathFunction *function = new RSGISExponentStretchFunction();
+		
+		try
+		{
+			int numBands = inputImage->GetRasterCount();
+			datasets = new GDALDataset*[1];
+			datasets[0] = inputImage;
+			
+			imageMax = new double[numBands];
+			imageMin = new double[numBands];
+			outMax = new double[numBands];
+			outMin = new double[numBands];
+			
+			std::vector<BandSpecThresholdStats> *stats = this->readBandSpecThresholds(this->inStatsFile);
+            
+			for(int i = 0; i < numBands; i++)
+			{
+				imageMin[i] = stats->at(i).origMin;
+				imageMax[i] = stats->at(i).origMax;
+				outMax[i] = stats->at(i).imgMax;
+				outMin[i] = stats->at(i).imgMin;
+                
+                std::cout << "Band[" << i+1 << "] Image Min = " << imageMin[i] << " Image Max = " << imageMax[i] << " Output Min = " << outMin[i] << " Output Max = " << outMax[i] << std::endl;
+			}
+            
+			delete stats;
+			
+			stretchImage = new RSGISFuncLinearStretchImage(numBands, imageMax, imageMin, outMax, outMin, function);
+			calcImg = new RSGISCalcImage(stretchImage, "", true);
+			calcImg->calcImage(datasets, 1, outputImage, false, NULL, imageFormat, outDataType);
+			
+		}
+		catch(RSGISImageCalcException e)
+		{
+			if(datasets != NULL)
+			{
+				delete[] datasets;
+			}
+			throw e;
+		}
+		catch(RSGISImageBandException e)
+		{
+			if(datasets != NULL)
+			{
+				delete[] datasets;
+			}
+			throw RSGISImageCalcException(e.what());
+		}
+		
+		delete[] imageMax;
+		delete[] imageMin;
+		delete[] outMax;
+		delete[] outMin;
+		
+		delete stretchImage;
+		delete calcImg;
+		delete function;
+		
+		if(datasets != NULL)
+		{
+			delete[] datasets;
+		}
+	}
+	
+	void RSGISStretchImageWithStats::executeLogrithmicStretch() throw(RSGISImageCalcException)
+	{
+		GDALDataset **datasets = NULL;
+		RSGISCalcImage *calcImg = NULL;
+		RSGISFuncLinearStretchImage *stretchImage = NULL;
+		double *imageMax = NULL;
+		double *imageMin = NULL;
+		double *outMax = NULL;
+		double *outMin = NULL;
+		
+		rsgis::math::RSGISMathFunction *function = new RSGISLogrithmStretchFunction();
+		
+		try
+		{
+			int numBands = inputImage->GetRasterCount();
+			datasets = new GDALDataset*[1];
+			datasets[0] = inputImage;
+			
+			imageMax = new double[numBands];
+			imageMin = new double[numBands];
+			outMax = new double[numBands];
+			outMin = new double[numBands];
+			
+			std::vector<BandSpecThresholdStats> *stats = this->readBandSpecThresholds(this->inStatsFile);
+            
+			for(int i = 0; i < numBands; i++)
+			{
+				imageMin[i] = stats->at(i).origMin;
+				imageMax[i] = stats->at(i).origMax;
+				outMax[i] = stats->at(i).imgMax;
+				outMin[i] = stats->at(i).imgMin;
+                
+                std::cout << "Band[" << i+1 << "] Image Min = " << imageMin[i] << " Image Max = " << imageMax[i] << " Output Min = " << outMin[i] << " Output Max = " << outMax[i] << std::endl;
+			}
+            
+			delete stats;
+			
+			stretchImage = new RSGISFuncLinearStretchImage(numBands, imageMax, imageMin, outMax, outMin, function);
+			calcImg = new RSGISCalcImage(stretchImage, "", true);
+			calcImg->calcImage(datasets, 1, outputImage, false, NULL, imageFormat, outDataType);
+			
+		}
+		catch(RSGISImageCalcException e)
+		{
+			if(datasets != NULL)
+			{
+				delete[] datasets;
+			}
+			throw e;
+		}
+		catch(RSGISImageBandException e)
+		{
+			if(datasets != NULL)
+			{
+				delete[] datasets;
+			}
+			throw RSGISImageCalcException(e.what());
+		}
+		
+		delete[] imageMax;
+		delete[] imageMin;
+		delete[] outMax;
+		delete[] outMin;
+		
+		delete stretchImage;
+		delete calcImg;
+		delete function;
+		
+		if(datasets != NULL)
+		{
+			delete[] datasets;
+		}
+	}
+	
+	void RSGISStretchImageWithStats::executePowerLawStretch(float power) throw(RSGISImageCalcException)
+	{
+		GDALDataset **datasets = NULL;
+		RSGISCalcImage *calcImg = NULL;
+		RSGISFuncLinearStretchImage *stretchImage = NULL;
+		double *imageMax = NULL;
+		double *imageMin = NULL;
+		double *outMax = NULL;
+		double *outMin = NULL;
+		
+		rsgis::math::RSGISMathFunction *function = new RSGISPowerLawStretchFunction(power);
+		
+		try
+		{
+			int numBands = inputImage->GetRasterCount();
+			datasets = new GDALDataset*[1];
+			datasets[0] = inputImage;
+			
+			imageMax = new double[numBands];
+			imageMin = new double[numBands];
+			outMax = new double[numBands];
+			outMin = new double[numBands];
+			
+			std::vector<BandSpecThresholdStats> *stats = this->readBandSpecThresholds(this->inStatsFile);
+            
+			for(int i = 0; i < numBands; i++)
+			{
+				imageMin[i] = stats->at(i).origMin;
+				imageMax[i] = stats->at(i).origMax;
+				outMax[i] = stats->at(i).imgMax;
+				outMin[i] = stats->at(i).imgMin;
+                
+                std::cout << "Band[" << i+1 << "] Image Min = " << imageMin[i] << " Image Max = " << imageMax[i] << " Output Min = " << outMin[i] << " Output Max = " << outMax[i] << std::endl;
+			}
+            
+			delete stats;
+			
+			stretchImage = new RSGISFuncLinearStretchImage(numBands, imageMax, imageMin, outMax, outMin, function);
+			calcImg = new RSGISCalcImage(stretchImage, "", true);
+			calcImg->calcImage(datasets, 1, outputImage, false, NULL, imageFormat, outDataType);
+			
+		}
+		catch(RSGISImageCalcException e)
+		{
+			if(datasets != NULL)
+			{
+				delete[] datasets;
+			}
+			throw e;
+		}
+		catch(RSGISImageBandException e)
+		{
+			if(datasets != NULL)
+			{
+				delete[] datasets;
+			}
+			throw RSGISImageCalcException(e.what());
+		}
+		
+		delete[] imageMax;
+		delete[] imageMin;
+		delete[] outMax;
+		delete[] outMin;
+		
+		delete stretchImage;
+		delete calcImg;
+		delete function;
+		
+		if(datasets != NULL)
+		{
+			delete[] datasets;
+		}
+	}
+	
+	RSGISStretchImageWithStats::~RSGISStretchImageWithStats()
+	{
+		
+	}
+    
+    
+    
 	
 	
 	double RSGISExponentStretchFunction::calcFunction(double value) throw(rsgis::math::RSGISMathException)
