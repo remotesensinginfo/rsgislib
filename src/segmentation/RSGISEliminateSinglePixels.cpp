@@ -1196,7 +1196,11 @@ namespace rsgis{namespace segment{
             
             bool hasNeighbour = false;
             
-            if( noDataValProvided & (dataBlock[0][winHsize][winHsize] != noDataVal) )
+            if( noDataValProvided & (dataBlock[0][winHsize][winHsize] == noDataVal) )
+            {
+                output[0] = 0;
+            }
+            else
             {
                 if(dataBlock[0][winHsize][winHsize] == dataBlock[0][0][1])
                 {
@@ -1218,17 +1222,18 @@ namespace rsgis{namespace segment{
                     hasNeighbour = true;
                 }
                 
+                
+                if(!hasNeighbour)
+                {
+                    output[0] = 1;
+                    ++numSingles;
+                }
+                else
+                {
+                    output[0] = 0;
+                }
             }
             
-            if(!hasNeighbour)
-            {
-                output[0] = 1;
-                ++numSingles;
-            }
-            else
-            {
-                output[0] = 0;
-            }
         }
         catch(rsgis::img::RSGISImageCalcException &e)
         {
