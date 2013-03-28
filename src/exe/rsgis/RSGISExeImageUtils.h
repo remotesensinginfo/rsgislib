@@ -143,7 +143,8 @@ class RSGISExeImageUtils : public RSGISAlgorithmParameters
             subset2img,
             defineimgtiles,
             gentilemasks,
-            cutouttile
+            cutouttile,
+            stretchwithstats
 		};
 
 		enum interpolators
@@ -186,6 +187,7 @@ class RSGISExeImageUtils : public RSGISAlgorithmParameters
 		string inputVector;
         string inputCSV;
         string inputDEM;
+        string inputFile;
 		string outputFile;
 		string filenameAttribute;
 		string imageMask;
