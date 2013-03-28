@@ -3530,6 +3530,8 @@ void RSGISExeSegment::runAlgorithm() throw(rsgis::RSGISException)
                 GDALClose(clumpsDataset);
             }
             
+            resultDataset->GetRasterBand(1)->SetMetadataItem("LAYER_TYPE", "thematic");
+            
             // Tidy up
             GDALClose(inDataset);
             GDALClose(inClumpDataset);
@@ -4314,6 +4316,8 @@ void RSGISExeSegment::runAlgorithm() throw(rsgis::RSGISException)
                 GDALClose(clumpsDataset);
             }
             
+            resultDataset->GetRasterBand(1)->SetMetadataItem("LAYER_TYPE", "thematic");
+            
             // Tidy up
             GDALClose(inDataset);
             GDALClose(inClumpDataset);
@@ -4373,6 +4377,8 @@ void RSGISExeSegment::runAlgorithm() throw(rsgis::RSGISException)
                 GDALClose(outDataset);
                 GDALClose(catagoryDataset);
             }
+            
+            resultDataset->GetRasterBand(1)->SetMetadataItem("LAYER_TYPE", "thematic");
             
             // Tidy up
             GDALClose(inDataset);
