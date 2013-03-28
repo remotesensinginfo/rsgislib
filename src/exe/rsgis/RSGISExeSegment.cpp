@@ -4809,7 +4809,7 @@ void RSGISExeSegment::runAlgorithm() throw(rsgis::RSGISException)
             
             std::cout << "Eliminating Individual Pixels\n";
             rsgis::segment::RSGISEliminateSinglePixels eliminate;
-            eliminate.eliminate(spectralDataset, clumpsDataset, pixelMaskDataset, this->outputImage, 0, this->ignoreZeros, this->projFromImage, this->proj, this->imageFormat);
+            eliminate.eliminateBlocks(spectralDataset, clumpsDataset, pixelMaskDataset, this->outputImage, 0, this->ignoreZeros, this->projFromImage, this->proj, this->imageFormat);
             
             clumpsDataset->GetRasterBand(1)->SetMetadataItem("LAYER_TYPE", "thematic");
             
