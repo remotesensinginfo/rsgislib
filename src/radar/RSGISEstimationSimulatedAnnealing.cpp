@@ -111,11 +111,6 @@ namespace rsgis {namespace radar{
             }
         }
         
-        // Open text file to write errors to
-        /*ofstream outTxtFile;
-         outTxtFile.open("/Users/danclewley/Documents/Research/USC/Inversion/AIRSAR/CP/SensitivityAnalysis/SAConvTests/SAIttTest.csv");
-         outTxtFile << "itt,bestHErr,CurrHErr,bestDErr,CurrDErr,bestEpsErr,CurrEpsErr" << endl;*/
-        
         rsgis::math::RSGISVectors vectorUtils;
         rsgis::math::RSGISMatrices matrixUtils;
         
@@ -150,11 +145,10 @@ namespace rsgis {namespace radar{
         bestParError->push_back(99999);
         
         unsigned int tRuns = maxItt;// / (runsStep * runsTemp * 5);
-        unsigned int t = 0;
-        for(unsigned int i = 0; i < tRuns; ++i)
+        for(unsigned int t = 0; t < tRuns; ++t)
         {
             // Decrease tempreature
-            if(i == (tRuns - 1)) // Last Run
+            if(t == (tRuns - 1)) // Last Run
             {
                 // Set temperature to zero
                 temp = 0;
@@ -171,6 +165,7 @@ namespace rsgis {namespace radar{
                 for (unsigned int j = 0; j < this->nPar; j++) 
                 {
                     stepSize[j] = initialStepSize[j];
+                    currentParError->at(j) = bestParError->at(j);
                 }
             }
             
@@ -204,87 +199,82 @@ namespace rsgis {namespace radar{
                             withinLimits = false;
                         }
                         
-                        if (withinLimits) 
-                        {							
-							double prevEnergy = currentParError->at(this->nPar);
-                            // Calculate energy
-                            newEnergy = this->calcLeastSquares(testPar);
-                            double error = newEnergy;
-                            if(newEnergy < currentParError->at(this->nPar)) // If new energy is lower accept
+                    }
+                    if (withinLimits)
+                    {
+                        double prevEnergy = currentParError->at(this->nPar);
+                        // Calculate energy
+                        newEnergy = this->calcLeastSquares(testPar);
+                        double error = newEnergy;
+                        if(newEnergy < currentParError->at(this->nPar)) // If new energy is lower accept
+                        {
+                            
+                            for(unsigned int j = 0; j < this->nPar; j++)
                             {
-                                // Calculate rel error (Test)
-                                /*double realCDepth = 5.74304;
-                                 double realDensity = 0.0578171;
-                                 double realEps = 25.8736;
-                                 
-                                 double bestcDepthError = sqrt(pow((realCDepth - bestParError[0]),2)) / realCDepth; 
-                                 double bestdensError = sqrt(pow((realDensity - bestParError[1]),2)) / realDensity;
-                                 double bestEpsError = sqrt(pow((realEps - bestParError[2]),2)) / realEps;
-                                 
-                                 double currentcDepthError = sqrt(pow((realCDepth - currentParError[0]),2)) / realCDepth; 
-                                 double currentdensError = sqrt(pow((realDensity - currentParError[1]),2)) / realDensity;
-                                 double currentEpsError = sqrt(pow((realEps - currentParError[2]),2)) / realEps;
-                                 
-                                 outTxtFile << numItt << "," << bestcDepthError << "," << bestdensError << "," << currentcDepthError << "," << currentdensError << "," << bestEpsError << "," << currentEpsError << endl;*/
-                                
                                 currentParError->at(j) = testPar->at(j);
                                 accepted[j]++;
-                                
-                                currentParError->at(this->nPar) = newEnergy;
-                                
-                                if(currentParError->at(this->nPar) < bestParError->at(this->nPar)) // If new energy is less than best, update best.
-                                {
-                                    for (unsigned int k = 0; k < this->nPar + 1; k++) 
-                                    {
-                                        bestParError->at(k) = currentParError->at(k);
-                                    }
-                                    bestParError->at(this->nPar) = currentParError->at(this->nPar);
-                                    
-                                    if (bestParError->at(this->nPar) < this->minEnergy) // If new energy is less than threashold return.
-                                    {
-                                        bestParError->at(this->nPar) = error;
-                                        
-                                        for (unsigned int k = 0; k < this->nPar + 1; k++) 
-                                        {
-                                            gsl_vector_set(outParError, k, bestParError->at(k));
-                                        }
-                                        
-                                        // Tidy
-                                        delete currentParError;
-                                        delete testPar;
-                                        delete bestParError;
-                                        delete[] accepted;
-                                        delete[] stepSize;
-                                        
-                                        // Exit
-                                        return 1;
-                                    }
-                                }
-                                
                             }
-                            else // If new energy is lower, accept based on Boltzman probability
+                            
+                            currentParError->at(this->nPar) = newEnergy;
+                            
+                            if(currentParError->at(this->nPar) < bestParError->at(this->nPar)) // If new energy is less than best, update best.
                             {
-                                boltzmanProb = exp((-1*(newEnergy - currentParError->at(this->nPar)))/temp);
-                                if (boltzmanProb > gsl_rng_uniform(randgsl)) 
+                                for (unsigned int k = 0; k < this->nPar + 1; k++)
+                                {
+                                    bestParError->at(k) = currentParError->at(k);
+                                }
+                                bestParError->at(this->nPar) = currentParError->at(this->nPar);
+                                
+                                if (bestParError->at(this->nPar) < this->minEnergy) // If new energy is less than threashold return.
+                                {
+                                    bestParError->at(this->nPar) = error;
+                                    
+                                    for (unsigned int k = 0; k < this->nPar + 1; k++)
+                                    {
+                                        gsl_vector_set(outParError, k, bestParError->at(k));
+                                    }
+                                    
+                                    // Tidy
+                                    delete currentParError;
+                                    delete testPar;
+                                    delete bestParError;
+                                    delete[] accepted;
+                                    delete[] stepSize;
+                                    
+                                    // Exit
+                                    return 1;
+                                }
+                            }
+                            
+                        }
+                        else // If new energy is lower, accept based on Boltzman probability
+                        {
+                            boltzmanProb = exp((-1*(newEnergy - currentParError->at(this->nPar)))/temp);
+                            if (boltzmanProb > gsl_rng_uniform(randgsl))
+                            {
+                                for(unsigned int j = 0; j < this->nPar; j++)
                                 {
                                     currentParError->at(j) = testPar->at(j);
                                     accepted[j]++;
                                     currentParError->at(this->nPar) = newEnergy;
                                 }
                             }
-                            if(abs(newEnergy - prevEnergy)  < 10e-10)
-                            {							
-                                currentParError->at(j) = gsl_vector_get(initialPar, j);
-                                temp = startTemp;
-                                //t = 0;
-                            }
                         }
-                        
+                        if(abs(newEnergy - prevEnergy)  < 10e-10)
+                        {
+                            for(unsigned int j = 0; j < this->nPar; j++)
+                            {
+                                currentParError->at(j) = gsl_vector_get(initialPar, j);
+                            }
+                            temp = startTemp;
+                        }
                     }
-                    numItt++;
                     
-                }
+                    }
+                    ++numItt;
                 
+                }
+            
                 // Change step size, uses formula of Corana et al.
                 for(unsigned int j = 0; j < this->nPar; j++)
                 {
@@ -308,9 +298,6 @@ namespace rsgis {namespace radar{
                     }
                 }
             }
-            ++t;
-            
-        }
         
         // Set output to best value
         for (unsigned int j = 0; j < this->nPar + 1; j++) 
