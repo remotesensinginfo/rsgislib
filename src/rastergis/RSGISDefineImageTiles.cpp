@@ -936,6 +936,151 @@ namespace rsgis{namespace rastergis{
         
     }
     
+    
+    
+    
+    
+    RSGISDefineSegmentsWithinTiles::RSGISDefineSegmentsWithinTiles()
+    {
+        
+    }
+    
+    void RSGISDefineSegmentsWithinTiles::defineSegmentTilePos(GDALDataset *clumpsDataset, GDALDataset *tileDataset, std::string outColName, unsigned int tileOverlap, unsigned int tileBoundary, unsigned int tileBody) throw(RSGISImageException, RSGISAttributeTableException)
+    {
+        try
+        {
+            // Get Attribute table
+            const GDALRasterAttributeTable *attTableTmp = clumpsDataset->GetRasterBand(1)->GetDefaultRAT();
+            GDALRasterAttributeTable *attTable = NULL;
+            if(attTableTmp != NULL)
+            {
+                attTable = new GDALRasterAttributeTable(*attTableTmp);
+            }
+            else
+            {
+                attTable = new GDALRasterAttributeTable();
+            }
+            
+            // Make sure it is long enough and extend if required.
+            int numRows = attTable->GetRowCount();
+            
+            double maxVal = 0;
+            clumpsDataset->GetRasterBand(1)->GetStatistics(false, true, NULL, &maxVal, NULL, NULL);
+            
+            if(maxVal > numRows)
+            {
+                attTable->SetRowCount(maxVal+1);
+            }
+            numRows = attTable->GetRowCount();
+            
+            RSGISSegTilePos *clumpTilePos = new RSGISSegTilePos[numRows];
+            for(size_t i = 0; i < numRows; ++i)
+            {
+                clumpTilePos[i].overlap = false;
+                clumpTilePos[i].boundary = false;
+                clumpTilePos[i].body = false;
+            }
+            
+            GDALDataset **datasets = new GDALDataset*[2];
+            datasets[0] = clumpsDataset;
+            datasets[1] = tileDataset;
+            
+            RSGISFindClumpPositionsInTile *calcImgValStats = new RSGISFindClumpPositionsInTile(numRows, clumpTilePos, tileOverlap, tileBoundary, tileBody);
+            rsgis::img::RSGISCalcImage calcImageStats(calcImgValStats);
+            calcImageStats.calcImage(datasets, 2);
+            delete calcImgValStats;
+            
+            delete[] datasets;
+            
+            RSGISRasterAttUtils attUtils;
+            unsigned int colClumpPosIdx = attUtils.findColumnIndexOrCreate(attTable, outColName, GFT_Integer);
+            
+            for(size_t i = 1; i < numRows; ++i)
+            {
+                if(clumpTilePos[i].boundary)
+                {
+                    attTable->SetValue(i, colClumpPosIdx, (int)tileBoundary);
+                }
+                else if(clumpTilePos[i].overlap & clumpTilePos[i].body)
+                {
+                    attTable->SetValue(i, colClumpPosIdx, (int)tileBoundary); // Just in case the boundary is not defined.
+                }
+                else if(clumpTilePos[i].overlap)
+                {
+                    attTable->SetValue(i, colClumpPosIdx, (int)tileOverlap);
+                }
+                else if(clumpTilePos[i].body)
+                {
+                    attTable->SetValue(i, colClumpPosIdx, (int)tileBody);
+                }
+            }
+            
+            clumpsDataset->GetRasterBand(1)->SetDefaultRAT(attTable);
+            
+            delete[] clumpTilePos;
+            
+        }
+        catch (RSGISImageException &e)
+        {
+            throw e;
+        }
+        catch(RSGISAttributeTableException &e)
+        {
+            throw e;
+        }
+        catch(RSGISException &e)
+        {
+            throw RSGISImageException(e.what());
+        }
+        catch(std::exception &e)
+        {
+            throw RSGISImageException(e.what());
+        }
+    }
+    
+    RSGISDefineSegmentsWithinTiles::~RSGISDefineSegmentsWithinTiles()
+    {
+        
+    }
+    
+    RSGISFindClumpPositionsInTile::RSGISFindClumpPositionsInTile(size_t numRows, RSGISSegTilePos *clumpPos, unsigned int tileOverlap, unsigned int tileBoundary, unsigned int tileBody): rsgis::img::RSGISCalcImageValue(0)
+    {
+        this->numRows = numRows;
+        this->clumpPos = clumpPos;
+        this->tileOverlap = tileOverlap;
+        this->tileBoundary = tileBoundary;
+        this->tileBody = tileBody;
+    }
+		
+    void RSGISFindClumpPositionsInTile::calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException)
+    {
+        if((bandValues[0] > 0) && (bandValues[0] < numRows))
+        {
+            size_t fid = boost::lexical_cast<size_t>(bandValues[0]);
+            
+            if(bandValues[1] == this->tileOverlap)
+            {
+                this->clumpPos[fid].overlap = true;
+            }
+            else if(bandValues[1] == this->tileBoundary)
+            {
+                this->clumpPos[fid].boundary = true;
+            }
+            else if(bandValues[1] == this->tileBody)
+            {
+                this->clumpPos[fid].body = true;
+            }
+        }
+    }
+    
+    RSGISFindClumpPositionsInTile::~RSGISFindClumpPositionsInTile()
+    {
+        
+    }
+    
+    
+    
+    
 }}
 
 

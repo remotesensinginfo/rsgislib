@@ -131,6 +131,45 @@ namespace rsgis{namespace rastergis{
         double **tileExtent;
         bool *firstVals;
 	};
+    
+    struct RSGISSegTilePos
+    {
+        bool boundary;
+        bool overlap;
+        bool body;
+    };
+    
+    class RSGISDefineSegmentsWithinTiles
+    {
+    public:
+        RSGISDefineSegmentsWithinTiles();
+        void defineSegmentTilePos(GDALDataset *clumpsDataset, GDALDataset *tileDataset, std::string outColName, unsigned int tileOverlap, unsigned int tileBoundary, unsigned int tileBody) throw(RSGISImageException, RSGISAttributeTableException);
+        ~RSGISDefineSegmentsWithinTiles();
+    };
+    
+    
+    class RSGISFindClumpPositionsInTile : public rsgis::img::RSGISCalcImageValue
+	{
+	public:
+		RSGISFindClumpPositionsInTile(size_t numRows, RSGISSegTilePos *clumpPos, unsigned int tileOverlap, unsigned int tileBoundary, unsigned int tileBody);
+		void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+		void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException);
+		void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+		void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+		void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+		bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+		~RSGISFindClumpPositionsInTile();
+    private:
+        size_t numRows;
+        RSGISSegTilePos *clumpPos;
+        unsigned int tileOverlap;
+        unsigned int tileBoundary;
+        unsigned int tileBody;
+	};
+    
+    
+    
 
 }}
 

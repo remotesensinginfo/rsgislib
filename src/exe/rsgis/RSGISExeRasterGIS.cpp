@@ -71,6 +71,7 @@ namespace rsgisexe{
         XMLCh *optionCalcBorderLength = xercesc::XMLString::transcode("calcborderlength");
         XMLCh *optionCalcRelBorderLength = xercesc::XMLString::transcode("calcrelborderlength");
         XMLCh *optionCalcShapeIndices = xercesc::XMLString::transcode("calcshapeindices");
+        XMLCh *optionDefineClumpTilePosition = xercesc::XMLString::transcode("defineclumptileposition");
         
         const XMLCh *algorNameEle = argElement->getAttribute(algorXMLStr);
         if(!xercesc::XMLString::equals(algorName, algorNameEle))
@@ -2612,6 +2613,90 @@ namespace rsgisexe{
                 shapeIndexes->push_back(index);
             }
         }
+        else if(xercesc::XMLString::equals(optionDefineClumpTilePosition, optionXML))
+        {
+            this->option = RSGISExeRasterGIS::defineclumptileposition;
+            
+            XMLCh *clumpsXMLStr = xercesc::XMLString::transcode("clumps");
+            if(argElement->hasAttribute(clumpsXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(clumpsXMLStr));
+                this->clumpsImage = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'clumps\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&clumpsXMLStr);
+            
+            XMLCh *tileXMLStr = xercesc::XMLString::transcode("tile");
+            if(argElement->hasAttribute(tileXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(tileXMLStr));
+                this->tileImage = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'tile\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&tileXMLStr);
+            
+            XMLCh *colNameXMLStr = xercesc::XMLString::transcode("colname");
+            if(argElement->hasAttribute(colNameXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(colNameXMLStr));
+                this->outColsName = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'colname\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&colNameXMLStr);
+            
+            XMLCh *overlapXMLStr = xercesc::XMLString::transcode("overlap");
+            if(argElement->hasAttribute(overlapXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(overlapXMLStr));
+                this->tileOverlap = textUtils.strto32bitInt(std::string(charValue));
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'overlap\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&overlapXMLStr);
+            
+            
+            XMLCh *boundaryXMLStr = xercesc::XMLString::transcode("boundary");
+            if(argElement->hasAttribute(boundaryXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(boundaryXMLStr));
+                this->tileBoundary = textUtils.strto32bitInt(std::string(charValue));
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'boundary\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&boundaryXMLStr);
+            
+            
+            XMLCh *bodyXMLStr = xercesc::XMLString::transcode("body");
+            if(argElement->hasAttribute(bodyXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(bodyXMLStr));
+                this->tileBody = textUtils.strto32bitInt(std::string(charValue));
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'body\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&bodyXMLStr);
+        }
         else
         {
             std::string message = std::string("The option (") + std::string(xercesc::XMLString::transcode(optionXML)) + std::string(") is not known: RSGISExeRasterGIS.");
@@ -2649,6 +2734,7 @@ namespace rsgisexe{
         xercesc::XMLString::release(&optionCalcBorderLength);
         xercesc::XMLString::release(&optionCalcRelBorderLength);
         xercesc::XMLString::release(&optionCalcShapeIndices);
+        xercesc::XMLString::release(&optionDefineClumpTilePosition);
     }
     
     void RSGISExeRasterGIS::runAlgorithm() throw(rsgis::RSGISException)
@@ -3755,6 +3841,46 @@ namespace rsgisexe{
                 {
                     throw e;
                 }
+            }
+            else if(this->option == RSGISExeRasterGIS::defineclumptileposition)
+            {
+                std::cout << "A command to define the position within the file of the clumps\n";
+                std::cout << "Clumps: " << this->clumpsImage << std::endl;
+                std::cout << "Tile: " << this->tileImage << std::endl;
+                std::cout << "Output Column: " << this->outColsName << std::endl;
+                std::cout << "Tile Overlap: " << this->tileOverlap << std::endl;
+                std::cout << "Tile Boundary: " << this->tileBoundary << std::endl;
+                std::cout << "Tile Body: " << this->tileBody << std::endl;
+                
+                try
+                {
+                    GDALAllRegister();
+                    
+                    GDALDataset *clumpsDataset = (GDALDataset *) GDALOpen(this->clumpsImage.c_str(), GA_Update);
+                    if(clumpsDataset == NULL)
+                    {
+                        std::string message = std::string("Could not open image ") + this->clumpsImage;
+                        throw rsgis::RSGISImageException(message.c_str());
+                    }
+                    
+                    GDALDataset *tileDataset = (GDALDataset *) GDALOpen(this->tileImage.c_str(), GA_ReadOnly);
+                    if(tileDataset == NULL)
+                    {
+                        std::string message = std::string("Could not open image ") + this->tileImage;
+                        throw rsgis::RSGISImageException(message.c_str());
+                    }
+                    
+                    rsgis::rastergis::RSGISDefineSegmentsWithinTiles defineSegsInTile;
+                    defineSegsInTile.defineSegmentTilePos(clumpsDataset, tileDataset, this->outColsName, this->tileOverlap, this->tileBoundary, this->tileBody);
+                    
+                    GDALClose(clumpsDataset);
+                    GDALClose(tileDataset);
+                }
+                catch(rsgis::RSGISException &e)
+                {
+                    throw e;
+                }
+                
             }
             else
             {

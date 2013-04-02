@@ -54,6 +54,7 @@
 #include "rastergis/RSGISFindClumpNeighbours.h"
 #include "rastergis/RSGISClumpBorders.h"
 #include "rastergis/RSGISCalcClumpShapeParameters.h"
+#include "rastergis/RSGISDefineImageTiles.h"
 
 #include "gdal_priv.h"
 #include "ogrsf_frmts.h"
@@ -97,7 +98,8 @@ namespace rsgisexe{
             findboundarypixels,
             calcborderlength,
             calcrelborder,
-            calcshapeindices
+            calcshapeindices,
+            defineclumptileposition
         };
         
         RSGISExeRasterGIS();
@@ -139,6 +141,7 @@ namespace rsgisexe{
         std::string infoClassCol;
         std::string trainingSelectCol;
         std::string className;
+        std::string tileImage;
         size_t fid;
         unsigned int nFeatures;
         float specDistThreshold;
@@ -162,6 +165,9 @@ namespace rsgisexe{
         bool allowZeroPriors;
         bool ignoreZeroEdges;
         std::vector<rsgis::rastergis::RSGISShapeParam*> *shapeIndexes;
+        unsigned int tileBoundary;
+        unsigned int tileOverlap;
+        unsigned int tileBody;
     };
     
 }
