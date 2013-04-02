@@ -151,8 +151,8 @@ namespace rsgis{namespace img{
 			gdalTransform[4] = rotateY;
 			gdalTransform[5] = pixelYRes;
             
-			*width = ceil(((maxX - minX)/pixelXRes));
-			*height = floor(((maxY - minY)/pixelYResPos));
+			*width = floor(((maxX - minX)/pixelXRes)+0.5);
+			*height = floor(((maxY - minY)/pixelYResPos)+0.5);
 			
 			double diffX = 0;
 			double diffY = 0;
@@ -344,8 +344,8 @@ namespace rsgis{namespace img{
 			gdalTransform[4] = rotateY;
 			gdalTransform[5] = pixelYRes;
             
-			*width = ceil(((maxX - minX)/pixelXRes));
-			*height = floor(((maxY - minY)/pixelYResPos));
+			*width = floor(((maxX - minX)/pixelXRes)+0.5);
+			*height = floor(((maxY - minY)/pixelYResPos)+0.5);
 			
 			double diffX = 0;
 			double diffY = 0;
@@ -552,8 +552,8 @@ namespace rsgis{namespace img{
 			gdalTransform[4] = rotateY;
 			gdalTransform[5] = pixelYRes;
             
-			*width = ceil(((maxX - minX)/pixelXRes));
-			*height = floor(((maxY - minY)/pixelYResPos));
+			*width = floor(((maxX - minX)/pixelXRes)+0.5);
+			*height = floor(((maxY - minY)/pixelYResPos)+0.5);
 			
 			double diffX = 0;
 			double diffY = 0;
@@ -761,8 +761,8 @@ namespace rsgis{namespace img{
 			gdalTransform[4] = rotateY;
 			gdalTransform[5] = pixelYRes;
             
-			*width = ceil(((maxX - minX)/pixelXRes));
-			*height = floor(((maxY - minY)/pixelYResPos));
+			*width = floor(((maxX - minX)/pixelXRes)+0.5);
+			*height = floor(((maxY - minY)/pixelYResPos)+0.5);
 			
 			double diffX = 0;
 			double diffY = 0;
@@ -1011,8 +1011,8 @@ namespace rsgis{namespace img{
 				gdalTransform[4] = rotateY;
 				gdalTransform[5] = pixelYRes;
 				
-				*width = ceil(((maxX - minX)/pixelXRes));
-				*height = floor(((maxY - minY)/pixelYResPos));
+				*width = floor(((maxX - minX)/pixelXRes)+0.5);
+				*height = floor(((maxY - minY)/pixelYResPos)+0.5);
 				
 				double diffX = 0;
 				double diffY = 0;
@@ -1065,8 +1065,8 @@ namespace rsgis{namespace img{
                     gdalTransform[4] = rotateY;
                     gdalTransform[5] = pixelYRes;
                     
-                    *width = floor(((maxX - minX)/pixelXRes));
-                    *height = floor(((maxY - minY)/pixelYResPos));
+                    *width = floor(((maxX - minX)/pixelXRes)+0.5);
+                    *height = floor(((maxY - minY)/pixelYResPos)+0.5);
                     
                     double diffX = 0;
                     double diffY = 0;
@@ -1298,8 +1298,8 @@ namespace rsgis{namespace img{
 			gdalTransform[4] = rotateY;
 			gdalTransform[5] = pixelYRes;
 			
-			*width = ceil(((maxX - minX)/pixelXRes));
-			*height = floor(((maxY - minY)/pixelYResPos));
+			*width = floor(((maxX - minX)/pixelXRes)+0.5);
+			*height = floor(((maxY - minY)/pixelYResPos)+0.5);
 			
 			double diffX = 0;
 			double diffY = 0;
@@ -1544,8 +1544,8 @@ namespace rsgis{namespace img{
 			gdalTransform[4] = rotateY;
 			gdalTransform[5] = pixelYRes;
 			
-			*width = ceil(((maxX - minX)/pixelXRes));
-			*height = floor(((maxY - minY)/pixelYResPos));
+			*width = floor(((maxX - minX)/pixelXRes)+0.5);
+			*height = floor(((maxY - minY)/pixelYResPos)+0.5);
 			
 			double diffX = 0;
 			double diffY = 0;
@@ -1756,8 +1756,8 @@ namespace rsgis{namespace img{
 			minY = env->getMinY();
 			maxY = env->getMaxY();
 			
-			*width = ceil(((maxX - minX)/pixelXRes));
-			*height = floor(((maxY - minY)/pixelYResPos));
+			*width = floor(((maxX - minX)/pixelXRes)+0.5);
+			*height = floor(((maxY - minY)/pixelYResPos)+0.5);
 		}
 		catch(RSGISImageBandException& e)
 		{
@@ -1908,8 +1908,8 @@ namespace rsgis{namespace img{
 			gdalTransform[4] = rotateY;
 			gdalTransform[5] = pixelYRes;
 			
-			*width = ceil(((maxX - minX)/pixelXRes));
-			*height = floor(((maxY - minY)/pixelYResPos));
+			*width = floor(((maxX - minX)/pixelXRes)+0.5);
+			*height = floor(((maxY - minY)/pixelYResPos)+0.5);
 		}
 		catch(RSGISImageBandException& e)
 		{
@@ -2079,8 +2079,8 @@ namespace rsgis{namespace img{
 			gdalTransform[4] = rotateY;
 			gdalTransform[5] = pixelYRes;
 			
-			*width = ceil(((maxX - minX)/pixelXRes));
-			*height = floor(((maxY - minY)/pixelYResPos));
+			*width = floor(((maxX - minX)/pixelXRes)+0.5);
+			*height = floor(((maxY - minY)/pixelYResPos)+0.5);
 		}
 		catch(RSGISImageBandException& e)
 		{
