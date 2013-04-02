@@ -264,19 +264,19 @@ namespace rsgis{namespace radar{
 
 	void RSGISObjectBasedEstimation::processFeature(OGRFeature *inFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
 	{
+
 		try
 		{
-			std::cout << "Processing feature" << std::endl;
 			// GET DATA
 			rsgis::vec::RSGISVectorUtils vecUtils;
 			OGRPolygon *inOGRPoly;
 			geos::geom::Polygon *poly;
-			rsgis::img::RSGISCalcImageValue *invValuesObj;
-			rsgis::img::RSGISCalcImageValue *invValues;
 			inOGRPoly = (OGRPolygon *) inFeature->GetGeometryRef();
 			poly = vecUtils.convertOGRPolygon2GEOSPolygon(inOGRPoly);
-			getValues->reset();
+			rsgis::img::RSGISCalcImageValue *invValuesObj;
+			rsgis::img::RSGISCalcImageValue *invValues;
 
+			getValues->reset();
 			calcImageSingle->calcImageWithinPolygon(this->datasetsInput, 1, NULL, env, poly, false, rsgis::img::polyContainsPixelCenter); // The pixel in poly method is hardcoded as 'polyContainsPixelCenter', no output is required
 
 			unsigned int estClass = 0;
@@ -292,11 +292,11 @@ namespace rsgis{namespace radar{
 					std::cout << "Class number greater than number classes parameterised for. Using last available class.\n";
 					estClass = this->slowOptimiser->size() - 1;
 				}
-				this->slowOptimiserSingle = this->slowOptimiser->at(estClass);
+
+                this->slowOptimiserSingle = this->slowOptimiser->at(estClass);
 				this->fastOptimiserSingle = this->fastOptimiser->at(estClass);
 				this->initialParSingle = this->initialPar->at(estClass);
 			}
-
 
 			// OBTAIN AVERAGE FOR OBJECT AND PERFORM INVERSION
 			if (this->useDefaultMinMax)
@@ -305,26 +305,62 @@ namespace rsgis{namespace radar{
 			}
 			else
 			{
-				invValuesObj = new RSGISEstimationAlgorithmSingleSpecies(this->numOutputBands, this->initialParSingle, this->slowOptimiserSingle, this->parameters, this->minMaxVals[estClass]);
+                invValuesObj = new RSGISEstimationAlgorithmSingleSpecies(this->numOutputBands, this->initialParSingle, this->slowOptimiserSingle, this->parameters, this->minMaxVals[estClass]);
 			}
 
 			float *outData = new float[numOutputBands]; // Create array large enough to hold all output bands (more than parameters)
 			float *inData = new float[this->numBands];
+			bool *indB = new bool[this->numBands];
+			bool *convertdB = new bool[this->numBands];
 
 			for (int i = 0; i < this->numBands; i++)  // Loop through bands
 			{
+				inData[i] = 0;
 				for(unsigned int r = 0; r < pixelVals[i]->size(); r++) // Loop through pixels in object
 				{
-					inData[i] = inData[i] + pow(10,(pixelVals[i]->at(r) / 10));
+					if (r == 0)
+					{
+						if ((pixelVals[i]->at(0) > 0))
+						{
+							indB[i] = false;
+							if ((pixelVals[i]->at(0) < 1))
+							{
+								convertdB[i] = true;
+							}
+							else
+							{
+								convertdB[i] = false;
+							}
+						}
+					}
+					if (indB[i])
+					{
+						inData[i] = inData[i] + pow(10,(pixelVals[i]->at(r) / 10));
+					}
+					else
+					{
+						inData[i] = inData[i] + pixelVals[i]->at(r);
+					}
 				}
 			}
 
 			for (int i = 0; i < this->numBands; i++) // Obtain average and convert to dB
 			{
-				inData[i] = 10*log10(inData[i] / pixelVals[i]->size());
+				if (convertdB[i])
+				{
+					inData[i] = 10*log10(inData[i] / pixelVals[i]->size());
+				}
+				else
+				{
+					inData[i] = inData[i] / pixelVals[i]->size();
+				}
+
+				//std::cout << "inData[" << i << "] = " << inData[i] << std::endl;
 			}
 
-			//invValues->calcImageValue(inData, this->numBands, outData);
+            //std::cout << "In data = " << inData[0] << ", " << inData[1] << ", " << inData[2] << std::endl;
+
+			invValuesObj->calcImageValue(inData, this->numBands, outData);
 
 			// Get averages for each band.
 			gsl_vector *localPar;
@@ -332,10 +368,15 @@ namespace rsgis{namespace radar{
 			for(unsigned int i = 0; i < this->numOutputPar; i++)
 			{
 				gsl_vector_set(localPar, i, outData[i]);
+				//std::cout << "outData[" << i << "] = " << outData[i] << std::endl;
 			}
 
+            //std::cout << "outData[" << 3 << "] = " << outData[3] << std::endl;
+            //std::cout << "outData[" << 4 << "] = " << outData[4] << std::endl;
+			//std::cout << "object height = " << gsl_vector_get(localPar, 0) << ", object density = " << gsl_vector_get(localPar, 1) << std::endl;
+
 			// PARAMETERISE OPIMISER USING VALUES FROM DATA
-			// Update optimser
+			// Update optimser if error low enough
             if ( outData[this->numOutputBands - 1] < 1e-8)
             {
                 this->fastOptimiserSingle->modifyAPriori(localPar);
@@ -363,7 +404,7 @@ namespace rsgis{namespace radar{
                 }
             }
 
-			rsgis::img::RSGISCalcImage *calcImage = new rsgis::img::RSGISCalcImage(invValues, "", true);
+            rsgis::img::RSGISCalcImage *calcImage = new rsgis::img::RSGISCalcImage(invValues, "", true);
 			calcImage->calcImageWithinPolygon(this->datasetsIO, 2, env, poly, rsgis::img::polyContainsPixelCenter);
 
 			// TIDY
@@ -373,12 +414,13 @@ namespace rsgis{namespace radar{
 			delete calcImage;
 			delete[] inData;
 			delete[] outData;
+			delete[] indB;
+			delete[] convertdB;
 		}
 		catch(RSGISException& e)
 		{
 			throw RSGISVectorException(e.what());
 		}
-
 	}
 
 	void RSGISObjectBasedEstimation::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(rsgis::vec::RSGISVectorOutputException)
@@ -1214,7 +1256,6 @@ namespace rsgis{namespace radar{
 
 	void RSGISObjectBasedEstimationRasterPolygon::processFeature(OGRFeature *inFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
 	{
-
         try
         {
             // GET DATA

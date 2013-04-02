@@ -3036,7 +3036,7 @@ namespace rsgis {namespace radar
 			double stepB =  (minMaxIntervalB[1] - minMaxIntervalB[0]) / pow(nRestarts, 1.0/3.0);
 			double stepC = (minMaxIntervalC[1] - minMaxIntervalC[0]) / pow(nRestarts, 1.0/3.0);
 
-			// Try one run with inital parameters
+			// Try one run with initial parameters
 			this->conjGradOpt->minimise(inData, initialPar, outParError);
 
 			if (gsl_vector_get(currentParError, 3) < gsl_vector_get(outParError, 3)) // Check if resuduals are lower
@@ -3278,94 +3278,5 @@ namespace rsgis {namespace radar
 			delete conjGradOpt;
 		}
 
-		RSGISEstimationConjugateGradient2Var2DataDistro::RSGISEstimationConjugateGradient2Var2DataDistro(
-																													 rsgis::math::RSGISMathTwoVariableFunction *functionA,
-																													 rsgis::math::RSGISMathTwoVariableFunction *functionB,
-																										             rsgis::math::RSGISProbDistro *distroA,
-																										             rsgis::math::RSGISProbDistro *distroB,
-																													 double *minMaxIntervalA,
-																													 double *minMaxIntervalB,
-																													 gsl_vector *aPrioriPar,
-																													 gsl_matrix *covMatrixP,
-																													 gsl_matrix *invCovMatrixD,
-																													 double minError,
-																													 int ittmax,
-																													 int nRestarts
-																													 )
-		{
-			this->functionA = functionA;
-			this->functionB = functionB;
-			this->distroA = distroA;
-			this->distroB = distroB;
-			this->minMaxIntervalA = minMaxIntervalA;
-			this->minMaxIntervalB = minMaxIntervalB;
-			this->aPrioriPar = aPrioriPar;
-			this->covMatrixP = covMatrixP;
-			this->invCovMatrixD = invCovMatrixD;
-			this->ittmax = ittmax;
-			this->nRestarts = nRestarts;
-			this->minError = minError;
-			this->conjGradOpt = new RSGISEstimationConjugateGradient2Var2Data(functionA, functionB, aPrioriPar, covMatrixP, invCovMatrixD, minError, ittmax);
-		}
-		int RSGISEstimationConjugateGradient2Var2DataDistro::minimise(gsl_vector *inData, gsl_vector *initialPar, gsl_vector *outParError)
-		{
-
-			gsl_vector *currentParError;
-			gsl_vector *testInitialPar;
-
-			currentParError = gsl_vector_alloc(3);
-			testInitialPar = gsl_vector_alloc(2);
-
-			double randA;
-			double randB;
-
-			// LOOP THROUGH DIFFERNT STARTING VALUES
-			for(unsigned int i = 0; i < nRestarts; i++)
-			{
-				// Set inital par
-				randA = distroA->calcRand();
-				randB = distroB->calcRand();
-
-				gsl_vector_set(testInitialPar, 0, randA);
-				gsl_vector_set(testInitialPar, 1, randB);
-
-				//std::cout << "height = " << randA << " density = " << randB << std::endl;
-
-				this->conjGradOpt->minimise(inData, testInitialPar, currentParError);
-
-				// Calculate weighed least squares
-
-
-				// Check values are within range
-				if(gsl_vector_get(currentParError, 0) > minMaxIntervalA[0] && gsl_vector_get(currentParError, 0) < minMaxIntervalA[1] && gsl_vector_get(currentParError, 1) > minMaxIntervalB[0] && gsl_vector_get(currentParError, 1) < minMaxIntervalB[1])
-				{
-					if (gsl_vector_get(currentParError, 2) < gsl_vector_get(outParError, 2))
-					{
-						// If new values are better than current best, update
-						gsl_vector_memcpy(outParError, currentParError);
-
-						if (gsl_vector_get(outParError, 2) < minError)
-						{
-							// free memory and terminate if target error is reached.
-							gsl_vector_free(currentParError);
-							gsl_vector_free(testInitialPar);
-							return 1;
-						}
-
-					}
-				}
-
-			}
-
-
-			gsl_vector_free(currentParError);
-			gsl_vector_free(testInitialPar);
-
-			return 0;
-		}
-		RSGISEstimationConjugateGradient2Var2DataDistro::~RSGISEstimationConjugateGradient2Var2DataDistro()
-		{
-			delete conjGradOpt;
-		}
 	}}
 

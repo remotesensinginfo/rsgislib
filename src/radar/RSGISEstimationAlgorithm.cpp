@@ -2139,8 +2139,6 @@ namespace rsgis {namespace radar
 					double dielectric = gsl_vector_get(outPar, 2);
 					double error = gsl_vector_get(outPar, 3);
 
-
-    
                     // Set to limits of min/max values
                     if (height < this->minMaxVals[0][0]){height = this->minMaxVals[0][0];}
                     if (height > this->minMaxVals[0][1]){height = this->minMaxVals[0][1];}
@@ -2148,7 +2146,7 @@ namespace rsgis {namespace radar
                     if (density > this->minMaxVals[1][1]){density = this->minMaxVals[1][1];}
                     if (dielectric < this->minMaxVals[2][0]){dielectric = this->minMaxVals[2][0];}
                     if (dielectric > this->minMaxVals[2][1]){dielectric = this->minMaxVals[2][1];}
-					
+
                     // Write out
 					if (boost::math::isnan(height)){output[0] = 0;}
 					else{output[0] = height;}

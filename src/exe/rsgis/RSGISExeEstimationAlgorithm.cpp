@@ -5190,7 +5190,7 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
 					{
 						this->estSlowOptimiserClass->push_back(new RSGISEstimationConjugateGradient3Var3DataWithRestarts(coeffHH, coeffHV, coeffVV, this->polyOrderX, this->polyOrderY, this->polyOrderZ, minMaxStepAll[0], minMaxStepAll[1], minMaxStepAll[2], this->initialPar, covMatrixP, invCovMatrixD, minError, this->ittmax, numRestarts));
 					}
-					else if(XMLString::equals(methodConjugateGradientWithRestarts, methodStr))
+					else if(XMLString::equals(methodConjugateGradient, methodStr))
 					{
 						this->estSlowOptimiserClass->push_back(new RSGISEstimationConjugateGradient3DPoly3Channel(coeffHH, coeffHV, coeffVV, this->polyOrderX, this->polyOrderY, this->polyOrderZ, this->initialPar, covMatrixP, invCovMatrixD, minError, this->ittmax));
 					}
@@ -5573,12 +5573,11 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
                     {
                         char *charValue = XMLString::transcode(fastOptimiserElement->getAttribute(minDielectricStr));
                         minMaxStepAll[2][0] = mathUtils.strtodouble(string(charValue));
-                        this->useDefaultMinMax = false;
                         XMLString::release(&charValue);
                     }
                     else
                     {
-                        minMaxStepAll[2][0] = 10;
+                        minMaxStepAll[2][0] = 1;
                     }
                     XMLString::release(&minDielectricStr);
 
@@ -5587,7 +5586,6 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
                     {
                         char *charValue = XMLString::transcode(fastOptimiserElement->getAttribute(maxDielectricStr));
                         minMaxStepAll[2][1] = mathUtils.strtodouble(string(charValue));
-                        this->useDefaultMinMax = false;
                         XMLString::release(&charValue);
                     }
                     else
@@ -5601,7 +5599,6 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
                     {
                         char *charValue = XMLString::transcode(fastOptimiserElement->getAttribute(dielectricStepStr));
                         minMaxStepAll[2][2] = mathUtils.strtodouble(string(charValue));
-                        this->useDefaultMinMax = false;
                         XMLString::release(&charValue);
                     }
                     else
@@ -5674,11 +5671,11 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
 
                     if (XMLString::equals(methodConjugateGradientWithRestarts, methodStr))
 					{
-						this->estFastOptimiserClass->push_back(new RSGISEstimationConjugateGradient3Var3DataWithRestarts(coeffHH, coeffHV, coeffVV, this->polyOrderX, this->polyOrderY, this->polyOrderZ, minMaxStepAll[0], minMaxStepAll[1], minMaxStepAll[2], this->initialPar, covMatrixP, invCovMatrixD, minError, this->ittmax, numRestarts));
+						this->estFastOptimiserClass->push_back(new RSGISEstimationConjugateGradient3Var3DataWithRestarts(this->coeffHH, this->coeffHV, this->coeffVV, this->polyOrderX, this->polyOrderY, this->polyOrderZ, minMaxStepAll[0], minMaxStepAll[1], minMaxStepAll[2], this->initialPar, covMatrixP, invCovMatrixD, minError, this->ittmax, numRestarts));
 					}
-					else if(XMLString::equals(methodConjugateGradientWithRestarts, methodStr))
+					else if(XMLString::equals(methodConjugateGradient, methodStr))
 					{
-						this->estFastOptimiserClass->push_back(new RSGISEstimationConjugateGradient3DPoly3Channel(coeffHH, coeffHV, coeffVV, this->polyOrderX, this->polyOrderY, this->polyOrderZ, this->initialPar, covMatrixP, invCovMatrixD, minError, this->ittmax));
+						this->estFastOptimiserClass->push_back(new RSGISEstimationConjugateGradient3DPoly3Channel(this->coeffHH, this->coeffHV, this->coeffVV, this->polyOrderX, this->polyOrderY, this->polyOrderZ, this->initialPar, covMatrixP, invCovMatrixD, minError, this->ittmax));
 					}
                     else
                     {
