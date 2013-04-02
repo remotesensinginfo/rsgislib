@@ -196,7 +196,7 @@ namespace rsgis{namespace rastergis{
     }
     
     
-    RSGISPopAttributeTablePxlCountCalcImg::RSGISPopAttributeTablePxlCountCalcImg(int numberOutBands, RSGISAttributeTable *attTable, unsigned int pxlCountIdx):rsgis::img::RSGISCalcImageValue(numberOutBands)
+    RSGISPopAttributeTablePxlCountCalcImg::RSGISPopAttributeTablePxlCountCalcImg(int numberOutBands, RSGISAttributeTable *attTable, size_t pxlCountIdx):rsgis::img::RSGISCalcImageValue(numberOutBands)
     {
         this->attTable = attTable;
         this->pxlCountIdx = pxlCountIdx;
