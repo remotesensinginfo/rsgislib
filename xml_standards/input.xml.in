@@ -509,6 +509,8 @@
         <rsgis:index name="Area | Asymmetry | BorderIndex | BorderLength | Compactness| Density | EllipticFit | Length | LengthWidth | Width | MainDirection | RadiusLargestEnclosedEllipse | RadiusSmallestEnclosedEllipse | RectangularFit | Roundness | ShapeIndex" column="string" />
         <rsgis:index name="Area | Asymmetry | BorderIndex | BorderLength | Compactness| Density | EllipticFit | Length | LengthWidth | Width | MainDirection | RadiusLargestEnclosedEllipse | RadiusSmallestEnclosedEllipse | RectangularFit | Roundness | ShapeIndex" column="string" />
     </rsgis:command>
+	<!-- A command to define the position within the file of the clumps (i.e., on the tile border, in the overlap or the main body).-->
+	<rsgis:command algor="rastergis" option="defineclumptileposition" clumps="clumps.kea" tile="image.kea" colname="string" overlap="int" boundary="int" body="int" />
 
 
 
