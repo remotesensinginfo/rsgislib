@@ -90,7 +90,9 @@ namespace rsgis{namespace vec{
 				}
 				
 				if(!nullGeometry)
-				{					
+				{
+                    std::cout << "Env: [" << env->getMinX() << ", " << env->getMaxX() << "][" << env->getMinY() << ", " << env->getMaxY() << "]\n";
+                    
 					extractMeanValues->processFeature(inFeature, polygon, env, fid);
                     
                     for(unsigned int j = 0; j < numImageBands; ++j)
