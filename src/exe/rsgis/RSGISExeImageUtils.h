@@ -275,6 +275,7 @@ class RSGISExeImageUtils : public RSGISAlgorithmParameters
         float overlap;
         bool createAnOverlap;
         bool growOverlap;
+        bool offsetTiling;
 	};
 }
 #endif
