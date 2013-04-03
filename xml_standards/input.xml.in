@@ -511,6 +511,8 @@
     </rsgis:command>
 	<!-- A command to define the position within the file of the clumps (i.e., on the tile border, in the overlap or the main body).-->
 	<rsgis:command algor="rastergis" option="defineclumptileposition" clumps="clumps.kea" tile="image.kea" colname="string" overlap="int" boundary="int" body="int" />
+	<!-- A command to define the clumps which are on the border within the file of the clumps using a mask.-->
+	<rsgis:command algor="rastergis" option="defineborderclumps" clumps="clumps.kea" bordermask="image.kea" colname="string" overlap="int" boundary="int" body="int" />
 
 
 
@@ -1024,8 +1026,18 @@
         <rsgis:image file="string" />
 		<rsgis:image file="string" />
     </rsgis:command>
-
-
+	<!-- A command to merge tiles of image clumps and border object mask into an existing image files where clumps are labelled as overlap, boundary or body clumps.-->
+	<rsgis:command algor="segmentation" option="mergeclumptiles" output="image.kea" bordermask="image.kea" colname="string" overlap="int" boundary="int" body="int" >
+		<rsgis:image clumps="string" />
+        <rsgis:image clumps="string" />
+		<rsgis:image clumps="string" />
+    </rsgis:command>
+	<!-- A command to create mask of the border clumps from the segmented tiles.-->
+	<rsgis:command algor="segmentation" option="findtilebordersmask" bordermask="image.kea" colname="string" overlap="int" boundary="int" body="int" >
+		<rsgis:image clumps="string" />
+        <rsgis:image clumps="string" />
+		<rsgis:image clumps="string" />
+    </rsgis:command>
 
 
 

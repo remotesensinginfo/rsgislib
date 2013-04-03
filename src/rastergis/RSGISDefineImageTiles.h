@@ -144,6 +144,7 @@ namespace rsgis{namespace rastergis{
     public:
         RSGISDefineSegmentsWithinTiles();
         void defineSegmentTilePos(GDALDataset *clumpsDataset, GDALDataset *tileDataset, std::string outColName, unsigned int tileOverlap, unsigned int tileBoundary, unsigned int tileBody) throw(RSGISImageException, RSGISAttributeTableException);
+        void defineBorderSegmentsUsingMask(GDALDataset *clumpsDataset, GDALDataset *maskDataset, std::string outColName, unsigned int tileOverlap, unsigned int tileBoundary, unsigned int tileBody) throw(RSGISImageException, RSGISAttributeTableException);
         ~RSGISDefineSegmentsWithinTiles();
     };
     
