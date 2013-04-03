@@ -513,6 +513,8 @@
 	<rsgis:command algor="rastergis" option="defineclumptileposition" clumps="clumps.kea" tile="image.kea" colname="string" overlap="int" boundary="int" body="int" />
 	<!-- A command to define the clumps which are on the border within the file of the clumps using a mask.-->
 	<rsgis:command algor="rastergis" option="defineborderclumps" clumps="clumps.kea" bordermask="image.kea" colname="string" overlap="int" boundary="int" body="int" />
+	<!-- A command to populate an image with the statistics (maximum, minimum, histogram) required for the a thematic image -->
+	<rsgis:command algor="rastergis" option="populatestats" clumps="clumps.kea" pyramids="yes | no" colourtable="yes | no" />
 
 
 

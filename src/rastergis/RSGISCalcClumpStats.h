@@ -35,6 +35,8 @@
 
 #include "math/RSGISMathException.h"
 
+#include "utils/RSGISTextUtils.h"
+
 #include "img/RSGISImageCalcException.h"
 #include "img/RSGISCalcImageValue.h"
 #include "img/RSGISCalcImage.h"
@@ -196,6 +198,48 @@ namespace rsgis{namespace rastergis{
         size_t *validPxlCount;
         float noDataValue;
 	};
+    
+    
+    
+    
+    inline int StatsTextProgress( double dfComplete, const char *pszMessage, void *pData)
+    {
+        if( pszMessage != NULL )
+            printf( "%d%% complete: %s\r", (int) (dfComplete*100), pszMessage );
+        else
+            printf( "%d%% complete.\r", (int) (dfComplete*100) );
+        
+        return true;
+    };
+    
+    
+    
+    class RSGISPopulateWithImageStats
+    {
+    public:
+        RSGISPopulateWithImageStats();
+        void populateImageWithRasterGISStats(GDALDataset *clumpsDataset, bool addColourTable, bool calcImagePyramids) throw(rsgis::RSGISImageException);
+        ~RSGISPopulateWithImageStats();
+    };
+    
+    
+    class RSGISGetClumpsHistogram : public rsgis::img::RSGISCalcImageValue
+	{
+	public:
+		RSGISGetClumpsHistogram(unsigned int *histogram, unsigned int maxVal);
+		void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+		void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException);
+		void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+		void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+		void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+		bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+		~RSGISGetClumpsHistogram();
+    private:
+        unsigned int *histogram;
+        unsigned int maxVal;
+	};
+    
 	
 }}
 

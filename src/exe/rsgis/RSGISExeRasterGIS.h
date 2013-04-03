@@ -63,7 +63,7 @@
 #include <xercesc/dom/DOM.hpp>
 #include <xercesc/util/XMLString.hpp>
 
-namespace rsgisexe{
+namespace rsgisexe{    
     
     class RSGISExeRasterGIS : public rsgis::RSGISAlgorithmParameters
     {
@@ -100,7 +100,8 @@ namespace rsgisexe{
             calcrelborder,
             calcshapeindices,
             defineclumptileposition,
-            defineborderclumps
+            defineborderclumps,
+            populatestats
         };
         
         RSGISExeRasterGIS();
@@ -170,6 +171,8 @@ namespace rsgisexe{
         unsigned int tileBoundary;
         unsigned int tileOverlap;
         unsigned int tileBody;
+        bool calcImgPyramids;
+        bool addColourTable2Img;
     };
     
 }
