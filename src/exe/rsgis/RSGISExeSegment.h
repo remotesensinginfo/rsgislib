@@ -93,7 +93,8 @@ namespace rsgisexe{
             elimsinglepxls,
             unionsegments,
             mergeclumptiles,
-            findtilebordersmask
+            findtilebordersmask,
+            mergeclumpimages
 		};
 		RSGISExeSegment();
 		virtual rsgis::RSGISAlgorithmParameters* getInstance();

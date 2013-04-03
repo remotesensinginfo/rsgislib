@@ -167,6 +167,85 @@ namespace rsgis{namespace segment{
         }
     }
     
+    void RSGISMergeSegmentationTiles::mergeClumpImages(GDALDataset *outputDataset, std::vector<std::string> inputImagePaths) throw(rsgis::img::RSGISImageCalcException)
+    {
+        try
+        {
+            GDALRasterAttributeTable *attTable = NULL;
+            const GDALRasterAttributeTable *attTableTmp = NULL;
+            size_t numRows = 0;
+            double maxVal = 0;
+            unsigned int clumpPosColIdx = 0;
+            unsigned int outClumpIDColIdx = 0;
+            size_t clumpsOffset = 0;
+            size_t numClumps = 0;
+            
+            outputDataset->GetRasterBand(1)->GetStatistics(false, true, NULL, &maxVal, NULL, NULL);
+            clumpsOffset = maxVal;
+            
+            for(std::vector<std::string>::iterator iterFiles = inputImagePaths.begin(); iterFiles != inputImagePaths.end(); ++iterFiles)
+            {
+                std::cout << "\t Opening - " << (*iterFiles) << std::endl;
+                GDALDataset *inImage = (GDALDataset *) GDALOpen((*iterFiles).c_str(), GA_ReadOnly);
+                if(inImage == NULL)
+                {
+                    std::string message = std::string("Could not open image ") + (*iterFiles);
+                    throw rsgis::RSGISImageException(message.c_str());
+                }
+                
+                attTableTmp = inImage->GetRasterBand(1)->GetDefaultRAT();
+                
+                if(attTableTmp == NULL)
+                {
+                    throw RSGISImageException("Input image does not have an attribute table.");
+                }
+                
+                numRows = attTableTmp->GetRowCount();
+                
+                inImage->GetRasterBand(1)->GetStatistics(false, true, NULL, &maxVal, NULL, NULL);
+                
+                if(maxVal > numRows)
+                {
+                    throw RSGISImageException("Number of rows and maximum image pixel value does not match.");
+                }
+                
+                attTable = new GDALRasterAttributeTable(*attTableTmp);
+                
+                std::cout << "Row Count: " << numRows << std::endl;
+                                
+                outClumpIDColIdx = this->findColumnIndexOrCreate(attTable, "GlobalClumpID", GFT_Integer);
+                
+                std::cout << "Clumps offset: " << clumpsOffset << std::endl;
+                
+                numClumps = this->numberClumps(attTable, outClumpIDColIdx, clumpsOffset);
+                
+                std::cout << "Number of body clumps: " << numClumps << std::endl;
+                
+                clumpsOffset += numClumps;
+                
+                this->addImageClumps(outputDataset, inImage, attTable, outClumpIDColIdx);
+                
+                GDALClose(inImage);
+            }
+        }
+        catch (rsgis::img::RSGISImageCalcException &e)
+        {
+            throw e;
+        }
+        catch (rsgis::RSGISImageException &e)
+        {
+            throw rsgis::RSGISImageException(e.what());
+        }
+        catch (rsgis::RSGISException &e)
+        {
+            throw rsgis::img::RSGISImageCalcException(e.what());
+        }
+        catch (std::exception &e)
+        {
+            throw rsgis::img::RSGISImageCalcException(e.what());
+        }
+    }
+    
     unsigned int RSGISMergeSegmentationTiles::findColumnIndex(const GDALRasterAttributeTable *gdalATT, std::string colName) throw(RSGISException)
     {
         int numColumns = gdalATT->GetColumnCount();
@@ -246,6 +325,32 @@ namespace rsgis{namespace segment{
         }
         
         return numBodyClumps;
+    }
+    
+    size_t RSGISMergeSegmentationTiles::numberClumps(GDALRasterAttributeTable *gdalATT, unsigned int outColIdx, size_t clumpsOffset) throw(RSGISException)
+    {
+        size_t numClumps = 0;
+        try
+        {
+            size_t numRows = gdalATT->GetRowCount();
+            
+            for(size_t i = 1; i < numRows; ++i)
+            {
+                gdalATT->SetValue(i, outColIdx, ((int)clumpsOffset++));
+                ++numClumps;
+            }
+            
+        }
+        catch (rsgis::RSGISException &e)
+        {
+            throw e;
+        }
+        catch (std::exception &e)
+        {
+            throw rsgis::RSGISException(e.what());
+        }
+        
+        return numClumps;
     }
     
     void RSGISMergeSegmentationTiles::addTileBodyClumps(GDALDataset *outputDataset, GDALDataset *tileDataset, GDALDataset *borderMaskDataset, const GDALRasterAttributeTable *gdalATT, unsigned int outClumpIDColIdx, unsigned int clumpPosColIdx, unsigned int tileBody, unsigned int tileBoundary) throw(rsgis::img::RSGISImageCalcException)
@@ -640,6 +745,195 @@ namespace rsgis{namespace segment{
             delete[] imgMaskData;
             delete[] inOffset;
             delete[] maskOffset;
+            delete[] gdalTranslation;
+            for(int i = 0; i < 2; i++)
+            {
+                delete[] dsOffsets[i];
+            }
+            delete[] dsOffsets;
+        }
+        catch(rsgis::img::RSGISImageCalcException& e)
+        {
+            throw e;
+        }
+        catch(rsgis::img::RSGISImageBandException& e)
+        {
+            throw rsgis::img::RSGISImageCalcException(e.what());
+        }
+        catch(rsgis::RSGISImageException& e)
+        {
+            throw rsgis::img::RSGISImageCalcException(e.what());
+        }
+        catch(rsgis::RSGISException& e)
+        {
+            throw rsgis::img::RSGISImageCalcException(e.what());
+        }
+        catch(std::exception& e)
+        {
+            throw rsgis::img::RSGISImageCalcException(e.what());
+        }
+    }
+    
+    void RSGISMergeSegmentationTiles::addImageClumps(GDALDataset *outputDataset, GDALDataset *clumpsDataset, const GDALRasterAttributeTable *gdalATT, unsigned int outClumpIDColIdx) throw(rsgis::img::RSGISImageCalcException)
+    {
+        rsgis::img::RSGISImageUtils imgUtils;
+        try
+        {
+            GDALDataset **datasets = new GDALDataset*[2];
+            datasets[0] = clumpsDataset;
+            datasets[1] = outputDataset;
+            
+            double *gdalTranslation = new double[6];
+            int **dsOffsets = new int*[2];
+            for(int i = 0; i < 2; i++)
+            {
+                dsOffsets[i] = new int[2];
+            }
+            int height = 0;
+            int width = 0;
+            
+            int xBlockSize = 0;
+            int yBlockSize = 0;
+            
+            imgUtils.getImageOverlap(datasets, 2, dsOffsets, &width, &height, gdalTranslation, &xBlockSize, &yBlockSize);
+            
+            GDALRasterBand *outputBand = outputDataset->GetRasterBand(1);
+            GDALRasterBand *clumpsBand = clumpsDataset->GetRasterBand(1);
+            
+            int *inOffset = new int[2];
+            inOffset[0] = dsOffsets[0][0];
+            inOffset[1] = dsOffsets[0][1];
+            
+            std::cout << "Input Offset: [" << inOffset[0] << "," << inOffset[1] << "]\n";
+            
+            int *outOffset = new int[2];
+            outOffset[0] = dsOffsets[1][0];
+            outOffset[1] = dsOffsets[1][1];
+            
+            std::cout << "Output Offset: [" << outOffset[0] << "," << outOffset[1] << "]\n";
+            
+            unsigned int *imgInData = (unsigned int *) CPLMalloc(sizeof(unsigned int)*width*yBlockSize);
+            unsigned int *imgOutData = (unsigned int *) CPLMalloc(sizeof(unsigned int)*width*yBlockSize);
+            
+            int nYBlocks = height / yBlockSize;
+            int remainRows = height - (nYBlocks * yBlockSize);
+            int rowOffset = 0;
+            
+            size_t fid = 0;
+            size_t numRows = gdalATT->GetRowCount();
+            std::cout << "Number of Rows = " << numRows << std::endl;
+            
+			int feedback = height/10;
+			int feedbackCounter = 0;
+			std::cout << "Started" << std::flush;
+			// Loop images to process data
+			for(int i = 0; i < nYBlocks; i++)
+			{
+				//std::cout << i << " of " << nYBlocks << std::endl;
+                
+				rowOffset = inOffset[1] + (yBlockSize * i);
+                clumpsBand->RasterIO(GF_Read, inOffset[0], rowOffset, width, yBlockSize, imgInData, width, yBlockSize, GDT_UInt32, 0, 0);
+                rowOffset = outOffset[1] + (yBlockSize * i);
+                outputBand->RasterIO(GF_Read, outOffset[0], rowOffset, width, yBlockSize, imgOutData, width, yBlockSize, GDT_UInt32, 0, 0);
+                
+                for(int m = 0; m < yBlockSize; ++m)
+                {
+                    if((feedback != 0) && ((((i*yBlockSize)+m) % feedback) == 0))
+                    {
+                        std::cout << "." << feedbackCounter << "." << std::flush;
+                        feedbackCounter = feedbackCounter + 10;
+                    }
+                    
+                    for(int j = 0; j < width; j++)
+                    {
+                        //std::cout << "imgInData[" << (m*width)+j << "] = " << imgInData[(m*width)+j] << std::endl;
+                        
+                        if((imgInData[(m*width)+j] > 0) & (imgInData[(m*width)+j] < numRows))
+                        {
+                            try
+                            {
+                                fid = boost::lexical_cast<size_t>(imgInData[(m*width)+j]);
+                            }
+                            catch(boost::numeric::negative_overflow& e)
+                            {
+                                std::cout << "imgInData[" << (m*width)+j << "] = " << imgInData[(m*width)+j] << std::endl;
+                                throw rsgis::img::RSGISImageCalcException(e.what());
+                            }
+                            catch(boost::numeric::positive_overflow& e)
+                            {
+                                std::cout << "imgInData[" << (m*width)+j << "] = " << imgInData[(m*width)+j] << std::endl;
+                                throw rsgis::img::RSGISImageCalcException(e.what());
+                            }
+                            catch(boost::numeric::bad_numeric_cast& e)
+                            {
+                                std::cout << "imgInData[" << (m*width)+j << "] = " << imgInData[(m*width)+j] << std::endl;
+                                throw rsgis::img::RSGISImageCalcException(e.what());
+                            }
+                            
+                            imgOutData[(m*width)+j] = gdalATT->GetValueAsInt(fid, outClumpIDColIdx);
+                            
+                        }
+                    }
+                    
+                }
+                
+                rowOffset = outOffset[1] + (yBlockSize * i);
+                outputBand->RasterIO(GF_Write, outOffset[0], rowOffset, width, yBlockSize, imgOutData, width, yBlockSize, GDT_UInt32, 0, 0);
+            }
+            
+            if(remainRows > 0)
+            {
+                rowOffset = inOffset[1] + (yBlockSize * nYBlocks);
+                clumpsBand->RasterIO(GF_Read, inOffset[0], rowOffset, width, remainRows, imgInData, width, remainRows, GDT_UInt32, 0, 0);
+                rowOffset = outOffset[1] + (yBlockSize * nYBlocks);
+                outputBand->RasterIO(GF_Read, outOffset[0], rowOffset, width, remainRows, imgOutData, width, remainRows, GDT_UInt32, 0, 0);
+                
+                for(int m = 0; m < remainRows; ++m)
+                {
+                    if((feedback != 0) && ((((nYBlocks*yBlockSize)+m) % feedback) == 0))
+                    {
+                        std::cout << "." << feedbackCounter << "." << std::flush;
+                        feedbackCounter = feedbackCounter + 10;
+                    }
+                    
+                    for(int j = 0; j < width; j++)
+                    {
+                        if((imgInData[(m*width)+j] > 0) & (imgInData[(m*width)+j] < numRows))
+                        {
+                            try
+                            {
+                                fid = boost::lexical_cast<size_t>(imgInData[(m*width)+j]);
+                            }
+                            catch(boost::numeric::negative_overflow& e)
+                            {
+                                std::cout << "imgInData[" << (m*width)+j << "] = " << imgInData[(m*width)+j] << std::endl;
+                                throw rsgis::img::RSGISImageCalcException(e.what());
+                            }
+                            catch(boost::numeric::positive_overflow& e)
+                            {
+                                std::cout << "imgInData[" << (m*width)+j << "] = " << imgInData[(m*width)+j] << std::endl;
+                                throw rsgis::img::RSGISImageCalcException(e.what());
+                            }
+                            catch(boost::numeric::bad_numeric_cast& e)
+                            {
+                                std::cout << "imgInData[" << (m*width)+j << "] = " << imgInData[(m*width)+j] << std::endl;
+                                throw rsgis::img::RSGISImageCalcException(e.what());
+                            }
+                            
+                            imgOutData[(m*width)+j] = gdalATT->GetValueAsInt(fid, outClumpIDColIdx);
+                        }
+                    }
+                }
+                
+                rowOffset = outOffset[1] + (yBlockSize * nYBlocks);
+                outputBand->RasterIO(GF_Write, outOffset[0], rowOffset, width, remainRows, imgOutData, width, remainRows, GDT_UInt32, 0, 0);
+            }
+            std::cout << " Complete.\n";
+            
+            delete[] imgInData;
+            delete[] imgOutData;
+            delete[] outOffset;
+            delete[] inOffset;
             delete[] gdalTranslation;
             for(int i = 0; i < 2; i++)
             {

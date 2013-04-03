@@ -1038,6 +1038,12 @@
         <rsgis:image clumps="string" />
 		<rsgis:image clumps="string" />
     </rsgis:command>
+	<!-- A command to merge clump images (i.e., tile boundaries) into an exiting clump image.-->
+	<rsgis:command algor="segmentation" option="mergeclumpimages" output="image.kea"  >
+		<rsgis:image clumps="string" />
+        <rsgis:image clumps="string" />
+		<rsgis:image clumps="string" />
+    </rsgis:command>
 
 
 
