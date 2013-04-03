@@ -810,7 +810,8 @@ set(LIB_SEGMENTATION_H
 	${RSGIS_SRC_SEGMENTATION_DIR}/RSGISRegionGrowAttributeTable.h
 	${RSGIS_SRC_SEGMENTATION_DIR}/RSGISRegionGrowSegmentsPixels.h
 	${RSGIS_SRC_SEGMENTATION_DIR}/RSGISDefineSpectralDivision.h 
-	${RSGIS_SRC_SEGMENTATION_DIR}/RSGISEliminateSinglePixels.h)
+	${RSGIS_SRC_SEGMENTATION_DIR}/RSGISEliminateSinglePixels.h
+	${RSGIS_SRC_SEGMENTATION_DIR}/RSGISMergeSegmentationTiles.h)
 	
 set(LIB_SEGMENTATION_CPP
 	${RSGIS_SRC_SEGMENTATION_DIR}/RSGISGenMeanSegImage.cpp 
@@ -838,7 +839,9 @@ set(LIB_SEGMENTATION_CPP
 	${RSGIS_SRC_SEGMENTATION_DIR}/RSGISDefineSpectralDivision.cpp
 	${RSGIS_SRC_SEGMENTATION_DIR}/RSGISDefineSpectralDivision.h 
 	${RSGIS_SRC_SEGMENTATION_DIR}/RSGISEliminateSinglePixels.cpp
-	${RSGIS_SRC_SEGMENTATION_DIR}/RSGISEliminateSinglePixels.h)
+	${RSGIS_SRC_SEGMENTATION_DIR}/RSGISEliminateSinglePixels.h
+	${RSGIS_SRC_SEGMENTATION_DIR}/RSGISMergeSegmentationTiles.cpp
+	${RSGIS_SRC_SEGMENTATION_DIR}/RSGISMergeSegmentationTiles.h)
 ###############################################################################
 
 ###############################################################################

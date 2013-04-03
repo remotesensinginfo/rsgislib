@@ -99,7 +99,8 @@ namespace rsgisexe{
             calcborderlength,
             calcrelborder,
             calcshapeindices,
-            defineclumptileposition
+            defineclumptileposition,
+            defineborderclumps
         };
         
         RSGISExeRasterGIS();
@@ -142,6 +143,7 @@ namespace rsgisexe{
         std::string trainingSelectCol;
         std::string className;
         std::string tileImage;
+        std::string maskImage;
         size_t fid;
         unsigned int nFeatures;
         float specDistThreshold;
