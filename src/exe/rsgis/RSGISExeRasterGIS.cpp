@@ -73,6 +73,7 @@ namespace rsgisexe{
         XMLCh *optionCalcShapeIndices = xercesc::XMLString::transcode("calcshapeindices");
         XMLCh *optionDefineClumpTilePosition = xercesc::XMLString::transcode("defineclumptileposition");
         XMLCh *optionDefineBorderClumps = xercesc::XMLString::transcode("defineborderclumps");
+        XMLCh *optionPopulateStats = xercesc::XMLString::transcode("populatestats");
         
         const XMLCh *algorNameEle = argElement->getAttribute(algorXMLStr);
         if(!xercesc::XMLString::equals(algorName, algorNameEle))
@@ -2783,6 +2784,68 @@ namespace rsgisexe{
             xercesc::XMLString::release(&bodyXMLStr);
         
         }
+        else if(xercesc::XMLString::equals(optionPopulateStats, optionXML))
+        {
+            this->option = RSGISExeRasterGIS::populatestats;
+            
+            XMLCh *clumpsXMLStr = xercesc::XMLString::transcode("clumps");
+            if(argElement->hasAttribute(clumpsXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(clumpsXMLStr));
+                this->clumpsImage = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'clumps\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&clumpsXMLStr);
+
+            XMLCh *pyramidsXMLStr = xercesc::XMLString::transcode("pyramids");
+            if(argElement->hasAttribute(pyramidsXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(pyramidsXMLStr));
+                std::string typeStr = std::string(charValue);
+                if(typeStr == "yes")
+                {
+                    this->calcImgPyramids = true;
+                }
+                else
+                {
+                    this->calcImgPyramids = false;
+                }
+                
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                this->calcImgPyramids = false;
+            }
+            xercesc::XMLString::release(&pyramidsXMLStr);
+            
+            XMLCh *colourtableXMLStr = xercesc::XMLString::transcode("colourtable");
+            if(argElement->hasAttribute(colourtableXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(colourtableXMLStr));
+                std::string typeStr = std::string(charValue);
+                if(typeStr == "yes")
+                {
+                    this->addColourTable2Img = true;
+                }
+                else
+                {
+                    this->addColourTable2Img = false;
+                }
+                
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                this->addColourTable2Img = false;
+            }
+            xercesc::XMLString::release(&colourtableXMLStr);
+            
+        }
         else
         {
             std::string message = std::string("The option (") + std::string(xercesc::XMLString::transcode(optionXML)) + std::string(") is not known: RSGISExeRasterGIS.");
@@ -2822,6 +2885,7 @@ namespace rsgisexe{
         xercesc::XMLString::release(&optionCalcShapeIndices);
         xercesc::XMLString::release(&optionDefineClumpTilePosition);
         xercesc::XMLString::release(&optionDefineBorderClumps);
+        xercesc::XMLString::release(&optionPopulateStats);
     }
     
     void RSGISExeRasterGIS::runAlgorithm() throw(rsgis::RSGISException)
@@ -4002,6 +4066,51 @@ namespace rsgisexe{
                     
                     GDALClose(clumpsDataset);
                     GDALClose(maskDataset);
+                }
+                catch(rsgis::RSGISException &e)
+                {
+                    throw e;
+                }
+                
+            }
+            else if(this->option == RSGISExeRasterGIS::populatestats)
+            {
+                std::cout << "A command to define the clumps which are on the border within the file of the clumps using a mask\n";
+                std::cout << "Clumps: " << this->clumpsImage << std::endl;
+                if(calcImgPyramids)
+                {
+                    std::cout << "Image pyramids will be calculated\n";
+                }
+                else
+                {
+                    std::cout << "Image pyramids will NOT be calculated\n";
+                }
+                if(addColourTable2Img)
+                {
+                    std::cout << "A colour table will be added\n";
+                }
+                else
+                {
+                    std::cout << "A colour table will NOT be added\n";
+                }
+                
+                try
+                {
+                    GDALAllRegister();
+                    
+                    GDALDataset *clumpsDataset = (GDALDataset *) GDALOpen(this->clumpsImage.c_str(), GA_Update);
+                    if(clumpsDataset == NULL)
+                    {
+                        std::string message = std::string("Could not open image ") + this->clumpsImage;
+                        throw rsgis::RSGISImageException(message.c_str());
+                    }
+                    
+                    rsgis::rastergis::RSGISPopulateWithImageStats popImageStats;
+                    popImageStats.populateImageWithRasterGISStats(clumpsDataset, this->addColourTable2Img, this->calcImgPyramids);
+                    
+                    clumpsDataset->GetRasterBand(1)->SetMetadataItem("LAYER_TYPE", "thematic");
+                    
+                    GDALClose(clumpsDataset);
                 }
                 catch(rsgis::RSGISException &e)
                 {
