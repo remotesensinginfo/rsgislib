@@ -2637,6 +2637,29 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			this->tileOverlap = 0;
 		}
 		XMLString::release(&overlapXMLStr);
+        
+        
+        XMLCh *offsetXMLStr = XMLString::transcode("offset");
+		if(argElement->hasAttribute(offsetXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(offsetXMLStr));
+			string typeStr = string(charValue);
+			if(typeStr == "yes")
+			{
+				this->offsetTiling = true;
+			}
+            else
+            {
+                this->offsetTiling = false;
+            }
+            
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			this->offsetTiling = false;
+		}
+		XMLString::release(&offsetXMLStr);
 
     }
     else if (XMLString::equals(optionBandColourUsage, optionXML))
@@ -4913,7 +4936,16 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
 		}
         else if(option == RSGISExeImageUtils::createtiles)
 		{
-			cout << "Create tiles from image\n";
+			cout << "A command to create tiles from image\n";
+            cout << "Input Image: " << this->inputImage << std::endl;
+            cout << "Output Image Base: " << this->outputImage << std::endl;
+            cout << "Tile Width: " << this->width << std::endl;
+            cout << "Tile Height: " << this->height << std::endl;
+            cout << "Tile Overlap: " << this->tileOverlap << std::endl;
+            if(offsetTiling)
+            {
+                cout << "Tiling is offset by half a tile.\n";
+            }
 			GDALAllRegister();
 			OGRRegisterAll();
 
@@ -4930,7 +4962,7 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
 			{
 				// Open Image
 				dataset = new GDALDataset*[1];
-				cout << this->inputImage << endl;
+				//cout << this->inputImage << endl;
 				dataset[0] = (GDALDataset *) GDALOpenShared(this->inputImage.c_str(), GA_ReadOnly);
 				if(dataset[0] == NULL)
 				{
@@ -4950,10 +4982,10 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
                 {
                     dsOffsets[i] = new int[2];
                 }
-                int height = 0;
-                int width = 0;
+                int imgHeight = 0;
+                int imgWidth = 0;
 
-                imgUtils.getImageOverlap(dataset, numDS, dsOffsets, &width, &height, gdalTransform);
+                imgUtils.getImageOverlap(dataset, numDS, dsOffsets, &imgWidth, &imgHeight, gdalTransform);
                
                 double pixelXRes = gdalTransform[1];
                 double pixelYRes = gdalTransform[5];
@@ -4961,8 +4993,16 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
                 double minX = gdalTransform[0];
                 double maxY = gdalTransform[3];
 
-                double maxX = minX + (width * pixelXRes);
-                double minY = maxY - (height * abs(pixelYRes));
+                double maxX = minX + (imgWidth * pixelXRes);
+                double minY = maxY - (imgHeight * abs(pixelYRes));
+                
+                if(offsetTiling)
+                {
+                    minX -= (this->width * pixelXRes)/2;
+                    maxX += (this->width * pixelXRes)/2;
+                    minY -= (this->height * abs(pixelYRes))/2;
+                    maxY += (this->height * abs(pixelYRes))/2;
+                }
 
                 double tileWidthMapUnits = this->width * pixelXRes;
                 double tileHeighMapUnits = this->height * abs(pixelYRes); // Max y resolution positive (makes things simpler)
