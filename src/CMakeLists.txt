@@ -328,6 +328,7 @@ set(LIB_IMG_H
 	${RSGIS_SRC_IMG_DIR}/RSGISPopWithStats.h
 	${RSGIS_SRC_IMG_DIR}/RSGISGenHistogram.h
 	${RSGIS_SRC_IMG_DIR}/RSGISGenAccuracyPoints.h
+	${RSGIS_SRC_IMG_DIR}/RSGISSampleImage.h
 	)
 	
 set(LIB_IMG_CPP
@@ -458,6 +459,8 @@ set(LIB_IMG_CPP
 	${RSGIS_SRC_IMG_DIR}/RSGISGenHistogram.h
 	${RSGIS_SRC_IMG_DIR}/RSGISGenAccuracyPoints.cpp
 	${RSGIS_SRC_IMG_DIR}/RSGISGenAccuracyPoints.h
+	${RSGIS_SRC_IMG_DIR}/RSGISSampleImage.cpp
+	${RSGIS_SRC_IMG_DIR}/RSGISSampleImage.h
 	)
 ###############################################################################
 
@@ -861,7 +864,8 @@ set(LIB_UTILS_H
 	${RSGIS_SRC_UTILS_DIR}/RSGISGEOSFactoryGenerator.h 
 	${RSGIS_SRC_UTILS_DIR}/RSGISPlotPolygonsCSVParse.h 
 	${RSGIS_SRC_UTILS_DIR}/RSGISImageFootprintPolygonsCSVParse.h 
-	${RSGIS_SRC_UTILS_DIR}/RSGISExportForPlottingIncremental.h )
+	${RSGIS_SRC_UTILS_DIR}/RSGISExportForPlottingIncremental.h
+	${RSGIS_SRC_UTILS_DIR}/RSGISExportData2HDF.h )
 	
 set(LIB_UTILS_CPP
 	${RSGIS_SRC_UTILS_DIR}/RSGISENVIROIException.cpp 
@@ -892,7 +896,9 @@ set(LIB_UTILS_CPP
 	${RSGIS_SRC_UTILS_DIR}/RSGISImageFootprintPolygonsCSVParse.cpp 
 	${RSGIS_SRC_UTILS_DIR}/RSGISImageFootprintPolygonsCSVParse.h 
 	${RSGIS_SRC_UTILS_DIR}/RSGISExportForPlottingIncremental.cpp 
-	${RSGIS_SRC_UTILS_DIR}/RSGISExportForPlottingIncremental.h )
+	${RSGIS_SRC_UTILS_DIR}/RSGISExportForPlottingIncremental.h
+	${RSGIS_SRC_UTILS_DIR}/RSGISExportData2HDF.cpp
+	${RSGIS_SRC_UTILS_DIR}/RSGISExportData2HDF.h )
 ###############################################################################
 
 ###############################################################################
@@ -1226,7 +1232,7 @@ add_library( ${RSGISLIB_MATHS_LIB_NAME} ${LIB_MATH_CPP} )
 target_link_libraries(${RSGISLIB_MATHS_LIB_NAME} ${RSGISLIB_COMMONS_LIB_NAME} ${GSL_LIBRARIES} ${FFTW_LIBRARIES} ${MUPARSER_LIBRARIES} ${GEOS_LIBRARIES} ${GDAL_LIBRARIES} ${GMP_LIBRARIES} ${MPFR_LIBRARIES} ${KEA_LIBRARIES} )
 
 add_library( ${RSGISLIB_UTILS_LIB_NAME} ${LIB_UTILS_CPP} )
-target_link_libraries(${RSGISLIB_UTILS_LIB_NAME} ${RSGISLIB_COMMONS_LIB_NAME} ${RSGISLIB_MATHS_LIB_NAME} ${GDAL_LIBRARIES} ${GEOS_LIBRARIES} ${XERCESC_LIBRARIES} ${GMP_LIBRARIES} ${MPFR_LIBRARIES} ${KEA_LIBRARIES} )
+target_link_libraries(${RSGISLIB_UTILS_LIB_NAME} ${RSGISLIB_COMMONS_LIB_NAME} ${RSGISLIB_MATHS_LIB_NAME} ${GDAL_LIBRARIES} ${GEOS_LIBRARIES} ${XERCESC_LIBRARIES} ${HDF5_LIBRARIES} ${GMP_LIBRARIES} ${MPFR_LIBRARIES} ${KEA_LIBRARIES} )
 
 add_library( ${RSGISLIB_GEOM_LIB_NAME} ${LIB_GEOM_CPP} )
 target_link_libraries(${RSGISLIB_GEOM_LIB_NAME} ${RSGISLIB_COMMONS_LIB_NAME} ${RSGISLIB_DATASTRUCT_LIB_NAME} ${RSGISLIB_MATHS_LIB_NAME}  ${RSGISLIB_UTILS_LIB_NAME} ${GDAL_LIBRARIES} ${GEOS_LIBRARIES} ${GMP_LIBRARIES} ${MPFR_LIBRARIES} ${KEA_LIBRARIES} )
