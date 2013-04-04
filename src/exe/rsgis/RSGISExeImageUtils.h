@@ -69,6 +69,7 @@
 #include "img/RSGISRelabelPixelValuesFromLUT.h"
 #include "img/RSGISPopWithStats.h"
 #include "img/RSGISGenAccuracyPoints.h"
+#include "img/RSGISSampleImage.h"
 
 
 #include "vec/RSGISImageTileVector.h"
@@ -144,7 +145,8 @@ class RSGISExeImageUtils : public RSGISAlgorithmParameters
             defineimgtiles,
             gentilemasks,
             cutouttile,
-            stretchwithstats
+            stretchwithstats,
+            subsampleimage
 		};
 
 		enum interpolators
@@ -276,6 +278,7 @@ class RSGISExeImageUtils : public RSGISAlgorithmParameters
         bool createAnOverlap;
         bool growOverlap;
         bool offsetTiling;
+        unsigned int imageSample;
 	};
 }
 #endif

@@ -689,6 +689,8 @@
 	<rsgis:command algor="imageutils" option="gentilemasks" image="image.env" outputbase="image_out_path" format="GDAL Format" extension="string" [overlap="float" growoverlap="yes|no"] />
 	<!-- A command to extract and a region for the tile and apply a mask --> 
 	<rsgis:command algor="imageutils" option="cutouttile" image="image.env" tile="tile.env" output="image_out.env" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" nodataval="float" />
+	<!-- A command to extract a subsample of image data to a hdf5 file --> 
+	<rsgis:command algor="imageutils" option="subsampleimage" image="image.kea" output="data.hdf" nodata="float" subsample="int" />
 
 
 

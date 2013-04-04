@@ -111,6 +111,7 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
     XMLCh *optionGenTileMasks = XMLString::transcode("gentilemasks");
     XMLCh *optionCutOutTile = XMLString::transcode("cutouttile");
     XMLCh *optionStretchImageWithStats = XMLString::transcode("stretchwithstats");
+    XMLCh *optionSubSampleImage = XMLString::transcode("subsampleimage");
 
 	const XMLCh *algorNameEle = argElement->getAttribute(algorXMLStr);
 	if(!XMLString::equals(algorName, algorNameEle))
@@ -3393,6 +3394,68 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
         
         
 	}
+    else if (XMLString::equals(optionSubSampleImage, optionXML))
+	{
+		this->option = RSGISExeImageUtils::subsampleimage;
+        
+		XMLCh *imageXMLStr = XMLString::transcode("image");
+		if(argElement->hasAttribute(imageXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(imageXMLStr));
+			this->inputImage = string(charValue);
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+		}
+		XMLString::release(&imageXMLStr);
+        
+		XMLCh *outputXMLStr = XMLString::transcode("output");
+		if(argElement->hasAttribute(outputXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
+			this->outputFile = string(charValue);
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+		}
+		XMLString::release(&outputXMLStr);
+       
+        
+        XMLCh *nodataXMLStr = XMLString::transcode("nodata");
+		if(argElement->hasAttribute(nodataXMLStr))
+		{
+            char *charValue = XMLString::transcode(argElement->getAttribute(nodataXMLStr));
+            this->nodataValue = mathUtils.strtofloat(string(charValue));
+            XMLString::release(&charValue);
+            this->useIgnoreVal = true;
+		}
+		else
+		{
+			this->useIgnoreVal = false;
+		}
+		XMLString::release(&nodataXMLStr);
+        
+        
+        XMLCh *subSampleXMLStr = XMLString::transcode("subsample");
+		if(argElement->hasAttribute(subSampleXMLStr))
+		{
+            char *charValue = XMLString::transcode(argElement->getAttribute(subSampleXMLStr));
+            this->imageSample = mathUtils.strtounsignedint(string(charValue));
+            XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'subsample\' attribute was provided.");
+		}
+		XMLString::release(&subSampleXMLStr);
+        
+        
+        
+	}
 	else
 	{
 		string message = string("The option (") + string(XMLString::transcode(optionXML)) + string(") is not known: RSGISExeImageUtils.");
@@ -3447,6 +3510,7 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
     XMLString::release(&optionGenTileMasks);
     XMLString::release(&optionCutOutTile);
     XMLString::release(&optionStretchImageWithStats);
+    XMLString::release(&optionSubSampleImage);
     
 	parsed = true;
 }
@@ -5746,6 +5810,42 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
 			}
             
 		}
+        else if(option == RSGISExeImageUtils::subsampleimage)
+		{
+			cout << "A command to extract a subsample of image data to a hdf5 file.\n";
+			cout << "Input Image: " << this->inputImage << endl;
+			cout << "Output File: " << this->outputFile << endl;
+            cout << "Sub-Sample: " << this->imageSample << endl;
+            if(this->useIgnoreVal)
+            {
+                cout << "No data value: " << this->nodataValue << endl;
+            }
+            
+			try
+			{
+				GDALAllRegister();
+
+				GDALDataset *inDataset = NULL;
+                
+				inDataset = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_ReadOnly);
+				if(inDataset == NULL)
+				{
+					string message = string("Could not open image ") + this->inputImage;
+					throw RSGISImageException(message.c_str());
+				}
+                
+                rsgis::img::RSGISSampleImage sampleData;
+                sampleData.subSampleImage(inDataset, this->outputFile, this->imageSample, this->nodataValue, this->useIgnoreVal);
+                
+				GDALClose(inDataset);
+				GDALDestroyDriverManager();
+			}
+			catch(RSGISException& e)
+			{
+				throw e;
+			}
+            
+		}
 		else
 		{
 			cout << "Options not recognised\n";
@@ -6148,6 +6248,57 @@ void RSGISExeImageUtils::printParameters()
             }
             cout << "Image format: " << this->imageFormat << endl;
             cout << "Image Extension: " << this->outFileExtension << endl;
+        }
+        else if(option == RSGISExeImageUtils::cutouttile)
+        {
+            cout << "A command to extract and a region for the tile and apply a mask.\n";
+            cout << "Image: " << this->inputImage << endl;
+            cout << "Output: " << this->outputImage << endl;
+            cout << "Tile: " << this->tileImage << endl;
+            cout << "Image format: " << this->imageFormat << endl;
+            cout << "No Data: " << this->nodataValue << endl;
+        }
+        else if(option == RSGISExeImageUtils::stretchwithstats)
+		{
+			cout << "Apply an enhancement stretch to the an input image using defined stats\n";
+			cout << "Input Image: " << this->inputImage << endl;
+			cout << "Output Image: " << this->outputImage << endl;
+            cout << "Input Stats File: " << this->inputFile << endl;
+			if(stretchType == linearMinMax)
+			{
+				cout << "Linear Min-Max stretch\n";
+			}
+			else if(stretchType == histogram)
+			{
+				cout << "Histogram stretch\n";
+			}
+			else if(stretchType == exponential)
+			{
+				cout << "Exponential stretch\n";
+			}
+			else if(stretchType == logarithmic)
+			{
+				cout << "Logarithmic stretch\n";
+			}
+			else if(stretchType == powerLaw)
+			{
+				cout << power << " Power Law stretch\n";
+			}
+			else
+			{
+				throw RSGISException("Stretch is not recognised.");
+			}
+        }
+        else if(option == RSGISExeImageUtils::subsampleimage)
+		{
+			cout << "A command to extract a subsample of image data to a hdf5 file.\n";
+			cout << "Input Image: " << this->inputImage << endl;
+			cout << "Output File: " << this->outputFile << endl;
+            cout << "Sub-Sample: " << this->imageSample << endl;
+            if(this->useIgnoreVal)
+            {
+                cout << "No data value: " << this->nodataValue << endl;
+            }
         }
 		else
 		{
