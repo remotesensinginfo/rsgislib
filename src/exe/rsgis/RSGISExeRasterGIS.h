@@ -55,6 +55,7 @@
 #include "rastergis/RSGISClumpBorders.h"
 #include "rastergis/RSGISCalcClumpShapeParameters.h"
 #include "rastergis/RSGISDefineImageTiles.h"
+#include "rastergis/RSGISFindChangeClumps.h"
 
 #include "gdal_priv.h"
 #include "ogrsf_frmts.h"
@@ -101,7 +102,8 @@ namespace rsgisexe{
             calcshapeindices,
             defineclumptileposition,
             defineborderclumps,
-            populatestats
+            populatestats,
+            findchangeclumpsfromstddev
         };
         
         RSGISExeRasterGIS();
@@ -145,6 +147,7 @@ namespace rsgisexe{
         std::string className;
         std::string tileImage;
         std::string maskImage;
+        std::string changeField;
         size_t fid;
         unsigned int nFeatures;
         float specDistThreshold;
@@ -173,6 +176,8 @@ namespace rsgisexe{
         unsigned int tileBody;
         bool calcImgPyramids;
         bool addColourTable2Img;
+        std::vector<rsgis::rastergis::RSGISClassChangeFields*> *classChangeField;
+        std::vector<std::string> *attFields;
     };
     
 }

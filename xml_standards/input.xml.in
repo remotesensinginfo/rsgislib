@@ -515,8 +515,12 @@
 	<rsgis:command algor="rastergis" option="defineborderclumps" clumps="clumps.kea" bordermask="image.kea" colname="string" overlap="int" boundary="int" body="int" />
 	<!-- A command to populate an image with the statistics (maximum, minimum, histogram) required for the a thematic image -->
 	<rsgis:command algor="rastergis" option="populatestats" clumps="clumps.kea" pyramids="yes | no" colourtable="yes | no" />
-
-
+	<!-- A command to identify segments which have changed by looking for statistical outliners (std dev) from class population -->
+	<rsgis:command algor="rastergis" option="findchangeclumpsfromstddev" clumps="clumps.kea" classcol="string" changefield="string" fields="col1,col2,col3" >
+		<rsgis:class name="string" stddevthres="float" changeval="int" />
+        <rsgis:class name="string" stddevthres="float" changeval="int" />
+        <rsgis:class name="string" stddevthres="float" changeval="int" />
+    </rsgis:command>
 
 
 
