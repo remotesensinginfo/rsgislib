@@ -74,6 +74,7 @@ namespace rsgisexe{
         XMLCh *optionDefineClumpTilePosition = xercesc::XMLString::transcode("defineclumptileposition");
         XMLCh *optionDefineBorderClumps = xercesc::XMLString::transcode("defineborderclumps");
         XMLCh *optionPopulateStats = xercesc::XMLString::transcode("populatestats");
+        XMLCh *optionFindChangeClumpsFromStddev = xercesc::XMLString::transcode("findchangeclumpsfromstddev");
         
         const XMLCh *algorNameEle = argElement->getAttribute(algorXMLStr);
         if(!xercesc::XMLString::equals(algorName, algorNameEle))
@@ -2846,6 +2847,129 @@ namespace rsgisexe{
             xercesc::XMLString::release(&colourtableXMLStr);
             
         }
+        else if(xercesc::XMLString::equals(optionFindChangeClumpsFromStddev, optionXML))
+        {
+            this->option = RSGISExeRasterGIS::findchangeclumpsfromstddev;
+            
+            XMLCh *imageXMLStr = xercesc::XMLString::transcode("clumps");
+            if(argElement->hasAttribute(imageXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(imageXMLStr));
+                this->clumpsImage = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'clumps\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&imageXMLStr);
+            
+            XMLCh *classColXMLStr = xercesc::XMLString::transcode("classcol");
+            if(argElement->hasAttribute(classColXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(classColXMLStr));
+                this->classField = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'classcol\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&classColXMLStr);
+            
+            XMLCh *changeFieldXMLStr = xercesc::XMLString::transcode("changefield");
+            if(argElement->hasAttribute(changeFieldXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(changeFieldXMLStr));
+                this->changeField = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'changefield\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&changeFieldXMLStr);
+            
+            XMLCh *fieldsXMLStr = xercesc::XMLString::transcode("fields");
+            if(argElement->hasAttribute(fieldsXMLStr))
+            {
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(fieldsXMLStr));
+                std::string fields = std::string(charValue);
+                attFields = new std::vector<std::string>();
+                textUtils.tokenizeString(fields, ',', attFields);
+                xercesc::XMLString::release(&charValue);
+            }
+            else
+            {
+                throw rsgis::RSGISXMLArgumentsException("No \'fields\' attribute was provided.");
+            }
+            xercesc::XMLString::release(&fieldsXMLStr);
+                        
+            XMLCh *rsgisClassXMLStr = xercesc::XMLString::transcode("rsgis:class");
+            xercesc::DOMNodeList *classNodesList = argElement->getElementsByTagName(rsgisClassXMLStr);
+            unsigned int numClassTags = classNodesList->getLength();
+            
+            std::cout << "Found " << numClassTags << " class tags" << std::endl;
+            
+            if(numClassTags == 0)
+            {
+                throw rsgis::RSGISXMLArgumentsException("No class tags have been provided, at least 1 is required.");
+            }
+            classChangeField = new std::vector<rsgis::rastergis::RSGISClassChangeFields*>();
+            classChangeField->reserve(numClassTags);
+            
+            xercesc::DOMElement *attElement = NULL;
+            rsgis::rastergis::RSGISClassChangeFields *classChange = NULL;
+            for(int i = 0; i < numClassTags; i++)
+            {
+                attElement = static_cast<xercesc::DOMElement*>(classNodesList->item(i));
+                
+                classChange = new rsgis::rastergis::RSGISClassChangeFields();
+                
+                XMLCh *nameXMLStr = xercesc::XMLString::transcode("name");
+                if(attElement->hasAttribute(nameXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(attElement->getAttribute(nameXMLStr));
+                    classChange->name = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'name\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&nameXMLStr);
+                
+                XMLCh *stddevThresXMLStr = xercesc::XMLString::transcode("stddevthres");
+                if(attElement->hasAttribute(stddevThresXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(attElement->getAttribute(stddevThresXMLStr));
+                    classChange->threshold = textUtils.strtofloat(std::string(charValue));
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'stddevthres\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&stddevThresXMLStr);
+                                
+                XMLCh *changeValXMLStr = xercesc::XMLString::transcode("changeval");
+                if(attElement->hasAttribute(changeValXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(attElement->getAttribute(changeValXMLStr));
+                    classChange->outName = textUtils.strto32bitUInt(std::string(charValue));
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'changeval\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&changeValXMLStr);
+                
+                classChangeField->push_back(classChange);
+            }
+            
+            xercesc::XMLString::release(&rsgisClassXMLStr);
+        }
         else
         {
             std::string message = std::string("The option (") + std::string(xercesc::XMLString::transcode(optionXML)) + std::string(") is not known: RSGISExeRasterGIS.");
@@ -2886,6 +3010,7 @@ namespace rsgisexe{
         xercesc::XMLString::release(&optionDefineClumpTilePosition);
         xercesc::XMLString::release(&optionDefineBorderClumps);
         xercesc::XMLString::release(&optionPopulateStats);
+        xercesc::XMLString::release(&optionFindChangeClumpsFromStddev);
     }
     
     void RSGISExeRasterGIS::runAlgorithm() throw(rsgis::RSGISException)
@@ -4118,6 +4243,48 @@ namespace rsgisexe{
                 }
                 
             }
+            else if(this->option == RSGISExeRasterGIS::findchangeclumpsfromstddev)
+            {
+                std::cout << "A command to identify segments which have changed by looking for statistical outliners (std dev) from class population\n";
+                std::cout << "Clumps Image: " << this->clumpsImage << std::endl;
+                std::cout << "Class Column: " << this->classField << std::endl;
+                std::cout << "Change Field: " << this->changeField << std::endl;
+                std::cout << "Fields:\n";
+                for(std::vector<std::string>::iterator iterFields = attFields->begin(); iterFields != attFields->end(); ++iterFields)
+                {
+                    std::cout << "\t" << *iterFields << std::endl;
+                }
+                std::cout << "Class:\n";
+                for(std::vector<rsgis::rastergis::RSGISClassChangeFields*>::iterator iterClass = classChangeField->begin(); iterClass != classChangeField->end(); ++iterClass)
+                {
+                    std::cout << "\t" << (*iterClass)->name << "\t" << (*iterClass)->outName << "\t" << (*iterClass)->threshold << std::endl;
+                }
+                
+                try
+                {
+                    GDALAllRegister();
+                    
+                    GDALDataset *clumpsDataset = (GDALDataset *) GDALOpen(this->clumpsImage.c_str(), GA_Update);
+                    if(clumpsDataset == NULL)
+                    {
+                        std::string message = std::string("Could not open image ") + this->clumpsImage;
+                        throw rsgis::RSGISImageException(message.c_str());
+                    }
+                    
+                    rsgis::rastergis::RSGISFindChangeClumps changeClumps;
+                    changeClumps.findChangeStdDevThreshold(clumpsDataset, this->classField, this->changeField, attFields, classChangeField);
+                    
+                    GDALClose(clumpsDataset);
+                }
+                catch (rsgis::RSGISException &e)
+                {
+                    throw e;
+                }
+                catch (std::exception &e)
+                {
+                    throw rsgis::RSGISException(e.what());
+                }
+            }
             else
             {
                 throw rsgis::RSGISException("The option is not recognised: RSGISExeRasterGIS");
@@ -4436,6 +4603,44 @@ namespace rsgisexe{
                 std::cout << "Tile Overlap: " << this->tileOverlap << std::endl;
                 std::cout << "Tile Boundary: " << this->tileBoundary << std::endl;
                 std::cout << "Tile Body: " << this->tileBody << std::endl;
+            }
+            else if(this->option == RSGISExeRasterGIS::populatestats)
+            {
+                std::cout << "A command to define the clumps which are on the border within the file of the clumps using a mask\n";
+                std::cout << "Clumps: " << this->clumpsImage << std::endl;
+                if(calcImgPyramids)
+                {
+                    std::cout << "Image pyramids will be calculated\n";
+                }
+                else
+                {
+                    std::cout << "Image pyramids will NOT be calculated\n";
+                }
+                if(addColourTable2Img)
+                {
+                    std::cout << "A colour table will be added\n";
+                }
+                else
+                {
+                    std::cout << "A colour table will NOT be added\n";
+                }
+            }
+            else if(this->option == RSGISExeRasterGIS::findchangeclumpsfromstddev)
+            {
+                std::cout << "A command to identify segments which have changed by looking for statistical outliners (std dev) from class population\n";
+                std::cout << "Clumps Image: " << this->clumpsImage << std::endl;
+                std::cout << "Class Column: " << this->classField << std::endl;
+                std::cout << "Change Field: " << this->changeField << std::endl;
+                std::cout << "Fields:\n";
+                for(std::vector<std::string>::iterator iterFields = attFields->begin(); iterFields != attFields->end(); ++iterFields)
+                {
+                    std::cout << "\t" << *iterFields << std::endl;
+                }
+                std::cout << "Class:\n";
+                for(std::vector<rsgis::rastergis::RSGISClassChangeFields*>::iterator iterClass = classChangeField->begin(); iterClass != classChangeField->end(); ++iterClass)
+                {
+                    std::cout << "\t" << (*iterClass)->name << "\t" << (*iterClass)->outName << "\t" << (*iterClass)->threshold << std::endl;
+                }
             }
             else
             {
