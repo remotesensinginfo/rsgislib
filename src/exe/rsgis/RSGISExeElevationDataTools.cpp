@@ -162,12 +162,12 @@ void RSGISExeElevationDataTools::retrieveParameters(xercesc::DOMElement *argElem
             if(argElement->hasAttribute(bandXMLStr))
             {
                 char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(bandXMLStr));
-                imageBand = mathUtils.strtounsignedint(std::string(charValue))-1;
+                imageBand = mathUtils.strtounsignedint(std::string(charValue));
                 xercesc::XMLString::release(&charValue);
             }
             else
             {
-                imageBand = 0;
+                imageBand = 1;
             }
             xercesc::XMLString::release(&bandXMLStr);
             
@@ -227,12 +227,12 @@ void RSGISExeElevationDataTools::retrieveParameters(xercesc::DOMElement *argElem
             if(argElement->hasAttribute(bandXMLStr))
             {
                 char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(bandXMLStr));
-                imageBand = mathUtils.strtounsignedint(std::string(charValue))-1;
+                imageBand = mathUtils.strtounsignedint(std::string(charValue));
                 xercesc::XMLString::release(&charValue);
             }
             else
             {
-                imageBand = 0;
+                imageBand = 1;
             }
             xercesc::XMLString::release(&bandXMLStr);
         }
@@ -270,12 +270,12 @@ void RSGISExeElevationDataTools::retrieveParameters(xercesc::DOMElement *argElem
             if(argElement->hasAttribute(bandXMLStr))
             {
                 char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(bandXMLStr));
-                imageBand = mathUtils.strtounsignedint(std::string(charValue))-1;
+                imageBand = mathUtils.strtounsignedint(std::string(charValue));
                 xercesc::XMLString::release(&charValue);
             }
             else
             {
-                imageBand = 0;
+                imageBand = 1;
             }
             xercesc::XMLString::release(&bandXMLStr);
         }
@@ -313,12 +313,12 @@ void RSGISExeElevationDataTools::retrieveParameters(xercesc::DOMElement *argElem
             if(argElement->hasAttribute(bandXMLStr))
             {
                 char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(bandXMLStr));
-                imageBand = mathUtils.strtounsignedint(std::string(charValue))-1;
+                imageBand = mathUtils.strtounsignedint(std::string(charValue));
                 xercesc::XMLString::release(&charValue);
             }
             else
             {
-                imageBand = 0;
+                imageBand = 1;
             }
             xercesc::XMLString::release(&bandXMLStr);
             
@@ -466,12 +466,12 @@ void RSGISExeElevationDataTools::retrieveParameters(xercesc::DOMElement *argElem
             if(argElement->hasAttribute(bandXMLStr))
             {
                 char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(bandXMLStr));
-                imageBand = mathUtils.strtounsignedint(std::string(charValue))-1;
+                imageBand = mathUtils.strtounsignedint(std::string(charValue));
                 xercesc::XMLString::release(&charValue);
             }
             else
             {
-                imageBand = 0;
+                imageBand = 1;
             }
             xercesc::XMLString::release(&bandXMLStr);
             
@@ -535,12 +535,12 @@ void RSGISExeElevationDataTools::retrieveParameters(xercesc::DOMElement *argElem
             if(argElement->hasAttribute(bandXMLStr))
             {
                 char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(bandXMLStr));
-                imageBand = mathUtils.strtounsignedint(std::string(charValue))-1;
+                imageBand = mathUtils.strtounsignedint(std::string(charValue));
                 xercesc::XMLString::release(&charValue);
             }
             else
             {
-                imageBand = 0;
+                imageBand = 1;
             }
             xercesc::XMLString::release(&bandXMLStr);
             
@@ -604,12 +604,12 @@ void RSGISExeElevationDataTools::retrieveParameters(xercesc::DOMElement *argElem
             if(argElement->hasAttribute(bandXMLStr))
             {
                 char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(bandXMLStr));
-                imageBand = mathUtils.strtounsignedint(std::string(charValue))-1;
+                imageBand = mathUtils.strtounsignedint(std::string(charValue));
                 xercesc::XMLString::release(&charValue);
             }
             else
             {
-                imageBand = 0;
+                imageBand = 1;
             }
             xercesc::XMLString::release(&bandXMLStr);
             
@@ -839,7 +839,7 @@ void RSGISExeElevationDataTools::runAlgorithm() throw(rsgis::RSGISException)
             std::cout << "This command calculates the slope from a DEM.\n";
 			std::cout << "Input Image: " << this->inputImage << std::endl;
             std::cout << "Output Image: " << this->outputImage << std::endl;
-            std::cout << "Input Band: " << this->imageBand+1 << std::endl;
+            std::cout << "Input Band: " << this->imageBand << std::endl;
             
             GDALAllRegister();
 			GDALDataset **datasets = NULL;
@@ -859,7 +859,7 @@ void RSGISExeElevationDataTools::runAlgorithm() throw(rsgis::RSGISException)
 				}
 				
 				int numRasterBands = datasets[0]->GetRasterCount();
-                if(this->imageBand >= numRasterBands)
+                if(this->imageBand > numRasterBands)
                 {
                     GDALClose(datasets[0]);
                     delete[] datasets;
@@ -879,7 +879,7 @@ void RSGISExeElevationDataTools::runAlgorithm() throw(rsgis::RSGISException)
                 
                 delete[] transformation;
                 
-				calcSlope = new rsgis::calib::RSGISCalcSlope(1, imageBand, imageEWRes, imageNSRes, slopeOutputType);
+				calcSlope = new rsgis::calib::RSGISCalcSlope(1, imageBand-1, imageEWRes, imageNSRes, slopeOutputType);
 				
 				calcImage = new rsgis::img::RSGISCalcImage(calcSlope, "", true);
 				calcImage->calcImageWindowData(datasets, 1, this->outputImage, 3, this->imageFormat, this->outDataType);
@@ -901,7 +901,7 @@ void RSGISExeElevationDataTools::runAlgorithm() throw(rsgis::RSGISException)
             std::cout << "This command calculates the aspect from a DEM.\n";
 			std::cout << "Input Image: " << this->inputImage << std::endl;
             std::cout << "Output Image: " << this->outputImage << std::endl;
-            std::cout << "Input Band: " << this->imageBand+1 << std::endl;
+            std::cout << "Input Band: " << this->imageBand << std::endl;
             
             GDALAllRegister();
 			GDALDataset **datasets = NULL;
@@ -921,7 +921,7 @@ void RSGISExeElevationDataTools::runAlgorithm() throw(rsgis::RSGISException)
 				}
 				
 				int numRasterBands = datasets[0]->GetRasterCount();
-                if(this->imageBand >= numRasterBands)
+                if(this->imageBand > numRasterBands)
                 {
                     GDALClose(datasets[0]);
                     delete[] datasets;
@@ -941,7 +941,7 @@ void RSGISExeElevationDataTools::runAlgorithm() throw(rsgis::RSGISException)
                 
                 delete[] transformation;
                 
-				calcAspect = new rsgis::calib::RSGISCalcAspect(1, imageBand, imageEWRes, imageNSRes);
+				calcAspect = new rsgis::calib::RSGISCalcAspect(1, imageBand-1, imageEWRes, imageNSRes);
 				
 				calcImage = new rsgis::img::RSGISCalcImage(calcAspect, "", true);
 				calcImage->calcImageWindowData(datasets, 1, this->outputImage, 3, this->imageFormat, this->outDataType);
@@ -983,7 +983,7 @@ void RSGISExeElevationDataTools::runAlgorithm() throw(rsgis::RSGISException)
 				}
 				
 				int numRasterBands = datasets[0]->GetRasterCount();
-                if(this->imageBand >= numRasterBands)
+                if(this->imageBand > numRasterBands)
                 {
                     GDALClose(datasets[0]);
                     delete[] datasets;
@@ -1003,7 +1003,7 @@ void RSGISExeElevationDataTools::runAlgorithm() throw(rsgis::RSGISException)
                 
                 delete[] transformation;
                 
-				calcSlopeAspect = new rsgis::calib::RSGISCalcSlopeAspect(2, imageBand, imageEWRes, imageNSRes);
+				calcSlopeAspect = new rsgis::calib::RSGISCalcSlopeAspect(2, imageBand-1, imageEWRes, imageNSRes);
 				
 				calcImage = new rsgis::img::RSGISCalcImage(calcSlopeAspect, "", true);
 				calcImage->calcImageWindowData(datasets, 1, this->outputImage, 3, this->imageFormat, this->outDataType);
@@ -1025,7 +1025,7 @@ void RSGISExeElevationDataTools::runAlgorithm() throw(rsgis::RSGISException)
             std::cout << "This command generates a hill shade image from the DEM.\n";
 			std::cout << "Input Image: " << this->inputImage << std::endl;
             std::cout << "Output Image: " << this->outputImage << std::endl;
-            std::cout << "Input Band: " << this->imageBand+1 << std::endl;
+            std::cout << "Input Band: " << this->imageBand << std::endl;
             std::cout << "Solar Azimuth: " << this->solarAzimuth << std::endl;
             std::cout << "Solar Zenith: " << this->solarZenith << std::endl;
             
@@ -1047,7 +1047,7 @@ void RSGISExeElevationDataTools::runAlgorithm() throw(rsgis::RSGISException)
 				}
 				
 				int numRasterBands = datasets[0]->GetRasterCount();
-                if(this->imageBand >= numRasterBands)
+                if(this->imageBand > numRasterBands)
                 {
                     GDALClose(datasets[0]);
                     delete[] datasets;
@@ -1067,7 +1067,7 @@ void RSGISExeElevationDataTools::runAlgorithm() throw(rsgis::RSGISException)
                 
                 delete[] transformation;
                 
-				calcHillShade = new rsgis::calib::RSGISCalcHillShade(1, imageBand, imageEWRes, imageNSRes, solarZenith, solarAzimuth);
+				calcHillShade = new rsgis::calib::RSGISCalcHillShade(1, imageBand-1, imageEWRes, imageNSRes, solarZenith, solarAzimuth);
 				
 				calcImage = new rsgis::img::RSGISCalcImage(calcHillShade, "", true);
 				calcImage->calcImageWindowData(datasets, 1, this->outputImage, 3, this->imageFormat, this->outDataType);
@@ -1089,7 +1089,7 @@ void RSGISExeElevationDataTools::runAlgorithm() throw(rsgis::RSGISException)
             std::cout << "This command calculates a shadow mask from a DEM.\n";
 			std::cout << "Input Image: " << this->inputImage << std::endl;
             std::cout << "Output Image: " << this->outputImage << std::endl;
-            std::cout << "Input Band: " << this->imageBand+1 << std::endl;
+            std::cout << "Input Band: " << this->imageBand << std::endl;
             std::cout << "Solar Azimuth: " << this->solarAzimuth << std::endl;
             std::cout << "Solar Zenith: " << this->solarZenith << std::endl;
             
@@ -1123,7 +1123,7 @@ void RSGISExeElevationDataTools::runAlgorithm() throw(rsgis::RSGISException)
 				}
 				
 				int numRasterBands = datasets[0]->GetRasterCount();
-                if((this->imageBand > numRasterBands) | (this->imageBand == 0))
+                if(this->imageBand > numRasterBands)
                 {
                     GDALClose(datasets[0]);
                     delete[] datasets;
@@ -1143,7 +1143,7 @@ void RSGISExeElevationDataTools::runAlgorithm() throw(rsgis::RSGISException)
                 
                 delete[] transformation;
                 
-				calcMaskShadow = new rsgis::calib::RSGISCalcShadowBinaryMask(1, datasets[0], imageBand, imageEWRes, imageNSRes, solarZenith, solarAzimuth, maxElevHeight);
+				calcMaskShadow = new rsgis::calib::RSGISCalcShadowBinaryMask(1, datasets[0], imageBand-1, imageEWRes, imageNSRes, solarZenith, solarAzimuth, maxElevHeight);
 				
 				calcImage = new rsgis::img::RSGISCalcImage(calcMaskShadow, "", true);
 				calcImage->calcImageExtent(datasets, 1, outputImage, this->imageFormat);
@@ -1164,7 +1164,7 @@ void RSGISExeElevationDataTools::runAlgorithm() throw(rsgis::RSGISException)
             std::cout << "This command calculate the incidence angle of light (from the provided zenith and azimuth) from a DEM.\n";
 			std::cout << "Input Image: " << this->inputImage << std::endl;
             std::cout << "Output Image: " << this->outputImage << std::endl;
-            std::cout << "Input Band: " << this->imageBand+1 << std::endl;
+            std::cout << "Input Band: " << this->imageBand << std::endl;
             std::cout << "Solar Azimuth: " << this->solarAzimuth << std::endl;
             std::cout << "Solar Zenith: " << this->solarZenith << std::endl;
             
@@ -1186,7 +1186,7 @@ void RSGISExeElevationDataTools::runAlgorithm() throw(rsgis::RSGISException)
 				}
 				
 				int numRasterBands = datasets[0]->GetRasterCount();
-                if(this->imageBand >= numRasterBands)
+                if(this->imageBand > numRasterBands)
                 {
                     GDALClose(datasets[0]);
                     delete[] datasets;
@@ -1206,7 +1206,7 @@ void RSGISExeElevationDataTools::runAlgorithm() throw(rsgis::RSGISException)
                 
                 delete[] transformation;
                 
-				calcIncidence = new rsgis::calib::RSGISCalcRayIncidentAngle(1, imageBand, imageEWRes, imageNSRes, solarZenith, solarAzimuth);
+				calcIncidence = new rsgis::calib::RSGISCalcRayIncidentAngle(1, imageBand-1, imageEWRes, imageNSRes, solarZenith, solarAzimuth);
 				
 				calcImage = new rsgis::img::RSGISCalcImage(calcIncidence, "", true);
 				calcImage->calcImageWindowData(datasets, 1, this->outputImage, 3, this->imageFormat, this->outDataType);
@@ -1227,7 +1227,7 @@ void RSGISExeElevationDataTools::runAlgorithm() throw(rsgis::RSGISException)
             std::cout << "This command calculate the exitance angle of light (from the provided zenith and azimuth) from a DEM.\n";
 			std::cout << "Input Image: " << this->inputImage << std::endl;
             std::cout << "Output Image: " << this->outputImage << std::endl;
-            std::cout << "Input Band: " << this->imageBand+1 << std::endl;
+            std::cout << "Input Band: " << this->imageBand << std::endl;
             std::cout << "View Azimuth: " << this->viewAzimuth << std::endl;
             std::cout << "View Zenith: " << this->viewZenith << std::endl;
             
@@ -1249,7 +1249,7 @@ void RSGISExeElevationDataTools::runAlgorithm() throw(rsgis::RSGISException)
 				}
 				
 				int numRasterBands = datasets[0]->GetRasterCount();
-                if(this->imageBand >= numRasterBands)
+                if(this->imageBand > numRasterBands)
                 {
                     GDALClose(datasets[0]);
                     delete[] datasets;
@@ -1269,7 +1269,7 @@ void RSGISExeElevationDataTools::runAlgorithm() throw(rsgis::RSGISException)
                 
                 delete[] transformation;
                 
-				calcIncidence = new rsgis::calib::RSGISCalcRayExitanceAngle(1, imageBand, imageEWRes, imageNSRes, solarZenith, solarAzimuth);
+				calcIncidence = new rsgis::calib::RSGISCalcRayExitanceAngle(1, imageBand-1, imageEWRes, imageNSRes, solarZenith, solarAzimuth);
 				
 				calcImage = new rsgis::img::RSGISCalcImage(calcIncidence, "", true);
 				calcImage->calcImageWindowData(datasets, 1, this->outputImage, 3);
@@ -1290,7 +1290,7 @@ void RSGISExeElevationDataTools::runAlgorithm() throw(rsgis::RSGISException)
             std::cout << "This command calculate the incidence angle of light (from the provided zenith and azimuth) from a DEM.\n";
 			std::cout << "Input Image: " << this->inputImage << std::endl;
             std::cout << "Output Image: " << this->outputImage << std::endl;
-            std::cout << "Input Band: " << this->imageBand+1 << std::endl;
+            std::cout << "Input Band: " << this->imageBand << std::endl;
             std::cout << "Solar Azimuth: " << this->solarAzimuth << std::endl;
             std::cout << "Solar Zenith: " << this->solarZenith << std::endl;
             std::cout << "View Azimuth: " << this->viewAzimuth << std::endl;
@@ -1314,7 +1314,7 @@ void RSGISExeElevationDataTools::runAlgorithm() throw(rsgis::RSGISException)
 				}
 				
 				int numRasterBands = datasets[0]->GetRasterCount();
-                if(this->imageBand >= numRasterBands)
+                if(this->imageBand > numRasterBands)
                 {
                     GDALClose(datasets[0]);
                     delete[] datasets;
@@ -1334,7 +1334,7 @@ void RSGISExeElevationDataTools::runAlgorithm() throw(rsgis::RSGISException)
                 
                 delete[] transformation;
                 
-				calcIncidence = new rsgis::calib::RSGISCalcRayIncidentAndExitanceAngles(2, imageBand, imageEWRes, imageNSRes, solarZenith, solarAzimuth, viewZenith, viewAzimuth);
+				calcIncidence = new rsgis::calib::RSGISCalcRayIncidentAndExitanceAngles(2, imageBand-1, imageEWRes, imageNSRes, solarZenith, solarAzimuth, viewZenith, viewAzimuth);
 				
 				calcImage = new rsgis::img::RSGISCalcImage(calcIncidence, "", true);
 				calcImage->calcImageWindowData(datasets, 1, this->outputImage, 3);
@@ -1511,7 +1511,7 @@ void RSGISExeElevationDataTools::printParameters()
             std::cout << "This command calculate the incidence angle of light (from the provided zenith and azimuth) from a DEM.\n";
 			std::cout << "Input Image: " << this->inputImage << std::endl;
             std::cout << "Output Image: " << this->outputImage << std::endl;
-            std::cout << "Input Band: " << this->imageBand+1 << std::endl;
+            std::cout << "Input Band: " << this->imageBand << std::endl;
             std::cout << "Solar Azimuth: " << this->solarAzimuth << std::endl;
             std::cout << "Solar Zenith: " << this->solarZenith << std::endl;
         }
@@ -1520,7 +1520,7 @@ void RSGISExeElevationDataTools::printParameters()
             std::cout << "This command calculate the exitance angle of light (from the provided zenith and azimuth) from a DEM.\n";
 			std::cout << "Input Image: " << this->inputImage << std::endl;
             std::cout << "Output Image: " << this->outputImage << std::endl;
-            std::cout << "Input Band: " << this->imageBand+1 << std::endl;
+            std::cout << "Input Band: " << this->imageBand << std::endl;
             std::cout << "View Azimuth: " << this->viewAzimuth << std::endl;
             std::cout << "View Zenith: " << this->viewZenith << std::endl;
         }
@@ -1529,7 +1529,7 @@ void RSGISExeElevationDataTools::printParameters()
             std::cout << "This command calculate the incidence angle of light (from the provided zenith and azimuth) from a DEM.\n";
 			std::cout << "Input Image: " << this->inputImage << std::endl;
             std::cout << "Output Image: " << this->outputImage << std::endl;
-            std::cout << "Input Band: " << this->imageBand+1 << std::endl;
+            std::cout << "Input Band: " << this->imageBand << std::endl;
             std::cout << "Solar Azimuth: " << this->solarAzimuth << std::endl;
             std::cout << "Solar Zenith: " << this->solarZenith << std::endl;
             std::cout << "View Azimuth: " << this->viewAzimuth << std::endl;
