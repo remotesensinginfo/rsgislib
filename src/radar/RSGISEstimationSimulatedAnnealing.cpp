@@ -97,6 +97,7 @@ namespace rsgis {namespace radar{
     int RSGISEstimationSimulatedAnnealingWithAP::minimise(gsl_vector *inData, gsl_vector *initialPar, gsl_vector *outParError)
     {
         this->inData = inData;
+
         // Check for no-data
         for(unsigned int i = 0;i < this->nData; i++)
         {
