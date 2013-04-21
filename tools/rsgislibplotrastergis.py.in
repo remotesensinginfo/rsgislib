@@ -94,11 +94,11 @@ class PlotAverageData (object):
         plt.savefig(outputFile, format='PDF')
 
     def run(self, cmdargs):
-        print 'rsgislibcmdxml.py script generates the XML commands for the '
-        print '@PACKAGE@ software library from a user defined template.'
-        print 'This script was distributed with @RSGISLIB_PACKAGE_STRING@'
-        print 'Copyright (C) @RSGISLIB_COPYRIGHT_YEAR@ Peter Bunting and Daniel Clewley'
-        print 'For maintainance email @RSGISLIB_PACKAGE_BUGREPORT@'
+        print('rsgislibcmdxml.py script generates the XML commands for the ')
+        print('@PACKAGE@ software library from a user defined template.')
+        print('This script was distributed with @RSGISLIB_PACKAGE_STRING@')
+        print('Copyright (C) @RSGISLIB_COPYRIGHT_YEAR@ Peter Bunting and Daniel Clewley')
+        print('For maintainance email @RSGISLIB_PACKAGE_BUGREPORT@')
         yDataValsList = list()
         minList = list()
         maxList = list()
@@ -117,35 +117,35 @@ class PlotAverageData (object):
                 self.readCSVFile(inputTextFile, minList, maxList, meanList, medianList, stddevList, meanSDP1List, meanSDM1List)
                 inputTextFile.close()
             except IOError, e:
-                print '\nCould not open file:\n', e
+                print('\nCould not open file:\n', e)
                 return
 
         if len(minList) != len(yDataValsList):
-            print "Y data values not the same len as min vals."
+            print("Y data values not the same len as min vals.")
             return
 
         if len(maxList) != len(yDataValsList):
-            print "Y data values not the same len as max vals."
+            print("Y data values not the same len as max vals.")
             return
 
         if len(meanList) != len(yDataValsList):
-            print "Y data values not the same len as mean vals."
+            print("Y data values not the same len as mean vals.")
             return
 
         if len(medianList) != len(yDataValsList):
-            print "Y data values not the same len as median vals."
+            print("Y data values not the same len as median vals.")
             return
 
         if len(stddevList) != len(yDataValsList):
-            print "Y data values not the same len as Std Dev vals."
+            print("Y data values not the same len as Std Dev vals.")
             return
 
         if len(meanSDP1List) != len(yDataValsList):
-            print "Y data values not the same len as plus 1 std dev vals."
+            print("Y data values not the same len as plus 1 std dev vals.")
             return
 
         if len(meanSDM1List) != len(yDataValsList):
-            print "Y data values not the same len as minus 1 std dev vals."
+            print("Y data values not the same len as minus 1 std dev vals.")
             return
 
         self.plotData(cmdargs.outputFile, cmdargs.title, cmdargs.xAxis, cmdargs.yAxis, yDataValsList, minList, maxList, meanList, medianList, meanSDP1List, meanSDM1List, cmdargs.mean, cmdargs.median, cmdargs.stddev, cmdargs.range)
@@ -173,7 +173,7 @@ class CmdArgs:
 
     if self.outputFile is None:
         p.print_help()
-        print "output filename must be set."
+        print("output filename must be set.")
         sys.exit()
 
 
