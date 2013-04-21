@@ -41,7 +41,6 @@ import tempfile as tempfile
 class RSGISXMLInputFile2CMD(object):
 
     def getCommands(self, algorithm):
-    
         ''' Convert RSGISLib XML commands list to list of commands for rsgiscmd '''
     
         xmlFile = open("@CMAKE_INSTALL_PREFIX@/doc/RSGISLib_XML_Listing.xml",'r')
@@ -118,7 +117,7 @@ Copyright (C) @RSGISLIB_COPYRIGHT_YEAR@ Peter Bunting and Daniel Clewley
 
 Report bugs on the trac or directly to @RSGISLIB_PACKAGE_BUGREPORT@
 '''
-        print helpText
+        print(helpText)
 
     def createAndRunXML(self):
         incommand = ''
@@ -180,12 +179,12 @@ if __name__ == '__main__':
             
             if algorithm == 'all':
                 if allOutCommands != '':
-                    print allOutCommands
+                    print(allOutCommands)
                 else:
                     rsgiscmd.help()
             
             elif selectedOutCommands != '':
-                print selectedOutCommands
+                print(selectedOutCommands)
             else:
                 rsgiscmd.help()
             exit()
