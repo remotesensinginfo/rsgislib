@@ -33,6 +33,8 @@
 
 #include "img/RSGISImageUtils.h"
 #include "img/RSGISImageCalcException.h"
+#include "img/RSGISCalcImageValue.h"
+#include "img/RSGISCalcImage.h"
 
 namespace rsgis{namespace segment{
     
@@ -42,7 +44,47 @@ namespace rsgis{namespace segment{
         RSGISGenMeanSegImage();
         void generateMeanImage(GDALDataset *spectral, GDALDataset *clumps, GDALDataset *meanImg) throw(rsgis::img::RSGISImageCalcException);
         void generateMeanImageUsingClumpTable(GDALDataset *spectral, GDALDataset *clumps, GDALDataset *meanImg) throw(rsgis::img::RSGISImageCalcException);
+        void generateMeanImageUsingCalcImage(GDALDataset *spectral, GDALDataset *clumps, GDALDataset *meanImg) throw(rsgis::img::RSGISImageCalcException);
         ~RSGISGenMeanSegImage();
+    };
+    
+    
+    
+    class RSGISPopulateMeans : public rsgis::img::RSGISCalcImageValue
+    {
+    public:
+        RSGISPopulateMeans(std::vector<rsgis::img::ImgClumpMean*> *clumpTable, unsigned int numSpecBands, unsigned int numClumps);
+        void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented.");};
+        void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException);
+        void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented.");};
+        void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented.");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented.");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented.");};
+        bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented.");};
+        ~RSGISPopulateMeans();
+    protected:
+        std::vector<rsgis::img::ImgClumpMean*> *clumpTable;
+        unsigned int numSpecBands;
+        unsigned int numClumps;
+    };
+    
+    
+    class RSGISApplyMeans2Output : public rsgis::img::RSGISCalcImageValue
+    {
+    public:
+        RSGISApplyMeans2Output(std::vector<rsgis::img::ImgClumpMean*> *clumpTable, unsigned int numSpecBands, unsigned int numClumps);
+        void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException);
+        void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented.");};
+        void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented.");};
+        void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented.");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented.");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented.");};
+        bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented.");};
+        ~RSGISApplyMeans2Output();
+    protected:
+        std::vector<rsgis::img::ImgClumpMean*> *clumpTable;
+        unsigned int numSpecBands;
+        unsigned int numClumps;
     };
     
 }}
