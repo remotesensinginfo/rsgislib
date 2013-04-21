@@ -3718,7 +3718,8 @@ void RSGISExeSegment::runAlgorithm() throw(rsgis::RSGISException)
             
             std::cout << "Calculating Mean Image\n";
             rsgis::segment::RSGISGenMeanSegImage genMeanImg;
-            genMeanImg.generateMeanImageUsingClumpTable(spectralDataset, clumpsDataset, resultDataset);
+            //genMeanImg.generateMeanImageUsingClumpTable(spectralDataset, clumpsDataset, resultDataset);
+            genMeanImg.generateMeanImageUsingCalcImage(spectralDataset, clumpsDataset, resultDataset);
             
             if(this->processInMemory)
             {
@@ -4642,7 +4643,8 @@ void RSGISExeSegment::runAlgorithm() throw(rsgis::RSGISException)
             
             std::cout << "Performing relabel\n";
             rsgis::segment::RSGISRelabelClumps relabelImg;
-            relabelImg.relabelClumps(catagoryDataset, resultDataset);
+            //relabelImg.relabelClumps(catagoryDataset, resultDataset);
+            relabelImg.relabelClumpsCalcImg(catagoryDataset, resultDataset);
             
             if(this->processInMemory)
             {
