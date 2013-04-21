@@ -9214,6 +9214,10 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				}
 				inputSpatialRef = inputSHPLayer->GetSpatialRef();	
 				inFeatureDefn = inputSHPLayer->GetLayerDefn();
+                
+                // Get Geometry Type
+                OGRFeature *feature = inputSHPLayer->GetFeature(0);
+				OGRwkbGeometryType geometryType = feature->GetGeometryRef()->getGeometryType();
 				
 				/////////////////////////////////////
 				//
@@ -9232,7 +9236,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					string message = string("Could not create vector file ") + this->outputVector;
 					throw RSGISVectorOutputException(message.c_str());
 				}
-				outputSHPLayer = outputSHPDS->CreateLayer(SHPFileOutLayer.c_str(), inputSpatialRef, wkbPolygon, NULL );
+				outputSHPLayer = outputSHPDS->CreateLayer(SHPFileOutLayer.c_str(), inputSpatialRef, geometryType, NULL );
 				if( outputSHPLayer == NULL )
 				{
 					string message = string("Could not create vector layer ") + SHPFileOutLayer;
