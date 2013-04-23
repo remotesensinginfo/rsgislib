@@ -4,7 +4,7 @@
  *
  *  Created by Daniel Clewley on 31/03/2010.
  *  Copyright 2010 RSGISLib.
- * 
+ *
  *  RSGISLib is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -39,7 +39,7 @@
 #include <boost/math/special_functions/fpclassify.hpp>
 
 namespace rsgis {namespace radar{
-    	
+
 	class RSGISEstimationSimulatedAnnealingWithAP : public RSGISEstimationOptimiser
     {
         /// Simulated Annealing to use in Estimation algorithm
@@ -52,14 +52,14 @@ namespace rsgis {namespace radar{
                                                 unsigned int runsTemp,
                                                 double cooling,
                                                 unsigned int maxItt,
-                                                gsl_matrix *covMatrixP, 
+                                                gsl_matrix *covMatrixP,
                                                 gsl_matrix *invCovMatrixD,
                                                 gsl_vector *aPrioriPar);
         int minimise(gsl_vector *inData, gsl_vector *initialPar, gsl_vector *outParError);
         virtual void modifyAPriori(gsl_vector *newAPrioriPar){this->aPrioriPar = newAPrioriPar;};
         gsl_vector* getAPrioriPar(){return this->aPrioriPar;};
-        virtual estOptimizerType getOptimiserType(){return simulatedAnnealing;}; 
-        virtual void printOptimiser(){std::cout << "Simulated Annealing - 3 Var 3 Data (with a Priori)" << std::endl;};
+        virtual estOptimizerType getOptimiserType(){return simulatedAnnealing;};
+        virtual void printOptimiser(){std::cout << "Simulated Annealing" << std::endl;};
         double calcLeastSquares(std::vector<double> *values);
         ~RSGISEstimationSimulatedAnnealingWithAP();
     private:
@@ -83,7 +83,7 @@ namespace rsgis {namespace radar{
         gsl_vector *deltaX;
         gsl_vector *tempD;
         gsl_vector *tempX;
-        gsl_vector *inData;
+        gsl_vector *inputData;
         bool useAP;
     };
 }}

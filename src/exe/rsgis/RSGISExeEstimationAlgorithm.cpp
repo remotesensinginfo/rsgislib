@@ -1167,7 +1167,7 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
 					unsigned int runsTemp = 100; // Number of times step is changed at each temperature
 					double cooling = 0.85; // Cooling factor
 					double minEnergy = 1e-12; // Set the target energy
-					this->ittmax = 10000; // Maximum number of itterations
+					this->ittmax = 50; // Maximum number of itterations
 
 					// Maximum number of itterations
 					XMLCh *ittmaxStr = XMLString::transcode("ittmax");
@@ -2416,7 +2416,7 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
 					unsigned int runsTemp = 100; // Number of times step is changed at each temperature
 					double cooling = 0.85; // Cooling factor
 					double minEnergy = 1e-12; // Set the target energy
-					this->ittmax = 10000; // Maximum number of itterations
+					this->ittmax = 50; // Maximum number of itterations
 
 					// Maximum number of itterations
 					XMLCh *ittmaxStr = XMLString::transcode("ittmax");
@@ -3639,7 +3639,7 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
 					unsigned int runsTemp = 100; // Number of times step is changed at each temperature
 					double cooling = 0.85; // Cooling factor
 					double minEnergy = 1e-12; // Set the target energy
-					this->ittmax = 10000; // Maximum number of itterations
+					this->ittmax = 50; // Maximum number of itterations
 
 					// Maximum number of itterations
 					XMLCh *ittmaxStr = XMLString::transcode("ittmax");
@@ -4516,7 +4516,7 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
 					unsigned int runsTemp = 100; // Number of times step is changed at each temperature
 					double cooling = 0.85; // Cooling factor
 					double minEnergy = 1e-12; // Set the target energy
-					this->ittmax = 10000; // Maximum number of itterations
+					this->ittmax = 50; // Maximum number of itterations
 
 					// Maximum number of itterations
 					XMLCh *ittmaxStr = XMLString::transcode("ittmax");
@@ -5188,11 +5188,11 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
 
                     if (XMLString::equals(methodConjugateGradientWithRestarts, methodStr))
 					{
-						this->estSlowOptimiserClass->push_back(new RSGISEstimationConjugateGradient3Var3DataWithRestarts(coeffHH, coeffHV, coeffVV, this->polyOrderX, this->polyOrderY, this->polyOrderZ, minMaxStepAll[0], minMaxStepAll[1], minMaxStepAll[2], this->initialPar, covMatrixP, invCovMatrixD, minError, this->ittmax, numRestarts));
+						this->estSlowOptimiserClass->push_back(new RSGISEstimationConjugateGradient3Var3DataWithRestarts(this->coeffHH, this->coeffHV, this->coeffVV, this->polyOrderX, this->polyOrderY, this->polyOrderZ, minMaxStepAll[0], minMaxStepAll[1], minMaxStepAll[2], this->initialParClass->at(0), covMatrixP, invCovMatrixD, minError, this->ittmax, numRestarts));
 					}
 					else if(XMLString::equals(methodConjugateGradient, methodStr))
 					{
-						this->estSlowOptimiserClass->push_back(new RSGISEstimationConjugateGradient3DPoly3Channel(coeffHH, coeffHV, coeffVV, this->polyOrderX, this->polyOrderY, this->polyOrderZ, this->initialPar, covMatrixP, invCovMatrixD, minError, this->ittmax));
+						this->estSlowOptimiserClass->push_back(new RSGISEstimationConjugateGradient3DPoly3Channel(this->coeffHH, this->coeffHV, this->coeffVV, this->polyOrderX, this->polyOrderY, this->polyOrderZ, this->initialParClass->at(0), covMatrixP, invCovMatrixD, minError, this->ittmax));
 					}
                     else
                     {
@@ -5206,6 +5206,7 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
                         unsigned int runsTemp = 100; // Number of times step is changed at each temperature
                         double cooling = 0.85; // Cooling factor
                         double minEnergy = 1e-12; // Set the target energy
+
 
                         // Number of runs at each step size
                         XMLCh *runsStepStr = XMLString::transcode("runsStep");
@@ -5267,7 +5268,7 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
                         functionsAll->push_back(new RSGISFunctionNDPoly(coeffHV, polyOrders));
                         functionsAll->push_back(new RSGISFunctionNDPoly(coeffVV, polyOrders));
 
-                        this->estSlowOptimiserClass->push_back(new RSGISEstimationSimulatedAnnealingWithAP(functionsAll, minMaxStepAll, minEnergy, startTemp, runsStep, runsTemp, cooling, ittmax, covMatrixP, invCovMatrixD, this->initialPar));
+                        this->estSlowOptimiserClass->push_back(new RSGISEstimationSimulatedAnnealingWithAP(functionsAll, minMaxStepAll, minEnergy, startTemp, runsStep, runsTemp, cooling, ittmax, covMatrixP, invCovMatrixD, this->initialParClass->at(0)));
 
 
                     }
@@ -5689,7 +5690,16 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
                         unsigned int runsTemp = 100; // Number of times step is changed at each temperature
                         double cooling = 0.85; // Cooling factor
                         double minEnergy = 1e-12; // Set the target energy
+                        this->ittmax = 50;                  // Maximum number of itterations
 
+                        XMLCh *ittmaxStr = XMLString::transcode("ittmax");
+                        if(fastOptimiserElement->hasAttribute(ittmaxStr))
+                        {
+                            char *charValue = XMLString::transcode(fastOptimiserElement->getAttribute(ittmaxStr));
+                            this->ittmax = mathUtils.strtoint(string(charValue));
+                            XMLString::release(&charValue);
+                        }
+                        XMLString::release(&ittmaxStr);
                         // Number of runs at each step size
                         XMLCh *runsStepStr = XMLString::transcode("runsStep");
                         if(fastOptimiserElement->hasAttribute(runsStepStr))
@@ -5750,7 +5760,7 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
                         functionsAll->push_back(new RSGISFunctionNDPoly(coeffHV, polyOrders));
                         functionsAll->push_back(new RSGISFunctionNDPoly(coeffVV, polyOrders));
 
-                        this->estFastOptimiserClass->push_back(new RSGISEstimationSimulatedAnnealingWithAP(functionsAll, minMaxStepAll, minEnergy, startTemp, runsStep, runsTemp, cooling, ittmax, covMatrixP, invCovMatrixD, this->initialParClass->at(i)));
+                        this->estFastOptimiserClass->push_back(new RSGISEstimationSimulatedAnnealingWithAP(functionsAll, minMaxStepAll, minEnergy, startTemp, runsStep, runsTemp, cooling, this->ittmax, covMatrixP, invCovMatrixD, this->initialParClass->at(i)));
 
                     }
 
