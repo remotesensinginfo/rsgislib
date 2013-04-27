@@ -128,12 +128,6 @@ namespace rsgisexe{
             imgcalcdist
 		};
 		
-		struct VariableStruct
-		{
-			std::string image;
-			std::string name;
-			int bandNum;
-		};
 		
 		RSGISExeImageCalculation();
 		virtual rsgis::RSGISAlgorithmParameters* getInstance();
@@ -175,7 +169,7 @@ namespace rsgisexe{
         double binWidth;
 		bool calcInMinMax;
 		bool calcMean;
-		VariableStruct *variables;
+        rsgis::img::VariableStruct *variables;
 		double value;
 		double threshold;
 		unsigned int *imageBands;

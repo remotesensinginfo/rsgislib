@@ -3934,7 +3934,6 @@ namespace rsgis{namespace img{
     	else if((resDiff < 0) && (resDiff > -1.*resDiffVal)){closeRes = false;}
 
     	return closeRes;
-
     }
 
 	RSGISImageUtils::~RSGISImageUtils()
