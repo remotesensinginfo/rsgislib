@@ -110,6 +110,8 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
     XMLCh *optionDefineImgTiles = XMLString::transcode("defineimgtiles");
     XMLCh *optionGenTileMasks = XMLString::transcode("gentilemasks");
     XMLCh *optionCutOutTile = XMLString::transcode("cutouttile");
+    XMLCh *optionStretchImageWithStats = XMLString::transcode("stretchwithstats");
+    XMLCh *optionSubSampleImage = XMLString::transcode("subsampleimage");
 
 	const XMLCh *algorNameEle = argElement->getAttribute(algorXMLStr);
 	if(!XMLString::equals(algorName, algorNameEle))
@@ -2636,6 +2638,29 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			this->tileOverlap = 0;
 		}
 		XMLString::release(&overlapXMLStr);
+        
+        
+        XMLCh *offsetXMLStr = XMLString::transcode("offset");
+		if(argElement->hasAttribute(offsetXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(offsetXMLStr));
+			string typeStr = string(charValue);
+			if(typeStr == "yes")
+			{
+				this->offsetTiling = true;
+			}
+            else
+            {
+                this->offsetTiling = false;
+            }
+            
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			this->offsetTiling = false;
+		}
+		XMLString::release(&offsetXMLStr);
 
     }
     else if (XMLString::equals(optionBandColourUsage, optionXML))
@@ -3263,6 +3288,174 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 		XMLString::release(&noDataValXMLStr);
         
 	}
+    else if (XMLString::equals(optionStretchImageWithStats, optionXML))
+	{
+		this->option = RSGISExeImageUtils::stretchwithstats;
+        
+		XMLCh *imageXMLStr = XMLString::transcode("image");
+		if(argElement->hasAttribute(imageXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(imageXMLStr));
+			this->inputImage = string(charValue);
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+		}
+		XMLString::release(&imageXMLStr);
+        
+		XMLCh *outputXMLStr = XMLString::transcode("output");
+		if(argElement->hasAttribute(outputXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
+			this->outputImage = string(charValue);
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+		}
+		XMLString::release(&outputXMLStr);
+        
+        XMLCh *inputStatsXMLStr = XMLString::transcode("stats");
+		if(argElement->hasAttribute(inputStatsXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(inputStatsXMLStr));
+			this->inputFile = string(charValue);
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'stats\' attribute was provided.");
+		}
+		XMLString::release(&inputStatsXMLStr);
+        
+        
+		XMLCh *stretchLinearMinMax = XMLString::transcode("LinearMinMax");
+		XMLCh *stretchHistogram = XMLString::transcode("Histogram");
+		XMLCh *stretchExponential = XMLString::transcode("Exponential");
+		XMLCh *stretchLogarithmic = XMLString::transcode("Logarithmic");
+		XMLCh *stretchPowerLaw = XMLString::transcode("PowerLaw");
+        
+		XMLCh *stretchXMLStr = XMLString::transcode("stretch");
+		if(argElement->hasAttribute(stretchXMLStr))
+		{
+			const XMLCh *stretchXMLValue = argElement->getAttribute(stretchXMLStr);
+			if(XMLString::equals(stretchLinearMinMax, stretchXMLValue))
+			{
+				this->stretchType = RSGISExeImageUtils::linearMinMax;
+			}
+			else if (XMLString::equals(stretchHistogram, stretchXMLValue))
+			{
+				this->stretchType = RSGISExeImageUtils::histogram;
+			}
+			else if (XMLString::equals(stretchExponential, stretchXMLValue))
+			{
+				this->stretchType = RSGISExeImageUtils::exponential;
+			}
+			else if (XMLString::equals(stretchLogarithmic, stretchXMLValue))
+			{
+				this->stretchType = RSGISExeImageUtils::logarithmic;
+			}
+			else if (XMLString::equals(stretchPowerLaw, stretchXMLValue))
+			{
+				this->stretchType = RSGISExeImageUtils::powerLaw;
+				XMLCh *powerXMLStr = XMLString::transcode("power");
+				if(argElement->hasAttribute(powerXMLStr))
+				{
+					char *charValue = XMLString::transcode(argElement->getAttribute(powerXMLStr));
+					this->power = mathUtils.strtofloat(string(charValue));
+					XMLString::release(&charValue);
+				}
+				else
+				{
+					throw RSGISXMLArgumentsException("No \'power\' attribute was provided.");
+				}
+				XMLString::release(&powerXMLStr);
+			}
+			else
+			{
+				throw RSGISXMLArgumentsException("Stretch was not recognized.");
+			}
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'stretch\' attribute was provided.");
+		}
+		XMLString::release(&stretchXMLStr);
+        
+		XMLString::release(&stretchLinearMinMax);
+		XMLString::release(&stretchHistogram);
+		XMLString::release(&stretchExponential);
+		XMLString::release(&stretchLogarithmic);
+		XMLString::release(&stretchPowerLaw);
+        
+        
+        
+	}
+    else if (XMLString::equals(optionSubSampleImage, optionXML))
+	{
+		this->option = RSGISExeImageUtils::subsampleimage;
+        
+		XMLCh *imageXMLStr = XMLString::transcode("image");
+		if(argElement->hasAttribute(imageXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(imageXMLStr));
+			this->inputImage = string(charValue);
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+		}
+		XMLString::release(&imageXMLStr);
+        
+		XMLCh *outputXMLStr = XMLString::transcode("output");
+		if(argElement->hasAttribute(outputXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
+			this->outputFile = string(charValue);
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+		}
+		XMLString::release(&outputXMLStr);
+       
+        
+        XMLCh *nodataXMLStr = XMLString::transcode("nodata");
+		if(argElement->hasAttribute(nodataXMLStr))
+		{
+            char *charValue = XMLString::transcode(argElement->getAttribute(nodataXMLStr));
+            this->nodataValue = mathUtils.strtofloat(string(charValue));
+            XMLString::release(&charValue);
+            this->useIgnoreVal = true;
+		}
+		else
+		{
+			this->useIgnoreVal = false;
+		}
+		XMLString::release(&nodataXMLStr);
+        
+        
+        XMLCh *subSampleXMLStr = XMLString::transcode("subsample");
+		if(argElement->hasAttribute(subSampleXMLStr))
+		{
+            char *charValue = XMLString::transcode(argElement->getAttribute(subSampleXMLStr));
+            this->imageSample = mathUtils.strtounsignedint(string(charValue));
+            XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'subsample\' attribute was provided.");
+		}
+		XMLString::release(&subSampleXMLStr);
+        
+        
+        
+	}
 	else
 	{
 		string message = string("The option (") + string(XMLString::transcode(optionXML)) + string(") is not known: RSGISExeImageUtils.");
@@ -3316,6 +3509,8 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
     XMLString::release(&optionDefineImgTiles);
     XMLString::release(&optionGenTileMasks);
     XMLString::release(&optionCutOutTile);
+    XMLString::release(&optionStretchImageWithStats);
+    XMLString::release(&optionSubSampleImage);
     
 	parsed = true;
 }
@@ -4805,7 +5000,16 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
 		}
         else if(option == RSGISExeImageUtils::createtiles)
 		{
-			cout << "Create tiles from image\n";
+			cout << "A command to create tiles from image\n";
+            cout << "Input Image: " << this->inputImage << std::endl;
+            cout << "Output Image Base: " << this->outputImage << std::endl;
+            cout << "Tile Width: " << this->width << std::endl;
+            cout << "Tile Height: " << this->height << std::endl;
+            cout << "Tile Overlap: " << this->tileOverlap << std::endl;
+            if(offsetTiling)
+            {
+                cout << "Tiling is offset by half a tile.\n";
+            }
 			GDALAllRegister();
 			OGRRegisterAll();
 
@@ -4822,7 +5026,7 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
 			{
 				// Open Image
 				dataset = new GDALDataset*[1];
-				cout << this->inputImage << endl;
+				//cout << this->inputImage << endl;
 				dataset[0] = (GDALDataset *) GDALOpenShared(this->inputImage.c_str(), GA_ReadOnly);
 				if(dataset[0] == NULL)
 				{
@@ -4842,10 +5046,10 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
                 {
                     dsOffsets[i] = new int[2];
                 }
-                int height = 0;
-                int width = 0;
+                int imgHeight = 0;
+                int imgWidth = 0;
 
-                imgUtils.getImageOverlap(dataset, numDS, dsOffsets, &width, &height, gdalTransform);
+                imgUtils.getImageOverlap(dataset, numDS, dsOffsets, &imgWidth, &imgHeight, gdalTransform);
                
                 double pixelXRes = gdalTransform[1];
                 double pixelYRes = gdalTransform[5];
@@ -4853,8 +5057,16 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
                 double minX = gdalTransform[0];
                 double maxY = gdalTransform[3];
 
-                double maxX = minX + (width * pixelXRes);
-                double minY = maxY - (height * abs(pixelYRes));
+                double maxX = minX + (imgWidth * pixelXRes);
+                double minY = maxY - (imgHeight * abs(pixelYRes));
+                
+                if(offsetTiling)
+                {
+                    minX -= (this->width * pixelXRes)/2;
+                    maxX += (this->width * pixelXRes)/2;
+                    minY -= (this->height * abs(pixelYRes))/2;
+                    maxY += (this->height * abs(pixelYRes))/2;
+                }
 
                 double tileWidthMapUnits = this->width * pixelXRes;
                 double tileHeighMapUnits = this->height * abs(pixelYRes); // Max y resolution positive (makes things simpler)
@@ -5517,6 +5729,123 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
 			GDALDestroyDriverManager();
             
         }
+        else if(option == RSGISExeImageUtils::stretchwithstats)
+		{
+			cout << "Apply an enhancement stretch to the an input image using defined stats\n";
+			cout << "Input Image: " << this->inputImage << endl;
+			cout << "Output Image: " << this->outputImage << endl;
+            cout << "Input Stats File: " << this->inputFile << endl;
+			if(stretchType == linearMinMax)
+			{
+				cout << "Linear Min-Max stretch\n";
+			}
+			else if(stretchType == histogram)
+			{
+				cout << "Histogram stretch\n";
+			}
+			else if(stretchType == exponential)
+			{
+				cout << "Exponential stretch\n";
+			}
+			else if(stretchType == logarithmic)
+			{
+				cout << "Logarithmic stretch\n";
+			}
+			else if(stretchType == powerLaw)
+			{
+				cout << power << " Power Law stretch\n";
+			}
+			else
+			{
+				throw RSGISException("Stretch is not recognised.");
+			}
+            
+            
+			try
+			{
+				GDALAllRegister();
+				RSGISStretchImageWithStats *stretchImg = NULL;
+				GDALDataset *inDataset = NULL;
+                
+				inDataset = (GDALDataset *) GDALOpenShared(this->inputImage.c_str(), GA_ReadOnly);
+				if(inDataset == NULL)
+				{
+					string message = string("Could not open image ") + this->inputImage;
+					throw RSGISImageException(message.c_str());
+				}
+                
+				stretchImg = new RSGISStretchImageWithStats(inDataset, this->outputImage, this->inputFile, this->imageFormat, this->outDataType);
+				if(stretchType == linearMinMax)
+				{
+					stretchImg->executeLinearMinMaxStretch();
+				}
+				else if(stretchType == histogram)
+				{
+					stretchImg->executeHistogramStretch();
+				}
+				else if(stretchType == exponential)
+				{
+					stretchImg->executeExponentialStretch();
+				}
+				else if(stretchType == logarithmic)
+				{
+					stretchImg->executeLogrithmicStretch();
+				}
+				else if(stretchType == powerLaw)
+				{
+					stretchImg->executePowerLawStretch(power);
+				}
+				else
+				{
+					throw RSGISException("Stretch is not recognised.");
+				}
+                
+				GDALClose(inDataset);
+				GDALDestroyDriverManager();
+				delete stretchImg;
+			}
+			catch(RSGISException& e)
+			{
+				throw e;
+			}
+            
+		}
+        else if(option == RSGISExeImageUtils::subsampleimage)
+		{
+			cout << "A command to extract a subsample of image data to a hdf5 file.\n";
+			cout << "Input Image: " << this->inputImage << endl;
+			cout << "Output File: " << this->outputFile << endl;
+            cout << "Sub-Sample: " << this->imageSample << endl;
+            if(this->useIgnoreVal)
+            {
+                cout << "No data value: " << this->nodataValue << endl;
+            }
+            
+			try
+			{
+				GDALAllRegister();
+
+				GDALDataset *inDataset = NULL;
+                
+				inDataset = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_ReadOnly);
+				if(inDataset == NULL)
+				{
+					string message = string("Could not open image ") + this->inputImage;
+					throw RSGISImageException(message.c_str());
+				}
+                
+                rsgis::img::RSGISSampleImage sampleData;
+                sampleData.subSampleImage(inDataset, this->outputFile, this->imageSample, this->nodataValue, this->useIgnoreVal);
+                
+				GDALClose(inDataset);
+				GDALDestroyDriverManager();
+			}
+			catch(RSGISException& e)
+			{
+				throw e;
+			}
+            
+		}
 		else
 		{
 			cout << "Options not recognised\n";
@@ -5919,6 +6248,57 @@ void RSGISExeImageUtils::printParameters()
             }
             cout << "Image format: " << this->imageFormat << endl;
             cout << "Image Extension: " << this->outFileExtension << endl;
+        }
+        else if(option == RSGISExeImageUtils::cutouttile)
+        {
+            cout << "A command to extract and a region for the tile and apply a mask.\n";
+            cout << "Image: " << this->inputImage << endl;
+            cout << "Output: " << this->outputImage << endl;
+            cout << "Tile: " << this->tileImage << endl;
+            cout << "Image format: " << this->imageFormat << endl;
+            cout << "No Data: " << this->nodataValue << endl;
+        }
+        else if(option == RSGISExeImageUtils::stretchwithstats)
+		{
+			cout << "Apply an enhancement stretch to the an input image using defined stats\n";
+			cout << "Input Image: " << this->inputImage << endl;
+			cout << "Output Image: " << this->outputImage << endl;
+            cout << "Input Stats File: " << this->inputFile << endl;
+			if(stretchType == linearMinMax)
+			{
+				cout << "Linear Min-Max stretch\n";
+			}
+			else if(stretchType == histogram)
+			{
+				cout << "Histogram stretch\n";
+			}
+			else if(stretchType == exponential)
+			{
+				cout << "Exponential stretch\n";
+			}
+			else if(stretchType == logarithmic)
+			{
+				cout << "Logarithmic stretch\n";
+			}
+			else if(stretchType == powerLaw)
+			{
+				cout << power << " Power Law stretch\n";
+			}
+			else
+			{
+				throw RSGISException("Stretch is not recognised.");
+			}
+        }
+        else if(option == RSGISExeImageUtils::subsampleimage)
+		{
+			cout << "A command to extract a subsample of image data to a hdf5 file.\n";
+			cout << "Input Image: " << this->inputImage << endl;
+			cout << "Output File: " << this->outputFile << endl;
+            cout << "Sub-Sample: " << this->imageSample << endl;
+            if(this->useIgnoreVal)
+            {
+                cout << "No data value: " << this->nodataValue << endl;
+            }
         }
 		else
 		{

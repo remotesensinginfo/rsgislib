@@ -148,6 +148,84 @@ namespace rsgis { namespace img {
         std::string imageFormat;
         GDALDataType outDataType;
 	};
+    
+    class RSGISStretchImageWithStats
+	{
+	public:
+		RSGISStretchImageWithStats(GDALDataset *inputImage, std::string outputImage, std::string inStatsFile, std::string imageFormat, GDALDataType outDataType);
+		void executeLinearMinMaxStretch() throw(RSGISImageCalcException);
+		void executeHistogramStretch() throw(RSGISImageCalcException);
+		void executeExponentialStretch() throw(RSGISImageCalcException);
+		void executeLogrithmicStretch() throw(RSGISImageCalcException);
+		void executePowerLawStretch(float power) throw(RSGISImageCalcException);
+        
+        static std::vector<BandSpecThresholdStats>* readBandSpecThresholds(std::string inputFile)throw(rsgis::RSGISFileException)
+        {
+            std::vector<BandSpecThresholdStats> *bandStats = new std::vector<BandSpecThresholdStats>();
+            
+            try
+            {
+                std::vector<std::string> *tokens = new std::vector<std::string>();
+                
+                rsgis::utils::RSGISTextUtils textUtils;
+                rsgis::utils::RSGISTextFileLineReader reader;
+                std::string line = "";
+                size_t band = 0;
+                float imgMin = 0;
+                float imgMax = 0;
+                float origMin = 0;
+                float origMax = 0;
+                reader.openFile(inputFile);
+                while(!reader.endOfFile())
+                {
+                    line = reader.readLine();
+                    
+                    if(!textUtils.lineStart(line, '#') & !textUtils.blankline(line))
+                    {
+                        textUtils.tokenizeString(line, ',', tokens, true, true);
+                        if(tokens->size() != 5)
+                        {
+                            throw rsgis::utils::RSGISTextException("A line should have 5 tokens (band,img_min,img_max,out_min,out_max).");
+                        }
+                        
+                        band = textUtils.strtosizet(tokens->at(0));
+                        origMin = textUtils.strtofloat(tokens->at(1));
+                        origMax = textUtils.strtofloat(tokens->at(2));
+                        imgMin = textUtils.strtofloat(tokens->at(3));
+                        imgMax = textUtils.strtofloat(tokens->at(4));
+                        
+                        bandStats->push_back(BandSpecThresholdStats(band, imgMin, imgMax, origMin, origMax));
+                    }
+                    
+                    tokens->clear();
+                }
+                
+                delete tokens;
+                reader.closeFile();
+            }
+            catch(rsgis::RSGISFileException &e)
+            {
+                throw e;
+            }
+            catch(rsgis::utils::RSGISTextException &e)
+            {
+                throw rsgis::RSGISFileException(e.what());
+            }
+            catch(std::exception &e)
+            {
+                throw rsgis::RSGISFileException(e.what());
+            }
+            
+            return bandStats;
+        };
+		~RSGISStretchImageWithStats();
+	protected:
+		GDALDataset *inputImage;
+        std::string outputImage;
+        std::string inStatsFile;
+        std::string imageFormat;
+        GDALDataType outDataType;
+	};
 
 	class RSGISExponentStretchFunction : public rsgis::math::RSGISMathFunction
 	{

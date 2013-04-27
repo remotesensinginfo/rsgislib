@@ -33,6 +33,9 @@
 #include "img/RSGISImageUtils.h"
 #include "img/RSGISImageCalcException.h"
 
+#include "img/RSGISCalcImageValue.h"
+#include "img/RSGISCalcImage.h"
+
 namespace rsgis{namespace segment{
 
     class RSGISClumpPxls
@@ -52,8 +55,45 @@ namespace rsgis{namespace segment{
     public:
         RSGISRelabelClumps();
         void relabelClumps(GDALDataset *catagories, GDALDataset *clumps) throw(rsgis::img::RSGISImageCalcException);
+        void relabelClumpsCalcImg(GDALDataset *catagories, GDALDataset *clumps) throw(rsgis::img::RSGISImageCalcException);
         ~RSGISRelabelClumps();
     };
+    
+    class RSGISCreateRelabelLookupTable : public rsgis::img::RSGISCalcImageValue
+	{
+	public:
+		RSGISCreateRelabelLookupTable(unsigned int *clumpIdxLookUp, unsigned int numVals);
+		void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+		void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException);
+		void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+		void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+		void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+		bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+        ~RSGISCreateRelabelLookupTable();
+    protected:
+        unsigned int *clumpIdxLookUp;
+        unsigned int numVals;
+        unsigned int nextVal;
+	};
+    
+    
+    class RSGISApplyRelabelLookupTable : public rsgis::img::RSGISCalcImageValue
+	{
+	public:
+		RSGISApplyRelabelLookupTable(unsigned int *clumpIdxLookUp, unsigned int numVals);
+		void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException);
+		void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+		void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+		void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+		void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+		bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+        ~RSGISApplyRelabelLookupTable();
+    protected:
+        unsigned int *clumpIdxLookUp;
+        unsigned int numVals;
+	};
     
 }}
 

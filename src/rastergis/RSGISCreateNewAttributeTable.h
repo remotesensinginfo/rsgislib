@@ -65,7 +65,7 @@ namespace rsgis{namespace rastergis{
     class RSGISPopAttributeTablePxlCountCalcImg : public rsgis::img::RSGISCalcImageValue
     {
     public: 
-        RSGISPopAttributeTablePxlCountCalcImg(int numberOutBands, RSGISAttributeTable *attTable, unsigned int pxlCountIdx);
+        RSGISPopAttributeTablePxlCountCalcImg(int numberOutBands, RSGISAttributeTable *attTable, size_t pxlCountIdx);
         void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
         void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException);
         void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
@@ -76,7 +76,7 @@ namespace rsgis{namespace rastergis{
         ~RSGISPopAttributeTablePxlCountCalcImg();
     protected:
         RSGISAttributeTable *attTable;
-        unsigned int pxlCountIdx;
+        size_t pxlCountIdx;
     };
     
     class RSGISPopAttributeTablePxlCountArrCalcImg : public rsgis::img::RSGISCalcImageValue
@@ -92,7 +92,7 @@ namespace rsgis{namespace rastergis{
         bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
         ~RSGISPopAttributeTablePxlCountArrCalcImg();
     protected:
-        unsigned long *pxlCounts;
+        size_t *pxlCounts;
         unsigned int len;
     };
     

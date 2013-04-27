@@ -55,7 +55,7 @@ class RSGISLibXMLVariables (object):
         for var in variables:
             var = var.strip()
             symbolReplace = str("$VAR") + str(count)
-            print "Replacing: ", symbolReplace, " with ", var
+            print("Replacing: ", symbolReplace, " with ", var)
             xmloutlineWithVarValues = xmloutlineWithVarValues.replace(symbolReplace, var, xmloutlineWithVarValues.count(symbolReplace))
             count = count + 1
 
@@ -65,16 +65,16 @@ class RSGISLibXMLVariables (object):
         outputXMLFile.close()
 
     def run(self, cmdargs):
-        print 'rsgislibcmdxml.py script generates the XML commands for the '
-        print '@PACKAGE@ software library from a user defined template.'
-        print 'This script was distributed with @RSGISLIB_PACKAGE_STRING@'
-        print 'Copyright (C) @RSGISLIB_COPYRIGHT_YEAR@ Peter Bunting and Daniel Clewley'
-        print 'For maintainance email @RSGISLIB_PACKAGE_BUGREPORT@'
+        print('rsgislibcmdxml.py script generates the XML commands for the ')
+        print('@PACKAGE@ software library from a user defined template.')
+        print('This script was distributed with @RSGISLIB_PACKAGE_STRING@')
+        print('Copyright (C) @RSGISLIB_COPYRIGHT_YEAR@ Peter Bunting and Daniel Clewley')
+        print('For maintainance email @RSGISLIB_PACKAGE_BUGREPORT@')
 
         inTemplateStr = self.readInputTemplate(cmdargs.inputxml)
         self.constructXMLFile(cmdargs.variables, inTemplateStr, cmdargs.outputxml.strip())
-        print 'Commands written to single XML file'
-        print 'If complete run using:\n rsgisexe -x ' + cmdargs.outputxml.strip()
+        print('Commands written to single XML file')
+        print('If complete run using:\n rsgisexe -x ' + cmdargs.outputxml.strip())
         
 
 # Command arguments
@@ -90,12 +90,12 @@ class CmdArgs:
 
     if self.inputxml is None:
         p.print_help()
-        print "Input xml file must be set."
+        print("Input xml file must be set.")
         sys.exit()
 
     if self.outputxml is None:
         p.print_help()
-        print "Output xml filename must be set."
+        print("Output xml filename must be set.")
         sys.exit()
 
 if __name__ == '__main__':

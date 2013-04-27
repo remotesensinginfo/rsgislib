@@ -2412,6 +2412,7 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
 			XMLString::release(&methodSimulatedAnnealing);
 			XMLString::release(&methodSimulatedAnnealingAP);
 			XMLString::release(&methodAssignAP);
+            XMLString::release(&methodNone);
 
 		}
 		else
@@ -2419,7 +2420,7 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
 			throw RSGISXMLArgumentsException("Parameters to be retrieved not recognised or compatible with this option");
 		}
 	}
-	//---- Full Pol Single Species - , Object Based ---//
+	//---- Full Pol Single Species - Object Based ---//
 	else if((XMLString::equals(typeFullPolObject,optionStr)) | (XMLString::equals(typeFullPolObjectObjAP,optionStr)))
 	{
 		// Object based estimation
@@ -2577,6 +2578,7 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
 			XMLCh *methodSimulatedAnnealing = XMLString::transcode("simulatedAnnealing");
 			XMLCh *methodSimulatedAnnealingAP = XMLString::transcode("simulatedAnnealingAP");
 			XMLCh *methodAssignAP = XMLString::transcode("assignAP");
+            XMLCh *methodNone= XMLString::transcode("none");
 
 			DOMNodeList *slowOptimiserNodesList = argElement->getElementsByTagName(XMLString::transcode("rsgis:estSlowOptimiserParameters"));
 			DOMNodeList *fastOptimiserNodesList = argElement->getElementsByTagName(XMLString::transcode("rsgis:estFastOptimiserParameters"));
@@ -2787,7 +2789,10 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
 				}
 				else
 				{
+                    if(!XMLString::equals(methodNone, methodStr))
+					{
 						throw RSGISXMLArgumentsException("Function type not provieded / not recognised");
+					}
 				}
 
 				XMLString::release(&functionLn2Var);
@@ -2795,6 +2800,113 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
 				XMLString::release(&functionLinXfLinY);
 				XMLString::release(&function2DPoly);
 
+                /* Get minimum and maximum heights and density.
+                 * Setting these is optional and default values will be chosen with no message if
+                 * values are not set
+                 */
+                
+                double *minMaxStepHeight = new double[3];
+                double *minMaxStepDensity = new double[3];
+                
+                XMLCh *minHeightStr = XMLString::transcode("minHeight");
+                if(slowOptimiserElement->hasAttribute(minHeightStr))
+                {
+                    char *charValue = XMLString::transcode(slowOptimiserElement->getAttribute(minHeightStr));
+                    minMaxStepHeight[0] = mathUtils.strtodouble(string(charValue));
+                    XMLString::release(&charValue);
+                }
+                else
+                {
+                    minMaxStepHeight[0] = 1;
+                }
+                XMLString::release(&minHeightStr);
+                
+                XMLCh *maxHeightStr = XMLString::transcode("maxHeight");
+                if(slowOptimiserElement->hasAttribute(maxHeightStr))
+                {
+                    char *charValue = XMLString::transcode(slowOptimiserElement->getAttribute(maxHeightStr));
+                    minMaxStepHeight[1] = mathUtils.strtodouble(string(charValue));
+                    XMLString::release(&charValue);
+                }
+                else
+                {
+                    minMaxStepHeight[1] = 20;
+                }
+                XMLString::release(&maxHeightStr);
+                
+                XMLCh *heightStepStr = XMLString::transcode("heightStep");
+                if(slowOptimiserElement->hasAttribute(heightStepStr))
+                {
+                    char *charValue = XMLString::transcode(slowOptimiserElement->getAttribute(heightStepStr));
+                    minMaxStepHeight[2] = mathUtils.strtodouble(string(charValue));
+                    XMLString::release(&charValue);
+                }
+                else
+                {
+                    minMaxStepHeight[2] = 0.01;
+                }
+                XMLString::release(&heightStepStr);
+                
+                XMLCh *minDensityStr = XMLString::transcode("minDensity");
+                if(slowOptimiserElement->hasAttribute(minDensityStr))
+                {
+                    char *charValue = XMLString::transcode(slowOptimiserElement->getAttribute(minDensityStr));
+                    minMaxStepDensity[0] = mathUtils.strtodouble(string(charValue));
+                    XMLString::release(&charValue);
+                }
+                else
+                {
+                    minMaxStepDensity[0] = 0.1;
+                }
+                XMLString::release(&minDensityStr);
+                
+                XMLCh *maxDensityStr = XMLString::transcode("maxDensity");
+                if(slowOptimiserElement->hasAttribute(maxDensityStr))
+                {
+                    char *charValue = XMLString::transcode(slowOptimiserElement->getAttribute(maxDensityStr));
+                    minMaxStepDensity[1] = mathUtils.strtodouble(string(charValue));
+                    XMLString::release(&charValue);
+                }
+                else
+                {
+                    minMaxStepDensity[1] = 2;
+                }
+                XMLString::release(&maxDensityStr);
+                
+                XMLCh *densityStepStr = XMLString::transcode("densityStep");
+                if(slowOptimiserElement->hasAttribute(densityStepStr))
+                {
+                    char *charValue = XMLString::transcode(slowOptimiserElement->getAttribute(densityStepStr));
+                    minMaxStepDensity[2] = mathUtils.strtodouble(string(charValue));
+                    XMLString::release(&charValue);
+                }
+                else
+                {
+                    minMaxStepDensity[2] = 0.001;
+                }
+                XMLString::release(&densityStepStr);
+                
+                
+                double **minMaxStepAll = new double*[2];
+                minMaxStepAll[0] = new double[3];
+                minMaxStepAll[1] = new double[3];
+                minMaxStepAll[0][0] = minMaxStepHeight[0];
+                minMaxStepAll[0][1] = minMaxStepHeight[1];
+                minMaxStepAll[0][2] = minMaxStepHeight[2];
+                minMaxStepAll[1][0] = minMaxStepDensity[0];
+                minMaxStepAll[1][1] = minMaxStepDensity[1];
+                minMaxStepAll[1][2] = minMaxStepDensity[2];
+                
+                
+                // Add to min / max values for inversion
+                this->minMaxValuesClass[i][0] = new double[2];
+                this->minMaxValuesClass[i][1] = new double[2];
+                
+                this->minMaxValuesClass[i][0][0] = minMaxStepHeight[0];
+                this->minMaxValuesClass[i][0][1] = minMaxStepHeight[1];
+                this->minMaxValuesClass[i][1][0] = minMaxStepDensity[0];
+                this->minMaxValuesClass[i][1][1] = minMaxStepDensity[1];
+                
 				// Get optimisation method
 				if(XMLString::equals(methodConjugateGradientWithRestarts, methodStr) | XMLString::equals(methodConjugateGradient, methodStr))
 				{
@@ -2837,91 +2949,6 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
 					}
 					XMLString::release(&targetErrorStr);
 
-					/* Get minimum and maximum heights and density.
-					 * Setting these is optional and default values will be chosen with no message if
-					 * values are not set
-					 */
-
-					double *minMaxStepHeight = new double[3];
-					double *minMaxStepDensity = new double[3];
-
-					XMLCh *minHeightStr = XMLString::transcode("minHeight");
-					if(slowOptimiserElement->hasAttribute(minHeightStr))
-					{
-						char *charValue = XMLString::transcode(slowOptimiserElement->getAttribute(minHeightStr));
-						minMaxStepHeight[0] = mathUtils.strtodouble(string(charValue));
-						XMLString::release(&charValue);
-					}
-					else
-					{
-						minMaxStepHeight[0] = 1;
-					}
-					XMLString::release(&minHeightStr);
-
-					XMLCh *maxHeightStr = XMLString::transcode("maxHeight");
-					if(slowOptimiserElement->hasAttribute(maxHeightStr))
-					{
-						char *charValue = XMLString::transcode(slowOptimiserElement->getAttribute(maxHeightStr));
-						minMaxStepHeight[1] = mathUtils.strtodouble(string(charValue));
-						XMLString::release(&charValue);
-					}
-					else
-					{
-						minMaxStepHeight[1] = 20;
-					}
-					XMLString::release(&maxHeightStr);
-
-					XMLCh *heightStepStr = XMLString::transcode("heightStep");
-					if(slowOptimiserElement->hasAttribute(heightStepStr))
-					{
-						char *charValue = XMLString::transcode(slowOptimiserElement->getAttribute(heightStepStr));
-						minMaxStepHeight[2] = mathUtils.strtodouble(string(charValue));
-						XMLString::release(&charValue);
-					}
-					else
-					{
-						minMaxStepHeight[2] = 0.01;
-					}
-					XMLString::release(&heightStepStr);
-
-					XMLCh *minDensityStr = XMLString::transcode("minDensity");
-					if(slowOptimiserElement->hasAttribute(minDensityStr))
-					{
-						char *charValue = XMLString::transcode(slowOptimiserElement->getAttribute(minDensityStr));
-						minMaxStepDensity[0] = mathUtils.strtodouble(string(charValue));
-						XMLString::release(&charValue);
-					}
-					else
-					{
-						minMaxStepDensity[0] = 0.1;
-					}
-					XMLString::release(&minDensityStr);
-
-					XMLCh *maxDensityStr = XMLString::transcode("maxDensity");
-					if(slowOptimiserElement->hasAttribute(maxDensityStr))
-					{
-						char *charValue = XMLString::transcode(slowOptimiserElement->getAttribute(maxDensityStr));
-						minMaxStepDensity[1] = mathUtils.strtodouble(string(charValue));
-						XMLString::release(&charValue);
-					}
-					else
-					{
-						minMaxStepDensity[1] = 2;
-					}
-					XMLString::release(&maxDensityStr);
-
-					XMLCh *densityStepStr = XMLString::transcode("densityStep");
-					if(slowOptimiserElement->hasAttribute(densityStepStr))
-					{
-						char *charValue = XMLString::transcode(slowOptimiserElement->getAttribute(densityStepStr));
-						minMaxStepDensity[2] = mathUtils.strtodouble(string(charValue));
-						XMLString::release(&charValue);
-					}
-					else
-					{
-						minMaxStepDensity[2] = 0.001;
-					}
-					XMLString::release(&densityStepStr);
 
 					/******************************
 					 * Set up covariance matrices *
@@ -2999,91 +3026,6 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
 				{
 					cout << "\tUsing Exhaustive Search" << endl;
 
-					double *minMaxStepHeight = new double[3];
-					double *minMaxStepDensity = new double[3];
-
-					/* Get minimum and maximum heights and density.
-					 * Setting these is optional and default values will be chosen with no message if
-					 * values are not set
-					 */
-
-					XMLCh *minHeightStr = XMLString::transcode("minHeight");
-					if(slowOptimiserElement->hasAttribute(minHeightStr))
-					{
-						char *charValue = XMLString::transcode(slowOptimiserElement->getAttribute(minHeightStr));
-						minMaxStepHeight[0] = mathUtils.strtodouble(string(charValue));
-						XMLString::release(&charValue);
-					}
-					else
-					{
-						minMaxStepHeight[0] = 1;
-					}
-					XMLString::release(&minHeightStr);
-
-					XMLCh *maxHeightStr = XMLString::transcode("maxHeight");
-					if(slowOptimiserElement->hasAttribute(maxHeightStr))
-					{
-						char *charValue = XMLString::transcode(slowOptimiserElement->getAttribute(maxHeightStr));
-						minMaxStepHeight[1] = mathUtils.strtodouble(string(charValue));
-						XMLString::release(&charValue);
-					}
-					else
-					{
-						minMaxStepHeight[1] = 20;
-					}
-					XMLString::release(&maxHeightStr);
-
-					XMLCh *heightStepStr = XMLString::transcode("heightStep");
-					if(slowOptimiserElement->hasAttribute(heightStepStr))
-					{
-						char *charValue = XMLString::transcode(slowOptimiserElement->getAttribute(heightStepStr));
-						minMaxStepHeight[2] = mathUtils.strtodouble(string(charValue));
-						XMLString::release(&charValue);
-					}
-					else
-					{
-						minMaxStepHeight[2] = 0.1;
-					}
-					XMLString::release(&heightStepStr);
-
-					XMLCh *minDensityStr = XMLString::transcode("minDensity");
-					if(slowOptimiserElement->hasAttribute(minDensityStr))
-					{
-						char *charValue = XMLString::transcode(slowOptimiserElement->getAttribute(minDensityStr));
-						minMaxStepDensity[0] = mathUtils.strtodouble(string(charValue));
-						XMLString::release(&charValue);
-					}
-					else
-					{
-						minMaxStepDensity[0] = 0.1;
-					}
-					XMLString::release(&minDensityStr);
-
-					XMLCh *maxDensityStr = XMLString::transcode("maxDensity");
-					if(slowOptimiserElement->hasAttribute(maxDensityStr))
-					{
-						char *charValue = XMLString::transcode(slowOptimiserElement->getAttribute(maxDensityStr));
-						minMaxStepDensity[1] = mathUtils.strtodouble(string(charValue));
-						XMLString::release(&charValue);
-					}
-					else
-					{
-						minMaxStepDensity[1] = 2;
-					}
-					XMLString::release(&maxDensityStr);
-
-					XMLCh *densityStepStr = XMLString::transcode("densityStep");
-					if(slowOptimiserElement->hasAttribute(densityStepStr))
-					{
-						char *charValue = XMLString::transcode(slowOptimiserElement->getAttribute(densityStepStr));
-						minMaxStepDensity[2] = mathUtils.strtodouble(string(charValue));
-						XMLString::release(&charValue);
-					}
-					else
-					{
-						minMaxStepDensity[2] = 0.01;
-					}
-					XMLString::release(&densityStepStr);
 
 					if (XMLString::equals(methodExhaustiveSearchAP, methodStr))
 					{
@@ -3159,93 +3101,6 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
 				else if((XMLString::equals(methodSimulatedAnnealing, methodStr)) | (XMLString::equals(methodSimulatedAnnealingAP, methodStr)))
 				{
 					cout << "\tUsing Simulated Annealing" << endl;
-
-					/* Get minimum and maximum heights and density.
-					 * Setting these is optional and default values will be chosen with no message if
-					 * values are not set
-					 */
-
-					double **minMaxStepAll = new double*[2];
-                    minMaxStepAll[0] = new double[3];
-                    minMaxStepAll[1] = new double[3];
-
-					XMLCh *minHeightStr = XMLString::transcode("minHeight");
-					if(slowOptimiserElement->hasAttribute(minHeightStr))
-					{
-						char *charValue = XMLString::transcode(slowOptimiserElement->getAttribute(minHeightStr));
-						minMaxStepAll[0][0] = mathUtils.strtodouble(string(charValue));
-						XMLString::release(&charValue);
-					}
-					else
-					{
-						minMaxStepAll[0][0] = 1;
-					}
-					XMLString::release(&minHeightStr);
-
-					XMLCh *maxHeightStr = XMLString::transcode("maxHeight");
-					if(slowOptimiserElement->hasAttribute(maxHeightStr))
-					{
-						char *charValue = XMLString::transcode(slowOptimiserElement->getAttribute(maxHeightStr));
-						minMaxStepAll[0][1] = mathUtils.strtodouble(string(charValue));
-						XMLString::release(&charValue);
-					}
-					else
-					{
-						minMaxStepAll[0][1] = 20;
-					}
-					XMLString::release(&maxHeightStr);
-
-					XMLCh *heightStepStr = XMLString::transcode("heightStep");
-					if(slowOptimiserElement->hasAttribute(heightStepStr))
-					{
-						char *charValue = XMLString::transcode(slowOptimiserElement->getAttribute(heightStepStr));
-						minMaxStepAll[0][2] = mathUtils.strtodouble(string(charValue));
-						XMLString::release(&charValue);
-					}
-					else
-					{
-						minMaxStepAll[0][2] = 0.01;
-					}
-					XMLString::release(&heightStepStr);
-
-					XMLCh *minDensityStr = XMLString::transcode("minDensity");
-					if(slowOptimiserElement->hasAttribute(minDensityStr))
-					{
-						char *charValue = XMLString::transcode(slowOptimiserElement->getAttribute(minDensityStr));
-						minMaxStepAll[1][0] = mathUtils.strtodouble(string(charValue));
-						XMLString::release(&charValue);
-					}
-					else
-					{
-						minMaxStepAll[1][0] = 0.1;
-					}
-					XMLString::release(&minDensityStr);
-
-					XMLCh *maxDensityStr = XMLString::transcode("maxDensity");
-					if(slowOptimiserElement->hasAttribute(maxDensityStr))
-					{
-						char *charValue = XMLString::transcode(slowOptimiserElement->getAttribute(maxDensityStr));
-						minMaxStepAll[1][1] = mathUtils.strtodouble(string(charValue));
-						XMLString::release(&charValue);
-					}
-					else
-					{
-						minMaxStepAll[1][1] = 2;
-					}
-					XMLString::release(&maxDensityStr);
-
-					XMLCh *densityStepStr = XMLString::transcode("densityStep");
-					if(slowOptimiserElement->hasAttribute(densityStepStr))
-					{
-						char *charValue = XMLString::transcode(slowOptimiserElement->getAttribute(densityStepStr));
-						minMaxStepAll[1][2] = mathUtils.strtodouble(string(charValue));
-						XMLString::release(&charValue);
-					}
-					else
-					{
-						minMaxStepAll[1][2] = 0.001;
-					}
-					XMLString::release(&densityStepStr);
 
 					/* Get other parameters for simulated annealing.
 					 * Setting these is optional and default values will be chosen with no message if
@@ -3411,6 +3266,11 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
                     this->estSlowOptimiserClass->push_back(new RSGISEstimationSimulatedAnnealingWithAP(functionsAll, minMaxStepAll, minEnergy, startTemp, runsStep, runsTemp, cooling, ittmax, covMatrixP, invCovMatrixD, this->initialParClass->at(i)));
 
 				}
+                else if(XMLString::equals(methodNone,methodNone))
+                {
+                    cout << "\tUsing No optimiser (pixel based estimation)." << endl;
+                    this->estSlowOptimiserClass->push_back(new rsgis::radar::RSGISEstimationNoEstimation());
+                }
 				else if(XMLString::equals(methodAssignAP, methodStr))
 				{
 					throw RSGISXMLArgumentsException("The optimiser \"assignAP\" cannot be used at the object level");
@@ -3636,6 +3496,118 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
 				XMLString::release(&functionLn2VarQuadratic);
 				XMLString::release(&functionLinXfLinY);
 				XMLString::release(&function2DPoly);
+                
+                double *minMaxStepHeight = new double[3];
+                double *minMaxStepDensity = new double[3];
+                
+                /* Get minimum and maximum heights and density.
+                 * Setting these is optional and default values will be chosen with no message if
+                 * values are not set
+                 */
+                
+                XMLCh *minHeightStr = XMLString::transcode("minHeight");
+                if(fastOptimiserElement->hasAttribute(minHeightStr))
+                {
+                    char *charValue = XMLString::transcode(fastOptimiserElement->getAttribute(minHeightStr));
+                    minMaxStepHeight[0] = mathUtils.strtodouble(string(charValue));
+                    this->useDefaultMinMax = false;
+                    XMLString::release(&charValue);
+                }
+                else
+                {
+                    minMaxStepHeight[0] = 1;
+                }
+                XMLString::release(&minHeightStr);
+                
+                XMLCh *maxHeightStr = XMLString::transcode("maxHeight");
+                if(fastOptimiserElement->hasAttribute(maxHeightStr))
+                {
+                    char *charValue = XMLString::transcode(fastOptimiserElement->getAttribute(maxHeightStr));
+                    minMaxStepHeight[1] = mathUtils.strtodouble(string(charValue));
+                    this->useDefaultMinMax = false;
+                    XMLString::release(&charValue);
+                }
+                else
+                {
+                    minMaxStepHeight[1] = 20;
+                }
+                XMLString::release(&maxHeightStr);
+                
+                XMLCh *heightStepStr = XMLString::transcode("heightStep");
+                if(fastOptimiserElement->hasAttribute(heightStepStr))
+                {
+                    char *charValue = XMLString::transcode(fastOptimiserElement->getAttribute(heightStepStr));
+                    minMaxStepHeight[2] = mathUtils.strtodouble(string(charValue));
+                    this->useDefaultMinMax = false;
+                    XMLString::release(&charValue);
+                }
+                else
+                {
+                    minMaxStepHeight[2] = 0.1;
+                }
+                XMLString::release(&heightStepStr);
+                
+                XMLCh *minDensityStr = XMLString::transcode("minDensity");
+                if(fastOptimiserElement->hasAttribute(minDensityStr))
+                {
+                    char *charValue = XMLString::transcode(fastOptimiserElement->getAttribute(minDensityStr));
+                    minMaxStepDensity[0] = mathUtils.strtodouble(string(charValue));
+                    this->useDefaultMinMax = false;
+                    XMLString::release(&charValue);
+                }
+                else
+                {
+                    minMaxStepDensity[0] = 0.1;
+                }
+                XMLString::release(&minDensityStr);
+                
+                XMLCh *maxDensityStr = XMLString::transcode("maxDensity");
+                if(fastOptimiserElement->hasAttribute(maxDensityStr))
+                {
+                    char *charValue = XMLString::transcode(fastOptimiserElement->getAttribute(maxDensityStr));
+                    minMaxStepDensity[1] = mathUtils.strtodouble(string(charValue));
+                    this->useDefaultMinMax = false;
+                    XMLString::release(&charValue);
+                }
+                else
+                {
+                    minMaxStepDensity[1] = 2;
+                }
+                XMLString::release(&maxDensityStr);
+                
+                XMLCh *densityStepStr = XMLString::transcode("densityStep");
+                if(fastOptimiserElement->hasAttribute(densityStepStr))
+                {
+                    char *charValue = XMLString::transcode(fastOptimiserElement->getAttribute(densityStepStr));
+                    minMaxStepDensity[2] = mathUtils.strtodouble(string(charValue));
+                    this->useDefaultMinMax = false;
+                    XMLString::release(&charValue);
+                }
+                else
+                {
+                    minMaxStepDensity[2] = 0.01;
+                }
+                XMLString::release(&densityStepStr);
+                
+                double **minMaxStepAll = new double*[2];
+                minMaxStepAll[0] = new double[3];
+                minMaxStepAll[1] = new double[3];
+                minMaxStepAll[0][0] = minMaxStepHeight[0];
+                minMaxStepAll[0][1] = minMaxStepHeight[1];
+                minMaxStepAll[0][2] = minMaxStepHeight[2];
+                minMaxStepAll[1][0] = minMaxStepDensity[0];
+                minMaxStepAll[1][1] = minMaxStepDensity[1];
+                minMaxStepAll[1][2] = minMaxStepDensity[2];
+                
+                // Add to min / max values for inversion
+                this->minMaxValuesClass[i] = new double*[2];
+                this->minMaxValuesClass[i][0] = new double[2];
+                this->minMaxValuesClass[i][1] = new double[2];
+                
+                this->minMaxValuesClass[i][0][0] = minMaxStepHeight[0];
+                this->minMaxValuesClass[i][0][1] = minMaxStepHeight[1];
+                this->minMaxValuesClass[i][1][0] = minMaxStepDensity[0];
+                this->minMaxValuesClass[i][1][1] = minMaxStepDensity[1];
 
 				// Get optimisation method
 				if(XMLString::equals(methodConjugateGradientWithRestarts, methodStr) | XMLString::equals(methodConjugateGradient, methodStr))
@@ -3678,98 +3650,6 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
 						XMLString::release(&charValue);
 					}
 					XMLString::release(&targetErrorStr);
-
-					/* Get minimum and maximum heights and density.
-					 * Setting these is optional and default values will be chosen with no message if
-					 * values are not set
-					 */
-
-					double *minMaxStepHeight = new double[3];
-					double *minMaxStepDensity = new double[3];
-
-					XMLCh *minHeightStr = XMLString::transcode("minHeight");
-					if(fastOptimiserElement->hasAttribute(minHeightStr))
-					{
-						char *charValue = XMLString::transcode(fastOptimiserElement->getAttribute(minHeightStr));
-						minMaxStepHeight[0] = mathUtils.strtodouble(string(charValue));
-						this->useDefaultMinMax = false;
-						XMLString::release(&charValue);
-					}
-					else
-					{
-						minMaxStepHeight[0] = 1;
-					}
-					XMLString::release(&minHeightStr);
-
-					XMLCh *maxHeightStr = XMLString::transcode("maxHeight");
-					if(fastOptimiserElement->hasAttribute(maxHeightStr))
-					{
-						char *charValue = XMLString::transcode(fastOptimiserElement->getAttribute(maxHeightStr));
-						minMaxStepHeight[1] = mathUtils.strtodouble(string(charValue));
-						this->useDefaultMinMax = false;
-						XMLString::release(&charValue);
-					}
-					else
-					{
-						minMaxStepHeight[1] = 20;
-					}
-					XMLString::release(&maxHeightStr);
-
-					XMLCh *heightStepStr = XMLString::transcode("heightStep");
-					if(fastOptimiserElement->hasAttribute(heightStepStr))
-					{
-						char *charValue = XMLString::transcode(fastOptimiserElement->getAttribute(heightStepStr));
-						minMaxStepHeight[2] = mathUtils.strtodouble(string(charValue));
-						this->useDefaultMinMax = false;
-						XMLString::release(&charValue);
-					}
-					else
-					{
-						minMaxStepHeight[2] = 0.01;
-					}
-					XMLString::release(&heightStepStr);
-
-					XMLCh *minDensityStr = XMLString::transcode("minDensity");
-					if(fastOptimiserElement->hasAttribute(minDensityStr))
-					{
-						char *charValue = XMLString::transcode(fastOptimiserElement->getAttribute(minDensityStr));
-						minMaxStepDensity[0] = mathUtils.strtodouble(string(charValue));
-						this->useDefaultMinMax = false;
-						XMLString::release(&charValue);
-					}
-					else
-					{
-						minMaxStepDensity[0] = 0.1;
-					}
-					XMLString::release(&minDensityStr);
-
-					XMLCh *maxDensityStr = XMLString::transcode("maxDensity");
-					if(fastOptimiserElement->hasAttribute(maxDensityStr))
-					{
-						char *charValue = XMLString::transcode(fastOptimiserElement->getAttribute(maxDensityStr));
-						minMaxStepDensity[1] = mathUtils.strtodouble(string(charValue));
-						this->useDefaultMinMax = false;
-						XMLString::release(&charValue);
-					}
-					else
-					{
-						minMaxStepDensity[1] = 2;
-					}
-					XMLString::release(&maxDensityStr);
-
-					XMLCh *densityStepStr = XMLString::transcode("densityStep");
-					if(fastOptimiserElement->hasAttribute(densityStepStr))
-					{
-						char *charValue = XMLString::transcode(fastOptimiserElement->getAttribute(densityStepStr));
-						minMaxStepDensity[2] = mathUtils.strtodouble(string(charValue));
-						this->useDefaultMinMax = false;
-						XMLString::release(&charValue);
-					}
-					else
-					{
-						minMaxStepDensity[2] = 0.001;
-					}
-					XMLString::release(&densityStepStr);
 
 					/******************************
 					 * Set up covariance matrices *
@@ -3841,112 +3721,10 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
 						this->estFastOptimiserClass->push_back(new RSGISEstimationConjugateGradient2Var3Data(functionHH, functionHV, functionVV, this->initialParClass->at(i), covMatrixP, invCovMatrixD, minError, this->ittmax));
 					}
 
-					// Add to min / max values for inversion
-                    this->minMaxValuesClass[i] = new double*[2];
-                    this->minMaxValuesClass[i][0] = new double[2];
-                    this->minMaxValuesClass[i][1] = new double[2];
-
-                    this->minMaxValuesClass[i][0][0] = minMaxStepHeight[0];
-                    this->minMaxValuesClass[i][0][1] = minMaxStepHeight[1];
-                    this->minMaxValuesClass[i][1][0] = minMaxStepDensity[0];
-                    this->minMaxValuesClass[i][1][1] = minMaxStepDensity[1];
-
 				}
 				else if((XMLString::equals(methodExhaustiveSearch, methodStr)) | (XMLString::equals(methodExhaustiveSearchAP, methodStr)))
 				{
 					cout << "\tUsing Exhaustive Search" << endl;
-
-					double *minMaxStepHeight = new double[3];
-					double *minMaxStepDensity = new double[3];
-
-					/* Get minimum and maximum heights and density.
-					 * Setting these is optional and default values will be chosen with no message if
-					 * values are not set
-					 */
-
-					XMLCh *minHeightStr = XMLString::transcode("minHeight");
-					if(fastOptimiserElement->hasAttribute(minHeightStr))
-					{
-						char *charValue = XMLString::transcode(fastOptimiserElement->getAttribute(minHeightStr));
-						minMaxStepHeight[0] = mathUtils.strtodouble(string(charValue));
-						this->useDefaultMinMax = false;
-						XMLString::release(&charValue);
-					}
-					else
-					{
-						minMaxStepHeight[0] = 1;
-					}
-					XMLString::release(&minHeightStr);
-
-					XMLCh *maxHeightStr = XMLString::transcode("maxHeight");
-					if(fastOptimiserElement->hasAttribute(maxHeightStr))
-					{
-						char *charValue = XMLString::transcode(fastOptimiserElement->getAttribute(maxHeightStr));
-						minMaxStepHeight[1] = mathUtils.strtodouble(string(charValue));
-						this->useDefaultMinMax = false;
-						XMLString::release(&charValue);
-					}
-					else
-					{
-						minMaxStepHeight[1] = 20;
-					}
-					XMLString::release(&maxHeightStr);
-
-					XMLCh *heightStepStr = XMLString::transcode("heightStep");
-					if(fastOptimiserElement->hasAttribute(heightStepStr))
-					{
-						char *charValue = XMLString::transcode(fastOptimiserElement->getAttribute(heightStepStr));
-						minMaxStepHeight[2] = mathUtils.strtodouble(string(charValue));
-						this->useDefaultMinMax = false;
-						XMLString::release(&charValue);
-					}
-					else
-					{
-						minMaxStepHeight[2] = 0.1;
-					}
-					XMLString::release(&heightStepStr);
-
-					XMLCh *minDensityStr = XMLString::transcode("minDensity");
-					if(fastOptimiserElement->hasAttribute(minDensityStr))
-					{
-						char *charValue = XMLString::transcode(fastOptimiserElement->getAttribute(minDensityStr));
-						minMaxStepDensity[0] = mathUtils.strtodouble(string(charValue));
-						this->useDefaultMinMax = false;
-						XMLString::release(&charValue);
-					}
-					else
-					{
-						minMaxStepDensity[0] = 0.1;
-					}
-					XMLString::release(&minDensityStr);
-
-					XMLCh *maxDensityStr = XMLString::transcode("maxDensity");
-					if(fastOptimiserElement->hasAttribute(maxDensityStr))
-					{
-						char *charValue = XMLString::transcode(fastOptimiserElement->getAttribute(maxDensityStr));
-						minMaxStepDensity[1] = mathUtils.strtodouble(string(charValue));
-						this->useDefaultMinMax = false;
-						XMLString::release(&charValue);
-					}
-					else
-					{
-						minMaxStepDensity[1] = 2;
-					}
-					XMLString::release(&maxDensityStr);
-
-					XMLCh *densityStepStr = XMLString::transcode("densityStep");
-					if(fastOptimiserElement->hasAttribute(densityStepStr))
-					{
-						char *charValue = XMLString::transcode(fastOptimiserElement->getAttribute(densityStepStr));
-						minMaxStepDensity[2] = mathUtils.strtodouble(string(charValue));
-						this->useDefaultMinMax = false;
-						XMLString::release(&charValue);
-					}
-					else
-					{
-						minMaxStepDensity[2] = 0.01;
-					}
-					XMLString::release(&densityStepStr);
 
 					if (XMLString::equals(methodExhaustiveSearchAP, methodStr))
 					{
@@ -4019,110 +3797,11 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
 						this->estFastOptimiserClass->push_back(new RSGISEstimationExhaustiveSearch2Var3Data(functionHH, functionHV, functionVV, minMaxStepHeight, minMaxStepDensity));
 					}
 
-					// Add to min / max values for inversion
-					if (!this->useDefaultMinMax)
-					{
-						this->minMaxValuesClass[i] = new double*[2];
-						this->minMaxValuesClass[i][0] = new double[2];
-						this->minMaxValuesClass[i][1] = new double[2];
-
-						this->minMaxValuesClass[i][0][0] = minMaxStepHeight[0];
-						this->minMaxValuesClass[i][0][1] = minMaxStepHeight[1];
-						this->minMaxValuesClass[i][1][0] = minMaxStepDensity[0];
-						this->minMaxValuesClass[i][1][1] = minMaxStepDensity[1];
-					}
 
 				}
 				else if((XMLString::equals(methodSimulatedAnnealing, methodStr)) | (XMLString::equals(methodSimulatedAnnealingAP, methodStr)))
 				{
 					cout << "\tUsing Simulated Annealing" << endl;
-
-					/* Get minimum and maximum heights and density.
-					 * Setting these is optional and default values will be chosen with no message if
-					 * values are not set
-					 */
-
-					double **minMaxStepAll = new double*[2];
-                    minMaxStepAll[0] = new double[3];
-                    minMaxStepAll[1] = new double[3];
-
-					XMLCh *minHeightStr = XMLString::transcode("minHeight");
-					if(fastOptimiserElement->hasAttribute(minHeightStr))
-					{
-						char *charValue = XMLString::transcode(fastOptimiserElement->getAttribute(minHeightStr));
-						minMaxStepAll[0][0] = mathUtils.strtodouble(string(charValue));
-						XMLString::release(&charValue);
-					}
-					else
-					{
-						minMaxStepAll[0][0] = 1;
-					}
-					XMLString::release(&minHeightStr);
-
-					XMLCh *maxHeightStr = XMLString::transcode("maxHeight");
-					if(fastOptimiserElement->hasAttribute(maxHeightStr))
-					{
-						char *charValue = XMLString::transcode(fastOptimiserElement->getAttribute(maxHeightStr));
-						minMaxStepAll[0][1] = mathUtils.strtodouble(string(charValue));
-						XMLString::release(&charValue);
-					}
-					else
-					{
-						minMaxStepAll[0][1] = 20;
-					}
-					XMLString::release(&maxHeightStr);
-
-					XMLCh *heightStepStr = XMLString::transcode("heightStep");
-					if(fastOptimiserElement->hasAttribute(heightStepStr))
-					{
-						char *charValue = XMLString::transcode(fastOptimiserElement->getAttribute(heightStepStr));
-						minMaxStepAll[0][2] = mathUtils.strtodouble(string(charValue));
-						XMLString::release(&charValue);
-					}
-					else
-					{
-						minMaxStepAll[0][2] = 0.01;
-					}
-					XMLString::release(&heightStepStr);
-
-					XMLCh *minDensityStr = XMLString::transcode("minDensity");
-					if(fastOptimiserElement->hasAttribute(minDensityStr))
-					{
-						char *charValue = XMLString::transcode(fastOptimiserElement->getAttribute(minDensityStr));
-						minMaxStepAll[1][0] = mathUtils.strtodouble(string(charValue));
-						XMLString::release(&charValue);
-					}
-					else
-					{
-						minMaxStepAll[1][0] = 0.1;
-					}
-					XMLString::release(&minDensityStr);
-
-					XMLCh *maxDensityStr = XMLString::transcode("maxDensity");
-					if(fastOptimiserElement->hasAttribute(maxDensityStr))
-					{
-						char *charValue = XMLString::transcode(fastOptimiserElement->getAttribute(maxDensityStr));
-						minMaxStepAll[1][1] = mathUtils.strtodouble(string(charValue));
-						XMLString::release(&charValue);
-					}
-					else
-					{
-						minMaxStepAll[1][1] = 2;
-					}
-					XMLString::release(&maxDensityStr);
-
-					XMLCh *densityStepStr = XMLString::transcode("densityStep");
-					if(fastOptimiserElement->hasAttribute(densityStepStr))
-					{
-						char *charValue = XMLString::transcode(fastOptimiserElement->getAttribute(densityStepStr));
-						minMaxStepAll[1][2] = mathUtils.strtodouble(string(charValue));
-						XMLString::release(&charValue);
-					}
-					else
-					{
-						minMaxStepAll[1][2] = 0.001;
-					}
-					XMLString::release(&densityStepStr);
 
 					/* Get other parameters for simulated annealing.
 					 * Setting these is optional and default values will be chosen with no message if
@@ -4195,7 +3874,6 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
 						XMLString::release(&charValue);
 					}
 					XMLString::release(&startTempStr);
-
 
 
                     /******************************
@@ -4288,21 +3966,6 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
 
                     this->estFastOptimiserClass->push_back(new RSGISEstimationSimulatedAnnealingWithAP(functionsAll, minMaxStepAll, minEnergy, startTemp, runsStep, runsTemp, cooling, ittmax, covMatrixP, invCovMatrixD, this->initialPar));
 
-
-					// Add to min / max values for inversion
-					if (!this->useDefaultMinMax)
-					{
-						this->minMaxValuesClass[i] = new double*[2];
-						this->minMaxValuesClass[i][0] = new double[2];
-						this->minMaxValuesClass[i][1] = new double[2];
-
-						this->minMaxValuesClass[i][0][0] = minMaxStepAll[0][0];
-						this->minMaxValuesClass[i][0][1] = minMaxStepAll[0][1];
-						this->minMaxValuesClass[i][1][0] = minMaxStepAll[1][0];
-						this->minMaxValuesClass[i][1][1] = minMaxStepAll[1][1];
-					}
-
-
 				}
 				else if(XMLString::equals(methodAssignAP, methodStr))
 				{
@@ -4323,6 +3986,7 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
 			XMLString::release(&methodSimulatedAnnealing);
 			XMLString::release(&methodSimulatedAnnealingAP);
 			XMLString::release(&methodAssignAP);
+            XMLString::release(&methodNone);
 
 		}
 		else if(XMLString::equals(typeDielectricDensityHeight,parametersStr))
@@ -4383,6 +4047,17 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
 			this->initialParClass= new vector <gsl_vector*>;
 			this->estFastOptimiserClass = new vector <RSGISEstimationOptimiser*>;
 			this->estSlowOptimiserClass = new vector <RSGISEstimationOptimiser*>;
+            
+            
+			/**************************************
+			 * Get method to use for optimisation *
+			 **************************************/
+			XMLCh *methodConjugateGradient = XMLString::transcode("conjugateGradient");
+			XMLCh *methodConjugateGradientWithRestarts = XMLString::transcode("conjugateGradientWithRestarts");
+			XMLCh *methodSimulatedAnnealing = XMLString::transcode("simulatedAnnealing");
+			XMLCh *methodSimulatedAnnealingAP = XMLString::transcode("simulatedAnnealingAP");
+			XMLCh *methodAssignAP = XMLString::transcode("assignAP");
+            XMLCh *methodNone= XMLString::transcode("none");
 
             DOMNodeList *slowOptimiserNodesList = argElement->getElementsByTagName(XMLString::transcode("rsgis:estSlowOptimiserParameters"));
 			DOMNodeList *fastOptimiserNodesList = argElement->getElementsByTagName(XMLString::transcode("rsgis:estFastOptimiserParameters"));
@@ -4451,133 +4126,256 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
                 XMLCh *function3DPoly = XMLString::transcode("3DPoly");
                 if (XMLString::equals(function3DPoly,functionStr))
                 {
-                    // Read coefficients
-                    XMLCh *coefficientsHH = XMLString::transcode("coefficientsHH");
-                    if(slowOptimiserElement->hasAttribute(coefficientsHH))
+                    // Read coefficients (if using optimiser at the object level
+                    if(!XMLString::equals(methodNone, methodStr))
                     {
-                        char *charValue = XMLString::transcode(slowOptimiserElement->getAttribute(coefficientsHH));
-                        string coeffHHFile = string(charValue);
-                        this->coeffHH = matrixUtils.readGSLMatrixFromTxt(coeffHHFile);
-                        XMLString::release(&charValue);
-                    }
-                    else
-                    {
-                        throw RSGISXMLArgumentsException("No coefficents provided for HH");
-                    }
-                    XMLString::release(&coefficientsHH);
-                    XMLCh *coefficientsHV = XMLString::transcode("coefficientsHV");
-                    if(slowOptimiserElement->hasAttribute(coefficientsHV))
-                    {
-                        char *charValue = XMLString::transcode(slowOptimiserElement->getAttribute(coefficientsHV));
-                        string coeffHVFile = string(charValue);
-                        this->coeffHV = matrixUtils.readGSLMatrixFromTxt(coeffHVFile);
-                        XMLString::release(&charValue);
-                    }
-                    else
-                    {
-                        throw RSGISXMLArgumentsException("No coefficents provided for HV");
-                    }
-                    XMLString::release(&coefficientsHV);
+                        XMLCh *coefficientsHH = XMLString::transcode("coefficientsHH");
+                        if(slowOptimiserElement->hasAttribute(coefficientsHH))
+                        {
+                            char *charValue = XMLString::transcode(slowOptimiserElement->getAttribute(coefficientsHH));
+                            string coeffHHFile = string(charValue);
+                            this->coeffHH = matrixUtils.readGSLMatrixFromTxt(coeffHHFile);
+                            XMLString::release(&charValue);
+                        }
+                        else
+                        {
+                            throw RSGISXMLArgumentsException("No coefficents provided for HH");
+                        }
+                        XMLString::release(&coefficientsHH);
+                        XMLCh *coefficientsHV = XMLString::transcode("coefficientsHV");
+                        if(slowOptimiserElement->hasAttribute(coefficientsHV))
+                        {
+                            char *charValue = XMLString::transcode(slowOptimiserElement->getAttribute(coefficientsHV));
+                            string coeffHVFile = string(charValue);
+                            this->coeffHV = matrixUtils.readGSLMatrixFromTxt(coeffHVFile);
+                            XMLString::release(&charValue);
+                        }
+                        else
+                        {
+                            throw RSGISXMLArgumentsException("No coefficents provided for HV");
+                        }
+                        XMLString::release(&coefficientsHV);
 
-                    XMLCh *inCoeffVV = XMLString::transcode("coefficientsVV"); // Coefficients
-                    if(slowOptimiserElement->hasAttribute(inCoeffVV))
-                    {
-                        char *charValue = XMLString::transcode(slowOptimiserElement->getAttribute(inCoeffVV));
-                        string inCoeffVVFileName = string(charValue);
-                        this->coeffVV = matrixUtils.readGSLMatrixFromTxt(inCoeffVVFileName);
-                        XMLString::release(&charValue);
-                    }
-                    else
-                    {
-                        throw RSGISXMLArgumentsException("No Coefficients not Provided for VV");
-                    }
-                    XMLString::release(&inCoeffVV);
+                        XMLCh *inCoeffVV = XMLString::transcode("coefficientsVV"); // Coefficients
+                        if(slowOptimiserElement->hasAttribute(inCoeffVV))
+                        {
+                            char *charValue = XMLString::transcode(slowOptimiserElement->getAttribute(inCoeffVV));
+                            string inCoeffVVFileName = string(charValue);
+                            this->coeffVV = matrixUtils.readGSLMatrixFromTxt(inCoeffVVFileName);
+                            XMLString::release(&charValue);
+                        }
+                        else
+                        {
+                            throw RSGISXMLArgumentsException("No Coefficients not Provided for VV");
+                        }
+                        XMLString::release(&inCoeffVV);
 
-                    bool sameOrderBothFits = false;
-                    XMLCh *polyOrderStr = XMLString::transcode("polyOrder"); // Polynomial Order
-                    if(slowOptimiserElement->hasAttribute(polyOrderStr))
-                    {
-                        char *charValue = XMLString::transcode(slowOptimiserElement->getAttribute(polyOrderStr));
-                        int orderInt = mathUtils.strtoint(string(charValue));
-                        cout << "\tusing same order polynomial for both sets of fits, use \'polyOrderX\', \'polyOrderY\' and \'polyOrderZ\' to set seperately" << endl;
-                        sameOrderBothFits = true;
-                        this->polyOrderX = orderInt + 1;
-                        this->polyOrderY = orderInt + 1;
-                        this->polyOrderZ = orderInt + 1;
-                        XMLString::release(&charValue);
-                    }
-                    XMLString::release(&polyOrderStr);
-                    XMLCh *polyOrderXStr = XMLString::transcode("polyOrderX"); // Polynomial Order
-                    if(slowOptimiserElement->hasAttribute(polyOrderXStr))
-                    {
-                        char *charValue = XMLString::transcode(slowOptimiserElement->getAttribute(polyOrderXStr));
-                        int orderInt = mathUtils.strtoint(string(charValue));
-                        this->polyOrderX = orderInt + 1;
-                        XMLString::release(&charValue);
-                    }
-                    else
-                    {
-                        if (!sameOrderBothFits)
+                        bool sameOrderBothFits = false;
+                        XMLCh *polyOrderStr = XMLString::transcode("polyOrder"); // Polynomial Order
+                        if(slowOptimiserElement->hasAttribute(polyOrderStr))
                         {
-                            throw RSGISXMLArgumentsException("No value provided for polynomial order for x fits");
+                            char *charValue = XMLString::transcode(slowOptimiserElement->getAttribute(polyOrderStr));
+                            int orderInt = mathUtils.strtoint(string(charValue));
+                            cout << "\tusing same order polynomial for both sets of fits, use \'polyOrderX\', \'polyOrderY\' and \'polyOrderZ\' to set seperately" << endl;
+                            sameOrderBothFits = true;
+                            this->polyOrderX = orderInt + 1;
+                            this->polyOrderY = orderInt + 1;
+                            this->polyOrderZ = orderInt + 1;
+                            XMLString::release(&charValue);
                         }
-                    }
-                    XMLString::release(&polyOrderXStr);
-                    XMLCh *polyOrderYStr = XMLString::transcode("polyOrderY"); // Polynomial Order
-                    if(slowOptimiserElement->hasAttribute(polyOrderYStr))
-                    {
-                        char *charValue = XMLString::transcode(slowOptimiserElement->getAttribute(polyOrderYStr));
-                        int orderInt = mathUtils.strtoint(string(charValue));
-                        this->polyOrderY = orderInt + 1;
-                        XMLString::release(&charValue);
-                    }
-                    else
-                    {
-                        if (!sameOrderBothFits)
+                        XMLString::release(&polyOrderStr);
+                        XMLCh *polyOrderXStr = XMLString::transcode("polyOrderX"); // Polynomial Order
+                        if(slowOptimiserElement->hasAttribute(polyOrderXStr))
                         {
-                            throw RSGISXMLArgumentsException("No value provided for polynomial order for y fits");
+                            char *charValue = XMLString::transcode(slowOptimiserElement->getAttribute(polyOrderXStr));
+                            int orderInt = mathUtils.strtoint(string(charValue));
+                            this->polyOrderX = orderInt + 1;
+                            XMLString::release(&charValue);
                         }
-                    }
-                    XMLString::release(&polyOrderYStr);
-                    XMLCh *polyOrderZStr = XMLString::transcode("polyOrderZ"); // Polynomial Order
-                    if(slowOptimiserElement->hasAttribute(polyOrderZStr))
-                    {
-                        char *charValue = XMLString::transcode(slowOptimiserElement->getAttribute(polyOrderZStr));
-                        int orderInt = mathUtils.strtoint(string(charValue));
-                        this->polyOrderZ = orderInt + 1;
-                        XMLString::release(&charValue);
-                    }
-                    else
-                    {
-                        if (!sameOrderBothFits)
+                        else
                         {
-                            throw RSGISXMLArgumentsException("No value provided for polynomial order for z fits");
+                            if (!sameOrderBothFits)
+                            {
+                                throw RSGISXMLArgumentsException("No value provided for polynomial order for x fits");
+                            }
                         }
+                        XMLString::release(&polyOrderXStr);
+                        XMLCh *polyOrderYStr = XMLString::transcode("polyOrderY"); // Polynomial Order
+                        if(slowOptimiserElement->hasAttribute(polyOrderYStr))
+                        {
+                            char *charValue = XMLString::transcode(slowOptimiserElement->getAttribute(polyOrderYStr));
+                            int orderInt = mathUtils.strtoint(string(charValue));
+                            this->polyOrderY = orderInt + 1;
+                            XMLString::release(&charValue);
+                        }
+                        else
+                        {
+                            if (!sameOrderBothFits)
+                            {
+                                throw RSGISXMLArgumentsException("No value provided for polynomial order for y fits");
+                            }
+                        }
+                        XMLString::release(&polyOrderYStr);
+                        XMLCh *polyOrderZStr = XMLString::transcode("polyOrderZ"); // Polynomial Order
+                        if(slowOptimiserElement->hasAttribute(polyOrderZStr))
+                        {
+                            char *charValue = XMLString::transcode(slowOptimiserElement->getAttribute(polyOrderZStr));
+                            int orderInt = mathUtils.strtoint(string(charValue));
+                            this->polyOrderZ = orderInt + 1;
+                            XMLString::release(&charValue);
+                        }
+                        else
+                        {
+                            if (!sameOrderBothFits)
+                            {
+                                throw RSGISXMLArgumentsException("No value provided for polynomial order for z fits");
+                            }
+                        }
+                        XMLString::release(&polyOrderZStr);
                     }
-                    XMLString::release(&polyOrderZStr);
                 }
-
                 else
                 {
-                    throw RSGISXMLArgumentsException("Function type not provieded / not recognised");
+                    if(!XMLString::equals(methodNone, methodStr))
+					{
+						throw RSGISXMLArgumentsException("Function type not provieded / not recognised");
+					}
                 }
-
                 XMLString::release(&function3DPoly);
-
-                /**************************************
-                 * Get method to use for optimisation *
-                 **************************************/
-                XMLCh *methodConjugateGradient = XMLString::transcode("conjugateGradient");
-                XMLCh *methodConjugateGradientWithRestarts = XMLString::transcode("conjugateGradientWithRestarts");
-                XMLCh *methodSimulatedAnnealing = XMLString::transcode("simulatedAnnealing");
-                XMLCh *methodSimulatedAnnealingAP = XMLString::transcode("simulatedAnnealingAP");
-
+                
+                /* Get minimum and maximum heights and density.
+                 * Setting these is optional and default values will be chosen with no message if
+                 * values are not set
+                 */
+                
+                double **minMaxStepAll = new double*[3];
+                minMaxStepAll[0] = new double[3];
+                minMaxStepAll[1] = new double[3];
+                minMaxStepAll[2] = new double[3];
+                
+                XMLCh *minHeightStr = XMLString::transcode("minHeight");
+                if(slowOptimiserElement->hasAttribute(minHeightStr))
+                {
+                    char *charValue = XMLString::transcode(slowOptimiserElement->getAttribute(minHeightStr));
+                    minMaxStepAll[0][0] = mathUtils.strtodouble(string(charValue));
+                    XMLString::release(&charValue);
+                }
+                else
+                {
+                    minMaxStepAll[0][0] = 1;
+                }
+                XMLString::release(&minHeightStr);
+                
+                XMLCh *maxHeightStr = XMLString::transcode("maxHeight");
+                if(slowOptimiserElement->hasAttribute(maxHeightStr))
+                {
+                    char *charValue = XMLString::transcode(slowOptimiserElement->getAttribute(maxHeightStr));
+                    minMaxStepAll[0][1] = mathUtils.strtodouble(string(charValue));
+                    XMLString::release(&charValue);
+                }
+                else
+                {
+                    minMaxStepAll[0][1] = 20;
+                }
+                XMLString::release(&maxHeightStr);
+                
+                XMLCh *heightStepStr = XMLString::transcode("heightStep");
+                if(slowOptimiserElement->hasAttribute(heightStepStr))
+                {
+                    char *charValue = XMLString::transcode(slowOptimiserElement->getAttribute(heightStepStr));
+                    minMaxStepAll[0][2] = mathUtils.strtodouble(string(charValue));
+                    XMLString::release(&charValue);
+                }
+                else
+                {
+                    minMaxStepAll[0][2] = 0.01;
+                }
+                XMLString::release(&heightStepStr);
+                
+                XMLCh *minDensityStr = XMLString::transcode("minDensity");
+                if(slowOptimiserElement->hasAttribute(minDensityStr))
+                {
+                    char *charValue = XMLString::transcode(slowOptimiserElement->getAttribute(minDensityStr));
+                    minMaxStepAll[1][0] = mathUtils.strtodouble(string(charValue));
+                    XMLString::release(&charValue);
+                }
+                else
+                {
+                    minMaxStepAll[1][0] = 0.1;
+                }
+                XMLString::release(&minDensityStr);
+                
+                XMLCh *maxDensityStr = XMLString::transcode("maxDensity");
+                if(slowOptimiserElement->hasAttribute(maxDensityStr))
+                {
+                    char *charValue = XMLString::transcode(slowOptimiserElement->getAttribute(maxDensityStr));
+                    minMaxStepAll[1][1] = mathUtils.strtodouble(string(charValue));
+                    XMLString::release(&charValue);
+                }
+                else
+                {
+                    minMaxStepAll[1][1] = 2;
+                }
+                XMLString::release(&maxDensityStr);
+                
+                XMLCh *densityStepStr = XMLString::transcode("densityStep");
+                if(slowOptimiserElement->hasAttribute(densityStepStr))
+                {
+                    char *charValue = XMLString::transcode(slowOptimiserElement->getAttribute(densityStepStr));
+                    minMaxStepAll[1][2] = mathUtils.strtodouble(string(charValue));
+                    XMLString::release(&charValue);
+                }
+                else
+                {
+                    minMaxStepAll[1][2] = 0.001;
+                }
+                XMLString::release(&densityStepStr);
+                
+                XMLCh *minDielectricStr = XMLString::transcode("minDielectric");
+                if(slowOptimiserElement->hasAttribute(minDielectricStr))
+                {
+                    char *charValue = XMLString::transcode(slowOptimiserElement->getAttribute(minDielectricStr));
+                    minMaxStepAll[2][0] = mathUtils.strtodouble(string(charValue));
+                    XMLString::release(&charValue);
+                }
+                else
+                {
+                    minMaxStepAll[2][0] = 10;
+                }
+                XMLString::release(&minDielectricStr);
+                
+                XMLCh *maxDielectricStr = XMLString::transcode("maxDielectric");
+                if(slowOptimiserElement->hasAttribute(maxDielectricStr))
+                {
+                    char *charValue = XMLString::transcode(slowOptimiserElement->getAttribute(maxDielectricStr));
+                    minMaxStepAll[2][1] = mathUtils.strtodouble(string(charValue));
+                    XMLString::release(&charValue);
+                }
+                else
+                {
+                    minMaxStepAll[2][1] = 60;
+                }
+                XMLString::release(&maxDielectricStr);
+                
+                XMLCh *dielectricStepStr = XMLString::transcode("dielectricStep");
+                if(slowOptimiserElement->hasAttribute(dielectricStepStr))
+                {
+                    char *charValue = XMLString::transcode(slowOptimiserElement->getAttribute(dielectricStepStr));
+                    minMaxStepAll[2][2] = mathUtils.strtodouble(string(charValue));
+                    XMLString::release(&charValue);
+                }
+                else
+                {
+                    minMaxStepAll[2][2] = 0.5;
+                }
+                XMLString::release(&dielectricStepStr);
+                
                 if(XMLString::equals(methodConjugateGradientWithRestarts, methodStr) | XMLString::equals(methodConjugateGradient, methodStr) | XMLString::equals(methodSimulatedAnnealing, methodStr) | XMLString::equals(methodSimulatedAnnealingAP, methodStr))
                 {
                     if (XMLString::equals(methodConjugateGradientWithRestarts, methodStr)) {cout << "\tUsing ConjugateGradient - with restarts" << endl;}
                     else if (XMLString::equals(methodConjugateGradient, methodStr)){cout << "\tUsing ConjugateGradient" << endl;}
                     else {cout << "\tUsing Simulated Annealing" << endl;}
-
+                    
                     // Maximum number of itterations
                     XMLCh *ittmaxStr = XMLString::transcode("ittmax");
                     if(slowOptimiserElement->hasAttribute(ittmaxStr))
@@ -4614,133 +4412,6 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
                         XMLString::release(&charValue);
                     }
                     XMLString::release(&targetErrorStr);
-
-                    /* Get minimum and maximum heights and density.
-                     * Setting these is optional and default values will be chosen with no message if
-                     * values are not set
-                     */
-
-					double **minMaxStepAll = new double*[3];
-                    minMaxStepAll[0] = new double[3];
-                    minMaxStepAll[1] = new double[3];
-                    minMaxStepAll[2] = new double[3];
-
-					XMLCh *minHeightStr = XMLString::transcode("minHeight");
-					if(slowOptimiserElement->hasAttribute(minHeightStr))
-					{
-						char *charValue = XMLString::transcode(slowOptimiserElement->getAttribute(minHeightStr));
-						minMaxStepAll[0][0] = mathUtils.strtodouble(string(charValue));
-						XMLString::release(&charValue);
-					}
-					else
-					{
-						minMaxStepAll[0][0] = 1;
-					}
-					XMLString::release(&minHeightStr);
-
-					XMLCh *maxHeightStr = XMLString::transcode("maxHeight");
-					if(slowOptimiserElement->hasAttribute(maxHeightStr))
-					{
-						char *charValue = XMLString::transcode(slowOptimiserElement->getAttribute(maxHeightStr));
-						minMaxStepAll[0][1] = mathUtils.strtodouble(string(charValue));
-						XMLString::release(&charValue);
-					}
-					else
-					{
-						minMaxStepAll[0][1] = 20;
-					}
-					XMLString::release(&maxHeightStr);
-
-					XMLCh *heightStepStr = XMLString::transcode("heightStep");
-					if(slowOptimiserElement->hasAttribute(heightStepStr))
-					{
-						char *charValue = XMLString::transcode(slowOptimiserElement->getAttribute(heightStepStr));
-						minMaxStepAll[0][2] = mathUtils.strtodouble(string(charValue));
-						XMLString::release(&charValue);
-					}
-					else
-					{
-						minMaxStepAll[0][2] = 0.01;
-					}
-					XMLString::release(&heightStepStr);
-
-					XMLCh *minDensityStr = XMLString::transcode("minDensity");
-					if(slowOptimiserElement->hasAttribute(minDensityStr))
-					{
-						char *charValue = XMLString::transcode(slowOptimiserElement->getAttribute(minDensityStr));
-						minMaxStepAll[1][0] = mathUtils.strtodouble(string(charValue));
-						XMLString::release(&charValue);
-					}
-					else
-					{
-						minMaxStepAll[1][0] = 0.1;
-					}
-					XMLString::release(&minDensityStr);
-
-					XMLCh *maxDensityStr = XMLString::transcode("maxDensity");
-					if(slowOptimiserElement->hasAttribute(maxDensityStr))
-					{
-						char *charValue = XMLString::transcode(slowOptimiserElement->getAttribute(maxDensityStr));
-						minMaxStepAll[1][1] = mathUtils.strtodouble(string(charValue));
-						XMLString::release(&charValue);
-					}
-					else
-					{
-						minMaxStepAll[1][1] = 2;
-					}
-					XMLString::release(&maxDensityStr);
-
-					XMLCh *densityStepStr = XMLString::transcode("densityStep");
-					if(slowOptimiserElement->hasAttribute(densityStepStr))
-					{
-						char *charValue = XMLString::transcode(slowOptimiserElement->getAttribute(densityStepStr));
-						minMaxStepAll[1][2] = mathUtils.strtodouble(string(charValue));
-						XMLString::release(&charValue);
-					}
-					else
-					{
-						minMaxStepAll[1][2] = 0.001;
-					}
-					XMLString::release(&densityStepStr);
-
-                    XMLCh *minDielectricStr = XMLString::transcode("minDielectric");
-                    if(slowOptimiserElement->hasAttribute(minDielectricStr))
-                    {
-                        char *charValue = XMLString::transcode(slowOptimiserElement->getAttribute(minDielectricStr));
-                        minMaxStepAll[2][0] = mathUtils.strtodouble(string(charValue));
-                        XMLString::release(&charValue);
-                    }
-                    else
-                    {
-                        minMaxStepAll[2][0] = 10;
-                    }
-                    XMLString::release(&minDielectricStr);
-
-                    XMLCh *maxDielectricStr = XMLString::transcode("maxDielectric");
-                    if(slowOptimiserElement->hasAttribute(maxDielectricStr))
-                    {
-                        char *charValue = XMLString::transcode(slowOptimiserElement->getAttribute(maxDielectricStr));
-                        minMaxStepAll[2][1] = mathUtils.strtodouble(string(charValue));
-                        XMLString::release(&charValue);
-                    }
-                    else
-                    {
-                        minMaxStepAll[2][1] = 60;
-                    }
-                    XMLString::release(&maxDielectricStr);
-
-                    XMLCh *dielectricStepStr = XMLString::transcode("dielectricStep");
-                    if(slowOptimiserElement->hasAttribute(dielectricStepStr))
-                    {
-                        char *charValue = XMLString::transcode(slowOptimiserElement->getAttribute(dielectricStepStr));
-                        minMaxStepAll[2][2] = mathUtils.strtodouble(string(charValue));
-                        XMLString::release(&charValue);
-                    }
-                    else
-                    {
-                        minMaxStepAll[2][2] = 0.5;
-                    }
-                    XMLString::release(&dielectricStepStr);
 
                     /******************************
                      * Set up covariance matrices *
@@ -4891,41 +4562,27 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
 
                     }
 
-                    // Set minimum and maximum values
-                    this->minMaxValuesClass[i] = new double*[3];
-                    this->minMaxValuesClass[i][0] = new double[2];
-                    this->minMaxValuesClass[i][1] = new double[2];
-                    this->minMaxValuesClass[i][2] = new double[2];
-
-                    this->minMaxValuesClass[i][0][0] = minMaxStepAll[0][0];
-                    this->minMaxValuesClass[i][0][1] = minMaxStepAll[0][1];
-                    this->minMaxValuesClass[i][1][0] = minMaxStepAll[1][0];
-                    this->minMaxValuesClass[i][1][1] = minMaxStepAll[1][1];
-                    this->minMaxValuesClass[i][2][0] = minMaxStepAll[2][0];
-                    this->minMaxValuesClass[i][2][1] = minMaxStepAll[2][1];
-
 
                 }
-
+                else if(XMLString::equals(methodNone,methodNone))
+                {
+                    cout << "\tUsing No optimiser (pixel based estimation)." << endl;
+                    this->estSlowOptimiserClass->push_back(new rsgis::radar::RSGISEstimationNoEstimation());
+                }
+				else if(XMLString::equals(methodAssignAP, methodStr))
+				{
+					throw RSGISXMLArgumentsException("The optimiser \"assignAP\" cannot be used at the object level");
+				}
                 else
                 {
                     throw RSGISXMLArgumentsException("Method for optimisation not recognised.");
                 }
-                XMLString::release(&methodConjugateGradient);
-                XMLString::release(&methodConjugateGradientWithRestarts);
-                XMLString::release(&methodSimulatedAnnealing);
-                XMLString::release(&methodSimulatedAnnealingAP);
 
 			}
 
 			// Loop through fast optimisers
 			for(unsigned int i = 0; i < fastOptimiserNodesList->getLength(); i++)
 			{
-                XMLCh *methodConjugateGradient = XMLString::transcode("conjugateGradient");
-                XMLCh *methodConjugateGradientWithRestarts = XMLString::transcode("conjugateGradientWithRestarts");
-                XMLCh *methodSimulatedAnnealing = XMLString::transcode("simulatedAnnealing");
-                XMLCh *methodSimulatedAnnealingAP = XMLString::transcode("simulatedAnnealingAP");
-                XMLCh *methodAssignAP = XMLString::transcode("assignAP");
 
                 fastOptimiserElement = static_cast<DOMElement*>(fastOptimiserNodesList->item(i));
                 const XMLCh *methodStr = fastOptimiserElement->getAttribute(XMLString::transcode("method"));
@@ -5050,9 +4707,146 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
                 }
 
 
-
-
-
+                /* Get minimum and maximum heights and density.
+                 * Setting these is optional and default values will be chosen with no message if
+                 * values are not set
+                 */
+                
+                double **minMaxStepAll = new double*[3];
+                minMaxStepAll[0] = new double[3];
+                minMaxStepAll[1] = new double[3];
+                minMaxStepAll[2] = new double[3];
+                
+                XMLCh *minHeightStr = XMLString::transcode("minHeight");
+                if(fastOptimiserElement->hasAttribute(minHeightStr))
+                {
+                    char *charValue = XMLString::transcode(fastOptimiserElement->getAttribute(minHeightStr));
+                    minMaxStepAll[0][0] = mathUtils.strtodouble(string(charValue));
+                    XMLString::release(&charValue);
+                }
+                else
+                {
+                    minMaxStepAll[0][0] = 1;
+                }
+                XMLString::release(&minHeightStr);
+                
+                XMLCh *maxHeightStr = XMLString::transcode("maxHeight");
+                if(fastOptimiserElement->hasAttribute(maxHeightStr))
+                {
+                    char *charValue = XMLString::transcode(fastOptimiserElement->getAttribute(maxHeightStr));
+                    minMaxStepAll[0][1] = mathUtils.strtodouble(string(charValue));
+                    XMLString::release(&charValue);
+                }
+                else
+                {
+                    minMaxStepAll[0][1] = 20;
+                }
+                XMLString::release(&maxHeightStr);
+                
+                XMLCh *heightStepStr = XMLString::transcode("heightStep");
+                if(fastOptimiserElement->hasAttribute(heightStepStr))
+                {
+                    char *charValue = XMLString::transcode(fastOptimiserElement->getAttribute(heightStepStr));
+                    minMaxStepAll[0][2] = mathUtils.strtodouble(string(charValue));
+                    XMLString::release(&charValue);
+                }
+                else
+                {
+                    minMaxStepAll[0][2] = 0.01;
+                }
+                XMLString::release(&heightStepStr);
+                
+                XMLCh *minDensityStr = XMLString::transcode("minDensity");
+                if(fastOptimiserElement->hasAttribute(minDensityStr))
+                {
+                    char *charValue = XMLString::transcode(fastOptimiserElement->getAttribute(minDensityStr));
+                    minMaxStepAll[1][0] = mathUtils.strtodouble(string(charValue));
+                    XMLString::release(&charValue);
+                }
+                else
+                {
+                    minMaxStepAll[1][0] = 0.1;
+                }
+                XMLString::release(&minDensityStr);
+                
+                XMLCh *maxDensityStr = XMLString::transcode("maxDensity");
+                if(fastOptimiserElement->hasAttribute(maxDensityStr))
+                {
+                    char *charValue = XMLString::transcode(fastOptimiserElement->getAttribute(maxDensityStr));
+                    minMaxStepAll[1][1] = mathUtils.strtodouble(string(charValue));
+                    XMLString::release(&charValue);
+                }
+                else
+                {
+                    minMaxStepAll[1][1] = 2;
+                }
+                XMLString::release(&maxDensityStr);
+                
+                XMLCh *densityStepStr = XMLString::transcode("densityStep");
+                if(fastOptimiserElement->hasAttribute(densityStepStr))
+                {
+                    char *charValue = XMLString::transcode(fastOptimiserElement->getAttribute(densityStepStr));
+                    minMaxStepAll[1][2] = mathUtils.strtodouble(string(charValue));
+                    XMLString::release(&charValue);
+                }
+                else
+                {
+                    minMaxStepAll[1][2] = 0.001;
+                }
+                XMLString::release(&densityStepStr);
+                
+                XMLCh *minDielectricStr = XMLString::transcode("minDielectric");
+                if(fastOptimiserElement->hasAttribute(minDielectricStr))
+                {
+                    char *charValue = XMLString::transcode(fastOptimiserElement->getAttribute(minDielectricStr));
+                    minMaxStepAll[2][0] = mathUtils.strtodouble(string(charValue));
+                    XMLString::release(&charValue);
+                }
+                else
+                {
+                    minMaxStepAll[2][0] = 1;
+                }
+                XMLString::release(&minDielectricStr);
+                
+                XMLCh *maxDielectricStr = XMLString::transcode("maxDielectric");
+                if(fastOptimiserElement->hasAttribute(maxDielectricStr))
+                {
+                    char *charValue = XMLString::transcode(fastOptimiserElement->getAttribute(maxDielectricStr));
+                    minMaxStepAll[2][1] = mathUtils.strtodouble(string(charValue));
+                    XMLString::release(&charValue);
+                }
+                else
+                {
+                    minMaxStepAll[2][1] = 60;
+                }
+                XMLString::release(&maxDielectricStr);
+                
+                XMLCh *dielectricStepStr = XMLString::transcode("dielectricStep");
+                if(fastOptimiserElement->hasAttribute(dielectricStepStr))
+                {
+                    char *charValue = XMLString::transcode(fastOptimiserElement->getAttribute(dielectricStepStr));
+                    minMaxStepAll[2][2] = mathUtils.strtodouble(string(charValue));
+                    XMLString::release(&charValue);
+                }
+                else
+                {
+                    minMaxStepAll[2][2] = 0.5;
+                }
+                XMLString::release(&dielectricStepStr);
+                
+                // Set minimum and maximum values
+                this->minMaxValuesClass[i] = new double*[3];
+                this->minMaxValuesClass[i][0] = new double[2];
+                this->minMaxValuesClass[i][1] = new double[2];
+                this->minMaxValuesClass[i][2] = new double[2];
+                
+                this->minMaxValuesClass[i][0][0] = minMaxStepAll[0][0];
+                this->minMaxValuesClass[i][0][1] = minMaxStepAll[0][1];
+                this->minMaxValuesClass[i][1][0] = minMaxStepAll[1][0];
+                this->minMaxValuesClass[i][1][1] = minMaxStepAll[1][1];
+                this->minMaxValuesClass[i][2][0] = minMaxStepAll[2][0];
+                this->minMaxValuesClass[i][2][1] = minMaxStepAll[2][1];
+                
                 /**************************************
                  * Get method to use for optimisation *
                  **************************************/
@@ -5099,132 +4893,6 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
                     }
                     XMLString::release(&targetErrorStr);
 
-                    /* Get minimum and maximum heights and density.
-                     * Setting these is optional and default values will be chosen with no message if
-                     * values are not set
-                     */
-
-					double **minMaxStepAll = new double*[3];
-                    minMaxStepAll[0] = new double[3];
-                    minMaxStepAll[1] = new double[3];
-                    minMaxStepAll[2] = new double[3];
-
-					XMLCh *minHeightStr = XMLString::transcode("minHeight");
-					if(fastOptimiserElement->hasAttribute(minHeightStr))
-					{
-						char *charValue = XMLString::transcode(fastOptimiserElement->getAttribute(minHeightStr));
-						minMaxStepAll[0][0] = mathUtils.strtodouble(string(charValue));
-						XMLString::release(&charValue);
-					}
-					else
-					{
-						minMaxStepAll[0][0] = 1;
-					}
-					XMLString::release(&minHeightStr);
-
-					XMLCh *maxHeightStr = XMLString::transcode("maxHeight");
-					if(fastOptimiserElement->hasAttribute(maxHeightStr))
-					{
-						char *charValue = XMLString::transcode(fastOptimiserElement->getAttribute(maxHeightStr));
-						minMaxStepAll[0][1] = mathUtils.strtodouble(string(charValue));
-						XMLString::release(&charValue);
-					}
-					else
-					{
-						minMaxStepAll[0][1] = 20;
-					}
-					XMLString::release(&maxHeightStr);
-
-					XMLCh *heightStepStr = XMLString::transcode("heightStep");
-					if(fastOptimiserElement->hasAttribute(heightStepStr))
-					{
-						char *charValue = XMLString::transcode(fastOptimiserElement->getAttribute(heightStepStr));
-						minMaxStepAll[0][2] = mathUtils.strtodouble(string(charValue));
-						XMLString::release(&charValue);
-					}
-					else
-					{
-						minMaxStepAll[0][2] = 0.01;
-					}
-					XMLString::release(&heightStepStr);
-
-					XMLCh *minDensityStr = XMLString::transcode("minDensity");
-					if(fastOptimiserElement->hasAttribute(minDensityStr))
-					{
-						char *charValue = XMLString::transcode(fastOptimiserElement->getAttribute(minDensityStr));
-						minMaxStepAll[1][0] = mathUtils.strtodouble(string(charValue));
-						XMLString::release(&charValue);
-					}
-					else
-					{
-						minMaxStepAll[1][0] = 0.1;
-					}
-					XMLString::release(&minDensityStr);
-
-					XMLCh *maxDensityStr = XMLString::transcode("maxDensity");
-					if(fastOptimiserElement->hasAttribute(maxDensityStr))
-					{
-						char *charValue = XMLString::transcode(fastOptimiserElement->getAttribute(maxDensityStr));
-						minMaxStepAll[1][1] = mathUtils.strtodouble(string(charValue));
-						XMLString::release(&charValue);
-					}
-					else
-					{
-						minMaxStepAll[1][1] = 2;
-					}
-					XMLString::release(&maxDensityStr);
-
-					XMLCh *densityStepStr = XMLString::transcode("densityStep");
-					if(fastOptimiserElement->hasAttribute(densityStepStr))
-					{
-						char *charValue = XMLString::transcode(fastOptimiserElement->getAttribute(densityStepStr));
-						minMaxStepAll[1][2] = mathUtils.strtodouble(string(charValue));
-						XMLString::release(&charValue);
-					}
-					else
-					{
-						minMaxStepAll[1][2] = 0.001;
-					}
-					XMLString::release(&densityStepStr);
-
-                    XMLCh *minDielectricStr = XMLString::transcode("minDielectric");
-                    if(fastOptimiserElement->hasAttribute(minDielectricStr))
-                    {
-                        char *charValue = XMLString::transcode(fastOptimiserElement->getAttribute(minDielectricStr));
-                        minMaxStepAll[2][0] = mathUtils.strtodouble(string(charValue));
-                        XMLString::release(&charValue);
-                    }
-                    else
-                    {
-                        minMaxStepAll[2][0] = 1;
-                    }
-                    XMLString::release(&minDielectricStr);
-
-                    XMLCh *maxDielectricStr = XMLString::transcode("maxDielectric");
-                    if(fastOptimiserElement->hasAttribute(maxDielectricStr))
-                    {
-                        char *charValue = XMLString::transcode(fastOptimiserElement->getAttribute(maxDielectricStr));
-                        minMaxStepAll[2][1] = mathUtils.strtodouble(string(charValue));
-                        XMLString::release(&charValue);
-                    }
-                    else
-                    {
-                        minMaxStepAll[2][1] = 60;
-                    }
-                    XMLString::release(&maxDielectricStr);
-
-                    XMLCh *dielectricStepStr = XMLString::transcode("dielectricStep");
-                    if(fastOptimiserElement->hasAttribute(dielectricStepStr))
-                    {
-                        char *charValue = XMLString::transcode(fastOptimiserElement->getAttribute(dielectricStepStr));
-                        minMaxStepAll[2][2] = mathUtils.strtodouble(string(charValue));
-                        XMLString::release(&charValue);
-                    }
-                    else
-                    {
-                        minMaxStepAll[2][2] = 0.5;
-                    }
-                    XMLString::release(&dielectricStepStr);
 
                     /******************************
                      * Set up covariance matrices *
@@ -5393,12 +5061,14 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
                 {
                     throw RSGISXMLArgumentsException("Method for optimisation not recognised.");
                 }
-                XMLString::release(&methodConjugateGradient);
-                XMLString::release(&methodConjugateGradientWithRestarts);
-                XMLString::release(&methodSimulatedAnnealing);
-                XMLString::release(&methodSimulatedAnnealingAP);
-                XMLString::release(&methodAssignAP);
 			}
+            
+            XMLString::release(&methodConjugateGradient);
+			XMLString::release(&methodConjugateGradientWithRestarts);
+			XMLString::release(&methodSimulatedAnnealing);
+			XMLString::release(&methodSimulatedAnnealingAP);
+			XMLString::release(&methodAssignAP);
+            XMLString::release(&methodNone);
 
         }
 		else

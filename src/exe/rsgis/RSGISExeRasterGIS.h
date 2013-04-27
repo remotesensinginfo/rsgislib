@@ -53,6 +53,9 @@
 #include "rastergis/RSGISClassMask.h"
 #include "rastergis/RSGISFindClumpNeighbours.h"
 #include "rastergis/RSGISClumpBorders.h"
+#include "rastergis/RSGISCalcClumpShapeParameters.h"
+#include "rastergis/RSGISDefineImageTiles.h"
+#include "rastergis/RSGISFindChangeClumps.h"
 
 #include "gdal_priv.h"
 #include "ogrsf_frmts.h"
@@ -61,7 +64,7 @@
 #include <xercesc/dom/DOM.hpp>
 #include <xercesc/util/XMLString.hpp>
 
-namespace rsgisexe{
+namespace rsgisexe{    
     
     class RSGISExeRasterGIS : public rsgis::RSGISAlgorithmParameters
     {
@@ -95,7 +98,12 @@ namespace rsgisexe{
             findneighbours,
             findboundarypixels,
             calcborderlength,
-            calcrelborder
+            calcrelborder,
+            calcshapeindices,
+            defineclumptileposition,
+            defineborderclumps,
+            populatestats,
+            findchangeclumpsfromstddev
         };
         
         RSGISExeRasterGIS();
@@ -137,6 +145,9 @@ namespace rsgisexe{
         std::string infoClassCol;
         std::string trainingSelectCol;
         std::string className;
+        std::string tileImage;
+        std::string maskImage;
+        std::string changeField;
         size_t fid;
         unsigned int nFeatures;
         float specDistThreshold;
@@ -159,6 +170,14 @@ namespace rsgisexe{
         std::vector<std::string> priorStrs;
         bool allowZeroPriors;
         bool ignoreZeroEdges;
+        std::vector<rsgis::rastergis::RSGISShapeParam*> *shapeIndexes;
+        unsigned int tileBoundary;
+        unsigned int tileOverlap;
+        unsigned int tileBody;
+        bool calcImgPyramids;
+        bool addColourTable2Img;
+        std::vector<rsgis::rastergis::RSGISClassChangeFields*> *classChangeField;
+        std::vector<std::string> *attFields;
     };
     
 }

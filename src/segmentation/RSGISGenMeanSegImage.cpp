@@ -406,7 +406,219 @@ namespace rsgis{namespace segment{
         delete clumpTab;
     }
     
+    void RSGISGenMeanSegImage::generateMeanImageUsingCalcImage(GDALDataset *spectral, GDALDataset *clumps, GDALDataset *meanImg) throw(rsgis::img::RSGISImageCalcException)
+    {
+        try
+        {
+            if((spectral->GetRasterXSize() != clumps->GetRasterXSize()) |
+               (spectral->GetRasterXSize() != meanImg->GetRasterXSize()))
+            {
+                throw rsgis::img::RSGISImageCalcException("Widths are not the same");
+            }
+            if((spectral->GetRasterYSize() != clumps->GetRasterYSize()) |
+               (spectral->GetRasterYSize() != meanImg->GetRasterYSize()))
+            {
+                throw rsgis::img::RSGISImageCalcException("Heights are not the same");
+            }
+            if(spectral->GetRasterCount() != meanImg->GetRasterCount())
+            {
+                throw rsgis::img::RSGISImageCalcException("The number of bands is not the same");
+            }
+            
+            GDALRasterBand *clumpsBand = clumps->GetRasterBand(1);
+            
+            std::cout << "Finding maximum image value\n";
+            double maxVal = 0;
+            clumpsBand->GetStatistics(false, true, NULL, &maxVal, NULL, NULL);
+            unsigned int maxClumpIdx = boost::lexical_cast<unsigned long>(maxVal);
+            
+            unsigned int numSpecBands = spectral->GetRasterCount();
+                        
+            std::vector<rsgis::img::ImgClumpMean*> *clumpTable = new std::vector<rsgis::img::ImgClumpMean*>();
+            clumpTable->reserve(maxClumpIdx);
+            
+            std::cout << "Build clump table\n";
+            rsgis::img::ImgClumpMean *cClump = NULL;
+            for(unsigned int i = 0; i < maxClumpIdx; ++i)
+            {
+                cClump = new rsgis::img::ImgClumpMean(i+1);
+                cClump->sumVals = new float[numSpecBands];
+                cClump->meanVals = new float[numSpecBands];
+                cClump->numPxls = 0;
+                for(unsigned int n = 0; n < numSpecBands; ++n)
+                {
+                    cClump->sumVals[n] = 0;
+                    cClump->meanVals[n] = 0;
+                }
+                clumpTable->push_back(cClump);
+            }
+            
+            std::cout << "Creating Look up table.\n";
+            RSGISPopulateMeans *createLookUp = new RSGISPopulateMeans(clumpTable, numSpecBands, maxClumpIdx);
+            rsgis::img::RSGISCalcImage calcImgCreateLoopUp = rsgis::img::RSGISCalcImage(createLookUp);
+            GDALDataset **datasets = new GDALDataset*[2];
+            datasets[0] = clumps;
+            datasets[1] = spectral;
+            calcImgCreateLoopUp.calcImage(datasets, 2);
+            delete createLookUp;
+            
+            
+            
+            //for(unsigned int i = 0; i < maxClumpIdx; ++i)
+            for(std::vector<rsgis::img::ImgClumpMean*>::iterator iterClump = clumpTable->begin(); iterClump != clumpTable->end(); ++iterClump)
+            {
+                for(unsigned int n = 0; n < numSpecBands; ++n)
+                {
+                    (*iterClump)->meanVals[n] = (*iterClump)->sumVals[n]/(*iterClump)->numPxls;
+                }
+            }
+            
+            std::cout << "Applying Look up table.\n";
+            RSGISApplyMeans2Output *applyMeansLookUp = new RSGISApplyMeans2Output(clumpTable, numSpecBands, maxClumpIdx);
+            rsgis::img::RSGISCalcImage calcImgApplyLookUp = rsgis::img::RSGISCalcImage(applyMeansLookUp);
+            calcImgApplyLookUp.calcImage(datasets, 2, meanImg);
+            delete applyMeansLookUp;
+            delete[] datasets;
+            
+            for(std::vector<rsgis::img::ImgClumpMean*>::iterator iterClump = clumpTable->begin(); iterClump != clumpTable->end(); ++iterClump)
+            {
+                delete[] (*iterClump)->meanVals;
+                delete[] (*iterClump)->sumVals;
+                delete (*iterClump);
+            }
+            delete clumpTable;
+            
+        }
+        catch(rsgis::img::RSGISImageCalcException &e)
+        {
+            throw e;
+        }
+        catch (rsgis::RSGISException &e)
+        {
+            throw rsgis::img::RSGISImageCalcException(e.what());
+        }
+        catch (std::exception &e)
+        {
+            throw rsgis::img::RSGISImageCalcException(e.what());
+        }
+    }
+    
+    
     RSGISGenMeanSegImage::~RSGISGenMeanSegImage()
+    {
+        
+    }
+    
+    
+    RSGISPopulateMeans::RSGISPopulateMeans(std::vector<rsgis::img::ImgClumpMean*> *clumpTable, unsigned int numSpecBands, unsigned int numClumps):rsgis::img::RSGISCalcImageValue(0)
+    {
+        this->clumpTable = clumpTable;
+        this->numSpecBands = numSpecBands;
+        this->numClumps = numClumps;
+    }
+    
+    void RSGISPopulateMeans::calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException)
+    {
+        try
+        {
+            if((bandValues[0] > 0) & (bandValues[0] < numClumps))
+            {
+                size_t fid = boost::lexical_cast<size_t>(bandValues[0]);
+                rsgis::img::ImgClumpMean *cClump = clumpTable->at(fid - 1);
+                for(unsigned int n = 0; n < numSpecBands; ++n)
+                {
+                    cClump->sumVals[n] += bandValues[n+1];
+                }
+                ++cClump->numPxls;
+            }
+        }
+        catch(boost::numeric::negative_overflow& e)
+        {
+            //std::cout << "bandValues[0] = " << bandValues[0] << std::endl;
+            throw rsgis::img::RSGISImageCalcException(e.what());
+        }
+        catch(boost::numeric::positive_overflow& e)
+        {
+            //std::cout << "bandValues[0] = " << bandValues[0] << std::endl;
+            throw rsgis::img::RSGISImageCalcException(e.what());
+        }
+        catch(boost::numeric::bad_numeric_cast& e)
+        {
+            //std::cout << "bandValues[0] = " << bandValues[0] << std::endl;
+            throw rsgis::img::RSGISImageCalcException(e.what());
+        }
+        catch(rsgis::img::RSGISImageCalcException &e)
+        {
+            throw e;
+        }
+        catch(rsgis::RSGISException &e)
+        {
+            throw rsgis::img::RSGISImageCalcException(e.what());
+        }
+        catch(std::exception &e)
+        {
+            throw rsgis::img::RSGISImageCalcException(e.what());
+        }
+    }
+    
+    RSGISPopulateMeans::~RSGISPopulateMeans()
+    {
+        
+    }
+    
+    
+    RSGISApplyMeans2Output::RSGISApplyMeans2Output(std::vector<rsgis::img::ImgClumpMean*> *clumpTable, unsigned int numSpecBands, unsigned int numClumps):rsgis::img::RSGISCalcImageValue(numSpecBands)
+    {
+        this->clumpTable = clumpTable;
+        this->numSpecBands = numSpecBands;
+        this->numClumps = numClumps;
+    }
+    
+    void RSGISApplyMeans2Output::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
+    {
+        try
+        {
+            if((bandValues[0] > 0) & (bandValues[0] < numClumps))
+            {
+                size_t fid = boost::lexical_cast<size_t>(bandValues[0]);
+                
+                rsgis::img::ImgClumpMean *cClump = clumpTable->at(fid - 1);
+                for(unsigned int n = 0; n < numSpecBands; ++n)
+                {
+                    output[n] = cClump->meanVals[n];
+                }
+            }
+        }
+        catch(boost::numeric::negative_overflow& e)
+        {
+            //std::cout << "bandValues[0] = " << bandValues[0] << std::endl;
+            throw rsgis::img::RSGISImageCalcException(e.what());
+        }
+        catch(boost::numeric::positive_overflow& e)
+        {
+            //std::cout << "bandValues[0] = " << bandValues[0] << std::endl;
+            throw rsgis::img::RSGISImageCalcException(e.what());
+        }
+        catch(boost::numeric::bad_numeric_cast& e)
+        {
+            //std::cout << "bandValues[0] = " << bandValues[0] << std::endl;
+            throw rsgis::img::RSGISImageCalcException(e.what());
+        }
+        catch(rsgis::img::RSGISImageCalcException &e)
+        {
+            throw e;
+        }
+        catch(rsgis::RSGISException &e)
+        {
+            throw rsgis::img::RSGISImageCalcException(e.what());
+        }
+        catch(std::exception &e)
+        {
+            throw rsgis::img::RSGISImageCalcException(e.what());
+        }
+    }
+    
+    RSGISApplyMeans2Output::~RSGISApplyMeans2Output()
     {
         
     }

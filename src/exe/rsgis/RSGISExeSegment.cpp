@@ -67,6 +67,9 @@ void RSGISExeSegment::retrieveParameters(xercesc::DOMElement *argElement) throw(
     XMLCh *optionStepwiseElimination = xercesc::XMLString::transcode("stepwiseelimination");
     XMLCh *optionElimSinglePxls = xercesc::XMLString::transcode("elimsinglepxls");
     XMLCh *optionUnionSegments = xercesc::XMLString::transcode("unionsegments");
+    XMLCh *optionMergeClumpTiles = xercesc::XMLString::transcode("mergeclumptiles");
+    XMLCh *optionFindTileBordersMask = xercesc::XMLString::transcode("findtilebordersmask");
+    XMLCh *optionMergeClumpImages = xercesc::XMLString::transcode("mergeclumpimages");
     
     XMLCh *projImage = xercesc::XMLString::transcode("IMAGE");
 	XMLCh *projOSGB = xercesc::XMLString::transcode("OSGB");
@@ -3225,6 +3228,275 @@ void RSGISExeSegment::retrieveParameters(xercesc::DOMElement *argElement) throw(
 		}
         xercesc::XMLString::release(&rsgisImageXMLStr);
     }
+    else if(xercesc::XMLString::equals(optionMergeClumpTiles, optionXML))
+    {
+        this->option = RSGISExeSegment::mergeclumptiles;
+        
+		XMLCh *outputXMLStr = xercesc::XMLString::transcode("output");
+		if(argElement->hasAttribute(outputXMLStr))
+		{
+			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outputXMLStr));
+			this->outputImage = std::string(charValue);
+			xercesc::XMLString::release(&charValue);
+		}
+		else
+		{
+			throw rsgis::RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+		}
+		xercesc::XMLString::release(&outputXMLStr);
+        
+        
+        XMLCh *borderMaskXMLStr = xercesc::XMLString::transcode("bordermask");
+		if(argElement->hasAttribute(borderMaskXMLStr))
+		{
+			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(borderMaskXMLStr));
+			this->borderMaskImage = std::string(charValue);
+			xercesc::XMLString::release(&charValue);
+		}
+		else
+		{
+			throw rsgis::RSGISXMLArgumentsException("No \'bordermask\' attribute was provided.");
+		}
+		xercesc::XMLString::release(&borderMaskXMLStr);
+        
+        XMLCh *colNameXMLStr = xercesc::XMLString::transcode("colname");
+        if(argElement->hasAttribute(colNameXMLStr))
+        {
+            char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(colNameXMLStr));
+            this->colsName = std::string(charValue);
+            xercesc::XMLString::release(&charValue);
+        }
+        else
+        {
+            throw rsgis::RSGISXMLArgumentsException("No \'colname\' attribute was provided.");
+        }
+        xercesc::XMLString::release(&colNameXMLStr);
+        
+        XMLCh *overlapXMLStr = xercesc::XMLString::transcode("overlap");
+        if(argElement->hasAttribute(overlapXMLStr))
+        {
+            char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(overlapXMLStr));
+            this->tileOverlap = mathUtils.strtounsignedint(std::string(charValue));
+            xercesc::XMLString::release(&charValue);
+        }
+        else
+        {
+            throw rsgis::RSGISXMLArgumentsException("No \'overlap\' attribute was provided.");
+        }
+        xercesc::XMLString::release(&overlapXMLStr);
+        
+        
+        XMLCh *boundaryXMLStr = xercesc::XMLString::transcode("boundary");
+        if(argElement->hasAttribute(boundaryXMLStr))
+        {
+            char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(boundaryXMLStr));
+            this->tileBoundary = mathUtils.strtounsignedint(std::string(charValue));
+            xercesc::XMLString::release(&charValue);
+        }
+        else
+        {
+            throw rsgis::RSGISXMLArgumentsException("No \'boundary\' attribute was provided.");
+        }
+        xercesc::XMLString::release(&boundaryXMLStr);
+        
+        
+        XMLCh *bodyXMLStr = xercesc::XMLString::transcode("body");
+        if(argElement->hasAttribute(bodyXMLStr))
+        {
+            char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(bodyXMLStr));
+            this->tileBody = mathUtils.strtounsignedint(std::string(charValue));
+            xercesc::XMLString::release(&charValue);
+        }
+        else
+        {
+            throw rsgis::RSGISXMLArgumentsException("No \'body\' attribute was provided.");
+        }
+        xercesc::XMLString::release(&bodyXMLStr);
+        
+        XMLCh *rsgisImageXMLStr = xercesc::XMLString::transcode("rsgis:image");
+        xercesc::DOMNodeList *imageNodesList = argElement->getElementsByTagName(rsgisImageXMLStr);
+		unsigned int numImages = imageNodesList->getLength();
+		if(numImages > 0)
+		{
+            inputImagePaths.reserve(numImages);
+			xercesc::DOMElement *imageElement = NULL;
+            
+			for(unsigned int i = 0; i < numImages; i++)
+			{
+				imageElement = static_cast<xercesc::DOMElement*>(imageNodesList->item(i));
+				
+				XMLCh *fileXMLStr = xercesc::XMLString::transcode("clumps");
+				if(imageElement->hasAttribute(fileXMLStr))
+				{
+					char *charValue = xercesc::XMLString::transcode(imageElement->getAttribute(fileXMLStr));
+					inputImagePaths.push_back(std::string(charValue));
+					xercesc::XMLString::release(&charValue);
+				}
+				else
+				{
+					throw rsgis::RSGISXMLArgumentsException("No \'clumps\' attribute was provided for seed.");
+				}
+				xercesc::XMLString::release(&fileXMLStr);
+			}
+		}
+		else
+		{
+			throw rsgis::RSGISXMLArgumentsException("No attributes \'rsgis:image\' tags were provided.");
+		}
+        xercesc::XMLString::release(&rsgisImageXMLStr);
+    }
+    else if(xercesc::XMLString::equals(optionFindTileBordersMask, optionXML))
+    {
+        this->option = RSGISExeSegment::findtilebordersmask;
+        
+        XMLCh *borderMaskXMLStr = xercesc::XMLString::transcode("bordermask");
+		if(argElement->hasAttribute(borderMaskXMLStr))
+		{
+			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(borderMaskXMLStr));
+			this->borderMaskImage = std::string(charValue);
+			xercesc::XMLString::release(&charValue);
+		}
+		else
+		{
+			throw rsgis::RSGISXMLArgumentsException("No \'bordermask\' attribute was provided.");
+		}
+		xercesc::XMLString::release(&borderMaskXMLStr);
+        
+        XMLCh *colNameXMLStr = xercesc::XMLString::transcode("colname");
+        if(argElement->hasAttribute(colNameXMLStr))
+        {
+            char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(colNameXMLStr));
+            this->colsName = std::string(charValue);
+            xercesc::XMLString::release(&charValue);
+        }
+        else
+        {
+            throw rsgis::RSGISXMLArgumentsException("No \'colname\' attribute was provided.");
+        }
+        xercesc::XMLString::release(&colNameXMLStr);
+        
+        XMLCh *overlapXMLStr = xercesc::XMLString::transcode("overlap");
+        if(argElement->hasAttribute(overlapXMLStr))
+        {
+            char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(overlapXMLStr));
+            this->tileOverlap = mathUtils.strtounsignedint(std::string(charValue));
+            xercesc::XMLString::release(&charValue);
+        }
+        else
+        {
+            throw rsgis::RSGISXMLArgumentsException("No \'overlap\' attribute was provided.");
+        }
+        xercesc::XMLString::release(&overlapXMLStr);
+        
+        
+        XMLCh *boundaryXMLStr = xercesc::XMLString::transcode("boundary");
+        if(argElement->hasAttribute(boundaryXMLStr))
+        {
+            char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(boundaryXMLStr));
+            this->tileBoundary = mathUtils.strtounsignedint(std::string(charValue));
+            xercesc::XMLString::release(&charValue);
+        }
+        else
+        {
+            throw rsgis::RSGISXMLArgumentsException("No \'boundary\' attribute was provided.");
+        }
+        xercesc::XMLString::release(&boundaryXMLStr);
+        
+        
+        XMLCh *bodyXMLStr = xercesc::XMLString::transcode("body");
+        if(argElement->hasAttribute(bodyXMLStr))
+        {
+            char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(bodyXMLStr));
+            this->tileBody = mathUtils.strtounsignedint(std::string(charValue));
+            xercesc::XMLString::release(&charValue);
+        }
+        else
+        {
+            throw rsgis::RSGISXMLArgumentsException("No \'body\' attribute was provided.");
+        }
+        xercesc::XMLString::release(&bodyXMLStr);
+        
+        XMLCh *rsgisImageXMLStr = xercesc::XMLString::transcode("rsgis:image");
+        xercesc::DOMNodeList *imageNodesList = argElement->getElementsByTagName(rsgisImageXMLStr);
+		unsigned int numImages = imageNodesList->getLength();
+		if(numImages > 0)
+		{
+            inputImagePaths.reserve(numImages);
+			xercesc::DOMElement *imageElement = NULL;
+            
+			for(unsigned int i = 0; i < numImages; i++)
+			{
+				imageElement = static_cast<xercesc::DOMElement*>(imageNodesList->item(i));
+				
+				XMLCh *fileXMLStr = xercesc::XMLString::transcode("clumps");
+				if(imageElement->hasAttribute(fileXMLStr))
+				{
+					char *charValue = xercesc::XMLString::transcode(imageElement->getAttribute(fileXMLStr));
+					inputImagePaths.push_back(std::string(charValue));
+					xercesc::XMLString::release(&charValue);
+				}
+				else
+				{
+					throw rsgis::RSGISXMLArgumentsException("No \'clumps\' attribute was provided for seed.");
+				}
+				xercesc::XMLString::release(&fileXMLStr);
+			}
+		}
+		else
+		{
+			throw rsgis::RSGISXMLArgumentsException("No attributes \'rsgis:image\' tags were provided.");
+		}
+        xercesc::XMLString::release(&rsgisImageXMLStr);
+    }
+    else if(xercesc::XMLString::equals(optionMergeClumpImages, optionXML))
+    {
+        this->option = RSGISExeSegment::mergeclumpimages;
+        
+		XMLCh *outputXMLStr = xercesc::XMLString::transcode("output");
+		if(argElement->hasAttribute(outputXMLStr))
+		{
+			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outputXMLStr));
+			this->outputImage = std::string(charValue);
+			xercesc::XMLString::release(&charValue);
+		}
+		else
+		{
+			throw rsgis::RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+		}
+		xercesc::XMLString::release(&outputXMLStr);
+        
+        XMLCh *rsgisImageXMLStr = xercesc::XMLString::transcode("rsgis:image");
+        xercesc::DOMNodeList *imageNodesList = argElement->getElementsByTagName(rsgisImageXMLStr);
+		unsigned int numImages = imageNodesList->getLength();
+		if(numImages > 0)
+		{
+            inputImagePaths.reserve(numImages);
+			xercesc::DOMElement *imageElement = NULL;
+            
+			for(unsigned int i = 0; i < numImages; i++)
+			{
+				imageElement = static_cast<xercesc::DOMElement*>(imageNodesList->item(i));
+				
+				XMLCh *fileXMLStr = xercesc::XMLString::transcode("clumps");
+				if(imageElement->hasAttribute(fileXMLStr))
+				{
+					char *charValue = xercesc::XMLString::transcode(imageElement->getAttribute(fileXMLStr));
+					inputImagePaths.push_back(std::string(charValue));
+					xercesc::XMLString::release(&charValue);
+				}
+				else
+				{
+					throw rsgis::RSGISXMLArgumentsException("No \'clumps\' attribute was provided for seed.");
+				}
+				xercesc::XMLString::release(&fileXMLStr);
+			}
+		}
+		else
+		{
+			throw rsgis::RSGISXMLArgumentsException("No attributes \'rsgis:image\' tags were provided.");
+		}
+        xercesc::XMLString::release(&rsgisImageXMLStr);
+    }
     else
     {
         std::string message = std::string("The option (") + std::string(xercesc::XMLString::transcode(optionXML)) + std::string(") is not known: RSGISExeSegment.");
@@ -3257,6 +3529,9 @@ void RSGISExeSegment::retrieveParameters(xercesc::DOMElement *argElement) throw(
     xercesc::XMLString::release(&optionStepwiseElimination);
     xercesc::XMLString::release(&optionElimSinglePxls);
     xercesc::XMLString::release(&optionUnionSegments);
+    xercesc::XMLString::release(&optionMergeClumpTiles);
+    xercesc::XMLString::release(&optionFindTileBordersMask);
+    xercesc::XMLString::release(&optionMergeClumpImages);
     
     xercesc::XMLString::release(&projImage);
 	xercesc::XMLString::release(&projOSGB);
@@ -3443,7 +3718,8 @@ void RSGISExeSegment::runAlgorithm() throw(rsgis::RSGISException)
             
             std::cout << "Calculating Mean Image\n";
             rsgis::segment::RSGISGenMeanSegImage genMeanImg;
-            genMeanImg.generateMeanImageUsingClumpTable(spectralDataset, clumpsDataset, resultDataset);
+            //genMeanImg.generateMeanImageUsingClumpTable(spectralDataset, clumpsDataset, resultDataset);
+            genMeanImg.generateMeanImageUsingCalcImage(spectralDataset, clumpsDataset, resultDataset);
             
             if(this->processInMemory)
             {
@@ -3529,6 +3805,8 @@ void RSGISExeSegment::runAlgorithm() throw(rsgis::RSGISException)
                 GDALClose(spectralDataset);
                 GDALClose(clumpsDataset);
             }
+            
+            resultDataset->GetRasterBand(1)->SetMetadataItem("LAYER_TYPE", "thematic");
             
             // Tidy up
             GDALClose(inDataset);
@@ -4314,6 +4592,8 @@ void RSGISExeSegment::runAlgorithm() throw(rsgis::RSGISException)
                 GDALClose(clumpsDataset);
             }
             
+            resultDataset->GetRasterBand(1)->SetMetadataItem("LAYER_TYPE", "thematic");
+            
             // Tidy up
             GDALClose(inDataset);
             GDALClose(inClumpDataset);
@@ -4363,7 +4643,8 @@ void RSGISExeSegment::runAlgorithm() throw(rsgis::RSGISException)
             
             std::cout << "Performing relabel\n";
             rsgis::segment::RSGISRelabelClumps relabelImg;
-            relabelImg.relabelClumps(catagoryDataset, resultDataset);
+            //relabelImg.relabelClumps(catagoryDataset, resultDataset);
+            relabelImg.relabelClumpsCalcImg(catagoryDataset, resultDataset);
             
             if(this->processInMemory)
             {
@@ -4373,6 +4654,8 @@ void RSGISExeSegment::runAlgorithm() throw(rsgis::RSGISException)
                 GDALClose(outDataset);
                 GDALClose(catagoryDataset);
             }
+            
+            resultDataset->GetRasterBand(1)->SetMetadataItem("LAYER_TYPE", "thematic");
             
             // Tidy up
             GDALClose(inDataset);
@@ -4803,7 +5086,7 @@ void RSGISExeSegment::runAlgorithm() throw(rsgis::RSGISException)
             
             std::cout << "Eliminating Individual Pixels\n";
             rsgis::segment::RSGISEliminateSinglePixels eliminate;
-            eliminate.eliminate(spectralDataset, clumpsDataset, pixelMaskDataset, this->outputImage, 0, this->ignoreZeros, this->projFromImage, this->proj, this->imageFormat);
+            eliminate.eliminateBlocks(spectralDataset, clumpsDataset, pixelMaskDataset, this->outputImage, 0, this->ignoreZeros, this->projFromImage, this->proj, this->imageFormat);
             
             clumpsDataset->GetRasterBand(1)->SetMetadataItem("LAYER_TYPE", "thematic");
             
@@ -4862,6 +5145,126 @@ void RSGISExeSegment::runAlgorithm() throw(rsgis::RSGISException)
             }
             delete images;
             
+        }
+        catch (rsgis::RSGISException &e)
+        {
+            throw e;
+        }
+    }
+    else if(option == RSGISExeSegment::mergeclumptiles)
+    {
+        std::cout << "A command to merge tiles of image clumps into an existing image file.\n";
+        std::cout << "Output File: " << this->outputImage << std::endl;
+        std::cout << "Border Mask File: " << this->borderMaskImage << std::endl;
+        std::cout << "Tile Info Column: " << this->colsName << std::endl;
+        std::cout << "Tile Overlap: " << this->tileOverlap << std::endl;
+        std::cout << "Tile Boundary: " << this->tileBoundary << std::endl;
+        std::cout << "Tile Body: " << this->tileBody << std::endl;
+        std::cout << "Input Clump Images: \n";
+        for(std::vector<std::string>::iterator iterFiles = inputImagePaths.begin(); iterFiles != inputImagePaths.end(); ++iterFiles)
+        {
+            std::cout << "\t" << *iterFiles << std::endl;
+        }
+        
+        try
+        {
+            GDALAllRegister();
+            
+            GDALDataset *outputDataset = (GDALDataset *) GDALOpen(this->outputImage.c_str(), GA_Update);
+            if(outputDataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + this->outputImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            GDALDataset *borderMaskDataset = (GDALDataset *) GDALOpen(this->borderMaskImage.c_str(), GA_Update);
+            if(borderMaskDataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + this->borderMaskImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            std::cout << "Running Merge\n";
+            rsgis::segment::RSGISMergeSegmentationTiles mergeSegmentTiles;
+            mergeSegmentTiles.mergeClumpBodies(outputDataset, borderMaskDataset, this->inputImagePaths, this->tileBoundary, this->tileOverlap, this->tileBody, this->colsName);
+            
+            outputDataset->GetRasterBand(1)->SetMetadataItem("LAYER_TYPE", "thematic");
+            borderMaskDataset->GetRasterBand(1)->SetMetadataItem("LAYER_TYPE", "thematic");
+            
+            GDALClose(outputDataset);
+            GDALClose(borderMaskDataset);
+        }
+        catch (rsgis::RSGISException &e)
+        {
+            throw e;
+        }
+    }
+    else if(option == RSGISExeSegment::findtilebordersmask)
+    {
+        std::cout << "A command to create mask of the border clumps from the segmented tiles.\n";
+        std::cout << "Border Mask File: " << this->borderMaskImage << std::endl;
+        std::cout << "Tile Info Column: " << this->colsName << std::endl;
+        std::cout << "Tile Overlap: " << this->tileOverlap << std::endl;
+        std::cout << "Tile Boundary: " << this->tileBoundary << std::endl;
+        std::cout << "Tile Body: " << this->tileBody << std::endl;
+        std::cout << "Input Clump Images: \n";
+        for(std::vector<std::string>::iterator iterFiles = inputImagePaths.begin(); iterFiles != inputImagePaths.end(); ++iterFiles)
+        {
+            std::cout << "\t" << *iterFiles << std::endl;
+        }
+        
+        try
+        {
+            GDALAllRegister();
+            
+            GDALDataset *borderMaskDataset = (GDALDataset *) GDALOpen(this->borderMaskImage.c_str(), GA_Update);
+            if(borderMaskDataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + this->borderMaskImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            std::cout << "Generating the border mask.\n";
+            rsgis::segment::RSGISMergeSegmentationTiles mergeSegmentTiles;
+            mergeSegmentTiles.createTileBorderClumpMask(borderMaskDataset, this->inputImagePaths, this->tileBoundary, this->tileOverlap, this->tileBody, this->colsName);
+            
+            borderMaskDataset->GetRasterBand(1)->SetMetadataItem("LAYER_TYPE", "thematic");
+            
+            GDALClose(borderMaskDataset);
+        }
+        catch (rsgis::RSGISException &e)
+        {
+            throw e;
+        }
+    }
+    else if(option == RSGISExeSegment::mergeclumpimages)
+    {
+        std::cout << "A command to merge clump images into an exiting clump image.\n";
+        std::cout << "Output File: " << this->outputImage << std::endl;
+        std::cout << "Input Clump Images: \n";
+        for(std::vector<std::string>::iterator iterFiles = inputImagePaths.begin(); iterFiles != inputImagePaths.end(); ++iterFiles)
+        {
+            std::cout << "\t" << *iterFiles << std::endl;
+        }
+        
+        try
+        {
+            GDALAllRegister();
+            
+            GDALDataset *outputDataset = (GDALDataset *) GDALOpen(this->outputImage.c_str(), GA_Update);
+            if(outputDataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + this->outputImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            std::cout << "Running Merge\n";
+            rsgis::segment::RSGISMergeSegmentationTiles mergeSegmentTiles;
+            mergeSegmentTiles.mergeClumpImages(outputDataset, this->inputImagePaths);
+            
+            outputDataset->GetRasterBand(1)->SetMetadataItem("LAYER_TYPE", "thematic");
+            
+            GDALClose(outputDataset);
         }
         catch (rsgis::RSGISException &e)
         {
@@ -5192,6 +5595,20 @@ void RSGISExeSegment::printParameters()
             std::cout << "A no data value was not provided\n";
         }
         std::cout << "Input Images: \n";
+        for(std::vector<std::string>::iterator iterFiles = inputImagePaths.begin(); iterFiles != inputImagePaths.end(); ++iterFiles)
+        {
+            std::cout << "\t" << *iterFiles << std::endl;
+        }
+    }
+    else if(option == RSGISExeSegment::mergeclumptiles)
+    {
+        std::cout << "A command to merge tiles of image clumps into an existing image file.\n";
+        std::cout << "Output File: " << this->outputImage << std::endl;
+        std::cout << "Tile Info Column: " << this->colsName << std::endl;
+        std::cout << "Tile Overlap: " << this->tileOverlap << std::endl;
+        std::cout << "Tile Boundary: " << this->tileBoundary << std::endl;
+        std::cout << "Tile Body: " << this->tileBody << std::endl;
+        std::cout << "Input Clump Images: \n";
         for(std::vector<std::string>::iterator iterFiles = inputImagePaths.begin(); iterFiles != inputImagePaths.end(); ++iterFiles)
         {
             std::cout << "\t" << *iterFiles << std::endl;

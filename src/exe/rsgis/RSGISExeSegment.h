@@ -48,6 +48,7 @@
 #include "segmentation/RSGISRegionGrowSegmentsPixels.h"
 #include "segmentation/RSGISDefineSpectralDivision.h"
 #include "segmentation/RSGISEliminateSinglePixels.h"
+#include "segmentation/RSGISMergeSegmentationTiles.h"
 
 #include "rastergis/RSGISAttributeTable.h"
 #include "rastergis/RSGISCreateNewAttributeTable.h"
@@ -90,7 +91,10 @@ namespace rsgisexe{
             spectraldiv,
             stepwiseelimination,
             elimsinglepxls,
-            unionsegments
+            unionsegments,
+            mergeclumptiles,
+            findtilebordersmask,
+            mergeclumpimages
 		};
 		RSGISExeSegment();
 		virtual rsgis::RSGISAlgorithmParameters* getInstance();
@@ -107,6 +111,7 @@ namespace rsgisexe{
         std::string clumpsImage;
         std::string largeClumpsImage;
 		std::string outputImage;
+        std::string borderMaskImage;
         std::string imageFormat;
         std::string outputTextFile;
         std::string seedsTextFile;
@@ -141,6 +146,10 @@ namespace rsgisexe{
         std::string exportLUTFile;
         bool exportLUT;
         bool storeMean;
+        unsigned int tileBoundary;
+        unsigned int tileOverlap;
+        unsigned int tileBody;
+        std::string colsName;
 	};
 }
 #endif

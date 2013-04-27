@@ -32,6 +32,9 @@
 #include "img/RSGISImageCalcException.h"
 #include "math/RSGISMathsUtils.h"
 
+#include "img/RSGISCalcImageValue.h"
+#include "img/RSGISCalcImage.h"
+
 #include "gdal_priv.h"
 #include "ogrsf_frmts.h"
 #include "ogr_api.h"
@@ -43,12 +46,57 @@ namespace rsgis{namespace segment{
     public:
         RSGISEliminateSinglePixels();
         void eliminate(GDALDataset *inSpecData, GDALDataset *inClumpsData, GDALDataset *tmpData, std::string outputImage, float noDataVal, bool noDataValProvided, bool projFromImage, std::string proj, std::string format)throw(rsgis::img::RSGISImageCalcException);
+        void eliminateBlocks(GDALDataset *inSpecData, GDALDataset *inClumpsData, GDALDataset *tmpData, std::string outputImage, float noDataVal, bool noDataValProvided, bool projFromImage, std::string proj, std::string format)throw(rsgis::img::RSGISImageCalcException);
         ~RSGISEliminateSinglePixels();
     private:
         unsigned long findSinglePixels(GDALDataset *inClumpsData, GDALDataset *tmpData, float noDataVal, bool noDataValProvided) throw(rsgis::img::RSGISImageCalcException);
         bool eliminateSinglePixels(GDALDataset *inSpecData, GDALDataset *inClumpsData, GDALDataset *tmpData, GDALDataset *outDataset, float noDataVal, bool noDataValProvided) throw(rsgis::img::RSGISImageCalcException);
         inline float eucDistance(float **vals1, float **vals2, unsigned int numBands, unsigned int col1, unsigned int col2);
     };
+    
+    
+    
+    class RSGISFindSinglePixels : public rsgis::img::RSGISCalcImageValue
+	{
+	public:
+		RSGISFindSinglePixels(float noDataVal, bool noDataValProvided);
+		void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+		void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+		void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+		void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+		void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException);
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+		bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+		void resetCount(){this->numSingles = 0;};
+        unsigned long getCount(){return this->numSingles;};
+        ~RSGISFindSinglePixels();
+    protected:
+        float noDataVal;
+        bool noDataValProvided;
+        unsigned long numSingles;
+	};
+    
+    
+    class RSGISElimSinglePixelsCalcImg : public rsgis::img::RSGISCalcImageValue
+	{
+	public:
+		RSGISElimSinglePixelsCalcImg(float noDataVal, bool noDataValProvided);
+		void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+		void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+		void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+		void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+		void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException);
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+		bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+		void resetChangeOccured(){this->hasChangeOccured = false;};
+        bool getChangeOccured(){return this->hasChangeOccured;};
+        ~RSGISElimSinglePixelsCalcImg();
+    protected:
+        bool hasChangeOccured;
+        float noDataVal;
+        bool noDataValProvided;
+        inline float eucDistance(float *vals1, float *vals2, unsigned int numBands);
+	};
     
 }}
 

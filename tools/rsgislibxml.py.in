@@ -68,11 +68,11 @@ class RSGISLibXML (object):
                         if(self.checkFileExtension(filename, extension)):
                             filelist.append(os.path.join(directory,filename))
                     else:
-                        print filename + ' is NOT a file or directory!'
+                        print(filename + ' is NOT a file or directory!')
             else:
-                print directory + ' is not a directory!'
+                print(directory + ' is not a directory!')
         else:
-            print directory + ' does not exist!'
+            print(directory + ' does not exist!')
 
 
     def findFiles(self, filelist, directory, extension):
@@ -81,16 +81,16 @@ class RSGISLibXML (object):
                 dirFileList = os.listdir(directory)
                 for filename in dirFileList:
                     if(os.path.isdir(os.path.join(directory,filename))):
-                        print os.path.join(directory,filename) + ' is a directory and therefore ignored!'
+                        print(os.path.join(directory,filename) + ' is a directory and therefore ignored!')
                     elif(os.path.isfile(os.path.join(directory,filename))):
                         if(self.checkFileExtension(filename, extension)):
                             filelist.append(os.path.join(directory,filename))
                     else:
-                        print filename + ' is NOT a file or directory!'
+                        print(filename + ' is NOT a file or directory!')
             else:
-                print directory + ' is not a directory!'
+                print(directory + ' is not a directory!')
         else:
-            print directory + ' does not exist!'
+            print(directory + ' does not exist!')
 
     def readInputTemplate(self, inputFile):
         xmloutline = str()
@@ -180,28 +180,28 @@ class RSGISLibXML (object):
         args = parser.parse_args()    
 
         if args.xmloutlineFile is None:
-            print "Input XML template must be set."
+            print("Input XML template must be set.")
             parser.print_help()
             sys.exit()
             
         if args.outfile is None:
-            print "Output XML must be set."
+            print("Output XML must be set.")
             parser.print_help()
             sys.exit()
 
         if args.extension is None:
-            print "Extension must be set."
+            print("Extension must be set.")
             parser.print_help()
             sys.exit()
         
         if args.dir is None:
-            print "Directory must be set."
+            print("Directory must be set.")
             parser.print_help()
             sys.exit()
         
         if args.path is None:
-            print "WARNING: No path set, assuming the same as search directory:"
-            print args.dir
+            print("WARNING: No path set, assuming the same as search directory:")
+            print(args.dir)
             args.path = args.dir
         
         filelist = list()
@@ -218,32 +218,32 @@ class RSGISLibXML (object):
                 if os.path.splitext(args.outfile)[1] != '.xml':
                     args.outfile = args.outfile + '.xml'
                 self.constructXMLFile(filelist, xmloutline, args.outfile, args.path)
-                print 'Commands written to single XML file'
-                print 'Run using:\n rsgisexe -x ' + args.outfile
+                print('Commands written to single XML file')
+                print('Run using:\n rsgisexe -x ' + args.outfile)
             elif args.outputtype == 'multiple':
                 # Get rid of .xml extension if provided for outfile
                 args.outfile = args.outfile.replace('.xml','')
                 self.constructMultipleXMLFiles(filelist, xmloutline, args.outfile, args.path)
-                print 'Commands written to multiple XML files and shell script generated'
-                print 'Run using:\n sh ' + args.outfile + '_exe_all.sh'
+                print('Commands written to multiple XML files and shell script generated')
+                print('Run using:\n sh ' + args.outfile + '_exe_all.sh')
 
         else:
-            print 'Input File does not exist'
+            print('Input File does not exist')
 
 
     def scriptInfo(self):
-        print 'rsgislibxml.py script generates the XML commands for the '
-        print '@PACKAGE@ software library from a user defined template'
-        print ''
-        print 'This script was distributed with @RSGISLIB_PACKAGE_STRING@'
-        print 'Copyright (C) @RSGISLIB_COPYRIGHT_YEAR@ Peter Bunting and Daniel Clewley'
-        print 'For maintainance email @RSGISLIB_PACKAGE_BUGREPORT@'
-        print ''
-        print 'Within XML Template (--input):'
-        print '\t$FILEPATH - Replaced with full file path'
-        print '\t$FILENAME - Replaced with file name'
-        print '\t$PATH - Replaced with path (--path)'
-        print ''
+        print('rsgislibxml.py script generates the XML commands for the ')
+        print('@PACKAGE@ software library from a user defined template')
+        print('')
+        print('This script was distributed with @RSGISLIB_PACKAGE_STRING@')
+        print('Copyright (C) @RSGISLIB_COPYRIGHT_YEAR@ Peter Bunting and Daniel Clewley')
+        print('For maintainance email @RSGISLIB_PACKAGE_BUGREPORT@')
+        print('')
+        print('Within XML Template (--input):')
+        print('\t$FILEPATH - Replaced with full file path')
+        print('\t$FILENAME - Replaced with file name')
+        print('\t$PATH - Replaced with path (--path)')
+        print('')
 
 if __name__ == '__main__':
     obj = RSGISLibXML()

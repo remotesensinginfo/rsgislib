@@ -202,13 +202,13 @@ namespace rsgis{namespace radar{
         /** Intended to be used within object based estimation as the slow optimiser, 
             so the estimation is run on a pixel only basis */
     public:
-        RSGISEstimationNoEstimation();
+        RSGISEstimationNoEstimation(){};
         int minimise(gsl_vector *inData, gsl_vector *initialPar, gsl_vector *outParError){return -999;};
         virtual void modifyAPriori(gsl_vector *newAPrioriPar){};
         virtual estOptimizerType getOptimiserType(){return rsgis::radar::noOptimiser;};
         virtual void printOptimiser(){std::cout << "No Optimiser" << std::endl;};
         double calcLeastSquares(std::vector<double> *values);
-        ~RSGISEstimationNoEstimation();
+        ~RSGISEstimationNoEstimation(){};
     };
 
 }}
