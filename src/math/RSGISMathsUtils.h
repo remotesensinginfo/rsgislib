@@ -118,6 +118,7 @@ namespace rsgis{namespace math{
 			Matrix* calculateCumulativeArea(Matrix *inData, Matrix *widths);
             void fitPlane(double *x, double *y, double *z, unsigned int numValues, double *a, double *b, double *c) throw(RSGISMathException);
             void generateStats(std::vector<double> *data, RSGISStatsSummary *stats) throw(RSGISMathException);
+            void initStatsSummary(RSGISStatsSummary *stats);
 		};
 	
 }}

@@ -586,7 +586,178 @@ namespace rsgis{namespace segment{
         delete[] clumpIdxs;
     }
     
+    void RSGISRelabelClumps::relabelClumpsCalcImg(GDALDataset *catagories, GDALDataset *clumps) throw(rsgis::img::RSGISImageCalcException)
+    {
+        try
+        {
+            if(catagories->GetRasterXSize() != clumps->GetRasterXSize())
+            {
+                throw rsgis::img::RSGISImageCalcException("Widths are not the same");
+            }
+            if(catagories->GetRasterYSize() != clumps->GetRasterYSize())
+            {
+                throw rsgis::img::RSGISImageCalcException("Heights are not the same");
+            }
+            
+            GDALRasterBand *catagoryBand = catagories->GetRasterBand(1);
+            
+            std::cout << "Finding maximum image value\n";
+            double maxVal = 0;
+            catagoryBand->GetStatistics(false, true, NULL, &maxVal, NULL, NULL);
+            unsigned int maxClumpIdx = boost::lexical_cast<unsigned long>(maxVal);
+            
+            unsigned int *clumpIdxLookUp = new unsigned int[maxClumpIdx];
+            for(unsigned int i = 0; i < maxClumpIdx; ++i)
+            {
+                clumpIdxLookUp[i] = 0;
+            }
+            
+            std::cout << "Creating Look up table.\n";
+            RSGISCreateRelabelLookupTable *createLookUp = new RSGISCreateRelabelLookupTable(clumpIdxLookUp, maxClumpIdx);
+            rsgis::img::RSGISCalcImage calcImgCreateLoopUp = rsgis::img::RSGISCalcImage(createLookUp);
+            calcImgCreateLoopUp.calcImage(&catagories, 1);
+            delete createLookUp;
+            
+            
+            std::cout << "Applying Look up table.\n";
+            RSGISApplyRelabelLookupTable *applyLookUp = new RSGISApplyRelabelLookupTable(clumpIdxLookUp, maxClumpIdx);
+            rsgis::img::RSGISCalcImage calcImgApplyLookUp = rsgis::img::RSGISCalcImage(applyLookUp);
+            calcImgApplyLookUp.calcImage(&catagories, 1, clumps);
+            delete applyLookUp;
+            
+            delete[] clumpIdxLookUp;
+            
+        }
+        catch(rsgis::img::RSGISImageCalcException &e)
+        {
+            throw e;
+        }
+        catch (rsgis::RSGISException &e)
+        {
+            throw rsgis::img::RSGISImageCalcException(e.what());
+        }
+        catch (std::exception &e)
+        {
+            throw rsgis::img::RSGISImageCalcException(e.what());
+        }
+    }
+    
     RSGISRelabelClumps::~RSGISRelabelClumps()
+    {
+        
+    }
+    
+    
+    
+
+    RSGISCreateRelabelLookupTable::RSGISCreateRelabelLookupTable(unsigned int *clumpIdxLookUp, unsigned int numVals):rsgis::img::RSGISCalcImageValue(0)
+    {
+        this->clumpIdxLookUp = clumpIdxLookUp;
+        this->numVals = numVals;
+        this->nextVal = 1;
+    }
+
+    void RSGISCreateRelabelLookupTable::calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException)
+    {
+        try
+        {
+            if((bandValues[0] > 0) & (bandValues[0] < numVals))
+            {
+                size_t fid = boost::lexical_cast<size_t>(bandValues[0]);
+                
+                if(clumpIdxLookUp[fid] == 0)
+                {
+                    clumpIdxLookUp[fid] = this->nextVal++;
+                }
+            }
+        }
+        catch(boost::numeric::negative_overflow& e)
+        {
+            //std::cout << "bandValues[0] = " << bandValues[0] << std::endl;
+            throw rsgis::img::RSGISImageCalcException(e.what());
+        }
+        catch(boost::numeric::positive_overflow& e)
+        {
+            //std::cout << "bandValues[0] = " << bandValues[0] << std::endl;
+            throw rsgis::img::RSGISImageCalcException(e.what());
+        }
+        catch(boost::numeric::bad_numeric_cast& e)
+        {
+            //std::cout << "bandValues[0] = " << bandValues[0] << std::endl;
+            throw rsgis::img::RSGISImageCalcException(e.what());
+        }
+        catch(rsgis::img::RSGISImageCalcException &e)
+        {
+            throw e;
+        }
+        catch(rsgis::RSGISException &e)
+        {
+            throw rsgis::img::RSGISImageCalcException(e.what());
+        }
+        catch(std::exception &e)
+        {
+            throw rsgis::img::RSGISImageCalcException(e.what());
+        }
+    }
+    
+    RSGISCreateRelabelLookupTable::~RSGISCreateRelabelLookupTable()
+    {
+        
+    }
+
+    
+    
+    RSGISApplyRelabelLookupTable::RSGISApplyRelabelLookupTable(unsigned int *clumpIdxLookUp, unsigned int numVals): rsgis::img::RSGISCalcImageValue(1)
+    {
+        this->clumpIdxLookUp = clumpIdxLookUp;
+        this->numVals = numVals;
+    }
+		
+    void RSGISApplyRelabelLookupTable::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
+    {
+        try
+        {
+            if((bandValues[0] > 0) & (bandValues[0] < numVals))
+            {
+                size_t fid = boost::lexical_cast<size_t>(bandValues[0]);
+                
+                output[0] = clumpIdxLookUp[fid];
+            }
+            else
+            {
+                output[0] = 0;
+            }
+        }
+        catch(boost::numeric::negative_overflow& e)
+        {
+            //std::cout << "bandValues[0] = " << bandValues[0] << std::endl;
+            throw rsgis::img::RSGISImageCalcException(e.what());
+        }
+        catch(boost::numeric::positive_overflow& e)
+        {
+            //std::cout << "bandValues[0] = " << bandValues[0] << std::endl;
+            throw rsgis::img::RSGISImageCalcException(e.what());
+        }
+        catch(boost::numeric::bad_numeric_cast& e)
+        {
+            //std::cout << "bandValues[0] = " << bandValues[0] << std::endl;
+            throw rsgis::img::RSGISImageCalcException(e.what());
+        }
+        catch(rsgis::img::RSGISImageCalcException &e)
+        {
+            throw e;
+        }
+        catch(rsgis::RSGISException &e)
+        {
+            throw rsgis::img::RSGISImageCalcException(e.what());
+        }
+        catch(std::exception &e)
+        {
+            throw rsgis::img::RSGISImageCalcException(e.what());
+        }
+    }
+    
+    RSGISApplyRelabelLookupTable::~RSGISApplyRelabelLookupTable()
     {
         
     }

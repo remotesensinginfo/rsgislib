@@ -57,7 +57,10 @@ namespace rsgis{namespace segment{
         unsigned long clumpIdx = 0;
         unsigned int uiPxlVal = 0;
         
-        unsigned long maxClumpIdx = 0;
+        double maxVal = 0;
+        clumpBand->GetStatistics(false, true, NULL, &maxVal, NULL, NULL);
+        unsigned long maxClumpIdx = boost::lexical_cast<unsigned long>(maxVal);
+        /*
         for(unsigned int i = 0; i < height; ++i)
         {
             for(unsigned int j = 0; j < width; ++j)
@@ -73,6 +76,7 @@ namespace rsgis{namespace segment{
                 }
             }
         }
+         */
         std::vector<rsgis::img::ImgClump*> *clumpTable = new std::vector<rsgis::img::ImgClump*>();
         clumpTable->reserve(maxClumpIdx);
         std::deque<rsgis::img::ImgClump*> smallClumps;
@@ -325,21 +329,23 @@ namespace rsgis{namespace segment{
             }
         }
         
-        unsigned int *clumpIdxs = new unsigned int[width];
-        float **spectralVals = new float*[numSpecBands];
-        GDALRasterBand **spectralBands = new GDALRasterBand*[numSpecBands];
-        for(unsigned int n = 0; n < numSpecBands; ++n)
-        {
-            spectralBands[n] = spectral->GetRasterBand(n+1);
-            spectralVals[n] = new float[width];
-        }
+        //unsigned int *clumpIdxs = new unsigned int[width];
+        //float **spectralVals = new float*[numSpecBands];
+        //GDALRasterBand **spectralBands = new GDALRasterBand*[numSpecBands];
+        //for(unsigned int n = 0; n < numSpecBands; ++n)
+        //{
+        //    spectralBands[n] = spectral->GetRasterBand(n+1);
+        //    spectralVals[n] = new float[width];
+        //}
         GDALRasterBand *clumpBand = clumps->GetRasterBand(1);
         
         unsigned int uiPxlVal = 0;
         
         std::cout << "Calc Number of clumps\n";
-        unsigned long maxClumpIdx = 0;
-        for(unsigned int i = 0; i < height; ++i)
+        double maxVal = 0;
+        clumpBand->GetStatistics(false, true, NULL, &maxVal, NULL, NULL);
+        unsigned long maxClumpIdx = boost::lexical_cast<unsigned long>(maxVal);
+        /*for(unsigned int i = 0; i < height; ++i)
         {
             clumpBand->RasterIO(GF_Read, 0, i, width, 1, clumpIdxs, width, 1, GDT_UInt32, 0, 0);
             for(unsigned int j = 0; j < width; ++j)
@@ -353,7 +359,7 @@ namespace rsgis{namespace segment{
                     maxClumpIdx = clumpIdxs[j];
                 }
             }
-        }
+        }*/
         std::vector<rsgis::img::ImgClump*> *clumpTable = new std::vector<rsgis::img::ImgClump*>();
         clumpTable->reserve(maxClumpIdx);
         
@@ -379,6 +385,7 @@ namespace rsgis{namespace segment{
         std::vector< std::pair<rsgis::img::ImgClump*, rsgis::img::ImgClump*> > mergeLookupTab;
         
         std::cout << "Calculate Initial Clump Means\n";
+        /*
         for(unsigned int i = 0; i < height; ++i)
         {
             clumpBand->RasterIO(GF_Read, 0, i, width, 1, clumpIdxs, width, 1, GDT_UInt32, 0, 0);
@@ -399,6 +406,17 @@ namespace rsgis{namespace segment{
                 }
             }
         }
+        */
+        
+        RSGISPopulateMeansPxlLocs *calcMeans = new RSGISPopulateMeansPxlLocs(clumpTable, numSpecBands);
+        rsgis::img::RSGISCalcImage calcImg = rsgis::img::RSGISCalcImage(calcMeans);
+        
+        GDALDataset **datasets = new  GDALDataset*[2];
+        datasets[0] = clumps;
+        datasets[1] = spectral;
+        calcImg.calcImagePosPxl(datasets, 2);
+        delete[] datasets;
+        delete calcMeans;
         
         for(std::vector<rsgis::img::ImgClump*>::iterator iterClumps = clumpTable->begin(); iterClumps != clumpTable->end(); ++iterClumps)
         {
@@ -604,14 +622,14 @@ namespace rsgis{namespace segment{
             delete[] stretch2reflGains;
         }
         
-        delete[] spectralBands;
+        //delete[] spectralBands;
         
-        delete[] clumpIdxs;
-        for(unsigned int n = 0; n < numSpecBands; ++n)
-        {
-            delete[] spectralVals[n];
-        }
-        delete[] spectralVals;
+        //delete[] clumpIdxs;
+        //for(unsigned int n = 0; n < numSpecBands; ++n)
+        //{
+        //    delete[] spectralVals[n];
+        //}
+        //delete[] spectralVals;
     }
     
     void RSGISEliminateSmallClumps::stepwiseEliminateSmallClumpsNoMean(GDALDataset *spectral, GDALDataset *clumps, unsigned int minClumpSize, float specThreshold, std::vector<rsgis::img::BandSpecThresholdStats> *bandStretchStats, bool bandStatsAvail) throw(rsgis::img::RSGISImageCalcException)
@@ -642,7 +660,10 @@ namespace rsgis{namespace segment{
         unsigned int uiPxlVal = 0;
         
         std::cout << "Calc Number of clumps\n";
-        unsigned long maxClumpIdx = 0;
+        double maxVal = 0;
+        clumpBand->GetStatistics(false, true, NULL, &maxVal, NULL, NULL);
+        unsigned long maxClumpIdx = boost::lexical_cast<unsigned long>(maxVal);
+        /*
         for(unsigned int i = 0; i < height; ++i)
         {
             clumpBand->RasterIO(GF_Read, 0, i, width, 1, clumpIdxs, width, 1, GDT_UInt32, 0, 0);
@@ -657,7 +678,7 @@ namespace rsgis{namespace segment{
                     maxClumpIdx = clumpIdxs[j];
                 }
             }
-        }
+        */
         rsgis::img::ImgClumpSum **clumpTable = new rsgis::img::ImgClumpSum*[maxClumpIdx];
         
         std::cout << "Build clump table\n";
@@ -1467,6 +1488,69 @@ namespace rsgis{namespace segment{
     {
         
     }
+    
+    
+
+    RSGISPopulateMeansPxlLocs::RSGISPopulateMeansPxlLocs(std::vector<rsgis::img::ImgClump*> *clumpTable, unsigned int numSpecBands):rsgis::img::RSGISCalcImageValue(0)
+    {
+        this->clumpTable = clumpTable;
+        this->numSpecBands = numSpecBands;
+    }
+    
+    void RSGISPopulateMeansPxlLocs::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException)
+    {
+        try
+        {            
+            if(bandValues[0] > 0)
+            {
+                size_t fid = boost::lexical_cast<size_t>(bandValues[0]);                
+                
+                rsgis::img::ImgClump *cClump = clumpTable->at(fid - 1);
+                for(unsigned int n = 0; n < numSpecBands; ++n)
+                {
+                    cClump->sumVals[n] += bandValues[n+1];
+                }
+                
+                unsigned int xPos = boost::lexical_cast<unsigned int>(extent.getMinX());
+                unsigned int yPos = boost::lexical_cast<unsigned int>(extent.getMinY());
+                
+                cClump->pxls->push_back(rsgis::img::PxlLoc(xPos, yPos));
+            }
+        }
+        catch(boost::numeric::negative_overflow& e)
+        {
+            //std::cout << "bandValues[0] = " << bandValues[0] << std::endl;
+            throw rsgis::img::RSGISImageCalcException(e.what());
+        }
+        catch(boost::numeric::positive_overflow& e)
+        {
+            //std::cout << "bandValues[0] = " << bandValues[0] << std::endl;
+            throw rsgis::img::RSGISImageCalcException(e.what());
+        }
+        catch(boost::numeric::bad_numeric_cast& e)
+        {
+            //std::cout << "bandValues[0] = " << bandValues[0] << std::endl;
+            throw rsgis::img::RSGISImageCalcException(e.what());
+        }
+        catch(rsgis::img::RSGISImageCalcException &e)
+        {
+            throw e;
+        }
+        catch(rsgis::RSGISException &e)
+        {
+            throw rsgis::img::RSGISImageCalcException(e.what());
+        }
+        catch(std::exception &e)
+        {
+            throw rsgis::img::RSGISImageCalcException(e.what());
+        }
+    }
+
+    RSGISPopulateMeansPxlLocs::~RSGISPopulateMeansPxlLocs()
+    {
+        
+    }
+
     
 }}
 

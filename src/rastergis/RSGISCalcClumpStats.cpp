@@ -769,6 +769,191 @@ namespace rsgis{namespace rastergis{
         
     }
     
+    
+    
+    
+    
+    RSGISPopulateWithImageStats::RSGISPopulateWithImageStats()
+    {
+        
+    }
+    
+    void RSGISPopulateWithImageStats::populateImageWithRasterGISStats(GDALDataset *clumpsDataset, bool addColourTable, bool calcImagePyramids) throw(rsgis::RSGISImageException)
+    {
+        try
+        {
+            rsgis::utils::RSGISTextUtils txtUtils;
+            RSGISRasterAttUtils attUtils;
+            
+            GDALRasterBand *band = clumpsDataset->GetRasterBand(1);
+            
+            double max = 0;
+            double min = 0;
+            
+            std::cout << "Get Image Min and Max.\n";
+            band->ComputeStatistics(false, &min, &max, NULL, NULL, StatsTextProgress, NULL);
+            
+            if(min < 0)
+            {
+                throw rsgis::RSGISImageException("The minimum value is less than zero.");
+            }
+            
+            unsigned int maxHistVal = ceil(max);
+            unsigned int *histo = new unsigned int[maxHistVal];
+            
+            for(unsigned int i = 0; i < maxHistVal; ++i)
+            {
+                histo[i] = 0;
+            }
+            
+            std::cout << "Get Image Histogram.\n";
+            RSGISGetClumpsHistogram *calcImgHisto = new RSGISGetClumpsHistogram(histo, maxHistVal);
+            rsgis::img::RSGISCalcImage calcImageStats(calcImgHisto);
+            calcImageStats.calcImage(&clumpsDataset, 1);
+            delete calcImgHisto;
+            
+            const GDALRasterAttributeTable *attTableTmp = band->GetDefaultRAT();
+            GDALRasterAttributeTable *attTable = NULL;
+            if(attTableTmp != NULL)
+            {
+                attTable = new GDALRasterAttributeTable(*attTableTmp);
+            }
+            else
+            {
+                attTable = new GDALRasterAttributeTable();
+            }
+            attTable->SetRowCount(maxHistVal);
+            
+            band->SetMetadataItem("STATISTICS_HISTOBINFUNCTION", "direct");
+            band->SetMetadataItem("STATISTICS_HISTOMIN", "0");
+            band->SetMetadataItem("STATISTICS_HISTOMAX", txtUtils.int64bittostring(maxHistVal).c_str());
+            band->SetMetadataItem("STATISTICS_HISTONUMBINS", txtUtils.int64bittostring(maxHistVal).c_str());
+            
+            unsigned int histoColIdx = attUtils.findColumnIndexOrCreate(attTable, "Histogram", GFT_Integer);
+            
+            std::string histoVals = "";
+            for(unsigned int i = 0; i < maxHistVal; ++i)
+            {
+                if(i == 0)
+                {
+                    histoVals = txtUtils.int64bittostring(histo[i]);
+                }
+                else
+                {
+                    histoVals += std::string("|") + txtUtils.int64bittostring(histo[i]);
+                }
+                
+                attTable->SetValue(i, histoColIdx, (int)histo[i]);
+            }
+            
+            band->SetMetadataItem("STATISTICS_HISTOBINVALUES", histoVals.c_str());
+            
+            if(addColourTable)
+            {
+                std::cout << "Adding a colour table.\n";
+                GDALColorTable *clrTab = new GDALColorTable();
+                GDALColorEntry *clrEntry = new GDALColorEntry();
+                srand(time(NULL));
+                for(unsigned int i = 0; i < maxHistVal; ++i)
+                {
+                    if(i == 0)
+                    {
+                        clrEntry->c1 = 0;
+                        clrEntry->c2 = 0;
+                        clrEntry->c3 = 0;
+                        clrEntry->c4 = 255;
+                    }
+                    else
+                    {
+                        clrEntry->c1 = rand() % 255 + 1;
+                        clrEntry->c2 = rand() % 255 + 1;
+                        clrEntry->c3 = rand() % 255 + 1;
+                        clrEntry->c4 = 255;
+                    }
+                    clrTab->SetColorEntry(i, clrEntry);
+                }
+                band->SetColorTable(clrTab);
+                delete clrTab;
+            }
+            
+            std::cout << "Writing RAT to file.\n";
+            band->SetDefaultRAT(attTable);
+            delete attTable;
+            
+            if(calcImagePyramids)
+            {
+                std::cout << "Calculating Image Pyramids.\n";
+                int nLevels[] = { 4, 8, 16, 32, 64, 128, 256, 512 };
+                int nOverviews = 0;
+                int mindim = 0;
+                const char *pszType = "NEAREST";
+                
+                /* first we work out how many overviews to build based on the size */
+                if(clumpsDataset->GetRasterXSize() < clumpsDataset->GetRasterYSize())
+                {
+                    mindim = clumpsDataset->GetRasterXSize();
+                }
+                else
+                {
+                    mindim = clumpsDataset->GetRasterYSize();
+                }
+                
+                nOverviews = 0;
+                for(int i = 0; i < 8; i++)
+                {
+                    if( (mindim/nLevels[i]) > 33 )
+                    {
+                        ++nOverviews;
+                    }
+                }
+                
+                clumpsDataset->BuildOverviews(pszType, nOverviews, nLevels, 0, NULL, StatsTextProgress, NULL);
+            }
+                        
+            delete[] histo;
+        }
+        catch(rsgis::RSGISImageException &e)
+        {
+            throw e;
+        }
+        catch(rsgis::RSGISException &e)
+        {
+            throw rsgis::RSGISImageException(e.what());
+        }
+        catch(std::exception &e)
+        {
+            throw rsgis::RSGISImageException(e.what());
+        }
+    }
+    
+    RSGISPopulateWithImageStats::~RSGISPopulateWithImageStats()
+    {
+        
+    }
+    
+    
+    
+    RSGISGetClumpsHistogram::RSGISGetClumpsHistogram(unsigned int *histogram, unsigned int maxVal):rsgis::img::RSGISCalcImageValue(0)
+    {
+        this->histogram = histogram;
+        this->maxVal = maxVal;
+    }
+
+    void RSGISGetClumpsHistogram::calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException)
+    {
+        if((bandValues[0] > 0) & (bandValues[0] < maxVal))
+        {
+            size_t fid = boost::lexical_cast<size_t>(bandValues[0]);
+            ++histogram[fid];
+        }
+    }
+    
+    RSGISGetClumpsHistogram::~RSGISGetClumpsHistogram()
+    {
+        
+    }
+    
+    
 	
 }}
 

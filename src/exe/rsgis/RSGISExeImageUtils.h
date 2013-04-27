@@ -69,6 +69,7 @@
 #include "img/RSGISRelabelPixelValuesFromLUT.h"
 #include "img/RSGISPopWithStats.h"
 #include "img/RSGISGenAccuracyPoints.h"
+#include "img/RSGISSampleImage.h"
 
 
 #include "vec/RSGISImageTileVector.h"
@@ -143,7 +144,9 @@ class RSGISExeImageUtils : public RSGISAlgorithmParameters
             subset2img,
             defineimgtiles,
             gentilemasks,
-            cutouttile
+            cutouttile,
+            stretchwithstats,
+            subsampleimage
 		};
 
 		enum interpolators
@@ -186,6 +189,7 @@ class RSGISExeImageUtils : public RSGISAlgorithmParameters
 		string inputVector;
         string inputCSV;
         string inputDEM;
+        string inputFile;
 		string outputFile;
 		string filenameAttribute;
 		string imageMask;
@@ -273,6 +277,8 @@ class RSGISExeImageUtils : public RSGISAlgorithmParameters
         float overlap;
         bool createAnOverlap;
         bool growOverlap;
+        bool offsetTiling;
+        unsigned int imageSample;
 	};
 }
 #endif

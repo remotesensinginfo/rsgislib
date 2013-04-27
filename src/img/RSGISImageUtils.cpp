@@ -151,8 +151,8 @@ namespace rsgis{namespace img{
 			gdalTransform[4] = rotateY;
 			gdalTransform[5] = pixelYRes;
             
-			*width = floor(((maxX - minX)/pixelXRes));
-			*height = floor(((maxY - minY)/pixelYResPos));
+			*width = floor(((maxX - minX)/pixelXRes)+0.5);
+			*height = floor(((maxY - minY)/pixelYResPos)+0.5);
 			
 			double diffX = 0;
 			double diffY = 0;
@@ -344,8 +344,8 @@ namespace rsgis{namespace img{
 			gdalTransform[4] = rotateY;
 			gdalTransform[5] = pixelYRes;
             
-			*width = floor(((maxX - minX)/pixelXRes));
-			*height = floor(((maxY - minY)/pixelYResPos));
+			*width = floor(((maxX - minX)/pixelXRes)+0.5);
+			*height = floor(((maxY - minY)/pixelYResPos)+0.5);
 			
 			double diffX = 0;
 			double diffY = 0;
@@ -552,8 +552,8 @@ namespace rsgis{namespace img{
 			gdalTransform[4] = rotateY;
 			gdalTransform[5] = pixelYRes;
             
-			*width = floor(((maxX - minX)/pixelXRes));
-			*height = floor(((maxY - minY)/pixelYResPos));
+			*width = floor(((maxX - minX)/pixelXRes)+0.5);
+			*height = floor(((maxY - minY)/pixelYResPos)+0.5);
 			
 			double diffX = 0;
 			double diffY = 0;
@@ -761,8 +761,8 @@ namespace rsgis{namespace img{
 			gdalTransform[4] = rotateY;
 			gdalTransform[5] = pixelYRes;
             
-			*width = floor(((maxX - minX)/pixelXRes));
-			*height = floor(((maxY - minY)/pixelYResPos));
+			*width = floor(((maxX - minX)/pixelXRes)+0.5);
+			*height = floor(((maxY - minY)/pixelYResPos)+0.5);
 			
 			double diffX = 0;
 			double diffY = 0;
@@ -1011,8 +1011,8 @@ namespace rsgis{namespace img{
 				gdalTransform[4] = rotateY;
 				gdalTransform[5] = pixelYRes;
 				
-				*width = floor(((maxX - minX)/pixelXRes));
-				*height = floor(((maxY - minY)/pixelYResPos));
+				*width = floor(((maxX - minX)/pixelXRes)+0.5);
+				*height = floor(((maxY - minY)/pixelYResPos)+0.5);
 				
 				double diffX = 0;
 				double diffY = 0;
@@ -1065,8 +1065,8 @@ namespace rsgis{namespace img{
                     gdalTransform[4] = rotateY;
                     gdalTransform[5] = pixelYRes;
                     
-                    *width = floor(((maxX - minX)/pixelXRes));
-                    *height = floor(((maxY - minY)/pixelYResPos));
+                    *width = floor(((maxX - minX)/pixelXRes)+0.5);
+                    *height = floor(((maxY - minY)/pixelYResPos)+0.5);
                     
                     double diffX = 0;
                     double diffY = 0;
@@ -1298,8 +1298,8 @@ namespace rsgis{namespace img{
 			gdalTransform[4] = rotateY;
 			gdalTransform[5] = pixelYRes;
 			
-			*width = floor(((maxX - minX)/pixelXRes));
-			*height = floor(((maxY - minY)/pixelYResPos));
+			*width = floor(((maxX - minX)/pixelXRes)+0.5);
+			*height = floor(((maxY - minY)/pixelYResPos)+0.5);
 			
 			double diffX = 0;
 			double diffY = 0;
@@ -1366,6 +1366,255 @@ namespace rsgis{namespace img{
 		{
 			delete[] ySize;
 		}
+	}
+    
+    void RSGISImageUtils::getImageOverlapCut2Env(GDALDataset **datasets, int numDS,  int **dsOffsets, int *width, int *height, double *gdalTransform, geos::geom::Envelope *env, int *maxBlockX, int *maxBlockY) throw(RSGISImageBandException)
+	{
+		double **transformations = new double*[numDS];
+		int *xSize = new int[numDS];
+		int *ySize = new int[numDS];
+        int *xBlockSize = new int[numDS];
+		int *yBlockSize = new int[numDS];
+		for(int i = 0; i < numDS; i++)
+		{
+			transformations[i] = new double[6];
+			datasets[i]->GetGeoTransform(transformations[i]);
+			xSize[i] = datasets[i]->GetRasterXSize();
+			ySize[i] = datasets[i]->GetRasterYSize();
+			datasets[i]->GetRasterBand(1)->GetBlockSize(&xBlockSize[i], &yBlockSize[i]);
+			//std::cout << "TL [" << transformations[i][0] << "," << transformations[i][3] << "]\n";
+		}
+		double rotateX = 0;
+		double rotateY = 0;
+		double pixelXRes = 0;
+		double pixelYRes = 0;
+		double pixelYResPos = 0;
+		double minX = 0;
+		double maxX = 0;
+		double tmpMaxX = 0;
+		double minY = 0;
+		double tmpMinY = 0;
+		double maxY = 0;
+		const char *proj = NULL;
+		bool first = true;
+		
+		
+		try
+		{
+			// Calculate Image Overlap.
+			for(int i = 0; i < numDS; ++i)
+			{
+				if(first)
+				{
+                    *maxBlockX = xBlockSize[i];
+                    *maxBlockY = yBlockSize[i];
+                    
+					pixelXRes = transformations[i][1];
+					pixelYRes = transformations[i][5];
+					
+					rotateX = transformations[i][2];
+					rotateY = transformations[i][4];
+					
+					if(pixelYRes < 0)
+					{
+						pixelYResPos = pixelYRes * (-1);
+					}
+					else
+					{
+						pixelYResPos = pixelYRes;
+					}
+					
+					minX = transformations[i][0];
+					maxY = transformations[i][3];
+					
+					maxX = minX + (xSize[i] * pixelXRes);
+					minY = maxY - (ySize[i] * pixelYResPos);
+					
+					proj = datasets[i]->GetProjectionRef(); // Get projection of first band in image
+					
+					first = false;
+				}
+				else
+				{
+					if((this->closeResTest(pixelXRes, transformations[i][1]) == false) | (this->closeResTest(pixelYRes, transformations[i][5]) == false))
+					{
+						throw RSGISImageBandException("Not all image bands have the same resolution..");
+					}
+					
+					if(std::string(datasets[i]->GetProjectionRef()) != std::string(proj))
+					{
+						//std::cout << "Band 1 Projection = " << proj << std::endl;
+						//std::cout << "Band " << i <<  " Projection = " << datasets[i]->GetProjectionRef()<< std::endl;
+						throw RSGISImageBandException("Not all image bands have the same projection..");
+					}
+					
+					if(transformations[i][2] != rotateX & transformations[i][4] != rotateY)
+					{
+						throw RSGISImageBandException("Not all image bands have the same rotation..");
+					}
+					
+					if(transformations[i][0] > minX)
+					{
+						minX = transformations[i][0];
+					}
+					
+					if(transformations[i][3] < maxY)
+					{
+						maxY = transformations[i][3];
+					}
+					
+					tmpMaxX = transformations[i][0] + (xSize[i] * pixelXRes);
+					tmpMinY = transformations[i][3] - (ySize[i] * pixelYResPos);
+					
+					if(tmpMaxX < maxX)
+					{
+						maxX = tmpMaxX;
+					}
+					
+					if(tmpMinY > minY)
+					{
+						minY = tmpMinY;
+					}
+                    
+                    if(xBlockSize[i] > (*maxBlockX))
+                    {
+                        *maxBlockX = xBlockSize[i];
+                    }
+                    
+                    if(yBlockSize[i] > (*maxBlockY))
+                    {
+                        *maxBlockY = yBlockSize[i];
+                    }
+				}
+			}
+            
+			if(maxX - minX <= 0)
+			{
+				std::cout << "MinX = " << minX << std::endl;
+				std::cout << "MaxX = " << maxX << std::endl;
+				throw RSGISImageBandException("Images do not overlap in the X axis");
+			}
+			
+			if(maxY - minY <= 0)
+			{
+				std::cout << "MinY = " << minY << std::endl;
+				std::cout << "MaxY = " << maxY << std::endl;
+				throw RSGISImageBandException("Images do not overlap in the Y axis");
+			}
+			
+			// Cut to env extent
+			if(env->getMinX() > minX)
+			{
+                minX = env->getMinX();
+			}
+			
+			if(env->getMinY() > minY)
+			{
+				minY = env->getMinY();
+			}
+			
+			if(env->getMaxX() < maxX)
+			{
+				maxX = env->getMaxX();
+			}
+			
+			if(env->getMaxY() < maxY)
+			{
+				maxY = env->getMaxY();
+			}
+			
+            if(maxX - minX <= 0)
+			{
+				std::cout << "MinX = " << minX << std::endl;
+				std::cout << "MaxX = " << maxX << std::endl;
+				throw RSGISImageBandException("Images and Envelope do not overlap in the X axis");
+			}
+			
+			if(maxY - minY <= 0)
+			{
+				std::cout << "MinY = " << minY << std::endl;
+				std::cout << "MaxY = " << maxY << std::endl;
+				throw RSGISImageBandException("Images and Envelope do not overlap in the Y axis");
+			}
+            
+            gdalTransform[0] = minX;
+			gdalTransform[1] = pixelXRes;
+			gdalTransform[2] = rotateX;
+			gdalTransform[3] = maxY;
+			gdalTransform[4] = rotateY;
+			gdalTransform[5] = pixelYRes;
+			
+			*width = floor(((maxX - minX)/pixelXRes)+0.5);
+			*height = floor(((maxY - minY)/pixelYResPos)+0.5);
+			
+			double diffX = 0;
+			double diffY = 0;
+			
+			for(int i = 0; i < numDS; i++)
+			{
+				diffX = minX - transformations[i][0];
+				diffY = transformations[i][3] - maxY;
+				
+				if(diffX != 0)
+				{
+					dsOffsets[i][0] = ceil(diffX/pixelXRes);
+				}
+				else
+				{
+					dsOffsets[i][0] = 0;
+				}
+				
+				if(diffY != 0)
+				{
+					dsOffsets[i][1] = ceil(diffY/pixelYResPos);
+				}
+				else
+				{
+					dsOffsets[i][1] = 0;
+				}
+			}
+			
+		}
+		catch(RSGISImageBandException& e)
+		{
+			if(transformations != NULL)
+			{
+				for(int i = 0; i < numDS; i++)
+				{
+					delete[] transformations[i];
+				}
+				delete[] transformations;
+			}
+			if(xSize != NULL)
+			{
+				delete[] xSize;
+			}
+			if(ySize != NULL)
+			{
+				delete[] ySize;
+			}
+			throw e;
+		}
+		
+		if(transformations != NULL)
+		{
+			for(int i = 0; i < numDS; i++)
+			{
+				delete[] transformations[i];
+			}
+			delete[] transformations;
+		}
+		if(xSize != NULL)
+		{
+			delete[] xSize;
+		}
+		if(ySize != NULL)
+		{
+			delete[] ySize;
+		}
+        
+        delete[] xBlockSize;
+        delete[] yBlockSize;
 	}
 	
 	void RSGISImageUtils::getImageOverlap(GDALDataset **datasets, int numDS, int *width, int *height, geos::geom::Envelope *env) throw(RSGISImageBandException)
@@ -1507,8 +1756,8 @@ namespace rsgis{namespace img{
 			minY = env->getMinY();
 			maxY = env->getMaxY();
 			
-			*width = floor(((maxX - minX)/pixelXRes));
-			*height = floor(((maxY - minY)/pixelYResPos));
+			*width = floor(((maxX - minX)/pixelXRes)+0.5);
+			*height = floor(((maxY - minY)/pixelYResPos)+0.5);
 		}
 		catch(RSGISImageBandException& e)
 		{
@@ -1659,8 +1908,8 @@ namespace rsgis{namespace img{
 			gdalTransform[4] = rotateY;
 			gdalTransform[5] = pixelYRes;
 			
-			*width = ceil(((maxX - minX)/pixelXRes));
-			*height = ceil(((maxY - minY)/pixelYResPos));
+			*width = floor(((maxX - minX)/pixelXRes)+0.5);
+			*height = floor(((maxY - minY)/pixelYResPos)+0.5);
 		}
 		catch(RSGISImageBandException& e)
 		{
@@ -1830,8 +2079,8 @@ namespace rsgis{namespace img{
 			gdalTransform[4] = rotateY;
 			gdalTransform[5] = pixelYRes;
 			
-			*width = ceil(((maxX - minX)/pixelXRes));
-			*height = ceil(((maxY - minY)/pixelYResPos));
+			*width = floor(((maxX - minX)/pixelXRes)+0.5);
+			*height = floor(((maxY - minY)/pixelYResPos)+0.5);
 		}
 		catch(RSGISImageBandException& e)
 		{
@@ -3685,7 +3934,6 @@ namespace rsgis{namespace img{
     	else if((resDiff < 0) && (resDiff > -1.*resDiffVal)){closeRes = false;}
 
     	return closeRes;
-
     }
 
 	RSGISImageUtils::~RSGISImageUtils()

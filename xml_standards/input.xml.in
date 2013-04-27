@@ -195,7 +195,7 @@
     <!-- A command to find the value of a point from an image -->
     <rsgis:command algor="zonalstats" option="pointvalue" image="image.env" vector="points.shp" output="output.shp" force="yes | no" />
     <!-- A command to extract the pixel values for regions to a matrix file as columns which can be used as endmembers for unmixing -->
-    <rsgis:command algor="zonalstats" option="endmembers" image="image.env" vector="points.shp" output="output.mtxt" method="polyContainsPixel | polyContainsPixelCenter | polyOverlapsPixel | polyOverlapsOrContainsPixel | pixelContainsPoly | pixelContainsPolyCenter | adaptive | envelope" />
+    <rsgis:command algor="zonalstats" option="endmembers" image="image.env" vector="polygons.shp" output="output.mtxt" method="polyContainsPixel | polyContainsPixelCenter | polyOverlapsPixel | polyOverlapsOrContainsPixel | pixelContainsPoly | pixelContainsPolyCenter | adaptive | envelope" />
 
 
 
@@ -503,6 +503,26 @@
 	<rsgis:command algor="rastergis" option="calcborderlength" clumps="clumps.kea" ignorezeroedges="yes | no" colname="string" />
 	<!-- A command to calculate the relative border length of the clumps to a class -->
 	<rsgis:command algor="rastergis" option="calcrelborderlength" clumps="clumps.kea" ignorezeroedges="yes | no" colname="string" classcolumn="string" classname="string" />
+	<!-- A command to calculate shape indices for clumps -->
+	<rsgis:command algor="rastergis" option="calcshapeindices" clumps="clumps.kea" >
+		<rsgis:index name="Area | Asymmetry | BorderIndex | BorderLength | Compactness| Density | EllipticFit | Length | LengthWidth | Width | MainDirection | RadiusLargestEnclosedEllipse | RadiusSmallestEnclosedEllipse | RectangularFit | Roundness | ShapeIndex" column="string" />
+        <rsgis:index name="Area | Asymmetry | BorderIndex | BorderLength | Compactness| Density | EllipticFit | Length | LengthWidth | Width | MainDirection | RadiusLargestEnclosedEllipse | RadiusSmallestEnclosedEllipse | RectangularFit | Roundness | ShapeIndex" column="string" />
+        <rsgis:index name="Area | Asymmetry | BorderIndex | BorderLength | Compactness| Density | EllipticFit | Length | LengthWidth | Width | MainDirection | RadiusLargestEnclosedEllipse | RadiusSmallestEnclosedEllipse | RectangularFit | Roundness | ShapeIndex" column="string" />
+    </rsgis:command>
+	<!-- A command to define the position within the file of the clumps (i.e., on the tile border, in the overlap or the main body).-->
+	<rsgis:command algor="rastergis" option="defineclumptileposition" clumps="clumps.kea" tile="image.kea" colname="string" overlap="int" boundary="int" body="int" />
+	<!-- A command to define the clumps which are on the border within the file of the clumps using a mask.-->
+	<rsgis:command algor="rastergis" option="defineborderclumps" clumps="clumps.kea" bordermask="image.kea" colname="string" overlap="int" boundary="int" body="int" />
+	<!-- A command to populate an image with the statistics (maximum, minimum, histogram) required for the a thematic image -->
+	<rsgis:command algor="rastergis" option="populatestats" clumps="clumps.kea" pyramids="yes | no" colourtable="yes | no" />
+	<!-- A command to identify segments which have changed by looking for statistical outliners (std dev) from class population -->
+	<rsgis:command algor="rastergis" option="findchangeclumpsfromstddev" clumps="clumps.kea" classcol="string" changefield="string" fields="col1,col2,col3" >
+		<rsgis:class name="string" stddevthres="float" changeval="int" />
+        <rsgis:class name="string" stddevthres="float" changeval="int" />
+        <rsgis:class name="string" stddevthres="float" changeval="int" />
+    </rsgis:command>
+
+
 
 
 
@@ -621,6 +641,8 @@
     <rsgis:command algor="imageutils" option="createimage" output="image_out.env" numbands="int" width="int" height="int" resolution="float" eastings="double" northings="double" proj4="string" value="float"/>
     <!-- A command to apply an enhancement stretch an images pixel values to a range of 0 to 255 - normally used for visualisation -->
     <rsgis:command algor="imageutils" option="stretch" image="image.env" output="image_out.env" [stats="filepath.txt"] format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" ignorezeros="yes | no" stretch="LinearMinMax | LinearPercent | LinearStdDev | Histogram | Exponential | Logarithmic | PowerLaw" percent="float - only LinearPercent" stddev="float - only LinearStdDev" onePassSD="yes | no" power="float - only PowerLaw"/>
+	<!-- A command to apply an enhancement stretch an images pixel values to a range of 0 to 255 - normally used for visualisation -->
+    <rsgis:command algor="imageutils" option="stretchwithstats" image="image.env" output="image_out.env" stats="filepath.txt" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" stretch="LinearMinMax | Histogram | Exponential | Logarithmic | PowerLaw" power="float - only PowerLaw"/>
     <!-- A command to colour to generate a colour image, using the Hue of a HSV transformation, for a particular input image band -->
     <rsgis:command algor="imageutils" option="huecolour" image="image.env" output="image_out.env" band="int" lowvalue="float" highvalue="float" background="float" />
     <!-- A command to remove / define spatial reference to nothing and size set to pixel size -->
@@ -638,7 +660,7 @@
     <!-- A command to generate a set of slices from a multi-band image -->
     <rsgis:command algor="imageutils" option="createslices" image="image.env" output="image_out_base" />
     <!-- A command to generate tiles from an input image-->
-    <rsgis:command algor="imageutils" option="createtiles" image="image.env" output="image_out_base" width="int" height="int" overlap="int" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64"/>
+    <rsgis:command algor="imageutils" option="createtiles" image="image.env" output="image_out_base" width="int" height="int" overlap="int" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" [offset="yes|no"] />
     <!-- A command to clump an image for a given pixel values -->
     <rsgis:command algor="imageutils" option="clump" image="image.env" output="image_out.env" format="GDAL Format" inmemory="yes | no" proj="OSGB | NZ2000 | NZ1949 | IMAGE" />
     <!-- A command to create a composite image from a multi-band input image -->
@@ -668,9 +690,11 @@
 	<!-- A command to create a thematic image defining tiles for an image image -->
     <rsgis:command algor="imageutils" option="defineimgtiles" image="image.env" output="image_out.env" tilesize="int" [nodata="float"] validpixelratio="float" format="GDAL Format"  />
 	<!-- A command to create individual mask images for each tile with an optional overlap defined -->
-	<rsgis:command algor="imageutils" option="gentilemasks" image="image.env" outputbase="image_out.env" format="GDAL Format" extension="string" [overlap="float" growoverlap="yes|no"] />
+	<rsgis:command algor="imageutils" option="gentilemasks" image="image.env" outputbase="image_out_path" format="GDAL Format" extension="string" [overlap="float" growoverlap="yes|no"] />
 	<!-- A command to extract and a region for the tile and apply a mask --> 
 	<rsgis:command algor="imageutils" option="cutouttile" image="image.env" tile="tile.env" output="image_out.env" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" nodataval="float" />
+	<!-- A command to extract a subsample of image data to a hdf5 file --> 
+	<rsgis:command algor="imageutils" option="subsampleimage" image="image.kea" output="data.hdf" nodata="float" subsample="int" />
 
 
 
@@ -1010,8 +1034,24 @@
         <rsgis:image file="string" />
 		<rsgis:image file="string" />
     </rsgis:command>
-
-
+	<!-- A command to merge tiles of image clumps and border object mask into an existing image files where clumps are labelled as overlap, boundary or body clumps.-->
+	<rsgis:command algor="segmentation" option="mergeclumptiles" output="image.kea" bordermask="image.kea" colname="string" overlap="int" boundary="int" body="int" >
+		<rsgis:image clumps="string" />
+        <rsgis:image clumps="string" />
+		<rsgis:image clumps="string" />
+    </rsgis:command>
+	<!-- A command to create mask of the border clumps from the segmented tiles.-->
+	<rsgis:command algor="segmentation" option="findtilebordersmask" bordermask="image.kea" colname="string" overlap="int" boundary="int" body="int" >
+		<rsgis:image clumps="string" />
+        <rsgis:image clumps="string" />
+		<rsgis:image clumps="string" />
+    </rsgis:command>
+	<!-- A command to merge clump images (i.e., tile boundaries) into an exiting clump image.-->
+	<rsgis:command algor="segmentation" option="mergeclumpimages" output="image.kea"  >
+		<rsgis:image clumps="string" />
+        <rsgis:image clumps="string" />
+		<rsgis:image clumps="string" />
+    </rsgis:command>
 
 
 
