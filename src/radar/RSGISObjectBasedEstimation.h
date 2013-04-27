@@ -184,16 +184,32 @@ namespace rsgis{namespace radar{
 	class RSGISEstimationAssignAP : public RSGISEstimationOptimiser
 	{
 		/// Assign output vector to initial parameters
-		/** - Primarily to assign object classification to pixels within object.*/
+		/** - Intended to assign object classification to pixels within object, 
+              so estimation is run on an object only basis */
 	public:
 		RSGISEstimationAssignAP(){};
 		virtual int minimise(gsl_vector *inData, gsl_vector *initialPar, gsl_vector *outParError);
 		virtual void modifyAPriori(gsl_vector *newAPrioriPar){};
-		virtual estOptimizerType getOptimiserType(){return assignAP;};
+		virtual estOptimizerType getOptimiserType(){return rsgis::radar::assignAP;};
 		virtual void printOptimiser(){std::cout << "Assign" << std::endl;};
 		~RSGISEstimationAssignAP(){};
 	private:
 	};
+    
+    class RSGISEstimationNoEstimation : public RSGISEstimationOptimiser
+    {
+        /// Class to skip estimation for a class.
+        /** Intended to be used within object based estimation as the slow optimiser, 
+            so the estimation is run on a pixel only basis */
+    public:
+        RSGISEstimationNoEstimation();
+        int minimise(gsl_vector *inData, gsl_vector *initialPar, gsl_vector *outParError){return -999;};
+        virtual void modifyAPriori(gsl_vector *newAPrioriPar){};
+        virtual estOptimizerType getOptimiserType(){return rsgis::radar::noOptimiser;};
+        virtual void printOptimiser(){std::cout << "No Optimiser" << std::endl;};
+        double calcLeastSquares(std::vector<double> *values);
+        ~RSGISEstimationNoEstimation();
+    };
 
 }}
 
