@@ -636,7 +636,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 		std::cout << "Found " << this->numVars << " Variables \n";
 		
 		xercesc::DOMElement *varElement = NULL;
-		variables = new VariableStruct[numVars];
+		variables = new rsgis::img::VariableStruct[numVars];
 		
 		for(int i = 0; i < numVars; i++)
 		{
@@ -2918,88 +2918,15 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 				std::cout << i << ")\t name = " << variables[i].name << " image = " << variables[i].image << " band = " << variables[i].bandNum << std::endl;
 			}
 			
-			std::string *outBandName = new std::string[1];
-			outBandName[0] = this->mathsExpression;
-
-			GDALAllRegister();
-			GDALDataset **datasets = NULL;
-			rsgis::img::RSGISBandMath *bandmaths = NULL;
-			rsgis::img::RSGISCalcImage *calcImage = NULL;
-            mu::Parser *muParser = new mu::Parser();
-						
 			try
-			{
-                rsgis::img::VariableBands **processVaribles = new rsgis::img::VariableBands*[numVars];
-				datasets = new GDALDataset*[numVars];
-				
-				int numRasterBands = 0;
-				int totalNumRasterBands = 0;
-				
-				for(int i = 0; i < this->numVars; ++i)
-				{
-					std::cout << this->variables[i].image << std::endl;
-					datasets[i] = (GDALDataset *) GDALOpen(this->variables[i].image.c_str(), GA_ReadOnly);
-					if(datasets[i] == NULL)
-					{
-						std::string message = std::string("Could not open image ") + this->variables[i].image;
-						throw rsgis::RSGISImageException(message.c_str());
-					}
-					
-					numRasterBands = datasets[i]->GetRasterCount();
-					
-					if((this->variables[i].bandNum < 0) | (this->variables[i].bandNum > numRasterBands))
-					{
-						throw rsgis::RSGISImageException("You have specified a band which is not within the image");
-					}
-					
-					processVaribles[i] = new rsgis::img::VariableBands();
-					processVaribles[i]->name = this->variables[i].name;
-					processVaribles[i]->band = totalNumRasterBands + (this->variables[i].bandNum - 1);
-					
-					totalNumRasterBands += numRasterBands;
-				}	
-				
-                mu::value_type *inVals = new mu::value_type[this->numVars];
-				for(int i = 0; i < this->numVars; ++i)
-				{
-					inVals[i] = 0;
-					muParser->DefineVar(_T(processVaribles[i]->name.c_str()), &inVals[i]);
-				}
-				
-				muParser->SetExpr(this->mathsExpression.c_str());
-				
-				bandmaths = new rsgis::img::RSGISBandMath(1, processVaribles, this->numVars, muParser);
-				
-				calcImage = new rsgis::img::RSGISCalcImage(bandmaths, "", true);
-				calcImage->calcImage(datasets, this->numVars, this->outputImage, true, outBandName, this->imageFormat, this->outDataType);
-				
-				
-				for(int i = 0; i < this->numVars; ++i)
-				{
-					GDALClose(datasets[i]);
-					delete processVaribles[i];
-				}
-				delete[] datasets;
-				delete[] processVaribles;
-				
-				delete[] inVals;
-				
-				delete muParser;
-				delete bandmaths;
-				delete calcImage;
-				delete[] outBandName;
-			}
-			catch(rsgis::RSGISException e)
-			{
-				throw e;
-			}
-			catch (mu::ParserError &e) 
-			{
-				std::string message = std::string("ERROR: ") + std::string(e.GetMsg()) + std::string(":\t \'") + std::string(e.GetExpr()) + std::string("\'");
-				throw rsgis::RSGISException(message);
-			}
-			
-			
+            {
+                rsgis::img::RSGISBandMath::executeBandMaths(variables, numVars, outputImage, mathsExpression, imageFormat, outDataType);
+                delete[] variables;
+            }
+            catch (rsgis::RSGISException &e)
+            {
+                throw e;
+            }			
 		}
 		else if(option == RSGISExeImageCalculation::replacevalueslessthan)
 		{
@@ -3113,52 +3040,14 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 			std::cout << "Output Image: " << this->outputImage << std::endl;
 			std::cout << "Expression: " << this->mathsExpression << std::endl;
 			
-			GDALAllRegister();
-			GDALDataset **datasets = NULL;
-			rsgis::img::RSGISImageMaths *imageMaths = NULL;
-			rsgis::img::RSGISCalcImage *calcImage = NULL;
-            mu::Parser *muParser = new mu::Parser();
-			
-			try
-			{
-				datasets = new GDALDataset*[1];
-				
-				std::cout << "Open " << this->inputImage << std::endl;
-				datasets[0] = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_ReadOnly);
-				if(datasets[0] == NULL)
-				{
-					std::string message = std::string("Could not open image ") + this->inputImage;
-					throw rsgis::RSGISImageException(message.c_str());
-				}
-				
-				int numRasterBands = datasets[0]->GetRasterCount();
-				
-                mu::value_type inVal;
-				muParser->DefineVar(_T("b1"), &inVal);
-				muParser->SetExpr(this->mathsExpression.c_str());
-				
-				imageMaths = new rsgis::img::RSGISImageMaths(numRasterBands, muParser);
-				
-				calcImage = new rsgis::img::RSGISCalcImage(imageMaths, "", true);
-				calcImage->calcImage(datasets, 1, this->outputImage, false, NULL, this->imageFormat, this->outDataType);
-				
-				
-				GDALClose(datasets[0]);
-				delete[] datasets;
-
-				delete muParser;
-				delete imageMaths;
-				delete calcImage;
-			}
-			catch(rsgis::RSGISException e)
-			{
-				throw e;
-			}
-			catch (mu::ParserError &e) 
-			{
-				std::string message = std::string("ERROR: ") + std::string(e.GetMsg()) + std::string(":\t \'") + std::string(e.GetExpr()) + std::string("\'");
-				throw rsgis::RSGISException(message);
-			}			
+            try
+            {
+                rsgis::img::RSGISImageMaths::executeImageMaths(this->inputImage, this->outputImage, this->mathsExpression, this->imageFormat, this->outDataType);
+            }
+            catch(rsgis::RSGISException &e)
+            {
+                throw e;
+            }
 		}
 		else if(option == RSGISExeImageCalculation::movementspeed)
 		{

@@ -31,6 +31,7 @@
 
 #include "img/RSGISImageCalcException.h"
 #include "img/RSGISCalcImageValue.h"
+#include "img/RSGISCalcImage.h"
 
 #include "muParser.h"
 
@@ -41,7 +42,13 @@ namespace rsgis{namespace img{
         std::string name;
 		int band;
 	};
-	
+    
+    struct VariableStruct
+    {
+        std::string image;
+        std::string name;
+        int bandNum;
+    };
 	
 	class RSGISBandMath : public RSGISCalcImageValue
 		{
@@ -55,6 +62,7 @@ namespace rsgis{namespace img{
             void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
 			bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException);
 			~RSGISBandMath();
+            static void executeBandMaths(VariableStruct *variables, unsigned int numVars, std::string outputImage, std::string mathsExpression, std::string gdalFormat, GDALDataType outDataType)throw(rsgis::RSGISImageException);
 		private:
 			VariableBands **variables;
 			int numVariables;
