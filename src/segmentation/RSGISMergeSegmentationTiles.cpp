@@ -175,7 +175,6 @@ namespace rsgis{namespace segment{
             const GDALRasterAttributeTable *attTableTmp = NULL;
             size_t numRows = 0;
             double maxVal = 0;
-            unsigned int clumpPosColIdx = 0;
             unsigned int outClumpIDColIdx = 0;
             size_t clumpsOffset = 0;
             size_t numClumps = 0;
