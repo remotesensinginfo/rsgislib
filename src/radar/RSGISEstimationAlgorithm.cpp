@@ -2046,7 +2046,7 @@ namespace rsgis {namespace radar
 
 
 
-					if ((boost::math::isnan(height)) | (boost::math::isnan(density))) 
+					if ((boost::math::isnan(height)) | (boost::math::isnan(density)))
 					{
 						try
 						{
@@ -2066,7 +2066,7 @@ namespace rsgis {namespace radar
                     if (height > this->minMaxVals[0][1]){height = this->minMaxVals[0][1];}
                     if (density < this->minMaxVals[1][0]){density = this->minMaxVals[1][0];}
                     if (density > this->minMaxVals[1][1]){density = this->minMaxVals[1][1];}
-					
+
                     // Calculate Biomass
 					double heightcm = height * 100;
 					double tMass = allometric.calculateTotalBiomassHeight(heightcm, species);
@@ -2111,7 +2111,7 @@ namespace rsgis {namespace radar
                     if (cDepth > this->minMaxVals[0][1]){cDepth = this->minMaxVals[0][1];}
                     if (density < this->minMaxVals[1][0]){density = this->minMaxVals[1][0];}
                     if (density > this->minMaxVals[1][1]){density = this->minMaxVals[1][1];}
-					
+
                     // Calculate Biomass
 					height = cDepth * 240; // convert to cm
 					double tMass = allometric.calculateTotalBiomassHeight(height, species);
@@ -2130,17 +2130,13 @@ namespace rsgis {namespace radar
 				}
 				else if(parameters == dielectricDensityHeight)
 				{
-					//std::cout << "Starting optimisation...";
 					estOptimiser->minimise(inSigma0dB, initialPar, outPar);
-					//std::cout << "..finished optimisation" << std::endl;
 
 					double height = gsl_vector_get(outPar, 0);
 					double density = gsl_vector_get(outPar, 1);
 					double dielectric = gsl_vector_get(outPar, 2);
 					double error = gsl_vector_get(outPar, 3);
 
-
-    
                     // Set to limits of min/max values
                     if (height < this->minMaxVals[0][0]){height = this->minMaxVals[0][0];}
                     if (height > this->minMaxVals[0][1]){height = this->minMaxVals[0][1];}
@@ -2148,7 +2144,7 @@ namespace rsgis {namespace radar
                     if (density > this->minMaxVals[1][1]){density = this->minMaxVals[1][1];}
                     if (dielectric < this->minMaxVals[2][0]){dielectric = this->minMaxVals[2][0];}
                     if (dielectric > this->minMaxVals[2][1]){dielectric = this->minMaxVals[2][1];}
-					
+
                     // Write out
 					if (boost::math::isnan(height)){output[0] = 0;}
 					else{output[0] = height;}
@@ -2162,7 +2158,7 @@ namespace rsgis {namespace radar
 				}
 				else
 				{
-					std::cout << "Parameters not recognised, cannot calculate biomass.";
+					std::cout << "Parameters not recognised, cannot calculate biomass." << std::endl;
 				}
 
 			}

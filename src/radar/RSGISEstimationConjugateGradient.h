@@ -352,44 +352,7 @@ namespace rsgis {namespace radar{
 		unsigned int nRestarts;
 		RSGISEstimationConjugateGradient3DPoly4Channel *conjGradOpt;
 	};
-	
-	class RSGISEstimationConjugateGradient2Var2DataDistro : public RSGISEstimationOptimiser
-	{
-		// Takes two distrobutions and sampels from them to form the start point for CG.
-	public:
-		RSGISEstimationConjugateGradient2Var2DataDistro(rsgis::math::RSGISMathTwoVariableFunction *functionA, 
-													    rsgis::math::RSGISMathTwoVariableFunction *functionB,
-													    rsgis::math::RSGISProbDistro *distroA,
-													    rsgis::math::RSGISProbDistro *distroB,
-													    double *minMaxIntervalA,
-													    double *minMaxIntervalB,
-														gsl_vector *aPrioriPar,
-													    gsl_matrix *covMatrixP, 
-													    gsl_matrix *invCovMatrixD,
-													    double minError,
-													    int ittmax,
-													    int nRestarts);
-		int minimise(gsl_vector *inData, gsl_vector *initialPar, gsl_vector *outParError);
-		void modifyAPriori(gsl_vector *newAPrioriPar){this->conjGradOpt->modifyAPriori(newAPrioriPar);};
-		gsl_vector* getAPrioriPar(){return this->aPrioriPar;};
-		virtual estOptimizerType getOptimiserType(){return conjugateGradient;}; 
-		virtual void printOptimiser(){std::cout << "Conjugate gradient - 2 Var 2 Data, with restarts from distrobution" << std::endl;};
-		~RSGISEstimationConjugateGradient2Var2DataDistro();
-	private:
-		rsgis::math::RSGISMathTwoVariableFunction *functionA;
-		rsgis::math::RSGISMathTwoVariableFunction *functionB;
-		rsgis::math::RSGISProbDistro *distroA;
-		rsgis::math::RSGISProbDistro *distroB;
-		double *minMaxIntervalA;
-		double *minMaxIntervalB;
-		gsl_vector *aPrioriPar;
-		gsl_matrix *covMatrixP;
-		gsl_matrix *invCovMatrixD;
-		double minError;
-		int ittmax;
-		unsigned int nRestarts;
-		RSGISEstimationConjugateGradient2Var2Data *conjGradOpt;
-	};
+
 }}
 
 
