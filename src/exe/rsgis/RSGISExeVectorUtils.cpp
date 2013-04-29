@@ -3713,6 +3713,10 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			char *charValue = XMLString::transcode(argElement->getAttribute(xresXMLStr));
 			this->xres = mathUtils.strtodouble(string(charValue));
 			XMLString::release(&charValue);
+			if(this->xres <= 0)
+			{
+				throw RSGISXMLArgumentsException("Resolution can't be 0 or negative");
+			}
 		}
 		else
 		{
@@ -3727,6 +3731,10 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			char *charValue = XMLString::transcode(argElement->getAttribute(yresXMLStr));
 			this->yres = mathUtils.strtodouble(string(charValue));
 			XMLString::release(&charValue);
+			if(this->yres <= 0)
+			{
+				throw RSGISXMLArgumentsException("Resolution can't be 0 or negative");
+			}
 		}
 		else
 		{
