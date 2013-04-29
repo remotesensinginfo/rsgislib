@@ -33,6 +33,7 @@ namespace rsgis {namespace radar{
 		threasholdAccepting,
 		exhaustiveSearch,
 		assignAP,
+        noOptimiser,
 		unknown
 	};
 	
