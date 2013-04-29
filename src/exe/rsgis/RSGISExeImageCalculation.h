@@ -28,10 +28,14 @@
 #include <fstream>
 #include <boost/algorithm/string/replace.hpp>
 
+#include "common/RSGISCommons.h"
 #include "common/RSGISException.h"
 #include "common/RSGISXMLArgumentsException.h"
 #include "common/RSGISAlgorithmParameters.h"
 #include "common/RSGISImageException.h"
+
+#include "cmds/RSGISCmdImageCalc.h"
+#include "cmds/RSGISCmdException.h"
 
 #include "math/RSGISMathsUtils.h"
 #include "math/RSGISMatrices.h"
@@ -169,7 +173,7 @@ namespace rsgisexe{
         double binWidth;
 		bool calcInMinMax;
 		bool calcMean;
-        rsgis::img::VariableStruct *variables;
+        rsgis::cmds::VariableStruct *variables;
 		double value;
 		double threshold;
 		unsigned int *imageBands;
@@ -201,6 +205,7 @@ namespace rsgisexe{
         float outputTrueVal;
         float outputFalseVal;
         GDALDataType outDataType;
+        rsgis::RSGISLibDataType rsgisOutDataType;
         float lsumWeight;
         float lsumGain;
         float lsumOffset;

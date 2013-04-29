@@ -16,6 +16,7 @@ set(RSGIS_SRC_REGISTRATION_DIR registration)
 set(RSGIS_SRC_SEGMENTATION_DIR segmentation)
 set(RSGIS_SRC_UTILS_DIR utils)
 set(RSGIS_SRC_VEC_DIR vec)
+set(RSGIS_SRC_CMDS_DIR cmds)
 set(RSGIS_SRC_EXE_DIR exe/rsgis)
 ###############################################################################
 
@@ -37,7 +38,6 @@ set(LIB_CALIBRATION_CPP
 	${RSGIS_SRC_CALIBRATION_DIR}/RSGISStandardDN2RadianceCalibration.cpp 
 	${RSGIS_SRC_CALIBRATION_DIR}/RSGISStandardDN2RadianceCalibration.h )
 ###############################################################################
-
 
 ###############################################################################
 # Files within the classifier Library.
@@ -77,8 +77,26 @@ set(LIB_CLASSIFY_CPP
 ###############################################################################
 
 ###############################################################################
+# Files within the commands Library.
+set(LIB_COMMANDS_H
+	${RSGIS_SRC_CMDS_DIR}/RSGISCmdException.h
+	${RSGIS_SRC_CMDS_DIR}/RSGISCmdParent.h
+	${RSGIS_SRC_CMDS_DIR}/RSGISCmdImageCalc.h 
+	)
+	
+set(LIB_COMMANDS_CPP
+	${RSGIS_SRC_CMDS_DIR}/RSGISCmdException.h
+	${RSGIS_SRC_CMDS_DIR}/RSGISCmdException.cpp
+	${RSGIS_SRC_CMDS_DIR}/RSGISCmdParent.h
+	${RSGIS_SRC_CMDS_DIR}/RSGISCmdImageCalc.cpp 
+	${RSGIS_SRC_CMDS_DIR}/RSGISCmdImageCalc.h 
+	)
+###############################################################################
+
+###############################################################################
 # Files within the common Library.
 set(LIB_COMMON_H
+	${RSGIS_SRC_COMMON_DIR}/RSGISCommons.h
 	${RSGIS_SRC_COMMON_DIR}/RSGISException.h 
 	${RSGIS_SRC_COMMON_DIR}/RSGISFileException.h 
 	${RSGIS_SRC_COMMON_DIR}/RSGISImageException.h 
@@ -98,6 +116,7 @@ set(LIB_COMMON_H
 	${RSGIS_SRC_COMMON_DIR}/rsgis-config.h )
 	
 set(LIB_COMMON_CPP
+	${RSGIS_SRC_COMMON_DIR}/RSGISCommons.h
 	${RSGIS_SRC_COMMON_DIR}/RSGISException.cpp 
 	${RSGIS_SRC_COMMON_DIR}/RSGISException.h 
 	${RSGIS_SRC_COMMON_DIR}/RSGISFileException.cpp 
@@ -1201,6 +1220,7 @@ source_group("CMake Files" FILES CMakeLists.txt)
 source_group("RSGISEXE" FILES ${EXE_RSGISEXE_CPP} )
 source_group("Calibration" FILES ${LIB_CALIBRATION_CPP})
 source_group("Classify" FILES ${LIB_CLASSIFY_CPP})
+source_group("Commands" FILES ${LIB_COMMANDS_CPP})
 source_group("Common" FILES ${LIB_COMMON_CPP})
 source_group("DataStructures" FILES ${LIB_DATASTRUCT_CPP})
 source_group("Filtering" FILES ${LIB_FILTERING_CPP})
@@ -1269,6 +1289,10 @@ target_link_libraries(${RSGISLIB_RADAR_LIB_NAME}  ${RSGISLIB_COMMONS_LIB_NAME} $
 
 add_library( ${RSGISLIB_CLASSIFY_LIB_NAME} ${LIB_CLASSIFY_CPP} )
 target_link_libraries(${RSGISLIB_CLASSIFY_LIB_NAME} ${RSGISLIB_COMMONS_LIB_NAME} ${RSGISLIB_MATHS_LIB_NAME}  ${RSGISLIB_UTILS_LIB_NAME} ${RSGISLIB_GEOM_LIB_NAME} ${RSGISLIB_IMG_LIB_NAME} ${RSGISLIB_VECTOR_LIB_NAME} ${GDAL_LIBRARIES} ${GSL_LIBRARIES} ${GEOS_LIBRARIES} ${XERCES_LIBRARIES} ${GMP_LIBRARIES} ${MPFR_LIBRARIES} ${KEA_LIBRARIES} )
+
+add_library( ${RSGISLIB_CMDSINTERFACE_LIB_NAME} ${LIB_COMMANDS_CPP} )
+target_link_libraries(${RSGISLIB_CMDSINTERFACE_LIB_NAME} ${RSGISLIB_COMMONS_LIB_NAME} ${RSGISLIB_MATHS_LIB_NAME} ${RSGISLIB_UTILS_LIB_NAME} ${RSGISLIB_GEOM_LIB_NAME} ${RSGISLIB_IMG_LIB_NAME} ${RSGISLIB_VECTOR_LIB_NAME} ${RSGISLIB_CALIBRATION_LIB_NAME} ${RSGISLIB_CLASSIFY_LIB_NAME} ${RSGISLIB_DATASTRUCT_LIB_NAME} ${RSGISLIB_FILTERING_LIB_NAME} ${RSGISLIB_MODELING_LIB_NAME} ${RSGISLIB_RADAR_LIB_NAME} ${RSGISLIB_RASTERGIS_LIB_NAME} ${RSGISLIB_REGISTRATION_LIB_NAME} ${RSGISLIB_SEGMENTATION_LIB_NAME} ${GDAL_LIBRARIES} ${GSL_LIBRARIES} ${CGAL_LIBRARY} ${GEOS_LIBRARIES} ${XERCES_LIBRARIES} ${FFTW_LIBRARIES} ${MUPARSER_LIBRARIES} ${HDF5_LIBRARIES} ${GMP_LIBRARIES} ${MPFR_LIBRARIES} ${KEA_LIBRARIES} )
+
 ###############################################################################
 
 ###############################################################################
@@ -1364,13 +1388,19 @@ PROPERTIES
         VERSION ${RSGISLIB_CLASSIFY_VERSION}
 )
 
+SET_TARGET_PROPERTIES(${RSGISLIB_CMDSINTERFACE_LIB_NAME}
+PROPERTIES
+        SOVERSION ${RSGISLIB_CMDSINTERFACE_VERSION}
+        VERSION ${RSGISLIB_CMDSINTERFACE_VERSION}
+)
+
 ###############################################################################
 
 ###############################################################################
 # Build executables
 #if (RSGISLIB_WITH_RSGISEXE)
 	add_executable(rsgisexe ${EXE_RSGISEXE_CPP})
-	target_link_libraries (rsgisexe ${RSGISLIB_COMMONS_LIB_NAME} ${RSGISLIB_DATASTRUCT_LIB_NAME} ${RSGISLIB_MATHS_LIB_NAME} ${RSGISLIB_UTILS_LIB_NAME} ${RSGISLIB_GEOM_LIB_NAME} ${RSGISLIB_IMG_LIB_NAME} ${RSGISLIB_REGISTRATION_LIB_NAME} ${RSGISLIB_CALIBRATION_LIB_NAME} ${RSGISLIB_FILTERING_LIB_NAME} ${RSGISLIB_RASTERGIS_LIB_NAME} ${RSGISLIB_SEGMENTATION_LIB_NAME} ${RSGISLIB_VECTOR_LIB_NAME} ${RSGISLIB_MODELING_LIB_NAME} ${RSGISLIB_RADAR_LIB_NAME} ${RSGISLIB_CLASSIFY_LIB_NAME} ${GDAL_LIBRARIES} ${GEOS_LIBRARIES} ${GSL_LIBRARIES} ${MUPARSER_LIBRARIES} ${XERCESC_LIBRARIES} ${FFTW_LIBRARIES} ${CGAL_LIBRARY} ${GMP_LIBRARIES} ${MPFR_LIBRARIES} ${KEA_LIBRARIES})
+	target_link_libraries (rsgisexe ${RSGISLIB_COMMONS_LIB_NAME} ${RSGISLIB_DATASTRUCT_LIB_NAME} ${RSGISLIB_MATHS_LIB_NAME} ${RSGISLIB_UTILS_LIB_NAME} ${RSGISLIB_GEOM_LIB_NAME} ${RSGISLIB_IMG_LIB_NAME} ${RSGISLIB_REGISTRATION_LIB_NAME} ${RSGISLIB_CALIBRATION_LIB_NAME} ${RSGISLIB_FILTERING_LIB_NAME} ${RSGISLIB_RASTERGIS_LIB_NAME} ${RSGISLIB_SEGMENTATION_LIB_NAME} ${RSGISLIB_VECTOR_LIB_NAME} ${RSGISLIB_MODELING_LIB_NAME} ${RSGISLIB_RADAR_LIB_NAME} ${RSGISLIB_CLASSIFY_LIB_NAME} ${RSGISLIB_CMDSINTERFACE_LIB_NAME} ${GDAL_LIBRARIES} ${GEOS_LIBRARIES} ${GSL_LIBRARIES} ${MUPARSER_LIBRARIES} ${XERCESC_LIBRARIES} ${FFTW_LIBRARIES} ${CGAL_LIBRARY} ${GMP_LIBRARIES} ${MPFR_LIBRARIES} ${KEA_LIBRARIES})
 #endif(RSGISLIB_WITH_RSGISEXE)
 ###############################################################################
 
@@ -1391,6 +1421,7 @@ install (TARGETS ${RSGISLIB_VECTOR_LIB_NAME} DESTINATION lib)
 install (TARGETS ${RSGISLIB_MODELING_LIB_NAME} DESTINATION lib)
 install (TARGETS ${RSGISLIB_RADAR_LIB_NAME} DESTINATION lib)
 install (TARGETS ${RSGISLIB_CLASSIFY_LIB_NAME} DESTINATION lib)
+install (TARGETS ${RSGISLIB_CMDSINTERFACE_LIB_NAME} DESTINATION lib)
 
 install (TARGETS rsgisexe DESTINATION bin)
 
@@ -1409,5 +1440,6 @@ install (FILES ${LIB_REGISTRATION_H} DESTINATION include/rsgis/registration)
 install (FILES ${LIB_SEGMENTATION_H} DESTINATION include/rsgis/segmentation)
 install (FILES ${LIB_UTILS_H} DESTINATION include/rsgis/utils)
 install (FILES ${LIB_VEC_H} DESTINATION include/rsgis/vec)
+install (FILES ${LIB_COMMANDS_H} DESTINATION include/rsgis/cmds)
 
 ###############################################################################
