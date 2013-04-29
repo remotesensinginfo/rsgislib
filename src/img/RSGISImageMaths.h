@@ -49,7 +49,6 @@ namespace rsgis{namespace img{
 		void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
         void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
 		bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
-		static void executeImageMaths(std::string inputImage, std::string outputImage, std::string mathsExpression, std::string imageFormat, GDALDataType outDataType)throw(RSGISImageException);
         ~RSGISImageMaths();
 	private:
         mu::Parser *muParser;

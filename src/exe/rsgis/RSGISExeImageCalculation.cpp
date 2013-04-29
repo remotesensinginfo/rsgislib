@@ -126,30 +126,37 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
         if(xercesc::XMLString::equals(dtByte, dtXMLValue))
         {
             this->outDataType = GDT_Byte;
+            this->rsgisOutDataType = rsgis::rsgis_8int;
         }
         else if(xercesc::XMLString::equals(dtUInt16, dtXMLValue))
         {
             this->outDataType = GDT_UInt16;
+            this->rsgisOutDataType = rsgis::rsgis_16uint;
         }
         else if(xercesc::XMLString::equals(dtInt16, dtXMLValue))
         {
             this->outDataType = GDT_Int16;
+            this->rsgisOutDataType = rsgis::rsgis_16int;
         }
         else if(xercesc::XMLString::equals(dtUInt32, dtXMLValue))
         {
             this->outDataType = GDT_UInt32;
+            this->rsgisOutDataType = rsgis::rsgis_32uint;
         }
         else if(xercesc::XMLString::equals(dtInt32, dtXMLValue))
         {
             this->outDataType = GDT_Int32;
+            this->rsgisOutDataType = rsgis::rsgis_32int;
         }
         else if(xercesc::XMLString::equals(dtFloat32, dtXMLValue))
         {
             this->outDataType = GDT_Float32;
+            this->rsgisOutDataType = rsgis::rsgis_32float;
         }
         else if(xercesc::XMLString::equals(dtFloat64, dtXMLValue))
         {
             this->outDataType = GDT_Float64;
+            this->rsgisOutDataType = rsgis::rsgis_64float;
         }
         else
         {
@@ -636,7 +643,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 		std::cout << "Found " << this->numVars << " Variables \n";
 		
 		xercesc::DOMElement *varElement = NULL;
-		variables = new rsgis::img::VariableStruct[numVars];
+		variables = new rsgis::cmds::VariableStruct[numVars];
 		
 		for(int i = 0; i < numVars; i++)
 		{
@@ -2920,7 +2927,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 			
 			try
             {
-                rsgis::img::RSGISBandMath::executeBandMaths(variables, numVars, outputImage, mathsExpression, imageFormat, outDataType);
+                rsgis::cmds::executeBandMaths(variables, numVars, outputImage, mathsExpression, imageFormat, rsgisOutDataType);
                 delete[] variables;
             }
             catch (rsgis::RSGISException &e)
@@ -3042,7 +3049,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 			
             try
             {
-                rsgis::img::RSGISImageMaths::executeImageMaths(this->inputImage, this->outputImage, this->mathsExpression, this->imageFormat, this->outDataType);
+                rsgis::cmds::executeImageMaths(this->inputImage, this->outputImage, this->mathsExpression, this->imageFormat, rsgisOutDataType);
             }
             catch(rsgis::RSGISException &e)
             {
