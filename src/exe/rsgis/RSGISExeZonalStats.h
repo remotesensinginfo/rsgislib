@@ -145,11 +145,12 @@ class RSGISExeZonalStats : public RSGISAlgorithmParameters
         bool modeAll;
         bool sumAll;
 		bool countAll;
-		bool minThreashAll;
-		bool maxThreashAll;
-		double minThreashAllVal;
-		double maxThreashAllVal;
+		bool minThreshAll;
+		bool maxThreshAll;
+		double minThreshAllVal;
+		double maxThreshAllVal;
         bool transposeOutput;
+        bool useBandNames;
 	};
 }
 

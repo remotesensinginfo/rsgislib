@@ -28,6 +28,8 @@
 #include <string>
 #include <list>
 
+#include <boost/algorithm/string/replace.hpp>
+
 #include "ogrsf_frmts.h"
 
 #include "gdal_priv.h"
@@ -47,7 +49,7 @@ namespace rsgis{namespace vec{
 	class RSGISVectorZonalStats : public RSGISProcessOGRFeature
 	{
 	public:
-		RSGISVectorZonalStats(GDALDataset *image, std::string outZonalFileName = "");
+		RSGISVectorZonalStats(GDALDataset *image, std::string outZonalFileName = "", bool useBandNames = false);
 		virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
 		virtual void processFeature(OGRFeature *inFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
 		virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException);
@@ -60,6 +62,8 @@ namespace rsgis{namespace vec{
 		geos::geom::Envelope *imageExtent;
 		double imgRes;
 		float *pxlValues;
+        bool useBandNames;
+        std::string *outNames;
         bool outputToTextFile;
         bool firstLine;
         std::ofstream outZonalFile;
