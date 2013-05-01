@@ -39,5 +39,5 @@ which vim > /dev/null
 if [ $? -ne 0 ]; then
     less @CMAKE_INSTALL_PREFIX@/doc/RSGISLib_XML_Listing.xml
 else
-   vim --cmd 'let no_plugin_maps = 1' -c 'runtime! macros/less.vim' @CMAKE_INSTALL_PREFIX@/doc/RSGISLib_XML_Listing.xml  
+   vim -n --cmd 'let no_plugin_maps = 1' -c 'runtime! macros/less.vim' @CMAKE_INSTALL_PREFIX@/doc/RSGISLib_XML_Listing.xml  
 fi
