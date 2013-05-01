@@ -28,6 +28,8 @@
 #include <stdio.h>
 #include <limits>
 
+#include <boost/algorithm/string/replace.hpp>
+
 #include "common/RSGISException.h"
 #include "common/RSGISXMLArgumentsException.h"
 #include "common/RSGISAlgorithmParameters.h"

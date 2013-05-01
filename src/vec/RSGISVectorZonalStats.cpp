@@ -59,8 +59,11 @@ namespace rsgis{namespace vec{
                 boost::algorithm::replace_all(bandName, "<", "lt");
                 boost::algorithm::replace_all(bandName, "=", "eq");
                 
+                /* Check if band name us longer than maximum length for shapefile field name
+                   No limit on CSV but makes management easier with shorter names */
                 if(bandName.length() > 9)
                 {
+                    // If not using all of name, append number so unique
                     std::cerr << "WARNING: "<< bandName << " will be truncated to \'" << bandName.substr(0, 7) << i+1 << "\'" << std::endl;
                     this->outNames[i] = bandName.substr(0, 7) + mathUtils.inttostring(i+1);
                 }

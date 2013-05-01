@@ -1752,13 +1752,20 @@ namespace rsgis{namespace vec{
 	
 	void RSGISZonalStatsPoly::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
 	{
-		try
+        // Check for polygon geometry
+        if( (wkbFlatten(inFeature->GetGeometryRef()->getGeometryType()) != wkbPolygon) && (wkbFlatten(inFeature->GetGeometryRef()->getGeometryType()) != wkbMultiPolygon)   )
+        {
+            if(wkbFlatten(inFeature->GetGeometryRef()->getGeometryType()) == wkbPoint){throw RSGISVectorException("This function is for polygons. Either buffer points first (using \'buffervector\') or use \'pixelval\' instead.");}
+            else{throw RSGISVectorException("Unsupported geometry.");}
+        }
+        try
 		{
 			RSGISVectorUtils vecUtils;
 			calcValue->reset();
 			
 			OGRPolygon *inOGRPoly;
 			geos::geom::Polygon *poly;
+            
 			inOGRPoly = (OGRPolygon *) inFeature->GetGeometryRef();
 			poly = vecUtils.convertOGRPolygon2GEOSPolygon(inOGRPoly);
 
@@ -1829,6 +1836,12 @@ namespace rsgis{namespace vec{
 		{
 			throw RSGISVectorException("Text file not open to write to!");
 		}
+        // Check for polygon geometry
+        if( (wkbFlatten(feature->GetGeometryRef()->getGeometryType()) != wkbPolygon) && (wkbFlatten(feature->GetGeometryRef()->getGeometryType()) != wkbMultiPolygon)   )
+        {
+            if(wkbFlatten(feature->GetGeometryRef()->getGeometryType()) == wkbPoint){throw RSGISVectorException("This function is for polygons. Either buffer points first (using \'buffervector\') or use \'pixelval\' instead.");}
+            else{throw RSGISVectorException("Unsupported geometry.");}
+        }
 		try
 		{
 			RSGISVectorUtils vecUtils;
@@ -1836,6 +1849,7 @@ namespace rsgis{namespace vec{
 			
 			OGRPolygon *inOGRPoly;
 			geos::geom::Polygon *poly;
+            
 			inOGRPoly = (OGRPolygon *) feature->GetGeometryRef();
 			poly = vecUtils.convertOGRPolygon2GEOSPolygon(inOGRPoly);
 			
