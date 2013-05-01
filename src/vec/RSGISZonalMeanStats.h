@@ -53,8 +53,8 @@ namespace rsgis{namespace vec{
 		std::string name;
 		int numBands;
 		int *bands;
-		float *minThreasholds;
-		float *maxThreasholds;
+		float *minThresholds;
+		float *maxThresholds;
 		
 	};
 	

@@ -98,8 +98,8 @@ namespace rsgis
             bool outMode;
             bool outSum;
 			int *bands;
-			float *minThreasholds;
-			float *maxThreasholds;
+			float *minThresholds;
+			float *maxThresholds;
 		};
 		
 		class ZonalStats

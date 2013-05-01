@@ -144,7 +144,7 @@ namespace rsgis{namespace vec{
                 {
 					if(first)
 					{
-						if((bandValuesImage[attributes[i]->bands[j]+1] > attributes[i]->minThreasholds[j]) && (bandValuesImage[attributes[i]->bands[j]+1] < attributes[i]->maxThreasholds[j]))
+						if((bandValuesImage[attributes[i]->bands[j]+1] > attributes[i]->minThresholds[j]) && (bandValuesImage[attributes[i]->bands[j]+1] < attributes[i]->maxThresholds[j]))
 						{
 							min = bandValuesImage[attributes[i]->bands[j]+1];
 							first = false;
@@ -153,7 +153,7 @@ namespace rsgis{namespace vec{
 					}
 					else
 					{
-						if((bandValuesImage[attributes[i]->bands[j]+1] > attributes[i]->minThreasholds[j]) && (bandValuesImage[attributes[i]->bands[j]+1] < attributes[i]->maxThreasholds[j]))
+						if((bandValuesImage[attributes[i]->bands[j]+1] > attributes[i]->minThresholds[j]) && (bandValuesImage[attributes[i]->bands[j]+1] < attributes[i]->maxThresholds[j]))
 						{
 							if(bandValuesImage[attributes[i]->bands[j]+1] < min)
 							{
@@ -339,7 +339,7 @@ namespace rsgis{namespace vec{
                 {
 					if(first)
 					{
-						if((bandValuesImage[attributes[i]->bands[j]] > attributes[i]->minThreasholds[j]) && (bandValuesImage[attributes[i]->bands[j]] < attributes[i]->maxThreasholds[j]))
+						if((bandValuesImage[attributes[i]->bands[j]] > attributes[i]->minThresholds[j]) && (bandValuesImage[attributes[i]->bands[j]] < attributes[i]->maxThresholds[j]))
 						{
 							min = bandValuesImage[attributes[i]->bands[j]];
 							first = false;
@@ -348,7 +348,7 @@ namespace rsgis{namespace vec{
 					}
 					else
 					{
-						if((bandValuesImage[attributes[i]->bands[j]] > attributes[i]->minThreasholds[j]) && (bandValuesImage[attributes[i]->bands[j]] < attributes[i]->maxThreasholds[j]))
+						if((bandValuesImage[attributes[i]->bands[j]] > attributes[i]->minThresholds[j]) && (bandValuesImage[attributes[i]->bands[j]] < attributes[i]->maxThresholds[j]))
 						{
 							if(bandValuesImage[attributes[i]->bands[j]] < min)
 							{
@@ -437,7 +437,7 @@ namespace rsgis{namespace vec{
                 {
 					if(first)
 					{
-						if((bandValuesImage[attributes[i]->bands[j]] > attributes[i]->minThreasholds[j]) && (bandValuesImage[attributes[i]->bands[j]] < attributes[i]->maxThreasholds[j]))
+						if((bandValuesImage[attributes[i]->bands[j]] > attributes[i]->minThresholds[j]) && (bandValuesImage[attributes[i]->bands[j]] < attributes[i]->maxThresholds[j]))
 						{
 							min = pow(10,(bandValuesImage[attributes[i]->bands[j]] / 10));
 							first = false;
@@ -446,7 +446,7 @@ namespace rsgis{namespace vec{
 					}
 					else
 					{
-						if((bandValuesImage[attributes[i]->bands[j]] > attributes[i]->minThreasholds[j]) && (bandValuesImage[attributes[i]->bands[j]] < attributes[i]->maxThreasholds[j]))
+						if((bandValuesImage[attributes[i]->bands[j]] > attributes[i]->minThresholds[j]) && (bandValuesImage[attributes[i]->bands[j]] < attributes[i]->maxThresholds[j]))
 						{
 							if(bandValuesImage[attributes[i]->bands[j]] < min)
 							{
@@ -626,7 +626,7 @@ namespace rsgis{namespace vec{
                 {
 					if(first)
 					{
-						if((bandValuesImage[attributes[i]->bands[j]] > attributes[i]->minThreasholds[j]) && (bandValuesImage[attributes[i]->bands[j]] < attributes[i]->maxThreasholds[j]))
+						if((bandValuesImage[attributes[i]->bands[j]] > attributes[i]->minThresholds[j]) && (bandValuesImage[attributes[i]->bands[j]] < attributes[i]->maxThresholds[j]))
 						{
 							weightedVal = bandValuesImage[attributes[i]->bands[j]] * interceptArea; // Pixel Value
 							found = true;
@@ -635,7 +635,7 @@ namespace rsgis{namespace vec{
 					}
 					else
 					{
-						if((bandValuesImage[attributes[i]->bands[j]] > attributes[i]->minThreasholds[j]) && (bandValuesImage[attributes[i]->bands[j]] < attributes[i]->maxThreasholds[j]))
+						if((bandValuesImage[attributes[i]->bands[j]] > attributes[i]->minThresholds[j]) && (bandValuesImage[attributes[i]->bands[j]] < attributes[i]->maxThresholds[j]))
 						{
 							if(bandValuesImage[attributes[i]->bands[j]] < weightedVal)
 							{
