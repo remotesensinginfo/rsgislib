@@ -234,7 +234,7 @@ namespace rsgis{namespace vec{
                 {
 					if(first)
 					{
-						if((bandValuesImage[attributes[i]->bands[j]] > attributes[i]->minThreasholds[j]) && (bandValuesImage[attributes[i]->bands[j]] < attributes[i]->maxThreasholds[j]))
+						if((bandValuesImage[attributes[i]->bands[j]] > attributes[i]->minThresholds[j]) && (bandValuesImage[attributes[i]->bands[j]] < attributes[i]->maxThresholds[j]))
 						{
 							min = bandValuesImage[attributes[i]->bands[j]];
 							first = false;
@@ -243,7 +243,7 @@ namespace rsgis{namespace vec{
 					}
 					else
 					{
-						if((bandValuesImage[attributes[i]->bands[j]] > attributes[i]->minThreasholds[j]) && (bandValuesImage[attributes[i]->bands[j]] < attributes[i]->maxThreasholds[j]))
+						if((bandValuesImage[attributes[i]->bands[j]] > attributes[i]->minThresholds[j]) && (bandValuesImage[attributes[i]->bands[j]] < attributes[i]->maxThresholds[j]))
 						{
 							if(bandValuesImage[attributes[i]->bands[j]] < min)
 							{

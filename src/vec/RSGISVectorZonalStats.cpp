@@ -25,7 +25,7 @@
 
 namespace rsgis{namespace vec{
 	
-	RSGISVectorZonalStats::RSGISVectorZonalStats(GDALDataset *image)
+	RSGISVectorZonalStats::RSGISVectorZonalStats(GDALDataset *image, std::string outZonalFileName)
 	{
 		this->image = image;
 		this->numImgBands = image->GetRasterCount();
@@ -42,20 +42,21 @@ namespace rsgis{namespace vec{
 			double xMin = geoTransform[0];
 			double yMax = geoTransform[3];
 			
-			//std::cout << "Origin [" << geoTransform[0] << "," << geoTransform[3] << "]\n";
-			//std::cout << "Size [" << image->GetRasterXSize() << "," << image->GetRasterYSize() << "]\n";
-			//std::cout << "Resolution [" << geoTransform[1] << "," << geoTransform[5] << "]\n";
-			
 			double xMax = geoTransform[0] + (image->GetRasterXSize() * geoTransform[1]);
 			double yMin = geoTransform[3] + (image->GetRasterYSize() * geoTransform[5]);
 			
 			imageExtent = new geos::geom::Envelope(xMin, xMax, yMin, yMax);
 			
 			imgRes = geoTransform[1];
-			
-			//std::cout << "Image Extent: [" << imageExtent->getMinX() << "," << imageExtent->getMinY() << "][" << imageExtent->getMaxX() << "," << imageExtent->getMaxY() << "]\n";
 		
 			pxlValues = (float *) CPLMalloc(sizeof(float));
+		}
+        
+        if (outZonalFileName != "")
+		{
+			this->outputToTextFile = true;
+			this->outZonalFile.open(outZonalFileName.c_str());
+			this->firstLine = true;
 		}
 
 	}
@@ -65,19 +66,16 @@ namespace rsgis{namespace vec{
 		OGRGeometry *geometry = inFeature->GetGeometryRef();
 		if( geometry != NULL && wkbFlatten(geometry->getGeometryType()) == wkbPolygon )
 		{
-			//OGRPolygon *polygon = (OGRPolygon *) geometry;
-			throw RSGISVectorException("Polygons not implemented yet.");
+			throw RSGISVectorException("This function is for point geometries, use \'pixelstats\' for polygons");
 		} 
 		else if( geometry != NULL && wkbFlatten(geometry->getGeometryType()) == wkbMultiPolygon )
 		{
-			//OGRMultiPolygon *multiPolygon = (OGRMultiPolygon *) geometry;
-			throw RSGISVectorException("Multi-Polygons not implemented yet.");
+			throw RSGISVectorException("This function is for point geometries, use \'pixelstats\' for polygons");
 		}
 		else if( geometry != NULL && wkbFlatten(geometry->getGeometryType()) == wkbPoint )
 		{
 			OGRPoint *point = (OGRPoint *) geometry;
 			
-			//std::cout << "Point [" << point->getX() << "," << point->getY() << "]\n";
 			OGRFeatureDefn *outFeatureDefn = outFeature->GetDefnRef();
 			
 			if( (point->getX() > imageExtent->getMinX()) &&
@@ -85,37 +83,31 @@ namespace rsgis{namespace vec{
 				(point->getY() > imageExtent->getMinY()) &&
 			    (point->getY() < imageExtent->getMaxY()))
 			{
-				//std::cout << "Point within image\n";
 				double xDiff = point->getX() - imageExtent->getMinX();
 				double yDiff = imageExtent->getMaxY() - point->getY();
 				
 				int xPxl = static_cast<int> (xDiff/imgRes);
 				int yPxl = static_cast<int> (yDiff/imgRes);
 				
-				//std::cout << "Pixel [" << xPxl << "," << yPxl << "]\n";
 				float *values = this->getPixelColumns(xPxl, yPxl);
 				rsgis::math::RSGISMathsUtils mathUtils;
 				std::string fieldname = "";
-				for(int i = 0; i < numImgBands; ++i)
+				for(int i = 0; i < this->numImgBands; ++i)
 				{
-					//std::cout << values[i] << ",";
-					fieldname = std::string("b") + mathUtils.inttostring(i);
+					fieldname = std::string("b") + mathUtils.inttostring(i+1);
 					outFeature->SetField(outFeatureDefn->GetFieldIndex(fieldname.c_str()), values[i]);
 				}
-				//std::cout << std::endl;
 			}
 			else 
 			{
-				//throw RSGISVectorException("Point not within image.");
-				std::cout << "WARNING: Point not within image\n";
+				std::cerr << "WARNING: Point not within image\n";
 				
                 rsgis::math::RSGISMathsUtils mathUtils;
 				std::string fieldname = "";
 				
 				for(int i = 0; i < numImgBands; ++i)
 				{
-					//std::cout << values[i] << ",";
-					fieldname = std::string("b") + mathUtils.inttostring(i);
+					fieldname = std::string("b") + mathUtils.inttostring(i+1);
 					outFeature->SetField(outFeatureDefn->GetFieldIndex(fieldname.c_str()), 0);
 				}
 			}
@@ -123,12 +115,11 @@ namespace rsgis{namespace vec{
 		}	
 		else if( geometry != NULL && wkbFlatten(geometry->getGeometryType()) == wkbLineString )
 		{
-			//OGRLineString *line = (OGRLineString *) geometry;
 			throw RSGISVectorException("Polylines not implemented yet.");
 		}
 		else if(geometry != NULL)
 		{
-			std::string message = std::string("Unsupport data type: ") + std::string(geometry->getGeometryName());
+			std::string message = std::string("Unsupported data type: ") + std::string(geometry->getGeometryName());
 			throw RSGISVectorException(message);
 		}
 		else 
@@ -137,9 +128,87 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISVectorZonalStats::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISVectorZonalStats::processFeature(OGRFeature *inFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
 	{
-		throw RSGISVectorException("Not implemented");
+        OGRGeometry *geometry = inFeature->GetGeometryRef();
+		if( geometry != NULL && wkbFlatten(geometry->getGeometryType()) == wkbPolygon )
+		{
+			throw RSGISVectorException("This function is for point geometries, use \'pixelstats\' for polygons");
+		}
+		else if( geometry != NULL && wkbFlatten(geometry->getGeometryType()) == wkbMultiPolygon )
+		{
+			throw RSGISVectorException("This function is for point geometries, use \'pixelstats\' for polygons");
+		}
+		else if( geometry != NULL && wkbFlatten(geometry->getGeometryType()) == wkbPoint )
+		{
+			OGRPoint *point = (OGRPoint *) geometry;
+			if( (point->getX() > imageExtent->getMinX()) &&
+               (point->getX() < imageExtent->getMaxX()) &&
+               (point->getY() > imageExtent->getMinY()) &&
+               (point->getY() < imageExtent->getMaxY()))
+			{
+				double xDiff = point->getX() - imageExtent->getMinX();
+				double yDiff = imageExtent->getMaxY() - point->getY();
+				
+				int xPxl = static_cast<int> (xDiff/imgRes);
+				int yPxl = static_cast<int> (yDiff/imgRes);
+				
+				float *values = this->getPixelColumns(xPxl, yPxl);
+				rsgis::math::RSGISMathsUtils mathUtils;
+				
+                // Add header info for first line
+                if(this->firstLine)
+                {
+                    this->outZonalFile << "FID";
+                    for(int i = 0; i < this->numImgBands; i++)
+                    {
+                        
+                        std::string fieldname = std::string("b") + mathUtils.inttostring(i+1);
+                        this->outZonalFile << "," << fieldname;
+                    }
+                    
+                    this->outZonalFile << "\n";
+                    this->firstLine = false;
+                }
+                // Write out FID
+                this->outZonalFile << fid;
+                // Write out pixel value for each band
+                for(int i = 0; i < this->numImgBands; ++i)
+				{
+                    this->outZonalFile << "," << values[i];
+                }
+
+                this->outZonalFile << "\n";
+			}
+			else
+			{
+				std::cerr << "WARNING: Point not within image\n";
+				
+                // Write out FID
+                this->outZonalFile << fid;
+                // Write out zero for each band
+                for(int i = 0; i < this->numImgBands; ++i)
+				{
+                    this->outZonalFile << "," << 0;
+                }
+                
+                this->outZonalFile << "\n";
+			}
+            
+		}
+		else if( geometry != NULL && wkbFlatten(geometry->getGeometryType()) == wkbLineString )
+		{
+			throw RSGISVectorException("Polylines not implemented yet.");
+		}
+		else if(geometry != NULL)
+		{
+			std::string message = std::string("Unsupported data type: ") + std::string(geometry->getGeometryName());
+			throw RSGISVectorException(message);
+		}
+		else
+		{
+			throw RSGISVectorException("WARNING: NULL Geometry Present within input file");
+		}
 	}
 	
 	void RSGISVectorZonalStats::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException)
@@ -148,7 +217,7 @@ namespace rsgis{namespace vec{
 		std::string fieldname = "";
 		for(int i = 0; i < numImgBands; ++i)
 		{
-			fieldname = std::string("b") + mathUtils.inttostring(i);
+			fieldname = std::string("b") + mathUtils.inttostring(i+1);
 			OGRFieldDefn shpField(fieldname.c_str(), OFTReal);
 			shpField.SetPrecision(10);
 			if(outputLayer->CreateField( &shpField ) != OGRERR_NONE )
@@ -172,7 +241,12 @@ namespace rsgis{namespace vec{
 	
 	RSGISVectorZonalStats::~RSGISVectorZonalStats()
 	{
-		delete[] bands;
+        // Close text tile (if writing to).
+        if (this->outputToTextFile)
+		{
+			this->outZonalFile.close();
+		}
+        delete[] bands;
 		delete imageExtent;
 		delete[] pxlValues;
 	}

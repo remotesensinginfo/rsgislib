@@ -389,7 +389,6 @@ namespace rsgis{namespace math{
 	private:
 		gsl_matrix *coefficients;
 		std::vector<int> *polyOrders;
-        std::vector<double> *values;
         int numVar;
 	};
     

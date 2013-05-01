@@ -47,9 +47,9 @@ namespace rsgis{namespace vec{
 	class RSGISVectorZonalStats : public RSGISProcessOGRFeature
 	{
 	public:
-		RSGISVectorZonalStats(GDALDataset *image);
+		RSGISVectorZonalStats(GDALDataset *image, std::string outZonalFileName = "");
 		virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
-		virtual void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
+		virtual void processFeature(OGRFeature *inFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
 		virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException);
 		float* getPixelColumns(int xPxl, int yPxl);
 		virtual ~RSGISVectorZonalStats();
@@ -60,6 +60,9 @@ namespace rsgis{namespace vec{
 		geos::geom::Envelope *imageExtent;
 		double imgRes;
 		float *pxlValues;
+        bool outputToTextFile;
+        bool firstLine;
+        std::ofstream outZonalFile;
 	};
 }}
 

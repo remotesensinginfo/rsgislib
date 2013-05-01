@@ -1283,8 +1283,8 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 				{
 					DOMElement *bandElement = NULL;
 					attributeZonalList[i]->bands = new int[attributeZonalList[i]->numBands];
-					attributeZonalList[i]->minThreasholds = new float[attributeZonalList[i]->numBands];
-					attributeZonalList[i]->maxThreasholds = new float[attributeZonalList[i]->numBands];
+					attributeZonalList[i]->minThresholds = new float[attributeZonalList[i]->numBands];
+					attributeZonalList[i]->maxThresholds = new float[attributeZonalList[i]->numBands];
 					
 					for(int j = 0; j < attributeZonalList[i]->numBands; j++)
 					{
@@ -1309,16 +1309,16 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 						if(bandElement->hasAttribute(minThresholdXMLStr))
 						{
 							char *charValue = XMLString::transcode(bandElement->getAttribute(minThresholdXMLStr));
-							attributeZonalList[i]->minThreasholds[j] = mathUtils.strtofloat(string(charValue));
+							attributeZonalList[i]->minThresholds[j] = mathUtils.strtofloat(string(charValue));
 							XMLString::release(&charValue);
 						}
 						else if(minThreashAll)
 						{
-							attributeZonalList[i]->minThreasholds[j] = minThreashAllVal;
+							attributeZonalList[i]->minThresholds[j] = minThreashAllVal;
 						}
 						else 
 						{
-							attributeZonalList[i]->minThreasholds[j] = -numeric_limits<double>::infinity();
+							attributeZonalList[i]->minThresholds[j] = -numeric_limits<double>::infinity();
 						}
 						
 						XMLString::release(&minThresholdXMLStr);
@@ -1327,16 +1327,16 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 						if(bandElement->hasAttribute(maxThresholdXMLStr))
 						{
 							char *charValue = XMLString::transcode(bandElement->getAttribute(maxThresholdXMLStr));
-							attributeZonalList[i]->maxThreasholds[j] = mathUtils.strtofloat(string(charValue));
+							attributeZonalList[i]->maxThresholds[j] = mathUtils.strtofloat(string(charValue));
 							XMLString::release(&charValue);
 						}
 						else if(maxThreashAll)
 						{
-							attributeZonalList[i]->maxThreasholds[j] = maxThreashAllVal;
+							attributeZonalList[i]->maxThresholds[j] = maxThreashAllVal;
 						}
 						else
 						{
-							attributeZonalList[i]->maxThreasholds[j] = +numeric_limits<double>::infinity();
+							attributeZonalList[i]->maxThresholds[j] = +numeric_limits<double>::infinity();
 						}
 						XMLString::release(&maxThresholdXMLStr);
 					}
@@ -1556,8 +1556,8 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 				{
 					DOMElement *bandElement = NULL;
 					attributeMeanList[i]->bands = new int[attributeMeanList[i]->numBands];
-					attributeMeanList[i]->minThreasholds = new float[attributeMeanList[i]->numBands];
-					attributeMeanList[i]->maxThreasholds = new float[attributeMeanList[i]->numBands];
+					attributeMeanList[i]->minThresholds = new float[attributeMeanList[i]->numBands];
+					attributeMeanList[i]->maxThresholds = new float[attributeMeanList[i]->numBands];
 					for(int j = 0; j < attributeMeanList[i]->numBands; j++)
 					{
 						bandElement = static_cast<DOMElement*>(bandNodesList->item(j));
@@ -1588,16 +1588,16 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 						if(bandElement->hasAttribute(minThresholdXMLStr))
 						{
 							char *charValue = XMLString::transcode(bandElement->getAttribute(minThresholdXMLStr));
-							attributeMeanList[i]->minThreasholds[j] = mathUtils.strtofloat(string(charValue));
+							attributeMeanList[i]->minThresholds[j] = mathUtils.strtofloat(string(charValue));
 							XMLString::release(&charValue);
 						}
 						else if(minThreashAll)
 						{
-							attributeMeanList[i]->minThreasholds[j] = minThreashAllVal;
+							attributeMeanList[i]->minThresholds[j] = minThreashAllVal;
 						}
 						else 
 						{
-							attributeMeanList[i]->minThreasholds[j] = -numeric_limits<double>::infinity();
+							attributeMeanList[i]->minThresholds[j] = -numeric_limits<double>::infinity();
 						}
 						
 						XMLString::release(&minThresholdXMLStr);
@@ -1607,7 +1607,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 						{
 							cout << "WARNING: \"threashold\" is no longer been used, please update scripts to use \"minThreshold\" instead" << endl;
 							char *charValue = XMLString::transcode(bandElement->getAttribute(thresholdXMLStr));
-							attributeMeanList[i]->minThreasholds[j] = mathUtils.strtofloat(string(charValue));
+							attributeMeanList[i]->minThresholds[j] = mathUtils.strtofloat(string(charValue));
 							XMLString::release(&charValue);
 						}
 						XMLString::release(&thresholdXMLStr);
@@ -1616,16 +1616,16 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 						if(bandElement->hasAttribute(maxThresholdXMLStr))
 						{
 							char *charValue = XMLString::transcode(bandElement->getAttribute(maxThresholdXMLStr));
-							attributeMeanList[i]->maxThreasholds[j] = mathUtils.strtofloat(string(charValue));
+							attributeMeanList[i]->maxThresholds[j] = mathUtils.strtofloat(string(charValue));
 							XMLString::release(&charValue);
 						}
 						else if(maxThreashAll)
 						{
-							attributeMeanList[i]->maxThreasholds[j] = maxThreashAllVal;
+							attributeMeanList[i]->maxThresholds[j] = maxThreashAllVal;
 						}
 						else
 						{
-							attributeMeanList[i]->maxThreasholds[j] = +numeric_limits<double>::infinity();
+							attributeMeanList[i]->maxThresholds[j] = +numeric_limits<double>::infinity();
 						}
 						XMLString::release(&maxThresholdXMLStr);
 					}
@@ -1823,8 +1823,8 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 				{
 					DOMElement *bandElement = NULL;
 					attributeMeanList[i]->bands = new int[attributeMeanList[i]->numBands];
-					attributeMeanList[i]->minThreasholds = new float[attributeMeanList[i]->numBands];
-					attributeMeanList[i]->minThreasholds = new float[attributeMeanList[i]->numBands];
+					attributeMeanList[i]->minThresholds = new float[attributeMeanList[i]->numBands];
+					attributeMeanList[i]->minThresholds = new float[attributeMeanList[i]->numBands];
 					for(int j = 0; j < attributeMeanList[i]->numBands; j++)
 					{
 						bandElement = static_cast<DOMElement*>(bandNodesList->item(j));
@@ -1855,16 +1855,16 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 						if(bandElement->hasAttribute(minThresholdXMLStr))
 						{
 							char *charValue = XMLString::transcode(bandElement->getAttribute(minThresholdXMLStr));
-							attributeMeanList[i]->minThreasholds[j] = mathUtils.strtofloat(string(charValue));
+							attributeMeanList[i]->minThresholds[j] = mathUtils.strtofloat(string(charValue));
 							XMLString::release(&charValue);
 						}
 						else if(minThreashAll)
 						{
-							attributeMeanList[i]->minThreasholds[j] = minThreashAllVal;
+							attributeMeanList[i]->minThresholds[j] = minThreashAllVal;
 						}
 						else 
 						{
-							attributeMeanList[i]->minThreasholds[j] = -numeric_limits<double>::infinity();
+							attributeMeanList[i]->minThresholds[j] = -numeric_limits<double>::infinity();
 						}
 						
 						XMLString::release(&minThresholdXMLStr);
@@ -1874,7 +1874,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 						{
 							cout << "WARNING: \"threashold\" is no longer been used, please update scripts to use \"minThreshold\" instead" << endl;
 							char *charValue = XMLString::transcode(bandElement->getAttribute(thresholdXMLStr));
-							attributeMeanList[i]->minThreasholds[j] = mathUtils.strtofloat(string(charValue));
+							attributeMeanList[i]->minThresholds[j] = mathUtils.strtofloat(string(charValue));
 							XMLString::release(&charValue);
 						}
 						XMLString::release(&thresholdXMLStr);
@@ -1883,16 +1883,16 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 						if(bandElement->hasAttribute(maxThresholdXMLStr))
 						{
 							char *charValue = XMLString::transcode(bandElement->getAttribute(maxThresholdXMLStr));
-							attributeMeanList[i]->maxThreasholds[j] = mathUtils.strtofloat(string(charValue));
+							attributeMeanList[i]->maxThresholds[j] = mathUtils.strtofloat(string(charValue));
 							XMLString::release(&charValue);
 						}
 						else if(maxThreashAll)
 						{
-							attributeMeanList[i]->maxThreasholds[j] = maxThreashAllVal;
+							attributeMeanList[i]->maxThresholds[j] = maxThreashAllVal;
 						}
 						else
 						{
-							attributeMeanList[i]->maxThreasholds[j] = +numeric_limits<double>::infinity();
+							attributeMeanList[i]->maxThresholds[j] = +numeric_limits<double>::infinity();
 						}
 						XMLString::release(&maxThresholdXMLStr);
 					}
@@ -2029,8 +2029,8 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 				{
 					DOMElement *bandElement = NULL;
 					attributeMeanList[i]->bands = new int[attributeMeanList[i]->numBands];
-					attributeMeanList[i]->minThreasholds = new float[attributeMeanList[i]->numBands];
-					attributeMeanList[i]->maxThreasholds = new float[attributeMeanList[i]->numBands];
+					attributeMeanList[i]->minThresholds = new float[attributeMeanList[i]->numBands];
+					attributeMeanList[i]->maxThresholds = new float[attributeMeanList[i]->numBands];
 					for(int j = 0; j < attributeMeanList[i]->numBands; j++)
 					{
 						bandElement = static_cast<DOMElement*>(bandNodesList->item(j));
@@ -2061,16 +2061,16 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 						if(bandElement->hasAttribute(minThresholdXMLStr))
 						{
 							char *charValue = XMLString::transcode(bandElement->getAttribute(minThresholdXMLStr));
-							attributeMeanList[i]->minThreasholds[j] = mathUtils.strtofloat(string(charValue));
+							attributeMeanList[i]->minThresholds[j] = mathUtils.strtofloat(string(charValue));
 							XMLString::release(&charValue);
 						}
 						else if(minThreashAll)
 						{
-							attributeMeanList[i]->minThreasholds[j] = minThreashAllVal;
+							attributeMeanList[i]->minThresholds[j] = minThreashAllVal;
 						}
 						else 
 						{
-							attributeMeanList[i]->minThreasholds[j] = -numeric_limits<double>::infinity();
+							attributeMeanList[i]->minThresholds[j] = -numeric_limits<double>::infinity();
 						}
 						
 						XMLString::release(&minThresholdXMLStr);
@@ -2080,7 +2080,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 						{
 							cout << "WARNING: \"threashold\" is no longer been used, please update scripts to use \"minThreshold\" instead" << endl;
 							char *charValue = XMLString::transcode(bandElement->getAttribute(thresholdXMLStr));
-							attributeMeanList[i]->minThreasholds[j] = mathUtils.strtofloat(string(charValue));
+							attributeMeanList[i]->minThresholds[j] = mathUtils.strtofloat(string(charValue));
 							XMLString::release(&charValue);
 						}
 						XMLString::release(&thresholdXMLStr);
@@ -2089,16 +2089,16 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 						if(bandElement->hasAttribute(maxThresholdXMLStr))
 						{
 							char *charValue = XMLString::transcode(bandElement->getAttribute(maxThresholdXMLStr));
-							attributeMeanList[i]->maxThreasholds[j] = mathUtils.strtofloat(string(charValue));
+							attributeMeanList[i]->maxThresholds[j] = mathUtils.strtofloat(string(charValue));
 							XMLString::release(&charValue);
 						}
 						else if(maxThreashAll)
 						{
-							attributeMeanList[i]->maxThreasholds[j] = maxThreashAllVal;
+							attributeMeanList[i]->maxThresholds[j] = maxThreashAllVal;
 						}
 						else
 						{
-							attributeMeanList[i]->maxThreasholds[j] = +numeric_limits<double>::infinity();
+							attributeMeanList[i]->maxThresholds[j] = +numeric_limits<double>::infinity();
 						}
 						XMLString::release(&maxThresholdXMLStr);
 					}
@@ -2454,19 +2454,38 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 		}
 	}
 	else if(XMLString::equals(optionPointValue, optionXML))
-	{		
+	{
 		this->option = RSGISExeZonalStats::pointvalue;
+		
+		// Text file
+		XMLCh *outputCSVXMLStr = XMLString::transcode("outputCSV");
+		if(argElement->hasAttribute(outputCSVXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(outputCSVXMLStr));
+			this->outputTextFile = string(charValue);
+			XMLString::release(&charValue);
+			this->outputToText = true;
+		}
+		XMLString::release(&outputCSVXMLStr);
+		
 		
 		XMLCh *outputXMLStr = XMLString::transcode("output");
 		if(argElement->hasAttribute(outputXMLStr))
 		{
-			char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
-			this->outputVecPolys = string(charValue);
-			XMLString::release(&charValue);
+			if(this->outputToText)
+			{
+				cout << "WARNING! Can't output to shapefile and CSV, ignoring shapefile." << endl;
+			}
+			else
+			{
+				char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
+				this->outputVecPolys = string(charValue);
+				XMLString::release(&charValue);
+			}
 		}
 		else
 		{
-			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+			if(!this->outputToText){throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");}
 		}
 		XMLString::release(&outputXMLStr);
 		
@@ -2488,7 +2507,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 		}
 		else
 		{
-			throw RSGISXMLArgumentsException("No \'force\' attribute was provided.");
+            if(!this->outputToText){throw RSGISXMLArgumentsException("No \'force\' attribute was provided.");}
 		}
 		XMLString::release(&forceXMLStr);
 		
@@ -3445,11 +3464,11 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 						attributeZonalList[i]->outCount = this->countAll;
 						attributeZonalList[i]->numBands = 1;
 						attributeZonalList[i]->bands = new int[1];
-						attributeZonalList[i]->minThreasholds = new float[1];
-						attributeZonalList[i]->maxThreasholds = new float[1];
+						attributeZonalList[i]->minThresholds = new float[1];
+						attributeZonalList[i]->maxThresholds = new float[1];
 						attributeZonalList[i]->bands[0] = i;
-						attributeZonalList[i]->minThreasholds[0] = this->minThreashAllVal;
-						attributeZonalList[i]->maxThreasholds[0] = this->maxThreashAllVal;
+						attributeZonalList[i]->minThresholds[0] = this->minThreashAllVal;
+						attributeZonalList[i]->maxThresholds[0] = this->maxThreashAllVal;
 						
 					}
 				}
@@ -3567,8 +3586,8 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 				for(int i = 0; i < numAttributes; i++)
 				{
 					delete[] attributeZonalList[i]->bands;
-					delete[] attributeZonalList[i]->minThreasholds;
-					delete[] attributeZonalList[i]->maxThreasholds;
+					delete[] attributeZonalList[i]->minThresholds;
+					delete[] attributeZonalList[i]->maxThresholds;
 					delete attributeZonalList[i];
 				}
 				delete[] attributeZonalList;
@@ -3727,8 +3746,8 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 				for(int i = 0; i < numAttributes; i++)
 				{
 					delete[] attributeMeanList[i]->bands;
-					delete[] attributeMeanList[i]->minThreasholds;
-					delete[] attributeMeanList[i]->maxThreasholds;
+					delete[] attributeMeanList[i]->minThresholds;
+					delete[] attributeMeanList[i]->maxThresholds;
 					delete attributeMeanList[i];
 				}
 				delete[] attributeMeanList;
@@ -3869,8 +3888,8 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 				for(int i = 0; i < numAttributes; i++)
 				{
 					delete[] attributeMeanList[i]->bands;
-					delete[] attributeMeanList[i]->minThreasholds;
-					delete[] attributeMeanList[i]->maxThreasholds;
+					delete[] attributeMeanList[i]->minThresholds;
+					delete[] attributeMeanList[i]->maxThresholds;
 					delete attributeMeanList[i];
 				}
 				delete[] attributeMeanList;
@@ -4021,8 +4040,8 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 				for(int i = 0; i < numAttributes; i++)
 				{
 					delete[] attributeMeanList[i]->bands;
-					delete[] attributeMeanList[i]->minThreasholds;
-					delete[] attributeMeanList[i]->maxThreasholds;
+					delete[] attributeMeanList[i]->minThresholds;
+					delete[] attributeMeanList[i]->maxThresholds;
 					delete attributeMeanList[i];
 				}
 				delete[] attributeMeanList;
@@ -4307,7 +4326,15 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 			cout << "Calculate zonal stats for vector\n";
 			cout << "Input Image: " << this->inputImage << endl;
 			cout << "Input Vector: " << this->inputVecPolys << endl;
-			cout << "Output Vector : " << this->outputVecPolys << endl;
+			if (this->outputToText)
+			{
+				cout << "Output CSV : " << this->outputTextFile << endl;
+				
+			}
+			else
+			{
+				cout << "Output Vector : " << this->outputVecPolys << endl;
+			}
 			
 			GDALAllRegister();
 			OGRRegisterAll();
@@ -4319,7 +4346,7 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 			RSGISProcessOGRFeature *processFeature = NULL;
 			
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVecPolys);
-			string SHPFileOutLayer = vecUtils.getLayerName(this->outputVecPolys);
+            string SHPFileOutLayer = "";
 			
 			GDALDataset *inputImageDS = NULL;
 			OGRDataSource *inputSHPDS = NULL;
@@ -4333,19 +4360,23 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 			
 			try
 			{
-				outputDIR = fileUtils.getFileDirectoryPath(this->outputVecPolys);
-				
-				if(vecUtils.checkDIR4SHP(outputDIR, SHPFileOutLayer))
-				{
-					if(this->force)
-					{
-						vecUtils.deleteSHP(outputDIR, SHPFileOutLayer);
-					}
-					else
-					{
-						throw RSGISException("Shapefile already exists, either delete or select force.");
-					}
-				}
+				if (!this->outputToText)
+                {
+                    SHPFileOutLayer = vecUtils.getLayerName(this->outputVecPolys);
+                    outputDIR = fileUtils.getFileDirectoryPath(this->outputVecPolys);
+                    
+                    if(vecUtils.checkDIR4SHP(outputDIR, SHPFileOutLayer))
+                    {
+                        if(this->force)
+                        {
+                            vecUtils.deleteSHP(outputDIR, SHPFileOutLayer);
+                        }
+                        else
+                        {
+                            throw RSGISException("Shapefile already exists, either delete or select force.");
+                        }
+                    }
+                }
 				
 				/////////////////////////////////////
 				//
@@ -4388,36 +4419,50 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 				// Create Output Shapfile.
 				//
 				/////////////////////////////////////
-				const char *pszDriverName = "ESRI Shapefile";
-				shpFiledriver = OGRSFDriverRegistrar::GetRegistrar()->GetDriverByName(pszDriverName );
-				if( shpFiledriver == NULL )
-				{
-					throw RSGISException("SHP driver not available.");
+                if (!this->outputToText)
+                {
+                    const char *pszDriverName = "ESRI Shapefile";
+                    shpFiledriver = OGRSFDriverRegistrar::GetRegistrar()->GetDriverByName(pszDriverName );
+                    if( shpFiledriver == NULL )
+                    {
+                        throw RSGISException("SHP driver not available.");
+                    }
+                    outputSHPDS = shpFiledriver->CreateDataSource(this->outputVecPolys.c_str(), NULL);
+                    if( outputSHPDS == NULL )
+                    {
+                        string message = string("Could not create vector file ") + this->outputVecPolys;
+                        throw RSGISException(message.c_str());
+                    }
+                    outputSHPLayer = outputSHPDS->CreateLayer(SHPFileOutLayer.c_str(), inputSpatialRef, geometryType, NULL );
+                    if( outputSHPLayer == NULL )
+                    {
+                        string message = string("Could not create vector layer ") + SHPFileOutLayer;
+                        throw RSGISException(message.c_str());
+                    }
+                    
+                    processFeature = new RSGISVectorZonalStats(inputImageDS);
+                    processVector = new RSGISProcessVector(processFeature);
+                    
+                    processVector->processVectors(inputSHPLayer, outputSHPLayer, true, true, false);
+                    OGRDataSource::DestroyDataSource(outputSHPDS);
+                    
+                    delete processVector;
+                    delete processFeature;
 				}
-				outputSHPDS = shpFiledriver->CreateDataSource(this->outputVecPolys.c_str(), NULL);
-				if( outputSHPDS == NULL )
-				{
-					string message = string("Could not create vector file ") + this->outputVecPolys;
-					throw RSGISException(message.c_str());
-				}
-				outputSHPLayer = outputSHPDS->CreateLayer(SHPFileOutLayer.c_str(), inputSpatialRef, geometryType, NULL );
-				if( outputSHPLayer == NULL )
-				{
-					string message = string("Could not create vector layer ") + SHPFileOutLayer;
-					throw RSGISException(message.c_str());
-				}
-				
-				processFeature = new RSGISVectorZonalStats(inputImageDS);
-				processVector = new RSGISProcessVector(processFeature);
-				
-				processVector->processVectors(inputSHPLayer, outputSHPLayer, true, true, false);
-				
+                else
+                {
+                    
+                    processFeature = new RSGISVectorZonalStats(inputImageDS, this->outputTextFile);
+                    processVector = new RSGISProcessVector(processFeature);
+                    
+                    processVector->processVectorsNoOutput(inputSHPLayer, true);
+                    
+                    delete processVector;
+                    delete processFeature;
+                    
+                }
 				GDALClose(inputImageDS);
 				OGRDataSource::DestroyDataSource(inputSHPDS);
-				OGRDataSource::DestroyDataSource(outputSHPDS);
-				
-				delete processVector;
-				delete processFeature;
 				
 				//OGRCleanupAll();
 				GDALDestroyDriverManager();
@@ -4731,16 +4776,16 @@ void RSGISExeZonalStats::printParameters()
 			cout << numAttributes << " attributes are to be summarised\n";
 			for(int i = 0; i < numAttributes; i++)
 			{
-				cout << i << ": " << attributeMeanList[i]->name << " using bands [band:minThreashold, maxThreashold] [";
+				cout << i << ": " << attributeMeanList[i]->name << " using bands [band:minThreshold, maxThreshold] [";
 				for(int j = 0; j < attributeMeanList[i]->numBands; j++)
 				{
 					if(j == 0)
 					{
-						cout << "[" << attributeMeanList[i]->bands[j] << ":" << attributeMeanList[i]->minThreasholds[j] << "," << attributeMeanList[i]->maxThreasholds[j] << "]";
+						cout << "[" << attributeMeanList[i]->bands[j] << ":" << attributeMeanList[i]->minThresholds[j] << "," << attributeMeanList[i]->maxThresholds[j] << "]";
 					}
 					else
 					{
-						cout << " [" << attributeMeanList[i]->bands[j] << ":" << attributeMeanList[i]->minThreasholds[j] << "," << attributeMeanList[i]->maxThreasholds[j] << "]";
+						cout << " [" << attributeMeanList[i]->bands[j] << ":" << attributeMeanList[i]->minThresholds[j] << "," << attributeMeanList[i]->maxThresholds[j] << "]";
 					}
 				}
 				cout << "]\n";
@@ -4764,16 +4809,16 @@ void RSGISExeZonalStats::printParameters()
 			cout << numAttributes << " attributes are to be summarised\n";
 			for(int i = 0; i < numAttributes; i++)
 			{
-				cout << i << ": " << attributeMeanList[i]->name << " using bands [band:minThreashold, maxThreashold] [";
+				cout << i << ": " << attributeMeanList[i]->name << " using bands [band:minThreshold, maxThreshold] [";
 				for(int j = 0; j < attributeMeanList[i]->numBands; j++)
 				{
 					if(j == 0)
 					{
-						cout << "[" << attributeMeanList[i]->bands[j] << ":" << attributeMeanList[i]->minThreasholds[j] << "," << attributeMeanList[i]->maxThreasholds[j] << "]";
+						cout << "[" << attributeMeanList[i]->bands[j] << ":" << attributeMeanList[i]->minThresholds[j] << "," << attributeMeanList[i]->maxThresholds[j] << "]";
 					}
 					else
 					{
-						cout << " [" << attributeMeanList[i]->bands[j] << ":" << attributeMeanList[i]->minThreasholds[j] << "," << attributeMeanList[i]->maxThreasholds[j] << "]";
+						cout << " [" << attributeMeanList[i]->bands[j] << ":" << attributeMeanList[i]->minThresholds[j] << "," << attributeMeanList[i]->maxThresholds[j] << "]";
 					}
 				}
 				cout << "]\n";
@@ -4891,12 +4936,12 @@ void RSGISExeZonalStats::help()
     cout << "    vector=\"polys.shp\" raster=\"polys.env\" output=\"output.shp\" force=\"yes | no\"" << endl;
     cout << "    ignoreProjection=\"yes | no\" copyAttributes=\"yes | no\" pxlcount=\"yes | no\"" << endl;
     cout << "    mean=\"yes | no \" min=\"yes | no\" max=\"yes | no \" stddev=\"yes | no\" " << endl;
-    cout << "    mode=\"yes | no\" count=\"yes | no\" minThreshold=\"float\" maxThreashold=\"float\" >" << endl;
+    cout << "    mode=\"yes | no\" count=\"yes | no\" minThreshold=\"float\" maxThreshold=\"float\" >" << endl;
     cout << "    <rsgis:attribute name=\"attribute_name\" >" << endl;
-    cout << "        <rsgis:band band=\"int\" minThreshold=\"float\" maxThreashold=\"float\" />" << endl;
+    cout << "        <rsgis:band band=\"int\" minThreshold=\"float\" maxThreshold=\"float\" />" << endl;
     cout << "    </rsgis:attribute>" << endl;
     cout << "    <rsgis:attribute name=\"attribute_name\" >" << endl;
-    cout << "        <rsgis:band band=\"int\" minThreshold=\"float\" maxThreashold=\"float\" />" << endl;
+    cout << "        <rsgis:band band=\"int\" minThreshold=\"float\" maxThreshold=\"float\" />" << endl;
     cout << "    </rsgis:attribute>" << endl;
     cout << "</rsgis:command>" << endl;
     cout << "" << endl;
@@ -4904,13 +4949,13 @@ void RSGISExeZonalStats::help()
     cout << "    raster=\"polys.env\"  vector=\"polys.shp\" output=\"output.shp\" force=\"yes | no\"" << endl;
     cout << "    pxlcount=\"yes | no\" dB=\"yes | no\">" << endl;
     cout << "    <rsgis:attribute name=\"attribute_name\" >" << endl;
-    cout << "        <rsgis:band band=\"int\" minThreshold=\"float\" maxThreashold=\"float\" />" << endl;
+    cout << "        <rsgis:band band=\"int\" minThreshold=\"float\" maxThreshold=\"float\" />" << endl;
     cout << "    </rsgis:attribute>" << endl;
     cout << "    <rsgis:attribute name=\"attribute_name\" >" << endl;
-    cout << "        <rsgis:band band=\"int\" minThreshold=\"float\" maxThreashold=\"float\" />" << endl;
+    cout << "        <rsgis:band band=\"int\" minThreshold=\"float\" maxThreshold=\"float\" />" << endl;
     cout << "    </rsgis:attribute>" << endl;
     cout << "    <rsgis:attribute name=\"attribute_name\" >" << endl;
-    cout << "        <rsgis:band band=\"int\" minThreshold=\"float\" maxThreashold=\"float\" />" << endl;
+    cout << "        <rsgis:band band=\"int\" minThreshold=\"float\" maxThreshold=\"float\" />" << endl;
     cout << "    </rsgis:attribute>" << endl;
     cout << "</rsgis:command>" << endl;
     cout << "" << endl;
@@ -4918,13 +4963,13 @@ void RSGISExeZonalStats::help()
     cout << "    image=\"image.env\" vector=\"polys.shp\" output=\"output.shp\" " << endl;
     cout << "    force=\"yes | no\" pxlcount=\"yes | no\">" << endl;
     cout << "    <rsgis:attribute name=\"attribute_name\" >" << endl;
-    cout << "        <rsgis:band band=\"int\" minThreshold=\"float\" maxThreashold=\"float\" />" << endl;
+    cout << "        <rsgis:band band=\"int\" minThreshold=\"float\" maxThreshold=\"float\" />" << endl;
     cout << "    </rsgis:attribute>" << endl;
     cout << "    <rsgis:attribute name=\"attribute_name\" >" << endl;
-    cout << "        <rsgis:band band=\"int\" minThreshold=\"float\" maxThreashold=\"float\" />" << endl;
+    cout << "        <rsgis:band band=\"int\" minThreshold=\"float\" maxThreshold=\"float\" />" << endl;
     cout << "    </rsgis:attribute>" << endl;
     cout << "    <rsgis:attribute name=\"attribute_name\" >" << endl;
-    cout << "        <rsgis:band band=\"int\" minThreshold=\"float\" maxThreashold=\"float\"/>" << endl;
+    cout << "        <rsgis:band band=\"int\" minThreshold=\"float\" maxThreshold=\"float\"/>" << endl;
     cout << "    </rsgis:attribute>" << endl;
     cout << "</rsgis:command>" << endl;
     cout << "" << endl;
@@ -4932,18 +4977,20 @@ void RSGISExeZonalStats::help()
     cout << "    vector=\"polys.shp\"  output=\"output.shp\" windowSize=\"int\" " << endl;
     cout << "    offsetSize=\"float\" force=\"yes | no\" pxlcount=\"yes | no\">" << endl;
     cout << "    <rsgis:attribute name=\"attribute_name\" >" << endl;
-    cout << "        <rsgis:band band=\"int\" minThreshold=\"float\" maxThreashold=\"float\" />" << endl;
+    cout << "        <rsgis:band band=\"int\" minThreshold=\"float\" maxThreshold=\"float\" />" << endl;
     cout << "    </rsgis:attribute>" << endl;
     cout << "    <rsgis:attribute name=\"attribute_name\" >" << endl;
-    cout << "        <rsgis:band band=\"int\" minThreshold=\"float\" maxThreashold=\"float\" />" << endl;
+    cout << "        <rsgis:band band=\"int\" minThreshold=\"float\" maxThreshold=\"float\" />" << endl;
     cout << "    </rsgis:attribute>" << endl;
     cout << "    <rsgis:attribute name=\"attribute_name\" >" << endl;
-    cout << "        <rsgis:band band=\"int\" minThreshold=\"float\" maxThreashold=\"float\"/>" << endl;
+    cout << "        <rsgis:band band=\"int\" minThreshold=\"float\" maxThreshold=\"float\"/>" << endl;
     cout << "    </rsgis:attribute>" << endl;
     cout << "</rsgis:command>" << endl;
     cout << "" << endl;
     cout << "<rsgis:command algor=\"zonalstats\" option=\"pointvalue\" image=\"image.env\"" << endl;
     cout << "    vector=\"points.shp\" output=\"output.shp\" force=\"yes | no\" />" << endl;
+    cout << "<rsgis:command algor=\"zonalstats\" option=\"pointvalue\" image=\"image.env\"" << endl;
+    cout << "    vector=\"points.shp\" outputCSV=\"output.csv\" force=\"yes | no\" />" << endl;
     cout << "" << endl;
     cout << "<rsgis:command algor=\"zonalstats\" option=\"endmembers\" image=\"image.env\"" << endl;
     cout << "    vector=\"points.shp\" output=\"output.mtxt\"  />" << endl;
