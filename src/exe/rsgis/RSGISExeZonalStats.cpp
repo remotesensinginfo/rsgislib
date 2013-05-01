@@ -3489,6 +3489,44 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 						attributeZonalList[i]->bands[0] = i;
 						attributeZonalList[i]->minThresholds[0] = this->minThreshAllVal;
 						attributeZonalList[i]->maxThresholds[0] = this->maxThreshAllVal;
+                        
+                        // If using band names get names from image
+                        if(this->useBandNames)
+                        {
+                            std::string bandName = inputImageDS->GetRasterBand(i+1)->GetDescription();
+                            
+                            // Replace spaces and parentheses in file name
+                            boost::algorithm::replace_all(bandName, " ", "_");
+                            boost::algorithm::replace_all(bandName, "(", "_");
+                            boost::algorithm::replace_all(bandName, ")", "_");
+                            boost::algorithm::replace_all(bandName, "[", "_");
+                            boost::algorithm::replace_all(bandName, "]", "_");
+                            boost::algorithm::replace_all(bandName, ":", "");
+                            boost::algorithm::replace_all(bandName, "?", "");
+                            boost::algorithm::replace_all(bandName, ">", "gt");
+                            boost::algorithm::replace_all(bandName, "<", "lt");
+                            boost::algorithm::replace_all(bandName, "=", "eq");
+                            
+                            /* Check if band name us longer than maximum length for shapefile field name
+                             No limit on CSV but makes management easier with shorter names */
+                            if(bandName.length() > 7)
+                            {
+                                // If not using all of name, append number so unique
+                                std::cerr << "WARNING: "<< bandName << " will be truncated to \'" << bandName.substr(0, 5) << i+1 << "\'" << std::endl;
+                                attributeZonalList[i]->name = bandName.substr(0, 5) + mathsUtil.inttostring(i+1);
+                            }
+                            else if(bandName == "")
+                            {
+                                // If escription is empty, use b1 etc.,
+                                attributeZonalList[i]->name  = std::string("b") + mathsUtil.inttostring(i+1);
+                            }
+                            else{attributeZonalList[i]->name = bandName;}
+                        }
+                        
+                        else
+                        {
+                            attributeZonalList[i]->name = std::string("b") + mathsUtil.inttostring(i+1);
+                        }
 						
 					}
 				}
@@ -4954,7 +4992,7 @@ void RSGISExeZonalStats::help()
     cout << "" << endl;
     cout << "<rsgis:command algor=\"zonalstats\" option=\"pixelstats\" image=\"image.env\"  " << endl;
     cout << "    vector=\"polys.shp\" raster=\"polys.env\" output=\"output.shp\" force=\"yes | no\"" << endl;
-    cout << "    ignoreProjection=\"yes | no\" copyAttributes=\"yes | no\" pxlcount=\"yes | no\"" << endl;
+    cout << "    ignoreProjection=\"yes | no\" copyAttributes=\"yes | no\" useBandNames=\"yes | no\" pxlcount=\"yes | no\"" << endl;
     cout << "    mean=\"yes | no \" min=\"yes | no\" max=\"yes | no \" stddev=\"yes | no\" " << endl;
     cout << "    mode=\"yes | no\" count=\"yes | no\" minThreshold=\"float\" maxThreshold=\"float\" >" << endl;
     cout << "    <rsgis:attribute name=\"attribute_name\" >" << endl;
