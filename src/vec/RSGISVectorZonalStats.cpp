@@ -25,14 +25,57 @@
 
 namespace rsgis{namespace vec{
 	
-	RSGISVectorZonalStats::RSGISVectorZonalStats(GDALDataset *image, std::string outZonalFileName)
+	RSGISVectorZonalStats::RSGISVectorZonalStats(GDALDataset *image, std::string outZonalFileName, bool useBandNames)
 	{
-		this->image = image;
-		this->numImgBands = image->GetRasterCount();
-		bands = new GDALRasterBand*[numImgBands];
+		rsgis::math::RSGISMathsUtils mathUtils;
+        
+        this->image = image;
+		
+        this->numImgBands = image->GetRasterCount();
+        
+		this->bands = new GDALRasterBand*[numImgBands];
+        
+        // Set up output names
+        this->useBandNames = useBandNames;
+        this->outNames = new std::string[numImgBands];
+        
 		for(int i = 0; i < numImgBands; ++i)
 		{
 			bands[i] = image->GetRasterBand(i+1);
+            
+            if(this->useBandNames)
+            {
+                std::string bandName = bands[i]->GetDescription();
+                
+                // Replace spaces and parentheses in file name
+                boost::algorithm::replace_all(bandName, " ", "_");
+                boost::algorithm::replace_all(bandName, "(", "_");
+                boost::algorithm::replace_all(bandName, ")", "_");
+                boost::algorithm::replace_all(bandName, "[", "_");
+                boost::algorithm::replace_all(bandName, "]", "_");
+                boost::algorithm::replace_all(bandName, ":", "");
+                boost::algorithm::replace_all(bandName, "?", "");
+                boost::algorithm::replace_all(bandName, ">", "gt");
+                boost::algorithm::replace_all(bandName, "<", "lt");
+                boost::algorithm::replace_all(bandName, "=", "eq");
+                
+                if(bandName.length() > 9)
+                {
+                    std::cerr << "WARNING: "<< bandName << " will be truncated to \'" << bandName.substr(0, 7) << i+1 << "\'" << std::endl;
+                    this->outNames[i] = bandName.substr(0, 7) + mathUtils.inttostring(i+1);
+                }
+                else if(bandName == "")
+                {
+                    // Description is empty, use b1 etc.,
+                    this->outNames[i] = std::string("b") + mathUtils.inttostring(i+1);
+                }
+                else{this->outNames[i] = bandName;}
+            }
+
+            else
+            {
+                this->outNames[i] = std::string("b") + mathUtils.inttostring(i+1);
+            }
 		}
 		
 		double geoTransform[6];
@@ -94,7 +137,7 @@ namespace rsgis{namespace vec{
 				std::string fieldname = "";
 				for(int i = 0; i < this->numImgBands; ++i)
 				{
-					fieldname = std::string("b") + mathUtils.inttostring(i+1);
+					fieldname = this->outNames[i];
 					outFeature->SetField(outFeatureDefn->GetFieldIndex(fieldname.c_str()), values[i]);
 				}
 			}
@@ -107,7 +150,7 @@ namespace rsgis{namespace vec{
 				
 				for(int i = 0; i < numImgBands; ++i)
 				{
-					fieldname = std::string("b") + mathUtils.inttostring(i+1);
+					fieldname = this->outNames[i];
 					outFeature->SetField(outFeatureDefn->GetFieldIndex(fieldname.c_str()), 0);
 				}
 			}
@@ -163,7 +206,7 @@ namespace rsgis{namespace vec{
                     for(int i = 0; i < this->numImgBands; i++)
                     {
                         
-                        std::string fieldname = std::string("b") + mathUtils.inttostring(i+1);
+                        std::string fieldname = this->outNames[i];
                         this->outZonalFile << "," << fieldname;
                     }
                     
@@ -217,7 +260,7 @@ namespace rsgis{namespace vec{
 		std::string fieldname = "";
 		for(int i = 0; i < numImgBands; ++i)
 		{
-			fieldname = std::string("b") + mathUtils.inttostring(i+1);
+			fieldname = this->outNames[i];;
 			OGRFieldDefn shpField(fieldname.c_str(), OFTReal);
 			shpField.SetPrecision(10);
 			if(outputLayer->CreateField( &shpField ) != OGRERR_NONE )
@@ -246,9 +289,10 @@ namespace rsgis{namespace vec{
 		{
 			this->outZonalFile.close();
 		}
-        delete[] bands;
-		delete imageExtent;
-		delete[] pxlValues;
+        delete[] this->bands;
+		delete this->imageExtent;
+		delete[] this->pxlValues;
+        delete[] this->outNames;
 	}
 }}
 

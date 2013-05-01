@@ -133,6 +133,26 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
     }
     XMLString::release(&forceProjXMLStr);
     
+    // Check if band names, from image should be used
+    this->useBandNames = false;
+    XMLCh *useBandNamesXMLStr = XMLString::transcode("useBandNames");
+    if(argElement->hasAttribute(useBandNamesXMLStr))
+    {
+        XMLCh *yesStr = XMLString::transcode("yes");
+        const XMLCh *forceValue = argElement->getAttribute(useBandNamesXMLStr);
+        
+        if(XMLString::equals(forceValue, yesStr))
+        {
+            this->useBandNames = true;
+        }
+        else
+        {
+            this->useBandNames = false;
+        }
+        XMLString::release(&yesStr);
+    }
+    XMLString::release(&useBandNamesXMLStr);
+    
 	const XMLCh *optionXML = argElement->getAttribute(optionXMLStr);
 	if(XMLString::equals(optionPolygonsToShp, optionXML))
 	{		
@@ -982,10 +1002,10 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
         this->modeAll = false;
         this->sumAll = false;
 		this->countAll = false;
-		this->minThreashAll = false;
-		this->maxThreashAll = false;
-		this->minThreashAllVal = -numeric_limits<double>::infinity();
-		this->maxThreashAllVal = +numeric_limits<double>::infinity();
+		this->minThreshAll = false;
+		this->maxThreshAll = false;
+		this->minThreshAllVal = -numeric_limits<double>::infinity();
+		this->maxThreshAllVal = +numeric_limits<double>::infinity();
 		
 		XMLCh *minXMLStr = XMLString::transcode("min");
 		if(argElement->hasAttribute(minXMLStr))
@@ -1089,9 +1109,9 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 		if(argElement->hasAttribute(minThresholdXMLStr))
 		{
 			char *charValue = XMLString::transcode(argElement->getAttribute(minThresholdXMLStr));
-			minThreashAllVal= mathUtils.strtofloat(string(charValue));
+			minThreshAllVal= mathUtils.strtofloat(string(charValue));
 			XMLString::release(&charValue);
-			minThreashAll = true; 
+			minThreshAll = true; 
 		}
 		XMLString::release(&minThresholdXMLStr);
 		
@@ -1099,9 +1119,9 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 		if(argElement->hasAttribute(maxThresholdXMLStr))
 		{
 			char *charValue = XMLString::transcode(argElement->getAttribute(maxThresholdXMLStr));
-			maxThreashAllVal= mathUtils.strtofloat(string(charValue));
+			maxThreshAllVal= mathUtils.strtofloat(string(charValue));
 			XMLString::release(&charValue);
-			maxThreashAll = true; 
+			maxThreshAll = true; 
 		}
 		XMLString::release(&maxThresholdXMLStr);
 		
@@ -1312,9 +1332,9 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 							attributeZonalList[i]->minThresholds[j] = mathUtils.strtofloat(string(charValue));
 							XMLString::release(&charValue);
 						}
-						else if(minThreashAll)
+						else if(minThreshAll)
 						{
-							attributeZonalList[i]->minThresholds[j] = minThreashAllVal;
+							attributeZonalList[i]->minThresholds[j] = minThreshAllVal;
 						}
 						else 
 						{
@@ -1330,9 +1350,9 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 							attributeZonalList[i]->maxThresholds[j] = mathUtils.strtofloat(string(charValue));
 							XMLString::release(&charValue);
 						}
-						else if(maxThreashAll)
+						else if(maxThreshAll)
 						{
-							attributeZonalList[i]->maxThresholds[j] = maxThreashAllVal;
+							attributeZonalList[i]->maxThresholds[j] = maxThreshAllVal;
 						}
 						else
 						{
@@ -1498,18 +1518,18 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 		XMLString::release(&pxlcountXMLStr);
 		
 		// Set values for minimum and maximum for all attributes
-		this->minThreashAll = false;
-		this->maxThreashAll = false;
-		this->minThreashAllVal = -numeric_limits<double>::infinity();
-		this->maxThreashAllVal = +numeric_limits<double>::infinity();
+		this->minThreshAll = false;
+		this->maxThreshAll = false;
+		this->minThreshAllVal = -numeric_limits<double>::infinity();
+		this->maxThreshAllVal = +numeric_limits<double>::infinity();
 		
 		XMLCh *minThresholdXMLStr = XMLString::transcode("minThreshold");
 		if(argElement->hasAttribute(minThresholdXMLStr))
 		{
 			char *charValue = XMLString::transcode(argElement->getAttribute(minThresholdXMLStr));
-			minThreashAllVal= mathUtils.strtofloat(string(charValue));
+			minThreshAllVal= mathUtils.strtofloat(string(charValue));
 			XMLString::release(&charValue);
-			minThreashAll = true; 
+			minThreshAll = true; 
 		}
 		XMLString::release(&minThresholdXMLStr);
 		
@@ -1517,9 +1537,9 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 		if(argElement->hasAttribute(maxThresholdXMLStr))
 		{
 			char *charValue = XMLString::transcode(argElement->getAttribute(maxThresholdXMLStr));
-			maxThreashAllVal= mathUtils.strtofloat(string(charValue));
+			maxThreshAllVal= mathUtils.strtofloat(string(charValue));
 			XMLString::release(&charValue);
-			maxThreashAll = true; 
+			maxThreshAll = true; 
 		}
 		XMLString::release(&maxThresholdXMLStr);
 		
@@ -1591,9 +1611,9 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 							attributeMeanList[i]->minThresholds[j] = mathUtils.strtofloat(string(charValue));
 							XMLString::release(&charValue);
 						}
-						else if(minThreashAll)
+						else if(minThreshAll)
 						{
-							attributeMeanList[i]->minThresholds[j] = minThreashAllVal;
+							attributeMeanList[i]->minThresholds[j] = minThreshAllVal;
 						}
 						else 
 						{
@@ -1619,9 +1639,9 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 							attributeMeanList[i]->maxThresholds[j] = mathUtils.strtofloat(string(charValue));
 							XMLString::release(&charValue);
 						}
-						else if(maxThreashAll)
+						else if(maxThreshAll)
 						{
-							attributeMeanList[i]->maxThresholds[j] = maxThreashAllVal;
+							attributeMeanList[i]->maxThresholds[j] = maxThreshAllVal;
 						}
 						else
 						{
@@ -1765,18 +1785,18 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 		XMLString::release(&pxlcountXMLStr);
 		
 		// Set values for minimum and maximum for all attributes
-		bool minThreashAll = false;
-		bool maxThreashAll = false;
-		double minThreashAllVal = -numeric_limits<double>::infinity();
-		double maxThreashAllVal = +numeric_limits<double>::infinity();
+		bool minThreshAll = false;
+		bool maxThreshAll = false;
+		double minThreshAllVal = -numeric_limits<double>::infinity();
+		double maxThreshAllVal = +numeric_limits<double>::infinity();
 		
 		XMLCh *minThresholdXMLStr = XMLString::transcode("minThreshold");
 		if(argElement->hasAttribute(minThresholdXMLStr))
 		{
 			char *charValue = XMLString::transcode(argElement->getAttribute(minThresholdXMLStr));
-			minThreashAllVal= mathUtils.strtofloat(string(charValue));
+			minThreshAllVal= mathUtils.strtofloat(string(charValue));
 			XMLString::release(&charValue);
-			minThreashAll = true; 
+			minThreshAll = true; 
 		}
 		XMLString::release(&minThresholdXMLStr);
 		
@@ -1784,9 +1804,9 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 		if(argElement->hasAttribute(maxThresholdXMLStr))
 		{
 			char *charValue = XMLString::transcode(argElement->getAttribute(maxThresholdXMLStr));
-			maxThreashAllVal= mathUtils.strtofloat(string(charValue));
+			maxThreshAllVal= mathUtils.strtofloat(string(charValue));
 			XMLString::release(&charValue);
-			maxThreashAll = true; 
+			maxThreshAll = true; 
 		}
 		XMLString::release(&maxThresholdXMLStr);
 		
@@ -1858,9 +1878,9 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 							attributeMeanList[i]->minThresholds[j] = mathUtils.strtofloat(string(charValue));
 							XMLString::release(&charValue);
 						}
-						else if(minThreashAll)
+						else if(minThreshAll)
 						{
-							attributeMeanList[i]->minThresholds[j] = minThreashAllVal;
+							attributeMeanList[i]->minThresholds[j] = minThreshAllVal;
 						}
 						else 
 						{
@@ -1886,9 +1906,9 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 							attributeMeanList[i]->maxThresholds[j] = mathUtils.strtofloat(string(charValue));
 							XMLString::release(&charValue);
 						}
-						else if(maxThreashAll)
+						else if(maxThreshAll)
 						{
-							attributeMeanList[i]->maxThresholds[j] = maxThreashAllVal;
+							attributeMeanList[i]->maxThresholds[j] = maxThreshAllVal;
 						}
 						else
 						{
@@ -1971,18 +1991,18 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 		XMLString::release(&pxlcountXMLStr);
 		
 		// Set values for minimum and maximum for all attributes
-		this->minThreashAll = false;
-		this->maxThreashAll = false;
-		this->minThreashAllVal = -numeric_limits<double>::infinity();
-		this->maxThreashAllVal = +numeric_limits<double>::infinity();
+		this->minThreshAll = false;
+		this->maxThreshAll = false;
+		this->minThreshAllVal = -numeric_limits<double>::infinity();
+		this->maxThreshAllVal = +numeric_limits<double>::infinity();
 		
 		XMLCh *minThresholdXMLStr = XMLString::transcode("minThreshold");
 		if(argElement->hasAttribute(minThresholdXMLStr))
 		{
 			char *charValue = XMLString::transcode(argElement->getAttribute(minThresholdXMLStr));
-			minThreashAllVal= mathUtils.strtofloat(string(charValue));
+			minThreshAllVal= mathUtils.strtofloat(string(charValue));
 			XMLString::release(&charValue);
-			minThreashAll = true; 
+			minThreshAll = true; 
 		}
 		XMLString::release(&minThresholdXMLStr);
 		
@@ -1990,9 +2010,9 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 		if(argElement->hasAttribute(maxThresholdXMLStr))
 		{
 			char *charValue = XMLString::transcode(argElement->getAttribute(maxThresholdXMLStr));
-			maxThreashAllVal= mathUtils.strtofloat(string(charValue));
+			maxThreshAllVal= mathUtils.strtofloat(string(charValue));
 			XMLString::release(&charValue);
-			maxThreashAll = true; 
+			maxThreshAll = true; 
 		}
 		XMLString::release(&maxThresholdXMLStr);
 		
@@ -2064,9 +2084,9 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 							attributeMeanList[i]->minThresholds[j] = mathUtils.strtofloat(string(charValue));
 							XMLString::release(&charValue);
 						}
-						else if(minThreashAll)
+						else if(minThreshAll)
 						{
-							attributeMeanList[i]->minThresholds[j] = minThreashAllVal;
+							attributeMeanList[i]->minThresholds[j] = minThreshAllVal;
 						}
 						else 
 						{
@@ -2092,9 +2112,9 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 							attributeMeanList[i]->maxThresholds[j] = mathUtils.strtofloat(string(charValue));
 							XMLString::release(&charValue);
 						}
-						else if(maxThreashAll)
+						else if(maxThreshAll)
 						{
-							attributeMeanList[i]->maxThresholds[j] = maxThreashAllVal;
+							attributeMeanList[i]->maxThresholds[j] = maxThreshAllVal;
 						}
 						else
 						{
@@ -3467,8 +3487,8 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 						attributeZonalList[i]->minThresholds = new float[1];
 						attributeZonalList[i]->maxThresholds = new float[1];
 						attributeZonalList[i]->bands[0] = i;
-						attributeZonalList[i]->minThresholds[0] = this->minThreashAllVal;
-						attributeZonalList[i]->maxThresholds[0] = this->maxThreashAllVal;
+						attributeZonalList[i]->minThresholds[0] = this->minThreshAllVal;
+						attributeZonalList[i]->maxThresholds[0] = this->maxThreshAllVal;
 						
 					}
 				}
@@ -4440,7 +4460,7 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
                         throw RSGISException(message.c_str());
                     }
                     
-                    processFeature = new RSGISVectorZonalStats(inputImageDS);
+                    processFeature = new RSGISVectorZonalStats(inputImageDS,"",this->useBandNames);
                     processVector = new RSGISProcessVector(processFeature);
                     
                     processVector->processVectors(inputSHPLayer, outputSHPLayer, true, true, false);
@@ -4452,7 +4472,7 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
                 else
                 {
                     
-                    processFeature = new RSGISVectorZonalStats(inputImageDS, this->outputTextFile);
+                    processFeature = new RSGISVectorZonalStats(inputImageDS, this->outputTextFile,this->useBandNames);
                     processVector = new RSGISProcessVector(processFeature);
                     
                     processVector->processVectorsNoOutput(inputSHPLayer, true);
@@ -4988,9 +5008,9 @@ void RSGISExeZonalStats::help()
     cout << "</rsgis:command>" << endl;
     cout << "" << endl;
     cout << "<rsgis:command algor=\"zonalstats\" option=\"pointvalue\" image=\"image.env\"" << endl;
-    cout << "    vector=\"points.shp\" output=\"output.shp\" force=\"yes | no\" />" << endl;
+    cout << "    vector=\"points.shp\" output=\"output.shp\" force=\"yes | no\" useBandNames=\"yes | no\" />" << endl;
     cout << "<rsgis:command algor=\"zonalstats\" option=\"pointvalue\" image=\"image.env\"" << endl;
-    cout << "    vector=\"points.shp\" outputCSV=\"output.csv\" force=\"yes | no\" />" << endl;
+    cout << "    vector=\"points.shp\" outputCSV=\"output.csv\" force=\"yes | no\" useBandNames=\"yes | no\" />" << endl;
     cout << "" << endl;
     cout << "<rsgis:command algor=\"zonalstats\" option=\"endmembers\" image=\"image.env\"" << endl;
     cout << "    vector=\"points.shp\" output=\"output.mtxt\"  />" << endl;
