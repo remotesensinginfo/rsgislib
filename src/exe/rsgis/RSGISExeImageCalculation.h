@@ -192,7 +192,7 @@ namespace rsgisexe{
         float degreeOfChange;
         unsigned int subSample;
         unsigned int numClusters;
-        rsgis::math::InitClustererMethods initClusterMethod;
+        rsgis::cmds::RSGISInitClustererMethods initClusterMethod;
         bool ignoreZeros;
         float minDistBetweenClusters;
         unsigned int minNumFeatures;

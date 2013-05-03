@@ -1874,31 +1874,31 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 			
 			if(xercesc::XMLString::equals(strValue, randomStr))
 			{
-				this->initClusterMethod = rsgis::math::init_random;
+				this->initClusterMethod = rsgis::cmds::rsgis_init_random;
 			}
             else if(xercesc::XMLString::equals(strValue, diagonalRangeStr))
 			{
-				this->initClusterMethod = rsgis::math::init_diagonal_full;
+				this->initClusterMethod = rsgis::cmds::rsgis_init_diagonal_full;
 			}
             else if(xercesc::XMLString::equals(strValue, diagonalStdDevStr))
 			{
-				this->initClusterMethod = rsgis::math::init_diagonal_stddev;
+				this->initClusterMethod = rsgis::cmds::rsgis_init_diagonal_stddev;
 			}
             else if(xercesc::XMLString::equals(strValue, diagonalRangeAttachStr))
 			{
-				this->initClusterMethod = rsgis::math::init_diagonal_full_attach;
+				this->initClusterMethod = rsgis::cmds::rsgis_init_diagonal_full_attach;
 			}
             else if(xercesc::XMLString::equals(strValue, diagonalStdDevAttachStr))
 			{
-				this->initClusterMethod = rsgis::math::init_diagonal_stddev_attach;
+				this->initClusterMethod = rsgis::cmds::rsgis_init_diagonal_stddev_attach;
 			}
             else if(xercesc::XMLString::equals(strValue, kppStr))
 			{
-				this->initClusterMethod = rsgis::math::init_kpp;
+				this->initClusterMethod = rsgis::cmds::rsgis_init_kpp;
 			}
 			else
 			{
-				this->initClusterMethod = rsgis::math::init_random;
+				this->initClusterMethod = rsgis::cmds::rsgis_init_random;
                 std::cerr << "The initial cluster method was not reconised so random method is being used\n";
 			}
 			xercesc::XMLString::release(&randomStr);
@@ -2039,31 +2039,31 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 			
 			if(xercesc::XMLString::equals(strValue, randomStr))
 			{
-				this->initClusterMethod = rsgis::math::init_random;
+				this->initClusterMethod = rsgis::cmds::rsgis_init_random;
 			}
             else if(xercesc::XMLString::equals(strValue, diagonalRangeStr))
 			{
-				this->initClusterMethod = rsgis::math::init_diagonal_full;
+				this->initClusterMethod = rsgis::cmds::rsgis_init_diagonal_full;
 			}
             else if(xercesc::XMLString::equals(strValue, diagonalStdDevStr))
 			{
-				this->initClusterMethod = rsgis::math::init_diagonal_stddev;
+				this->initClusterMethod = rsgis::cmds::rsgis_init_diagonal_stddev;
 			}
             else if(xercesc::XMLString::equals(strValue, diagonalRangeAttachStr))
 			{
-				this->initClusterMethod = rsgis::math::init_diagonal_full_attach;
+				this->initClusterMethod = rsgis::cmds::rsgis_init_diagonal_full_attach;
 			}
             else if(xercesc::XMLString::equals(strValue, diagonalStdDevAttachStr))
 			{
-				this->initClusterMethod = rsgis::math::init_diagonal_stddev_attach;
+				this->initClusterMethod = rsgis::cmds::rsgis_init_diagonal_stddev_attach;
 			}
             else if(xercesc::XMLString::equals(strValue, kppStr))
 			{
-				this->initClusterMethod = rsgis::math::init_kpp;
+				this->initClusterMethod = rsgis::cmds::rsgis_init_kpp;
 			}
 			else
 			{
-				this->initClusterMethod = rsgis::math::init_random;
+				this->initClusterMethod = rsgis::cmds::rsgis_init_random;
                 std::cerr << "The initial cluster method was not reconised so random method is being used\n";
 			}
 			xercesc::XMLString::release(&randomStr);
@@ -3662,11 +3662,12 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
             std::cout << "Degree of Change: " << degreeOfChange << std::endl;
             std::cout << "Sub Sampling: " << subSample << std::endl;
             
-            GDALAllRegister();
-			GDALDataset *dataset = NULL;
+            //GDALAllRegister();
+			//GDALDataset *dataset = NULL;
 			
 			try
 			{
+                /*
 				dataset = (GDALDataset *) GDALOpenShared(this->inputImage.c_str(), GA_ReadOnly);
 				if(dataset == NULL)
 				{
@@ -3678,10 +3679,12 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
                 imgClustering.findKMeansCentres(dataset, outputFile, numClusters, maxNumIterations, subSample, ignoreZeros, degreeOfChange, initClusterMethod);
                 
                 GDALClose(dataset);
+                */
+                rsgis::cmds::executeKMeansClustering(this->inputImage, this->outputFile, this->numClusters, this->maxNumIterations, this->subSample, this->ignoreZeros, this->degreeOfChange, this->initClusterMethod);
 			}
-			catch(rsgis::RSGISException e)
+			catch(rsgis::cmds::RSGISCmdException &e)
 			{
-				throw e;
+				throw rsgis::RSGISException(e.what());
 			}
         }
         else if(option == RSGISExeImageCalculation::isodatacentres)
@@ -3700,12 +3703,12 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
             std::cout << "Start Iteration: " << startIteration << std::endl;
             std::cout << "End Iteration: " << endIteration << std::endl;
                         
-            GDALAllRegister();
-			GDALDataset *dataset = NULL;
+            //GDALAllRegister();
+			//GDALDataset *dataset = NULL;
 			
 			try
 			{
-				dataset = (GDALDataset *) GDALOpenShared(this->inputImage.c_str(), GA_ReadOnly);
+				/*dataset = (GDALDataset *) GDALOpenShared(this->inputImage.c_str(), GA_ReadOnly);
 				if(dataset == NULL)
 				{
 					std::string message = std::string("Could not open image ") + this->inputImage;
@@ -3716,6 +3719,8 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
                 imgClustering.findISODataCentres(dataset, outputFile, numClusters, maxNumIterations, subSample, ignoreZeros, degreeOfChange, initClusterMethod, minDistBetweenClusters, minNumFeatures, maxStdDev, minNumClusters, startIteration, endIteration);
                 
                 GDALClose(dataset);
+                 */
+                rsgis::cmds::executeISODataClustering(this->inputImage, this->outputFile, this->numClusters, this->maxNumIterations, this->subSample, this->ignoreZeros, this->degreeOfChange, this->initClusterMethod, this->minDistBetweenClusters, this->minNumFeatures, this->maxStdDev, this->minNumClusters, this->startIteration, this->endIteration);
 			}
 			catch(rsgis::RSGISException e)
 			{
