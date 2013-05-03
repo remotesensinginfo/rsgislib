@@ -154,6 +154,7 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
     
     
     this->outDataType = GDT_Float32;
+    this->rsgisOutDataType = rsgis::rsgis_32float;
 	XMLCh *datatypeXMLStr = XMLString::transcode("datatype");
 	if(argElement->hasAttribute(datatypeXMLStr))
 	{
@@ -4448,15 +4449,15 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
             {
                 if(stretchType == rsgis::cmds::linearPercent)
                 {
-                    cout << "Linear " << percent << " % stretch\n";
+                    rsgis::cmds::executeStretchImage(this->inputImage, this->outputImage, this->outStatsFile, this->outputFile, this->ignoreZeros, this->onePassSD, this->imageFormat, rsgisOutDataType, stretchType, this->percent);
                 }
                 else if(stretchType == rsgis::cmds::linearStdDev)
                 {
-                    cout << "Linear " << stddev << " Standard Deviation stretch\n";
+                    rsgis::cmds::executeStretchImage(this->inputImage, this->outputImage, this->outStatsFile, this->outputFile, this->ignoreZeros, this->onePassSD, this->imageFormat, rsgisOutDataType, stretchType, this->stddev);
                 }
                 else if(stretchType == rsgis::cmds::powerLaw)
                 {
-                    cout << power << " Power Law stretch\n";
+                    rsgis::cmds::executeStretchImage(this->inputImage, this->outputImage, this->outStatsFile, this->outputFile, this->ignoreZeros, this->onePassSD, this->imageFormat, rsgisOutDataType, stretchType, this->power);
                 }
                 else
                 {
