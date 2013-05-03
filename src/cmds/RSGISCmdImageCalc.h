@@ -38,10 +38,25 @@ namespace rsgis{ namespace cmds {
         int bandNum;
     };
     
+    enum RSGISInitClustererMethods
+    {
+        rsgis_init_random,
+        rsgis_init_diagonal_full,
+        rsgis_init_diagonal_stddev,
+        rsgis_init_diagonal_full_attach,
+        rsgis_init_diagonal_stddev_attach,
+        rsgis_init_kpp
+    };
+    
     /** Function to run the band maths tools */
     void executeBandMaths(VariableStruct *variables, unsigned int numVars, std::string outputImage, std::string mathsExpression, std::string gdalFormat, RSGISLibDataType outDataType)throw(RSGISCmdException);
     /** Function to run the image maths tools */
     void executeImageMaths(std::string inputImage, std::string outputImage, std::string mathsExpression, std::string imageFormat, RSGISLibDataType outDataType)throw(RSGISCmdException);
+    /** Function to run the KMeans tool */
+    void executeKMeansClustering(std::string inputImage, std::string outputMatrixFile, unsigned int numClusters, unsigned int maxNumIterations, unsigned int subSample, bool ignoreZeros, float degreeOfChange, RSGISInitClustererMethods initClusterMethod)throw(RSGISCmdException);
+    /** Function to run the KMeans tool */
+    void executeISODataClustering(std::string inputImage, std::string outputMatrixFile, unsigned int numClusters, unsigned int maxNumIterations, unsigned int subSample, bool ignoreZeros, float degreeOfChange, RSGISInitClustererMethods initClusterMethod, float minDistBetweenClusters, unsigned int minNumFeatures, float maxStdDev, unsigned int minNumClusters, unsigned int startIteration, unsigned int endIteration)throw(RSGISCmdException);
+    
     
 }}
 

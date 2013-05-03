@@ -3842,7 +3842,7 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
             
 			try
             {
-                rsgis::cmds::executeStretchImage(this->inputImage, this->imageMask, this->outputImage, this->imageFormat, this->rsgisOutDataType, this->outValue, this->maskValue);
+                rsgis::cmds::executeMaskImage(this->inputImage, this->imageMask, this->outputImage, this->imageFormat, this->rsgisOutDataType, this->outValue, this->maskValue);
             }
             catch(rsgis::cmds::RSGISCmdException &e)
             {

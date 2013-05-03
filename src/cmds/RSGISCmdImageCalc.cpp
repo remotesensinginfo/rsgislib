@@ -30,6 +30,7 @@
 #include "img/RSGISImageCalcException.h"
 #include "img/RSGISCalcImageValue.h"
 #include "img/RSGISCalcImage.h"
+#include "img/RSGISImageClustering.h"
 
 #include "muParser.h"
 
@@ -107,8 +108,13 @@ namespace rsgis{ namespace cmds {
             delete bandmaths;
             delete calcImage;
             delete[] outBandName;
+            GDALDestroyDriverManager();
         }
-        catch(rsgis::RSGISException e)
+        catch(rsgis::RSGISImageException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(rsgis::RSGISException &e)
         {
             throw RSGISCmdException(e.what());
         }
@@ -159,19 +165,134 @@ namespace rsgis{ namespace cmds {
             delete muParser;
             delete imageMaths;
             delete calcImage;
+            GDALDestroyDriverManager();
+        }
+        catch(rsgis::RSGISImageException &e)
+        {
+            throw RSGISCmdException(e.what());
         }
         catch(rsgis::RSGISException &e)
         {
-            throw RSGISImageException(e.what());
+            throw RSGISCmdException(e.what());
         }
         catch (mu::ParserError &e)
         {
             std::string message = std::string("ERROR: ") + std::string(e.GetMsg()) + std::string(":\t \'") + std::string(e.GetExpr()) + std::string("\'");
-            throw rsgis::RSGISException(message);
+            throw RSGISCmdException(message);
         }
         catch(std::exception &e)
         {
-            throw RSGISImageException(e.what());
+            throw RSGISCmdException(e.what());
+        }
+    }
+    
+    void executeKMeansClustering(std::string inputImage, std::string outputMatrixFile, unsigned int numClusters, unsigned int maxNumIterations, unsigned int subSample, bool ignoreZeros, float degreeOfChange, RSGISInitClustererMethods initClusterMethod)throw(RSGISCmdException)
+    {
+        try
+        {
+            GDALAllRegister();
+            GDALDataset *dataset = (GDALDataset *) GDALOpenShared(inputImage.c_str(), GA_ReadOnly);
+            if(dataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            rsgis::math::InitClustererMethods initMethod = rsgis::math::init_diagonal_full_attach;
+            
+            switch( initClusterMethod )
+            {
+                case rsgis::cmds::rsgis_init_random:
+                    initMethod = rsgis::math::init_random;
+                    break;
+                case rsgis::cmds::rsgis_init_diagonal_full:
+                    initMethod = rsgis::math::init_diagonal_full;
+                    break;
+                case rsgis::cmds::rsgis_init_diagonal_stddev:
+                    initMethod = rsgis::math::init_diagonal_stddev;
+                    break;
+                case rsgis::cmds::rsgis_init_diagonal_full_attach:
+                    initMethod = rsgis::math::init_diagonal_full_attach;
+                    break;
+                case rsgis::cmds::rsgis_init_diagonal_stddev_attach:
+                    initMethod = rsgis::math::init_diagonal_stddev_attach;
+                    break;
+                case rsgis::cmds::rsgis_init_kpp:
+                    initMethod = rsgis::math::init_kpp;
+                    break;
+                default:
+                    initMethod = rsgis::math::init_diagonal_full_attach;
+                    break;
+            }
+            
+            rsgis::img::RSGISImageClustering imgClustering;
+            imgClustering.findKMeansCentres(dataset, outputMatrixFile, numClusters, maxNumIterations, subSample, ignoreZeros, degreeOfChange, initMethod);
+            
+            GDALClose(dataset);
+            GDALDestroyDriverManager();
+        }
+        catch(rsgis::RSGISException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(std::exception &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
+
+    void executeISODataClustering(std::string inputImage, std::string outputMatrixFile, unsigned int numClusters, unsigned int maxNumIterations, unsigned int subSample, bool ignoreZeros, float degreeOfChange, RSGISInitClustererMethods initClusterMethod, float minDistBetweenClusters, unsigned int minNumFeatures, float maxStdDev, unsigned int minNumClusters, unsigned int startIteration, unsigned int endIteration)throw(RSGISCmdException)
+    {
+        try
+        {
+            GDALAllRegister();
+            GDALDataset *dataset = (GDALDataset *) GDALOpenShared(inputImage.c_str(), GA_ReadOnly);
+            if(dataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            rsgis::math::InitClustererMethods initMethod = rsgis::math::init_diagonal_full_attach;
+            
+            switch( initClusterMethod )
+            {
+                case rsgis::cmds::rsgis_init_random:
+                    initMethod = rsgis::math::init_random;
+                    break;
+                case rsgis::cmds::rsgis_init_diagonal_full:
+                    initMethod = rsgis::math::init_diagonal_full;
+                    break;
+                case rsgis::cmds::rsgis_init_diagonal_stddev:
+                    initMethod = rsgis::math::init_diagonal_stddev;
+                    break;
+                case rsgis::cmds::rsgis_init_diagonal_full_attach:
+                    initMethod = rsgis::math::init_diagonal_full_attach;
+                    break;
+                case rsgis::cmds::rsgis_init_diagonal_stddev_attach:
+                    initMethod = rsgis::math::init_diagonal_stddev_attach;
+                    break;
+                case rsgis::cmds::rsgis_init_kpp:
+                    initMethod = rsgis::math::init_kpp;
+                    break;
+                default:
+                    initMethod = rsgis::math::init_diagonal_full_attach;
+                    break;
+            }
+            
+            rsgis::img::RSGISImageClustering imgClustering;
+            imgClustering.findISODataCentres(dataset, outputMatrixFile, numClusters, maxNumIterations, subSample, ignoreZeros, degreeOfChange, initMethod, minDistBetweenClusters, minNumFeatures, maxStdDev, minNumClusters, startIteration, endIteration);
+            
+            GDALClose(dataset);
+            GDALDestroyDriverManager();
+        }
+        catch(rsgis::RSGISException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(std::exception &e)
+        {
+            throw RSGISCmdException(e.what());
         }
     }
     
