@@ -3840,40 +3840,14 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
             std::cout << "Output value: " << this->outValue << std::endl;
             std::cout << "Mask value: " << this->maskValue << std::endl;
             
-			GDALAllRegister();
-			RSGISMaskImage *maskImage = NULL;
-			GDALDataset *dataset = NULL;
-			GDALDataset *mask = NULL;
 			try
-			{
-				cout << this->inputImage << endl;
-				dataset = (GDALDataset *) GDALOpenShared(this->inputImage.c_str(), GA_ReadOnly);
-				if(dataset == NULL)
-				{
-					string message = string("Could not open image ") + this->inputImage;
-					throw RSGISImageException(message.c_str());
-				}
-
-				cout << this->imageMask << endl;
-				mask = (GDALDataset *) GDALOpenShared(this->imageMask.c_str(), GA_ReadOnly);
-				if(mask == NULL)
-				{
-					string message = string("Could not open image ") + this->imageMask;
-					throw RSGISImageException(message.c_str());
-				}
-
-				maskImage = new RSGISMaskImage();
-				maskImage->maskImage(dataset, mask, this->outputImage, this->imageFormat, this->outDataType, this->outValue, this->maskValue);
-
-				GDALClose(dataset);
-				GDALClose(mask);
-				delete maskImage;
-				GDALDestroyDriverManager();
-			}
-			catch(RSGISException& e)
-			{
-				throw e;
-			}
+            {
+                rsgis::cmds::executeStretchImage(this->inputImage, this->imageMask, this->outputImage, this->imageFormat, this->rsgisOutDataType, this->outValue, this->maskValue);
+            }
+            catch(rsgis::cmds::RSGISCmdException &e)
+            {
+                throw RSGISException(e.what());
+            }
 		}
 		else if(option == RSGISExeImageUtils::resample)
 		{

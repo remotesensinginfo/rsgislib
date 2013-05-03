@@ -31,6 +31,7 @@
 #include "img/RSGISCalcImageValue.h"
 #include "img/RSGISCalcImage.h"
 #include "img/RSGISStretchImage.h"
+#include "img/RSGISMaskImage.h"
 
 
 namespace rsgis{ namespace cmds {
@@ -93,6 +94,39 @@ namespace rsgis{ namespace cmds {
         catch(std::exception& e)
         {
             throw RSGISCmdException(e.what());
+        }
+    }
+    
+    
+    void executeStretchImage(std::string inputImage, std::string imageMask, std::string outputImage, std::string gdalFormat, RSGISLibDataType outDataType, float outValue, float maskValue)throw(RSGISCmdException)
+    {
+        try
+        {
+            GDALAllRegister();
+            GDALDataset *dataset = (GDALDataset *) GDALOpenShared(inputImage.c_str(), GA_ReadOnly);
+            if(dataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputImage;
+                throw RSGISImageException(message.c_str());
+            }
+            
+            GDALDataset *mask = (GDALDataset *) GDALOpenShared(imageMask.c_str(), GA_ReadOnly);
+            if(mask == NULL)
+            {
+                std::string message = std::string("Could not open image ") + imageMask;
+                throw RSGISImageException(message.c_str());
+            }
+            
+            rsgis::img::RSGISMaskImage maskImage =  rsgis::img::RSGISMaskImage();
+            maskImage.maskImage(dataset, mask, outputImage, gdalFormat, RSGIS_to_GDAL_Type(outDataType), outValue, maskValue);
+            
+            GDALClose(dataset);
+            GDALClose(mask);
+            GDALDestroyDriverManager();
+        }
+        catch(RSGISException& e)
+        {
+            throw e;
         }
     }
     
