@@ -1,7 +1,8 @@
 /*
- *  RSGISCmdException.cpp
+ *  RSGISCmdSegmentation.cpp
  *
- *  Created by Pete Bunting on 29/04/2013.
+ *
+ *  Created by Pete Bunting on 03/05/2013.
  *  Copyright 2013 RSGISLib.
  *
  *  RSGISLib is free software: you can redistribute it and/or modify
@@ -19,33 +20,22 @@
  *
  */
 
-#include "RSGISCmdException.h"
+#include "RSGISCmdSegmentation.h"
+#include "RSGISCmdParent.h"
 
-namespace rsgis { namespace cmds {
+#include "common/RSGISImageException.h"
+
+#include "img/RSGISBandMath.h"
+#include "img/RSGISImageMaths.h"
+#include "img/RSGISImageCalcException.h"
+#include "img/RSGISCalcImageValue.h"
+#include "img/RSGISCalcImage.h"
+
+
+namespace rsgis{ namespace cmds {
     
-	RSGISCmdException::RSGISCmdException() : std::exception()
-	{
-		msgs = "A RSGISCmdException has been created..";
-	}
     
-	RSGISCmdException::RSGISCmdException(const char* message) : exception()
-	{
-		msgs = std::string(message);
-	}
-	
-	RSGISCmdException::RSGISCmdException(std::string message) : std::exception()
-	{
-		msgs = message;
-	}
     
-	const char* RSGISCmdException::what() const throw()
-	{
-		return msgs.c_str();
-	}
-    
-	RSGISCmdException::~RSGISCmdException() throw()
-	{
-        
-	}
     
 }}
+

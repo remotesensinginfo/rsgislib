@@ -26,8 +26,8 @@
 #include <iostream>
 #include <string>
 
-namespace rsgis
-{
+namespace rsgis{ namespace cmds {
+
 	class RSGISCmdException : public std::exception
 	{
     public:
@@ -39,7 +39,7 @@ namespace rsgis
     protected:
         std::string msgs;
 	};
-}
+}}
 
 
 #endif

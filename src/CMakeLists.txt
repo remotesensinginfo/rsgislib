@@ -82,6 +82,8 @@ set(LIB_COMMANDS_H
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdException.h
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdParent.h
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdImageCalc.h 
+	${RSGIS_SRC_CMDS_DIR}/RSGISCmdImageUtils.h 	
+	${RSGIS_SRC_CMDS_DIR}/RSGISCmdSegmentation.h 
 	)
 	
 set(LIB_COMMANDS_CPP
@@ -90,6 +92,10 @@ set(LIB_COMMANDS_CPP
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdParent.h
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdImageCalc.cpp 
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdImageCalc.h 
+	${RSGIS_SRC_CMDS_DIR}/RSGISCmdImageUtils.cpp	
+	${RSGIS_SRC_CMDS_DIR}/RSGISCmdImageUtils.h 
+	${RSGIS_SRC_CMDS_DIR}/RSGISCmdSegmentation.cpp
+	${RSGIS_SRC_CMDS_DIR}/RSGISCmdSegmentation.h
 	)
 ###############################################################################
 
