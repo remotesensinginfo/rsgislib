@@ -84,6 +84,7 @@ set(LIB_COMMANDS_H
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdImageCalc.h 
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdImageUtils.h 	
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdSegmentation.h 
+	${RSGIS_SRC_CMDS_DIR}/RSGISCmdRasterGIS.h
 	)
 	
 set(LIB_COMMANDS_CPP
@@ -96,6 +97,8 @@ set(LIB_COMMANDS_CPP
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdImageUtils.h 
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdSegmentation.cpp
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdSegmentation.h
+	${RSGIS_SRC_CMDS_DIR}/RSGISCmdRasterGIS.cpp
+	${RSGIS_SRC_CMDS_DIR}/RSGISCmdRasterGIS.h
 	)
 ###############################################################################
 

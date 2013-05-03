@@ -4221,25 +4221,11 @@ namespace rsgisexe{
                 
                 try
                 {
-                    GDALAllRegister();
-                    
-                    GDALDataset *clumpsDataset = (GDALDataset *) GDALOpen(this->clumpsImage.c_str(), GA_Update);
-                    if(clumpsDataset == NULL)
-                    {
-                        std::string message = std::string("Could not open image ") + this->clumpsImage;
-                        throw rsgis::RSGISImageException(message.c_str());
-                    }
-                    
-                    rsgis::rastergis::RSGISPopulateWithImageStats popImageStats;
-                    popImageStats.populateImageWithRasterGISStats(clumpsDataset, this->addColourTable2Img, this->calcImgPyramids);
-                    
-                    clumpsDataset->GetRasterBand(1)->SetMetadataItem("LAYER_TYPE", "thematic");
-                    
-                    GDALClose(clumpsDataset);
+                    rsgis::cmds::executePopulateStats(this->clumpsImage, this->addColourTable2Img, this->calcImgPyramids);
                 }
-                catch(rsgis::RSGISException &e)
+                catch(rsgis::cmds::RSGISCmdException &e)
                 {
-                    throw e;
+                    throw rsgis::RSGISException(e.what());
                 }
                 
             }
