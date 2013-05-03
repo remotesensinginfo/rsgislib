@@ -25,6 +25,7 @@
 
 #include <iostream>
 #include <string>
+#include <vector>
 
 #include "common/RSGISCommons.h"
 #include "RSGISCmdException.h"
@@ -44,7 +45,13 @@ namespace rsgis{ namespace cmds {
     
     /** Function to run the stretch image command */
     void executeStretchImage(std::string inputImage, std::string outputImage, bool saveOutStats, std::string outStatsFile, bool ignoreZeros, bool onePassSD, std::string gdalFormat, RSGISLibDataType outDataType, RSGISStretches stretchType, float stretchParam)throw(RSGISCmdException);
-    
+    /** A function to split an image into image tiles.
+        An overlap between tiles may be specified.
+        Optionally the tiles may be offset from the image boundries by half a pixel, useful for creating two overlapping lots of tiles.
+        The filenames for each tile are passed back as a vector.
+     */
+    void executeCreateTiles(std::string inputImage, std::string outputImageBase, float width, float height, float tileOverlap, bool offsetTiling, std::string gdalFormat, RSGISLibDataType outDataType, std::string outFileExtension, std::vector<std::string> *outFileNames = NULL)throw(RSGISCmdException);
+
 }}
 
 

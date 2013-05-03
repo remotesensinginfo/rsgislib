@@ -152,7 +152,6 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 	XMLString::release(&formatExtXMLStr);
     
     
-    
     this->outDataType = GDT_Float32;
 	XMLCh *datatypeXMLStr = XMLString::transcode("datatype");
 	if(argElement->hasAttribute(datatypeXMLStr))
@@ -4987,140 +4986,20 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
             {
                 cout << "Tiling is offset by half a tile.\n";
             }
-			GDALAllRegister();
-			OGRRegisterAll();
-
-			GDALDataset **dataset = NULL;
-
-            RSGISImageUtils imgUtils;
-			RSGISCopyImage *copyImage = NULL;
-			RSGISCalcImage *calcImage = NULL;
-
-			int numImageBands = 0;
-			string outputFilePath;
-
-			try
-			{
-				// Open Image
-				dataset = new GDALDataset*[1];
-				//cout << this->inputImage << endl;
-				dataset[0] = (GDALDataset *) GDALOpenShared(this->inputImage.c_str(), GA_ReadOnly);
-				if(dataset[0] == NULL)
-				{
-					string message = string("Could not open image ") + this->inputImage;
-					throw RSGISImageException(message.c_str());
-				}
-				numImageBands = dataset[0]->GetRasterCount();
-				cout << "Raster Band Count = " << numImageBands << endl;
-
-                // Set up envlopes for image tiles
-                vector<geos::geom::Envelope*> *tileEnvelopes = new vector<geos::geom::Envelope*>;
-
-                int numDS = 1;
-                double *gdalTransform = new double[6];
-                int **dsOffsets = new int*[numDS];
-                for(int i = 0; i < numDS; i++)
-                {
-                    dsOffsets[i] = new int[2];
-                }
-                int imgHeight = 0;
-                int imgWidth = 0;
-
-                imgUtils.getImageOverlap(dataset, numDS, dsOffsets, &imgWidth, &imgHeight, gdalTransform);
-               
-                double pixelXRes = gdalTransform[1];
-                double pixelYRes = gdalTransform[5];
-
-                double minX = gdalTransform[0];
-                double maxY = gdalTransform[3];
-
-                double maxX = minX + (imgWidth * pixelXRes);
-                double minY = maxY - (imgHeight * abs(pixelYRes));
-                
-                if(offsetTiling)
-                {
-                    minX -= (this->width * pixelXRes)/2;
-                    maxX += (this->width * pixelXRes)/2;
-                    minY -= (this->height * abs(pixelYRes))/2;
-                    maxY += (this->height * abs(pixelYRes))/2;
-                }
-
-                double tileWidthMapUnits = this->width * pixelXRes;
-                double tileHeighMapUnits = this->height * abs(pixelYRes); // Max y resolution positive (makes things simpler)
-                double tileXOverlapMapUnits = this->tileOverlap * pixelXRes;
-                double tileYOverlapMapUnits = this->tileOverlap * abs(pixelYRes);
-
-                double xStart = 0;
-                double yStart = 0;
-                double yEnd = 0;
-                double xEnd = 0;
-                double xStartOverlap = 0;
-                double yStartOverlap = 0;
-                double xEndOverlap = 0;
-                double yEndOverlap = 0;
-
-                // Start at top left corner and work down (minX, maxY) 
-                for(xStart = minX; xStart < maxX; xStart+=tileWidthMapUnits)
-                {
-                    xEnd = xStart + tileWidthMapUnits;
-                    xStartOverlap = xStart - tileXOverlapMapUnits;
-                    xEndOverlap = xEnd + tileXOverlapMapUnits;
-                    if(xStartOverlap < minX) // Check tile will fit within image
-                    {
-                        xStartOverlap = minX;
-                    }
-                    if(xEndOverlap > maxX) // Check tile will fit within image
-                    {
-                        xEndOverlap = maxX;
-                    }
-                    
-                    for(yStart = maxY; yStart > minY; yStart-=tileHeighMapUnits)
-                    {
-                        yEnd = yStart - tileHeighMapUnits;
-                        
-                        yStartOverlap = yStart + tileYOverlapMapUnits;
-                        yEndOverlap = yEnd - tileYOverlapMapUnits;
-                        if(yStartOverlap > maxY) // Check tile will fit within image
-                        {
-                            yStartOverlap = maxY+(0.5*abs(pixelYRes));
-                        }
-                        if(yEndOverlap < minY) // Check tile will fit within image
-                        {
-                            yEndOverlap = minY+(0.5*abs(pixelYRes));
-                        }
-                        
-                        tileEnvelopes->push_back(new geos::geom::Envelope(xStartOverlap, xEndOverlap, yStartOverlap, yEndOverlap));
-                    }
-                }
-
-                copyImage = new RSGISCopyImage(numImageBands);
-				calcImage = new RSGISCalcImage(copyImage, "", true);
- 
-				for(unsigned int i = 0; i < tileEnvelopes->size(); ++i)
-				{
-                    std::cout << "Tile " << i+1 << "/" << tileEnvelopes->size() << std::endl;
-                    outputFilePath = this->outputImage + "_tile" + boost::lexical_cast<std::string>(i) + "." + this->outFileExtension;
-                    try
-                    {
-                        calcImage->calcImageInEnv(dataset, 1, outputFilePath, tileEnvelopes->at(i), false, NULL, this->imageFormat, this->outDataType);
-                    }
-                    catch (RSGISImageBandException e)
-                    {
-                        cerr << "Error" << endl;
-                        throw e;
-                    }
-				}
-
-				GDALClose(dataset[0]);
-				delete[] dataset;
-				GDALDestroyDriverManager();
-				delete calcImage;
-				delete copyImage;
-			}
-			catch(RSGISException e)
-			{
-				cerr << "RSGISException caught: " << e.what() << endl;
-			}
+            try
+            {
+                rsgis::cmds::executeCreateTiles(this->inputImage, this->outputImage, this->width, this->height, this->tileOverlap, this->offsetTiling, this->imageFormat, this->rsgisOutDataType, this->outFileExtension);
+            }
+            catch(rsgis::cmds::RSGISCmdException& e)
+            {
+                throw RSGISException(e.what());
+            }
+            catch(std::exception& e)
+            {
+                throw RSGISException(e.what());
+            }
+            
+            
 		}
         else if(option == RSGISExeImageUtils::relabel)
         {
