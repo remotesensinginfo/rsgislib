@@ -25,17 +25,98 @@
 
 #include "common/RSGISImageException.h"
 
-#include "img/RSGISBandMath.h"
-#include "img/RSGISImageMaths.h"
 #include "img/RSGISImageCalcException.h"
 #include "img/RSGISCalcImageValue.h"
 #include "img/RSGISCalcImage.h"
 
+#include "segmentation/RSGISLabelPixelsUsingClusters.h"
+#include "segmentation/RSGISEliminateSinglePixels.h"
+
 
 namespace rsgis{ namespace cmds {
     
+    void executeLabelPixelsFromClusterCentres(std::string inputImage, std::string outputImage, std::string clusterCentresFile, bool ignoreZeros, std::string imageFormat)throw(RSGISCmdException)
+    {
+        try
+        {
+            GDALAllRegister();
+            GDALDataset **datasets = new GDALDataset*[1];
+            datasets[0] = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_ReadOnly);
+            if(datasets[0] == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            rsgis::segment::RSGISLabelPixelsUsingClusters labelPixels;
+            labelPixels.labelPixelsUsingClusters(datasets, 1, outputImage, clusterCentresFile, ignoreZeros, imageFormat, true, "");
+            
+            // Tidy up
+            GDALClose(datasets[0]);
+            GDALDestroyDriverManager();
+        }
+        catch (rsgis::RSGISException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch (std::exception &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
     
     
+    void executeEliminateSinglePixels(std::string inputImage, std::string clumpsImage, std::string outputImage, std::string tempImage, std::string imageFormat, bool processInMemory, bool ignoreZeros)throw(RSGISCmdException)
+    {
+        try
+        {
+            rsgis::img::RSGISImageUtils imgUtils;
+            
+            GDALAllRegister();
+            GDALDataset *spectralDataset = NULL;
+            spectralDataset = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_ReadOnly);
+            if(spectralDataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            GDALDataset *clumpsDataset = NULL;
+            clumpsDataset = (GDALDataset *) GDALOpen(clumpsImage.c_str(), GA_ReadOnly);
+            if(clumpsDataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + clumpsImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            GDALDataset *pixelMaskDataset = NULL;
+            if(processInMemory)
+            {
+                pixelMaskDataset = imgUtils.createCopy(clumpsDataset, 1, "", "MEM", GDT_Byte , true, "");
+            }
+            else
+            {
+                pixelMaskDataset = imgUtils.createCopy(clumpsDataset, 1, tempImage, imageFormat, GDT_Byte, true, "");
+            }
+            
+            
+            std::cout << "Eliminating Individual Pixels\n";
+            rsgis::segment::RSGISEliminateSinglePixels eliminate;
+            eliminate.eliminateBlocks(spectralDataset, clumpsDataset, pixelMaskDataset, outputImage, 0, ignoreZeros, true, "", imageFormat);
+            
+            clumpsDataset->GetRasterBand(1)->SetMetadataItem("LAYER_TYPE", "thematic");
+            
+            // Tidy up
+            GDALClose(spectralDataset);
+            GDALClose(clumpsDataset);
+            GDALClose(pixelMaskDataset);
+            GDALDestroyDriverManager();
+        }
+        catch (rsgis::RSGISException &e)
+        {
+            throw e;
+        }
+    }
     
 }}
 

@@ -31,6 +31,12 @@
 
 namespace rsgis{ namespace cmds {
     
+    /** Function to run the label pixels from clusters centres command */
+    void executeLabelPixelsFromClusterCentres(std::string inputImage, std::string outputImage, std::string clusterCentresFile, bool ignoreZeros, std::string imageFormat)throw(RSGISCmdException);
+    
+    /** Function to run the eliminate single pixels command */
+    void executeEliminateSinglePixels(std::string inputImage, std::string clumpsImage, std::string outputImage, std::string tempImage, std::string imageFormat, bool processInMemory, bool ignoreZeros)throw(RSGISCmdException);
+
     
 }}
 

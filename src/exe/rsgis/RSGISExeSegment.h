@@ -31,6 +31,9 @@
 #include "common/RSGISAlgorithmParameters.h"
 #include "common/RSGISImageException.h"
 
+#include "cmds/RSGISCmdSegmentation.h"
+#include "cmds/RSGISCmdException.h"
+
 #include "img/RSGISCalcImage.h"
 #include "img/RSGISProjectionStrings.h"
 #include "img/RSGISImageUtils.h"
