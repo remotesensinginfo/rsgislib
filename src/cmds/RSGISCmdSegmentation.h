@@ -36,8 +36,15 @@ namespace rsgis{ namespace cmds {
     
     /** Function to run the eliminate single pixels command */
     void executeEliminateSinglePixels(std::string inputImage, std::string clumpsImage, std::string outputImage, std::string tempImage, std::string imageFormat, bool processInMemory, bool ignoreZeros)throw(RSGISCmdException);
-
     
+    /** Function to run the clump command */
+    void executeClump(std::string inputImage, std::string outputImage, std::string imageFormat, bool processInMemory, bool noDataValProvided, float noDataVal)throw(RSGISCmdException);
+
+    /** Function to run the iterative stepwise elimination command */
+    void executeRMSmallClumpsStepwise(std::string inputImage, std::string clumpsImage, std::string outputImage, std::string imageFormat, bool stretchStatsAvail, std::string stretchStatsFile, bool storeMean, bool processInMemory, unsigned int minClumpSize, float specThreshold)throw(RSGISCmdException);
+    
+    /** Function to run the relabel clumps command */
+    void executeRelabelClumps(std::string inputImage, std::string outputImage, std::string imageFormat, bool processInMemory) throw(RSGISCmdException);
 }}
 
 

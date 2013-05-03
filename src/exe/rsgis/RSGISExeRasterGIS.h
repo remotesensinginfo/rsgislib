@@ -35,6 +35,9 @@
 #include "common/RSGISAlgorithmParameters.h"
 #include "common/RSGISImageException.h"
 
+#include "cmds/RSGISCmdRasterGIS.h"
+#include "cmds/RSGISCmdException.h"
+
 #include "utils/RSGISTextUtils.h"
 #include "utils/RSGISFileUtils.h"
 #include "utils/RSGISColour.h"

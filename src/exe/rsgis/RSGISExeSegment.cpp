@@ -3848,91 +3848,13 @@ void RSGISExeSegment::runAlgorithm() throw(rsgis::RSGISException)
         
         try
         {
-            GDALAllRegister();
-            GDALDataset *inDataset = NULL;
-            inDataset = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_ReadOnly);
-            if(inDataset == NULL)
-            {
-                std::string message = std::string("Could not open image ") + this->inputImage;
-                throw rsgis::RSGISImageException(message.c_str());
-            }
-            
-            GDALDataset *inClumpDataset = NULL;
-            inClumpDataset = (GDALDataset *) GDALOpen(this->clumpsImage.c_str(), GA_ReadOnly);
-            if(inClumpDataset == NULL)
-            {
-                std::string message = std::string("Could not open image ") + this->clumpsImage;
-                throw rsgis::RSGISImageException(message.c_str());
-            }
-            
-            rsgis::img::RSGISImageUtils imgUtils;
-                        
-            std::vector<rsgis::img::BandSpecThresholdStats> *bandStretchStats = NULL;
-            if(this->stretchStatsAvail)
-            {
-                bandStretchStats = rsgis::img::RSGISStretchImage::readBandSpecThresholds(stretchStatsFile);
-            }
-            
-            GDALDataset *spectralDataset = NULL;
-            GDALDataset *clumpsDataset = NULL;
-            GDALDataset *resultDataset = NULL;
-            
-            if(this->processInMemory)
-            {
-                std::cout << "Processing in Memory\n";
-                spectralDataset = imgUtils.createCopy(inDataset, "", "MEM", GDT_Float32, this->projFromImage, this->proj);
-                imgUtils.copyFloat32GDALDataset(inDataset, spectralDataset);
-                clumpsDataset = imgUtils.createCopy(inClumpDataset, "", "MEM", GDT_UInt32, this->projFromImage, this->proj);
-                imgUtils.copyUIntGDALDataset(inClumpDataset, clumpsDataset);
-                resultDataset = imgUtils.createCopy(inClumpDataset, "", "MEM", GDT_UInt32, this->projFromImage, this->proj);
-            }
-            else
-            {
-                std::cout << "Processing using Disk\n";
-                spectralDataset = inDataset;
-                clumpsDataset = inClumpDataset;
-                resultDataset = imgUtils.createCopy(inClumpDataset, this->outputImage, this->imageFormat, GDT_UInt32, this->projFromImage, this->proj);
-            }
-            imgUtils.copyUIntGDALDataset(clumpsDataset, resultDataset);
-            
-            std::cout << "Eliminant Clumps\n";
-            rsgis::segment::RSGISEliminateSmallClumps eliminate;
-            if(this->storeMean)
-            {
-                eliminate.stepwiseEliminateSmallClumps(spectralDataset, resultDataset, minClumpSize, specThreshold, bandStretchStats, this->stretchStatsAvail);
-            }
-            else
-            {
-                eliminate.stepwiseEliminateSmallClumpsNoMean(spectralDataset, resultDataset, minClumpSize, specThreshold, bandStretchStats, this->stretchStatsAvail);
-            }
-            
-            if(this->processInMemory)
-            {
-                std::cout << "Copying output to disk\n";
-                GDALDataset *outDataset = imgUtils.createCopy(inClumpDataset, this->outputImage, this->imageFormat, GDT_UInt32, this->projFromImage, this->proj);
-                imgUtils.copyUIntGDALDataset(resultDataset, outDataset);
-                GDALClose(outDataset);
-                GDALClose(spectralDataset);
-                GDALClose(clumpsDataset);
-            }
-            
-            if(this->stretchStatsAvail)
-            {
-                delete bandStretchStats;
-            }
-            
-            resultDataset->GetRasterBand(1)->SetMetadataItem("LAYER_TYPE", "thematic");
-            
-            // Tidy up
-            GDALClose(inDataset);
-            GDALClose(inClumpDataset);
-            GDALClose(resultDataset);
-            GDALDestroyDriverManager();
-        } 
-        catch (rsgis::RSGISException &e) 
-        {
-            throw e;
+            rsgis::cmds::executeRMSmallClumpsStepwise(this->inputImage, this->clumpsImage, this->outputImage, this->imageFormat, this->stretchStatsAvail, this->stretchStatsFile, this->storeMean, this->processInMemory, this->minClumpSize, this->specThreshold);
         }
+        catch(rsgis::cmds::RSGISCmdException &e)
+        {
+            throw rsgis::RSGISException(e.what());
+        }
+        
     }
     else if(option == RSGISExeSegment::clump)
     {
@@ -3942,57 +3864,11 @@ void RSGISExeSegment::runAlgorithm() throw(rsgis::RSGISException)
         
         try
         {
-            GDALAllRegister();
-            GDALDataset *inDataset = NULL;
-            inDataset = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_ReadOnly);
-            if(inDataset == NULL)
-            {
-                std::string message = std::string("Could not open image ") + this->inputImage;
-                throw rsgis::RSGISImageException(message.c_str());
-            }
-            
-            rsgis::img::RSGISImageUtils imgUtils;
-            
-            GDALDataset *catagoryDataset = NULL;
-            GDALDataset *resultDataset = NULL;
-            
-            if(this->processInMemory)
-            {
-                std::cout << "Processing in Memory\n";
-                catagoryDataset = imgUtils.createCopy(inDataset, "", "MEM", GDT_UInt32, this->projFromImage, this->proj);
-                imgUtils.copyUIntGDALDataset(inDataset, catagoryDataset);
-                resultDataset = imgUtils.createCopy(inDataset, 1, "", "MEM", GDT_UInt32, this->projFromImage, this->proj);
-            }
-            else
-            {
-                std::cout << "Processing using Disk\n";
-                catagoryDataset = inDataset;
-                resultDataset = imgUtils.createCopy(inDataset, 1, this->outputImage, this->imageFormat, GDT_UInt32, this->projFromImage, this->proj);
-            }
-            
-            std::cout << "Performing Clump\n";
-            rsgis::segment::RSGISClumpPxls clumpImg;
-            clumpImg.performClump(catagoryDataset, resultDataset, this->noDataValProvided, this->noDataVal);
-            
-            if(this->processInMemory)
-            {
-                std::cout << "Copying output to disk\n";
-                GDALDataset *outDataset = imgUtils.createCopy(inDataset, 1, this->outputImage, this->imageFormat, GDT_UInt32, this->projFromImage, this->proj);
-                imgUtils.copyUIntGDALDataset(resultDataset, outDataset);
-                GDALClose(outDataset);
-                GDALClose(catagoryDataset);
-            }
-            
-            resultDataset->GetRasterBand(1)->SetMetadataItem("LAYER_TYPE", "thematic");
-            
-            // Tidy up
-            GDALClose(inDataset);
-            GDALClose(resultDataset);
-            GDALDestroyDriverManager();  
-        } 
-        catch (rsgis::RSGISException &e) 
+            rsgis::cmds::executeClump(this->inputImage, this->outputImage, this->imageFormat, this->processInMemory, this->noDataValProvided, this->noDataVal);
+        }
+        catch(rsgis::cmds::RSGISCmdException &e)
         {
-            throw e;
+            throw rsgis::RSGISException(e.what());
         }
     }
     else if(option == RSGISExeSegment::randomcolourclumps)
@@ -4611,61 +4487,16 @@ void RSGISExeSegment::runAlgorithm() throw(rsgis::RSGISException)
         std::cout << "Input Image: " << this->inputImage << std::endl;
         std::cout << "Output Image: " << this->outputImage << std::endl;
         
-        try 
+        try
         {
-            GDALAllRegister();
-            GDALDataset *inDataset = NULL;
-            inDataset = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_ReadOnly);
-            if(inDataset == NULL)
-            {
-                std::string message = std::string("Could not open image ") + this->inputImage;
-                throw rsgis::RSGISImageException(message.c_str());
-            }
-            
-            rsgis::img::RSGISImageUtils imgUtils;
-            
-            GDALDataset *catagoryDataset = NULL;
-            GDALDataset *resultDataset = NULL;
-            
-            if(this->processInMemory)
-            {
-                std::cout << "Processing in Memory\n";
-                catagoryDataset = imgUtils.createCopy(inDataset, "", "MEM", GDT_UInt32, this->projFromImage, this->proj);
-                imgUtils.copyUIntGDALDataset(inDataset, catagoryDataset);
-                resultDataset = imgUtils.createCopy(inDataset, 1, "", "MEM", GDT_UInt32, this->projFromImage, this->proj);
-            }
-            else
-            {
-                std::cout << "Processing using Disk\n";
-                catagoryDataset = inDataset;
-                resultDataset = imgUtils.createCopy(inDataset, 1, this->outputImage, this->imageFormat, GDT_UInt32, this->projFromImage, this->proj);
-            }
-            
-            std::cout << "Performing relabel\n";
-            rsgis::segment::RSGISRelabelClumps relabelImg;
-            //relabelImg.relabelClumps(catagoryDataset, resultDataset);
-            relabelImg.relabelClumpsCalcImg(catagoryDataset, resultDataset);
-            
-            if(this->processInMemory)
-            {
-                std::cout << "Copying output to disk\n";
-                GDALDataset *outDataset = imgUtils.createCopy(inDataset, 1, this->outputImage, this->imageFormat, GDT_UInt32, this->projFromImage, this->proj);
-                imgUtils.copyUIntGDALDataset(resultDataset, outDataset);
-                GDALClose(outDataset);
-                GDALClose(catagoryDataset);
-            }
-            
-            resultDataset->GetRasterBand(1)->SetMetadataItem("LAYER_TYPE", "thematic");
-            
-            // Tidy up
-            GDALClose(inDataset);
-            GDALClose(resultDataset);
-            GDALDestroyDriverManager();
-        } 
-        catch (rsgis::RSGISException &e) 
-        {
-            throw e;
+            rsgis::cmds::executeRelabelClumps(this->inputImage, this->outputImage, this->imageFormat, this->processInMemory);
         }
+        catch (rsgis::cmds::RSGISCmdException &e)
+        {
+            throw rsgis::RSGISException(e.what());
+        }
+        
+        
     }
     else if(option == RSGISExeSegment::labelsfromclusters)
     {
