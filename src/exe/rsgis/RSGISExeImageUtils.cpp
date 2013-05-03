@@ -169,35 +169,43 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
         if(XMLString::equals(dtByte, dtXMLValue))
         {
             this->outDataType = GDT_Byte;
+            this->rsgisOutDataType = rsgis::rsgis_8uint;
         }
         else if(XMLString::equals(dtUInt16, dtXMLValue))
         {
             this->outDataType = GDT_UInt16;
+            this->rsgisOutDataType = rsgis::rsgis_16uint;
         }
         else if(XMLString::equals(dtInt16, dtXMLValue))
         {
             this->outDataType = GDT_Int16;
+            this->rsgisOutDataType = rsgis::rsgis_16int;
         }
         else if(XMLString::equals(dtUInt32, dtXMLValue))
         {
             this->outDataType = GDT_UInt32;
+            this->rsgisOutDataType = rsgis::rsgis_32uint;
         }
         else if(XMLString::equals(dtInt32, dtXMLValue))
         {
             this->outDataType = GDT_Int32;
+            this->rsgisOutDataType = rsgis::rsgis_32int;
         }
         else if(XMLString::equals(dtFloat32, dtXMLValue))
         {
             this->outDataType = GDT_Float32;
+            this->rsgisOutDataType = rsgis::rsgis_8uint;
         }
         else if(XMLString::equals(dtFloat64, dtXMLValue))
         {
             this->outDataType = GDT_Float64;
+            this->rsgisOutDataType = rsgis::rsgis_64float;
         }
         else
         {
             cerr << "Data type not recognised, defaulting to 32 bit float.";
             this->outDataType = GDT_Float32;
+            this->rsgisOutDataType = rsgis::rsgis_32float;
         }
 
         XMLString::release(&dtByte);
@@ -1572,11 +1580,11 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			const XMLCh *stretchXMLValue = argElement->getAttribute(stretchXMLStr);
 			if(XMLString::equals(stretchLinearMinMax, stretchXMLValue))
 			{
-				this->stretchType = RSGISExeImageUtils::linearMinMax;
+				this->stretchType = rsgis::cmds::linearMinMax;
 			}
 			else if (XMLString::equals(stretchLinearPercent, stretchXMLValue))
 			{
-				this->stretchType = RSGISExeImageUtils::linearPercent;
+				this->stretchType = rsgis::cmds::linearPercent;
 
 				XMLCh *percentXMLStr = XMLString::transcode("percent");
 				if(argElement->hasAttribute(percentXMLStr))
@@ -1593,7 +1601,7 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			}
 			else if (XMLString::equals(stretchLinearStdDev, stretchXMLValue))
 			{
-				this->stretchType = RSGISExeImageUtils::linearStdDev;
+				this->stretchType = rsgis::cmds::linearStdDev;
 
 				XMLCh *stdDevXMLStr = XMLString::transcode("stddev");
 				if(argElement->hasAttribute(stdDevXMLStr))
@@ -1610,19 +1618,19 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			}
 			else if (XMLString::equals(stretchHistogram, stretchXMLValue))
 			{
-				this->stretchType = RSGISExeImageUtils::histogram;
+				this->stretchType = rsgis::cmds::histogram;
 			}
 			else if (XMLString::equals(stretchExponential, stretchXMLValue))
 			{
-				this->stretchType = RSGISExeImageUtils::exponential;
+				this->stretchType = rsgis::cmds::exponential;
 			}
 			else if (XMLString::equals(stretchLogarithmic, stretchXMLValue))
 			{
-				this->stretchType = RSGISExeImageUtils::logarithmic;
+				this->stretchType = rsgis::cmds::logarithmic;
 			}
 			else if (XMLString::equals(stretchPowerLaw, stretchXMLValue))
 			{
-				this->stretchType = RSGISExeImageUtils::powerLaw;
+				this->stretchType = rsgis::cmds::powerLaw;
 				XMLCh *powerXMLStr = XMLString::transcode("power");
 				if(argElement->hasAttribute(powerXMLStr))
 				{
@@ -3344,23 +3352,23 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			const XMLCh *stretchXMLValue = argElement->getAttribute(stretchXMLStr);
 			if(XMLString::equals(stretchLinearMinMax, stretchXMLValue))
 			{
-				this->stretchType = RSGISExeImageUtils::linearMinMax;
+				this->stretchType = rsgis::cmds::linearMinMax;
 			}
 			else if (XMLString::equals(stretchHistogram, stretchXMLValue))
 			{
-				this->stretchType = RSGISExeImageUtils::histogram;
+				this->stretchType = rsgis::cmds::histogram;
 			}
 			else if (XMLString::equals(stretchExponential, stretchXMLValue))
 			{
-				this->stretchType = RSGISExeImageUtils::exponential;
+				this->stretchType = rsgis::cmds::exponential;
 			}
 			else if (XMLString::equals(stretchLogarithmic, stretchXMLValue))
 			{
-				this->stretchType = RSGISExeImageUtils::logarithmic;
+				this->stretchType = rsgis::cmds::logarithmic;
 			}
 			else if (XMLString::equals(stretchPowerLaw, stretchXMLValue))
 			{
-				this->stretchType = RSGISExeImageUtils::powerLaw;
+				this->stretchType = rsgis::cmds::powerLaw;
 				XMLCh *powerXMLStr = XMLString::transcode("power");
 				if(argElement->hasAttribute(powerXMLStr))
 				{
@@ -4395,31 +4403,31 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
             {
                 cout << "Output Stats File: " << this->outputFile << endl;
             }
-			if(stretchType == linearMinMax)
+			if(stretchType == rsgis::cmds::linearMinMax)
 			{
 				cout << "Linear Min-Max stretch\n";
 			}
-			else if(stretchType == linearPercent)
+			else if(stretchType == rsgis::cmds::linearPercent)
 			{
 				cout << "Linear " << percent << " % stretch\n";
 			}
-			else if(stretchType == linearStdDev)
+			else if(stretchType == rsgis::cmds::linearStdDev)
 			{
 				cout << "Linear " << stddev << " Standard Deviation stretch\n";
 			}
-			else if(stretchType == histogram)
+			else if(stretchType == rsgis::cmds::histogram)
 			{
 				cout << "Histogram stretch\n";
 			}
-			else if(stretchType == exponential)
+			else if(stretchType == rsgis::cmds::exponential)
 			{
 				cout << "Exponential stretch\n";
 			}
-			else if(stretchType == logarithmic)
+			else if(stretchType == rsgis::cmds::logarithmic)
 			{
 				cout << "Logarithmic stretch\n";
 			}
-			else if(stretchType == powerLaw)
+			else if(stretchType == rsgis::cmds::powerLaw)
 			{
 				cout << power << " Power Law stretch\n";
 			}
@@ -4436,61 +4444,30 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
                 std::cout << "Calculating SD in one pass\n";
             }
 
-			try
-			{
-				GDALAllRegister();
-				RSGISStretchImage *stretchImg = NULL;
-				GDALDataset *inDataset = NULL;
-
-				inDataset = (GDALDataset *) GDALOpenShared(this->inputImage.c_str(), GA_ReadOnly);
-				if(inDataset == NULL)
-				{
-					string message = string("Could not open image ") + this->inputImage;
-					throw RSGISImageException(message.c_str());
-				}
-
-				stretchImg = new RSGISStretchImage(inDataset, this->outputImage, this->outStatsFile, this->outputFile, this->ignoreZeros, this->onePassSD, this->imageFormat, this->outDataType);
-				if(stretchType == linearMinMax)
-				{
-					stretchImg->executeLinearMinMaxStretch();
-				}
-				else if(stretchType == linearPercent)
-				{
-					stretchImg->executeLinearPercentStretch(this->percent);
-				}
-				else if(stretchType == linearStdDev)
-				{
-					stretchImg->executeLinearStdDevStretch(this->stddev);
-				}
-				else if(stretchType == histogram)
-				{
-					stretchImg->executeHistogramStretch();
-				}
-				else if(stretchType == exponential)
-				{
-					stretchImg->executeExponentialStretch();
-				}
-				else if(stretchType == logarithmic)
-				{
-					stretchImg->executeLogrithmicStretch();
-				}
-				else if(stretchType == powerLaw)
-				{
-					stretchImg->executePowerLawStretch(power);
-				}
-				else
-				{
-					throw RSGISException("Stretch is not recognised.");
-				}
-
-				GDALClose(inDataset);
-				GDALDestroyDriverManager();
-				delete stretchImg;
-			}
-			catch(RSGISException& e)
-			{
-				throw e;
-			}
+            try
+            {
+                if(stretchType == rsgis::cmds::linearPercent)
+                {
+                    cout << "Linear " << percent << " % stretch\n";
+                }
+                else if(stretchType == rsgis::cmds::linearStdDev)
+                {
+                    cout << "Linear " << stddev << " Standard Deviation stretch\n";
+                }
+                else if(stretchType == rsgis::cmds::powerLaw)
+                {
+                    cout << power << " Power Law stretch\n";
+                }
+                else
+                {
+                    rsgis::cmds::executeStretchImage(this->inputImage, this->outputImage, this->outStatsFile, this->outputFile, this->ignoreZeros, this->onePassSD, this->imageFormat, rsgisOutDataType, stretchType, 0.0);
+                }                
+            }
+            catch(rsgis::cmds::RSGISCmdException &e)
+            {
+                throw RSGISException(e.what());
+            }
+			
 
 		}
 		else if(option == RSGISExeImageUtils::huecolour)
@@ -5735,23 +5712,23 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
 			cout << "Input Image: " << this->inputImage << endl;
 			cout << "Output Image: " << this->outputImage << endl;
             cout << "Input Stats File: " << this->inputFile << endl;
-			if(stretchType == linearMinMax)
+			if(stretchType == rsgis::cmds::linearMinMax)
 			{
 				cout << "Linear Min-Max stretch\n";
 			}
-			else if(stretchType == histogram)
+			else if(stretchType == rsgis::cmds::histogram)
 			{
 				cout << "Histogram stretch\n";
 			}
-			else if(stretchType == exponential)
+			else if(stretchType == rsgis::cmds::exponential)
 			{
 				cout << "Exponential stretch\n";
 			}
-			else if(stretchType == logarithmic)
+			else if(stretchType == rsgis::cmds::logarithmic)
 			{
 				cout << "Logarithmic stretch\n";
 			}
-			else if(stretchType == powerLaw)
+			else if(stretchType == rsgis::cmds::powerLaw)
 			{
 				cout << power << " Power Law stretch\n";
 			}
@@ -5775,23 +5752,23 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
 				}
                 
 				stretchImg = new RSGISStretchImageWithStats(inDataset, this->outputImage, this->inputFile, this->imageFormat, this->outDataType);
-				if(stretchType == linearMinMax)
+				if(stretchType == rsgis::cmds::linearMinMax)
 				{
 					stretchImg->executeLinearMinMaxStretch();
 				}
-				else if(stretchType == histogram)
+				else if(stretchType == rsgis::cmds::histogram)
 				{
 					stretchImg->executeHistogramStretch();
 				}
-				else if(stretchType == exponential)
+				else if(stretchType == rsgis::cmds::exponential)
 				{
 					stretchImg->executeExponentialStretch();
 				}
-				else if(stretchType == logarithmic)
+				else if(stretchType == rsgis::cmds::logarithmic)
 				{
 					stretchImg->executeLogrithmicStretch();
 				}
-				else if(stretchType == powerLaw)
+				else if(stretchType == rsgis::cmds::powerLaw)
 				{
 					stretchImg->executePowerLawStretch(power);
 				}
@@ -6027,31 +6004,31 @@ void RSGISExeImageUtils::printParameters()
 			cout << "Apply an enhancement stretch to the an input image - usually for visualisation\n";
 			cout << "Input Image: " << this->inputImage << endl;
 			cout << "Output Image: " << this->outputImage << endl;
-			if(stretchType == linearMinMax)
+			if(stretchType == rsgis::cmds::linearMinMax)
 			{
 				cout << "Linear Min-Max stretch\n";
 			}
-			else if(stretchType == linearPercent)
+			else if(stretchType == rsgis::cmds::linearPercent)
 			{
 				cout << "Linear " << percent << " % stretch\n";
 			}
-			else if(stretchType == linearStdDev)
+			else if(stretchType == rsgis::cmds::linearStdDev)
 			{
 				cout << "Linear " << stddev << " Standard Deviation stretch\n";
 			}
-			else if(stretchType == histogram)
+			else if(stretchType == rsgis::cmds::histogram)
 			{
 				cout << "Histogram stretch\n";
 			}
-			else if(stretchType == exponential)
+			else if(stretchType == rsgis::cmds::exponential)
 			{
 				cout << "Exponential stretch\n";
 			}
-			else if(stretchType == logarithmic)
+			else if(stretchType == rsgis::cmds::logarithmic)
 			{
 				cout << "Logarithmic stretch\n";
 			}
-			else if(stretchType == powerLaw)
+			else if(stretchType == rsgis::cmds::powerLaw)
 			{
 				cout << "Power Law stretch\n";
 			}
@@ -6264,23 +6241,23 @@ void RSGISExeImageUtils::printParameters()
 			cout << "Input Image: " << this->inputImage << endl;
 			cout << "Output Image: " << this->outputImage << endl;
             cout << "Input Stats File: " << this->inputFile << endl;
-			if(stretchType == linearMinMax)
+			if(stretchType == rsgis::cmds::linearMinMax)
 			{
 				cout << "Linear Min-Max stretch\n";
 			}
-			else if(stretchType == histogram)
+			else if(stretchType == rsgis::cmds::histogram)
 			{
 				cout << "Histogram stretch\n";
 			}
-			else if(stretchType == exponential)
+			else if(stretchType == rsgis::cmds::exponential)
 			{
 				cout << "Exponential stretch\n";
 			}
-			else if(stretchType == logarithmic)
+			else if(stretchType == rsgis::cmds::logarithmic)
 			{
 				cout << "Logarithmic stretch\n";
 			}
-			else if(stretchType == powerLaw)
+			else if(stretchType == rsgis::cmds::powerLaw)
 			{
 				cout << power << " Power Law stretch\n";
 			}

@@ -81,6 +81,9 @@
 #include "rastergis/RSGISDefineImageTiles.h"
 #include "rastergis/RSGISCreateImageTiles.h"
 
+#include "cmds/RSGISCmdImageUtils.h"
+#include "cmds/RSGISCmdException.h"
+
 #include "gdal_priv.h"
 #include "ogrsf_frmts.h"
 #include "ogr_api.h"
@@ -158,16 +161,7 @@ class RSGISExeImageUtils : public RSGISAlgorithmParameters
 			trangular
 		};
 
-		enum stretches
-		{
-			linearMinMax,
-			linearPercent,
-			linearStdDev,
-			histogram,
-			exponential,
-			logarithmic,
-			powerLaw
-		};
+
 
 		RSGISExeImageUtils();
 		virtual RSGISAlgorithmParameters* getInstance();
@@ -181,7 +175,7 @@ class RSGISExeImageUtils : public RSGISAlgorithmParameters
 	protected:
 		options option;
 		interpolators interpolator;
-		stretches stretchType;
+        rsgis::cmds::RSGISStretches stretchType;
 		string inputImage;
 		string outputImage;
         string outputImageBase;
@@ -246,6 +240,7 @@ class RSGISExeImageUtils : public RSGISAlgorithmParameters
         bool ignoreZeros;
         bool onePassSD;
         GDALDataType outDataType;
+        RSGISLibDataType rsgisOutDataType;
         bool calcImgPyramids;
         bool useIgnoreVal;
         bool bandsDefined;
