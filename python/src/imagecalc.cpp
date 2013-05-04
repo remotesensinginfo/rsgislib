@@ -122,6 +122,60 @@ static PyObject *ImageCalc_imageMath(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
+static PyObject *ImageCalc_KMeansClustering(PyObject *self, PyObject *args)
+{
+    const char *pszInputImage, *pszOutputFile;
+    unsigned int nNumClusters, nMaxNumIterations, nSubSample;
+    int nIgnoreZeros; // passed as a bool - seems the only way to pass into C
+    float fDegreeOfChange;
+    int nClusterMethod;
+    if( !PyArg_ParseTuple(args, "ssIIIifi:KMeansClustering", &pszInputImage, &pszOutputFile, &nNumClusters, 
+                                &nMaxNumIterations, &nSubSample, &nIgnoreZeros, &fDegreeOfChange, &nClusterMethod ))
+        return NULL;
+
+    try
+    {
+        rsgis::cmds::executeKMeansClustering(pszInputImage, pszOutputFile, nNumClusters, nMaxNumIterations, 
+                            nSubSample, nIgnoreZeros, fDegreeOfChange, (rsgis::cmds::RSGISInitClustererMethods)nClusterMethod);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+
+    Py_RETURN_NONE;
+}
+
+static PyObject *ImageCalc_ISODataClustering(PyObject *self, PyObject *args)
+{
+    const char *pszInputImage, *pszOutputFile;
+    unsigned int nNumClusters, nMaxNumIterations, nSubSample, minNumFeatures, minNumClusters;
+    unsigned int startIteration, endIteration;
+    int nIgnoreZeros; // passed as a bool - seems the only way to pass into C
+    float fDegreeOfChange, fMinDistBetweenClusters, maxStdDev;
+    int nClusterMethod;
+    if( !PyArg_ParseTuple(args, "ssIIIififIfIII:ISODataClustering", &pszInputImage, &pszOutputFile, &nNumClusters, 
+                                &nMaxNumIterations, &nSubSample, &nIgnoreZeros, &fDegreeOfChange, &nClusterMethod,
+                                &fMinDistBetweenClusters, &minNumFeatures, &maxStdDev, &minNumClusters, 
+                                &startIteration, &endIteration ))
+        return NULL;
+
+    try
+    {
+        rsgis::cmds::executeISODataClustering(pszInputImage, pszOutputFile, nNumClusters, nMaxNumIterations, 
+                            nSubSample, nIgnoreZeros, fDegreeOfChange, (rsgis::cmds::RSGISInitClustererMethods)nClusterMethod, fMinDistBetweenClusters,
+                            minNumFeatures, maxStdDev, minNumClusters, startIteration, endIteration);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+
+    Py_RETURN_NONE;
+}
+
 
 // Our list of functions in this module
 static PyMethodDef ImageCalcMethods[] = {
@@ -134,8 +188,9 @@ static PyMethodDef ImageCalcMethods[] = {
 "  gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
 "  gdaltype is an containing one of the values from rsgislib.TYPE_*\n"
 "  bandDefnSeq is a sequence of rsgislib.imagecalc.BandDefn objects that define the inputs"},
+
     {"imageMath", ImageCalc_imageMath, METH_VARARGS,
-"Perferms image math calculation.\n"
+"Performs image math calculation.\n"
 "call signature: imagecalc.imageMath(inputImage, outputImage, expression, gdalformat, gdaltype)\n"
 "where:\n"
 "  inimage is a string containing the name of the input file\n"
@@ -143,6 +198,39 @@ static PyMethodDef ImageCalcMethods[] = {
 "  expression is a string containing the expression to run over the images\n"
 "  gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
 "  gdaltype is an containing one of the values from rsgislib.TYPE_*\n"},
+
+    {"KMeansClustering", ImageCalc_KMeansClustering, METH_VARARGS,
+"Performs K Means Clustering.\n"
+"call signature: imagecalc.KMeansClustering(inputImage, outputMatrix, numClusters, maxIterations, subSample, ignoreZeros, degreeOfChange, initMethod)\n"
+"where:\n"
+"  inputImage is a string\n"
+"  outputMatrix is a string\n"
+"  numClusters is an int\n"
+"  maxIterations is an int\n"
+"  subSample is an int\n"
+"  ignoreZeros is a bool\n"
+"  degreeofChange is a float\n"
+"  initMethod is one of INITCLUSTER_* values\n"},
+
+    {"ISODataClustering", ImageCalc_ISODataClustering, METH_VARARGS,
+"Performs ISO Data Clustering.\n"
+"call signature: imagecalc.ISODataClustering(inputImage, outputMatrix, numClusters, maxIterations, subSample, ignoreZeros, degreeOfChange, initMethod, minDistBetweenClusters, minNumFeatures, maxStdDev, minNumClusters, startIteration, endIteration)\n"
+"where:\n"
+"  inputImage is a string\n"
+"  outputMatrix is a string\n"
+"  numClusters is an int\n"
+"  maxIterations is an int\n"
+"  subSample is an int\n"
+"  ignoreZeros is a bool\n"
+"  initMethod is one of INITCLUSTER_* values\n"
+"  minDistBetweenClusters is a float\n"
+"  minNumFeatures is an int\n"
+"  maxStdDev is a float\n"
+"  minNumClusters is an int\n"
+"  startIteration is an int\n"
+"  endIteration is an int\n"
+},
+
     {NULL}        /* Sentinel */
 };
 
@@ -201,6 +289,13 @@ init_imagecalc(void)
         Py_DECREF(pModule);
         INITERROR;
     }
+
+    // add constants
+    PyModule_AddIntConstant(pModule, "INITCLUSTER_RANDOM", rsgis::cmds::rsgis_init_random);
+    PyModule_AddIntConstant(pModule, "INITCLUSTER_DIAGONAL_FULL", rsgis::cmds::rsgis_init_diagonal_full);
+    PyModule_AddIntConstant(pModule, "INITCLUSTER_DIAGONAL_STDDEV", rsgis::cmds::rsgis_init_diagonal_stddev);
+    PyModule_AddIntConstant(pModule, "INITCLUSTER_DIAGONAL_FULL_ATTACH", rsgis::cmds::rsgis_init_diagonal_full_attach);
+    PyModule_AddIntConstant(pModule, "INITCLUSTER_DIAGONAL_STDDEV_ATTACH", rsgis::cmds::rsgis_init_diagonal_stddev_attach);
 
 #if PY_MAJOR_VERSION >= 3
     return pModule;
