@@ -1,0 +1,15 @@
+"""
+This namespace contains rsgislib Python bindings
+"""
+
+TYPE_UNDEFINED = 0
+TYPE_8INT = 1
+TYPE_16INT = 2
+TYPE_32INT = 3
+TYPE_64INT = 4
+TYPE_8UINT = 5
+TYPE_16UINT = 6
+TYPE_32UINT = 7
+TYPE_64UINT = 8
+TYPE_32FLOAT = 9
+TYPE_64FLOAT = 10
