@@ -155,8 +155,8 @@ namespace rsgisexe{
         unsigned int nFeatures;
         float specDistThreshold;
         float distThreshold;
-        std::vector<rsgis::rastergis::RSGISBandAttStats*> *bandStats;
-        std::vector<rsgis::rastergis::RSGISBandAttPercentiles*> *bandPercentiles;
+        std::vector<rsgis::cmds::RSGISBandAttStatsCmds*> *bandStats;
+        std::vector<rsgis::cmds::RSGISBandAttPercentilesCmds*> *bandPercentiles;
         bool copyClassNames;
         rsgis::rastergis::ClassMajorityMethod majMethod;
         float weightA;
@@ -167,6 +167,7 @@ namespace rsgisexe{
         unsigned int greenBand;
         unsigned int blueBand;
         GDALDataType outDataType;
+        rsgis::RSGISLibDataType rsgisOutDataType;
         rsgis::rastergis::SpectralDistanceMethod distThresMethod;
         float specThresOriginDist;
         rsgis::rastergis::rsgismlpriors priorsMethod;
