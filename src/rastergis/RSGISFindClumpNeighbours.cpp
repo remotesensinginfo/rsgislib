@@ -575,13 +575,13 @@ namespace rsgis{namespace rastergis{
     {
         try
         {
-            libkea::KEAImageIO *keaImgIO;
+            kealib::KEAImageIO *keaImgIO;
             void *internalData = clumpImage->GetInternalHandle("");
             if(internalData != NULL)
             {
                 try
                 {
-                    keaImgIO = static_cast<libkea::KEAImageIO*>(internalData);
+                    keaImgIO = static_cast<kealib::KEAImageIO*>(internalData);
                     
                     if((keaImgIO == NULL) | (keaImgIO == 0))
                     {
@@ -606,7 +606,7 @@ namespace rsgis{namespace rastergis{
                 throw rsgis::img::RSGISImageCalcException("Internal data on GDAL Dataset was NULL - check input file is KEA.");
             }
             
-            libkea::KEAAttributeTable *keaAtt = keaImgIO->getAttributeTable(libkea::kea_att_mem, 1);
+            kealib::KEAAttributeTable *keaAtt = keaImgIO->getAttributeTable(kealib::kea_att_mem, 1);
             size_t numRows = keaAtt->getSize();
             
             std::vector<std::list<size_t>* > *neighbours = new std::vector<std::list<size_t>* >();
@@ -626,7 +626,7 @@ namespace rsgis{namespace rastergis{
             size_t numNeighboursIdx = keaAtt->getFieldIndex("NumNeighbours");
             
             size_t clump = 0;
-            libkea::KEAATTFeature *attFeat = NULL;
+            kealib::KEAATTFeature *attFeat = NULL;
             for(std::vector<std::list<size_t>* >::iterator iterClumps = neighbours->begin(); iterClumps != neighbours->end(); ++iterClumps)
             {
                 attFeat = keaAtt->getFeature(clump);
@@ -654,11 +654,11 @@ namespace rsgis{namespace rastergis{
         {
             throw rsgis::img::RSGISImageCalcException(e.what());
         }
-        catch(libkea::KEAATTException &e)
+        catch(kealib::KEAATTException &e)
         {
             throw rsgis::img::RSGISImageCalcException(e.what());
         }
-        catch(libkea::KEAException &e)
+        catch(kealib::KEAException &e)
         {
             throw rsgis::img::RSGISImageCalcException(e.what());
         }
