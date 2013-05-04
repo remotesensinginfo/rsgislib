@@ -298,6 +298,15 @@ ELSEIF(NOT Boost_FOUND)
   MESSAGE(FATAL_ERROR "Unable to find correct Boost version. Did you set BOOST_ROOT?")
 ENDIF()
 
+FIND_PROGRAM(PYTHON_EXE python ENV PATH)
+IF(PYTHON_EXE STREQUAL "PYTHON_EXE-NOTFOUND")
+  MESSAGE(STATUS "Python not found. Python bindings disabled")
+  SET(BUILD_PYTHON_BINDINGS OFF)
+ELSEIF(NOT PYTHON_EXE STREQUAL "PYTHON_EXE-NOTFOUND")
+  MESSAGE(STATUS "Building Python bindings with ${PYTHON_EXE}")
+  SET(BUILD_PYTHON_BINDINGS ON)
+ENDIF()
+
 include_directories(${GDAL_INCLUDE_DIR})
 set(GDAL_LIBRARIES -L${GDAL_LIB_PATH} -lgdal)
 
@@ -360,6 +369,11 @@ if (RSGISLIB_WITH_DOCUMENTS)
 	configure_file ( "${PROJECT_TOOLS_DIR}/rsgislibxmllist.sh.in" "${PROJECT_BINARY_DIR}/rsgislibxmllist" )
 endif(RSGISLIB_WITH_DOCUMENTS)
 
+# Python 
+if (BUILD_PYTHON_BINDINGS)
+  add_custom_target("Python_build" ALL COMMAND ${PYTHON_EXE} "setup.py" "build" DEPENDS ${RSGISLIB_CMDSINTERFACE_LIB_NAME} WORKING_DIRECTORY "python")
+endif(BUILD_PYTHON_BINDINGS)
+
 ###############################################################################
 
 ###############################################################################
@@ -381,6 +395,12 @@ if (RSGISLIB_WITH_DOCUMENTS)
 	install (FILES "${PROJECT_XML_DIR}/RSGISLib_XML_Listing.xml" DESTINATION doc PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
 	install (FILES "${PROJECT_BINARY_DIR}/rsgislibxmllist" DESTINATION bin PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
 endif(RSGISLIB_WITH_DOCUMENTS)
+
+# Python 
+if (BUILD_PYTHON_BINDINGS)
+  install(CODE "execute_process(COMMAND ${PYTHON_EXE} \"setup.py\" \"install\" \"--prefix=${CMAKE_INSTALL_PREFIX}\"  WORKING_DIRECTORY \"python\")")
+endif(BUILD_PYTHON_BINDINGS)
+
 ###############################################################################
 
 ###############################################################################
