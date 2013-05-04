@@ -53,7 +53,9 @@ namespace rsgis{ namespace cmds {
         The filenames for each tile are passed back as a vector.
      */
     void executeCreateTiles(std::string inputImage, std::string outputImageBase, float width, float height, float tileOverlap, bool offsetTiling, std::string gdalFormat, RSGISLibDataType outDataType, std::string outFileExtension, std::vector<std::string> *outFileNames = NULL)throw(RSGISCmdException);
-
+    /** A function to run the populate statistics command */
+    void executePopulateImgStats(std::string inputImage, bool useIgnoreVal, float nodataValue, bool calcImgPyramids)throw(RSGISCmdException);
+    
 }}
 
 

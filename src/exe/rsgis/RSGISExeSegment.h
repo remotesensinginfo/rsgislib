@@ -26,6 +26,7 @@
 #include <string>
 #include <iostream>
 
+#include "common/RSGISCommons.h"
 #include "common/RSGISException.h"
 #include "common/RSGISXMLArgumentsException.h"
 #include "common/RSGISAlgorithmParameters.h"
@@ -153,6 +154,7 @@ namespace rsgisexe{
         unsigned int tileOverlap;
         unsigned int tileBody;
         std::string colsName;
+        rsgis::RSGISLibDataType rsgisOutDataType;
 	};
 }
 #endif

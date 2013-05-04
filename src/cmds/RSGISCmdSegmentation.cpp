@@ -34,7 +34,9 @@
 #include "segmentation/RSGISEliminateSinglePixels.h"
 #include "segmentation/RSGISClumpPxls.h"
 #include "segmentation/RSGISEliminateSmallClumps.h"
-
+#include "segmentation/RSGISGenMeanSegImage.h"
+#include "segmentation/RSGISRandomColourClumps.h"
+#include "segmentation/RSGISMergeSegmentationTiles.h"
 
 namespace rsgis{ namespace cmds {
     
@@ -339,6 +341,280 @@ namespace rsgis{ namespace cmds {
             throw rsgis::cmds::RSGISCmdException(e.what());
         }
     }
+    
+    void executeMeanImage(std::string inputImage, std::string clumpsImage, std::string outputImage, std::string imageFormat, RSGISLibDataType outDataType, bool processInMemory) throw(RSGISCmdException)
+    {
+        try
+        {
+            GDALAllRegister();
+            GDALDataset *inDataset = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_ReadOnly);
+            if(inDataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            GDALDataset *inClumpDataset = (GDALDataset *) GDALOpen(clumpsImage.c_str(), GA_ReadOnly);
+            if(inClumpDataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + clumpsImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            rsgis::img::RSGISImageUtils imgUtils;
+            
+            GDALDataset *spectralDataset = NULL;
+            GDALDataset *clumpsDataset = NULL;
+            GDALDataset *resultDataset = NULL;
+            
+            if(processInMemory)
+            {
+                std::cout << "Processing in Memory\n";
+                spectralDataset = imgUtils.createCopy(inDataset, "", "MEM", GDT_Float32, true, "");
+                imgUtils.copyFloat32GDALDataset(inDataset, spectralDataset);
+                clumpsDataset = imgUtils.createCopy(inClumpDataset, "", "MEM", GDT_UInt32, true, "");
+                imgUtils.copyUIntGDALDataset(inClumpDataset, clumpsDataset);
+                resultDataset = imgUtils.createCopy(inDataset, "", "MEM", RSGIS_to_GDAL_Type(outDataType), true, "");
+            }
+            else
+            {
+                std::cout << "Processing using Disk\n";
+                spectralDataset = inDataset;
+                clumpsDataset = inClumpDataset;
+                resultDataset = imgUtils.createCopy(inDataset, outputImage, imageFormat, RSGIS_to_GDAL_Type(outDataType), true, "");
+            }
+            
+            std::cout << "Calculating Mean Image\n";
+            rsgis::segment::RSGISGenMeanSegImage genMeanImg;
+            genMeanImg.generateMeanImageUsingCalcImage(spectralDataset, clumpsDataset, resultDataset);
+            
+            if(processInMemory)
+            {
+                std::cout << "Copying output to disk\n";
+                GDALDataset *outDataset = imgUtils.createCopy(inDataset, outputImage, imageFormat, RSGIS_to_GDAL_Type(outDataType), true, "");
+                imgUtils.copyFloatGDALDataset(resultDataset, outDataset);
+                GDALClose(outDataset);
+                GDALClose(spectralDataset);
+                GDALClose(clumpsDataset);
+            }
+            
+            // Tidy up
+            GDALClose(inDataset);
+            GDALClose(inClumpDataset);
+            GDALClose(resultDataset);
+            GDALDestroyDriverManager();
+        }
+        catch (rsgis::RSGISException &e)
+        {
+            throw rsgis::cmds::RSGISCmdException(e.what());
+        }
+        catch (std::exception &e)
+        {
+            throw rsgis::cmds::RSGISCmdException(e.what());
+        }
+    }
+
+    void executeRandomColourClumps(std::string inputImage, std::string outputImage, std::string imageFormat, bool processInMemory, std::string importLUTFile, bool importLUT, std::string exportLUTFile, bool exportLUT)throw(RSGISCmdException)
+    {
+        try
+        {
+            GDALAllRegister();
+            GDALDataset *inDataset = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_ReadOnly);
+            if(inDataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            rsgis::img::RSGISImageUtils imgUtils;
+            
+            GDALDataset *catagoryDataset = NULL;
+            GDALDataset *resultDataset = NULL;
+            
+            if(processInMemory)
+            {
+                std::cout << "Processing in Memory\n";
+                catagoryDataset = imgUtils.createCopy(inDataset, "", "MEM", GDT_UInt32, true, "");
+                imgUtils.copyUIntGDALDataset(inDataset, catagoryDataset);
+                resultDataset = imgUtils.createCopy(inDataset, 3, "", "MEM", GDT_Byte, true, "");
+            }
+            else
+            {
+                std::cout << "Processing using Disk\n";
+                catagoryDataset = inDataset;
+                resultDataset = imgUtils.createCopy(inDataset, 3, outputImage, imageFormat, GDT_Byte, true, "");
+            }
+            
+            std::cout << "Generating Random Colours Image\n";
+            rsgis::segment::RSGISRandomColourClumps colourClumps;
+            colourClumps.generateRandomColouredClump(catagoryDataset, resultDataset, importLUTFile, importLUT, exportLUTFile, exportLUT);
+            
+            if(processInMemory)
+            {
+                std::cout << "Copying output to disk\n";
+                GDALDataset *outDataset = imgUtils.createCopy(inDataset, 3, outputImage, imageFormat, GDT_Byte, true, "");
+                imgUtils.copyByteGDALDataset(resultDataset, outDataset);
+                GDALClose(outDataset);
+                GDALClose(catagoryDataset);
+            }
+            
+            // Tidy up
+            GDALClose(inDataset);
+            GDALClose(resultDataset);
+            GDALDestroyDriverManager();
+        }
+        catch (rsgis::RSGISException &e)
+        {
+            throw rsgis::cmds::RSGISCmdException(e.what());
+        }
+        catch (std::exception &e)
+        {
+            throw rsgis::cmds::RSGISCmdException(e.what());
+        }
+    }
+    
+    void executeUnionOfClumps(std::vector<std::string> inputImagePaths, std::string outputImage, std::string imageFormat, bool noDataValProvided, float noDataVal)throw(RSGISCmdException)
+    {
+        try
+        {
+            GDALAllRegister();
+            std::vector<GDALDataset*> *images = new std::vector<GDALDataset*>();
+            images->reserve(inputImagePaths.size());
+            for(std::vector<std::string>::iterator iterFiles = inputImagePaths.begin(); iterFiles != inputImagePaths.end(); ++iterFiles)
+            {
+                GDALDataset *tmp = (GDALDataset *) GDALOpen((*iterFiles).c_str(), GA_ReadOnly);
+                if(tmp == NULL)
+                {
+                    std::string message = std::string("Could not open image ") + (*iterFiles);
+                    throw rsgis::RSGISImageException(message.c_str());
+                }
+                images->push_back(tmp);
+            }
+            
+            rsgis::segment::RSGISClumpPxls clumpPxls;
+            clumpPxls.performMultiBandClump(images, outputImage, imageFormat, noDataValProvided, noDataVal);
+            
+            for(std::vector<GDALDataset*>::iterator iterImages = images->begin(); iterImages != images->end(); ++iterImages)
+            {
+                GDALClose(*iterImages);
+            }
+            delete images;
+            
+        }
+        catch (rsgis::RSGISException &e)
+        {
+            throw rsgis::cmds::RSGISCmdException(e.what());
+        }
+        catch (std::exception &e)
+        {
+            throw rsgis::cmds::RSGISCmdException(e.what());
+        }
+    }
+    
+    void executeMergeSegmentationTiles(std::string outputImage, std::string borderMaskImage, std::vector<std::string> inputImagePaths, unsigned int tileBoundary, unsigned int tileOverlap, unsigned int tileBody, std::string colsName)throw(RSGISCmdException)
+    {
+        try
+        {
+            GDALAllRegister();
+            
+            GDALDataset *outputDataset = (GDALDataset *) GDALOpen(outputImage.c_str(), GA_Update);
+            if(outputDataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + outputImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            GDALDataset *borderMaskDataset = (GDALDataset *) GDALOpen(borderMaskImage.c_str(), GA_Update);
+            if(borderMaskDataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + borderMaskImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            std::cout << "Running Merge\n";
+            rsgis::segment::RSGISMergeSegmentationTiles mergeSegmentTiles;
+            mergeSegmentTiles.mergeClumpBodies(outputDataset, borderMaskDataset, inputImagePaths, tileBoundary, tileOverlap, tileBody, colsName);
+            
+            outputDataset->GetRasterBand(1)->SetMetadataItem("LAYER_TYPE", "thematic");
+            borderMaskDataset->GetRasterBand(1)->SetMetadataItem("LAYER_TYPE", "thematic");
+            
+            GDALClose(outputDataset);
+            GDALClose(borderMaskDataset);
+        }
+        catch (rsgis::RSGISException &e)
+        {
+            throw rsgis::cmds::RSGISCmdException(e.what());
+        }
+        catch (std::exception &e)
+        {
+            throw rsgis::cmds::RSGISCmdException(e.what());
+        }
+    }
+    
+    
+    void executeFindTileBordersMask(std::vector<std::string> inputImagePaths, std::string borderMaskImage, unsigned int tileBoundary, unsigned int tileOverlap, unsigned int tileBody, std::string colsName)throw(RSGISCmdException)
+    {
+        try
+        {
+            GDALAllRegister();
+            
+            GDALDataset *borderMaskDataset = (GDALDataset *) GDALOpen(borderMaskImage.c_str(), GA_Update);
+            if(borderMaskDataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + borderMaskImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            std::cout << "Generating the border mask.\n";
+            rsgis::segment::RSGISMergeSegmentationTiles mergeSegmentTiles;
+            mergeSegmentTiles.createTileBorderClumpMask(borderMaskDataset, inputImagePaths, tileBoundary, tileOverlap, tileBody, colsName);
+            
+            borderMaskDataset->GetRasterBand(1)->SetMetadataItem("LAYER_TYPE", "thematic");
+            
+            GDALClose(borderMaskDataset);
+        }
+        catch (rsgis::RSGISException &e)
+        {
+            throw rsgis::cmds::RSGISCmdException(e.what());
+        }
+        catch (std::exception &e)
+        {
+            throw rsgis::cmds::RSGISCmdException(e.what());
+        }
+    }
+    
+    
+    void executeMergeClumpImages(std::vector<std::string> inputImagePaths, std::string outputImage)throw(RSGISCmdException)
+    {
+        try
+        {
+            GDALAllRegister();
+            
+            GDALDataset *outputDataset = (GDALDataset *) GDALOpen(outputImage.c_str(), GA_Update);
+            if(outputDataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + outputImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            std::cout << "Running Merge\n";
+            rsgis::segment::RSGISMergeSegmentationTiles mergeSegmentTiles;
+            mergeSegmentTiles.mergeClumpImages(outputDataset, inputImagePaths);
+            
+            outputDataset->GetRasterBand(1)->SetMetadataItem("LAYER_TYPE", "thematic");
+            
+            GDALClose(outputDataset);
+        }
+        catch (rsgis::RSGISException &e)
+        {
+            throw rsgis::cmds::RSGISCmdException(e.what());
+        }
+        catch (std::exception &e)
+        {
+            throw rsgis::cmds::RSGISCmdException(e.what());
+        }
+    }
+    
     
 }}
 

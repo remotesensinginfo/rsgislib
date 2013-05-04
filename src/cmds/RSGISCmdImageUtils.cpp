@@ -35,10 +35,10 @@
 #include "img/RSGISCopyImage.h"
 #include "img/RSGISStretchImage.h"
 #include "img/RSGISMaskImage.h"
+#include "img/RSGISPopWithStats.h"
 
 
 namespace rsgis{ namespace cmds {
-    
     
     void executeStretchImage(std::string inputImage, std::string outputImage, bool saveOutStats, std::string outStatsFile, bool ignoreZeros, bool onePassSD, std::string gdalFormat, RSGISLibDataType outDataType, RSGISStretches stretchType, float stretchParam)throw(RSGISCmdException)
     {
@@ -278,7 +278,35 @@ namespace rsgis{ namespace cmds {
             delete calcImage;
             delete copyImage;
         }
-
+        catch(rsgis::RSGISException& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(std::exception& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
+    
+    void executePopulateImgStats(std::string inputImage, bool useIgnoreVal, float nodataValue, bool calcImgPyramids)throw(RSGISCmdException)
+    {
+        try
+        {
+            GDALAllRegister();
+            GDALDataset *inDataset = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_Update);
+            if(inDataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputImage;
+                throw RSGISImageException(message.c_str());
+            }
+            
+            rsgis::img::RSGISPopWithStats popWithStats;
+            popWithStats.calcPopStats( inDataset, useIgnoreVal, nodataValue, calcImgPyramids );
+            
+            
+            GDALClose(inDataset);
+            GDALDestroyDriverManager();
+        }
         catch(rsgis::RSGISException& e)
         {
             throw RSGISCmdException(e.what());
