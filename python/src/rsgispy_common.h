@@ -34,6 +34,15 @@ inline std::string RSGISPY_STRING_EXTRACT(PyObject *o)
     return sVal;
 }
 
+inline PyObject *RSGISPY_CREATE_STRING(const char *psz)
+{
+#if PY_MAJOR_VERSION >= 3
+    return PyUnicode_FromString(psz);
+#else
+    return PyString_FromString(psz);
+#endif
+}
+
 inline long RSGISPY_CHECK_INT(PyObject *o)
 {
 #if PY_MAJOR_VERSION >= 3
