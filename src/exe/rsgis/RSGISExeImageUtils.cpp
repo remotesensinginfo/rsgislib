@@ -5048,29 +5048,19 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
             {
                 cout << "Calculating image pyramids\n";
             }
-
+            
             try
             {
-                GDALAllRegister();
-                GDALDataset *inDataset = NULL;
-                inDataset = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_Update);
-                if(inDataset == NULL)
-                {
-                    string message = string("Could not open image ") + this->inputImage;
-                    throw RSGISImageException(message.c_str());
-                }
-
-                RSGISPopWithStats popWithStats;
-                popWithStats.calcPopStats( inDataset, this->useIgnoreVal, this->nodataValue, this->calcImgPyramids );
-
-
-                GDALClose(inDataset);
-                GDALDestroyDriverManager();
+                rsgis::cmds::executePopulateImgStats(this->inputImage, this->useIgnoreVal, this->nodataValue, this->calcImgPyramids);
             }
-            catch (RSGISException &e)
+            catch(rsgis::cmds::RSGISCmdException& e)
             {
-                throw e;
+                throw RSGISException(e.what());
             }
+            catch(std::exception& e)
+            {
+                throw RSGISException(e.what());
+            }            
         }
         else if(option == RSGISExeImageUtils::createcopy)
         {

@@ -588,6 +588,13 @@ namespace rsgis{namespace segment{
                     output[n] = cClump->meanVals[n];
                 }
             }
+            else
+            {
+                for(unsigned int n = 0; n < numSpecBands; ++n)
+                {
+                    output[n] = 0;
+                }
+            }
         }
         catch(boost::numeric::negative_overflow& e)
         {
