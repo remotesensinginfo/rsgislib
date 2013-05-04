@@ -111,6 +111,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 
 
     this->outDataType = GDT_Float32;
+    this->rsgisOutDataType = rsgis::rsgis_32float;
 	XMLCh *datatypeXMLStr = xercesc::XMLString::transcode("datatype");
 	if(argElement->hasAttribute(datatypeXMLStr))
 	{
@@ -162,6 +163,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
         {
             std::cerr << "Data type not recognised, defaulting to 32 bit float.";
             this->outDataType = GDT_Float32;
+            this->rsgisOutDataType = rsgis::rsgis_32float;
         }
         
         xercesc::XMLString::release(&dtByte);

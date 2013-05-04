@@ -500,16 +500,16 @@ namespace rsgisexe{
             
             std::cout << "Found " << numBands << " Attributes" << std::endl;
             
-            bandStats = new std::vector<rsgis::rastergis::RSGISBandAttStats*>();
+            bandStats = new std::vector<rsgis::cmds::RSGISBandAttStatsCmds*>();
             bandStats->reserve(numBands);
             
-            rsgis::rastergis::RSGISBandAttStats *bandStat = NULL;
+            rsgis::cmds::RSGISBandAttStatsCmds *bandStat = NULL;
             xercesc::DOMElement *bandElement = NULL;
             for(int i = 0; i < numBands; i++)
             {
                 bandElement = static_cast<xercesc::DOMElement*>(bandNodesList->item(i));
                 
-                bandStat = new rsgis::rastergis::RSGISBandAttStats();
+                bandStat = new rsgis::cmds::RSGISBandAttStatsCmds();
                 
                 XMLCh *bandXMLStr = xercesc::XMLString::transcode("band");
                 if(bandElement->hasAttribute(bandXMLStr))
@@ -977,16 +977,16 @@ namespace rsgisexe{
             
             std::cout << "Found " << numBands << " Attributes" << std::endl;
             
-            bandPercentiles = new std::vector<rsgis::rastergis::RSGISBandAttPercentiles*>();
+            bandPercentiles = new std::vector<rsgis::cmds::RSGISBandAttPercentilesCmds*>();
             bandPercentiles->reserve(numBands);
             
-            rsgis::rastergis::RSGISBandAttPercentiles *bandPercentile = NULL;
+            rsgis::cmds::RSGISBandAttPercentilesCmds *bandPercentile = NULL;
             xercesc::DOMElement *bandElement = NULL;
             for(int i = 0; i < numBands; i++)
             {
                 bandElement = static_cast<xercesc::DOMElement*>(bandNodesList->item(i));
                 
-                bandPercentile = new rsgis::rastergis::RSGISBandAttPercentiles();
+                bandPercentile = new rsgis::cmds::RSGISBandAttPercentilesCmds();
                 
                 XMLCh *bandXMLStr = xercesc::XMLString::transcode("band");
                 if(bandElement->hasAttribute(bandXMLStr))
@@ -1536,8 +1536,7 @@ namespace rsgisexe{
             }
             xercesc::XMLString::release(&formatXMLStr);
             
-            
-            this->outDataType = GDT_Float32;
+            this->rsgisOutDataType = rsgis::rsgis_32float;
             XMLCh *datatypeXMLStr = xercesc::XMLString::transcode("datatype");
             if(argElement->hasAttribute(datatypeXMLStr))
             {
@@ -1552,36 +1551,36 @@ namespace rsgisexe{
                 const XMLCh *dtXMLValue = argElement->getAttribute(datatypeXMLStr);
                 if(xercesc::XMLString::equals(dtByte, dtXMLValue))
                 {
-                    this->outDataType = GDT_Byte;
+                    this->rsgisOutDataType = rsgis::rsgis_8int;
                 }
                 else if(xercesc::XMLString::equals(dtUInt16, dtXMLValue))
                 {
-                    this->outDataType = GDT_UInt16;
+                    this->rsgisOutDataType = rsgis::rsgis_16uint;
                 }
                 else if(xercesc::XMLString::equals(dtInt16, dtXMLValue))
                 {
-                    this->outDataType = GDT_Int16;
+                    this->rsgisOutDataType = rsgis::rsgis_16int;
                 }
                 else if(xercesc::XMLString::equals(dtUInt32, dtXMLValue))
                 {
-                    this->outDataType = GDT_UInt32;
+                    this->rsgisOutDataType = rsgis::rsgis_32uint;
                 }
                 else if(xercesc::XMLString::equals(dtInt32, dtXMLValue))
                 {
-                    this->outDataType = GDT_Int32;
+                    this->rsgisOutDataType = rsgis::rsgis_32int;
                 }
                 else if(xercesc::XMLString::equals(dtFloat32, dtXMLValue))
                 {
-                    this->outDataType = GDT_Float32;
+                    this->rsgisOutDataType = rsgis::rsgis_32float;
                 }
                 else if(xercesc::XMLString::equals(dtFloat64, dtXMLValue))
                 {
-                    this->outDataType = GDT_Float64;
+                    this->rsgisOutDataType = rsgis::rsgis_64float;
                 }
                 else
                 {
                     std::cerr << "Data type not recognised, defaulting to 32 bit float.";
-                    this->outDataType = GDT_Float32;
+                    this->rsgisOutDataType = rsgis::rsgis_32float;
                 }
                 
                 xercesc::XMLString::release(&dtByte);
@@ -3027,38 +3026,14 @@ namespace rsgisexe{
                 std::cout << "Input Table: " << this->inputImage << std::endl;
                 std::cout << "Output Image: " << this->clumpsImage << std::endl;
                 
-                
-                GDALAllRegister();
                 try
                 {
-                    GDALDataset *inputDataset = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_ReadOnly);
-                    if(inputDataset == NULL)
-                    {
-                        std::string message = std::string("Could not open image ") + this->inputImage;
-                        throw rsgis::RSGISImageException(message.c_str());
-                    }
-                    
-                    GDALDataset *outRATDataset = (GDALDataset *) GDALOpen(this->clumpsImage.c_str(), GA_Update);
-                    if(outRATDataset == NULL)
-                    {
-                        std::string message = std::string("Could not open image ") + this->clumpsImage;
-                        throw rsgis::RSGISImageException(message.c_str());
-                    }
-                    
-                    std::cout << "Import attribute table\n";
-                    const GDALRasterAttributeTable *gdalAtt = inputDataset->GetRasterBand(1)->GetDefaultRAT();
-                    
-                    std::cout << "Adding RAT\n";
-                    outRATDataset->GetRasterBand(1)->SetDefaultRAT(gdalAtt);
-                    outRATDataset->GetRasterBand(1)->SetMetadataItem("LAYER_TYPE", "thematic");
-                    
-                    GDALClose(inputDataset);
-                    GDALClose(outRATDataset);
+                    rsgis::cmds::executeCoptRAT(this->inputImage, this->clumpsImage);
                 }
-                catch(rsgis::RSGISException &e)
+                catch(rsgis::cmds::RSGISCmdException &e)
                 {
-                    throw e;
-                }	
+                    throw rsgis::RSGISException(e.what());
+                }                
             }
             else if(this->option == RSGISExeRasterGIS::spatiallocation)
             {
@@ -3069,25 +3044,12 @@ namespace rsgisexe{
                 
                 try
                 {
-                    GDALAllRegister();
-                    
-                    GDALDataset *inputDataset = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_Update);
-                    if(inputDataset == NULL)
-                    {
-                        std::string message = std::string("Could not open image ") + this->inputImage;
-                        throw rsgis::RSGISImageException(message.c_str());
-                    }
-                    
-                    rsgis::rastergis::RSGISCalcClusterLocation calcLoc;
-                    calcLoc.populateAttWithClumpLocation(inputDataset, eastingsField, northingsField);
-                    
-                    GDALClose(inputDataset);
+                    rsgis::cmds::executeSpatialLocation(this->inputImage, this->clumpsImage, this->eastingsField, this->northingsField);
                 }
-                catch(rsgis::RSGISException &e)
+                catch(rsgis::cmds::RSGISCmdException &e)
                 {
-                    throw e;
-                }
-                
+                    throw rsgis::RSGISException(e.what());
+                } 
             }
             else if(this->option == RSGISExeRasterGIS::eucdistfromfeat)
             {
@@ -3198,36 +3160,14 @@ namespace rsgisexe{
                     std::cout << "\tField: " << (*iterFields) << std::endl;
                 }
                 
-                
-                GDALAllRegister();
                 try
                 {
-                    GDALDataset *inputDataset = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_ReadOnly);
-                    if(inputDataset == NULL)
-                    {
-                        std::string message = std::string("Could not open image ") + this->inputImage;
-                        throw rsgis::RSGISImageException(message.c_str());
-                    }
-                    
-                    GDALDataset *outRATDataset = (GDALDataset *) GDALOpen(this->clumpsImage.c_str(), GA_Update);
-                    if(outRATDataset == NULL)
-                    {
-                        std::string message = std::string("Could not open image ") + this->clumpsImage;
-                        throw rsgis::RSGISImageException(message.c_str());
-                    }
-                    
-                    rsgis::rastergis::RSGISRasterAttUtils attUtils;
-                    attUtils.copyAttColumns(inputDataset, outRATDataset, fields);
-                    
-                    outRATDataset->GetRasterBand(1)->SetMetadataItem("LAYER_TYPE", "thematic");
-                    
-                    GDALClose(inputDataset);
-                    GDALClose(outRATDataset);
+                    rsgis::cmds::executeCopyGDALATTColumns(this->inputImage, this->clumpsImage, this->fields);
                 }
-                catch(rsgis::RSGISException &e)
+                catch(rsgis::cmds::RSGISCmdException &e)
                 {
-                    throw e;
-                }	
+                    throw rsgis::RSGISException(e.what());
+                }                
             }
             else if(this->option == RSGISExeRasterGIS::popattributestats)
             {
@@ -3235,7 +3175,7 @@ namespace rsgisexe{
                 std::cout << "Input Image: " << this->inputImage << std::endl;
                 std::cout << "Clump Image: " << this->clumpsImage << std::endl;
                 std::cout << "Statistics to be calculated:\n";
-                for(std::vector<rsgis::rastergis::RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
+                for(std::vector<rsgis::cmds::RSGISBandAttStatsCmds*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
                 {
                     std::cout << "Band " << (*iterBands)->band << ": ";
                     if((*iterBands)->calcMin)
@@ -3264,45 +3204,16 @@ namespace rsgisexe{
                     }
                     
                     std::cout << std::endl;
-                    
-                    (*iterBands)->countIdxDef = false;
-                    (*iterBands)->minIdxDef = false;
-                    (*iterBands)->maxIdxDef = false;
-                    (*iterBands)->meanIdxDef = false;
-                    (*iterBands)->sumIdxDef = false;
-                    (*iterBands)->stdDevIdxDef = false;
-                    (*iterBands)->medianIdxDef = false;
                 }
                 
-                try 
+                try
                 {
-                    GDALAllRegister();
-                    
-                    GDALDataset *clumpsDataset = (GDALDataset *) GDALOpenShared(this->clumpsImage.c_str(), GA_Update);
-                    if(clumpsDataset == NULL)
-                    {
-                        std::string message = std::string("Could not open image ") + this->clumpsImage;
-                        throw rsgis::RSGISImageException(message.c_str());
-                    }
-                    GDALDataset *imageDataset = (GDALDataset *) GDALOpenShared(this->inputImage.c_str(), GA_ReadOnly);
-                    if(imageDataset == NULL)
-                    {
-                        std::string message = std::string("Could not open image ") + this->inputImage;
-                        throw rsgis::RSGISImageException(message.c_str());
-                    }
-                    
-                    rsgis::rastergis::RSGISCalcClumpStats clumpStats;
-                    clumpStats.calcImageClumpStatistic(clumpsDataset, imageDataset, bandStats);
-                    
-                    clumpsDataset->GetRasterBand(1)->SetMetadataItem("LAYER_TYPE", "thematic");
-                    
-                    GDALClose(clumpsDataset);
-                    GDALClose(imageDataset);
-                } 
-                catch (rsgis::RSGISException &e) 
-                {
-                    throw e;
+                    rsgis::cmds::executePopulateRATWithStats(this->inputImage, this->clumpsImage, this->bandStats);
                 }
+                catch (rsgis::cmds::RSGISCmdException &e)
+                {
+                    throw rsgis::RSGISException(e.what());
+                }                
             }
             else if(this->option == RSGISExeRasterGIS::popcategoryproportions)
             {
@@ -3317,39 +3228,13 @@ namespace rsgisexe{
                     std::cout << "Class name column: " << this->classNameField << std::endl;
                 }
                 
-                try 
+                try
                 {
-                    GDALAllRegister();
-                    
-                    GDALDataset *clumpsDataset = (GDALDataset *) GDALOpenShared(this->clumpsImage.c_str(), GA_Update);
-                    if(clumpsDataset == NULL)
-                    {
-                        std::string message = std::string("Could not open image ") + this->clumpsImage;
-                        throw rsgis::RSGISImageException(message.c_str());
-                    }
-                    GDALDataset *catsDataset = (GDALDataset *) GDALOpenShared(this->categoriesImage.c_str(), GA_ReadOnly);
-                    if(catsDataset == NULL)
-                    {
-                        std::string message = std::string("Could not open image ") + this->categoriesImage;
-                        throw rsgis::RSGISImageException(message.c_str());
-                    }
-                    
-                    rsgis::rastergis::RSGISFindClumpCatagoryStats findClumpStats;
-                    findClumpStats.calcCatergoriesOverlaps(clumpsDataset, catsDataset, this->outColsName, this->majorityColName, this->copyClassNames, this->majClassNameField, this->classNameField);                    
-                    
-                    clumpsDataset->GetRasterBand(1)->SetMetadataItem("LAYER_TYPE", "thematic");
-                    
-                    GDALClose(clumpsDataset);
-                    GDALClose(catsDataset);
+                    rsgis::cmds::executePopulateCategoryProportions(this->categoriesImage, this->clumpsImage, this->outColsName, this->majorityColName, this->copyClassNames, this->majClassNameField, this->classNameField);
                 }
-                catch (rsgis::RSGISAttributeTableException &e) 
+                catch (rsgis::cmds::RSGISCmdException &e)
                 {
-                    throw e;
-                }
-                catch (rsgis::RSGISException &e) 
-                {
-                    std::cout << e.what() << std::endl;
-                    throw e;
+                    throw rsgis::RSGISException(e.what());
                 }
             }
             else if(this->option == RSGISExeRasterGIS::copycatcolours)
@@ -3359,39 +3244,13 @@ namespace rsgisexe{
                 std::cout << "Categories Image: " << this->categoriesImage << std::endl;
                 std::cout << "Class Field: " << this->classField << std::endl;
                 
-                try 
+                try
                 {
-                    GDALAllRegister();
-                    
-                    GDALDataset *clumpsDataset = (GDALDataset *) GDALOpenShared(this->clumpsImage.c_str(), GA_Update);
-                    if(clumpsDataset == NULL)
-                    {
-                        std::string message = std::string("Could not open image ") + this->clumpsImage;
-                        throw rsgis::RSGISImageException(message.c_str());
-                    }
-                    GDALDataset *catsDataset = (GDALDataset *) GDALOpenShared(this->categoriesImage.c_str(), GA_ReadOnly);
-                    if(catsDataset == NULL)
-                    {
-                        std::string message = std::string("Could not open image ") + this->categoriesImage;
-                        throw rsgis::RSGISImageException(message.c_str());
-                    }
-                    
-                    rsgis::rastergis::RSGISRasterAttUtils attUtils;
-                    attUtils.copyColourForCats(clumpsDataset, catsDataset, this->classField);
-                    
-                    clumpsDataset->GetRasterBand(1)->SetMetadataItem("LAYER_TYPE", "thematic");
-                    
-                    GDALClose(clumpsDataset);
-                    GDALClose(catsDataset);
+                    rsgis::cmds::executeCopyCatagoriesColours(this->categoriesImage, this->clumpsImage, this->classField);
                 }
-                catch (rsgis::RSGISAttributeTableException &e) 
+                catch (rsgis::cmds::RSGISCmdException &e)
                 {
-                    throw e;
-                }
-                catch (rsgis::RSGISException &e) 
-                {
-                    std::cout << e.what() << std::endl;
-                    throw e;
+                    throw rsgis::RSGISException(e.what());
                 }
             }
             else if(this->option == RSGISExeRasterGIS::knnmajorityclassifier)
@@ -3449,42 +3308,20 @@ namespace rsgisexe{
                 std::cout << "Input Image: " << this->inputImage << std::endl;
                 std::cout << "Clump Image: " << this->clumpsImage << std::endl;
                 std::cout << "Percentiles to be calculated:\n";
-                for(std::vector<rsgis::rastergis::RSGISBandAttPercentiles*>::iterator iterBands = bandPercentiles->begin(); iterBands != bandPercentiles->end(); ++iterBands)
+                for(std::vector<rsgis::cmds::RSGISBandAttPercentilesCmds*>::iterator iterBands = bandPercentiles->begin(); iterBands != bandPercentiles->end(); ++iterBands)
                 {
                     std::cout << "Band " << (*iterBands)->band << ": " << (*iterBands)->fieldName << " percentile " << (*iterBands)->percentile << std::endl;
-
-                    (*iterBands)->fieldIdxDef = false;
                 }
                 
-                try 
+                try
                 {
-                    GDALAllRegister();
-                    
-                    GDALDataset *clumpsDataset = (GDALDataset *) GDALOpenShared(this->clumpsImage.c_str(), GA_Update);
-                    if(clumpsDataset == NULL)
-                    {
-                        std::string message = std::string("Could not open image ") + this->clumpsImage;
-                        throw rsgis::RSGISImageException(message.c_str());
-                    }
-                    GDALDataset *imageDataset = (GDALDataset *) GDALOpenShared(this->inputImage.c_str(), GA_ReadOnly);
-                    if(imageDataset == NULL)
-                    {
-                        std::string message = std::string("Could not open image ") + this->inputImage;
-                        throw rsgis::RSGISImageException(message.c_str());
-                    }
-                    
-                    rsgis::rastergis::RSGISCalcClumpStats clumpStats;
-                    clumpStats.calcImageClumpPercentiles(clumpsDataset, imageDataset, bandPercentiles);
-                    
-                    clumpsDataset->GetRasterBand(1)->SetMetadataItem("LAYER_TYPE", "thematic");
-                    
-                    GDALClose(clumpsDataset);
-                    GDALClose(imageDataset);
-                } 
-                catch (rsgis::RSGISException &e) 
-                {
-                    throw e;
+                    rsgis::cmds::executePopulateRATWithPercentiles(this->inputImage, this->clumpsImage, this->bandPercentiles);
                 }
+                catch (rsgis::cmds::RSGISCmdException &e)
+                {
+                    throw rsgis::RSGISException(e.what());
+                }
+                
             }
             else if(this->option == RSGISExeRasterGIS::export2ascii)
             {
@@ -3669,40 +3506,13 @@ namespace rsgisexe{
                 
                 try
                 {
-                    GDALAllRegister();
-                    
-                    GDALDataset *inputDataset = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_Update);
-                    if(inputDataset == NULL)
-                    {
-                        std::string message = std::string("Could not open image ") + this->inputImage;
-                        throw rsgis::RSGISImageException(message.c_str());
-                    }
-                    
-                    rsgis::rastergis::RSGISRasterAttUtils attUtils;
-                    const GDALRasterAttributeTable *gdalATT = inputDataset->GetRasterBand(1)->GetDefaultRAT();
-                    
-                    std::vector<unsigned int> *colIdxs = new std::vector<unsigned int>();
-                    std::string *bandNames = new std::string[fields.size()];
-                    unsigned int i = 0;
-                    for(std::vector<std::string>::iterator iterFields = fields.begin(); iterFields != fields.end(); ++iterFields)
-                    {
-                        bandNames[i] = *iterFields;
-                        colIdxs->push_back(attUtils.findColumnIndex(gdalATT, *iterFields));
-                        ++i;
-                    }
-                    
-                    rsgis::rastergis::RSGISExportColumns2ImageCalcImage *calcImageVal = new rsgis::rastergis::RSGISExportColumns2ImageCalcImage(fields.size(), gdalATT, colIdxs);
-                    rsgis::img::RSGISCalcImage calcImage(calcImageVal);
-                    calcImage.calcImage(&inputDataset, 1, this->outputFile, true, bandNames, this->imageFormat, outDataType);
-                    delete calcImageVal;
-                    delete[] bandNames;
-                    
-                    GDALClose(inputDataset);
+                    rsgis::cmds::executeExportCols2GDALImage(this->inputImage, this->outputFile, this->imageFormat, this->rsgisOutDataType, this->fields);
                 }
-                catch(rsgis::RSGISException &e)
+                catch (rsgis::cmds::RSGISCmdException &e)
                 {
-                    throw e;
+                    throw rsgis::RSGISException(e.what());
                 }
+                
             }
             else if(this->option == RSGISExeRasterGIS::strclassmajority)
             {
@@ -4333,7 +4143,7 @@ namespace rsgisexe{
                 std::cout << "Input Image: " << this->inputImage << std::endl;
                 std::cout << "Clump Image: " << this->clumpsImage << std::endl;
                 std::cout << "Statistics to be calculated:\n";
-                for(std::vector<rsgis::rastergis::RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
+                for(std::vector<rsgis::cmds::RSGISBandAttStatsCmds*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
                 {
                     std::cout << "Band " << (*iterBands)->band << ": ";
                     if((*iterBands)->calcMin)
@@ -4417,7 +4227,7 @@ namespace rsgisexe{
                 std::cout << "Input Image: " << this->inputImage << std::endl;
                 std::cout << "Clump Image: " << this->clumpsImage << std::endl;
                 std::cout << "Percentiles to be calculated:\n";
-                for(std::vector<rsgis::rastergis::RSGISBandAttPercentiles*>::iterator iterBands = bandPercentiles->begin(); iterBands != bandPercentiles->end(); ++iterBands)
+                for(std::vector<rsgis::cmds::RSGISBandAttPercentilesCmds*>::iterator iterBands = bandPercentiles->begin(); iterBands != bandPercentiles->end(); ++iterBands)
                 {
                     std::cout << "Band " << (*iterBands)->band << ": " << (*iterBands)->fieldName << " percentile " << (*iterBands)->percentile << std::endl;
                 }
