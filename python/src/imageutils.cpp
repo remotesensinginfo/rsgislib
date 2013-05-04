@@ -190,7 +190,7 @@ init_imageutils(void)
 #if PY_MAJOR_VERSION >= 3
     PyObject *pModule = PyModule_Create(&moduledef);
 #else
-    PyObject *pModule = Py_InitModule("_imageutils", ImageCalcMethods);
+    PyObject *pModule = Py_InitModule("_imageutils", ImageUtilsMethods);
 #endif
     if( pModule == NULL )
         INITERROR;
