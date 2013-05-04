@@ -1,5 +1,5 @@
 """
-Contains some types for RSGISLib
+Contains ImageCalc functionality for rsgislib
 """
 
 # import the C++ extension into this level
