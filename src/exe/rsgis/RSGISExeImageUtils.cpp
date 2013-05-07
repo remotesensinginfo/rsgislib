@@ -2607,6 +2607,19 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 		}
 		XMLString::release(&outputXMLStr);
 
+        XMLCh *outTilesListXMLStr = XMLString::transcode("outTilesList");
+		if(argElement->hasAttribute(outTilesListXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(outTilesListXMLStr));
+			this->outTilesList = string(charValue);
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			this->outTilesList = "";
+		}
+		XMLString::release(&outTilesListXMLStr);
+        
         XMLCh *widthXMLStr = XMLString::transcode("width");
 		if(argElement->hasAttribute(widthXMLStr))
 		{
@@ -4954,6 +4967,10 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
 			cout << "A command to create tiles from image\n";
             cout << "Input Image: " << this->inputImage << std::endl;
             cout << "Output Image Base: " << this->outputImage << std::endl;
+            if(this->outTilesList != "")
+            {
+                std::cout << "Saving list of tiles to: " << this->outTilesList << std::endl;
+            }
             cout << "Tile Width: " << this->width << std::endl;
             cout << "Tile Height: " << this->height << std::endl;
             cout << "Tile Overlap: " << this->tileOverlap << std::endl;
@@ -4963,7 +4980,22 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
             }
             try
             {
-                rsgis::cmds::executeCreateTiles(this->inputImage, this->outputImage, this->width, this->height, this->tileOverlap, this->offsetTiling, this->imageFormat, this->rsgisOutDataType, this->outFileExtension);
+                if(this->outTilesList != "")
+                {
+                    std::vector<std::string> *outFileNames = new std::vector<std::string>;
+                    rsgis::cmds::executeCreateTiles(this->inputImage, this->outputImage, this->width, this->height, this->tileOverlap, this->offsetTiling, this->imageFormat, this->rsgisOutDataType, this->outFileExtension, outFileNames);
+                    std::ofstream tilesListFile;
+                    tilesListFile.open(this->outTilesList.c_str());
+                    for( std::vector<std::string>::iterator itr = outFileNames->begin(); itr != outFileNames->end(); itr++)
+                    {
+                        tilesListFile << *itr << "\n";
+                    }
+                    tilesListFile.close();
+                }
+                else
+                {
+                    rsgis::cmds::executeCreateTiles(this->inputImage, this->outputImage, this->width, this->height, this->tileOverlap, this->offsetTiling, this->imageFormat, this->rsgisOutDataType, this->outFileExtension);
+                }
             }
             catch(rsgis::cmds::RSGISCmdException& e)
             {

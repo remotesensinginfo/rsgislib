@@ -661,7 +661,7 @@
     <!-- A command to generate a set of slices from a multi-band image -->
     <rsgis:command algor="imageutils" option="createslices" image="image.env" output="image_out_base" />
     <!-- A command to generate tiles from an input image-->
-    <rsgis:command algor="imageutils" option="createtiles" image="image.env" output="image_out_base" width="int" height="int" overlap="int" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" [offset="yes|no"] />
+    <rsgis:command algor="imageutils" option="createtiles" image="image.env" output="image_out_base" width="int" height="int" overlap="int" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" [offset="yes|no"] [outTilesList="list.txt"]/>
     <!-- A command to clump an image for a given pixel values -->
     <rsgis:command algor="imageutils" option="clump" image="image.env" output="image_out.env" format="GDAL Format" inmemory="yes | no" proj="OSGB | NZ2000 | NZ1949 | IMAGE" />
     <!-- A command to create a composite image from a multi-band input image -->
