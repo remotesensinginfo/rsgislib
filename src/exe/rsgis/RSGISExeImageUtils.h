@@ -197,6 +197,7 @@ class RSGISExeImageUtils : public RSGISAlgorithmParameters
         string classColumnName;
         string inputROIImage;
         string tileImage;
+        string outTilesList;
 		ClassColour **classColour;
 		float nodataValue;
 		float skipValue;

@@ -1,3 +1,24 @@
+/*
+ *  imageutils.cpp
+ *  RSGIS_LIB
+ *
+ *  Created by Sam Gillingham on 02/05/2013.
+ *  Copyright 2013 RSGISLib.
+ *
+ *  RSGISLib is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  RSGISLib is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with RSGISLib.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
 
 #include "rsgispy_common.h"
 #include "cmds/RSGISCmdImageUtils.h"
@@ -68,9 +89,13 @@ static PyObject *ImageUtils_maskImage(PyObject *self, PyObject *args)
 static PyObject *ImageUtils_createTiles(PyObject *self, PyObject *args)
 {
     const char *pszInputImage, *pszImageBase, *pszGDALFormat, *pszExt;
-    float width, height, tileOverlap;
+    float width, height, tileOverlap; // Command actually needs ints. Won't complain if floats are provided
     int offsetTiling, nDataType;
-    if( !PyArg_ParseTuple(args, "ssfffisi:createTiles", &pszInputImage, &pszImageBase,
+    /* Check if required parameters are present and of the correct type
+       The type and order are specified by ssfffisis.
+       I.e., string, string, float ...etc
+    */
+    if( !PyArg_ParseTuple(args, "ssfffisis:createTiles", &pszInputImage, &pszImageBase,
                                 &width, &height, &tileOverlap, &offsetTiling, &pszGDALFormat, 
                                 &nDataType, &pszExt ))
         return NULL;
@@ -132,17 +157,17 @@ static PyMethodDef ImageUtilsMethods[] = {
 "  maskvalue is a float\n"},
 
     {"createTiles", ImageUtils_createTiles, METH_VARARGS,
-"Create Tiles\n"
+"Create tiles from a larger image, useful for splitting a large image into multiple smaller ones for processing.\n"
 "call signature: imageutils.createTiles(inputimage, baseimage, width, height, overlap, offsettiling, gdalformat, type, ext)\n"
 "  inputImage is a string containing the name of the input file\n"
-"  baseimage is a string\n"
-"  width is a float\n"
-"  height is a float\n"
-"  overlap is a float\n"
-"  offsettiling is a bool\n"
-"  gdalformat is a string\n"
-"  type is a rsgislib.TYPE_* value\n"
-"  ext is a string\n"
+"  baseimage is a string containing the base name of the output file\n    the number of the tile and file extension will be appended.\n"
+"  width is the width of each tile, in pixels.\n"
+"  height is the height of each tile, in pixels.\n"
+"  overlap is the overlap between tiles, in pixels\n"
+"  offsettiling is a bool, determining if tiles should start halfway into the image\n    useful for generating overlapping sets of tiles.\n"
+"  gdalformat is a string providing the output format of the tiles (e.g., KEA).\n"
+"  type is a rsgislib.TYPE_* value providing the output data type of the tiles.\n"
+"  ext is a string providing the extension for the tiles (as required by the specified data type).\n"
 "\nA list of strings containing the filenames is returned\n"},
 
     {NULL}        /* Sentinel */
