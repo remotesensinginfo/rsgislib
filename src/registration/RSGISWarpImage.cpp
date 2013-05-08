@@ -95,7 +95,9 @@ namespace rsgis{namespace reg{
 				{
 					textUtils.tokenizeString(strLine, ',', tokens, true);
 					
-					if(tokens->size() != 4)
+                    // Accept 4 or 5 tokens to take new format GCPs with metric value
+                    // without breaking backwards compatibility.
+					if((tokens->size() != 4) && (tokens->size() != 5))
 					{
 						delete tokens;
 						gcpFile.close();

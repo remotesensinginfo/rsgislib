@@ -1181,7 +1181,7 @@ namespace rsgis{namespace reg{
 		outPtsFile << std::fixed;
 		
 		outPtsFile << "# RSGISLib Image to Map GCP File\n";
-		outPtsFile << "# Reference Map (E,N), Floating Image (x,y)\n";
+		outPtsFile << "# Reference Map (E,N), Floating Image (x,y), Metric Value\n";
 		outPtsFile << "#\n";
 		
 		std::cout << tiePts->size() << " tie points to be exported\n";
@@ -1189,7 +1189,8 @@ namespace rsgis{namespace reg{
 		std::list<TiePoint*>::iterator iterTiePts;
 		for(iterTiePts = tiePts->begin(); iterTiePts != tiePts->end(); ++iterTiePts)
 		{
-			outPtsFile << (*iterTiePts)->eastings << "," << (*iterTiePts)->northings << "," << (*iterTiePts)->xFloat << "," << (*iterTiePts)->yFloat << std::endl;
+			outPtsFile << (*iterTiePts)->eastings << "," << (*iterTiePts)->northings << "," << (*iterTiePts)->xFloat << ","
+            << (*iterTiePts)->yFloat << "," << (*iterTiePts)->metricVal << std::endl;
 		}
 		
 		outPtsFile << "# End Of File\n";
@@ -1214,7 +1215,7 @@ namespace rsgis{namespace reg{
 		outPtsFile << std::fixed;
 		
 		outPtsFile << "# RSGISLib Map offsets GCP File\n";
-		outPtsFile << "# Eastings, Northings, Offset to correct location for floating image (E,N)\n";
+		outPtsFile << "# Eastings, Northings, Offset to correct location for floating image (E,N), Metric Value\n";
 		outPtsFile << "#\n";
 		
 		std::cout << tiePts->size() << " tie points to be exported\n";
@@ -1222,7 +1223,8 @@ namespace rsgis{namespace reg{
 		std::list<TiePoint*>::iterator iterTiePts;
 		for(iterTiePts = tiePts->begin(); iterTiePts != tiePts->end(); ++iterTiePts)
 		{
-			outPtsFile << (*iterTiePts)->eastings << "," << (*iterTiePts)->northings << "," << (*iterTiePts)->xShift << "," << (*iterTiePts)->yShift << std::endl;
+			outPtsFile << (*iterTiePts)->eastings << "," << (*iterTiePts)->northings << "," << (*iterTiePts)->xShift << ","
+            << (*iterTiePts)->yShift << "," << (*iterTiePts)->metricVal << std::endl;
 		}
 		
 		outPtsFile << "# End Of File\n";
