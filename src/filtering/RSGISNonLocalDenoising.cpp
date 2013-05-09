@@ -77,7 +77,7 @@ namespace rsgis{namespace filter{
 			{
 				throw rsgis::img::RSGISImageCalcException("Search window size needs to at least twice the filter window size");
 			}
-			unsigned int filterWinPix = floor(filterWindowSize / 2); // Number of pixels each side of middle pixel
+			unsigned int filterWinPix = floor((float)filterWindowSize / 2); // Number of pixels each side of middle pixel
 			unsigned int windowMid = floor(((float)filterWindowSize)/2.0); // Pixel at centre of block
             
             std::cout << "Search window Size: " << searchWindowSize << std::endl;
@@ -145,11 +145,11 @@ namespace rsgis{namespace filter{
             // Set search window height and width so multiples of block size
             if(searchWindowWidth > outXBlockSize)
             {
-                searchWindowWidth =  floor(searchWindowWidth / outXBlockSize) + outXBlockSize;
+                searchWindowWidth =  floor((float)searchWindowWidth / outXBlockSize) + outXBlockSize;
             }
             if(searchWindowHeight > outYBlockSize)
             {
-                searchWindowHeight = floor(searchWindowHeight / outYBlockSize) + outYBlockSize;
+                searchWindowHeight = floor((float)searchWindowHeight / outYBlockSize) + outYBlockSize;
             }
             searchWindowOverlap = filterWindowSize*2;
             if(searchWindowOverlap < outYBlockSize)

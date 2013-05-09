@@ -3019,7 +3019,7 @@ namespace rsgis{namespace img{
             unsigned int bufSize = width*blockSizeY;
             float *imgData = new float[bufSize];
             
-            int numBlocks = floor(height/blockSizeY);
+            int numBlocks = floor((float)height/(float)blockSizeY);
             unsigned int numRowsRemaining = height - (numBlocks*blockSizeY);
             
             int yOff = 0;
