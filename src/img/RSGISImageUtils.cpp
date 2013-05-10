@@ -584,9 +584,9 @@ namespace rsgis{namespace img{
 					dsOffsets[i][1] = 0;
 				}
                 
-                std::cout << "Offset (" << i << "):\t[" << dsOffsets[i][0] << ", " << dsOffsets[i][1] << "]" << std::endl;
-                std::cout << "Offset Width (" << i << "):\t[" << dsOffsets[i][0]+*width << "]" << std::endl;
-                std::cout << "Image Width (" << i << "):\t[" << datasets[i]->GetRasterXSize() << "]" << std::endl << std::endl;
+                //std::cout << "Offset (" << i << "):\t[" << dsOffsets[i][0] << ", " << dsOffsets[i][1] << "]" << std::endl;
+                //std::cout << "Offset Width (" << i << "):\t[" << dsOffsets[i][0]+*width << "]" << std::endl;
+                //std::cout << "Image Width (" << i << "):\t[" << datasets[i]->GetRasterXSize() << "]" << std::endl << std::endl;
 			}
 			
 		}
