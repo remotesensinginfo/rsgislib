@@ -154,56 +154,56 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
     
     this->outDataType = GDT_Float32;
     this->rsgisOutDataType = rsgis::rsgis_32float;
-	XMLCh *datatypeXMLStr = XMLString::transcode("datatype");
+	XMLCh *datatypeXMLStr = xercesc::XMLString::transcode("datatype");
 	if(argElement->hasAttribute(datatypeXMLStr))
 	{
-        XMLCh *dtByte = XMLString::transcode("Byte");
-        XMLCh *dtUInt16 = XMLString::transcode("UInt16");
-        XMLCh *dtInt16 = XMLString::transcode("Int16");
-        XMLCh *dtUInt32 = XMLString::transcode("UInt32");
-        XMLCh *dtInt32 = XMLString::transcode("Int32");
-        XMLCh *dtFloat32 = XMLString::transcode("Float32");
-        XMLCh *dtFloat64 = XMLString::transcode("Float64");
-
+        XMLCh *dtByte = xercesc::XMLString::transcode("Byte");
+        XMLCh *dtUInt16 = xercesc::XMLString::transcode("UInt16");
+        XMLCh *dtInt16 = xercesc::XMLString::transcode("Int16");
+        XMLCh *dtUInt32 = xercesc::XMLString::transcode("UInt32");
+        XMLCh *dtInt32 = xercesc::XMLString::transcode("Int32");
+        XMLCh *dtFloat32 = xercesc::XMLString::transcode("Float32");
+        XMLCh *dtFloat64 = xercesc::XMLString::transcode("Float64");
+        
         const XMLCh *dtXMLValue = argElement->getAttribute(datatypeXMLStr);
-        if(XMLString::equals(dtByte, dtXMLValue))
+        if(xercesc::XMLString::equals(dtByte, dtXMLValue))
         {
             this->outDataType = GDT_Byte;
-            this->rsgisOutDataType = rsgis::rsgis_8uint;
+            this->rsgisOutDataType = rsgis::rsgis_8int;
         }
-        else if(XMLString::equals(dtUInt16, dtXMLValue))
+        else if(xercesc::XMLString::equals(dtUInt16, dtXMLValue))
         {
             this->outDataType = GDT_UInt16;
             this->rsgisOutDataType = rsgis::rsgis_16uint;
         }
-        else if(XMLString::equals(dtInt16, dtXMLValue))
+        else if(xercesc::XMLString::equals(dtInt16, dtXMLValue))
         {
             this->outDataType = GDT_Int16;
             this->rsgisOutDataType = rsgis::rsgis_16int;
         }
-        else if(XMLString::equals(dtUInt32, dtXMLValue))
+        else if(xercesc::XMLString::equals(dtUInt32, dtXMLValue))
         {
             this->outDataType = GDT_UInt32;
             this->rsgisOutDataType = rsgis::rsgis_32uint;
         }
-        else if(XMLString::equals(dtInt32, dtXMLValue))
+        else if(xercesc::XMLString::equals(dtInt32, dtXMLValue))
         {
             this->outDataType = GDT_Int32;
             this->rsgisOutDataType = rsgis::rsgis_32int;
         }
-        else if(XMLString::equals(dtFloat32, dtXMLValue))
+        else if(xercesc::XMLString::equals(dtFloat32, dtXMLValue))
         {
             this->outDataType = GDT_Float32;
-            this->rsgisOutDataType = rsgis::rsgis_8uint;
+            this->rsgisOutDataType = rsgis::rsgis_32float;
         }
-        else if(XMLString::equals(dtFloat64, dtXMLValue))
+        else if(xercesc::XMLString::equals(dtFloat64, dtXMLValue))
         {
             this->outDataType = GDT_Float64;
             this->rsgisOutDataType = rsgis::rsgis_64float;
         }
         else
         {
-            cerr << "Data type not recognised, defaulting to 32 bit float.";
+            std::cerr << "Data type not recognised, defaulting to 32 bit float.";
             this->outDataType = GDT_Float32;
             this->rsgisOutDataType = rsgis::rsgis_32float;
         }
