@@ -164,7 +164,7 @@ namespace rsgis{namespace img{
 				
 				if(!((diffX > -0.0001) & (diffX < 0.0001)))
 				{
-					dsOffsets[i][0] = ceil(diffX/pixelXRes);
+					dsOffsets[i][0] = floor(diffX/pixelXRes);
 				}
 				else
 				{
@@ -173,7 +173,7 @@ namespace rsgis{namespace img{
 				
 				if(!((diffY > -0.0001) & (diffY < 0.0001)))
 				{
-					dsOffsets[i][1] = ceil(diffY/pixelYResPos);
+					dsOffsets[i][1] = floor(diffY/pixelYResPos);
 				}
 				else
 				{
@@ -357,7 +357,7 @@ namespace rsgis{namespace img{
 				
 				if(!((diffX > -0.0001) & (diffX < 0.0001)))
 				{
-					dsOffsets[i][0] = ceil(diffX/pixelXRes);
+					dsOffsets[i][0] = floor(diffX/pixelXRes);
 				}
 				else
 				{
@@ -366,7 +366,7 @@ namespace rsgis{namespace img{
 				
 				if(!((diffY > -0.0001) & (diffY < 0.0001)))
 				{
-					dsOffsets[i][1] = ceil(diffY/pixelYResPos);
+					dsOffsets[i][1] = floor(diffY/pixelYResPos);
 				}
 				else
 				{
@@ -554,6 +554,9 @@ namespace rsgis{namespace img{
             
 			*width = floor(((maxX - minX)/pixelXRes)+0.5);
 			*height = floor(((maxY - minY)/pixelYResPos)+0.5);
+            
+            //std::cout << "Out Width: " << *width << std::endl;
+            //std::cout << "Out Height: " << *height << std::endl;
 			
 			double diffX = 0;
 			double diffY = 0;
@@ -565,7 +568,7 @@ namespace rsgis{namespace img{
 				
 				if(!((diffX > -0.0001) & (diffX < 0.0001)))
 				{
-					dsOffsets[i][0] = ceil(diffX/pixelXRes);
+					dsOffsets[i][0] = floor((diffX/pixelXRes));
 				}
 				else
 				{
@@ -574,12 +577,16 @@ namespace rsgis{namespace img{
 				
 				if(!((diffY > -0.0001) & (diffY < 0.0001)))
 				{
-					dsOffsets[i][1] = ceil(diffY/pixelYResPos);
+					dsOffsets[i][1] = floor((diffY/pixelYResPos));
 				}
 				else
 				{
 					dsOffsets[i][1] = 0;
 				}
+                
+                std::cout << "Offset (" << i << "):\t[" << dsOffsets[i][0] << ", " << dsOffsets[i][1] << "]" << std::endl;
+                std::cout << "Offset Width (" << i << "):\t[" << dsOffsets[i][0]+*width << "]" << std::endl;
+                std::cout << "Image Width (" << i << "):\t[" << datasets[i]->GetRasterXSize() << "]" << std::endl << std::endl;
 			}
 			
 		}
@@ -774,7 +781,7 @@ namespace rsgis{namespace img{
 				
 				if(!((diffX > -0.0001) & (diffX < 0.0001)))
 				{
-					dsOffsets[i][0] = ceil(diffX/pixelXRes);
+					dsOffsets[i][0] = floor(diffX/pixelXRes);
 				}
 				else
 				{
@@ -783,7 +790,7 @@ namespace rsgis{namespace img{
 				
 				if(!((diffY > -0.0001) & (diffY < 0.0001)))
 				{
-					dsOffsets[i][1] = ceil(diffY/pixelYResPos);
+					dsOffsets[i][1] = floor(diffY/pixelYResPos);
 				}
 				else
 				{
@@ -1024,7 +1031,7 @@ namespace rsgis{namespace img{
 					
 					if(diffX != 0)
 					{
-						dsOffsets[i][0] = ceil(diffX/pixelXRes);
+						dsOffsets[i][0] = floor(diffX/pixelXRes);
 					}
 					else
 					{
@@ -1033,7 +1040,7 @@ namespace rsgis{namespace img{
 					
 					if(diffY != 0)
 					{
-						dsOffsets[i][1] = ceil(diffY/pixelYResPos);
+						dsOffsets[i][1] = floor(diffY/pixelYResPos);
 					}
 					else
 					{
@@ -1311,7 +1318,7 @@ namespace rsgis{namespace img{
 				
 				if(diffX != 0)
 				{
-					dsOffsets[i][0] = ceil(diffX/pixelXRes);
+					dsOffsets[i][0] = floor(diffX/pixelXRes);
 				}
 				else
 				{
@@ -1320,7 +1327,7 @@ namespace rsgis{namespace img{
 				
 				if(diffY != 0)
 				{
-					dsOffsets[i][1] = ceil(diffY/pixelYResPos);
+					dsOffsets[i][1] = floor(diffY/pixelYResPos);
 				}
 				else
 				{
@@ -1557,7 +1564,7 @@ namespace rsgis{namespace img{
 				
 				if(diffX != 0)
 				{
-					dsOffsets[i][0] = ceil(diffX/pixelXRes);
+					dsOffsets[i][0] = floor(diffX/pixelXRes);
 				}
 				else
 				{
@@ -1566,7 +1573,7 @@ namespace rsgis{namespace img{
 				
 				if(diffY != 0)
 				{
-					dsOffsets[i][1] = ceil(diffY/pixelYResPos);
+					dsOffsets[i][1] = floor(diffY/pixelYResPos);
 				}
 				else
 				{
