@@ -2,8 +2,8 @@
  *  main.cpp
  *  RSGIS_LIB
  *
- *  Created by Pete Bunting on 03/12/2008.
- *  Copyright 2008 RSGISLib.
+ *  Created by Pete Bunting on 10/05/2013.
+ *  Copyright 2013 RSGISLib.
  *
  *  RSGISLib is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -48,9 +48,7 @@ int main(int argc, char **argv)
             printf( "Driver: %s/%s\n",
                    dataset->GetDriver()->GetDescription(),
                    dataset->GetDriver()->GetMetadataItem( GDAL_DMD_LONGNAME ) );
-            
-            
-            
+                        
             printf( "Image Size is %dx%d\n",
                    dataset->GetRasterXSize(), dataset->GetRasterYSize() );
             printf( "Image has %d image bands\n",
@@ -68,7 +66,6 @@ int main(int argc, char **argv)
             {
                 printf( "Projection is `%s'\n", dataset->GetProjectionRef() );
             }
-            
             
             GDALClose(dataset);
             GDALDestroyDriverManager();
