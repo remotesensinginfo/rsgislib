@@ -3243,7 +3243,14 @@ void RSGISExeSegment::retrieveParameters(xercesc::DOMElement *argElement) throw(
 		if(argElement->hasAttribute(noDataXMLStr))
 		{
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(noDataXMLStr));
-			this->noDataVal = mathUtils.strtounsignedint(std::string(charValue));
+            try
+            {
+                this->noDataVal = mathUtils.strtounsignedint(std::string(charValue));
+            }
+            catch(rsgis::RSGISException &e)
+            {
+                throw rsgis::RSGISXMLArgumentsException("\'nodata\' attribute was provided but was not a number.");
+            }
 			xercesc::XMLString::release(&charValue);
             this->noDataValProvided = true;
 		}
