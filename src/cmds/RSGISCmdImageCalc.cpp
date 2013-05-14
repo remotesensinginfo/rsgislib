@@ -108,7 +108,7 @@ namespace rsgis{ namespace cmds {
             delete bandmaths;
             delete calcImage;
             delete[] outBandName;
-            GDALDestroyDriverManager();
+            //GDALDestroyDriverManager();
         }
         catch(rsgis::RSGISImageException &e)
         {
@@ -165,7 +165,7 @@ namespace rsgis{ namespace cmds {
             delete muParser;
             delete imageMaths;
             delete calcImage;
-            GDALDestroyDriverManager();
+            //GDALDestroyDriverManager();
         }
         catch(rsgis::RSGISImageException &e)
         {
