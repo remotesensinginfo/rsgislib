@@ -149,6 +149,28 @@ static PyObject *Segmentation_RMSmallClumpsStepwise(PyObject *self, PyObject *ar
 
     Py_RETURN_NONE;
 }
+    
+static PyObject *Segmentation_relabelClumps(PyObject *self, PyObject *args)
+{
+    const char *pszInputImage, *pszOutputImage, *pszGDALFormat;
+    int processInMemory;
+    if( !PyArg_ParseTuple(args, "sssn:relabelClumps", &pszInputImage, 
+                        &pszOutputImage, &pszGDALFormat, &processInMemory ))
+        return NULL;
+
+    try
+    {
+        rsgis::cmds::executeRelabelClumps(pszInputImage, pszOutputImage,
+                    pszGDALFormat, processInMemory);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+
+    Py_RETURN_NONE;
+}    
 
 
 // Our list of functions in this module
@@ -199,6 +221,15 @@ static PyMethodDef SegmentationMethods[] = {
 "  processinmemory is a bool\n"
 "  minclumpsize is an unsigned integer\n"
 "  specThreshold is a float\n"},
+
+    {"relabelClumps", Segmentation_relabelClumps, METH_VARARGS,
+"Relabel clumps\n"
+"call signature: segmentation.relabelClumps(inputimage, outputimage, gdalformat, processinmemory)\n"
+"where:\n"
+"  inputimage is a string containing the name of the input file\n"
+"  outputimage is a string containing the name of the output file\n"
+"  gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
+"  processinmemory is a bool\n"},
 
     {NULL}        /* Sentinel */
 };
