@@ -2476,6 +2476,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 	else if(XMLString::equals(optionPointValue, optionXML))
 	{
 		this->option = RSGISExeZonalStats::pointvalue;
+        this->outputToText = false;
 		
 		// Text file
 		XMLCh *outputCSVXMLStr = XMLString::transcode("outputCSV");
