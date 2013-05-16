@@ -205,7 +205,7 @@ init_segmentation(void)
 #if PY_MAJOR_VERSION >= 3
     PyObject *pModule = PyModule_Create(&moduledef);
 #else
-    PyObject *pModule = Py_InitModule("_imagecalc", SegmentationMethods);
+    PyObject *pModule = Py_InitModule("_segmentation", SegmentationMethods);
 #endif
     if( pModule == NULL )
         INITERROR;
