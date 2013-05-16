@@ -86,8 +86,12 @@ namespace rsgis {namespace radar{
         {
             // If all diagonal values of covarience matrix greater than 1e8, don't use covarience matrix
             if(gsl_matrix_get(this->covMatrixP, i, i) > 1e8){this->useAP = false;}
-            gsl_matrix_set(this->invCovMatrixP, i, i, 1. / gsl_matrix_get(this->covMatrixP, i, i));
+            else
+            {
+                gsl_matrix_set(this->invCovMatrixP, i, i, 1. / gsl_matrix_get(this->covMatrixP, i, i));
+            }
         }
+        if(this->useAP){std::cout << "\tUsing a priori values" << std::endl;}
 
         // Set up vectors for least squares calculation
         this->deltaD = gsl_vector_alloc(this->nData);
