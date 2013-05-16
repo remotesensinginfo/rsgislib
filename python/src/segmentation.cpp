@@ -84,7 +84,7 @@ static PyObject *Segmentation_eliminateSinglePixels(PyObject *self, PyObject *ar
 static PyObject *Segmentation_clump(PyObject *self, PyObject *args)
 {
     const char *pszInputImage, *pszOutputImage, *pszGDALFormat;
-    int processInMemory;
+    int processInMemory;    
     bool nodataprovided;
     float fnodata;
     PyObject *pNoData; //could be none or a number
@@ -126,6 +126,52 @@ static PyObject *Segmentation_clump(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
+static PyObject *Segmentation_RMSmallClumpsStepwise(PyObject *self, PyObject *args)
+{
+    const char *pszInputImage, *pszClumpsImage, *pszOutputImage, *pszGDALFormat, *pszStretchStatsFile;
+    int storeMean,processInMemory,stretchStatsAvail;
+    unsigned int minClumpSize;
+    float specThreshold;                   
+    if( !PyArg_ParseTuple(args, "ssssnsnnkf:RMSmallClumpsStepwise", &pszInputImage, &pszClumpsImage, &pszOutputImage, &pszGDALFormat,
+                    &stretchStatsAvail, &pszStretchStatsFile, &storeMean, &processInMemory, &minClumpSize, &specThreshold))            
+        return NULL;
+    
+    try
+    {
+        rsgis::cmds::executeRMSmallClumpsStepwise(pszInputImage, pszClumpsImage, pszOutputImage, pszGDALFormat, 
+                                stretchStatsAvail, pszStretchStatsFile, storeMean, processInMemory, minClumpSize, specThreshold);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+
+    Py_RETURN_NONE;
+}
+    
+static PyObject *Segmentation_relabelClumps(PyObject *self, PyObject *args)
+{
+    const char *pszInputImage, *pszOutputImage, *pszGDALFormat;
+    int processInMemory;
+    if( !PyArg_ParseTuple(args, "sssn:relabelClumps", &pszInputImage, 
+                        &pszOutputImage, &pszGDALFormat, &processInMemory ))
+        return NULL;
+
+    try
+    {
+        rsgis::cmds::executeRelabelClumps(pszInputImage, pszOutputImage,
+                    pszGDALFormat, processInMemory);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+
+    Py_RETURN_NONE;
+}    
+
 
 // Our list of functions in this module
 static PyMethodDef SegmentationMethods[] = {
@@ -161,9 +207,33 @@ static PyMethodDef SegmentationMethods[] = {
 "  processinmemory is a bool\n"
 "  nodata is None or float\n"},
 
+    {"RMSmallClumpsStepwise", Segmentation_RMSmallClumpsStepwise, METH_VARARGS,
+"Does even more stuff\n"
+"call signature: segmentation.RMSmallClumpsStepwise(inputimage, clumpsimage, outputimage, gdalformat, stretchstatsavail, stretchstatsfile, storemean, processinmemory, minclumpsize, specThreshold)\n"
+"where:\n"
+"  inputimage is a string containing the name of the input file\n"
+"  clumpsimage is a string containing the name of the clump file\n"
+"  outputimage is a string containing the name of the output file\n"
+"  gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
+"  stretchstatsavail is a bool\n"
+"  stretchstatsfile is a string containing the name of the stretch stats file\n"
+"  storemean is a bool\n"
+"  processinmemory is a bool\n"
+"  minclumpsize is an unsigned integer\n"
+"  specThreshold is a float\n"},
+
+    {"relabelClumps", Segmentation_relabelClumps, METH_VARARGS,
+"Relabel clumps\n"
+"call signature: segmentation.relabelClumps(inputimage, outputimage, gdalformat, processinmemory)\n"
+"where:\n"
+"  inputimage is a string containing the name of the input file\n"
+"  outputimage is a string containing the name of the output file\n"
+"  gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
+"  processinmemory is a bool\n"},
+
     {NULL}        /* Sentinel */
 };
-
+                                
 #if PY_MAJOR_VERSION >= 3
 
 static int Segmentation_traverse(PyObject *m, visitproc visit, void *arg) 
@@ -205,7 +275,7 @@ init_segmentation(void)
 #if PY_MAJOR_VERSION >= 3
     PyObject *pModule = PyModule_Create(&moduledef);
 #else
-    PyObject *pModule = Py_InitModule("_imagecalc", SegmentationMethods);
+    PyObject *pModule = Py_InitModule("_segmentation", SegmentationMethods);
 #endif
     if( pModule == NULL )
         INITERROR;
