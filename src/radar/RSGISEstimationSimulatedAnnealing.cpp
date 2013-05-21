@@ -180,7 +180,7 @@ namespace rsgis {namespace radar{
                 for (unsigned int j = 0; j < this->nPar; j++)
                 {
                     stepSize[j] = initialStepSize[j];
-                    currentParError->at(j) = bestParError->at(j);
+                    //currentParError->at(j) = bestParError->at(j);
                 }
             }
 
@@ -234,6 +234,7 @@ namespace rsgis {namespace radar{
 
                             if(currentParError->at(this->nPar) < bestParError->at(this->nPar)) // If new energy is less than best, update best.
                             {
+                                //std::cout << newEnergy << std::endl;
                                 for (unsigned int k = 0; k < this->nPar + 1; k++)
                                 {
                                     bestParError->at(k) = currentParError->at(k);
