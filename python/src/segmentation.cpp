@@ -174,7 +174,8 @@ static PyObject *Segmentation_relabelClumps(PyObject *self, PyObject *args)
 
 static PyObject *Segmentation_mergeSegmentationTiles(PyObject *self, PyObject *args)
 {
-    const char *pszOutputImage, *pszBorderMaskImage, *pszColsName, *inputImage;
+    const char *pszOutputImage, *pszBorderMaskImage, *pszColsName;
+    std::string inputImage;
     unsigned int tileBoundary, tileOverlap, tileBody;
     PyObject *pInputListObj;
     if( !PyArg_ParseTuple(args, "ssIIIsO:mergeSegmentationTiles", &pszOutputImage, &pszBorderMaskImage,
@@ -194,7 +195,13 @@ static PyObject *Segmentation_mergeSegmentationTiles(PyObject *self, PyObject *a
         
         PyObject *strObj;
         strObj = PyList_GetItem(pInputListObj, n);
-        inputImage = PyString_AsString(strObj);       
+        if( !RSGISPY_CHECK_STRING(strObj) )
+        {
+            PyErr_SetString(GETSTATE(self)->error, "must pass a list of strings");
+            Py_DECREF(strObj);
+            return NULL;
+        }
+        inputImage = RSGISPY_STRING_EXTRACT(strObj);
         inputImagePaths.push_back(inputImage);      
         Py_DECREF(strObj);
     
