@@ -4,7 +4,7 @@
  *
  *  Created by Pete Bunting on 11/12/2008.
  *  Copyright 2008 RSGISLib.
- * 
+ *
  *  RSGISLib is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -27,7 +27,7 @@ namespace rsgisexe{
 RSGISExeZonalStats::RSGISExeZonalStats() : RSGISAlgorithmParameters()
 {
 	this->algorithm = "zonalstats";
-	
+
 	this->option = RSGISExeZonalStats::none;
 	this->inputImage = "";
 	this->inputVecPolys = "";
@@ -57,9 +57,9 @@ RSGISAlgorithmParameters* RSGISExeZonalStats::getInstance()
 }
 
 void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISXMLArgumentsException)
-{	
+{
 	RSGISMathsUtils mathUtils;
-	
+
 	XMLCh *algorName = XMLString::transcode(this->algorithm.c_str());
 	XMLCh *algorXMLStr = XMLString::transcode("algor");
 	XMLCh *optionXMLStr = XMLString::transcode("option");
@@ -80,13 +80,13 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 	XMLCh *rsgisbandXMLStr = XMLString::transcode("rsgis:band");
 	XMLCh *optionPointValue = XMLString::transcode("pointvalue");
     XMLCh *optionEndmembers = XMLString::transcode("endmembers");
-	
+
 	const XMLCh *algorNameEle = argElement->getAttribute(algorXMLStr);
 	if(!XMLString::equals(algorName, algorNameEle))
 	{
 		throw RSGISXMLArgumentsException("The algorithm name is incorrect.");
 	}
-	
+
 	XMLCh *imageXMLStr = XMLString::transcode("image");
 	if(argElement->hasAttribute(imageXMLStr))
 	{
@@ -99,7 +99,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 		throw RSGISXMLArgumentsException("No \'image\' attribute was provided.");
 	}
 	XMLString::release(&imageXMLStr);
-	
+
 	XMLCh *vectorXMLStr = XMLString::transcode("vector");
 	if(argElement->hasAttribute(vectorXMLStr))
 	{
@@ -112,7 +112,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 		throw RSGISXMLArgumentsException("No \'vector\' attribute was provided.");
 	}
 	XMLString::release(&vectorXMLStr);
-    
+
     // Don't check shapefile and image are the same Projection (common for all utilities)
     this->ignoreProjection = false;
     XMLCh *forceProjXMLStr = XMLString::transcode("ignoreProjection");
@@ -120,7 +120,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
     {
         XMLCh *yesStr = XMLString::transcode("yes");
         const XMLCh *forceValue = argElement->getAttribute(forceProjXMLStr);
-        
+
         if(XMLString::equals(forceValue, yesStr))
         {
             this->ignoreProjection = true;
@@ -132,7 +132,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
         XMLString::release(&yesStr);
     }
     XMLString::release(&forceProjXMLStr);
-    
+
     // Check if band names, from image should be used
     this->useBandNames = false;
     XMLCh *useBandNamesXMLStr = XMLString::transcode("useBandNames");
@@ -140,7 +140,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
     {
         XMLCh *yesStr = XMLString::transcode("yes");
         const XMLCh *forceValue = argElement->getAttribute(useBandNamesXMLStr);
-        
+
         if(XMLString::equals(forceValue, yesStr))
         {
             this->useBandNames = true;
@@ -152,12 +152,12 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
         XMLString::release(&yesStr);
     }
     XMLString::release(&useBandNamesXMLStr);
-    
+
 	const XMLCh *optionXML = argElement->getAttribute(optionXMLStr);
 	if(XMLString::equals(optionPolygonsToShp, optionXML))
-	{		
+	{
 		this->option = RSGISExeZonalStats::polygons2shp;
-		
+
 		XMLCh *outputXMLStr = XMLString::transcode("output");
 		if(argElement->hasAttribute(outputXMLStr))
 		{
@@ -170,9 +170,9 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
 		}
 		XMLString::release(&outputXMLStr);
-		
+
 		XMLCh *yes = XMLString::transcode("yes");
-		
+
 		XMLCh *meanXMLStr = XMLString::transcode("mean");
 		if(argElement->hasAttribute(meanXMLStr))
 		{
@@ -191,8 +191,8 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'mean\' attribute was provided.");
 		}
 		XMLString::release(&meanXMLStr);
-		
-		
+
+
 		XMLCh *minXMLStr = XMLString::transcode("min");
 		if(argElement->hasAttribute(minXMLStr))
 		{
@@ -211,8 +211,8 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'min\' attribute was provided.");
 		}
 		XMLString::release(&minXMLStr);
-		
-		
+
+
 		XMLCh *maxXMLStr = XMLString::transcode("max");
 		if(argElement->hasAttribute(maxXMLStr))
 		{
@@ -231,7 +231,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'max\' attribute was provided.");
 		}
 		XMLString::release(&maxXMLStr);
-		
+
 		XMLCh *stddevXMLStr = XMLString::transcode("stddev");
 		if(argElement->hasAttribute(stddevXMLStr))
 		{
@@ -250,13 +250,13 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'stddev\' attribute was provided.");
 		}
 		XMLString::release(&stddevXMLStr);
-		
+
 		XMLString::release(&yes);
 	}
 	else if(XMLString::equals(optionRasterPolygonsToShp, optionXML))
-	{		
+	{
 		this->option = RSGISExeZonalStats::rasterpolygons2shp;
-		
+
 		XMLCh *outputXMLStr = XMLString::transcode("output");
 		if(argElement->hasAttribute(outputXMLStr))
 		{
@@ -269,7 +269,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
 		}
 		XMLString::release(&outputXMLStr);
-		
+
 		XMLCh *rasterXMLStr = XMLString::transcode("raster");
 		if(argElement->hasAttribute(rasterXMLStr))
 		{
@@ -282,9 +282,9 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'raster\' attribute was provided.");
 		}
 		XMLString::release(&rasterXMLStr);
-		
+
 		XMLCh *yes = XMLString::transcode("yes");
-		
+
 		XMLCh *meanXMLStr = XMLString::transcode("mean");
 		if(argElement->hasAttribute(meanXMLStr))
 		{
@@ -303,8 +303,8 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'mean\' attribute was provided.");
 		}
 		XMLString::release(&meanXMLStr);
-		
-		
+
+
 		XMLCh *minXMLStr = XMLString::transcode("min");
 		if(argElement->hasAttribute(minXMLStr))
 		{
@@ -323,8 +323,8 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'min\' attribute was provided.");
 		}
 		XMLString::release(&minXMLStr);
-		
-		
+
+
 		XMLCh *maxXMLStr = XMLString::transcode("max");
 		if(argElement->hasAttribute(maxXMLStr))
 		{
@@ -343,7 +343,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'max\' attribute was provided.");
 		}
 		XMLString::release(&maxXMLStr);
-		
+
 		XMLCh *stddevXMLStr = XMLString::transcode("stddev");
 		if(argElement->hasAttribute(stddevXMLStr))
 		{
@@ -362,13 +362,13 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'stddev\' attribute was provided.");
 		}
 		XMLString::release(&stddevXMLStr);
-		
+
 		XMLString::release(&yes);
 	}
 	else if(XMLString::equals(optionRasterPolygonsToTxt, optionXML))
-	{		
+	{
 		this->option = RSGISExeZonalStats::rasterpolygons2txt;
-		
+
 		XMLCh *outputXMLStr = XMLString::transcode("output");
 		if(argElement->hasAttribute(outputXMLStr))
 		{
@@ -381,7 +381,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
 		}
 		XMLString::release(&outputXMLStr);
-		
+
 		XMLCh *rasterXMLStr = XMLString::transcode("raster");
 		if(argElement->hasAttribute(rasterXMLStr))
 		{
@@ -394,9 +394,9 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'raster\' attribute was provided.");
 		}
 		XMLString::release(&rasterXMLStr);
-		
+
 		XMLCh *yes = XMLString::transcode("yes");
-		
+
 		XMLCh *meanXMLStr = XMLString::transcode("mean");
 		if(argElement->hasAttribute(meanXMLStr))
 		{
@@ -415,8 +415,8 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'mean\' attribute was provided.");
 		}
 		XMLString::release(&meanXMLStr);
-		
-		
+
+
 		XMLCh *minXMLStr = XMLString::transcode("min");
 		if(argElement->hasAttribute(minXMLStr))
 		{
@@ -435,8 +435,8 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'min\' attribute was provided.");
 		}
 		XMLString::release(&minXMLStr);
-		
-		
+
+
 		XMLCh *maxXMLStr = XMLString::transcode("max");
 		if(argElement->hasAttribute(maxXMLStr))
 		{
@@ -455,7 +455,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'max\' attribute was provided.");
 		}
 		XMLString::release(&maxXMLStr);
-		
+
 		XMLCh *stddevXMLStr = XMLString::transcode("stddev");
 		if(argElement->hasAttribute(stddevXMLStr))
 		{
@@ -474,13 +474,13 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'stddev\' attribute was provided.");
 		}
 		XMLString::release(&stddevXMLStr);
-		
+
 		XMLString::release(&yes);
 	}
 	else if(XMLString::equals(optionPixelVals2txt, optionXML))
-	{		
+	{
 		this->option = RSGISExeZonalStats::pixelVals2txt;
-		
+
 		XMLCh *outputXMLStr = XMLString::transcode("output");
 		if(argElement->hasAttribute(outputXMLStr))
 		{
@@ -493,7 +493,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
 		}
 		XMLString::release(&outputXMLStr);
-		
+
 		XMLCh *attributeXMLStr = XMLString::transcode("attribute");
 		if(argElement->hasAttribute(attributeXMLStr))
 		{
@@ -506,7 +506,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'attribute\' attribute was provided.");
 		}
 		XMLString::release(&attributeXMLStr);
-		
+
 		// Get pixel in poly method
 		XMLCh *methodXMLStr = XMLString::transcode("method");
 		if(argElement->hasAttribute(methodXMLStr))
@@ -538,7 +538,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			this->method = rsgis::img::polyContainsPixelCenter;
 		}
 		XMLString::release(&methodXMLStr);
-		
+
 		// Get output text format
 		XMLCh *outTXTStr = XMLString::transcode("outTXT");
 		if(argElement->hasAttribute(outTXTStr))
@@ -557,12 +557,12 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			this->outtxt = csv;
 		}
 		XMLString::release(&outTXTStr);
-		
+
 	}
     else if(XMLString::equals(optionVariablesToMatrix, optionXML))
-	{		
+	{
 		this->option = RSGISExeZonalStats::varibles2matrix;
-		
+
 		XMLCh *outputXMLStr = XMLString::transcode("output");
 		if(argElement->hasAttribute(outputXMLStr))
 		{
@@ -575,7 +575,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
 		}
 		XMLString::release(&outputXMLStr);
-		
+
 		XMLCh *attributeXMLStr = XMLString::transcode("attribute");
 		if(argElement->hasAttribute(attributeXMLStr))
 		{
@@ -588,7 +588,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'attribute\' attribute was provided.");
 		}
 		XMLString::release(&attributeXMLStr);
-        
+
         XMLCh *methodXMLStr = XMLString::transcode("method");
 		if(argElement->hasAttribute(methodXMLStr))
 		{
@@ -622,9 +622,9 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 		XMLString::release(&methodXMLStr);
 	}
 	else if(XMLString::equals(optionImageToMatrix, optionXML))
-	{		
+	{
 		this->option = RSGISExeZonalStats::image2matrix;
-		
+
 		XMLCh *outputXMLStr = XMLString::transcode("output");
 		if(argElement->hasAttribute(outputXMLStr))
 		{
@@ -637,7 +637,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
 		}
 		XMLString::release(&outputXMLStr);
-		
+
 		XMLCh *bandXMLStr = XMLString::transcode("band");
 		if(argElement->hasAttribute(bandXMLStr))
 		{
@@ -650,12 +650,12 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'band\' attribute was provided.");
 		}
 		XMLString::release(&bandXMLStr);
-		
+
 	}
 	else if(XMLString::equals(optionPixelCount, optionXML))
 	{
 		this->option = RSGISExeZonalStats::pixelcount;
-		
+
 		XMLCh *outputXMLStr = XMLString::transcode("output");
 		if(argElement->hasAttribute(outputXMLStr))
 		{
@@ -668,7 +668,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
 		}
 		XMLString::release(&outputXMLStr);
-		
+
 		XMLCh *rasterXMLStr = XMLString::transcode("raster");
 		if(argElement->hasAttribute(rasterXMLStr))
 		{
@@ -681,13 +681,13 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'raster\' attribute was provided.");
 		}
 		XMLString::release(&rasterXMLStr);
-		
+
 		XMLCh *forceXMLStr = XMLString::transcode("force");
 		if(argElement->hasAttribute(forceXMLStr))
 		{
 			XMLCh *yesStr = XMLString::transcode("yes");
 			const XMLCh *forceValue = argElement->getAttribute(forceXMLStr);
-			
+
 			if(XMLString::equals(forceValue, yesStr))
 			{
 				this->force = true;
@@ -703,13 +703,13 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'force\' attribute was provided.");
 		}
 		XMLString::release(&forceXMLStr);
-		
+
 		XMLCh *pxlcountXMLStr = XMLString::transcode("pxlcount");
 		if(argElement->hasAttribute(pxlcountXMLStr))
 		{
 			XMLCh *yesStr = XMLString::transcode("yes");
 			const XMLCh *value = argElement->getAttribute(pxlcountXMLStr);
-			
+
 			if(XMLString::equals(value, yesStr))
 			{
 				this->pxlcount = true;
@@ -725,15 +725,15 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'pxlcount\' attribute was provided.");
 		}
 		XMLString::release(&pxlcountXMLStr);
-		
-		
-		
+
+
+
 		XMLCh *emptysetXMLStr = XMLString::transcode("emptyset");
 		if(argElement->hasAttribute(emptysetXMLStr))
 		{
 			XMLCh *yesStr = XMLString::transcode("yes");
 			const XMLCh *value = argElement->getAttribute(emptysetXMLStr);
-			
+
 			if(XMLString::equals(value, yesStr))
 			{
 				this->emptyset = true;
@@ -749,13 +749,13 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'emptyset\' attribute was provided.");
 		}
 		XMLString::release(&emptysetXMLStr);
-		
-		
+
+
 		DOMNodeList *attributeNodesList = argElement->getElementsByTagName(rsgisattributeXMLStr);
 		this->numAttributes = attributeNodesList->getLength();
-		
+
 		//cout << "Found " << this->numAttributes << " attributes" << endl;
-		
+
 		if(numAttributes > 0)
 		{
 			attributeCountList = new CountAttributes*[numAttributes];
@@ -764,7 +764,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			{
 				attributeCountList[i] = new CountAttributes();
 				attributeElement = static_cast<DOMElement*>(attributeNodesList->item(i));
-				
+
 				XMLCh *nameXMLStr = XMLString::transcode("name");
 				if(attributeElement->hasAttribute(nameXMLStr))
 				{
@@ -777,7 +777,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 					throw RSGISXMLArgumentsException("No \'name\' attribute was provided.");
 				}
 				XMLString::release(&nameXMLStr);
-				
+
 				DOMNodeList *bandNodesList = attributeElement->getElementsByTagName(rsgisbandXMLStr);
 				attributeCountList[i]->numBands = bandNodesList->getLength();
 				if(attributeCountList[i]->numBands > 0)
@@ -788,7 +788,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 					for(int j = 0; j < attributeCountList[i]->numBands; j++)
 					{
 						bandElement = static_cast<DOMElement*>(bandNodesList->item(j));
-						
+
 						XMLCh *bandXMLStr = XMLString::transcode("band");
 						if(bandElement->hasAttribute(bandXMLStr))
 						{
@@ -801,8 +801,8 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 							throw RSGISXMLArgumentsException("No \'band\' attribute was provided.");
 						}
 						XMLString::release(&bandXMLStr);
-						
-						
+
+
 						XMLCh *thresholdXMLStr = XMLString::transcode("threshold");
 						if(bandElement->hasAttribute(thresholdXMLStr))
 						{
@@ -821,7 +821,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 				{
 					throw RSGISXMLArgumentsException("No attributes \'rsgis:band\' tags were provided.");
 				}
-				
+
 			}
 		}
 		else
@@ -834,7 +834,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 		this->option = RSGISExeZonalStats::pixelstats;
 		this->outputToText = false;
 		this->outputTextFile = "";
-		
+
 		// Text file
 		XMLCh *outputCSVXMLStr = XMLString::transcode("outputCSV");
 		if(argElement->hasAttribute(outputCSVXMLStr))
@@ -845,8 +845,8 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			this->outputToText = true;
 		}
 		XMLString::release(&outputCSVXMLStr);
-		
-		
+
+
 		XMLCh *outputXMLStr = XMLString::transcode("output");
 		if(argElement->hasAttribute(outputXMLStr))
 		{
@@ -854,7 +854,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			{
 				cout << "WARNING! Can't output to shapefile and CSV, ignoring shapefile." << endl;
 			}
-			else 
+			else
 			{
 				char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
 				this->outputVecPolys = string(charValue);
@@ -866,7 +866,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			if(!this->outputToText){throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");}
 		}
 		XMLString::release(&outputXMLStr);
-		
+
 		XMLCh *rasterXMLStr = XMLString::transcode("raster");
 		if(argElement->hasAttribute(rasterXMLStr))
 		{
@@ -881,12 +881,12 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			this->useRasPoly = false;
 		}
 		XMLString::release(&rasterXMLStr);
-		
+
 		// Retrieve method for calculating pixels in polygon
 		XMLCh *methodXMLStr = XMLString::transcode("method");
 		if(argElement->hasAttribute(methodXMLStr))
 		{
-			if (useRasPoly) 
+			if (useRasPoly)
 			{
 				cout << "\tUsing rasterised version of polygon - ignoring method" << endl;
 			}
@@ -917,20 +917,20 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 		}
 		else
 		{
-			if (useRasPoly == false) 
+			if (useRasPoly == false)
 			{
 				cout << "\tMethod not recognised, using default of \'polyContainsPixelCenter\'." << endl;
 				this->method = rsgis::img::polyContainsPixelCenter;
 			}
 		}
 		XMLString::release(&methodXMLStr);
-		
+
 		XMLCh *forceXMLStr = XMLString::transcode("force");
 		if(argElement->hasAttribute(forceXMLStr))
 		{
 			XMLCh *yesStr = XMLString::transcode("yes");
 			const XMLCh *forceValue = argElement->getAttribute(forceXMLStr);
-			
+
 			if(XMLString::equals(forceValue, yesStr))
 			{
 				this->force = true;
@@ -946,13 +946,13 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			if(!this->outputToText){throw RSGISXMLArgumentsException("No \'force\' attribute was provided.");}
 		}
 		XMLString::release(&forceXMLStr);
-		
+
 		XMLCh *copyAttributesXMLStr = XMLString::transcode("copyAttributes");
 		if(argElement->hasAttribute(copyAttributesXMLStr))
 		{
 			XMLCh *yesStr = XMLString::transcode("yes");
 			const XMLCh *forceValue = argElement->getAttribute(copyAttributesXMLStr);
-			
+
 			if(XMLString::equals(forceValue, yesStr))
 			{
 				this->copyAttributes = true;
@@ -968,13 +968,13 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			this->copyAttributes = true;
 		}
 		XMLString::release(&copyAttributesXMLStr);
-		
+
 		XMLCh *pxlcountXMLStr = XMLString::transcode("pxlcount");
 		if(argElement->hasAttribute(pxlcountXMLStr))
 		{
 			XMLCh *yesStr = XMLString::transcode("yes");
 			const XMLCh *value = argElement->getAttribute(pxlcountXMLStr);
-			
+
 			if(XMLString::equals(value, yesStr))
 			{
 				this->pxlcount = true;
@@ -990,7 +990,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			this->pxlcount = false;;
 		}
 		XMLString::release(&pxlcountXMLStr);
-		
+
 		/* Check for stats for all attributes
 		 * It is possible to set for all attributes for individual
 		 */
@@ -1006,13 +1006,13 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 		this->maxThreshAll = false;
 		this->minThreshAllVal = -numeric_limits<double>::infinity();
 		this->maxThreshAllVal = +numeric_limits<double>::infinity();
-		
+
 		XMLCh *minXMLStr = XMLString::transcode("min");
 		if(argElement->hasAttribute(minXMLStr))
 		{
 			XMLCh *yesStr = XMLString::transcode("yes");
 			const XMLCh *value = argElement->getAttribute(minXMLStr);
-			
+
 			if(XMLString::equals(value, yesStr))
 			{
 				this->minAll = true;
@@ -1020,13 +1020,13 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			XMLString::release(&yesStr);
 		}
 		XMLString::release(&minXMLStr);
-		
+
 		XMLCh *maxXMLStr = XMLString::transcode("max");
 		if(argElement->hasAttribute(maxXMLStr))
 		{
 			XMLCh *yesStr = XMLString::transcode("yes");
 			const XMLCh *value = argElement->getAttribute(maxXMLStr);
-			
+
 			if(XMLString::equals(value, yesStr))
 			{
 				this->maxAll = true;
@@ -1034,13 +1034,13 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			XMLString::release(&yesStr);
 		}
 		XMLString::release(&maxXMLStr);
-		
+
 		XMLCh *meanXMLStr = XMLString::transcode("mean");
 		if(argElement->hasAttribute(meanXMLStr))
 		{
 			XMLCh *yesStr = XMLString::transcode("yes");
 			const XMLCh *value = argElement->getAttribute(meanXMLStr);
-			
+
 			if(XMLString::equals(value, yesStr))
 			{
 				this->meanAll = true;
@@ -1048,13 +1048,13 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			XMLString::release(&yesStr);
 		}
 		XMLString::release(&meanXMLStr);
-		
+
 		XMLCh *stddevXMLStr = XMLString::transcode("stddev");
 		if(argElement->hasAttribute(stddevXMLStr))
 		{
 			XMLCh *yesStr = XMLString::transcode("yes");
 			const XMLCh *value = argElement->getAttribute(stddevXMLStr);
-			
+
 			if(XMLString::equals(value, yesStr))
 			{
 				this->stdDevAll = true;
@@ -1062,13 +1062,13 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			XMLString::release(&yesStr);
 		}
 		XMLString::release(&stddevXMLStr);
-        
+
         XMLCh *modeXMLStr = XMLString::transcode("mode");
 		if(argElement->hasAttribute(modeXMLStr))
 		{
 			XMLCh *yesStr = XMLString::transcode("yes");
 			const XMLCh *value = argElement->getAttribute(modeXMLStr);
-			
+
 			if(XMLString::equals(value, yesStr))
 			{
 				this->modeAll = true;
@@ -1076,13 +1076,13 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			XMLString::release(&yesStr);
 		}
 		XMLString::release(&modeXMLStr);
-        
+
         XMLCh *sumXMLStr = XMLString::transcode("sum");
 		if(argElement->hasAttribute(sumXMLStr))
 		{
 			XMLCh *yesStr = XMLString::transcode("yes");
 			const XMLCh *value = argElement->getAttribute(sumXMLStr);
-			
+
 			if(XMLString::equals(value, yesStr))
 			{
 				this->sumAll = true;
@@ -1090,13 +1090,13 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			XMLString::release(&yesStr);
 		}
 		XMLString::release(&sumXMLStr);
-		
+
 		XMLCh *countXMLStr = XMLString::transcode("count");
 		if(argElement->hasAttribute(countXMLStr))
 		{
 			XMLCh *yesStr = XMLString::transcode("yes");
 			const XMLCh *value = argElement->getAttribute(countXMLStr);
-			
+
 			if(XMLString::equals(value, yesStr))
 			{
 				this->countAll = true;
@@ -1104,36 +1104,36 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			XMLString::release(&yesStr);
 		}
 		XMLString::release(&countXMLStr);
-		
+
 		XMLCh *minThresholdXMLStr = XMLString::transcode("minThreshold");
 		if(argElement->hasAttribute(minThresholdXMLStr))
 		{
 			char *charValue = XMLString::transcode(argElement->getAttribute(minThresholdXMLStr));
 			minThreshAllVal= mathUtils.strtofloat(string(charValue));
 			XMLString::release(&charValue);
-			minThreshAll = true; 
+			minThreshAll = true;
 		}
 		XMLString::release(&minThresholdXMLStr);
-		
+
 		XMLCh *maxThresholdXMLStr = XMLString::transcode("maxThreshold");
 		if(argElement->hasAttribute(maxThresholdXMLStr))
 		{
 			char *charValue = XMLString::transcode(argElement->getAttribute(maxThresholdXMLStr));
 			maxThreshAllVal= mathUtils.strtofloat(string(charValue));
 			XMLString::release(&charValue);
-			maxThreshAll = true; 
+			maxThreshAll = true;
 		}
 		XMLString::release(&maxThresholdXMLStr);
-		
-		
+
+
 		DOMNodeList *attributeNodesList = argElement->getElementsByTagName(rsgisattributeXMLStr);
 		this->numAttributes = attributeNodesList->getLength();
-		if ((this->numAttributes > 253) && (!this->outputToText)) 
+		if ((this->numAttributes > 253) && (!this->outputToText))
 		{
 			throw RSGISXMLArgumentsException("Number of attributes exceeds limit for shapefile, output to text file using \'outputCSV\' instead.");
 		}
 		//cout << "Found " << this->numAttributes << " attributes" << endl;
-		
+
 		if(numAttributes > 0)
 		{
 			this->calcZonalAllBands = false;
@@ -1143,7 +1143,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			{
 				attributeZonalList[i] = new ZonalAttributes();
 				attributeElement = static_cast<DOMElement*>(attributeNodesList->item(i));
-				
+
 				XMLCh *nameXMLStr = XMLString::transcode("name");
 				if(attributeElement->hasAttribute(nameXMLStr))
 				{
@@ -1156,7 +1156,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 					throw RSGISXMLArgumentsException("No \'name\' attribute was provided.");
 				}
 				XMLString::release(&nameXMLStr);
-				
+
 				// Set statistics for each attribute to values for all attributes
 				attributeZonalList[i]->outMin = minAll;
 				attributeZonalList[i]->outMax = maxAll;
@@ -1165,106 +1165,106 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 				attributeZonalList[i]->outMode = modeAll;
                 attributeZonalList[i]->outSum = sumAll;
 				attributeZonalList[i]->outCount = countAll;
-				
-				
+
+
 				// Get statistics to calculate - this overrides options set for all attributes
-				
+
 				XMLCh *minXMLStr = XMLString::transcode("min");
 				if(attributeElement->hasAttribute(minXMLStr))
 				{
 					XMLCh *yesStr = XMLString::transcode("yes");
 					const XMLCh *value = attributeElement->getAttribute(minXMLStr);
-					
+
 					if(XMLString::equals(value, yesStr))
 					{
 						attributeZonalList[i]->outMin = true;
 					}
-					else 
+					else
 					{
 						attributeZonalList[i]->outMin = false;
 					}
 					XMLString::release(&yesStr);
 				}
 				XMLString::release(&minXMLStr);
-				
+
 				XMLCh *maxXMLStr = XMLString::transcode("max");
 				if(attributeElement->hasAttribute(maxXMLStr))
 				{
 					XMLCh *yesStr = XMLString::transcode("yes");
 					const XMLCh *value = attributeElement->getAttribute(maxXMLStr);
-					
+
 					if(XMLString::equals(value, yesStr))
 					{
 						attributeZonalList[i]->outMax = true;
 					}
-					else 
+					else
 					{
 						attributeZonalList[i]->outMax = false;
 					}
 					XMLString::release(&yesStr);
 				}
 				XMLString::release(&maxXMLStr);
-				
+
 				XMLCh *meanXMLStr = XMLString::transcode("mean");
 				if(attributeElement->hasAttribute(meanXMLStr))
 				{
 					XMLCh *yesStr = XMLString::transcode("yes");
 					const XMLCh *value = attributeElement->getAttribute(meanXMLStr);
-					
+
 					if(XMLString::equals(value, yesStr))
 					{
 						attributeZonalList[i]->outMean = true;
 					}
-					else 
+					else
 					{
 						attributeZonalList[i]->outMean = false;
 					}
 					XMLString::release(&yesStr);
 				}
 				XMLString::release(&meanXMLStr);
-				
+
 				XMLCh *stddevXMLStr = XMLString::transcode("stddev");
 				if(attributeElement->hasAttribute(stddevXMLStr))
 				{
 					XMLCh *yesStr = XMLString::transcode("yes");
 					const XMLCh *value = attributeElement->getAttribute(stddevXMLStr);
-					
+
 					if(XMLString::equals(value, yesStr))
 					{
 						attributeZonalList[i]->outStDev = true;
 					}
-					else 
+					else
 					{
 						attributeZonalList[i]->outStDev = false;
 					}
 					XMLString::release(&yesStr);
 				}
-				XMLString::release(&stddevXMLStr);	
-                
+				XMLString::release(&stddevXMLStr);
+
                 XMLCh *modeXMLStr = XMLString::transcode("mode");
 				if(attributeElement->hasAttribute(modeXMLStr))
 				{
 					XMLCh *yesStr = XMLString::transcode("yes");
 					const XMLCh *value = attributeElement->getAttribute(modeXMLStr);
-					
+
 					if(XMLString::equals(value, yesStr))
 					{
 						attributeZonalList[i]->outMode = true;
 					}
-					else 
+					else
 					{
 						attributeZonalList[i]->outMode = false;
 					}
 					XMLString::release(&yesStr);
 				}
 				XMLString::release(&modeXMLStr);
-				
+
                 XMLCh *sumXMLStr = XMLString::transcode("sum");
 				if(attributeElement->hasAttribute(sumXMLStr))
 				{
 					XMLCh *yesStr = XMLString::transcode("yes");
 					const XMLCh *value = attributeElement->getAttribute(sumXMLStr);
-					
+
 					if(XMLString::equals(value, yesStr))
 					{
 						attributeZonalList[i]->outSum = true;
@@ -1276,27 +1276,27 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 					XMLString::release(&yesStr);
 				}
 				XMLString::release(&sumXMLStr);
-                
+
 				XMLCh *countXMLStr = XMLString::transcode("count");
 				if(attributeElement->hasAttribute(countXMLStr))
 				{
 					XMLCh *yesStr = XMLString::transcode("yes");
 					const XMLCh *value = attributeElement->getAttribute(countXMLStr);
-					
+
 					if(XMLString::equals(value, yesStr))
 					{
 						attributeZonalList[i]->outCount = true;
 					}
-					else 
+					else
 					{
 						attributeZonalList[i]->outCount = false;
 					}
-					
+
 					XMLString::release(&yesStr);
 				}
 				XMLString::release(&countXMLStr);
 
-				
+
 				DOMNodeList *bandNodesList = attributeElement->getElementsByTagName(rsgisbandXMLStr);
 				attributeZonalList[i]->numBands = bandNodesList->getLength();
 				if(attributeZonalList[i]->numBands > 0)
@@ -1305,12 +1305,12 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 					attributeZonalList[i]->bands = new int[attributeZonalList[i]->numBands];
 					attributeZonalList[i]->minThresholds = new float[attributeZonalList[i]->numBands];
 					attributeZonalList[i]->maxThresholds = new float[attributeZonalList[i]->numBands];
-					
+
 					for(int j = 0; j < attributeZonalList[i]->numBands; j++)
 					{
 						bandElement = static_cast<DOMElement*>(bandNodesList->item(j));
-						
-						
+
+
 						XMLCh *bandXMLStr = XMLString::transcode("band");
 						if(bandElement->hasAttribute(bandXMLStr))
 						{
@@ -1323,8 +1323,8 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 							throw RSGISXMLArgumentsException("No \'band\' attribute was provided.");
 						}
 						XMLString::release(&bandXMLStr);
-						
-						
+
+
 						XMLCh *minThresholdXMLStr = XMLString::transcode("minThreshold");
 						if(bandElement->hasAttribute(minThresholdXMLStr))
 						{
@@ -1336,13 +1336,13 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 						{
 							attributeZonalList[i]->minThresholds[j] = minThreshAllVal;
 						}
-						else 
+						else
 						{
 							attributeZonalList[i]->minThresholds[j] = -numeric_limits<double>::infinity();
 						}
-						
+
 						XMLString::release(&minThresholdXMLStr);
-						
+
 						XMLCh *maxThresholdXMLStr = XMLString::transcode("maxThreshold");
 						if(bandElement->hasAttribute(maxThresholdXMLStr))
 						{
@@ -1365,7 +1365,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 				{
 					throw RSGISXMLArgumentsException("No attributes \'rsgis:band\' tags were provided.");
 				}
-				
+
 			}
 		}
 		else
@@ -1377,7 +1377,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 	else if(XMLString::equals(optionPixelMean, optionXML))
 	{
 		this->option = RSGISExeZonalStats::pixelmean;
-		
+
 		XMLCh *outputXMLStr = XMLString::transcode("output");
 		if(argElement->hasAttribute(outputXMLStr))
 		{
@@ -1390,7 +1390,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
 		}
 		XMLString::release(&outputXMLStr);
-		
+
 		XMLCh *rasterXMLStr = XMLString::transcode("raster");
 		if(argElement->hasAttribute(rasterXMLStr))
 		{
@@ -1405,12 +1405,12 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			this->useRasPoly = false;
 		}
 		XMLString::release(&rasterXMLStr);
-		
+
 		// Retrieve method for calculating pixels in polygon
 		XMLCh *methodXMLStr = XMLString::transcode("method");
 		if(argElement->hasAttribute(methodXMLStr))
 		{
-			if (useRasPoly) 
+			if (useRasPoly)
 			{
 				cout << "\tUsing rasterised version of polygon - ignoring method" << endl;
 			}
@@ -1441,20 +1441,20 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 		}
 		else
 		{
-			if (useRasPoly == false) 
+			if (useRasPoly == false)
 			{
 				cout << "\tMethod not recognised, using default of \'polyContainsPixelCenter\'." << endl;
 				this->method = rsgis::img::polyContainsPixelCenter;
 			}
 		}
 		XMLString::release(&methodXMLStr);
-		
+
 		XMLCh *forceXMLStr = XMLString::transcode("force");
 		if(argElement->hasAttribute(forceXMLStr))
 		{
 			XMLCh *yesStr = XMLString::transcode("yes");
 			const XMLCh *forceValue = argElement->getAttribute(forceXMLStr);
-			
+
 			if(XMLString::equals(forceValue, yesStr))
 			{
 				this->force = true;
@@ -1470,13 +1470,13 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'force\' attribute was provided.");
 		}
 		XMLString::release(&forceXMLStr);
-		
+
 		XMLCh *dBXMLStr = XMLString::transcode("dB");
 		if(argElement->hasAttribute(dBXMLStr))
 		{
 			XMLCh *yesStr = XMLString::transcode("yes");
 			const XMLCh *dbValue = argElement->getAttribute(dBXMLStr);
-			
+
 			if(XMLString::equals(dbValue, yesStr))
 			{
 				this->dB = true;
@@ -1494,13 +1494,13 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			this->dB = false;
 		}
 		XMLString::release(&dBXMLStr);
-		
+
 		XMLCh *pxlcountXMLStr = XMLString::transcode("pxlcount");
 		if(argElement->hasAttribute(pxlcountXMLStr))
 		{
 			XMLCh *yesStr = XMLString::transcode("yes");
 			const XMLCh *value = argElement->getAttribute(pxlcountXMLStr);
-			
+
 			if(XMLString::equals(value, yesStr))
 			{
 				this->pxlcount = true;
@@ -1516,38 +1516,38 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'pxlcount\' attribute was provided.");
 		}
 		XMLString::release(&pxlcountXMLStr);
-		
+
 		// Set values for minimum and maximum for all attributes
 		this->minThreshAll = false;
 		this->maxThreshAll = false;
 		this->minThreshAllVal = -numeric_limits<double>::infinity();
 		this->maxThreshAllVal = +numeric_limits<double>::infinity();
-		
+
 		XMLCh *minThresholdXMLStr = XMLString::transcode("minThreshold");
 		if(argElement->hasAttribute(minThresholdXMLStr))
 		{
 			char *charValue = XMLString::transcode(argElement->getAttribute(minThresholdXMLStr));
 			minThreshAllVal= mathUtils.strtofloat(string(charValue));
 			XMLString::release(&charValue);
-			minThreshAll = true; 
+			minThreshAll = true;
 		}
 		XMLString::release(&minThresholdXMLStr);
-		
+
 		XMLCh *maxThresholdXMLStr = XMLString::transcode("maxThreshold");
 		if(argElement->hasAttribute(maxThresholdXMLStr))
 		{
 			char *charValue = XMLString::transcode(argElement->getAttribute(maxThresholdXMLStr));
 			maxThreshAllVal= mathUtils.strtofloat(string(charValue));
 			XMLString::release(&charValue);
-			maxThreshAll = true; 
+			maxThreshAll = true;
 		}
 		XMLString::release(&maxThresholdXMLStr);
-		
+
 		DOMNodeList *attributeNodesList = argElement->getElementsByTagName(rsgisattributeXMLStr);
 		this->numAttributes = attributeNodesList->getLength();
-		
+
 		//cout << "Found " << this->numAttributes << " attributes" << endl;
-		
+
 		if(numAttributes > 0)
 		{
 			this->attributeMeanList = new MeanAttributes*[numAttributes];
@@ -1556,7 +1556,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			{
 				attributeMeanList[i] = new MeanAttributes();
 				attributeElement = static_cast<DOMElement*>(attributeNodesList->item(i));
-				
+
 				XMLCh *nameXMLStr = XMLString::transcode("name");
 				if(attributeElement->hasAttribute(nameXMLStr))
 				{
@@ -1569,7 +1569,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 					throw RSGISXMLArgumentsException("No \'name\' attribute was provided.");
 				}
 				XMLString::release(&nameXMLStr);
-				
+
 				DOMNodeList *bandNodesList = attributeElement->getElementsByTagName(rsgisbandXMLStr);
 				attributeMeanList[i]->numBands = bandNodesList->getLength();
 				if(attributeMeanList[i]->numBands > 0)
@@ -1581,7 +1581,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 					for(int j = 0; j < attributeMeanList[i]->numBands; j++)
 					{
 						bandElement = static_cast<DOMElement*>(bandNodesList->item(j));
-						
+
 						XMLCh *bandXMLStr = XMLString::transcode("band");
 						if(bandElement->hasAttribute(bandXMLStr))
 						{
@@ -1591,7 +1591,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 							{
 								throw RSGISXMLArgumentsException("Band numbering starts at 1");
 							}
-							else 
+							else
 							{
 								attributeMeanList[i]->bands[j] = band - 1;
 							}
@@ -1602,8 +1602,8 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 							throw RSGISXMLArgumentsException("No \'band\' attribute was provided.");
 						}
 						XMLString::release(&bandXMLStr);
-						
-						
+
+
 						XMLCh *minThresholdXMLStr = XMLString::transcode("minThreshold");
 						if(bandElement->hasAttribute(minThresholdXMLStr))
 						{
@@ -1615,13 +1615,13 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 						{
 							attributeMeanList[i]->minThresholds[j] = minThreshAllVal;
 						}
-						else 
+						else
 						{
 							attributeMeanList[i]->minThresholds[j] = -numeric_limits<double>::infinity();
 						}
-						
+
 						XMLString::release(&minThresholdXMLStr);
-						
+
 						XMLCh *thresholdXMLStr = XMLString::transcode("threshold"); // Old version of minimum threashold, used to retain compatibility
 						if(bandElement->hasAttribute(thresholdXMLStr))
 						{
@@ -1631,7 +1631,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 							XMLString::release(&charValue);
 						}
 						XMLString::release(&thresholdXMLStr);
-						
+
 						XMLCh *maxThresholdXMLStr = XMLString::transcode("maxThreshold");
 						if(bandElement->hasAttribute(maxThresholdXMLStr))
 						{
@@ -1654,7 +1654,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 				{
 					throw RSGISXMLArgumentsException("No attributes \'rsgis:band\' tags were provided.");
 				}
-				
+
 			}
 		}
 		else
@@ -1665,7 +1665,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 	else if(XMLString::equals(optionPixelMeanLSSVar, optionXML))
 	{
 		this->option = RSGISExeZonalStats::pixelmeanLSSVar;
-		
+
 		XMLCh *outputXMLStr = XMLString::transcode("output");
 		if(argElement->hasAttribute(outputXMLStr))
 		{
@@ -1678,7 +1678,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
 		}
 		XMLString::release(&outputXMLStr);
-		
+
 		// Retrieve method for calculating pixels in polygon
 		XMLCh *methodXMLStr = XMLString::transcode("method");
 		if(argElement->hasAttribute(methodXMLStr))
@@ -1711,13 +1711,13 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			this->method = rsgis::img::polyContainsPixelCenter;
 		}
 		XMLString::release(&methodXMLStr);
-		
+
 		XMLCh *forceXMLStr = XMLString::transcode("force");
 		if(argElement->hasAttribute(forceXMLStr))
 		{
 			XMLCh *yesStr = XMLString::transcode("yes");
 			const XMLCh *forceValue = argElement->getAttribute(forceXMLStr);
-			
+
 			if(XMLString::equals(forceValue, yesStr))
 			{
 				this->force = true;
@@ -1733,7 +1733,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'force\' attribute was provided.");
 		}
 		XMLString::release(&forceXMLStr);
-		
+
 		XMLCh *windowSizeXMLStr = XMLString::transcode("windowSize"); // Get window size
 		if(argElement->hasAttribute(windowSizeXMLStr))
 		{
@@ -1747,7 +1747,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			this->windowSize = 3;
 		}
 		XMLString::release(&windowSizeXMLStr);
-		
+
 		XMLCh *offsetSizeXMLStr = XMLString::transcode("offsetSize");
 		if(argElement->hasAttribute(offsetSizeXMLStr))
 		{
@@ -1761,13 +1761,13 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			this->usePixelSize = true;
 		}
 		XMLString::release(&offsetSizeXMLStr);
-		
+
 		XMLCh *pxlcountXMLStr = XMLString::transcode("pxlcount");
 		if(argElement->hasAttribute(pxlcountXMLStr))
 		{
 			XMLCh *yesStr = XMLString::transcode("yes");
 			const XMLCh *value = argElement->getAttribute(pxlcountXMLStr);
-			
+
 			if(XMLString::equals(value, yesStr))
 			{
 				this->pxlcount = true;
@@ -1783,38 +1783,38 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'pxlcount\' attribute was provided.");
 		}
 		XMLString::release(&pxlcountXMLStr);
-		
+
 		// Set values for minimum and maximum for all attributes
 		bool minThreshAll = false;
 		bool maxThreshAll = false;
 		double minThreshAllVal = -numeric_limits<double>::infinity();
 		double maxThreshAllVal = +numeric_limits<double>::infinity();
-		
+
 		XMLCh *minThresholdXMLStr = XMLString::transcode("minThreshold");
 		if(argElement->hasAttribute(minThresholdXMLStr))
 		{
 			char *charValue = XMLString::transcode(argElement->getAttribute(minThresholdXMLStr));
 			minThreshAllVal= mathUtils.strtofloat(string(charValue));
 			XMLString::release(&charValue);
-			minThreshAll = true; 
+			minThreshAll = true;
 		}
 		XMLString::release(&minThresholdXMLStr);
-		
+
 		XMLCh *maxThresholdXMLStr = XMLString::transcode("maxThreshold");
 		if(argElement->hasAttribute(maxThresholdXMLStr))
 		{
 			char *charValue = XMLString::transcode(argElement->getAttribute(maxThresholdXMLStr));
 			maxThreshAllVal= mathUtils.strtofloat(string(charValue));
 			XMLString::release(&charValue);
-			maxThreshAll = true; 
+			maxThreshAll = true;
 		}
 		XMLString::release(&maxThresholdXMLStr);
-		
+
 		DOMNodeList *attributeNodesList = argElement->getElementsByTagName(rsgisattributeXMLStr);
 		this->numAttributes = attributeNodesList->getLength();
-		
+
 		//cout << "Found " << this->numAttributes << " attributes" << endl;
-		
+
 		if(numAttributes > 0)
 		{
 			this->attributeMeanList = new MeanAttributes*[numAttributes];
@@ -1823,7 +1823,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			{
 				attributeMeanList[i] = new MeanAttributes();
 				attributeElement = static_cast<DOMElement*>(attributeNodesList->item(i));
-				
+
 				XMLCh *nameXMLStr = XMLString::transcode("name");
 				if(attributeElement->hasAttribute(nameXMLStr))
 				{
@@ -1836,7 +1836,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 					throw RSGISXMLArgumentsException("No \'name\' attribute was provided.");
 				}
 				XMLString::release(&nameXMLStr);
-				
+
 				DOMNodeList *bandNodesList = attributeElement->getElementsByTagName(rsgisbandXMLStr);
 				attributeMeanList[i]->numBands = bandNodesList->getLength();
 				if(attributeMeanList[i]->numBands > 0)
@@ -1848,8 +1848,8 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 					for(int j = 0; j < attributeMeanList[i]->numBands; j++)
 					{
 						bandElement = static_cast<DOMElement*>(bandNodesList->item(j));
-						
-						
+
+
 						XMLCh *bandXMLStr = XMLString::transcode("band");
 						if(bandElement->hasAttribute(bandXMLStr))
 						{
@@ -1859,7 +1859,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 							{
 								throw RSGISXMLArgumentsException("Band numbering starts at 1");
 							}
-							else 
+							else
 							{
 								attributeMeanList[i]->bands[j] = band - 1;
 							}
@@ -1870,7 +1870,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 							throw RSGISXMLArgumentsException("No \'band\' attribute was provided.");
 						}
 						XMLString::release(&bandXMLStr);
-						
+
 						XMLCh *minThresholdXMLStr = XMLString::transcode("minThreshold");
 						if(bandElement->hasAttribute(minThresholdXMLStr))
 						{
@@ -1882,13 +1882,13 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 						{
 							attributeMeanList[i]->minThresholds[j] = minThreshAllVal;
 						}
-						else 
+						else
 						{
 							attributeMeanList[i]->minThresholds[j] = -numeric_limits<double>::infinity();
 						}
-						
+
 						XMLString::release(&minThresholdXMLStr);
-						
+
 						XMLCh *thresholdXMLStr = XMLString::transcode("threshold"); // Old version of minimum threashold, used to retain compatibility
 						if(bandElement->hasAttribute(thresholdXMLStr))
 						{
@@ -1898,7 +1898,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 							XMLString::release(&charValue);
 						}
 						XMLString::release(&thresholdXMLStr);
-						
+
 						XMLCh *maxThresholdXMLStr = XMLString::transcode("maxThreshold");
 						if(bandElement->hasAttribute(maxThresholdXMLStr))
 						{
@@ -1921,7 +1921,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 				{
 					throw RSGISXMLArgumentsException("No attributes \'rsgis:band\' tags were provided.");
 				}
-				
+
 			}
 		}
 		else
@@ -1932,7 +1932,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 	else if(XMLString::equals(optionPixelWeightedMean, optionXML))
 	{
 		this->option = RSGISExeZonalStats::pixelWeightedMean;
-		
+
 		XMLCh *outputXMLStr = XMLString::transcode("output");
 		if(argElement->hasAttribute(outputXMLStr))
 		{
@@ -1945,13 +1945,13 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
 		}
 		XMLString::release(&outputXMLStr);
-		
+
 		XMLCh *forceXMLStr = XMLString::transcode("force");
 		if(argElement->hasAttribute(forceXMLStr))
 		{
 			XMLCh *yesStr = XMLString::transcode("yes");
 			const XMLCh *forceValue = argElement->getAttribute(forceXMLStr);
-			
+
 			if(XMLString::equals(forceValue, yesStr))
 			{
 				this->force = true;
@@ -1967,13 +1967,13 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'force\' attribute was provided.");
 		}
 		XMLString::release(&forceXMLStr);
-		
+
 		XMLCh *pxlcountXMLStr = XMLString::transcode("pxlcount");
 		if(argElement->hasAttribute(pxlcountXMLStr))
 		{
 			XMLCh *yesStr = XMLString::transcode("yes");
 			const XMLCh *value = argElement->getAttribute(pxlcountXMLStr);
-			
+
 			if(XMLString::equals(value, yesStr))
 			{
 				this->pxlcount = true;
@@ -1989,38 +1989,38 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'pxlcount\' attribute was provided.");
 		}
 		XMLString::release(&pxlcountXMLStr);
-		
+
 		// Set values for minimum and maximum for all attributes
 		this->minThreshAll = false;
 		this->maxThreshAll = false;
 		this->minThreshAllVal = -numeric_limits<double>::infinity();
 		this->maxThreshAllVal = +numeric_limits<double>::infinity();
-		
+
 		XMLCh *minThresholdXMLStr = XMLString::transcode("minThreshold");
 		if(argElement->hasAttribute(minThresholdXMLStr))
 		{
 			char *charValue = XMLString::transcode(argElement->getAttribute(minThresholdXMLStr));
 			minThreshAllVal= mathUtils.strtofloat(string(charValue));
 			XMLString::release(&charValue);
-			minThreshAll = true; 
+			minThreshAll = true;
 		}
 		XMLString::release(&minThresholdXMLStr);
-		
+
 		XMLCh *maxThresholdXMLStr = XMLString::transcode("maxThreshold");
 		if(argElement->hasAttribute(maxThresholdXMLStr))
 		{
 			char *charValue = XMLString::transcode(argElement->getAttribute(maxThresholdXMLStr));
 			maxThreshAllVal= mathUtils.strtofloat(string(charValue));
 			XMLString::release(&charValue);
-			maxThreshAll = true; 
+			maxThreshAll = true;
 		}
 		XMLString::release(&maxThresholdXMLStr);
-		
+
 		DOMNodeList *attributeNodesList = argElement->getElementsByTagName(rsgisattributeXMLStr);
 		this->numAttributes = attributeNodesList->getLength();
-		
+
 		//cout << "Found " << this->numAttributes << " attributes" << endl;
-		
+
 		if(numAttributes > 0)
 		{
 			this->attributeMeanList = new MeanAttributes*[numAttributes];
@@ -2029,7 +2029,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			{
 				attributeMeanList[i] = new MeanAttributes();
 				attributeElement = static_cast<DOMElement*>(attributeNodesList->item(i));
-				
+
 				XMLCh *nameXMLStr = XMLString::transcode("name");
 				if(attributeElement->hasAttribute(nameXMLStr))
 				{
@@ -2042,7 +2042,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 					throw RSGISXMLArgumentsException("No \'name\' attribute was provided.");
 				}
 				XMLString::release(&nameXMLStr);
-				
+
 				DOMNodeList *bandNodesList = attributeElement->getElementsByTagName(rsgisbandXMLStr);
 				attributeMeanList[i]->numBands = bandNodesList->getLength();
 				if(attributeMeanList[i]->numBands > 0)
@@ -2054,7 +2054,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 					for(int j = 0; j < attributeMeanList[i]->numBands; j++)
 					{
 						bandElement = static_cast<DOMElement*>(bandNodesList->item(j));
-						
+
 						XMLCh *bandXMLStr = XMLString::transcode("band");
 						if(bandElement->hasAttribute(bandXMLStr))
 						{
@@ -2064,7 +2064,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 							{
 								throw RSGISXMLArgumentsException("Band numbering starts at 1");
 							}
-							else 
+							else
 							{
 								attributeMeanList[i]->bands[j] = band - 1;
 							}
@@ -2075,8 +2075,8 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 							throw RSGISXMLArgumentsException("No \'band\' attribute was provided.");
 						}
 						XMLString::release(&bandXMLStr);
-						
-						
+
+
 						XMLCh *minThresholdXMLStr = XMLString::transcode("minThreshold");
 						if(bandElement->hasAttribute(minThresholdXMLStr))
 						{
@@ -2088,13 +2088,13 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 						{
 							attributeMeanList[i]->minThresholds[j] = minThreshAllVal;
 						}
-						else 
+						else
 						{
 							attributeMeanList[i]->minThresholds[j] = -numeric_limits<double>::infinity();
 						}
-						
+
 						XMLString::release(&minThresholdXMLStr);
-						
+
 						XMLCh *thresholdXMLStr = XMLString::transcode("threshold"); // Old version of minimum threashold, used to retain compatibility
 						if(bandElement->hasAttribute(thresholdXMLStr))
 						{
@@ -2104,7 +2104,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 							XMLString::release(&charValue);
 						}
 						XMLString::release(&thresholdXMLStr);
-						
+
 						XMLCh *maxThresholdXMLStr = XMLString::transcode("maxThreshold");
 						if(bandElement->hasAttribute(maxThresholdXMLStr))
 						{
@@ -2127,7 +2127,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 				{
 					throw RSGISXMLArgumentsException("No attributes \'rsgis:band\' tags were provided.");
 				}
-				
+
 			}
 		}
 		else
@@ -2138,7 +2138,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 	else if(XMLString::equals(optionFuzzy, optionXML))
 	{
 		this->option = RSGISExeZonalStats::fuzzy;
-		
+
 		XMLCh *outputXMLStr = XMLString::transcode("output");
 		if(argElement->hasAttribute(outputXMLStr))
 		{
@@ -2151,7 +2151,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
 		}
 		XMLString::release(&outputXMLStr);
-		
+
 		XMLCh *rasterXMLStr = XMLString::transcode("raster");
 		if(argElement->hasAttribute(rasterXMLStr))
 		{
@@ -2164,13 +2164,13 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'raster\' attribute was provided.");
 		}
 		XMLString::release(&rasterXMLStr);
-		
+
 		XMLCh *forceXMLStr = XMLString::transcode("force");
 		if(argElement->hasAttribute(forceXMLStr))
 		{
 			XMLCh *yesStr = XMLString::transcode("yes");
 			const XMLCh *forceValue = argElement->getAttribute(forceXMLStr);
-			
+
 			if(XMLString::equals(forceValue, yesStr))
 			{
 				this->force = true;
@@ -2186,13 +2186,13 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'force\' attribute was provided.");
 		}
 		XMLString::release(&forceXMLStr);
-		
+
 		XMLCh *pxlcountXMLStr = XMLString::transcode("pxlcount");
 		if(argElement->hasAttribute(pxlcountXMLStr))
 		{
 			XMLCh *yesStr = XMLString::transcode("yes");
 			const XMLCh *value = argElement->getAttribute(pxlcountXMLStr);
-			
+
 			if(XMLString::equals(value, yesStr))
 			{
 				this->pxlcount = true;
@@ -2208,7 +2208,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'pxlcount\' attribute was provided.");
 		}
 		XMLString::release(&pxlcountXMLStr);
-		
+
 		XMLCh *classattributeXMLStr = XMLString::transcode("classattribute");
 		if(argElement->hasAttribute(classattributeXMLStr))
 		{
@@ -2221,8 +2221,8 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'classattribute\' attribute was provided.");
 		}
 		XMLString::release(&classattributeXMLStr);
-		
-		
+
+
 		XMLCh *binsizeXMLStr = XMLString::transcode("binsize");
 		if(argElement->hasAttribute(binsizeXMLStr))
 		{
@@ -2235,8 +2235,8 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'binsize\' attribute was provided.");
 		}
 		XMLString::release(&binsizeXMLStr);
-		
-		
+
+
 		XMLCh *thresholdXMLStr = XMLString::transcode("threshold");
 		if(argElement->hasAttribute(thresholdXMLStr))
 		{
@@ -2249,12 +2249,12 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'threshold\' attribute was provided.");
 		}
 		XMLString::release(&thresholdXMLStr);
-		
+
 		DOMNodeList *attributeNodesList = argElement->getElementsByTagName(rsgisattributeXMLStr);
 		this->numAttributes = attributeNodesList->getLength();
-		
+
 		//cout << "Found " << this->numAttributes << " attributes" << endl;
-		
+
 		if(numAttributes > 0)
 		{
 			attributeFuzzyList = new FuzzyAttributes*[numAttributes];
@@ -2263,9 +2263,9 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			{
 				attributeFuzzyList[i] = new FuzzyAttributes();
 				attributeElement = static_cast<DOMElement*>(attributeNodesList->item(i));
-				
+
 				attributeFuzzyList[i]->index = i;
-				
+
 				XMLCh *nameXMLStr = XMLString::transcode("name");
 				if(attributeElement->hasAttribute(nameXMLStr))
 				{
@@ -2278,8 +2278,8 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 					throw RSGISXMLArgumentsException("No \'name\' attribute was provided.");
 				}
 				XMLString::release(&nameXMLStr);
-				
-				
+
+
 				XMLCh *classXMLStr = XMLString::transcode("class");
 				if(attributeElement->hasAttribute(classXMLStr))
 				{
@@ -2292,7 +2292,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 					throw RSGISXMLArgumentsException("No \'class\' attribute was provided.");
 				}
 				XMLString::release(&classXMLStr);
-				
+
 				DOMNodeList *bandNodesList = attributeElement->getElementsByTagName(rsgisbandXMLStr);
 				attributeFuzzyList[i]->numBands = bandNodesList->getLength();
 				if(attributeFuzzyList[i]->numBands > 0)
@@ -2302,7 +2302,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 					for(int j = 0; j < attributeFuzzyList[i]->numBands; j++)
 					{
 						bandElement = static_cast<DOMElement*>(bandNodesList->item(j));
-						
+
 						XMLCh *bandXMLStr = XMLString::transcode("band");
 						if(bandElement->hasAttribute(bandXMLStr))
 						{
@@ -2315,7 +2315,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 							throw RSGISXMLArgumentsException("No \'band\' attribute was provided.");
 						}
 						XMLString::release(&bandXMLStr);
-						
+
 					}
 				}
 				else
@@ -2332,7 +2332,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 	else if(XMLString::equals(optionPowersetCount, optionXML))
 	{
 		this->option = RSGISExeZonalStats::powersetcount;
-		
+
 		XMLCh *outputXMLStr = XMLString::transcode("output");
 		if(argElement->hasAttribute(outputXMLStr))
 		{
@@ -2345,7 +2345,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
 		}
 		XMLString::release(&outputXMLStr);
-		
+
 		XMLCh *rasterXMLStr = XMLString::transcode("raster");
 		if(argElement->hasAttribute(rasterXMLStr))
 		{
@@ -2358,13 +2358,13 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'raster\' attribute was provided.");
 		}
 		XMLString::release(&rasterXMLStr);
-		
+
 		XMLCh *forceXMLStr = XMLString::transcode("force");
 		if(argElement->hasAttribute(forceXMLStr))
 		{
 			XMLCh *yesStr = XMLString::transcode("yes");
 			const XMLCh *forceValue = argElement->getAttribute(forceXMLStr);
-			
+
 			if(XMLString::equals(forceValue, yesStr))
 			{
 				this->force = true;
@@ -2380,7 +2380,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'force\' attribute was provided.");
 		}
 		XMLString::release(&forceXMLStr);
-		
+
 		XMLCh *nTopXMLStr = XMLString::transcode("nTop");
 		if(argElement->hasAttribute(nTopXMLStr))
 		{
@@ -2393,13 +2393,13 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'nTop\' attribute was provided.");
 		}
 		XMLString::release(&nTopXMLStr);
-		
-		
+
+
 		DOMNodeList *attributeNodesList = argElement->getElementsByTagName(rsgisattributeXMLStr);
 		this->numAttributes = attributeNodesList->getLength();
-		
+
 		//cout << "Found " << this->numAttributes << " attributes" << endl;
-		
+
 		if(numAttributes > 0)
 		{
 			attributeCountList = new CountAttributes*[numAttributes];
@@ -2408,7 +2408,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			{
 				attributeCountList[i] = new CountAttributes();
 				attributeElement = static_cast<DOMElement*>(attributeNodesList->item(i));
-				
+
 				XMLCh *nameXMLStr = XMLString::transcode("name");
 				if(attributeElement->hasAttribute(nameXMLStr))
 				{
@@ -2421,7 +2421,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 					throw RSGISXMLArgumentsException("No \'name\' attribute was provided.");
 				}
 				XMLString::release(&nameXMLStr);
-				
+
 				DOMNodeList *bandNodesList = attributeElement->getElementsByTagName(rsgisbandXMLStr);
 				attributeCountList[i]->numBands = bandNodesList->getLength();
 				if(attributeCountList[i]->numBands > 0)
@@ -2432,7 +2432,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 					for(int j = 0; j < attributeCountList[i]->numBands; j++)
 					{
 						bandElement = static_cast<DOMElement*>(bandNodesList->item(j));
-						
+
 						XMLCh *bandXMLStr = XMLString::transcode("band");
 						if(bandElement->hasAttribute(bandXMLStr))
 						{
@@ -2445,8 +2445,8 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 							throw RSGISXMLArgumentsException("No \'band\' attribute was provided.");
 						}
 						XMLString::release(&bandXMLStr);
-						
-						
+
+
 						XMLCh *thresholdXMLStr = XMLString::transcode("threshold");
 						if(bandElement->hasAttribute(thresholdXMLStr))
 						{
@@ -2465,7 +2465,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 				{
 					throw RSGISXMLArgumentsException("No attributes \'rsgis:band\' tags were provided.");
 				}
-				
+
 			}
 		}
 		else
@@ -2476,8 +2476,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 	else if(XMLString::equals(optionPointValue, optionXML))
 	{
 		this->option = RSGISExeZonalStats::pointvalue;
-        this->outputToText = false;
-		
+
 		// Text file
 		XMLCh *outputCSVXMLStr = XMLString::transcode("outputCSV");
 		if(argElement->hasAttribute(outputCSVXMLStr))
@@ -2488,8 +2487,8 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			this->outputToText = true;
 		}
 		XMLString::release(&outputCSVXMLStr);
-		
-		
+
+
 		XMLCh *outputXMLStr = XMLString::transcode("output");
 		if(argElement->hasAttribute(outputXMLStr))
 		{
@@ -2509,13 +2508,13 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			if(!this->outputToText){throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");}
 		}
 		XMLString::release(&outputXMLStr);
-		
+
 		XMLCh *forceXMLStr = XMLString::transcode("force");
 		if(argElement->hasAttribute(forceXMLStr))
 		{
 			XMLCh *yesStr = XMLString::transcode("yes");
 			const XMLCh *forceValue = argElement->getAttribute(forceXMLStr);
-			
+
 			if(XMLString::equals(forceValue, yesStr))
 			{
 				this->force = true;
@@ -2531,12 +2530,12 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
             if(!this->outputToText){throw RSGISXMLArgumentsException("No \'force\' attribute was provided.");}
 		}
 		XMLString::release(&forceXMLStr);
-		
+
 	}
     else if(XMLString::equals(optionEndmembers, optionXML))
-	{		
+	{
 		this->option = RSGISExeZonalStats::endmembers;
-		
+
 		XMLCh *outputXMLStr = XMLString::transcode("output");
 		if(argElement->hasAttribute(outputXMLStr))
 		{
@@ -2549,7 +2548,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
 		}
 		XMLString::release(&outputXMLStr);
-        
+
         XMLCh *methodXMLStr = XMLString::transcode("method");
 		if(argElement->hasAttribute(methodXMLStr))
 		{
@@ -2587,9 +2586,9 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 		string message = string("The option (") + string(XMLString::transcode(optionXML)) + string(") is not known: RSGISExeZonalStats.");
 		throw RSGISXMLArgumentsException(message.c_str());
 	}
-	
+
 	parsed = true;
-	
+
 	XMLString::release(&algorName);
 	XMLString::release(&algorXMLStr);
 	XMLString::release(&optionXMLStr);
@@ -2609,7 +2608,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 	XMLString::release(&rsgisbandXMLStr);
 	XMLString::release(&optionPointValue);
     XMLString::release(&optionEndmembers);
-	
+
 }
 
 void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
@@ -2625,11 +2624,11 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 			cout << "polygons2shp\n";
 			GDALAllRegister();
 			OGRRegisterAll();
-			
+
 			RSGISVectorUtils vecUtils;
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVecPolys);
 			string SHPFileOutLayer = vecUtils.getLayerName(this->outputVecPolys);
-			
+
 			GDALDataset *inputImageDS = NULL;
 			OGRDataSource *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
@@ -2646,7 +2645,7 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 					string message = string("Could not open image ") + inputImage;
 					throw RSGISException(message.c_str());
 				}
-				
+
 				/////////////////////////////////////
 				//
 				// Open Input Shapfile.
@@ -2664,7 +2663,7 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 					string message = string("Could not open vector layer ") + SHPFileInLayer;
 					throw RSGISException(message.c_str());
 				}
-				
+
 				/////////////////////////////////////
 				//
 				// Create Output Shapfile.
@@ -2688,7 +2687,7 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 					string message = string("Could not create vector layer ") + SHPFileOutLayer;
 					throw RSGISException(message.c_str());
 				}
-				
+
 				toCalc = new bool*[inputImageDS->GetRasterCount()];
 				for(int i = 0; i < inputImageDS->GetRasterCount(); i++)
 				{
@@ -2701,7 +2700,7 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 					{
 						toCalc[i][0] = false;
 					}
-					
+
 					if(this->min)
 					{
 						toCalc[i][1] = true;
@@ -2710,7 +2709,7 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 					{
 						toCalc[i][1] = false;
 					}
-					
+
 					if(this->max)
 					{
 						toCalc[i][2] = true;
@@ -2719,7 +2718,7 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 					{
 						toCalc[i][2] = false;
 					}
-					
+
 					if(this->stddev)
 					{
 						toCalc[i][3] = true;
@@ -2729,16 +2728,16 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 						toCalc[i][3] = false;
 					}
 				}
-				
-				
+
+
 				zonal = new ZonalStats();
 				zonal->zonalStatsVector(inputImageDS, inputSHPLayer, toCalc, outputSHPLayer);
 			}
-			catch (RSGISException e) 
+			catch (RSGISException e)
 			{
 				throw e;
 			}
-			
+
 			if(zonal != NULL)
 			{
 				delete zonal;
@@ -2754,20 +2753,20 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 			GDALClose(inputImageDS);
 			OGRDataSource::DestroyDataSource(inputSHPDS);
 			OGRDataSource::DestroyDataSource(outputSHPDS);
-			
+
 			//OGRCleanupAll();
-			GDALDestroyDriverManager();
+			//GDALDestroyDriverManager();
 		}
 		else if(this->option == RSGISExeZonalStats::rasterpolygons2shp)
 		{
 			cout << "rasterpolygons2shp\n";
 			GDALAllRegister();
 			OGRRegisterAll();
-			
+
 			RSGISVectorUtils vecUtils;
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVecPolys);
 			string SHPFileOutLayer = vecUtils.getLayerName(this->outputVecPolys);
-			
+
 			GDALDataset *inputImageDS = NULL;
 			GDALDataset *inputRasterFeaturesDS = NULL;
 			OGRDataSource *inputSHPDS = NULL;
@@ -2785,14 +2784,14 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 					string message = string("Could not open image ") + this->inputImage;
 					throw RSGISException(message.c_str());
 				}
-				
+
 				inputRasterFeaturesDS = (GDALDataset *) GDALOpen(this->inputRasPolys.c_str(), GA_ReadOnly);
 				if(inputRasterFeaturesDS == NULL)
 				{
 					string message = string("Could not open image ") + this->inputRasPolys;
 					throw RSGISException(message.c_str());
 				}
-				
+
 				/////////////////////////////////////
 				//
 				// Open Input Shapfile.
@@ -2810,7 +2809,7 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 					string message = string("Could not open vector layer ") + SHPFileInLayer;
 					throw RSGISException(message.c_str());
 				}
-				
+
 				/////////////////////////////////////
 				//
 				// Create Output Shapfile.
@@ -2834,7 +2833,7 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 					string message = string("Could not create vector layer ") + SHPFileOutLayer;
 					throw RSGISException(message.c_str());
 				}
-				
+
 				toCalc = new bool*[inputImageDS->GetRasterCount()];
 				for(int i = 0; i < inputImageDS->GetRasterCount(); i++)
 				{
@@ -2847,7 +2846,7 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 					{
 						toCalc[i][0] = false;
 					}
-					
+
 					if(this->min)
 					{
 						toCalc[i][1] = true;
@@ -2856,7 +2855,7 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 					{
 						toCalc[i][1] = false;
 					}
-					
+
 					if(this->max)
 					{
 						toCalc[i][2] = true;
@@ -2865,7 +2864,7 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 					{
 						toCalc[i][2] = false;
 					}
-					
+
 					if(this->stddev)
 					{
 						toCalc[i][3] = true;
@@ -2875,16 +2874,16 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 						toCalc[i][3] = false;
 					}
 				}
-				
-				
+
+
 				zonal = new ZonalStats();
 				zonal->zonalStatsRaster(inputImageDS, inputRasterFeaturesDS, inputSHPLayer, outputSHPLayer, toCalc);
 			}
-			catch (RSGISException e) 
+			catch (RSGISException e)
 			{
 				throw e;
 			}
-			
+
 			if(zonal != NULL)
 			{
 				delete zonal;
@@ -2901,19 +2900,19 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 			GDALClose(inputRasterFeaturesDS);
 			OGRDataSource::DestroyDataSource(inputSHPDS);
 			OGRDataSource::DestroyDataSource(outputSHPDS);
-			
+
 			//OGRCleanupAll();
-			GDALDestroyDriverManager();
+			//GDALDestroyDriverManager();
 		}
 		else if(this->option == RSGISExeZonalStats::rasterpolygons2txt)
 		{
 			cout << "rasterpolygons2txt\n";
 			GDALAllRegister();
 			OGRRegisterAll();
-			
+
 			RSGISVectorUtils vecUtils;
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVecPolys);
-			
+
 			GDALDataset *inputImageDS = NULL;
 			GDALDataset *inputRasterFeaturesDS = NULL;
 			OGRDataSource *inputSHPDS = NULL;
@@ -2928,14 +2927,14 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 					string message = string("Could not open image ") + this->inputImage;
 					throw RSGISException(message.c_str());
 				}
-				
+
 				inputRasterFeaturesDS = (GDALDataset *) GDALOpen(this->inputRasPolys.c_str(), GA_ReadOnly);
 				if(inputRasterFeaturesDS == NULL)
 				{
 					string message = string("Could not open image ") + this->inputRasPolys;
 					throw RSGISException(message.c_str());
 				}
-				
+
 				/////////////////////////////////////
 				//
 				// Open Input Shapfile.
@@ -2953,7 +2952,7 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 					string message = string("Could not open vector layer ") + SHPFileInLayer;
 					throw RSGISException(message.c_str());
 				}
-				
+
 				toCalc = new bool*[inputImageDS->GetRasterCount()];
 				for(int i = 0; i < inputImageDS->GetRasterCount(); i++)
 				{
@@ -2966,7 +2965,7 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 					{
 						toCalc[i][0] = false;
 					}
-					
+
 					if(this->min)
 					{
 						toCalc[i][1] = true;
@@ -2975,7 +2974,7 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 					{
 						toCalc[i][1] = false;
 					}
-					
+
 					if(this->max)
 					{
 						toCalc[i][2] = true;
@@ -2984,7 +2983,7 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 					{
 						toCalc[i][2] = false;
 					}
-					
+
 					if(this->stddev)
 					{
 						toCalc[i][3] = true;
@@ -2994,15 +2993,15 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 						toCalc[i][3] = false;
 					}
 				}
-				
+
 				zonal = new ZonalStats();
 				zonal->zonalStatsRaster2txt(inputImageDS, inputRasterFeaturesDS, inputSHPLayer, this->outputTextFile, toCalc);
 			}
-			catch (RSGISException e) 
+			catch (RSGISException e)
 			{
 				throw e;
 			}
-			
+
 			if(zonal != NULL)
 			{
 				delete zonal;
@@ -3018,50 +3017,50 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 			GDALClose(inputImageDS);
 			GDALClose(inputRasterFeaturesDS);
 			OGRDataSource::DestroyDataSource(inputSHPDS);
-			
+
 			//OGRCleanupAll();
-			GDALDestroyDriverManager();
+			//GDALDestroyDriverManager();
 		}
 		else if(this->option == RSGISExeZonalStats::pixelVals2txt)
 		{
             std::cout << "Pixel values to CSV \n";
             std::cout << "Input Image: " << this->inputImage << std::endl;
             std::cout << "Input Vector: " << this->inputVecPolys << std::endl;
-            
+
 			GDALAllRegister();
 			OGRRegisterAll();
 			RSGISMathsUtils mathsUtil;
 			RSGISFileUtils fileUtils;
 			RSGISVectorUtils vecUtils;
-			
+
 			RSGISProcessVector *processVector = NULL;
 			RSGISProcessOGRFeature *processFeature = NULL;
-			
+
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVecPolys);
-			
+
 			GDALDataset *inputImageDS = NULL;
 			OGRDataSource *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
 			OGRSpatialReference* inputSpatialRef = NULL;
-			
+
 			string outputDIR = "";
-			
+
 			try
 			{
-				
+
 				/////////////////////////////////////
 				//
 				// Open Input Image.
 				//
 				/////////////////////////////////////
-                
+
 				inputImageDS = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_ReadOnly);
 				if(inputImageDS == NULL)
 				{
 					string message = string("Could not open image ") + this->inputImage;
 					throw RSGISException(message.c_str());
 				}
-				
+
 				/////////////////////////////////////
 				//
 				// Open Input Shapfile.
@@ -3079,48 +3078,48 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 					string message = string("Could not open vector layer ") + SHPFileInLayer;
 					throw RSGISException(message.c_str());
 				}
-				
+
 				inputSpatialRef = inputSHPLayer->GetSpatialRef();
-                
+
                 // Check the projection is the same for shapefile and image
                 if(!this->ignoreProjection)
                 {
                     const char *pszWKTImg = inputImageDS->GetProjectionRef();
                     char **pszWKTShp = new char*[1];
                     inputSpatialRef->exportToWkt(pszWKTShp);
-                    
+
                     if((string(pszWKTImg) != string(pszWKTShp[0])))
                     {
                         cerr << "WARNING: Shapefile and image are not the same projection!\n\tImage is: " + string(pszWKTImg) + "\n\tShapefile is: " + string(pszWKTShp[0]) << "\n...Continuing anyway" << endl;
                     }
                     OGRFree(pszWKTShp);
                 }
-                                
+
                 processFeature = new RSGISPixelVals22Txt(inputImageDS, this->outputMatrix, this->polyAttribute, this->outtxt, this->method);
 				processVector = new RSGISProcessVector(processFeature);
 
 				processVector->processVectorsNoOutput(inputSHPLayer, true);
 
-				
+
 				// TIDY
 				delete processFeature;
                 delete processVector;
-				
+
                 GDALClose(inputImageDS); // Close input image
 				cout << "Image closed OK" << endl;
 				OGRDataSource::DestroyDataSource(inputSHPDS); // Close inputshape
 				cout << "Shapefile closed OK" << endl;
-                
+
 				//OGRCleanupAll();
-				GDALDestroyDriverManager();
+				//GDALDestroyDriverManager();
 			}
-			catch (RSGISException& e) 
+			catch (RSGISException& e)
 			{
 				throw e;
 			}
-            
-            
-            
+
+
+
 		}
         else if(this->option == RSGISExeZonalStats::varibles2matrix)
 		{
@@ -3131,18 +3130,18 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 			cout << "Attribute Name: " << this->polyAttribute << endl;
 			GDALAllRegister();
 			OGRRegisterAll();
-			
+
 			RSGISVectorUtils vecUtils;
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVecPolys);
-			
+
 			GDALDataset **images = NULL;
 			OGRDataSource *inputVecDS = NULL;
 			OGRLayer *inputVecLayer = NULL;
-			
+
 			RSGISZonalStats2Matrix zonalStats;
 			ClassVariables **classVars = NULL;
-			int numMatricies = 0;	
-			
+			int numMatricies = 0;
+
 			try
 			{
 				// Open Image
@@ -3153,7 +3152,7 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 					string message = string("Could not open image ") + this->inputImage;
 					throw RSGISException(message.c_str());
 				}
-				
+
 				// Open vector
 				inputVecDS = OGRSFDriverRegistrar::Open(this->inputVecPolys.c_str(), FALSE);
 				if(inputVecDS == NULL)
@@ -3167,7 +3166,7 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 					string message = string("Could not open vector layer ") + SHPFileInLayer;
 					throw RSGISException(message.c_str());
 				}
-				
+
 				classVars = zonalStats.findPixelStats(images, 1, inputVecLayer, this->polyAttribute, &numMatricies, this->method);
 				RSGISMatrices matrixUtils;
 				string filepath = "";
@@ -3182,31 +3181,31 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 			{
 				throw e;
 			}
-			
+
 			GDALClose(images[0]);
 			OGRDataSource::DestroyDataSource(inputVecDS);
-			
-			OGRCleanupAll();
-			GDALDestroyDriverManager();
+
+			//OGRCleanupAll();
+			//GDALDestroyDriverManager();
 		}
 		else if(this->option == RSGISExeZonalStats::image2matrix)
 		{
 			cout << "image2matrix\n";
 			GDALAllRegister();
 			OGRRegisterAll();
-			
+
 			RSGISMathsUtils mathsUtils;
 			RSGISVectorUtils vecUtils;
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVecPolys);
-			
+
 			GDALDataset **images = NULL;
 			OGRDataSource *inputVecDS = NULL;
 			OGRLayer *inputVecLayer = NULL;
-			
+
 			RSGISZonalStats2Matrix zonalStats;
 			Matrix **matrices;
-			int numMatricies = 0;	
-			
+			int numMatricies = 0;
+
 			try
 			{
 				// Open Image
@@ -3217,7 +3216,7 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 					string message = string("Could not open image ") + this->inputImage;
 					throw RSGISException(message.c_str());
 				}
-				
+
 				// Open vector
 				inputVecDS = OGRSFDriverRegistrar::Open(this->inputVecPolys.c_str(), FALSE);
 				if(inputVecDS == NULL)
@@ -3231,7 +3230,7 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 					string message = string("Could not open vector layer ") + SHPFileInLayer;
 					throw RSGISException(message.c_str());
 				}
-				
+
 				matrices = zonalStats.findPixelsForImageBand(images, 1, inputVecLayer, &numMatricies, this->imageBand);
 				RSGISMatrices matrixUtils;
 				string filepath = "";
@@ -3248,12 +3247,12 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 			{
 				cout << "RSGISException caught: " << e.what() << endl;
 			}
-			
+
 			GDALClose(images[0]);
 			OGRDataSource::DestroyDataSource(inputVecDS);
-			
+
 			//OGRCleanupAll();
-			GDALDestroyDriverManager();
+			//GDALDestroyDriverManager();
 		}
 		else if(this->option == RSGISExeZonalStats::pixelcount)
 		{
@@ -3262,19 +3261,19 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 			cout << "Input Vector: " << this->inputVecPolys << endl;
 			cout << "Input Raster Polygons: " << this->inputRasPolys << endl;
 			cout << "Output Vector : " << this->outputVecPolys << endl;
-			
+
 			GDALAllRegister();
 			OGRRegisterAll();
-			
+
 			RSGISFileUtils fileUtils;
 			RSGISVectorUtils vecUtils;
-			
+
 			RSGISProcessVector *processVector = NULL;
 			RSGISProcessOGRFeature *processFeature = NULL;
-			
+
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVecPolys);
 			string SHPFileOutLayer = vecUtils.getLayerName(this->outputVecPolys);
-			
+
 			GDALDataset *inputImageDS = NULL;
 			GDALDataset *inputRasterFeaturesDS = NULL;
 			OGRDataSource *inputSHPDS = NULL;
@@ -3283,13 +3282,13 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 			OGRDataSource *outputSHPDS = NULL;
 			OGRLayer *outputSHPLayer = NULL;
 			OGRSpatialReference* inputSpatialRef = NULL;
-			
+
 			string outputDIR = "";
-			
+
 			try
 			{
 				outputDIR = fileUtils.getFileDirectoryPath(this->outputVecPolys);
-				
+
 				if(vecUtils.checkDIR4SHP(outputDIR, SHPFileOutLayer))
 				{
 					if(this->force)
@@ -3301,21 +3300,21 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 						throw RSGISException("Shapefile already exists, either delete or select force.");
 					}
 				}
-				
+
 				inputImageDS = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_ReadOnly);
 				if(inputImageDS == NULL)
 				{
 					string message = string("Could not open image ") + this->inputImage;
 					throw RSGISException(message.c_str());
 				}
-				
+
 				inputRasterFeaturesDS = (GDALDataset *) GDALOpen(this->inputRasPolys.c_str(), GA_ReadOnly);
 				if(inputRasterFeaturesDS == NULL)
 				{
 					string message = string("Could not open image ") + this->inputRasPolys;
 					throw RSGISException(message.c_str());
 				}
-				
+
 				/////////////////////////////////////
 				//
 				// Open Input Shapfile.
@@ -3333,9 +3332,9 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 					string message = string("Could not open vector layer ") + SHPFileInLayer;
 					throw RSGISException(message.c_str());
 				}
-				
+
 				inputSpatialRef = inputSHPLayer->GetSpatialRef();
-				
+
 				/////////////////////////////////////
 				//
 				// Create Output Shapfile.
@@ -3359,20 +3358,20 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 					string message = string("Could not create vector layer ") + SHPFileOutLayer;
 					throw RSGISException(message.c_str());
 				}
-				
+
 				processFeature = new RSGISZonalCountStats(inputImageDS, inputRasterFeaturesDS, attributeCountList, numAttributes, pxlcount, emptyset);
 				processVector = new RSGISProcessVector(processFeature);
-				
+
 				processVector->processVectors(inputSHPLayer, outputSHPLayer, true, true, false);
-				
+
 				GDALClose(inputImageDS);
 				GDALClose(inputRasterFeaturesDS);
 				OGRDataSource::DestroyDataSource(inputSHPDS);
 				OGRDataSource::DestroyDataSource(outputSHPDS);
-				
+
 				delete processVector;
 				delete processFeature;
-				
+
 				for(int i = 0; i < numAttributes; i++)
 				{
 					delete[] attributeCountList[i]->bands;
@@ -3380,11 +3379,11 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 					delete attributeCountList[i];
 				}
 				delete[] attributeCountList;
-				
+
 				//OGRCleanupAll();
-				GDALDestroyDriverManager();
+				//GDALDestroyDriverManager();
 			}
-			catch (RSGISException& e) 
+			catch (RSGISException& e)
 			{
 				throw e;
 			}
@@ -3399,26 +3398,26 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 			if (this->outputToText)
 			{
 				cout << "Output CSV : " << this->outputTextFile << endl;
-				
+
 			}
 			else
 			{
 				cout << "Output Vector : " << this->outputVecPolys << endl;
 			}
-			
+
 			GDALAllRegister();
 			OGRRegisterAll();
-			
+
 			RSGISFileUtils fileUtils;
 			RSGISVectorUtils vecUtils;
-			
+
 			RSGISProcessVector *processVector = NULL;
 			RSGISProcessOGRFeature *processFeature = NULL;
-			
+
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVecPolys);
 			string SHPFileOutLayer = "";
 			if (!this->outputToText){SHPFileOutLayer = vecUtils.getLayerName(this->outputVecPolys);}
-			
+
 			GDALDataset *inputImageDS = NULL;
 			GDALDataset *inputRasterFeaturesDS = NULL;
 			OGRDataSource *inputSHPDS = NULL;
@@ -3427,13 +3426,13 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 			OGRDataSource *outputSHPDS = NULL;
 			OGRLayer *outputSHPLayer = NULL;
 			OGRSpatialReference* inputSpatialRef = NULL;
-			
+
 			string outputDIR = "";
-			
+
 			try
 			{
 				outputDIR = fileUtils.getFileDirectoryPath(this->outputVecPolys);
-				
+
 				// Check is output shapefile exists
 				if (!this->outputToText)
 				{
@@ -3447,9 +3446,9 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 						{
 							throw RSGISException("Shapefile already exists, either delete or select force.");
 						}
-					}	
+					}
 				}
-				
+
 				/////////////////////////////////////
 				//
 				// Open Input Image.
@@ -3462,8 +3461,8 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 					string message = string("Could not open image ") + this->inputImage;
 					throw RSGISException(message.c_str());
 				}
-				
-				
+
+
 				// Set up attributes if using all bands
 				if(calcZonalAllBands)
 				{
@@ -3490,12 +3489,12 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 						attributeZonalList[i]->bands[0] = i;
 						attributeZonalList[i]->minThresholds[0] = this->minThreshAllVal;
 						attributeZonalList[i]->maxThresholds[0] = this->maxThreshAllVal;
-                        
+
                         // If using band names get names from image
                         if(this->useBandNames)
                         {
                             std::string bandName = inputImageDS->GetRasterBand(i+1)->GetDescription();
-                            
+
                             // Replace spaces and parentheses in file name
                             boost::algorithm::replace_all(bandName, " ", "_");
                             boost::algorithm::replace_all(bandName, "(", "_");
@@ -3507,7 +3506,7 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
                             boost::algorithm::replace_all(bandName, ">", "gt");
                             boost::algorithm::replace_all(bandName, "<", "lt");
                             boost::algorithm::replace_all(bandName, "=", "eq");
-                            
+
                             /* Check if band name us longer than maximum length for shapefile field name
                              No limit on CSV but makes management easier with shorter names */
                             if(bandName.length() > 7)
@@ -3523,16 +3522,16 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
                             }
                             else{attributeZonalList[i]->name = bandName;}
                         }
-                        
+
                         else
                         {
                             attributeZonalList[i]->name = std::string("b") + mathsUtil.inttostring(i+1);
                         }
-						
+
 					}
 				}
-				
-				if (useRasPoly) 
+
+				if (useRasPoly)
 				{
 					/////////////////////////////////////
 					//
@@ -3545,10 +3544,10 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 						string message = string("Could not open image ") + this->inputRasPolys;
 						throw RSGISException(message.c_str());
 					}
-                    
+
                     cout << "Using raster for point in polygon...\n";
 				}
-				
+
 				/////////////////////////////////////
 				//
 				// Open Input Shapfile.
@@ -3566,25 +3565,25 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 					string message = string("Could not open vector layer ") + SHPFileInLayer;
 					throw RSGISException(message.c_str());
 				}
-				
+
 				inputSpatialRef = inputSHPLayer->GetSpatialRef();
-                
+
                 // Check the projection is the same for shapefile and image
                 if(!this->ignoreProjection)
                 {
                     const char *pszWKTImg = inputImageDS->GetProjectionRef();
                     char **pszWKTShp = new char*[1];
                     inputSpatialRef->exportToWkt(pszWKTShp);
-                    
+
                     if((string(pszWKTImg) != string(pszWKTShp[0])))
                     {
                         cerr << "WARNING: Shapefile and image are not the same projection!\n\tImage is: " + string(pszWKTImg) + "\n\tShapefile is: " + string(pszWKTShp[0]) << "\n...Continuing anyway" << endl;
                     }
                     OGRFree(pszWKTShp);
                 }
-                
+
 				if(!this->outputToText)
-				{					
+				{
 					/////////////////////////////////////
 					//
 					// Create Output Shapfile.
@@ -3610,34 +3609,34 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 					}
 
 				}
-					
+
 				if(useRasPoly)
 				{
 					processFeature = new RSGISZonalStats(inputImageDS, inputRasterFeaturesDS, attributeZonalList, numAttributes, pxlcount, this->outputTextFile);
 					processVector = new RSGISProcessVector(processFeature);
 				}
-				else 
+				else
 				{
 					processFeature = new RSGISZonalStatsPoly(inputImageDS, attributeZonalList, numAttributes, pxlcount, method, this->outputTextFile);
 					processVector = new RSGISProcessVector(processFeature);
 				}
-				if (this->outputToText) 
+				if (this->outputToText)
 				{
 					processVector->processVectorsNoOutput(inputSHPLayer, true);
 				}
-				else 
+				else
 				{
 					processVector->processVectors(inputSHPLayer, outputSHPLayer, this->copyAttributes, true, false);
 				}
 
-				
+
 				// TIDY
 				GDALClose(inputImageDS); // Close input image
 				cout << "Image closed OK" << endl;
 				if(useRasPoly) {GDALClose(inputRasterFeaturesDS);} // Close rasterised poly (if using)
 				OGRDataSource::DestroyDataSource(inputSHPDS); // Close inputshape
 				cout << "in shp closed OK" << endl;
-				if (!this->outputToText) 
+				if (!this->outputToText)
 				{
 					OGRDataSource::DestroyDataSource(outputSHPDS); // Close output shape
 					cout << "out shp closed OK" << endl;
@@ -3650,14 +3649,14 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 					delete attributeZonalList[i];
 				}
 				delete[] attributeZonalList;
-				
+
 				delete processVector;
 				delete processFeature;
-				
+
 				//OGRCleanupAll();
-				GDALDestroyDriverManager();
+				//GDALDestroyDriverManager();
 			}
-			catch (RSGISException& e) 
+			catch (RSGISException& e)
 			{
 				throw e;
 			}
@@ -3669,19 +3668,19 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 			cout << "Input Vector: " << this->inputVecPolys << endl;
 			if (useRasPoly) {cout << "Input Raster Polygons: " << this->inputRasPolys << endl;}
 			cout << "Output Vector : " << this->outputVecPolys << endl;
-			
+
 			GDALAllRegister();
 			OGRRegisterAll();
-			
+
 			RSGISFileUtils fileUtils;
 			RSGISVectorUtils vecUtils;
-			
+
 			RSGISProcessVector *processVector = NULL;
 			RSGISProcessOGRFeature *processFeature = NULL;
-			
+
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVecPolys);
 			string SHPFileOutLayer = vecUtils.getLayerName(this->outputVecPolys);
-			
+
 			GDALDataset *inputImageDS = NULL;
 			GDALDataset *inputRasterFeaturesDS = NULL;
 			OGRDataSource *inputSHPDS = NULL;
@@ -3690,13 +3689,13 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 			OGRDataSource *outputSHPDS = NULL;
 			OGRLayer *outputSHPLayer = NULL;
 			OGRSpatialReference* inputSpatialRef = NULL;
-			
+
 			string outputDIR = "";
-			
+
 			try
 			{
 				outputDIR = fileUtils.getFileDirectoryPath(this->outputVecPolys);
-				
+
 				// Check is output shapefile exists
 				if(vecUtils.checkDIR4SHP(outputDIR, SHPFileOutLayer))
 				{
@@ -3709,14 +3708,14 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 						throw RSGISException("Shapefile already exists, either delete or select force.");
 					}
 				}
-				
+
 				inputImageDS = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_ReadOnly);
 				if(inputImageDS == NULL)
 				{
 					string message = string("Could not open image ") + this->inputImage;
 					throw RSGISException(message.c_str());
 				}
-				if (useRasPoly) 
+				if (useRasPoly)
 				{
 					inputRasterFeaturesDS = (GDALDataset *) GDALOpen(this->inputRasPolys.c_str(), GA_ReadOnly);
 					if(inputRasterFeaturesDS == NULL)
@@ -3725,7 +3724,7 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 						throw RSGISException(message.c_str());
 					}
 				}
-				
+
 				/////////////////////////////////////
 				//
 				// Open Input Shapfile.
@@ -3743,23 +3742,23 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 					string message = string("Could not open vector layer ") + SHPFileInLayer;
 					throw RSGISException(message.c_str());
 				}
-				
+
 				inputSpatialRef = inputSHPLayer->GetSpatialRef();
-                
+
                 // Check the projection is the same for shapefile and image
                 if(!this->ignoreProjection)
                 {
                     const char *pszWKTImg = inputImageDS->GetProjectionRef();
                     char **pszWKTShp = new char*[1];
                     inputSpatialRef->exportToWkt(pszWKTShp);
-                    
+
                     if((string(pszWKTImg) != string(pszWKTShp[0])))
                     {
                         cerr << "WARNING: Shapefile and image are not the same projection!\n\tImage is: " + string(pszWKTImg) + "\n\tShapefile is: " + string(pszWKTShp[0]) << "\n...Continuing anyway" << endl;
                     }
                     OGRFree(pszWKTShp);
                 }
-				
+
 				/////////////////////////////////////
 				//
 				// Create Output Shapfile.
@@ -3788,20 +3787,20 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 					processFeature = new RSGISZonalMeanStats(inputImageDS, inputRasterFeaturesDS, attributeMeanList, numAttributes, pxlcount);
 					processVector = new RSGISProcessVector(processFeature);
 				}
-				else 
+				else
 				{
 					processFeature = new RSGISZonalMeanStatsPoly(inputImageDS, attributeMeanList, numAttributes, pxlcount, method, this->dB);
 					processVector = new RSGISProcessVector(processFeature);
 				}
-				
+
 				processVector->processVectors(inputSHPLayer, outputSHPLayer, true, true, false);
-				
+
 				// TIDY
 				GDALClose(inputImageDS); // Close input image
 				if(useRasPoly) {GDALClose(inputRasterFeaturesDS);} // Close rasterised poly (if using)
 				OGRDataSource::DestroyDataSource(inputSHPDS); // Close inputshape
 				OGRDataSource::DestroyDataSource(outputSHPDS); // Close output shape
-				
+
 				for(int i = 0; i < numAttributes; i++)
 				{
 					delete[] attributeMeanList[i]->bands;
@@ -3810,14 +3809,14 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 					delete attributeMeanList[i];
 				}
 				delete[] attributeMeanList;
-				
+
 				delete processVector;
 				delete processFeature;
-				
+
 				//OGRCleanupAll();
-				GDALDestroyDriverManager();
+				//GDALDestroyDriverManager();
 			}
-			catch (RSGISException& e) 
+			catch (RSGISException& e)
 			{
 				throw e;
 			}
@@ -3828,19 +3827,19 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 			cout << "Input Image: " << this->inputImage << endl;
 			cout << "Input Vector: " << this->inputVecPolys << endl;
 			cout << "Output Vector : " << this->outputVecPolys << endl;
-			
+
 			GDALAllRegister();
 			OGRRegisterAll();
-			
+
 			RSGISFileUtils fileUtils;
 			RSGISVectorUtils vecUtils;
-			
+
 			RSGISProcessVector *processVector = NULL;
 			RSGISProcessOGRFeature *processFeature = NULL;
-			
+
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVecPolys);
 			string SHPFileOutLayer = vecUtils.getLayerName(this->outputVecPolys);
-			
+
 			GDALDataset *inputImageDS = NULL;
 			OGRDataSource *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
@@ -3848,13 +3847,13 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 			OGRDataSource *outputSHPDS = NULL;
 			OGRLayer *outputSHPLayer = NULL;
 			OGRSpatialReference* inputSpatialRef = NULL;
-			
+
 			string outputDIR = "";
-			
+
 			try
 			{
 				outputDIR = fileUtils.getFileDirectoryPath(this->outputVecPolys);
-				
+
 				// Check is output shapefile exists
 				if(vecUtils.checkDIR4SHP(outputDIR, SHPFileOutLayer))
 				{
@@ -3867,14 +3866,14 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 						throw RSGISException("Shapefile already exists, either delete or select force.");
 					}
 				}
-				
+
 				inputImageDS = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_ReadOnly);
 				if(inputImageDS == NULL)
 				{
 					string message = string("Could not open image ") + this->inputImage;
 					throw RSGISException(message.c_str());
 				}
-				
+
 				/////////////////////////////////////
 				//
 				// Open Input Shapfile.
@@ -3892,23 +3891,23 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 					string message = string("Could not open vector layer ") + SHPFileInLayer;
 					throw RSGISException(message.c_str());
 				}
-				
+
                 inputSpatialRef = inputSHPLayer->GetSpatialRef();
-                
+
                 // Check the projection is the same for shapefile and image
                 if(!this->ignoreProjection)
                 {
                     const char *pszWKTImg = inputImageDS->GetProjectionRef();
                     char **pszWKTShp = new char*[1];
                     inputSpatialRef->exportToWkt(pszWKTShp);
-                    
+
                     if((string(pszWKTImg) != string(pszWKTShp[0])))
                     {
                         cerr << "WARNING: Shapefile and image are not the same projection!\n\tImage is: " + string(pszWKTImg) + "\n\tShapefile is: " + string(pszWKTShp[0]) << "\n...Continuing anyway" << endl;
                     }
                     OGRFree(pszWKTShp);
                 }
-				
+
 				/////////////////////////////////////
 				//
 				// Create Output Shapfile.
@@ -3932,18 +3931,18 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 					string message = string("Could not create vector layer ") + SHPFileOutLayer;
 					throw RSGISException(message.c_str());
 				}
-				
+
 				processFeature = new RSGISZonalWeightedMeanStatsPoly(inputImageDS, attributeMeanList, numAttributes, pxlcount);
 				processVector = new RSGISProcessVector(processFeature);
-				
-				
+
+
 				processVector->processVectors(inputSHPLayer, outputSHPLayer, true, true, false);
-				
+
 				// TIDY
 				GDALClose(inputImageDS); // Close input image
 				OGRDataSource::DestroyDataSource(inputSHPDS); // Close inputshape
 				OGRDataSource::DestroyDataSource(outputSHPDS); // Close output shape
-				
+
 				for(int i = 0; i < numAttributes; i++)
 				{
 					delete[] attributeMeanList[i]->bands;
@@ -3952,14 +3951,14 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 					delete attributeMeanList[i];
 				}
 				delete[] attributeMeanList;
-				
+
 				delete processVector;
 				delete processFeature;
-				
+
 				//OGRCleanupAll();
-				GDALDestroyDriverManager();
+				//GDALDestroyDriverManager();
 			}
-			catch (RSGISException& e) 
+			catch (RSGISException& e)
 			{
 				throw e;
 			}
@@ -3970,19 +3969,19 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 			cout << "Input Image: " << this->inputImage << endl;
 			cout << "Input Vector: " << this->inputVecPolys << endl;
 			cout << "Output Vector : " << this->outputVecPolys << endl;
-			
+
 			GDALAllRegister();
 			OGRRegisterAll();
-			
+
 			RSGISFileUtils fileUtils;
 			RSGISVectorUtils vecUtils;
-			
+
 			RSGISProcessVector *processVector = NULL;
 			RSGISProcessOGRFeature *processFeature = NULL;
-			
+
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVecPolys);
 			string SHPFileOutLayer = vecUtils.getLayerName(this->outputVecPolys);
-			
+
 			GDALDataset *inputImageDS = NULL;
 			OGRDataSource *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
@@ -3990,13 +3989,13 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 			OGRDataSource *outputSHPDS = NULL;
 			OGRLayer *outputSHPLayer = NULL;
 			OGRSpatialReference* inputSpatialRef = NULL;
-			
+
 			string outputDIR = "";
-			
+
 			try
 			{
 				outputDIR = fileUtils.getFileDirectoryPath(this->outputVecPolys);
-				
+
 				// Check is output shapefile exists
 				if(vecUtils.checkDIR4SHP(outputDIR, SHPFileOutLayer))
 				{
@@ -4009,14 +4008,14 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 						throw RSGISException("Shapefile already exists, either delete or select force.");
 					}
 				}
-				
+
 				inputImageDS = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_ReadOnly);
 				if(inputImageDS == NULL)
 				{
 					string message = string("Could not open image ") + this->inputImage;
 					throw RSGISException(message.c_str());
 				}
-				
+
 				/////////////////////////////////////
 				//
 				// Open Input Shapfile.
@@ -4034,23 +4033,23 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 					string message = string("Could not open vector layer ") + SHPFileInLayer;
 					throw RSGISException(message.c_str());
 				}
-				
+
                 inputSpatialRef = inputSHPLayer->GetSpatialRef();
-                
+
                 // Check the projection is the same for shapefile and image
                 if(!this->ignoreProjection)
                 {
                     const char *pszWKTImg = inputImageDS->GetProjectionRef();
                     char **pszWKTShp = new char*[1];
                     inputSpatialRef->exportToWkt(pszWKTShp);
-                    
+
                     if((string(pszWKTImg) != string(pszWKTShp[0])))
                     {
                         cerr << "WARNING: Shapefile and image are not the same projection!\n\tImage is: " + string(pszWKTImg) + "\n\tShapefile is: " + string(pszWKTShp[0]) << "\n...Continuing anyway" << endl;
                     }
                     OGRFree(pszWKTShp);
                 }
-				
+
 				/////////////////////////////////////
 				//
 				// Create Output Shapfile.
@@ -4074,28 +4073,28 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 					string message = string("Could not create vector layer ") + SHPFileOutLayer;
 					throw RSGISException(message.c_str());
 				}
-				
-				if (usePixelSize) 
+
+				if (usePixelSize)
 				{
 					double *transformations = new double[6];
 					inputImageDS[0].GetGeoTransform(transformations);
-					
-					// Get pixel size			
+
+					// Get pixel size
 					this->offsetSize = transformations[1];
 					delete transformations;
 				}
-				
+
 				processFeature = new RSGISZonalLSSMeanVar(inputImageDS, attributeMeanList, numAttributes, pxlcount, windowSize, offsetSize, method);
 				processVector = new RSGISProcessVector(processFeature);
-				
-				
+
+
 				processVector->processVectors(inputSHPLayer, outputSHPLayer, true, true, false);
-				
+
 				// TIDY
 				GDALClose(inputImageDS); // Close input image
 				OGRDataSource::DestroyDataSource(inputSHPDS); // Close inputshape
 				OGRDataSource::DestroyDataSource(outputSHPDS); // Close output shape
-				
+
 				for(int i = 0; i < numAttributes; i++)
 				{
 					delete[] attributeMeanList[i]->bands;
@@ -4104,14 +4103,14 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 					delete attributeMeanList[i];
 				}
 				delete[] attributeMeanList;
-				
+
 				delete processVector;
 				delete processFeature;
-				
+
 				//OGRCleanupAll();
-				GDALDestroyDriverManager();
+				//GDALDestroyDriverManager();
 			}
-			catch (RSGISException& e) 
+			catch (RSGISException& e)
 			{
 				throw e;
 			}
@@ -4125,16 +4124,16 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 			cout << "Input Raster Polygons: " << this->inputRasPolys << endl;
 			cout << "Output Vector : " << this->outputVecPolys << endl;
 			cout << "Histogram bin size: " << this->binsize << endl;
-			
+
 			GDALAllRegister();
 			OGRRegisterAll();
-			
+
 			RSGISFileUtils fileUtils;
 			RSGISVectorUtils vecUtils;
-			
+
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVecPolys);
 			string SHPFileOutLayer = vecUtils.getLayerName(this->outputVecPolys);
-			
+
 			GDALDataset *inputImageDS = NULL;
 			GDALDataset *inputRasterFeaturesDS = NULL;
 			OGRDataSource *inputSHPDS = NULL;
@@ -4143,17 +4142,17 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 			OGRDataSource *outputSHPDS = NULL;
 			OGRLayer *outputSHPLayer = NULL;
 			OGRSpatialReference* inputSpatialRef = NULL;
-			
+
 			string outputDIR = "";
 			int numInImgBands = 0;
-			
+
 			RSGISProcessVector *processVector = NULL;
 			RSGISProcessOGRFeature *processFeature = NULL;
-			
+
 			try
 			{
 				outputDIR = fileUtils.getFileDirectoryPath(this->outputVecPolys);
-				
+
 				if(vecUtils.checkDIR4SHP(outputDIR, SHPFileOutLayer))
 				{
 					if(this->force)
@@ -4165,7 +4164,7 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 						throw RSGISException("Shapefile already exists, either delete or select force.");
 					}
 				}
-				
+
 				inputImageDS = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_ReadOnly);
 				if(inputImageDS == NULL)
 				{
@@ -4173,14 +4172,14 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 					throw RSGISException(message.c_str());
 				}
 				numInImgBands = inputImageDS->GetRasterCount();
-				
+
 				inputRasterFeaturesDS = (GDALDataset *) GDALOpen(this->inputRasPolys.c_str(), GA_ReadOnly);
 				if(inputRasterFeaturesDS == NULL)
 				{
 					string message = string("Could not open image ") + this->inputRasPolys;
 					throw RSGISException(message.c_str());
 				}
-				
+
 				/////////////////////////////////////
 				//
 				// Open Input Shapfile.
@@ -4198,9 +4197,9 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 					string message = string("Could not open vector layer ") + SHPFileInLayer;
 					throw RSGISException(message.c_str());
 				}
-				
+
 				inputSpatialRef = inputSHPLayer->GetSpatialRef();
-				
+
 				/////////////////////////////////////
 				//
 				// Create Output Shapfile.
@@ -4224,31 +4223,31 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 					string message = string("Could not create vector layer ") + SHPFileOutLayer;
 					throw RSGISException(message.c_str());
 				}
-				
+
 				processFeature = new RSGISFuzzyZonalStats(inputImageDS, inputRasterFeaturesDS, attributeFuzzyList, numAttributes, binsize, threshold, pxlcount, classAttribute);
 				processVector = new RSGISProcessVector(processFeature);
-				
+
 				processVector->processVectors(inputSHPLayer, outputSHPLayer, true, true, false);
-				
+
 				GDALClose(inputImageDS);
 				GDALClose(inputRasterFeaturesDS);
 				OGRDataSource::DestroyDataSource(inputSHPDS);
 				OGRDataSource::DestroyDataSource(outputSHPDS);
-				
+
 				delete processVector;
 				delete processFeature;
-				
+
 				for(int i = 0; i < numAttributes; i++)
 				{
 					delete[] attributeFuzzyList[i]->bands;
 					delete attributeFuzzyList[i];
 				}
 				delete[] attributeFuzzyList;
-				
+
 				//OGRCleanupAll();
-				GDALDestroyDriverManager();
+				//GDALDestroyDriverManager();
 			}
-			catch (RSGISException& e) 
+			catch (RSGISException& e)
 			{
 				throw e;
 			}
@@ -4261,19 +4260,19 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 			cout << "Input Raster Polygons: " << this->inputRasPolys << endl;
 			cout << "Output Vector : " << this->outputVecPolys << endl;
 			cout << "Number of Top elements: " << this->nTop << endl;
-			
+
 			GDALAllRegister();
 			OGRRegisterAll();
-			
+
 			RSGISFileUtils fileUtils;
 			RSGISVectorUtils vecUtils;
-			
+
 			RSGISProcessVector *processVector = NULL;
 			RSGISProcessOGRFeature *processFeature = NULL;
-			
+
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVecPolys);
 			string SHPFileOutLayer = vecUtils.getLayerName(this->outputVecPolys);
-			
+
 			GDALDataset *inputImageDS = NULL;
 			GDALDataset *inputRasterFeaturesDS = NULL;
 			OGRDataSource *inputSHPDS = NULL;
@@ -4282,13 +4281,13 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 			OGRDataSource *outputSHPDS = NULL;
 			OGRLayer *outputSHPLayer = NULL;
 			OGRSpatialReference* inputSpatialRef = NULL;
-			
+
 			string outputDIR = "";
-			
+
 			try
 			{
 				outputDIR = fileUtils.getFileDirectoryPath(this->outputVecPolys);
-				
+
 				if(vecUtils.checkDIR4SHP(outputDIR, SHPFileOutLayer))
 				{
 					if(this->force)
@@ -4300,21 +4299,21 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 						throw RSGISException("Shapefile already exists, either delete or select force.");
 					}
 				}
-				
+
 				inputImageDS = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_ReadOnly);
 				if(inputImageDS == NULL)
 				{
 					string message = string("Could not open image ") + this->inputImage;
 					throw RSGISException(message.c_str());
 				}
-				
+
 				inputRasterFeaturesDS = (GDALDataset *) GDALOpen(this->inputRasPolys.c_str(), GA_ReadOnly);
 				if(inputRasterFeaturesDS == NULL)
 				{
 					string message = string("Could not open image ") + this->inputRasPolys;
 					throw RSGISException(message.c_str());
 				}
-				
+
 				/////////////////////////////////////
 				//
 				// Open Input Shapfile.
@@ -4332,9 +4331,9 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 					string message = string("Could not open vector layer ") + SHPFileInLayer;
 					throw RSGISException(message.c_str());
 				}
-				
+
 				inputSpatialRef = inputSHPLayer->GetSpatialRef();
-				
+
 				/////////////////////////////////////
 				//
 				// Create Output Shapfile.
@@ -4358,24 +4357,24 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 					string message = string("Could not create vector layer ") + SHPFileOutLayer;
 					throw RSGISException(message.c_str());
 				}
-				
+
 				processFeature = new RSGISPopulateTopPowerSet(inputImageDS, inputRasterFeaturesDS, attributeCountList, numAttributes, nTop);
 				processVector = new RSGISProcessVector(processFeature);
-				
+
 				processVector->processVectors(inputSHPLayer, outputSHPLayer, true, true, false);
-				
+
 				GDALClose(inputImageDS);
 				GDALClose(inputRasterFeaturesDS);
 				OGRDataSource::DestroyDataSource(inputSHPDS);
 				OGRDataSource::DestroyDataSource(outputSHPDS);
-				
+
 				delete processVector;
 				delete processFeature;
-				
+
 				//OGRCleanupAll();
-				GDALDestroyDriverManager();
+				//GDALDestroyDriverManager();
 			}
-			catch (RSGISException& e) 
+			catch (RSGISException& e)
 			{
 				throw e;
 			}
@@ -4388,25 +4387,25 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 			if (this->outputToText)
 			{
 				cout << "Output CSV : " << this->outputTextFile << endl;
-				
+
 			}
 			else
 			{
 				cout << "Output Vector : " << this->outputVecPolys << endl;
 			}
-			
+
 			GDALAllRegister();
 			OGRRegisterAll();
-			
+
 			RSGISFileUtils fileUtils;
 			RSGISVectorUtils vecUtils;
-			
+
 			RSGISProcessVector *processVector = NULL;
 			RSGISProcessOGRFeature *processFeature = NULL;
-			
+
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVecPolys);
             string SHPFileOutLayer = "";
-			
+
 			GDALDataset *inputImageDS = NULL;
 			OGRDataSource *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
@@ -4414,16 +4413,16 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 			OGRDataSource *outputSHPDS = NULL;
 			OGRLayer *outputSHPLayer = NULL;
 			OGRSpatialReference* inputSpatialRef = NULL;
-			
+
 			string outputDIR = "";
-			
+
 			try
 			{
 				if (!this->outputToText)
                 {
                     SHPFileOutLayer = vecUtils.getLayerName(this->outputVecPolys);
                     outputDIR = fileUtils.getFileDirectoryPath(this->outputVecPolys);
-                    
+
                     if(vecUtils.checkDIR4SHP(outputDIR, SHPFileOutLayer))
                     {
                         if(this->force)
@@ -4436,7 +4435,7 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
                         }
                     }
                 }
-				
+
 				/////////////////////////////////////
 				//
 				// Open Input Image.
@@ -4448,7 +4447,7 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 					string message = string("Could not open image ") + this->inputImage;
 					throw RSGISException(message.c_str());
 				}
-				
+
 				/////////////////////////////////////
 				//
 				// Open Input Shapfile.
@@ -4466,13 +4465,13 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 					string message = string("Could not open vector layer ") + SHPFileInLayer;
 					throw RSGISException(message.c_str());
 				}
-				
+
 				inputSpatialRef = inputSHPLayer->GetSpatialRef();
-				
+
 				OGRFeature *feature = inputSHPLayer->GetFeature(1);
 				OGRwkbGeometryType geometryType = feature->GetGeometryRef()->getGeometryType();
 				OGRFeature::DestroyFeature(feature);
-				
+
 				/////////////////////////////////////
 				//
 				// Create Output Shapfile.
@@ -4498,40 +4497,40 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
                         string message = string("Could not create vector layer ") + SHPFileOutLayer;
                         throw RSGISException(message.c_str());
                     }
-                    
+
                     processFeature = new RSGISVectorZonalStats(inputImageDS,"",this->useBandNames);
                     processVector = new RSGISProcessVector(processFeature);
-                    
+
                     processVector->processVectors(inputSHPLayer, outputSHPLayer, true, true, false);
                     OGRDataSource::DestroyDataSource(outputSHPDS);
-                    
+
                     delete processVector;
                     delete processFeature;
 				}
                 else
                 {
-                    
+
                     processFeature = new RSGISVectorZonalStats(inputImageDS, this->outputTextFile,this->useBandNames);
                     processVector = new RSGISProcessVector(processFeature);
-                    
+
                     processVector->processVectorsNoOutput(inputSHPLayer, true);
-                    
+
                     delete processVector;
                     delete processFeature;
-                    
+
                 }
 				GDALClose(inputImageDS);
 				OGRDataSource::DestroyDataSource(inputSHPDS);
-				
+
 				//OGRCleanupAll();
-				GDALDestroyDriverManager();
+				//GDALDestroyDriverManager();
 			}
-			catch (RSGISException& e) 
+			catch (RSGISException& e)
 			{
 				throw e;
 			}
-			
-			
+
+
 		}
         else if(this->option == RSGISExeZonalStats::endmembers)
 		{
@@ -4539,21 +4538,21 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 			cout << "Input Image: " << this->inputImage << endl;
 			cout << "Input Vector: " << this->inputVecPolys << endl;
 			cout << "Output Matrix : " << this->outputMatrix << endl;
-            
+
             GDALAllRegister();
 			OGRRegisterAll();
-			
+
 			RSGISVectorUtils vecUtils;
-			
+
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVecPolys);
-			
+
 			GDALDataset *inputImageDS = NULL;
 			OGRDataSource *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
 
-			
+
 			string outputDIR = "";
-			
+
 			try
 			{
 				/////////////////////////////////////
@@ -4567,7 +4566,7 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 					string message = string("Could not open image ") + this->inputImage;
 					throw RSGISException(message.c_str());
 				}
-				
+
 				/////////////////////////////////////
 				//
 				// Open Input Shapfile.
@@ -4585,18 +4584,18 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 					string message = string("Could not open vector layer ") + SHPFileInLayer;
 					throw RSGISException(message.c_str());
 				}
-				
+
                 RSGISExtractEndMembers2Matrix extractEndMembers;
                 extractEndMembers.extractColumnPerPolygon2Matrix(inputImageDS, inputSHPLayer, this->outputMatrix, this->method);
-				
+
 				GDALClose(inputImageDS);
 				OGRDataSource::DestroyDataSource(inputSHPDS);
 
-				
+
 				//OGRCleanupAll();
-				GDALDestroyDriverManager();
+				//GDALDestroyDriverManager();
 			}
-			catch (RSGISException& e) 
+			catch (RSGISException& e)
 			{
 				throw e;
 			}
@@ -4627,7 +4626,7 @@ void RSGISExeZonalStats::printParameters()
 			{
 				cout << "no\n";
 			}
-			
+
 			cout << "Min: ";
 			if(min)
 			{
@@ -4637,7 +4636,7 @@ void RSGISExeZonalStats::printParameters()
 			{
 				cout << "no\n";
 			}
-			
+
 			cout << "Max: ";
 			if(max)
 			{
@@ -4647,7 +4646,7 @@ void RSGISExeZonalStats::printParameters()
 			{
 				cout << "no\n";
 			}
-			
+
 			cout << "Standard deviation: ";
 			if(stddev)
 			{
@@ -4674,7 +4673,7 @@ void RSGISExeZonalStats::printParameters()
 			{
 				cout << "no\n";
 			}
-			
+
 			cout << "Min: ";
 			if(min)
 			{
@@ -4684,7 +4683,7 @@ void RSGISExeZonalStats::printParameters()
 			{
 				cout << "no\n";
 			}
-			
+
 			cout << "Max: ";
 			if(max)
 			{
@@ -4694,7 +4693,7 @@ void RSGISExeZonalStats::printParameters()
 			{
 				cout << "no\n";
 			}
-			
+
 			cout << "Standard deviation: ";
 			if(stddev)
 			{
@@ -4721,7 +4720,7 @@ void RSGISExeZonalStats::printParameters()
 			{
 				cout << "no\n";
 			}
-			
+
 			cout << "Min: ";
 			if(min)
 			{
@@ -4731,7 +4730,7 @@ void RSGISExeZonalStats::printParameters()
 			{
 				cout << "no\n";
 			}
-			
+
 			cout << "Max: ";
 			if(max)
 			{
@@ -4741,7 +4740,7 @@ void RSGISExeZonalStats::printParameters()
 			{
 				cout << "no\n";
 			}
-			
+
 			cout << "Standard deviation: ";
 			if(stddev)
 			{
@@ -4797,7 +4796,7 @@ void RSGISExeZonalStats::printParameters()
 			{
 				cout << "The empty set will be outputted.\n";
 			}
-			
+
 			cout << numAttributes << " attributes are to be summarised\n";
 			for(int i = 0; i < numAttributes; i++)
 			{
@@ -4831,7 +4830,7 @@ void RSGISExeZonalStats::printParameters()
 			{
 				cout << "A pixel count will be outputted\n";
 			}
-			
+
 			cout << numAttributes << " attributes are to be summarised\n";
 			for(int i = 0; i < numAttributes; i++)
 			{
@@ -4864,7 +4863,7 @@ void RSGISExeZonalStats::printParameters()
 			{
 				cout << "A pixel count will be outputted\n";
 			}
-			
+
 			cout << numAttributes << " attributes are to be summarised\n";
 			for(int i = 0; i < numAttributes; i++)
 			{
@@ -4904,7 +4903,7 @@ void RSGISExeZonalStats::printParameters()
 			{
 				cout << "The empty set will be outputted.\n";
 			}
-			
+
 			cout << numAttributes << " attributes are to be summarised\n";
 			for(int i = 0; i < numAttributes; i++)
 			{
@@ -4921,7 +4920,7 @@ void RSGISExeZonalStats::printParameters()
 					}
 				}
 				cout << "]\n";
-			}			
+			}
 		}
 		else if(this->option == RSGISExeZonalStats::powersetcount)
 		{
@@ -4931,12 +4930,12 @@ void RSGISExeZonalStats::printParameters()
 			cout << "Input Raster Polygons: " << this->inputRasPolys << endl;
 			cout << "Output Vector : " << this->outputVecPolys << endl;
 			cout << "n top attributes: " << this->nTop << endl;
-			
+
 			if(this->force)
 			{
 				cout << "If output shapefile is present then it will be deleted\n";
 			}
-			
+
 			cout << numAttributes << " attributes are to be summarised\n";
 			for(int i = 0; i < numAttributes; i++)
 			{
@@ -4953,7 +4952,7 @@ void RSGISExeZonalStats::printParameters()
 					}
 				}
 				cout << "]\n";
-			}	
+			}
 		}
 		else if(this->option == RSGISExeZonalStats::pointvalue)
 		{
@@ -5068,7 +5067,7 @@ string RSGISExeZonalStats::getXMLSchema()
 
 RSGISExeZonalStats::~RSGISExeZonalStats()
 {
-	
+
 }
 
 }
