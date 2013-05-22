@@ -166,7 +166,7 @@ namespace rsgis{namespace img{
 			delete[] imgTransform;
 		}
 		GDALClose(outputDataset);
-        GDALDestroyDriverManager();
+        //GDALDestroyDriverManager();
 	}
 
 	void RSGISImageMosaic::mosaicSkipVals(std::string *inputImages, int numDS, std::string outputImage, float background, float skipVal, bool projFromImage, std::string proj, unsigned int skipBand, unsigned int overlapBehaviour, std::string format, GDALDataType imgDataType) throw(RSGISImageException)
@@ -363,7 +363,7 @@ namespace rsgis{namespace img{
 		}
 		delete[] imgData;
 		GDALClose(outputDataset);
-        GDALDestroyDriverManager();
+        //GDALDestroyDriverManager();
 	}
 
 	void RSGISImageMosaic::mosaicSkipThreash(std::string *inputImages, int numDS, std::string outputImage, float background, float skipLowerThreash, float skipUpperThreash, bool projFromImage, std::string proj, unsigned int threashBand, unsigned int overlapBehaviour, std::string format, GDALDataType imgDataType) throw(RSGISImageException)
@@ -560,7 +560,7 @@ namespace rsgis{namespace img{
 		}
 		delete[] imgData;
 		GDALClose(outputDataset);
-        GDALDestroyDriverManager();
+        //GDALDestroyDriverManager();
 	}
 
 	void RSGISImageMosaic::includeDatasets(GDALDataset *baseImage, std::string *inputImages, int numDS, std::vector<int> bands, bool bandsDefined) throw(RSGISImageException)
