@@ -4,7 +4,7 @@
  *
  *  Created by Pete Bunting on 07/11/2008.
  *  Copyright 2008 RSGISLib.
- * 
+ *
  *  RSGISLib is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -22,18 +22,18 @@
  *  Modified by Dan Clewley on 21/11/2010
  *  Added 'mosaicSkipVals' and 'mosaicSkipThreash'
  *  to skip values in input image
- * 
+ *
  */
 
 #include "RSGISImageMosaic.h"
 
 namespace rsgis{namespace img{
-	
+
 	RSGISImageMosaic::RSGISImageMosaic()
 	{
-		
+
 	}
-	
+
 	void RSGISImageMosaic::mosaic(std::string *inputImages, int numDS, std::string outputImage, float background, bool projFromImage, std::string proj, std::string format, GDALDataType imgDataType) throw(RSGISImageException)
 	{
 		RSGISImageUtils imgUtils;
@@ -56,9 +56,9 @@ namespace rsgis{namespace img{
 		GDALRasterBand *inputBand = NULL;
 		GDALRasterBand *outputBand = NULL;
 		float *imgData = NULL;
-		
+
         std::vector<std::string> bandnames;
-        
+
 		try
 		{
 			for(int i = 0; i < numDS; i++)
@@ -92,39 +92,39 @@ namespace rsgis{namespace img{
 				}
                 GDALClose(dataset);
 			}
-            
+
 			imgUtils.getImagesExtent(inputImages, numDS, &width, &height, transformation);
-			
+
 			std::cout << "Create new image [" << width << "," << height << "] with projection: \n" << projection << std::endl;
-			
+
 			outputDataset = imgUtils.createBlankImage(outputImage, transformation, width, height, numberBands, projection, background, bandnames, format, imgDataType);
-			
+
 			// COPY IMAGE DATA INTO THE BLANK IMAGE
-			
+
 			std::cout << "Started (total " << numDS << ") ." << std::flush;
-			
+
 			for(int i = 0; i < numDS; i++)
 			{
 				std::cout << "." << i+1 << "." << std::flush;
-                
+
                 dataset = (GDALDataset *) GDALOpenShared(inputImages[i].c_str(), GA_ReadOnly);
                 if(dataset == NULL)
                 {
                     std::string message = std::string("Could not open image ") + inputImages[i];
                     throw RSGISImageException(message.c_str());
                 }
-                
+
 				dataset->GetGeoTransform(imgTransform);
 				tileXSize = dataset->GetRasterXSize();
 				tileYSize = dataset->GetRasterYSize();
-				
+
 				xDiff = imgTransform[0] - transformation[0];
 				yDiff = transformation[3] - imgTransform[3];
-				
+
 				xStart = floor(xDiff/transformation[1]);
 				yStart = floor(yDiff/transformation[1]);
 				imgData = (float *) CPLMalloc(sizeof(float)*tileXSize);
-				
+
 				for(int n = 1; n <= numberBands; n++)
 				{
 					inputBand = dataset->GetRasterBand(n);
@@ -156,7 +156,7 @@ namespace rsgis{namespace img{
 			}
 			throw e;
 		}
-		
+
 		if(transformation != NULL)
 		{
 			delete[] transformation;
@@ -168,8 +168,8 @@ namespace rsgis{namespace img{
 		GDALClose(outputDataset);
         GDALDestroyDriverManager();
 	}
-	
-	void RSGISImageMosaic::mosaicSkipVals(std::string *inputImages, int numDS, std::string outputImage, float background, float skipVal, bool projFromImage, std::string proj, unsigned int skipBand, std::string format, GDALDataType imgDataType) throw(RSGISImageException)
+
+	void RSGISImageMosaic::mosaicSkipVals(std::string *inputImages, int numDS, std::string outputImage, float background, float skipVal, bool projFromImage, std::string proj, unsigned int skipBand, unsigned int overlapBehaviour, std::string format, GDALDataType imgDataType) throw(RSGISImageException)
 	{
 		RSGISImageUtils imgUtils;
         GDALAllRegister();
@@ -191,9 +191,10 @@ namespace rsgis{namespace img{
 		GDALRasterBand *inputBand = NULL;
 		GDALRasterBand *outputBand = NULL;
 		float **imgData = new float*[numberBands];
+		float **outData = new float*[numberBands];
 		bool skip;
         std::vector<std::string> bandnames;
-		
+
 		try
 		{
 			for(int i = 0; i < numDS; i++)
@@ -204,7 +205,7 @@ namespace rsgis{namespace img{
                     std::string message = std::string("Could not open image ") + inputImages[i];
                     throw RSGISImageException(message.c_str());
                 }
-                
+
 				if(i == 0)
 				{
 					numberBands = dataset->GetRasterCount();
@@ -227,56 +228,62 @@ namespace rsgis{namespace img{
 				}
                 GDALClose(dataset);
 			}
-			
+
 			imgUtils.getImagesExtent(inputImages, numDS, &width, &height, transformation);
-			
+
 			std::cout << "Create new image [" << width << "," << height << "] with projection: \n" << projection << std::endl;
-			
+
 			outputDataset = imgUtils.createBlankImage(outputImage, transformation, width, height, numberBands, projection, background, bandnames, format, imgDataType);
-			
+
 			// COPY IMAGE DATA INTO THE BLANK IMAGE
-			
+
 			std::cout << "Started (total " << numDS << ") ." << std::flush;
-			
+
+            // Allocate memory for out data array (read in to compare to value from tile)
+            for(int n = 0; n < numberBands; n++)
+            {
+                outData[n] = (float *) CPLMalloc(sizeof(float)*1);
+            }
+
+            
 			for(int i = 0; i < numDS; i++)
 			{
 				std::cout << "." << i << "." << std::flush;
-                
+
                 dataset = (GDALDataset *) GDALOpenShared(inputImages[i].c_str(), GA_ReadOnly);
                 if(dataset == NULL)
                 {
                     std::string message = std::string("Could not open image ") + inputImages[i];
                     throw RSGISImageException(message.c_str());
                 }
-                
+
 				dataset->GetGeoTransform(imgTransform);
 				tileXSize = dataset->GetRasterXSize();
 				tileYSize = dataset->GetRasterYSize();
-				
+
 				xDiff = imgTransform[0] - transformation[0];
 				yDiff = transformation[3] - imgTransform[3];
-				
+
 				xStart = floor(xDiff/transformation[1]);
 				yStart = floor(yDiff/transformation[1]);
-				
+
 				for(int n = 0; n < numberBands; n++)
 				{
-					imgData[n] = (float *) CPLMalloc(sizeof(float)*1);					
+					imgData[n] = (float *) CPLMalloc(sizeof(float)*1);
 				}
-				
+
 				for(int y = 0; y < tileYSize; y++)
 				{
-					for (int x = 0; x < tileXSize; x++) 
+					for (int x = 0; x < tileXSize; x++)
 					{
 						skip = false;
 						for(int n = 1; n <= numberBands; n++)
 						{
 							inputBand = dataset->GetRasterBand(n);
-						
 							inputBand->RasterIO(GF_Read, x, y, 1, 1, imgData[n-1], 1, 1, GDT_Float32, 0, 0);
 						}
 						//std::cout << "Skip Val = " << skipVal << " imgData[n][0] = " << imgData[skipBand][0] << std::endl;
-						if(imgData[skipBand][0] == skipVal) // Check for skip value in band 1
+						if(imgData[skipBand][0] == skipVal) // Check for skip value in band skip band
 						{
 							skip = true;
 						}
@@ -285,20 +292,48 @@ namespace rsgis{namespace img{
 							for(int n = 1; n <= numberBands; n++)
 							{
 								outputBand = outputDataset->GetRasterBand(n);
-								outputBand->RasterIO(GF_Write, (xStart + x), (yStart + y), 1, 1, imgData[n-1], 1, 1, GDT_Float32, 0, 0);
+                                
+                                // If overwriting, or first image don't need to check output data
+                                if(overlapBehaviour == 0 | i == 0)
+                                {
+                                    outputBand->RasterIO(GF_Write, (xStart + x), (yStart + y), 1, 1, imgData[n-1], 1, 1, GDT_Float32, 0, 0);
+                                }
+                                else
+                                {
+                                    outputBand->RasterIO(GF_Read, (xStart + x), (yStart + y), 1, 1, outData[n-1], 1, 1, GDT_Float32, 0, 0);
+
+                                    // Check if input image is less than pixel value in out data, write if it is.
+                                    if((imgData[n-1][0] < outData[n-1][0]) && (outData[n-1][0] != 0) && (overlapBehaviour == 1))
+                                    {
+                                        outputBand->RasterIO(GF_Write, (xStart + x), (yStart + y), 1, 1, imgData[n-1], 1, 1, GDT_Float32, 0, 0);
+                                    }
+                                    // Check if input image is greater than pixel value in out data, write if it is.
+                                    else if((imgData[n-1][0] > outData[n-1][0]) && (overlapBehaviour == 2))
+                                    {
+                                        outputBand->RasterIO(GF_Write, (xStart + x), (yStart + y), 1, 1, imgData[n-1], 1, 1, GDT_Float32, 0, 0);
+                                    }
+                                    
+                                }
+
+
+
 							}
-							
+
 						}
 					}
 				}
-				
+
 				for(int n = 0; n < numberBands; n++)
 				{
-					delete imgData[n];					
+					delete imgData[n];
 				}
 
                 GDALClose(dataset);
 			}
+            for(int n = 0; n < numberBands; n++)
+            {
+                delete outData[n];
+            }
 			std::cout << ".complete\n";
 		}
 		catch(RSGISImageBandException e)
@@ -317,7 +352,7 @@ namespace rsgis{namespace img{
 			}
 			throw e;
 		}
-		
+
 		if(transformation != NULL)
 		{
 			delete[] transformation;
@@ -330,8 +365,8 @@ namespace rsgis{namespace img{
 		GDALClose(outputDataset);
         GDALDestroyDriverManager();
 	}
-	
-	void RSGISImageMosaic::mosaicSkipThreash(std::string *inputImages, int numDS, std::string outputImage, float background, float skipLowerThreash, float skipUpperThreash, bool projFromImage, std::string proj, unsigned int threashBand, std::string format, GDALDataType imgDataType) throw(RSGISImageException)
+
+	void RSGISImageMosaic::mosaicSkipThreash(std::string *inputImages, int numDS, std::string outputImage, float background, float skipLowerThreash, float skipUpperThreash, bool projFromImage, std::string proj, unsigned int threashBand, unsigned int overlapBehaviour, std::string format, GDALDataType imgDataType) throw(RSGISImageException)
 	{
 		RSGISImageUtils imgUtils;
         GDALAllRegister();
@@ -353,9 +388,10 @@ namespace rsgis{namespace img{
 		GDALRasterBand *inputBand = NULL;
 		GDALRasterBand *outputBand = NULL;
 		float **imgData = new float*[numberBands];
+		float **outData = new float*[numberBands];
 		bool skip;
         std::vector<std::string> bandnames;
-		
+        
 		try
 		{
 			for(int i = 0; i < numDS; i++)
@@ -389,17 +425,24 @@ namespace rsgis{namespace img{
 				}
                 GDALClose(dataset);
 			}
-			
+            
 			imgUtils.getImagesExtent(inputImages, numDS, &width, &height, transformation);
-			
+            
 			std::cout << "Create new image [" << width << "," << height << "] with projection: \n" << projection << std::endl;
-			
+            
 			outputDataset = imgUtils.createBlankImage(outputImage, transformation, width, height, numberBands, projection, background, bandnames, format, imgDataType);
-			
+            
 			// COPY IMAGE DATA INTO THE BLANK IMAGE
-			
+            
 			std::cout << "Started (total " << numDS << ") ." << std::flush;
-			
+            
+            // Allocate memory for out data array (read in to compare to value from tile)
+            for(int n = 0; n < numberBands; n++)
+            {
+                outData[n] = (float *) CPLMalloc(sizeof(float)*1);
+            }
+            
+            
 			for(int i = 0; i < numDS; i++)
 			{
 				std::cout << "." << i << "." << std::flush;
@@ -414,21 +457,21 @@ namespace rsgis{namespace img{
 				dataset->GetGeoTransform(imgTransform);
 				tileXSize = dataset->GetRasterXSize();
 				tileYSize = dataset->GetRasterYSize();
-				
+                
 				xDiff = imgTransform[0] - transformation[0];
 				yDiff = transformation[3] - imgTransform[3];
-				
+                
 				xStart = floor(xDiff/transformation[1]);
 				yStart = floor(yDiff/transformation[1]);
-				
+                
 				for(int n = 0; n < numberBands; n++)
 				{
-					imgData[n] = (float *) CPLMalloc(sizeof(float)*1);					
+					imgData[n] = (float *) CPLMalloc(sizeof(float)*1);
 				}
-				
+                
 				for(int y = 0; y < tileYSize; y++)
 				{
-					for (int x = 0; x < tileXSize; x++) 
+					for (int x = 0; x < tileXSize; x++)
 					{
 						skip = false;
 						for(int n = 1; n <= numberBands; n++)
@@ -446,18 +489,48 @@ namespace rsgis{namespace img{
 							for(int n = 1; n <= numberBands; n++)
 							{
 								outputBand = outputDataset->GetRasterBand(n);
-								outputBand->RasterIO(GF_Write, (xStart + x), (yStart + y), 1, 1, imgData[n-1], 1, 1, GDT_Float32, 0, 0);
+                                
+                                // If overwriting, or first image don't need to check output data
+                                if(overlapBehaviour == 0 | i == 0)
+                                {
+                                    outputBand->RasterIO(GF_Write, (xStart + x), (yStart + y), 1, 1, imgData[n-1], 1, 1, GDT_Float32, 0, 0);
+                                }
+                                else
+                                {
+                                    outputBand->RasterIO(GF_Read, (xStart + x), (yStart + y), 1, 1, outData[n-1], 1, 1, GDT_Float32, 0, 0);
+                                    
+                                    // Check if input image is less than pixel value in out data, write if it is.
+                                    if((imgData[n-1][0] < outData[n-1][0]) && (outData[n-1][0] != 0) && (overlapBehaviour == 1))
+                                    {
+                                        outputBand->RasterIO(GF_Write, (xStart + x), (yStart + y), 1, 1, imgData[n-1], 1, 1, GDT_Float32, 0, 0);
+                                    }
+                                    // Check if input image is greater than pixel value in out data, write if it is.
+                                    else if((imgData[n-1][0] > outData[n-1][0]) && (overlapBehaviour == 2))
+                                    {
+                                        outputBand->RasterIO(GF_Write, (xStart + x), (yStart + y), 1, 1, imgData[n-1], 1, 1, GDT_Float32, 0, 0);
+                                    }
+                                    
+                                }
+                                
+                                
+                                
 							}
+                            
 						}
-						
 					}
 				}
+                
 				for(int n = 0; n < numberBands; n++)
 				{
-					delete imgData[n];					
+					delete imgData[n];
 				}
+                
                 GDALClose(dataset);
 			}
+            for(int n = 0; n < numberBands; n++)
+            {
+                delete outData[n];
+            }
 			std::cout << ".complete\n";
 		}
 		catch(RSGISImageBandException e)
@@ -476,7 +549,7 @@ namespace rsgis{namespace img{
 			}
 			throw e;
 		}
-		
+        
 		if(transformation != NULL)
 		{
 			delete[] transformation;
@@ -489,14 +562,14 @@ namespace rsgis{namespace img{
 		GDALClose(outputDataset);
         GDALDestroyDriverManager();
 	}
-	
+
 	void RSGISImageMosaic::includeDatasets(GDALDataset *baseImage, std::string *inputImages, int numDS, std::vector<int> bands, bool bandsDefined) throw(RSGISImageException)
 	{
 		RSGISImageUtils imgUtils;
         GDALDataset *dataset = NULL;
 		int width;
 		int height;
-		
+
 		double *transformation = new double[6];
 		double *imgTransform = new double[6];
 		double *baseTransform = new double[6];
@@ -512,7 +585,7 @@ namespace rsgis{namespace img{
 		GDALRasterBand *inputBand = NULL;
 		GDALRasterBand *outputBand = NULL;
 		float *imgData = NULL;
-		
+
 		try
 		{
 			numberBands = baseImage->GetRasterCount();
@@ -524,7 +597,7 @@ namespace rsgis{namespace img{
                     std::string message = std::string("Could not open image ") + inputImages[i];
                     throw RSGISImageException(message.c_str());
                 }
-                
+
                 if(!bandsDefined)
                 {
                     if(dataset->GetRasterCount() != numberBands)
@@ -532,7 +605,7 @@ namespace rsgis{namespace img{
                         throw RSGISImageBandException("All input images need to have the same number of bands.");
                     }
                 }
-                else 
+                else
                 {
                     for(std::vector<int>::iterator iterBands = bands.begin(); iterBands != bands.end(); ++iterBands)
                     {
@@ -546,7 +619,7 @@ namespace rsgis{namespace img{
                 }
                 GDALClose(dataset);
 			}
-            
+
             if(bandsDefined)
             {
                 if(numberBands < bands.size())
@@ -554,42 +627,42 @@ namespace rsgis{namespace img{
                     throw RSGISImageException("The base image does not have enough image bands for the output data specificed.");
                 }
             }
-            
+
             projection = std::string(baseImage->GetProjectionRef());
 			imgUtils.getImagesExtent(inputImages, numDS, &width, &height, transformation);
-			
+
 			baseImage->GetGeoTransform(baseTransform);
-			
+
 			double baseExtentX = baseTransform[0] + (baseImage->GetRasterXSize() * baseTransform[1]);
 			double baseExtentY = baseTransform[3] + (baseImage->GetRasterYSize() * baseTransform[5]);
 			double imgExtentX = transformation[0] + (width * transformation[1]);
 			double imgExtentY = transformation[3] + (height * transformation[5]);
-			
+
 			/*std::cout << "Transformation[0] = " << transformation[0] << std::endl;
 			std::cout << "Transformation[1] = " << transformation[1] << std::endl;
 			std::cout << "Transformation[2] = " << transformation[2] << std::endl;
 			std::cout << "Transformation[3] = " << transformation[3] << std::endl;
 			std::cout << "Transformation[4] = " << transformation[4] << std::endl;
 			std::cout << "Transformation[5] = " << transformation[5] << std::endl;
-			
+
 			std::cout << "baseTransform[0] = " << baseTransform[0] << std::endl;
 			std::cout << "baseTransform[1] = " << baseTransform[1] << std::endl;
 			std::cout << "baseTransform[2] = " << baseTransform[2] << std::endl;
 			std::cout << "baseTransform[3] = " << baseTransform[3] << std::endl;
 			std::cout << "baseTransform[4] = " << baseTransform[4] << std::endl;
 			std::cout << "baseTransform[5] = " << baseTransform[5] << std::endl;
-			
+
 			std::cout << "baseImage->GetRasterXSize() = " << baseImage->GetRasterXSize() << std::endl;
 			std::cout << "baseImage->GetRasterYSize() = " << baseImage->GetRasterYSize() << std::endl;
-			
+
 			std::cout << "height = " << height << std::endl;
 			std::cout << "Width = " << width << std::endl;
-			
+
 			std::cout << "baseExtentX = " << baseExtentX << std::endl;
 			std::cout << "baseExtentY = " << baseExtentY << std::endl;
 			std::cout << "imgExtentX = " << imgExtentX << std::endl;
 			std::cout << "imgExtentY = " << imgExtentY << std::endl;*/
-			
+
 			// Check datasets fit within the base image.
 			if(transformation[0] < baseTransform[0])
 			{
@@ -610,9 +683,9 @@ namespace rsgis{namespace img{
 
 			height = baseImage->GetRasterYSize();
 			width = baseImage->GetRasterXSize();
-			
+
 			std::cout << "Started (total " << numDS << ") ." << std::flush;
-			
+
 			for(int i = 0; i < numDS; i++)
 			{
 				std::cout << "." << i << "." << std::flush;
@@ -622,18 +695,18 @@ namespace rsgis{namespace img{
                     std::string message = std::string("Could not open image ") + inputImages[i];
                     throw RSGISImageException(message.c_str());
                 }
-                
+
 				dataset->GetGeoTransform(imgTransform);
 				tileXSize = dataset->GetRasterXSize();
 				tileYSize = dataset->GetRasterYSize();
-				
+
 				xDiff = imgTransform[0] - baseTransform[0];
 				yDiff = baseTransform[3] - imgTransform[3];
-				
+
 				xStart = floor(xDiff/baseTransform[1]);
 				yStart = floor(yDiff/baseTransform[1]);
 				imgData = (float *) CPLMalloc(sizeof(float)*tileXSize);
-				
+
                 if(bandsDefined)
                 {
                     int nBand = 1;
@@ -653,13 +726,13 @@ namespace rsgis{namespace img{
                         ++nBand;
                     }
                 }
-                else 
+                else
                 {
                     if(numberBands != dataset->GetRasterCount())
                     {
                         throw RSGISImageException("The number of bands in the input datasets and base dataset need to be the same.");
                     }
-                    
+
                     for(int n = 1; n <= numberBands; n++)
                     {
                         inputBand = dataset->GetRasterBand(n);
@@ -671,7 +744,7 @@ namespace rsgis{namespace img{
                         }
                     }
                 }
-				
+
 				delete imgData;
                 GDALClose(dataset);
 			}
@@ -693,7 +766,7 @@ namespace rsgis{namespace img{
 			}
 			throw e;
 		}
-		
+
 		if(transformation != NULL)
 		{
 			delete[] transformation;
@@ -703,10 +776,10 @@ namespace rsgis{namespace img{
 			delete[] imgTransform;
 		}
 	}
-	
+
 	RSGISImageMosaic::~RSGISImageMosaic()
 	{
-		
+
 	}
 }}
 

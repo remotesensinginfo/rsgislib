@@ -55,6 +55,14 @@ namespace rsgis{ namespace cmds {
     void executeCreateTiles(std::string inputImage, std::string outputImageBase, float width, float height, float tileOverlap, bool offsetTiling, std::string gdalFormat, RSGISLibDataType outDataType, std::string outFileExtension, std::vector<std::string> *outFileNames = NULL)throw(RSGISCmdException);
     /** A function to run the populate statistics command */
     void executePopulateImgStats(std::string inputImage, bool useIgnoreVal, float nodataValue, bool calcImgPyramids)throw(RSGISCmdException);
+    /** A function to mosaic a set of input images 
+        Pixels with a value of 'skipValue' in band 'skipBand' are excluded (all bands).
+        Where pixels overlap:
+        - The pixel is overwritten by the next image (overlapBehaviour=0)
+        - The minimum value is taken (overlapBehaviour=1)
+        - The maximum behaviour is taken (overlapBehaviour=1)
+     */
+    void executeImageMosaic(std::string *inputImages, int numDS, std::string outputImage, float background, float skipVal, unsigned int skipBand, unsigned int overlapBehaviour, std::string format, RSGISLibDataType outDataType) throw(RSGISCmdException);
     
 }}
 
