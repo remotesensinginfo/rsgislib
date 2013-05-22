@@ -275,6 +275,7 @@ class RSGISExeImageUtils : public RSGISAlgorithmParameters
         bool growOverlap;
         bool offsetTiling;
         unsigned int imageSample;
+        unsigned int overlapBehaviour; // Behaviour for multiple pixels in mosaic
 	};
 }
 #endif

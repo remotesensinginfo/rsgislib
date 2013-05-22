@@ -507,6 +507,7 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 		this->option = RSGISExeImageUtils::mosaic;
 		this->mosaicSkipVals = false;
 		this->mosaicSkipThreash = false;
+        this->overlapBehaviour = 0;
 		this->skipLowerThreash = -numeric_limits<double>::infinity();
 		this->skipUpperThreash = +numeric_limits<double>::infinity();
 		this->skipBand = 0;
@@ -621,8 +622,40 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			{
 				cout << "\tSkiping pixels with a value between \'" << this->skipLowerThreash << "\' and \'" << this->skipUpperThreash << "\' using the first band (default)" << endl;			}
 		}
-
 		XMLString::release(&skipBandXMLStr);
+        
+        XMLCh *overlapBehaviourXML = XMLString::transcode("overlapBehaviour");
+        if(argElement->hasAttribute(overlapBehaviourXML))
+        {
+            if(!this->mosaicSkipVals && !this->mosaicSkipThreash)
+            {
+                throw RSGISXMLArgumentsException("Can't define overlap behaviour for simple mosaic.");
+            }
+                
+            const XMLCh *overlapBehaviourStr = argElement->getAttribute(overlapBehaviourXML);
+            
+            XMLCh *minXML = XMLString::transcode("min");
+            XMLCh *maxXML = XMLString::transcode("max");
+
+            if(XMLString::equals(overlapBehaviourStr, minXML))
+            {
+                std::cout << "\tTaking the minimum value for overlaping pixels" << std::endl;
+                this->overlapBehaviour=1;
+            }
+            else if(XMLString::equals(overlapBehaviourStr, maxXML))
+            {
+                std::cout << "\tTaking the maximum value for overlaping pixels" << std::endl;
+                this->overlapBehaviour=2;
+            }
+            else
+            {
+                throw RSGISXMLArgumentsException("Overlap behaviour not recognised, options are 'min' or 'max'");
+            }
+            
+            XMLString::release(&minXML);
+            XMLString::release(&maxXML);
+        }
+        
 
 		XMLCh *projXMLStr = XMLString::transcode("proj");
 		if(argElement->hasAttribute(projXMLStr))
@@ -3672,12 +3705,12 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
 				if (this->mosaicSkipVals)
 				{
                     std::cout << "Skipping pixel values = " << this->skipValue << " in band " << this->skipBand << std::endl;
-					mosaic.mosaicSkipVals(inputImages, this->numImages, this->outputImage, this->nodataValue, this->skipValue, this->projFromImage, this->proj, this->skipBand, this->imageFormat, this->outDataType);
+					mosaic.mosaicSkipVals(inputImages, this->numImages, this->outputImage, this->nodataValue, this->skipValue, this->projFromImage, this->proj, this->skipBand, this->overlapBehaviour, this->imageFormat, this->outDataType);
 				}
 				else if (this->mosaicSkipThreash)
 				{
                     std::cout << "Skipping pixel values between " << this->skipLowerThreash << " and " << this->skipUpperThreash << " in band " << this->skipBand << std::endl;
-					mosaic.mosaicSkipThreash(inputImages, this->numImages, this->outputImage, this->nodataValue, this->skipLowerThreash, this->skipUpperThreash, this->projFromImage, this->proj, this->skipBand, this->imageFormat, this->outDataType);
+					mosaic.mosaicSkipThreash(inputImages, this->numImages, this->outputImage, this->nodataValue, this->skipLowerThreash, this->skipUpperThreash, this->projFromImage, this->proj, this->skipBand, this->overlapBehaviour, this->imageFormat, this->outDataType);
 				}
 				else
 				{
