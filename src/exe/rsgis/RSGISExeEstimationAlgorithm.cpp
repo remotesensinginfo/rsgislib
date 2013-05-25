@@ -92,8 +92,8 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
 	const XMLCh *optionStr = argElement->getAttribute(XMLString::transcode("option"));
 	const XMLCh *parametersStr = argElement->getAttribute(XMLString::transcode("parameters"));
 
-    
-    
+
+
 	//---- Dual Pol Single Species - , Object Based ---//
 	if((XMLString::equals(typeDualPolObject,optionStr)) | (XMLString::equals(typeDualPolObjectObjAP,optionStr)))
 	{
@@ -1284,7 +1284,7 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
                         // Set to default values if no file (don't print warning)
                         covMatrixP = gsl_matrix_alloc(2,2);
                         double pCov1 = 1e10;
-                        double pCov2 = 1e10 * (gsl_vector_get(this->initialParClass->at(i), 1) / gsl_vector_get(this->initialParClass->at(i), 0));
+                        double pCov2 = 1e10;
                         gsl_matrix_set_zero(covMatrixP);
                         gsl_matrix_set(covMatrixP, 0, 0, pCov1);
                         gsl_matrix_set(covMatrixP, 1, 1, pCov2);
@@ -2348,7 +2348,7 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
                         // Set to default values if no file (don't print warning)
                         covMatrixP = gsl_matrix_alloc(2,2);
                         double pCov1 = 1e10;
-                        double pCov2 = 1e10 * (gsl_vector_get(this->initialParClass->at(i), 1) / gsl_vector_get(this->initialParClass->at(i), 0));
+                        double pCov2 = 1e10;
                         gsl_matrix_set_zero(covMatrixP);
                         gsl_matrix_set(covMatrixP, 0, 0, pCov1);
                         gsl_matrix_set(covMatrixP, 1, 1, pCov2);
@@ -2804,10 +2804,10 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
                  * Setting these is optional and default values will be chosen with no message if
                  * values are not set
                  */
-                
+
                 double *minMaxStepHeight = new double[3];
                 double *minMaxStepDensity = new double[3];
-                
+
                 XMLCh *minHeightStr = XMLString::transcode("minHeight");
                 if(slowOptimiserElement->hasAttribute(minHeightStr))
                 {
@@ -2820,7 +2820,7 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
                     minMaxStepHeight[0] = 1;
                 }
                 XMLString::release(&minHeightStr);
-                
+
                 XMLCh *maxHeightStr = XMLString::transcode("maxHeight");
                 if(slowOptimiserElement->hasAttribute(maxHeightStr))
                 {
@@ -2833,7 +2833,7 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
                     minMaxStepHeight[1] = 20;
                 }
                 XMLString::release(&maxHeightStr);
-                
+
                 XMLCh *heightStepStr = XMLString::transcode("heightStep");
                 if(slowOptimiserElement->hasAttribute(heightStepStr))
                 {
@@ -2846,7 +2846,7 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
                     minMaxStepHeight[2] = 0.01;
                 }
                 XMLString::release(&heightStepStr);
-                
+
                 XMLCh *minDensityStr = XMLString::transcode("minDensity");
                 if(slowOptimiserElement->hasAttribute(minDensityStr))
                 {
@@ -2859,7 +2859,7 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
                     minMaxStepDensity[0] = 0.1;
                 }
                 XMLString::release(&minDensityStr);
-                
+
                 XMLCh *maxDensityStr = XMLString::transcode("maxDensity");
                 if(slowOptimiserElement->hasAttribute(maxDensityStr))
                 {
@@ -2872,7 +2872,7 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
                     minMaxStepDensity[1] = 2;
                 }
                 XMLString::release(&maxDensityStr);
-                
+
                 XMLCh *densityStepStr = XMLString::transcode("densityStep");
                 if(slowOptimiserElement->hasAttribute(densityStepStr))
                 {
@@ -2885,8 +2885,8 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
                     minMaxStepDensity[2] = 0.001;
                 }
                 XMLString::release(&densityStepStr);
-                
-                
+
+
                 double **minMaxStepAll = new double*[2];
                 minMaxStepAll[0] = new double[3];
                 minMaxStepAll[1] = new double[3];
@@ -2896,17 +2896,17 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
                 minMaxStepAll[1][0] = minMaxStepDensity[0];
                 minMaxStepAll[1][1] = minMaxStepDensity[1];
                 minMaxStepAll[1][2] = minMaxStepDensity[2];
-                
-                
+
+
                 // Add to min / max values for inversion
                 this->minMaxValuesClass[i][0] = new double[2];
                 this->minMaxValuesClass[i][1] = new double[2];
-                
+
                 this->minMaxValuesClass[i][0][0] = minMaxStepHeight[0];
                 this->minMaxValuesClass[i][0][1] = minMaxStepHeight[1];
                 this->minMaxValuesClass[i][1][0] = minMaxStepDensity[0];
                 this->minMaxValuesClass[i][1][1] = minMaxStepDensity[1];
-                
+
 				// Get optimisation method
 				if(XMLString::equals(methodConjugateGradientWithRestarts, methodStr) | XMLString::equals(methodConjugateGradient, methodStr))
 				{
@@ -3225,7 +3225,7 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
                         // Set to default values if no file (don't print warning)
                         covMatrixP = gsl_matrix_alloc(2,2);
                         double pCov1 = 1e10;
-                        double pCov2 = 1e10 * (gsl_vector_get(this->initialParClass->at(i), 1) / gsl_vector_get(this->initialParClass->at(i), 0));
+                        double pCov2 = 1e10;
                         gsl_matrix_set_zero(covMatrixP);
                         gsl_matrix_set(covMatrixP, 0, 0, pCov1);
                         gsl_matrix_set(covMatrixP, 1, 1, pCov2);
@@ -3496,15 +3496,15 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
 				XMLString::release(&functionLn2VarQuadratic);
 				XMLString::release(&functionLinXfLinY);
 				XMLString::release(&function2DPoly);
-                
+
                 double *minMaxStepHeight = new double[3];
                 double *minMaxStepDensity = new double[3];
-                
+
                 /* Get minimum and maximum heights and density.
                  * Setting these is optional and default values will be chosen with no message if
                  * values are not set
                  */
-                
+
                 XMLCh *minHeightStr = XMLString::transcode("minHeight");
                 if(fastOptimiserElement->hasAttribute(minHeightStr))
                 {
@@ -3518,7 +3518,7 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
                     minMaxStepHeight[0] = 1;
                 }
                 XMLString::release(&minHeightStr);
-                
+
                 XMLCh *maxHeightStr = XMLString::transcode("maxHeight");
                 if(fastOptimiserElement->hasAttribute(maxHeightStr))
                 {
@@ -3532,7 +3532,7 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
                     minMaxStepHeight[1] = 20;
                 }
                 XMLString::release(&maxHeightStr);
-                
+
                 XMLCh *heightStepStr = XMLString::transcode("heightStep");
                 if(fastOptimiserElement->hasAttribute(heightStepStr))
                 {
@@ -3546,7 +3546,7 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
                     minMaxStepHeight[2] = 0.1;
                 }
                 XMLString::release(&heightStepStr);
-                
+
                 XMLCh *minDensityStr = XMLString::transcode("minDensity");
                 if(fastOptimiserElement->hasAttribute(minDensityStr))
                 {
@@ -3560,7 +3560,7 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
                     minMaxStepDensity[0] = 0.1;
                 }
                 XMLString::release(&minDensityStr);
-                
+
                 XMLCh *maxDensityStr = XMLString::transcode("maxDensity");
                 if(fastOptimiserElement->hasAttribute(maxDensityStr))
                 {
@@ -3574,7 +3574,7 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
                     minMaxStepDensity[1] = 2;
                 }
                 XMLString::release(&maxDensityStr);
-                
+
                 XMLCh *densityStepStr = XMLString::transcode("densityStep");
                 if(fastOptimiserElement->hasAttribute(densityStepStr))
                 {
@@ -3588,7 +3588,7 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
                     minMaxStepDensity[2] = 0.01;
                 }
                 XMLString::release(&densityStepStr);
-                
+
                 double **minMaxStepAll = new double*[2];
                 minMaxStepAll[0] = new double[3];
                 minMaxStepAll[1] = new double[3];
@@ -3598,12 +3598,12 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
                 minMaxStepAll[1][0] = minMaxStepDensity[0];
                 minMaxStepAll[1][1] = minMaxStepDensity[1];
                 minMaxStepAll[1][2] = minMaxStepDensity[2];
-                
+
                 // Add to min / max values for inversion
                 this->minMaxValuesClass[i] = new double*[2];
                 this->minMaxValuesClass[i][0] = new double[2];
                 this->minMaxValuesClass[i][1] = new double[2];
-                
+
                 this->minMaxValuesClass[i][0][0] = minMaxStepHeight[0];
                 this->minMaxValuesClass[i][0][1] = minMaxStepHeight[1];
                 this->minMaxValuesClass[i][1][0] = minMaxStepDensity[0];
@@ -3926,7 +3926,7 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
                         // Set to default values if no file (don't print warning)
                         covMatrixP = gsl_matrix_alloc(2,2);
                         double pCov1 = 1e10;
-                        double pCov2 = 1e10 * (gsl_vector_get(this->initialParClass->at(i), 1) / gsl_vector_get(this->initialParClass->at(i), 0));
+                        double pCov2 = 1e10;
                         gsl_matrix_set_zero(covMatrixP);
                         gsl_matrix_set(covMatrixP, 0, 0, pCov1);
                         gsl_matrix_set(covMatrixP, 1, 1, pCov2);
@@ -4047,8 +4047,8 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
 			this->initialParClass= new vector <gsl_vector*>;
 			this->estFastOptimiserClass = new vector <RSGISEstimationOptimiser*>;
 			this->estSlowOptimiserClass = new vector <RSGISEstimationOptimiser*>;
-            
-            
+
+
 			/**************************************
 			 * Get method to use for optimisation *
 			 **************************************/
@@ -4242,17 +4242,17 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
 					}
                 }
                 XMLString::release(&function3DPoly);
-                
+
                 /* Get minimum and maximum heights and density.
                  * Setting these is optional and default values will be chosen with no message if
                  * values are not set
                  */
-                
+
                 double **minMaxStepAll = new double*[3];
                 minMaxStepAll[0] = new double[3];
                 minMaxStepAll[1] = new double[3];
                 minMaxStepAll[2] = new double[3];
-                
+
                 XMLCh *minHeightStr = XMLString::transcode("minHeight");
                 if(slowOptimiserElement->hasAttribute(minHeightStr))
                 {
@@ -4265,7 +4265,7 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
                     minMaxStepAll[0][0] = 1;
                 }
                 XMLString::release(&minHeightStr);
-                
+
                 XMLCh *maxHeightStr = XMLString::transcode("maxHeight");
                 if(slowOptimiserElement->hasAttribute(maxHeightStr))
                 {
@@ -4278,7 +4278,7 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
                     minMaxStepAll[0][1] = 20;
                 }
                 XMLString::release(&maxHeightStr);
-                
+
                 XMLCh *heightStepStr = XMLString::transcode("heightStep");
                 if(slowOptimiserElement->hasAttribute(heightStepStr))
                 {
@@ -4291,7 +4291,7 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
                     minMaxStepAll[0][2] = 0.01;
                 }
                 XMLString::release(&heightStepStr);
-                
+
                 XMLCh *minDensityStr = XMLString::transcode("minDensity");
                 if(slowOptimiserElement->hasAttribute(minDensityStr))
                 {
@@ -4304,7 +4304,7 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
                     minMaxStepAll[1][0] = 0.1;
                 }
                 XMLString::release(&minDensityStr);
-                
+
                 XMLCh *maxDensityStr = XMLString::transcode("maxDensity");
                 if(slowOptimiserElement->hasAttribute(maxDensityStr))
                 {
@@ -4317,7 +4317,7 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
                     minMaxStepAll[1][1] = 2;
                 }
                 XMLString::release(&maxDensityStr);
-                
+
                 XMLCh *densityStepStr = XMLString::transcode("densityStep");
                 if(slowOptimiserElement->hasAttribute(densityStepStr))
                 {
@@ -4330,7 +4330,7 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
                     minMaxStepAll[1][2] = 0.001;
                 }
                 XMLString::release(&densityStepStr);
-                
+
                 XMLCh *minDielectricStr = XMLString::transcode("minDielectric");
                 if(slowOptimiserElement->hasAttribute(minDielectricStr))
                 {
@@ -4343,7 +4343,7 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
                     minMaxStepAll[2][0] = 10;
                 }
                 XMLString::release(&minDielectricStr);
-                
+
                 XMLCh *maxDielectricStr = XMLString::transcode("maxDielectric");
                 if(slowOptimiserElement->hasAttribute(maxDielectricStr))
                 {
@@ -4356,7 +4356,7 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
                     minMaxStepAll[2][1] = 60;
                 }
                 XMLString::release(&maxDielectricStr);
-                
+
                 XMLCh *dielectricStepStr = XMLString::transcode("dielectricStep");
                 if(slowOptimiserElement->hasAttribute(dielectricStepStr))
                 {
@@ -4369,13 +4369,13 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
                     minMaxStepAll[2][2] = 0.5;
                 }
                 XMLString::release(&dielectricStepStr);
-                
+
                 if(XMLString::equals(methodConjugateGradientWithRestarts, methodStr) | XMLString::equals(methodConjugateGradient, methodStr) | XMLString::equals(methodSimulatedAnnealing, methodStr) | XMLString::equals(methodSimulatedAnnealingAP, methodStr))
                 {
                     if (XMLString::equals(methodConjugateGradientWithRestarts, methodStr)) {cout << "\tUsing ConjugateGradient - with restarts" << endl;}
                     else if (XMLString::equals(methodConjugateGradient, methodStr)){cout << "\tUsing ConjugateGradient" << endl;}
                     else {cout << "\tUsing Simulated Annealing" << endl;}
-                    
+
                     // Maximum number of itterations
                     XMLCh *ittmaxStr = XMLString::transcode("ittmax");
                     if(slowOptimiserElement->hasAttribute(ittmaxStr))
@@ -4439,6 +4439,13 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
                         double pCov1 = 1e10 * (gsl_vector_get(this->initialParClass->at(i), 0) / gsl_vector_get(this->initialParClass->at(i), 1));
                         double pCov2 = 1e10;
                         double pCov3 = 1e10 * (gsl_vector_get(this->initialParClass->at(i), 2) / gsl_vector_get(this->initialParClass->at(i), 1));
+                        // If simulated annealing set all values to 10e10 (not used)
+                        if (XMLString::equals(methodSimulatedAnnealing, methodStr))
+                        {
+                            pCov1 = 1e10;
+                            pCov2 = 1e10;
+                            pCov3 = 1e10;
+                        }
                         gsl_matrix_set_zero(covMatrixP);
                         gsl_matrix_set(covMatrixP, 0, 0, pCov1);
                         gsl_matrix_set(covMatrixP, 1, 1, pCov2);
@@ -4711,12 +4718,12 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
                  * Setting these is optional and default values will be chosen with no message if
                  * values are not set
                  */
-                
+
                 double **minMaxStepAll = new double*[3];
                 minMaxStepAll[0] = new double[3];
                 minMaxStepAll[1] = new double[3];
                 minMaxStepAll[2] = new double[3];
-                
+
                 XMLCh *minHeightStr = XMLString::transcode("minHeight");
                 if(fastOptimiserElement->hasAttribute(minHeightStr))
                 {
@@ -4729,7 +4736,7 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
                     minMaxStepAll[0][0] = 1;
                 }
                 XMLString::release(&minHeightStr);
-                
+
                 XMLCh *maxHeightStr = XMLString::transcode("maxHeight");
                 if(fastOptimiserElement->hasAttribute(maxHeightStr))
                 {
@@ -4742,7 +4749,7 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
                     minMaxStepAll[0][1] = 20;
                 }
                 XMLString::release(&maxHeightStr);
-                
+
                 XMLCh *heightStepStr = XMLString::transcode("heightStep");
                 if(fastOptimiserElement->hasAttribute(heightStepStr))
                 {
@@ -4755,7 +4762,7 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
                     minMaxStepAll[0][2] = 0.01;
                 }
                 XMLString::release(&heightStepStr);
-                
+
                 XMLCh *minDensityStr = XMLString::transcode("minDensity");
                 if(fastOptimiserElement->hasAttribute(minDensityStr))
                 {
@@ -4768,7 +4775,7 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
                     minMaxStepAll[1][0] = 0.1;
                 }
                 XMLString::release(&minDensityStr);
-                
+
                 XMLCh *maxDensityStr = XMLString::transcode("maxDensity");
                 if(fastOptimiserElement->hasAttribute(maxDensityStr))
                 {
@@ -4781,7 +4788,7 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
                     minMaxStepAll[1][1] = 2;
                 }
                 XMLString::release(&maxDensityStr);
-                
+
                 XMLCh *densityStepStr = XMLString::transcode("densityStep");
                 if(fastOptimiserElement->hasAttribute(densityStepStr))
                 {
@@ -4794,7 +4801,7 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
                     minMaxStepAll[1][2] = 0.001;
                 }
                 XMLString::release(&densityStepStr);
-                
+
                 XMLCh *minDielectricStr = XMLString::transcode("minDielectric");
                 if(fastOptimiserElement->hasAttribute(minDielectricStr))
                 {
@@ -4807,7 +4814,7 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
                     minMaxStepAll[2][0] = 1;
                 }
                 XMLString::release(&minDielectricStr);
-                
+
                 XMLCh *maxDielectricStr = XMLString::transcode("maxDielectric");
                 if(fastOptimiserElement->hasAttribute(maxDielectricStr))
                 {
@@ -4820,7 +4827,7 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
                     minMaxStepAll[2][1] = 60;
                 }
                 XMLString::release(&maxDielectricStr);
-                
+
                 XMLCh *dielectricStepStr = XMLString::transcode("dielectricStep");
                 if(fastOptimiserElement->hasAttribute(dielectricStepStr))
                 {
@@ -4833,20 +4840,20 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
                     minMaxStepAll[2][2] = 0.5;
                 }
                 XMLString::release(&dielectricStepStr);
-                
+
                 // Set minimum and maximum values
                 this->minMaxValuesClass[i] = new double*[3];
                 this->minMaxValuesClass[i][0] = new double[2];
                 this->minMaxValuesClass[i][1] = new double[2];
                 this->minMaxValuesClass[i][2] = new double[2];
-                
+
                 this->minMaxValuesClass[i][0][0] = minMaxStepAll[0][0];
                 this->minMaxValuesClass[i][0][1] = minMaxStepAll[0][1];
                 this->minMaxValuesClass[i][1][0] = minMaxStepAll[1][0];
                 this->minMaxValuesClass[i][1][1] = minMaxStepAll[1][1];
                 this->minMaxValuesClass[i][2][0] = minMaxStepAll[2][0];
                 this->minMaxValuesClass[i][2][1] = minMaxStepAll[2][1];
-                
+
                 /**************************************
                  * Get method to use for optimisation *
                  **************************************/
@@ -4917,9 +4924,18 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
                     {
                         // Set to default values if no file (don't print warning)
                         covMatrixP = gsl_matrix_alloc(3,3);
+
                         double pCov1 = 1e10 * (gsl_vector_get(this->initialParClass->at(i), 0) / gsl_vector_get(this->initialParClass->at(i), 1));
                         double pCov2 = 1e10;
                         double pCov3 = 1e10 * (gsl_vector_get(this->initialParClass->at(i), 2) / gsl_vector_get(this->initialParClass->at(i), 1));
+                        // If simulated annealing set all values to 10e10 (not used)
+                        if (XMLString::equals(methodSimulatedAnnealing, methodStr))
+                        {
+                            pCov1 = 1e10;
+                            pCov2 = 1e10;
+                            pCov3 = 1e10;
+                        }
+
                         gsl_matrix_set_zero(covMatrixP);
                         gsl_matrix_set(covMatrixP, 0, 0, pCov1);
                         gsl_matrix_set(covMatrixP, 1, 1, pCov2);
@@ -5062,7 +5078,7 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
                     throw RSGISXMLArgumentsException("Method for optimisation not recognised.");
                 }
 			}
-            
+
             XMLString::release(&methodConjugateGradient);
 			XMLString::release(&methodConjugateGradientWithRestarts);
 			XMLString::release(&methodSimulatedAnnealing);
