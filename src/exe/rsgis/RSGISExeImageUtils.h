@@ -201,8 +201,8 @@ class RSGISExeImageUtils : public RSGISAlgorithmParameters
 		ClassColour **classColour;
 		float nodataValue;
 		float skipValue;
-		float skipUpperThreash;
-		float skipLowerThreash;
+		float skipUpperThresh;
+		float skipLowerThresh;
 		unsigned int skipBand;
 		float maskValue;
 		float resampleScale;
