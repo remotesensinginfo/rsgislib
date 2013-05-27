@@ -2329,7 +2329,7 @@ namespace rsgis{namespace img{
 
                         for(int n = 0; n < numBands; n++)
                         {
-                            imgData[n][j] = value;
+                            imgData[n][(m*xSize)+j] = value;
                         }
                     }
                     
@@ -2352,7 +2352,7 @@ namespace rsgis{namespace img{
                         
                         for(int n = 0; n < numBands; n++)
                         {
-                            imgData[n][j] = value;
+                            imgData[n][(m*xSize)+j] = value;
                         }
                     }
                 }
@@ -2528,7 +2528,7 @@ namespace rsgis{namespace img{
                         
                         for(int n = 0; n < numBands; n++)
                         {
-                            imgData[n][j] = value;
+                            imgData[n][(m*xSize)+j] = value;
                         }
                     }
                     
@@ -2551,7 +2551,7 @@ namespace rsgis{namespace img{
                         
                         for(int n = 0; n < numBands; n++)
                         {
-                            imgData[n][j] = value;
+                            imgData[n][(m*xSize)+j] = value;
                         }
                     }
                 }
