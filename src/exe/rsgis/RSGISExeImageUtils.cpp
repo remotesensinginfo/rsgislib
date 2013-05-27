@@ -508,8 +508,8 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 		this->mosaicSkipVals = false;
 		this->mosaicSkipThreash = false;
         this->overlapBehaviour = 0;
-		this->skipLowerThreash = -numeric_limits<double>::infinity();
-		this->skipUpperThreash = +numeric_limits<double>::infinity();
+		this->skipLowerThresh = -numeric_limits<double>::infinity();
+		this->skipUpperThresh = +numeric_limits<double>::infinity();
 		this->skipBand = 0;
 
 		XMLCh *outputXMLStr = XMLString::transcode("output");
@@ -563,34 +563,34 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 		XMLString::release(&skipValueXMLStr);
 
 		// Set upper threashold to skip in all bands, if not set no error will be printed and standard mosaic method will be used.
-		XMLCh *skipUpperThreashXMLStr = XMLString::transcode("skipUpperThreash");
-		if(argElement->hasAttribute(skipUpperThreashXMLStr))
+		XMLCh *skipUpperThreshXMLStr = XMLString::transcode("skipUpperThresh");
+		if(argElement->hasAttribute(skipUpperThreshXMLStr))
 		{
-			char *charValue = XMLString::transcode(argElement->getAttribute(skipUpperThreashXMLStr));
-			this->skipUpperThreash = mathUtils.strtofloat(string(charValue));
+			char *charValue = XMLString::transcode(argElement->getAttribute(skipUpperThreshXMLStr));
+			this->skipUpperThresh = mathUtils.strtofloat(string(charValue));
 			this->mosaicSkipThreash = true;
 			XMLString::release(&charValue);
 			if (mosaicSkipVals)
 			{
-				cout << "\tCan't use \'skipValue\' with \'skipUpperThreash\', using threashold instead" << endl;
+				cout << "\tCan't use \'skipValue\' with \'skipUpperThresh\', using threshold instead" << endl;
 			}
 		}
-		XMLString::release(&skipUpperThreashXMLStr);
+		XMLString::release(&skipUpperThreshXMLStr);
 
 		// Set lower threashold to skip in all bands, if not set no error will be printed and standard mosaic method will be used.
-		XMLCh *skipLowerThreashXMLStr = XMLString::transcode("skipLowerThreash");
-		if(argElement->hasAttribute(skipLowerThreashXMLStr))
+		XMLCh *skipLowerThreshXMLStr = XMLString::transcode("skipLowerThresh");
+		if(argElement->hasAttribute(skipLowerThreshXMLStr))
 		{
-			char *charValue = XMLString::transcode(argElement->getAttribute(skipLowerThreashXMLStr));
-			this->skipLowerThreash = mathUtils.strtofloat(string(charValue));
+			char *charValue = XMLString::transcode(argElement->getAttribute(skipLowerThreshXMLStr));
+			this->skipLowerThresh = mathUtils.strtofloat(string(charValue));
 			this->mosaicSkipThreash = true;
 			XMLString::release(&charValue);
 			if (mosaicSkipVals)
 			{
-				cout << "\tCan't use \'skipValue\' with \'skipLowerThreash\', using threashold instead" << endl;
+				cout << "\tCan't use \'skipValue\' with \'skipLowerThresh\', using threshold instead" << endl;
 			}
 		}
-		XMLString::release(&skipLowerThreashXMLStr);
+		XMLString::release(&skipLowerThreshXMLStr);
 
 		XMLCh *skipBandXMLStr = XMLString::transcode("setSkipBand");
 		if(argElement->hasAttribute(skipBandXMLStr))
@@ -604,11 +604,11 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			}
 			else if (this->mosaicSkipThreash)
 			{
-				cout << "\tSkiping pixels with a value between \'" << this->skipLowerThreash << "\' and \'" << this->skipUpperThreash << "\' in band \'" << this->skipBand + 1<< "\'" << endl;
+				cout << "\tSkiping pixels with a value between \'" << this->skipLowerThresh << "\' and \'" << this->skipUpperThresh << "\' in band \'" << this->skipBand + 1<< "\'" << endl;
 			}
 			else
 			{
-				cout << "\tBand set to define values to skip using \'setSkipBand\' but no value or threasholds set - IGNORING" << endl;
+				cout << "\tBand set to define values to skip using \'setSkipBand\' but no value or thresholds set - IGNORING" << endl;
 			}
 
 		}
@@ -620,7 +620,7 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			}
 			else if (this->mosaicSkipThreash)
 			{
-				cout << "\tSkiping pixels with a value between \'" << this->skipLowerThreash << "\' and \'" << this->skipUpperThreash << "\' using the first band (default)" << endl;			}
+				cout << "\tSkiping pixels with a value between \'" << this->skipLowerThresh << "\' and \'" << this->skipUpperThresh << "\' using the first band (default)" << endl;			}
 		}
 		XMLString::release(&skipBandXMLStr);
         
@@ -3697,7 +3697,7 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
             cout << "Input Images: \n";
             for(int i = 0; i < this->numImages; ++i)
             {
-                cout << i << ": " << inputImages[i] << endl;
+                cout << i+1 << ": " << inputImages[i] << endl;
             }
 			RSGISImageMosaic mosaic;
 			try
@@ -3709,8 +3709,8 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
 				}
 				else if (this->mosaicSkipThreash)
 				{
-                    std::cout << "Skipping pixel values between " << this->skipLowerThreash << " and " << this->skipUpperThreash << " in band " << this->skipBand << std::endl;
-					mosaic.mosaicSkipThreash(inputImages, this->numImages, this->outputImage, this->nodataValue, this->skipLowerThreash, this->skipUpperThreash, this->projFromImage, this->proj, this->skipBand, this->overlapBehaviour, this->imageFormat, this->outDataType);
+                    std::cout << "Skipping pixel values between " << this->skipLowerThresh << " and " << this->skipUpperThresh << " in band " << this->skipBand << std::endl;
+					mosaic.mosaicSkipThreash(inputImages, this->numImages, this->outputImage, this->nodataValue, this->skipLowerThresh, this->skipUpperThresh, this->projFromImage, this->proj, this->skipBand, this->overlapBehaviour, this->imageFormat, this->outDataType);
 				}
 				else
 				{
@@ -6213,14 +6213,14 @@ void RSGISExeImageUtils::help()
     cout << "    <rsgis:colour name=\"class_name_3\" id=\"int\" lower=\"double\" upper=\"double\" red=\"int\" green=\"int\" blue=\"int\" />" << endl;
     cout << "</rsgis:command>" << endl;
     cout << "<!-- A command to mosaic a set of input images to generate a single output image -->" << endl;
-    cout << "<rsgis:command algor=\"imageutils\" option=\"mosaic\" output=\"image_out.env\" nodata=\"float=0\" skipValue=\"float (optional)\" skipLowerThreash=\"float (optional)\" skipUpperThreash=\"float (optional)\"  proj=\"OSGB | NZ2000 | NZ1949 | IMAGE\" setSkipBand=\"1\" >" << endl;
+    cout << "<rsgis:command algor=\"imageutils\" option=\"mosaic\" output=\"image_out.env\" nodata=\"float=0\" skipValue=\"float (optional)\" skipLowerThresh=\"float (optional)\" skipUpperThresh=\"float (optional)\"  proj=\"OSGB | NZ2000 | NZ1949 | IMAGE\" setSkipBand=\"1\" >" << endl;
     cout << "    <rsgis:image file=\"image1\" />" << endl;
     cout << "    <rsgis:image file=\"image2\" />" << endl;
     cout << "    <rsgis:image file=\"image3\" />" << endl;
     cout << "    <rsgis:image file=\"image4\" />" << endl;
     cout << "</rsgis:command>" << endl;
     cout << "<!-- A command to mosaic a set of input images from a directory to generate a single output image -->" << endl;
-    cout << "<rsgis:command algor=\"imageutils\" option=\"mosaic\" dir=\"directory\" ext=\"file_extension\" output=\"image_out.env\" nodata=\"float=0\" skipValue=\"float (optional)\" skipLowerThreash=\"float (optional)\" skipUpperThreash=\"float (optional)\"  proj=\"OSGB | NZ2000 | NZ1949 | IMAGE\" />" << endl;
+    cout << "<rsgis:command algor=\"imageutils\" option=\"mosaic\" dir=\"directory\" ext=\"file_extension\" output=\"image_out.env\" nodata=\"float=0\" skipValue=\"float (optional)\" skipLowerThresh=\"float (optional)\" skipUpperThresh=\"float (optional)\"  proj=\"OSGB | NZ2000 | NZ1949 | IMAGE\" />" << endl;
     cout << "<!-- A command to include a set of input images into an existing image -->" << endl;
     cout << "<rsgis:command algor=\"imageutils\" option=\"include\" image=\"base_image.env\" >" << endl;
     cout << "    <rsgis:image file=\"image1\" />" << endl;

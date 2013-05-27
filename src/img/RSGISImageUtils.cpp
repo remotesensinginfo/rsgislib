@@ -2489,7 +2489,7 @@ namespace rsgis{namespace img{
 			for(int i = 0; i < numBands; i++)
 			{
 				outputRasterBands[i] = outputImage->GetRasterBand(i+1);
-                outputRasterBands[i]->SetDescription(bandNames.at(0).c_str());
+                outputRasterBands[i]->SetDescription(bandNames.at(i).c_str());
 			}
             outputRasterBands[0]->GetBlockSize(&xBlockSize, &yBlockSize);
             
