@@ -53,9 +53,9 @@ namespace rsgis{namespace img{
 		int yStart = 0;
 		std::string projection = proj;
 		GDALDataset *outputDataset = NULL;
-		GDALRasterBand *inputBand = NULL;
-		GDALRasterBand *outputBand = NULL;
-		float *imgData = NULL;
+		GDALRasterBand **inputRasterBands = NULL;
+		GDALRasterBand **outputRasterBands = NULL;
+		float **inputData = NULL;
 
         std::vector<std::string> bandnames;
 
@@ -95,57 +95,132 @@ namespace rsgis{namespace img{
 
 			imgUtils.getImagesExtent(inputImages, numDS, &width, &height, transformation);
 
+            // Create blank image
 			std::cout << "Create new image [" << width << "," << height << "] with projection: \n" << projection << std::endl;
 
 			outputDataset = imgUtils.createBlankImage(outputImage, transformation, width, height, numberBands, projection, background, bandnames, format, imgDataType);
 
 			// COPY IMAGE DATA INTO THE BLANK IMAGE
+            
+            //Get Image Output Bands
+            outputRasterBands = new GDALRasterBand*[numberBands];
+            for(int i = 0; i < numberBands; i++)
+            {
+                outputRasterBands[i] = outputDataset->GetRasterBand(i+1);
+            }
+            
+            int xBlockSize = 0;
+            int yBlockSize = 0;
+            outputRasterBands[0]->GetBlockSize (&xBlockSize, &yBlockSize);
+            
+            std::cout << "Max. block size: " << yBlockSize << std::endl;
 
 			std::cout << "Started (total " << numDS << ") ." << std::flush;
-
-			for(int i = 0; i < numDS; i++)
+            
+            for(int ds = 0; ds < numDS; ds++)
 			{
-				std::cout << "." << i+1 << "." << std::flush;
-
-                dataset = (GDALDataset *) GDALOpenShared(inputImages[i].c_str(), GA_ReadOnly);
+				std::cout << "." << ds+1 << "." << std::flush;
+                
+                dataset = (GDALDataset *) GDALOpenShared(inputImages[ds].c_str(), GA_ReadOnly);
                 if(dataset == NULL)
                 {
-                    std::string message = std::string("Could not open image ") + inputImages[i];
+                    std::string message = std::string("Could not open image ") + inputImages[ds];
                     throw RSGISImageException(message.c_str());
                 }
-
+                
+                inputRasterBands = new GDALRasterBand*[numberBands];
+                for(int i = 0; i < numberBands; i++)
+                {
+                    inputRasterBands[i] = dataset->GetRasterBand(i+1);
+                }
+                
 				dataset->GetGeoTransform(imgTransform);
 				tileXSize = dataset->GetRasterXSize();
 				tileYSize = dataset->GetRasterYSize();
-
+                
 				xDiff = imgTransform[0] - transformation[0];
 				yDiff = transformation[3] - imgTransform[3];
-
+                
 				xStart = floor(xDiff/transformation[1]);
 				yStart = floor(yDiff/transformation[1]);
-				imgData = (float *) CPLMalloc(sizeof(float)*tileXSize);
-
-				for(int n = 1; n <= numberBands; n++)
-				{
-					inputBand = dataset->GetRasterBand(n);
-					outputBand = outputDataset->GetRasterBand(n);
-					for(int m = 0; m < tileYSize; m++)
-					{
-						inputBand->RasterIO(GF_Read, 0, m, tileXSize, 1, imgData, tileXSize, 1, GDT_Float32, 0, 0);
-						outputBand->RasterIO(GF_Write, xStart, (yStart + m), tileXSize, 1, imgData, tileXSize, 1, GDT_Float32, 0, 0);
-					}
-				}
-				delete imgData;
+                
+                // Allocate memory
+                inputData = new float*[numberBands];
+                for(int i = 0; i < numberBands; i++)
+                {
+                    inputData[i] = (float *) CPLMalloc(sizeof(float)*(tileXSize*yBlockSize));
+                }
+                    
+                int nYBlocks = tileYSize / yBlockSize;
+                int remainRows = tileYSize - (nYBlocks * yBlockSize);
+                int rowOffset = 0;
+                
+                for(int i = 0; i < nYBlocks; i++)
+                {
+                    //std::cout << i << " of " << nYBlocks << std::endl;
+                    
+                    for(int n = 0; n < numberBands; n++)
+                    {
+                        rowOffset = yBlockSize * i;
+                        inputRasterBands[n]->RasterIO(GF_Read, 0, rowOffset, tileXSize, yBlockSize, inputData[n], tileXSize, yBlockSize, GDT_Float32, 0, 0);
+                        outputRasterBands[n]->RasterIO(GF_Write, xStart, (yStart + rowOffset), tileXSize, yBlockSize, inputData[n], tileXSize, yBlockSize, GDT_Float32, 0, 0);
+                    }
+                    
+                }
+                
+                if(remainRows > 0)
+                {
+                    for(int n = 0; n < numberBands; n++)
+                    {
+                        rowOffset = yBlockSize * nYBlocks;
+                        inputRasterBands[n]->RasterIO(GF_Read, 0, rowOffset, tileXSize, remainRows, inputData[n], tileXSize, remainRows, GDT_Float32, 0, 0);
+                        outputRasterBands[n]->RasterIO(GF_Write, xStart, (yStart + rowOffset), tileXSize, remainRows, inputData[n], tileXSize, remainRows, GDT_Float32, 0, 0);
+                    }
+                }
+                
+                // Tidy up
+                if(inputData != NULL)
+                {
+                    for(int i = 0; i < numberBands; i++)
+                    {
+                        if(inputData[i] != NULL)
+                        {
+                            delete[] inputData[i];
+                        }
+                    }
+                    delete[] inputData;
+                }
+                if(inputRasterBands != NULL)
+                {
+                    delete[] inputRasterBands;
+                }
+                
                 GDALClose(dataset);
 			}
 			std::cout << ".complete\n";
+            
 		}
 		catch(RSGISImageBandException e)
 		{
-			if(imgData != NULL)
-			{
-				delete imgData;
-			}
+            if(inputData != NULL)
+            {
+                for(int i = 0; i < numberBands; i++)
+                {
+                    if(inputData[i] != NULL)
+                    {
+                        delete[] inputData[i];
+                    }
+                }
+                delete[] inputData;
+            }
+            if(inputRasterBands != NULL)
+            {
+                delete[] inputRasterBands;
+            }
+            if(outputRasterBands != NULL)
+            {
+                delete[] outputRasterBands;
+            }
 			if(transformation != NULL)
 			{
 				delete[] transformation;
@@ -157,6 +232,12 @@ namespace rsgis{namespace img{
 			throw e;
 		}
 
+        // Tidy
+        if(outputRasterBands != NULL)
+        {
+            delete[] outputRasterBands;
+        }
+        
 		if(transformation != NULL)
 		{
 			delete[] transformation;
