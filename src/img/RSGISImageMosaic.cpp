@@ -23,6 +23,9 @@
  *  Added 'mosaicSkipVals' and 'mosaicSkipThreash'
  *  to skip values in input image
  *
+ *  Modified by Dan Clewley on 27/05/2013
+ *  Changed to block read / write
+ *  Added ability to take minimum / maximum pixel in overlapping regions
  */
 
 #include "RSGISImageMosaic.h"
@@ -384,7 +387,7 @@ namespace rsgis{namespace img{
                         // Read input data
                         inputRasterBands[n]->RasterIO(GF_Read, 0, rowOffset, tileXSize, yBlockSize, inputData[n], tileXSize, yBlockSize, GDT_Float32, 0, 0);
                         // Read output data
-                        outputRasterBands[n]->RasterIO(GF_Read, 0, rowOffset, tileXSize, yBlockSize, outputData[n], tileXSize, yBlockSize, GDT_Float32, 0, 0);
+                        outputRasterBands[n]->RasterIO(GF_Read, xStart, (yStart + rowOffset), tileXSize, yBlockSize, outputData[n], tileXSize, yBlockSize, GDT_Float32, 0, 0);
                     }
                     
                     pixelsChanged = false; // Keep track if there are changes that need writing out.
@@ -396,11 +399,29 @@ namespace rsgis{namespace img{
                             // Check for skip value
                             if(inputData[skipBand][(m*tileXSize)+j] != skipVal)
                             {
-                                // Minimum pixel overlap behaviour - overwrite if less than existing value
-                                if(overlapBehaviour == 1)
+                                // Check if behaviour is defined for overlap and not the first image
+                                if( (overlapBehaviour > 0) && (ds > 0) )
                                 {
-                                    // If first or less than existing value write out
-                                    if( (ds == 0) || (inputData[skipBand][(m*tileXSize)+j] < outputData[skipBand][(m*tileXSize)+j]) )
+                                    // Check if pixel is background value (no data has been written yet)
+                                    if( outputData[skipBand][(m*tileXSize)+j] == background )
+                                    {
+                                        for(int n = 0; n < numberBands; n++)
+                                        {
+                                            outputData[n][(m*tileXSize)+j] = inputData[n][(m*tileXSize)+j];
+                                        }
+                                        pixelsChanged = true;
+                                    }
+                                    // If data has been written - check if new value is less (min overlap behaviour)
+                                    else if( (overlapBehaviour == 1) &&  (inputData[skipBand][(m*tileXSize)+j] < outputData[skipBand][(m*tileXSize)+j]) )
+                                    {
+                                        for(int n = 0; n < numberBands; n++)
+                                        {
+                                            outputData[n][(m*tileXSize)+j] = inputData[n][(m*tileXSize)+j];
+                                        }
+                                        pixelsChanged = true;
+                                    }
+                                    // If data has been written - check if new value is greater (max overlap behaviour)
+                                    else if( (overlapBehaviour == 2) &&  (inputData[skipBand][(m*tileXSize)+j] > outputData[skipBand][(m*tileXSize)+j]) )
                                     {
                                         for(int n = 0; n < numberBands; n++)
                                         {
@@ -409,19 +430,7 @@ namespace rsgis{namespace img{
                                         pixelsChanged = true;
                                     }
                                 }
-                                // Maximum pixel overlap behaviour - overwrite if more than existing value
-                                else if(overlapBehaviour == 2)
-                                {
-                                    // If first or more than existing value write out
-                                    if( (ds == 0) || (inputData[skipBand][(m*tileXSize)+j] > outputData[skipBand][(m*tileXSize)+j]) )
-                                    {
-                                        for(int n = 0; n < numberBands; n++)
-                                        {
-                                            outputData[n][(m*tileXSize)+j] = inputData[n][(m*tileXSize)+j];
-                                        }
-                                        pixelsChanged = true;
-                                    }
-                                }
+                                // If no overlap behaviour defined, write out,
                                 else
                                 {
                                     for(int n = 0; n < numberBands; n++)
@@ -436,7 +445,7 @@ namespace rsgis{namespace img{
                         }
                     }
                     
-                    // Write out data
+                    // Write out data to mosaic
                     if(pixelsChanged)
                     {
                         for(int n = 0; n < numberBands; n++)
@@ -455,7 +464,7 @@ namespace rsgis{namespace img{
                         // Read input data
                         inputRasterBands[n]->RasterIO(GF_Read, 0, rowOffset, tileXSize, remainRows, inputData[n], tileXSize, remainRows, GDT_Float32, 0, 0);
                         // Read output data
-                        outputRasterBands[n]->RasterIO(GF_Write, xStart, (yStart + rowOffset), tileXSize, remainRows, inputData[n], tileXSize, remainRows, GDT_Float32, 0, 0);
+                        outputRasterBands[n]->RasterIO(GF_Read, xStart, (yStart + rowOffset), tileXSize, remainRows, outputData[n], tileXSize, remainRows, GDT_Float32, 0, 0);
                     }
                     
                     pixelsChanged = false; // Keep track if there are changes that need writing out.
@@ -467,11 +476,29 @@ namespace rsgis{namespace img{
                             // Check for skip value
                             if(inputData[skipBand][(m*tileXSize)+j] != skipVal)
                             {
-                                // Minimum pixel overlap behaviour - overwrite if less than existing value
-                                if(overlapBehaviour == 1)
+                                // Check if behaviour is defined for overlap and not the first image
+                                if( (overlapBehaviour > 0) && (ds > 0) )
                                 {
-                                    // If first or less than existing value write out
-                                    if( (ds == 0) || (inputData[skipBand][(m*tileXSize)+j] < outputData[skipBand][(m*tileXSize)+j]) )
+                                    // Check if pixel is background value (no data has been written yet)
+                                    if( outputData[skipBand][(m*tileXSize)+j] == background )
+                                    {
+                                        for(int n = 0; n < numberBands; n++)
+                                        {
+                                            outputData[n][(m*tileXSize)+j] = inputData[n][(m*tileXSize)+j];
+                                        }
+                                        pixelsChanged = true;
+                                    }
+                                    // If data has been written - check if new value is less (min overlap behaviour)
+                                    else if( (overlapBehaviour == 1) &&  (inputData[skipBand][(m*tileXSize)+j] < outputData[skipBand][(m*tileXSize)+j]) )
+                                    {
+                                        for(int n = 0; n < numberBands; n++)
+                                        {
+                                            outputData[n][(m*tileXSize)+j] = inputData[n][(m*tileXSize)+j];
+                                        }
+                                        pixelsChanged = true;
+                                    }
+                                    // If data has been written - check if new value is greater (max overlap behaviour)
+                                    else if( (overlapBehaviour == 2) &&  (inputData[skipBand][(m*tileXSize)+j] > outputData[skipBand][(m*tileXSize)+j]) )
                                     {
                                         for(int n = 0; n < numberBands; n++)
                                         {
@@ -480,19 +507,7 @@ namespace rsgis{namespace img{
                                         pixelsChanged = true;
                                     }
                                 }
-                                // Maximum pixel overlap behaviour - overwrite if more than existing value
-                                else if(overlapBehaviour == 2)
-                                {
-                                    // If first or more than existing value write out
-                                    if( (ds == 0) || (inputData[skipBand][(m*tileXSize)+j] > outputData[skipBand][(m*tileXSize)+j]) )
-                                    {
-                                        for(int n = 0; n < numberBands; n++)
-                                        {
-                                            outputData[n][(m*tileXSize)+j] = inputData[n][(m*tileXSize)+j];
-                                        }
-                                        pixelsChanged = true;
-                                    }
-                                }
+                                // If no overlap behaviour defined, write out,
                                 else
                                 {
                                     for(int n = 0; n < numberBands; n++)
@@ -612,7 +627,7 @@ namespace rsgis{namespace img{
         //GDALDestroyDriverManager();
 	}
 
-	void RSGISImageMosaic::mosaicSkipThreash(std::string *inputImages, int numDS, std::string outputImage, float background, float skipLowerThreash, float skipUpperThreash, bool projFromImage, std::string proj, unsigned int threashBand, unsigned int overlapBehaviour, std::string format, GDALDataType imgDataType) throw(RSGISImageException)
+	void RSGISImageMosaic::mosaicSkipThreash(std::string *inputImages, int numDS, std::string outputImage, float background, float skipLowerThreash, float skipUpperThreash, bool projFromImage, std::string proj, unsigned int threshBand, unsigned int overlapBehaviour, std::string format, GDALDataType imgDataType) throw(RSGISImageException)
 	{
 		RSGISImageUtils imgUtils;
         GDALAllRegister();
@@ -656,7 +671,6 @@ namespace rsgis{namespace img{
                     for(int j = 0; j < numberBands; ++j)
                     {
                         imgBand = dataset->GetRasterBand(j+1);
-                        std::cout << std::string(imgBand->GetDescription()) << std::endl;
                         bandnames.push_back(std::string(imgBand->GetDescription()));
                     }
                     if(projFromImage)
@@ -747,7 +761,7 @@ namespace rsgis{namespace img{
                         // Read input data
                         inputRasterBands[n]->RasterIO(GF_Read, 0, rowOffset, tileXSize, yBlockSize, inputData[n], tileXSize, yBlockSize, GDT_Float32, 0, 0);
                         // Read output data
-                        outputRasterBands[n]->RasterIO(GF_Read, 0, rowOffset, tileXSize, yBlockSize, outputData[n], tileXSize, yBlockSize, GDT_Float32, 0, 0);
+                        outputRasterBands[n]->RasterIO(GF_Read, xStart, (yStart + rowOffset), tileXSize, yBlockSize, outputData[n], tileXSize, yBlockSize, GDT_Float32, 0, 0);
                     }
                     
                     pixelsChanged = false; // Keep track if there are changes that need writing out.
@@ -756,14 +770,32 @@ namespace rsgis{namespace img{
                     {
                         for(int j = 0; j < tileXSize; j++)
                         {
-                            // Check if pixel is within thresholds
-                            if((inputData[threashBand][(m*tileXSize)+j] > skipLowerThreash) && (inputData[threashBand][(m*tileXSize)+j] < skipUpperThreash)) 
+                            // Check value is between upper and lower limits
+                            if((inputData[threshBand][(m*tileXSize)+j] > skipLowerThreash) && (inputData[threshBand][(m*tileXSize)+j] < skipUpperThreash))
                             {
-                                // Minimum pixel overlap behaviour - overwrite if less than existing value
-                                if(overlapBehaviour == 1)
+                                // Check if behaviour is defined for overlap and not the first image
+                                if( (overlapBehaviour > 0) && (ds > 0) )
                                 {
-                                    // If first or less than existing value write out
-                                    if( (ds == 0) || (inputData[threashBand][(m*tileXSize)+j] < outputData[threashBand][(m*tileXSize)+j]) )
+                                    // Check if pixel is background value (no data has been written yet)
+                                    if( outputData[threshBand][(m*tileXSize)+j] == background )
+                                    {
+                                        for(int n = 0; n < numberBands; n++)
+                                        {
+                                            outputData[n][(m*tileXSize)+j] = inputData[n][(m*tileXSize)+j];
+                                        }
+                                        pixelsChanged = true;
+                                    }
+                                    // If data has been written - check if new value is less (min overlap behaviour)
+                                    else if( (overlapBehaviour == 1) &&  (inputData[threshBand][(m*tileXSize)+j] < outputData[threshBand][(m*tileXSize)+j]) )
+                                    {
+                                        for(int n = 0; n < numberBands; n++)
+                                        {
+                                            outputData[n][(m*tileXSize)+j] = inputData[n][(m*tileXSize)+j];
+                                        }
+                                        pixelsChanged = true;
+                                    }
+                                    // If data has been written - check if new value is greater (max overlap behaviour)
+                                    else if( (overlapBehaviour == 2) &&  (inputData[threshBand][(m*tileXSize)+j] > outputData[threshBand][(m*tileXSize)+j]) )
                                     {
                                         for(int n = 0; n < numberBands; n++)
                                         {
@@ -772,19 +804,7 @@ namespace rsgis{namespace img{
                                         pixelsChanged = true;
                                     }
                                 }
-                                // Maximum pixel overlap behaviour - overwrite if more than existing value
-                                else if(overlapBehaviour == 2)
-                                {
-                                    // If first or more than existing value write out
-                                    if( (ds == 0) || (inputData[threashBand][(m*tileXSize)+j] > outputData[threashBand][(m*tileXSize)+j]) )
-                                    {
-                                        for(int n = 0; n < numberBands; n++)
-                                        {
-                                            outputData[n][(m*tileXSize)+j] = inputData[n][(m*tileXSize)+j];
-                                        }
-                                        pixelsChanged = true;
-                                    }
-                                }
+                                // If no overlap behaviour defined, write out,
                                 else
                                 {
                                     for(int n = 0; n < numberBands; n++)
@@ -799,7 +819,7 @@ namespace rsgis{namespace img{
                         }
                     }
                     
-                    // Write out data
+                    // Write out data to mosaic
                     if(pixelsChanged)
                     {
                         for(int n = 0; n < numberBands; n++)
@@ -818,7 +838,7 @@ namespace rsgis{namespace img{
                         // Read input data
                         inputRasterBands[n]->RasterIO(GF_Read, 0, rowOffset, tileXSize, remainRows, inputData[n], tileXSize, remainRows, GDT_Float32, 0, 0);
                         // Read output data
-                        outputRasterBands[n]->RasterIO(GF_Write, xStart, (yStart + rowOffset), tileXSize, remainRows, inputData[n], tileXSize, remainRows, GDT_Float32, 0, 0);
+                        outputRasterBands[n]->RasterIO(GF_Read, xStart, (yStart + rowOffset), tileXSize, remainRows, outputData[n], tileXSize, remainRows, GDT_Float32, 0, 0);
                     }
                     
                     pixelsChanged = false; // Keep track if there are changes that need writing out.
@@ -827,14 +847,32 @@ namespace rsgis{namespace img{
                     {
                         for(int j = 0; j < tileXSize; j++)
                         {
-                            // Check if pixel is within thresholds
-                            if((inputData[threashBand][(m*tileXSize)+j] > skipLowerThreash) && (inputData[threashBand][(m*tileXSize)+j] < skipUpperThreash))
+                            // Check value is between upper and lower limits
+                            if((inputData[threshBand][(m*tileXSize)+j] > skipLowerThreash) && (inputData[threshBand][(m*tileXSize)+j] < skipUpperThreash))
                             {
-                                // Minimum pixel overlap behaviour - overwrite if less than existing value
-                                if(overlapBehaviour == 1)
+                                // Check if behaviour is defined for overlap and not the first image
+                                if( (overlapBehaviour > 0) && (ds > 0) )
                                 {
-                                    // If first or less than existing value write out
-                                    if( (ds == 0) || (inputData[threashBand][(m*tileXSize)+j] < outputData[threashBand][(m*tileXSize)+j]) )
+                                    // Check if pixel is background value (no data has been written yet)
+                                    if( outputData[threshBand][(m*tileXSize)+j] == background )
+                                    {
+                                        for(int n = 0; n < numberBands; n++)
+                                        {
+                                            outputData[n][(m*tileXSize)+j] = inputData[n][(m*tileXSize)+j];
+                                        }
+                                        pixelsChanged = true;
+                                    }
+                                    // If data has been written - check if new value is less (min overlap behaviour)
+                                    else if( (overlapBehaviour == 1) &&  (inputData[threshBand][(m*tileXSize)+j] < outputData[threshBand][(m*tileXSize)+j]) )
+                                    {
+                                        for(int n = 0; n < numberBands; n++)
+                                        {
+                                            outputData[n][(m*tileXSize)+j] = inputData[n][(m*tileXSize)+j];
+                                        }
+                                        pixelsChanged = true;
+                                    }
+                                    // If data has been written - check if new value is greater (max overlap behaviour)
+                                    else if( (overlapBehaviour == 2) &&  (inputData[threshBand][(m*tileXSize)+j] > outputData[threshBand][(m*tileXSize)+j]) )
                                     {
                                         for(int n = 0; n < numberBands; n++)
                                         {
@@ -843,19 +881,7 @@ namespace rsgis{namespace img{
                                         pixelsChanged = true;
                                     }
                                 }
-                                // Maximum pixel overlap behaviour - overwrite if more than existing value
-                                else if(overlapBehaviour == 2)
-                                {
-                                    // If first or more than existing value write out
-                                    if( (ds == 0) || (inputData[threashBand][(m*tileXSize)+j] > outputData[threashBand][(m*tileXSize)+j]) )
-                                    {
-                                        for(int n = 0; n < numberBands; n++)
-                                        {
-                                            outputData[n][(m*tileXSize)+j] = inputData[n][(m*tileXSize)+j];
-                                        }
-                                        pixelsChanged = true;
-                                    }
-                                }
+                                // If no overlap behaviour defined, write out,
                                 else
                                 {
                                     for(int n = 0; n < numberBands; n++)

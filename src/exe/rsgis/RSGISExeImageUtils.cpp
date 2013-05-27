@@ -629,7 +629,7 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
         {
             if(!this->mosaicSkipVals && !this->mosaicSkipThreash)
             {
-                throw RSGISXMLArgumentsException("Can't define overlap behaviour for simple mosaic.");
+                throw RSGISXMLArgumentsException("Can't define overlap behaviour for simple mosaic, define \'skipValue\' or \'skipLowerThresh\' and \'skipLowerThresh\'");
             }
                 
             const XMLCh *overlapBehaviourStr = argElement->getAttribute(overlapBehaviourXML);
