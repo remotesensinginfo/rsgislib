@@ -647,8 +647,10 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
 					{
 						// Set to default values if no file (don't print warning)
 						covMatrixP = gsl_matrix_alloc(2,2);
-						double pCov1 = 1e10;
-						double pCov2 = 1e10 * (gsl_vector_get(this->initialParClass->at(i), 1) / gsl_vector_get(this->initialParClass->at(i), 0));
+                        // Values of matrix based on assumption that standard deviation is 50 percent of value
+						double pCov1 = pow(gsl_vector_get(this->initialParClass->at(i),0)*0.5,2)*1e6;
+						double pCov2 = pow(gsl_vector_get(this->initialParClass->at(i),1)*0.5,2)*1e6*
+                                        gsl_vector_get(this->initialParClass->at(i),0)/gsl_vector_get(this->initialParClass->at(i),1);
 						gsl_matrix_set_zero(covMatrixP);
 						gsl_matrix_set(covMatrixP, 0, 0, pCov1);
 						gsl_matrix_set(covMatrixP, 1, 1, pCov2);
@@ -1029,7 +1031,7 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
 							// Set to default values if no file (don't print warning)
 							covMatrixP = gsl_matrix_alloc(2,2);
 							double pCov1 = 1e10;
-							double pCov2 = 1e10 * (gsl_vector_get(this->initialParClass->at(i), 1) / gsl_vector_get(this->initialParClass->at(i), 0));
+							double pCov2 = 1e10;
 							gsl_matrix_set_zero(covMatrixP);
 							gsl_matrix_set(covMatrixP, 0, 0, pCov1);
 							gsl_matrix_set(covMatrixP, 1, 1, pCov2);
@@ -1689,8 +1691,10 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
 					{
 						// Set to default values if no file (don't print warning)
 						covMatrixP = gsl_matrix_alloc(2,2);
-						double pCov1 = 1e10;
-						double pCov2 = 1e10 * (gsl_vector_get(this->initialParClass->at(i), 1) / gsl_vector_get(this->initialParClass->at(i), 0));
+                        // Values of matrix based on assumption that standard deviation is 50 percent of value
+						double pCov1 = pow(gsl_vector_get(this->initialParClass->at(i),0)*0.5,2)*1e6;
+						double pCov2 = pow(gsl_vector_get(this->initialParClass->at(i),1)*0.5,2)*1e6*
+                        gsl_vector_get(this->initialParClass->at(i),0)/gsl_vector_get(this->initialParClass->at(i),1);
 						gsl_matrix_set_zero(covMatrixP);
 						gsl_matrix_set(covMatrixP, 0, 0, pCov1);
 						gsl_matrix_set(covMatrixP, 1, 1, pCov2);
@@ -1929,8 +1933,10 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
 					{
 						// Set to default values if no file (don't print warning)
 						covMatrixP = gsl_matrix_alloc(2,2);
-						double pCov1 = 1e10;
-						double pCov2 = 1e10 * (gsl_vector_get(this->initialParClass->at(i), 1) / gsl_vector_get(this->initialParClass->at(i), 0));
+                        // Values of matrix based on assumption that standard deviation is 50 percent of value
+						double pCov1 = pow(gsl_vector_get(this->initialParClass->at(i),0)*0.5,2)*1e6;
+						double pCov2 = pow(gsl_vector_get(this->initialParClass->at(i),1)*0.5,2)*1e6*
+                        gsl_vector_get(this->initialParClass->at(i),0)/gsl_vector_get(this->initialParClass->at(i),1);
 						gsl_matrix_set_zero(covMatrixP);
 						gsl_matrix_set(covMatrixP, 0, 0, pCov1);
 						gsl_matrix_set(covMatrixP, 1, 1, pCov2);
@@ -2084,7 +2090,7 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
 							// Set to default values if no file (don't print warning)
 							covMatrixP = gsl_matrix_alloc(2,2);
 							double pCov1 = 1e10;
-							double pCov2 = 1e10 * (gsl_vector_get(this->initialParClass->at(i), 1) / gsl_vector_get(this->initialParClass->at(i), 0));
+							double pCov2 = 1e10;
 							gsl_matrix_set_zero(covMatrixP);
 							gsl_matrix_set(covMatrixP, 0, 0, pCov1);
 							gsl_matrix_set(covMatrixP, 1, 1, pCov2);
@@ -2974,8 +2980,10 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
 					{
 						// Set to default values if no file (don't print warning)
 						covMatrixP = gsl_matrix_alloc(2,2);
-						double pCov1 = 1e10;
-						double pCov2 = 1e10 * (gsl_vector_get(this->initialParClass->at(i), 1) / gsl_vector_get(this->initialParClass->at(i), 0));
+                        // Values of matrix based on assumption that standard deviation is 50 percent of value
+						double pCov1 = pow(gsl_vector_get(this->initialParClass->at(i),0)*0.5,2)*1e6;
+						double pCov2 = pow(gsl_vector_get(this->initialParClass->at(i),1)*0.5,2)*1e6*
+                        gsl_vector_get(this->initialParClass->at(i),0)/gsl_vector_get(this->initialParClass->at(i),1);
 						gsl_matrix_set_zero(covMatrixP);
 						gsl_matrix_set(covMatrixP, 0, 0, pCov1);
 						gsl_matrix_set(covMatrixP, 1, 1, pCov2);
@@ -3057,7 +3065,7 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
 							// Set to default values if no file (don't print warning)
 							covMatrixP = gsl_matrix_alloc(2,2);
 							double pCov1 = 1e10;
-							double pCov2 = 1e10 * (gsl_vector_get(this->initialParClass->at(i), 1) / gsl_vector_get(this->initialParClass->at(i), 0));
+							double pCov2 = 1e10;
 							gsl_matrix_set_zero(covMatrixP);
 							gsl_matrix_set(covMatrixP, 0, 0, pCov1);
 							gsl_matrix_set(covMatrixP, 1, 1, pCov2);
@@ -3675,8 +3683,10 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
 					{
 						// Set to default values if no file (don't print warning)
 						covMatrixP = gsl_matrix_alloc(2,2);
-						double pCov1 = 1e10;
-						double pCov2 = 1e10 * ((gsl_vector_get(this->initialParClass->at(i), 1)) / (gsl_vector_get(this->initialParClass->at(i), 0)));
+                        // Values of matrix based on assumption that standard deviation is 50 percent of value
+						double pCov1 = pow(gsl_vector_get(this->initialParClass->at(i),0)*0.5,2)*1e6;
+						double pCov2 = pow(gsl_vector_get(this->initialParClass->at(i),1)*0.5,2)*1e6*
+                        gsl_vector_get(this->initialParClass->at(i),0)/gsl_vector_get(this->initialParClass->at(i),1);
 						gsl_matrix_set_zero(covMatrixP);
 						gsl_matrix_set(covMatrixP, 0, 0, pCov1);
 						gsl_matrix_set(covMatrixP, 1, 1, pCov2);
@@ -3756,7 +3766,7 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
 							// Set to default values if no file (don't print warning)
 							covMatrixP = gsl_matrix_alloc(2,2);
 							double pCov1 = 1e10;
-							double pCov2 = 1e10 * ((gsl_vector_get(this->initialParClass->at(i), 1)) / (gsl_vector_get(this->initialParClass->at(i), 0)));
+							double pCov2 = 1e10;
 							gsl_matrix_set_zero(covMatrixP);
 							gsl_matrix_set(covMatrixP, 0, 0, pCov1);
 							gsl_matrix_set(covMatrixP, 1, 1, pCov2);
@@ -4436,9 +4446,11 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
                     {
                         // Set to default values if no file (don't print warning)
                         covMatrixP = gsl_matrix_alloc(3,3);
-                        double pCov1 = 1e10 * (gsl_vector_get(this->initialParClass->at(i), 0) / gsl_vector_get(this->initialParClass->at(i), 1));
-                        double pCov2 = 1e10;
-                        double pCov3 = 1e10 * (gsl_vector_get(this->initialParClass->at(i), 2) / gsl_vector_get(this->initialParClass->at(i), 1));
+						double pCov1 = pow(gsl_vector_get(this->initialParClass->at(i),0)*0.5,2)*1e6;
+						double pCov2 = pow(gsl_vector_get(this->initialParClass->at(i),1)*0.5,2)*1e6*
+                            gsl_vector_get(this->initialParClass->at(i),0)/gsl_vector_get(this->initialParClass->at(i),1);
+						double pCov3 = pow(gsl_vector_get(this->initialParClass->at(i),2)*0.5,2)*1e6*
+                            gsl_vector_get(this->initialParClass->at(i),0)/gsl_vector_get(this->initialParClass->at(i),2);
                         // If simulated annealing set all values to 10e10 (not used)
                         if (XMLString::equals(methodSimulatedAnnealing, methodStr))
                         {
@@ -4925,9 +4937,11 @@ void RSGISExeEstimationAlgorithm::retrieveParameters(DOMElement *argElement) thr
                         // Set to default values if no file (don't print warning)
                         covMatrixP = gsl_matrix_alloc(3,3);
 
-                        double pCov1 = 1e10 * (gsl_vector_get(this->initialParClass->at(i), 0) / gsl_vector_get(this->initialParClass->at(i), 1));
-                        double pCov2 = 1e10;
-                        double pCov3 = 1e10 * (gsl_vector_get(this->initialParClass->at(i), 2) / gsl_vector_get(this->initialParClass->at(i), 1));
+						double pCov1 = pow(gsl_vector_get(this->initialParClass->at(i),0)*0.5,2)*1e6;
+						double pCov2 = pow(gsl_vector_get(this->initialParClass->at(i),1)*0.5,2)*1e6*
+                            gsl_vector_get(this->initialParClass->at(i),0)/gsl_vector_get(this->initialParClass->at(i),1);
+						double pCov3 = pow(gsl_vector_get(this->initialParClass->at(i),2)*0.5,2)*1e6*
+                            gsl_vector_get(this->initialParClass->at(i),0)/gsl_vector_get(this->initialParClass->at(i),2);
                         // If simulated annealing set all values to 10e10 (not used)
                         if (XMLString::equals(methodSimulatedAnnealing, methodStr))
                         {

@@ -64,7 +64,7 @@ namespace rsgis {namespace radar{
 
         // Set up random number generator
         this->randgsl = gsl_rng_alloc (gsl_rng_taus2);
-        double seed = 0; // time(0) + rand();
+        double seed = time(0) + std::rand();
         gsl_rng_set (randgsl, seed);
 
 
