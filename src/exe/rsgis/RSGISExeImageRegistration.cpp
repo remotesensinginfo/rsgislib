@@ -1066,6 +1066,10 @@ void RSGISExeImageRegistration::runAlgorithm() throw(rsgis::RSGISException)
 				{
 					regImgs->exportTiePointsRSGISImage2Map(this->outputGCPFile);
 				}
+                else if(outputType == rsgis_mapoffs)
+				{
+					regImgs->exportTiePointsRSGISMapOffs(this->outputGCPFile);
+				}
 				
 				delete similarityMetric;
 				delete regImgs;
