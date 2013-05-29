@@ -131,7 +131,7 @@ void RSGISExeImageRegistration::retrieveParameters(xercesc::DOMElement *argEleme
 				else
 				{
 					this->outputType = RSGISExeImageRegistration::undefinedOutput;
-					throw rsgis::RSGISXMLArgumentsException("The \'outputType\' attribute needs to have one of the following values envi_img2img | envi_img2map | gdal.");
+					throw rsgis::RSGISXMLArgumentsException("The \'outputType\' attribute needs to have one of the following values:\n\tenvi_img2img | envi_img2map | rsgis_img2map | rsgis_mapoffs.");
 				}
 				xercesc::XMLString::release(&envImg2ImgStr);
 				xercesc::XMLString::release(&enviImg2MapStr);
