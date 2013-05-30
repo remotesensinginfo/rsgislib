@@ -230,7 +230,7 @@ class RSGISExeImageUtils : public RSGISAlgorithmParameters
 		float lowerRangeValue;
 		float upperRangeValue;
 		bool mosaicSkipVals;
-		bool mosaicSkipThreash;
+		bool mosaicSkipThresh;
 		noiseType noise;
 		float scale;
         bool definiensTiles;
