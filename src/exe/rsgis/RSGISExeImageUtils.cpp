@@ -3704,12 +3704,12 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
 			{
 				if (this->mosaicSkipVals)
 				{
-                    std::cout << "Skipping pixel values = " << this->skipValue << " in band " << this->skipBand << std::endl;
+                    std::cout << "Skipping pixel values = " << this->skipValue << " in band " << this->skipBand + 1 << std::endl;
 					mosaic.mosaicSkipVals(inputImages, this->numImages, this->outputImage, this->nodataValue, this->skipValue, this->projFromImage, this->proj, this->skipBand, this->overlapBehaviour, this->imageFormat, this->outDataType);
 				}
 				else if (this->mosaicSkipThreash)
 				{
-                    std::cout << "Skipping pixel values between " << this->skipLowerThresh << " and " << this->skipUpperThresh << " in band " << this->skipBand << std::endl;
+                    std::cout << "Skipping pixel values between " << this->skipLowerThresh << " and " << this->skipUpperThresh << " in band " << this->skipBand + 1 << std::endl;
 					mosaic.mosaicSkipThreash(inputImages, this->numImages, this->outputImage, this->nodataValue, this->skipLowerThresh, this->skipUpperThresh, this->projFromImage, this->proj, this->skipBand, this->overlapBehaviour, this->imageFormat, this->outDataType);
 				}
 				else
