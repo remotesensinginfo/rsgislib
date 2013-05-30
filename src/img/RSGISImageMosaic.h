@@ -20,7 +20,7 @@
  *
  *
  *  Modified by Dan Clewley on 21/11/2010
- *  Added 'mosaicSkipVals' and 'mosaicSkipThreash'
+ *  Added 'mosaicSkipVals' and 'mosaicSkipThresh'
  *  to skip values in input image
  * 
  */
@@ -49,7 +49,7 @@ namespace rsgis
 				RSGISImageMosaic();
 				void mosaic(std::string *inputImages, int numDS, std::string outputImage, float background, bool projFromImage, std::string proj, std::string format="ENVI", GDALDataType imgDataType=GDT_Float32) throw(RSGISImageException);
 				void mosaicSkipVals(std::string *inputImages, int numDS, std::string outputImage, float background, float skipVal, bool projFromImage, std::string proj, unsigned int skipBand = 0, unsigned int overlapBehaviour = 0, std::string format="ENVI", GDALDataType imgDataType=GDT_Float32) throw(RSGISImageException);
-				void mosaicSkipThreash(std::string *inputImages, int numDS, std::string outputImage, float background, float skipLowerThreash, float skipUpperThreash, bool projFromImage, std::string proj, unsigned int threashBand = 0, unsigned int overlapBehaviour = 0, std::string format="ENVI", GDALDataType imgDataType=GDT_Float32) throw(RSGISImageException);
+				void mosaicSkipThresh(std::string *inputImages, int numDS, std::string outputImage, float background, float skipLowerThresh, float skipUpperThresh, bool projFromImage, std::string proj, unsigned int threshBand = 0, unsigned int overlapBehaviour = 0, std::string format="ENVI", GDALDataType imgDataType=GDT_Float32) throw(RSGISImageException);
 				void includeDatasets(GDALDataset *baseImage, std::string *inputImages, int numDS, std::vector<int> bands, bool bandsDefined) throw(RSGISImageException);
 				~RSGISImageMosaic();
 			};

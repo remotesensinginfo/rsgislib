@@ -714,11 +714,11 @@ namespace rsgis{namespace img{
                             int n = 0;
                             while((n < numInBands) && dataPixel)
                             {
-                                if(inputData[n][j] == skipValue)
+                                if(inputData[n][(m*width)+j] == skipValue)
                                 {
                                     for(int n = 0; n < numInBands; n++)
                                     {
-                                        inputData[n][j] = noDataValue;
+                                        inputData[n][(m*width)+j] = noDataValue;
                                     }
                                     
                                     dataPixel = false;
@@ -762,11 +762,11 @@ namespace rsgis{namespace img{
                             int n = 0;
                             while((n < numInBands) && dataPixel)
                             {
-                                if(inputData[n][j] == skipValue)
+                                if(inputData[n][(m*width)+j] == skipValue)
                                 {
                                     for(int n = 0; n < numInBands; n++)
                                     {
-                                        inputData[n][j] = noDataValue;
+                                        inputData[n][(m*width)+j] = noDataValue;
                                     }
                                     
                                     dataPixel = false;
