@@ -20,7 +20,7 @@
  *
  *
  *  Modified by Dan Clewley on 21/11/2010
- *  Added 'mosaicSkipVals' and 'mosaicSkipThreash'
+ *  Added 'mosaicSkipVals' and 'mosaicSkipThresh'
  *  to skip values in input image
  *
  *  Modified by Dan Clewley on 27/05/2013
@@ -632,7 +632,7 @@ namespace rsgis{namespace img{
         //GDALDestroyDriverManager();
 	}
 
-	void RSGISImageMosaic::mosaicSkipThreash(std::string *inputImages, int numDS, std::string outputImage, float background, float skipLowerThreash, float skipUpperThreash, bool projFromImage, std::string proj, unsigned int threshBand, unsigned int overlapBehaviour, std::string format, GDALDataType imgDataType) throw(RSGISImageException)
+	void RSGISImageMosaic::mosaicSkipThresh(std::string *inputImages, int numDS, std::string outputImage, float background, float skipLowerThresh, float skipUpperThresh, bool projFromImage, std::string proj, unsigned int threshBand, unsigned int overlapBehaviour, std::string format, GDALDataType imgDataType) throw(RSGISImageException)
 	{
 		RSGISImageUtils imgUtils;
         rsgis::math::RSGISMathsUtils mathsUtils;
@@ -778,7 +778,7 @@ namespace rsgis{namespace img{
                         for(int j = 0; j < tileXSize; j++)
                         {
                             // Check value is between upper and lower limits
-                            if((inputData[threshBand][(m*tileXSize)+j] > skipLowerThreash) && (inputData[threshBand][(m*tileXSize)+j] < skipUpperThreash))
+                            if((inputData[threshBand][(m*tileXSize)+j] > skipLowerThresh) && (inputData[threshBand][(m*tileXSize)+j] < skipUpperThresh))
                             {
                                 // Check if behaviour is defined for overlap and not the first image
                                 if( (overlapBehaviour > 0) && (ds > 0) )
@@ -855,7 +855,7 @@ namespace rsgis{namespace img{
                         for(int j = 0; j < tileXSize; j++)
                         {
                             // Check value is between upper and lower limits
-                            if((inputData[threshBand][(m*tileXSize)+j] > skipLowerThreash) && (inputData[threshBand][(m*tileXSize)+j] < skipUpperThreash))
+                            if((inputData[threshBand][(m*tileXSize)+j] > skipLowerThresh) && (inputData[threshBand][(m*tileXSize)+j] < skipUpperThresh))
                             {
                                 // Check if behaviour is defined for overlap and not the first image
                                 if( (overlapBehaviour > 0) && (ds > 0) )
