@@ -1033,7 +1033,6 @@ namespace rsgis{namespace radar{
 			gsl_vector_free(objAP);
 			delete invValues;
 			delete calcImage;
-			delete calcImage;
 			delete[] inData;
 			delete[] outData;
 		}
