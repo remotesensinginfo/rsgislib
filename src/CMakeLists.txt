@@ -649,7 +649,7 @@ set(LIB_RADAR_H
 	${RSGIS_SRC_RADAR_DIR}/RSGISEstimationExhaustiveSearch.h 
 	${RSGIS_SRC_RADAR_DIR}/RSGISEstimationGSLOptimiser.h 
 	${RSGIS_SRC_RADAR_DIR}/RSGISEstimationLinearLeastSquares.h 
-	${RSGIS_SRC_RADAR_DIR}/RSGISEstimationThreasholdAccepting.h 
+	${RSGIS_SRC_RADAR_DIR}/RSGISEstimationThresholdAccepting.h 
 	${RSGIS_SRC_RADAR_DIR}/RSGISObjectBasedEstimation.h)
 	
 set(LIB_RADAR_UTILS_CPP
@@ -683,8 +683,8 @@ set(LIB_RADAR_INVERSION_CPP
 	${RSGIS_SRC_RADAR_DIR}/RSGISEstimationGSLOptimiser.h 
 	${RSGIS_SRC_RADAR_DIR}/RSGISEstimationLinearLeastSquares.cpp 
 	${RSGIS_SRC_RADAR_DIR}/RSGISEstimationLinearLeastSquares.h 
-	${RSGIS_SRC_RADAR_DIR}/RSGISEstimationThreasholdAccepting.cpp 
-	${RSGIS_SRC_RADAR_DIR}/RSGISEstimationThreasholdAccepting.h 
+	${RSGIS_SRC_RADAR_DIR}/RSGISEstimationThresholdAccepting.cpp 
+	${RSGIS_SRC_RADAR_DIR}/RSGISEstimationThresholdAccepting.h 
 	${RSGIS_SRC_RADAR_DIR}/RSGISObjectBasedEstimation.h 
 	${RSGIS_SRC_RADAR_DIR}/RSGISObjectBasedEstimation.cpp )
 

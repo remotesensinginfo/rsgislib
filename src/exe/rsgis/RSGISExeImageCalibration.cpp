@@ -2194,7 +2194,7 @@ void RSGISExeImageCalibration::retrieveParameters(DOMElement *argElement) throw(
 					this->aX[i] = new float[this->numElevation+1];
 					this->bX[i] = new float[this->numElevation+1];
 					this->cX[i] = new float[this->numElevation+1];
-					this->elevationThreash = NULL;
+					this->elevationThresh = NULL;
 					
 					XMLCh *aXXMLStr = XMLString::transcode("ax");
 					if(bandElement->hasAttribute(aXXMLStr))
@@ -2255,7 +2255,7 @@ void RSGISExeImageCalibration::retrieveParameters(DOMElement *argElement) throw(
 					this->aX[i] = new float[this->numElevation];
 					this->bX[i] = new float[this->numElevation];
 					this->cX[i] = new float[this->numElevation];
-					this->elevationThreash = new float[this->numElevation];
+					this->elevationThresh = new float[this->numElevation];
 					
 					for(unsigned int et = 0; et < this->numElevation; et++)
 					{
@@ -2267,7 +2267,7 @@ void RSGISExeImageCalibration::retrieveParameters(DOMElement *argElement) throw(
 							if(elevationElement->hasAttribute(elevationUpperXXMLStr))
 							{
 								char *charValue = XMLString::transcode(elevationElement->getAttribute(elevationUpperXXMLStr));
-								this->elevationThreash[et] = mathUtils.strtofloat(string(charValue));
+								this->elevationThresh[et] = mathUtils.strtofloat(string(charValue));
 								XMLString::release(&charValue);
 							}
 							else
@@ -3068,7 +3068,7 @@ void RSGISExeImageCalibration::runAlgorithm() throw(RSGISException)
 					
 				}
 				
-				apply6SCoefficients = new RSGISApply6SCoefficients(this->numValues, this->imageBands, this->aX, this->bX, this->cX, this->numValues, this->elevationThreash, this->numElevation, this->scaleFactor);
+				apply6SCoefficients = new RSGISApply6SCoefficients(this->numValues, this->imageBands, this->aX, this->bX, this->cX, this->numValues, this->elevationThresh, this->numElevation, this->scaleFactor);
 				
 				calcImage = new RSGISCalcImage(apply6SCoefficients, "", true);
 				calcImage->calcImage(datasets, nDatasets, this->outputImage, false, NULL, this->imageFormat, this->outDataType);
@@ -3082,7 +3082,7 @@ void RSGISExeImageCalibration::runAlgorithm() throw(RSGISException)
 				delete[] datasets;
                 
                 delete[] imageBands;
-                delete[] this->elevationThreash;
+                delete[] this->elevationThresh;
 				
 				for (int i = 0; i < this->numValues; ++i) 
 				{

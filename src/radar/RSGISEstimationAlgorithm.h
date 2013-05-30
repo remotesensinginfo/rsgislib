@@ -108,7 +108,7 @@ namespace rsgis
 			 * HV<br>
 			 */
 		public: 
-			RSGISEstimationAlgorithmDualPolFPCSingleSpecies(int numOutputBands, double nonForestThreashold, gsl_matrix *coeffHH, gsl_matrix *coeffHV, gsl_vector *coeffFPCHH, gsl_vector *coeffFPCHV, gsl_vector *coeffFPCAttenuationH, gsl_vector *coeffFPCAttenuationV, estParameters parameters, rsgis::utils::treeSpecies species, int ittmax);
+			RSGISEstimationAlgorithmDualPolFPCSingleSpecies(int numOutputBands, double nonForestThreshold, gsl_matrix *coeffHH, gsl_matrix *coeffHV, gsl_vector *coeffFPCHH, gsl_vector *coeffFPCHV, gsl_vector *coeffFPCAttenuationH, gsl_vector *coeffFPCAttenuationV, estParameters parameters, rsgis::utils::treeSpecies species, int ittmax);
 			virtual void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException);
 			virtual void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
 			virtual void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
@@ -126,7 +126,7 @@ namespace rsgis
 			gsl_vector *coeffFPCHV;
 			gsl_vector *coeffFPCAttenuationH;
 			gsl_vector *coeffFPCAttenuationV;
-			double nonForestThreashold;
+			double nonForestThreshold;
 			int order;
 			int fpcOrder;
 			int ittmax;
@@ -159,7 +159,7 @@ namespace rsgis
 		{
 			/// Estimates parameters from dual-pol SAR data for a single species defined using a mask
 			public: 
-				RSGISEstimationAlgorithmDualPolSingleSpeciesPolyMask(int numOutputBands, double nonForestThreashold, gsl_matrix *coeffHH, gsl_matrix *coeffVV, estParameters parameters, gsl_vector *initialPar, int ittmax);
+				RSGISEstimationAlgorithmDualPolSingleSpeciesPolyMask(int numOutputBands, double nonForestThreshold, gsl_matrix *coeffHH, gsl_matrix *coeffVV, estParameters parameters, gsl_vector *initialPar, int ittmax);
 				virtual void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException);
 				virtual void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
 				virtual void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
@@ -175,7 +175,7 @@ namespace rsgis
 				gsl_matrix *coeffVV;
 				gsl_vector *initialPar;
 				int ittmax;
-				double nonForestThreashold;
+				double nonForestThreshold;
 			};
 		
 		class RSGISEstimationAlgorithmDualPolFPCMoistureSingleSpecies : public rsgis::img::RSGISCalcImageValue
@@ -261,7 +261,7 @@ namespace rsgis
 			
 		public: 
 			RSGISEstimationAlgorithmSingleSpeciesMask(int numOutputBands, 
-																	  double nonForestThreashold,
+																	  double nonForestThreshold,
 																	  gsl_vector *initialPar,
 																	  RSGISEstimationOptimiser *estOptimiser, 
 																	  estParameters parameters,
@@ -275,7 +275,7 @@ namespace rsgis
 			virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};													
 			~RSGISEstimationAlgorithmSingleSpeciesMask();
 		protected:
-			double nonForestThreashold;
+			double nonForestThreshold;
 			gsl_vector *initialPar;
 			estParameters parameters;
 			rsgis::utils::treeSpecies species;
@@ -334,7 +334,7 @@ namespace rsgis
 			 */
 		public: 
 			RSGISEstimationAlgorithmDualPolSingleSpeciesMaskPixAP(int numOutputBands, 
-																	  double nonForestThreashold,
+																	  double nonForestThreshold,
 																	  gsl_vector *initialPar,
 																	  RSGISEstimationOptimiser *estOptimiser, 
 																	  estParameters parameters);
@@ -347,7 +347,7 @@ namespace rsgis
 			virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};													
 			~RSGISEstimationAlgorithmDualPolSingleSpeciesMaskPixAP();
 		protected:
-			double nonForestThreashold;
+			double nonForestThreshold;
 			gsl_vector *initialPar;
 			estParameters parameters;
 			rsgis::utils::treeSpecies species;
