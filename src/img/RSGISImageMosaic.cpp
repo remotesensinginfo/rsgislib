@@ -20,9 +20,12 @@
  *
  *
  *  Modified by Dan Clewley on 21/11/2010
- *  Added 'mosaicSkipVals' and 'mosaicSkipThreash'
+ *  Added 'mosaicSkipVals' and 'mosaicSkipThresh'
  *  to skip values in input image
  *
+ *  Modified by Dan Clewley on 27/05/2013
+ *  Changed to block read / write
+ *  Added ability to take minimum / maximum pixel in overlapping regions
  */
 
 #include "RSGISImageMosaic.h"
@@ -37,6 +40,7 @@ namespace rsgis{namespace img{
 	void RSGISImageMosaic::mosaic(std::string *inputImages, int numDS, std::string outputImage, float background, bool projFromImage, std::string proj, std::string format, GDALDataType imgDataType) throw(RSGISImageException)
 	{
 		RSGISImageUtils imgUtils;
+        rsgis::math::RSGISMathsUtils mathsUtils;
         GDALAllRegister();
         GDALDataset *dataset = NULL;
         GDALRasterBand *imgBand = NULL;
@@ -53,9 +57,9 @@ namespace rsgis{namespace img{
 		int yStart = 0;
 		std::string projection = proj;
 		GDALDataset *outputDataset = NULL;
-		GDALRasterBand *inputBand = NULL;
-		GDALRasterBand *outputBand = NULL;
-		float *imgData = NULL;
+		GDALRasterBand **inputRasterBands = NULL;
+		GDALRasterBand **outputRasterBands = NULL;
+		float **inputData = NULL;
 
         std::vector<std::string> bandnames;
 
@@ -87,7 +91,8 @@ namespace rsgis{namespace img{
 				{
 					if(dataset->GetRasterCount() != numberBands)
 					{
-						throw RSGISImageBandException("All input images need to have the same number of bands.");
+						throw RSGISImageBandException("All input images need to have the same number of bands (" + mathsUtils.doubletostring(numberBands) + ").\n"
+                                    + inputImages[i] + " has " + mathsUtils.doubletostring(dataset->GetRasterCount()) );
 					}
 				}
                 GDALClose(dataset);
@@ -95,23 +100,43 @@ namespace rsgis{namespace img{
 
 			imgUtils.getImagesExtent(inputImages, numDS, &width, &height, transformation);
 
+            // Create blank image
 			std::cout << "Create new image [" << width << "," << height << "] with projection: \n" << projection << std::endl;
 
 			outputDataset = imgUtils.createBlankImage(outputImage, transformation, width, height, numberBands, projection, background, bandnames, format, imgDataType);
 
 			// COPY IMAGE DATA INTO THE BLANK IMAGE
 
+            //Get Image Output Bands
+            outputRasterBands = new GDALRasterBand*[numberBands];
+            for(int i = 0; i < numberBands; i++)
+            {
+                outputRasterBands[i] = outputDataset->GetRasterBand(i+1);
+            }
+
+            int xBlockSize = 0;
+            int yBlockSize = 0;
+            outputRasterBands[0]->GetBlockSize (&xBlockSize, &yBlockSize);
+
+            std::cout << "Max. block size: " << yBlockSize << std::endl;
+
 			std::cout << "Started (total " << numDS << ") ." << std::flush;
 
-			for(int i = 0; i < numDS; i++)
+            for(int ds = 0; ds < numDS; ds++)
 			{
-				std::cout << "." << i+1 << "." << std::flush;
+				std::cout << "." << ds+1 << "." << std::flush;
 
-                dataset = (GDALDataset *) GDALOpenShared(inputImages[i].c_str(), GA_ReadOnly);
+                dataset = (GDALDataset *) GDALOpenShared(inputImages[ds].c_str(), GA_ReadOnly);
                 if(dataset == NULL)
                 {
-                    std::string message = std::string("Could not open image ") + inputImages[i];
+                    std::string message = std::string("Could not open image ") + inputImages[ds];
                     throw RSGISImageException(message.c_str());
+                }
+
+                inputRasterBands = new GDALRasterBand*[numberBands];
+                for(int i = 0; i < numberBands; i++)
+                {
+                    inputRasterBands[i] = dataset->GetRasterBand(i+1);
                 }
 
 				dataset->GetGeoTransform(imgTransform);
@@ -123,29 +148,84 @@ namespace rsgis{namespace img{
 
 				xStart = floor(xDiff/transformation[1]);
 				yStart = floor(yDiff/transformation[1]);
-				imgData = (float *) CPLMalloc(sizeof(float)*tileXSize);
 
-				for(int n = 1; n <= numberBands; n++)
-				{
-					inputBand = dataset->GetRasterBand(n);
-					outputBand = outputDataset->GetRasterBand(n);
-					for(int m = 0; m < tileYSize; m++)
-					{
-						inputBand->RasterIO(GF_Read, 0, m, tileXSize, 1, imgData, tileXSize, 1, GDT_Float32, 0, 0);
-						outputBand->RasterIO(GF_Write, xStart, (yStart + m), tileXSize, 1, imgData, tileXSize, 1, GDT_Float32, 0, 0);
-					}
-				}
-				delete imgData;
+                // Allocate memory
+                inputData = new float*[numberBands];
+                for(int i = 0; i < numberBands; i++)
+                {
+                    inputData[i] = (float *) CPLMalloc(sizeof(float)*(tileXSize*yBlockSize));
+                }
+
+                int nYBlocks = tileYSize / yBlockSize;
+                int remainRows = tileYSize - (nYBlocks * yBlockSize);
+                int rowOffset = 0;
+
+                for(int i = 0; i < nYBlocks; i++)
+                {
+                    //std::cout << i << " of " << nYBlocks << std::endl;
+
+                    for(int n = 0; n < numberBands; n++)
+                    {
+                        rowOffset = yBlockSize * i;
+                        inputRasterBands[n]->RasterIO(GF_Read, 0, rowOffset, tileXSize, yBlockSize, inputData[n], tileXSize, yBlockSize, GDT_Float32, 0, 0);
+                        outputRasterBands[n]->RasterIO(GF_Write, xStart, (yStart + rowOffset), tileXSize, yBlockSize, inputData[n], tileXSize, yBlockSize, GDT_Float32, 0, 0);
+                    }
+
+                }
+
+                if(remainRows > 0)
+                {
+                    for(int n = 0; n < numberBands; n++)
+                    {
+                        rowOffset = yBlockSize * nYBlocks;
+                        inputRasterBands[n]->RasterIO(GF_Read, 0, rowOffset, tileXSize, remainRows, inputData[n], tileXSize, remainRows, GDT_Float32, 0, 0);
+                        outputRasterBands[n]->RasterIO(GF_Write, xStart, (yStart + rowOffset), tileXSize, remainRows, inputData[n], tileXSize, remainRows, GDT_Float32, 0, 0);
+                    }
+                }
+
+                // Tidy up
+                if(inputData != NULL)
+                {
+                    for(int i = 0; i < numberBands; i++)
+                    {
+                        if(inputData[i] != NULL)
+                        {
+                            delete[] inputData[i];
+                        }
+                    }
+                    delete[] inputData;
+                }
+                if(inputRasterBands != NULL)
+                {
+                    delete[] inputRasterBands;
+                }
+
                 GDALClose(dataset);
 			}
 			std::cout << ".complete\n";
+
 		}
 		catch(RSGISImageBandException e)
 		{
-			if(imgData != NULL)
-			{
-				delete imgData;
-			}
+            if(inputData != NULL)
+            {
+                for(int i = 0; i < numberBands; i++)
+                {
+                    if(inputData[i] != NULL)
+                    {
+                        delete[] inputData[i];
+                    }
+                }
+                delete[] inputData;
+            }
+            if(inputRasterBands != NULL)
+            {
+                delete[] inputRasterBands;
+            }
+            if(outputRasterBands != NULL)
+            {
+                delete[] outputRasterBands;
+            }
 			if(transformation != NULL)
 			{
 				delete[] transformation;
@@ -156,6 +236,12 @@ namespace rsgis{namespace img{
 			}
 			throw e;
 		}
+
+        // Tidy
+        if(outputRasterBands != NULL)
+        {
+            delete[] outputRasterBands;
+        }
 
 		if(transformation != NULL)
 		{
@@ -172,6 +258,8 @@ namespace rsgis{namespace img{
 	void RSGISImageMosaic::mosaicSkipVals(std::string *inputImages, int numDS, std::string outputImage, float background, float skipVal, bool projFromImage, std::string proj, unsigned int skipBand, unsigned int overlapBehaviour, std::string format, GDALDataType imgDataType) throw(RSGISImageException)
 	{
 		RSGISImageUtils imgUtils;
+		rsgis::math::RSGISMathsUtils mathsUtils;
+
         GDALAllRegister();
         GDALDataset *dataset = NULL;
         GDALRasterBand *imgBand = NULL;
@@ -188,11 +276,12 @@ namespace rsgis{namespace img{
 		int yStart = 0;
 		std::string projection = proj;
 		GDALDataset *outputDataset = NULL;
-		GDALRasterBand *inputBand = NULL;
-		GDALRasterBand *outputBand = NULL;
-		float **imgData = new float*[numberBands];
-		float **outData = new float*[numberBands];
-		bool skip;
+		GDALRasterBand **inputRasterBands = NULL;
+		GDALRasterBand **outputRasterBands = NULL;
+		float **inputData = NULL;
+		float **outputData = NULL;
+		bool pixelsChanged;
+
         std::vector<std::string> bandnames;
 
 		try
@@ -223,7 +312,8 @@ namespace rsgis{namespace img{
 				{
 					if(dataset->GetRasterCount() != numberBands)
 					{
-						throw RSGISImageBandException("All input images need to have the same number of bands.");
+						throw RSGISImageBandException("All input images need to have the same number of bands (" + mathsUtils.doubletostring(numberBands) + ").\n"
+                                    + inputImages[i] + " has " + mathsUtils.doubletostring(dataset->GetRasterCount()) );
 					}
 				}
                 GDALClose(dataset);
@@ -231,30 +321,43 @@ namespace rsgis{namespace img{
 
 			imgUtils.getImagesExtent(inputImages, numDS, &width, &height, transformation);
 
+            // Create blank image
 			std::cout << "Create new image [" << width << "," << height << "] with projection: \n" << projection << std::endl;
 
 			outputDataset = imgUtils.createBlankImage(outputImage, transformation, width, height, numberBands, projection, background, bandnames, format, imgDataType);
 
 			// COPY IMAGE DATA INTO THE BLANK IMAGE
 
-			std::cout << "Started (total " << numDS << ") ." << std::flush;
-
-            // Allocate memory for out data array (read in to compare to value from tile)
-            for(int n = 0; n < numberBands; n++)
+            //Get Image Output Bands
+            outputRasterBands = new GDALRasterBand*[numberBands];
+            for(int i = 0; i < numberBands; i++)
             {
-                outData[n] = (float *) CPLMalloc(sizeof(float)*1);
+                outputRasterBands[i] = outputDataset->GetRasterBand(i+1);
             }
 
-            
-			for(int i = 0; i < numDS; i++)
-			{
-				std::cout << "." << i << "." << std::flush;
+            int xBlockSize = 0;
+            int yBlockSize = 0;
+            outputRasterBands[0]->GetBlockSize (&xBlockSize, &yBlockSize);
 
-                dataset = (GDALDataset *) GDALOpenShared(inputImages[i].c_str(), GA_ReadOnly);
+            std::cout << "Max. block size: " << yBlockSize << std::endl;
+
+			std::cout << "Started (total " << numDS << ") ." << std::flush;
+
+            for(int ds = 0; ds < numDS; ds++)
+			{
+				std::cout << "." << ds+1 << "." << std::flush;
+
+                dataset = (GDALDataset *) GDALOpenShared(inputImages[ds].c_str(), GA_ReadOnly);
                 if(dataset == NULL)
                 {
-                    std::string message = std::string("Could not open image ") + inputImages[i];
+                    std::string message = std::string("Could not open image ") + inputImages[ds];
                     throw RSGISImageException(message.c_str());
+                }
+
+                inputRasterBands = new GDALRasterBand*[numberBands];
+                for(int i = 0; i < numberBands; i++)
+                {
+                    inputRasterBands[i] = dataset->GetRasterBand(i+1);
                 }
 
 				dataset->GetGeoTransform(imgTransform);
@@ -267,81 +370,239 @@ namespace rsgis{namespace img{
 				xStart = floor(xDiff/transformation[1]);
 				yStart = floor(yDiff/transformation[1]);
 
-				for(int n = 0; n < numberBands; n++)
-				{
-					imgData[n] = (float *) CPLMalloc(sizeof(float)*1);
-				}
+                // Allocate memory
+                inputData = new float*[numberBands];
+                outputData = new float*[numberBands];
+                for(int i = 0; i < numberBands; i++)
+                {
+                    inputData[i] = (float *) CPLMalloc(sizeof(float)*(tileXSize*yBlockSize));
+                    outputData[i] = (float *) CPLMalloc(sizeof(float)*(tileXSize*yBlockSize));
+                }
 
-				for(int y = 0; y < tileYSize; y++)
-				{
-					for (int x = 0; x < tileXSize; x++)
-					{
-						skip = false;
-						for(int n = 1; n <= numberBands; n++)
-						{
-							inputBand = dataset->GetRasterBand(n);
-							inputBand->RasterIO(GF_Read, x, y, 1, 1, imgData[n-1], 1, 1, GDT_Float32, 0, 0);
-						}
-						//std::cout << "Skip Val = " << skipVal << " imgData[n][0] = " << imgData[skipBand][0] << std::endl;
-						if(imgData[skipBand][0] == skipVal) // Check for skip value in band skip band
-						{
-							skip = true;
-						}
-						if(!skip)
-						{
-							for(int n = 1; n <= numberBands; n++)
-							{
-								outputBand = outputDataset->GetRasterBand(n);
-                                
-                                // If overwriting, or first image don't need to check output data
-                                if(overlapBehaviour == 0 | i == 0)
+                int nYBlocks = tileYSize / yBlockSize;
+                int remainRows = tileYSize - (nYBlocks * yBlockSize);
+                int rowOffset = 0;
+
+                for(int i = 0; i < nYBlocks; i++)
+                {
+                    // Read input and output data
+                    for(int n = 0; n < numberBands; n++)
+                    {
+                        rowOffset = yBlockSize * i;
+                        // Read input data
+                        inputRasterBands[n]->RasterIO(GF_Read, 0, rowOffset, tileXSize, yBlockSize, inputData[n], tileXSize, yBlockSize, GDT_Float32, 0, 0);
+                        // Read output data
+                        outputRasterBands[n]->RasterIO(GF_Read, xStart, (yStart + rowOffset), tileXSize, yBlockSize, outputData[n], tileXSize, yBlockSize, GDT_Float32, 0, 0);
+                    }
+
+                    pixelsChanged = false; // Keep track if there are changes that need writing out.
+
+                    for(int m = 0; m < yBlockSize; ++m)
+                    {
+                        for(int j = 0; j < tileXSize; j++)
+                        {
+                            // Check for skip value
+                            if(inputData[skipBand][(m*tileXSize)+j] != skipVal)
+                            {
+                                // Check if behaviour is defined for overlap and not the first image
+                                if( (overlapBehaviour > 0) && (ds > 0) )
                                 {
-                                    outputBand->RasterIO(GF_Write, (xStart + x), (yStart + y), 1, 1, imgData[n-1], 1, 1, GDT_Float32, 0, 0);
+                                    // Check if pixel is background value (no data has been written yet)
+                                    if( outputData[skipBand][(m*tileXSize)+j] == background )
+                                    {
+                                        for(int n = 0; n < numberBands; n++)
+                                        {
+                                            outputData[n][(m*tileXSize)+j] = inputData[n][(m*tileXSize)+j];
+                                        }
+                                        pixelsChanged = true;
+                                    }
+                                    // If data has been written - check if new value is less (min overlap behaviour)
+                                    else if( (overlapBehaviour == 1) &&  (inputData[skipBand][(m*tileXSize)+j] < outputData[skipBand][(m*tileXSize)+j]) )
+                                    {
+                                        for(int n = 0; n < numberBands; n++)
+                                        {
+                                            outputData[n][(m*tileXSize)+j] = inputData[n][(m*tileXSize)+j];
+                                        }
+                                        pixelsChanged = true;
+                                    }
+                                    // If data has been written - check if new value is greater (max overlap behaviour)
+                                    else if( (overlapBehaviour == 2) &&  (inputData[skipBand][(m*tileXSize)+j] > outputData[skipBand][(m*tileXSize)+j]) )
+                                    {
+                                        for(int n = 0; n < numberBands; n++)
+                                        {
+                                            outputData[n][(m*tileXSize)+j] = inputData[n][(m*tileXSize)+j];
+                                        }
+                                        pixelsChanged = true;
+                                    }
                                 }
+                                // If no overlap behaviour defined, write out,
                                 else
                                 {
-                                    outputBand->RasterIO(GF_Read, (xStart + x), (yStart + y), 1, 1, outData[n-1], 1, 1, GDT_Float32, 0, 0);
-
-                                    // Check if input image is less than pixel value in out data, write if it is.
-                                    if((imgData[n-1][0] < outData[n-1][0]) && (outData[n-1][0] != 0) && (overlapBehaviour == 1))
+                                    for(int n = 0; n < numberBands; n++)
                                     {
-                                        outputBand->RasterIO(GF_Write, (xStart + x), (yStart + y), 1, 1, imgData[n-1], 1, 1, GDT_Float32, 0, 0);
+                                        outputData[n][(m*tileXSize)+j] = inputData[n][(m*tileXSize)+j];
                                     }
-                                    // Check if input image is greater than pixel value in out data, write if it is.
-                                    else if((imgData[n-1][0] > outData[n-1][0]) && (overlapBehaviour == 2))
-                                    {
-                                        outputBand->RasterIO(GF_Write, (xStart + x), (yStart + y), 1, 1, imgData[n-1], 1, 1, GDT_Float32, 0, 0);
-                                    }
-                                    
+                                    pixelsChanged = true;
                                 }
 
 
+                            }
+                        }
+                    }
 
-							}
+                    // Write out data to mosaic
+                    if(pixelsChanged)
+                    {
+                        for(int n = 0; n < numberBands; n++)
+                        {
+                            outputRasterBands[n]->RasterIO(GF_Write, xStart, (yStart + rowOffset), tileXSize, yBlockSize, outputData[n], tileXSize, yBlockSize, GDT_Float32, 0, 0);
+                        }
+                    }
 
-						}
-					}
-				}
+                }
 
-				for(int n = 0; n < numberBands; n++)
-				{
-					delete imgData[n];
-				}
+                if(remainRows > 0)
+                {
+                    for(int n = 0; n < numberBands; n++)
+                    {
+                        rowOffset = yBlockSize * nYBlocks;
+                        // Read input data
+                        inputRasterBands[n]->RasterIO(GF_Read, 0, rowOffset, tileXSize, remainRows, inputData[n], tileXSize, remainRows, GDT_Float32, 0, 0);
+                        // Read output data
+                        outputRasterBands[n]->RasterIO(GF_Read, xStart, (yStart + rowOffset), tileXSize, remainRows, outputData[n], tileXSize, remainRows, GDT_Float32, 0, 0);
+                    }
+
+                    pixelsChanged = false; // Keep track if there are changes that need writing out.
+
+                    for(int m = 0; m < remainRows; ++m)
+                    {
+                        for(int j = 0; j < tileXSize; j++)
+                        {
+                            // Check for skip value
+                            if(inputData[skipBand][(m*tileXSize)+j] != skipVal)
+                            {
+                                // Check if behaviour is defined for overlap and not the first image
+                                if( (overlapBehaviour > 0) && (ds > 0) )
+                                {
+                                    // Check if pixel is background value (no data has been written yet)
+                                    if( outputData[skipBand][(m*tileXSize)+j] == background )
+                                    {
+                                        for(int n = 0; n < numberBands; n++)
+                                        {
+                                            outputData[n][(m*tileXSize)+j] = inputData[n][(m*tileXSize)+j];
+                                        }
+                                        pixelsChanged = true;
+                                    }
+                                    // If data has been written - check if new value is less (min overlap behaviour)
+                                    else if( (overlapBehaviour == 1) &&  (inputData[skipBand][(m*tileXSize)+j] < outputData[skipBand][(m*tileXSize)+j]) )
+                                    {
+                                        for(int n = 0; n < numberBands; n++)
+                                        {
+                                            outputData[n][(m*tileXSize)+j] = inputData[n][(m*tileXSize)+j];
+                                        }
+                                        pixelsChanged = true;
+                                    }
+                                    // If data has been written - check if new value is greater (max overlap behaviour)
+                                    else if( (overlapBehaviour == 2) &&  (inputData[skipBand][(m*tileXSize)+j] > outputData[skipBand][(m*tileXSize)+j]) )
+                                    {
+                                        for(int n = 0; n < numberBands; n++)
+                                        {
+                                            outputData[n][(m*tileXSize)+j] = inputData[n][(m*tileXSize)+j];
+                                        }
+                                        pixelsChanged = true;
+                                    }
+                                }
+                                // If no overlap behaviour defined, write out,
+                                else
+                                {
+                                    for(int n = 0; n < numberBands; n++)
+                                    {
+                                        outputData[n][(m*tileXSize)+j] = inputData[n][(m*tileXSize)+j];
+                                    }
+                                    pixelsChanged = true;
+                                }
+
+
+                            }
+                        }
+                    }
+
+                    // Write out data
+                    if(pixelsChanged)
+                    {
+                        for(int n = 0; n < numberBands; n++)
+                        {
+                            outputRasterBands[n]->RasterIO(GF_Write, xStart, (yStart + rowOffset), tileXSize, remainRows, outputData[n], tileXSize, remainRows, GDT_Float32, 0, 0);
+                        }
+                    }
+
+                }
+
+                // Tidy up
+                if(inputData != NULL)
+                {
+                    for(int i = 0; i < numberBands; i++)
+                    {
+                        if(inputData[i] != NULL)
+                        {
+                            delete[] inputData[i];
+                        }
+                    }
+                    delete[] inputData;
+                }
+                if(outputData != NULL)
+                {
+                    for(int i = 0; i < numberBands; i++)
+                    {
+                        if(outputData[i] != NULL)
+                        {
+                            delete[] outputData[i];
+                        }
+                    }
+                    delete[] outputData;
+                }
+                if(inputRasterBands != NULL)
+                {
+                    delete[] inputRasterBands;
+                }
 
                 GDALClose(dataset);
 			}
-            for(int n = 0; n < numberBands; n++)
-            {
-                delete outData[n];
-            }
 			std::cout << ".complete\n";
+
 		}
 		catch(RSGISImageBandException e)
 		{
-			if(imgData != NULL)
-			{
-				delete imgData;
-			}
+            if(inputData != NULL)
+            {
+                for(int i = 0; i < numberBands; i++)
+                {
+                    if(inputData[i] != NULL)
+                    {
+                        delete[] inputData[i];
+                    }
+                }
+                delete[] inputData;
+            }
+            if(outputData != NULL)
+            {
+                for(int i = 0; i < numberBands; i++)
+                {
+                    if(outputData[i] != NULL)
+                    {
+                        delete[] outputData[i];
+                    }
+                }
+                delete[] outputData;
+            }
+            if(inputRasterBands != NULL)
+            {
+                delete[] inputRasterBands;
+            }
+            if(outputRasterBands != NULL)
+            {
+                delete[] outputRasterBands;
+            }
 			if(transformation != NULL)
 			{
 				delete[] transformation;
@@ -353,6 +614,12 @@ namespace rsgis{namespace img{
 			throw e;
 		}
 
+        // Tidy
+        if(outputRasterBands != NULL)
+        {
+            delete[] outputRasterBands;
+        }
+
 		if(transformation != NULL)
 		{
 			delete[] transformation;
@@ -361,14 +628,14 @@ namespace rsgis{namespace img{
 		{
 			delete[] imgTransform;
 		}
-		delete[] imgData;
 		GDALClose(outputDataset);
         //GDALDestroyDriverManager();
 	}
 
-	void RSGISImageMosaic::mosaicSkipThreash(std::string *inputImages, int numDS, std::string outputImage, float background, float skipLowerThreash, float skipUpperThreash, bool projFromImage, std::string proj, unsigned int threashBand, unsigned int overlapBehaviour, std::string format, GDALDataType imgDataType) throw(RSGISImageException)
+	void RSGISImageMosaic::mosaicSkipThresh(std::string *inputImages, int numDS, std::string outputImage, float background, float skipLowerThresh, float skipUpperThresh, bool projFromImage, std::string proj, unsigned int threshBand, unsigned int overlapBehaviour, std::string format, GDALDataType imgDataType) throw(RSGISImageException)
 	{
 		RSGISImageUtils imgUtils;
+        rsgis::math::RSGISMathsUtils mathsUtils;
         GDALAllRegister();
         GDALDataset *dataset = NULL;
         GDALRasterBand *imgBand = NULL;
@@ -385,13 +652,14 @@ namespace rsgis{namespace img{
 		int yStart = 0;
 		std::string projection = proj;
 		GDALDataset *outputDataset = NULL;
-		GDALRasterBand *inputBand = NULL;
-		GDALRasterBand *outputBand = NULL;
-		float **imgData = new float*[numberBands];
-		float **outData = new float*[numberBands];
-		bool skip;
+		GDALRasterBand **inputRasterBands = NULL;
+		GDALRasterBand **outputRasterBands = NULL;
+		float **inputData = NULL;
+		float **outputData = NULL;
+		bool pixelsChanged;
+
         std::vector<std::string> bandnames;
-        
+
 		try
 		{
 			for(int i = 0; i < numDS; i++)
@@ -402,7 +670,7 @@ namespace rsgis{namespace img{
                     std::string message = std::string("Could not open image ") + inputImages[i];
                     throw RSGISImageException(message.c_str());
                 }
-                
+
 				if(i == 0)
 				{
 					numberBands = dataset->GetRasterCount();
@@ -420,125 +688,297 @@ namespace rsgis{namespace img{
 				{
 					if(dataset->GetRasterCount() != numberBands)
 					{
-						throw RSGISImageBandException("All input images need to have the same number of bands.");
+						throw RSGISImageBandException("All input images need to have the same number of bands (" + mathsUtils.doubletostring(numberBands) + ").\n"
+                                    + inputImages[i] + " has " + mathsUtils.doubletostring(dataset->GetRasterCount()) );
 					}
 				}
                 GDALClose(dataset);
 			}
-            
+
 			imgUtils.getImagesExtent(inputImages, numDS, &width, &height, transformation);
-            
+
+            // Create blank image
 			std::cout << "Create new image [" << width << "," << height << "] with projection: \n" << projection << std::endl;
-            
+
 			outputDataset = imgUtils.createBlankImage(outputImage, transformation, width, height, numberBands, projection, background, bandnames, format, imgDataType);
-            
+
 			// COPY IMAGE DATA INTO THE BLANK IMAGE
-            
-			std::cout << "Started (total " << numDS << ") ." << std::flush;
-            
-            // Allocate memory for out data array (read in to compare to value from tile)
-            for(int n = 0; n < numberBands; n++)
+
+            //Get Image Output Bands
+            outputRasterBands = new GDALRasterBand*[numberBands];
+            for(int i = 0; i < numberBands; i++)
             {
-                outData[n] = (float *) CPLMalloc(sizeof(float)*1);
+                outputRasterBands[i] = outputDataset->GetRasterBand(i+1);
             }
-            
-            
-			for(int i = 0; i < numDS; i++)
+
+            int xBlockSize = 0;
+            int yBlockSize = 0;
+            outputRasterBands[0]->GetBlockSize (&xBlockSize, &yBlockSize);
+
+            std::cout << "Max. block size: " << yBlockSize << std::endl;
+
+			std::cout << "Started (total " << numDS << ") ." << std::flush;
+
+            for(int ds = 0; ds < numDS; ds++)
 			{
-				std::cout << "." << i << "." << std::flush;
-                
-                dataset = (GDALDataset *) GDALOpenShared(inputImages[i].c_str(), GA_ReadOnly);
+				std::cout << "." << ds+1 << "." << std::flush;
+
+                dataset = (GDALDataset *) GDALOpenShared(inputImages[ds].c_str(), GA_ReadOnly);
                 if(dataset == NULL)
                 {
-                    std::string message = std::string("Could not open image ") + inputImages[i];
+                    std::string message = std::string("Could not open image ") + inputImages[ds];
                     throw RSGISImageException(message.c_str());
                 }
-                
+
+                inputRasterBands = new GDALRasterBand*[numberBands];
+                for(int i = 0; i < numberBands; i++)
+                {
+                    inputRasterBands[i] = dataset->GetRasterBand(i+1);
+                }
+
 				dataset->GetGeoTransform(imgTransform);
 				tileXSize = dataset->GetRasterXSize();
 				tileYSize = dataset->GetRasterYSize();
-                
+
 				xDiff = imgTransform[0] - transformation[0];
 				yDiff = transformation[3] - imgTransform[3];
-                
+
 				xStart = floor(xDiff/transformation[1]);
 				yStart = floor(yDiff/transformation[1]);
-                
-				for(int n = 0; n < numberBands; n++)
-				{
-					imgData[n] = (float *) CPLMalloc(sizeof(float)*1);
-				}
-                
-				for(int y = 0; y < tileYSize; y++)
-				{
-					for (int x = 0; x < tileXSize; x++)
-					{
-						skip = false;
-						for(int n = 1; n <= numberBands; n++)
-						{
-							inputBand = dataset->GetRasterBand(n);
-							inputBand->RasterIO(GF_Read, x, y, 1, 1, imgData[n-1], 1, 1, GDT_Float32, 0, 0);
-						}
-						//std::cout << "Skip Val = " << skipVal << " imgData[n][0] = " << imgData[skipBand][0] << std::endl;
-						if((imgData[threashBand][0] > skipLowerThreash) && (imgData[threashBand][0] < skipUpperThreash)) // Check if pixel is outside threasholds
-						{
-							skip = true;
-						}
-						if(!skip)
-						{
-							for(int n = 1; n <= numberBands; n++)
-							{
-								outputBand = outputDataset->GetRasterBand(n);
-                                
-                                // If overwriting, or first image don't need to check output data
-                                if(overlapBehaviour == 0 | i == 0)
+
+                // Allocate memory
+                inputData = new float*[numberBands];
+                outputData = new float*[numberBands];
+                for(int i = 0; i < numberBands; i++)
+                {
+                    inputData[i] = (float *) CPLMalloc(sizeof(float)*(tileXSize*yBlockSize));
+                    outputData[i] = (float *) CPLMalloc(sizeof(float)*(tileXSize*yBlockSize));
+                }
+
+                int nYBlocks = tileYSize / yBlockSize;
+                int remainRows = tileYSize - (nYBlocks * yBlockSize);
+                int rowOffset = 0;
+
+                for(int i = 0; i < nYBlocks; i++)
+                {
+                    // Read input and output data
+                    for(int n = 0; n < numberBands; n++)
+                    {
+                        rowOffset = yBlockSize * i;
+                        // Read input data
+                        inputRasterBands[n]->RasterIO(GF_Read, 0, rowOffset, tileXSize, yBlockSize, inputData[n], tileXSize, yBlockSize, GDT_Float32, 0, 0);
+                        // Read output data
+                        outputRasterBands[n]->RasterIO(GF_Read, xStart, (yStart + rowOffset), tileXSize, yBlockSize, outputData[n], tileXSize, yBlockSize, GDT_Float32, 0, 0);
+                    }
+
+                    pixelsChanged = false; // Keep track if there are changes that need writing out.
+
+                    for(int m = 0; m < yBlockSize; ++m)
+                    {
+                        for(int j = 0; j < tileXSize; j++)
+                        {
+                            // Check value is between upper and lower limits
+                            if((inputData[threshBand][(m*tileXSize)+j] > skipLowerThresh) && (inputData[threshBand][(m*tileXSize)+j] < skipUpperThresh))
+                            {
+                                // Check if behaviour is defined for overlap and not the first image
+                                if( (overlapBehaviour > 0) && (ds > 0) )
                                 {
-                                    outputBand->RasterIO(GF_Write, (xStart + x), (yStart + y), 1, 1, imgData[n-1], 1, 1, GDT_Float32, 0, 0);
+                                    // Check if pixel is background value (no data has been written yet)
+                                    if( outputData[threshBand][(m*tileXSize)+j] == background )
+                                    {
+                                        for(int n = 0; n < numberBands; n++)
+                                        {
+                                            outputData[n][(m*tileXSize)+j] = inputData[n][(m*tileXSize)+j];
+                                        }
+                                        pixelsChanged = true;
+                                    }
+                                    // If data has been written - check if new value is less (min overlap behaviour)
+                                    else if( (overlapBehaviour == 1) &&  (inputData[threshBand][(m*tileXSize)+j] < outputData[threshBand][(m*tileXSize)+j]) )
+                                    {
+                                        for(int n = 0; n < numberBands; n++)
+                                        {
+                                            outputData[n][(m*tileXSize)+j] = inputData[n][(m*tileXSize)+j];
+                                        }
+                                        pixelsChanged = true;
+                                    }
+                                    // If data has been written - check if new value is greater (max overlap behaviour)
+                                    else if( (overlapBehaviour == 2) &&  (inputData[threshBand][(m*tileXSize)+j] > outputData[threshBand][(m*tileXSize)+j]) )
+                                    {
+                                        for(int n = 0; n < numberBands; n++)
+                                        {
+                                            outputData[n][(m*tileXSize)+j] = inputData[n][(m*tileXSize)+j];
+                                        }
+                                        pixelsChanged = true;
+                                    }
                                 }
+                                // If no overlap behaviour defined, write out,
                                 else
                                 {
-                                    outputBand->RasterIO(GF_Read, (xStart + x), (yStart + y), 1, 1, outData[n-1], 1, 1, GDT_Float32, 0, 0);
-                                    
-                                    // Check if input image is less than pixel value in out data, write if it is.
-                                    if((imgData[n-1][0] < outData[n-1][0]) && (outData[n-1][0] != 0) && (overlapBehaviour == 1))
+                                    for(int n = 0; n < numberBands; n++)
                                     {
-                                        outputBand->RasterIO(GF_Write, (xStart + x), (yStart + y), 1, 1, imgData[n-1], 1, 1, GDT_Float32, 0, 0);
+                                        outputData[n][(m*tileXSize)+j] = inputData[n][(m*tileXSize)+j];
                                     }
-                                    // Check if input image is greater than pixel value in out data, write if it is.
-                                    else if((imgData[n-1][0] > outData[n-1][0]) && (overlapBehaviour == 2))
-                                    {
-                                        outputBand->RasterIO(GF_Write, (xStart + x), (yStart + y), 1, 1, imgData[n-1], 1, 1, GDT_Float32, 0, 0);
-                                    }
-                                    
+                                    pixelsChanged = true;
                                 }
-                                
-                                
-                                
-							}
-                            
-						}
-					}
-				}
-                
-				for(int n = 0; n < numberBands; n++)
-				{
-					delete imgData[n];
-				}
-                
+
+
+                            }
+                        }
+                    }
+
+                    // Write out data to mosaic
+                    if(pixelsChanged)
+                    {
+                        for(int n = 0; n < numberBands; n++)
+                        {
+                            outputRasterBands[n]->RasterIO(GF_Write, xStart, (yStart + rowOffset), tileXSize, yBlockSize, outputData[n], tileXSize, yBlockSize, GDT_Float32, 0, 0);
+                        }
+                    }
+
+                }
+
+                if(remainRows > 0)
+                {
+                    for(int n = 0; n < numberBands; n++)
+                    {
+                        rowOffset = yBlockSize * nYBlocks;
+                        // Read input data
+                        inputRasterBands[n]->RasterIO(GF_Read, 0, rowOffset, tileXSize, remainRows, inputData[n], tileXSize, remainRows, GDT_Float32, 0, 0);
+                        // Read output data
+                        outputRasterBands[n]->RasterIO(GF_Read, xStart, (yStart + rowOffset), tileXSize, remainRows, outputData[n], tileXSize, remainRows, GDT_Float32, 0, 0);
+                    }
+
+                    pixelsChanged = false; // Keep track if there are changes that need writing out.
+
+                    for(int m = 0; m < remainRows; ++m)
+                    {
+                        for(int j = 0; j < tileXSize; j++)
+                        {
+                            // Check value is between upper and lower limits
+                            if((inputData[threshBand][(m*tileXSize)+j] > skipLowerThresh) && (inputData[threshBand][(m*tileXSize)+j] < skipUpperThresh))
+                            {
+                                // Check if behaviour is defined for overlap and not the first image
+                                if( (overlapBehaviour > 0) && (ds > 0) )
+                                {
+                                    // Check if pixel is background value (no data has been written yet)
+                                    if( outputData[threshBand][(m*tileXSize)+j] == background )
+                                    {
+                                        for(int n = 0; n < numberBands; n++)
+                                        {
+                                            outputData[n][(m*tileXSize)+j] = inputData[n][(m*tileXSize)+j];
+                                        }
+                                        pixelsChanged = true;
+                                    }
+                                    // If data has been written - check if new value is less (min overlap behaviour)
+                                    else if( (overlapBehaviour == 1) &&  (inputData[threshBand][(m*tileXSize)+j] < outputData[threshBand][(m*tileXSize)+j]) )
+                                    {
+                                        for(int n = 0; n < numberBands; n++)
+                                        {
+                                            outputData[n][(m*tileXSize)+j] = inputData[n][(m*tileXSize)+j];
+                                        }
+                                        pixelsChanged = true;
+                                    }
+                                    // If data has been written - check if new value is greater (max overlap behaviour)
+                                    else if( (overlapBehaviour == 2) &&  (inputData[threshBand][(m*tileXSize)+j] > outputData[threshBand][(m*tileXSize)+j]) )
+                                    {
+                                        for(int n = 0; n < numberBands; n++)
+                                        {
+                                            outputData[n][(m*tileXSize)+j] = inputData[n][(m*tileXSize)+j];
+                                        }
+                                        pixelsChanged = true;
+                                    }
+                                }
+                                // If no overlap behaviour defined, write out,
+                                else
+                                {
+                                    for(int n = 0; n < numberBands; n++)
+                                    {
+                                        outputData[n][(m*tileXSize)+j] = inputData[n][(m*tileXSize)+j];
+                                    }
+                                    pixelsChanged = true;
+                                }
+
+
+                            }
+                        }
+                    }
+
+                    // Write out data
+                    if(pixelsChanged)
+                    {
+                        for(int n = 0; n < numberBands; n++)
+                        {
+                            outputRasterBands[n]->RasterIO(GF_Write, xStart, (yStart + rowOffset), tileXSize, remainRows, outputData[n], tileXSize, remainRows, GDT_Float32, 0, 0);
+                        }
+                    }
+
+                }
+
+                // Tidy up
+                if(inputData != NULL)
+                {
+                    for(int i = 0; i < numberBands; i++)
+                    {
+                        if(inputData[i] != NULL)
+                        {
+                            delete[] inputData[i];
+                        }
+                    }
+                    delete[] inputData;
+                }
+                if(outputData != NULL)
+                {
+                    for(int i = 0; i < numberBands; i++)
+                    {
+                        if(outputData[i] != NULL)
+                        {
+                            delete[] outputData[i];
+                        }
+                    }
+                    delete[] outputData;
+                }
+                if(inputRasterBands != NULL)
+                {
+                    delete[] inputRasterBands;
+                }
+
                 GDALClose(dataset);
 			}
-            for(int n = 0; n < numberBands; n++)
-            {
-                delete outData[n];
-            }
 			std::cout << ".complete\n";
+
 		}
 		catch(RSGISImageBandException e)
 		{
-			if(imgData != NULL)
-			{
-				delete imgData;
-			}
+            if(inputData != NULL)
+            {
+                for(int i = 0; i < numberBands; i++)
+                {
+                    if(inputData[i] != NULL)
+                    {
+                        delete[] inputData[i];
+                    }
+                }
+                delete[] inputData;
+            }
+            if(outputData != NULL)
+            {
+                for(int i = 0; i < numberBands; i++)
+                {
+                    if(outputData[i] != NULL)
+                    {
+                        delete[] outputData[i];
+                    }
+                }
+                delete[] outputData;
+            }
+            if(inputRasterBands != NULL)
+            {
+                delete[] inputRasterBands;
+            }
+            if(outputRasterBands != NULL)
+            {
+                delete[] outputRasterBands;
+            }
 			if(transformation != NULL)
 			{
 				delete[] transformation;
@@ -549,7 +989,13 @@ namespace rsgis{namespace img{
 			}
 			throw e;
 		}
-        
+
+        // Tidy
+        if(outputRasterBands != NULL)
+        {
+            delete[] outputRasterBands;
+        }
+
 		if(transformation != NULL)
 		{
 			delete[] transformation;
@@ -558,7 +1004,6 @@ namespace rsgis{namespace img{
 		{
 			delete[] imgTransform;
 		}
-		delete[] imgData;
 		GDALClose(outputDataset);
         //GDALDestroyDriverManager();
 	}
