@@ -150,8 +150,8 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
         else{std::cout << "Extension not known for file format, using \".env\"" << std::endl;}
     }
 	XMLString::release(&formatExtXMLStr);
-    
-    
+
+
     this->outDataType = GDT_Float32;
     this->rsgisOutDataType = rsgis::rsgis_32float;
 	XMLCh *datatypeXMLStr = xercesc::XMLString::transcode("datatype");
@@ -164,7 +164,7 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
         XMLCh *dtInt32 = xercesc::XMLString::transcode("Int32");
         XMLCh *dtFloat32 = xercesc::XMLString::transcode("Float32");
         XMLCh *dtFloat64 = xercesc::XMLString::transcode("Float64");
-        
+
         const XMLCh *dtXMLValue = argElement->getAttribute(datatypeXMLStr);
         if(xercesc::XMLString::equals(dtByte, dtXMLValue))
         {
@@ -623,7 +623,7 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 				cout << "\tSkiping pixels with a value between \'" << this->skipLowerThresh << "\' and \'" << this->skipUpperThresh << "\' using the first band (default)" << endl;			}
 		}
 		XMLString::release(&skipBandXMLStr);
-        
+
         XMLCh *overlapBehaviourXML = XMLString::transcode("overlapBehaviour");
         if(argElement->hasAttribute(overlapBehaviourXML))
         {
@@ -631,9 +631,9 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
             {
                 throw RSGISXMLArgumentsException("Can't define overlap behaviour for simple mosaic, define \'skipValue\' or \'skipLowerThresh\' and \'skipLowerThresh\'");
             }
-                
+
             const XMLCh *overlapBehaviourStr = argElement->getAttribute(overlapBehaviourXML);
-            
+
             XMLCh *minXML = XMLString::transcode("min");
             XMLCh *maxXML = XMLString::transcode("max");
 
@@ -651,11 +651,11 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
             {
                 throw RSGISXMLArgumentsException("Overlap behaviour not recognised, options are 'min' or 'max'");
             }
-            
+
             XMLString::release(&minXML);
             XMLString::release(&maxXML);
         }
-        
+
 
 		XMLCh *projXMLStr = XMLString::transcode("proj");
 		if(argElement->hasAttribute(projXMLStr))
@@ -983,7 +983,7 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'outputvalue\' attribute was provided.");
 		}
 		XMLString::release(&outputValueXMLStr);
-        
+
 		XMLCh *maskValueXMLStr = XMLString::transcode("maskvalue");
 		if(argElement->hasAttribute(maskValueXMLStr))
 		{
@@ -1582,7 +1582,7 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
 		}
 		XMLString::release(&outputXMLStr);
-        
+
         this->outStatsFile = false;
         XMLCh *outputStatsXMLStr = XMLString::transcode("stats");
 		if(argElement->hasAttribute(outputStatsXMLStr))
@@ -2652,7 +2652,7 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			this->outTilesList = "";
 		}
 		XMLString::release(&outTilesListXMLStr);
-        
+
         XMLCh *widthXMLStr = XMLString::transcode("width");
 		if(argElement->hasAttribute(widthXMLStr))
 		{
@@ -2678,7 +2678,7 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'height\' attribute was provided.");
 		}
 		XMLString::release(&heightXMLStr);
-        
+
         XMLCh *overlapXMLStr = XMLString::transcode("overlap");
 		if(argElement->hasAttribute(overlapXMLStr))
 		{
@@ -2692,8 +2692,8 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			this->tileOverlap = 0;
 		}
 		XMLString::release(&overlapXMLStr);
-        
-        
+
+
         XMLCh *offsetXMLStr = XMLString::transcode("offset");
 		if(argElement->hasAttribute(offsetXMLStr))
 		{
@@ -2707,7 +2707,7 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
             {
                 this->offsetTiling = false;
             }
-            
+
 			XMLString::release(&charValue);
 		}
 		else
@@ -2720,7 +2720,7 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
     else if (XMLString::equals(optionBandColourUsage, optionXML))
 	{
 		this->option = RSGISExeImageUtils::bandcolourusage;
-        
+
 		XMLCh *imageXMLStr = XMLString::transcode("image");
 		if(argElement->hasAttribute(imageXMLStr))
 		{
@@ -2733,24 +2733,24 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'image\' attribute was provided.");
 		}
 		XMLString::release(&imageXMLStr);
-        
+
         DOMElement *bandElement = NULL;
         XMLCh *rsgisBandXMLStr = XMLString::transcode("rsgis:band");
         XMLCh *bandXMLStr = XMLString::transcode("band");
         XMLCh *usageXMLStr = XMLString::transcode("usage");
-        
+
         DOMNodeList *bandsList = argElement->getElementsByTagName(rsgisBandXMLStr);
         unsigned int numBandsSpecified = bandsList->getLength();
         this->bandClrUses.reserve(numBandsSpecified);
-        
-        
+
+
         unsigned int bandNo = 0;
         GDALColorInterp gdalClrInterp = GCI_GrayIndex;
         string clrInterp = "";
         for(int i = 0; i < numBandsSpecified; i++)
         {
             bandElement = static_cast<DOMElement*>(bandsList->item(i));
-            
+
             if(bandElement->hasAttribute(bandXMLStr))
             {
                 char *charValue = XMLString::transcode(bandElement->getAttribute(bandXMLStr));
@@ -2761,7 +2761,7 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
             {
                 throw RSGISXMLArgumentsException("No \'band\' attribute was provided.");
             }
-            
+
             if(bandElement->hasAttribute(usageXMLStr))
             {
                 char *charValue = XMLString::transcode(bandElement->getAttribute(usageXMLStr));
@@ -2800,7 +2800,7 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
             {
                 throw RSGISXMLArgumentsException("No \'usage\' attribute was provided.");
             }
-            
+
             bandClrUses.push_back(std::pair<unsigned int, GDALColorInterp>(bandNo, gdalClrInterp));
         }
         XMLString::release(&bandXMLStr);
@@ -2810,7 +2810,7 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
     else if (XMLString::equals(optionAssignSpatialInfo, optionXML))
 	{
 		this->option = RSGISExeImageUtils::assignspatialinfo;
-        
+
 		XMLCh *imageXMLStr = XMLString::transcode("image");
 		if(argElement->hasAttribute(imageXMLStr))
 		{
@@ -2823,7 +2823,7 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'image\' attribute was provided.");
 		}
 		XMLString::release(&imageXMLStr);
-        
+
         XMLCh *tlxXMLStr = XMLString::transcode("tlx");
 		if(argElement->hasAttribute(tlxXMLStr))
 		{
@@ -2837,7 +2837,7 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			this->tlxDef = false;
 		}
 		XMLString::release(&tlxXMLStr);
-        
+
         XMLCh *tlyXMLStr = XMLString::transcode("tly");
 		if(argElement->hasAttribute(tlyXMLStr))
 		{
@@ -2851,7 +2851,7 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			this->tlyDef = false;
 		}
 		XMLString::release(&tlyXMLStr);
-        
+
         XMLCh *resXXMLStr = XMLString::transcode("resX");
 		if(argElement->hasAttribute(resXXMLStr))
 		{
@@ -2865,7 +2865,7 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			this->resXDef = false;
 		}
 		XMLString::release(&resXXMLStr);
-        
+
         XMLCh *resYXMLStr = XMLString::transcode("resY");
 		if(argElement->hasAttribute(resYXMLStr))
 		{
@@ -2879,7 +2879,7 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			this->resYDef = false;
 		}
 		XMLString::release(&resYXMLStr);
-        
+
         XMLCh *rotXXMLStr = XMLString::transcode("rotX");
 		if(argElement->hasAttribute(rotXXMLStr))
 		{
@@ -2893,7 +2893,7 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			this->rotXDef = false;
 		}
 		XMLString::release(&rotXXMLStr);
-        
+
         XMLCh *rotYXMLStr = XMLString::transcode("rotY");
 		if(argElement->hasAttribute(rotYXMLStr))
 		{
@@ -2911,7 +2911,7 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
     else if (XMLString::equals(optionGenAssessPoints, optionXML))
 	{
 		this->option = RSGISExeImageUtils::genassesspoints;
-        
+
 		XMLCh *imageXMLStr = XMLString::transcode("image");
 		if(argElement->hasAttribute(imageXMLStr))
 		{
@@ -2924,7 +2924,7 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'image\' attribute was provided.");
 		}
 		XMLString::release(&imageXMLStr);
-        
+
         XMLCh *demXMLStr = XMLString::transcode("dem");
 		if(argElement->hasAttribute(demXMLStr))
 		{
@@ -2938,7 +2938,7 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			this->demProvided = false;
 		}
 		XMLString::release(&demXMLStr);
-        
+
         XMLCh *outputXMLStr = XMLString::transcode("output");
 		if(argElement->hasAttribute(outputXMLStr))
 		{
@@ -2951,7 +2951,7 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
 		}
 		XMLString::release(&outputXMLStr);
-        
+
         XMLCh *classColumnXMLStr = XMLString::transcode("classcolumn");
 		if(argElement->hasAttribute(classColumnXMLStr))
 		{
@@ -2964,8 +2964,8 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'classcolumn\' attribute was provided.");
 		}
 		XMLString::release(&classColumnXMLStr);
-        
-        
+
+
         XMLCh *typeXMLStr = XMLString::transcode("type");
 		if(argElement->hasAttribute(typeXMLStr))
 		{
@@ -2990,7 +2990,7 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'type\' attribute was provided.");
 		}
 		XMLString::release(&typeXMLStr);
-        
+
         XMLCh *nStr = XMLString::transcode("n");
 		if(argElement->hasAttribute(nStr))
 		{
@@ -3003,7 +3003,7 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'n\' attribute was provided.");
 		}
 		XMLString::release(&nStr);
-        
+
         XMLCh *seedStr = XMLString::transcode("seed");
 		if(argElement->hasAttribute(seedStr))
 		{
@@ -3015,12 +3015,12 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 		{
 			throw RSGISXMLArgumentsException("No \'seed\' attribute was provided.");
 		}
-		XMLString::release(&seedStr);        
+		XMLString::release(&seedStr);
 	}
     else if (XMLString::equals(optionUniquePxlClumps, optionXML))
 	{
 		this->option = RSGISExeImageUtils::uniquepxlclumps;
-        
+
 		XMLCh *imageXMLStr = XMLString::transcode("image");
 		if(argElement->hasAttribute(imageXMLStr))
 		{
@@ -3033,8 +3033,8 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'image\' attribute was provided.");
 		}
 		XMLString::release(&imageXMLStr);
-        
-        
+
+
 		XMLCh *outputXMLStr = XMLString::transcode("output");
 		if(argElement->hasAttribute(outputXMLStr))
 		{
@@ -3047,7 +3047,7 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
 		}
 		XMLString::release(&outputXMLStr);
-        
+
         noDataValDefined = false;
         XMLCh *noDataValXMLStr = XMLString::transcode("nodata");
 		if(argElement->hasAttribute(noDataValXMLStr))
@@ -3073,12 +3073,12 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			noDataValDefined = false;
 		}
 		XMLString::release(&noDataValXMLStr);
-        
+
 	}
     else if (XMLString::equals(optionSubset2Image, optionXML))
 	{
 		this->option = RSGISExeImageUtils::subset2img;
-        
+
 		XMLCh *imageXMLStr = XMLString::transcode("image");
 		if(argElement->hasAttribute(imageXMLStr))
 		{
@@ -3091,7 +3091,7 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'image\' attribute was provided.");
 		}
 		XMLString::release(&imageXMLStr);
-        
+
 		XMLCh *outputXMLStr = XMLString::transcode("output");
 		if(argElement->hasAttribute(outputXMLStr))
 		{
@@ -3104,8 +3104,8 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
 		}
 		XMLString::release(&outputXMLStr);
-        
-        
+
+
 		XMLCh *roiXMLStr = XMLString::transcode("roi");
 		if(argElement->hasAttribute(roiXMLStr))
 		{
@@ -3122,7 +3122,7 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
     else if (XMLString::equals(optionDefineImgTiles, optionXML))
 	{
 		this->option = RSGISExeImageUtils::defineimgtiles;
-        
+
 		XMLCh *imageXMLStr = XMLString::transcode("image");
 		if(argElement->hasAttribute(imageXMLStr))
 		{
@@ -3135,8 +3135,8 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'image\' attribute was provided.");
 		}
 		XMLString::release(&imageXMLStr);
-        
-        
+
+
 		XMLCh *outputXMLStr = XMLString::transcode("output");
 		if(argElement->hasAttribute(outputXMLStr))
 		{
@@ -3149,7 +3149,7 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
 		}
 		XMLString::release(&outputXMLStr);
-        
+
         noDataValDefined = false;
         XMLCh *noDataValXMLStr = XMLString::transcode("nodata");
 		if(argElement->hasAttribute(noDataValXMLStr))
@@ -3175,7 +3175,7 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			noDataValDefined = false;
 		}
 		XMLString::release(&noDataValXMLStr);
-        
+
         validPixelRatio = 0.0;
         XMLCh *ratioXMLStr = XMLString::transcode("validpixelratio");
 		if(argElement->hasAttribute(ratioXMLStr))
@@ -3189,7 +3189,7 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'validpixelratio\' attribute was provided.");
 		}
 		XMLString::release(&ratioXMLStr);
-        
+
         XMLCh *tileSizeXMLStr = XMLString::transcode("tilesize");
 		if(argElement->hasAttribute(tileSizeXMLStr))
 		{
@@ -3202,12 +3202,12 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'tilesize\' attribute was provided.");
 		}
 		XMLString::release(&tileSizeXMLStr);
-        
+
 	}
     else if (XMLString::equals(optionGenTileMasks, optionXML))
 	{
 		this->option = RSGISExeImageUtils::gentilemasks;
-        
+
 		XMLCh *imageXMLStr = XMLString::transcode("image");
 		if(argElement->hasAttribute(imageXMLStr))
 		{
@@ -3220,8 +3220,8 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'image\' attribute was provided.");
 		}
 		XMLString::release(&imageXMLStr);
-        
-        
+
+
 		XMLCh *outputXMLStr = XMLString::transcode("outputbase");
 		if(argElement->hasAttribute(outputXMLStr))
 		{
@@ -3234,7 +3234,7 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'outputbase\' attribute was provided.");
 		}
 		XMLString::release(&outputXMLStr);
-        
+
         createAnOverlap = false;
         XMLCh *overlapXMLStr = XMLString::transcode("overlap");
 		if(argElement->hasAttribute(overlapXMLStr))
@@ -3249,14 +3249,14 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
             createAnOverlap = false;
 		}
 		XMLString::release(&overlapXMLStr);
-        
-        
+
+
         XMLCh *growOverlapXMLStr = XMLString::transcode("growoverlap");
 		if(argElement->hasAttribute(growOverlapXMLStr))
 		{
 			XMLCh *yesStr = XMLString::transcode("yes");
 			const XMLCh *strValue = argElement->getAttribute(growOverlapXMLStr);
-			
+
 			if(XMLString::equals(strValue, yesStr))
 			{
 				this->growOverlap = true;
@@ -3276,7 +3276,7 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
     else if (XMLString::equals(optionCutOutTile, optionXML))
 	{
 		this->option = RSGISExeImageUtils::cutouttile;
-        
+
 		XMLCh *imageXMLStr = XMLString::transcode("image");
 		if(argElement->hasAttribute(imageXMLStr))
 		{
@@ -3289,7 +3289,7 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'image\' attribute was provided.");
 		}
 		XMLString::release(&imageXMLStr);
-        
+
 		XMLCh *outputXMLStr = XMLString::transcode("output");
 		if(argElement->hasAttribute(outputXMLStr))
 		{
@@ -3302,7 +3302,7 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
 		}
 		XMLString::release(&outputXMLStr);
-        
+
         XMLCh *tileXMLStr = XMLString::transcode("tile");
 		if(argElement->hasAttribute(tileXMLStr))
 		{
@@ -3315,8 +3315,8 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'tile\' attribute was provided.");
 		}
 		XMLString::release(&tileXMLStr);
-        
-        
+
+
         XMLCh *noDataValXMLStr = XMLString::transcode("nodataval");
 		if(argElement->hasAttribute(noDataValXMLStr))
 		{
@@ -3340,12 +3340,12 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'nodataval\' attribute was provided.");
 		}
 		XMLString::release(&noDataValXMLStr);
-        
+
 	}
     else if (XMLString::equals(optionStretchImageWithStats, optionXML))
 	{
 		this->option = RSGISExeImageUtils::stretchwithstats;
-        
+
 		XMLCh *imageXMLStr = XMLString::transcode("image");
 		if(argElement->hasAttribute(imageXMLStr))
 		{
@@ -3358,7 +3358,7 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'image\' attribute was provided.");
 		}
 		XMLString::release(&imageXMLStr);
-        
+
 		XMLCh *outputXMLStr = XMLString::transcode("output");
 		if(argElement->hasAttribute(outputXMLStr))
 		{
@@ -3371,7 +3371,7 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
 		}
 		XMLString::release(&outputXMLStr);
-        
+
         XMLCh *inputStatsXMLStr = XMLString::transcode("stats");
 		if(argElement->hasAttribute(inputStatsXMLStr))
 		{
@@ -3384,14 +3384,14 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'stats\' attribute was provided.");
 		}
 		XMLString::release(&inputStatsXMLStr);
-        
-        
+
+
 		XMLCh *stretchLinearMinMax = XMLString::transcode("LinearMinMax");
 		XMLCh *stretchHistogram = XMLString::transcode("Histogram");
 		XMLCh *stretchExponential = XMLString::transcode("Exponential");
 		XMLCh *stretchLogarithmic = XMLString::transcode("Logarithmic");
 		XMLCh *stretchPowerLaw = XMLString::transcode("PowerLaw");
-        
+
 		XMLCh *stretchXMLStr = XMLString::transcode("stretch");
 		if(argElement->hasAttribute(stretchXMLStr))
 		{
@@ -3438,20 +3438,20 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'stretch\' attribute was provided.");
 		}
 		XMLString::release(&stretchXMLStr);
-        
+
 		XMLString::release(&stretchLinearMinMax);
 		XMLString::release(&stretchHistogram);
 		XMLString::release(&stretchExponential);
 		XMLString::release(&stretchLogarithmic);
 		XMLString::release(&stretchPowerLaw);
-        
-        
-        
+
+
+
 	}
     else if (XMLString::equals(optionSubSampleImage, optionXML))
 	{
 		this->option = RSGISExeImageUtils::subsampleimage;
-        
+
 		XMLCh *imageXMLStr = XMLString::transcode("image");
 		if(argElement->hasAttribute(imageXMLStr))
 		{
@@ -3464,7 +3464,7 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'image\' attribute was provided.");
 		}
 		XMLString::release(&imageXMLStr);
-        
+
 		XMLCh *outputXMLStr = XMLString::transcode("output");
 		if(argElement->hasAttribute(outputXMLStr))
 		{
@@ -3477,8 +3477,8 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
 		}
 		XMLString::release(&outputXMLStr);
-       
-        
+
+
         XMLCh *nodataXMLStr = XMLString::transcode("nodata");
 		if(argElement->hasAttribute(nodataXMLStr))
 		{
@@ -3492,8 +3492,8 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			this->useIgnoreVal = false;
 		}
 		XMLString::release(&nodataXMLStr);
-        
-        
+
+
         XMLCh *subSampleXMLStr = XMLString::transcode("subsample");
 		if(argElement->hasAttribute(subSampleXMLStr))
 		{
@@ -3506,9 +3506,9 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'subsample\' attribute was provided.");
 		}
 		XMLString::release(&subSampleXMLStr);
-        
-        
-        
+
+
+
 	}
 	else
 	{
@@ -3565,7 +3565,7 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
     XMLString::release(&optionCutOutTile);
     XMLString::release(&optionStretchImageWithStats);
     XMLString::release(&optionSubSampleImage);
-    
+
 	parsed = true;
 }
 
@@ -3694,11 +3694,16 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
             }
 			cout << "Mosaicing Images\n";
             cout << "Number of Images = " << this->numImages << endl;
-            cout << "Input Images: \n";
-            for(int i = 0; i < this->numImages; ++i)
+            // Don't print if over 100 images
+            if(this->numImages < 100)
             {
-                cout << i+1 << ": " << inputImages[i] << endl;
+                cout << "Input Images: \n";
+                for(int i = 0; i < this->numImages; ++i)
+                {
+                    cout << i+1 << ": " << inputImages[i] << endl;
+                }
             }
+
 			RSGISImageMosaic mosaic;
 			try
 			{
@@ -3884,7 +3889,7 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
             std::cout << "Output Data Type: " << this->outDataType << std::endl;
             std::cout << "Output value: " << this->outValue << std::endl;
             std::cout << "Mask value: " << this->maskValue << std::endl;
-            
+
 			try
             {
                 rsgis::cmds::executeMaskImage(this->inputImage, this->imageMask, this->outputImage, this->imageFormat, this->rsgisOutDataType, this->outValue, this->maskValue);
@@ -4481,13 +4486,13 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
                 else
                 {
                     rsgis::cmds::executeStretchImage(this->inputImage, this->outputImage, this->outStatsFile, this->outputFile, this->ignoreZeros, this->onePassSD, this->imageFormat, rsgisOutDataType, stretchType, 0.0);
-                }                
+                }
             }
             catch(rsgis::cmds::RSGISCmdException &e)
             {
                 throw RSGISException(e.what());
             }
-			
+
 
 		}
 		else if(option == RSGISExeImageUtils::huecolour)
@@ -5038,8 +5043,8 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
             {
                 throw RSGISException(e.what());
             }
-            
-            
+
+
 		}
         else if(option == RSGISExeImageUtils::relabel)
         {
@@ -5113,7 +5118,7 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
             {
                 cout << "Calculating image pyramids\n";
             }
-            
+
             try
             {
                 rsgis::cmds::executePopulateImgStats(this->inputImage, this->useIgnoreVal, this->nodataValue, this->calcImgPyramids);
@@ -5125,7 +5130,7 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
             catch(std::exception& e)
             {
                 throw RSGISException(e.what());
-            }            
+            }
         }
         else if(option == RSGISExeImageUtils::createcopy)
         {
@@ -5175,7 +5180,7 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
         {
             cout << "Defining the colour usage parameter on the image bands\n";
             cout << "Image: " << this->inputImage << std::endl;
-            
+
             GDALAllRegister();
             GDALDataset *inDataset = NULL;
             inDataset = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_Update);
@@ -5184,41 +5189,41 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
                 string message = string("Could not open image ") + this->inputImage;
                 throw RSGISImageException(message.c_str());
             }
-            
+
             unsigned int numBandsInDS = inDataset->GetRasterCount();
-            
+
             for(std::vector<std::pair<unsigned int, GDALColorInterp> >::iterator iterUsages = bandClrUses.begin(); iterUsages != bandClrUses.end(); ++iterUsages)
             {
                 cout << "Band " << (*iterUsages).first;
                 if((*iterUsages).second == GCI_GrayIndex)
                 {
-                    cout << " Greyscale usage\n"; 
+                    cout << " Greyscale usage\n";
                 }
                 else if((*iterUsages).second == GCI_PaletteIndex)
                 {
-                    cout << " Paletted usage\n"; 
+                    cout << " Paletted usage\n";
                 }
                 else if((*iterUsages).second == GCI_RedBand)
                 {
-                    cout << " Red usage\n"; 
+                    cout << " Red usage\n";
                 }
                 else if((*iterUsages).second == GCI_GreenBand)
                 {
-                    cout << " Green usage\n"; 
+                    cout << " Green usage\n";
                 }
                 else if((*iterUsages).second == GCI_BlueBand)
                 {
-                    cout << " Blue usage\n"; 
+                    cout << " Blue usage\n";
                 }
                 else if((*iterUsages).second == GCI_AlphaBand)
                 {
-                    cout << " Alpha usage\n"; 
+                    cout << " Alpha usage\n";
                 }
                 else
                 {
                     throw RSGISImageException("Band usage is unknown...");
                 }
-                
+
                 if((*iterUsages).first == 0)
                 {
                     throw RSGISImageException("Band not within the image - indexing starts at 1.");
@@ -5227,10 +5232,10 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
                 {
                     throw RSGISImageException("Band not within the image - too many bands referenced.");
                 }
-                
+
                 inDataset->GetRasterBand((*iterUsages).first)->SetColorInterpretation((*iterUsages).second);
             }
-            
+
             GDALClose(inDataset);
             GDALDestroyDriverManager();
         }
@@ -5263,7 +5268,7 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
             {
                 cout << "Rot Y: " << this->rotY << std::endl;
             }
-            
+
             try
             {
                 GDALAllRegister();
@@ -5274,10 +5279,10 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
                     string message = string("Could not open image ") + this->inputImage;
                     throw RSGISImageException(message.c_str());
                 }
-                
+
                 double *trans = new double[6];
                 inDataset->GetGeoTransform(trans);
-                
+
                 if(this->tlxDef)
                 {
                     trans[0] = this->tlx;
@@ -5302,13 +5307,13 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
                 {
                     trans[4] = this->rotY;
                 }
-                
+
                 cout << "TL: [" << trans[0] << "," << trans[3] << "]" << endl;
                 cout << "RES: [" << trans[1] << "," << trans[5] << "]" << endl;
                 cout << "ROT: [" << trans[2] << "," << trans[4] << "]" << endl;
-                
+
                 inDataset->SetGeoTransform(trans);
-                
+
                 GDALClose(inDataset);
                 delete trans;
                 GDALDestroyDriverManager();
@@ -5341,7 +5346,7 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
                 cout << "Generating " << this->numPoints << " stratified random points per class.\n";
             }
             cout << "Random generator seed: " << this->seed << endl;
-            
+
             GDALAllRegister();
             GDALDataset *inDataset = NULL;
             GDALDataset *inDEMDataset = NULL;
@@ -5351,7 +5356,7 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
                 string message = string("Could not open image ") + this->inputImage;
                 throw RSGISImageException(message.c_str());
             }
-            
+
             if(demProvided)
             {
                 inDEMDataset = (GDALDataset *) GDALOpen(this->inputDEM.c_str(), GA_ReadOnly);
@@ -5361,9 +5366,9 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
                     throw RSGISImageException(message.c_str());
                 }
             }
-            
+
             RSGISGenAccuracyPoints mapAcc;
-            
+
             if(accuracyPtsType == rsgis_randompts)
             {
                 mapAcc.generateRandomPoints(inDataset, inDEMDataset, this->demProvided, this->outputFile, this->classColumnName, this->numPoints, this->seed);
@@ -5372,12 +5377,12 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
             {
                 mapAcc.generateStratifiedRandomPoints(inDataset, inDEMDataset, this->demProvided, this->outputFile, this->classColumnName, this->numPoints, this->seed);
             }
-            
-            
+
+
             GDALClose(inDataset);
             GDALClose(inDEMDataset);
             GDALDestroyDriverManager();
-            
+
         }
         else if(option == RSGISExeImageUtils::uniquepxlclumps)
         {
@@ -5393,14 +5398,14 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
                 cout << "A no data value has not been defined\n";
             }
             cout << "Image format: " << this->imageFormat << endl;
-            
+
             GDALAllRegister();
-                       
+
 			GDALDataset **datasets = NULL;
-            
+
 			RSGISCalcImage *calcImage = NULL;
 			RSGISCalcImageValue *calcImageValue = NULL;
-            
+
 			try
 			{
                 datasets = new GDALDataset*[1];
@@ -5410,15 +5415,15 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
 					string message = string("Could not open image ") + this->inputImage;
 					throw RSGISImageException(message.c_str());
 				}
-                
+
 				calcImageValue = new RSGISUniquePixelClumps(this->noDataValDefined, this->nodataValue);
 				calcImage = new RSGISCalcImage(calcImageValue, "", true);
-                
+
 				calcImage->calcImage(datasets, 1, this->outputImage, false, NULL, this->imageFormat, GDT_UInt32);
-                
+
 				delete calcImage;
 				delete calcImageValue;
-                                
+
 				GDALClose(datasets[0]);
 				delete[] datasets;
 			}
@@ -5427,22 +5432,22 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
 				throw e;
 			}
 			GDALDestroyDriverManager();
-            
+
         }
         else if(option == RSGISExeImageUtils::subset2img)
 		{
 			cout << "Subset image to another image\n";
 			GDALAllRegister();
 			OGRRegisterAll();
-            
+
 			GDALDataset **dataset = NULL;
             GDALDataset *roiDataset = NULL;
-            
+
 			RSGISCopyImage *copyImage = NULL;
 			RSGISCalcImage *calcImage = NULL;
-            
+
 			int numImageBands = 0;
-            
+
 			try
 			{
 				// Open Image
@@ -5456,26 +5461,26 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
 				}
 				numImageBands = dataset[0]->GetRasterCount();
 				cout << "Raster Band Count = " << numImageBands << endl;
-                
+
                 roiDataset = (GDALDataset *) GDALOpenShared(this->inputROIImage.c_str(), GA_ReadOnly);
 				if(roiDataset == NULL)
 				{
 					string message = string("Could not open image ") + this->inputROIImage;
 					throw RSGISImageException(message.c_str());
 				}
-				
+
                 RSGISImageUtils imgUtils;
-                
+
                 OGREnvelope *ogrExtent = imgUtils.getSpatialExtent(roiDataset);
                 geos::geom::Envelope extent = geos::geom::Envelope(ogrExtent->MinX, ogrExtent->MaxX, ogrExtent->MinY, ogrExtent->MaxY);
-                
+
                 cout.precision(12);
                 cout << "BBOX [" << ogrExtent->MinX << "," << ogrExtent->MaxX << "][" << ogrExtent->MinY << "," << ogrExtent->MaxY << "]\n";
-                
+
 				copyImage = new RSGISCopyImage(numImageBands);
 				calcImage = new RSGISCalcImage(copyImage, "", true);
                 calcImage->calcImageInEnv(dataset, 1, outputImage, &extent, false, NULL, imageFormat, outDataType);
-                
+
 				GDALClose(dataset[0]);
 				delete[] dataset;
                 GDALClose(roiDataset);
@@ -5505,9 +5510,9 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
                 cout << "A no data value has not been defined\n";
             }
             cout << "Image format: " << this->imageFormat << endl;
-            
+
             GDALAllRegister();
-            
+
 			try
 			{
 				GDALDataset *inDataset = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_ReadOnly);
@@ -5516,10 +5521,10 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
 					string message = string("Could not open image ") + this->inputImage;
 					throw RSGISImageException(message.c_str());
 				}
-                
+
                 rsgis::rastergis::RSGISDefineImageTiles defImgTiles;
                 defImgTiles.defineTiles(inDataset, this->outputImage, this->imageFormat, this->tileSizePxl, this->validPixelRatio, this->nodataValue, noDataValDefined);
-                
+
 				GDALClose(inDataset);
 			}
 			catch(RSGISException& e)
@@ -5527,7 +5532,7 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
 				throw e;
 			}
 			GDALDestroyDriverManager();
-            
+
         }
         else if(option == RSGISExeImageUtils::gentilemasks)
         {
@@ -5544,9 +5549,9 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
             }
             cout << "Image format: " << this->imageFormat << endl;
             cout << "Image Extension: " << this->outFileExtension << endl;
-            
+
             GDALAllRegister();
-            
+
 			try
 			{
 				GDALDataset *inDataset = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_ReadOnly);
@@ -5555,10 +5560,10 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
 					string message = string("Could not open image ") + this->inputImage;
 					throw RSGISImageException(message.c_str());
 				}
-                
+
                 rsgis::rastergis::RSGISCreateImageTileMasks tileMasks;
                 tileMasks.createTileMasks(inDataset, this->outputImageBase, this->imageFormat, this->outFileExtension, this->createAnOverlap, this->overlap, this->growOverlap);
-                
+
 				GDALClose(inDataset);
 			}
 			catch(RSGISException& e)
@@ -5566,7 +5571,7 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
 				throw e;
 			}
 			GDALDestroyDriverManager();
-            
+
         }
         else if(option == RSGISExeImageUtils::cutouttile)
         {
@@ -5576,34 +5581,34 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
             cout << "Tile: " << this->tileImage << endl;
             cout << "Image format: " << this->imageFormat << endl;
             cout << "No Data: " << this->nodataValue << endl;
-            
+
             GDALAllRegister();
-            
+
 			try
 			{
                 GDALDataset **dataset = new GDALDataset*[2];
-				
+
                 dataset[0] = (GDALDataset *) GDALOpen(this->tileImage.c_str(), GA_ReadOnly);
 				if(dataset[0] == NULL)
 				{
 					string message = string("Could not open image ") + this->tileImage;
 					throw RSGISImageException(message.c_str());
 				}
-                                
+
                 dataset[1] = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_ReadOnly);
 				if(dataset[1] == NULL)
 				{
 					string message = string("Could not open image ") + this->inputImage;
 					throw RSGISImageException(message.c_str());
 				}
-                
+
                 rsgis::rastergis::RSGISCutOutTile *cutTiles = new rsgis::rastergis::RSGISCutOutTile(nodataValue, dataset[1]->GetRasterCount());
                 rsgis::img::RSGISCalcImage calcTile = rsgis::img::RSGISCalcImage(cutTiles);
-                
+
                 calcTile.calcImage(dataset, 2, this->outputImage, false, NULL, this->imageFormat, this->outDataType);
-                
+
                 delete cutTiles;
-                
+
 				GDALClose(dataset[0]);
                 GDALClose(dataset[1]);
                 delete[] dataset;
@@ -5613,7 +5618,7 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
 				throw e;
 			}
 			GDALDestroyDriverManager();
-            
+
         }
         else if(option == RSGISExeImageUtils::stretchwithstats)
 		{
@@ -5645,21 +5650,21 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
 			{
 				throw RSGISException("Stretch is not recognised.");
 			}
-            
-            
+
+
 			try
 			{
 				GDALAllRegister();
 				RSGISStretchImageWithStats *stretchImg = NULL;
 				GDALDataset *inDataset = NULL;
-                
+
 				inDataset = (GDALDataset *) GDALOpenShared(this->inputImage.c_str(), GA_ReadOnly);
 				if(inDataset == NULL)
 				{
 					string message = string("Could not open image ") + this->inputImage;
 					throw RSGISImageException(message.c_str());
 				}
-                
+
 				stretchImg = new RSGISStretchImageWithStats(inDataset, this->outputImage, this->inputFile, this->imageFormat, this->outDataType);
 				if(stretchType == rsgis::cmds::linearMinMax)
 				{
@@ -5685,7 +5690,7 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
 				{
 					throw RSGISException("Stretch is not recognised.");
 				}
-                
+
 				GDALClose(inDataset);
 				GDALDestroyDriverManager();
 				delete stretchImg;
@@ -5694,7 +5699,7 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
 			{
 				throw e;
 			}
-            
+
 		}
         else if(option == RSGISExeImageUtils::subsampleimage)
 		{
@@ -5706,23 +5711,23 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
             {
                 cout << "No data value: " << this->nodataValue << endl;
             }
-            
+
 			try
 			{
 				GDALAllRegister();
 
 				GDALDataset *inDataset = NULL;
-                
+
 				inDataset = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_ReadOnly);
 				if(inDataset == NULL)
 				{
 					string message = string("Could not open image ") + this->inputImage;
 					throw RSGISImageException(message.c_str());
 				}
-                
+
                 rsgis::img::RSGISSampleImage sampleData;
                 sampleData.subSampleImage(inDataset, this->outputFile, this->imageSample, this->nodataValue, this->useIgnoreVal);
-                
+
 				GDALClose(inDataset);
 				GDALDestroyDriverManager();
 			}
@@ -5730,7 +5735,7 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
 			{
 				throw e;
 			}
-            
+
 		}
 		else
 		{
@@ -6025,27 +6030,27 @@ void RSGISExeImageUtils::printParameters()
                 cout << "Band " << (*iterUsages).first;
                 if((*iterUsages).second == GCI_GrayIndex)
                 {
-                    cout << " Greyscale usage\n"; 
+                    cout << " Greyscale usage\n";
                 }
                 else if((*iterUsages).second == GCI_PaletteIndex)
                 {
-                    cout << " Paletted usage\n"; 
+                    cout << " Paletted usage\n";
                 }
                 else if((*iterUsages).second == GCI_RedBand)
                 {
-                    cout << " Red usage\n"; 
+                    cout << " Red usage\n";
                 }
                 else if((*iterUsages).second == GCI_GreenBand)
                 {
-                    cout << " Green usage\n"; 
+                    cout << " Green usage\n";
                 }
                 else if((*iterUsages).second == GCI_BlueBand)
                 {
-                    cout << " Blue usage\n"; 
+                    cout << " Blue usage\n";
                 }
                 else if((*iterUsages).second == GCI_AlphaBand)
                 {
-                    cout << " Alpha usage\n"; 
+                    cout << " Alpha usage\n";
                 }
             }
         }
