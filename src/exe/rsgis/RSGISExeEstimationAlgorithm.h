@@ -44,7 +44,7 @@
 #include "radar/RSGISEstimationSimulatedAnnealing.h"
 #include "radar/RSGISEstimationExhaustiveSearch.h"
 #include "radar/RSGISEstimationLinearLeastSquares.h"
-#include "radar/RSGISEstimationThreasholdAccepting.h"
+#include "radar/RSGISEstimationThresholdAccepting.h"
 #include "vec/RSGISProcessVector.h"
 #include "vec/RSGISProcessOGRFeature.h"
 
@@ -115,7 +115,7 @@ class RSGISExeEstimationAlgorithm : public RSGISAlgorithmParameters
 		RSGISEstimationOptimiser *estSlowOptimiser;
 		RSGISEstimationOptimiser *estFastOptimiser;
 		estOptimizerType estOptType;
-		double maskThreashold;
+		double maskThreshold;
 		int ittmax;
 		vector <gsl_vector*> *initialParClass;
 		vector <RSGISEstimationOptimiser*> *estOptimiserClass;
