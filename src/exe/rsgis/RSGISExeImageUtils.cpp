@@ -690,7 +690,8 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 		}
 		else
 		{
-			throw RSGISXMLArgumentsException("No \'proj\' attribute was provided.");
+            this->projFromImage = true;
+			this->proj = "";
 		}
 		XMLString::release(&projXMLStr);
 
@@ -1194,7 +1195,8 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 		}
 		else
 		{
-			throw RSGISXMLArgumentsException("No \'proj\' attribute was provided.");
+            this->projFromImage = true;
+			this->proj = "";
 		}
 		XMLString::release(&projXMLStr);
 	}
@@ -1963,7 +1965,8 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 		}
 		else
 		{
-			throw RSGISXMLArgumentsException("No \'proj\' attribute was provided.");
+            this->projFromImage = true;
+			this->proj = "";
 		}
 		XMLString::release(&projXMLStr);
 
@@ -2283,7 +2286,8 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 		}
 		else
 		{
-			throw RSGISXMLArgumentsException("No \'proj\' attribute was provided.");
+            this->projFromImage = true;
+			this->proj = "";
 		}
 		XMLString::release(&projXMLStr);
 
