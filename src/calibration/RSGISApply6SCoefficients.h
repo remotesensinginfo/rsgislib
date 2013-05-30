@@ -43,7 +43,7 @@ namespace rsgis{namespace calib{
     {
 		/** Class to apply 6S coeffiecients to an image
 			Coefficients are supplied for each band.
-			Optionally a DEM may be used, passed in as the first image band, with a set of threasholds (elevationThreash) coresponding to specific coefficients for each elevation.
+			Optionally a DEM may be used, passed in as the first image band, with a set of threasholds (elevationThresh) coresponding to specific coefficients for each elevation.
 		 
 			When no DEM is used the coeffiecents are structured as follows:
 			
@@ -52,12 +52,12 @@ namespace rsgis{namespace calib{
 		 
 			When a DEM is used, coefficients are structured as follows:
 			
-			 ax[0][0] = ax for band 1, when elevation is less than elevationThreash[0]
-			 ax[0][1] = ax for band 1, when elevation is between elevationThreash[0] and elevationThreash[1]
-			 ax[0][2] = ax for band 1, when elevation is between elevationThreash[1] and elevationThreash[2]
-			 ax[1][0] = ax for band 2, when elevation is less than elevationThreash[0]
-			 ax[1][1] = ax for band 2, when elevation is between elevationThreash[0] and elevationThreash[1]
-			 ax[1][2] = ax for band 2, when elevation is between elevationThreash[1] and elevationThreash[2]
+			 ax[0][0] = ax for band 1, when elevation is less than elevationThresh[0]
+			 ax[0][1] = ax for band 1, when elevation is between elevationThresh[0] and elevationThresh[1]
+			 ax[0][2] = ax for band 1, when elevation is between elevationThresh[1] and elevationThresh[2]
+			 ax[1][0] = ax for band 2, when elevation is less than elevationThresh[0]
+			 ax[1][1] = ax for band 2, when elevation is between elevationThresh[0] and elevationThresh[1]
+			 ax[1][2] = ax for band 2, when elevation is between elevationThresh[1] and elevationThresh[2]
 		 
 			The DEM is provided as the first band of the input array (bandValues)
 		 
@@ -65,7 +65,7 @@ namespace rsgis{namespace calib{
 		 
 		 */
     public: 
-        RSGISApply6SCoefficients(int numberOutBands, unsigned int *imageBands, float **aX, float **bX, float **cX, int numValues, float *elevationThreash = NULL, int numElevation = 0, float scaleFactor = 1.0);
+        RSGISApply6SCoefficients(int numberOutBands, unsigned int *imageBands, float **aX, float **bX, float **cX, int numValues, float *elevationThresh = NULL, int numElevation = 0, float scaleFactor = 1.0);
         void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException);
         void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implmented.");};
         void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implmented.");};
@@ -79,7 +79,7 @@ namespace rsgis{namespace calib{
         float **aX;
         float **bX;
         float **cX;
-		float *elevationThreash;
+		float *elevationThresh;
         unsigned int numValues;
 		unsigned int numElevation;
 		bool useTopo6S;

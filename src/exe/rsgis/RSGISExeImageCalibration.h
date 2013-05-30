@@ -106,7 +106,7 @@ protected:
     float **aX;
     float **bX;
     float **cX;
-	float *elevationThreash;
+	float *elevationThresh;
     float scaleFactor;
     int numValues;
 	unsigned int numElevation;

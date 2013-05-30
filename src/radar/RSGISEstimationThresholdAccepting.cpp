@@ -1,5 +1,5 @@
 /*
- *  RSGISEstimationThreasholdAccepting.cpp
+ *  RSGISEstimationThresholdAccepting.cpp
  *  RSGIS_LIB
  *
  *  Created by Daniel Clewley on 02/06/2010.
@@ -21,33 +21,33 @@
  *
  */
 
-#include "RSGISEstimationThreasholdAccepting.h"
+#include "RSGISEstimationThresholdAccepting.h"
 
 namespace rsgis {namespace radar{
 	
-	RSGISEstimationThreasholdAccepting2Var2Data::RSGISEstimationThreasholdAccepting2Var2Data(
+	RSGISEstimationThresholdAccepting2Var2Data::RSGISEstimationThresholdAccepting2Var2Data(
 																							 rsgis::math::RSGISMathTwoVariableFunction *functionHH, 
 																							 rsgis::math::RSGISMathTwoVariableFunction *functionHV,
 																							 double *minMaxIntervalA,
 																							 double *minMaxIntervalB,
 																							 double minEnergy,
-																							 double startThreashold,
+																							 double startThreshold,
 																							 unsigned int runsStep,
-																							 unsigned int runsThreashold,
+																							 unsigned int runsThreshold,
 																							 double cooling,
 																							 unsigned int maxItt)
 	{
 		/*
-		 this->startThreashold = 1000000;
+		 this->startThreshold = 1000000;
 		 this->runsStep = 10; // Number of runs at each step size
-		 this->runsThreashold = 20; // Number of times step is changed at each threasherature
+		 this->runsThreshold = 20; // Number of times step is changed at each threasherature
 		 this->cooling = 0.85; // Cooling factor
 		 this->minEnergy = minEnergy; // Set the target energy
 		 this->maxItt = 100000; // Maximum number of itterations*/
 		
-		this->startThreashold = startThreashold;
+		this->startThreshold = startThreshold;
 		this->runsStep = runsStep; // Number of runs at each step size
-		this->runsThreashold = runsThreashold; // Number of times step is changed at each threasherature
+		this->runsThreshold = runsThreshold; // Number of times step is changed at each threasherature
 		this->cooling = cooling; // Cooling factor
 		this->minEnergy = minEnergy; // Set the target energy
 		this->maxItt = maxItt; // Maximum number of itterations
@@ -68,13 +68,13 @@ namespace rsgis {namespace radar{
 		this->initialStepSize[0] = (minMaxIntervalA[1] - minMaxIntervalA[0]) / 5;
 		this->initialStepSize[1] = (minMaxIntervalB[1] - minMaxIntervalB[0]) / 5;
 	}
-	int RSGISEstimationThreasholdAccepting2Var2Data::minimise(gsl_vector *inData, gsl_vector *initialPar, gsl_vector *outParError)
+	int RSGISEstimationThresholdAccepting2Var2Data::minimise(gsl_vector *inData, gsl_vector *initialPar, gsl_vector *outParError)
 	{
 		rsgis::math::RSGISVectors vectorUtils;
 		rsgis::math::RSGISMatrices matrixUtils;
 		
 		unsigned int numItt = 0;
-		double threash = startThreashold;
+		double threash = startThreshold;
 		double stepRand = 0.0;
 		double newEnergy = 0.0;
 
@@ -114,10 +114,10 @@ namespace rsgis {namespace radar{
 		leastSquares = new rsgis::math::RSGISFunction2Var2DataLeastSquares(functionHH, functionHV, gsl_vector_get(inData, 0), gsl_vector_get(inData, 1)); 
 		
 		/* Set maximum number of threasherature runs
-		 Divide by runsStep * runsThreashold * 2 so threasherature will be reduced in maximum number of itterations
+		 Divide by runsStep * runsThreshold * 2 so threasherature will be reduced in maximum number of itterations
 		 */
 		
-		unsigned int tRuns = maxItt / (runsStep * runsThreashold * 2); 
+		unsigned int tRuns = maxItt / (runsStep * runsThreshold * 2); 
 		
 		for(unsigned int t = 0; t < tRuns; t++)
 		{
@@ -133,7 +133,7 @@ namespace rsgis {namespace radar{
 			}
 			else 
 			{
-				threash = pow(this->cooling,double(t)) * startThreashold;
+				threash = pow(this->cooling,double(t)) * startThreshold;
 			}
 			
 			// Reset step size
@@ -142,7 +142,7 @@ namespace rsgis {namespace radar{
 				stepSize[j] = initialStepSize[j] / 2;
 			}
 			
-			for(unsigned int n = 0; n < runsThreashold; n++)
+			for(unsigned int n = 0; n < runsThreshold; n++)
 			{
 				for (unsigned int j = 0; j < nPar; j++) 
 				{
@@ -313,21 +313,21 @@ namespace rsgis {namespace radar{
 		return 0;
 		
 	}
-	RSGISEstimationThreasholdAccepting2Var2Data::~RSGISEstimationThreasholdAccepting2Var2Data()
+	RSGISEstimationThresholdAccepting2Var2Data::~RSGISEstimationThresholdAccepting2Var2Data()
 	{
 		delete[] initialStepSize;
 		gsl_rng_free(randgsl);
 	}
 	
-	RSGISEstimationThreasholdAccepting2Var2DataWithAP::RSGISEstimationThreasholdAccepting2Var2DataWithAP(
+	RSGISEstimationThresholdAccepting2Var2DataWithAP::RSGISEstimationThresholdAccepting2Var2DataWithAP(
 																										 rsgis::math::RSGISMathTwoVariableFunction *functionHH, 
 																										 rsgis::math::RSGISMathTwoVariableFunction *functionHV,
 																										 double *minMaxIntervalA,
 																										 double *minMaxIntervalB,
 																										 double minEnergy,
-																										 double startThreashold,
+																										 double startThreshold,
 																										 unsigned int runsStep,
-																										 unsigned int runsThreashold,
+																										 unsigned int runsThreshold,
 																										 double cooling,
 																										 unsigned int maxItt,
 																										 gsl_matrix *covMatrixP, 
@@ -335,17 +335,17 @@ namespace rsgis {namespace radar{
 																										 gsl_vector *aPrioriPar)
 	{
 		/*
-		 this->startThreashold = 1000000;
+		 this->startThreshold = 1000000;
 		 this->runsStep = 10; // Number of runs at each step size
-		 this->runsThreashold = 20; // Number of times step is changed at each threasherature
+		 this->runsThreshold = 20; // Number of times step is changed at each threasherature
 		 this->cooling = 0.85; // Cooling factor
 		 this->minEnergy = minEnergy; // Set the target energy
 		 this->maxItt = 100000; // Maximum number of itterations*/
 		rsgis::math::RSGISMatrices matrixUtils;
 		
-		this->startThreashold = startThreashold;
+		this->startThreshold = startThreshold;
 		this->runsStep = runsStep; // Number of runs at each step size
-		this->runsThreashold = runsThreashold; // Number of times step is changed at each threasherature
+		this->runsThreshold = runsThreshold; // Number of times step is changed at each threasherature
 		this->cooling = cooling; // Cooling factor
 		this->minEnergy = minEnergy; // Set the target energy
 		this->maxItt = maxItt; // Maximum number of itterations
@@ -374,7 +374,7 @@ namespace rsgis {namespace radar{
 		this->invCovMatrixP = gsl_matrix_alloc(2,2);
 		matrixUtils.inv2x2GSLMatrix(covMatrixP, this->invCovMatrixP);
 	}
-	int RSGISEstimationThreasholdAccepting2Var2DataWithAP::minimise(gsl_vector *inData, gsl_vector *initialPar, gsl_vector *outParError)
+	int RSGISEstimationThresholdAccepting2Var2DataWithAP::minimise(gsl_vector *inData, gsl_vector *initialPar, gsl_vector *outParError)
 	{
 		
 		// Open text file to write errors to
@@ -386,7 +386,7 @@ namespace rsgis {namespace radar{
 		rsgis::math::RSGISMatrices matrixUtils;
 		
 		unsigned int numItt = 0;
-		double threash = startThreashold;
+		double threash = startThreshold;
 		double stepRand = 0.0;
 		double newEnergy = 0.0;
 
@@ -426,10 +426,10 @@ namespace rsgis {namespace radar{
 		leastSquares = new rsgis::math::RSGISFunction2Var2DataPreconditionedLeastSquares(functionHH, functionHV, gsl_vector_get(inData, 0), gsl_vector_get(inData, 1), gsl_vector_get(this->aPrioriPar, 0), gsl_vector_get(this->aPrioriPar, 1), this->invCovMatrixP, this->invCovMatrixD);
 		
 		/* Set maximum number of threasherature runs
-		 Divide by runsStep * runsThreashold * 2 so threasherature will be reduced in maximum number of itterations
+		 Divide by runsStep * runsThreshold * 2 so threasherature will be reduced in maximum number of itterations
 		 */
 		
-		unsigned int tRuns = maxItt / (runsStep * runsThreashold * nPar);
+		unsigned int tRuns = maxItt / (runsStep * runsThreshold * nPar);
 		
 		for(unsigned int t = 0; t < tRuns; t++)
 		{
@@ -445,7 +445,7 @@ namespace rsgis {namespace radar{
 			}
 			else 
 			{
-				threash = pow(this->cooling,double(t)) * startThreashold;
+				threash = pow(this->cooling,double(t)) * startThreshold;
 				// Reset step size
 				for (unsigned int j = 0; j < nPar; j++) 
 				{
@@ -453,7 +453,7 @@ namespace rsgis {namespace radar{
 				}
 			}
 			
-			for(unsigned int n = 0; n < runsThreashold; n++)
+			for(unsigned int n = 0; n < runsThreshold; n++)
 			{
 				for (unsigned int j = 0; j < nPar; j++) 
 				{
@@ -555,7 +555,7 @@ namespace rsgis {namespace radar{
 							}
 							if(abs(newEnergy - prevEnergy) < 1e-10)
 							{
-								threash = startThreashold;
+								threash = startThreshold;
 								t = t / 2;
 							}
 							numItt++;
@@ -618,37 +618,37 @@ namespace rsgis {namespace radar{
 		return 0;
 		
 	}
-	RSGISEstimationThreasholdAccepting2Var2DataWithAP::~RSGISEstimationThreasholdAccepting2Var2DataWithAP()
+	RSGISEstimationThresholdAccepting2Var2DataWithAP::~RSGISEstimationThresholdAccepting2Var2DataWithAP()
 	{
 		delete[] initialStepSize;
 		gsl_rng_free(randgsl);
 		gsl_matrix_free(invCovMatrixP);
 	}
 	
-	RSGISEstimationThreasholdAccepting2Var3Data::RSGISEstimationThreasholdAccepting2Var3Data(
+	RSGISEstimationThresholdAccepting2Var3Data::RSGISEstimationThresholdAccepting2Var3Data(
 																							 rsgis::math::RSGISMathTwoVariableFunction *functionHH, 
 																							 rsgis::math::RSGISMathTwoVariableFunction *functionHV,
 																							 rsgis::math::RSGISMathTwoVariableFunction *functionVV,
 																							 double *minMaxIntervalA,
 																							 double *minMaxIntervalB,
 																							 double minEnergy,
-																							 double startThreashold,
+																							 double startThreshold,
 																							 unsigned int runsStep,
-																							 unsigned int runsThreashold,
+																							 unsigned int runsThreshold,
 																							 double cooling,
 																							 unsigned int maxItt)
 	{
 		/*
-		 this->startThreashold = 1000000;
+		 this->startThreshold = 1000000;
 		 this->runsStep = 10; // Number of runs at each step size
-		 this->runsThreashold = 20; // Number of times step is changed at each threasherature
+		 this->runsThreshold = 20; // Number of times step is changed at each threasherature
 		 this->cooling = 0.85; // Cooling factor
 		 this->minEnergy = minEnergy; // Set the target energy
 		 this->maxItt = 100000; // Maximum number of itterations*/
 		
-		this->startThreashold = startThreashold;
+		this->startThreshold = startThreshold;
 		this->runsStep = runsStep; // Number of runs at each step size
-		this->runsThreashold = runsThreashold; // Number of times step is changed at each threasherature
+		this->runsThreshold = runsThreshold; // Number of times step is changed at each threasherature
 		this->cooling = cooling; // Cooling factor
 		this->minEnergy = minEnergy; // Set the target energy
 		this->maxItt = maxItt; // Maximum number of itterations
@@ -670,13 +670,13 @@ namespace rsgis {namespace radar{
 		this->initialStepSize[0] = (minMaxIntervalA[1] - minMaxIntervalA[0]) / 5;
 		this->initialStepSize[1] = (minMaxIntervalB[1] - minMaxIntervalB[0]) / 5;
 	}
-	int RSGISEstimationThreasholdAccepting2Var3Data::minimise(gsl_vector *inData, gsl_vector *initialPar, gsl_vector *outParError)
+	int RSGISEstimationThresholdAccepting2Var3Data::minimise(gsl_vector *inData, gsl_vector *initialPar, gsl_vector *outParError)
 	{
 		rsgis::math::RSGISVectors vectorUtils;
 		rsgis::math::RSGISMatrices matrixUtils;
 		
 		unsigned int numItt = 0;
-		double threash = startThreashold;
+		double threash = startThreshold;
 		double stepRand = 0.0;
 		double newEnergy = 0.0;
 
@@ -716,10 +716,10 @@ namespace rsgis {namespace radar{
 		leastSquares = new rsgis::math::RSGISFunction2Var3DataLeastSquares(this->functionHH, this->functionHV, this->functionVV, gsl_vector_get(inData, 0), gsl_vector_get(inData, 1), gsl_vector_get(inData, 2)); 
 		
 		/* Set maximum number of threasherature runs
-		 Divide by runsStep * runsThreashold * 2 so threasherature will be reduced in maximum number of itterations
+		 Divide by runsStep * runsThreshold * 2 so threasherature will be reduced in maximum number of itterations
 		 */
 		
-		unsigned int tRuns = maxItt / (runsStep * runsThreashold * 2); 
+		unsigned int tRuns = maxItt / (runsStep * runsThreshold * 2); 
 		
 		for(unsigned int t = 0; t < tRuns; t++)
 		{
@@ -735,7 +735,7 @@ namespace rsgis {namespace radar{
 			}
 			else 
 			{
-				threash = pow(this->cooling,double(t)) * startThreashold;
+				threash = pow(this->cooling,double(t)) * startThreshold;
 				// Reset step size
 				for (unsigned int j = 0; j < nPar; j++) 
 				{
@@ -749,7 +749,7 @@ namespace rsgis {namespace radar{
 				stepSize[j] = initialStepSize[j] / 2;
 			}
 			
-			for(unsigned int n = 0; n < runsThreashold; n++)
+			for(unsigned int n = 0; n < runsThreshold; n++)
 			{
 				for (unsigned int j = 0; j < nPar; j++) 
 				{
@@ -840,7 +840,7 @@ namespace rsgis {namespace radar{
 							}
 							if(abs(newEnergy - prevEnergy) < 1e-10)
 							{
-								threash = startThreashold;
+								threash = startThreshold;
 								t = 0;
 							}
 							numItt++;
@@ -905,22 +905,22 @@ namespace rsgis {namespace radar{
 		return 0;
 		
 	}
-	RSGISEstimationThreasholdAccepting2Var3Data::~RSGISEstimationThreasholdAccepting2Var3Data()
+	RSGISEstimationThresholdAccepting2Var3Data::~RSGISEstimationThresholdAccepting2Var3Data()
 	{
 		delete[] initialStepSize;
 		gsl_rng_free(randgsl);
 	}
 	
-	RSGISEstimationThreasholdAccepting2Var3DataWithAP::RSGISEstimationThreasholdAccepting2Var3DataWithAP(
+	RSGISEstimationThresholdAccepting2Var3DataWithAP::RSGISEstimationThresholdAccepting2Var3DataWithAP(
 																										 rsgis::math::RSGISMathTwoVariableFunction *functionHH, 
 																										 rsgis::math::RSGISMathTwoVariableFunction *functionHV,
 																										 rsgis::math::RSGISMathTwoVariableFunction *functionVV,
 																										 double *minMaxIntervalA,
 																										 double *minMaxIntervalB,
 																										 double minEnergy,
-																										 double startThreashold,
+																										 double startThreshold,
 																										 unsigned int runsStep,
-																										 unsigned int runsThreashold,
+																										 unsigned int runsThreshold,
 																										 double cooling,
 																										 unsigned int maxItt,
 																										 gsl_matrix *covMatrixP, 
@@ -928,17 +928,17 @@ namespace rsgis {namespace radar{
 																										 gsl_vector *aPrioriPar)
 	{
 		/*
-		 this->startThreashold = 1000000;
+		 this->startThreshold = 1000000;
 		 this->runsStep = 10; // Number of runs at each step size
-		 this->runsThreashold = 20; // Number of times step is changed at each threasherature
+		 this->runsThreshold = 20; // Number of times step is changed at each threasherature
 		 this->cooling = 0.85; // Cooling factor
 		 this->minEnergy = minEnergy; // Set the target energy
 		 this->maxItt = 100000; // Maximum number of itterations*/
 		rsgis::math::RSGISMatrices matrixUtils;
 		
-		this->startThreashold = startThreashold;
+		this->startThreshold = startThreshold;
 		this->runsStep = runsStep; // Number of runs at each step size
-		this->runsThreashold = runsThreashold; // Number of times step is changed at each threasherature
+		this->runsThreshold = runsThreshold; // Number of times step is changed at each threasherature
 		this->cooling = cooling; // Cooling factor
 		this->minEnergy = minEnergy; // Set the target energy
 		this->maxItt = maxItt; // Maximum number of itterations
@@ -967,14 +967,14 @@ namespace rsgis {namespace radar{
 		this->invCovMatrixP = gsl_matrix_alloc(2,2);
 		matrixUtils.inv2x2GSLMatrix(covMatrixP, this->invCovMatrixP);
 	}
-	int RSGISEstimationThreasholdAccepting2Var3DataWithAP::minimise(gsl_vector *inData, gsl_vector *initialPar, gsl_vector *outParError)
+	int RSGISEstimationThresholdAccepting2Var3DataWithAP::minimise(gsl_vector *inData, gsl_vector *initialPar, gsl_vector *outParError)
 	{
 		
 		rsgis::math::RSGISVectors vectorUtils;
 		rsgis::math::RSGISMatrices matrixUtils;
 		
 		unsigned int numItt = 0;
-		double threash = startThreashold;
+		double threash = startThreshold;
 		double stepRand = 0.0;
 		double newEnergy = 0.0;
 
@@ -1014,10 +1014,10 @@ namespace rsgis {namespace radar{
 		leastSquares = new rsgis::math::RSGISFunction2Var3DataPreconditionedLeastSquares(this->functionHH, this->functionHV, this->functionVV, gsl_vector_get(inData, 0), gsl_vector_get(inData, 1), gsl_vector_get(inData, 2), gsl_vector_get(this->aPrioriPar, 0), gsl_vector_get(this->aPrioriPar, 1), this->invCovMatrixP, this->invCovMatrixD);
 		
 		/* Set maximum number of threasherature runs
-		 Divide by runsStep * runsThreashold * 2 so threasherature will be reduced in maximum number of itterations
+		 Divide by runsStep * runsThreshold * 2 so threasherature will be reduced in maximum number of itterations
 		 */
 		
-		unsigned int tRuns = maxItt / (runsStep * runsThreashold * 2); 
+		unsigned int tRuns = maxItt / (runsStep * runsThreshold * 2); 
 		
 		for(unsigned int t = 0; t < tRuns; t++)
 		{
@@ -1033,7 +1033,7 @@ namespace rsgis {namespace radar{
 			}
 			else 
 			{
-				threash = pow(this->cooling,double(t)) * startThreashold;
+				threash = pow(this->cooling,double(t)) * startThreshold;
 			}
 			
 			// Reset step size
@@ -1042,7 +1042,7 @@ namespace rsgis {namespace radar{
 				stepSize[j] = initialStepSize[j] / 2;
 			}
 			
-			for(unsigned int n = 0; n < runsThreashold; n++)
+			for(unsigned int n = 0; n < runsThreshold; n++)
 			{
 				for (unsigned int j = 0; j < nPar; j++) 
 				{
@@ -1136,7 +1136,7 @@ namespace rsgis {namespace radar{
 							}
 							if(abs(newEnergy - prevEnergy) < 1e-10)
 							{
-								threash = startThreashold;
+								threash = startThreshold;
 								t = t / 2;
 							}
 							numItt++;
@@ -1201,14 +1201,14 @@ namespace rsgis {namespace radar{
 		return 0;
 		
 	}
-	RSGISEstimationThreasholdAccepting2Var3DataWithAP::~RSGISEstimationThreasholdAccepting2Var3DataWithAP()
+	RSGISEstimationThresholdAccepting2Var3DataWithAP::~RSGISEstimationThresholdAccepting2Var3DataWithAP()
 	{
 		delete[] initialStepSize;
 		gsl_rng_free(randgsl);
 		gsl_matrix_free(invCovMatrixP);
 	}
 	
-	RSGISEstimationThreasholdAccepting3Var3DataWithAP::RSGISEstimationThreasholdAccepting3Var3DataWithAP(
+	RSGISEstimationThresholdAccepting3Var3DataWithAP::RSGISEstimationThresholdAccepting3Var3DataWithAP(
 																										 rsgis::math::RSGISMathThreeVariableFunction *functionHH, 
 																										 rsgis::math::RSGISMathThreeVariableFunction *functionHV,
 																										 rsgis::math::RSGISMathThreeVariableFunction *functionVV,
@@ -1216,9 +1216,9 @@ namespace rsgis {namespace radar{
 																										 double *minMaxIntervalB,
 																										 double *minMaxIntervalC,
 																										 double minEnergy,
-																										 double startThreashold,
+																										 double startThreshold,
 																										 unsigned int runsStep,
-																										 unsigned int runsThreashold,
+																										 unsigned int runsThreshold,
 																										 double cooling,
 																										 unsigned int maxItt,
 																										 gsl_matrix *covMatrixP, 
@@ -1226,16 +1226,16 @@ namespace rsgis {namespace radar{
 																										 gsl_vector *aPrioriPar)
 	{
 		/*
-		 this->startThreashold = 1000000;
+		 this->startThreshold = 1000000;
 		 this->runsStep = 10; // Number of runs at each step size
-		 this->runsThreashold = 20; // Number of times step is changed at each threasherature
+		 this->runsThreshold = 20; // Number of times step is changed at each threasherature
 		 this->cooling = 0.85; // Cooling factor
 		 this->minEnergy = minEnergy; // Set the target energy
 		 this->maxItt = 100000; // Maximum number of itterations*/
 		
-		this->startThreashold = startThreashold;
+		this->startThreshold = startThreshold;
 		this->runsStep = runsStep; // Number of runs at each step size
-		this->runsThreashold = runsThreashold; // Number of times step is changed at each threasherature
+		this->runsThreshold = runsThreshold; // Number of times step is changed at each threasherature
 		this->cooling = cooling; // Cooling factor
 		this->minEnergy = minEnergy; // Set the target energy
 		this->maxItt = maxItt; // Maximum number of itterations
@@ -1270,7 +1270,7 @@ namespace rsgis {namespace radar{
 			gsl_matrix_set(this->invCovMatrixP, i, i, 1 / gsl_matrix_get(covMatrixP, i, i));
 		}
 	}
-	int RSGISEstimationThreasholdAccepting3Var3DataWithAP::minimise(gsl_vector *inData, gsl_vector *initialPar, gsl_vector *outParError)
+	int RSGISEstimationThresholdAccepting3Var3DataWithAP::minimise(gsl_vector *inData, gsl_vector *initialPar, gsl_vector *outParError)
 	{
 		// Open text file to write errors to
 		/*ofstream outTxtFile;
@@ -1281,7 +1281,7 @@ namespace rsgis {namespace radar{
 		rsgis::math::RSGISMatrices matrixUtils;
 		
 		unsigned int numItt = 0;
-		double threash = startThreashold;
+		double threash = startThreshold;
 		double stepRand = 0.0;
 		double newEnergy = 0.0;
 
@@ -1325,10 +1325,10 @@ namespace rsgis {namespace radar{
 		leastSquares = new rsgis::math::RSGISFunction3Var3DataPreconditionedLeastSquares(this->functionHH, this->functionHV, this->functionVV, gsl_vector_get(inData, 0), gsl_vector_get(inData, 1), gsl_vector_get(inData, 2), gsl_vector_get(this->aPrioriPar, 0), gsl_vector_get(this->aPrioriPar, 1), gsl_vector_get(this->aPrioriPar, 2), this->invCovMatrixP, this->invCovMatrixD);
 		
 		/* Set maximum number of threasherature runs
-		 Divide by runsStep * runsThreashold * nPar so threasherature will be reduced in maximum number of itterations
+		 Divide by runsStep * runsThreshold * nPar so threasherature will be reduced in maximum number of itterations
 		 */
 		
-		unsigned int tRuns = maxItt / (runsStep * runsThreashold * nPar); 
+		unsigned int tRuns = maxItt / (runsStep * runsThreshold * nPar); 
 		
 		for(unsigned int t = 0; t < tRuns; t++)
 		{
@@ -1344,7 +1344,7 @@ namespace rsgis {namespace radar{
 			}
 			else 
 			{
-				threash = pow(this->cooling,double(t)) * startThreashold;
+				threash = pow(this->cooling,double(t)) * startThreshold;
 				// Reset step size
 				for (unsigned int j = 0; j < nPar; j++) 
 				{
@@ -1353,7 +1353,7 @@ namespace rsgis {namespace radar{
 			}
 			
 			
-			for(unsigned int n = 0; n < runsThreashold; n++)
+			for(unsigned int n = 0; n < runsThreshold; n++)
 			{
 				for (unsigned int j = 0; j < nPar; j++) 
 				{
@@ -1465,7 +1465,7 @@ namespace rsgis {namespace radar{
 							}
 							if(abs(newEnergy - prevEnergy) < 1e-8)
 							{
-								threash = startThreashold;
+								threash = startThreshold;
 								t = t / 2;
 							}
 							numItt++;
@@ -1532,14 +1532,14 @@ namespace rsgis {namespace radar{
 		return 0;
 		
 	}
-	RSGISEstimationThreasholdAccepting3Var3DataWithAP::~RSGISEstimationThreasholdAccepting3Var3DataWithAP()
+	RSGISEstimationThresholdAccepting3Var3DataWithAP::~RSGISEstimationThresholdAccepting3Var3DataWithAP()
 	{
 		delete[] initialStepSize;
 		gsl_rng_free(randgsl);
 		gsl_matrix_free(invCovMatrixP);
 	}
 	
-	RSGISEstimationThreasholdAccepting3Var4DataWithAP::RSGISEstimationThreasholdAccepting3Var4DataWithAP(
+	RSGISEstimationThresholdAccepting3Var4DataWithAP::RSGISEstimationThresholdAccepting3Var4DataWithAP(
 																										 rsgis::math::RSGISMathThreeVariableFunction *function1, 
 																										 rsgis::math::RSGISMathThreeVariableFunction *function2, 
 																										 rsgis::math::RSGISMathThreeVariableFunction *function3, 
@@ -1548,9 +1548,9 @@ namespace rsgis {namespace radar{
 																										 double *minMaxIntervalB,
 																										 double *minMaxIntervalC,
 																										 double minEnergy,
-																										 double startThreashold,
+																										 double startThreshold,
 																										 unsigned int runsStep,
-																										 unsigned int runsThreashold,
+																										 unsigned int runsThreshold,
 																										 double cooling,
 																										 unsigned int maxItt,
 																										 gsl_matrix *covMatrixP, 
@@ -1558,16 +1558,16 @@ namespace rsgis {namespace radar{
 																										 gsl_vector *aPrioriPar)
 	{
 		/*
-		 this->startThreashold = 1000000;
+		 this->startThreshold = 1000000;
 		 this->runsStep = 10; // Number of runs at each step size
-		 this->runsThreashold = 20; // Number of times step is changed at each threasherature
+		 this->runsThreshold = 20; // Number of times step is changed at each threasherature
 		 this->cooling = 0.85; // Cooling factor
 		 this->minEnergy = minEnergy; // Set the target energy
 		 this->maxItt = 100000; // Maximum number of itterations*/
 		
-		this->startThreashold = startThreashold;
+		this->startThreshold = startThreshold;
 		this->runsStep = runsStep; // Number of runs at each step size
-		this->runsThreashold = runsThreashold; // Number of times step is changed at each threasherature
+		this->runsThreshold = runsThreshold; // Number of times step is changed at each threasherature
 		this->cooling = cooling; // Cooling factor
 		this->minEnergy = minEnergy; // Set the target energy
 		this->maxItt = maxItt; // Maximum number of itterations
@@ -1603,7 +1603,7 @@ namespace rsgis {namespace radar{
 			gsl_matrix_set(this->invCovMatrixP, i, i, 1 / gsl_matrix_get(covMatrixP, i, i));
 		}
 	}
-	int RSGISEstimationThreasholdAccepting3Var4DataWithAP::minimise(gsl_vector *inData, gsl_vector *initialPar, gsl_vector *outParError)
+	int RSGISEstimationThresholdAccepting3Var4DataWithAP::minimise(gsl_vector *inData, gsl_vector *initialPar, gsl_vector *outParError)
 	{
 		// Open text file to write errors to
 		/*ofstream outTxtFile;
@@ -1618,7 +1618,7 @@ namespace rsgis {namespace radar{
 		rsgis::math::RSGISMatrices matrixUtils;
 		
 		unsigned int numItt = 0;
-		double threash = startThreashold;
+		double threash = startThreshold;
 		double stepRand = 0.0;
 		double newEnergy = 0.0;
 
@@ -1674,9 +1674,9 @@ namespace rsgis {namespace radar{
 		
 		
 		/* Set maximum number of threasherature runs
-		 Divide by runsStep * runsThreashold * nPar so threasherature will be reduced in maximum number of itterations
+		 Divide by runsStep * runsThreshold * nPar so threasherature will be reduced in maximum number of itterations
 		 */
-		unsigned int tRuns = maxItt / (runsStep * runsThreashold * nPar); 
+		unsigned int tRuns = maxItt / (runsStep * runsThreshold * nPar); 
 		for(unsigned int t = 0; t < tRuns; t++)
 		{
 			// Decrease threashreature
@@ -1703,11 +1703,11 @@ namespace rsgis {namespace radar{
 				 double upperVal = upperLimit[j] - lowerLimit[j];
 				 currentParError[j] =  (gsl_rng_uniform(randgsl)*upperVal) + lowerLimit[j];
 				 }*/
-				threash = pow(this->cooling,double(t)) * startThreashold;
+				threash = pow(this->cooling,double(t)) * startThreshold;
 				
 			}
 			
-			for(unsigned int n = 0; n < runsThreashold; n++)
+			for(unsigned int n = 0; n < runsThreshold; n++)
 			{
 				for (unsigned int j = 0; j < nPar; j++) 
 				{
@@ -1819,7 +1819,7 @@ namespace rsgis {namespace radar{
 							}
 							if(abs(newEnergy - prevEnergy) < 1e-10)
 							{
-								threash = startThreashold;
+								threash = startThreshold;
 								t = t / 2;
 								currentParError[0] = (minMaxIntervalA[1] - minMaxIntervalA[0]) / 2;
 								currentParError[1] = (minMaxIntervalB[1] - minMaxIntervalB[0]) / 2;
@@ -1890,7 +1890,7 @@ namespace rsgis {namespace radar{
 		return 0;
 		
 	}
-	RSGISEstimationThreasholdAccepting3Var4DataWithAP::~RSGISEstimationThreasholdAccepting3Var4DataWithAP()
+	RSGISEstimationThresholdAccepting3Var4DataWithAP::~RSGISEstimationThresholdAccepting3Var4DataWithAP()
 	{
 		delete[] initialStepSize;
 		gsl_rng_free(randgsl);
