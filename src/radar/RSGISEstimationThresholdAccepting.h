@@ -1,5 +1,5 @@
  /*
- *  RSGISEstimationThreasholdAccepting.h
+ *  RSGISEstimationThresholdAccepting.h
  *  RSGIS_LIB
  *
  *  Created by Daniel Clewley on 02/06/2010.
@@ -21,8 +21,8 @@
  *
  */
 
-#ifndef RSGISEstimationThreasholdAccepting_H
-#define RSGISEstimationThreasholdAccepting_H
+#ifndef RSGISEstimationThresholdAccepting_H
+#define RSGISEstimationThresholdAccepting_H
 
 #include <math.h>
 #include <time.h>
@@ -39,30 +39,30 @@
 
 namespace rsgis {namespace radar{
     
-	class RSGISEstimationThreasholdAccepting2Var2Data : public RSGISEstimationOptimiser
+	class RSGISEstimationThresholdAccepting2Var2Data : public RSGISEstimationOptimiser
 	{
 		/// Simulated Annealing to use in Estimation algorithm
 	public:
-		RSGISEstimationThreasholdAccepting2Var2Data(
+		RSGISEstimationThresholdAccepting2Var2Data(
 												   rsgis::math::RSGISMathTwoVariableFunction *functionHH, 
 												   rsgis::math::RSGISMathTwoVariableFunction *functionHV,
 												   double *minMaxIntervalA,
 												   double *minMaxIntervalB,
 												   double minEnergy,
-												   double startThreashold,
+												   double startThreshold,
 												   unsigned int runsStep,
-												   unsigned int runsThreashold,
+												   unsigned int runsThreshold,
 												   double cooling,
 												   unsigned int maxItt);
 		int minimise(gsl_vector *inData, gsl_vector *initialPar, gsl_vector *outParError);
 		virtual void modifyAPriori(gsl_vector *newAPrioriPar){};
 		virtual estOptimizerType getOptimiserType(){return simulatedAnnealing;}; 
 		virtual void printOptimiser(){std::cout << "Simulated Annealing - 2 Var 2 Data" << std::endl;};
-		~RSGISEstimationThreasholdAccepting2Var2Data();
+		~RSGISEstimationThresholdAccepting2Var2Data();
 	private:
-		double startThreashold;
+		double startThreshold;
 		unsigned int runsStep; // Number of runs at each step size
-		unsigned int runsThreashold; // Number of times step is changed at each threasherature
+		unsigned int runsThreshold; // Number of times step is changed at each threasherature
 		double cooling; // Cooling factor
 		unsigned int nPar;
 		double *minMaxIntervalA;
@@ -75,18 +75,18 @@ namespace rsgis {namespace radar{
 		rsgis::math::RSGISMathTwoVariableFunction *functionHV;
 	};
 	
-	class RSGISEstimationThreasholdAccepting2Var2DataWithAP : public RSGISEstimationOptimiser
+	class RSGISEstimationThresholdAccepting2Var2DataWithAP : public RSGISEstimationOptimiser
 	{
 		/// Simulated Annealing to use in Estimation algorithm
 	public:
-		RSGISEstimationThreasholdAccepting2Var2DataWithAP(rsgis::math::RSGISMathTwoVariableFunction *functionHH, 
+		RSGISEstimationThresholdAccepting2Var2DataWithAP(rsgis::math::RSGISMathTwoVariableFunction *functionHH, 
 														 rsgis::math::RSGISMathTwoVariableFunction *functionHV,
 														 double *minMaxIntervalA,
 														 double *minMaxIntervalB,
 														 double minEnergy,
-														 double startThreashold,
+														 double startThreshold,
 														 unsigned int runsStep,
-														 unsigned int runsThreashold,
+														 unsigned int runsThreshold,
 														 double cooling,
 														 unsigned int maxItt,
 														 gsl_matrix *covMatrixP, 
@@ -97,11 +97,11 @@ namespace rsgis {namespace radar{
 		gsl_vector* getAPrioriPar(){return this->aPrioriPar;};
 		virtual estOptimizerType getOptimiserType(){return simulatedAnnealing;}; 
 		virtual void printOptimiser(){std::cout << "Simulated Annealing - 2 Var 2 Data (with a Priori)" << std::endl;};
-		~RSGISEstimationThreasholdAccepting2Var2DataWithAP();
+		~RSGISEstimationThresholdAccepting2Var2DataWithAP();
 	private:
-		double startThreashold;
+		double startThreshold;
 		unsigned int runsStep; // Number of runs at each step size
-		unsigned int runsThreashold; // Number of times step is changed at each threasherature
+		unsigned int runsThreshold; // Number of times step is changed at each threasherature
 		double cooling; // Cooling factor
 		unsigned int nPar;
 		double *minMaxIntervalA;
@@ -118,31 +118,31 @@ namespace rsgis {namespace radar{
 		gsl_vector *aPrioriPar;
 	};
 	
-	class RSGISEstimationThreasholdAccepting2Var3Data : public RSGISEstimationOptimiser
+	class RSGISEstimationThresholdAccepting2Var3Data : public RSGISEstimationOptimiser
 	{
 		/// Simulated Annealing to use in Estimation algorithm
 	public:
-		RSGISEstimationThreasholdAccepting2Var3Data(
+		RSGISEstimationThresholdAccepting2Var3Data(
 												   rsgis::math::RSGISMathTwoVariableFunction *functionHH, 
 												   rsgis::math::RSGISMathTwoVariableFunction *functionHV,
 												   rsgis::math::RSGISMathTwoVariableFunction *functionVV,
 												   double *minMaxIntervalA,
 												   double *minMaxIntervalB,
 												   double minEnergy,
-												   double startThreashold,
+												   double startThreshold,
 												   unsigned int runsStep,
-												   unsigned int runsThreashold,
+												   unsigned int runsThreshold,
 												   double cooling,
 												   unsigned int maxItt);
 		int minimise(gsl_vector *inData, gsl_vector *initialPar, gsl_vector *outParError);
 		virtual void modifyAPriori(gsl_vector *newAPrioriPar){};
 		virtual estOptimizerType getOptimiserType(){return simulatedAnnealing;}; 
 		virtual void printOptimiser(){std::cout << "Simulated Annealing - 2 Var 3 Data" << std::endl;};
-		~RSGISEstimationThreasholdAccepting2Var3Data();
+		~RSGISEstimationThresholdAccepting2Var3Data();
 	private:
-		double startThreashold;
+		double startThreshold;
 		unsigned int runsStep; // Number of runs at each step size
-		unsigned int runsThreashold; // Number of times step is changed at each threasherature
+		unsigned int runsThreshold; // Number of times step is changed at each threasherature
 		double cooling; // Cooling factor
 		unsigned int nPar;
 		double *minMaxIntervalA;
@@ -156,19 +156,19 @@ namespace rsgis {namespace radar{
 		rsgis::math::RSGISMathTwoVariableFunction *functionVV;
 	};
 	
-	class RSGISEstimationThreasholdAccepting2Var3DataWithAP : public RSGISEstimationOptimiser
+	class RSGISEstimationThresholdAccepting2Var3DataWithAP : public RSGISEstimationOptimiser
 	{
 		/// Simulated Annealing to use in Estimation algorithm
 	public:
-		RSGISEstimationThreasholdAccepting2Var3DataWithAP(rsgis::math::RSGISMathTwoVariableFunction *functionHH, 
+		RSGISEstimationThresholdAccepting2Var3DataWithAP(rsgis::math::RSGISMathTwoVariableFunction *functionHH, 
 														 rsgis::math::RSGISMathTwoVariableFunction *functionHV,
 														 rsgis::math::RSGISMathTwoVariableFunction *functionVV,
 														 double *minMaxIntervalA,
 														 double *minMaxIntervalB,
 														 double minEnergy,
-														 double startThreashold,
+														 double startThreshold,
 														 unsigned int runsStep,
-														 unsigned int runsThreashold,
+														 unsigned int runsThreshold,
 														 double cooling,
 														 unsigned int maxItt,
 														 gsl_matrix *covMatrixP, 
@@ -179,11 +179,11 @@ namespace rsgis {namespace radar{
 		gsl_vector* getAPrioriPar(){return this->aPrioriPar;};
 		virtual estOptimizerType getOptimiserType(){return simulatedAnnealing;}; 
 		virtual void printOptimiser(){std::cout << "Simulated Annealing - 2 Var 3 Data (with a Priori)" << std::endl;};
-		~RSGISEstimationThreasholdAccepting2Var3DataWithAP();
+		~RSGISEstimationThresholdAccepting2Var3DataWithAP();
 	private:
-		double startThreashold;
+		double startThreshold;
 		unsigned int runsStep; // Number of runs at each step size
-		unsigned int runsThreashold; // Number of times step is changed at each threasherature
+		unsigned int runsThreshold; // Number of times step is changed at each threasherature
 		double cooling; // Cooling factor
 		unsigned int nPar;
 		double *minMaxIntervalA;
@@ -201,20 +201,20 @@ namespace rsgis {namespace radar{
 		gsl_vector *aPrioriPar;
 	};
 	
-	class RSGISEstimationThreasholdAccepting3Var3DataWithAP : public RSGISEstimationOptimiser
+	class RSGISEstimationThresholdAccepting3Var3DataWithAP : public RSGISEstimationOptimiser
 	{
 		/// Simulated Annealing to use in Estimation algorithm
 	public:
-		RSGISEstimationThreasholdAccepting3Var3DataWithAP(rsgis::math::RSGISMathThreeVariableFunction *functionHH, 
+		RSGISEstimationThresholdAccepting3Var3DataWithAP(rsgis::math::RSGISMathThreeVariableFunction *functionHH, 
 														 rsgis::math::RSGISMathThreeVariableFunction *functionHV,
 														 rsgis::math::RSGISMathThreeVariableFunction *functionVV,
 														 double *minMaxIntervalA,
 														 double *minMaxIntervalB,
 														 double *minMaxIntervalC,
 														 double minEnergy,
-														 double startThreashold,
+														 double startThreshold,
 														 unsigned int runsStep,
-														 unsigned int runsThreashold,
+														 unsigned int runsThreshold,
 														 double cooling,
 														 unsigned int maxItt,
 														 gsl_matrix *covMatrixP, 
@@ -225,11 +225,11 @@ namespace rsgis {namespace radar{
 		gsl_vector* getAPrioriPar(){return this->aPrioriPar;};
 		virtual estOptimizerType getOptimiserType(){return simulatedAnnealing;}; 
 		virtual void printOptimiser(){std::cout << "Simulated Annealing - 3 Var 3 Data (with a Priori)" << std::endl;};
-		~RSGISEstimationThreasholdAccepting3Var3DataWithAP();
+		~RSGISEstimationThresholdAccepting3Var3DataWithAP();
 	private:
-		double startThreashold;
+		double startThreshold;
 		unsigned int runsStep; // Number of runs at each step size
-		unsigned int runsThreashold; // Number of times step is changed at each threasherature
+		unsigned int runsThreshold; // Number of times step is changed at each threasherature
 		double cooling; // Cooling factor
 		unsigned int nPar;
 		double *minMaxIntervalA;
@@ -248,11 +248,11 @@ namespace rsgis {namespace radar{
 		gsl_vector *aPrioriPar;
 	};
 	
-	class RSGISEstimationThreasholdAccepting3Var4DataWithAP : public RSGISEstimationOptimiser
+	class RSGISEstimationThresholdAccepting3Var4DataWithAP : public RSGISEstimationOptimiser
 	{
 		/// Simulated Annealing to use in Estimation algorithm
 	public:
-		RSGISEstimationThreasholdAccepting3Var4DataWithAP(rsgis::math::RSGISMathThreeVariableFunction *function1, 
+		RSGISEstimationThresholdAccepting3Var4DataWithAP(rsgis::math::RSGISMathThreeVariableFunction *function1, 
 														 rsgis::math::RSGISMathThreeVariableFunction *function2,
 														 rsgis::math::RSGISMathThreeVariableFunction *function3,
 														 rsgis::math::RSGISMathThreeVariableFunction *function4,
@@ -260,9 +260,9 @@ namespace rsgis {namespace radar{
 														 double *minMaxIntervalB,
 														 double *minMaxIntervalC,
 														 double minEnergy,
-														 double startThreashold,
+														 double startThreshold,
 														 unsigned int runsStep,
-														 unsigned int runsThreashold,
+														 unsigned int runsThreshold,
 														 double cooling,
 														 unsigned int maxItt,
 														 gsl_matrix *covMatrixP, 
@@ -272,11 +272,11 @@ namespace rsgis {namespace radar{
 		virtual void modifyAPriori(gsl_vector *newAPrioriPar){this->aPrioriPar = newAPrioriPar;};
 		virtual estOptimizerType getOptimiserType(){return simulatedAnnealing;}; 
 		virtual void printOptimiser(){std::cout << "Simulated Annealing - 3 Var 4 Data (with a Priori)" << std::endl;};
-		~RSGISEstimationThreasholdAccepting3Var4DataWithAP();
+		~RSGISEstimationThresholdAccepting3Var4DataWithAP();
 	private:
-		double startThreashold;
+		double startThreshold;
 		unsigned int runsStep; // Number of runs at each step size
-		unsigned int runsThreashold; // Number of times step is changed at each threasherature
+		unsigned int runsThreshold; // Number of times step is changed at each threasherature
 		double cooling; // Cooling factor
 		unsigned int nPar;
 		double *minMaxIntervalA;
