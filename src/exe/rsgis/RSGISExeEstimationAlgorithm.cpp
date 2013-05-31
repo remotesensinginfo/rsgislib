@@ -5509,7 +5509,7 @@ void RSGISExeEstimationAlgorithm::runAlgorithm() throw(RSGISException)
 				}
 
 				//OGRCleanupAll();
-				GDALDestroyDriverManager();
+				//GDALDestroyDriverManager();
 			}
 			catch (RSGISException& e)
 			{

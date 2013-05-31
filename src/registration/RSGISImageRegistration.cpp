@@ -401,7 +401,7 @@ namespace rsgis{namespace reg{
 			}
 			else if(!metric->findMin() & (currentMetricVal > metricThreshold))
 			{
-				tiePt->xShift += finalYShift;
+				tiePt->xShift += finalXShift;
 				tiePt->yShift += finalYShift;
 				tiePt->metricVal = currentMetricVal;
 			}
@@ -784,7 +784,8 @@ namespace rsgis{namespace reg{
 		return extremeX;
 	}
 	
-	void RSGISImageRegistration::getImageOverlapWithFloatShift(int xShift, int yShift, int **dsOffsets, int *width, int *height, double *gdalTransform, geos::geom::Envelope *env) throw(RSGISRegistrationException)
+	//void RSGISImageRegistration::getImageOverlapWithFloatShift(int xShift, int yShift, int **dsOffsets, int *width, int *height, double *gdalTransform, geos::geom::Envelope *env) throw(RSGISRegistrationException)
+    void RSGISImageRegistration::getImageOverlapWithFloatShift(float xShift, float yShift, int **dsOffsets, int *width, int *height, double *gdalTransform, geos::geom::Envelope *env) throw(RSGISRegistrationException)
 	{
 		if(!overlapDefined)
 		{

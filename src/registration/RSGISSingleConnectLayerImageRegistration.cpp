@@ -125,6 +125,7 @@ namespace rsgis{namespace reg{
 		{
 			tmpTiePtInLayer = new TiePointInSingleLayer();
 			tmpTiePtInLayer->tiePt = *iterTiePts;
+            
 			tmpTiePtInLayer->nrTiePts = new std::list<TiePoint*>();
 			
 			for(iterNrTiePts = tmpTiePts->begin(); iterNrTiePts != tmpTiePts->end(); iterNrTiePts++)
@@ -175,7 +176,8 @@ namespace rsgis{namespace reg{
 		
 		std::list<TiePointInSingleLayer*>::iterator iterTiePts;
 		std::list<TiePoint*>::iterator iterNrTiePts;
-		
+            
+        
 		for(unsigned int i = 0; i < maxNumIterations; ++i)
 		{
 			std::cout << "Started (Iteration " << i << ")." << std::flush;
@@ -191,10 +193,13 @@ namespace rsgis{namespace reg{
 				}
 				
 				//std::cout << "Finding location of tie point " << counter << std::endl;
+                
+                //std::cout << "Initial: " << (*iterTiePts)->tiePt->xShift << "," << (*iterTiePts)->tiePt->yShift << std::endl;
 				totalMovement += this->findTiePointLocation((*iterTiePts)->tiePt, windowSize, searchArea, metric, metricThreshold, subPixelResolution, &xShift, &yShift);
-
-				for(iterNrTiePts = (*iterTiePts)->nrTiePts->begin(); iterNrTiePts != (*iterTiePts)->nrTiePts->end(); ++iterNrTiePts)
-				{
+                //std::cout << "Final: " << (*iterTiePts)->tiePt->xShift << "," << (*iterTiePts)->tiePt->yShift << std::endl;
+                
+                for(iterNrTiePts = (*iterTiePts)->nrTiePts->begin(); iterNrTiePts != (*iterTiePts)->nrTiePts->end(); ++iterNrTiePts)
+                {
 					distance = (*iterTiePts)->tiePt->floatDistance((*iterNrTiePts));
 					if(distance < 1)
 					{
@@ -213,7 +218,6 @@ namespace rsgis{namespace reg{
 					(*iterNrTiePts)->yShift += invDist*yShiftDiff;
 					//std::cout << "After = [" << (*iterNrTiePts)->xShift << "," << (*iterNrTiePts)->yShift << "]\n\n";
 				}
-				
 				++counter;
 			}
 			averageMovement = totalMovement/tiePoints->size();

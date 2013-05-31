@@ -850,7 +850,7 @@ namespace rsgis {namespace radar
 		 * DUAL-POL SINGLE SPECIES WITH FPC                          *
 		 * - FPC used to calculate canopy scattering and attenuation *
 		 *************************************************************/
-		RSGISEstimationAlgorithmDualPolFPCSingleSpecies::RSGISEstimationAlgorithmDualPolFPCSingleSpecies(int numOutputBands, double nonForestThreashold, gsl_matrix *coeffHH, gsl_matrix *coeffHV, gsl_vector *coeffFPCHH, gsl_vector *coeffFPCHV, gsl_vector *coeffFPCAttenuationH, gsl_vector *coeffFPCAttenuationV, estParameters parameters, rsgis::utils::treeSpecies species, int ittmax) : RSGISCalcImageValue(numOutputBands)
+		RSGISEstimationAlgorithmDualPolFPCSingleSpecies::RSGISEstimationAlgorithmDualPolFPCSingleSpecies(int numOutputBands, double nonForestThreshold, gsl_matrix *coeffHH, gsl_matrix *coeffHV, gsl_vector *coeffFPCHH, gsl_vector *coeffFPCHV, gsl_vector *coeffFPCAttenuationH, gsl_vector *coeffFPCAttenuationV, estParameters parameters, rsgis::utils::treeSpecies species, int ittmax) : RSGISCalcImageValue(numOutputBands)
 		{
 			this->coeffHH = coeffHH;
 			this->coeffHV = coeffHV;
@@ -862,7 +862,7 @@ namespace rsgis {namespace radar
 			this->parameters = parameters;
 			this->order = coeffHH->size2 - 1;
 			this->fpcOrder = coeffFPCHV->size;
-			this->nonForestThreashold = nonForestThreashold;
+			this->nonForestThreshold = nonForestThreshold;
 
 			std::cout << "FPC Order = " << fpcOrder << std::endl;
 
@@ -955,7 +955,7 @@ namespace rsgis {namespace radar
 			if(parameters == diameterDensity) // Retrieve stem diameter and density
 			{
 
-				if (bandValues[0] < this->nonForestThreashold) // If FPC < non-forest mask set to zero.
+				if (bandValues[0] < this->nonForestThreshold) // If FPC < non-forest mask set to zero.
 				{
 					output[0] = 0;
 					output[1] = 0;
@@ -1432,14 +1432,14 @@ namespace rsgis {namespace radar
 		 * DUAL-POL SINGLE SPECIES WITH MASK                   *
 		 * - Mask used to determine areas estimation is run on *
 		 *******************************************************/
-		RSGISEstimationAlgorithmDualPolSingleSpeciesPolyMask::RSGISEstimationAlgorithmDualPolSingleSpeciesPolyMask(int numOutputBands, double nonForestThreashold, gsl_matrix *coeffHH, gsl_matrix *coeffVV, estParameters parameters, gsl_vector *initialPar, int ittmax) : RSGISCalcImageValue(numOutputBands)
+		RSGISEstimationAlgorithmDualPolSingleSpeciesPolyMask::RSGISEstimationAlgorithmDualPolSingleSpeciesPolyMask(int numOutputBands, double nonForestThreshold, gsl_matrix *coeffHH, gsl_matrix *coeffVV, estParameters parameters, gsl_vector *initialPar, int ittmax) : RSGISCalcImageValue(numOutputBands)
 		{
 			this->coeffHH = coeffHH;
 			this->coeffVV = coeffVV;
 			this->initialPar = initialPar;
 			this->ittmax = ittmax;
 			this->parameters = parameters;
-			this->nonForestThreashold = nonForestThreashold;
+			this->nonForestThreshold = nonForestThreshold;
 			std::cout << "numOutputBands " << numOutputBands << std::endl;
 		}
 		void RSGISEstimationAlgorithmDualPolSingleSpeciesPolyMask::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
@@ -1484,7 +1484,7 @@ namespace rsgis {namespace radar
 
 			/***********************************/
 
-			if(bandValues[0] > this->nonForestThreashold) // Mask
+			if(bandValues[0] > this->nonForestThreshold) // Mask
 			{
 				for(int i = 0; i < 2; i++)
 				{
@@ -2178,14 +2178,14 @@ namespace rsgis {namespace radar
 		 * fits (not limited to polynomial)*
 		 ***********************************/
 		RSGISEstimationAlgorithmSingleSpeciesMask::RSGISEstimationAlgorithmSingleSpeciesMask(int numOutputBands,
-																							 double nonForestThreashold,
+																							 double nonForestThreshold,
 																							 gsl_vector *initialPar,
 																							 RSGISEstimationOptimiser *estOptimiser,
 																							 estParameters parameters,
 																							 double **minMaxVals) : RSGISCalcImageValue(numOutputBands)
 		{
 			this->initialPar = initialPar;
-			this->nonForestThreashold = nonForestThreashold;
+			this->nonForestThreshold = nonForestThreshold;
 			this->estOptimiser = estOptimiser;
 			this->parameters = parameters;
 			this->numOutputBands = numOutputBands;
@@ -2213,7 +2213,7 @@ namespace rsgis {namespace radar
 			inSigma0dB = gsl_vector_alloc(nData);
 
 			// Check within mask and not border
-			if((bandValues[0] > this->nonForestThreashold) && (bandValues[1] > -100) && (bandValues[1] < 0) )
+			if((bandValues[0] > this->nonForestThreshold) && (bandValues[1] > -100) && (bandValues[1] < 0) )
 			{
 				for(unsigned int i = 0; i < nData; i++)
 				{
@@ -2650,13 +2650,13 @@ namespace rsgis {namespace radar
 		 * fits (not limited to polynomial)*
 		 ***********************************/
 		RSGISEstimationAlgorithmDualPolSingleSpeciesMaskPixAP::RSGISEstimationAlgorithmDualPolSingleSpeciesMaskPixAP(int numOutputBands,
-																															 double nonForestThreashold,
+																															 double nonForestThreshold,
 																															 gsl_vector *initialPar,
 																															 RSGISEstimationOptimiser *estOptimiser,
 																															 estParameters parameters) : RSGISCalcImageValue(numOutputBands)
 		{
 			this->initialPar = initialPar;
-			this->nonForestThreashold = nonForestThreashold;
+			this->nonForestThreshold = nonForestThreshold;
 			this->estOptimiser = estOptimiser;
 			this->parameters = parameters;
 			this->aPrioriPar = gsl_vector_alloc(2);
@@ -2695,7 +2695,7 @@ namespace rsgis {namespace radar
 				}
 				if(parameters == heightDensity) // Retrieve stem diameter and density
 				{
-					if (bandValues[0] < this->nonForestThreashold) // If FPC < non-forest mask set to zero.
+					if (bandValues[0] < this->nonForestThreshold) // If FPC < non-forest mask set to zero.
 					{
 						output[0] = 0;
 						output[1] = 0;

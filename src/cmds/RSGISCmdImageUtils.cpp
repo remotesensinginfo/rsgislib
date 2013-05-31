@@ -35,6 +35,7 @@
 #include "img/RSGISCopyImage.h"
 #include "img/RSGISStretchImage.h"
 #include "img/RSGISMaskImage.h"
+#include "img/RSGISImageMosaic.h"
 #include "img/RSGISPopWithStats.h"
 
 
@@ -320,6 +321,26 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
-
+    
+    void executeImageMosaic(std::string *inputImages, int numDS, std::string outputImage, float background, float skipVal, unsigned int skipBand, unsigned int overlapBehaviour, std::string format, RSGISLibDataType outDataType) throw(RSGISCmdException)
+    {
+        try
+        {
+            rsgis::img::RSGISImageMosaic *mosaic = NULL;
+            mosaic = new rsgis::img::RSGISImageMosaic();
+            // Projection hardcoded to from image (to simplify interface)
+            mosaic->mosaicSkipVals(inputImages, numDS, outputImage, background, skipVal, true, "", skipBand, overlapBehaviour, format, RSGIS_to_GDAL_Type(outDataType));
+        }
+        catch (RSGISImageException& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(std::exception& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
+    
+    
 }}
 

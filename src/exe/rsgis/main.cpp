@@ -165,6 +165,11 @@ void Control::runXML(std::string xmlFile)
 				{
 					std::cout << "less than a second\n";
 				}
+				else if(timeDiff > 3600)
+				{
+					timeDiff = timeDiff/3600;
+					std::cout << timeDiff << " hours\n";
+				}
 				else if(timeDiff > 60)
 				{
 					timeDiff = timeDiff/60;
@@ -293,7 +298,7 @@ void Control::createBlankXMLFile(std::string xmlFile)
     {
         struct tm *timeInfo = 0;
         time_t rawStartTime = 0;
-        
+
         time(&rawStartTime);
         timeInfo = localtime(&rawStartTime);
         std::string formatedTime = std::string(asctime(timeInfo));
@@ -301,7 +306,7 @@ void Control::createBlankXMLFile(std::string xmlFile)
         char buffer [80];
         strftime (buffer,80,"%Y",timeInfo);
         std::string year = std::string(buffer);
-        
+
         std::string newFileText = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n";
 		newFileText += "<!--\n";
 		newFileText += "    Description:\n";
@@ -312,11 +317,11 @@ void Control::createBlankXMLFile(std::string xmlFile)
 		newFileText += "<rsgis:commands xmlns:rsgis=\"http://www.rsgislib.org/xml/\">\n";
 		newFileText += "\n    <!-- ENTER YOUR XML HERE -->\n\n";
 		newFileText += "</rsgis:commands>\n";
-        
-        
+
+
         rsgis::utils::RSGISTextUtils textUtils;
         textUtils.writeStringToFile(xmlFile, newFileText);
-        
+
         std::cout << xmlFile << " has been created\n";
     }
     catch(rsgis::RSGISException& e)
@@ -368,7 +373,7 @@ void Control::help()
 void Control::versionInfo()
 {
     std::cout << "You are using Mercurial version " << RSGISLIB_HG_COMMIT << std::endl << std::endl;
-    
+
     std::cout << "With library versions:\n";
     std::cout << "Calibration Library Version: " << RSGISLIB_CALIBRATION_VERSION << std::endl;
     std::cout << "Classify Library Version: " << RSGISLIB_CLASSIFY_VERSION << std::endl;
