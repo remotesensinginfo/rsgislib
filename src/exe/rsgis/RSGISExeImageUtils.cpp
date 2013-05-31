@@ -4425,7 +4425,7 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
 		}
 		else if(option == RSGISExeImageUtils::stretch)
 		{
-			cout << "Apply an enhancement stretch to the an input image - usually for visualisation\n";
+			cout << "Apply an enhancement stretch to an input image - usually for visualisation\n";
 			cout << "Input Image: " << this->inputImage << endl;
 			cout << "Output Image: " << this->outputImage << endl;
             if(this->outStatsFile)
