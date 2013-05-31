@@ -128,7 +128,11 @@ namespace rsgis{ namespace cmds {
         }
         catch(RSGISException& e)
         {
-            throw e;
+            throw RSGISCmdException(e.what());
+        }
+        catch(std::exception& e)
+        {
+            throw RSGISCmdException(e.what());
         }
     }
     
