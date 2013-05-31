@@ -25,7 +25,7 @@
 
 namespace rsgis{namespace calib{
     
-    RSGISApply6SCoefficients::RSGISApply6SCoefficients(int numberOutBands, unsigned int *imageBands, float **aX, float **bX, float **cX, int numValues, float *elevationThreash, int numElevation, float scaleFactor):rsgis::img::RSGISCalcImageValue(numberOutBands)
+    RSGISApply6SCoefficients::RSGISApply6SCoefficients(int numberOutBands, unsigned int *imageBands, float **aX, float **bX, float **cX, int numValues, float *elevationThresh, int numElevation, float scaleFactor):rsgis::img::RSGISCalcImageValue(numberOutBands)
     {
         this->useTopo6S = true;
         this->bandOffset = 1;
@@ -33,7 +33,7 @@ namespace rsgis{namespace calib{
         this->aX = aX;
         this->bX = bX;
         this->cX = cX;
-		this->elevationThreash = elevationThreash;
+		this->elevationThresh = elevationThresh;
         this->numValues = numValues;
         this->scaleFactor = scaleFactor;
 		this->numElevation = numElevation;
@@ -76,7 +76,7 @@ namespace rsgis{namespace calib{
                 elevationScale = int(elevationScale + 0.5);
                 int elevationInt = elevationScale * 100;
                 
-                if (elevationInt < this->elevationThreash[0]) 
+                if (elevationInt < this->elevationThresh[0]) 
                 {
                     elv = 0;
                 }
@@ -84,7 +84,7 @@ namespace rsgis{namespace calib{
                 {
                     for (unsigned int d = 1; d < numElevation; ++d) 
                     {
-                        if((elevationInt >= this->elevationThreash[d - 1]) && (elevationInt < this->elevationThreash[d]))
+                        if((elevationInt >= this->elevationThresh[d - 1]) && (elevationInt < this->elevationThresh[d]))
                         {
                             elv = d;
                         }

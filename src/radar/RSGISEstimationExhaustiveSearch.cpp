@@ -417,7 +417,7 @@ namespace rsgis {namespace radar{
 		rsgis::math::RSGISMatrices matrixUtils;
 		
 		unsigned int nPar = 2;
-		double leastSquaresThreashold = 500;
+		double leastSquaresThreshold = 500;
 		
 		rsgis::math::RSGISFunctionEstimationLeastSquares *leastSquares;
 		leastSquares = new rsgis::math::RSGISFunctionEstimationLeastSquares(functionHH, functionHV, gsl_vector_get(inData, 0), gsl_vector_get(inData, 1)); 
@@ -438,7 +438,7 @@ namespace rsgis {namespace radar{
 			double d = minMaxIntervalB[0];
 			while(d < minMaxIntervalB[1]) 
 			{
-				if (leastSquares->calcFunction(h, d) < leastSquaresThreashold) // If least squares is less than threashold run optimiser
+				if (leastSquares->calcFunction(h, d) < leastSquaresThreshold) // If least squares is less than threashold run optimiser
 				{
 					gsl_vector_set(testPar, 0, h);
 					gsl_vector_set(testPar, 1, d);
