@@ -116,7 +116,7 @@ namespace rsgis {namespace radar{
                 {
             		gsl_vector_set(outParError, j, gsl_vector_get(initialPar, j));
                 }
-                gsl_vector_set(outParError, nPar, 999);
+                gsl_vector_set(outParError, nPar, +std::numeric_limits<double>::infinity());
                 return 0;
             }
             else
