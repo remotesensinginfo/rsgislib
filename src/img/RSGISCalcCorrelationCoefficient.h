@@ -28,6 +28,7 @@
 #include "img/RSGISImageCalcException.h"
 #include "img/RSGISCalcImageSingleValue.h"
 #include "img/RSGISCalcImageSingle.h"
+#include "img/RSGISCalcImageValue.h"
 
 namespace rsgis{namespace img{
 	
@@ -52,7 +53,8 @@ namespace rsgis{namespace img{
 			double b;
 			double aSQ;
 			double bSQ;
-		};
+		}; 
+    
 }}
 
 #endif
