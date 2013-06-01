@@ -58,6 +58,29 @@ namespace rsgis{namespace img{
         rsgis::math::RSGISStatsSummary *stats;
         std::vector<double> *distVals;
     };
+    
+    
+    class RSGISCalcImgPxl2WindowDist: public RSGISCalcImageValue
+    {
+    public:
+        RSGISCalcImgPxl2WindowDist(gsl_matrix *invCovarianceMatrix, rsgis::math::Vector *varMeans, gsl_vector *dVals, gsl_vector *outVec);
+        void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented");};
+        void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented");};
+        void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented");};
+        void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException);
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented");};
+        bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented");};
+        ~RSGISCalcImgPxl2WindowDist();
+    private:
+        rsgis::math::RSGISStatsSummary *stats;
+        std::vector<double> *distVals;
+        gsl_matrix *invCovarianceMatrix;
+        rsgis::math::Vector *varMeans;
+        gsl_vector *dVals;
+        gsl_vector *outVec;
+
+    };
 
     
     

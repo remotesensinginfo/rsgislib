@@ -770,8 +770,8 @@
     <rsgis:command algor="imagecalc" option="bandpercentile" image="image.env" output="image_out.mtxt" percentile="float 0-1" nodata="float" />
 	<!-- A command to calculate the Mahalanobis distance within a window - the centre pixel compared to the others within the window -->
 	<rsgis:command algor="imagecalc" option="mahalanobisdistwindow" image="image.env" output="image.env" window="int" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
-	
-	
+	<!-- A command to calculate the Mahalanobis distance of a window to the whole image -->
+	<rsgis:command algor="imagecalc" option="mahalanobisdistimg2window" image="image.env" output="image.env" window="int" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
 	
 	
 
