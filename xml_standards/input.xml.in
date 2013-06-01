@@ -768,8 +768,8 @@
     <rsgis:command algor="imagecalc" option="histogram" image="image.env" output="image_out.txt" mask="mask.env" value="int" band="int" [min="float" max="float"] [width="float"] />
 	<!-- A command to calculate image band percentiles. -->
     <rsgis:command algor="imagecalc" option="bandpercentile" image="image.env" output="image_out.mtxt" percentile="float 0-1" nodata="float" />
-	<!-- A command to calculate the correlation within a window - the centre pixel compared to the others within the window -->
-	<rsgis:command algor="imagecalc" option="correlationwindow" image="image.env" output="image.env" window="int" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
+	<!-- A command to calculate the Mahalanobis distance within a window - the centre pixel compared to the others within the window -->
+	<rsgis:command algor="imagecalc" option="mahalanobisdistwindow" image="image.env" output="image.env" window="int" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
 	
 	
 	
