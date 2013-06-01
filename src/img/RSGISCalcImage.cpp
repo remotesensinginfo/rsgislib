@@ -3379,13 +3379,26 @@ namespace rsgis{namespace img{
                         // Read Lower Block
                         for(int n = 0; n < numInBands; n++)
                         {
-                            rowOffset = bandOffsets[n][1] + (numOfLines * (i+1));
-                            //std::cout << "rowOffset: " << rowOffset << std::endl;
-                            //std::cout << "bandOffsets["<<n<<"][0]: " << bandOffsets[n][0] << std::endl;
-                            //std::cout << "width: " << width << std::endl;
-                            //std::cout << "numOfLines: " << numOfLines << std::endl;
-                            
-                            inputRasterBands[n]->RasterIO(GF_Read, bandOffsets[n][0], rowOffset, width, numOfLines, inputDataLower[n], width, numOfLines, GDT_Float32, 0, 0);
+                            if(remainRows > 0)
+                            {
+                                rowOffset = bandOffsets[n][1] + (numOfLines * (i+1));
+                                //std::cout << "rowOffset: " << rowOffset << std::endl;
+                                //std::cout << "bandOffsets["<<n<<"][0]: " << bandOffsets[n][0] << std::endl;
+                                //std::cout << "width: " << width << std::endl;
+                                //std::cout << "remainRows = " << remainRows << std::endl;
+                                inputRasterBands[n]->RasterIO(GF_Read, bandOffsets[n][0], rowOffset, width, remainRows, inputDataLower[n], width, remainRows, GDT_Float32, 0, 0);
+                                for(int k = (remainRows*width); k < numPxlsInBlock; k++)
+                                {
+                                    inputDataLower[n][k] = 0;
+                                }
+                            }
+                            else
+                            {
+                                for(int k = 0; k < numPxlsInBlock; k++)
+                                {
+                                    inputDataLower[n][k] = 0;
+                                }
+                            }
                         }
                     }
                     else if(i == (nYBlocks-1))
@@ -4171,7 +4184,7 @@ namespace rsgis{namespace img{
 			{
 				throw RSGISImageBandException("Driver does not exists..");
 			}
-			//std::cout << "New image width = " << width << " height = " << height << std::endl;
+			std::cout << "New image width = " << width << " height = " << height << std::endl;
             
 			outputImageDS = gdalDriver->Create(outputImage.c_str(), width, height, this->numOutBands, gdalDataType, NULL);
 			
@@ -4303,7 +4316,6 @@ namespace rsgis{namespace img{
             {
                 for(int i = 0; i < nYBlocks; i++)
                 {
-                    //std::cout << "i: " << i << std::endl;
                     if(i == 0)
                     {
                         // Set Upper Block with Zeros.
@@ -4329,13 +4341,26 @@ namespace rsgis{namespace img{
                         // Read Lower Block
                         for(int n = 0; n < numInBands; n++)
                         {
-                            rowOffset = bandOffsets[n][1] + (numOfLines * (i+1));
-                            //std::cout << "rowOffset: " << rowOffset << std::endl;
-                            //std::cout << "bandOffsets["<<n<<"][0]: " << bandOffsets[n][0] << std::endl;
-                            //std::cout << "width: " << width << std::endl;
-                            //std::cout << "numOfLines: " << numOfLines << std::endl;
-                            
-                            inputRasterBands[n]->RasterIO(GF_Read, bandOffsets[n][0], rowOffset, width, numOfLines, inputDataLower[n], width, numOfLines, GDT_Float32, 0, 0);
+                            if(remainRows > 0)
+                            {
+                                rowOffset = bandOffsets[n][1] + (numOfLines * (i+1));
+                                //std::cout << "rowOffset: " << rowOffset << std::endl;
+                                //std::cout << "bandOffsets["<<n<<"][0]: " << bandOffsets[n][0] << std::endl;
+                                //std::cout << "width: " << width << std::endl;
+                                //std::cout << "remainRows = " << remainRows << std::endl;
+                                inputRasterBands[n]->RasterIO(GF_Read, bandOffsets[n][0], rowOffset, width, remainRows, inputDataLower[n], width, remainRows, GDT_Float32, 0, 0);
+                                for(int k = (remainRows*width); k < numPxlsInBlock; k++)
+                                {
+                                    inputDataLower[n][k] = 0;
+                                }
+                            }
+                            else
+                            {
+                                for(int k = 0; k < numPxlsInBlock; k++)
+                                {
+                                    inputDataLower[n][k] = 0;
+                                }
+                            }
                         }
                     }
                     else if(i == (nYBlocks-1))
@@ -4620,7 +4645,7 @@ namespace rsgis{namespace img{
                         outputRasterBands[n]->RasterIO(GF_Write, 0, (numOfLines * i), width, numOfLines, outputData[n], width, numOfLines, GDT_Float32, 0, 0);
                     }
                 }
-                
+                                
                 if(remainRows > 0)
                 {
                     // Shift Lower Block to Main Block
@@ -4637,8 +4662,10 @@ namespace rsgis{namespace img{
                     {
                         for(int k = 0; k < numPxlsInBlock; k++)
                         {
+                            //std::cout << inputDataLower[n][k] << " ";
                             inputDataMain[n][k] = inputDataLower[n][k];
                         }
+                        //std::cout << std::endl;
                     }
                     
                     // Read Lower Block
@@ -4846,7 +4873,7 @@ namespace rsgis{namespace img{
                             this->calc->calcImageValue(inDataBlock, numInBands, windowSize, outDataColumn);
                             
                             for(int n = 0; n < this->numOutBands; n++)
-                            {
+                            {                                
                                 outputData[n][cPxl] = outDataColumn[n];
                             }
                         }
@@ -5321,13 +5348,26 @@ namespace rsgis{namespace img{
                         // Read Lower Block
                         for(int n = 0; n < numInBands; n++)
                         {
-                            rowOffset = bandOffsets[n][1] + (numOfLines * (i+1));
-                            //std::cout << "rowOffset: " << rowOffset << std::endl;
-                            //std::cout << "bandOffsets["<<n<<"][0]: " << bandOffsets[n][0] << std::endl;
-                            //std::cout << "width: " << width << std::endl;
-                            //std::cout << "numOfLines: " << numOfLines << std::endl;
-                            
-                            inputRasterBands[n]->RasterIO(GF_Read, bandOffsets[n][0], rowOffset, width, numOfLines, inputDataLower[n], width, numOfLines, GDT_Float32, 0, 0);
+                            if(remainRows > 0)
+                            {
+                                rowOffset = bandOffsets[n][1] + (numOfLines * (i+1));
+                                //std::cout << "rowOffset: " << rowOffset << std::endl;
+                                //std::cout << "bandOffsets["<<n<<"][0]: " << bandOffsets[n][0] << std::endl;
+                                //std::cout << "width: " << width << std::endl;
+                                //std::cout << "remainRows = " << remainRows << std::endl;
+                                inputRasterBands[n]->RasterIO(GF_Read, bandOffsets[n][0], rowOffset, width, remainRows, inputDataLower[n], width, remainRows, GDT_Float32, 0, 0);
+                                for(int k = (remainRows*width); k < numPxlsInBlock; k++)
+                                {
+                                    inputDataLower[n][k] = 0;
+                                }
+                            }
+                            else
+                            {
+                                for(int k = 0; k < numPxlsInBlock; k++)
+                                {
+                                    inputDataLower[n][k] = 0;
+                                }
+                            }
                         }
                     }
                     else if(i == (nYBlocks-1))
