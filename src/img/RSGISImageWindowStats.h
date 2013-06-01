@@ -1,10 +1,10 @@
 /*
- *  RSGISCalcCovariance.h
+ *  RSGISImageWindowStats.h
  *  RSGIS_LIB
  *
  *  Created by Pete Bunting on 25/07/2008.
  *  Copyright 2008 RSGISLib.
- * 
+ *
  *  RSGISLib is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef RSGISCalcCovariance_H
-#define RSGISCalcCovariance_H
+#ifndef RSGISImageWindowStats_H
+#define RSGISImageWindowStats_H
 
 #include <iostream>
 #include <string>
@@ -30,45 +30,37 @@
 #include "img/RSGISCalcImageSingle.h"
 #include "math/RSGISMatrices.h"
 #include "math/RSGISVectors.h"
+#include "math/RSGISMathsUtils.h"
 #include "img/RSGISCalcImageValue.h"
 
+#include <gsl/gsl_matrix.h>
+#include <gsl/gsl_vector.h>
+#include <gsl/gsl_linalg.h>
+#include <gsl/gsl_blas.h>
+
 namespace rsgis{namespace img{
-	
-	class RSGISCalcCovariance : public RSGISCalcImageSingleValue
-		{
-		public:
-			RSGISCalcCovariance(int numOutputValues, rsgis::math::Matrix *aMeans, rsgis::math::Matrix *bMeans);
-			void calcImageValue(float *bandValuesImageA, float *bandValuesImageB, int numBands, int bandA, int bandB) throw(RSGISImageCalcException);
-			void calcImageValue(float *bandValuesImage, int numBands, int band) throw(RSGISImageCalcException);
-			void calcImageValue(float *bandValuesImage, int numBands, geos::geom::Envelope *extent) throw(RSGISImageCalcException);
-			void calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt) throw(RSGISImageCalcException);
-			double* getOutputValues() throw(RSGISImageCalcException);
-			void reset();
-		private:
-			int n;
-			double sum;
-			rsgis::math::Matrix *aMeans;
-			rsgis::math::Matrix *bMeans;
-		};
-    
-    
-    
-    class RSGISCreateCovarianceMatrix: public RSGISCalcImageValue
+
+    class RSGISCalcImgPxlNeighboursDist: public RSGISCalcImageValue
     {
     public:
-        RSGISCreateCovarianceMatrix(rsgis::math::Vector *meanVector, rsgis::math::Matrix *covarianceMatrix);
+        RSGISCalcImgPxlNeighboursDist(gsl_matrix *invCovarianceMatrix, rsgis::math::Vector *varMeans, gsl_vector *dVals, gsl_vector *outVec);
         void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented");};
-        void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException);
+        void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented");};
         void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented");};
         void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException);
         void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented");};
         bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented");};
-        ~RSGISCreateCovarianceMatrix();
+        ~RSGISCalcImgPxlNeighboursDist();
     private:
-        rsgis::math::Vector *meanVector;
-        rsgis::math::Matrix *covarianceMatrix;
+        rsgis::math::RSGISStatsSummary *stats;
+        std::vector<double> *distVals;
+        gsl_matrix *invCovarianceMatrix;
+        rsgis::math::Vector *varMeans;
+        gsl_vector *dVals;
+        gsl_vector *outVec;
     };
+
     
     
 }}

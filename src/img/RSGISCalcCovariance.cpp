@@ -76,6 +76,33 @@ namespace rsgis{namespace img{
 		this->n = 0;
 		this->sum = 0;
 	}
+    
+    
+    
+    
+    
+    
+    RSGISCreateCovarianceMatrix::RSGISCreateCovarianceMatrix(rsgis::math::Vector *meanVector, rsgis::math::Matrix *covarianceMatrix) : RSGISCalcImageValue(0)
+    {
+        this->meanVector = meanVector;
+        this->covarianceMatrix = covarianceMatrix;
+    }
+
+    void RSGISCreateCovarianceMatrix::calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException)
+    {
+        for(int i = 0; i < numBands; ++i)
+        {
+            for(int j = 0; j < numBands; ++j)
+            {
+                covarianceMatrix->matrix[(i*numBands)+j] += (bandValues[i]-meanVector->vector[i]) * (bandValues[j]-meanVector->vector[j]);
+            }
+        }
+    }
+    
+    RSGISCreateCovarianceMatrix::~RSGISCreateCovarianceMatrix()
+    {
+        
+    }
 	
 }}
 
