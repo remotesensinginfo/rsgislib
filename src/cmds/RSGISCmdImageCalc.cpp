@@ -323,73 +323,15 @@ namespace rsgis{ namespace cmds {
             }
             
             rsgis::img::RSGISCalcImage *calcImage = NULL;
-
-            // Initial Mahalanobis distance Calculation
-            int numRasterBands = datasets[0]->GetRasterCount();
-            rsgis::img::ImageStats **imgStats = new rsgis::img::ImageStats*[numRasterBands];
-            for(int i = 0; i < numRasterBands; ++i)
-            {
-                imgStats[i] = new rsgis::img::ImageStats();
-                imgStats[i]->max = 0;
-                imgStats[i]->min = 0;
-                imgStats[i]->mean = 0;
-                imgStats[i]->sum = 0;
-                imgStats[i]->stddev = 0;
-            }
-            rsgis::img::RSGISImageStatistics calcStats;
-            calcStats.calcImageStatistics(datasets, 1, imgStats, numRasterBands, true, true);
             
-            rsgis::math::RSGISVectors vecUtils;
-            rsgis::math::RSGISMatrices matrixUtils;
-            rsgis::math::Vector *varMeans = vecUtils.createVector(numRasterBands);
-            for(int i = 0; i < numRasterBands; ++i)
-            {
-                varMeans->vector[i] = imgStats[i]->mean;
-                delete imgStats[i];
-            }
-            delete[] imgStats;
-            
-            rsgis::math::Matrix *covarianceMatrix = matrixUtils.createMatrix(numRasterBands, numRasterBands);
-            matrixUtils.setValues(covarianceMatrix, 0.0);
-            
-            rsgis::img::RSGISCreateCovarianceMatrix createCovarMatrix = rsgis::img::RSGISCreateCovarianceMatrix(varMeans, covarianceMatrix);
-            calcImage = new rsgis::img::RSGISCalcImage(&createCovarMatrix, "", true);
-            calcImage->calcImage(datasets, 1);
-            delete calcImage;
-            
-            std::cout << "Covariance Matrix:\n";
-            matrixUtils.printMatrix(covarianceMatrix);
-            
-            size_t numVals = covarianceMatrix->m;
-            
-            gsl_matrix *coVarGSL = matrixUtils.convertRSGIS2GSLMatrix(covarianceMatrix);
-            
-            gsl_matrix *invCovarianceMatrix = gsl_matrix_alloc(covarianceMatrix->m, covarianceMatrix->n);
-            gsl_permutation *p = gsl_permutation_alloc(covarianceMatrix->m);
-            int signum = 0;
-            gsl_linalg_LU_decomp(coVarGSL, p, &signum);
-            gsl_linalg_LU_invert (coVarGSL, p, invCovarianceMatrix);
-            gsl_permutation_free(p);
-            gsl_matrix_free(coVarGSL);
-            
-            std::cout << "Inverse Covariance Matrix:\n";
-            matrixUtils.printGSLMatrix(invCovarianceMatrix);
-            
-            gsl_vector *dVals = gsl_vector_alloc(numVals);
-            gsl_vector *outVec = gsl_vector_alloc(numVals);
-            
-            rsgis::img::RSGISCalcImgPxlNeighboursDist *calcDistWindow = new rsgis::img::RSGISCalcImgPxlNeighboursDist(invCovarianceMatrix, varMeans, dVals, outVec);
+            rsgis::img::RSGISCalcImgPxlNeighboursDist *calcDistWindow = new rsgis::img::RSGISCalcImgPxlNeighboursDist();
             
             calcImage = new rsgis::img::RSGISCalcImage(calcDistWindow, "", true);
             calcImage->calcImageWindowData(datasets, 1, outputImage, winSize, gdalFormat, RSGIS_to_GDAL_Type(outDataType));
             delete calcDistWindow;
             delete calcImage;
             
-            gsl_vector_free(dVals);
-            gsl_vector_free(outVec);
-            gsl_matrix_free(invCovarianceMatrix);
-            matrixUtils.freeMatrix(covarianceMatrix);
-            vecUtils.freeVector(varMeans);
+            
             
             GDALClose(datasets[0]);
             delete[] datasets;

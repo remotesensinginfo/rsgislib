@@ -32,6 +32,8 @@
 #include "math/RSGISVectors.h"
 #include "math/RSGISMathsUtils.h"
 #include "img/RSGISCalcImageValue.h"
+#include "img/RSGISCalcCovariance.h"
+#include "img/RSGISCalcImage.h"
 
 #include <gsl/gsl_matrix.h>
 #include <gsl/gsl_vector.h>
@@ -43,7 +45,7 @@ namespace rsgis{namespace img{
     class RSGISCalcImgPxlNeighboursDist: public RSGISCalcImageValue
     {
     public:
-        RSGISCalcImgPxlNeighboursDist(gsl_matrix *invCovarianceMatrix, rsgis::math::Vector *varMeans, gsl_vector *dVals, gsl_vector *outVec);
+        RSGISCalcImgPxlNeighboursDist();
         void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented");};
         void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented");};
         void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented");};
@@ -55,10 +57,6 @@ namespace rsgis{namespace img{
     private:
         rsgis::math::RSGISStatsSummary *stats;
         std::vector<double> *distVals;
-        gsl_matrix *invCovarianceMatrix;
-        rsgis::math::Vector *varMeans;
-        gsl_vector *dVals;
-        gsl_vector *outVec;
     };
 
     

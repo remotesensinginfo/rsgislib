@@ -130,7 +130,7 @@ namespace rsgisexe{
             bandpercentile,
             imgdist2geoms,
             imgcalcdist,
-            correlationwindow
+            mahalanobisdistwindow
 		};
 		
 		

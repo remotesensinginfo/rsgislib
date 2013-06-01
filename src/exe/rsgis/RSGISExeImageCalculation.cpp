@@ -90,7 +90,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
     XMLCh *optionBandPercentile = xercesc::XMLString::transcode("bandpercentile");
     XMLCh *optionImgDist2Geoms = xercesc::XMLString::transcode("imgdist2geoms");
     XMLCh *optionImgCalcDist = xercesc::XMLString::transcode("imgcalcdist");
-    XMLCh *optionCorrelationWindow = xercesc::XMLString::transcode("correlationwindow");
+    XMLCh *optionMahalanobisDistWindow = xercesc::XMLString::transcode("mahalanobisdistwindow");
     
 
 	const XMLCh *algorNameEle = argElement->getAttribute(xercesc::XMLString::transcode("algor"));
@@ -2502,9 +2502,9 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 		}
 		xercesc::XMLString::release(&outputXMLStr);
 	}
-    else if(xercesc::XMLString::equals(optionCorrelationWindow, optionXML))
+    else if(xercesc::XMLString::equals(optionMahalanobisDistWindow, optionXML))
 	{
-		this->option = RSGISExeImageCalculation::correlationwindow;
+		this->option = RSGISExeImageCalculation::mahalanobisdistwindow;
 		
         XMLCh *imageXMLStr = xercesc::XMLString::transcode("image");
 		if(argElement->hasAttribute(imageXMLStr))
@@ -2580,7 +2580,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
     xercesc::XMLString::release(&optionBandPercentile);
     xercesc::XMLString::release(&optionImgDist2Geoms);
     xercesc::XMLString::release(&optionImgCalcDist);
-    xercesc::XMLString::release(&optionCorrelationWindow);
+    xercesc::XMLString::release(&optionMahalanobisDistWindow);
 
 	parsed = true;
 }
@@ -4063,9 +4063,9 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 				throw e;
 			}
         }
-        else if(option == RSGISExeImageCalculation::correlationwindow)
+        else if(option == RSGISExeImageCalculation::mahalanobisdistwindow)
         {
-            std::cout << "A command to calculate the distance to the nearest geometry for each pixel within an image.\n";
+            std::cout << "A command to calculate the mahalanobis distance within a window to the centre pixel.\n";
             std::cout << "Input Image: " << inputImage << std::endl;
             std::cout << "Output Image: " << outputImage << std::endl;
             std::cout << "Window Size: " << this->windowSize << std::endl;
@@ -4329,9 +4329,9 @@ void RSGISExeImageCalculation::printParameters()
             std::cout << "Input Image: " << inputImage << std::endl;
             std::cout << "Output Image: " << outputImage << std::endl;
         }
-        else if(option == RSGISExeImageCalculation::correlationwindow)
+        else if(option == RSGISExeImageCalculation::mahalanobisdistwindow)
         {
-            std::cout << "A command to calculate the distance to the nearest geometry for each pixel within an image.\n";
+            std::cout << "A command to calculate the mahalanobis distance within a window to the centre pixel.\n";
             std::cout << "Input Image: " << inputImage << std::endl;
             std::cout << "Output Image: " << outputImage << std::endl;
             std::cout << "Window Size: " << this->windowSize << std::endl;
