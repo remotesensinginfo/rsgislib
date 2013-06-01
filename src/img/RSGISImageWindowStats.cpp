@@ -191,6 +191,78 @@ namespace rsgis{namespace img{
         delete distVals;
     }
     
+    
+    
+    
+    
+    
+    RSGISCalcImgPxl2WindowDist::RSGISCalcImgPxl2WindowDist(gsl_matrix *invCovarianceMatrix, rsgis::math::Vector *varMeans, gsl_vector *dVals, gsl_vector *outVec) : RSGISCalcImageValue(4)
+    {
+        stats = new rsgis::math::RSGISStatsSummary();
+        distVals = new std::vector<double>();
+        this->invCovarianceMatrix = invCovarianceMatrix;
+        this->varMeans = varMeans;
+        this->dVals = dVals;
+        this->outVec = outVec;
+
+    }
+    
+    void RSGISCalcImgPxl2WindowDist::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException)
+    {
+        unsigned int numPxls = winSize * winSize;
+        double dist = 0;
+        distVals->clear();
+        distVals->reserve(numPxls);
+        
+        for(unsigned int i = 0; i < winSize; ++i)
+        {
+            for(unsigned int j = 0; j < winSize; ++j)
+            {
+                for(int n = 0; n < numBands; ++n)
+                {
+                    gsl_vector_set(dVals, n, (dataBlock[n][i][j] - varMeans->vector[n]));
+                }
+                //std::cout << "\nVector D:\n";
+                //vecUtils.printGSLVector(dVals);
+                
+                gsl_blas_dgemv(CblasNoTrans, 1.0, invCovarianceMatrix, dVals, 0.0, outVec );
+                
+                //std::cout << "Mah Out Vec:\n";
+                //vecUtils.printGSLVector(outVec);
+                
+                dist = 0;
+                for(int n = 0; n < numBands; ++n)
+                {
+                    dist += gsl_vector_get(dVals, n) * gsl_vector_get(outVec, n);
+                }
+                dist = sqrt(dist);
+                
+                distVals->push_back(dist);
+            }
+        }
+        
+        rsgis::math::RSGISMathsUtils mathUtils;
+        mathUtils.initStatsSummary(stats);
+        stats->calcMax = true;
+        stats->calcMin = true;
+        stats->calcMean = true;
+        stats->calcMedian = true;
+        
+        mathUtils.generateStats(distVals, stats);
+        
+        output[0] = stats->mean;
+        output[1] = stats->median;
+        output[2] = stats->min;
+        output[3] = stats->max;
+    }
+
+    
+    RSGISCalcImgPxl2WindowDist::~RSGISCalcImgPxl2WindowDist()
+    {
+        delete stats;
+        delete distVals;
+    }
+    
 	
 }}
 
