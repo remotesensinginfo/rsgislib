@@ -148,8 +148,10 @@ namespace rsgis{namespace reg{
 			
 			//std::cout << "Finding location of tie point " << counter << std::endl;
             //std::cout << "Initial: " << (*iterTiePts)->xShift << "," << (*iterTiePts)->yShift << std::endl;
+            //(*iterTiePts)->xShift=0.25;
+            //(*iterTiePts)->yShift=0.25;
 			this->findTiePointLocation(*iterTiePts, windowSize, searchArea, metric, metricThreshold, subPixelResolution, &xShift, &yShift);
-            //std::cout << "Final: " << (*iterTiePts)->xShift << "," << (*iterTiePts)->yShift << std::endl;
+            std::cout << "Final: " << (*iterTiePts)->xShift << "," << (*iterTiePts)->yShift << std::endl;
             
 			++counter;
 		}

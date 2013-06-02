@@ -255,7 +255,7 @@ namespace rsgis{namespace reg{
 				++yIdx;
 			}
 			
-			//std::cout << "Initial shift[" << tiePt->xShift << "," << tiePt->yShift << "] Move tie points with shift [" << currentShiftX << "," << currentShiftY << "] with value " << currentMetricVal << std::endl;
+			std::cout << "Initial shift[" << tiePt->xShift << "," << tiePt->yShift << "] Move tie points with shift [" << currentShiftX << "," << currentShiftY << "] with value " << currentMetricVal << std::endl;
 			/*
 			for(unsigned int i = 0; i < numSearchPoints; ++i)
 			{
@@ -381,7 +381,7 @@ namespace rsgis{namespace reg{
 				
 			}
 			
-			//std::cout << "Sub pixel component = [" << subPixelXShift << "," << subPixelYShift << "]\n";
+			std::cout << "Sub pixel component = [" << subPixelXShift << "," << subPixelYShift << "]\n";
 			//std::cout << "Extrema values = [" << subPixelXMetric << "," << subPixelYMetric << "]\n";
 			
 			currentMetricVal = (subPixelXMetric + subPixelYMetric)/2;
@@ -392,7 +392,7 @@ namespace rsgis{namespace reg{
 			distanceMoved = sqrt(((finalXShift*finalXShift)+(finalYShift*finalYShift))/2);
 			*moveInX = finalXShift;
 			*moveInY = finalYShift;
-			
+            
 			if(metric->findMin() & (currentMetricVal < metricThreshold))
 			{
 				tiePt->xShift += finalXShift;
@@ -909,53 +909,56 @@ namespace rsgis{namespace reg{
 			gdalTransform[4] = overlap->yRot;
 			gdalTransform[5] = overlap->yRes;
 			
-			*width = floor(((brX - tlX)/overlap->xRes));
-			*height = floor(((tlY - brY)/overlap->yRes));
-
+			//*width = floor(((brX - tlX)/overlap->xRes));
+			//*height = floor(((tlY - brY)/overlap->yRes));
+			*width = floor(((brX - tlX)/overlap->xRes)+0.5);
+			*height = floor(((tlY - brY)/overlap->yRes)+0.5);
+            
 			double diffX = 0;
 			double diffY = 0;
 			
 			// Define reference offsets
 			diffX = tlX - refTransform[0];
 			diffY = refTransform[3] - tlY;
-			if(diffX != 0)
-			{
-				dsOffsets[0][0] = ceil(diffX/overlap->xRes);
-			}
-			else
-			{
-				dsOffsets[0][0] = 0;
-			}
-			
-			if(diffY != 0)
-			{
-				dsOffsets[0][1] = ceil(diffY/overlap->yRes);
-			}
-			else
-			{
-				dsOffsets[0][1] = 0;
-			}
+            
+            if(!((diffX > -0.0001) & (diffX < 0.0001)))
+            {
+                dsOffsets[0][0] = floor((diffX/overlap->xRes));
+            }
+            else
+            {
+                dsOffsets[0][0] = 0;
+            }
+            
+            if(!((diffY > -0.0001) & (diffY < 0.0001)))
+            {
+                dsOffsets[0][1] = floor((diffY/overlap->yRes));
+            }
+            else
+            {
+                dsOffsets[0][1] = 0;
+            }
 			
 			// Define floating offsets
 			diffX = tlX - floatTransform[0];
 			diffY = floatTransform[3] - tlY;
-			if(diffX != 0)
-			{
-				dsOffsets[1][0] = ceil(diffX/overlap->xRes);
-			}
-			else
-			{
-				dsOffsets[1][0] = 0;
-			}
-			
-			if(diffY != 0)
-			{
-				dsOffsets[1][1] = ceil(diffY/overlap->yRes);
-			}
-			else
-			{
-				dsOffsets[1][1] = 0;
-			}
+            if(!((diffX > -0.0001) & (diffX < 0.0001)))
+            {
+                dsOffsets[1][0] = floor((diffX/overlap->xRes));
+            }
+            else
+            {
+                dsOffsets[1][0] = 0;
+            }
+            
+            if(!((diffY > -0.0001) & (diffY < 0.0001)))
+            {
+                dsOffsets[1][1] = floor((diffY/overlap->yRes));
+            }
+            else
+            {
+                dsOffsets[1][1] = 0;
+            }
 		}
 		catch(RSGISRegistrationException &e)
 		{
