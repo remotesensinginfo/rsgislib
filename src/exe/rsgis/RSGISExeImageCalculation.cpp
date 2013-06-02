@@ -90,6 +90,8 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
     XMLCh *optionBandPercentile = xercesc::XMLString::transcode("bandpercentile");
     XMLCh *optionImgDist2Geoms = xercesc::XMLString::transcode("imgdist2geoms");
     XMLCh *optionImgCalcDist = xercesc::XMLString::transcode("imgcalcdist");
+    XMLCh *optionMahalanobisDistWindow = xercesc::XMLString::transcode("mahalanobisdistwindow");
+    XMLCh *optionMahalanobisDistImg2Window = xercesc::XMLString::transcode("mahalanobisdistimg2window");
     
 
 	const XMLCh *algorNameEle = argElement->getAttribute(xercesc::XMLString::transcode("algor"));
@@ -2501,6 +2503,92 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 		}
 		xercesc::XMLString::release(&outputXMLStr);
 	}
+    else if(xercesc::XMLString::equals(optionMahalanobisDistWindow, optionXML))
+	{
+		this->option = RSGISExeImageCalculation::mahalanobisdistwindow;
+		
+        XMLCh *imageXMLStr = xercesc::XMLString::transcode("image");
+		if(argElement->hasAttribute(imageXMLStr))
+		{
+			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(imageXMLStr));
+			this->inputImage = std::string(charValue);
+			xercesc::XMLString::release(&charValue);
+		}
+		else
+		{
+			throw rsgis::RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+		}
+		xercesc::XMLString::release(&imageXMLStr);
+        
+		XMLCh *outputXMLStr = xercesc::XMLString::transcode("output");
+		if(argElement->hasAttribute(outputXMLStr))
+		{
+			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outputXMLStr));
+			this->outputImage = std::string(charValue);
+			xercesc::XMLString::release(&charValue);
+		}
+		else
+		{
+			throw rsgis::RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+		}
+		xercesc::XMLString::release(&outputXMLStr);
+        
+        XMLCh *windowXMLStr = xercesc::XMLString::transcode("window");
+		if(argElement->hasAttribute(windowXMLStr))
+		{
+			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(windowXMLStr));
+			this->windowSize = mathUtils.strtounsignedint(std::string(charValue));
+			xercesc::XMLString::release(&charValue);
+		}
+		else
+		{
+			throw rsgis::RSGISXMLArgumentsException("No \'window\' attribute was provided.");
+		}
+		xercesc::XMLString::release(&windowXMLStr);
+	}
+    else if(xercesc::XMLString::equals(optionMahalanobisDistImg2Window, optionXML))
+	{
+		this->option = RSGISExeImageCalculation::mahalanobisdistimg2window;
+		
+        XMLCh *imageXMLStr = xercesc::XMLString::transcode("image");
+		if(argElement->hasAttribute(imageXMLStr))
+		{
+			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(imageXMLStr));
+			this->inputImage = std::string(charValue);
+			xercesc::XMLString::release(&charValue);
+		}
+		else
+		{
+			throw rsgis::RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+		}
+		xercesc::XMLString::release(&imageXMLStr);
+        
+		XMLCh *outputXMLStr = xercesc::XMLString::transcode("output");
+		if(argElement->hasAttribute(outputXMLStr))
+		{
+			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outputXMLStr));
+			this->outputImage = std::string(charValue);
+			xercesc::XMLString::release(&charValue);
+		}
+		else
+		{
+			throw rsgis::RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+		}
+		xercesc::XMLString::release(&outputXMLStr);
+        
+        XMLCh *windowXMLStr = xercesc::XMLString::transcode("window");
+		if(argElement->hasAttribute(windowXMLStr))
+		{
+			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(windowXMLStr));
+			this->windowSize = mathUtils.strtounsignedint(std::string(charValue));
+			xercesc::XMLString::release(&charValue);
+		}
+		else
+		{
+			throw rsgis::RSGISXMLArgumentsException("No \'window\' attribute was provided.");
+		}
+		xercesc::XMLString::release(&windowXMLStr);
+	}
 	else
 	{
 		std::string message = std::string("The option (") + std::string(xercesc::XMLString::transcode(optionXML)) + std::string(") is not known: RSGISExeImageCalculation.");
@@ -2536,6 +2624,8 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
     xercesc::XMLString::release(&optionBandPercentile);
     xercesc::XMLString::release(&optionImgDist2Geoms);
     xercesc::XMLString::release(&optionImgCalcDist);
+    xercesc::XMLString::release(&optionMahalanobisDistWindow);
+    xercesc::XMLString::release(&optionMahalanobisDistImg2Window);
 
 	parsed = true;
 }
@@ -4018,6 +4108,56 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 				throw e;
 			}
         }
+        else if(option == RSGISExeImageCalculation::mahalanobisdistwindow)
+        {
+            std::cout << "A command to calculate the mahalanobis distance within a window to the centre pixel.\n";
+            std::cout << "Input Image: " << inputImage << std::endl;
+            std::cout << "Output Image: " << outputImage << std::endl;
+            std::cout << "Window Size: " << this->windowSize << std::endl;
+            std::cout << "Output Format: " << this->imageFormat << std::endl;
+            
+            try
+            {
+                rsgis::cmds::executeMahalanobisDistFilter(this->inputImage, this->outputImage, this->windowSize, this->imageFormat, this->rsgisOutDataType);
+            }
+            catch (rsgis::RSGISException e)
+            {
+                throw rsgis::RSGISException(e.what());
+            }
+            catch (rsgis::cmds::RSGISCmdException e)
+            {
+                throw rsgis::RSGISException(e.what());
+            }
+            catch (std::exception e)
+            {
+                throw rsgis::RSGISException(e.what());
+            }
+        }
+        else if(option == RSGISExeImageCalculation::mahalanobisdistimg2window)
+        {
+            std::cout << "A command to calculate the mahalanobis distance within a window to the whole image.\n";
+            std::cout << "Input Image: " << inputImage << std::endl;
+            std::cout << "Output Image: " << outputImage << std::endl;
+            std::cout << "Window Size: " << this->windowSize << std::endl;
+            std::cout << "Output Format: " << this->imageFormat << std::endl;
+            
+            try
+            {
+                rsgis::cmds::executeMahalanobisDist2ImgFilter(this->inputImage, this->outputImage, this->windowSize, this->imageFormat, this->rsgisOutDataType);
+            }
+            catch (rsgis::RSGISException e)
+            {
+                throw rsgis::RSGISException(e.what());
+            }
+            catch (rsgis::cmds::RSGISCmdException e)
+            {
+                throw rsgis::RSGISException(e.what());
+            }
+            catch (std::exception e)
+            {
+                throw rsgis::RSGISException(e.what());
+            }
+        }
 		else
 		{
 			std::cout << "Options not recognised\n";
@@ -4252,6 +4392,28 @@ void RSGISExeImageCalculation::printParameters()
                 std::cout << "Min: " << this->inMin << std::endl;
                 std::cout << "Max: " << this->inMax << std::endl;
             }
+        }
+        else if(option == RSGISExeImageCalculation::imgcalcdist)
+        {
+            std::cout << "A command to calculate the distance to the nearest geometry for each pixel within an image.\n";
+            std::cout << "Input Image: " << inputImage << std::endl;
+            std::cout << "Output Image: " << outputImage << std::endl;
+        }
+        else if(option == RSGISExeImageCalculation::mahalanobisdistwindow)
+        {
+            std::cout << "A command to calculate the mahalanobis distance within a window to the centre pixel.\n";
+            std::cout << "Input Image: " << inputImage << std::endl;
+            std::cout << "Output Image: " << outputImage << std::endl;
+            std::cout << "Window Size: " << this->windowSize << std::endl;
+            std::cout << "Output Format: " << this->imageFormat << std::endl;
+        }
+        else if(option == RSGISExeImageCalculation::mahalanobisdistimg2window)
+        {
+            std::cout << "A command to calculate the mahalanobis distance within a window to the whole image.\n";
+            std::cout << "Input Image: " << inputImage << std::endl;
+            std::cout << "Output Image: " << outputImage << std::endl;
+            std::cout << "Window Size: " << this->windowSize << std::endl;
+            std::cout << "Output Format: " << this->imageFormat << std::endl;
         }
 		else
 		{
