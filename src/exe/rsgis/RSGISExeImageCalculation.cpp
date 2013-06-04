@@ -3022,10 +3022,18 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
                 rsgis::cmds::executeBandMaths(variables, numVars, outputImage, mathsExpression, imageFormat, rsgisOutDataType);
                 delete[] variables;
             }
-            catch (rsgis::RSGISException &e)
+            catch (rsgis::RSGISException e)
             {
-                throw e;
-            }			
+                throw rsgis::RSGISException(e.what());
+            }
+            catch (rsgis::cmds::RSGISCmdException e)
+            {
+                throw rsgis::RSGISException(e.what());
+            }
+            catch (std::exception e)
+            {
+                throw rsgis::RSGISException(e.what());
+            }
 		}
 		else if(option == RSGISExeImageCalculation::replacevalueslessthan)
 		{
@@ -3143,9 +3151,17 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
             {
                 rsgis::cmds::executeImageMaths(this->inputImage, this->outputImage, this->mathsExpression, this->imageFormat, rsgisOutDataType);
             }
-            catch(rsgis::RSGISException &e)
+            catch (rsgis::RSGISException e)
             {
-                throw e;
+                throw rsgis::RSGISException(e.what());
+            }
+            catch (rsgis::cmds::RSGISCmdException e)
+            {
+                throw rsgis::RSGISException(e.what());
+            }
+            catch (std::exception e)
+            {
+                throw rsgis::RSGISException(e.what());
             }
 		}
 		else if(option == RSGISExeImageCalculation::movementspeed)
