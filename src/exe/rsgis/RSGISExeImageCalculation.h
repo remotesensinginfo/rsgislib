@@ -129,7 +129,9 @@ namespace rsgisexe{
             histogram,
             bandpercentile,
             imgdist2geoms,
-            imgcalcdist
+            imgcalcdist,
+            mahalanobisdistwindow,
+            mahalanobisdistimg2window
 		};
 		
 		
@@ -213,6 +215,7 @@ namespace rsgisexe{
         float percentile;
         float noDataValue;
         bool noDataValueSpecified;
+        unsigned int windowSize;
 	};
 }
 #endif

@@ -357,6 +357,7 @@ set(LIB_IMG_H
 	${RSGIS_SRC_IMG_DIR}/RSGISGenHistogram.h
 	${RSGIS_SRC_IMG_DIR}/RSGISGenAccuracyPoints.h
 	${RSGIS_SRC_IMG_DIR}/RSGISSampleImage.h
+	${RSGIS_SRC_IMG_DIR}/RSGISImageWindowStats.h
 	)
 	
 set(LIB_IMG_CPP
@@ -489,6 +490,8 @@ set(LIB_IMG_CPP
 	${RSGIS_SRC_IMG_DIR}/RSGISGenAccuracyPoints.h
 	${RSGIS_SRC_IMG_DIR}/RSGISSampleImage.cpp
 	${RSGIS_SRC_IMG_DIR}/RSGISSampleImage.h
+	${RSGIS_SRC_IMG_DIR}/RSGISImageWindowStats.cpp
+	${RSGIS_SRC_IMG_DIR}/RSGISImageWindowStats.h
 	)
 ###############################################################################
 
