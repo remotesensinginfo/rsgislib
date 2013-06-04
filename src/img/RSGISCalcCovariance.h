@@ -29,6 +29,8 @@
 #include "img/RSGISCalcImageSingleValue.h"
 #include "img/RSGISCalcImageSingle.h"
 #include "math/RSGISMatrices.h"
+#include "math/RSGISVectors.h"
+#include "img/RSGISCalcImageValue.h"
 
 namespace rsgis{namespace img{
 	
@@ -48,6 +50,27 @@ namespace rsgis{namespace img{
 			rsgis::math::Matrix *aMeans;
 			rsgis::math::Matrix *bMeans;
 		};
+    
+    
+    
+    class RSGISCreateCovarianceMatrix: public RSGISCalcImageValue
+    {
+    public:
+        RSGISCreateCovarianceMatrix(rsgis::math::Vector *meanVector, rsgis::math::Matrix *covarianceMatrix);
+        void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented");};
+        void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException);
+        void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented");};
+        void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented");};
+        bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented");};
+        ~RSGISCreateCovarianceMatrix();
+    private:
+        rsgis::math::Vector *meanVector;
+        rsgis::math::Matrix *covarianceMatrix;
+    };
+    
+    
 }}
 
 #endif
