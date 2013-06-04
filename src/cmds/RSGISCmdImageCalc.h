@@ -60,7 +60,8 @@ namespace rsgis{ namespace cmds {
     void executeMahalanobisDistFilter(std::string inputImage, std::string outputImage, unsigned int winSize, std::string gdalFormat, RSGISLibDataType outDataType)throw(RSGISCmdException);
     /** Function to run mahalanobis distance Image to Window Filter */
     void executeMahalanobisDist2ImgFilter(std::string inputImage, std::string outputImage, unsigned int winSize, std::string gdalFormat, RSGISLibDataType outDataType)throw(RSGISCmdException);
-    
+    /** Function to run image calculate distance command */
+    void executeImageCalcDistance(std::string inputImage, std::string outputImage, std::string gdalFormat)throw(RSGISCmdException);
 
     
 }}

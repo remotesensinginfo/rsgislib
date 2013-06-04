@@ -4061,52 +4061,22 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
             std::cout << "Input Image: " << inputImage << std::endl;
             std::cout << "Output Image: " << outputImage << std::endl;
             
-            GDALAllRegister();
 			try
 			{
-                GDALDataset *imgDataset = (GDALDataset *) GDALOpenShared(this->inputImage.c_str(), GA_ReadOnly);
-				if(imgDataset == NULL)
-				{
-					std::string message = std::string("Could not open image ") + this->inputImage;
-					throw rsgis::RSGISImageException(message.c_str());
-				}
-                
-                // Create blank image
-                rsgis::img::RSGISImageUtils imageUtils;
-                GDALDataset *outImage = imageUtils.createCopy(imgDataset, 1, this->outputImage, this->imageFormat, GDT_Float32);
-                imageUtils.copyFloatGDALDataset(imgDataset, outImage);
-                
-                double *transform = new double[6];
-                outImage->GetGeoTransform(transform);
-                
-                rsgis::img::RSGISCalcDistViaIterativeGrowth *calcDist = new rsgis::img::RSGISCalcDistViaIterativeGrowth(transform[1]);
-                rsgis::img::RSGISCalcEditImage *calcEditImage = new rsgis::img::RSGISCalcEditImage(calcDist);
-                
-                bool change = true;
-                unsigned int dist = 1;
-                while(change)
-                {
-                    std::cout << "Distance " << dist << ":\t" << std::flush;
-                    calcDist->resetChange();
-                    calcEditImage->calcImageWindowData(outImage, 3, -2);
-                    change = calcDist->changeOccurred();
-                    calcDist->incrementCounter();
-                    dist += 1;
-                }
-                
-                // Translate to distance...
-                std::cout << "Multiple by pixel size\n";
-                calcEditImage->calcImageUseOut(outImage);
-                
-                // Clean up memory.
-                GDALClose(outImage);
-                GDALClose(imgDataset);
-                delete[] transform;
+                rsgis::cmds::executeImageCalcDistance(this->inputImage, this->outputImage, this->imageFormat);
 			}
 			catch (rsgis::RSGISException e)
-			{
-				throw e;
-			}
+            {
+                throw rsgis::RSGISException(e.what());
+            }
+            catch (rsgis::cmds::RSGISCmdException e)
+            {
+                throw rsgis::RSGISException(e.what());
+            }
+            catch (std::exception e)
+            {
+                throw rsgis::RSGISException(e.what());
+            }
         }
         else if(option == RSGISExeImageCalculation::mahalanobisdistwindow)
         {
