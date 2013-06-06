@@ -171,8 +171,14 @@ namespace rsgis{namespace reg{
 			unsigned int currentXIdx = 0;
 			unsigned int currentYIdx = 0;
             
-            double xLeftOver = tiePt->xShift - floor(tiePt->xShift+0.5);
-            double yLeftOver = tiePt->yShift - floor(tiePt->yShift+0.5);
+            // Set up variables to hold remainder from image overlap
+            float remainderX = 0;
+            float remainderY = 0;
+            // Remainder for heighest metric
+            float currentRemainderX = 0;
+            float currentRemainderY = 0;
+            
+            
 			
             // Move floating window over search space
 			for(int yShift = yShiftStart; yShift <= yShiftEnd; ++yShift)
@@ -184,7 +190,7 @@ namespace rsgis{namespace reg{
 					//std::cout << "Shift = [" << (((float)xShift)+tiePt->xShift) << "," << (((float)yShift)+tiePt->yShift) << "]\n";
 					try 
 					{
-						this->getImageOverlapWithFloatShift((((float)xShift)+tiePt->xShift), (((float)yShift)+tiePt->yShift), dsOffsets, &overlapWidth, &overlapHeight, overlapTransform, env);
+						this->getImageOverlapWithFloatShift((((float)xShift)+tiePt->xShift), (((float)yShift)+tiePt->yShift), dsOffsets, &overlapWidth, &overlapHeight, overlapTransform, env, &remainderX, &remainderY);
 
 						//std::cout << "Overlap Width = " << overlapWidth << std::endl;
 						//std::cout << "Overlap Height = " << overlapHeight << std::endl;
@@ -218,6 +224,8 @@ namespace rsgis{namespace reg{
 									currentShiftY = yShift;
 									currentXIdx = xIdx;
 									currentYIdx = yIdx;
+                                    currentRemainderX = remainderX;
+                                    currentRemainderY = remainderY;
 									first = false;
 								}
 								else if(metric->findMin() & (metricVal < currentMetricVal))
@@ -227,6 +235,8 @@ namespace rsgis{namespace reg{
 									currentShiftY = yShift;
 									currentXIdx = xIdx;
 									currentYIdx = yIdx;
+                                    currentRemainderX = remainderX;
+                                    currentRemainderY = remainderY;
 								}
 								else if(!metric->findMin() & (metricVal > currentMetricVal))
 								{
@@ -235,6 +245,8 @@ namespace rsgis{namespace reg{
 									currentShiftY = yShift;
 									currentXIdx = xIdx;
 									currentYIdx = yIdx;
+                                    currentRemainderX = remainderX;
+                                    currentRemainderY = remainderY;
 								}
 							}
 							
@@ -323,7 +335,7 @@ namespace rsgis{namespace reg{
 					gsl_matrix_set (inputDataMatrix, 2, 0, 1);
 					gsl_matrix_set (inputDataMatrix, 2, 1, imageSimilarity[currentYIdx+1][currentXIdx]);
 					
-					unsigned int order = 5; // 2nd Order - starts at zero.
+					unsigned int order = 3; // 2nd Order - starts at zero.
 					gsl_vector *coefficients = polyFit.PolyfitOneDimensionQuiet(order, inputDataMatrix);
 					
 					subPixelYShift = findExtreme(metric->findMin(), coefficients, order, -1, 1, subPixelResolution, &subPixelYMetric);
@@ -350,7 +362,7 @@ namespace rsgis{namespace reg{
 					gsl_matrix_set (inputDataMatrix, 4, 0, 2);
 					gsl_matrix_set (inputDataMatrix, 4, 1, imageSimilarity[currentYIdx][currentXIdx+2]);
 					
-					unsigned int order = 5; // 4th Order - starts at zero.
+					unsigned int order = 4; // 3rd Order - starts at zero.
 					gsl_vector *coefficients = polyFit.PolyfitOneDimensionQuiet(order, inputDataMatrix);
 					
 					subPixelXShift = findExtreme(metric->findMin(), coefficients, order, -1, 1, subPixelResolution, &subPixelXMetric);
@@ -374,7 +386,7 @@ namespace rsgis{namespace reg{
 					gsl_matrix_set (inputDataMatrix, 4, 0, 2);
 					gsl_matrix_set (inputDataMatrix, 4, 1, imageSimilarity[currentYIdx+2][currentXIdx]);
 					
-					unsigned int order = 5; // 4th Order - starts at zero.
+					unsigned int order = 4; // 3rd Order - starts at zero.
 					gsl_vector *coefficients = polyFit.PolyfitOneDimensionQuiet(order, inputDataMatrix);
 					
 					subPixelYShift = findExtreme(metric->findMin(), coefficients, order, -1, 1, subPixelResolution, &subPixelYMetric);
@@ -389,10 +401,13 @@ namespace rsgis{namespace reg{
 			//std::cout << "Extrema values = [" << subPixelXMetric << "," << subPixelYMetric << "]\n";
 			
 			currentMetricVal = (subPixelXMetric + subPixelYMetric)/2;
-			
-			float finalXShift = (((float)currentShiftX) + subPixelXShift) - xLeftOver;
-			float finalYShift = (((float)currentShiftY) + subPixelYShift) - yLeftOver;
-			
+            
+            //std::cout << currentRemainderX << ", " << currentRemainderY << std::endl;
+            
+            // Calculate final shift, adding on offsets due to rounding in image overlap calculation
+            float finalXShift = (((float)currentShiftX) + subPixelXShift) + currentRemainderX;
+			float finalYShift = (((float)currentShiftY) + subPixelYShift) + currentRemainderY;
+            
 			distanceMoved = sqrt(((finalXShift*finalXShift)+(finalYShift*finalYShift))/2);
 			*moveInX = finalXShift;
 			*moveInY = finalYShift;
@@ -491,6 +506,13 @@ namespace rsgis{namespace reg{
 			unsigned int yIdx = 0;
 			unsigned int currentXIdx = 0;
 			unsigned int currentYIdx = 0;
+            
+            // Set up variables to hold remainder from image overlap
+            float remainderX = 0;
+            float remainderY = 0;
+            // Remainder for heighest metric
+            float currentRemainderX = 0;
+            float currentRemainderY = 0;
 			
 			for(int yShift = yShiftStart; yShift <= yShiftEnd; ++yShift)
 			{
@@ -501,7 +523,7 @@ namespace rsgis{namespace reg{
 					//std::cout << "Shift = [" << (((float)xShift)+tiePt->xShift) << "," << (((float)yShift)+tiePt->yShift) << "]\n";
 					try
 					{
-						this->getImageOverlapWithFloatShift((((float)xShift)+tiePt->xShift), (((float)yShift)+tiePt->yShift), dsOffsets, &overlapWidth, &overlapHeight, overlapTransform, env);
+						this->getImageOverlapWithFloatShift((((float)xShift)+tiePt->xShift), (((float)yShift)+tiePt->yShift), dsOffsets, &overlapWidth, &overlapHeight, overlapTransform, env, &remainderX, &remainderY);
 						
 						//std::cout << "Overlap Width = " << overlapWidth << std::endl;
 						//std::cout << "Overlap Height = " << overlapHeight << std::endl;
@@ -535,6 +557,8 @@ namespace rsgis{namespace reg{
 									currentShiftY = yShift;
 									currentXIdx = xIdx;
 									currentYIdx = yIdx;
+                                    currentRemainderX = remainderX;
+                                    currentRemainderY = remainderY;
 									first = false;
 								}
 								else if(metric->findMin() & (metricVal < currentMetricVal))
@@ -544,6 +568,8 @@ namespace rsgis{namespace reg{
 									currentShiftY = yShift;
 									currentXIdx = xIdx;
 									currentYIdx = yIdx;
+                                    currentRemainderX = remainderX;
+                                    currentRemainderY = remainderY;
 								}
 								else if(!metric->findMin() & (metricVal > currentMetricVal))
 								{
@@ -552,6 +578,8 @@ namespace rsgis{namespace reg{
 									currentShiftY = yShift;
 									currentXIdx = xIdx;
 									currentYIdx = yIdx;
+                                    currentRemainderX = remainderX;
+                                    currentRemainderY = remainderY;
 								}
 							}
 							
@@ -667,7 +695,7 @@ namespace rsgis{namespace reg{
 					gsl_matrix_set (inputDataMatrix, 4, 0, 2);
 					gsl_matrix_set (inputDataMatrix, 4, 1, imageSimilarity[currentYIdx][currentXIdx+2]);
 					
-					unsigned int order = 5; // 4th Order - starts at zero.
+					unsigned int order = 4; // 3th Order - starts at zero.
 					gsl_vector *coefficients = polyFit.PolyfitOneDimensionQuiet(order, inputDataMatrix);
 					
 					subPixelXShift = findExtreme(metric->findMin(), coefficients, order, -1, 1, subPixelResolution, &subPixelXMetric);
@@ -691,7 +719,7 @@ namespace rsgis{namespace reg{
 					gsl_matrix_set (inputDataMatrix, 4, 0, 2);
 					gsl_matrix_set (inputDataMatrix, 4, 1, imageSimilarity[currentYIdx+2][currentXIdx]);
 					
-					unsigned int order = 5; // 4th Order - starts at zero.
+					unsigned int order = 4; // 3th Order - starts at zero.
 					gsl_vector *coefficients = polyFit.PolyfitOneDimensionQuiet(order, inputDataMatrix);
 					
 					subPixelYShift = findExtreme(metric->findMin(), coefficients, order, -1, 1, subPixelResolution, &subPixelYMetric);
@@ -707,8 +735,9 @@ namespace rsgis{namespace reg{
 			
 			currentMetricVal = (subPixelXMetric + subPixelYMetric)/2;
 			
-			float finalXShift = (((float)currentShiftX) + subPixelXShift);
-			float finalYShift = (((float)currentShiftY) + subPixelYShift);
+            // Calculate final shift, adding on offsets due to rounding in image overlap calculation
+            float finalXShift = (((float)currentShiftX) + subPixelXShift) + currentRemainderX;
+			float finalYShift = (((float)currentShiftY) + subPixelYShift) + currentRemainderY;
 			
 			distanceMoved = sqrt(((finalXShift*finalXShift)+(finalYShift*finalYShift))/2);
 			*moveInX = finalXShift;
@@ -752,9 +781,103 @@ namespace rsgis{namespace reg{
 		bool first = true;
 		double extremeX = 0;
 		double extremeY = 0;
-		
-		for(unsigned int i = 0; i < numTests; ++i)
-		{
+
+        // Quadratic
+        if(order == 3)
+        {
+            // Calculate value for which first order derivative equals 0.
+            extremeX = (-1.0*gsl_vector_get(coefficients,1)) / (2.0*gsl_vector_get(coefficients,2));
+            
+            // Predict coresponding y value.
+            double yPredicted = 0;
+			for(unsigned int j = 0; j < order ; j++)
+			{
+				double xPow = pow(extremeX, static_cast<int>(j)); // x^n;
+				double coeff = gsl_vector_get(coefficients, j); // a_n
+				double coeffXPow = coeff * xPow; // a_n * x^n
+				yPredicted = yPredicted + coeffXPow;
+			}
+            extremeY=yPredicted;
+			
+            
+        }
+        else if(order == 4)
+        {
+            // Find the values for which the first order derivative is equal to 0.
+            double a = gsl_vector_get(coefficients,1);
+            double b = 2.0*gsl_vector_get(coefficients,2);
+            double c = 3.0*gsl_vector_get(coefficients,3);
+            double xValue1 = ((-1.0*b)+sqrt(b*b - 4*a*c))/(2.0*a);
+            double xValue2 = ((-1.0*b)-sqrt(b*b - 4*a*c))/(2.0*a);
+            
+            // Predict coresponding y value.
+            double yPredicted1 = 0;
+			for(unsigned int j = 0; j < order ; j++)
+			{
+				double xPow = pow(xValue1, static_cast<int>(j)); // x^n;
+				double coeff = gsl_vector_get(coefficients, j); // a_n
+				double coeffXPow = coeff * xPow; // a_n * x^n
+				yPredicted1 = yPredicted1 + coeffXPow;
+			}
+            
+            double yPredicted2 = 0;
+			for(unsigned int j = 0; j < order ; j++)
+			{
+				double xPow = pow(xValue2, static_cast<int>(j)); // x^n;
+				double coeff = gsl_vector_get(coefficients, j); // a_n
+				double coeffXPow = coeff * xPow; // a_n * x^n
+				yPredicted2 = yPredicted2 + coeffXPow;
+			}
+            if(yPredicted1 > yPredicted2)
+            {
+                extremeX = xValue1;
+                extremeY = yPredicted1;
+            }
+            else
+            {
+                extremeX = xValue2;
+                extremeY = yPredicted2;
+            }
+            
+            // Check if outside range (something went wrong)
+            if((extremeX < minRange) | (extremeX > maxRange))
+            {
+                for(unsigned int i = 0; i < numTests; ++i)
+                {
+                    xValue = minRange + (i*division);
+                    yPredicted = 0;
+                    for(unsigned int j = 0; j < order ; j++)
+                    {
+                        double xPow = pow(xValue, static_cast<int>(j)); // x^n;
+                        double coeff = gsl_vector_get(coefficients, j); // a_n
+                        double coeffXPow = coeff * xPow; // a_n * x^n
+                        yPredicted = yPredicted + coeffXPow;
+                    }
+                    
+                    if(first)
+                    {
+                        extremeX = xValue;
+                        extremeY = yPredicted;
+                        first = false;
+                    }
+                    else if(findMin & (yPredicted < extremeY))
+                    {
+                        extremeX = xValue;
+                        extremeY = yPredicted;
+                    }
+                    else if(!findMin & (yPredicted > extremeY))
+                    {
+                        extremeX = xValue;
+                        extremeY = yPredicted;
+                    }
+                    //std::cout << xValue << " = " << yPredicted << std::endl;
+                }
+            }
+        }
+        else
+        {
+            for(unsigned int i = 0; i < numTests; ++i)
+            {
 			xValue = minRange + (i*division);
 			yPredicted = 0;
 			for(unsigned int j = 0; j < order ; j++)
@@ -783,7 +906,7 @@ namespace rsgis{namespace reg{
 			}
 			//std::cout << xValue << " = " << yPredicted << std::endl;
 		}
-		
+        }
 		*extremeVal = extremeY;
 		return extremeX;
 	}
@@ -985,7 +1108,7 @@ namespace rsgis{namespace reg{
 		}
 	}
     
-    void RSGISImageRegistration::getImageOverlapWithFloatShift(float xShift, float yShift, int **dsOffsets, int *width, int *height, double *gdalTransform, geos::geom::Envelope *env) throw(RSGISRegistrationException)
+    void RSGISImageRegistration::getImageOverlapWithFloatShift(float xShift, float yShift, int **dsOffsets, int *width, int *height, double *gdalTransform, geos::geom::Envelope *env, float *remainderX, float *remainderY) throw(RSGISRegistrationException)
 	{
 		if(!overlapDefined)
 		{
@@ -1109,8 +1232,6 @@ namespace rsgis{namespace reg{
 			gdalTransform[4] = overlap->yRot;
 			gdalTransform[5] = overlap->yRes;
 			
-			//*width = floor(((brX - tlX)/overlap->xRes));
-			//*height = floor(((tlY - brY)/overlap->yRes));
 			*width = floor(((brX - tlX)/overlap->xRes)+0.5);
 			*height = floor(((tlY - brY)/overlap->yRes)+0.5);
             
@@ -1145,24 +1266,23 @@ namespace rsgis{namespace reg{
             if(!((diffX > -0.0001) & (diffX < 0.0001)))
             {
                 dsOffsets[1][0] = floor((diffX/overlap->xRes));
-                /*if ((diffX/overlap->xRes) - floor((diffX/overlap->xRes)) != 0)
-                {
-                    std::cout << "xDiff = " << (diffX/overlap->xRes) - floor((diffX/overlap->xRes));
-                }*/
-
+                *remainderX = (diffX/overlap->xRes) - dsOffsets[1][0];
             }
             else
             {
                 dsOffsets[1][0] = 0;
+                *remainderX = 0;
             }
             
             if(!((diffY > -0.0001) & (diffY < 0.0001)))
             {
                 dsOffsets[1][1] = floor((diffY/overlap->yRes));
+                *remainderY = (diffY/overlap->yRes) - dsOffsets[1][1];
             }
             else
             {
                 dsOffsets[1][1] = 0;
+                *remainderY = 0;
             }
 		}
 		catch(RSGISRegistrationException &e)
@@ -1199,6 +1319,10 @@ namespace rsgis{namespace reg{
 		
 		double floatStdDev = 0;
 		double refStdDev = 0;
+        
+        // Set up variables to hold remainder from overlap (won't use them here)
+        float remainderX = 0;
+        float remainderY = 0;
 		
 		try 
 		{
@@ -1210,7 +1334,7 @@ namespace rsgis{namespace reg{
 						  ((*iterTiePts)->northings - windowYHeight),
 						  ((*iterTiePts)->northings + windowYHeight + +overlap->yRes));
 				
-				this->getImageOverlapWithFloatShift(0, 0, dsOffsets, &overlapWidth, &overlapHeight, overlapTransform, env);
+				this->getImageOverlapWithFloatShift(0, 0, dsOffsets, &overlapWidth, &overlapHeight, overlapTransform, env, &remainderX, &remainderY);
 				
 				refDataBlock = imgUtils.getImageDataBlock(referenceIMG, dsOffsets[0], overlapWidth, overlapHeight, &numRefDataVals);
 				floatDataBlock = imgUtils.getImageDataBlock(floatingIMG, dsOffsets[1], overlapWidth, overlapHeight, &numFloatDataVals);
