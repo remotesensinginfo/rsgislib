@@ -46,7 +46,8 @@ void RSGISExeImageRegistration::retrieveParameters(xercesc::DOMElement *argEleme
 	XMLCh *optionNNWarp = xercesc::XMLString::transcode("nnwarp");
     XMLCh *optionPolyWarp = xercesc::XMLString::transcode("polywarp");
     XMLCh *optionPxlShift = xercesc::XMLString::transcode("pxlshift");
-	
+	XMLCh *optionGCP2GDAL = xercesc::XMLString::transcode("gcp2gdal");
+    
 	try
 	{
 		const XMLCh *algorNameEle = argElement->getAttribute(algorXMLStr);
@@ -923,7 +924,66 @@ void RSGISExeImageRegistration::retrieveParameters(xercesc::DOMElement *argEleme
 			}
 			xercesc::XMLString::release(&subPixelResXMLStr);
 		}
-		else 
+        else if(xercesc::XMLString::equals(optionGCP2GDAL, optionXML))
+		{
+            this->option = gcp2gdal;
+			
+			XMLCh *gcpsXMLStr = xercesc::XMLString::transcode("gcps");
+			if(argElement->hasAttribute(gcpsXMLStr))
+			{
+				char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(gcpsXMLStr));
+				this->inputGCPs = std::string(charValue);
+				xercesc::XMLString::release(&charValue);
+			}
+			else
+			{
+				throw rsgis::RSGISXMLArgumentsException("No \'gcps\' attribute was provided.");
+			}
+			xercesc::XMLString::release(&gcpsXMLStr);
+			
+			XMLCh *imageXMLStr = xercesc::XMLString::transcode("image");
+			if(argElement->hasAttribute(imageXMLStr))
+			{
+				char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(imageXMLStr));
+				this->inputImage = std::string(charValue);
+				xercesc::XMLString::release(&charValue);
+			}
+			else
+			{
+				throw rsgis::RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+			}
+			xercesc::XMLString::release(&imageXMLStr);
+			
+			XMLCh *outputImageXMLStr = xercesc::XMLString::transcode("output");
+			if(argElement->hasAttribute(outputImageXMLStr))
+			{
+				char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outputImageXMLStr));
+				this->outputImage = std::string(charValue);
+				xercesc::XMLString::release(&charValue);
+			}
+			else
+			{
+                std::cout << "No \'output\' attribute was provided, adding GCPs to input image" << std::endl;
+                this->outputImage = "";
+			}
+			xercesc::XMLString::release(&outputImageXMLStr);
+			
+                    
+            XMLCh *outImageFormatXMLStr = xercesc::XMLString::transcode("format");
+			if(argElement->hasAttribute(outImageFormatXMLStr))
+			{
+				char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outImageFormatXMLStr));
+				this->outImageFormat = std::string(charValue);
+				xercesc::XMLString::release(&charValue);
+			}
+			else
+			{
+				this->outImageFormat = "KEA";
+			}
+			xercesc::XMLString::release(&outImageFormatXMLStr);
+			
+		}
+		else
 		{
 			std::string message = "RSGISExeImageRegistration did not recognise option " + std::string(xercesc::XMLString::transcode(optionXML));
 			throw rsgis::RSGISXMLArgumentsException(message);
@@ -944,6 +1004,7 @@ void RSGISExeImageRegistration::retrieveParameters(xercesc::DOMElement *argEleme
 	xercesc::XMLString::release(&optionNNWarp);
     xercesc::XMLString::release(&optionPolyWarp);
     xercesc::XMLString::release(&optionPxlShift);
+    xercesc::XMLString::release(&optionGCP2GDAL);
 	
 	parsed = true; // if all successful, it is parsed
 }
@@ -1433,6 +1494,24 @@ void RSGISExeImageRegistration::runAlgorithm() throw(rsgis::RSGISException)
 			catch(rsgis::RSGISException& e)
 			{
 				throw e;
+			}
+		}
+        else if(this->option == RSGISExeImageRegistration::gcp2gdal)
+		{
+			std::cout << "Add GCPs to GDAL dataset";
+            
+			std::cout << "GCPs: " << this->inputGCPs << std::endl;
+			std::cout << "Image: " << this->inputImage << std::endl;
+            if(this->outputImage != ""){std::cout << "Output Image: " << this->outputImage << std::endl;}
+			
+			try
+			{
+
+				rsgis::reg::RSGISAddGCPsGDAL(this->inputImage, this->inputGCPs, this->outputImage);
+            }
+			catch(rsgis::RSGISRegistrationException &e)
+			{
+				throw rsgis::RSGISException(e.what());
 			}
 		}
 		else

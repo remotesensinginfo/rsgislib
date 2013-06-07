@@ -42,6 +42,7 @@
 #include "registration/RSGISWarpImageUsingTriangulation.h"
 #include "registration/RSGISPolynomialImageWarp.h"
 #include "registration/RSGISImagePixelRegistration.h"
+#include "registration/RSGISAddGCPsGDAL.h"
 
 #include "utils/RSGISFileUtils.h"
 #include "utils/RSGISTextUtils.h"
@@ -65,7 +66,8 @@ namespace rsgisexe{
             triangularwarp,
             nnwarp,
             polywarp,
-            pxlshift
+            pxlshift,
+            gcp2gdal
         };
         
         enum OutputType
