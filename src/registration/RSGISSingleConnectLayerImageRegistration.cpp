@@ -197,7 +197,7 @@ namespace rsgis{namespace reg{
                 //std::cout << "Initial: " << (*iterTiePts)->tiePt->xShift << "," << (*iterTiePts)->tiePt->yShift << std::endl;
                 totalMovement += this->findTiePointLocation((*iterTiePts)->tiePt, windowSize, searchArea, metric, metricThreshold, subPixelResolution, &xShift, &yShift);
                 //std::cout << "Final: " << (*iterTiePts)->tiePt->xShift << "," << (*iterTiePts)->tiePt->yShift << std::endl;
-                
+
                 for(iterNrTiePts = (*iterTiePts)->nrTiePts->begin(); iterNrTiePts != (*iterTiePts)->nrTiePts->end(); ++iterNrTiePts)
                 {
 					distance = (*iterTiePts)->tiePt->floatDistance((*iterNrTiePts));
