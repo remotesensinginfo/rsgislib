@@ -26,7 +26,7 @@
 
 namespace rsgis{namespace reg{
 
-    RSGISAddGCPsGDAL::RSGISAddGCPsGDAL(std::string inFileName, std::string gcpFilePath, std::string outFileName)
+    RSGISAddGCPsGDAL::RSGISAddGCPsGDAL(std::string inFileName, std::string gcpFilePath, std::string outFileName, std::string gdalFormat, GDALDataType gdalDataType)
     {
         std::string gcpImage = "";
         GDALAllRegister();
@@ -36,7 +36,7 @@ namespace rsgis{namespace reg{
         {
             //std::cout << "Creating new image: " << outFileName << std::endl;
 
-            this->copyImageWithoutSpatialRef(inFileName, outFileName, "KEA",GDT_Float32);
+            this->copyImageWithoutSpatialRef(inFileName, outFileName, gdalFormat, gdalDataType);
             
             gcpImage = outFileName;
         }
@@ -143,7 +143,7 @@ namespace rsgis{namespace reg{
             
             //gdalGCPList[gcpNum].pszId = boost::lexical_cast<char*>(gcpNum);
             //gdalGCPList[gcpNum].pszInfo = boost::lexical_cast<char*>(gcpInfo);
-            gdalGCPList[gcpNum].dfGCPPixel = (*iterGCPs)->imgX();  // Pixel X
+            gdalGCPList[gcpNum].dfGCPPixel = (*iterGCPs)->imgX()-1;  // Pixel X
             gdalGCPList[gcpNum].dfGCPLine = (*iterGCPs)->imgY()-1;   // Pixel Y
             gdalGCPList[gcpNum].dfGCPX = (*iterGCPs)->eastings();  // Easting
             gdalGCPList[gcpNum].dfGCPY = (*iterGCPs)->northings(); // Northing
@@ -230,11 +230,16 @@ namespace rsgis{namespace reg{
             
 			int feedback = height/10.0;
 			int feedbackCounter = 0;
-			std::cout << "Started" << std::flush;
+            bool provideFeedback = false;
+            
+            // Only provide feedback if more than 10 blocks
+            if(nYBlocks > 10){provideFeedback = true;}
+            
+			if(provideFeedback){std::cout << "Started" << std::flush;}
 			// Loop images to process data
 			for(int i = 0; i < nYBlocks; i++)
 			{
-                if((feedback != 0) && (i*yBlockSize > feedback*feedbackCounter) == 0)
+                if((provideFeedback) && (feedback != 0) && (i*yBlockSize > feedback*feedbackCounter) )
                 {
                     std::cout << "." << feedbackCounter*10 << "." << std::flush;
                     ++feedbackCounter;
@@ -258,7 +263,7 @@ namespace rsgis{namespace reg{
 				}
                 
             }
-			std::cout << " Complete.\n";
+			if(provideFeedback){std::cout << " Complete.\n";}
 		}
 		catch(RSGISImageWarpException& e)
 		{

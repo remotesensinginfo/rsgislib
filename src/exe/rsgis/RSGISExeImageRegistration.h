@@ -48,6 +48,8 @@
 #include "utils/RSGISTextUtils.h"
 #include "math/RSGISMathsUtils.h"
 
+#include "cmds/RSGISCmdParent.h"
+
 #include <xercesc/dom/DOM.hpp>
 #include <xercesc/util/XMLString.hpp>
 
@@ -106,7 +108,9 @@ namespace rsgisexe{
         std::string inputFloatingmage;
         std::string outputGCPFile;
         std::string projFile;
-        std::string outImageFormat;
+        std::string imageFormat;
+        GDALDataType outDataType;
+        rsgis::RSGISLibDataType rsgisOutDataType;
         OutputType outputType;
         SimilarityMetric metricType;
         unsigned int gcpGap;
@@ -123,6 +127,7 @@ namespace rsgisexe{
         float resolution;
         int polyOrder;
         bool genTransformImage;
+        
     };
 }
 
