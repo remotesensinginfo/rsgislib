@@ -172,7 +172,7 @@ namespace rsgis{namespace segment{
                             }
                         }
                         
-                        clumpIdx++;
+                        ++clumpIdx;
                     }
                 }
             }
@@ -402,7 +402,7 @@ namespace rsgis{namespace segment{
                                 }
                             }
                             
-                            clumpIdx++;
+                            ++clumpIdx;
                         }
                     }
                 }
