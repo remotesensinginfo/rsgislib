@@ -37,6 +37,7 @@ struct SegmentationState
 static struct SegmentationState _state;
 #endif
 
+
 static PyObject *Segmentation_labelPixelsFromClusterCentres(PyObject *self, PyObject *args)
 {
     const char *pszInputImage, *pszOutputImage, *pszClusterCentres, *pszGDALFormat;
@@ -59,6 +60,7 @@ static PyObject *Segmentation_labelPixelsFromClusterCentres(PyObject *self, PyOb
     Py_RETURN_NONE;
 }
 
+
 static PyObject *Segmentation_eliminateSinglePixels(PyObject *self, PyObject *args)
 {
     const char *pszInputImage, *pszOutputImage, *pszClumpsImage, *pszGDALFormat, *pszTempImage;
@@ -80,6 +82,7 @@ static PyObject *Segmentation_eliminateSinglePixels(PyObject *self, PyObject *ar
 
     Py_RETURN_NONE;
 }
+
 
 static PyObject *Segmentation_clump(PyObject *self, PyObject *args)
 {
@@ -126,6 +129,7 @@ static PyObject *Segmentation_clump(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
+
 static PyObject *Segmentation_RMSmallClumpsStepwise(PyObject *self, PyObject *args)
 {
     const char *pszInputImage, *pszClumpsImage, *pszOutputImage, *pszGDALFormat, *pszStretchStatsFile;
@@ -149,7 +153,8 @@ static PyObject *Segmentation_RMSmallClumpsStepwise(PyObject *self, PyObject *ar
 
     Py_RETURN_NONE;
 }
-    
+
+ 
 static PyObject *Segmentation_relabelClumps(PyObject *self, PyObject *args)
 {
     const char *pszInputImage, *pszOutputImage, *pszGDALFormat;
@@ -171,6 +176,81 @@ static PyObject *Segmentation_relabelClumps(PyObject *self, PyObject *args)
 
     Py_RETURN_NONE;
 }
+
+
+static PyObject *Segmentation_unionOfClumps(PyObject *self, PyObject *args)
+{
+    const char *pszOutputImage, *pszGDALFormat;
+    std::string inputImage;
+    bool nodataprovided;
+    float fnodata;
+    PyObject *pNoData; //could be none or a number
+    PyObject *pInputListObj;
+    if( !PyArg_ParseTuple(args, "ss0O:unionOfClumps", &pszOutputImage, &pszGDALFormat,
+                                &pInputListObj, &pNoData))
+        return NULL;
+
+    if( pNoData == Py_None )
+    {
+        nodataprovided = false;
+        fnodata = 0;
+    }
+    else
+    {
+        // convert to a float if needed
+        PyObject *pFloatNoData = PyNumber_Float(pNoData);
+        if( pFloatNoData == NULL )
+        {
+            PyErr_SetString(GETSTATE(self)->error, "nodata parameter must be None or a valid number\n");
+            return NULL;
+        }
+
+        nodataprovided = true;
+        fnodata = PyFloat_AsDouble(pFloatNoData);
+        Py_DECREF(pFloatNoData);
+    }
+
+    Py_ssize_t nInputImages = PyList_Size(pInputListObj);
+    if( nInputImages < 0)
+    {
+        PyErr_SetString(GETSTATE(self)->error, "last argument must be a list");
+        return NULL;
+    }
+    
+    std::vector<std::string> inputImagePaths;
+    for(Py_ssize_t n = 0; n < nInputImages; n++)
+    {
+        
+        PyObject *strObj;
+        strObj = PyList_GetItem(pInputListObj, n);
+        if( !RSGISPY_CHECK_STRING(strObj) )
+        {
+            PyErr_SetString(GETSTATE(self)->error, "must pass a list of strings");
+            Py_DECREF(strObj);
+            return NULL;
+        }
+        inputImage = RSGISPY_STRING_EXTRACT(strObj);
+        inputImagePaths.push_back(inputImage);      
+        Py_DECREF(strObj);
+    
+    }    
+    
+    try
+    {
+                        
+        rsgis::cmds::executeUnionOfClumps(inputImagePaths, pszOutputImage, pszGDALFormat,
+                        nodataprovided, fnodata);
+
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+
+    Py_RETURN_NONE;
+}
+
 
 static PyObject *Segmentation_mergeSegmentationTiles(PyObject *self, PyObject *args)
 {
@@ -283,6 +363,15 @@ static PyMethodDef SegmentationMethods[] = {
 "  outputimage is a string containing the name of the output file\n"
 "  gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
 "  processinmemory is a bool\n"},
+                                
+    {"UnionOfClumps", Segmentation_unionOfClumps, METH_VARARGS,
+"Union of clumps\n"
+"call signature: segmentation.unionOfClumps(outputimage, gdalformat, inputimagepaths, nodata)\n"
+"where:\n"
+"  outputimage is a string containing the name of the output file\n"
+"  gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
+"  inputimagepaths is a list of input image paths\n"
+"  nodata is None or float\n"},
 
     {"mergeSegmentationTiles", Segmentation_mergeSegmentationTiles, METH_VARARGS,
 "Merge segmentation tiles\n"

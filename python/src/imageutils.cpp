@@ -63,6 +63,31 @@ static PyObject *ImageUtils_StretchImage(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
+static PyObject *ImageUtils_StretchImageWithStats(PyObject *self, PyObject *args)
+{
+    const char *pszInputImage, *pszOutputFile, *pszGDALFormat, *pszInStatsFile;
+    int nOutDataType, nStretchType;
+    float fStretchParam;
+    if( !PyArg_ParseTuple(args, "ssssiif:stretchImageWithStats", &pszInputImage, &pszOutputFile, 
+                                &pszInStatsFile, &pszGDALFormat, &nOutDataType, &nStretchType,
+                                &fStretchParam))
+        return NULL;
+
+    try
+    {
+        rsgis::cmds::executeStretchImageWithStats(pszInputImage, pszOutputFile, pszInStatsFile,
+                    pszGDALFormat, (rsgis::RSGISLibDataType)nOutDataType, 
+                    (rsgis::cmds::RSGISStretches)nStretchType, fStretchParam);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+
+    Py_RETURN_NONE;
+}
+
 static PyObject *ImageUtils_maskImage(PyObject *self, PyObject *args)
 {
     const char *pszInputImage, *pszImageMask, *pszOutputImage, *pszGDALFormat;
@@ -142,7 +167,20 @@ static PyMethodDef ImageUtilsMethods[] = {
 "  onepasssd is a bool\n"
 "  gdalformat is a string\n"
 "  outtype is a rsgislib.TYPE_* value\n"
-"  stretchtype is a STRETCH_* value\n"},
+"  stretchtype is a STRETCH_* value\n"
+"  stretchparam is a float\n"},
+
+    {"stretchImageWithStats", ImageUtils_StretchImageWithStats, METH_VARARGS, 
+"Stretch\n"
+"call signature: imageutils.stretchImageWithStats(inputimage, outputimage, instatsfile, gdalformat, outtype, stretchtype, stretchparam)\n"
+"where:\n"
+"  inputImage is a string containing the name of the input file\n"
+"  outputImage is a string containing the name of the output file\n"
+"  instatsfile is a string containing the name of the statistics file\n"
+"  gdalformat is a string\n"
+"  outtype is a rsgislib.TYPE_* value\n"
+"  stretchtype is a STRETCH_* value\n"
+"  stretchparam is a float\n"},
 
     {"maskImage", ImageUtils_maskImage, METH_VARARGS,
 "Mask\n"
