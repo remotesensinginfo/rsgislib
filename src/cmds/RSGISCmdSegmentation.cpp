@@ -240,7 +240,8 @@ namespace rsgis{ namespace cmds {
             rsgis::segment::RSGISEliminateSmallClumps eliminate;
             if(storeMean)
             {
-                eliminate.stepwiseEliminateSmallClumps(spectralDataset, resultDataset, minClumpSize, specThreshold, bandStretchStats, stretchStatsAvail);
+                //eliminate.stepwiseEliminateSmallClumps(spectralDataset, resultDataset, minClumpSize, specThreshold, bandStretchStats, stretchStatsAvail);
+                eliminate.stepwiseIterativeEliminateSmallClumps(spectralDataset, resultDataset, minClumpSize, specThreshold, bandStretchStats, stretchStatsAvail);
             }
             else
             {
