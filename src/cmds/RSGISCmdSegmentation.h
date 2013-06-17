@@ -32,6 +32,18 @@
 
 namespace rsgis{ namespace cmds {
     
+    struct FeatureShapeDescription
+    {
+        bool area;
+        double areaLower;
+        double areaUpper;
+        bool lenWidth;
+        double lenWidthLower;
+        double lenWidthUpper;
+    };
+    
+    
+    
     /** Function to run the label pixels from clusters centres command */
     void executeLabelPixelsFromClusterCentres(std::string inputImage, std::string outputImage, std::string clusterCentresFile, bool ignoreZeros, std::string imageFormat)throw(RSGISCmdException);
     
@@ -64,6 +76,9 @@ namespace rsgis{ namespace cmds {
 
     /** Function to run command to merge clump image */
     void executeMergeClumpImages(std::vector<std::string> inputImagePaths, std::string outputImage)throw(RSGISCmdException);
+    
+    /** Function to run command to merge clump image */
+    void executeExtractBrightFeatures(std::string inputImage, std::string maskImage, std::string outputImage, std::string temp1Image, std::string temp2Image, std::string outputFormat, float initThres, float thresIncrement, float thresholdUpper, std::vector<rsgis::cmds::FeatureShapeDescription*> shapeFeatDescript)throw(RSGISCmdException);
 
 }}
 
