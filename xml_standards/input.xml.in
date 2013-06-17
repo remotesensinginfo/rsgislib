@@ -1054,6 +1054,12 @@
         <rsgis:image clumps="string" />
 		<rsgis:image clumps="string" />
     </rsgis:command>
+	<!-- A command to extract features from which are bright within the scene with a particular shape and size.-->
+	<rsgis:command algor="segmentation" option="extractbrightfeatures" image="image.kea" mask="image.kea" output="image.kea" format="GDAL Format" tmp1="image.kea" tmp2="image.kea" initthres="float" thresincrement="float" thresholdupper="float" >
+		<rsgis:description arealow="float" areahigh="float" lenwidthlow="float" lenwidthhigh="float" />
+        <rsgis:description arealow="float" areahigh="float" lenwidthlow="float" lenwidthhigh="float" />
+		<rsgis:description arealow="float" areahigh="float" lenwidthlow="float" lenwidthhigh="float" />
+    </rsgis:command>
 
 
 

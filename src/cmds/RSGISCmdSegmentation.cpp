@@ -29,6 +29,7 @@
 #include "img/RSGISCalcImageValue.h"
 #include "img/RSGISCalcImage.h"
 #include "img/RSGISStretchImage.h"
+#include "img/RSGISImageUtils.h"
 
 #include "segmentation/RSGISLabelPixelsUsingClusters.h"
 #include "segmentation/RSGISEliminateSinglePixels.h"
@@ -37,6 +38,7 @@
 #include "segmentation/RSGISGenMeanSegImage.h"
 #include "segmentation/RSGISRandomColourClumps.h"
 #include "segmentation/RSGISMergeSegmentationTiles.h"
+#include "segmentation/RSGISBottomUpShapeFeatureExtraction.h"
 
 namespace rsgis{ namespace cmds {
     
@@ -552,7 +554,6 @@ namespace rsgis{ namespace cmds {
         }
     }
     
-    
     void executeFindTileBordersMask(std::vector<std::string> inputImagePaths, std::string borderMaskImage, unsigned int tileBoundary, unsigned int tileOverlap, unsigned int tileBody, std::string colsName)throw(RSGISCmdException)
     {
         try
@@ -583,7 +584,6 @@ namespace rsgis{ namespace cmds {
             throw rsgis::cmds::RSGISCmdException(e.what());
         }
     }
-    
     
     void executeMergeClumpImages(std::vector<std::string> inputImagePaths, std::string outputImage)throw(RSGISCmdException)
     {
@@ -616,6 +616,65 @@ namespace rsgis{ namespace cmds {
         }
     }
     
+    void executeExtractBrightFeatures(std::string inputImage, std::string maskImage, std::string outputImage, std::string temp1Image, std::string temp2Image, std::string outputFormat, float initThres, float thresIncrement, float thresholdUpper, std::vector<rsgis::cmds::FeatureShapeDescription*> shapeFeatDescript)throw(RSGISCmdException)
+    {
+        try
+        {
+            rsgis::img::RSGISImageUtils imgUtils;
+            GDALAllRegister();
+            
+            GDALDataset *inputDataset = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_Update);
+            if(inputDataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            GDALDataset *maskDataset = (GDALDataset *) GDALOpen(maskImage.c_str(), GA_Update);
+            if(inputDataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + maskImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            GDALDataset *outputDataset = imgUtils.createCopy(inputDataset, 1, outputImage, outputFormat, GDT_Int32);
+            
+            GDALDataset *temp1Dataset = imgUtils.createCopy(inputDataset, 1, temp1Image, outputFormat, GDT_Int32);
+            GDALDataset *temp2Dataset = imgUtils.createCopy(inputDataset, 1, temp2Image, outputFormat, GDT_Int32);
+            
+            std::vector<rsgis::segment::FeatureShapeDescription*> shapeFeatDescriptSegs;
+            shapeFeatDescriptSegs.reserve(shapeFeatDescript.size());
+            rsgis::segment::FeatureShapeDescription *feat = NULL;
+            for(std::vector<rsgis::cmds::FeatureShapeDescription*>::iterator iterFeats = shapeFeatDescript.begin(); iterFeats != shapeFeatDescript.end(); ++iterFeats)
+            {
+                feat = new rsgis::segment::FeatureShapeDescription();
+                feat->area = (*iterFeats)->area;
+                feat->areaLower = (*iterFeats)->areaLower;
+                feat->areaUpper = (*iterFeats)->areaUpper;
+                feat->lenWidth = (*iterFeats)->lenWidth;
+                feat->lenWidthLower = (*iterFeats)->lenWidthLower;
+                feat->lenWidthUpper = (*iterFeats)->lenWidthUpper;
+                shapeFeatDescriptSegs.push_back(feat);
+            }
+            
+            rsgis::segment::RSGISBottomUpShapeFeatureExtraction rsgisExtractFeats;
+            rsgisExtractFeats.extractBrightFeatures(inputDataset, maskDataset, outputDataset, temp1Dataset, temp2Dataset, initThres, thresIncrement, thresholdUpper, shapeFeatDescriptSegs);
+            
+            GDALClose(inputDataset);
+            GDALClose(outputDataset);
+            GDALClose(temp1Dataset);
+            GDALClose(temp2Dataset);
+            GDALClose(maskDataset);
+        }
+        catch (rsgis::RSGISException &e)
+        {
+            throw rsgis::cmds::RSGISCmdException(e.what());
+        }
+        catch (std::exception &e)
+        {
+            throw rsgis::cmds::RSGISCmdException(e.what());
+        }
+    }
     
 }}
 
