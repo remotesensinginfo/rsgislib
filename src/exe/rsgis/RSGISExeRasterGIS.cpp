@@ -39,642 +39,2505 @@ namespace rsgisexe{
     void RSGISExeRasterGIS::retrieveParameters(xercesc::DOMElement *argElement) throw(rsgis::RSGISXMLArgumentsException)
     {	
         rsgis::utils::RSGISTextUtils textUtils;
-        
-        XMLCh *algorName = xercesc::XMLString::transcode(this->algorithm.c_str());
-        XMLCh *algorXMLStr = xercesc::XMLString::transcode("algor");
-        XMLCh *optionXMLStr = xercesc::XMLString::transcode("option");
-        
-        XMLCh *optionCopyGDALATT = xercesc::XMLString::transcode("copyGDALATT");
-        XMLCh *optionSpatialLocation = xercesc::XMLString::transcode("spatiallocation");
-        XMLCh *optionEucDistFromFeat = xercesc::XMLString::transcode("eucdistfromfeat");
-        XMLCh *optionFindTopN = xercesc::XMLString::transcode("findtopn");
-        XMLCh *optionFindSpecClose = xercesc::XMLString::transcode("findspecclose");
-        XMLCh *optionCopyGDALATTColumns = xercesc::XMLString::transcode("copyGDALATTColumns");
-        XMLCh *optionPopAttributeStats = xercesc::XMLString::transcode("popattributestats");
-        XMLCh *optionPopCategoryProportions = xercesc::XMLString::transcode("popcategoryproportions");
-        XMLCh *optionCopyCatColours = xercesc::XMLString::transcode("copycatcolours");
-        XMLCh *optionKNNMajorityClassifier = xercesc::XMLString::transcode("knnmajorityclassifier");
-        XMLCh *optionPopAttributePercentile = xercesc::XMLString::transcode("popattributepercentile");
-        XMLCh *optionExport2ASCII = xercesc::XMLString::transcode("export2ascii");
-        XMLCh *optionClassTranslate = xercesc::XMLString::transcode("classtranslate");
-        XMLCh *optionColourClasses = xercesc::XMLString::transcode("colourclasses");
-        XMLCh *optionColourStrClasses = xercesc::XMLString::transcode("colourstrclasses");
-        XMLCh *optionGenColourTab = xercesc::XMLString::transcode("gencolourtab");
-        XMLCh *optionExportCols2Raster = xercesc::XMLString::transcode("exportcols2raster");
-        XMLCh *optionStrClassMajority = xercesc::XMLString::transcode("strclassmajority");
-        XMLCh *optionSpecDistMajorityClassifier = xercesc::XMLString::transcode("specdistmajorityclassifier");
-        XMLCh *optionMaxLikelihoodClassifier = xercesc::XMLString::transcode("maxlikelihoodclassifier");
-        XMLCh *optionMaxLikelihoodClassifierLocalPriors = xercesc::XMLString::transcode("maxlikelihoodclassifierlocalpriors");
-        XMLCh *optionClassMask = xercesc::XMLString::transcode("classmask");
-        XMLCh *optionFindNeighbours = xercesc::XMLString::transcode("findneighbours");
-        XMLCh *optionFindBoundaryPixels = xercesc::XMLString::transcode("findboundarypixels");
-        XMLCh *optionCalcBorderLength = xercesc::XMLString::transcode("calcborderlength");
-        XMLCh *optionCalcRelBorderLength = xercesc::XMLString::transcode("calcrelborderlength");
-        XMLCh *optionCalcShapeIndices = xercesc::XMLString::transcode("calcshapeindices");
-        XMLCh *optionDefineClumpTilePosition = xercesc::XMLString::transcode("defineclumptileposition");
-        XMLCh *optionDefineBorderClumps = xercesc::XMLString::transcode("defineborderclumps");
-        XMLCh *optionPopulateStats = xercesc::XMLString::transcode("populatestats");
-        XMLCh *optionFindChangeClumpsFromStddev = xercesc::XMLString::transcode("findchangeclumpsfromstddev");
-        
-        const XMLCh *algorNameEle = argElement->getAttribute(algorXMLStr);
-        if(!xercesc::XMLString::equals(algorName, algorNameEle))
+        try
         {
-            throw rsgis::RSGISXMLArgumentsException("The algorithm name is incorrect.");
-        }
-        
-        const XMLCh *optionXML = argElement->getAttribute(optionXMLStr);
-        if(xercesc::XMLString::equals(optionCopyGDALATT, optionXML))
-        {		
-            this->option = RSGISExeRasterGIS::copyGDALATT;
+            XMLCh *algorName = xercesc::XMLString::transcode(this->algorithm.c_str());
+            XMLCh *algorXMLStr = xercesc::XMLString::transcode("algor");
+            XMLCh *optionXMLStr = xercesc::XMLString::transcode("option");
             
-            XMLCh *tableXMLStr = xercesc::XMLString::transcode("table");
-            if(argElement->hasAttribute(tableXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(tableXMLStr));
-                this->inputImage = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'table\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&tableXMLStr);
+            XMLCh *optionCopyGDALATT = xercesc::XMLString::transcode("copyGDALATT");
+            XMLCh *optionSpatialLocation = xercesc::XMLString::transcode("spatiallocation");
+            XMLCh *optionEucDistFromFeat = xercesc::XMLString::transcode("eucdistfromfeat");
+            XMLCh *optionFindTopN = xercesc::XMLString::transcode("findtopn");
+            XMLCh *optionFindSpecClose = xercesc::XMLString::transcode("findspecclose");
+            XMLCh *optionCopyGDALATTColumns = xercesc::XMLString::transcode("copyGDALATTColumns");
+            XMLCh *optionPopAttributeStats = xercesc::XMLString::transcode("popattributestats");
+            XMLCh *optionPopCategoryProportions = xercesc::XMLString::transcode("popcategoryproportions");
+            XMLCh *optionCopyCatColours = xercesc::XMLString::transcode("copycatcolours");
+            XMLCh *optionKNNMajorityClassifier = xercesc::XMLString::transcode("knnmajorityclassifier");
+            XMLCh *optionPopAttributePercentile = xercesc::XMLString::transcode("popattributepercentile");
+            XMLCh *optionExport2ASCII = xercesc::XMLString::transcode("export2ascii");
+            XMLCh *optionClassTranslate = xercesc::XMLString::transcode("classtranslate");
+            XMLCh *optionColourClasses = xercesc::XMLString::transcode("colourclasses");
+            XMLCh *optionColourStrClasses = xercesc::XMLString::transcode("colourstrclasses");
+            XMLCh *optionGenColourTab = xercesc::XMLString::transcode("gencolourtab");
+            XMLCh *optionExportCols2Raster = xercesc::XMLString::transcode("exportcols2raster");
+            XMLCh *optionStrClassMajority = xercesc::XMLString::transcode("strclassmajority");
+            XMLCh *optionSpecDistMajorityClassifier = xercesc::XMLString::transcode("specdistmajorityclassifier");
+            XMLCh *optionMaxLikelihoodClassifier = xercesc::XMLString::transcode("maxlikelihoodclassifier");
+            XMLCh *optionMaxLikelihoodClassifierLocalPriors = xercesc::XMLString::transcode("maxlikelihoodclassifierlocalpriors");
+            XMLCh *optionClassMask = xercesc::XMLString::transcode("classmask");
+            XMLCh *optionFindNeighbours = xercesc::XMLString::transcode("findneighbours");
+            XMLCh *optionFindBoundaryPixels = xercesc::XMLString::transcode("findboundarypixels");
+            XMLCh *optionCalcBorderLength = xercesc::XMLString::transcode("calcborderlength");
+            XMLCh *optionCalcRelBorderLength = xercesc::XMLString::transcode("calcrelborderlength");
+            XMLCh *optionCalcShapeIndices = xercesc::XMLString::transcode("calcshapeindices");
+            XMLCh *optionDefineClumpTilePosition = xercesc::XMLString::transcode("defineclumptileposition");
+            XMLCh *optionDefineBorderClumps = xercesc::XMLString::transcode("defineborderclumps");
+            XMLCh *optionPopulateStats = xercesc::XMLString::transcode("populatestats");
+            XMLCh *optionFindChangeClumpsFromStddev = xercesc::XMLString::transcode("findchangeclumpsfromstddev");
             
-            
-            XMLCh *imageXMLStr = xercesc::XMLString::transcode("image");
-            if(argElement->hasAttribute(imageXMLStr))
+            const XMLCh *algorNameEle = argElement->getAttribute(algorXMLStr);
+            if(!xercesc::XMLString::equals(algorName, algorNameEle))
             {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(imageXMLStr));
-                this->clumpsImage = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'image\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&imageXMLStr);
-        }
-        else if(xercesc::XMLString::equals(optionSpatialLocation, optionXML))
-        {		
-            this->option = RSGISExeRasterGIS::spatiallocation;
-            
-            XMLCh *imageXMLStr = xercesc::XMLString::transcode("image");
-            if(argElement->hasAttribute(imageXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(imageXMLStr));
-                this->inputImage = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'image\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&imageXMLStr);
-            
-            XMLCh *eastingsXMLStr = xercesc::XMLString::transcode("eastings");
-            if(argElement->hasAttribute(eastingsXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(eastingsXMLStr));
-                this->eastingsField = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'eastings\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&eastingsXMLStr);
-            
-            XMLCh *northingsXMLStr = xercesc::XMLString::transcode("northings");
-            if(argElement->hasAttribute(northingsXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(northingsXMLStr));
-                this->northingsField = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'northings\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&northingsXMLStr);
-        }
-        else if(xercesc::XMLString::equals(optionEucDistFromFeat, optionXML))
-        {		
-            this->option = RSGISExeRasterGIS::eucdistfromfeat;
-            
-            XMLCh *imageXMLStr = xercesc::XMLString::transcode("image");
-            if(argElement->hasAttribute(imageXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(imageXMLStr));
-                this->inputImage = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'image\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&imageXMLStr);
-            
-            XMLCh *outFieldXMLStr = xercesc::XMLString::transcode("outfield");
-            if(argElement->hasAttribute(outFieldXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outFieldXMLStr));
-                this->outputField = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'outfield\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&outFieldXMLStr);
-            
-            XMLCh *featureXMLStr = xercesc::XMLString::transcode("feature");
-            if(argElement->hasAttribute(featureXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(featureXMLStr));
-                this->fid = textUtils.strtosizet(std::string(charValue));
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'feature\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&featureXMLStr);
-            
-            XMLCh *rsgisFieldXMLStr = xercesc::XMLString::transcode("rsgis:field");
-            xercesc::DOMNodeList *fieldNodesList = argElement->getElementsByTagName(rsgisFieldXMLStr);
-            unsigned int numFieldTags = fieldNodesList->getLength();
-            
-            std::cout << "Found " << numFieldTags << " field tags" << std::endl;
-            
-            if(numFieldTags == 0)
-            {
-                throw rsgis::RSGISXMLArgumentsException("No field tags have been provided, at least 1 is required.");
+                throw rsgis::RSGISXMLArgumentsException("The algorithm name is incorrect.");
             }
             
-            fields.reserve(numFieldTags);
-            
-            xercesc::DOMElement *attElement = NULL;
-            std::string fieldName = "";
-            for(int i = 0; i < numFieldTags; i++)
-            {
-                attElement = static_cast<xercesc::DOMElement*>(fieldNodesList->item(i));
-                
-                XMLCh *nameXMLStr = xercesc::XMLString::transcode("name");
-                if(attElement->hasAttribute(nameXMLStr))
-                {
-                    char *charValue = xercesc::XMLString::transcode(attElement->getAttribute(nameXMLStr));
-                    fields.push_back(std::string(charValue));
-                    xercesc::XMLString::release(&charValue);
-                }
-                else
-                {
-                    throw rsgis::RSGISXMLArgumentsException("No \'name\' attribute was provided.");
-                }
-                xercesc::XMLString::release(&nameXMLStr);
-            }  
-        }
-        else if(xercesc::XMLString::equals(optionFindTopN, optionXML))
-        {		
-            this->option = RSGISExeRasterGIS::findtopn;
-            
-            XMLCh *imageXMLStr = xercesc::XMLString::transcode("image");
-            if(argElement->hasAttribute(imageXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(imageXMLStr));
-                this->inputImage = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'image\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&imageXMLStr);
-            
-            XMLCh *spatialDistXMLStr = xercesc::XMLString::transcode("spatialdist");
-            if(argElement->hasAttribute(spatialDistXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(spatialDistXMLStr));
-                this->spatialDistField = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'spatialdist\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&spatialDistXMLStr);
+            const XMLCh *optionXML = argElement->getAttribute(optionXMLStr);
 
-            
-            XMLCh *metricDistXMLStr = xercesc::XMLString::transcode("metricdist");
-            if(argElement->hasAttribute(metricDistXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(metricDistXMLStr));
-                this->distanceField = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'metricdist\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&metricDistXMLStr);
-            
-            XMLCh *outFieldXMLStr = xercesc::XMLString::transcode("outfield");
-            if(argElement->hasAttribute(outFieldXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outFieldXMLStr));
-                this->outputField = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'outfield\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&outFieldXMLStr);
-            
-            XMLCh *distThresholdXMLStr = xercesc::XMLString::transcode("distthreshold");
-            if(argElement->hasAttribute(distThresholdXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(distThresholdXMLStr));
-                this->distThreshold = textUtils.strtofloat(std::string(charValue));
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'distthreshold\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&distThresholdXMLStr);
-            
-            XMLCh *nXMLStr = xercesc::XMLString::transcode("n");
-            if(argElement->hasAttribute(nXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(nXMLStr));
-                this->nFeatures = textUtils.strto16bitUInt(std::string(charValue));
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'n\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&nXMLStr);
-             
-        }
-        else if(xercesc::XMLString::equals(optionFindSpecClose, optionXML))
-        {
-            this->option = RSGISExeRasterGIS::findspecclose;
-            
-            XMLCh *imageXMLStr = xercesc::XMLString::transcode("image");
-            if(argElement->hasAttribute(imageXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(imageXMLStr));
-                this->inputImage = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'image\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&imageXMLStr);
-            
-            XMLCh *spatialDistXMLStr = xercesc::XMLString::transcode("spatialdist");
-            if(argElement->hasAttribute(spatialDistXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(spatialDistXMLStr));
-                this->spatialDistField = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'spatialdist\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&spatialDistXMLStr);
-            
-            
-            XMLCh *metricDistXMLStr = xercesc::XMLString::transcode("metricdist");
-            if(argElement->hasAttribute(metricDistXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(metricDistXMLStr));
-                this->distanceField = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'metricdist\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&metricDistXMLStr);
-            
-            XMLCh *outFieldXMLStr = xercesc::XMLString::transcode("outfield");
-            if(argElement->hasAttribute(outFieldXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outFieldXMLStr));
-                this->outputField = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'outfield\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&outFieldXMLStr);
-            
-            XMLCh *specDistThresholdXMLStr = xercesc::XMLString::transcode("specdistthreshold");
-            if(argElement->hasAttribute(specDistThresholdXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(specDistThresholdXMLStr));
-                this->specDistThreshold = textUtils.strtofloat(std::string(charValue));
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'specdistthreshold\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&specDistThresholdXMLStr);
-            
-            XMLCh *spatDistThresholdXMLStr = xercesc::XMLString::transcode("spatdistthreshold");
-            if(argElement->hasAttribute(spatDistThresholdXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(spatDistThresholdXMLStr));
-                this->distThreshold = textUtils.strtofloat(std::string(charValue));
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'spatdistthreshold\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&spatDistThresholdXMLStr);
-            
-        }
-        else if(xercesc::XMLString::equals(optionCopyGDALATTColumns, optionXML))
-        {		
-            this->option = RSGISExeRasterGIS::copyGDALATTColumns;
-            
-            XMLCh *tableXMLStr = xercesc::XMLString::transcode("table");
-            if(argElement->hasAttribute(tableXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(tableXMLStr));
-                this->inputImage = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'table\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&tableXMLStr);
-            
-            
-            XMLCh *imageXMLStr = xercesc::XMLString::transcode("image");
-            if(argElement->hasAttribute(imageXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(imageXMLStr));
-                this->clumpsImage = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'image\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&imageXMLStr);
-            
-            XMLCh *rsgisFieldXMLStr = xercesc::XMLString::transcode("rsgis:field");
-            xercesc::DOMNodeList *fieldNodesList = argElement->getElementsByTagName(rsgisFieldXMLStr);
-            unsigned int numFieldTags = fieldNodesList->getLength();
-            
-            std::cout << "Found " << numFieldTags << " field tags" << std::endl;
-            
-            if(numFieldTags == 0)
-            {
-                throw rsgis::RSGISXMLArgumentsException("No field tags have been provided, at least 1 is required.");
-            }
-            
-            fields.reserve(numFieldTags);
-            
-            xercesc::DOMElement *attElement = NULL;
-            std::string fieldName = "";
-            for(int i = 0; i < numFieldTags; i++)
-            {
-                attElement = static_cast<xercesc::DOMElement*>(fieldNodesList->item(i));
+            if(xercesc::XMLString::equals(optionCopyGDALATT, optionXML))
+            {		
+                this->option = RSGISExeRasterGIS::copyGDALATT;
                 
-                XMLCh *nameXMLStr = xercesc::XMLString::transcode("name");
-                if(attElement->hasAttribute(nameXMLStr))
+                XMLCh *tableXMLStr = xercesc::XMLString::transcode("table");
+                if(argElement->hasAttribute(tableXMLStr))
                 {
-                    char *charValue = xercesc::XMLString::transcode(attElement->getAttribute(nameXMLStr));
-                    fields.push_back(std::string(charValue));
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(tableXMLStr));
+                    this->inputImage = std::string(charValue);
                     xercesc::XMLString::release(&charValue);
                 }
                 else
                 {
-                    throw rsgis::RSGISXMLArgumentsException("No \'name\' attribute was provided.");
+                    throw rsgis::RSGISXMLArgumentsException("No \'table\' attribute was provided.");
                 }
-                xercesc::XMLString::release(&nameXMLStr);
-            }
-        }
-        else if(xercesc::XMLString::equals(optionPopAttributeStats, optionXML))
-        {
-            this->option = RSGISExeRasterGIS::popattributestats;
-            XMLCh *inputXMLStr = xercesc::XMLString::transcode("input");
-            if(argElement->hasAttribute(inputXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(inputXMLStr));
-                this->inputImage = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'input\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&inputXMLStr);
-            
-            XMLCh *clumpsXMLStr = xercesc::XMLString::transcode("clumps");
-            if(argElement->hasAttribute(clumpsXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(clumpsXMLStr));
-                this->clumpsImage = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'clumps\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&clumpsXMLStr);
-            
-            XMLCh *rsgisBandXMLStr = xercesc::XMLString::transcode("rsgis:band");
-            xercesc::DOMNodeList *bandNodesList = argElement->getElementsByTagName(rsgisBandXMLStr);
-            unsigned int numBands = bandNodesList->getLength();
-            
-            std::cout << "Found " << numBands << " Attributes" << std::endl;
-            
-            bandStats = new std::vector<rsgis::cmds::RSGISBandAttStatsCmds*>();
-            bandStats->reserve(numBands);
-            
-            rsgis::cmds::RSGISBandAttStatsCmds *bandStat = NULL;
-            xercesc::DOMElement *bandElement = NULL;
-            for(int i = 0; i < numBands; i++)
-            {
-                bandElement = static_cast<xercesc::DOMElement*>(bandNodesList->item(i));
+                xercesc::XMLString::release(&tableXMLStr);
                 
-                bandStat = new rsgis::cmds::RSGISBandAttStatsCmds();
                 
-                XMLCh *bandXMLStr = xercesc::XMLString::transcode("band");
-                if(bandElement->hasAttribute(bandXMLStr))
+                XMLCh *imageXMLStr = xercesc::XMLString::transcode("image");
+                if(argElement->hasAttribute(imageXMLStr))
                 {
-                    char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(bandXMLStr));
-                    bandStat->band = textUtils.strto32bitUInt(std::string(charValue));
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(imageXMLStr));
+                    this->clumpsImage = std::string(charValue);
                     xercesc::XMLString::release(&charValue);
                 }
                 else
                 {
-                    throw rsgis::RSGISXMLArgumentsException("No \'band\' attribute was provided.");
+                    throw rsgis::RSGISXMLArgumentsException("No \'image\' attribute was provided.");
                 }
-                xercesc::XMLString::release(&bandXMLStr);
+                xercesc::XMLString::release(&imageXMLStr);
+            }
+            else if(xercesc::XMLString::equals(optionSpatialLocation, optionXML))
+            {		
+                this->option = RSGISExeRasterGIS::spatiallocation;
                 
-                XMLCh *minXMLStr = xercesc::XMLString::transcode("min");
-                if(bandElement->hasAttribute(minXMLStr))
+                XMLCh *imageXMLStr = xercesc::XMLString::transcode("image");
+                if(argElement->hasAttribute(imageXMLStr))
                 {
-                    char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(minXMLStr));
-                    bandStat->minField = std::string(charValue);
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(imageXMLStr));
+                    this->inputImage = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&imageXMLStr);
+                
+                XMLCh *eastingsXMLStr = xercesc::XMLString::transcode("eastings");
+                if(argElement->hasAttribute(eastingsXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(eastingsXMLStr));
+                    this->eastingsField = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'eastings\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&eastingsXMLStr);
+                
+                XMLCh *northingsXMLStr = xercesc::XMLString::transcode("northings");
+                if(argElement->hasAttribute(northingsXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(northingsXMLStr));
+                    this->northingsField = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'northings\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&northingsXMLStr);
+            }
+            else if(xercesc::XMLString::equals(optionEucDistFromFeat, optionXML))
+            {		
+                this->option = RSGISExeRasterGIS::eucdistfromfeat;
+                
+                XMLCh *imageXMLStr = xercesc::XMLString::transcode("image");
+                if(argElement->hasAttribute(imageXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(imageXMLStr));
+                    this->inputImage = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&imageXMLStr);
+                
+                XMLCh *outFieldXMLStr = xercesc::XMLString::transcode("outfield");
+                if(argElement->hasAttribute(outFieldXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outFieldXMLStr));
+                    this->outputField = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'outfield\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&outFieldXMLStr);
+                
+                XMLCh *featureXMLStr = xercesc::XMLString::transcode("feature");
+                if(argElement->hasAttribute(featureXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(featureXMLStr));
+                    this->fid = textUtils.strtosizet(std::string(charValue));
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'feature\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&featureXMLStr);
+                
+                XMLCh *rsgisFieldXMLStr = xercesc::XMLString::transcode("rsgis:field");
+                xercesc::DOMNodeList *fieldNodesList = argElement->getElementsByTagName(rsgisFieldXMLStr);
+                unsigned int numFieldTags = fieldNodesList->getLength();
+                
+                std::cout << "Found " << numFieldTags << " field tags" << std::endl;
+                
+                if(numFieldTags == 0)
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No field tags have been provided, at least 1 is required.");
+                }
+                
+                fields.reserve(numFieldTags);
+                
+                xercesc::DOMElement *attElement = NULL;
+                std::string fieldName = "";
+                for(int i = 0; i < numFieldTags; i++)
+                {
+                    attElement = static_cast<xercesc::DOMElement*>(fieldNodesList->item(i));
+                    
+                    XMLCh *nameXMLStr = xercesc::XMLString::transcode("name");
+                    if(attElement->hasAttribute(nameXMLStr))
+                    {
+                        char *charValue = xercesc::XMLString::transcode(attElement->getAttribute(nameXMLStr));
+                        fields.push_back(std::string(charValue));
+                        xercesc::XMLString::release(&charValue);
+                    }
+                    else
+                    {
+                        throw rsgis::RSGISXMLArgumentsException("No \'name\' attribute was provided.");
+                    }
+                    xercesc::XMLString::release(&nameXMLStr);
+                }  
+            }
+            else if(xercesc::XMLString::equals(optionFindTopN, optionXML))
+            {		
+                this->option = RSGISExeRasterGIS::findtopn;
+                
+                XMLCh *imageXMLStr = xercesc::XMLString::transcode("image");
+                if(argElement->hasAttribute(imageXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(imageXMLStr));
+                    this->inputImage = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&imageXMLStr);
+                
+                XMLCh *spatialDistXMLStr = xercesc::XMLString::transcode("spatialdist");
+                if(argElement->hasAttribute(spatialDistXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(spatialDistXMLStr));
+                    this->spatialDistField = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'spatialdist\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&spatialDistXMLStr);
+
+                
+                XMLCh *metricDistXMLStr = xercesc::XMLString::transcode("metricdist");
+                if(argElement->hasAttribute(metricDistXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(metricDistXMLStr));
+                    this->distanceField = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'metricdist\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&metricDistXMLStr);
+                
+                XMLCh *outFieldXMLStr = xercesc::XMLString::transcode("outfield");
+                if(argElement->hasAttribute(outFieldXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outFieldXMLStr));
+                    this->outputField = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'outfield\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&outFieldXMLStr);
+                
+                XMLCh *distThresholdXMLStr = xercesc::XMLString::transcode("distthreshold");
+                if(argElement->hasAttribute(distThresholdXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(distThresholdXMLStr));
+                    this->distThreshold = textUtils.strtofloat(std::string(charValue));
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'distthreshold\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&distThresholdXMLStr);
+                
+                XMLCh *nXMLStr = xercesc::XMLString::transcode("n");
+                if(argElement->hasAttribute(nXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(nXMLStr));
+                    this->nFeatures = textUtils.strto16bitUInt(std::string(charValue));
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'n\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&nXMLStr);
+                 
+            }
+            else if(xercesc::XMLString::equals(optionFindSpecClose, optionXML))
+            {
+                this->option = RSGISExeRasterGIS::findspecclose;
+                
+                XMLCh *imageXMLStr = xercesc::XMLString::transcode("image");
+                if(argElement->hasAttribute(imageXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(imageXMLStr));
+                    this->inputImage = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&imageXMLStr);
+                
+                XMLCh *spatialDistXMLStr = xercesc::XMLString::transcode("spatialdist");
+                if(argElement->hasAttribute(spatialDistXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(spatialDistXMLStr));
+                    this->spatialDistField = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'spatialdist\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&spatialDistXMLStr);
+                
+                
+                XMLCh *metricDistXMLStr = xercesc::XMLString::transcode("metricdist");
+                if(argElement->hasAttribute(metricDistXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(metricDistXMLStr));
+                    this->distanceField = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'metricdist\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&metricDistXMLStr);
+                
+                XMLCh *outFieldXMLStr = xercesc::XMLString::transcode("outfield");
+                if(argElement->hasAttribute(outFieldXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outFieldXMLStr));
+                    this->outputField = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'outfield\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&outFieldXMLStr);
+                
+                XMLCh *specDistThresholdXMLStr = xercesc::XMLString::transcode("specdistthreshold");
+                if(argElement->hasAttribute(specDistThresholdXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(specDistThresholdXMLStr));
+                    this->specDistThreshold = textUtils.strtofloat(std::string(charValue));
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'specdistthreshold\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&specDistThresholdXMLStr);
+                
+                XMLCh *spatDistThresholdXMLStr = xercesc::XMLString::transcode("spatdistthreshold");
+                if(argElement->hasAttribute(spatDistThresholdXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(spatDistThresholdXMLStr));
+                    this->distThreshold = textUtils.strtofloat(std::string(charValue));
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'spatdistthreshold\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&spatDistThresholdXMLStr);
+                
+            }
+            else if(xercesc::XMLString::equals(optionCopyGDALATTColumns, optionXML))
+            {		
+                this->option = RSGISExeRasterGIS::copyGDALATTColumns;
+                
+                XMLCh *tableXMLStr = xercesc::XMLString::transcode("table");
+                if(argElement->hasAttribute(tableXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(tableXMLStr));
+                    this->inputImage = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'table\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&tableXMLStr);
+                
+                
+                XMLCh *imageXMLStr = xercesc::XMLString::transcode("image");
+                if(argElement->hasAttribute(imageXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(imageXMLStr));
+                    this->clumpsImage = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&imageXMLStr);
+                
+                XMLCh *rsgisFieldXMLStr = xercesc::XMLString::transcode("rsgis:field");
+                xercesc::DOMNodeList *fieldNodesList = argElement->getElementsByTagName(rsgisFieldXMLStr);
+                unsigned int numFieldTags = fieldNodesList->getLength();
+                
+                std::cout << "Found " << numFieldTags << " field tags" << std::endl;
+                
+                if(numFieldTags == 0)
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No field tags have been provided, at least 1 is required.");
+                }
+                
+                fields.reserve(numFieldTags);
+                
+                xercesc::DOMElement *attElement = NULL;
+                std::string fieldName = "";
+                for(int i = 0; i < numFieldTags; i++)
+                {
+                    attElement = static_cast<xercesc::DOMElement*>(fieldNodesList->item(i));
+                    
+                    XMLCh *nameXMLStr = xercesc::XMLString::transcode("name");
+                    if(attElement->hasAttribute(nameXMLStr))
+                    {
+                        char *charValue = xercesc::XMLString::transcode(attElement->getAttribute(nameXMLStr));
+                        fields.push_back(std::string(charValue));
+                        xercesc::XMLString::release(&charValue);
+                    }
+                    else
+                    {
+                        throw rsgis::RSGISXMLArgumentsException("No \'name\' attribute was provided.");
+                    }
+                    xercesc::XMLString::release(&nameXMLStr);
+                }
+            }
+            else if(xercesc::XMLString::equals(optionPopAttributeStats, optionXML))
+            {
+                this->option = RSGISExeRasterGIS::popattributestats;
+                XMLCh *inputXMLStr = xercesc::XMLString::transcode("input");
+                if(argElement->hasAttribute(inputXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(inputXMLStr));
+                    this->inputImage = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'input\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&inputXMLStr);
+                
+                XMLCh *clumpsXMLStr = xercesc::XMLString::transcode("clumps");
+                if(argElement->hasAttribute(clumpsXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(clumpsXMLStr));
+                    this->clumpsImage = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'clumps\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&clumpsXMLStr);
+                
+                XMLCh *rsgisBandXMLStr = xercesc::XMLString::transcode("rsgis:band");
+                xercesc::DOMNodeList *bandNodesList = argElement->getElementsByTagName(rsgisBandXMLStr);
+                unsigned int numBands = bandNodesList->getLength();
+                
+                std::cout << "Found " << numBands << " Attributes" << std::endl;
+                
+                bandStats = new std::vector<rsgis::cmds::RSGISBandAttStatsCmds*>();
+                bandStats->reserve(numBands);
+                
+                rsgis::cmds::RSGISBandAttStatsCmds *bandStat = NULL;
+                xercesc::DOMElement *bandElement = NULL;
+                for(int i = 0; i < numBands; i++)
+                {
+                    bandElement = static_cast<xercesc::DOMElement*>(bandNodesList->item(i));
+                    
+                    bandStat = new rsgis::cmds::RSGISBandAttStatsCmds();
+                    
+                    XMLCh *bandXMLStr = xercesc::XMLString::transcode("band");
+                    if(bandElement->hasAttribute(bandXMLStr))
+                    {
+                        char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(bandXMLStr));
+                        bandStat->band = textUtils.strto32bitUInt(std::string(charValue));
+                        xercesc::XMLString::release(&charValue);
+                    }
+                    else
+                    {
+                        throw rsgis::RSGISXMLArgumentsException("No \'band\' attribute was provided.");
+                    }
+                    xercesc::XMLString::release(&bandXMLStr);
+                    
+                    XMLCh *minXMLStr = xercesc::XMLString::transcode("min");
+                    if(bandElement->hasAttribute(minXMLStr))
+                    {
+                        char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(minXMLStr));
+                        bandStat->minField = std::string(charValue);
+                        xercesc::XMLString::release(&charValue);
+                        
+                        bandStat->calcMin = true;
+                    }
+                    else
+                    {
+                        bandStat->calcMin = false;
+                    }
+                    xercesc::XMLString::release(&minXMLStr);
+                    
+                    XMLCh *maxXMLStr = xercesc::XMLString::transcode("max");
+                    if(bandElement->hasAttribute(maxXMLStr))
+                    {
+                        char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(maxXMLStr));
+                        bandStat->maxField = std::string(charValue);
+                        xercesc::XMLString::release(&charValue);
+                        
+                        bandStat->calcMax = true;
+                    }
+                    else
+                    {
+                        bandStat->calcMax = false;
+                    }
+                    xercesc::XMLString::release(&maxXMLStr);
+                    
+                    XMLCh *meanXMLStr = xercesc::XMLString::transcode("mean");
+                    if(bandElement->hasAttribute(meanXMLStr))
+                    {
+                        char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(meanXMLStr));
+                        bandStat->meanField = std::string(charValue);
+                        xercesc::XMLString::release(&charValue);
+                        
+                        bandStat->calcMean = true;
+                    }
+                    else
+                    {
+                        bandStat->calcMean = false;
+                    }
+                    xercesc::XMLString::release(&meanXMLStr);
+                    
+                    XMLCh *stdDevXMLStr = xercesc::XMLString::transcode("stddev");
+                    if(bandElement->hasAttribute(stdDevXMLStr))
+                    {
+                        char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(stdDevXMLStr));
+                        bandStat->stdDevField = std::string(charValue);
+                        xercesc::XMLString::release(&charValue);
+                        
+                        bandStat->calcStdDev = true;
+                    }
+                    else
+                    {
+                        bandStat->calcStdDev = false;
+                    }
+                    xercesc::XMLString::release(&stdDevXMLStr);
+                    
+                    XMLCh *sumXMLStr = xercesc::XMLString::transcode("sum");
+                    if(bandElement->hasAttribute(sumXMLStr))
+                    {
+                        char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(sumXMLStr));
+                        bandStat->sumField = std::string(charValue);
+                        xercesc::XMLString::release(&charValue);
+                        
+                        bandStat->calcSum = true;
+                    }
+                    else
+                    {
+                        bandStat->calcSum = false;
+                    }
+                    xercesc::XMLString::release(&sumXMLStr);
+                    
+                    bandStat->calcMedian = false;
+                    bandStats->push_back(bandStat);
+                }
+                xercesc::XMLString::release(&rsgisBandXMLStr);
+                
+            }
+            else if(xercesc::XMLString::equals(optionPopCategoryProportions, optionXML))
+            {
+                this->option = RSGISExeRasterGIS::popcategoryproportions;
+                
+                XMLCh *clumpsXMLStr = xercesc::XMLString::transcode("clumps");
+                if(argElement->hasAttribute(clumpsXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(clumpsXMLStr));
+                    this->clumpsImage = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'clumps\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&clumpsXMLStr);
+                
+                
+                XMLCh *categoriesXMLStr = xercesc::XMLString::transcode("categories");
+                if(argElement->hasAttribute(categoriesXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(categoriesXMLStr));
+                    this->categoriesImage = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'categories\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&categoriesXMLStr);
+                
+                XMLCh *outColsXMLStr = xercesc::XMLString::transcode("outcols");
+                if(argElement->hasAttribute(outColsXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outColsXMLStr));
+                    this->outColsName = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'outcols\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&outColsXMLStr);
+                
+                XMLCh *majorityXMLStr = xercesc::XMLString::transcode("majority");
+                if(argElement->hasAttribute(majorityXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(majorityXMLStr));
+                    this->majorityColName = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'majority\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&majorityXMLStr);
+                
+                this->copyClassNames = false;
+                XMLCh *majClassNameXMLStr = xercesc::XMLString::transcode("majclassname");
+                if(argElement->hasAttribute(majClassNameXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(majClassNameXMLStr));
+                    this->majClassNameField = std::string(charValue);
                     xercesc::XMLString::release(&charValue);
                     
-                    bandStat->calcMin = true;
-                }
-                else
-                {
-                    bandStat->calcMin = false;
-                }
-                xercesc::XMLString::release(&minXMLStr);
-                
-                XMLCh *maxXMLStr = xercesc::XMLString::transcode("max");
-                if(bandElement->hasAttribute(maxXMLStr))
-                {
-                    char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(maxXMLStr));
-                    bandStat->maxField = std::string(charValue);
-                    xercesc::XMLString::release(&charValue);
+                    XMLCh *classNameXMLStr = xercesc::XMLString::transcode("classname");
+                    if(argElement->hasAttribute(classNameXMLStr))
+                    {
+                        char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(classNameXMLStr));
+                        this->classNameField = std::string(charValue);
+                        xercesc::XMLString::release(&charValue);
+                    }
+                    else
+                    {
+                        throw rsgis::RSGISXMLArgumentsException("No \'classname\' attribute was provided.");
+                    }
+                    xercesc::XMLString::release(&classNameXMLStr);
                     
-                    bandStat->calcMax = true;
+                    this->copyClassNames = true;
                 }
                 else
                 {
-                    bandStat->calcMax = false;
+                    this->copyClassNames = false;
                 }
-                xercesc::XMLString::release(&maxXMLStr);
+                xercesc::XMLString::release(&majClassNameXMLStr);
                 
-                XMLCh *meanXMLStr = xercesc::XMLString::transcode("mean");
-                if(bandElement->hasAttribute(meanXMLStr))
+            }
+            else if(xercesc::XMLString::equals(optionCopyCatColours, optionXML))
+            {
+                this->option = RSGISExeRasterGIS::copycatcolours;
+                
+                XMLCh *clumpsXMLStr = xercesc::XMLString::transcode("clumps");
+                if(argElement->hasAttribute(clumpsXMLStr))
                 {
-                    char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(meanXMLStr));
-                    bandStat->meanField = std::string(charValue);
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(clumpsXMLStr));
+                    this->clumpsImage = std::string(charValue);
                     xercesc::XMLString::release(&charValue);
-                    
-                    bandStat->calcMean = true;
                 }
                 else
                 {
-                    bandStat->calcMean = false;
+                    throw rsgis::RSGISXMLArgumentsException("No \'clumps\' attribute was provided.");
                 }
-                xercesc::XMLString::release(&meanXMLStr);
+                xercesc::XMLString::release(&clumpsXMLStr);
                 
-                XMLCh *stdDevXMLStr = xercesc::XMLString::transcode("stddev");
-                if(bandElement->hasAttribute(stdDevXMLStr))
+                
+                XMLCh *categoriesXMLStr = xercesc::XMLString::transcode("categories");
+                if(argElement->hasAttribute(categoriesXMLStr))
                 {
-                    char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(stdDevXMLStr));
-                    bandStat->stdDevField = std::string(charValue);
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(categoriesXMLStr));
+                    this->categoriesImage = std::string(charValue);
                     xercesc::XMLString::release(&charValue);
-                    
-                    bandStat->calcStdDev = true;
                 }
                 else
                 {
-                    bandStat->calcStdDev = false;
+                    throw rsgis::RSGISXMLArgumentsException("No \'categories\' attribute was provided.");
                 }
-                xercesc::XMLString::release(&stdDevXMLStr);
+                xercesc::XMLString::release(&categoriesXMLStr);
                 
-                XMLCh *sumXMLStr = xercesc::XMLString::transcode("sum");
-                if(bandElement->hasAttribute(sumXMLStr))
+                XMLCh *classFieldXMLStr = xercesc::XMLString::transcode("classfield");
+                if(argElement->hasAttribute(classFieldXMLStr))
                 {
-                    char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(sumXMLStr));
-                    bandStat->sumField = std::string(charValue);
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(classFieldXMLStr));
+                    this->classField = std::string(charValue);
                     xercesc::XMLString::release(&charValue);
-                    
-                    bandStat->calcSum = true;
                 }
                 else
                 {
-                    bandStat->calcSum = false;
+                    throw rsgis::RSGISXMLArgumentsException("No \'classfield\' attribute was provided.");
                 }
-                xercesc::XMLString::release(&sumXMLStr);
+                xercesc::XMLString::release(&classFieldXMLStr);
+            }
+            else if(xercesc::XMLString::equals(optionKNNMajorityClassifier, optionXML))
+            {
+                this->option = RSGISExeRasterGIS::knnmajorityclassifier;
                 
-                bandStat->calcMedian = false;
-                bandStats->push_back(bandStat);
+                XMLCh *imageXMLStr = xercesc::XMLString::transcode("image");
+                if(argElement->hasAttribute(imageXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(imageXMLStr));
+                    this->inputImage = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&imageXMLStr);
+                
+                XMLCh *inClassFieldXMLStr = xercesc::XMLString::transcode("inclassfield");
+                if(argElement->hasAttribute(inClassFieldXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(inClassFieldXMLStr));
+                    this->inClassNameField = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'inclassfield\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&inClassFieldXMLStr);
+                
+                XMLCh *outClassFieldXMLStr = xercesc::XMLString::transcode("outclassfield");
+                if(argElement->hasAttribute(outClassFieldXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outClassFieldXMLStr));
+                    this->outClassNameField = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'outclassfield\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&outClassFieldXMLStr);
+                
+                XMLCh *trainingColXMLStr = xercesc::XMLString::transcode("trainingcol");
+                if(argElement->hasAttribute(trainingColXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(trainingColXMLStr));
+                    this->trainingSelectCol = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'trainingcol\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&trainingColXMLStr);
+                
+                XMLCh *eastingsXMLStr = xercesc::XMLString::transcode("eastings");
+                if(argElement->hasAttribute(eastingsXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(eastingsXMLStr));
+                    this->eastingsField = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'eastings\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&eastingsXMLStr);
+                
+                XMLCh *northingsXMLStr = xercesc::XMLString::transcode("northings");
+                if(argElement->hasAttribute(northingsXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(northingsXMLStr));
+                    this->northingsField = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'northings\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&northingsXMLStr);
+                
+                XMLCh *areaXMLStr = xercesc::XMLString::transcode("area");
+                if(argElement->hasAttribute(areaXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(areaXMLStr));
+                    this->areaField = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'area\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&areaXMLStr);
+                
+                XMLCh *weightFieldXMLStr = xercesc::XMLString::transcode("weightfield");
+                if(argElement->hasAttribute(weightFieldXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(weightFieldXMLStr));
+                    this->majWeightField = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'weightfield\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&weightFieldXMLStr);
+                
+                XMLCh *distThresholdXMLStr = xercesc::XMLString::transcode("distthreshold");
+                if(argElement->hasAttribute(distThresholdXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(distThresholdXMLStr));
+                    this->distThreshold = textUtils.strtofloat(std::string(charValue));
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'distthreshold\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&distThresholdXMLStr);
+                
+                XMLCh *nXMLStr = xercesc::XMLString::transcode("n");
+                if(argElement->hasAttribute(nXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(nXMLStr));
+                    this->nFeatures = textUtils.strto16bitUInt(std::string(charValue));
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'n\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&nXMLStr);
+                
+                XMLCh *weightAXMLStr = xercesc::XMLString::transcode("weighta");
+                if(argElement->hasAttribute(weightAXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(weightAXMLStr));
+                    this->weightA = textUtils.strtofloat(std::string(charValue));
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    this->weightA = 3;
+                }
+                xercesc::XMLString::release(&weightAXMLStr);    
+                
+                
+                XMLCh *majMethodXMLStr = xercesc::XMLString::transcode("majoritymethod");
+                if(argElement->hasAttribute(majMethodXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(majMethodXMLStr));
+                    std::string majMethodStr = std::string(charValue);
+                    if(majMethodStr == "standardKNN")
+                    {
+                        this->majMethod = rsgis::rastergis::stdMajority;
+                    }
+                    else if(majMethodStr == "weightedKNN")
+                    {
+                        this->majMethod = rsgis::rastergis::weightedMajority;
+                    }
+                    else
+                    {
+                        throw rsgis::RSGISXMLArgumentsException("Majority method is not recognised, options are \'standardKNN\' or \'weightedKNN\'.");
+                    }
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'majoritymethod\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&majMethodXMLStr);
+                
+                XMLCh *rsgisFieldXMLStr = xercesc::XMLString::transcode("rsgis:field");
+                xercesc::DOMNodeList *fieldNodesList = argElement->getElementsByTagName(rsgisFieldXMLStr);
+                unsigned int numFieldTags = fieldNodesList->getLength();
+                
+                std::cout << "Found " << numFieldTags << " field tags" << std::endl;
+                
+                if(numFieldTags == 0)
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No field tags have been provided, at least 1 is required.");
+                }
+                
+                fields.reserve(numFieldTags);
+                
+                xercesc::DOMElement *attElement = NULL;
+                std::string fieldName = "";
+                for(int i = 0; i < numFieldTags; i++)
+                {
+                    attElement = static_cast<xercesc::DOMElement*>(fieldNodesList->item(i));
+                    
+                    XMLCh *nameXMLStr = xercesc::XMLString::transcode("name");
+                    if(attElement->hasAttribute(nameXMLStr))
+                    {
+                        char *charValue = xercesc::XMLString::transcode(attElement->getAttribute(nameXMLStr));
+                        fields.push_back(std::string(charValue));
+                        xercesc::XMLString::release(&charValue);
+                    }
+                    else
+                    {
+                        throw rsgis::RSGISXMLArgumentsException("No \'name\' attribute was provided.");
+                    }
+                    xercesc::XMLString::release(&nameXMLStr);
+                } 
             }
-            xercesc::XMLString::release(&rsgisBandXMLStr);
-            
-        }
-        else if(xercesc::XMLString::equals(optionPopCategoryProportions, optionXML))
-        {
-            this->option = RSGISExeRasterGIS::popcategoryproportions;
-            
-            XMLCh *clumpsXMLStr = xercesc::XMLString::transcode("clumps");
-            if(argElement->hasAttribute(clumpsXMLStr))
+            else if(xercesc::XMLString::equals(optionPopAttributePercentile, optionXML))
             {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(clumpsXMLStr));
-                this->clumpsImage = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
+                this->option = RSGISExeRasterGIS::popattributepercentile;
+                XMLCh *inputXMLStr = xercesc::XMLString::transcode("input");
+                if(argElement->hasAttribute(inputXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(inputXMLStr));
+                    this->inputImage = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'input\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&inputXMLStr);
+                
+                XMLCh *clumpsXMLStr = xercesc::XMLString::transcode("clumps");
+                if(argElement->hasAttribute(clumpsXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(clumpsXMLStr));
+                    this->clumpsImage = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'clumps\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&clumpsXMLStr);
+                
+                XMLCh *rsgisBandXMLStr = xercesc::XMLString::transcode("rsgis:band");
+                xercesc::DOMNodeList *bandNodesList = argElement->getElementsByTagName(rsgisBandXMLStr);
+                unsigned int numBands = bandNodesList->getLength();
+                
+                std::cout << "Found " << numBands << " Attributes" << std::endl;
+                
+                bandPercentiles = new std::vector<rsgis::cmds::RSGISBandAttPercentilesCmds*>();
+                bandPercentiles->reserve(numBands);
+                
+                rsgis::cmds::RSGISBandAttPercentilesCmds *bandPercentile = NULL;
+                xercesc::DOMElement *bandElement = NULL;
+                for(int i = 0; i < numBands; i++)
+                {
+                    bandElement = static_cast<xercesc::DOMElement*>(bandNodesList->item(i));
+                    
+                    bandPercentile = new rsgis::cmds::RSGISBandAttPercentilesCmds();
+                    
+                    XMLCh *bandXMLStr = xercesc::XMLString::transcode("band");
+                    if(bandElement->hasAttribute(bandXMLStr))
+                    {
+                        char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(bandXMLStr));
+                        bandPercentile->band = textUtils.strto32bitUInt(std::string(charValue));
+                        xercesc::XMLString::release(&charValue);
+                    }
+                    else
+                    {
+                        throw rsgis::RSGISXMLArgumentsException("No \'band\' attribute was provided.");
+                    }
+                    xercesc::XMLString::release(&bandXMLStr);
+                    
+                    XMLCh *nameXMLStr = xercesc::XMLString::transcode("name");
+                    if(bandElement->hasAttribute(nameXMLStr))
+                    {
+                        char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(nameXMLStr));
+                        bandPercentile->fieldName = std::string(charValue);
+                        xercesc::XMLString::release(&charValue);                    
+                    }
+                    else
+                    {
+                        throw rsgis::RSGISXMLArgumentsException("No \'name\' attribute was provided.");
+                    }
+                    xercesc::XMLString::release(&nameXMLStr);
+                    
+                    XMLCh *percentileXMLStr = xercesc::XMLString::transcode("percentile");
+                    if(bandElement->hasAttribute(percentileXMLStr))
+                    {
+                        char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(percentileXMLStr));
+                        bandPercentile->percentile = textUtils.strto32bitUInt(std::string(charValue));
+                        xercesc::XMLString::release(&charValue);
+                    }
+                    else
+                    {
+                        throw rsgis::RSGISXMLArgumentsException("No \'percentile\' attribute was provided.");
+                    }
+                    xercesc::XMLString::release(&percentileXMLStr);
+                    
+                    bandPercentiles->push_back(bandPercentile);
+                }
+                xercesc::XMLString::release(&rsgisBandXMLStr);
+                
             }
-            else
+            else if(xercesc::XMLString::equals(optionExport2ASCII, optionXML))
             {
-                throw rsgis::RSGISXMLArgumentsException("No \'clumps\' attribute was provided.");
+                this->option = RSGISExeRasterGIS::export2ascii;
+                
+                XMLCh *tableXMLStr = xercesc::XMLString::transcode("table");
+                if(argElement->hasAttribute(tableXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(tableXMLStr));
+                    this->inputImage = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'table\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&tableXMLStr);
+                
+                XMLCh *outputXMLStr = xercesc::XMLString::transcode("output");
+                if(argElement->hasAttribute(outputXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outputXMLStr));
+                    this->outputFile = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&outputXMLStr);
+                            
+                XMLCh *rsgisFieldXMLStr = xercesc::XMLString::transcode("rsgis:field");
+                xercesc::DOMNodeList *fieldNodesList = argElement->getElementsByTagName(rsgisFieldXMLStr);
+                unsigned int numFieldTags = fieldNodesList->getLength();
+                
+                std::cout << "Found " << numFieldTags << " field tags" << std::endl;
+                
+                if(numFieldTags == 0)
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No field tags have been provided, at least 1 is required.");
+                }
+                
+                fields.reserve(numFieldTags);
+                
+                xercesc::DOMElement *attElement = NULL;
+                std::string fieldName = "";
+                for(int i = 0; i < numFieldTags; i++)
+                {
+                    attElement = static_cast<xercesc::DOMElement*>(fieldNodesList->item(i));
+                    
+                    XMLCh *nameXMLStr = xercesc::XMLString::transcode("name");
+                    if(attElement->hasAttribute(nameXMLStr))
+                    {
+                        char *charValue = xercesc::XMLString::transcode(attElement->getAttribute(nameXMLStr));
+                        fields.push_back(std::string(charValue));
+                        xercesc::XMLString::release(&charValue);
+                    }
+                    else
+                    {
+                        throw rsgis::RSGISXMLArgumentsException("No \'name\' attribute was provided.");
+                    }
+                    xercesc::XMLString::release(&nameXMLStr);
+                }
             }
-            xercesc::XMLString::release(&clumpsXMLStr);
-            
-            
-            XMLCh *categoriesXMLStr = xercesc::XMLString::transcode("categories");
-            if(argElement->hasAttribute(categoriesXMLStr))
+            else if(xercesc::XMLString::equals(optionClassTranslate, optionXML))
             {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(categoriesXMLStr));
-                this->categoriesImage = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
+                this->option = RSGISExeRasterGIS::classtranslate;
+                
+                XMLCh *tableXMLStr = xercesc::XMLString::transcode("table");
+                if(argElement->hasAttribute(tableXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(tableXMLStr));
+                    this->inputImage = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'table\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&tableXMLStr);
+                
+                XMLCh *inFieldXMLStr = xercesc::XMLString::transcode("infield");
+                if(argElement->hasAttribute(inFieldXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(inFieldXMLStr));
+                    this->classInField = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'infield\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&inFieldXMLStr);
+                
+                XMLCh *outFieldXMLStr = xercesc::XMLString::transcode("outfield");
+                if(argElement->hasAttribute(outFieldXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outFieldXMLStr));
+                    this->classOutField = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'outfield\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&outFieldXMLStr);
+                
+                XMLCh *rsgisClassXMLStr = xercesc::XMLString::transcode("rsgis:class");
+                xercesc::DOMNodeList *classNodesList = argElement->getElementsByTagName(rsgisClassXMLStr);
+                unsigned int numClassTags = classNodesList->getLength();
+                
+                std::cout << "Found " << numClassTags << " class tags" << std::endl;
+                
+                if(numClassTags == 0)
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No class tags have been provided, at least 1 is required.");
+                }
+                
+                xercesc::DOMElement *attElement = NULL;
+                size_t inClassId = 0;
+                size_t outClassId = 0;
+                for(int i = 0; i < numClassTags; i++)
+                {
+                    attElement = static_cast<xercesc::DOMElement*>(classNodesList->item(i));
+                    
+                    XMLCh *inIDXMLStr = xercesc::XMLString::transcode("inid");
+                    if(attElement->hasAttribute(inIDXMLStr))
+                    {
+                        char *charValue = xercesc::XMLString::transcode(attElement->getAttribute(inIDXMLStr));
+                        inClassId = textUtils.strtosizet(std::string(charValue));
+                        xercesc::XMLString::release(&charValue);
+                    }
+                    else
+                    {
+                        throw rsgis::RSGISXMLArgumentsException("No \'inid\' attribute was provided.");
+                    }
+                    xercesc::XMLString::release(&inIDXMLStr);
+                    
+                    XMLCh *outIDXMLStr = xercesc::XMLString::transcode("outid");
+                    if(attElement->hasAttribute(outIDXMLStr))
+                    {
+                        char *charValue = xercesc::XMLString::transcode(attElement->getAttribute(outIDXMLStr));
+                        outClassId = textUtils.strtosizet(std::string(charValue));
+                        xercesc::XMLString::release(&charValue);
+                    }
+                    else
+                    {
+                        throw rsgis::RSGISXMLArgumentsException("No \'outid\' attribute was provided.");
+                    }
+                    xercesc::XMLString::release(&outIDXMLStr);
+                    
+                    classPairs.insert(std::pair<size_t, size_t>(inClassId, outClassId));
+                }
             }
-            else
+            else if(xercesc::XMLString::equals(optionColourClasses, optionXML))
             {
-                throw rsgis::RSGISXMLArgumentsException("No \'categories\' attribute was provided.");
+                this->option = RSGISExeRasterGIS::colourclasses;
+                
+                XMLCh *tableXMLStr = xercesc::XMLString::transcode("table");
+                if(argElement->hasAttribute(tableXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(tableXMLStr));
+                    this->inputImage = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'table\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&tableXMLStr);
+                
+                XMLCh *classFieldXMLStr = xercesc::XMLString::transcode("classfield");
+                if(argElement->hasAttribute(classFieldXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(classFieldXMLStr));
+                    this->classInField = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'classfield\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&classFieldXMLStr);
+                
+                
+                XMLCh *rsgisClassXMLStr = xercesc::XMLString::transcode("rsgis:class");
+                xercesc::DOMNodeList *classNodesList = argElement->getElementsByTagName(rsgisClassXMLStr);
+                unsigned int numClassTags = classNodesList->getLength();
+                
+                std::cout << "Found " << numClassTags << " class tags" << std::endl;
+                
+                if(numClassTags == 0)
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No class tags have been provided, at least 1 is required.");
+                }
+                
+                xercesc::DOMElement *attElement = NULL;
+                size_t classId = 0;
+                int red = 0;
+                int green = 0;
+                int blue = 0;
+                int alpha = 0;
+                for(int i = 0; i < numClassTags; i++)
+                {
+                    attElement = static_cast<xercesc::DOMElement*>(classNodesList->item(i));
+                    
+                    XMLCh *idXMLStr = xercesc::XMLString::transcode("id");
+                    if(attElement->hasAttribute(idXMLStr))
+                    {
+                        char *charValue = xercesc::XMLString::transcode(attElement->getAttribute(idXMLStr));
+                        classId = textUtils.strtosizet(std::string(charValue));
+                        xercesc::XMLString::release(&charValue);
+                    }
+                    else
+                    {
+                        throw rsgis::RSGISXMLArgumentsException("No \'id\' attribute was provided.");
+                    }
+                    xercesc::XMLString::release(&idXMLStr);
+                    
+                    XMLCh *redXMLStr = xercesc::XMLString::transcode("r");
+                    if(attElement->hasAttribute(redXMLStr))
+                    {
+                        char *charValue = xercesc::XMLString::transcode(attElement->getAttribute(redXMLStr));
+                        red = textUtils.strto32bitInt(std::string(charValue));
+                        xercesc::XMLString::release(&charValue);
+                    }
+                    else
+                    {
+                        throw rsgis::RSGISXMLArgumentsException("No \'r\' attribute was provided.");
+                    }
+                    xercesc::XMLString::release(&redXMLStr);
+                    
+                    XMLCh *greenXMLStr = xercesc::XMLString::transcode("g");
+                    if(attElement->hasAttribute(greenXMLStr))
+                    {
+                        char *charValue = xercesc::XMLString::transcode(attElement->getAttribute(greenXMLStr));
+                        green = textUtils.strto32bitInt(std::string(charValue));
+                        xercesc::XMLString::release(&charValue);
+                    }
+                    else
+                    {
+                        throw rsgis::RSGISXMLArgumentsException("No \'g\' attribute was provided.");
+                    }
+                    xercesc::XMLString::release(&greenXMLStr);
+                    
+                    XMLCh *blueXMLStr = xercesc::XMLString::transcode("b");
+                    if(attElement->hasAttribute(blueXMLStr))
+                    {
+                        char *charValue = xercesc::XMLString::transcode(attElement->getAttribute(blueXMLStr));
+                        blue = textUtils.strto32bitInt(std::string(charValue));
+                        xercesc::XMLString::release(&charValue);
+                    }
+                    else
+                    {
+                        throw rsgis::RSGISXMLArgumentsException("No \'b\' attribute was provided.");
+                    }
+                    xercesc::XMLString::release(&blueXMLStr);
+                    
+                    XMLCh *alphaXMLStr = xercesc::XMLString::transcode("a");
+                    if(attElement->hasAttribute(alphaXMLStr))
+                    {
+                        char *charValue = xercesc::XMLString::transcode(attElement->getAttribute(alphaXMLStr));
+                        alpha = textUtils.strto32bitInt(std::string(charValue));
+                        xercesc::XMLString::release(&charValue);
+                    }
+                    else
+                    {
+                        throw rsgis::RSGISXMLArgumentsException("No \'a\' attribute was provided.");
+                    }
+                    xercesc::XMLString::release(&alphaXMLStr);
+                    
+                    classColourPairs.insert(std::pair<size_t, rsgis::utils::RSGISColourInt>(classId, rsgis::utils::RSGISColourInt(red, green, blue, alpha)));
+                }
             }
-            xercesc::XMLString::release(&categoriesXMLStr);
-            
-            XMLCh *outColsXMLStr = xercesc::XMLString::transcode("outcols");
-            if(argElement->hasAttribute(outColsXMLStr))
+            else if(xercesc::XMLString::equals(optionColourStrClasses, optionXML))
             {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outColsXMLStr));
-                this->outColsName = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
+                this->option = RSGISExeRasterGIS::colourstrclasses;
+                
+                XMLCh *tableXMLStr = xercesc::XMLString::transcode("table");
+                if(argElement->hasAttribute(tableXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(tableXMLStr));
+                    this->inputImage = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'table\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&tableXMLStr);
+                
+                XMLCh *classFieldXMLStr = xercesc::XMLString::transcode("classfield");
+                if(argElement->hasAttribute(classFieldXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(classFieldXMLStr));
+                    this->classInField = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'classfield\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&classFieldXMLStr);
+                
+                
+                XMLCh *rsgisClassXMLStr = xercesc::XMLString::transcode("rsgis:class");
+                xercesc::DOMNodeList *classNodesList = argElement->getElementsByTagName(rsgisClassXMLStr);
+                unsigned int numClassTags = classNodesList->getLength();
+                
+                std::cout << "Found " << numClassTags << " class tags" << std::endl;
+                
+                if(numClassTags == 0)
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No class tags have been provided, at least 1 is required.");
+                }
+                
+                xercesc::DOMElement *attElement = NULL;
+                std::string className = 0;
+                int red = 0;
+                int green = 0;
+                int blue = 0;
+                int alpha = 0;
+                for(int i = 0; i < numClassTags; i++)
+                {
+                    std::cout << "i = " << i << std::endl;
+                    attElement = static_cast<xercesc::DOMElement*>(classNodesList->item(i));
+                    
+                    XMLCh *nameXMLStr = xercesc::XMLString::transcode("classname");
+                    if(attElement->hasAttribute(nameXMLStr))
+                    {
+                        char *charValue = xercesc::XMLString::transcode(attElement->getAttribute(nameXMLStr));
+                        className = std::string(charValue);
+                        xercesc::XMLString::release(&charValue);
+                    }
+                    else
+                    {
+                        throw rsgis::RSGISXMLArgumentsException("No \'classname\' attribute was provided.");
+                    }
+                    xercesc::XMLString::release(&nameXMLStr);
+                    
+                    XMLCh *redXMLStr = xercesc::XMLString::transcode("r");
+                    if(attElement->hasAttribute(redXMLStr))
+                    {
+                        char *charValue = xercesc::XMLString::transcode(attElement->getAttribute(redXMLStr));
+                        red = textUtils.strto32bitInt(std::string(charValue));
+                        xercesc::XMLString::release(&charValue);
+                    }
+                    else
+                    {
+                        throw rsgis::RSGISXMLArgumentsException("No \'r\' attribute was provided.");
+                    }
+                    xercesc::XMLString::release(&redXMLStr);
+                    
+                    XMLCh *greenXMLStr = xercesc::XMLString::transcode("g");
+                    if(attElement->hasAttribute(greenXMLStr))
+                    {
+                        char *charValue = xercesc::XMLString::transcode(attElement->getAttribute(greenXMLStr));
+                        green = textUtils.strto32bitInt(std::string(charValue));
+                        xercesc::XMLString::release(&charValue);
+                    }
+                    else
+                    {
+                        throw rsgis::RSGISXMLArgumentsException("No \'g\' attribute was provided.");
+                    }
+                    xercesc::XMLString::release(&greenXMLStr);
+                    
+                    XMLCh *blueXMLStr = xercesc::XMLString::transcode("b");
+                    if(attElement->hasAttribute(blueXMLStr))
+                    {
+                        char *charValue = xercesc::XMLString::transcode(attElement->getAttribute(blueXMLStr));
+                        blue = textUtils.strto32bitInt(std::string(charValue));
+                        xercesc::XMLString::release(&charValue);
+                    }
+                    else
+                    {
+                        throw rsgis::RSGISXMLArgumentsException("No \'b\' attribute was provided.");
+                    }
+                    xercesc::XMLString::release(&blueXMLStr);
+                    
+                    XMLCh *alphaXMLStr = xercesc::XMLString::transcode("a");
+                    if(attElement->hasAttribute(alphaXMLStr))
+                    {
+                        char *charValue = xercesc::XMLString::transcode(attElement->getAttribute(alphaXMLStr));
+                        alpha = textUtils.strto32bitInt(std::string(charValue));
+                        xercesc::XMLString::release(&charValue);
+                    }
+                    else
+                    {
+                        throw rsgis::RSGISXMLArgumentsException("No \'a\' attribute was provided.");
+                    }
+                    xercesc::XMLString::release(&alphaXMLStr);
+                    
+                    classStrColourPairs.insert(std::pair<std::string, rsgis::utils::RSGISColourInt>(className, rsgis::utils::RSGISColourInt(red, green, blue, alpha)));
+                }
             }
-            else
+            else if(xercesc::XMLString::equals(optionGenColourTab, optionXML))
             {
-                throw rsgis::RSGISXMLArgumentsException("No \'outcols\' attribute was provided.");
+                this->option = RSGISExeRasterGIS::gencolourtab;
+                
+                XMLCh *tableXMLStr = xercesc::XMLString::transcode("table");
+                if(argElement->hasAttribute(tableXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(tableXMLStr));
+                    this->clumpsImage = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'table\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&tableXMLStr);
+                
+                XMLCh *inputXMLStr = xercesc::XMLString::transcode("input");
+                if(argElement->hasAttribute(inputXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(inputXMLStr));
+                    this->inputImage = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'input\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&inputXMLStr);
+                            
+                XMLCh *redXMLStr = xercesc::XMLString::transcode("red");
+                if(argElement->hasAttribute(redXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(redXMLStr));
+                    this->redBand = textUtils.strto32bitInt(std::string(charValue));
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'red\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&redXMLStr);
+                
+                XMLCh *greenXMLStr = xercesc::XMLString::transcode("green");
+                if(argElement->hasAttribute(greenXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(greenXMLStr));
+                    this->greenBand = textUtils.strto32bitInt(std::string(charValue));
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'green\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&greenXMLStr);
+                
+                XMLCh *blueXMLStr = xercesc::XMLString::transcode("blue");
+                if(argElement->hasAttribute(blueXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(blueXMLStr));
+                    this->blueBand = textUtils.strto32bitInt(std::string(charValue));
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'blue\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&blueXMLStr);
             }
-            xercesc::XMLString::release(&outColsXMLStr);
-            
-            XMLCh *majorityXMLStr = xercesc::XMLString::transcode("majority");
-            if(argElement->hasAttribute(majorityXMLStr))
+            else if(xercesc::XMLString::equals(optionExportCols2Raster, optionXML))
             {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(majorityXMLStr));
-                this->majorityColName = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
+                this->option = RSGISExeRasterGIS::exportcols2raster;
+                
+                XMLCh *clumpsXMLStr = xercesc::XMLString::transcode("clumps");
+                if(argElement->hasAttribute(clumpsXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(clumpsXMLStr));
+                    this->inputImage = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'clumps\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&clumpsXMLStr);
+                
+                XMLCh *outputXMLStr = xercesc::XMLString::transcode("output");
+                if(argElement->hasAttribute(outputXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outputXMLStr));
+                    this->outputFile = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&outputXMLStr);
+                
+                // Set output image fomat (defaults to KEA)
+                this->imageFormat = "KEA";
+                XMLCh *formatXMLStr = xercesc::XMLString::transcode("format");
+                if(argElement->hasAttribute(formatXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(formatXMLStr));
+                    this->imageFormat = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                xercesc::XMLString::release(&formatXMLStr);
+                
+                this->rsgisOutDataType = rsgis::rsgis_32float;
+                XMLCh *datatypeXMLStr = xercesc::XMLString::transcode("datatype");
+                if(argElement->hasAttribute(datatypeXMLStr))
+                {
+                    XMLCh *dtByte = xercesc::XMLString::transcode("Byte");
+                    XMLCh *dtUInt16 = xercesc::XMLString::transcode("UInt16");
+                    XMLCh *dtInt16 = xercesc::XMLString::transcode("Int16");
+                    XMLCh *dtUInt32 = xercesc::XMLString::transcode("UInt32");
+                    XMLCh *dtInt32 = xercesc::XMLString::transcode("Int32");
+                    XMLCh *dtFloat32 = xercesc::XMLString::transcode("Float32");
+                    XMLCh *dtFloat64 = xercesc::XMLString::transcode("Float64");
+                    
+                    const XMLCh *dtXMLValue = argElement->getAttribute(datatypeXMLStr);
+                    if(xercesc::XMLString::equals(dtByte, dtXMLValue))
+                    {
+                        this->rsgisOutDataType = rsgis::rsgis_8int;
+                    }
+                    else if(xercesc::XMLString::equals(dtUInt16, dtXMLValue))
+                    {
+                        this->rsgisOutDataType = rsgis::rsgis_16uint;
+                    }
+                    else if(xercesc::XMLString::equals(dtInt16, dtXMLValue))
+                    {
+                        this->rsgisOutDataType = rsgis::rsgis_16int;
+                    }
+                    else if(xercesc::XMLString::equals(dtUInt32, dtXMLValue))
+                    {
+                        this->rsgisOutDataType = rsgis::rsgis_32uint;
+                    }
+                    else if(xercesc::XMLString::equals(dtInt32, dtXMLValue))
+                    {
+                        this->rsgisOutDataType = rsgis::rsgis_32int;
+                    }
+                    else if(xercesc::XMLString::equals(dtFloat32, dtXMLValue))
+                    {
+                        this->rsgisOutDataType = rsgis::rsgis_32float;
+                    }
+                    else if(xercesc::XMLString::equals(dtFloat64, dtXMLValue))
+                    {
+                        this->rsgisOutDataType = rsgis::rsgis_64float;
+                    }
+                    else
+                    {
+                        std::cerr << "Data type not recognised, defaulting to 32 bit float.";
+                        this->rsgisOutDataType = rsgis::rsgis_32float;
+                    }
+                    
+                    xercesc::XMLString::release(&dtByte);
+                    xercesc::XMLString::release(&dtUInt16);
+                    xercesc::XMLString::release(&dtInt16);
+                    xercesc::XMLString::release(&dtUInt32);
+                    xercesc::XMLString::release(&dtInt32);
+                    xercesc::XMLString::release(&dtFloat32);
+                    xercesc::XMLString::release(&dtFloat64);
+                }
+                xercesc::XMLString::release(&datatypeXMLStr);
+                
+                XMLCh *rsgisFieldXMLStr = xercesc::XMLString::transcode("rsgis:field");
+                xercesc::DOMNodeList *fieldNodesList = argElement->getElementsByTagName(rsgisFieldXMLStr);
+                unsigned int numFieldTags = fieldNodesList->getLength();
+                
+                std::cout << "Found " << numFieldTags << " field tags" << std::endl;
+                
+                if(numFieldTags == 0)
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No field tags have been provided, at least 1 is required.");
+                }
+                
+                fields.reserve(numFieldTags);
+                
+                xercesc::DOMElement *attElement = NULL;
+                std::string fieldName = "";
+                for(int i = 0; i < numFieldTags; i++)
+                {
+                    attElement = static_cast<xercesc::DOMElement*>(fieldNodesList->item(i));
+                    
+                    XMLCh *nameXMLStr = xercesc::XMLString::transcode("name");
+                    if(attElement->hasAttribute(nameXMLStr))
+                    {
+                        char *charValue = xercesc::XMLString::transcode(attElement->getAttribute(nameXMLStr));
+                        fields.push_back(std::string(charValue));
+                        xercesc::XMLString::release(&charValue);
+                    }
+                    else
+                    {
+                        throw rsgis::RSGISXMLArgumentsException("No \'name\' attribute was provided.");
+                    }
+                    xercesc::XMLString::release(&nameXMLStr);
+                }
             }
-            else
+            else if(xercesc::XMLString::equals(optionStrClassMajority, optionXML))
             {
-                throw rsgis::RSGISXMLArgumentsException("No \'majority\' attribute was provided.");
+                this->option = RSGISExeRasterGIS::strclassmajority;
+                
+                XMLCh *baseXMLStr = xercesc::XMLString::transcode("base");
+                if(argElement->hasAttribute(baseXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(baseXMLStr));
+                    this->baseSegment = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'base\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&baseXMLStr);
+                
+                
+                XMLCh *baseClassXMLStr = xercesc::XMLString::transcode("baseclass");
+                if(argElement->hasAttribute(baseClassXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(baseClassXMLStr));
+                    this->baseClassCol = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'baseclass\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&baseClassXMLStr);
+
+                XMLCh *infoXMLStr = xercesc::XMLString::transcode("info");
+                if(argElement->hasAttribute(infoXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(infoXMLStr));
+                    this->infoSegment = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'info\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&infoXMLStr);
+                
+                XMLCh *infoClassXMLStr = xercesc::XMLString::transcode("infoclass");
+                if(argElement->hasAttribute(infoClassXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(infoClassXMLStr));
+                    this->infoClassCol = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'infoclass\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&infoClassXMLStr);
+                
             }
-            xercesc::XMLString::release(&majorityXMLStr);
-            
-            this->copyClassNames = false;
-            XMLCh *majClassNameXMLStr = xercesc::XMLString::transcode("majclassname");
-            if(argElement->hasAttribute(majClassNameXMLStr))
+            else if(xercesc::XMLString::equals(optionSpecDistMajorityClassifier, optionXML))
             {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(majClassNameXMLStr));
-                this->majClassNameField = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
+                this->option = RSGISExeRasterGIS::specdistmajorityclassifier;
+                
+                XMLCh *imageXMLStr = xercesc::XMLString::transcode("image");
+                if(argElement->hasAttribute(imageXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(imageXMLStr));
+                    this->inputImage = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&imageXMLStr);
+                
+                XMLCh *inClassFieldXMLStr = xercesc::XMLString::transcode("inclassfield");
+                if(argElement->hasAttribute(inClassFieldXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(inClassFieldXMLStr));
+                    this->inClassNameField = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'inclassfield\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&inClassFieldXMLStr);
+                
+                XMLCh *outClassFieldXMLStr = xercesc::XMLString::transcode("outclassfield");
+                if(argElement->hasAttribute(outClassFieldXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outClassFieldXMLStr));
+                    this->outClassNameField = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'outclassfield\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&outClassFieldXMLStr);
+                
+                XMLCh *trainingColXMLStr = xercesc::XMLString::transcode("trainingcol");
+                if(argElement->hasAttribute(trainingColXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(trainingColXMLStr));
+                    this->trainingSelectCol = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'trainingcol\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&trainingColXMLStr);
+                
+                XMLCh *eastingsXMLStr = xercesc::XMLString::transcode("eastings");
+                if(argElement->hasAttribute(eastingsXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(eastingsXMLStr));
+                    this->eastingsField = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'eastings\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&eastingsXMLStr);
+                
+                XMLCh *northingsXMLStr = xercesc::XMLString::transcode("northings");
+                if(argElement->hasAttribute(northingsXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(northingsXMLStr));
+                    this->northingsField = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'northings\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&northingsXMLStr);
+                
+                XMLCh *areaXMLStr = xercesc::XMLString::transcode("area");
+                if(argElement->hasAttribute(areaXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(areaXMLStr));
+                    this->areaField = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'area\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&areaXMLStr);
+                
+                XMLCh *weightFieldXMLStr = xercesc::XMLString::transcode("weightfield");
+                if(argElement->hasAttribute(weightFieldXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(weightFieldXMLStr));
+                    this->majWeightField = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'weightfield\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&weightFieldXMLStr);
+                
+                XMLCh *specDistThresholdXMLStr = xercesc::XMLString::transcode("specdistthreshold");
+                if(argElement->hasAttribute(specDistThresholdXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(specDistThresholdXMLStr));
+                    this->specDistThreshold = textUtils.strtofloat(std::string(charValue));
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'specdistthreshold\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&specDistThresholdXMLStr);
+                
+                XMLCh *spatDistThresholdXMLStr = xercesc::XMLString::transcode("spatdistthreshold");
+                if(argElement->hasAttribute(spatDistThresholdXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(spatDistThresholdXMLStr));
+                    this->distThreshold = textUtils.strtofloat(std::string(charValue));
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'spatdistthreshold\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&spatDistThresholdXMLStr);
+                
+                XMLCh *thresOriginDistXMLStr = xercesc::XMLString::transcode("thresorigindist");
+                if(argElement->hasAttribute(thresOriginDistXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(thresOriginDistXMLStr));
+                    this->specThresOriginDist = textUtils.strtofloat(std::string(charValue));
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    this->specThresOriginDist = 100;
+                }
+                xercesc::XMLString::release(&thresOriginDistXMLStr);
+                
+                XMLCh *majMethodXMLStr = xercesc::XMLString::transcode("specdistmethod");
+                if(argElement->hasAttribute(majMethodXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(majMethodXMLStr));
+                    std::string distMethodStr = std::string(charValue);
+                    if(distMethodStr == "euclidean")
+                    {
+                        this->distThresMethod = rsgis::rastergis::stdEucSpecDist;
+                    }
+                    else if(distMethodStr == "origineucweighted")
+                    {
+                        this->distThresMethod = rsgis::rastergis::originWeightedEuc;
+                    }
+                    else
+                    {
+                        throw rsgis::RSGISXMLArgumentsException("Distance method is not recognised, options are \'euclidean\' or \'origineucweighted\'.");
+                    }
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'majoritymethod\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&majMethodXMLStr);
+                
+                XMLCh *rsgisFieldXMLStr = xercesc::XMLString::transcode("rsgis:field");
+                xercesc::DOMNodeList *fieldNodesList = argElement->getElementsByTagName(rsgisFieldXMLStr);
+                unsigned int numFieldTags = fieldNodesList->getLength();
+                
+                std::cout << "Found " << numFieldTags << " field tags" << std::endl;
+                
+                if(numFieldTags == 0)
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No field tags have been provided, at least 1 is required.");
+                }
+                
+                fields.reserve(numFieldTags);
+                
+                xercesc::DOMElement *attElement = NULL;
+                std::string fieldName = "";
+                for(int i = 0; i < numFieldTags; i++)
+                {
+                    attElement = static_cast<xercesc::DOMElement*>(fieldNodesList->item(i));
+                    
+                    XMLCh *nameXMLStr = xercesc::XMLString::transcode("name");
+                    if(attElement->hasAttribute(nameXMLStr))
+                    {
+                        char *charValue = xercesc::XMLString::transcode(attElement->getAttribute(nameXMLStr));
+                        fields.push_back(std::string(charValue));
+                        xercesc::XMLString::release(&charValue);
+                    }
+                    else
+                    {
+                        throw rsgis::RSGISXMLArgumentsException("No \'name\' attribute was provided.");
+                    }
+                    xercesc::XMLString::release(&nameXMLStr);
+                }
+            }
+            else if(xercesc::XMLString::equals(optionMaxLikelihoodClassifier, optionXML))
+            {
+                this->option = RSGISExeRasterGIS::maxlikelihoodclassifier;
+                
+                XMLCh *imageXMLStr = xercesc::XMLString::transcode("image");
+                if(argElement->hasAttribute(imageXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(imageXMLStr));
+                    this->inputImage = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&imageXMLStr);
+                
+                XMLCh *inClassFieldXMLStr = xercesc::XMLString::transcode("inclassfield");
+                if(argElement->hasAttribute(inClassFieldXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(inClassFieldXMLStr));
+                    this->inClassNameField = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'inclassfield\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&inClassFieldXMLStr);
+                
+                XMLCh *outClassFieldXMLStr = xercesc::XMLString::transcode("outclassfield");
+                if(argElement->hasAttribute(outClassFieldXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outClassFieldXMLStr));
+                    this->outClassNameField = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'outclassfield\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&outClassFieldXMLStr);
+                
+                XMLCh *trainingColXMLStr = xercesc::XMLString::transcode("trainingcol");
+                if(argElement->hasAttribute(trainingColXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(trainingColXMLStr));
+                    this->trainingSelectCol = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'trainingcol\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&trainingColXMLStr);
+                
+                XMLCh *areaXMLStr = xercesc::XMLString::transcode("area");
+                if(argElement->hasAttribute(areaXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(areaXMLStr));
+                    this->areaField = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'area\' attribute was provided.");
+                }
+                
+                XMLCh *priorsXMLStr = xercesc::XMLString::transcode("priors");
+                if(argElement->hasAttribute(priorsXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(priorsXMLStr));
+                    std::string priorsMethodStr = std::string(charValue);
+                    if(priorsMethodStr == "equal")
+                    {
+                        this->priorsMethod = rsgis::rastergis::rsgis_equal;
+                    }
+                    else if(priorsMethodStr == "area")
+                    {
+                        this->priorsMethod = rsgis::rastergis::rsgis_area;
+                    }
+                    else if(priorsMethodStr == "samples")
+                    {
+                        this->priorsMethod = rsgis::rastergis::rsgis_samples;
+                    }
+                    else
+                    {
+                        this->priorsMethod = rsgis::rastergis::rsgis_userdefined;
+                        try
+                        {
+                            this->priorStrs = textUtils.readFileToStringVector(priorsMethodStr);
+                        }
+                        catch(rsgis::utils::RSGISTextException &e)
+                        {
+                            throw rsgis::RSGISXMLArgumentsException("Error reading priors files. Options are equal | area | samples | file.txt");
+                        }
+                    }
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'priors\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&priorsXMLStr);
+                
+                
+                XMLCh *rsgisFieldXMLStr = xercesc::XMLString::transcode("rsgis:field");
+                xercesc::DOMNodeList *fieldNodesList = argElement->getElementsByTagName(rsgisFieldXMLStr);
+                unsigned int numFieldTags = fieldNodesList->getLength();
+                
+                std::cout << "Found " << numFieldTags << " field tags" << std::endl;
+                
+                if(numFieldTags == 0)
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No field tags have been provided, at least 1 is required.");
+                }
+                
+                fields.reserve(numFieldTags);
+                
+                xercesc::DOMElement *attElement = NULL;
+                std::string fieldName = "";
+                for(int i = 0; i < numFieldTags; i++)
+                {
+                    attElement = static_cast<xercesc::DOMElement*>(fieldNodesList->item(i));
+                    
+                    XMLCh *nameXMLStr = xercesc::XMLString::transcode("name");
+                    if(attElement->hasAttribute(nameXMLStr))
+                    {
+                        char *charValue = xercesc::XMLString::transcode(attElement->getAttribute(nameXMLStr));
+                        fields.push_back(std::string(charValue));
+                        xercesc::XMLString::release(&charValue);
+                    }
+                    else
+                    {
+                        throw rsgis::RSGISXMLArgumentsException("No \'name\' attribute was provided.");
+                    }
+                    xercesc::XMLString::release(&nameXMLStr);
+                }
+            }
+            else if(xercesc::XMLString::equals(optionMaxLikelihoodClassifierLocalPriors, optionXML))
+            {
+                this->option = RSGISExeRasterGIS::maxlikelihoodclassifierlocalpriors;
+                
+                XMLCh *imageXMLStr = xercesc::XMLString::transcode("image");
+                if(argElement->hasAttribute(imageXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(imageXMLStr));
+                    this->inputImage = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&imageXMLStr);
+                
+                XMLCh *inClassFieldXMLStr = xercesc::XMLString::transcode("inclassfield");
+                if(argElement->hasAttribute(inClassFieldXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(inClassFieldXMLStr));
+                    this->inClassNameField = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'inclassfield\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&inClassFieldXMLStr);
+                
+                XMLCh *outClassFieldXMLStr = xercesc::XMLString::transcode("outclassfield");
+                if(argElement->hasAttribute(outClassFieldXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outClassFieldXMLStr));
+                    this->outClassNameField = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'outclassfield\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&outClassFieldXMLStr);
+                
+                XMLCh *trainingColXMLStr = xercesc::XMLString::transcode("trainingcol");
+                if(argElement->hasAttribute(trainingColXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(trainingColXMLStr));
+                    this->trainingSelectCol = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'trainingcol\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&trainingColXMLStr);
+                
+                XMLCh *eastingsXMLStr = xercesc::XMLString::transcode("eastings");
+                if(argElement->hasAttribute(eastingsXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(eastingsXMLStr));
+                    this->eastingsField = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'eastings\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&eastingsXMLStr);
+                
+                XMLCh *northingsXMLStr = xercesc::XMLString::transcode("northings");
+                if(argElement->hasAttribute(northingsXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(northingsXMLStr));
+                    this->northingsField = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'northings\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&northingsXMLStr);
+                
+                XMLCh *areaXMLStr = xercesc::XMLString::transcode("area");
+                if(argElement->hasAttribute(areaXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(areaXMLStr));
+                    this->areaField = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'area\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&areaXMLStr);
+                
+                XMLCh *spatialRadiusXMLStr = xercesc::XMLString::transcode("spatialradius");
+                if(argElement->hasAttribute(spatialRadiusXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(spatialRadiusXMLStr));
+                    this->distThreshold = textUtils.strtofloat(std::string(charValue));
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'spatialradius\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&spatialRadiusXMLStr);
+                
+                
+                XMLCh *weightAXMLStr = xercesc::XMLString::transcode("weighta");
+                if(argElement->hasAttribute(weightAXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(weightAXMLStr));
+                    this->weightA = textUtils.strtofloat(std::string(charValue));
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    this->weightA = 3;
+                }
+                xercesc::XMLString::release(&weightAXMLStr);
+                
+                XMLCh *majMethodXMLStr = xercesc::XMLString::transcode("majoritymethod");
+                if(argElement->hasAttribute(majMethodXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(majMethodXMLStr));
+                    std::string majMethodStr = std::string(charValue);
+                    if(majMethodStr == "area")
+                    {
+                        this->priorsMethod = rsgis::rastergis::rsgis_area;
+                    }
+                    else if(majMethodStr == "weighted")
+                    {
+                        this->priorsMethod = rsgis::rastergis::rsgis_weighted;
+                    }
+                    else
+                    {
+                        throw rsgis::RSGISXMLArgumentsException("Majority method is not recognised, options are \'area\' or \'weighted\'.");
+                    }
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'majoritymethod\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&majMethodXMLStr);
+                
+                XMLCh *noZeroPriorsXMLStr = xercesc::XMLString::transcode("nozeropriors");
+                if(argElement->hasAttribute(noZeroPriorsXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(noZeroPriorsXMLStr));
+                    std::string noZeroPriorsStr = std::string(charValue);
+                    if(noZeroPriorsStr == "yes")
+                    {
+                        this->allowZeroPriors = true;
+                    }
+                    else
+                    {
+                        this->allowZeroPriors = false;
+                    }
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'nozeropriors\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&noZeroPriorsXMLStr);
+                
+                XMLCh *rsgisFieldXMLStr = xercesc::XMLString::transcode("rsgis:field");
+                xercesc::DOMNodeList *fieldNodesList = argElement->getElementsByTagName(rsgisFieldXMLStr);
+                unsigned int numFieldTags = fieldNodesList->getLength();
+                
+                std::cout << "Found " << numFieldTags << " field tags" << std::endl;
+                
+                if(numFieldTags == 0)
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No field tags have been provided, at least 1 is required.");
+                }
+                
+                fields.reserve(numFieldTags);
+                
+                xercesc::DOMElement *attElement = NULL;
+                std::string fieldName = "";
+                for(int i = 0; i < numFieldTags; i++)
+                {
+                    attElement = static_cast<xercesc::DOMElement*>(fieldNodesList->item(i));
+                    
+                    XMLCh *nameXMLStr = xercesc::XMLString::transcode("name");
+                    if(attElement->hasAttribute(nameXMLStr))
+                    {
+                        char *charValue = xercesc::XMLString::transcode(attElement->getAttribute(nameXMLStr));
+                        fields.push_back(std::string(charValue));
+                        xercesc::XMLString::release(&charValue);
+                    }
+                    else
+                    {
+                        throw rsgis::RSGISXMLArgumentsException("No \'name\' attribute was provided.");
+                    }
+                    xercesc::XMLString::release(&nameXMLStr);
+                }
+            }
+            else if(xercesc::XMLString::equals(optionClassMask, optionXML))
+            {
+                this->option = RSGISExeRasterGIS::classmask;
+                
+                XMLCh *clumpsXMLStr = xercesc::XMLString::transcode("clumps");
+                if(argElement->hasAttribute(clumpsXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(clumpsXMLStr));
+                    this->inputImage = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'clumps\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&clumpsXMLStr);
+                
+                XMLCh *outputXMLStr = xercesc::XMLString::transcode("output");
+                if(argElement->hasAttribute(outputXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outputXMLStr));
+                    this->outputFile = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&outputXMLStr);
+                
+                // Set output image fomat (defaults to KEA)
+                this->imageFormat = "KEA";
+                XMLCh *formatXMLStr = xercesc::XMLString::transcode("format");
+                if(argElement->hasAttribute(formatXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(formatXMLStr));
+                    this->imageFormat = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                xercesc::XMLString::release(&formatXMLStr);
+                
+                
+                this->outDataType = GDT_Byte;
+                XMLCh *datatypeXMLStr = xercesc::XMLString::transcode("datatype");
+                if(argElement->hasAttribute(datatypeXMLStr))
+                {
+                    XMLCh *dtByte = xercesc::XMLString::transcode("Byte");
+                    XMLCh *dtUInt16 = xercesc::XMLString::transcode("UInt16");
+                    XMLCh *dtInt16 = xercesc::XMLString::transcode("Int16");
+                    XMLCh *dtUInt32 = xercesc::XMLString::transcode("UInt32");
+                    XMLCh *dtInt32 = xercesc::XMLString::transcode("Int32");
+                    XMLCh *dtFloat32 = xercesc::XMLString::transcode("Float32");
+                    XMLCh *dtFloat64 = xercesc::XMLString::transcode("Float64");
+                    
+                    const XMLCh *dtXMLValue = argElement->getAttribute(datatypeXMLStr);
+                    if(xercesc::XMLString::equals(dtByte, dtXMLValue))
+                    {
+                        this->outDataType = GDT_Byte;
+                    }
+                    else if(xercesc::XMLString::equals(dtUInt16, dtXMLValue))
+                    {
+                        this->outDataType = GDT_UInt16;
+                    }
+                    else if(xercesc::XMLString::equals(dtInt16, dtXMLValue))
+                    {
+                        this->outDataType = GDT_Int16;
+                    }
+                    else if(xercesc::XMLString::equals(dtUInt32, dtXMLValue))
+                    {
+                        this->outDataType = GDT_UInt32;
+                    }
+                    else if(xercesc::XMLString::equals(dtInt32, dtXMLValue))
+                    {
+                        this->outDataType = GDT_Int32;
+                    }
+                    else if(xercesc::XMLString::equals(dtFloat32, dtXMLValue))
+                    {
+                        this->outDataType = GDT_Float32;
+                    }
+                    else if(xercesc::XMLString::equals(dtFloat64, dtXMLValue))
+                    {
+                        this->outDataType = GDT_Float64;
+                    }
+                    else
+                    {
+                        std::cerr << "Data type not recognised, defaulting to 32 bit float.";
+                        this->outDataType = GDT_Byte;
+                    }
+                    
+                    xercesc::XMLString::release(&dtByte);
+                    xercesc::XMLString::release(&dtUInt16);
+                    xercesc::XMLString::release(&dtInt16);
+                    xercesc::XMLString::release(&dtUInt32);
+                    xercesc::XMLString::release(&dtInt32);
+                    xercesc::XMLString::release(&dtFloat32);
+                    xercesc::XMLString::release(&dtFloat64);
+                }
+                xercesc::XMLString::release(&datatypeXMLStr);
+                
+                XMLCh *classColumnXMLStr = xercesc::XMLString::transcode("classcolumn");
+                if(argElement->hasAttribute(classColumnXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(classColumnXMLStr));
+                    this->classField = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'classcolumn\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&classColumnXMLStr);
+                
+                XMLCh *classXMLStr = xercesc::XMLString::transcode("class");
+                if(argElement->hasAttribute(classXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(classXMLStr));
+                    this->className = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'class\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&classXMLStr);
+                
+                
+            }
+            else if(xercesc::XMLString::equals(optionFindNeighbours, optionXML))
+            {
+                this->option = RSGISExeRasterGIS::findneighbours;
+                
+                XMLCh *clumpsXMLStr = xercesc::XMLString::transcode("clumps");
+                if(argElement->hasAttribute(clumpsXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(clumpsXMLStr));
+                    this->inputImage = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'clumps\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&clumpsXMLStr);
+                
+            }
+            else if(xercesc::XMLString::equals(optionFindBoundaryPixels, optionXML))
+            {
+                this->option = RSGISExeRasterGIS::findboundarypixels;
+                
+                XMLCh *clumpsXMLStr = xercesc::XMLString::transcode("clumps");
+                if(argElement->hasAttribute(clumpsXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(clumpsXMLStr));
+                    this->inputImage = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'clumps\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&clumpsXMLStr);
+                
+                XMLCh *outputXMLStr = xercesc::XMLString::transcode("output");
+                if(argElement->hasAttribute(outputXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outputXMLStr));
+                    this->outputFile = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&outputXMLStr);
+                
+                // Set output image fomat (defaults to KEA)
+                this->imageFormat = "KEA";
+                XMLCh *formatXMLStr = xercesc::XMLString::transcode("format");
+                if(argElement->hasAttribute(formatXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(formatXMLStr));
+                    this->imageFormat = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                xercesc::XMLString::release(&formatXMLStr);
+            }
+            else if(xercesc::XMLString::equals(optionCalcBorderLength, optionXML))
+            {
+                this->option = RSGISExeRasterGIS::calcborderlength;
+                
+                XMLCh *clumpsXMLStr = xercesc::XMLString::transcode("clumps");
+                if(argElement->hasAttribute(clumpsXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(clumpsXMLStr));
+                    this->inputImage = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'clumps\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&clumpsXMLStr);
+                
+                XMLCh *ignoreZeroEdgesXMLStr = xercesc::XMLString::transcode("ignorezeroedges");
+                if(argElement->hasAttribute(ignoreZeroEdgesXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(ignoreZeroEdgesXMLStr));
+                    std::string ignoreZeroEdgesStr = std::string(charValue);
+                    if(ignoreZeroEdgesStr == "yes")
+                    {
+                        this->ignoreZeroEdges = true;
+                    }
+                    else
+                    {
+                        this->ignoreZeroEdges = false;
+                    }
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'ignorezeroedges\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&ignoreZeroEdgesXMLStr);
+                
+                XMLCh *colNameXMLStr = xercesc::XMLString::transcode("colname");
+                if(argElement->hasAttribute(colNameXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(colNameXMLStr));
+                    this->outColsName = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'colname\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&colNameXMLStr);
+                
+            }
+            else if(xercesc::XMLString::equals(optionCalcRelBorderLength, optionXML))
+            {
+                this->option = RSGISExeRasterGIS::calcrelborder;
+                
+                XMLCh *clumpsXMLStr = xercesc::XMLString::transcode("clumps");
+                if(argElement->hasAttribute(clumpsXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(clumpsXMLStr));
+                    this->inputImage = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'clumps\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&clumpsXMLStr);
+                
+                XMLCh *ignoreZeroEdgesXMLStr = xercesc::XMLString::transcode("ignorezeroedges");
+                if(argElement->hasAttribute(ignoreZeroEdgesXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(ignoreZeroEdgesXMLStr));
+                    std::string ignoreZeroEdgesStr = std::string(charValue);
+                    if(ignoreZeroEdgesStr == "yes")
+                    {
+                        this->ignoreZeroEdges = true;
+                    }
+                    else
+                    {
+                        this->ignoreZeroEdges = false;
+                    }
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'ignorezeroedges\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&ignoreZeroEdgesXMLStr);
+                
+                XMLCh *colNameXMLStr = xercesc::XMLString::transcode("colname");
+                if(argElement->hasAttribute(colNameXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(colNameXMLStr));
+                    this->outColsName = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'colname\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&colNameXMLStr);
+                
+                XMLCh *classColumnXMLStr = xercesc::XMLString::transcode("classcolumn");
+                if(argElement->hasAttribute(classColumnXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(classColumnXMLStr));
+                    this->classNameField = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'classcolumn\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&classColumnXMLStr);
                 
                 XMLCh *classNameXMLStr = xercesc::XMLString::transcode("classname");
                 if(argElement->hasAttribute(classNameXMLStr))
                 {
                     char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(classNameXMLStr));
-                    this->classNameField = std::string(charValue);
+                    this->className = std::string(charValue);
                     xercesc::XMLString::release(&charValue);
                 }
                 else
@@ -683,2333 +2546,485 @@ namespace rsgisexe{
                 }
                 xercesc::XMLString::release(&classNameXMLStr);
                 
-                this->copyClassNames = true;
             }
-            else
+            else if(xercesc::XMLString::equals(optionCalcShapeIndices, optionXML))
             {
-                this->copyClassNames = false;
-            }
-            xercesc::XMLString::release(&majClassNameXMLStr);
-            
-        }
-        else if(xercesc::XMLString::equals(optionCopyCatColours, optionXML))
-        {
-            this->option = RSGISExeRasterGIS::copycatcolours;
-            
-            XMLCh *clumpsXMLStr = xercesc::XMLString::transcode("clumps");
-            if(argElement->hasAttribute(clumpsXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(clumpsXMLStr));
-                this->clumpsImage = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'clumps\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&clumpsXMLStr);
-            
-            
-            XMLCh *categoriesXMLStr = xercesc::XMLString::transcode("categories");
-            if(argElement->hasAttribute(categoriesXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(categoriesXMLStr));
-                this->categoriesImage = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'categories\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&categoriesXMLStr);
-            
-            XMLCh *classFieldXMLStr = xercesc::XMLString::transcode("classfield");
-            if(argElement->hasAttribute(classFieldXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(classFieldXMLStr));
-                this->classField = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'classfield\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&classFieldXMLStr);
-        }
-        else if(xercesc::XMLString::equals(optionKNNMajorityClassifier, optionXML))
-        {
-            this->option = RSGISExeRasterGIS::knnmajorityclassifier;
-            
-            XMLCh *imageXMLStr = xercesc::XMLString::transcode("image");
-            if(argElement->hasAttribute(imageXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(imageXMLStr));
-                this->inputImage = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'image\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&imageXMLStr);
-            
-            XMLCh *inClassFieldXMLStr = xercesc::XMLString::transcode("inclassfield");
-            if(argElement->hasAttribute(inClassFieldXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(inClassFieldXMLStr));
-                this->inClassNameField = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'inclassfield\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&inClassFieldXMLStr);
-            
-            XMLCh *outClassFieldXMLStr = xercesc::XMLString::transcode("outclassfield");
-            if(argElement->hasAttribute(outClassFieldXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outClassFieldXMLStr));
-                this->outClassNameField = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'outclassfield\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&outClassFieldXMLStr);
-            
-            XMLCh *trainingColXMLStr = xercesc::XMLString::transcode("trainingcol");
-            if(argElement->hasAttribute(trainingColXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(trainingColXMLStr));
-                this->trainingSelectCol = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'trainingcol\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&trainingColXMLStr);
-            
-            XMLCh *eastingsXMLStr = xercesc::XMLString::transcode("eastings");
-            if(argElement->hasAttribute(eastingsXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(eastingsXMLStr));
-                this->eastingsField = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'eastings\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&eastingsXMLStr);
-            
-            XMLCh *northingsXMLStr = xercesc::XMLString::transcode("northings");
-            if(argElement->hasAttribute(northingsXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(northingsXMLStr));
-                this->northingsField = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'northings\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&northingsXMLStr);
-            
-            XMLCh *areaXMLStr = xercesc::XMLString::transcode("area");
-            if(argElement->hasAttribute(areaXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(areaXMLStr));
-                this->areaField = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'area\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&areaXMLStr);
-            
-            XMLCh *weightFieldXMLStr = xercesc::XMLString::transcode("weightfield");
-            if(argElement->hasAttribute(weightFieldXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(weightFieldXMLStr));
-                this->majWeightField = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'weightfield\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&weightFieldXMLStr);
-            
-            XMLCh *distThresholdXMLStr = xercesc::XMLString::transcode("distthreshold");
-            if(argElement->hasAttribute(distThresholdXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(distThresholdXMLStr));
-                this->distThreshold = textUtils.strtofloat(std::string(charValue));
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'distthreshold\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&distThresholdXMLStr);
-            
-            XMLCh *nXMLStr = xercesc::XMLString::transcode("n");
-            if(argElement->hasAttribute(nXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(nXMLStr));
-                this->nFeatures = textUtils.strto16bitUInt(std::string(charValue));
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'n\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&nXMLStr);
-            
-            XMLCh *weightAXMLStr = xercesc::XMLString::transcode("weighta");
-            if(argElement->hasAttribute(weightAXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(weightAXMLStr));
-                this->weightA = textUtils.strtofloat(std::string(charValue));
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                this->weightA = 3;
-            }
-            xercesc::XMLString::release(&weightAXMLStr);    
-            
-            
-            XMLCh *majMethodXMLStr = xercesc::XMLString::transcode("majoritymethod");
-            if(argElement->hasAttribute(majMethodXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(majMethodXMLStr));
-                std::string majMethodStr = std::string(charValue);
-                if(majMethodStr == "standardKNN")
-                {
-                    this->majMethod = rsgis::rastergis::stdMajority;
-                }
-                else if(majMethodStr == "weightedKNN")
-                {
-                    this->majMethod = rsgis::rastergis::weightedMajority;
-                }
-                else
-                {
-                    throw rsgis::RSGISXMLArgumentsException("Majority method is not recognised, options are \'standardKNN\' or \'weightedKNN\'.");
-                }
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'majoritymethod\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&majMethodXMLStr);
-            
-            XMLCh *rsgisFieldXMLStr = xercesc::XMLString::transcode("rsgis:field");
-            xercesc::DOMNodeList *fieldNodesList = argElement->getElementsByTagName(rsgisFieldXMLStr);
-            unsigned int numFieldTags = fieldNodesList->getLength();
-            
-            std::cout << "Found " << numFieldTags << " field tags" << std::endl;
-            
-            if(numFieldTags == 0)
-            {
-                throw rsgis::RSGISXMLArgumentsException("No field tags have been provided, at least 1 is required.");
-            }
-            
-            fields.reserve(numFieldTags);
-            
-            xercesc::DOMElement *attElement = NULL;
-            std::string fieldName = "";
-            for(int i = 0; i < numFieldTags; i++)
-            {
-                attElement = static_cast<xercesc::DOMElement*>(fieldNodesList->item(i));
+                this->option = RSGISExeRasterGIS::calcshapeindices;
                 
-                XMLCh *nameXMLStr = xercesc::XMLString::transcode("name");
-                if(attElement->hasAttribute(nameXMLStr))
+                XMLCh *clumpsXMLStr = xercesc::XMLString::transcode("clumps");
+                if(argElement->hasAttribute(clumpsXMLStr))
                 {
-                    char *charValue = xercesc::XMLString::transcode(attElement->getAttribute(nameXMLStr));
-                    fields.push_back(std::string(charValue));
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(clumpsXMLStr));
+                    this->inputImage = std::string(charValue);
                     xercesc::XMLString::release(&charValue);
                 }
                 else
                 {
-                    throw rsgis::RSGISXMLArgumentsException("No \'name\' attribute was provided.");
+                    throw rsgis::RSGISXMLArgumentsException("No \'clumps\' attribute was provided.");
                 }
-                xercesc::XMLString::release(&nameXMLStr);
-            } 
-        }
-        else if(xercesc::XMLString::equals(optionPopAttributePercentile, optionXML))
-        {
-            this->option = RSGISExeRasterGIS::popattributepercentile;
-            XMLCh *inputXMLStr = xercesc::XMLString::transcode("input");
-            if(argElement->hasAttribute(inputXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(inputXMLStr));
-                this->inputImage = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'input\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&inputXMLStr);
-            
-            XMLCh *clumpsXMLStr = xercesc::XMLString::transcode("clumps");
-            if(argElement->hasAttribute(clumpsXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(clumpsXMLStr));
-                this->clumpsImage = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'clumps\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&clumpsXMLStr);
-            
-            XMLCh *rsgisBandXMLStr = xercesc::XMLString::transcode("rsgis:band");
-            xercesc::DOMNodeList *bandNodesList = argElement->getElementsByTagName(rsgisBandXMLStr);
-            unsigned int numBands = bandNodesList->getLength();
-            
-            std::cout << "Found " << numBands << " Attributes" << std::endl;
-            
-            bandPercentiles = new std::vector<rsgis::cmds::RSGISBandAttPercentilesCmds*>();
-            bandPercentiles->reserve(numBands);
-            
-            rsgis::cmds::RSGISBandAttPercentilesCmds *bandPercentile = NULL;
-            xercesc::DOMElement *bandElement = NULL;
-            for(int i = 0; i < numBands; i++)
-            {
-                bandElement = static_cast<xercesc::DOMElement*>(bandNodesList->item(i));
+                xercesc::XMLString::release(&clumpsXMLStr);
                 
-                bandPercentile = new rsgis::cmds::RSGISBandAttPercentilesCmds();
+                XMLCh *rsgisIndexXMLStr = xercesc::XMLString::transcode("rsgis:index");
+                xercesc::DOMNodeList *indexNodesList = argElement->getElementsByTagName(rsgisIndexXMLStr);
+                unsigned int numIndexTags = indexNodesList->getLength();
                 
-                XMLCh *bandXMLStr = xercesc::XMLString::transcode("band");
-                if(bandElement->hasAttribute(bandXMLStr))
-                {
-                    char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(bandXMLStr));
-                    bandPercentile->band = textUtils.strto32bitUInt(std::string(charValue));
-                    xercesc::XMLString::release(&charValue);
-                }
-                else
-                {
-                    throw rsgis::RSGISXMLArgumentsException("No \'band\' attribute was provided.");
-                }
-                xercesc::XMLString::release(&bandXMLStr);
+                std::cout << "Found " << numIndexTags << " index tags" << std::endl;
                 
-                XMLCh *nameXMLStr = xercesc::XMLString::transcode("name");
-                if(bandElement->hasAttribute(nameXMLStr))
+                if(numIndexTags == 0)
                 {
-                    char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(nameXMLStr));
-                    bandPercentile->fieldName = std::string(charValue);
-                    xercesc::XMLString::release(&charValue);                    
-                }
-                else
-                {
-                    throw rsgis::RSGISXMLArgumentsException("No \'name\' attribute was provided.");
-                }
-                xercesc::XMLString::release(&nameXMLStr);
-                
-                XMLCh *percentileXMLStr = xercesc::XMLString::transcode("percentile");
-                if(bandElement->hasAttribute(percentileXMLStr))
-                {
-                    char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(percentileXMLStr));
-                    bandPercentile->percentile = textUtils.strto32bitUInt(std::string(charValue));
-                    xercesc::XMLString::release(&charValue);
-                }
-                else
-                {
-                    throw rsgis::RSGISXMLArgumentsException("No \'percentile\' attribute was provided.");
-                }
-                xercesc::XMLString::release(&percentileXMLStr);
-                
-                bandPercentiles->push_back(bandPercentile);
-            }
-            xercesc::XMLString::release(&rsgisBandXMLStr);
-            
-        }
-        else if(xercesc::XMLString::equals(optionExport2ASCII, optionXML))
-        {
-            this->option = RSGISExeRasterGIS::export2ascii;
-            
-            XMLCh *tableXMLStr = xercesc::XMLString::transcode("table");
-            if(argElement->hasAttribute(tableXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(tableXMLStr));
-                this->inputImage = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'table\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&tableXMLStr);
-            
-            XMLCh *outputXMLStr = xercesc::XMLString::transcode("output");
-            if(argElement->hasAttribute(outputXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outputXMLStr));
-                this->outputFile = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'output\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&outputXMLStr);
-                        
-            XMLCh *rsgisFieldXMLStr = xercesc::XMLString::transcode("rsgis:field");
-            xercesc::DOMNodeList *fieldNodesList = argElement->getElementsByTagName(rsgisFieldXMLStr);
-            unsigned int numFieldTags = fieldNodesList->getLength();
-            
-            std::cout << "Found " << numFieldTags << " field tags" << std::endl;
-            
-            if(numFieldTags == 0)
-            {
-                throw rsgis::RSGISXMLArgumentsException("No field tags have been provided, at least 1 is required.");
-            }
-            
-            fields.reserve(numFieldTags);
-            
-            xercesc::DOMElement *attElement = NULL;
-            std::string fieldName = "";
-            for(int i = 0; i < numFieldTags; i++)
-            {
-                attElement = static_cast<xercesc::DOMElement*>(fieldNodesList->item(i));
-                
-                XMLCh *nameXMLStr = xercesc::XMLString::transcode("name");
-                if(attElement->hasAttribute(nameXMLStr))
-                {
-                    char *charValue = xercesc::XMLString::transcode(attElement->getAttribute(nameXMLStr));
-                    fields.push_back(std::string(charValue));
-                    xercesc::XMLString::release(&charValue);
-                }
-                else
-                {
-                    throw rsgis::RSGISXMLArgumentsException("No \'name\' attribute was provided.");
-                }
-                xercesc::XMLString::release(&nameXMLStr);
-            }
-        }
-        else if(xercesc::XMLString::equals(optionClassTranslate, optionXML))
-        {
-            this->option = RSGISExeRasterGIS::classtranslate;
-            
-            XMLCh *tableXMLStr = xercesc::XMLString::transcode("table");
-            if(argElement->hasAttribute(tableXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(tableXMLStr));
-                this->inputImage = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'table\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&tableXMLStr);
-            
-            XMLCh *inFieldXMLStr = xercesc::XMLString::transcode("infield");
-            if(argElement->hasAttribute(inFieldXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(inFieldXMLStr));
-                this->classInField = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'infield\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&inFieldXMLStr);
-            
-            XMLCh *outFieldXMLStr = xercesc::XMLString::transcode("outfield");
-            if(argElement->hasAttribute(outFieldXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outFieldXMLStr));
-                this->classOutField = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'outfield\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&outFieldXMLStr);
-            
-            XMLCh *rsgisClassXMLStr = xercesc::XMLString::transcode("rsgis:class");
-            xercesc::DOMNodeList *classNodesList = argElement->getElementsByTagName(rsgisClassXMLStr);
-            unsigned int numClassTags = classNodesList->getLength();
-            
-            std::cout << "Found " << numClassTags << " class tags" << std::endl;
-            
-            if(numClassTags == 0)
-            {
-                throw rsgis::RSGISXMLArgumentsException("No class tags have been provided, at least 1 is required.");
-            }
-            
-            xercesc::DOMElement *attElement = NULL;
-            size_t inClassId = 0;
-            size_t outClassId = 0;
-            for(int i = 0; i < numClassTags; i++)
-            {
-                attElement = static_cast<xercesc::DOMElement*>(classNodesList->item(i));
-                
-                XMLCh *inIDXMLStr = xercesc::XMLString::transcode("inid");
-                if(attElement->hasAttribute(inIDXMLStr))
-                {
-                    char *charValue = xercesc::XMLString::transcode(attElement->getAttribute(inIDXMLStr));
-                    inClassId = textUtils.strtosizet(std::string(charValue));
-                    xercesc::XMLString::release(&charValue);
-                }
-                else
-                {
-                    throw rsgis::RSGISXMLArgumentsException("No \'inid\' attribute was provided.");
-                }
-                xercesc::XMLString::release(&inIDXMLStr);
-                
-                XMLCh *outIDXMLStr = xercesc::XMLString::transcode("outid");
-                if(attElement->hasAttribute(outIDXMLStr))
-                {
-                    char *charValue = xercesc::XMLString::transcode(attElement->getAttribute(outIDXMLStr));
-                    outClassId = textUtils.strtosizet(std::string(charValue));
-                    xercesc::XMLString::release(&charValue);
-                }
-                else
-                {
-                    throw rsgis::RSGISXMLArgumentsException("No \'outid\' attribute was provided.");
-                }
-                xercesc::XMLString::release(&outIDXMLStr);
-                
-                classPairs.insert(std::pair<size_t, size_t>(inClassId, outClassId));
-            }
-        }
-        else if(xercesc::XMLString::equals(optionColourClasses, optionXML))
-        {
-            this->option = RSGISExeRasterGIS::colourclasses;
-            
-            XMLCh *tableXMLStr = xercesc::XMLString::transcode("table");
-            if(argElement->hasAttribute(tableXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(tableXMLStr));
-                this->inputImage = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'table\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&tableXMLStr);
-            
-            XMLCh *classFieldXMLStr = xercesc::XMLString::transcode("classfield");
-            if(argElement->hasAttribute(classFieldXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(classFieldXMLStr));
-                this->classInField = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'classfield\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&classFieldXMLStr);
-            
-            
-            XMLCh *rsgisClassXMLStr = xercesc::XMLString::transcode("rsgis:class");
-            xercesc::DOMNodeList *classNodesList = argElement->getElementsByTagName(rsgisClassXMLStr);
-            unsigned int numClassTags = classNodesList->getLength();
-            
-            std::cout << "Found " << numClassTags << " class tags" << std::endl;
-            
-            if(numClassTags == 0)
-            {
-                throw rsgis::RSGISXMLArgumentsException("No class tags have been provided, at least 1 is required.");
-            }
-            
-            xercesc::DOMElement *attElement = NULL;
-            size_t classId = 0;
-            int red = 0;
-            int green = 0;
-            int blue = 0;
-            int alpha = 0;
-            for(int i = 0; i < numClassTags; i++)
-            {
-                attElement = static_cast<xercesc::DOMElement*>(classNodesList->item(i));
-                
-                XMLCh *idXMLStr = xercesc::XMLString::transcode("id");
-                if(attElement->hasAttribute(idXMLStr))
-                {
-                    char *charValue = xercesc::XMLString::transcode(attElement->getAttribute(idXMLStr));
-                    classId = textUtils.strtosizet(std::string(charValue));
-                    xercesc::XMLString::release(&charValue);
-                }
-                else
-                {
-                    throw rsgis::RSGISXMLArgumentsException("No \'id\' attribute was provided.");
-                }
-                xercesc::XMLString::release(&idXMLStr);
-                
-                XMLCh *redXMLStr = xercesc::XMLString::transcode("r");
-                if(attElement->hasAttribute(redXMLStr))
-                {
-                    char *charValue = xercesc::XMLString::transcode(attElement->getAttribute(redXMLStr));
-                    red = textUtils.strto32bitInt(std::string(charValue));
-                    xercesc::XMLString::release(&charValue);
-                }
-                else
-                {
-                    throw rsgis::RSGISXMLArgumentsException("No \'r\' attribute was provided.");
-                }
-                xercesc::XMLString::release(&redXMLStr);
-                
-                XMLCh *greenXMLStr = xercesc::XMLString::transcode("g");
-                if(attElement->hasAttribute(greenXMLStr))
-                {
-                    char *charValue = xercesc::XMLString::transcode(attElement->getAttribute(greenXMLStr));
-                    green = textUtils.strto32bitInt(std::string(charValue));
-                    xercesc::XMLString::release(&charValue);
-                }
-                else
-                {
-                    throw rsgis::RSGISXMLArgumentsException("No \'g\' attribute was provided.");
-                }
-                xercesc::XMLString::release(&greenXMLStr);
-                
-                XMLCh *blueXMLStr = xercesc::XMLString::transcode("b");
-                if(attElement->hasAttribute(blueXMLStr))
-                {
-                    char *charValue = xercesc::XMLString::transcode(attElement->getAttribute(blueXMLStr));
-                    blue = textUtils.strto32bitInt(std::string(charValue));
-                    xercesc::XMLString::release(&charValue);
-                }
-                else
-                {
-                    throw rsgis::RSGISXMLArgumentsException("No \'b\' attribute was provided.");
-                }
-                xercesc::XMLString::release(&blueXMLStr);
-                
-                XMLCh *alphaXMLStr = xercesc::XMLString::transcode("a");
-                if(attElement->hasAttribute(alphaXMLStr))
-                {
-                    char *charValue = xercesc::XMLString::transcode(attElement->getAttribute(alphaXMLStr));
-                    alpha = textUtils.strto32bitInt(std::string(charValue));
-                    xercesc::XMLString::release(&charValue);
-                }
-                else
-                {
-                    throw rsgis::RSGISXMLArgumentsException("No \'a\' attribute was provided.");
-                }
-                xercesc::XMLString::release(&alphaXMLStr);
-                
-                classColourPairs.insert(std::pair<size_t, rsgis::utils::RSGISColourInt>(classId, rsgis::utils::RSGISColourInt(red, green, blue, alpha)));
-            }
-        }
-        else if(xercesc::XMLString::equals(optionColourStrClasses, optionXML))
-        {
-            this->option = RSGISExeRasterGIS::colourstrclasses;
-            
-            XMLCh *tableXMLStr = xercesc::XMLString::transcode("table");
-            if(argElement->hasAttribute(tableXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(tableXMLStr));
-                this->inputImage = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'table\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&tableXMLStr);
-            
-            XMLCh *classFieldXMLStr = xercesc::XMLString::transcode("classfield");
-            if(argElement->hasAttribute(classFieldXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(classFieldXMLStr));
-                this->classInField = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'classfield\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&classFieldXMLStr);
-            
-            
-            XMLCh *rsgisClassXMLStr = xercesc::XMLString::transcode("rsgis:class");
-            xercesc::DOMNodeList *classNodesList = argElement->getElementsByTagName(rsgisClassXMLStr);
-            unsigned int numClassTags = classNodesList->getLength();
-            
-            std::cout << "Found " << numClassTags << " class tags" << std::endl;
-            
-            if(numClassTags == 0)
-            {
-                throw rsgis::RSGISXMLArgumentsException("No class tags have been provided, at least 1 is required.");
-            }
-            
-            xercesc::DOMElement *attElement = NULL;
-            std::string className = 0;
-            int red = 0;
-            int green = 0;
-            int blue = 0;
-            int alpha = 0;
-            for(int i = 0; i < numClassTags; i++)
-            {
-                std::cout << "i = " << i << std::endl;
-                attElement = static_cast<xercesc::DOMElement*>(classNodesList->item(i));
-                
-                XMLCh *nameXMLStr = xercesc::XMLString::transcode("classname");
-                if(attElement->hasAttribute(nameXMLStr))
-                {
-                    char *charValue = xercesc::XMLString::transcode(attElement->getAttribute(nameXMLStr));
-                    className = std::string(charValue);
-                    xercesc::XMLString::release(&charValue);
-                }
-                else
-                {
-                    throw rsgis::RSGISXMLArgumentsException("No \'classname\' attribute was provided.");
-                }
-                xercesc::XMLString::release(&nameXMLStr);
-                
-                XMLCh *redXMLStr = xercesc::XMLString::transcode("r");
-                if(attElement->hasAttribute(redXMLStr))
-                {
-                    char *charValue = xercesc::XMLString::transcode(attElement->getAttribute(redXMLStr));
-                    red = textUtils.strto32bitInt(std::string(charValue));
-                    xercesc::XMLString::release(&charValue);
-                }
-                else
-                {
-                    throw rsgis::RSGISXMLArgumentsException("No \'r\' attribute was provided.");
-                }
-                xercesc::XMLString::release(&redXMLStr);
-                
-                XMLCh *greenXMLStr = xercesc::XMLString::transcode("g");
-                if(attElement->hasAttribute(greenXMLStr))
-                {
-                    char *charValue = xercesc::XMLString::transcode(attElement->getAttribute(greenXMLStr));
-                    green = textUtils.strto32bitInt(std::string(charValue));
-                    xercesc::XMLString::release(&charValue);
-                }
-                else
-                {
-                    throw rsgis::RSGISXMLArgumentsException("No \'g\' attribute was provided.");
-                }
-                xercesc::XMLString::release(&greenXMLStr);
-                
-                XMLCh *blueXMLStr = xercesc::XMLString::transcode("b");
-                if(attElement->hasAttribute(blueXMLStr))
-                {
-                    char *charValue = xercesc::XMLString::transcode(attElement->getAttribute(blueXMLStr));
-                    blue = textUtils.strto32bitInt(std::string(charValue));
-                    xercesc::XMLString::release(&charValue);
-                }
-                else
-                {
-                    throw rsgis::RSGISXMLArgumentsException("No \'b\' attribute was provided.");
-                }
-                xercesc::XMLString::release(&blueXMLStr);
-                
-                XMLCh *alphaXMLStr = xercesc::XMLString::transcode("a");
-                if(attElement->hasAttribute(alphaXMLStr))
-                {
-                    char *charValue = xercesc::XMLString::transcode(attElement->getAttribute(alphaXMLStr));
-                    alpha = textUtils.strto32bitInt(std::string(charValue));
-                    xercesc::XMLString::release(&charValue);
-                }
-                else
-                {
-                    throw rsgis::RSGISXMLArgumentsException("No \'a\' attribute was provided.");
-                }
-                xercesc::XMLString::release(&alphaXMLStr);
-                
-                classStrColourPairs.insert(std::pair<std::string, rsgis::utils::RSGISColourInt>(className, rsgis::utils::RSGISColourInt(red, green, blue, alpha)));
-            }
-        }
-        else if(xercesc::XMLString::equals(optionGenColourTab, optionXML))
-        {
-            this->option = RSGISExeRasterGIS::gencolourtab;
-            
-            XMLCh *tableXMLStr = xercesc::XMLString::transcode("table");
-            if(argElement->hasAttribute(tableXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(tableXMLStr));
-                this->clumpsImage = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'table\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&tableXMLStr);
-            
-            XMLCh *inputXMLStr = xercesc::XMLString::transcode("input");
-            if(argElement->hasAttribute(inputXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(inputXMLStr));
-                this->inputImage = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'input\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&inputXMLStr);
-                        
-            XMLCh *redXMLStr = xercesc::XMLString::transcode("red");
-            if(argElement->hasAttribute(redXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(redXMLStr));
-                this->redBand = textUtils.strto32bitInt(std::string(charValue));
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'red\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&redXMLStr);
-            
-            XMLCh *greenXMLStr = xercesc::XMLString::transcode("green");
-            if(argElement->hasAttribute(greenXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(greenXMLStr));
-                this->greenBand = textUtils.strto32bitInt(std::string(charValue));
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'green\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&greenXMLStr);
-            
-            XMLCh *blueXMLStr = xercesc::XMLString::transcode("blue");
-            if(argElement->hasAttribute(blueXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(blueXMLStr));
-                this->blueBand = textUtils.strto32bitInt(std::string(charValue));
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'blue\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&blueXMLStr);
-        }
-        else if(xercesc::XMLString::equals(optionExportCols2Raster, optionXML))
-        {
-            this->option = RSGISExeRasterGIS::exportcols2raster;
-            
-            XMLCh *clumpsXMLStr = xercesc::XMLString::transcode("clumps");
-            if(argElement->hasAttribute(clumpsXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(clumpsXMLStr));
-                this->inputImage = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'clumps\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&clumpsXMLStr);
-            
-            XMLCh *outputXMLStr = xercesc::XMLString::transcode("output");
-            if(argElement->hasAttribute(outputXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outputXMLStr));
-                this->outputFile = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'output\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&outputXMLStr);
-            
-            // Set output image fomat (defaults to KEA)
-            this->imageFormat = "KEA";
-            XMLCh *formatXMLStr = xercesc::XMLString::transcode("format");
-            if(argElement->hasAttribute(formatXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(formatXMLStr));
-                this->imageFormat = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            xercesc::XMLString::release(&formatXMLStr);
-            
-            this->rsgisOutDataType = rsgis::rsgis_32float;
-            XMLCh *datatypeXMLStr = xercesc::XMLString::transcode("datatype");
-            if(argElement->hasAttribute(datatypeXMLStr))
-            {
-                XMLCh *dtByte = xercesc::XMLString::transcode("Byte");
-                XMLCh *dtUInt16 = xercesc::XMLString::transcode("UInt16");
-                XMLCh *dtInt16 = xercesc::XMLString::transcode("Int16");
-                XMLCh *dtUInt32 = xercesc::XMLString::transcode("UInt32");
-                XMLCh *dtInt32 = xercesc::XMLString::transcode("Int32");
-                XMLCh *dtFloat32 = xercesc::XMLString::transcode("Float32");
-                XMLCh *dtFloat64 = xercesc::XMLString::transcode("Float64");
-                
-                const XMLCh *dtXMLValue = argElement->getAttribute(datatypeXMLStr);
-                if(xercesc::XMLString::equals(dtByte, dtXMLValue))
-                {
-                    this->rsgisOutDataType = rsgis::rsgis_8int;
-                }
-                else if(xercesc::XMLString::equals(dtUInt16, dtXMLValue))
-                {
-                    this->rsgisOutDataType = rsgis::rsgis_16uint;
-                }
-                else if(xercesc::XMLString::equals(dtInt16, dtXMLValue))
-                {
-                    this->rsgisOutDataType = rsgis::rsgis_16int;
-                }
-                else if(xercesc::XMLString::equals(dtUInt32, dtXMLValue))
-                {
-                    this->rsgisOutDataType = rsgis::rsgis_32uint;
-                }
-                else if(xercesc::XMLString::equals(dtInt32, dtXMLValue))
-                {
-                    this->rsgisOutDataType = rsgis::rsgis_32int;
-                }
-                else if(xercesc::XMLString::equals(dtFloat32, dtXMLValue))
-                {
-                    this->rsgisOutDataType = rsgis::rsgis_32float;
-                }
-                else if(xercesc::XMLString::equals(dtFloat64, dtXMLValue))
-                {
-                    this->rsgisOutDataType = rsgis::rsgis_64float;
-                }
-                else
-                {
-                    std::cerr << "Data type not recognised, defaulting to 32 bit float.";
-                    this->rsgisOutDataType = rsgis::rsgis_32float;
+                    throw rsgis::RSGISXMLArgumentsException("No index tags have been provided, at least 1 is required.");
                 }
                 
-                xercesc::XMLString::release(&dtByte);
-                xercesc::XMLString::release(&dtUInt16);
-                xercesc::XMLString::release(&dtInt16);
-                xercesc::XMLString::release(&dtUInt32);
-                xercesc::XMLString::release(&dtInt32);
-                xercesc::XMLString::release(&dtFloat32);
-                xercesc::XMLString::release(&dtFloat64);
-            }
-            xercesc::XMLString::release(&datatypeXMLStr);
-            
-            XMLCh *rsgisFieldXMLStr = xercesc::XMLString::transcode("rsgis:field");
-            xercesc::DOMNodeList *fieldNodesList = argElement->getElementsByTagName(rsgisFieldXMLStr);
-            unsigned int numFieldTags = fieldNodesList->getLength();
-            
-            std::cout << "Found " << numFieldTags << " field tags" << std::endl;
-            
-            if(numFieldTags == 0)
-            {
-                throw rsgis::RSGISXMLArgumentsException("No field tags have been provided, at least 1 is required.");
-            }
-            
-            fields.reserve(numFieldTags);
-            
-            xercesc::DOMElement *attElement = NULL;
-            std::string fieldName = "";
-            for(int i = 0; i < numFieldTags; i++)
-            {
-                attElement = static_cast<xercesc::DOMElement*>(fieldNodesList->item(i));
+                shapeIndexes = new std::vector<rsgis::rastergis::RSGISShapeParam*>();
+                shapeIndexes->reserve(numIndexTags);
                 
-                XMLCh *nameXMLStr = xercesc::XMLString::transcode("name");
-                if(attElement->hasAttribute(nameXMLStr))
+                rsgis::rastergis::RSGISShapeParam *index = NULL;
+                xercesc::DOMElement *attElement = NULL;
+                for(int i = 0; i < numIndexTags; i++)
                 {
-                    char *charValue = xercesc::XMLString::transcode(attElement->getAttribute(nameXMLStr));
-                    fields.push_back(std::string(charValue));
-                    xercesc::XMLString::release(&charValue);
-                }
-                else
-                {
-                    throw rsgis::RSGISXMLArgumentsException("No \'name\' attribute was provided.");
-                }
-                xercesc::XMLString::release(&nameXMLStr);
-            }
-        }
-        else if(xercesc::XMLString::equals(optionStrClassMajority, optionXML))
-        {
-            this->option = RSGISExeRasterGIS::strclassmajority;
-            
-            XMLCh *baseXMLStr = xercesc::XMLString::transcode("base");
-            if(argElement->hasAttribute(baseXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(baseXMLStr));
-                this->baseSegment = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'base\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&baseXMLStr);
-            
-            
-            XMLCh *baseClassXMLStr = xercesc::XMLString::transcode("baseclass");
-            if(argElement->hasAttribute(baseClassXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(baseClassXMLStr));
-                this->baseClassCol = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'baseclass\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&baseClassXMLStr);
-
-            XMLCh *infoXMLStr = xercesc::XMLString::transcode("info");
-            if(argElement->hasAttribute(infoXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(infoXMLStr));
-                this->infoSegment = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'info\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&infoXMLStr);
-            
-            XMLCh *infoClassXMLStr = xercesc::XMLString::transcode("infoclass");
-            if(argElement->hasAttribute(infoClassXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(infoClassXMLStr));
-                this->infoClassCol = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'infoclass\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&infoClassXMLStr);
-            
-        }
-        else if(xercesc::XMLString::equals(optionSpecDistMajorityClassifier, optionXML))
-        {
-            this->option = RSGISExeRasterGIS::specdistmajorityclassifier;
-            
-            XMLCh *imageXMLStr = xercesc::XMLString::transcode("image");
-            if(argElement->hasAttribute(imageXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(imageXMLStr));
-                this->inputImage = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'image\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&imageXMLStr);
-            
-            XMLCh *inClassFieldXMLStr = xercesc::XMLString::transcode("inclassfield");
-            if(argElement->hasAttribute(inClassFieldXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(inClassFieldXMLStr));
-                this->inClassNameField = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'inclassfield\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&inClassFieldXMLStr);
-            
-            XMLCh *outClassFieldXMLStr = xercesc::XMLString::transcode("outclassfield");
-            if(argElement->hasAttribute(outClassFieldXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outClassFieldXMLStr));
-                this->outClassNameField = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'outclassfield\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&outClassFieldXMLStr);
-            
-            XMLCh *trainingColXMLStr = xercesc::XMLString::transcode("trainingcol");
-            if(argElement->hasAttribute(trainingColXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(trainingColXMLStr));
-                this->trainingSelectCol = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'trainingcol\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&trainingColXMLStr);
-            
-            XMLCh *eastingsXMLStr = xercesc::XMLString::transcode("eastings");
-            if(argElement->hasAttribute(eastingsXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(eastingsXMLStr));
-                this->eastingsField = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'eastings\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&eastingsXMLStr);
-            
-            XMLCh *northingsXMLStr = xercesc::XMLString::transcode("northings");
-            if(argElement->hasAttribute(northingsXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(northingsXMLStr));
-                this->northingsField = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'northings\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&northingsXMLStr);
-            
-            XMLCh *areaXMLStr = xercesc::XMLString::transcode("area");
-            if(argElement->hasAttribute(areaXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(areaXMLStr));
-                this->areaField = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'area\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&areaXMLStr);
-            
-            XMLCh *weightFieldXMLStr = xercesc::XMLString::transcode("weightfield");
-            if(argElement->hasAttribute(weightFieldXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(weightFieldXMLStr));
-                this->majWeightField = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'weightfield\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&weightFieldXMLStr);
-            
-            XMLCh *specDistThresholdXMLStr = xercesc::XMLString::transcode("specdistthreshold");
-            if(argElement->hasAttribute(specDistThresholdXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(specDistThresholdXMLStr));
-                this->specDistThreshold = textUtils.strtofloat(std::string(charValue));
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'specdistthreshold\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&specDistThresholdXMLStr);
-            
-            XMLCh *spatDistThresholdXMLStr = xercesc::XMLString::transcode("spatdistthreshold");
-            if(argElement->hasAttribute(spatDistThresholdXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(spatDistThresholdXMLStr));
-                this->distThreshold = textUtils.strtofloat(std::string(charValue));
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'spatdistthreshold\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&spatDistThresholdXMLStr);
-            
-            XMLCh *thresOriginDistXMLStr = xercesc::XMLString::transcode("thresorigindist");
-            if(argElement->hasAttribute(thresOriginDistXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(thresOriginDistXMLStr));
-                this->specThresOriginDist = textUtils.strtofloat(std::string(charValue));
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                this->specThresOriginDist = 100;
-            }
-            xercesc::XMLString::release(&thresOriginDistXMLStr);
-            
-            XMLCh *majMethodXMLStr = xercesc::XMLString::transcode("specdistmethod");
-            if(argElement->hasAttribute(majMethodXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(majMethodXMLStr));
-                std::string distMethodStr = std::string(charValue);
-                if(distMethodStr == "euclidean")
-                {
-                    this->distThresMethod = rsgis::rastergis::stdEucSpecDist;
-                }
-                else if(distMethodStr == "origineucweighted")
-                {
-                    this->distThresMethod = rsgis::rastergis::originWeightedEuc;
-                }
-                else
-                {
-                    throw rsgis::RSGISXMLArgumentsException("Distance method is not recognised, options are \'euclidean\' or \'origineucweighted\'.");
-                }
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'majoritymethod\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&majMethodXMLStr);
-            
-            XMLCh *rsgisFieldXMLStr = xercesc::XMLString::transcode("rsgis:field");
-            xercesc::DOMNodeList *fieldNodesList = argElement->getElementsByTagName(rsgisFieldXMLStr);
-            unsigned int numFieldTags = fieldNodesList->getLength();
-            
-            std::cout << "Found " << numFieldTags << " field tags" << std::endl;
-            
-            if(numFieldTags == 0)
-            {
-                throw rsgis::RSGISXMLArgumentsException("No field tags have been provided, at least 1 is required.");
-            }
-            
-            fields.reserve(numFieldTags);
-            
-            xercesc::DOMElement *attElement = NULL;
-            std::string fieldName = "";
-            for(int i = 0; i < numFieldTags; i++)
-            {
-                attElement = static_cast<xercesc::DOMElement*>(fieldNodesList->item(i));
-                
-                XMLCh *nameXMLStr = xercesc::XMLString::transcode("name");
-                if(attElement->hasAttribute(nameXMLStr))
-                {
-                    char *charValue = xercesc::XMLString::transcode(attElement->getAttribute(nameXMLStr));
-                    fields.push_back(std::string(charValue));
-                    xercesc::XMLString::release(&charValue);
-                }
-                else
-                {
-                    throw rsgis::RSGISXMLArgumentsException("No \'name\' attribute was provided.");
-                }
-                xercesc::XMLString::release(&nameXMLStr);
-            }
-        }
-        else if(xercesc::XMLString::equals(optionMaxLikelihoodClassifier, optionXML))
-        {
-            this->option = RSGISExeRasterGIS::maxlikelihoodclassifier;
-            
-            XMLCh *imageXMLStr = xercesc::XMLString::transcode("image");
-            if(argElement->hasAttribute(imageXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(imageXMLStr));
-                this->inputImage = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'image\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&imageXMLStr);
-            
-            XMLCh *inClassFieldXMLStr = xercesc::XMLString::transcode("inclassfield");
-            if(argElement->hasAttribute(inClassFieldXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(inClassFieldXMLStr));
-                this->inClassNameField = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'inclassfield\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&inClassFieldXMLStr);
-            
-            XMLCh *outClassFieldXMLStr = xercesc::XMLString::transcode("outclassfield");
-            if(argElement->hasAttribute(outClassFieldXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outClassFieldXMLStr));
-                this->outClassNameField = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'outclassfield\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&outClassFieldXMLStr);
-            
-            XMLCh *trainingColXMLStr = xercesc::XMLString::transcode("trainingcol");
-            if(argElement->hasAttribute(trainingColXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(trainingColXMLStr));
-                this->trainingSelectCol = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'trainingcol\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&trainingColXMLStr);
-            
-            XMLCh *areaXMLStr = xercesc::XMLString::transcode("area");
-            if(argElement->hasAttribute(areaXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(areaXMLStr));
-                this->areaField = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'area\' attribute was provided.");
-            }
-            
-            XMLCh *priorsXMLStr = xercesc::XMLString::transcode("priors");
-            if(argElement->hasAttribute(priorsXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(priorsXMLStr));
-                std::string priorsMethodStr = std::string(charValue);
-                if(priorsMethodStr == "equal")
-                {
-                    this->priorsMethod = rsgis::rastergis::rsgis_equal;
-                }
-                else if(priorsMethodStr == "area")
-                {
-                    this->priorsMethod = rsgis::rastergis::rsgis_area;
-                }
-                else if(priorsMethodStr == "samples")
-                {
-                    this->priorsMethod = rsgis::rastergis::rsgis_samples;
-                }
-                else
-                {
-                    this->priorsMethod = rsgis::rastergis::rsgis_userdefined;
-                    try
+                    attElement = static_cast<xercesc::DOMElement*>(indexNodesList->item(i));
+                    
+                    index = new rsgis::rastergis::RSGISShapeParam();
+                    
+                    
+                    XMLCh *nameXMLStr = xercesc::XMLString::transcode("name");
+                    if(attElement->hasAttribute(nameXMLStr))
                     {
-                        this->priorStrs = textUtils.readFileToStringVector(priorsMethodStr);
+                        char *charValue = xercesc::XMLString::transcode(attElement->getAttribute(nameXMLStr));
+                        index->idx = rsgis::rastergis::RSGISCalcClumpShapeParameters::getRSGISShapeIndex(std::string(charValue));
+                        xercesc::XMLString::release(&charValue);
                     }
-                    catch(rsgis::utils::RSGISTextException &e)
+                    else
                     {
-                        throw rsgis::RSGISXMLArgumentsException("Error reading priors files. Options are equal | area | samples | file.txt");
+                        throw rsgis::RSGISXMLArgumentsException("No \'name\' attribute was provided.");
                     }
+                    xercesc::XMLString::release(&nameXMLStr);
+                    
+                    
+                    XMLCh *columnXMLStr = xercesc::XMLString::transcode("column");
+                    if(attElement->hasAttribute(columnXMLStr))
+                    {
+                        char *charValue = xercesc::XMLString::transcode(attElement->getAttribute(columnXMLStr));
+                        index->colName = std::string(charValue);
+                        xercesc::XMLString::release(&charValue);
+                    }
+                    else
+                    {
+                        throw rsgis::RSGISXMLArgumentsException("No \'column\' attribute was provided.");
+                    }
+                    xercesc::XMLString::release(&columnXMLStr);
+                    
+                    shapeIndexes->push_back(index);
                 }
-                xercesc::XMLString::release(&charValue);
             }
-            else
+            else if(xercesc::XMLString::equals(optionDefineClumpTilePosition, optionXML))
             {
-                throw rsgis::RSGISXMLArgumentsException("No \'priors\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&priorsXMLStr);
-            
-            
-            XMLCh *rsgisFieldXMLStr = xercesc::XMLString::transcode("rsgis:field");
-            xercesc::DOMNodeList *fieldNodesList = argElement->getElementsByTagName(rsgisFieldXMLStr);
-            unsigned int numFieldTags = fieldNodesList->getLength();
-            
-            std::cout << "Found " << numFieldTags << " field tags" << std::endl;
-            
-            if(numFieldTags == 0)
-            {
-                throw rsgis::RSGISXMLArgumentsException("No field tags have been provided, at least 1 is required.");
-            }
-            
-            fields.reserve(numFieldTags);
-            
-            xercesc::DOMElement *attElement = NULL;
-            std::string fieldName = "";
-            for(int i = 0; i < numFieldTags; i++)
-            {
-                attElement = static_cast<xercesc::DOMElement*>(fieldNodesList->item(i));
+                this->option = RSGISExeRasterGIS::defineclumptileposition;
                 
-                XMLCh *nameXMLStr = xercesc::XMLString::transcode("name");
-                if(attElement->hasAttribute(nameXMLStr))
+                XMLCh *clumpsXMLStr = xercesc::XMLString::transcode("clumps");
+                if(argElement->hasAttribute(clumpsXMLStr))
                 {
-                    char *charValue = xercesc::XMLString::transcode(attElement->getAttribute(nameXMLStr));
-                    fields.push_back(std::string(charValue));
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(clumpsXMLStr));
+                    this->clumpsImage = std::string(charValue);
                     xercesc::XMLString::release(&charValue);
                 }
                 else
                 {
-                    throw rsgis::RSGISXMLArgumentsException("No \'name\' attribute was provided.");
+                    throw rsgis::RSGISXMLArgumentsException("No \'clumps\' attribute was provided.");
                 }
-                xercesc::XMLString::release(&nameXMLStr);
-            }
-        }
-        else if(xercesc::XMLString::equals(optionMaxLikelihoodClassifierLocalPriors, optionXML))
-        {
-            this->option = RSGISExeRasterGIS::maxlikelihoodclassifierlocalpriors;
-            
-            XMLCh *imageXMLStr = xercesc::XMLString::transcode("image");
-            if(argElement->hasAttribute(imageXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(imageXMLStr));
-                this->inputImage = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'image\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&imageXMLStr);
-            
-            XMLCh *inClassFieldXMLStr = xercesc::XMLString::transcode("inclassfield");
-            if(argElement->hasAttribute(inClassFieldXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(inClassFieldXMLStr));
-                this->inClassNameField = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'inclassfield\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&inClassFieldXMLStr);
-            
-            XMLCh *outClassFieldXMLStr = xercesc::XMLString::transcode("outclassfield");
-            if(argElement->hasAttribute(outClassFieldXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outClassFieldXMLStr));
-                this->outClassNameField = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'outclassfield\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&outClassFieldXMLStr);
-            
-            XMLCh *trainingColXMLStr = xercesc::XMLString::transcode("trainingcol");
-            if(argElement->hasAttribute(trainingColXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(trainingColXMLStr));
-                this->trainingSelectCol = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'trainingcol\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&trainingColXMLStr);
-            
-            XMLCh *eastingsXMLStr = xercesc::XMLString::transcode("eastings");
-            if(argElement->hasAttribute(eastingsXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(eastingsXMLStr));
-                this->eastingsField = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'eastings\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&eastingsXMLStr);
-            
-            XMLCh *northingsXMLStr = xercesc::XMLString::transcode("northings");
-            if(argElement->hasAttribute(northingsXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(northingsXMLStr));
-                this->northingsField = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'northings\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&northingsXMLStr);
-            
-            XMLCh *areaXMLStr = xercesc::XMLString::transcode("area");
-            if(argElement->hasAttribute(areaXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(areaXMLStr));
-                this->areaField = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'area\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&areaXMLStr);
-            
-            XMLCh *spatialRadiusXMLStr = xercesc::XMLString::transcode("spatialradius");
-            if(argElement->hasAttribute(spatialRadiusXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(spatialRadiusXMLStr));
-                this->distThreshold = textUtils.strtofloat(std::string(charValue));
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'spatialradius\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&spatialRadiusXMLStr);
-            
-            
-            XMLCh *weightAXMLStr = xercesc::XMLString::transcode("weighta");
-            if(argElement->hasAttribute(weightAXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(weightAXMLStr));
-                this->weightA = textUtils.strtofloat(std::string(charValue));
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                this->weightA = 3;
-            }
-            xercesc::XMLString::release(&weightAXMLStr);
-            
-            XMLCh *majMethodXMLStr = xercesc::XMLString::transcode("majoritymethod");
-            if(argElement->hasAttribute(majMethodXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(majMethodXMLStr));
-                std::string majMethodStr = std::string(charValue);
-                if(majMethodStr == "area")
-                {
-                    this->priorsMethod = rsgis::rastergis::rsgis_area;
-                }
-                else if(majMethodStr == "weighted")
-                {
-                    this->priorsMethod = rsgis::rastergis::rsgis_weighted;
-                }
-                else
-                {
-                    throw rsgis::RSGISXMLArgumentsException("Majority method is not recognised, options are \'area\' or \'weighted\'.");
-                }
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'majoritymethod\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&majMethodXMLStr);
-            
-            XMLCh *noZeroPriorsXMLStr = xercesc::XMLString::transcode("nozeropriors");
-            if(argElement->hasAttribute(noZeroPriorsXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(noZeroPriorsXMLStr));
-                std::string noZeroPriorsStr = std::string(charValue);
-                if(noZeroPriorsStr == "yes")
-                {
-                    this->allowZeroPriors = true;
-                }
-                else
-                {
-                    this->allowZeroPriors = false;
-                }
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'nozeropriors\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&noZeroPriorsXMLStr);
-            
-            XMLCh *rsgisFieldXMLStr = xercesc::XMLString::transcode("rsgis:field");
-            xercesc::DOMNodeList *fieldNodesList = argElement->getElementsByTagName(rsgisFieldXMLStr);
-            unsigned int numFieldTags = fieldNodesList->getLength();
-            
-            std::cout << "Found " << numFieldTags << " field tags" << std::endl;
-            
-            if(numFieldTags == 0)
-            {
-                throw rsgis::RSGISXMLArgumentsException("No field tags have been provided, at least 1 is required.");
-            }
-            
-            fields.reserve(numFieldTags);
-            
-            xercesc::DOMElement *attElement = NULL;
-            std::string fieldName = "";
-            for(int i = 0; i < numFieldTags; i++)
-            {
-                attElement = static_cast<xercesc::DOMElement*>(fieldNodesList->item(i));
+                xercesc::XMLString::release(&clumpsXMLStr);
                 
-                XMLCh *nameXMLStr = xercesc::XMLString::transcode("name");
-                if(attElement->hasAttribute(nameXMLStr))
+                XMLCh *tileXMLStr = xercesc::XMLString::transcode("tile");
+                if(argElement->hasAttribute(tileXMLStr))
                 {
-                    char *charValue = xercesc::XMLString::transcode(attElement->getAttribute(nameXMLStr));
-                    fields.push_back(std::string(charValue));
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(tileXMLStr));
+                    this->tileImage = std::string(charValue);
                     xercesc::XMLString::release(&charValue);
                 }
                 else
                 {
-                    throw rsgis::RSGISXMLArgumentsException("No \'name\' attribute was provided.");
+                    throw rsgis::RSGISXMLArgumentsException("No \'tile\' attribute was provided.");
                 }
-                xercesc::XMLString::release(&nameXMLStr);
-            }
-        }
-        else if(xercesc::XMLString::equals(optionClassMask, optionXML))
-        {
-            this->option = RSGISExeRasterGIS::classmask;
-            
-            XMLCh *clumpsXMLStr = xercesc::XMLString::transcode("clumps");
-            if(argElement->hasAttribute(clumpsXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(clumpsXMLStr));
-                this->inputImage = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'clumps\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&clumpsXMLStr);
-            
-            XMLCh *outputXMLStr = xercesc::XMLString::transcode("output");
-            if(argElement->hasAttribute(outputXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outputXMLStr));
-                this->outputFile = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'output\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&outputXMLStr);
-            
-            // Set output image fomat (defaults to KEA)
-            this->imageFormat = "KEA";
-            XMLCh *formatXMLStr = xercesc::XMLString::transcode("format");
-            if(argElement->hasAttribute(formatXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(formatXMLStr));
-                this->imageFormat = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            xercesc::XMLString::release(&formatXMLStr);
-            
-            
-            this->outDataType = GDT_Byte;
-            XMLCh *datatypeXMLStr = xercesc::XMLString::transcode("datatype");
-            if(argElement->hasAttribute(datatypeXMLStr))
-            {
-                XMLCh *dtByte = xercesc::XMLString::transcode("Byte");
-                XMLCh *dtUInt16 = xercesc::XMLString::transcode("UInt16");
-                XMLCh *dtInt16 = xercesc::XMLString::transcode("Int16");
-                XMLCh *dtUInt32 = xercesc::XMLString::transcode("UInt32");
-                XMLCh *dtInt32 = xercesc::XMLString::transcode("Int32");
-                XMLCh *dtFloat32 = xercesc::XMLString::transcode("Float32");
-                XMLCh *dtFloat64 = xercesc::XMLString::transcode("Float64");
+                xercesc::XMLString::release(&tileXMLStr);
                 
-                const XMLCh *dtXMLValue = argElement->getAttribute(datatypeXMLStr);
-                if(xercesc::XMLString::equals(dtByte, dtXMLValue))
+                XMLCh *colNameXMLStr = xercesc::XMLString::transcode("colname");
+                if(argElement->hasAttribute(colNameXMLStr))
                 {
-                    this->outDataType = GDT_Byte;
-                }
-                else if(xercesc::XMLString::equals(dtUInt16, dtXMLValue))
-                {
-                    this->outDataType = GDT_UInt16;
-                }
-                else if(xercesc::XMLString::equals(dtInt16, dtXMLValue))
-                {
-                    this->outDataType = GDT_Int16;
-                }
-                else if(xercesc::XMLString::equals(dtUInt32, dtXMLValue))
-                {
-                    this->outDataType = GDT_UInt32;
-                }
-                else if(xercesc::XMLString::equals(dtInt32, dtXMLValue))
-                {
-                    this->outDataType = GDT_Int32;
-                }
-                else if(xercesc::XMLString::equals(dtFloat32, dtXMLValue))
-                {
-                    this->outDataType = GDT_Float32;
-                }
-                else if(xercesc::XMLString::equals(dtFloat64, dtXMLValue))
-                {
-                    this->outDataType = GDT_Float64;
-                }
-                else
-                {
-                    std::cerr << "Data type not recognised, defaulting to 32 bit float.";
-                    this->outDataType = GDT_Byte;
-                }
-                
-                xercesc::XMLString::release(&dtByte);
-                xercesc::XMLString::release(&dtUInt16);
-                xercesc::XMLString::release(&dtInt16);
-                xercesc::XMLString::release(&dtUInt32);
-                xercesc::XMLString::release(&dtInt32);
-                xercesc::XMLString::release(&dtFloat32);
-                xercesc::XMLString::release(&dtFloat64);
-            }
-            xercesc::XMLString::release(&datatypeXMLStr);
-            
-            XMLCh *classColumnXMLStr = xercesc::XMLString::transcode("classcolumn");
-            if(argElement->hasAttribute(classColumnXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(classColumnXMLStr));
-                this->classField = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'classcolumn\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&classColumnXMLStr);
-            
-            XMLCh *classXMLStr = xercesc::XMLString::transcode("class");
-            if(argElement->hasAttribute(classXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(classXMLStr));
-                this->className = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'class\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&classXMLStr);
-            
-            
-        }
-        else if(xercesc::XMLString::equals(optionFindNeighbours, optionXML))
-        {
-            this->option = RSGISExeRasterGIS::findneighbours;
-            
-            XMLCh *clumpsXMLStr = xercesc::XMLString::transcode("clumps");
-            if(argElement->hasAttribute(clumpsXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(clumpsXMLStr));
-                this->inputImage = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'clumps\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&clumpsXMLStr);
-            
-        }
-        else if(xercesc::XMLString::equals(optionFindBoundaryPixels, optionXML))
-        {
-            this->option = RSGISExeRasterGIS::findboundarypixels;
-            
-            XMLCh *clumpsXMLStr = xercesc::XMLString::transcode("clumps");
-            if(argElement->hasAttribute(clumpsXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(clumpsXMLStr));
-                this->inputImage = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'clumps\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&clumpsXMLStr);
-            
-            XMLCh *outputXMLStr = xercesc::XMLString::transcode("output");
-            if(argElement->hasAttribute(outputXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outputXMLStr));
-                this->outputFile = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'output\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&outputXMLStr);
-            
-            // Set output image fomat (defaults to KEA)
-            this->imageFormat = "KEA";
-            XMLCh *formatXMLStr = xercesc::XMLString::transcode("format");
-            if(argElement->hasAttribute(formatXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(formatXMLStr));
-                this->imageFormat = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            xercesc::XMLString::release(&formatXMLStr);
-        }
-        else if(xercesc::XMLString::equals(optionCalcBorderLength, optionXML))
-        {
-            this->option = RSGISExeRasterGIS::calcborderlength;
-            
-            XMLCh *clumpsXMLStr = xercesc::XMLString::transcode("clumps");
-            if(argElement->hasAttribute(clumpsXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(clumpsXMLStr));
-                this->inputImage = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'clumps\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&clumpsXMLStr);
-            
-            XMLCh *ignoreZeroEdgesXMLStr = xercesc::XMLString::transcode("ignorezeroedges");
-            if(argElement->hasAttribute(ignoreZeroEdgesXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(ignoreZeroEdgesXMLStr));
-                std::string ignoreZeroEdgesStr = std::string(charValue);
-                if(ignoreZeroEdgesStr == "yes")
-                {
-                    this->ignoreZeroEdges = true;
-                }
-                else
-                {
-                    this->ignoreZeroEdges = false;
-                }
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'ignorezeroedges\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&ignoreZeroEdgesXMLStr);
-            
-            XMLCh *colNameXMLStr = xercesc::XMLString::transcode("colname");
-            if(argElement->hasAttribute(colNameXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(colNameXMLStr));
-                this->outColsName = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'colname\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&colNameXMLStr);
-            
-        }
-        else if(xercesc::XMLString::equals(optionCalcRelBorderLength, optionXML))
-        {
-            this->option = RSGISExeRasterGIS::calcrelborder;
-            
-            XMLCh *clumpsXMLStr = xercesc::XMLString::transcode("clumps");
-            if(argElement->hasAttribute(clumpsXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(clumpsXMLStr));
-                this->inputImage = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'clumps\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&clumpsXMLStr);
-            
-            XMLCh *ignoreZeroEdgesXMLStr = xercesc::XMLString::transcode("ignorezeroedges");
-            if(argElement->hasAttribute(ignoreZeroEdgesXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(ignoreZeroEdgesXMLStr));
-                std::string ignoreZeroEdgesStr = std::string(charValue);
-                if(ignoreZeroEdgesStr == "yes")
-                {
-                    this->ignoreZeroEdges = true;
-                }
-                else
-                {
-                    this->ignoreZeroEdges = false;
-                }
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'ignorezeroedges\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&ignoreZeroEdgesXMLStr);
-            
-            XMLCh *colNameXMLStr = xercesc::XMLString::transcode("colname");
-            if(argElement->hasAttribute(colNameXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(colNameXMLStr));
-                this->outColsName = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'colname\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&colNameXMLStr);
-            
-            XMLCh *classColumnXMLStr = xercesc::XMLString::transcode("classcolumn");
-            if(argElement->hasAttribute(classColumnXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(classColumnXMLStr));
-                this->classNameField = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'classcolumn\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&classColumnXMLStr);
-            
-            XMLCh *classNameXMLStr = xercesc::XMLString::transcode("classname");
-            if(argElement->hasAttribute(classNameXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(classNameXMLStr));
-                this->className = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'classname\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&classNameXMLStr);
-            
-        }
-        else if(xercesc::XMLString::equals(optionCalcShapeIndices, optionXML))
-        {
-            this->option = RSGISExeRasterGIS::calcshapeindices;
-            
-            XMLCh *clumpsXMLStr = xercesc::XMLString::transcode("clumps");
-            if(argElement->hasAttribute(clumpsXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(clumpsXMLStr));
-                this->inputImage = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'clumps\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&clumpsXMLStr);
-            
-            XMLCh *rsgisIndexXMLStr = xercesc::XMLString::transcode("rsgis:index");
-            xercesc::DOMNodeList *indexNodesList = argElement->getElementsByTagName(rsgisIndexXMLStr);
-            unsigned int numIndexTags = indexNodesList->getLength();
-            
-            std::cout << "Found " << numIndexTags << " index tags" << std::endl;
-            
-            if(numIndexTags == 0)
-            {
-                throw rsgis::RSGISXMLArgumentsException("No index tags have been provided, at least 1 is required.");
-            }
-            
-            shapeIndexes = new std::vector<rsgis::rastergis::RSGISShapeParam*>();
-            shapeIndexes->reserve(numIndexTags);
-            
-            rsgis::rastergis::RSGISShapeParam *index = NULL;
-            xercesc::DOMElement *attElement = NULL;
-            for(int i = 0; i < numIndexTags; i++)
-            {
-                attElement = static_cast<xercesc::DOMElement*>(indexNodesList->item(i));
-                
-                index = new rsgis::rastergis::RSGISShapeParam();
-                
-                
-                XMLCh *nameXMLStr = xercesc::XMLString::transcode("name");
-                if(attElement->hasAttribute(nameXMLStr))
-                {
-                    char *charValue = xercesc::XMLString::transcode(attElement->getAttribute(nameXMLStr));
-                    index->idx = rsgis::rastergis::RSGISCalcClumpShapeParameters::getRSGISShapeIndex(std::string(charValue));
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(colNameXMLStr));
+                    this->outColsName = std::string(charValue);
                     xercesc::XMLString::release(&charValue);
                 }
                 else
                 {
-                    throw rsgis::RSGISXMLArgumentsException("No \'name\' attribute was provided.");
+                    throw rsgis::RSGISXMLArgumentsException("No \'colname\' attribute was provided.");
                 }
-                xercesc::XMLString::release(&nameXMLStr);
+                xercesc::XMLString::release(&colNameXMLStr);
                 
-                
-                XMLCh *columnXMLStr = xercesc::XMLString::transcode("column");
-                if(attElement->hasAttribute(columnXMLStr))
+                XMLCh *overlapXMLStr = xercesc::XMLString::transcode("overlap");
+                if(argElement->hasAttribute(overlapXMLStr))
                 {
-                    char *charValue = xercesc::XMLString::transcode(attElement->getAttribute(columnXMLStr));
-                    index->colName = std::string(charValue);
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(overlapXMLStr));
+                    this->tileOverlap = textUtils.strto32bitInt(std::string(charValue));
                     xercesc::XMLString::release(&charValue);
                 }
                 else
                 {
-                    throw rsgis::RSGISXMLArgumentsException("No \'column\' attribute was provided.");
+                    throw rsgis::RSGISXMLArgumentsException("No \'overlap\' attribute was provided.");
                 }
-                xercesc::XMLString::release(&columnXMLStr);
+                xercesc::XMLString::release(&overlapXMLStr);
                 
-                shapeIndexes->push_back(index);
+                
+                XMLCh *boundaryXMLStr = xercesc::XMLString::transcode("boundary");
+                if(argElement->hasAttribute(boundaryXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(boundaryXMLStr));
+                    this->tileBoundary = textUtils.strto32bitInt(std::string(charValue));
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'boundary\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&boundaryXMLStr);
+                
+                
+                XMLCh *bodyXMLStr = xercesc::XMLString::transcode("body");
+                if(argElement->hasAttribute(bodyXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(bodyXMLStr));
+                    this->tileBody = textUtils.strto32bitInt(std::string(charValue));
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'body\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&bodyXMLStr);
             }
-        }
-        else if(xercesc::XMLString::equals(optionDefineClumpTilePosition, optionXML))
-        {
-            this->option = RSGISExeRasterGIS::defineclumptileposition;
+            else if(xercesc::XMLString::equals(optionDefineBorderClumps, optionXML))
+            {
+                this->option = RSGISExeRasterGIS::defineborderclumps;
+                
+                XMLCh *clumpsXMLStr = xercesc::XMLString::transcode("clumps");
+                if(argElement->hasAttribute(clumpsXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(clumpsXMLStr));
+                    this->clumpsImage = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'clumps\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&clumpsXMLStr);
+                
+                XMLCh *maskXMLStr = xercesc::XMLString::transcode("bordermask");
+                if(argElement->hasAttribute(maskXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(maskXMLStr));
+                    this->maskImage = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'bordermask\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&maskXMLStr);
+                
+                XMLCh *colNameXMLStr = xercesc::XMLString::transcode("colname");
+                if(argElement->hasAttribute(colNameXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(colNameXMLStr));
+                    this->outColsName = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'colname\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&colNameXMLStr);
+                
+                XMLCh *overlapXMLStr = xercesc::XMLString::transcode("overlap");
+                if(argElement->hasAttribute(overlapXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(overlapXMLStr));
+                    this->tileOverlap = textUtils.strto32bitInt(std::string(charValue));
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'overlap\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&overlapXMLStr);
+                
+                
+                XMLCh *boundaryXMLStr = xercesc::XMLString::transcode("boundary");
+                if(argElement->hasAttribute(boundaryXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(boundaryXMLStr));
+                    this->tileBoundary = textUtils.strto32bitInt(std::string(charValue));
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'boundary\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&boundaryXMLStr);
+                
+                
+                XMLCh *bodyXMLStr = xercesc::XMLString::transcode("body");
+                if(argElement->hasAttribute(bodyXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(bodyXMLStr));
+                    this->tileBody = textUtils.strto32bitInt(std::string(charValue));
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'body\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&bodyXMLStr);
             
-            XMLCh *clumpsXMLStr = xercesc::XMLString::transcode("clumps");
-            if(argElement->hasAttribute(clumpsXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(clumpsXMLStr));
-                this->clumpsImage = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
             }
-            else
+            else if(xercesc::XMLString::equals(optionPopulateStats, optionXML))
             {
-                throw rsgis::RSGISXMLArgumentsException("No \'clumps\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&clumpsXMLStr);
-            
-            XMLCh *tileXMLStr = xercesc::XMLString::transcode("tile");
-            if(argElement->hasAttribute(tileXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(tileXMLStr));
-                this->tileImage = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'tile\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&tileXMLStr);
-            
-            XMLCh *colNameXMLStr = xercesc::XMLString::transcode("colname");
-            if(argElement->hasAttribute(colNameXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(colNameXMLStr));
-                this->outColsName = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'colname\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&colNameXMLStr);
-            
-            XMLCh *overlapXMLStr = xercesc::XMLString::transcode("overlap");
-            if(argElement->hasAttribute(overlapXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(overlapXMLStr));
-                this->tileOverlap = textUtils.strto32bitInt(std::string(charValue));
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'overlap\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&overlapXMLStr);
-            
-            
-            XMLCh *boundaryXMLStr = xercesc::XMLString::transcode("boundary");
-            if(argElement->hasAttribute(boundaryXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(boundaryXMLStr));
-                this->tileBoundary = textUtils.strto32bitInt(std::string(charValue));
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'boundary\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&boundaryXMLStr);
-            
-            
-            XMLCh *bodyXMLStr = xercesc::XMLString::transcode("body");
-            if(argElement->hasAttribute(bodyXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(bodyXMLStr));
-                this->tileBody = textUtils.strto32bitInt(std::string(charValue));
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'body\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&bodyXMLStr);
-        }
-        else if(xercesc::XMLString::equals(optionDefineBorderClumps, optionXML))
-        {
-            this->option = RSGISExeRasterGIS::defineborderclumps;
-            
-            XMLCh *clumpsXMLStr = xercesc::XMLString::transcode("clumps");
-            if(argElement->hasAttribute(clumpsXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(clumpsXMLStr));
-                this->clumpsImage = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'clumps\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&clumpsXMLStr);
-            
-            XMLCh *maskXMLStr = xercesc::XMLString::transcode("bordermask");
-            if(argElement->hasAttribute(maskXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(maskXMLStr));
-                this->maskImage = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'bordermask\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&maskXMLStr);
-            
-            XMLCh *colNameXMLStr = xercesc::XMLString::transcode("colname");
-            if(argElement->hasAttribute(colNameXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(colNameXMLStr));
-                this->outColsName = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'colname\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&colNameXMLStr);
-            
-            XMLCh *overlapXMLStr = xercesc::XMLString::transcode("overlap");
-            if(argElement->hasAttribute(overlapXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(overlapXMLStr));
-                this->tileOverlap = textUtils.strto32bitInt(std::string(charValue));
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'overlap\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&overlapXMLStr);
-            
-            
-            XMLCh *boundaryXMLStr = xercesc::XMLString::transcode("boundary");
-            if(argElement->hasAttribute(boundaryXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(boundaryXMLStr));
-                this->tileBoundary = textUtils.strto32bitInt(std::string(charValue));
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'boundary\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&boundaryXMLStr);
-            
-            
-            XMLCh *bodyXMLStr = xercesc::XMLString::transcode("body");
-            if(argElement->hasAttribute(bodyXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(bodyXMLStr));
-                this->tileBody = textUtils.strto32bitInt(std::string(charValue));
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'body\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&bodyXMLStr);
-        
-        }
-        else if(xercesc::XMLString::equals(optionPopulateStats, optionXML))
-        {
-            this->option = RSGISExeRasterGIS::populatestats;
-            
-            XMLCh *clumpsXMLStr = xercesc::XMLString::transcode("clumps");
-            if(argElement->hasAttribute(clumpsXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(clumpsXMLStr));
-                this->clumpsImage = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'clumps\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&clumpsXMLStr);
+                this->option = RSGISExeRasterGIS::populatestats;
+                
+                XMLCh *clumpsXMLStr = xercesc::XMLString::transcode("clumps");
+                if(argElement->hasAttribute(clumpsXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(clumpsXMLStr));
+                    this->clumpsImage = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'clumps\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&clumpsXMLStr);
 
-            XMLCh *pyramidsXMLStr = xercesc::XMLString::transcode("pyramids");
-            if(argElement->hasAttribute(pyramidsXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(pyramidsXMLStr));
-                std::string typeStr = std::string(charValue);
-                if(typeStr == "yes")
+                XMLCh *pyramidsXMLStr = xercesc::XMLString::transcode("pyramids");
+                if(argElement->hasAttribute(pyramidsXMLStr))
                 {
-                    this->calcImgPyramids = true;
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(pyramidsXMLStr));
+                    std::string typeStr = std::string(charValue);
+                    if(typeStr == "yes")
+                    {
+                        this->calcImgPyramids = true;
+                    }
+                    else
+                    {
+                        this->calcImgPyramids = false;
+                    }
+                    
+                    xercesc::XMLString::release(&charValue);
                 }
                 else
                 {
                     this->calcImgPyramids = false;
                 }
+                xercesc::XMLString::release(&pyramidsXMLStr);
                 
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                this->calcImgPyramids = false;
-            }
-            xercesc::XMLString::release(&pyramidsXMLStr);
-            
-            XMLCh *colourtableXMLStr = xercesc::XMLString::transcode("colourtable");
-            if(argElement->hasAttribute(colourtableXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(colourtableXMLStr));
-                std::string typeStr = std::string(charValue);
-                if(typeStr == "yes")
+                XMLCh *colourtableXMLStr = xercesc::XMLString::transcode("colourtable");
+                if(argElement->hasAttribute(colourtableXMLStr))
                 {
-                    this->addColourTable2Img = true;
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(colourtableXMLStr));
+                    std::string typeStr = std::string(charValue);
+                    if(typeStr == "yes")
+                    {
+                        this->addColourTable2Img = true;
+                    }
+                    else
+                    {
+                        this->addColourTable2Img = false;
+                    }
+                    
+                    xercesc::XMLString::release(&charValue);
                 }
                 else
                 {
                     this->addColourTable2Img = false;
                 }
+                xercesc::XMLString::release(&colourtableXMLStr);
                 
-                xercesc::XMLString::release(&charValue);
+            }
+            else if(xercesc::XMLString::equals(optionFindChangeClumpsFromStddev, optionXML))
+            {
+                this->option = RSGISExeRasterGIS::findchangeclumpsfromstddev;
+                
+                XMLCh *imageXMLStr = xercesc::XMLString::transcode("clumps");
+                if(argElement->hasAttribute(imageXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(imageXMLStr));
+                    this->clumpsImage = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'clumps\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&imageXMLStr);
+                
+                XMLCh *classColXMLStr = xercesc::XMLString::transcode("classcol");
+                if(argElement->hasAttribute(classColXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(classColXMLStr));
+                    this->classField = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'classcol\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&classColXMLStr);
+                
+                XMLCh *changeFieldXMLStr = xercesc::XMLString::transcode("changefield");
+                if(argElement->hasAttribute(changeFieldXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(changeFieldXMLStr));
+                    this->changeField = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'changefield\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&changeFieldXMLStr);
+                
+                XMLCh *fieldsXMLStr = xercesc::XMLString::transcode("fields");
+                if(argElement->hasAttribute(fieldsXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(fieldsXMLStr));
+                    std::string fields = std::string(charValue);
+                    attFields = new std::vector<std::string>();
+                    textUtils.tokenizeString(fields, ',', attFields);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'fields\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&fieldsXMLStr);
+                            
+                XMLCh *rsgisClassXMLStr = xercesc::XMLString::transcode("rsgis:class");
+                xercesc::DOMNodeList *classNodesList = argElement->getElementsByTagName(rsgisClassXMLStr);
+                unsigned int numClassTags = classNodesList->getLength();
+                
+                std::cout << "Found " << numClassTags << " class tags" << std::endl;
+                
+                if(numClassTags == 0)
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No class tags have been provided, at least 1 is required.");
+                }
+                classChangeField = new std::vector<rsgis::rastergis::RSGISClassChangeFields*>();
+                classChangeField->reserve(numClassTags);
+                
+                xercesc::DOMElement *attElement = NULL;
+                rsgis::rastergis::RSGISClassChangeFields *classChange = NULL;
+                for(int i = 0; i < numClassTags; i++)
+                {
+                    attElement = static_cast<xercesc::DOMElement*>(classNodesList->item(i));
+                    
+                    classChange = new rsgis::rastergis::RSGISClassChangeFields();
+                    
+                    XMLCh *nameXMLStr = xercesc::XMLString::transcode("name");
+                    if(attElement->hasAttribute(nameXMLStr))
+                    {
+                        char *charValue = xercesc::XMLString::transcode(attElement->getAttribute(nameXMLStr));
+                        classChange->name = std::string(charValue);
+                        xercesc::XMLString::release(&charValue);
+                    }
+                    else
+                    {
+                        throw rsgis::RSGISXMLArgumentsException("No \'name\' attribute was provided.");
+                    }
+                    xercesc::XMLString::release(&nameXMLStr);
+                    
+                    XMLCh *stddevThresXMLStr = xercesc::XMLString::transcode("stddevthres");
+                    if(attElement->hasAttribute(stddevThresXMLStr))
+                    {
+                        char *charValue = xercesc::XMLString::transcode(attElement->getAttribute(stddevThresXMLStr));
+                        classChange->threshold = textUtils.strtofloat(std::string(charValue));
+                        xercesc::XMLString::release(&charValue);
+                    }
+                    else
+                    {
+                        throw rsgis::RSGISXMLArgumentsException("No \'stddevthres\' attribute was provided.");
+                    }
+                    xercesc::XMLString::release(&stddevThresXMLStr);
+                                    
+                    XMLCh *changeValXMLStr = xercesc::XMLString::transcode("changeval");
+                    if(attElement->hasAttribute(changeValXMLStr))
+                    {
+                        char *charValue = xercesc::XMLString::transcode(attElement->getAttribute(changeValXMLStr));
+                        classChange->outName = textUtils.strto32bitUInt(std::string(charValue));
+                        xercesc::XMLString::release(&charValue);
+                    }
+                    else
+                    {
+                        throw rsgis::RSGISXMLArgumentsException("No \'changeval\' attribute was provided.");
+                    }
+                    xercesc::XMLString::release(&changeValXMLStr);
+                    
+                    classChangeField->push_back(classChange);
+                }
+                
+                xercesc::XMLString::release(&rsgisClassXMLStr);
             }
             else
             {
-                this->addColourTable2Img = false;
+                std::string message = std::string("The option (") + std::string(xercesc::XMLString::transcode(optionXML)) + std::string(") is not known: RSGISExeRasterGIS.");
+                throw rsgis::RSGISXMLArgumentsException(message.c_str());
             }
-            xercesc::XMLString::release(&colourtableXMLStr);
             
+            parsed = true;
+            
+            xercesc::XMLString::release(&algorName);
+            xercesc::XMLString::release(&algorXMLStr);
+            xercesc::XMLString::release(&optionXMLStr);
+            xercesc::XMLString::release(&optionCopyGDALATT);
+            xercesc::XMLString::release(&optionSpatialLocation);
+            xercesc::XMLString::release(&optionFindTopN);
+            xercesc::XMLString::release(&optionFindSpecClose);
+            xercesc::XMLString::release(&optionCopyGDALATTColumns);
+            xercesc::XMLString::release(&optionPopAttributeStats);
+            xercesc::XMLString::release(&optionPopCategoryProportions);
+            xercesc::XMLString::release(&optionCopyCatColours);
+            xercesc::XMLString::release(&optionKNNMajorityClassifier);
+            xercesc::XMLString::release(&optionPopAttributePercentile);
+            xercesc::XMLString::release(&optionExport2ASCII);
+            xercesc::XMLString::release(&optionClassTranslate);
+            xercesc::XMLString::release(&optionColourClasses);
+            xercesc::XMLString::release(&optionColourStrClasses);
+            xercesc::XMLString::release(&optionGenColourTab);
+            xercesc::XMLString::release(&optionExportCols2Raster);
+            xercesc::XMLString::release(&optionStrClassMajority);
+            xercesc::XMLString::release(&optionSpecDistMajorityClassifier);
+            xercesc::XMLString::release(&optionMaxLikelihoodClassifier);
+            xercesc::XMLString::release(&optionMaxLikelihoodClassifierLocalPriors);
+            xercesc::XMLString::release(&optionClassMask);
+            xercesc::XMLString::release(&optionFindNeighbours);
+            xercesc::XMLString::release(&optionFindBoundaryPixels);
+            xercesc::XMLString::release(&optionCalcBorderLength);
+            xercesc::XMLString::release(&optionCalcRelBorderLength);
+            xercesc::XMLString::release(&optionCalcShapeIndices);
+            xercesc::XMLString::release(&optionDefineClumpTilePosition);
+            xercesc::XMLString::release(&optionDefineBorderClumps);
+            xercesc::XMLString::release(&optionPopulateStats);
+            xercesc::XMLString::release(&optionFindChangeClumpsFromStddev);
         }
-        else if(xercesc::XMLString::equals(optionFindChangeClumpsFromStddev, optionXML))
+        catch (rsgis::RSGISXMLArgumentsException &e)
         {
-            this->option = RSGISExeRasterGIS::findchangeclumpsfromstddev;
-            
-            XMLCh *imageXMLStr = xercesc::XMLString::transcode("clumps");
-            if(argElement->hasAttribute(imageXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(imageXMLStr));
-                this->clumpsImage = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'clumps\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&imageXMLStr);
-            
-            XMLCh *classColXMLStr = xercesc::XMLString::transcode("classcol");
-            if(argElement->hasAttribute(classColXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(classColXMLStr));
-                this->classField = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'classcol\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&classColXMLStr);
-            
-            XMLCh *changeFieldXMLStr = xercesc::XMLString::transcode("changefield");
-            if(argElement->hasAttribute(changeFieldXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(changeFieldXMLStr));
-                this->changeField = std::string(charValue);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'changefield\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&changeFieldXMLStr);
-            
-            XMLCh *fieldsXMLStr = xercesc::XMLString::transcode("fields");
-            if(argElement->hasAttribute(fieldsXMLStr))
-            {
-                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(fieldsXMLStr));
-                std::string fields = std::string(charValue);
-                attFields = new std::vector<std::string>();
-                textUtils.tokenizeString(fields, ',', attFields);
-                xercesc::XMLString::release(&charValue);
-            }
-            else
-            {
-                throw rsgis::RSGISXMLArgumentsException("No \'fields\' attribute was provided.");
-            }
-            xercesc::XMLString::release(&fieldsXMLStr);
-                        
-            XMLCh *rsgisClassXMLStr = xercesc::XMLString::transcode("rsgis:class");
-            xercesc::DOMNodeList *classNodesList = argElement->getElementsByTagName(rsgisClassXMLStr);
-            unsigned int numClassTags = classNodesList->getLength();
-            
-            std::cout << "Found " << numClassTags << " class tags" << std::endl;
-            
-            if(numClassTags == 0)
-            {
-                throw rsgis::RSGISXMLArgumentsException("No class tags have been provided, at least 1 is required.");
-            }
-            classChangeField = new std::vector<rsgis::rastergis::RSGISClassChangeFields*>();
-            classChangeField->reserve(numClassTags);
-            
-            xercesc::DOMElement *attElement = NULL;
-            rsgis::rastergis::RSGISClassChangeFields *classChange = NULL;
-            for(int i = 0; i < numClassTags; i++)
-            {
-                attElement = static_cast<xercesc::DOMElement*>(classNodesList->item(i));
-                
-                classChange = new rsgis::rastergis::RSGISClassChangeFields();
-                
-                XMLCh *nameXMLStr = xercesc::XMLString::transcode("name");
-                if(attElement->hasAttribute(nameXMLStr))
-                {
-                    char *charValue = xercesc::XMLString::transcode(attElement->getAttribute(nameXMLStr));
-                    classChange->name = std::string(charValue);
-                    xercesc::XMLString::release(&charValue);
-                }
-                else
-                {
-                    throw rsgis::RSGISXMLArgumentsException("No \'name\' attribute was provided.");
-                }
-                xercesc::XMLString::release(&nameXMLStr);
-                
-                XMLCh *stddevThresXMLStr = xercesc::XMLString::transcode("stddevthres");
-                if(attElement->hasAttribute(stddevThresXMLStr))
-                {
-                    char *charValue = xercesc::XMLString::transcode(attElement->getAttribute(stddevThresXMLStr));
-                    classChange->threshold = textUtils.strtofloat(std::string(charValue));
-                    xercesc::XMLString::release(&charValue);
-                }
-                else
-                {
-                    throw rsgis::RSGISXMLArgumentsException("No \'stddevthres\' attribute was provided.");
-                }
-                xercesc::XMLString::release(&stddevThresXMLStr);
-                                
-                XMLCh *changeValXMLStr = xercesc::XMLString::transcode("changeval");
-                if(attElement->hasAttribute(changeValXMLStr))
-                {
-                    char *charValue = xercesc::XMLString::transcode(attElement->getAttribute(changeValXMLStr));
-                    classChange->outName = textUtils.strto32bitUInt(std::string(charValue));
-                    xercesc::XMLString::release(&charValue);
-                }
-                else
-                {
-                    throw rsgis::RSGISXMLArgumentsException("No \'changeval\' attribute was provided.");
-                }
-                xercesc::XMLString::release(&changeValXMLStr);
-                
-                classChangeField->push_back(classChange);
-            }
-            
-            xercesc::XMLString::release(&rsgisClassXMLStr);
+            throw e;
         }
-        else
+        catch (rsgis::RSGISException &e)
         {
-            std::string message = std::string("The option (") + std::string(xercesc::XMLString::transcode(optionXML)) + std::string(") is not known: RSGISExeRasterGIS.");
-            throw rsgis::RSGISXMLArgumentsException(message.c_str());
+            throw rsgis::RSGISXMLArgumentsException(e.what());
         }
-        
-        parsed = true;
-        
-        xercesc::XMLString::release(&algorName);
-        xercesc::XMLString::release(&algorXMLStr);
-        xercesc::XMLString::release(&optionXMLStr);
-        xercesc::XMLString::release(&optionCopyGDALATT);
-        xercesc::XMLString::release(&optionSpatialLocation);
-        xercesc::XMLString::release(&optionFindTopN);
-        xercesc::XMLString::release(&optionFindSpecClose);
-        xercesc::XMLString::release(&optionCopyGDALATTColumns);
-        xercesc::XMLString::release(&optionPopAttributeStats);
-        xercesc::XMLString::release(&optionPopCategoryProportions);
-        xercesc::XMLString::release(&optionCopyCatColours);
-        xercesc::XMLString::release(&optionKNNMajorityClassifier);
-        xercesc::XMLString::release(&optionPopAttributePercentile);
-        xercesc::XMLString::release(&optionExport2ASCII);
-        xercesc::XMLString::release(&optionClassTranslate);
-        xercesc::XMLString::release(&optionColourClasses);
-        xercesc::XMLString::release(&optionColourStrClasses);
-        xercesc::XMLString::release(&optionGenColourTab);
-        xercesc::XMLString::release(&optionExportCols2Raster);
-        xercesc::XMLString::release(&optionStrClassMajority);
-        xercesc::XMLString::release(&optionSpecDistMajorityClassifier);
-        xercesc::XMLString::release(&optionMaxLikelihoodClassifier);
-        xercesc::XMLString::release(&optionMaxLikelihoodClassifierLocalPriors);
-        xercesc::XMLString::release(&optionClassMask);
-        xercesc::XMLString::release(&optionFindNeighbours);
-        xercesc::XMLString::release(&optionFindBoundaryPixels);
-        xercesc::XMLString::release(&optionCalcBorderLength);
-        xercesc::XMLString::release(&optionCalcRelBorderLength);
-        xercesc::XMLString::release(&optionCalcShapeIndices);
-        xercesc::XMLString::release(&optionDefineClumpTilePosition);
-        xercesc::XMLString::release(&optionDefineBorderClumps);
-        xercesc::XMLString::release(&optionPopulateStats);
-        xercesc::XMLString::release(&optionFindChangeClumpsFromStddev);
+        catch (std::exception &e)
+        {
+            throw rsgis::RSGISXMLArgumentsException(e.what());
+        }
     }
     
     void RSGISExeRasterGIS::runAlgorithm() throw(rsgis::RSGISException)
