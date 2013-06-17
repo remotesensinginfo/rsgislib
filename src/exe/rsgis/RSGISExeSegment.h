@@ -98,7 +98,8 @@ namespace rsgisexe{
             unionsegments,
             mergeclumptiles,
             findtilebordersmask,
-            mergeclumpimages
+            mergeclumpimages,
+            extractbrightfeatures
 		};
 		RSGISExeSegment();
 		virtual rsgis::RSGISAlgorithmParameters* getInstance();
@@ -122,6 +123,9 @@ namespace rsgisexe{
         std::string clustersMatrix;
         std::string tempTable;
         std::string tempImage;
+        std::string temp1Image;
+        std::string temp2Image;
+        std::string maskImage;
         std::string proj;
         std::string stretchStatsFile;
         std::vector<std::string> inputImagePaths;
@@ -155,6 +159,10 @@ namespace rsgisexe{
         unsigned int tileBody;
         std::string colsName;
         rsgis::RSGISLibDataType rsgisOutDataType;
+        float initThres;
+        float thresIncrement;
+        float thresholdUpper;
+        std::vector<rsgis::cmds::FeatureShapeDescription*> shapeFeatDescript;
 	};
 }
 #endif
