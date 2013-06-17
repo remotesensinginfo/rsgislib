@@ -100,6 +100,58 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
+
+    void executeStretchImageWithStats(std::string inputImage, std::string outputImage, std::string inStatsFile, std::string gdalFormat, RSGISLibDataType outDataType, RSGISStretches stretchType, float stretchParam)throw(RSGISCmdException)
+    {
+        try
+        {
+            GDALAllRegister();
+            
+            GDALDataset *inDataset = (GDALDataset *) GDALOpenShared(inputImage.c_str(), GA_ReadOnly);
+            if(inDataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputImage;
+                throw RSGISImageException(message.c_str());
+            }
+            
+            rsgis::img::RSGISStretchImageWithStats stretchImg = rsgis::img::RSGISStretchImageWithStats(inDataset, outputImage, inStatsFile, gdalFormat, RSGIS_to_GDAL_Type(outDataType));
+            if(stretchType == linearMinMax)
+            {
+                stretchImg.executeLinearMinMaxStretch();
+            }
+            else if(stretchType == histogram)
+            {
+                stretchImg.executeHistogramStretch();
+            }
+            else if(stretchType == exponential)
+            {
+                stretchImg.executeExponentialStretch();
+            }
+            else if(stretchType == logarithmic)
+            {
+                stretchImg.executeLogrithmicStretch();
+            }
+            else if(stretchType == powerLaw)
+            {
+                stretchImg.executePowerLawStretch(stretchParam);
+            }
+            else
+            {
+                throw RSGISException("Stretch is not recognised.");
+            }
+            
+            GDALClose(inDataset);
+            GDALDestroyDriverManager();
+        }
+        catch(RSGISException& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(std::exception& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
     
     void executeMaskImage(std::string inputImage, std::string imageMask, std::string outputImage, std::string gdalFormat, RSGISLibDataType outDataType, float outValue, float maskValue)throw(RSGISCmdException)
     {
