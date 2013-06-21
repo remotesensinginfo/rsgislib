@@ -5013,13 +5013,7 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
             {
                 std::cout << "Saving list of tiles to: " << this->outTilesList << std::endl;
             }
-            cout << "Tile Width: " << this->width << std::endl;
-            cout << "Tile Height: " << this->height << std::endl;
-            cout << "Tile Overlap: " << this->tileOverlap << std::endl;
-            if(offsetTiling)
-            {
-                cout << "Tiling is offset by half a tile.\n";
-            }
+
             try
             {
                 if(this->outTilesList != "")
