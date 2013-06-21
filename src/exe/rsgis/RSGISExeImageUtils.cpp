@@ -147,6 +147,7 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
         else if(this->imageFormat == "HFA"){this->outFileExtension = "img";}
         else if(this->imageFormat == "PNG"){this->outFileExtension = "png";}
         else if(this->imageFormat == "AAIGrid"){this->outFileExtension = "asc";}
+        else if(this->imageFormat == "PCIDSK"){this->outFileExtension = "pix";}
         else{std::cout << "Extension not known for file format, using \".env\"" << std::endl;}
     }
 	XMLString::release(&formatExtXMLStr);
