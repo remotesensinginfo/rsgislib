@@ -4,7 +4,7 @@
  *
  *  Created by Pete Bunting on 12/12/2008.
  *  Copyright 2008 RSGISLib.
- * 
+ *
  *  RSGISLib is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -67,7 +67,7 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 {
 	RSGISMathsUtils mathUtils;
 	RSGISFileUtils fileUtils;
-	
+
 	XMLCh *algorName = XMLString::transcode(this->algorithm.c_str());
 	XMLCh *algorXMLStr = XMLString::transcode("algor");
 	XMLCh *optionXMLStr = XMLString::transcode("option");
@@ -130,16 +130,16 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
     XMLCh *optionPrintWKT = XMLString::transcode("printwkt");
     XMLCh *optionAddFIDCol = XMLString::transcode("addfidcol");
     XMLCh *optionMinDist2Polys = XMLString::transcode("mindist2polys");
-	
+
 	XMLCh *optionGenerateGrid = XMLString::transcode("generategrid");
 	XMLCh *optionGenerateImageGrid = XMLString::transcode("generateimagegrid");
-	
+
 	const XMLCh *algorNameEle = argElement->getAttribute(algorXMLStr);
 	if(!XMLString::equals(algorName, algorNameEle))
 	{
 		throw RSGISXMLArgumentsException("The algorithm name is incorrect.");
 	}
-	
+
 	this->inputFileNotVector = false;
 	bool noInputProvide = true;
 	XMLCh *inputXMLStr = XMLString::transcode("input");
@@ -168,7 +168,7 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 		char *charValue = XMLString::transcode(argElement->getAttribute(dirXMLStr));
 		string inputDIR = string(charValue);
 		XMLString::release(&charValue);
-		
+
 		XMLCh *extXMLStr = XMLString::transcode("ext");
 		if(argElement->hasAttribute(extXMLStr))
 		{
@@ -181,7 +181,7 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'ext\' attribute was provided.");
 		}
 		XMLString::release(&extXMLStr);
-		
+
 		inputVectors = new list<string>();
 		try
 		{
@@ -204,7 +204,7 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			for(unsigned int i = 0; i < vectorNodesList->getLength(); ++i)
 			{
 				vectorElement = static_cast<DOMElement*>(vectorNodesList->item(i));
-				
+
 				XMLCh *fileXMLStr = XMLString::transcode("file");
 				if(vectorElement->hasAttribute(fileXMLStr))
 				{
@@ -229,12 +229,12 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 	XMLString::release(&dirXMLStr);
 	XMLString::release(&vectortagXMLStr);
 	XMLString::release(&inputXMLStr);
-	
+
 	const XMLCh *optionXML = argElement->getAttribute(optionXMLStr);
 	if(XMLString::equals(optionRemoveAttributes, optionXML))
-	{		
+	{
 		this->option = RSGISExeVectorUtils::removeAttributes;
-		
+
 		if(!singlevector)
 		{
 			throw RSGISXMLArgumentsException("This algorithm requires only a single vector input.");
@@ -243,7 +243,7 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 		{
 			throw RSGISXMLArgumentsException("No input file has been provided.");
 		}
-		
+
 		XMLCh *outputXMLStr = XMLString::transcode("output");
 		if(argElement->hasAttribute(outputXMLStr))
 		{
@@ -256,13 +256,13 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
 		}
 		XMLString::release(&outputXMLStr);
-		
+
 		XMLCh *forceXMLStr = XMLString::transcode("force");
 		if(argElement->hasAttribute(forceXMLStr))
 		{
 			XMLCh *yesStr = XMLString::transcode("yes");
 			const XMLCh *forceValue = argElement->getAttribute(forceXMLStr);
-			
+
 			if(XMLString::equals(forceValue, yesStr))
 			{
 				this->force = true;
@@ -280,19 +280,19 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 		XMLString::release(&forceXMLStr);
 	}
 	else if(XMLString::equals(optionBufferVector, optionXML))
-	{		
+	{
 		this->option = RSGISExeVectorUtils::bufferVector;
-		
+
 		if(!singlevector)
 		{
 			throw RSGISXMLArgumentsException("This algorithm requires only a single vector input.");
 		}
-		
+
 		if(noInputProvide)
 		{
 			throw RSGISXMLArgumentsException("No input file has been provided.");
 		}
-		
+
 		XMLCh *outputXMLStr = XMLString::transcode("output");
 		if(argElement->hasAttribute(outputXMLStr))
 		{
@@ -305,7 +305,7 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
 		}
 		XMLString::release(&outputXMLStr);
-		
+
 		bufferValueInText = false;
 		XMLCh *bufferXMLStr = XMLString::transcode("buffer");
 		if(argElement->hasAttribute(bufferXMLStr))
@@ -328,16 +328,16 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
             {
                 throw RSGISXMLArgumentsException("No \'buffertxt\' or 'buffer' attribute was provided.");
             }
-            XMLString::release(&bufferTxtXMLStr);	
+            XMLString::release(&bufferTxtXMLStr);
 		}
-		XMLString::release(&bufferXMLStr);	        
-		
+		XMLString::release(&bufferXMLStr);
+
 		XMLCh *forceXMLStr = XMLString::transcode("force");
 		if(argElement->hasAttribute(forceXMLStr))
 		{
 			XMLCh *yesStr = XMLString::transcode("yes");
 			const XMLCh *forceValue = argElement->getAttribute(forceXMLStr);
-			
+
 			if(XMLString::equals(forceValue, yesStr))
 			{
 				this->force = true;
@@ -355,19 +355,19 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 		XMLString::release(&forceXMLStr);
 	}
 	else if(XMLString::equals(optiongeom2circles, optionXML))
-	{		
+	{
 		this->option = RSGISExeVectorUtils::geom2circles;
-		
+
 		if(!singlevector)
 		{
 			throw RSGISXMLArgumentsException("This algorithm requires only a single vector input.");
 		}
-		
+
 		if(noInputProvide)
 		{
 			throw RSGISXMLArgumentsException("No input file has been provided.");
 		}
-		
+
 		XMLCh *outputXMLStr = XMLString::transcode("output");
 		if(argElement->hasAttribute(outputXMLStr))
 		{
@@ -380,7 +380,7 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
 		}
 		XMLString::release(&outputXMLStr);
-		
+
 		XMLCh *areaattributeXMLStr = XMLString::transcode("areaattribute");
 		if(argElement->hasAttribute(areaattributeXMLStr))
 		{
@@ -393,7 +393,7 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'areaattribute\' attribute was provided.");
 		}
 		XMLString::release(&areaattributeXMLStr);
-		
+
 		XMLCh *radiusattributeXMLStr = XMLString::transcode("radiusattribute");
 		if(argElement->hasAttribute(radiusattributeXMLStr))
 		{
@@ -406,8 +406,8 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'radiusattribute\' attribute was provided.");
 		}
 		XMLString::release(&radiusattributeXMLStr);
-		
-		
+
+
 		XMLCh *radiusValueXMLStr = XMLString::transcode("radius");
 		if(argElement->hasAttribute(radiusValueXMLStr))
 		{
@@ -420,8 +420,8 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'radius\' attribute was provided.");
 		}
 		XMLString::release(&radiusValueXMLStr);
-		
-		
+
+
 		XMLCh *resolutionXMLStr = XMLString::transcode("resolution");
 		if(argElement->hasAttribute(resolutionXMLStr))
 		{
@@ -433,14 +433,14 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 		{
 			throw RSGISXMLArgumentsException("No \'resolution\' attribute was provided.");
 		}
-		XMLString::release(&resolutionXMLStr);	
-		
+		XMLString::release(&resolutionXMLStr);
+
 		XMLCh *forceXMLStr = XMLString::transcode("force");
 		if(argElement->hasAttribute(forceXMLStr))
 		{
 			XMLCh *yesStr = XMLString::transcode("yes");
 			const XMLCh *forceValue = argElement->getAttribute(forceXMLStr);
-			
+
 			if(XMLString::equals(forceValue, yesStr))
 			{
 				this->force = true;
@@ -458,33 +458,33 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 		XMLString::release(&forceXMLStr);
 	}
 	else if(XMLString::equals(optionPrintPolygonGeoms, optionXML))
-	{		
+	{
 		this->option = RSGISExeVectorUtils::printpolygeom;
-		
+
 		if(!singlevector)
 		{
 			throw RSGISXMLArgumentsException("This algorithm requires only a single vector input.");
 		}
-		
+
 		if(noInputProvide)
 		{
 			throw RSGISXMLArgumentsException("No input file has been provided.");
 		}
 	}
 	else if(XMLString::equals(optionFindReplaceText, optionXML))
-	{		
+	{
 		this->option = RSGISExeVectorUtils::findreplacetext;
-		
+
 		if(!singlevector)
 		{
 			throw RSGISXMLArgumentsException("This algorithm requires only a single vector input.");
 		}
-		
+
 		if(noInputProvide)
 		{
 			throw RSGISXMLArgumentsException("No input file has been provided.");
 		}
-		
+
 		XMLCh *attributeXMLStr = XMLString::transcode("attribute");
 		if(argElement->hasAttribute(attributeXMLStr))
 		{
@@ -497,8 +497,8 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'attribute\' attribute was provided.");
 		}
 		XMLString::release(&attributeXMLStr);
-		
-		
+
+
 		XMLCh *findXMLStr = XMLString::transcode("find");
 		if(argElement->hasAttribute(findXMLStr))
 		{
@@ -512,7 +512,7 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 		}
 		XMLString::release(&findXMLStr);
 
-		
+
 		XMLCh *replaceXMLStr = XMLString::transcode("replace");
 		if(argElement->hasAttribute(replaceXMLStr))
 		{
@@ -527,33 +527,33 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 		XMLString::release(&replaceXMLStr);
 	}
 	else if(XMLString::equals(optionListAttributes, optionXML))
-	{		
+	{
 		this->option = RSGISExeVectorUtils::listattributes;
-		
+
 		if(!singlevector)
 		{
 			throw RSGISXMLArgumentsException("This algorithm requires only a single vector input.");
 		}
-		
+
 		if(noInputProvide)
 		{
 			throw RSGISXMLArgumentsException("No input file has been provided.");
 		}
 	}
 	else if(XMLString::equals(optionPrintAttribute, optionXML))
-	{		
+	{
 		this->option = RSGISExeVectorUtils::printattribute;
-		
+
 		if(!singlevector)
 		{
 			throw RSGISXMLArgumentsException("This algorithm requires only a single vector input.");
 		}
-		
+
 		if(noInputProvide)
 		{
 			throw RSGISXMLArgumentsException("No input file has been provided.");
 		}
-		
+
 		XMLCh *attributeXMLStr = XMLString::transcode("attribute");
 		if(argElement->hasAttribute(attributeXMLStr))
 		{
@@ -566,22 +566,22 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'attribute\' attribute was provided.");
 		}
 		XMLString::release(&attributeXMLStr);
-		
+
 	}
 	else if(XMLString::equals(optionTopAttributes, optionXML))
-	{		
+	{
 		this->option = RSGISExeVectorUtils::topattributes;
-		
+
 		if(!singlevector)
 		{
 			throw RSGISXMLArgumentsException("This algorithm requires only a single vector input.");
 		}
-		
+
 		if(noInputProvide)
 		{
 			throw RSGISXMLArgumentsException("No input file has been provided.");
 		}
-		
+
 		XMLCh *outputXMLStr = XMLString::transcode("output");
 		if(argElement->hasAttribute(outputXMLStr))
 		{
@@ -594,16 +594,16 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
 		}
 		XMLString::release(&outputXMLStr);
-		
-		
+
+
 		XMLCh *summaryXMLStr = XMLString::transcode("summary");
 		if(argElement->hasAttribute(summaryXMLStr))
 		{
-			const XMLCh *summaryValueStr = argElement->getAttribute(summaryXMLStr);			
-			
+			const XMLCh *summaryValueStr = argElement->getAttribute(summaryXMLStr);
+
 			XMLCh *valueStr = XMLString::transcode("value");
 			XMLCh *aggregateStr = XMLString::transcode("aggregate");
-			
+
 			if(XMLString::equals(summaryValueStr, valueStr))
 			{
 				this->summary = rsgis::math::sumtype_value;
@@ -616,7 +616,7 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			{
 				throw RSGISXMLArgumentsException("Summary type not recognised.");
 			}
-			
+
 			XMLString::release(&valueStr);
 			XMLString::release(&aggregateStr);
 		}
@@ -625,8 +625,8 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'summary\' attribute was provided.");
 		}
 		XMLString::release(&summaryXMLStr);
-		
-		
+
+
 		XMLCh *topXMLStr = XMLString::transcode("top");
 		if(argElement->hasAttribute(topXMLStr))
 		{
@@ -639,14 +639,14 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'top\' attribute was provided.");
 		}
 		XMLString::release(&topXMLStr);
-		
-		
+
+
 		XMLCh *forceXMLStr = XMLString::transcode("force");
 		if(argElement->hasAttribute(forceXMLStr))
 		{
 			XMLCh *yesStr = XMLString::transcode("yes");
 			const XMLCh *forceValue = argElement->getAttribute(forceXMLStr);
-			
+
 			if(XMLString::equals(forceValue, yesStr))
 			{
 				this->force = true;
@@ -662,13 +662,13 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'force\' attribute was provided.");
 		}
 		XMLString::release(&forceXMLStr);
-		
-		
+
+
 		DOMNodeList *attributeNodesList = argElement->getElementsByTagName(rsgisattributeXMLStr);
 		this->numAttributes = attributeNodesList->getLength();
-		
+
 		//cout << "Found " << this->numAttributes << " attributes" << endl;
-		
+
 		if(numAttributes > 0)
 		{
 			attributes = new string[numAttributes];
@@ -676,8 +676,8 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			for(int i = 0; i < numAttributes; i++)
 			{
 				attributeElement = static_cast<DOMElement*>(attributeNodesList->item(i));
-				
-				
+
+
 				XMLCh *nameXMLStr = XMLString::transcode("name");
 				if(attributeElement->hasAttribute(nameXMLStr))
 				{
@@ -698,19 +698,19 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 		}
 	}
 	else if(XMLString::equals(optionAddAttributes, optionXML))
-	{		
+	{
 		this->option = RSGISExeVectorUtils::addattributes;
-		
+
 		if(!singlevector)
 		{
 			throw RSGISXMLArgumentsException("This algorithm requires only a single vector input.");
 		}
-		
+
 		if(noInputProvide)
 		{
 			throw RSGISXMLArgumentsException("No input file has been provided.");
 		}
-		
+
 		XMLCh *OFTIntegerStr = XMLString::transcode("OFTInteger");
 		XMLCh *OFTIntegerListStr = XMLString::transcode("OFTIntegerList");
 		XMLCh *OFTRealStr = XMLString::transcode("OFTReal");
@@ -723,7 +723,7 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 		XMLCh *OFTDateStr = XMLString::transcode("OFTDate");
 		XMLCh *OFTTimeStr = XMLString::transcode("OFTTime");
 		XMLCh *OFTDateTimeStr = XMLString::transcode("OFTDateTime");
-		
+
 		XMLCh *outputXMLStr = XMLString::transcode("output");
 		if(argElement->hasAttribute(outputXMLStr))
 		{
@@ -736,13 +736,13 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
 		}
 		XMLString::release(&outputXMLStr);
-		
+
 		XMLCh *forceXMLStr = XMLString::transcode("force");
 		if(argElement->hasAttribute(forceXMLStr))
 		{
 			XMLCh *yesStr = XMLString::transcode("yes");
 			const XMLCh *forceValue = argElement->getAttribute(forceXMLStr);
-			
+
 			if(XMLString::equals(forceValue, yesStr))
 			{
 				this->force = true;
@@ -758,12 +758,12 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'force\' attribute was provided.");
 		}
 		XMLString::release(&forceXMLStr);
-		
+
 		DOMNodeList *attributeNodesList = argElement->getElementsByTagName(XMLString::transcode("rsgis:attribute"));
 		this->numAttributes = attributeNodesList->getLength();
-		
+
 		//cout << "Found " << this->numAttributes << " attributes" << endl;
-		
+
 		if(numAttributes > 0)
 		{
 			newAttributes = new Attribute*[numAttributes];
@@ -772,7 +772,7 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			{
 				newAttributes[i] = new Attribute();
 				attributeElement = static_cast<DOMElement*>(attributeNodesList->item(i));
-				
+
 				XMLCh *nameXMLStr = XMLString::transcode("name");
 				if(attributeElement->hasAttribute(nameXMLStr))
 				{
@@ -785,9 +785,9 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 					throw RSGISXMLArgumentsException("No \'name\' attribute was provided.");
 				}
 				XMLString::release(&nameXMLStr);
-				
-				
-				
+
+
+
 				XMLCh *typeXMLStr = XMLString::transcode("type");
 				if(attributeElement->hasAttribute(typeXMLStr))
 				{
@@ -856,7 +856,7 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 		{
 			throw RSGISXMLArgumentsException("No attributes \'rsgis:attribute\' tags were provided.");
 		}
-		
+
 		XMLString::release(&OFTIntegerStr);
 		XMLString::release(&OFTIntegerListStr);
 		XMLString::release(&OFTRealStr);
@@ -872,19 +872,19 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 
 	}
 	else if(XMLString::equals(optionCopyPolygons, optionXML))
-	{		
+	{
 		this->option = RSGISExeVectorUtils::copypolygons;
-		
+
 		if(!singlevector)
 		{
 			throw RSGISXMLArgumentsException("This algorithm requires only a single vector input.");
 		}
-		
+
 		if(noInputProvide)
 		{
 			throw RSGISXMLArgumentsException("No input file has been provided.");
 		}
-		
+
 		XMLCh *outputXMLStr = XMLString::transcode("output");
 		if(argElement->hasAttribute(outputXMLStr))
 		{
@@ -897,13 +897,13 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
 		}
 		XMLString::release(&outputXMLStr);
-		
+
 		XMLCh *forceXMLStr = XMLString::transcode("force");
 		if(argElement->hasAttribute(forceXMLStr))
 		{
 			XMLCh *yesStr = XMLString::transcode("yes");
 			const XMLCh *forceValue = argElement->getAttribute(forceXMLStr);
-			
+
 			if(XMLString::equals(forceValue, yesStr))
 			{
 				this->force = true;
@@ -918,36 +918,36 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 		{
 			throw RSGISXMLArgumentsException("No \'force\' attribute was provided.");
 		}
-		XMLString::release(&forceXMLStr);		
+		XMLString::release(&forceXMLStr);
 	}
 	else if(XMLString::equals(optionPrintFIDs, optionXML))
-	{		
-		this->option = RSGISExeVectorUtils::printfids;	
-		
+	{
+		this->option = RSGISExeVectorUtils::printfids;
+
 		if(!singlevector)
 		{
 			throw RSGISXMLArgumentsException("This algorithm requires only a single vector input.");
 		}
-		
+
 		if(noInputProvide)
 		{
 			throw RSGISXMLArgumentsException("No input file has been provided.");
 		}
 	}
 	else if(XMLString::equals(optionCountPxlsArea, optionXML))
-	{		
+	{
 		this->option = RSGISExeVectorUtils::countpxlsarea;
-		
+
 		if(!singlevector)
 		{
 			throw RSGISXMLArgumentsException("This algorithm requires only a single vector input.");
 		}
-		
+
 		if(noInputProvide)
 		{
 			throw RSGISXMLArgumentsException("No input file has been provided.");
 		}
-		
+
 		XMLCh *rasterXMLStr = XMLString::transcode("raster");
 		if(argElement->hasAttribute(rasterXMLStr))
 		{
@@ -960,7 +960,7 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'raster\' attribute was provided.");
 		}
 		XMLString::release(&rasterXMLStr);
-		
+
 		XMLCh *outputXMLStr = XMLString::transcode("output");
 		if(argElement->hasAttribute(outputXMLStr))
 		{
@@ -973,13 +973,13 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
 		}
 		XMLString::release(&outputXMLStr);
-		
+
 		XMLCh *forceXMLStr = XMLString::transcode("force");
 		if(argElement->hasAttribute(forceXMLStr))
 		{
 			XMLCh *yesStr = XMLString::transcode("yes");
 			const XMLCh *forceValue = argElement->getAttribute(forceXMLStr);
-			
+
 			if(XMLString::equals(forceValue, yesStr))
 			{
 				this->force = true;
@@ -995,22 +995,22 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'force\' attribute was provided.");
 		}
 		XMLString::release(&forceXMLStr);
-		
+
 	}
 	else if(XMLString::equals(optionPoints2ASCII, optionXML))
-	{		
+	{
 		this->option = RSGISExeVectorUtils::points2ascii;
-		
+
 		if(!singlevector)
 		{
 			throw RSGISXMLArgumentsException("This algorithm requires only a single vector input.");
 		}
-		
+
 		if(noInputProvide)
 		{
 			throw RSGISXMLArgumentsException("No input file has been provided.");
 		}
-		
+
 		XMLCh *outputXMLStr = XMLString::transcode("output");
 		if(argElement->hasAttribute(outputXMLStr))
 		{
@@ -1023,21 +1023,21 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
 		}
 		XMLString::release(&outputXMLStr);
-	}	
+	}
 	else if(XMLString::equals(optionRotate, optionXML))
-	{		
+	{
 		this->option = RSGISExeVectorUtils::rotate;
-		
+
 		if(!singlevector)
 		{
 			throw RSGISXMLArgumentsException("This algorithm requires only a single vector input.");
 		}
-		
+
 		if(noInputProvide)
 		{
 			throw RSGISXMLArgumentsException("No input file has been provided.");
 		}
-		
+
 		XMLCh *outputXMLStr = XMLString::transcode("output");
 		if(argElement->hasAttribute(outputXMLStr))
 		{
@@ -1050,13 +1050,13 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
 		}
 		XMLString::release(&outputXMLStr);
-				
+
 		XMLCh *forceXMLStr = XMLString::transcode("force");
 		if(argElement->hasAttribute(forceXMLStr))
 		{
 			XMLCh *yesStr = XMLString::transcode("yes");
 			const XMLCh *forceValue = argElement->getAttribute(forceXMLStr);
-			
+
 			if(XMLString::equals(forceValue, yesStr))
 			{
 				this->force = true;
@@ -1072,7 +1072,7 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'force\' attribute was provided.");
 		}
 		XMLString::release(&forceXMLStr);
-		
+
 		XMLCh *angleXMLStr = XMLString::transcode("angle");
 		if(argElement->hasAttribute(angleXMLStr))
 		{
@@ -1085,19 +1085,19 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'angle\' attribute was provided.");
 		}
 		XMLString::release(&angleXMLStr);
-		
-		
+
+
 		DOMNodeList *pointsNodesList = argElement->getElementsByTagName(XMLString::transcode("rsgis:point"));
 		int numPoints = pointsNodesList->getLength();
-		
-		
+
+
 		cout << "Found " << numPoints << " point" << endl;
-		
+
 		if(numPoints == 1)
 		{
 			this->fixedPt = new Coordinate(0,0,0);
 			DOMElement *pointElement = static_cast<DOMElement*>(pointsNodesList->item(0));
-			
+
 			XMLCh *xXMLStr = XMLString::transcode("x");
 			if(pointElement->hasAttribute(xXMLStr))
 			{
@@ -1110,7 +1110,7 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 				throw RSGISXMLArgumentsException("No \'x\' attribute was provided.");
 			}
 			XMLString::release(&xXMLStr);
-			
+
 			XMLCh *yXMLStr = XMLString::transcode("y");
 			if(pointElement->hasAttribute(yXMLStr))
 			{
@@ -1123,7 +1123,7 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 				throw RSGISXMLArgumentsException("No \'y\' attribute was provided.");
 			}
 			XMLString::release(&yXMLStr);
-			
+
 			XMLCh *zXMLStr = XMLString::transcode("z");
 			if(pointElement->hasAttribute(zXMLStr))
 			{
@@ -1136,24 +1136,24 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 				throw RSGISXMLArgumentsException("No \'z\' attribute was provided.");
 			}
 			XMLString::release(&zXMLStr);
-			
+
 		}
-		
+
 	}
 	else if(XMLString::equals(optionArea, optionXML))
-	{		
+	{
 		this->option = RSGISExeVectorUtils::calcarea;
-		
+
 		if(!singlevector)
 		{
 			throw RSGISXMLArgumentsException("This algorithm requires only a single vector input.");
 		}
-		
+
 		if(noInputProvide)
 		{
 			throw RSGISXMLArgumentsException("No input file has been provided.");
 		}
-				
+
 		XMLCh *outputXMLStr = XMLString::transcode("output");
 		if(argElement->hasAttribute(outputXMLStr))
 		{
@@ -1166,13 +1166,13 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
 		}
 		XMLString::release(&outputXMLStr);
-		
+
 		XMLCh *forceXMLStr = XMLString::transcode("force");
 		if(argElement->hasAttribute(forceXMLStr))
 		{
 			XMLCh *yesStr = XMLString::transcode("yes");
 			const XMLCh *forceValue = argElement->getAttribute(forceXMLStr);
-			
+
 			if(XMLString::equals(forceValue, yesStr))
 			{
 				this->force = true;
@@ -1190,19 +1190,19 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 		XMLString::release(&forceXMLStr);
 	}
 	else if(XMLString::equals(optionSplitFeatures, optionXML))
-	{		
+	{
 		this->option = RSGISExeVectorUtils::splitfeatures;
-		
+
 		if(!singlevector)
 		{
 			throw RSGISXMLArgumentsException("This algorithm requires only a single vector input.");
 		}
-		
+
 		if(noInputProvide)
 		{
 			throw RSGISXMLArgumentsException("No input file has been provided.");
 		}
-		
+
 		XMLCh *dirXMLStr = XMLString::transcode("dir");
 		if(argElement->hasAttribute(dirXMLStr))
 		{
@@ -1215,13 +1215,13 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'dir\' attribute was provided.");
 		}
 		XMLString::release(&dirXMLStr);
-		
+
 		XMLCh *forceXMLStr = XMLString::transcode("force");
 		if(argElement->hasAttribute(forceXMLStr))
 		{
 			XMLCh *yesStr = XMLString::transcode("yes");
 			const XMLCh *forceValue = argElement->getAttribute(forceXMLStr);
-			
+
 			if(XMLString::equals(forceValue, yesStr))
 			{
 				this->force = true;
@@ -1239,19 +1239,19 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 		XMLString::release(&forceXMLStr);
 	}
 	else if(XMLString::equals(optionRemovePolyOverlaps, optionXML))
-	{		
+	{
 		this->option = RSGISExeVectorUtils::removepolyoverlaps;
-		
+
 		if(!singlevector)
 		{
 			throw RSGISXMLArgumentsException("This algorithm requires only a single vector input.");
 		}
-		
+
 		if(noInputProvide)
 		{
 			throw RSGISXMLArgumentsException("No input file has been provided.");
 		}
-		
+
 		XMLCh *outputXMLStr = XMLString::transcode("output");
 		if(argElement->hasAttribute(outputXMLStr))
 		{
@@ -1263,14 +1263,14 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 		{
 			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
 		}
-		XMLString::release(&outputXMLStr);		
-		
+		XMLString::release(&outputXMLStr);
+
 		XMLCh *forceXMLStr = XMLString::transcode("force");
 		if(argElement->hasAttribute(forceXMLStr))
 		{
 			XMLCh *yesStr = XMLString::transcode("yes");
 			const XMLCh *forceValue = argElement->getAttribute(forceXMLStr);
-			
+
 			if(XMLString::equals(forceValue, yesStr))
 			{
 				this->force = true;
@@ -1286,13 +1286,13 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'force\' attribute was provided.");
 		}
 		XMLString::release(&forceXMLStr);
-		
+
 		XMLCh *snapXMLStr = XMLString::transcode("snap2grid");
 		if(argElement->hasAttribute(snapXMLStr))
 		{
 			XMLCh *yesStr = XMLString::transcode("yes");
 			const XMLCh *snapValue = argElement->getAttribute(snapXMLStr);
-			
+
 			if(XMLString::equals(snapValue, yesStr))
 			{
 				this->snap2Grid = true;
@@ -1308,7 +1308,7 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'snap2grid\' attribute was provided.");
 		}
 		XMLString::release(&snapXMLStr);
-		
+
 		XMLCh *toleranceXMLStr = XMLString::transcode("tolerance");
 		if(argElement->hasAttribute(toleranceXMLStr))
 		{
@@ -1321,7 +1321,7 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'tolerance\' attribute was provided.");
 		}
 		XMLString::release(&toleranceXMLStr);
-		
+
 		XMLCh *dissolveXMLStr = XMLString::transcode("dissolve");
 		if(argElement->hasAttribute(dissolveXMLStr))
 		{
@@ -1336,19 +1336,19 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 		XMLString::release(&dissolveXMLStr);
 	}
 	else if(XMLString::equals(optionMergeSmallPolysNear, optionXML))
-	{		
+	{
 		this->option = RSGISExeVectorUtils::mergesmallpolysnear;
-		
+
 		if(!singlevector)
 		{
 			throw RSGISXMLArgumentsException("This algorithm requires only a single vector input.");
 		}
-		
+
 		if(noInputProvide)
 		{
 			throw RSGISXMLArgumentsException("No input file has been provided.");
 		}
-		
+
 		XMLCh *outputXMLStr = XMLString::transcode("output");
 		if(argElement->hasAttribute(outputXMLStr))
 		{
@@ -1360,14 +1360,14 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 		{
 			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
 		}
-		XMLString::release(&outputXMLStr);		
-		
+		XMLString::release(&outputXMLStr);
+
 		XMLCh *forceXMLStr = XMLString::transcode("force");
 		if(argElement->hasAttribute(forceXMLStr))
 		{
 			XMLCh *yesStr = XMLString::transcode("yes");
 			const XMLCh *forceValue = argElement->getAttribute(forceXMLStr);
-			
+
 			if(XMLString::equals(forceValue, yesStr))
 			{
 				this->force = true;
@@ -1383,7 +1383,7 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'force\' attribute was provided.");
 		}
 		XMLString::release(&forceXMLStr);
-		
+
 		XMLCh *areaXMLStr = XMLString::transcode("area");
 		if(argElement->hasAttribute(areaXMLStr))
 		{
@@ -1396,7 +1396,7 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'area\' attribute was provided.");
 		}
 		XMLString::release(&areaXMLStr);
-		
+
 		XMLCh *resolutionXMLStr = XMLString::transcode("resolution");
 		if(argElement->hasAttribute(resolutionXMLStr))
 		{
@@ -1408,22 +1408,22 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 		{
 			throw RSGISXMLArgumentsException("No \'resolution\' attribute was provided.");
 		}
-		XMLString::release(&resolutionXMLStr);	
+		XMLString::release(&resolutionXMLStr);
 	}
 	else if(XMLString::equals(optionMergeSmallPolysTouching, optionXML))
-	{		
+	{
 		this->option = RSGISExeVectorUtils::mergesmallpolystouching;
-		
+
 		if(!singlevector)
 		{
 			throw RSGISXMLArgumentsException("This algorithm requires only a single vector input.");
 		}
-		
+
 		if(noInputProvide)
 		{
 			throw RSGISXMLArgumentsException("No input file has been provided.");
 		}
-		
+
 		XMLCh *outputXMLStr = XMLString::transcode("output");
 		if(argElement->hasAttribute(outputXMLStr))
 		{
@@ -1435,14 +1435,14 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 		{
 			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
 		}
-		XMLString::release(&outputXMLStr);		
-		
+		XMLString::release(&outputXMLStr);
+
 		XMLCh *forceXMLStr = XMLString::transcode("force");
 		if(argElement->hasAttribute(forceXMLStr))
 		{
 			XMLCh *yesStr = XMLString::transcode("yes");
 			const XMLCh *forceValue = argElement->getAttribute(forceXMLStr);
-			
+
 			if(XMLString::equals(forceValue, yesStr))
 			{
 				this->force = true;
@@ -1458,7 +1458,7 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'force\' attribute was provided.");
 		}
 		XMLString::release(&forceXMLStr);
-		
+
 		XMLCh *areaXMLStr = XMLString::transcode("area");
 		if(argElement->hasAttribute(areaXMLStr))
 		{
@@ -1471,8 +1471,8 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'area\' attribute was provided.");
 		}
 		XMLString::release(&areaXMLStr);
-		
-		
+
+
 		XMLCh *relborderXMLStr = XMLString::transcode("relborder");
 		if(argElement->hasAttribute(relborderXMLStr))
 		{
@@ -1487,19 +1487,19 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 		XMLString::release(&relborderXMLStr);
 	}
 	else if(XMLString::equals(optionMorphClosing, optionXML))
-	{		
+	{
 		this->option = RSGISExeVectorUtils::morphologicalclosing;
-		
+
 		if(!singlevector)
 		{
 			throw RSGISXMLArgumentsException("This algorithm requires only a single vector input.");
 		}
-		
+
 		if(noInputProvide)
 		{
 			throw RSGISXMLArgumentsException("No input file has been provided.");
 		}
-		
+
 		XMLCh *outputXMLStr = XMLString::transcode("output");
 		if(argElement->hasAttribute(outputXMLStr))
 		{
@@ -1511,14 +1511,14 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 		{
 			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
 		}
-		XMLString::release(&outputXMLStr);		
-		
+		XMLString::release(&outputXMLStr);
+
 		XMLCh *forceXMLStr = XMLString::transcode("force");
 		if(argElement->hasAttribute(forceXMLStr))
 		{
 			XMLCh *yesStr = XMLString::transcode("yes");
 			const XMLCh *forceValue = argElement->getAttribute(forceXMLStr);
-			
+
 			if(XMLString::equals(forceValue, yesStr))
 			{
 				this->force = true;
@@ -1534,7 +1534,7 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'force\' attribute was provided.");
 		}
 		XMLString::release(&forceXMLStr);
-		
+
 		XMLCh *bufferXMLStr = XMLString::transcode("buffer");
 		if(argElement->hasAttribute(bufferXMLStr))
 		{
@@ -1547,7 +1547,7 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'buffer\' attribute was provided.");
 		}
 		XMLString::release(&bufferXMLStr);
-		
+
 		XMLCh *curveXMLStr = XMLString::transcode("curve");
 		if(argElement->hasAttribute(curveXMLStr))
 		{
@@ -1562,19 +1562,19 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 		XMLString::release(&curveXMLStr);
 	}
 	else if(XMLString::equals(optionMorphOpening, optionXML))
-	{		
+	{
 		this->option = RSGISExeVectorUtils::morphologicalopening;
-		
+
 		if(!singlevector)
 		{
 			throw RSGISXMLArgumentsException("This algorithm requires only a single vector input.");
 		}
-		
+
 		if(noInputProvide)
 		{
 			throw RSGISXMLArgumentsException("No input file has been provided.");
 		}
-		
+
 		XMLCh *outputXMLStr = XMLString::transcode("output");
 		if(argElement->hasAttribute(outputXMLStr))
 		{
@@ -1586,14 +1586,14 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 		{
 			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
 		}
-		XMLString::release(&outputXMLStr);		
-		
+		XMLString::release(&outputXMLStr);
+
 		XMLCh *forceXMLStr = XMLString::transcode("force");
 		if(argElement->hasAttribute(forceXMLStr))
 		{
 			XMLCh *yesStr = XMLString::transcode("yes");
 			const XMLCh *forceValue = argElement->getAttribute(forceXMLStr);
-			
+
 			if(XMLString::equals(forceValue, yesStr))
 			{
 				this->force = true;
@@ -1609,7 +1609,7 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'force\' attribute was provided.");
 		}
 		XMLString::release(&forceXMLStr);
-		
+
 		XMLCh *bufferXMLStr = XMLString::transcode("buffer");
 		if(argElement->hasAttribute(bufferXMLStr))
 		{
@@ -1622,7 +1622,7 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'buffer\' attribute was provided.");
 		}
 		XMLString::release(&bufferXMLStr);
-		
+
 		XMLCh *curveXMLStr = XMLString::transcode("curve");
 		if(argElement->hasAttribute(curveXMLStr))
 		{
@@ -1637,19 +1637,19 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 		XMLString::release(&curveXMLStr);
 	}
 	else if(XMLString::equals(optionMorphDilation, optionXML))
-	{		
+	{
 		this->option = RSGISExeVectorUtils::morphologicaldilation;
-		
+
 		if(!singlevector)
 		{
 			throw RSGISXMLArgumentsException("This algorithm requires only a single vector input.");
 		}
-		
+
 		if(noInputProvide)
 		{
 			throw RSGISXMLArgumentsException("No input file has been provided.");
 		}
-		
+
 		XMLCh *outputXMLStr = XMLString::transcode("output");
 		if(argElement->hasAttribute(outputXMLStr))
 		{
@@ -1661,14 +1661,14 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 		{
 			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
 		}
-		XMLString::release(&outputXMLStr);		
-		
+		XMLString::release(&outputXMLStr);
+
 		XMLCh *forceXMLStr = XMLString::transcode("force");
 		if(argElement->hasAttribute(forceXMLStr))
 		{
 			XMLCh *yesStr = XMLString::transcode("yes");
 			const XMLCh *forceValue = argElement->getAttribute(forceXMLStr);
-			
+
 			if(XMLString::equals(forceValue, yesStr))
 			{
 				this->force = true;
@@ -1684,7 +1684,7 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'force\' attribute was provided.");
 		}
 		XMLString::release(&forceXMLStr);
-		
+
 		XMLCh *bufferXMLStr = XMLString::transcode("buffer");
 		if(argElement->hasAttribute(bufferXMLStr))
 		{
@@ -1697,7 +1697,7 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'buffer\' attribute was provided.");
 		}
 		XMLString::release(&bufferXMLStr);
-		
+
 		XMLCh *curveXMLStr = XMLString::transcode("curve");
 		if(argElement->hasAttribute(curveXMLStr))
 		{
@@ -1712,19 +1712,19 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 		XMLString::release(&curveXMLStr);
 	}
 	else if(XMLString::equals(optionMorphErosion, optionXML))
-	{		
+	{
 		this->option = RSGISExeVectorUtils::morphologicalerosion;
-		
+
 		if(!singlevector)
 		{
 			throw RSGISXMLArgumentsException("This algorithm requires only a single vector input.");
 		}
-		
+
 		if(noInputProvide)
 		{
 			throw RSGISXMLArgumentsException("No input file has been provided.");
 		}
-		
+
 		XMLCh *outputXMLStr = XMLString::transcode("output");
 		if(argElement->hasAttribute(outputXMLStr))
 		{
@@ -1736,14 +1736,14 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 		{
 			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
 		}
-		XMLString::release(&outputXMLStr);		
-		
+		XMLString::release(&outputXMLStr);
+
 		XMLCh *forceXMLStr = XMLString::transcode("force");
 		if(argElement->hasAttribute(forceXMLStr))
 		{
 			XMLCh *yesStr = XMLString::transcode("yes");
 			const XMLCh *forceValue = argElement->getAttribute(forceXMLStr);
-			
+
 			if(XMLString::equals(forceValue, yesStr))
 			{
 				this->force = true;
@@ -1759,7 +1759,7 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'force\' attribute was provided.");
 		}
 		XMLString::release(&forceXMLStr);
-		
+
 		XMLCh *bufferXMLStr = XMLString::transcode("buffer");
 		if(argElement->hasAttribute(bufferXMLStr))
 		{
@@ -1772,7 +1772,7 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'buffer\' attribute was provided.");
 		}
 		XMLString::release(&bufferXMLStr);
-		
+
 		XMLCh *curveXMLStr = XMLString::transcode("curve");
 		if(argElement->hasAttribute(curveXMLStr))
 		{
@@ -1787,19 +1787,19 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 		XMLString::release(&curveXMLStr);
 	}
 	else if(XMLString::equals(optionNonConvexLineProj, optionXML))
-	{		
+	{
 		this->option = RSGISExeVectorUtils::nonconvexoutlinelineproj;
-		
+
 		if(!singlevector)
 		{
 			throw RSGISXMLArgumentsException("This algorithm requires only a single vector input.");
 		}
-		
+
 		if(noInputProvide)
 		{
 			throw RSGISXMLArgumentsException("No input file has been provided.");
 		}
-		
+
 		XMLCh *outputXMLStr = XMLString::transcode("output");
 		if(argElement->hasAttribute(outputXMLStr))
 		{
@@ -1812,13 +1812,13 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
 		}
 		XMLString::release(&outputXMLStr);
-		
+
 		XMLCh *forceXMLStr = XMLString::transcode("force");
 		if(argElement->hasAttribute(forceXMLStr))
 		{
 			XMLCh *yesStr = XMLString::transcode("yes");
 			const XMLCh *forceValue = argElement->getAttribute(forceXMLStr);
-			
+
 			if(XMLString::equals(forceValue, yesStr))
 			{
 				this->force = true;
@@ -1834,7 +1834,7 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'force\' attribute was provided.");
 		}
 		XMLString::release(&forceXMLStr);
-		
+
 		XMLCh *resolutionXMLStr = XMLString::transcode("resolution");
 		if(argElement->hasAttribute(resolutionXMLStr))
 		{
@@ -1849,19 +1849,19 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 		XMLString::release(&resolutionXMLStr);
 	}
 	else if(XMLString::equals(optionNonConvexDelaunay, optionXML))
-	{		
+	{
 		this->option = RSGISExeVectorUtils::nonconvexoutlinedelaunay;
-		
+
 		if(!singlevector)
 		{
 			throw RSGISXMLArgumentsException("This algorithm requires only a single vector input.");
 		}
-		
+
 		if(noInputProvide)
 		{
 			throw RSGISXMLArgumentsException("No input file has been provided.");
 		}
-		
+
 		XMLCh *outputXMLStr = XMLString::transcode("output");
 		if(argElement->hasAttribute(outputXMLStr))
 		{
@@ -1874,13 +1874,13 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
 		}
 		XMLString::release(&outputXMLStr);
-		
+
 		XMLCh *forceXMLStr = XMLString::transcode("force");
 		if(argElement->hasAttribute(forceXMLStr))
 		{
 			XMLCh *yesStr = XMLString::transcode("yes");
 			const XMLCh *forceValue = argElement->getAttribute(forceXMLStr);
-			
+
 			if(XMLString::equals(forceValue, yesStr))
 			{
 				this->force = true;
@@ -1898,19 +1898,19 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 		XMLString::release(&forceXMLStr);
 	}
 	else if(XMLString::equals(optionNonConvexSnakes, optionXML))
-	{		
+	{
 		this->option = RSGISExeVectorUtils::nonconvexoutlinesnakes;
-		
+
 		if(!singlevector)
 		{
 			throw RSGISXMLArgumentsException("This algorithm requires only a single vector input.");
 		}
-		
+
 		if(noInputProvide)
 		{
 			throw RSGISXMLArgumentsException("No input file has been provided.");
 		}
-		
+
 		XMLCh *outputXMLStr = XMLString::transcode("output");
 		if(argElement->hasAttribute(outputXMLStr))
 		{
@@ -1923,13 +1923,13 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
 		}
 		XMLString::release(&outputXMLStr);
-		
+
 		XMLCh *forceXMLStr = XMLString::transcode("force");
 		if(argElement->hasAttribute(forceXMLStr))
 		{
 			XMLCh *yesStr = XMLString::transcode("yes");
 			const XMLCh *forceValue = argElement->getAttribute(forceXMLStr);
-			
+
 			if(XMLString::equals(forceValue, yesStr))
 			{
 				this->force = true;
@@ -1947,19 +1947,19 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 		XMLString::release(&forceXMLStr);
 	}
 	else if(XMLString::equals(optionConvexOutline, optionXML))
-	{		
+	{
 		this->option = RSGISExeVectorUtils::convexoutline;
-		
+
 		if(!singlevector)
 		{
 			throw RSGISXMLArgumentsException("This algorithm requires only a single vector input.");
 		}
-		
+
 		if(noInputProvide)
 		{
 			throw RSGISXMLArgumentsException("No input file has been provided.");
 		}
-		
+
 		XMLCh *outputXMLStr = XMLString::transcode("output");
 		if(argElement->hasAttribute(outputXMLStr))
 		{
@@ -1972,13 +1972,13 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
 		}
 		XMLString::release(&outputXMLStr);
-		
+
 		XMLCh *forceXMLStr = XMLString::transcode("force");
 		if(argElement->hasAttribute(forceXMLStr))
 		{
 			XMLCh *yesStr = XMLString::transcode("yes");
 			const XMLCh *forceValue = argElement->getAttribute(forceXMLStr);
-			
+
 			if(XMLString::equals(forceValue, yesStr))
 			{
 				this->force = true;
@@ -1996,19 +1996,19 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 		XMLString::release(&forceXMLStr);
 	}
 	else if(XMLString::equals(optionMergetouchingpolys, optionXML))
-	{		
+	{
 		this->option = RSGISExeVectorUtils::mergetouchingpoly;
-		
+
 		if(!singlevector)
 		{
 			throw RSGISXMLArgumentsException("This algorithm requires only a single vector input.");
 		}
-		
+
 		if(noInputProvide)
 		{
 			throw RSGISXMLArgumentsException("No input file has been provided.");
 		}
-		
+
 		XMLCh *outputXMLStr = XMLString::transcode("output");
 		if(argElement->hasAttribute(outputXMLStr))
 		{
@@ -2021,13 +2021,13 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
 		}
 		XMLString::release(&outputXMLStr);
-		
+
 		XMLCh *forceXMLStr = XMLString::transcode("force");
 		if(argElement->hasAttribute(forceXMLStr))
 		{
 			XMLCh *yesStr = XMLString::transcode("yes");
 			const XMLCh *forceValue = argElement->getAttribute(forceXMLStr);
-			
+
 			if(XMLString::equals(forceValue, yesStr))
 			{
 				this->force = true;
@@ -2045,20 +2045,20 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 		XMLString::release(&forceXMLStr);
 	}
 	else if(XMLString::equals(optionFreqDist, optionXML))
-	{		
+	{
 		this->option = RSGISExeVectorUtils::freqdist;
-		
+
 		if(singlevector)
 		{
 			inputVectors = new list<string>();
 			inputVectors->push_back(inputVector);
 		}
-		
+
 		if(noInputProvide)
 		{
 			throw RSGISXMLArgumentsException("No input file has been provided.");
 		}
-		
+
 		XMLCh *outputXMLStr = XMLString::transcode("output");
 		if(argElement->hasAttribute(outputXMLStr))
 		{
@@ -2071,7 +2071,7 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
 		}
 		XMLString::release(&outputXMLStr);
-		
+
 		XMLCh *attributeXMLStr = XMLString::transcode("attribute");
 		if(argElement->hasAttribute(attributeXMLStr))
 		{
@@ -2084,22 +2084,22 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'attribute\' attribute was provided.");
 		}
 		XMLString::release(&attributeXMLStr);
-		
+
 	}
 	else if(XMLString::equals(optionRasterise, optionXML) | XMLString::equals(optionRasterize, optionXML) ) // Check for British or American spelling
-	{		
+	{
 		this->option = RSGISExeVectorUtils::rasterise;
-		
+
 		if(!singlevector)
 		{
 			throw RSGISXMLArgumentsException("This algorithm requires only a single vector input.");
 		}
-		
+
 		if(noInputProvide)
 		{
 			throw RSGISXMLArgumentsException("No input file has been provided.");
 		}
-		
+
 		XMLCh *outputXMLStr = XMLString::transcode("output");
 		if(argElement->hasAttribute(outputXMLStr))
 		{
@@ -2112,8 +2112,8 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
 		}
 		XMLString::release(&outputXMLStr);
-		
-		
+
+
 		XMLCh *imageXMLStr = XMLString::transcode("image");
 		if(argElement->hasAttribute(imageXMLStr))
 		{
@@ -2127,7 +2127,7 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			this->useExistingRaster = false;
 		}
 		XMLString::release(&imageXMLStr);
-		
+
 		XMLCh *attributeXMLStr = XMLString::transcode("attribute");
 		if(argElement->hasAttribute(attributeXMLStr))
 		{
@@ -2140,7 +2140,7 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'attribute\' attribute was provided.");
 		}
 		XMLString::release(&attributeXMLStr);
-		
+
 		// Retrieve method for calculating pixels in polygon
 		XMLCh *methodXMLStr = XMLString::transcode("method");
 		if(argElement->hasAttribute(methodXMLStr))
@@ -2173,7 +2173,7 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			this->method = polyContainsPixelCenter;
 		}
 		XMLString::release(&methodXMLStr);
-		
+
 		XMLCh *resolutionXMLStr = XMLString::transcode("resolution");
 		if(argElement->hasAttribute(resolutionXMLStr))
 		{
@@ -2186,7 +2186,7 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'resolution\' attribute was provided.");
 		}
 		XMLString::release(&resolutionXMLStr);
-		
+
 		XMLCh *constValXMLStr = XMLString::transcode("constval");
 		if(argElement->hasAttribute(constValXMLStr))
 		{
@@ -2200,22 +2200,22 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			this->constVal = 0;
 		}
 		XMLString::release(&constValXMLStr);
-		
+
 	}
     else if(XMLString::equals(optionBurnRasterise, optionXML) | XMLString::equals(optionBurnRasterize, optionXML) ) // Check for British or American spelling
-	{		
+	{
 		this->option = RSGISExeVectorUtils::burnrasterise;
-		
+
 		if(!singlevector)
 		{
 			throw RSGISXMLArgumentsException("This algorithm requires only a single vector input.");
 		}
-		
+
 		if(noInputProvide)
 		{
 			throw RSGISXMLArgumentsException("No input file has been provided.");
 		}
-		
+
 		XMLCh *imageXMLStr = XMLString::transcode("image");
 		if(argElement->hasAttribute(imageXMLStr))
 		{
@@ -2228,7 +2228,7 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'image\' attribute was provided.");
 		}
 		XMLString::release(&imageXMLStr);
-		
+
 		XMLCh *attributeXMLStr = XMLString::transcode("attribute");
 		if(argElement->hasAttribute(attributeXMLStr))
 		{
@@ -2241,7 +2241,7 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'attribute\' attribute was provided.");
 		}
 		XMLString::release(&attributeXMLStr);
-		
+
 		// Retrieve method for calculating pixels in polygon
 		XMLCh *methodXMLStr = XMLString::transcode("method");
 		if(argElement->hasAttribute(methodXMLStr))
@@ -2278,17 +2278,17 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 	else if(XMLString::equals(optionPolygonPlots, optionXML))
 	{
 		this->option = RSGISExeVectorUtils::polygonplots;
-		
+
 		if(!inputFileNotVector)
 		{
 			throw RSGISXMLArgumentsException("This algorithm requires only a single CSV file input.");
 		}
-		
+
 		if(noInputProvide)
 		{
 			throw RSGISXMLArgumentsException("No input file has been provided.");
 		}
-		
+
 		XMLCh *outputXMLStr = XMLString::transcode("output");
 		if(argElement->hasAttribute(outputXMLStr))
 		{
@@ -2301,13 +2301,13 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
 		}
 		XMLString::release(&outputXMLStr);
-		
+
 		XMLCh *forceXMLStr = XMLString::transcode("force");
 		if(argElement->hasAttribute(forceXMLStr))
 		{
 			XMLCh *yesStr = XMLString::transcode("yes");
 			const XMLCh *forceValue = argElement->getAttribute(forceXMLStr);
-			
+
 			if(XMLString::equals(forceValue, yesStr))
 			{
 				this->force = true;
@@ -2322,22 +2322,22 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 		{
 			throw RSGISXMLArgumentsException("No \'force\' attribute was provided.");
 		}
-		XMLString::release(&forceXMLStr);		
+		XMLString::release(&forceXMLStr);
 	}
 	else if(XMLString::equals(optionPolygonImageFootprints, optionXML))
 	{
 		this->option = RSGISExeVectorUtils::polygonImageFootprints;
-		
+
 		if(!inputFileNotVector)
 		{
 			throw RSGISXMLArgumentsException("This algorithm requires only a single CSV file input.");
 		}
-		
+
 		if(noInputProvide)
 		{
 			throw RSGISXMLArgumentsException("No input file has been provided.");
 		}
-		
+
 		XMLCh *outputXMLStr = XMLString::transcode("output");
 		if(argElement->hasAttribute(outputXMLStr))
 		{
@@ -2350,13 +2350,13 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
 		}
 		XMLString::release(&outputXMLStr);
-		
+
 		XMLCh *forceXMLStr = XMLString::transcode("force");
 		if(argElement->hasAttribute(forceXMLStr))
 		{
 			XMLCh *yesStr = XMLString::transcode("yes");
 			const XMLCh *forceValue = argElement->getAttribute(forceXMLStr);
-			
+
 			if(XMLString::equals(forceValue, yesStr))
 			{
 				this->force = true;
@@ -2371,22 +2371,22 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 		{
 			throw RSGISXMLArgumentsException("No \'force\' attribute was provided.");
 		}
-		XMLString::release(&forceXMLStr);		
+		XMLString::release(&forceXMLStr);
 	}
 	else if(XMLString::equals(optionPolygoniseMPolys, optionXML))
 	{
 		this->option = RSGISExeVectorUtils::polygonizempolys;
-		
+
 		if(!singlevector)
 		{
 			throw RSGISXMLArgumentsException("This algorithm requires only a single vector input.");
 		}
-		
+
 		if(noInputProvide)
 		{
 			throw RSGISXMLArgumentsException("No input file has been provided.");
 		}
-		
+
 		XMLCh *outputXMLStr = XMLString::transcode("output");
 		if(argElement->hasAttribute(outputXMLStr))
 		{
@@ -2399,13 +2399,13 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
 		}
 		XMLString::release(&outputXMLStr);
-		
+
 		XMLCh *forceXMLStr = XMLString::transcode("force");
 		if(argElement->hasAttribute(forceXMLStr))
 		{
 			XMLCh *yesStr = XMLString::transcode("yes");
 			const XMLCh *forceValue = argElement->getAttribute(forceXMLStr);
-			
+
 			if(XMLString::equals(forceValue, yesStr))
 			{
 				this->force = true;
@@ -2420,14 +2420,14 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 		{
 			throw RSGISXMLArgumentsException("No \'force\' attribute was provided.");
 		}
-		XMLString::release(&forceXMLStr);	
-		
+		XMLString::release(&forceXMLStr);
+
 		XMLCh *polygonizertagXMLStr = XMLString::transcode("rsgis:polygonizer");
 		XMLCh *polygonizerLineProj = XMLString::transcode("lineproj");
 		XMLCh *polygonizerDelaunay1 = XMLString::transcode("delaunay1");
 		XMLCh *polygonizerConvexHull = XMLString::transcode("convexhull");
 		XMLCh *polygonizerSnakes = XMLString::transcode("snakes");
-		
+
 		DOMNodeList *polgonizerNodesList = argElement->getElementsByTagName(polygonizertagXMLStr);
 		if(polgonizerNodesList->getLength() == 1)
 		{
@@ -2435,11 +2435,11 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			if(polygonizerElement->hasAttribute(algorXMLStr))
 			{
 				const XMLCh *polygonizerAlgor = polygonizerElement->getAttribute(algorXMLStr);
-				
+
 				if(XMLString::equals(polygonizerLineProj, polygonizerAlgor))
 				{
 					polygonizertype = lineproj;
-					
+
 					XMLCh *resolutionXMLStr = XMLString::transcode("resolution");
 					if(polygonizerElement->hasAttribute(resolutionXMLStr))
 					{
@@ -2452,7 +2452,7 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 						throw RSGISXMLArgumentsException("No \'resolution\' attribute was provided for polygonizer.");
 					}
 					XMLString::release(&resolutionXMLStr);
-					
+
 				}
 				else if(XMLString::equals(polygonizerDelaunay1, polygonizerAlgor))
 				{
@@ -2465,7 +2465,7 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 				else if(XMLString::equals(polygonizerSnakes, polygonizerAlgor))
 				{
 					polygonizertype = snakes;
-					
+
 					XMLCh *resolutionXMLStr = XMLString::transcode("resolution");
 					if(polygonizerElement->hasAttribute(resolutionXMLStr))
 					{
@@ -2478,7 +2478,7 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 						throw RSGISXMLArgumentsException("No \'resolution\' attribute was provided for polygonizer.");
 					}
 					XMLString::release(&resolutionXMLStr);
-					
+
 					XMLCh *alphaXMLStr = XMLString::transcode("alpha");
 					if(polygonizerElement->hasAttribute(alphaXMLStr))
 					{
@@ -2491,7 +2491,7 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 						throw RSGISXMLArgumentsException("No \'alpha\' attribute was provided for polygonizer.");
 					}
 					XMLString::release(&alphaXMLStr);
-					
+
 					XMLCh *betaXMLStr = XMLString::transcode("beta");
 					if(polygonizerElement->hasAttribute(betaXMLStr))
 					{
@@ -2504,7 +2504,7 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 						throw RSGISXMLArgumentsException("No \'beta\' attribute was provided for polygonizer.");
 					}
 					XMLString::release(&betaXMLStr);
-					
+
 					XMLCh *gammaXMLStr = XMLString::transcode("gamma");
 					if(polygonizerElement->hasAttribute(gammaXMLStr))
 					{
@@ -2517,8 +2517,8 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 						throw RSGISXMLArgumentsException("No \'gamma\' attribute was provided for polygonizer.");
 					}
 					XMLString::release(&gammaXMLStr);
-					
-					
+
+
 					XMLCh *deltaXMLStr = XMLString::transcode("delta");
 					if(polygonizerElement->hasAttribute(deltaXMLStr))
 					{
@@ -2531,8 +2531,8 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 						throw RSGISXMLArgumentsException("No \'delta\' attribute was provided for polygonizer.");
 					}
 					XMLString::release(&deltaXMLStr);
-					
-					
+
+
 					XMLCh *maxNumIterationsXMLStr = XMLString::transcode("maxNumIterations");
 					if(polygonizerElement->hasAttribute(maxNumIterationsXMLStr))
 					{
@@ -2550,13 +2550,13 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 				{
 					throw RSGISXMLArgumentsException("Polygonizer algorithm was not recognised");
 				}
-				
+
 			}
 		    else
 			{
 				throw RSGISXMLArgumentsException("No \'algor\' attribute was provided for polygonizer.");
 			}
-			
+
 		}
 		else if(polgonizerNodesList->getLength() == 0)
 		{
@@ -2566,7 +2566,7 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 		{
 			throw RSGISXMLArgumentsException("Only one rsgis:polygonizer tag should be provided.");
 		}
-		
+
 		XMLString::release(&polygonizertagXMLStr);
 		XMLString::release(&polygonizerLineProj);
 		XMLString::release(&polygonizerDelaunay1);
@@ -2574,19 +2574,19 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 		XMLString::release(&polygonizerSnakes);
 	}
 	else if(XMLString::equals(optionScatter2D, optionXML))
-	{		
+	{
 		this->option = RSGISExeVectorUtils::scatter2D;
-		
+
 		if(!singlevector)
 		{
 			throw RSGISXMLArgumentsException("This algorithm requires only a single vector input.");
 		}
-		
+
 		if(noInputProvide)
 		{
 			throw RSGISXMLArgumentsException("No input file has been provided.");
 		}
-		
+
 		XMLCh *outputXMLStr = XMLString::transcode("output");
 		if(argElement->hasAttribute(outputXMLStr))
 		{
@@ -2599,8 +2599,8 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
 		}
 		XMLString::release(&outputXMLStr);
-		
-		
+
+
 		XMLCh *attribute1XMLStr = XMLString::transcode("attribute1");
 		if(argElement->hasAttribute(attribute1XMLStr))
 		{
@@ -2613,7 +2613,7 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'attribute1\' attribute was provided.");
 		}
 		XMLString::release(&attribute1XMLStr);
-		
+
 		XMLCh *attribute2XMLStr = XMLString::transcode("attribute2");
 		if(argElement->hasAttribute(attribute2XMLStr))
 		{
@@ -2626,22 +2626,22 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'attribute2\' attribute was provided.");
 		}
 		XMLString::release(&attribute2XMLStr);
-		
-	}	
+
+	}
 	else if(XMLString::equals(optionCopyCheckPolys, optionXML))
-	{		
+	{
 		this->option = RSGISExeVectorUtils::copycheckpolys;
-		
+
 		if(!singlevector)
 		{
 			throw RSGISXMLArgumentsException("This algorithm requires only a single vector input.");
 		}
-		
+
 		if(noInputProvide)
 		{
 			throw RSGISXMLArgumentsException("No input file has been provided.");
 		}
-		
+
 		XMLCh *outputXMLStr = XMLString::transcode("output");
 		if(argElement->hasAttribute(outputXMLStr))
 		{
@@ -2654,13 +2654,13 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
 		}
 		XMLString::release(&outputXMLStr);
-		
+
 		XMLCh *forceXMLStr = XMLString::transcode("force");
 		if(argElement->hasAttribute(forceXMLStr))
 		{
 			XMLCh *yesStr = XMLString::transcode("yes");
 			const XMLCh *forceValue = argElement->getAttribute(forceXMLStr);
-			
+
 			if(XMLString::equals(forceValue, yesStr))
 			{
 				this->force = true;
@@ -2676,21 +2676,21 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'force\' attribute was provided.");
 		}
 		XMLString::release(&forceXMLStr);
-	}	
+	}
 	else if(XMLString::equals(optionSplitByAttribute, optionXML))
-	{		
+	{
 		this->option = RSGISExeVectorUtils::splitbyattribute;
-		
+
 		if(!singlevector)
 		{
 			throw RSGISXMLArgumentsException("This algorithm requires only a single vector input.");
 		}
-		
+
 		if(noInputProvide)
 		{
 			throw RSGISXMLArgumentsException("No input file has been provided.");
 		}
-		
+
 		XMLCh *outputXMLStr = XMLString::transcode("output");
 		if(argElement->hasAttribute(outputXMLStr))
 		{
@@ -2703,13 +2703,13 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
 		}
 		XMLString::release(&outputXMLStr);
-		
+
 		XMLCh *forceXMLStr = XMLString::transcode("force");
 		if(argElement->hasAttribute(forceXMLStr))
 		{
 			XMLCh *yesStr = XMLString::transcode("yes");
 			const XMLCh *forceValue = argElement->getAttribute(forceXMLStr);
-			
+
 			if(XMLString::equals(forceValue, yesStr))
 			{
 				this->force = true;
@@ -2725,7 +2725,7 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'force\' attribute was provided.");
 		}
 		XMLString::release(&forceXMLStr);
-		
+
 		XMLCh *attributeXMLStr = XMLString::transcode("attribute");
 		if(argElement->hasAttribute(attributeXMLStr))
 		{
@@ -2738,22 +2738,22 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'attribute\' attribute was provided.");
 		}
 		XMLString::release(&attributeXMLStr);
-		
-	}	
+
+	}
 	else if(XMLString::equals(optionRemoveContainedPolygons, optionXML))
-	{		
+	{
 		this->option = RSGISExeVectorUtils::removecontainedpolygons;
-		
+
 		if(!singlevector)
 		{
 			throw RSGISXMLArgumentsException("This algorithm requires only a single vector input.");
 		}
-		
+
 		if(noInputProvide)
 		{
 			throw RSGISXMLArgumentsException("No input file has been provided.");
 		}
-		
+
 		XMLCh *outputXMLStr = XMLString::transcode("output");
 		if(argElement->hasAttribute(outputXMLStr))
 		{
@@ -2766,13 +2766,13 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
 		}
 		XMLString::release(&outputXMLStr);
-		
+
 		XMLCh *forceXMLStr = XMLString::transcode("force");
 		if(argElement->hasAttribute(forceXMLStr))
 		{
 			XMLCh *yesStr = XMLString::transcode("yes");
 			const XMLCh *forceValue = argElement->getAttribute(forceXMLStr);
-			
+
 			if(XMLString::equals(forceValue, yesStr))
 			{
 				this->force = true;
@@ -2790,21 +2790,21 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 		XMLString::release(&forceXMLStr);
 	}
 	else if(XMLString::equals(optionRemoveContainedPolygonsDIR, optionXML))
-	{		
+	{
 		this->option = RSGISExeVectorUtils::removecontainedpolygonsDIR;
-		
+
 		if(!inputFileNotVector)
 		{
 			throw RSGISXMLArgumentsException("This algorithm requires a single input parameter specifying the input directory.");
 		}
-		
+
 		if(noInputProvide)
 		{
 			throw RSGISXMLArgumentsException("No input file has been provided.");
 		}
-		
+
 		this->inputDIR = this->inputFile;
-		
+
 		XMLCh *outputXMLStr = XMLString::transcode("output");
 		if(argElement->hasAttribute(outputXMLStr))
 		{
@@ -2817,13 +2817,13 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
 		}
 		XMLString::release(&outputXMLStr);
-		
+
 		XMLCh *forceXMLStr = XMLString::transcode("force");
 		if(argElement->hasAttribute(forceXMLStr))
 		{
 			XMLCh *yesStr = XMLString::transcode("yes");
 			const XMLCh *forceValue = argElement->getAttribute(forceXMLStr);
-			
+
 			if(XMLString::equals(forceValue, yesStr))
 			{
 				this->force = true;
@@ -2841,19 +2841,19 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 		XMLString::release(&forceXMLStr);
 	}
 	else if(XMLString::equals(optionPolygonsInPolygon, optionXML))
-	{		
+	{
 		this->option = RSGISExeVectorUtils::polygonsInPolygon;
-		
+
 		if(!singlevector)
 		{
 			throw RSGISXMLArgumentsException("This algorithm requires only a single vector input.");
 		}
-		
+
 		if(noInputProvide)
 		{
 			throw RSGISXMLArgumentsException("No input file has been provided.");
 		}
-		
+
 		// Get attribute to use shapefile
 		XMLCh *attributeNameXMLStr = XMLString::transcode("attributeName");
 		if(argElement->hasAttribute(attributeNameXMLStr))
@@ -2867,7 +2867,7 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			cout << "No attribute name provided for cover shapefile, using default of FID" << endl;
 		}
 		XMLString::release(&attributeNameXMLStr);
-		
+
 		// Get covering shapefile
 		XMLCh *inputCoverVectorXMLStr = XMLString::transcode("coverVector");
 		if(argElement->hasAttribute(inputCoverVectorXMLStr))
@@ -2881,7 +2881,7 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \"inputCoverVector\" attribute provided");
 		}
 		XMLString::release(&inputCoverVectorXMLStr);
-		
+
 		// Get output direcrory
 		XMLCh *dirXMLStr = XMLString::transcode("dir");
 		if(argElement->hasAttribute(dirXMLStr))
@@ -2895,64 +2895,13 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'dir\' attribute was provided.");
 		}
 		XMLString::release(&dirXMLStr);
-		
+
 		XMLCh *forceXMLStr = XMLString::transcode("force");
 		if(argElement->hasAttribute(forceXMLStr))
 		{
 			XMLCh *yesStr = XMLString::transcode("yes");
 			const XMLCh *forceValue = argElement->getAttribute(forceXMLStr);
-			
-			if(XMLString::equals(forceValue, yesStr))
-			{
-				this->force = true;
-			}
-			else
-			{
-				this->force = false;
-			}
-			XMLString::release(&yesStr);
-		}
-		else
-		{
-			throw RSGISXMLArgumentsException("No \'force\' attribute was provided.");
-		}
-		XMLString::release(&forceXMLStr);		
-	}
-	else if(XMLString::equals(optionMergetouchingpolysDIR, optionXML))
-	{		
-		this->option = RSGISExeVectorUtils::mergetouchingpolyDIR;
-		
-		if(!inputFileNotVector)
-		{
-			throw RSGISXMLArgumentsException("This algorithm requires a single input parameter specifying the input directory.");
-		}
-		
-		if(noInputProvide)
-		{
-			throw RSGISXMLArgumentsException("No input file has been provided.");
-		}
-		
-		this->inputDIR = this->inputFile;
-		
-		XMLCh *outputXMLStr = XMLString::transcode("output");
-		if(argElement->hasAttribute(outputXMLStr))
-		{
-			char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
-			this->output_DIR = string(charValue);
-			XMLString::release(&charValue);
-		}
-		else
-		{
-			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
-		}
-		XMLString::release(&outputXMLStr);
-		
-		XMLCh *forceXMLStr = XMLString::transcode("force");
-		if(argElement->hasAttribute(forceXMLStr))
-		{
-			XMLCh *yesStr = XMLString::transcode("yes");
-			const XMLCh *forceValue = argElement->getAttribute(forceXMLStr);
-			
+
 			if(XMLString::equals(forceValue, yesStr))
 			{
 				this->force = true;
@@ -2968,7 +2917,58 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'force\' attribute was provided.");
 		}
 		XMLString::release(&forceXMLStr);
-		
+	}
+	else if(XMLString::equals(optionMergetouchingpolysDIR, optionXML))
+	{
+		this->option = RSGISExeVectorUtils::mergetouchingpolyDIR;
+
+		if(!inputFileNotVector)
+		{
+			throw RSGISXMLArgumentsException("This algorithm requires a single input parameter specifying the input directory.");
+		}
+
+		if(noInputProvide)
+		{
+			throw RSGISXMLArgumentsException("No input file has been provided.");
+		}
+
+		this->inputDIR = this->inputFile;
+
+		XMLCh *outputXMLStr = XMLString::transcode("output");
+		if(argElement->hasAttribute(outputXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
+			this->output_DIR = string(charValue);
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+		}
+		XMLString::release(&outputXMLStr);
+
+		XMLCh *forceXMLStr = XMLString::transcode("force");
+		if(argElement->hasAttribute(forceXMLStr))
+		{
+			XMLCh *yesStr = XMLString::transcode("yes");
+			const XMLCh *forceValue = argElement->getAttribute(forceXMLStr);
+
+			if(XMLString::equals(forceValue, yesStr))
+			{
+				this->force = true;
+			}
+			else
+			{
+				this->force = false;
+			}
+			XMLString::release(&yesStr);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'force\' attribute was provided.");
+		}
+		XMLString::release(&forceXMLStr);
+
 		XMLCh *attributeXMLStr = XMLString::transcode("attribute");
 		if(argElement->hasAttribute(attributeXMLStr))
 		{
@@ -2982,23 +2982,23 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			attributeDef = false;
 		}
 		XMLString::release(&attributeXMLStr);
-		
-		
+
+
 	}
 	else if(XMLString::equals(optionSplitlargesmall, optionXML))
-	{		
+	{
 		this->option = RSGISExeVectorUtils::splitlargesmall;
-		
+
 		if(!singlevector)
 		{
 			throw RSGISXMLArgumentsException("This algorithm requires only a single vector input.");
 		}
-		
+
 		if(noInputProvide)
 		{
 			throw RSGISXMLArgumentsException("No input file has been provided.");
 		}
-		
+
 		XMLCh *outputLargeXMLStr = XMLString::transcode("outputlarge");
 		if(argElement->hasAttribute(outputLargeXMLStr))
 		{
@@ -3011,7 +3011,7 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'outputlarge\' attribute was provided.");
 		}
 		XMLString::release(&outputLargeXMLStr);
-		
+
 		XMLCh *outputSmallXMLStr = XMLString::transcode("outputsmall");
 		if(argElement->hasAttribute(outputSmallXMLStr))
 		{
@@ -3024,13 +3024,13 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'outputsmall\' attribute was provided.");
 		}
 		XMLString::release(&outputSmallXMLStr);
-		
+
 		XMLCh *forceXMLStr = XMLString::transcode("force");
 		if(argElement->hasAttribute(forceXMLStr))
 		{
 			XMLCh *yesStr = XMLString::transcode("yes");
 			const XMLCh *forceValue = argElement->getAttribute(forceXMLStr);
-			
+
 			if(XMLString::equals(forceValue, yesStr))
 			{
 				this->force = true;
@@ -3046,7 +3046,7 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'force\' attribute was provided.");
 		}
 		XMLString::release(&forceXMLStr);
-		
+
 		XMLCh *thresholdXMLStr = XMLString::transcode("threshold");
 		if(argElement->hasAttribute(thresholdXMLStr))
 		{
@@ -3059,22 +3059,22 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'threshold\' attribute was provided.");
 		}
 		XMLString::release(&thresholdXMLStr);
-		
+
 	}
 	else if(XMLString::equals(optionRemovepolygonscontainedwithingeom, optionXML))
-	{		
+	{
 		this->option = RSGISExeVectorUtils::removepolygonscontainedwithingeom;
-		
+
 		if(!singlevector)
 		{
 			throw RSGISXMLArgumentsException("This algorithm requires only a single vector input.");
 		}
-		
+
 		if(noInputProvide)
 		{
 			throw RSGISXMLArgumentsException("No input file has been provided.");
 		}
-		
+
 		XMLCh *geometryXMLStr = XMLString::transcode("geometry");
 		if(argElement->hasAttribute(geometryXMLStr))
 		{
@@ -3087,7 +3087,7 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'geometry\' attribute was provided.");
 		}
 		XMLString::release(&geometryXMLStr);
-		
+
 		XMLCh *outputXMLStr = XMLString::transcode("output");
 		if(argElement->hasAttribute(outputXMLStr))
 		{
@@ -3100,13 +3100,13 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
 		}
 		XMLString::release(&outputXMLStr);
-		
+
 		XMLCh *forceXMLStr = XMLString::transcode("force");
 		if(argElement->hasAttribute(forceXMLStr))
 		{
 			XMLCh *yesStr = XMLString::transcode("yes");
 			const XMLCh *forceValue = argElement->getAttribute(forceXMLStr);
-			
+
 			if(XMLString::equals(forceValue, yesStr))
 			{
 				this->force = true;
@@ -3124,20 +3124,20 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 		XMLString::release(&forceXMLStr);
 	}
 	else if(XMLString::equals(optionMergeSHPs, optionXML))
-	{		
+	{
 		this->option = RSGISExeVectorUtils::mergeshps;
-		
+
 		if(singlevector)
 		{
 			inputVectors = new list<string>();
 			inputVectors->push_back(inputVector);
 		}
-		
+
 		if(noInputProvide)
 		{
 			throw RSGISXMLArgumentsException("No input file has been provided.");
 		}
-		
+
 		XMLCh *outputXMLStr = XMLString::transcode("output");
 		if(argElement->hasAttribute(outputXMLStr))
 		{
@@ -3150,13 +3150,13 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
 		}
 		XMLString::release(&outputXMLStr);
-		
+
 		XMLCh *forceXMLStr = XMLString::transcode("force");
 		if(argElement->hasAttribute(forceXMLStr))
 		{
 			XMLCh *yesStr = XMLString::transcode("yes");
 			const XMLCh *forceValue = argElement->getAttribute(forceXMLStr);
-			
+
 			if(XMLString::equals(forceValue, yesStr))
 			{
 				this->force = true;
@@ -3173,13 +3173,13 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 		}
 		XMLString::release(&forceXMLStr);
 
-		
+
 		XMLCh *ignoreAttrXMLStr = XMLString::transcode("ignoreattributes");
 		if(argElement->hasAttribute(ignoreAttrXMLStr))
 		{
 			XMLCh *yesStr = XMLString::transcode("yes");
 			const XMLCh *strValue = argElement->getAttribute(ignoreAttrXMLStr);
-			
+
 			if(XMLString::equals(strValue, yesStr))
 			{
 				this->ignoreAttr = true;
@@ -3194,22 +3194,22 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 		{
 			throw RSGISXMLArgumentsException("No \'ignoreattributes\' attribute was provided.");
 		}
-		XMLString::release(&ignoreAttrXMLStr);			
+		XMLString::release(&ignoreAttrXMLStr);
 	}
 	else if(XMLString::equals(optionFixPolyExtBoundary, optionXML))
 	{
 		this->option = RSGISExeVectorUtils::fixpolyextboundary;
-		
+
 		if(!singlevector)
 		{
 			throw RSGISXMLArgumentsException("This algorithm requires only a single vector input.");
 		}
-		
+
 		if(noInputProvide)
 		{
 			throw RSGISXMLArgumentsException("No input file has been provided.");
 		}
-		
+
 		XMLCh *outputXMLStr = XMLString::transcode("output");
 		if(argElement->hasAttribute(outputXMLStr))
 		{
@@ -3222,13 +3222,13 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
 		}
 		XMLString::release(&outputXMLStr);
-		
+
 		XMLCh *forceXMLStr = XMLString::transcode("force");
 		if(argElement->hasAttribute(forceXMLStr))
 		{
 			XMLCh *yesStr = XMLString::transcode("yes");
 			const XMLCh *forceValue = argElement->getAttribute(forceXMLStr);
-			
+
 			if(XMLString::equals(forceValue, yesStr))
 			{
 				this->force = true;
@@ -3248,17 +3248,17 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 	else if(XMLString::equals(optionRemoveHoles, optionXML))
 	{
 		this->option = RSGISExeVectorUtils::removepolyholes;
-		
+
 		if(!singlevector)
 		{
 			throw RSGISXMLArgumentsException("This algorithm requires only a single vector input.");
 		}
-		
+
 		if(noInputProvide)
 		{
 			throw RSGISXMLArgumentsException("No input file has been provided.");
 		}
-		
+
 		XMLCh *outputXMLStr = XMLString::transcode("output");
 		if(argElement->hasAttribute(outputXMLStr))
 		{
@@ -3271,13 +3271,13 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
 		}
 		XMLString::release(&outputXMLStr);
-		
+
 		XMLCh *forceXMLStr = XMLString::transcode("force");
 		if(argElement->hasAttribute(forceXMLStr))
 		{
 			XMLCh *yesStr = XMLString::transcode("yes");
 			const XMLCh *forceValue = argElement->getAttribute(forceXMLStr);
-			
+
 			if(XMLString::equals(forceValue, yesStr))
 			{
 				this->force = true;
@@ -3293,7 +3293,7 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'force\' attribute was provided.");
 		}
 		XMLString::release(&forceXMLStr);
-        
+
         XMLCh *thresholdXMLStr = XMLString::transcode("threshold");
 		if(argElement->hasAttribute(thresholdXMLStr))
 		{
@@ -3311,17 +3311,17 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 	else if(XMLString::equals(optionDropSmallPolys, optionXML))
 	{
 		this->option = RSGISExeVectorUtils::dropsmallpolys;
-		
+
 		if(!singlevector)
 		{
 			throw RSGISXMLArgumentsException("This algorithm requires only a single vector input.");
 		}
-		
+
 		if(noInputProvide)
 		{
 			throw RSGISXMLArgumentsException("No input file has been provided.");
 		}
-		
+
 		XMLCh *outputXMLStr = XMLString::transcode("output");
 		if(argElement->hasAttribute(outputXMLStr))
 		{
@@ -3334,13 +3334,13 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
 		}
 		XMLString::release(&outputXMLStr);
-		
+
 		XMLCh *forceXMLStr = XMLString::transcode("force");
 		if(argElement->hasAttribute(forceXMLStr))
 		{
 			XMLCh *yesStr = XMLString::transcode("yes");
 			const XMLCh *forceValue = argElement->getAttribute(forceXMLStr);
-			
+
 			if(XMLString::equals(forceValue, yesStr))
 			{
 				this->force = true;
@@ -3356,7 +3356,7 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'force\' attribute was provided.");
 		}
 		XMLString::release(&forceXMLStr);
-		
+
 		XMLCh *thresholdXMLStr = XMLString::transcode("threshold");
 		if(argElement->hasAttribute(thresholdXMLStr))
 		{
@@ -3369,22 +3369,22 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'threshold\' attribute was provided.");
 		}
 		XMLString::release(&thresholdXMLStr);
-		
+
 	}
 	else if(XMLString::equals(optionExtractLargestPoly, optionXML))
 	{
 		this->option = RSGISExeVectorUtils::extractlargestpoly;
-		
+
 		if(!singlevector)
 		{
 			throw RSGISXMLArgumentsException("This algorithm requires only a single vector input.");
 		}
-		
+
 		if(noInputProvide)
 		{
 			throw RSGISXMLArgumentsException("No input file has been provided.");
 		}
-		
+
 		XMLCh *outputXMLStr = XMLString::transcode("output");
 		if(argElement->hasAttribute(outputXMLStr))
 		{
@@ -3397,13 +3397,13 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
 		}
 		XMLString::release(&outputXMLStr);
-		
+
 		XMLCh *forceXMLStr = XMLString::transcode("force");
 		if(argElement->hasAttribute(forceXMLStr))
 		{
 			XMLCh *yesStr = XMLString::transcode("yes");
 			const XMLCh *forceValue = argElement->getAttribute(forceXMLStr);
-			
+
 			if(XMLString::equals(forceValue, yesStr))
 			{
 				this->force = true;
@@ -3423,17 +3423,17 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 	else if(XMLString::equals(optionGenerateSinglePoly, optionXML))
 	{
 		this->option = RSGISExeVectorUtils::generatesinglepoly;
-		
+
 		if(!singlevector)
 		{
 			throw RSGISXMLArgumentsException("This algorithm requires only a single vector input.");
 		}
-		
+
 		if(noInputProvide)
 		{
 			throw RSGISXMLArgumentsException("No input file has been provided.");
 		}
-		
+
 		XMLCh *outputXMLStr = XMLString::transcode("output");
 		if(argElement->hasAttribute(outputXMLStr))
 		{
@@ -3446,13 +3446,13 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
 		}
 		XMLString::release(&outputXMLStr);
-		
+
 		XMLCh *forceXMLStr = XMLString::transcode("force");
 		if(argElement->hasAttribute(forceXMLStr))
 		{
 			XMLCh *yesStr = XMLString::transcode("yes");
 			const XMLCh *forceValue = argElement->getAttribute(forceXMLStr);
-			
+
 			if(XMLString::equals(forceValue, yesStr))
 			{
 				this->force = true;
@@ -3467,14 +3467,14 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 		{
 			throw RSGISXMLArgumentsException("No \'force\' attribute was provided.");
 		}
-		XMLString::release(&forceXMLStr);	
-		
+		XMLString::release(&forceXMLStr);
+
 		XMLCh *polygonizertagXMLStr = XMLString::transcode("rsgis:polygonizer");
 		XMLCh *polygonizerLineProj = XMLString::transcode("lineproj");
 		XMLCh *polygonizerDelaunay1 = XMLString::transcode("delaunay1");
 		XMLCh *polygonizerConvexHull = XMLString::transcode("convexhull");
 		XMLCh *polygonizerSnakes = XMLString::transcode("snakes");
-		
+
 		DOMNodeList *polgonizerNodesList = argElement->getElementsByTagName(polygonizertagXMLStr);
 		if(polgonizerNodesList->getLength() == 1)
 		{
@@ -3482,11 +3482,11 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			if(polygonizerElement->hasAttribute(algorXMLStr))
 			{
 				const XMLCh *polygonizerAlgor = polygonizerElement->getAttribute(algorXMLStr);
-				
+
 				if(XMLString::equals(polygonizerLineProj, polygonizerAlgor))
 				{
 					polygonizertype = lineproj;
-					
+
 					XMLCh *resolutionXMLStr = XMLString::transcode("resolution");
 					if(polygonizerElement->hasAttribute(resolutionXMLStr))
 					{
@@ -3499,7 +3499,7 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 						throw RSGISXMLArgumentsException("No \'resolution\' attribute was provided for polygonizer.");
 					}
 					XMLString::release(&resolutionXMLStr);
-					
+
 				}
 				else if(XMLString::equals(polygonizerDelaunay1, polygonizerAlgor))
 				{
@@ -3512,7 +3512,7 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 				else if(XMLString::equals(polygonizerSnakes, polygonizerAlgor))
 				{
 					polygonizertype = snakes;
-					
+
 					XMLCh *resolutionXMLStr = XMLString::transcode("resolution");
 					if(polygonizerElement->hasAttribute(resolutionXMLStr))
 					{
@@ -3525,7 +3525,7 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 						throw RSGISXMLArgumentsException("No \'resolution\' attribute was provided for polygonizer.");
 					}
 					XMLString::release(&resolutionXMLStr);
-					
+
 					XMLCh *alphaXMLStr = XMLString::transcode("alpha");
 					if(polygonizerElement->hasAttribute(alphaXMLStr))
 					{
@@ -3538,7 +3538,7 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 						throw RSGISXMLArgumentsException("No \'alpha\' attribute was provided for polygonizer.");
 					}
 					XMLString::release(&alphaXMLStr);
-					
+
 					XMLCh *betaXMLStr = XMLString::transcode("beta");
 					if(polygonizerElement->hasAttribute(betaXMLStr))
 					{
@@ -3551,7 +3551,7 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 						throw RSGISXMLArgumentsException("No \'beta\' attribute was provided for polygonizer.");
 					}
 					XMLString::release(&betaXMLStr);
-					
+
 					XMLCh *gammaXMLStr = XMLString::transcode("gamma");
 					if(polygonizerElement->hasAttribute(gammaXMLStr))
 					{
@@ -3564,8 +3564,8 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 						throw RSGISXMLArgumentsException("No \'gamma\' attribute was provided for polygonizer.");
 					}
 					XMLString::release(&gammaXMLStr);
-					
-					
+
+
 					XMLCh *deltaXMLStr = XMLString::transcode("delta");
 					if(polygonizerElement->hasAttribute(deltaXMLStr))
 					{
@@ -3578,8 +3578,8 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 						throw RSGISXMLArgumentsException("No \'delta\' attribute was provided for polygonizer.");
 					}
 					XMLString::release(&deltaXMLStr);
-					
-					
+
+
 					XMLCh *maxNumIterationsXMLStr = XMLString::transcode("maxNumIterations");
 					if(polygonizerElement->hasAttribute(maxNumIterationsXMLStr))
 					{
@@ -3597,13 +3597,13 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 				{
 					throw RSGISXMLArgumentsException("Polygonizer algorithm was not recognised");
 				}
-				
+
 			}
 		    else
 			{
 				throw RSGISXMLArgumentsException("No \'algor\' attribute was provided for polygonizer.");
 			}
-			
+
 		}
 		else if(polgonizerNodesList->getLength() == 0)
 		{
@@ -3613,7 +3613,7 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 		{
 			throw RSGISXMLArgumentsException("Only one rsgis:polygonizer tag should be provided.");
 		}
-		
+
 		XMLString::release(&polygonizertagXMLStr);
 		XMLString::release(&polygonizerLineProj);
 		XMLString::release(&polygonizerDelaunay1);
@@ -3628,7 +3628,7 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 		{
 			cerr << "An input file has been provided but this will be ignored\n";
 		}
-		
+
 		XMLCh *outputXMLStr = XMLString::transcode("output");
 		if(argElement->hasAttribute(outputXMLStr))
 		{
@@ -3641,13 +3641,13 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
 		}
 		XMLString::release(&outputXMLStr);
-		
+
 		XMLCh *forceXMLStr = XMLString::transcode("force");
 		if(argElement->hasAttribute(forceXMLStr))
 		{
 			XMLCh *yesStr = XMLString::transcode("yes");
 			const XMLCh *forceValue = argElement->getAttribute(forceXMLStr);
-			
+
 			if(XMLString::equals(forceValue, yesStr))
 			{
 				this->force = true;
@@ -3663,7 +3663,7 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'force\' attribute was provided.");
 		}
 		XMLString::release(&forceXMLStr);
-		
+
 		XMLCh *proj4XMLStr = XMLString::transcode("proj4");
 		if(argElement->hasAttribute(proj4XMLStr))
 		{
@@ -3676,9 +3676,9 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'proj4\' attribute was provided.");
 		}
 		XMLString::release(&proj4XMLStr);
-		
-		
-		
+
+
+
 		XMLCh *tlxXMLStr = XMLString::transcode("tlx");
 		if(argElement->hasAttribute(tlxXMLStr))
 		{
@@ -3692,7 +3692,7 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 		}
 		XMLString::release(&tlxXMLStr);
 
-		
+
 		XMLCh *tlyXMLStr = XMLString::transcode("tly");
 		if(argElement->hasAttribute(tlyXMLStr))
 		{
@@ -3705,8 +3705,8 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'tly\' attribute was provided.");
 		}
 		XMLString::release(&tlyXMLStr);
-		
-		
+
+
 		XMLCh *xresXMLStr = XMLString::transcode("xres");
 		if(argElement->hasAttribute(xresXMLStr))
 		{
@@ -3723,8 +3723,8 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'xres\' attribute was provided.");
 		}
 		XMLString::release(&xresXMLStr);
-		
-		
+
+
 		XMLCh *yresXMLStr = XMLString::transcode("yres");
 		if(argElement->hasAttribute(yresXMLStr))
 		{
@@ -3741,8 +3741,8 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'yres\' attribute was provided.");
 		}
 		XMLString::release(&yresXMLStr);
-		
-		
+
+
 		XMLCh *widthXMLStr = XMLString::transcode("width");
 		if(argElement->hasAttribute(widthXMLStr))
 		{
@@ -3755,7 +3755,7 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'width\' attribute was provided.");
 		}
 		XMLString::release(&widthXMLStr);
-		
+
 		XMLCh *heightXMLStr = XMLString::transcode("height");
 		if(argElement->hasAttribute(heightXMLStr))
 		{
@@ -3767,24 +3767,24 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 		{
 			throw RSGISXMLArgumentsException("No \'height\' attribute was provided.");
 		}
-		XMLString::release(&heightXMLStr);		
-		
+		XMLString::release(&heightXMLStr);
+
 	}
 	else if(XMLString::equals(optionGenerateImageGrid, optionXML))
 	{
 		this->option = RSGISExeVectorUtils::generateimagegrid;
-		
+
 		if(!inputFileNotVector)
 		{
 			throw RSGISXMLArgumentsException("This algorithm requires only a single image file input.");
 		}
-		
+
 		if(noInputProvide)
 		{
 			throw RSGISXMLArgumentsException("No input file has been provided.");
 		}
-		
-		
+
+
 		XMLCh *outputXMLStr = XMLString::transcode("output");
 		if(argElement->hasAttribute(outputXMLStr))
 		{
@@ -3797,13 +3797,13 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
 		}
 		XMLString::release(&outputXMLStr);
-		
+
 		XMLCh *forceXMLStr = XMLString::transcode("force");
 		if(argElement->hasAttribute(forceXMLStr))
 		{
 			XMLCh *yesStr = XMLString::transcode("yes");
 			const XMLCh *forceValue = argElement->getAttribute(forceXMLStr);
-			
+
 			if(XMLString::equals(forceValue, yesStr))
 			{
 				this->force = true;
@@ -3819,7 +3819,7 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'force\' attribute was provided.");
 		}
 		XMLString::release(&forceXMLStr);
-				
+
 		XMLCh *xresXMLStr = XMLString::transcode("xres");
 		if(argElement->hasAttribute(xresXMLStr))
 		{
@@ -3832,7 +3832,7 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'xres\' attribute was provided.");
 		}
 		XMLString::release(&xresXMLStr);
-		
+
 		XMLCh *yresXMLStr = XMLString::transcode("yres");
 		if(argElement->hasAttribute(yresXMLStr))
 		{
@@ -3849,7 +3849,7 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 	else if(XMLString::equals(optionVectorMaths, optionXML))
 	{
 		this->option = RSGISExeVectorUtils::vectormaths;
-		
+
 		XMLCh *outputXMLStr = XMLString::transcode("output");
 		if(argElement->hasAttribute(outputXMLStr))
 		{
@@ -3862,13 +3862,13 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
 		}
 		XMLString::release(&outputXMLStr);
-		
+
 		XMLCh *forceXMLStr = XMLString::transcode("force");
 		if(argElement->hasAttribute(forceXMLStr))
 		{
 			XMLCh *yesStr = XMLString::transcode("yes");
 			const XMLCh *forceValue = argElement->getAttribute(forceXMLStr);
-			
+
 			if(XMLString::equals(forceValue, yesStr))
 			{
 				this->force = true;
@@ -3884,7 +3884,7 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'force\' attribute was provided.");
 		}
 		XMLString::release(&forceXMLStr);
-		
+
 		XMLCh *expressionXMLStr = XMLString::transcode("expression");
 		XMLCh *expressionFileXMLStr = XMLString::transcode("expressionFile");
 		if(argElement->hasAttribute(expressionXMLStr))
@@ -3895,12 +3895,12 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
             replace_all(muExpression, "&gt;", ">");
             replace_all(muExpression, "&ge;", ">=");
             replace_all(muExpression, "&le;", "<=");
-            
+
             replace_all(muExpression, "lt", "<");
             replace_all(muExpression, "gt", ">");
             replace_all(muExpression, "ge", ">=");
             replace_all(muExpression, "le", "<=");
-			
+
 			this->mathsExpression = muExpression;
 			XMLString::release(&charValue);
 		}
@@ -3926,17 +3926,17 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
             replace_all(muExpression, "&gt;", ">");
             replace_all(muExpression, "&ge;", ">=");
             replace_all(muExpression, "&le;", "<=");
-            
+
             replace_all(muExpression, "lt", "<");
             replace_all(muExpression, "gt", ">");
             replace_all(muExpression, "ge", ">=");
             replace_all(muExpression, "le", "<=");
-			
+
 			// Replace tabs
-			replace_all(muExpression, "\t", ""); 
-			replace_all(muExpression, "\n", ""); 
-			replace_all(muExpression, " ", ""); 
-			
+			replace_all(muExpression, "\t", "");
+			replace_all(muExpression, "\n", "");
+			replace_all(muExpression, " ", "");
+
 			this->mathsExpression = muExpression;
 			XMLString::release(&charValue);
 		}
@@ -3946,7 +3946,7 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 		}
 		XMLString::release(&expressionXMLStr);
 		XMLString::release(&expressionFileXMLStr);
-		
+
 		XMLCh *outHeadingXMLStr = XMLString::transcode("outHeading");
 		if(argElement->hasAttribute(outHeadingXMLStr))
 		{
@@ -3959,22 +3959,22 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'outHeading\' attribute was provided.");
 		}
 		XMLString::release(&outHeadingXMLStr);
-		
-		
+
+
 		DOMNodeList *varNodesList = argElement->getElementsByTagName(XMLString::transcode("rsgis:variable"));
-		this->numVars = varNodesList->getLength();		
-		
+		this->numVars = varNodesList->getLength();
+
 		cout << "Found " << this->numVars << " Variables \n";
-		
+
 		DOMElement *varElement = NULL;
 		variables = new VariableFields*[numVars];
-		
+
 		for(int i = 0; i < numVars; i++)
 		{
 			varElement = static_cast<DOMElement*>(varNodesList->item(i));
-			
+
 			variables[i] = new VariableFields();
-			
+
 			XMLCh *varNameXMLStr = XMLString::transcode("name");
 			if(varElement->hasAttribute(varNameXMLStr))
 			{
@@ -3991,7 +3991,7 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 				throw RSGISXMLArgumentsException("No \'name\' attribute was provided.");
 			}
 			XMLString::release(&varNameXMLStr);
-			
+
 			XMLCh *varFieldNameXMLStr = XMLString::transcode("fieldname");
 			if(varElement->hasAttribute(varFieldNameXMLStr))
 			{
@@ -4003,24 +4003,24 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			{
 				throw RSGISXMLArgumentsException("No \'fieldname\' attribute was provided.");
 			}
-			XMLString::release(&varFieldNameXMLStr);		
+			XMLString::release(&varFieldNameXMLStr);
 		}
-		
+
 	}
     else if(XMLString::equals(optionVectorSelect, optionXML))
     {
         this->option = RSGISExeVectorUtils::select;
-        
+
         if(!singlevector)
 		{
 			throw RSGISXMLArgumentsException("This algorithm requires only a single vector input.");
 		}
-		
+
 		if(noInputProvide)
 		{
 			throw RSGISXMLArgumentsException("No input file has been provided.");
 		}
-        
+
         XMLCh *outputXMLStr = XMLString::transcode("output");
 		if(argElement->hasAttribute(outputXMLStr))
 		{
@@ -4033,13 +4033,13 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
 		}
 		XMLString::release(&outputXMLStr);
-		
+
 		XMLCh *forceXMLStr = XMLString::transcode("force");
 		if(argElement->hasAttribute(forceXMLStr))
 		{
 			XMLCh *yesStr = XMLString::transcode("yes");
 			const XMLCh *forceValue = argElement->getAttribute(forceXMLStr);
-			
+
 			if(XMLString::equals(forceValue, yesStr))
 			{
 				this->force = true;
@@ -4055,7 +4055,7 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'force\' attribute was provided.");
 		}
 		XMLString::release(&forceXMLStr);
-		
+
 		XMLCh *expressionXMLStr = XMLString::transcode("expression");
 		if(argElement->hasAttribute(expressionXMLStr))
 		{
@@ -4067,22 +4067,22 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 		{
 			throw RSGISXMLArgumentsException("No \'expression\' attribute was provided.");
 		}
-		XMLString::release(&expressionXMLStr);        
+		XMLString::release(&expressionXMLStr);
     }
     else if(XMLString::equals(optionCalcMeanMinDist, optionXML))
     {
         this->option = RSGISExeVectorUtils::calcmeanmindist;
-        
+
         if(!singlevector)
 		{
 			throw RSGISXMLArgumentsException("This algorithm requires only a single vector input.");
 		}
-		
+
 		if(noInputProvide)
 		{
 			throw RSGISXMLArgumentsException("No input file has been provided.");
 		}
-        
+
         XMLCh *outputXMLStr = XMLString::transcode("output");
 		if(argElement->hasAttribute(outputXMLStr))
 		{
@@ -4101,17 +4101,17 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
     else if (XMLString::equals(optionCopyAssignProj, optionXML))
     {
         this->option = RSGISExeVectorUtils::copyassignproj;
-                
+
         if(!singlevector)
 		{
 			throw RSGISXMLArgumentsException("This algorithm requires only a single vector input.");
 		}
-		
+
 		if(noInputProvide)
 		{
 			throw RSGISXMLArgumentsException("No input file has been provided.");
 		}
-        
+
         XMLCh *outputXMLStr = XMLString::transcode("output");
 		if(argElement->hasAttribute(outputXMLStr))
 		{
@@ -4124,8 +4124,8 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
 		}
 		XMLString::release(&outputXMLStr);
-        
-        
+
+
         XMLCh *projWKTXMLStr = XMLString::transcode("projwkt");
 		if(argElement->hasAttribute(projWKTXMLStr))
 		{
@@ -4138,13 +4138,13 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'projwkt\' attribute was provided.");
 		}
 		XMLString::release(&projWKTXMLStr);
-        
+
         XMLCh *forceXMLStr = XMLString::transcode("force");
 		if(argElement->hasAttribute(forceXMLStr))
 		{
 			XMLCh *yesStr = XMLString::transcode("yes");
 			const XMLCh *forceValue = argElement->getAttribute(forceXMLStr);
-			
+
 			if(XMLString::equals(forceValue, yesStr))
 			{
 				this->force = true;
@@ -4164,12 +4164,12 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
     else if (XMLString::equals(optionPrintWKT, optionXML))
     {
         this->option = RSGISExeVectorUtils::printwkt;
-        
+
         if(!singlevector)
 		{
 			throw RSGISXMLArgumentsException("This algorithm requires only a single vector input.");
 		}
-		
+
 		if(noInputProvide)
 		{
 			throw RSGISXMLArgumentsException("No input file has been provided.");
@@ -4178,17 +4178,17 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
     else if (XMLString::equals(optionAddFIDCol, optionXML))
     {
         this->option = RSGISExeVectorUtils::addfidcol;
-        
+
         if(!singlevector)
 		{
 			throw RSGISXMLArgumentsException("This algorithm requires only a single vector input.");
 		}
-		
+
 		if(noInputProvide)
 		{
 			throw RSGISXMLArgumentsException("No input file has been provided.");
 		}
-        
+
         XMLCh *outputXMLStr = XMLString::transcode("output");
 		if(argElement->hasAttribute(outputXMLStr))
 		{
@@ -4201,13 +4201,13 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
 		}
 		XMLString::release(&outputXMLStr);
-        
+
         XMLCh *forceXMLStr = XMLString::transcode("force");
 		if(argElement->hasAttribute(forceXMLStr))
 		{
 			XMLCh *yesStr = XMLString::transcode("yes");
 			const XMLCh *forceValue = argElement->getAttribute(forceXMLStr);
-			
+
 			if(XMLString::equals(forceValue, yesStr))
 			{
 				this->force = true;
@@ -4223,8 +4223,8 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'force\' attribute was provided.");
 		}
 		XMLString::release(&forceXMLStr);
-        
-        
+
+
         XMLCh *initXMLStr = XMLString::transcode("init");
 		if(argElement->hasAttribute(initXMLStr))
 		{
@@ -4241,17 +4241,17 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
     else if (XMLString::equals(optionMinDist2Polys, optionXML))
     {
         this->option = RSGISExeVectorUtils::mindist2polys;
-        
+
         if(!singlevector)
 		{
 			throw RSGISXMLArgumentsException("This algorithm requires only a single vector input.");
 		}
-		
+
 		if(noInputProvide)
 		{
 			throw RSGISXMLArgumentsException("No input file has been provided.");
 		}
-        
+
         XMLCh *polysXMLStr = XMLString::transcode("polygons");
 		if(argElement->hasAttribute(polysXMLStr))
 		{
@@ -4264,7 +4264,7 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'polygons\' attribute was provided.");
 		}
 		XMLString::release(&polysXMLStr);
-        
+
         XMLCh *outputXMLStr = XMLString::transcode("output");
 		if(argElement->hasAttribute(outputXMLStr))
 		{
@@ -4277,13 +4277,13 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
 		}
 		XMLString::release(&outputXMLStr);
-        
+
         XMLCh *forceXMLStr = XMLString::transcode("force");
 		if(argElement->hasAttribute(forceXMLStr))
 		{
 			XMLCh *yesStr = XMLString::transcode("yes");
 			const XMLCh *forceValue = argElement->getAttribute(forceXMLStr);
-			
+
 			if(XMLString::equals(forceValue, yesStr))
 			{
 				this->force = true;
@@ -4299,16 +4299,16 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 			throw RSGISXMLArgumentsException("No \'force\' attribute was provided.");
 		}
 		XMLString::release(&forceXMLStr);
-        
-        
-        
+
+
+
     }
 	else
 	{
 		string message = string("The option (") + string(XMLString::transcode(optionXML)) + string(") is not known: RSGISExeVectorUtils.");
 		throw RSGISXMLArgumentsException(message.c_str());
 	}
-	
+
 	parsed = true;
 
 	XMLString::release(&algorName);
@@ -4390,30 +4390,34 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 			cout << "Copy geometry and remove attributes\n";
 			cout << "Input Vector: " << this->inputVector << endl;
 			cout << "Output Vector: " << this->outputVector << endl;
-			
+
+            // Convert to absolute path
+            this->inputVector = boost::filesystem::absolute(this->inputVector).c_str();
+            this->outputVector = boost::filesystem::absolute(this->outputVector).c_str();
+
 			OGRRegisterAll();
-			
+
 			RSGISFileUtils fileUtils;
 			RSGISVectorUtils vecUtils;
-			
+
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
 			string SHPFileOutLayer = vecUtils.getLayerName(this->outputVector);
-			
+
 			OGRDataSource *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
 			OGRSFDriver *shpFiledriver = NULL;
 			OGRDataSource *outputSHPDS = NULL;
 			OGRLayer *outputSHPLayer = NULL;
 			OGRSpatialReference* inputSpatialRef = NULL;
-			
+
 			RSGISProcessVector *processVector = NULL;
 			RSGISProcessOGRFeature *processFeature = NULL;
-			
+
 			string outputDIR = "";
 			try
 			{
 				outputDIR = fileUtils.getFileDirectoryPath(this->outputVector);
-				
+
 				if(vecUtils.checkDIR4SHP(outputDIR, SHPFileOutLayer))
 				{
 					if(this->force)
@@ -4425,7 +4429,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 						throw RSGISException("Shapefile already exists, either delete or select force.");
 					}
 				}
-				
+
 				/////////////////////////////////////
 				//
 				// Open Input Shapfile.
@@ -4443,12 +4447,12 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					string message = string("Could not open vector layer ") + SHPFileInLayer;
 					throw RSGISFileException(message.c_str());
 				}
-				inputSpatialRef = inputSHPLayer->GetSpatialRef();	
-				
+				inputSpatialRef = inputSHPLayer->GetSpatialRef();
+
 				// Get Geometry Type.
 				OGRFeature *feature = inputSHPLayer->GetFeature(0);
 				OGRwkbGeometryType geometryType = feature->GetGeometryRef()->getGeometryType();
-				
+
 				/////////////////////////////////////
 				//
 				// Create Output Shapfile.
@@ -4472,21 +4476,21 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					string message = string("Could not create vector layer ") + SHPFileOutLayer;
 					throw RSGISVectorOutputException(message.c_str());
 				}
-				
+
 				processFeature = new RSGISProcessFeatureCopyVector();
 				processVector = new RSGISProcessVector(processFeature);
-				
+
 				processVector->processVectors(inputSHPLayer, outputSHPLayer, false, false, false);
-				
+
 				OGRDataSource::DestroyDataSource(inputSHPDS);
 				OGRDataSource::DestroyDataSource(outputSHPDS);
-				
+
 				delete processVector;
 				delete processFeature;
-				
+
 				//OGRCleanupAll();
 			}
-			catch (RSGISException e) 
+			catch (RSGISException e)
 			{
 				throw e;
 			}
@@ -4497,15 +4501,19 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 			cout << "Input Vector: " << this->inputVector << endl;
 			cout << "Output Vector: " << this->outputVector << endl;
 			cout << "Buffer: " << this->buffer << endl;
-			
+
+            // Convert to absolute path
+            this->inputVector = boost::filesystem::absolute(this->inputVector).c_str();
+            this->outputVector = boost::filesystem::absolute(this->outputVector).c_str();
+
 			OGRRegisterAll();
-			
+
 			RSGISFileUtils fileUtils;
 			RSGISVectorUtils vecUtils;
-			
+
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
 			string SHPFileOutLayer = vecUtils.getLayerName(this->outputVector);
-			
+
 			OGRDataSource *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
 			OGRSFDriver *shpFiledriver = NULL;
@@ -4513,15 +4521,15 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 			OGRLayer *outputSHPLayer = NULL;
 			OGRSpatialReference* inputSpatialRef = NULL;
 			OGRFeatureDefn *inFeatureDefn = NULL;
-			
+
 			RSGISProcessGeometry *processVector = NULL;
 			RSGISProcessOGRGeometry *processGeom = NULL;
-			
+
 			string outputDIR = "";
 			try
 			{
 				outputDIR = fileUtils.getFileDirectoryPath(this->outputVector);
-				
+
 				if(vecUtils.checkDIR4SHP(outputDIR, SHPFileOutLayer))
 				{
 					if(this->force)
@@ -4533,7 +4541,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 						throw RSGISException("Shapefile already exists, either delete or select force.");
 					}
 				}
-				
+
 				/////////////////////////////////////
 				//
 				// Open Input Shapfile.
@@ -4551,9 +4559,9 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					string message = string("Could not open vector layer ") + SHPFileInLayer;
 					throw RSGISFileException(message.c_str());
 				}
-				inputSpatialRef = inputSHPLayer->GetSpatialRef();	
+				inputSpatialRef = inputSHPLayer->GetSpatialRef();
 				inFeatureDefn = inputSHPLayer->GetLayerDefn();
-				
+
 				/////////////////////////////////////
 				//
 				// Create Output Shapfile.
@@ -4577,28 +4585,28 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					string message = string("Could not create vector layer ") + SHPFileOutLayer;
 					throw RSGISVectorOutputException(message.c_str());
 				}
-				
+
                 if(bufferValueInText)
                 {
                     RSGISTextUtils textUtils;
                     string fileContents = textUtils.readFileToString(bufferValueFile);
                     this->buffer = textUtils.strtofloat(fileContents);
                 }
-                
+
 				processGeom = new RSGISVectorBuffer(this->buffer);
 				processVector = new RSGISProcessGeometry(processGeom);
-				
+
 				processVector->processGeometryPolygonOutput(inputSHPLayer, outputSHPLayer, true, false);
-				
+
 				OGRDataSource::DestroyDataSource(inputSHPDS);
 				OGRDataSource::DestroyDataSource(outputSHPDS);
-				
+
 				delete processVector;
 				delete processGeom;
-				
+
 				//OGRCleanupAll();
 			}
-			catch (RSGISException e) 
+			catch (RSGISException e)
 			{
 				throw e;
 			}
@@ -4612,30 +4620,34 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 			cout << "Radius Attribute: " << this->radiusAttribute << endl;
 			cout << "Resolution: " << this->resolution << endl;
 			cout << "Radius Value: " << this->radius << endl;
-			
+
+            // Convert to absolute path
+            this->inputVector = boost::filesystem::absolute(this->inputVector).c_str();
+            this->outputVector = boost::filesystem::absolute(this->outputVector).c_str();
+
 			OGRRegisterAll();
-			
+
 			RSGISFileUtils fileUtils;
 			RSGISVectorUtils vecUtils;
-			
+
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
 			string SHPFileOutLayer = vecUtils.getLayerName(this->outputVector);
-			
+
 			OGRDataSource *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
 			OGRSFDriver *shpFiledriver = NULL;
 			OGRDataSource *outputSHPDS = NULL;
 			OGRLayer *outputSHPLayer = NULL;
 			OGRSpatialReference* inputSpatialRef = NULL;
-			
+
 			RSGISProcessVector *processVector = NULL;
 			RSGISProcessOGRFeature *processFeature = NULL;
-			
+
 			string outputDIR = "";
 			try
-			{				
+			{
 				outputDIR = fileUtils.getFileDirectoryPath(this->outputVector);
-				
+
 				if(vecUtils.checkDIR4SHP(outputDIR, SHPFileOutLayer))
 				//if(fileUtils.checkFilePresent(this->outputVector))
 				{
@@ -4665,8 +4677,8 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					string message = string("Could not open vector layer ") + SHPFileInLayer;
 					throw RSGISFileException(message.c_str());
 				}
-				inputSpatialRef = inputSHPLayer->GetSpatialRef();	
-								
+				inputSpatialRef = inputSHPLayer->GetSpatialRef();
+
 				/////////////////////////////////////
 				//
 				// Create Output Shapfile.
@@ -4690,39 +4702,43 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					string message = string("Could not create vector layer ") + SHPFileOutLayer;
 					throw RSGISVectorOutputException(message.c_str());
 				}
-				
+
 				processFeature = new RSGISGeometryToCircle(this->resolution, this->areaAttribute, this->radiusAttribute, this->radius);
 				processVector = new RSGISProcessVector(processFeature);
-				
+
 				processVector->processVectors(inputSHPLayer, outputSHPLayer, true, false, false);
-				
+
 				OGRDataSource::DestroyDataSource(inputSHPDS);
 				OGRDataSource::DestroyDataSource(outputSHPDS);
-				
+
 				delete processVector;
 				delete processFeature;
-				
+
 				//OGRCleanupAll();
 			}
-			catch (RSGISException& e) 
+			catch (RSGISException& e)
 			{
 				throw e;
 			}
-			
+
 		}
 		else if(option == RSGISExeVectorUtils::printpolygeom)
 		{
 			cout << "Print Polygon Geometry\n";
 			cout << "Input Vector: " << this->inputVector << endl;
+
+            // Convert to absolute path
+            this->inputVector = boost::filesystem::absolute(this->inputVector).c_str();
+
 			OGRRegisterAll();
-			
+
 			RSGISVectorUtils vecUtils;
 
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
-			
+
 			OGRDataSource *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
-			
+
 			RSGISVectorIO *vecIO = NULL;
 			RSGISPolygonData **polygons = NULL;
 			int numFeatures = 0;
@@ -4745,9 +4761,9 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					string message = string("Could not open vector layer ") + SHPFileInLayer;
 					throw RSGISFileException(message.c_str());
 				}
-				
+
 				numFeatures = inputSHPLayer->GetFeatureCount(true);
-				
+
 				cout << "Shapefile has " << numFeatures << " features\n";
 				vecIO = new RSGISVectorIO();
 				polygons = new RSGISPolygonData*[numFeatures];
@@ -4756,14 +4772,14 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					polygons[i] = new RSGISEmptyPolygon();
 				}
 				vecIO->readPolygons(inputSHPLayer, polygons, numFeatures);
-				
+
 				cout.precision(8);
-				
+
 				for(int i = 0; i < numFeatures; i++)
 				{
 					cout << "Polygon " << i << ":\t" << polygons[i]->getGeometry()->toText() << endl;
 				}
-				
+
 				if(vecIO != NULL)
 				{
 					delete vecIO;
@@ -4776,12 +4792,12 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					}
 					delete polygons;
 				}
-				
+
 				OGRDataSource::DestroyDataSource(inputSHPDS);
-				
+
 				//OGRCleanupAll();
 			}
-			catch (RSGISException e) 
+			catch (RSGISException e)
 			{
 				throw e;
 			}
@@ -4793,18 +4809,22 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 			cout << "Attribute: " << this->attribute << endl;
 			cout << "Find: " << this->find << endl;
 			cout << "Replace: " << this->replace << endl;
-			
+
+            // Convert to absolute path
+            this->inputVector = boost::filesystem::absolute(this->inputVector).c_str();
+
+
 			OGRRegisterAll();
-			
+
 			RSGISVectorUtils vecUtils;
 			RSGISProcessVector *processVector = NULL;
 			RSGISProcessOGRFeature *processFeature = NULL;
 
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
-			
+
 			OGRDataSource *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
-			
+
 			try
 			{
 				/////////////////////////////////////
@@ -4824,19 +4844,19 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					string message = string("Could not open vector layer ") + SHPFileInLayer;
 					throw RSGISFileException(message.c_str());
 				}
-				
+
 				processFeature = new RSGISVectorAttributeFindReplace(this->attribute, this->find, this->replace);
 				processVector = new RSGISProcessVector(processFeature);
-				
+
 				processVector->processVectors(inputSHPLayer, false);
-				
+
 				OGRDataSource::DestroyDataSource(inputSHPDS);
 				delete processVector;
 				delete processFeature;
-				
+
 				//OGRCleanupAll();
 			}
-			catch (RSGISException e) 
+			catch (RSGISException e)
 			{
 				throw e;
 			}
@@ -4845,17 +4865,20 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 		{
 			cout << "List attributes\n";
 			cout << "Input Vector: " << this->inputVector << endl;
-			
+
+            // Convert to absolute path
+            this->inputVector = boost::filesystem::absolute(this->inputVector).c_str();
+
 			OGRRegisterAll();
-			
+
 			RSGISVectorUtils vecUtils;
 			RSGISVectorProcessing vecProcessing;
-			
+
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
-			
+
 			OGRDataSource *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
-			
+
 			try
 			{
 				/////////////////////////////////////
@@ -4875,35 +4898,38 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					string message = string("Could not open vector layer ") + SHPFileInLayer;
 					throw RSGISFileException(message.c_str());
 				}
-				
+
 				vecProcessing.listAttributes(inputSHPLayer);
-				
+
 				OGRDataSource::DestroyDataSource(inputSHPDS);
-				
+
 				//OGRCleanupAll();
 			}
-			catch (RSGISException e) 
+			catch (RSGISException e)
 			{
 				throw e;
 			}
-			
+
 		}
 		else if(option == RSGISExeVectorUtils::printattribute)
 		{
 			cout << "Print attribute for all features\n";
 			cout << "Input Vector: " << this->inputVector << endl;
 			cout << "Attribute: " << this->attribute << endl;
-			
+
+            // Convert to absolute path
+            this->inputVector = boost::filesystem::absolute(this->inputVector).c_str();
+
 			OGRRegisterAll();
-			
+
 			RSGISVectorUtils vecUtils;
 			RSGISVectorProcessing vecProcessing;
-			
+
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
-			
+
 			OGRDataSource *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
-			
+
 			try
 			{
 				/////////////////////////////////////
@@ -4923,14 +4949,14 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					string message = string("Could not open vector layer ") + SHPFileInLayer;
 					throw RSGISFileException(message.c_str());
 				}
-				
+
 				vecProcessing.printAttribute(inputSHPLayer, this->attribute);
-				
+
 				OGRDataSource::DestroyDataSource(inputSHPDS);
-				
+
 				//OGRCleanupAll();
 			}
-			catch (RSGISException e) 
+			catch (RSGISException e)
 			{
 				throw e;
 			}
@@ -4938,29 +4964,34 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 		else if(option == RSGISExeVectorUtils::topattributes)
 		{
 			cout << "Calculate the top attributes\n";
+
+            // Convert to absolute path
+            this->inputVector = boost::filesystem::absolute(this->inputVector).c_str();
+            this->outputVector = boost::filesystem::absolute(this->outputVector).c_str();
+
 			OGRRegisterAll();
-			
+
 			RSGISFileUtils fileUtils;
 			RSGISVectorUtils vecUtils;
 
 			RSGISProcessVector *processVector = NULL;
 			RSGISProcessOGRFeature *processFeature = NULL;
-			
+
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
 			string SHPFileOutLayer = vecUtils.getLayerName(this->outputVector);
-			
+
 			OGRDataSource *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
 			OGRSFDriver *shpFiledriver = NULL;
 			OGRDataSource *outputSHPDS = NULL;
 			OGRLayer *outputSHPLayer = NULL;
 			OGRSpatialReference* inputSpatialRef = NULL;
-			
+
 			string outputDIR = "";
 			try
 			{
 				outputDIR = fileUtils.getFileDirectoryPath(this->outputVector);
-				
+
 				if(vecUtils.checkDIR4SHP(outputDIR, SHPFileOutLayer))
 				{
 					if(this->force)
@@ -4972,7 +5003,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 						throw RSGISException("Shapefile already exists, either delete or select force.");
 					}
 				}
-				
+
 				/////////////////////////////////////
 				//
 				// Open Input Shapfile.
@@ -4990,8 +5021,8 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					string message = string("Could not open vector layer ") + SHPFileInLayer;
 					throw RSGISFileException(message.c_str());
 				}
-				inputSpatialRef = inputSHPLayer->GetSpatialRef();				
-				
+				inputSpatialRef = inputSHPLayer->GetSpatialRef();
+
 				/////////////////////////////////////
 				//
 				// Create Output Shapfile.
@@ -5015,23 +5046,23 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					string message = string("Could not create vector layer ") + SHPFileOutLayer;
 					throw RSGISVectorOutputException(message.c_str());
 				}
-				
+
 				processFeature = new RSGISIdentifyTopLayerAttributes(attributes, numAttributes, numTop, summary);
 				processVector = new RSGISProcessVector(processFeature);
-				
+
 				processVector->processVectors(inputSHPLayer, outputSHPLayer, true, false, true);
-				
+
 				OGRDataSource::DestroyDataSource(inputSHPDS);
 				OGRDataSource::DestroyDataSource(outputSHPDS);
-				
+
 				delete[] attributes;
-				
+
 				delete processVector;
 				delete processFeature;
-				
+
 				//OGRCleanupAll();
 			}
-			catch (RSGISException e) 
+			catch (RSGISException e)
 			{
 				throw e;
 			}
@@ -5039,30 +5070,35 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 		else if(option == RSGISExeVectorUtils::addattributes)
 		{
 			cout << "Add attributes to a Vector Layer\n";
-			
+
+            // Convert to absolute path
+            this->inputVector = boost::filesystem::absolute(this->inputVector).c_str();
+            this->outputVector = boost::filesystem::absolute(this->outputVector).c_str();
+
+
 			OGRRegisterAll();
-			
+
 			RSGISFileUtils fileUtils;
 			RSGISVectorUtils vecUtils;
 
 			RSGISProcessVector *processVector = NULL;
 			RSGISProcessOGRFeature *processFeature = NULL;
-			
+
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
 			string SHPFileOutLayer = vecUtils.getLayerName(this->outputVector);
-			
+
 			OGRDataSource *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
 			OGRSFDriver *shpFiledriver = NULL;
 			OGRDataSource *outputSHPDS = NULL;
 			OGRLayer *outputSHPLayer = NULL;
 			OGRSpatialReference* inputSpatialRef = NULL;
-			
+
 			string outputDIR = "";
 			try
 			{
 				outputDIR = fileUtils.getFileDirectoryPath(this->outputVector);
-				
+
 				if(vecUtils.checkDIR4SHP(outputDIR, SHPFileOutLayer))
 				{
 					if(this->force)
@@ -5074,7 +5110,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 						throw RSGISException("Shapefile already exists, either delete or select force.");
 					}
 				}
-				
+
 				/////////////////////////////////////
 				//
 				// Open Input Shapfile.
@@ -5092,8 +5128,8 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					string message = string("Could not open vector layer ") + SHPFileInLayer;
 					throw RSGISFileException(message.c_str());
 				}
-				inputSpatialRef = inputSHPLayer->GetSpatialRef();				
-				
+				inputSpatialRef = inputSHPLayer->GetSpatialRef();
+
 				/////////////////////////////////////
 				//
 				// Create Output Shapfile.
@@ -5117,56 +5153,61 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					string message = string("Could not create vector layer ") + SHPFileOutLayer;
 					throw RSGISVectorOutputException(message.c_str());
 				}
-				
+
 				processFeature = new RSGISAddAttributes(newAttributes, numAttributes);
 				processVector = new RSGISProcessVector(processFeature);
-				
+
 				processVector->processVectors(inputSHPLayer, outputSHPLayer, true, false, false);
-				
+
 				OGRDataSource::DestroyDataSource(inputSHPDS);
 				OGRDataSource::DestroyDataSource(outputSHPDS);
 				delete processVector;
 				delete processFeature;
-				
+
 				delete[] newAttributes;
-				
+
 				//OGRCleanupAll();
 			}
-			catch (RSGISException& e) 
+			catch (RSGISException& e)
 			{
 				throw e;
 			}
-			
+
 		}
 		else if(option == RSGISExeVectorUtils::copypolygons)
 		{
 			cout << "Copy Polygon Vector Layer\n";
 			cout << "Input Vector: " << this->inputVector << endl;
 			cout << "Output Vector: " << this->outputVector << endl;
-			
+
+            // Convert to absolute path
+            this->inputVector = boost::filesystem::absolute(this->inputVector).c_str();
+            this->outputVector = boost::filesystem::absolute(this->outputVector).c_str();
+
+
 			OGRRegisterAll();
-			
+
 			RSGISFileUtils fileUtils;
 			RSGISVectorUtils vecUtils;
 
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
 			string SHPFileOutLayer = vecUtils.getLayerName(this->outputVector);
-			
+
 			OGRDataSource *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
 			OGRSFDriver *shpFiledriver = NULL;
 			OGRDataSource *outputSHPDS = NULL;
 			OGRLayer *outputSHPLayer = NULL;
 			OGRSpatialReference* inputSpatialRef = NULL;
-			
+
 			RSGISProcessVector *processVector = NULL;
 			RSGISProcessOGRFeature *processFeature = NULL;
-			
+
 			string outputDIR = "";
 			try
 			{
 				outputDIR = fileUtils.getFileDirectoryPath(this->outputVector);
-				
+
 				if(vecUtils.checkDIR4SHP(outputDIR, SHPFileOutLayer))
 				{
 					if(this->force)
@@ -5178,7 +5219,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 						throw RSGISException("Shapefile already exists, either delete or select force.");
 					}
 				}
-				
+
 				/////////////////////////////////////
 				//
 				// Open Input Shapfile.
@@ -5196,12 +5237,12 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					string message = string("Could not open vector layer ") + SHPFileInLayer;
 					throw RSGISFileException(message.c_str());
 				}
-				inputSpatialRef = inputSHPLayer->GetSpatialRef();	
-				
+				inputSpatialRef = inputSHPLayer->GetSpatialRef();
+
 				// Get Geometry Type.
 				OGRFeature *feature = inputSHPLayer->GetFeature(0);
 				OGRwkbGeometryType geometryType = feature->GetGeometryRef()->getGeometryType();
-				
+
 				/////////////////////////////////////
 				//
 				// Create Output Shapfile.
@@ -5225,21 +5266,21 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					string message = string("Could not create vector layer ") + SHPFileOutLayer;
 					throw RSGISVectorOutputException(message.c_str());
 				}
-				
+
 				processFeature = new RSGISProcessFeatureCopyVector();
 				processVector = new RSGISProcessVector(processFeature);
-				
+
 				processVector->processVectors(inputSHPLayer, outputSHPLayer, true, false, false);
-				
+
 				OGRDataSource::DestroyDataSource(inputSHPDS);
 				OGRDataSource::DestroyDataSource(outputSHPDS);
-				
+
 				delete processVector;
 				delete processFeature;
-				
+
 				//OGRCleanupAll();
 			}
-			catch (RSGISException& e) 
+			catch (RSGISException& e)
 			{
 				throw e;
 			}
@@ -5248,20 +5289,22 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 		{
 			cout << "Print FIDs\n";
 			cout << "Input Vector: " << this->inputVector << endl;
-			
-			
+
+            // Convert to absolute path
+            this->inputVector = boost::filesystem::absolute(this->inputVector).c_str();
+
 			OGRRegisterAll();
-			
+
 			RSGISVectorUtils vecUtils;
-			
+
 			RSGISProcessVector *processVector = NULL;
 			RSGISProcessOGRFeature *processFeature = NULL;
-			
+
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
-			
+
 			OGRDataSource *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
-			
+
 			try
 			{
 				/////////////////////////////////////
@@ -5281,19 +5324,19 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					string message = string("Could not open vector layer ") + SHPFileInLayer;
 					throw RSGISFileException(message.c_str());
 				}
-				
+
 				processFeature = new RSGISPrintFIDs();
 				processVector = new RSGISProcessVector(processFeature);
-				
+
 				processVector->processVectorsNoOutput(inputSHPLayer, true);
-				
+
 				OGRDataSource::DestroyDataSource(inputSHPDS);
 
 				delete processVector;
 				delete processFeature;
 				//OGRCleanupAll();
 			}
-			catch (RSGISException& e) 
+			catch (RSGISException& e)
 			{
 				throw e;
 			}
@@ -5303,17 +5346,22 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 			cout << "Calculate the number of pixels within a polygon and the polygon area\n";
 			cout << "Input Vector: " << this->inputVector << endl;
 			cout << "Output Vector: " << this->outputVector << endl;
-			cout << "Raster Polygons: " << this->inputRasterVector << endl;			
-			
+			cout << "Raster Polygons: " << this->inputRasterVector << endl;
+
+            // Convert to absolute path
+            this->inputVector = boost::filesystem::absolute(this->inputVector).c_str();
+            this->outputVector = boost::filesystem::absolute(this->outputVector).c_str();
+
+
 			OGRRegisterAll();
 			GDALAllRegister();
-			
+
 			RSGISFileUtils fileUtils;
 			RSGISVectorUtils vecUtils;
-			
+
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
 			string SHPFileOutLayer = vecUtils.getLayerName(this->outputVector);
-			
+
 			GDALDataset *inputPolysImage = NULL;
 			OGRDataSource *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
@@ -5321,15 +5369,15 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 			OGRDataSource *outputSHPDS = NULL;
 			OGRLayer *outputSHPLayer = NULL;
 			OGRSpatialReference* inputSpatialRef = NULL;
-			
+
 			RSGISProcessVector *processVector = NULL;
 			RSGISProcessOGRFeature *processFeature = NULL;
-			
+
 			string outputDIR = "";
 			try
 			{
 				outputDIR = fileUtils.getFileDirectoryPath(this->outputVector);
-				
+
 				if(vecUtils.checkDIR4SHP(outputDIR, SHPFileOutLayer))
 				{
 					if(this->force)
@@ -5341,7 +5389,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 						throw RSGISException("Shapefile already exists, either delete or select force.");
 					}
 				}
-				
+
 				/////////////////////////////////////
 				//
 				// Open Input Shapfile.
@@ -5359,8 +5407,8 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					string message = string("Could not open vector layer ") + SHPFileInLayer;
 					throw RSGISFileException(message.c_str());
 				}
-				inputSpatialRef = inputSHPLayer->GetSpatialRef();				
-				
+				inputSpatialRef = inputSHPLayer->GetSpatialRef();
+
 				/////////////////////////////////////
 				//
 				// Create Output Shapfile.
@@ -5384,7 +5432,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					string message = string("Could not create vector layer ") + SHPFileOutLayer;
 					throw RSGISVectorOutputException(message.c_str());
 				}
-				
+
 				///////////////////////
 				//
 				// Open raster polygons
@@ -5396,23 +5444,23 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					string message = string("Could not open image ") + inputRasterVector;
 					throw RSGISException(message.c_str());
 				}
-				
+
 				processFeature = new RSGISPixelAreaCountInPolygon(inputPolysImage);
 				processVector = new RSGISProcessVector(processFeature);
-				
+
 				processVector->processVectors(inputSHPLayer, outputSHPLayer, true, true, false);
-				
+
 				OGRDataSource::DestroyDataSource(inputSHPDS);
 				OGRDataSource::DestroyDataSource(outputSHPDS);
 				GDALClose(inputPolysImage);
-				
+
 				delete processVector;
 				delete processFeature;
-				
+
 				//OGRCleanupAll();
 				GDALDestroyDriverManager();
 			}
-			catch (RSGISException& e) 
+			catch (RSGISException& e)
 			{
 				throw e;
 			}
@@ -5422,23 +5470,28 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 			cout << "Convert points shapefile to a comma separated text file.\n";
 			cout << "Input Vector: " << this->inputVector << endl;
 			cout << "Output Vector: " << this->outputVector << endl;
-			
+
+            // Convert to absolute path
+            this->inputVector = boost::filesystem::absolute(this->inputVector).c_str();
+            this->outputVector = boost::filesystem::absolute(this->outputVector).c_str();
+
+
 			OGRRegisterAll();
 			GDALAllRegister();
-			
+
 			RSGISVectorUtils vecUtils;
-			
+
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
-			
+
 			OGRDataSource *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
-			
+
 			RSGISProcessVector *processVector = NULL;
 			RSGISProcessOGRFeature *processFeature = NULL;
-			
+
 			try
 			{
-				
+
 				/////////////////////////////////////
 				//
 				// Open Input Shapfile.
@@ -5456,22 +5509,22 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					string message = string("Could not open vector layer ") + SHPFileInLayer;
 					throw RSGISFileException(message.c_str());
 				}
-				
+
 				processFeature = new RSGISConvertToASCII(this->outputVector);
 				processVector = new RSGISProcessVector(processFeature);
-				
+
 				processVector->processVectorsNoOutput(inputSHPLayer, false);
-				
+
 				OGRDataSource::DestroyDataSource(inputSHPDS);
-				
+
 				delete processVector;
 				delete processFeature;
-				
+
 				//OGRCleanupAll();
 			}
-			catch (RSGISException& e) 
+			catch (RSGISException& e)
 			{
-				cout << "ERROR: " << e.what() << endl;; 
+				cout << "ERROR: " << e.what() << endl;;
 				throw e;
 			}
 		}
@@ -5482,12 +5535,17 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 			cout << "Output Vector: " << this->outputVector << endl;
 			cout << "Point: " << this->fixedPt->toString() << endl;
 			cout << "Angle: " << this->angle << endl;
-			
+
+            // Convert to absolute path
+            this->inputVector = boost::filesystem::absolute(this->inputVector).c_str();
+            this->outputVector = boost::filesystem::absolute(this->outputVector).c_str();
+
+
 			OGRRegisterAll();
-			
+
 			RSGISFileUtils fileUtils;
 			RSGISVectorUtils vecUtils;
-			
+
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
 			string SHPFileOutLayer = vecUtils.getLayerName(this->outputVector);
 
@@ -5498,15 +5556,15 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 			OGRLayer *outputSHPLayer = NULL;
 			OGRSpatialReference* inputSpatialRef = NULL;
 			OGRFeatureDefn *inFeatureDefn = NULL;
-			
+
 			RSGISProcessGeometry *processVector = NULL;
 			RSGISProcessOGRGeometry *processGeom = NULL;
-			
+
 			string outputDIR = "";
 			try
 			{
 				outputDIR = fileUtils.getFileDirectoryPath(this->outputVector);
-				
+
 				if(vecUtils.checkDIR4SHP(outputDIR, SHPFileOutLayer))
 				{
 					if(this->force)
@@ -5518,7 +5576,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 						throw RSGISException("Shapefile already exists, either delete or select force.");
 					}
 				}
-				
+
 				/////////////////////////////////////
 				//
 				// Open Input Shapfile.
@@ -5536,9 +5594,9 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					string message = string("Could not open vector layer ") + SHPFileInLayer;
 					throw RSGISFileException(message.c_str());
 				}
-				inputSpatialRef = inputSHPLayer->GetSpatialRef();	
+				inputSpatialRef = inputSHPLayer->GetSpatialRef();
 				inFeatureDefn = inputSHPLayer->GetLayerDefn();
-				
+
 				/////////////////////////////////////
 				//
 				// Create Output Shapfile.
@@ -5562,21 +5620,21 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					string message = string("Could not create vector layer ") + SHPFileOutLayer;
 					throw RSGISVectorOutputException(message.c_str());
 				}
-				
+
 				processGeom = new RSGISGeometryRotateAroundFixedPoint(fixedPt, angle);
 				processVector = new RSGISProcessGeometry(processGeom);
-				
+
 				processVector->processGeometry(inputSHPLayer, outputSHPLayer, true, false);
-				
+
 				OGRDataSource::DestroyDataSource(inputSHPDS);
 				OGRDataSource::DestroyDataSource(outputSHPDS);
-				
+
 				delete processVector;
 				delete processGeom;
-				
+
 				//OGRCleanupAll();
 			}
-			catch (RSGISException& e) 
+			catch (RSGISException& e)
 			{
 				throw e;
 			}
@@ -5586,15 +5644,20 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 			cout << "Calculating Polygon Area\n";
 			cout << "Input Vector: " << this->inputVector << endl;
 			cout << "Output Vector: " << this->outputVector << endl;
-			
+
+            // Convert to absolute path
+            this->inputVector = boost::filesystem::absolute(this->inputVector).c_str();
+            this->outputVector = boost::filesystem::absolute(this->outputVector).c_str();
+
+
 			OGRRegisterAll();
-			
+
 			RSGISFileUtils fileUtils;
 			RSGISVectorUtils vecUtils;
-			
+
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
 			string SHPFileOutLayer = vecUtils.getLayerName(this->outputVector);
-			
+
 			OGRDataSource *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
 			OGRSFDriver *shpFiledriver = NULL;
@@ -5602,15 +5665,15 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 			OGRLayer *outputSHPLayer = NULL;
 			OGRSpatialReference* inputSpatialRef = NULL;
 			OGRFeatureDefn *inFeatureDefn = NULL;
-			
+
 			RSGISProcessVector *processVector = NULL;
 			RSGISProcessOGRFeature *processFeature = NULL;
-			
+
 			string outputDIR = "";
 			try
 			{
 				outputDIR = fileUtils.getFileDirectoryPath(this->outputVector);
-				
+
 				if(vecUtils.checkDIR4SHP(outputDIR, SHPFileOutLayer))
 				{
 					if(this->force)
@@ -5622,7 +5685,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 						throw RSGISException("Shapefile already exists, either delete or select force.");
 					}
 				}
-				
+
 				/////////////////////////////////////
 				//
 				// Open Input Shapfile.
@@ -5640,9 +5703,9 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					string message = string("Could not open vector layer ") + SHPFileInLayer;
 					throw RSGISFileException(message.c_str());
 				}
-				inputSpatialRef = inputSHPLayer->GetSpatialRef();	
+				inputSpatialRef = inputSHPLayer->GetSpatialRef();
 				inFeatureDefn = inputSHPLayer->GetLayerDefn();
-				
+
 				/////////////////////////////////////
 				//
 				// Create Output Shapfile.
@@ -5666,21 +5729,21 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					string message = string("Could not create vector layer ") + SHPFileOutLayer;
 					throw RSGISVectorOutputException(message.c_str());
 				}
-				
+
 				processFeature = new RSGISCalcPolygonArea();
 				processVector = new RSGISProcessVector(processFeature);
-				
+
 				processVector->processVectors(inputSHPLayer, outputSHPLayer, true, false, false);
-				
+
 				OGRDataSource::DestroyDataSource(inputSHPDS);
 				OGRDataSource::DestroyDataSource(outputSHPDS);
-				
+
 				delete processVector;
 				delete processFeature;
-				
+
 				//OGRCleanupAll();
 			}
-			catch (RSGISException& e) 
+			catch (RSGISException& e)
 			{
 				throw e;
 			}
@@ -5690,18 +5753,23 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 			cout << "Split features into separate shapefiles\n";
 			cout << "Input Vector: " << this->inputVector << endl;
 			cout << "Output DIR: " << this->output_DIR << endl;
-			
+
+            // Convert to absolute path
+            this->inputVector = boost::filesystem::absolute(this->inputVector).c_str();
+            this->outputVector = boost::filesystem::absolute(this->outputVector).c_str();
+
+
 			OGRRegisterAll();
-			
+
 			RSGISFileUtils fileUtils;
 			RSGISVectorUtils vecUtils;
 			RSGISVectorProcessing vecProcessing;
-			
+
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
-			
+
 			OGRDataSource *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
-			
+
 			try
 			{
 				/////////////////////////////////////
@@ -5721,13 +5789,13 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					string message = string("Could not open vector layer ") + SHPFileInLayer;
 					throw RSGISFileException(message.c_str());
 				}
-			
+
 				vecProcessing.splitFeatures(inputSHPLayer, this->output_DIR, this->force);
-				
+
 				OGRDataSource::DestroyDataSource(inputSHPDS);
 				//OGRCleanupAll();
 			}
-			catch (RSGISException& e) 
+			catch (RSGISException& e)
 			{
 				throw e;
 			}
@@ -5735,23 +5803,26 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 		else if(option == RSGISExeVectorUtils::removepolyoverlaps)
 		{
 			cout << "Remove overlapping polygons in shapefile..\n";
-			
+
+            // Convert to absolute path
+            this->inputVector = boost::filesystem::absolute(this->inputVector).c_str();
+
 			OGRRegisterAll();
-			
+
 			RSGISFileUtils fileUtils;
 			RSGISVectorUtils vecUtils;
 			RSGISVectorIO vecIO;
 			RSGISGeometry geomUtils;
-			
+
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
-			
+
 			OGRDataSource *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
 			OGRSpatialReference* spatialRef = NULL;
-			
+
 			RSGISProcessVector *processVector = NULL;
-			RSGISProcessOGRFeature *processFeature = NULL;			
-			
+			RSGISProcessOGRFeature *processFeature = NULL;
+
 			try
 			{
 				/////////////////////////////////////
@@ -5772,17 +5843,17 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					throw RSGISFileException(message.c_str());
 				}
 				spatialRef = inputSHPLayer->GetSpatialRef();
-				
+
 				vector<Polygon*> *polygons = new vector<Polygon*>();
 				processFeature = new RSGISGEOSPolygonReader(polygons);
 				processVector = new RSGISProcessVector(processFeature);
-				
+
 				cout << "Read input Shapefile\n";
 				processVector->processVectorsNoOutput(inputSHPLayer, false);
-				
+
 				delete processVector;
 				delete processFeature;
-				
+
 				vector<Polygon*>::iterator iterPolys;
 				Envelope *env = new Envelope();
 				for(iterPolys = polygons->begin(); iterPolys != polygons->end(); iterPolys++)
@@ -5791,22 +5862,22 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					env->expandToInclude(tmpEnv);
 					delete tmpEnv;
 				}
-				
+
 				if(snap2Grid)
 				{
 					cout << "Snapping to grid\n";
 					vector<Polygon*> *snappedPolygons = new vector<Polygon*>();
-					
+
 					for(iterPolys = polygons->begin(); iterPolys != polygons->end(); iterPolys++)
 					{
 						snappedPolygons->push_back(geomUtils.snapToXYGrid(*iterPolys, tolerance, false, env));
 					}
-					
+
 					cout << "Identifying and solving overlaps\n";
 					geomUtils.removeOverlaps(snappedPolygons, env, tolerance, dissolve);
 					cout << "Outputting Shapefile\n";
 					vecIO.exportGEOSPolygons2SHP(this->outputVector, this->force, snappedPolygons);
-					
+
 					vector<Polygon*>::iterator iterPolys;
 					for(iterPolys = polygons->begin(); iterPolys != polygons->end(); )
 					{
@@ -5814,7 +5885,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 						polygons->erase(iterPolys);
 					}
 					delete polygons;
-					
+
 					for(iterPolys = snappedPolygons->begin(); iterPolys != snappedPolygons->end(); )
 					{
 						delete *iterPolys;
@@ -5828,7 +5899,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					geomUtils.removeOverlaps(polygons, env, tolerance, dissolve);
 					cout << "Outputting Shapefile\n";
 					vecIO.exportGEOSPolygons2SHP(this->outputVector, this->force, polygons, spatialRef);
-					
+
 					vector<Polygon*>::iterator iterPolys;
 					for(iterPolys = polygons->begin(); iterPolys != polygons->end(); )
 					{
@@ -5837,34 +5908,38 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					}
 					delete polygons;
 				}
-				
+
 				OGRDataSource::DestroyDataSource(inputSHPDS);
 				//OGRCleanupAll();
 			}
-			catch (RSGISException& e) 
+			catch (RSGISException& e)
 			{
 				throw e;
 			}
 		}
 		else if(option == RSGISExeVectorUtils::mergesmallpolysnear)
 		{
-			cout << "Merge small polygons to the nearest large polygon..\n";			
+			cout << "Merge small polygons to the nearest large polygon..\n";
+
+            // Convert to absolute path
+            this->inputVector = boost::filesystem::absolute(this->inputVector).c_str();
+
 			OGRRegisterAll();
-			
+
 			RSGISFileUtils fileUtils;
 			RSGISVectorUtils vecUtils;
 			RSGISVectorIO vecIO;
 			RSGISGeometry geomUtils;
-			
+
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
-			
+
 			OGRDataSource *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
 			OGRSpatialReference* spatialRef = NULL;
-			
+
 			RSGISProcessVector *processVector = NULL;
-			RSGISProcessOGRFeature *processFeature = NULL;			
-			
+			RSGISProcessOGRFeature *processFeature = NULL;
+
 			try
 			{
 				/////////////////////////////////////
@@ -5885,17 +5960,17 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					throw RSGISFileException(message.c_str());
 				}
 				spatialRef = inputSHPLayer->GetSpatialRef();
-				
+
 				vector<Polygon*> *polygons = new vector<Polygon*>();
 				processFeature = new RSGISGEOSPolygonReader(polygons);
 				processVector = new RSGISProcessVector(processFeature);
-				
+
 				cout << "Read input Shapefile\n";
 				processVector->processVectorsNoOutput(inputSHPLayer, false);
-				
+
 				delete processVector;
 				delete processFeature;
-				
+
 				cout << "Identifying small polygons\n";
 				vector<Polygon*> *smallPolygons = new vector<Polygon*>();
 				vector<Polygon*>::iterator iterPolys;
@@ -5911,49 +5986,53 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 						iterPolys++;
 					}
 				}
-				
+
 				cout << "Merge small polygons to nearest large polygon\n";
 				RSGISIdentifyNonConvexPolygons *identifyNonConvexPolygons = new RSGISIdentifyNonConvexPolygonsDelaunay();
 				geomUtils.mergeWithNearest(polygons, smallPolygons, identifyNonConvexPolygons);
 				delete identifyNonConvexPolygons;
-				
+
 				cout << "Outputting Shapefile\n";
 				vecIO.exportGEOSPolygons2SHP(this->outputVector, this->force, polygons, spatialRef);
-				
+
 				for(iterPolys = polygons->begin(); iterPolys != polygons->end(); )
 				{
 					delete *iterPolys;
 					polygons->erase(iterPolys);
 				}
 				delete polygons;
-				
+
 				OGRDataSource::DestroyDataSource(inputSHPDS);
 				//OGRCleanupAll();
 			}
-			catch (RSGISException& e) 
+			catch (RSGISException& e)
 			{
 				throw e;
 			}
 		}
 		else if(option == RSGISExeVectorUtils::mergesmallpolystouching)
 		{
-			cout << "Merge small polygons with neighboring polygons with a shared bordered..\n";			
+			cout << "Merge small polygons with neighboring polygons with a shared bordered..\n";
+
+            // Convert to absolute path
+            this->inputVector = boost::filesystem::absolute(this->inputVector).c_str();
+
 			OGRRegisterAll();
-			
+
 			RSGISFileUtils fileUtils;
 			RSGISVectorUtils vecUtils;
 			RSGISVectorIO vecIO;
 			RSGISGeometry geomUtils;
-			
+
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
-			
+
 			OGRDataSource *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
 			OGRSpatialReference* spatialRef = NULL;
-			
+
 			RSGISProcessVector *processVector = NULL;
-			RSGISProcessOGRFeature *processFeature = NULL;			
-			
+			RSGISProcessOGRFeature *processFeature = NULL;
+
 			try
 			{
 				/////////////////////////////////////
@@ -5974,17 +6053,17 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					throw RSGISFileException(message.c_str());
 				}
 				spatialRef = inputSHPLayer->GetSpatialRef();
-				
+
 				vector<Polygon*> *polygons = new vector<Polygon*>();
 				processFeature = new RSGISGEOSPolygonReader(polygons);
 				processVector = new RSGISProcessVector(processFeature);
-				
+
 				cout << "Read input Shapefile\n";
 				processVector->processVectorsNoOutput(inputSHPLayer, false);
-				
+
 				delete processVector;
 				delete processFeature;
-				
+
 				cout << "Identifying small polygons\n";
 				vector<Polygon*> *smallPolygons = new vector<Polygon*>();
 				vector<Polygon*>::iterator iterPolys;
@@ -6000,35 +6079,35 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 						++iterPolys;
 					}
 				}
-				
+
 				RSGISIdentifyNonConvexPolygons *identifyNonConvexPolygons = new RSGISIdentifyNonConvexPolygonsDelaunay();
 				cout << "Merge small polygons to touching neighboring large polygons\n";
 				geomUtils.mergeWithNeighbor(polygons, smallPolygons, relBorderThreshold, identifyNonConvexPolygons);
 				delete identifyNonConvexPolygons;
-				
+
 				for(iterPolys = smallPolygons->begin(); iterPolys != smallPolygons->end(); )
 				{
 					polygons->push_back(*iterPolys);
 					smallPolygons->erase(iterPolys);
 				}
 				delete smallPolygons;
-				
+
 				cout << "Outputting Shapefile\n";
 				vecIO.exportGEOSPolygons2SHP(this->outputVector, this->force, polygons, spatialRef);
-				
+
 				for(iterPolys = polygons->begin(); iterPolys != polygons->end(); )
 				{
 					delete *iterPolys;
 					polygons->erase(iterPolys);
 				}
 				delete polygons;
-				
+
 				delete identifyNonConvexPolygons;
-				
+
 				OGRDataSource::DestroyDataSource(inputSHPDS);
 				//OGRCleanupAll();
 			}
-			catch (RSGISException& e) 
+			catch (RSGISException& e)
 			{
 				throw e;
 			}
@@ -6036,23 +6115,26 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 		else if(option == RSGISExeVectorUtils::morphologicalclosing)
 		{
 			cout << "Perform a morphological closing\n";
-			
+
+            // Convert to absolute path
+            this->inputVector = boost::filesystem::absolute(this->inputVector).c_str();
+
 			OGRRegisterAll();
-			
+
 			RSGISFileUtils fileUtils;
 			RSGISVectorUtils vecUtils;
 			RSGISVectorIO vecIO;
 			RSGISGeometry geomUtils;
-			
+
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
-			
+
 			OGRDataSource *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
 			OGRSpatialReference* spatialRef = NULL;
-			
+
 			RSGISProcessVector *processVector = NULL;
-			RSGISProcessOGRFeature *processFeature = NULL;			
-			
+			RSGISProcessOGRFeature *processFeature = NULL;
+
 			try
 			{
 				/////////////////////////////////////
@@ -6073,26 +6155,26 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					throw RSGISFileException(message);
 				}
 				spatialRef = inputSHPLayer->GetSpatialRef();
-				
+
 				cout << "created objects\n";
-				
+
 				vector<Polygon*> *polygons = new vector<Polygon*>();
 				processFeature = new RSGISGEOSPolygonReader(polygons);
 				processVector = new RSGISProcessVector(processFeature);
-				
+
 				cout << "Read input Shapefile\n";
 				processVector->processVectorsNoOutput(inputSHPLayer, false);
-				
+
 				delete processVector;
 				delete processFeature;
-				
-				
+
+
 				cout << "Performing Morphological Operation\n";
 				geomUtils.performMorphologicalOperation(polygons, closing, buffer, curvesegments);
-				
+
 				cout << "Outputting Shapefile\n";
 				vecIO.exportGEOSPolygons2SHP(this->outputVector, this->force, polygons, spatialRef);
-				
+
 				vector<Polygon*>::iterator iterPolys;
 				for(iterPolys = polygons->begin(); iterPolys != polygons->end(); )
 				{
@@ -6100,11 +6182,11 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					polygons->erase(iterPolys);
 				}
 				delete polygons;
-				
+
 				OGRDataSource::DestroyDataSource(inputSHPDS);
 				//OGRCleanupAll();
 			}
-			catch (RSGISException e) 
+			catch (RSGISException e)
 			{
 				throw e;
 			}
@@ -6112,23 +6194,26 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 		else if(option == RSGISExeVectorUtils::morphologicalopening)
 		{
 			cout << "Perform a morphological opening\n";
-			
+
+            // Convert to absolute path
+            this->inputVector = boost::filesystem::absolute(this->inputVector).c_str();
+
 			OGRRegisterAll();
-			
+
 			RSGISFileUtils fileUtils;
 			RSGISVectorUtils vecUtils;
 			RSGISVectorIO vecIO;
 			RSGISGeometry geomUtils;
-			
+
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
-			
+
 			OGRDataSource *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
 			OGRSpatialReference* spatialRef = NULL;
-			
+
 			RSGISProcessVector *processVector = NULL;
-			RSGISProcessOGRFeature *processFeature = NULL;			
-			
+			RSGISProcessOGRFeature *processFeature = NULL;
+
 			try
 			{
 				/////////////////////////////////////
@@ -6149,24 +6234,24 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					throw RSGISFileException(message.c_str());
 				}
 				spatialRef = inputSHPLayer->GetSpatialRef();
-				
+
 				vector<Polygon*> *polygons = new vector<Polygon*>();
 				processFeature = new RSGISGEOSPolygonReader(polygons);
 				processVector = new RSGISProcessVector(processFeature);
-				
+
 				cout << "Read input Shapefile\n";
 				processVector->processVectorsNoOutput(inputSHPLayer, false);
-				
+
 				delete processVector;
 				delete processFeature;
-				
-				
+
+
 				cout << "Performing Morphological Operation\n";
 				geomUtils.performMorphologicalOperation(polygons, opening, buffer, curvesegments);
-				
+
 				cout << "Outputting Shapefile\n";
 				vecIO.exportGEOSPolygons2SHP(this->outputVector, this->force, polygons, spatialRef);
-				
+
 				vector<Polygon*>::iterator iterPolys;
 				for(iterPolys = polygons->begin(); iterPolys != polygons->end(); )
 				{
@@ -6174,11 +6259,11 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					polygons->erase(iterPolys);
 				}
 				delete polygons;
-				
+
 				OGRDataSource::DestroyDataSource(inputSHPDS);
 				//OGRCleanupAll();
 			}
-			catch (RSGISException& e) 
+			catch (RSGISException& e)
 			{
 				throw e;
 			}
@@ -6186,23 +6271,26 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 		else if(option == RSGISExeVectorUtils::morphologicaldilation)
 		{
 			cout << "Perform a morphological dilation\n";
-			
+
+            // Convert to absolute path
+            this->inputVector = boost::filesystem::absolute(this->inputVector).c_str();
+
 			OGRRegisterAll();
-			
+
 			RSGISFileUtils fileUtils;
 			RSGISVectorUtils vecUtils;
 			RSGISVectorIO vecIO;
 			RSGISGeometry geomUtils;
-			
+
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
-			
+
 			OGRDataSource *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
 			OGRSpatialReference* spatialRef = NULL;
-			
+
 			RSGISProcessVector *processVector = NULL;
-			RSGISProcessOGRFeature *processFeature = NULL;			
-			
+			RSGISProcessOGRFeature *processFeature = NULL;
+
 			try
 			{
 				/////////////////////////////////////
@@ -6223,22 +6311,22 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					throw RSGISFileException(message.c_str());
 				}
 				spatialRef = inputSHPLayer->GetSpatialRef();
-				
+
 				vector<Polygon*> *polygons = new vector<Polygon*>();
 				processFeature = new RSGISGEOSPolygonReader(polygons);
 				processVector = new RSGISProcessVector(processFeature);
-				
+
 				cout << "Read input Shapefile\n";
 				processVector->processVectorsNoOutput(inputSHPLayer, false);
-				
-				
+
+
 				delete processVector;
 				delete processFeature;
-				
-				
+
+
 				cout << "Performing Morphological Operation\n";
 				geomUtils.performMorphologicalOperation(polygons, dilation, buffer, curvesegments);
-				
+
 				cout << "Outputting Shapefile\n";
 				vecIO.exportGEOSPolygons2SHP(this->outputVector, this->force, polygons, spatialRef);
 				vector<Polygon*>::iterator iterPolys;
@@ -6248,11 +6336,11 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					polygons->erase(iterPolys);
 				}
 				delete polygons;
-				
+
 				OGRDataSource::DestroyDataSource(inputSHPDS);
 				//OGRCleanupAll();
 			}
-			catch (RSGISException& e) 
+			catch (RSGISException& e)
 			{
 				throw e;
 			}
@@ -6260,23 +6348,26 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 		else if(option == RSGISExeVectorUtils::morphologicalerosion)
 		{
 			cout << "Perform a morphological erosion\n";
-			
+
+            // Convert to absolute path
+            this->inputVector = boost::filesystem::absolute(this->inputVector).c_str();
+
 			OGRRegisterAll();
-			
+
 			RSGISFileUtils fileUtils;
 			RSGISVectorUtils vecUtils;
 			RSGISVectorIO vecIO;
 			RSGISGeometry geomUtils;
-			
+
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
-			
+
 			OGRDataSource *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
 			OGRSpatialReference* spatialRef = NULL;
-			
+
 			RSGISProcessVector *processVector = NULL;
-			RSGISProcessOGRFeature *processFeature = NULL;			
-			
+			RSGISProcessOGRFeature *processFeature = NULL;
+
 			try
 			{
 				/////////////////////////////////////
@@ -6297,22 +6388,22 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					throw RSGISFileException(message.c_str());
 				}
 				spatialRef = inputSHPLayer->GetSpatialRef();
-				
+
 				vector<Polygon*> *polygons = new vector<Polygon*>();
 				processFeature = new RSGISGEOSPolygonReader(polygons);
 				processVector = new RSGISProcessVector(processFeature);
-				
+
 				cout << "Read input Shapefile\n";
 				processVector->processVectorsNoOutput(inputSHPLayer, false);
-				
+
 				OGRDataSource::DestroyDataSource(inputSHPDS);
 				delete processVector;
 				delete processFeature;
-				
-				
+
+
 				cout << "Performing Morphological Operation\n";
 				geomUtils.performMorphologicalOperation(polygons, erosion, buffer, curvesegments);
-				
+
 				cout << "Outputting Shapefile\n";
 				vecIO.exportGEOSPolygons2SHP(this->outputVector, this->force, polygons, spatialRef);
 				vector<Polygon*>::iterator iterPolys;
@@ -6322,10 +6413,10 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					polygons->erase(iterPolys);
 				}
 				delete polygons;
-				
+
 				//OGRCleanupAll();
 			}
-			catch (RSGISException& e) 
+			catch (RSGISException& e)
 			{
 				throw e;
 			}
@@ -6335,24 +6426,28 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 			cout << "Identify the non-convex outline of the input vector\n";
 			cout << "Input Vector: " << this->inputVector << endl;
 			cout << "Output Vector: " << this->outputVector << endl;
-			
+
+            // Convert to absolute path
+            this->inputVector = boost::filesystem::absolute(this->inputVector).c_str();
+            this->outputVector = boost::filesystem::absolute(this->outputVector).c_str();
+
 			OGRRegisterAll();
-			
+
 			RSGISFileUtils fileUtils;
 			RSGISVectorUtils vecUtils;
 			RSGISVectorIO vecIO;
-			
+
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
-			
+
 			OGRDataSource *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
 			OGRSpatialReference* spatialRef = NULL;
-			
+
 			RSGISProcessVector *processVector = NULL;
-			RSGISProcessOGRFeature *processFeature = NULL;			
-			
+			RSGISProcessOGRFeature *processFeature = NULL;
+
 			try
-			{				
+			{
 				/////////////////////////////////////
 				//
 				// Open Input Shapfile.
@@ -6371,33 +6466,33 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					throw RSGISFileException(message.c_str());
 				}
 				spatialRef = inputSHPLayer->GetSpatialRef();
-				
+
 				vector<Polygon*> *polygons = new vector<Polygon*>();
 				processFeature = new RSGISGEOSPolygonReader(polygons);
 				processVector = new RSGISProcessVector(processFeature);
-				
+
 				cout << "Read input Shapefile\n";
 				processVector->processVectorsNoOutput(inputSHPLayer, false);
-				
+
 				delete processVector;
 				delete processFeature;
-				
+
 				cout.precision(10);
-				
+
 				resolution = 1;
 				double alpha = 0.01;
 				double beta = 0.01;
 				double gamma = 1;
 				double delta = 1;
 				int maxNumIterations = 5;
-				
+
 				RSGISIdentifyNonConvexPolygons *calcNewPoly = new RSGISIdentifyNonConvexPolygonsSnakes(resolution, spatialRef, alpha, beta, gamma, delta, maxNumIterations);
-				
+
 				vector<Polygon*> *newPolys = new vector<Polygon*>();
 				newPolys->push_back(calcNewPoly->retrievePolygon(polygons));
-				
+
 				vecIO.exportGEOSPolygons2SHP(this->outputVector, this->force, newPolys, spatialRef);
-				
+
 				vector<Polygon*>::iterator iterPolys;
 				for(iterPolys = newPolys->begin(); iterPolys != newPolys->end(); )
 				{
@@ -6405,18 +6500,18 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					newPolys->erase(iterPolys);
 				}
 				delete newPolys;
-				
+
 				for(iterPolys = polygons->begin(); iterPolys != polygons->end(); )
 				{
 					delete *iterPolys;
 					polygons->erase(iterPolys);
 				}
 				delete polygons;
-				 
+
 				delete (RSGISIdentifyNonConvexPolygonsSnakes*) calcNewPoly;
-				
+
 				delete RSGISGEOSFactoryGenerator::getInstance();
-				
+
 				OGRDataSource::DestroyDataSource(inputSHPDS);
 				//OGRCleanupAll();
 			}
@@ -6430,24 +6525,28 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 			cout << "Identify the non-convex outline of the input vector\n";
 			cout << "Input Vector: " << this->inputVector << endl;
 			cout << "Output Vector: " << this->outputVector << endl;
-			
+
+            // Convert to absolute path
+            this->inputVector = boost::filesystem::absolute(this->inputVector).c_str();
+            this->outputVector = boost::filesystem::absolute(this->outputVector).c_str();
+
 			OGRRegisterAll();
-			
+
 			RSGISFileUtils fileUtils;
 			RSGISVectorUtils vecUtils;
 			RSGISVectorIO vecIO;
-			
+
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
-			
+
 			OGRDataSource *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
 			OGRSpatialReference* spatialRef = NULL;
-			
+
 			RSGISProcessVector *processVector = NULL;
-			RSGISProcessOGRFeature *processFeature = NULL;			
-			
+			RSGISProcessOGRFeature *processFeature = NULL;
+
 			try
-			{				
+			{
 				/////////////////////////////////////
 				//
 				// Open Input Shapfile.
@@ -6466,24 +6565,24 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					throw RSGISFileException(message.c_str());
 				}
 				spatialRef = inputSHPLayer->GetSpatialRef();
-				
+
 				vector<Polygon*> *polygons = new vector<Polygon*>();
 				processFeature = new RSGISGEOSPolygonReader(polygons);
 				processVector = new RSGISProcessVector(processFeature);
-				
+
 				cout << "Read input Shapefile\n";
 				processVector->processVectorsNoOutput(inputSHPLayer, false);
-				
+
 				delete processVector;
 				delete processFeature;
-				
+
 				RSGISGeometry geomUtils;
-				
+
 				vector<Polygon*> *newPolys = new vector<Polygon*>();
 				newPolys->push_back(geomUtils.findConvexHull(polygons));
-				
+
 				vecIO.exportGEOSPolygons2SHP(this->outputVector, this->force, newPolys, spatialRef);
-				
+
 				vector<Polygon*>::iterator iterPolys;
 				for(iterPolys = newPolys->begin(); iterPolys != newPolys->end(); )
 				{
@@ -6491,16 +6590,16 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					newPolys->erase(iterPolys);
 				}
 				delete newPolys;
-				
+
 				for(iterPolys = polygons->begin(); iterPolys != polygons->end(); )
 				{
 					delete *iterPolys;
 					polygons->erase(iterPolys);
 				}
 				delete polygons;
-								
+
 				delete RSGISGEOSFactoryGenerator::getInstance();
-				
+
 				OGRDataSource::DestroyDataSource(inputSHPDS);
 				//OGRCleanupAll();
 			}
@@ -6514,24 +6613,28 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 			cout << "Identify the non-convex outline of the input vector\n";
 			cout << "Input Vector: " << this->inputVector << endl;
 			cout << "Output Vector: " << this->outputVector << endl;
-			
+
+            // Convert to absolute path
+            this->inputVector = boost::filesystem::absolute(this->inputVector).c_str();
+            this->outputVector = boost::filesystem::absolute(this->outputVector).c_str();
+
 			OGRRegisterAll();
-			
+
 			RSGISFileUtils fileUtils;
 			RSGISVectorUtils vecUtils;
 			RSGISVectorIO vecIO;
-			
+
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
-			
+
 			OGRDataSource *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
 			OGRSpatialReference* spatialRef = NULL;
-			
+
 			RSGISProcessVector *processVector = NULL;
-			RSGISProcessOGRFeature *processFeature = NULL;			
-			
+			RSGISProcessOGRFeature *processFeature = NULL;
+
 			try
-			{				
+			{
 				/////////////////////////////////////
 				//
 				// Open Input Shapfile.
@@ -6550,22 +6653,22 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					throw RSGISFileException(message.c_str());
 				}
 				spatialRef = inputSHPLayer->GetSpatialRef();
-				
+
 				vector<Polygon*> *polygons = new vector<Polygon*>();
 				processFeature = new RSGISGEOSPolygonReader(polygons);
 				processVector = new RSGISProcessVector(processFeature);
-				
+
 				cout << "Read input Shapefile\n";
 				processVector->processVectorsNoOutput(inputSHPLayer, false);
-				
+
 				delete processVector;
 				delete processFeature;
-				
+
 				RSGISIdentifyNonConvexPolygons *calcNewPoly = new RSGISIdentifyNonConvexPolygonsDelaunay();
-				
+
 				vector<Polygon*> *newPolys = new vector<Polygon*>();
 				newPolys->push_back(calcNewPoly->retrievePolygon(polygons));
-				
+
 				vecIO.exportGEOSPolygons2SHP(this->outputVector, this->force, newPolys, spatialRef);
 				vector<Polygon*>::iterator iterPolys;
 				for(iterPolys = polygons->begin(); iterPolys != polygons->end(); )
@@ -6574,14 +6677,14 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					polygons->erase(iterPolys);
 				}
 				delete polygons;
-				
+
 				for(iterPolys = newPolys->begin(); iterPolys != newPolys->end(); )
 				{
 					delete *iterPolys;
 					newPolys->erase(iterPolys);
 				}
 				delete newPolys;
-								
+
 				OGRDataSource::DestroyDataSource(inputSHPDS);
 				//OGRCleanupAll();
 			}
@@ -6596,22 +6699,26 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 			cout << "Input Vector: " << this->inputVector << endl;
 			cout << "Output Vector: " << this->outputVector << endl;
 			cout << "Resolution: " << this->resolution << endl;
-			
+
+            // Convert to absolute path
+            this->inputVector = boost::filesystem::absolute(this->inputVector).c_str();
+            this->outputVector = boost::filesystem::absolute(this->outputVector).c_str();
+
 			OGRRegisterAll();
-			
+
 			RSGISFileUtils fileUtils;
 			RSGISVectorUtils vecUtils;
 			RSGISVectorIO vecIO;
-			
+
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
-			
+
 			OGRDataSource *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
 			OGRSpatialReference* spatialRef = NULL;
-			
+
 			RSGISProcessVector *processVector = NULL;
-			RSGISProcessOGRFeature *processFeature = NULL;			
-			
+			RSGISProcessOGRFeature *processFeature = NULL;
+
 			try
 			{
 				/////////////////////////////////////
@@ -6632,22 +6739,22 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					throw RSGISFileException(message.c_str());
 				}
 				spatialRef = inputSHPLayer->GetSpatialRef();
-				
+
 				vector<Polygon*> *polygons = new vector<Polygon*>();
 				processFeature = new RSGISGEOSPolygonReader(polygons);
 				processVector = new RSGISProcessVector(processFeature);
-				
+
 				cout << "Read input Shapefile\n";
 				processVector->processVectorsNoOutput(inputSHPLayer, false);
-				
+
 				delete processVector;
 				delete processFeature;
-				
+
 				RSGISIdentifyNonConvexPolygons *calcNewPoly = new RSGISIdentifyNonConvexPolygonsLineProject(resolution);
-				
+
 				vector<Polygon*> *newPolys = new vector<Polygon*>();
 				newPolys->push_back(calcNewPoly->retrievePolygon(polygons));
-				
+
 				vecIO.exportGEOSPolygons2SHP(this->outputVector, this->force, newPolys, spatialRef);
 				vector<Polygon*>::iterator iterPolys;
 				for(iterPolys = polygons->begin(); iterPolys != polygons->end(); )
@@ -6656,14 +6763,14 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					polygons->erase(iterPolys);
 				}
 				delete polygons;
-				
+
 				for(iterPolys = newPolys->begin(); iterPolys != newPolys->end(); )
 				{
 					delete *iterPolys;
 					newPolys->erase(iterPolys);
 				}
 				delete newPolys;
-				
+
 				OGRDataSource::DestroyDataSource(inputSHPDS);
 				//OGRCleanupAll();
 			}
@@ -6677,22 +6784,26 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 			cout << "Merge touching polygons\n";
 			cout << "Input Vector: " << this->inputVector << endl;
 			cout << "Output Vector: " << this->outputVector << endl;
-			
+
+            // Convert to absolute path
+            this->inputVector = boost::filesystem::absolute(this->inputVector).c_str();
+            this->outputVector = boost::filesystem::absolute(this->outputVector).c_str();
+
 			OGRRegisterAll();
-			
+
 			RSGISFileUtils fileUtils;
 			RSGISVectorUtils vecUtils;
 			RSGISVectorIO vecIO;
-			
+
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
-			
+
 			OGRDataSource *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
 			OGRSpatialReference* spatialRef = NULL;
-			
+
 			RSGISProcessVector *processVector = NULL;
-			RSGISProcessOGRFeature *processFeature = NULL;			
-			
+			RSGISProcessOGRFeature *processFeature = NULL;
+
 			try
 			{
 				/////////////////////////////////////
@@ -6713,24 +6824,24 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					throw RSGISFileException(message.c_str());
 				}
 				spatialRef = inputSHPLayer->GetSpatialRef();
-				
+
 				vector<Polygon*> *polygons = new vector<Polygon*>();
 				processFeature = new RSGISGEOSPolygonReader(polygons);
 				processVector = new RSGISProcessVector(processFeature);
-				
+
 				cout << "Read input Shapefile\n";
 				processVector->processVectorsNoOutput(inputSHPLayer, false);
-				
+
 				delete processVector;
 				delete processFeature;
-				
-				
+
+
 				RSGISGeometry geomUtils;
 				//geomUtils.mergeTouchingPolygons(polygons);
 				geomUtils.mergeTouchingPolygonsWithIndex(polygons);
-				
+
 				vecIO.exportGEOSPolygons2SHP(this->outputVector, this->force, polygons, spatialRef);
-				
+
 				vector<Polygon*>::iterator iterPolys;
 				for(iterPolys = polygons->begin(); iterPolys != polygons->end(); )
 				{
@@ -6738,7 +6849,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					polygons->erase(iterPolys);
 				}
 				delete polygons;
-							
+
 				OGRDataSource::DestroyDataSource(inputSHPDS);
 				//OGRCleanupAll();
 			}
@@ -6750,41 +6861,44 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 		else if(option == RSGISExeVectorUtils::freqdist)
 		{
 			cout << "Produce a frequency distribution for the attribute in the input shapefile.\n";
-			
+
+            // Convert to absolute path
+            this->inputVector = boost::filesystem::absolute(this->inputVector).c_str();
+
 			try
 			{
 				OGRRegisterAll();
-				
+
 				RSGISFileUtils fileUtils;
 				RSGISVectorUtils vecUtils;
 				RSGISVectorIO vecIO;
-				
+
 				string SHPFileInLayer = "";
-				
+
 				OGRDataSource *inputSHPDS = NULL;
 				OGRLayer *inputSHPLayer = NULL;
-				
+
 				RSGISProcessVector *processVector = NULL;
-				RSGISProcessOGRFeature *processFeature = NULL;	
-				
+				RSGISProcessOGRFeature *processFeature = NULL;
+
 				list<double> *values = new list<double>();
 				processFeature = new RSGISGetAttributeValues(values, this->attribute);
 				processVector = new RSGISProcessVector(processFeature);
-				
+
 				if(inputVectors->size() > 0)
 				{
 					list<string>::iterator iterFiles;
 					for(iterFiles = inputVectors->begin(); iterFiles != inputVectors->end(); ++iterFiles)
 					{
 						inputVector =  *iterFiles;
-						
+
 						/////////////////////////////////////
 						//
 						// Open Input Shapfile.
 						//
 						/////////////////////////////////////
 						SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
-						
+
 						inputSHPDS = OGRSFDriverRegistrar::Open(this->inputVector.c_str(), FALSE);
 						if(inputSHPDS == NULL)
 						{
@@ -6797,36 +6911,36 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 							string message = string("Could not open vector layer ") + SHPFileInLayer;
 							throw RSGISFileException(message.c_str());
 						}
-						
+
 						// Get data from attribute..
 						processVector->processVectorsNoOutput(inputSHPLayer, false);
-						
+
 						OGRDataSource::DestroyDataSource(inputSHPDS);
 					}
-					
+
 					string filename = fileUtils.getFileNameNoExtension(outputPlot);
 					cout << "filename: " << filename << endl;
-					
+
 					RSGISExportForPlotting::getInstance()->export2DFreq(filename, values);
 				}
 				else
 				{
 					throw RSGISException("There were no input files.");
 				}
-				
+
 				values->clear();
 				delete values;
-				
+
 				delete processVector;
 				delete processFeature;
-				
+
 				//OGRCleanupAll();
 			}
 			catch(RSGISException &e)
 			{
 				throw e;
 			}
-			
+
 		}
 		else if(option == RSGISExeVectorUtils::rasterise)
 		{
@@ -6836,28 +6950,31 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 			cout << "Attribute = " << this->attribute << endl;
 			cout << "Resolution = " << this->resolution << endl;
 			cout << "Const Value = " << this->constVal << endl;
-			
+
+            // Convert to absolute path
+            this->inputVector = boost::filesystem::absolute(this->inputVector).c_str();
+
 			try
 			{
 				OGRRegisterAll();
 				GDALAllRegister();
-				
+
 				RSGISVectorUtils vecUtils;
 				RSGISRasterizeVector rasteriseVec;
-								
+
 				OGRDataSource *inputSHPDS = NULL;
 				OGRLayer *inputSHPLayer = NULL;
-				
+
 				GDALDriver *gdalDriver = NULL;
 				GDALDataset *imageData = NULL;
-				
+
 				/////////////////////////////////////
 				//
 				// Open Input Shapfile.
 				//
 				/////////////////////////////////////
 				string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
-				
+
 				inputSHPDS = OGRSFDriverRegistrar::Open(this->inputVector.c_str(), FALSE);
 				if(inputSHPDS == NULL)
 				{
@@ -6870,8 +6987,8 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					string message = string("Could not open vector layer ") + SHPFileInLayer;
 					throw RSGISFileException(message.c_str());
 				}
-				
-				if (this->useExistingRaster) 
+
+				if (this->useExistingRaster)
 				{
 					RSGISImageUtils imgUtils;
 					// OPEN INPUT IMAGE
@@ -6883,7 +7000,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 						string message = string("Could not open image ") + this->inputImage;
 						throw RSGISException(message.c_str());
 					}
-					
+
 					// CREATE OUTPUT IMAGE
 					GDALDriver *gdalDriver = NULL;
 					double *gdalTranslation = new double[6];
@@ -6891,10 +7008,10 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					dsOffsets[0] = new int[2];
 					int height = 0;
 					int width = 0;
-					
+
 					dataset = new GDALDataset*[1];
 					dataset[0] = inputImageDS;
-					
+
 					imgUtils.getImageOverlap(dataset, 1, dsOffsets, &width, &height, gdalTranslation);
 					gdalDriver = GetGDALDriverManager()->GetDriverByName("ENVI");
 					if(gdalDriver == NULL)
@@ -6902,14 +7019,14 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 						throw RSGISImageBandException("ENVI driver does not exists..");
 					}
 					cout << "New image width = " << width << " height = " << height << " bands = " << 1 << endl;
-					
+
 					imageData = imgUtils.createBlankImage(this->outputImage.c_str(), gdalTranslation, width, height, 1, inputImageDS->GetProjectionRef(), this->constVal);
-					
+
 					delete[] gdalTranslation;
 					delete[] dataset;
 					GDALClose(inputImageDS);
 				}
-				else 
+				else
 				{
 					gdalDriver = GetGDALDriverManager()->GetDriverByName("ENVI");
 					if(gdalDriver == NULL)
@@ -6920,9 +7037,9 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					imageData = rasteriseVec.createDataset(gdalDriver, inputSHPLayer, this->outputImage, this->resolution, this->constVal);
 					cout << "Dataset created ..." << endl;
 				}
-				
+
 				rasteriseVec.rasterizeLayer(inputSHPLayer, imageData, this->attribute, this->method);
-				
+
 				GDALClose(imageData);
 				OGRDataSource::DestroyDataSource(inputSHPDS);
 				//OGRCleanupAll();
@@ -6930,7 +7047,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 			catch(RSGISException &e)
 			{
 				throw e;
-			}			
+			}
 		}
         else if(option == RSGISExeVectorUtils::burnrasterise)
 		{
@@ -6938,25 +7055,28 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 			cout << "Input Vector = " << this->inputVector << endl;
 			cout << "Input Image = " << this->inputImage << endl;
 			cout << "Attribute = " << this->attribute << endl;
-			
+
+			// Convert to absolute path
+            this->inputVector = boost::filesystem::absolute(this->inputVector).c_str();
+
 			try
 			{
 				OGRRegisterAll();
 				GDALAllRegister();
-				
+
 				RSGISVectorUtils vecUtils;
 				RSGISRasterizeVector rasteriseVec;
-                
+
 				OGRDataSource *inputSHPDS = NULL;
 				OGRLayer *inputSHPLayer = NULL;
-				
+
 				/////////////////////////////////////
 				//
 				// Open Input Shapfile.
 				//
 				/////////////////////////////////////
 				string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
-				
+
 				inputSHPDS = OGRSFDriverRegistrar::Open(this->inputVector.c_str(), FALSE);
 				if(inputSHPDS == NULL)
 				{
@@ -6969,7 +7089,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					string message = string("Could not open vector layer ") + SHPFileInLayer;
 					throw RSGISFileException(message.c_str());
 				}
-				
+
                 GDALDataset *imgDataset = NULL;
                 imgDataset = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_Update);
                 if(imgDataset == NULL)
@@ -6977,9 +7097,9 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
                     string message = string("Could not open image ") + this->inputImage;
                     throw RSGISException(message.c_str());
                 }
-                				
+
 				rasteriseVec.rasterizeLayer(inputSHPLayer, imgDataset, this->attribute, this->method);
-				
+
 				GDALClose(imgDataset);
 				OGRDataSource::DestroyDataSource(inputSHPDS);
 				//OGRCleanupAll();
@@ -6987,24 +7107,27 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 			catch(RSGISException &e)
 			{
 				throw e;
-			}			
+			}
 		}
 		else if(option == RSGISExeVectorUtils::polygonplots)
 		{
 			cout << "Create plot polygons from input CSV file\n";
 			cout << "Input CSV = " << this->inputFile << endl;
 			cout << "Output Vector = " << this->outputVector << endl;
-			
-			try 
+
+			// Convert to absolute path
+            this->outputVector = boost::filesystem::absolute(this->outputVector).c_str();
+
+			try
 			{
 				RSGISPlotPolygonsCSVParse *parse = new RSGISPlotPolygonsCSVParse();
 				vector<PlotPoly*> *polyDetails = parse->parsePolyPlots(this->inputFile);
 				delete parse;
-				
+
 				RSGISVectorProcessing *vecProcessing = new RSGISVectorProcessing();
 				vecProcessing->createPlotPolygons(polyDetails, this->outputVector, this->force);
 				delete vecProcessing;
-				
+
 				vector<PlotPoly*>::iterator iterPolyDetails;
 				for(iterPolyDetails = polyDetails->begin(); iterPolyDetails != polyDetails->end(); )
 				{
@@ -7013,28 +7136,31 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				}
 				delete polyDetails;
 			}
-			catch (RSGISException &e) 
+			catch (RSGISException &e)
 			{
 				throw e;
 			}
-			
+
 		}
 		else if(option == RSGISExeVectorUtils::polygonImageFootprints)
 		{
 			cout << "Create plot polygons from input CSV file\n";
 			cout << "Input CSV = " << this->inputFile << endl;
 			cout << "Output Vector = " << this->outputVector << endl;
-			
-			try 
+
+            // Convert to absolute path
+            this->outputVector = boost::filesystem::absolute(this->outputVector).c_str();
+
+			try
 			{
 				RSGISImageFootprintPolygonsCSVParse *parse = new RSGISImageFootprintPolygonsCSVParse();
 				vector<ImageFootPrintPoly*> *polyDetails = parse->parsePoly(this->inputFile);
 				delete parse;
-				
+
 				RSGISVectorProcessing *vecProcessing = new RSGISVectorProcessing();
 				vecProcessing->createImageFootprintPolygons(polyDetails, this->outputVector, this->force);
 				delete vecProcessing;
-				
+
 				vector<ImageFootPrintPoly*>::iterator iterPolyDetails;
 				for(iterPolyDetails = polyDetails->begin(); iterPolyDetails != polyDetails->end(); )
 				{
@@ -7043,18 +7169,22 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				}
 				delete polyDetails;
 			}
-			catch (RSGISException &e) 
+			catch (RSGISException &e)
 			{
 				throw e;
 			}
-			
+
 		}
 		else if(option == RSGISExeVectorUtils::polygonizempolys)
 		{
 			cout << "Create a polygon around each Multi-Polygon.\n";
 			cout << "Input Vector: " << this->inputVector << endl;
 			cout << "Output Vector: " << this->outputVector << endl;
-			
+
+            // Convert to absolute path
+            this->inputVector = boost::filesystem::absolute(this->inputVector).c_str();
+            this->outputVector = boost::filesystem::absolute(this->outputVector).c_str();
+
 			if(polygonizertype == lineproj)
 			{
 				cout << "The line projection polygonizer will be used\n";
@@ -7085,22 +7215,22 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				cout << "Gamma = " << this->gamma << endl;
 				cout << "Delta = " << this->delta << endl;
 			}
-			
+
 			OGRRegisterAll();
-			
+
 			RSGISFileUtils fileUtils;
 			RSGISVectorUtils vecUtils;
 			RSGISVectorIO vecIO;
-			
+
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
-			
+
 			OGRDataSource *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
 			OGRSpatialReference* spatialRef = NULL;
-			
+
 			RSGISProcessVector *processVector = NULL;
-			RSGISProcessOGRFeature *processFeature = NULL;			
-			
+			RSGISProcessOGRFeature *processFeature = NULL;
+
 			try
 			{
 				/////////////////////////////////////
@@ -7121,19 +7251,19 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					throw RSGISFileException(message.c_str());
 				}
 				spatialRef = inputSHPLayer->GetSpatialRef();
-				
+
 				vector<MultiPolygon*> *mPolys = new vector<MultiPolygon*>();
 				processFeature = new RSGISGEOSMultiPolygonReader(mPolys);
 				processVector = new RSGISProcessVector(processFeature);
-				
+
 				cout << "Read input Shapefile\n";
 				processVector->processVectorsNoOutput(inputSHPLayer, false);
-				
+
 				delete processVector;
 				delete processFeature;
-								
+
 				RSGISGeometry geomUtils;
-				
+
 				vector<Polygon*> *polygons = new vector<Polygon*>();
 				vector<Polygon*> *tmpPolys = new vector<Polygon*>();
 				vector<Polygon*>::iterator iterPolys;
@@ -7141,7 +7271,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				for(iterMultiPolys = mPolys->begin(); iterMultiPolys != mPolys->end(); ++iterMultiPolys)
 				{
 					geomUtils.retrievePolygons((*iterMultiPolys), tmpPolys);
-					
+
 					if(polygonizertype == lineproj)
 					{
 						RSGISIdentifyNonConvexPolygonsLineProject *identifyNonConvexLineProj = new RSGISIdentifyNonConvexPolygonsLineProject(resolution);
@@ -7168,33 +7298,33 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					{
 						throw RSGISException("Do not know polygonization option.");
 					}
-					
-					
+
+
 					for(iterPolys = tmpPolys->begin(); iterPolys != tmpPolys->end(); )
 					{
 						delete *iterPolys;
 						tmpPolys->erase(iterPolys);
 					}
-					
+
 				}
 				delete tmpPolys;
-				
+
 				vecIO.exportGEOSPolygons2SHP(this->outputVector, this->force, polygons, spatialRef);
-				
+
 				for(iterMultiPolys = mPolys->begin(); iterMultiPolys != mPolys->end(); )
 				{
 					delete *iterMultiPolys;
 					mPolys->erase(iterMultiPolys);
 				}
 				delete mPolys;
-				
+
 				for(iterPolys = polygons->begin(); iterPolys != polygons->end(); )
 				{
 					delete *iterPolys;
 					polygons->erase(iterPolys);
 				}
 				delete polygons;
-				
+
 				OGRDataSource::DestroyDataSource(inputSHPDS);
 				//OGRCleanupAll();
 			}
@@ -7202,7 +7332,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 			{
 				throw e;
 			}
-			
+
 		}
 		else if(option == RSGISExeVectorUtils::scatter2D)
 		{
@@ -7211,21 +7341,24 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 			cout << "Output Plot = " << this->outputPlot << endl;
 			cout << "Attribute1 = " << this->attribute1 << endl;
 			cout << "Attribute2 = " << this->attribute2 << endl;
-			
+
+            // Convert to absolute path
+            this->inputVector = boost::filesystem::absolute(this->inputVector).c_str();
+
 			OGRRegisterAll();
-			
+
 			RSGISFileUtils fileUtils;
 			RSGISVectorUtils vecUtils;
 			RSGISVectorIO vecIO;
-			
+
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
-			
+
 			OGRDataSource *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
-			
+
 			RSGISProcessVector *processVector = NULL;
-			RSGISProcessOGRFeature *processFeature = NULL;			
-			
+			RSGISProcessOGRFeature *processFeature = NULL;
+
 			try
 			{
 				/////////////////////////////////////
@@ -7245,21 +7378,21 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					string message = string("Could not open vector layer ") + SHPFileInLayer;
 					throw RSGISFileException(message.c_str());
 				}
-				
+
 				RSGISExportForPlottingIncremental *plotter = new RSGISExportForPlottingIncremental();
 				plotter->openFile(this->outputPlot, scatter2d);
 				processFeature = new RSGIS2DScatterPlotVariables(plotter, attribute1, attribute2);
 				processVector = new RSGISProcessVector(processFeature);
-			
+
 				processVector->processVectorsNoOutput(inputSHPLayer, false);
-			
+
 				plotter->close();
 				delete plotter;
-				
+
 				delete processVector;
 				delete processFeature;
-				
-				
+
+
 				OGRDataSource::DestroyDataSource(inputSHPDS);
 				//OGRCleanupAll();
 			}
@@ -7267,34 +7400,38 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 			{
 				throw e;
 			}
-			
+
 		}
 		else if(option == RSGISExeVectorUtils::copycheckpolys)
 		{
 			cout << "Copy and check Polygon Vector Layer\n";
 			cout << "Input Vector: " << this->inputVector << endl;
 			cout << "Output Vector: " << this->outputVector << endl;
-			
+
+            // Convert to absolute path
+            this->inputVector = boost::filesystem::absolute(this->inputVector).c_str();
+            this->outputVector = boost::filesystem::absolute(this->outputVector).c_str();
+
 			OGRRegisterAll();
-			
+
 			RSGISFileUtils fileUtils;
 			RSGISVectorUtils vecUtils;
-			
+
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
 			string SHPFileOutLayer = vecUtils.getLayerName(this->outputVector);
-			
+
 			OGRDataSource *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
 			OGRSFDriver *shpFiledriver = NULL;
 			OGRDataSource *outputSHPDS = NULL;
 			OGRLayer *outputSHPLayer = NULL;
 			OGRSpatialReference* inputSpatialRef = NULL;
-			
+
 			string outputDIR = "";
 			try
 			{
 				outputDIR = fileUtils.getFileDirectoryPath(this->outputVector);
-				
+
 				if(vecUtils.checkDIR4SHP(outputDIR, SHPFileOutLayer))
 				{
 					if(this->force)
@@ -7306,7 +7443,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 						throw RSGISException("Shapefile already exists, either delete or select force.");
 					}
 				}
-				
+
 				/////////////////////////////////////
 				//
 				// Open Input Shapfile.
@@ -7324,12 +7461,12 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					string message = string("Could not open vector layer ") + SHPFileInLayer;
 					throw RSGISFileException(message.c_str());
 				}
-				inputSpatialRef = inputSHPLayer->GetSpatialRef();	
-				
+				inputSpatialRef = inputSHPLayer->GetSpatialRef();
+
 				// Get Geometry Type.
 				OGRFeature *feature = inputSHPLayer->GetFeature(0);
 				OGRwkbGeometryType geometryType = feature->GetGeometryRef()->getGeometryType();
-				
+
 				/////////////////////////////////////
 				//
 				// Create Output Shapfile.
@@ -7353,17 +7490,17 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					string message = string("Could not create vector layer ") + SHPFileOutLayer;
 					throw RSGISVectorOutputException(message.c_str());
 				}
-				
+
 				RSGISCopyCheckPolygons copyCheckPolygons;
-				try 
+				try
 				{
 					copyCheckPolygons.copyCheckPolygons(inputSHPLayer, outputSHPLayer, true);
-					
+
 					OGRDataSource::DestroyDataSource(inputSHPDS);
 					OGRDataSource::DestroyDataSource(outputSHPDS);
 					//OGRCleanupAll();
 				}
-				catch (RSGISVectorException &e) 
+				catch (RSGISVectorException &e)
 				{
 					OGRDataSource::DestroyDataSource(inputSHPDS);
 					OGRDataSource::DestroyDataSource(outputSHPDS);
@@ -7371,7 +7508,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					throw e;
 				}
 			}
-			catch (RSGISException& e) 
+			catch (RSGISException& e)
 			{
 				throw e;
 			}
@@ -7382,27 +7519,31 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 			cout << "Input Vector: " << this->inputVector << endl;
 			cout << "Output Vector Base: " << this->outputVectorBase << endl;
 			cout << "Attribute: " << this->attribute << endl;
-			
+
+            // Convert to absolute path
+            this->inputVector = boost::filesystem::absolute(this->inputVector).c_str();
+            this->outputVectorBase = boost::filesystem::absolute(this->outputVectorBase).c_str();
+
 			OGRRegisterAll();
-			
+
 			RSGISFileUtils fileUtils;
 			RSGISVectorUtils vecUtils;
-						
+
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
-			
+
 			OGRDataSource *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
 			OGRSFDriver *shpFiledriver = NULL;
 			OGRDataSource *outputSHPDS = NULL;
 			OGRLayer *outputSHPLayer = NULL;
 			OGRSpatialReference* inputSpatialRef = NULL;
-			
+
 			RSGISProcessVector *processVector = NULL;
 			RSGISProcessVectorSQL *processVectorSQL = NULL;
-			RSGISProcessOGRFeature *processFeature = NULL;	
-			
+			RSGISProcessOGRFeature *processFeature = NULL;
+
 			vector<string> *attributeValues = new vector<string>();
-			
+
 			try
 			{
 				const char *pszDriverName = "ESRI Shapefile";
@@ -7411,7 +7552,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				{
 					throw RSGISVectorOutputException("SHP driver not available.");
 				}
-				
+
 				/////////////////////////////////////
 				//
 				// Open Input Shapfile.
@@ -7429,29 +7570,29 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					string message = string("Could not open vector layer ") + SHPFileInLayer;
 					throw RSGISFileException(message.c_str());
 				}
-				inputSpatialRef = inputSHPLayer->GetSpatialRef();	
-				
+				inputSpatialRef = inputSHPLayer->GetSpatialRef();
+
 				// Get Geometry Type.
 				OGRFeature *feature = inputSHPLayer->GetFeature(0);
 				OGRwkbGeometryType geometryType = feature->GetGeometryRef()->getGeometryType();
-								
+
 				processFeature = new RSGISCreateListOfAttributeValues(attributeValues, attribute);
 				processVector = new RSGISProcessVector(processFeature);
 				processVector->processVectorsNoOutput(inputSHPLayer, false);
-				
+
 				delete processVector;
 				delete processFeature;
-				
+
 				cout << "There are " << attributeValues->size() << " independent values within the shapefile\n";
-				
+
 				string outputShpFilePath = "";
 				string SHPFileOutLayer = "";
 				string outputDIR = "";
 				string sql = "";
-				
+
 				processFeature = new RSGISCopyFeatures();
 				processVectorSQL = new RSGISProcessVectorSQL(processFeature);
-				
+
 				vector<string>::iterator iterAttr;
 				for(iterAttr = attributeValues->begin(); iterAttr != attributeValues->end(); ++iterAttr)
 				{
@@ -7472,7 +7613,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 							throw RSGISException("Shapefile already exists, either delete or select force.");
 						}
 					}
-					
+
 					/////////////////////////////////////
 					//
 					// Create Output Shapfile.
@@ -7490,23 +7631,23 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 						string message = string("Could not create vector layer ") + SHPFileOutLayer;
 						throw RSGISVectorOutputException(message.c_str());
 					}
-					
+
 					sql = "SELECT * FROM " + SHPFileInLayer + " WHERE " + this->attribute + " = " + *iterAttr;
-					
+
 					cout << "SQL: " << sql << endl;
-					
+
 					processVectorSQL->processVectors(inputSHPDS, outputSHPLayer, true, false, sql);
-					
+
 					OGRDataSource::DestroyDataSource(outputSHPDS);
 				}
 				OGRDataSource::DestroyDataSource(inputSHPDS);
-				
+
 				delete processFeature;
 				delete processVectorSQL;
-				
+
 				//OGRCleanupAll();
 			}
-			catch (RSGISException& e) 
+			catch (RSGISException& e)
 			{
 				throw e;
 			}
@@ -7516,27 +7657,31 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 			cout << "Remove polygons which are contained within another polygon.\n";
 			cout << "Input Vector: " << this->inputVector << endl;
 			cout << "Output Vector: " << this->outputVector << endl;
-			
+
+            // Convert to absolute path
+            this->inputVector = boost::filesystem::absolute(this->inputVector).c_str();
+            this->outputVector = boost::filesystem::absolute(this->outputVector).c_str();
+
 			OGRRegisterAll();
-			
+
 			RSGISFileUtils fileUtils;
 			RSGISVectorUtils vecUtils;
-			
+
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
 			string SHPFileOutLayer = vecUtils.getLayerName(this->outputVector);
-			
+
 			OGRDataSource *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
 			OGRSFDriver *shpFiledriver = NULL;
 			OGRDataSource *outputSHPDS = NULL;
 			OGRLayer *outputSHPLayer = NULL;
 			OGRSpatialReference* inputSpatialRef = NULL;
-			
+
 			string outputDIR = "";
 			try
 			{
 				outputDIR = fileUtils.getFileDirectoryPath(this->outputVector);
-				
+
 				if(vecUtils.checkDIR4SHP(outputDIR, SHPFileOutLayer))
 				{
 					if(this->force)
@@ -7548,7 +7693,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 						throw RSGISException("Shapefile already exists, either delete or select force.");
 					}
 				}
-				
+
 				/////////////////////////////////////
 				//
 				// Open Input Shapfile.
@@ -7566,12 +7711,12 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					string message = string("Could not open vector layer ") + SHPFileInLayer;
 					throw RSGISFileException(message.c_str());
 				}
-				inputSpatialRef = inputSHPLayer->GetSpatialRef();	
-				
+				inputSpatialRef = inputSHPLayer->GetSpatialRef();
+
 				// Get Geometry Type.
 				OGRFeature *feature = inputSHPLayer->GetFeature(0);
 				OGRwkbGeometryType geometryType = feature->GetGeometryRef()->getGeometryType();
-				
+
 				/////////////////////////////////////
 				//
 				// Create Output Shapfile.
@@ -7595,58 +7740,63 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					string message = string("Could not create vector layer ") + SHPFileOutLayer;
 					throw RSGISVectorOutputException(message.c_str());
 				}
-				
-				
-				try 
+
+
+				try
 				{
 					RSGISRemoveContainedPolygons removeContainedPolys;
 					unsigned long numOutPolys = removeContainedPolys.removeContainedPolygons(inputSHPLayer, outputSHPLayer);
 					cout << numOutPolys << " Polygons have been outputted.\n";
-					
+
 					OGRDataSource::DestroyDataSource(inputSHPDS);
 					OGRDataSource::DestroyDataSource(outputSHPDS);
-					
+
 				}
-				catch (RSGISVectorException &e) 
+				catch (RSGISVectorException &e)
 				{
 					OGRDataSource::DestroyDataSource(inputSHPDS);
 					OGRDataSource::DestroyDataSource(outputSHPDS);
 					throw e;
 				}
-				
+
 				//OGRCleanupAll();
 			}
-			catch (RSGISException& e) 
+			catch (RSGISException& e)
 			{
 				throw e;
 			}
 		}
 		else if(option == RSGISExeVectorUtils::polygonsInPolygon)
 		{
-			//cout << "Copy and check Polygon Vector Layer\n";
-			//cout << "Input Vector: " << this->inputVector << endl;
-			//cout << "Output Vector: " << this->outputVector << endl;
-			
+			std::cout << "Split polgons in:" << std::endl;
+			std::cout << "\t" << this->inputVector << std::endl;
+			std::cout << "By polygons in:" << std::endl;
+            std::cout << "\t" << this->inputCoverVector << std::endl;
+			std::cout << "Output DIR = " <<  this->output_DIR << std::endl;
+
+            // Convert to absolute path
+            this->inputVector = boost::filesystem::absolute(this->inputVector).c_str();
+            this->inputCoverVector = boost::filesystem::absolute(this->inputCoverVector).c_str();
+            this->output_DIR = boost::filesystem::absolute(this->output_DIR).c_str();
+
+
 			OGRRegisterAll();
-			
+
 			RSGISFileUtils fileUtils;
 			RSGISVectorUtils vecUtils;
-			
+
 			string coverSHPFileInLayer = vecUtils.getLayerName(this->inputCoverVector);
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
-			
-			cout << "Cover file = " << this->inputCoverVector << endl;
-			cout << "Vector = " << this->inputVector << endl;
-			
+
 			OGRDataSource *inputCoverSHPDS = NULL;
 			OGRLayer *inputCoverSHPLayer = NULL;
 			OGRSpatialReference* inputCoverSpatialRef = NULL;
-			
+
 			OGRDataSource *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
 			OGRSpatialReference* inputSpatialRef = NULL;
 			OGRGeometry *coverGeometry = NULL; // OGRGeometry representation of feature in cover layer
-			
+
 			// Output shapefile
 			OGRSFDriver *shpFiledriver = NULL;
 			const char *pszDriverName = "ESRI Shapefile";
@@ -7655,15 +7805,15 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 			{
 				throw RSGISVectorOutputException("SHP driver not available.");
 			}
-			string coverFeatureName = ""; 
+			string coverFeatureName = "";
 			string outVector = ""; // Filename of out vector
-			
+
 			try
 			{
 				/************************
 				 * OPEN COVER SHAPEFILE *
 				 ************************/
-				
+
 				inputCoverSHPDS = OGRSFDriverRegistrar::Open(this->inputCoverVector.c_str(), FALSE);
 				if(inputCoverSHPDS == NULL)
 				{
@@ -7677,14 +7827,14 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					throw RSGISFileException(message.c_str());
 				}
 				inputCoverSpatialRef = inputCoverSHPLayer->GetSpatialRef();
-				
+
 				/*********************************
 				 * OPEN SHAPEFILE                *
 				 * This shapefile contains the   *
 				 * polygons to check if          *
 				 * covered by 'inputCoverVector' *
 				 *********************************/
-				
+
 				inputSHPDS = OGRSFDriverRegistrar::Open(this->inputVector.c_str(), FALSE);
 				if(inputSHPDS == NULL)
 				{
@@ -7697,40 +7847,40 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					string message = string("Could not open vector layer ") + SHPFileInLayer;
 					throw RSGISFileException(message.c_str());
 				}
-				inputSpatialRef = inputSHPLayer->GetSpatialRef();	
-				
+				inputSpatialRef = inputSHPLayer->GetSpatialRef();
+
 				if(inputCoverSpatialRef != inputSpatialRef)
 				{
 					//throw RSGISException("Shapefiles are of different projection!");
 				}
-				
+
 				// Get Geometry Type.
 				OGRFeature *feature = inputSHPLayer->GetFeature(0);
 				OGRwkbGeometryType geometryType = feature->GetGeometryRef()->getGeometryType();
-				
+
 				/********************************************
 				 * Loop through features in input shapefile *
 				 ********************************************/
 				OGRFeature *inCoverFeature = NULL;
 				while( (inCoverFeature = inputCoverSHPLayer->GetNextFeature()) != NULL )
 				{
-					
+
 					// Get name of feature
 					int fieldIdx = inCoverFeature->GetFieldIndex(this->attributeName.c_str());
 					coverFeatureName = inCoverFeature->GetFieldAsString(fieldIdx);
-					
+
 					// Represent as OGRGeometry
-					coverGeometry = inCoverFeature->GetGeometryRef(); 				
-					
+					coverGeometry = inCoverFeature->GetGeometryRef();
+
 					outVector = this->output_DIR + "/" + coverFeatureName + ".shp";
 					string SHPFileOutLayer = vecUtils.getLayerName(outVector);
-					
+
 					OGRDataSource *outputSHPDS = NULL;
 					OGRLayer *outputSHPLayer = NULL;
-					
+
 					string outputDIR = "";
 					outputDIR = fileUtils.getFileDirectoryPath(outVector);
-					
+
 					if(vecUtils.checkDIR4SHP(outputDIR, SHPFileOutLayer))
 					{
 						if(this->force)
@@ -7742,16 +7892,16 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 							throw RSGISException("Shapefile already exists, either delete or select force.");
 						}
 					}
-					
+
 					/**************************************
 					 * CREATE OUTPUT SHAPEFILE            *
 					 * This is the shapefile representing *
 					 * polygons contained within the	  *
 					 * cover feature                      *
 					 **************************************/
-					
+
 					outputSHPDS = shpFiledriver->CreateDataSource(outVector.c_str(), NULL);
-					
+
 					cout << "Creating new shapefile" << endl;
 					if( outputSHPDS == NULL )
 					{
@@ -7764,21 +7914,21 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 						string message = string("Could not create vector layer ") + SHPFileOutLayer;
 						throw RSGISVectorOutputException(message.c_str());
 					}
-					
+
 					cout << "Created shapefile " << outVector << endl;
-					
+
 					/************************************
 					 * ADD POLYGONS IN POLYGON TO NEW   *
 					 * SHAPEFILE						*
 					 ************************************/
 					RSGISCopyPolygonsInPolygon copyPolysinPoly;
 					long unsigned numPolygonsInCover = 0;
-					try 
+					try
 					{
 						numPolygonsInCover = copyPolysinPoly.copyPolygonsInPoly(inputSHPLayer, outputSHPLayer, coverGeometry);
 						OGRDataSource::DestroyDataSource(outputSHPDS);
 					}
-					catch (RSGISVectorException &e) 
+					catch (RSGISVectorException &e)
 					{
 						OGRDataSource::DestroyDataSource(outputSHPDS);
 						//OGRCleanupAll();
@@ -7790,18 +7940,18 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 						cout << SHPFileOutLayer << " covers no polygons and will be deleted" << endl;
 						vecUtils.deleteSHP(outputDIR, SHPFileOutLayer);
 					}
-					else 
+					else
 					{
 						cout << coverFeatureName << " covers " << numPolygonsInCover << " polygons" << endl;
 					}
-					
-					
-				}		
-				
+
+
+				}
+
 				//OGRCleanupAll();
-				
+
 			}
-			catch (RSGISException& e) 
+			catch (RSGISException& e)
 			{
 				throw e;
 			}
@@ -7811,57 +7961,61 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 			cout << "Remove polygons which are contained within another polygon for files within a DIR.\n";
 			cout << "Input DIR: " << this->inputDIR << endl;
 			cout << "Output DIR: " << this->output_DIR << endl;
-			
+
+            // Convert to absolute path
+            this->inputDIR = boost::filesystem::absolute(this->inputDIR).c_str();
+            this->output_DIR = boost::filesystem::absolute(this->output_DIR).c_str();
+
 			OGRRegisterAll();
-			
+
 			RSGISFileUtils fileUtils;
 			RSGISVectorUtils vecUtils;
-			
-			string SHPFileInLayer = "";			
+
+			string SHPFileInLayer = "";
 			string SHPFileOutLayer = "";
 			string outputDIR = "";
-			
+
 			OGRDataSource *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
 			OGRSFDriver *shpFiledriver = NULL;
 			OGRDataSource *outputSHPDS = NULL;
 			OGRLayer *outputSHPLayer = NULL;
 			OGRSpatialReference* inputSpatialRef = NULL;
-			
+
 			const char *pszDriverName = "ESRI Shapefile";
 			shpFiledriver = OGRSFDriverRegistrar::GetRegistrar()->GetDriverByName(pszDriverName );
 			if( shpFiledriver == NULL )
 			{
 				throw RSGISVectorOutputException("SHP driver not available.");
 			}
-			
+
 			RSGISRemoveContainedPolygons removeContainedPolys;
-			
+
 			vector<string>::iterator iterFiles;
 			vector<string> *inputShpFiles = new vector<string>();
 			fileUtils.getDIRList(this->inputDIR, ".shp", inputShpFiles, true);
-			
+
 			if(inputShpFiles->size() == 0)
 			{
 				throw RSGISException("There were no shapefiles within the specified directory.");
 			}
-			else 
+			else
 			{
 				for(iterFiles = inputShpFiles->begin(); iterFiles != inputShpFiles->end(); ++iterFiles)
 				{
 					try
 					{
-					
+
 						cout << "Processing: " << *iterFiles << endl;
 						this->inputVector = *iterFiles;
 						SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
 						//cout << "In layer name: " << SHPFileInLayer << endl;
 						SHPFileOutLayer = SHPFileInLayer + "_nocontained";
 						//cout << "Out layer name: " << SHPFileOutLayer << endl;
-						
+
 						this->outputVector = output_DIR + SHPFileOutLayer + ".shp";
 						cout << "Output: " << this->outputVector << endl;
-						
+
 						if(vecUtils.checkDIR4SHP(output_DIR, SHPFileOutLayer))
 						{
 							if(this->force)
@@ -7873,7 +8027,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 								throw RSGISException("Shapefile already exists, either delete or select force.");
 							}
 						}
-						
+
 						/////////////////////////////////////
 						//
 						// Open Input Shapfile.
@@ -7891,18 +8045,18 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 							string message = string("Could not open vector layer ") + SHPFileInLayer;
 							throw RSGISFileException(message.c_str());
 						}
-						inputSpatialRef = inputSHPLayer->GetSpatialRef();	
-						
+						inputSpatialRef = inputSHPLayer->GetSpatialRef();
+
 						// Get Geometry Type.
 						OGRFeature *feature = inputSHPLayer->GetFeature(0);
 						OGRwkbGeometryType geometryType = feature->GetGeometryRef()->getGeometryType();
-						
+
 						/////////////////////////////////////
 						//
 						// Create Output Shapfile.
 						//
 						/////////////////////////////////////
-						
+
 						outputSHPDS = shpFiledriver->CreateDataSource(this->outputVector.c_str(), NULL);
 						if( outputSHPDS == NULL )
 						{
@@ -7915,31 +8069,31 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 							string message = string("Could not create vector layer ") + SHPFileOutLayer;
 							throw RSGISVectorOutputException(message.c_str());
 						}
-						
-						try 
+
+						try
 						{
 							unsigned long numOutPolys = removeContainedPolys.removeContainedPolygons(inputSHPLayer, outputSHPLayer);
 							cout << numOutPolys << " Polygons have been outputted.\n";
-							
+
 							OGRDataSource::DestroyDataSource(inputSHPDS);
 							OGRDataSource::DestroyDataSource(outputSHPDS);
-							
+
 						}
-						catch (RSGISVectorException &e) 
+						catch (RSGISVectorException &e)
 						{
 							OGRDataSource::DestroyDataSource(inputSHPDS);
 							OGRDataSource::DestroyDataSource(outputSHPDS);
 							throw e;
 						}
 					}
-					catch (RSGISException& e) 
+					catch (RSGISException& e)
 					{
 						throw e;
 					}
 				}
-				
+
 				delete inputShpFiles;
-				
+
 				//OGRCleanupAll();
 			}
 		}
@@ -7948,57 +8102,62 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 			cout << "Merge touching polygons for a shapefile within a directory.\n";
 			cout << "Input DIR: " << this->inputDIR << endl;
 			cout << "Output DIR: " << this->output_DIR << endl;
+
+            // Convert to absolute path
+            this->inputDIR = boost::filesystem::absolute(this->inputDIR).c_str();
+            this->output_DIR = boost::filesystem::absolute(this->output_DIR).c_str();
+
 			if(attributeDef)
 			{
 				cout << "The attribute " << this->attribute << " will be added to the output.\n";
 			}
-			
+
 			OGRRegisterAll();
-			
+
 			RSGISFileUtils fileUtils;
 			RSGISVectorUtils vecUtils;
 			RSGISVectorIO vecIO;
-			
-			string SHPFileInLayer = "";			
+
+			string SHPFileInLayer = "";
 			string SHPFileOutLayer = "";
 			string outputDIR = "";
-			
+
 			OGRDataSource *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
 			OGRSpatialReference* inputSpatialRef = NULL;
-			
+
 			RSGISProcessVector *processVector = NULL;
 			RSGISProcessOGRFeature *processFeature = NULL;
-			
+
 			vector<string>::iterator iterFiles;
 			vector<string> *inputShpFiles = new vector<string>();
 			fileUtils.getDIRList(this->inputDIR, ".shp", inputShpFiles, true);
-			
+
 			string attributeValue = "";
-			
+
 			vector<Polygon*> *polygons = new vector<Polygon*>();
-			
+
 			if(inputShpFiles->size() == 0)
 			{
 				throw RSGISException("There were no shapefiles within the specified directory.");
 			}
-			else 
+			else
 			{
 				for(iterFiles = inputShpFiles->begin(); iterFiles != inputShpFiles->end(); ++iterFiles)
 				{
 					try
 					{
-						
+
 						cout << "Processing: " << *iterFiles << endl;
 						this->inputVector = *iterFiles;
 						SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
 						//cout << "In layer name: " << SHPFileInLayer << endl;
 						SHPFileOutLayer = SHPFileInLayer + "_notouch";
 						//cout << "Out layer name: " << SHPFileOutLayer << endl;
-						
+
 						this->outputVector = output_DIR + SHPFileOutLayer + ".shp";
 						cout << "Output: " << this->outputVector << endl;
-						
+
 						if(vecUtils.checkDIR4SHP(output_DIR, SHPFileOutLayer))
 						{
 							if(this->force)
@@ -8010,7 +8169,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 								throw RSGISException("Shapefile already exists, either delete or select force.");
 							}
 						}
-						
+
 						/////////////////////////////////////
 						//
 						// Open Input Shapfile.
@@ -8041,59 +8200,59 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 							}
 							attributeValue = feature->GetFieldAsString(fieldIdx);
 						}
-						
-						
-						try 
+
+
+						try
 						{
 							processFeature = new RSGISGEOSPolygonReader(polygons);
 							processVector = new RSGISProcessVector(processFeature);
-							
+
 							cout << "Read input Shapefile\n";
 							processVector->processVectorsNoOutput(inputSHPLayer, false);
-							
+
 							delete processVector;
 							delete processFeature;
-							
-							
+
+
 							RSGISGeometry geomUtils;
 							geomUtils.mergeTouchingPolygons(polygons);
-							
+
 							if(attributeDef)
 							{
 								vecIO.exportGEOSPolygons2SHP(this->outputVector, this->force, polygons, inputSpatialRef, attribute, attributeValue);
 							}
-							else 
+							else
 							{
 								vecIO.exportGEOSPolygons2SHP(this->outputVector, this->force, polygons, inputSpatialRef);
 							}
-							
+
 							vector<Polygon*>::iterator iterPolys;
 							for(iterPolys = polygons->begin(); iterPolys != polygons->end(); )
 							{
 								delete *iterPolys;
 								polygons->erase(iterPolys);
 							}
-							
-							
+
+
 							OGRDataSource::DestroyDataSource(inputSHPDS);
-							
+
 						}
-						catch (RSGISVectorException &e) 
+						catch (RSGISVectorException &e)
 						{
 							OGRDataSource::DestroyDataSource(inputSHPDS);
 							throw e;
 						}
 					}
-					catch (RSGISException& e) 
+					catch (RSGISException& e)
 					{
 						throw e;
 					}
 				}
 			}
-			
+
 			delete polygons;
 			delete inputShpFiles;
-			
+
 			//OGRCleanupAll();
 		}
 		else if(option == RSGISExeVectorUtils::splitlargesmall)
@@ -8103,16 +8262,21 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 			cout << "Output Large Vector: " << this->outputlarge << endl;
 			cout << "Output Small Vector: " << this->outputsmall << endl;
 			cout << "Threshold = " << this->threshold << endl;
-			
+
+            // Convert to absolute path
+            this->inputVector = boost::filesystem::absolute(this->inputVector).c_str();
+            this->outputlarge = boost::filesystem::absolute(this->outputlarge).c_str();
+            this->outputsmall = boost::filesystem::absolute(this->outputsmall).c_str();
+
 			OGRRegisterAll();
-			
+
 			RSGISFileUtils fileUtils;
 			RSGISVectorUtils vecUtils;
-			
+
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
 			string SHPFileOutLayerLarge = vecUtils.getLayerName(this->outputlarge);
 			string SHPFileOutLayerSmall = vecUtils.getLayerName(this->outputsmall);
-			
+
 			OGRDataSource *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
 			OGRSFDriver *shpFiledriver = NULL;
@@ -8121,21 +8285,21 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 			OGRDataSource *outputSHPDSSmall = NULL;
 			OGRLayer *outputSHPLayerSmall = NULL;
 			OGRSpatialReference* inputSpatialRef = NULL;
-			
+
 			const char *pszDriverName = "ESRI Shapefile";
 			shpFiledriver = OGRSFDriverRegistrar::GetRegistrar()->GetDriverByName(pszDriverName );
 			if( shpFiledriver == NULL )
 			{
 				throw RSGISVectorOutputException("SHP driver not available.");
 			}
-			
+
 			string outputLargeDIR = "";
 			string outputSmallDIR = "";
 			try
 			{
 				outputLargeDIR = fileUtils.getFileDirectoryPath(this->outputlarge);
 				outputSmallDIR = fileUtils.getFileDirectoryPath(this->outputsmall);
-				
+
 				if(vecUtils.checkDIR4SHP(outputLargeDIR, SHPFileOutLayerLarge))
 				{
 					if(this->force)
@@ -8147,7 +8311,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 						throw RSGISException("Shapefile already exists, either delete or select force.");
 					}
 				}
-				
+
 				if(vecUtils.checkDIR4SHP(outputSmallDIR, SHPFileOutLayerSmall))
 				{
 					if(this->force)
@@ -8159,7 +8323,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 						throw RSGISException("Shapefile already exists, either delete or select force.");
 					}
 				}
-				
+
 				/////////////////////////////////////
 				//
 				// Open Input Shapfile.
@@ -8177,12 +8341,12 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					string message = string("Could not open vector layer ") + SHPFileInLayer;
 					throw RSGISFileException(message.c_str());
 				}
-				inputSpatialRef = inputSHPLayer->GetSpatialRef();	
-				
+				inputSpatialRef = inputSHPLayer->GetSpatialRef();
+
 				// Get Geometry Type.
 				OGRFeature *feature = inputSHPLayer->GetFeature(0);
 				OGRwkbGeometryType geometryType = feature->GetGeometryRef()->getGeometryType();
-				
+
 				/////////////////////////////////////
 				//
 				// Create Output Shapfile Large
@@ -8200,7 +8364,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					string message = string("Could not create vector layer ") + SHPFileOutLayerLarge;
 					throw RSGISVectorOutputException(message.c_str());
 				}
-				
+
 				/////////////////////////////////////
 				//
 				// Create Output Shapfile Small
@@ -8218,18 +8382,18 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					string message = string("Could not create vector layer ") + SHPFileOutLayerSmall;
 					throw RSGISVectorOutputException(message.c_str());
 				}
-				
-				try 
+
+				try
 				{
 					RSGISSplitSmallLargePolygons splitSmallLarge;
-					splitSmallLarge.splitPolygons(inputSHPLayer, outputSHPLayerSmall, outputSHPLayerLarge, threshold);			
-					
+					splitSmallLarge.splitPolygons(inputSHPLayer, outputSHPLayerSmall, outputSHPLayerLarge, threshold);
+
 					OGRDataSource::DestroyDataSource(inputSHPDS);
 					OGRDataSource::DestroyDataSource(outputSHPDSLarge);
 					OGRDataSource::DestroyDataSource(outputSHPDSSmall);
 					//OGRCleanupAll();
 				}
-				catch (RSGISVectorException &e) 
+				catch (RSGISVectorException &e)
 				{
 					OGRDataSource::DestroyDataSource(inputSHPDS);
 					OGRDataSource::DestroyDataSource(outputSHPDSLarge);
@@ -8238,7 +8402,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					throw e;
 				}
 			}
-			catch (RSGISException& e) 
+			catch (RSGISException& e)
 			{
 				throw e;
 			}
@@ -8249,16 +8413,21 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 			cout << "Input Geometry: " << this->inputGeometry << endl;
 			cout << "Input Vector: " << this->inputVector << endl;
 			cout << "Output Vector: " << this->outputVector << endl;
-						
+
+            // Convert to absolute path
+            this->inputGeometry = boost::filesystem::absolute(this->inputGeometry).c_str();
+            this->inputVector = boost::filesystem::absolute(this->inputVector).c_str();
+            this->outputVector = boost::filesystem::absolute(this->outputVector).c_str();
+
 			OGRRegisterAll();
-			
+
 			RSGISFileUtils fileUtils;
 			RSGISVectorUtils vecUtils;
-			
+
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
 			string SHPFileInLayerGeom = vecUtils.getLayerName(this->inputGeometry);
 			string SHPFileOutLayer = vecUtils.getLayerName(this->outputVector);
-			
+
 			OGRDataSource *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
 			OGRDataSource *inputSHPDSGeom = NULL;
@@ -8267,15 +8436,15 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 			OGRDataSource *outputSHPDS = NULL;
 			OGRLayer *outputSHPLayer = NULL;
 			OGRSpatialReference* inputSpatialRef = NULL;
-			
+
 			RSGISProcessVector *processVector = NULL;
-			RSGISProcessOGRFeature *processFeature = NULL;	
-			
+			RSGISProcessOGRFeature *processFeature = NULL;
+
 			string outputDIR = "";
 			try
 			{
 				outputDIR = fileUtils.getFileDirectoryPath(this->outputVector);
-				
+
 				if(vecUtils.checkDIR4SHP(outputDIR, SHPFileOutLayer))
 				{
 					if(this->force)
@@ -8287,7 +8456,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 						throw RSGISException("Shapefile already exists, either delete or select force.");
 					}
 				}
-				
+
 				/////////////////////////////////////
 				//
 				// Open Input Shapfile. (Geometry)
@@ -8304,8 +8473,8 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				{
 					string message = string("Could not open vector layer ") + SHPFileInLayerGeom;
 					throw RSGISFileException(message.c_str());
-				}	
-				
+				}
+
 				/////////////////////////////////////
 				//
 				// Open Input Shapfile.
@@ -8323,12 +8492,12 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					string message = string("Could not open vector layer ") + SHPFileInLayer;
 					throw RSGISFileException(message.c_str());
 				}
-				inputSpatialRef = inputSHPLayer->GetSpatialRef();	
-				
+				inputSpatialRef = inputSHPLayer->GetSpatialRef();
+
 				// Get Geometry Type.
 				OGRFeature *feature = inputSHPLayer->GetFeature(0);
 				OGRwkbGeometryType geometryType = feature->GetGeometryRef()->getGeometryType();
-				
+
 				/////////////////////////////////////
 				//
 				// Create Output Shapfile.
@@ -8352,40 +8521,40 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					string message = string("Could not create vector layer ") + SHPFileOutLayer;
 					throw RSGISVectorOutputException(message.c_str());
 				}
-				
-				
-				try 
+
+
+				try
 				{
 					vector<OGRPolygon*> *polys = new vector<OGRPolygon*>();
 					processFeature = new RSGISOGRPolygonReader(polys);
 					processVector = new RSGISProcessVector(processFeature);
 					processVector->processVectorsNoOutput(inputSHPLayerGeom, false);
-					
+
 					delete processVector;
 					delete processFeature;
-					
+
 					RSGISRemoveContainedPolygons removeContainedPolys;
 					unsigned long numOutPolys = removeContainedPolys.removeContainedPolygons(inputSHPLayer, outputSHPLayer, polys);
 					cout << numOutPolys << " Polygons have been outputted.\n";
-					
+
 					OGRDataSource::DestroyDataSource(inputSHPDS);
 					OGRDataSource::DestroyDataSource(outputSHPDS);
-					
+
 				}
-				catch (RSGISVectorException &e) 
+				catch (RSGISVectorException &e)
 				{
 					OGRDataSource::DestroyDataSource(inputSHPDS);
 					OGRDataSource::DestroyDataSource(outputSHPDS);
 					throw e;
 				}
-				
+
 				//OGRCleanupAll();
 			}
-			catch (RSGISException& e) 
+			catch (RSGISException& e)
 			{
 				throw e;
 			}
-		}	
+		}
 		else if(option == RSGISExeVectorUtils::mergeshps)
 		{
 			cout << "Merge the input shapefiles to a single shapefile.\n";
@@ -8400,32 +8569,32 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 			{
 				cout << "The attributes will be ignored\n";
 			}
-			else 
+			else
 			{
 				cout << "The attributes will be outputed\n";
 			}
 			OGRRegisterAll();
-			
+
 			RSGISFileUtils fileUtils;
 			RSGISVectorUtils vecUtils;
-			
+
 			string SHPFileInLayer = "";
 			string SHPFileOutLayer = vecUtils.getLayerName(this->outputVector);
-			
+
 			OGRDataSource *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
 			OGRSFDriver *shpFiledriver = NULL;
 			OGRDataSource *outputSHPDS = NULL;
 			OGRLayer *outputSHPLayer = NULL;
 			OGRSpatialReference* inputSpatialRef = NULL;
-			
+
 			RSGISAppendToVectorLayer appendToVector;
-			
+
 			string outputDIR = "";
 			try
 			{
 				outputDIR = fileUtils.getFileDirectoryPath(this->outputVector);
-				
+
 				if(vecUtils.checkDIR4SHP(outputDIR, SHPFileOutLayer))
 				{
 					if(this->force)
@@ -8437,20 +8606,20 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 						throw RSGISException("Shapefile already exists, either delete or select force.");
 					}
 				}
-				
+
 				bool first = true;
-				
+
 				for(iterFiles = inputVectors->begin(); iterFiles != inputVectors->end(); ++iterFiles)
 				{
 					inputVector = *iterFiles;
-					
+
 					/////////////////////////////////////
 					//
 					// Open Input Shapfile.
 					//
 					/////////////////////////////////////
 					SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
-					
+
 					inputSHPDS = OGRSFDriverRegistrar::Open(this->inputVector.c_str(), FALSE);
 					if(inputSHPDS == NULL)
 					{
@@ -8463,15 +8632,15 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 						string message = string("Could not open vector layer ") + SHPFileInLayer;
 						throw RSGISFileException(message.c_str());
 					}
-					
+
 					if(first)
 					{
-						inputSpatialRef = inputSHPLayer->GetSpatialRef();	
-						
+						inputSpatialRef = inputSHPLayer->GetSpatialRef();
+
 						// Get Geometry Type.
 						OGRFeature *feature = inputSHPLayer->GetFeature(0);
 						OGRwkbGeometryType geometryType = feature->GetGeometryRef()->getGeometryType();
-						
+
 						/////////////////////////////////////
 						//
 						// Create Output Shapfile.
@@ -8495,40 +8664,40 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 							string message = string("Could not create vector layer ") + SHPFileOutLayer;
 							throw RSGISVectorOutputException(message.c_str());
 						}
-						
+
 						if(!ignoreAttr)
 						{
 							appendToVector.copyFeatureDefn(outputSHPLayer, inputSHPLayer->GetLayerDefn());
 						}
-						
+
 						first = false;
 					}
-					else 
+					else
 					{
 						// Do Nothing...
 					}
 
-					try 
+					try
 					{
 						appendToVector.appendLayer(inputSHPLayer, outputSHPLayer, ignoreAttr);
-						
+
 						OGRDataSource::DestroyDataSource(inputSHPDS);
-						
+
 					}
-					catch (RSGISVectorException &e) 
+					catch (RSGISVectorException &e)
 					{
 						OGRDataSource::DestroyDataSource(inputSHPDS);
 						OGRDataSource::DestroyDataSource(outputSHPDS);
 						//OGRCleanupAll();
 						throw e;
 					}
-					
+
 				}
-				
+
 				OGRDataSource::DestroyDataSource(outputSHPDS);
 				//OGRCleanupAll();
 			}
-			catch (RSGISException& e) 
+			catch (RSGISException& e)
 			{
 				throw e;
 			}
@@ -8538,27 +8707,31 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 			cout << "Fix geometric errors in polygon boundary (note not all errors can be corrected.\n";
 			cout << "Input Vector: " << this->inputVector << endl;
 			cout << "Output Vector: " << this->outputVector << endl;
-			
+
+            // Convert to absolute path
+            this->inputVector = boost::filesystem::absolute(this->inputVector).c_str();
+            this->outputVector = boost::filesystem::absolute(this->outputVector).c_str();
+
 			OGRRegisterAll();
-			
+
 			RSGISFileUtils fileUtils;
 			RSGISVectorUtils vecUtils;
-			
+
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
 			string SHPFileOutLayer = vecUtils.getLayerName(this->outputVector);
-			
+
 			OGRDataSource *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
 			OGRSFDriver *shpFiledriver = NULL;
 			OGRDataSource *outputSHPDS = NULL;
 			OGRLayer *outputSHPLayer = NULL;
 			OGRSpatialReference* inputSpatialRef = NULL;
-			
+
 			string outputDIR = "";
 			try
 			{
 				outputDIR = fileUtils.getFileDirectoryPath(this->outputVector);
-				
+
 				if(vecUtils.checkDIR4SHP(outputDIR, SHPFileOutLayer))
 				{
 					if(this->force)
@@ -8570,7 +8743,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 						throw RSGISException("Shapefile already exists, either delete or select force.");
 					}
 				}
-				
+
 				/////////////////////////////////////
 				//
 				// Open Input Shapfile.
@@ -8588,12 +8761,12 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					string message = string("Could not open vector layer ") + SHPFileInLayer;
 					throw RSGISFileException(message.c_str());
 				}
-				inputSpatialRef = inputSHPLayer->GetSpatialRef();	
-				
+				inputSpatialRef = inputSHPLayer->GetSpatialRef();
+
 				// Get Geometry Type.
 				OGRFeature *feature = inputSHPLayer->GetFeature(0);
 				OGRwkbGeometryType geometryType = feature->GetGeometryRef()->getGeometryType();
-				
+
 				/////////////////////////////////////
 				//
 				// Create Output Shapfile.
@@ -8617,17 +8790,17 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					string message = string("Could not create vector layer ") + SHPFileOutLayer;
 					throw RSGISVectorOutputException(message.c_str());
 				}
-				
+
 				RSGISCopyCheckPolygons copyCheckPolygons;
-				try 
+				try
 				{
 					copyCheckPolygons.copyCheckPolygons(inputSHPLayer, outputSHPLayer, true);
-					
+
 					OGRDataSource::DestroyDataSource(inputSHPDS);
 					OGRDataSource::DestroyDataSource(outputSHPDS);
 					//OGRCleanupAll();
 				}
-				catch (RSGISVectorException &e) 
+				catch (RSGISVectorException &e)
 				{
 					OGRDataSource::DestroyDataSource(inputSHPDS);
 					OGRDataSource::DestroyDataSource(outputSHPDS);
@@ -8635,7 +8808,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					throw e;
 				}
 			}
-			catch (RSGISException& e) 
+			catch (RSGISException& e)
 			{
 				throw e;
 			}
@@ -8649,27 +8822,31 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
             {
                 cout << "Area threshold: " << this->threshold << endl;
             }
-			
+
+            // Convert to absolute path
+            this->inputVector = boost::filesystem::absolute(this->inputVector).c_str();
+            this->outputVector = boost::filesystem::absolute(this->outputVector).c_str();
+
 			OGRRegisterAll();
-			
+
 			RSGISFileUtils fileUtils;
 			RSGISVectorUtils vecUtils;
-			
+
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
 			string SHPFileOutLayer = vecUtils.getLayerName(this->outputVector);
-			
+
 			OGRDataSource *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
 			OGRSFDriver *shpFiledriver = NULL;
 			OGRDataSource *outputSHPDS = NULL;
 			OGRLayer *outputSHPLayer = NULL;
 			OGRSpatialReference* inputSpatialRef = NULL;
-			
+
 			string outputDIR = "";
 			try
 			{
 				outputDIR = fileUtils.getFileDirectoryPath(this->outputVector);
-				
+
 				if(vecUtils.checkDIR4SHP(outputDIR, SHPFileOutLayer))
 				{
 					if(this->force)
@@ -8681,7 +8858,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 						throw RSGISException("Shapefile already exists, either delete or select force.");
 					}
 				}
-				
+
 				/////////////////////////////////////
 				//
 				// Open Input Shapfile.
@@ -8699,12 +8876,12 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					string message = string("Could not open vector layer ") + SHPFileInLayer;
 					throw RSGISFileException(message.c_str());
 				}
-				inputSpatialRef = inputSHPLayer->GetSpatialRef();	
-				
+				inputSpatialRef = inputSHPLayer->GetSpatialRef();
+
 				// Get Geometry Type.
 				OGRFeature *feature = inputSHPLayer->GetFeature(0);
 				OGRwkbGeometryType geometryType = feature->GetGeometryRef()->getGeometryType();
-				
+
 				/////////////////////////////////////
 				//
 				// Create Output Shapfile.
@@ -8728,18 +8905,18 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					string message = string("Could not create vector layer ") + SHPFileOutLayer;
 					throw RSGISVectorOutputException(message.c_str());
 				}
-				
-				
-				try 
+
+
+				try
 				{
                     RSGISRemovePolygonHoles removePolyHolesObj = RSGISRemovePolygonHoles(this->threshold, this->areaThresholdProvided);
                     removePolyHolesObj.removeholes(inputSHPLayer, outputSHPLayer);
-					
+
 					OGRDataSource::DestroyDataSource(inputSHPDS);
 					OGRDataSource::DestroyDataSource(outputSHPDS);
 					//OGRCleanupAll();
 				}
-				catch (RSGISVectorException &e) 
+				catch (RSGISVectorException &e)
 				{
 					OGRDataSource::DestroyDataSource(inputSHPDS);
 					OGRDataSource::DestroyDataSource(outputSHPDS);
@@ -8747,7 +8924,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					throw e;
 				}
 			}
-			catch (RSGISException& e) 
+			catch (RSGISException& e)
 			{
 				throw e;
 			}
@@ -8758,27 +8935,31 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 			cout << "Input Vector: " << this->inputVector << endl;
 			cout << "Output Vector: " << this->outputVector << endl;
 			cout << "Threshold: " << this->threshold << endl;
-			
+
+            // Convert to absolute path
+            this->inputVector = boost::filesystem::absolute(this->inputVector).c_str();
+            this->outputVector = boost::filesystem::absolute(this->outputVector).c_str();
+
 			OGRRegisterAll();
-			
+
 			RSGISFileUtils fileUtils;
 			RSGISVectorUtils vecUtils;
-			
+
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
 			string SHPFileOutLayer = vecUtils.getLayerName(this->outputVector);
-			
+
 			OGRDataSource *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
 			OGRSFDriver *shpFiledriver = NULL;
 			OGRDataSource *outputSHPDS = NULL;
 			OGRLayer *outputSHPLayer = NULL;
 			OGRSpatialReference* inputSpatialRef = NULL;
-			
+
 			string outputDIR = "";
 			try
 			{
 				outputDIR = fileUtils.getFileDirectoryPath(this->outputVector);
-				
+
 				if(vecUtils.checkDIR4SHP(outputDIR, SHPFileOutLayer))
 				{
 					if(this->force)
@@ -8790,7 +8971,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 						throw RSGISException("Shapefile already exists, either delete or select force.");
 					}
 				}
-				
+
 				/////////////////////////////////////
 				//
 				// Open Input Shapfile.
@@ -8808,12 +8989,12 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					string message = string("Could not open vector layer ") + SHPFileInLayer;
 					throw RSGISFileException(message.c_str());
 				}
-				inputSpatialRef = inputSHPLayer->GetSpatialRef();	
-				
+				inputSpatialRef = inputSHPLayer->GetSpatialRef();
+
 				// Get Geometry Type.
 				OGRFeature *feature = inputSHPLayer->GetFeature(0);
 				OGRwkbGeometryType geometryType = feature->GetGeometryRef()->getGeometryType();
-				
+
 				/////////////////////////////////////
 				//
 				// Create Output Shapfile.
@@ -8837,17 +9018,17 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					string message = string("Could not create vector layer ") + SHPFileOutLayer;
 					throw RSGISVectorOutputException(message.c_str());
 				}
-				
+
 				RSGISDropSmallPolygons dropSmallPolys;
-				try 
+				try
 				{
 					dropSmallPolys.dropSmallPolys(inputSHPLayer, outputSHPLayer, threshold);
-					
+
 					OGRDataSource::DestroyDataSource(inputSHPDS);
 					OGRDataSource::DestroyDataSource(outputSHPDS);
 					//OGRCleanupAll();
 				}
-				catch (RSGISVectorException &e) 
+				catch (RSGISVectorException &e)
 				{
 					OGRDataSource::DestroyDataSource(inputSHPDS);
 					OGRDataSource::DestroyDataSource(outputSHPDS);
@@ -8855,7 +9036,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					throw e;
 				}
 			}
-			catch (RSGISException& e) 
+			catch (RSGISException& e)
 			{
 				throw e;
 			}
@@ -8865,22 +9046,26 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 			cout << "Extract the largest polygon in file.\n";
 			cout << "Input File: " << this->inputVector << endl;
 			cout << "Output File: " << this->outputVector << endl;
-			
+
+            // Convert to absolute path
+            this->inputVector = boost::filesystem::absolute(this->inputVector).c_str();
+            this->outputVector = boost::filesystem::absolute(this->outputVector).c_str();
+
 			OGRRegisterAll();
-			
+
 			RSGISFileUtils fileUtils;
 			RSGISVectorUtils vecUtils;
 			RSGISVectorIO vecIO;
-			
+
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
-			
+
 			OGRDataSource *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
 			OGRSpatialReference* spatialRef = NULL;
-			
+
 			RSGISProcessVector *processVector = NULL;
-			RSGISProcessOGRFeature *processFeature = NULL;			
-			
+			RSGISProcessOGRFeature *processFeature = NULL;
+
 			try
 			{
 				/////////////////////////////////////
@@ -8901,19 +9086,19 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					throw RSGISFileException(message.c_str());
 				}
 				spatialRef = inputSHPLayer->GetSpatialRef();
-				
+
 				vector<Polygon*> *polygons = new vector<Polygon*>();
 				processFeature = new RSGISGEOSPolygonReader(polygons);
 				processVector = new RSGISProcessVector(processFeature);
-				
+
 				cout << "Read input Shapefile\n";
 				processVector->processVectorsNoOutput(inputSHPLayer, false);
-				
+
 				delete processVector;
 				delete processFeature;
-				
+
 				vector<Polygon*> *largestPolyVec = new vector<Polygon*>();
-				
+
 				bool first = true;
 				Polygon *largePoly;
 				vector<Polygon*>::iterator iterPolys;
@@ -8930,9 +9115,9 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					}
 				}
 				largestPolyVec->push_back(largePoly);
-				
+
 				vecIO.exportGEOSPolygons2SHP(this->outputVector, this->force, largestPolyVec, spatialRef);
-				
+
 				for(iterPolys = polygons->begin(); iterPolys != polygons->end(); )
 				{
 					delete *iterPolys;
@@ -8940,7 +9125,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				}
 				delete polygons;
 				delete largestPolyVec;
-				
+
 				OGRDataSource::DestroyDataSource(inputSHPDS);
 				//OGRCleanupAll();
 			}
@@ -8954,7 +9139,11 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 			cout << "Create a polygon around the polygons within the input file\n";
 			cout << "Input Vector: " << this->inputVector << endl;
 			cout << "Output Vector: " << this->outputVector << endl;
-			
+
+            // Convert to absolute path
+            this->inputVector = boost::filesystem::absolute(this->inputVector).c_str();
+            this->outputVector = boost::filesystem::absolute(this->outputVector).c_str();
+
 			if(polygonizertype == lineproj)
 			{
 				cout << "The line projection polygonizer will be used\n";
@@ -8985,22 +9174,22 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				cout << "Gamma = " << this->gamma << endl;
 				cout << "Delta = " << this->delta << endl;
 			}
-			
+
 			OGRRegisterAll();
-			
+
 			RSGISFileUtils fileUtils;
 			RSGISVectorUtils vecUtils;
 			RSGISVectorIO vecIO;
-			
+
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
-			
+
 			OGRDataSource *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
 			OGRSpatialReference* spatialRef = NULL;
-			
+
 			RSGISProcessVector *processVector = NULL;
-			RSGISProcessOGRFeature *processFeature = NULL;			
-			
+			RSGISProcessOGRFeature *processFeature = NULL;
+
 			try
 			{
 				/////////////////////////////////////
@@ -9021,17 +9210,17 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					throw RSGISFileException(message.c_str());
 				}
 				spatialRef = inputSHPLayer->GetSpatialRef();
-				
+
 				vector<Polygon*> *polygons = new vector<Polygon*>();
 				processFeature = new RSGISGEOSPolygonReader(polygons);
 				processVector = new RSGISProcessVector(processFeature);
-				
+
 				cout << "Read input Shapefile\n";
 				processVector->processVectorsNoOutput(inputSHPLayer, false);
-				
+
 				delete processVector;
 				delete processFeature;
-				
+
 				vector<Polygon*> *outPoly = new vector<Polygon*>();
 				RSGISGeometry geomUtils;
 				if(polygonizertype == lineproj)
@@ -9060,24 +9249,24 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				{
 					throw RSGISException("Do not know polygonization option.");
 				}
-				
+
 				vecIO.exportGEOSPolygons2SHP(this->outputVector, this->force, outPoly, spatialRef);
-				
-				vector<Polygon*>::iterator iterPolys;				
+
+				vector<Polygon*>::iterator iterPolys;
 				for(iterPolys = polygons->begin(); iterPolys != polygons->end(); )
 				{
 					delete *iterPolys;
 					polygons->erase(iterPolys);
 				}
 				delete polygons;
-				
+
 				for(iterPolys = outPoly->begin(); iterPolys != outPoly->end(); )
 				{
 					delete *iterPolys;
 					outPoly->erase(iterPolys);
 				}
 				delete outPoly;
-				
+
 				OGRDataSource::DestroyDataSource(inputSHPDS);
 				//OGRCleanupAll();
 			}
@@ -9085,7 +9274,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 			{
 				throw e;
 			}
-			
+
 		}
 		else if(option == RSGISExeVectorUtils::generategrid)
 		{
@@ -9098,15 +9287,18 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 			cout << "Y Resolution: " << yres << endl;
 			cout << "Width: " << width << endl;
 			cout << "Height: " << height << endl;
-			
+
+			// Convert to absolute path
+            this->outputVector = boost::filesystem::absolute(this->outputVector).c_str();
+
 			RSGISVectorProcessing vecProcessing;
 			OGRSpatialReference ogrSpatial = OGRSpatialReference();
 			ogrSpatial.importFromProj4(this->proj4.c_str());
-			try 
+			try
 			{
 				vecProcessing.createGrid(outputVector, &ogrSpatial, force, tlx, tly, xres, yres, width, height);
 			}
-			catch (RSGISVectorException &e) 
+			catch (RSGISVectorException &e)
 			{
 				throw e;
 			}
@@ -9118,7 +9310,10 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 			cout << "Output File: " << this->outputVector << endl;
 			cout << "X Resolution: " << xres << endl;
 			cout << "Y Resolution: " << yres << endl;
-			
+
+            // Convert to absolute path
+            this->outputVector = boost::filesystem::absolute(this->outputVector).c_str();
+
 			GDALAllRegister();
 			GDALDataset *dataset = NULL;
 			dataset = (GDALDataset *) GDALOpenShared(this->inputFile.c_str(), GA_ReadOnly);
@@ -9126,37 +9321,37 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 			dataset->GetGeoTransform(transform);
 			int pxlWidth = dataset->GetRasterXSize();
 			int pxlHeight = dataset->GetRasterYSize();
-			OGRSpatialReference ogrSpatial = OGRSpatialReference(dataset->GetProjectionRef());			
+			OGRSpatialReference ogrSpatial = OGRSpatialReference(dataset->GetProjectionRef());
 			GDALClose(dataset);
-			
+
 			if(transform[1] < 0)
 			{
 				transform[1] = transform[1] * (-1);
 			}
-			
+
 			if(transform[5] < 0)
 			{
 				transform[5] = transform[5] * (-1);
 			}
-			
+
 			this->tlx = transform[0];
 			this->tly = transform[3];
 			this->width = ((double)pxlWidth)*transform[1];
 			this->height = ((double)pxlHeight)*transform[5];
-			
+
 			delete[] transform;
-			
+
 			cout << "TLX: " << tlx << endl;
 			cout << "TLY: " << tly << endl;
 			cout << "Width: " << width << endl;
 			cout << "Height: " << height << endl;
-			
+
 			RSGISVectorProcessing vecProcessing;
-			try 
+			try
 			{
 				vecProcessing.createGrid(outputVector, &ogrSpatial, force, tlx, tly, xres, yres, width, height);
 			}
-			catch (RSGISVectorException &e) 
+			catch (RSGISVectorException &e)
 			{
 				throw e;
 			}
@@ -9166,15 +9361,19 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 			cout << "Vector Maths\n";
 			cout << "Input Vector: " << this->inputFile << endl;
 			cout << "Output Vector: " << this->outputVector << endl;
-			
+
+            // Convert to absolute path
+            this->inputVector = boost::filesystem::absolute(this->inputVector).c_str();
+            this->outputVector = boost::filesystem::absolute(this->outputVector).c_str();
+
 			OGRRegisterAll();
-			
+
 			RSGISFileUtils fileUtils;
 			RSGISVectorUtils vecUtils;
-			
+
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputFile);
 			string SHPFileOutLayer = vecUtils.getLayerName(this->outputVector);
-			
+
 			OGRDataSource *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
 			OGRSFDriver *shpFiledriver = NULL;
@@ -9182,15 +9381,15 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 			OGRLayer *outputSHPLayer = NULL;
 			OGRSpatialReference* inputSpatialRef = NULL;
 			OGRFeatureDefn *inFeatureDefn = NULL;
-			
+
 			RSGISProcessVector *processVector = NULL;
 			RSGISProcessOGRFeature *processFeature = NULL;
-			
+
 			string outputDIR = "";
 			try
 			{
 				outputDIR = fileUtils.getFileDirectoryPath(this->outputVector);
-				
+
 				if(vecUtils.checkDIR4SHP(outputDIR, SHPFileOutLayer))
 				{
 					if(this->force)
@@ -9202,7 +9401,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 						throw RSGISException("Shapefile already exists, either delete or select force.");
 					}
 				}
-				
+
 				/////////////////////////////////////
 				//
 				// Open Input Shapfile.
@@ -9220,13 +9419,13 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					string message = string("Could not open vector layer ") + SHPFileInLayer;
 					throw RSGISFileException(message.c_str());
 				}
-				inputSpatialRef = inputSHPLayer->GetSpatialRef();	
+				inputSpatialRef = inputSHPLayer->GetSpatialRef();
 				inFeatureDefn = inputSHPLayer->GetLayerDefn();
-                
+
                 // Get Geometry Type
                 OGRFeature *feature = inputSHPLayer->GetFeature(0);
 				OGRwkbGeometryType geometryType = feature->GetGeometryRef()->getGeometryType();
-				
+
 				/////////////////////////////////////
 				//
 				// Create Output Shapfile.
@@ -9250,39 +9449,39 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					string message = string("Could not create vector layer ") + SHPFileOutLayer;
 					throw RSGISVectorOutputException(message.c_str());
 				}
-				
+
 				//Parser *muParser = new Parser();
 				/*VariableFields **processVaribles = new VariableFields*[this->numVars];
-				
+
 				for(int i = 0; i < this->numVars; ++i)
 				{
 					cout << i << endl;
 					processVaribles[i]->name = this->variables[i].name;
 					processVaribles[i]->fieldName = this->variables[i].fieldName;
 				}*/
-				
+
 				/*value_type *inVals = new value_type[this->numVars];
 				for(int i = 0; i < this->numVars; ++i)
 				{
 					inVals[i] = 0;
 					muParser->DefineVar(_T(this->variables[i].name.c_str()), &inVals[i]);
 				}
-				
+
 				muParser->SetExpr(this->mathsExpression.c_str());*/
-				
+
 				processFeature = new RSGISVectorMaths(this->variables, this->numVars, this->mathsExpression, this->outHeading);
 				processVector = new RSGISProcessVector(processFeature);
 				processVector->processVectors(inputSHPLayer, outputSHPLayer, true, true, false);
-				
+
 				OGRDataSource::DestroyDataSource(inputSHPDS);
 				OGRDataSource::DestroyDataSource(outputSHPDS);
-				
+
 				delete processVector;
 				delete processFeature;
-				
+
 				//OGRCleanupAll();
 			}
-			catch (RSGISException e) 
+			catch (RSGISException e)
 			{
 				throw e;
 			}
@@ -9293,15 +9492,19 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
             cout << "Input Vector: " << this->inputFile << endl;
 			cout << "Output Vector: " << this->outputVector << endl;
             cout << "Expression: " << this->sqlExpression << endl;
-            
+
+            // Convert to absolute path
+            this->inputVector = boost::filesystem::absolute(this->inputVector).c_str();
+            this->outputVector = boost::filesystem::absolute(this->outputVector).c_str();
+
             OGRRegisterAll();
-			
+
 			RSGISFileUtils fileUtils;
 			RSGISVectorUtils vecUtils;
-			
+
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputFile);
 			string SHPFileOutLayer = vecUtils.getLayerName(this->outputVector);
-			
+
 			OGRDataSource *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
 			OGRSFDriver *shpFiledriver = NULL;
@@ -9309,12 +9512,12 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 			OGRLayer *outputSHPLayer = NULL;
 			OGRSpatialReference* inputSpatialRef = NULL;
 			OGRFeatureDefn *inFeatureDefn = NULL;
-			
+
 			string outputDIR = "";
 			try
 			{
 				outputDIR = fileUtils.getFileDirectoryPath(this->outputVector);
-				
+
 				if(vecUtils.checkDIR4SHP(outputDIR, SHPFileOutLayer))
 				{
 					if(this->force)
@@ -9326,7 +9529,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 						throw RSGISException("Shapefile already exists, either delete or select force.");
 					}
 				}
-				
+
 				/////////////////////////////////////
 				//
 				// Open Input Shapfile.
@@ -9344,10 +9547,10 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					string message = string("Could not open vector layer ") + SHPFileInLayer;
 					throw RSGISFileException(message.c_str());
 				}
-				inputSpatialRef = inputSHPLayer->GetSpatialRef();	
+				inputSpatialRef = inputSHPLayer->GetSpatialRef();
 				inFeatureDefn = inputSHPLayer->GetLayerDefn();
                 OGRwkbGeometryType wktGeomType = inputSHPLayer->GetGeomType();
-				
+
 				/////////////////////////////////////
 				//
 				// Create Output Shapfile.
@@ -9371,23 +9574,23 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					string message = string("Could not create vector layer ") + SHPFileOutLayer;
 					throw RSGISVectorOutputException(message.c_str());
 				}
-                
+
                 string sqlStatement =  string("SELECT * FROM ") + SHPFileInLayer + string(" WHERE ") + sqlExpression;
                 cout << "SQL: " << sqlStatement << endl;
-                
+
                 RSGISCopyFeatures *copyFeatures = new RSGISCopyFeatures();
                 RSGISProcessVectorSQL processSQLFeatures(copyFeatures);
-                
+
                 processSQLFeatures.processVectors(inputSHPDS, outputSHPLayer, true, false, sqlStatement);
-                
+
                 delete copyFeatures;
-				
+
 				OGRDataSource::DestroyDataSource(inputSHPDS);
 				OGRDataSource::DestroyDataSource(outputSHPDS);
-				
+
 				//OGRCleanupAll();
 			}
-			catch (RSGISException e) 
+			catch (RSGISException e)
 			{
 				throw e;
 			}
@@ -9400,19 +9603,22 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
             {
                 cout << "Output Text File: " << this->outputTextFile << endl;
             }
-            
+
+            // Convert to absolute path
+            this->inputVector = boost::filesystem::absolute(this->inputVector).c_str();
+
             OGRRegisterAll();
-			
+
 			RSGISFileUtils fileUtils;
 			RSGISVectorUtils vecUtils;
-			
+
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputFile);
-			
+
 			OGRDataSource *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
 			try
 			{
-				
+
 				/////////////////////////////////////
 				//
 				// Open Input Shapfile.
@@ -9430,20 +9636,20 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					string message = string("Could not open vector layer ") + SHPFileInLayer;
 					throw RSGISFileException(message.c_str());
 				}
-				
+
                 // Get Geometries into memory
                 vector<OGRGeometry*> *ogrGeoms = new vector<OGRGeometry*>();
                 RSGISGetOGRGeometries *getOGRGeoms = new RSGISGetOGRGeometries(ogrGeoms);
                 RSGISProcessVector processVector = RSGISProcessVector(getOGRGeoms);
                 processVector.processVectorsNoOutput(inputSHPLayer, false);
                 delete getOGRGeoms;
-                
+
                 // Calculate mean min distance
                 RSGISVectorProcessing vecProcess;
                 float meanMinDist = vecProcess.calcMeanMinDistance(ogrGeoms);
-                
+
                 cout << "Mean Minimum Distance = " << meanMinDist << endl;
-                
+
                 if(outTextFile)
                 {
                     ofstream outTxtFile;
@@ -9460,7 +9666,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
                         throw RSGISException("Text file could not be created.");
                     }
                 }
-                
+
                 // Clean up memory.
                 for(vector<OGRGeometry*>::iterator iterGeoms = ogrGeoms->begin(); iterGeoms != ogrGeoms->end(); )
                 {
@@ -9468,12 +9674,12 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
                     iterGeoms = ogrGeoms->erase(iterGeoms);
                 }
                 delete ogrGeoms;
-               				
+
 				OGRDataSource::DestroyDataSource(inputSHPDS);
-				
+
 				//OGRCleanupAll();
 			}
-			catch (RSGISException e) 
+			catch (RSGISException e)
 			{
 				throw e;
 			}
@@ -9484,29 +9690,33 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
             cout << "Input Vector: " << this->inputVector << endl;
             cout << "Output Vector: " << this->outputVector << endl;
             cout << "Projection File: " << this->projFile << endl;
-            
-            try 
+
+            // Convert to absolute path
+            this->inputVector = boost::filesystem::absolute(this->inputVector).c_str();
+            this->outputVector = boost::filesystem::absolute(this->outputVector).c_str();
+
+            try
             {
                 OGRRegisterAll();
-                
+
                 RSGISTextUtils textUtils;
                 string projWKTStr = textUtils.readFileToString(this->projFile);
-                
+
                 RSGISFileUtils fileUtils;
                 RSGISVectorUtils vecUtils;
-                
+
                 OGRDataSource *inputSHPDS = NULL;
                 OGRLayer *inputSHPLayer = NULL;
                 OGRSFDriver *shpFiledriver = NULL;
                 OGRDataSource *outputSHPDS = NULL;
                 OGRLayer *outputSHPLayer = NULL;
                 OGRFeatureDefn *inFeatureDefn = NULL;
-                
+
                 string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
                 string SHPFileOutLayer = vecUtils.getLayerName(this->outputVector);
-                
+
                 string outputDIR = fileUtils.getFileDirectoryPath(this->outputVector);
-				
+
 				if(vecUtils.checkDIR4SHP(outputDIR, SHPFileOutLayer))
 				{
 					if(this->force)
@@ -9518,7 +9728,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 						throw RSGISException("Shapefile already exists, either delete or select force.");
 					}
 				}
-				
+
 				/////////////////////////////////////
 				//
 				// Open Input Shapfile.
@@ -9538,10 +9748,10 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				}
 				inFeatureDefn = inputSHPLayer->GetLayerDefn();
                 OGRwkbGeometryType wktGeomType = inputSHPLayer->GetGeomType();
-				
-                
+
+
                 OGRSpatialReference *outSpatialRef = new OGRSpatialReference(projWKTStr.c_str());
-                
+
 				/////////////////////////////////////
 				//
 				// Create Output Shapfile.
@@ -9565,18 +9775,18 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					string message = string("Could not create vector layer ") + SHPFileOutLayer;
 					throw RSGISVectorOutputException(message.c_str());
 				}
-                
+
                 RSGISCopyFeatures *copyFeatures = new RSGISCopyFeatures();
                 RSGISProcessVector *processVector = new RSGISProcessVector(copyFeatures);
 				processVector->processVectors(inputSHPLayer, outputSHPLayer, true, true, false);
-                
+
                 delete copyFeatures;
                 delete processVector;
-                
+
                 OGRDataSource::DestroyDataSource(inputSHPDS);
                 OGRDataSource::DestroyDataSource(outputSHPDS);
-            } 
-            catch (RSGISException &e) 
+            }
+            catch (RSGISException &e)
             {
                 throw e;
             }
@@ -9585,19 +9795,22 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
         {
             cout << "Printing WKT string for vector layer\n";
             cout << "Input Vector: " << this->inputVector << endl;
-            
-            try 
+
+            // Convert to absolute path
+            this->inputVector = boost::filesystem::absolute(this->inputVector).c_str();
+
+            try
             {
                 OGRRegisterAll();
-                
+
                 //RSGISFileUtils fileUtils;
                 RSGISVectorUtils vecUtils;
-                
+
                 OGRDataSource *inputSHPDS = NULL;
                 OGRLayer *inputSHPLayer = NULL;
-                
+
                 string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
-				
+
 				/////////////////////////////////////
 				//
 				// Open Input Shapfile.
@@ -9616,15 +9829,15 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					throw RSGISFileException(message.c_str());
 				}
                 OGRSpatialReference *spatialRef = inputSHPLayer->GetSpatialRef();
-                
+
                 char **wktPrettySpatialRef = new char*[1];
                 spatialRef->exportToPrettyWkt(wktPrettySpatialRef);
                 cout << wktPrettySpatialRef[0] << endl;
                 OGRFree(wktPrettySpatialRef);
-                
+
                 OGRDataSource::DestroyDataSource(inputSHPDS);
-            } 
-            catch (RSGISException &e) 
+            }
+            catch (RSGISException &e)
             {
                 throw e;
             }
@@ -9635,127 +9848,30 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
             cout << "Input Vector: " << this->inputVector << endl;
             cout << "Output Vector: " << this->outputVector << endl;
             cout << "Init Value: " << this->initFID << endl;
-            
-            try 
-            {
-                OGRRegisterAll();
-                                
-                RSGISFileUtils fileUtils;
-                RSGISVectorUtils vecUtils;
-                
-                OGRDataSource *inputSHPDS = NULL;
-                OGRLayer *inputSHPLayer = NULL;
-                OGRSFDriver *shpFiledriver = NULL;
-                OGRDataSource *outputSHPDS = NULL;
-                OGRLayer *outputSHPLayer = NULL;
-                OGRFeatureDefn *inFeatureDefn = NULL;
-                
-                string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
-                string SHPFileOutLayer = vecUtils.getLayerName(this->outputVector);
-                
-                string outputDIR = fileUtils.getFileDirectoryPath(this->outputVector);
-				
-				if(vecUtils.checkDIR4SHP(outputDIR, SHPFileOutLayer))
-				{
-					if(this->force)
-					{
-						vecUtils.deleteSHP(outputDIR, SHPFileOutLayer);
-					}
-					else
-					{
-						throw RSGISException("Shapefile already exists, either delete or select force.");
-					}
-				}
-				
-				/////////////////////////////////////
-				//
-				// Open Input Shapfile.
-				//
-				/////////////////////////////////////
-				inputSHPDS = OGRSFDriverRegistrar::Open(this->inputVector.c_str(), FALSE);
-				if(inputSHPDS == NULL)
-				{
-					string message = string("Could not open vector file ") + this->inputVector;
-					throw RSGISFileException(message.c_str());
-				}
-				inputSHPLayer = inputSHPDS->GetLayerByName(SHPFileInLayer.c_str());
-				if(inputSHPLayer == NULL)
-				{
-					string message = string("Could not open vector layer ") + SHPFileInLayer;
-					throw RSGISFileException(message.c_str());
-				}
-				inFeatureDefn = inputSHPLayer->GetLayerDefn();
-                OGRwkbGeometryType wktGeomType = inputSHPLayer->GetGeomType();				
-                OGRSpatialReference *outSpatialRef = inputSHPLayer->GetSpatialRef();
-                
-				/////////////////////////////////////
-				//
-				// Create Output Shapfile.
-				//
-				/////////////////////////////////////
-				const char *pszDriverName = "ESRI Shapefile";
-				shpFiledriver = OGRSFDriverRegistrar::GetRegistrar()->GetDriverByName(pszDriverName );
-				if( shpFiledriver == NULL )
-				{
-					throw RSGISVectorOutputException("SHP driver not available.");
-				}
-				outputSHPDS = shpFiledriver->CreateDataSource(this->outputVector.c_str(), NULL);
-				if( outputSHPDS == NULL )
-				{
-					string message = string("Could not create vector file ") + this->outputVector;
-					throw RSGISVectorOutputException(message.c_str());
-				}
-				outputSHPLayer = outputSHPDS->CreateLayer(SHPFileOutLayer.c_str(), outSpatialRef, wktGeomType, NULL );
-				if( outputSHPLayer == NULL )
-				{
-					string message = string("Could not create vector layer ") + SHPFileOutLayer;
-					throw RSGISVectorOutputException(message.c_str());
-				}
-                
-                RSGISCopyFeaturesAddFIDCol *copyFeatures = new RSGISCopyFeaturesAddFIDCol(initFID);
-                RSGISProcessVector *processVector = new RSGISProcessVector(copyFeatures);
-				processVector->processVectors(inputSHPLayer, outputSHPLayer, true, true, false);
-                
-                delete copyFeatures;
-                delete processVector;
-                
-                OGRDataSource::DestroyDataSource(inputSHPDS);
-                OGRDataSource::DestroyDataSource(outputSHPDS);
-            } 
-            catch (RSGISException &e) 
-            {
-                throw e;
-            }
-        }
-        else if(option == RSGISExeVectorUtils::mindist2polys)
-        {
-            cout << "A command to calculate the minimum distance to each polygon for each point.\n";
-            cout << "Input Vector: " << this->inputVector << endl;
-            cout << "Polygons Vector: " << this->inputGeometry << endl;
-            cout << "Output Vector: " << this->outputVector << endl;
-            
+
+            // Convert to absolute path
+            this->inputVector = boost::filesystem::absolute(this->inputVector).c_str();
+            this->outputVector = boost::filesystem::absolute(this->outputVector).c_str();
+
             try
             {
                 OGRRegisterAll();
-                
+
                 RSGISFileUtils fileUtils;
                 RSGISVectorUtils vecUtils;
-                
+
                 OGRDataSource *inputSHPDS = NULL;
                 OGRLayer *inputSHPLayer = NULL;
-                OGRDataSource *inputPolysSHPDS = NULL;
-                OGRLayer *inputPolysSHPLayer = NULL;
                 OGRSFDriver *shpFiledriver = NULL;
                 OGRDataSource *outputSHPDS = NULL;
                 OGRLayer *outputSHPLayer = NULL;
                 OGRFeatureDefn *inFeatureDefn = NULL;
-                
+
                 string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
-                string SHPFileInPolysLayer = vecUtils.getLayerName(this->inputGeometry);
                 string SHPFileOutLayer = vecUtils.getLayerName(this->outputVector);
-                
+
                 string outputDIR = fileUtils.getFileDirectoryPath(this->outputVector);
-				
+
 				if(vecUtils.checkDIR4SHP(outputDIR, SHPFileOutLayer))
 				{
 					if(this->force)
@@ -9767,7 +9883,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 						throw RSGISException("Shapefile already exists, either delete or select force.");
 					}
 				}
-				
+
 				/////////////////////////////////////
 				//
 				// Open Input Shapfile.
@@ -9788,26 +9904,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				inFeatureDefn = inputSHPLayer->GetLayerDefn();
                 OGRwkbGeometryType wktGeomType = inputSHPLayer->GetGeomType();
                 OGRSpatialReference *outSpatialRef = inputSHPLayer->GetSpatialRef();
-                
-                
-                /////////////////////////////////////
-				//
-				// Open Input Polygons Shapfile.
-				//
-				/////////////////////////////////////
-				inputPolysSHPDS = OGRSFDriverRegistrar::Open(this->inputGeometry.c_str(), FALSE);
-				if(inputPolysSHPDS == NULL)
-				{
-					string message = string("Could not open vector file ") + this->inputGeometry;
-					throw RSGISFileException(message.c_str());
-				}
-				inputPolysSHPLayer = inputPolysSHPDS->GetLayerByName(SHPFileInPolysLayer.c_str());
-				if(inputPolysSHPLayer == NULL)
-				{
-					string message = string("Could not open vector layer ") + SHPFileInPolysLayer;
-					throw RSGISFileException(message.c_str());
-				}
-                
+
 				/////////////////////////////////////
 				//
 				// Create Output Shapfile.
@@ -9831,7 +9928,132 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					string message = string("Could not create vector layer ") + SHPFileOutLayer;
 					throw RSGISVectorOutputException(message.c_str());
 				}
-                
+
+                RSGISCopyFeaturesAddFIDCol *copyFeatures = new RSGISCopyFeaturesAddFIDCol(initFID);
+                RSGISProcessVector *processVector = new RSGISProcessVector(copyFeatures);
+				processVector->processVectors(inputSHPLayer, outputSHPLayer, true, true, false);
+
+                delete copyFeatures;
+                delete processVector;
+
+                OGRDataSource::DestroyDataSource(inputSHPDS);
+                OGRDataSource::DestroyDataSource(outputSHPDS);
+            }
+            catch (RSGISException &e)
+            {
+                throw e;
+            }
+        }
+        else if(option == RSGISExeVectorUtils::mindist2polys)
+        {
+            cout << "A command to calculate the minimum distance to each polygon for each point.\n";
+            cout << "Input Vector: " << this->inputVector << endl;
+            cout << "Polygons Vector: " << this->inputGeometry << endl;
+            cout << "Output Vector: " << this->outputVector << endl;
+
+            // Convert to absolute path
+            this->inputVector = boost::filesystem::absolute(this->inputVector).c_str();
+            this->inputGeometry = boost::filesystem::absolute(this->inputGeometry).c_str();
+            this->outputVector = boost::filesystem::absolute(this->outputVector).c_str();
+
+            try
+            {
+                OGRRegisterAll();
+
+                RSGISFileUtils fileUtils;
+                RSGISVectorUtils vecUtils;
+
+                OGRDataSource *inputSHPDS = NULL;
+                OGRLayer *inputSHPLayer = NULL;
+                OGRDataSource *inputPolysSHPDS = NULL;
+                OGRLayer *inputPolysSHPLayer = NULL;
+                OGRSFDriver *shpFiledriver = NULL;
+                OGRDataSource *outputSHPDS = NULL;
+                OGRLayer *outputSHPLayer = NULL;
+                OGRFeatureDefn *inFeatureDefn = NULL;
+
+                string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
+                string SHPFileInPolysLayer = vecUtils.getLayerName(this->inputGeometry);
+                string SHPFileOutLayer = vecUtils.getLayerName(this->outputVector);
+
+                string outputDIR = fileUtils.getFileDirectoryPath(this->outputVector);
+
+				if(vecUtils.checkDIR4SHP(outputDIR, SHPFileOutLayer))
+				{
+					if(this->force)
+					{
+						vecUtils.deleteSHP(outputDIR, SHPFileOutLayer);
+					}
+					else
+					{
+						throw RSGISException("Shapefile already exists, either delete or select force.");
+					}
+				}
+
+				/////////////////////////////////////
+				//
+				// Open Input Shapfile.
+				//
+				/////////////////////////////////////
+				inputSHPDS = OGRSFDriverRegistrar::Open(this->inputVector.c_str(), FALSE);
+				if(inputSHPDS == NULL)
+				{
+					string message = string("Could not open vector file ") + this->inputVector;
+					throw RSGISFileException(message.c_str());
+				}
+				inputSHPLayer = inputSHPDS->GetLayerByName(SHPFileInLayer.c_str());
+				if(inputSHPLayer == NULL)
+				{
+					string message = string("Could not open vector layer ") + SHPFileInLayer;
+					throw RSGISFileException(message.c_str());
+				}
+				inFeatureDefn = inputSHPLayer->GetLayerDefn();
+                OGRwkbGeometryType wktGeomType = inputSHPLayer->GetGeomType();
+                OGRSpatialReference *outSpatialRef = inputSHPLayer->GetSpatialRef();
+
+
+                /////////////////////////////////////
+				//
+				// Open Input Polygons Shapfile.
+				//
+				/////////////////////////////////////
+				inputPolysSHPDS = OGRSFDriverRegistrar::Open(this->inputGeometry.c_str(), FALSE);
+				if(inputPolysSHPDS == NULL)
+				{
+					string message = string("Could not open vector file ") + this->inputGeometry;
+					throw RSGISFileException(message.c_str());
+				}
+				inputPolysSHPLayer = inputPolysSHPDS->GetLayerByName(SHPFileInPolysLayer.c_str());
+				if(inputPolysSHPLayer == NULL)
+				{
+					string message = string("Could not open vector layer ") + SHPFileInPolysLayer;
+					throw RSGISFileException(message.c_str());
+				}
+
+				/////////////////////////////////////
+				//
+				// Create Output Shapfile.
+				//
+				/////////////////////////////////////
+				const char *pszDriverName = "ESRI Shapefile";
+				shpFiledriver = OGRSFDriverRegistrar::GetRegistrar()->GetDriverByName(pszDriverName );
+				if( shpFiledriver == NULL )
+				{
+					throw RSGISVectorOutputException("SHP driver not available.");
+				}
+				outputSHPDS = shpFiledriver->CreateDataSource(this->outputVector.c_str(), NULL);
+				if( outputSHPDS == NULL )
+				{
+					string message = string("Could not create vector file ") + this->outputVector;
+					throw RSGISVectorOutputException(message.c_str());
+				}
+				outputSHPLayer = outputSHPDS->CreateLayer(SHPFileOutLayer.c_str(), outSpatialRef, wktGeomType, NULL );
+				if( outputSHPLayer == NULL )
+				{
+					string message = string("Could not create vector layer ") + SHPFileOutLayer;
+					throw RSGISVectorOutputException(message.c_str());
+				}
+
                 cout << "Reading Polygons\n";
                 std::vector<OGRGeometry*> *polys = new std::vector<OGRGeometry*>();
                 RSGISGetOGRGeometries *getPolys = new RSGISGetOGRGeometries(polys);
@@ -9839,23 +10061,23 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				readVector->processVectorsNoOutput(inputPolysSHPLayer, false);
                 delete readVector;
                 delete getPolys;
-                
+
                 cout << "There are " << polys->size() << " geometries to which distances will be calulated\n";
-                
+
                 cout << "Calculate Distances\n";
                 RSGISCalcMinDists2Polys *calcMinDists = new RSGISCalcMinDists2Polys(polys);
                 RSGISProcessVector *processVector = new RSGISProcessVector(calcMinDists);
 				processVector->processVectors(inputSHPLayer, outputSHPLayer, true, true, false);
-                
+
                 delete calcMinDists;
                 delete processVector;
-                
+
                 for(std::vector<OGRGeometry*>::iterator iterGeoms = polys->begin(); iterGeoms != polys->end(); ++iterGeoms)
                 {
                     delete *iterGeoms;
                 }
                 delete polys;
-                
+
                 OGRDataSource::DestroyDataSource(inputSHPDS);
                 OGRDataSource::DestroyDataSource(inputPolysSHPDS);
                 OGRDataSource::DestroyDataSource(outputSHPDS);
@@ -9864,13 +10086,13 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
             {
                 throw e;
             }
-            
+
         }
 		else
 		{
 			cout << "Options not recognised\n";
 		}
-		
+
 		delete RSGISGEOSFactoryGenerator::getInstance();
 	}
 }
@@ -9951,7 +10173,7 @@ void RSGISExeVectorUtils::printParameters()
 			cout << "Add attributes to a Vector Layer\n";
 			cout << "Input Vector: " << this->inputVector << endl;
 			cout << "Output Vector: " << this->outputVector << endl;
-			
+
 			for(int i = 0; i < numAttributes; i++)
 			{
 				cout << i << ":\t" << newAttributes[i]->name << " ";
@@ -10167,7 +10389,7 @@ void RSGISExeVectorUtils::printParameters()
 			cout << "Create a polygon around each Multi-Polygon.\n";
 			cout << "Input Vector: " << this->inputVector << endl;
 			cout << "Output Vector: " << this->outputVector << endl;
-			
+
 			if(polygonizertype == lineproj)
 			{
 				cout << "The line projection polygonizer will be used\n";
@@ -10271,7 +10493,7 @@ void RSGISExeVectorUtils::printParameters()
 			{
 				cout << "The attributes will be ignored\n";
 			}
-			else 
+			else
 			{
 				cout << "The attributes will be outputed\n";
 			}
@@ -10306,7 +10528,7 @@ void RSGISExeVectorUtils::printParameters()
 			cout << "Create a polygon around the polygons within the input file\n";
 			cout << "Input Vector: " << this->inputVector << endl;
 			cout << "Output Vector: " << this->outputVector << endl;
-			
+
 			if(polygonizertype == lineproj)
 			{
 				cout << "The line projection polygonizer will be used\n";
