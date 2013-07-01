@@ -377,6 +377,11 @@ namespace rsgis{namespace vec{
 					OGRLineString *line = (OGRLineString *) geometry;
 					env = vecUtils.getEnvelope(line);
 				}
+                else if( geometry != NULL && wkbFlatten(geometry->getGeometryType()) == wkbMultiLineString )
+				{
+					OGRMultiLineString *line = (OGRMultiLineString *) geometry;
+					env = vecUtils.getEnvelope(line);
+				}
 				else if(geometry != NULL)
 				{
 					std::string message = std::string("Unsupport data type: ") + std::string(geometry->getGeometryName());
