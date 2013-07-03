@@ -36,6 +36,7 @@
 
 #include "cmds/RSGISCmdImageCalc.h"
 #include "cmds/RSGISCmdException.h"
+#include "cmds/RSGISCmdCommon.h"
 
 #include "math/RSGISMathsUtils.h"
 #include "math/RSGISMatrices.h"
@@ -131,7 +132,9 @@ namespace rsgisexe{
             imgdist2geoms,
             imgcalcdist,
             mahalanobisdistwindow,
-            mahalanobisdistimg2window
+            mahalanobisdistimg2window,
+            calcpxlcolstats,
+            pxlcolregression
 		};
 		
 		
@@ -163,6 +166,7 @@ namespace rsgisexe{
         std::string outputFile;
         std::string endmembersFile;
         std::string imageMask;
+        std::string bandValues;
 		int numComponents;
 		int numImages;
 		int numVars;
@@ -216,6 +220,7 @@ namespace rsgisexe{
         float noDataValue;
         bool noDataValueSpecified;
         unsigned int windowSize;
+        rsgis::cmds::RSGISCmdStatsSummary statsSummary;
 	};
 }
 #endif
