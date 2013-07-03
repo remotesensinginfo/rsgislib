@@ -28,6 +28,7 @@
 
 #include "common/RSGISCommons.h"
 #include "RSGISCmdException.h"
+#include "RSGISCmdCommon.h"
 
 namespace rsgis{ namespace cmds {
     
@@ -62,6 +63,10 @@ namespace rsgis{ namespace cmds {
     void executeMahalanobisDist2ImgFilter(std::string inputImage, std::string outputImage, unsigned int winSize, std::string gdalFormat, RSGISLibDataType outDataType)throw(RSGISCmdException);
     /** Function to run image calculate distance command */
     void executeImageCalcDistance(std::string inputImage, std::string outputImage, std::string gdalFormat)throw(RSGISCmdException);
+    /** Function to calculate summary statistics for a column of pixels */
+    void executeImagePixelColumnSummary(std::string inputImage, std::string outputImage, rsgis::cmds::RSGISCmdStatsSummary summaryStats, std::string gdalFormat, RSGISLibDataType outDataType, float noDataValue, bool useNoDataValue)throw(RSGISCmdException);
+    /** Function to perform a linear regression on each column of pixels */
+    void executeImagePixelLinearFit(std::string inputImage, std::string outputImage, std::string gdalFormat, std::string bandValues, float noDataValue, bool useNoDataValue)throw(RSGISCmdException);
 
     
 }}

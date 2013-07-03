@@ -81,6 +81,7 @@ set(LIB_CLASSIFY_CPP
 set(LIB_COMMANDS_H
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdException.h
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdParent.h
+	${RSGIS_SRC_CMDS_DIR}/RSGISCmdCommon.h
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdImageCalc.h 
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdImageUtils.h 	
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdSegmentation.h 
@@ -91,6 +92,7 @@ set(LIB_COMMANDS_CPP
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdException.h
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdException.cpp
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdParent.h
+	${RSGIS_SRC_CMDS_DIR}/RSGISCmdCommon.h
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdImageCalc.cpp 
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdImageCalc.h 
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdImageUtils.cpp	
@@ -358,6 +360,7 @@ set(LIB_IMG_H
 	${RSGIS_SRC_IMG_DIR}/RSGISGenAccuracyPoints.h
 	${RSGIS_SRC_IMG_DIR}/RSGISSampleImage.h
 	${RSGIS_SRC_IMG_DIR}/RSGISImageWindowStats.h
+	${RSGIS_SRC_IMG_DIR}/RSGISFitFunction2Pxls.h
 	)
 	
 set(LIB_IMG_CPP
@@ -492,6 +495,8 @@ set(LIB_IMG_CPP
 	${RSGIS_SRC_IMG_DIR}/RSGISSampleImage.h
 	${RSGIS_SRC_IMG_DIR}/RSGISImageWindowStats.cpp
 	${RSGIS_SRC_IMG_DIR}/RSGISImageWindowStats.h
+	${RSGIS_SRC_IMG_DIR}/RSGISFitFunction2Pxls.cpp
+	${RSGIS_SRC_IMG_DIR}/RSGISFitFunction2Pxls.h
 	)
 ###############################################################################
 

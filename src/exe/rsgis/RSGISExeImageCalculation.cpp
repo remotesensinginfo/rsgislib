@@ -92,6 +92,8 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
     XMLCh *optionImgCalcDist = xercesc::XMLString::transcode("imgcalcdist");
     XMLCh *optionMahalanobisDistWindow = xercesc::XMLString::transcode("mahalanobisdistwindow");
     XMLCh *optionMahalanobisDistImg2Window = xercesc::XMLString::transcode("mahalanobisdistimg2window");
+    XMLCh *optionCalcPxlColStats = xercesc::XMLString::transcode("calcpxlcolstats");
+    XMLCh *optionPxlColRegression = xercesc::XMLString::transcode("pxlcolregression");
     
 
 	const XMLCh *algorNameEle = argElement->getAttribute(xercesc::XMLString::transcode("algor"));
@@ -2589,6 +2591,255 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 		}
 		xercesc::XMLString::release(&windowXMLStr);
 	}
+    else if(xercesc::XMLString::equals(optionCalcPxlColStats, optionXML))
+	{
+		this->option = RSGISExeImageCalculation::calcpxlcolstats;
+		
+        XMLCh *imageXMLStr = xercesc::XMLString::transcode("image");
+		if(argElement->hasAttribute(imageXMLStr))
+		{
+			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(imageXMLStr));
+			this->inputImage = std::string(charValue);
+			xercesc::XMLString::release(&charValue);
+		}
+		else
+		{
+			throw rsgis::RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+		}
+		xercesc::XMLString::release(&imageXMLStr);
+        
+		XMLCh *outputXMLStr = xercesc::XMLString::transcode("output");
+		if(argElement->hasAttribute(outputXMLStr))
+		{
+			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outputXMLStr));
+			this->outputImage = std::string(charValue);
+			xercesc::XMLString::release(&charValue);
+		}
+		else
+		{
+			throw rsgis::RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+		}
+		xercesc::XMLString::release(&outputXMLStr);
+        
+        
+        XMLCh *noDataXMLStr = xercesc::XMLString::transcode("nodata");
+		if(argElement->hasAttribute(noDataXMLStr))
+		{
+			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(noDataXMLStr));
+			this->noDataValue = mathUtils.strtofloat(std::string(charValue));
+            this->noDataValueSpecified = true;
+			xercesc::XMLString::release(&charValue);
+		}
+		else
+		{
+			this->noDataValueSpecified = false;
+		}
+		xercesc::XMLString::release(&noDataXMLStr);
+        
+        statsSummary.calcMin = false;
+        statsSummary.calcMax = false;
+        statsSummary.calcMean = false;
+        statsSummary.calcStdDev = false;
+        statsSummary.calcSum = false;
+        statsSummary.calcMedian = false;
+        
+        statsSummary.min = 0;
+        statsSummary.max = 0;
+        statsSummary.mean = 0;
+        statsSummary.stdDev = 0;
+        statsSummary.sum = 0;
+        statsSummary.median = 0;
+        
+        XMLCh *minXMLStr = xercesc::XMLString::transcode("min");
+		if(argElement->hasAttribute(minXMLStr))
+		{
+            XMLCh *yesStr = xercesc::XMLString::transcode("yes");
+			const XMLCh *strValue = argElement->getAttribute(minXMLStr);
+			
+			if(xercesc::XMLString::equals(strValue, yesStr))
+			{
+				statsSummary.calcMin = true;
+			}
+			else
+			{
+				statsSummary.calcMin = false;
+			}
+			xercesc::XMLString::release(&yesStr);
+		}
+		else
+		{
+			statsSummary.calcMin = false;
+		}
+		xercesc::XMLString::release(&minXMLStr);
+        
+        XMLCh *maxXMLStr = xercesc::XMLString::transcode("max");
+		if(argElement->hasAttribute(maxXMLStr))
+		{
+            XMLCh *yesStr = xercesc::XMLString::transcode("yes");
+			const XMLCh *strValue = argElement->getAttribute(maxXMLStr);
+			
+			if(xercesc::XMLString::equals(strValue, yesStr))
+			{
+				statsSummary.calcMax = true;
+			}
+			else
+			{
+				statsSummary.calcMax = false;
+			}
+			xercesc::XMLString::release(&yesStr);
+		}
+		else
+		{
+			statsSummary.calcMax = false;
+		}
+		xercesc::XMLString::release(&maxXMLStr);
+        
+        XMLCh *meanXMLStr = xercesc::XMLString::transcode("mean");
+		if(argElement->hasAttribute(meanXMLStr))
+		{
+            XMLCh *yesStr = xercesc::XMLString::transcode("yes");
+			const XMLCh *strValue = argElement->getAttribute(meanXMLStr);
+			
+			if(xercesc::XMLString::equals(strValue, yesStr))
+			{
+				statsSummary.calcMean = true;
+			}
+			else
+			{
+				statsSummary.calcMean = false;
+			}
+			xercesc::XMLString::release(&yesStr);
+		}
+		else
+		{
+			statsSummary.calcMean = false;
+		}
+		xercesc::XMLString::release(&meanXMLStr);
+        
+        XMLCh *medianXMLStr = xercesc::XMLString::transcode("median");
+		if(argElement->hasAttribute(medianXMLStr))
+		{
+            XMLCh *yesStr = xercesc::XMLString::transcode("yes");
+			const XMLCh *strValue = argElement->getAttribute(medianXMLStr);
+			
+			if(xercesc::XMLString::equals(strValue, yesStr))
+			{
+				statsSummary.calcMedian = true;
+			}
+			else
+			{
+				statsSummary.calcMedian = false;
+			}
+			xercesc::XMLString::release(&yesStr);
+		}
+		else
+		{
+			statsSummary.calcMedian = false;
+		}
+		xercesc::XMLString::release(&medianXMLStr);
+        
+        XMLCh *sumXMLStr = xercesc::XMLString::transcode("sum");
+		if(argElement->hasAttribute(sumXMLStr))
+		{
+            XMLCh *yesStr = xercesc::XMLString::transcode("yes");
+			const XMLCh *strValue = argElement->getAttribute(sumXMLStr);
+			
+			if(xercesc::XMLString::equals(strValue, yesStr))
+			{
+				statsSummary.calcSum = true;
+			}
+			else
+			{
+				statsSummary.calcSum = false;
+			}
+			xercesc::XMLString::release(&yesStr);
+		}
+		else
+		{
+			statsSummary.calcSum = false;
+		}
+		xercesc::XMLString::release(&sumXMLStr);
+        
+        XMLCh *stdDevXMLStr = xercesc::XMLString::transcode("stddev");
+		if(argElement->hasAttribute(stdDevXMLStr))
+		{
+            XMLCh *yesStr = xercesc::XMLString::transcode("yes");
+			const XMLCh *strValue = argElement->getAttribute(stdDevXMLStr);
+			
+			if(xercesc::XMLString::equals(strValue, yesStr))
+			{
+				statsSummary.calcStdDev = true;
+			}
+			else
+			{
+				statsSummary.calcStdDev = false;
+			}
+			xercesc::XMLString::release(&yesStr);
+		}
+		else
+		{
+			statsSummary.calcStdDev = false;
+		}
+		xercesc::XMLString::release(&stdDevXMLStr);
+	}
+    else if(xercesc::XMLString::equals(optionPxlColRegression, optionXML))
+	{
+		this->option = RSGISExeImageCalculation::pxlcolregression;
+		
+        XMLCh *imageXMLStr = xercesc::XMLString::transcode("image");
+		if(argElement->hasAttribute(imageXMLStr))
+		{
+			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(imageXMLStr));
+			this->inputImage = std::string(charValue);
+			xercesc::XMLString::release(&charValue);
+		}
+		else
+		{
+			throw rsgis::RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+		}
+		xercesc::XMLString::release(&imageXMLStr);
+        
+		XMLCh *outputXMLStr = xercesc::XMLString::transcode("output");
+		if(argElement->hasAttribute(outputXMLStr))
+		{
+			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outputXMLStr));
+			this->outputImage = std::string(charValue);
+			xercesc::XMLString::release(&charValue);
+		}
+		else
+		{
+			throw rsgis::RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+		}
+		xercesc::XMLString::release(&outputXMLStr);
+        
+        XMLCh *bandValuesXMLStr = xercesc::XMLString::transcode("bandvalues");
+		if(argElement->hasAttribute(bandValuesXMLStr))
+		{
+			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(bandValuesXMLStr));
+			this->bandValues = std::string(charValue);
+			xercesc::XMLString::release(&charValue);
+		}
+		else
+		{
+			throw rsgis::RSGISXMLArgumentsException("No \'bandvalues\' attribute was provided.");
+		}
+		xercesc::XMLString::release(&bandValuesXMLStr);
+        
+        
+        XMLCh *noDataXMLStr = xercesc::XMLString::transcode("nodata");
+		if(argElement->hasAttribute(noDataXMLStr))
+		{
+			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(noDataXMLStr));
+			this->noDataValue = mathUtils.strtofloat(std::string(charValue));
+            this->noDataValueSpecified = true;
+			xercesc::XMLString::release(&charValue);
+		}
+		else
+		{
+			this->noDataValueSpecified = false;
+		}
+		xercesc::XMLString::release(&noDataXMLStr);
+	}
 	else
 	{
 		std::string message = std::string("The option (") + std::string(xercesc::XMLString::transcode(optionXML)) + std::string(") is not known: RSGISExeImageCalculation.");
@@ -2626,6 +2877,8 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
     xercesc::XMLString::release(&optionImgCalcDist);
     xercesc::XMLString::release(&optionMahalanobisDistWindow);
     xercesc::XMLString::release(&optionMahalanobisDistImg2Window);
+    xercesc::XMLString::release(&optionCalcPxlColStats);
+    xercesc::XMLString::release(&optionPxlColRegression);
 
 	parsed = true;
 }
@@ -4144,6 +4397,87 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
                 throw rsgis::RSGISException(e.what());
             }
         }
+        else if(option == RSGISExeImageCalculation::calcpxlcolstats)
+        {
+            std::cout << "A command to calculate statistics for each column of image bands for each pixel.\n";
+            std::cout << "Input Image: " << inputImage << std::endl;
+            std::cout << "Output Image: " << outputImage << std::endl;
+            std::cout << "Output Format: " << this->imageFormat << std::endl;
+            if(noDataValueSpecified)
+            {
+                std::cout << "No data value: " << this->noDataValue << std::endl;
+            }
+            if(statsSummary.calcMin)
+            {
+                std::cout << "Calculating Minimum\n";
+            }
+            if(statsSummary.calcMax)
+            {
+                std::cout << "Calculating Maximum\n";
+            }
+            if(statsSummary.calcMean)
+            {
+                std::cout << "Calculating Mean\n";
+            }
+            if(statsSummary.calcMedian)
+            {
+                std::cout << "Calculating Median\n";
+            }
+            if(statsSummary.calcSum)
+            {
+                std::cout << "Calculating Sum\n";
+            }
+            if(statsSummary.calcStdDev)
+            {
+                std::cout << "Calculating Standard Deviation\n";
+            }
+            
+            try
+            {
+                rsgis::cmds::executeImagePixelColumnSummary(this->inputImage, this->outputImage, this->statsSummary, this->imageFormat, this->rsgisOutDataType, this->noDataValue, this->noDataValueSpecified);
+            }
+            catch (rsgis::RSGISException e)
+            {
+                throw rsgis::RSGISException(e.what());
+            }
+            catch (rsgis::cmds::RSGISCmdException e)
+            {
+                throw rsgis::RSGISException(e.what());
+            }
+            catch (std::exception e)
+            {
+                throw rsgis::RSGISException(e.what());
+            }
+        }
+        else if(option == RSGISExeImageCalculation::pxlcolregression)
+        {
+            std::cout << "A command to calculate a linear regression for each pixel column.\n";
+            std::cout << "Input Image: " << inputImage << std::endl;
+            std::cout << "Output Image: " << outputImage << std::endl;
+            std::cout << "Output Format: " << this->imageFormat << std::endl;
+            std::cout << "Band Values: " << this->bandValues << std::endl;
+            if(noDataValueSpecified)
+            {
+                std::cout << "No data value: " << this->noDataValue << std::endl;
+            }
+            
+            try
+            {
+                rsgis::cmds::executeImagePixelLinearFit(this->inputImage, this->outputImage, this->imageFormat, this->bandValues, this->noDataValue, this->noDataValueSpecified);
+            }
+            catch (rsgis::RSGISException e)
+            {
+                throw rsgis::RSGISException(e.what());
+            }
+            catch (rsgis::cmds::RSGISCmdException e)
+            {
+                throw rsgis::RSGISException(e.what());
+            }
+            catch (std::exception e)
+            {
+                throw rsgis::RSGISException(e.what());
+            }
+        }
 		else
 		{
 			std::cout << "Options not recognised\n";
@@ -4400,6 +4734,53 @@ void RSGISExeImageCalculation::printParameters()
             std::cout << "Output Image: " << outputImage << std::endl;
             std::cout << "Window Size: " << this->windowSize << std::endl;
             std::cout << "Output Format: " << this->imageFormat << std::endl;
+        }
+        else if(option == RSGISExeImageCalculation::calcpxlcolstats)
+        {
+            std::cout << "A command to calculate statistics for each column of image bands for each pixel.\n";
+            std::cout << "Input Image: " << inputImage << std::endl;
+            std::cout << "Output Image: " << outputImage << std::endl;
+            std::cout << "Output Format: " << this->imageFormat << std::endl;
+            if(noDataValueSpecified)
+            {
+                std::cout << "No data value: " << this->noDataValue << std::endl;
+            }
+            if(statsSummary.calcMin)
+            {
+                std::cout << "Calculating Minimum\n";
+            }
+            if(statsSummary.calcMax)
+            {
+                std::cout << "Calculating Maximum\n";
+            }
+            if(statsSummary.calcMean)
+            {
+                std::cout << "Calculating Mean\n";
+            }
+            if(statsSummary.calcMedian)
+            {
+                std::cout << "Calculating Median\n";
+            }
+            if(statsSummary.calcSum)
+            {
+                std::cout << "Calculating Sum\n";
+            }
+            if(statsSummary.calcStdDev)
+            {
+                std::cout << "Calculating Standard Deviation\n";
+            }
+        }
+        else if(option == RSGISExeImageCalculation::pxlcolregression)
+        {
+            std::cout << "A command to calculate a linear regression for each pixel column.\n";
+            std::cout << "Input Image: " << inputImage << std::endl;
+            std::cout << "Output Image: " << outputImage << std::endl;
+            std::cout << "Output Format: " << this->imageFormat << std::endl;
+            std::cout << "Band Values: " << this->bandValues << std::endl;
+            if(noDataValueSpecified)
+            {
+                std::cout << "No data value: " << this->noDataValue << std::endl;
+            }
         }
 		else
 		{

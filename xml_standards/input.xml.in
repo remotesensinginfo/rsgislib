@@ -772,6 +772,11 @@
 	<rsgis:command algor="imagecalc" option="mahalanobisdistwindow" image="image.env" output="image.env" window="int" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
 	<!-- A command to calculate the Mahalanobis distance of a window to the whole image -->
 	<rsgis:command algor="imagecalc" option="mahalanobisdistimg2window" image="image.env" output="image.env" window="int" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
+	<!-- A command to calculate statistics for each column of image bands for each pixel -->
+	<rsgis:command algor="imagecalc" option="calcpxlcolstats" image="image.env" output="image.env" min="yes|no" max="yes|no" mean="yes|no" median="yes|no" sum="yes|no" stddev="yes|no" [nodata="float"] format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
+	<!-- A command to calculate a linear regression for each pixel column -->
+	<rsgis:command algor="imagecalc" option="pxlcolregression" image="image.env" output="image.env" bandvalues="file.txt" [nodata="float"] format="GDAL Format" />
+	
 	
 	
 

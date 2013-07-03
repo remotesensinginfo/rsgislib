@@ -36,9 +36,12 @@
 #include "img/RSGISCalcCovariance.h"
 #include "img/RSGISCalcEditImage.h"
 #include "img/RSGISCalcDist2Geom.h"
+#include "img/RSGISFitFunction2Pxls.h"
 
 #include "math/RSGISVectors.h"
 #include "math/RSGISMatrices.h"
+
+#include "utils/RSGISTextUtils.h"
 
 #include <gsl/gsl_matrix.h>
 #include <gsl/gsl_vector.h>
@@ -486,6 +489,172 @@ namespace rsgis{ namespace cmds {
             GDALClose(outImage);
             GDALClose(imgDataset);
             delete[] transform;
+        }
+        catch(rsgis::RSGISException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(std::exception &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
+    
+    void executeImagePixelColumnSummary(std::string inputImage, std::string outputImage, rsgis::cmds::RSGISCmdStatsSummary summaryStats, std::string gdalFormat, RSGISLibDataType outDataType, float noDataValue, bool useNoDataValue)throw(RSGISCmdException)
+    {
+        try
+        {
+            GDALAllRegister();
+            GDALDataset *imgDataset = (GDALDataset *) GDALOpenShared(inputImage.c_str(), GA_ReadOnly);
+            if(imgDataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            rsgis::math::RSGISMathsUtils mathUtils;
+            rsgis::math::RSGISStatsSummary *mathSummaryStats = new rsgis::math::RSGISStatsSummary();
+            mathUtils.initStatsSummary(mathSummaryStats);
+            
+            mathSummaryStats->calcMin = summaryStats.calcMin;
+            mathSummaryStats->calcMax = summaryStats.calcMax;
+            mathSummaryStats->calcMean = summaryStats.calcMean;
+            mathSummaryStats->calcStdDev = summaryStats.calcStdDev;
+            mathSummaryStats->calcSum = summaryStats.calcSum;
+            mathSummaryStats->calcMedian = summaryStats.calcMedian;
+            
+            unsigned int numOutBands = 0;
+            if(mathSummaryStats->calcMin)
+            {
+                ++numOutBands;
+            }
+            if(mathSummaryStats->calcMax)
+            {
+                ++numOutBands;
+            }
+            if(mathSummaryStats->calcMean)
+            {
+                ++numOutBands;
+            }
+            if(mathSummaryStats->calcMedian)
+            {
+                ++numOutBands;
+            }
+            if(mathSummaryStats->calcSum)
+            {
+                ++numOutBands;
+            }
+            if(mathSummaryStats->calcStdDev)
+            {
+                ++numOutBands;
+            }
+            
+            if(numOutBands == 0)
+            {
+                throw RSGISException("No summaries where specified and therefore there would be no output image bands.");
+            }
+            
+            std::string *bandNames = new std::string[numOutBands];
+            int nameIdx = 0;
+            if(mathSummaryStats->calcMin)
+            {
+                bandNames[nameIdx++] = "Min";
+            }
+            if(mathSummaryStats->calcMax)
+            {
+                bandNames[nameIdx++] = "Max";
+            }
+            if(mathSummaryStats->calcMean)
+            {
+                bandNames[nameIdx++] = "Mean";
+            }
+            if(mathSummaryStats->calcMedian)
+            {
+                bandNames[nameIdx++] = "Median";
+            }
+            if(mathSummaryStats->calcSum)
+            {
+                bandNames[nameIdx++] = "Sum";
+            }
+            if(mathSummaryStats->calcStdDev)
+            {
+                bandNames[nameIdx++] = "StdDev";
+            }
+            
+            rsgis::img::RSGISImagePixelSummaries *pxlSummary = new rsgis::img::RSGISImagePixelSummaries(numOutBands, mathSummaryStats, noDataValue, useNoDataValue);
+            
+            rsgis::img::RSGISCalcImage calcImage = rsgis::img::RSGISCalcImage(pxlSummary, "", true);
+            calcImage.calcImage(&imgDataset, 1, outputImage, true, bandNames, gdalFormat, RSGIS_to_GDAL_Type(outDataType));
+            
+            delete[] bandNames;
+            delete pxlSummary;
+            GDALClose(imgDataset);
+        }
+        catch(rsgis::RSGISException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(std::exception &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
+    
+    
+    void executeImagePixelLinearFit(std::string inputImage, std::string outputImage, std::string gdalFormat, std::string bandValues, float noDataValue, bool useNoDataValue)throw(RSGISCmdException)
+    {
+        try
+        {
+            GDALAllRegister();
+            GDALDataset *imgDataset = (GDALDataset *) GDALOpenShared(inputImage.c_str(), GA_ReadOnly);
+            if(imgDataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            rsgis::utils::RSGISTextUtils textUtils;
+            std::vector<std::string> strValues = textUtils.readFileToStringVector(bandValues);
+            std::vector<float> bandXValues;
+            for(std::vector<std::string>::iterator iterStrVals = strValues.begin(); iterStrVals != strValues.end(); ++iterStrVals)
+            {
+                if((*iterStrVals) != "")
+                {
+                    try
+                    {
+                        bandXValues.push_back(textUtils.strtofloat(*iterStrVals));
+                    }
+                    catch (rsgis::RSGISException &e)
+                    {
+                        // ignore.
+                        std::cout << "Warning \'" << *iterStrVals << "\' could not be converted to an float.\n";
+                    }
+                }
+            }
+            
+            if(bandXValues.size() != imgDataset->GetRasterCount())
+            {
+                std::cout << "bandXValues.size() = " << bandXValues.size() << std::endl;
+                std::cout << "imgDataset->GetRasterCount() = " << imgDataset->GetRasterCount() << std::endl;
+                GDALClose(imgDataset);
+                throw RSGISException("The number of image bands and x values are not the same.");
+            }
+            
+            std::string *bandNames = new std::string[3];
+            bandNames[0] = "Intercept";
+            bandNames[1] = "Slope";
+            bandNames[2] = "SumSq";
+            
+            rsgis::img::RSGISLinearFit2Column *linearFit = new rsgis::img::RSGISLinearFit2Column(bandXValues, noDataValue, useNoDataValue);
+            
+            rsgis::img::RSGISCalcImage calcImage = rsgis::img::RSGISCalcImage(linearFit, "", true);
+            calcImage.calcImage(&imgDataset, 1, outputImage, true, bandNames, gdalFormat, GDT_Float32);
+            
+            delete[] bandNames;
+            delete linearFit;
+            
+            
+            GDALClose(imgDataset);
         }
         catch(rsgis::RSGISException &e)
         {

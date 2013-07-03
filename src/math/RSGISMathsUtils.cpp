@@ -723,6 +723,19 @@ namespace rsgis{namespace math{
             stats->median = 0;
         }
     }
+    
+    void RSGISMathsUtils::initStatsSummaryValues(RSGISStatsSummary *stats)
+    {
+        if(stats != NULL)
+        {
+            stats->min = 0;
+            stats->max = 0;
+            stats->mean = 0;
+            stats->stdDev = 0;
+            stats->sum = 0;
+            stats->median = 0;
+        }
+    }
 
 }}
 
