@@ -1224,6 +1224,8 @@
 	<rsgis:command algor="vectorutils" option="addfidcol" vector="vector.shp" output="string" init="unsigned int" force="yes | no" />
 	<!-- A command to calculate the minimum distance to each polygon for each point -->
 	<rsgis:command algor="vectorutils" option="mindist2polys" vector="vector.shp" polygons="vector.shp" output="string" force="yes | no" />
+	<!-- A command to produce convex hulls for groups of (X, Y, Attribute) point locations -->
+	<rsgis:command algor="vectorutils" option="convexhullgrps" input="points.csv" polygons="vector.shp" projwkt="txt.wkt" force="yes | no" eastingscol="int" northingscol="int" attributecol="int"/>
 
 
 

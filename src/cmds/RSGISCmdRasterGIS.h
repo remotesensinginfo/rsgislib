@@ -86,8 +86,6 @@ namespace rsgis{ namespace cmds {
     /** Function for exporting columns of the attribute table as GDAL images */
     void executeExportCols2GDALImage(std::string inputImage, std::string outputFile, std::string imageFormat, RSGISLibDataType outDataType, std::vector<std::string> fields)throw(RSGISCmdException);
     
-    
-    
 }}
 
 

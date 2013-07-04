@@ -86,6 +86,7 @@ set(LIB_COMMANDS_H
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdImageUtils.h 	
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdSegmentation.h 
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdRasterGIS.h
+	${RSGIS_SRC_CMDS_DIR}/RSGISCmdVectorUtils.h
 	)
 	
 set(LIB_COMMANDS_CPP
@@ -101,6 +102,8 @@ set(LIB_COMMANDS_CPP
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdSegmentation.h
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdRasterGIS.cpp
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdRasterGIS.h
+	${RSGIS_SRC_CMDS_DIR}/RSGISCmdVectorUtils.cpp
+	${RSGIS_SRC_CMDS_DIR}/RSGISCmdVectorUtils.h
 	)
 ###############################################################################
 
@@ -1059,6 +1062,8 @@ set(LIB_VEC_UTILS_CPP
 	${RSGIS_SRC_VEC_DIR}/RSGISCreateListOfAttributeValues.cpp 
 	${RSGIS_SRC_VEC_DIR}/RSGISDropSmallPolygons.cpp 
 	${RSGIS_SRC_VEC_DIR}/RSGISDropSmallPolygons.h 
+	${RSGIS_SRC_VEC_DIR}/RSGISGenerateConvexHullGroups.cpp
+	${RSGIS_SRC_VEC_DIR}/RSGISGenerateConvexHullGroups.h
 	${RSGIS_SRC_VEC_DIR}/RSGISGeometryRotateAroundFixedPoint.cpp 
 	${RSGIS_SRC_VEC_DIR}/RSGISGeometryRotateAroundFixedPoint.h
 	${RSGIS_SRC_VEC_DIR}/RSGISGeometryToCircle.cpp 
@@ -1098,7 +1103,7 @@ set(LIB_VEC_UTILS_CPP
 	${RSGIS_SRC_VEC_DIR}/RSGISVectorSQLClassification.cpp 
 	${RSGIS_SRC_VEC_DIR}/RSGISVectorSQLClassification.h 
     ${RSGIS_SRC_VEC_DIR}/RSGISVectorUtils.cpp 
-	${RSGIS_SRC_VEC_DIR}/RSGISVectorUtils.h 
+	${RSGIS_SRC_VEC_DIR}/RSGISVectorUtils.h
 )
 
 
@@ -1171,7 +1176,9 @@ set(LIB_VEC_H
 	${RSGIS_SRC_VEC_DIR}/RSGISVectorMaths.h 
 	${RSGIS_SRC_VEC_DIR}/RSGISGetOGRGeometries.h 
 	${RSGIS_SRC_VEC_DIR}/RSGISExtractEndMembers2Matrix.h
-	${RSGIS_SRC_VEC_DIR}/RSGISAttCountPolyIntersect.h)
+	${RSGIS_SRC_VEC_DIR}/RSGISAttCountPolyIntersect.h
+	${RSGIS_SRC_VEC_DIR}/RSGISGenerateConvexHullGroups.h)
+	
 	
 ###############################################################################
 

@@ -595,100 +595,208 @@ namespace rsgis{namespace geom{
 	
 	geos::geom::Polygon* RSGISGeometry::findConvexHull(std::vector<geos::geom::Coordinate> *coordinates) throw(RSGISGeometryException)
 	{
-		geos::geom::Polygon *poly = NULL;
-		std::sort(coordinates->begin(), coordinates->end(), SortCoordinates(geos::geom::Coordinate(0,0,0)));
-
-		if(coordinates->size() > 2)
-		{
-			bool upEdgeLoopBack = true;
-			
-			// Upper Edge
-			std::vector<geos::geom::Coordinate> *upperEdge = new std::vector<geos::geom::Coordinate>();
-			upperEdge->push_back(coordinates->at(0));
-			upperEdge->push_back(coordinates->at(1));
-			
-			for(unsigned int i = 2; i < coordinates->size(); i++)
-			{
-				upEdgeLoopBack = true;
-						
-				upperEdge->push_back(coordinates->at(i));
-				
-				while(upEdgeLoopBack)
-				{
-					int currentIndex = upperEdge->size() -1;
-													
-					if(upperEdge->size() <= 2)
-					{
-						upEdgeLoopBack = false;
-					}
-					else if(this->turnDirections(&(upperEdge->at(currentIndex-2)), 
-									&(upperEdge->at(currentIndex-1)), 
-									&(upperEdge->at(currentIndex))) != 1)
-					{
-						this->removeItem(upperEdge, upperEdge->at(currentIndex-1));
-					}
-					else
-					{
-						upEdgeLoopBack = false;
-					}
-				}
-			}
+        geos::geom::Polygon *poly = NULL;
+        try
+        {
+            std::sort(coordinates->begin(), coordinates->end(), SortCoordinates(geos::geom::Coordinate(0,0,0)));
             
-			// Lower Edge
-			std::vector<geos::geom::Coordinate> *lowerEdge = new std::vector<geos::geom::Coordinate>();
-			int nodeIndex = coordinates->size() -1;
-			lowerEdge->push_back(coordinates->at(nodeIndex--));
-			lowerEdge->push_back(coordinates->at(nodeIndex--));
-			
-			for(int i = nodeIndex; i >= 0; i--)
-			{
-				upEdgeLoopBack = true;
-				lowerEdge->push_back(coordinates->at(i));
-				while(upEdgeLoopBack)
-				{
-					int currentIndex = lowerEdge->size() -1;
-					if(lowerEdge->size() <= 2)
-					{
-						upEdgeLoopBack = false;
-					}
-					else if(this->turnDirections(&(lowerEdge->at(currentIndex)), 
-									&(lowerEdge->at(currentIndex-1)), 
-									&(lowerEdge->at(currentIndex-2))) != -1)
-					{
-						this->removeItem(lowerEdge, lowerEdge->at(currentIndex-1));
-					}
-					else
-					{
-						upEdgeLoopBack = false;
-					}
-				}
-			}
-			// Create Polygon...
-			geos::geom::CoordinateArraySequence *coordSeq = new geos::geom::CoordinateArraySequence();
-			std::vector<geos::geom::Coordinate>::iterator iterCoords;
-			for(iterCoords = upperEdge->begin(); iterCoords != upperEdge->end(); iterCoords++)
-			{
-				coordSeq->add((*iterCoords), false);
-			}
-			for(iterCoords = lowerEdge->begin(); iterCoords != lowerEdge->end(); iterCoords++)
-			{
-				coordSeq->add((*iterCoords), false);
-			}
-            
-			geos::geom::GeometryFactory* geomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
-			geos::geom::LinearRing *polyRing = new geos::geom::LinearRing(coordSeq, geomFactory);
-			poly = geomFactory->createPolygon(polyRing, NULL);
-			
-			delete upperEdge;
-			delete lowerEdge;
-		}
-		else 
-		{
-			throw RSGISGeometryException("Too few geos::geom::Coordinate to create convert hull.");
-		}
+            if(coordinates->size() > 2)
+            {
+                bool upEdgeLoopBack = true;
+                
+                // Upper Edge
+                std::vector<geos::geom::Coordinate> *upperEdge = new std::vector<geos::geom::Coordinate>();
+                upperEdge->push_back(coordinates->at(0));
+                upperEdge->push_back(coordinates->at(1));
+                
+                for(unsigned int i = 2; i < coordinates->size(); i++)
+                {
+                    upEdgeLoopBack = true;
+                    
+                    upperEdge->push_back(coordinates->at(i));
+                    
+                    while(upEdgeLoopBack)
+                    {
+                        int currentIndex = upperEdge->size() -1;
+                        
+                        if(upperEdge->size() <= 2)
+                        {
+                            upEdgeLoopBack = false;
+                        }
+                        else if(this->turnDirections(&(upperEdge->at(currentIndex-2)),
+                                                     &(upperEdge->at(currentIndex-1)),
+                                                     &(upperEdge->at(currentIndex))) != 1)
+                        {
+                            this->removeItem(upperEdge, upperEdge->at(currentIndex-1));
+                        }
+                        else
+                        {
+                            upEdgeLoopBack = false;
+                        }
+                    }
+                }
+                
+                // Lower Edge
+                std::vector<geos::geom::Coordinate> *lowerEdge = new std::vector<geos::geom::Coordinate>();
+                int nodeIndex = coordinates->size() -1;
+                lowerEdge->push_back(coordinates->at(nodeIndex--));
+                lowerEdge->push_back(coordinates->at(nodeIndex--));
+                
+                for(int i = nodeIndex; i >= 0; i--)
+                {
+                    upEdgeLoopBack = true;
+                    lowerEdge->push_back(coordinates->at(i));
+                    while(upEdgeLoopBack)
+                    {
+                        int currentIndex = lowerEdge->size() -1;
+                        if(lowerEdge->size() <= 2)
+                        {
+                            upEdgeLoopBack = false;
+                        }
+                        else if(this->turnDirections(&(lowerEdge->at(currentIndex)),
+                                                     &(lowerEdge->at(currentIndex-1)),
+                                                     &(lowerEdge->at(currentIndex-2))) != -1)
+                        {
+                            this->removeItem(lowerEdge, lowerEdge->at(currentIndex-1));
+                        }
+                        else
+                        {
+                            upEdgeLoopBack = false;
+                        }
+                    }
+                }
+                //std::cout << "Number of Upper Coords outline = " << upperEdge->size() << std::endl;
+                //std::cout << "Number of Lower Coords outline = " << lowerEdge->size() << std::endl;
+                
+                // Create Polygon...
+                geos::geom::CoordinateArraySequence *coordSeq = new geos::geom::CoordinateArraySequence();
+                std::vector<geos::geom::Coordinate>::iterator iterCoords;
+                for(iterCoords = upperEdge->begin(); iterCoords != upperEdge->end(); ++iterCoords)
+                {
+                    coordSeq->add((*iterCoords), true);
+                    //std::cout << "Number of Coords outline = " << coordSeq->size() << std::endl;
+                }
+                for(iterCoords = lowerEdge->begin(); iterCoords != lowerEdge->end(); ++iterCoords)
+                {
+                    coordSeq->add((*iterCoords), true);
+                    //std::cout << "Number of Coords outline = " << coordSeq->size() << std::endl;
+                }
+                
+                coordSeq->add(upperEdge->front(), true);
+                
+                //std::cout << "Number of Coords outline = " << coordSeq->size() << std::endl;
+                
+                geos::geom::GeometryFactory* geomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
+                geos::geom::LinearRing *polyRing = new geos::geom::LinearRing(coordSeq, geomFactory);
+                poly = geomFactory->createPolygon(polyRing, NULL);
+                
+                delete upperEdge;
+                delete lowerEdge;
+            }
+            else 
+            {
+                throw RSGISGeometryException("Too few geos::geom::Coordinate to create convert hull.");
+            }
+        }
+        catch (RSGISGeometryException &e)
+        {
+            throw e;
+        }
+		catch (RSGISException &e)
+        {
+            throw RSGISGeometryException(e.what());
+        }
+        catch (std::exception &e)
+        {
+            throw RSGISGeometryException(e.what());
+        }
 		
 		return poly;
 	}
+    
+    geos::geom::Polygon* RSGISGeometry::findBoundingBox(std::vector<geos::geom::Coordinate> *coordinates) throw(RSGISGeometryException)
+    {
+        geos::geom::Polygon *poly = NULL;
+        try
+        {
+            // Do something else.
+            double xMin = 0;
+            double xMax = 0;
+            double yMin = 0;
+            double yMax = 0;
+            bool first = true;
+            for(std::vector<geos::geom::Coordinate>::iterator iterCoords = coordinates->begin(); iterCoords != coordinates->end(); ++iterCoords)
+            {
+                if(first)
+                {
+                    xMin = (*iterCoords).x;
+                    xMax = (*iterCoords).x;
+                    yMin = (*iterCoords).y;
+                    yMax = (*iterCoords).y;
+                    first = false;
+                }
+                else
+                {
+                    if((*iterCoords).x < xMin)
+                    {
+                        xMin = (*iterCoords).x;
+                    }
+                    else if((*iterCoords).x > xMax)
+                    {
+                        xMax = (*iterCoords).x;
+                    }
+                    
+                    if((*iterCoords).y < yMin)
+                    {
+                        yMin = (*iterCoords).y;
+                    }
+                    else if((*iterCoords).y > yMax)
+                    {
+                        yMax = (*iterCoords).y;
+                    }
+                }
+            }
+            
+            if((xMax - xMin) < 0.1)
+            {
+                xMax += 1;
+                xMin -= 1;
+            }
+            
+            if((yMax - yMin) < 0.1)
+            {
+                yMax += 1;
+                yMin -= 1;
+            }
+            
+            
+            // Create Polygon...
+            geos::geom::CoordinateArraySequence *coordSeq = new geos::geom::CoordinateArraySequence();
+            coordSeq->add(geos::geom::Coordinate(xMin, yMax), true);
+            coordSeq->add(geos::geom::Coordinate(xMax, yMax), true);
+            coordSeq->add(geos::geom::Coordinate(xMax, yMin), true);
+            coordSeq->add(geos::geom::Coordinate(xMin, yMin), true);
+            coordSeq->add(geos::geom::Coordinate(xMin, yMax), true);
+            
+            geos::geom::GeometryFactory* geomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
+            geos::geom::LinearRing *polyRing = new geos::geom::LinearRing(coordSeq, geomFactory);
+            poly = geomFactory->createPolygon(polyRing, NULL);
+        }
+        catch (RSGISGeometryException &e)
+        {
+            throw e;
+        }
+		catch (RSGISException &e)
+        {
+            throw RSGISGeometryException(e.what());
+        }
+        catch (std::exception &e)
+        {
+            throw RSGISGeometryException(e.what());
+        }
+		
+		return poly;
+    }
 	
     int RSGISGeometry::turnDirections(geos::geom::Coordinate *a, geos::geom::Coordinate *b, geos::geom::Coordinate *c)
     {
