@@ -855,6 +855,110 @@ namespace rsgis{namespace vec{
 			throw RSGISVectorOutputException(e.what());
 		}
 	}
+    
+    void RSGISVectorIO::exportGEOSPolygons2SHP(std::string outputFile, bool deleteIfPresent, std::vector<geos::geom::Polygon*> *polys, OGRSpatialReference* spatialRef, std::vector<std::string> *outAtts, std::string attName) throw(RSGISVectorOutputException)
+    {
+        try
+		{
+            if(polys->size() != outAtts->size())
+            {
+                throw RSGISVectorOutputException("The list of polygons and attribute values are different lengths.");
+            }
+            
+			OGRRegisterAll();
+			RSGISVectorUtils vecUtils;
+			rsgis::utils::RSGISFileUtils fileUtils;
+			
+			/////////////////////////////////////
+			//
+			// Check whether file already present.
+			//
+			/////////////////////////////////////
+			std::string SHPFileOutLayer = vecUtils.getLayerName(outputFile);
+			std::string outputDIR = fileUtils.getFileDirectoryPath(outputFile);
+			
+			if(vecUtils.checkDIR4SHP(outputDIR, SHPFileOutLayer))
+			{
+				if(deleteIfPresent)
+				{
+					vecUtils.deleteSHP(outputDIR, SHPFileOutLayer);
+				}
+				else
+				{
+					throw RSGISException("Shapefile already exists, either delete or select force.");
+				}
+			}
+			
+			OGRSFDriver *shpFiledriver = NULL;
+			OGRDataSource *outputSHPDS = NULL;
+			OGRLayer *outputSHPLayer = NULL;
+			/////////////////////////////////////
+			//
+			// Create Output Shapfile.
+			//
+			/////////////////////////////////////
+			const char *pszDriverName = "ESRI Shapefile";
+			shpFiledriver = OGRSFDriverRegistrar::GetRegistrar()->GetDriverByName(pszDriverName );
+			if( shpFiledriver == NULL )
+			{
+				throw RSGISVectorOutputException("SHP driver not available.");
+			}
+			outputSHPDS = shpFiledriver->CreateDataSource(outputFile.c_str(), NULL);
+			if( outputSHPDS == NULL )
+			{
+				std::string message = std::string("Could not create vector file ") + outputFile;
+				throw RSGISVectorOutputException(message.c_str());
+			}
+			
+			outputSHPLayer = outputSHPDS->CreateLayer(SHPFileOutLayer.c_str(), spatialRef, wkbPolygon, NULL );
+			if( outputSHPLayer == NULL )
+			{
+				std::string message = std::string("Could not create vector layer ") + SHPFileOutLayer;
+				throw RSGISVectorOutputException(message.c_str());
+			}
+            
+            OGRFieldDefn shpField(attName.c_str(), OFTString);
+			shpField.SetWidth(254);
+			if( outputSHPLayer->CreateField( &shpField ) != OGRERR_NONE )
+			{
+                std::string message = std::string("Creating shapefile field \'") + attName + std::string("\' has failed");
+				throw RSGISVectorOutputException(message);
+			}
+			
+			OGRFeatureDefn *outputDefn = outputSHPLayer->GetLayerDefn();
+            int outColIdx = outputDefn->GetFieldIndex(attName.c_str());
+            unsigned int polyIdx = 0;
+			OGRFeature *featureOutput = NULL;
+			
+			// Write Polygons to file
+			if(polys->size() > 0)
+			{
+				std::vector<geos::geom::Polygon*>::iterator iterPolys;
+				for(iterPolys = polys->begin(); iterPolys != polys->end(); iterPolys++)
+				{
+                    if((*iterPolys) != NULL)
+                    {
+                        featureOutput = OGRFeature::CreateFeature(outputDefn);
+                        featureOutput->SetGeometryDirectly(vecUtils.convertGEOSPolygon2OGRPolygon((*iterPolys)));
+                        
+                        featureOutput->SetField(outColIdx, outAtts->at(polyIdx++).c_str());
+                        
+                        if( outputSHPLayer->CreateFeature(featureOutput) != OGRERR_NONE )
+                        {
+                            throw RSGISVectorOutputException("Failed to write feature to the output shapefile.");
+                        }
+                        OGRFeature::DestroyFeature(featureOutput);
+                    }
+				}
+				
+			}
+			OGRDataSource::DestroyDataSource(outputSHPDS);
+		}
+		catch(RSGISException &e)
+		{
+			throw RSGISVectorOutputException(e.what());
+		}
+    }
 	
 	void RSGISVectorIO::exportGEOSPolygons2SHP(std::string outputFile, bool deleteIfPresent, std::vector<geos::geom::Polygon*> *polys, OGRSpatialReference* spatialRef, std::string attribute, std::string attributeVal) throw(RSGISVectorOutputException)
 	{

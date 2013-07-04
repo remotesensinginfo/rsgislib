@@ -29,6 +29,10 @@
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/filesystem.hpp>
 
+#include "cmds/RSGISCmdException.h"
+#include "cmds/RSGISCmdVectorUtils.h"
+
+
 #include "common/RSGISException.h"
 #include "common/RSGISXMLArgumentsException.h"
 #include "common/RSGISAlgorithmParameters.h"
@@ -190,7 +194,8 @@ class RSGISExeVectorUtils : public RSGISAlgorithmParameters
             copyassignproj,
             printwkt,
             addfidcol,
-            mindist2polys
+            mindist2polys,
+            convexhullgrps
 		};
 
 		RSGISExeVectorUtils();
@@ -279,6 +284,9 @@ class RSGISExeVectorUtils : public RSGISAlgorithmParameters
         bool bufferValueInText;
         unsigned int initFID;
         bool areaThresholdProvided;
+        unsigned int eastingsColIdx;
+        unsigned int northingsColIdx;
+        unsigned int attributeColIdx;
 	};
 }
 #endif

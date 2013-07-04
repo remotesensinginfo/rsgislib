@@ -130,6 +130,7 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
     XMLCh *optionPrintWKT = XMLString::transcode("printwkt");
     XMLCh *optionAddFIDCol = XMLString::transcode("addfidcol");
     XMLCh *optionMinDist2Polys = XMLString::transcode("mindist2polys");
+    XMLCh *optionConvexHullGrps = XMLString::transcode("convexhullgrps");
 
 	XMLCh *optionGenerateGrid = XMLString::transcode("generategrid");
 	XMLCh *optionGenerateImageGrid = XMLString::transcode("generateimagegrid");
@@ -4303,6 +4304,108 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
 
 
     }
+    else if (XMLString::equals(optionConvexHullGrps, optionXML))
+    {
+        this->option = RSGISExeVectorUtils::convexhullgrps;
+        
+        if(!inputFileNotVector)
+		{
+			throw RSGISXMLArgumentsException("This algorithm requires only a single input CSV file to be provided.");
+		}
+        
+		if(noInputProvide)
+		{
+			throw RSGISXMLArgumentsException("No input file has been provided.");
+		}
+        
+        XMLCh *polysXMLStr = XMLString::transcode("polygons");
+		if(argElement->hasAttribute(polysXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(polysXMLStr));
+			this->outputVector = string(charValue);
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'polygons\' attribute was provided.");
+		}
+		XMLString::release(&polysXMLStr);
+        
+        XMLCh *projWKTXMLStr = XMLString::transcode("projwkt");
+		if(argElement->hasAttribute(projWKTXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(projWKTXMLStr));
+			this->projFile = string(charValue);
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'projwkt\' attribute was provided.");
+		}
+		XMLString::release(&projWKTXMLStr);
+        
+        XMLCh *forceXMLStr = XMLString::transcode("force");
+		if(argElement->hasAttribute(forceXMLStr))
+		{
+			XMLCh *yesStr = XMLString::transcode("yes");
+			const XMLCh *forceValue = argElement->getAttribute(forceXMLStr);
+            
+			if(XMLString::equals(forceValue, yesStr))
+			{
+				this->force = true;
+			}
+			else
+			{
+				this->force = false;
+			}
+			XMLString::release(&yesStr);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'force\' attribute was provided.");
+		}
+		XMLString::release(&forceXMLStr);
+        
+        XMLCh *eastingsColXMLStr = XMLString::transcode("eastingscol");
+		if(argElement->hasAttribute(eastingsColXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(eastingsColXMLStr));
+			this->eastingsColIdx = mathUtils.strtounsignedint(string(charValue));
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'eastingscol\' attribute was provided.");
+		}
+		XMLString::release(&eastingsColXMLStr);
+        
+        XMLCh *northingsColXMLStr = XMLString::transcode("northingscol");
+		if(argElement->hasAttribute(northingsColXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(northingsColXMLStr));
+			this->northingsColIdx = mathUtils.strtounsignedint(string(charValue));
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'northingscol\' attribute was provided.");
+		}
+		XMLString::release(&northingsColXMLStr);
+        
+        XMLCh *attributeColXMLStr = XMLString::transcode("attributecol");
+		if(argElement->hasAttribute(attributeColXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(attributeColXMLStr));
+			this->attributeColIdx = mathUtils.strtounsignedint(string(charValue));
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'attributecol\' attribute was provided.");
+		}
+		XMLString::release(&attributeColXMLStr);
+        
+    }
 	else
 	{
 		string message = string("The option (") + string(XMLString::transcode(optionXML)) + string(") is not known: RSGISExeVectorUtils.");
@@ -4374,6 +4477,7 @@ void RSGISExeVectorUtils::retrieveParameters(DOMElement *argElement) throw(RSGIS
     XMLString::release(&optionPrintWKT);
     XMLString::release(&optionAddFIDCol);
     XMLString::release(&optionMinDist2Polys);
+    XMLString::release(&optionConvexHullGrps);
 }
 
 void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
@@ -10088,6 +10192,33 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
             }
 
         }
+        else if(option == RSGISExeVectorUtils::convexhullgrps)
+        {
+            std::cout << "A command to produce convex hulls for groups of (X, Y, Attribute) point locations\n";
+            std::cout << "Input File: " << this->inputFile << std::endl;
+            std::cout << "Output File: " << this->outputVector << std::endl;
+            std::cout << "Proj: " << this->projFile << std::endl;
+            std::cout << "Eastings Column: " << this->eastingsColIdx << std::endl;
+            std::cout << "Northings Column: " << this->northingsColIdx << std::endl;
+            std::cout << "Attribute Column: " << this->attributeColIdx << std::endl;
+            
+            try
+            {
+                rsgis::cmds::executeGenerateConvexHullsGroups(this->inputFile, this->outputVector, this->projFile, this->force, this->eastingsColIdx, this->northingsColIdx, this->attributeColIdx);
+            }
+            catch (rsgis::cmds::RSGISCmdException &e)
+            {
+                throw RSGISException(e.what());
+            }
+            catch(rsgis::RSGISException &e)
+            {
+                throw e;
+            }
+            catch(std::exception &e)
+            {
+                throw RSGISException(e.what());
+            }
+        }
 		else
 		{
 			cout << "Options not recognised\n";
@@ -10600,6 +10731,16 @@ void RSGISExeVectorUtils::printParameters()
             cout << "Input Vector: " << this->inputVector << endl;
             cout << "Polygons Vector: " << this->inputGeometry << endl;
             cout << "Output Vector: " << this->outputVector << endl;
+        }
+        else if(option == RSGISExeVectorUtils::convexhullgrps)
+        {
+            std::cout << "A command to produce convex hulls for groups of (X, Y, Attribute) point locations\n";
+            std::cout << "Input File: " << this->inputFile << std::endl;
+            std::cout << "Output File: " << this->outputVector << std::endl;
+            std::cout << "Proj: " << this->projFile << std::endl;
+            std::cout << "Eastings Column: " << this->eastingsColIdx << std::endl;
+            std::cout << "Northings Column: " << this->northingsColIdx << std::endl;
+            std::cout << "Attribute Column: " << this->attributeColIdx << std::endl;
         }
 		else
 		{
