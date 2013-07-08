@@ -37,6 +37,7 @@
 #include "img/RSGISCalcEditImage.h"
 #include "img/RSGISCalcDist2Geom.h"
 #include "img/RSGISFitFunction2Pxls.h"
+#include "img/RSGISImageNormalisation.h"
 
 #include "math/RSGISVectors.h"
 #include "math/RSGISMatrices.h"
@@ -600,7 +601,6 @@ namespace rsgis{ namespace cmds {
         }
     }
     
-    
     void executeImagePixelLinearFit(std::string inputImage, std::string outputImage, std::string gdalFormat, std::string bandValues, float noDataValue, bool useNoDataValue)throw(RSGISCmdException)
     {
         try
@@ -664,6 +664,79 @@ namespace rsgis{ namespace cmds {
         {
             throw RSGISCmdException(e.what());
         }
+    }
+    
+    void executeNormalisation(std::vector<std::string> inputImages, std::vector<std::string> outputImages, bool calcInMinMax, double inMin, double inMax, double outMin, double outMax)throw(RSGISCmdException)
+    {
+        GDALAllRegister();
+        GDALDataset *dataset = NULL;
+        rsgis::img::RSGISImageNormalisation *normImage = NULL;
+        double *imageMaxBands = NULL;
+        double *imageMinBands = NULL;
+        double *outMinBands = NULL;
+        double *outMaxBands = NULL;
+        
+        int rasterCount = 0;
+        
+        std::vector<std::string>::iterator inImage;
+        std::vector<std::string>::iterator outImage;
+        
+        try
+        {
+            normImage = new rsgis::img::RSGISImageNormalisation();
+            
+            for(inImage = inputImages.begin(), outImage = outputImages.begin(); inImage != inputImages.end(); ++inImage, ++outImage)
+            {
+                std::cout << *inImage << std::endl;
+                dataset = (GDALDataset *) GDALOpen((*inImage).c_str(), GA_ReadOnly);
+                if(dataset == NULL)
+                {
+                    std::string message = std::string("Could not open image ") + *inImage;
+                    throw rsgis::RSGISImageException(message.c_str());
+                }
+                
+                rasterCount = dataset->GetRasterCount();
+                
+                imageMaxBands = new double[rasterCount];
+                imageMinBands = new double[rasterCount];
+                outMinBands = new double[rasterCount];
+                outMaxBands = new double[rasterCount];
+                
+                for(int j = 0; j < rasterCount; j++)
+                {
+                    if(calcInMinMax)
+                    {
+                        imageMaxBands[j] = 0;
+                        imageMinBands[j] = 0;
+                    }
+                    else
+                    {
+                        imageMaxBands[j] = inMax;
+                        imageMinBands[j] = inMin;
+                    }
+                    outMaxBands[j] = outMax;
+                    outMinBands[j] = outMin;
+                }
+                
+                normImage->normaliseImage(dataset, imageMaxBands, imageMinBands, outMaxBands, outMinBands, calcInMinMax, *outImage);
+                
+                GDALClose(dataset);
+                delete[] imageMinBands;
+                delete[] imageMaxBands;
+                delete[] outMinBands;
+                delete[] outMaxBands;
+            }	
+        }
+        catch(rsgis::RSGISException e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        
+        if(normImage != NULL)
+        {
+            delete normImage;
+        }			
+
     }
     
 }}

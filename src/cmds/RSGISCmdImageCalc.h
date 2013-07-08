@@ -25,6 +25,7 @@
 
 #include <iostream>
 #include <string>
+#include <vector>
 
 #include "common/RSGISCommons.h"
 #include "RSGISCmdException.h"
@@ -67,8 +68,8 @@ namespace rsgis{ namespace cmds {
     void executeImagePixelColumnSummary(std::string inputImage, std::string outputImage, rsgis::cmds::RSGISCmdStatsSummary summaryStats, std::string gdalFormat, RSGISLibDataType outDataType, float noDataValue, bool useNoDataValue)throw(RSGISCmdException);
     /** Function to perform a linear regression on each column of pixels */
     void executeImagePixelLinearFit(std::string inputImage, std::string outputImage, std::string gdalFormat, std::string bandValues, float noDataValue, bool useNoDataValue)throw(RSGISCmdException);
-
-    
+    /** Function to perform image normalisation */
+    void executeNormalisation(std::vector<std::string> inputImages, std::vector<std::string> outputImages, bool calcInMinMax, double inMin, double inMax, double outMin, double outMax)throw(RSGISCmdException);
 }}
 
 
