@@ -2924,213 +2924,47 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 		}
 		else if(option == RSGISExeImageCalculation::correlation)
 		{
-			GDALAllRegister();
-			GDALDataset **datasetsA = NULL;
-			GDALDataset **datasetsB = NULL;
-			
-			rsgis::math::RSGISMatrices matrixUtils;
-			
-			rsgis::img::RSGISCalcImageSingle *calcImgSingle = NULL;
-			rsgis::img::RSGISCalcCC *calcCC = NULL;
-			rsgis::img::RSGISCalcImageMatrix *calcImgMatrix = NULL;
-			
-			rsgis::math::Matrix *correlationMatrix = NULL;
-			
-			try
-			{
-				datasetsA = new GDALDataset*[1];
-				std::cout << this->inputImageA << std::endl;
-				datasetsA[0] = (GDALDataset *) GDALOpenShared(this->inputImageA.c_str(), GA_ReadOnly);
-				if(datasetsA[0] == NULL)
-				{
-					std::string message = std::string("Could not open image ") + this->inputImageA;
-					throw rsgis::RSGISImageException(message.c_str());
-				}
-				
-				
-				datasetsB = new GDALDataset*[1];
-				std::cout << this->inputImageB << std::endl;
-				datasetsB[0] = (GDALDataset *) GDALOpenShared(this->inputImageB.c_str(), GA_ReadOnly);
-				if(datasetsB[0] == NULL)
-				{
-					std::string message = std::string("Could not open image ") + this->inputImageB;
-					throw rsgis::RSGISImageException(message.c_str());
-				}
-				
-				calcCC = new rsgis::img::RSGISCalcCC(1);
-				calcImgSingle = new rsgis::img::RSGISCalcImageSingle(calcCC);
-				calcImgMatrix = new rsgis::img::RSGISCalcImageMatrix(calcImgSingle);
-				correlationMatrix = calcImgMatrix->calcImageMatrix(datasetsA, datasetsB, 1);
-				matrixUtils.saveMatrix2txt(correlationMatrix, this->outputMatrix);
-				
-				delete calcCC;
-				delete calcImgMatrix;
-				delete calcImgSingle;
-			}
-			catch(rsgis::RSGISException e)
-			{
-				throw e;
-			}
-		}
+            try {
+                rsgis::cmds::executeCorrelation(this->inputImageA, this->inputImageB, this->outputMatrix);
+            } catch (rsgis::RSGISException e) {
+                throw rsgis::RSGISException(e.what());
+            }
+            catch (rsgis::cmds::RSGISCmdException e) {
+                throw rsgis::RSGISException(e.what());
+            }
+            catch (std::exception e) {
+                throw rsgis::RSGISException(e.what());
+            }
+
+        }
 		else if(option == RSGISExeImageCalculation::covariance)
 		{
-			GDALAllRegister();
-			GDALDataset **datasetsA = NULL;
-			GDALDataset **datasetsB = NULL;
-			
-			rsgis::math::RSGISMatrices matrixUtils;
-			
-			rsgis::img::RSGISCalcImageSingle *calcImgSingle = NULL;
-			rsgis::img::RSGISCalcCovariance *calcCovar = NULL;
-			rsgis::img::RSGISCalcImageMatrix *calcImgMatrix = NULL;
-			
-			rsgis::img::RSGISCalcImageSingle *calcImgSingleMean = NULL;
-			rsgis::img::RSGISCalcMeanVectorIndividual *calcMean = NULL;
-			rsgis::img::RSGISCalcImageMatrix *calcImgMatrixMean = NULL;
-			
-			rsgis::math::Matrix *meanAMatrix = NULL;
-			rsgis::math::Matrix *meanBMatrix = NULL;
-			rsgis::math::Matrix *covarianceMatrix = NULL;
-			
-			try
-			{
-				datasetsA = new GDALDataset*[1];
-				std::cout << this->inputImageA << std::endl;
-				datasetsA[0] = (GDALDataset *) GDALOpenShared(this->inputImageA.c_str(), GA_ReadOnly);
-				if(datasetsA[0] == NULL)
-				{
-					std::string message = std::string("Could not open image ") + this->inputImageA;
-					throw rsgis::RSGISImageException(message.c_str());
-				}
-				
-				datasetsB = new GDALDataset*[1];
-				std::cout << this->inputImageB << std::endl;
-				datasetsB[0] = (GDALDataset *) GDALOpenShared(this->inputImageB.c_str(), GA_ReadOnly);
-				if(datasetsB[0] == NULL)
-				{
-					std::string message = std::string("Could not open image ") + this->inputImageB;
-					throw rsgis::RSGISImageException(message.c_str());
-				}
-				
-				
-				if(calcMean)
-				{
-					std::cout << "Mean vectors will be calculated\n";
-					calcMean = new rsgis::img::RSGISCalcMeanVectorIndividual(1);
-					calcImgSingleMean = new rsgis::img::RSGISCalcImageSingle(calcMean);
-					calcImgMatrixMean = new rsgis::img::RSGISCalcImageMatrix(calcImgSingle);
-					meanAMatrix = calcImgMatrixMean->calcImageVector(datasetsA, 1);
-					meanBMatrix = calcImgMatrixMean->calcImageVector(datasetsB, 1);
-					std::cout << "Mean Vectors have been calculated\n";
-				}
-				else
-				{
-					meanAMatrix = matrixUtils.readMatrixFromTxt(this->inputMatrixA);
-					meanBMatrix = matrixUtils.readMatrixFromTxt(this->inputMatrixB);
-				}
-				
-				calcCovar = new rsgis::img::RSGISCalcCovariance(1, meanAMatrix, meanBMatrix);
-				calcImgSingle = new rsgis::img::RSGISCalcImageSingle(calcCovar);
-				calcImgMatrix = new rsgis::img::RSGISCalcImageMatrix(calcImgSingle);
-				covarianceMatrix = calcImgMatrix->calcImageMatrix(datasetsA, datasetsB, 1);
-				matrixUtils.saveMatrix2txt(covarianceMatrix, this->outputMatrix);
-			}
-			catch(rsgis::RSGISException e)
-			{
-				throw e;
-			}
-			
-			if(calcImgSingle != NULL)
-			{
-				delete calcImgSingle;
-			}
-			if(calcCovar != NULL)
-			{
-				delete calcCovar;
-			}
-			if(calcImgMatrix != NULL)
-			{
-				delete calcImgMatrix;
-			}
-			
-			if(calcImgSingleMean != NULL)
-			{
-				delete calcImgSingleMean;
-			}
-			if(calcMean != NULL)
-			{
-				delete calcMean;
-			}
-			if(calcImgMatrixMean != NULL)
-			{
-				delete calcImgMatrixMean;
-			}
-			
-			if(meanAMatrix != NULL)
-			{
-				matrixUtils.freeMatrix(meanAMatrix);
-			}
-			if(meanBMatrix != NULL)
-			{
-				matrixUtils.freeMatrix(meanBMatrix);
-			}
-			if(covarianceMatrix != NULL)
-			{
-				matrixUtils.freeMatrix(covarianceMatrix);
-			}
+			try {
+                rsgis::cmds::executeCovariance(this->inputImageA, this->inputImageB, this->inputMatrixA, this->inputMatrixB, this->calcMean, this->outputMatrix);
+            } catch (rsgis::RSGISException e) {
+                throw rsgis::RSGISException(e.what());
+            }
+            catch (rsgis::cmds::RSGISCmdException e) {
+                throw rsgis::RSGISException(e.what());
+            }
+            catch (std::exception e) {
+                throw rsgis::RSGISException(e.what());
+            }
 		}
 		else if(option == RSGISExeImageCalculation::meanvector)
 		{
-			GDALAllRegister();
-			GDALDataset **datasets = NULL;
-			
-			rsgis::img::RSGISCalcImageSingle *calcImgSingle = NULL;
-			rsgis::img::RSGISCalcMeanVectorIndividual *calcMean = NULL;
-			rsgis::img::RSGISCalcImageMatrix *calcImgMatrix = NULL;
-			
-			rsgis::math::RSGISMatrices matrixUtils;
-			rsgis::math::Matrix *meanVectorMatrix = NULL;
-			
-			try
-			{
-				datasets = new GDALDataset*[1];
-				std::cout << this->inputImage << std::endl;
-				datasets[0] = (GDALDataset *) GDALOpenShared(this->inputImage.c_str(), GA_ReadOnly);
-				if(datasets[0] == NULL)
-				{
-					std::string message = std::string("Could not open image ") + this->inputImage;
-					throw rsgis::RSGISImageException(message.c_str());
-				}
-				
-				calcMean = new rsgis::img::RSGISCalcMeanVectorIndividual(1);
-				calcImgSingle = new rsgis::img::RSGISCalcImageSingle(calcMean);
-				calcImgMatrix = new rsgis::img::RSGISCalcImageMatrix(calcImgSingle);
-				meanVectorMatrix = calcImgMatrix->calcImageVector(datasets, 1);
-				matrixUtils.saveMatrix2txt(meanVectorMatrix, this->outputMatrix);
-			}
-			catch(rsgis::RSGISException e)
-			{
-				throw e;
-			}
-			
-			if(calcImgSingle != NULL)
-			{
-				delete calcImgSingle;
-			}
-			if(calcMean != NULL)
-			{
-				delete calcMean;
-			}
-			if(calcImgMatrix != NULL)
-			{
-				delete calcImgMatrix;
-			}
-			
-			if(meanVectorMatrix != NULL)
-			{
-				matrixUtils.freeMatrix(meanVectorMatrix);
-			}
-		}
+            try {
+                rsgis::cmds::executeMeanVector(this->inputImage, this->outputMatrix);
+            } catch (rsgis::RSGISException e) {
+                throw rsgis::RSGISException(e.what());
+            }
+            catch (rsgis::cmds::RSGISCmdException e) {
+                throw rsgis::RSGISException(e.what());
+            }
+            catch (std::exception e) {
+                throw rsgis::RSGISException(e.what());
+            }
+        }
 		else if(option == RSGISExeImageCalculation::pca)
 		{
 			GDALAllRegister();

@@ -70,6 +70,12 @@ namespace rsgis{ namespace cmds {
     void executeImagePixelLinearFit(std::string inputImage, std::string outputImage, std::string gdalFormat, std::string bandValues, float noDataValue, bool useNoDataValue)throw(RSGISCmdException);
     /** Function to perform image normalisation */
     void executeNormalisation(std::vector<std::string> inputImages, std::vector<std::string> outputImages, bool calcInMinMax, double inMin, double inMax, double outMin, double outMax)throw(RSGISCmdException);
+    /** Function to calculate the correlation between 2 images */
+    void executeCorrelation(std::string inputImageA, std::string inputImageB, std::string outputMatrix) throw(RSGISCmdException);
+    /** Function to calculate the covariance between 2 images */
+    void executeCovariance(std::string inputImageA, std::string inputImageB, std::string inputMatrixA, std::string inputMatrixB, bool shouldCalcMean, std::string outputMatrix)throw(RSGISCmdException);
+    /** Function to calculate the mean vector of an image */
+    void executeMeanVector(std::string inputImage, std::string outputMatrix)throw(RSGISCmdException);
 }}
 
 
