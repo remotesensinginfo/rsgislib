@@ -2913,11 +2913,9 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
                 rsgis::cmds::executeNormalisation(inImages, outImages, this->calcInMinMax, this->inMin, this->inMax, this->outMin, this->outMax);
             } catch (rsgis::RSGISException e) {
                 throw rsgis::RSGISException(e.what());
-            }
-            catch (rsgis::cmds::RSGISCmdException e) {
+            } catch (rsgis::cmds::RSGISCmdException e) {
                 throw rsgis::RSGISException(e.what());
-            }
-            catch (std::exception e) {
+            } catch (std::exception e) {
                 throw rsgis::RSGISException(e.what());
             }
 
@@ -2928,11 +2926,9 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
                 rsgis::cmds::executeCorrelation(this->inputImageA, this->inputImageB, this->outputMatrix);
             } catch (rsgis::RSGISException e) {
                 throw rsgis::RSGISException(e.what());
-            }
-            catch (rsgis::cmds::RSGISCmdException e) {
+            } catch (rsgis::cmds::RSGISCmdException e) {
                 throw rsgis::RSGISException(e.what());
-            }
-            catch (std::exception e) {
+            } catch (std::exception e) {
                 throw rsgis::RSGISException(e.what());
             }
 
@@ -2943,11 +2939,9 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
                 rsgis::cmds::executeCovariance(this->inputImageA, this->inputImageB, this->inputMatrixA, this->inputMatrixB, this->calcMean, this->outputMatrix);
             } catch (rsgis::RSGISException e) {
                 throw rsgis::RSGISException(e.what());
-            }
-            catch (rsgis::cmds::RSGISCmdException e) {
+            } catch (rsgis::cmds::RSGISCmdException e) {
                 throw rsgis::RSGISException(e.what());
-            }
-            catch (std::exception e) {
+            } catch (std::exception e) {
                 throw rsgis::RSGISException(e.what());
             }
 		}
@@ -2957,103 +2951,35 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
                 rsgis::cmds::executeMeanVector(this->inputImage, this->outputMatrix);
             } catch (rsgis::RSGISException e) {
                 throw rsgis::RSGISException(e.what());
-            }
-            catch (rsgis::cmds::RSGISCmdException e) {
+            } catch (rsgis::cmds::RSGISCmdException e) {
                 throw rsgis::RSGISException(e.what());
-            }
-            catch (std::exception e) {
+            } catch (std::exception e) {
                 throw rsgis::RSGISException(e.what());
             }
         }
 		else if(option == RSGISExeImageCalculation::pca)
 		{
-			GDALAllRegister();
-			GDALDataset **datasets = NULL;
-			
-			rsgis::math::RSGISMatrices matrixUtils;	
-			rsgis::img::RSGISCalcImage *calcImage = NULL;
-			rsgis::img::RSGISApplyEigenvectors *applyPCA = NULL;
-			rsgis::math::Matrix *eigenvectorsMatrix = NULL;
-			
-			try
-			{
-				std::cout << "Reading in from file " << this->eigenvectors << std::endl;
-				eigenvectorsMatrix = matrixUtils.readMatrixFromTxt(this->eigenvectors);
-				std::cout << "Finished reading in matrix\n";
-				
-				datasets = new GDALDataset*[1];
-				std::cout << "Reading in image " << this->inputImage << std::endl;
-				datasets[0] = (GDALDataset *) GDALOpenShared(this->inputImage.c_str(), GA_ReadOnly);
-				if(datasets[0] == NULL)
-				{
-					std::string message = std::string("Could not open image ") + this->inputImage;
-					throw rsgis::RSGISImageException(message.c_str());
-				}
-				
-				applyPCA = new rsgis::img::RSGISApplyEigenvectors(this->numComponents, eigenvectorsMatrix);
-				calcImage = new rsgis::img::RSGISCalcImage(applyPCA, "", true);
-				calcImage->calcImage(datasets, 1, this->outputImage);
-				
-				GDALClose(datasets[0]);
-			}
-			catch(rsgis::RSGISException e)
-			{
-				throw e;
-			}
-			
-			if(calcImage != NULL)
-			{
-				delete calcImage;
-			}
-			if(applyPCA != NULL)
-			{
-				delete applyPCA;
-			}
-			
-			if(eigenvectorsMatrix != NULL)
-			{
-				matrixUtils.freeMatrix(eigenvectorsMatrix);
-			}
+			try {
+                rsgis::cmds::executePCA(this->eigenvectors, this->inputImage, this->outputImage, this->numComponents);
+            } catch (rsgis::RSGISException e) {
+                throw rsgis::RSGISException(e.what());
+            } catch (rsgis::cmds::RSGISCmdException e) {
+                throw rsgis::RSGISException(e.what());
+            } catch (std::exception e) {
+                throw rsgis::RSGISException(e.what());
+            }
 		}
 		else if(option == RSGISExeImageCalculation::standardise)
 		{
-			GDALAllRegister();
-			GDALDataset **datasets = NULL;
-			
-			rsgis::math::RSGISMatrices matrixUtils;	
-			rsgis::img::RSGISCalcImage *calcImage = NULL;
-			rsgis::img::RSGISStandardiseImage *stdImg = NULL;
-			rsgis::math::Matrix *meanVectorMatrix = NULL;
-			
-			try
-			{
-				std::cout << "Reading in from file " << this->meanvectorStr << std::endl;
-				meanVectorMatrix = matrixUtils.readMatrixFromTxt(this->meanvectorStr);
-				std::cout << "Finished reading in matrix\n";
-				
-				datasets = new GDALDataset*[1];
-				std::cout << "Reading in image " << this->inputImage << std::endl;
-				datasets[0] = (GDALDataset *) GDALOpenShared(this->inputImage.c_str(), GA_ReadOnly);
-				if(datasets[0] == NULL)
-				{
-					std::string message = std::string("Could not open image ") + this->inputImage;
-					throw rsgis::RSGISImageException(message.c_str());
-				}
-				
-				stdImg = new rsgis::img::RSGISStandardiseImage(datasets[0]->GetRasterCount(), meanVectorMatrix);
-				calcImage = new rsgis::img::RSGISCalcImage(stdImg, "", true);
-				calcImage->calcImage(datasets, 1, this->outputImage);
-				
-				delete calcImage;
-				delete stdImg;
-				matrixUtils.freeMatrix(meanVectorMatrix);
-				GDALClose(datasets[0]);
-				
-			}
-			catch(rsgis::RSGISException e)
-			{
-				throw e;
-			}
+			try {
+                rsgis::cmds::executeStandardise(this->meanvectorStr, this->inputImage, this->outputImage);
+            } catch (rsgis::RSGISException e) {
+                throw rsgis::RSGISException(e.what());
+            } catch (rsgis::cmds::RSGISCmdException e) {
+                throw rsgis::RSGISException(e.what());
+            } catch (std::exception e) {
+                throw rsgis::RSGISException(e.what());
+            }
 		}
 		else if(option == RSGISExeImageCalculation::bandmaths)
 		{

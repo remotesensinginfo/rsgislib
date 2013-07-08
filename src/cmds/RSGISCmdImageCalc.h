@@ -76,6 +76,10 @@ namespace rsgis{ namespace cmds {
     void executeCovariance(std::string inputImageA, std::string inputImageB, std::string inputMatrixA, std::string inputMatrixB, bool shouldCalcMean, std::string outputMatrix)throw(RSGISCmdException);
     /** Function to calculate the mean vector of an image */
     void executeMeanVector(std::string inputImage, std::string outputMatrix)throw(RSGISCmdException);
+    /** Function to perform principal components analysis of an image */
+    void executePCA(std::string eigenvectors, std::string inputImage, std::string outputImage, int numComponents)throw(RSGISCmdException);
+    /** Function to generate a standardised image using the mean vector provided */
+    void executeStandardise(std::string meanvectorStr, std::string inputImage, std::string outputImage)throw(RSGISCmdException);
 }}
 
 

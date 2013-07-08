@@ -41,6 +41,8 @@
 #include "img/RSGISCalcImageMatrix.h"
 #include "img/RSGISFitFunction2Pxls.h"
 #include "img/RSGISImageNormalisation.h"
+#include "img/RSGISStandardiseImage.h"
+#include "img/RSGISApplyEigenvectors.h"
 
 #include "math/RSGISVectors.h"
 #include "math/RSGISMatrices.h"
@@ -787,6 +789,16 @@ namespace rsgis{ namespace cmds {
             delete calcCC;
             delete calcImgMatrix;
             delete calcImgSingle;
+            
+            if(datasetsA[0] != NULL) {
+                GDALClose(datasetsA[0]);
+            }
+            if(datasetsB[0] != NULL) {
+                GDALClose(datasetsB[0]);
+            }
+            
+            delete [] datasetsA;
+            delete [] datasetsB;
         }
         catch(rsgis::RSGISException e)
         {
@@ -900,6 +912,17 @@ namespace rsgis{ namespace cmds {
         {
             matrixUtils.freeMatrix(covarianceMatrix);
         }
+        
+        if(datasetsA[0] != NULL) {
+            GDALClose(datasetsA[0]);
+        }
+        if(datasetsB[0] != NULL) {
+            GDALClose(datasetsB[0]);
+        }
+        
+        delete [] datasetsA;
+        delete [] datasetsB;
+
     }
     
     void executeMeanVector(std::string inputImage, std::string outputMatrix)throw(RSGISCmdException)
@@ -922,7 +945,7 @@ namespace rsgis{ namespace cmds {
             if(datasets[0] == NULL)
             {
                 std::string message = std::string("Could not open image ") + inputImage;
-                throw rsgis::RSGISImageException(message.c_str());
+                throw RSGISCmdException(message.c_str());
             }
             
             calcMean = new rsgis::img::RSGISCalcMeanVectorIndividual(1);
@@ -933,7 +956,7 @@ namespace rsgis{ namespace cmds {
         }
         catch(rsgis::RSGISException e)
         {
-            throw e;
+            throw RSGISCmdException(e.what());
         }
         
         if(calcImgSingle != NULL)
@@ -953,7 +976,111 @@ namespace rsgis{ namespace cmds {
         {
             matrixUtils.freeMatrix(meanVectorMatrix);
         }
+        
+        if(datasets[0] != NULL) {
+            GDALClose(datasets[0]);
+        }
+        
+        delete [] datasets;
 
+    }
+    
+    void executePCA(std::string eigenvectors, std::string inputImage, std::string outputImage, int numComponents)throw(RSGISCmdException)
+    {
+        GDALAllRegister();
+        GDALDataset **datasets = NULL;
+        
+        rsgis::math::RSGISMatrices matrixUtils;
+        rsgis::img::RSGISCalcImage *calcImage = NULL;
+        rsgis::img::RSGISApplyEigenvectors *applyPCA = NULL;
+        rsgis::math::Matrix *eigenvectorsMatrix = NULL;
+        
+        try
+        {
+            std::cout << "Reading in from file " << eigenvectors << std::endl;
+            eigenvectorsMatrix = matrixUtils.readMatrixFromTxt(eigenvectors);
+            std::cout << "Finished reading in matrix\n";
+            
+            datasets = new GDALDataset*[1];
+            std::cout << "Reading in image " << inputImage << std::endl;
+            datasets[0] = (GDALDataset *) GDALOpenShared(inputImage.c_str(), GA_ReadOnly);
+            if(datasets[0] == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            applyPCA = new rsgis::img::RSGISApplyEigenvectors(numComponents, eigenvectorsMatrix);
+            calcImage = new rsgis::img::RSGISCalcImage(applyPCA, "", true);
+            calcImage->calcImage(datasets, 1, outputImage);
+            
+            if(datasets[0] != NULL) {
+                GDALClose(datasets[0]);
+            }
+            
+        }
+        catch(rsgis::RSGISException e)
+        {
+            throw e;
+        }
+        
+        if(calcImage != NULL)
+        {
+            delete calcImage;
+        }
+        if(applyPCA != NULL)
+        {
+            delete applyPCA;
+        }
+        
+        if(eigenvectorsMatrix != NULL)
+        {
+            matrixUtils.freeMatrix(eigenvectorsMatrix);
+        }
+    
+        delete [] datasets;
+    }
+    
+    void executeStandardise(std::string meanvectorStr, std::string inputImage, std::string outputImage)throw(RSGISCmdException)
+    {
+        GDALAllRegister();
+        GDALDataset **datasets = NULL;
+        
+        rsgis::math::RSGISMatrices matrixUtils;
+        rsgis::img::RSGISCalcImage *calcImage = NULL;
+        rsgis::img::RSGISStandardiseImage *stdImg = NULL;
+        rsgis::math::Matrix *meanVectorMatrix = NULL;
+        
+        try
+        {
+            std::cout << "Reading in from file " << meanvectorStr << std::endl;
+            meanVectorMatrix = matrixUtils.readMatrixFromTxt(meanvectorStr);
+            std::cout << "Finished reading in matrix\n";
+            
+            datasets = new GDALDataset*[1];
+            std::cout << "Reading in image " << inputImage << std::endl;
+            datasets[0] = (GDALDataset *) GDALOpenShared(inputImage.c_str(), GA_ReadOnly);
+            if(datasets[0] == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            stdImg = new rsgis::img::RSGISStandardiseImage(datasets[0]->GetRasterCount(), meanVectorMatrix);
+            calcImage = new rsgis::img::RSGISCalcImage(stdImg, "", true);
+            calcImage->calcImage(datasets, 1, outputImage);
+            
+            delete calcImage;
+            delete stdImg;
+            matrixUtils.freeMatrix(meanVectorMatrix);
+            GDALClose(datasets[0]);
+            delete [] datasets;
+            
+        }
+        catch(rsgis::RSGISException e)
+        {
+            throw e;
+        }
     }
     
 }}
