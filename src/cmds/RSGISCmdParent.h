@@ -67,7 +67,7 @@ namespace rsgis{ namespace cmds {
     };
     
     // function for converting a GDAL type to a rsgis type
-    inline rsgis::RSGISLibDataType GDAL_to_RGGIS_Type( GDALDataType gdalType )
+    inline rsgis::RSGISLibDataType GDAL_to_RSGIS_Type( GDALDataType gdalType )
     {
         rsgis::RSGISLibDataType rsgisType = rsgis::rsgis_undefined;
         switch( gdalType )

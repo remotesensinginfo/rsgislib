@@ -2894,72 +2894,33 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 	{
 		if(option == RSGISExeImageCalculation::normalise)
 		{
-			GDALAllRegister();
-			GDALDataset *dataset = NULL;
-            rsgis::img::RSGISImageNormalisation *normImage = NULL;
-			double *imageMaxBands = NULL;
-			double *imageMinBands = NULL;
-			double *outMinBands = NULL;
-			double *outMaxBands = NULL;
-			
-			int rasterCount = 0;
-			
-			try
-			{
-				normImage = new rsgis::img::RSGISImageNormalisation();
-				
-				for(int i = 0; i < this->numImages; i++)
-				{
-					std::cout << this->inputImages[i] << std::endl;
-					dataset = (GDALDataset *) GDALOpen(this->inputImages[i].c_str(), GA_ReadOnly);
-					if(dataset == NULL)
-					{
-						std::string message = std::string("Could not open image ") + this->inputImages[i];
-						throw rsgis::RSGISImageException(message.c_str());
-					}
-					
-					rasterCount = dataset->GetRasterCount();
-					
-					imageMaxBands = new double[rasterCount];
-					imageMinBands = new double[rasterCount];
-					outMinBands = new double[rasterCount];
-					outMaxBands = new double[rasterCount];
-					
-					for(int j = 0; j < rasterCount; j++)
-					{
-						if(this->calcInMinMax)
-						{
-							imageMaxBands[j] = 0;
-							imageMinBands[j] = 0;
-						}
-						else 
-						{
-							imageMaxBands[j] = this->inMax;
-							imageMinBands[j] = this->inMin;
-						}
-						outMaxBands[j] = this->outMax;
-						outMinBands[j] = this->outMin;
-					}
-					normImage->normaliseImage(dataset, imageMaxBands, imageMinBands, outMaxBands, outMinBands, this->calcInMinMax, this->outputImages[i]);
-					
-					GDALClose(dataset);
-					delete[] imageMinBands;
-					delete[] imageMaxBands;
-					delete[] outMinBands;
-					delete[] outMaxBands;
-				}	
-				delete[] inputImages;
-				delete[] outputImages;
-			}
-			catch(rsgis::RSGISException e)
-			{
-				throw e;
-			}
-			
-			if(normImage != NULL)
-			{
-				delete normImage;
-			}			
+			// iterate through member arrays converting to vectors
+            std::vector<std::string> inImages, outImages;
+            inImages.reserve(this->numImages);
+            outImages.reserve(this->numImages);
+            
+            for(int i = 0; i < this->numImages; ++i) {
+                inImages.push_back(this->inputImages[i]);
+                outImages.push_back(this->outputImages[i]);
+            }
+            
+            // cleanup members
+            if(this->inputImages != NULL) { delete[] this->inputImages; }
+            if(this->outputImages != NULL) { delete[] this->outputImages; }
+            
+            // pass to function and catch errors
+            try {
+                rsgis::cmds::executeNormalisation(inImages, outImages, this->calcInMinMax, this->inMin, this->inMax, this->outMin, this->outMax);
+            } catch (rsgis::RSGISException e) {
+                throw rsgis::RSGISException(e.what());
+            }
+            catch (rsgis::cmds::RSGISCmdException e) {
+                throw rsgis::RSGISException(e.what());
+            }
+            catch (std::exception e) {
+                throw rsgis::RSGISException(e.what());
+            }
+
 		}
 		else if(option == RSGISExeImageCalculation::correlation)
 		{
