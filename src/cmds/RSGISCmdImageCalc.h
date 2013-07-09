@@ -84,6 +84,8 @@ namespace rsgis{ namespace cmds {
     void executeReplaceValuesLessThan(std::string inputImage, std::string outputImage, double threshold, double value)throw(RSGISCmdException);
     /** Function to convert the image spectra to unit area */
     void executeUnitArea(std::string inputImage, std::string outputImage, std::string inMatrixfile)throw(RSGISCmdException);
+    /** Function to calculate the speed of movement (mean, min and max) */
+    void executeMovementSpeed(std::vector<std::string> inputImages, std::vector<unsigned int> imageBands, std::vector<float> imageTimes, float upper, float lower, std::string outputImage)throw(RSGISCmdException);
 }}
 
 

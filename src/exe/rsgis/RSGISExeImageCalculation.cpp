@@ -3071,82 +3071,38 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 		{
 			std::cout << "This command calculates the speed of movment (mean, min and max)\n";
 			std::cout << "Output Image: " << this->outputImage << std::endl;
+            
+            std::vector<std::string> inImages;
+            std::vector<unsigned int> inImageBands;
+            std::vector<float> inImageTimes;
+            
+            inImages.reserve(this->numImages);
+            inImageBands.reserve(this->numImages);
+            inImageTimes.reserve(this->numImages);
+            
+            
 			for(int i = 0; i < this->numImages; ++i)
 			{
 				std::cout << "Image: " << this->inputImages[i] << " using band " << this->imageBands[i] << " at time " << this->imageTimes[i] << std::endl;
+                inImages.push_back(this->inputImages[i]);
+                inImageBands.push_back(this->imageBands[i]);
+                inImageTimes.push_back(this->imageTimes[i]);
 			}
+            
+            delete[] this->inputImages;
+            delete[] this->imageBands;
+            delete[] this->imageTimes;
+            
 			
-			GDALAllRegister();
-			GDALDataset **datasets = NULL;
-			rsgis::img::RSGISCalcImage *calcImage = NULL;
-			rsgis::img::RSGISCalculateImageMovementSpeed *calcImageValue = NULL;
-			
-			try
-			{
-				datasets = new GDALDataset*[numImages];
-				
-				unsigned int numRasterBands = 0;
-				unsigned int totalNumRasterBands = 0;
-				unsigned int *imgBandsInStack = new unsigned int[numImages];
-				
-				for(int i = 0; i < this->numImages; ++i)
-				{
-					datasets[i] = (GDALDataset *) GDALOpen(this->inputImages[i].c_str(), GA_ReadOnly);
-					if(datasets[i] == NULL)
-					{
-						std::string message = std::string("Could not open image ") + this->inputImages[i];
-						throw rsgis::RSGISImageException(message.c_str());
-					}
-					
-					numRasterBands = datasets[i]->GetRasterCount();
-					imgBandsInStack[i] = totalNumRasterBands + imageBands[i];
-					
-					std::cout << "Opened Image: " << this->inputImages[i] << " will be using band " << imgBandsInStack[i] << " in stack." << std::endl;
-					
-					if(imageBands[i] > (numRasterBands-1))
-					{
-						throw rsgis::RSGISImageException("You have specified a band which is not within the image");
-					}
-					
-					totalNumRasterBands += numRasterBands;
-				}
-				
-				int numOutputBands = ((this->numImages-1)*2) + 3;
-                
-                rsgis::math::RSGISMathsUtils mathUtils;
-                std::string *outBandNames = new std::string[numOutputBands];
-                outBandNames[0] = std::string("Mean Movement Speed");
-                outBandNames[1] = std::string("Min Movement Speed");
-                outBandNames[2] = std::string("Max Movement Speed");
-                
-                int idx = 0;
-                for(int i = 0; i < this->numImages-1; ++i)
-                {
-                    idx = (i * 2) + 3;
-                    outBandNames[idx] = std::string("Images ") + mathUtils.inttostring(i+1) + std::string("-") + mathUtils.inttostring(i+2) + std::string(" Displacement");
-                    outBandNames[idx+1] = std::string("Images ") + mathUtils.inttostring(i+1) + std::string("-") + mathUtils.inttostring(i+2) + std::string(" Movement");
-                }
-				
-				std::cout << "Number of Output Image bands = " << numOutputBands << std::endl;
-				
-				calcImageValue = new rsgis::img::RSGISCalculateImageMovementSpeed(numOutputBands, this->numImages, imgBandsInStack, this->imageTimes, upper, lower);
-				calcImage = new rsgis::img::RSGISCalcImage(calcImageValue, "", true);
-				calcImage->calcImage(datasets, this->numImages, this->outputImage, true, outBandNames);
-				
-				for(int i = 0; i < this->numImages; ++i)
-				{
-					GDALClose(datasets[i]);
-				}
-				delete[] datasets;
-
-				delete calcImage;
-				delete calcImageValue;
-			}
-			catch(rsgis::RSGISException e)
-			{
-				throw e;
-			}
-			
+			try {
+                rsgis::cmds::executeMovementSpeed(inImages, inImageBands, inImageTimes, this->upper, this->lower, this->outputImage);
+            } catch (rsgis::RSGISException e) {
+                throw rsgis::RSGISException(e.what());
+            } catch (rsgis::cmds::RSGISCmdException e) {
+                throw rsgis::RSGISException(e.what());
+            } catch (std::exception e) {
+                throw rsgis::RSGISException(e.what());
+            }
 		}
 		else if(option == RSGISExeImageCalculation::countvalsincol)
 		{
