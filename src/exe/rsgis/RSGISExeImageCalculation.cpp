@@ -3033,62 +3033,16 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 			std::cout << "Image: " << this->inputImage << std::endl;
 			std::cout << "Output: " << this->outputImage << std::endl;
 			std::cout << "Image Bands Matrix: " << this->inMatrixfile << std::endl;
-			
-			GDALAllRegister();
-			GDALDataset **datasets = NULL;
-			rsgis::img::RSGISCalcImageValue *calcImageValue = NULL;
-			rsgis::img::RSGISCalcImage *calcImage = NULL;
-			rsgis::math::RSGISMatrices matrixUtils;
-			
-			try
-			{
-				datasets = new GDALDataset*[1];
-				
-				datasets[0] = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_ReadOnly);
-				if(datasets[0] == NULL)
-				{
-					std::string message = std::string("Could not open image ") + this->inputImage;
-					throw rsgis::RSGISImageException(message.c_str());
-				}
-				
-				int numImgBands = datasets[0]->GetRasterCount();
-				
-				rsgis::math::Matrix *bandsValuesMatrix = matrixUtils.readMatrixFromTxt(this->inMatrixfile);
-
-				if(bandsValuesMatrix->n != numImgBands)
-				{
-					GDALClose(datasets[0]);
-					matrixUtils.freeMatrix(bandsValuesMatrix);
-					
-					throw rsgis::RSGISException("The bandvalues matrix needs to have the same number of rows as the input image has bands");
-				}
-				
-				if(bandsValuesMatrix->m != 2)
-				{
-					GDALClose(datasets[0]);
-					matrixUtils.freeMatrix(bandsValuesMatrix);
-					
-					throw rsgis::RSGISException("The bandvalues matrix needs to have 2 columns (Wavelength, Width)");
-				}
-				
-				calcImageValue = new rsgis::img::RSGISConvertSpectralToUnitArea(numImgBands, bandsValuesMatrix);
-				
-				calcImage = new rsgis::img::RSGISCalcImage(calcImageValue, "", true);
-				calcImage->calcImage(datasets, 1, this->outputImage);
-				
-				
-				GDALClose(datasets[0]);
-				
-				matrixUtils.freeMatrix(bandsValuesMatrix);
-				
-				delete calcImageValue;
-				delete calcImage;
-			}
-			catch(rsgis::RSGISException &e)
-			{
-				throw e;
-			}
-		}
+            try {
+                rsgis::cmds::executeUnitArea(this->inputImage, this->outputImage, this->inMatrixfile);
+            } catch (rsgis::RSGISException e) {
+                throw rsgis::RSGISException(e.what());
+            } catch (rsgis::cmds::RSGISCmdException e) {
+                throw rsgis::RSGISException(e.what());
+            } catch (std::exception e) {
+                throw rsgis::RSGISException(e.what());
+            }
+        }
 		else if(option == RSGISExeImageCalculation::imagemaths)
 		{
 			std::cout << "This command performs band maths on each band within an image\n";
