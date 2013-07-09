@@ -44,6 +44,7 @@
 #include "img/RSGISStandardiseImage.h"
 #include "img/RSGISApplyEigenvectors.h"
 #include "img/RSGISReplaceValuesLessThanGivenValue.h"
+#include "img/RSGISConvertSpectralToUnitArea.h"
 
 #include "math/RSGISVectors.h"
 #include "math/RSGISMatrices.h"
@@ -1112,6 +1113,67 @@ namespace rsgis{ namespace cmds {
             
             
             GDALClose(datasets[0]);
+            
+            delete calcImageValue;
+            delete calcImage;
+            delete [] datasets;
+        }
+        catch(rsgis::RSGISException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+
+    }
+    
+    void executeUnitArea(std::string inputImage, std::string outputImage, std::string inMatrixfile)throw(RSGISCmdException)
+    {
+        GDALAllRegister();
+        GDALDataset **datasets = NULL;
+        rsgis::img::RSGISCalcImageValue *calcImageValue = NULL;
+        rsgis::img::RSGISCalcImage *calcImage = NULL;
+        rsgis::math::RSGISMatrices matrixUtils;
+        
+        try
+        {
+            datasets = new GDALDataset*[1];
+            
+            datasets[0] = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_ReadOnly);
+            if(datasets[0] == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            int numImgBands = datasets[0]->GetRasterCount();
+            
+            rsgis::math::Matrix *bandsValuesMatrix = matrixUtils.readMatrixFromTxt(inMatrixfile);
+            
+            if(bandsValuesMatrix->n != numImgBands)
+            {
+                GDALClose(datasets[0]);
+                matrixUtils.freeMatrix(bandsValuesMatrix);
+                
+                throw rsgis::RSGISException("The bandvalues matrix needs to have the same number of rows as the input image has bands");
+            }
+            
+            if(bandsValuesMatrix->m != 2)
+            {
+                GDALClose(datasets[0]);
+                matrixUtils.freeMatrix(bandsValuesMatrix);
+                delete [] datasets;
+                
+                throw rsgis::RSGISException("The bandvalues matrix needs to have 2 columns (Wavelength, Width)");
+            }
+            
+            calcImageValue = new rsgis::img::RSGISConvertSpectralToUnitArea(numImgBands, bandsValuesMatrix);
+            
+            calcImage = new rsgis::img::RSGISCalcImage(calcImageValue, "", true);
+            calcImage->calcImage(datasets, 1, outputImage);
+            
+            
+            GDALClose(datasets[0]);
+            
+            matrixUtils.freeMatrix(bandsValuesMatrix);
             
             delete calcImageValue;
             delete calcImage;

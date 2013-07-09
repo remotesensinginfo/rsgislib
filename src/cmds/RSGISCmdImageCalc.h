@@ -82,6 +82,8 @@ namespace rsgis{ namespace cmds {
     void executeStandardise(std::string meanvectorStr, std::string inputImage, std::string outputImage)throw(RSGISCmdException);
     /** Function to replace values less then given, using a threshold */
     void executeReplaceValuesLessThan(std::string inputImage, std::string outputImage, double threshold, double value)throw(RSGISCmdException);
+    /** Function to convert the image spectra to unit area */
+    void executeUnitArea(std::string inputImage, std::string outputImage, std::string inMatrixfile)throw(RSGISCmdException);
 }}
 
 
