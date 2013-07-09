@@ -43,6 +43,7 @@
 #include "img/RSGISImageNormalisation.h"
 #include "img/RSGISStandardiseImage.h"
 #include "img/RSGISApplyEigenvectors.h"
+#include "img/RSGISReplaceValuesLessThanGivenValue.h"
 
 #include "math/RSGISVectors.h"
 #include "math/RSGISMatrices.h"
@@ -1081,6 +1082,46 @@ namespace rsgis{ namespace cmds {
         {
             throw e;
         }
+    }
+    
+    void executeReplaceValuesLessThan(std::string inputImage, std::string outputImage, double threshold, double value)throw(RSGISCmdException)
+    {
+        GDALAllRegister();
+        GDALDataset **datasets = NULL;
+        rsgis::img::RSGISCalcImageValue *calcImageValue = NULL;
+        rsgis::img::RSGISCalcImage *calcImage = NULL;
+        
+        try
+        {
+            datasets = new GDALDataset*[1];
+            
+            datasets[0] = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_ReadOnly);
+            if(datasets[0] == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            int numImgBands = datasets[0]->GetRasterCount();
+            
+            
+            calcImageValue = new rsgis::img::RSGISReplaceValuesLessThanGivenValue(numImgBands, threshold, value);
+            
+            calcImage = new rsgis::img::RSGISCalcImage(calcImageValue, "", true);
+            calcImage->calcImage(datasets, 1, outputImage);
+            
+            
+            GDALClose(datasets[0]);
+            
+            delete calcImageValue;
+            delete calcImage;
+            delete [] datasets;
+        }
+        catch(rsgis::RSGISException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+
     }
     
 }}

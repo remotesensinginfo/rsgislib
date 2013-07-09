@@ -3017,40 +3017,15 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 			std::cout << "Threshold: " << this->threshold << std::endl;
 			std::cout << "Value: " << this->value << std::endl;
 			
-			GDALAllRegister();
-			GDALDataset **datasets = NULL;
-			rsgis::img::RSGISCalcImageValue *calcImageValue = NULL;
-			rsgis::img::RSGISCalcImage *calcImage = NULL;
-			
-			try
-			{
-				datasets = new GDALDataset*[1];
-				
-				datasets[0] = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_ReadOnly);
-				if(datasets[0] == NULL)
-				{
-					std::string message = std::string("Could not open image ") + this->inputImage;
-					throw rsgis::RSGISImageException(message.c_str());
-				}
-				
-				int numImgBands = datasets[0]->GetRasterCount();
-
-				
-				calcImageValue = new rsgis::img::RSGISReplaceValuesLessThanGivenValue(numImgBands, threshold, value);
-				
-				calcImage = new rsgis::img::RSGISCalcImage(calcImageValue, "", true);
-				calcImage->calcImage(datasets, 1, this->outputImage);
-				
-				
-				GDALClose(datasets[0]);
-				
-				delete calcImageValue;
-				delete calcImage;
-			}
-			catch(rsgis::RSGISException &e)
-			{
-				throw e;
-			}
+			try {
+                rsgis::cmds::executeReplaceValuesLessThan(this->inputImage, this->outputImage, this->threshold, this->value);
+            } catch (rsgis::RSGISException e) {
+                throw rsgis::RSGISException(e.what());
+            } catch (rsgis::cmds::RSGISCmdException e) {
+                throw rsgis::RSGISException(e.what());
+            } catch (std::exception e) {
+                throw rsgis::RSGISException(e.what());
+            }
 		}
 		else if(option == RSGISExeImageCalculation::unitarea)
 		{

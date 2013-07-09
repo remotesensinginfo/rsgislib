@@ -80,6 +80,8 @@ namespace rsgis{ namespace cmds {
     void executePCA(std::string eigenvectors, std::string inputImage, std::string outputImage, int numComponents)throw(RSGISCmdException);
     /** Function to generate a standardised image using the mean vector provided */
     void executeStandardise(std::string meanvectorStr, std::string inputImage, std::string outputImage)throw(RSGISCmdException);
+    /** Function to replace values less then given, using a threshold */
+    void executeReplaceValuesLessThan(std::string inputImage, std::string outputImage, double threshold, double value)throw(RSGISCmdException);
 }}
 
 
