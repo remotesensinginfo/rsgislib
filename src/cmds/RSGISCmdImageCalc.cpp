@@ -45,6 +45,7 @@
 #include "img/RSGISApplyEigenvectors.h"
 #include "img/RSGISReplaceValuesLessThanGivenValue.h"
 #include "img/RSGISConvertSpectralToUnitArea.h"
+#include "img/RSGISCalculateImageMovementSpeed.h"
 
 #include "math/RSGISVectors.h"
 #include "math/RSGISMatrices.h"
@@ -1180,6 +1181,94 @@ namespace rsgis{ namespace cmds {
             delete [] datasets;
         }
         catch(rsgis::RSGISException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+
+    }
+    
+    void executeMovementSpeed(std::vector<std::string> inputImages, std::vector<unsigned int> imageBands, std::vector<float> imageTimes, float upper, float lower, std::string outputImage)throw(RSGISCmdException)
+    {
+        GDALAllRegister();
+        GDALDataset **datasets = NULL;
+        rsgis::img::RSGISCalcImage *calcImage = NULL;
+        rsgis::img::RSGISCalculateImageMovementSpeed *calcImageValue = NULL;
+
+        unsigned int numImages = inputImages.size();
+        
+        // check that we have bands and times for each image
+        if(imageBands.size() != numImages || imageTimes.size() != numImages) {
+            throw RSGISCmdException("Bands and Times were not supplied for all images");
+        }
+        
+        try
+        {
+            datasets = new GDALDataset*[numImages];
+            
+            unsigned int numRasterBands = 0;
+            unsigned int totalNumRasterBands = 0;
+            unsigned int *imgBandsInStack = new unsigned int[numImages];
+            
+            for(int i = 0; i < numImages; ++i)
+            {
+                datasets[i] = (GDALDataset *) GDALOpen(inputImages[i].c_str(), GA_ReadOnly);
+                if(datasets[i] == NULL)
+                {
+                    std::string message = std::string("Could not open image ") + inputImages[i];
+                    throw rsgis::RSGISImageException(message.c_str());
+                }
+                
+                numRasterBands = datasets[i]->GetRasterCount();
+                imgBandsInStack[i] = totalNumRasterBands + imageBands[i];
+                
+                std::cout << "Opened Image: " << inputImages[i] << " will be using band " << imgBandsInStack[i] << " in stack." << std::endl;
+                
+                if(imageBands[i] > (numRasterBands-1))
+                {
+                    throw rsgis::RSGISImageException("You have specified a band which is not within the image");
+                }
+                
+                totalNumRasterBands += numRasterBands;
+            }
+            
+            int numOutputBands = ((numImages-1)*2) + 3;
+            
+            rsgis::math::RSGISMathsUtils mathUtils;
+            std::string *outBandNames = new std::string[numOutputBands];
+            outBandNames[0] = std::string("Mean Movement Speed");
+            outBandNames[1] = std::string("Min Movement Speed");
+            outBandNames[2] = std::string("Max Movement Speed");
+            
+            int idx = 0;
+            for(int i = 0; i < numImages-1; ++i)
+            {
+                idx = (i * 2) + 3;
+                outBandNames[idx] = std::string("Images ") + mathUtils.inttostring(i+1) + std::string("-") + mathUtils.inttostring(i+2) + std::string(" Displacement");
+                outBandNames[idx+1] = std::string("Images ") + mathUtils.inttostring(i+1) + std::string("-") + mathUtils.inttostring(i+2) + std::string(" Movement");
+            }
+            
+            std::cout << "Number of Output Image bands = " << numOutputBands << std::endl;
+            
+            float *timesArrayPointer = &imageTimes[0];  // WARNING WARNING - this may be bonkers, on the other hand, it may be a nice shorthand for passing a vector as array
+            
+            calcImageValue = new rsgis::img::RSGISCalculateImageMovementSpeed(numOutputBands, numImages, imgBandsInStack, timesArrayPointer, upper, lower);
+            calcImage = new rsgis::img::RSGISCalcImage(calcImageValue, "", true);
+            calcImage->calcImage(datasets, numImages, outputImage, true, outBandNames);
+            
+            for(int i = 0; i < numImages; ++i)
+            {
+                GDALClose(datasets[i]);
+            }
+            
+            delete[] datasets;
+            delete[] outBandNames;
+            
+            delete calcImage;
+            delete calcImageValue;
+            delete[] imgBandsInStack;
+
+        }
+        catch(rsgis::RSGISException e)
         {
             throw RSGISCmdException(e.what());
         }
