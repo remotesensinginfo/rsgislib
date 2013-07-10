@@ -18,6 +18,12 @@ segmentation_module = Extension(name='segmentation._segmentation',
                 library_dirs=['../src'],
                 libraries=['rsgis_cmds'])
 
+imagecalibration_module = Extension(name='imagecalibration._imagecalibration', 
+                sources=['src/imagecalibration.cpp'],
+                include_dirs=['../src/cmds', '../src'],
+                library_dirs=['../src'],
+                libraries=['rsgis_cmds'])
+
 # do the setup
 setup( name = 'RSGISLib',
         version = '0.1',
@@ -25,8 +31,8 @@ setup( name = 'RSGISLib',
         author = 'Sam Gillingham',
         author_email = 'gillingham.sam@gmail.com',
         packages = ['rsgislib', 'rsgislib.imagecalc', 'rsgislib.imageutils',
-                        'rsgislib.segmentation'],
+                        'rsgislib.segmentation','rsgislib.imagecalibration'],
         ext_package = 'rsgislib',
         ext_modules = [imagecalc_module, imageutils_module, 
-                            segmentation_module])
+                            segmentation_module, imagecalibration_module])
 
