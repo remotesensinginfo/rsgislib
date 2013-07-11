@@ -2896,63 +2896,24 @@ void RSGISExeImageCalibration::runAlgorithm() throw(rsgis::RSGISException)
 				std::cout << "Solar Irradiance for band " <<  i+1 << ":\t" << this->solarIrradiance[i] << std::endl;
 			}
             
-            GDALAllRegister();
-			GDALDataset **datasets = NULL;
-			rsgis::calib::RSGISCalculateTopOfAtmosphereReflectance *calcTopAtmosRefl = NULL;
-			rsgis::img::RSGISCalcImage *calcImage = NULL;
-			
-			try
-			{
-				datasets = new GDALDataset*[1];
-				
-				std::cout << "Open " << this->inputImage << std::endl;
-				datasets[0] = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_ReadOnly);
-				if(datasets[0] == NULL)
-				{
-					std::string message = std::string("Could not open image ") + this->inputImage;
-					throw rsgis::RSGISImageException(message.c_str());
-				}
-				
-				unsigned int numRasterBands = datasets[0]->GetRasterCount();
-                if(this->numBands != numRasterBands)
-                {
-                    GDALClose(datasets[0]);
-                    delete[] datasets;
-                    throw rsgis::RSGISException("The number of input image bands and solar irradiance values are different.");
-                }
-                
-				
-                double solarDistance = 0;
-                
-                solarDistance = rsgis::calib::rsgisCalcSolarDistance(this->julianDay);
-                
-                /*for(int i = 1; i < 366; ++i)
-                 {
-                 double radiansJulianDay = ((i - 4)*0.9856)*(M_PI/180);
-                 std::cout << "radiansJulianDay = " << radiansJulianDay << std::endl;
-                 std::cout << "cos(radiansJulianDay) = " << cos(radiansJulianDay) << std::endl;
-                 double distanceTmp = 1 - 0.01672 * cos(radiansJulianDay);
-                 std::cout << "Day " << i << " = " << distanceTmp << std::endl;
-                 std::cout << "Day " << i << " = " << rsgisCalcSolarDistance(i) << std::endl;
-                 }*/
-                
-				calcTopAtmosRefl = new rsgis::calib::RSGISCalculateTopOfAtmosphereReflectance(numRasterBands, solarIrradiance, solarDistance, (solarZenith*(M_PI/180)), this->scaleFactor);
-				
-				calcImage = new rsgis::img::RSGISCalcImage(calcTopAtmosRefl, "", true);
-				calcImage->calcImage(datasets, 1, this->outputImage, false, NULL, this->imageFormat, this->outDataType);
-				
-				
-				GDALClose(datasets[0]);
-				delete[] datasets;
-                delete[] solarIrradiance;
-                
-				delete calcTopAtmosRefl;
-				delete calcImage;
-			}
-			catch(rsgis::RSGISException e)
-			{
-				throw e;
-			}
+            try
+            {
+                rsgis::cmds::executeConvertRadiance2TOARefl(this->inputImage, this->outputImage, this->imageFormat, this->rsgisOutDataType, this->scaleFactor, this->julianDay, true, 0, 0, 0, (this->solarZenith*(M_PI/180)), this->solarIrradiance, this->numBands);
+            }
+            catch (rsgis::cmds::RSGISCmdException &e)
+            {
+                throw rsgis::RSGISException(e.what());
+            }
+            catch (rsgis::RSGISException &e)
+            {
+                throw e;
+            }
+            catch (std::exception &e)
+            {
+                throw rsgis::RSGISException(e.what());
+            }
+            
+            delete[] solarIrradiance;
         }
         else if(this->option == RSGISExeImageCalibration::apply6s)
         {
@@ -3109,7 +3070,17 @@ void RSGISExeImageCalibration::printParameters()
 		}
         else if(this->option == RSGISExeImageCalibration::topatmosrefl)
         {
+            std::cout << "This command converts at sensor radiance to top of atmosphere reflectance.\n";
+			std::cout << "Input Image: " << this->inputImage << std::endl;
+            std::cout << "Output Image: " << this->outputImage << std::endl;
+            std::cout << "Scaling factor: " << this->scaleFactor << std::endl;
+            std::cout << "Julian Day: " << this->julianDay << std::endl;
+            std::cout << "Solar Zenith: " << this->solarZenith << std::endl;
             
+			for(unsigned int i = 0; i < numBands; ++i)
+			{
+				std::cout << "Solar Irradiance for band " <<  i+1 << ":\t" << this->solarIrradiance[i] << std::endl;
+			}
         }
         else if(this->option == RSGISExeImageCalibration::apply6s)
         {

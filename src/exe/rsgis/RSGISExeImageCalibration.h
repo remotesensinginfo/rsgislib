@@ -33,7 +33,7 @@
 #include "common/RSGISRegistrationException.h"
 
 #include "calibration/RSGISStandardDN2RadianceCalibration.h"
-#include "calibration/RSGISCalculateTopOfAtmosphereReflectance.h"
+//#include "calibration/RSGISCalculateTopOfAtmosphereReflectance.h"
 #include "calibration/RSGISApply6SCoefficients.h"
 
 #include "cmds/RSGISCmdImageCalibration.h"
