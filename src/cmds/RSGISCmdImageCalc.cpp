@@ -1795,7 +1795,7 @@ namespace rsgis{ namespace cmds {
 
     }
     
-    void executeHistogram(std::string inputImage, std::string imageMask, std::string outputFile, unsigned int imgBand, float imgValue, double binWidth, bool calcInMinMax, double inMin, double inMax, void *exeInstance)throw(RSGISCmdException)
+    void executeHistogram(std::string inputImage, std::string imageMask, std::string outputFile, unsigned int imgBand, float imgValue, double binWidth, bool calcInMinMax, double inMin, double inMax)throw(RSGISCmdException)
     {
         try {
             GDALAllRegister();
@@ -1815,7 +1815,7 @@ namespace rsgis{ namespace cmds {
                 throw rsgis::RSGISImageException(message.c_str());
             }
             
-            if(calcInMinMax )
+            if(calcInMinMax)
             {
                 unsigned int numImgBands = datasets[1]->GetRasterCount();
                 rsgis::img::ImageStats **imgStats = new rsgis::img::ImageStats*[numImgBands];
@@ -1844,12 +1844,6 @@ namespace rsgis{ namespace cmds {
             
             inMin = floor(inMin);
             inMax = ceil(inMax);
-            
-            if (exeInstance) {
-                rsgisexe::RSGISExeImageCalculation *theInstance = (rsgisexe::RSGISExeImageCalculation*) exeInstance;
-                theInstance->setInMin(inMin);
-                theInstance->setInMax(inMax);
-            }
             
             rsgis::img::RSGISGenHistogram genHistogram;
             genHistogram.genHistogram(datasets, 2, outputFile, imgBand, inMin, inMax, imgValue, binWidth);
