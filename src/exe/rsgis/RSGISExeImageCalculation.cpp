@@ -3265,7 +3265,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
             std::cout << "Offset: " << this->lsumOffset << std::endl;
             
             try {
-                rsgis::cmds::executeConSum1LinearSpecUnmix(this->inputImage, this->imageFormat, this->outDataType, this->lsumGain, this->lsumOffset, this->lsumWeight, this->outputFile, this->endmembersFile);
+                rsgis::cmds::executeConSum1LinearSpecUnmix(this->inputImage, this->imageFormat, this->rsgisOutDataType, this->lsumGain, this->lsumOffset, this->lsumWeight, this->outputFile, this->endmembersFile);
             } catch (rsgis::RSGISException e) {
                 throw rsgis::RSGISException(e.what());
             } catch (rsgis::cmds::RSGISCmdException e) {

@@ -1735,7 +1735,7 @@ namespace rsgis{ namespace cmds {
         }
     }
     
-    void executeNnConSum1LinearSpecUnmix(std::string inputImage, std::string imageFormat, unsigned int outDataType, float lsumGain, float lsumOffset, float lsumWeight, std::string outputFile, std::string endmembersFile)throw(RSGISCmdException)
+    void executeNnConSum1LinearSpecUnmix(std::string inputImage, std::string imageFormat, RSGISLibDataType outDataType, float lsumGain, float lsumOffset, float lsumWeight, std::string outputFile, std::string endmembersFile)throw(RSGISCmdException)
     {
         GDALAllRegister();
         GDALDataset **datasets = NULL;
@@ -1749,10 +1749,9 @@ namespace rsgis{ namespace cmds {
                 std::string message = std::string("Could not open image ") + inputImage;
                 throw rsgis::RSGISImageException(message.c_str());
             }
+        
             
-            GDALDataType outType = (GDALDataType) outDataType;
-            
-            rsgis::img::RSGISCalcLinearSpectralUnmixing calcSpecUnmix(imageFormat, outType, lsumGain, lsumOffset);
+            rsgis::img::RSGISCalcLinearSpectralUnmixing calcSpecUnmix(imageFormat, RSGIS_to_GDAL_Type(outDataType), lsumGain, lsumOffset);
             calcSpecUnmix.performConstainedNNLinearSpectralUnmixing(datasets, 1, outputFile, endmembersFile, lsumWeight);
             
             GDALClose(datasets[0]);
