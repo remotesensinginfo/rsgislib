@@ -145,6 +145,8 @@ namespace rsgisexe{
 		virtual void printParameters();
 		virtual std::string getDescription();
 		virtual std::string getXMLSchema();
+        virtual void setInMin(double min);
+        virtual void setInMax(double max);
 		virtual void help();
 		~RSGISExeImageCalculation();
 	protected:
