@@ -24,53 +24,54 @@
 
 namespace rsgisexe{
 
-RSGISExeImageCalibration::RSGISExeImageCalibration() : RSGISAlgorithmParameters()
+RSGISExeImageCalibration::RSGISExeImageCalibration() : rsgis::RSGISAlgorithmParameters()
 {
 	this->algorithm = "imagecalibration";
 }
 
-RSGISAlgorithmParameters* RSGISExeImageCalibration::getInstance()
+rsgis::RSGISAlgorithmParameters* RSGISExeImageCalibration::getInstance()
 {
 	return new RSGISExeImageCalibration();
 }
 
-void RSGISExeImageCalibration::retrieveParameters(DOMElement *argElement) throw(RSGISXMLArgumentsException)
+void RSGISExeImageCalibration::retrieveParameters(xercesc::DOMElement *argElement) throw(rsgis::RSGISXMLArgumentsException)
 {
-	RSGISMathsUtils mathUtils;	
-	XMLCh *algorName = XMLString::transcode(this->algorithm.c_str());
-	XMLCh *algorXMLStr = XMLString::transcode("algor");
-	XMLCh *optionXMLStr = XMLString::transcode("option");
-	XMLCh *optionLandsatRadCal = XMLString::transcode("landsatradcal");
-    XMLCh *optionTopAtmosRefl = XMLString::transcode("topatmosrefl");
-    XMLCh *optionSPOTRadCal = XMLString::transcode("spotradcal");
-    XMLCh *optionIkonosRadCal = XMLString::transcode("ikonosradcal");
-    XMLCh *optionASTERRadCal = XMLString::transcode("asterradcal");
-    XMLCh *optionIRSRadCal = XMLString::transcode("irsradcal");
-    XMLCh *optionQuickbird16bitRadCal = XMLString::transcode("quickbird16bitradcal");
-    XMLCh *optionQuickbird8bitRadCal = XMLString::transcode("quickbird8bitradcal");
-    XMLCh *optionWorldView2RadCal = XMLString::transcode("worldview2radcal");
-    XMLCh *optionApply6S = XMLString::transcode("apply6s");
+	rsgis::math::RSGISMathsUtils mathUtils;
+	XMLCh *algorName = xercesc::XMLString::transcode(this->algorithm.c_str());
+	XMLCh *algorXMLStr = xercesc::XMLString::transcode("algor");
+	XMLCh *optionXMLStr = xercesc::XMLString::transcode("option");
+	XMLCh *optionLandsatRadCal = xercesc::XMLString::transcode("landsatradcal");
+    XMLCh *optionTopAtmosRefl = xercesc::XMLString::transcode("topatmosrefl");
+    XMLCh *optionSPOTRadCal = xercesc::XMLString::transcode("spotradcal");
+    XMLCh *optionIkonosRadCal = xercesc::XMLString::transcode("ikonosradcal");
+    XMLCh *optionASTERRadCal = xercesc::XMLString::transcode("asterradcal");
+    XMLCh *optionIRSRadCal = xercesc::XMLString::transcode("irsradcal");
+    XMLCh *optionQuickbird16bitRadCal = xercesc::XMLString::transcode("quickbird16bitradcal");
+    XMLCh *optionQuickbird8bitRadCal = xercesc::XMLString::transcode("quickbird8bitradcal");
+    XMLCh *optionWorldView2RadCal = xercesc::XMLString::transcode("worldview2radcal");
+    XMLCh *optionApply6S = xercesc::XMLString::transcode("apply6s");
     
 	try
 	{
 		const XMLCh *algorNameEle = argElement->getAttribute(algorXMLStr);
-		if(!XMLString::equals(algorName, algorNameEle))
+		if(!xercesc::XMLString::equals(algorName, algorNameEle))
 		{
-			throw RSGISXMLArgumentsException("The algorithm name is incorrect.");
+			throw rsgis::RSGISXMLArgumentsException("The algorithm name is incorrect.");
 		}
         
         // Set output image format (defaults to ENVI)
 		this->imageFormat = "ENVI";
-		XMLCh *formatXMLStr = XMLString::transcode("format");
+		XMLCh *formatXMLStr = xercesc::XMLString::transcode("format");
 		if(argElement->hasAttribute(formatXMLStr))
 		{
-			char *charValue = XMLString::transcode(argElement->getAttribute(formatXMLStr));
-			this->imageFormat = string(charValue);
-			XMLString::release(&charValue);
+			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(formatXMLStr));
+			this->imageFormat = std::string(charValue);
+			xercesc::XMLString::release(&charValue);
 		}
-		XMLString::release(&formatXMLStr);
+		xercesc::XMLString::release(&formatXMLStr);
         
         this->outDataType = GDT_Float32;
+        this->rsgisOutDataType = rsgis::rsgis_32float;
         XMLCh *datatypeXMLStr = xercesc::XMLString::transcode("datatype");
         if(argElement->hasAttribute(datatypeXMLStr))
         {
@@ -86,34 +87,43 @@ void RSGISExeImageCalibration::retrieveParameters(DOMElement *argElement) throw(
             if(xercesc::XMLString::equals(dtByte, dtXMLValue))
             {
                 this->outDataType = GDT_Byte;
+                this->rsgisOutDataType = rsgis::rsgis_8int;
             }
             else if(xercesc::XMLString::equals(dtUInt16, dtXMLValue))
             {
                 this->outDataType = GDT_UInt16;
+                this->rsgisOutDataType = rsgis::rsgis_16uint;
             }
             else if(xercesc::XMLString::equals(dtInt16, dtXMLValue))
             {
                 this->outDataType = GDT_Int16;
+                this->rsgisOutDataType = rsgis::rsgis_16int;
             }
             else if(xercesc::XMLString::equals(dtUInt32, dtXMLValue))
             {
                 this->outDataType = GDT_UInt32;
+                this->rsgisOutDataType = rsgis::rsgis_32uint;
             }
             else if(xercesc::XMLString::equals(dtInt32, dtXMLValue))
             {
                 this->outDataType = GDT_Int32;
+                this->rsgisOutDataType = rsgis::rsgis_32int;
             }
             else if(xercesc::XMLString::equals(dtFloat32, dtXMLValue))
             {
                 this->outDataType = GDT_Float32;
+                this->rsgisOutDataType = rsgis::rsgis_32float;
             }
             else if(xercesc::XMLString::equals(dtFloat64, dtXMLValue))
             {
                 this->outDataType = GDT_Float64;
+                this->rsgisOutDataType = rsgis::rsgis_64float;
             }
             else
             {
+                std::cerr << "Data type not recognised, defaulting to 32 bit float.";
                 this->outDataType = GDT_Float32;
+                this->rsgisOutDataType = rsgis::rsgis_32float;
             }
             
             xercesc::XMLString::release(&dtByte);
@@ -127,562 +137,566 @@ void RSGISExeImageCalibration::retrieveParameters(DOMElement *argElement) throw(
         xercesc::XMLString::release(&datatypeXMLStr);
 		
 		const XMLCh *optionXML = argElement->getAttribute(optionXMLStr);
-		if(XMLString::equals(optionLandsatRadCal, optionXML))
+		if(xercesc::XMLString::equals(optionLandsatRadCal, optionXML))
 		{
             this->option = landsatradcal;
-            XMLCh *outputXMLStr = XMLString::transcode("output");
+            XMLCh *outputXMLStr = xercesc::XMLString::transcode("output");
             if(argElement->hasAttribute(outputXMLStr))
             {
-                char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
-                this->outputImage = string(charValue);
-                XMLString::release(&charValue);
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outputXMLStr));
+                this->outputImage = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
             }
             else
             {
-                throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+                throw rsgis::RSGISXMLArgumentsException("No \'output\' attribute was provided.");
             }
-            XMLString::release(&outputXMLStr);
+            xercesc::XMLString::release(&outputXMLStr);
 
             
-            DOMNodeList *bandsNodesList = argElement->getElementsByTagName(XMLString::transcode("rsgis:band"));
+            xercesc::DOMNodeList *bandsNodesList = argElement->getElementsByTagName(xercesc::XMLString::transcode("rsgis:band"));
             this->numBands = bandsNodesList->getLength();		
             
-            cout << "Found " << this->numBands << " Bands listed.\n";
+            std::cout << "Found " << this->numBands << " Bands listed.\n";
             
-            DOMElement *bandElement = NULL;
-            landsatRadGainOffs = new LandsatRadianceGainsOffsets[numBands];
-            inputImages = new string[numBands];
+            xercesc::DOMElement *bandElement = NULL;
+            
+            landsatRadGainOffs.reserve(numBands);
             
             for(unsigned int i = 0; i < numBands; i++)
             {
-                bandElement = static_cast<DOMElement*>(bandsNodesList->item(i));
+                bandElement = static_cast<xercesc::DOMElement*>(bandsNodesList->item(i));
                 
-                XMLCh *bandNameXMLStr = XMLString::transcode("name");
+                rsgis::cmds::CmdsLandsatRadianceGainsOffsets radVals;
+                
+                XMLCh *bandNameXMLStr = xercesc::XMLString::transcode("name");
                 if(bandElement->hasAttribute(bandNameXMLStr))
                 {
-                    char *charValue = XMLString::transcode(bandElement->getAttribute(bandNameXMLStr));
-                    this->landsatRadGainOffs[i].bandName = string(charValue);
-                    XMLString::release(&charValue);
+                    char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(bandNameXMLStr));
+                    radVals.bandName = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
                 }
                 else
                 {
-                    throw RSGISXMLArgumentsException("No \'name\' attribute was provided.");
+                    throw rsgis::RSGISXMLArgumentsException("No \'name\' attribute was provided.");
                 }
-                XMLString::release(&bandNameXMLStr);
+                xercesc::XMLString::release(&bandNameXMLStr);
                 
-                XMLCh *bandImageXMLStr = XMLString::transcode("image");
+                XMLCh *bandImageXMLStr = xercesc::XMLString::transcode("image");
                 if(bandElement->hasAttribute(bandImageXMLStr))
                 {
-                    char *charValue = XMLString::transcode(bandElement->getAttribute(bandImageXMLStr));
-                    this->inputImages[i] = string(charValue);
-                    XMLString::release(&charValue);
+                    char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(bandImageXMLStr));
+                    radVals.imagePath = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
                 }
                 else
                 {
-                    throw RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+                    throw rsgis::RSGISXMLArgumentsException("No \'image\' attribute was provided.");
                 }
-                XMLString::release(&bandImageXMLStr);
+                xercesc::XMLString::release(&bandImageXMLStr);
                 
-                XMLCh *bandIdxXMLStr = XMLString::transcode("band");
+                XMLCh *bandIdxXMLStr = xercesc::XMLString::transcode("band");
                 if(bandElement->hasAttribute(bandIdxXMLStr))
                 {
-                    char *charValue = XMLString::transcode(bandElement->getAttribute(bandIdxXMLStr));
-                    this->landsatRadGainOffs[i].band = mathUtils.strtounsignedint(string(charValue));
-                    XMLString::release(&charValue);
+                    char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(bandIdxXMLStr));
+                    radVals.band = mathUtils.strtounsignedint(std::string(charValue));
+                    xercesc::XMLString::release(&charValue);
                 }
                 else
                 {
-                    throw RSGISXMLArgumentsException("No \'band\' attribute was provided.");
+                    throw rsgis::RSGISXMLArgumentsException("No \'band\' attribute was provided.");
                 }
-                XMLString::release(&bandIdxXMLStr);
+                xercesc::XMLString::release(&bandIdxXMLStr);
                 
-                XMLCh *sensorBandXMLStr = XMLString::transcode("sensorband");
+                XMLCh *sensorBandXMLStr = xercesc::XMLString::transcode("sensorband");
                 if(bandElement->hasAttribute(sensorBandXMLStr))
                 {
-                    char *charValue = XMLString::transcode(bandElement->getAttribute(sensorBandXMLStr));
-                    string sensorBand = string(charValue);
+                    char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(sensorBandXMLStr));
+                    std::string sensorBand = std::string(charValue);
                     if(sensorBand == "LMSS1_B1")
                     {
-                        this->landsatRadGainOffs[i].lMin = 0;
-                        this->landsatRadGainOffs[i].lMax = 248;
-                        this->landsatRadGainOffs[i].qCalMin = 0;
-                        this->landsatRadGainOffs[i].qCalMax = 127;
+                        radVals.lMin = 0;
+                        radVals.lMax = 248;
+                        radVals.qCalMin = 0;
+                        radVals.qCalMax = 127;
                     }
                     else if(sensorBand == "LMSS1_B2")
                     {
-                        this->landsatRadGainOffs[i].lMin = 0;
-                        this->landsatRadGainOffs[i].lMax = 200;
-                        this->landsatRadGainOffs[i].qCalMin = 0;
-                        this->landsatRadGainOffs[i].qCalMax = 127;
+                        radVals.lMin = 0;
+                        radVals.lMax = 200;
+                        radVals.qCalMin = 0;
+                        radVals.qCalMax = 127;
                     }
                     else if(sensorBand == "LMSS1_B3")
                     {
-                        this->landsatRadGainOffs[i].lMin = 0;
-                        this->landsatRadGainOffs[i].lMax = 176;
-                        this->landsatRadGainOffs[i].qCalMin = 0;
-                        this->landsatRadGainOffs[i].qCalMax = 127;
+                        radVals.lMin = 0;
+                        radVals.lMax = 176;
+                        radVals.qCalMin = 0;
+                        radVals.qCalMax = 127;
                     }
                     else if(sensorBand == "LMSS1_B4")
                     {
-                        this->landsatRadGainOffs[i].lMin = 0;
-                        this->landsatRadGainOffs[i].lMax = 153;
-                        this->landsatRadGainOffs[i].qCalMin = 0;
-                        this->landsatRadGainOffs[i].qCalMax = 127;
+                        radVals.lMin = 0;
+                        radVals.lMax = 153;
+                        radVals.qCalMin = 0;
+                        radVals.qCalMax = 127;
                     }
                     else if(sensorBand == "LMSS2_B1")
                     {
-                        this->landsatRadGainOffs[i].lMin = 8;
-                        this->landsatRadGainOffs[i].lMax = 263;
-                        this->landsatRadGainOffs[i].qCalMin = 0;
-                        this->landsatRadGainOffs[i].qCalMax = 127;
+                        radVals.lMin = 8;
+                        radVals.lMax = 263;
+                        radVals.qCalMin = 0;
+                        radVals.qCalMax = 127;
                     }
                     else if(sensorBand == "LMSS2_B2")
                     {
-                        this->landsatRadGainOffs[i].lMin = 6;
-                        this->landsatRadGainOffs[i].lMax = 176;
-                        this->landsatRadGainOffs[i].qCalMin = 0;
-                        this->landsatRadGainOffs[i].qCalMax = 127;
+                        radVals.lMin = 6;
+                        radVals.lMax = 176;
+                        radVals.qCalMin = 0;
+                        radVals.qCalMax = 127;
                     }
                     else if(sensorBand == "LMSS2_B3")
                     {
-                        this->landsatRadGainOffs[i].lMin = 6;
-                        this->landsatRadGainOffs[i].lMax = 152;
-                        this->landsatRadGainOffs[i].qCalMin = 0;
-                        this->landsatRadGainOffs[i].qCalMax = 127;
+                        radVals.lMin = 6;
+                        radVals.lMax = 152;
+                        radVals.qCalMin = 0;
+                        radVals.qCalMax = 127;
                     }
                     else if(sensorBand == "LMSS2_B4")
                     {
-                        this->landsatRadGainOffs[i].lMin = 3.66667;
-                        this->landsatRadGainOffs[i].lMax = 130.333;
-                        this->landsatRadGainOffs[i].qCalMin = 0;
-                        this->landsatRadGainOffs[i].qCalMax = 127;
+                        radVals.lMin = 3.66667;
+                        radVals.lMax = 130.333;
+                        radVals.qCalMin = 0;
+                        radVals.qCalMax = 127;
                     }
                     else if(sensorBand == "LMSS3_B1")
                     {
-                        this->landsatRadGainOffs[i].lMin = 4;
-                        this->landsatRadGainOffs[i].lMax = 259;
-                        this->landsatRadGainOffs[i].qCalMin = 0;
-                        this->landsatRadGainOffs[i].qCalMax = 127;
+                        radVals.lMin = 4;
+                        radVals.lMax = 259;
+                        radVals.qCalMin = 0;
+                        radVals.qCalMax = 127;
                     }
                     else if(sensorBand == "LMSS3_B2")
                     {
-                        this->landsatRadGainOffs[i].lMin = 3;
-                        this->landsatRadGainOffs[i].lMax = 179;
-                        this->landsatRadGainOffs[i].qCalMin = 0;
-                        this->landsatRadGainOffs[i].qCalMax = 127;
+                        radVals.lMin = 3;
+                        radVals.lMax = 179;
+                        radVals.qCalMin = 0;
+                        radVals.qCalMax = 127;
                     }
                     else if(sensorBand == "LMSS3_B3")
                     {
-                        this->landsatRadGainOffs[i].lMin = 3;
-                        this->landsatRadGainOffs[i].lMax = 149;
-                        this->landsatRadGainOffs[i].qCalMin = 0;
-                        this->landsatRadGainOffs[i].qCalMax = 127;
+                        radVals.lMin = 3;
+                        radVals.lMax = 149;
+                        radVals.qCalMin = 0;
+                        radVals.qCalMax = 127;
                     }
                     else if(sensorBand == "LMSS3_B4")
                     {
-                        this->landsatRadGainOffs[i].lMin = 1;
-                        this->landsatRadGainOffs[i].lMax = 128;
-                        this->landsatRadGainOffs[i].qCalMin = 0;
-                        this->landsatRadGainOffs[i].qCalMax = 127;
+                        radVals.lMin = 1;
+                        radVals.lMax = 128;
+                        radVals.qCalMin = 0;
+                        radVals.qCalMax = 127;
                     }
                     else if(sensorBand == "LMSS4_B1")
                     {
-                        this->landsatRadGainOffs[i].lMin = 4;
-                        this->landsatRadGainOffs[i].lMax = 238;
-                        this->landsatRadGainOffs[i].qCalMin = 0;
-                        this->landsatRadGainOffs[i].qCalMax = 127;
+                        radVals.lMin = 4;
+                        radVals.lMax = 238;
+                        radVals.qCalMin = 0;
+                        radVals.qCalMax = 127;
                     }
                     else if(sensorBand == "LMSS4_B2")
                     {
-                        this->landsatRadGainOffs[i].lMin = 4;
-                        this->landsatRadGainOffs[i].lMax = 164;
-                        this->landsatRadGainOffs[i].qCalMin = 0;
-                        this->landsatRadGainOffs[i].qCalMax = 127;
+                        radVals.lMin = 4;
+                        radVals.lMax = 164;
+                        radVals.qCalMin = 0;
+                        radVals.qCalMax = 127;
                     }
                     else if(sensorBand == "LMSS4_B3")
                     {
-                        this->landsatRadGainOffs[i].lMin = 5;
-                        this->landsatRadGainOffs[i].lMax = 142;
-                        this->landsatRadGainOffs[i].qCalMin = 0;
-                        this->landsatRadGainOffs[i].qCalMax = 127;
+                        radVals.lMin = 5;
+                        radVals.lMax = 142;
+                        radVals.qCalMin = 0;
+                        radVals.qCalMax = 127;
                     }
                     else if(sensorBand == "LMSS4_B4")
                     {
-                        this->landsatRadGainOffs[i].lMin = 4;
-                        this->landsatRadGainOffs[i].lMax = 116;
-                        this->landsatRadGainOffs[i].qCalMin = 0;
-                        this->landsatRadGainOffs[i].qCalMax = 127;
+                        radVals.lMin = 4;
+                        radVals.lMax = 116;
+                        radVals.qCalMin = 0;
+                        radVals.qCalMax = 127;
                     }
                     else if(sensorBand == "LMSS5_B1")
                     {
-                        this->landsatRadGainOffs[i].lMin = 3;
-                        this->landsatRadGainOffs[i].lMax = 268;
-                        this->landsatRadGainOffs[i].qCalMin = 0;
-                        this->landsatRadGainOffs[i].qCalMax = 127;
+                        radVals.lMin = 3;
+                        radVals.lMax = 268;
+                        radVals.qCalMin = 0;
+                        radVals.qCalMax = 127;
                     }
                     else if(sensorBand == "LMSS5_B2")
                     {
-                        this->landsatRadGainOffs[i].lMin = 3;
-                        this->landsatRadGainOffs[i].lMax = 179;
-                        this->landsatRadGainOffs[i].qCalMin = 0;
-                        this->landsatRadGainOffs[i].qCalMax = 127;
+                        radVals.lMin = 3;
+                        radVals.lMax = 179;
+                        radVals.qCalMin = 0;
+                        radVals.qCalMax = 127;
                     }
                     else if(sensorBand == "LMSS5_B3")
                     {
-                        this->landsatRadGainOffs[i].lMin = 5;
-                        this->landsatRadGainOffs[i].lMax = 148;
-                        this->landsatRadGainOffs[i].qCalMin = 0;
-                        this->landsatRadGainOffs[i].qCalMax = 127;
+                        radVals.lMin = 5;
+                        radVals.lMax = 148;
+                        radVals.qCalMin = 0;
+                        radVals.qCalMax = 127;
                     }
                     else if(sensorBand == "LMSS5_B4")
                     {
-                        this->landsatRadGainOffs[i].lMin = 3;
-                        this->landsatRadGainOffs[i].lMax = 123;
-                        this->landsatRadGainOffs[i].qCalMin = 0;
-                        this->landsatRadGainOffs[i].qCalMax = 127;
+                        radVals.lMin = 3;
+                        radVals.lMax = 123;
+                        radVals.qCalMin = 0;
+                        radVals.qCalMax = 127;
                     }                    
                     else if(sensorBand == "LTM5_B1_Pre1992")
                     {
-                        this->landsatRadGainOffs[i].lMin = -1.52;
-                        this->landsatRadGainOffs[i].lMax = 169;
-                        this->landsatRadGainOffs[i].qCalMin = 1;
-                        this->landsatRadGainOffs[i].qCalMax = 255;
+                        radVals.lMin = -1.52;
+                        radVals.lMax = 169;
+                        radVals.qCalMin = 1;
+                        radVals.qCalMax = 255;
                     }
                     else if(sensorBand == "LTM5_B1_Post1992")
                     {
-                        this->landsatRadGainOffs[i].lMin = -1.52;
-                        this->landsatRadGainOffs[i].lMax = 169;
-                        this->landsatRadGainOffs[i].qCalMin = 1;
-                        this->landsatRadGainOffs[i].qCalMax = 255;
+                        radVals.lMin = -1.52;
+                        radVals.lMax = 169;
+                        radVals.qCalMin = 1;
+                        radVals.qCalMax = 255;
                     }
                     else if(sensorBand == "LTM5_B1_Post1992")
                     {
-                        this->landsatRadGainOffs[i].lMin = -1.52;
-                        this->landsatRadGainOffs[i].lMax = 193;
-                        this->landsatRadGainOffs[i].qCalMin = 1;
-                        this->landsatRadGainOffs[i].qCalMax = 255;
+                        radVals.lMin = -1.52;
+                        radVals.lMax = 193;
+                        radVals.qCalMin = 1;
+                        radVals.qCalMax = 255;
                     }
                     else if(sensorBand == "LTM5_B2_Pre1992")
                     {
-                        this->landsatRadGainOffs[i].lMin = -2.84;
-                        this->landsatRadGainOffs[i].lMax = 333;
-                        this->landsatRadGainOffs[i].qCalMin = 1;
-                        this->landsatRadGainOffs[i].qCalMax = 255;
+                        radVals.lMin = -2.84;
+                        radVals.lMax = 333;
+                        radVals.qCalMin = 1;
+                        radVals.qCalMax = 255;
                     }
                     else if(sensorBand == "LTM5_B2_Post1992")
                     {
-                        this->landsatRadGainOffs[i].lMin = -2.84;
-                        this->landsatRadGainOffs[i].lMax = 365;
-                        this->landsatRadGainOffs[i].qCalMin = 1;
-                        this->landsatRadGainOffs[i].qCalMax = 255;
+                        radVals.lMin = -2.84;
+                        radVals.lMax = 365;
+                        radVals.qCalMin = 1;
+                        radVals.qCalMax = 255;
                     }
                     else if(sensorBand == "LTM5_B3")
                     {
-                        this->landsatRadGainOffs[i].lMin = -1.17;
-                        this->landsatRadGainOffs[i].lMax = 264;
-                        this->landsatRadGainOffs[i].qCalMin = 1;
-                        this->landsatRadGainOffs[i].qCalMax = 255;
+                        radVals.lMin = -1.17;
+                        radVals.lMax = 264;
+                        radVals.qCalMin = 1;
+                        radVals.qCalMax = 255;
                     }
                     else if(sensorBand == "LTM5_B4")
                     {
-                        this->landsatRadGainOffs[i].lMin = -1.51;
-                        this->landsatRadGainOffs[i].lMax = 221;
-                        this->landsatRadGainOffs[i].qCalMin = 1;
-                        this->landsatRadGainOffs[i].qCalMax = 255;
+                        radVals.lMin = -1.51;
+                        radVals.lMax = 221;
+                        radVals.qCalMin = 1;
+                        radVals.qCalMax = 255;
                     }
                     else if(sensorBand == "LTM5_B5")
                     {
-                        this->landsatRadGainOffs[i].lMin = -0.37;
-                        this->landsatRadGainOffs[i].lMax = 30.2;
-                        this->landsatRadGainOffs[i].qCalMin = 1;
-                        this->landsatRadGainOffs[i].qCalMax = 255;
+                        radVals.lMin = -0.37;
+                        radVals.lMax = 30.2;
+                        radVals.qCalMin = 1;
+                        radVals.qCalMax = 255;
                     }
                     else if(sensorBand == "LTM5_B6")
                     {
-                        this->landsatRadGainOffs[i].lMin = 1.238;
-                        this->landsatRadGainOffs[i].lMax = 15.303;
-                        this->landsatRadGainOffs[i].qCalMin = 1;
-                        this->landsatRadGainOffs[i].qCalMax = 255;
+                        radVals.lMin = 1.238;
+                        radVals.lMax = 15.303;
+                        radVals.qCalMin = 1;
+                        radVals.qCalMax = 255;
                     }
                     else if(sensorBand == "LTM5_B7")
                     {
-                        this->landsatRadGainOffs[i].lMin = -0.15;
-                        this->landsatRadGainOffs[i].lMax = 16.6;
-                        this->landsatRadGainOffs[i].qCalMin = 1;
-                        this->landsatRadGainOffs[i].qCalMax = 255;
+                        radVals.lMin = -0.15;
+                        radVals.lMax = 16.6;
+                        radVals.qCalMin = 1;
+                        radVals.qCalMax = 255;
                     }
                     else if(sensorBand == "LETM7_B1")
                     {
-                        this->landsatRadGainOffs[i].lMin = -6.2;
-                        this->landsatRadGainOffs[i].lMax = 191.6;
-                        this->landsatRadGainOffs[i].qCalMin = 1;
-                        this->landsatRadGainOffs[i].qCalMax = 255;
+                        radVals.lMin = -6.2;
+                        radVals.lMax = 191.6;
+                        radVals.qCalMin = 1;
+                        radVals.qCalMax = 255;
                     }
                     else if(sensorBand == "LETM7_B2")
                     {
-                        this->landsatRadGainOffs[i].lMin = -6.4;
-                        this->landsatRadGainOffs[i].lMax = 196.5;
-                        this->landsatRadGainOffs[i].qCalMin = 1;
-                        this->landsatRadGainOffs[i].qCalMax = 255;
+                        radVals.lMin = -6.4;
+                        radVals.lMax = 196.5;
+                        radVals.qCalMin = 1;
+                        radVals.qCalMax = 255;
                     }
                     else if(sensorBand == "LETM7_B3")
                     {
-                        this->landsatRadGainOffs[i].lMin = -5;
-                        this->landsatRadGainOffs[i].lMax = 152.9;
-                        this->landsatRadGainOffs[i].qCalMin = 1;
-                        this->landsatRadGainOffs[i].qCalMax = 255;
+                        radVals.lMin = -5;
+                        radVals.lMax = 152.9;
+                        radVals.qCalMin = 1;
+                        radVals.qCalMax = 255;
                     }
                     else if(sensorBand == "LETM7_B4")
                     {
-                        this->landsatRadGainOffs[i].lMin = -5.1;
-                        this->landsatRadGainOffs[i].lMax = 241.1;
-                        this->landsatRadGainOffs[i].qCalMin = 1;
-                        this->landsatRadGainOffs[i].qCalMax = 255;
+                        radVals.lMin = -5.1;
+                        radVals.lMax = 241.1;
+                        radVals.qCalMin = 1;
+                        radVals.qCalMax = 255;
                     }
                     else if(sensorBand == "LETM7_B5")
                     {
-                        this->landsatRadGainOffs[i].lMin = -1;
-                        this->landsatRadGainOffs[i].lMax = 31.06;
-                        this->landsatRadGainOffs[i].qCalMin = 1;
-                        this->landsatRadGainOffs[i].qCalMax = 255;
+                        radVals.lMin = -1;
+                        radVals.lMax = 31.06;
+                        radVals.qCalMin = 1;
+                        radVals.qCalMax = 255;
                     }
                     else if(sensorBand == "LETM7_B61")
                     {
-                        this->landsatRadGainOffs[i].lMin = 0;
-                        this->landsatRadGainOffs[i].lMax = 17.04;
-                        this->landsatRadGainOffs[i].qCalMin = 1;
-                        this->landsatRadGainOffs[i].qCalMax = 255;
+                        radVals.lMin = 0;
+                        radVals.lMax = 17.04;
+                        radVals.qCalMin = 1;
+                        radVals.qCalMax = 255;
                     }
                     else if(sensorBand == "LETM7_B62")
                     {
-                        this->landsatRadGainOffs[i].lMin = 3.2;
-                        this->landsatRadGainOffs[i].lMax = 12.65;
-                        this->landsatRadGainOffs[i].qCalMin = 1;
-                        this->landsatRadGainOffs[i].qCalMax = 255;
+                        radVals.lMin = 3.2;
+                        radVals.lMax = 12.65;
+                        radVals.qCalMin = 1;
+                        radVals.qCalMax = 255;
                     }
                     else if(sensorBand == "LETM7_B7")
                     {
-                        this->landsatRadGainOffs[i].lMin = -0.35;
-                        this->landsatRadGainOffs[i].lMax = 10.8;
-                        this->landsatRadGainOffs[i].qCalMin = 1;
-                        this->landsatRadGainOffs[i].qCalMax = 255;
+                        radVals.lMin = -0.35;
+                        radVals.lMax = 10.8;
+                        radVals.qCalMin = 1;
+                        radVals.qCalMax = 255;
                     }
                     else if(sensorBand == "LETM7_PAN")
                     {
-                        this->landsatRadGainOffs[i].lMin = -4.7;
-                        this->landsatRadGainOffs[i].lMax = 243.1;
-                        this->landsatRadGainOffs[i].qCalMin = 1;
-                        this->landsatRadGainOffs[i].qCalMax = 255;
+                        radVals.lMin = -4.7;
+                        radVals.lMax = 243.1;
+                        radVals.qCalMin = 1;
+                        radVals.qCalMax = 255;
                     }
                     else
                     {
-                        cout << "sensorBand = " << sensorBand << endl;
-                        throw RSGISXMLArgumentsException("Do not recognised sensorBand.");
+                        std::cout << "sensorBand = " << sensorBand << std::endl;
+                        throw rsgis::RSGISXMLArgumentsException("Do not recognised sensorBand.");
                     }
-                    XMLString::release(&charValue);
+                    xercesc::XMLString::release(&charValue);
                 }
                 else
                 {
-                    //throw RSGISXMLArgumentsException("No \'sensorband\' attribute was provided.");
+                    //throw rsgis::RSGISXMLArgumentsException("No \'sensorband\' attribute was provided.");
                     
-                    XMLCh *lMinXMLStr = XMLString::transcode("lmin");
+                    XMLCh *lMinXMLStr = xercesc::XMLString::transcode("lmin");
                     if(bandElement->hasAttribute(lMinXMLStr))
                     {
-                        char *charValue = XMLString::transcode(bandElement->getAttribute(lMinXMLStr));
-                        this->landsatRadGainOffs[i].lMin = mathUtils.strtofloat(string(charValue));
-                        XMLString::release(&charValue);
+                        char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(lMinXMLStr));
+                        radVals.lMin = mathUtils.strtofloat(std::string(charValue));
+                        xercesc::XMLString::release(&charValue);
                     }
                     else
                     {
-                        throw RSGISXMLArgumentsException("No \'lmin\' attribute was provided.");
+                        throw rsgis::RSGISXMLArgumentsException("No \'lmin\' attribute was provided.");
                     }
-                    XMLString::release(&lMinXMLStr);
+                    xercesc::XMLString::release(&lMinXMLStr);
                     
-                    XMLCh *lMaxXMLStr = XMLString::transcode("lmax");
+                    XMLCh *lMaxXMLStr = xercesc::XMLString::transcode("lmax");
                     if(bandElement->hasAttribute(lMaxXMLStr))
                     {
-                        char *charValue = XMLString::transcode(bandElement->getAttribute(lMaxXMLStr));
-                        this->landsatRadGainOffs[i].lMax = mathUtils.strtofloat(string(charValue));
-                        XMLString::release(&charValue);
+                        char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(lMaxXMLStr));
+                        radVals.lMax = mathUtils.strtofloat(std::string(charValue));
+                        xercesc::XMLString::release(&charValue);
                     }
                     else
                     {
-                        throw RSGISXMLArgumentsException("No \'lmax\' attribute was provided.");
+                        throw rsgis::RSGISXMLArgumentsException("No \'lmax\' attribute was provided.");
                     }
-                    XMLString::release(&lMaxXMLStr);
+                    xercesc::XMLString::release(&lMaxXMLStr);
                     
-                    XMLCh *qCalMinXMLStr = XMLString::transcode("qcalmin");
+                    XMLCh *qCalMinXMLStr = xercesc::XMLString::transcode("qcalmin");
                     if(bandElement->hasAttribute(qCalMinXMLStr))
                     {
-                        char *charValue = XMLString::transcode(bandElement->getAttribute(qCalMinXMLStr));
-                        this->landsatRadGainOffs[i].qCalMin = mathUtils.strtofloat(string(charValue));
-                        XMLString::release(&charValue);
+                        char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(qCalMinXMLStr));
+                        radVals.qCalMin = mathUtils.strtofloat(std::string(charValue));
+                        xercesc::XMLString::release(&charValue);
                     }
                     else
                     {
-                        throw RSGISXMLArgumentsException("No \'qcalmin\' attribute was provided.");
+                        throw rsgis::RSGISXMLArgumentsException("No \'qcalmin\' attribute was provided.");
                     }
-                    XMLString::release(&qCalMinXMLStr);
+                    xercesc::XMLString::release(&qCalMinXMLStr);
                     
-                    XMLCh *qCalMaxXMLStr = XMLString::transcode("qcalmax");
+                    XMLCh *qCalMaxXMLStr = xercesc::XMLString::transcode("qcalmax");
                     if(bandElement->hasAttribute(qCalMaxXMLStr))
                     {
-                        char *charValue = XMLString::transcode(bandElement->getAttribute(qCalMaxXMLStr));
-                        this->landsatRadGainOffs[i].qCalMax = mathUtils.strtofloat(string(charValue));
-                        XMLString::release(&charValue);
+                        char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(qCalMaxXMLStr));
+                        radVals.qCalMax = mathUtils.strtofloat(std::string(charValue));
+                        xercesc::XMLString::release(&charValue);
                     }
                     else
                     {
-                        throw RSGISXMLArgumentsException("No \'qcalmax\' attribute was provided.");
+                        throw rsgis::RSGISXMLArgumentsException("No \'qcalmax\' attribute was provided.");
                     }
-                    XMLString::release(&qCalMaxXMLStr);
+                    xercesc::XMLString::release(&qCalMaxXMLStr);
                 }
-                XMLString::release(&sensorBandXMLStr);	
+                xercesc::XMLString::release(&sensorBandXMLStr);
+                
+                landsatRadGainOffs.push_back(radVals);
             }
 		}
-        else if(XMLString::equals(optionTopAtmosRefl, optionXML))
+        else if(xercesc::XMLString::equals(optionTopAtmosRefl, optionXML))
 		{
             this->option = topatmosrefl;
             
-            XMLCh *inputXMLStr = XMLString::transcode("input");
+            XMLCh *inputXMLStr = xercesc::XMLString::transcode("input");
             if(argElement->hasAttribute(inputXMLStr))
             {
-                char *charValue = XMLString::transcode(argElement->getAttribute(inputXMLStr));
-                this->inputImage = string(charValue);
-                XMLString::release(&charValue);
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(inputXMLStr));
+                this->inputImage = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
             }
             else
             {
-                throw RSGISXMLArgumentsException("No \'input\' attribute was provided.");
+                throw rsgis::RSGISXMLArgumentsException("No \'input\' attribute was provided.");
             }
-            XMLString::release(&inputXMLStr);
+            xercesc::XMLString::release(&inputXMLStr);
             
-            XMLCh *outputXMLStr = XMLString::transcode("output");
+            XMLCh *outputXMLStr = xercesc::XMLString::transcode("output");
             if(argElement->hasAttribute(outputXMLStr))
             {
-                char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
-                this->outputImage = string(charValue);
-                XMLString::release(&charValue);
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outputXMLStr));
+                this->outputImage = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
             }
             else
             {
-                throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+                throw rsgis::RSGISXMLArgumentsException("No \'output\' attribute was provided.");
             }
-            XMLString::release(&outputXMLStr);
+            xercesc::XMLString::release(&outputXMLStr);
             
             // Set scaling factor for output images
             this->scaleFactor = 1.0;
-            XMLCh *scaleFactorXMLStr = XMLString::transcode("scaleFactor");
+            XMLCh *scaleFactorXMLStr = xercesc::XMLString::transcode("scaleFactor");
             if(argElement->hasAttribute(scaleFactorXMLStr))
             {
-                char *charValue = XMLString::transcode(argElement->getAttribute(scaleFactorXMLStr));
-                this->scaleFactor = mathUtils.strtofloat(string(charValue));
-                XMLString::release(&charValue);
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(scaleFactorXMLStr));
+                this->scaleFactor = mathUtils.strtofloat(std::string(charValue));
+                xercesc::XMLString::release(&charValue);
             }
-            XMLString::release(&scaleFactorXMLStr);
+            xercesc::XMLString::release(&scaleFactorXMLStr);
             
-            XMLCh *julianDayXMLStr = XMLString::transcode("julianday");
+            XMLCh *julianDayXMLStr = xercesc::XMLString::transcode("julianday");
             if(argElement->hasAttribute(julianDayXMLStr))
             {
-                char *charValue = XMLString::transcode(argElement->getAttribute(julianDayXMLStr));
-                this->julianDay = mathUtils.strtounsignedint(string(charValue));
-                XMLString::release(&charValue);
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(julianDayXMLStr));
+                this->julianDay = mathUtils.strtounsignedint(std::string(charValue));
+                xercesc::XMLString::release(&charValue);
             }
             else
             {
-                //throw RSGISXMLArgumentsException("No \'julianday\' attribute was provided.");
+                //throw rsgis::RSGISXMLArgumentsException("No \'julianday\' attribute was provided.");
                 unsigned int day = 0;
                 unsigned int month = 0;
                 unsigned int year = 0;
-                XMLCh *dayXMLStr = XMLString::transcode("day");
+                XMLCh *dayXMLStr = xercesc::XMLString::transcode("day");
                 if(argElement->hasAttribute(dayXMLStr))
                 {
-                    char *charValue = XMLString::transcode(argElement->getAttribute(dayXMLStr));
-                    day = mathUtils.strtounsignedint(string(charValue));
-                    XMLString::release(&charValue);
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(dayXMLStr));
+                    day = mathUtils.strtounsignedint(std::string(charValue));
+                    xercesc::XMLString::release(&charValue);
                 }
                 else
                 {
-                    throw RSGISXMLArgumentsException("No \'day\' attribute was provided.");
+                    throw rsgis::RSGISXMLArgumentsException("No \'day\' attribute was provided.");
                 }
-                XMLString::release(&dayXMLStr);
+                xercesc::XMLString::release(&dayXMLStr);
                 
-                XMLCh *monthXMLStr = XMLString::transcode("month");
+                XMLCh *monthXMLStr = xercesc::XMLString::transcode("month");
                 if(argElement->hasAttribute(monthXMLStr))
                 {
-                    char *charValue = XMLString::transcode(argElement->getAttribute(monthXMLStr));
-                    month = mathUtils.strtounsignedint(string(charValue));
-                    XMLString::release(&charValue);
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(monthXMLStr));
+                    month = mathUtils.strtounsignedint(std::string(charValue));
+                    xercesc::XMLString::release(&charValue);
                 }
                 else
                 {
-                    throw RSGISXMLArgumentsException("No \'month\' attribute was provided.");
+                    throw rsgis::RSGISXMLArgumentsException("No \'month\' attribute was provided.");
                 }
-                XMLString::release(&monthXMLStr);
+                xercesc::XMLString::release(&monthXMLStr);
                 
-                XMLCh *yearXMLStr = XMLString::transcode("year");
+                XMLCh *yearXMLStr = xercesc::XMLString::transcode("year");
                 if(argElement->hasAttribute(yearXMLStr))
                 {
-                    char *charValue = XMLString::transcode(argElement->getAttribute(yearXMLStr));
-                    year = mathUtils.strtounsignedint(string(charValue));
-                    XMLString::release(&charValue);
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(yearXMLStr));
+                    year = mathUtils.strtounsignedint(std::string(charValue));
+                    xercesc::XMLString::release(&charValue);
                 }
                 else
                 {
-                    throw RSGISXMLArgumentsException("No \'year\' attribute was provided.");
+                    throw rsgis::RSGISXMLArgumentsException("No \'year\' attribute was provided.");
                 }
-                XMLString::release(&yearXMLStr);
+                xercesc::XMLString::release(&yearXMLStr);
                 
                 
                 boost::gregorian::date d(year,month,day);
                 julianDay = d.julian_day();
             }
-            XMLString::release(&julianDayXMLStr);
+            xercesc::XMLString::release(&julianDayXMLStr);
             
             
-            XMLCh *zenithXMLStr = XMLString::transcode("zenith");
+            XMLCh *zenithXMLStr = xercesc::XMLString::transcode("zenith");
             if(argElement->hasAttribute(zenithXMLStr))
             {
-                char *charValue = XMLString::transcode(argElement->getAttribute(zenithXMLStr));
-                this->solarZenith = mathUtils.strtofloat(string(charValue));
-                XMLString::release(&charValue);
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(zenithXMLStr));
+                this->solarZenith = mathUtils.strtofloat(std::string(charValue));
+                xercesc::XMLString::release(&charValue);
             }
             else
             {
-                XMLCh *elevationXMLStr = XMLString::transcode("elevation");
+                XMLCh *elevationXMLStr = xercesc::XMLString::transcode("elevation");
                 if(argElement->hasAttribute(elevationXMLStr))
                 {
-                    char *charValue = XMLString::transcode(argElement->getAttribute(elevationXMLStr));
-                    this->solarZenith = 90-mathUtils.strtofloat(string(charValue));
-                    XMLString::release(&charValue);
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(elevationXMLStr));
+                    this->solarZenith = 90-mathUtils.strtofloat(std::string(charValue));
+                    xercesc::XMLString::release(&charValue);
                 }
                 else
                 {
-                    throw RSGISXMLArgumentsException("No \'zenith\' or \'elevation\' attribute was provided.");
+                    throw rsgis::RSGISXMLArgumentsException("No \'zenith\' or \'elevation\' attribute was provided.");
                 }
-                XMLString::release(&elevationXMLStr);
+                xercesc::XMLString::release(&elevationXMLStr);
             }
-            XMLString::release(&zenithXMLStr);
+            xercesc::XMLString::release(&zenithXMLStr);
             
             
             
-            DOMNodeList *bandsNodesList = argElement->getElementsByTagName(XMLString::transcode("rsgis:band"));
+            xercesc::DOMNodeList *bandsNodesList = argElement->getElementsByTagName(xercesc::XMLString::transcode("rsgis:band"));
             this->numBands = bandsNodesList->getLength();		
             
-            cout << "Found " << this->numBands << " Bands listed.\n";
+            std::cout << "Found " << this->numBands << " Bands listed.\n";
             
-            DOMElement *bandElement = NULL;
+            xercesc::DOMElement *bandElement = NULL;
             solarIrradiance = new float[numBands];
             
             for(unsigned int i = 0; i < numBands; i++)
             {
-                bandElement = static_cast<DOMElement*>(bandsNodesList->item(i));
+                bandElement = static_cast<xercesc::DOMElement*>(bandsNodesList->item(i));
                 
-                XMLCh *sensorBandXMLStr = XMLString::transcode("sensorband");
+                XMLCh *sensorBandXMLStr = xercesc::XMLString::transcode("sensorband");
                 if(bandElement->hasAttribute(sensorBandXMLStr))
                 {
-                    char *charValue = XMLString::transcode(bandElement->getAttribute(sensorBandXMLStr));
-                    string sensorBand = string(charValue);
+                    char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(sensorBandXMLStr));
+                    std::string sensorBand = std::string(charValue);
                     if(sensorBand == "LMSS1_B1")
                     {
                         this->solarIrradiance[i] = 1823;
@@ -1149,189 +1163,189 @@ void RSGISExeImageCalibration::retrieveParameters(DOMElement *argElement) throw(
                     }
                     else
                     {
-                        cout << "sensorBand = " << sensorBand << endl;
-                        throw RSGISXMLArgumentsException("Do not recognised sensorBand.");
+                        std::cout << "sensorBand = " << sensorBand << std::endl;
+                        throw rsgis::RSGISXMLArgumentsException("Do not recognised sensorBand.");
                     }
-                    XMLString::release(&charValue);
+                    xercesc::XMLString::release(&charValue);
                 }
                 else
                 {
-                    //throw RSGISXMLArgumentsException("No \'sensorband\' attribute was provided.");
+                    //throw rsgis::RSGISXMLArgumentsException("No \'sensorband\' attribute was provided.");
                     
-                    XMLCh *irradianceXMLStr = XMLString::transcode("irradiance");
+                    XMLCh *irradianceXMLStr = xercesc::XMLString::transcode("irradiance");
                     if(bandElement->hasAttribute(irradianceXMLStr))
                     {
-                        char *charValue = XMLString::transcode(bandElement->getAttribute(irradianceXMLStr));
-                        this->solarIrradiance[i] = mathUtils.strtofloat(string(charValue));
-                        XMLString::release(&charValue);
+                        char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(irradianceXMLStr));
+                        this->solarIrradiance[i] = mathUtils.strtofloat(std::string(charValue));
+                        xercesc::XMLString::release(&charValue);
                     }
                     else
                     {
-                        throw RSGISXMLArgumentsException("No \'irradiance\' attribute was provided.");
+                        throw rsgis::RSGISXMLArgumentsException("No \'irradiance\' attribute was provided.");
                     }
-                    XMLString::release(&irradianceXMLStr);
+                    xercesc::XMLString::release(&irradianceXMLStr);
                     
                 }
-                XMLString::release(&sensorBandXMLStr);	
+                xercesc::XMLString::release(&sensorBandXMLStr);	
             }
         }
-        else if(XMLString::equals(optionSPOTRadCal, optionXML))
+        else if(xercesc::XMLString::equals(optionSPOTRadCal, optionXML))
         {
             this->option = spotradcal;
-            XMLCh *outputXMLStr = XMLString::transcode("output");
+            XMLCh *outputXMLStr = xercesc::XMLString::transcode("output");
             if(argElement->hasAttribute(outputXMLStr))
             {
-                char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
-                this->outputImage = string(charValue);
-                XMLString::release(&charValue);
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outputXMLStr));
+                this->outputImage = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
             }
             else
             {
-                throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+                throw rsgis::RSGISXMLArgumentsException("No \'output\' attribute was provided.");
             }
-            XMLString::release(&outputXMLStr);
+            xercesc::XMLString::release(&outputXMLStr);
             
             
-            DOMNodeList *bandsNodesList = argElement->getElementsByTagName(XMLString::transcode("rsgis:band"));
+            xercesc::DOMNodeList *bandsNodesList = argElement->getElementsByTagName(xercesc::XMLString::transcode("rsgis:band"));
             this->numBands = bandsNodesList->getLength();		
             
-            cout << "Found " << this->numBands << " Bands listed.\n";
+            std::cout << "Found " << this->numBands << " Bands listed.\n";
             
-            DOMElement *bandElement = NULL;
-            spotRadGainOffs = new SPOTRadianceGainsOffsets[numBands];
-            inputImages = new string[numBands];
+            xercesc::DOMElement *bandElement = NULL;
+            spotRadGainOffs = new rsgis::calib::SPOTRadianceGainsOffsets[numBands];
+            inputImages = new std::string[numBands];
             
             for(unsigned int i = 0; i < numBands; i++)
             {
-                bandElement = static_cast<DOMElement*>(bandsNodesList->item(i));
+                bandElement = static_cast<xercesc::DOMElement*>(bandsNodesList->item(i));
                 
-                XMLCh *bandNameXMLStr = XMLString::transcode("name");
+                XMLCh *bandNameXMLStr = xercesc::XMLString::transcode("name");
                 if(bandElement->hasAttribute(bandNameXMLStr))
                 {
-                    char *charValue = XMLString::transcode(bandElement->getAttribute(bandNameXMLStr));
-                    this->spotRadGainOffs[i].bandName = string(charValue);
-                    XMLString::release(&charValue);
+                    char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(bandNameXMLStr));
+                    this->spotRadGainOffs[i].bandName = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
                 }
                 else
                 {
-                    throw RSGISXMLArgumentsException("No \'name\' attribute was provided.");
+                    throw rsgis::RSGISXMLArgumentsException("No \'name\' attribute was provided.");
                 }
-                XMLString::release(&bandNameXMLStr);
+                xercesc::XMLString::release(&bandNameXMLStr);
                 
-                XMLCh *bandImageXMLStr = XMLString::transcode("image");
+                XMLCh *bandImageXMLStr = xercesc::XMLString::transcode("image");
                 if(bandElement->hasAttribute(bandImageXMLStr))
                 {
-                    char *charValue = XMLString::transcode(bandElement->getAttribute(bandImageXMLStr));
-                    this->inputImages[i] = string(charValue);
-                    XMLString::release(&charValue);
+                    char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(bandImageXMLStr));
+                    this->inputImages[i] = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
                 }
                 else
                 {
-                    throw RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+                    throw rsgis::RSGISXMLArgumentsException("No \'image\' attribute was provided.");
                 }
-                XMLString::release(&bandImageXMLStr);
+                xercesc::XMLString::release(&bandImageXMLStr);
                 
-                XMLCh *bandIdxXMLStr = XMLString::transcode("band");
+                XMLCh *bandIdxXMLStr = xercesc::XMLString::transcode("band");
                 if(bandElement->hasAttribute(bandIdxXMLStr))
                 {
-                    char *charValue = XMLString::transcode(bandElement->getAttribute(bandIdxXMLStr));
-                    this->spotRadGainOffs[i].band = mathUtils.strtounsignedint(string(charValue));
-                    XMLString::release(&charValue);
+                    char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(bandIdxXMLStr));
+                    this->spotRadGainOffs[i].band = mathUtils.strtounsignedint(std::string(charValue));
+                    xercesc::XMLString::release(&charValue);
                 }
                 else
                 {
-                    throw RSGISXMLArgumentsException("No \'band\' attribute was provided.");
+                    throw rsgis::RSGISXMLArgumentsException("No \'band\' attribute was provided.");
                 }
-                XMLString::release(&bandIdxXMLStr);
+                xercesc::XMLString::release(&bandIdxXMLStr);
                 
-                XMLCh *gainXMLStr = XMLString::transcode("gain");
+                XMLCh *gainXMLStr = xercesc::XMLString::transcode("gain");
 				if(bandElement->hasAttribute(gainXMLStr))
 				{
-					char *charValue = XMLString::transcode(bandElement->getAttribute(gainXMLStr));
-					this->spotRadGainOffs[i].gain = mathUtils.strtofloat(string(charValue));
-					XMLString::release(&charValue);
+					char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(gainXMLStr));
+					this->spotRadGainOffs[i].gain = mathUtils.strtofloat(std::string(charValue));
+					xercesc::XMLString::release(&charValue);
 				}
 				else
 				{
-					throw RSGISXMLArgumentsException("No \'gain\' attribute was provided.");
+					throw rsgis::RSGISXMLArgumentsException("No \'gain\' attribute was provided.");
 				}
-				XMLString::release(&gainXMLStr);	
+				xercesc::XMLString::release(&gainXMLStr);	
             }
         }
-        else if(XMLString::equals(optionIkonosRadCal, optionXML))
+        else if(xercesc::XMLString::equals(optionIkonosRadCal, optionXML))
         {
             this->option = ikonosradcal;
-            XMLCh *outputXMLStr = XMLString::transcode("output");
+            XMLCh *outputXMLStr = xercesc::XMLString::transcode("output");
             if(argElement->hasAttribute(outputXMLStr))
             {
-                char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
-                this->outputImage = string(charValue);
-                XMLString::release(&charValue);
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outputXMLStr));
+                this->outputImage = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
             }
             else
             {
-                throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+                throw rsgis::RSGISXMLArgumentsException("No \'output\' attribute was provided.");
             }
-            XMLString::release(&outputXMLStr);
+            xercesc::XMLString::release(&outputXMLStr);
             
             
-            DOMNodeList *bandsNodesList = argElement->getElementsByTagName(XMLString::transcode("rsgis:band"));
+            xercesc::DOMNodeList *bandsNodesList = argElement->getElementsByTagName(xercesc::XMLString::transcode("rsgis:band"));
             this->numBands = bandsNodesList->getLength();		
             
-            cout << "Found " << this->numBands << " Bands listed.\n";
+            std::cout << "Found " << this->numBands << " Bands listed.\n";
             
-            DOMElement *bandElement = NULL;
-            ikonosRadGainOffs = new IkonosRadianceGainsOffsets[numBands];
-            inputImages = new string[numBands];
+            xercesc::DOMElement *bandElement = NULL;
+            ikonosRadGainOffs = new rsgis::calib::IkonosRadianceGainsOffsets[numBands];
+            inputImages = new std::string[numBands];
             
             for(unsigned int i = 0; i < numBands; i++)
             {
-                bandElement = static_cast<DOMElement*>(bandsNodesList->item(i));
+                bandElement = static_cast<xercesc::DOMElement*>(bandsNodesList->item(i));
                 
-                XMLCh *bandNameXMLStr = XMLString::transcode("name");
+                XMLCh *bandNameXMLStr = xercesc::XMLString::transcode("name");
                 if(bandElement->hasAttribute(bandNameXMLStr))
                 {
-                    char *charValue = XMLString::transcode(bandElement->getAttribute(bandNameXMLStr));
-                    this->ikonosRadGainOffs[i].bandName = string(charValue);
-                    XMLString::release(&charValue);
+                    char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(bandNameXMLStr));
+                    this->ikonosRadGainOffs[i].bandName = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
                 }
                 else
                 {
-                    throw RSGISXMLArgumentsException("No \'name\' attribute was provided.");
+                    throw rsgis::RSGISXMLArgumentsException("No \'name\' attribute was provided.");
                 }
-                XMLString::release(&bandNameXMLStr);
+                xercesc::XMLString::release(&bandNameXMLStr);
                 
-                XMLCh *bandImageXMLStr = XMLString::transcode("image");
+                XMLCh *bandImageXMLStr = xercesc::XMLString::transcode("image");
                 if(bandElement->hasAttribute(bandImageXMLStr))
                 {
-                    char *charValue = XMLString::transcode(bandElement->getAttribute(bandImageXMLStr));
-                    this->inputImages[i] = string(charValue);
-                    XMLString::release(&charValue);
+                    char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(bandImageXMLStr));
+                    this->inputImages[i] = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
                 }
                 else
                 {
-                    throw RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+                    throw rsgis::RSGISXMLArgumentsException("No \'image\' attribute was provided.");
                 }
-                XMLString::release(&bandImageXMLStr);
+                xercesc::XMLString::release(&bandImageXMLStr);
                 
-                XMLCh *bandIdxXMLStr = XMLString::transcode("band");
+                XMLCh *bandIdxXMLStr = xercesc::XMLString::transcode("band");
                 if(bandElement->hasAttribute(bandIdxXMLStr))
                 {
-                    char *charValue = XMLString::transcode(bandElement->getAttribute(bandIdxXMLStr));
-                    this->ikonosRadGainOffs[i].band = mathUtils.strtounsignedint(string(charValue));
-                    XMLString::release(&charValue);
+                    char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(bandIdxXMLStr));
+                    this->ikonosRadGainOffs[i].band = mathUtils.strtounsignedint(std::string(charValue));
+                    xercesc::XMLString::release(&charValue);
                 }
                 else
                 {
-                    throw RSGISXMLArgumentsException("No \'band\' attribute was provided.");
+                    throw rsgis::RSGISXMLArgumentsException("No \'band\' attribute was provided.");
                 }
-                XMLString::release(&bandIdxXMLStr);
+                xercesc::XMLString::release(&bandIdxXMLStr);
                 
-                XMLCh *sensorBandXMLStr = XMLString::transcode("sensorband");
+                XMLCh *sensorBandXMLStr = xercesc::XMLString::transcode("sensorband");
                 if(bandElement->hasAttribute(sensorBandXMLStr))
                 {
-                    char *charValue = XMLString::transcode(bandElement->getAttribute(sensorBandXMLStr));
-                    string sensorBand = string(charValue);
+                    char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(sensorBandXMLStr));
+                    std::string sensorBand = std::string(charValue);
                     if(sensorBand == "IK_Pan_Pre2001")
                     {
                         this->ikonosRadGainOffs[i].calCoef = 161;
@@ -1384,116 +1398,116 @@ void RSGISExeImageCalibration::retrieveParameters(DOMElement *argElement) throw(
                     }
                     else
                     {
-                        cout << "sensorBand = " << sensorBand << endl;
-                        throw RSGISXMLArgumentsException("Do not recognised sensorBand.");
+                        std::cout << "sensorBand = " << sensorBand << std::endl;
+                        throw rsgis::RSGISXMLArgumentsException("Do not recognised sensorBand.");
                     }
-                    XMLString::release(&charValue);
+                    xercesc::XMLString::release(&charValue);
                 }
                 else
                 {
-                    XMLCh *calCoefXMLStr = XMLString::transcode("calcoef");
+                    XMLCh *calCoefXMLStr = xercesc::XMLString::transcode("calcoef");
                     if(bandElement->hasAttribute(calCoefXMLStr))
                     {
-                        char *charValue = XMLString::transcode(bandElement->getAttribute(calCoefXMLStr));
-                        this->ikonosRadGainOffs[i].calCoef = mathUtils.strtofloat(string(charValue));
-                        XMLString::release(&charValue);
+                        char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(calCoefXMLStr));
+                        this->ikonosRadGainOffs[i].calCoef = mathUtils.strtofloat(std::string(charValue));
+                        xercesc::XMLString::release(&charValue);
                     }
                     else
                     {
-                        throw RSGISXMLArgumentsException("No \'calcoef\' attribute was provided.");
+                        throw rsgis::RSGISXMLArgumentsException("No \'calcoef\' attribute was provided.");
                     }
-                    XMLString::release(&calCoefXMLStr);
+                    xercesc::XMLString::release(&calCoefXMLStr);
                     
-                    XMLCh *bandwidthXMLStr = XMLString::transcode("bandwidth");
+                    XMLCh *bandwidthXMLStr = xercesc::XMLString::transcode("bandwidth");
                     if(bandElement->hasAttribute(bandwidthXMLStr))
                     {
-                        char *charValue = XMLString::transcode(bandElement->getAttribute(bandwidthXMLStr));
-                        this->ikonosRadGainOffs[i].bandwidth = mathUtils.strtofloat(string(charValue));
-                        XMLString::release(&charValue);
+                        char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(bandwidthXMLStr));
+                        this->ikonosRadGainOffs[i].bandwidth = mathUtils.strtofloat(std::string(charValue));
+                        xercesc::XMLString::release(&charValue);
                     }
                     else
                     {
-                        throw RSGISXMLArgumentsException("No \'bandwidth\' attribute was provided.");
+                        throw rsgis::RSGISXMLArgumentsException("No \'bandwidth\' attribute was provided.");
                     }
-                    XMLString::release(&bandwidthXMLStr);
+                    xercesc::XMLString::release(&bandwidthXMLStr);
                 }
-                XMLString::release(&sensorBandXMLStr);
+                xercesc::XMLString::release(&sensorBandXMLStr);
             }
         }
-        else if(XMLString::equals(optionASTERRadCal, optionXML))
+        else if(xercesc::XMLString::equals(optionASTERRadCal, optionXML))
         {
             this->option = asterradcal;
-            XMLCh *outputXMLStr = XMLString::transcode("output");
+            XMLCh *outputXMLStr = xercesc::XMLString::transcode("output");
             if(argElement->hasAttribute(outputXMLStr))
             {
-                char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
-                this->outputImage = string(charValue);
-                XMLString::release(&charValue);
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outputXMLStr));
+                this->outputImage = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
             }
             else
             {
-                throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+                throw rsgis::RSGISXMLArgumentsException("No \'output\' attribute was provided.");
             }
-            XMLString::release(&outputXMLStr);
+            xercesc::XMLString::release(&outputXMLStr);
             
             
-            DOMNodeList *bandsNodesList = argElement->getElementsByTagName(XMLString::transcode("rsgis:band"));
+            xercesc::DOMNodeList *bandsNodesList = argElement->getElementsByTagName(xercesc::XMLString::transcode("rsgis:band"));
             this->numBands = bandsNodesList->getLength();		
             
-            cout << "Found " << this->numBands << " Bands listed.\n";
+            std::cout << "Found " << this->numBands << " Bands listed.\n";
             
-            DOMElement *bandElement = NULL;
-            asterRadGainOffs = new ASTERRadianceGainsOffsets[numBands];
-            inputImages = new string[numBands];
+            xercesc::DOMElement *bandElement = NULL;
+            asterRadGainOffs = new rsgis::calib::ASTERRadianceGainsOffsets[numBands];
+            inputImages = new std::string[numBands];
             
             for(unsigned int i = 0; i < numBands; i++)
             {
-                bandElement = static_cast<DOMElement*>(bandsNodesList->item(i));
+                bandElement = static_cast<xercesc::DOMElement*>(bandsNodesList->item(i));
                 
-                XMLCh *bandNameXMLStr = XMLString::transcode("name");
+                XMLCh *bandNameXMLStr = xercesc::XMLString::transcode("name");
                 if(bandElement->hasAttribute(bandNameXMLStr))
                 {
-                    char *charValue = XMLString::transcode(bandElement->getAttribute(bandNameXMLStr));
-                    this->asterRadGainOffs[i].bandName = string(charValue);
-                    XMLString::release(&charValue);
+                    char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(bandNameXMLStr));
+                    this->asterRadGainOffs[i].bandName = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
                 }
                 else
                 {
-                    throw RSGISXMLArgumentsException("No \'name\' attribute was provided.");
+                    throw rsgis::RSGISXMLArgumentsException("No \'name\' attribute was provided.");
                 }
-                XMLString::release(&bandNameXMLStr);
+                xercesc::XMLString::release(&bandNameXMLStr);
                 
-                XMLCh *bandImageXMLStr = XMLString::transcode("image");
+                XMLCh *bandImageXMLStr = xercesc::XMLString::transcode("image");
                 if(bandElement->hasAttribute(bandImageXMLStr))
                 {
-                    char *charValue = XMLString::transcode(bandElement->getAttribute(bandImageXMLStr));
-                    this->inputImages[i] = string(charValue);
-                    XMLString::release(&charValue);
+                    char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(bandImageXMLStr));
+                    this->inputImages[i] = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
                 }
                 else
                 {
-                    throw RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+                    throw rsgis::RSGISXMLArgumentsException("No \'image\' attribute was provided.");
                 }
-                XMLString::release(&bandImageXMLStr);
+                xercesc::XMLString::release(&bandImageXMLStr);
                 
-                XMLCh *bandIdxXMLStr = XMLString::transcode("band");
+                XMLCh *bandIdxXMLStr = xercesc::XMLString::transcode("band");
                 if(bandElement->hasAttribute(bandIdxXMLStr))
                 {
-                    char *charValue = XMLString::transcode(bandElement->getAttribute(bandIdxXMLStr));
-                    this->asterRadGainOffs[i].band = mathUtils.strtounsignedint(string(charValue));
-                    XMLString::release(&charValue);
+                    char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(bandIdxXMLStr));
+                    this->asterRadGainOffs[i].band = mathUtils.strtounsignedint(std::string(charValue));
+                    xercesc::XMLString::release(&charValue);
                 }
                 else
                 {
-                    throw RSGISXMLArgumentsException("No \'band\' attribute was provided.");
+                    throw rsgis::RSGISXMLArgumentsException("No \'band\' attribute was provided.");
                 }
-                XMLString::release(&bandIdxXMLStr);
+                xercesc::XMLString::release(&bandIdxXMLStr);
                 
-                XMLCh *sensorBandXMLStr = XMLString::transcode("sensorband");
+                XMLCh *sensorBandXMLStr = xercesc::XMLString::transcode("sensorband");
                 if(bandElement->hasAttribute(sensorBandXMLStr))
                 {
-                    char *charValue = XMLString::transcode(bandElement->getAttribute(sensorBandXMLStr));
-                    string sensorBand = string(charValue);
+                    char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(sensorBandXMLStr));
+                    std::string sensorBand = std::string(charValue);
                     if(sensorBand == "XXX")
                     {
                         this->asterRadGainOffs[i].unitConCoef = 0;
@@ -1504,103 +1518,103 @@ void RSGISExeImageCalibration::retrieveParameters(DOMElement *argElement) throw(
                     }
                     else
                     {
-                        cout << "sensorBand = " << sensorBand << endl;
-                        throw RSGISXMLArgumentsException("Do not recognised sensorBand.");
+                        std::cout << "sensorBand = " << sensorBand << std::endl;
+                        throw rsgis::RSGISXMLArgumentsException("Do not recognised sensorBand.");
                     }
-                    XMLString::release(&charValue);
+                    xercesc::XMLString::release(&charValue);
                 }
                 else
                 {
-                    XMLCh *coefficientXMLStr = XMLString::transcode("coefficient");
+                    XMLCh *coefficientXMLStr = xercesc::XMLString::transcode("coefficient");
                     if(bandElement->hasAttribute(coefficientXMLStr))
                     {
-                        char *charValue = XMLString::transcode(bandElement->getAttribute(coefficientXMLStr));
-                        this->asterRadGainOffs[i].unitConCoef = mathUtils.strtofloat(string(charValue));
-                        XMLString::release(&charValue);
+                        char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(coefficientXMLStr));
+                        this->asterRadGainOffs[i].unitConCoef = mathUtils.strtofloat(std::string(charValue));
+                        xercesc::XMLString::release(&charValue);
                     }
                     else
                     {
-                        throw RSGISXMLArgumentsException("No \'coefficient\' attribute was provided.");
+                        throw rsgis::RSGISXMLArgumentsException("No \'coefficient\' attribute was provided.");
                     }
-                    XMLString::release(&coefficientXMLStr);
+                    xercesc::XMLString::release(&coefficientXMLStr);
                 }
-                XMLString::release(&sensorBandXMLStr);
+                xercesc::XMLString::release(&sensorBandXMLStr);
             }
         }
-        else if(XMLString::equals(optionIRSRadCal, optionXML))
+        else if(xercesc::XMLString::equals(optionIRSRadCal, optionXML))
         {
             this->option = irsradcal;
-            XMLCh *outputXMLStr = XMLString::transcode("output");
+            XMLCh *outputXMLStr = xercesc::XMLString::transcode("output");
             if(argElement->hasAttribute(outputXMLStr))
             {
-                char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
-                this->outputImage = string(charValue);
-                XMLString::release(&charValue);
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outputXMLStr));
+                this->outputImage = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
             }
             else
             {
-                throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+                throw rsgis::RSGISXMLArgumentsException("No \'output\' attribute was provided.");
             }
-            XMLString::release(&outputXMLStr);
+            xercesc::XMLString::release(&outputXMLStr);
             
             
-            DOMNodeList *bandsNodesList = argElement->getElementsByTagName(XMLString::transcode("rsgis:band"));
+            xercesc::DOMNodeList *bandsNodesList = argElement->getElementsByTagName(xercesc::XMLString::transcode("rsgis:band"));
             this->numBands = bandsNodesList->getLength();		
             
-            cout << "Found " << this->numBands << " Bands listed.\n";
+            std::cout << "Found " << this->numBands << " Bands listed.\n";
             
-            DOMElement *bandElement = NULL;
-            irsRadGainOffs = new IRSRadianceGainsOffsets[numBands];
-            inputImages = new string[numBands];
+            xercesc::DOMElement *bandElement = NULL;
+            irsRadGainOffs = new rsgis::calib::IRSRadianceGainsOffsets[numBands];
+            inputImages = new std::string[numBands];
             
             for(unsigned int i = 0; i < numBands; i++)
             {
-                bandElement = static_cast<DOMElement*>(bandsNodesList->item(i));
+                bandElement = static_cast<xercesc::DOMElement*>(bandsNodesList->item(i));
                 
-                XMLCh *bandNameXMLStr = XMLString::transcode("name");
+                XMLCh *bandNameXMLStr = xercesc::XMLString::transcode("name");
                 if(bandElement->hasAttribute(bandNameXMLStr))
                 {
-                    char *charValue = XMLString::transcode(bandElement->getAttribute(bandNameXMLStr));
-                    this->irsRadGainOffs[i].bandName = string(charValue);
-                    XMLString::release(&charValue);
+                    char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(bandNameXMLStr));
+                    this->irsRadGainOffs[i].bandName = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
                 }
                 else
                 {
-                    throw RSGISXMLArgumentsException("No \'name\' attribute was provided.");
+                    throw rsgis::RSGISXMLArgumentsException("No \'name\' attribute was provided.");
                 }
-                XMLString::release(&bandNameXMLStr);
+                xercesc::XMLString::release(&bandNameXMLStr);
                 
-                XMLCh *bandImageXMLStr = XMLString::transcode("image");
+                XMLCh *bandImageXMLStr = xercesc::XMLString::transcode("image");
                 if(bandElement->hasAttribute(bandImageXMLStr))
                 {
-                    char *charValue = XMLString::transcode(bandElement->getAttribute(bandImageXMLStr));
-                    this->inputImages[i] = string(charValue);
-                    XMLString::release(&charValue);
+                    char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(bandImageXMLStr));
+                    this->inputImages[i] = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
                 }
                 else
                 {
-                    throw RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+                    throw rsgis::RSGISXMLArgumentsException("No \'image\' attribute was provided.");
                 }
-                XMLString::release(&bandImageXMLStr);
+                xercesc::XMLString::release(&bandImageXMLStr);
                 
-                XMLCh *bandIdxXMLStr = XMLString::transcode("band");
+                XMLCh *bandIdxXMLStr = xercesc::XMLString::transcode("band");
                 if(bandElement->hasAttribute(bandIdxXMLStr))
                 {
-                    char *charValue = XMLString::transcode(bandElement->getAttribute(bandIdxXMLStr));
-                    this->irsRadGainOffs[i].band = mathUtils.strtounsignedint(string(charValue));
-                    XMLString::release(&charValue);
+                    char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(bandIdxXMLStr));
+                    this->irsRadGainOffs[i].band = mathUtils.strtounsignedint(std::string(charValue));
+                    xercesc::XMLString::release(&charValue);
                 }
                 else
                 {
-                    throw RSGISXMLArgumentsException("No \'band\' attribute was provided.");
+                    throw rsgis::RSGISXMLArgumentsException("No \'band\' attribute was provided.");
                 }
-                XMLString::release(&bandIdxXMLStr);
+                xercesc::XMLString::release(&bandIdxXMLStr);
                 
-                XMLCh *sensorBandXMLStr = XMLString::transcode("sensorband");
+                XMLCh *sensorBandXMLStr = xercesc::XMLString::transcode("sensorband");
                 if(bandElement->hasAttribute(sensorBandXMLStr))
                 {
-                    char *charValue = XMLString::transcode(bandElement->getAttribute(sensorBandXMLStr));
-                    string sensorBand = string(charValue);
+                    char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(sensorBandXMLStr));
+                    std::string sensorBand = std::string(charValue);
                     if(sensorBand == "IRSP6LISS3_Green")
                     {
                         this->irsRadGainOffs[i].lMin = 0.0;
@@ -1631,142 +1645,142 @@ void RSGISExeImageCalibration::retrieveParameters(DOMElement *argElement) throw(
                     }
                     else
                     {
-                        cout << "sensorBand = " << sensorBand << endl;
-                        throw RSGISXMLArgumentsException("Do not recognised sensorBand.");
+                        std::cout << "sensorBand = " << sensorBand << std::endl;
+                        throw rsgis::RSGISXMLArgumentsException("Do not recognised sensorBand.");
                     }
-                    XMLString::release(&charValue);
+                    xercesc::XMLString::release(&charValue);
                 }
                 else
                 {
-                    XMLCh *lMinXMLStr = XMLString::transcode("lmin");
+                    XMLCh *lMinXMLStr = xercesc::XMLString::transcode("lmin");
                     if(bandElement->hasAttribute(lMinXMLStr))
                     {
-                        char *charValue = XMLString::transcode(bandElement->getAttribute(lMinXMLStr));
-                        this->irsRadGainOffs[i].lMin = mathUtils.strtofloat(string(charValue));
-                        XMLString::release(&charValue);
+                        char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(lMinXMLStr));
+                        this->irsRadGainOffs[i].lMin = mathUtils.strtofloat(std::string(charValue));
+                        xercesc::XMLString::release(&charValue);
                     }
                     else
                     {
-                        throw RSGISXMLArgumentsException("No \'lmin\' attribute was provided.");
+                        throw rsgis::RSGISXMLArgumentsException("No \'lmin\' attribute was provided.");
                     }
-                    XMLString::release(&lMinXMLStr);
+                    xercesc::XMLString::release(&lMinXMLStr);
                     
-                    XMLCh *lMaxXMLStr = XMLString::transcode("lmax");
+                    XMLCh *lMaxXMLStr = xercesc::XMLString::transcode("lmax");
                     if(bandElement->hasAttribute(lMaxXMLStr))
                     {
-                        char *charValue = XMLString::transcode(bandElement->getAttribute(lMaxXMLStr));
-                        this->irsRadGainOffs[i].lMax = mathUtils.strtofloat(string(charValue));
-                        XMLString::release(&charValue);
+                        char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(lMaxXMLStr));
+                        this->irsRadGainOffs[i].lMax = mathUtils.strtofloat(std::string(charValue));
+                        xercesc::XMLString::release(&charValue);
                     }
                     else
                     {
-                        throw RSGISXMLArgumentsException("No \'lmax\' attribute was provided.");
+                        throw rsgis::RSGISXMLArgumentsException("No \'lmax\' attribute was provided.");
                     }
-                    XMLString::release(&lMaxXMLStr);
+                    xercesc::XMLString::release(&lMaxXMLStr);
                     
-                    XMLCh *qCalMinXMLStr = XMLString::transcode("qcalmin");
+                    XMLCh *qCalMinXMLStr = xercesc::XMLString::transcode("qcalmin");
                     if(bandElement->hasAttribute(qCalMinXMLStr))
                     {
-                        char *charValue = XMLString::transcode(bandElement->getAttribute(qCalMinXMLStr));
-                        this->irsRadGainOffs[i].qCalMin = mathUtils.strtofloat(string(charValue));
-                        XMLString::release(&charValue);
+                        char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(qCalMinXMLStr));
+                        this->irsRadGainOffs[i].qCalMin = mathUtils.strtofloat(std::string(charValue));
+                        xercesc::XMLString::release(&charValue);
                     }
                     else
                     {
-                        throw RSGISXMLArgumentsException("No \'qcalmin\' attribute was provided.");
+                        throw rsgis::RSGISXMLArgumentsException("No \'qcalmin\' attribute was provided.");
                     }
-                    XMLString::release(&qCalMinXMLStr);
+                    xercesc::XMLString::release(&qCalMinXMLStr);
                     
-                    XMLCh *qCalMaxXMLStr = XMLString::transcode("qcalmax");
+                    XMLCh *qCalMaxXMLStr = xercesc::XMLString::transcode("qcalmax");
                     if(bandElement->hasAttribute(qCalMaxXMLStr))
                     {
-                        char *charValue = XMLString::transcode(bandElement->getAttribute(qCalMaxXMLStr));
-                        this->irsRadGainOffs[i].qCalMax = mathUtils.strtofloat(string(charValue));
-                        XMLString::release(&charValue);
+                        char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(qCalMaxXMLStr));
+                        this->irsRadGainOffs[i].qCalMax = mathUtils.strtofloat(std::string(charValue));
+                        xercesc::XMLString::release(&charValue);
                     }
                     else
                     {
-                        throw RSGISXMLArgumentsException("No \'qcalmax\' attribute was provided.");
+                        throw rsgis::RSGISXMLArgumentsException("No \'qcalmax\' attribute was provided.");
                     }
-                    XMLString::release(&qCalMaxXMLStr);
+                    xercesc::XMLString::release(&qCalMaxXMLStr);
                 }
-                XMLString::release(&sensorBandXMLStr);
+                xercesc::XMLString::release(&sensorBandXMLStr);
             }
         }
-        else if(XMLString::equals(optionQuickbird16bitRadCal, optionXML))
+        else if(xercesc::XMLString::equals(optionQuickbird16bitRadCal, optionXML))
         {
             this->option = quickbird16bitradcal;
-            XMLCh *outputXMLStr = XMLString::transcode("output");
+            XMLCh *outputXMLStr = xercesc::XMLString::transcode("output");
             if(argElement->hasAttribute(outputXMLStr))
             {
-                char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
-                this->outputImage = string(charValue);
-                XMLString::release(&charValue);
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outputXMLStr));
+                this->outputImage = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
             }
             else
             {
-                throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+                throw rsgis::RSGISXMLArgumentsException("No \'output\' attribute was provided.");
             }
-            XMLString::release(&outputXMLStr);
+            xercesc::XMLString::release(&outputXMLStr);
             
             
-            DOMNodeList *bandsNodesList = argElement->getElementsByTagName(XMLString::transcode("rsgis:band"));
+            xercesc::DOMNodeList *bandsNodesList = argElement->getElementsByTagName(xercesc::XMLString::transcode("rsgis:band"));
             this->numBands = bandsNodesList->getLength();		
             
-            cout << "Found " << this->numBands << " Bands listed.\n";
+            std::cout << "Found " << this->numBands << " Bands listed.\n";
             
-            DOMElement *bandElement = NULL;
-            quickbird16bitRadGainOffs = new Quickbird16bitRadianceGainsOffsets[numBands];
-            inputImages = new string[numBands];
+            xercesc::DOMElement *bandElement = NULL;
+            quickbird16bitRadGainOffs = new rsgis::calib::Quickbird16bitRadianceGainsOffsets[numBands];
+            inputImages = new std::string[numBands];
             
             for(unsigned int i = 0; i < numBands; i++)
             {
-                bandElement = static_cast<DOMElement*>(bandsNodesList->item(i));
+                bandElement = static_cast<xercesc::DOMElement*>(bandsNodesList->item(i));
                 
-                XMLCh *bandNameXMLStr = XMLString::transcode("name");
+                XMLCh *bandNameXMLStr = xercesc::XMLString::transcode("name");
                 if(bandElement->hasAttribute(bandNameXMLStr))
                 {
-                    char *charValue = XMLString::transcode(bandElement->getAttribute(bandNameXMLStr));
-                    this->quickbird16bitRadGainOffs[i].bandName = string(charValue);
-                    XMLString::release(&charValue);
+                    char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(bandNameXMLStr));
+                    this->quickbird16bitRadGainOffs[i].bandName = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
                 }
                 else
                 {
-                    throw RSGISXMLArgumentsException("No \'name\' attribute was provided.");
+                    throw rsgis::RSGISXMLArgumentsException("No \'name\' attribute was provided.");
                 }
-                XMLString::release(&bandNameXMLStr);
+                xercesc::XMLString::release(&bandNameXMLStr);
                 
-                XMLCh *bandImageXMLStr = XMLString::transcode("image");
+                XMLCh *bandImageXMLStr = xercesc::XMLString::transcode("image");
                 if(bandElement->hasAttribute(bandImageXMLStr))
                 {
-                    char *charValue = XMLString::transcode(bandElement->getAttribute(bandImageXMLStr));
-                    this->inputImages[i] = string(charValue);
-                    XMLString::release(&charValue);
+                    char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(bandImageXMLStr));
+                    this->inputImages[i] = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
                 }
                 else
                 {
-                    throw RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+                    throw rsgis::RSGISXMLArgumentsException("No \'image\' attribute was provided.");
                 }
-                XMLString::release(&bandImageXMLStr);
+                xercesc::XMLString::release(&bandImageXMLStr);
                 
-                XMLCh *bandIdxXMLStr = XMLString::transcode("band");
+                XMLCh *bandIdxXMLStr = xercesc::XMLString::transcode("band");
                 if(bandElement->hasAttribute(bandIdxXMLStr))
                 {
-                    char *charValue = XMLString::transcode(bandElement->getAttribute(bandIdxXMLStr));
-                    this->quickbird16bitRadGainOffs[i].band = mathUtils.strtounsignedint(string(charValue));
-                    XMLString::release(&charValue);
+                    char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(bandIdxXMLStr));
+                    this->quickbird16bitRadGainOffs[i].band = mathUtils.strtounsignedint(std::string(charValue));
+                    xercesc::XMLString::release(&charValue);
                 }
                 else
                 {
-                    throw RSGISXMLArgumentsException("No \'band\' attribute was provided.");
+                    throw rsgis::RSGISXMLArgumentsException("No \'band\' attribute was provided.");
                 }
-                XMLString::release(&bandIdxXMLStr);
+                xercesc::XMLString::release(&bandIdxXMLStr);
                 
-                XMLCh *sensorBandXMLStr = XMLString::transcode("sensorband");
+                XMLCh *sensorBandXMLStr = xercesc::XMLString::transcode("sensorband");
                 if(bandElement->hasAttribute(sensorBandXMLStr))
                 {
-                    char *charValue = XMLString::transcode(bandElement->getAttribute(sensorBandXMLStr));
-                    string sensorBand = string(charValue);
+                    char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(sensorBandXMLStr));
+                    std::string sensorBand = std::string(charValue);
                     if(sensorBand == "XXX")
                     {
                         this->quickbird16bitRadGainOffs[i].calFactor = 0;
@@ -1779,116 +1793,116 @@ void RSGISExeImageCalibration::retrieveParameters(DOMElement *argElement) throw(
                     }
                     else
                     {
-                        cout << "sensorBand = " << sensorBand << endl;
-                        throw RSGISXMLArgumentsException("Do not recognised sensorBand.");
+                        std::cout << "sensorBand = " << sensorBand << std::endl;
+                        throw rsgis::RSGISXMLArgumentsException("Do not recognised sensorBand.");
                     }
-                    XMLString::release(&charValue);
+                    xercesc::XMLString::release(&charValue);
                 }
                 else
                 {
-                    XMLCh *calFactorXMLStr = XMLString::transcode("calfactor");
+                    XMLCh *calFactorXMLStr = xercesc::XMLString::transcode("calfactor");
                     if(bandElement->hasAttribute(calFactorXMLStr))
                     {
-                        char *charValue = XMLString::transcode(bandElement->getAttribute(calFactorXMLStr));
-                        this->quickbird16bitRadGainOffs[i].calFactor = mathUtils.strtofloat(string(charValue));
-                        XMLString::release(&charValue);
+                        char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(calFactorXMLStr));
+                        this->quickbird16bitRadGainOffs[i].calFactor = mathUtils.strtofloat(std::string(charValue));
+                        xercesc::XMLString::release(&charValue);
                     }
                     else
                     {
-                        throw RSGISXMLArgumentsException("No \'calfactor\' attribute was provided.");
+                        throw rsgis::RSGISXMLArgumentsException("No \'calfactor\' attribute was provided.");
                     }
-                    XMLString::release(&calFactorXMLStr);
+                    xercesc::XMLString::release(&calFactorXMLStr);
                     
-                    XMLCh *bandIntegrateXMLStr = XMLString::transcode("bandintegrate");
+                    XMLCh *bandIntegrateXMLStr = xercesc::XMLString::transcode("bandintegrate");
                     if(bandElement->hasAttribute(bandIntegrateXMLStr))
                     {
-                        char *charValue = XMLString::transcode(bandElement->getAttribute(bandIntegrateXMLStr));
-                        this->quickbird16bitRadGainOffs[i].bandIntegrate = mathUtils.strtofloat(string(charValue));
-                        XMLString::release(&charValue);
+                        char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(bandIntegrateXMLStr));
+                        this->quickbird16bitRadGainOffs[i].bandIntegrate = mathUtils.strtofloat(std::string(charValue));
+                        xercesc::XMLString::release(&charValue);
                     }
                     else
                     {
-                        throw RSGISXMLArgumentsException("No \'bandintegrate\' attribute was provided.");
+                        throw rsgis::RSGISXMLArgumentsException("No \'bandintegrate\' attribute was provided.");
                     }
-                    XMLString::release(&bandIntegrateXMLStr);
+                    xercesc::XMLString::release(&bandIntegrateXMLStr);
                 }
-                XMLString::release(&sensorBandXMLStr);
+                xercesc::XMLString::release(&sensorBandXMLStr);
             }
         }
-        else if(XMLString::equals(optionQuickbird8bitRadCal, optionXML))
+        else if(xercesc::XMLString::equals(optionQuickbird8bitRadCal, optionXML))
         {
             this->option = quickbird8bitradcal;
-            XMLCh *outputXMLStr = XMLString::transcode("output");
+            XMLCh *outputXMLStr = xercesc::XMLString::transcode("output");
             if(argElement->hasAttribute(outputXMLStr))
             {
-                char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
-                this->outputImage = string(charValue);
-                XMLString::release(&charValue);
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outputXMLStr));
+                this->outputImage = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
             }
             else
             {
-                throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+                throw rsgis::RSGISXMLArgumentsException("No \'output\' attribute was provided.");
             }
-            XMLString::release(&outputXMLStr);
+            xercesc::XMLString::release(&outputXMLStr);
             
             
-            DOMNodeList *bandsNodesList = argElement->getElementsByTagName(XMLString::transcode("rsgis:band"));
+            xercesc::DOMNodeList *bandsNodesList = argElement->getElementsByTagName(xercesc::XMLString::transcode("rsgis:band"));
             this->numBands = bandsNodesList->getLength();		
             
-            cout << "Found " << this->numBands << " Bands listed.\n";
+            std::cout << "Found " << this->numBands << " Bands listed.\n";
             
-            DOMElement *bandElement = NULL;
-            quickbird8bitRadGainOffs = new Quickbird8bitRadianceGainsOffsets[numBands];
-            inputImages = new string[numBands];
+            xercesc::DOMElement *bandElement = NULL;
+            quickbird8bitRadGainOffs = new rsgis::calib::Quickbird8bitRadianceGainsOffsets[numBands];
+            inputImages = new std::string[numBands];
             
             for(unsigned int i = 0; i < numBands; i++)
             {
-                bandElement = static_cast<DOMElement*>(bandsNodesList->item(i));
+                bandElement = static_cast<xercesc::DOMElement*>(bandsNodesList->item(i));
                 
-                XMLCh *bandNameXMLStr = XMLString::transcode("name");
+                XMLCh *bandNameXMLStr = xercesc::XMLString::transcode("name");
                 if(bandElement->hasAttribute(bandNameXMLStr))
                 {
-                    char *charValue = XMLString::transcode(bandElement->getAttribute(bandNameXMLStr));
-                    this->quickbird8bitRadGainOffs[i].bandName = string(charValue);
-                    XMLString::release(&charValue);
+                    char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(bandNameXMLStr));
+                    this->quickbird8bitRadGainOffs[i].bandName = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
                 }
                 else
                 {
-                    throw RSGISXMLArgumentsException("No \'name\' attribute was provided.");
+                    throw rsgis::RSGISXMLArgumentsException("No \'name\' attribute was provided.");
                 }
-                XMLString::release(&bandNameXMLStr);
+                xercesc::XMLString::release(&bandNameXMLStr);
                 
-                XMLCh *bandImageXMLStr = XMLString::transcode("image");
+                XMLCh *bandImageXMLStr = xercesc::XMLString::transcode("image");
                 if(bandElement->hasAttribute(bandImageXMLStr))
                 {
-                    char *charValue = XMLString::transcode(bandElement->getAttribute(bandImageXMLStr));
-                    this->inputImages[i] = string(charValue);
-                    XMLString::release(&charValue);
+                    char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(bandImageXMLStr));
+                    this->inputImages[i] = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
                 }
                 else
                 {
-                    throw RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+                    throw rsgis::RSGISXMLArgumentsException("No \'image\' attribute was provided.");
                 }
-                XMLString::release(&bandImageXMLStr);
+                xercesc::XMLString::release(&bandImageXMLStr);
                 
-                XMLCh *bandIdxXMLStr = XMLString::transcode("band");
+                XMLCh *bandIdxXMLStr = xercesc::XMLString::transcode("band");
                 if(bandElement->hasAttribute(bandIdxXMLStr))
                 {
-                    char *charValue = XMLString::transcode(bandElement->getAttribute(bandIdxXMLStr));
-                    this->quickbird8bitRadGainOffs[i].band = mathUtils.strtounsignedint(string(charValue));
-                    XMLString::release(&charValue);
+                    char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(bandIdxXMLStr));
+                    this->quickbird8bitRadGainOffs[i].band = mathUtils.strtounsignedint(std::string(charValue));
+                    xercesc::XMLString::release(&charValue);
                 }
                 else
                 {
-                    throw RSGISXMLArgumentsException("No \'band\' attribute was provided.");
+                    throw rsgis::RSGISXMLArgumentsException("No \'band\' attribute was provided.");
                 }
-                XMLString::release(&bandIdxXMLStr);
+                xercesc::XMLString::release(&bandIdxXMLStr);
                 
-                XMLCh *sensorBandXMLStr = XMLString::transcode("sensorband");
+                XMLCh *sensorBandXMLStr = xercesc::XMLString::transcode("sensorband");
                 if(bandElement->hasAttribute(sensorBandXMLStr))
                 {
-                    char *charValue = XMLString::transcode(bandElement->getAttribute(sensorBandXMLStr));
-                    string sensorBand = string(charValue);
+                    char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(sensorBandXMLStr));
+                    std::string sensorBand = std::string(charValue);
                     if(sensorBand == "XXX")
                     {
                         this->quickbird8bitRadGainOffs[i].calFactor = 0;
@@ -1903,129 +1917,129 @@ void RSGISExeImageCalibration::retrieveParameters(DOMElement *argElement) throw(
                     }
                     else
                     {
-                        cout << "sensorBand = " << sensorBand << endl;
-                        throw RSGISXMLArgumentsException("Do not recognised sensorBand.");
+                        std::cout << "sensorBand = " << sensorBand << std::endl;
+                        throw rsgis::RSGISXMLArgumentsException("Do not recognised sensorBand.");
                     }
-                    XMLString::release(&charValue);
+                    xercesc::XMLString::release(&charValue);
                 }
                 else
                 {
-                    XMLCh *calFactorXMLStr = XMLString::transcode("calfactor");
+                    XMLCh *calFactorXMLStr = xercesc::XMLString::transcode("calfactor");
                     if(bandElement->hasAttribute(calFactorXMLStr))
                     {
-                        char *charValue = XMLString::transcode(bandElement->getAttribute(calFactorXMLStr));
-                        this->quickbird8bitRadGainOffs[i].calFactor = mathUtils.strtofloat(string(charValue));
-                        XMLString::release(&charValue);
+                        char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(calFactorXMLStr));
+                        this->quickbird8bitRadGainOffs[i].calFactor = mathUtils.strtofloat(std::string(charValue));
+                        xercesc::XMLString::release(&charValue);
                     }
                     else
                     {
-                        throw RSGISXMLArgumentsException("No \'calfactor\' attribute was provided.");
+                        throw rsgis::RSGISXMLArgumentsException("No \'calfactor\' attribute was provided.");
                     }
-                    XMLString::release(&calFactorXMLStr);
+                    xercesc::XMLString::release(&calFactorXMLStr);
                     
-                    XMLCh *kXMLStr = XMLString::transcode("k");
+                    XMLCh *kXMLStr = xercesc::XMLString::transcode("k");
                     if(bandElement->hasAttribute(kXMLStr))
                     {
-                        char *charValue = XMLString::transcode(bandElement->getAttribute(kXMLStr));
-                        this->quickbird8bitRadGainOffs[i].k = mathUtils.strtofloat(string(charValue));
-                        XMLString::release(&charValue);
+                        char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(kXMLStr));
+                        this->quickbird8bitRadGainOffs[i].k = mathUtils.strtofloat(std::string(charValue));
+                        xercesc::XMLString::release(&charValue);
                     }
                     else
                     {
-                        throw RSGISXMLArgumentsException("No \'k\' attribute was provided.");
+                        throw rsgis::RSGISXMLArgumentsException("No \'k\' attribute was provided.");
                     }
-                    XMLString::release(&kXMLStr);
+                    xercesc::XMLString::release(&kXMLStr);
                     
-                    XMLCh *bandIntegrateXMLStr = XMLString::transcode("bandintegrate");
+                    XMLCh *bandIntegrateXMLStr = xercesc::XMLString::transcode("bandintegrate");
                     if(bandElement->hasAttribute(bandIntegrateXMLStr))
                     {
-                        char *charValue = XMLString::transcode(bandElement->getAttribute(bandIntegrateXMLStr));
-                        this->quickbird8bitRadGainOffs[i].bandIntegrate = mathUtils.strtofloat(string(charValue));
-                        XMLString::release(&charValue);
+                        char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(bandIntegrateXMLStr));
+                        this->quickbird8bitRadGainOffs[i].bandIntegrate = mathUtils.strtofloat(std::string(charValue));
+                        xercesc::XMLString::release(&charValue);
                     }
                     else
                     {
-                        throw RSGISXMLArgumentsException("No \'bandintegrate\' attribute was provided.");
+                        throw rsgis::RSGISXMLArgumentsException("No \'bandintegrate\' attribute was provided.");
                     }
-                    XMLString::release(&bandIntegrateXMLStr);
+                    xercesc::XMLString::release(&bandIntegrateXMLStr);
                 }
-                XMLString::release(&sensorBandXMLStr);
+                xercesc::XMLString::release(&sensorBandXMLStr);
             }
         }
-        else if(XMLString::equals(optionWorldView2RadCal, optionXML))
+        else if(xercesc::XMLString::equals(optionWorldView2RadCal, optionXML))
         {
             this->option = worldview2radcal;
-            XMLCh *outputXMLStr = XMLString::transcode("output");
+            XMLCh *outputXMLStr = xercesc::XMLString::transcode("output");
             if(argElement->hasAttribute(outputXMLStr))
             {
-                char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
-                this->outputImage = string(charValue);
-                XMLString::release(&charValue);
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outputXMLStr));
+                this->outputImage = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
             }
             else
             {
-                throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+                throw rsgis::RSGISXMLArgumentsException("No \'output\' attribute was provided.");
             }
-            XMLString::release(&outputXMLStr);
+            xercesc::XMLString::release(&outputXMLStr);
             
             
-            DOMNodeList *bandsNodesList = argElement->getElementsByTagName(XMLString::transcode("rsgis:band"));
+            xercesc::DOMNodeList *bandsNodesList = argElement->getElementsByTagName(xercesc::XMLString::transcode("rsgis:band"));
             this->numBands = bandsNodesList->getLength();		
             
-            cout << "Found " << this->numBands << " Bands listed.\n";
+            std::cout << "Found " << this->numBands << " Bands listed.\n";
             
-            DOMElement *bandElement = NULL;
-            worldview2RadGainOffs = new WorldView2RadianceGainsOffsets[numBands];
-            inputImages = new string[numBands];
+            xercesc::DOMElement *bandElement = NULL;
+            worldview2RadGainOffs = new rsgis::calib::WorldView2RadianceGainsOffsets[numBands];
+            inputImages = new std::string[numBands];
             
             for(unsigned int i = 0; i < numBands; i++)
             {
-                bandElement = static_cast<DOMElement*>(bandsNodesList->item(i));
+                bandElement = static_cast<xercesc::DOMElement*>(bandsNodesList->item(i));
                 
-                XMLCh *bandNameXMLStr = XMLString::transcode("name");
+                XMLCh *bandNameXMLStr = xercesc::XMLString::transcode("name");
                 if(bandElement->hasAttribute(bandNameXMLStr))
                 {
-                    char *charValue = XMLString::transcode(bandElement->getAttribute(bandNameXMLStr));
-                    this->worldview2RadGainOffs[i].bandName = string(charValue);
-                    XMLString::release(&charValue);
+                    char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(bandNameXMLStr));
+                    this->worldview2RadGainOffs[i].bandName = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
                 }
                 else
                 {
-                    throw RSGISXMLArgumentsException("No \'name\' attribute was provided.");
+                    throw rsgis::RSGISXMLArgumentsException("No \'name\' attribute was provided.");
                 }
-                XMLString::release(&bandNameXMLStr);
+                xercesc::XMLString::release(&bandNameXMLStr);
                 
-                XMLCh *bandImageXMLStr = XMLString::transcode("image");
+                XMLCh *bandImageXMLStr = xercesc::XMLString::transcode("image");
                 if(bandElement->hasAttribute(bandImageXMLStr))
                 {
-                    char *charValue = XMLString::transcode(bandElement->getAttribute(bandImageXMLStr));
-                    this->inputImages[i] = string(charValue);
-                    XMLString::release(&charValue);
+                    char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(bandImageXMLStr));
+                    this->inputImages[i] = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
                 }
                 else
                 {
-                    throw RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+                    throw rsgis::RSGISXMLArgumentsException("No \'image\' attribute was provided.");
                 }
-                XMLString::release(&bandImageXMLStr);
+                xercesc::XMLString::release(&bandImageXMLStr);
                 
-                XMLCh *bandIdxXMLStr = XMLString::transcode("band");
+                XMLCh *bandIdxXMLStr = xercesc::XMLString::transcode("band");
                 if(bandElement->hasAttribute(bandIdxXMLStr))
                 {
-                    char *charValue = XMLString::transcode(bandElement->getAttribute(bandIdxXMLStr));
-                    this->worldview2RadGainOffs[i].band = mathUtils.strtounsignedint(string(charValue));
-                    XMLString::release(&charValue);
+                    char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(bandIdxXMLStr));
+                    this->worldview2RadGainOffs[i].band = mathUtils.strtounsignedint(std::string(charValue));
+                    xercesc::XMLString::release(&charValue);
                 }
                 else
                 {
-                    throw RSGISXMLArgumentsException("No \'band\' attribute was provided.");
+                    throw rsgis::RSGISXMLArgumentsException("No \'band\' attribute was provided.");
                 }
-                XMLString::release(&bandIdxXMLStr);
+                xercesc::XMLString::release(&bandIdxXMLStr);
                 
-                XMLCh *sensorBandXMLStr = XMLString::transcode("sensorband");
+                XMLCh *sensorBandXMLStr = xercesc::XMLString::transcode("sensorband");
                 if(bandElement->hasAttribute(sensorBandXMLStr))
                 {
-                    char *charValue = XMLString::transcode(bandElement->getAttribute(sensorBandXMLStr));
-                    string sensorBand = string(charValue);
+                    char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(sensorBandXMLStr));
+                    std::string sensorBand = std::string(charValue);
                     if(sensorBand == "WV2_Coast")
                     {
                         this->worldview2RadGainOffs[i].calFactor = 0;
@@ -2068,105 +2082,105 @@ void RSGISExeImageCalibration::retrieveParameters(DOMElement *argElement) throw(
                     }
                     else
                     {
-                        cout << "sensorBand = " << sensorBand << endl;
-                        throw RSGISXMLArgumentsException("Do not recognised sensorBand.");
+                        std::cout << "sensorBand = " << sensorBand << std::endl;
+                        throw rsgis::RSGISXMLArgumentsException("Do not recognised sensorBand.");
                     }
-                    XMLString::release(&charValue);
+                    xercesc::XMLString::release(&charValue);
                 }
                 else
                 {
-                    XMLCh *calFactorXMLStr = XMLString::transcode("calfactor");
+                    XMLCh *calFactorXMLStr = xercesc::XMLString::transcode("calfactor");
                     if(bandElement->hasAttribute(calFactorXMLStr))
                     {
-                        char *charValue = XMLString::transcode(bandElement->getAttribute(calFactorXMLStr));
-                        this->worldview2RadGainOffs[i].calFactor = mathUtils.strtofloat(string(charValue));
-                        XMLString::release(&charValue);
+                        char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(calFactorXMLStr));
+                        this->worldview2RadGainOffs[i].calFactor = mathUtils.strtofloat(std::string(charValue));
+                        xercesc::XMLString::release(&charValue);
                     }
                     else
                     {
-                        throw RSGISXMLArgumentsException("No \'calfactor\' attribute was provided.");
+                        throw rsgis::RSGISXMLArgumentsException("No \'calfactor\' attribute was provided.");
                     }
-                    XMLString::release(&calFactorXMLStr);
+                    xercesc::XMLString::release(&calFactorXMLStr);
                     
-                    XMLCh *bandIntegrateXMLStr = XMLString::transcode("bandintegrate");
+                    XMLCh *bandIntegrateXMLStr = xercesc::XMLString::transcode("bandintegrate");
                     if(bandElement->hasAttribute(bandIntegrateXMLStr))
                     {
-                        char *charValue = XMLString::transcode(bandElement->getAttribute(bandIntegrateXMLStr));
-                        this->worldview2RadGainOffs[i].bandIntegrate = mathUtils.strtofloat(string(charValue));
-                        XMLString::release(&charValue);
+                        char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(bandIntegrateXMLStr));
+                        this->worldview2RadGainOffs[i].bandIntegrate = mathUtils.strtofloat(std::string(charValue));
+                        xercesc::XMLString::release(&charValue);
                     }
                     else
                     {
-                        throw RSGISXMLArgumentsException("No \'bandintegrate\' attribute was provided.");
+                        throw rsgis::RSGISXMLArgumentsException("No \'bandintegrate\' attribute was provided.");
                     }
-                    XMLString::release(&bandIntegrateXMLStr);
+                    xercesc::XMLString::release(&bandIntegrateXMLStr);
                 }
-                XMLString::release(&sensorBandXMLStr);
+                xercesc::XMLString::release(&sensorBandXMLStr);
             }
         }
-        else if(XMLString::equals(optionApply6S, optionXML))
+        else if(xercesc::XMLString::equals(optionApply6S, optionXML))
 		{
             this->option = apply6s;
             this->useTopo6S = false;
 			
-            XMLCh *inputXMLStr = XMLString::transcode("input");
+            XMLCh *inputXMLStr = xercesc::XMLString::transcode("input");
             if(argElement->hasAttribute(inputXMLStr))
             {
-                char *charValue = XMLString::transcode(argElement->getAttribute(inputXMLStr));
-                this->inputImage = string(charValue);
-                XMLString::release(&charValue);
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(inputXMLStr));
+                this->inputImage = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
             }
             else
             {
-                throw RSGISXMLArgumentsException("No \'input\' attribute was provided.");
+                throw rsgis::RSGISXMLArgumentsException("No \'input\' attribute was provided.");
             }
-            XMLString::release(&inputXMLStr);
+            xercesc::XMLString::release(&inputXMLStr);
             
-            XMLCh *outputXMLStr = XMLString::transcode("output");
+            XMLCh *outputXMLStr = xercesc::XMLString::transcode("output");
             if(argElement->hasAttribute(outputXMLStr))
             {
-                char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
-                this->outputImage = string(charValue);
-                XMLString::release(&charValue);
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outputXMLStr));
+                this->outputImage = std::string(charValue);
+                xercesc::XMLString::release(&charValue);
             }
             else
             {
-                throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+                throw rsgis::RSGISXMLArgumentsException("No \'output\' attribute was provided.");
             }
-            XMLString::release(&outputXMLStr);
+            xercesc::XMLString::release(&outputXMLStr);
             
             // Set scaling factor for output images
             this->scaleFactor = 1.0;
-            XMLCh *scaleFactorXMLStr = XMLString::transcode("scaleFactor");
+            XMLCh *scaleFactorXMLStr = xercesc::XMLString::transcode("scaleFactor");
             if(argElement->hasAttribute(scaleFactorXMLStr))
             {
-                char *charValue = XMLString::transcode(argElement->getAttribute(scaleFactorXMLStr));
-                this->scaleFactor = mathUtils.strtofloat(string(charValue));
-                XMLString::release(&charValue);
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(scaleFactorXMLStr));
+                this->scaleFactor = mathUtils.strtofloat(std::string(charValue));
+                xercesc::XMLString::release(&charValue);
             }
-            XMLString::release(&scaleFactorXMLStr);
+            xercesc::XMLString::release(&scaleFactorXMLStr);
             
-			XMLCh *demXMLStr = XMLString::transcode("inputDEM");
+			XMLCh *demXMLStr = xercesc::XMLString::transcode("inputDEM");
             if(argElement->hasAttribute(demXMLStr))
             {
-                char *charValue = XMLString::transcode(argElement->getAttribute(demXMLStr));
-                this->inputDEM = string(charValue);
+                char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(demXMLStr));
+                this->inputDEM = std::string(charValue);
 				this->useTopo6S = true;
-                XMLString::release(&charValue);
+                xercesc::XMLString::release(&charValue);
             }
             else
             {
-                cout << "\tNo DEM provided, using the same coefficients for all elevations" << endl;
+                std::cout << "\tNo DEM provided, using the same coefficients for all elevations" << std::endl;
             }
-            XMLString::release(&demXMLStr);
+            xercesc::XMLString::release(&demXMLStr);
 			
-            DOMNodeList *bandsNodesList = argElement->getElementsByTagName(XMLString::transcode("rsgis:band"));
+            xercesc::DOMNodeList *bandsNodesList = argElement->getElementsByTagName(xercesc::XMLString::transcode("rsgis:band"));
             this->numValues = bandsNodesList->getLength();		
             this->numElevation = 0;
-            cout << "Found " << this->numValues << " Bands listed.\n";
+            std::cout << "Found " << this->numValues << " Bands listed.\n";
             
-            DOMElement *bandElement = NULL;
-			DOMElement *elevationElement = NULL;
+            xercesc::DOMElement *bandElement = NULL;
+			xercesc::DOMElement *elevationElement = NULL;
             this->aX = new float*[numValues];
             this->bX = new float*[numValues];
             this->cX = new float*[numValues];
@@ -2174,20 +2188,20 @@ void RSGISExeImageCalibration::retrieveParameters(DOMElement *argElement) throw(
             
             for(int i = 0; i < numValues; i++)
             {
-                bandElement = static_cast<DOMElement*>(bandsNodesList->item(i));
+                bandElement = static_cast<xercesc::DOMElement*>(bandsNodesList->item(i));
 				
-				XMLCh *bandXMLStr = XMLString::transcode("band");
+				XMLCh *bandXMLStr = xercesc::XMLString::transcode("band");
 				if(bandElement->hasAttribute(bandXMLStr))
 				{
-					char *charValue = XMLString::transcode(bandElement->getAttribute(bandXMLStr));
-					this->imageBands[i] = mathUtils.strtounsignedint(string(charValue))-1;
-					XMLString::release(&charValue);
+					char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(bandXMLStr));
+					this->imageBands[i] = mathUtils.strtounsignedint(std::string(charValue))-1;
+					xercesc::XMLString::release(&charValue);
 				}
 				else
 				{
-					throw RSGISXMLArgumentsException("No \'band\' attribute was provided.");
+					throw rsgis::RSGISXMLArgumentsException("No \'band\' attribute was provided.");
 				}
-				XMLString::release(&bandXMLStr);
+				xercesc::XMLString::release(&bandXMLStr);
 				
 				if (!this->useTopo6S) 
 				{
@@ -2196,59 +2210,59 @@ void RSGISExeImageCalibration::retrieveParameters(DOMElement *argElement) throw(
 					this->cX[i] = new float[this->numElevation+1];
 					this->elevationThresh = NULL;
 					
-					XMLCh *aXXMLStr = XMLString::transcode("ax");
+					XMLCh *aXXMLStr = xercesc::XMLString::transcode("ax");
 					if(bandElement->hasAttribute(aXXMLStr))
 					{
-						char *charValue = XMLString::transcode(bandElement->getAttribute(aXXMLStr));
-						this->aX[i][0] = mathUtils.strtofloat(string(charValue));
-						XMLString::release(&charValue);
+						char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(aXXMLStr));
+						this->aX[i][0] = mathUtils.strtofloat(std::string(charValue));
+						xercesc::XMLString::release(&charValue);
 					}
 					else
 					{
-						throw RSGISXMLArgumentsException("No \'ax\' attribute was provided.");
+						throw rsgis::RSGISXMLArgumentsException("No \'ax\' attribute was provided.");
 					}
-					XMLString::release(&aXXMLStr);
+					xercesc::XMLString::release(&aXXMLStr);
 					
-					XMLCh *bXXMLStr = XMLString::transcode("bx");
+					XMLCh *bXXMLStr = xercesc::XMLString::transcode("bx");
 					if(bandElement->hasAttribute(bXXMLStr))
 					{
-						char *charValue = XMLString::transcode(bandElement->getAttribute(bXXMLStr));
-						this->bX[i][0] = mathUtils.strtofloat(string(charValue));
-						XMLString::release(&charValue);
+						char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(bXXMLStr));
+						this->bX[i][0] = mathUtils.strtofloat(std::string(charValue));
+						xercesc::XMLString::release(&charValue);
 					}
 					else
 					{
-						throw RSGISXMLArgumentsException("No \'bx\' attribute was provided.");
+						throw rsgis::RSGISXMLArgumentsException("No \'bx\' attribute was provided.");
 					}
-					XMLString::release(&bXXMLStr);
+					xercesc::XMLString::release(&bXXMLStr);
 					
-					XMLCh *cXXMLStr = XMLString::transcode("cx");
+					XMLCh *cXXMLStr = xercesc::XMLString::transcode("cx");
 					if(bandElement->hasAttribute(cXXMLStr))
 					{
-						char *charValue = XMLString::transcode(bandElement->getAttribute(cXXMLStr));
-						this->cX[i][0] = mathUtils.strtofloat(string(charValue));
-						XMLString::release(&charValue);
+						char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(cXXMLStr));
+						this->cX[i][0] = mathUtils.strtofloat(std::string(charValue));
+						xercesc::XMLString::release(&charValue);
 					}
 					else
 					{
-						throw RSGISXMLArgumentsException("No \'cx\' attribute was provided.");
+						throw rsgis::RSGISXMLArgumentsException("No \'cx\' attribute was provided.");
 					}
-					XMLString::release(&cXXMLStr);
+					xercesc::XMLString::release(&cXXMLStr);
 				}
 				
 				else
 				{
-					DOMNodeList *elevationNodesList = bandElement->getElementsByTagName(XMLString::transcode("rsgis:elevation"));
+					xercesc::DOMNodeList *elevationNodesList = bandElement->getElementsByTagName(xercesc::XMLString::transcode("rsgis:elevation"));
 					if (i == 0) // Set number of elevation values based on first band
 					{
 						this->numElevation = elevationNodesList->getLength();
-						cout << "numElevation = " << this->numElevation << endl;
+						std::cout << "numElevation = " << this->numElevation << std::endl;
 					}
 					else 
 					{
 						 if(elevationNodesList->getLength() != this->numElevation)
 						 {
-							 throw RSGISXMLArgumentsException("The number of elevation threasholds is not equal for all bands");
+							 throw rsgis::RSGISXMLArgumentsException("The number of elevation threasholds is not equal for all bands");
 						 }
 					}
 					
@@ -2259,62 +2273,62 @@ void RSGISExeImageCalibration::retrieveParameters(DOMElement *argElement) throw(
 					
 					for(unsigned int et = 0; et < this->numElevation; et++)
 					{
-						elevationElement = static_cast<DOMElement*>(elevationNodesList->item(et));
+						elevationElement = static_cast<xercesc::DOMElement*>(elevationNodesList->item(et));
 						
 						if (i == 0) // Seting elevation threasholds using first band
 						{
-							XMLCh *elevationUpperXXMLStr = XMLString::transcode("elevationUpper");
+							XMLCh *elevationUpperXXMLStr = xercesc::XMLString::transcode("elevationUpper");
 							if(elevationElement->hasAttribute(elevationUpperXXMLStr))
 							{
-								char *charValue = XMLString::transcode(elevationElement->getAttribute(elevationUpperXXMLStr));
-								this->elevationThresh[et] = mathUtils.strtofloat(string(charValue));
-								XMLString::release(&charValue);
+								char *charValue = xercesc::XMLString::transcode(elevationElement->getAttribute(elevationUpperXXMLStr));
+								this->elevationThresh[et] = mathUtils.strtofloat(std::string(charValue));
+								xercesc::XMLString::release(&charValue);
 							}
 							else
 							{
-								throw RSGISXMLArgumentsException("No \'elevationUpper\' attribute was provided.");
+								throw rsgis::RSGISXMLArgumentsException("No \'elevationUpper\' attribute was provided.");
 							}
-							XMLString::release(&elevationUpperXXMLStr);
+							xercesc::XMLString::release(&elevationUpperXXMLStr);
 						}
 						
-						XMLCh *aXXMLStr = XMLString::transcode("ax");
+						XMLCh *aXXMLStr = xercesc::XMLString::transcode("ax");
 						if(elevationElement->hasAttribute(aXXMLStr))
 						{
-							char *charValue = XMLString::transcode(elevationElement->getAttribute(aXXMLStr));
-							this->aX[i][et] = mathUtils.strtofloat(string(charValue));
-							XMLString::release(&charValue);
+							char *charValue = xercesc::XMLString::transcode(elevationElement->getAttribute(aXXMLStr));
+							this->aX[i][et] = mathUtils.strtofloat(std::string(charValue));
+							xercesc::XMLString::release(&charValue);
 						}
 						else
 						{
-							throw RSGISXMLArgumentsException("No \'ax\' attribute was provided for elevtion threashold.");
+							throw rsgis::RSGISXMLArgumentsException("No \'ax\' attribute was provided for elevtion threashold.");
 						}
-						XMLString::release(&aXXMLStr);
+						xercesc::XMLString::release(&aXXMLStr);
 						
-						XMLCh *bXXMLStr = XMLString::transcode("bx");
+						XMLCh *bXXMLStr = xercesc::XMLString::transcode("bx");
 						if(elevationElement->hasAttribute(bXXMLStr))
 						{
-							char *charValue = XMLString::transcode(elevationElement->getAttribute(bXXMLStr));
-							this->bX[i][et] = mathUtils.strtofloat(string(charValue));
-							XMLString::release(&charValue);
+							char *charValue = xercesc::XMLString::transcode(elevationElement->getAttribute(bXXMLStr));
+							this->bX[i][et] = mathUtils.strtofloat(std::string(charValue));
+							xercesc::XMLString::release(&charValue);
 						}
 						else
 						{
-							throw RSGISXMLArgumentsException("No \'bx\' attribute was provided for elevtion threashold.");
+							throw rsgis::RSGISXMLArgumentsException("No \'bx\' attribute was provided for elevtion threashold.");
 						}
-						XMLString::release(&bXXMLStr);
+						xercesc::XMLString::release(&bXXMLStr);
 						
-						XMLCh *cXXMLStr = XMLString::transcode("cx");
+						XMLCh *cXXMLStr = xercesc::XMLString::transcode("cx");
 						if(elevationElement->hasAttribute(cXXMLStr))
 						{
-							char *charValue = XMLString::transcode(elevationElement->getAttribute(cXXMLStr));
-							this->cX[i][et] = mathUtils.strtofloat(string(charValue));
-							XMLString::release(&charValue);
+							char *charValue = xercesc::XMLString::transcode(elevationElement->getAttribute(cXXMLStr));
+							this->cX[i][et] = mathUtils.strtofloat(std::string(charValue));
+							xercesc::XMLString::release(&charValue);
 						}
 						else
 						{
-							throw RSGISXMLArgumentsException("No \'cx\' attribute was provided for elevtion threashold.");
+							throw rsgis::RSGISXMLArgumentsException("No \'cx\' attribute was provided for elevtion threashold.");
 						}
-						XMLString::release(&cXXMLStr);
+						xercesc::XMLString::release(&cXXMLStr);
 						
 						
 					}
@@ -2326,149 +2340,109 @@ void RSGISExeImageCalibration::retrieveParameters(DOMElement *argElement) throw(
         }
 		else 
 		{
-			string message = "RSGISExeImageCalibration did not recognise option " + string(XMLString::transcode(optionXML));
-			throw RSGISXMLArgumentsException(message);
+			std::string message = "RSGISExeImageCalibration did not recognise option " + std::string(xercesc::XMLString::transcode(optionXML));
+			throw rsgis::RSGISXMLArgumentsException(message);
 		}
         
 	}
-	catch(RSGISXMLArgumentsException &e)
+	catch(rsgis::RSGISXMLArgumentsException &e)
 	{
 		throw e;
 	}
 	
-	XMLString::release(&algorName);
-	XMLString::release(&algorXMLStr);
-	XMLString::release(&optionXMLStr);
-	XMLString::release(&optionLandsatRadCal);
-    XMLString::release(&optionTopAtmosRefl);
-    XMLString::release(&optionSPOTRadCal);
-    XMLString::release(&optionIkonosRadCal);
-    XMLString::release(&optionASTERRadCal);
-    XMLString::release(&optionIRSRadCal);
-    XMLString::release(&optionQuickbird16bitRadCal);
-    XMLString::release(&optionQuickbird8bitRadCal);
-    XMLString::release(&optionWorldView2RadCal);
-    XMLString::release(&optionApply6S);
+	xercesc::XMLString::release(&algorName);
+	xercesc::XMLString::release(&algorXMLStr);
+	xercesc::XMLString::release(&optionXMLStr);
+	xercesc::XMLString::release(&optionLandsatRadCal);
+    xercesc::XMLString::release(&optionTopAtmosRefl);
+    xercesc::XMLString::release(&optionSPOTRadCal);
+    xercesc::XMLString::release(&optionIkonosRadCal);
+    xercesc::XMLString::release(&optionASTERRadCal);
+    xercesc::XMLString::release(&optionIRSRadCal);
+    xercesc::XMLString::release(&optionQuickbird16bitRadCal);
+    xercesc::XMLString::release(&optionQuickbird8bitRadCal);
+    xercesc::XMLString::release(&optionWorldView2RadCal);
+    xercesc::XMLString::release(&optionApply6S);
 	
 	parsed = true; // if all successful, it is parsed
 }
 
-void RSGISExeImageCalibration::runAlgorithm() throw(RSGISException)
+void RSGISExeImageCalibration::runAlgorithm() throw(rsgis::RSGISException)
 {
-	cout.precision(10);
+	std::cout.precision(10);
 	
 	if(!parsed)
 	{
-		throw RSGISException("Before running the parameters must be retrieved");
+		throw rsgis::RSGISException("Before running the parameters must be retrieved");
 	}
 	else
 	{
 		if(this->option == RSGISExeImageCalibration::landsatradcal)
 		{
-			cout << "This command converts Landsat from digital number values to at sensor radiance.\n";
-			cout << "Output Image: " << this->outputImage << endl;
-			for(unsigned int i = 0; i < numBands; ++i)
+			std::cout << "This command converts Landsat from digital number values to at sensor radiance.\n";
+			std::cout << "Output Image: " << this->outputImage << std::endl;
+            int i = 1;
+			for(std::vector<rsgis::cmds::CmdsLandsatRadianceGainsOffsets>::iterator iterBands = landsatRadGainOffs.begin(); iterBands != landsatRadGainOffs.end(); ++iterBands)
 			{
-				cout << i << ")\t name = " << landsatRadGainOffs[i].bandName << " band = " << landsatRadGainOffs[i].band << endl;
+				std::cout << i << ")\t name = " << (*iterBands).bandName << "    band = " << (*iterBands).band << std::endl;
+                ++i;
 			}
             
-			GDALAllRegister();
-			GDALDataset **datasets = NULL;
-			RSGISLandsatRadianceCalibration *radianceCalibration = NULL;
-			RSGISCalcImage *calcImage = NULL;
-            string *outBandNames = NULL;
-            
-			try
-			{
-				datasets = new GDALDataset*[numBands];
-                outBandNames = new string[numBands];
-				
-				unsigned int numRasterBands = 0;
-				unsigned int totalNumRasterBands = 0;
-				
-				for(unsigned int i = 0; i < this->numBands; ++i)
-				{
-					cout << "Opening: " << this->inputImages[i] << endl;
-					datasets[i] = (GDALDataset *) GDALOpen(this->inputImages[i].c_str(), GA_ReadOnly);
-					if(datasets[i] == NULL)
-					{
-						string message = string("Could not open image ") + this->inputImages[i];
-						throw RSGISImageException(message.c_str());
-					}
-					
-					numRasterBands = datasets[i]->GetRasterCount();
-					
-					if(this->landsatRadGainOffs[i].band > numRasterBands)
-					{
-						throw RSGISImageException("You have specified a band which is not within the image");
-					}
-					
-					this->landsatRadGainOffs[i].band = totalNumRasterBands + this->landsatRadGainOffs[i].band-1;
-					outBandNames[i] = this->landsatRadGainOffs[i].bandName;
-                    
-					totalNumRasterBands += numRasterBands;
-				}	
-				
-				radianceCalibration = new RSGISLandsatRadianceCalibration(numBands, this->landsatRadGainOffs);
-				
-				calcImage = new RSGISCalcImage(radianceCalibration, "", true);
-				calcImage->calcImage(datasets, this->numBands, this->outputImage, true, outBandNames,this->imageFormat);
-				
-				
-				for(unsigned int i = 0; i < this->numBands; ++i)
-				{
-					GDALClose(datasets[i]);
-				}
-				delete[] datasets;
-				delete[] landsatRadGainOffs;
-				delete[] outBandNames;
-				
-				delete radianceCalibration;
-				delete calcImage;
-			}
-			catch(RSGISException e)
-			{
-				throw e;
-			}
+            try
+            {
+                rsgis::cmds::executeConvertLandsat2Radiance(this->outputImage, this->imageFormat, this->landsatRadGainOffs);
+            }
+            catch (rsgis::cmds::RSGISCmdException &e)
+            {
+                throw rsgis::RSGISException(e.what());
+            }
+            catch (rsgis::RSGISException &e)
+            {
+                throw e;
+            }
+            catch (std::exception &e)
+            {
+                throw rsgis::RSGISException(e.what());
+            }
 		}
         else if(this->option == RSGISExeImageCalibration::spotradcal)
         {
-            cout << "This command converts SPOT from digital number values to at sensor radiance.\n";
-			cout << "Output Image: " << this->outputImage << endl;
+            std::cout << "This command converts SPOT from digital number values to at sensor radiance.\n";
+			std::cout << "Output Image: " << this->outputImage << std::endl;
 			for(unsigned int i = 0; i < numBands; ++i)
 			{
-				cout << i << ")\t name = " << spotRadGainOffs[i].bandName << " band = " << spotRadGainOffs[i].band << endl;
+				std::cout << i << ")\t name = " << spotRadGainOffs[i].bandName << " band = " << spotRadGainOffs[i].band << std::endl;
 			}
             
 			GDALAllRegister();
 			GDALDataset **datasets = NULL;
-			RSGISSPOTRadianceCalibration *radianceCalibration = NULL;
-			RSGISCalcImage *calcImage = NULL;
-            string *outBandNames = NULL;
+			rsgis::calib::RSGISSPOTRadianceCalibration *radianceCalibration = NULL;
+			rsgis::img::RSGISCalcImage *calcImage = NULL;
+            std::string *outBandNames = NULL;
             
 			try
 			{
 				datasets = new GDALDataset*[numBands];
-                outBandNames = new string[numBands];
+                outBandNames = new std::string[numBands];
 				
 				unsigned int numRasterBands = 0;
 				unsigned int totalNumRasterBands = 0;
 				
 				for(unsigned int i = 0; i < this->numBands; ++i)
 				{
-					cout << "Opening: " << this->inputImages[i] << endl;
+					std::cout << "Opening: " << this->inputImages[i] << std::endl;
 					datasets[i] = (GDALDataset *) GDALOpen(this->inputImages[i].c_str(), GA_ReadOnly);
 					if(datasets[i] == NULL)
 					{
-						string message = string("Could not open image ") + this->inputImages[i];
-						throw RSGISImageException(message.c_str());
+						std::string message = std::string("Could not open image ") + this->inputImages[i];
+						throw rsgis::RSGISImageException(message.c_str());
 					}
 					
 					numRasterBands = datasets[i]->GetRasterCount();
 					
 					if(this->spotRadGainOffs[i].band > numRasterBands)
 					{
-						throw RSGISImageException("You have specified a band which is not within the image");
+						throw rsgis::RSGISImageException("You have specified a band which is not within the image");
 					}
 					
 					this->spotRadGainOffs[i].band = totalNumRasterBands + this->spotRadGainOffs[i].band-1;
@@ -2477,9 +2451,9 @@ void RSGISExeImageCalibration::runAlgorithm() throw(RSGISException)
 					totalNumRasterBands += numRasterBands;
 				}	
 				
-				radianceCalibration = new RSGISSPOTRadianceCalibration(numBands, this->spotRadGainOffs);
+				radianceCalibration = new rsgis::calib::RSGISSPOTRadianceCalibration(numBands, this->spotRadGainOffs);
 				
-				calcImage = new RSGISCalcImage(radianceCalibration, "", true);
+				calcImage = new rsgis::img::RSGISCalcImage(radianceCalibration, "", true);
 				calcImage->calcImage(datasets, this->numBands, this->outputImage, true, outBandNames,this->imageFormat);
 				
 				
@@ -2494,7 +2468,7 @@ void RSGISExeImageCalibration::runAlgorithm() throw(RSGISException)
 				delete radianceCalibration;
 				delete calcImage;
 			}
-			catch(RSGISException e)
+			catch(rsgis::RSGISException e)
 			{
 				throw e;
 			}
@@ -2502,42 +2476,42 @@ void RSGISExeImageCalibration::runAlgorithm() throw(RSGISException)
         }
         else if(this->option == RSGISExeImageCalibration::ikonosradcal)
         {
-            cout << "This command converts Ikonos from digital number values to at sensor radiance.\n";
-			cout << "Output Image: " << this->outputImage << endl;
+            std::cout << "This command converts Ikonos from digital number values to at sensor radiance.\n";
+			std::cout << "Output Image: " << this->outputImage << std::endl;
 			for(unsigned int i = 0; i < numBands; ++i)
 			{
-				cout << i << ")\t name = " << ikonosRadGainOffs[i].bandName << " band = " << ikonosRadGainOffs[i].band << endl;
+				std::cout << i << ")\t name = " << ikonosRadGainOffs[i].bandName << " band = " << ikonosRadGainOffs[i].band << std::endl;
 			}
             
 			GDALAllRegister();
 			GDALDataset **datasets = NULL;
-			RSGISIkonosRadianceCalibration *radianceCalibration = NULL;
-			RSGISCalcImage *calcImage = NULL;
-            string *outBandNames = NULL;
+			rsgis::calib::RSGISIkonosRadianceCalibration *radianceCalibration = NULL;
+			rsgis::img::RSGISCalcImage *calcImage = NULL;
+            std::string *outBandNames = NULL;
             
 			try
 			{
 				datasets = new GDALDataset*[numBands];
-                outBandNames = new string[numBands];
+                outBandNames = new std::string[numBands];
 				
 				unsigned int numRasterBands = 0;
 				unsigned int totalNumRasterBands = 0;
 				
 				for(unsigned int i = 0; i < this->numBands; ++i)
 				{
-					cout << "Opening: " << this->inputImages[i] << endl;
+					std::cout << "Opening: " << this->inputImages[i] << std::endl;
 					datasets[i] = (GDALDataset *) GDALOpen(this->inputImages[i].c_str(), GA_ReadOnly);
 					if(datasets[i] == NULL)
 					{
-						string message = string("Could not open image ") + this->inputImages[i];
-						throw RSGISImageException(message.c_str());
+						std::string message = std::string("Could not open image ") + this->inputImages[i];
+						throw rsgis::RSGISImageException(message.c_str());
 					}
 					
 					numRasterBands = datasets[i]->GetRasterCount();
 					
 					if(this->ikonosRadGainOffs[i].band > numRasterBands)
 					{
-						throw RSGISImageException("You have specified a band which is not within the image");
+						throw rsgis::RSGISImageException("You have specified a band which is not within the image");
 					}
 					
 					this->ikonosRadGainOffs[i].band = totalNumRasterBands + this->ikonosRadGainOffs[i].band-1;
@@ -2546,9 +2520,9 @@ void RSGISExeImageCalibration::runAlgorithm() throw(RSGISException)
 					totalNumRasterBands += numRasterBands;
 				}	
 				
-				radianceCalibration = new RSGISIkonosRadianceCalibration(numBands, this->ikonosRadGainOffs);
+				radianceCalibration = new rsgis::calib::RSGISIkonosRadianceCalibration(numBands, this->ikonosRadGainOffs);
 				
-				calcImage = new RSGISCalcImage(radianceCalibration, "", true);
+				calcImage = new rsgis::img::RSGISCalcImage(radianceCalibration, "", true);
 				calcImage->calcImage(datasets, this->numBands, this->outputImage, true, outBandNames,this->imageFormat);
 				
 				
@@ -2563,49 +2537,49 @@ void RSGISExeImageCalibration::runAlgorithm() throw(RSGISException)
 				delete radianceCalibration;
 				delete calcImage;
 			}
-			catch(RSGISException e)
+			catch(rsgis::RSGISException e)
 			{
 				throw e;
 			}
         }
         else if(this->option == RSGISExeImageCalibration::asterradcal)
         {
-            cout << "This command converts ASTER from digital number values to at sensor radiance.\n";
-			cout << "Output Image: " << this->outputImage << endl;
+            std::cout << "This command converts ASTER from digital number values to at sensor radiance.\n";
+			std::cout << "Output Image: " << this->outputImage << std::endl;
 			for(unsigned int i = 0; i < numBands; ++i)
 			{
-				cout << i << ")\t name = " << asterRadGainOffs[i].bandName << " band = " << asterRadGainOffs[i].band << endl;
+				std::cout << i << ")\t name = " << asterRadGainOffs[i].bandName << " band = " << asterRadGainOffs[i].band << std::endl;
 			}
             
 			GDALAllRegister();
 			GDALDataset **datasets = NULL;
-			RSGISASTERRadianceCalibration *radianceCalibration = NULL;
-			RSGISCalcImage *calcImage = NULL;
-            string *outBandNames = NULL;
+			rsgis::calib::RSGISASTERRadianceCalibration *radianceCalibration = NULL;
+			rsgis::img::RSGISCalcImage *calcImage = NULL;
+            std::string *outBandNames = NULL;
             
 			try
 			{
 				datasets = new GDALDataset*[numBands];
-                outBandNames = new string[numBands];
+                outBandNames = new std::string[numBands];
 				
 				unsigned int numRasterBands = 0;
 				unsigned int totalNumRasterBands = 0;
 				
 				for(unsigned int i = 0; i < this->numBands; ++i)
 				{
-					cout << "Opening: " << this->inputImages[i] << endl;
+					std::cout << "Opening: " << this->inputImages[i] << std::endl;
 					datasets[i] = (GDALDataset *) GDALOpen(this->inputImages[i].c_str(), GA_ReadOnly);
 					if(datasets[i] == NULL)
 					{
-						string message = string("Could not open image ") + this->inputImages[i];
-						throw RSGISImageException(message.c_str());
+						std::string message = std::string("Could not open image ") + this->inputImages[i];
+						throw rsgis::RSGISImageException(message.c_str());
 					}
 					
 					numRasterBands = datasets[i]->GetRasterCount();
 					
 					if(this->asterRadGainOffs[i].band > numRasterBands)
 					{
-						throw RSGISImageException("You have specified a band which is not within the image");
+						throw rsgis::RSGISImageException("You have specified a band which is not within the image");
 					}
 					
 					this->asterRadGainOffs[i].band = totalNumRasterBands + this->asterRadGainOffs[i].band-1;
@@ -2614,9 +2588,9 @@ void RSGISExeImageCalibration::runAlgorithm() throw(RSGISException)
 					totalNumRasterBands += numRasterBands;
 				}	
 				
-				radianceCalibration = new RSGISASTERRadianceCalibration(numBands, this->asterRadGainOffs);
+				radianceCalibration = new rsgis::calib::RSGISASTERRadianceCalibration(numBands, this->asterRadGainOffs);
 				
-				calcImage = new RSGISCalcImage(radianceCalibration, "", true);
+				calcImage = new rsgis::img::RSGISCalcImage(radianceCalibration, "", true);
 				calcImage->calcImage(datasets, this->numBands, this->outputImage, true, outBandNames,this->imageFormat);
 				
 				
@@ -2631,49 +2605,49 @@ void RSGISExeImageCalibration::runAlgorithm() throw(RSGISException)
 				delete radianceCalibration;
 				delete calcImage;
 			}
-			catch(RSGISException e)
+			catch(rsgis::RSGISException e)
 			{
 				throw e;
 			}
         }
         else if(this->option == RSGISExeImageCalibration::irsradcal)
         {
-            cout << "This command converts IRS from digital number values to at sensor radiance.\n";
-			cout << "Output Image: " << this->outputImage << endl;
+            std::cout << "This command converts IRS from digital number values to at sensor radiance.\n";
+			std::cout << "Output Image: " << this->outputImage << std::endl;
 			for(unsigned int i = 0; i < numBands; ++i)
 			{
-				cout << i << ")\t name = " << irsRadGainOffs[i].bandName << " band = " << irsRadGainOffs[i].band << endl;
+				std::cout << i << ")\t name = " << irsRadGainOffs[i].bandName << " band = " << irsRadGainOffs[i].band << std::endl;
 			}
             
 			GDALAllRegister();
 			GDALDataset **datasets = NULL;
-			RSGISIRSRadianceCalibration *radianceCalibration = NULL;
-			RSGISCalcImage *calcImage = NULL;
-            string *outBandNames = NULL;
+			rsgis::calib::RSGISIRSRadianceCalibration *radianceCalibration = NULL;
+			rsgis::img::RSGISCalcImage *calcImage = NULL;
+            std::string *outBandNames = NULL;
             
 			try
 			{
 				datasets = new GDALDataset*[numBands];
-                outBandNames = new string[numBands];
+                outBandNames = new std::string[numBands];
 				
 				unsigned int numRasterBands = 0;
 				unsigned int totalNumRasterBands = 0;
 				
 				for(unsigned int i = 0; i < this->numBands; ++i)
 				{
-					cout << "Opening: " << this->inputImages[i] << endl;
+					std::cout << "Opening: " << this->inputImages[i] << std::endl;
 					datasets[i] = (GDALDataset *) GDALOpen(this->inputImages[i].c_str(), GA_ReadOnly);
 					if(datasets[i] == NULL)
 					{
-						string message = string("Could not open image ") + this->inputImages[i];
-						throw RSGISImageException(message.c_str());
+						std::string message = std::string("Could not open image ") + this->inputImages[i];
+						throw rsgis::RSGISImageException(message.c_str());
 					}
 					
 					numRasterBands = datasets[i]->GetRasterCount();
 					
 					if(this->irsRadGainOffs[i].band > numRasterBands)
 					{
-						throw RSGISImageException("You have specified a band which is not within the image");
+						throw rsgis::RSGISImageException("You have specified a band which is not within the image");
 					}
 					
 					this->irsRadGainOffs[i].band = totalNumRasterBands + this->irsRadGainOffs[i].band-1;
@@ -2682,9 +2656,9 @@ void RSGISExeImageCalibration::runAlgorithm() throw(RSGISException)
 					totalNumRasterBands += numRasterBands;
 				}	
 				
-				radianceCalibration = new RSGISIRSRadianceCalibration(numBands, this->irsRadGainOffs);
+				radianceCalibration = new rsgis::calib::RSGISIRSRadianceCalibration(numBands, this->irsRadGainOffs);
 				
-				calcImage = new RSGISCalcImage(radianceCalibration, "", true);
+				calcImage = new rsgis::img::RSGISCalcImage(radianceCalibration, "", true);
 				calcImage->calcImage(datasets, this->numBands, this->outputImage, true, outBandNames,this->imageFormat);
 				
 				
@@ -2699,49 +2673,49 @@ void RSGISExeImageCalibration::runAlgorithm() throw(RSGISException)
 				delete radianceCalibration;
 				delete calcImage;
 			}
-			catch(RSGISException e)
+			catch(rsgis::RSGISException e)
 			{
 				throw e;
 			}
         }
         else if(this->option == RSGISExeImageCalibration::quickbird16bitradcal)
         {
-            cout << "This command converts QuickBird 16bit from digital number values to at sensor radiance.\n";
-			cout << "Output Image: " << this->outputImage << endl;
+            std::cout << "This command converts QuickBird 16bit from digital number values to at sensor radiance.\n";
+			std::cout << "Output Image: " << this->outputImage << std::endl;
 			for(unsigned int i = 0; i < numBands; ++i)
 			{
-				cout << i << ")\t name = " << quickbird16bitRadGainOffs[i].bandName << " band = " << quickbird16bitRadGainOffs[i].band << endl;
+				std::cout << i << ")\t name = " << quickbird16bitRadGainOffs[i].bandName << " band = " << quickbird16bitRadGainOffs[i].band << std::endl;
 			}
             
 			GDALAllRegister();
 			GDALDataset **datasets = NULL;
-			RSGISQuickbird16bitRadianceCalibration *radianceCalibration = NULL;
-			RSGISCalcImage *calcImage = NULL;
-            string *outBandNames = NULL;
+			rsgis::calib::RSGISQuickbird16bitRadianceCalibration *radianceCalibration = NULL;
+			rsgis::img::RSGISCalcImage *calcImage = NULL;
+            std::string *outBandNames = NULL;
             
 			try
 			{
 				datasets = new GDALDataset*[numBands];
-                outBandNames = new string[numBands];
+                outBandNames = new std::string[numBands];
 				
 				unsigned int numRasterBands = 0;
 				unsigned int totalNumRasterBands = 0;
 				
 				for(unsigned int i = 0; i < this->numBands; ++i)
 				{
-					cout << "Opening: " << this->inputImages[i] << endl;
+					std::cout << "Opening: " << this->inputImages[i] << std::endl;
 					datasets[i] = (GDALDataset *) GDALOpen(this->inputImages[i].c_str(), GA_ReadOnly);
 					if(datasets[i] == NULL)
 					{
-						string message = string("Could not open image ") + this->inputImages[i];
-						throw RSGISImageException(message.c_str());
+						std::string message = std::string("Could not open image ") + this->inputImages[i];
+						throw rsgis::RSGISImageException(message.c_str());
 					}
 					
 					numRasterBands = datasets[i]->GetRasterCount();
 					
 					if(this->quickbird16bitRadGainOffs[i].band > numRasterBands)
 					{
-						throw RSGISImageException("You have specified a band which is not within the image");
+						throw rsgis::RSGISImageException("You have specified a band which is not within the image");
 					}
 					
 					this->quickbird16bitRadGainOffs[i].band = totalNumRasterBands + this->quickbird16bitRadGainOffs[i].band-1;
@@ -2750,9 +2724,9 @@ void RSGISExeImageCalibration::runAlgorithm() throw(RSGISException)
 					totalNumRasterBands += numRasterBands;
 				}	
 				
-				radianceCalibration = new RSGISQuickbird16bitRadianceCalibration(numBands, this->quickbird16bitRadGainOffs);
+				radianceCalibration = new rsgis::calib::RSGISQuickbird16bitRadianceCalibration(numBands, this->quickbird16bitRadGainOffs);
 				
-				calcImage = new RSGISCalcImage(radianceCalibration, "", true);
+				calcImage = new rsgis::img::RSGISCalcImage(radianceCalibration, "", true);
 				calcImage->calcImage(datasets, this->numBands, this->outputImage, true, outBandNames,this->imageFormat);
 				
 				
@@ -2767,49 +2741,49 @@ void RSGISExeImageCalibration::runAlgorithm() throw(RSGISException)
 				delete radianceCalibration;
 				delete calcImage;
 			}
-			catch(RSGISException e)
+			catch(rsgis::RSGISException e)
 			{
 				throw e;
 			}
         }
         else if(this->option == RSGISExeImageCalibration::quickbird8bitradcal)
         {
-            cout << "This command converts QuickBird 8 bit from digital number values to at sensor radiance.\n";
-			cout << "Output Image: " << this->outputImage << endl;
+            std::cout << "This command converts QuickBird 8 bit from digital number values to at sensor radiance.\n";
+			std::cout << "Output Image: " << this->outputImage << std::endl;
 			for(unsigned int i = 0; i < numBands; ++i)
 			{
-				cout << i << ")\t name = " << quickbird8bitRadGainOffs[i].bandName << " band = " << quickbird8bitRadGainOffs[i].band << endl;
+				std::cout << i << ")\t name = " << quickbird8bitRadGainOffs[i].bandName << " band = " << quickbird8bitRadGainOffs[i].band << std::endl;
 			}
             
 			GDALAllRegister();
 			GDALDataset **datasets = NULL;
-			RSGISQuickbird8bitRadianceCalibration *radianceCalibration = NULL;
-			RSGISCalcImage *calcImage = NULL;
-            string *outBandNames = NULL;
+			rsgis::calib::RSGISQuickbird8bitRadianceCalibration *radianceCalibration = NULL;
+			rsgis::img::RSGISCalcImage *calcImage = NULL;
+            std::string *outBandNames = NULL;
             
 			try
 			{
 				datasets = new GDALDataset*[numBands];
-                outBandNames = new string[numBands];
+                outBandNames = new std::string[numBands];
 				
 				unsigned int numRasterBands = 0;
 				unsigned int totalNumRasterBands = 0;
 				
 				for(unsigned int i = 0; i < this->numBands; ++i)
 				{
-					cout << "Opening: " << this->inputImages[i] << endl;
+					std::cout << "Opening: " << this->inputImages[i] << std::endl;
 					datasets[i] = (GDALDataset *) GDALOpen(this->inputImages[i].c_str(), GA_ReadOnly);
 					if(datasets[i] == NULL)
 					{
-						string message = string("Could not open image ") + this->inputImages[i];
-						throw RSGISImageException(message.c_str());
+						std::string message = std::string("Could not open image ") + this->inputImages[i];
+						throw rsgis::RSGISImageException(message.c_str());
 					}
 					
 					numRasterBands = datasets[i]->GetRasterCount();
 					
 					if(this->quickbird8bitRadGainOffs[i].band > numRasterBands)
 					{
-						throw RSGISImageException("You have specified a band which is not within the image");
+						throw rsgis::RSGISImageException("You have specified a band which is not within the image");
 					}
 					
 					this->quickbird8bitRadGainOffs[i].band = totalNumRasterBands + this->quickbird8bitRadGainOffs[i].band-1;
@@ -2818,9 +2792,9 @@ void RSGISExeImageCalibration::runAlgorithm() throw(RSGISException)
 					totalNumRasterBands += numRasterBands;
 				}	
 				
-				radianceCalibration = new RSGISQuickbird8bitRadianceCalibration(numBands, this->quickbird8bitRadGainOffs);
+				radianceCalibration = new rsgis::calib::RSGISQuickbird8bitRadianceCalibration(numBands, this->quickbird8bitRadGainOffs);
 				
-				calcImage = new RSGISCalcImage(radianceCalibration, "", true);
+				calcImage = new rsgis::img::RSGISCalcImage(radianceCalibration, "", true);
 				calcImage->calcImage(datasets, this->numBands, this->outputImage, true, outBandNames,this->imageFormat);
 				
 				
@@ -2835,49 +2809,49 @@ void RSGISExeImageCalibration::runAlgorithm() throw(RSGISException)
 				delete radianceCalibration;
 				delete calcImage;
 			}
-			catch(RSGISException e)
+			catch(rsgis::RSGISException e)
 			{
 				throw e;
 			}
         }
         else if(this->option == RSGISExeImageCalibration::worldview2radcal)
         {
-            cout << "This command converts WorldView2 from digital number values to at sensor radiance.\n";
-			cout << "Output Image: " << this->outputImage << endl;
+            std::cout << "This command converts WorldView2 from digital number values to at sensor radiance.\n";
+			std::cout << "Output Image: " << this->outputImage << std::endl;
 			for(unsigned int i = 0; i < numBands; ++i)
 			{
-				cout << i << ")\t name = " << worldview2RadGainOffs[i].bandName << " band = " << worldview2RadGainOffs[i].band << endl;
+				std::cout << i << ")\t name = " << worldview2RadGainOffs[i].bandName << " band = " << worldview2RadGainOffs[i].band << std::endl;
 			}
             
 			GDALAllRegister();
 			GDALDataset **datasets = NULL;
-			RSGISWorldView2RadianceCalibration *radianceCalibration = NULL;
-			RSGISCalcImage *calcImage = NULL;
-            string *outBandNames = NULL;
+			rsgis::calib::RSGISWorldView2RadianceCalibration *radianceCalibration = NULL;
+			rsgis::img::RSGISCalcImage *calcImage = NULL;
+            std::string *outBandNames = NULL;
             
 			try
 			{
 				datasets = new GDALDataset*[numBands];
-                outBandNames = new string[numBands];
+                outBandNames = new std::string[numBands];
 				
 				unsigned int numRasterBands = 0;
 				unsigned int totalNumRasterBands = 0;
 				
 				for(unsigned int i = 0; i < this->numBands; ++i)
 				{
-					cout << "Opening: " << this->inputImages[i] << endl;
+					std::cout << "Opening: " << this->inputImages[i] << std::endl;
 					datasets[i] = (GDALDataset *) GDALOpen(this->inputImages[i].c_str(), GA_ReadOnly);
 					if(datasets[i] == NULL)
 					{
-						string message = string("Could not open image ") + this->inputImages[i];
-						throw RSGISImageException(message.c_str());
+						std::string message = std::string("Could not open image ") + this->inputImages[i];
+						throw rsgis::RSGISImageException(message.c_str());
 					}
 					
 					numRasterBands = datasets[i]->GetRasterCount();
 					
 					if(this->worldview2RadGainOffs[i].band > numRasterBands)
 					{
-						throw RSGISImageException("You have specified a band which is not within the image");
+						throw rsgis::RSGISImageException("You have specified a band which is not within the image");
 					}
 					
 					this->worldview2RadGainOffs[i].band = totalNumRasterBands + this->worldview2RadGainOffs[i].band-1;
@@ -2886,9 +2860,9 @@ void RSGISExeImageCalibration::runAlgorithm() throw(RSGISException)
 					totalNumRasterBands += numRasterBands;
 				}	
 				
-				radianceCalibration = new RSGISWorldView2RadianceCalibration(numBands, this->worldview2RadGainOffs);
+				radianceCalibration = new rsgis::calib::RSGISWorldView2RadianceCalibration(numBands, this->worldview2RadGainOffs);
 				
-				calcImage = new RSGISCalcImage(radianceCalibration, "", true);
+				calcImage = new rsgis::img::RSGISCalcImage(radianceCalibration, "", true);
 				calcImage->calcImage(datasets, this->numBands, this->outputImage, true, outBandNames,this->imageFormat);
 				
 				
@@ -2903,107 +2877,68 @@ void RSGISExeImageCalibration::runAlgorithm() throw(RSGISException)
 				delete radianceCalibration;
 				delete calcImage;
 			}
-			catch(RSGISException e)
+			catch(rsgis::RSGISException e)
 			{
 				throw e;
 			}
         }
         else if(this->option == RSGISExeImageCalibration::topatmosrefl)
         {
-            cout << "This command converts at sensor radiance to top of atmosphere reflectance.\n";
-			cout << "Input Image: " << this->inputImage << endl;
-            cout << "Output Image: " << this->outputImage << endl;
-            cout << "Scaling factor: " << this->scaleFactor << endl;
-            cout << "Julian Day: " << this->julianDay << endl;
-            cout << "Solar Zenith: " << this->solarZenith << endl;
+            std::cout << "This command converts at sensor radiance to top of atmosphere reflectance.\n";
+			std::cout << "Input Image: " << this->inputImage << std::endl;
+            std::cout << "Output Image: " << this->outputImage << std::endl;
+            std::cout << "Scaling factor: " << this->scaleFactor << std::endl;
+            std::cout << "Julian Day: " << this->julianDay << std::endl;
+            std::cout << "Solar Zenith: " << this->solarZenith << std::endl;
             
 			for(unsigned int i = 0; i < numBands; ++i)
 			{
-				cout << "Solar Irradiance for band " <<  i+1 << ":\t" << this->solarIrradiance[i] << endl;
+				std::cout << "Solar Irradiance for band " <<  i+1 << ":\t" << this->solarIrradiance[i] << std::endl;
 			}
             
-            GDALAllRegister();
-			GDALDataset **datasets = NULL;
-			RSGISCalculateTopOfAtmosphereReflectance *calcTopAtmosRefl = NULL;
-			RSGISCalcImage *calcImage = NULL;
-			
-			try
-			{
-				datasets = new GDALDataset*[1];
-				
-				cout << "Open " << this->inputImage << endl;
-				datasets[0] = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_ReadOnly);
-				if(datasets[0] == NULL)
-				{
-					string message = string("Could not open image ") + this->inputImage;
-					throw RSGISImageException(message.c_str());
-				}
-				
-				unsigned int numRasterBands = datasets[0]->GetRasterCount();
-                if(this->numBands != numRasterBands)
-                {
-                    GDALClose(datasets[0]);
-                    delete[] datasets;
-                    throw RSGISException("The number of input image bands and solar irradiance values are different.");
-                }
-                
-				
-                double solarDistance = 0;
-                
-                solarDistance = rsgisCalcSolarDistance(this->julianDay);
-                
-                /*for(int i = 1; i < 366; ++i)
-                 {
-                 double radiansJulianDay = ((i - 4)*0.9856)*(M_PI/180);
-                 cout << "radiansJulianDay = " << radiansJulianDay << endl;
-                 cout << "cos(radiansJulianDay) = " << cos(radiansJulianDay) << endl;
-                 double distanceTmp = 1 - 0.01672 * cos(radiansJulianDay);
-                 cout << "Day " << i << " = " << distanceTmp << endl;
-                 cout << "Day " << i << " = " << rsgisCalcSolarDistance(i) << endl;
-                 }*/
-                
-				calcTopAtmosRefl = new RSGISCalculateTopOfAtmosphereReflectance(numRasterBands, solarIrradiance, solarDistance, (solarZenith*(M_PI/180)), this->scaleFactor);
-				
-				calcImage = new RSGISCalcImage(calcTopAtmosRefl, "", true);
-				calcImage->calcImage(datasets, 1, this->outputImage, false, NULL, this->imageFormat, this->outDataType);
-				
-				
-				GDALClose(datasets[0]);
-				delete[] datasets;
-                delete[] solarIrradiance;
-                
-				delete calcTopAtmosRefl;
-				delete calcImage;
-			}
-			catch(RSGISException e)
-			{
-				throw e;
-			}
+            try
+            {
+                rsgis::cmds::executeConvertRadiance2TOARefl(this->inputImage, this->outputImage, this->imageFormat, this->rsgisOutDataType, this->scaleFactor, this->julianDay, true, 0, 0, 0, (this->solarZenith*(M_PI/180)), this->solarIrradiance, this->numBands);
+            }
+            catch (rsgis::cmds::RSGISCmdException &e)
+            {
+                throw rsgis::RSGISException(e.what());
+            }
+            catch (rsgis::RSGISException &e)
+            {
+                throw e;
+            }
+            catch (std::exception &e)
+            {
+                throw rsgis::RSGISException(e.what());
+            }
+            
+            delete[] solarIrradiance;
         }
         else if(this->option == RSGISExeImageCalibration::apply6s)
         {
-            cout << "This command applies coefficients exported from 6S to a radiance image.\n";
-			cout << "Input Image: " << this->inputImage << endl;
-            cout << "Output Image: " << this->outputImage << endl;
-            cout << "Scale Factor: " << this->scaleFactor << endl;
-            cout << "Num Elevations: " << this->numElevation << endl;
+            std::cout << "This command applies coefficients exported from 6S to a radiance image.\n";
+			std::cout << "Input Image: " << this->inputImage << std::endl;
+            std::cout << "Output Image: " << this->outputImage << std::endl;
+            std::cout << "Scale Factor: " << this->scaleFactor << std::endl;
+            std::cout << "Num Elevations: " << this->numElevation << std::endl;
 			if(this->useTopo6S)
             {
-                cout << "Coefficients (for first elevation threashold):" << endl;
+                std::cout << "Coefficients (for first elevation threashold):" << std::endl;
             }
 			else
             {
-                cout << "Coefficients:" << endl;
+                std::cout << "Coefficients:" << std::endl;
             }
             for(int i = 0; i < numValues; ++i)
 			{
-				cout << " Band " <<  this->imageBands[i]+1 << ": " << "ax = " <<this->aX[i][0] << ", bx = " << this->bX[i][0] << ", cx = " << this->cX[i][0] << endl;
+				std::cout << " Band " <<  this->imageBands[i]+1 << ": " << "ax = " <<this->aX[i][0] << ", bx = " << this->bX[i][0] << ", cx = " << this->cX[i][0] << std::endl;
 			}
             
             GDALAllRegister();
 			GDALDataset **datasets = NULL;
-			RSGISApply6SCoefficients *apply6SCoefficients = NULL;
-			RSGISCalcImage *calcImage = NULL;
+			rsgis::calib::RSGISApply6SCoefficients *apply6SCoefficients = NULL;
+			rsgis::img::RSGISCalcImage *calcImage = NULL;
             
             try
 			{
@@ -3011,12 +2946,12 @@ void RSGISExeImageCalibration::runAlgorithm() throw(RSGISException)
 				if(!this->useTopo6S)
 				{
 					datasets = new GDALDataset*[1];
-					cout << "Open image" << this->inputImage << endl;
+					std::cout << "Open image" << this->inputImage << std::endl;
 					datasets[0] = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_ReadOnly);
 					if(datasets[0] == NULL)
 					{
-						string message = string("Could not open image ") + this->inputImage;
-						throw RSGISImageException(message.c_str());
+						std::string message = std::string("Could not open image ") + this->inputImage;
+						throw rsgis::RSGISImageException(message.c_str());
 					}
 					
 					int numRasterBands = datasets[0]->GetRasterCount();
@@ -3024,7 +2959,7 @@ void RSGISExeImageCalibration::runAlgorithm() throw(RSGISException)
 					{
 						GDALClose(datasets[0]);
 						delete[] datasets;
-						throw RSGISException("The number of input image bands is less than the number of values specified.");
+						throw rsgis::RSGISException("The number of input image bands is less than the number of values specified.");
 					}
 					
 				}
@@ -3034,28 +2969,28 @@ void RSGISExeImageCalibration::runAlgorithm() throw(RSGISException)
 					
 					datasets = new GDALDataset*[2];
 					
-					cout << "Open DEM" << this->inputDEM << endl;
+					std::cout << "Open DEM" << this->inputDEM << std::endl;
 					datasets[0] = (GDALDataset *) GDALOpen(this->inputDEM.c_str(), GA_ReadOnly);
 					if(datasets[0] == NULL)
 					{
-						string message = string("Could not open DEM ") + this->inputDEM;
-						throw RSGISImageException(message.c_str());
+						std::string message = std::string("Could not open DEM ") + this->inputDEM;
+						throw rsgis::RSGISImageException(message.c_str());
 					}
 					
 					if(datasets[0]->GetRasterCount() != 1)
 					{
 						GDALClose(datasets[0]);
 						delete[] datasets;
-						throw RSGISException("The DEM should only contain one band");
+						throw rsgis::RSGISException("The DEM should only contain one band");
 					}
 					
 					
-					cout << "Open image" << this->inputImage << endl;
+					std::cout << "Open image" << this->inputImage << std::endl;
 					datasets[1] = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_ReadOnly);
 					if(datasets[1] == NULL)
 					{
-						string message = string("Could not open image ") + this->inputImage;
-						throw RSGISImageException(message.c_str());
+						std::string message = std::string("Could not open image ") + this->inputImage;
+						throw rsgis::RSGISImageException(message.c_str());
 					}
 					
 					int numRasterBands = datasets[1]->GetRasterCount();
@@ -3063,14 +2998,14 @@ void RSGISExeImageCalibration::runAlgorithm() throw(RSGISException)
 					{
 						GDALClose(datasets[1]);
 						delete[] datasets;
-						throw RSGISException("The number of input image bands is less than the number of values specified.");
+						throw rsgis::RSGISException("The number of input image bands is less than the number of values specified.");
 					}
 					
 				}
 				
-				apply6SCoefficients = new RSGISApply6SCoefficients(this->numValues, this->imageBands, this->aX, this->bX, this->cX, this->numValues, this->elevationThresh, this->numElevation, this->scaleFactor);
+				apply6SCoefficients = new rsgis::calib::RSGISApply6SCoefficients(this->numValues, this->imageBands, this->aX, this->bX, this->cX, this->numValues, this->elevationThresh, this->numElevation, this->scaleFactor);
 				
-				calcImage = new RSGISCalcImage(apply6SCoefficients, "", true);
+				calcImage = new rsgis::img::RSGISCalcImage(apply6SCoefficients, "", true);
 				calcImage->calcImage(datasets, nDatasets, this->outputImage, false, NULL, this->imageFormat, this->outDataType);
 				
 				
@@ -3098,7 +3033,7 @@ void RSGISExeImageCalibration::runAlgorithm() throw(RSGISException)
 				delete apply6SCoefficients;
 				delete calcImage;
 			}
-			catch(RSGISException e)
+			catch(rsgis::RSGISException e)
 			{
 				throw e;
 			}
@@ -3106,7 +3041,7 @@ void RSGISExeImageCalibration::runAlgorithm() throw(RSGISException)
         }
 		else
 		{
-			throw RSGISException("RSGISExeImageCalibration does not know this option");
+			throw rsgis::RSGISException("RSGISExeImageCalibration does not know this option");
 		}
 	}
 }
@@ -3114,122 +3049,139 @@ void RSGISExeImageCalibration::runAlgorithm() throw(RSGISException)
 
 void RSGISExeImageCalibration::printParameters()
 {
-	cout.precision(10);
+	std::cout.precision(10);
 	
 	if(!parsed)
 	{
-		throw RSGISException("Before running the parameters must be retrieved");
+		throw rsgis::RSGISException("Before running the parameters must be retrieved");
 	}
 	else
 	{
 		if(this->option == RSGISExeImageCalibration::landsatradcal)
 		{
-			
+			std::cout << "This command converts Landsat from digital number values to at sensor radiance.\n";
+			std::cout << "Output Image: " << this->outputImage << std::endl;
+            int i = 1;
+			for(std::vector<rsgis::cmds::CmdsLandsatRadianceGainsOffsets>::iterator iterBands = landsatRadGainOffs.begin(); iterBands != landsatRadGainOffs.end(); ++iterBands)
+			{
+				std::cout << i << ")\t name = " << (*iterBands).bandName << " band = " << (*iterBands).band << std::endl;
+                ++i;
+			}
 		}
         else if(this->option == RSGISExeImageCalibration::topatmosrefl)
         {
+            std::cout << "This command converts at sensor radiance to top of atmosphere reflectance.\n";
+			std::cout << "Input Image: " << this->inputImage << std::endl;
+            std::cout << "Output Image: " << this->outputImage << std::endl;
+            std::cout << "Scaling factor: " << this->scaleFactor << std::endl;
+            std::cout << "Julian Day: " << this->julianDay << std::endl;
+            std::cout << "Solar Zenith: " << this->solarZenith << std::endl;
             
+			for(unsigned int i = 0; i < numBands; ++i)
+			{
+				std::cout << "Solar Irradiance for band " <<  i+1 << ":\t" << this->solarIrradiance[i] << std::endl;
+			}
         }
         else if(this->option == RSGISExeImageCalibration::apply6s)
         {
-            cout << "This command applies coefficients exported from 6S to a radiance image.\n";
-			cout << "Input Image: " << this->inputImage << endl;
-            cout << "Output Image: " << this->outputImage << endl;
+            std::cout << "This command applies coefficients exported from 6S to a radiance image.\n";
+			std::cout << "Input Image: " << this->inputImage << std::endl;
+            std::cout << "Output Image: " << this->outputImage << std::endl;
             for(int i = 0; i < numValues; ++i)
 			{
-				cout << "Band " <<  i+1 << ":\t" << this->aX[i] << this->bX[i] << this->cX[i] << endl;
+				std::cout << "Band " <<  i+1 << ":\t" << this->aX[i] << this->bX[i] << this->cX[i] << std::endl;
 			}
         }
 		else
 		{
-			throw RSGISException("RSGISExeImageCalibration does not know this option");
+			throw rsgis::RSGISException("RSGISExeImageCalibration does not know this option");
 		}
 	}
 }
 
 void RSGISExeImageCalibration::help()
 {
-	cout << "<rsgis:commands xmlns:rsgis=\"http://www.rsgislib.org/xml/\">" << endl;
-	cout << "" << endl;
-    cout << "<rsgis:command algor=\"imagecalibration\" option=\"landsatradcal\" output=\"image_out.env\" format=\"GDAL Format\" >" << endl;
-    cout << "    <rsgis:band name=\"string\" image=\"image1\" band=\"int\" [sensorband=\"string\" | lmin=\"float\" lmax=\"float\" qcalmin=\"float\" qcalmax=\"float\"] />" << endl;
-    cout << "    <rsgis:band name=\"string\" image=\"image2\" band=\"int\" [sensorband=\"string\" | lmin=\"float\" lmax=\"float\" qcalmin=\"float\" qcalmax=\"float\"]/>" << endl;
-    cout << "    <rsgis:band name=\"string\" image=\"image3\" band=\"int\" [sensorband=\"string\" | lmin=\"float\" lmax=\"float\" qcalmin=\"float\" qcalmax=\"float\"]/>" << endl;
-    cout << "</rsgis:command>" << endl;
-    cout << "" << endl;
-    cout << "<rsgis:command algor=\"imagecalibration\" option=\"spotradcal\" output=\"image_out.env\" format=\"GDAL Format\" >" << endl;
-    cout << "    <rsgis:band name=\"string\" image=\"image1\" band=\"int\"gain=\"float\" />" << endl;
-    cout << "    <rsgis:band name=\"string\" image=\"image2\" band=\"int\"gain=\"float\" />" << endl;
-    cout << "    <rsgis:band name=\"string\" image=\"image3\" band=\"int\"gain=\"float\" />" << endl;
-    cout << "</rsgis:command>" << endl;
-    cout << "" << endl;
-    cout << "<rsgis:command algor=\"imagecalibration\" option=\"ikonosradcal\" output=\"image_out.env\" format=\"GDAL Format\" >" << endl;
-    cout << "    <rsgis:band name=\"string\" image=\"image1\" band=\"int\" [sensorband=\"string\" | calcoef=\"float\" bandwidth=\"float\" ] />" << endl;
-    cout << "    <rsgis:band name=\"string\" image=\"image2\" band=\"int\" [sensorband=\"string\" | calcoef=\"float\" bandwidth=\"float\" ] />" << endl;
-    cout << "    <rsgis:band name=\"string\" image=\"image3\" band=\"int\" [sensorband=\"string\" | calcoef=\"float\" bandwidth=\"float\" ] />" << endl;
-    cout << "</rsgis:command>" << endl;
-    cout << "" << endl;
-    cout << "<rsgis:command algor=\"imagecalibration\" option=\"asterradcal\" output=\"image_out.env\" format=\"GDAL Format\" >" << endl;
-    cout << "    <rsgis:band name=\"string\" image=\"image1\" band=\"int\" [sensorband=\"string\" | coefficient=\"float\" ] />" << endl;
-    cout << "    <rsgis:band name=\"string\" image=\"image2\" band=\"int\" [sensorband=\"string\" | coefficient=\"float\" ] />" << endl;
-    cout << "    <rsgis:band name=\"string\" image=\"image3\" band=\"int\" [sensorband=\"string\" | coefficient=\"float\" ] />" << endl;
-    cout << "</rsgis:command>" << endl;
-    cout << "" << endl;
-    cout << "<rsgis:command algor=\"imagecalibration\" option=\"irsradcal\" output=\"image_out.env\" format=\"GDAL Format\" >" << endl;
-    cout << "    <rsgis:band name=\"string\" image=\"image1\" band=\"int\" [sensorband=\"string\" | lmin=\"float\" lmax=\"float\" qcalmin=\"float\" qcalmax=\"float\"] />" << endl;
-    cout << "    <rsgis:band name=\"string\" image=\"image2\" band=\"int\" [sensorband=\"string\" | lmin=\"float\" lmax=\"float\" qcalmin=\"float\" qcalmax=\"float\"]/>" << endl;
-    cout << "    <rsgis:band name=\"string\" image=\"image3\" band=\"int\" [sensorband=\"string\" | lmin=\"float\" lmax=\"float\" qcalmin=\"float\" qcalmax=\"float\"]/>" << endl;
-    cout << "</rsgis:command>" << endl;
-    cout << "" << endl;
-    cout << "<rsgis:command algor=\"imagecalibration\" option=\"quickbird16bitradcal\" output=\"image_out.env\" format=\"GDAL Format\" >" << endl;
-    cout << "    <rsgis:band name=\"string\" image=\"image1\" band=\"int\" [sensorband=\"string\" | calfactor=\"float\" bandintegrate=\"float\" ] />" << endl;
-    cout << "    <rsgis:band name=\"string\" image=\"image2\" band=\"int\" [sensorband=\"string\" | calfactor=\"float\" bandintegrate=\"float\" ] />" << endl;
-    cout << "    <rsgis:band name=\"string\" image=\"image3\" band=\"int\" [sensorband=\"string\" | calfactor=\"float\" bandintegrate=\"float\" ] />" << endl;
-    cout << "</rsgis:command>" << endl;
-    cout << "" << endl;
-    cout << "<rsgis:command algor=\"imagecalibration\" option=\"quickbird8bitradcal\" output=\"image_out.env\" format=\"GDAL Format\" >" << endl;
-    cout << "    <rsgis:band name=\"string\" image=\"image1\" band=\"int\" [sensorband=\"string\" | calfactor=\"float\" bandintegrate=\"float\" k=\"float\" ] />" << endl;
-    cout << "    <rsgis:band name=\"string\" image=\"image2\" band=\"int\" [sensorband=\"string\" | calfactor=\"float\" bandintegrate=\"float\" k=\"float\" ] />" << endl;
-    cout << "    <rsgis:band name=\"string\" image=\"image3\" band=\"int\" [sensorband=\"string\" | calfactor=\"float\" bandintegrate=\"float\" k=\"float\" ] />" << endl;
-    cout << "</rsgis:command>" << endl;
-    cout << "" << endl;
-    cout << "<rsgis:command algor=\"imagecalibration\" option=\"worldview2radcal\" output=\"image_out.env\" format=\"GDAL Format\">" << endl;
-    cout << "    <rsgis:band name=\"string\" image=\"image1\" band=\"int\" [sensorband=\"string\" | calfactor=\"float\" bandintegrate=\"float\" ] />" << endl;
-    cout << "    <rsgis:band name=\"string\" image=\"image2\" band=\"int\" [sensorband=\"string\" | calfactor=\"float\" bandintegrate=\"float\" ] />" << endl;
-    cout << "    <rsgis:band name=\"string\" image=\"image3\" band=\"int\" [sensorband=\"string\" | calfactor=\"float\" bandintegrate=\"float\" ] />" << endl;
-    cout << "</rsgis:command>" << endl;
-    cout << "" << endl;
-    cout << "<rsgis:command algor=\"imagecalibration\" option=\"topatmosrefl\" input=\"image_in.env\" output=\"image_out.env\" format=\"GDAL Format\" scaleFactor=\"float\" [julianday=\"int\" | day=\"int\" month=\"int\" year=\"int\"] [zenith=\"float\" | elevation=\"float\"] >" << endl;
-    cout << "    <rsgis:band [sensorband=\"string\" | irradiance=\"float\"] />" << endl;
-    cout << "    <rsgis:band [sensorband=\"string\" | irradiance=\"float\"] />" << endl;
-    cout << "    <rsgis:band [sensorband=\"string\" | irradiance=\"float\"] />" << endl;
-    cout << "</rsgis:command>" << endl;
-    cout << "" << endl;
-    cout << "<rsgis:command algor=\"imagecalibration\" option=\"apply6s\" input=\"image_in.env\" output=\"image_out.env\" scaleFactor=\"float\" format=\"GDAL Format\" >" << endl;
-    cout << "    <rsgis:band band=\"int\" ax=\"float\" bx=\"float\" cx=\"float\" />" << endl;
-    cout << "    <rsgis:band band=\"int\" ax=\"float\" bx=\"float\" cx=\"float\" />" << endl;
-    cout << "    <rsgis:band band=\"int\" ax=\"float\" bx=\"float\" cx=\"float\" />" << endl;
-    cout << "</rsgis:command>" << endl;
-    cout << "" << endl;
-    cout << "<rsgis:command algor=\"imagecalibration\" option=\"apply6s\" input=\"image_in.env\" output=\"image_out.env\" format=\"GDAL Format\" scaleFactor=\"float\" inputDEM=\"in_dem.env\">" << endl;
-    cout << "    <rsgis:band band=\"int\" >" << endl;
-    cout << "          <rsgis:elevation elevationUpper=\"float\" ax=\"float\" bx=\"float\" cx=\"float\"  />" << endl;
-    cout << "          <rsgis:elevation elevationUpper=\"float\" ax=\"float\" bx=\"float\" cx=\"float\"  />" << endl;
-    cout << "    </rsgls:band>" << endl;
-    cout << "    <rsgis:band band=\"int\" >" << endl;
-    cout << "          <rsgis:elevation elevationUpper=\"float\" ax=\"float\" bx=\"float\" cx=\"float\"  />" << endl;
-    cout << "          <rsgis:elevation elevationUpper=\"float\" ax=\"float\" bx=\"float\" cx=\"float\"  />" << endl;
-    cout << "    </rsgls:band>" << endl;
-    cout << "</rsgis:command>" << endl;
-	cout << "</rsgis:commands>\n";
+	std::cout << "<rsgis:commands xmlns:rsgis=\"http://www.rsgislib.org/xml/\">" << std::endl;
+	std::cout << "" << std::endl;
+    std::cout << "<rsgis:command algor=\"imagecalibration\" option=\"landsatradcal\" output=\"image_out.env\" format=\"GDAL Format\" >" << std::endl;
+    std::cout << "    <rsgis:band name=\"std::string\" image=\"image1\" band=\"int\" [sensorband=\"std::string\" | lmin=\"float\" lmax=\"float\" qcalmin=\"float\" qcalmax=\"float\"] />" << std::endl;
+    std::cout << "    <rsgis:band name=\"std::string\" image=\"image2\" band=\"int\" [sensorband=\"std::string\" | lmin=\"float\" lmax=\"float\" qcalmin=\"float\" qcalmax=\"float\"]/>" << std::endl;
+    std::cout << "    <rsgis:band name=\"std::string\" image=\"image3\" band=\"int\" [sensorband=\"std::string\" | lmin=\"float\" lmax=\"float\" qcalmin=\"float\" qcalmax=\"float\"]/>" << std::endl;
+    std::cout << "</rsgis:command>" << std::endl;
+    std::cout << "" << std::endl;
+    std::cout << "<rsgis:command algor=\"imagecalibration\" option=\"spotradcal\" output=\"image_out.env\" format=\"GDAL Format\" >" << std::endl;
+    std::cout << "    <rsgis:band name=\"std::string\" image=\"image1\" band=\"int\"gain=\"float\" />" << std::endl;
+    std::cout << "    <rsgis:band name=\"std::string\" image=\"image2\" band=\"int\"gain=\"float\" />" << std::endl;
+    std::cout << "    <rsgis:band name=\"std::string\" image=\"image3\" band=\"int\"gain=\"float\" />" << std::endl;
+    std::cout << "</rsgis:command>" << std::endl;
+    std::cout << "" << std::endl;
+    std::cout << "<rsgis:command algor=\"imagecalibration\" option=\"ikonosradcal\" output=\"image_out.env\" format=\"GDAL Format\" >" << std::endl;
+    std::cout << "    <rsgis:band name=\"std::string\" image=\"image1\" band=\"int\" [sensorband=\"std::string\" | calcoef=\"float\" bandwidth=\"float\" ] />" << std::endl;
+    std::cout << "    <rsgis:band name=\"std::string\" image=\"image2\" band=\"int\" [sensorband=\"std::string\" | calcoef=\"float\" bandwidth=\"float\" ] />" << std::endl;
+    std::cout << "    <rsgis:band name=\"std::string\" image=\"image3\" band=\"int\" [sensorband=\"std::string\" | calcoef=\"float\" bandwidth=\"float\" ] />" << std::endl;
+    std::cout << "</rsgis:command>" << std::endl;
+    std::cout << "" << std::endl;
+    std::cout << "<rsgis:command algor=\"imagecalibration\" option=\"asterradcal\" output=\"image_out.env\" format=\"GDAL Format\" >" << std::endl;
+    std::cout << "    <rsgis:band name=\"std::string\" image=\"image1\" band=\"int\" [sensorband=\"std::string\" | coefficient=\"float\" ] />" << std::endl;
+    std::cout << "    <rsgis:band name=\"std::string\" image=\"image2\" band=\"int\" [sensorband=\"std::string\" | coefficient=\"float\" ] />" << std::endl;
+    std::cout << "    <rsgis:band name=\"std::string\" image=\"image3\" band=\"int\" [sensorband=\"std::string\" | coefficient=\"float\" ] />" << std::endl;
+    std::cout << "</rsgis:command>" << std::endl;
+    std::cout << "" << std::endl;
+    std::cout << "<rsgis:command algor=\"imagecalibration\" option=\"irsradcal\" output=\"image_out.env\" format=\"GDAL Format\" >" << std::endl;
+    std::cout << "    <rsgis:band name=\"std::string\" image=\"image1\" band=\"int\" [sensorband=\"std::string\" | lmin=\"float\" lmax=\"float\" qcalmin=\"float\" qcalmax=\"float\"] />" << std::endl;
+    std::cout << "    <rsgis:band name=\"std::string\" image=\"image2\" band=\"int\" [sensorband=\"std::string\" | lmin=\"float\" lmax=\"float\" qcalmin=\"float\" qcalmax=\"float\"]/>" << std::endl;
+    std::cout << "    <rsgis:band name=\"std::string\" image=\"image3\" band=\"int\" [sensorband=\"std::string\" | lmin=\"float\" lmax=\"float\" qcalmin=\"float\" qcalmax=\"float\"]/>" << std::endl;
+    std::cout << "</rsgis:command>" << std::endl;
+    std::cout << "" << std::endl;
+    std::cout << "<rsgis:command algor=\"imagecalibration\" option=\"quickbird16bitradcal\" output=\"image_out.env\" format=\"GDAL Format\" >" << std::endl;
+    std::cout << "    <rsgis:band name=\"std::string\" image=\"image1\" band=\"int\" [sensorband=\"std::string\" | calfactor=\"float\" bandintegrate=\"float\" ] />" << std::endl;
+    std::cout << "    <rsgis:band name=\"std::string\" image=\"image2\" band=\"int\" [sensorband=\"std::string\" | calfactor=\"float\" bandintegrate=\"float\" ] />" << std::endl;
+    std::cout << "    <rsgis:band name=\"std::string\" image=\"image3\" band=\"int\" [sensorband=\"std::string\" | calfactor=\"float\" bandintegrate=\"float\" ] />" << std::endl;
+    std::cout << "</rsgis:command>" << std::endl;
+    std::cout << "" << std::endl;
+    std::cout << "<rsgis:command algor=\"imagecalibration\" option=\"quickbird8bitradcal\" output=\"image_out.env\" format=\"GDAL Format\" >" << std::endl;
+    std::cout << "    <rsgis:band name=\"std::string\" image=\"image1\" band=\"int\" [sensorband=\"std::string\" | calfactor=\"float\" bandintegrate=\"float\" k=\"float\" ] />" << std::endl;
+    std::cout << "    <rsgis:band name=\"std::string\" image=\"image2\" band=\"int\" [sensorband=\"std::string\" | calfactor=\"float\" bandintegrate=\"float\" k=\"float\" ] />" << std::endl;
+    std::cout << "    <rsgis:band name=\"std::string\" image=\"image3\" band=\"int\" [sensorband=\"std::string\" | calfactor=\"float\" bandintegrate=\"float\" k=\"float\" ] />" << std::endl;
+    std::cout << "</rsgis:command>" << std::endl;
+    std::cout << "" << std::endl;
+    std::cout << "<rsgis:command algor=\"imagecalibration\" option=\"worldview2radcal\" output=\"image_out.env\" format=\"GDAL Format\">" << std::endl;
+    std::cout << "    <rsgis:band name=\"std::string\" image=\"image1\" band=\"int\" [sensorband=\"std::string\" | calfactor=\"float\" bandintegrate=\"float\" ] />" << std::endl;
+    std::cout << "    <rsgis:band name=\"std::string\" image=\"image2\" band=\"int\" [sensorband=\"std::string\" | calfactor=\"float\" bandintegrate=\"float\" ] />" << std::endl;
+    std::cout << "    <rsgis:band name=\"std::string\" image=\"image3\" band=\"int\" [sensorband=\"std::string\" | calfactor=\"float\" bandintegrate=\"float\" ] />" << std::endl;
+    std::cout << "</rsgis:command>" << std::endl;
+    std::cout << "" << std::endl;
+    std::cout << "<rsgis:command algor=\"imagecalibration\" option=\"topatmosrefl\" input=\"image_in.env\" output=\"image_out.env\" format=\"GDAL Format\" scaleFactor=\"float\" [julianday=\"int\" | day=\"int\" month=\"int\" year=\"int\"] [zenith=\"float\" | elevation=\"float\"] >" << std::endl;
+    std::cout << "    <rsgis:band [sensorband=\"std::string\" | irradiance=\"float\"] />" << std::endl;
+    std::cout << "    <rsgis:band [sensorband=\"std::string\" | irradiance=\"float\"] />" << std::endl;
+    std::cout << "    <rsgis:band [sensorband=\"std::string\" | irradiance=\"float\"] />" << std::endl;
+    std::cout << "</rsgis:command>" << std::endl;
+    std::cout << "" << std::endl;
+    std::cout << "<rsgis:command algor=\"imagecalibration\" option=\"apply6s\" input=\"image_in.env\" output=\"image_out.env\" scaleFactor=\"float\" format=\"GDAL Format\" >" << std::endl;
+    std::cout << "    <rsgis:band band=\"int\" ax=\"float\" bx=\"float\" cx=\"float\" />" << std::endl;
+    std::cout << "    <rsgis:band band=\"int\" ax=\"float\" bx=\"float\" cx=\"float\" />" << std::endl;
+    std::cout << "    <rsgis:band band=\"int\" ax=\"float\" bx=\"float\" cx=\"float\" />" << std::endl;
+    std::cout << "</rsgis:command>" << std::endl;
+    std::cout << "" << std::endl;
+    std::cout << "<rsgis:command algor=\"imagecalibration\" option=\"apply6s\" input=\"image_in.env\" output=\"image_out.env\" format=\"GDAL Format\" scaleFactor=\"float\" inputDEM=\"in_dem.env\">" << std::endl;
+    std::cout << "    <rsgis:band band=\"int\" >" << std::endl;
+    std::cout << "          <rsgis:elevation elevationUpper=\"float\" ax=\"float\" bx=\"float\" cx=\"float\"  />" << std::endl;
+    std::cout << "          <rsgis:elevation elevationUpper=\"float\" ax=\"float\" bx=\"float\" cx=\"float\"  />" << std::endl;
+    std::cout << "    </rsgls:band>" << std::endl;
+    std::cout << "    <rsgis:band band=\"int\" >" << std::endl;
+    std::cout << "          <rsgis:elevation elevationUpper=\"float\" ax=\"float\" bx=\"float\" cx=\"float\"  />" << std::endl;
+    std::cout << "          <rsgis:elevation elevationUpper=\"float\" ax=\"float\" bx=\"float\" cx=\"float\"  />" << std::endl;
+    std::cout << "    </rsgls:band>" << std::endl;
+    std::cout << "</rsgis:command>" << std::endl;
+	std::cout << "</rsgis:commands>\n";
 }
 
-string RSGISExeImageCalibration::getDescription()
+std::string RSGISExeImageCalibration::getDescription()
 {
 	return "Provides a set of tools for calibrating Remotely Sensed image data.";
 }
 
-string RSGISExeImageCalibration::getXMLSchema()
+std::string RSGISExeImageCalibration::getXMLSchema()
 {
 	return "NOT PROVIDED!";
 }

@@ -38,7 +38,6 @@ namespace rsgis{namespace calib{
     
 	struct LandsatRadianceGainsOffsets
     {
-        std::string bandName;
         unsigned int band;
         float lMax;
         float lMin;

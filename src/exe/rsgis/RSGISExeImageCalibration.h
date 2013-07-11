@@ -33,8 +33,10 @@
 #include "common/RSGISRegistrationException.h"
 
 #include "calibration/RSGISStandardDN2RadianceCalibration.h"
-#include "calibration/RSGISCalculateTopOfAtmosphereReflectance.h"
+//#include "calibration/RSGISCalculateTopOfAtmosphereReflectance.h"
 #include "calibration/RSGISApply6SCoefficients.h"
+
+#include "cmds/RSGISCmdImageCalibration.h"
 
 #include "utils/RSGISFileUtils.h"
 #include "math/RSGISMathsUtils.h"
@@ -48,15 +50,7 @@
 
 namespace rsgisexe{
 
-using namespace std;
-using namespace xercesc;
-using namespace rsgis;
-using namespace rsgis::utils;
-using namespace rsgis::math;
-using namespace rsgis::img;
-using namespace rsgis::calib;
-
-class RSGISExeImageCalibration : public RSGISAlgorithmParameters
+class RSGISExeImageCalibration : public rsgis::RSGISAlgorithmParameters
 {
 public:
 	enum options 
@@ -75,30 +69,30 @@ public:
     };
 	
 	RSGISExeImageCalibration();
-	virtual RSGISAlgorithmParameters* getInstance();
-	virtual void retrieveParameters(DOMElement *argElement) throw(RSGISXMLArgumentsException);
-	virtual void runAlgorithm() throw(RSGISException);
+	virtual rsgis::RSGISAlgorithmParameters* getInstance();
+	virtual void retrieveParameters(xercesc::DOMElement *argElement) throw(rsgis::RSGISXMLArgumentsException);
+	virtual void runAlgorithm() throw(rsgis::RSGISException);
 	virtual void printParameters();
-	virtual string getDescription();
-	virtual string getXMLSchema();
+	virtual std::string getDescription();
+	virtual std::string getXMLSchema();
 	virtual void help();
 	~RSGISExeImageCalibration();
 protected:
 	options option;
-    string outputImage;
-    string inputImage;
-	string inputDEM;
-    string *inputImages;
+    std::string outputImage;
+    std::string inputImage;
+	std::string inputDEM;
+    std::string *inputImages;
     unsigned int numBands;
 	bool useTopo6S;
-    LandsatRadianceGainsOffsets *landsatRadGainOffs;
-    SPOTRadianceGainsOffsets *spotRadGainOffs;
-    IkonosRadianceGainsOffsets *ikonosRadGainOffs;
-    ASTERRadianceGainsOffsets *asterRadGainOffs;
-    IRSRadianceGainsOffsets *irsRadGainOffs;
-    Quickbird16bitRadianceGainsOffsets *quickbird16bitRadGainOffs;
-    Quickbird8bitRadianceGainsOffsets *quickbird8bitRadGainOffs;
-    WorldView2RadianceGainsOffsets *worldview2RadGainOffs;
+    std::vector<rsgis::cmds::CmdsLandsatRadianceGainsOffsets> landsatRadGainOffs;
+    rsgis::calib::SPOTRadianceGainsOffsets *spotRadGainOffs;
+    rsgis::calib::IkonosRadianceGainsOffsets *ikonosRadGainOffs;
+    rsgis::calib::ASTERRadianceGainsOffsets *asterRadGainOffs;
+    rsgis::calib::IRSRadianceGainsOffsets *irsRadGainOffs;
+    rsgis::calib::Quickbird16bitRadianceGainsOffsets *quickbird16bitRadGainOffs;
+    rsgis::calib::Quickbird8bitRadianceGainsOffsets *quickbird8bitRadGainOffs;
+    rsgis::calib::WorldView2RadianceGainsOffsets *worldview2RadGainOffs;
     float *solarIrradiance;
     float solarZenith;
     unsigned int julianDay;
@@ -110,8 +104,9 @@ protected:
     float scaleFactor;
     int numValues;
 	unsigned int numElevation;
-	string imageFormat;
+	std::string imageFormat;
     GDALDataType outDataType;
+    rsgis::RSGISLibDataType rsgisOutDataType;
 };
 
 }

@@ -153,6 +153,29 @@ static PyObject *ImageUtils_createTiles(PyObject *self, PyObject *args)
 }
 
 
+static PyObject *ImageUtils_PopImageStats(PyObject *self, PyObject *args)
+{
+    const char *pszInputImage;
+    int useNoDataValue, buildPyramids;
+    float noDataValue;
+    if( !PyArg_ParseTuple(args, "sifi:popImageStats", &pszInputImage, &useNoDataValue, &noDataValue,
+                          &buildPyramids))
+        return NULL;
+    
+    try
+    {
+        rsgis::cmds::executePopulateImgStats(pszInputImage, useNoDataValue, noDataValue, buildPyramids);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
+
 // Our list of functions in this module
 static PyMethodDef ImageUtilsMethods[] = {
     {"stretchImage", ImageUtils_StretchImage, METH_VARARGS, 
@@ -207,6 +230,14 @@ static PyMethodDef ImageUtilsMethods[] = {
 "  type is a rsgislib.TYPE_* value providing the output data type of the tiles.\n"
 "  ext is a string providing the extension for the tiles (as required by the specified data type).\n"
 "\nA list of strings containing the filenames is returned\n"},
+    
+    {"popImageStats", ImageUtils_PopImageStats, METH_VARARGS,
+"Calculate the image statistics and build image pyramids populating the image file.\n"
+"call signature: imageutils.popImageStats(inputImage, useNoDataValue, noDataValue, buildPyramids)\n"
+"  inputImage is a string containing the name of the input file\n"
+"  useNoDataValue is a boolean stating whether the no data value is to be used.\n"
+"  noDataValue is a floating point value to be used as the no data value.\n"
+"  buildPyramids is a boolean stating whether image pyramids should be calculated.\n"},
 
     {NULL}        /* Sentinel */
 };
