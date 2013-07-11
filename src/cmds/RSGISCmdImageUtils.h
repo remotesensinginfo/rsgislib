@@ -66,6 +66,7 @@ namespace rsgis{ namespace cmds {
      */
     void executeImageMosaic(std::string *inputImages, int numDS, std::string outputImage, float background, float skipVal, unsigned int skipBand, unsigned int overlapBehaviour, std::string format, RSGISLibDataType outDataType) throw(RSGISCmdException);
     
+    
 }}
 
 

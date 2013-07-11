@@ -24,6 +24,7 @@
 #include "RSGISCmdParent.h"
 
 #include "calibration/RSGISStandardDN2RadianceCalibration.h"
+#include "calibration/RSGISCalculateTopOfAtmosphereReflectance.h"
 
 #include "img/RSGISImageCalcException.h"
 #include "img/RSGISCalcImageValue.h"
@@ -91,6 +92,61 @@ namespace rsgis{ namespace cmds {
             delete[] outBandNames;
             
             delete radianceCalibration;
+            delete calcImage;
+        }
+        catch(RSGISException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(std::exception &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
+    
+    
+    
+    void executeConvertRadiance2TOARefl(std::string inputImage, std::string outputImage, std::string gdalFormat, rsgis::RSGISLibDataType rsgisOutDataType, float scaleFactor, unsigned int julianDay, bool useJulianDay, unsigned int year, unsigned int month, unsigned int day, float solarZenith, float *solarIrradiance, unsigned int numBands) throw(RSGISCmdException)
+    {
+        GDALAllRegister();
+        GDALDataset **datasets = NULL;
+        rsgis::calib::RSGISCalculateTopOfAtmosphereReflectance *calcTopAtmosRefl = NULL;
+        rsgis::img::RSGISCalcImage *calcImage = NULL;
+        
+        try
+        {
+            datasets = new GDALDataset*[1];
+            
+            std::cout << "Open " << inputImage << std::endl;
+            datasets[0] = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_ReadOnly);
+            if(datasets[0] == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            unsigned int numRasterBands = datasets[0]->GetRasterCount();
+            if(numBands != numRasterBands)
+            {
+                GDALClose(datasets[0]);
+                delete[] datasets;
+                throw rsgis::RSGISException("The number of input image bands and solar irradiance values are different.");
+            }
+            
+            double solarDistance = 0;
+            
+            solarDistance = rsgis::calib::rsgisCalcSolarDistance(julianDay);
+
+            
+            calcTopAtmosRefl = new rsgis::calib::RSGISCalculateTopOfAtmosphereReflectance(numRasterBands, solarIrradiance, solarDistance, solarZenith, scaleFactor);
+            
+            calcImage = new rsgis::img::RSGISCalcImage(calcTopAtmosRefl, "", true);
+            calcImage->calcImage(datasets, 1, outputImage, false, NULL, gdalFormat, RSGIS_to_GDAL_Type(rsgisOutDataType));
+            
+            GDALClose(datasets[0]);
+            delete[] datasets;
+            
+            delete calcTopAtmosRefl;
             delete calcImage;
         }
         catch(RSGISException &e)

@@ -178,6 +178,60 @@ static PyObject *ImageCalibration_landsat2Radiance(PyObject *self, PyObject *arg
     Py_RETURN_NONE;
 }
 
+static PyObject *ImageCalibration_Radiance2TOARefl(PyObject *self, PyObject *args)
+{
+    const char *pszInputFile, *pszOutputFile, *pszGDALFormat;
+    int nDataType, year, month, day;
+    float scaleFactor, solarZenith;
+    PyObject *pSolarIrrObj;
+    if( !PyArg_ParseTuple(args, "sssifiiifO:radiance2TOARefl", &pszInputFile, &pszOutputFile, &pszGDALFormat, &nDataType, &scaleFactor, &year, &month, &day, &solarZenith, &pSolarIrrObj))
+    {
+        return NULL;
+    }
+    
+    if( !PySequence_Check(pSolarIrrObj))
+    {
+        PyErr_SetString(GETSTATE(self)->error, "Last argument must be a sequence");
+        return NULL;
+    }
+    
+    Py_ssize_t nSolarIrrDefns = PySequence_Size(pSolarIrrObj);
+    unsigned int numSolarIrrVals = nSolarIrrDefns;
+    float *solarIrradiance = new float[numSolarIrrVals];
+    
+    for( Py_ssize_t n = 0; n < nSolarIrrDefns; n++ )
+    {
+        PyObject *o = PySequence_GetItem(pSolarIrrObj, n);
+        
+        PyObject *pIrradiance = PyObject_GetAttrString(o, "irradiance");
+        if( ( pIrradiance == NULL ) || ( pIrradiance == Py_None ) || !RSGISPY_CHECK_FLOAT(pIrradiance) )
+        {
+            PyErr_SetString(GETSTATE(self)->error, "Could not find float attribute \'irradiance\'" );
+            Py_XDECREF(pIrradiance);
+            Py_DECREF(o);
+            return NULL;
+        }
+        
+        solarIrradiance[n] = RSGISPY_FLOAT_EXTRACT(pIrradiance);
+        
+        Py_DECREF(pIrradiance);
+        Py_DECREF(o);
+    }
+    
+    try
+    {
+        rsgis::RSGISLibDataType type = (rsgis::RSGISLibDataType)nDataType;
+        rsgis::cmds::executeConvertRadiance2TOARefl(pszInputFile, pszOutputFile, pszGDALFormat, type, scaleFactor, 0, false, year, month, day, (solarZenith*(M_PI/180)), solarIrradiance, numSolarIrrVals);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
 
 
 // Our list of functions in this module
@@ -197,6 +251,22 @@ static PyMethodDef ImageCalibrationMethods[] = {
 "      lMax - lMax value from Landsat header.\n"
 "      qCalMin - qCalMin value from Landsat header.\n"
 "      qCalMax - qCalMax value from Landsat header.\n"},
+    
+{"radiance2TOARefl", ImageCalibration_Radiance2TOARefl, METH_VARARGS,
+    "Converts at sensor radiance values to Top of Atmosphere Reflectance.\n"
+    "call signature: imagecalibration.radiance2TOARefl(inputFile, outputFile, gdalFormat, gdaltype, scaleFactor, julianDay, solarZenith, solarIrradianceVals)\n"
+    "where:\n"
+    "  inputFile is a string containing the name of the input image file\n"
+    "  outputFile is a string containing the name of the output image file\n"
+    "  gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
+    "  gdaltype is an containing one of the values from rsgislib.TYPE_*\n"
+    "  scaleFactor is a float which can be used to scale the output pixel values (e.g., multiple by 1000), set as 1 if not wanted.\n"
+    "  year is an int with the year of the sensor acquisition.\n"
+    "  month is an int with the month of the sensor acquisition.\n"
+    "  day is an int with the day of the sensor acquisition.\n"
+    "  solarZenith is a a float with the solar zenith in degrees at the time of the acquisition (note 90-solarElevation = solarZenith).\n"
+    "  solarIrradianceVals is a sequence of floats each with the name \'irradiance\' which is in order of the bands in the input image.\n"},
+    
     {NULL}        /* Sentinel */
 };
 
