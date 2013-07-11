@@ -86,6 +86,36 @@ namespace rsgis{ namespace cmds {
     void executeUnitArea(std::string inputImage, std::string outputImage, std::string inMatrixfile)throw(RSGISCmdException);
     /** Function to calculate the speed of movement (mean, min and max) */
     void executeMovementSpeed(std::vector<std::string> inputImages, std::vector<unsigned int> imageBands, std::vector<float> imageTimes, float upper, float lower, std::string outputImage)throw(RSGISCmdException);
+    /** Function that counts the number of values with a given range for each column*/
+    void executeCountValsInCols(std::string inputImage, float upper, float lower, std::string outputImage)throw(RSGISCmdException);
+    /** Function to calculate the root mean squared error between 2 images */
+    void executeCalculateRMSE(std::string inputImageA, int inputBandA, std::string inputImageB, int inputBandB)throw(RSGISCmdException);
+    /** Function to apply 2 var function to image */
+    void executeApply2VarFunction(std::string inputImage, void *twoVarFunction, std::string outputImage)throw(RSGISCmdException);
+    /** Function to apply 3 var function to image */
+    void executeApply3VarFunction(std::string inputImage, void *threeVarFunction, std::string outputImage)throw(RSGISCmdException);
+    /** Function to calculate the distance to the nearest geometry for each pixel in an image */
+    void executeDist2Geoms(std::string inputVector, float imgResolution, std::string outputImage)throw(RSGISCmdException);
+    /** Function to calculate statistics for individual image bands */
+    void executeImageBandStats(std::string inputImage, std::string outputFile, bool ignoreZeros)throw(RSGISCmdException);
+    /** Function to calculate the statistics for the whole image across all bands */
+    void executeImageStats(std::string inputImage, std::string outputFile, bool ignoreZeros)throw(RSGISCmdException);
+    /** Function to undertake an unconstrained linear spectral unmixing of the input image for a set of endmembers */
+    void executeUnconLinearSpecUnmix(std::string inputImage, std::string imageFormat, unsigned int outDataType, float lsumGain, float lsumOffset, std::string outputFile, std::string endmembersFile)throw(RSGISCmdException);
+    /** Function to undertake an exhaustive constrained linear spectral unmixing of the input image for a set of endmembers */
+    void executeExhconLinearSpecUnmix(std::string inputImage, std::string imageFormat, unsigned int outDataType, float lsumGain, float lsumOffset, std::string outputFile, std::string endmembersFile, float stepResolution)throw(RSGISCmdException);
+    /** Function to undertake a partially constrained linear spectral unmixing of the input image for a set of endmembers where the sum of the unmixing will be approximately */
+    void executeConSum1LinearSpecUnmix(std::string inputImage, std::string imageFormat, unsigned int outDataType, float lsumGain, float lsumOffset, float lsumWeight, std::string outputFile, std::string endmembersFile)throw(RSGISCmdException);
+    /** Function to undertake a constrained linear spectral unmixing of the input image for a set of endmembers where the sum of the unmixing will be approximately 1 and non-negative */
+    void executeNnConSum1LinearSpecUnmix(std::string inputImage, std::string imageFormat, unsigned int outDataType, float lsumGain, float lsumOffset, float lsumWeight, std::string outputFile, std::string endmembersFile)throw(RSGISCmdException);
+    /** Function to test whether all bands are equal to the same value */
+    void executeAllBandsEqualTo(std::string inputImage, float imgValue, float outputTrueVal, float outputFalseVal, std::string outputImage, std::string imageFormat, unsigned int outDataType)throw(RSGISCmdException);
+    /** Function to generate a histogram for the region of the mask selected */
+    void executeHistogram(std::string inputImage, std::string imageMask, std::string outputFile, unsigned int imgBand, float imgValue, double binWidth, bool calcInMinMax, double inMin, double inMax, void *exeInstance=NULL)throw(RSGISCmdException);
+    /** Function to calculate image band percentiles */
+    void executeBandPercentile(std::string inputImage, float percentile, float noDataValue, bool noDataValueSpecified, std::string outputFile)throw(RSGISCmdException);
+    /** Function to calculate the distance to the nearest geometry for every pixel in an image */
+    void executeImageDistToGeoms(std::string inputImage, std::string inputVector, std::string imageFormat, std::string outputImage)throw(RSGISCmdException);
 }}
 
 
