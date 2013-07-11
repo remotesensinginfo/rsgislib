@@ -1646,7 +1646,7 @@ namespace rsgis{ namespace cmds {
 
     }
     
-    void executeUnconLinearSpecUnmix(std::string inputImage, std::string imageFormat, unsigned int outDataType, float lsumGain, float lsumOffset, std::string outputFile, std::string endmembersFile)throw(RSGISCmdException)
+    void executeUnconLinearSpecUnmix(std::string inputImage, std::string imageFormat, RSGISLibDataType outDataType, float lsumGain, float lsumOffset, std::string outputFile, std::string endmembersFile)throw(RSGISCmdException)
     {
         GDALAllRegister();
         GDALDataset **datasets = NULL;
@@ -1661,9 +1661,7 @@ namespace rsgis{ namespace cmds {
                     throw rsgis::RSGISImageException(message.c_str());
             }
             
-            GDALDataType outType = (GDALDataType) outDataType;
-            
-            rsgis::img::RSGISCalcLinearSpectralUnmixing calcSpecUnmix(imageFormat, outType, lsumGain, lsumOffset);
+            rsgis::img::RSGISCalcLinearSpectralUnmixing calcSpecUnmix(imageFormat, RSGIS_to_GDAL_Type(outDataType), lsumGain, lsumOffset);
             calcSpecUnmix.performUnconstainedLinearSpectralUnmixing(datasets, 1, outputFile, endmembersFile);
             
             GDALClose(datasets[0]);
@@ -1676,7 +1674,7 @@ namespace rsgis{ namespace cmds {
 
     }
     
-    void executeExhconLinearSpecUnmix(std::string inputImage, std::string imageFormat, unsigned int outDataType, float lsumGain, float lsumOffset, std::string outputFile, std::string endmembersFile, float stepResolution)throw(RSGISCmdException)
+    void executeExhconLinearSpecUnmix(std::string inputImage, std::string imageFormat, RSGISLibDataType outDataType, float lsumGain, float lsumOffset, std::string outputFile, std::string endmembersFile, float stepResolution)throw(RSGISCmdException)
     {
         GDALAllRegister();
         GDALDataset **datasets = NULL;
@@ -1691,9 +1689,7 @@ namespace rsgis{ namespace cmds {
                 throw rsgis::RSGISImageException(message.c_str());
             }
             
-            GDALDataType outType = (GDALDataType) outDataType;
-            
-            rsgis::img::RSGISCalcLinearSpectralUnmixing calcSpecUnmix(imageFormat, outType, lsumGain, lsumOffset);
+            rsgis::img::RSGISCalcLinearSpectralUnmixing calcSpecUnmix(imageFormat, RSGIS_to_GDAL_Type(outDataType), lsumGain, lsumOffset);
             calcSpecUnmix.performExhaustiveConstrainedSpectralUnmixing(datasets, 1, outputFile, endmembersFile, stepResolution);
             
             GDALClose(datasets[0]);
@@ -1706,7 +1702,7 @@ namespace rsgis{ namespace cmds {
 
     }
     
-    void executeConSum1LinearSpecUnmix(std::string inputImage, std::string imageFormat, unsigned int outDataType, float lsumGain, float lsumOffset, float lsumWeight, std::string outputFile, std::string endmembersFile)throw(RSGISCmdException)
+    void executeConSum1LinearSpecUnmix(std::string inputImage, std::string imageFormat, RSGISLibDataType outDataType, float lsumGain, float lsumOffset, float lsumWeight, std::string outputFile, std::string endmembersFile)throw(RSGISCmdException)
     {
         GDALAllRegister();
         GDALDataset **datasets = NULL;
@@ -1721,9 +1717,7 @@ namespace rsgis{ namespace cmds {
                 throw rsgis::RSGISImageException(message.c_str());
             }
             
-            GDALDataType outType = (GDALDataType) outDataType;
-            
-            rsgis::img::RSGISCalcLinearSpectralUnmixing calcSpecUnmix(imageFormat, outType, lsumGain, lsumOffset);
+            rsgis::img::RSGISCalcLinearSpectralUnmixing calcSpecUnmix(imageFormat, RSGIS_to_GDAL_Type(outDataType), lsumGain, lsumOffset);
             calcSpecUnmix.performPartConstainedLinearSpectralUnmixing(datasets, 1, outputFile, endmembersFile, lsumWeight);
             
             GDALClose(datasets[0]);
@@ -1764,7 +1758,7 @@ namespace rsgis{ namespace cmds {
 
     }
     
-    void executeAllBandsEqualTo(std::string inputImage, float imgValue, float outputTrueVal, float outputFalseVal, std::string outputImage, std::string imageFormat, unsigned int outDataType)throw(RSGISCmdException)
+    void executeAllBandsEqualTo(std::string inputImage, float imgValue, float outputTrueVal, float outputFalseVal, std::string outputImage, std::string imageFormat, RSGISLibDataType outDataType)throw(RSGISCmdException)
     {
         try
         {
@@ -1777,11 +1771,9 @@ namespace rsgis{ namespace cmds {
                 throw rsgis::RSGISImageException(message.c_str());
             }
             
-            GDALDataType outType = (GDALDataType) outDataType;
-            
             rsgis::img::RSGISAllBandsEqualTo *calcImageValue = new rsgis::img::RSGISAllBandsEqualTo(1, imgValue, outputTrueVal, outputFalseVal);
             rsgis::img::RSGISCalcImage calcImage = rsgis::img::RSGISCalcImage(calcImageValue, "", true);
-            calcImage.calcImage(datasets, 1, outputImage, false, NULL, imageFormat, outType);
+            calcImage.calcImage(datasets, 1, outputImage, false, NULL, imageFormat, RSGIS_to_GDAL_Type(outDataType));
             
             GDALClose(datasets[0]);
             delete[] datasets;

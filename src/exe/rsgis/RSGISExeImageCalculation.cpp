@@ -3225,7 +3225,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
             std::cout << "Offset: " << this->lsumOffset << std::endl;
         
             try {
-                rsgis::cmds::executeUnconLinearSpecUnmix(this->inputImage, this->imageFormat, this->outDataType, this->lsumGain, this->lsumOffset, this->outputFile, this->endmembersFile);
+                rsgis::cmds::executeUnconLinearSpecUnmix(this->inputImage, this->imageFormat, this->rsgisOutDataType, this->lsumGain, this->lsumOffset, this->outputFile, this->endmembersFile);
             } catch (rsgis::RSGISException e) {
                 throw rsgis::RSGISException(e.what());
             } catch (rsgis::cmds::RSGISCmdException e) {
@@ -3245,7 +3245,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
             std::cout << "Offset: " << this->lsumOffset << std::endl;
             
             try {
-                rsgis::cmds::executeExhconLinearSpecUnmix(this->inputImage, this->imageFormat, this->outDataType, this->lsumGain, this->lsumOffset, this->outputFile, this->endmembersFile, this->stepResolution);
+                rsgis::cmds::executeExhconLinearSpecUnmix(this->inputImage, this->imageFormat, this->rsgisOutDataType, this->lsumGain, this->lsumOffset, this->outputFile, this->endmembersFile, this->stepResolution);
             } catch (rsgis::RSGISException e) {
                 throw rsgis::RSGISException(e.what());
             } catch (rsgis::cmds::RSGISCmdException e) {
@@ -3285,7 +3285,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
             std::cout << "Offset: " << this->lsumOffset << std::endl;
             
             try {
-                rsgis::cmds::executeNnConSum1LinearSpecUnmix(this->inputImage, this->imageFormat, this->outDataType, this->lsumGain, this->lsumOffset, this->lsumWeight, this->outputFile, this->endmembersFile);
+                rsgis::cmds::executeNnConSum1LinearSpecUnmix(this->inputImage, this->imageFormat, this->rsgisOutDataType, this->lsumGain, this->lsumOffset, this->lsumWeight, this->outputFile, this->endmembersFile);
             } catch (rsgis::RSGISException e) {
                 throw rsgis::RSGISException(e.what());
             } catch (rsgis::cmds::RSGISCmdException e) {
@@ -3363,7 +3363,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
             std::cout << "If false output: " << this->outputFalseVal << std::endl;
             			
 			try {
-                rsgis::cmds::executeAllBandsEqualTo(this->inputImage, this->imgValue, this->outputTrueVal, this->outputFalseVal, this->outputImage, this->imageFormat, this->outDataType);
+                rsgis::cmds::executeAllBandsEqualTo(this->inputImage, this->imgValue, this->outputTrueVal, this->outputFalseVal, this->outputImage, this->imageFormat, this->rsgisOutDataType);
 			} catch (rsgis::RSGISException e) {
                 throw rsgis::RSGISException(e.what());
             } catch (rsgis::cmds::RSGISCmdException e) {
