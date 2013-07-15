@@ -57,6 +57,7 @@ public:
 	{
 		none,
 		landsatradcal,
+        landsatradcalmultiadd,
         spotradcal,
         ikonosradcal,
         asterradcal,
@@ -65,6 +66,7 @@ public:
         quickbird8bitradcal,
         worldview2radcal,
         topatmosrefl,
+        apply6ssingle,
         apply6s
     };
 	
@@ -86,6 +88,7 @@ protected:
     unsigned int numBands;
 	bool useTopo6S;
     std::vector<rsgis::cmds::CmdsLandsatRadianceGainsOffsets> landsatRadGainOffs;
+    std::vector<rsgis::cmds::CmdsLandsatRadianceGainsOffsetsMultiAdd> landsatRadGainOffsMultiAdd;
     rsgis::calib::SPOTRadianceGainsOffsets *spotRadGainOffs;
     rsgis::calib::IkonosRadianceGainsOffsets *ikonosRadGainOffs;
     rsgis::calib::ASTERRadianceGainsOffsets *asterRadGainOffs;
@@ -100,6 +103,9 @@ protected:
     float **aX;
     float **bX;
     float **cX;
+    float *aXSingle;
+    float *bXSingle;
+    float *cXSingle;
 	float *elevationThresh;
     float scaleFactor;
     int numValues;
@@ -107,6 +113,8 @@ protected:
 	std::string imageFormat;
     GDALDataType outDataType;
     rsgis::RSGISLibDataType rsgisOutDataType;
+    bool useNoDataVal;
+    float noDataVal;
 };
 
 }
