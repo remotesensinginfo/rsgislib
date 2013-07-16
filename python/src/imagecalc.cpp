@@ -37,8 +37,7 @@ struct ImageCalcState
 static struct ImageCalcState _state;
 #endif
 
-static PyObject *ImageCalc_bandMath(PyObject *self, PyObject *args)
-{
+static PyObject *ImageCalc_BandMath(PyObject *self, PyObject *args) {
     const char *pszOutputFile, *pszExpression, *pszGDALFormat;
     int nDataType;
     PyObject *pBandDefnObj;
@@ -120,8 +119,7 @@ static PyObject *ImageCalc_bandMath(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
-static PyObject *ImageCalc_imageMath(PyObject *self, PyObject *args)
-{
+static PyObject *ImageCalc_ImageMath(PyObject *self, PyObject *args) {
     const char *pszInputImage, *pszOutputFile, *pszExpression, *pszGDALFormat;
     int nDataType;
     if( !PyArg_ParseTuple(args, "ssssi:bandMath", &pszInputImage, &pszOutputFile, &pszExpression, 
@@ -143,14 +141,13 @@ static PyObject *ImageCalc_imageMath(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
-static PyObject *ImageCalc_KMeansClustering(PyObject *self, PyObject *args)
-{
+static PyObject *ImageCalc_KMeansClustering(PyObject *self, PyObject *args) {
     const char *pszInputImage, *pszOutputFile;
     unsigned int nNumClusters, nMaxNumIterations, nSubSample;
     int nIgnoreZeros; // passed as a bool - seems the only way to pass into C
     float fDegreeOfChange;
     int nClusterMethod;
-    if( !PyArg_ParseTuple(args, "ssIIIifi:KMeansClustering", &pszInputImage, &pszOutputFile, &nNumClusters, 
+    if( !PyArg_ParseTuple(args, "ssIIIifi:kMeansClustering", &pszInputImage, &pszOutputFile, &nNumClusters,
                                 &nMaxNumIterations, &nSubSample, &nIgnoreZeros, &fDegreeOfChange, &nClusterMethod ))
         return NULL;
 
@@ -168,15 +165,14 @@ static PyObject *ImageCalc_KMeansClustering(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
-static PyObject *ImageCalc_ISODataClustering(PyObject *self, PyObject *args)
-{
+static PyObject *ImageCalc_ISODataClustering(PyObject *self, PyObject *args) {
     const char *pszInputImage, *pszOutputFile;
     unsigned int nNumClusters, nMaxNumIterations, nSubSample, minNumFeatures, minNumClusters;
     unsigned int startIteration, endIteration;
     int nIgnoreZeros; // passed as a bool - seems the only way to pass into C
     float fDegreeOfChange, fMinDistBetweenClusters, maxStdDev;
     int nClusterMethod;
-    if( !PyArg_ParseTuple(args, "ssIIIififIfIII:ISODataClustering", &pszInputImage, &pszOutputFile, &nNumClusters, 
+    if( !PyArg_ParseTuple(args, "ssIIIififIfIII:isoDataClustering", &pszInputImage, &pszOutputFile, &nNumClusters, 
                                 &nMaxNumIterations, &nSubSample, &nIgnoreZeros, &fDegreeOfChange, &nClusterMethod,
                                 &fMinDistBetweenClusters, &minNumFeatures, &maxStdDev, &minNumClusters, 
                                 &startIteration, &endIteration ))
@@ -197,10 +193,523 @@ static PyObject *ImageCalc_ISODataClustering(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
+static PyObject *ImageCalc_MahalanobisDistFilter(PyObject *self, PyObject *args) {
+    const char *inputImage, *outputImage, *gdalFormat;
+    unsigned int dataType, winSize;
+    
+    if(!PyArg_ParseTuple(args, "ssIsI:mahalanobisDistFilter", &inputImage, &outputImage, &winSize, &gdalFormat, &dataType))
+        return NULL;
+    
+    rsgis::RSGISLibDataType type = (rsgis::RSGISLibDataType)dataType;
+    
+    try {
+        rsgis::cmds::executeMahalanobisDistFilter(inputImage, outputImage, winSize, gdalFormat, type);
+    } catch(rsgis::cmds::RSGISCmdException &e) {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
+static PyObject *ImageCalc_MahalanobisDist2ImgFilter(PyObject *self, PyObject *args) {
+    const char *inputImage, *outputImage, *gdalFormat;
+    unsigned int dataType, winSize;
+    
+    if(!PyArg_ParseTuple(args, "ssIsI:mahalanobisDist2ImgFilter", &inputImage, &outputImage, &winSize, &gdalFormat, &dataType))
+        return NULL;
+    
+    rsgis::RSGISLibDataType type = (rsgis::RSGISLibDataType)dataType;
+    
+    try {
+        rsgis::cmds::executeMahalanobisDist2ImgFilter(inputImage, outputImage, winSize, gdalFormat, type);
+    } catch(rsgis::cmds::RSGISCmdException &e) {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
+static PyObject *ImageCalc_ImageCalcDistance(PyObject *self, PyObject *args) {
+    const char *inputImage, *outputImage, *gdalFormat;
+    
+    if(!PyArg_ParseTuple(args, "sss:imageCalcDistance", &inputImage, &outputImage, &gdalFormat))
+        return NULL;
+    
+    try {
+        rsgis::cmds::executeImageCalcDistance(inputImage, outputImage, gdalFormat);
+    } catch (rsgis::cmds::RSGISCmdException &e) {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
+static PyObject *ImageCalc_ImagePixelColumnSummary(PyObject *self, PyObject *args) {
+    const char *inputImage, *outputImage, *gdalFormat;
+    unsigned int dataType;
+    int useNoDataValue;
+    float noDataValue;
+    PyObject *summaryStats;
+    
+    if(!PyArg_ParseTuple(args, "ssOsIfi:ImagePixelColumnSummary", &inputImage, &outputImage, &summaryStats, &gdalFormat, &dataType, &noDataValue, useNoDataValue))
+        return NULL;
+    
+    // get the kw attrs from the object
+    PyObject *pCalcMin = PyObject_GetAttrString(summaryStats, "calcMin");
+    if( ( pCalcMin == NULL ) || ( pCalcMin == Py_None ) || !RSGISPY_CHECK_INT(pCalcMin) ) {
+        PyErr_SetString(GETSTATE(self)->error, "could not find string attribute \'calcMin\'" );
+        Py_XDECREF(pCalcMin);
+        return NULL;
+    }
+    
+    PyObject *pCalcMax = PyObject_GetAttrString(summaryStats, "calcMax");
+    if( ( pCalcMax == NULL ) || ( pCalcMax == Py_None ) || !RSGISPY_CHECK_INT(pCalcMax) ) {
+        PyErr_SetString(GETSTATE(self)->error, "could not find string attribute \'calcMax\'" );
+        Py_XDECREF(pCalcMax);
+        Py_DECREF(pCalcMin);
+        return NULL;
+    }
+    
+    PyObject *pCalcMean = PyObject_GetAttrString(summaryStats, "calcMean");
+    if( ( pCalcMean == NULL ) || ( pCalcMean == Py_None ) || !RSGISPY_CHECK_INT(pCalcMean) ) {
+        PyErr_SetString(GETSTATE(self)->error, "could not find string attribute \'calcMean\'" );
+        Py_XDECREF(pCalcMean);
+        Py_DECREF(pCalcMax);
+        Py_DECREF(pCalcMin);
+        return NULL;
+    }
+    
+    PyObject *pCalcSum = PyObject_GetAttrString(summaryStats, "calcSum");
+    if( ( pCalcSum == NULL ) || ( pCalcSum == Py_None ) || !RSGISPY_CHECK_INT(pCalcSum) ) {
+        PyErr_SetString(GETSTATE(self)->error, "could not find string attribute \'calcSum\'" );
+        Py_XDECREF(pCalcSum);
+        Py_DECREF(pCalcMean);
+        Py_DECREF(pCalcMax);
+        Py_DECREF(pCalcMin);
+        return NULL;
+    }
+    
+    PyObject *pCalcStdDev = PyObject_GetAttrString(summaryStats, "calcStdDev");
+    if( ( pCalcStdDev == NULL ) || ( pCalcStdDev == Py_None ) || !RSGISPY_CHECK_INT(pCalcStdDev) ) {
+        PyErr_SetString(GETSTATE(self)->error, "could not find string attribute \'calcStdDev\'" );
+        Py_XDECREF(pCalcStdDev);
+        Py_DECREF(pCalcSum);
+        Py_DECREF(pCalcMean);
+        Py_DECREF(pCalcMax);
+        Py_DECREF(pCalcMin);
+        return NULL;
+    }
+    
+    PyObject *pCalcMedian = PyObject_GetAttrString(summaryStats, "calcMedian");
+    if( ( pCalcMedian == NULL ) || ( pCalcMedian == Py_None ) || !RSGISPY_CHECK_INT(pCalcMedian) ) {
+        PyErr_SetString(GETSTATE(self)->error, "could not find string attribute \'calcMedian\'" );
+        Py_XDECREF(pCalcMedian);
+        Py_DECREF(pCalcStdDev);
+        Py_DECREF(pCalcSum);
+        Py_DECREF(pCalcMean);
+        Py_DECREF(pCalcMax);
+        Py_DECREF(pCalcMin);
+        return NULL;
+    }
+    
+    PyObject *pMin = PyObject_GetAttrString(summaryStats, "min");
+    if( ( pMin == NULL ) || ( pMin == Py_None ) || !RSGISPY_CHECK_FLOAT(pMin) ) {
+        PyErr_SetString(GETSTATE(self)->error, "could not find string attribute \'min\'" );
+        Py_XDECREF(pMin);
+        Py_DECREF(pCalcMedian);
+        Py_DECREF(pCalcStdDev);
+        Py_DECREF(pCalcSum);
+        Py_DECREF(pCalcMean);
+        Py_DECREF(pCalcMax);
+        Py_DECREF(pCalcMin);
+        return NULL;
+    }
+    
+    PyObject *pMax = PyObject_GetAttrString(summaryStats, "max");
+    if( ( pMax == NULL ) || ( pMax == Py_None ) || !RSGISPY_CHECK_FLOAT(pMax) ) {
+        PyErr_SetString(GETSTATE(self)->error, "could not find string attribute \'max\'" );
+        Py_XDECREF(pMax);
+        Py_DECREF(pMin);
+        Py_DECREF(pCalcMedian);
+        Py_DECREF(pCalcStdDev);
+        Py_DECREF(pCalcSum);
+        Py_DECREF(pCalcMean);
+        Py_DECREF(pCalcMax);
+        Py_DECREF(pCalcMin);
+        return NULL;
+    }
+    
+    PyObject *pMean = PyObject_GetAttrString(summaryStats, "mean");
+    if( ( pMean == NULL ) || ( pMean == Py_None ) || !RSGISPY_CHECK_FLOAT(pMean) ) {
+        PyErr_SetString(GETSTATE(self)->error, "could not find string attribute \'mean\'" );
+        Py_XDECREF(pMean);
+        Py_DECREF(pMax);
+        Py_DECREF(pMin);
+        Py_DECREF(pCalcMedian);
+        Py_DECREF(pCalcStdDev);
+        Py_DECREF(pCalcSum);
+        Py_DECREF(pCalcMean);
+        Py_DECREF(pCalcMax);
+        Py_DECREF(pCalcMin);
+        return NULL;
+    }
+    
+    PyObject *pSum = PyObject_GetAttrString(summaryStats, "sum");
+    if( ( pSum == NULL ) || ( pSum == Py_None ) || !RSGISPY_CHECK_FLOAT(pSum) ) {
+        PyErr_SetString(GETSTATE(self)->error, "could not find string attribute \'sum\'" );
+        Py_XDECREF(pSum);
+        Py_DECREF(pMean);
+        Py_DECREF(pMax);
+        Py_DECREF(pMin);
+        Py_DECREF(pCalcMedian);
+        Py_DECREF(pCalcStdDev);
+        Py_DECREF(pCalcSum);
+        Py_DECREF(pCalcMean);
+        Py_DECREF(pCalcMax);
+        Py_DECREF(pCalcMin);
+        return NULL;
+    }
+    
+    PyObject *pStdDev = PyObject_GetAttrString(summaryStats, "stdDev");
+    if( ( pStdDev == NULL ) || ( pStdDev == Py_None ) || !RSGISPY_CHECK_FLOAT(pStdDev) ) {
+        PyErr_SetString(GETSTATE(self)->error, "could not find string attribute \'stdDev\'" );
+        Py_XDECREF(pStdDev);
+        Py_DECREF(pSum);
+        Py_DECREF(pMean);
+        Py_DECREF(pMax);
+        Py_DECREF(pMin);
+        Py_DECREF(pCalcMedian);
+        Py_DECREF(pCalcStdDev);
+        Py_DECREF(pCalcSum);
+        Py_DECREF(pCalcMean);
+        Py_DECREF(pCalcMax);
+        Py_DECREF(pCalcMin);
+        return NULL;
+    }
+    
+    PyObject *pMedian = PyObject_GetAttrString(summaryStats, "median");
+    if( ( pMedian == NULL ) || ( pMedian == Py_None ) || !RSGISPY_CHECK_FLOAT(pMedian) ) {
+        PyErr_SetString(GETSTATE(self)->error, "could not find string attribute \'median\'" );
+        Py_XDECREF(pMedian);
+        Py_DECREF(pStdDev);
+        Py_DECREF(pSum);
+        Py_DECREF(pMean);
+        Py_DECREF(pMax);
+        Py_DECREF(pMin);
+        Py_DECREF(pCalcMedian);
+        Py_DECREF(pCalcStdDev);
+        Py_DECREF(pCalcSum);
+        Py_DECREF(pCalcMean);
+        Py_DECREF(pCalcMax);
+        Py_DECREF(pCalcMin);
+        return NULL;
+    }
+    
+    // generate struct to pass to C function from python object attributes
+    rsgis::cmds::RSGISCmdStatsSummary summary;
+    summary.calcMin = RSGISPY_INT_EXTRACT(pCalcMin);
+    summary.calcMax = RSGISPY_INT_EXTRACT(pCalcMax);
+    summary.calcMean = RSGISPY_INT_EXTRACT(pCalcMean);
+    summary.calcSum = RSGISPY_INT_EXTRACT(pCalcSum);
+    summary.calcStdDev = RSGISPY_INT_EXTRACT(pCalcStdDev);
+    summary.calcMedian = RSGISPY_INT_EXTRACT(pCalcMedian);
+    
+    summary.min = RSGISPY_FLOAT_EXTRACT(pMin);
+    summary.max = RSGISPY_FLOAT_EXTRACT(pMax);
+    summary.mean = RSGISPY_FLOAT_EXTRACT(pMean);
+    summary.sum = RSGISPY_FLOAT_EXTRACT(pSum);
+    summary.stdDev = RSGISPY_FLOAT_EXTRACT(pStdDev);
+    summary.median = RSGISPY_FLOAT_EXTRACT(pMedian);
+    
+    Py_DECREF(pCalcMin);
+    Py_DECREF(pCalcMax);
+    Py_DECREF(pCalcMean);
+    Py_DECREF(pCalcSum);
+    Py_DECREF(pCalcStdDev);
+    Py_DECREF(pCalcMedian);
+    Py_DECREF(pMin);
+    Py_DECREF(pMax);
+    Py_DECREF(pMean);
+    Py_DECREF(pSum);
+    Py_DECREF(pStdDev);
+    Py_DECREF(pMedian);
+    
+    rsgis::RSGISLibDataType type = (rsgis::RSGISLibDataType)dataType;
+    
+    try {
+        rsgis::cmds::executeImagePixelColumnSummary(inputImage, outputImage, summary, gdalFormat, type, noDataValue, useNoDataValue);
+    } catch (rsgis::cmds::RSGISCmdException &e) {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
+static PyObject *ImageCalc_ImagePixelLinearFit(PyObject *self, PyObject *args) {
+    const char *inputImage, *outputImage, *gdalFormat, *bandValues;
+    double noDataValue;
+    int useNoDataValue;
+    
+    if(!PyArg_ParseTuple(args, "ssssfi:imagePixelLinearFit", &inputImage, &outputImage, &gdalFormat, &bandValues, &noDataValue, &useNoDataValue))
+        return NULL;
+    
+    try {
+        rsgis::cmds::executeImagePixelLinearFit(inputImage, outputImage, gdalFormat, bandValues, noDataValue, useNoDataValue);
+    } catch (rsgis::cmds::RSGISCmdException &e) {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
+static PyObject *ImageCalc_Normalisation(PyObject *self, PyObject *args) {
+    PyObject *pInputImages, *pOutputImages;
+    int calcInMinMax;
+    double inMin, inMax, outMin, outMax;
+    
+    if(!PyArg_ParseTuple(args, "OOiffff:normalisation", &pInputImages, &pOutputImages, &calcInMinMax, &inMin, &inMax, &outMin, &outMax))
+        return NULL;
+    
+    if( !PySequence_Check(pInputImages) || !PySequence_Check(pOutputImages)) {
+        PyErr_SetString(GETSTATE(self)->error, "first two arguments must be sequences");
+        return NULL;
+    }
+
+    // extract the image strings from the python sequences
+    Py_ssize_t nImages = PySequence_Size(pInputImages);
+    std::vector<std::string> inputImages, outputImages;
+    inputImages.reserve(nImages);
+    outputImages.reserve(nImages);
+    
+    for(int i = 0; i < nImages; ++i) {
+        PyObject *inImageObj = PySequence_GetItem(pInputImages, i);
+        PyObject *outImageObj = PySequence_GetItem(pOutputImages, i);
+        
+        if(!RSGISPY_CHECK_STRING(inImageObj) || RSGISPY_CHECK_STRING(outImageObj)) {
+            PyErr_SetString(GETSTATE(self)->error, "Input and output images must be strings");
+            Py_DECREF(inImageObj);
+            Py_DECREF(outImageObj);
+            return NULL;
+        }
+        
+        inputImages.push_back(RSGISPY_STRING_EXTRACT(inImageObj));
+        outputImages.push_back(RSGISPY_STRING_EXTRACT(outImageObj));
+        
+        Py_DECREF(inImageObj);
+        Py_DECREF(outImageObj);
+    }
+    
+    try {
+        rsgis::cmds::executeNormalisation(inputImages, outputImages, calcInMinMax, inMin, inMax, outMin, outMax);
+    } catch (rsgis::cmds::RSGISCmdException &e) {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
+static PyObject *ImageCalc_Correlation(PyObject *self, PyObject *args) {
+    const char *inputImageA, *inputImageB, *outputMatrix;
+    
+    if(!PyArg_ParseTuple(args, "sss:correlation", &inputImageA, &inputImageB, &outputMatrix))
+        return NULL;
+    
+    try {
+        rsgis::cmds::executeCorrelation(inputImageA, inputImageB, outputMatrix);
+    } catch (rsgis::cmds::RSGISCmdException &e) {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
+static PyObject *ImageCalc_Covariance(PyObject *self, PyObject *args) {
+    const char *inputImageA, *inputImageB, *inputMatrixA, *inputMatrixB, *outputMatrix;
+    int shouldCalcMean;
+    
+    if(!PyArg_ParseTuple(args, "ssssis:covariance", &inputImageA, &inputImageB, &inputMatrixA, &inputMatrixB, &shouldCalcMean, &outputMatrix))
+        return NULL;
+    
+    try {
+        rsgis::cmds::executeCovariance(inputImageA, inputImageB, inputMatrixA, inputMatrixB, shouldCalcMean, outputMatrix);
+    } catch (rsgis::cmds::RSGISCmdException &e) {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
+static PyObject *ImageCalc_MeanVector(PyObject *self, PyObject *args) {
+    const char *inputImage, *outputMatrix;
+    
+    if(!PyArg_ParseTuple(args, "ss:meanVector", &inputImage, &outputMatrix))
+        return NULL;
+    
+    try {
+        rsgis::cmds::executeMeanVetor(inputImage, outputMatrix);
+    } catch (rsgis::cmds::RSGISCmdException &e) {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
+static PyObject *ImageCalc_PCA(PyObject *self, PyObject *args) {
+    const char *eigenVectors, *inputImage, *outputImage;
+    unsigned int numComponents;
+    
+    if(!PyArg_ParseTuple(args, "sssI:pca", &inputImage, &eigenVectors, &outputImage, &numComponents))
+        return NULL;
+    
+    try {
+        rsgis::cmds::executePCA(eigenVectors, inputImage, outputImage, numComponents);
+    } catch (rsgis::cmds::RSGISCmdException &e) {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
+static PyObject *ImageCalc_Standardise(PyObject *self, PyObject *args) {
+    const char *meanVector, *inputImage, *outputImage;
+    
+    if(!PyArg_ParseTuple(args, "sss:standardise", &meanVector, &inputImage, &outputImage))
+        return NULL;
+    
+    try {
+        rsgis::cmds::executeStandardise(meanVector, inputImage, outputImage);
+    } catch (rsgis::cmds::RSGISCmdException &e) {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
+static PyObject *ImageCalc_ReplaceValuesLessThan(PyObject *self, PyObject *args) {
+    const char *inputImage, *outputImage;
+    double threshold, value;
+    
+    if(!PyArg_ParseTuple(args, "ssff:replaceValuesLessThan", &inputImage, &outputImage, &threshold, &value))
+        return NULL;
+    
+    try {
+        rsgis::cmds::executeReplaceValuesLessThan(inputImage, outputImage, threshold, value);
+    } catch (rsgis::cmds::RSGISCmdException &e) {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
+static PyObject *ImageCalc_UnitArea(PyObject *self, PyObject *args) {
+    const char *inputImage, *outputImage, *inputMatrix;
+    double threshold, value;
+    
+    if(!PyArg_ParseTuple(args, "sss:unitArea", &inputImage, &outputImage, &inputMatrix))
+        return NULL;
+    
+    try {
+        rsgis::cmds::executeUnitArea(inputImage, outputImage, inputMatrix);
+    } catch (rsgis::cmds::RSGISCmdException &e) {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
+static PyObject *ImageCalc_MovementSpeed(PyObject *self, PyObject *args) {
+    // declare variables
+    PyObject *inImagesObj, *imageBandsObj, *imageTimesObj;
+    const char *outputImage;
+    float upper, lower;
+    bool failedCheck = false;
+    
+    // extract (with basic checking) parameters from called python function
+    if(!PyArg_ParseTuple(args, "OOOffs:movementSpeed", &inImagesObj, &imageBandsObj, &imageTimesObj, &upper, &lower, &outputImage))
+        return NULL;
+    
+    // check that the objects we expect to be are sequences
+    if( !PySequence_Check(inImagesObj) || !PySequence_Check(imageBandsObj) || !PySequence_Check(imageTimesObj)) {
+        PyErr_SetString(GETSTATE(self)->error, "first three arguments must be sequences");
+        return NULL;
+    }
+    
+    // extract the items from the sequences...
+    Py_ssize_t nImages = PySequence_Size(inImagesObj);
+    
+    // set up vectors to hold extracted sequence items
+    std::vector<std::string> inputImages;
+    std::vector<unsigned int> imageBands;
+    std::vector<float> imageTimes;
+    
+    inputImages.reserve(nImages);
+    imageBands.reserve(nImages);
+    imageTimes.reserve(nImages);
+    
+    // for each image
+    for(int i = 0; i < nImages; ++i) {
+        // get the elements for this image from each of the sequences
+        PyObject *inImageObj = PySequence_GetItem(inImagesObj, i);
+        PyObject *imageBandObj = PySequence_GetItem(imageBandsObj, i);
+        PyObject *imageTimeObj = PySequence_GetItem(imageTimesObj, i);
+        
+        // check they are the expected types
+        if(!RSGISPY_CHECK_STRING(inImageObj)) {
+            failedCheck = true;
+            PyErr_SetString(GETSTATE(self)->error, "Input images must be strings");
+        } if(!RSGISPY_CHECK_INT(imageBandObj)) {
+            failedCheck = true;
+            PyErr_SetString(GETSTATE(self)->error, "Image bands must be integers");
+        } if (!RSGISPY_CHECK_FLOAT(imageTimeObj)) {
+            failedCheck = true;
+            PyErr_SetString(GETSTATE(self)->error, "Image times must be floats");
+        }
+        
+        if(failedCheck) {
+            Py_DECREF(inImageObj);
+            Py_DECREF(imageBandObj);
+            Py_DECREF(imageTimeObj);
+            return NULL;
+        }
+        
+        // append them to our vectors
+        inputImages.push_back(RSGISPY_STRING_EXTRACT(inImageObj));
+        imageBands.push_back(RSGISPY_INT_EXTRACT(imageBandObj));
+        imageTimes.push_back(RSGISPY_FLOAT_EXTRACT(imageTimeObj));
+        
+        // release the python resources
+        Py_DECREF(inImageObj);
+        Py_DECREF(imageBandObj);
+        Py_DECREF(imageTimeObj);
+    }
+    
+    // run the command
+    try {
+        rsgis::cmds::executeMovementSpeed(inputImages, imageBands, imageTimes, upper, lower, outputImage);
+    } catch (rsgis::cmds::RSGISCmdException &e) {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
 
 // Our list of functions in this module
 static PyMethodDef ImageCalcMethods[] = {
-    {"bandMath", ImageCalc_bandMath, METH_VARARGS, 
+    {"bandMath", ImageCalc_BandMath, METH_VARARGS,
 "Performs band math calculation.\n"
 "call signature: imagecalc.bandMath(outputImage, expression, gdalformat, gdaltype, bandDefnSeq)\n"
 "where:\n"
@@ -210,7 +719,7 @@ static PyMethodDef ImageCalcMethods[] = {
 "  gdaltype is an containing one of the values from rsgislib.TYPE_*\n"
 "  bandDefnSeq is a sequence of rsgislib.imagecalc.BandDefn objects that define the inputs"},
 
-    {"imageMath", ImageCalc_imageMath, METH_VARARGS,
+    {"imageMath", ImageCalc_ImageMath, METH_VARARGS,
 "Performs image math calculation.\n"
 "call signature: imagecalc.imageMath(inputImage, outputImage, expression, gdalformat, gdaltype)\n"
 "where:\n"
@@ -251,7 +760,169 @@ static PyMethodDef ImageCalcMethods[] = {
 "  startIteration is an int\n"
 "  endIteration is an int\n"
 },
+    
+    {"mahalanobisDistFilter", ImageCalc_MahalanobisDistFilter, METH_VARARGS,
+"Performs mahalanobis distance window filter.\n"
+"call signature: imagecalc.mahalanobisDistFilter(inputImage, outputImage, windowSize, gdalFormat, gdalDataType)\n"
+"where:\n"
+"  inputImage is a string containing the name of the input file\n"
+"  outputImage is a string containing the name of the output file\n"
+"  windowSize is an int defining the size of the window to be used\n"
+"  gdalFormat is a string containing the GDAL format for the output file - eg 'KEA'\n"
+"  gdalDataType is an int containing one of the values from rsgislib.TYPE_*\n"
+},
+    
+    {"mahalanobisDist2ImgFilter", ImageCalc_MahalanobisDist2ImgFilter, METH_VARARGS,
+"Performs mahalanobis distance image to window filter.\n"
+"call signature: imagecalc.mahalanobisDist2ImgFilter(inputImage, outputImage, windowSize, gdalFormat, gdalDataType)\n"
+"where:\n"
+"  inputImage is a string containing the name of the input file\n"
+"  outputImage is a string containing the name of the output file\n"
+"  windowSize is an int defining the size of the window to be used\n"
+"  gdalFormat is a string containing the GDAL format for the output file - eg 'KEA'\n"
+"  gdalDataType is an int containing one of the values from rsgislib.TYPE_*\n"
+},
+    
+    {"imageCalcDistance", ImageCalc_ImageCalcDistance, METH_VARARGS,
+"Performs image calculate distance command.\n"
+"call signature: imagecalc.imageCalcDistance(inputImage, outputImage, gdalFormat)\n"
+"where:\n"
+"  inputImage is a string containing the name of the input file\n"
+"  outputImage is a string containing the name of the output file\n"
+"  gdalFormat is a string containing the GDAL format for the output file - eg 'KEA'\n"
+},
+  
+    {"imagePixelColumnSummary", ImageCalc_ImagePixelColumnSummary, METH_VARARGS,
+"Calculates summary statistics for a column of pixels.\n"
+"call signature: imagecalc.imagePixelColumnSummary(inputImage, outputImage, summaryStats, gdalFormat, gdalDataType, noDataValue, useNoDataValue)\n"
+"where:\n"
+"  inputImage is a string containing the name of the input file\n"
+"  outputImage is a string containing the name of the output file\n"
+"  summaryStats is an object that has attributes matching rsgis.cmds.RSGISCmdStatsSummary\n"
+"    Requires: TODO: Check\n"
+"      calcMin: boolean defining if the min value should be calculated\n"
+"      calcMax: boolean defining if the max value should be calculated\n"
+"      calcSum: boolean defining if the sum value should be calculated\n"
+"      calcMean: boolean defining if the mean value should be calculated\n"
+"      calcStdDev: boolean defining if the standard deviation should be calculated\n"
+"      calcMedian: boolean defining if the median value should be calculated\n"
+"      min: float defining the min value to use\n"
+"      max: float defining the max value to use\n"
+"      mean: float defining the mean value to use\n"
+"      sum: float defining the sum value to use\n"
+"      stdDev: float defining the standard deviation value to use\n"
+"      median: float defining the median value to use\n"
+"  gdalFormat is a string containing the GDAL format for the output file - eg 'KEA'\n"
+"  gdalDataType is an int containing one of the values from rsgislib.TYPE_*\n"
+"  noDataValue is a float specifying what value is used to signify no data\n"
+"  useNoDataValue is a boolean specifying whether the noDataValue should be used\n"
+},
+    
+    {"imagePixelLinearFit", ImageCalc_ImagePixelLinearFit, METH_VARARGS,
+"Performs a linear regression on each column of pixels.\n"
+"call signature: imagecalc.imagePixelLinearFit(inputImage, outputImage, gdalFormat, bandValues, noDataValue, useNoDataValue)\n"
+"where:\n"
+"  inputImage is a string containing the name of the input file\n"
+"  outputImage is a string containing the name of the output file\n"
+"  gdalFormat is a string containing the GDAL format for the output file - eg 'KEA'\n"
+"  bandValues is TODO\n"
+"  noDataValue is a float specifying what value is used to signify no data\n"
+"  useNoDataValue is a boolean specifying whether the noDataValue should be used\n"
+},
+    
+    {"normalisation", ImageCalc_Normalisation, METH_VARARGS,
+"Performs image normalisation\n"
+"call signature: imagecalc.normalisation(inputImages, outputImages, calcInMinMax, inMin, inMax, outMin, outMax)\n"
+"where:\n"
+"  inputImages is a sequence of strings containing the names of the input files\n"
+"  outputImages is a sequence of strings containing the names of the output files\n"
+"  calcInMinMax is a boolean specifying whether to calculate inMin and inMax values TODO: Check'\n"
+"  inMin is a float specifying the TODO\n"
+"  inMax is a float specifying the TODO\n"
+"  outMin is a float specifying the TODO\n"
+"  outMax is a float specifying the TODO\n"
+},
 
+    {"correlation", ImageCalc_Correlation, METH_VARARGS,
+"Calculates the correlation between two images\n"
+"call signature: imagecalc.correlation(inputImageA, inputImageB, outputMatrix)\n"
+"where:\n"
+"  inputImageA is a string containing the name of the first input image file\n"
+"  inputImageB is a string containing the name of the second input image file\n"
+"  outputMatrix is a string containing the name of the output matrix\n"
+},
+    
+    {"covariance", ImageCalc_Covariance, METH_VARARGS,
+"Calculates the covariance between two images\n"
+"call signature: imagecalc.covariance(inputImageA, inputImageB, inputMatrixA, inputMatrixB, shouldCalcMean, outputMatrix)\n"
+"where:\n"
+"  inputImageA is a string containing the name of the first input image file\n"
+"  inputImageB is a string containing the name of the second input image file\n"
+"  inputMatrixA is a string containing the name of the first input matrix file\n"
+"  inputMatrixB is a string containing the name of the second input matrix file\n"
+"  shouldCalcMean is a boolean defining whether the mean should be calculated TODO: check\n"
+"  outputMatrix is a string containing the name of the output matrix\n"
+},
+
+    {"meanVector", ImageCalc_MeanVector, METH_VARARGS,
+"Calculates the mean vector of an image\n"
+"call signature: imagecalc.meanVector(inputImage, outputMatrix)\n"
+"where:\n"
+"  inputImage is a string containing the name of the input image file\n"
+"  outputMatrix is a string containing the name of the output matrix\n"
+},
+
+    
+    {"pca", ImageCalc_PCA, METH_VARARGS,
+"Performs a principal components analysis of an image\n"
+"call signature: imagecalc.pca(eigenVectors, inputImage, outputImage, numComponents)\n"
+"where:\n"
+"  eigenVectors is a string containing the name of the file of eigen vectors for the PCA\n"
+"  inputImage is a string containing the name of the input image file\n"
+"  outputImage is a string containing the name of the output image file\n"
+"  numComponents is an int containing number of components to use for PCA\n"
+},
+    
+    {"standardise", ImageCalc_Standardise, METH_VARARGS,
+"Generates a standardised image using the mean vector provided\n"
+"call signature: imagecalc.standardise(meanVector, inputImage, outputImage)\n"
+"where:\n"
+"  meanVector is a string containing the name of the file containing the mean vector TODO: check\n"
+"  inputImage is a string containing the name of the input image file\n"
+"  outputImage is a string containing the name of the output image file\n"
+},
+
+    {"replaceValuesLessThan", ImageCalc_ReplaceValuesLessThan, METH_VARARGS,
+"Replaces values in an image that are less than the provided, according to the provided threshold\n"
+"call signature: imagecalc.replaceValuesLessThan(inputImage, outputImage, threshold, value)\n"
+"where:\n"
+"  inputImage is a string containing the name of the input image file\n"
+"  outputImage is a string containing the name of the output image file\n"
+"  threshold is a float containing the threshold to use\n"
+"  value is a float containing the value below which replacement will occur\n"
+},
+    
+    {"unitArea", ImageCalc_UnitArea, METH_VARARGS,
+"Converts the image spectra to unit area\n"
+"call signature: imagecalc.unitArea(inputImage, outputImage, inputMatrixFile)\n"
+"where:\n"
+"  inputImage is a string containing the name of the input image file\n"
+"  outputImage is a string containing the name of the output image file\n"
+"  inputMatrixFile is a string containing the name of the input matrix file TODO: check\n"
+},
+
+    {"movementSpeed", ImageCalc_MovementSpeed, METH_VARARGS,
+"Calculates the speed of movement in images (mean, min and max)\n"
+"call signature: imagecalc.movementSpeed(inputImages, imageBands, imageTimes, upper, lower, outputImage)\n"
+"where:\n"
+"  inputImages is a python sequence of strings of the input image files\n"
+"  imageBands is a python sequence of integers defining the band of each image to use\n"
+"  imageTimes is a python sequence of floats defining the time corresponding to each image\n"
+"  upper is a float TODO: expand\n"
+"  lower is a float TODO: expand\n"
+"  outputImage is a string defining the output image file name\n"
+},
+    
     {NULL}        /* Sentinel */
 };
 
