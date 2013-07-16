@@ -32,14 +32,14 @@
 #include "RSGISCmdCommon.h"
 
 namespace rsgis{ namespace cmds {
-    
+
     struct VariableStruct
     {
         std::string image;
         std::string name;
         int bandNum;
     };
-    
+
     enum RSGISInitClustererMethods
     {
         rsgis_init_random,
@@ -49,7 +49,7 @@ namespace rsgis{ namespace cmds {
         rsgis_init_diagonal_stddev_attach,
         rsgis_init_kpp
     };
-    
+
     /** Function to run the band maths tools */
     void executeBandMaths(VariableStruct *variables, unsigned int numVars, std::string outputImage, std::string mathsExpression, std::string gdalFormat, RSGISLibDataType outDataType)throw(RSGISCmdException);
     /** Function to run the image maths tools */
@@ -104,7 +104,7 @@ namespace rsgis{ namespace cmds {
     void executeUnconLinearSpecUnmix(std::string inputImage, std::string imageFormat, RSGISLibDataType outDataType, float lsumGain, float lsumOffset, std::string outputFile, std::string endmembersFile)throw(RSGISCmdException);
     /** Function to undertake an exhaustive constrained linear spectral unmixing of the input image for a set of endmembers */
     void executeExhconLinearSpecUnmix(std::string inputImage, std::string imageFormat, RSGISLibDataType outDataType, float lsumGain, float lsumOffset, std::string outputFile, std::string endmembersFile, float stepResolution)throw(RSGISCmdException);
-    /** Function to undertake a partially constrained linear spectral unmixing of the input image for a set of endmembers where the sum of the unmixing will be approximately */
+    /** Function to undertake a partially constrained linear spectral unmixing of the input image for a set of endmembers where the sum of the unmixing will be approximately 1*/
     void executeConSum1LinearSpecUnmix(std::string inputImage, std::string imageFormat, RSGISLibDataType outDataType, float lsumGain, float lsumOffset, float lsumWeight, std::string outputFile, std::string endmembersFile)throw(RSGISCmdException);
     /** Function to undertake a constrained linear spectral unmixing of the input image for a set of endmembers where the sum of the unmixing will be approximately 1 and non-negative */
     void executeNnConSum1LinearSpecUnmix(std::string inputImage, std::string imageFormat, RSGISLibDataType outDataType, float lsumGain, float lsumOffset, float lsumWeight, std::string outputFile, std::string endmembersFile)throw(RSGISCmdException);
@@ -115,7 +115,7 @@ namespace rsgis{ namespace cmds {
     /** Function to calculate image band percentiles */
     void executeBandPercentile(std::string inputImage, float percentile, float noDataValue, bool noDataValueSpecified, std::string outputFile)throw(RSGISCmdException);
     /** Function to calculate the distance to the nearest geometry for every pixel in an image */
-    void executeImageDistToGeoms(std::string inputImage, std::string inputVector, std::string imageFormat, std::string outputImage)throw(RSGISCmdException);
+    void executeImageDist2Geoms(std::string inputImage, std::string inputVector, std::string imageFormat, std::string outputImage)throw(RSGISCmdException);
 }}
 
 
