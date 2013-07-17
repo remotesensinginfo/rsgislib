@@ -50,7 +50,8 @@ namespace rsgis{namespace math{
 		sumtype_count,
 		sumtype_aggregate,
 		sumtype_value,
-		sumtype_histogram
+		sumtype_histogram,
+        sumtype_median
 	};
     
     enum rsgiscomparetype
@@ -119,6 +120,7 @@ namespace rsgis{namespace math{
             void fitPlane(double *x, double *y, double *z, unsigned int numValues, double *a, double *b, double *c) throw(RSGISMathException);
             void generateStats(std::vector<double> *data, RSGISStatsSummary *stats) throw(RSGISMathException);
             void initStatsSummary(RSGISStatsSummary *stats);
+            void initStatsSummaryValues(RSGISStatsSummary *stats);
 		};
 	
 }}

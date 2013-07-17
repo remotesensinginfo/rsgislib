@@ -36,6 +36,7 @@
 
 #include "math/RSGISMathFunction.h"
 #include "math/RSGISMatrices.h"
+#include "math/RSGISMathsUtils.h"
 
 #include "gsl/gsl_statistics_double.h"
 
@@ -135,6 +136,26 @@ namespace rsgis{namespace img{
         double getPercentile(GDALDataset *dataset, unsigned int band, float percentile, float noDataVal, bool noDataDefined)throw(rsgis::RSGISImageException);
         ~RSGISImagePercentiles();
     };
+    
+    
+    class RSGISImagePixelSummaries: public RSGISCalcImageValue
+    {
+    public:
+        RSGISImagePixelSummaries(unsigned int numOutBands, rsgis::math::RSGISStatsSummary *statsSummary, float noDataValue=0, bool useNoDataValue=false);
+        void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException);
+        void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+        bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
+        ~RSGISImagePixelSummaries();
+    protected:
+        rsgis::math::RSGISStatsSummary *statsSummary;
+        float noDataValue;
+        bool useNoDataValue;
+    };
+    
 	
 }}
 #endif

@@ -36,6 +36,7 @@
 
 #include "cmds/RSGISCmdImageCalc.h"
 #include "cmds/RSGISCmdException.h"
+#include "cmds/RSGISCmdCommon.h"
 
 #include "math/RSGISMathsUtils.h"
 #include "math/RSGISMatrices.h"
@@ -129,7 +130,11 @@ namespace rsgisexe{
             histogram,
             bandpercentile,
             imgdist2geoms,
-            imgcalcdist
+            imgcalcdist,
+            mahalanobisdistwindow,
+            mahalanobisdistimg2window,
+            calcpxlcolstats,
+            pxlcolregression
 		};
 		
 		
@@ -161,6 +166,7 @@ namespace rsgisexe{
         std::string outputFile;
         std::string endmembersFile;
         std::string imageMask;
+        std::string bandValues;
 		int numComponents;
 		int numImages;
 		int numVars;
@@ -213,6 +219,8 @@ namespace rsgisexe{
         float percentile;
         float noDataValue;
         bool noDataValueSpecified;
+        unsigned int windowSize;
+        rsgis::cmds::RSGISCmdStatsSummary statsSummary;
 	};
 }
 #endif

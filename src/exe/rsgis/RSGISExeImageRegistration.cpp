@@ -46,7 +46,8 @@ void RSGISExeImageRegistration::retrieveParameters(xercesc::DOMElement *argEleme
 	XMLCh *optionNNWarp = xercesc::XMLString::transcode("nnwarp");
     XMLCh *optionPolyWarp = xercesc::XMLString::transcode("polywarp");
     XMLCh *optionPxlShift = xercesc::XMLString::transcode("pxlshift");
-	
+	XMLCh *optionGCP2GDAL = xercesc::XMLString::transcode("gcp2gdal");
+    
 	try
 	{
 		const XMLCh *algorNameEle = argElement->getAttribute(algorXMLStr);
@@ -56,6 +57,84 @@ void RSGISExeImageRegistration::retrieveParameters(xercesc::DOMElement *argEleme
 		}
 		
 		
+        // Set output image fomat (defaults to KEA)
+        this->imageFormat = "KEA";
+        XMLCh *formatXMLStr = xercesc::XMLString::transcode("format");
+        if(argElement->hasAttribute(formatXMLStr))
+        {
+            char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(formatXMLStr));
+            this->imageFormat = std::string(charValue);
+            xercesc::XMLString::release(&charValue);
+        }
+        xercesc::XMLString::release(&formatXMLStr);
+
+        // Set output data type (defaults to 32 bit float)
+        this->outDataType = GDT_Float32;
+        this->rsgisOutDataType = rsgis::rsgis_32float;
+        XMLCh *datatypeXMLStr = xercesc::XMLString::transcode("datatype");
+        if(argElement->hasAttribute(datatypeXMLStr))
+        {
+            XMLCh *dtByte = xercesc::XMLString::transcode("Byte");
+            XMLCh *dtUInt16 = xercesc::XMLString::transcode("UInt16");
+            XMLCh *dtInt16 = xercesc::XMLString::transcode("Int16");
+            XMLCh *dtUInt32 = xercesc::XMLString::transcode("UInt32");
+            XMLCh *dtInt32 = xercesc::XMLString::transcode("Int32");
+            XMLCh *dtFloat32 = xercesc::XMLString::transcode("Float32");
+            XMLCh *dtFloat64 = xercesc::XMLString::transcode("Float64");
+            
+            const XMLCh *dtXMLValue = argElement->getAttribute(datatypeXMLStr);
+            if(xercesc::XMLString::equals(dtByte, dtXMLValue))
+            {
+                this->outDataType = GDT_Byte;
+                this->rsgisOutDataType = rsgis::rsgis_8int;
+            }
+            else if(xercesc::XMLString::equals(dtUInt16, dtXMLValue))
+            {
+                this->outDataType = GDT_UInt16;
+                this->rsgisOutDataType = rsgis::rsgis_16uint;
+            }
+            else if(xercesc::XMLString::equals(dtInt16, dtXMLValue))
+            {
+                this->outDataType = GDT_Int16;
+                this->rsgisOutDataType = rsgis::rsgis_16int;
+            }
+            else if(xercesc::XMLString::equals(dtUInt32, dtXMLValue))
+            {
+                this->outDataType = GDT_UInt32;
+                this->rsgisOutDataType = rsgis::rsgis_32uint;
+            }
+            else if(xercesc::XMLString::equals(dtInt32, dtXMLValue))
+            {
+                this->outDataType = GDT_Int32;
+                this->rsgisOutDataType = rsgis::rsgis_32int;
+            }
+            else if(xercesc::XMLString::equals(dtFloat32, dtXMLValue))
+            {
+                this->outDataType = GDT_Float32;
+                this->rsgisOutDataType = rsgis::rsgis_32float;
+            }
+            else if(xercesc::XMLString::equals(dtFloat64, dtXMLValue))
+            {
+                this->outDataType = GDT_Float64;
+                this->rsgisOutDataType = rsgis::rsgis_64float;
+            }
+            else
+            {
+                std::cerr << "Data type not recognised, defaulting to 32 bit float.";
+                this->outDataType = GDT_Float32;
+                this->rsgisOutDataType = rsgis::rsgis_32float;
+            }
+            
+            xercesc::XMLString::release(&dtByte);
+            xercesc::XMLString::release(&dtUInt16);
+            xercesc::XMLString::release(&dtInt16);
+            xercesc::XMLString::release(&dtUInt32);
+            xercesc::XMLString::release(&dtInt32);
+            xercesc::XMLString::release(&dtFloat32);
+            xercesc::XMLString::release(&dtFloat64);
+        }
+        xercesc::XMLString::release(&datatypeXMLStr);
+        
 		const XMLCh *optionXML = argElement->getAttribute(optionXMLStr);
 		if(xercesc::XMLString::equals(optionBasic, optionXML))
 		{
@@ -625,20 +704,7 @@ void RSGISExeImageRegistration::retrieveParameters(xercesc::DOMElement *argEleme
 				throw rsgis::RSGISXMLArgumentsException("No \'resolution\' attribute was provided.");
 			}
 			xercesc::XMLString::release(&resolutionXMLStr);
-			
-			XMLCh *outImageFormatXMLStr = xercesc::XMLString::transcode("format");
-			if(argElement->hasAttribute(outImageFormatXMLStr))
-			{
-				char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outImageFormatXMLStr));
-				this->outImageFormat = std::string(charValue);
-				xercesc::XMLString::release(&charValue);
-			}
-			else
-			{
-				this->outImageFormat = "ENVI";
-			}
-			xercesc::XMLString::release(&outImageFormatXMLStr);
-            
+			         
             XMLCh *outTransformXMLStr = xercesc::XMLString::transcode("transform");
 			if(argElement->hasAttribute(outTransformXMLStr))
 			{
@@ -730,20 +796,6 @@ void RSGISExeImageRegistration::retrieveParameters(xercesc::DOMElement *argEleme
 				throw rsgis::RSGISXMLArgumentsException("No \'resolution\' attribute was provided.");
 			}
 			xercesc::XMLString::release(&resolutionXMLStr);
-			
-			
-            XMLCh *outImageFormatXMLStr = xercesc::XMLString::transcode("format");
-			if(argElement->hasAttribute(outImageFormatXMLStr))
-			{
-				char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outImageFormatXMLStr));
-				this->outImageFormat = std::string(charValue);
-				xercesc::XMLString::release(&charValue);
-			}
-			else
-			{
-				this->outImageFormat = "ENVI";
-			}
-			xercesc::XMLString::release(&outImageFormatXMLStr);
             
             if(this->option == polywarp) // Get polynominal order for polynominal warp
             {
@@ -760,8 +812,6 @@ void RSGISExeImageRegistration::retrieveParameters(xercesc::DOMElement *argEleme
                 }
                 xercesc::XMLString::release(&polyOrderStr);
             }
-            
-            
             
             XMLCh *outTransformXMLStr = xercesc::XMLString::transcode("transform");
 			if(argElement->hasAttribute(outTransformXMLStr))
@@ -828,19 +878,6 @@ void RSGISExeImageRegistration::retrieveParameters(xercesc::DOMElement *argEleme
 				throw rsgis::RSGISXMLArgumentsException("No \'output\' attribute was provided.");
 			}
 			xercesc::XMLString::release(&outputXMLStr);
-            
-            XMLCh *outImageFormatXMLStr = xercesc::XMLString::transcode("format");
-			if(argElement->hasAttribute(outImageFormatXMLStr))
-			{
-				char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outImageFormatXMLStr));
-				this->outImageFormat = std::string(charValue);
-				xercesc::XMLString::release(&charValue);
-			}
-			else
-			{
-				this->outImageFormat = "ENVI";
-			}
-			xercesc::XMLString::release(&outImageFormatXMLStr);
 			
 			XMLCh *metricXMLStr = xercesc::XMLString::transcode("metric");
 			if(argElement->hasAttribute(metricXMLStr))
@@ -923,7 +960,52 @@ void RSGISExeImageRegistration::retrieveParameters(xercesc::DOMElement *argEleme
 			}
 			xercesc::XMLString::release(&subPixelResXMLStr);
 		}
-		else 
+        else if(xercesc::XMLString::equals(optionGCP2GDAL, optionXML))
+		{
+            this->option = gcp2gdal;
+			
+			XMLCh *gcpsXMLStr = xercesc::XMLString::transcode("gcps");
+			if(argElement->hasAttribute(gcpsXMLStr))
+			{
+				char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(gcpsXMLStr));
+				this->inputGCPs = std::string(charValue);
+				xercesc::XMLString::release(&charValue);
+			}
+			else
+			{
+				throw rsgis::RSGISXMLArgumentsException("No \'gcps\' attribute was provided.");
+			}
+			xercesc::XMLString::release(&gcpsXMLStr);
+			
+			XMLCh *imageXMLStr = xercesc::XMLString::transcode("image");
+			if(argElement->hasAttribute(imageXMLStr))
+			{
+				char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(imageXMLStr));
+				this->inputImage = std::string(charValue);
+				xercesc::XMLString::release(&charValue);
+			}
+			else
+			{
+				throw rsgis::RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+			}
+			xercesc::XMLString::release(&imageXMLStr);
+			
+			XMLCh *outputImageXMLStr = xercesc::XMLString::transcode("output");
+			if(argElement->hasAttribute(outputImageXMLStr))
+			{
+				char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outputImageXMLStr));
+				this->outputImage = std::string(charValue);
+				xercesc::XMLString::release(&charValue);
+			}
+			else
+			{
+                std::cout << "No \'output\' attribute was provided, adding GCPs to input image" << std::endl;
+                this->outputImage = "";
+			}
+			xercesc::XMLString::release(&outputImageXMLStr);
+			
+		}
+		else
 		{
 			std::string message = "RSGISExeImageRegistration did not recognise option " + std::string(xercesc::XMLString::transcode(optionXML));
 			throw rsgis::RSGISXMLArgumentsException(message);
@@ -944,6 +1026,7 @@ void RSGISExeImageRegistration::retrieveParameters(xercesc::DOMElement *argEleme
 	xercesc::XMLString::release(&optionNNWarp);
     xercesc::XMLString::release(&optionPolyWarp);
     xercesc::XMLString::release(&optionPxlShift);
+    xercesc::XMLString::release(&optionGCP2GDAL);
 	
 	parsed = true; // if all successful, it is parsed
 }
@@ -1089,7 +1172,7 @@ void RSGISExeImageRegistration::runAlgorithm() throw(rsgis::RSGISException)
 		}
 		else if(this->option == RSGISExeImageRegistration::singlelayer)
 		{
-			std::cout << "A registration algorithm which representings a single layer of tie\n";
+			std::cout << "A registration algorithm using a single layer of tie\n";
 			std::cout << "points which are connected within a given distance and updated as the neighbouring tie points are moved.\n";
 			std::cout << "Reference Image: " << this->inputReferenceImage << std::endl;
 			std::cout << "Floating Image: " << this->inputFloatingmage << std::endl;
@@ -1229,7 +1312,7 @@ void RSGISExeImageRegistration::runAlgorithm() throw(rsgis::RSGISException)
 			std::cout << "Output Image: " << this->outputImage << std::endl;
 			std::cout << "Projection: " << this->projFile << std::endl;
 			std::cout << "Output Resolution: " << this->resolution << std::endl;
-            std::cout << "Output Image format: " << this->outImageFormat << std::endl;
+            std::cout << "Output Image format: " << this->imageFormat << std::endl;
 			
 			GDALAllRegister();
 			rsgis::reg::RSGISWarpImage *warp = NULL;
@@ -1244,7 +1327,7 @@ void RSGISExeImageRegistration::runAlgorithm() throw(rsgis::RSGISException)
                     projWKTStr = textUtils.readFileToString(this->projFile);
                 }
                 
-				warp = new rsgis::reg::RSGISWarpImageUsingTriangulation(this->inputImage, this->outputImage, projWKTStr, this->inputGCPs, this->resolution, interpolator, this->outImageFormat);
+				warp = new rsgis::reg::RSGISWarpImageUsingTriangulation(this->inputImage, this->outputImage, projWKTStr, this->inputGCPs, this->resolution, interpolator, this->imageFormat);
 				if(this->genTransformImage)
                 {
                     warp->generateTransformImage();
@@ -1269,7 +1352,7 @@ void RSGISExeImageRegistration::runAlgorithm() throw(rsgis::RSGISException)
 			std::cout << "Output Image: " << this->outputImage << std::endl;
 			std::cout << "Projection: " << this->projFile << std::endl;
 			std::cout << "Output Resolution: " << this->resolution << std::endl;
-            std::cout << "Output Image format: " << this->outImageFormat << std::endl;
+            std::cout << "Output Image format: " << this->imageFormat << std::endl;
 			
 			GDALAllRegister();
 			rsgis::reg::RSGISWarpImage *warp = NULL;
@@ -1284,7 +1367,7 @@ void RSGISExeImageRegistration::runAlgorithm() throw(rsgis::RSGISException)
                     projWKTStr = textUtils.readFileToString(this->projFile);
                 }
                 
-				warp = new rsgis::reg::RSGISBasicNNGCPImageWarp(this->inputImage, this->outputImage, projWKTStr, this->inputGCPs, this->resolution, interpolator, this->outImageFormat);
+				warp = new rsgis::reg::RSGISBasicNNGCPImageWarp(this->inputImage, this->outputImage, projWKTStr, this->inputGCPs, this->resolution, interpolator, this->imageFormat);
 				if(this->genTransformImage)
                 {
                     warp->generateTransformImage();
@@ -1314,7 +1397,7 @@ void RSGISExeImageRegistration::runAlgorithm() throw(rsgis::RSGISException)
 			std::cout << "Output Image: " << this->outputImage << std::endl;
 			std::cout << "Projection: " << this->projFile << std::endl;
 			std::cout << "Output Resolution: " << this->resolution << std::endl;
-            std::cout << "Output Image format: " << this->outImageFormat << std::endl;
+            std::cout << "Output Image format: " << this->imageFormat << std::endl;
 			
 			GDALAllRegister();
 			rsgis::reg::RSGISWarpImage *warp = NULL;
@@ -1329,7 +1412,7 @@ void RSGISExeImageRegistration::runAlgorithm() throw(rsgis::RSGISException)
                     projWKTStr = textUtils.readFileToString(this->projFile);
                 }
                 
-				warp = new rsgis::reg::RSGISPolynomialImageWarp(this->inputImage, this->outputImage, projWKTStr, this->inputGCPs, this->resolution, interpolator, this->polyOrder, this->outImageFormat);
+				warp = new rsgis::reg::RSGISPolynomialImageWarp(this->inputImage, this->outputImage, projWKTStr, this->inputGCPs, this->resolution, interpolator, this->polyOrder, this->imageFormat);
 				if(this->genTransformImage)
                 {
                     warp->generateTransformImage();
@@ -1352,7 +1435,7 @@ void RSGISExeImageRegistration::runAlgorithm() throw(rsgis::RSGISException)
 			std::cout << "Reference Image: " << this->inputReferenceImage << std::endl;
 			std::cout << "Floating Image: " << this->inputFloatingmage << std::endl;
 			std::cout << "Output Image: " << this->outputImage << std::endl;
-            std::cout << "Output Format: " << this->outImageFormat << std::endl;
+            std::cout << "Output Format: " << this->imageFormat << std::endl;
 			if(metricType == euclidean)
 			{
 				std::cout << "The Euclidean similarity metric will be used\n";
@@ -1415,7 +1498,7 @@ void RSGISExeImageRegistration::runAlgorithm() throw(rsgis::RSGISException)
 					similarityMetric = new rsgis::reg::RSGISCorrelationSimilarityMetric();
 				}
 				
-				rsgis::reg::RSGISImageRegistration *regImgs = new rsgis::reg::RSGISImagePixelRegistration(inRefDataset, inFloatDataset, this->outputImage, this->outImageFormat, windowSize, searchArea, similarityMetric, subPixelResolution);
+				rsgis::reg::RSGISImageRegistration *regImgs = new rsgis::reg::RSGISImagePixelRegistration(inRefDataset, inFloatDataset, this->outputImage, this->imageFormat, windowSize, searchArea, similarityMetric, subPixelResolution);
                 
 				regImgs->runCompleteRegistration();				
 				
@@ -1433,6 +1516,24 @@ void RSGISExeImageRegistration::runAlgorithm() throw(rsgis::RSGISException)
 			catch(rsgis::RSGISException& e)
 			{
 				throw e;
+			}
+		}
+        else if(this->option == RSGISExeImageRegistration::gcp2gdal)
+		{
+			std::cout << "Add GCPs to GDAL dataset";
+            
+			std::cout << "GCPs: " << this->inputGCPs << std::endl;
+			std::cout << "Image: " << this->inputImage << std::endl;
+            if(this->outputImage != ""){std::cout << "Output Image: " << this->outputImage << std::endl;}
+			
+			try
+			{
+
+				rsgis::reg::RSGISAddGCPsGDAL(this->inputImage, this->inputGCPs, this->outputImage, this->imageFormat, this->outDataType);
+            }
+			catch(rsgis::RSGISRegistrationException &e)
+			{
+				throw rsgis::RSGISException(e.what());
 			}
 		}
 		else
@@ -1567,7 +1668,7 @@ void RSGISExeImageRegistration::printParameters()
 			std::cout << "Output Image: " << this->outputImage << std::endl;
 			std::cout << "Projection: " << this->projFile << std::endl;
 			std::cout << "Output Resolution: " << this->resolution << std::endl;
-            std::cout << "Output Image format: " << this->outImageFormat << std::endl;
+            std::cout << "Output Image format: " << this->imageFormat << std::endl;
 		}
 		else if(this->option == RSGISExeImageRegistration::nnwarp)
 		{
@@ -1577,7 +1678,7 @@ void RSGISExeImageRegistration::printParameters()
 			std::cout << "Output Image: " << this->outputImage << std::endl;
 			std::cout << "Projection: " << this->projFile << std::endl;
 			std::cout << "Output Resolution: " << this->resolution << std::endl;
-            std::cout << "Output Image format: " << this->outImageFormat << std::endl;
+            std::cout << "Output Image format: " << this->imageFormat << std::endl;
 		}
 		else
 		{
@@ -1593,9 +1694,36 @@ void RSGISExeImageRegistration::printParameters()
 
 void RSGISExeImageRegistration::help()
 {
-	std::cout << "<rsgis:commands>\n";
-	
-	std::cout << "</rsgis:commands>\n";
+	std::cout << "<rsgis:commands xmlns:rsgis=\"http://www.rsgislib.org/xml/\">" << std::endl;
+	std::cout << "<!-- A command for automatically generating a set of ground control points between a pair of images " << std::endl;
+    std::cout << "    - A basic algorithm with a single iteration and movement of gcps-->" << std::endl;
+    std::cout << "<rsgis:command algor=\"registration\" option=\"basic\" reference=\"image\" " << std::endl;
+    std::cout << "    floating=\"image\" output=\"gcps.txt\" outputType=\"envi_img2img|envi_img2map|rsgis_img2map|rsgis_mapoffs\" " << std::endl;
+    std::cout << "    metric=\"euclidean|sqdiff|manhatten|correlation\" pixelgap=\"int\" window=\"int\" " << std::endl;
+    std::cout << "    search=\"int\" threshold=\"float\" stddevRef=\"float\" stddevFloat=\"float\" subpixelresolution=\"int\"/>" << std::endl;
+    std::cout << "<!-- A command for automatically generating a set of ground control points between a pair of images " << std::endl;
+    std::cout << "    - An algorithm with a single layer of connected gcps which used IDW to shift neighbouring gcps within a distance threshold -->" << std::endl;
+    std::cout << "<rsgis:command algor=\"registration\" option=\"singlelayer\" reference=\"image\" floating=\"image\" " << std::endl;
+    std::cout << "    output=\"gcps.txt\" outputType=\"envi_img2img|envi_img2map|rsgis_img2map|rsgis_mapoffs\" " << std::endl;
+    std::cout << "    metric=\"euclidean|sqdiff|manhatten|correlation\" pixelgap=\"int\" window=\"int\" search=\"int\" " << std::endl;
+    std::cout << "    threshold=\"float\" stddevRef=\"float\" stddevFloat=\"float\" subpixelresolution=\"int\" distanceThreshold=\"float\" " << std::endl;
+    std::cout << "    maxiterations=\"int\" movementThreshold=\"float\" pSmoothness=\"float\"/>" << std::endl;
+    std::cout << "<!-- A command to warp an input image using a set of ground control points using a nearest neighbour algorithm -->" << std::endl;
+    std::cout << "<rsgis:command algor=\"registration\" option=\"nnwarp\" gcps=\"string\" image=\"string\" output=\"string\" " << std::endl;
+    std::cout << "    projection=\"file.wkt\" resolution=\"float\" format=\"string\" transform=\"yes | no\" />" << std::endl;
+    std::cout << "<!-- A command to warp an input image using a set of ground control points using a polynomial -->" << std::endl;
+    std::cout << "<rsgis:command algor=\"registration\" option=\"polywarp\" gcps=\"string\" image=\"string\" output=\"string\" " << std::endl;
+    std::cout << "    projection=\"file.wkt\" resolution=\"float\" format=\"string\" polyOrder=\"int\" transform=\"yes | no\" />" << std::endl;
+    std::cout << "<!-- A command to warp an input image using a set of ground control points using a triangulation -->" << std::endl;
+    std::cout << "<rsgis:command algor=\"registration\" option=\"triangularwarp\" gcps=\"string\" image=\"string\" output=\"string\" " << std::endl;
+    std::cout << "    projection=\"file.wkt\" resolution=\"float\" format=\"string\" transform=\"yes | no\" />" << std::endl;
+    std::cout << "<!-- A command to add tie points as GCPs to GDAL dataset -->" << std::endl;
+    std::cout << "<rsgis:command algor=\"registration\" option=\"gcp2gdal\" gcps=\"string\" image=\"image\" [output=\"image\" ] />" << std::endl;
+    std::cout << "<!-- A command for doing a per pixel image matching where a 3 band image is outputted " << std::endl;
+    std::cout << "   with the X Shift, Y Shift and Metric value -->" << std::endl;
+    std::cout << "<rsgis:command algor=\"registration\" option=\"pxlshift\" reference=\"image\" floating=\"image\" output=\"image\" " << std::endl;
+    std::cout << "format=\"string\" metric=\"euclidean|sqdiff|manhatten|correlation\" window=\"int\" search=\"int\" subpixelresolution=\"int\"/>" << std::endl;
+	std::cout << "</rsgis:commands>" << std::endl;
 }
 
 std::string RSGISExeImageRegistration::getDescription()

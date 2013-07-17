@@ -43,6 +43,7 @@ namespace rsgis{namespace segment{
     public:
         RSGISClumpPxls();
         void performClump(GDALDataset *catagories, GDALDataset *clumps, bool noDataValProvided, unsigned int noDataVal) throw(rsgis::img::RSGISImageCalcException);
+        void performClumpPosVals(GDALDataset *catagories, GDALDataset *clumps) throw(rsgis::img::RSGISImageCalcException);
         void performMultiBandClump(std::vector<GDALDataset*> *catagories, std::string clumpsOutputPath, std::string outFormat, bool noDataValProvided, unsigned int noDataVal) throw(rsgis::img::RSGISImageCalcException);
         ~RSGISClumpPxls();
     protected:

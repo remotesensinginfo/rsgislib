@@ -70,6 +70,7 @@ void RSGISExeSegment::retrieveParameters(xercesc::DOMElement *argElement) throw(
     XMLCh *optionMergeClumpTiles = xercesc::XMLString::transcode("mergeclumptiles");
     XMLCh *optionFindTileBordersMask = xercesc::XMLString::transcode("findtilebordersmask");
     XMLCh *optionMergeClumpImages = xercesc::XMLString::transcode("mergeclumpimages");
+    XMLCh *optionExtractBrightFeatures = xercesc::XMLString::transcode("extractbrightfeatures");
     
     XMLCh *projImage = xercesc::XMLString::transcode("IMAGE");
 	XMLCh *projOSGB = xercesc::XMLString::transcode("OSGB");
@@ -3561,6 +3562,203 @@ void RSGISExeSegment::retrieveParameters(xercesc::DOMElement *argElement) throw(
 		}
         xercesc::XMLString::release(&rsgisImageXMLStr);
     }
+    else if(xercesc::XMLString::equals(optionExtractBrightFeatures, optionXML))
+    {
+        this->option = RSGISExeSegment::extractbrightfeatures;
+        
+        XMLCh *inputXMLStr = xercesc::XMLString::transcode("image");
+		if(argElement->hasAttribute(inputXMLStr))
+		{
+			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(inputXMLStr));
+			this->inputImage = std::string(charValue);
+			xercesc::XMLString::release(&charValue);
+		}
+		else
+		{
+			throw rsgis::RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+		}
+		xercesc::XMLString::release(&inputXMLStr);
+		
+        XMLCh *maskXMLStr = xercesc::XMLString::transcode("mask");
+		if(argElement->hasAttribute(maskXMLStr))
+		{
+			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(maskXMLStr));
+			this->maskImage = std::string(charValue);
+			xercesc::XMLString::release(&charValue);
+		}
+		else
+		{
+			throw rsgis::RSGISXMLArgumentsException("No \'mask\' attribute was provided.");
+		}
+		xercesc::XMLString::release(&maskXMLStr);
+        
+        XMLCh *temp1ImgXMLStr = xercesc::XMLString::transcode("tmp1");
+		if(argElement->hasAttribute(temp1ImgXMLStr))
+		{
+			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(temp1ImgXMLStr));
+			this->temp1Image = std::string(charValue);
+			xercesc::XMLString::release(&charValue);
+		}
+		else
+		{
+			throw rsgis::RSGISXMLArgumentsException("No \'tmp1\' attribute was provided.");
+		}
+		xercesc::XMLString::release(&temp1ImgXMLStr);
+        
+        
+        XMLCh *temp2ImgXMLStr = xercesc::XMLString::transcode("tmp2");
+		if(argElement->hasAttribute(temp2ImgXMLStr))
+		{
+			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(temp2ImgXMLStr));
+			this->temp2Image = std::string(charValue);
+			xercesc::XMLString::release(&charValue);
+		}
+		else
+		{
+			throw rsgis::RSGISXMLArgumentsException("No \'tmp2\' attribute was provided.");
+		}
+		xercesc::XMLString::release(&temp2ImgXMLStr);
+        
+        
+        XMLCh *outputXMLStr = xercesc::XMLString::transcode("output");
+		if(argElement->hasAttribute(outputXMLStr))
+		{
+			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outputXMLStr));
+			this->outputImage = std::string(charValue);
+			xercesc::XMLString::release(&charValue);
+		}
+		else
+		{
+			throw rsgis::RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+		}
+		xercesc::XMLString::release(&outputXMLStr);
+        
+        XMLCh *formatXMLStr = xercesc::XMLString::transcode("format");
+		if(argElement->hasAttribute(formatXMLStr))
+		{
+			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(formatXMLStr));
+			this->imageFormat = std::string(charValue);
+			xercesc::XMLString::release(&charValue);
+		}
+		else
+		{
+			this->imageFormat = "KEA";
+		}
+		xercesc::XMLString::release(&formatXMLStr);
+        
+        XMLCh *initThresXMLStr = xercesc::XMLString::transcode("initthres");
+		if(argElement->hasAttribute(initThresXMLStr))
+		{
+			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(initThresXMLStr));
+			this->initThres = mathUtils.strtofloat(std::string(charValue));
+			xercesc::XMLString::release(&charValue);
+		}
+        else
+        {
+            throw rsgis::RSGISXMLArgumentsException("No \'initthres\' attribute was provided.");
+        }
+		xercesc::XMLString::release(&initThresXMLStr);
+        
+        
+        XMLCh *thresIncrementXMLStr = xercesc::XMLString::transcode("thresincrement");
+		if(argElement->hasAttribute(thresIncrementXMLStr))
+		{
+			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(thresIncrementXMLStr));
+			this->thresIncrement = mathUtils.strtofloat(std::string(charValue));
+			xercesc::XMLString::release(&charValue);
+		}
+        else
+        {
+            throw rsgis::RSGISXMLArgumentsException("No \'thresincrement\' attribute was provided.");
+        }
+		xercesc::XMLString::release(&thresIncrementXMLStr);
+        
+        XMLCh *thresholdUpperXMLStr = xercesc::XMLString::transcode("thresholdupper");
+		if(argElement->hasAttribute(thresholdUpperXMLStr))
+		{
+			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(thresholdUpperXMLStr));
+			this->thresholdUpper = mathUtils.strtofloat(std::string(charValue));
+			xercesc::XMLString::release(&charValue);
+		}
+        else
+        {
+            throw rsgis::RSGISXMLArgumentsException("No \'thresholdupper\' attribute was provided.");
+        }
+		xercesc::XMLString::release(&thresholdUpperXMLStr);
+        
+        
+        XMLCh *rsgisDescriptionXMLStr = xercesc::XMLString::transcode("rsgis:description");
+        xercesc::DOMNodeList *descriptNodesList = argElement->getElementsByTagName(rsgisDescriptionXMLStr);
+		unsigned int numDescriptions = descriptNodesList->getLength();
+		if(numDescriptions > 0)
+		{
+            rsgis::cmds::FeatureShapeDescription *shapeFeat = NULL;
+            shapeFeatDescript.reserve(numDescriptions);
+			xercesc::DOMElement *descriptElement = NULL;
+            
+			for(unsigned int i = 0; i < numDescriptions; i++)
+			{
+				descriptElement = static_cast<xercesc::DOMElement*>(descriptNodesList->item(i));
+				shapeFeat = new rsgis::cmds::FeatureShapeDescription();
+                shapeFeat->area = false;
+                shapeFeat->areaLower = 0;
+                shapeFeat->areaUpper = 0;
+                shapeFeat->lenWidth = false;
+                shapeFeat->lenWidthLower = 0;
+                shapeFeat->lenWidthUpper = 0;
+                
+				XMLCh *areaLowXMLStr = xercesc::XMLString::transcode("arealow");
+                XMLCh *areaHighXMLStr = xercesc::XMLString::transcode("areahigh");
+				if(descriptElement->hasAttribute(areaLowXMLStr) & descriptElement->hasAttribute(areaHighXMLStr))
+				{
+					char *charValueLow = xercesc::XMLString::transcode(descriptElement->getAttribute(areaLowXMLStr));
+					shapeFeat->areaLower = mathUtils.strtofloat(std::string(charValueLow));
+					xercesc::XMLString::release(&charValueLow);
+                    
+                    char *charValueUpper = xercesc::XMLString::transcode(descriptElement->getAttribute(areaHighXMLStr));
+					shapeFeat->areaUpper = mathUtils.strtofloat(std::string(charValueUpper));
+					xercesc::XMLString::release(&charValueUpper);
+                    
+                    shapeFeat->area = true;
+				}
+				else
+				{
+					throw rsgis::RSGISXMLArgumentsException("Both \'arealow\' and \'areahigh\' attributes need to be provided.");
+				}
+				xercesc::XMLString::release(&areaLowXMLStr);
+                xercesc::XMLString::release(&areaHighXMLStr);
+                
+                
+                XMLCh *lenWidthLowXMLStr = xercesc::XMLString::transcode("lenwidthlow");
+                XMLCh *lenWidthHighXMLStr = xercesc::XMLString::transcode("lenwidthhigh");
+				if(descriptElement->hasAttribute(lenWidthLowXMLStr) & descriptElement->hasAttribute(lenWidthHighXMLStr))
+				{
+					char *charValueLow = xercesc::XMLString::transcode(descriptElement->getAttribute(lenWidthLowXMLStr));
+					shapeFeat->lenWidthLower = mathUtils.strtofloat(std::string(charValueLow));
+					xercesc::XMLString::release(&charValueLow);
+                    
+                    char *charValueUpper = xercesc::XMLString::transcode(descriptElement->getAttribute(lenWidthHighXMLStr));
+					shapeFeat->lenWidthUpper = mathUtils.strtofloat(std::string(charValueUpper));
+					xercesc::XMLString::release(&charValueUpper);
+                    
+                    shapeFeat->lenWidth = true;
+				}
+				else
+				{
+					throw rsgis::RSGISXMLArgumentsException("Both \'arealow\' and \'areahigh\' attributes need to be provided.");
+				}
+				xercesc::XMLString::release(&lenWidthLowXMLStr);
+                xercesc::XMLString::release(&lenWidthHighXMLStr);
+                
+                shapeFeatDescript.push_back(shapeFeat);
+			}
+		}
+		else
+		{
+			throw rsgis::RSGISXMLArgumentsException("No attributes \'rsgis:description\' tags were provided.");
+		}
+        xercesc::XMLString::release(&rsgisDescriptionXMLStr);
+    }
     else
     {
         std::string message = std::string("The option (") + std::string(xercesc::XMLString::transcode(optionXML)) + std::string(") is not known: RSGISExeSegment.");
@@ -3596,6 +3794,7 @@ void RSGISExeSegment::retrieveParameters(xercesc::DOMElement *argElement) throw(
     xercesc::XMLString::release(&optionMergeClumpTiles);
     xercesc::XMLString::release(&optionFindTileBordersMask);
     xercesc::XMLString::release(&optionMergeClumpImages);
+    xercesc::XMLString::release(&optionExtractBrightFeatures);
     
     xercesc::XMLString::release(&projImage);
 	xercesc::XMLString::release(&projOSGB);
@@ -4932,6 +5131,45 @@ void RSGISExeSegment::runAlgorithm() throw(rsgis::RSGISException)
         catch(rsgis::cmds::RSGISCmdException &e)
         {
             throw rsgis::RSGISException(e.what());
+        }
+    }
+    else if(option == RSGISExeSegment::extractbrightfeatures)
+    {
+        std::cout << "A command to extract features from which are bright within the scene with a particular shape and size.";
+        std::cout << "Input Image: " << this->inputImage << std::endl;
+        std::cout << "Mask Image: " << this->maskImage << std::endl;
+        std::cout << "Output Image: " << this->outputImage << std::endl;
+        std::cout << "Output Image Format: " << this->imageFormat << std::endl;
+        std::cout << "Temp 1 Image: " << this->temp1Image << std::endl;
+        std::cout << "Temp 2 Image: " << this->temp2Image << std::endl;
+        std::cout << "Initial Threshold: " << this->initThres << std::endl;
+        std::cout << "Threshold Increment: " << this->thresIncrement << std::endl;
+        std::cout << "Threshold Limit: " << this->thresholdUpper << std::endl;
+        for(std::vector<rsgis::cmds::FeatureShapeDescription*>::iterator iterShpFeat = shapeFeatDescript.begin(); iterShpFeat != shapeFeatDescript.end(); ++iterShpFeat)
+        {
+            std::cout << "Feature: (Area: " << (*iterShpFeat)->areaLower << ", " << (*iterShpFeat)->areaUpper << ") (Length / Width: " << (*iterShpFeat)->lenWidthLower << ", " << (*iterShpFeat)->lenWidthUpper << ")\n";
+        }
+        
+        try
+        {
+            rsgis::cmds::executeExtractBrightFeatures(this->inputImage, this->maskImage, this->outputImage, this->temp1Image, this->temp2Image, this->imageFormat, this->initThres, this->thresIncrement, this->thresholdUpper, shapeFeatDescript);
+        }
+        catch(rsgis::cmds::RSGISCmdException &e)
+        {
+            throw rsgis::RSGISException(e.what());
+        }
+        catch(rsgis::RSGISException &e)
+        {
+            throw e;
+        }
+        catch(std::exception &e)
+        {
+            throw rsgis::RSGISException(e.what());
+        }
+        
+        for(std::vector<rsgis::cmds::FeatureShapeDescription*>::iterator iterShpFeat = shapeFeatDescript.begin(); iterShpFeat != shapeFeatDescript.end(); ++iterShpFeat)
+        {
+            delete *iterShpFeat;
         }
     }
     else

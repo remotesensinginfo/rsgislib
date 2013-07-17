@@ -106,4 +106,7 @@ namespace rsgis{namespace img{
 		this->aSQ = 0;
 		this->bSQ = 0;
 	}
+
+    
+    
 }}

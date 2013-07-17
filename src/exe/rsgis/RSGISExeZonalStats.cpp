@@ -2622,6 +2622,11 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 		if(this->option == RSGISExeZonalStats::polygons2shp)
 		{
 			cout << "polygons2shp\n";
+
+            // Convert to absolute path
+            this->inputVecPolys = boost::filesystem::absolute(this->inputVecPolys).c_str();
+            this->outputVecPolys = boost::filesystem::absolute(this->outputVecPolys).c_str();
+
 			GDALAllRegister();
 			OGRRegisterAll();
 
@@ -2760,6 +2765,11 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 		else if(this->option == RSGISExeZonalStats::rasterpolygons2shp)
 		{
 			cout << "rasterpolygons2shp\n";
+
+            // Convert to absolute path
+            this->inputVecPolys = boost::filesystem::absolute(this->inputVecPolys).c_str();
+            this->outputVecPolys = boost::filesystem::absolute(this->outputVecPolys).c_str();
+
 			GDALAllRegister();
 			OGRRegisterAll();
 
@@ -2907,6 +2917,10 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 		else if(this->option == RSGISExeZonalStats::rasterpolygons2txt)
 		{
 			cout << "rasterpolygons2txt\n";
+
+            // Convert to absolute path
+            this->inputVecPolys = boost::filesystem::absolute(this->inputVecPolys).c_str();
+
 			GDALAllRegister();
 			OGRRegisterAll();
 
@@ -3027,6 +3041,9 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
             std::cout << "Input Image: " << this->inputImage << std::endl;
             std::cout << "Input Vector: " << this->inputVecPolys << std::endl;
 
+            // Convert to absolute path
+            this->inputVecPolys = boost::filesystem::absolute(this->inputVecPolys).c_str();
+
 			GDALAllRegister();
 			OGRRegisterAll();
 			RSGISMathsUtils mathsUtil;
@@ -3128,6 +3145,10 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 			cout << "Input Vector: " << this->inputVecPolys << endl;
 			cout << "Output Matrix: " << this->outputMatrix << endl;
 			cout << "Attribute Name: " << this->polyAttribute << endl;
+
+            // Convert to absolute path
+            this->inputVecPolys = boost::filesystem::absolute(this->inputVecPolys).c_str();
+
 			GDALAllRegister();
 			OGRRegisterAll();
 
@@ -3261,6 +3282,10 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 			cout << "Input Vector: " << this->inputVecPolys << endl;
 			cout << "Input Raster Polygons: " << this->inputRasPolys << endl;
 			cout << "Output Vector : " << this->outputVecPolys << endl;
+
+            // Convert to absolute path
+            this->inputVecPolys = boost::filesystem::absolute(this->inputVecPolys).c_str();
+            this->outputVecPolys = boost::filesystem::absolute(this->outputVecPolys).c_str();
 
 			GDALAllRegister();
 			OGRRegisterAll();
@@ -3403,7 +3428,12 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 			else
 			{
 				cout << "Output Vector : " << this->outputVecPolys << endl;
+                // Convert to absolute path
+                this->outputVecPolys = boost::filesystem::absolute(this->outputVecPolys).c_str();
 			}
+
+			// Convert to absolute path
+			this->inputVecPolys = boost::filesystem::absolute(this->inputVecPolys).c_str();
 
 			GDALAllRegister();
 			OGRRegisterAll();
@@ -3669,6 +3699,10 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 			if (useRasPoly) {cout << "Input Raster Polygons: " << this->inputRasPolys << endl;}
 			cout << "Output Vector : " << this->outputVecPolys << endl;
 
+            // Convert to absolute path
+			this->inputVecPolys = boost::filesystem::absolute(this->inputVecPolys).c_str();
+            this->outputVecPolys = boost::filesystem::absolute(this->outputVecPolys).c_str();
+
 			GDALAllRegister();
 			OGRRegisterAll();
 
@@ -3828,6 +3862,10 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 			cout << "Input Vector: " << this->inputVecPolys << endl;
 			cout << "Output Vector : " << this->outputVecPolys << endl;
 
+            // Convert to absolute path
+			this->inputVecPolys = boost::filesystem::absolute(this->inputVecPolys).c_str();
+            this->outputVecPolys = boost::filesystem::absolute(this->outputVecPolys).c_str();
+
 			GDALAllRegister();
 			OGRRegisterAll();
 
@@ -3969,6 +4007,10 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 			cout << "Input Image: " << this->inputImage << endl;
 			cout << "Input Vector: " << this->inputVecPolys << endl;
 			cout << "Output Vector : " << this->outputVecPolys << endl;
+
+            // Convert to absolute path
+			this->inputVecPolys = boost::filesystem::absolute(this->inputVecPolys).c_str();
+            this->outputVecPolys = boost::filesystem::absolute(this->outputVecPolys).c_str();
 
 			GDALAllRegister();
 			OGRRegisterAll();
@@ -4125,6 +4167,10 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 			cout << "Output Vector : " << this->outputVecPolys << endl;
 			cout << "Histogram bin size: " << this->binsize << endl;
 
+            // Convert to absolute path
+			this->inputVecPolys = boost::filesystem::absolute(this->inputVecPolys).c_str();
+            this->outputVecPolys = boost::filesystem::absolute(this->outputVecPolys).c_str();
+
 			GDALAllRegister();
 			OGRRegisterAll();
 
@@ -4261,6 +4307,10 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 			cout << "Output Vector : " << this->outputVecPolys << endl;
 			cout << "Number of Top elements: " << this->nTop << endl;
 
+            // Convert to absolute path
+			this->inputVecPolys = boost::filesystem::absolute(this->inputVecPolys).c_str();
+            this->outputVecPolys = boost::filesystem::absolute(this->outputVecPolys).c_str();
+
 			GDALAllRegister();
 			OGRRegisterAll();
 
@@ -4392,7 +4442,14 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 			else
 			{
 				cout << "Output Vector : " << this->outputVecPolys << endl;
+
+				// Convert to absolute path
+				this->outputVecPolys = boost::filesystem::absolute(this->outputVecPolys).c_str();
 			}
+
+            // Convert to absolute path
+			this->inputVecPolys = boost::filesystem::absolute(this->inputVecPolys).c_str();
+
 
 			GDALAllRegister();
 			OGRRegisterAll();
@@ -4538,6 +4595,9 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 			cout << "Input Image: " << this->inputImage << endl;
 			cout << "Input Vector: " << this->inputVecPolys << endl;
 			cout << "Output Matrix : " << this->outputMatrix << endl;
+
+			// Convert to absolute path
+            this->inputVecPolys = boost::filesystem::absolute(this->inputVecPolys).c_str();
 
             GDALAllRegister();
 			OGRRegisterAll();

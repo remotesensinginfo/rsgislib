@@ -86,7 +86,7 @@ namespace rsgis{namespace img{
         {
             if((dataBlock[0][midPoint-1][midPoint-1] == counter) || (dataBlock[0][midPoint-1][midPoint-1] == counter+0.5))
             {
-                output[0] = counter+1.5;
+                output[0] = counter+1;
                 change = true;
             }
             else if((dataBlock[0][midPoint-1][midPoint] == counter) || (dataBlock[0][midPoint-1][midPoint] == counter+0.5))
@@ -96,7 +96,7 @@ namespace rsgis{namespace img{
             }
             else if((dataBlock[0][midPoint-1][midPoint+1] == counter) || (dataBlock[0][midPoint-1][midPoint+1] == counter+0.5))
             {
-                output[0] = counter+1.5;
+                output[0] = counter+1;
                 change = true;
             }
             else if((dataBlock[0][midPoint][midPoint-1] == counter) || (dataBlock[0][midPoint][midPoint-1] == counter+0.5))
@@ -111,7 +111,7 @@ namespace rsgis{namespace img{
             }
             else if((dataBlock[0][midPoint+1][midPoint-1] == counter) || (dataBlock[0][midPoint+1][midPoint-1] == counter+0.5))
             {
-                output[0] = counter+1.5;
+                output[0] = counter+1;
                 change = true;
             }
             else if((dataBlock[0][midPoint+1][midPoint] == counter) || (dataBlock[0][midPoint+1][midPoint] == counter+0.5))
@@ -121,7 +121,7 @@ namespace rsgis{namespace img{
             }
             else if((dataBlock[0][midPoint+1][midPoint+1] == counter) || (dataBlock[0][midPoint+1][midPoint+1] == counter+0.5))
             {
-                output[0] = counter+1.5;
+                output[0] = counter+1;
                 change = true;
             }
             else

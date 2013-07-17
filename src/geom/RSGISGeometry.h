@@ -131,6 +131,7 @@ namespace rsgis{namespace geom{
 		geos::geom::Polygon* findConvexHull(const std::vector<geos::geom::Geometry*> *geometries) throw(RSGISGeometryException);
 		geos::geom::Polygon* findConvexHull(std::vector<geos::geom::LineSegment> *lines) throw(RSGISGeometryException);
 		geos::geom::Polygon* findConvexHull(std::vector<geos::geom::Coordinate> *coordinates) throw(RSGISGeometryException);
+        geos::geom::Polygon* findBoundingBox(std::vector<geos::geom::Coordinate> *coordinates) throw(RSGISGeometryException);
 		/** 
 		 * turnDirection. A method to identify which direction the middle point b 
 		 * is turning. 

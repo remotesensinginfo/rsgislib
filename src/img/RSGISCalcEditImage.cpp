@@ -639,14 +639,40 @@ namespace rsgis
                             // Read Lower Block
                             for(int n = 0; n < numBands; n++)
                             {
-                                rowOffset = (numOfLines * (i+1));
-                                //std::cout << "rowOffset: " << rowOffset << std::endl;
-                                //std::cout << "bandOffsets["<<n<<"][0]: " << bandOffsets[n][0] << std::endl;
-                                //std::cout << "width: " << width << std::endl;
-                                //std::cout << "numOfLines: " << numOfLines << std::endl;
-                                
-                                rasterBands[n]->RasterIO(GF_Read, 0, rowOffset, width, numOfLines, inputDataLower[n], width, numOfLines, GDT_Float32, 0, 0);
+                                if(nYBlocks == 1)
+                                {
+                                    if(remainRows > 0)
+                                    {
+                                        rowOffset = (numOfLines * (i+1));
+                                        //std::cout << "rowOffset: " << rowOffset << std::endl;
+                                        //std::cout << "bandOffsets["<<n<<"][0]: " << bandOffsets[n][0] << std::endl;
+                                        //std::cout << "width: " << width << std::endl;
+                                        //std::cout << "remainRows = " << remainRows << std::endl;
+                                        rasterBands[n]->RasterIO(GF_Read, 0, rowOffset, width, remainRows, inputDataLower[n], width, remainRows, GDT_Float32, 0, 0);
+                                        for(int k = (remainRows*width); k < numPxlsInBlock; k++)
+                                        {
+                                            inputDataLower[n][k] = 0;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        for(int k = 0; k < numPxlsInBlock; k++)
+                                        {
+                                            inputDataLower[n][k] = 0;
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    rowOffset = (numOfLines * (i+1));
+                                    //std::cout << "rowOffset: " << rowOffset << std::endl;
+                                    //std::cout << "bandOffsets["<<n<<"][0]: " << bandOffsets[n][0] << std::endl;
+                                    //std::cout << "width: " << width << std::endl;
+                                    //std::cout << "remainRows = " << remainRows << std::endl;
+                                    rasterBands[n]->RasterIO(GF_Read, 0, rowOffset, width, numOfLines, inputDataLower[n], width, numOfLines, GDT_Float32, 0, 0);
+                                }
                             }
+                            
                         }
                         else if(i == (nYBlocks-1))
                         {

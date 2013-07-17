@@ -63,6 +63,31 @@ static PyObject *ImageUtils_StretchImage(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
+static PyObject *ImageUtils_StretchImageWithStats(PyObject *self, PyObject *args)
+{
+    const char *pszInputImage, *pszOutputFile, *pszGDALFormat, *pszInStatsFile;
+    int nOutDataType, nStretchType;
+    float fStretchParam;
+    if( !PyArg_ParseTuple(args, "ssssiif:stretchImageWithStats", &pszInputImage, &pszOutputFile, 
+                                &pszInStatsFile, &pszGDALFormat, &nOutDataType, &nStretchType,
+                                &fStretchParam))
+        return NULL;
+
+    try
+    {
+        rsgis::cmds::executeStretchImageWithStats(pszInputImage, pszOutputFile, pszInStatsFile,
+                    pszGDALFormat, (rsgis::RSGISLibDataType)nOutDataType, 
+                    (rsgis::cmds::RSGISStretches)nStretchType, fStretchParam);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+
+    Py_RETURN_NONE;
+}
+
 static PyObject *ImageUtils_maskImage(PyObject *self, PyObject *args)
 {
     const char *pszInputImage, *pszImageMask, *pszOutputImage, *pszGDALFormat;
@@ -128,6 +153,29 @@ static PyObject *ImageUtils_createTiles(PyObject *self, PyObject *args)
 }
 
 
+static PyObject *ImageUtils_PopImageStats(PyObject *self, PyObject *args)
+{
+    const char *pszInputImage;
+    int useNoDataValue, buildPyramids;
+    float noDataValue;
+    if( !PyArg_ParseTuple(args, "sifi:popImageStats", &pszInputImage, &useNoDataValue, &noDataValue,
+                          &buildPyramids))
+        return NULL;
+    
+    try
+    {
+        rsgis::cmds::executePopulateImgStats(pszInputImage, useNoDataValue, noDataValue, buildPyramids);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
+
 // Our list of functions in this module
 static PyMethodDef ImageUtilsMethods[] = {
     {"stretchImage", ImageUtils_StretchImage, METH_VARARGS, 
@@ -142,7 +190,20 @@ static PyMethodDef ImageUtilsMethods[] = {
 "  onepasssd is a bool\n"
 "  gdalformat is a string\n"
 "  outtype is a rsgislib.TYPE_* value\n"
-"  stretchtype is a STRETCH_* value\n"},
+"  stretchtype is a STRETCH_* value\n"
+"  stretchparam is a float\n"},
+
+    {"stretchImageWithStats", ImageUtils_StretchImageWithStats, METH_VARARGS, 
+"Stretch\n"
+"call signature: imageutils.stretchImageWithStats(inputimage, outputimage, instatsfile, gdalformat, outtype, stretchtype, stretchparam)\n"
+"where:\n"
+"  inputImage is a string containing the name of the input file\n"
+"  outputImage is a string containing the name of the output file\n"
+"  instatsfile is a string containing the name of the statistics file\n"
+"  gdalformat is a string\n"
+"  outtype is a rsgislib.TYPE_* value\n"
+"  stretchtype is a STRETCH_* value\n"
+"  stretchparam is a float\n"},
 
     {"maskImage", ImageUtils_maskImage, METH_VARARGS,
 "Mask\n"
@@ -169,6 +230,14 @@ static PyMethodDef ImageUtilsMethods[] = {
 "  type is a rsgislib.TYPE_* value providing the output data type of the tiles.\n"
 "  ext is a string providing the extension for the tiles (as required by the specified data type).\n"
 "\nA list of strings containing the filenames is returned\n"},
+    
+    {"popImageStats", ImageUtils_PopImageStats, METH_VARARGS,
+"Calculate the image statistics and build image pyramids populating the image file.\n"
+"call signature: imageutils.popImageStats(inputImage, useNoDataValue, noDataValue, buildPyramids)\n"
+"  inputImage is a string containing the name of the input file\n"
+"  useNoDataValue is a boolean stating whether the no data value is to be used.\n"
+"  noDataValue is a floating point value to be used as the no data value.\n"
+"  buildPyramids is a boolean stating whether image pyramids should be calculated.\n"},
 
     {NULL}        /* Sentinel */
 };

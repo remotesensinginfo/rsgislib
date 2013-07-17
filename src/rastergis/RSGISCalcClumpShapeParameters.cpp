@@ -33,7 +33,6 @@ namespace rsgis{namespace rastergis{
     {
         try
         {
-            std::cout << "Read RAT\n";
             RSGISRasterAttUtils attUtils;
             const GDALRasterAttributeTable *attTableTmp = clumpImage->GetRasterBand(1)->GetDefaultRAT();
             GDALRasterAttributeTable *attTable = NULL;
@@ -49,7 +48,6 @@ namespace rsgis{namespace rastergis{
             // Make sure it is long enough and extend if required.
             int numRows = attTable->GetRowCount();
             
-            std::cout << "Check image statistics\n";
             double maxVal = 0;
             clumpImage->GetRasterBand(1)->GetStatistics(false, true, NULL, &maxVal, NULL, NULL);
             
@@ -195,7 +193,7 @@ namespace rsgis{namespace rastergis{
             
             if(needBorderLength)
             {
-                std::cout << "Calculating the Border Lengths\n";
+                //std::cout << "Calculating the Border Lengths\n";
                 rsgis::img::RSGISCalcImageValue *calcBorderLen = new RSGISCalcBorderLenInPixels(borderLen, numRows, xRes, yRes, true);
                 rsgis::img::RSGISCalcImage imgCalcBorderLen = rsgis::img::RSGISCalcImage(calcBorderLen);
                 imgCalcBorderLen.calcImageWindowData(&clumpImage, 1, 3);
@@ -204,7 +202,7 @@ namespace rsgis{namespace rastergis{
             
             if(needNumPixels | needPixelCoords)
             {
-                std::cout << "Calculating the clump area and pixel locations\n";
+                //std::cout << "Calculating the clump area and pixel locations\n";
                 rsgis::img::RSGISCalcImageValue *calcPxlsLocsArea = new RSGISCalcShapePrimativesAreaPxlLocs(numPxls, pts, numRows, needNumPixels ,needPixelCoords);
                 rsgis::img::RSGISCalcImage imgCalcPxlsLocsArea = rsgis::img::RSGISCalcImage(calcPxlsLocsArea);
                 imgCalcPxlsLocsArea.calcImageExtent(&clumpImage, 1);
@@ -219,7 +217,7 @@ namespace rsgis{namespace rastergis{
             double lengthwidthratio = 0.0;
             double eigenHigh = 0.0;
             double eigenLow = 0.0;
-            std::cout << "Pixel Area = " << pxlArea << std::endl;
+            //std::cout << "Pixel Area = " << pxlArea << std::endl;
             std::vector<double> *xVals = NULL;
             std::vector<double> *yVals = NULL;
             std::vector<double> *xyVals = NULL;
@@ -227,6 +225,7 @@ namespace rsgis{namespace rastergis{
             rsgis::math::RSGISPrincipalComponentAnalysis *pca = NULL;
             rsgis::math::Matrix *inputDataMatrix = NULL;
             const rsgis::math::Matrix *eigenVals = NULL;
+            bool pcaUsed = false;
             
             if(needPixelCoords)
             {
@@ -249,40 +248,53 @@ namespace rsgis{namespace rastergis{
                     
                     if(needWidthLength)
                     {
-                        inputDataMatrix = matrixUtils.createMatrix(2, pts[i]->size());
-                        size_t idx = 0;
-                        for(std::vector<ShapePoint*>::iterator iterPts = pts[i]->begin(); iterPts != pts[i]->end(); ++iterPts)
+                        //std::cout << "pts[" << i << "]->size() = " << pts[i]->size() << std::endl;
+                        if(pts[i]->size() > 0)
                         {
-                            inputDataMatrix->matrix[idx++] = (*iterPts)->x;
-                            inputDataMatrix->matrix[idx++] = (*iterPts)->y;
-                        }
-                        pca = new rsgis::math::RSGISPrincipalComponentAnalysis(inputDataMatrix);
-                        
-                        eigenVals = pca->getEigenvalues();
-                        
-                        if((eigenVals->n != 2) & (eigenVals->m != 2))
-                        {
-                            std::cout << "eigenVals->n = " << eigenVals->n << std::endl;
-                            std::cout << "eigenVals->m = " << eigenVals->m << std::endl;
-                            rsgis::img::RSGISImageCalcException("Returned Eigenvalues matrix not the expected shape.");
-                        }
-                        
-                        if(eigenVals->matrix[0] > eigenVals->matrix[1])
-                        {
-                            eigenHigh = eigenVals->matrix[0];
-                            eigenLow = eigenVals->matrix[1];
+                            inputDataMatrix = matrixUtils.createMatrix(2, pts[i]->size());
+                            //std::cout << "created matrix\n";
+                            size_t idx = 0;
+                            for(std::vector<ShapePoint*>::iterator iterPts = pts[i]->begin(); iterPts != pts[i]->end(); ++iterPts)
+                            {
+                                inputDataMatrix->matrix[idx++] = (*iterPts)->x;
+                                inputDataMatrix->matrix[idx++] = (*iterPts)->y;
+                            }
+                            pca = new rsgis::math::RSGISPrincipalComponentAnalysis(inputDataMatrix);
+                            
+                            eigenVals = pca->getEigenvalues();
+                            
+                            if((eigenVals->n != 2) & (eigenVals->m != 2))
+                            {
+                                std::cout << "eigenVals->n = " << eigenVals->n << std::endl;
+                                std::cout << "eigenVals->m = " << eigenVals->m << std::endl;
+                                rsgis::img::RSGISImageCalcException("Returned Eigenvalues matrix not the expected shape.");
+                            }
+                            
+                            if(eigenVals->matrix[0] > eigenVals->matrix[1])
+                            {
+                                eigenHigh = eigenVals->matrix[0];
+                                eigenLow = eigenVals->matrix[1];
+                            }
+                            else
+                            {
+                                eigenHigh = eigenVals->matrix[1];
+                                eigenLow = eigenVals->matrix[0];
+                            }
+                            
+                            lengthwidthratio = eigenHigh/eigenLow;
+                            if(needNumPixels)
+                            {
+                                length = sqrt((((double)numPxls[i])*pxlArea)*lengthwidthratio);
+                                width = (((double)numPxls[i])*pxlArea)/lengthwidthratio;
+                            }
+                            pcaUsed = true;
                         }
                         else
                         {
-                            eigenHigh = eigenVals->matrix[1];
-                            eigenLow = eigenVals->matrix[0];
-                        }
-                        
-                        lengthwidthratio = eigenHigh/eigenLow;
-                        if(needNumPixels)
-                        {
-                            length = sqrt((((double)numPxls[i])*pxlArea)*lengthwidthratio);
-                            width = (((double)numPxls[i])*pxlArea)/lengthwidthratio;
+                            lengthwidthratio = 0;
+                            length = 0;
+                            width = 0;
+                            pcaUsed = false;
                         }
                     }
                     
@@ -419,7 +431,7 @@ namespace rsgis{namespace rastergis{
                 xVals->clear();
                 yVals->clear();
                 xyVals->clear();
-                if(needWidthLength)
+                if(needWidthLength & pcaUsed)
                 {
                     delete pca;
                 }

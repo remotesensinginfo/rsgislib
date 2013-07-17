@@ -83,4 +83,22 @@ inline long RSGISPY_INT_EXTRACT(PyObject *o)
 #endif
 }
 
+inline long RSGISPY_CHECK_FLOAT(PyObject *o)
+{
+#if PY_MAJOR_VERSION >= 3
+    return PyFloat_Check(o);
+#else
+    return PyFloat_Check(o);
+#endif
+}
+
+inline double RSGISPY_FLOAT_EXTRACT(PyObject *o)
+{
+#if PY_MAJOR_VERSION >= 3
+    return PyFloat_AsDouble(o);
+#else
+    return PyFloat_AsDouble(o);
+#endif
+}
+
 #endif // RSGISPY_COMMON_H

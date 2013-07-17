@@ -38,12 +38,18 @@ namespace rsgis{namespace calib{
     
 	struct LandsatRadianceGainsOffsets
     {
-        std::string bandName;
         unsigned int band;
         float lMax;
         float lMin;
         float qCalMax;
         float qCalMin;
+    };
+    
+    struct LandsatRadianceGainsOffsetsMultiAdd
+    {
+        unsigned int band;
+        float addVal;
+        float multiVal;
     };
     
     struct SPOTRadianceGainsOffsets
@@ -120,6 +126,25 @@ namespace rsgis{namespace calib{
         ~RSGISLandsatRadianceCalibration(){};
     protected:
         LandsatRadianceGainsOffsets *radGainOff;
+    };
+    
+    class RSGISLandsatRadianceCalibrationMultiAdd : public rsgis::img::RSGISCalcImageValue
+    {
+    public:
+        RSGISLandsatRadianceCalibrationMultiAdd(unsigned int numberOutBands, LandsatRadianceGainsOffsetsMultiAdd *radGainOff):rsgis::img::RSGISCalcImageValue(numberOutBands)
+        {
+            this->radGainOff = radGainOff;
+        };
+        void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException);
+        void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implmented.");};
+        void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implmented.");};
+        void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implmented.");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implmented.");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+        bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implmented.");};
+        ~RSGISLandsatRadianceCalibrationMultiAdd(){};
+    protected:
+        LandsatRadianceGainsOffsetsMultiAdd *radGainOff;
     };
     
     class RSGISSPOTRadianceCalibration : public rsgis::img::RSGISCalcImageValue

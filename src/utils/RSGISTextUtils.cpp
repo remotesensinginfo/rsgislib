@@ -644,10 +644,12 @@ namespace rsgis{namespace utils{
 			if ((ch == 0x0a) && (lastch == 0x0d))
 			{
 				lineEnding = true; // Windows Line Ending
+                inputFileStream.unget();
 			}
 			else if ((lastch == 0x0d) && (ch != 0x0a)) 
 			{
 				lineEnding = true; // Mac Line Ending
+                inputFileStream.unget();
 			} 
 			else if (ch == 0x0a) 
 			{
