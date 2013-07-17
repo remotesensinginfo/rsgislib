@@ -620,4 +620,72 @@ namespace rsgis{namespace img{
         
     }
 	
+    
+    
+    
+
+    RSGISImagePixelSummaries::RSGISImagePixelSummaries(unsigned int numOutBands, rsgis::math::RSGISStatsSummary *statsSummary, float noDataValue, bool useNoDataValue) : RSGISCalcImageValue(numOutBands)
+    {
+        this->statsSummary = statsSummary;
+        this->noDataValue = noDataValue;
+        this->useNoDataValue = useNoDataValue;
+    }
+    
+    void RSGISImagePixelSummaries::calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException)
+    {
+        std::vector<double> *dataVals = new std::vector<double>();
+        for(int i = 0; i < numBands; ++i)
+        {
+            if(this->useNoDataValue & (bandValues[i] == this->noDataValue))
+            {
+                // ignore value.
+            }
+            else
+            {
+                dataVals->push_back(bandValues[i]);
+            }
+        }
+        std::sort(dataVals->begin(), dataVals->end());
+        
+        rsgis::math::RSGISMathsUtils mathUtils;
+        mathUtils.initStatsSummaryValues(this->statsSummary);
+        mathUtils.generateStats(dataVals, statsSummary);
+        
+        unsigned int outIdx = 0;
+
+        if(statsSummary->calcMin)
+        {
+            output[outIdx++] = statsSummary->min;
+        }
+        if(statsSummary->calcMax)
+        {
+            output[outIdx++] = statsSummary->max;
+        }
+        if(statsSummary->calcMean)
+        {
+            output[outIdx++] = statsSummary->mean;
+        }
+        if(statsSummary->calcMedian)
+        {
+            output[outIdx++] = statsSummary->median;
+        }
+        if(statsSummary->calcSum)
+        {
+            output[outIdx++] = statsSummary->sum;
+        }
+        if(statsSummary->calcStdDev)
+        {
+            output[outIdx++] = statsSummary->stdDev;
+        }
+
+        delete dataVals;
+    }
+    
+    RSGISImagePixelSummaries::~RSGISImagePixelSummaries()
+    {
+        
+    }
+    
+    
+    
 }}

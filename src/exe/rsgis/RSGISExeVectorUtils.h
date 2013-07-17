@@ -4,7 +4,7 @@
  *
  *  Created by Pete Bunting on 12/12/2008.
  *  Copyright 2008 RSGISLib.
- * 
+ *
  *  RSGISLib is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -27,6 +27,11 @@
 #include <iostream>
 #include <fstream>
 #include <boost/algorithm/string/replace.hpp>
+#include <boost/filesystem.hpp>
+
+#include "cmds/RSGISCmdException.h"
+#include "cmds/RSGISCmdVectorUtils.h"
+
 
 #include "common/RSGISException.h"
 #include "common/RSGISXMLArgumentsException.h"
@@ -117,7 +122,7 @@ using namespace geos::geom;
 class RSGISExeVectorUtils : public RSGISAlgorithmParameters
 	{
 	public:
-		
+
 		enum polygonizer
 		{
 			polyonizernotdefined,
@@ -128,8 +133,8 @@ class RSGISExeVectorUtils : public RSGISAlgorithmParameters
 			multipoly,
 			snakes
 		};
-		
-		enum options 
+
+		enum options
 		{
 			none,
 			removeAttributes,
@@ -189,9 +194,10 @@ class RSGISExeVectorUtils : public RSGISAlgorithmParameters
             copyassignproj,
             printwkt,
             addfidcol,
-            mindist2polys
+            mindist2polys,
+            convexhullgrps
 		};
-		
+
 		RSGISExeVectorUtils();
 		virtual RSGISAlgorithmParameters* getInstance();
 		virtual void retrieveParameters(DOMElement *argElement) throw(RSGISXMLArgumentsException);
@@ -278,6 +284,9 @@ class RSGISExeVectorUtils : public RSGISAlgorithmParameters
         bool bufferValueInText;
         unsigned int initFID;
         bool areaThresholdProvided;
+        unsigned int eastingsColIdx;
+        unsigned int northingsColIdx;
+        unsigned int attributeColIdx;
 	};
 }
 #endif

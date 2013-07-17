@@ -81,24 +81,32 @@ set(LIB_CLASSIFY_CPP
 set(LIB_COMMANDS_H
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdException.h
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdParent.h
+	${RSGIS_SRC_CMDS_DIR}/RSGISCmdCommon.h
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdImageCalc.h 
+	${RSGIS_SRC_CMDS_DIR}/RSGISCmdImageCalibration.h
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdImageUtils.h 	
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdSegmentation.h 
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdRasterGIS.h
+	${RSGIS_SRC_CMDS_DIR}/RSGISCmdVectorUtils.h
 	)
 	
 set(LIB_COMMANDS_CPP
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdException.h
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdException.cpp
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdParent.h
+	${RSGIS_SRC_CMDS_DIR}/RSGISCmdCommon.h
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdImageCalc.cpp 
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdImageCalc.h 
+	${RSGIS_SRC_CMDS_DIR}/RSGISCmdImageCalibration.cpp 
+	${RSGIS_SRC_CMDS_DIR}/RSGISCmdImageCalibration.h
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdImageUtils.cpp	
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdImageUtils.h 
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdSegmentation.cpp
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdSegmentation.h
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdRasterGIS.cpp
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdRasterGIS.h
+	${RSGIS_SRC_CMDS_DIR}/RSGISCmdVectorUtils.cpp
+	${RSGIS_SRC_CMDS_DIR}/RSGISCmdVectorUtils.h
 	)
 ###############################################################################
 
@@ -357,6 +365,8 @@ set(LIB_IMG_H
 	${RSGIS_SRC_IMG_DIR}/RSGISGenHistogram.h
 	${RSGIS_SRC_IMG_DIR}/RSGISGenAccuracyPoints.h
 	${RSGIS_SRC_IMG_DIR}/RSGISSampleImage.h
+	${RSGIS_SRC_IMG_DIR}/RSGISImageWindowStats.h
+	${RSGIS_SRC_IMG_DIR}/RSGISFitFunction2Pxls.h
 	)
 	
 set(LIB_IMG_CPP
@@ -489,6 +499,10 @@ set(LIB_IMG_CPP
 	${RSGIS_SRC_IMG_DIR}/RSGISGenAccuracyPoints.h
 	${RSGIS_SRC_IMG_DIR}/RSGISSampleImage.cpp
 	${RSGIS_SRC_IMG_DIR}/RSGISSampleImage.h
+	${RSGIS_SRC_IMG_DIR}/RSGISImageWindowStats.cpp
+	${RSGIS_SRC_IMG_DIR}/RSGISImageWindowStats.h
+	${RSGIS_SRC_IMG_DIR}/RSGISFitFunction2Pxls.cpp
+	${RSGIS_SRC_IMG_DIR}/RSGISFitFunction2Pxls.h
 	)
 ###############################################################################
 
@@ -799,7 +813,8 @@ set(LIB_REGISTRATION_H
 	${RSGIS_SRC_REGISTRATION_DIR}/RSGISWarpImageUsingTriangulation.h 
 	${RSGIS_SRC_REGISTRATION_DIR}/RSGISBasicNNGCPImageWarp.h
 	${RSGIS_SRC_REGISTRATION_DIR}/RSGISPolynomialImageWarp.h
-	${RSGIS_SRC_REGISTRATION_DIR}/RSGISImagePixelRegistration.h)
+	${RSGIS_SRC_REGISTRATION_DIR}/RSGISImagePixelRegistration.h
+	${RSGIS_SRC_REGISTRATION_DIR}/RSGISAddGCPsGDAL.h)
 	
 set(LIB_REGISTRATION_CPP
 	${RSGIS_SRC_REGISTRATION_DIR}/RSGISImageWarpException.cpp 
@@ -826,7 +841,9 @@ set(LIB_REGISTRATION_CPP
 	${RSGIS_SRC_REGISTRATION_DIR}/RSGISPolynomialImageWarp.cpp
 	${RSGIS_SRC_REGISTRATION_DIR}/RSGISPolynomialImageWarp.h
 	${RSGIS_SRC_REGISTRATION_DIR}/RSGISImagePixelRegistration.cpp
-	${RSGIS_SRC_REGISTRATION_DIR}/RSGISImagePixelRegistration.h)
+	${RSGIS_SRC_REGISTRATION_DIR}/RSGISImagePixelRegistration.h
+	${RSGIS_SRC_REGISTRATION_DIR}/RSGISAddGCPsGDAL.cpp
+	${RSGIS_SRC_REGISTRATION_DIR}/RSGISAddGCPsGDAL.h)
 ###############################################################################
 
 ###############################################################################
@@ -845,7 +862,8 @@ set(LIB_SEGMENTATION_H
 	${RSGIS_SRC_SEGMENTATION_DIR}/RSGISRegionGrowSegmentsPixels.h
 	${RSGIS_SRC_SEGMENTATION_DIR}/RSGISDefineSpectralDivision.h 
 	${RSGIS_SRC_SEGMENTATION_DIR}/RSGISEliminateSinglePixels.h
-	${RSGIS_SRC_SEGMENTATION_DIR}/RSGISMergeSegmentationTiles.h)
+	${RSGIS_SRC_SEGMENTATION_DIR}/RSGISMergeSegmentationTiles.h
+	${RSGIS_SRC_SEGMENTATION_DIR}/RSGISBottomUpShapeFeatureExtraction.h)
 	
 set(LIB_SEGMENTATION_CPP
 	${RSGIS_SRC_SEGMENTATION_DIR}/RSGISGenMeanSegImage.cpp 
@@ -875,7 +893,9 @@ set(LIB_SEGMENTATION_CPP
 	${RSGIS_SRC_SEGMENTATION_DIR}/RSGISEliminateSinglePixels.cpp
 	${RSGIS_SRC_SEGMENTATION_DIR}/RSGISEliminateSinglePixels.h
 	${RSGIS_SRC_SEGMENTATION_DIR}/RSGISMergeSegmentationTiles.cpp
-	${RSGIS_SRC_SEGMENTATION_DIR}/RSGISMergeSegmentationTiles.h)
+	${RSGIS_SRC_SEGMENTATION_DIR}/RSGISMergeSegmentationTiles.h
+	${RSGIS_SRC_SEGMENTATION_DIR}/RSGISBottomUpShapeFeatureExtraction.cpp
+	${RSGIS_SRC_SEGMENTATION_DIR}/RSGISBottomUpShapeFeatureExtraction.h)
 ###############################################################################
 
 ###############################################################################
@@ -1045,6 +1065,8 @@ set(LIB_VEC_UTILS_CPP
 	${RSGIS_SRC_VEC_DIR}/RSGISCreateListOfAttributeValues.cpp 
 	${RSGIS_SRC_VEC_DIR}/RSGISDropSmallPolygons.cpp 
 	${RSGIS_SRC_VEC_DIR}/RSGISDropSmallPolygons.h 
+	${RSGIS_SRC_VEC_DIR}/RSGISGenerateConvexHullGroups.cpp
+	${RSGIS_SRC_VEC_DIR}/RSGISGenerateConvexHullGroups.h
 	${RSGIS_SRC_VEC_DIR}/RSGISGeometryRotateAroundFixedPoint.cpp 
 	${RSGIS_SRC_VEC_DIR}/RSGISGeometryRotateAroundFixedPoint.h
 	${RSGIS_SRC_VEC_DIR}/RSGISGeometryToCircle.cpp 
@@ -1084,7 +1106,7 @@ set(LIB_VEC_UTILS_CPP
 	${RSGIS_SRC_VEC_DIR}/RSGISVectorSQLClassification.cpp 
 	${RSGIS_SRC_VEC_DIR}/RSGISVectorSQLClassification.h 
     ${RSGIS_SRC_VEC_DIR}/RSGISVectorUtils.cpp 
-	${RSGIS_SRC_VEC_DIR}/RSGISVectorUtils.h 
+	${RSGIS_SRC_VEC_DIR}/RSGISVectorUtils.h
 )
 
 
@@ -1157,7 +1179,9 @@ set(LIB_VEC_H
 	${RSGIS_SRC_VEC_DIR}/RSGISVectorMaths.h 
 	${RSGIS_SRC_VEC_DIR}/RSGISGetOGRGeometries.h 
 	${RSGIS_SRC_VEC_DIR}/RSGISExtractEndMembers2Matrix.h
-	${RSGIS_SRC_VEC_DIR}/RSGISAttCountPolyIntersect.h)
+	${RSGIS_SRC_VEC_DIR}/RSGISAttCountPolyIntersect.h
+	${RSGIS_SRC_VEC_DIR}/RSGISGenerateConvexHullGroups.h)
+	
 	
 ###############################################################################
 
@@ -1409,7 +1433,7 @@ PROPERTIES
 # Build executables
 #if (RSGISLIB_WITH_RSGISEXE)
 	add_executable(rsgisexe ${EXE_RSGISEXE_CPP})
-	target_link_libraries (rsgisexe ${RSGISLIB_COMMONS_LIB_NAME} ${RSGISLIB_DATASTRUCT_LIB_NAME} ${RSGISLIB_MATHS_LIB_NAME} ${RSGISLIB_UTILS_LIB_NAME} ${RSGISLIB_GEOM_LIB_NAME} ${RSGISLIB_IMG_LIB_NAME} ${RSGISLIB_REGISTRATION_LIB_NAME} ${RSGISLIB_CALIBRATION_LIB_NAME} ${RSGISLIB_FILTERING_LIB_NAME} ${RSGISLIB_RASTERGIS_LIB_NAME} ${RSGISLIB_SEGMENTATION_LIB_NAME} ${RSGISLIB_VECTOR_LIB_NAME} ${RSGISLIB_MODELING_LIB_NAME} ${RSGISLIB_RADAR_LIB_NAME} ${RSGISLIB_CLASSIFY_LIB_NAME} ${RSGISLIB_CMDSINTERFACE_LIB_NAME} ${GDAL_LIBRARIES} ${GEOS_LIBRARIES} ${GSL_LIBRARIES} ${MUPARSER_LIBRARIES} ${XERCESC_LIBRARIES} ${FFTW_LIBRARIES} ${CGAL_LIBRARY} ${GMP_LIBRARIES} ${MPFR_LIBRARIES} ${KEA_LIBRARIES})
+	target_link_libraries (rsgisexe ${RSGISLIB_COMMONS_LIB_NAME} ${RSGISLIB_DATASTRUCT_LIB_NAME} ${RSGISLIB_MATHS_LIB_NAME} ${RSGISLIB_UTILS_LIB_NAME} ${RSGISLIB_GEOM_LIB_NAME} ${RSGISLIB_IMG_LIB_NAME} ${RSGISLIB_REGISTRATION_LIB_NAME} ${RSGISLIB_CALIBRATION_LIB_NAME} ${RSGISLIB_FILTERING_LIB_NAME} ${RSGISLIB_RASTERGIS_LIB_NAME} ${RSGISLIB_SEGMENTATION_LIB_NAME} ${RSGISLIB_VECTOR_LIB_NAME} ${RSGISLIB_MODELING_LIB_NAME} ${RSGISLIB_RADAR_LIB_NAME} ${RSGISLIB_CLASSIFY_LIB_NAME} ${RSGISLIB_CMDSINTERFACE_LIB_NAME} ${GDAL_LIBRARIES} ${GEOS_LIBRARIES} ${GSL_LIBRARIES} ${MUPARSER_LIBRARIES} ${XERCESC_LIBRARIES} ${FFTW_LIBRARIES} ${CGAL_LIBRARY} ${GMP_LIBRARIES} ${MPFR_LIBRARIES} ${KEA_LIBRARIES} ${BOOST_LIBRARIES})
 #endif(RSGISLIB_WITH_RSGISEXE)
 ###############################################################################
 

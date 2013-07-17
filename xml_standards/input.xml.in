@@ -768,8 +768,14 @@
     <rsgis:command algor="imagecalc" option="histogram" image="image.env" output="image_out.txt" mask="mask.env" value="int" band="int" [min="float" max="float"] [width="float"] />
 	<!-- A command to calculate image band percentiles. -->
     <rsgis:command algor="imagecalc" option="bandpercentile" image="image.env" output="image_out.mtxt" percentile="float 0-1" nodata="float" />
-	
-	
+	<!-- A command to calculate the Mahalanobis distance within a window - the centre pixel compared to the others within the window -->
+	<rsgis:command algor="imagecalc" option="mahalanobisdistwindow" image="image.env" output="image.env" window="int" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
+	<!-- A command to calculate the Mahalanobis distance of a window to the whole image -->
+	<rsgis:command algor="imagecalc" option="mahalanobisdistimg2window" image="image.env" output="image.env" window="int" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
+	<!-- A command to calculate statistics for each column of image bands for each pixel -->
+	<rsgis:command algor="imagecalc" option="calcpxlcolstats" image="image.env" output="image.env" min="yes|no" max="yes|no" mean="yes|no" median="yes|no" sum="yes|no" stddev="yes|no" [nodata="float"] format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
+	<!-- A command to calculate a linear regression for each pixel column -->
+	<rsgis:command algor="imagecalc" option="pxlcolregression" image="image.env" output="image.env" bandvalues="file.txt" [nodata="float"] format="GDAL Format" />
 	
 	
 	
@@ -780,6 +786,11 @@
         <rsgis:band name="string" image="image1" band="int" [sensorband="string" | lmin="float" lmax="float" qcalmin="float" qcalmax="float"] />
         <rsgis:band name="string" image="image2" band="int" [sensorband="string" | lmin="float" lmax="float" qcalmin="float" qcalmax="float"]/>
         <rsgis:band name="string" image="image3" band="int" [sensorband="string" | lmin="float" lmax="float" qcalmin="float" qcalmax="float"]/>
+    </rsgis:command>
+	<rsgis:command algor="imagecalibration" option="landsatradcalmultiadd" output="image_out.env" format="GDAL Format" >
+        <rsgis:band name="string" image="image1" band="int" addval="float" multival="float" />
+        <rsgis:band name="string" image="image2" band="int" addval="float" multival="float" />
+        <rsgis:band name="string" image="image3" band="int" addval="float" multival="float" />
     </rsgis:command>
     <!-- A command to calibrate image SPOT data from at sensor DNs to at sensor radiance -->
     <rsgis:command algor="imagecalibration" option="spotradcal" output="image_out.env" format="GDAL Format" >
@@ -830,7 +841,7 @@
         <rsgis:band [sensorband="string" | irradiance="float"] />
     </rsgis:command>
     <!-- A command to convert from at sensor radiance to surface reflectance using coefficients provided by 6S -->
-    <rsgis:command algor="imagecalibration" option="apply6s" input="image_in.env" output="image_out.env" scaleFactor="float" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" >
+    <rsgis:command algor="imagecalibration" option="apply6sSingle" input="image_in.env" output="image_out.env" scaleFactor="float" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" [noData="float"] >
         <rsgis:band band="int" ax="float" bx="float" cx="float" />
         <rsgis:band band="int" ax="float" bx="float" cx="float" />
         <rsgis:band band="int" ax="float" bx="float" cx="float" />
@@ -1053,6 +1064,12 @@
         <rsgis:image clumps="string" />
 		<rsgis:image clumps="string" />
     </rsgis:command>
+	<!-- A command to extract features from which are bright within the scene with a particular shape and size.-->
+	<rsgis:command algor="segmentation" option="extractbrightfeatures" image="image.kea" mask="image.kea" output="image.kea" format="GDAL Format" tmp1="image.kea" tmp2="image.kea" initthres="float" thresincrement="float" thresholdupper="float" >
+		<rsgis:description arealow="float" areahigh="float" lenwidthlow="float" lenwidthhigh="float" />
+        <rsgis:description arealow="float" areahigh="float" lenwidthlow="float" lenwidthhigh="float" />
+		<rsgis:description arealow="float" areahigh="float" lenwidthlow="float" lenwidthhigh="float" />
+    </rsgis:command>
 
 
 
@@ -1212,6 +1229,8 @@
 	<rsgis:command algor="vectorutils" option="addfidcol" vector="vector.shp" output="string" init="unsigned int" force="yes | no" />
 	<!-- A command to calculate the minimum distance to each polygon for each point -->
 	<rsgis:command algor="vectorutils" option="mindist2polys" vector="vector.shp" polygons="vector.shp" output="string" force="yes | no" />
+	<!-- A command to produce convex hulls for groups of (X, Y, Attribute) point locations -->
+	<rsgis:command algor="vectorutils" option="convexhullgrps" input="points.csv" polygons="vector.shp" projwkt="txt.wkt" force="yes | no" eastingscol="int" northingscol="int" attributecol="int"/>
 
 
 
@@ -1418,6 +1437,8 @@
     <rsgis:command algor="registration" option="polywarp" gcps="string" image="string" output="string" projection="file.wkt" resolution="float" format="string" polyOrder="int" transform="yes | no" />
     <!-- A command to warp an input image using a set of ground control points using a triangulation -->
     <rsgis:command algor="registration" option="triangularwarp" gcps="string" image="string" output="string" projection="file.wkt" resolution="float" format="string" transform="yes | no" />
+    <!-- A command to add tie points as GCPs to GDAL dataset -->
+    <rsgis:command algor="registration" option="gcp2gdal" gcps="string"         image="image" [output="image" ] />
 	<!-- A command for doing a per pixel image matching where a 3 band image is outputted with the X Shift, Y Shift and Metric value -->
 	<rsgis:command algor="registration" option="pxlshift" reference="image" floating="image" output="image" format="string" metric="euclidean|sqdiff|manhatten|correlation" window="int" search="int" subpixelresolution="int"/>
 

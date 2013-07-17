@@ -42,10 +42,13 @@
 #include "registration/RSGISWarpImageUsingTriangulation.h"
 #include "registration/RSGISPolynomialImageWarp.h"
 #include "registration/RSGISImagePixelRegistration.h"
+#include "registration/RSGISAddGCPsGDAL.h"
 
 #include "utils/RSGISFileUtils.h"
 #include "utils/RSGISTextUtils.h"
 #include "math/RSGISMathsUtils.h"
+
+#include "cmds/RSGISCmdParent.h"
 
 #include <xercesc/dom/DOM.hpp>
 #include <xercesc/util/XMLString.hpp>
@@ -65,7 +68,8 @@ namespace rsgisexe{
             triangularwarp,
             nnwarp,
             polywarp,
-            pxlshift
+            pxlshift,
+            gcp2gdal
         };
         
         enum OutputType
@@ -104,7 +108,9 @@ namespace rsgisexe{
         std::string inputFloatingmage;
         std::string outputGCPFile;
         std::string projFile;
-        std::string outImageFormat;
+        std::string imageFormat;
+        GDALDataType outDataType;
+        rsgis::RSGISLibDataType rsgisOutDataType;
         OutputType outputType;
         SimilarityMetric metricType;
         unsigned int gcpGap;
@@ -121,6 +127,7 @@ namespace rsgisexe{
         float resolution;
         int polyOrder;
         bool genTransformImage;
+        
     };
 }
 

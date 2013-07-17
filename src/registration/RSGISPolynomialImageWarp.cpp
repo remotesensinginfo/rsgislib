@@ -262,8 +262,10 @@ namespace rsgis{namespace reg{
         pY = pY + (gsl_vector_get(aY, offset) * pow(eastings, this->polyOrder));
         pY = pY + (gsl_vector_get(aY, offset+1) * pow(northings, this->polyOrder));
     
-		*x = floor(pX+0.5);
-		*y = floor(pY+0.5);
+		//*x = floor(pX+0.5);
+		//*y = floor(pY+0.5);
+        *x = ceil(pX);
+		*y = ceil(pY);
 	}
 		
 	RSGISPolynomialImageWarp::~RSGISPolynomialImageWarp()

@@ -147,6 +147,7 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
         else if(this->imageFormat == "HFA"){this->outFileExtension = "img";}
         else if(this->imageFormat == "PNG"){this->outFileExtension = "png";}
         else if(this->imageFormat == "AAIGrid"){this->outFileExtension = "asc";}
+        else if(this->imageFormat == "PCIDSK"){this->outFileExtension = "pix";}
         else{std::cout << "Extension not known for file format, using \".env\"" << std::endl;}
     }
 	XMLString::release(&formatExtXMLStr);
@@ -3713,12 +3714,12 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
 			{
 				if (this->mosaicSkipVals)
 				{
-                    std::cout << "Skipping pixel values = " << this->skipValue << " in band " << this->skipBand << std::endl;
+                    std::cout << "Skipping pixel values = " << this->skipValue << " in band " << this->skipBand + 1 << std::endl;
 					mosaic.mosaicSkipVals(inputImages, this->numImages, this->outputImage, this->nodataValue, this->skipValue, this->projFromImage, this->proj, this->skipBand, this->overlapBehaviour, this->imageFormat, this->outDataType);
 				}
 				else if (this->mosaicSkipThresh)
 				{
-                    std::cout << "Skipping pixel values between " << this->skipLowerThresh << " and " << this->skipUpperThresh << " in band " << this->skipBand << std::endl;
+                    std::cout << "Skipping pixel values between " << this->skipLowerThresh << " and " << this->skipUpperThresh << " in band " << this->skipBand + 1 << std::endl;
 					mosaic.mosaicSkipThresh(inputImages, this->numImages, this->outputImage, this->nodataValue, this->skipLowerThresh, this->skipUpperThresh, this->projFromImage, this->proj, this->skipBand, this->overlapBehaviour, this->imageFormat, this->outDataType);
 				}
 				else
@@ -4425,7 +4426,7 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
 		}
 		else if(option == RSGISExeImageUtils::stretch)
 		{
-			cout << "Apply an enhancement stretch to the an input image - usually for visualisation\n";
+			cout << "Apply an enhancement stretch to an input image - usually for visualisation\n";
 			cout << "Input Image: " << this->inputImage << endl;
 			cout << "Output Image: " << this->outputImage << endl;
             if(this->outStatsFile)
@@ -5013,13 +5014,7 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
             {
                 std::cout << "Saving list of tiles to: " << this->outTilesList << std::endl;
             }
-            cout << "Tile Width: " << this->width << std::endl;
-            cout << "Tile Height: " << this->height << std::endl;
-            cout << "Tile Overlap: " << this->tileOverlap << std::endl;
-            if(offsetTiling)
-            {
-                cout << "Tiling is offset by half a tile.\n";
-            }
+
             try
             {
                 if(this->outTilesList != "")

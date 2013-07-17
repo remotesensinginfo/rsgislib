@@ -113,10 +113,10 @@ namespace rsgis{namespace reg{
 			double yRes;
 			double xRot;
 			double yRot;
-			unsigned int refXStart;
-			unsigned int refYStart;
-			unsigned int floatXStart;
-			unsigned int floatYStart;
+			float refXStart;
+			float refYStart;
+			float floatXStart;
+			float floatYStart;
 			unsigned long xSize;
 			unsigned long ySize;
 			unsigned int numRefBands;
@@ -139,8 +139,8 @@ namespace rsgis{namespace reg{
 		float findTiePointLocation(TiePoint *tiePt, unsigned int windowSize, unsigned int searchArea, RSGISImageSimilarityMetric *metric, float metricThreshold, unsigned int subPixelResolution, float *moveInX, float *moveInY) throw(RSGISRegistrationException);
         float findTiePointLocation(TiePoint *tiePt, unsigned int windowSize, unsigned int searchArea, RSGISImageSimilarityMetric *metric, unsigned int subPixelResolution, float *moveInX, float *moveInY) throw(RSGISRegistrationException);
 		float findExtreme(bool findMin, gsl_vector *coefficients, unsigned int order, float minRange, float maxRange, unsigned int resolution, float *extremeVal);
-		void getImageOverlapWithFloatShift(float xShift, float yShift, int **dsOffsets, int *width, int *height, double *gdalTransform, geos::geom::Envelope *env) throw(RSGISRegistrationException);
-		//oid getImageOverlapWithFloatShift(int xShift, int yShift, int **dsOffsets, int *width, int *height, double *gdalTransform, geos::geom::Envelope *env) throw(RSGISRegistrationException);
+        void getImageOverlapFloat(GDALDataset **datasets, int numDS,  float **dsOffsets, int *width, int *height, double *gdalTransform) throw(RSGISRegistrationException);
+		void getImageOverlapWithFloatShift(float xShift, float yShift, int **dsOffsets, int *width, int *height, double *gdalTransform, geos::geom::Envelope *env, float *remainderX, float *remainderY) throw(RSGISRegistrationException);
 		void removeTiePointsWithLowStdDev(std::list<TiePoint*> *tiePts, unsigned int windowSize, float stdDevRefThreshold, float stdDevFloatThreshold);
 		double calcStdDev(float **data, unsigned int numVals, unsigned int numDims);
 		void exportTiePointsENVIImage2MapImpl(std::string filepath, std::list<TiePoint*> *tiePts)throw(RSGISRegistrationException);
