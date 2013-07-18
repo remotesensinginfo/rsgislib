@@ -30,11 +30,20 @@
 #include "rastergis/RSGISCalcClusterLocation.h"
 #include "rastergis/RSGISFindClumpCatagoryStats.h"
 #include "rastergis/RSGISExportColumns2Image.h"
+#include "rastergis/RSGISCalcEucDistanceInAttTable.h"
+#include "rastergis/RSGISFindTopNWithinDist.h"
+#include "rastergis/RSGISFindClosestSpecSpatialFeats.h"
+#include "rastergis/RSGISKNNATTMajorityClassifier.h"
+#include "rastergis/RSGISFindInfoBetweenLayers.h"
+#include "rastergis/RSGISMaxLikelihoodRATClassification.h"
+#include "rastergis/RSGISClassMask.h"
+#include "rastergis/RSGISFindClumpNeighbours.h"
+#include "rastergis/RSGISClumpBorders.h"
+#include "rastergis/RSGISCalcClumpShapeParameters.h"
 
 namespace rsgis{ namespace cmds {
     
-    void executePopulateStats(std::string clumpsImage, bool addColourTable2Img, bool calcImgPyramids)throw(RSGISCmdException)
-    {
+    void executePopulateStats(std::string clumpsImage, bool addColourTable2Img, bool calcImgPyramids)throw(RSGISCmdException) {
         try
         {
             GDALAllRegister();
@@ -63,8 +72,7 @@ namespace rsgis{ namespace cmds {
         }
     }
     
-    void executeCoptRAT(std::string inputImage, std::string clumpsImage)throw(RSGISCmdException)
-    {
+    void executeCopyRAT(std::string inputImage, std::string clumpsImage)throw(RSGISCmdException) {
         try
         {
             GDALAllRegister();
@@ -103,8 +111,7 @@ namespace rsgis{ namespace cmds {
         }
     }
     
-    void executeCopyGDALATTColumns(std::string inputImage, std::string clumpsImage, std::vector<std::string> fields)throw(RSGISCmdException)
-    {
+    void executeCopyGDALATTColumns(std::string inputImage, std::string clumpsImage, std::vector<std::string> fields)throw(RSGISCmdException) {
         try
         {
             GDALAllRegister();
@@ -141,8 +148,7 @@ namespace rsgis{ namespace cmds {
         }
     }
     
-    void executeSpatialLocation(std::string inputImage, std::string clumpsImage, std::string eastingsField, std::string northingsField)throw(RSGISCmdException)
-    {
+    void executeSpatialLocation(std::string inputImage, std::string clumpsImage, std::string eastingsField, std::string northingsField)throw(RSGISCmdException) {
         try
         {
             GDALAllRegister();
@@ -170,8 +176,7 @@ namespace rsgis{ namespace cmds {
         }
     }
     
-    void executePopulateRATWithStats(std::string inputImage, std::string clumpsImage, std::vector<rsgis::cmds::RSGISBandAttStatsCmds*> *bandStatsCmds)throw(RSGISCmdException)
-    {
+    void executePopulateRATWithStats(std::string inputImage, std::string clumpsImage, std::vector<rsgis::cmds::RSGISBandAttStatsCmds*> *bandStatsCmds)throw(RSGISCmdException) {
         try
         {
             GDALAllRegister();
@@ -251,8 +256,7 @@ namespace rsgis{ namespace cmds {
         }
     }
     
-    void executePopulateRATWithPercentiles(std::string inputImage, std::string clumpsImage, std::vector<rsgis::cmds::RSGISBandAttPercentilesCmds*> *bandPercentilesCmds)throw(RSGISCmdException)
-    {
+    void executePopulateRATWithPercentiles(std::string inputImage, std::string clumpsImage, std::vector<rsgis::cmds::RSGISBandAttPercentilesCmds*> *bandPercentilesCmds)throw(RSGISCmdException) {
         try
         {
             GDALAllRegister();
@@ -313,8 +317,7 @@ namespace rsgis{ namespace cmds {
         }
     }
     
-    void executePopulateCategoryProportions(std::string categoriesImage, std::string clumpsImage, std::string outColsName, std::string majorityColName, bool copyClassNames, std::string majClassNameField, std::string classNameField)throw(RSGISCmdException)
-    {
+    void executePopulateCategoryProportions(std::string categoriesImage, std::string clumpsImage, std::string outColsName, std::string majorityColName, bool copyClassNames, std::string majClassNameField, std::string classNameField)throw(RSGISCmdException) {
         try
         {
             GDALAllRegister();
@@ -351,8 +354,7 @@ namespace rsgis{ namespace cmds {
         }
     }
     
-    void executeCopyCatagoriesColours(std::string categoriesImage, std::string clumpsImage, std::string classField)throw(RSGISCmdException)
-    {
+    void executeCopyCatagoriesColours(std::string categoriesImage, std::string clumpsImage, std::string classField)throw(RSGISCmdException) {
         try
         {
             GDALAllRegister();
@@ -389,8 +391,7 @@ namespace rsgis{ namespace cmds {
         }
     }
     
-    void executeExportCols2GDALImage(std::string inputImage, std::string outputFile, std::string imageFormat, RSGISLibDataType outDataType, std::vector<std::string> fields)throw(RSGISCmdException)
-    {
+    void executeExportCols2GDALImage(std::string inputImage, std::string outputFile, std::string imageFormat, RSGISLibDataType outDataType, std::vector<std::string> fields)throw(RSGISCmdException) {
         try
         {
             GDALAllRegister();
@@ -431,6 +432,498 @@ namespace rsgis{ namespace cmds {
         catch(std::exception &e)
         {
             throw RSGISCmdException(e.what());
+        }
+    }
+    
+    void executeEucDistFromFeature(std::string inputImage, size_t fid, std::string outputField, std::vector<std::string> fields)throw(RSGISCmdException) {
+        GDALAllRegister();
+        GDALDataset *inputDataset;
+        
+        try {
+            inputDataset = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_Update);
+            if(inputDataset == NULL) {
+                std::string message = std::string("Could not open image ") + inputImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            rsgis::rastergis::RSGISCalcEucDistanceInAttTable calcDist;
+            calcDist.calcEucDist(inputDataset, fid, outputField, fields);
+            
+            GDALClose(inputDataset);
+        } catch(rsgis::RSGISException &e) {
+            throw RSGISCmdException(e.what());
+        }
+    }
+    
+    void executeFindTopN(std::string inputImage, std::string spatialDistField, std::string distanceField, std::string outputField, unsigned int nFeatures, float distThreshold)throw(RSGISCmdException) {
+        GDALAllRegister();
+        GDALDataset *inputDataset;
+        
+        try {
+            inputDataset = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_Update);
+            
+            if(inputDataset == NULL) {
+                std::string message = std::string("Could not open image ") + inputImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            rsgis::rastergis::RSGISFindTopNWithinDist calcTopN;
+            calcTopN.calcMinDistTopN(inputDataset, spatialDistField, distanceField, outputField, nFeatures, distThreshold);
+            
+            GDALClose(inputDataset);
+        } catch(rsgis::RSGISException &e) {
+            throw RSGISCmdException(e.what());
+        }
+    }
+    
+    void executeFindSpecClose(std::string inputImage, std::string distanceField, std::string spatialDistField, std::string outputField, float specDistThreshold, float distThreshold)throw(RSGISCmdException) {
+        GDALAllRegister();
+        GDALDataset *inputDataset;
+        
+        try {
+            inputDataset = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_Update);
+            
+            if(inputDataset == NULL) {
+                std::string message = std::string("Could not open image ") + inputImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            rsgis::rastergis::RSGISFindClosestSpecSpatialFeats findFeats;
+            findFeats.calcFeatsWithinSpatSpecThresholds(inputDataset, spatialDistField, distanceField, outputField, specDistThreshold, distThreshold);
+            
+            GDALClose(inputDataset);
+        } catch(rsgis::RSGISException &e) {
+            throw RSGISCmdException(e.what());
+        }
+
+    }
+    
+    void executeKnnMajorityClassifier(std::string inputImage, std::string inClassNameField, std::string outClassNameField, std::string trainingSelectCol, std::string eastingsField, std::string northingsField, std::string areaField, std::string majWeightField, std::vector<std::string> fields, unsigned int nFeatures, float distThreshold, float weightA, void *majorMethod)throw(RSGISCmdException) {
+        GDALAllRegister();
+        GDALDataset *inputDataset;
+        
+        try {
+            inputDataset = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_Update);
+            
+            if(inputDataset == NULL) {
+                std::string message = std::string("Could not open image ") + inputImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            rsgis::rastergis::ClassMajorityMethod *majMethodPtr = (rsgis::rastergis::ClassMajorityMethod *) majorMethod;
+            
+            rsgis::rastergis::RSGISKNNATTMajorityClassifier knnMajorityClass;
+            knnMajorityClass.applyKNNClassifier(inputDataset, inClassNameField, outClassNameField, trainingSelectCol, eastingsField, northingsField, areaField, majWeightField, fields, nFeatures, distThreshold,weightA, *majMethodPtr);
+            
+            GDALClose(inputDataset);
+        } catch(rsgis::RSGISException &e) {
+            throw RSGISCmdException(e.what());
+        }
+
+    }
+    
+    void executeExport2Ascii(std::string inputImage, std::string outputFile, std::vector<std::string> fields)throw(RSGISCmdException) {
+        GDALAllRegister();
+        GDALDataset *inputDataset;
+        
+        try {
+            inputDataset = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_Update);
+            
+            if(inputDataset == NULL) {
+                std::string message = std::string("Could not open image ") + inputImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            rsgis::rastergis::RSGISRasterAttUtils attUtils;
+            attUtils.exportColumns2ASCII(inputDataset, outputFile, fields);
+            
+            GDALClose(inputDataset);
+        }
+        catch(rsgis::RSGISException &e) {
+            throw RSGISCmdException(e.what());
+        }
+    }
+    
+    void executeClassTranslate(std::string inputImage, std::string classInField, std::string classOutField, std::map<size_t, size_t> classPairs)throw(RSGISCmdException) {
+        GDALAllRegister();
+        GDALDataset *inputDataset;
+        
+        try {
+            inputDataset = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_Update);
+            
+            if(inputDataset == NULL) {
+                std::string message = std::string("Could not open image ") + inputImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            rsgis::rastergis::RSGISRasterAttUtils attUtils;
+            attUtils.translateClasses(inputDataset, classInField, classOutField, classPairs);
+            
+            GDALClose(inputDataset);
+        } catch(rsgis::RSGISException &e) {
+            throw RSGISCmdException(e.what());
+        }
+    }
+    
+    void executeColourClasses(std::string inputImage, std::string classInField, std::map<size_t, RSGISColourIntCmds> classColourPairs)throw(RSGISCmdException) {
+        GDALAllRegister();
+        GDALDataset *inputDataset;
+        
+        try {
+            inputDataset = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_Update);
+            
+            if(inputDataset == NULL) {
+                std::string message = std::string("Could not open image ") + inputImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            // translate from RSGISColourIntCmds to RSGISColourInt object
+            std::map<size_t, utils::RSGISColourInt> ccPairs;
+            int r,g,b,a;
+            
+            for(std::map<size_t, RSGISColourIntCmds>::iterator iterClass = classColourPairs.begin(); iterClass != classColourPairs.end(); ++iterClass) {
+                r = (*iterClass).second.getRed();
+                g = (*iterClass).second.getGreen();
+                b = (*iterClass).second.getBlue();
+                a = (*iterClass).second.getAlpha();
+                ccPairs[(*iterClass).first] = utils::RSGISColourInt(r, g, b, a);
+            }
+            
+            rsgis::rastergis::RSGISRasterAttUtils attUtils;
+            attUtils.applyClassColours(inputDataset, classInField, ccPairs);
+            
+            GDALClose(inputDataset);
+        } catch(rsgis::RSGISException &e) {
+            throw RSGISCmdException(e.what());
+        }
+    }
+    
+    void executeColourStrClasses(std::string inputImage, std::string classInField, std::map<std::string, RSGISColourIntCmds> classStrColourPairs)throw(RSGISCmdException) {
+        GDALAllRegister();
+        GDALDataset *inputDataset;
+        try {
+            inputDataset = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_Update);
+            
+            if(inputDataset == NULL) {
+                std::string message = std::string("Could not open image ") + inputImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            // translate to map using RSGISColourInt type
+            std::map<std::string, utils::RSGISColourInt> ccPairs;
+            int r,g,b,a;
+            
+            for(std::map<std::string, RSGISColourIntCmds>::iterator iterClass = classStrColourPairs.begin(); iterClass != classStrColourPairs.end(); ++iterClass) {
+                r = (*iterClass).second.getRed();
+                g = (*iterClass).second.getGreen();
+                b = (*iterClass).second.getBlue();
+                a = (*iterClass).second.getAlpha();
+                ccPairs[(*iterClass).first] = utils::RSGISColourInt(r, g, b, a);
+            }
+            
+            rsgis::rastergis::RSGISRasterAttUtils attUtils;
+            attUtils.applyClassStrColours(inputDataset, classInField, ccPairs);
+            
+            GDALClose(inputDataset);
+        } catch(rsgis::RSGISException &e) {
+            throw RSGISCmdException(e.what());
+        }
+    }
+    
+    void executeGenerateColourTable(std::string inputImage, std::string clumpsImage, unsigned int redBand, unsigned int greenBand, unsigned int blueBand)throw(RSGISCmdException) {
+        GDALAllRegister();
+        GDALDataset *inputDataset, *clumpsDataset;
+        try {
+            inputDataset = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_Update);
+            if(inputDataset == NULL) {
+                std::string message = std::string("Could not open image ") + inputImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            clumpsDataset = (GDALDataset *) GDALOpenShared(clumpsImage.c_str(), GA_Update);
+            if(clumpsDataset == NULL) {
+                std::string message = std::string("Could not open image ") + clumpsImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            rsgis::rastergis::RSGISCalcClumpStats clumpStats;
+            clumpStats.populateColourTable(clumpsDataset, inputDataset, redBand, greenBand, blueBand);
+            
+            clumpsDataset->GetRasterBand(1)->SetMetadataItem("LAYER_TYPE", "thematic");
+            
+            GDALClose(inputDataset);
+            GDALClose(clumpsDataset);
+        } catch (rsgis::RSGISException &e) {
+            throw e;
+        }
+
+    }
+    
+    void executeStrClassMajority(std::string baseSegment, std::string infoSegment, std::string baseClassCol, std::string infoClassCol)throw(RSGISCmdException) {
+        GDALAllRegister();
+        GDALDataset *baseSegDataset, *infoSegDataset;
+        try {
+            baseSegDataset = (GDALDataset *) GDALOpen(baseSegment.c_str(), GA_Update);
+            if(baseSegDataset == NULL) {
+                std::string message = std::string("Could not open image ") + baseSegment;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            infoSegDataset = (GDALDataset *) GDALOpen(infoSegment.c_str(), GA_Update);
+            if(infoSegDataset == NULL) {
+                std::string message = std::string("Could not open image ") + infoSegment;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            rsgis::rastergis::RSGISFindInfoBetweenLayers findClassMajority;
+            findClassMajority.findClassMajority(baseSegDataset, infoSegDataset, baseClassCol, infoClassCol);
+            
+            GDALClose(baseSegDataset);
+            GDALClose(infoSegDataset);
+        } catch(rsgis::RSGISException &e) {
+            throw RSGISCmdException(e.what());
+        }
+    }
+    
+    void executeSpecDistMajorityClassifier(std::string inputImage, std::string inClassNameField, std::string outClassNameField, std::string trainingSelectCol, std::string eastingsField, std::string northingsField, std::string areaField, std::string majWeightField, std::vector<std::string> fields, float distThreshold, float specDistThreshold, SpectralDistanceMethodCmds distMethod, float specThresOriginDist)throw(RSGISCmdException) {
+        GDALAllRegister();
+        GDALDataset *inputDataset;
+        try {
+            inputDataset = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_Update);
+            if(inputDataset == NULL) {
+                std::string message = std::string("Could not open image ") + inputImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            rsgis::rastergis::SpectralDistanceMethod distThresMethod = (rsgis::rastergis::SpectralDistanceMethod) distMethod;
+            
+            rsgis::rastergis::RSGISFindClosestSpecSpatialFeats findFeats;
+            findFeats.applyMajorityClassifier(inputDataset, inClassNameField, outClassNameField, trainingSelectCol, eastingsField, northingsField, areaField, majWeightField, fields, distThreshold, specDistThreshold, distThresMethod, specThresOriginDist);
+            
+            GDALClose(inputDataset);
+        } catch(rsgis::RSGISException &e) {
+            throw RSGISCmdException(e.what());
+        }
+    }
+    
+    void executeMaxLikelihoodClassifier(std::string inputImage, std::string inClassNameField, std::string outClassNameField, std::string trainingSelectCol, std::string areaField, std::vector<std::string> fields, rsgismlpriorscmds priorsMethod, std::vector<std::string> priorStrs)throw(RSGISCmdException) {
+        GDALAllRegister();
+        GDALDataset *inputDataset;
+        std::vector<float> priors;
+        try
+        {
+            inputDataset = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_Update);
+            
+            if(inputDataset == NULL) {
+                std::string message = std::string("Could not open image ") + inputImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            // if the method is user defined we need to unpack the priorsStrs vector into priors
+            if(priorsMethod == rsgis_userdefined) {
+                rsgis::utils::RSGISTextUtils textUtils;
+                for(std::vector<std::string>::iterator iterStrs = priorStrs.begin(); iterStrs != priorStrs.end(); ++iterStrs) {
+                    try {
+                        priors.push_back(textUtils.strtofloat(*iterStrs));
+                    } catch (rsgis::utils::RSGISTextException &e) {
+                        throw rsgis::RSGISException(e.what());
+                    }
+                }
+            }
+
+            rsgis::rastergis::rsgismlpriors priMeth = (rsgis::rastergis::rsgismlpriors) priorsMethod;
+        
+            rsgis::rastergis::RSGISMaxLikelihoodRATClassification mlRat;
+            mlRat.applyMLClassifier(inputDataset, inClassNameField, outClassNameField, trainingSelectCol, areaField, fields, priMeth, priors);
+            
+            GDALClose(inputDataset);
+        } catch(rsgis::RSGISException &e) {
+            throw RSGISCmdException(e.what());
+        }
+    }
+    
+    void executeMaxLikelihoodClassiferLocalPriors(std::string inputImage, std::string inClassNameField, std::string outClassNameField, std::string trainingSelectCol,
+                                                  std::string areaField, std::vector<std::string> fields, std::string eastingsField, std::string northingsField,
+                                                  float distThreshold, rsgismlpriorscmds priorsMethod, float weightA, bool allowZeroPriors)throw(RSGISCmdException) {
+        GDALAllRegister();
+        GDALDataset *inputDataset;
+        try {
+            inputDataset = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_Update);
+            if(inputDataset == NULL) {
+                std::string message = std::string("Could not open image ") + inputImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            rsgis::rastergis::RSGISMaxLikelihoodRATClassification mlRat;
+            
+            rsgis::rastergis::rsgismlpriors priMeth = (rsgis::rastergis::rsgismlpriors) priorsMethod;
+            
+            mlRat.applyMLClassifierLocalPriors(inputDataset, inClassNameField, outClassNameField, trainingSelectCol, areaField, fields, eastingsField, northingsField, distThreshold, priMeth, weightA, allowZeroPriors);
+            
+            GDALClose(inputDataset);
+        } catch(rsgis::RSGISException &e) {
+            throw RSGISCmdException(e.what());
+        }
+    }
+    
+    void executeClassMask(std::string inputImage, std::string classField, std::string className, std::string outputFile, std::string imageFormat, RSGISLibDataType dataType)throw(RSGISCmdException) {
+        GDALAllRegister();
+        GDALDataset *inputDataset;
+        try {
+            inputDataset = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_Update);
+            if(inputDataset == NULL) {
+                std::string message = std::string("Could not open image ") + inputImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            rsgis::rastergis::RSGISRasterAttUtils attUtils;
+            const GDALRasterAttributeTable *gdalATT = inputDataset->GetRasterBand(1)->GetDefaultRAT();
+            
+            unsigned int colIdx = attUtils.findColumnIndex(gdalATT, classField);
+            std::string *bandNames = new std::string[1];
+            bandNames[0] = std::string("MASK - ") + className;
+            
+            rsgis::rastergis::RSGISClassMask *calcImageVal = new rsgis::rastergis::RSGISClassMask(gdalATT, colIdx, className);
+            rsgis::img::RSGISCalcImage calcImage(calcImageVal);
+            
+            GDALDataType outDataType = (GDALDataType) dataType;
+            
+            calcImage.calcImage(&inputDataset, 1, outputFile, true, bandNames, imageFormat, outDataType);
+            delete calcImageVal;
+            delete[] bandNames;
+            
+            GDALClose(inputDataset);
+        } catch(rsgis::RSGISException &e) {
+            throw RSGISCmdException(e.what());
+        }
+    }
+    
+    void executeFindNeighbours(std::string inputImage)throw(RSGISCmdException) {
+        GDALAllRegister();
+        GDALDataset *inputDataset;
+        try {
+            inputDataset = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_Update);
+            if(inputDataset == NULL) {
+                std::string message = std::string("Could not open image ") + inputImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            rsgis::rastergis::RSGISFindClumpNeighbours findNeighboursObj;
+            findNeighboursObj.findNeighboursKEAImageCalc(inputDataset);
+            
+            GDALClose(inputDataset);
+        } catch(rsgis::RSGISException &e) {
+            throw RSGISCmdException(e.what());
+        }
+    }
+    
+    void executeFindBoundaryPixels(std::string inputImage, std::string outputFile, std::string imageFormat)throw(RSGISCmdException) {
+        GDALAllRegister();
+        GDALDataset *inputDataset;
+        try {
+            inputDataset = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_Update);
+            if(inputDataset == NULL) {
+                std::string message = std::string("Could not open image ") + inputImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            rsgis::img::RSGISCalcImageValue *findBoundaries = new rsgis::rastergis::RSGISIdentifyBoundaryPixels();
+            rsgis::img::RSGISCalcImage imgCalc = rsgis::img::RSGISCalcImage(findBoundaries);
+            
+            imgCalc.calcImageWindowData(&inputDataset, 1, outputFile, 3, imageFormat, GDT_Byte);
+            
+            GDALClose(inputDataset);
+            delete findBoundaries;
+        } catch(rsgis::RSGISException &e) {
+            throw RSGISCmdException(e.what());
+        }
+    }
+    
+    void executeCalcBorderLength(std::string inputImage, bool ignoreZeroEdges, std::string outColsName)throw(RSGISCmdException) {
+        GDALAllRegister();
+        GDALDataset *inputDataset;
+        try
+        {
+            inputDataset = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_Update);
+            if(inputDataset == NULL) {
+                std::string message = std::string("Could not open image ") + inputImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            rsgis::rastergis::RSGISClumpBorders clumpBorders;
+            clumpBorders.calcClumpBorderLength(inputDataset, !ignoreZeroEdges, outColsName);
+            
+            GDALClose(inputDataset);
+        } catch(rsgis::RSGISException &e) {
+            throw RSGISCmdException(e.what());
+        }
+
+    }
+    
+    void executeCalcRelBorder(std::string inputImage, std::string outColsName, std::string classNameField, std::string className, bool ignoreZeroEdges)throw(RSGISCmdException) {
+        GDALAllRegister();
+        GDALDataset *inputDataset;
+        try {
+            inputDataset = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_Update);
+            if(inputDataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            rsgis::rastergis::RSGISClumpBorders clumpBorders;
+            clumpBorders.calcClumpRelBorderLen2Class(inputDataset, !ignoreZeroEdges, outColsName, classNameField, className);
+            
+            GDALClose(inputDataset);
+        } catch(rsgis::RSGISException &e) {
+            throw RSGISCmdException(e.what());
+        }
+    }
+    
+    void executeCalcShapeIndices(std::string inputImage, std::vector<RSGISShapeParamCmds> shapeIndexes)throw(RSGISCmdException) {
+        std::cout.precision(12);
+        GDALAllRegister();
+        GDALDataset *inputDataset;
+        try
+        {
+            inputDataset = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_Update);
+            if(inputDataset == NULL) {
+                std::string message = std::string("Could not open image ") + inputImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            // unpack shapeIndexes vector, translating to structs and enums required
+            std::vector<rastergis::RSGISShapeParam> shapes;
+            shapes.reserve(shapeIndexes.size());
+            std::vector<RSGISShapeParamCmds>::iterator shapeIter;
+            for(shapeIter = shapeIndexes.begin(); shapeIter != shapeIndexes.end(); ++shapeIter) {
+                rastergis::rsgisshapeindex idx = (rastergis::rsgisshapeindex) (*shapeIter).idx;
+                std::string colName = (*shapeIter).colName;
+                unsigned int colIdx = (*shapeIter).colIdx;
+                
+                rastergis::RSGISShapeParam p;
+                p.idx = idx;
+                p.colName = colName;
+                p.colIdx = colIdx;
+                
+                shapes.push_back(p);
+            }
+            
+            
+            rsgis::rastergis::RSGISCalcClumpShapeParameters calcShapeParams;
+            calcShapeParams.calcClumpShapeParams(inputDataset, shapes);
+            
+            for(std::vector<rsgis::rastergis::RSGISShapeParam*>::iterator iterIndexes = shapeIndexes->begin(); iterIndexes != shapeIndexes->end(); ++iterIndexes)
+            {
+                delete *iterIndexes;
+            }
+            delete shapeIndexes;
+            
+            GDALClose(inputDataset);
+        }
+        catch(rsgis::RSGISException &e)
+        {
+            throw e;
         }
     }
     

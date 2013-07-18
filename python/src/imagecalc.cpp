@@ -554,7 +554,7 @@ static PyObject *ImageCalc_MeanVector(PyObject *self, PyObject *args) {
         return NULL;
 
     try {
-        rsgis::cmds::executeMeanVetor(inputImage, outputMatrix);
+        rsgis::cmds::executeMeanVector(inputImage, outputMatrix);
     } catch (rsgis::cmds::RSGISCmdException &e) {
         PyErr_SetString(GETSTATE(self)->error, e.what());
         return NULL;
@@ -615,7 +615,6 @@ static PyObject *ImageCalc_ReplaceValuesLessThan(PyObject *self, PyObject *args)
 
 static PyObject *ImageCalc_UnitArea(PyObject *self, PyObject *args) {
     const char *inputImage, *outputImage, *inputMatrix;
-    double threshold, value;
 
     if(!PyArg_ParseTuple(args, "sss:unitArea", &inputImage, &outputImage, &inputMatrix))
         return NULL;
@@ -708,7 +707,7 @@ static PyObject *ImageCalc_MovementSpeed(PyObject *self, PyObject *args) {
 }
 
 static PyObject *ImageCalc_CountValsInCols(PyObject *self, PyObject *args) {
-    const char *inputImage, *outputImage,;
+    const char *inputImage, *outputImage;
     double upper, lower;
 
     if(!PyArg_ParseTuple(args, "sffs:countValsInCols", &inputImage, &upper, &lower, &outputImage))
@@ -759,7 +758,7 @@ static PyObject *ImageCalc_Dist2Geoms(PyObject *self, PyObject *args) {
 }
 
 static PyObject *ImageCalc_ImageBandStats(PyObject *self, PyObject *args) {
-    const char *inputImage, *outputFile;
+    const char *inputImage, *outputFile, *inputVector;
     int ignoreZeros;
 
     if(!PyArg_ParseTuple(args, "ssi:imageBandStats", &inputVector, &outputFile, &ignoreZeros))
@@ -776,7 +775,7 @@ static PyObject *ImageCalc_ImageBandStats(PyObject *self, PyObject *args) {
 }
 
 static PyObject *ImageCalc_ImageStats(PyObject *self, PyObject *args) {
-    const char *inputImage, *outputFile;
+    const char *inputImage, *outputFile, *inputVector;
     int ignoreZeros;
 
     if(!PyArg_ParseTuple(args, "ssi:imageStats", &inputVector, &outputFile, &ignoreZeros))
@@ -883,7 +882,7 @@ static PyObject *ImageCalc_AllBandsEqualTo(PyObject *self, PyObject *args) {
     rsgis::RSGISLibDataType type = (rsgis::RSGISLibDataType)dataType;
 
     try {
-        rsgis::cmds::executeAllBandsEqualTo(inputImage, imgValue, outputTrueVal, outputFalseVal, outputImage, imageFormat, dataType);
+        rsgis::cmds::executeAllBandsEqualTo(inputImage, imgValue, outputTrueVal, outputFalseVal, outputImage, imageFormat, type);
     } catch (rsgis::cmds::RSGISCmdException &e) {
         PyErr_SetString(GETSTATE(self)->error, e.what());
         return NULL;

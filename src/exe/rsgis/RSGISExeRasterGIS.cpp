@@ -3043,7 +3043,7 @@ namespace rsgisexe{
 
                 try
                 {
-                    rsgis::cmds::executeCoptRAT(this->inputImage, this->clumpsImage);
+                    rsgis::cmds::executeCopyRAT(this->inputImage, this->clumpsImage);
                 }
                 catch(rsgis::cmds::RSGISCmdException &e)
                 {
@@ -3073,32 +3073,19 @@ namespace rsgisexe{
                 std::cout << "Feature: " << this->fid << std::endl;
                 std::cout << "Output Field: " << this->outputField << std::endl;
                 std::cout << "Distance calculated using:\n";
-                for(std::vector<std::string>::iterator iterFields = fields.begin(); iterFields != fields.end(); ++iterFields)
-                {
+                for(std::vector<std::string>::iterator iterFields = fields.begin(); iterFields != fields.end(); ++iterFields) {
                     std::cout << "\tField: " << (*iterFields) << std::endl;
                 }
 
-                try
-                {
-                    GDALAllRegister();
-
-                    GDALDataset *inputDataset = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_Update);
-                    if(inputDataset == NULL)
-                    {
-                        std::string message = std::string("Could not open image ") + this->inputImage;
-                        throw rsgis::RSGISImageException(message.c_str());
-                    }
-
-                    rsgis::rastergis::RSGISCalcEucDistanceInAttTable calcDist;
-                    calcDist.calcEucDist(inputDataset, this->fid, this->outputField, this->fields);
-
-                    GDALClose(inputDataset);
+                try {
+                    rsgis::cmds::executeEucDistFromFeature(this->inputImage, this->fid, this->outputField, this->fields);
+                } catch (rsgis::RSGISException e) {
+                    throw rsgis::RSGISException(e.what());
+                } catch (rsgis::cmds::RSGISCmdException e) {
+                    throw rsgis::RSGISException(e.what());
+                } catch (std::exception e) {
+                    throw rsgis::RSGISException(e.what());
                 }
-                catch(rsgis::RSGISException &e)
-                {
-                    throw e;
-                }
-
             }
             else if(this->option == RSGISExeRasterGIS::findtopn)
             {
@@ -3110,27 +3097,15 @@ namespace rsgisexe{
                 std::cout << "Distance threshold: " << this->distThreshold << std::endl;
                 std::cout << "N: " << this->nFeatures << std::endl;
 
-                try
-                {
-                    GDALAllRegister();
-
-                    GDALDataset *inputDataset = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_Update);
-                    if(inputDataset == NULL)
-                    {
-                        std::string message = std::string("Could not open image ") + this->inputImage;
-                        throw rsgis::RSGISImageException(message.c_str());
-                    }
-
-                    rsgis::rastergis::RSGISFindTopNWithinDist calcTopN;
-                    calcTopN.calcMinDistTopN(inputDataset, this->spatialDistField, this->distanceField, this->outputField, this->nFeatures, this->distThreshold);
-
-                    GDALClose(inputDataset);
+                try {
+                    rsgis::cmds::executeFindTopN(this->inputImage, this->spatialDistField, this->distanceField, this->outputField, this->nFeatures, this->distThreshold);
+                } catch (rsgis::RSGISException e) {
+                    throw rsgis::RSGISException(e.what());
+                } catch (rsgis::cmds::RSGISCmdException e) {
+                    throw rsgis::RSGISException(e.what());
+                } catch (std::exception e) {
+                    throw rsgis::RSGISException(e.what());
                 }
-                catch(rsgis::RSGISException &e)
-                {
-                    throw e;
-                }
-
             }
             else if(this->option == RSGISExeRasterGIS::findspecclose)
             {
@@ -3142,25 +3117,14 @@ namespace rsgisexe{
                 std::cout << "Spatial Distance threshold: " << this->distThreshold << std::endl;
                 std::cout << "Spectral Distance threshold: " << this->specDistThreshold << std::endl;
 
-                try
-                {
-                    GDALAllRegister();
-
-                    GDALDataset *inputDataset = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_Update);
-                    if(inputDataset == NULL)
-                    {
-                        std::string message = std::string("Could not open image ") + this->inputImage;
-                        throw rsgis::RSGISImageException(message.c_str());
-                    }
-
-                    rsgis::rastergis::RSGISFindClosestSpecSpatialFeats findFeats;
-                    findFeats.calcFeatsWithinSpatSpecThresholds(inputDataset, this->spatialDistField, this->distanceField, this->outputField, this->specDistThreshold, this->distThreshold);
-
-                    GDALClose(inputDataset);
-                }
-                catch(rsgis::RSGISException &e)
-                {
-                    throw e;
+                try {
+                    rsgis::cmds::executeFindSpecClose(this->inputImage, this->distanceField, this->spatialDistField, this->outputField, this->specDistThreshold, this->distThreshold);
+                } catch (rsgis::RSGISException e) {
+                    throw rsgis::RSGISException(e.what());
+                } catch (rsgis::cmds::RSGISCmdException e) {
+                    throw rsgis::RSGISException(e.what());
+                } catch (std::exception e) {
+                    throw rsgis::RSGISException(e.what());
                 }
 
             }
@@ -3291,30 +3255,19 @@ namespace rsgisexe{
                 {
                     std::cout << "Using standard majority method\n";
                 }
-                else if(this->majMethod == rsgis::rastergis::stdMajority)
+                else if(this->majMethod == rsgis::rastergis::weightedMajority)
                 {
-                    std::cout << "Using standard majority method\n";
+                    std::cout << "Using weighted majority method\n";
                 }
 
-                try
-                {
-                    GDALAllRegister();
-
-                    GDALDataset *inputDataset = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_Update);
-                    if(inputDataset == NULL)
-                    {
-                        std::string message = std::string("Could not open image ") + this->inputImage;
-                        throw rsgis::RSGISImageException(message.c_str());
-                    }
-
-                    rsgis::rastergis::RSGISKNNATTMajorityClassifier knnMajorityClass;
-                    knnMajorityClass.applyKNNClassifier(inputDataset, this->inClassNameField, this->outClassNameField, this->trainingSelectCol, this->eastingsField, this->northingsField, this->areaField, this->majWeightField, this->fields, this->nFeatures, this->distThreshold, this->weightA, this->majMethod);
-
-                    GDALClose(inputDataset);
-                }
-                catch(rsgis::RSGISException &e)
-                {
-                    throw e;
+                try {
+                    rsgis::cmds::executeKnnMajorityClassifier(this->inputImage, this->inClassNameField, this->outClassNameField, this->trainingSelectCol, this->eastingsField, this->northingsField, this->areaField, this->majWeightField, this->fields, this->nFeatures, this->distThreshold, this->weightA, &this->majMethod);
+                } catch (rsgis::RSGISException e) {
+                    throw rsgis::RSGISException(e.what());
+                } catch (rsgis::cmds::RSGISCmdException e) {
+                    throw rsgis::RSGISException(e.what());
+                } catch (std::exception e) {
+                    throw rsgis::RSGISException(e.what());
                 }
             }
             else if(this->option == RSGISExeRasterGIS::popattributepercentile)
@@ -3349,25 +3302,14 @@ namespace rsgisexe{
                     std::cout << "\tField: " << (*iterFields) << std::endl;
                 }
 
-                try
-                {
-                    GDALAllRegister();
-
-                    GDALDataset *inputDataset = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_Update);
-                    if(inputDataset == NULL)
-                    {
-                        std::string message = std::string("Could not open image ") + this->inputImage;
-                        throw rsgis::RSGISImageException(message.c_str());
-                    }
-
-                    rsgis::rastergis::RSGISRasterAttUtils attUtils;
-                    attUtils.exportColumns2ASCII(inputDataset, this->outputFile, this->fields);
-
-                    GDALClose(inputDataset);
-                }
-                catch(rsgis::RSGISException &e)
-                {
-                    throw e;
+                try {
+                    rsgis::cmds::executeExport2Ascii(this->inputImage, this->outputFile, this->fields);
+                } catch (rsgis::RSGISException e) {
+                    throw rsgis::RSGISException(e.what());
+                } catch (rsgis::cmds::RSGISCmdException e) {
+                    throw rsgis::RSGISException(e.what());
+                } catch (std::exception e) {
+                    throw rsgis::RSGISException(e.what());
                 }
             }
             else if(this->option == RSGISExeRasterGIS::classtranslate)
@@ -3381,26 +3323,15 @@ namespace rsgisexe{
                 {
                     std::cout << "\tClass " << (*iterClass).first << " = " << (*iterClass).second << std::endl;
                 }
-
-                try
-                {
-                    GDALAllRegister();
-
-                    GDALDataset *inputDataset = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_Update);
-                    if(inputDataset == NULL)
-                    {
-                        std::string message = std::string("Could not open image ") + this->inputImage;
-                        throw rsgis::RSGISImageException(message.c_str());
-                    }
-
-                    rsgis::rastergis::RSGISRasterAttUtils attUtils;
-                    attUtils.translateClasses(inputDataset, this->classInField, this->classOutField, this->classPairs);
-
-                    GDALClose(inputDataset);
-                }
-                catch(rsgis::RSGISException &e)
-                {
-                    throw e;
+                
+                try {
+                    rsgis::cmds::executeClassTranslate(this->inputImage, this->classInField, this->classOutField, this->classPairs);
+                } catch (rsgis::RSGISException e) {
+                    throw rsgis::RSGISException(e.what());
+                } catch (rsgis::cmds::RSGISCmdException e) {
+                    throw rsgis::RSGISException(e.what());
+                } catch (std::exception e) {
+                    throw rsgis::RSGISException(e.what());
                 }
             }
             else if(this->option == RSGISExeRasterGIS::colourclasses)
@@ -3409,30 +3340,27 @@ namespace rsgisexe{
                 std::cout << "Input Image: " << this->inputImage << std::endl;
                 std::cout << "Input Class Field: " << this->classInField << std::endl;
                 std::cout << "Class Colour Pairs:\n";
-                for(std::map<size_t, rsgis::utils::RSGISColourInt>::iterator iterClass = classColourPairs.begin(); iterClass != classColourPairs.end(); ++iterClass)
-                {
+                
+                // print out colours, also translate to map using RSGISColourIntCmds
+                int r,g,b,a;
+                std::map<size_t, rsgis::cmds::RSGISColourIntCmds> ccPairs;
+                for(std::map<size_t, rsgis::utils::RSGISColourInt>::iterator iterClass = this->classColourPairs.begin(); iterClass != this->classColourPairs.end(); ++iterClass) {
                     std::cout << "\tClass " << (*iterClass).first << " = [" << (*iterClass).second.getRed() << "," << (*iterClass).second.getGreen() << "," << (*iterClass).second.getBlue() << "," << (*iterClass).second.getAlpha() << "]" << std::endl;
+                    r = (*iterClass).second.getRed();
+                    g = (*iterClass).second.getGreen();
+                    b = (*iterClass).second.getBlue();
+                    a = (*iterClass).second.getAlpha();
+                    ccPairs[(*iterClass).first] = rsgis::cmds::RSGISColourIntCmds(r, g, b, a);
                 }
 
-                try
-                {
-                    GDALAllRegister();
-
-                    GDALDataset *inputDataset = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_Update);
-                    if(inputDataset == NULL)
-                    {
-                        std::string message = std::string("Could not open image ") + this->inputImage;
-                        throw rsgis::RSGISImageException(message.c_str());
-                    }
-
-                    rsgis::rastergis::RSGISRasterAttUtils attUtils;
-                    attUtils.applyClassColours(inputDataset, this->classInField, this->classColourPairs);
-
-                    GDALClose(inputDataset);
-                }
-                catch(rsgis::RSGISException &e)
-                {
-                    throw e;
+                try {
+                    rsgis::cmds::executeColourClasses(this->inputImage, this->classInField, ccPairs);
+                } catch (rsgis::RSGISException e) {
+                    throw rsgis::RSGISException(e.what());
+                } catch (rsgis::cmds::RSGISCmdException e) {
+                    throw rsgis::RSGISException(e.what());
+                } catch (std::exception e) {
+                    throw rsgis::RSGISException(e.what());
                 }
             }
             else if(this->option == RSGISExeRasterGIS::colourstrclasses)
@@ -3441,31 +3369,28 @@ namespace rsgisexe{
                 std::cout << "Input Image: " << this->inputImage << std::endl;
                 std::cout << "Input Class Field: " << this->classInField << std::endl;
                 std::cout << "Class Colour Pairs:\n";
-                for(std::map<size_t, rsgis::utils::RSGISColourInt>::iterator iterClass = classColourPairs.begin(); iterClass != classColourPairs.end(); ++iterClass)
-                {
+                // translate and print out colours
+                int r,g,b,a;
+                std::map<std::string, rsgis::cmds::RSGISColourIntCmds> ccPairs;
+                for(std::map<std::string, rsgis::utils::RSGISColourInt>::iterator iterClass = classStrColourPairs.begin(); iterClass != classStrColourPairs.end(); ++iterClass) {
                     std::cout << "\tClass \'" << (*iterClass).first << "\' = [" << (*iterClass).second.getRed() << "," << (*iterClass).second.getGreen() << "," << (*iterClass).second.getBlue() << "," << (*iterClass).second.getAlpha() << "]" << std::endl;
+                    r = (*iterClass).second.getRed();
+                    g = (*iterClass).second.getGreen();
+                    b = (*iterClass).second.getBlue();
+                    a = (*iterClass).second.getAlpha();
+                    ccPairs[(*iterClass).first] = rsgis::cmds::RSGISColourIntCmds(r, g, b, a);
                 }
 
-                try
-                {
-                    GDALAllRegister();
-
-                    GDALDataset *inputDataset = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_Update);
-                    if(inputDataset == NULL)
-                    {
-                        std::string message = std::string("Could not open image ") + this->inputImage;
-                        throw rsgis::RSGISImageException(message.c_str());
-                    }
-
-                    rsgis::rastergis::RSGISRasterAttUtils attUtils;
-                    attUtils.applyClassStrColours(inputDataset, this->classInField, this->classStrColourPairs);
-
-                    GDALClose(inputDataset);
+                try {
+                    rsgis::cmds::executeColourStrClasses(this->inputImage, this->classInField, ccPairs);
+                } catch (rsgis::RSGISException e) {
+                    throw rsgis::RSGISException(e.what());
+                } catch (rsgis::cmds::RSGISCmdException e) {
+                    throw rsgis::RSGISException(e.what());
+                } catch (std::exception e) {
+                    throw rsgis::RSGISException(e.what());
                 }
-                catch(rsgis::RSGISException &e)
-                {
-                    throw e;
-                }
+
             }
             else if(this->option == RSGISExeRasterGIS::gencolourtab)
             {
@@ -3476,36 +3401,16 @@ namespace rsgisexe{
                 std::cout << "Green: " << this->greenBand <<std::endl;
                 std::cout << "Blue: " << this->blueBand <<std::endl;
 
-                try
-                {
-                    GDALAllRegister();
-
-                    GDALDataset *inputDataset = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_Update);
-                    if(inputDataset == NULL)
-                    {
-                        std::string message = std::string("Could not open image ") + this->inputImage;
-                        throw rsgis::RSGISImageException(message.c_str());
-                    }
-
-                    GDALDataset *clumpsDataset = (GDALDataset *) GDALOpenShared(this->clumpsImage.c_str(), GA_Update);
-                    if(clumpsDataset == NULL)
-                    {
-                        std::string message = std::string("Could not open image ") + this->clumpsImage;
-                        throw rsgis::RSGISImageException(message.c_str());
-                    }
-
-                    rsgis::rastergis::RSGISCalcClumpStats clumpStats;
-                    clumpStats.populateColourTable(clumpsDataset, inputDataset, this->redBand, this->greenBand, this->blueBand);
-
-                    clumpsDataset->GetRasterBand(1)->SetMetadataItem("LAYER_TYPE", "thematic");
-
-                    GDALClose(inputDataset);
-                    GDALClose(clumpsDataset);
+                try {
+                    rsgis::cmds::executeGenerateColourTable(this->inputImage, this->clumpsImage, this->redBand, this->greenBand, this->blueBand);
+                } catch (rsgis::RSGISException e) {
+                    throw rsgis::RSGISException(e.what());
+                } catch (rsgis::cmds::RSGISCmdException e) {
+                    throw rsgis::RSGISException(e.what());
+                } catch (std::exception e) {
+                    throw rsgis::RSGISException(e.what());
                 }
-                catch (rsgis::RSGISException &e)
-                {
-                    throw e;
-                }
+
             }
             else if(this->option == RSGISExeRasterGIS::exportcols2raster)
             {
@@ -3537,33 +3442,14 @@ namespace rsgisexe{
                 std::cout << "Base Class Columns: " << this->baseClassCol << std::endl;
                 std::cout << "Info Class Columns: " << this->infoClassCol << std::endl;
 
-                try
-                {
-                    GDALAllRegister();
-
-                    GDALDataset *baseSegDataset = (GDALDataset *) GDALOpen(this->baseSegment.c_str(), GA_Update);
-                    if(baseSegDataset == NULL)
-                    {
-                        std::string message = std::string("Could not open image ") + this->baseSegment;
-                        throw rsgis::RSGISImageException(message.c_str());
-                    }
-
-                    GDALDataset *infoSegDataset = (GDALDataset *) GDALOpen(this->infoSegment.c_str(), GA_Update);
-                    if(infoSegDataset == NULL)
-                    {
-                        std::string message = std::string("Could not open image ") + this->infoSegment;
-                        throw rsgis::RSGISImageException(message.c_str());
-                    }
-
-                    rsgis::rastergis::RSGISFindInfoBetweenLayers findClassMajority;
-                    findClassMajority.findClassMajority(baseSegDataset, infoSegDataset, this->baseClassCol, this->infoClassCol);
-
-                    GDALClose(baseSegDataset);
-                    GDALClose(infoSegDataset);
-                }
-                catch(rsgis::RSGISException &e)
-                {
-                    throw e;
+                try {
+                    rsgis::cmds::executeStrClassMajority(this->baseSegment, this->infoSegment, this->baseClassCol, this->infoClassCol);
+                } catch (rsgis::RSGISException e) {
+                    throw rsgis::RSGISException(e.what());
+                } catch (rsgis::cmds::RSGISCmdException e) {
+                    throw rsgis::RSGISException(e.what());
+                } catch (std::exception e) {
+                    throw rsgis::RSGISException(e.what());
                 }
             }
             else if(this->option == RSGISExeRasterGIS::specdistmajorityclassifier)
@@ -3593,25 +3479,14 @@ namespace rsgisexe{
                     std::cout << "\tField: " << (*iterFields) << std::endl;
                 }
 
-                try
-                {
-                    GDALAllRegister();
-
-                    GDALDataset *inputDataset = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_Update);
-                    if(inputDataset == NULL)
-                    {
-                        std::string message = std::string("Could not open image ") + this->inputImage;
-                        throw rsgis::RSGISImageException(message.c_str());
-                    }
-
-                    rsgis::rastergis::RSGISFindClosestSpecSpatialFeats findFeats;
-                    findFeats.applyMajorityClassifier(inputDataset, this->inClassNameField, this->outClassNameField, this->trainingSelectCol, this->eastingsField, this->northingsField, this->areaField, this->majWeightField, this->fields, this->distThreshold, this->specDistThreshold, this->distThresMethod, this->specThresOriginDist);
-
-                    GDALClose(inputDataset);
-                }
-                catch(rsgis::RSGISException &e)
-                {
-                    throw e;
+                try {
+                    rsgis::cmds::executeSpecDistMajorityClassifier(this->inputImage, this->inClassNameField, this->outClassNameField, this->trainingSelectCol, this->eastingsField, this->northingsField, this->areaField, this->majWeightField, this->fields, this->distThreshold, this->specDistThreshold, (rsgis::cmds::SpectralDistanceMethodCmds)this->distThresMethod, this->specThresOriginDist);
+                } catch (rsgis::RSGISException e) {
+                    throw rsgis::RSGISException(e.what());
+                } catch (rsgis::cmds::RSGISCmdException e) {
+                    throw rsgis::RSGISException(e.what());
+                } catch (std::exception e) {
+                    throw rsgis::RSGISException(e.what());
                 }
             }
             else if(this->option == RSGISExeRasterGIS::maxlikelihoodclassifier)
@@ -3623,63 +3498,34 @@ namespace rsgisexe{
                 std::cout << "Selected Training: " << this->trainingSelectCol << std::endl;
                 std::cout << "Area Field: " << this->areaField << std::endl;
                 std::vector<float> priors;
-                if(this->priorsMethod == rsgis::rastergis::rsgis_samples)
-                {
+                if(this->priorsMethod == rsgis::rastergis::rsgis_samples) {
                     std::cout << "Priors calculated using number of samples.\n";
-                }
-                else if(this->priorsMethod == rsgis::rastergis::rsgis_area)
-                {
+                } else if(this->priorsMethod == rsgis::rastergis::rsgis_area) {
                     std::cout << "Priors calculated using area of samples.\n";
-                }
-                else if(this->priorsMethod == rsgis::rastergis::rsgis_equal)
-                {
+                } else if(this->priorsMethod == rsgis::rastergis::rsgis_equal) {
                     std::cout << "Priors will all be equal.\n";
-                }
-                else if(this->priorsMethod == rsgis::rastergis::rsgis_userdefined)
-                {
+                } else if(this->priorsMethod == rsgis::rastergis::rsgis_userdefined) {
                     std::cout << "Priors have been defined by the user as: \n";
                     int idx = 1;
-                    rsgis::utils::RSGISTextUtils textUtils;
-                    for(std::vector<std::string>::iterator iterStrs = this->priorStrs.begin(); iterStrs != this->priorStrs.end(); ++iterStrs)
-                    {
+                    for(std::vector<std::string>::iterator iterStrs = this->priorStrs.begin(); iterStrs != this->priorStrs.end(); ++iterStrs) {
                         std::cout << "\t" << idx << ": " << *iterStrs << std::endl;
-                        try
-                        {
-                            priors.push_back(textUtils.strtofloat(*iterStrs));
-                        }
-                        catch (rsgis::utils::RSGISTextException &e)
-                        {
-                            throw rsgis::RSGISException(e.what());
-                        }
                         ++idx;
                     }
                 }
 
                 std::cout << "Using Features:\n";
-                for(std::vector<std::string>::iterator iterFields = fields.begin(); iterFields != fields.end(); ++iterFields)
-                {
+                for(std::vector<std::string>::iterator iterFields = fields.begin(); iterFields != fields.end(); ++iterFields) {
                     std::cout << "\tField: " << (*iterFields) << std::endl;
                 }
 
-                try
-                {
-                    GDALAllRegister();
-
-                    GDALDataset *inputDataset = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_Update);
-                    if(inputDataset == NULL)
-                    {
-                        std::string message = std::string("Could not open image ") + this->inputImage;
-                        throw rsgis::RSGISImageException(message.c_str());
-                    }
-
-                    rsgis::rastergis::RSGISMaxLikelihoodRATClassification mlRat;
-                    mlRat.applyMLClassifier(inputDataset, this->inClassNameField, this->outClassNameField, this->trainingSelectCol, this->areaField, this->fields, this->priorsMethod, priors);
-
-                    GDALClose(inputDataset);
-                }
-                catch(rsgis::RSGISException &e)
-                {
-                    throw e;
+                try {
+                    rsgis::cmds::executeMaxLikelihoodClassifier(this->inputImage, this->inClassNameField, this->outClassNameField, this->trainingSelectCol, this->areaField, this->fields, (rsgis::cmds::rsgismlpriorscmds)this->priorsMethod, this->priorStrs);
+                } catch (rsgis::RSGISException e) {
+                    throw rsgis::RSGISException(e.what());
+                } catch (rsgis::cmds::RSGISCmdException e) {
+                    throw rsgis::RSGISException(e.what());
+                } catch (std::exception e) {
+                    throw rsgis::RSGISException(e.what());
                 }
             }
             else if(this->option == RSGISExeRasterGIS::maxlikelihoodclassifierlocalpriors)
@@ -3716,25 +3562,14 @@ namespace rsgisexe{
                     std::cout << "\tField: " << (*iterFields) << std::endl;
                 }
 
-                try
-                {
-                    GDALAllRegister();
-
-                    GDALDataset *inputDataset = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_Update);
-                    if(inputDataset == NULL)
-                    {
-                        std::string message = std::string("Could not open image ") + this->inputImage;
-                        throw rsgis::RSGISImageException(message.c_str());
-                    }
-
-                    rsgis::rastergis::RSGISMaxLikelihoodRATClassification mlRat;
-                    mlRat.applyMLClassifierLocalPriors(inputDataset, this->inClassNameField, this->outClassNameField, this->trainingSelectCol, this->areaField, this->fields, this->eastingsField, this->northingsField, this->distThreshold, this->priorsMethod, this->weightA, this->allowZeroPriors);
-
-                    GDALClose(inputDataset);
-                }
-                catch(rsgis::RSGISException &e)
-                {
-                    throw e;
+                try {
+                    rsgis::cmds::executeMaxLikelihoodClassiferLocalPriors(this->inputImage, this->inClassNameField, this->outClassNameField, this->trainingSelectCol, this->areaField, this->fields, this->eastingsField, this->northingsField, this->distThreshold, (rsgis::cmds::rsgismlpriorscmds)this->priorsMethod, this->weightA, this->allowZeroPriors);
+                } catch (rsgis::RSGISException e) {
+                    throw rsgis::RSGISException(e.what());
+                } catch (rsgis::cmds::RSGISCmdException e) {
+                    throw rsgis::RSGISException(e.what());
+                } catch (std::exception e) {
+                    throw rsgis::RSGISException(e.what());
                 }
             }
             else if(this->option == RSGISExeRasterGIS::classmask)
@@ -3746,35 +3581,14 @@ namespace rsgisexe{
                 std::cout << "Output Format: " << this->imageFormat << std::endl;
                 std::cout << "Output File: " << this->outputFile << std::endl;
 
-                try
-                {
-                    GDALAllRegister();
-
-                    GDALDataset *inputDataset = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_Update);
-                    if(inputDataset == NULL)
-                    {
-                        std::string message = std::string("Could not open image ") + this->inputImage;
-                        throw rsgis::RSGISImageException(message.c_str());
-                    }
-
-                    rsgis::rastergis::RSGISRasterAttUtils attUtils;
-                    const GDALRasterAttributeTable *gdalATT = inputDataset->GetRasterBand(1)->GetDefaultRAT();
-
-                    unsigned int colIdx = attUtils.findColumnIndex(gdalATT, classField);
-                    std::string *bandNames = new std::string[1];
-                    bandNames[0] = std::string("MASK - ") + this->className;
-
-                    rsgis::rastergis::RSGISClassMask *calcImageVal = new rsgis::rastergis::RSGISClassMask(gdalATT, colIdx, className);
-                    rsgis::img::RSGISCalcImage calcImage(calcImageVal);
-                    calcImage.calcImage(&inputDataset, 1, this->outputFile, true, bandNames, this->imageFormat, outDataType);
-                    delete calcImageVal;
-                    delete[] bandNames;
-
-                    GDALClose(inputDataset);
-                }
-                catch(rsgis::RSGISException &e)
-                {
-                    throw e;
+                try {
+                    rsgis::cmds::executeClassMask(this->inputImage, this->classField, this->className, this->outputFile, this->imageFormat, (rsgis::RSGISLibDataType)this->outDataType);
+                } catch (rsgis::RSGISException e) {
+                    throw rsgis::RSGISException(e.what());
+                } catch (rsgis::cmds::RSGISCmdException e) {
+                    throw rsgis::RSGISException(e.what());
+                } catch (std::exception e) {
+                    throw rsgis::RSGISException(e.what());
                 }
             }
             else if(this->option == RSGISExeRasterGIS::findneighbours)
@@ -3782,25 +3596,14 @@ namespace rsgisexe{
                 std::cout << "A command to find the clump neighbours.\n";
                 std::cout << "Input Image: " << this->inputImage << std::endl;
 
-                try
-                {
-                    GDALAllRegister();
-
-                    GDALDataset *inputDataset = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_Update);
-                    if(inputDataset == NULL)
-                    {
-                        std::string message = std::string("Could not open image ") + this->inputImage;
-                        throw rsgis::RSGISImageException(message.c_str());
-                    }
-
-                    rsgis::rastergis::RSGISFindClumpNeighbours findNeighboursObj;
-                    findNeighboursObj.findNeighboursKEAImageCalc(inputDataset);
-
-                    GDALClose(inputDataset);
-                }
-                catch(rsgis::RSGISException &e)
-                {
-                    throw e;
+                try {
+                    rsgis::cmds::executeFindNeighbours(this->inputImage);
+                } catch (rsgis::RSGISException e) {
+                    throw rsgis::RSGISException(e.what());
+                } catch (rsgis::cmds::RSGISCmdException e) {
+                    throw rsgis::RSGISException(e.what());
+                } catch (std::exception e) {
+                    throw rsgis::RSGISException(e.what());
                 }
             }
             else if(this->option == RSGISExeRasterGIS::findboundarypixels)
@@ -3810,27 +3613,14 @@ namespace rsgisexe{
                 std::cout << "Output Image: " << this->outputFile << std::endl;
                 std::cout << "Output Image Format: " << this->imageFormat << std::endl;
 
-                try
-                {
-                    GDALAllRegister();
-
-                    GDALDataset *inputDataset = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_Update);
-                    if(inputDataset == NULL)
-                    {
-                        std::string message = std::string("Could not open image ") + this->inputImage;
-                        throw rsgis::RSGISImageException(message.c_str());
-                    }
-
-                    rsgis::img::RSGISCalcImageValue *findBoundaries = new rsgis::rastergis::RSGISIdentifyBoundaryPixels();
-                    rsgis::img::RSGISCalcImage imgCalc = rsgis::img::RSGISCalcImage(findBoundaries);
-
-                    imgCalc.calcImageWindowData(&inputDataset, 1, this->outputFile, 3, this->imageFormat, GDT_Byte);
-
-                    GDALClose(inputDataset);
-                }
-                catch(rsgis::RSGISException &e)
-                {
-                    throw e;
+                try {
+                    rsgis::cmds::executeFindBoundaryPixels(this->inputImage, this->outputFile, this->imageFormat);
+                } catch (rsgis::RSGISException e) {
+                    throw rsgis::RSGISException(e.what());
+                } catch (rsgis::cmds::RSGISCmdException e) {
+                    throw rsgis::RSGISException(e.what());
+                } catch (std::exception e) {
+                    throw rsgis::RSGISException(e.what());
                 }
             }
             else if(this->option == RSGISExeRasterGIS::calcborderlength)
@@ -3847,25 +3637,14 @@ namespace rsgisexe{
                     std::cout << "Not ignoring zero edges on clumps\n";
                 }
 
-                try
-                {
-                    GDALAllRegister();
-
-                    GDALDataset *inputDataset = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_Update);
-                    if(inputDataset == NULL)
-                    {
-                        std::string message = std::string("Could not open image ") + this->inputImage;
-                        throw rsgis::RSGISImageException(message.c_str());
-                    }
-
-                    rsgis::rastergis::RSGISClumpBorders clumpBorders;
-                    clumpBorders.calcClumpBorderLength(inputDataset, !ignoreZeroEdges, this->outColsName);
-
-                    GDALClose(inputDataset);
-                }
-                catch(rsgis::RSGISException &e)
-                {
-                    throw e;
+                try {
+                    rsgis::cmds::executeCalcBorderLength(this->inputImage, this->ignoreZeroEdges, this->outColsName);
+                } catch (rsgis::RSGISException e) {
+                    throw rsgis::RSGISException(e.what());
+                } catch (rsgis::cmds::RSGISCmdException e) {
+                    throw rsgis::RSGISException(e.what());
+                } catch (std::exception e) {
+                    throw rsgis::RSGISException(e.what());
                 }
             }
             else if(this->option == RSGISExeRasterGIS::calcrelborder)
@@ -3884,25 +3663,14 @@ namespace rsgisexe{
                     std::cout << "Not ignoring zero edges on clumps\n";
                 }
 
-                try
-                {
-                    GDALAllRegister();
-
-                    GDALDataset *inputDataset = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_Update);
-                    if(inputDataset == NULL)
-                    {
-                        std::string message = std::string("Could not open image ") + this->inputImage;
-                        throw rsgis::RSGISImageException(message.c_str());
-                    }
-
-                    rsgis::rastergis::RSGISClumpBorders clumpBorders;
-                    clumpBorders.calcClumpRelBorderLen2Class(inputDataset, !ignoreZeroEdges, this->outColsName, this->classNameField, this->className);
-
-                    GDALClose(inputDataset);
-                }
-                catch(rsgis::RSGISException &e)
-                {
-                    throw e;
+                try {
+                    rsgis::cmds::executeCalcRelBorder(this->inputImage, this->outColsName, this->classNameField, this->className, this->ignoreZeroEdges);
+                } catch (rsgis::RSGISException e) {
+                    throw rsgis::RSGISException(e.what());
+                } catch (rsgis::cmds::RSGISCmdException e) {
+                    throw rsgis::RSGISException(e.what());
+                } catch (std::exception e) {
+                    throw rsgis::RSGISException(e.what());
                 }
             }
             else if(this->option == RSGISExeRasterGIS::calcshapeindices)
