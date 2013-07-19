@@ -211,13 +211,16 @@ namespace rsgis{ namespace cmds {
     void executeCalcRelBorder(std::string inputImage, std::string outColsName, std::string classNameField, std::string className, bool ignoreZeroEdges)throw(RSGISCmdException);
 
     /** Function to command to calculate shape indices for clumps */
-    void executeCalcShapeIndices(std::string inputImage, std::vector<RSGISShapeParamCmds> shapeIndexes)throw(RSGISCmdException);
+    void executeCalcShapeIndices(std::string inputImage, std::vector<void *> shapeIndexes)throw(RSGISCmdException);
 
     /** Function to define the position within the file of the clumps */
     void executeDefineClumpTilePositions(std::string clumpsImage, std::string tileImage, std::string outColsName, unsigned int tileOverlap, unsigned int tileBoundary, unsigned int tileBody)throw(RSGISCmdException);
 
     /** Function to define the clumps which are on the border within the file of the clumps using a mask */
     void executeDefineBorderClumps(std::string clumpsImage, std::string tileImage, std::string outColsName, unsigned int tileOverlap, unsigned int tileBoundary, unsigned int tileBody)throw(RSGISCmdException);
+
+    /** Function to identify segments which have changed by looking for statistical outliners (std dev) from class population */
+    void executeFindChangeClumpsFromStdDev(std::string clumpsImage, std::string classField, std::string changeField, std::vector<std::string> attFields, std::vector<void *> classChangeFields)throw(RSGISCmdException);
 }}
 
 
