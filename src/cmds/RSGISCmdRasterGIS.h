@@ -89,21 +89,6 @@ namespace rsgis{ namespace cmds {
         std::string sumField;
     };
 
-    struct RSGISClassChangeFieldsCmds {
-        std::string name;
-        int outName;
-        float threshold;
-        float *means;
-        float *stddev;
-        size_t count;
-    };
-
-    struct RSGISShapeParamCmds
-    {
-        rsgisshapeindexcmds idx;
-        std::string colName;
-        unsigned int colIdx;
-    };
 
     struct RSGISBandAttPercentilesCmds
     {
