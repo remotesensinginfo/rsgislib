@@ -3684,6 +3684,7 @@ namespace rsgisexe{
 
                 try {
                     // translate the structures to a vector of cmd types, cleanup this pointers
+                    /*
                     std::vector<cmds::RSGISShapeParamCmds> shapes;
                     shapes.reserve(this->shapeIndexes->size());
                     std::vector<cmds::RSGISShapeParam*>::iterator shapeIter;
@@ -3700,8 +3701,24 @@ namespace rsgisexe{
                         delete *shapeIter;
                     }
                     delete this->shapeIndexes;
+                    */
+                    // instead of that, make a vector of void pointers
+                    std::vector<void *> shapes;
+                    shapes.reserve(this->shapesIndexes->size());
+                    std::vector<cmds::RSGISShapeParam*>::iterator shapeIter;
+                    for(shapeIter = this->shapeIndexes->begin(); shapeIter != this->shapeIndexes->end(); ++shapeIter) {
+                        shapes.push_back((void *)(*shapeIter));
+                    }
+
                     // call function passing vector
                     rsgis::cmds::executeCalcShapeIndices(this->inputImage, shapes);
+
+                    // free pointers?
+                    for(shapeIter = this->shapeIndexes->begin(); shapeIter != this->shapeIndexes->end(); ++shapeIter) {
+                        delete *shapeIter;
+                    }
+                    delete this->shapeIndexes;
+
                 } catch (rsgis::RSGISException e) {
                     throw rsgis::RSGISException(e.what());
                 } catch (rsgis::cmds::RSGISCmdException e) {
@@ -3800,28 +3817,21 @@ namespace rsgisexe{
                     std::cout << "\t" << (*iterClass)->name << "\t" << (*iterClass)->outName << "\t" << (*iterClass)->threshold << std::endl;
                 }
 
-                try
-                {
-                    GDALAllRegister();
-
-                    GDALDataset *clumpsDataset = (GDALDataset *) GDALOpen(this->clumpsImage.c_str(), GA_Update);
-                    if(clumpsDataset == NULL)
-                    {
-                        std::string message = std::string("Could not open image ") + this->clumpsImage;
-                        throw rsgis::RSGISImageException(message.c_str());
+                try {
+                    // translate classChangeField to void pointers
+                    std::vector<void *> classFields;
+                    std::vector<rastergis::RSGISClassChangeFields*>::iterator classIter;
+                    classFields.reserve(classChangeField->size());
+                    for(classIter = classChangedField->begin(); classIter != classChangedField->end(); ++classIter) {
+                        classFields.push_back((void *)(*classIter));
                     }
 
-                    rsgis::rastergis::RSGISFindChangeClumps changeClumps;
-                    changeClumps.findChangeStdDevThreshold(clumpsDataset, this->classField, this->changeField, attFields, classChangeField);
-
-                    GDALClose(clumpsDataset);
-                }
-                catch (rsgis::RSGISException &e)
-                {
-                    throw e;
-                }
-                catch (std::exception &e)
-                {
+                    rsgis::cmds::executeFindChangeClumpsFromStdDev(this->clumpsImage, this->classField, this->changeField, this->attFields, classFields);
+                } catch (rsgis::RSGISException e) {
+                    throw rsgis::RSGISException(e.what());
+                } catch (rsgis::cmds::RSGISCmdException e) {
+                    throw rsgis::RSGISException(e.what());
+                } catch (std::exception e) {
                     throw rsgis::RSGISException(e.what());
                 }
             }
