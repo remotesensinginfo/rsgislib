@@ -3323,7 +3323,7 @@ namespace rsgisexe{
                 {
                     std::cout << "\tClass " << (*iterClass).first << " = " << (*iterClass).second << std::endl;
                 }
-                
+
                 try {
                     rsgis::cmds::executeClassTranslate(this->inputImage, this->classInField, this->classOutField, this->classPairs);
                 } catch (rsgis::RSGISException e) {
@@ -3340,7 +3340,7 @@ namespace rsgisexe{
                 std::cout << "Input Image: " << this->inputImage << std::endl;
                 std::cout << "Input Class Field: " << this->classInField << std::endl;
                 std::cout << "Class Colour Pairs:\n";
-                
+
                 // print out colours, also translate to map using RSGISColourIntCmds
                 int r,g,b,a;
                 std::map<size_t, rsgis::cmds::RSGISColourIntCmds> ccPairs;
@@ -3682,33 +3682,32 @@ namespace rsgisexe{
                     std::cout << rsgis::rastergis::RSGISCalcClumpShapeParameters::getRSGISShapeIndexAsString((*iterIndexes)->idx) << " Index with output column name \'" << (*iterIndexes)->colName << "\'" << std::endl;
                 }
 
-                try
-                {
-                    std::cout.precision(12);
+                try {
+                    // translate the structures to a vector of cmd types, cleanup this pointers
+                    std::vector<cmds::RSGISShapeParamCmds> shapes;
+                    shapes.reserve(this->shapeIndexes->size());
+                    std::vector<cmds::RSGISShapeParam*>::iterator shapeIter;
 
-                    GDALAllRegister();
+                    for(shapeIter = this->shapeIndexes->begin(); shapeIter != this->shapeIndexes->end(); ++shapeIter) {
+                        RSGISShapeParam in = (*shapeIter);
+                        rsgis::cmds::RSGISShapeParamCmds out;
+                        out.idx = (rsgisshapeindexcmds)in->idx;
+                        out.colName = in->colName;
+                        out.colIdx = in->colIdx;
 
-                    GDALDataset *inputDataset = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_Update);
-                    if(inputDataset == NULL)
-                    {
-                        std::string message = std::string("Could not open image ") + this->inputImage;
-                        throw rsgis::RSGISImageException(message.c_str());
+                        shapes.push_back(out);
+
+                        delete *shapeIter;
                     }
-
-                    rsgis::rastergis::RSGISCalcClumpShapeParameters calcShapeParams;
-                    calcShapeParams.calcClumpShapeParams(inputDataset, shapeIndexes);
-
-                    for(std::vector<rsgis::rastergis::RSGISShapeParam*>::iterator iterIndexes = shapeIndexes->begin(); iterIndexes != shapeIndexes->end(); ++iterIndexes)
-                    {
-                        delete *iterIndexes;
-                    }
-                    delete shapeIndexes;
-
-                    GDALClose(inputDataset);
-                }
-                catch(rsgis::RSGISException &e)
-                {
-                    throw e;
+                    delete this->shapeIndexes;
+                    // call function passing vector
+                    rsgis::cmds::executeCalcShapeIndices(this->inputImage, shapes);
+                } catch (rsgis::RSGISException e) {
+                    throw rsgis::RSGISException(e.what());
+                } catch (rsgis::cmds::RSGISCmdException e) {
+                    throw rsgis::RSGISException(e.what());
+                } catch (std::exception e) {
+                    throw rsgis::RSGISException(e.what());
                 }
             }
             else if(this->option == RSGISExeRasterGIS::defineclumptileposition)
@@ -3721,33 +3720,14 @@ namespace rsgisexe{
                 std::cout << "Tile Boundary: " << this->tileBoundary << std::endl;
                 std::cout << "Tile Body: " << this->tileBody << std::endl;
 
-                try
-                {
-                    GDALAllRegister();
-
-                    GDALDataset *clumpsDataset = (GDALDataset *) GDALOpen(this->clumpsImage.c_str(), GA_Update);
-                    if(clumpsDataset == NULL)
-                    {
-                        std::string message = std::string("Could not open image ") + this->clumpsImage;
-                        throw rsgis::RSGISImageException(message.c_str());
-                    }
-
-                    GDALDataset *tileDataset = (GDALDataset *) GDALOpen(this->tileImage.c_str(), GA_ReadOnly);
-                    if(tileDataset == NULL)
-                    {
-                        std::string message = std::string("Could not open image ") + this->tileImage;
-                        throw rsgis::RSGISImageException(message.c_str());
-                    }
-
-                    rsgis::rastergis::RSGISDefineSegmentsWithinTiles defineSegsInTile;
-                    defineSegsInTile.defineSegmentTilePos(clumpsDataset, tileDataset, this->outColsName, this->tileOverlap, this->tileBoundary, this->tileBody);
-
-                    GDALClose(clumpsDataset);
-                    GDALClose(tileDataset);
-                }
-                catch(rsgis::RSGISException &e)
-                {
-                    throw e;
+                try {
+                    rsgis::cmds::executeDefineClumpTilePositions(this->clumpsImage, this->tileImage, this->outColsName, this->tileOverlap, this->tileBoundary, this->tileBody);
+                } catch (rsgis::RSGISException e) {
+                    throw rsgis::RSGISException(e.what());
+                } catch (rsgis::cmds::RSGISCmdException e) {
+                    throw rsgis::RSGISException(e.what());
+                } catch (std::exception e) {
+                    throw rsgis::RSGISException(e.what());
                 }
 
             }
@@ -3761,33 +3741,14 @@ namespace rsgisexe{
                 std::cout << "Tile Boundary: " << this->tileBoundary << std::endl;
                 std::cout << "Tile Body: " << this->tileBody << std::endl;
 
-                try
-                {
-                    GDALAllRegister();
-
-                    GDALDataset *clumpsDataset = (GDALDataset *) GDALOpen(this->clumpsImage.c_str(), GA_Update);
-                    if(clumpsDataset == NULL)
-                    {
-                        std::string message = std::string("Could not open image ") + this->clumpsImage;
-                        throw rsgis::RSGISImageException(message.c_str());
-                    }
-
-                    GDALDataset *maskDataset = (GDALDataset *) GDALOpen(this->maskImage.c_str(), GA_ReadOnly);
-                    if(maskDataset == NULL)
-                    {
-                        std::string message = std::string("Could not open image ") + this->tileImage;
-                        throw rsgis::RSGISImageException(message.c_str());
-                    }
-
-                    rsgis::rastergis::RSGISDefineSegmentsWithinTiles defineSegsInTile;
-                    defineSegsInTile.defineBorderSegmentsUsingMask(clumpsDataset, maskDataset, this->outColsName, this->tileOverlap, this->tileBoundary, this->tileBody);
-
-                    GDALClose(clumpsDataset);
-                    GDALClose(maskDataset);
-                }
-                catch(rsgis::RSGISException &e)
-                {
-                    throw e;
+                try {
+                    rsgis::cmds::executeDefineBorderClumps(this->clumpsImage, this->tileImage, this->outColsName, this->tileOverlap, this->tileBoundary, this->tileBody);
+                } catch (rsgis::RSGISException e) {
+                    throw rsgis::RSGISException(e.what());
+                } catch (rsgis::cmds::RSGISCmdException e) {
+                    throw rsgis::RSGISException(e.what());
+                } catch (std::exception e) {
+                    throw rsgis::RSGISException(e.what());
                 }
 
             }
