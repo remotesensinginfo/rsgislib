@@ -141,8 +141,6 @@ static PyMethodDef RasterGISMethods[] = {
 "  calcImagePyramids is a boolean\n"
 },
 
-
-GDSSZFZ
     {"copyRAT", RasterGIS_CopyRAT, METH_VARARGS,
 "Copies a GDAL RAT from one image to anoother\n"
 "call signature: rastergis.copyRAT(inputImage, clumpsImage)\n"
