@@ -100,13 +100,13 @@ namespace rsgis{ namespace cmds {
 
     class RSGISColourIntCmds {
     public:
-        RSGISColourIntCmds();
-        RSGISColourIntCmds(int r, int g, int b, int a);
-        int getRed();
-        int getGreen();
-        int getBlue();
-        int getAlpha();
-        ~RSGISColourIntCmds();
+        RSGISColourIntCmds() { this->red = 0; this->green = 0; this->blue = 0; this->alpha = 0 };
+        RSGISColourIntCmds(int r, int g, int b, int a) { this->red = r; this->green = g; this->blue = b; this->alpha = a;};
+        int getRed() { return this->red; };
+        int getGreen() { return this->green; };
+        int getBlue() { return this->blue; };
+        int getAlpha() { return this->alpha; };
+        ~RSGISColourIntCmds(){};
     protected:
         int red;
         int green;
