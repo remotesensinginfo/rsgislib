@@ -3225,7 +3225,7 @@ namespace rsgisexe{
 
                 try
                 {
-                    rsgis::cmds::executeCopyCatagoriesColours(this->categoriesImage, this->clumpsImage, this->classField);
+                    rsgis::cmds::executeCopyCategoriesColours(this->categoriesImage, this->clumpsImage, this->classField);
                 }
                 catch (rsgis::cmds::RSGISCmdException &e)
                 {

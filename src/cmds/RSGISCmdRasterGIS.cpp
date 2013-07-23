@@ -354,7 +354,7 @@ namespace rsgis{ namespace cmds {
         }
     }
 
-    void executeCopyCatagoriesColours(std::string categoriesImage, std::string clumpsImage, std::string classField)throw(RSGISCmdException) {
+    void executeCopyCategoriesColours(std::string categoriesImage, std::string clumpsImage, std::string classField)throw(RSGISCmdException) {
         try
         {
             GDALAllRegister();
