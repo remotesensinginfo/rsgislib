@@ -136,7 +136,7 @@ namespace rsgis{ namespace cmds {
     void executePopulateCategoryProportions(std::string categoriesImage, std::string clumpsImage, std::string outColsName, std::string majorityColName, bool copyClassNames, std::string majClassNameField, std::string classNameField)throw(RSGISCmdException);
 
     /** Function for copying an attribute tables colour table to another table based on class column */
-    void executeCopyCatagoriesColours(std::string categoriesImage, std::string clumpsImage, std::string classField)throw(RSGISCmdException);
+    void executeCopyCategoriesColours(std::string categoriesImage, std::string clumpsImage, std::string classField)throw(RSGISCmdException);
 
     /** Function for exporting columns of the attribute table as GDAL images */
     void executeExportCols2GDALImage(std::string inputImage, std::string outputFile, std::string imageFormat, RSGISLibDataType outDataType, std::vector<std::string> fields)throw(RSGISCmdException);
