@@ -587,6 +587,311 @@ static PyObject *RasterGIS_EucDistFromFeature(PyObject *self, PyObject *args) {
     Py_RETURN_NONE;
 }
 
+static PyObject *RasterGIS_FindTopN(PyObject *self, PyObject *args) {
+    const char *inputImage, *outputField, *spatialDistField, *distanceField;
+    unsigned int nFeatures;
+    float distThreshold;
+
+    if(!PyArg_ParseTuple(args, "ssssIf:findTopN", &inputImage, &spatialDistField, &distanceField, &outputField, &nFeatures, &distThreshold))
+        return NULL;
+
+    try {
+        rsgis::cmds::executeFindTopN(std::string(inputImage), std::string(spatialDistField), std::string(distanceField), std::string(outputField), nFeatures, distThreshold);
+    } catch (rsgis::cmds::RSGISCmdException &e) {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+
+    Py_RETURN_NONE;
+}
+
+static PyObject *RasterGIS_FindSpecClose(PyObject *self, PyObject *args) {
+    const char *inputImage, *outputField, *spatialDistField, *distanceField;
+    float distThreshold, specDistThreshold;
+
+    if(!PyArg_ParseTuple(args, "ssssff:findSpecClose", &inputImage, &distanceField, &spatialDistField, &outputField, &specDistThreshold, &distThreshold))
+        return NULL;
+
+    try {
+        rsgis::cmds::executeFindSpecClose(std::string(inputImage), std::string(distanceField), std::string(spatialDistField), std::string(outputField), specDistThreshold, distThreshold);
+    } catch (rsgis::cmds::RSGISCmdException &e) {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+
+    Py_RETURN_NONE;
+}
+
+static PyObject *RasterGIS_Export2Ascii(PyObject *self, PyObject *args) {
+    const char *inputImage, *outputFile;
+    PyObject pFields;
+
+    if(!PyArg_ParseTuple(args, "ssO:export2Ascii", &inputImage, &outputFile, &pFields))
+        return NULL;
+
+    if(!PySequence_Check(pFields)) {
+        PyErr_SetString(GETSTATE(self)->error, "last argument must be a sequence");
+        return NULL;
+    }
+
+    std::vector<std::string> fields = ExtractVectorStringFromSequence(pFields);
+    if(fields == NULL) { return NULL; }
+
+    try {
+        rsgis::cmds::executeExport2Ascii(std::string(inputImage), std::string(outputFile), fields);
+    } catch (rsgis::cmds::RSGISCmdException &e) {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+
+    Py_RETURN_NONE;
+}
+
+static PyObject *RasterGIS_ClassTranslate(PyObject *self, PyObject *args) {
+    const char *inputImage, *classInField, *classOutField;
+    PyObject pClassPairs;
+
+    if(!PyArg_ParseTuple(args, "sssO:classTranslate", &inputImage, &classInField, &classOutField, &pClassPairs))
+        return NULL;
+
+    if(!PyDict_Check(pClassPairs)) {
+        PyErr_SetString(GETSTATE(self)->error, "last argument must be a dict");
+        return NULL;
+    }
+
+    std::map<size_t, size_t> classPairs;
+    PyObject *key, *value;
+    Py_ssize_t pos = 0;
+
+    while (PyDict_Next(pClassPairs, &pos, &key, &value)) {
+        if(!RSGISPY_CHECK_INT(key) || !RSGISPY_CHECK_INT(value)) {
+            PyErr_SetString(GETSTATE(self)->error, "dict key and values must be ints");
+            return NULL;
+        }
+        classPairs[(size_t)RSGISPY_INT_EXTRACT(key)] = (size_t)RSGISPY_INT_EXTRACT(value);
+    }
+
+    try {
+        rsgis::cmds::executeClassTranslate(std::string(inputImage), std::string(classInField), std::string(classOutField), classPairs);
+    } catch (rsgis::cmds::RSGISCmdException &e) {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+
+    Py_RETURN_NONE;
+}
+
+static PyObject *RasterGIS_ColourClasses(PyObject *self, PyObject *args) {
+    const char *inputImage, *classInField;
+    PyObject *pClassColourPairs;
+
+    if(!PyArg_ParseTuple(args, "ssO:colourClasses", &inputImage, &classInField, &pClassColourPairs))
+        return NULL;
+
+    if(!PyDict_Check(pClassColourPairs)) {
+        PyErr_SetString(GETSTATE(self)->error, "last argument must be a dict");
+        return NULL;
+    }
+
+    std::map<size_t, rsgis::cmds::RSGISColourIntCmds> classPairs;
+    PyObject *key, *value;
+    Py_ssize_t pos = 0;
+
+    while (PyDict_Next(pClassPairs, &pos, &key, &value)) {
+        if(!RSGISPY_CHECK_INT(key)) {
+            PyErr_SetString(GETSTATE(self)->error, "dict keys must be ints");
+            return NULL;
+        }
+
+        PyObject *red, *green, *blue, *alpha;
+        red = green = blue = alpha = NULL;
+
+        std::vector<PyObject*> extractedAttributes;     // store a list of extracted pyobjects to dereference
+
+        pRed = PyObject_GetAttrString(value, "red");
+        extractedAttributes.push_back(pRed);
+        if( ( pRed == NULL ) || ( pRed == Py_None ) || !RSGISPY_CHECK_INT(pRed)) {
+            PyErr_SetString(GETSTATE(self)->error, "could not find int attribute \'red\'" );
+            FreePythonObjects(extractedAttributes);
+            return NULL;
+        }
+
+        pGreen = PyObject_GetAttrString(value, "green");
+        extractedAttributes.push_back(pGreen);
+        if( ( pGreen == NULL ) || ( pGreen == Py_None ) || !RSGISPY_CHECK_INT(pGreen)) {
+            PyErr_SetString(GETSTATE(self)->error, "could not find int attribute \'green\'" );
+            FreePythonObjects(extractedAttributes);
+            return NULL;
+        }
+
+        pBlue = PyObject_GetAttrString(value, "blue");
+        extractedAttributes.push_back(pBlue);
+        if( ( pBlue == NULL ) || ( pBlue == Py_None ) || !RSGISPY_CHECK_INT(pBlue)) {
+            PyErr_SetString(GETSTATE(self)->error, "could not find int attribute \'blue\'" );
+            FreePythonObjects(extractedAttributes);
+            return NULL;
+        }
+
+        pAlpha = PyObject_GetAttrString(value, "alpha");
+        extractedAttributes.push_back(pAlpha);
+        if( ( pAlpha == NULL ) || ( pAlpha == Py_None ) || !RSGISPY_CHECK_INT(pAlpha)) {
+            PyErr_SetString(GETSTATE(self)->error, "could not find int attribute \'alpha\'" );
+            FreePythonObjects(extractedAttributes);
+            return NULL;
+        }
+
+        rsgis::cmds::RSGISColourIntCmds colour(RSGISPY_INT_EXTRACT(pRed), RSGISPY_INT_EXTRACT(pGreen), RSGISPY_INT_EXTRACT(pBlue), RSGISPY_INT_EXTRACT(pAlpha));
+        classPairs[(size_t)RSGISPY_INT_EXTRACT(key)] = colour;
+        FreePythonObjects(extractedAttributes);
+    }
+
+    try {
+        rsgis::cmds::executeColourClasses(std::string(inputImage), std::string(classInField), classPairs);
+    } catch (rsgis::cmds::RSGISCmdException &e) {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+
+    Py_RETURN_NONE;
+}
+
+static PyObject *RasterGIS_ColourStrClasses(PyObject *self, PyObject *args) {
+    const char *inputImage, *classInField;
+    PyObject *pClassColourPairs;
+
+    if(!PyArg_ParseTuple(args, "ssO:colourClasses", &inputImage, &classInField, &pClassColourPairs))
+        return NULL;
+
+    if(!PyDict_Check(pClassColourPairs)) {
+        PyErr_SetString(GETSTATE(self)->error, "last argument must be a dict");
+        return NULL;
+    }
+
+    std::map<std::string, rsgis::cmds::RSGISColourIntCmds> classPairs;
+    PyObject *key, *value;
+    Py_ssize_t pos = 0;
+
+    while (PyDict_Next(pClassPairs, &pos, &key, &value)) {
+        if(!RSGISPY_CHECK_STRING(key)) {
+            PyErr_SetString(GETSTATE(self)->error, "dict keys must be strings");
+            return NULL;
+        }
+
+        PyObject *red, *green, *blue, *alpha;
+        red = green = blue = alpha = NULL;
+
+        std::vector<PyObject*> extractedAttributes;     // store a list of extracted pyobjects to dereference
+
+        pRed = PyObject_GetAttrString(value, "red");
+        extractedAttributes.push_back(pRed);
+        if( ( pRed == NULL ) || ( pRed == Py_None ) || !RSGISPY_CHECK_INT(pRed)) {
+            PyErr_SetString(GETSTATE(self)->error, "could not find int attribute \'red\'" );
+            FreePythonObjects(extractedAttributes);
+            return NULL;
+        }
+
+        pGreen = PyObject_GetAttrString(value, "green");
+        extractedAttributes.push_back(pGreen);
+        if( ( pGreen == NULL ) || ( pGreen == Py_None ) || !RSGISPY_CHECK_INT(pGreen)) {
+            PyErr_SetString(GETSTATE(self)->error, "could not find int attribute \'green\'" );
+            FreePythonObjects(extractedAttributes);
+            return NULL;
+        }
+
+        pBlue = PyObject_GetAttrString(value, "blue");
+        extractedAttributes.push_back(pBlue);
+        if( ( pBlue == NULL ) || ( pBlue == Py_None ) || !RSGISPY_CHECK_INT(pBlue)) {
+            PyErr_SetString(GETSTATE(self)->error, "could not find int attribute \'blue\'" );
+            FreePythonObjects(extractedAttributes);
+            return NULL;
+        }
+
+        pAlpha = PyObject_GetAttrString(value, "alpha");
+        extractedAttributes.push_back(pAlpha);
+        if( ( pAlpha == NULL ) || ( pAlpha == Py_None ) || !RSGISPY_CHECK_INT(pAlpha)) {
+            PyErr_SetString(GETSTATE(self)->error, "could not find int attribute \'alpha\'" );
+            FreePythonObjects(extractedAttributes);
+            return NULL;
+        }
+
+        rsgis::cmds::RSGISColourIntCmds colour(RSGISPY_INT_EXTRACT(pRed), RSGISPY_INT_EXTRACT(pGreen), RSGISPY_INT_EXTRACT(pBlue), RSGISPY_INT_EXTRACT(pAlpha));
+        classPairs[(size_t)RSGISPY_STRING_EXTRACT(key)] = colour;
+        FreePythonObjects(extractedAttributes);
+    }
+
+    try {
+        rsgis::cmds::executeColourStrClasses(std::string(inputImage), std::string(classInField), classPairs);
+    } catch (rsgis::cmds::RSGISCmdException &e) {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+
+    Py_RETURN_NONE;
+}
+
+static PyObject *RasterGIS_GenerateColourTable(PyObject *self, PyObject *args) {
+    const char *inputImage, *clumpsImage;
+    unsigned int redBand, greenBand, blueBand;
+
+    if(!PyArg_ParseTuple(args, "ssIII:generateColourTable", &inputImage, &clumpsImage, &redBand, &greenBand, &blueBand))
+        return NULL;
+
+
+    try {
+        rsgis::cmds::executeGenerateColourTable(std::string(inputImage), std::string(clumpsImage), redBand, greenBand, blueBand);
+    } catch (rsgis::cmds::RSGISCmdException &e) {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+
+    Py_RETURN_NONE;
+}
+
+static PyObject *RasterGIS_StrClassMajority(PyObject *self, PyObject *args) {
+    const char *baseSegment, *infoSegment, *bassClassCol, *infoClassCol;
+
+    if(!PyArg_ParseTuple(args, "ssss:strClassMajority", &baseSegment, &infoSegment, &bassClassCol, &infoClassCol)
+        return NULL;
+
+    try {
+        rsgis::cmds::executeStrClassMajority(std::string(baseSegment), std::string(infoSegment), std::string(bassClassCol), std::string(infoClassCol));
+    } catch (rsgis::cmds::RSGISCmdException &e) {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+
+    Py_RETURN_NONE;
+}
+
+static PyObject *RasterGIS_SpecDistMajorityClassifier(PyObject *self, PyObject *args) {
+    const char *inputImage, *inClassNameField, *outClassNameField, *trainingSelectCol, *eastingsField, *northingsField, *areaField, *majWeightField;
+    int distMethod;
+    float distThreshold, specDistThreshold, specThreshOriginDist;
+    PyObject *pFields;
+
+    if(!PyArg_ParseTuple(args, "ssssssssOffif:specDistMajorityClassifier", &inputImage, &inClassNameField, &outClassNameField, &trainingSelectCol,
+                         &eastingsField, &northingsField, &areaField, &majWeightField, &pFields, &distThreshold, &specDistThreshold, &distMethod, &specThreshOriginDist))
+    {
+        return NULL;
+    }
+
+    vector<std::string> fields = ExtractVectorStringFromSequence(pFields);
+    if(fields == NULL) {
+        return NULL;
+    }
+
+    rsgis::cmds::SpectralDistanceMethodCmds method = (rsgis::cmds::SpectralDistanceMethodCmds)distMethod;
+
+    try {
+        rsgis::cmds::executeSpecDistMajorityClassifier(std::string(inputImage), std::string(inClassNameField), std::string(outClassNameField), std::string(trainingSelectCol), std::string(eastingsField),
+                                                       std::string(northingsField), std::string(areaField), std::string(majWeightField), fields, distThreshold, specDistThreshold, method, specThreshOriginDist));
+    } catch (rsgis::cmds::RSGISCmdException &e) {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+
+    Py_RETURN_NONE;
+}
 
 static PyMethodDef RasterGISMethods[] = {
     {"populateStats", RasterGIS_PopulateStats, METH_VARARGS,
@@ -706,6 +1011,119 @@ static PyMethodDef RasterGISMethods[] = {
 "  fields is a sequence of strings\n"
 },
 
+   {"findTopN", RasterGIS_FindTopN, METH_VARARGS,
+"Calculates the top N features within a given spatial distance\n"
+"call signature: rastergis.findTopN(inputImage, spatialDistField, distanceField, outputField, nFeatures, distThreshold)\n"
+"where:\n"
+"  inputImage is a string containing the name of the input image file TODO: check and expand\n"
+"  spatialDistField is a string containing the name of the field containing the spatial distance\n"
+"  distanceField is a string containing the name of the field containing the distance\n"
+"  outputField is a string continaing the name of the output field\n"
+"  nFeatures is an int containing the number of features to find\n"
+"  distThreshold is a float specifying the distance threshold with which to operate\n"
+},
+
+   {"findSpecClose", RasterGIS_FindSpecClose, METH_VARARGS,
+"Calculates the features within a given spatial and spectral distance\n"
+"call signature: rastergis.findSpecClose(inputImage, distanceField, spatialDistField, outputField, specDistThreshold, distThreshold)\n"
+"where:\n"
+"  inputImage is a string containing the name of the input image file TODO: check and expand\n"
+"  distanceField is a string containing the name of the field containing the distance\n"
+"  spatialDistField is a string containing the name of the field containing the spatial distance\n"
+"  outputField is a string continaing the name of the output field\n"
+"  specDistThreshold is a float specifying the spectral distance threshold with which to operate\n"
+"  distThreshold is a float specifying the spatial distance threshold with which to operate\n"
+},
+
+    {"export2Ascii", RasterGIS_Export2Ascii, METH_VARARGS,
+"Exports columns from a GDAL RAT to ascii\n"
+"call signature: rastergis.export2Ascii(inputImage, outputFile, fields)\n"
+"where:\n"
+"  inputImage is a string containing the name of the input image file TODO: check and expand\n"
+"  outputFile is a string containing the name of the output file \n"
+"  fields is a sequence of strings containing the field names\n"
+},
+
+    {"classTranslate", RasterGIS_ClassTranslate, METH_VARARGS,
+"Translates a set of classes to another\n"
+"call signature: rastergis.classTranslate(inputImage, classInField, classOutField, classPairs)\n"
+"where:\n"
+"  inputImage is a string containing the name of the input image file TODO: check and expand\n"
+"  classInField is a string containing the name of the input class field\n"
+"  classOutField is a string containing the name of the output class field\n"
+"  classPairs is a dict of int key value pairs mapping the classes. TODO: Fixme\n"
+},
+
+    {"colourClasses", RasterGIS_ColourClasses, METH_VARARGS,
+"Sets a colour table for a set of classes within the attribute table\n"
+"call signature: rastergis.colourClasses(inputImage, classInField, classColourPairs)\n"
+"where:\n"
+"  inputImage is a string containing the name of the input image file TODO: check and expand\n"
+"  classInField is a string containing the name of the input class field\n"
+"  classColourPairs is dict mapping int class ids to an object having attributes matching rsgis.cmds.RSGISColourIntCmds TODO: Fixme\n"
+"  Requires: TODO: Check\n"
+"      red: int defining the red colour component\n"
+"      green: int defining the green colour component\n"
+"      blue: int defining the bluecolour component\n"
+"      alpha: int defining the alpha colour component\n"
+},
+
+    {"colourStrClasses", RasterGIS_ColourStrClasses, METH_VARARGS,
+"Sets a colour table for a set of classes (string column) within the attribute table\n"
+"call signature: rastergis.colourStrClasses(inputImage, classInField, classColourPairs)\n"
+"where:\n"
+"  inputImage is a string containing the name of the input image file TODO: check and expand\n"
+"  classInField is a string containing the name of the input class field\n"
+"  classColourPairs is dict mapping string class columns to an object having attributes matching rsgis.cmds.RSGISColourIntCmds TODO: Fixme\n"
+"  Requires: TODO: Check\n"
+"      red: int defining the red colour component\n"
+"      green: int defining the green colour component\n"
+"      blue: int defining the bluecolour component\n"
+"      alpha: int defining the alpha colour component\n"
+},
+
+    {"generateColourTable", RasterGIS_GenerateColourTable, METH_VARARGS,
+"Generates a colour table using an input image\n"
+"call signature: rastergis.generateColourTable(inputImage, classInField, classColourPairs)\n"
+"where:\n"
+"  inputImage is a string containing the name of the input image file TODO: check and expand\n"
+"  classInField is a string containing the name of the input class field\n"
+"  classColourPairs is dict mapping string class columns to an object having attributes matching rsgis.cmds.RSGISColourIntCmds TODO: Fixme\n"
+"  Requires: TODO: Check\n"
+"      red: int defining the red colour component\n"
+"      green: int defining the green colour component\n"
+"      blue: int defining the bluecolour component\n"
+"      alpha: int defining the alpha colour component\n"
+},
+
+    {"strClassMajority", RasterGIS_StrClassMajority, METH_VARARGS,
+"Finds the majority for class (string - field) from a set of small objects to large objects\n"
+"call signature: rastergis.strClassMajority(baseSegment, infoSegment, baseClassCol, infoClassCol)\n"
+"where:\n"
+"  baseSegment is a string TODO: expand\n"
+"  infoSegment is a string\n"
+"  baseClassCol is a string\n"
+"  infoClassCol is a string\n"
+},
+
+    {"specDistMajorityClassifier", RasterGIS_SpecDistMajorityClassifier, METH_VARARGS,
+"Classifies segments using a spectral distance majority classification\n"
+"call signature: rastergis.specDistMajorityClassifier(inputImage, inClassNameField, outClassNameField, trainingSelectCol, eastingsField, northingsField, areaField, \n"
+"                                                     majWeightField, fields, distThreshold, specDistThreshold, distMethod, specThreshOriginDist)\n"
+"where:\n"
+"  inputImage is a string containing the name of the input image file TODO: expand\n"
+"  inClassNameField is a string\n"
+"  outClassNameField is a string\n"
+"  trainingSelectCol is a string\n"
+"  eastingsField is a string\n"
+"  northingsField is a string\n"
+"  areaField is a string\n"
+"  majWeightField is a string\n"
+"  fields is a sequence of strings containing field names\n"
+"  distThreshold is a float\n"
+"  specDistThreshold is a float\n"
+"  specThreshOriginDist is a float\n"
+},
     {NULL}        /* Sentinel */
 };
 
