@@ -38,9 +38,7 @@ static struct RasterGisState _state;
 #endif
 
 // FUNCS HERE
-/**
- * Helper func for cleaner dec reffing
- */
+
 static void FreePythonObjects(std::vector<PyObject*> toFree) {
     std::vector<PyObject*>::iterator iter;
     for(iter = toFree.begin(); iter != toFree.end(); ++iter) {
@@ -51,18 +49,19 @@ static void FreePythonObjects(std::vector<PyObject*> toFree) {
 /**
  * Helper Function for converting a python sequence of strings to a vector
  */
-static std::vector<std::string> ExtractVectorStringFromSequence(PyObject sequence) {
-    Py_ssize_t nFields = PySequence_Size(pFields);
+static std::vector<std::string> ExtractVectorStringFromSequence(PyObject *sequence) {
+    Py_ssize_t nFields = PySequence_Size(sequence);
     std::vector<std::string> fields;
     fields.reserve(nFields);
 
     for(int i = 0; i < nFields; ++i) {
-        PyObject *fieldObj = PySequence_GetItem(pFields, i);
+        PyObject *fieldObj = PySequence_GetItem(sequence, i);
 
         if(!RSGISPY_CHECK_STRING(fieldObj)) {
             PyErr_SetString(GETSTATE(self)->error, "Fields must be strings");
             Py_DECREF(fieldObj);
-            return NULL;
+            fields.clear();
+            return fields;
         }
 
         fields.push_back(RSGISPY_STRING_EXTRACT(fieldObj));
@@ -118,10 +117,11 @@ static PyObject *RasterGIS_CopyGDALATTColumns(PyObject *self, PyObject *args) {
     }
 
     std::vector<std::string> fields = ExtractVectorStringFromSequence(pFields);
-    if(fields == NULL) { return NULL; }
+    if(fields.size() == 0) { return NULL; }
+
 
     try {
-        rsgis::cmds::executeCopyGDALATTColumns(std::string(inputImage), std::string(clumpImage), fields);
+        rsgis::cmds::executeCopyGDALATTColumns(std::string(inputImage), std::string(clumpsImage), fields);
     } catch (rsgis::cmds::RSGISCmdException &e) {
         PyErr_SetString(GETSTATE(self)->error, e.what());
         return NULL;
@@ -148,12 +148,12 @@ static PyObject *RasterGIS_SpatialLocation(PyObject *self, PyObject *args) {
 
 static PyObject *RasterGIS_PopulateRATWithStats(PyObject *self, PyObject *args) {
     const char *inputImage, *clumpsImage;
-    PyObject pBandAttStatsCmds;
+    PyObject *pBandAttStatsCmds;
 
     if(!PyArg_ParseTuple(args, "ssO:populateRATWithStats", &inputImage, &clumpsImage, &pBandAttStatsCmds))
         return NULL;
 
-     if(!PySequence_Check(pBandAttStats)) {
+     if(!PySequence_Check(pBandAttStatsCmds)) {
         PyErr_SetString(GETSTATE(self)->error, "last argument must be a sequence");
         return NULL;
     }
@@ -409,7 +409,7 @@ static PyObject *RasterGIS_PopulateRATWithStats(PyObject *self, PyObject *args) 
 
 static PyObject *RasterGIS_PopulateRATWithPercentiles(PyObject *self, PyObject *args) {
     const char *inputImage, *clumpsImage;
-    PyObject pBandPercentilesCmds;
+    PyObject *pBandPercentilesCmds;
 
     if(!PyArg_ParseTuple(args, "ssO:populateRATWithPercentiles", &inputImage, &clumpsImage, &pBandPercentilesCmds))
         return NULL;
@@ -517,8 +517,7 @@ static PyObject *RasterGIS_PopulateCategoryProportions(PyObject *self, PyObject 
 }
 
 static PyObject *RasterGIS_CopyCategoriesColours(PyObject *self, PyObject *args) {
-    const char *clumpsImage, *categoriesImage, *outColsName, *classField;
-    int copyClassNames;
+    const char *clumpsImage, *categoriesImage, *classField;
 
     if(!PyArg_ParseTuple(args, "sss:copyCategoriesColours", &categoriesImage, &clumpsImage, &classField))
         return NULL;
@@ -536,7 +535,7 @@ static PyObject *RasterGIS_CopyCategoriesColours(PyObject *self, PyObject *args)
 static PyObject *RasterGIS_ExportCols2GDALImage(PyObject *self, PyObject *args) {
     const char *inputImage, *outputFile, *imageFormat;
     int dataType;
-    PyObject pFields;
+    PyObject *pFields;
 
     if(!PyArg_ParseTuple(args, "sssiO:copyCategoriesColours", &inputImage, &outputFile, &imageFormat, &dataType, &pFields))
         return NULL;
@@ -549,7 +548,7 @@ static PyObject *RasterGIS_ExportCols2GDALImage(PyObject *self, PyObject *args) 
     rsgis::RSGISLibDataType type = (rsgis::RSGISLibDataType)dataType;
 
     std::vector<std::string> fields = ExtractVectorStringFromSequence(pFields);
-    if(fields == NULL) { return NULL; }
+    if(fields.size() == 0) { return NULL; }
 
     try {
         rsgis::cmds::executeExportCols2GDALImage(std::string(inputImage), std::string(outputFile), std::string(imageFormat), type, fields);
@@ -575,7 +574,7 @@ static PyObject *RasterGIS_EucDistFromFeature(PyObject *self, PyObject *args) {
     }
 
     std::vector<std::string> fields = ExtractVectorStringFromSequence(pFields);
-    if(fields == NULL) { return NULL; }
+    if(fields.size() == 0) { return NULL; }
 
     try {
         rsgis::cmds::executeEucDistFromFeature(std::string(inputImage), (size_t)fid, std::string(outputField), fields);
@@ -624,7 +623,7 @@ static PyObject *RasterGIS_FindSpecClose(PyObject *self, PyObject *args) {
 
 static PyObject *RasterGIS_Export2Ascii(PyObject *self, PyObject *args) {
     const char *inputImage, *outputFile;
-    PyObject pFields;
+    PyObject *pFields;
 
     if(!PyArg_ParseTuple(args, "ssO:export2Ascii", &inputImage, &outputFile, &pFields))
         return NULL;
@@ -635,7 +634,7 @@ static PyObject *RasterGIS_Export2Ascii(PyObject *self, PyObject *args) {
     }
 
     std::vector<std::string> fields = ExtractVectorStringFromSequence(pFields);
-    if(fields == NULL) { return NULL; }
+    if(fields.size() == 0) { return NULL; }
 
     try {
         rsgis::cmds::executeExport2Ascii(std::string(inputImage), std::string(outputFile), fields);
@@ -649,7 +648,7 @@ static PyObject *RasterGIS_Export2Ascii(PyObject *self, PyObject *args) {
 
 static PyObject *RasterGIS_ClassTranslate(PyObject *self, PyObject *args) {
     const char *inputImage, *classInField, *classOutField;
-    PyObject pClassPairs;
+    PyObject *pClassPairs;
 
     if(!PyArg_ParseTuple(args, "sssO:classTranslate", &inputImage, &classInField, &classOutField, &pClassPairs))
         return NULL;
@@ -697,14 +696,14 @@ static PyObject *RasterGIS_ColourClasses(PyObject *self, PyObject *args) {
     PyObject *key, *value;
     Py_ssize_t pos = 0;
 
-    while (PyDict_Next(pClassPairs, &pos, &key, &value)) {
+    while (PyDict_Next(pClassColourPairs, &pos, &key, &value)) {
         if(!RSGISPY_CHECK_INT(key)) {
             PyErr_SetString(GETSTATE(self)->error, "dict keys must be ints");
             return NULL;
         }
 
-        PyObject *red, *green, *blue, *alpha;
-        red = green = blue = alpha = NULL;
+        PyObject *pRed, *pGreen, *pBlue, *pAlpha;
+        pRed = pGreen = pBlue = pAlpha = NULL;
 
         std::vector<PyObject*> extractedAttributes;     // store a list of extracted pyobjects to dereference
 
@@ -771,14 +770,14 @@ static PyObject *RasterGIS_ColourStrClasses(PyObject *self, PyObject *args) {
     PyObject *key, *value;
     Py_ssize_t pos = 0;
 
-    while (PyDict_Next(pClassPairs, &pos, &key, &value)) {
+    while (PyDict_Next(pClassColourPairs, &pos, &key, &value)) {
         if(!RSGISPY_CHECK_STRING(key)) {
             PyErr_SetString(GETSTATE(self)->error, "dict keys must be strings");
             return NULL;
         }
 
-        PyObject *red, *green, *blue, *alpha;
-        red = green = blue = alpha = NULL;
+        PyObject *pRed, *pGreen, *pBlue, *pAlpha;
+        pRed = pGreen = pBlue = pAlpha = NULL;
 
         std::vector<PyObject*> extractedAttributes;     // store a list of extracted pyobjects to dereference
 
@@ -815,7 +814,7 @@ static PyObject *RasterGIS_ColourStrClasses(PyObject *self, PyObject *args) {
         }
 
         rsgis::cmds::RSGISColourIntCmds colour(RSGISPY_INT_EXTRACT(pRed), RSGISPY_INT_EXTRACT(pGreen), RSGISPY_INT_EXTRACT(pBlue), RSGISPY_INT_EXTRACT(pAlpha));
-        classPairs[(size_t)RSGISPY_STRING_EXTRACT(key)] = colour;
+        classPairs[RSGISPY_STRING_EXTRACT(key)] = colour;
         FreePythonObjects(extractedAttributes);
     }
 
@@ -850,7 +849,7 @@ static PyObject *RasterGIS_GenerateColourTable(PyObject *self, PyObject *args) {
 static PyObject *RasterGIS_StrClassMajority(PyObject *self, PyObject *args) {
     const char *baseSegment, *infoSegment, *bassClassCol, *infoClassCol;
 
-    if(!PyArg_ParseTuple(args, "ssss:strClassMajority", &baseSegment, &infoSegment, &bassClassCol, &infoClassCol)
+    if(!PyArg_ParseTuple(args, "ssss:strClassMajority", &baseSegment, &infoSegment, &bassClassCol, &infoClassCol))
         return NULL;
 
     try {
@@ -874,17 +873,19 @@ static PyObject *RasterGIS_SpecDistMajorityClassifier(PyObject *self, PyObject *
     {
         return NULL;
     }
-
-    vector<std::string> fields = ExtractVectorStringFromSequence(pFields);
-    if(fields == NULL) {
+    
+    if(!PySequence_Check(pFields)) {
+        PyErr_SetString(GETSTATE(self)->error, "9th argument must be a sequence");
         return NULL;
     }
 
+    std::vector<std::string> fields = ExtractVectorStringFromSequence(pFields);
+    if(fields.size() == 0) { return NULL; }
+    
     rsgis::cmds::SpectralDistanceMethodCmds method = (rsgis::cmds::SpectralDistanceMethodCmds)distMethod;
 
     try {
-        rsgis::cmds::executeSpecDistMajorityClassifier(std::string(inputImage), std::string(inClassNameField), std::string(outClassNameField), std::string(trainingSelectCol), std::string(eastingsField),
-                                                       std::string(northingsField), std::string(areaField), std::string(majWeightField), fields, distThreshold, specDistThreshold, method, specThreshOriginDist));
+        rsgis::cmds::executeSpecDistMajorityClassifier(std::string(inputImage), std::string(inClassNameField), std::string(outClassNameField), std::string(trainingSelectCol), std::string(eastingsField), std::string(northingsField), std::string(areaField), std::string(majWeightField), fields, distThreshold, specDistThreshold, method, specThreshOriginDist);
     } catch (rsgis::cmds::RSGISCmdException &e) {
         PyErr_SetString(GETSTATE(self)->error, e.what());
         return NULL;
@@ -892,6 +893,405 @@ static PyObject *RasterGIS_SpecDistMajorityClassifier(PyObject *self, PyObject *
 
     Py_RETURN_NONE;
 }
+
+
+static PyObject *RasterGIS_MaxLikelihoodClassifier(PyObject *self, PyObject *args) {
+    const char *inputImage, *inClassNameField, *outClassNameField, *trainingSelectCol, *areaField;
+    int priorsMethod;
+    PyObject *pFields, *pPriorStrs;
+    
+    if(!PyArg_ParseTuple(args, "sssssOiO:maxLikelihoodClassifier", &inputImage, &inClassNameField, &outClassNameField, &trainingSelectCol, &areaField, &pFields, &priorsMethod, &pPriorStrs)) {
+        return NULL;
+    }
+       
+    if(!PySequence_Check(pFields) || !PySequence_Check(pPriorStrs)) {
+       PyErr_SetString(GETSTATE(self)->error, "6th and last arguments must be sequences");
+       return NULL;
+    }
+    
+    std::vector<std::string> fields, priorStrs;
+    fields = ExtractVectorStringFromSequence(pFields);
+    priorStrs = ExtractVectorStringFromSequence(pPriorStrs);
+    if(fields.size() == 0 || priorStrs.size() == 0) { return NULL; }
+    rsgis::cmds::rsgismlpriorscmds method = (rsgis::cmds::rsgismlpriorscmds)priorsMethod;
+    
+    try {
+        rsgis::cmds::executeMaxLikelihoodClassifier(std::string(inputImage), std::string(inClassNameField), std::string(outClassNameField), std::string(trainingSelectCol), std::string(areaField), fields, method, priorStrs);
+    } catch (rsgis::cmds::RSGISCmdException &e) {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+    
+}
+
+static PyObject *RasterGIS_MaxLikelihoodClassifierLocalPriors(PyObject *self, PyObject *args) {
+    const char *inputImage, *inClassNameField, *outClassNameField, *trainingSelectCol, *areaField, *eastingsField, *northingsField;
+    float distThreshold, weightA;
+    int priorsMethod, iAllowZeroPriors;
+    PyObject *pFields;
+    
+    if(!PyArg_ParseTuple(args, "sssssOssfifi:maxLikelihoodClassifierLocalPriors", &inputImage, &inClassNameField, &outClassNameField, &trainingSelectCol, &areaField, &pFields, &eastingsField, &northingsField, &distThreshold, &priorsMethod, &weightA, &iAllowZeroPriors)) {
+        return NULL;
+    }
+    
+    if(!PySequence_Check(pFields)) {
+        PyErr_SetString(GETSTATE(self)->error, "6th argument must be a sequence");
+        return NULL;
+    }
+    
+    std::vector<std::string> fields;
+    fields = ExtractVectorStringFromSequence(pFields);
+    if(fields.size() == 0) { return NULL; }
+    
+    rsgis::cmds::rsgismlpriorscmds method = (rsgis::cmds::rsgismlpriorscmds)priorsMethod;
+    bool allowZeroPriors = (iAllowZeroPriors != 0);
+    
+    try {
+        rsgis::cmds::executeMaxLikelihoodClassifierLocalPriors(std::string(inputImage), std::string(inClassNameField), std::string(outClassNameField), std::string(trainingSelectCol), std::string(areaField), fields, std::string(eastingsField), std::string(northingsField), distThreshold, method, weightA, allowZeroPriors);
+    } catch (rsgis::cmds::RSGISCmdException &e) {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+    
+}
+
+static PyObject *RasterGIS_ClassMask(PyObject *self, PyObject *args) {
+    const char *inputImage, *classField, *className, *outputFile, *imageFormat;
+    int dataType;
+    
+    if(!PyArg_ParseTuple(args, "sssssi:classMask", &inputImage, &classField, &className, &outputFile, &imageFormat, &dataType)) {
+        return NULL;
+    }
+    
+    rsgis::RSGISLibDataType type = (rsgis::RSGISLibDataType) dataType;
+    
+    try {
+        rsgis::cmds::executeClassMask(std::string(inputImage), std::string(classField), std::string(className), std::string(outputFile), std::string(imageFormat), type);
+    } catch (rsgis::cmds::RSGISCmdException &e) {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
+static PyObject *RasterGIS_FindNeighbours(PyObject *self, PyObject *args) {
+    const char *inputImage;
+    
+    if(!PyArg_ParseTuple(args, "s:findNeighbours", &inputImage)) {
+        return NULL;
+    }
+    
+    try {
+        rsgis::cmds::executeFindNeighbours(std::string(inputImage));
+    } catch (rsgis::cmds::RSGISCmdException &e) {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
+static PyObject *RasterGIS_FindBoundaryPixels(PyObject *self, PyObject *args) {
+    const char *inputImage, *outputFile, *imageFormat;
+    
+    if(!PyArg_ParseTuple(args, "sss:findBoundaryPixels", &inputImage, &outputFile, &imageFormat)) {
+        return NULL;
+    }
+    
+    try {
+        rsgis::cmds::executeFindBoundaryPixels(std::string(inputImage), std::string(outputFile), std::string(imageFormat));
+    } catch (rsgis::cmds::RSGISCmdException &e) {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
+static PyObject *RasterGIS_CalcBorderLength(PyObject *self, PyObject *args) {
+    const char *inputImage, *outColsName;
+    int iIgnoreZeroEdges;
+    
+    if(!PyArg_ParseTuple(args, "sis:calcBorderLength", &inputImage, &iIgnoreZeroEdges, &outColsName)) {
+        return NULL;
+    }
+    
+    try {
+        rsgis::cmds::executeCalcBorderLength(std::string(inputImage), (iIgnoreZeroEdges != 0), std::string(outColsName));
+    } catch (rsgis::cmds::RSGISCmdException &e) {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
+static PyObject *RasterGIS_CalcRelBorder(PyObject *self, PyObject *args) {
+    const char *inputImage, *outColsName, *classNameField, *className;
+    int iIgnoreZeroEdges;
+    
+    if(!PyArg_ParseTuple(args, "ssssi:calcRelBorder", &inputImage, &outColsName, &classNameField, &className, &iIgnoreZeroEdges)) {
+        return NULL;
+    }
+    
+    try {
+        rsgis::cmds::executeCalcRelBorder(std::string(inputImage), std::string(outColsName), std::string(classNameField), std::string(className), (iIgnoreZeroEdges != 0));
+    } catch (rsgis::cmds::RSGISCmdException &e) {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
+static PyObject *RasterGIS_CalcShapeIndices(PyObject *self, PyObject *args) {
+    const char *inputImage;
+    PyObject *pShapeIndexes;
+    
+    if(!PyArg_ParseTuple(args, "sO:calcShapeIndices", &inputImage, &pShapeIndexes)) {
+        return NULL;
+    }
+    
+    if(!PySequence_Check(pShapeIndexes)) {
+        PyErr_SetString(GETSTATE(self)->error, "6th argument must be a sequence");
+        return NULL;
+    }
+    
+    // extract the attributes from the sequence of objects into our structs
+    Py_ssize_t nIndexes = PySequence_Size(pShapeIndexes);
+    std::vector<rsgis::cmds::RSGISShapeParamCmds> shapeIndexes;
+    shapeIndexes.reserve(nIndexes);
+    
+    for(int i = 0; i < nIndexes; ++i) {
+        PyObject *o = PySequence_GetItem(pShapeIndexes, i);     // the python object
+        
+        rsgis::cmds::RSGISShapeParamCmds shapeIndex;
+        
+        // declare and initialise pointers for all the attributes of the struct
+        PyObject *pIdx, *pColName, *pColIdx;
+        pIdx = pColName = pColIdx = NULL;
+        
+        std::vector<PyObject*> extractedAttributes;     // store a list of extracted pyobjects to dereference later
+        extractedAttributes.push_back(o);
+        
+        pIdx = PyObject_GetAttrString(o, "idx");
+        extractedAttributes.push_back(pIdx);
+        if( ( pIdx == NULL ) || ( pIdx == Py_None ) || !RSGISPY_CHECK_INT(pIdx)) {
+            PyErr_SetString(GETSTATE(self)->error, "could not find int attribute \'idx\'" );
+            FreePythonObjects(extractedAttributes);
+            return NULL;
+        }
+        
+        pColName = PyObject_GetAttrString(o, "colName");
+        extractedAttributes.push_back(pColName);
+        if( ( pColName == NULL ) || ( pColName == Py_None ) || !RSGISPY_CHECK_STRING(pColName)) {
+            PyErr_SetString(GETSTATE(self)->error, "could not find string attribute \'colName\'" );
+            FreePythonObjects(extractedAttributes);
+            return NULL;
+        }
+        
+        pColIdx = PyObject_GetAttrString(o, "colIdx");
+        extractedAttributes.push_back(pColIdx);
+        if( ( pColIdx == NULL ) || ( pColIdx == Py_None ) || !RSGISPY_CHECK_INT(pColIdx)) {
+            PyErr_SetString(GETSTATE(self)->error, "could not find int attribute \'colIdx\'" );
+            FreePythonObjects(extractedAttributes);
+            return NULL;
+        }
+        
+        shapeIndex.colIdx = RSGISPY_INT_EXTRACT(pColIdx);
+        shapeIndex.colName = RSGISPY_STRING_EXTRACT(pColName);
+        shapeIndex.idx = (rsgis::cmds::rsgisshapeindexcmds) RSGISPY_INT_EXTRACT(pIdx);
+        
+        FreePythonObjects(extractedAttributes);
+        shapeIndexes.push_back(shapeIndex);
+    }
+    
+    try {
+        rsgis::cmds::executeCalcShapeIndices(std::string(inputImage), shapeIndexes);
+    } catch (rsgis::cmds::RSGISCmdException &e) {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+
+    Py_RETURN_NONE;
+}
+
+static PyObject *RasterGIS_DefineClumpTilePositions(PyObject *self, PyObject *args) {
+    const char *clumpsImage, *tileImage, *outColsName;
+    unsigned int tileOverlap, tileBoundary, tileBody;
+    
+    if(!PyArg_ParseTuple(args, "sssIII:defineClumpTilePositions", &clumpsImage, &tileImage, &outColsName, &tileOverlap, &tileBoundary, &tileBody)) {
+        return NULL;
+    }
+    
+    try {
+        rsgis::cmds::executeDefineClumpTilePositions(std::string(clumpsImage), std::string(tileImage), std::string(outColsName), tileOverlap, tileBoundary, tileBody);
+    } catch (rsgis::cmds::RSGISCmdException &e) {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
+static PyObject *RasterGIS_DefineBorderClumps(PyObject *self, PyObject *args) {
+    const char *clumpsImage, *tileImage, *outColsName;
+    unsigned int tileOverlap, tileBoundary, tileBody;
+    
+    if(!PyArg_ParseTuple(args, "sssIII:defineBorderClumps", &clumpsImage, &tileImage, &outColsName, &tileOverlap, &tileBoundary, &tileBody)) {
+        return NULL;
+    }
+    
+    try {
+        rsgis::cmds::executeDefineBorderClumps(std::string(clumpsImage), std::string(tileImage), std::string(outColsName), tileOverlap, tileBoundary, tileBody);
+    } catch (rsgis::cmds::RSGISCmdException &e) {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
+static PyObject *RasterGIS_FindChangeClumpsFromStdDev(PyObject *self, PyObject *args) {
+    const char *clumpsImage, *classField, *changeField;
+    PyObject *pAttFields, *pClassFields;
+    
+    if(!PyArg_ParseTuple(args, "sssOO:findChangeClumpsFromStdDev", &clumpsImage, &classField, &changeField, &pAttFields, &pClassFields)) {
+        return NULL;
+    }
+    
+    if(!PySequence_Check(pAttFields) || !PySequence_Check(pClassFields)) {
+        PyErr_SetString(GETSTATE(self)->error, "last 2 arguments must be sequences");
+    }
+    
+    std::vector<std::string> attFields = ExtractVectorStringFromSequence(pAttFields);
+    
+    Py_ssize_t nFields = PySequence_Size(pClassFields);
+    std::vector<rsgis::cmds::RSGISClassChangeFieldsCmds> classFields;
+    classFields.reserve(nFields);
+    
+    for(int i = 0; i < nFields; ++i) {
+        PyObject *o = PySequence_GetItem(pClassFields, i);     // the python object
+        
+        rsgis::cmds::RSGISClassChangeFieldsCmds classField;
+        
+        // declare and initialise pointers for all the attributes of the struct
+        PyObject *name, *outName, *threshold, *means, *stdDevs, *count;
+        name = outName = threshold = means = stdDevs = count = NULL;
+        
+        std::vector<PyObject*> extractedAttributes;     // store a list of extracted pyobjects to dereference later
+        extractedAttributes.push_back(o);
+        
+        name = PyObject_GetAttrString(o, "name");
+        extractedAttributes.push_back(name);
+        if( ( name == NULL ) || ( name == Py_None ) || !RSGISPY_CHECK_STRING(name)) {
+            PyErr_SetString(GETSTATE(self)->error, "could not find string attribute \'name\'" );
+            FreePythonObjects(extractedAttributes);
+            return NULL;
+        }
+        
+        outName = PyObject_GetAttrString(o, "outName");
+        extractedAttributes.push_back(outName);
+        if( ( outName == NULL ) || ( outName == Py_None ) || !RSGISPY_CHECK_INT(outName)) {
+            PyErr_SetString(GETSTATE(self)->error, "could not find int attribute \'outName\'" );
+            FreePythonObjects(extractedAttributes);
+            return NULL;
+        }
+        
+        threshold = PyObject_GetAttrString(o, "threshold");
+        extractedAttributes.push_back(threshold);
+        if( ( threshold == NULL ) || ( threshold == Py_None ) || !RSGISPY_CHECK_FLOAT(threshold)) {
+            PyErr_SetString(GETSTATE(self)->error, "could not find float attribute \'threshold\'" );
+            FreePythonObjects(extractedAttributes);
+            return NULL;
+        }
+        
+        count = PyObject_GetAttrString(o, "count");
+        extractedAttributes.push_back(count);
+        if( ( count == NULL ) || ( count == Py_None ) || !RSGISPY_CHECK_INT(count)) {
+            PyErr_SetString(GETSTATE(self)->error, "could not find int attribute \'count\'" );
+            FreePythonObjects(extractedAttributes);
+            return NULL;
+        }
+        
+        means = PyObject_GetAttrString(o, "means");
+        extractedAttributes.push_back(means);
+        if( ( means == NULL ) || ( means == Py_None ) || !PySequence_Check(means)) {
+            PyErr_SetString(GETSTATE(self)->error, "could not find sequence attribute \'means\'" );
+            FreePythonObjects(extractedAttributes);
+            return NULL;
+        }
+        
+        stdDevs = PyObject_GetAttrString(o, "stddev");
+        extractedAttributes.push_back(stdDevs);
+        if( ( stdDevs == NULL ) || ( stdDevs == Py_None ) || !PySequence_Check(stdDevs)) {
+            PyErr_SetString(GETSTATE(self)->error, "could not find sequence attribute \'stddev\'" );
+            FreePythonObjects(extractedAttributes);
+            return NULL;
+        }
+        
+        classField.name = RSGISPY_STRING_EXTRACT(name);
+        classField.outName = RSGISPY_INT_EXTRACT(outName);
+        classField.threshold = RSGISPY_FLOAT_EXTRACT(threshold);
+        classField.count = RSGISPY_INT_EXTRACT(count);
+        
+        // now unpack the sequences
+        Py_ssize_t nMeans = PySequence_Size(means);
+        classField.means = new float[nMeans];
+        
+        for(int i = 0; i < nMeans; ++i) {
+            PyObject *fieldObj = PySequence_GetItem(means, i);
+            
+            if(!RSGISPY_CHECK_FLOAT(fieldObj)) {
+                PyErr_SetString(GETSTATE(self)->error, "Means must be floats");
+                Py_DECREF(fieldObj);
+                delete classField.means;
+                FreePythonObjects(extractedAttributes);
+                return NULL;
+            }
+            
+            classField.means[i] = RSGISPY_FLOAT_EXTRACT(fieldObj);
+            Py_DECREF(fieldObj);
+        }
+        
+        Py_ssize_t nStdDev = PySequence_Size(stdDevs);
+        classField.stddev = new float[nStdDev];
+        
+        for(int i = 0; i < nStdDev; ++i) {
+            PyObject *fieldObj = PySequence_GetItem(stdDevs, i);
+            
+            if(!RSGISPY_CHECK_FLOAT(fieldObj)) {
+                PyErr_SetString(GETSTATE(self)->error, "Stddevs must be floats");
+                Py_DECREF(fieldObj);
+                delete classField.stddev;
+                FreePythonObjects(extractedAttributes);
+                return NULL;
+            }
+            
+            classField.stddev[i] = RSGISPY_FLOAT_EXTRACT(fieldObj);
+            Py_DECREF(fieldObj);
+        }
+        
+        classFields.push_back(classField);
+        FreePythonObjects(extractedAttributes);
+    }
+    
+    try {
+        rsgis::cmds::executeFindChangeClumpsFromStdDev(std::string(clumpsImage), std::string(classField), std::string(changeField), attFields, classFields);
+    } catch (rsgis::cmds::RSGISCmdException &e) {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
+
 
 static PyMethodDef RasterGISMethods[] = {
     {"populateStats", RasterGIS_PopulateStats, METH_VARARGS,
@@ -997,7 +1397,7 @@ static PyMethodDef RasterGISMethods[] = {
 "  inputImage is a string containing the name of the input image file TODO: check and expand\n"
 "  outputFile is a string containing the name of the output gdal file\n"
 "  gdalFormat is a string containing the GDAL format for the output file - eg 'KEA'\n"
-"  gdaltype is an containing one of the values from rsgislib.TYPE_*\n"
+"  gdaltype is an int containing one of the values from rsgislib.TYPE_*\n"
 "  fields is a sequence of strings\n"
 },
 
@@ -1124,6 +1524,142 @@ static PyMethodDef RasterGISMethods[] = {
 "  specDistThreshold is a float\n"
 "  specThreshOriginDist is a float\n"
 },
+    
+    {"maxLikelihoodClassifier", RasterGIS_MaxLikelihoodClassifier, METH_VARARGS,
+"Classifies segments using a maximum likelihood classification\n"
+"call signature: rastergis.maxLikelihoodClassifier(inputImage, inClassNameField, outClassNameField, trainingSelectCol, areaField, \n"
+"                                                     fields, priorsMethod, priorStrs)\n"
+"where:\n"
+"  inputImage is a string containing the name of the input image file TODO: expand\n"
+"  inClassNameField is a string\n"
+"  outClassNameField is a string\n"
+"  trainingSelectCol is a string\n"
+"  areaField is a string\n"
+"  fields is a sequence of strings containing field names\n"
+"  priorsMethod is an int containing one of the values from rsgislib.METHOD_*\n"
+"  priorStrs is a sequence of strings\n"
+},
+    
+    {"maxLikelihoodClassifierLocalPriors", RasterGIS_MaxLikelihoodClassifierLocalPriors, METH_VARARGS,
+"Classifies segments using a maximum likelihood classification and local priors\n"
+"call signature: rastergis.maxLikelihoodClassifierLocalPriors(inputImage, inClassNameField, outClassNameField, trainingSelectCol, areaField, fields, \n"
+"                                                     eastingsField, northingsField, distThreshold, priorsMethod, weightA, allowZeroPriors)\n"
+"where:\n"
+"  inputImage is a string containing the name of the input image file TODO: expand\n"
+"  inClassNameField is a string\n"
+"  outClassNameField is a string\n"
+"  trainingSelectCol is a string\n"
+"  areaField is a string\n"
+"  fields is a sequence of strings containing field names\n"
+"  eastingsField is a string containing the name of the field holding the eastings\n"
+"  northingsField is a string containing the name of the field holding the northings\n"
+"  distThreshold is a float\n"
+"  priorsMethod is an int containing one of the values from rsgislib.METHOD_*\n"
+"  weightA is a float\n"
+"  allowZeroPriors is a bool\n"
+},
+    
+    {"classMask", RasterGIS_ClassMask, METH_VARARGS,
+"Generates a mask for a particular class\n"
+"call signature: rastergis.classMask(inputImage, classField, className, outputFile, gdalFormat, gdalType)\n"
+"where:\n"
+"  inputImage is a string containing the name of the input image file TODO: expand\n"
+"  classField is a string\n"
+"  className is a string\n"
+"  outputFile is a string containing the name of the output file\n"
+"  gdalFormat is a string containing the GDAL format for the output file - eg 'KEA'\n"
+"  gdaltype is an int containing one of the values from rsgislib.TYPE_*\n"
+},
+    
+    {"findNeighbours", RasterGIS_FindNeighbours, METH_VARARGS,
+"Finds the clump neighbours from an image\n"
+"call signature: rastergis.findNeighbours(inputImage)\n"
+"where:\n"
+"  inputImage is a string containing the name of the input image file\n"
+},
+    
+    {"findBoundaryPixels", RasterGIS_FindBoundaryPixels, METH_VARARGS,
+"Identifies the pixels on the boundary of the clumps\n"
+"call signature: rastergis.findBoundaryPixels(inputImage, outputFile, gdalFormat)\n"
+"where:\n"
+"  inputImage is a string containing the name of the input image file\n"
+"  outputFile is a string containing the name of the output file\n"
+"  gdalFormat is a string containing the GDAL format for the output file - eg 'KEA'\n"
+},
+    
+    {"calcBorderLength", RasterGIS_CalcBorderLength, METH_VARARGS,
+"Calculate the border length of clumps\n"
+"call signature: rastergis.calcBorderLength(inputImage, ignoreZeroEdges, outColsName)\n"
+"where:\n"
+"  inputImage is a string containing the name of the input image file\n"
+"  ignoreZeroEdges is a bool\n"
+"  outColsName is a string\n"
+},
+    
+    {"calcRelBorder", RasterGIS_CalcRelBorder, METH_VARARGS,
+"Calculates the relative border length of the clumps to a class\n"
+"call signature: rastergis.calcRelBorder(inputImage, outColsName, classNameField, className, ignoreZeroEdges)\n"
+"where:\n"
+"  inputImage is a string containing the name of the input image file\n"
+"  outColsName is a string\n"
+"  classNameField is a string\n"
+"  className is a string\n"
+"  ignoreZeroEdges is a bool\n"
+},
+
+    {"calcShapeIndices", RasterGIS_CalcShapeIndices, METH_VARARGS,
+"Calculates shape indices for clumps\n"
+"call signature: rastergis.calcShapeIndices(inputImage, shapeIndices)\n"
+"where:\n"
+"  inputImage is a string containing the name of the input image file\n"
+"  shapeIndices is a sequence of python object that have the following attributes:\n"
+"      colName - a string holding the column name\n"
+"      colIdx - an int holding the column index\n"
+"      idx - an int containing one of the values from rsgis.SHAPE_*\n"
+},
+    
+    {"defineClumpTilePositions", RasterGIS_DefineClumpTilePositions, METH_VARARGS,
+"Defines the position within the file of the clumps\n"
+"call signature: rastergis.defineClumpTilePositions(clumpsImage, tileImage, outColsName, tileOverlap, tileBoundary, tileBody)\n"
+"where:\n"
+"  clumpsImage is a string containing the name of the input clump file\n"
+"  tileImage is a string containing the name of the input tile image\n"
+"  outColsName is a string containing the name of the output column\n"
+"  tileOverlap is an unsigned int defining the overlap between tiles\n"
+"  tileBoundary is an unsigned int\n"
+"  tileBody is an unsigned int\n"
+},
+
+    {"defineBorderClumps", RasterGIS_DefineBorderClumps, METH_VARARGS,
+"Defines the clumps which are on the border within the file of the clumps using a mask\n"
+"call signature: rastergis.defineBorderClumps(clumpsImage, tileImage, outColsName, tileOverlap, tileBoundary, tileBody)\n"
+"where:\n"
+"  clumpsImage is a string containing the name of the input clump file\n"
+"  tileImage is a string containing the name of the input tile image\n"
+"  outColsName is a string containing the name of the output column\n"
+"  tileOverlap is an unsigned int defining the overlap between tiles\n"
+"  tileBoundary is an unsigned int\n"
+"  tileBody is an unsigned int\n"
+},
+    
+    {"findChangeClumpsFromStdDev", RasterGIS_FindChangeClumpsFromStdDev, METH_VARARGS,
+"Identifies segments which have changed by looking for statistical outliers (std dev) from class population\n"
+"call signature: rastergis.findChangeClumpsFromStdDev(clumpsImage, classField, changeField, attFields, classChangeFields)\n"
+"where:\n"
+"  clumpsImage is a string containing the name of the input clump file\n"
+"  classField is a string\n"
+"  changeField is a string\n"
+"  attFields is a sequence of strings\n"
+"  classChangeFields is a sequence of python objects having the following attributes:\n"
+"      name - a string holding the name\n"
+"      outName - an int\n"
+"      threshold - a float\n"
+"      count - an int, possibly number of means/std devs? TODO: Check these\n"
+"      means - a sequence of floats, containing the means\n"
+"      stddev - a sequence of floats, containing the stddevs corresponding to the means\n"
+},
+    
+    
     {NULL}        /* Sentinel */
 };
 
@@ -1183,12 +1719,6 @@ init_rastergis(void)
         INITERROR;
     }
 
-    // add constants
-    PyModule_AddIntConstant(pModule, "INITCLUSTER_RANDOM", rsgis::cmds::rsgis_init_random);
-    PyModule_AddIntConstant(pModule, "INITCLUSTER_DIAGONAL_FULL", rsgis::cmds::rsgis_init_diagonal_full);
-    PyModule_AddIntConstant(pModule, "INITCLUSTER_DIAGONAL_STDDEV", rsgis::cmds::rsgis_init_diagonal_stddev);
-    PyModule_AddIntConstant(pModule, "INITCLUSTER_DIAGONAL_FULL_ATTACH", rsgis::cmds::rsgis_init_diagonal_full_attach);
-    PyModule_AddIntConstant(pModule, "INITCLUSTER_DIAGONAL_STDDEV_ATTACH", rsgis::cmds::rsgis_init_diagonal_stddev_attach);
 
 #if PY_MAJOR_VERSION >= 3
     return pModule;

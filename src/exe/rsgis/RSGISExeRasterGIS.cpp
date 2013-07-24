@@ -3563,7 +3563,7 @@ namespace rsgisexe{
                 }
 
                 try {
-                    rsgis::cmds::executeMaxLikelihoodClassiferLocalPriors(this->inputImage, this->inClassNameField, this->outClassNameField, this->trainingSelectCol, this->areaField, this->fields, this->eastingsField, this->northingsField, this->distThreshold, (rsgis::cmds::rsgismlpriorscmds)this->priorsMethod, this->weightA, this->allowZeroPriors);
+                    rsgis::cmds::executeMaxLikelihoodClassifierLocalPriors(this->inputImage, this->inClassNameField, this->outClassNameField, this->trainingSelectCol, this->areaField, this->fields, this->eastingsField, this->northingsField, this->distThreshold, (rsgis::cmds::rsgismlpriorscmds)this->priorsMethod, this->weightA, this->allowZeroPriors);
                 } catch (rsgis::RSGISException e) {
                     throw rsgis::RSGISException(e.what());
                 } catch (rsgis::cmds::RSGISCmdException e) {
@@ -3684,41 +3684,25 @@ namespace rsgisexe{
 
                 try {
                     // translate the structures to a vector of cmd types, cleanup this pointers
-                    /*
-                    std::vector<cmds::RSGISShapeParamCmds> shapes;
+                    std::vector<rsgis::cmds::RSGISShapeParamCmds> shapes;
                     shapes.reserve(this->shapeIndexes->size());
-                    std::vector<cmds::RSGISShapeParam*>::iterator shapeIter;
+                    std::vector<rsgis::rastergis::RSGISShapeParam *>::iterator shapeIter;
 
                     for(shapeIter = this->shapeIndexes->begin(); shapeIter != this->shapeIndexes->end(); ++shapeIter) {
-                        RSGISShapeParam in = (*shapeIter);
+                        rsgis::rastergis::RSGISShapeParam *in = (*shapeIter);
                         rsgis::cmds::RSGISShapeParamCmds out;
-                        out.idx = (rsgisshapeindexcmds)in->idx;
+                        out.idx = (rsgis::cmds::rsgisshapeindexcmds)in->idx;
                         out.colName = in->colName;
                         out.colIdx = in->colIdx;
 
                         shapes.push_back(out);
-
                         delete *shapeIter;
                     }
+                    
                     delete this->shapeIndexes;
-                    */
-                    // instead of that, make a vector of void pointers
-                    std::vector<void *> shapes;
-                    shapes.reserve(this->shapesIndexes->size());
-                    std::vector<cmds::RSGISShapeParam*>::iterator shapeIter;
-                    for(shapeIter = this->shapeIndexes->begin(); shapeIter != this->shapeIndexes->end(); ++shapeIter) {
-                        shapes.push_back((void *)(*shapeIter));
-                    }
-
+                    
                     // call function passing vector
                     rsgis::cmds::executeCalcShapeIndices(this->inputImage, shapes);
-
-                    // free pointers?
-                    for(shapeIter = this->shapeIndexes->begin(); shapeIter != this->shapeIndexes->end(); ++shapeIter) {
-                        delete *shapeIter;
-                    }
-                    delete this->shapeIndexes;
-
                 } catch (rsgis::RSGISException e) {
                     throw rsgis::RSGISException(e.what());
                 } catch (rsgis::cmds::RSGISCmdException e) {
@@ -3818,15 +3802,24 @@ namespace rsgisexe{
                 }
 
                 try {
-                    // translate classChangeField to void pointers
-                    std::vector<void *> classFields;
-                    std::vector<rastergis::RSGISClassChangeFields*>::iterator classIter;
+                    // translate classChangeField to void pointers, actually to CMD data types
+                    std::vector<rsgis::cmds::RSGISClassChangeFieldsCmds> classFields;
+                    std::vector<rsgis::rastergis::RSGISClassChangeFields*>::iterator classIter;
                     classFields.reserve(classChangeField->size());
-                    for(classIter = classChangedField->begin(); classIter != classChangedField->end(); ++classIter) {
-                        classFields.push_back((void *)(*classIter));
+                    for(classIter = classChangeField->begin(); classIter != classChangeField->end(); ++classIter) {
+                        rsgis::cmds::RSGISClassChangeFieldsCmds classField;
+                        classField.name = (*classIter)->name;
+                        classField.outName = (*classIter)->outName;
+                        classField.threshold = (*classIter)->threshold;
+                        classField.means = (*classIter)->means;
+                        classField.stddev = (*classIter)->stddev;
+                        classField.count = (*classIter)->count;
+                        classFields.push_back(classField);
+                        delete *classIter;
                     }
 
-                    rsgis::cmds::executeFindChangeClumpsFromStdDev(this->clumpsImage, this->classField, this->changeField, this->attFields, classFields);
+                    rsgis::cmds::executeFindChangeClumpsFromStdDev(this->clumpsImage, this->classField, this->changeField, *this->attFields, classFields);
+                    delete classChangeField;
                 } catch (rsgis::RSGISException e) {
                     throw rsgis::RSGISException(e.what());
                 } catch (rsgis::cmds::RSGISCmdException e) {

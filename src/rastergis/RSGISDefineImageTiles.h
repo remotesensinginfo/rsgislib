@@ -1,5 +1,5 @@
 /*
- *  RSGISDefineImageTiles.h
+ *  
  *  RSGIS_LIB
  *
  *  Created by Pete Bunting on 02/03/2013.

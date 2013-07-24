@@ -155,6 +155,7 @@ static PyObject *ImageCalc_KMeansClustering(PyObject *self, PyObject *args) {
     {
         rsgis::cmds::executeKMeansClustering(pszInputImage, pszOutputFile, nNumClusters, nMaxNumIterations,
                             nSubSample, nIgnoreZeros, fDegreeOfChange, (rsgis::cmds::RSGISInitClustererMethods)nClusterMethod);
+        
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
