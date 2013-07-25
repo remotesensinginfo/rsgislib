@@ -312,6 +312,7 @@ set(LIB_IMG_H
 	${RSGIS_SRC_IMG_DIR}/RSGISImageUtils.h 
 	${RSGIS_SRC_IMG_DIR}/RSGISCalcImage.h 
 	${RSGIS_SRC_IMG_DIR}/RSGISCalcImageSingle.h 
+	${RSGIS_SRC_IMG_DIR}/RSGISDarkTargetIdentification.h 
 	${RSGIS_SRC_IMG_DIR}/RSGISImageInterpolator.h 
 	${RSGIS_SRC_IMG_DIR}/RSGISImageInterpolation.h 
 	${RSGIS_SRC_IMG_DIR}/RSGISAddBands.h 
@@ -402,6 +403,8 @@ set(LIB_IMG_CPP
 	${RSGIS_SRC_IMG_DIR}/RSGISCopyImageBands.h 
 	${RSGIS_SRC_IMG_DIR}/RSGISCreateTestImages.cpp 
 	${RSGIS_SRC_IMG_DIR}/RSGISCreateTestImages.h 
+	${RSGIS_SRC_IMG_DIR}/RSGISDarkTargetIdentification.h
+	${RSGIS_SRC_IMG_DIR}/RSGISDarkTargetIdentification.cpp
 	${RSGIS_SRC_IMG_DIR}/RSGISDefiniensCSVRasterise.cpp 
 	${RSGIS_SRC_IMG_DIR}/RSGISDefiniensCSVRasterise.h 
 	${RSGIS_SRC_IMG_DIR}/RSGISExport2DScatterPTxt.cpp 

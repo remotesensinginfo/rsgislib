@@ -696,6 +696,14 @@
 	<rsgis:command algor="imageutils" option="cutouttile" image="image.env" tile="tile.env" output="image_out.env" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" nodataval="float" />
 	<!-- A command to extract a subsample of image data to a hdf5 file --> 
 	<rsgis:command algor="imageutils" option="subsampleimage" image="image.kea" output="data.hdf" nodata="float" subsample="int" />
+	<!-- A command to identify dark targets which can be used for a number of applications (e.g., radiometric correction) --> 
+	<rsgis:command algor="imageutils" option="darktargetmask" image="image.kea" output="data.hdf" nodata="float"  />
+	
+	
+	
+	
+	
+	
 
 
 
