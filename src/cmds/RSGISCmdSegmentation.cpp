@@ -129,7 +129,7 @@ namespace rsgis{ namespace cmds {
     }
     
     void executeClump(std::string inputImage, std::string outputImage, std::string imageFormat, bool processInMemory, bool noDataValProvided, float noDataVal) throw(RSGISCmdException)
-    {
+    {        
         try
         {
             GDALAllRegister();

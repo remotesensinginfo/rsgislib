@@ -60,6 +60,10 @@ namespace rsgis{namespace segment{
         {
             throw e;
         }
+        catch (rsgis::RSGISException &e)
+        {
+            throw rsgis::RSGISImageException(e.what());
+        }
     }
 
     RSGISLabelPixelsUsingClusters::~RSGISLabelPixelsUsingClusters()
