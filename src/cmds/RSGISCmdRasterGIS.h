@@ -139,7 +139,7 @@ namespace rsgis{ namespace cmds {
     void executeCopyGDALATTColumns(std::string inputImage, std::string clumpsImage, std::vector<std::string> fields)throw(RSGISCmdException);
 
     /** Function for adding spatial location columns to the attribute table */
-    void executeSpatialLocation(std::string inputImage, std::string clumpsImage, std::string eastingsField, std::string northingsField)throw(RSGISCmdException);
+    void executeSpatialLocation(std::string inputImage, std::string eastingsField, std::string northingsField)throw(RSGISCmdException);
 
     /** Function for populating an attribute table from an image */
     void executePopulateRATWithStats(std::string inputImage, std::string clumpsImage, std::vector<rsgis::cmds::RSGISBandAttStatsCmds*> *bandStatsCmds)throw(RSGISCmdException);
@@ -197,7 +197,7 @@ namespace rsgis{ namespace cmds {
 
     /** Function to generate a mask for paraticular class */
     void executeClassMask(std::string inputImage, std::string classField, std::string className, std::string outputFile, std::string imageFormat, RSGISLibDataType dataType)throw(RSGISCmdException);
-
+    
     /** Function to find the clump neighbours */
     void executeFindNeighbours(std::string inputImage)throw(RSGISCmdException);
 

@@ -3059,7 +3059,7 @@ namespace rsgisexe{
 
                 try
                 {
-                    rsgis::cmds::executeSpatialLocation(this->inputImage, this->clumpsImage, this->eastingsField, this->northingsField);
+                    rsgis::cmds::executeSpatialLocation(this->inputImage, this->eastingsField, this->northingsField);
                 }
                 catch(rsgis::cmds::RSGISCmdException &e)
                 {

@@ -150,7 +150,7 @@ namespace rsgis{ namespace cmds {
         }
     }
 
-    void executeSpatialLocation(std::string inputImage, std::string clumpsImage, std::string eastingsField, std::string northingsField)throw(RSGISCmdException) {
+    void executeSpatialLocation(std::string inputImage, std::string eastingsField, std::string northingsField)throw(RSGISCmdException) {
         try
         {
             GDALAllRegister();

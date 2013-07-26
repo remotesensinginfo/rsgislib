@@ -131,13 +131,13 @@ static PyObject *RasterGIS_CopyGDALATTColumns(PyObject *self, PyObject *args) {
 }
 
 static PyObject *RasterGIS_SpatialLocation(PyObject *self, PyObject *args) {
-    const char *clumpsImage, *inputImage, *eastingsField, *northingsField;
+    const char *inputImage, *eastingsField, *northingsField;
 
-    if(!PyArg_ParseTuple(args, "ssss:spatialLocation", &inputImage, &clumpsImage, &eastingsField, &northingsField))
+    if(!PyArg_ParseTuple(args, "sss:spatialLocation", &inputImage, &eastingsField, &northingsField))
         return NULL;
 
     try {
-        rsgis::cmds::executeSpatialLocation(std::string(clumpsImage), std::string(inputImage), std::string(eastingsField), std::string(northingsField));
+        rsgis::cmds::executeSpatialLocation(std::string(inputImage), std::string(eastingsField), std::string(northingsField));
     } catch (rsgis::cmds::RSGISCmdException &e) {
         PyErr_SetString(GETSTATE(self)->error, e.what());
         return NULL;
@@ -175,6 +175,8 @@ static PyObject *RasterGIS_PopulateRATWithStats(PyObject *self, PyObject *args) 
         std::vector<PyObject*> extractedAttributes;     // store a list of extracted pyobjects to dereference
         extractedAttributes.push_back(o);
 
+        // TODO: BELOW - GET RID OF CALC* EXTRACTION AND RATHER SET IN STRUCT BASED ON IF FIELD STRING IS PY_NONE
+        
         pBand = PyObject_GetAttrString(o, "band");
         extractedAttributes.push_back(pBand);
         if( ( pBand == NULL ) || ( pBand == Py_None ) || !RSGISPY_CHECK_INT(pBand)) {
@@ -608,7 +610,7 @@ static PyObject *RasterGIS_FindSpecClose(PyObject *self, PyObject *args) {
     const char *inputImage, *outputField, *spatialDistField, *distanceField;
     float distThreshold, specDistThreshold;
 
-    if(!PyArg_ParseTuple(args, "ssssff:findSpecClose", &inputImage, &distanceField, &spatialDistField, &outputField, &specDistThreshold, &distThreshold))
+    if(!PyArg_ParseTuple(args, "ssssff:findSpecClose", &inputImage, &spatialDistField, &distanceField, &outputField, &specDistThreshold, &distThreshold))
         return NULL;
 
     try {
@@ -1322,10 +1324,9 @@ static PyMethodDef RasterGISMethods[] = {
 
    {"spatialLocation", RasterGIS_SpatialLocation, METH_VARARGS,
 "Adds spatial location columns to the attribute table\n"
-"call signature: rastergis.spatialLocation(inputImage, clumpsImage, eastingsField, northingsField)\n"
+"call signature: rastergis.spatialLocation(inputImage, eastingsField, northingsField)\n"
 "where:\n"
 "  inputImage is a string containing the name of the input image file\n"
-"  clumpsImage is a string containing the name of the input clump file\n"
 "  eastingsField is a string containing the name of the eastings field\n"
 "  northingsField is a string containing the name of the northings field\n"
 },
@@ -1336,16 +1337,9 @@ static PyMethodDef RasterGISMethods[] = {
 "where:\n"
 "  inputImage is a string containing the name of the input image file\n"
 "  clumpsImage is a string containing the name of the input clump file\n"
-"  bandStatsCmds is a sequence of objects that have attributes matching rsgis.cmds.RSGISBandAttStatsCmds\n"
+"  bandStatsCmds is a sequence of rsgislib.rastergis.BandAttStats objects that have attributes in line with rsgis.cmds.RSGISBandAttStatsCmds\n"
 "    Requires: TODO: Check\n"
 "      band: int defining the image band to process\n"
-"      calcCount: boolean defining if the count value should be calculated\n"
-"      calcMin: boolean defining if the min value should be calculated\n"
-"      calcMax: boolean defining if the max value should be calculated\n"
-"      calcSum: boolean defining if the sum value should be calculated\n"
-"      calcMean: boolean defining if the mean value should be calculated\n"
-"      calcStdDev: boolean defining if the standard deviation should be calculated\n"
-"      calcMedian: boolean defining if the median value should be calculated\n"
 "      countField: string defining the name of the field for count value\n"
 "      minField: string defining the name of the field for min value\n"
 "      maxField: string defining the name of the field for max value\n"
@@ -1425,11 +1419,11 @@ static PyMethodDef RasterGISMethods[] = {
 
    {"findSpecClose", RasterGIS_FindSpecClose, METH_VARARGS,
 "Calculates the features within a given spatial and spectral distance\n"
-"call signature: rastergis.findSpecClose(inputImage, distanceField, spatialDistField, outputField, specDistThreshold, distThreshold)\n"
+"call signature: rastergis.findSpecClose(inputImage, spatialDistField, distanceField, outputField, specDistThreshold, distThreshold)\n"
 "where:\n"
 "  inputImage is a string containing the name of the input image file TODO: check and expand\n"
-"  distanceField is a string containing the name of the field containing the distance\n"
 "  spatialDistField is a string containing the name of the field containing the spatial distance\n"
+"  distanceField is a string containing the name of the field containing the distance\n"
 "  outputField is a string continaing the name of the output field\n"
 "  specDistThreshold is a float specifying the spectral distance threshold with which to operate\n"
 "  distThreshold is a float specifying the spatial distance threshold with which to operate\n"

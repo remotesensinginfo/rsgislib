@@ -150,7 +150,7 @@ static PyObject *ImageCalc_KMeansClustering(PyObject *self, PyObject *args) {
     if( !PyArg_ParseTuple(args, "ssIIIifi:kMeansClustering", &pszInputImage, &pszOutputFile, &nNumClusters,
                                 &nMaxNumIterations, &nSubSample, &nIgnoreZeros, &fDegreeOfChange, &nClusterMethod ))
         return NULL;
-
+    
     try
     {
         rsgis::cmds::executeKMeansClustering(pszInputImage, pszOutputFile, nNumClusters, nMaxNumIterations,
@@ -254,21 +254,21 @@ static PyObject *ImageCalc_ImagePixelColumnSummary(PyObject *self, PyObject *arg
     int useNoDataValue;
     float noDataValue;
     PyObject *summaryStats;
-
-    if(!PyArg_ParseTuple(args, "ssOsIfi:ImagePixelColumnSummary", &inputImage, &outputImage, &summaryStats, &gdalFormat, &dataType, &noDataValue, useNoDataValue))
+    
+    if(!PyArg_ParseTuple(args, "ssOsIfi:imagePixelColumnSummary", &inputImage, &outputImage, &summaryStats, &gdalFormat, &dataType, &noDataValue, &useNoDataValue))
         return NULL;
 
     // get the kw attrs from the object
     PyObject *pCalcMin = PyObject_GetAttrString(summaryStats, "calcMin");
     if( ( pCalcMin == NULL ) || ( pCalcMin == Py_None ) || !RSGISPY_CHECK_INT(pCalcMin) ) {
-        PyErr_SetString(GETSTATE(self)->error, "could not find string attribute \'calcMin\'" );
+        PyErr_SetString(GETSTATE(self)->error, "could not find bool attribute \'calcMin\'" );
         Py_XDECREF(pCalcMin);
         return NULL;
     }
 
     PyObject *pCalcMax = PyObject_GetAttrString(summaryStats, "calcMax");
     if( ( pCalcMax == NULL ) || ( pCalcMax == Py_None ) || !RSGISPY_CHECK_INT(pCalcMax) ) {
-        PyErr_SetString(GETSTATE(self)->error, "could not find string attribute \'calcMax\'" );
+        PyErr_SetString(GETSTATE(self)->error, "could not find bool attribute \'calcMax\'" );
         Py_XDECREF(pCalcMax);
         Py_DECREF(pCalcMin);
         return NULL;
@@ -276,7 +276,7 @@ static PyObject *ImageCalc_ImagePixelColumnSummary(PyObject *self, PyObject *arg
 
     PyObject *pCalcMean = PyObject_GetAttrString(summaryStats, "calcMean");
     if( ( pCalcMean == NULL ) || ( pCalcMean == Py_None ) || !RSGISPY_CHECK_INT(pCalcMean) ) {
-        PyErr_SetString(GETSTATE(self)->error, "could not find string attribute \'calcMean\'" );
+        PyErr_SetString(GETSTATE(self)->error, "could not find bool attribute \'calcMean\'" );
         Py_XDECREF(pCalcMean);
         Py_DECREF(pCalcMax);
         Py_DECREF(pCalcMin);
@@ -285,7 +285,7 @@ static PyObject *ImageCalc_ImagePixelColumnSummary(PyObject *self, PyObject *arg
 
     PyObject *pCalcSum = PyObject_GetAttrString(summaryStats, "calcSum");
     if( ( pCalcSum == NULL ) || ( pCalcSum == Py_None ) || !RSGISPY_CHECK_INT(pCalcSum) ) {
-        PyErr_SetString(GETSTATE(self)->error, "could not find string attribute \'calcSum\'" );
+        PyErr_SetString(GETSTATE(self)->error, "could not find bool attribute \'calcSum\'" );
         Py_XDECREF(pCalcSum);
         Py_DECREF(pCalcMean);
         Py_DECREF(pCalcMax);
@@ -295,7 +295,7 @@ static PyObject *ImageCalc_ImagePixelColumnSummary(PyObject *self, PyObject *arg
 
     PyObject *pCalcStdDev = PyObject_GetAttrString(summaryStats, "calcStdDev");
     if( ( pCalcStdDev == NULL ) || ( pCalcStdDev == Py_None ) || !RSGISPY_CHECK_INT(pCalcStdDev) ) {
-        PyErr_SetString(GETSTATE(self)->error, "could not find string attribute \'calcStdDev\'" );
+        PyErr_SetString(GETSTATE(self)->error, "could not find bool attribute \'calcStdDev\'" );
         Py_XDECREF(pCalcStdDev);
         Py_DECREF(pCalcSum);
         Py_DECREF(pCalcMean);
@@ -306,7 +306,7 @@ static PyObject *ImageCalc_ImagePixelColumnSummary(PyObject *self, PyObject *arg
 
     PyObject *pCalcMedian = PyObject_GetAttrString(summaryStats, "calcMedian");
     if( ( pCalcMedian == NULL ) || ( pCalcMedian == Py_None ) || !RSGISPY_CHECK_INT(pCalcMedian) ) {
-        PyErr_SetString(GETSTATE(self)->error, "could not find string attribute \'calcMedian\'" );
+        PyErr_SetString(GETSTATE(self)->error, "could not find bool attribute \'calcMedian\'" );
         Py_XDECREF(pCalcMedian);
         Py_DECREF(pCalcStdDev);
         Py_DECREF(pCalcSum);
@@ -318,7 +318,7 @@ static PyObject *ImageCalc_ImagePixelColumnSummary(PyObject *self, PyObject *arg
 
     PyObject *pMin = PyObject_GetAttrString(summaryStats, "min");
     if( ( pMin == NULL ) || ( pMin == Py_None ) || !RSGISPY_CHECK_FLOAT(pMin) ) {
-        PyErr_SetString(GETSTATE(self)->error, "could not find string attribute \'min\'" );
+        PyErr_SetString(GETSTATE(self)->error, "could not find float attribute \'min\'" );
         Py_XDECREF(pMin);
         Py_DECREF(pCalcMedian);
         Py_DECREF(pCalcStdDev);
@@ -331,7 +331,7 @@ static PyObject *ImageCalc_ImagePixelColumnSummary(PyObject *self, PyObject *arg
 
     PyObject *pMax = PyObject_GetAttrString(summaryStats, "max");
     if( ( pMax == NULL ) || ( pMax == Py_None ) || !RSGISPY_CHECK_FLOAT(pMax) ) {
-        PyErr_SetString(GETSTATE(self)->error, "could not find string attribute \'max\'" );
+        PyErr_SetString(GETSTATE(self)->error, "could not find float attribute \'max\'" );
         Py_XDECREF(pMax);
         Py_DECREF(pMin);
         Py_DECREF(pCalcMedian);
@@ -345,7 +345,7 @@ static PyObject *ImageCalc_ImagePixelColumnSummary(PyObject *self, PyObject *arg
 
     PyObject *pMean = PyObject_GetAttrString(summaryStats, "mean");
     if( ( pMean == NULL ) || ( pMean == Py_None ) || !RSGISPY_CHECK_FLOAT(pMean) ) {
-        PyErr_SetString(GETSTATE(self)->error, "could not find string attribute \'mean\'" );
+        PyErr_SetString(GETSTATE(self)->error, "could not find float attribute \'mean\'" );
         Py_XDECREF(pMean);
         Py_DECREF(pMax);
         Py_DECREF(pMin);
@@ -360,7 +360,7 @@ static PyObject *ImageCalc_ImagePixelColumnSummary(PyObject *self, PyObject *arg
 
     PyObject *pSum = PyObject_GetAttrString(summaryStats, "sum");
     if( ( pSum == NULL ) || ( pSum == Py_None ) || !RSGISPY_CHECK_FLOAT(pSum) ) {
-        PyErr_SetString(GETSTATE(self)->error, "could not find string attribute \'sum\'" );
+        PyErr_SetString(GETSTATE(self)->error, "could not find float attribute \'sum\'" );
         Py_XDECREF(pSum);
         Py_DECREF(pMean);
         Py_DECREF(pMax);
@@ -376,7 +376,7 @@ static PyObject *ImageCalc_ImagePixelColumnSummary(PyObject *self, PyObject *arg
 
     PyObject *pStdDev = PyObject_GetAttrString(summaryStats, "stdDev");
     if( ( pStdDev == NULL ) || ( pStdDev == Py_None ) || !RSGISPY_CHECK_FLOAT(pStdDev) ) {
-        PyErr_SetString(GETSTATE(self)->error, "could not find string attribute \'stdDev\'" );
+        PyErr_SetString(GETSTATE(self)->error, "could not find float attribute \'stdDev\'" );
         Py_XDECREF(pStdDev);
         Py_DECREF(pSum);
         Py_DECREF(pMean);
@@ -393,7 +393,7 @@ static PyObject *ImageCalc_ImagePixelColumnSummary(PyObject *self, PyObject *arg
 
     PyObject *pMedian = PyObject_GetAttrString(summaryStats, "median");
     if( ( pMedian == NULL ) || ( pMedian == Py_None ) || !RSGISPY_CHECK_FLOAT(pMedian) ) {
-        PyErr_SetString(GETSTATE(self)->error, "could not find string attribute \'median\'" );
+        PyErr_SetString(GETSTATE(self)->error, "could not find float attribute \'median\'" );
         Py_XDECREF(pMedian);
         Py_DECREF(pStdDev);
         Py_DECREF(pSum);
@@ -424,7 +424,7 @@ static PyObject *ImageCalc_ImagePixelColumnSummary(PyObject *self, PyObject *arg
     summary.sum = RSGISPY_FLOAT_EXTRACT(pSum);
     summary.stdDev = RSGISPY_FLOAT_EXTRACT(pStdDev);
     summary.median = RSGISPY_FLOAT_EXTRACT(pMedian);
-
+    
     Py_DECREF(pCalcMin);
     Py_DECREF(pCalcMax);
     Py_DECREF(pCalcMean);
@@ -491,7 +491,7 @@ static PyObject *ImageCalc_Normalisation(PyObject *self, PyObject *args) {
         PyObject *inImageObj = PySequence_GetItem(pInputImages, i);
         PyObject *outImageObj = PySequence_GetItem(pOutputImages, i);
 
-        if(!RSGISPY_CHECK_STRING(inImageObj) || RSGISPY_CHECK_STRING(outImageObj)) {
+        if(!RSGISPY_CHECK_STRING(inImageObj) || !RSGISPY_CHECK_STRING(outImageObj)) {
             PyErr_SetString(GETSTATE(self)->error, "Input and output images must be strings");
             Py_DECREF(inImageObj);
             Py_DECREF(outImageObj);
@@ -759,10 +759,10 @@ static PyObject *ImageCalc_Dist2Geoms(PyObject *self, PyObject *args) {
 }
 
 static PyObject *ImageCalc_ImageBandStats(PyObject *self, PyObject *args) {
-    const char *inputImage, *outputFile, *inputVector;
+    const char *inputImage, *outputFile;
     int ignoreZeros;
 
-    if(!PyArg_ParseTuple(args, "ssi:imageBandStats", &inputVector, &outputFile, &ignoreZeros))
+    if(!PyArg_ParseTuple(args, "ssi:imageBandStats", &inputImage, &outputFile, &ignoreZeros))
         return NULL;
 
     try {
@@ -776,10 +776,10 @@ static PyObject *ImageCalc_ImageBandStats(PyObject *self, PyObject *args) {
 }
 
 static PyObject *ImageCalc_ImageStats(PyObject *self, PyObject *args) {
-    const char *inputImage, *outputFile, *inputVector;
+    const char *inputImage, *outputFile;
     int ignoreZeros;
 
-    if(!PyArg_ParseTuple(args, "ssi:imageStats", &inputVector, &outputFile, &ignoreZeros))
+    if(!PyArg_ParseTuple(args, "ssi:imageStats", &inputImage, &outputFile, &ignoreZeros))
         return NULL;
 
     try {
@@ -969,9 +969,9 @@ static PyMethodDef ImageCalcMethods[] = {
 "  gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
 "  gdaltype is an containing one of the values from rsgislib.TYPE_*\n"},
 
-    {"KMeansClustering", ImageCalc_KMeansClustering, METH_VARARGS,
+    {"kMeansClustering", ImageCalc_KMeansClustering, METH_VARARGS,
 "Performs K Means Clustering.\n"
-"call signature: imagecalc.KMeansClustering(inputImage, outputMatrix, numClusters, maxIterations, subSample, ignoreZeros, degreeOfChange, initMethod)\n"
+"call signature: imagecalc.kMeansClustering(inputImage, outputMatrix, numClusters, maxIterations, subSample, ignoreZeros, degreeOfChange, initMethod)\n"
 "where:\n"
 "  inputImage is a string\n"
 "  outputMatrix is a string\n"
@@ -982,9 +982,9 @@ static PyMethodDef ImageCalcMethods[] = {
 "  degreeofChange is a float\n"
 "  initMethod is one of INITCLUSTER_* values\n"},
 
-    {"ISODataClustering", ImageCalc_ISODataClustering, METH_VARARGS,
+    {"isoDataClustering", ImageCalc_ISODataClustering, METH_VARARGS,
 "Performs ISO Data Clustering.\n"
-"call signature: imagecalc.ISODataClustering(inputImage, outputMatrix, numClusters, maxIterations, subSample, ignoreZeros, degreeOfChange, initMethod, minDistBetweenClusters, minNumFeatures, maxStdDev, minNumClusters, startIteration, endIteration)\n"
+"call signature: imagecalc.isoDataClustering(inputImage, outputMatrix, numClusters, maxIterations, subSample, ignoreZeros, degreeOfChange, initMethod, minDistBetweenClusters, minNumFeatures, maxStdDev, minNumClusters, startIteration, endIteration)\n"
 "where:\n"
 "  inputImage is a string\n"
 "  outputMatrix is a string\n"
@@ -1038,7 +1038,7 @@ static PyMethodDef ImageCalcMethods[] = {
 "where:\n"
 "  inputImage is a string containing the name of the input file\n"
 "  outputImage is a string containing the name of the output file\n"
-"  summaryStats is an object that has attributes matching rsgis.cmds.RSGISCmdStatsSummary\n"
+"  summaryStats is an rsgislib.imagecalc.StatsSummary object that has attributes matching rsgis.cmds.RSGISCmdStatsSummary\n"
 "    Requires: TODO: Check\n"
 "      calcMin: boolean defining if the min value should be calculated\n"
 "      calcMax: boolean defining if the max value should be calculated\n"

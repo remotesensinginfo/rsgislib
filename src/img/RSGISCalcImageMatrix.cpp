@@ -43,7 +43,7 @@ namespace rsgis{namespace img{
 		double *outputValue = new double[calcImageSingleValue->getNumberOfOutValues()];
 		
 		rsgis::math::Matrix *outputMatrix = new rsgis::math::Matrix();
-		
+
 		try
 		{
 			// Number of bands..
@@ -56,12 +56,12 @@ namespace rsgis{namespace img{
 			{
 				numInBandsDSB += datasetsB[i]->GetRasterCount();
 			}
-			
+
 			if(numInBandsDSA != numInBandsDSB)
 			{
-				throw new RSGISImageBandException("The two image sets do not have the same number of bands.");
+				throw RSGISImageBandException("The two image sets do not have the same number of bands.");
 			}
-			
+            
 			outputMatrix->m = numInBandsDSA;
 			outputMatrix->n = numInBandsDSB;
 			outputMatrix->matrix = new double[(outputMatrix->m * outputMatrix->n)];
@@ -99,15 +99,21 @@ namespace rsgis{namespace img{
 			matrixUtils.saveMatrix2Binary(outputMatrix, outputFile);*/
 			
 		}
-		catch(RSGISImageCalcException e)
+		catch(RSGISImageCalcException &e)
 		{
-			std::cout << e.what() << std::endl;
 			throw e;
 		}
-		catch(RSGISImageBandException e)
+		catch(RSGISImageBandException &e)
 		{
-			std::cout << e.what() << std::endl;
 			throw e;
+		}
+        catch(rsgis::RSGISException &e)
+		{
+			throw RSGISImageCalcException(e.what());
+		}
+        catch(std::exception &e)
+		{
+			throw RSGISImageCalcException(e.what());
 		}
 		
 		return outputMatrix;

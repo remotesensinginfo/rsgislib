@@ -763,7 +763,6 @@ namespace rsgis{ namespace cmds {
 
     void executeCorrelation(std::string inputImageA, std::string inputImageB, std::string outputMatrix) throw(RSGISCmdException)
     {
-
         GDALAllRegister();
         GDALDataset **datasetsA = NULL;
         GDALDataset **datasetsB = NULL;
@@ -817,7 +816,11 @@ namespace rsgis{ namespace cmds {
             delete [] datasetsA;
             delete [] datasetsB;
         }
-        catch(rsgis::RSGISException e)
+        catch(rsgis::RSGISException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(std::exception &e)
         {
             throw RSGISCmdException(e.what());
         }
@@ -869,7 +872,7 @@ namespace rsgis{ namespace cmds {
                 std::cout << "Mean vectors will be calculated\n";
                 calcMean = new rsgis::img::RSGISCalcMeanVectorIndividual(1);
                 calcImgSingleMean = new rsgis::img::RSGISCalcImageSingle(calcMean);
-                calcImgMatrixMean = new rsgis::img::RSGISCalcImageMatrix(calcImgSingle);
+                calcImgMatrixMean = new rsgis::img::RSGISCalcImageMatrix(calcImgSingleMean);
                 meanAMatrix = calcImgMatrixMean->calcImageVector(datasetsA, 1);
                 meanBMatrix = calcImgMatrixMean->calcImageVector(datasetsB, 1);
                 std::cout << "Mean Vectors have been calculated\n";
@@ -886,10 +889,13 @@ namespace rsgis{ namespace cmds {
             covarianceMatrix = calcImgMatrix->calcImageMatrix(datasetsA, datasetsB, 1);
             matrixUtils.saveMatrix2txt(covarianceMatrix, outputMatrix);
         }
-        catch(rsgis::RSGISException e)
-        {
-            throw e;
+        catch(rsgis::RSGISException e) {
+            throw RSGISCmdException(e.what());
         }
+        catch(rsgis::math::RSGISMatricesException e) {
+            throw RSGISCmdException(e.what());
+        }
+        
 
         if(calcImgSingle != NULL)
         {
