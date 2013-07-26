@@ -92,7 +92,7 @@ namespace rsgis{namespace img{
 			
 			/*if(numInBandsDSA != numInBandsDSB)
 			{
-				throw new RSGISImageCalcException("The two image sets do not have the same number of bands.");
+				throw RSGISImageCalcException("The two image sets do not have the same number of bands.");
 			}*/
 			numInBands = numInBandsDSA;
 			

@@ -39,12 +39,12 @@ namespace rsgis{namespace img{
 		if(bandA > numBands)
 		{
 			std::cout << "The band A specificed is larger than the number of available bands." << std::endl;
-			throw new RSGISImageCalcException("The band A specificed is larger than the number of available bands.");
+			throw RSGISImageCalcException("The band A specificed is larger than the number of available bands.");
 		}
 		else if(bandB > numBands)
 		{
 			std::cout << "The band B specificed is larger than the number of available bands." << std::endl;
-			throw new RSGISImageCalcException("The band B specificed is larger than the number of available bands.");
+			throw RSGISImageCalcException("The band B specificed is larger than the number of available bands.");
 		}
 		
 		n++;

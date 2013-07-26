@@ -2924,7 +2924,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 		{
             try {
                 rsgis::cmds::executeCorrelation(this->inputImageA, this->inputImageB, this->outputMatrix);
-            } catch (rsgis::RSGISException e) {
+            } catch (rsgis::RSGISException &e) {
                 throw rsgis::RSGISException(e.what());
             } catch (rsgis::cmds::RSGISCmdException e) {
                 throw rsgis::RSGISException(e.what());
