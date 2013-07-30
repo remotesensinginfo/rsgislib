@@ -1,0 +1,15 @@
+ENVI
+description = {
+/Users/sebclarke/Temp/RSGISLibTests/Rasters/injune_p142_casi_sub_ll.kea}
+samples = 500
+lines   = 150
+bands   = 1
+header offset = 0
+file type = ENVI Standard
+data type = 4
+interleave = bsq
+byte order = 0
+map info = {UTM, 1, 1, 539549.500000001, 7147674.5, 1, 1, 55, South,WGS-84}
+coordinate system string = {PROJCS["WGS_1984_UTM_Zone_55S",GEOGCS["GCS_WGS_1984",DATUM["D_WGS_1984",SPHEROID["WGS_1984",6378137,298.257223563]],PRIMEM["Greenwich",0],UNIT["Degree",0.017453292519943295]],PROJECTION["Transverse_Mercator"],PARAMETER["latitude_of_origin",0],PARAMETER["central_meridian",147],PARAMETER["scale_factor",0.9996],PARAMETER["false_easting",500000],PARAMETER["false_northing",10000000],UNIT["Meter",1]]}
+band names = {
+Band 1}

@@ -169,13 +169,11 @@ static PyObject *RasterGIS_PopulateRATWithStats(PyObject *self, PyObject *args) 
         rsgis::cmds::RSGISBandAttStatsCmds *cmdObj = new rsgis::cmds::RSGISBandAttStatsCmds();   // the c++ object we need to pass pointers of
 
         // declare and initialise pointers for all the attributes of the struct
-        PyObject *pBand, *pThreshold, *pCalcCount, *pCountField, *pCalcMin, *pMinField, *pCalcMax, *pMaxField, *pCalcStdDev, *pStdDevField, *pCalcMedian, *pMedianField, *pCalcSum, *pSumField, *pCalcMean, *pMeanField;
-        pBand = pThreshold = pCalcCount = pCountField = pCalcMin = pMinField = pCalcMax = pMaxField = pMeanField = pCalcMean = pCalcStdDev = pStdDevField = pCalcMedian = pMedianField = pCalcSum = pSumField = NULL;
+        PyObject *pBand, *pThreshold, *pCountField, *pMinField, *pMaxField, *pStdDevField, *pMedianField, *pSumField, *pMeanField;
+        pBand = pThreshold = pCountField = pMinField = pMaxField = pMeanField = pStdDevField = pMedianField = pSumField = NULL;
 
         std::vector<PyObject*> extractedAttributes;     // store a list of extracted pyobjects to dereference
         extractedAttributes.push_back(o);
-
-        // TODO: BELOW - GET RID OF CALC* EXTRACTION AND RATHER SET IN STRUCT BASED ON IF FIELD STRING IS PY_NONE
         
         pBand = PyObject_GetAttrString(o, "band");
         extractedAttributes.push_back(pBand);
@@ -200,198 +198,66 @@ static PyObject *RasterGIS_PopulateRATWithStats(PyObject *self, PyObject *args) 
             delete cmdObj;
             return NULL;
         }
-
-        pCalcCount = PyObject_GetAttrString(o, "calcCount");
-        extractedAttributes.push_back(pCalcCount);
-        if( ( pCalcCount == NULL ) || ( pCalcCount == Py_None ) || !RSGISPY_CHECK_INT(pCalcCount) ) {
-            PyErr_SetString(GETSTATE(self)->error, "could not find bool (int) attribute \'calcCount\'" );
-            FreePythonObjects(extractedAttributes);
-            delete cmdObj;
-            for(std::vector<rsgis::cmds::RSGISBandAttStatsCmds*>::iterator iter = bandStatsCmds.begin(); iter != bandStatsCmds.end(); ++iter) {
-                delete *iter;
-            }
-            return NULL;
-        }
-
+        
+        // check if fields have been set, set calcValue accordingly
         pCountField = PyObject_GetAttrString(o, "countField");
         extractedAttributes.push_back(pCountField);
-        if( ( pCountField == NULL ) || ( pCountField == Py_None ) || !RSGISPY_CHECK_STRING(pCountField) ) {
-            PyErr_SetString(GETSTATE(self)->error, "could not find string attribute \'countField\'" );
-            FreePythonObjects(extractedAttributes);
-            for(std::vector<rsgis::cmds::RSGISBandAttStatsCmds*>::iterator iter = bandStatsCmds.begin(); iter != bandStatsCmds.end(); ++iter) {
-                delete *iter;
-            }
-            delete cmdObj;
-            return NULL;
-        }
-
-        pCalcMin = PyObject_GetAttrString(o, "calcMin");
-        extractedAttributes.push_back(pCalcMin);
-        if( ( pCalcMin == NULL ) || ( pCalcMin == Py_None ) || !RSGISPY_CHECK_INT(pCalcMin) ) {
-            PyErr_SetString(GETSTATE(self)->error, "could not find bool (int) attribute \'calcMin\'" );
-            FreePythonObjects(extractedAttributes);
-            for(std::vector<rsgis::cmds::RSGISBandAttStatsCmds*>::iterator iter = bandStatsCmds.begin(); iter != bandStatsCmds.end(); ++iter) {
-                delete *iter;
-            }
-            delete cmdObj;
-            return NULL;
-        }
+        cmdObj->calcCount = !(pCountField == NULL || !RSGISPY_CHECK_STRING(pCountField));
 
         pMinField = PyObject_GetAttrString(o, "minField");
         extractedAttributes.push_back(pMinField);
-        if( ( pMinField == NULL ) || ( pMinField == Py_None ) || !RSGISPY_CHECK_STRING(pMinField) ) {
-            PyErr_SetString(GETSTATE(self)->error, "could not find string attribute \'minField\'" );
-            FreePythonObjects(extractedAttributes);
-            for(std::vector<rsgis::cmds::RSGISBandAttStatsCmds*>::iterator iter = bandStatsCmds.begin(); iter != bandStatsCmds.end(); ++iter) {
-                delete *iter;
-            }
-            delete cmdObj;
-            return NULL;
-        }
-
-        pCalcMax = PyObject_GetAttrString(o, "calcMax");
-        extractedAttributes.push_back(pCalcMax);
-        if( ( pCalcMax == NULL ) || ( pCalcMax == Py_None ) || !RSGISPY_CHECK_INT(pCalcMax) ) {
-            PyErr_SetString(GETSTATE(self)->error, "could not find bool (int) attribute \'calcMax\'" );
-            FreePythonObjects(extractedAttributes);
-            for(std::vector<rsgis::cmds::RSGISBandAttStatsCmds*>::iterator iter = bandStatsCmds.begin(); iter != bandStatsCmds.end(); ++iter) {
-                delete *iter;
-            }
-            delete cmdObj;
-            return NULL;
-        }
+        cmdObj->calcMin =  !(pMinField == NULL || !RSGISPY_CHECK_STRING(pMinField));
 
         pMaxField = PyObject_GetAttrString(o, "maxField");
         extractedAttributes.push_back(pMaxField);
-        if( ( pMaxField == NULL ) || ( pMaxField == Py_None ) || !RSGISPY_CHECK_STRING(pMaxField) ) {
-            PyErr_SetString(GETSTATE(self)->error, "could not find string attribute \'maxField\'" );
-            FreePythonObjects(extractedAttributes);
-            for(std::vector<rsgis::cmds::RSGISBandAttStatsCmds*>::iterator iter = bandStatsCmds.begin(); iter != bandStatsCmds.end(); ++iter) {
-                delete *iter;
-            }
-            delete cmdObj;
-            return NULL;
-        }
-
-        pCalcMean = PyObject_GetAttrString(o, "calcMean");
-        extractedAttributes.push_back(pCalcMean);
-        if( ( pCalcMean == NULL ) || ( pCalcMean == Py_None ) || !RSGISPY_CHECK_INT(pCalcMean) ) {
-            PyErr_SetString(GETSTATE(self)->error, "could not find bool (int) attribute \'calcMean\'" );
-            FreePythonObjects(extractedAttributes);
-            for(std::vector<rsgis::cmds::RSGISBandAttStatsCmds*>::iterator iter = bandStatsCmds.begin(); iter != bandStatsCmds.end(); ++iter) {
-                delete *iter;
-            }
-            delete cmdObj;
-            return NULL;
-        }
+        cmdObj->calcMax = !(pMaxField == NULL || !RSGISPY_CHECK_STRING(pMaxField));
 
         pMeanField = PyObject_GetAttrString(o, "meanField");
         extractedAttributes.push_back(pMeanField);
-        if( ( pMeanField == NULL ) || ( pMeanField == Py_None ) || !RSGISPY_CHECK_STRING(pMeanField) ) {
-            PyErr_SetString(GETSTATE(self)->error, "could not find string attribute \'meanField\'" );
-            FreePythonObjects(extractedAttributes);
-            for(std::vector<rsgis::cmds::RSGISBandAttStatsCmds*>::iterator iter = bandStatsCmds.begin(); iter != bandStatsCmds.end(); ++iter) {
-                delete *iter;
-            }
-            delete cmdObj;
-            return NULL;
-        }
-
-        pCalcStdDev = PyObject_GetAttrString(o, "calcStdDev");
-        extractedAttributes.push_back(pCalcStdDev);
-        if( ( pCalcStdDev == NULL ) || ( pCalcStdDev == Py_None ) || !RSGISPY_CHECK_INT(pCalcStdDev) ) {
-            PyErr_SetString(GETSTATE(self)->error, "could not find bool (int) attribute \'stdDev\'" );
-            FreePythonObjects(extractedAttributes);
-            for(std::vector<rsgis::cmds::RSGISBandAttStatsCmds*>::iterator iter = bandStatsCmds.begin(); iter != bandStatsCmds.end(); ++iter) {
-                delete *iter;
-            }
-            delete cmdObj;
-            return NULL;
-        }
+        cmdObj->calcMean = !(pMeanField == NULL || !RSGISPY_CHECK_STRING(pMeanField));
 
         pStdDevField = PyObject_GetAttrString(o, "stdDevField");
         extractedAttributes.push_back(pStdDevField);
-        if( ( pStdDevField == NULL ) || ( pStdDevField == Py_None ) || !RSGISPY_CHECK_STRING(pStdDevField) ) {
-            PyErr_SetString(GETSTATE(self)->error, "could not find string attribute \'stdDevField\'" );
-            FreePythonObjects(extractedAttributes);
-            for(std::vector<rsgis::cmds::RSGISBandAttStatsCmds*>::iterator iter = bandStatsCmds.begin(); iter != bandStatsCmds.end(); ++iter) {
-                delete *iter;
-            }
-            delete cmdObj;
-            return NULL;
-        }
-
-        pCalcMedian = PyObject_GetAttrString(o, "calcMedian");
-        extractedAttributes.push_back(pCalcMedian);
-        if( ( pCalcMedian == NULL ) || ( pCalcMedian == Py_None ) || !RSGISPY_CHECK_INT(pCalcMedian) ) {
-            PyErr_SetString(GETSTATE(self)->error, "could not find bool (int) attribute \'calcMedian\'" );
-            FreePythonObjects(extractedAttributes);
-            for(std::vector<rsgis::cmds::RSGISBandAttStatsCmds*>::iterator iter = bandStatsCmds.begin(); iter != bandStatsCmds.end(); ++iter) {
-                delete *iter;
-            }
-            delete cmdObj;
-            return NULL;
-        }
+        cmdObj->calcStdDev = !(pStdDevField == NULL || !RSGISPY_CHECK_STRING(pStdDevField));
 
         pMedianField = PyObject_GetAttrString(o, "medianField");
         extractedAttributes.push_back(pMedianField);
-        if( ( pMedianField == NULL ) || ( pMedianField == Py_None ) || !RSGISPY_CHECK_STRING(pMedianField) ) {
-            PyErr_SetString(GETSTATE(self)->error, "could not find string attribute \'medianField\'" );
-            FreePythonObjects(extractedAttributes);
-            for(std::vector<rsgis::cmds::RSGISBandAttStatsCmds*>::iterator iter = bandStatsCmds.begin(); iter != bandStatsCmds.end(); ++iter) {
-                delete *iter;
-            }
-            delete cmdObj;
-            return NULL;
-        }
-
-        pCalcSum = PyObject_GetAttrString(o, "calcSum");
-        extractedAttributes.push_back(pCalcSum);
-        if( ( pCalcSum == NULL ) || ( pCalcSum == Py_None ) || !RSGISPY_CHECK_INT(pCalcSum) ) {
-            PyErr_SetString(GETSTATE(self)->error, "could not find bool (int) attribute \'calcSum\'" );
-            FreePythonObjects(extractedAttributes);
-            for(std::vector<rsgis::cmds::RSGISBandAttStatsCmds*>::iterator iter = bandStatsCmds.begin(); iter != bandStatsCmds.end(); ++iter) {
-                delete *iter;
-            }
-            delete cmdObj;
-            return NULL;
-        }
+        cmdObj->calcMedian = !(pMedianField == NULL || !RSGISPY_CHECK_STRING(pMedianField));
 
         pSumField = PyObject_GetAttrString(o, "sumField");
         extractedAttributes.push_back(pSumField);
-        if( ( pSumField == NULL ) || ( pSumField == Py_None ) || !RSGISPY_CHECK_STRING(pSumField) ) {
-            PyErr_SetString(GETSTATE(self)->error, "could not find string attribute \'sumField\'" );
-            FreePythonObjects(extractedAttributes);
-            for(std::vector<rsgis::cmds::RSGISBandAttStatsCmds*>::iterator iter = bandStatsCmds.begin(); iter != bandStatsCmds.end(); ++iter) {
-                delete *iter;
-            }
-            delete cmdObj;
-            return NULL;
-        }
+        cmdObj->calcSum = !(pSumField == NULL || !RSGISPY_CHECK_STRING(pSumField));
 
         // extract the values from the objects
         cmdObj->band = RSGISPY_INT_EXTRACT(pBand);
         cmdObj->threshold = RSGISPY_FLOAT_EXTRACT(pThreshold);
-        cmdObj->calcCount = (RSGISPY_INT_EXTRACT(pCalcCount) != 0);
-        cmdObj->calcMax = (RSGISPY_INT_EXTRACT(pCalcMax) != 0);
-        cmdObj->calcMean = (RSGISPY_INT_EXTRACT(pCalcMean) != 0);
-        cmdObj->calcMedian = (RSGISPY_INT_EXTRACT(pCalcMedian) != 0);
-        cmdObj->calcMin = (RSGISPY_INT_EXTRACT(pCalcMin) != 0);
-        cmdObj->calcStdDev = (RSGISPY_INT_EXTRACT(pCalcStdDev) != 0);
-        cmdObj->calcSum = (RSGISPY_INT_EXTRACT(pCalcSum) != 0);
-        cmdObj->countField = RSGISPY_STRING_EXTRACT(pCountField);
-        cmdObj->maxField = RSGISPY_STRING_EXTRACT(pMaxField);
-        cmdObj->meanField = RSGISPY_STRING_EXTRACT(pMeanField);
-        cmdObj->medianField = RSGISPY_STRING_EXTRACT(pMedianField);
-        cmdObj->minField = RSGISPY_STRING_EXTRACT(pMinField);
-        cmdObj->stdDevField = RSGISPY_STRING_EXTRACT(pStdDevField);
-        cmdObj->sumField = RSGISPY_STRING_EXTRACT(pSumField);
-
+        // check the calcValue and extract fields if required
+        if(cmdObj->calcCount) {
+            cmdObj->countField = RSGISPY_STRING_EXTRACT(pCountField);
+        }
+        if(cmdObj->calcMax) {
+            cmdObj->maxField = RSGISPY_STRING_EXTRACT(pMaxField);
+        }
+        if(cmdObj->calcMean) {
+            cmdObj->meanField = RSGISPY_STRING_EXTRACT(pMeanField);
+        }
+        if(cmdObj->calcMedian) {
+            cmdObj->medianField = RSGISPY_STRING_EXTRACT(pMedianField);
+        }
+        if(cmdObj->calcMin) {
+            cmdObj->minField = RSGISPY_STRING_EXTRACT(pMinField);
+        }
+        if(cmdObj->calcStdDev) {
+            cmdObj->stdDevField = RSGISPY_STRING_EXTRACT(pStdDevField);
+        }
+        if(cmdObj->calcSum) {
+            cmdObj->sumField = RSGISPY_STRING_EXTRACT(pSumField);
+        }
+        
         FreePythonObjects(extractedAttributes);
         bandStatsCmds.push_back(cmdObj);
     }
-
-     try {
+    try {
         rsgis::cmds::executePopulateRATWithStats(std::string(inputImage), std::string(clumpsImage), &bandStatsCmds);
     } catch (rsgis::cmds::RSGISCmdException &e) {
         PyErr_SetString(GETSTATE(self)->error, e.what());
@@ -464,8 +330,8 @@ static PyObject *RasterGIS_PopulateRATWithPercentiles(PyObject *self, PyObject *
 
         pFieldName = PyObject_GetAttrString(o, "fieldName");
         extractedAttributes.push_back(pFieldName);
-        if( ( pFieldName == NULL ) || ( pFieldName == Py_None ) || !RSGISPY_CHECK_INT(pFieldName)) {
-            PyErr_SetString(GETSTATE(self)->error, "could not find int attribute \'fieldName\'" );
+        if( ( pFieldName == NULL ) || ( pFieldName == Py_None ) || !RSGISPY_CHECK_STRING(pFieldName)) {
+            PyErr_SetString(GETSTATE(self)->error, "could not find string attribute \'fieldName\'" );
             FreePythonObjects(extractedAttributes);
             for(std::vector<rsgis::cmds::RSGISBandAttPercentilesCmds*>::iterator iter = bandPercentilesCmds.begin(); iter != bandPercentilesCmds.end(); ++iter) {
                 delete *iter;
@@ -1606,7 +1472,7 @@ static PyMethodDef RasterGISMethods[] = {
 "call signature: rastergis.calcShapeIndices(inputImage, shapeIndices)\n"
 "where:\n"
 "  inputImage is a string containing the name of the input image file\n"
-"  shapeIndices is a sequence of python object that have the following attributes:\n"
+"  shapeIndices is a sequence of rsgislib.rastergis.ShapeIndex objects that have the following attributes:\n"
 "      colName - a string holding the column name\n"
 "      colIdx - an int holding the column index\n"
 "      idx - an int containing one of the values from rsgis.SHAPE_*\n"
