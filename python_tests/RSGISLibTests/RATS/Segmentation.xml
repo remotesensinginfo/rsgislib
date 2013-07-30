@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+    Description
+        XML File for execution within RSGISLib 2.0.0
+    Created by rsgislibxml.py on Sat May 05 18:10:00 2013.
+    Copyright (c) 2013 [Your Organisation]. All rights reserved.
+-->
+<rsgis:commands xmlns:rsgis="http://www.rsgislib.org/xml/">
+	<!-- injune_p142_casi_sub_utm -->
+
+<rsgis:command algor="imagecalc" option="kmeanscentres" 
+               image="injune_p142_casi_sub_utm.kea" 
+               output="injune_p142_casi_sub_utm_clusters" numclusters="60" maxiterations="200" 
+               degreeofchange="0.25" subsample="10" initmethod="diagonal_range_attach" />
+
+<rsgis:command algor="segmentation" option="labelsfromclusters" 
+               image="injune_p142_casi_sub_utm.kea" 
+               output="injune_p142_casi_sub_utm_clusters.kea" 
+               clusters="injune_p142_casi_sub_utm_clusters.gmtxt" 
+               ignorezeros="yes" format="KEA" proj="IMAGE" /> 
+
+<rsgis:command algor="segmentation" option="elimsinglepxls" 
+               image="injune_p142_casi_sub_utm.kea" 
+               clumps="injune_p142_casi_sub_utm_clusters.kea" 
+               temp="injune_p142_casi_sub_utm_clusters_singlepxls_tmp.kea" 
+               output="injune_p142_casi_sub_utm_clusters_nosinglepxls.kea" 
+               ignorezeros="yes" format="KEA" proj="IMAGE" />
+
+<rsgis:command algor="commandline" option="execute" 
+               command="rm injune_p142_casi_sub_utm_clusters.kea" />
+<rsgis:command algor="commandline" option="execute" 
+               command="rm injune_p142_casi_sub_utm_clusters_singlepxls_tmp.kea" />
+
+<rsgis:command algor="segmentation" option="clump" 
+               image="injune_p142_casi_sub_utm_clusters_nosinglepxls.kea" 
+               output="injune_p142_casi_sub_utm_clumps.kea" nodata="0" 
+               format="KEA" inmemory="yes" proj="IMAGE" />
+
+<rsgis:command algor="commandline" option="execute" 
+               command="rm injune_p142_casi_sub_utm_clusters_nosinglepxls.kea" />
+
+<rsgis:command algor="segmentation" option="rmsmallclumpsstepwise" 
+               image="injune_p142_casi_sub_utm.kea" 
+               clumps="injune_p142_casi_sub_utm_clumps.kea" 
+               output="injune_p142_casi_sub_utm_clumps_elim.kea" 
+               minsize="20" maxspectraldist="5000" 
+               format="KEA" inmemory="yes" proj="IMAGE" />
+
+<rsgis:command algor="commandline" option="execute" 
+               command="rm injune_p142_casi_sub_utm_clumps.kea" />
+
+<rsgis:command algor="segmentation" option="relabelclumps" 
+               image="injune_p142_casi_sub_utm_clumps_elim.kea" 
+               output="injune_p142_casi_sub_utm_clumps_elim_final.kea" 
+               format="KEA" inmemory="yes" proj="IMAGE" />
+
+<rsgis:command algor="commandline" option="execute" 
+               command="rm injune_p142_casi_sub_utm_clumps_elim.kea" />
+
+<rsgis:command algor="segmentation" option="meanimg" 
+               image="injune_p142_casi_sub_utm.kea" clumps="injune_p142_casi_sub_utm_clumps_elim_final.kea" 
+               output="injune_p142_casi_sub_utm_clumps_elim_mean.kea" 
+               format="KEA" inmemory="yes" proj="IMAGE" />
+
+<rsgis:command algor="imageutils" option="popimgstats" 
+               image="injune_p142_casi_sub_utm_clumps_elim_mean.kea" ignore="0" pyramids="yes" />
+
+ <rsgis:command algor="rastergis" option="popattributestats"
+                   clumps="injune_p142_casi_sub_utm_clumps_elim_final.kea"
+                   input="injune_p142_casi_sub_utm.kea" >
+        <rsgis:band band="1" mean="B1Avg" stddev="B1Std" />
+        <rsgis:band band="2" mean="B2Avg" stddev="B2Std" />
+        <rsgis:band band="3" mean="B3Avg" stddev="B3Std" />
+    </rsgis:command>
+
+
+</rsgis:commands>

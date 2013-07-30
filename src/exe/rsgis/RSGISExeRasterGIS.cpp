@@ -2600,6 +2600,7 @@ namespace rsgisexe{
                     }
                     xercesc::XMLString::release(&nameXMLStr);
 
+                    
 
                     XMLCh *columnXMLStr = xercesc::XMLString::transcode("column");
                     if(attElement->hasAttribute(columnXMLStr))
@@ -3193,6 +3194,10 @@ namespace rsgisexe{
                 {
                     throw rsgis::RSGISException(e.what());
                 }
+                for(std::vector<rsgis::cmds::RSGISBandAttStatsCmds*>::iterator iter = this->bandStats->begin(); iter != this->bandStats->end(); ++iter) {
+                    delete *iter;
+                }
+                delete bandStats;
             }
             else if(this->option == RSGISExeRasterGIS::popcategoryproportions)
             {
@@ -3289,6 +3294,10 @@ namespace rsgisexe{
                 {
                     throw rsgis::RSGISException(e.what());
                 }
+                for(std::vector<rsgis::cmds::RSGISBandAttPercentilesCmds*>::iterator iterBands = bandPercentiles->begin(); iterBands != bandPercentiles->end(); ++iterBands) {
+                    delete *iterBands;
+                }
+                delete bandPercentiles;
 
             }
             else if(this->option == RSGISExeRasterGIS::export2ascii)

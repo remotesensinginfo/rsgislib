@@ -229,9 +229,7 @@ namespace rsgis{ namespace cmds {
                 bandStat->medianIdxDef = false;
 
                 bandStats->push_back(bandStat);
-                delete (*iterBand);
             }
-            delete bandStatsCmds;
 
             rsgis::rastergis::RSGISCalcClumpStats clumpStats;
             clumpStats.calcImageClumpStatistic(clumpsDataset, imageDataset, bandStats);

@@ -1,0 +1,28 @@
+ENVI
+description = {
+Rasters/injune_p142_casi_sub_ll_lt100.kea}
+samples = 504
+lines   = 138
+bands   = 14
+header offset = 0
+file type = ENVI Standard
+data type = 4
+interleave = bsq
+byte order = 0
+map info = {Geographic Lat/Lon, 1, 1, 147.394482547148, -25.7885258929777, 9.90124528566754e-06, 9.90124528566754e-06,WGS-84}
+coordinate system string = {GEOGCS["GCS_WGS_1984",DATUM["D_WGS_1984",SPHEROID["WGS_1984",6378137,298.257223563]],PRIMEM["Greenwich",0],UNIT["Degree",0.017453292519943295]]}
+band names = {
+Band 1,
+Band 2,
+Band 3,
+Band 4,
+Band 5,
+Band 6,
+Band 7,
+Band 8,
+Band 9,
+Band 10,
+Band 11,
+Band 12,
+Band 13,
+Band 14}

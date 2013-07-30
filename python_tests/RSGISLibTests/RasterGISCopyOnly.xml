@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+    Description:
+        XML File for execution within RSGISLib
+    Created by **ME** on Fri Jul 26 08:34:14 2013.
+    Copyright (c) 2013 **Organisation**. All rights reserved.
+-->
+
+<rsgis:commands xmlns:rsgis="http://www.rsgislib.org/xml/">
+
+    <rsgis:command algor="commandline" option="execute" command="cp ./RATS/injune_p142_casi_sub_utm_segs.kea ./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_cptab.kea" />
+    
+	<rsgis:command algor="commandline" option="execute" command="cp ./RATS/injune_p142_casi_sub_utm_segs.kea ./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_cpcols.kea" />
+	
+	<rsgis:command algor="commandline" option="execute" command="cp ./RATS/injune_p142_casi_sub_utm_clumps_elim_final_clumps_elim_final.kea ./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_spatloc_eucdist.kea" />
+	
+	
+	<rsgis:command algor="commandline" option="execute" command="cp ./RATS/injune_p142_casi_sub_utm_segs.kea ./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_popstats.kea" />
+	    <rsgis:command algor="commandline" option="execute" command="cp ./RATS/injune_p142_casi_sub_utm_segs.kea ./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_neighbours.kea" />
+	
+    <rsgis:command algor="commandline" option="execute" command="cp ./RATS/injune_p142_casi_sub_utm_segs.kea ./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_borlen.kea" />
+	
+    
+    <rsgis:command algor="commandline" option="execute" command="cp ./RATS/injune_p142_casi_sub_utm_segs.kea ./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_shape.kea" />
+  
+    <rsgis:command algor="commandline" option="execute" command="cp ./RATS/injune_p142_casi_sub_utm_segs_nostats.kea ./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_nostats_addstats.kea" />
+
+</rsgis:commands>
+

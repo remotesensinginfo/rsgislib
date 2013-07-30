@@ -1,0 +1,43 @@
+== Rasters ==
+General
+14 band hyperspecteral data. In reflectance multiplied by a scaling factor of 10,000.
+* injune_p142_casi_sub_utm.kea - UTM Zone 55 S, WGS84 projection (m). UInt16.
+* injune_p142_casi_sub_ll.kea - WGS84 datum (degrees). UInt16.
+
+Overlap
+Single band subset of hyperspectral test dataset, 50 m shorter on the right (left portion; _left_) or left (right portion; _right_)
+To be used for testing overlaps.
+* injune_p142_casi_sub_right_utm.kea 
+* injune_p142_casi_sub_right_ll.kea
+* injune_p142_casi_sub_left_utm.kea
+* injune_p142_casi_sub_left_ll.kea
+
+Small values / large range
+* injune_p142_airsar_sub_utm.kea - 14 band SAR data in liner units. UTM Zone 55 S, WGS84 projection (m). Float32.
+
+Negative Values
+* injune_p142_airsar_sub_dB_utm.kea - 14 band SAR data in dB. UTM Zone 55 S, WGS84 projection (m). Float32.
+
+== Vectors ==
+Deliniated tree crowns (irregular features) clipped to 1 m inside hyperspectral data.
+* injune_p142_crowns_withincasi_ll.shp - UTM Zone 55 S, WGS84 projection (m).
+* injune_p142_crowns_withincasi_utm.shp - WGS84 datum (degrees).
+
+Deliniated tree crowns (irregular features) extending 1 m inside hyperspectral data.
+Designed to test tools that should work with polygons outside image and those that shouldn't.
+* injune_p142_crowns_ll.shp - UTM Zone 55 S, WGS84 projection (m).
+* injune_p142_crowns_utm.shp - WGS84 datum (degrees).
+
+Extent of hyperspectral data
+* injune_p142_psu_ll.shp - UTM Zone 55 S, WGS84 projection (m).
+* injune_p142_psu_utm.shp - WGS84 datum (degrees).
+
+50 x 50 m regular grid, exact extent of hyperspectral data
+* injune_p142_ssu_cells_ll.shp - UTM Zone 55 S, WGS84 projection (m).
+* injune_p142_ssu_cells_utm.shp - WGS84 datum (degrees).
+
+== Raster Attribute Tables ==
+Segmented hyperspecteral data, attributed with mean and standard deviation of first three
+bands.
+* injune_p142_casi_sub_utm_clumps_elim_final_clumps_elim_final.kea
+
