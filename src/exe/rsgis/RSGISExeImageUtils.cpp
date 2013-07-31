@@ -112,6 +112,7 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
     XMLCh *optionCutOutTile = XMLString::transcode("cutouttile");
     XMLCh *optionStretchImageWithStats = XMLString::transcode("stretchwithstats");
     XMLCh *optionSubSampleImage = XMLString::transcode("subsampleimage");
+    XMLCh *optionDarkTargetMask = XMLString::transcode("darktargetmask");
 
 	const XMLCh *algorNameEle = argElement->getAttribute(algorXMLStr);
 	if(!XMLString::equals(algorName, algorNameEle))
@@ -3515,6 +3516,52 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 
 
 	}
+    else if (XMLString::equals(optionDarkTargetMask, optionXML))
+	{
+		this->option = RSGISExeImageUtils::darktargetmask;
+        
+		XMLCh *imageXMLStr = XMLString::transcode("image");
+		if(argElement->hasAttribute(imageXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(imageXMLStr));
+			this->inputImage = string(charValue);
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+		}
+		XMLString::release(&imageXMLStr);
+        
+		XMLCh *outputXMLStr = XMLString::transcode("output");
+		if(argElement->hasAttribute(outputXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
+			this->outputFile = string(charValue);
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+		}
+		XMLString::release(&outputXMLStr);
+        
+        
+        XMLCh *nodataXMLStr = XMLString::transcode("nodata");
+		if(argElement->hasAttribute(nodataXMLStr))
+		{
+            char *charValue = XMLString::transcode(argElement->getAttribute(nodataXMLStr));
+            this->nodataValue = mathUtils.strtofloat(string(charValue));
+            XMLString::release(&charValue);
+            this->useIgnoreVal = true;
+		}
+		else
+		{
+			this->useIgnoreVal = false;
+		}
+		XMLString::release(&nodataXMLStr);
+        
+	}
 	else
 	{
 		string message = string("The option (") + string(XMLString::transcode(optionXML)) + string(") is not known: RSGISExeImageUtils.");
@@ -3570,6 +3617,7 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
     XMLString::release(&optionCutOutTile);
     XMLString::release(&optionStretchImageWithStats);
     XMLString::release(&optionSubSampleImage);
+    XMLString::release(&optionDarkTargetMask);
 
 	parsed = true;
 }

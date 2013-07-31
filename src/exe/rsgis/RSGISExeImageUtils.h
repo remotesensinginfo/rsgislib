@@ -149,7 +149,8 @@ class RSGISExeImageUtils : public RSGISAlgorithmParameters
             gentilemasks,
             cutouttile,
             stretchwithstats,
-            subsampleimage
+            subsampleimage,
+            darktargetmask
 		};
 
 		enum interpolators

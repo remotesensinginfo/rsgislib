@@ -226,6 +226,18 @@ namespace rsgis{ namespace cmds {
 
     void executeKMeansClustering(std::string inputImage, std::string outputMatrixFile, unsigned int numClusters, unsigned int maxNumIterations, unsigned int subSample, bool ignoreZeros, float degreeOfChange, RSGISInitClustererMethods initClusterMethod)throw(RSGISCmdException)
     {
+        
+        std::cout << "inputImage = " << inputImage << std::endl;
+        std::cout << "outputMatrixFile = " << outputMatrixFile << std::endl;
+        std::cout << "numClusters = " << numClusters << std::endl;
+        std::cout << "maxNumIterations = " << maxNumIterations << std::endl;
+        std::cout << "subSample = " << subSample << std::endl;
+        std::cout << "degreeOfChange = " << degreeOfChange << std::endl;
+        if(ignoreZeros)
+        {
+            std::cout << "Ignoring Zeros\n";
+        }
+        
         try
         {
             GDALAllRegister();
@@ -250,6 +262,7 @@ namespace rsgis{ namespace cmds {
                     initMethod = rsgis::math::init_diagonal_stddev;
                     break;
                 case rsgis::cmds::rsgis_init_diagonal_full_attach:
+                    std::cout << "Full diag attached.\n";
                     initMethod = rsgis::math::init_diagonal_full_attach;
                     break;
                 case rsgis::cmds::rsgis_init_diagonal_stddev_attach:

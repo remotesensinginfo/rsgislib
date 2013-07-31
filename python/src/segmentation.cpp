@@ -91,10 +91,9 @@ static PyObject *Segmentation_clump(PyObject *self, PyObject *args)
     bool nodataprovided;
     float fnodata;
     PyObject *pNoData; //could be none or a number
-    if( !PyArg_ParseTuple(args, "sssnO:clump", &pszInputImage, &pszOutputImage, &pszGDALFormat, 
-                    &processInMemory, &pNoData))
+    if( !PyArg_ParseTuple(args, "sssiO:clump", &pszInputImage, &pszOutputImage, &pszGDALFormat, &processInMemory, &pNoData))
         return NULL;
-
+    
     if( pNoData == Py_None )
     {
         nodataprovided = false;
@@ -159,7 +158,7 @@ static PyObject *Segmentation_relabelClumps(PyObject *self, PyObject *args)
 {
     const char *pszInputImage, *pszOutputImage, *pszGDALFormat;
     int processInMemory;
-    if( !PyArg_ParseTuple(args, "sssn:relabelClumps", &pszInputImage, 
+    if( !PyArg_ParseTuple(args, "sssi:relabelClumps", &pszInputImage, 
                         &pszOutputImage, &pszGDALFormat, &processInMemory ))
         return NULL;
 
@@ -186,7 +185,7 @@ static PyObject *Segmentation_unionOfClumps(PyObject *self, PyObject *args)
     float fnodata;
     PyObject *pNoData; //could be none or a number
     PyObject *pInputListObj;
-    if( !PyArg_ParseTuple(args, "ss0O:unionOfClumps", &pszOutputImage, &pszGDALFormat,
+    if( !PyArg_ParseTuple(args, "ssOO:unionOfClumps", &pszOutputImage, &pszGDALFormat,
                                 &pInputListObj, &pNoData))
         return NULL;
 
