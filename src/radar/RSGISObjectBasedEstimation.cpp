@@ -47,7 +47,7 @@ namespace rsgis{namespace radar{
             this->datasetsInput[1] = inputImage;
             this->useRasPoly = true;
         }
-        
+
 		this->slowOptimiser = slowOptimiser; // Initial optimiser, for selection of object.
 		this->fastOptimiser = fastOptimiser; // Fast optimser, for entire object.
 		this->numBands = inputImage->GetRasterCount();
@@ -107,9 +107,9 @@ namespace rsgis{namespace radar{
 			poly = vecUtils.convertOGRPolygon2GEOSPolygon(inOGRPoly);
 			rsgis::img::RSGISCalcImageValue *invValuesObj;
 			rsgis::img::RSGISCalcImageValue *invValues;
-            
+
 			getValues->reset();
-            
+
             // Get values for pixels within polygon
             if(this->useRasPoly)
             {
@@ -119,7 +119,7 @@ namespace rsgis{namespace radar{
             {
                 calcImageSingle->calcImageWithinPolygon(this->datasetsInput, 1, NULL, env, poly, false, rsgis::img::polyContainsPixelCenter); // The pixel in poly method is hardcoded as 'polyContainsPixelCenter', no output is required
             }
-            
+
 			unsigned int estClass = 0;
 			OGRFeatureDefn *inFeatureDefn = inFeature->GetDefnRef();
 
@@ -137,7 +137,7 @@ namespace rsgis{namespace radar{
                 this->slowOptimiserSingle = this->slowOptimiser->at(estClass);
 				this->fastOptimiserSingle = this->fastOptimiser->at(estClass);
 				this->initialParSingle = this->initialPar->at(estClass);
-                
+
                 if(this->slowOptimiserSingle->getOptimiserType() == rsgis::radar::noOptimiser)
                 {
                     throw rsgis::RSGISException("Writing to a shapefile is not supported at the object level.");
@@ -209,11 +209,13 @@ namespace rsgis{namespace radar{
 			// Get averages for each band.
 			gsl_vector *localPar;
 			localPar = gsl_vector_alloc(this->numOutputPar);
+			//std::cout << "Estimated parameters:" << std::endl;
 			for(unsigned int i = 0; i < this->numOutputPar; i++)
 			{
 				gsl_vector_set(localPar, i, outData[i]);
+                //std::cout << gsl_vector_get(localPar, i) << ",";
 			}
-
+            //std::cout << std::endl;
 
 			// SAVE PARAMETERS TO OUTPUT SHAPEFILE
 			OGRFeatureDefn *outFeatureDefn = outFeature->GetDefnRef();
@@ -239,7 +241,7 @@ namespace rsgis{namespace radar{
 
 			// PARAMETERISE OPIMISER USING VALUES FROM DATA
 			// Update optimser if error low enough
-            if ( outData[this->numOutputBands - 1] < 1e-8)
+            if ( (outData[this->numOutputBands - 1] < 1e-8) && (outData[this->numOutputBands - 1] > 0))
             {
                 this->fastOptimiserSingle->modifyAPriori(localPar);
                 // RUN INVERISION ON ALL PIXELS IN OBJECT
@@ -267,7 +269,7 @@ namespace rsgis{namespace radar{
             }
 
             rsgis::img::RSGISCalcImage *calcImage = new rsgis::img::RSGISCalcImage(invValues, "", true);
-            
+
             if(this->useRasPoly)
             {
                 calcImage->calcImageWithinRasterPolygon(this->datasetsIO, 3, env, fid);
@@ -313,9 +315,9 @@ namespace rsgis{namespace radar{
             float *inData = new float[this->numBands];
             bool *indB = new bool[this->numBands];
             bool *convertdB = new bool[this->numBands];
-            
+
 			getValues->reset();
-            
+
             // Get values for pixels within polygon
             if(this->useRasPoly)
             {
@@ -404,12 +406,12 @@ namespace rsgis{namespace radar{
 
 
                 invValuesObj->calcImageValue(inData, this->numBands, outData);
-                
+
                 for(unsigned int i = 0; i < this->numOutputPar; i++)
                 {
                     gsl_vector_set(localPar, i, outData[i]);
                 }
-                
+
                 delete invValuesObj;
             }
 
@@ -443,7 +445,7 @@ namespace rsgis{namespace radar{
             }
 
             rsgis::img::RSGISCalcImage *calcImage = new rsgis::img::RSGISCalcImage(invValues, "", true);
-            
+
             if(this->useRasPoly)
             {
                 calcImage->calcImageWithinRasterPolygon(this->datasetsIO, 3, env, fid);
@@ -452,7 +454,7 @@ namespace rsgis{namespace radar{
             {
                 calcImage->calcImageWithinPolygon(this->datasetsIO, 2, env, poly, rsgis::img::polyContainsPixelCenter);
             }
-            
+
 			// TIDY
 			gsl_vector_free(localPar);
 			delete invValues;
@@ -641,7 +643,7 @@ namespace rsgis{namespace radar{
 			inOGRPoly = (OGRPolygon *) inFeature->GetGeometryRef();
 			poly = vecUtils.convertOGRPolygon2GEOSPolygon(inOGRPoly);
 			getValues->reset();
-            
+
             // Get values for pixels within polygon
             if(this->useRasPoly)
             {
@@ -668,7 +670,7 @@ namespace rsgis{namespace radar{
 				this->slowOptimiserSingle = this->slowOptimiser->at(estClass);
 				this->fastOptimiserSingle = this->fastOptimiser->at(estClass);
 				this->initialParSingle = this->initialPar->at(estClass);
-                
+
                 if(this->slowOptimiserSingle->getOptimiserType() == rsgis::radar::noOptimiser)
                 {
                     throw rsgis::RSGISException("Writing to a shapefile is not supported at the object level.");
@@ -816,7 +818,7 @@ namespace rsgis{namespace radar{
             }
 
 			calcImage = new rsgis::img::RSGISCalcImage(invValues, "", true);
-            
+
             if(this->useRasPoly)
             {
                 calcImage->calcImageWithinRasterPolygon(this->datasetsIO, 3, env, fid);
@@ -853,19 +855,19 @@ namespace rsgis{namespace radar{
 			geos::geom::Polygon *poly;
 			rsgis::img::RSGISCalcImageValue *invValuesObj;
 			rsgis::img::RSGISCalcImageValue *invValues;
-            
+
             float *outData = new float[numOutputBands]; // Create array large enough to hold all output bands (more than parameters)
             float *inData = new float[this->numBands];
             bool *indB = new bool[this->numBands];
             bool *convertdB = new bool[this->numBands];
-            
+
             gsl_vector *localPar;
             localPar = gsl_vector_alloc(this->numOutputPar);
 
 			inOGRPoly = (OGRPolygon *) inFeature->GetGeometryRef();
 			poly = vecUtils.convertOGRPolygon2GEOSPolygon(inOGRPoly);
 			getValues->reset();
-			
+
             // Get values for pixels within polygon
             if(this->useRasPoly)
             {
@@ -878,7 +880,7 @@ namespace rsgis{namespace radar{
 
 			unsigned int estClass = 0;
 			OGRFeatureDefn *inFeatureDefn = inFeature->GetDefnRef();
-            
+
 
 			if (useClass)
 			{
@@ -918,7 +920,7 @@ namespace rsgis{namespace radar{
             {
 
                 this->slowOptimiserSingle->modifyAPriori(objAP);
-                
+
                 // OBTAIN AVERAGE FOR OBJECT AND PERFORM INVERSION
                 if (this->useDefaultMinMax)
                 {
@@ -981,7 +983,7 @@ namespace rsgis{namespace radar{
                     gsl_vector_set(localPar, i, outData[i]);
                 }
 
-                
+
             }
             else
             {
@@ -1018,7 +1020,7 @@ namespace rsgis{namespace radar{
 
 
 			calcImage = new rsgis::img::RSGISCalcImage(invValues, "", true);
-            
+
             if(this->useRasPoly)
             {
                 calcImage->calcImageWithinRasterPolygon(this->datasetsIO, 3, env, fid);
@@ -1032,7 +1034,6 @@ namespace rsgis{namespace radar{
 			gsl_vector_free(localPar);
 			gsl_vector_free(objAP);
 			delete invValues;
-			delete calcImage;
 			delete calcImage;
 			delete[] inData;
 			delete[] outData;

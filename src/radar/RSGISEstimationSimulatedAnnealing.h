@@ -26,6 +26,7 @@
 #include <math.h>
 #include <time.h>
 #include <iostream>
+#include <limits>
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_matrix.h>
 #include <gsl/gsl_rng.h>

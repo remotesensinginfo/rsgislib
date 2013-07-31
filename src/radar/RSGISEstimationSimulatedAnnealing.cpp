@@ -64,7 +64,7 @@ namespace rsgis {namespace radar{
 
         // Set up random number generator
         this->randgsl = gsl_rng_alloc (gsl_rng_taus2);
-        double seed = 0; // time(0) + rand();
+        double seed = time(0) + std::rand();
         gsl_rng_set (randgsl, seed);
 
 
@@ -86,8 +86,12 @@ namespace rsgis {namespace radar{
         {
             // If all diagonal values of covarience matrix greater than 1e8, don't use covarience matrix
             if(gsl_matrix_get(this->covMatrixP, i, i) > 1e8){this->useAP = false;}
-            gsl_matrix_set(this->invCovMatrixP, i, i, 1. / gsl_matrix_get(this->covMatrixP, i, i));
+            else
+            {
+                gsl_matrix_set(this->invCovMatrixP, i, i, 1. / gsl_matrix_get(this->covMatrixP, i, i));
+            }
         }
+        if(this->useAP){std::cout << "\tUsing a priori values" << std::endl;}
 
         // Set up vectors for least squares calculation
         this->deltaD = gsl_vector_alloc(this->nData);
@@ -112,7 +116,7 @@ namespace rsgis {namespace radar{
                 {
             		gsl_vector_set(outParError, j, gsl_vector_get(initialPar, j));
                 }
-                gsl_vector_set(outParError, nPar, 999);
+                gsl_vector_set(outParError, nPar, +std::numeric_limits<double>::infinity());
                 return 0;
             }
             else
@@ -176,7 +180,7 @@ namespace rsgis {namespace radar{
                 for (unsigned int j = 0; j < this->nPar; j++)
                 {
                     stepSize[j] = initialStepSize[j];
-                    currentParError->at(j) = bestParError->at(j);
+                    //currentParError->at(j) = bestParError->at(j);
                 }
             }
 
@@ -230,6 +234,7 @@ namespace rsgis {namespace radar{
 
                             if(currentParError->at(this->nPar) < bestParError->at(this->nPar)) // If new energy is less than best, update best.
                             {
+                                //std::cout << newEnergy << std::endl;
                                 for (unsigned int k = 0; k < this->nPar + 1; k++)
                                 {
                                     bestParError->at(k) = currentParError->at(k);

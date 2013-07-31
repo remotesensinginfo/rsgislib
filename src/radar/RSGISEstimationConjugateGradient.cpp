@@ -2767,8 +2767,7 @@ namespace rsgis {namespace radar
 
 			gsl_vector_set(outParError, 0, gsl_vector_get(initialPar, 0));
 			gsl_vector_set(outParError, 1, gsl_vector_get(initialPar, 1));
-			gsl_vector_set(outParError, 2, 9999); // Set initial error to large number
-
+			gsl_vector_set(outParError, 2, +std::numeric_limits<double>::infinity()); // Set initial error to upper numerical limit
 			// Try one run with inital parameters
 			this->conjGradOpt->minimise(inData, initialPar, currentParError);
 
@@ -2902,12 +2901,13 @@ namespace rsgis {namespace radar
 
 			gsl_vector_set(outParError, 0, gsl_vector_get(initialPar, 0));
 			gsl_vector_set(outParError, 1, gsl_vector_get(initialPar, 1));
-			gsl_vector_set(outParError, 2, 9999); // Set initial error to large number
+			gsl_vector_set(outParError, 2, +std::numeric_limits<double>::infinity()); // Set initial error to upper numerical limit
 
 			// Try one run with inital parameters
 			this->conjGradOpt->minimise(inData, initialPar, currentParError);
 
-			if ((gsl_vector_get(currentParError, 0) > minMaxIntervalA[0]) && (gsl_vector_get(currentParError, 0) < minMaxIntervalA[1]) && (gsl_vector_get(currentParError, 1) > minMaxIntervalB[0]) && (gsl_vector_get(currentParError, 1) < minMaxIntervalB[1]))
+			if ((gsl_vector_get(currentParError, 0) > minMaxIntervalA[0]) && (gsl_vector_get(currentParError, 0) < minMaxIntervalA[1]) &&
+                (gsl_vector_get(currentParError, 1) > minMaxIntervalB[0]) && (gsl_vector_get(currentParError, 1) < minMaxIntervalB[1]))
 			{
 				gsl_vector_memcpy(outParError, currentParError);
 			}
@@ -2937,10 +2937,10 @@ namespace rsgis {namespace radar
 
 					conjGradOpt->minimise(inData, testInitialPar, currentParError);
 
-					//if ((gsl_vector_get(currentParError, 2) < gsl_vector_get(outParError, 2)) && (gsl_vector_get(currentParError, 0) > minMaxIntervalA[0]) && (gsl_vector_get(currentParError, 0) < minMaxIntervalA[1]) && (gsl_vector_get(currentParError, 1) > minMaxIntervalB[0]) && (gsl_vector_get(currentParError, 1) < minMaxIntervalB[1]))
 					if (gsl_vector_get(currentParError, 2) < gsl_vector_get(outParError, 2)) // If new values are better than current best, update
 					{
-						if ((gsl_vector_get(currentParError, 0) > minMaxIntervalA[0]) && (gsl_vector_get(currentParError, 0) < minMaxIntervalA[1]) && (gsl_vector_get(currentParError, 1) > minMaxIntervalB[0]) && (gsl_vector_get(currentParError, 1) < minMaxIntervalB[1]))
+						if ((gsl_vector_get(currentParError, 0) > minMaxIntervalA[0]) && (gsl_vector_get(currentParError, 0) < minMaxIntervalA[1]) &&
+                            (gsl_vector_get(currentParError, 1) > minMaxIntervalB[0]) && (gsl_vector_get(currentParError, 1) < minMaxIntervalB[1]))
 						{
 							gsl_vector_memcpy(outParError, currentParError);
 
@@ -2966,7 +2966,8 @@ namespace rsgis {namespace radar
 
 			if (gsl_vector_get(currentParError, 2) < gsl_vector_get(outParError, 2)) // If new values are better than current best, update
 			{
-				if ((gsl_vector_get(currentParError, 0) > minMaxIntervalA[0]) && (gsl_vector_get(currentParError, 0) < minMaxIntervalA[1]) && (gsl_vector_get(currentParError, 1) > minMaxIntervalB[0]) && (gsl_vector_get(currentParError, 1) < minMaxIntervalB[1]))
+				if ((gsl_vector_get(currentParError, 0) > minMaxIntervalA[0]) && (gsl_vector_get(currentParError, 0) < minMaxIntervalA[1]) &&
+                    (gsl_vector_get(currentParError, 1) > minMaxIntervalB[0]) && (gsl_vector_get(currentParError, 1) < minMaxIntervalB[1]))
 				{
 					gsl_vector_memcpy(outParError, currentParError);
 
@@ -3030,34 +3031,31 @@ namespace rsgis {namespace radar
 			gsl_vector_set(outParError, 0, gsl_vector_get(initialPar, 0));
 			gsl_vector_set(outParError, 1, gsl_vector_get(initialPar, 1));
 			gsl_vector_set(outParError, 2, gsl_vector_get(initialPar, 2));
-			gsl_vector_set(outParError, 3, 9999); // Set initial error to large number
+			gsl_vector_set(outParError, 3, +std::numeric_limits<double>::infinity()); // Set initial error to upper numerical limit
 
 			double stepA = (minMaxIntervalA[1] - minMaxIntervalA[0]) / pow(nRestarts, 1.0/3.0);
 			double stepB =  (minMaxIntervalB[1] - minMaxIntervalB[0]) / pow(nRestarts, 1.0/3.0);
 			double stepC = (minMaxIntervalC[1] - minMaxIntervalC[0]) / pow(nRestarts, 1.0/3.0);
 
 			// Try one run with initial parameters
-			this->conjGradOpt->minimise(inData, initialPar, outParError);
+			this->conjGradOpt->minimise(inData, initialPar, currentParError);
 
-			if (gsl_vector_get(currentParError, 3) < gsl_vector_get(outParError, 3)) // Check if resuduals are lower
-			{
-				// Check within limits of equation
-				if ((gsl_vector_get(currentParError, 0) > minMaxIntervalA[0]) && (gsl_vector_get(currentParError, 0) < minMaxIntervalA[1]) && (gsl_vector_get(currentParError, 1) > minMaxIntervalB[0]) && (gsl_vector_get(currentParError, 1) < minMaxIntervalB[1])  && (gsl_vector_get(currentParError, 2) > minMaxIntervalC[0]) && (gsl_vector_get(currentParError, 2) < minMaxIntervalC[1])  && (gsl_vector_get(currentParError, 2) > minMaxIntervalC[0]) && (gsl_vector_get(currentParError, 2) < minMaxIntervalC[1]))
-				{
-                    //std::cout << gsl_vector_get(outParError, 3) << std::endl;
-					// If new values are better than current best, update
-					gsl_vector_memcpy(outParError, currentParError);
+            // Check within limits of equation
+            if ((gsl_vector_get(currentParError, 0) > minMaxIntervalA[0]) && (gsl_vector_get(currentParError, 0) < minMaxIntervalA[1]) &&
+                (gsl_vector_get(currentParError, 1) > minMaxIntervalB[0]) && (gsl_vector_get(currentParError, 1) < minMaxIntervalB[1]) &&
+                (gsl_vector_get(currentParError, 2) > minMaxIntervalC[0]) && (gsl_vector_get(currentParError, 2) < minMaxIntervalC[1]))
+            {
+                gsl_vector_memcpy(outParError, currentParError);
 
-					if (gsl_vector_get(outParError, 3) < minError)
-					{
-						// free memory and terminate if target error is reached.
-						gsl_vector_free(currentParError);
-						gsl_vector_free(testInitialPar);
-						return 1;
-					}
-				}
+                if (gsl_vector_get(outParError, 3) < minError)
+                {
+                    // free memory and terminate if target error is reached.
+                    gsl_vector_free(currentParError);
+                    gsl_vector_free(testInitialPar);
+                    return 1;
+                }
+            }
 
-			}
 
 			// LOOP THROUGH DIFFERNT STARTING VALUES
 			double a = minMaxIntervalA[0];
@@ -3069,7 +3067,8 @@ namespace rsgis {namespace radar
 					double c = minMaxIntervalC[0];
 					while (c < minMaxIntervalC[1])
 					{
-						gsl_vector_set(testInitialPar, 0, a);
+
+                        gsl_vector_set(testInitialPar, 0, a);
 						gsl_vector_set(testInitialPar, 1, b);
 						gsl_vector_set(testInitialPar, 2, c);
 
@@ -3078,10 +3077,13 @@ namespace rsgis {namespace radar
 						if (gsl_vector_get(currentParError, 3) < gsl_vector_get(outParError, 3)) // Check if resuduals are lower
 						{
 
+							//std::cout << gsl_vector_get(currentParError, 0) << "," << gsl_vector_get(currentParError, 1) << ","<< gsl_vector_get(currentParError, 2) << std::endl;
 							// Check within limits of equation
-							if ((gsl_vector_get(currentParError, 0) > minMaxIntervalA[0]) && (gsl_vector_get(currentParError, 0) < minMaxIntervalA[1]) && (gsl_vector_get(currentParError, 1) > minMaxIntervalB[0]) && (gsl_vector_get(currentParError, 1) < minMaxIntervalB[1])  && (gsl_vector_get(currentParError, 2) > minMaxIntervalC[0]) && (gsl_vector_get(currentParError, 2) < minMaxIntervalC[1]))
+							if ((gsl_vector_get(currentParError, 0) > minMaxIntervalA[0]) && (gsl_vector_get(currentParError, 0) < minMaxIntervalA[1]) &&
+                                (gsl_vector_get(currentParError, 1) > minMaxIntervalB[0]) && (gsl_vector_get(currentParError, 1) < minMaxIntervalB[1]) &&
+                                (gsl_vector_get(currentParError, 2) > minMaxIntervalC[0]) && (gsl_vector_get(currentParError, 2) < minMaxIntervalC[1]))
 							{
-								// If new values are better than current best, update
+                                // If new values are better than current best, update
 								gsl_vector_memcpy(outParError, currentParError);
 
 								if (gsl_vector_get(outParError, 3) < minError)
@@ -3109,7 +3111,9 @@ namespace rsgis {namespace radar
 
 			if (gsl_vector_get(currentParError, 3) < gsl_vector_get(outParError, 3)) // If new values are better than current best, update
 			{
-				if ((gsl_vector_get(currentParError, 0) > minMaxIntervalA[0]) && (gsl_vector_get(currentParError, 0) < minMaxIntervalA[1]) && (gsl_vector_get(currentParError, 1) > minMaxIntervalB[0]) && (gsl_vector_get(currentParError, 1) < minMaxIntervalB[1]) && (gsl_vector_get(currentParError, 2) > minMaxIntervalC[0]) && (gsl_vector_get(currentParError, 2) < minMaxIntervalC[1]))
+				if ((gsl_vector_get(currentParError, 0) > minMaxIntervalA[0]) && (gsl_vector_get(currentParError, 0) < minMaxIntervalA[1]) &&
+                    (gsl_vector_get(currentParError, 1) > minMaxIntervalB[0]) && (gsl_vector_get(currentParError, 1) < minMaxIntervalB[1]) &&
+                    (gsl_vector_get(currentParError, 2) > minMaxIntervalC[0]) && (gsl_vector_get(currentParError, 2) < minMaxIntervalC[1]))
 				{
 					gsl_vector_memcpy(outParError, currentParError);
 
@@ -3171,33 +3175,31 @@ namespace rsgis {namespace radar
 			gsl_vector_set(outParError, 0, gsl_vector_get(initialPar, 0));
 			gsl_vector_set(outParError, 1, gsl_vector_get(initialPar, 1));
 			gsl_vector_set(outParError, 2, gsl_vector_get(initialPar, 2));
-			gsl_vector_set(outParError, 3, 9999); // Set initial error to large number
+			gsl_vector_set(outParError, 3, +std::numeric_limits<double>::infinity()); // Set initial error to upper numerical limit
 
 			double stepA = (minMaxIntervalA[1] - minMaxIntervalA[0]) / pow(nRestarts, 1.0/3.0);
 			double stepB =  (minMaxIntervalB[1] - minMaxIntervalB[0]) / pow(nRestarts, 1.0/3.0);
 			double stepC = (minMaxIntervalC[1] - minMaxIntervalC[0]) / pow(nRestarts, 1.0/3.0);
 
 			// Try one run with inital parameters
-			this->conjGradOpt->minimise(inData, initialPar, outParError);
+			this->conjGradOpt->minimise(inData, initialPar, currentParError);
 
-			if (gsl_vector_get(currentParError, 3) < gsl_vector_get(outParError, 3)) // Check if resuduals are lower
-			{
-				// Check within limits of equation
-				if ((gsl_vector_get(currentParError, 0) > minMaxIntervalA[0]) && (gsl_vector_get(currentParError, 0) < minMaxIntervalA[1]) && (gsl_vector_get(currentParError, 1) > minMaxIntervalB[0]) && (gsl_vector_get(currentParError, 1) < minMaxIntervalB[1])  && (gsl_vector_get(currentParError, 2) > minMaxIntervalC[0]) && (gsl_vector_get(currentParError, 2) < minMaxIntervalC[1]))
-				{
-					// If new values are better than current best, update
-					gsl_vector_memcpy(outParError, currentParError);
+            // Check within limits of equation
+            if ((gsl_vector_get(currentParError, 0) > minMaxIntervalA[0]) && (gsl_vector_get(currentParError, 0) < minMaxIntervalA[1]) &&
+                (gsl_vector_get(currentParError, 1) > minMaxIntervalB[0]) && (gsl_vector_get(currentParError, 1) < minMaxIntervalB[1]) &&
+                (gsl_vector_get(currentParError, 2) > minMaxIntervalC[0]) && (gsl_vector_get(currentParError, 2) < minMaxIntervalC[1]))
+            {
+                // If new values are better than current best, update
+                gsl_vector_memcpy(outParError, currentParError);
 
-					if (gsl_vector_get(outParError, 3) < minError)
-					{
-						// free memory and terminate if target error is reached.
-						gsl_vector_free(currentParError);
-						gsl_vector_free(testInitialPar);
-						return 1;
-					}
-				}
-
-			}
+                if (gsl_vector_get(outParError, 3) < minError)
+                {
+                    // free memory and terminate if target error is reached.
+                    gsl_vector_free(currentParError);
+                    gsl_vector_free(testInitialPar);
+                    return 1;
+                }
+            }
 
 			// LOOP THROUGH DIFFERNT STARTING VALUES
 			double a = minMaxIntervalA[0];
@@ -3220,7 +3222,9 @@ namespace rsgis {namespace radar
 						if (gsl_vector_get(currentParError, 3) < gsl_vector_get(outParError, 3)) // Check if resuduals are lower
 						{
 							// Check within limits of equation
-							if ((gsl_vector_get(currentParError, 0) > minMaxIntervalA[0]) && (gsl_vector_get(currentParError, 0) < minMaxIntervalA[1]) && (gsl_vector_get(currentParError, 1) > minMaxIntervalB[0]) && (gsl_vector_get(currentParError, 1) < minMaxIntervalB[1])  && (gsl_vector_get(currentParError, 2) > minMaxIntervalC[0]) && (gsl_vector_get(currentParError, 2) < minMaxIntervalC[1]))
+							if ((gsl_vector_get(currentParError, 0) > minMaxIntervalA[0]) && (gsl_vector_get(currentParError, 0) < minMaxIntervalA[1]) &&
+                                (gsl_vector_get(currentParError, 1) > minMaxIntervalB[0]) && (gsl_vector_get(currentParError, 1) < minMaxIntervalB[1]) &&
+                                (gsl_vector_get(currentParError, 2) > minMaxIntervalC[0]) && (gsl_vector_get(currentParError, 2) < minMaxIntervalC[1]))
 							{
 								// If new values are better than current best, update
 								gsl_vector_memcpy(outParError, currentParError);
@@ -3254,7 +3258,9 @@ namespace rsgis {namespace radar
 
 			if (gsl_vector_get(currentParError, 2) < gsl_vector_get(outParError, 2)) // If new values are better than current best, update
 			{
-				if ((gsl_vector_get(currentParError, 0) > minMaxIntervalA[0]) && (gsl_vector_get(currentParError, 0) < minMaxIntervalA[1]) && (gsl_vector_get(currentParError, 1) > minMaxIntervalB[0]) && (gsl_vector_get(currentParError, 1) < minMaxIntervalB[1]))
+				if ((gsl_vector_get(currentParError, 0) > minMaxIntervalA[0]) && (gsl_vector_get(currentParError, 0) < minMaxIntervalA[1]) &&
+                    (gsl_vector_get(currentParError, 1) > minMaxIntervalB[0]) && (gsl_vector_get(currentParError, 1) < minMaxIntervalB[1]) &&
+                    (gsl_vector_get(currentParError, 2) > minMaxIntervalC[0]) && (gsl_vector_get(currentParError, 2) < minMaxIntervalC[1]))
 				{
 					gsl_vector_memcpy(outParError, currentParError);
 

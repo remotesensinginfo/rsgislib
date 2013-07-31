@@ -29,7 +29,19 @@ namespace rsgis{namespace calib{
     {
         double gain = 0;
         
-        if (int(bandValues[0]) == 0) // If pixels values for first band are 0 - consider image border
+        // If pixels values are 0 - consider image border
+        bool nodata = true;
+        for(int i = 0; i < numBands; ++i)
+        {
+            if(bandValues[i] != 0)
+            {
+                nodata = false;
+                break;
+            }
+        }
+        
+        
+        if(nodata)
         {
             for(unsigned int i = 0; i < this->numOutBands; ++i)
             {
@@ -46,6 +58,40 @@ namespace rsgis{namespace calib{
                 }
                 gain = (this->radGainOff[i].lMax - this->radGainOff[i].lMin)/(this->radGainOff[i].qCalMax - this->radGainOff[i].qCalMin);
                 output[i] = gain * (bandValues[i] - this->radGainOff[i].qCalMin) + this->radGainOff[i].lMin;
+            }
+        }
+    }
+    
+    
+    void RSGISLandsatRadianceCalibrationMultiAdd::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
+    {        
+        // If pixels values are 0 - consider image border
+        bool nodata = true;
+        for(int i = 0; i < numBands; ++i)
+        {
+            if(bandValues[i] != 0)
+            {
+                nodata = false;
+                break;
+            }
+        }
+        
+        if(nodata)
+        {
+            for(unsigned int i = 0; i < this->numOutBands; ++i)
+            {
+                output[i] = 0;
+            }
+        }
+        else
+        {
+            for(unsigned int i = 0; i < this->numOutBands; ++i)
+            {
+                if(this->radGainOff[i].band > numBands)
+                {
+                    throw rsgis::img::RSGISImageCalcException("Band is not within input image bands.");
+                }
+                output[i] = (this->radGainOff[i].multiVal * bandValues[i]) + this->radGainOff[i].addVal;
             }
         }
     }
