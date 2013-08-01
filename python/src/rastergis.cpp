@@ -1198,21 +1198,21 @@ static PyMethodDef RasterGISMethods[] = {
 },
 
     {"populateRATWithStats", RasterGIS_PopulateRATWithStats, METH_VARARGS,
-"Populates an attribute table from an image */\n"
-"call signature: rastergis.populateRATWithStats(inputImage, clumpsImage, bandStatsCmds)\n"
+"rsgislib.rastergis.populateRATWithStats(inputImage, clumpsImage, bandStatsCmds)\n"
+"Populates an attribute table from an image \n"
 "where:\n"
-"  inputImage is a string containing the name of the input image file\n"
-"  clumpsImage is a string containing the name of the input clump file\n"
-"  bandStatsCmds is a sequence of rsgislib.rastergis.BandAttStats objects that have attributes in line with rsgis.cmds.RSGISBandAttStatsCmds\n"
-"    Requires: TODO: Check\n"
-"      band: int defining the image band to process\n"
-"      countField: string defining the name of the field for count value\n"
-"      minField: string defining the name of the field for min value\n"
-"      maxField: string defining the name of the field for max value\n"
-"      sumField: string defining the name of the field for sum value\n"
-"      meanField: string defining the name of the field for mean value\n"
-"      stdDevField: string defining the name of the field for standard deviation value\n"
-"      medianField: string defining the name of the field for median value\n"
+"  * inputImage is a string containing the name of the input image file\n"
+"  * clumpsImage is a string containing the name of the input clump file\n"
+"  * bandStatsCmds is a sequence of rsgislib.rastergis.BandAttStats objects that have attributes in line with rsgis.cmds.RSGISBandAttStatsCmds\n"
+"    * Requires: TODO: Check\n"
+"       * band: int defining the image band to process\n"
+"       * countField: string defining the name of the field for count value\n"
+"       * minField: string defining the name of the field for min value\n"
+"       * maxField: string defining the name of the field for max value\n"
+"       * sumField: string defining the name of the field for sum value\n"
+"       * meanField: string defining the name of the field for mean value\n"
+"       * stdDevField: string defining the name of the field for standard deviation value\n"
+"       * medianField: string defining the name of the field for median value\n"
 },
 
     {"populateRATWithPercentiles", RasterGIS_PopulateRATWithPercentiles, METH_VARARGS,
