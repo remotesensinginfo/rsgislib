@@ -62,7 +62,7 @@ namespace rsgis{ namespace cmds {
             popImageStats.populateImageWithRasterGISStats(clumpsDataset, addColourTable2Img, calcImgPyramids);
 
             GDALClose(clumpsDataset);
-            GDALDestroyDriverManager();
+            //GDALDestroyDriverManager();
         }
         catch(rsgis::RSGISException &e)
         {
@@ -101,7 +101,7 @@ namespace rsgis{ namespace cmds {
 
             GDALClose(inputDataset);
             GDALClose(outRATDataset);
-            GDALDestroyDriverManager();
+            //GDALDestroyDriverManager();
         }
         catch(rsgis::RSGISException &e)
         {
@@ -138,7 +138,7 @@ namespace rsgis{ namespace cmds {
 
             GDALClose(inputDataset);
             GDALClose(outRATDataset);
-            GDALDestroyDriverManager();
+            //GDALDestroyDriverManager();
         }
         catch(rsgis::RSGISException &e)
         {
@@ -166,7 +166,7 @@ namespace rsgis{ namespace cmds {
             calcLoc.populateAttWithClumpLocation(inputDataset, eastingsField, northingsField);
 
             GDALClose(inputDataset);
-            GDALDestroyDriverManager();
+            //GDALDestroyDriverManager();
         }
         catch(rsgis::RSGISException &e)
         {
@@ -244,7 +244,7 @@ namespace rsgis{ namespace cmds {
 
             GDALClose(clumpsDataset);
             GDALClose(imageDataset);
-            GDALDestroyDriverManager();
+            //GDALDestroyDriverManager();
         }
         catch(rsgis::RSGISException &e)
         {
@@ -305,7 +305,7 @@ namespace rsgis{ namespace cmds {
 
             GDALClose(clumpsDataset);
             GDALClose(imageDataset);
-            GDALDestroyDriverManager();
+            //GDALDestroyDriverManager();
         }
         catch(rsgis::RSGISException &e)
         {
@@ -342,7 +342,7 @@ namespace rsgis{ namespace cmds {
 
             GDALClose(clumpsDataset);
             GDALClose(catsDataset);
-            GDALDestroyDriverManager();
+            //GDALDestroyDriverManager();
         }
         catch(rsgis::RSGISException &e)
         {
@@ -379,7 +379,7 @@ namespace rsgis{ namespace cmds {
 
             GDALClose(clumpsDataset);
             GDALClose(catsDataset);
-            GDALDestroyDriverManager();
+            //GDALDestroyDriverManager();
         }
         catch(rsgis::RSGISException &e)
         {
@@ -423,7 +423,7 @@ namespace rsgis{ namespace cmds {
             delete[] bandNames;
 
             GDALClose(inputDataset);
-            GDALDestroyDriverManager();
+            //GDALDestroyDriverManager();
         }
         catch(rsgis::RSGISException &e)
         {
