@@ -152,7 +152,6 @@ static PyObject *ImageUtils_createTiles(PyObject *self, PyObject *args)
     return pOutList;
 }
 
-
 static PyObject *ImageUtils_PopImageStats(PyObject *self, PyObject *args)
 {
     const char *pszInputImage;
@@ -165,6 +164,189 @@ static PyObject *ImageUtils_PopImageStats(PyObject *self, PyObject *args)
     try
     {
         rsgis::cmds::executePopulateImgStats(pszInputImage, useNoDataValue, noDataValue, buildPyramids);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
+static PyObject *ImageUtils_AssignProj(PyObject *self, PyObject *args)
+{
+    const char *pszInputImage;
+    std::string pszInputProj = "";
+    std::string pszInputProjFile = "";
+    bool readWKTFromFile = false;
+    PyObject *pszInputProjObj;
+    PyObject *pszInputProjFileObj;
+    
+    if( !PyArg_ParseTuple(args, "sOO:assignProj", &pszInputImage, &pszInputProjObj, &pszInputProjFileObj))
+        return NULL;
+    
+    if(pszInputProjObj == Py_None)
+    {
+        pszInputProj = "";
+        if(pszInputProjFileObj == Py_None)
+        {
+            pszInputProjFile = "";
+            PyErr_SetString(GETSTATE(self)->error, "Must specify either a wkt string or a file from which it can be read." );
+            return NULL;
+        }
+        else
+        {
+            readWKTFromFile = true;
+            pszInputProjFile = RSGISPY_STRING_EXTRACT(pszInputProjFileObj);
+        }
+    }
+    else
+    {
+        pszInputProj = RSGISPY_STRING_EXTRACT(pszInputProjObj);
+        readWKTFromFile = false;
+    }
+    
+    try
+    {
+        rsgis::cmds::executeAssignProj(pszInputImage, pszInputProj, readWKTFromFile, pszInputProjFile);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
+static PyObject *ImageUtils_CopyProjFromImage(PyObject *self, PyObject *args)
+{
+    const char *pszInputImage;
+    const char *pszInputRefImage;
+    
+    if( !PyArg_ParseTuple(args, "ss:copyProjFromImage", &pszInputImage, &pszInputRefImage))
+        return NULL;
+    
+    try
+    {
+        rsgis::cmds::executeCopyProj(pszInputImage, pszInputRefImage);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
+static PyObject *ImageUtils_CopySpatialAndProjFromImage(PyObject *self, PyObject *args)
+{
+    const char *pszInputImage;
+    const char *pszInputRefImage;
+    
+    if( !PyArg_ParseTuple(args, "ss:copySpatialAndProjFromImage", &pszInputImage, &pszInputRefImage))
+        return NULL;
+    
+    try
+    {
+        rsgis::cmds::executeCopyProjSpatial(pszInputImage, pszInputRefImage);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
+static PyObject *ImageUtils_AssignSpatialInfo(PyObject *self, PyObject *args)
+{
+    const char *pszInputImage;
+    PyObject *xTLObj;
+    PyObject *yTLObj;
+    PyObject *xResObj;
+    PyObject *yResObj;
+    PyObject *xRotObj;
+    PyObject *yRotObj;
+        
+    if( !PyArg_ParseTuple(args, "sOOOOOO:assignSpatialInfo", &pszInputImage, &xTLObj, &yTLObj, &xResObj, &yResObj, &xRotObj, &yRotObj))
+        return NULL;
+    
+    
+    double xTL = 0.0;
+    double yTL = 0.0;
+    double xRes = 0.0;
+    double yRes = 0.0;
+    double xRot = 0.0;
+    double yRot = 0.0;
+    
+    bool xTLDef = false;
+    bool yTLDef = false;
+    bool xResDef = false;
+    bool yResDef = false;
+    bool xRotDef = false;
+    bool yRotDef = false;
+    
+    if(xTLObj != Py_None)
+    {
+        if(RSGISPY_CHECK_FLOAT(xTLObj) | RSGISPY_CHECK_INT(xTLObj))
+        {
+            xTL = RSGISPY_FLOAT_EXTRACT(xTLObj);
+            xTLDef = true;
+        }
+    }
+    
+    if(yTLObj != Py_None)
+    {
+        if(RSGISPY_CHECK_FLOAT(yTLObj) | RSGISPY_CHECK_INT(yTLObj))
+        {
+            yTL = RSGISPY_FLOAT_EXTRACT(yTLObj);
+            yTLDef = true;
+        }
+    }
+    
+    if(xResObj != Py_None)
+    {
+        if(RSGISPY_CHECK_FLOAT(xResObj) | RSGISPY_CHECK_INT(xResObj))
+        {
+            xRes = RSGISPY_FLOAT_EXTRACT(xResObj);
+            xResDef = true;
+        }
+    }
+    
+    if(yResObj != Py_None)
+    {
+        if(RSGISPY_CHECK_FLOAT(yResObj) | RSGISPY_CHECK_INT(yResObj))
+        {
+            yRes = RSGISPY_FLOAT_EXTRACT(yResObj);
+            yResDef = true;
+        }
+    }
+    
+    if(xRotObj != Py_None)
+    {
+        if(RSGISPY_CHECK_FLOAT(xRotObj) | RSGISPY_CHECK_INT(xRotObj))
+        {
+            xRot = RSGISPY_FLOAT_EXTRACT(xRotObj);
+            xRotDef = true;
+        }
+    }
+    
+    if(yRotObj != Py_None)
+    {
+        if(RSGISPY_CHECK_FLOAT(yRotObj) | RSGISPY_CHECK_INT(yRotObj))
+        {
+            yRot = RSGISPY_FLOAT_EXTRACT(yRotObj);
+            yRotDef = true;
+        }
+    }
+    
+    try
+    {
+        rsgis::cmds::executeAssignSpatialInfo(pszInputImage, xTL, yTL, xRes, yRes, xRot, yRot, xTLDef, yTLDef, xResDef, yResDef, xRotDef, yRotDef);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -232,12 +414,42 @@ static PyMethodDef ImageUtilsMethods[] = {
 "\nA list of strings containing the filenames is returned\n"},
     
     {"popImageStats", ImageUtils_PopImageStats, METH_VARARGS,
+"rsgislib.imageutils.popImageStats(inputImage, useNoDataValue, noDataValue, buildPyramids)\n"
 "Calculate the image statistics and build image pyramids populating the image file.\n"
-"call signature: imageutils.popImageStats(inputImage, useNoDataValue, noDataValue, buildPyramids)\n"
-"  inputImage is a string containing the name of the input file\n"
-"  useNoDataValue is a boolean stating whether the no data value is to be used.\n"
-"  noDataValue is a floating point value to be used as the no data value.\n"
-"  buildPyramids is a boolean stating whether image pyramids should be calculated.\n"},
+"  * inputImage is a string containing the name of the input file\n"
+"  * useNoDataValue is a boolean stating whether the no data value is to be used.\n"
+"  * noDataValue is a floating point value to be used as the no data value.\n"
+"  * buildPyramids is a boolean stating whether image pyramids should be calculated.\n"},
+    
+    {"assignProj", ImageUtils_AssignProj, METH_VARARGS,
+"rsgislib.imageutils.assignProj(inputImage, wktString, wktStringFile)\n"
+"Assign a projection to the input GDAL image file.\n"
+"  * inputImage is a string containing the name of the input file\n"
+"  * wktString is the wkt string to be assigned to the image. If None then it will be read from the wktStringFile.\n"
+"  * wktStringFile is a file path to a text file containing the WKT string to be assigned. This is ignored if wktString is not None.\n"},
+    
+    {"copyProjFromImage", ImageUtils_CopyProjFromImage, METH_VARARGS,
+"rsgislib.imageutils.copyProjFromImage(inputImage, refImage)\n"
+"Copy the projection from a reference image to an input GDAL image file.\n"
+"  * inputImage is a string containing the name and path of the input file\n"
+"  * refImage is a string containing the name and path of the reference image.\n"},
+    
+    {"copySpatialAndProjFromImage", ImageUtils_CopySpatialAndProjFromImage, METH_VARARGS,
+"rsgislib.imageutils.copySpatialAndProjFromImage(inputImage, refImage)\n"
+"Copy the spatial information and projection from a reference image to an input GDAL image file.\n"
+"  * inputImage is a string containing the name and path of the input file\n"
+"  * refImage is a string containing the name and path of the reference image.\n"},
+
+    {"assignSpatialInfo", ImageUtils_AssignSpatialInfo, METH_VARARGS,
+"rsgislib.imageutils.assignSpatialInfo(inputImage, tlX, tlY, resX, resY, rotX, rotY)\n"
+"Assign the spatial information to an input GDAL image file.\n"
+"  * inputImage is a string containing the name and path of the input file\n"
+"  * tlX is a double representing the top left X coordinate of the image.\n"
+"  * tlY is a double representing the top left Y coordinate of the image.\n"
+"  * resX is a double representing X resolution of the image.\n"
+"  * resY is a double representing Y resolution of the image.\n"
+"  * rotX is a double representing X rotation of the image.\n"
+"  * rotY is a double representing Y rotation of the image.\n"},
 
     {NULL}        /* Sentinel */
 };

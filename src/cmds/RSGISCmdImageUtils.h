@@ -66,6 +66,17 @@ namespace rsgis{ namespace cmds {
      */
     void executeImageMosaic(std::string *inputImages, int numDS, std::string outputImage, float background, float skipVal, unsigned int skipBand, unsigned int overlapBehaviour, std::string format, RSGISLibDataType outDataType) throw(RSGISCmdException);
     
+    /** A function to assign the projection on an image file */
+    void executeAssignProj(std::string inputImage, std::string wktStr, bool readWKTFromFile=false, std::string wktFile="")throw(RSGISCmdException);
+    
+    /** A function to assign the spatial information on an image file */
+    void executeAssignSpatialInfo(std::string inputImage, double xTL, double yTL, double xRes, double yRes, double xRot, double yRot, bool xTLDef, bool yTLDef, bool xResDef, bool yResDef, bool xRotDef, bool yRotDef)throw(RSGISCmdException);
+    
+    /** A function to copy the projection from one file to another (i.e., similar to executeAssignProj) */
+    void executeCopyProj(std::string inputImage, std::string refImageFile)throw(RSGISCmdException);
+    
+    /** A function to copy the projection and spaital info from one file to another (i.e., similar to executeAssignProj and executeAssignSpatialInfo combined) */
+    void executeCopyProjSpatial(std::string inputImage, std::string refImageFile)throw(RSGISCmdException);
     
 }}
 

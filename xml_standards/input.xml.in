@@ -698,6 +698,10 @@
 	<rsgis:command algor="imageutils" option="subsampleimage" image="image.kea" output="data.hdf" nodata="float" subsample="int" />
 	<!-- A command to identify dark targets which can be used for a number of applications (e.g., radiometric correction) --> 
 	<rsgis:command algor="imageutils" option="darktargetmask" image="image.kea" output="data.hdf" nodata="float"  />
+	<!-- A command to copy the projection definition from one image to another --> 
+	<rsgis:command algor="imageutils" option="copyprojdef" image="image.kea" refimage="data.kea" />
+	<!-- A command to copy the projection definition and spatial information from one image to another --> 
+	<rsgis:command algor="imageutils" option="copyprojdefspatialinfo" image="image.kea" refimage="data.kea" />
 	
 	
 	
