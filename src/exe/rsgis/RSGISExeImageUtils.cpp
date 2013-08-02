@@ -113,6 +113,8 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
     XMLCh *optionStretchImageWithStats = XMLString::transcode("stretchwithstats");
     XMLCh *optionSubSampleImage = XMLString::transcode("subsampleimage");
     XMLCh *optionDarkTargetMask = XMLString::transcode("darktargetmask");
+    XMLCh *optionCopyProjDef = XMLString::transcode("copyprojdef");
+    XMLCh *optionCopyProjDefSpatialInfo = XMLString::transcode("copyprojdefspatialinfo");
 
 	const XMLCh *algorNameEle = argElement->getAttribute(algorXMLStr);
 	if(!XMLString::equals(algorName, algorNameEle))
@@ -3562,6 +3564,66 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 		XMLString::release(&nodataXMLStr);
         
 	}
+    else if (XMLString::equals(optionCopyProjDef, optionXML))
+	{
+		this->option = RSGISExeImageUtils::copyprojdef;
+        
+		XMLCh *imageXMLStr = XMLString::transcode("image");
+		if(argElement->hasAttribute(imageXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(imageXMLStr));
+			this->inputImage = string(charValue);
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+		}
+		XMLString::release(&imageXMLStr);
+        
+		XMLCh *refImageXMLStr = XMLString::transcode("refimage");
+		if(argElement->hasAttribute(refImageXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(refImageXMLStr));
+			this->inputFile = string(charValue);
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'refimage\' attribute was provided.");
+		}
+		XMLString::release(&refImageXMLStr);
+	}
+    else if (XMLString::equals(optionCopyProjDefSpatialInfo, optionXML))
+	{
+		this->option = RSGISExeImageUtils::copyprojdefspatialinfo;
+        
+		XMLCh *imageXMLStr = XMLString::transcode("image");
+		if(argElement->hasAttribute(imageXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(imageXMLStr));
+			this->inputImage = string(charValue);
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+		}
+		XMLString::release(&imageXMLStr);
+        
+		XMLCh *refImageXMLStr = XMLString::transcode("refimage");
+		if(argElement->hasAttribute(refImageXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(refImageXMLStr));
+			this->inputFile = string(charValue);
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'refimage\' attribute was provided.");
+		}
+		XMLString::release(&refImageXMLStr);
+	}
 	else
 	{
 		string message = string("The option (") + string(XMLString::transcode(optionXML)) + string(") is not known: RSGISExeImageUtils.");
@@ -3618,6 +3680,8 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
     XMLString::release(&optionStretchImageWithStats);
     XMLString::release(&optionSubSampleImage);
     XMLString::release(&optionDarkTargetMask);
+    XMLString::release(&optionCopyProjDef);
+    XMLString::release(&optionCopyProjDefSpatialInfo);
 
 	parsed = true;
 }
@@ -5131,26 +5195,11 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
 
             try
             {
-                GDALAllRegister();
-                GDALDataset *inDataset = NULL;
-                inDataset = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_Update);
-                if(inDataset == NULL)
-                {
-                    string message = string("Could not open image ") + this->inputImage;
-                    throw RSGISImageException(message.c_str());
-                }
-
-                RSGISTextUtils textUtils;
-                string projWKTStr = textUtils.readFileToString(this->projFile);
-
-                inDataset->SetProjection(projWKTStr.c_str());
-
-                GDALClose(inDataset);
-                GDALDestroyDriverManager();
+                rsgis::cmds::executeAssignProj(this->inputImage, "", true, this->projFile);
             }
-            catch (RSGISException &e)
+            catch (rsgis::cmds::RSGISCmdException &e)
             {
-                throw e;
+                throw rsgis::RSGISException(e.what());
             }
         }
         else if(option == RSGISExeImageUtils::popimgstats)
@@ -5318,56 +5367,11 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
 
             try
             {
-                GDALAllRegister();
-                GDALDataset *inDataset = NULL;
-                inDataset = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_Update);
-                if(inDataset == NULL)
-                {
-                    string message = string("Could not open image ") + this->inputImage;
-                    throw RSGISImageException(message.c_str());
-                }
-
-                double *trans = new double[6];
-                inDataset->GetGeoTransform(trans);
-
-                if(this->tlxDef)
-                {
-                    trans[0] = this->tlx;
-                }
-                if(this->tlyDef)
-                {
-                    trans[3] = this->tly;
-                }
-                if(this->resXDef)
-                {
-                    trans[1] = this->resX;
-                }
-                if(this->resYDef)
-                {
-                    trans[5] = this->resY;
-                }
-                if(this->rotXDef)
-                {
-                    trans[2] = this->rotX;
-                }
-                if(this->rotYDef)
-                {
-                    trans[4] = this->rotY;
-                }
-
-                cout << "TL: [" << trans[0] << "," << trans[3] << "]" << endl;
-                cout << "RES: [" << trans[1] << "," << trans[5] << "]" << endl;
-                cout << "ROT: [" << trans[2] << "," << trans[4] << "]" << endl;
-
-                inDataset->SetGeoTransform(trans);
-
-                GDALClose(inDataset);
-                delete trans;
-                GDALDestroyDriverManager();
+                rsgis::cmds::executeAssignSpatialInfo(this->inputImage, this->tlx, this->tly, this->resX, this->resY, this->rotX, this->rotY, this->tlxDef, this->tlyDef, this->resXDef, this->resYDef, this->rotXDef, this->rotYDef);
             }
-            catch (RSGISException &e)
+            catch (rsgis::cmds::RSGISCmdException &e)
             {
-                throw e;
+                throw rsgis::RSGISException(e.what());
             }
         }
         else if(option == RSGISExeImageUtils::genassesspoints)
@@ -5784,6 +5788,36 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
 			}
 
 		}
+        else if(option == RSGISExeImageUtils::copyprojdef)
+        {
+            cout.precision(12);
+            cout << "A command to copy the projection definition from one image to another\n";
+            cout << "Input Image: " << this->inputImage << endl;
+            cout << "Reference Image: " << this->inputFile << endl;
+            try
+            {
+                rsgis::cmds::executeCopyProj(this->inputImage, this->inputFile);
+            }
+            catch (rsgis::cmds::RSGISCmdException &e)
+            {
+                throw rsgis::RSGISException(e.what());
+            }
+        }
+        else if(option == RSGISExeImageUtils::copyprojdefspatialinfo)
+        {
+            cout.precision(12);
+            cout << "A command to copy the projection definition and spatial information from one image to another\n";
+            cout << "Input Image: " << this->inputImage << endl;
+            cout << "Reference Image: " << this->inputFile << endl;
+            try
+            {
+                rsgis::cmds::executeCopyProjSpatial(this->inputImage, this->inputFile);
+            }
+            catch (rsgis::cmds::RSGISCmdException &e)
+            {
+                throw rsgis::RSGISException(e.what());
+            }
+        }
 		else
 		{
 			cout << "Options not recognised\n";
@@ -6237,6 +6271,18 @@ void RSGISExeImageUtils::printParameters()
             {
                 cout << "No data value: " << this->nodataValue << endl;
             }
+        }
+        else if(option == RSGISExeImageUtils::copyprojdef)
+        {
+            cout << "A command to copy the projection definition from one image to another\n";
+            cout << "Input Image: " << this->inputImage << endl;
+            cout << "Reference Image: " << this->inputFile << endl;
+        }
+        else if(option == RSGISExeImageUtils::copyprojdefspatialinfo)
+        {
+            cout << "A command to copy the projection definition and spatial information from one image to another\n";
+            cout << "Input Image: " << this->inputImage << endl;
+            cout << "Reference Image: " << this->inputFile << endl;
         }
 		else
 		{

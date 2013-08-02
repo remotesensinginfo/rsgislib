@@ -410,6 +410,189 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
+    
+    
+    void executeAssignProj(std::string inputImage, std::string wktStr, bool readWKTFromFile, std::string wktFile)throw(RSGISCmdException)
+    {
+        try
+        {
+            GDALAllRegister();
+            GDALDataset *inDataset = NULL;
+            inDataset = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_Update);
+            if(inDataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputImage;
+                throw RSGISImageException(message.c_str());
+            }
+            
+            if(readWKTFromFile)
+            {
+                rsgis::utils::RSGISTextUtils textUtils;
+                wktStr = textUtils.readFileToString(wktFile);
+            }
+            
+            inDataset->SetProjection(wktStr.c_str());
+            
+            GDALClose(inDataset);
+        }
+        catch (RSGISImageException& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch (RSGISException& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(std::exception& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
+    
+    void executeAssignSpatialInfo(std::string inputImage, double xTL, double yTL, double xRes, double yRes, double xRot, double yRot, bool xTLDef, bool yTLDef, bool xResDef, bool yResDef, bool xRotDef, bool yRotDef)throw(RSGISCmdException)
+    {
+        try
+        {
+            std::cout.precision(12);
+            GDALAllRegister();
+            GDALDataset *inDataset = NULL;
+            inDataset = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_Update);
+            if(inDataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputImage;
+                throw RSGISImageException(message.c_str());
+            }
+            
+            double *trans = new double[6];
+            inDataset->GetGeoTransform(trans);
+            
+            if(xTLDef)
+            {
+                trans[0] = xTL;
+            }
+            if(yTLDef)
+            {
+                trans[3] = yTL;
+            }
+            if(xResDef)
+            {
+                trans[1] = xRes;
+            }
+            if(yResDef)
+            {
+                trans[5] = yRes;
+            }
+            if(xRotDef)
+            {
+                trans[2] = xRot;
+            }
+            if(yRotDef)
+            {
+                trans[4] = yRot;
+            }
+            
+            std::cout << "TL: [" << trans[0] << "," << trans[3] << "]" << std::endl;
+            std::cout << "RES: [" << trans[1] << "," << trans[5] << "]" << std::endl;
+            std::cout << "ROT: [" << trans[2] << "," << trans[4] << "]" << std::endl;
+            
+            inDataset->SetGeoTransform(trans);
+            
+            GDALClose(inDataset);
+            delete trans;
+        }
+        catch (RSGISImageException& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch (RSGISException& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(std::exception& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
+    
+    void executeCopyProj(std::string inputImage, std::string refImageFile)throw(RSGISCmdException)
+    {
+        try
+        {
+            GDALAllRegister();
+            GDALDataset *refDataset = (GDALDataset *) GDALOpen(refImageFile.c_str(), GA_ReadOnly);
+            if(refDataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + refImageFile;
+                throw RSGISImageException(message.c_str());
+            }
+            
+            std::string wktString = std::string(refDataset->GetProjectionRef());
+            
+            GDALClose(refDataset);
+            
+            executeAssignProj(inputImage, wktString);
+        }
+        catch (RSGISImageException& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch (RSGISException& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(std::exception& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
+    
+    void executeCopyProjSpatial(std::string inputImage, std::string refImageFile)throw(RSGISCmdException)
+    {
+        try
+        {
+            GDALAllRegister();
+            GDALDataset *refDataset = (GDALDataset *) GDALOpen(refImageFile.c_str(), GA_ReadOnly);
+            if(refDataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + refImageFile;
+                throw RSGISImageException(message.c_str());
+            }
+            
+            std::string wktString = std::string(refDataset->GetProjectionRef());
+            
+            double *trans = new double[6];
+            refDataset->GetGeoTransform(trans);
+            
+            GDALClose(refDataset);
+            
+            
+            GDALDataset *inDataset = NULL;
+            inDataset = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_Update);
+            if(inDataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputImage;
+                throw RSGISImageException(message.c_str());
+            }
+            
+            inDataset->SetGeoTransform(trans);
+            inDataset->SetProjection(wktString.c_str());
+            
+            delete[] trans;
+            GDALClose(inDataset);
+        }
+        catch (RSGISImageException& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch (RSGISException& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(std::exception& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
 
 
 }}
