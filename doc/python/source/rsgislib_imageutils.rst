@@ -5,6 +5,10 @@ RSGISLib Image Utilities Module
    :members:
    :undoc-members:
 
+.. autofunction:: rsgislib.imageutils.assignProj
+.. autofunction:: rsgislib.imageutils.assignSpatialInfo
+.. autofunction:: rsgislib.imageutils.copyProjFromImage
+.. autofunction:: rsgislib.imageutils.copySpatialAndProjFromImage
 .. autofunction:: rsgislib.imageutils.createTiles
 .. autofunction:: rsgislib.imageutils.maskImage
 .. autofunction:: rsgislib.imageutils.popImageStats
