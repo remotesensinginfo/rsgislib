@@ -202,6 +202,13 @@ void RSGISExeFilterImages::retrieveParameters(xercesc::DOMElement *argElement) t
 		XMLCh *filterTypeHarlick = xercesc::XMLString::transcode("Harlick");
 		XMLCh *filterTypeFree = xercesc::XMLString::transcode("Free");
         XMLCh *filterTypeLee = xercesc::XMLString::transcode("Lee");
+        XMLCh *filterTypeNormVar = xercesc::XMLString::transcode("NormVar");
+        XMLCh *filterTypeNormVarPow = xercesc::XMLString::transcode("NormVarPower");
+        XMLCh *filterTypeNormVarSqrt = xercesc::XMLString::transcode("NormVarSqrt");
+        XMLCh *filterTypeNormVarAmp = xercesc::XMLString::transcode("NormVarAmplitude");
+        XMLCh *filterTypeNormVarLn = xercesc::XMLString::transcode("NormVarLn");
+        XMLCh *filterTypeNormVarLnPow = xercesc::XMLString::transcode("NormVarLnPower");
+        XMLCh *filterTypeNormLn = xercesc::XMLString::transcode("NormLn");
 		
 		XMLCh *filterTypeOptionX = xercesc::XMLString::transcode("x");
 		XMLCh *filterTypeOptionY = xercesc::XMLString::transcode("y");
@@ -463,6 +470,50 @@ void RSGISExeFilterImages::retrieveParameters(xercesc::DOMElement *argElement) t
 				rsgis::filter::RSGISImageFilter *filter = new rsgis::filter::RSGISLeeFilter(0, size, fileEnding, nLooks);
 				filterBank->addFilter(filter);
 			}
+            // Normalised variance of DN (Power for SAR image)
+            else if((xercesc::XMLString::equals(filterTypeNormVar, filterType)) | (xercesc::XMLString::equals(filterTypeNormVarPow, filterType)))
+			{
+				const XMLCh *fileEndingStr = filterElement->getAttribute(xercesc::XMLString::transcode("fileending"));
+				std::string fileEnding = xercesc::XMLString::transcode(fileEndingStr);
+                
+                int size = mathUtils.strtofloat(xercesc::XMLString::transcode(filterElement->getAttribute(xercesc::XMLString::transcode("size"))));
+                
+				rsgis::filter::RSGISImageFilter *filter = new rsgis::filter::RSGISNormVarPowerFilter(0, size, fileEnding);
+				filterBank->addFilter(filter);
+			}
+            // Normalised variance of Sqrt DN (Amplitude for SAR image)
+            else if((xercesc::XMLString::equals(filterTypeNormVarSqrt, filterType)) | (xercesc::XMLString::equals(filterTypeNormVarAmp, filterType)))
+			{
+				const XMLCh *fileEndingStr = filterElement->getAttribute(xercesc::XMLString::transcode("fileending"));
+				std::string fileEnding = xercesc::XMLString::transcode(fileEndingStr);
+                
+                int size = mathUtils.strtofloat(xercesc::XMLString::transcode(filterElement->getAttribute(xercesc::XMLString::transcode("size"))));
+                
+				rsgis::filter::RSGISImageFilter *filter = new rsgis::filter::RSGISNormVarAmplitudeFilter(0, size, fileEnding);
+				filterBank->addFilter(filter);
+			}
+            // Normalised variance of ln DN (Natural log Power for SAR image)
+            else if((xercesc::XMLString::equals(filterTypeNormVarLn, filterType)) | (xercesc::XMLString::equals(filterTypeNormVarLnPow, filterType)))
+			{
+				const XMLCh *fileEndingStr = filterElement->getAttribute(xercesc::XMLString::transcode("fileending"));
+				std::string fileEnding = xercesc::XMLString::transcode(fileEndingStr);
+                
+                int size = mathUtils.strtofloat(xercesc::XMLString::transcode(filterElement->getAttribute(xercesc::XMLString::transcode("size"))));
+                
+				rsgis::filter::RSGISImageFilter *filter = new rsgis::filter::RSGISNormVarLnPowerFilter(0, size, fileEnding);
+				filterBank->addFilter(filter);
+			}
+            // Normalised natural log
+            else if(xercesc::XMLString::equals(filterTypeNormLn, filterType))
+			{
+				const XMLCh *fileEndingStr = filterElement->getAttribute(xercesc::XMLString::transcode("fileending"));
+				std::string fileEnding = xercesc::XMLString::transcode(fileEndingStr);
+                
+                int size = mathUtils.strtofloat(xercesc::XMLString::transcode(filterElement->getAttribute(xercesc::XMLString::transcode("size"))));
+                
+				rsgis::filter::RSGISImageFilter *filter = new rsgis::filter::RSGISNormLnFilter(0, size, fileEnding);
+				filterBank->addFilter(filter);
+			}
 			else if(xercesc::XMLString::equals(filterTypeHarlick, filterType))
 			{
 				throw rsgis::RSGISXMLArgumentsException("Harlick features are not implemented");
@@ -495,7 +546,13 @@ void RSGISExeFilterImages::retrieveParameters(xercesc::DOMElement *argElement) t
         xercesc::XMLString::release(&filterTypeHarlick);
         xercesc::XMLString::release(&filterTypeFree);
         xercesc::XMLString::release(&filterTypeLee);
-        
+        xercesc::XMLString::release(&filterTypeNormVar);
+        xercesc::XMLString::release(&filterTypeNormVarPow);
+        xercesc::XMLString::release(&filterTypeNormVarSqrt);
+        xercesc::XMLString::release(&filterTypeNormVarAmp);
+        xercesc::XMLString::release(&filterTypeNormVarLn);
+        xercesc::XMLString::release(&filterTypeNormVarLnPow);
+        xercesc::XMLString::release(&filterTypeNormLn);
         xercesc::XMLString::release(&filterTypeOptionX);
         xercesc::XMLString::release(&filterTypeOptionY);
         xercesc::XMLString::release(&filterTypeOptionXY);

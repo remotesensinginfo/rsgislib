@@ -932,6 +932,10 @@
         <rsgis:filter size="int" type="Total" fileending="total" />
         <rsgis:filter size="int" type="Kuwahara" fileending="kuwahara" />
         <rsgis:filter size="int" type="Lee" fileending="lee" nLooks="int" />
+        <rsgis:filter size="5" type="NormVar" fileending="nvar" />
+        <rsgis:filter size="5" type="NormVarSqrt" fileending="nvarsqrt" />
+        <rsgis:filter size="5" type="NormVarLn" fileending="nvarln" />
+        <rsgis:filter size="5" type="NormLn" fileending="nln" />
     </rsgis:command>
     <!-- A command to filter an input image using a predefined filter band -->
     <rsgis:command algor="imagefilter" option="filter" image="image.env" output="output_image_base" filterbank="LM" format="GDAL Format" extension="string" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
