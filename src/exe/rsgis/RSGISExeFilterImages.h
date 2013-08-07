@@ -43,6 +43,7 @@
 #include "filtering/RSGISStatsFilters.h"
 #include "filtering/RSGISSpeckleFilters.h"
 #include "filtering/RSGISNonLocalDenoising.h"
+#include "filtering/RSGISSARTextureFilters.h"
 
 #include <xercesc/dom/DOM.hpp>
 #include <xercesc/util/XMLString.hpp>
