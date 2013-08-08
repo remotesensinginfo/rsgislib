@@ -47,7 +47,7 @@ static std::string *ExtractStringArrayFromSequence(PyObject *sequence, int *nEle
         PyObject *stringObj = PySequence_GetItem(sequence, i);
 
         if(!RSGISPY_CHECK_STRING(stringObj)) {
-            //PyErr_SetString(GETSTATE(self)->error, "Fields must be strings");
+            PyErr_SetString(GETSTATE(sequence)->error, "Fields must be strings");
             Py_DECREF(stringObj);
             return stringsArray;
         }
