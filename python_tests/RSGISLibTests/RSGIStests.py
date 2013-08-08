@@ -1,5 +1,34 @@
 #!/usr/bin/env python
 
+############################################################################
+# Copyright (c) 2013 Sebastian Clarke, RSGISLib
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+# 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+# THE SOFTWARE.
+#
+#
+# Purpose:  Test suite for RSGISLib python bindings
+# Author: Sebastian Clarke
+# Email: sec14@aber.ac.uk
+# Date: 30/07/2013
+# Version: 1.0
+#
+#############################################################################
+
 import os
 import rsgislib
 from rsgislib import imagecalc
@@ -22,7 +51,19 @@ class RSGISTests:
             print inst
             self.failures.append(function.__name__)
 
-
+    def copyData(self):
+        """ Copy data files from original directory to test directory """
+        print("COPYING DATA")
+        os.system('cp ./RATS/injune_p142_casi_sub_utm_segs.kea ./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_cptab.kea')
+        os.system('cp ./RATS/injune_p142_casi_sub_utm_segs.kea ./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_cpcols.kea')
+        os.system('cp ./RATS/injune_p142_casi_sub_utm_clumps_elim_final_clumps_elim_final.kea ./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_spatloc_eucdist.kea')
+        os.system('cp ./RATS/injune_p142_casi_sub_utm_segs.kea ./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_popstats.kea')
+        os.system('cp ./RATS/injune_p142_casi_sub_utm_segs.kea ./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_neighbours.kea')
+        os.system('cp ./RATS/injune_p142_casi_sub_utm_segs.kea ./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_borlen.kea')
+        os.system('cp ./RATS/injune_p142_casi_sub_utm_segs.kea ./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_borlen.kea')
+        os.system('cp ./RATS/injune_p142_casi_sub_utm_segs.kea ./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_shape.kea')
+        os.system('cp ./RATS/injune_p142_casi_sub_utm_segs_nostats.kea ./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_nostats_addstats.kea')
+    
     def testNormalise1(self):
         print("PYTHON TEST: Testing normalisation no in calc")
         inImages = [inFileName];
@@ -111,7 +152,7 @@ class RSGISTests:
 
     def testCountValsInCol(self):
         print("PYTHON TEST: countValsInCols")
-        outputImage = path + "Rasters/injune_p142_casi_sub_ll.kea"
+        outputImage = path + "TestOutputs/injune_p142_casi_sub_ll_count.kea"
         upper = 1000
         lower = 500
         imagecalc.countValsInCols(inFileName, upper, lower, outputImage)
@@ -369,6 +410,9 @@ class RSGISTests:
 if __name__ == '__main__':
     t = RSGISTests()
     
+    """ Copy Data """
+    t.copyData()
+    
     """ ImageCalc functions """
     t.tryFuncAndCatch(t.testNormalise1)
     t.tryFuncAndCatch(t.testNormalise2)
@@ -427,8 +471,6 @@ if __name__ == '__main__':
     if(len(t.failures)):
         for failure in t.failures:
             print("FAIL: %s"%failure)
-
-
 
     
 
