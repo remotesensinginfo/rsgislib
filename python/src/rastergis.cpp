@@ -58,7 +58,7 @@ static std::vector<std::string> ExtractVectorStringFromSequence(PyObject *sequen
         PyObject *fieldObj = PySequence_GetItem(sequence, i);
 
         if(!RSGISPY_CHECK_STRING(fieldObj)) {
-            //PyErr_SetString(GETSTATE(self)->error, "Fields must be strings");
+            PyErr_SetString(GETSTATE(sequence)->error, "Fields must be strings");
             Py_DECREF(fieldObj);
             fields.clear();
             return fields;
