@@ -65,6 +65,20 @@ class RSGISTests:
         os.system('cp ./RATS/injune_p142_casi_sub_utm_segs.kea ./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_shape.kea')
         os.system('cp ./RATS/injune_p142_casi_sub_utm_segs_nostats.kea ./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_nostats_addstats.kea')
     
+    def checkDIRStructure(self):
+        """ Create directory and sub directories for test
+            outputs, if they don't already exist.  """
+        testOutputsDIR = os.path.join(path,'TestOutputs')
+        if os.path.isdir(testOutputsDIR) == False:
+            os.mkdir(testOutputsDIR)
+        testRasterGISDIR = os.path.join(path,'TestOutputs','RasterGIS')
+        if os.path.isdir(testRasterGISDIR) == False:
+            os.mkdir(testRasterGISDIR)
+            
+        testTilesDIR = os.path.join(path,'TestOutputs','Tiles')
+        if os.path.isdir(testTilesDIR) == False:
+            os.mkdir(testTilesDIR)
+    
     def testNormalise1(self):
         print("PYTHON TEST: Testing normalisation no in calc")
         inImages = [inFileName];
@@ -422,7 +436,8 @@ class RSGISTests:
 if __name__ == '__main__':
     t = RSGISTests()
     
-    """ Copy Data """
+    """ Check directory structure and copy Data """
+    t.checkDIRStructure()
     t.copyData()
     
     """ ImageCalc functions """
