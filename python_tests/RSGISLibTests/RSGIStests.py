@@ -49,7 +49,7 @@ class RSGISTests:
             function()
         except Exception as inst:
             print("ERROR - ERROR - ERROR")
-            print inst
+            print("inst")
             self.failures.append(function.__name__)
 
     def copyData(self):
