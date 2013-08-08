@@ -31,6 +31,7 @@
 
 import os
 import rsgislib
+from rsgislib import imageutils
 from rsgislib import imagecalc
 from rsgislib import rastergis
 from rsgislib.imagecalc import BandDefn
@@ -404,7 +405,18 @@ class RSGISTests:
         colourtable=True
         rastergis.populateStats(clumps, colourtable, pyramids)
 
-
+    def testCreateTiles(self):
+        print("PYTHON TEST: createTiles")
+        inputImage = path + "Rasters/injune_p142_casi_sub_utm.kea"
+        outBase = './TestOutputs/Tiles/injune_p142_casi_sub_utm'
+        width = 100
+        height = width
+        overlap = 5
+        offsettiling = 0
+        format = "KEA"
+        dataType = rsgislib.TYPE_32INT
+        ext='kea'
+        imageutils.createTiles(inputImage, outBase, width, height, overlap, offsettiling, format, dataType, ext)
 
 
 if __name__ == '__main__':
@@ -449,6 +461,9 @@ if __name__ == '__main__':
     t.tryFuncAndCatch(t.testMahalanobisDistImg2Window)
     t.tryFuncAndCatch(t.testCalcPxlColStats)
     t.tryFuncAndCatch(t.testPxlColRegression)
+    
+    """ ImageUtils functions """
+    t.tryFuncAndCatch(t.testCreateTiles)
     
     """ RasterGIS functions """
     
