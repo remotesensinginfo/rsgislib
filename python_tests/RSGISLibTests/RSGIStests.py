@@ -1,12 +1,13 @@
-#!/share/osgeo/fw/python/2.7.3/bin/python
+#!/usr/bin/env python
 
+import os
 import rsgislib
 from rsgislib import imagecalc
 from rsgislib import rastergis
 from rsgislib.imagecalc import BandDefn
 
-path = "/Users/sebclarke/Temp/RSGISLibTests/"
-inFileName = path+"Rasters/injune_p142_casi_sub_utm.kea"
+path = os.sys.path[0] + '/'
+inFileName = os.path.join(path,"Rasters","injune_p142_casi_sub_utm.kea")
 
 class RSGISTests:
     numTests = 0
