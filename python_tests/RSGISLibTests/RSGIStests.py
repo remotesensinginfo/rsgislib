@@ -432,6 +432,19 @@ class RSGISTests:
         ext='kea'
         imageutils.createTiles(inputImage, outBase, width, height, overlap, offsettiling, format, dataType, ext)
 
+    def testCreateImageMosaic(self):
+        print("PYTHON TEST: createImageMosaic")
+        inputList = ['./TestOutputs/Tiles/injune_p142_casi_sub_utm_tile0.kea','./TestOutputs/Tiles/injune_p142_casi_sub_utm_tile1.kea','./TestOutputs/Tiles/injune_p142_casi_sub_utm_tile2.kea','./TestOutputs/Tiles/injune_p142_casi_sub_utm_tile3.kea']
+        outImage = './TestOutputs/injune_p142_casi_sub_utm_remosaic.kea'
+        backgroundVal = 0.
+        skipVal = 0.
+        skipBand = 1
+        overlapBehaviour = 0
+        format = "KEA"
+        dataType = rsgislib.TYPE_32FLOAT
+        imageutils.createImageMosaic(inputList, outImage, backgroundVal, skipVal, skipBand, overlapBehaviour, format, dataType)
+    
+    
 
 if __name__ == '__main__':
     t = RSGISTests()
@@ -479,6 +492,7 @@ if __name__ == '__main__':
     
     """ ImageUtils functions """
     t.tryFuncAndCatch(t.testCreateTiles)
+    t.tryFuncAndCatch(t.testCreateImageMosaic)
     
     """ RasterGIS functions """
     

@@ -37,6 +37,28 @@ struct ImageUtilsState
 static struct ImageUtilsState _state;
 #endif
 
+// Helper function to extract python sequence to array of strings
+static std::string *ExtractStringArrayFromSequence(PyObject *sequence, int *nElements) {
+    Py_ssize_t nFields = PySequence_Size(sequence);
+	*nElements = nFields;
+    std::string *stringsArray = new std::string[nFields];
+
+    for(int i = 0; i < nFields; ++i) {
+        PyObject *stringObj = PySequence_GetItem(sequence, i);
+
+        if(!RSGISPY_CHECK_STRING(stringObj)) {
+            PyErr_SetString(GETSTATE(self)->error, "Fields must be strings");
+            Py_DECREF(stringObj);
+            return stringsArray;
+        }
+
+        stringsArray[i] = RSGISPY_STRING_EXTRACT(stringObj);
+        Py_DECREF(stringObj);
+    }
+
+    return stringsArray;
+}
+
 static PyObject *ImageUtils_StretchImage(PyObject *self, PyObject *args)
 {
     const char *pszInputImage, *pszOutputFile, *pszGDALFormat, *pszOutStatsFile;
@@ -152,6 +174,47 @@ static PyObject *ImageUtils_createTiles(PyObject *self, PyObject *args)
     return pOutList;
 }
 
+static PyObject *ImageUtils_createImageMosaic(PyObject *self, PyObject *args)
+{
+    const char *pszOutputImage, *pszGDALFormat;
+	float backgroundVal, skipVal, skipBand;
+    int nDataType, overlapBehaviour;
+	PyObject *pInputImages; // List of input images
+
+    // Check parameters are present and of correct type
+	if( !PyArg_ParseTuple(args, "Osffiisi:createImageMosaic", &pInputImages, &pszOutputImage,
+                                &backgroundVal, &skipVal, &skipBand, &overlapBehaviour,&pszGDALFormat, &nDataType))
+        return NULL;
+
+	// TODO: Look into this function - doesn't seem to catch when only a single image is provided.
+    if(!PySequence_Check(pInputImages)) {
+        PyErr_SetString(GETSTATE(self)->error, "First argument must be a sequence");
+        return NULL;
+    }
+
+	// Extract list of images to array of strings.
+	int numImages = 0;
+    std::string *inputImages = ExtractStringArrayFromSequence(pInputImages, &numImages);
+    if(numImages == 0) 
+	{ 
+        PyErr_SetString(GETSTATE(self)->error, "No input images provided");
+		return NULL; 
+	}
+	
+    try
+    {
+		rsgis::cmds::executeImageMosaic(inputImages, numImages, pszOutputImage, backgroundVal, 
+					skipVal, skipBand, overlapBehaviour, pszGDALFormat, (rsgis::RSGISLibDataType)nDataType);
+
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+
+    Py_RETURN_NONE;
+}
 static PyObject *ImageUtils_PopImageStats(PyObject *self, PyObject *args)
 {
     const char *pszInputImage;
@@ -402,17 +465,35 @@ static PyMethodDef ImageUtilsMethods[] = {
     {"createTiles", ImageUtils_createTiles, METH_VARARGS,
 "Create tiles from a larger image, useful for splitting a large image into multiple smaller ones for processing.\n"
 "call signature: imageutils.createTiles(inputimage, baseimage, width, height, overlap, offsettiling, gdalformat, type, ext)\n"
-"  inputImage is a string containing the name of the input file\n"
-"  baseimage is a string containing the base name of the output file\n    the number of the tile and file extension will be appended.\n"
-"  width is the width of each tile, in pixels.\n"
-"  height is the height of each tile, in pixels.\n"
-"  overlap is the overlap between tiles, in pixels\n"
-"  offsettiling is a bool, determining if tiles should start halfway into the image\n    useful for generating overlapping sets of tiles.\n"
-"  gdalformat is a string providing the output format of the tiles (e.g., KEA).\n"
-"  type is a rsgislib.TYPE_* value providing the output data type of the tiles.\n"
-"  ext is a string providing the extension for the tiles (as required by the specified data type).\n"
+"  * inputImage is a string containing the name of the input file\n"
+"  * baseimage is a string containing the base name of the output file\n    the number of the tile and file extension will be appended.\n"
+"  * width is the width of each tile, in pixels.\n"
+"  * height is the height of each tile, in pixels.\n"
+"  * overlap is the overlap between tiles, in pixels\n"
+"  * offsettiling is a bool, determining if tiles should start halfway into the image\n    useful for generating overlapping sets of tiles.\n"
+"  * gdalformat is a string providing the output format of the tiles (e.g., KEA).\n"
+"  * type is a rsgislib.TYPE_* value providing the output data type of the tiles.\n"
+"  * ext is a string providing the extension for the tiles (as required by the specified data type).\n"
 "\nA list of strings containing the filenames is returned\n"},
     
+    {"createImageMosaic", ImageUtils_createImageMosaic, METH_VARARGS,
+"Create mosaic from list of input images.\n"
+"call signature: imageutils.createImageMosaic(inputimagelist, outputimage, backgroundVal, \n    skipVal, skipBand, overlapBehaviour, gdalformat, type)\n"
+"  * inputimagelist is a list of input images.\n"
+"  * outputimage is a string containing the name of the output mosaic\n"
+"  * backgroundVal is a float providing the background (nodata) value for the mosaic\n"
+"  * skipVal is a float providing the value to be skipped (nodata values) in the input images\n"
+"  * skipBand is an integer providing the band to check for skipVal\n"
+"  * overlapBehaviour is an integer specifying the behaviour for overlaping regions\n"
+"\n"
+"  		* 0 - Overwrite\n"
+"  		* 1 - Overwrite if value of new pixel is lower (minimum)\n"
+"  		* 2 - Overwrite if value of new pixel is higher (maximum)\n"
+"\n"
+"  * gdalformat is a string providing the output format of the tiles (e.g., KEA).\n"
+"  * type is a rsgislib.TYPE_* value providing the output data type of the tiles.\n"
+"\nA list of strings containing the filenames is returned\n"},
+ 
     {"popImageStats", ImageUtils_PopImageStats, METH_VARARGS,
 "rsgislib.imageutils.popImageStats(inputImage, useNoDataValue, noDataValue, buildPyramids)\n"
 "Calculate the image statistics and build image pyramids populating the image file.\n"
