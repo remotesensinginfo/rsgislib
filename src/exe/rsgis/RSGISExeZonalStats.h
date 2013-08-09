@@ -52,6 +52,8 @@
 #include "vec/RSGISZonalLocalSpatialStats.h"
 #include "vec/RSGISExtractEndMembers2Matrix.h"
 
+#include "cmds/RSGISCmdZonalStats.h"
+
 #include "math/RSGISMathsUtils.h"
 #include "math/RSGISMatrices.h"
 

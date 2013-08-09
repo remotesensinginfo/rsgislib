@@ -4442,150 +4442,23 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 			else
 			{
 				cout << "Output Vector : " << this->outputVecPolys << endl;
-
-				// Convert to absolute path
-				this->outputVecPolys = boost::filesystem::absolute(this->outputVecPolys).c_str();
 			}
 
-            // Convert to absolute path
-			this->inputVecPolys = boost::filesystem::absolute(this->inputVecPolys).c_str();
-
-
-			GDALAllRegister();
-			OGRRegisterAll();
-
-			RSGISFileUtils fileUtils;
-			RSGISVectorUtils vecUtils;
-
-			RSGISProcessVector *processVector = NULL;
-			RSGISProcessOGRFeature *processFeature = NULL;
-
-			string SHPFileInLayer = vecUtils.getLayerName(this->inputVecPolys);
-            string SHPFileOutLayer = "";
-
-			GDALDataset *inputImageDS = NULL;
-			OGRDataSource *inputSHPDS = NULL;
-			OGRLayer *inputSHPLayer = NULL;
-			OGRSFDriver *shpFiledriver = NULL;
-			OGRDataSource *outputSHPDS = NULL;
-			OGRLayer *outputSHPLayer = NULL;
-			OGRSpatialReference* inputSpatialRef = NULL;
-
-			string outputDIR = "";
-
-			try
-			{
-				if (!this->outputToText)
+            try
+            {
+                if(this->outputToText)
                 {
-                    SHPFileOutLayer = vecUtils.getLayerName(this->outputVecPolys);
-                    outputDIR = fileUtils.getFileDirectoryPath(this->outputVecPolys);
-
-                    if(vecUtils.checkDIR4SHP(outputDIR, SHPFileOutLayer))
-                    {
-                        if(this->force)
-                        {
-                            vecUtils.deleteSHP(outputDIR, SHPFileOutLayer);
-                        }
-                        else
-                        {
-                            throw RSGISException("Shapefile already exists, either delete or select force.");
-                        }
-                    }
+                    rsgis::cmds::executePointValue2TXT(this->inputImage, this->inputVecPolys, this->outputTextFile, this->useBandNames);
                 }
-
-				/////////////////////////////////////
-				//
-				// Open Input Image.
-				//
-				/////////////////////////////////////
-				inputImageDS = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_ReadOnly);
-				if(inputImageDS == NULL)
-				{
-					string message = string("Could not open image ") + this->inputImage;
-					throw RSGISException(message.c_str());
-				}
-
-				/////////////////////////////////////
-				//
-				// Open Input Shapfile.
-				//
-				/////////////////////////////////////
-				inputSHPDS = OGRSFDriverRegistrar::Open(this->inputVecPolys.c_str(), FALSE);
-				if(inputSHPDS == NULL)
-				{
-					string message = string("Could not open vector file ") + this->inputVecPolys;
-					throw RSGISException(message.c_str());
-				}
-				inputSHPLayer = inputSHPDS->GetLayerByName(SHPFileInLayer.c_str());
-				if(inputSHPLayer == NULL)
-				{
-					string message = string("Could not open vector layer ") + SHPFileInLayer;
-					throw RSGISException(message.c_str());
-				}
-
-				inputSpatialRef = inputSHPLayer->GetSpatialRef();
-
-				OGRFeature *feature = inputSHPLayer->GetFeature(1);
-				OGRwkbGeometryType geometryType = feature->GetGeometryRef()->getGeometryType();
-				OGRFeature::DestroyFeature(feature);
-
-				/////////////////////////////////////
-				//
-				// Create Output Shapfile.
-				//
-				/////////////////////////////////////
-                if (!this->outputToText)
-                {
-                    const char *pszDriverName = "ESRI Shapefile";
-                    shpFiledriver = OGRSFDriverRegistrar::GetRegistrar()->GetDriverByName(pszDriverName );
-                    if( shpFiledriver == NULL )
-                    {
-                        throw RSGISException("SHP driver not available.");
-                    }
-                    outputSHPDS = shpFiledriver->CreateDataSource(this->outputVecPolys.c_str(), NULL);
-                    if( outputSHPDS == NULL )
-                    {
-                        string message = string("Could not create vector file ") + this->outputVecPolys;
-                        throw RSGISException(message.c_str());
-                    }
-                    outputSHPLayer = outputSHPDS->CreateLayer(SHPFileOutLayer.c_str(), inputSpatialRef, geometryType, NULL );
-                    if( outputSHPLayer == NULL )
-                    {
-                        string message = string("Could not create vector layer ") + SHPFileOutLayer;
-                        throw RSGISException(message.c_str());
-                    }
-
-                    processFeature = new RSGISVectorZonalStats(inputImageDS,"",this->useBandNames);
-                    processVector = new RSGISProcessVector(processFeature);
-
-                    processVector->processVectors(inputSHPLayer, outputSHPLayer, true, true, false);
-                    OGRDataSource::DestroyDataSource(outputSHPDS);
-
-                    delete processVector;
-                    delete processFeature;
-				}
                 else
                 {
-
-                    processFeature = new RSGISVectorZonalStats(inputImageDS, this->outputTextFile,this->useBandNames);
-                    processVector = new RSGISProcessVector(processFeature);
-
-                    processVector->processVectorsNoOutput(inputSHPLayer, true);
-
-                    delete processVector;
-                    delete processFeature;
-
+                    rsgis::cmds::executePointValue2SHP(this->inputImage, this->inputVecPolys, this->outputVecPolys, this->force, this->useBandNames);
                 }
-				GDALClose(inputImageDS);
-				OGRDataSource::DestroyDataSource(inputSHPDS);
-
-				//OGRCleanupAll();
-				//GDALDestroyDriverManager();
-			}
-			catch (RSGISException& e)
-			{
-				throw e;
-			}
+            }
+            catch(rsgis::cmds::RSGISCmdException &e)
+            {
+                throw RSGISException(e.what());
+            }
 
 
 		}
