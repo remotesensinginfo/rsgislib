@@ -34,6 +34,7 @@ import rsgislib
 from rsgislib import imageutils
 from rsgislib import imagecalc
 from rsgislib import rastergis
+from rsgislib import zonalstats
 from rsgislib.imagecalc import BandDefn
 
 path = os.sys.path[0] + '/'
@@ -444,7 +445,19 @@ class RSGISTests:
         dataType = rsgislib.TYPE_32FLOAT
         imageutils.createImageMosaic(inputList, outImage, backgroundVal, skipVal, skipBand, overlapBehaviour, format, dataType)
     
-    
+    def testPointValue2SHP(self):
+        print("PYTHON TEST: pointValues2SHP")
+        inputImage = './Rasters/injune_p142_casi_sub_utm.kea'
+        inputVector = './Vectors/injune_p142_stem_locations.shp'
+        outputVector = './TestOutputs/injune_p142_stem_locations_stats.shp'
+        zonalstats.pointValue2SHP(inputImage, inputVector, outputVector, True, True)
+
+    def testPointValue2TXT(self):
+        print("PYTHON TEST: pointValues2TXT")
+        inputImage = './Rasters/injune_p142_casi_sub_utm.kea'
+        inputVector = './Vectors/injune_p142_stem_locations.shp'
+        outputTxt = './TestOutputs/injune_p142_stem_locations_stats_txt.csv'
+        zonalstats.pointValue2TXT(inputImage, inputVector, outputTxt, True)
 
 if __name__ == '__main__':
     t = RSGISTests()
@@ -510,6 +523,10 @@ if __name__ == '__main__':
     t.tryFuncAndCatch(t.testFindBoundaryPixels)
     t.tryFuncAndCatch(t.testCalcBorderLength)
     t.tryFuncAndCatch(t.testCalcShapeIndices)
+    
+    """ Zonal Stats functions """
+    t.tryFuncAndCatch(t.testPointValue2SHP)
+    t.tryFuncAndCatch(t.testPointValue2TXT)
     
     print("%s TESTS COMPLETED - %s FAILURES LISTED BELOW:"%(t.numTests, len(t.failures)))
     if(len(t.failures)):
