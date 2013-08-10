@@ -151,6 +151,9 @@ namespace rsgis{ namespace cmds {
             GDALClose(inputImageDS);
             OGRDataSource::DestroyDataSource(inputSHPDS);
             
+            //OGRCleanupAll();
+            //GDALDestroyDriverManager();
+            
         }
         catch(RSGISException& e)
         {
@@ -234,6 +237,9 @@ namespace rsgis{ namespace cmds {
             
             GDALClose(inputImageDS);
             OGRDataSource::DestroyDataSource(inputSHPDS);
+            
+            //OGRCleanupAll();
+            //GDALDestroyDriverManager();
     
         }
         catch(RSGISException& e)

@@ -29,7 +29,7 @@
 #
 #############################################################################
 
-import os
+import sys, os
 import rsgislib
 from rsgislib import imageutils
 from rsgislib import imagecalc
@@ -460,73 +460,87 @@ class RSGISTests:
         zonalstats.pointValue2TXT(inputImage, inputVector, outputTxt, True)
 
 if __name__ == '__main__':
+
+    # Get libraries to test (defaults to all)
+    testLibraries = 'all'
+    
+    if len(sys.argv) >= 2:
+        testLibraries = sys.argv[1].lower()
+
     t = RSGISTests()
     
     """ Check directory structure and copy Data """
     t.checkDIRStructure()
     t.copyData()
     
-    """ ImageCalc functions """
-    t.tryFuncAndCatch(t.testNormalise1)
-    t.tryFuncAndCatch(t.testNormalise2)
-    t.tryFuncAndCatch(t.testCorrelation)
-    t.tryFuncAndCatch(t.testCovariance1)
-    t.tryFuncAndCatch(t.testCovariance2)
-    t.tryFuncAndCatch(t.testCalcRMSE)
-    t.tryFuncAndCatch(t.testMeanVector)
-    t.tryFuncAndCatch(t.testPCA)
-    t.tryFuncAndCatch(t.testStandardise)
-    t.tryFuncAndCatch(t.testBandMath)
-    t.tryFuncAndCatch(t.testImageMaths)
-    t.tryFuncAndCatch(t.testReplaceValuesLessThan)
-    t.tryFuncAndCatch(t.testUnitArea)
-    t.tryFuncAndCatch(t.testMovementSpeed)
-    t.tryFuncAndCatch(t.testCountValsInCol)
-    t.tryFuncAndCatch(t.testDist2Geoms)
-    t.tryFuncAndCatch(t.testImgDist2Geoms)
-    t.tryFuncAndCatch(t.testImgCalcDist)
-    t.tryFuncAndCatch(t.testImageBandStats)
-    t.tryFuncAndCatch(t.testImageBandStatsIgnoreZeros)
-    t.tryFuncAndCatch(t.testImageStats)
-    t.tryFuncAndCatch(t.testImageStatsIgnoreZeros)
-    t.tryFuncAndCatch(t.testUnconLinearSpecUnmix)
-    t.tryFuncAndCatch(t.testExhConLinearSpecUnmix)
-    t.tryFuncAndCatch(t.testConSum1LinearSpecUnmix)
-    t.tryFuncAndCatch(t.testNnConSum1LinearSpecUnmix)
-    t.tryFuncAndCatch(t.testKMeansCentres)
-    t.tryFuncAndCatch(t.testIsoDataClustering)
-    t.tryFuncAndCatch(t.testAllBandsEqualTo)
-    t.tryFuncAndCatch(t.testHistogram)
-    t.tryFuncAndCatch(t.testBandPercentile)
-    t.tryFuncAndCatch(t.testMahalanobisDistWindow)
-    t.tryFuncAndCatch(t.testMahalanobisDistImg2Window)
-    t.tryFuncAndCatch(t.testCalcPxlColStats)
-    t.tryFuncAndCatch(t.testPxlColRegression)
+    if testLibraries == 'all' or testLibraries == 'imagecalc':
+        """ ImageCalc functions """
+        t.tryFuncAndCatch(t.testNormalise1)
+        t.tryFuncAndCatch(t.testNormalise2)
+        t.tryFuncAndCatch(t.testCorrelation)
+        t.tryFuncAndCatch(t.testCovariance1)
+        t.tryFuncAndCatch(t.testCovariance2)
+        t.tryFuncAndCatch(t.testCalcRMSE)
+        t.tryFuncAndCatch(t.testMeanVector)
+        t.tryFuncAndCatch(t.testPCA)
+        t.tryFuncAndCatch(t.testStandardise)
+        t.tryFuncAndCatch(t.testBandMath)
+        t.tryFuncAndCatch(t.testImageMaths)
+        t.tryFuncAndCatch(t.testReplaceValuesLessThan)
+        t.tryFuncAndCatch(t.testUnitArea)
+        t.tryFuncAndCatch(t.testMovementSpeed)
+        t.tryFuncAndCatch(t.testCountValsInCol)
+        t.tryFuncAndCatch(t.testDist2Geoms)
+        t.tryFuncAndCatch(t.testImgDist2Geoms)
+        t.tryFuncAndCatch(t.testImgCalcDist)
+        t.tryFuncAndCatch(t.testImageBandStats)
+        t.tryFuncAndCatch(t.testImageBandStatsIgnoreZeros)
+        t.tryFuncAndCatch(t.testImageStats)
+        t.tryFuncAndCatch(t.testImageStatsIgnoreZeros)
+        t.tryFuncAndCatch(t.testUnconLinearSpecUnmix)
+        t.tryFuncAndCatch(t.testExhConLinearSpecUnmix)
+        t.tryFuncAndCatch(t.testConSum1LinearSpecUnmix)
+        t.tryFuncAndCatch(t.testNnConSum1LinearSpecUnmix)
+        t.tryFuncAndCatch(t.testKMeansCentres)
+        t.tryFuncAndCatch(t.testIsoDataClustering)
+        t.tryFuncAndCatch(t.testAllBandsEqualTo)
+        t.tryFuncAndCatch(t.testHistogram)
+        t.tryFuncAndCatch(t.testBandPercentile)
+        t.tryFuncAndCatch(t.testMahalanobisDistWindow)
+        t.tryFuncAndCatch(t.testMahalanobisDistImg2Window)
+        t.tryFuncAndCatch(t.testCalcPxlColStats)
+        t.tryFuncAndCatch(t.testPxlColRegression)
+        
+    if testLibraries == 'all' or testLibraries == 'imageutils':
+        
+        """ ImageUtils functions """
+        t.tryFuncAndCatch(t.testCreateTiles)
+        t.tryFuncAndCatch(t.testCreateImageMosaic)
+        
+    if testLibraries == 'all' or testLibraries == 'rastergis':
     
-    """ ImageUtils functions """
-    t.tryFuncAndCatch(t.testCreateTiles)
-    t.tryFuncAndCatch(t.testCreateImageMosaic)
-    
-    """ RasterGIS functions """
-    
-    t.tryFuncAndCatch(t.testCopyGDLATT)
-    t.tryFuncAndCatch(t.testCopyGDLATTColumns)
-    t.tryFuncAndCatch(t.testSpatialLocation)
-    t.tryFuncAndCatch(t.testEucDistFromFeat)
-    t.tryFuncAndCatch(t.testFindTopN)
-    t.tryFuncAndCatch(t.testFindSpecClose)
-    t.tryFuncAndCatch(t.testPopulateRATWithStats)
-    t.tryFuncAndCatch(t.testPopulateRATWithPercentiles)
-    t.tryFuncAndCatch(t.testExport2Ascii)
-    t.tryFuncAndCatch(t.testExporCols2GDALImage)
-    t.tryFuncAndCatch(t.testFindNeighbours)
-    t.tryFuncAndCatch(t.testFindBoundaryPixels)
-    t.tryFuncAndCatch(t.testCalcBorderLength)
-    t.tryFuncAndCatch(t.testCalcShapeIndices)
-    
-    """ Zonal Stats functions """
-    t.tryFuncAndCatch(t.testPointValue2SHP)
-    t.tryFuncAndCatch(t.testPointValue2TXT)
+        """ RasterGIS functions """
+        
+        t.tryFuncAndCatch(t.testCopyGDLATT)
+        t.tryFuncAndCatch(t.testCopyGDLATTColumns)
+        t.tryFuncAndCatch(t.testSpatialLocation)
+        t.tryFuncAndCatch(t.testEucDistFromFeat)
+        t.tryFuncAndCatch(t.testFindTopN)
+        t.tryFuncAndCatch(t.testFindSpecClose)
+        t.tryFuncAndCatch(t.testPopulateRATWithStats)
+        t.tryFuncAndCatch(t.testPopulateRATWithPercentiles)
+        t.tryFuncAndCatch(t.testExport2Ascii)
+        t.tryFuncAndCatch(t.testExporCols2GDALImage)
+        t.tryFuncAndCatch(t.testFindNeighbours)
+        t.tryFuncAndCatch(t.testFindBoundaryPixels)
+        t.tryFuncAndCatch(t.testCalcBorderLength)
+        t.tryFuncAndCatch(t.testCalcShapeIndices)
+        
+    if testLibraries == 'all' or testLibraries == 'zonalstats':
+        
+        """ Zonal Stats functions """
+        t.tryFuncAndCatch(t.testPointValue2SHP)
+        t.tryFuncAndCatch(t.testPointValue2TXT)
     
     print("%s TESTS COMPLETED - %s FAILURES LISTED BELOW:"%(t.numTests, len(t.failures)))
     if(len(t.failures)):
