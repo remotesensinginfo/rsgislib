@@ -4448,11 +4448,11 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
             {
                 if(this->outputToText)
                 {
-                    rsgis::cmds::executePointValue2TXT(this->inputImage, this->inputVecPolys, this->outputTextFile, this->useBandNames);
+                    rsgis::cmds::executePointValue(this->inputImage, this->inputVecPolys, this->outputTextFile, true, false, this->useBandNames);
                 }
                 else
                 {
-                    rsgis::cmds::executePointValue2SHP(this->inputImage, this->inputVecPolys, this->outputVecPolys, this->force, this->useBandNames);
+                    rsgis::cmds::executePointValue(this->inputImage, this->inputVecPolys, this->outputVecPolys, false, this->force, this->useBandNames);
                 }
             }
             catch(rsgis::cmds::RSGISCmdException &e)

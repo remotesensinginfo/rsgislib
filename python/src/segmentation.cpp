@@ -311,78 +311,78 @@ static PyMethodDef SegmentationMethods[] = {
 "Does stuff.\n"
 "call signature: segmentation.labelPixelsFromClusterCentres(inputimage, outputimage, clustercenters, ignorezeros, gdalformat)\n"
 "where:\n"
-"  inputimage is a string containing the name of the input file\n"
-"  outputimage is a string containing the name of the output file\n"
-"  clustercentres is a string containing the name of the cluster centre file\n"
-"  ignore zeros is a bool\n"
-"  gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"},
+" * inputimage is a string containing the name of the input file\n"
+" * outputimage is a string containing the name of the output file\n"
+" * clustercentres is a string containing the name of the cluster centre file\n"
+" * ignore zeros is a bool\n"
+" * gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"},
 
     {"eliminateSinglePixels", Segmentation_eliminateSinglePixels, METH_VARARGS, 
 "Does other stuff\n"
 "call signature: segmentation.eliminateSinglePixels(inputimage, clumpsimage, outputimage, tempfile, gdalformat, processinmemory, ignorezeros)\n"
 "where:\n"
-"  inputimage is a string containing the name of the input file\n"
-"  clumpsimage is a string containing the name of the clump file\n"
-"  outputimage is a string containing the name of the output file\n"
-"  tempfile is a string containing the name of the temporary file to use\n"
-"  gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
-"  processinmemory is a bool\n"
-"  ignore zeros is a bool\n"},
+" * inputimage is a string containing the name of the input file\n"
+" * clumpsimage is a string containing the name of the clump file\n"
+" * outputimage is a string containing the name of the output file\n"
+" * tempfile is a string containing the name of the temporary file to use\n"
+" * gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
+" * processinmemory is a bool\n"
+" * ignore zeros is a bool\n"},
 
     {"clump", Segmentation_clump, METH_VARARGS,
 "clump\n"
 "call signature: segmentation.clump(inputimage, outputimage, gdalformat, processinmemory, nodata)\n"
 "where:\n"
-"  inputimage is a string containing the name of the input file\n"
-"  outputimage is a string containing the name of the output file\n"
-"  gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
-"  processinmemory is a bool\n"
-"  nodata is None or float\n"},
+" * inputimage is a string containing the name of the input file\n"
+" * outputimage is a string containing the name of the output file\n"
+" * gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
+" * processinmemory is a bool\n"
+" * nodata is None or float\n"},
 
     {"RMSmallClumpsStepwise", Segmentation_RMSmallClumpsStepwise, METH_VARARGS,
 "Does even more stuff\n"
 "call signature: segmentation.RMSmallClumpsStepwise(inputimage, clumpsimage, outputimage, gdalformat, stretchstatsavail, stretchstatsfile, storemean, processinmemory, minclumpsize, specThreshold)\n"
 "where:\n"
-"  inputimage is a string containing the name of the input file\n"
-"  clumpsimage is a string containing the name of the clump file\n"
-"  outputimage is a string containing the name of the output file\n"
-"  gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
-"  stretchstatsavail is a bool\n"
-"  stretchstatsfile is a string containing the name of the stretch stats file\n"
-"  storemean is a bool\n"
-"  processinmemory is a bool\n"
-"  minclumpsize is an unsigned integer\n"
-"  specThreshold is a float\n"},
+" * inputimage is a string containing the name of the input file\n"
+" * clumpsimage is a string containing the name of the clump file\n"
+" * outputimage is a string containing the name of the output file\n"
+" * gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
+" * stretchstatsavail is a bool\n"
+" * stretchstatsfile is a string containing the name of the stretch stats file\n"
+" * storemean is a bool\n"
+" * processinmemory is a bool\n"
+" * minclumpsize is an unsigned integer\n"
+" * specThreshold is a float\n"},
 
     {"relabelClumps", Segmentation_relabelClumps, METH_VARARGS,
 "Relabel clumps\n"
 "call signature: segmentation.relabelClumps(inputimage, outputimage, gdalformat, processinmemory)\n"
 "where:\n"
-"  inputimage is a string containing the name of the input file\n"
-"  outputimage is a string containing the name of the output file\n"
-"  gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
-"  processinmemory is a bool\n"},
+" * inputimage is a string containing the name of the input file\n"
+" * outputimage is a string containing the name of the output file\n"
+" * gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
+" * processinmemory is a bool\n"},
                                 
     {"UnionOfClumps", Segmentation_unionOfClumps, METH_VARARGS,
 "Union of clumps\n"
 "call signature: segmentation.unionOfClumps(outputimage, gdalformat, inputimagepaths, nodata)\n"
 "where:\n"
-"  outputimage is a string containing the name of the output file\n"
-"  gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
-"  inputimagepaths is a list of input image paths\n"
-"  nodata is None or float\n"},
+" * outputimage is a string containing the name of the output file\n"
+" * gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
+" * inputimagepaths is a list of input image paths\n"
+" * nodata is None or float\n"},
 
     {"mergeSegmentationTiles", Segmentation_mergeSegmentationTiles, METH_VARARGS,
 "Merge segmentation tiles\n"
 "call signature: segmentation.mergeSegmentationTiles(outputimage, bordermaskimage, tileboundary, tileoverlap, tilebody, colsname, inputimagepaths)\n"
 "where:\n"
-"  outputimage is a string containing the name of the output file\n"
-"  bordermaskimage is a string containing the name of the border mask file\n"
-"  tileboundary is an unsigned integer containing the tile boundary pixel value\n"
-"  tileoverlap is an unsigned integer containing the tile overlap pixel value\n"
-"  tilebody is an unsigned integer containing the tile body pixel value\n"
-"  colsname is a string containing the name of the object id column\n"
-"  inputimagepaths is a list of input image paths\n"},
+" * outputimage is a string containing the name of the output file\n"
+" * bordermaskimage is a string containing the name of the border mask file\n"
+" * tileboundary is an unsigned integer containing the tile boundary pixel value\n"
+" * tileoverlap is an unsigned integer containing the tile overlap pixel value\n"
+" * tilebody is an unsigned integer containing the tile body pixel value\n"
+" * colsname is a string containing the name of the object id column\n"
+" * inputimagepaths is a list of input image paths\n"},
 
     {NULL}        /* Sentinel */
 };

@@ -32,10 +32,23 @@
 
 namespace rsgis{ namespace cmds {
     
-    /** Function to extract pixel value for points and save as a Shape file */
-    void executePointValue2SHP(std::string inputImage, std::string inputVecPolys, std::string outputVecPolys, bool force = false, bool useBandNames = true);
-    /** Function to extract pixel value for points and save as a text file */
-    void executePointValue2TXT(std::string inputImage, std::string inputVecPolys, std::string outputTextFile, bool useBandNames);
+    struct RSGISBandAttZonalStatsCmds
+    {
+        float minThreshold;
+        float maxThreshold;
+        bool calcCount;
+        bool calcMin;
+        bool calcMax;
+        bool calcMean;
+        bool calcStdDev;
+        bool calcMode;
+        bool calcSum;
+    };
+    
+    /** Function to extract pixel value for points and save as a shapefile or CSV */
+    void executePointValue(std::string inputImage, std::string inputVecPolys, std::string outputStatsFile, bool outputToText = false, bool force = false, bool useBandNames = true);
+    /** Function to extract statistics for pixels falling within a polygon */
+    void executePixelStats(std::string inputImage, std::string inputVecPolys, std::string outputStatsFile, RSGISBandAttZonalStatsCmds *calcStats, std::string inputRasPolys = "", bool outputToText = false, bool force = false, bool useBandNames = true);
 }}
 
 
