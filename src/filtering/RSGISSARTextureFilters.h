@@ -35,81 +35,102 @@
 #include <boost/math/special_functions/fpclassify.hpp>
 
 namespace rsgis{namespace filter{
-	
+
 	class RSGISNormVarPowerFilter : public RSGISImageFilter
     {
         /**
-         
+
          Normalised variance of power.
-         
+
          Given in equation 8.4 in Chapter 8 of Oliver, C. and Quegen, S. 1998. Understanding Synthetic Apature Radar Images
 
          */
-        
-    public: 
-        
+
+    public:
+
         RSGISNormVarPowerFilter(int numberOutBands, int size, std::string filenameEnding);
         virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException);
         virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw RSGISImageFilterException("Not implemented for NVarPower filter!");};;
         virtual void exportAsImage(std::string filename) throw(RSGISImageFilterException){throw RSGISImageFilterException("No image to output!");};
         ~RSGISNormVarPowerFilter(){};
     };
-    
+
     class RSGISNormVarAmplitudeFilter : public RSGISImageFilter
     {
         /**
-         
+
          Normalised variance of amplitude.
-         
+
          Given for power in Chapter 8 of Oliver, C. and Quegen, S. 1998. Understanding Synthetic Apature Radar Images
-         
+
          */
-        
+
     public:
-        
+
         RSGISNormVarAmplitudeFilter(int numberOutBands, int size, std::string filenameEnding);
         virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException);
         virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw RSGISImageFilterException("Not implemented for NVarAmplitude filter!");};;
         virtual void exportAsImage(std::string filename) throw(RSGISImageFilterException){throw RSGISImageFilterException("No image to output!");};
         ~RSGISNormVarAmplitudeFilter(){};
     };
-    
+
     class RSGISNormVarLnPowerFilter : public RSGISImageFilter
     {
         /**
-         
+
          Normalised variance of natural log power (ln(I)).
-         
+
          Given for power in Chapter 8 of Oliver, C. and Quegen, S. 1998. Understanding Synthetic Apature Radar Images
-         
+
          */
-        
+
     public:
-        
+
         RSGISNormVarLnPowerFilter(int numberOutBands, int size, std::string filenameEnding);
         virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException);
         virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw RSGISImageFilterException("Not implemented for NVarLogPower filter!");};;
         virtual void exportAsImage(std::string filename) throw(RSGISImageFilterException){throw RSGISImageFilterException("No image to output!");};
         ~RSGISNormVarLnPowerFilter(){};
     };
-    
+
     class RSGISNormLnFilter : public RSGISImageFilter
     {
         /**
-         
+
          Normalised natural log filter.
-         
+
          Given in equation 8.27 in Chapter 8 of Oliver, C. and Quegen, S. 1998. Understanding Synthetic Apature Radar Images
-         
+
          */
-        
+
     public:
-        
+
         RSGISNormLnFilter(int numberOutBands, int size, std::string filenameEnding);
         virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException);
         virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw RSGISImageFilterException("Not implemented for NVarLogPower filter!");};;
         virtual void exportAsImage(std::string filename) throw(RSGISImageFilterException){throw RSGISImageFilterException("No image to output!");};
         ~RSGISNormLnFilter(){};
+    };
+
+    class RSGISTextureVar : public RSGISImageFilter
+    {
+        /**
+
+         Texture variance
+
+         Given in equation 21.89b (p1913) of:
+
+         Ulaby, F.T., Moore, R.K., and Fung, A.K. 1986. Microwave remote sensing active and passive. Volume III: from theory to applications. Artech House, Inc., Norwood, Mass. pp. 1909–1912.
+
+         */
+
+    public:
+
+        RSGISTextureVar(int numberOutBands, int size, std::string filenameEnding);
+        virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException);
+        virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw RSGISImageFilterException("Not implemented for NVarLogPower filter!");};;
+        virtual void exportAsImage(std::string filename) throw(RSGISImageFilterException){throw RSGISImageFilterException("No image to output!");};
+        ~RSGISTextureVar(){};
     };
 }}
 
