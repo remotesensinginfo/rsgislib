@@ -446,6 +446,7 @@ class RSGISTests:
         imageutils.createImageMosaic(inputList, outImage, backgroundVal, skipVal, skipBand, overlapBehaviour, format, dataType)
     
     def testPointValue2SHP(self):
+        # Not all pixels are within image - should print warnings but pass test.
         print("PYTHON TEST: pointValues2SHP")
         inputImage = './Rasters/injune_p142_casi_sub_utm.kea'
         inputVector = './Vectors/injune_p142_stem_locations.shp'
@@ -453,11 +454,28 @@ class RSGISTests:
         zonalstats.pointValue2SHP(inputImage, inputVector, outputVector, True, True)
 
     def testPointValue2TXT(self):
+        # Not all pixels are within image - should print warnings but pass test.
         print("PYTHON TEST: pointValues2TXT")
         inputImage = './Rasters/injune_p142_casi_sub_utm.kea'
         inputVector = './Vectors/injune_p142_stem_locations.shp'
         outputTxt = './TestOutputs/injune_p142_stem_locations_stats_txt.csv'
         zonalstats.pointValue2TXT(inputImage, inputVector, outputTxt, True)
+        
+    def pixelStats2SHP(self):
+        print("PYTHON TEST: pixelValue2SHP")
+        inputImage = './Rasters/injune_p142_casi_sub_utm.kea'
+        inputVector = './Vectors/injune_p142_crowns_utm.shp'
+        outputVector = './TestOutputs/injune_p142_casi_sub_utm_stats.shp'
+        zonalattributes = zonalstats.ZonalAttributes(minThreshold=0, maxThreshold=10000, calcCount=True, calcMin=True, calcMax=True, calcMean=True, calcStdDev=True, calcMode=False, calcSum=True)
+        zonalstats.pixelStats2SHP(inputImage, inputVector, outputVector, zonalattributes, True, True)
+    
+    def pixelStats2TXT(self):
+        print("PYTHON TEST: pixelValue2TXT")
+        inputImage = './Rasters/injune_p142_casi_sub_utm.kea'
+        inputVector = './Vectors/injune_p142_crowns_utm.shp'
+        outputTxt = './TestOutputs/injune_p142_casi_sub_utm_stats_txt.csv'
+        zonalattributes = zonalstats.ZonalAttributes(minThreshold=0, maxThreshold=10000, calcCount=True, calcMin=True, calcMax=True, calcMean=True, calcStdDev=True, calcMode=False, calcSum=True)
+        zonalstats.pixelStats2TXT(inputImage, inputVector, outputTxt, zonalattributes, True)
 
 if __name__ == '__main__':
 
@@ -541,6 +559,10 @@ if __name__ == '__main__':
         """ Zonal Stats functions """
         t.tryFuncAndCatch(t.testPointValue2SHP)
         t.tryFuncAndCatch(t.testPointValue2TXT)
+        t.tryFuncAndCatch(t.pixelStats2SHP)
+        t.tryFuncAndCatch(t.pixelStats2TXT)
+    
+
     
     print("%s TESTS COMPLETED - %s FAILURES LISTED BELOW:"%(t.numTests, len(t.failures)))
     if(len(t.failures)):
