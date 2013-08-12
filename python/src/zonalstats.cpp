@@ -48,7 +48,7 @@ static PyObject *ZonalStats_PointValue2SHP(PyObject *self, PyObject *args)
 {
     const char *pszInputImage, *pszInputVector, *pszOutputVector;
     int force, useBandNames;
-    if( !PyArg_ParseTuple(args, "sssii:stretchImage", &pszInputImage, &pszInputVector, &pszOutputVector, 
+    if( !PyArg_ParseTuple(args, "sssii:pointValue2SHP", &pszInputImage, &pszInputVector, &pszOutputVector, 
                                 &force, &useBandNames))
         return NULL;
 
@@ -69,7 +69,7 @@ static PyObject *ZonalStats_PointValue2TXT(PyObject *self, PyObject *args)
 {
     const char *pszInputImage, *pszInputVector, *pszOutputTxt;
     int useBandNames;
-    if( !PyArg_ParseTuple(args, "sssi:stretchImage", &pszInputImage, &pszInputVector, &pszOutputTxt, 
+    if( !PyArg_ParseTuple(args, "sssi:pointValue2TXT", &pszInputImage, &pszInputVector, &pszOutputTxt, 
                                 &useBandNames))
         return NULL;
 
@@ -92,86 +92,179 @@ static PyObject *ZonalStats_PixelStats2SHP(PyObject *self, PyObject *args)
     const char *pszInputImage, *pszInputVector, *pszOutputVector;
     int force, useBandNames;
     PyObject *pBandAttZonalStatsCmds;
-    if( !PyArg_ParseTuple(args, "sssoii:stretchImage", &pszInputImage, &pszInputVector, &pszOutputVector, 
+    if( !PyArg_ParseTuple(args, "sssOii:pixelStats2SHP", &pszInputImage, &pszInputVector, &pszOutputVector, 
                                 &pBandAttZonalStatsCmds, &force, &useBandNames))
         return NULL;
-
-    PyObject *o = pBandAttZonalStatsCmds;     // the python object
-
-    rsgis::cmds::RSGISBandAttZonalStatsCmds *cmdObj = new rsgis::cmds::RSGISBandAttZonalStatsCmds();   // the c++ object we need to pass pointers of
+    
+    rsgis::cmds::RSGISBandAttZonalStatsCmds *zonalAtts = new rsgis::cmds::RSGISBandAttZonalStatsCmds();   // the c++ struct
 
     // declare and initialise pointers for all the attributes of the struct
-    PyObject *pMinThreshold, *pMaxThreshold, *pCalcCount, *pCalcMin, *pCalcMax, *pCalcMean, *pCalcStDev, *pCalcMode, *pCalcSum;
-    pMinThreshold = pMaxThreshold = pCalcCount = pCalcMin = pCalcMax = pCalcMean = pCalcStDev = pCalcMode = pCalcSum = NULL;
+    PyObject *pMinThreshold, *pMaxThreshold, *pCalcCount, *pCalcMin, *pCalcMax, *pCalcMean, *pCalcStdDev, *pCalcMode, *pCalcSum;
+    pMinThreshold = pMaxThreshold = pCalcCount = pCalcMin = pCalcMax = pCalcMean = pCalcStdDev = pCalcMode = pCalcSum = NULL;
 
     std::vector<PyObject*> extractedAttributes;     // store a list of extracted pyobjects to dereference
-    extractedAttributes.push_back(o);
+    extractedAttributes.push_back(pBandAttZonalStatsCmds);
 
     
     /* Check if values have been set. 
         If not set assume false.
         If set, assume true for now - will check the value later
     */
-    pCalcCount = PyObject_GetAttrString(o, "count");
+    pCalcCount = PyObject_GetAttrString(pBandAttZonalStatsCmds, "calcCount");
     extractedAttributes.push_back(pCalcCount);
-    cmdObj->calcCount = !(pCalcCount == NULL || !RSGISPY_CHECK_STRING(pCalcCount));
+    zonalAtts->calcCount = !(pCalcCount == NULL || !RSGISPY_CHECK_INT(pCalcCount));
     
-    pCalcMin = PyObject_GetAttrString(o, "min");
+    pCalcMin = PyObject_GetAttrString(pBandAttZonalStatsCmds, "calcMin");
     extractedAttributes.push_back(pCalcMin);
-    cmdObj->calcMin = !(pCalcMin == NULL || !RSGISPY_CHECK_STRING(pCalcMin));
+    zonalAtts->calcMin = !(pCalcMin == NULL || !RSGISPY_CHECK_INT(pCalcMin));
 
-    pCalcMax = PyObject_GetAttrString(o, "max");
+    pCalcMax = PyObject_GetAttrString(pBandAttZonalStatsCmds, "calcMax");
     extractedAttributes.push_back(pCalcMax);
-    cmdObj->calcMax = !(pCalcMax == NULL || !RSGISPY_CHECK_STRING(pCalcMax));
+    zonalAtts->calcMax = !(pCalcMax == NULL || !RSGISPY_CHECK_INT(pCalcMax));
     
-    pCalcMean = PyObject_GetAttrString(o, "mean");
+    pCalcMean = PyObject_GetAttrString(pBandAttZonalStatsCmds, "calcMean");
     extractedAttributes.push_back(pCalcMean);
-    cmdObj->calcMean = !(pCalcMean == NULL || !RSGISPY_CHECK_STRING(pCalcMean));
+    zonalAtts->calcMean = !(pCalcMean == NULL || !RSGISPY_CHECK_INT(pCalcMean));
     
-    pCalcStDev = PyObject_GetAttrString(o, "stDev");
-    extractedAttributes.push_back(pCalcStDev);
-    cmdObj->calcStdDev= !(pCalcStDev == NULL || !RSGISPY_CHECK_STRING(pCalcStDev));
+    pCalcStdDev = PyObject_GetAttrString(pBandAttZonalStatsCmds, "calcStdDev");
+    extractedAttributes.push_back(pCalcStdDev);
+    zonalAtts->calcStdDev= !(pCalcStdDev == NULL || !RSGISPY_CHECK_INT(pCalcStdDev));
     
-    pCalcMode = PyObject_GetAttrString(o, "mode");
+    pCalcMode = PyObject_GetAttrString(pBandAttZonalStatsCmds, "calcMode");
     extractedAttributes.push_back(pCalcMode);
-    cmdObj->calcMode = !(pCalcMode == NULL || !RSGISPY_CHECK_STRING(pCalcMode));
+    zonalAtts->calcMode = !(pCalcMode == NULL || !RSGISPY_CHECK_INT(pCalcMode));
     
-    pCalcSum = PyObject_GetAttrString(o, "sum");
+    pCalcSum = PyObject_GetAttrString(pBandAttZonalStatsCmds, "calcSum");
     extractedAttributes.push_back(pCalcSum);
-    cmdObj->calcSum = !(pCalcSum == NULL || !RSGISPY_CHECK_STRING(pCalcSum));
+    zonalAtts->calcSum = !(pCalcSum == NULL || !RSGISPY_CHECK_INT(pCalcSum));
 
     // check the calcValue and extract fields if required
-    if(cmdObj->calcCount) {cmdObj->calcCount = RSGISPY_INT_EXTRACT(pCalcCount);}
-    if(cmdObj->calcMin) {cmdObj->calcMin = RSGISPY_INT_EXTRACT(pCalcMin);}
-    if(cmdObj->calcMax) {cmdObj->calcMax = RSGISPY_INT_EXTRACT(pCalcMax);}
-    if(cmdObj->calcMean) {cmdObj->calcCount = RSGISPY_INT_EXTRACT(pCalcMean);}
-    if(cmdObj->calcStdDev) {cmdObj->calcCount = RSGISPY_INT_EXTRACT(pCalcStDev);}
-    if(cmdObj->calcMode) {cmdObj->calcCount = RSGISPY_INT_EXTRACT(pCalcMode);}
-    if(cmdObj->calcSum) {cmdObj->calcCount = RSGISPY_INT_EXTRACT(pCalcSum);}
+    if(zonalAtts->calcCount) {zonalAtts->calcCount = RSGISPY_INT_EXTRACT(pCalcCount);}
+    if(zonalAtts->calcMin) {zonalAtts->calcMin = RSGISPY_INT_EXTRACT(pCalcMin);}
+    if(zonalAtts->calcMax) {zonalAtts->calcMax = RSGISPY_INT_EXTRACT(pCalcMax);}
+    if(zonalAtts->calcMean) {zonalAtts->calcMean = RSGISPY_INT_EXTRACT(pCalcMean);}
+    if(zonalAtts->calcStdDev) {zonalAtts->calcStdDev = RSGISPY_INT_EXTRACT(pCalcStdDev);}
+    if(zonalAtts->calcMode) {zonalAtts->calcMode = RSGISPY_INT_EXTRACT(pCalcMode);}
+    if(zonalAtts->calcSum) {zonalAtts->calcSum = RSGISPY_INT_EXTRACT(pCalcSum);}
     
     // Check if thresholds have been set - use default values (+/- Inf) if not.
-    pMinThreshold = PyObject_GetAttrString(o, "minThreshold");
+    // Check for float or int (want float but don't complain if we get int.)
+    pMinThreshold = PyObject_GetAttrString(pBandAttZonalStatsCmds, "minThreshold");
     extractedAttributes.push_back(pMinThreshold);
-    if( ( pMinThreshold == NULL ) || ( pMinThreshold == Py_None ) || !RSGISPY_CHECK_FLOAT(pMinThreshold) ) 
+    if( ( pMinThreshold == NULL ) || ( pMinThreshold == Py_None ) || !(RSGISPY_CHECK_FLOAT(pMinThreshold) || RSGISPY_CHECK_INT(pMinThreshold))) 
     {
-        cmdObj->minThreshold = -std::numeric_limits<double>::infinity();
+        zonalAtts->minThreshold = -std::numeric_limits<double>::infinity();
     }
-    else{cmdObj->minThreshold = RSGISPY_FLOAT_EXTRACT(pMinThreshold);}
+    else{zonalAtts->minThreshold = RSGISPY_FLOAT_EXTRACT(pMinThreshold);}
     
-    pMaxThreshold = PyObject_GetAttrString(o, "maxThreshold");
+    pMaxThreshold = PyObject_GetAttrString(pBandAttZonalStatsCmds, "maxThreshold");
     extractedAttributes.push_back(pMaxThreshold);
-    if( ( pMaxThreshold == NULL ) || ( pMaxThreshold == Py_None ) || !RSGISPY_CHECK_FLOAT(pMaxThreshold) ) 
+    if( ( pMaxThreshold == NULL ) || ( pMaxThreshold == Py_None ) || !(RSGISPY_CHECK_FLOAT(pMaxThreshold) || RSGISPY_CHECK_INT(pMaxThreshold)))
     {
-        cmdObj->maxThreshold = +std::numeric_limits<double>::infinity();
+        zonalAtts->maxThreshold = +std::numeric_limits<double>::infinity();
     }
-    else{cmdObj->maxThreshold = RSGISPY_FLOAT_EXTRACT(pMaxThreshold);}
+    else{zonalAtts->maxThreshold = RSGISPY_FLOAT_EXTRACT(pMaxThreshold);}
     
     FreePythonObjects(extractedAttributes);
-    
+  
     try
     {
-        rsgis::cmds::executePixelStats(pszInputImage, pszInputVector, pszOutputVector, cmdObj, 
+        rsgis::cmds::executePixelStats(pszInputImage, pszInputVector, pszOutputVector, zonalAtts, 
             "", false, force, useBandNames);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+
+    Py_RETURN_NONE;
+}
+
+static PyObject *ZonalStats_PixelStats2TXT(PyObject *self, PyObject *args)
+{
+    const char *pszInputImage, *pszInputVector, *pszOutputTxt;
+    int useBandNames;
+    PyObject *pBandAttZonalStatsCmds;
+    if( !PyArg_ParseTuple(args, "sssOi:pixelStats2SHP", &pszInputImage, &pszInputVector, &pszOutputTxt, 
+                                &pBandAttZonalStatsCmds, &useBandNames))
+        return NULL;
+    
+    rsgis::cmds::RSGISBandAttZonalStatsCmds *zonalAtts = new rsgis::cmds::RSGISBandAttZonalStatsCmds();   // the c++ struct
+
+    // declare and initialise pointers for all the attributes of the struct
+    PyObject *pMinThreshold, *pMaxThreshold, *pCalcCount, *pCalcMin, *pCalcMax, *pCalcMean, *pCalcStdDev, *pCalcMode, *pCalcSum;
+    pMinThreshold = pMaxThreshold = pCalcCount = pCalcMin = pCalcMax = pCalcMean = pCalcStdDev = pCalcMode = pCalcSum = NULL;
+
+    std::vector<PyObject*> extractedAttributes;     // store a list of extracted pyobjects to dereference
+    extractedAttributes.push_back(pBandAttZonalStatsCmds);
+
+    
+    /* Check if values have been set. 
+        If not set assume false.
+        If set, assume true for now - will check the value later
+    */
+    pCalcCount = PyObject_GetAttrString(pBandAttZonalStatsCmds, "calcCount");
+    extractedAttributes.push_back(pCalcCount);
+    zonalAtts->calcCount = !(pCalcCount == NULL || !RSGISPY_CHECK_INT(pCalcCount));
+    
+    pCalcMin = PyObject_GetAttrString(pBandAttZonalStatsCmds, "calcMin");
+    extractedAttributes.push_back(pCalcMin);
+    zonalAtts->calcMin = !(pCalcMin == NULL || !RSGISPY_CHECK_INT(pCalcMin));
+
+    pCalcMax = PyObject_GetAttrString(pBandAttZonalStatsCmds, "calcMax");
+    extractedAttributes.push_back(pCalcMax);
+    zonalAtts->calcMax = !(pCalcMax == NULL || !RSGISPY_CHECK_INT(pCalcMax));
+    
+    pCalcMean = PyObject_GetAttrString(pBandAttZonalStatsCmds, "calcMean");
+    extractedAttributes.push_back(pCalcMean);
+    zonalAtts->calcMean = !(pCalcMean == NULL || !RSGISPY_CHECK_INT(pCalcMean));
+    
+    pCalcStdDev = PyObject_GetAttrString(pBandAttZonalStatsCmds, "calcStdDev");
+    extractedAttributes.push_back(pCalcStdDev);
+    zonalAtts->calcStdDev= !(pCalcStdDev == NULL || !RSGISPY_CHECK_INT(pCalcStdDev));
+    
+    pCalcMode = PyObject_GetAttrString(pBandAttZonalStatsCmds, "calcMode");
+    extractedAttributes.push_back(pCalcMode);
+    zonalAtts->calcMode = !(pCalcMode == NULL || !RSGISPY_CHECK_INT(pCalcMode));
+    
+    pCalcSum = PyObject_GetAttrString(pBandAttZonalStatsCmds, "calcSum");
+    extractedAttributes.push_back(pCalcSum);
+    zonalAtts->calcSum = !(pCalcSum == NULL || !RSGISPY_CHECK_INT(pCalcSum));
+
+    // check the calcValue and extract fields if required
+    if(zonalAtts->calcCount) {zonalAtts->calcCount = RSGISPY_INT_EXTRACT(pCalcCount);}
+    if(zonalAtts->calcMin) {zonalAtts->calcMin = RSGISPY_INT_EXTRACT(pCalcMin);}
+    if(zonalAtts->calcMax) {zonalAtts->calcMax = RSGISPY_INT_EXTRACT(pCalcMax);}
+    if(zonalAtts->calcMean) {zonalAtts->calcMean = RSGISPY_INT_EXTRACT(pCalcMean);}
+    if(zonalAtts->calcStdDev) {zonalAtts->calcStdDev = RSGISPY_INT_EXTRACT(pCalcStdDev);}
+    if(zonalAtts->calcMode) {zonalAtts->calcMode = RSGISPY_INT_EXTRACT(pCalcMode);}
+    if(zonalAtts->calcSum) {zonalAtts->calcSum = RSGISPY_INT_EXTRACT(pCalcSum);}
+    
+    // Check if thresholds have been set - use default values (+/- Inf) if not.
+    // Check for float or int (want float but don't complain if we get int.)
+    pMinThreshold = PyObject_GetAttrString(pBandAttZonalStatsCmds, "minThreshold");
+    extractedAttributes.push_back(pMinThreshold);
+    if( ( pMinThreshold == NULL ) || ( pMinThreshold == Py_None ) || !(RSGISPY_CHECK_FLOAT(pMinThreshold) || RSGISPY_CHECK_INT(pMinThreshold))) 
+    {
+        zonalAtts->minThreshold = -std::numeric_limits<double>::infinity();
+    }
+    else{zonalAtts->minThreshold = RSGISPY_FLOAT_EXTRACT(pMinThreshold);}
+    
+    pMaxThreshold = PyObject_GetAttrString(pBandAttZonalStatsCmds, "maxThreshold");
+    extractedAttributes.push_back(pMaxThreshold);
+    if( ( pMaxThreshold == NULL ) || ( pMaxThreshold == Py_None ) || !(RSGISPY_CHECK_FLOAT(pMaxThreshold) || RSGISPY_CHECK_INT(pMaxThreshold)))
+    {
+        zonalAtts->maxThreshold = +std::numeric_limits<double>::infinity();
+    }
+    else{zonalAtts->maxThreshold = RSGISPY_FLOAT_EXTRACT(pMaxThreshold);}
+    
+    FreePythonObjects(extractedAttributes);
+  
+    try
+    {
+        rsgis::cmds::executePixelStats(pszInputImage, pszInputVector, pszOutputTxt, zonalAtts, 
+            "", true, false, useBandNames);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -186,7 +279,7 @@ static PyObject *ZonalStats_PixelStats2SHP(PyObject *self, PyObject *args)
 // Our list of functions in this module
 static PyMethodDef ZonalStatsMethods[] = {
     {"pointValue2SHP", ZonalStats_PointValue2SHP, METH_VARARGS, 
-"Stretch\n"
+"Extract pixel value for each point in a shape file and output as a shapefile.\n"
 "call signature: zonalstats.pointValue2SHP(inputimage, inputvector, outputvector, force, useBandNames)\n"
 "where:\n"
 "  * inputimage is a string containing the name of the input image\n"
@@ -196,7 +289,7 @@ static PyMethodDef ZonalStatsMethods[] = {
 "  * useBandNames is a bool, specifying whether to use the band names of the input dataset in the output file (if not uses b1, b2, etc.,\n"},
 
     {"pointValue2TXT", ZonalStats_PointValue2TXT, METH_VARARGS, 
-"Stretch\n"
+"Extract pixel value for each point in a shape file and output as a CSV.\n"
 "call signature: zonalstats.pointValue2TXT(inputimage, inputvector, outputtxt, useBandNames)\n"
 "where:\n"
 "  * inputimage is a string containing the name of the input image\n"
@@ -204,26 +297,47 @@ static PyMethodDef ZonalStatsMethods[] = {
 "  * outputtxt is a string containing the name of the output text file\n"
 "  * useBandNames is a bool, specifying whether to use the band names of the input dataset in the output file (if not uses b1, b2, etc.,\n"},
 
-    {"pixelValue2SHP", ZonalStats_PixelStats2SHP, METH_VARARGS, 
-"Stretch\n"
-"call signature: zonalstats.pixelValue2SHP(inputimage, inputvector, outputvector, zonalattributes, force, useBandNames)\n"
+    {"pixelStats2SHP", ZonalStats_PixelStats2SHP, METH_VARARGS, 
+"Calculate statistics for pixels falling within each polygon in a shapefile output as a shapefile.\n"
+"call signature: zonalstats.pixelStats2SHP(inputimage, inputvector, outputvector, zonalattributes, force, useBandNames)\n"
 "where:\n"
 "  * inputimage is a string containing the name of the input image\n"
 "  * inputvector is a string containing the name of the input vector\n"
 "  * outputvector is a string containing the name of the output vector\n"
-"  * zonalattributes is a sequence containing:\n"
+"  * ZonalAttributes is an rsgislib.rastergis.zonalattributes object that has attributes in line with rsgis::cmds::RSGISBandAttZStatsCmds\n"
 "\n"
 "       * minThreshold, a float providing the minimum pixel value to include when calculating statistics.\n"
 "       * maxThreshold, a float providing the maximum pixel value to include when calculating statistics.\n"
-"       * count, a bool specifying whether to report a count of pixels between thresholds.\n"
-"       * min, a bool specifying whether to report the minimum of pixels between thresholds.\n"
-"       * max, a bool specifying whether to report the maximum of pixels between thresholds.\n"
-"       * mean, a bool specifying whether to report the mean of pixels between thresholds.\n"
-"       * stDev, a bool specifying whether to report the standard deviation of pixels between thresholds.\n"
-"       * mode, a bool specifying whether to report the mode of pixels between thresholds (for integer datasets only).\n"
-"       * sum, a bool specifying whether to report the sum of pixels between thresholds.\n"
+"       * calcCount, a bool specifying whether to report a count of pixels between thresholds.\n"
+"       * calcMin, a bool specifying whether to report the minimum of pixels between thresholds.\n"
+"       * calcMax, a bool specifying whether to report the maximum of pixels between thresholds.\n"
+"       * calcMean, a bool specifying whether to report the mean of pixels between thresholds.\n"
+"       * calcStdDev, a bool specifying whether to report the standard deviation of pixels between thresholds.\n"
+"       * calcMode, a bool specifying whether to report the mode of pixels between thresholds (for integer datasets only).\n"
+"       * calcSum, a bool specifying whether to report the sum of pixels between thresholds.\n"
 "\n"
 "  * force is a bool, specifying whether to force removal of the output vector if it exists\n"
+"  * useBandNames is a bool, specifying whether to use the band names of the input dataset in the output file (if not uses b1, b2, etc.,\n"},
+
+    {"pixelStats2TXT", ZonalStats_PixelStats2TXT, METH_VARARGS, 
+"Calculate statistics for pixels falling within each polygon in a shapefile output as a CSV.\n"
+"call signature: zonalstats.pixelStats2SHP(inputimage, inputvector, outputtxt, zonalattributes, useBandNames)\n"
+"where:\n"
+"  * inputimage is a string containing the name of the input image\n"
+"  * inputvector is a string containing the name of the input vector\n"
+"  * outputtxt is a string containing the name of the output text file\n"
+"  * ZonalAttributes is an rsgislib.rastergis.zonalattributes object that has attributes in line with rsgis::cmds::RSGISBandAttZStatsCmds\n"
+"\n"
+"       * minThreshold, a float providing the minimum pixel value to include when calculating statistics.\n"
+"       * maxThreshold, a float providing the maximum pixel value to include when calculating statistics.\n"
+"       * calcCount, a bool specifying whether to report a count of pixels between thresholds.\n"
+"       * calcMin, a bool specifying whether to report the minimum of pixels between thresholds.\n"
+"       * calcMax, a bool specifying whether to report the maximum of pixels between thresholds.\n"
+"       * calcMean, a bool specifying whether to report the mean of pixels between thresholds.\n"
+"       * calcStdDev, a bool specifying whether to report the standard deviation of pixels between thresholds.\n"
+"       * calcMode, a bool specifying whether to report the mode of pixels between thresholds (for integer datasets only).\n"
+"       * calcSum, a bool specifying whether to report the sum of pixels between thresholds.\n"
+"\n"
 "  * useBandNames is a bool, specifying whether to use the band names of the input dataset in the output file (if not uses b1, b2, etc.,\n"},
 
     {NULL}        /* Sentinel */

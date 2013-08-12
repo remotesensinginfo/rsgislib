@@ -213,6 +213,18 @@ namespace rsgis{ namespace cmds {
 		double minThreshAllVal = calcStats->minThreshold;
 		double maxThreshAllVal = calcStats->maxThreshold;
         
+        std::cout << "Calculating: ";
+        if(minAll){std::cout << "min, ";}
+        if(maxAll){std::cout << "max, ";}
+        if(meanAll){std::cout << "mean, ";}
+        if(stdDevAll){std::cout << "stdDev, ";}
+        if(modeAll){std::cout << "mode, ";}
+        if(countAll){std::cout << "cont, ";}
+        std::cout << "for pixels with values between " << minThreshAllVal << " and " << maxThreshAllVal << "." << std::endl;
+        std::cout << "and pixelcount for all pixels in polygon." << std::endl;
+        
+        std::cout << "minThreshAllVal = " << minThreshAllVal << std::endl;
+        
         // Ignore projection by default (just print a warning and hope people read it)
         bool ignoreProjection = true;
         
