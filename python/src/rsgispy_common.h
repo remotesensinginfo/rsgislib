@@ -24,6 +24,7 @@
 #define RSGISPY_COMMON_H
 
 #include <Python.h>
+#include <limits>
 #include <string>
 #include <string.h>
 
