@@ -4,7 +4,7 @@
  *
  *  Created by Pete Bunting on 11/12/2008.
  *  Copyright 2008 RSGISLib.
- * 
+ *
  *  RSGISLib is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -41,18 +41,18 @@ rsgis::RSGISAlgorithmParameters* RSGISExeFilterImages::getInstance()
 void RSGISExeFilterImages::retrieveParameters(xercesc::DOMElement *argElement) throw(rsgis::RSGISXMLArgumentsException)
 {
 	rsgis::math::RSGISMathsUtils mathUtils;
-	
+
 	const XMLCh *algorName = xercesc::XMLString::transcode(this->algorithm.c_str());
 	const XMLCh *optionFilter = xercesc::XMLString::transcode("filter");
 	const XMLCh *optionExportFilterBank = xercesc::XMLString::transcode("exportfilterbank");
     const XMLCh *optionNLDenoising = xercesc::XMLString::transcode("nldenoising");
-	
+
 	const XMLCh *algorNameEle = argElement->getAttribute(xercesc::XMLString::transcode("algor"));
 	if(!xercesc::XMLString::equals(algorName, algorNameEle))
 	{
 		throw rsgis::RSGISXMLArgumentsException("The algorithm name is incorrect.");
 	}
-    
+
     XMLCh *imageXMLStr = xercesc::XMLString::transcode("image");
     if(argElement->hasAttribute(imageXMLStr))
     {
@@ -65,7 +65,7 @@ void RSGISExeFilterImages::retrieveParameters(xercesc::DOMElement *argElement) t
         throw rsgis::RSGISXMLArgumentsException("No \'image\' attribute was provided.");
     }
     xercesc::XMLString::release(&imageXMLStr);
-    
+
     XMLCh *outputXMLStr = xercesc::XMLString::transcode("output");
     if(argElement->hasAttribute(outputXMLStr))
     {
@@ -78,8 +78,8 @@ void RSGISExeFilterImages::retrieveParameters(xercesc::DOMElement *argElement) t
         throw rsgis::RSGISXMLArgumentsException("No \'output\' attribute was provided.");
     }
     xercesc::XMLString::release(&outputXMLStr);
-    
-        
+
+
     // Set output image fomat (defaults to KEA)
 	this->imageFormat = "KEA";
 	XMLCh *formatXMLStr = xercesc::XMLString::transcode("format");
@@ -90,7 +90,7 @@ void RSGISExeFilterImages::retrieveParameters(xercesc::DOMElement *argElement) t
 		xercesc::XMLString::release(&charValue);
 	}
 	xercesc::XMLString::release(&formatXMLStr);
-    
+
     // Set output image fomat (defaults to KEA)
 	this->imageExt = "kea";
 	XMLCh *extensionXMLStr = xercesc::XMLString::transcode("extension");
@@ -105,7 +105,7 @@ void RSGISExeFilterImages::retrieveParameters(xercesc::DOMElement *argElement) t
         throw rsgis::RSGISXMLArgumentsException("No \'extension\' attribute was provided.");
     }
 	xercesc::XMLString::release(&extensionXMLStr);
-    
+
     this->outDataType = GDT_Float32;
 	XMLCh *datatypeXMLStr = xercesc::XMLString::transcode("datatype");
 	if(argElement->hasAttribute(datatypeXMLStr))
@@ -117,7 +117,7 @@ void RSGISExeFilterImages::retrieveParameters(xercesc::DOMElement *argElement) t
         XMLCh *dtInt32 = xercesc::XMLString::transcode("Int32");
         XMLCh *dtFloat32 = xercesc::XMLString::transcode("Float32");
         XMLCh *dtFloat64 = xercesc::XMLString::transcode("Float64");
-        
+
         const XMLCh *dtXMLValue = argElement->getAttribute(datatypeXMLStr);
         if(xercesc::XMLString::equals(dtByte, dtXMLValue))
         {
@@ -152,7 +152,7 @@ void RSGISExeFilterImages::retrieveParameters(xercesc::DOMElement *argElement) t
             std::cerr << "Data type not recognised, defaulting to 32 bit float.";
             this->outDataType = GDT_Float32;
         }
-        
+
         xercesc::XMLString::release(&dtByte);
         xercesc::XMLString::release(&dtUInt16);
         xercesc::XMLString::release(&dtInt16);
@@ -162,15 +162,15 @@ void RSGISExeFilterImages::retrieveParameters(xercesc::DOMElement *argElement) t
         xercesc::XMLString::release(&dtFloat64);
 	}
 	xercesc::XMLString::release(&datatypeXMLStr);
-    
-	
+
+
 	this->filterBank = new rsgis::filter::RSGISFilterBank();
-	
+
 	if(argElement->hasAttribute(xercesc::XMLString::transcode("filterbank")))
 	{
 		const XMLCh *filterBankXMLStr = argElement->getAttribute(xercesc::XMLString::transcode("filterbank"));
 		std::cout << "Default Filter Bank " << xercesc::XMLString::transcode(filterBankXMLStr) << " to be created\n";
-		
+
 		const XMLCh *filterBankLM = xercesc::XMLString::transcode("LM");
 		if(xercesc::XMLString::equals(filterBankXMLStr, filterBankLM))
 		{
@@ -183,7 +183,7 @@ void RSGISExeFilterImages::retrieveParameters(xercesc::DOMElement *argElement) t
 		xercesc::DOMNodeList *filterNodesList = argElement->getElementsByTagName(xercesc::XMLString::transcode("rsgis:filter"));
 		int numFilters = filterNodesList->getLength();
 		xercesc::DOMElement *filterElement = NULL;
-		
+
 		XMLCh *filterTypeGuassianSmooth = xercesc::XMLString::transcode("GaussianSmooth");
 		XMLCh *filterTypeGuassian1st = xercesc::XMLString::transcode("Gaussian1st");
 		XMLCh *filterTypeGuassian2nd = xercesc::XMLString::transcode("Gaussian2nd");
@@ -209,28 +209,29 @@ void RSGISExeFilterImages::retrieveParameters(xercesc::DOMElement *argElement) t
         XMLCh *filterTypeNormVarLn = xercesc::XMLString::transcode("NormVarLn");
         XMLCh *filterTypeNormVarLnPow = xercesc::XMLString::transcode("NormVarLnPower");
         XMLCh *filterTypeNormLn = xercesc::XMLString::transcode("NormLn");
-		
+        XMLCh *filterTypeTextureVar = xercesc::XMLString::transcode("TextureVar");
+
 		XMLCh *filterTypeOptionX = xercesc::XMLString::transcode("x");
 		XMLCh *filterTypeOptionY = xercesc::XMLString::transcode("y");
 		XMLCh *filterTypeOptionXY = xercesc::XMLString::transcode("xy");
-		
+
 		for(int i = 0; i < numFilters; i++)
 		{
 			filterElement = static_cast<xercesc::DOMElement*>(filterNodesList->item(i));
 			const XMLCh *filterType = filterElement->getAttribute(xercesc::XMLString::transcode("type"));
 			std::cout << "Filter: " << xercesc::XMLString::transcode(filterType) << std::endl;
-			
+
 			if(xercesc::XMLString::equals(filterTypeGuassianSmooth, filterType))
 			{
 				const XMLCh *fileEndingStr = filterElement->getAttribute(xercesc::XMLString::transcode("fileending"));
 				std::string fileEnding = xercesc::XMLString::transcode(fileEndingStr);
-                
+
 				int size = mathUtils.strtofloat(xercesc::XMLString::transcode(filterElement->getAttribute(xercesc::XMLString::transcode("size"))));
 				float stddevX = mathUtils.strtofloat(xercesc::XMLString::transcode(filterElement->getAttribute(xercesc::XMLString::transcode("stddevX"))));
 				float stddevY = mathUtils.strtofloat(xercesc::XMLString::transcode(filterElement->getAttribute(xercesc::XMLString::transcode("stddevY"))));
 				float angle = mathUtils.strtofloat(xercesc::XMLString::transcode(filterElement->getAttribute(xercesc::XMLString::transcode("angle"))));
 				float angleRadians = angle*(M_PI/180);
-				
+
 				rsgis::filter::RSGISCalcGaussianSmoothFilter *calcGaussianSmoothFilter = new rsgis::filter::RSGISCalcGaussianSmoothFilter(stddevX, stddevY, angleRadians);
 				rsgis::filter::RSGISGenerateFilter *genFilter = new rsgis::filter::RSGISGenerateFilter(calcGaussianSmoothFilter);
 				rsgis::filter::ImageFilter *filterKernal = genFilter->generateFilter(size);
@@ -243,13 +244,13 @@ void RSGISExeFilterImages::retrieveParameters(xercesc::DOMElement *argElement) t
 			{
 				const XMLCh *fileEndingStr = filterElement->getAttribute(xercesc::XMLString::transcode("fileending"));
 				std::string fileEnding = xercesc::XMLString::transcode(fileEndingStr);
-				
+
 				int size = mathUtils.strtofloat(xercesc::XMLString::transcode(filterElement->getAttribute(xercesc::XMLString::transcode("size"))));
 				float stddevX = mathUtils.strtofloat(xercesc::XMLString::transcode(filterElement->getAttribute(xercesc::XMLString::transcode("stddevX"))));
 				float stddevY = mathUtils.strtofloat(xercesc::XMLString::transcode(filterElement->getAttribute(xercesc::XMLString::transcode("stddevY"))));
 				float angle = mathUtils.strtofloat(xercesc::XMLString::transcode(filterElement->getAttribute(xercesc::XMLString::transcode("angle"))));
 				float angleRadians = angle*(M_PI/180);
-				
+
 				rsgis::filter::RSGISCalcGaussianFirstDerivativeFilter *calcGaussian1stDerivFilter = new rsgis::filter::RSGISCalcGaussianFirstDerivativeFilter(stddevX, stddevY, angleRadians);
 				rsgis::filter::RSGISGenerateFilter *genFilter = new rsgis::filter::RSGISGenerateFilter(calcGaussian1stDerivFilter);
 				rsgis::filter::ImageFilter *filterKernal = genFilter->generateFilter(size);
@@ -257,19 +258,19 @@ void RSGISExeFilterImages::retrieveParameters(xercesc::DOMElement *argElement) t
 				filterBank->addFilter(filter);
 				delete calcGaussian1stDerivFilter;
 				delete genFilter;
-				
+
 			}
 			else if(xercesc::XMLString::equals(filterTypeGuassian2nd, filterType))
 			{
 				const XMLCh *fileEndingStr = filterElement->getAttribute(xercesc::XMLString::transcode("fileending"));
 				std::string fileEnding = xercesc::XMLString::transcode(fileEndingStr);
-				
+
 				int size = mathUtils.strtofloat(xercesc::XMLString::transcode(filterElement->getAttribute(xercesc::XMLString::transcode("size"))));
 				float stddevX = mathUtils.strtofloat(xercesc::XMLString::transcode(filterElement->getAttribute(xercesc::XMLString::transcode("stddevX"))));
 				float stddevY = mathUtils.strtofloat(xercesc::XMLString::transcode(filterElement->getAttribute(xercesc::XMLString::transcode("stddevY"))));
 				float angle = mathUtils.strtofloat(xercesc::XMLString::transcode(filterElement->getAttribute(xercesc::XMLString::transcode("angle"))));
 				float angleRadians = angle*(M_PI/180);
-				
+
 				rsgis::filter::RSGISCalcGaussianSecondDerivativeFilter *calcGaussian2ndDerivFilter = new rsgis::filter::RSGISCalcGaussianSecondDerivativeFilter(stddevX, stddevY, angleRadians);
 				rsgis::filter::RSGISGenerateFilter *genFilter = new rsgis::filter::RSGISGenerateFilter(calcGaussian2ndDerivFilter);
 				rsgis::filter::ImageFilter *filterKernal = genFilter->generateFilter(size);
@@ -282,10 +283,10 @@ void RSGISExeFilterImages::retrieveParameters(xercesc::DOMElement *argElement) t
 			{
 				const XMLCh *fileEndingStr = filterElement->getAttribute(xercesc::XMLString::transcode("fileending"));
 				std::string fileEnding = xercesc::XMLString::transcode(fileEndingStr);
-				
+
 				int size = mathUtils.strtofloat(xercesc::XMLString::transcode(filterElement->getAttribute(xercesc::XMLString::transcode("size"))));
 				float stddev = mathUtils.strtofloat(xercesc::XMLString::transcode(filterElement->getAttribute(xercesc::XMLString::transcode("stddev"))));
-				
+
 				rsgis::filter::RSGISCalcLapacianFilter *calcLapacianFilter = new rsgis::filter::RSGISCalcLapacianFilter(stddev);
 				rsgis::filter::RSGISGenerateFilter *genFilter = new rsgis::filter::RSGISGenerateFilter(calcLapacianFilter);
 				rsgis::filter::ImageFilter *filterKernal = genFilter->generateFilter(size);
@@ -298,11 +299,11 @@ void RSGISExeFilterImages::retrieveParameters(xercesc::DOMElement *argElement) t
 			{
 				const XMLCh *fileEndingStr = filterElement->getAttribute(xercesc::XMLString::transcode("fileending"));
 				std::string fileEnding = xercesc::XMLString::transcode(fileEndingStr);
-				
+
 				const XMLCh *sobelFilterOption = filterElement->getAttribute(xercesc::XMLString::transcode("option"));
-                
+
 				rsgis::filter::RSGISImageFilter *filter = NULL;
-				
+
 				if(xercesc::XMLString::equals(filterTypeOptionX, sobelFilterOption))
 				{
 					filter = new rsgis::filter::RSGISSobelFilter(0, 3, fileEnding, rsgis::filter::RSGISSobelFilter::x);
@@ -319,18 +320,18 @@ void RSGISExeFilterImages::retrieveParameters(xercesc::DOMElement *argElement) t
 				{
 					throw rsgis::RSGISXMLArgumentsException("Sobel type not recognised");
 				}
-                
+
 				filterBank->addFilter(filter);
 			}
 			else if(xercesc::XMLString::equals(filterTypePrewitt, filterType))
 			{
 				const XMLCh *fileEndingStr = filterElement->getAttribute(xercesc::XMLString::transcode("fileending"));
 				std::string fileEnding = xercesc::XMLString::transcode(fileEndingStr);
-				
+
 				const XMLCh *prewittFilterOption = filterElement->getAttribute(xercesc::XMLString::transcode("option"));
-				
+
 				rsgis::filter::RSGISImageFilter *filter = NULL;
-				
+
 				if(xercesc::XMLString::equals(filterTypeOptionX, prewittFilterOption))
 				{
 					filter = new rsgis::filter::RSGISPrewittFilter(0, 3, fileEnding, rsgis::filter::RSGISPrewittFilter::x);
@@ -347,16 +348,16 @@ void RSGISExeFilterImages::retrieveParameters(xercesc::DOMElement *argElement) t
 				{
 					throw rsgis::RSGISXMLArgumentsException("Sobel type not recognised");
 				}
-				
+
 				filterBank->addFilter(filter);
 			}
 			else if(xercesc::XMLString::equals(filterTypeMean, filterType))
 			{
 				const XMLCh *fileEndingStr = filterElement->getAttribute(xercesc::XMLString::transcode("fileending"));
 				std::string fileEnding = xercesc::XMLString::transcode(fileEndingStr);
-				
+
 				int size = mathUtils.strtofloat(xercesc::XMLString::transcode(filterElement->getAttribute(xercesc::XMLString::transcode("size"))));
-				
+
 				rsgis::filter::RSGISImageFilter *filter = new rsgis::filter::RSGISMeanFilter(0, size, fileEnding);
 				filterBank->addFilter(filter);
 			}
@@ -364,9 +365,9 @@ void RSGISExeFilterImages::retrieveParameters(xercesc::DOMElement *argElement) t
 			{
 				const XMLCh *fileEndingStr = filterElement->getAttribute(xercesc::XMLString::transcode("fileending"));
 				std::string fileEnding = xercesc::XMLString::transcode(fileEndingStr);
-				
+
 				int size = mathUtils.strtofloat(xercesc::XMLString::transcode(filterElement->getAttribute(xercesc::XMLString::transcode("size"))));
-				
+
 				rsgis::filter::RSGISImageFilter *filter = new rsgis::filter::RSGISMedianFilter(0, size, fileEnding);
 				filterBank->addFilter(filter);
 			}
@@ -374,9 +375,9 @@ void RSGISExeFilterImages::retrieveParameters(xercesc::DOMElement *argElement) t
 			{
 				const XMLCh *fileEndingStr = filterElement->getAttribute(xercesc::XMLString::transcode("fileending"));
 				std::string fileEnding = xercesc::XMLString::transcode(fileEndingStr);
-				
+
 				int size = mathUtils.strtofloat(xercesc::XMLString::transcode(filterElement->getAttribute(xercesc::XMLString::transcode("size"))));
-				
+
 				rsgis::filter::RSGISImageFilter *filter = new rsgis::filter::RSGISModeFilter(0, size, fileEnding);
 				filterBank->addFilter(filter);
 			}
@@ -384,64 +385,64 @@ void RSGISExeFilterImages::retrieveParameters(xercesc::DOMElement *argElement) t
 			{
 				const XMLCh *fileEndingStr = filterElement->getAttribute(xercesc::XMLString::transcode("fileending"));
 				std::string fileEnding = xercesc::XMLString::transcode(fileEndingStr);
-				
+
 				int size = mathUtils.strtofloat(xercesc::XMLString::transcode(filterElement->getAttribute(xercesc::XMLString::transcode("size"))));
-				
+
 				rsgis::filter::RSGISImageFilter *filter = new rsgis::filter::RSGISRangeFilter(0, size, fileEnding);
 				filterBank->addFilter(filter);
-				
+
 			}
 			else if(xercesc::XMLString::equals(filterTypeStdDev, filterType))
 			{
 				const XMLCh *fileEndingStr = filterElement->getAttribute(xercesc::XMLString::transcode("fileending"));
 				std::string fileEnding = xercesc::XMLString::transcode(fileEndingStr);
-				
+
 				int size = mathUtils.strtofloat(xercesc::XMLString::transcode(filterElement->getAttribute(xercesc::XMLString::transcode("size"))));
-				
+
 				rsgis::filter::RSGISImageFilter *filter = new rsgis::filter::RSGISStdDevFilter(0, size, fileEnding);
 				filterBank->addFilter(filter);
-				
+
 			}
 			else if(xercesc::XMLString::equals(filterTypeMin, filterType))
 			{
 				const XMLCh *fileEndingStr = filterElement->getAttribute(xercesc::XMLString::transcode("fileending"));
 				std::string fileEnding = xercesc::XMLString::transcode(fileEndingStr);
-				
+
 				int size = mathUtils.strtofloat(xercesc::XMLString::transcode(filterElement->getAttribute(xercesc::XMLString::transcode("size"))));
-				
+
 				rsgis::filter::RSGISImageFilter *filter = new rsgis::filter::RSGISMinFilter(0, size, fileEnding);
 				filterBank->addFilter(filter);
-				
+
 			}
 			else if(xercesc::XMLString::equals(filterTypeMax, filterType))
 			{
 				const XMLCh *fileEndingStr = filterElement->getAttribute(xercesc::XMLString::transcode("fileending"));
 				std::string fileEnding = xercesc::XMLString::transcode(fileEndingStr);
-				
+
 				int size = mathUtils.strtofloat(xercesc::XMLString::transcode(filterElement->getAttribute(xercesc::XMLString::transcode("size"))));
-				
+
 				rsgis::filter::RSGISImageFilter *filter = new rsgis::filter::RSGISMaxFilter(0, size, fileEnding);
 				filterBank->addFilter(filter);
-				
+
 			}
 			else if(xercesc::XMLString::equals(filterTypeTotal, filterType))
 			{
 				const XMLCh *fileEndingStr = filterElement->getAttribute(xercesc::XMLString::transcode("fileending"));
 				std::string fileEnding = xercesc::XMLString::transcode(fileEndingStr);
-				
+
 				int size = mathUtils.strtofloat(xercesc::XMLString::transcode(filterElement->getAttribute(xercesc::XMLString::transcode("size"))));
-				
+
 				rsgis::filter::RSGISImageFilter *filter = new rsgis::filter::RSGISTotalFilter(0, size, fileEnding);
 				filterBank->addFilter(filter);
-				
+
 			}
 			else if(xercesc::XMLString::equals(filterTypeKuwahara, filterType))
 			{
 				const XMLCh *fileEndingStr = filterElement->getAttribute(xercesc::XMLString::transcode("fileending"));
 				std::string fileEnding = xercesc::XMLString::transcode(fileEndingStr);
-				
+
 				int size = mathUtils.strtofloat(xercesc::XMLString::transcode(filterElement->getAttribute(xercesc::XMLString::transcode("size"))));
-				
+
 				rsgis::filter::RSGISImageFilter *filter = new rsgis::filter::RSGISKuwaharaFilter(0, size, fileEnding);
 				filterBank->addFilter(filter);
 			}
@@ -449,11 +450,11 @@ void RSGISExeFilterImages::retrieveParameters(xercesc::DOMElement *argElement) t
 			{
 				const XMLCh *fileEndingStr = filterElement->getAttribute(xercesc::XMLString::transcode("fileending"));
 				std::string fileEnding = xercesc::XMLString::transcode(fileEndingStr);
-				
+
 				int size = mathUtils.strtofloat(xercesc::XMLString::transcode(filterElement->getAttribute(xercesc::XMLString::transcode("size"))));
-				
+
                 unsigned int nLooks = size; // Set number of looks to window size
-                
+
                 XMLCh *nLooksXMLStr = xercesc::XMLString::transcode("nLooks");
                 if(argElement->hasAttribute(nLooksXMLStr))
                 {
@@ -466,7 +467,7 @@ void RSGISExeFilterImages::retrieveParameters(xercesc::DOMElement *argElement) t
                     nLooks = size;
                 }
                 xercesc::XMLString::release(&nLooksXMLStr);
-                
+
 				rsgis::filter::RSGISImageFilter *filter = new rsgis::filter::RSGISLeeFilter(0, size, fileEnding, nLooks);
 				filterBank->addFilter(filter);
 			}
@@ -475,9 +476,9 @@ void RSGISExeFilterImages::retrieveParameters(xercesc::DOMElement *argElement) t
 			{
 				const XMLCh *fileEndingStr = filterElement->getAttribute(xercesc::XMLString::transcode("fileending"));
 				std::string fileEnding = xercesc::XMLString::transcode(fileEndingStr);
-                
+
                 int size = mathUtils.strtofloat(xercesc::XMLString::transcode(filterElement->getAttribute(xercesc::XMLString::transcode("size"))));
-                
+
 				rsgis::filter::RSGISImageFilter *filter = new rsgis::filter::RSGISNormVarPowerFilter(0, size, fileEnding);
 				filterBank->addFilter(filter);
 			}
@@ -486,9 +487,9 @@ void RSGISExeFilterImages::retrieveParameters(xercesc::DOMElement *argElement) t
 			{
 				const XMLCh *fileEndingStr = filterElement->getAttribute(xercesc::XMLString::transcode("fileending"));
 				std::string fileEnding = xercesc::XMLString::transcode(fileEndingStr);
-                
+
                 int size = mathUtils.strtofloat(xercesc::XMLString::transcode(filterElement->getAttribute(xercesc::XMLString::transcode("size"))));
-                
+
 				rsgis::filter::RSGISImageFilter *filter = new rsgis::filter::RSGISNormVarAmplitudeFilter(0, size, fileEnding);
 				filterBank->addFilter(filter);
 			}
@@ -497,9 +498,9 @@ void RSGISExeFilterImages::retrieveParameters(xercesc::DOMElement *argElement) t
 			{
 				const XMLCh *fileEndingStr = filterElement->getAttribute(xercesc::XMLString::transcode("fileending"));
 				std::string fileEnding = xercesc::XMLString::transcode(fileEndingStr);
-                
+
                 int size = mathUtils.strtofloat(xercesc::XMLString::transcode(filterElement->getAttribute(xercesc::XMLString::transcode("size"))));
-                
+
 				rsgis::filter::RSGISImageFilter *filter = new rsgis::filter::RSGISNormVarLnPowerFilter(0, size, fileEnding);
 				filterBank->addFilter(filter);
 			}
@@ -508,10 +509,21 @@ void RSGISExeFilterImages::retrieveParameters(xercesc::DOMElement *argElement) t
 			{
 				const XMLCh *fileEndingStr = filterElement->getAttribute(xercesc::XMLString::transcode("fileending"));
 				std::string fileEnding = xercesc::XMLString::transcode(fileEndingStr);
-                
+
                 int size = mathUtils.strtofloat(xercesc::XMLString::transcode(filterElement->getAttribute(xercesc::XMLString::transcode("size"))));
-                
+
 				rsgis::filter::RSGISImageFilter *filter = new rsgis::filter::RSGISNormLnFilter(0, size, fileEnding);
+				filterBank->addFilter(filter);
+			}
+            // Texture variance (eq. 21.89b in Ulaby et. al, Microwave Remove Sensing - Vol III)
+            else if(xercesc::XMLString::equals(filterTypeTextureVar, filterType))
+			{
+				const XMLCh *fileEndingStr = filterElement->getAttribute(xercesc::XMLString::transcode("fileending"));
+				std::string fileEnding = xercesc::XMLString::transcode(fileEndingStr);
+
+                int size = mathUtils.strtofloat(xercesc::XMLString::transcode(filterElement->getAttribute(xercesc::XMLString::transcode("size"))));
+
+				rsgis::filter::RSGISImageFilter *filter = new rsgis::filter::RSGISTextureVar(0, size, fileEnding);
 				filterBank->addFilter(filter);
 			}
 			else if(xercesc::XMLString::equals(filterTypeHarlick, filterType))
@@ -527,7 +539,7 @@ void RSGISExeFilterImages::retrieveParameters(xercesc::DOMElement *argElement) t
 				throw rsgis::RSGISXMLArgumentsException("Filter Type not recognised");
 			}
 		}
-        
+
         xercesc::XMLString::release(&filterTypeGuassianSmooth);
         xercesc::XMLString::release(&filterTypeGuassian1st);
         xercesc::XMLString::release(&filterTypeGuassian2nd);
@@ -553,14 +565,15 @@ void RSGISExeFilterImages::retrieveParameters(xercesc::DOMElement *argElement) t
         xercesc::XMLString::release(&filterTypeNormVarLn);
         xercesc::XMLString::release(&filterTypeNormVarLnPow);
         xercesc::XMLString::release(&filterTypeNormLn);
+        xercesc::XMLString::release(&filterTypeTextureVar);
         xercesc::XMLString::release(&filterTypeOptionX);
         xercesc::XMLString::release(&filterTypeOptionY);
         xercesc::XMLString::release(&filterTypeOptionXY);
     }
-    
+
     const XMLCh *optionXML = argElement->getAttribute(xercesc::XMLString::transcode("option"));
     if(xercesc::XMLString::equals(optionFilter, optionXML))
-    {		
+    {
         this->option = RSGISExeFilterImages::filter;
     }
     else if(xercesc::XMLString::equals(optionNLDenoising, optionXML))
@@ -568,7 +581,7 @@ void RSGISExeFilterImages::retrieveParameters(xercesc::DOMElement *argElement) t
         this->option = RSGISExeFilterImages::nldenoising;
     }
     else if(xercesc::XMLString::equals(optionExportFilterBank, optionXML))
-    {		
+    {
         this->option = RSGISExeFilterImages::exportfilterbank;
     }
     else
@@ -576,7 +589,7 @@ void RSGISExeFilterImages::retrieveParameters(xercesc::DOMElement *argElement) t
         std::string message = std::string("The option (") + std::string(xercesc::XMLString::transcode(optionXML)) + std::string(") is not known: RSGISExeFilterImages.");
         throw rsgis::RSGISXMLArgumentsException(message.c_str());
     }
-    
+
     parsed = true;
 }
 
@@ -602,9 +615,9 @@ void RSGISExeFilterImages::runAlgorithm() throw(rsgis::RSGISException)
                     std::string message = std::string("Could not open image ") + this->inputImage;
                     throw rsgis::RSGISImageException(message.c_str());
                 }
-                
+
                 filterBank->executeFilters(dataset, 1, this->outputImageBase, this->imageFormat, this->imageExt, this->outDataType);
-                
+
                 GDALClose(dataset[0]);
                 delete[] dataset;
                 delete filterBank;
@@ -628,13 +641,13 @@ void RSGISExeFilterImages::runAlgorithm() throw(rsgis::RSGISException)
                     std::string message = std::string("Could not open image ") + this->inputImage;
                     throw rsgis::RSGISImageException(message.c_str());
                 }
-                
+
                 this->aPar = 2;
                 this->hPar = 2;
-                
+
                 rsgis::filter::RSGISApplyNonLocalDenoising *dnFilter = new rsgis::filter::RSGISApplyNonLocalDenoising();
                 dnFilter->ApplyFilter(dataset, 1, this->outputImageBase, 5, 256, this->aPar, this->hPar, this->imageFormat, this->outDataType);
-                
+
                 GDALClose(dataset[0]);
                 delete dnFilter;
                 delete[] dataset;
@@ -651,7 +664,7 @@ void RSGISExeFilterImages::runAlgorithm() throw(rsgis::RSGISException)
         else
         {
             std::cout << "Options not recognised\n";
-        }		
+        }
     }
 }
 
@@ -737,8 +750,8 @@ std::string RSGISExeFilterImages::getXMLSchema()
 
 RSGISExeFilterImages::~RSGISExeFilterImages()
 {
-    
+
 }
-    
+
 }
 
