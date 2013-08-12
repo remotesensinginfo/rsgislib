@@ -427,40 +427,40 @@ static PyMethodDef ImageUtilsMethods[] = {
 "Stretch\n"
 "call signature: imageutils.stretchImage(inputimage, outputimage, saveoutstats, outstatsfile, ignorezeros, onepasssd, gdalformat, outtype, stretchtype, stretchparam)\n"
 "where:\n"
-"  inputImage is a string containing the name of the input file\n"
-"  outputImage is a string containing the name of the output file\n"
-"  saveoutstats is a bool\n"
-"  outstatsfile is a string\n"
-"  ignorezeros is a bool\n"
-"  onepasssd is a bool\n"
-"  gdalformat is a string\n"
-"  outtype is a rsgislib.TYPE_* value\n"
-"  stretchtype is a STRETCH_* value\n"
-"  stretchparam is a float\n"},
+" * inputImage is a string containing the name of the input file\n"
+" * outputImage is a string containing the name of the output file\n"
+" * saveoutstats is a bool\n"
+" * outstatsfile is a string\n"
+" * ignorezeros is a bool\n"
+" * onepasssd is a bool\n"
+" * gdalformat is a string\n"
+" * outtype is a rsgislib.TYPE_* value\n"
+" * stretchtype is a STRETCH_* value\n"
+" * stretchparam is a float\n"},
 
     {"stretchImageWithStats", ImageUtils_StretchImageWithStats, METH_VARARGS, 
 "Stretch\n"
 "call signature: imageutils.stretchImageWithStats(inputimage, outputimage, instatsfile, gdalformat, outtype, stretchtype, stretchparam)\n"
 "where:\n"
-"  inputImage is a string containing the name of the input file\n"
-"  outputImage is a string containing the name of the output file\n"
-"  instatsfile is a string containing the name of the statistics file\n"
-"  gdalformat is a string\n"
-"  outtype is a rsgislib.TYPE_* value\n"
-"  stretchtype is a STRETCH_* value\n"
-"  stretchparam is a float\n"},
+" * inputImage is a string containing the name of the input file\n"
+" * outputImage is a string containing the name of the output file\n"
+" * instatsfile is a string containing the name of the statistics file\n"
+" * gdalformat is a string\n"
+" * outtype is a rsgislib.TYPE_* value\n"
+" * stretchtype is a STRETCH_* value\n"
+" * stretchparam is a float\n"},
 
     {"maskImage", ImageUtils_maskImage, METH_VARARGS,
 "Mask\n"
 "call signature: imageutils.maskImage(inputimage, imagemask, outputimage, gdalformat, type, outvalue, maskvalue)\n"
 "where:\n"
-"  inputImage is a string containing the name of the input file\n"
-"  imagemask is a string\n"
-"  outputimage is a string\n"
-"  gdalformat is a string\n"
-"  type is a rsgislib.TYPE_* value\n"
-"  outvalue is a float\n"
-"  maskvalue is a float\n"},
+" * inputImage is a string containing the name of the input file\n"
+" * imagemask is a string\n"
+" * outputimage is a string\n"
+" * gdalformat is a string\n"
+" * type is a rsgislib.TYPE_* value\n"
+" * outvalue is a float\n"
+" * maskvalue is a float\n"},
 
     {"createTiles", ImageUtils_createTiles, METH_VARARGS,
 "Create tiles from a larger image, useful for splitting a large image into multiple smaller ones for processing.\n"
