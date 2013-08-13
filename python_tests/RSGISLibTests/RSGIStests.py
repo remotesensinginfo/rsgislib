@@ -64,6 +64,8 @@ class RSGISTests:
         os.system('cp ./RATS/injune_p142_casi_sub_utm_segs.kea ./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_borlen.kea')
         os.system('cp ./RATS/injune_p142_casi_sub_utm_segs.kea ./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_borlen.kea')
         os.system('cp ./RATS/injune_p142_casi_sub_utm_segs.kea ./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_shape.kea')
+        os.system('cp ./Rasters/injune_p142_casi_sub_utm.kea ./TestOutputs/injune_p142_casi_sub_utm.kea')
+        
         os.system('cp ./RATS/injune_p142_casi_sub_utm_segs_nostats.kea ./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_nostats_addstats.kea')
     
     def checkDIRStructure(self):
@@ -445,6 +447,10 @@ class RSGISTests:
         dataType = rsgislib.TYPE_32FLOAT
         imageutils.createImageMosaic(inputList, outImage, backgroundVal, skipVal, skipBand, overlapBehaviour, format, dataType)
     
+    def testPopImageStats(self):
+        inputImage = './TestOutputs/injune_p142_casi_sub_utm.kea'
+        imageutils.popImageStats(inputImage,True,0.,True)
+
     def testPointValue2SHP(self):
         # Not all pixels are within image - should print warnings but pass test.
         print("PYTHON TEST: pointValues2SHP")
@@ -534,6 +540,7 @@ if __name__ == '__main__':
         """ ImageUtils functions """
         t.tryFuncAndCatch(t.testCreateTiles)
         t.tryFuncAndCatch(t.testCreateImageMosaic)
+        t.tryFuncAndCatch(t.testPopImageStats)
         
     if testLibraries == 'all' or testLibraries == 'rastergis':
     
