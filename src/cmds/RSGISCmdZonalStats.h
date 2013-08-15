@@ -49,6 +49,8 @@ namespace rsgis{ namespace cmds {
     void executePointValue(std::string inputImage, std::string inputVecPolys, std::string outputStatsFile, bool outputToText = false, bool force = false, bool useBandNames = true);
     /** Function to extract statistics for pixels falling within a polygon */
     void executePixelStats(std::string inputImage, std::string inputVecPolys, std::string outputStatsFile, RSGISBandAttZonalStatsCmds *calcStats, std::string inputRasPolys = "", bool outputToText = false, bool force = false, bool useBandNames = true);
+    /** Function to extract pixel values for each polygon and save to a seperate text file */
+    void executePointValue(std::string inputImage, std::string inputVecPolys, std::string outputTextBase, std::string polyAttribute, std::string outtxtform = "csv", bool ignoreProjection = false);
 }}
 
 
