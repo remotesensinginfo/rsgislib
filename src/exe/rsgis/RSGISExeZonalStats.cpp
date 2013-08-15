@@ -545,9 +545,9 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 		{
 			char *charValue = XMLString::transcode(argElement->getAttribute(outTXTStr));
 			string outStr = string(charValue);
-			if(outStr == "mtxt"){cout << "\tsaving to mtxt\n";this->outtxt = mtxt;}
-			else if(outStr == "gtxt"){cout << "\tsaving to gtxt\n";this->outtxt = gtxt;}
-			else if(outStr == "csv"){cout << "\tsaving to csv\n";this->outtxt = csv;}
+			if(outStr == "mtxt"){cout << "\tsaving to mtxt\n";this->outtxt = "mtxt";}
+			else if(outStr == "gtxt"){cout << "\tsaving to gtxt\n";this->outtxt = "gtxt";}
+			else if(outStr == "csv"){cout << "\tsaving to csv\n";this->outtxt = "csv";}
 			// Set to default value if not recognised.
 			else {this->outtxt = csv;}
 			XMLString::release(&charValue);
@@ -3040,101 +3040,15 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
             std::cout << "Pixel values to CSV \n";
             std::cout << "Input Image: " << this->inputImage << std::endl;
             std::cout << "Input Vector: " << this->inputVecPolys << std::endl;
-
-            // Convert to absolute path
-            this->inputVecPolys = boost::filesystem::absolute(this->inputVecPolys).c_str();
-
-			GDALAllRegister();
-			OGRRegisterAll();
-			RSGISMathsUtils mathsUtil;
-			RSGISFileUtils fileUtils;
-			RSGISVectorUtils vecUtils;
-
-			RSGISProcessVector *processVector = NULL;
-			RSGISProcessOGRFeature *processFeature = NULL;
-
-			string SHPFileInLayer = vecUtils.getLayerName(this->inputVecPolys);
-
-			GDALDataset *inputImageDS = NULL;
-			OGRDataSource *inputSHPDS = NULL;
-			OGRLayer *inputSHPLayer = NULL;
-			OGRSpatialReference* inputSpatialRef = NULL;
-
-			string outputDIR = "";
-
-			try
-			{
-
-				/////////////////////////////////////
-				//
-				// Open Input Image.
-				//
-				/////////////////////////////////////
-
-				inputImageDS = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_ReadOnly);
-				if(inputImageDS == NULL)
-				{
-					string message = string("Could not open image ") + this->inputImage;
-					throw RSGISException(message.c_str());
-				}
-
-				/////////////////////////////////////
-				//
-				// Open Input Shapfile.
-				//
-				/////////////////////////////////////
-				inputSHPDS = OGRSFDriverRegistrar::Open(this->inputVecPolys.c_str(), FALSE);
-				if(inputSHPDS == NULL)
-				{
-					string message = string("Could not open vector file ") + this->inputVecPolys;
-					throw RSGISException(message.c_str());
-				}
-				inputSHPLayer = inputSHPDS->GetLayerByName(SHPFileInLayer.c_str());
-				if(inputSHPLayer == NULL)
-				{
-					string message = string("Could not open vector layer ") + SHPFileInLayer;
-					throw RSGISException(message.c_str());
-				}
-
-				inputSpatialRef = inputSHPLayer->GetSpatialRef();
-
-                // Check the projection is the same for shapefile and image
-                if(!this->ignoreProjection)
-                {
-                    const char *pszWKTImg = inputImageDS->GetProjectionRef();
-                    char **pszWKTShp = new char*[1];
-                    inputSpatialRef->exportToWkt(pszWKTShp);
-
-                    if((string(pszWKTImg) != string(pszWKTShp[0])))
-                    {
-                        cerr << "WARNING: Shapefile and image are not the same projection!\n\tImage is: " + string(pszWKTImg) + "\n\tShapefile is: " + string(pszWKTShp[0]) << "\n...Continuing anyway" << endl;
-                    }
-                    OGRFree(pszWKTShp);
-                }
-
-                processFeature = new RSGISPixelVals22Txt(inputImageDS, this->outputMatrix, this->polyAttribute, this->outtxt, this->method);
-				processVector = new RSGISProcessVector(processFeature);
-
-				processVector->processVectorsNoOutput(inputSHPLayer, true);
-
-
-				// TIDY
-				delete processFeature;
-                delete processVector;
-
-                GDALClose(inputImageDS); // Close input image
-				cout << "Image closed OK" << endl;
-				OGRDataSource::DestroyDataSource(inputSHPDS); // Close inputshape
-				cout << "Shapefile closed OK" << endl;
-
-				//OGRCleanupAll();
-				//GDALDestroyDriverManager();
-			}
-			catch (RSGISException& e)
-			{
-				throw e;
-			}
-
+            
+            try
+            {
+                rsgis::cmds::executePointValue(this->inputImage, this->inputVecPolys, this->outputMatrix,  this->polyAttribute, this->outtxt, this->ignoreProjection);
+            }
+            catch(rsgis::cmds::RSGISCmdException &e)
+            {
+                throw RSGISException(e.what());
+            }
 
 
 		}

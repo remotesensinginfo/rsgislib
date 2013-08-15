@@ -140,7 +140,7 @@ class RSGISExeZonalStats : public RSGISAlgorithmParameters
 		bool copyAttributes;
 		bool dB;
         rsgis::img::pixelInPolyOption method;
-		outTXTform outtxt;
+        std::string outtxt;
 		bool outputToText;
 		bool calcZonalAllBands;
 		bool minAll;

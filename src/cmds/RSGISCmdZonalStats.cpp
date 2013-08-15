@@ -28,9 +28,12 @@
 #include "common/RSGISVectorException.h"
 #include "common/RSGISException.h"
 
+#include "math/RSGISMatrices.h"
+
 #include "img/RSGISPixelInPoly.h"
 
 #include "vec/RSGISVectorZonalStats.h"
+#include "vec/RSGISZonalStats2Matrix.h"
 #include "vec/RSGISProcessVector.h"
 #include "vec/RSGISZonalStats.h"
 
@@ -226,7 +229,7 @@ namespace rsgis{ namespace cmds {
         std::cout << "minThreshAllVal = " << minThreshAllVal << std::endl;
         
         // Ignore projection by default (just print a warning and hope people read it)
-        bool ignoreProjection = true;
+        bool ignoreProjection = false;
         
         // Copy attributes to shapefile be default
         bool copyAttributes = true;
@@ -486,6 +489,111 @@ namespace rsgis{ namespace cmds {
         catch(std::exception& e)
         {
             throw RSGISCmdException(e.what());
+        }
+    }
+    
+    void executePointValue(std::string inputImage, std::string inputVecPolys, std::string outputTextBase, std::string polyAttribute, std::string outtxtform, bool ignoreProjection)
+    {
+        // Convert to absolute path
+        inputVecPolys = boost::filesystem::absolute(inputVecPolys).c_str();
+
+        rsgis::math::outTXTform  rOutTextForm = rsgis::math::csv;
+        if(outtxtform == "mtxt"){rOutTextForm = rsgis::math::mtxt;}
+        else if(outtxtform == "gtxt"){rOutTextForm = rsgis::math::gtxt;}
+        
+        
+        // Set pixel in poly method to pixel contains centre
+        rsgis::img::pixelInPolyOption pixelInPolyMethod = rsgis::img::pixelContainsPolyCenter;
+        
+        GDALAllRegister();
+        OGRRegisterAll();
+        rsgis::math::RSGISMathsUtils mathsUtil;
+        rsgis::utils::RSGISFileUtils fileUtils;
+        rsgis::vec::RSGISVectorUtils vecUtils;
+        
+        rsgis::vec::RSGISProcessVector *processVector = NULL;
+        rsgis::vec::RSGISProcessOGRFeature *processFeature = NULL;
+        
+        std::string SHPFileInLayer = vecUtils.getLayerName(inputVecPolys);
+        
+        GDALDataset *inputImageDS = NULL;
+        OGRDataSource *inputSHPDS = NULL;
+        OGRLayer *inputSHPLayer = NULL;
+        OGRSpatialReference* inputSpatialRef = NULL;
+        
+        std::string outputDIR = "";
+        
+        try
+        {
+            
+            /////////////////////////////////////
+            //
+            // Open Input Image.
+            //
+            /////////////////////////////////////
+            
+            inputImageDS = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_ReadOnly);
+            if(inputImageDS == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputImage;
+                throw rsgis::RSGISException(message.c_str());
+            }
+            
+            /////////////////////////////////////
+            //
+            // Open Input Shapfile.
+            //
+            /////////////////////////////////////
+            inputSHPDS = OGRSFDriverRegistrar::Open(inputVecPolys.c_str(), FALSE);
+            if(inputSHPDS == NULL)
+            {
+                std::string message = std::string("Could not open vector file ") + inputVecPolys;
+                throw rsgis::RSGISException(message.c_str());
+            }
+            inputSHPLayer = inputSHPDS->GetLayerByName(SHPFileInLayer.c_str());
+            if(inputSHPLayer == NULL)
+            {
+                std::string message = std::string("Could not open vector layer ") + SHPFileInLayer;
+                throw RSGISException(message.c_str());
+            }
+            
+            inputSpatialRef = inputSHPLayer->GetSpatialRef();
+            
+            // Check the projection is the same for shapefile and image
+            if(!ignoreProjection)
+            {
+                const char *pszWKTImg = inputImageDS->GetProjectionRef();
+                char **pszWKTShp = new char*[1];
+                inputSpatialRef->exportToWkt(pszWKTShp);
+                
+                if((std::string(pszWKTImg) != std::string(pszWKTShp[0])))
+                {
+                    std::cerr << "WARNING: Shapefile and image are not the same projection!\n\tImage is: " + std::string(pszWKTImg) + "\n\tShapefile is: " + std::string(pszWKTShp[0]) << "\n...Continuing anyway" << std::endl;
+                }
+                OGRFree(pszWKTShp);
+            }
+            
+            processFeature = new rsgis::vec::RSGISPixelVals22Txt(inputImageDS, outputTextBase, polyAttribute, rOutTextForm, pixelInPolyMethod);
+            processVector = new rsgis::vec::RSGISProcessVector(processFeature);
+            
+            processVector->processVectorsNoOutput(inputSHPLayer, true);
+            
+            
+            // TIDY
+            delete processFeature;
+            delete processVector;
+            
+            GDALClose(inputImageDS); // Close input image
+            std::cout << "Image closed OK" << std::endl;
+            OGRDataSource::DestroyDataSource(inputSHPDS); // Close inputshape
+            std::cout << "Shapefile closed OK" << std::endl;
+            
+            //OGRCleanupAll();
+            //GDALDestroyDriverManager();
+        }
+        catch (RSGISException& e)
+        {
+            throw e;
         }
     }
 }}
