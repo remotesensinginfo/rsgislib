@@ -41,8 +41,14 @@ path = os.sys.path[0] + '/'
 inFileName = os.path.join(path,"Rasters","injune_p142_casi_sub_utm.kea")
 
 class RSGISTests:
-    numTests = 0
-    failures = []
+
+    def __init__(self):
+        self.numTests = 0
+        self.failures = []
+        self.testOutputsDIR = os.path.join(path,'TestOutputs')
+        self.testRasterGISDIR = os.path.join(path,'TestOutputs','RasterGIS')
+        self.testTilesDIR = os.path.join(path,'TestOutputs','Tiles')
+        self.testZonalTXTDIR = os.path.join(path,'TestOutputs','ZonalTXT')
 
     def tryFuncAndCatch(self, function):
         self.numTests += 1
@@ -71,21 +77,25 @@ class RSGISTests:
     def checkDIRStructure(self):
         """ Create directory and sub directories for test
             outputs, if they don't already exist.  """
-        testOutputsDIR = os.path.join(path,'TestOutputs')
-        if os.path.isdir(testOutputsDIR) == False:
-            os.mkdir(testOutputsDIR)
+        if os.path.isdir(self.testOutputsDIR) == False:
+            os.mkdir(self.testOutputsDIR)
 
-        testRasterGISDIR = os.path.join(path,'TestOutputs','RasterGIS')
-        if os.path.isdir(testRasterGISDIR) == False:
-            os.mkdir(testRasterGISDIR)
+        if os.path.isdir(self.testRasterGISDIR) == False:
+            os.mkdir(self.testRasterGISDIR)
             
-        testTilesDIR = os.path.join(path,'TestOutputs','Tiles')
-        if os.path.isdir(testTilesDIR) == False:
-            os.mkdir(testTilesDIR)
+        if os.path.isdir(self.testTilesDIR) == False:
+            os.mkdir(self.testTilesDIR)
     
-        testZonalTXTDIR = os.path.join(path,'TestOutputs','ZonalTXT')
-        if os.path.isdir(testZonalTXTDIR) == False:
-            os.mkdir(testZonalTXTDIR)
+        if os.path.isdir(self.testZonalTXTDIR) == False:
+            os.mkdir(self.testZonalTXTDIR)
+
+    def removeTestFiles(self):
+        """ Removes all files in test directory """
+        print('Removing test files')
+        os.system('rm ' + self.testOutputsDIR + '/* 2> /dev/null')
+        os.system('rm ' + self.testRasterGISDIR + '/* 2> /dev/null')
+        os.system('rm ' + self.testTilesDIR + '/* 2> /dev/null')
+        os.system('rm ' + self.testZonalTXTDIR + '/* 2> /dev/null')
 
     def testNormalise1(self):
         print("PYTHON TEST: Testing normalisation no in calc")
@@ -498,13 +508,16 @@ class RSGISTests:
 
 if __name__ == '__main__':
 
+    t = RSGISTests()
+
     # Get libraries to test (defaults to all)
     testLibraries = 'all'
     
     if len(sys.argv) >= 2:
         testLibraries = sys.argv[1].lower()
-
-    t = RSGISTests()
+        if testLibraries == 'clean':
+            t.removeTestFiles()
+            sys.exit()
     
     """ Check directory structure and copy Data """
     t.checkDIRStructure()
