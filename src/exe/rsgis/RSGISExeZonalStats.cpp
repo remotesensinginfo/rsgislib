@@ -3040,10 +3040,11 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
             std::cout << "Pixel values to CSV \n";
             std::cout << "Input Image: " << this->inputImage << std::endl;
             std::cout << "Input Vector: " << this->inputVecPolys << std::endl;
-            
+
             try
             {
-                rsgis::cmds::executePointValue(this->inputImage, this->inputVecPolys, this->outputMatrix,  this->polyAttribute, this->outtxt, this->ignoreProjection);
+                rsgis::cmds::executePixelVals2txt(this->inputImage, this->inputVecPolys, this->outputMatrix,  this->polyAttribute,
+                                                  this->outtxt, this->ignoreProjection, rsgis::img::pixelInPolyEnum2Int(this->method));
             }
             catch(rsgis::cmds::RSGISCmdException &e)
             {

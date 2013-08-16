@@ -74,6 +74,7 @@ class RSGISTests:
         testOutputsDIR = os.path.join(path,'TestOutputs')
         if os.path.isdir(testOutputsDIR) == False:
             os.mkdir(testOutputsDIR)
+
         testRasterGISDIR = os.path.join(path,'TestOutputs','RasterGIS')
         if os.path.isdir(testRasterGISDIR) == False:
             os.mkdir(testRasterGISDIR)
@@ -82,6 +83,10 @@ class RSGISTests:
         if os.path.isdir(testTilesDIR) == False:
             os.mkdir(testTilesDIR)
     
+        testZonalTXTDIR = os.path.join(path,'TestOutputs','ZonalTXT')
+        if os.path.isdir(testZonalTXTDIR) == False:
+            os.mkdir(testZonalTXTDIR)
+
     def testNormalise1(self):
         print("PYTHON TEST: Testing normalisation no in calc")
         inImages = [inFileName];
@@ -467,21 +472,29 @@ class RSGISTests:
         outputTxt = './TestOutputs/injune_p142_stem_locations_stats_txt.csv'
         zonalstats.pointValue2TXT(inputImage, inputVector, outputTxt, True)
         
-    def pixelStats2SHP(self):
-        print("PYTHON TEST: pixelValue2SHP")
+    def testPixelStats2SHP(self):
+        print("PYTHON TEST: pixelStats2SHP")
         inputImage = './Rasters/injune_p142_casi_sub_utm.kea'
         inputVector = './Vectors/injune_p142_crowns_utm.shp'
         outputVector = './TestOutputs/injune_p142_casi_sub_utm_stats.shp'
         zonalattributes = zonalstats.ZonalAttributes(minThreshold=0, maxThreshold=10000, calcCount=True, calcMin=True, calcMax=True, calcMean=True, calcStdDev=True, calcMode=False, calcSum=True)
-        zonalstats.pixelStats2SHP(inputImage, inputVector, outputVector, zonalattributes, True, True)
+        zonalstats.pixelStats2SHP(inputImage, inputVector, outputVector, zonalattributes, True, True, zonalstats.METHOD_POLYCONTAINSPIXELCENTER)
     
-    def pixelStats2TXT(self):
-        print("PYTHON TEST: pixelValue2TXT")
+    def testPixelStats2TXT(self):
+        print("PYTHON TEST: pixelStats2TXT")
         inputImage = './Rasters/injune_p142_casi_sub_utm.kea'
         inputVector = './Vectors/injune_p142_crowns_utm.shp'
         outputTxt = './TestOutputs/injune_p142_casi_sub_utm_stats_txt.csv'
         zonalattributes = zonalstats.ZonalAttributes(minThreshold=0, maxThreshold=10000, calcCount=True, calcMin=True, calcMax=True, calcMean=True, calcStdDev=True, calcMode=False, calcSum=True)
-        zonalstats.pixelStats2TXT(inputImage, inputVector, outputTxt, zonalattributes, True)
+        zonalstats.pixelStats2TXT(inputImage, inputVector, outputTxt, zonalattributes, True, zonalstats.METHOD_POLYCONTAINSPIXELCENTER)
+    
+    def testPixelVals2TXT(self):
+        print("PYTHON TEST: pixelVals2TXT")
+        inputImage = './Rasters/injune_p142_casi_sub_utm.kea'
+        inputVector = './Vectors/injune_p142_crowns_utm.shp'
+        outputTxtBase = './TestOutputs/ZonalTXT/injune_p142_casi_sub_utm_txt'
+        zonalstats.pixelVals2TXT(inputImage, inputVector, outputTxtBase, 'FID',zonalstats.METHOD_POLYCONTAINSPIXELCENTER)
+
 
 if __name__ == '__main__':
 
@@ -566,10 +579,9 @@ if __name__ == '__main__':
         """ Zonal Stats functions """
         t.tryFuncAndCatch(t.testPointValue2SHP)
         t.tryFuncAndCatch(t.testPointValue2TXT)
-        t.tryFuncAndCatch(t.pixelStats2SHP)
-        t.tryFuncAndCatch(t.pixelStats2TXT)
-    
-
+        t.tryFuncAndCatch(t.testPixelStats2SHP)
+        t.tryFuncAndCatch(t.testPixelStats2TXT)
+        t.tryFuncAndCatch(t.testPixelVals2TXT)
     
     print("%s TESTS COMPLETED - %s FAILURES LISTED BELOW:"%(t.numTests, len(t.failures)))
     if(len(t.failures)):

@@ -41,22 +41,22 @@
 namespace rsgis{ namespace cmds {
 
     void executePointValue(std::string inputImage, std::string inputVecPolys, std::string outputStatsFile, bool outputToText, bool force, bool useBandNames)
-    {        
+    {
         // Convert to absolute path
         inputVecPolys = boost::filesystem::absolute(inputVecPolys).c_str();
-        
+
         GDALAllRegister();
         OGRRegisterAll();
-        
+
         rsgis::utils::RSGISFileUtils fileUtils;
         rsgis::vec::RSGISVectorUtils vecUtils;
-        
+
         rsgis::vec::RSGISProcessVector *processVector = NULL;
         rsgis::vec::RSGISProcessOGRFeature *processFeature = NULL;
-        
+
         std::string SHPFileInLayer = vecUtils.getLayerName(inputVecPolys);
         std::string SHPFileOutLayer = "";
-        
+
         GDALDataset *inputImageDS = NULL;
         OGRDataSource *inputSHPDS = NULL;
         OGRLayer *inputSHPLayer = NULL;
@@ -64,16 +64,16 @@ namespace rsgis{ namespace cmds {
         OGRDataSource *outputSHPDS = NULL;
         OGRLayer *outputSHPLayer = NULL;
         OGRSpatialReference* inputSpatialRef = NULL;
-        
+
         std::string outputDIR = "";
-        
+
         try
         {
             if (!outputToText)
             {
                 SHPFileOutLayer = vecUtils.getLayerName(outputStatsFile);
                 outputDIR = fileUtils.getFileDirectoryPath(outputStatsFile);
-                
+
                 if(vecUtils.checkDIR4SHP(outputDIR, SHPFileOutLayer))
                 {
                     if(force)
@@ -86,7 +86,7 @@ namespace rsgis{ namespace cmds {
                     }
                 }
             }
-            
+
             /////////////////////////////////////
             //
             // Open Input Image.
@@ -98,7 +98,7 @@ namespace rsgis{ namespace cmds {
                 std::string message = std::string("Could not open image ") + inputImage;
                 throw RSGISException(message.c_str());
             }
-            
+
             /////////////////////////////////////
             //
             // Open Input Shapfile.
@@ -116,13 +116,13 @@ namespace rsgis{ namespace cmds {
                 std::string message = std::string("Could not open vector layer ") + SHPFileInLayer;
                 throw RSGISException(message.c_str());
             }
-            
+
             inputSpatialRef = inputSHPLayer->GetSpatialRef();
-            
+
             OGRFeature *feature = inputSHPLayer->GetFeature(1);
             OGRwkbGeometryType geometryType = feature->GetGeometryRef()->getGeometryType();
             OGRFeature::DestroyFeature(feature);
-            
+
             /////////////////////////////////////
             //
             // Create Output Shapfile.
@@ -148,36 +148,36 @@ namespace rsgis{ namespace cmds {
                     std::string message = std::string("Could not create vector layer ") + SHPFileOutLayer;
                     throw RSGISException(message.c_str());
                 }
-                
+
                 processFeature = new rsgis::vec::RSGISVectorZonalStats(inputImageDS,"",useBandNames);
                 processVector = new rsgis::vec::RSGISProcessVector(processFeature);
-                
+
                 processVector->processVectors(inputSHPLayer, outputSHPLayer, true, true, false);
                 OGRDataSource::DestroyDataSource(outputSHPDS);
-                
+
                 delete processVector;
                 delete processFeature;
             }
-            
+
             else
             {
-                
+
                 processFeature = new rsgis::vec::RSGISVectorZonalStats(inputImageDS, outputStatsFile, useBandNames);
                 processVector = new rsgis::vec::RSGISProcessVector(processFeature);
-                
+
                 processVector->processVectorsNoOutput(inputSHPLayer, true);
-                
+
                 delete processVector;
                 delete processFeature;
-                
+
             }
-            
+
             GDALClose(inputImageDS);
             OGRDataSource::DestroyDataSource(inputSHPDS);
-            
+
             //OGRCleanupAll();
             //GDALDestroyDriverManager();
-            
+
         }
         catch(RSGISException& e)
         {
@@ -188,22 +188,23 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
-    
-    void executePixelStats(std::string inputImage, std::string inputVecPolys, std::string outputStatsFile, rsgis::cmds::RSGISBandAttZonalStatsCmds *calcStats, std::string inputRasPolys, bool outputToText, bool force, bool useBandNames)
+
+    void executePixelStats(std::string inputImage, std::string inputVecPolys, std::string outputStatsFile, rsgis::cmds::RSGISBandAttZonalStatsCmds *calcStats,
+                           std::string inputRasPolys, bool outputToText, bool force, bool useBandNames, int pixelInPolyMethodInt)
     {
-        
+
         // Convert to absolute path
         inputVecPolys = boost::filesystem::absolute(inputVecPolys).c_str();
-        
-        // Set pixel in poly method to pixel contains centre
-        rsgis::img::pixelInPolyOption pixelInPolyMethod = rsgis::img::pixelContainsPolyCenter;
-        
+
+        // Convert from int to enum
+        rsgis::img::pixelInPolyOption pixelInPolyMethod = rsgis::img::pixelInPolyInt2Enum(pixelInPolyMethodInt);
+
         // Check for raster version of polygon
         bool useRasPoly = false;
         if(inputRasPolys != ""){useRasPoly = false;}
-        
+
         unsigned int numAttributes = 0; // Number of attributes (bands)
-        
+
         // Calculate the same statistics for all bands
 		bool minAll = calcStats->calcMin;
 		bool maxAll = calcStats->calcMax;
@@ -215,7 +216,7 @@ namespace rsgis{ namespace cmds {
         bool pxlcount = true;
 		double minThreshAllVal = calcStats->minThreshold;
 		double maxThreshAllVal = calcStats->maxThreshold;
-        
+
         std::cout << "Calculating: ";
         if(minAll){std::cout << "min, ";}
         if(maxAll){std::cout << "max, ";}
@@ -225,12 +226,12 @@ namespace rsgis{ namespace cmds {
         if(countAll){std::cout << "cont, ";}
         std::cout << "for pixels with values between " << minThreshAllVal << " and " << maxThreshAllVal << "." << std::endl;
         std::cout << "and pixelcount for all pixels in polygon." << std::endl;
-        
+
         std::cout << "minThreshAllVal = " << minThreshAllVal << std::endl;
-        
+
         // Ignore projection by default (just print a warning and hope people read it)
         bool ignoreProjection = false;
-        
+
         // Copy attributes to shapefile be default
         bool copyAttributes = true;
 
@@ -262,7 +263,7 @@ namespace rsgis{ namespace cmds {
         try
         {
             outputDIR = fileUtils.getFileDirectoryPath(outputStatsFile);
-            
+
             // Check is output shapefile exists
             if (!outputToText)
             {
@@ -278,21 +279,21 @@ namespace rsgis{ namespace cmds {
                     }
                 }
             }
-            
+
             /////////////////////////////////////
             //
             // Open Input Image.
             //
             /////////////////////////////////////
-            
+
             inputImageDS = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_ReadOnly);
             if(inputImageDS == NULL)
             {
                 std::string message = std::string("Could not open image ") + inputImage;
                 throw rsgis::RSGISException(message.c_str());
             }
-            
-            
+
+
             // Set up attributes if using all bands
             unsigned int nImageBands = inputImageDS->GetRasterCount();
             std::cout << "Calculating stats for " << nImageBands << " bands." << std::endl;
@@ -317,12 +318,12 @@ namespace rsgis{ namespace cmds {
                 attributeZonalList[i]->bands[0] = i;
                 attributeZonalList[i]->minThresholds[0] = minThreshAllVal;
                 attributeZonalList[i]->maxThresholds[0] = maxThreshAllVal;
-                
+
                 // If using band names get names from image
                 if(useBandNames)
                 {
                     std::string bandName = inputImageDS->GetRasterBand(i+1)->GetDescription();
-                    
+
                     // Replace spaces and parentheses in file name
                     boost::algorithm::replace_all(bandName, " ", "_");
                     boost::algorithm::replace_all(bandName, "(", "_");
@@ -334,7 +335,7 @@ namespace rsgis{ namespace cmds {
                     boost::algorithm::replace_all(bandName, ">", "gt");
                     boost::algorithm::replace_all(bandName, "<", "lt");
                     boost::algorithm::replace_all(bandName, "=", "eq");
-                    
+
                     /* Check if band name us longer than maximum length for shapefile field name
                      No limit on CSV but makes management easier with shorter names */
                     if(bandName.length() > 7)
@@ -350,13 +351,13 @@ namespace rsgis{ namespace cmds {
                     }
                     else{attributeZonalList[i]->name = bandName;}
                 }
-                
+
                 else
                 {
                     attributeZonalList[i]->name = std::string("b") + mathsUtil.inttostring(i+1);
                 }
             }
-            
+
             if (useRasPoly)
             {
                 /////////////////////////////////////
@@ -370,10 +371,10 @@ namespace rsgis{ namespace cmds {
                     std::string message = std::string("Could not open image ") + inputRasPolys;
                     throw RSGISException(message.c_str());
                 }
-                
+
                 std::cout << "Using raster for point in polygon...\n";
             }
-            
+
             /////////////////////////////////////
             //
             // Open Input Shapfile.
@@ -391,23 +392,23 @@ namespace rsgis{ namespace cmds {
                 std::string message = std::string("Could not open vector layer ") + SHPFileInLayer;
                 throw RSGISException(message.c_str());
             }
-            
+
             inputSpatialRef = inputSHPLayer->GetSpatialRef();
-            
+
             // Check the projection is the same for shapefile and image
             if(!ignoreProjection)
             {
                 const char *pszWKTImg = inputImageDS->GetProjectionRef();
                 char **pszWKTShp = new char*[1];
                 inputSpatialRef->exportToWkt(pszWKTShp);
-                
+
                 if((std::string(pszWKTImg) != std::string(pszWKTShp[0])))
                 {
                     std::cerr << "WARNING: Shapefile and image are not the same projection!\n\tImage is: " + std::string(pszWKTImg) + "\n\tShapefile is: " + std::string(pszWKTShp[0]) << "\n...Continuing anyway" << std::endl;
                 }
                 OGRFree(pszWKTShp);
             }
-            
+
             if(!outputToText)
             {
                 /////////////////////////////////////
@@ -433,9 +434,9 @@ namespace rsgis{ namespace cmds {
                     std::string message = std::string("Could not create vector layer ") + SHPFileOutLayer;
                     throw RSGISException(message.c_str());
                 }
-                
+
             }
-            
+
             if(useRasPoly)
             {
                 processFeature = new rsgis::vec::RSGISZonalStats(inputImageDS, inputRasterFeaturesDS, attributeZonalList, numAttributes, pxlcount, outputStatsFile);
@@ -454,8 +455,8 @@ namespace rsgis{ namespace cmds {
             {
                 processVector->processVectors(inputSHPLayer, outputSHPLayer, copyAttributes, true, false);
             }
-            
-            
+
+
             // TIDY
             GDALClose(inputImageDS); // Close input image
             std::cout << "Image closed OK" << std::endl;
@@ -475,10 +476,10 @@ namespace rsgis{ namespace cmds {
                 delete attributeZonalList[i];
             }
             delete[] attributeZonalList;
-            
+
             delete processVector;
             delete processFeature;
-            
+
             //OGRCleanupAll();
             //GDALDestroyDriverManager();
     }
@@ -491,8 +492,9 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
-    
-    void executePointValue(std::string inputImage, std::string inputVecPolys, std::string outputTextBase, std::string polyAttribute, std::string outtxtform, bool ignoreProjection)
+
+    void executePixelVals2txt(std::string inputImage, std::string inputVecPolys, std::string outputTextBase, std::string polyAttribute, std::string outtxtform,
+                              bool ignoreProjection, int pixelInPolyMethodInt)
     {
         // Convert to absolute path
         inputVecPolys = boost::filesystem::absolute(inputVecPolys).c_str();
@@ -500,45 +502,43 @@ namespace rsgis{ namespace cmds {
         rsgis::math::outTXTform  rOutTextForm = rsgis::math::csv;
         if(outtxtform == "mtxt"){rOutTextForm = rsgis::math::mtxt;}
         else if(outtxtform == "gtxt"){rOutTextForm = rsgis::math::gtxt;}
-        
-        
-        // Set pixel in poly method to pixel contains centre
-        rsgis::img::pixelInPolyOption pixelInPolyMethod = rsgis::img::pixelContainsPolyCenter;
-        
+
+        rsgis::img::pixelInPolyOption pixelInPolyMethod = rsgis::img::pixelInPolyInt2Enum(pixelInPolyMethodInt);
+
         GDALAllRegister();
         OGRRegisterAll();
         rsgis::math::RSGISMathsUtils mathsUtil;
         rsgis::utils::RSGISFileUtils fileUtils;
         rsgis::vec::RSGISVectorUtils vecUtils;
-        
+
         rsgis::vec::RSGISProcessVector *processVector = NULL;
         rsgis::vec::RSGISProcessOGRFeature *processFeature = NULL;
-        
+
         std::string SHPFileInLayer = vecUtils.getLayerName(inputVecPolys);
-        
+
         GDALDataset *inputImageDS = NULL;
         OGRDataSource *inputSHPDS = NULL;
         OGRLayer *inputSHPLayer = NULL;
         OGRSpatialReference* inputSpatialRef = NULL;
-        
+
         std::string outputDIR = "";
-        
+
         try
         {
-            
+
             /////////////////////////////////////
             //
             // Open Input Image.
             //
             /////////////////////////////////////
-            
+
             inputImageDS = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_ReadOnly);
             if(inputImageDS == NULL)
             {
                 std::string message = std::string("Could not open image ") + inputImage;
                 throw rsgis::RSGISException(message.c_str());
             }
-            
+
             /////////////////////////////////////
             //
             // Open Input Shapfile.
@@ -556,38 +556,38 @@ namespace rsgis{ namespace cmds {
                 std::string message = std::string("Could not open vector layer ") + SHPFileInLayer;
                 throw RSGISException(message.c_str());
             }
-            
+
             inputSpatialRef = inputSHPLayer->GetSpatialRef();
-            
+
             // Check the projection is the same for shapefile and image
             if(!ignoreProjection)
             {
                 const char *pszWKTImg = inputImageDS->GetProjectionRef();
                 char **pszWKTShp = new char*[1];
                 inputSpatialRef->exportToWkt(pszWKTShp);
-                
+
                 if((std::string(pszWKTImg) != std::string(pszWKTShp[0])))
                 {
                     std::cerr << "WARNING: Shapefile and image are not the same projection!\n\tImage is: " + std::string(pszWKTImg) + "\n\tShapefile is: " + std::string(pszWKTShp[0]) << "\n...Continuing anyway" << std::endl;
                 }
                 OGRFree(pszWKTShp);
             }
-            
+
             processFeature = new rsgis::vec::RSGISPixelVals22Txt(inputImageDS, outputTextBase, polyAttribute, rOutTextForm, pixelInPolyMethod);
             processVector = new rsgis::vec::RSGISProcessVector(processFeature);
-            
+
             processVector->processVectorsNoOutput(inputSHPLayer, true);
-            
-            
+
+
             // TIDY
             delete processFeature;
             delete processVector;
-            
+
             GDALClose(inputImageDS); // Close input image
             std::cout << "Image closed OK" << std::endl;
             OGRDataSource::DestroyDataSource(inputSHPDS); // Close inputshape
             std::cout << "Shapefile closed OK" << std::endl;
-            
+
             //OGRCleanupAll();
             //GDALDestroyDriverManager();
         }
