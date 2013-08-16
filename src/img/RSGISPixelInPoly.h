@@ -5,7 +5,7 @@
  *  Created by Daniel Clewley on 05/03/2010.
  *  Copyright 2010 RSGISLib. All rights reserved.
  *  This file is part of RSGISLib.
- * 
+ *
  *  RSGISLib is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -30,8 +30,8 @@
 #include "common/RSGISVectorException.h"
 
 namespace rsgis{namespace img {
-	
-	enum pixelInPolyOption 
+
+	enum pixelInPolyOption
 	{
 		polyContainsPixel, /// Polygon completely contains pixel
 		polyContainsPixelCenter, /// Pixel center is within the polygon
@@ -44,8 +44,8 @@ namespace rsgis{namespace img {
 		pixelAreaInPoly, /// Percent of pixel area that is within the polygon
 		polyAreaInPixel /// Percent of polygon area that is within pixel
 	};
-	
-	class RSGISPixelInPoly 
+
+	class RSGISPixelInPoly
 	{
 	public:
 		RSGISPixelInPoly(pixelInPolyOption method);
@@ -55,7 +55,10 @@ namespace rsgis{namespace img {
 		pixelInPolyOption method;
 		OGRPolygon *polyOGRPoly;
 	};
-	
+	/** Convert pixel in poly enum to int*/
+	int pixelInPolyEnum2Int(pixelInPolyOption enumMethod);
+	/** Convert pixel in poly int to enum */
+	pixelInPolyOption pixelInPolyInt2Enum(int intMethod);
 }}
 
 #endif
