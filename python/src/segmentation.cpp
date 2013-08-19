@@ -303,6 +303,28 @@ static PyObject *Segmentation_mergeSegmentationTiles(PyObject *self, PyObject *a
 }
 
 
+static PyObject *Segmentation_rmSmallClumps(PyObject *self, PyObject *args)
+{
+    const char *pszInputClumps, *pszOutputClumps, *pszGDALFormat;
+    float areaThreshold;
+    PyObject *pNoData; //could be none or a number
+    if( !PyArg_ParseTuple(args, "ssfs:rmSmallClumps", &pszInputClumps, &pszOutputClumps, &areaThreshold, &pszGDALFormat))
+        return NULL;
+    
+    try
+    {
+        rsgis::cmds::executeRMSmallClumps(pszInputClumps, pszOutputClumps, areaThreshold, pszGDALFormat);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
+
 
 
 // Our list of functions in this module
@@ -383,6 +405,15 @@ static PyMethodDef SegmentationMethods[] = {
 "  tilebody is an unsigned integer containing the tile body pixel value\n"
 "  colsname is a string containing the name of the object id column\n"
 "  inputimagepaths is a list of input image paths\n"},
+
+    {"rmSmallClumps", Segmentation_rmSmallClumps, METH_VARARGS,
+"segmentation.rmSmallClumps(clumpsImage, outputImage, threshold, gdalFormat)\n"
+"A function to remove small clumps and set them with a value of 0 (i.e., no data) \n"
+"where:\n"
+"  clumpsImage is a string containing the name of the input clumps file - note a column called \'Histogram\'.\n"
+"  outputImage is a string containing the name of the output clumps file\n"
+"  threshold is a float containing the area threshold (in pixels)\n"
+"  gdalFormat is a string defining the format of the output image.\n"},
 
     {NULL}        /* Sentinel */
 };

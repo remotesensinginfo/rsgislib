@@ -1024,8 +1024,9 @@ namespace rsgis{ namespace cmds {
         } catch (rsgis::RSGISException &e) {
             throw RSGISCmdException(e.what());
         }
-
     }
+    
+    
 
 }}
 

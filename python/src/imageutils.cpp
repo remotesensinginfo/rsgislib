@@ -424,9 +424,9 @@ static PyMethodDef ImageUtilsMethods[] = {
     {"assignProj", ImageUtils_AssignProj, METH_VARARGS,
 "rsgislib.imageutils.assignProj(inputImage, wktString, wktStringFile)\n"
 "Assign a projection to the input GDAL image file.\n"
-"  * inputImage is a string containing the name of the input file\n"
-"  * wktString is the wkt string to be assigned to the image. If None then it will be read from the wktStringFile.\n"
-"  * wktStringFile is a file path to a text file containing the WKT string to be assigned. This is ignored if wktString is not None.\n"},
+"   *  inputImage is a string containing the name of the input file\n"
+"   *  wktString is the wkt string to be assigned to the image. If None then it will be read from the wktStringFile.\n"
+"   *  wktStringFile is a file path to a text file containing the WKT string to be assigned. This is ignored if wktString is not None.\n"},
     
     {"copyProjFromImage", ImageUtils_CopyProjFromImage, METH_VARARGS,
 "rsgislib.imageutils.copyProjFromImage(inputImage, refImage)\n"

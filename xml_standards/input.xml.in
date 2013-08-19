@@ -522,6 +522,8 @@
         <rsgis:class name="string" stddevthres="float" changeval="int" />
         <rsgis:class name="string" stddevthres="float" changeval="int" />
     </rsgis:command>
+	<!-- A command remove clumps with a size below a threshold and assign to the background value (i.e., 0).-->
+	<rsgis:command algor="rastergis" option="rmsmallclumps" clumps="clumps.kea" output="clumps.kea" threshold="int" format="GDAL Format" />
 
 
 
