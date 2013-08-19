@@ -79,7 +79,10 @@ namespace rsgis{ namespace cmds {
     
     /** Function to run command to merge clump image */
     void executeExtractBrightFeatures(std::string inputImage, std::string maskImage, std::string outputImage, std::string temp1Image, std::string temp2Image, std::string outputFormat, float initThres, float thresIncrement, float thresholdUpper, std::vector<rsgis::cmds::FeatureShapeDescription*> shapeFeatDescript)throw(RSGISCmdException);
-
+    
+    /** Function to remove small clumps */
+    void executeRMSmallClumps(std::string clumpsImage, std::string outputImage, float threshold, std::string imgFormat)throw(RSGISCmdException);
+    
 }}
 
 

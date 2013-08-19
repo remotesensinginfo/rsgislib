@@ -40,6 +40,8 @@
 #include "segmentation/RSGISMergeSegmentationTiles.h"
 #include "segmentation/RSGISBottomUpShapeFeatureExtraction.h"
 
+#include "rastergis/RSGISRasterAttUtils.h"
+
 namespace rsgis{ namespace cmds {
     
     void executeLabelPixelsFromClusterCentres(std::string inputImage, std::string outputImage, std::string clusterCentresFile, bool ignoreZeros, std::string imageFormat)throw(RSGISCmdException)
@@ -673,6 +675,51 @@ namespace rsgis{ namespace cmds {
         catch (std::exception &e)
         {
             throw rsgis::cmds::RSGISCmdException(e.what());
+        }
+    }
+    
+    void executeRMSmallClumps(std::string clumpsImage, std::string outputImage, float threshold, std::string imgFormat)throw(RSGISCmdException)
+    {
+        GDALAllRegister();
+        GDALDataset *clumpsDataset;
+        
+        try
+        {
+            clumpsDataset = (GDALDataset *) GDALOpen(clumpsImage.c_str(), GA_ReadOnly);
+            if(clumpsDataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + clumpsImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            const GDALRasterAttributeTable *rat = clumpsDataset->GetRasterBand(1)->GetDefaultRAT();
+            
+            rsgis::rastergis::RSGISRasterAttUtils attUtils;
+            unsigned int colID = attUtils.findColumnIndex(rat, "Histogram");
+            
+            rsgis::segment::RSGISRemoveClumpsBelowThreshold *rmClumpBelowSize = new rsgis::segment::RSGISRemoveClumpsBelowThreshold(threshold, rat, colID);
+            rsgis::img::RSGISCalcImage calcImg = rsgis::img::RSGISCalcImage(rmClumpBelowSize, "", true);
+            calcImg.calcImage(&clumpsDataset, 1, outputImage, false, NULL, imgFormat, GDT_UInt32);
+            
+            delete rmClumpBelowSize;
+            GDALClose(clumpsDataset);
+            
+            GDALDataset *outClumpsDataset = (GDALDataset *) GDALOpen(outputImage.c_str(), GA_Update);
+            if(outClumpsDataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + clumpsImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            outClumpsDataset->GetRasterBand(1)->SetMetadataItem("LAYER_TYPE", "thematic");
+            
+            rsgis::rastergis::RSGISPopulateWithImageStats popImageStats;
+            popImageStats.populateImageWithRasterGISStats(outClumpsDataset, true, true);
+            
+            GDALClose(outClumpsDataset);
+        }
+        catch (rsgis::RSGISException &e)
+        {
+            throw RSGISCmdException(e.what());
         }
     }
     

@@ -221,6 +221,8 @@ namespace rsgis{ namespace cmds {
 
     /** Function to identify segments which have changed by looking for statistical outliers (std dev) from class population */
     void executeFindChangeClumpsFromStdDev(std::string clumpsImage, std::string classField, std::string changeField, std::vector<std::string> attFields, std::vector<cmds::RSGISClassChangeFieldsCmds> classChangeFields)throw(RSGISCmdException);
+    
+    
 }}
 
 
