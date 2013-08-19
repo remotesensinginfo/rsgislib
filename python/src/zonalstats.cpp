@@ -89,12 +89,12 @@ static PyObject *ZonalStats_PointValue2TXT(PyObject *self, PyObject *args)
 static PyObject *ZonalStats_PixelVals2TXT(PyObject *self, PyObject *args)
 {
     const char *pszInputImage, *pszInputVector, *pszOutputTextBase, *pzsPolyAttribute;
-    int pixelInPolyMethod;
-    if( !PyArg_ParseTuple(args, "ssssi:pixelVals2TXT", &pszInputImage, &pszInputVector, &pszOutputTextBase, &pzsPolyAttribute, &pixelInPolyMethod))
+    int pixelInPolyMethod, noProjWarning;
+    if( !PyArg_ParseTuple(args, "ssssii:pixelVals2TXT", &pszInputImage, &pszInputVector, &pszOutputTextBase, &pzsPolyAttribute, &noProjWarning, &pixelInPolyMethod))
         return NULL;
     try
     {
-        rsgis::cmds::executePixelVals2txt(pszInputImage, pszInputVector, pszOutputTextBase, pzsPolyAttribute, "csv", false, pixelInPolyMethod);
+        rsgis::cmds::executePixelVals2txt(pszInputImage, pszInputVector, pszOutputTextBase, pzsPolyAttribute, "csv", noProjWarning, pixelInPolyMethod);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -108,10 +108,10 @@ static PyObject *ZonalStats_PixelVals2TXT(PyObject *self, PyObject *args)
 static PyObject *ZonalStats_PixelStats2SHP(PyObject *self, PyObject *args)
 {
     const char *pszInputImage, *pszInputVector, *pszOutputVector;
-    int force, useBandNames, pixelInPolyMethod;
+    int force, useBandNames, noProjWarning, pixelInPolyMethod;
     PyObject *pBandAttZonalStatsCmds;
-    if( !PyArg_ParseTuple(args, "sssOiii:pixelStats2SHP", &pszInputImage, &pszInputVector, &pszOutputVector, 
-                                &pBandAttZonalStatsCmds, &force, &useBandNames, &pixelInPolyMethod))
+    if( !PyArg_ParseTuple(args, "sssOiiii:pixelStats2SHP", &pszInputImage, &pszInputVector, &pszOutputVector, 
+                                &pBandAttZonalStatsCmds, &force, &useBandNames, &noProjWarning, &pixelInPolyMethod))
         return NULL;
     
     rsgis::cmds::RSGISBandAttZonalStatsCmds *zonalAtts = new rsgis::cmds::RSGISBandAttZonalStatsCmds();   // the c++ struct
@@ -188,7 +188,7 @@ static PyObject *ZonalStats_PixelStats2SHP(PyObject *self, PyObject *args)
     try
     {
         rsgis::cmds::executePixelStats(pszInputImage, pszInputVector, pszOutputVector, zonalAtts, 
-            "", false, force, useBandNames, pixelInPolyMethod);
+            "", false, force, useBandNames, noProjWarning, pixelInPolyMethod);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -202,10 +202,10 @@ static PyObject *ZonalStats_PixelStats2SHP(PyObject *self, PyObject *args)
 static PyObject *ZonalStats_PixelStats2TXT(PyObject *self, PyObject *args)
 {
     const char *pszInputImage, *pszInputVector, *pszOutputTxt;
-    int useBandNames, pixelInPolyMethod;
+    int useBandNames, noProjWarning, pixelInPolyMethod;
     PyObject *pBandAttZonalStatsCmds;
-    if( !PyArg_ParseTuple(args, "sssOii:pixelStats2SHP", &pszInputImage, &pszInputVector, &pszOutputTxt, 
-                                &pBandAttZonalStatsCmds, &useBandNames, &pixelInPolyMethod))
+    if( !PyArg_ParseTuple(args, "sssOiii:pixelStats2SHP", &pszInputImage, &pszInputVector, &pszOutputTxt, 
+                                &pBandAttZonalStatsCmds, &useBandNames, &noProjWarning, &pixelInPolyMethod))
         return NULL;
     
     rsgis::cmds::RSGISBandAttZonalStatsCmds *zonalAtts = new rsgis::cmds::RSGISBandAttZonalStatsCmds();   // the c++ struct
@@ -282,7 +282,7 @@ static PyObject *ZonalStats_PixelStats2TXT(PyObject *self, PyObject *args)
     try
     {
         rsgis::cmds::executePixelStats(pszInputImage, pszInputVector, pszOutputTxt, zonalAtts, 
-            "", true, false, useBandNames, pixelInPolyMethod);
+            "", true, false, useBandNames, noProjWarning, pixelInPolyMethod);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -317,17 +317,18 @@ static PyMethodDef ZonalStatsMethods[] = {
 
     {"pixelVals2TXT", ZonalStats_PixelVals2TXT, METH_VARARGS, 
 "Extract pixel value for all pixels within a polygon and save a seperate CSV for each polygon in the shapefile.\n"
-"call signature: zonalstats.pixelVals2TXT(inputimage, inputvector, outputtxtBase, attribute, pixelInPolyMethod)\n"
+"call signature: zonalstats.pixelVals2TXT(inputimage, inputvector, outputtxtBase, attribute, noProjWarning, pixelInPolyMethod)\n"
 "where:\n"
 "  * inputimage is a string containing the name of the input image.\n"
 "  * inputvector is a string containing the name of the input vector.\n"
 "  * outputtxtBase is a string containing the base name for output text files.\n"
 "  * attribute is a string specifying an identifier for each polygon to be used for the name of each output text file.\n"
+"  * noProjWarning is a bool, specifying whether to skip printing a warning if the vector and image have a different projections.\n"
 "  * pixelInPolyMethod is the method for determining if a pixel is included with a polygon of type rsgislib.zonalstats.METHOD_*.\n"},
 
     {"pixelStats2SHP", ZonalStats_PixelStats2SHP, METH_VARARGS, 
 "Calculate statistics for pixels falling within each polygon in a shapefile output as a shapefile.\n"
-"call signature: zonalstats.pixelStats2SHP(inputimage, inputvector, outputvector, zonalattributes, force, useBandNames, pixelInPolyMethod)\n"
+"call signature: zonalstats.pixelStats2SHP(inputimage, inputvector, outputvector, zonalattributes, force, useBandNames, noProjWarning, pixelInPolyMethod)\n"
 "where:\n"
 "  * inputimage is a string containing the name of the input image\n"
 "  * inputvector is a string containing the name of the input vector\n"
@@ -346,11 +347,12 @@ static PyMethodDef ZonalStatsMethods[] = {
 "\n"
 "  * force is a bool, specifying whether to force removal of the output vector if it exists\n"
 "  * useBandNames is a bool, specifying whether to use the band names of the input dataset in the output file (if not uses b1, b2, etc.,\n"
+"  * noProjWarning is a bool, specifying whether to skip printing a warning if the vector and image have a different projections.\n"
 "  * pixelInPolyMethod is the method for determining if a pixel is included with a polygon of type rsgislib.zonalstats.METHOD_*.\n"},
 
     {"pixelStats2TXT", ZonalStats_PixelStats2TXT, METH_VARARGS, 
 "Calculate statistics for pixels falling within each polygon in a shapefile output as a CSV.\n"
-"call signature: zonalstats.pixelStats2SHP(inputimage, inputvector, outputtxt, zonalattributes, useBandNames, pixelInPolyMethod)\n"
+"call signature: zonalstats.pixelStats2SHP(inputimage, inputvector, outputtxt, zonalattributes, useBandNames, noProjWarning, pixelInPolyMethod)\n"
 "where:\n"
 "  * inputimage is a string containing the name of the input image\n"
 "  * inputvector is a string containing the name of the input vector\n"
@@ -368,6 +370,7 @@ static PyMethodDef ZonalStatsMethods[] = {
 "       * calcSum, a bool specifying whether to report the sum of pixels between thresholds.\n"
 "\n"
 "  * useBandNames is a bool, specifying whether to use the band names of the input dataset in the output file (if not uses b1, b2, etc.,\n"
+"  * noProjWarning is a bool, specifying whether to skip printing a warning if the vector and image have a different projections.\n"
 "  * pixelInPolyMethod is the method for determining if a pixel is included with a polygon of type rsgislib.zonalstats.METHOD_*.\n"},
 
     {NULL}        /* Sentinel */

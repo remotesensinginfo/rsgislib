@@ -190,7 +190,7 @@ namespace rsgis{ namespace cmds {
     }
 
     void executePixelStats(std::string inputImage, std::string inputVecPolys, std::string outputStatsFile, rsgis::cmds::RSGISBandAttZonalStatsCmds *calcStats,
-                           std::string inputRasPolys, bool outputToText, bool force, bool useBandNames, int pixelInPolyMethodInt)
+                           std::string inputRasPolys, bool outputToText, bool force, bool useBandNames, bool ignoreProjection, int pixelInPolyMethodInt)
     {
 
         // Convert to absolute path
@@ -228,9 +228,6 @@ namespace rsgis{ namespace cmds {
         std::cout << "and pixelcount for all pixels in polygon." << std::endl;
 
         std::cout << "minThreshAllVal = " << minThreshAllVal << std::endl;
-
-        // Ignore projection by default (just print a warning and hope people read it)
-        bool ignoreProjection = false;
 
         // Copy attributes to shapefile be default
         bool copyAttributes = true;
