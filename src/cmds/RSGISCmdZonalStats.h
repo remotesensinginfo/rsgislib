@@ -48,7 +48,7 @@ namespace rsgis{ namespace cmds {
     /** Function to extract pixel value for points and save as a shapefile or CSV */
     void executePointValue(std::string inputImage, std::string inputVecPolys, std::string outputStatsFile, bool outputToText = false, bool force = false, bool useBandNames = true);
     /** Function to extract statistics for pixels falling within a polygon */
-    void executePixelStats(std::string inputImage, std::string inputVecPolys, std::string outputStatsFile, RSGISBandAttZonalStatsCmds *calcStats, std::string inputRasPolys = "", bool outputToText = false, bool force = false, bool useBandNames = true, int pixelInPolyMethodInt = 1);
+    void executePixelStats(std::string inputImage, std::string inputVecPolys, std::string outputStatsFile, RSGISBandAttZonalStatsCmds *calcStats, std::string inputRasPolys = "", bool outputToText = false, bool force = false, bool useBandNames = true, bool ignoreProjection = false, int pixelInPolyMethodInt = 1);
     /** Function to extract pixel values for each polygon and save to a seperate text file */
     void executePixelVals2txt(std::string inputImage, std::string inputVecPolys, std::string outputTextBase, std::string polyAttribute, std::string outtxtform = "csv", bool ignoreProjection = false, int pixelInPolyMethodInt = 1);
 }}
