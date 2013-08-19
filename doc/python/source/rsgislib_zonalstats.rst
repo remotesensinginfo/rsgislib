@@ -1,4 +1,4 @@
-RSGISLib Image Segmentation Module
+RSGISLib Zonal Stats Module
 =================================
 
 .. automodule:: rsgislib.zonalstats
@@ -7,6 +7,9 @@ RSGISLib Image Segmentation Module
 
 .. autofunction:: rsgislib.zonalstats.pointValue2SHP
 .. autofunction:: rsgislib.zonalstats.pointValue2TXT
+.. autofunction:: rsgislib.zonalstats.pixelVals2TXT
+.. autofunction:: rsgislib.zonalstats.pixelStats2SHP
+.. autofunction:: rsgislib.zonalstats.pixelStats2TXT
 
 * :ref:`genindex`
 * :ref:`modindex`

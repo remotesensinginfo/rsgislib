@@ -304,7 +304,7 @@ static PyMethodDef ZonalStatsMethods[] = {
 "  * inputvector is a string containing the name of the input vector\n"
 "  * outputvector is a string containing the name of the output vector\n"
 "  * force is a bool, specifying whether to force removal of the output vector if it exists\n"
-"  * useBandNames is a bool, specifying whether to use the band names of the input dataset in the output file (if not uses b1, b2, etc.,\n"},
+"  * useBandNames is a bool, specifying whether to use the band names of the input dataset in the output file (if not uses b1, b2, etc.)\n"},
 
     {"pointValue2TXT", ZonalStats_PointValue2TXT, METH_VARARGS, 
 "Extract pixel value for each point in a shape file and output as a CSV.\n"
@@ -313,7 +313,7 @@ static PyMethodDef ZonalStatsMethods[] = {
 "  * inputimage is a string containing the name of the input image\n"
 "  * inputvector is a string containing the name of the input vector\n"
 "  * outputtxt is a string containing the name of the output text file\n"
-"  * useBandNames is a bool, specifying whether to use the band names of the input dataset in the output file (if not uses b1, b2, etc.,\n"},
+"  * useBandNames is a bool, specifying whether to use the band names of the input dataset in the output file (if not uses b1, b2, etc.)\n"},
 
     {"pixelVals2TXT", ZonalStats_PixelVals2TXT, METH_VARARGS, 
 "Extract pixel value for all pixels within a polygon and save a seperate CSV for each polygon in the shapefile.\n"
@@ -346,8 +346,8 @@ static PyMethodDef ZonalStatsMethods[] = {
 "       * calcSum, a bool specifying whether to report the sum of pixels between thresholds.\n"
 "\n"
 "  * force is a bool, specifying whether to force removal of the output vector if it exists\n"
-"  * useBandNames is a bool, specifying whether to use the band names of the input dataset in the output file (if not uses b1, b2, etc.,\n"
 "  * noProjWarning is a bool, specifying whether to skip printing a warning if the vector and image have a different projections.\n"
+"  * useBandNames is a bool, specifying whether to use the band names of the input dataset in the output file (if not uses b1, b2, etc.)\n"
 "  * pixelInPolyMethod is the method for determining if a pixel is included with a polygon of type rsgislib.zonalstats.METHOD_*.\n"},
 
     {"pixelStats2TXT", ZonalStats_PixelStats2TXT, METH_VARARGS, 
@@ -369,7 +369,7 @@ static PyMethodDef ZonalStatsMethods[] = {
 "       * calcMode, a bool specifying whether to report the mode of pixels between thresholds (for integer datasets only).\n"
 "       * calcSum, a bool specifying whether to report the sum of pixels between thresholds.\n"
 "\n"
-"  * useBandNames is a bool, specifying whether to use the band names of the input dataset in the output file (if not uses b1, b2, etc.,\n"
+"  * useBandNames is a bool, specifying whether to use the band names of the input dataset in the output file (if not uses b1, b2, etc.)\n"
 "  * noProjWarning is a bool, specifying whether to skip printing a warning if the vector and image have a different projections.\n"
 "  * pixelInPolyMethod is the method for determining if a pixel is included with a polygon of type rsgislib.zonalstats.METHOD_*.\n"},
 
