@@ -77,6 +77,8 @@ class RSGISPyUtils (object):
             ext = ".img"
         elif format.lower() == "envi":
             ext = ".env"
+        elif format.lower() == "pcidsk":
+            ext = ".pix"
         else:
             raise RSGISPyException("The extension for the format specified is unknown.")
         return ext
@@ -101,3 +103,30 @@ class RSGISPyUtils (object):
         os.rmdir(dirPath)
         print("Deleted " + dirPath)
 
+    def getRSGISLibDataType(self, gdaltype):
+        """ Convert from GDAL data type string to 
+            RSGISLib data type int.
+        """
+        gdaltype = gdaltype.lower()
+        if gdaltype == 'byte' or gdaltype == 'int8':
+            return TYPE_8INT
+        elif gdaltype == 'int16':
+            return TYPE_16INT
+        elif gdaltype == 'int32':
+            return TYPE_32INT
+        elif gdaltype == 'int64':
+            return TYPE_64INT
+        elif gdaltype == 'uint8':
+            return TYPE_8UINT
+        elif gdaltype == 'uint16':
+            return TYPE_16UINT
+        elif gdaltype == 'uint32':
+            return TYPE_32UINT
+        elif gdaltype == 'uint64':
+            return TYPE_64UINT
+        elif gdaltype == 'float32':
+            return TYPE_32FLOAT
+        elif gdaltype == 'float64':
+            return TYPE_64FLOAT
+        else:
+            raise RSGISPyException("The data type '%s' is unknown / not supported."%(gdaltype))
