@@ -1930,7 +1930,63 @@ namespace rsgis{namespace segment{
     {
         
     }
-
+    
+    
+    
+    RSGISRemoveClumpsBelowThreshold::RSGISRemoveClumpsBelowThreshold(float threshold, const GDALRasterAttributeTable *rat, unsigned int colID): rsgis::img::RSGISCalcImageValue(1)
+    {
+        this->threshold = threshold;
+        this->rat = rat;
+        this->colID = colID;
+    }
+    
+    void RSGISRemoveClumpsBelowThreshold::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
+    {
+        try
+        {
+            if(bandValues[0] > 0)
+            {
+                size_t fid = boost::lexical_cast<size_t>(bandValues[0]);
+                
+                float area = rat->GetValueAsDouble(fid, colID);
+                //std::cout << "Area = " << area << std::endl;
+                //std::cout << "Threshold = " << this->threshold << std::endl;
+                if(area > this->threshold)
+                {
+                    output[0] = bandValues[0];
+                }
+                else
+                {
+                    output[0] = 0.0;
+                }
+            }
+            else
+            {
+                output[0] = 0.0;
+            }
+        }
+        catch(boost::numeric::negative_overflow& e)
+        {
+            throw rsgis::img::RSGISImageCalcException(e.what());
+        }
+        catch(boost::numeric::positive_overflow& e)
+        {
+            throw rsgis::img::RSGISImageCalcException(e.what());
+        }
+        catch(boost::numeric::bad_numeric_cast& e)
+        {
+            throw rsgis::img::RSGISImageCalcException(e.what());
+        }
+        catch(rsgis::img::RSGISImageCalcException &e)
+        {
+            throw e;
+        }
+    }
+       
+    RSGISRemoveClumpsBelowThreshold::~RSGISRemoveClumpsBelowThreshold()
+    {
+        
+    }
     
 }}
 

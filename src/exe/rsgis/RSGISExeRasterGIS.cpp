@@ -76,6 +76,7 @@ namespace rsgisexe{
             XMLCh *optionDefineBorderClumps = xercesc::XMLString::transcode("defineborderclumps");
             XMLCh *optionPopulateStats = xercesc::XMLString::transcode("populatestats");
             XMLCh *optionFindChangeClumpsFromStddev = xercesc::XMLString::transcode("findchangeclumpsfromstddev");
+            XMLCh *optionRMSmallClumps = xercesc::XMLString::transcode("rmsmallclumps");
 
             const XMLCh *algorNameEle = argElement->getAttribute(algorXMLStr);
             if(!xercesc::XMLString::equals(algorName, algorNameEle))
@@ -2972,6 +2973,61 @@ namespace rsgisexe{
 
                 xercesc::XMLString::release(&rsgisClassXMLStr);
             }
+            else if(xercesc::XMLString::equals(optionRMSmallClumps, optionXML))
+            {
+                this->option = RSGISExeRasterGIS::rmsmallclumps;
+                
+                XMLCh *clumpsXMLStr = xercesc::XMLString::transcode("clumps");
+                if(argElement->hasAttribute(clumpsXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(clumpsXMLStr));
+                    this->clumpsImage = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'clumps\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&clumpsXMLStr);
+                
+                XMLCh *outputXMLStr = xercesc::XMLString::transcode("output");
+                if(argElement->hasAttribute(outputXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outputXMLStr));
+                    this->outputFile = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&outputXMLStr);
+                
+                XMLCh *thresholdXMLStr = xercesc::XMLString::transcode("threshold");
+                if(argElement->hasAttribute(thresholdXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(thresholdXMLStr));
+                    this->areaThreshold = textUtils.strtofloat(std::string(charValue));
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'threshold\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&thresholdXMLStr);
+                
+                // Set output image fomat (defaults to KEA)
+                this->imageFormat = "KEA";
+                XMLCh *formatXMLStr = xercesc::XMLString::transcode("format");
+                if(argElement->hasAttribute(formatXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(formatXMLStr));
+                    this->imageFormat = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                xercesc::XMLString::release(&formatXMLStr);
+                
+            }
             else
             {
                 std::string message = std::string("The option (") + std::string(xercesc::XMLString::transcode(optionXML)) + std::string(") is not known: RSGISExeRasterGIS.");
@@ -3013,6 +3069,7 @@ namespace rsgisexe{
             xercesc::XMLString::release(&optionDefineBorderClumps);
             xercesc::XMLString::release(&optionPopulateStats);
             xercesc::XMLString::release(&optionFindChangeClumpsFromStddev);
+            xercesc::XMLString::release(&optionRMSmallClumps);
         }
         catch (rsgis::RSGISXMLArgumentsException &e)
         {
@@ -3837,6 +3894,30 @@ namespace rsgisexe{
                     throw rsgis::RSGISException(e.what());
                 }
             }
+            else if(this->option == RSGISExeRasterGIS::rmsmallclumps)
+            {
+                std::cout << "A command to remove small clumps\n";
+                std::cout << "Clumps: " << this->clumpsImage << std::endl;
+                std::cout << "Output: " << this->outputFile << std::endl;
+                std::cout << "Threshold: " << this->areaThreshold << std::endl;
+                
+                try
+                {
+                    rsgis::cmds::executeRMSmallClumps(this->clumpsImage, this->outputFile, this->areaThreshold, this->imageFormat);
+                }
+                catch(rsgis::RSGISException e)
+                {
+                    throw rsgis::RSGISException(e.what());
+                }
+                catch(rsgis::cmds::RSGISCmdException e)
+                {
+                    throw rsgis::RSGISException(e.what());
+                }
+                catch (std::exception e)
+                {
+                    throw rsgis::RSGISException(e.what());
+                }
+            }
             else
             {
                 throw rsgis::RSGISException("The option is not recognised: RSGISExeRasterGIS");
@@ -4193,6 +4274,13 @@ namespace rsgisexe{
                 {
                     std::cout << "\t" << (*iterClass)->name << "\t" << (*iterClass)->outName << "\t" << (*iterClass)->threshold << std::endl;
                 }
+            }
+            else if(this->option == RSGISExeRasterGIS::rmsmallclumps)
+            {
+                std::cout << "A command to remove small clumps\n";
+                std::cout << "Clumps: " << this->clumpsImage << std::endl;
+                std::cout << "Output: " << this->outputFile << std::endl;
+                std::cout << "Threshold: " << this->areaThreshold << std::endl;
             }
             else
             {

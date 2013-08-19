@@ -36,6 +36,7 @@
 #include "common/RSGISImageException.h"
 
 #include "cmds/RSGISCmdRasterGIS.h"
+#include "cmds/RSGISCmdSegmentation.h"
 #include "cmds/RSGISCmdException.h"
 
 #include "utils/RSGISTextUtils.h"
@@ -106,7 +107,8 @@ namespace rsgisexe{
             defineclumptileposition,
             defineborderclumps,
             populatestats,
-            findchangeclumpsfromstddev
+            findchangeclumpsfromstddev,
+            rmsmallclumps
         };
         
         RSGISExeRasterGIS();
@@ -155,6 +157,7 @@ namespace rsgisexe{
         unsigned int nFeatures;
         float specDistThreshold;
         float distThreshold;
+        float areaThreshold;
         std::vector<rsgis::cmds::RSGISBandAttStatsCmds*> *bandStats;
         std::vector<rsgis::cmds::RSGISBandAttPercentilesCmds*> *bandPercentiles;
         bool copyClassNames;
