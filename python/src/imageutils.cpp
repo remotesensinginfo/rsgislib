@@ -40,7 +40,7 @@ static struct ImageUtilsState _state;
 // Helper function to extract python sequence to array of strings
 static std::string *ExtractStringArrayFromSequence(PyObject *sequence, int *nElements) {
     Py_ssize_t nFields = PySequence_Size(sequence);
-	*nElements = nFields;
+    *nElements = nFields;
     std::string *stringsArray = new std::string[nFields];
 
     for(int i = 0; i < nFields; ++i) {
@@ -177,34 +177,34 @@ static PyObject *ImageUtils_createTiles(PyObject *self, PyObject *args)
 static PyObject *ImageUtils_createImageMosaic(PyObject *self, PyObject *args)
 {
     const char *pszOutputImage, *pszGDALFormat;
-	float backgroundVal, skipVal, skipBand;
+    float backgroundVal, skipVal, skipBand;
     int nDataType, overlapBehaviour;
-	PyObject *pInputImages; // List of input images
+    PyObject *pInputImages; // List of input images
 
     // Check parameters are present and of correct type
-	if( !PyArg_ParseTuple(args, "Osffiisi:createImageMosaic", &pInputImages, &pszOutputImage,
+    if( !PyArg_ParseTuple(args, "Osffiisi:createImageMosaic", &pInputImages, &pszOutputImage,
                                 &backgroundVal, &skipVal, &skipBand, &overlapBehaviour,&pszGDALFormat, &nDataType))
         return NULL;
 
-	// TODO: Look into this function - doesn't seem to catch when only a single image is provided.
+    // TODO: Look into this function - doesn't seem to catch when only a single image is provided.
     if(!PySequence_Check(pInputImages)) {
         PyErr_SetString(GETSTATE(self)->error, "First argument must be a sequence");
         return NULL;
     }
 
-	// Extract list of images to array of strings.
-	int numImages = 0;
+    // Extract list of images to array of strings.
+    int numImages = 0;
     std::string *inputImages = ExtractStringArrayFromSequence(pInputImages, &numImages);
     if(numImages == 0) 
-	{ 
+    { 
         PyErr_SetString(GETSTATE(self)->error, "No input images provided");
-		return NULL; 
-	}
-	
+        return NULL; 
+    }
+    
     try
     {
-		rsgis::cmds::executeImageMosaic(inputImages, numImages, pszOutputImage, backgroundVal, 
-					skipVal, skipBand, overlapBehaviour, pszGDALFormat, (rsgis::RSGISLibDataType)nDataType);
+        rsgis::cmds::executeImageMosaic(inputImages, numImages, pszOutputImage, backgroundVal, 
+                    skipVal, skipBand, overlapBehaviour, pszGDALFormat, (rsgis::RSGISLibDataType)nDataType);
 
     }
     catch(rsgis::cmds::RSGISCmdException &e)
@@ -465,72 +465,72 @@ static PyMethodDef ImageUtilsMethods[] = {
     {"createTiles", ImageUtils_createTiles, METH_VARARGS,
 "Create tiles from a larger image, useful for splitting a large image into multiple smaller ones for processing.\n"
 "call signature: imageutils.createTiles(inputimage, baseimage, width, height, overlap, offsettiling, gdalformat, type, ext)\n"
-"  * inputImage is a string containing the name of the input file\n"
-"  * baseimage is a string containing the base name of the output file\n    the number of the tile and file extension will be appended.\n"
-"  * width is the width of each tile, in pixels.\n"
-"  * height is the height of each tile, in pixels.\n"
-"  * overlap is the overlap between tiles, in pixels\n"
-"  * offsettiling is a bool, determining if tiles should start halfway into the image\n    useful for generating overlapping sets of tiles.\n"
-"  * gdalformat is a string providing the output format of the tiles (e.g., KEA).\n"
-"  * type is a rsgislib.TYPE_* value providing the output data type of the tiles.\n"
-"  * ext is a string providing the extension for the tiles (as required by the specified data type).\n"
+" * inputImage is a string containing the name of the input file\n"
+" * baseimage is a string containing the base name of the output file\n    the number of the tile and file extension will be appended.\n"
+" * width is the width of each tile, in pixels.\n"
+" * height is the height of each tile, in pixels.\n"
+" * overlap is the overlap between tiles, in pixels\n"
+" * offsettiling is a bool, determining if tiles should start halfway into the image\n    useful for generating overlapping sets of tiles.\n"
+" * gdalformat is a string providing the output format of the tiles (e.g., KEA).\n"
+" * type is a rsgislib.TYPE_* value providing the output data type of the tiles.\n"
+" * ext is a string providing the extension for the tiles (as required by the specified data type).\n"
 "\nA list of strings containing the filenames is returned\n"},
     
     {"createImageMosaic", ImageUtils_createImageMosaic, METH_VARARGS,
 "Create mosaic from list of input images.\n"
 "call signature: imageutils.createImageMosaic(inputimagelist, outputimage, backgroundVal, \n    skipVal, skipBand, overlapBehaviour, gdalformat, type)\n"
-"  * inputimagelist is a list of input images.\n"
-"  * outputimage is a string containing the name of the output mosaic\n"
-"  * backgroundVal is a float providing the background (nodata) value for the mosaic\n"
-"  * skipVal is a float providing the value to be skipped (nodata values) in the input images\n"
-"  * skipBand is an integer providing the band to check for skipVal\n"
-"  * overlapBehaviour is an integer specifying the behaviour for overlaping regions\n"
+" * inputimagelist is a list of input images.\n"
+" * outputimage is a string containing the name of the output mosaic\n"
+" * backgroundVal is a float providing the background (nodata) value for the mosaic\n"
+" * skipVal is a float providing the value to be skipped (nodata values) in the input images\n"
+" * skipBand is an integer providing the band to check for skipVal\n"
+" * overlapBehaviour is an integer specifying the behaviour for overlaping regions\n"
 "\n"
-"  		* 0 - Overwrite\n"
-"  		* 1 - Overwrite if value of new pixel is lower (minimum)\n"
-"  		* 2 - Overwrite if value of new pixel is higher (maximum)\n"
+"      * 0 - Overwrite\n"
+"      * 1 - Overwrite if value of new pixel is lower (minimum)\n"
+"      * 2 - Overwrite if value of new pixel is higher (maximum)\n"
 "\n"
-"  * gdalformat is a string providing the output format of the tiles (e.g., KEA).\n"
-"  * type is a rsgislib.TYPE_* value providing the output data type of the tiles.\n"
+" * gdalformat is a string providing the output format of the tiles (e.g., KEA).\n"
+" * type is a rsgislib.TYPE_* value providing the output data type of the tiles.\n"
 "\nA list of strings containing the filenames is returned\n"},
  
     {"popImageStats", ImageUtils_PopImageStats, METH_VARARGS,
 "rsgislib.imageutils.popImageStats(inputImage, useNoDataValue, noDataValue, buildPyramids)\n"
 "Calculate the image statistics and build image pyramids populating the image file.\n"
-"  * inputImage is a string containing the name of the input file\n"
-"  * useNoDataValue is a boolean stating whether the no data value is to be used.\n"
-"  * noDataValue is a floating point value to be used as the no data value.\n"
-"  * buildPyramids is a boolean stating whether image pyramids should be calculated.\n"},
+" * inputImage is a string containing the name of the input file\n"
+" * useNoDataValue is a boolean stating whether the no data value is to be used.\n"
+" * noDataValue is a floating point value to be used as the no data value.\n"
+" * buildPyramids is a boolean stating whether image pyramids should be calculated.\n"},
     
     {"assignProj", ImageUtils_AssignProj, METH_VARARGS,
 "rsgislib.imageutils.assignProj(inputImage, wktString, wktStringFile)\n"
 "Assign a projection to the input GDAL image file.\n"
-"   *  inputImage is a string containing the name of the input file\n"
-"   *  wktString is the wkt string to be assigned to the image. If None then it will be read from the wktStringFile.\n"
-"   *  wktStringFile is a file path to a text file containing the WKT string to be assigned. This is ignored if wktString is not None.\n"},
+" * inputImage is a string containing the name of the input file\n"
+" * wktString is the wkt string to be assigned to the image. If None then it will be read from the wktStringFile.\n"
+" * wktStringFile is a file path to a text file containing the WKT string to be assigned. This is ignored if wktString is not None.\n"},
     
     {"copyProjFromImage", ImageUtils_CopyProjFromImage, METH_VARARGS,
 "rsgislib.imageutils.copyProjFromImage(inputImage, refImage)\n"
 "Copy the projection from a reference image to an input GDAL image file.\n"
-"  * inputImage is a string containing the name and path of the input file\n"
-"  * refImage is a string containing the name and path of the reference image.\n"},
+" * inputImage is a string containing the name and path of the input file\n"
+" * refImage is a string containing the name and path of the reference image.\n"},
     
     {"copySpatialAndProjFromImage", ImageUtils_CopySpatialAndProjFromImage, METH_VARARGS,
 "rsgislib.imageutils.copySpatialAndProjFromImage(inputImage, refImage)\n"
 "Copy the spatial information and projection from a reference image to an input GDAL image file.\n"
-"  * inputImage is a string containing the name and path of the input file\n"
-"  * refImage is a string containing the name and path of the reference image.\n"},
+" * inputImage is a string containing the name and path of the input file\n"
+" * refImage is a string containing the name and path of the reference image.\n"},
 
     {"assignSpatialInfo", ImageUtils_AssignSpatialInfo, METH_VARARGS,
 "rsgislib.imageutils.assignSpatialInfo(inputImage, tlX, tlY, resX, resY, rotX, rotY)\n"
 "Assign the spatial information to an input GDAL image file.\n"
-"  * inputImage is a string containing the name and path of the input file\n"
-"  * tlX is a double representing the top left X coordinate of the image.\n"
-"  * tlY is a double representing the top left Y coordinate of the image.\n"
-"  * resX is a double representing X resolution of the image.\n"
-"  * resY is a double representing Y resolution of the image.\n"
-"  * rotX is a double representing X rotation of the image.\n"
-"  * rotY is a double representing Y rotation of the image.\n"},
+" * inputImage is a string containing the name and path of the input file\n"
+" * tlX is a double representing the top left X coordinate of the image.\n"
+" * tlY is a double representing the top left Y coordinate of the image.\n"
+" * resX is a double representing X resolution of the image.\n"
+" * resY is a double representing Y resolution of the image.\n"
+" * rotX is a double representing X rotation of the image.\n"
+" * rotY is a double representing Y rotation of the image.\n"},
 
     {NULL}        /* Sentinel */
 };
