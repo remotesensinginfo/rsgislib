@@ -474,7 +474,22 @@ static PyMethodDef ImageUtilsMethods[] = {
 " * gdalformat is a string providing the output format of the tiles (e.g., KEA).\n"
 " * type is a rsgislib.TYPE_* value providing the output data type of the tiles.\n"
 " * ext is a string providing the extension for the tiles (as required by the specified data type).\n"
-"\nA list of strings containing the filenames is returned\n"},
+"\nA list of strings containing the filenames is returned.\n"
+"Example::\n"
+"\n"
+"	import rsgislib\n"
+"	from rsgislib import imageutils\n"
+"	inputImage = './Rasters/injune_p142_casi_sub_utm.kea'\n"
+"	outBase = './TestOutputs/Tiles/injune_p142_casi_sub_utm'\n"
+"	width = 100\n"
+"	height = width\n"
+"	overlap = 5\n"
+"	offsettiling = 0\n"
+"	format = 'KEA'\n"
+"	dataType = rsgislib.TYPE_32INT\n"
+"	ext='kea'\n"
+"	imageutils.createTiles(inputImage, outBase, width, height, overlap, offsettiling, format, dataType, ext)\n"
+"\n"},
     
     {"createImageMosaic", ImageUtils_createImageMosaic, METH_VARARGS,
 "Create mosaic from list of input images.\n"
@@ -492,7 +507,23 @@ static PyMethodDef ImageUtilsMethods[] = {
 "\n"
 " * gdalformat is a string providing the output format of the tiles (e.g., KEA).\n"
 " * type is a rsgislib.TYPE_* value providing the output data type of the tiles.\n"
-"\nA list of strings containing the filenames is returned\n"},
+"Example::\n"
+"\n"
+"	import rsgislib\n"
+"	from rsgislib import imageutils\n"
+"	import glob\n"
+"	# Search for all files with the extension 'kea'\n"
+"	inputList = glob.glob('./TestOutputs/Tiles/*.kea')\n"
+"	outImage = './TestOutputs/injune_p142_casi_sub_utm_mosaic.kea'\n"
+"	backgroundVal = 0.\n"
+"	skipVal = 0.\n"
+"	skipBand = 1\n"
+"	overlapBehaviour = 0\n"
+"	format = 'KEA'\n"
+"	dataType = rsgislib.TYPE_32FLOAT\n"
+"	imageutils.createImageMosaic(inputList, outImage, backgroundVal, skipVal, skipBand, overlapBehaviour, format, dataType)\n"
+"\n"},
+ 
  
     {"popImageStats", ImageUtils_PopImageStats, METH_VARARGS,
 "rsgislib.imageutils.popImageStats(inputImage, useNoDataValue, noDataValue, buildPyramids)\n"
