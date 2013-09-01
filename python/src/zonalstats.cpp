@@ -422,8 +422,8 @@ static PyMethodDef ZonalStatsMethods[] = {
 "    outputtxt = './TestOutputs/injune_p142_casi_sub_utm_stats.txt'\n"
 "    zonalattributes = zonalstats.ZonalAttributes(minThreshold=0, maxThreshold=10000, calcCount=True, calcMin=True, calcMax=True, calcMean=True, calcStdDev=True, calcMode=False, calcSum=True)\n"
 "    zonalstats.pixelStats2SHP(inputImage, inputVector, outputtxt, zonalattributes, True, True, zonalstats.METHOD_POLYCONTAINSPIXELCENTER)\n"
-"\n"
-}
+"\n"},
+
     {NULL}        /* Sentinel */
 };
 

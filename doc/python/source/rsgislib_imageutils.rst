@@ -9,6 +9,7 @@ RSGISLib Image Utilities Module
 .. autofunction:: rsgislib.imageutils.assignSpatialInfo
 .. autofunction:: rsgislib.imageutils.copyProjFromImage
 .. autofunction:: rsgislib.imageutils.copySpatialAndProjFromImage
+.. autofunction:: rsgislib.imageutils.createImageMosaic
 .. autofunction:: rsgislib.imageutils.createTiles
 .. autofunction:: rsgislib.imageutils.maskImage
 .. autofunction:: rsgislib.imageutils.popImageStats
