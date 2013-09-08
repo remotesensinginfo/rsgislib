@@ -325,6 +325,29 @@ static PyObject *Segmentation_rmSmallClumps(PyObject *self, PyObject *args)
 }
 
 
+static PyObject *Segmentation_meanImage(PyObject *self, PyObject *args)
+{
+    const char *pszInputImage, *pszInputClumps, *pszOutputImage, *pszGDALFormat;
+    int nDataType;
+    PyObject *pNoData; //could be none or a number
+    if( !PyArg_ParseTuple(args, "ssssi:mergeImage", &pszInputImage, &pszInputClumps, &pszOutputImage, &pszGDALFormat, &nDataType))
+        return NULL;
+    
+    try
+    {
+        rsgis::RSGISLibDataType type = (rsgis::RSGISLibDataType)nDataType;
+        rsgis::cmds::executeMeanImage(pszInputImage, pszInputClumps, pszOutputImage, pszGDALFormat, type, false);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
+
 
 
 // Our list of functions in this module
@@ -414,6 +437,16 @@ static PyMethodDef SegmentationMethods[] = {
 "  outputImage is a string containing the name of the output clumps file\n"
 "  threshold is a float containing the area threshold (in pixels)\n"
 "  gdalFormat is a string defining the format of the output image.\n"},
+    
+    {"meanImage", Segmentation_meanImage, METH_VARARGS,
+        "segmentation.meanImage(inputImage, inputClumps, outputImage, gdalFormat, gdaltype)\n"
+        "A function to generate a mean image for the clumps.\n"
+        "where:\n"
+        "  inputImage is a string containing the name of the input image file for which the mean is taken.\n"
+        "  inputClumps is a string containing the name of the input clumps file\n"
+        "  outputImage is a string containing the name of the output image.\n"
+        "  gdalFormat is a string defining the format of the output image.\n"
+        "  gdaltype is an containing one of the values from rsgislib.TYPE_*\n"},
 
     {NULL}        /* Sentinel */
 };
