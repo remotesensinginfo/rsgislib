@@ -1047,41 +1047,52 @@ void RSGISExeImageRegistration::runAlgorithm() throw(rsgis::RSGISException)
 			std::cout << "Reference Image: " << this->inputReferenceImage << std::endl;
 			std::cout << "Floating Image: " << this->inputFloatingmage << std::endl;
 			std::cout << "Output GCP File: " << this->outputGCPFile << std::endl;
+            unsigned int metricTypeInt = 4;
+            unsigned int outputGCPTypeInt = 3;
+            
 			if(outputType == envi_img2img)
 			{
 				std::cout << "Output in image to image GCPs for ENVI\n";
+                outputGCPTypeInt = 1;
 			}
 			else if(outputType == envi_img2map)
 			{
 				std::cout << "Output in image to map GCPs for ENVI\n";
+                outputGCPTypeInt = 2;
 			}
 			else if(outputType == rsgis_img2map)
 			{
 				std::cout << "Output GCPs for RSGIS image to map\n";
+                outputGCPTypeInt = 3;
 			}
             else if(outputType == rsgis_mapoffs)
 			{
 				std::cout << "Output GCPs for RSGIS map offsets\n";
+                outputGCPTypeInt = 4;
 			}
-			else 
+			else
 			{
 				throw rsgis::RSGISException("Output format Unknown");
 			}
 			if(metricType == euclidean)
 			{
 				std::cout << "The Euclidean similarity metric will be used\n";
+                metricTypeInt = 1;
 			}
 			else if(metricType == sqdiff)
 			{
 				std::cout << "The Squared Difference similarity metric will be used\n";
+                metricTypeInt = 2;
 			}
 			else if(metricType == manhatten)
 			{
 				std::cout << "The Manhatten (taxi cab) similarity metric will be used\n";
+                metricTypeInt = 3;
 			}
 			else if(metricType == correlation)
 			{
 				std::cout << "The Correlation Coefficent similarity metric will be used\n";
+                metricTypeInt = 4;
 			}
 			else 
 			{
@@ -1096,102 +1107,47 @@ void RSGISExeImageRegistration::runAlgorithm() throw(rsgis::RSGISException)
 
 			try
 			{
-				GDALAllRegister();
-				GDALDataset *inRefDataset = NULL;
-				GDALDataset *inFloatDataset = NULL;
-				
-				inRefDataset = (GDALDataset *) GDALOpenShared(inputReferenceImage.c_str(), GA_ReadOnly);
-				if(inRefDataset == NULL)
-				{
-					std::string message = std::string("Could not open image ") + inputReferenceImage;
-					throw rsgis::RSGISException(message.c_str());
-				}
-				
-				inFloatDataset = (GDALDataset *) GDALOpenShared(inputFloatingmage.c_str(), GA_ReadOnly);
-				if(inFloatDataset == NULL)
-				{
-					std::string message = std::string("Could not open image ") + inputFloatingmage;
-					throw rsgis::RSGISException(message.c_str());
-				}
-				
-				rsgis::reg::RSGISImageSimilarityMetric *similarityMetric = NULL;
-				if(metricType == euclidean)
-				{
-					similarityMetric = new rsgis::reg::RSGISEuclideanSimilarityMetric();
-				}
-				else if(metricType == sqdiff)
-				{
-					similarityMetric = new rsgis::reg::RSGISSquaredDifferenceSimilarityMetric();		
-				}
-				else if(metricType == manhatten)
-				{
-					similarityMetric = new rsgis::reg::RSGISManhattanSimilarityMetric();		
-				}
-				else if(metricType == correlation)
-				{
-					similarityMetric = new rsgis::reg::RSGISCorrelationSimilarityMetric();		
-				}
-				
-				
-				rsgis::reg::RSGISImageRegistration *regImgs = new rsgis::reg::RSGISBasicImageRegistration(inRefDataset, inFloatDataset, gcpGap, metricThreshold, windowSize, searchArea, similarityMetric, stdDevRefThreshold, stdDevFloatThreshold, subPixelResolution);
-
-				regImgs->runCompleteRegistration();
-				
-				if(outputType == envi_img2img)
-				{
-					regImgs->exportTiePointsENVIImage2Image(this->outputGCPFile);
-				}
-				else if(outputType == envi_img2map)
-				{
-					regImgs->exportTiePointsENVIImage2Map(this->outputGCPFile);
-				}
-				else if(outputType == rsgis_img2map)
-				{
-					regImgs->exportTiePointsRSGISImage2Map(this->outputGCPFile);
-				}
-                else if(outputType == rsgis_mapoffs)
-				{
-					regImgs->exportTiePointsRSGISMapOffs(this->outputGCPFile);
-				}
-				
-				delete similarityMetric;
-				delete regImgs;
-				
-				GDALClose(inRefDataset);
-				GDALClose(inFloatDataset);
-				GDALDestroyDriverManager();
-			}
-			catch(rsgis::RSGISRegistrationException &e)
-			{
-				throw rsgis::RSGISException(e.what());
-			}
-			catch(rsgis::RSGISException& e)
-			{
-				throw e;
-			}
+                rsgis::cmds::excecuteBasicRegistration(this->inputReferenceImage, this->inputFloatingmage, this->gcpGap,
+                                                      this->metricThreshold, this->windowSize, this->searchArea, this->stdDevRefThreshold,
+                                                      this->stdDevFloatThreshold, this->subPixelResolution, metricTypeInt,
+                                                      outputGCPTypeInt, this->outputGCPFile);
+                
+            }
+            catch(rsgis::cmds::RSGISCmdException &e)
+            {
+                throw rsgis::RSGISException(e.what());
+            }
 		}
 		else if(this->option == RSGISExeImageRegistration::singlelayer)
 		{
-			std::cout << "A registration algorithm using a single layer of tie\n";
+			std::cout << "A registration algorithm using a single layer of tie.\n";
 			std::cout << "points which are connected within a given distance and updated as the neighbouring tie points are moved.\n";
 			std::cout << "Reference Image: " << this->inputReferenceImage << std::endl;
 			std::cout << "Floating Image: " << this->inputFloatingmage << std::endl;
 			std::cout << "Output GCP File: " << this->outputGCPFile << std::endl;
+            
+            unsigned int metricTypeInt = 4;
+            unsigned int outputGCPTypeInt = 3;
+            
 			if(outputType == envi_img2img)
 			{
 				std::cout << "Output in image to image GCPs for ENVI\n";
+                outputGCPTypeInt = 1;
 			}
 			else if(outputType == envi_img2map)
 			{
 				std::cout << "Output in image to map GCPs for ENVI\n";
+                outputGCPTypeInt = 2;
 			}
 			else if(outputType == rsgis_img2map)
 			{
 				std::cout << "Output GCPs for RSGIS image to map\n";
+                outputGCPTypeInt = 3;
 			}
             else if(outputType == rsgis_mapoffs)
 			{
 				std::cout << "Output GCPs for RSGIS map offsets\n";
+                outputGCPTypeInt = 4;
 			}
 			else 
 			{
@@ -1200,109 +1156,50 @@ void RSGISExeImageRegistration::runAlgorithm() throw(rsgis::RSGISException)
 			if(metricType == euclidean)
 			{
 				std::cout << "The Euclidean similarity metric will be used\n";
+                metricTypeInt = 1;
 			}
 			else if(metricType == sqdiff)
 			{
 				std::cout << "The Squared Difference similarity metric will be used\n";
+                metricTypeInt = 2;
 			}
 			else if(metricType == manhatten)
 			{
 				std::cout << "The Manhatten (taxi cab) similarity metric will be used\n";
+                metricTypeInt = 3;
 			}
 			else if(metricType == correlation)
 			{
 				std::cout << "The Correlation Coefficent similarity metric will be used\n";
+                metricTypeInt = 4;
 			}
 			else 
 			{
 				throw rsgis::RSGISException("Similarity Metric Unknown");
 			}
-			std::cout << "Window Size = " << windowSize << std::endl;
-			std::cout << "Search area = " << searchArea << std::endl;
-			std::cout << "Metric Threshold = " << metricThreshold << std::endl;
-			std::cout << "Std Dev reference threshold = " << stdDevRefThreshold << std::endl;
-			std::cout << "Std Dev floating threshold = " << stdDevFloatThreshold << std::endl;
-			std::cout << "Sub pixel resolution = " << subPixelResolution << std::endl;
-			std::cout << "Distance threshold = " << distanceThreshold << std::endl;
-			std::cout << "Max. number of iterations = " << maxNumIterations << std::endl;
-			std::cout << "Movement Threshold = " << moveChangeThreshold << std::endl;
-			std::cout << "p Smoothness = " << pSmoothness << std::endl;
+			std::cout << "Window Size = " << this->windowSize << std::endl;
+			std::cout << "Search area = " << this->searchArea << std::endl;
+			std::cout << "Metric Threshold = " << this->metricThreshold << std::endl;
+			std::cout << "Std Dev reference threshold = " << this->stdDevRefThreshold << std::endl;
+			std::cout << "Std Dev floating threshold = " << this->stdDevFloatThreshold << std::endl;
+			std::cout << "Sub pixel resolution = " << this->subPixelResolution << std::endl;
+			std::cout << "Distance threshold = " << this->distanceThreshold << std::endl;
+			std::cout << "Max. number of iterations = " << this->maxNumIterations << std::endl;
+			std::cout << "Movement Threshold = " << this->moveChangeThreshold << std::endl;
+			std::cout << "p Smoothness = " << this->pSmoothness << std::endl;
 			
 			try
 			{
-				GDALAllRegister();
-				GDALDataset *inRefDataset = NULL;
-				GDALDataset *inFloatDataset = NULL;
-				
-				inRefDataset = (GDALDataset *) GDALOpenShared(inputReferenceImage.c_str(), GA_ReadOnly);
-				if(inRefDataset == NULL)
-				{
-					std::string message = std::string("Could not open image ") + inputReferenceImage;
-					throw rsgis::RSGISException(message.c_str());
-				}
-				
-				inFloatDataset = (GDALDataset *) GDALOpenShared(inputFloatingmage.c_str(), GA_ReadOnly);
-				if(inFloatDataset == NULL)
-				{
-					std::string message = std::string("Could not open image ") + inputFloatingmage;
-					throw rsgis::RSGISException(message.c_str());
-				}
-				
-				rsgis::reg::RSGISImageSimilarityMetric *similarityMetric = NULL;
-				if(metricType == euclidean)
-				{
-					similarityMetric = new rsgis::reg::RSGISEuclideanSimilarityMetric();
-				}
-				else if(metricType == sqdiff)
-				{
-					similarityMetric = new rsgis::reg::RSGISSquaredDifferenceSimilarityMetric();		
-				}
-				else if(metricType == manhatten)
-				{
-					similarityMetric = new rsgis::reg::RSGISManhattanSimilarityMetric();		
-				}
-				else if(metricType == correlation)
-				{
-					similarityMetric = new rsgis::reg::RSGISCorrelationSimilarityMetric();		
-				}
-				
-				
-				rsgis::reg::RSGISImageRegistration *regImgs = new rsgis::reg::RSGISSingleConnectLayerImageRegistration(inRefDataset, inFloatDataset, gcpGap, metricThreshold, windowSize, searchArea, similarityMetric, stdDevRefThreshold, stdDevFloatThreshold, subPixelResolution, distanceThreshold, maxNumIterations, moveChangeThreshold, pSmoothness);
-				
-				regImgs->runCompleteRegistration();
-				
-				if(outputType == envi_img2img)
-				{
-					regImgs->exportTiePointsENVIImage2Image(this->outputGCPFile);
-				}
-				else if(outputType == envi_img2map)
-				{
-					regImgs->exportTiePointsENVIImage2Map(this->outputGCPFile);
-				}
-				else if(outputType == rsgis_img2map)
-				{
-					regImgs->exportTiePointsRSGISImage2Map(this->outputGCPFile);
-				}
-                else if(outputType == rsgis_mapoffs)
-				{
-					regImgs->exportTiePointsRSGISMapOffs(this->outputGCPFile);
-				}
-				
-				delete similarityMetric;
-				delete regImgs;
-				
-				GDALClose(inRefDataset);
-				GDALClose(inFloatDataset);
-				GDALDestroyDriverManager();
+                rsgis::cmds::excecuteSingleLayerConnectedRegistration(this->inputReferenceImage, this->inputFloatingmage, this->gcpGap,
+                                                                      this->metricThreshold, this->windowSize, this->searchArea, this->stdDevRefThreshold,
+                                                                      this->stdDevFloatThreshold, this->subPixelResolution, this->distanceThreshold,
+                                                                      this->maxNumIterations, this->moveChangeThreshold, this->pSmoothness, metricTypeInt,
+                                                                      outputGCPTypeInt, this->outputGCPFile);
 			}
-			catch(rsgis::RSGISRegistrationException &e)
-			{
-				throw rsgis::RSGISException(e.what());
-			}
-			catch(rsgis::RSGISException& e)
-			{
-				throw e;
-			}			
+            catch(rsgis::cmds::RSGISCmdException &e)
+            {
+                throw rsgis::RSGISException(e.what());
+            }
 		}
 		else if(this->option == RSGISExeImageRegistration::triangularwarp)
 		{

@@ -49,6 +49,7 @@
 #include "math/RSGISMathsUtils.h"
 
 #include "cmds/RSGISCmdParent.h"
+#include "cmds/RSGISCmdImageRegistration.h"
 
 #include <xercesc/dom/DOM.hpp>
 #include <xercesc/util/XMLString.hpp>

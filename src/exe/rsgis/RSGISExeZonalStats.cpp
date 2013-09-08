@@ -3048,7 +3048,7 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
             }
             catch(rsgis::cmds::RSGISCmdException &e)
             {
-                throw RSGISException(e.what());
+                throw rsgis::RSGISException(e.what());
             }
 
 
@@ -4372,7 +4372,7 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
             }
             catch(rsgis::cmds::RSGISCmdException &e)
             {
-                throw RSGISException(e.what());
+                throw rsgis::RSGISException(e.what());
             }
 
 
