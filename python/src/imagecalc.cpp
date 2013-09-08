@@ -1148,81 +1148,81 @@ static PyMethodDef ImageCalcMethods[] = {
 "Converts the image spectra to unit area\n"
 "call signature: imagecalc.unitArea(inputImage, outputImage, inputMatrixFile)\n"
 "where:\n"
-"  inputImage is a string containing the name of the input image file\n"
-"  outputImage is a string containing the name of the output image file\n"
-"  inputMatrixFile is a string containing the name of the input matrix file TODO: check\n"
+"  * inputImage is a string containing the name of the input image file\n"
+"  * outputImage is a string containing the name of the output image file\n"
+"  * inputMatrixFile is a string containing the name of the input matrix file TODO: check\n"
 },
 
     {"movementSpeed", ImageCalc_MovementSpeed, METH_VARARGS,
 "Calculates the speed of movement in images (mean, min and max)\n"
 "call signature: imagecalc.movementSpeed(inputImages, imageBands, imageTimes, upper, lower, outputImage)\n"
 "where:\n"
-"  inputImages is a python sequence of strings of the input image files\n"
-"  imageBands is a python sequence of integers defining the band of each image to use\n"
-"  imageTimes is a python sequence of floats defining the time corresponding to each image\n"
-"  upper is a float TODO: expand\n"
-"  lower is a float TODO: expand\n"
-"  outputImage is a string defining the output image file name\n"
+"  * inputImages is a python sequence of strings of the input image files\n"
+"  * imageBands is a python sequence of integers defining the band of each image to use\n"
+"  * imageTimes is a python sequence of floats defining the time corresponding to each image\n"
+"  * upper is a float TODO: expand\n"
+"  * lower is a float TODO: expand\n"
+"  * outputImage is a string defining the output image file name\n"
 },
 
     {"countValsInCols", ImageCalc_CountValsInCols, METH_VARARGS,
 "Counts the number of values within a given range for each column\n"
 "call signature: imagecalc.countValsInCols(inputImage, upper, lower, outputImage)\n"
 "where:\n"
-"  inputImage is a string containing the name of the input image file\n"
-"  upper is a float containing the upper limit of values to count\n"
-"  lower is a float containing the lower limit of values to count\n"
-"  outputImage is a string containing the name of the output image file\n"
+"  * inputImage is a string containing the name of the input image file\n"
+"  * upper is a float containing the upper limit of values to count\n"
+"  * lower is a float containing the lower limit of values to count\n"
+"  * outputImage is a string containing the name of the output image file\n"
 },
 
     {"calculateRMSE", ImageCalc_CalculateRMSE, METH_VARARGS,
 "Calculates the root mean squared error between two images\n"
 "call signature: imagecalc.calculateRMSE(inputImageA, inputBandA, inputImageB, inputBandB)\n"
 "where:\n"
-"  inputImageA is a string containing the name of the first input image file\n"
-"  inputBandA is an integer defining which band should be processed from inputImageA\n"
-"  inputImageB is a string containing the name of the second input image file\n"
-"  inputBandB is an integer defining which band should be processed from inputImageB\n"
+"  * inputImageA is a string containing the name of the first input image file\n"
+"  * inputBandA is an integer defining which band should be processed from inputImageA\n"
+"  * inputImageB is a string containing the name of the second input image file\n"
+"  * inputBandB is an integer defining which band should be processed from inputImageB\n"
 },
 
     {"dist2Geoms", ImageCalc_Dist2Geoms, METH_VARARGS,
 "Calculates the distance to the nearest geometry for every pixel in an image\n"
 "call signature: imagecalc.dist2Geoms(inputVector, imageResolution, outputImage)\n"
 "where:\n"
-"  inputVector is a string defining the geometry TODO: Check this and find out about input image\n"
-"  imageResolution is a float defining the resolution of which to process the image\n"
-"  outputImage is a string containing the name of the file for the output image\n"
+"  * inputVector is a string defining the geometry TODO: Check this and find out about input image\n"
+"  * imageResolution is a float defining the resolution of which to process the image\n"
+"  * outputImage is a string containing the name of the file for the output image\n"
 },
 
     {"imageBandStats", ImageCalc_ImageBandStats, METH_VARARGS,
 "Calculates statistics for individuals bands of an image\n"
 "call signature: imagecalc.imageBandStats(inputImage, outputFile, ignoreZeros)\n"
 "where:\n"
-"  inputImage is a string containing the name of the input image file\n"
-"  outputFile is a string containing the name of the output file\n"
-"  ignoreZeros is a boolean defining whether zeros are ignored in the statistic calculation\n"
+"  * inputImage is a string containing the name of the input image file\n"
+"  * outputFile is a string containing the name of the output file\n"
+"  * ignoreZeros is a boolean defining whether zeros are ignored in the statistic calculation\n"
 },
 
     {"imageStats", ImageCalc_ImageStats, METH_VARARGS,
 "Calculates statistics for an image across all bands\n"
 "call signature: imagecalc.imageStats(inputImage, outputFile, ignoreZeros)\n"
 "where:\n"
-"  inputImage is a string containing the name of the input image file\n"
-"  outputFile is a string containing the name of the output file\n"
-"  ignoreZeros is a boolean defining whether zeros are ignored in the statistic calculation\n"
+"  * inputImage is a string containing the name of the input image file\n"
+"  * outputFile is a string containing the name of the output file\n"
+"  * ignoreZeros is a boolean defining whether zeros are ignored in the statistic calculation\n"
 },
 
     {"unconLinearSpecUnmix", ImageCalc_UnconLinearSpecUnmix, METH_VARARGS,
 "Performs unconstrained linear spectral unmixing of the input image for a set of endmembers\n"
 "call signature: imagecalc.unconLinearSpecUnmix(inputImage, gdalformat, gdaltype, lsumGain, lsumOffset, outputFile, endmembersFile)\n"
 "where:\n"
-"  inputImage is a string containing the name of the input image file\n"
-"  gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
-"  gdaltype is an containing one of the values from rsgislib.TYPE_*\n"
-"  lsumGain is a float TODO: Complete here and below\n"
-"  lsumOffset is a float\n"
-"  outputFile is a string containing the name of the output file\n"
-"  endmembersFile is a string containing the names of the file containing the end members\n"
+"  * inputImage is a string containing the name of the input image file\n"
+"  * gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
+"  * gdaltype is an containing one of the values from rsgislib.TYPE_*\n"
+"  * lsumGain is a float TODO: Complete here and below\n"
+"  * lsumOffset is a float\n"
+"  * outputFile is a string containing the name of the output file\n"
+"  * endmembersFile is a string containing the names of the file containing the end members\n"
 },
 
     {"exhconLinearSpecUnmix", ImageCalc_ExhconLinearSpecUnmix, METH_VARARGS,
