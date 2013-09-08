@@ -571,54 +571,56 @@ namespace rsgis{namespace rastergis{
             //std::cout << "FID: " << fid << std::endl;
             for(std::vector<rsgis::rastergis::RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
             {
-                if((*iterBands)->calcMin)
+                if(boost::math::isfinite(bandValues[(*iterBands)->band]))
                 {
-                    if(firstVal[fid])
+                    if((*iterBands)->calcMin)
                     {
-                        attTable->SetValue(fid, (*iterBands)->minIdx, bandValues[(*iterBands)->band]);
+                        if(firstVal[fid])
+                        {
+                            attTable->SetValue(fid, (*iterBands)->minIdx, bandValues[(*iterBands)->band]);
+                        }
+                        else if(bandValues[(*iterBands)->band] < attTable->GetValueAsDouble(fid, (*iterBands)->minIdx))
+                        {
+                            attTable->SetValue(fid, (*iterBands)->minIdx, bandValues[(*iterBands)->band]);
+                        }
                     }
-                    else if(bandValues[(*iterBands)->band] < attTable->GetValueAsDouble(fid, (*iterBands)->minIdx))
+                    
+                    if((*iterBands)->calcMax)
                     {
-                        attTable->SetValue(fid, (*iterBands)->minIdx, bandValues[(*iterBands)->band]);
+                        if(firstVal[fid])
+                        {
+                            attTable->SetValue(fid, (*iterBands)->maxIdx, bandValues[(*iterBands)->band]);
+                        }
+                        else if(bandValues[(*iterBands)->band] > attTable->GetValueAsDouble(fid, (*iterBands)->maxIdx))
+                        {
+                            attTable->SetValue(fid, (*iterBands)->maxIdx, bandValues[(*iterBands)->band]);
+                        }
+                    }
+                    
+                    if((*iterBands)->calcMean)
+                    {
+                        if(firstVal[fid])
+                        {
+                            attTable->SetValue(fid, (*iterBands)->meanIdx, bandValues[(*iterBands)->band]);
+                        }
+                        else
+                        {
+                            attTable->SetValue(fid, (*iterBands)->meanIdx, (attTable->GetValueAsDouble(fid, (*iterBands)->meanIdx) + bandValues[(*iterBands)->band]));
+                        }
+                    }
+                    
+                    if((*iterBands)->calcSum)
+                    {
+                        if(firstVal[fid])
+                        {
+                            attTable->SetValue(fid, (*iterBands)->sumIdx, bandValues[(*iterBands)->band]);
+                        }
+                        else
+                        {
+                            attTable->SetValue(fid, (*iterBands)->sumIdx, (attTable->GetValueAsDouble(fid, (*iterBands)->sumIdx) + bandValues[(*iterBands)->band]));
+                        }
                     }
                 }
-                
-                if((*iterBands)->calcMax)
-                {
-                    if(firstVal[fid])
-                    {
-                        attTable->SetValue(fid, (*iterBands)->maxIdx, bandValues[(*iterBands)->band]);
-                    }
-                    else if(bandValues[(*iterBands)->band] > attTable->GetValueAsDouble(fid, (*iterBands)->maxIdx))
-                    {
-                        attTable->SetValue(fid, (*iterBands)->maxIdx, bandValues[(*iterBands)->band]);
-                    }
-                }
-                
-                if((*iterBands)->calcMean)
-                {
-                    if(firstVal[fid])
-                    {
-                        attTable->SetValue(fid, (*iterBands)->meanIdx, bandValues[(*iterBands)->band]);
-                    }
-                    else
-                    {
-                        attTable->SetValue(fid, (*iterBands)->meanIdx, (attTable->GetValueAsDouble(fid, (*iterBands)->meanIdx) + bandValues[(*iterBands)->band]));
-                    }
-                }
-                
-                if((*iterBands)->calcSum)
-                {
-                    if(firstVal[fid])
-                    {
-                        attTable->SetValue(fid, (*iterBands)->sumIdx, bandValues[(*iterBands)->band]);
-                    }
-                    else
-                    {
-                        attTable->SetValue(fid, (*iterBands)->sumIdx, (attTable->GetValueAsDouble(fid, (*iterBands)->sumIdx) + bandValues[(*iterBands)->band]));
-                    }
-                }
-                
             }
             
             if(firstVal[fid])
@@ -654,19 +656,22 @@ namespace rsgis{namespace rastergis{
             size_t fid = boost::lexical_cast<size_t>(bandValues[0]);
             for(std::vector<rsgis::rastergis::RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
             {
-                if((*iterBands)->calcStdDev)
+                if(boost::math::isfinite(bandValues[(*iterBands)->band]))
                 {
-                    double mean = attTable->GetValueAsDouble(fid, (*iterBands)->meanIdx);
-                    double stdDevComp = pow(((double)(bandValues[(*iterBands)->band] - mean)), 2.0);
-                    if(firstVal[fid])
+                    if((*iterBands)->calcStdDev)
                     {
-                        attTable->SetValue(fid, (*iterBands)->stdDevIdx, stdDevComp);
+                        double mean = attTable->GetValueAsDouble(fid, (*iterBands)->meanIdx);
+                        double stdDevComp = pow(((double)(bandValues[(*iterBands)->band] - mean)), 2.0);
+                        if(firstVal[fid])
+                        {
+                            attTable->SetValue(fid, (*iterBands)->stdDevIdx, stdDevComp);
+                        }
+                        else
+                        {
+                            attTable->SetValue(fid, (*iterBands)->stdDevIdx, (attTable->GetValueAsDouble(fid, (*iterBands)->stdDevIdx)+stdDevComp));
+                        }
                     }
-                    else
-                    {
-                        attTable->SetValue(fid, (*iterBands)->stdDevIdx, (attTable->GetValueAsDouble(fid, (*iterBands)->stdDevIdx)+stdDevComp));
-                    }
-                }                
+                }
             }
             
             if(firstVal[fid])
