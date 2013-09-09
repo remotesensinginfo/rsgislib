@@ -30,12 +30,18 @@
 #############################################################################
 
 import sys, os
-import rsgislib
-from rsgislib import imageutils
-from rsgislib import imagecalc
-from rsgislib import rastergis
-from rsgislib import zonalstats
-from rsgislib.imagecalc import BandDefn
+try:
+    import rsgislib
+    from rsgislib import imageutils
+    from rsgislib import imagecalc
+    from rsgislib import rastergis
+    from rsgislib import zonalstats
+    from rsgislib import imageregistration
+    from rsgislib.imagecalc import BandDefn
+except ImportError as err:
+    print(err)
+    sys.exit()
+    
 
 path = os.sys.path[0] + '/'
 inFileName = os.path.join(path,"Rasters","injune_p142_casi_sub_utm.kea")
@@ -96,6 +102,8 @@ class RSGISTests:
         os.system('rm ' + self.testRasterGISDIR + '/* 2> /dev/null')
         os.system('rm ' + self.testTilesDIR + '/* 2> /dev/null')
         os.system('rm ' + self.testZonalTXTDIR + '/* 2> /dev/null')
+
+    # Image Calc
 
     def testNormalise1(self):
         print("PYTHON TEST: Testing normalisation no in calc")
@@ -308,6 +316,8 @@ class RSGISTests:
     def testPxlColRegression(self):
         print("PYTHON TEST: pxlColRegression - skipping due to lack of bandvalues file.txt")
 
+    # Raster GIS
+    
     def testCopyGDLATT(self):
         print("PYTHON TEST: copyRAT")
         table = "./RATS/injune_p142_casi_sub_utm_clumps_elim_final_clumps_elim_final.kea"
@@ -437,6 +447,8 @@ class RSGISTests:
         colourtable=True
         rastergis.populateStats(clumps, colourtable, pyramids)
 
+    """ Image Utils """
+    
     def testCreateTiles(self):
         print("PYTHON TEST: createTiles")
         inputImage = path + "Rasters/injune_p142_casi_sub_utm.kea"
@@ -465,6 +477,8 @@ class RSGISTests:
     def testPopImageStats(self):
         inputImage = './TestOutputs/injune_p142_casi_sub_utm.kea'
         imageutils.popImageStats(inputImage,True,0.,True)
+        
+    # Zonal Stats
 
     def testPointValue2SHP(self):
         # Not all pixels are within image - should print warnings but pass test.
@@ -504,7 +518,43 @@ class RSGISTests:
         inputVector = './Vectors/injune_p142_crowns_utm.shp'
         outputTxtBase = './TestOutputs/ZonalTXT/injune_p142_casi_sub_utm_txt'
         zonalstats.pixelVals2TXT(inputImage, inputVector, outputTxtBase, 'FID', True, zonalstats.METHOD_POLYCONTAINSPIXELCENTER)
-
+        
+    # Image Registration
+    def testBasicRegistration(self):
+        print("PYTHON TEST: basicregistration")
+        reference = './Rasters/injune_p142_casi_sub_utm_single_band.vrt'        
+        floating = './Rasters/injune_p142_casi_sub_utm_single_band_offset3x3y.vrt'
+        pixelGap = 50 
+        threshold = 0.4
+        window = 100
+        search = 5
+        stddevRef = 2
+        stddevFloat = 2
+        subpixelresolution = 4
+        metric = imageregistration.METRIC_CORELATION
+        outputType = imageregistration.TYPE_RSGIS_IMG2MAP
+        output = './TestOutputs/injune_p142_casi_sub_utm_tie_points_basic.txt'
+        imageregistration.basicregistration(reference, floating, pixelGap, threshold, window, search, stddevRef, stddevFloat, subpixelresolution, metric, outputType, output)
+        
+    def testSingleLayerRegistration(self):
+        print("PYTHON TEST: basicregistration")
+        reference = './Rasters/injune_p142_casi_sub_utm_single_band.vrt'        
+        floating = './Rasters/injune_p142_casi_sub_utm_single_band_offset3x3y.vrt'
+        pixelGap = 50 
+        threshold = 0.4
+        window = 100
+        search = 5
+        stddevRef = 2
+        stddevFloat = 2
+        subpixelresolution = 4
+        distanceThreshold = 100
+        maxiterations = 10
+        movementThreshold = 0.01 
+        pSmoothness = 2    
+        metric = imageregistration.METRIC_CORELATION
+        outputType = imageregistration.TYPE_RSGIS_IMG2MAP
+        output = './TestOutputs/injune_p142_casi_sub_utm_tie_points_singlelayer.txt'
+        imageregistration.singlelayerregistration(reference, floating, pixelGap, threshold, window, search, stddevRef, stddevFloat, subpixelresolution, distanceThreshold, maxiterations, movementThreshold, pSmoothness, metric, outputType, output)
 
 if __name__ == '__main__':
 
@@ -595,6 +645,12 @@ if __name__ == '__main__':
         t.tryFuncAndCatch(t.testPixelStats2SHP)
         t.tryFuncAndCatch(t.testPixelStats2TXT)
         t.tryFuncAndCatch(t.testPixelVals2TXT)
+        
+    if testLibraries == 'all' or testLibraries == 'imageregistration':
+        
+        """ Image Registration functions """
+        t.tryFuncAndCatch(t.testBasicRegistration)
+        t.tryFuncAndCatch(t.testSingleLayerRegistration)
     
     print("%s TESTS COMPLETED - %s FAILURES LISTED BELOW:"%(t.numTests, len(t.failures)))
     if(len(t.failures)):

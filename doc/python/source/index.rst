@@ -29,6 +29,8 @@ These are the API documentation pages for the Remote Sensing and GIS Software Li
    help(rsgislib.segmentation)
    import rsgislib.zonalstats
    help(rsgislib.zonalstats)
+   import rsgislib.imageregistration
+   help(rsgislib.imageregistration)
 
 Contents:
 
@@ -42,6 +44,7 @@ Contents:
    rsgislib_rastergis
    rsgislib_segmentation
    rsgislib_zonalstats
+   rsgislib_imageregistration
    
 .. codeauthor:: Dr Peter Bunting <pfb@aber.ac.uk>
 

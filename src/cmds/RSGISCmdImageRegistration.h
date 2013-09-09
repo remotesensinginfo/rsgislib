@@ -41,8 +41,8 @@ namespace rsgis{ namespace cmds {
     /** Single connected layer image registration */
     void excecuteSingleLayerConnectedRegistration(std::string inputReferenceImage, std::string inputFloatingmage, int gcpGap,
                                                   float metricThreshold, int windowSize, int searchArea, float stdDevRefThreshold,
-                                                  float stdDevFloatThreshold, int subPixelResolution, float distanceThreshold,
-                                                  int maxNumIterations, float moveChangeThreshold, int pSmoothness, unsigned int metricTypeInt,
+                                                  float stdDevFloatThreshold, int subPixelResolution, int distanceThreshold,
+                                                  int maxNumIterations, float moveChangeThreshold, float pSmoothness, unsigned int metricTypeInt,
                                                   unsigned int outputType, std::string outputGCPFile);
 }}
 
