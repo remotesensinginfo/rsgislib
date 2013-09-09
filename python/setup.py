@@ -35,6 +35,12 @@ zonalstats_module = Extension(name='zonalstats._zonalstats',
                 include_dirs=['../src/cmds', '../src'],
                 library_dirs=['../src'],
                 libraries=['rsgis_cmds'])
+                
+imageregistration_module = Extension(name='imageregistration._imageregistration',
+                sources=['src/imageregistration.cpp'],
+                include_dirs=['../src/cmds', '../src'],
+                library_dirs=['../src'],
+                libraries=['rsgis_cmds'])
 
 
 # do the setup
@@ -44,8 +50,8 @@ setup( name = 'RSGISLib',
         author = 'Sam Gillingham',
         author_email = 'gillingham.sam@gmail.com',
         packages = ['rsgislib', 'rsgislib.imagecalc', 'rsgislib.imageutils',
-                        'rsgislib.segmentation','rsgislib.imagecalibration','rsgislib.rastergis','rsgislib.zonalstats'],
+                        'rsgislib.segmentation','rsgislib.imagecalibration','rsgislib.rastergis','rsgislib.zonalstats','rsgislib.imageregistration'],
         ext_package = 'rsgislib',
         ext_modules = [imagecalc_module, imageutils_module, 
-                            segmentation_module, imagecalibration_module, rastergis_module, zonalstats_module])
+                            segmentation_module, imagecalibration_module, rastergis_module, zonalstats_module, imageregistration_module])
 
