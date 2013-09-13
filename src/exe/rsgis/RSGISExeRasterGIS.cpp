@@ -77,6 +77,7 @@ namespace rsgisexe{
             XMLCh *optionPopulateStats = xercesc::XMLString::transcode("populatestats");
             XMLCh *optionFindChangeClumpsFromStddev = xercesc::XMLString::transcode("findchangeclumpsfromstddev");
             XMLCh *optionRMSmallClumps = xercesc::XMLString::transcode("rmsmallclumps");
+            XMLCh *optionSelectClumpsOnGrid = xercesc::XMLString::transcode("selectclumpsongrid");
 
             const XMLCh *algorNameEle = argElement->getAttribute(algorXMLStr);
             if(!xercesc::XMLString::equals(algorName, algorNameEle))
@@ -3028,6 +3029,116 @@ namespace rsgisexe{
                 xercesc::XMLString::release(&formatXMLStr);
                 
             }
+            else if(xercesc::XMLString::equals(optionSelectClumpsOnGrid, optionXML))
+            {
+                this->option = RSGISExeRasterGIS::selectclumpsongrid;
+                
+                XMLCh *clumpsXMLStr = xercesc::XMLString::transcode("clumps");
+                if(argElement->hasAttribute(clumpsXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(clumpsXMLStr));
+                    this->clumpsImage = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'clumps\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&clumpsXMLStr);
+                
+                XMLCh *inSelectFieldXMLStr = xercesc::XMLString::transcode("inselectfield");
+                if(argElement->hasAttribute(inSelectFieldXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(inSelectFieldXMLStr));
+                    this->inSelectField = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'inselectfield\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&inSelectFieldXMLStr);
+                
+                XMLCh *outSelectFieldXMLStr = xercesc::XMLString::transcode("outselectfield");
+                if(argElement->hasAttribute(outSelectFieldXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outSelectFieldXMLStr));
+                    this->outSelectField = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'outselectfield\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&outSelectFieldXMLStr);
+                
+                XMLCh *eastingsXMLStr = xercesc::XMLString::transcode("eastings");
+                if(argElement->hasAttribute(eastingsXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(eastingsXMLStr));
+                    this->eastingsField = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'eastings\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&eastingsXMLStr);
+                
+                XMLCh *northingsXMLStr = xercesc::XMLString::transcode("northings");
+                if(argElement->hasAttribute(northingsXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(northingsXMLStr));
+                    this->northingsField = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'northings\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&northingsXMLStr);
+                
+                XMLCh *methodXMLStr = xercesc::XMLString::transcode("method");
+                if(argElement->hasAttribute(methodXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(methodXMLStr));
+                    this->methodStr = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'method\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&methodXMLStr);
+                
+                XMLCh *rowsXMLStr = xercesc::XMLString::transcode("rows");
+                if(argElement->hasAttribute(rowsXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(rowsXMLStr));
+                    this->numRows = textUtils.strto16bitUInt(std::string(charValue));
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'rows\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&rowsXMLStr);
+                
+                
+                XMLCh *colsXMLStr = xercesc::XMLString::transcode("cols");
+                if(argElement->hasAttribute(colsXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(colsXMLStr));
+                    this->numCols = textUtils.strto16bitUInt(std::string(charValue));
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'cols\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&colsXMLStr);
+                
+            }
             else
             {
                 std::string message = std::string("The option (") + std::string(xercesc::XMLString::transcode(optionXML)) + std::string(") is not known: RSGISExeRasterGIS.");
@@ -3070,6 +3181,7 @@ namespace rsgisexe{
             xercesc::XMLString::release(&optionPopulateStats);
             xercesc::XMLString::release(&optionFindChangeClumpsFromStddev);
             xercesc::XMLString::release(&optionRMSmallClumps);
+            xercesc::XMLString::release(&optionSelectClumpsOnGrid);
         }
         catch (rsgis::RSGISXMLArgumentsException &e)
         {
@@ -3918,6 +4030,36 @@ namespace rsgisexe{
                     throw rsgis::RSGISException(e.what());
                 }
             }
+            else if(this->option == RSGISExeRasterGIS::selectclumpsongrid)
+            {
+                std::cout << "A command to identify an extreme clump/segment with regions of the image, regions defined on a grid\n";
+                std::cout << "Clumps: " << this->clumpsImage << std::endl;
+                std::cout << "In Select Field: " << this->inSelectField << std::endl;
+                std::cout << "Out Select Field: " << this->outSelectField << std::endl;
+                std::cout << "Eastings Field: " << this->eastingsField << std::endl;
+                std::cout << "Northings Field: " << this->northingsField << std::endl;
+                std::cout << "Method: " << this->methodStr << std::endl;
+                std::cout << "Metric Value Field: " << this->metricCol << std::endl;
+                std::cout << "Number of Rows: " << this->numRows << std::endl;
+                std::cout << "Number of Cols: " << this->numCols << std::endl;
+                
+                try
+                {
+                    rsgis::cmds::executeIdentifyClumpExtremesOnGrid(this->clumpsImage, this->inSelectField, this->outSelectField, this->eastingsField, this->northingsField, this->methodStr, this->numRows, this->numCols, this->metricCol);
+                }
+                catch(rsgis::RSGISException e)
+                {
+                    throw rsgis::RSGISException(e.what());
+                }
+                catch(rsgis::cmds::RSGISCmdException e)
+                {
+                    throw rsgis::RSGISException(e.what());
+                }
+                catch (std::exception e)
+                {
+                    throw rsgis::RSGISException(e.what());
+                }
+            }
             else
             {
                 throw rsgis::RSGISException("The option is not recognised: RSGISExeRasterGIS");
@@ -4281,6 +4423,19 @@ namespace rsgisexe{
                 std::cout << "Clumps: " << this->clumpsImage << std::endl;
                 std::cout << "Output: " << this->outputFile << std::endl;
                 std::cout << "Threshold: " << this->areaThreshold << std::endl;
+            }
+            else if(this->option == RSGISExeRasterGIS::selectclumpsongrid)
+            {
+                std::cout << "A command to identify an extreme clump/segment with regions of the image, regions defined on a grid\n";
+                std::cout << "Clumps: " << this->clumpsImage << std::endl;
+                std::cout << "In Select Field: " << this->inSelectField << std::endl;
+                std::cout << "Out Select Field: " << this->outSelectField << std::endl;
+                std::cout << "Eastings Field: " << this->eastingsField << std::endl;
+                std::cout << "Northings Field: " << this->northingsField << std::endl;
+                std::cout << "Method: " << this->methodStr << std::endl;
+                std::cout << "Metric Value Field: " << this->metricCol << std::endl;
+                std::cout << "Number of Rows: " << this->numRows << std::endl;
+                std::cout << "Number of Cols: " << this->numCols << std::endl;
             }
             else
             {

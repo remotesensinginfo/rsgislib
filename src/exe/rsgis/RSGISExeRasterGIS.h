@@ -108,7 +108,8 @@ namespace rsgisexe{
             defineborderclumps,
             populatestats,
             findchangeclumpsfromstddev,
-            rmsmallclumps
+            rmsmallclumps,
+            selectclumpsongrid
         };
         
         RSGISExeRasterGIS();
@@ -153,6 +154,10 @@ namespace rsgisexe{
         std::string tileImage;
         std::string maskImage;
         std::string changeField;
+        std::string inSelectField;
+        std::string outSelectField;
+        std::string metricCol;
+        std::string methodStr;
         size_t fid;
         unsigned int nFeatures;
         float specDistThreshold;
@@ -185,6 +190,8 @@ namespace rsgisexe{
         bool addColourTable2Img;
         std::vector<rsgis::rastergis::RSGISClassChangeFields*> *classChangeField;
         std::vector<std::string> *attFields;
+        unsigned int numRows;
+        unsigned int numCols;
     };
     
 }
