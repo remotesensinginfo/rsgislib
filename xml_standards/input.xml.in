@@ -524,6 +524,22 @@
     </rsgis:command>
 	<!-- A command remove clumps with a size below a threshold and assign to the background value (i.e., 0).-->
 	<rsgis:command algor="rastergis" option="rmsmallclumps" clumps="clumps.kea" output="clumps.kea" threshold="int" format="GDAL Format" />
+	<!-- A command to identify an extreme clump/segment with regions of the image, regions defined on a grid -->
+	<rsgis:command algor="rastergis" option="selectclumpsongrid" clumps="clumps.kea" inselectfield="string" outselectfield="string" eastings="string" northings="string" method="min | max | mean" rows="int" cols="int" metriccol="string" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -894,7 +910,6 @@
     <rsgis:command algor="elevation" option="incidenceexitanceangles" input="image.env" output="out_image.env" solarAzimuth="float" solarZenith="float" viewAzimuth="float" viewZenith="float" [band="int"] format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
 	<!-- A command to fills the holes within a DEM, the input image should have the following bands: elevation, slope, aspect -->
     <rsgis:command algor="elevation" option="fill" input="image.env" output="out_image.env" holesval="float" nodata="float" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
-
 	<!-- A command to fills the holes within a DEM derived slope or aspect layer from another layer derived from another source (before filling) -->
     <rsgis:command algor="elevation" option="infilldlayers" baseimage="image.env" infillimage="image.env" dem="dem.env" output="out_image.env" holesval="float" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
 
