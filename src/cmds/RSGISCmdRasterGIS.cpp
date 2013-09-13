@@ -1026,7 +1026,28 @@ namespace rsgis{ namespace cmds {
         }
     }
     
-    
+    void executeIdentifyClumpExtremesOnGrid(std::string clumpsImage, std::string inSelectField, std::string outSelectField, std::string eastingsCol, std::string northingsCol, std::string methodStr, unsigned int rows, unsigned int cols, std::string metricField)throw(RSGISCmdException)
+    {
+        GDALAllRegister();
+        GDALDataset *clumpsDataset;
+        
+        try
+        {
+            clumpsDataset = (GDALDataset *) GDALOpen(clumpsImage.c_str(), GA_Update);
+            if(clumpsDataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + clumpsImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            
+            GDALClose(clumpsDataset);
+        }
+        catch (rsgis::RSGISException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
 
 }}
 
