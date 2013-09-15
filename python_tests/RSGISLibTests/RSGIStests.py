@@ -537,7 +537,7 @@ class RSGISTests:
         imageregistration.basicregistration(reference, floating, pixelGap, threshold, window, search, stddevRef, stddevFloat, subpixelresolution, metric, outputType, output)
         
     def testSingleLayerRegistration(self):
-        print("PYTHON TEST: basicregistration")
+        print("PYTHON TEST: singlelayerregistration")
         reference = './Rasters/injune_p142_casi_sub_utm_single_band.vrt'        
         floating = './Rasters/injune_p142_casi_sub_utm_single_band_offset3x3y.vrt'
         pixelGap = 50 
