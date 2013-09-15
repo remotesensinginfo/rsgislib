@@ -30,7 +30,10 @@
 
 #include "common/RSGISFileException.h"
 #include "common/RSGISImageException.h"
+
 #include "img/RSGISImageInterpolator.h"
+
+#include "math/RSGIS2DInterpolation.h"
 
 namespace rsgis{namespace img{
 	
@@ -55,6 +58,16 @@ namespace rsgis{namespace img{
 			double findFloatingPointComponent(double floatingPointNum, int *integer); 
 			RSGISInterpolator *interpolator;
 		};
+    
+    
+    class RSGISPopulateImageFromInterpolator
+    {
+    public:
+        RSGISPopulateImageFromInterpolator();
+        void populateImage(rsgis::math::RSGIS2DInterpolator *interpolator, GDALDataset *image)throw(rsgis::RSGISImageException, rsgis::math::RSGISInterpolationException);
+        ~RSGISPopulateImageFromInterpolator();
+    };
+    
 }}
 
 #endif

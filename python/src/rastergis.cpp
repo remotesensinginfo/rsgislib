@@ -1161,6 +1161,48 @@ static PyObject *RasterGIS_FindChangeClumpsFromStdDev(PyObject *self, PyObject *
 
 
 
+static PyObject *RasterGIS_SelectClumpsOnGrid(PyObject *self, PyObject *args) {
+    const char *clumpsImage, *inSelectField, *outSelectField, *eastingsCol, *northingsCol, *metricField, *methodStr;
+    unsigned int rows, cols;
+    
+    if(!PyArg_ParseTuple(args, "sssssssII:selectClumpsOnGrid", &clumpsImage, &inSelectField, &outSelectField, &eastingsCol, &northingsCol, &metricField, &methodStr, &rows, &cols)) {
+        return NULL;
+    }
+    
+    try {
+        rsgis::cmds::executeIdentifyClumpExtremesOnGrid(std::string(clumpsImage), std::string(inSelectField), std::string(outSelectField), std::string(eastingsCol), std::string(northingsCol), std::string(methodStr), rows, cols, std::string(metricField));
+    } catch (rsgis::cmds::RSGISCmdException &e) {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
+
+static PyObject *RasterGIS_InterpolateClumpValues2Img(PyObject *self, PyObject *args) {
+    const char *clumpsImage, *selectField, *eastingsField, *northingsField, *methodStr, *valueField, *outputFile, *imageFormat;
+    int dataType;
+    
+    if(!PyArg_ParseTuple(args, "ssssssssi:interpolateClumpValues2Image", &clumpsImage, &selectField, &eastingsField, &northingsField, &methodStr, &valueField, &outputFile, &imageFormat, &dataType)) {
+        return NULL;
+    }
+    
+    try {
+        rsgis::RSGISLibDataType type = (rsgis::RSGISLibDataType) dataType;
+        rsgis::cmds::executeInterpolateClumpValuesToImage(std::string(clumpsImage), std::string(selectField), std::string(eastingsField), std::string(northingsField), std::string(methodStr), std::string(valueField), std::string(outputFile), std::string(imageFormat), type);
+    } catch (rsgis::cmds::RSGISCmdException &e) {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
+
+
+
+
 static PyMethodDef RasterGISMethods[] = {
     {"populateStats", RasterGIS_PopulateStats, METH_VARARGS,
 "Populates statics for thermatic imagess\n"
@@ -1525,6 +1567,36 @@ static PyMethodDef RasterGISMethods[] = {
 "    * means - a sequence of floats, containing the means\n"
 "    * stddev - a sequence of floats, containing the stddevs corresponding to the means\n"
 "\n"},
+
+{"selectClumpsOnGrid", RasterGIS_SelectClumpsOnGrid, METH_VARARGS,
+    "rsgislib.rastergis.selectClumpsOnGrid(clumpsImage, inSelectField, outSelectField, eastingsCol, northingsCol, metricField, methodStr, rows, cols)\n"
+    "Selects a segment within a regular grid pattern across the scene. The clump is selected based on the minimum, maximum or closest to the mean.\n"
+    "where:\n"
+    "  * clumpsImage is a string containing the name of the input clump file\n"
+    "  * inSelectField is a string which defines the column name where a value of 1 defines the clumps which will be included in the analysis.\n"
+    "  * outSelectField is a string which defines the column name where a value of 1 defines the clumps selected by the analysis.\n"
+    "  * eastingsCol is a string which defines a column with a eastings for each clump.\n"
+    "  * northingsCol is a string which defines a column with a northings for each clump.\n"
+    "  * metricField is a string which defines a column with a value for each clump which will be used for the distance, min, or max anaylsis.\n"
+    "  * methodStr is a string which defines whether the minimum, maximum or mean method of selecting a clump will be used (values can be either min, max or mean).\n"
+    "  * rows is an unsigned integer which defines the number of rows within which a clump will be selected.\n"
+    "  * cols is an unsigned integer which defines the number of columns within which a clump will be selected.\n"
+    "\n"},
+    
+{"interpolateClumpValues2Image", RasterGIS_InterpolateClumpValues2Img, METH_VARARGS,
+    "rsgislib.rastergis.interpolateClumpValues2Image(clumpsImage, selectField, eastingsField, northingsField, methodStr, valueField, outputFile, imageFormat, dataType)\n"
+    "Interpolates values from clumps to the whole image of pixels.\n"
+    "where:\n"
+    "  * clumpsImage is a string containing the name of the input clump file\n"
+    "  * selectField is a string which defines the column name where a value of 1 defines the clumps which will be included in the analysis.\n"
+    "  * eastingsField is a string which defines a column with a eastings for each clump.\n"
+    "  * northingsField is a string which defines a column with a northings for each clump.\n"
+    "  * methodStr is a string which defines a column with a value for each clump which will be used for the distance, nearestneighbour or naturalneighbour or naturalnearestneighbour or knearestneighbour anaylsis.\n"
+    "  * valueField is a string which defines a column containing the values to be interpolated creating the new image.\n"
+    "  * outputFile is a string for the path to the output image file.\n"
+    "  * imageFormat is string defining the GDAL format of the output image.\n"
+    "  * dataType is an containing one of the values from rsgislib.TYPE_*\n"
+    "\n"},
     
     
     {NULL}        /* Sentinel */

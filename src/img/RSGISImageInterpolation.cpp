@@ -767,5 +767,125 @@ namespace rsgis{namespace img{
 	{
 		
 	}
+    
+    
+    
+    
+    
+    RSGISPopulateImageFromInterpolator::RSGISPopulateImageFromInterpolator()
+    {
+        
+    }
+    
+    void RSGISPopulateImageFromInterpolator::populateImage(rsgis::math::RSGIS2DInterpolator *interpolator, GDALDataset *image)throw(rsgis::RSGISImageException, rsgis::math::RSGISInterpolationException)
+    {
+        try
+        {
+            int xBlockSize = 0;
+            int yBlockSize = 0;
+            int height = 0;
+            int width = 0;
+            float *imgData = NULL;
+            GDALRasterBand *outputRasterBand = image->GetRasterBand(1);
+            double *gdalTransform = new double[6];
+            image->GetGeoTransform(gdalTransform);
+            width = image->GetRasterXSize();
+            height = image->GetRasterYSize();
+            
+            outputRasterBand->GetBlockSize(&xBlockSize, &yBlockSize);
+            
+            int bufferSize = yBlockSize * width;
+            imgData = (float *) CPLMalloc(sizeof(float)*(bufferSize));
+            
+            int nYBlocks = floor(((double)height) / ((double)yBlockSize));
+            int remainRows = height - (nYBlocks * yBlockSize);
+            int rowOffset = 0;
+            
+            double tlX = gdalTransform[0];
+            double tlY = gdalTransform[3];
+            double xRes = gdalTransform[1];
+            double yRes = gdalTransform[5];
+            
+            //std::cout << "Resolution: [" << xRes << ", " << yRes << "]\n";
+            //std::cout << "TL: [" << tlX << ", " << tlY << "]\n";
+            
+            double cX = 0.0;
+            double cY = 0.0;
+            
+            
+			int feedback = height/10.0;
+			int feedbackCounter = 0;
+			std::cout << "Started" << std::flush;
+            cY = tlY;
+            for(int i = 0; i < nYBlocks; ++i)
+			{
+                for(int m = 0; m < yBlockSize; ++m)
+                {
+                    if((feedback != 0) && (((i*yBlockSize)+m) % feedback) == 0)
+                    {
+                        std::cout << "." << feedbackCounter << "." << std::flush;
+                        feedbackCounter = feedbackCounter + 10;
+                    }
+                    cX = tlX;
+                    //std::cout << "cY = " << cY << std::endl;
+                    for(int j = 0; j < width; ++j)
+                    {
+                        imgData[(m*width)+j] = interpolator->getValue(cX, cY);
+                        //std::cout << "[" << cX << "," << cY << "] = " << imgData[(m*width)+j] << std::endl;
+                        cX += xRes;
+                    }
+                    cY += yRes;
+                }
+				
+				rowOffset = yBlockSize * i;
+                outputRasterBand->RasterIO(GF_Write, 0, rowOffset, width, yBlockSize, imgData, width, yBlockSize, GDT_Float32, 0, 0);
+			}
+            
+            if(remainRows > 0)
+            {
+                for(int m = 0; m < remainRows; ++m)
+                {
+                    if((feedback != 0) && ((((nYBlocks*yBlockSize)+m) % feedback) == 0))
+                    {
+                        std::cout << "." << feedbackCounter << "." << std::flush;
+                        feedbackCounter = feedbackCounter + 10;
+                    }
+                    cX = tlX;
+                    for(int j = 0; j < width; ++j)
+                    {
+                        imgData[(m*width)+j] = interpolator->getValue(cX, cY);
+                        //std::cout << "[" << cX << "," << cY << "] = " << imgData[(m*width)+j] << std::endl;
+                        cX += xRes;
+                    }
+                    cY += yRes;
+                }
+				
+				rowOffset = (yBlockSize * nYBlocks);
+                outputRasterBand->RasterIO(GF_Write, 0, rowOffset, width, remainRows, imgData, width, remainRows, GDT_Float32, 0, 0);
+            }
+			std::cout << " Complete.\n";
+                        
+            delete[] gdalTransform;
+            delete[] imgData;
+            
+        }
+        catch(rsgis::math::RSGISInterpolationException &e)
+        {
+            throw e;
+        }
+        catch(rsgis::RSGISImageException &e)
+        {
+            throw e;
+        }
+        catch(rsgis::RSGISException &e)
+        {
+            throw rsgis::math::RSGISInterpolationException(e.what());
+        }
+    }
+    
+    RSGISPopulateImageFromInterpolator::~RSGISPopulateImageFromInterpolator()
+    {
+        
+    }
 	
 }}
