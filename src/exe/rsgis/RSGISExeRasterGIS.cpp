@@ -78,6 +78,7 @@ namespace rsgisexe{
             XMLCh *optionFindChangeClumpsFromStddev = xercesc::XMLString::transcode("findchangeclumpsfromstddev");
             XMLCh *optionRMSmallClumps = xercesc::XMLString::transcode("rmsmallclumps");
             XMLCh *optionSelectClumpsOnGrid = xercesc::XMLString::transcode("selectclumpsongrid");
+            XMLCh *optionInterpolateClumpValues2Img = xercesc::XMLString::transcode("interpolateclumpvalues2img");
 
             const XMLCh *algorNameEle = argElement->getAttribute(algorXMLStr);
             if(!xercesc::XMLString::equals(algorName, algorNameEle))
@@ -3111,6 +3112,19 @@ namespace rsgisexe{
                 }
                 xercesc::XMLString::release(&methodXMLStr);
                 
+                XMLCh *metricColXMLStr = xercesc::XMLString::transcode("metriccol");
+                if(argElement->hasAttribute(metricColXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(metricColXMLStr));
+                    this->metricCol = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'metriccol\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&metricColXMLStr);
+                
                 XMLCh *rowsXMLStr = xercesc::XMLString::transcode("rows");
                 if(argElement->hasAttribute(rowsXMLStr))
                 {
@@ -3138,6 +3152,170 @@ namespace rsgisexe{
                 }
                 xercesc::XMLString::release(&colsXMLStr);
                 
+            }
+            else if(xercesc::XMLString::equals(optionInterpolateClumpValues2Img, optionXML))
+            {
+                this->option = RSGISExeRasterGIS::interpolateclumpvalues2img;
+                
+                XMLCh *clumpsXMLStr = xercesc::XMLString::transcode("clumps");
+                if(argElement->hasAttribute(clumpsXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(clumpsXMLStr));
+                    this->clumpsImage = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'clumps\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&clumpsXMLStr);
+                
+                XMLCh *selectFieldXMLStr = xercesc::XMLString::transcode("selectfield");
+                if(argElement->hasAttribute(selectFieldXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(selectFieldXMLStr));
+                    this->inSelectField = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'selectfield\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&selectFieldXMLStr);
+                
+                XMLCh *eastingsXMLStr = xercesc::XMLString::transcode("eastings");
+                if(argElement->hasAttribute(eastingsXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(eastingsXMLStr));
+                    this->eastingsField = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'eastings\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&eastingsXMLStr);
+                
+                XMLCh *northingsXMLStr = xercesc::XMLString::transcode("northings");
+                if(argElement->hasAttribute(northingsXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(northingsXMLStr));
+                    this->northingsField = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'northings\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&northingsXMLStr);
+                
+                XMLCh *methodXMLStr = xercesc::XMLString::transcode("method");
+                if(argElement->hasAttribute(methodXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(methodXMLStr));
+                    this->methodStr = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'method\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&methodXMLStr);
+                
+                XMLCh *valueColXMLStr = xercesc::XMLString::transcode("valuecol");
+                if(argElement->hasAttribute(valueColXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(valueColXMLStr));
+                    this->valueCol = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'valuecol\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&valueColXMLStr);
+                
+                XMLCh *outputXMLStr = xercesc::XMLString::transcode("output");
+                if(argElement->hasAttribute(outputXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outputXMLStr));
+                    this->outputFile = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&outputXMLStr);
+                
+                // Set output image fomat (defaults to KEA)
+                this->imageFormat = "KEA";
+                XMLCh *formatXMLStr = xercesc::XMLString::transcode("format");
+                if(argElement->hasAttribute(formatXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(formatXMLStr));
+                    this->imageFormat = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                xercesc::XMLString::release(&formatXMLStr);
+                
+                
+                this->outDataType = GDT_Byte;
+                XMLCh *datatypeXMLStr = xercesc::XMLString::transcode("datatype");
+                if(argElement->hasAttribute(datatypeXMLStr))
+                {
+                    XMLCh *dtByte = xercesc::XMLString::transcode("Byte");
+                    XMLCh *dtUInt16 = xercesc::XMLString::transcode("UInt16");
+                    XMLCh *dtInt16 = xercesc::XMLString::transcode("Int16");
+                    XMLCh *dtUInt32 = xercesc::XMLString::transcode("UInt32");
+                    XMLCh *dtInt32 = xercesc::XMLString::transcode("Int32");
+                    XMLCh *dtFloat32 = xercesc::XMLString::transcode("Float32");
+                    XMLCh *dtFloat64 = xercesc::XMLString::transcode("Float64");
+                    
+                    const XMLCh *dtXMLValue = argElement->getAttribute(datatypeXMLStr);
+                    if(xercesc::XMLString::equals(dtByte, dtXMLValue))
+                    {
+                        this->outDataType = GDT_Byte;
+                    }
+                    else if(xercesc::XMLString::equals(dtUInt16, dtXMLValue))
+                    {
+                        this->outDataType = GDT_UInt16;
+                    }
+                    else if(xercesc::XMLString::equals(dtInt16, dtXMLValue))
+                    {
+                        this->outDataType = GDT_Int16;
+                    }
+                    else if(xercesc::XMLString::equals(dtUInt32, dtXMLValue))
+                    {
+                        this->outDataType = GDT_UInt32;
+                    }
+                    else if(xercesc::XMLString::equals(dtInt32, dtXMLValue))
+                    {
+                        this->outDataType = GDT_Int32;
+                    }
+                    else if(xercesc::XMLString::equals(dtFloat32, dtXMLValue))
+                    {
+                        this->outDataType = GDT_Float32;
+                    }
+                    else if(xercesc::XMLString::equals(dtFloat64, dtXMLValue))
+                    {
+                        this->outDataType = GDT_Float64;
+                    }
+                    else
+                    {
+                        std::cerr << "Data type not recognised, defaulting to 32 bit float.";
+                        this->outDataType = GDT_Byte;
+                    }
+                    
+                    xercesc::XMLString::release(&dtByte);
+                    xercesc::XMLString::release(&dtUInt16);
+                    xercesc::XMLString::release(&dtInt16);
+                    xercesc::XMLString::release(&dtUInt32);
+                    xercesc::XMLString::release(&dtInt32);
+                    xercesc::XMLString::release(&dtFloat32);
+                    xercesc::XMLString::release(&dtFloat64);
+                }
+                xercesc::XMLString::release(&datatypeXMLStr);
             }
             else
             {
@@ -3182,6 +3360,7 @@ namespace rsgisexe{
             xercesc::XMLString::release(&optionFindChangeClumpsFromStddev);
             xercesc::XMLString::release(&optionRMSmallClumps);
             xercesc::XMLString::release(&optionSelectClumpsOnGrid);
+            xercesc::XMLString::release(&optionInterpolateClumpValues2Img);
         }
         catch (rsgis::RSGISXMLArgumentsException &e)
         {
@@ -3760,7 +3939,7 @@ namespace rsgisexe{
                 std::cout << "Output File: " << this->outputFile << std::endl;
 
                 try {
-                    rsgis::cmds::executeClassMask(this->inputImage, this->classField, this->className, this->outputFile, this->imageFormat, (rsgis::RSGISLibDataType)this->outDataType);
+                    rsgis::cmds::executeClassMask(this->inputImage, this->classField, this->className, this->outputFile, this->imageFormat, rsgis::cmds::GDAL_to_RSGIS_Type(this->outDataType));
                 } catch (rsgis::RSGISException e) {
                     throw rsgis::RSGISException(e.what());
                 } catch (rsgis::cmds::RSGISCmdException e) {
@@ -4046,6 +4225,35 @@ namespace rsgisexe{
                 try
                 {
                     rsgis::cmds::executeIdentifyClumpExtremesOnGrid(this->clumpsImage, this->inSelectField, this->outSelectField, this->eastingsField, this->northingsField, this->methodStr, this->numRows, this->numCols, this->metricCol);
+                }
+                catch(rsgis::RSGISException e)
+                {
+                    throw rsgis::RSGISException(e.what());
+                }
+                catch(rsgis::cmds::RSGISCmdException e)
+                {
+                    throw rsgis::RSGISException(e.what());
+                }
+                catch (std::exception e)
+                {
+                    throw rsgis::RSGISException(e.what());
+                }
+            }
+            else if(this->option == RSGISExeRasterGIS::interpolateclumpvalues2img)
+            {
+                std::cout << "A command to interpolate values from clumps to the whole image of pixels.\n";
+                std::cout << "Clumps: " << this->clumpsImage << std::endl;
+                std::cout << "Output Format: " << this->imageFormat << std::endl;
+                std::cout << "Output File: " << this->outputFile << std::endl;
+                std::cout << "Select Field: " << this->inSelectField << std::endl;
+                std::cout << "Eastings Field: " << this->eastingsField << std::endl;
+                std::cout << "Northings Field: " << this->northingsField << std::endl;
+                std::cout << "Method: " << this->methodStr << std::endl;
+                std::cout << "Value Field: " << this->valueCol << std::endl;
+                
+                try
+                {
+                    rsgis::cmds::executeInterpolateClumpValuesToImage(this->clumpsImage, this->inSelectField, this->eastingsField, this->northingsField, this->methodStr, this->valueCol, this->outputFile, this->imageFormat, rsgis::cmds::GDAL_to_RSGIS_Type(this->outDataType));
                 }
                 catch(rsgis::RSGISException e)
                 {
@@ -4436,6 +4644,16 @@ namespace rsgisexe{
                 std::cout << "Metric Value Field: " << this->metricCol << std::endl;
                 std::cout << "Number of Rows: " << this->numRows << std::endl;
                 std::cout << "Number of Cols: " << this->numCols << std::endl;
+            }
+            else if(this->option == RSGISExeRasterGIS::interpolateclumpvalues2img)
+            {
+                std::cout << "A command to interpolate values from clumps to the whole image of pixels.\n";
+                std::cout << "Clumps: " << this->clumpsImage << std::endl;
+                std::cout << "Select Field: " << this->inSelectField << std::endl;
+                std::cout << "Eastings Field: " << this->eastingsField << std::endl;
+                std::cout << "Northings Field: " << this->northingsField << std::endl;
+                std::cout << "Method: " << this->methodStr << std::endl;
+                std::cout << "Value Field: " << this->valueCol << std::endl;
             }
             else
             {

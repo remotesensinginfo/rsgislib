@@ -1,5 +1,5 @@
 /*
- *  RSGISCmdsParent.h
+ *  RSGISCmdParent.h
  *
  *
  *  Created by Pete Bunting on 29/04/2013.

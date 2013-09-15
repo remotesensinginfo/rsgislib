@@ -38,6 +38,7 @@
 #include "cmds/RSGISCmdRasterGIS.h"
 #include "cmds/RSGISCmdSegmentation.h"
 #include "cmds/RSGISCmdException.h"
+#include "cmds/RSGISCmdParent.h"
 
 #include "utils/RSGISTextUtils.h"
 #include "utils/RSGISFileUtils.h"
@@ -109,7 +110,8 @@ namespace rsgisexe{
             populatestats,
             findchangeclumpsfromstddev,
             rmsmallclumps,
-            selectclumpsongrid
+            selectclumpsongrid,
+            interpolateclumpvalues2img
         };
         
         RSGISExeRasterGIS();
@@ -157,6 +159,7 @@ namespace rsgisexe{
         std::string inSelectField;
         std::string outSelectField;
         std::string metricCol;
+        std::string valueCol;
         std::string methodStr;
         size_t fid;
         unsigned int nFeatures;

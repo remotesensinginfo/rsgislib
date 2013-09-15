@@ -24,6 +24,9 @@
 #include "RSGISCmdParent.h"
 
 #include "common/RSGISImageException.h"
+#include "common/RSGISAttributeTableException.h"
+
+#include "math/RSGIS2DInterpolation.h"
 
 #include "rastergis/RSGISRasterAttUtils.h"
 #include "rastergis/RSGISCalcClumpStats.h"
@@ -42,6 +45,8 @@
 #include "rastergis/RSGISCalcClumpShapeParameters.h"
 #include "rastergis/RSGISDefineImageTiles.h"
 #include "rastergis/RSGISFindChangeClumps.h"
+#include "rastergis/RSGISSelectClumps.h"
+#include "rastergis/RSGISInterpolateClumpValues2Image.h"
 
 namespace rsgis{ namespace cmds {
 
@@ -1033,15 +1038,95 @@ namespace rsgis{ namespace cmds {
         
         try
         {
+            rsgis::rastergis::RSGISSelectMethods method = rsgis::rastergis::noMethod;
+            if(methodStr == "min")
+            {
+                method = rsgis::rastergis::minMethod;
+            }
+            else if(methodStr == "max")
+            {
+                method = rsgis::rastergis::maxMethod;
+            }
+            else if(methodStr == "mean")
+            {
+                method = rsgis::rastergis::meanMethod;
+            }
+            else
+            {
+                throw rsgis::RSGISAttributeTableException("Method was not recognised. Must be \'min\', \'max\' or \'mean\'.");
+            }
+            
             clumpsDataset = (GDALDataset *) GDALOpen(clumpsImage.c_str(), GA_Update);
             if(clumpsDataset == NULL)
             {
                 std::string message = std::string("Could not open image ") + clumpsImage;
                 throw rsgis::RSGISImageException(message.c_str());
-            }
+            }            
+            
+            rsgis::rastergis::RSGISSelectClumpsOnGrid selectClumps;
+            selectClumps.selectClumpsOnGrid(clumpsDataset, inSelectField, outSelectField, eastingsCol, northingsCol, metricField, rows, cols, method);
             
             
             GDALClose(clumpsDataset);
+        }
+        catch(rsgis::RSGISAttributeTableException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch (rsgis::RSGISException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
+    
+    void executeInterpolateClumpValuesToImage(std::string clumpsImage, std::string selectField, std::string eastingsField, std::string northingsField, std::string methodStr, std::string valueField, std::string outputFile, std::string imageFormat, RSGISLibDataType dataType)throw(RSGISCmdException)
+    {
+        GDALAllRegister();
+        GDALDataset *clumpsDataset;
+        
+        try
+        {
+            std::cout.precision(12);
+            
+            rsgis::math::RSGIS2DInterpolator *interpolator = NULL;
+            if(methodStr == "nearestneighbour")
+            {
+                interpolator = new rsgis::math::RSGISNearestNeighbour2DInterpolator();
+            }
+            else if(methodStr == "naturalneighbour")
+            {
+                interpolator = new rsgis::math::RSGISNaturalNeighbor2DInterpolator();
+            }
+            else if(methodStr == "naturalnearestneighbour")
+            {
+                interpolator = new rsgis::math::RSGISNaturalNeighbor2DInterpolator();
+            }
+            else if(methodStr == "knearestneighbour")
+            {
+                interpolator = new rsgis::math::RSGISKNearestNeighbour2DInterpolator(3);
+            }
+            else
+            {
+                throw rsgis::RSGISAttributeTableException("The interpolated specified was not recognised.");
+            }
+            
+            clumpsDataset = (GDALDataset *) GDALOpen(clumpsImage.c_str(), GA_ReadOnly);
+            if(clumpsDataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + clumpsImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+                        
+            rsgis::rastergis::RSGISInterpolateClumpValues2Image interpClumpVals;
+            interpClumpVals.interpolateImageFromClumps(clumpsDataset, selectField, eastingsField, northingsField, valueField, outputFile, imageFormat, rsgis::cmds::RSGIS_to_GDAL_Type(dataType), interpolator);
+            
+            delete interpolator;
+            
+            GDALClose(clumpsDataset);
+        }
+        catch(rsgis::RSGISAttributeTableException &e)
+        {
+            throw RSGISCmdException(e.what());
         }
         catch (rsgis::RSGISException &e)
         {

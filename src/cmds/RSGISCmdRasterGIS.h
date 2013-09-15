@@ -225,6 +225,9 @@ namespace rsgis{ namespace cmds {
     /** Function to identify an extreme clump/segment with regions of the image, regions defined on a grid */
     void executeIdentifyClumpExtremesOnGrid(std::string clumpsImage, std::string inSelectField, std::string outSelectField, std::string eastingsCol, std::string northingsCol, std::string methodStr, unsigned int rows, unsigned int cols, std::string metricField)throw(RSGISCmdException);
     
+    /** Function to interpolate values from clumps to the whole image of pixels */
+    void executeInterpolateClumpValuesToImage(std::string clumpsImage, std::string selectField, std::string eastingsField, std::string northingsField, std::string methodStr, std::string valueField, std::string outputFile, std::string imageFormat, RSGISLibDataType dataType)throw(RSGISCmdException);
+    
 }}
 
 
