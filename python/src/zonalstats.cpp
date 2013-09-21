@@ -294,6 +294,26 @@ static PyObject *ZonalStats_PixelStats2TXT(PyObject *self, PyObject *args)
 }
 
 
+static PyObject *ZonalStats_ImageZoneToHDF(PyObject *self, PyObject *args)
+{
+    const char *pszInputImage, *pszInputVector, *pszOutputHDF;
+    int pixelInPolyMethod, noProjWarning;
+    if( !PyArg_ParseTuple(args, "sssii:pixelVals2TXT", &pszInputImage, &pszInputVector, &pszOutputHDF, &noProjWarning, &pixelInPolyMethod))
+        return NULL;
+    try
+    {
+        rsgis::cmds::executeZonesImage2HDF5(pszInputImage, pszInputVector, pszOutputHDF, noProjWarning, pixelInPolyMethod);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
+
 // Our list of functions in this module
 static PyMethodDef ZonalStatsMethods[] = {
     {"pointValue2SHP", ZonalStats_PointValue2SHP, METH_VARARGS, 
@@ -423,6 +443,23 @@ static PyMethodDef ZonalStatsMethods[] = {
 "    zonalattributes = zonalstats.ZonalAttributes(minThreshold=0, maxThreshold=10000, calcCount=True, calcMin=True, calcMax=True, calcMean=True, calcStdDev=True, calcMode=False, calcSum=True)\n"
 "    zonalstats.pixelStats2SHP(inputImage, inputVector, outputtxt, zonalattributes, True, True, zonalstats.METHOD_POLYCONTAINSPIXELCENTER)\n"
 "\n"},
+{"imageZoneToHDF", ZonalStats_ImageZoneToHDF, METH_VARARGS,
+    "rsgislib.zonalstats.imageZoneToHDF(inputimage, inputvector, outputHDF, noProjWarning, pixelInPolyMethod)\n"
+    "Extract the all the pixel values for regions to a HDF5 file (1 column for each image band).\n"
+    "where:\n"
+    " * inputimage is a string containing the name of the input image.\n"
+    " * inputvector is a string containing the name of the input vector.\n"
+    " * outputHDF is a string containing name of the output HDF file.\n"
+    " * noProjWarning is a bool, specifying whether to skip printing a warning if the vector and image have a different projections.\n"
+    " * pixelInPolyMethod is the method for determining if a pixel is included with a polygon of type rsgislib.zonalstats.METHOD_*.\n"
+    "Example::\n"
+    "\n"
+    "    from rsgislib import zonalstats\n"
+    "    inputimage = './Rasters/injune_p142_casi_sub_utm.kea'\n"
+    "    inputvector = './Vectors/injune_p142_crowns_utm.shp'\n"
+    "    outputHDF = './TestOutputs/InjuneP142.hdf'\n"
+    "    zonalstats.imageZoneToHDF(inputimage, inputvector, outputHDF, True, zonalstats.METHOD_POLYCONTAINSPIXELCENTER)\n"
+    "\n"},
 
     {NULL}        /* Sentinel */
 };

@@ -71,7 +71,7 @@ namespace rsgis{namespace vec{
 				
 				if(!nullGeometry)
 				{
-                    std::cout << "Env: [" << env->getMinX() << ", " << env->getMaxX() << "][" << env->getMinY() << ", " << env->getMaxY() << "]\n";
+                    //std::cout << "Env: [" << env->getMinX() << ", " << env->getMaxX() << "][" << env->getMinY() << ", " << env->getMaxY() << "]\n";
                     
 					extractZonalValues->processFeature(inFeature, polygon, env, fid);
 

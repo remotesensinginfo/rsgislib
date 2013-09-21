@@ -600,6 +600,7 @@ namespace rsgis{ namespace cmds {
     
     void executeZonesImage2HDF5(std::string inputImage, std::string inputVecPolys, std::string outputHDF, bool ignoreProjection, int pixelInPolyMethodInt) throw(RSGISCmdException)
     {
+        std::cout.precision(12);
         // Convert to absolute path
         std::string inputVecPolysFullPath = std::string(boost::filesystem::absolute(inputVecPolys).c_str());
         
