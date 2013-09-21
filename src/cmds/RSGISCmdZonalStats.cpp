@@ -36,11 +36,12 @@
 #include "vec/RSGISZonalStats2Matrix.h"
 #include "vec/RSGISProcessVector.h"
 #include "vec/RSGISZonalStats.h"
+#include "vec/RSGISZonalImage2HDF.h"
 
 
 namespace rsgis{ namespace cmds {
 
-    void executePointValue(std::string inputImage, std::string inputVecPolys, std::string outputStatsFile, bool outputToText, bool force, bool useBandNames)
+    void executePointValue(std::string inputImage, std::string inputVecPolys, std::string outputStatsFile, bool outputToText, bool force, bool useBandNames)throw(RSGISCmdException)
     {
         // Convert to absolute path
         inputVecPolys = boost::filesystem::absolute(inputVecPolys).c_str();
@@ -190,9 +191,8 @@ namespace rsgis{ namespace cmds {
     }
 
     void executePixelStats(std::string inputImage, std::string inputVecPolys, std::string outputStatsFile, rsgis::cmds::RSGISBandAttZonalStatsCmds *calcStats,
-                           std::string inputRasPolys, bool outputToText, bool force, bool useBandNames, bool ignoreProjection, int pixelInPolyMethodInt)
+                           std::string inputRasPolys, bool outputToText, bool force, bool useBandNames, bool ignoreProjection, int pixelInPolyMethodInt) throw(RSGISCmdException)
     {
-
         // Convert to absolute path
         inputVecPolys = boost::filesystem::absolute(inputVecPolys).c_str();
 
@@ -479,7 +479,7 @@ namespace rsgis{ namespace cmds {
 
             //OGRCleanupAll();
             //GDALDestroyDriverManager();
-    }
+        }
         catch(RSGISException& e)
         {
             throw RSGISCmdException(e.what());
@@ -491,7 +491,7 @@ namespace rsgis{ namespace cmds {
     }
 
     void executePixelVals2txt(std::string inputImage, std::string inputVecPolys, std::string outputTextBase, std::string polyAttribute, std::string outtxtform,
-                              bool ignoreProjection, int pixelInPolyMethodInt)
+                              bool ignoreProjection, int pixelInPolyMethodInt) throw(RSGISCmdException)
     {
         // Convert to absolute path
         inputVecPolys = boost::filesystem::absolute(inputVecPolys).c_str();
@@ -588,10 +588,83 @@ namespace rsgis{ namespace cmds {
             //OGRCleanupAll();
             //GDALDestroyDriverManager();
         }
-        catch (RSGISException& e)
+        catch(rsgis::RSGISException& e)
         {
-            throw e;
+            throw RSGISCmdException(e.what());
         }
+        catch(std::exception& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
+    
+    void executeZonesImage2HDF5(std::string inputImage, std::string inputVecPolys, std::string outputHDF, bool ignoreProjection, int pixelInPolyMethodInt) throw(RSGISCmdException)
+    {
+        // Convert to absolute path
+        std::string inputVecPolysFullPath = std::string(boost::filesystem::absolute(inputVecPolys).c_str());
+        
+        GDALAllRegister();
+        OGRRegisterAll();
+        
+        rsgis::vec::RSGISVectorUtils vecUtils;
+        
+        std::string SHPFileInLayer = vecUtils.getLayerName(inputVecPolysFullPath);
+        
+        GDALDataset *inputImageDS = NULL;
+        OGRDataSource *inputSHPDS = NULL;
+        OGRLayer *inputSHPLayer = NULL;
+        
+        
+        std::string outputDIR = "";
+        
+        try
+        {
+            /////////////////////////////////////
+            //
+            // Open Input Image.
+            //
+            /////////////////////////////////////
+            inputImageDS = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_ReadOnly);
+            if(inputImageDS == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputImage;
+                throw RSGISException(message.c_str());
+            }
+            
+            /////////////////////////////////////
+            //
+            // Open Input Shapfile.
+            //
+            /////////////////////////////////////
+            inputSHPDS = OGRSFDriverRegistrar::Open(inputVecPolysFullPath.c_str(), FALSE);
+            if(inputSHPDS == NULL)
+            {
+                std::string message = std::string("Could not open vector file ") + inputVecPolysFullPath;
+                throw RSGISException(message.c_str());
+            }
+            inputSHPLayer = inputSHPDS->GetLayerByName(SHPFileInLayer.c_str());
+            if(inputSHPLayer == NULL)
+            {
+                std::string message = std::string("Could not open vector layer ") + SHPFileInLayer;
+                throw RSGISException(message.c_str());
+            }
+            
+            rsgis::vec::RSGISZonalImage2HDF zonalImg2HDF;
+            rsgis::img::pixelInPolyOption pixelInPolyMethod = rsgis::img::pixelInPolyInt2Enum(pixelInPolyMethodInt);
+            zonalImg2HDF.extractBandsToColumns(inputImageDS, inputSHPLayer, outputHDF, pixelInPolyMethod);
+            
+            GDALClose(inputImageDS);
+            OGRDataSource::DestroyDataSource(inputSHPDS);
+        }
+        catch(rsgis::RSGISException& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(std::exception& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+
     }
 }}
 
