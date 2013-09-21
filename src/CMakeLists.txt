@@ -1060,7 +1060,9 @@ set(LIB_VEC_ZONALSTATS_CPP
 	${RSGIS_SRC_VEC_DIR}/RSGISZonalStats.cpp 
 	${RSGIS_SRC_VEC_DIR}/RSGISZonalStats.h 
 	${RSGIS_SRC_VEC_DIR}/RSGISZonalStats2Matrix.cpp 
-	${RSGIS_SRC_VEC_DIR}/RSGISZonalStats2Matrix.h 
+	${RSGIS_SRC_VEC_DIR}/RSGISZonalStats2Matrix.h
+	${RSGIS_SRC_VEC_DIR}/RSGISZonalImage2HDF.cpp
+	${RSGIS_SRC_VEC_DIR}/RSGISZonalImage2HDF.h 
 )
 
 set(LIB_VEC_UTILS_CPP
@@ -1203,7 +1205,9 @@ set(LIB_VEC_H
 	${RSGIS_SRC_VEC_DIR}/RSGISGetOGRGeometries.h 
 	${RSGIS_SRC_VEC_DIR}/RSGISExtractEndMembers2Matrix.h
 	${RSGIS_SRC_VEC_DIR}/RSGISAttCountPolyIntersect.h
-	${RSGIS_SRC_VEC_DIR}/RSGISGenerateConvexHullGroups.h)
+	${RSGIS_SRC_VEC_DIR}/RSGISGenerateConvexHullGroups.h
+	${RSGIS_SRC_VEC_DIR}/RSGISZonalImage2HDF.h
+	)
 	
 	
 ###############################################################################

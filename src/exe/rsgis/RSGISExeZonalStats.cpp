@@ -80,6 +80,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 	XMLCh *rsgisbandXMLStr = XMLString::transcode("rsgis:band");
 	XMLCh *optionPointValue = XMLString::transcode("pointvalue");
     XMLCh *optionEndmembers = XMLString::transcode("endmembers");
+    XMLCh *optionImageZone2hdf = XMLString::transcode("imagezone2hdf");
 
 	const XMLCh *algorNameEle = argElement->getAttribute(algorXMLStr);
 	if(!XMLString::equals(algorName, algorNameEle))
@@ -2581,6 +2582,55 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 		}
 		XMLString::release(&methodXMLStr);
 	}
+    else if(XMLString::equals(optionImageZone2hdf, optionXML))
+	{
+		this->option = RSGISExeZonalStats::imagezone2hdf;
+        
+		XMLCh *outputXMLStr = XMLString::transcode("output");
+		if(argElement->hasAttribute(outputXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
+			this->outputFile = string(charValue);
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+		}
+		XMLString::release(&outputXMLStr);
+        
+        XMLCh *methodXMLStr = XMLString::transcode("method");
+		if(argElement->hasAttribute(methodXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(methodXMLStr));
+			string methodStr = string(charValue);
+			// Polygon completely contains pixel
+			if(methodStr == "polyContainsPixel"){this->method = rsgis::img::polyContainsPixel;}
+			// Pixel center is within the polygon
+			else if(methodStr == "polyContainsPixelCenter") {this->method = rsgis::img::polyContainsPixelCenter;}
+			// Polygon overlaps the pixel
+			else if(methodStr == "polyOverlapsPixel"){this->method = rsgis::img::polyOverlapsPixel;}
+			// Polygon overlaps or contains the pixel
+			else if(methodStr == "polyOverlapsOrContainsPixel"){this->method = rsgis::img::polyOverlapsOrContainsPixel;}
+			// Pixel contains the polygon
+			else if(methodStr == "pixelContainsPoly"){this->method = rsgis::img::pixelContainsPoly;}
+			// Polygon center is within pixel
+			else if(methodStr == "pixelContainsPolyCenter"){this->method = rsgis::img::pixelContainsPolyCenter;}
+			// The method is chosen based on relative areas of pixel and polygon.
+			else if(methodStr == "adaptive"){this->method = rsgis::img::adaptive;}
+			// Everything within the polygons envelope is chosen (for debugging)
+			else if(methodStr == "envelope"){this->method = rsgis::img::envelope;}
+			// Set to default value if not recognised.
+			else {cerr << "\tMethod not recognised, using default of \'polyContainsPixelCenter\'." << endl;this->method = rsgis::img::polyContainsPixelCenter;}
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			cerr << "\tMethod not recognised, using default of \'polyContainsPixelCenter\'." << endl;
+			this->method = rsgis::img::polyContainsPixelCenter;
+		}
+		XMLString::release(&methodXMLStr);
+	}
 	else
 	{
 		string message = string("The option (") + string(XMLString::transcode(optionXML)) + string(") is not known: RSGISExeZonalStats.");
@@ -2608,6 +2658,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 	XMLString::release(&rsgisbandXMLStr);
 	XMLString::release(&optionPointValue);
     XMLString::release(&optionEndmembers);
+    XMLString::release(&optionImageZone2hdf);
 
 }
 
@@ -4448,6 +4499,30 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 				throw e;
 			}
 		}
+        else if(this->option == RSGISExeZonalStats::imagezone2hdf)
+		{
+			cout << "A command to extract the all the pixel values for regions to a HDF5 file\n";
+			cout << "Input Image: " << this->inputImage << endl;
+			cout << "Input Vector: " << this->inputVecPolys << endl;
+			cout << "Output File : " << this->outputFile << endl;
+            cout.precision(12);
+            try
+			{
+                rsgis::cmds::executeZonesImage2HDF5(this->inputImage, this->inputVecPolys, this->outputFile, this->ignoreProjection, this->method);
+            }
+            catch (rsgis::RSGISException e)
+            {
+                throw rsgis::RSGISException(e.what());
+            }
+            catch (rsgis::cmds::RSGISCmdException e)
+            {
+                throw rsgis::RSGISException(e.what());
+            }
+            catch (std::exception e)
+            {
+                throw rsgis::RSGISException(e.what());
+            }
+        }
 		else
 		{
 			cout << "The option is not recognised\n";
