@@ -1867,6 +1867,62 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
+                
+    unsigned int* executeGetHistogram(std::string inputImage, unsigned int imgBand, double binWidth, unsigned int *nBins, bool calcInMinMax, double *inMin, double *inMax)throw(RSGISCmdException)
+    {
+        unsigned int *bins = NULL;
+        try
+        {
+            GDALAllRegister();
+            
+            GDALDataset *dataset = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_ReadOnly);
+            if(dataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            if(calcInMinMax)
+            {
+                unsigned int numImgBands = dataset->GetRasterCount();
+                rsgis::img::ImageStats **imgStats = new rsgis::img::ImageStats*[numImgBands];
+                for(unsigned int i = 0; i < numImgBands; ++i)
+                {
+                    imgStats[i] = new rsgis::img::ImageStats();
+                    imgStats[i]->max = 0;
+                    imgStats[i]->min = 0;
+                    imgStats[i]->mean = 0;
+                    imgStats[i]->stddev = 0;
+                    imgStats[i]->sum = 0;
+                }
+                rsgis::img::RSGISImageStatistics calcStats;
+                calcStats.calcImageStatistics(&dataset, 1, imgStats, numImgBands, false, false);
+                
+                *inMin = imgStats[imgBand-1]->min;
+                *inMax = imgStats[imgBand-1]->max;
+                
+                for(unsigned int i = 0; i < numImgBands; ++i)
+                {
+                    delete imgStats[i];
+                }
+                delete[] imgStats;
+            }
+            
+            *inMin = floor((*inMin));
+            *inMax = ceil((*inMax));
+            
+            rsgis::img::RSGISGenHistogram genHistogram;
+            bins = genHistogram.genGetHistogram(dataset, imgBand-1, *inMin, *inMax, binWidth, nBins);
+            
+            GDALClose(dataset);
+        }
+        catch(rsgis::RSGISException e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        
+        return bins;
+    }
 
     void executeBandPercentile(std::string inputImage, float percentile, float noDataValue, bool noDataValueSpecified, std::string outputFile)throw(RSGISCmdException)
     {

@@ -20,6 +20,7 @@
  *
  */
 
+#include <Python.h>
 #include "rsgispy_common.h"
 #include "cmds/RSGISCmdImageCalc.h"
 
@@ -895,7 +896,7 @@ static PyObject *ImageCalc_AllBandsEqualTo(PyObject *self, PyObject *args) {
 static PyObject *ImageCalc_Histogram(PyObject *self, PyObject *args) {
     const char *inputImage, *outputFile, *imageMask;
     float imgValue;
-    double binWidth, inMin, inMax;
+    float binWidth, inMin, inMax;
     int calcInMinMax;
     unsigned int imgBand;
 
@@ -910,6 +911,74 @@ static PyObject *ImageCalc_Histogram(PyObject *self, PyObject *args) {
     }
 
     Py_RETURN_NONE;
+}
+
+static PyObject *ImageCalc_GetHistogram(PyObject *self, PyObject *args) {
+    const char *inputImage;
+    float binWidth, inMin, inMax;
+    int calcInMinMax;
+    unsigned int imgBand;
+    
+    if(!PyArg_ParseTuple(args, "sIfiff:getHistogram", &inputImage, &imgBand, &binWidth, &calcInMinMax, &inMin, &inMax))
+        return NULL;
+    
+    PyObject *binsList = NULL;
+    PyObject *outList = PyTuple_New(3);
+    //PyObject *val = Py_BuildValue("I", 42);
+    try
+    {
+        unsigned int nBins = 0;
+        double inMinVal = inMin;
+        double inMaxVal = inMax;
+        unsigned int *bins = rsgis::cmds::executeGetHistogram(inputImage, imgBand, binWidth, &nBins, calcInMinMax, &inMinVal, &inMaxVal);
+        
+        //std::cout << "nBins = " << nBins << std::endl;
+        
+        //std::cout << "inMinVal = " << inMinVal << std::endl;
+        //std::cout << "inMaxVal = " << inMaxVal << std::endl;
+        
+        Py_ssize_t listLen = nBins;
+        
+        //std::cout << "listLen = " << listLen << std::endl;
+        
+        binsList = PyTuple_New(listLen);
+        if(binsList == NULL)
+        {
+            delete[] bins;
+            throw rsgis::cmds::RSGISCmdException("Could not create a python list...");
+        }
+        
+        for(unsigned int i = 0; i < nBins; ++i)
+        {
+            //std::cout << i << " = " << bins[i] << std::endl;
+            if(PyTuple_SetItem(binsList, i, Py_BuildValue("I", bins[i])) == -1)
+            {
+                throw rsgis::cmds::RSGISCmdException("Failed to add a value to the list...");
+            }
+        }
+        delete[] bins;
+        
+        if(PyTuple_SetItem(outList, 0, binsList) == -1)
+        {
+            throw rsgis::cmds::RSGISCmdException("Failed to add a value to the list...");
+        }
+        if(PyTuple_SetItem(outList, 1, Py_BuildValue("d", inMinVal)) == -1)
+        {
+            throw rsgis::cmds::RSGISCmdException("Failed to add a value to the list...");
+        }
+        if(PyTuple_SetItem(outList, 2, Py_BuildValue("d", inMaxVal)) == -1)
+        {
+            throw rsgis::cmds::RSGISCmdException("Failed to add a value to the list...");
+        }
+
+    }
+    catch (rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    return outList;
 }
 
 static PyObject *ImageCalc_BandPercentile(PyObject *self, PyObject *args) {
@@ -1290,8 +1359,22 @@ static PyMethodDef ImageCalcMethods[] = {
 "  * imgValue is a float\n"
 "  * binWidth is a float specifying the width of the histogram bins\n"
 "  * calcInMinMax is a boolean specifying whether inMin and inMax should be calculated\n"
-"  * inMin is a float\n"
-"  * inMax is a float\n"
+"  * inMin is a float for the minimum image value to be included in the histogram\n"
+"  * inMax is a floatf or the maximum image value to be included in the histogram\n"
+},
+    
+{"getHistogram", ImageCalc_GetHistogram, METH_VARARGS,
+    "Generates and returns a histogram for the image.\n"
+    "call signature: imagecalc.getHistogram(inputImage, imgBand, binWidth, calcInMinMax, inMin, inMax)\n"
+    "where:\n"
+    "  * inputImage is a string containing the name of the input image file\n"
+    "  * imgBand is an unsigned int specifying the image band starting from 1.\n"
+    "  * binWidth is a float specifying the width of the histogram bins\n"
+    "  * calcInMinMax is a boolean specifying whether inMin and inMax should be calculated\n"
+    "  * inMin is a float for the minimum image value to be included in the histogram\n"
+    "  * inMax is a floatf or the maximum image value to be included in the histogram\n"
+    "returns:\n"
+    "  * "
 },
 
     {"bandPercentile", ImageCalc_BandPercentile, METH_VARARGS,
