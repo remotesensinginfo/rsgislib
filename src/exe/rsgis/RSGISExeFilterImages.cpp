@@ -195,6 +195,7 @@ void RSGISExeFilterImages::retrieveParameters(xercesc::DOMElement *argElement) t
 		XMLCh *filterTypeMode = xercesc::XMLString::transcode("Mode");
 		XMLCh *filterTypeRange = xercesc::XMLString::transcode("Range");
 		XMLCh *filterTypeStdDev = xercesc::XMLString::transcode("StdDev");
+        XMLCh *filterTypeCoeffOfVar = xercesc::XMLString::transcode("CoeffOfVar");
 		XMLCh *filterTypeMin = xercesc::XMLString::transcode("Min");
 		XMLCh *filterTypeMax = xercesc::XMLString::transcode("Max");
 		XMLCh *filterTypeTotal = xercesc::XMLString::transcode("Total");
@@ -403,6 +404,16 @@ void RSGISExeFilterImages::retrieveParameters(xercesc::DOMElement *argElement) t
 				filterBank->addFilter(filter);
 
 			}
+            else if(xercesc::XMLString::equals(filterTypeCoeffOfVar, filterType))
+			{
+				const XMLCh *fileEndingStr = filterElement->getAttribute(xercesc::XMLString::transcode("fileending"));
+				std::string fileEnding = xercesc::XMLString::transcode(fileEndingStr);
+
+				int size = mathUtils.strtofloat(xercesc::XMLString::transcode(filterElement->getAttribute(xercesc::XMLString::transcode("size"))));
+
+				rsgis::filter::RSGISImageFilter *filter = new rsgis::filter::RSGISCoeffOfVarFilter(0, size, fileEnding);
+				filterBank->addFilter(filter);
+			}
 			else if(xercesc::XMLString::equals(filterTypeMin, filterType))
 			{
 				const XMLCh *fileEndingStr = filterElement->getAttribute(xercesc::XMLString::transcode("fileending"));
@@ -551,6 +562,7 @@ void RSGISExeFilterImages::retrieveParameters(xercesc::DOMElement *argElement) t
         xercesc::XMLString::release(&filterTypeMode);
         xercesc::XMLString::release(&filterTypeRange);
         xercesc::XMLString::release(&filterTypeStdDev);
+        xercesc::XMLString::release(&filterTypeCoeffOfVar);
         xercesc::XMLString::release(&filterTypeMin);
         xercesc::XMLString::release(&filterTypeMax);
         xercesc::XMLString::release(&filterTypeTotal);

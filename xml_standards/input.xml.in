@@ -947,6 +947,7 @@
         <rsgis:filter size="int" type="Mode" fileending="mode" />
         <rsgis:filter size="int" type="Range" fileending="range" />
         <rsgis:filter size="int" type="StdDev" fileending="stddev" />
+        <rsgis:filter size="int" type="CoeffOfVar" fileending="coeffofvar" />
         <rsgis:filter size="int" type="Min" fileending="min" />
         <rsgis:filter size="int" type="Max" fileending="max" />
         <rsgis:filter size="int" type="Total" fileending="total" />
