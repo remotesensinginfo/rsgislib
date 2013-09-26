@@ -317,8 +317,8 @@ static PyObject *ZonalStats_ImageZoneToHDF(PyObject *self, PyObject *args)
 // Our list of functions in this module
 static PyMethodDef ZonalStatsMethods[] = {
     {"pointValue2SHP", ZonalStats_PointValue2SHP, METH_VARARGS, 
+"zonalstats.pointValue2SHP(inputimage, inputvector, outputvector, force, useBandNames=True)\n"
 "Extract pixel value for each point in a shape file and output as a shapefile.\n"
-"call signature: zonalstats.pointValue2SHP(inputimage, inputvector, outputvector, force, useBandNames=True)\n"
 "where:\n"
 " * inputimage is a string containing the name of the input image\n"
 " * inputvector is a string containing the name of the input vector\n"
@@ -339,8 +339,8 @@ static PyMethodDef ZonalStatsMethods[] = {
 },
 
     {"pointValue2TXT", ZonalStats_PointValue2TXT, METH_VARARGS, 
+"zonalstats.pointValue2TXT(inputimage, inputvector, outputtxt, useBandNames=True)\n"
 "Extract pixel value for each point in a shape file and output as a CSV.\n"
-"call signature: zonalstats.pointValue2TXT(inputimage, inputvector, outputtxt, useBandNames=True)\n"
 "where:\n"
 " * inputimage is a string containing the name of the input image\n"
 " * inputvector is a string containing the name of the input vector\n"
@@ -358,8 +358,8 @@ static PyMethodDef ZonalStatsMethods[] = {
 
 
     {"pixelVals2TXT", ZonalStats_PixelVals2TXT, METH_VARARGS, 
+"zonalstats.pixelVals2TXT(inputimage, inputvector, outputtxtBase, attribute, noProjWarning, pixelInPolyMethod)\n"
 "Extract pixel value for all pixels within a polygon and save a seperate CSV for each polygon in the shapefile.\n"
-"call signature: zonalstats.pixelVals2TXT(inputimage, inputvector, outputtxtBase, attribute, noProjWarning, pixelInPolyMethod)\n"
 "where:\n"
 " * inputimage is a string containing the name of the input image.\n"
 " * inputvector is a string containing the name of the input vector.\n"
@@ -377,8 +377,8 @@ static PyMethodDef ZonalStatsMethods[] = {
 "\n"},
 
     {"pixelStats2SHP", ZonalStats_PixelStats2SHP, METH_VARARGS, 
+"zonalstats.pixelStats2SHP(inputimage, inputvector, outputvector, zonalattributes, force, useBandNames, noProjWarning, pixelInPolyMethod)\n"
 "Calculate statistics for pixels falling within each polygon in a shapefile output as a shapefile.\n"
-"call signature: zonalstats.pixelStats2SHP(inputimage, inputvector, outputvector, zonalattributes, force, useBandNames, noProjWarning, pixelInPolyMethod)\n"
 "where:\n"
 " * inputimage is a string containing the name of the input image\n"
 " * inputvector is a string containing the name of the input vector\n"
@@ -412,8 +412,8 @@ static PyMethodDef ZonalStatsMethods[] = {
 },
 
     {"pixelStats2TXT", ZonalStats_PixelStats2TXT, METH_VARARGS, 
+"zonalstats.pixelStats2TXT(inputimage, inputvector, outputtxt, zonalattributes, useBandNames, noProjWarning, pixelInPolyMethod)\n"
 "Calculate statistics for pixels falling within each polygon in a shapefile output as a CSV.\n"
-"call signature: zonalstats.pixelStats2SHP(inputimage, inputvector, outputtxt, zonalattributes, useBandNames, noProjWarning, pixelInPolyMethod)\n"
 "where:\n"
 " * inputimage is a string containing the name of the input image\n"
 " * inputvector is a string containing the name of the input vector\n"

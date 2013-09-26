@@ -1019,8 +1019,8 @@ static PyObject *ImageCalc_ImageDist2Geoms(PyObject *self, PyObject *args) {
 // Our list of functions in this module
 static PyMethodDef ImageCalcMethods[] = {
     {"bandMath", ImageCalc_BandMath, METH_VARARGS,
+"imagecalc.bandMath(outputImage, expression, gdalformat, gdaltype, bandDefnSeq)\n"
 "Performs band math calculation.\n"
-"call signature: imagecalc.bandMath(outputImage, expression, gdalformat, gdaltype, bandDefnSeq)\n"
 "where:\n"
 "  * outputImage is a string containing the name of the output file\n"
 "  * expression is a string containing the expression to run over the images\n"
@@ -1029,8 +1029,8 @@ static PyMethodDef ImageCalcMethods[] = {
 "  * bandDefnSeq is a sequence of rsgislib.imagecalc.BandDefn objects that define the inputs"},
 
     {"imageMath", ImageCalc_ImageMath, METH_VARARGS,
+"imagecalc.imageMath(inputImage, outputImage, expression, gdalformat, gdaltype)\n"
 "Performs image math calculation.\n"
-"call signature: imagecalc.imageMath(inputImage, outputImage, expression, gdalformat, gdaltype)\n"
 "where:\n"
 "  * inimage is a string containing the name of the input file\n"
 "  * outputImage is a string containing the name of the output file\n"
@@ -1039,8 +1039,8 @@ static PyMethodDef ImageCalcMethods[] = {
 "  * gdaltype is an containing one of the values from rsgislib.TYPE_*\n"},
 
     {"kMeansClustering", ImageCalc_KMeansClustering, METH_VARARGS,
+"imagecalc.kMeansClustering(inputImage, outputMatrix, numClusters, maxIterations, subSample, ignoreZeros, degreeOfChange, initMethod)\n"
 "Performs K Means Clustering.\n"
-"call signature: imagecalc.kMeansClustering(inputImage, outputMatrix, numClusters, maxIterations, subSample, ignoreZeros, degreeOfChange, initMethod)\n"
 "where:\n"
 "  * inputImage is a string\n"
 "  * outputMatrix is a string\n"
@@ -1052,8 +1052,8 @@ static PyMethodDef ImageCalcMethods[] = {
 "  * initMethod is one of INITCLUSTER_* values\n"},
 
     {"isoDataClustering", ImageCalc_ISODataClustering, METH_VARARGS,
+"imagecalc.isoDataClustering(inputImage, outputMatrix, numClusters, maxIterations, subSample, ignoreZeros, degreeOfChange, initMethod, minDistBetweenClusters, minNumFeatures, maxStdDev, minNumClusters, startIteration, endIteration)\n"
 "Performs ISO Data Clustering.\n"
-"call signature: imagecalc.isoDataClustering(inputImage, outputMatrix, numClusters, maxIterations, subSample, ignoreZeros, degreeOfChange, initMethod, minDistBetweenClusters, minNumFeatures, maxStdDev, minNumClusters, startIteration, endIteration)\n"
 "where:\n"
 "  * inputImage is a string\n"
 "  * outputMatrix is a string\n"
@@ -1071,8 +1071,8 @@ static PyMethodDef ImageCalcMethods[] = {
 },
 
     {"mahalanobisDistFilter", ImageCalc_MahalanobisDistFilter, METH_VARARGS,
+"imagecalc.mahalanobisDistFilter(inputImage, outputImage, windowSize, gdalFormat, gdalDataType)\n"
 "Performs mahalanobis distance window filter.\n"
-"call signature: imagecalc.mahalanobisDistFilter(inputImage, outputImage, windowSize, gdalFormat, gdalDataType)\n"
 "where:\n"
 "  * inputImage is a string containing the name of the input file\n"
 "  * outputImage is a string containing the name of the output file\n"
@@ -1082,8 +1082,8 @@ static PyMethodDef ImageCalcMethods[] = {
 },
 
     {"mahalanobisDist2ImgFilter", ImageCalc_MahalanobisDist2ImgFilter, METH_VARARGS,
+"imagecalc.mahalanobisDist2ImgFilter(inputImage, outputImage, windowSize, gdalFormat, gdalDataType)\n"
 "Performs mahalanobis distance image to window filter.\n"
-"call signature: imagecalc.mahalanobisDist2ImgFilter(inputImage, outputImage, windowSize, gdalFormat, gdalDataType)\n"
 "where:\n"
 "  * inputImage is a string containing the name of the input file\n"
 "  * outputImage is a string containing the name of the output file\n"
@@ -1093,8 +1093,8 @@ static PyMethodDef ImageCalcMethods[] = {
 },
 
     {"imageCalcDistance", ImageCalc_ImageCalcDistance, METH_VARARGS,
+"imagecalc.imageCalcDistance(inputImage, outputImage, gdalFormat)\n"
 "Performs image calculate distance command.\n"
-"call signature: imagecalc.imageCalcDistance(inputImage, outputImage, gdalFormat)\n"
 "where:\n"
 "  * inputImage is a string containing the name of the input file\n"
 "  * outputImage is a string containing the name of the output file\n"
@@ -1102,8 +1102,8 @@ static PyMethodDef ImageCalcMethods[] = {
 },
 
     {"imagePixelColumnSummary", ImageCalc_ImagePixelColumnSummary, METH_VARARGS,
+"imagecalc.imagePixelColumnSummary(inputImage, outputImage, summaryStats, gdalFormat, gdalDataType, noDataValue, useNoDataValue)\n"
 "Calculates summary statistics for a column of pixels.\n"
-"call signature: imagecalc.imagePixelColumnSummary(inputImage, outputImage, summaryStats, gdalFormat, gdalDataType, noDataValue, useNoDataValue)\n"
 "where:\n"
 "  * inputImage is a string containing the name of the input file\n"
 "  * outputImage is a string containing the name of the output file\n"
@@ -1130,8 +1130,8 @@ static PyMethodDef ImageCalcMethods[] = {
 },
 
     {"imagePixelLinearFit", ImageCalc_ImagePixelLinearFit, METH_VARARGS,
+"imagecalc.imagePixelLinearFit(inputImage, outputImage, gdalFormat, bandValues, noDataValue, useNoDataValue)\n"
 "Performs a linear regression on each column of pixels.\n"
-"call signature: imagecalc.imagePixelLinearFit(inputImage, outputImage, gdalFormat, bandValues, noDataValue, useNoDataValue)\n"
 "where:\n"
 "  * inputImage is a string containing the name of the input file\n"
 "  * outputImage is a string containing the name of the output file\n"
@@ -1142,8 +1142,8 @@ static PyMethodDef ImageCalcMethods[] = {
 },
 
     {"normalisation", ImageCalc_Normalisation, METH_VARARGS,
+"imagecalc.normalisation(inputImages, outputImages, calcInMinMax, inMin, inMax, outMin, outMax)\n"
 "Performs image normalisation\n"
-"call signature: imagecalc.normalisation(inputImages, outputImages, calcInMinMax, inMin, inMax, outMin, outMax)\n"
 "where:\n"
 "  * inputImages is a sequence of strings containing the names of the input files\n"
 "  * outputImages is a sequence of strings containing the names of the output files\n"
@@ -1155,8 +1155,8 @@ static PyMethodDef ImageCalcMethods[] = {
 },
 
     {"correlation", ImageCalc_Correlation, METH_VARARGS,
+"imagecalc.correlation(inputImageA, inputImageB, outputMatrix)\n"
 "Calculates the correlation between two images\n"
-"call signature: imagecalc.correlation(inputImageA, inputImageB, outputMatrix)\n"
 "where:\n"
 "  * inputImageA is a string containing the name of the first input image file\n"
 "  * inputImageB is a string containing the name of the second input image file\n"
@@ -1164,8 +1164,8 @@ static PyMethodDef ImageCalcMethods[] = {
 },
 
     {"covariance", ImageCalc_Covariance, METH_VARARGS,
+"imagecalc.covariance(inputImageA, inputImageB, inputMatrixA, inputMatrixB, shouldCalcMean, outputMatrix)\n"
 "Calculates the covariance between two images\n"
-"call signature: imagecalc.covariance(inputImageA, inputImageB, inputMatrixA, inputMatrixB, shouldCalcMean, outputMatrix)\n"
 "where:\n"
 "  * inputImageA is a string containing the name of the first input image file\n"
 "  * inputImageB is a string containing the name of the second input image file\n"
@@ -1176,8 +1176,8 @@ static PyMethodDef ImageCalcMethods[] = {
 },
 
     {"meanVector", ImageCalc_MeanVector, METH_VARARGS,
+"imagecalc.meanVector(inputImage, outputMatrix)\n"
 "Calculates the mean vector of an image\n"
-"call signature: imagecalc.meanVector(inputImage, outputMatrix)\n"
 "where:\n"
 "  * inputImage is a string containing the name of the input image file\n"
 "  * outputMatrix is a string containing the name of the output matrix\n"
@@ -1185,8 +1185,8 @@ static PyMethodDef ImageCalcMethods[] = {
 
 
     {"pca", ImageCalc_PCA, METH_VARARGS,
+"imagecalc.pca(eigenVectors, inputImage, outputImage, numComponents)\n"
 "Performs a principal components analysis of an image\n"
-"call signature: imagecalc.pca(eigenVectors, inputImage, outputImage, numComponents)\n"
 "where:\n"
 "  * eigenVectors is a string containing the name of the file of eigen vectors for the PCA\n"
 "  * inputImage is a string containing the name of the input image file\n"
@@ -1195,8 +1195,8 @@ static PyMethodDef ImageCalcMethods[] = {
 },
 
     {"standardise", ImageCalc_Standardise, METH_VARARGS,
+"imagecalc.standardise(meanVector, inputImage, outputImage)\n"
 "Generates a standardised image using the mean vector provided\n"
-"call signature: imagecalc.standardise(meanVector, inputImage, outputImage)\n"
 "where:\n"
 "  * meanVector is a string containing the name of the file containing the mean vector TODO: check\n"
 "  * inputImage is a string containing the name of the input image file\n"
@@ -1204,8 +1204,8 @@ static PyMethodDef ImageCalcMethods[] = {
 },
 
     {"replaceValuesLessThan", ImageCalc_ReplaceValuesLessThan, METH_VARARGS,
+"imagecalc.replaceValuesLessThan(inputImage, outputImage, threshold, value)\n"
 "Replaces values in an image that are less than the provided, according to the provided threshold\n"
-"call signature: imagecalc.replaceValuesLessThan(inputImage, outputImage, threshold, value)\n"
 "where:\n"
 "  * inputImage is a string containing the name of the input image file\n"
 "  * outputImage is a string containing the name of the output image file\n"
@@ -1214,8 +1214,8 @@ static PyMethodDef ImageCalcMethods[] = {
 },
 
     {"unitArea", ImageCalc_UnitArea, METH_VARARGS,
+"imagecalc.unitArea(inputImage, outputImage, inputMatrixFile)\n"
 "Converts the image spectra to unit area\n"
-"call signature: imagecalc.unitArea(inputImage, outputImage, inputMatrixFile)\n"
 "where:\n"
 "  * inputImage is a string containing the name of the input image file\n"
 "  * outputImage is a string containing the name of the output image file\n"
@@ -1223,8 +1223,8 @@ static PyMethodDef ImageCalcMethods[] = {
 },
 
     {"movementSpeed", ImageCalc_MovementSpeed, METH_VARARGS,
+"imagecalc.movementSpeed(inputImages, imageBands, imageTimes, upper, lower, outputImage)\n"
 "Calculates the speed of movement in images (mean, min and max)\n"
-"call signature: imagecalc.movementSpeed(inputImages, imageBands, imageTimes, upper, lower, outputImage)\n"
 "where:\n"
 "  * inputImages is a python sequence of strings of the input image files\n"
 "  * imageBands is a python sequence of integers defining the band of each image to use\n"
@@ -1235,8 +1235,8 @@ static PyMethodDef ImageCalcMethods[] = {
 },
 
     {"countValsInCols", ImageCalc_CountValsInCols, METH_VARARGS,
+"imagecalc.countValsInCols(inputImage, upper, lower, outputImage)\n"
 "Counts the number of values within a given range for each column\n"
-"call signature: imagecalc.countValsInCols(inputImage, upper, lower, outputImage)\n"
 "where:\n"
 "  * inputImage is a string containing the name of the input image file\n"
 "  * upper is a float containing the upper limit of values to count\n"
@@ -1245,8 +1245,8 @@ static PyMethodDef ImageCalcMethods[] = {
 },
 
     {"calculateRMSE", ImageCalc_CalculateRMSE, METH_VARARGS,
+"imagecalc.calculateRMSE(inputImageA, inputBandA, inputImageB, inputBandB)\n"
 "Calculates the root mean squared error between two images\n"
-"call signature: imagecalc.calculateRMSE(inputImageA, inputBandA, inputImageB, inputBandB)\n"
 "where:\n"
 "  * inputImageA is a string containing the name of the first input image file\n"
 "  * inputBandA is an integer defining which band should be processed from inputImageA\n"
@@ -1255,8 +1255,8 @@ static PyMethodDef ImageCalcMethods[] = {
 },
 
     {"dist2Geoms", ImageCalc_Dist2Geoms, METH_VARARGS,
+"imagecalc.dist2Geoms(inputVector, imageResolution, outputImage)\n"
 "Calculates the distance to the nearest geometry for every pixel in an image\n"
-"call signature: imagecalc.dist2Geoms(inputVector, imageResolution, outputImage)\n"
 "where:\n"
 "  * inputVector is a string defining the geometry TODO: Check this and find out about input image\n"
 "  * imageResolution is a float defining the resolution of which to process the image\n"
@@ -1264,8 +1264,8 @@ static PyMethodDef ImageCalcMethods[] = {
 },
 
     {"imageBandStats", ImageCalc_ImageBandStats, METH_VARARGS,
+"imagecalc.imageBandStats(inputImage, outputFile, ignoreZeros)\n"
 "Calculates statistics for individuals bands of an image\n"
-"call signature: imagecalc.imageBandStats(inputImage, outputFile, ignoreZeros)\n"
 "where:\n"
 "  * inputImage is a string containing the name of the input image file\n"
 "  * outputFile is a string containing the name of the output file\n"
@@ -1273,8 +1273,8 @@ static PyMethodDef ImageCalcMethods[] = {
 },
 
     {"imageStats", ImageCalc_ImageStats, METH_VARARGS,
+"imagecalc.imageStats(inputImage, outputFile, ignoreZeros)\n"
 "Calculates statistics for an image across all bands\n"
-"call signature: imagecalc.imageStats(inputImage, outputFile, ignoreZeros)\n"
 "where:\n"
 "  * inputImage is a string containing the name of the input image file\n"
 "  * outputFile is a string containing the name of the output file\n"
@@ -1282,8 +1282,8 @@ static PyMethodDef ImageCalcMethods[] = {
 },
 
     {"unconLinearSpecUnmix", ImageCalc_UnconLinearSpecUnmix, METH_VARARGS,
+"imagecalc.unconLinearSpecUnmix(inputImage, gdalformat, gdaltype, lsumGain, lsumOffset, outputFile, endmembersFile)\n"
 "Performs unconstrained linear spectral unmixing of the input image for a set of endmembers\n"
-"call signature: imagecalc.unconLinearSpecUnmix(inputImage, gdalformat, gdaltype, lsumGain, lsumOffset, outputFile, endmembersFile)\n"
 "where:\n"
 "  * inputImage is a string containing the name of the input image file\n"
 "  * gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
@@ -1295,8 +1295,8 @@ static PyMethodDef ImageCalcMethods[] = {
 },
 
     {"exhconLinearSpecUnmix", ImageCalc_ExhconLinearSpecUnmix, METH_VARARGS,
+"imagecalc.exhconLinearSpecUnmix(inputImage, gdalformat, gdaltype, lsumGain, lsumOffset, outputFile, endmembersFile, stepResolution)\n"
 "Performs an exhaustive constrained linear spectral unmixing of the input image for a set of endmembers\n"
-"call signature: imagecalc.exhconLinearSpecUnmix(inputImage, gdalformat, gdaltype, lsumGain, lsumOffset, outputFile, endmembersFile, stepResolution)\n"
 "where:\n"
 "  * inputImage is a string containing the name of the input image file\n"
 "  * gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
@@ -1309,8 +1309,8 @@ static PyMethodDef ImageCalcMethods[] = {
 },
 
     {"conSum1LinearSpecUnmix", ImageCalc_ConSum1LinearSpecUnmix, METH_VARARGS,
+"imagecalc.conSum1LinearSpecUnmix(inputImage, gdalformat, gdaltype, lsumGain, lsumOffset, lsumWeight, outputFile, endmembersFile, stepResolution)\n"
 "Performs a partially constrained linear spectral unmixing of the input image for a set of endmembers where the sum of the unmixing will be approximately 1\n"
-"call signature: imagecalc.conSum1LinearSpecUnmix(inputImage, gdalformat, gdaltype, lsumGain, lsumOffset, lsumWeight, outputFile, endmembersFile, stepResolution)\n"
 "where:\n"
 "  * inputImage is a string containing the name of the input image file\n"
 "  * gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
@@ -1323,8 +1323,8 @@ static PyMethodDef ImageCalcMethods[] = {
 },
 
     {"nnConSum1LinearSpecUnmix", ImageCalc_NnConSum1LinearSpecUnmix, METH_VARARGS,
+"imagecalc.nnConSum1LinearSpecUnmix(inputImage, gdalformat, gdaltype, lsumGain, lsumOffset, lsumWeight, outputFile, endmembersFile, stepResolution)\n"
 "Performs a constrained linear spectral unmixing of the input image for a set of endmembers where the sum of the unmixing will be approximately 1 and non-negative\n"
-"call signature: imagecalc.nnConSum1LinearSpecUnmix(inputImage, gdalformat, gdaltype, lsumGain, lsumOffset, lsumWeight, outputFile, endmembersFile, stepResolution)\n"
 "where:\n"
 "  * inputImage is a string containing the name of the input image file\n"
 "  * gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
@@ -1337,8 +1337,8 @@ static PyMethodDef ImageCalcMethods[] = {
 },
 
     {"allBandsEqualTo", ImageCalc_AllBandsEqualTo, METH_VARARGS,
+"imagecalc.allBandsEqualTo(inputImage, imgValue, outputTrueVal, outputFalseVal, outputImage, gdalformat, gdaltype)\n"
 "Tests whether all bands are equal to the same value\n"
-"call signature: imagecalc.allBandsEqualTo(inputImage, imgValue, outputTrueVal, outputFalseVal, outputImage, gdalformat, gdaltype)\n"
 "where:\n"
 "  * inputImage is a string containing the name of the input image file\n"
 "  * imgValue is a float specifying the value against which others are tested for equality TODO: Check this and below\n"
@@ -1350,8 +1350,8 @@ static PyMethodDef ImageCalcMethods[] = {
 },
 
     {"histogram", ImageCalc_Histogram, METH_VARARGS,
+"imagecalc.histogram(inputImage, imageMask, outputFile, imgBand, imgValue, binWidth, calcInMinMax, inMin, inMax)\n"
 "Generates a histogram for the region of the mask selected\n"
-"call signature: imagecalc.histogram(inputImage, imageMask, outputFile, imgBand, imgValue, binWidth, calcInMinMax, inMin, inMax)\n"
 "where:\n"
 "  * inputImage is a string containing the name of the input image file\n"
 "  * imageMask is a string containing the name of the image mask file\n"
@@ -1364,22 +1364,22 @@ static PyMethodDef ImageCalcMethods[] = {
 },
     
 {"getHistogram", ImageCalc_GetHistogram, METH_VARARGS,
-    "Generates and returns a histogram for the image.\n"
-    "call signature: imagecalc.getHistogram(inputImage, imgBand, binWidth, calcInMinMax, inMin, inMax)\n"
-    "where:\n"
-    "  * inputImage is a string containing the name of the input image file\n"
-    "  * imgBand is an unsigned int specifying the image band starting from 1.\n"
-    "  * binWidth is a float specifying the width of the histogram bins\n"
-    "  * calcInMinMax is a boolean specifying whether inMin and inMax should be calculated\n"
-    "  * inMin is a float for the minimum image value to be included in the histogram\n"
-    "  * inMax is a floatf or the maximum image value to be included in the histogram\n"
-    "returns:\n"
-    "  * "
+"imagecalc.getHistogram(inputImage, imgBand, binWidth, calcInMinMax, inMin, inMax)\n"
+"Generates and returns a histogram for the image.\n"
+"where:\n"
+"  * inputImage is a string containing the name of the input image file\n"
+"  * imgBand is an unsigned int specifying the image band starting from 1.\n"
+"  * binWidth is a float specifying the width of the histogram bins\n"
+"  * calcInMinMax is a boolean specifying whether inMin and inMax should be calculated\n"
+"  * inMin is a float for the minimum image value to be included in the histogram\n"
+"  * inMax is a floatf or the maximum image value to be included in the histogram\n"
+"returns:\n"
+"  * "
 },
 
     {"bandPercentile", ImageCalc_BandPercentile, METH_VARARGS,
+"imagecalc.bandPercentile(inputImage, percentile, noDataValue, noDataValueSpecified, outputFile)\n"
 "Calculates image band percentiles\n"
-"call signature: imagecalc.bandPercentile(inputImage, percentile, noDataValue, noDataValueSpecified, outputFile)\n"
 "where:\n"
 "  * inputImage is a string containing the name of the input image file\n"
 "  * percentile is a float TODO: more info\n"
@@ -1389,8 +1389,8 @@ static PyMethodDef ImageCalcMethods[] = {
 },
 
     {"imageDist2Geoms", ImageCalc_ImageDist2Geoms, METH_VARARGS,
+"imagecalc.imageDist2Geoms(inputImage, inputVector, gdalformat, outputImage)\n"
 "Calculates the distance to the nearest geometry for every pixel in an image\n"
-"call signature: imagecalc.imageDist2Geoms(inputImage, inputVector, gdalformat, outputImage)\n"
 "where:\n"
 "  * inputImage is a string containing the name of the input image file\n"
 "  * inputVector is a string containing the name of the input vector file containing the geometry TODO: check this\n"

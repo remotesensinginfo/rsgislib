@@ -449,8 +449,8 @@ static PyObject *ImageCalibration_Apply6SCoefficentsSingleParam(PyObject *self, 
 // Our list of functions in this module
 static PyMethodDef ImageCalibrationMethods[] = {
     {"landsat2Radiance", ImageCalibration_landsat2Radiance, METH_VARARGS,
+"imagecalibration.landsat2Radiance(outputImage, gdalformat, bandDefnSeq)\n"
 "Converts Landsat DN values to at sensor radiance.\n"
-"call signature: imagecalibration.landsat2Radiance(outputImage, gdalformat, bandDefnSeq)\n"
 "where:\n"
 "  * outputImage is a string containing the name of the output file\n"
 "  * gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
@@ -467,8 +467,8 @@ static PyMethodDef ImageCalibrationMethods[] = {
 "\n"},
     
     {"landsat2RadianceMultiAdd", ImageCalibration_landsat2RadianceMultiAdd, METH_VARARGS,
+        "imagecalibration.landsat2RadianceMultiAdd(outputImage, gdalformat, bandDefnSeq)\n"
         "Converts Landsat DN values to at sensor radiance.\n"
-        "call signature: imagecalibration.landsat2RadianceMultiAdd(outputImage, gdalformat, bandDefnSeq)\n"
         "where:\n"
         "  * outputImage is a string containing the name of the output file\n"
         "  * gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
@@ -483,8 +483,8 @@ static PyMethodDef ImageCalibrationMethods[] = {
 		"\n"},
     
 {"radiance2TOARefl", ImageCalibration_Radiance2TOARefl, METH_VARARGS,
+    "imagecalibration.radiance2TOARefl(inputFile, outputFile, gdalFormat, gdaltype, scaleFactor, julianDay, solarZenith, solarIrradianceVals)\n"
     "Converts at sensor radiance values to Top of Atmosphere Reflectance.\n"
-    "call signature: imagecalibration.radiance2TOARefl(inputFile, outputFile, gdalFormat, gdaltype, scaleFactor, julianDay, solarZenith, solarIrradianceVals)\n"
     "where:\n"
     "  * inputFile is a string containing the name of the input image file\n"
     "  * outputFile is a string containing the name of the output image file\n"
@@ -498,8 +498,8 @@ static PyMethodDef ImageCalibrationMethods[] = {
     "  * solarIrradianceVals is a sequence of floats each with the name \'irradiance\' which is in order of the bands in the input image.\n"},
 
 {"apply6SCoeffSingleParam", ImageCalibration_Apply6SCoefficentsSingleParam, METH_VARARGS,
+    "imagecalibration.apply6SCoeffSingleParam(inputFile, outputFile, gdalFormat, gdaltype, scaleFactor, noDataValue, useNoDataValue, bandCoeffs)\n"
     "Converts at sensor radiance values to surface reflectance by apply the 6S model parameters for each band (aX, bX, cX).\n"
-    "call signature: imagecalibration.apply6SCoeffSingleParam(inputFile, outputFile, gdalFormat, gdaltype, scaleFactor, noDataValue, useNoDataValue, bandCoeffs)\n"
     "where:\n"
     "  * inputFile is a string containing the name of the input image file\n"
     "  * outputFile is a string containing the name of the output image file\n"

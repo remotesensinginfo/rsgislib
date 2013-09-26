@@ -1205,8 +1205,8 @@ static PyObject *RasterGIS_InterpolateClumpValues2Img(PyObject *self, PyObject *
 
 static PyMethodDef RasterGISMethods[] = {
     {"populateStats", RasterGIS_PopulateStats, METH_VARARGS,
+"rastergis.populateStats(clumpsImage, addColourTable2Img, calcImgPyramids)\n"
 "Populates statics for thermatic imagess\n"
-"call signature: rastergis.populateStats(clumpsImage, addColourTable2Img, calcImgPyramids)\n"
 "where:\n"
 "  * clumpsImage is a string containing the name of the input clump file\n"
 "  * addColourTable2Img is a boolean TODO: expand\n"
@@ -1214,16 +1214,16 @@ static PyMethodDef RasterGISMethods[] = {
 },
 
     {"copyRAT", RasterGIS_CopyRAT, METH_VARARGS,
+"rastergis.copyRAT(inputImage, clumpsImage)\n"
 "Copies a GDAL RAT from one image to anoother\n"
-"call signature: rastergis.copyRAT(inputImage, clumpsImage)\n"
 "where:\n"
 "  * inputImage is a string containing the name of the input image file\n"
 "  * clumpsImage is a string containing the name of the input clump file\n"
 },
 
     {"copyGDALATTColumns", RasterGIS_CopyGDALATTColumns, METH_VARARGS,
+"rastergis.copyGDALATTColumns(inputImage, clumpsImage, fields)\n"
 "Copies GDAL RAT columns from one image to another\n"
-"call signature: rastergis.copyGDALATTColumns(inputImage, clumpsImage, fields)\n"
 "where:\n"
 "  * inputImage is a string containing the name of the input image file\n"
 "  * clumpsImage is a string containing the name of the input clump file\n"
@@ -1231,8 +1231,8 @@ static PyMethodDef RasterGISMethods[] = {
 },
 
    {"spatialLocation", RasterGIS_SpatialLocation, METH_VARARGS,
+"rastergis.spatialLocation(inputImage, eastingsField, northingsField)\n"
 "Adds spatial location columns to the attribute table\n"
-"call signature: rastergis.spatialLocation(inputImage, eastingsField, northingsField)\n"
 "where:\n"
 "  * inputImage is a string containing the name of the input image file\n"
 "  * eastingsField is a string containing the name of the eastings field\n"
@@ -1259,8 +1259,8 @@ static PyMethodDef RasterGISMethods[] = {
 "\n"},
 
     {"populateRATWithPercentiles", RasterGIS_PopulateRATWithPercentiles, METH_VARARGS,
+"rastergis.populateRATWithPercentiles(inputImage, clumpsImage, bandPercentiles)\n"
 "Populates an attribute table with a percentile of the pixel values from an image */\n"
-"call signature: rastergis.populateRATWithPercentiles(inputImage, clumpsImage, bandPercentiles)\n"
 "where:\n"
 "  * inputImage is a string containing the name of the input image file\n"
 "  * clumpsImage is a string containing the name of the input clump file\n"
@@ -1273,8 +1273,8 @@ static PyMethodDef RasterGISMethods[] = {
 "\n"},
 
    {"populateCategoryProportions", RasterGIS_PopulateCategoryProportions, METH_VARARGS,
+"rastergis.populateCategoryProportions(categoriesImage, clumpsImage, outColsName, majorityColName, copyClassNames, majClassNameField, classNameField)\n"
 "Populates the attribute table with the proporations of intersecting catagories\n"
-"call signature: rastergis.populateCategoryProportions(categoriesImage, clumpsImage, outColsName, majorityColName, copyClassNames, majClassNameField, classNameField)\n"
 "where:\n"
 "  * categoriesImage is a string containing the name of the categories image file TODO: check and expand\n"
 "  * clumpsImage is a string containing the name of the input clump file\n"
@@ -1286,8 +1286,8 @@ static PyMethodDef RasterGISMethods[] = {
 },
 
    {"copyCategoriesColours", RasterGIS_CopyCategoriesColours, METH_VARARGS,
+"rastergis.copyCategoriesColours(categoriesImage, clumpsImage, classField)\n"
 "Copies an attribute tables colour table to another table based on class column\n"
-"call signature: rastergis.copyCategoriesColours(categoriesImage, clumpsImage, classField)\n"
 "where:\n"
 "  * categoriesImage is a string containing the name of the categories image file TODO: check and expand\n"
 "  * clumpsImage is a string containing the name of the input clump file\n"
@@ -1295,8 +1295,8 @@ static PyMethodDef RasterGISMethods[] = {
 },
 
    {"exportCols2GDALImage", RasterGIS_ExportCols2GDALImage, METH_VARARGS,
+"rastergis.exportCols2GDALImage(inputImage, outputFile, gdalFormat, gdalDataType, fields)\n"
 "Exports columns of the attribute table as GDAL images\n"
-"call signature: rastergis.exportCols2GDALImage(inputImage, outputFile, gdalFormat, gdalDataType, fields)\n"
 "where:\n"
 "  * inputImage is a string containing the name of the input image file TODO: check and expand\n"
 "  * outputFile is a string containing the name of the output gdal file\n"
@@ -1306,8 +1306,8 @@ static PyMethodDef RasterGISMethods[] = {
 },
 
    {"eucDistFromFeature", RasterGIS_EucDistFromFeature, METH_VARARGS,
+"rastergis.eucDistFromFeature(inputImage, fid, outputField, fields)\n"
 "Calculates the euclidean distance from a feature to all other features\n"
-"call signature: rastergis.eucDistFromFeature(inputImage, fid, outputField, fields)\n"
 "where:\n"
 "  * inputImage is a string containing the name of the input image file TODO: check and expand\n"
 "  * fid is an integer\n"
@@ -1316,8 +1316,8 @@ static PyMethodDef RasterGISMethods[] = {
 },
 
    {"findTopN", RasterGIS_FindTopN, METH_VARARGS,
+"rastergis.findTopN(inputImage, spatialDistField, distanceField, outputField, nFeatures, distThreshold)\n"
 "Calculates the top N features within a given spatial distance\n"
-"call signature: rastergis.findTopN(inputImage, spatialDistField, distanceField, outputField, nFeatures, distThreshold)\n"
 "where:\n"
 "  * inputImage is a string containing the name of the input image file TODO: check and expand\n"
 "  * spatialDistField is a string containing the name of the field containing the spatial distance\n"
@@ -1328,8 +1328,8 @@ static PyMethodDef RasterGISMethods[] = {
 },
 
    {"findSpecClose", RasterGIS_FindSpecClose, METH_VARARGS,
+"rastergis.findSpecClose(inputImage, spatialDistField, distanceField, outputField, specDistThreshold, distThreshold)\n"
 "Calculates the features within a given spatial and spectral distance\n"
-"call signature: rastergis.findSpecClose(inputImage, spatialDistField, distanceField, outputField, specDistThreshold, distThreshold)\n"
 "where:\n"
 "  * inputImage is a string containing the name of the input image file TODO: check and expand\n"
 "  * spatialDistField is a string containing the name of the field containing the spatial distance\n"
@@ -1340,8 +1340,8 @@ static PyMethodDef RasterGISMethods[] = {
 },
 
     {"export2Ascii", RasterGIS_Export2Ascii, METH_VARARGS,
+"rastergis.export2Ascii(inputImage, outputFile, fields)\n"
 "Exports columns from a GDAL RAT to ascii\n"
-"call signature: rastergis.export2Ascii(inputImage, outputFile, fields)\n"
 "where:\n"
 "  * inputImage is a string containing the name of the input image file TODO: check and expand\n"
 "  * outputFile is a string containing the name of the output file \n"
@@ -1349,8 +1349,8 @@ static PyMethodDef RasterGISMethods[] = {
 },
 
     {"classTranslate", RasterGIS_ClassTranslate, METH_VARARGS,
+"rastergis.classTranslate(inputImage, classInField, classOutField, classPairs)\n"
 "Translates a set of classes to another\n"
-"call signature: rastergis.classTranslate(inputImage, classInField, classOutField, classPairs)\n"
 "where:\n"
 "  * inputImage is a string containing the name of the input image file TODO: check and expand\n"
 "  * classInField is a string containing the name of the input class field\n"
@@ -1359,8 +1359,8 @@ static PyMethodDef RasterGISMethods[] = {
 },
 
     {"colourClasses", RasterGIS_ColourClasses, METH_VARARGS,
+"rastergis.colourClasses(inputImage, classInField, classColourPairs)\n"
 "Sets a colour table for a set of classes within the attribute table\n"
-"call signature: rastergis.colourClasses(inputImage, classInField, classColourPairs)\n"
 "where:\n"
 "  * inputImage is a string containing the name of the input image file TODO: check and expand\n"
 "  * classInField is a string containing the name of the input class field\n"
@@ -1374,8 +1374,8 @@ static PyMethodDef RasterGISMethods[] = {
 "\n"},
 
     {"colourStrClasses", RasterGIS_ColourStrClasses, METH_VARARGS,
+"rastergis.colourStrClasses(inputImage, classInField, classColourPairs)\n"
 "Sets a colour table for a set of classes (string column) within the attribute table\n"
-"call signature: rastergis.colourStrClasses(inputImage, classInField, classColourPairs)\n"
 "where:\n"
 "  inputImage is a string containing the name of the input image file TODO: check and expand\n"
 "  classInField is a string containing the name of the input class field\n"
@@ -1389,8 +1389,8 @@ static PyMethodDef RasterGISMethods[] = {
 "\n"},
 
     {"generateColourTable", RasterGIS_GenerateColourTable, METH_VARARGS,
+"rastergis.generateColourTable(inputImage, classInField, classColourPairs)\n"
 "Generates a colour table using an input image\n"
-"call signature: rastergis.generateColourTable(inputImage, classInField, classColourPairs)\n"
 "where:\n"
 "  * inputImage is a string containing the name of the input image file TODO: check and expand\n"
 "  * classInField is a string containing the name of the input class field\n"
@@ -1404,8 +1404,8 @@ static PyMethodDef RasterGISMethods[] = {
 "\n"},
 
     {"strClassMajority", RasterGIS_StrClassMajority, METH_VARARGS,
+"rastergis.strClassMajority(baseSegment, infoSegment, baseClassCol, infoClassCol)\n"
 "Finds the majority for class (string - field) from a set of small objects to large objects\n"
-"call signature: rastergis.strClassMajority(baseSegment, infoSegment, baseClassCol, infoClassCol)\n"
 "where:\n"
 "  * baseSegment is a string TODO: expand\n"
 "  * infoSegment is a string\n"
@@ -1414,8 +1414,8 @@ static PyMethodDef RasterGISMethods[] = {
 },
 
     {"specDistMajorityClassifier", RasterGIS_SpecDistMajorityClassifier, METH_VARARGS,
+"rastergis.specDistMajorityClassifier(inputImage, inClassNameField, outClassNameField, trainingSelectCol, eastingsField, northingsField, areaField, \n"
 "Classifies segments using a spectral distance majority classification\n"
-"call signature: rastergis.specDistMajorityClassifier(inputImage, inClassNameField, outClassNameField, trainingSelectCol, eastingsField, northingsField, areaField, \n"
 "                                                     majWeightField, fields, distThreshold, specDistThreshold, distMethod, specThreshOriginDist)\n"
 "where:\n"
 "  * inputImage is a string containing the name of the input image file TODO: expand\n"
@@ -1433,8 +1433,8 @@ static PyMethodDef RasterGISMethods[] = {
 },
     
     {"maxLikelihoodClassifier", RasterGIS_MaxLikelihoodClassifier, METH_VARARGS,
+"rastergis.maxLikelihoodClassifier(inputImage, inClassNameField, outClassNameField, trainingSelectCol, areaField, \n"
 "Classifies segments using a maximum likelihood classification\n"
-"call signature: rastergis.maxLikelihoodClassifier(inputImage, inClassNameField, outClassNameField, trainingSelectCol, areaField, \n"
 "                                                     fields, priorsMethod, priorStrs)\n"
 "where:\n"
 "  * inputImage is a string containing the name of the input image file TODO: expand\n"
@@ -1448,8 +1448,8 @@ static PyMethodDef RasterGISMethods[] = {
 },
     
     {"maxLikelihoodClassifierLocalPriors", RasterGIS_MaxLikelihoodClassifierLocalPriors, METH_VARARGS,
+"rastergis.maxLikelihoodClassifierLocalPriors(inputImage, inClassNameField, outClassNameField, trainingSelectCol, areaField, fields, \n"
 "Classifies segments using a maximum likelihood classification and local priors\n"
-"call signature: rastergis.maxLikelihoodClassifierLocalPriors(inputImage, inClassNameField, outClassNameField, trainingSelectCol, areaField, fields, \n"
 "                                                     eastingsField, northingsField, distThreshold, priorsMethod, weightA, allowZeroPriors)\n"
 "where:\n"
 "  * inputImage is a string containing the name of the input image file TODO: expand\n"
@@ -1467,8 +1467,8 @@ static PyMethodDef RasterGISMethods[] = {
 },
     
     {"classMask", RasterGIS_ClassMask, METH_VARARGS,
+"rastergis.classMask(inputImage, classField, className, outputFile, gdalFormat, gdalType)\n"
 "Generates a mask for a particular class\n"
-"call signature: rastergis.classMask(inputImage, classField, className, outputFile, gdalFormat, gdalType)\n"
 "where:\n"
 "  * inputImage is a string containing the name of the input image file TODO: expand\n"
 "  * classField is a string\n"
@@ -1479,15 +1479,15 @@ static PyMethodDef RasterGISMethods[] = {
 },
     
     {"findNeighbours", RasterGIS_FindNeighbours, METH_VARARGS,
+"rastergis.findNeighbours(inputImage)\n"
 "Finds the clump neighbours from an image\n"
-"call signature: rastergis.findNeighbours(inputImage)\n"
 "where:\n"
 "  * inputImage is a string containing the name of the input image file\n"
 },
     
     {"findBoundaryPixels", RasterGIS_FindBoundaryPixels, METH_VARARGS,
+"rastergis.findBoundaryPixels(inputImage, outputFile, gdalFormat)\n"
 "Identifies the pixels on the boundary of the clumps\n"
-"call signature: rastergis.findBoundaryPixels(inputImage, outputFile, gdalFormat)\n"
 "where:\n"
 "  * inputImage is a string containing the name of the input image file\n"
 "  * outputFile is a string containing the name of the output file\n"
@@ -1495,8 +1495,8 @@ static PyMethodDef RasterGISMethods[] = {
 },
     
     {"calcBorderLength", RasterGIS_CalcBorderLength, METH_VARARGS,
+"rastergis.calcBorderLength(inputImage, ignoreZeroEdges, outColsName)\n"
 "Calculate the border length of clumps\n"
-"call signature: rastergis.calcBorderLength(inputImage, ignoreZeroEdges, outColsName)\n"
 "where:\n"
 "  * inputImage is a string containing the name of the input image file\n"
 "  * ignoreZeroEdges is a bool\n"
@@ -1504,8 +1504,8 @@ static PyMethodDef RasterGISMethods[] = {
 },
     
     {"calcRelBorder", RasterGIS_CalcRelBorder, METH_VARARGS,
+"rastergis.calcRelBorder(inputImage, outColsName, classNameField, className, ignoreZeroEdges)\n"
 "Calculates the relative border length of the clumps to a class\n"
-"call signature: rastergis.calcRelBorder(inputImage, outColsName, classNameField, className, ignoreZeroEdges)\n"
 "where:\n"
 "  * inputImage is a string containing the name of the input image file\n"
 "  * outColsName is a string\n"
@@ -1515,8 +1515,8 @@ static PyMethodDef RasterGISMethods[] = {
 },
 
     {"calcShapeIndices", RasterGIS_CalcShapeIndices, METH_VARARGS,
+"rastergis.calcShapeIndices(inputImage, shapeIndices)\n"
 "Calculates shape indices for clumps\n"
-"call signature: rastergis.calcShapeIndices(inputImage, shapeIndices)\n"
 "where:\n"
 "  * inputImage is a string containing the name of the input image file\n"
 "  * shapeIndices is a sequence of rsgislib.rastergis.ShapeIndex objects that have the following attributes:\n"
@@ -1527,8 +1527,8 @@ static PyMethodDef RasterGISMethods[] = {
 },
     
     {"defineClumpTilePositions", RasterGIS_DefineClumpTilePositions, METH_VARARGS,
+"rastergis.defineClumpTilePositions(clumpsImage, tileImage, outColsName, tileOverlap, tileBoundary, tileBody)\n"
 "Defines the position within the file of the clumps\n"
-"call signature: rastergis.defineClumpTilePositions(clumpsImage, tileImage, outColsName, tileOverlap, tileBoundary, tileBody)\n"
 "where:\n"
 "  * clumpsImage is a string containing the name of the input clump file\n"
 "  * tileImage is a string containing the name of the input tile image\n"
@@ -1539,8 +1539,8 @@ static PyMethodDef RasterGISMethods[] = {
 },
 
     {"defineBorderClumps", RasterGIS_DefineBorderClumps, METH_VARARGS,
+"rastergis.defineBorderClumps(clumpsImage, tileImage, outColsName, tileOverlap, tileBoundary, tileBody)\n"
 "Defines the clumps which are on the border within the file of the clumps using a mask\n"
-"call signature: rastergis.defineBorderClumps(clumpsImage, tileImage, outColsName, tileOverlap, tileBoundary, tileBody)\n"
 "where:\n"
 "  * clumpsImage is a string containing the name of the input clump file\n"
 "  * tileImage is a string containing the name of the input tile image\n"
@@ -1551,8 +1551,8 @@ static PyMethodDef RasterGISMethods[] = {
 },
     
     {"findChangeClumpsFromStdDev", RasterGIS_FindChangeClumpsFromStdDev, METH_VARARGS,
+"rastergis.findChangeClumpsFromStdDev(clumpsImage, classField, changeField, attFields, classChangeFields)\n"
 "Identifies segments which have changed by looking for statistical outliers (std dev) from class population\n"
-"call signature: rastergis.findChangeClumpsFromStdDev(clumpsImage, classField, changeField, attFields, classChangeFields)\n"
 "where:\n"
 "  * clumpsImage is a string containing the name of the input clump file\n"
 "  * classField is a string\n"
