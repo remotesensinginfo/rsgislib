@@ -94,7 +94,8 @@ class RSGISExeZonalStats : public RSGISAlgorithmParameters
 			fuzzy,
 			powersetcount,
 			pointvalue,
-            endmembers
+            endmembers,
+            imagezone2hdf
 		};
 
 		RSGISExeZonalStats();
@@ -114,6 +115,7 @@ class RSGISExeZonalStats : public RSGISAlgorithmParameters
 		string outputVecPolys;
 		string outputTextFile;
 		string outputMatrix;
+        string outputFile;
 		string polyAttribute;
 		string classAttribute;
 		CountAttributes **attributeCountList;

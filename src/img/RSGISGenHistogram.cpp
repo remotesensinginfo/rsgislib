@@ -85,6 +85,48 @@ namespace rsgis { namespace img {
         }
     }
     
+    unsigned int* RSGISGenHistogram::genGetHistogram(GDALDataset *dataset, unsigned int imgBand, double imgMin, double imgMax, float binWidth, unsigned int *nBins)throw(RSGISImageCalcException)
+    {
+        unsigned int *bins = NULL;
+        try
+        {
+            double range = (imgMax - imgMin);
+            *nBins = ceil((range/binWidth)+0.5);
+            bins = new unsigned int[(*nBins)];
+            float *binRanges = new float[(*nBins)+1];
+            
+            for(unsigned int i = 0; i < (*nBins); ++i)
+            {
+                bins[i] = 0;
+                binRanges[i] = imgMin + (i * binWidth);
+            }
+            binRanges[(*nBins)] = imgMin + ((*nBins) * binWidth);
+            
+            // Populate the Histogram - using image calc...
+            RSGISGenHistogramNoMaskCalcVal *genHists = new RSGISGenHistogramNoMaskCalcVal(bins, binRanges, imgBand, (*nBins), binWidth);
+            RSGISCalcImage calcImage = RSGISCalcImage(genHists);
+            calcImage.calcImage(&dataset, 1);
+            
+            /*for(unsigned int i = 0; i < (*nBins); ++i)
+            {
+                std::cout << i << "(" << binRanges[i] << " - " << binRanges[i+1] << ") = " << bins[i] << std::endl;
+            }*/
+            
+            delete[] binRanges;
+            delete genHists;
+        }
+        catch (RSGISImageCalcException &e)
+        {
+            throw e;
+        }
+        catch (RSGISException &e)
+        {
+            throw e;
+        }
+        
+        return bins;
+    }
+    
     RSGISGenHistogram::~RSGISGenHistogram()
     {
         
@@ -137,6 +179,47 @@ namespace rsgis { namespace img {
     }
 
     RSGISGenHistogramCalcVal::~RSGISGenHistogramCalcVal()
+    {
+        
+	}
+    
+    
+    
+    RSGISGenHistogramNoMaskCalcVal::RSGISGenHistogramNoMaskCalcVal(unsigned int *bins, float *binRanges, unsigned int band, unsigned int numBins, float binWidth): RSGISCalcImageValue(0)
+    {
+        this->bins = bins;
+        this->binRanges = binRanges;
+        this->band = band;
+        this->numBins = numBins;
+        this->binWidth = binWidth;
+    }
+    
+    void RSGISGenHistogramNoMaskCalcVal::calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException)
+    {
+        try
+        {
+            if(band > numBands)
+            {
+                throw RSGISImageCalcException("Band is beyond band range of the image.");
+            }
+            
+            float dist = bandValues[band] - binRanges[0];
+            if(dist > 0)
+            {
+                unsigned int binIdx = floor(dist/binWidth);
+                if(binIdx < numBins)
+                {
+                    ++bins[binIdx];
+                }
+            }
+        }
+        catch (RSGISImageCalcException &e)
+        {
+            throw e;
+        }
+    }
+    
+    RSGISGenHistogramNoMaskCalcVal::~RSGISGenHistogramNoMaskCalcVal()
     {
         
 	}

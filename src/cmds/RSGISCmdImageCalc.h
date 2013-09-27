@@ -112,6 +112,8 @@ namespace rsgis{ namespace cmds {
     void executeAllBandsEqualTo(std::string inputImage, float imgValue, float outputTrueVal, float outputFalseVal, std::string outputImage, std::string imageFormat, RSGISLibDataType outDataType)throw(RSGISCmdException);
     /** Function to generate a histogram for the region of the mask selected */
     void executeHistogram(std::string inputImage, std::string imageMask, std::string outputFile, unsigned int imgBand, float imgValue, double binWidth, bool calcInMinMax, double inMin, double inMax)throw(RSGISCmdException);
+    /** Function to generate a histogram and return it */
+    unsigned int* executeGetHistogram(std::string inputImage, unsigned int imgBand, double binWidth, unsigned int *nBins, bool calcInMinMax, double *inMin, double *inMax)throw(RSGISCmdException);
     /** Function to calculate image band percentiles */
     void executeBandPercentile(std::string inputImage, float percentile, float noDataValue, bool noDataValueSpecified, std::string outputFile)throw(RSGISCmdException);
     /** Function to calculate the distance to the nearest geometry for every pixel in an image */

@@ -120,7 +120,7 @@ namespace rsgis{namespace img{
                         this->dataRow[i] = bandValues[i];
                     }
                     //std::cout << std::endl;
-                    dataExport->addData(dataRow, H5::PredType::NATIVE_FLOAT);
+                    dataExport->addDataRow(dataRow, H5::PredType::NATIVE_FLOAT);
                     currentPxl = 1;
                 }
                 else
