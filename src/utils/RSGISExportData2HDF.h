@@ -56,15 +56,13 @@ namespace rsgis{namespace utils{
 	public:
 		RSGISExportColumnData2HDF();
         void createFile(std::string filePath, unsigned int numCols, std::string description, H5::DataType dataType) throw(rsgis::RSGISFileException);
-        void addData(void *data, H5::DataType h5Datatype) throw(rsgis::RSGISFileException);
+        void addDataRow(void *data, H5::DataType h5Datatype) throw(rsgis::RSGISFileException);
         void close();
 		~RSGISExportColumnData2HDF();
     protected:
         H5::H5File *dataH5File;
         H5::DataSet columnDataSet;
         unsigned int numCols;
-        //void **dataBuffer;
-        //unsigned int bufferSize;
         unsigned int blockSize;
         unsigned int numColsWritten;
 	};

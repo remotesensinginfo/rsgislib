@@ -71,9 +71,9 @@
 
 
 
-    <!-- Deprecated: A command to undertake zonal stats to calculate te min, max, mean, std dev for a polygon -->
+    <!-- Deprecated: A command to undertake zonal stats to calculate the min, max, mean, std dev for a polygon -->
     <rsgis:command algor="zonalstats" option="polygons2shp" image="image.env" vector="polys.shp" output="output.shp" mean="yes" max="yes" min="yes" stddev="yes" force="yes | no" />
-    <!-- Deprecated: A command to undertake zonal stats to calculate te min, max, mean, std dev for a rasterised polygon -->
+    <!-- Deprecated: A command to undertake zonal stats to calculate the min, max, mean, std dev for a rasterised polygon -->
     <rsgis:command algor="zonalstats" option="rasterpolygons2shp" image="image.env" raster="polys.env" vector="polys.shp" output="output.shp" mean="yes" max="yes" min="yes" stddev="yes" />
     <!-- Deprecated: A command to undertake zonal stats to calculate the min, max, mean, std dev for a rasterised polygon with the output written to a text file -->
     <rsgis:command algor="zonalstats" option="rasterpolygons2txt" image="image.env" raster="polys.env" vector="polys.shp" output="output.txt" mean="yes" max="yes" min="yes" stddev="yes" />
@@ -98,9 +98,9 @@
             <rsgis:band band="int" threshold="float" />
         </rsgis:attribute>
     </rsgis:command>
-        <!-- Calculates zonal statistics for image pixels, falling between minimum and maximum threasholds. Statistics are calculated for all bands in image using default names (b1, b2 etc.) or band names from image. -->
+        <!-- Calculates zonal statistics for image pixels, falling between minimum and maximum thresholds. Statistics are calculated for all bands in image using default names (b1, b2 etc.) or band names from image. -->
     <rsgis:command algor="zonalstats" option="pixelstats" image="image.env"   vector="polys.shp" raster="polys.env" output="output.shp" method="polyContainsPixel | polyContainsPixelCenter | polyOverlapsPixel | polyOverlapsOrContainsPixel | pixelContainsPoly | pixelContainsPolyCenter | adaptive | envelope" force="yes | no" ignoreProjection="yes | no" copyAttributes="yes | no" pxlcount="yes | no" mean="yes | no " min="yes | no" max="yes | no " stddev="yes | no" mode="yes | no" sum="yes | no"  count="yes | no" minThreshold="float" maxThreshold="float" useBandNames="yes | no"/>
-    <!-- Calculates zonal statistics for image pixels, falling between minimum and maximum threasholds. Statistics may be calculated for selected bands with user specified names, statistics specified for each attribute override common statistics -->
+    <!-- Calculates zonal statistics for image pixels, falling between minimum and maximum thresholds. Statistics may be calculated for selected bands with user specified names, statistics specified for each attribute override common statistics -->
     <rsgis:command algor="zonalstats" option="pixelstats" image="image.env"   vector="polys.shp" raster="polys.env" output="output.shp" method="polyContainsPixel | polyContainsPixelCenter | polyOverlapsPixel | polyOverlapsOrContainsPixel | pixelContainsPoly | pixelContainsPolyCenter | adaptive | envelope" force="yes | no" ignoreProjection="yes | no" copyAttributes="yes | no" pxlcount="yes | no" mean="yes | no " min="yes | no" max="yes | no " stddev="yes | no" mode="yes | no" sum="yes | no"  count="yes | no" minThreshold="float" maxThreshold="float" >
         <rsgis:attribute name="attribute_name" mean="yes | no " min="yes | no" max="yes | no " stddev="yes | no" mode="yes | no" sum="yes | no"   count="yes | no">
             <rsgis:band band="int" minThreshold="float" maxThreshold="float" />
@@ -197,6 +197,8 @@
     <rsgis:command algor="zonalstats" option="pointvalue" image="image.env" vector="points.shp" outputCSV="output.csv" useBandNames="yes | no" />
     <!-- A command to extract the pixel values for regions to a matrix file as columns which can be used as endmembers for unmixing -->
     <rsgis:command algor="zonalstats" option="endmembers" image="image.env" vector="polygons.shp" output="output.mtxt" method="polyContainsPixel | polyContainsPixelCenter | polyOverlapsPixel | polyOverlapsOrContainsPixel | pixelContainsPoly | pixelContainsPolyCenter | adaptive | envelope" />
+	<!-- A command to extract the all the pixel values for regions to a HDF5 file (1 column for each image band) -->
+    <rsgis:command algor="zonalstats" option="imagezone2hdf" image="image.env" vector="polygons.shp" output="output.hdf" method="polyContainsPixel | polyContainsPixelCenter | polyOverlapsPixel | polyOverlapsOrContainsPixel | pixelContainsPoly | pixelContainsPolyCenter | adaptive | envelope" ignoreProjection="yes | no" />
 
 
 
@@ -945,6 +947,7 @@
         <rsgis:filter size="int" type="Mode" fileending="mode" />
         <rsgis:filter size="int" type="Range" fileending="range" />
         <rsgis:filter size="int" type="StdDev" fileending="stddev" />
+        <rsgis:filter size="int" type="CoeffOfVar" fileending="coeffofvar" />
         <rsgis:filter size="int" type="Min" fileending="min" />
         <rsgis:filter size="int" type="Max" fileending="max" />
         <rsgis:filter size="int" type="Total" fileending="total" />

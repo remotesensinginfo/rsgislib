@@ -4,7 +4,7 @@
  *
  *  Created by Pete Bunting on 18/12/2008.
  *  Copyright 2008 RSGISLib.
- * 
+ *
  *  RSGISLib is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -23,19 +23,19 @@
 #include "RSGISStatsFilters.h"
 
 namespace rsgis{namespace filter{
-	
+
 	RSGISMeanFilter::RSGISMeanFilter(int numberOutBands, int size, std::string filenameEnding) : RSGISImageFilter(numberOutBands, size, filenameEnding)
 	{
-		
+
 	}
-	
+
 	void RSGISMeanFilter::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		if(this->size != winSize)
 		{
 			throw rsgis::img::RSGISImageCalcException("Window sizes are different");
 		}
-		
+
 		double outputValue = 0;
 		int numberElements = this->size * this->size;
 		for(int i = 0; i < numBands; i++)
@@ -56,35 +56,35 @@ namespace rsgis{namespace filter{
 	{
 		throw rsgis::img::RSGISImageCalcException("Not implemented yet");
 	}
-	
+
 	void RSGISMeanFilter::exportAsImage(std::string filename) throw(RSGISImageFilterException)
 	{
 		std::cout << "No Image to output\n";
 	}
-	
+
 	RSGISMeanFilter::~RSGISMeanFilter()
 	{
-		
+
 	}
-	
+
 	RSGISMedianFilter::RSGISMedianFilter(int numberOutBands, int size, std::string filenameEnding) : RSGISImageFilter(numberOutBands, size, filenameEnding)
 	{
-		
+
 	}
-	
+
 	void RSGISMedianFilter::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		if(this->size != winSize)
 		{
 			throw rsgis::img::RSGISImageCalcException("Window sizes are different");
 		}
-		
+
 		double outputValue = 0;
 		int numberElements = winSize * winSize;
 		int median = floor(((float)numberElements)/2.0);
 		std::vector<float> sortedList;
         sortedList.reserve(numberElements);
-		
+
 		for(int i = 0; i < numBands; i++)
 		{
 			outputValue = 0;
@@ -100,40 +100,40 @@ namespace rsgis{namespace filter{
             std::sort(sortedList.begin(), sortedList.end());
 			output[i] = sortedList[median];
 			sortedList.clear();
-		}		
+		}
 	}
-	
+
 	bool RSGISMedianFilter::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		throw rsgis::img::RSGISImageCalcException("Not implemented yet");
 	}
-	
+
 	void RSGISMedianFilter::exportAsImage(std::string filename) throw(RSGISImageFilterException)
 	{
 		std::cout << "No Image to output\n";
 	}
-	
+
 	RSGISMedianFilter::~RSGISMedianFilter()
 	{
-		
+
 	}
-	
+
 	RSGISModeFilter::RSGISModeFilter(int numberOutBands, int size, std::string filenameEnding) : RSGISImageFilter(numberOutBands, size, filenameEnding)
 	{
-		
+
 	}
-	
+
 	void RSGISModeFilter::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		if(this->size != winSize)
 		{
 			throw rsgis::img::RSGISImageCalcException("Window sizes are different");
 		}
-		
+
 		double outputValue = 0;
-		
+
         rsgis::datastruct::SortedGenericList<float> *sortedList = new rsgis::datastruct::SortedGenericList<float>();
-		
+
 		for(int i = 0; i < numBands; i++)
 		{
 			outputValue = 0;
@@ -147,42 +147,42 @@ namespace rsgis{namespace filter{
 			output[i] = *sortedList->getMostCommonValue();
 			sortedList->clearList();
 		}
-		
+
 		delete sortedList;
 	}
-	
+
 	bool RSGISModeFilter::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		throw rsgis::img::RSGISImageCalcException("Not implemented yet");
 	}
-	
+
 	void RSGISModeFilter::exportAsImage(std::string filename) throw(RSGISImageFilterException)
 	{
 		std::cout << "No Image to output\n";
 	}
-	
+
 	RSGISModeFilter::~RSGISModeFilter()
 	{
-		
+
 	}
-	
-	
+
+
 	RSGISRangeFilter::RSGISRangeFilter(int numberOutBands, int size, std::string filenameEnding) : RSGISImageFilter(numberOutBands, size, filenameEnding)
 	{
-		
+
 	}
-	
+
 	void RSGISRangeFilter::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		if(this->size != winSize)
 		{
 			throw rsgis::img::RSGISImageCalcException("Window sizes are different");
 		}
-		
+
 		float min = 0;
 		float max = 0;
 		bool first = true;
-		
+
 		for(int i = 0; i < numBands; i++)
 		{
 			min = 0;
@@ -214,34 +214,34 @@ namespace rsgis{namespace filter{
 			output[i] = max-min;
 		}
 	}
-	
+
 	bool RSGISRangeFilter::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		throw rsgis::img::RSGISImageCalcException("Not implemented yet");
 	}
-	
+
 	void RSGISRangeFilter::exportAsImage(std::string filename) throw(RSGISImageFilterException)
 	{
 		std::cout << "No Image to output\n";
 	}
-	
+
 	RSGISRangeFilter::~RSGISRangeFilter()
 	{
-		
+
 	}
-	
+
 	RSGISStdDevFilter::RSGISStdDevFilter(int numberOutBands, int size, std::string filenameEnding) : RSGISImageFilter(numberOutBands, size, filenameEnding)
 	{
-		
+
 	}
-	
+
 	void RSGISStdDevFilter::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		if(this->size != winSize)
 		{
 			throw rsgis::img::RSGISImageCalcException("Window sizes are different");
 		}
-		
+
 		double outputValue = 0;
 		double squSum = 0;
 		float mean = 0;
@@ -250,7 +250,7 @@ namespace rsgis{namespace filter{
 		{
 			outputValue = 0;
 			squSum = 0;
-			
+
 			for(int j = 0; j < this->size; j++)
 			{
 				for(int k = 0; k < this->size; k++)
@@ -258,9 +258,9 @@ namespace rsgis{namespace filter{
 					outputValue = outputValue + dataBlock[i][j][k];
 				}
 			}
-			
+
 			mean = outputValue/numberElements;
-			
+
 			for(int j = 0; j < this->size; j++)
 			{
 				for(int k = 0; k < this->size; k++)
@@ -268,41 +268,100 @@ namespace rsgis{namespace filter{
 					squSum += ((dataBlock[i][j][k] - mean) * (dataBlock[i][j][k] - mean));
 				}
 			}
-			
+
 			output[i] = sqrt(squSum/numberElements);
 		}
 	}
-	
+
 	bool RSGISStdDevFilter::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		throw rsgis::img::RSGISImageCalcException("Not implemented yet");
 	}
-	
+
 	void RSGISStdDevFilter::exportAsImage(std::string filename) throw(RSGISImageFilterException)
 	{
 		std::cout << "No Image to output\n";
 	}
-	
+
 	RSGISStdDevFilter::~RSGISStdDevFilter()
 	{
-		
+
 	}
-	
+
+    RSGISCoeffOfVarFilter::RSGISCoeffOfVarFilter(int numberOutBands, int size, std::string filenameEnding) : RSGISImageFilter(numberOutBands, size, filenameEnding)
+	{
+
+	}
+
+	void RSGISCoeffOfVarFilter::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
+	{
+		if(this->size != winSize)
+		{
+			throw rsgis::img::RSGISImageCalcException("Window sizes are different");
+		}
+
+		double outputValue = 0;
+		double squSum = 0;
+		float mean = 0;
+		int numberElements = this->size * this->size;
+		for(int i = 0; i < numBands; i++)
+		{
+			outputValue = 0;
+			squSum = 0;
+
+			for(int j = 0; j < this->size; j++)
+			{
+				for(int k = 0; k < this->size; k++)
+				{
+					outputValue = outputValue + dataBlock[i][j][k];
+				}
+			}
+
+			mean = outputValue/numberElements;
+
+			for(int j = 0; j < this->size; j++)
+			{
+				for(int k = 0; k < this->size; k++)
+				{
+					squSum += ((dataBlock[i][j][k] - mean) * (dataBlock[i][j][k] - mean));
+				}
+			}
+
+			output[i] = sqrt(squSum/numberElements) / mean;
+		}
+	}
+
+	bool RSGISCoeffOfVarFilter::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
+	{
+		throw rsgis::img::RSGISImageCalcException("Not implemented yet");
+	}
+
+	void RSGISCoeffOfVarFilter::exportAsImage(std::string filename) throw(RSGISImageFilterException)
+	{
+		std::cout << "No Image to output\n";
+	}
+
+	RSGISCoeffOfVarFilter::~RSGISCoeffOfVarFilter()
+	{
+
+	}
+
+
 	RSGISMinFilter::RSGISMinFilter(int numberOutBands, int size, std::string filenameEnding) : RSGISImageFilter(numberOutBands, size, filenameEnding)
 	{
-		
+
 	}
-	
+
 	void RSGISMinFilter::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		if(this->size != winSize)
 		{
 			throw rsgis::img::RSGISImageCalcException("Window sizes are different");
 		}
-		
+
 		float min = 0;
 		bool first = true;
-		
+
 		for(int i = 0; i < numBands; i++)
 		{
 			min = 0;
@@ -328,37 +387,37 @@ namespace rsgis{namespace filter{
 			output[i] = min;
 		}
 	}
-	
+
 	bool RSGISMinFilter::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		throw rsgis::img::RSGISImageCalcException("Not implemented yet");
 	}
-	
+
 	void RSGISMinFilter::exportAsImage(std::string filename) throw(RSGISImageFilterException)
 	{
 		std::cout << "No Image to output\n";
 	}
-	
+
 	RSGISMinFilter::~RSGISMinFilter()
 	{
-		
+
 	}
-	
+
 	RSGISMaxFilter::RSGISMaxFilter(int numberOutBands, int size, std::string filenameEnding) : RSGISImageFilter(numberOutBands, size, filenameEnding)
 	{
-		
+
 	}
-	
+
 	void RSGISMaxFilter::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		if(this->size != winSize)
 		{
 			throw rsgis::img::RSGISImageCalcException("Window sizes are different");
 		}
-		
+
 		float max = 0;
 		bool first = true;
-		
+
 		for(int i = 0; i < numBands; i++)
 		{
 			max = 0;
@@ -384,34 +443,34 @@ namespace rsgis{namespace filter{
 			output[i] = max;
 		}
 	}
-	
+
 	bool RSGISMaxFilter::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		throw rsgis::img::RSGISImageCalcException("Not implemented yet");
 	}
-	
+
 	void RSGISMaxFilter::exportAsImage(std::string filename) throw(RSGISImageFilterException)
 	{
 		std::cout << "No Image to output\n";
 	}
-	
+
 	RSGISMaxFilter::~RSGISMaxFilter()
 	{
-		
+
 	}
-	
+
 	RSGISTotalFilter::RSGISTotalFilter(int numberOutBands, int size, std::string filenameEnding) : RSGISImageFilter(numberOutBands, size, filenameEnding)
 	{
-		
+
 	}
-	
+
 	void RSGISTotalFilter::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		if(this->size != winSize)
 		{
 			throw rsgis::img::RSGISImageCalcException("Window sizes are different");
 		}
-		
+
 		double outputValue = 0;
 
 		for(int i = 0; i < numBands; i++)
@@ -427,46 +486,46 @@ namespace rsgis{namespace filter{
 			output[i] = outputValue;
 		}
 	}
-	
+
 	bool RSGISTotalFilter::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		throw rsgis::img::RSGISImageCalcException("Not implemented yet");
 	}
-	
+
 	void RSGISTotalFilter::exportAsImage(std::string filename) throw(RSGISImageFilterException)
 	{
 		std::cout << "No Image to output\n";
 	}
-	
+
 	RSGISTotalFilter::~RSGISTotalFilter()
 	{
-		
+
 	}
-	
+
 	RSGISKuwaharaFilter::RSGISKuwaharaFilter(int numberOutBands, int size, std::string filenameEnding) : RSGISImageFilter(numberOutBands, size, filenameEnding)
 	{
-		
+
 	}
-	
+
 	void RSGISKuwaharaFilter::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		if(this->size != winSize)
 		{
 			throw rsgis::img::RSGISImageCalcException("Window sizes are different");
 		}
-		
+
 		double outputValue = 0;
 		int subSize = (size-1)/2;
 		int numberElements = 0;
 		double squSum = 0;
-		
+
 		float *variance = new float[4];
 		float *mean = new float[4];
-		
+
 		float minValue = 0;
 		int minIndex = 0;
 		bool first = true;
-		
+
 		for(int i = 0; i < numBands; i++)
 		{
 			for(int n = 0; n < 4; n++)
@@ -474,7 +533,7 @@ namespace rsgis{namespace filter{
 				variance[n] = 0;
 				mean[n] = 0;
 			}
-			
+
 			outputValue = 0;
 			squSum = 0;
 			numberElements = 0;
@@ -487,7 +546,7 @@ namespace rsgis{namespace filter{
 				}
 			}
 			mean[0] = outputValue/numberElements;
-			
+
 			for(int j = 0; j < subSize; j++)
 			{
 				for(int k = 0; k < subSize; k++)
@@ -496,8 +555,8 @@ namespace rsgis{namespace filter{
 				}
 			}
 			variance[0] = squSum/numberElements;
-			
-			
+
+
 			outputValue = 0;
 			squSum = 0;
 			numberElements = 0;
@@ -510,7 +569,7 @@ namespace rsgis{namespace filter{
 				}
 			}
 			mean[1] = outputValue/numberElements;
-			
+
 			for(int j = (subSize+1); j < size; j++)
 			{
 				for(int k = 0; k < subSize; k++)
@@ -519,7 +578,7 @@ namespace rsgis{namespace filter{
 				}
 			}
 			variance[1] = squSum/numberElements;
-			
+
 			outputValue = 0;
 			squSum = 0;
 			numberElements = 0;
@@ -532,7 +591,7 @@ namespace rsgis{namespace filter{
 				}
 			}
 			mean[2] = outputValue/numberElements;
-			
+
 			for(int j = 0; j < subSize; j++)
 			{
 				for(int k = (subSize+1); k < size; k++)
@@ -541,7 +600,7 @@ namespace rsgis{namespace filter{
 				}
 			}
 			variance[2] = squSum/numberElements;
-			
+
 			outputValue = 0;
 			squSum = 0;
 			numberElements = 0;
@@ -554,7 +613,7 @@ namespace rsgis{namespace filter{
 				}
 			}
 			mean[3] = outputValue/numberElements;
-			
+
 			for(int j = (subSize+1); j < size; j++)
 			{
 				for(int k = (subSize+1); k < size; k++)
@@ -563,7 +622,7 @@ namespace rsgis{namespace filter{
 				}
 			}
 			variance[3] = squSum/numberElements;
-			
+
 			minValue = 0;
 			minIndex = 0;
 			first = true;
@@ -586,29 +645,29 @@ namespace rsgis{namespace filter{
 					}
 				}
 			}
-			
+
 			//std::cout << "Ouput Mean = " << mean[minIndex] << std::endl;
 			output[i] = mean[minIndex];
 		}
-		
+
 		delete[] variance;
 		delete[] mean;
 	}
-	
+
 	bool RSGISKuwaharaFilter::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		throw rsgis::img::RSGISImageCalcException("Not implemented yet");
 	}
-	
+
 	void RSGISKuwaharaFilter::exportAsImage(std::string filename) throw(RSGISImageFilterException)
 	{
 		std::cout << "No Image to output\n";
 	}
-	
+
 	RSGISKuwaharaFilter::~RSGISKuwaharaFilter()
 	{
-		
+
 	}
-	
+
 }}
 

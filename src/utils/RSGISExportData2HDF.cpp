@@ -113,7 +113,7 @@ namespace rsgis{namespace utils{
         }
     }
     
-    void RSGISExportColumnData2HDF::addData(void *data, H5::DataType h5Datatype) throw(rsgis::RSGISFileException)
+    void RSGISExportColumnData2HDF::addDataRow(void *data, H5::DataType h5Datatype) throw(rsgis::RSGISFileException)
     {
         try
         {

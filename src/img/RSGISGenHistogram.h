@@ -40,6 +40,7 @@ namespace rsgis { namespace img {
     public:
         RSGISGenHistogram();
         void genHistogram(GDALDataset **datasets, unsigned int numDS, std::string outputFile, unsigned int imgBand, double imgMin, double imgMax, float maskValue, float binWidth)throw(RSGISImageCalcException);
+        unsigned int* genGetHistogram(GDALDataset *dataset, unsigned int imgBand, double imgMin, double imgMax, float binWidth, unsigned int *nBins)throw(RSGISImageCalcException);
         ~RSGISGenHistogram();
     };
 	
@@ -60,6 +61,26 @@ namespace rsgis { namespace img {
         float *binRanges;
         unsigned int band;
         float maskValue;
+        float binWidth;
+        unsigned int numBins;
+	};
+    
+    class RSGISGenHistogramNoMaskCalcVal : public RSGISCalcImageValue
+	{
+	public:
+		RSGISGenHistogramNoMaskCalcVal(unsigned int *bins, float *binRanges, unsigned int band, unsigned int numBins, float binWidth);
+		void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
+		void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException);
+		void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
+		void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
+		void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+		bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
+		~RSGISGenHistogramNoMaskCalcVal();
+    protected:
+        unsigned int *bins;
+        float *binRanges;
+        unsigned int band;
         float binWidth;
         unsigned int numBins;
 	};

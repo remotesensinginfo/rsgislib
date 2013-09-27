@@ -26,7 +26,7 @@ set (PROJECT_TOOLS_DIR tools)
 set (PROJECT_XML_DIR xml_standards)
 
 # The version number.
-set (RSGISLIB_HG_COMMIT 606)
+set (RSGISLIB_HG_COMMIT 612)
 set (RSGISLIB_VERSION_MAJOR 2)
 set (RSGISLIB_VERSION_MINOR 0)
 set (RSGISLIB_VERSION_PATCH 0)
@@ -160,6 +160,9 @@ set(RSGISLIB_WITH_RSGISEXE TRUE CACHE BOOL "Choose if RSGISLib rsgisexe command 
 set(RSGISLIB_WITH_UTILTIES TRUE CACHE BOOL "Choose if RSGISLib utilities should be built")
 set(RSGISLIB_WITH_DOCUMENTS TRUE CACHE BOOL "Choose if RSGISLib documentation should be installed.")
 
+set(BOOST_INCLUDE_DIR /usr/local/include CACHE PATH "Include PATH for Boost")
+set(BOOST_LIB_PATH /usr/local/lib CACHE PATH "Library PATH for Boost")
+
 set(GSL_INCLUDE_DIR /usr/local/include CACHE PATH "Include PATH for GSL")
 set(GSL_LIB_PATH /usr/local/lib CACHE PATH "Library PATH for GSL")
 
@@ -288,16 +291,8 @@ endif(APPLE)
 ###############################################################################
 # Check the required libraries are present
 
-FIND_PACKAGE(Boost 1.4.8 REQUIRED)
-IF(Boost_FOUND)
-  INCLUDE_DIRECTORIES("${Boost_INCLUDE_DIRS}")
-  SET(Boost_USE_STATIC_LIBS OFF)
-  SET(Boost_USE_MULTITHREADED ON)
-  SET(Boost_USE_STATIC_RUNTIME OFF)
-  SET(BOOST_LIBRARIES -L${Boost_LIBRARY_DIRS} -lboost_filesystem -lboost_system)
-ELSEIF(NOT Boost_FOUND)
-  MESSAGE(FATAL_ERROR "Unable to find correct Boost version. Did you set BOOST_ROOT?")
-ENDIF()
+include_directories(${BOOST_INCLUDE_DIR})
+set(BOOST_LIBRARIES -L${BOOST_LIB_PATH} -lboost_filesystem -lboost_system)
 
 FIND_PROGRAM(PYTHON_EXE python ENV PATH)
 IF(PYTHON_EXE STREQUAL "PYTHON_EXE-NOTFOUND")

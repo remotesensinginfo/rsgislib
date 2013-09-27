@@ -100,9 +100,8 @@ static PyObject *ImageRegistration_SingleLayerRegistration(PyObject *self, PyObj
 // Our list of functions in this module
 static PyMethodDef ImageRegistrationMethods[] = {
     {"basicregistration", ImageRegistration_BasicRegistration, METH_VARARGS, 
+"imageregistration.basicregistration(reference, floating, pixelGap, threshold, window, search, stddevRef, stddevFloat, subpixelresolution, metric, outputType, output)\n"
 "Extract pixel value for each point in a shape file and output as a shapefile.\n"
-"call signature: imageregistration.basicregistration(reference, floating, pixelGap, threshold, window, search, \n"
-"                                           stddevRef, stddevFloat, subpixelresolution, metric, outputType, output)\n"
 "where:\n"
 " * reference is a string providing reference image which to which the floating image is to be registered.n"
 " * floating is a string providing the floating image to be registered to the reference image\n"
@@ -142,11 +141,9 @@ static PyMethodDef ImageRegistrationMethods[] = {
 },
 
     {"singlelayerregistration", ImageRegistration_SingleLayerRegistration, METH_VARARGS, 
-"Extract pixel value for each point in a shape file and output as a shapefile.\n"
-"call signature: imageregistration.singlelayerregistration(reference, floating, pixelGap, threshold, window, search, \n"
-"                                           stddevRef, stddevFloat, subpixelresolution, distanceThreshold, maxiterations, \n"
-"                                           movementThreshold, pSmoothness, metric, outputType, output)\n"
+"imageregistration.singlelayerregistration(reference, floating, pixelGap, threshold, window, search, stddevRef, stddevFloat, subpixelresolution, distanceThreshold, maxiterations, movementThreshold, pSmoothness, metric, outputType, output)\n"
 "where:\n"
+"Extract pixel value for each point in a shape file and output as a shapefile.\n"
 " * reference is a string providing reference image which to which the floating image is to be registered.n"
 " * floating is a string providing the floating image to be registered to the reference image\n"
 " * pixelGap is an int specifying the gap, in image pixels, between the initial tie points (this is for both the x and y axis) \n"

@@ -353,8 +353,8 @@ static PyObject *Segmentation_meanImage(PyObject *self, PyObject *args)
 // Our list of functions in this module
 static PyMethodDef SegmentationMethods[] = {
     {"labelPixelsFromClusterCentres", Segmentation_labelPixelsFromClusterCentres, METH_VARARGS, 
-"Does stuff.\n"
-"call signature: segmentation.labelPixelsFromClusterCentres(inputimage, outputimage, clustercenters, ignorezeros, gdalformat)\n"
+"segmentation.labelPixelsFromClusterCentres(inputimage, outputimage, clustercenters, ignorezeros, gdalformat)\n"
+"Labels image pixels with the ID of the nearest cluster centre.\n"
 "where:\n"
 " * inputimage is a string containing the name of the input file\n"
 " * outputimage is a string containing the name of the output file\n"
@@ -363,8 +363,8 @@ static PyMethodDef SegmentationMethods[] = {
 " * gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"},
 
     {"eliminateSinglePixels", Segmentation_eliminateSinglePixels, METH_VARARGS, 
-"Does other stuff\n"
-"call signature: segmentation.eliminateSinglePixels(inputimage, clumpsimage, outputimage, tempfile, gdalformat, processinmemory, ignorezeros)\n"
+"segmentation.eliminateSinglePixels(inputimage, clumpsimage, outputimage, tempfile, gdalformat, processinmemory, ignorezeros)\n"
+"Eliminates single pixels\n"
 "where:\n"
 " * inputimage is a string containing the name of the input file\n"
 " * clumpsimage is a string containing the name of the clump file\n"
@@ -375,8 +375,8 @@ static PyMethodDef SegmentationMethods[] = {
 " * ignore zeros is a bool\n"},
 
     {"clump", Segmentation_clump, METH_VARARGS,
+"segmentation.clump(inputimage, outputimage, gdalformat, processinmemory, nodata)\n"
 "clump\n"
-"call signature: segmentation.clump(inputimage, outputimage, gdalformat, processinmemory, nodata)\n"
 "where:\n"
 " * inputimage is a string containing the name of the input file\n"
 " * outputimage is a string containing the name of the output file\n"
@@ -385,8 +385,9 @@ static PyMethodDef SegmentationMethods[] = {
 " * nodata is None or float\n"},
 
     {"RMSmallClumpsStepwise", Segmentation_RMSmallClumpsStepwise, METH_VARARGS,
+"segmentation.RMSmallClumpsStepwise(inputimage, clumpsimage, outputimage, gdalformat, stretchstatsavail, stretchstatsfile, storemean, processinmemory, minclumpsize, specThreshold)\n"
+"eliminate clumps smaller than a given size from the scene, small clumps will be combined with their spectrally closest neighbouring  clump in a stepwise fashion unless over spectral distance threshold\n"
 "Does even more stuff\n"
-"call signature: segmentation.RMSmallClumpsStepwise(inputimage, clumpsimage, outputimage, gdalformat, stretchstatsavail, stretchstatsfile, storemean, processinmemory, minclumpsize, specThreshold)\n"
 "where:\n"
 " * inputimage is a string containing the name of the input file\n"
 " * clumpsimage is a string containing the name of the clump file\n"
@@ -400,8 +401,8 @@ static PyMethodDef SegmentationMethods[] = {
 " * specThreshold is a float\n"},
 
     {"relabelClumps", Segmentation_relabelClumps, METH_VARARGS,
+"segmentation.relabelClumps(inputimage, outputimage, gdalformat, processinmemory)\n"
 "Relabel clumps\n"
-"call signature: segmentation.relabelClumps(inputimage, outputimage, gdalformat, processinmemory)\n"
 "where:\n"
 " * inputimage is a string containing the name of the input file\n"
 " * outputimage is a string containing the name of the output file\n"
@@ -409,8 +410,8 @@ static PyMethodDef SegmentationMethods[] = {
 " * processinmemory is a bool\n"},
                                 
     {"UnionOfClumps", Segmentation_unionOfClumps, METH_VARARGS,
+"segmentation.unionOfClumps(outputimage, gdalformat, inputimagepaths, nodata)\n"
 "Union of clumps\n"
-"call signature: segmentation.unionOfClumps(outputimage, gdalformat, inputimagepaths, nodata)\n"
 "where:\n"
 " * outputimage is a string containing the name of the output file\n"
 " * gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
@@ -418,8 +419,8 @@ static PyMethodDef SegmentationMethods[] = {
 " * nodata is None or float\n"},
 
     {"mergeSegmentationTiles", Segmentation_mergeSegmentationTiles, METH_VARARGS,
+"segmentation.mergeSegmentationTiles(outputimage, bordermaskimage, tileboundary, tileoverlap, tilebody, colsname, inputimagepaths)\n"
 "Merge segmentation tiles\n"
-"call signature: segmentation.mergeSegmentationTiles(outputimage, bordermaskimage, tileboundary, tileoverlap, tilebody, colsname, inputimagepaths)\n"
 "where:\n"
 " * outputimage is a string containing the name of the output file\n"
 " * bordermaskimage is a string containing the name of the border mask file\n"

@@ -424,8 +424,7 @@ static PyObject *ImageUtils_AssignSpatialInfo(PyObject *self, PyObject *args)
 // Our list of functions in this module
 static PyMethodDef ImageUtilsMethods[] = {
     {"stretchImage", ImageUtils_StretchImage, METH_VARARGS, 
-"Stretch\n"
-"call signature: imageutils.stretchImage(inputimage, outputimage, saveoutstats, outstatsfile, ignorezeros, onepasssd, gdalformat, outtype, stretchtype, stretchparam)\n"
+"imageutils.stretchImage(inputimage, outputimage, saveoutstats, outstatsfile, ignorezeros, onepasssd, gdalformat, outtype, stretchtype, stretchparam)\n"
 "where:\n"
 " * inputImage is a string containing the name of the input file\n"
 " * outputImage is a string containing the name of the output file\n"
@@ -439,8 +438,8 @@ static PyMethodDef ImageUtilsMethods[] = {
 " * stretchparam is a float\n"},
 
     {"stretchImageWithStats", ImageUtils_StretchImageWithStats, METH_VARARGS, 
-"Stretch\n"
-"call signature: imageutils.stretchImageWithStats(inputimage, outputimage, instatsfile, gdalformat, outtype, stretchtype, stretchparam)\n"
+"imageutils.stretchImageWithStats(inputimage, outputimage, instatsfile, gdalformat, outtype, stretchtype, stretchparam)\n"
+"Stretch image with pre-computed statistics\n"
 "where:\n"
 " * inputImage is a string containing the name of the input file\n"
 " * outputImage is a string containing the name of the output file\n"
@@ -451,8 +450,8 @@ static PyMethodDef ImageUtilsMethods[] = {
 " * stretchparam is a float\n"},
 
     {"maskImage", ImageUtils_maskImage, METH_VARARGS,
-"Mask\n"
-"call signature: imageutils.maskImage(inputimage, imagemask, outputimage, gdalformat, type, outvalue, maskvalue)\n"
+"imageutils.maskImage(inputimage, imagemask, outputimage, gdalformat, type, outvalue, maskvalue)"
+"Mask image.\n"
 "where:\n"
 " * inputImage is a string containing the name of the input file\n"
 " * imagemask is a string\n"
@@ -463,8 +462,7 @@ static PyMethodDef ImageUtilsMethods[] = {
 " * maskvalue is a float\n"},
 
     {"createTiles", ImageUtils_createTiles, METH_VARARGS,
-"Create tiles from a larger image, useful for splitting a large image into multiple smaller ones for processing.\n"
-"call signature: imageutils.createTiles(inputimage, baseimage, width, height, overlap, offsettiling, gdalformat, type, ext)\n"
+"imageutils.createTiles(inputimage, baseimage, width, height, overlap, offsettiling, gdalformat, type, ext)\n"     "Create tiles from a larger image, useful for splitting a large image into multiple smaller ones for processing.\n"
 " * inputImage is a string containing the name of the input file\n"
 " * baseimage is a string containing the base name of the output file\n    the number of the tile and file extension will be appended.\n"
 " * width is the width of each tile, in pixels.\n"
@@ -492,8 +490,8 @@ static PyMethodDef ImageUtilsMethods[] = {
 "\n"},
     
     {"createImageMosaic", ImageUtils_createImageMosaic, METH_VARARGS,
+"imageutils.createImageMosaic(inputimagelist, outputimage, backgroundVal, skipVal, skipBand, overlapBehaviour, gdalformat, type)\n"  
 "Create mosaic from list of input images.\n"
-"call signature: imageutils.createImageMosaic(inputimagelist, outputimage, backgroundVal, \n    skipVal, skipBand, overlapBehaviour, gdalformat, type)\n"
 " * inputimagelist is a list of input images.\n"
 " * outputimage is a string containing the name of the output mosaic\n"
 " * backgroundVal is a float providing the background (nodata) value for the mosaic\n"
