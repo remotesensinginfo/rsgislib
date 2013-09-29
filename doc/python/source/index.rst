@@ -5,38 +5,27 @@
 
 .. _contents:
 
-Welcome to RSGISLib's documentation!
+The Remote Sensing and GIS Software Library (RSGISLib)
 ====================================
+The Remote Sensing and GIS software library (RSGISLib) was developed by Peter Bunting and Dan Clewley in the Earth Observation Group at Aberystwyth University. The software is a collection of tools for processing remote sensing and GIS datasets. Tools are accessed using an XML interface or python bindings.
 
-These are the API documentation pages for the Remote Sensing and GIS Software Library (RSGISLib) http://www.rsgislib.org. To get help through pydoc you can use one of the following commands:
+The project is hosted on Bitbucket and is available to download from https://bitbucket.org/petebunting/rsgislib 
 
-.. highlight:: python
+Site Contents
+---------------
 
-.. code-block:: python
-   :linenos:
+.. toctree::
+   about
+   download
+   documentation
 
-   import rsgislib
-   help(rsgislib)
-   import rsgislib.calibration
-   help(rsgislib.calibration)
-   import rsgislib.imagecalc
-   help(rsgislib.imagecalc)
-   import rsgislib.imageutils
-   help(rsgislib.imageutils)
-   import rsgislib.rastergis
-   help(rsgislib.rastergis)
-   import rsgislib.segmentation
-   help(rsgislib.segmentation)
-   import rsgislib.zonalstats
-   help(rsgislib.zonalstats)
-   import rsgislib.imageregistration
-   help(rsgislib.imageregistration)
 
-Contents:
+Python documentation:
+----------------------
 
 .. toctree::
    ::maxdepth: 2:
-   
+
    rsgislib
    rsgislib_calibration
    rsgislib_imagecalc
@@ -46,13 +35,9 @@ Contents:
    rsgislib_zonalstats
    rsgislib_imageregistration
    
-.. codeauthor:: Dr Peter Bunting <pfb@aber.ac.uk>
-
-Indices and tables
-==================
-
-* :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-* :ref:`glossary`
+
+.. codeauthor:: Dr Peter Bunting <pfb@aber.ac.uk>
+
 
