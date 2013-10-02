@@ -803,7 +803,7 @@ namespace rsgis{namespace rastergis{
                 throw rsgis::RSGISImageException("The minimum value is less than zero.");
             }
             
-            unsigned int maxHistVal = ceil(max);
+            unsigned int maxHistVal = ceil(max)+1;
             unsigned int *histo = new unsigned int[maxHistVal];
             
             for(unsigned int i = 0; i < maxHistVal; ++i)
