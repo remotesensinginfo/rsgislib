@@ -7,14 +7,16 @@
 
 The Remote Sensing and GIS Software Library (RSGISLib)
 ====================================
-The Remote Sensing and GIS software library (RSGISLib) was developed by Peter Bunting and Dan Clewley in the Earth Observation Group at Aberystwyth University. The software is a collection of tools for processing remote sensing and GIS datasets. Tools are accessed using an XML interface or python bindings.
+The Remote Sensing and GIS software library (RSGISLib) is a collection of tools for processing remote sensing and GIS datasets. Tools are accessed using an XML interface or python bindings. 
 
 The project is hosted on Bitbucket and is available to download from https://bitbucket.org/petebunting/rsgislib 
 
-Site Contents
+Information
 ---------------
 
 .. toctree::
+   ::maxdepth: 1:
+
    about
    download
    documentation
