@@ -22,7 +22,7 @@ Information
    documentation
 
 
-Python documentation:
+Python documentation
 ----------------------
 
 .. toctree::
