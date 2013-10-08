@@ -156,6 +156,21 @@ void RSGISExeStackBands::retrieveParameters(DOMElement *argElement) throw(RSGISX
 	}
 	XMLString::release(&outputXMLStr);
     
+    this->replaceBandNames = false;
+    XMLCh *replaceBandNamesXMLStr = XMLString::transcode("replacebandnames");
+	if(argElement->hasAttribute(replaceBandNamesXMLStr))
+	{
+		XMLCh *yesStr = XMLString::transcode("yes");
+		const XMLCh *vrtValue = argElement->getAttribute(replaceBandNamesXMLStr);
+		if(XMLString::equals(vrtValue, yesStr))
+		{
+			this->replaceBandNames = true;
+			cout << "\t Replacing band names." << endl;
+		}
+		XMLString::release(&yesStr);
+	}
+	XMLString::release(&replaceBandNamesXMLStr);
+    
     // Set value in any band to skip, if non is set standard algoritm is used and no error is printed
     XMLCh *skipValueXMLStr = XMLString::transcode("skipValue");
     if(argElement->hasAttribute(skipValueXMLStr))
@@ -372,7 +387,7 @@ void RSGISExeStackBands::runAlgorithm() throw(RSGISException)
 					}
 				}
 				
-				stackbands.stackImages(datasets, this->numImages, this->outputImage, this->imageBandNames, this->skipPixels, this->skipValue, this->noDataValue, this->imageFormat, this->outDataType);
+				stackbands.stackImages(datasets, this->numImages, this->outputImage, this->imageBandNames, this->skipPixels, this->skipValue, this->noDataValue, this->imageFormat, this->outDataType, this->replaceBandNames);
 				
 				if(datasets != NULL)
 				{
