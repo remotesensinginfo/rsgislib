@@ -39,6 +39,10 @@
 
 #include "gdal_priv.h"
 
+#include "cmds/RSGISCmdImageUtils.h"
+#include "cmds/RSGISCmdException.h"
+#include "cmds/RSGISCmdParent.h"
+
 namespace rsgisexe{
 
 using namespace std;
