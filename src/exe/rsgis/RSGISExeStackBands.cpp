@@ -369,6 +369,15 @@ void RSGISExeStackBands::runAlgorithm() throw(RSGISException)
 		}
 		else 
 		{
+            try
+			{
+                rsgis::cmds::executeStackImageBands(this->inputImages, this->imageBandNames, this->numImages, this->outputImage, this->skipPixels, this->skipValue, this->noDataValue, this->imageFormat, rsgis::cmds::GDAL_to_RSGIS_Type(this->outDataType), this->replaceBandNames);
+            }
+            catch(rsgis::cmds::RSGISCmdException &e)
+            {
+                throw RSGISException(e.what());
+            }
+            /*
 			GDALAllRegister();
 			GDALDataset **datasets = NULL;
 			RSGISAddBands stackbands;
@@ -411,6 +420,7 @@ void RSGISExeStackBands::runAlgorithm() throw(RSGISException)
 			{
 				throw e;
 			}
+             */
 		}
 
 	}

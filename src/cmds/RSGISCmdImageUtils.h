@@ -78,6 +78,9 @@ namespace rsgis{ namespace cmds {
     /** A function to copy the projection and spaital info from one file to another (i.e., similar to executeAssignProj and executeAssignSpatialInfo combined) */
     void executeCopyProjSpatial(std::string inputImage, std::string refImageFile)throw(RSGISCmdException);
     
+    /** A function to stack image bands into a single output image */
+    void executeStackImageBands(std::string *imageFiles, std::string *imageBandNames, int numImages, std::string outputImage, bool skipPixels, float skipValue, float noDataValue, std::string gdalFormat, RSGISLibDataType outDataType, bool replaceBandNames)throw(RSGISCmdException);
+    
 }}
 
 
