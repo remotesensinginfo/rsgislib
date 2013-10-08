@@ -578,7 +578,7 @@ namespace rsgis{namespace img{
 	}
     */
     
-    void RSGISAddBands::stackImages(GDALDataset **datasets, int numDS, std::string outputImage, std::string *imageBandNames, bool skipPixels, float skipValue, float noDataValue, std::string gdalFormat, GDALDataType gdalDataType) throw(RSGISImageBandException)
+    void RSGISAddBands::stackImages(GDALDataset **datasets, int numDS, std::string outputImage, std::string *imageBandNames, bool skipPixels, float skipValue, float noDataValue, std::string gdalFormat, GDALDataType gdalDataType, bool replaceBandNames) throw(RSGISImageBandException)
     {
         GDALAllRegister();
 		RSGISImageUtils imgUtils;
@@ -645,7 +645,14 @@ namespace rsgis{namespace img{
 					bandOffsets[counter] = new int[2];
 					bandOffsets[counter][0] = dsOffsets[i][0];
 					bandOffsets[counter][1] = dsOffsets[i][1];
-                    bandNames[counter] = inputRasterBands[counter]->GetDescription();
+                    if(replaceBandNames)
+                    {
+                        bandNames[counter] = imageBandNames[i];
+                    }
+                    else
+                    {
+                        bandNames[counter] = inputRasterBands[counter]->GetDescription();
+                    }
                     if(bandNames[counter] == "")
                     {
                         bandNames[counter] = std::string("Band ") + mathUtils.inttostring(i+1);

@@ -71,6 +71,7 @@ class RSGISExeStackBands : public RSGISAlgorithmParameters
         bool skipPixels;
         GDALDataType outDataType;
         string imageFormat;
+        bool replaceBandNames;
 	};
 }
 #endif
