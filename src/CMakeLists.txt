@@ -418,6 +418,8 @@ set(LIB_IMG_CPP
 	${RSGIS_SRC_IMG_DIR}/RSGISDefiniensCSVRasterise.h 
 	${RSGIS_SRC_IMG_DIR}/RSGISExport2DScatterPTxt.cpp 
 	${RSGIS_SRC_IMG_DIR}/RSGISExport2DScatterPTxt.h 
+	${RSGIS_SRC_IMG_DIR}/RSGISExtractImageValues.cpp 
+	${RSGIS_SRC_IMG_DIR}/RSGISExtractImageValues.h
 	${RSGIS_SRC_IMG_DIR}/RSGISFFTException.cpp 
 	${RSGIS_SRC_IMG_DIR}/RSGISFFTException.h
 	${RSGIS_SRC_IMG_DIR}/RSGISFFTProcessing.cpp

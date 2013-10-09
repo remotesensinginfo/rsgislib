@@ -115,6 +115,7 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
     XMLCh *optionDarkTargetMask = XMLString::transcode("darktargetmask");
     XMLCh *optionCopyProjDef = XMLString::transcode("copyprojdef");
     XMLCh *optionCopyProjDefSpatialInfo = XMLString::transcode("copyprojdefspatialinfo");
+    XMLCh *optionImageRasterZone2HDF = XMLString::transcode("imagerasterzone2hdf");
 
 	const XMLCh *algorNameEle = argElement->getAttribute(algorXMLStr);
 	if(!XMLString::equals(algorName, algorNameEle))
@@ -3624,6 +3625,63 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 		}
 		XMLString::release(&refImageXMLStr);
 	}
+    else if (XMLString::equals(optionImageRasterZone2HDF, optionXML))
+	{
+		this->option = RSGISExeImageUtils::imagerasterzone2hdf;
+        
+		XMLCh *imageXMLStr = XMLString::transcode("image");
+		if(argElement->hasAttribute(imageXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(imageXMLStr));
+			this->inputImage = string(charValue);
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+		}
+		XMLString::release(&imageXMLStr);
+        
+		XMLCh *outputXMLStr = XMLString::transcode("output");
+		if(argElement->hasAttribute(outputXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
+			this->outputHDFFile = string(charValue);
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+		}
+		XMLString::release(&outputXMLStr);
+        
+        
+		XMLCh *maskXMLStr = XMLString::transcode("mask");
+		if(argElement->hasAttribute(maskXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(maskXMLStr));
+			this->imageMask = string(charValue);
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'mask\' attribute was provided.");
+		}
+		XMLString::release(&maskXMLStr);
+        
+        XMLCh *maskValueXMLStr = XMLString::transcode("maskvalue");
+		if(argElement->hasAttribute(maskValueXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(maskValueXMLStr));
+			this->maskValue = mathUtils.strtofloat(string(charValue));
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'maskvalue\' attribute was provided.");
+		}
+		XMLString::release(&maskValueXMLStr);
+	}
 	else
 	{
 		string message = string("The option (") + string(XMLString::transcode(optionXML)) + string(") is not known: RSGISExeImageUtils.");
@@ -3682,6 +3740,7 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
     XMLString::release(&optionDarkTargetMask);
     XMLString::release(&optionCopyProjDef);
     XMLString::release(&optionCopyProjDefSpatialInfo);
+    XMLString::release(&optionImageRasterZone2HDF);
 
 	parsed = true;
 }
@@ -5818,6 +5877,23 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
                 throw rsgis::RSGISException(e.what());
             }
         }
+        else if(option == RSGISExeImageUtils::imagerasterzone2hdf)
+        {
+            cout.precision(12);
+            cout << "A command to extract the all the pixel values for raster regions to a HDF5 file (1 column for each image band).\n";
+            cout << "Input Image: " << this->inputImage << endl;
+            cout << "Mask Image: " << this->imageMask << endl;
+            cout << "Output: " << this->outputHDFFile << endl;
+            cout << "Mask Value: " << this->maskValue << endl;
+            try
+            {
+                rsgis::cmds::executeImageRasterZone2HDF(this->inputImage, this->imageMask, this->outputHDFFile, this->maskValue);
+            }
+            catch (rsgis::cmds::RSGISCmdException &e)
+            {
+                throw rsgis::RSGISException(e.what());
+            }
+        }
 		else
 		{
 			cout << "Options not recognised\n";
@@ -6283,6 +6359,15 @@ void RSGISExeImageUtils::printParameters()
             cout << "A command to copy the projection definition and spatial information from one image to another\n";
             cout << "Input Image: " << this->inputImage << endl;
             cout << "Reference Image: " << this->inputFile << endl;
+        }
+        else if(option == RSGISExeImageUtils::imagerasterzone2hdf)
+        {
+            cout.precision(12);
+            cout << "A command to extract the all the pixel values for raster regions to a HDF5 file (1 column for each image band).\n";
+            cout << "Input Image: " << this->inputImage << endl;
+            cout << "Mask Image: " << this->imageMask << endl;
+            cout << "Output: " << this->outputHDFFile << endl;
+            cout << "Mask Value: " << this->maskValue << endl;
         }
 		else
 		{

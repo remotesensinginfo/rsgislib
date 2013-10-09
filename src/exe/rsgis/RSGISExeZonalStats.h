@@ -95,7 +95,7 @@ class RSGISExeZonalStats : public RSGISAlgorithmParameters
 			powersetcount,
 			pointvalue,
             endmembers,
-            imagezone2hdf
+            imagezone2hdf,
 		};
 
 		RSGISExeZonalStats();
