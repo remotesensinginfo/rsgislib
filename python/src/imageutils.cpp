@@ -421,6 +421,30 @@ static PyObject *ImageUtils_AssignSpatialInfo(PyObject *self, PyObject *args)
 }
 
 
+static PyObject *ImageUtils_ExtractZoneImageValues2HDF(PyObject *self, PyObject *args)
+{
+    const char *pszInputImage;
+    const char *pszInputMaskImage;
+    const char *pszOutputFile;
+    float maskValue = 0;
+    
+    if( !PyArg_ParseTuple(args, "sssf:extractZoneImageValues2HDF", &pszInputImage, &pszInputMaskImage, &pszOutputFile, &maskValue))
+        return NULL;
+    
+    try
+    {
+        rsgis::cmds::executeImageRasterZone2HDF(std::string(pszInputImage), std::string(pszInputMaskImage), std::string(pszOutputFile), maskValue);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
+
 // Our list of functions in this module
 static PyMethodDef ImageUtilsMethods[] = {
     {"stretchImage", ImageUtils_StretchImage, METH_VARARGS, 
@@ -560,6 +584,14 @@ static PyMethodDef ImageUtilsMethods[] = {
 " * resY is a double representing Y resolution of the image.\n"
 " * rotX is a double representing X rotation of the image.\n"
 " * rotY is a double representing Y rotation of the image.\n"},
+    
+    {"extractZoneImageValues2HDF", ImageUtils_ExtractZoneImageValues2HDF, METH_VARARGS,
+    "rsgislib.imageutils.extractZoneImageValues2HDF(inputImage, imageMask, outputHDF, maskValue)\n"
+    "Extract the all the pixel values for raster regions to a HDF5 file (1 column for each image band).\n"
+    " * inputImage is a string containing the name and path of the input file\n"
+    " * imageMask is a string containing the name and path of the input image mask file; the mask file must have only 1 image band.\n"
+    " * outputHDF is a string containing the name and path of the output HDF5 file\n"
+    " * maskValue is a float containing the value of the pixel within the mask for which values are to be extracted\n"},
 
     {NULL}        /* Sentinel */
 };

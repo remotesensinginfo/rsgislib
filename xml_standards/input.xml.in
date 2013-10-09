@@ -723,7 +723,8 @@
 	<rsgis:command algor="imageutils" option="copyprojdef" image="image.kea" refimage="data.kea" />
 	<!-- A command to copy the projection definition and spatial information from one image to another --> 
 	<rsgis:command algor="imageutils" option="copyprojdefspatialinfo" image="image.kea" refimage="data.kea" />
-	
+	<!-- A command to extract the all the pixel values for raster regions to a HDF5 file (1 column for each image band) -->
+    <rsgis:command algor="imageutils" option="imagerasterzone2hdf" image="image.env" mask="mask.env" output="output.hdf" maskvalue="float" />
 	
 	
 	
