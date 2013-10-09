@@ -81,6 +81,9 @@ namespace rsgis{ namespace cmds {
     /** A function to stack image bands into a single output image */
     void executeStackImageBands(std::string *imageFiles, std::string *imageBandNames, int numImages, std::string outputImage, bool skipPixels, float skipValue, float noDataValue, std::string gdalFormat, RSGISLibDataType outDataType, bool replaceBandNames)throw(RSGISCmdException);
     
+    /** A function to extract image values to a HDF file */
+    void executeImageRasterZone2HDF(std::string imageFile, std::string maskImage, std::string outputHDF, float maskVal)throw(RSGISCmdException);
+    
 }}
 
 

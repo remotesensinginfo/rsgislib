@@ -152,7 +152,8 @@ class RSGISExeImageUtils : public RSGISAlgorithmParameters
             subsampleimage,
             darktargetmask,
             copyprojdef,
-            copyprojdefspatialinfo
+            copyprojdefspatialinfo,
+            imagerasterzone2hdf
 		};
 
 		enum interpolators
@@ -181,6 +182,7 @@ class RSGISExeImageUtils : public RSGISAlgorithmParameters
         rsgis::cmds::RSGISStretches stretchType;
 		string inputImage;
 		string outputImage;
+        string outputHDFFile;
         string outputImageBase;
 		string *inputImages;
 		string inputVector;

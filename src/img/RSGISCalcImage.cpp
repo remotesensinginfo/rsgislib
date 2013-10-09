@@ -918,6 +918,9 @@ namespace rsgis{namespace img{
 			// Find image overlap
 			imgUtils.getImageOverlap(datasets, numDS, dsOffsets, &width, &height, gdalTranslation, &xBlockSize, &yBlockSize);
             
+            //std::cout << "height = " << height << std::endl;
+            //std::cout << "Width = " << width << std::endl;
+            
             //std::cout << "Max. block size: " << yBlockSize << std::endl;
             
 			// Count number of image bands
