@@ -7,6 +7,7 @@ RSGISLib Image Registration Module
 
 .. autofunction:: rsgislib.imageregistration.basicregistration
 .. autofunction:: rsgislib.imageregistration.singlelayerregistration
+.. autofunction:: rsgislib.imageregistration.gcp2gdal
 
 * :ref:`genindex`
 * :ref:`modindex`

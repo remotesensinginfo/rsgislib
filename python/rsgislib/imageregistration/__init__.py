@@ -1,5 +1,6 @@
 """
-Contains image registration functionality for rsgislib
+The image registration module contains algorithms for generating tie points matching
+two image and warping images based on tie points.
 """
 
 # import the C++ extension into this level
