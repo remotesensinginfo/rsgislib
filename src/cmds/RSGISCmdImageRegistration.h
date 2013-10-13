@@ -44,6 +44,9 @@ namespace rsgis{ namespace cmds {
                                                   float stdDevFloatThreshold, int subPixelResolution, int distanceThreshold,
                                                   int maxNumIterations, float moveChangeThreshold, float pSmoothness, unsigned int metricTypeInt,
                                                   unsigned int outputType, std::string outputGCPFile);
+    
+    /** Add tie points to GCP */
+    void excecuteAddGCPsGDAL(std::string inputImage, std::string inputGCPs, std::string outputImage, std::string gdalFormat, RSGISLibDataType outDataType);
 }}
 
 
