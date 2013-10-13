@@ -95,13 +95,32 @@ static PyObject *ImageRegistration_SingleLayerRegistration(PyObject *self, PyObj
     Py_RETURN_NONE;
 }
 
+static PyObject *ImageRegistration_GCP2GDAL(PyObject *self, PyObject *args)
+{
+	const char *pszInputImage, *pszInputGCPFile, *pszOutputFile, *pszGDALFormat;
+	int nOutDataType;
+    
+    if( !PyArg_ParseTuple(args, "ssssi:gcp2gdal", &pszInputImage, &pszInputGCPFile, &pszOutputFile, &pszGDALFormat, &nOutDataType))
+        return NULL;
 
+    /*try
+    {
+        rsgis::cmds::excecuteAddGCPsGDAL(pszInputImage, pszInputGCPFile, pszOutputFile, pszGDALFormat, (rsgis::RSGISLibDataType) nOutDataType);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }*/
+
+    Py_RETURN_NONE;
+}
 
 // Our list of functions in this module
 static PyMethodDef ImageRegistrationMethods[] = {
     {"basicregistration", ImageRegistration_BasicRegistration, METH_VARARGS, 
 "imageregistration.basicregistration(reference, floating, pixelGap, threshold, window, search, stddevRef, stddevFloat, subpixelresolution, metric, outputType, output)\n"
-"Extract pixel value for each point in a shape file and output as a shapefile.\n"
+"Generate tie points between floating and reference image using basic algorithm.\n"
 "where:\n"
 " * reference is a string providing reference image which to which the floating image is to be registered.n"
 " * floating is a string providing the floating image to be registered to the reference image\n"
@@ -143,7 +162,7 @@ static PyMethodDef ImageRegistrationMethods[] = {
     {"singlelayerregistration", ImageRegistration_SingleLayerRegistration, METH_VARARGS, 
 "imageregistration.singlelayerregistration(reference, floating, pixelGap, threshold, window, search, stddevRef, stddevFloat, subpixelresolution, distanceThreshold, maxiterations, movementThreshold, pSmoothness, metric, outputType, output)\n"
 "where:\n"
-"Extract pixel value for each point in a shape file and output as a shapefile.\n"
+"Generate tie points between floating and reference image using a single connected layer of tie points.\n"
 " * reference is a string providing reference image which to which the floating image is to be registered.n"
 " * floating is a string providing the floating image to be registered to the reference image\n"
 " * pixelGap is an int specifying the gap, in image pixels, between the initial tie points (this is for both the x and y axis) \n"
@@ -184,7 +203,21 @@ static PyMethodDef ImageRegistrationMethods[] = {
 "   imageregistration.basicregistration(reference, floating, pixelGap, threshold, window, search, stddevRef, stddevFloat, subpixelresolution, metric, outputType, output)\n"
 "\n"
 },
-    {NULL}        /* Sentinel */
+    {"gcp2gdal", ImageRegistration_GCP2GDAL, METH_VARARGS, 
+"imageregistration.gcp2gdal(inputimage, inputgcps, outputimage, gdalformat, outtype)\n"
+"where:\n"
+"Add tie points to GDAL file.\n"
+" * inputimage is a string providing the input image.\n"
+" * inputgcps is a string providing the input text file containing the tie points.\n"
+" * outputimage is a string providing the output image.\n"
+" * gdalformat is a string providing the output format (e.g., KEA).\n"
+" * type is a rsgislib.TYPE_* value providing the output data type.\n"
+"\n"
+"Example::\n"
+"\n"
+"\n"
+},   
+	{NULL}        /* Sentinel */
 };
 
 

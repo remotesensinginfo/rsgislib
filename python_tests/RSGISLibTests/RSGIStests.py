@@ -556,6 +556,16 @@ class RSGISTests:
         output = './TestOutputs/injune_p142_casi_sub_utm_tie_points_singlelayer.txt'
         imageregistration.singlelayerregistration(reference, floating, pixelGap, threshold, window, search, stddevRef, stddevFloat, subpixelresolution, distanceThreshold, maxiterations, movementThreshold, pSmoothness, metric, outputType, output)
 
+    def testGCP2GDAL(self):
+        print("PYTHON TEST: gcps2gdal")
+        inputImage = './Rasters/injune_p142_casi_sub_utm_single_band_offset3x3y.vrt'
+        inputGCPs = './TestOutputs/injune_p142_casi_sub_utm_tie_points_basic.txt'
+        outputImage = './TestOutputs/injune_p142_casi_sub_utm_single_band_offset3x3y_gcps.kea'
+        format = "KEA"
+        dataType = rsgislib.TYPE_32INT
+        imageregistration.gcp2gdal(inputImage,inputGCPs, outputImage, format, dataType)
+
+
 if __name__ == '__main__':
 
     t = RSGISTests()
@@ -651,6 +661,7 @@ if __name__ == '__main__':
         """ Image Registration functions """
         t.tryFuncAndCatch(t.testBasicRegistration)
         t.tryFuncAndCatch(t.testSingleLayerRegistration)
+        t.tryFuncAndCatch(t.testGCP2GDAL)
     
     print("%s TESTS COMPLETED - %s FAILURES LISTED BELOW:"%(t.numTests, len(t.failures)))
     if(len(t.failures)):
