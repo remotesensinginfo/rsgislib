@@ -41,7 +41,7 @@
 
 namespace rsgis{ namespace cmds {
 
-    void executePointValue(std::string inputImage, std::string inputVecPolys, std::string outputStatsFile, bool outputToText, bool force, bool useBandNames)throw(RSGISCmdException)
+    void executePointValue(std::string inputImage, std::string inputVecPolys, std::string outputStatsFile, bool outputToText, bool force, bool useBandNames, bool shortenFileNames)throw(RSGISCmdException)
     {
         // Convert to absolute path
         inputVecPolys = boost::filesystem::absolute(inputVecPolys).c_str();
@@ -163,7 +163,7 @@ namespace rsgis{ namespace cmds {
             else
             {
 
-                processFeature = new rsgis::vec::RSGISVectorZonalStats(inputImageDS, outputStatsFile, useBandNames);
+                processFeature = new rsgis::vec::RSGISVectorZonalStats(inputImageDS, outputStatsFile, useBandNames, shortenFileNames);
                 processVector = new rsgis::vec::RSGISProcessVector(processFeature);
 
                 processVector->processVectorsNoOutput(inputSHPLayer, true);

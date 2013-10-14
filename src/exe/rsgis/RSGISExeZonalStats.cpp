@@ -2531,6 +2531,25 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
             if(!this->outputToText){throw RSGISXMLArgumentsException("No \'force\' attribute was provided.");}
 		}
 		XMLString::release(&forceXMLStr);
+        
+        shortenBandNames = true;
+        XMLCh *shortenBandNamesXMLStr = XMLString::transcode("shortenBandNames");
+		if(argElement->hasAttribute(shortenBandNamesXMLStr))
+		{
+			XMLCh *noStr = XMLString::transcode("no");
+			const XMLCh *shortenValue = argElement->getAttribute(shortenBandNamesXMLStr);
+            
+			if(XMLString::equals(shortenValue, noStr))
+			{
+				this->shortenBandNames = false;
+			}
+			else
+			{
+				this->shortenBandNames = true;
+			}
+			XMLString::release(&noStr);
+		}
+		XMLString::release(&shortenBandNamesXMLStr);
 
 	}
     else if(XMLString::equals(optionEndmembers, optionXML))
@@ -4414,7 +4433,7 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
             {
                 if(this->outputToText)
                 {
-                    rsgis::cmds::executePointValue(this->inputImage, this->inputVecPolys, this->outputTextFile, true, false, this->useBandNames);
+                    rsgis::cmds::executePointValue(this->inputImage, this->inputVecPolys, this->outputTextFile, true, false, this->useBandNames, this->shortenBandNames);
                 }
                 else
                 {
