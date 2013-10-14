@@ -1426,9 +1426,9 @@ void RSGISExeImageRegistration::runAlgorithm() throw(rsgis::RSGISException)
 			try
 			{
 
-				rsgis::reg::RSGISAddGCPsGDAL(this->inputImage, this->inputGCPs, this->outputImage, this->imageFormat, this->outDataType);
+                rsgis::cmds::excecuteAddGCPsGDAL(this->inputImage, this->inputGCPs, this->outputImage, this->imageFormat, this->rsgisOutDataType);
             }
-			catch(rsgis::RSGISRegistrationException &e)
+			catch(rsgis::cmds::RSGISCmdException &e)
 			{
 				throw rsgis::RSGISException(e.what());
 			}

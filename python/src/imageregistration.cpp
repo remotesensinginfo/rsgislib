@@ -95,32 +95,51 @@ static PyObject *ImageRegistration_SingleLayerRegistration(PyObject *self, PyObj
     Py_RETURN_NONE;
 }
 
+static PyObject *ImageRegistration_GCP2GDAL(PyObject *self, PyObject *args)
+{
+	const char *pszInputImage, *pszInputGCPFile, *pszOutputFile, *pszGDALFormat;
+	int nOutDataType;
+    
+    if( !PyArg_ParseTuple(args, "ssssi:gcp2gdal", &pszInputImage, &pszInputGCPFile, &pszOutputFile, &pszGDALFormat, &nOutDataType))
+        return NULL;
 
+    /*try
+    {
+        rsgis::cmds::excecuteAddGCPsGDAL(pszInputImage, pszInputGCPFile, pszOutputFile, pszGDALFormat, (rsgis::RSGISLibDataType) nOutDataType);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }*/
+
+    Py_RETURN_NONE;
+}
 
 // Our list of functions in this module
 static PyMethodDef ImageRegistrationMethods[] = {
     {"basicregistration", ImageRegistration_BasicRegistration, METH_VARARGS, 
 "imageregistration.basicregistration(reference, floating, pixelGap, threshold, window, search, stddevRef, stddevFloat, subpixelresolution, metric, outputType, output)\n"
-"Extract pixel value for each point in a shape file and output as a shapefile.\n"
+"Generate tie points between floating and reference image using basic algorithm.\n"
 "where:\n"
-" * reference is a string providing reference image which to which the floating image is to be registered.n"
-" * floating is a string providing the floating image to be registered to the reference image\n"
-" * pixelGap is an int specifying the gap, in image pixels, between the initial tie points (this is for both the x and y axis) \n"
-" * threshold is a float providing the threshold for the image metric above/below (depending on image metric)\n"
-"        which matching is consider insufficient to be reliable and therefore the match will be ignored.\n"
-" * window is an int providing the size of the window around each tie point which will be used for the matching \n"
-" * search is an int providing the distance (in pixels) from the tie point start point which will be searched.\n"
-" * stddevRef is a float which defines the standard deviation for the window around each tie point below which it is \n"
-"        deemed there is insufficient information to perform a match \n"
-" * stddevFloat is a float which defines the standard deviation for the window around each tie point below which it is \n"
-"        deemed there is insufficient information to perform a match \n"
-"Note, that the tie point window has to be below the threshold for both the reference and floating image to be ignored\n"
-" * subpixelresolution is an int specifying the sub-pixel resolution to which the pixel shifts are estimated.\n"
-"      Note that the values are positive integers such that a value of 2 will result in a sub pixel resolution \n"
-"      of 0.5 of a pixel and a value 4 will be 0.25 of a pixel. \n"
-" * metric is an the similarity metric used to compare images of type rsgislib.imageregistration.METRIC_* \n"
-" * outputType is an the format of the output file of type rsgislib.imageregistration.TYPE_* \n"
-" * output is a string giving specifying the output file, containing the generated tie points\n"
+"* reference is a string providing reference image which to which the floating image is to be registered.n"
+"* floating is a string providing the floating image to be registered to the reference image\n"
+"* pixelGap is an int specifying the gap, in image pixels, between the initial tie points (this is for both the x and y axis) \n"
+"* threshold is a float providing the threshold for the image metric above/below (depending on image metric)\n"
+"       which matching is consider insufficient to be reliable and therefore the match will be ignored.\n"
+"* window is an int providing the size of the window around each tie point which will be used for the matching \n"
+"* search is an int providing the distance (in pixels) from the tie point start point which will be searched.\n"
+"* stddevRef is a float which defines the standard deviation for the window around each tie point below which it is \n"
+"       deemed there is insufficient information to perform a match \n"
+"* stddevFloat is a float which defines the standard deviation for the window around each tie point below which it is \n"
+"       deemed there is insufficient information to perform a match \n"
+"ote, that the tie point window has to be below the threshold for both the reference and floating image to be ignored\n"
+"* subpixelresolution is an int specifying the sub-pixel resolution to which the pixel shifts are estimated.\n"
+"     Note that the values are positive integers such that a value of 2 will result in a sub pixel resolution \n"
+"     of 0.5 of a pixel and a value 4 will be 0.25 of a pixel. \n"
+"* metric is an the similarity metric used to compare images of type rsgislib.imageregistration.METRIC_* \n"
+"* outputType is an the format of the output file of type rsgislib.imageregistration.TYPE_* \n"
+"* output is a string giving specifying the output file, containing the generated tie points\n"
 "\n"
 "Example::\n"
 "\n"
@@ -143,29 +162,29 @@ static PyMethodDef ImageRegistrationMethods[] = {
     {"singlelayerregistration", ImageRegistration_SingleLayerRegistration, METH_VARARGS, 
 "imageregistration.singlelayerregistration(reference, floating, pixelGap, threshold, window, search, stddevRef, stddevFloat, subpixelresolution, distanceThreshold, maxiterations, movementThreshold, pSmoothness, metric, outputType, output)\n"
 "where:\n"
-"Extract pixel value for each point in a shape file and output as a shapefile.\n"
-" * reference is a string providing reference image which to which the floating image is to be registered.n"
-" * floating is a string providing the floating image to be registered to the reference image\n"
-" * pixelGap is an int specifying the gap, in image pixels, between the initial tie points (this is for both the x and y axis) \n"
-" * threshold is a float providing the threshold for the image metric above/below (depending on image metric)\n"
-"        which matching is consider insufficient to be reliable and therefore the match will be ignored.\n"
-" * window is an int providing the size of the window around each tie point which will be used for the matching \n"
-" * search is an int providing the distance (in pixels) from the tie point start point which will be searched.\n"
-" * stddevRef is a float which defines the standard deviation for the window around each tie point below which it is \n"
-"        deemed there is insufficient information to perform a match \n"
-" * stddevFloat is a float which defines the standard deviation for the window around each tie point below which it is \n"
-"        deemed there is insufficient information to perform a match \n"
-"Note, that the tie point window has to be below the threshold for both the reference and floating image to be ignored\n"
-" * subpixelresolution is an int specifying the sub-pixel resolution to which the pixel shifts are estimated.\n"
-"      Note that the values are positive integers such that a value of 2 will result in a sub pixel resolution \n"
-"      of 0.5 of a pixel and a value 4 will be 0.25 of a pixel. \n"
-" * distanceThreshold is an int giving the distance (in pixels) to be connected within the layer.\n"
-" * maxiterations is an int giving the maximum number of iterations of the tie point grid to find an optimal set of tie points\n"
-" * movementThreshold is a float providing the threshold for the average amount of tie point movement for the optimisation to be terminated\n"
-" * pSmoothness is a float providing the 'p' parameter for the inverse weighted distance calculation. A value of 2 should be used by default\n"
-" * metric is an the similarity metric used to compare images of type rsgislib.imageregistration.METRIC_* \n"
-" * outputType is an the format of the output file of type rsgislib.imageregistration.TYPE_* \n"
-" * output is a string giving specifying the output file, containing the generated tie points\n"
+"Generate tie points between floating and reference image using a single connected layer of tie points.\n"
+"* reference is a string providing reference image which to which the floating image is to be registered.n"
+"* floating is a string providing the floating image to be registered to the reference image\n"
+"* pixelGap is an int specifying the gap, in image pixels, between the initial tie points (this is for both the x and y axis) \n"
+"* threshold is a float providing the threshold for the image metric above/below (depending on image metric)\n"
+"       which matching is consider insufficient to be reliable and therefore the match will be ignored.\n"
+"* window is an int providing the size of the window around each tie point which will be used for the matching \n"
+"* search is an int providing the distance (in pixels) from the tie point start point which will be searched.\n"
+"* stddevRef is a float which defines the standard deviation for the window around each tie point below which it is \n"
+"       deemed there is insufficient information to perform a match \n"
+"* stddevFloat is a float which defines the standard deviation for the window around each tie point below which it is \n"
+"       deemed there is insufficient information to perform a match \n"
+"ote, that the tie point window has to be below the threshold for both the reference and floating image to be ignored\n"
+"* subpixelresolution is an int specifying the sub-pixel resolution to which the pixel shifts are estimated.\n"
+"     Note that the values are positive integers such that a value of 2 will result in a sub pixel resolution \n"
+"     of 0.5 of a pixel and a value 4 will be 0.25 of a pixel. \n"
+"* distanceThreshold is an int giving the distance (in pixels) to be connected within the layer.\n"
+"* maxiterations is an int giving the maximum number of iterations of the tie point grid to find an optimal set of tie points\n"
+"* movementThreshold is a float providing the threshold for the average amount of tie point movement for the optimisation to be terminated\n"
+"* pSmoothness is a float providing the 'p' parameter for the inverse weighted distance calculation. A value of 2 should be used by default\n"
+"* metric is an the similarity metric used to compare images of type rsgislib.imageregistration.METRIC_* \n"
+"* outputType is an the format of the output file of type rsgislib.imageregistration.TYPE_* \n"
+"* output is a string giving specifying the output file, containing the generated tie points\n"
 "\n"
 "Example::\n"
 "\n"
@@ -184,7 +203,27 @@ static PyMethodDef ImageRegistrationMethods[] = {
 "   imageregistration.basicregistration(reference, floating, pixelGap, threshold, window, search, stddevRef, stddevFloat, subpixelresolution, metric, outputType, output)\n"
 "\n"
 },
-    {NULL}        /* Sentinel */
+    {"gcp2gdal", ImageRegistration_GCP2GDAL, METH_VARARGS, 
+"imageregistration.gcp2gdal(inputimage, inputgcps, outputimage, gdalformat, outtype)\n"
+"where:\n"
+"Add tie points to GDAL file.\n"
+"* inputimage is a string providing the input image.\n"
+"* inputgcps is a string providing the input text file containing the tie points.\n"
+"* outputimage is a string providing the output image.\n"
+"* gdalformat is a string providing the output format (e.g., KEA).\n"
+"* type is a rsgislib.TYPE_* value providing the output data type.\n"
+"\n"
+"Example::\n"
+"\n"
+"    inputImage = './Rasters/injune_p142_casi_sub_utm_single_band_offset3x3y.vrt'\n"
+"    inputGCPs = './TestOutputs/injune_p142_casi_sub_utm_tie_points_basic.txt'\n"
+"    outputImage = './TestOutputs/injune_p142_casi_sub_utm_single_band_offset3x3y_gcps.kea'\n"
+"    format = 'KEA'\n"
+"    dataType = rsgislib.TYPE_32INT\n"
+"    imageregistration.gcp2gdal(inputImage,inputGCPs, outputImage, format, dataType)\n"
+"\n"
+},   
+	{NULL}        /* Sentinel */
 };
 
 

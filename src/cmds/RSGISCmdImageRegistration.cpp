@@ -30,6 +30,7 @@
 #include "registration/RSGISImageSimilarityMetric.h"
 #include "registration/RSGISStandardImageSimilarityMetrics.h"
 #include "registration/RSGISSingleConnectLayerImageRegistration.h"
+#include "registration/RSGISAddGCPsGDAL.h"
 
 
 namespace rsgis{ namespace cmds {
@@ -214,5 +215,22 @@ namespace rsgis{ namespace cmds {
         }
     }
     
+    void excecuteAddGCPsGDAL(std::string inputImage, std::string inputGCPs, std::string outputImage, std::string gdalFormat, RSGISLibDataType outDataType)
+    {
+        try
+        {
+            
+            rsgis::reg::RSGISAddGCPsGDAL(inputImage, inputGCPs, outputImage, gdalFormat, RSGIS_to_GDAL_Type(outDataType));
+            std::cout << "Added GCPs to: " << outputImage << std::endl;
+        }
+        catch(RSGISException& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(std::exception& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
 }}
 
