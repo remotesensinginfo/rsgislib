@@ -158,6 +158,7 @@ class RSGISExeZonalStats : public RSGISAlgorithmParameters
 		double maxThreshAllVal;
         bool transposeOutput;
         bool useBandNames;
+        bool shortenBandNames;
 	};
 }
 

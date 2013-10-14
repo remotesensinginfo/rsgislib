@@ -25,7 +25,7 @@
 
 namespace rsgis{namespace vec{
 	
-	RSGISVectorZonalStats::RSGISVectorZonalStats(GDALDataset *image, std::string outZonalFileName, bool useBandNames)
+	RSGISVectorZonalStats::RSGISVectorZonalStats(GDALDataset *image, std::string outZonalFileName, bool useBandNames, bool shortenFileNames)
 	{
 		rsgis::math::RSGISMathsUtils mathUtils;
         
@@ -59,9 +59,9 @@ namespace rsgis{namespace vec{
                 boost::algorithm::replace_all(bandName, "<", "lt");
                 boost::algorithm::replace_all(bandName, "=", "eq");
                 
-                /* Check if band name us longer than maximum length for shapefile field name
+                /* Check if band name is longer than maximum length for shapefile field name
                    No limit on CSV but makes management easier with shorter names */
-                if(bandName.length() > 9)
+                if((bandName.length() > 9) & shortenFileNames)
                 {
                     // If not using all of name, append number so unique
                     std::cerr << "WARNING: "<< bandName << " will be truncated to \'" << bandName.substr(0, 7) << i+1 << "\'" << std::endl;
@@ -176,6 +176,22 @@ namespace rsgis{namespace vec{
 	
 	void RSGISVectorZonalStats::processFeature(OGRFeature *inFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
 	{
+        // Add header info for first line
+        if(this->firstLine)
+        {
+            this->outZonalFile << "FID";
+            for(int i = 0; i < this->numImgBands; i++)
+            {
+                
+                std::string fieldname = this->outNames[i];
+                this->outZonalFile << "," << fieldname;
+            }
+            
+            this->outZonalFile << "\n";
+            this->firstLine = false;
+        }
+        
+        
         OGRGeometry *geometry = inFeature->GetGeometryRef();
 		if( geometry != NULL && wkbFlatten(geometry->getGeometryType()) == wkbPolygon )
 		{
@@ -202,20 +218,7 @@ namespace rsgis{namespace vec{
 				float *values = this->getPixelColumns(xPxl, yPxl);
 				rsgis::math::RSGISMathsUtils mathUtils;
 				
-                // Add header info for first line
-                if(this->firstLine)
-                {
-                    this->outZonalFile << "FID";
-                    for(int i = 0; i < this->numImgBands; i++)
-                    {
-                        
-                        std::string fieldname = this->outNames[i];
-                        this->outZonalFile << "," << fieldname;
-                    }
-                    
-                    this->outZonalFile << "\n";
-                    this->firstLine = false;
-                }
+                
                 // Write out FID
                 this->outZonalFile << fid;
                 // Write out pixel value for each band

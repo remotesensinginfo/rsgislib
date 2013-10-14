@@ -49,7 +49,7 @@ namespace rsgis{namespace vec{
 	class RSGISVectorZonalStats : public RSGISProcessOGRFeature
 	{
 	public:
-		RSGISVectorZonalStats(GDALDataset *image, std::string outZonalFileName = "", bool useBandNames = false);
+		RSGISVectorZonalStats(GDALDataset *image, std::string outZonalFileName = "", bool useBandNames = false, bool shortenFileNames = true);
 		virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
 		virtual void processFeature(OGRFeature *inFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
 		virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException);
