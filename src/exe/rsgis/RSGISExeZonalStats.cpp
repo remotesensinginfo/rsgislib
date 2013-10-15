@@ -970,6 +970,25 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 		}
 		XMLString::release(&copyAttributesXMLStr);
 
+        shortenBandNames = true;
+        XMLCh *shortenBandNamesXMLStr = XMLString::transcode("shortenBandNames");
+		if(argElement->hasAttribute(shortenBandNamesXMLStr))
+		{
+			XMLCh *noStr = XMLString::transcode("no");
+			const XMLCh *shortenValue = argElement->getAttribute(shortenBandNamesXMLStr);
+
+			if(XMLString::equals(shortenValue, noStr))
+			{
+				this->shortenBandNames = false;
+			}
+			else
+			{
+				this->shortenBandNames = true;
+			}
+			XMLString::release(&noStr);
+		}
+		XMLString::release(&shortenBandNamesXMLStr);
+
 		XMLCh *pxlcountXMLStr = XMLString::transcode("pxlcount");
 		if(argElement->hasAttribute(pxlcountXMLStr))
 		{
@@ -2531,14 +2550,14 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
             if(!this->outputToText){throw RSGISXMLArgumentsException("No \'force\' attribute was provided.");}
 		}
 		XMLString::release(&forceXMLStr);
-        
+
         shortenBandNames = true;
         XMLCh *shortenBandNamesXMLStr = XMLString::transcode("shortenBandNames");
 		if(argElement->hasAttribute(shortenBandNamesXMLStr))
 		{
 			XMLCh *noStr = XMLString::transcode("no");
 			const XMLCh *shortenValue = argElement->getAttribute(shortenBandNamesXMLStr);
-            
+
 			if(XMLString::equals(shortenValue, noStr))
 			{
 				this->shortenBandNames = false;
@@ -2604,7 +2623,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
     else if(XMLString::equals(optionImageZone2hdf, optionXML))
 	{
 		this->option = RSGISExeZonalStats::imagezone2hdf;
-        
+
 		XMLCh *outputXMLStr = XMLString::transcode("output");
 		if(argElement->hasAttribute(outputXMLStr))
 		{
@@ -2617,7 +2636,7 @@ void RSGISExeZonalStats::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
 		}
 		XMLString::release(&outputXMLStr);
-        
+
         XMLCh *methodXMLStr = XMLString::transcode("method");
 		if(argElement->hasAttribute(methodXMLStr))
 		{
@@ -3524,7 +3543,7 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 
                             /* Check if band name us longer than maximum length for shapefile field name
                              No limit on CSV but makes management easier with shorter names */
-                            if(bandName.length() > 7)
+                            if((bandName.length() > 7) && this->shortenBandNames)
                             {
                                 // If not using all of name, append number so unique
                                 std::cerr << "WARNING: "<< bandName << " will be truncated to \'" << bandName.substr(0, 5) << i+1 << "\'" << std::endl;

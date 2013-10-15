@@ -41,7 +41,8 @@
 
 namespace rsgis{ namespace cmds {
 
-    void executePointValue(std::string inputImage, std::string inputVecPolys, std::string outputStatsFile, bool outputToText, bool force, bool useBandNames, bool shortenFileNames)throw(RSGISCmdException)
+    void executePointValue(std::string inputImage, std::string inputVecPolys, std::string outputStatsFile, bool outputToText,
+                           bool force, bool useBandNames, bool shortenBandNames)throw(RSGISCmdException)
     {
         // Convert to absolute path
         inputVecPolys = boost::filesystem::absolute(inputVecPolys).c_str();
@@ -163,7 +164,7 @@ namespace rsgis{ namespace cmds {
             else
             {
 
-                processFeature = new rsgis::vec::RSGISVectorZonalStats(inputImageDS, outputStatsFile, useBandNames, shortenFileNames);
+                processFeature = new rsgis::vec::RSGISVectorZonalStats(inputImageDS, outputStatsFile, useBandNames, shortenBandNames);
                 processVector = new rsgis::vec::RSGISProcessVector(processFeature);
 
                 processVector->processVectorsNoOutput(inputSHPLayer, true);
@@ -191,7 +192,8 @@ namespace rsgis{ namespace cmds {
     }
 
     void executePixelStats(std::string inputImage, std::string inputVecPolys, std::string outputStatsFile, rsgis::cmds::RSGISBandAttZonalStatsCmds *calcStats,
-                           std::string inputRasPolys, bool outputToText, bool force, bool useBandNames, bool ignoreProjection, int pixelInPolyMethodInt) throw(RSGISCmdException)
+                           std::string inputRasPolys, bool outputToText, bool force, bool useBandNames,
+                           bool ignoreProjection, int pixelInPolyMethodInt, bool shortenBandNames) throw(RSGISCmdException)
     {
         // Convert to absolute path
         inputVecPolys = boost::filesystem::absolute(inputVecPolys).c_str();
@@ -335,7 +337,7 @@ namespace rsgis{ namespace cmds {
 
                     /* Check if band name us longer than maximum length for shapefile field name
                      No limit on CSV but makes management easier with shorter names */
-                    if(bandName.length() > 7)
+                    if((bandName.length() > 7) && shortenBandNames)
                     {
                         // If not using all of name, append number so unique
                         std::cerr << "WARNING: "<< bandName << " will be truncated to \'" << bandName.substr(0, 5) << i+1 << "\'" << std::endl;
@@ -597,27 +599,27 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
-    
+
     void executeZonesImage2HDF5(std::string inputImage, std::string inputVecPolys, std::string outputHDF, bool ignoreProjection, int pixelInPolyMethodInt) throw(RSGISCmdException)
     {
         std::cout.precision(12);
         // Convert to absolute path
         std::string inputVecPolysFullPath = std::string(boost::filesystem::absolute(inputVecPolys).c_str());
-        
+
         GDALAllRegister();
         OGRRegisterAll();
-        
+
         rsgis::vec::RSGISVectorUtils vecUtils;
-        
+
         std::string SHPFileInLayer = vecUtils.getLayerName(inputVecPolysFullPath);
-        
+
         GDALDataset *inputImageDS = NULL;
         OGRDataSource *inputSHPDS = NULL;
         OGRLayer *inputSHPLayer = NULL;
-        
-        
+
+
         std::string outputDIR = "";
-        
+
         try
         {
             /////////////////////////////////////
@@ -631,7 +633,7 @@ namespace rsgis{ namespace cmds {
                 std::string message = std::string("Could not open image ") + inputImage;
                 throw RSGISException(message.c_str());
             }
-            
+
             /////////////////////////////////////
             //
             // Open Input Shapfile.
@@ -649,11 +651,11 @@ namespace rsgis{ namespace cmds {
                 std::string message = std::string("Could not open vector layer ") + SHPFileInLayer;
                 throw RSGISException(message.c_str());
             }
-            
+
             rsgis::vec::RSGISZonalImage2HDF zonalImg2HDF;
             rsgis::img::pixelInPolyOption pixelInPolyMethod = rsgis::img::pixelInPolyInt2Enum(pixelInPolyMethodInt);
             zonalImg2HDF.extractBandsToColumns(inputImageDS, inputSHPLayer, outputHDF, pixelInPolyMethod);
-            
+
             GDALClose(inputImageDS);
             OGRDataSource::DestroyDataSource(inputSHPDS);
         }
