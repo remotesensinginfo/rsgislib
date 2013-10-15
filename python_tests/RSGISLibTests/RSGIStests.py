@@ -517,7 +517,14 @@ class RSGISTests:
         inputImage = './Rasters/injune_p142_casi_sub_utm.kea'
         inputVector = './Vectors/injune_p142_crowns_utm.shp'
         outputTxtBase = './TestOutputs/ZonalTXT/injune_p142_casi_sub_utm_txt'
-        zonalstats.pixelVals2TXT(inputImage, inputVector, outputTxtBase, 'FID', True, zonalstats.METHOD_POLYCONTAINSPIXELCENTER)
+        zonalstats.pixelVals2TXT(inputImage, inputVector, outputTxtBase, 'FID', True, zonalstats.METHOD_POLYCONTAINSPIXELCENTER)    
+    
+    def testImageZone2HDF(self):
+        print("PYTHON TEST: pixelVals2TXT")
+        inputimage = './Rasters/injune_p142_casi_sub_utm.kea'
+        inputvector = './Vectors/injune_p142_crowns_withincasi_utm.shp'
+        outputHDF = './TestOutputs/InjuneP142.hdf'
+        zonalstats.imageZoneToHDF(inputimage, inputvector, outputHDF, True, zonalstats.METHOD_POLYCONTAINSPIXELCENTER)
         
     # Image Registration
     def testBasicRegistration(self):
@@ -655,6 +662,7 @@ if __name__ == '__main__':
         t.tryFuncAndCatch(t.testPixelStats2SHP)
         t.tryFuncAndCatch(t.testPixelStats2TXT)
         t.tryFuncAndCatch(t.testPixelVals2TXT)
+        t.tryFuncAndCatch(t.testImageZone2HDF)
         
     if testLibraries == 'all' or testLibraries == 'imageregistration':
         

@@ -47,8 +47,9 @@ static void FreePythonObjects(std::vector<PyObject*> toFree) {
 static PyObject *ZonalStats_PointValue2SHP(PyObject *self, PyObject *args)
 {
     const char *pszInputImage, *pszInputVector, *pszOutputVector;
-    int force, useBandNames;
-    if( !PyArg_ParseTuple(args, "sssii:pointValue2SHP", &pszInputImage, &pszInputVector, &pszOutputVector, 
+    int force;
+    int useBandNames = true;
+    if( !PyArg_ParseTuple(args, "sssi|i:pointValue2SHP", &pszInputImage, &pszInputVector, &pszOutputVector, 
                                 &force, &useBandNames))
         return NULL;
 
@@ -68,14 +69,15 @@ static PyObject *ZonalStats_PointValue2SHP(PyObject *self, PyObject *args)
 static PyObject *ZonalStats_PointValue2TXT(PyObject *self, PyObject *args)
 {
     const char *pszInputImage, *pszInputVector, *pszOutputTxt;
-    int useBandNames;
-    if( !PyArg_ParseTuple(args, "sssi:pointValue2TXT", &pszInputImage, &pszInputVector, &pszOutputTxt, 
-                                &useBandNames))
+    int useBandNames = true;
+    int shortenBandNames = true;
+    if( !PyArg_ParseTuple(args, "sss|ii:pointValue2TXT", &pszInputImage, &pszInputVector, &pszOutputTxt, 
+                                &useBandNames, &shortenBandNames))
         return NULL;
 
     try
     {
-        rsgis::cmds::executePointValue(pszInputImage, pszInputVector, pszOutputTxt, true, false, useBandNames);
+        rsgis::cmds::executePointValue(pszInputImage, pszInputVector, pszOutputTxt, true, false, useBandNames, shortenBandNames);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -89,8 +91,9 @@ static PyObject *ZonalStats_PointValue2TXT(PyObject *self, PyObject *args)
 static PyObject *ZonalStats_PixelVals2TXT(PyObject *self, PyObject *args)
 {
     const char *pszInputImage, *pszInputVector, *pszOutputTextBase, *pzsPolyAttribute;
-    int pixelInPolyMethod, noProjWarning;
-    if( !PyArg_ParseTuple(args, "ssssii:pixelVals2TXT", &pszInputImage, &pszInputVector, &pszOutputTextBase, &pzsPolyAttribute, &noProjWarning, &pixelInPolyMethod))
+    int pixelInPolyMethod = 1;
+    int noProjWarning = false;
+    if( !PyArg_ParseTuple(args, "ssss|ii:pixelVals2TXT", &pszInputImage, &pszInputVector, &pszOutputTextBase, &pzsPolyAttribute, &noProjWarning, &pixelInPolyMethod))
         return NULL;
     try
     {
@@ -108,9 +111,12 @@ static PyObject *ZonalStats_PixelVals2TXT(PyObject *self, PyObject *args)
 static PyObject *ZonalStats_PixelStats2SHP(PyObject *self, PyObject *args)
 {
     const char *pszInputImage, *pszInputVector, *pszOutputVector;
-    int force, useBandNames, noProjWarning, pixelInPolyMethod;
-    PyObject *pBandAttZonalStatsCmds;
-    if( !PyArg_ParseTuple(args, "sssOiiii:pixelStats2SHP", &pszInputImage, &pszInputVector, &pszOutputVector, 
+    int force;
+    int useBandNames = 1;
+    int noProjWarning = 0;
+    int pixelInPolyMethod = 1;
+     PyObject *pBandAttZonalStatsCmds;
+    if( !PyArg_ParseTuple(args, "sssOi|iii:pixelStats2SHP", &pszInputImage, &pszInputVector, &pszOutputVector, 
                                 &pBandAttZonalStatsCmds, &force, &useBandNames, &noProjWarning, &pixelInPolyMethod))
         return NULL;
     
@@ -202,10 +208,14 @@ static PyObject *ZonalStats_PixelStats2SHP(PyObject *self, PyObject *args)
 static PyObject *ZonalStats_PixelStats2TXT(PyObject *self, PyObject *args)
 {
     const char *pszInputImage, *pszInputVector, *pszOutputTxt;
-    int useBandNames, noProjWarning, pixelInPolyMethod;
+    int useBandNames = true;
+    int noProjWarning = false;
+    int pixelInPolyMethod = 1;
+    int shortenBandNames = true;
     PyObject *pBandAttZonalStatsCmds;
-    if( !PyArg_ParseTuple(args, "sssOiii:pixelStats2SHP", &pszInputImage, &pszInputVector, &pszOutputTxt, 
-                                &pBandAttZonalStatsCmds, &useBandNames, &noProjWarning, &pixelInPolyMethod))
+    if( !PyArg_ParseTuple(args, "sssO|iiii:pixelStats2SHP", &pszInputImage, &pszInputVector, &pszOutputTxt, 
+                                &pBandAttZonalStatsCmds, &useBandNames, &noProjWarning, &pixelInPolyMethod,
+                                &shortenBandNames))
         return NULL;
     
     rsgis::cmds::RSGISBandAttZonalStatsCmds *zonalAtts = new rsgis::cmds::RSGISBandAttZonalStatsCmds();   // the c++ struct
@@ -282,7 +292,7 @@ static PyObject *ZonalStats_PixelStats2TXT(PyObject *self, PyObject *args)
     try
     {
         rsgis::cmds::executePixelStats(pszInputImage, pszInputVector, pszOutputTxt, zonalAtts, 
-            "", true, false, useBandNames, noProjWarning, pixelInPolyMethod);
+            "", true, false, useBandNames, noProjWarning, pixelInPolyMethod, shortenBandNames);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -297,8 +307,9 @@ static PyObject *ZonalStats_PixelStats2TXT(PyObject *self, PyObject *args)
 static PyObject *ZonalStats_ImageZoneToHDF(PyObject *self, PyObject *args)
 {
     const char *pszInputImage, *pszInputVector, *pszOutputHDF;
-    int pixelInPolyMethod, noProjWarning;
-    if( !PyArg_ParseTuple(args, "sssii:pixelVals2TXT", &pszInputImage, &pszInputVector, &pszOutputHDF, &noProjWarning, &pixelInPolyMethod))
+    int pixelInPolyMethod = 1;
+    int noProjWarning = false;
+    if( !PyArg_ParseTuple(args, "sss|ii:imageZoneToHDF", &pszInputImage, &pszInputVector, &pszOutputHDF, &noProjWarning, &pixelInPolyMethod))
         return NULL;
     try
     {
@@ -339,7 +350,7 @@ static PyMethodDef ZonalStatsMethods[] = {
 },
 
     {"pointValue2TXT", ZonalStats_PointValue2TXT, METH_VARARGS, 
-"zonalstats.pointValue2TXT(inputimage, inputvector, outputtxt, useBandNames=True)\n"
+"zonalstats.pointValue2TXT(inputimage, inputvector, outputtxt, useBandNames=True,shortenBandNames=True)\n"
 "Extract pixel value for each point in a shape file and output as a CSV.\n"
 "where:\n"
 "* inputimage is a string containing the name of the input image\n"
@@ -358,7 +369,7 @@ static PyMethodDef ZonalStatsMethods[] = {
 
 
     {"pixelVals2TXT", ZonalStats_PixelVals2TXT, METH_VARARGS, 
-"zonalstats.pixelVals2TXT(inputimage, inputvector, outputtxtBase, attribute, noProjWarning, pixelInPolyMethod)\n"
+"zonalstats.pixelVals2TXT(inputimage, inputvector, outputtxtBase, attribute, noProjWarning=False, pixelInPolyMethod=METHOD_POLYCONTAINSPIXELCENTER)\n"
 "Extract pixel value for all pixels within a polygon and save a seperate CSV for each polygon in the shapefile.\n"
 "where:\n"
 "* inputimage is a string containing the name of the input image.\n"
@@ -377,7 +388,7 @@ static PyMethodDef ZonalStatsMethods[] = {
 "\n"},
 
     {"pixelStats2SHP", ZonalStats_PixelStats2SHP, METH_VARARGS, 
-"zonalstats.pixelStats2SHP(inputimage, inputvector, outputvector, zonalattributes, force, useBandNames, noProjWarning, pixelInPolyMethod)\n"
+"zonalstats.pixelStats2SHP(inputimage, inputvector, outputvector, zonalattributes, force, useBandNames, noProjWarning=False, pixelInPolyMethod=METHOD_POLYCONTAINSPIXELCENTER)\n"
 "Calculate statistics for pixels falling within each polygon in a shapefile output as a shapefile.\n"
 "where:\n"
 "* inputimage is a string containing the name of the input image\n"
@@ -412,7 +423,7 @@ static PyMethodDef ZonalStatsMethods[] = {
 },
 
     {"pixelStats2TXT", ZonalStats_PixelStats2TXT, METH_VARARGS, 
-"zonalstats.pixelStats2TXT(inputimage, inputvector, outputtxt, zonalattributes, useBandNames, noProjWarning, pixelInPolyMethod)\n"
+"zonalstats.pixelStats2TXT(inputimage, inputvector, outputtxt, zonalattributes, useBandNames, noProjWarning=False, pixelInPolyMethod=METHOD_POLYCONTAINSPIXELCENTER)\n"
 "Calculate statistics for pixels falling within each polygon in a shapefile output as a CSV.\n"
 "where:\n"
 "* inputimage is a string containing the name of the input image\n"
@@ -444,7 +455,7 @@ static PyMethodDef ZonalStatsMethods[] = {
 "    zonalstats.pixelStats2SHP(inputImage, inputVector, outputtxt, zonalattributes, True, True, zonalstats.METHOD_POLYCONTAINSPIXELCENTER)\n"
 "\n"},
 {"imageZoneToHDF", ZonalStats_ImageZoneToHDF, METH_VARARGS,
-    "rsgislib.zonalstats.imageZoneToHDF(inputimage, inputvector, outputHDF, noProjWarning, pixelInPolyMethod)\n"
+    "rsgislib.zonalstats.imageZoneToHDF(inputimage, inputvector, outputHDF, noProjWarning=False, pixelInPolyMethod=METHOD_POLYCONTAINSPIXELCENTER)\n"
     "Extract the all the pixel values for regions to a HDF5 file (1 column for each image band).\n"
     "where:\n"
     "* inputimage is a string containing the name of the input image.\n"
