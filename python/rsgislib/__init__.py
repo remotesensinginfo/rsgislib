@@ -46,7 +46,7 @@ Shape indexes used with RasterGIS:
     * SHAPE_ROUNDNESS = 15
     * SHAPE_SHAPEINDEX = 16
 
-Methods of initilising KMEANS:
+Methods of initialising KMEANS:
 
     * INITCLUSTER_RANDOM = 0
     * INITCLUSTER_DIAGONAL_FULL = 1
@@ -59,6 +59,7 @@ Methods of initilising KMEANS:
 import os.path
 import os
 import fnmatch
+import time
 
 TYPE_UNDEFINED = 0
 TYPE_8INT = 1
@@ -122,13 +123,13 @@ class RSGISPyException(Exception):
 
 class RSGISPyUtils (object):
     """
-    A class with useful utilties within RSGISLib.
+    A class with useful utilities within RSGISLib.
     """
     
     def getFileExtension(self, format):
         """
         A function to get the extension for a given file format 
-        (NOTE, currently only KEA, GTIFF, HFA and ENVI are supported).
+        (NOTE, currently only KEA, GTIFF, HFA, PCI and ENVI are supported).
         """
         ext = ".NA"
         if format.lower() == "kea":
@@ -201,3 +202,57 @@ class RSGISPyUtils (object):
             return TYPE_64FLOAT
         else:
             raise RSGISPyException("The data type '%s' is unknown / not supported."%(gdaltype))
+
+class RSGISTime (object):
+    """ Class to calculate run time for a function, format and print out (similar to for XML interface).
+
+        Need to call start before running function and end immediately after.
+        Example::
+
+            t = RSGISTime()
+            t.start()
+            rsgislib.segmentation.clump(kMeansFileZonesNoSgls, initClumpsFile, gdalFormat, False, 0) 
+            t.end()
+        
+        Note, this is only designed to provide some general feedback, for benchmarking the timeit module
+        is better suited."""
+
+    def __init__(self):
+        self.startTime = time.time()
+        self.endTime = time.time()
+
+    def start(self, printStartTime=False):
+        """ Start timer, optionally printing start time"""
+        self.startTime = time.time()
+        if printStartTime:
+            print(time.strftime('Start Time: %H:%M:%S, %a %b %m %Y.'))
+
+
+    def end(self,reportDiff = True):
+        """ End timer and optionally print difference."""
+        self.endTime = time.time()
+        if reportDiff:
+            self.calcDiff()
+
+    def calcDiff(self):
+        """ Calculate time difference, format and print. """
+        timeDiff = self.endTime - self.startTime
+
+        if timeDiff <= 1:
+            print("Algorithm Completed in less than a second.")
+        elif timeDiff > 3600:
+            timeDiff = timeDiff/3600.;
+            timeDiffStr = str(round(timeDiff,2))
+            print('''Algorithm Completed in %s hours.'''%(timeDiffStr))
+        elif timeDiff > 60:
+            timeDiff = timeDiff/60.;
+            timeDiffStr = str(round(timeDiff,2))
+            print('''Algorithm Completed in %s minutes.'''%(timeDiffStr))
+        else:
+            timeDiffStr = str(round(timeDiff,2))
+            print('''Algorithm Completed in %s seconds.'''%(timeDiffStr))
+        
+        
+
+
+
