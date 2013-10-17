@@ -1211,35 +1211,15 @@ void RSGISExeImageRegistration::runAlgorithm() throw(rsgis::RSGISException)
 			std::cout << "Output Resolution: " << this->resolution << std::endl;
             std::cout << "Output Image format: " << this->imageFormat << std::endl;
 			
-			GDALAllRegister();
-			rsgis::reg::RSGISWarpImage *warp = NULL;
-			rsgis::reg::RSGISWarpImageInterpolator *interpolator = new rsgis::reg::RSGISWarpImageNNInterpolator();
-			
-			try 
+			try
 			{
-				std::string projWKTStr = "";
-                if(this->projFile != "")
-                {
-                    rsgis::utils::RSGISTextUtils textUtils;
-                    projWKTStr = textUtils.readFileToString(this->projFile);
-                }
-                
-				warp = new rsgis::reg::RSGISWarpImageUsingTriangulation(this->inputImage, this->outputImage, projWKTStr, this->inputGCPs, this->resolution, interpolator, this->imageFormat);
-				if(this->genTransformImage)
-                {
-                    warp->generateTransformImage();
-                }
-                else
-                {
-                    warp->performWarp();
-                }
-				delete warp;
-			}
-			catch (rsgis::RSGISException &e) 
+                rsgis::cmds::excecuteTriangularWarp(this->inputImage, this->outputImage, this->projFile, this->inputGCPs, this->resolution, this->imageFormat, this->genTransformImage);
+            }
+			catch(rsgis::cmds::RSGISCmdException &e)
 			{
-				throw e;
+				throw rsgis::RSGISException(e.what());
 			}
-			GDALDestroyDriverManager();
+            
 		}
 		else if(this->option == RSGISExeImageRegistration::nnwarp)
 		{
@@ -1250,36 +1230,16 @@ void RSGISExeImageRegistration::runAlgorithm() throw(rsgis::RSGISException)
 			std::cout << "Projection: " << this->projFile << std::endl;
 			std::cout << "Output Resolution: " << this->resolution << std::endl;
             std::cout << "Output Image format: " << this->imageFormat << std::endl;
-			
-			GDALAllRegister();
-			rsgis::reg::RSGISWarpImage *warp = NULL;
-			rsgis::reg::RSGISWarpImageInterpolator *interpolator = new rsgis::reg::RSGISWarpImageNNInterpolator();
-			
-			try 
+            
+			try
 			{
-                std::string projWKTStr = "";
-                if(this->projFile != "")
-                {
-                    rsgis::utils::RSGISTextUtils textUtils;
-                    projWKTStr = textUtils.readFileToString(this->projFile);
-                }
-                
-				warp = new rsgis::reg::RSGISBasicNNGCPImageWarp(this->inputImage, this->outputImage, projWKTStr, this->inputGCPs, this->resolution, interpolator, this->imageFormat);
-				if(this->genTransformImage)
-                {
-                    warp->generateTransformImage();
-                }
-                else
-                {
-                    warp->performWarp();
-                }
-				delete warp;
-			}
-			catch (rsgis::RSGISException &e) 
+                rsgis::cmds::excecuteNNWarp(this->inputImage, this->outputImage, this->projFile, this->inputGCPs, this->resolution, this->imageFormat, this->genTransformImage);
+            }
+			catch(rsgis::cmds::RSGISCmdException &e)
 			{
-				throw e;
+				throw rsgis::RSGISException(e.what());
 			}
-			GDALDestroyDriverManager();
+
 		}
 		else if(this->option == RSGISExeImageRegistration::polywarp)
 		{
@@ -1296,35 +1256,15 @@ void RSGISExeImageRegistration::runAlgorithm() throw(rsgis::RSGISException)
 			std::cout << "Output Resolution: " << this->resolution << std::endl;
             std::cout << "Output Image format: " << this->imageFormat << std::endl;
 			
-			GDALAllRegister();
-			rsgis::reg::RSGISWarpImage *warp = NULL;
-			rsgis::reg::RSGISWarpImageInterpolator *interpolator = new rsgis::reg::RSGISWarpImageNNInterpolator();
-			
-			try 
+            try
 			{
-                std::string projWKTStr = "";
-                if(this->projFile != "")
-                {
-                    rsgis::utils::RSGISTextUtils textUtils;
-                    projWKTStr = textUtils.readFileToString(this->projFile);
-                }
-                
-				warp = new rsgis::reg::RSGISPolynomialImageWarp(this->inputImage, this->outputImage, projWKTStr, this->inputGCPs, this->resolution, interpolator, this->polyOrder, this->imageFormat);
-				if(this->genTransformImage)
-                {
-                    warp->generateTransformImage();
-                }
-                else
-                {
-                    warp->performWarp();
-                }
-				delete warp;
-			}
-			catch (rsgis::RSGISException &e) 
+                rsgis::cmds::excecutePolyWarp(this->inputImage, this->outputImage, this->projFile, this->inputGCPs, this->resolution, this->polyOrder, this->imageFormat, this->genTransformImage);
+            }
+			catch(rsgis::cmds::RSGISCmdException &e)
 			{
-				throw e;
+				throw rsgis::RSGISException(e.what());
 			}
-			GDALDestroyDriverManager();
+
 		}
         else if(this->option == RSGISExeImageRegistration::pxlshift)
 		{
