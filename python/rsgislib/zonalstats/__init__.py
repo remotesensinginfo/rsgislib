@@ -19,7 +19,7 @@ METHOD_POLYAREAINPIXEL = 9             # Percent of polygon area that is within 
 class ZonalAttributes:
     """ Object, specifying which stats should be calculated and minimum / maximum thresholds. 
 This is passed to the pixelStats2SHP and pixelStats2TXT functions. """
-    def __init__(self, minThreshold, maxThreshold , calcCount=False, calcMin=False, calcMax=False, calcMean=False, calcStdDev=False, calcMode=False, calcSum=False):
+    def __init__(self, minThreshold=None, maxThreshold=None, calcCount=False, calcMin=False, calcMax=False, calcMean=False, calcStdDev=False, calcMode=False, calcSum=False):
         self.minThreshold = minThreshold
         self.maxThreshold = maxThreshold
         self.calcCount = calcCount
