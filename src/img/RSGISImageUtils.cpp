@@ -3317,7 +3317,7 @@ namespace rsgis{namespace img{
 			width = inDataset->GetRasterXSize();
 			height = inDataset->GetRasterYSize();
 			
-			transformation = new double[6];
+                transformation = new double[6];
 			transformation[0] = 0;
 			transformation[1] = 1;
 			transformation[2] = 0;

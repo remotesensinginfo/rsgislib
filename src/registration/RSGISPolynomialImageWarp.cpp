@@ -31,6 +31,7 @@ namespace rsgis{namespace reg{
 	RSGISPolynomialImageWarp::RSGISPolynomialImageWarp(std::string inputImage, std::string outputImage, std::string outProjWKT, std::string gcpFilePath, float outImgRes, RSGISWarpImageInterpolator *interpolator, unsigned int polyOrder, std::string gdalFormat) : RSGISWarpImage(inputImage, outputImage, outProjWKT, gcpFilePath, outImgRes, interpolator, gdalFormat)
 	{
 		this->polyOrder = polyOrder;
+        std::cout << "polyOrder = " << polyOrder << std::endl;
 	}
 	
 	void RSGISPolynomialImageWarp::initWarp()throw(RSGISImageWarpException)
@@ -40,9 +41,6 @@ namespace rsgis{namespace reg{
             and expressing easting and northing as a function of image pixels to determine the corner location of the
             image to be warped.
          */
-         
-        
-        std::cout << "Fitting polynomial..." << std::endl;
         
         unsigned int coeffSize = 3 * this->polyOrder; // x**N + y**N + xy**(N-1) + 1
         
@@ -75,7 +73,7 @@ namespace rsgis{namespace reg{
             
 			for(int j = 1; j < polyOrder; ++j)
 			{
-				offset = 1 + (3 * (j - 1));
+                offset = 1 + (3 * (j - 1));
                 gsl_matrix_set(eastNorthPow, pointN, offset, pow((*iterGCPs)->eastings(), j));
                 gsl_matrix_set(eastNorthPow, pointN, offset+1, pow((*iterGCPs)->northings(), j));
                 gsl_matrix_set(eastNorthPow, pointN, offset+2, pow((*iterGCPs)->eastings()*(*iterGCPs)->northings(), j));
