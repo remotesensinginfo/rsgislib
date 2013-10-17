@@ -6,7 +6,7 @@
 .. _contents:
 
 The Remote Sensing and GIS Software Library (RSGISLib)
-====================================
+========================================================
 The Remote Sensing and GIS software library (RSGISLib) is a collection of tools for processing remote sensing and GIS datasets. The tools are accessed using an XML interface or python bindings. 
 
 The project is hosted on Bitbucket and is available to download from https://bitbucket.org/petebunting/rsgislib 
@@ -29,7 +29,7 @@ Python documentation
 ----------------------
 
 .. toctree::
-   ::maxdepth: 2:
+   ::maxdepth: 0:
 
    rsgislib
    rsgislib_calibration
