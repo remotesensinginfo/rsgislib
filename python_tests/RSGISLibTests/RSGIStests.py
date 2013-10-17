@@ -447,7 +447,7 @@ class RSGISTests:
         colourtable=True
         rastergis.populateStats(clumps, colourtable, pyramids)
 
-    """ Image Utils """
+    # Image Utils 
     
     def testCreateTiles(self):
         print("PYTHON TEST: createTiles")
@@ -571,7 +571,7 @@ class RSGISTests:
         format = "KEA"
         dataType = rsgislib.TYPE_32INT
         imageregistration.gcp2gdal(inputImage,inputGCPs, outputImage, format, dataType)
-
+        
 
 if __name__ == '__main__':
 
