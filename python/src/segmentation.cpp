@@ -371,7 +371,7 @@ static PyMethodDef SegmentationMethods[] = {
 " * outputimage is a string containing the name of the output file\n"
 " * tempfile is a string containing the name of the temporary file to use\n"
 " * gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
-" * processinmemory is a bool\n"
+" * processinmemory is a bool specifying if processing should be carried out in memory (faster if sufficient RAM is available, set to False if unsure).\n"
 " * ignore zeros is a bool\n"},
 
     {"clump", Segmentation_clump, METH_VARARGS,
@@ -381,7 +381,7 @@ static PyMethodDef SegmentationMethods[] = {
 " * inputimage is a string containing the name of the input file\n"
 " * outputimage is a string containing the name of the output file\n"
 " * gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
-" * processinmemory is a bool\n"
+" * processinmemory is a bool specifying if processing should be carried out in memory (faster if sufficient RAM is available, set to False if unsure).\n"
 " * nodata is None or float\n"},
 
     {"RMSmallClumpsStepwise", Segmentation_RMSmallClumpsStepwise, METH_VARARGS,
@@ -396,9 +396,9 @@ static PyMethodDef SegmentationMethods[] = {
 " * stretchstatsavail is a bool\n"
 " * stretchstatsfile is a string containing the name of the stretch stats file\n"
 " * storemean is a bool\n"
-" * processinmemory is a bool\n"
-" * minclumpsize is an unsigned integer\n"
-" * specThreshold is a float\n"},
+" * processinmemory is a bool specifying if processing should be carried out in memory (faster if sufficient RAM is available, set to False if unsure).\n"
+" * minclumpsize is an unsigned integer providing the minimum size for clumps.\n"
+" * specThreshold is a float providing the maximum (Euclidian distance) spectral separation for which to merge clumps. Set to a large value to ignore spectral separation and always merge.\n"},
 
     {"relabelClumps", Segmentation_relabelClumps, METH_VARARGS,
 "segmentation.relabelClumps(inputimage, outputimage, gdalformat, processinmemory)\n"
@@ -407,7 +407,7 @@ static PyMethodDef SegmentationMethods[] = {
 " * inputimage is a string containing the name of the input file\n"
 " * outputimage is a string containing the name of the output file\n"
 " * gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
-" * processinmemory is a bool\n"},
+" * processinmemory is a bool specifying if processing should be carried out in memory (faster if sufficient RAM is available, set to False if unsure).\n"},
                                 
     {"UnionOfClumps", Segmentation_unionOfClumps, METH_VARARGS,
 "segmentation.unionOfClumps(outputimage, gdalformat, inputimagepaths, nodata)\n"
