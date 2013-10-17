@@ -447,7 +447,7 @@ class RSGISTests:
         colourtable=True
         rastergis.populateStats(clumps, colourtable, pyramids)
 
-    """ Image Utils """
+    # Image Utils 
     
     def testCreateTiles(self):
         print("PYTHON TEST: createTiles")
@@ -562,6 +562,34 @@ class RSGISTests:
         outputType = imageregistration.TYPE_RSGIS_IMG2MAP
         output = './TestOutputs/injune_p142_casi_sub_utm_tie_points_singlelayer.txt'
         imageregistration.singlelayerregistration(reference, floating, pixelGap, threshold, window, search, stddevRef, stddevFloat, subpixelresolution, distanceThreshold, maxiterations, movementThreshold, pSmoothness, metric, outputType, output)
+        
+    def testTriangularWarp(self):        
+        inputImage = './Rasters/injune_p142_casi_sub_utm_single_band_offset3x3y.vrt'
+        inputGCPs = './TestOutputs/injune_p142_casi_sub_utm_tie_points_basic.txt'
+        outputImage = './TestOutputs/injune_p142_casi_sub_utm_single_band_offset3x3y_twarp.kea'
+        wktStringFile = './Vectors/injune_p142_crowns_utm.prj'
+        resolution = 1
+        format = 'KEA'
+        imageregistration.triangularwarp(inputImage,inputGCPs, outputImage, wktStringFile, resolution, format)
+        
+    def testNNWarp(self):        
+        inputImage = './Rasters/injune_p142_casi_sub_utm_single_band_offset3x3y.vrt'
+        inputGCPs = './TestOutputs/injune_p142_casi_sub_utm_tie_points_basic.txt'
+        outputImage = './TestOutputs/injune_p142_casi_sub_utm_single_band_offset3x3y_nnwarp.kea'
+        wktStringFile = './Vectors/injune_p142_crowns_utm.prj'
+        resolution = 1
+        format = 'KEA'
+        imageregistration.nnwarp(inputImage,inputGCPs, outputImage, wktStringFile, resolution, format)
+
+    def testPolyWarp(self):        
+        inputImage = './Rasters/injune_p142_casi_sub_utm_single_band_offset3x3y.vrt'
+        inputGCPs = './TestOutputs/injune_p142_casi_sub_utm_tie_points_basic.txt'
+        outputImage = './TestOutputs/injune_p142_casi_sub_utm_single_band_offset3x3y_polywarp.kea'
+        wktStringFile = './Vectors/injune_p142_crowns_utm.prj'
+        resolution = 1
+        polyOrder = 1
+        format = 'KEA'
+        imageregistration.polywarp(inputImage,inputGCPs, outputImage, wktStringFile, resolution, polyOrder, format)
 
     def testGCP2GDAL(self):
         print("PYTHON TEST: gcps2gdal")
@@ -571,7 +599,7 @@ class RSGISTests:
         format = "KEA"
         dataType = rsgislib.TYPE_32INT
         imageregistration.gcp2gdal(inputImage,inputGCPs, outputImage, format, dataType)
-
+        
 
 if __name__ == '__main__':
 
@@ -670,6 +698,9 @@ if __name__ == '__main__':
         t.tryFuncAndCatch(t.testBasicRegistration)
         t.tryFuncAndCatch(t.testSingleLayerRegistration)
         t.tryFuncAndCatch(t.testGCP2GDAL)
+        t.tryFuncAndCatch(t.testTriangularWarp)
+        t.tryFuncAndCatch(t.testNNWarp)
+        t.tryFuncAndCatch(t.testPolyWarp)
     
     print("%s TESTS COMPLETED - %s FAILURES LISTED BELOW:"%(t.numTests, len(t.failures)))
     if(len(t.failures)):
