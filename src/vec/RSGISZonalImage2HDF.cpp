@@ -53,7 +53,7 @@ namespace rsgis{namespace vec{
             while( (inFeature = vecLayer->GetNextFeature()) != NULL )
 			{
 				fid = inFeature->GetFID();
-                std::cout << "Extracting Data for feature " << fid << std::endl;
+                std::cout << "\rExtracting Data for feature " << fid << "...       ";
 				
 				// Get Geometry.
 				nullGeometry = false;
@@ -66,7 +66,7 @@ namespace rsgis{namespace vec{
 				else
 				{
 					nullGeometry = true;
-					std::cout << "WARNING: NULL Geometry Present within input file - IGNORED\n";
+					std::cout << "\nWARNING: NULL Geometry Present within input file - IGNORED\n";
 				}
 				
 				if(!nullGeometry)
@@ -81,6 +81,7 @@ namespace rsgis{namespace vec{
 				
 				OGRFeature::DestroyFeature(inFeature);
 			}
+            std::cout << std::endl;
             
             rsgis::utils::RSGISExportColumnData2HDF exportCols2HDF;
             exportCols2HDF.createFile(outputFile, numImageBands, std::string("Pixels Extracted from ")+std::string(dataset->GetFileList()[0]), H5::PredType::IEEE_F32LE);

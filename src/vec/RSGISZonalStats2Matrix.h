@@ -80,7 +80,7 @@ namespace rsgis{namespace vec{
         /** Save pixel values to text file. Saves the values of all pixels within a text file to a text file.
          */
     public:
-        RSGISPixelVals22Txt(GDALDataset *image, std::string outFileBase, std::string outNameHeading = "FID", math::outTXTform outType = math::csv, rsgis::img::pixelInPolyOption method = rsgis::img::pixelContainsPolyCenter);
+        RSGISPixelVals22Txt(GDALDataset *image, std::string outFileBase, std::string outNameHeading = "FID", math::outTXTform outType = math::csv, rsgis::img::pixelInPolyOption method = rsgis::img::pixelContainsPolyCenter,  unsigned int maxPrintout = 10);
         virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException){throw RSGISVectorException("Not implemented");};
         virtual void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
         virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException){throw RSGISVectorException("Not implemented");};
@@ -98,6 +98,8 @@ namespace rsgis{namespace vec{
         std::string outNameHeading;
         math::outTXTform outType;
         std::string outStatusText;
+        unsigned int nFeatures; // Count of number of features
+        unsigned int maxPrintout; // Max features to print out
     };
     
     class RSGISCalcPixelValsFromPolygon : public rsgis::img::RSGISCalcImageSingleValue

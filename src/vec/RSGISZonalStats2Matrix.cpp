@@ -507,7 +507,7 @@ namespace rsgis{namespace vec{
 		
 	}
     
-    RSGISPixelVals22Txt::RSGISPixelVals22Txt(GDALDataset *image, std::string outFileBase, std::string outNameHeading, math::outTXTform outType, rsgis::img::pixelInPolyOption method)
+    RSGISPixelVals22Txt::RSGISPixelVals22Txt(GDALDataset *image, std::string outFileBase, std::string outNameHeading, math::outTXTform outType, rsgis::img::pixelInPolyOption method, unsigned int maxPrintout)
 	{
 		this->nImageBands = image->GetRasterCount(); // Get number of image bands
         this->datasets = new GDALDataset*[1];
@@ -520,6 +520,8 @@ namespace rsgis{namespace vec{
         this->outStatusText = "\n"; // Set up string for output text, print at end.
         // Set up structure for pixel values
         this->pixelValues = new std::vector<double>*[this->nImageBands];
+        this->nFeatures = 0; // Count of number of features
+        this->maxPrintout = maxPrintout; // Max features to print out
 		
 		for (int i = 0; i < this->nImageBands; i++)
 		{
@@ -540,6 +542,8 @@ namespace rsgis{namespace vec{
 		{
             RSGISVectorUtils vecUtils;
 			calcValue->reset(); // Reset values
+            
+            this->nFeatures++;
             
             OGRPolygon *inOGRPoly;
 			geos::geom::Polygon *poly;
@@ -642,7 +646,7 @@ namespace rsgis{namespace vec{
 	RSGISPixelVals22Txt::~RSGISPixelVals22Txt()
 	{
         // Print information to screen when finished, so as not to intefere with processing status display.
-        std::cout << this->outStatusText << std::endl;
+        if(this->nFeatures < this->maxPrintout){std::cout << this->outStatusText << std::endl;}
         delete this->calcValue;
         delete this->calcImage;
         delete this->data;
