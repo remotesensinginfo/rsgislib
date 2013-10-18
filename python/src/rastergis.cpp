@@ -1241,13 +1241,11 @@ static PyMethodDef RasterGISMethods[] = {
 
     {"populateRATWithStats", RasterGIS_PopulateRATWithStats, METH_VARARGS,
 "rsgislib.rastergis.populateRATWithStats(inputImage, clumpsImage, bandStatsCmds)\n"
-"Populates an attribute table from an image \n"
+"Populates an attribute table with statistics from an image.\n"
 "where:\n"
 "  * inputImage is a string containing the name of the input image file\n"
 "  * clumpsImage is a string containing the name of the input clump file\n"
 "  * bandStatsCmds is a sequence of rsgislib.rastergis.BandAttStats objects that have attributes in line with rsgis.cmds.RSGISBandAttStatsCmds\n"
-"    * Requires: TODO: Check\n"
-"\n"
 "       * band: int defining the image band to process\n"
 "       * countField: string defining the name of the field for count value\n"
 "       * minField: string defining the name of the field for min value\n"
@@ -1256,6 +1254,16 @@ static PyMethodDef RasterGISMethods[] = {
 "       * meanField: string defining the name of the field for mean value\n"
 "       * stdDevField: string defining the name of the field for standard deviation value\n"
 "       * medianField: string defining the name of the field for median value\n"
+"Example::\n"
+"\n"
+"	from rsgislib import rastergis\n"
+"	clumps='./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_popstats.kea'\n"
+"	input='./Rasters/injune_p142_casi_sub_utm.kea'\n"
+"	bs = []\n"
+"	bs.append(rastergis.BandAttStats(band=1, minField='b1Min', maxField='b1Max', meanField='b1Mean', sumField='b1Sum', stdDevField='b1StdDev'))\n"
+"	bs.append(rastergis.BandAttStats(band=2, minField='b2Min', maxField='b2Max', meanField='b2Mean', sumField='b2Sum', stdDevField='b2StdDev'))\n"
+"	bs.append(rastergis.BandAttStats(band=3, minField='b3Min', maxField='b3Max', meanField='b3Mean', sumField='b3Sum', stdDevField='b3StdDev'))\n"
+"	rastergis.populateRATWithStats(input, clumps, bs)\n"
 "\n"},
 
     {"populateRATWithPercentiles", RasterGIS_PopulateRATWithPercentiles, METH_VARARGS,
@@ -1404,14 +1412,20 @@ static PyMethodDef RasterGISMethods[] = {
 "\n"},
 
     {"strClassMajority", RasterGIS_StrClassMajority, METH_VARARGS,
-"rastergis.strClassMajority(baseSegment, infoSegment, baseClassCol, infoClassCol)\n"
 "Finds the majority for class (string - field) from a set of small objects to large objects\n"
+"rastergis.strClassMajority(baseSegment, infoSegment, baseClassCol, infoClassCol)\n"
 "where:\n"
-"  * baseSegment is a string TODO: expand\n"
-"  * infoSegment is a string\n"
-"  * baseClassCol is a string\n"
-"  * infoClassCol is a string\n"
-},
+"  * baseSegment is a the base clumps file, to be attribured.\n"
+"  * infoSegment is the file to take attributes from.\n"
+"  * baseClassCol the output column name in the baseSegment file.\n"
+"  * infoClassCol is the colum name in the infoSegment file.\n"
+"Example::\n"
+"\n"
+"	from rsgislib import rastergis\n"
+"	clumps='./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_popstats.kea'\n"
+"	classRAT='./TestOutputs/RasterGIS/reInt_rat.kea'\n"
+"	rastergis.strClassMajority(clumps, classRAT, 'REInt', 'REInt')\n"
+"\n"},
 
     {"specDistMajorityClassifier", RasterGIS_SpecDistMajorityClassifier, METH_VARARGS,
 "rastergis.specDistMajorityClassifier(inputImage, inClassNameField, outClassNameField, trainingSelectCol, eastingsField, northingsField, areaField, \n"
