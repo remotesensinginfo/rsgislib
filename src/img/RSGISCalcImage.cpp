@@ -7745,8 +7745,47 @@ namespace rsgis{namespace img{
         
 		try
 		{
+			// CHECK ENVELOPE IS AT LEAST 1 x 1 Pixel
+			/* For small polygons the the envelope can be smaller than a pixel, which will cause problems.
+			 * To avoid errors a buffer is applied to the envelope and this buffered envelope is used for 'getImageOverlap'
+			 * The buffered envelope is created and destroyed in this class and does not effect the passed in envelope
+			 */
+			bool buffer = false;
+			
+			double *transformations = new double[6];
+			datasets[0]->GetGeoTransform(transformations);
+			
+			// Get pixel size
+			pxlWidth = transformations[1];
+			pxlHeight = transformations[5];
+			
+			if(pxlHeight < 0) // Check resolution is positive (negative in Southern hemisphere).
+			{
+				pxlHeight = pxlHeight * (-1);
+			}
+			
+			delete[] transformations;
+			
+			geos::geom::Envelope *bufferedEnvelope = NULL;
+			
+			if (env->getWidth() < pxlWidth or env->getHeight() < pxlHeight)
+			{
+				//std::cout << "BUFFERING\n";
+				buffer = true;
+				bufferedEnvelope = new geos::geom::Envelope(env->getMinX() - pxlWidth / 2, env->getMaxX() + pxlWidth / 2, env->getMinY() - pxlHeight / 2, env->getMaxY() + pxlHeight / 2);
+			}
+			
 			// Find image overlap
-			imgUtils.getImageOverlapCut2Env(datasets, numDS, dsOffsets, &width, &height, gdalTranslation, env);
+			gdalTranslation = new double[6];
+			
+			if (buffer) // Use buffered envelope.
+			{
+				imgUtils.getImageOverlap(datasets, numDS, dsOffsets, &width, &height, gdalTranslation, bufferedEnvelope);
+			}
+			else // Use envelope passed in.
+			{
+				imgUtils.getImageOverlap(datasets, numDS, dsOffsets, &width, &height, gdalTranslation, env);
+			}
 			
 			// Count number of input image bands
 			for(int i = 0; i < numDS; i++)

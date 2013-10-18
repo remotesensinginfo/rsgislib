@@ -37,7 +37,7 @@ Classification
 .. autofunction:: rsgislib.rastergis.maxLikelihoodClassifier
 .. autofunction:: rsgislib.rastergis.maxLikelihoodClassifierLocalPriors
 
-Copy and Export
+Copy & Export
 ----------------
 .. autofunction:: rsgislib.rastergis.export2Ascii
 .. autofunction:: rsgislib.rastergis.exportCols2GDALImage
