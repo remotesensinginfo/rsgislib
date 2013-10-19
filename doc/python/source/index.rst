@@ -18,7 +18,7 @@ Information
 ---------------
 
 .. toctree::
-   ::maxdepth: 1:
+   :maxdepth: 2
 
    about
    download
@@ -29,7 +29,7 @@ Python documentation
 ----------------------
 
 .. toctree::
-   ::maxdepth: 0:
+   :maxdepth: 1
 
    rsgislib
    rsgislib_calibration

@@ -499,13 +499,13 @@ static PyMethodDef ImageCalibrationMethods[] = {
 
 {"apply6SCoeffSingleParam", ImageCalibration_Apply6SCoefficentsSingleParam, METH_VARARGS,
     "imagecalibration.apply6SCoeffSingleParam(inputFile, outputFile, gdalFormat, gdaltype, scaleFactor, noDataValue, useNoDataValue, bandCoeffs)\n"
-    "Converts at sensor radiance values to surface reflectance by apply the 6S model parameters for each band (aX, bX, cX).\n"
+    "Converts at sensor radiance values to surface reflectance by applying coefficients from the 6S model for each band (aX, bX, cX).\n"
     "where:\n"
     "  * inputFile is a string containing the name of the input image file\n"
     "  * outputFile is a string containing the name of the output image file\n"
     "  * gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
     "  * gdaltype is an containing one of the values from rsgislib.TYPE_*\n"
-    "  * scaleFactor is a float which can be used to scale the output pixel values (e.g., multiple by 1000), set as 1 if not wanted.\n"
+    "  * scaleFactor is a float which can be used to scale the output pixel values (e.g., multiple by 1000), set as 1 for no scaling.\n"
     "  * noDataValue is a float which if all bands contain that value will be ignored.\n"
     "  * useNoDataValue is a boolean as to whether the no data value specified is to be used.\n"
     "  * bandCoeffs is a sequence of objects with the following named fields.\n"
