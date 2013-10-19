@@ -4143,7 +4143,7 @@ namespace rsgisexe{
             }
             else if(this->option == RSGISExeRasterGIS::findchangeclumpsfromstddev)
             {
-                std::cout << "A command to identify segments which have changed by looking for statistical outliners (std dev) from class population\n";
+                std::cout << "A command to identify segments which have changed by looking for statistical outliers (std dev) from class population\n";
                 std::cout << "Clumps Image: " << this->clumpsImage << std::endl;
                 std::cout << "Class Column: " << this->classField << std::endl;
                 std::cout << "Change Field: " << this->changeField << std::endl;
