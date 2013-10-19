@@ -1349,12 +1349,18 @@ static PyMethodDef RasterGISMethods[] = {
 
     {"export2Ascii", RasterGIS_Export2Ascii, METH_VARARGS,
 "rastergis.export2Ascii(inputImage, outputFile, fields)\n"
-"Exports columns from a GDAL RAT to ascii\n"
+"Exports selected columns from a GDAL RAT to ASCII file (comma seperated).\n"
 "where:\n"
 "  * inputImage is a string containing the name of the input image file TODO: check and expand\n"
 "  * outputFile is a string containing the name of the output file \n"
 "  * fields is a sequence of strings containing the field names\n"
-},
+"Example::\n"
+"\n"
+"   table='./RATS/injune_p142_casi_sub_utm_clumps_elim_final_clumps_elim_final.kea'\n"
+"   output='./TestOutputs/RasterGIS/injune_p142_casi_rgb_exportascii.txt'\n"
+"   fields = ['BlueAvg', 'GreenAvg', 'RedAvg']\n"
+"   rastergis.export2Ascii(table, output, fields)\n"
+"\n"},
 
     {"classTranslate", RasterGIS_ClassTranslate, METH_VARARGS,
 "rastergis.classTranslate(inputImage, classInField, classOutField, classPairs)\n"
