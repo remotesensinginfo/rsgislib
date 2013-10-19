@@ -2603,7 +2603,7 @@ namespace rsgisexe{
                     }
                     xercesc::XMLString::release(&nameXMLStr);
 
-                    
+
 
                     XMLCh *columnXMLStr = xercesc::XMLString::transcode("column");
                     if(attElement->hasAttribute(columnXMLStr))
@@ -2978,7 +2978,7 @@ namespace rsgisexe{
             else if(xercesc::XMLString::equals(optionRMSmallClumps, optionXML))
             {
                 this->option = RSGISExeRasterGIS::rmsmallclumps;
-                
+
                 XMLCh *clumpsXMLStr = xercesc::XMLString::transcode("clumps");
                 if(argElement->hasAttribute(clumpsXMLStr))
                 {
@@ -2991,7 +2991,7 @@ namespace rsgisexe{
                     throw rsgis::RSGISXMLArgumentsException("No \'clumps\' attribute was provided.");
                 }
                 xercesc::XMLString::release(&clumpsXMLStr);
-                
+
                 XMLCh *outputXMLStr = xercesc::XMLString::transcode("output");
                 if(argElement->hasAttribute(outputXMLStr))
                 {
@@ -3004,7 +3004,7 @@ namespace rsgisexe{
                     throw rsgis::RSGISXMLArgumentsException("No \'output\' attribute was provided.");
                 }
                 xercesc::XMLString::release(&outputXMLStr);
-                
+
                 XMLCh *thresholdXMLStr = xercesc::XMLString::transcode("threshold");
                 if(argElement->hasAttribute(thresholdXMLStr))
                 {
@@ -3017,7 +3017,7 @@ namespace rsgisexe{
                     throw rsgis::RSGISXMLArgumentsException("No \'threshold\' attribute was provided.");
                 }
                 xercesc::XMLString::release(&thresholdXMLStr);
-                
+
                 // Set output image fomat (defaults to KEA)
                 this->imageFormat = "KEA";
                 XMLCh *formatXMLStr = xercesc::XMLString::transcode("format");
@@ -3028,12 +3028,12 @@ namespace rsgisexe{
                     xercesc::XMLString::release(&charValue);
                 }
                 xercesc::XMLString::release(&formatXMLStr);
-                
+
             }
             else if(xercesc::XMLString::equals(optionSelectClumpsOnGrid, optionXML))
             {
                 this->option = RSGISExeRasterGIS::selectclumpsongrid;
-                
+
                 XMLCh *clumpsXMLStr = xercesc::XMLString::transcode("clumps");
                 if(argElement->hasAttribute(clumpsXMLStr))
                 {
@@ -3046,7 +3046,7 @@ namespace rsgisexe{
                     throw rsgis::RSGISXMLArgumentsException("No \'clumps\' attribute was provided.");
                 }
                 xercesc::XMLString::release(&clumpsXMLStr);
-                
+
                 XMLCh *inSelectFieldXMLStr = xercesc::XMLString::transcode("inselectfield");
                 if(argElement->hasAttribute(inSelectFieldXMLStr))
                 {
@@ -3059,7 +3059,7 @@ namespace rsgisexe{
                     throw rsgis::RSGISXMLArgumentsException("No \'inselectfield\' attribute was provided.");
                 }
                 xercesc::XMLString::release(&inSelectFieldXMLStr);
-                
+
                 XMLCh *outSelectFieldXMLStr = xercesc::XMLString::transcode("outselectfield");
                 if(argElement->hasAttribute(outSelectFieldXMLStr))
                 {
@@ -3072,7 +3072,7 @@ namespace rsgisexe{
                     throw rsgis::RSGISXMLArgumentsException("No \'outselectfield\' attribute was provided.");
                 }
                 xercesc::XMLString::release(&outSelectFieldXMLStr);
-                
+
                 XMLCh *eastingsXMLStr = xercesc::XMLString::transcode("eastings");
                 if(argElement->hasAttribute(eastingsXMLStr))
                 {
@@ -3085,7 +3085,7 @@ namespace rsgisexe{
                     throw rsgis::RSGISXMLArgumentsException("No \'eastings\' attribute was provided.");
                 }
                 xercesc::XMLString::release(&eastingsXMLStr);
-                
+
                 XMLCh *northingsXMLStr = xercesc::XMLString::transcode("northings");
                 if(argElement->hasAttribute(northingsXMLStr))
                 {
@@ -3098,7 +3098,7 @@ namespace rsgisexe{
                     throw rsgis::RSGISXMLArgumentsException("No \'northings\' attribute was provided.");
                 }
                 xercesc::XMLString::release(&northingsXMLStr);
-                
+
                 XMLCh *methodXMLStr = xercesc::XMLString::transcode("method");
                 if(argElement->hasAttribute(methodXMLStr))
                 {
@@ -3111,7 +3111,7 @@ namespace rsgisexe{
                     throw rsgis::RSGISXMLArgumentsException("No \'method\' attribute was provided.");
                 }
                 xercesc::XMLString::release(&methodXMLStr);
-                
+
                 XMLCh *metricColXMLStr = xercesc::XMLString::transcode("metriccol");
                 if(argElement->hasAttribute(metricColXMLStr))
                 {
@@ -3124,7 +3124,7 @@ namespace rsgisexe{
                     throw rsgis::RSGISXMLArgumentsException("No \'metriccol\' attribute was provided.");
                 }
                 xercesc::XMLString::release(&metricColXMLStr);
-                
+
                 XMLCh *rowsXMLStr = xercesc::XMLString::transcode("rows");
                 if(argElement->hasAttribute(rowsXMLStr))
                 {
@@ -3137,8 +3137,8 @@ namespace rsgisexe{
                     throw rsgis::RSGISXMLArgumentsException("No \'rows\' attribute was provided.");
                 }
                 xercesc::XMLString::release(&rowsXMLStr);
-                
-                
+
+
                 XMLCh *colsXMLStr = xercesc::XMLString::transcode("cols");
                 if(argElement->hasAttribute(colsXMLStr))
                 {
@@ -3151,12 +3151,12 @@ namespace rsgisexe{
                     throw rsgis::RSGISXMLArgumentsException("No \'cols\' attribute was provided.");
                 }
                 xercesc::XMLString::release(&colsXMLStr);
-                
+
             }
             else if(xercesc::XMLString::equals(optionInterpolateClumpValues2Img, optionXML))
             {
                 this->option = RSGISExeRasterGIS::interpolateclumpvalues2img;
-                
+
                 XMLCh *clumpsXMLStr = xercesc::XMLString::transcode("clumps");
                 if(argElement->hasAttribute(clumpsXMLStr))
                 {
@@ -3169,7 +3169,7 @@ namespace rsgisexe{
                     throw rsgis::RSGISXMLArgumentsException("No \'clumps\' attribute was provided.");
                 }
                 xercesc::XMLString::release(&clumpsXMLStr);
-                
+
                 XMLCh *selectFieldXMLStr = xercesc::XMLString::transcode("selectfield");
                 if(argElement->hasAttribute(selectFieldXMLStr))
                 {
@@ -3182,7 +3182,7 @@ namespace rsgisexe{
                     throw rsgis::RSGISXMLArgumentsException("No \'selectfield\' attribute was provided.");
                 }
                 xercesc::XMLString::release(&selectFieldXMLStr);
-                
+
                 XMLCh *eastingsXMLStr = xercesc::XMLString::transcode("eastings");
                 if(argElement->hasAttribute(eastingsXMLStr))
                 {
@@ -3195,7 +3195,7 @@ namespace rsgisexe{
                     throw rsgis::RSGISXMLArgumentsException("No \'eastings\' attribute was provided.");
                 }
                 xercesc::XMLString::release(&eastingsXMLStr);
-                
+
                 XMLCh *northingsXMLStr = xercesc::XMLString::transcode("northings");
                 if(argElement->hasAttribute(northingsXMLStr))
                 {
@@ -3208,7 +3208,7 @@ namespace rsgisexe{
                     throw rsgis::RSGISXMLArgumentsException("No \'northings\' attribute was provided.");
                 }
                 xercesc::XMLString::release(&northingsXMLStr);
-                
+
                 XMLCh *methodXMLStr = xercesc::XMLString::transcode("method");
                 if(argElement->hasAttribute(methodXMLStr))
                 {
@@ -3221,7 +3221,7 @@ namespace rsgisexe{
                     throw rsgis::RSGISXMLArgumentsException("No \'method\' attribute was provided.");
                 }
                 xercesc::XMLString::release(&methodXMLStr);
-                
+
                 XMLCh *valueColXMLStr = xercesc::XMLString::transcode("valuecol");
                 if(argElement->hasAttribute(valueColXMLStr))
                 {
@@ -3234,7 +3234,7 @@ namespace rsgisexe{
                     throw rsgis::RSGISXMLArgumentsException("No \'valuecol\' attribute was provided.");
                 }
                 xercesc::XMLString::release(&valueColXMLStr);
-                
+
                 XMLCh *outputXMLStr = xercesc::XMLString::transcode("output");
                 if(argElement->hasAttribute(outputXMLStr))
                 {
@@ -3247,7 +3247,7 @@ namespace rsgisexe{
                     throw rsgis::RSGISXMLArgumentsException("No \'output\' attribute was provided.");
                 }
                 xercesc::XMLString::release(&outputXMLStr);
-                
+
                 // Set output image fomat (defaults to KEA)
                 this->imageFormat = "KEA";
                 XMLCh *formatXMLStr = xercesc::XMLString::transcode("format");
@@ -3258,8 +3258,8 @@ namespace rsgisexe{
                     xercesc::XMLString::release(&charValue);
                 }
                 xercesc::XMLString::release(&formatXMLStr);
-                
-                
+
+
                 this->outDataType = GDT_Byte;
                 XMLCh *datatypeXMLStr = xercesc::XMLString::transcode("datatype");
                 if(argElement->hasAttribute(datatypeXMLStr))
@@ -3271,7 +3271,7 @@ namespace rsgisexe{
                     XMLCh *dtInt32 = xercesc::XMLString::transcode("Int32");
                     XMLCh *dtFloat32 = xercesc::XMLString::transcode("Float32");
                     XMLCh *dtFloat64 = xercesc::XMLString::transcode("Float64");
-                    
+
                     const XMLCh *dtXMLValue = argElement->getAttribute(datatypeXMLStr);
                     if(xercesc::XMLString::equals(dtByte, dtXMLValue))
                     {
@@ -3306,7 +3306,7 @@ namespace rsgisexe{
                         std::cerr << "Data type not recognised, defaulting to 32 bit float.";
                         this->outDataType = GDT_Byte;
                     }
-                    
+
                     xercesc::XMLString::release(&dtByte);
                     xercesc::XMLString::release(&dtUInt16);
                     xercesc::XMLString::release(&dtInt16);
@@ -4055,9 +4055,9 @@ namespace rsgisexe{
                         shapes.push_back(out);
                         delete *shapeIter;
                     }
-                    
+
                     delete this->shapeIndexes;
-                    
+
                     // call function passing vector
                     rsgis::cmds::executeCalcShapeIndices(this->inputImage, shapes);
                 } catch (rsgis::RSGISException e) {
@@ -4112,7 +4112,7 @@ namespace rsgisexe{
             }
             else if(this->option == RSGISExeRasterGIS::populatestats)
             {
-                std::cout << "A command to define the clumps which are on the border within the file of the clumps using a mask\n";
+                std::cout << "A command to populate an image with the statistics (maximum, minimum,  histogram) required for a thematic image.\n";
                 std::cout << "Clumps: " << this->clumpsImage << std::endl;
                 if(calcImgPyramids)
                 {
@@ -4191,7 +4191,7 @@ namespace rsgisexe{
                 std::cout << "Clumps: " << this->clumpsImage << std::endl;
                 std::cout << "Output: " << this->outputFile << std::endl;
                 std::cout << "Threshold: " << this->areaThreshold << std::endl;
-                
+
                 try
                 {
                     rsgis::cmds::executeRMSmallClumps(this->clumpsImage, this->outputFile, this->areaThreshold, this->imageFormat);
@@ -4221,7 +4221,7 @@ namespace rsgisexe{
                 std::cout << "Metric Value Field: " << this->metricCol << std::endl;
                 std::cout << "Number of Rows: " << this->numRows << std::endl;
                 std::cout << "Number of Cols: " << this->numCols << std::endl;
-                
+
                 try
                 {
                     rsgis::cmds::executeIdentifyClumpExtremesOnGrid(this->clumpsImage, this->inSelectField, this->outSelectField, this->eastingsField, this->northingsField, this->methodStr, this->numRows, this->numCols, this->metricCol);
@@ -4250,7 +4250,7 @@ namespace rsgisexe{
                 std::cout << "Northings Field: " << this->northingsField << std::endl;
                 std::cout << "Method: " << this->methodStr << std::endl;
                 std::cout << "Value Field: " << this->valueCol << std::endl;
-                
+
                 try
                 {
                     rsgis::cmds::executeInterpolateClumpValuesToImage(this->clumpsImage, this->inSelectField, this->eastingsField, this->northingsField, this->methodStr, this->valueCol, this->outputFile, this->imageFormat, rsgis::cmds::GDAL_to_RSGIS_Type(this->outDataType));
