@@ -1077,7 +1077,7 @@ static PyMethodDef ImageCalcMethods[] = {
 "   maxIter = 200\n"
 "   degChange = 0.0025\n"
 "   subSample = 1\n"
-"   ignoreZeros = True\n:
+"   ignoreZeros = True\n"
 "   imagecalc.kMeansClustering(inputImage, output, numClust, maxIter, subSample, ignoreZeros, degChange, rsgislib.INITCLUSTER_DIAGONAL_FULL_ATTACH)\n"
 "\n"},
 
@@ -1091,7 +1091,7 @@ static PyMethodDef ImageCalcMethods[] = {
 "  * maxIterations is the maximum number of itterations.\n"
 "  * subSample is an int specifying what fraction of the total pixels should be considered (e.g., 100 = 1/100 pixels).\n"
 "  * ignoreZeros is a bool specifying if zeros in the image should be treated as no data.\n"
-"  * initMethod the method for initialising the clusters and is one of INITCLUSTER_* values\n"},
+"  * initMethod the method for initialising the clusters and is one of INITCLUSTER_* values\n"
 "  * minDistBetweenClusters is a float\n"
 "  * minNumFeatures is an int\n"
 "  * maxStdDev is a float\n"

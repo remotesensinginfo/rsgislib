@@ -624,7 +624,7 @@ if __name__ == '__main__':
         t.tryFuncAndCatch(t.testNormalise2)
         t.tryFuncAndCatch(t.testCorrelation)
         t.tryFuncAndCatch(t.testCovariance1)
-        t.tryFuncAndCatch(t.testCovariance2)
+        #t.tryFuncAndCatch(t.testCovariance2) # Missing matrix files.
         t.tryFuncAndCatch(t.testCalcRMSE)
         t.tryFuncAndCatch(t.testMeanVector)
         t.tryFuncAndCatch(t.testPCA)
