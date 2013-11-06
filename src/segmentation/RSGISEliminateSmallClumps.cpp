@@ -54,7 +54,7 @@ namespace rsgis{namespace segment{
         }
         GDALRasterBand *clumpBand = clumps->GetRasterBand(1);
         
-        unsigned long clumpIdx = 0;
+        //unsigned long clumpIdx = 0;
         unsigned int uiPxlVal = 0;
         
         double maxVal = 0;

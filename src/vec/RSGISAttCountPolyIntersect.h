@@ -82,7 +82,6 @@ namespace rsgis{namespace vec{
         void processFeature(OGRFeature *feature, OGRPolygon *poly, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
         ~RSGISPopulateAttTableForPolygonIntersect();
     protected:
-        unsigned int numImageBands;
         RSGISCalcValueCountInAttTable *valueCalc;
         GDALDataset **datasets;
         int numDS;
