@@ -143,7 +143,6 @@ namespace rsgis{namespace vec{
     
     RSGISPopulateAttTableForPolygonIntersect::RSGISPopulateAttTableForPolygonIntersect(RSGISCalcValueCountInAttTable *valueCalc, GDALDataset **datasets, int numDS, rsgis::img::pixelInPolyOption pixelPolyOption)
     {
-        this->numImageBands = numImageBands;
         this->valueCalc = valueCalc;
         this->datasets = datasets;
         this->numDS = numDS;

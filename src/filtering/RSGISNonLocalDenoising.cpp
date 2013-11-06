@@ -191,13 +191,13 @@ namespace rsgis{namespace filter{
             unsigned int maxSearchX = width - searchWindowWidth;
             unsigned int maxSearchY = height - searchWindowHeight;
             unsigned int searchWinOffsetX = 0; // Offset for start pixel in search window
-            unsigned int searchWinOffsetY = 0; // Offset for end pixel in search window
+            //unsigned int searchWinOffsetY = 0; // Offset for end pixel in search window
             
             std::cout << "height = " << height << ", searchWindowHeight = " << searchWindowHeight << std::endl;
             std::cout << "width = " << width << ", searchWindowWidth = " << searchWindowWidth << std::endl;
             
-            unsigned int feedback = height*width / 10.0;
-			int feedbackCounter = 0;
+            //unsigned int feedback = height*width / 10.0;
+			//int feedbackCounter = 0;
 			std::cout << "Started" << std::flush;
 			
             while (startSearchY < maxSearchY)
