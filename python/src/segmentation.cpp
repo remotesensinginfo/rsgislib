@@ -442,9 +442,9 @@ static PyMethodDef SegmentationMethods[] = {
     
     {"meanImage", Segmentation_meanImage, METH_VARARGS,
         "segmentation.meanImage(inputImage, inputClumps, outputImage, gdalFormat, gdaltype)\n"
-        "A function to generate a mean image for the clumps.\n"
+        "A function to generate an image where with the mean value for each clump. Primarily for visualisation and evaluating segmentation.\n"
         "where:\n"
-        "  inputImage is a string containing the name of the input image file for which the mean is taken.\n"
+        "  inputImage is a string containing the name of the input image file from which the mean is taken.\n"
         "  inputClumps is a string containing the name of the input clumps file\n"
         "  outputImage is a string containing the name of the output image.\n"
         "  gdalFormat is a string defining the format of the output image.\n"
