@@ -65,14 +65,15 @@ static PyObject *Segmentation_eliminateSinglePixels(PyObject *self, PyObject *ar
 {
     const char *pszInputImage, *pszOutputImage, *pszClumpsImage, *pszGDALFormat, *pszTempImage;
     int processInMemory, ignoreZeros;
-    if( !PyArg_ParseTuple(args, "sssssnn:eliminateSinglePixels", &pszInputImage, &pszClumpsImage, 
-                        &pszOutputImage, &pszTempImage, &pszGDALFormat, &processInMemory, &ignoreZeros ))
+
+    if( !PyArg_ParseTuple(args, "sssssii:eliminateSinglePixels", &pszInputImage, &pszClumpsImage, &pszOutputImage, &pszTempImage, &pszGDALFormat, &processInMemory, &ignoreZeros ))
+    {
         return NULL;
+    }
 
     try
     {
-        rsgis::cmds::executeEliminateSinglePixels(pszInputImage, pszClumpsImage, pszOutputImage, pszTempImage,
-                    pszGDALFormat, processInMemory, ignoreZeros);
+        rsgis::cmds::executeEliminateSinglePixels(pszInputImage, pszClumpsImage, pszOutputImage, pszTempImage, pszGDALFormat, processInMemory, ignoreZeros);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -135,7 +136,7 @@ static PyObject *Segmentation_RMSmallClumpsStepwise(PyObject *self, PyObject *ar
     int storeMean,processInMemory,stretchStatsAvail;
     unsigned int minClumpSize;
     float specThreshold;                   
-    if( !PyArg_ParseTuple(args, "ssssnsnnIf:RMSmallClumpsStepwise", &pszInputImage, &pszClumpsImage, &pszOutputImage, &pszGDALFormat,
+    if( !PyArg_ParseTuple(args, "ssssisiiIf:RMSmallClumpsStepwise", &pszInputImage, &pszClumpsImage, &pszOutputImage, &pszGDALFormat,
                     &stretchStatsAvail, &pszStretchStatsFile, &storeMean, &processInMemory, &minClumpSize, &specThreshold))            
         return NULL;
     
