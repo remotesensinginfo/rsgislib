@@ -11,13 +11,14 @@ The vector utils module performs geometry / attribute table operations on vector
 Geometry
 ---------
 
+.. autofunction:: rsgislib.vectorutils.buffervector
 .. autofunction:: rsgislib.vectorutils.generateConvexHullsGroups
 
 
 Attributes
 -----------
 
-.. autofunction:: rsgislib.vectorutils.removeAttributes
+.. autofunction:: rsgislib.vectorutils.removeattributes
 
 * :ref:`genindex`
 * :ref:`modindex`

@@ -603,11 +603,18 @@ class RSGISTests:
     
     # Vector utils
     def testRemoveAttributes(self):
-        print("PYTHON TEST: removeAttributes")
+        print("PYTHON TEST: removeattributes")
         inputVector = './Vectors/injune_p142_stem_locations.shp'
         outputVector = './TestOutputs/injune_p142_stem_locations_noatts.shp'
-        vectorutils.removeAttributes(inputVector, outputVector, True)
-        
+        vectorutils.removeattributes(inputVector, outputVector, True)
+
+    def testBufferVector(self):
+        print("PYTHON TEST: buffervector")
+        inputVector = './Vectors/injune_p142_stem_locations.shp'
+        outputVector = './TestOutputs/injune_p142_stem_locations_1mbuffer.shp'
+        bufferDist = 1
+        vectorutils.buffervector(inputVector, outputVector, bufferDist, True)
+         
 
 if __name__ == '__main__':
 
@@ -714,6 +721,7 @@ if __name__ == '__main__':
         
         """ Vector Utils functions """
         t.tryFuncAndCatch(t.testRemoveAttributes)
+        t.tryFuncAndCatch(t.testBufferVector)
     
     print("%s TESTS COMPLETED - %s FAILURES LISTED BELOW:"%(t.numTests, len(t.failures)))
     if(len(t.failures)):
