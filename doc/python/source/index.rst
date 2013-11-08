@@ -35,6 +35,7 @@ Python documentation
    rsgislib_calibration
    rsgislib_imagecalc
    rsgislib_imageutils
+   rsgislib_vectorutils
    rsgislib_rastergis
    rsgislib_segmentation
    rsgislib_zonalstats

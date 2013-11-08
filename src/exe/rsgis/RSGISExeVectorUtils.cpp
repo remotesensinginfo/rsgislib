@@ -4494,110 +4494,14 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 			cout << "Copy geometry and remove attributes\n";
 			cout << "Input Vector: " << this->inputVector << endl;
 			cout << "Output Vector: " << this->outputVector << endl;
-
-            // Convert to absolute path
-            this->inputVector = boost::filesystem::absolute(this->inputVector).c_str();
-            this->outputVector = boost::filesystem::absolute(this->outputVector).c_str();
-
-			OGRRegisterAll();
-
-			RSGISFileUtils fileUtils;
-			RSGISVectorUtils vecUtils;
-
-			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
-			string SHPFileOutLayer = vecUtils.getLayerName(this->outputVector);
-
-			OGRDataSource *inputSHPDS = NULL;
-			OGRLayer *inputSHPLayer = NULL;
-			OGRSFDriver *shpFiledriver = NULL;
-			OGRDataSource *outputSHPDS = NULL;
-			OGRLayer *outputSHPLayer = NULL;
-			OGRSpatialReference* inputSpatialRef = NULL;
-
-			RSGISProcessVector *processVector = NULL;
-			RSGISProcessOGRFeature *processFeature = NULL;
-
-			string outputDIR = "";
-			try
-			{
-				outputDIR = fileUtils.getFileDirectoryPath(this->outputVector);
-
-				if(vecUtils.checkDIR4SHP(outputDIR, SHPFileOutLayer))
-				{
-					if(this->force)
-					{
-						vecUtils.deleteSHP(outputDIR, SHPFileOutLayer);
-					}
-					else
-					{
-						throw RSGISException("Shapefile already exists, either delete or select force.");
-					}
-				}
-
-				/////////////////////////////////////
-				//
-				// Open Input Shapfile.
-				//
-				/////////////////////////////////////
-				inputSHPDS = OGRSFDriverRegistrar::Open(this->inputVector.c_str(), FALSE);
-				if(inputSHPDS == NULL)
-				{
-					string message = string("Could not open vector file ") + this->inputVector;
-					throw RSGISFileException(message.c_str());
-				}
-				inputSHPLayer = inputSHPDS->GetLayerByName(SHPFileInLayer.c_str());
-				if(inputSHPLayer == NULL)
-				{
-					string message = string("Could not open vector layer ") + SHPFileInLayer;
-					throw RSGISFileException(message.c_str());
-				}
-				inputSpatialRef = inputSHPLayer->GetSpatialRef();
-
-				// Get Geometry Type.
-				OGRFeature *feature = inputSHPLayer->GetFeature(0);
-				OGRwkbGeometryType geometryType = feature->GetGeometryRef()->getGeometryType();
-
-				/////////////////////////////////////
-				//
-				// Create Output Shapfile.
-				//
-				/////////////////////////////////////
-				const char *pszDriverName = "ESRI Shapefile";
-				shpFiledriver = OGRSFDriverRegistrar::GetRegistrar()->GetDriverByName(pszDriverName );
-				if( shpFiledriver == NULL )
-				{
-					throw RSGISVectorOutputException("SHP driver not available.");
-				}
-				outputSHPDS = shpFiledriver->CreateDataSource(this->outputVector.c_str(), NULL);
-				if( outputSHPDS == NULL )
-				{
-					string message = string("Could not create vector file ") + this->outputVector;
-					throw RSGISVectorOutputException(message.c_str());
-				}
-				outputSHPLayer = outputSHPDS->CreateLayer(SHPFileOutLayer.c_str(), inputSpatialRef, geometryType, NULL );
-				if( outputSHPLayer == NULL )
-				{
-					string message = string("Could not create vector layer ") + SHPFileOutLayer;
-					throw RSGISVectorOutputException(message.c_str());
-				}
-
-				processFeature = new RSGISProcessFeatureCopyVector();
-				processVector = new RSGISProcessVector(processFeature);
-
-				processVector->processVectors(inputSHPLayer, outputSHPLayer, false, false, false);
-
-				OGRDataSource::DestroyDataSource(inputSHPDS);
-				OGRDataSource::DestroyDataSource(outputSHPDS);
-
-				delete processVector;
-				delete processFeature;
-
-				//OGRCleanupAll();
-			}
-			catch (RSGISException e)
-			{
-				throw e;
-			}
+            try
+            {
+                rsgis::cmds::executeRemoveAttributes(this->inputVector, this->outputVector, this->force);
+            }
+            catch (rsgis::cmds::RSGISCmdException &e)
+            {
+                throw RSGISException(e.what());
+            }
 		}
 		else if(option == RSGISExeVectorUtils::bufferVector)
 		{
