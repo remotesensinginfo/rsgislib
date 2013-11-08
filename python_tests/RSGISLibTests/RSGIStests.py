@@ -33,6 +33,7 @@ import sys, os
 try:
     import rsgislib
     from rsgislib import imageutils
+    from rsgislib import vectorutils
     from rsgislib import imagecalc
     from rsgislib import rastergis
     from rsgislib import zonalstats
@@ -43,7 +44,7 @@ except ImportError as err:
     sys.exit()
     
 
-path = os.sys.path[0] + '/'
+path = os.sys.path[0]
 inFileName = os.path.join(path,"Rasters","injune_p142_casi_sub_utm.kea")
 
 class RSGISTests:
@@ -599,6 +600,13 @@ class RSGISTests:
         format = "KEA"
         dataType = rsgislib.TYPE_32INT
         imageregistration.gcp2gdal(inputImage,inputGCPs, outputImage, format, dataType)
+    
+    # Vector utils
+    def testRemoveAttributes(self):
+        print("PYTHON TEST: removeAttributes")
+        inputVector = './Vectors/injune_p142_stem_locations.shp'
+        outputVector = './TestOutputs/injune_p142_stem_locations_noatts.shp'
+        vectorutils.removeAttributes(inputVector, outputVector, True)
         
 
 if __name__ == '__main__':
@@ -701,6 +709,11 @@ if __name__ == '__main__':
         t.tryFuncAndCatch(t.testTriangularWarp)
         t.tryFuncAndCatch(t.testNNWarp)
         t.tryFuncAndCatch(t.testPolyWarp)
+    
+    if testLibraries == 'all' or testLibraries == 'vectorutils':
+        
+        """ Vector Utils functions """
+        t.tryFuncAndCatch(t.testRemoveAttributes)
     
     print("%s TESTS COMPLETED - %s FAILURES LISTED BELOW:"%(t.numTests, len(t.failures)))
     if(len(t.failures)):

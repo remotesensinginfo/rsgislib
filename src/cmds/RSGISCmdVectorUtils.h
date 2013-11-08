@@ -34,6 +34,8 @@ namespace rsgis{ namespace cmds {
     
     /** Function to produce convex hulls for groups of (X, Y, Attribute) point locations */
     void executeGenerateConvexHullsGroups(std::string inputFile, std::string outputVector, std::string outVecProj, bool force, unsigned int eastingsColIdx, unsigned int northingsColIdx, unsigned int attributeColIdx)throw(RSGISCmdException);
+    /** Function to copy geometry but remove attributes */
+    void executeRemoveAttributes(std::string inputVector, std::string outputVector, bool force)throw(RSGISCmdException);
     
 }}
 

@@ -67,6 +67,27 @@ static PyObject *VectorUtils_GenerateConvexHullsGroups(PyObject *self, PyObject 
     Py_RETURN_NONE;
 }
 
+static PyObject *VectorUtils_RemoveAttributes(PyObject *self, PyObject *args)
+{
+    const char *pszInputVector, *pszOutputVector;
+    int force = false;
+    if( !PyArg_ParseTuple(args, "ss|i:removeAttributes", &pszInputVector, &pszOutputVector, &force))
+        return NULL;
+
+    try
+    {
+        rsgis::cmds::executeRemoveAttributes(pszInputVector, pszOutputVector, force);
+     
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+
+    Py_RETURN_NONE;
+}
+
 
 
 // Our list of functions in this module
@@ -82,6 +103,15 @@ static PyMethodDef VectorUtilsMethods[] = {
 "* eastingsColIdx an integer specifying the easting column in the input text file \n"
 "* northingsColIdx an integer specifying the northing column in the input text file \n"
 "* attributeColIdx an integer specifying the attribute column in the input text file \n"
+"\n"},
+
+    {"removeAttributes", VectorUtils_RemoveAttributes, METH_VARARGS, 
+"vectorutils.removeAttributes(inputvector, outputvector, force))\n"
+"A command to copy the geometry, dropping attributes.\n"
+"where:\n"
+"* inputvector is a string containing the name of the input vector\n"
+"* outputvector is a string containing the name of the output vector\n"
+"* force is a bool, specifying whether to force removal of the output vector if it exists\n"
 "\n"},
 
     {NULL}        /* Sentinel */
