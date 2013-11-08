@@ -36,6 +36,8 @@ namespace rsgis{ namespace cmds {
     void executeGenerateConvexHullsGroups(std::string inputFile, std::string outputVector, std::string outVecProj, bool force, unsigned int eastingsColIdx, unsigned int northingsColIdx, unsigned int attributeColIdx)throw(RSGISCmdException);
     /** Function to copy geometry but remove attributes */
     void executeRemoveAttributes(std::string inputVector, std::string outputVector, bool force)throw(RSGISCmdException);
+    /** Function to buffer vector */
+    void executeBufferVector(std::string inputVector, std::string outputVector, float bufferDist, bool force)throw(RSGISCmdException);
     
 }}
 
