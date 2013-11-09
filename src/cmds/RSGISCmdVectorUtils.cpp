@@ -34,6 +34,7 @@
 #include "vec/RSGISGenerateConvexHullGroups.h"
 #include "vec/RSGISVectorUtils.h"
 #include "vec/RSGISProcessFeatureCopyVector.h"
+#include "vec/RSGISVectorAttributeFindReplace.h"
 #include "vec/RSGISVectorBuffer.h"
 
 #include "utils/RSGISTextUtils.h"
@@ -311,6 +312,157 @@ namespace rsgis{ namespace cmds {
             delete processGeom;
             
             //OGRCleanupAll();
+        }
+        catch(rsgis::RSGISVectorException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(rsgis::RSGISException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch (std::exception &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
+            
+    void  executePrintPolyGeom(std::string inputVector) throw(RSGISCmdException)
+    {
+        try
+        {
+            // Convert to absolute path
+            inputVector = boost::filesystem::absolute(inputVector).c_str();
+            
+			OGRRegisterAll();
+            
+            rsgis::vec::RSGISVectorUtils vecUtils;
+            
+            std::string SHPFileInLayer = vecUtils.getLayerName(inputVector);
+            
+			OGRDataSource *inputSHPDS = NULL;
+			OGRLayer *inputSHPLayer = NULL;
+            
+            rsgis::vec::RSGISVectorIO *vecIO = NULL;
+            rsgis::vec::RSGISPolygonData **polygons = NULL;
+			int numFeatures = 0;
+
+            /////////////////////////////////////
+            //
+            // Open Input Shapfile.
+            //
+            /////////////////////////////////////
+            inputSHPDS = OGRSFDriverRegistrar::Open(inputVector.c_str(), FALSE);
+            if(inputSHPDS == NULL)
+            {
+                std::string message = std::string("Could not open vector file ") + inputVector;
+                throw RSGISFileException(message.c_str());
+            }
+            inputSHPLayer = inputSHPDS->GetLayerByName(SHPFileInLayer.c_str());
+            if(inputSHPLayer == NULL)
+            {
+                std::string message = std::string("Could not open vector layer ") + SHPFileInLayer;
+                throw RSGISFileException(message.c_str());
+            }
+            
+            numFeatures = inputSHPLayer->GetFeatureCount(true);
+            
+            std::cout << "Shapefile has " << numFeatures << " features\n";
+            vecIO = new rsgis::vec::RSGISVectorIO();
+            polygons = new rsgis::vec::RSGISPolygonData*[numFeatures];
+            for(int i = 0; i < numFeatures; i++)
+            {
+                polygons[i] = new rsgis::vec::RSGISEmptyPolygon();
+            }
+            vecIO->readPolygons(inputSHPLayer, polygons, numFeatures);
+            
+            std::cout.precision(8);
+            
+            for(int i = 0; i < numFeatures; i++)
+            {
+                std::cout << "Polygon " << i << ":\t" << polygons[i]->getGeometry()->toText() << std::endl;
+            }
+            
+            if(vecIO != NULL)
+            {
+                delete vecIO;
+            }
+            if(polygons != NULL)
+            {
+                for(int i = 0; i < numFeatures; i++)
+                {
+                    delete polygons[i];
+                }
+                delete polygons;
+            }
+            
+            OGRDataSource::DestroyDataSource(inputSHPDS);
+            
+            //OGRCleanupAll();
+
+        }
+        catch(rsgis::RSGISVectorException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(rsgis::RSGISException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch (std::exception &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
+
+            void  executeFindReplaceText(std::string inputVector, std::string attribute, std::string find, std::string replace) throw(RSGISCmdException)
+    {
+        try
+        {
+            // Convert to absolute path
+            inputVector = boost::filesystem::absolute(inputVector).c_str();
+            
+            
+			OGRRegisterAll();
+            
+            rsgis::vec::RSGISVectorUtils vecUtils;
+            rsgis::vec::RSGISProcessVector *processVector = NULL;
+            rsgis::vec::RSGISProcessOGRFeature *processFeature = NULL;
+            
+            std::string SHPFileInLayer = vecUtils.getLayerName(inputVector);
+            
+			OGRDataSource *inputSHPDS = NULL;
+			OGRLayer *inputSHPLayer = NULL;
+            
+            /////////////////////////////////////
+            //
+            // Open Input Shapfile.
+            //
+            /////////////////////////////////////
+            inputSHPDS = OGRSFDriverRegistrar::Open(inputVector.c_str(), TRUE, NULL);
+            if(inputSHPDS == NULL)
+            {
+                std::string message = std::string("Could not open vector file ") + inputVector;
+                throw RSGISFileException(message.c_str());
+            }
+            inputSHPLayer = inputSHPDS->GetLayerByName(SHPFileInLayer.c_str());
+            if(inputSHPLayer == NULL)
+            {
+                std::string message = std::string("Could not open vector layer ") + SHPFileInLayer;
+                throw RSGISFileException(message.c_str());
+            }
+            
+            processFeature = new rsgis::vec::RSGISVectorAttributeFindReplace(attribute, find, replace);
+            processVector = new rsgis::vec::RSGISProcessVector(processFeature);
+            
+            processVector->processVectors(inputSHPLayer, false);
+            
+            OGRDataSource::DestroyDataSource(inputSHPDS);
+            delete processVector;
+            delete processFeature;
+            
+            //OGRCleanupAll();
+            
         }
         catch(rsgis::RSGISVectorException &e)
         {

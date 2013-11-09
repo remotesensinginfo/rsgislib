@@ -4642,76 +4642,10 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 			cout << "Print Polygon Geometry\n";
 			cout << "Input Vector: " << this->inputVector << endl;
 
-            // Convert to absolute path
-            this->inputVector = boost::filesystem::absolute(this->inputVector).c_str();
-
-			OGRRegisterAll();
-
-			RSGISVectorUtils vecUtils;
-
-			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
-
-			OGRDataSource *inputSHPDS = NULL;
-			OGRLayer *inputSHPLayer = NULL;
-
-			RSGISVectorIO *vecIO = NULL;
-			RSGISPolygonData **polygons = NULL;
-			int numFeatures = 0;
-			try
-			{
-				/////////////////////////////////////
-				//
-				// Open Input Shapfile.
-				//
-				/////////////////////////////////////
-				inputSHPDS = OGRSFDriverRegistrar::Open(this->inputVector.c_str(), FALSE);
-				if(inputSHPDS == NULL)
-				{
-					string message = string("Could not open vector file ") + this->inputVector;
-					throw RSGISFileException(message.c_str());
-				}
-				inputSHPLayer = inputSHPDS->GetLayerByName(SHPFileInLayer.c_str());
-				if(inputSHPLayer == NULL)
-				{
-					string message = string("Could not open vector layer ") + SHPFileInLayer;
-					throw RSGISFileException(message.c_str());
-				}
-
-				numFeatures = inputSHPLayer->GetFeatureCount(true);
-
-				cout << "Shapefile has " << numFeatures << " features\n";
-				vecIO = new RSGISVectorIO();
-				polygons = new RSGISPolygonData*[numFeatures];
-				for(int i = 0; i < numFeatures; i++)
-				{
-					polygons[i] = new RSGISEmptyPolygon();
-				}
-				vecIO->readPolygons(inputSHPLayer, polygons, numFeatures);
-
-				cout.precision(8);
-
-				for(int i = 0; i < numFeatures; i++)
-				{
-					cout << "Polygon " << i << ":\t" << polygons[i]->getGeometry()->toText() << endl;
-				}
-
-				if(vecIO != NULL)
-				{
-					delete vecIO;
-				}
-				if(polygons != NULL)
-				{
-					for(int i = 0; i < numFeatures; i++)
-					{
-						delete polygons[i];
-					}
-					delete polygons;
-				}
-
-				OGRDataSource::DestroyDataSource(inputSHPDS);
-
-				//OGRCleanupAll();
-			}
+            try
+            {
+                rsgis::cmds::executePrintPolyGeom(this->inputVector);
+            }
 			catch (RSGISException e)
 			{
 				throw e;
@@ -4725,53 +4659,11 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 			cout << "Find: " << this->find << endl;
 			cout << "Replace: " << this->replace << endl;
 
-            // Convert to absolute path
-            this->inputVector = boost::filesystem::absolute(this->inputVector).c_str();
-
-
-			OGRRegisterAll();
-
-			RSGISVectorUtils vecUtils;
-			RSGISProcessVector *processVector = NULL;
-			RSGISProcessOGRFeature *processFeature = NULL;
-
-			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
-
-			OGRDataSource *inputSHPDS = NULL;
-			OGRLayer *inputSHPLayer = NULL;
-
-			try
-			{
-				/////////////////////////////////////
-				//
-				// Open Input Shapfile.
-				//
-				/////////////////////////////////////
-				inputSHPDS = OGRSFDriverRegistrar::Open(this->inputVector.c_str(), TRUE, NULL);
-				if(inputSHPDS == NULL)
-				{
-					string message = string("Could not open vector file ") + this->inputVector;
-					throw RSGISFileException(message.c_str());
-				}
-				inputSHPLayer = inputSHPDS->GetLayerByName(SHPFileInLayer.c_str());
-				if(inputSHPLayer == NULL)
-				{
-					string message = string("Could not open vector layer ") + SHPFileInLayer;
-					throw RSGISFileException(message.c_str());
-				}
-
-				processFeature = new RSGISVectorAttributeFindReplace(this->attribute, this->find, this->replace);
-				processVector = new RSGISProcessVector(processFeature);
-
-				processVector->processVectors(inputSHPLayer, false);
-
-				OGRDataSource::DestroyDataSource(inputSHPDS);
-				delete processVector;
-				delete processFeature;
-
-				//OGRCleanupAll();
-			}
-			catch (RSGISException e)
+            try
+            {
+                rsgis::cmds::executeFindReplaceText(this->inputVector, this->attribute , this->find, this->replace);
+            }
+            catch (RSGISException e)
 			{
 				throw e;
 			}
