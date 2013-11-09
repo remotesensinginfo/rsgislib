@@ -38,6 +38,10 @@ namespace rsgis{ namespace cmds {
     void executeRemoveAttributes(std::string inputVector, std::string outputVector, bool force)throw(RSGISCmdException);
     /** Function to buffer vector */
     void executeBufferVector(std::string inputVector, std::string outputVector, float bufferDist, bool force)throw(RSGISCmdException);
+    /** Function to print polygon geometry */
+    void executePrintPolyGeom(std::string inputVector) throw(RSGISCmdException);
+    /** Function to find and replace text within an attribute table */
+    void executeFindReplaceText(std::string inputVector, std::string attribute, std::string find, std::string replace) throw(RSGISCmdException);
     
 }}
 

@@ -614,7 +614,12 @@ class RSGISTests:
         outputVector = './TestOutputs/injune_p142_stem_locations_1mbuffer.shp'
         bufferDist = 1
         vectorutils.buffervector(inputVector, outputVector, bufferDist, True)
-         
+
+    def testBufferVector(self):
+        print("PYTHON TEST: buffervector")
+        inputVector = './Vectors/injune_p142_psu_utm.shp'
+        vectorutils.printpolygeom(inputVector)
+                  
 
 if __name__ == '__main__':
 

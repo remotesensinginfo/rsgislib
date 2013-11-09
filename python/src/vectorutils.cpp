@@ -88,6 +88,25 @@ static PyObject *VectorUtils_RemoveAttributes(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
+static PyObject *VectorUtils_PrintPolyGeom(PyObject *self, PyObject *args)
+{
+    const char *pszInputVector;
+    if( !PyArg_ParseTuple(args, "s:printpolygeom", &pszInputVector))
+        return NULL;
+
+    try
+    {
+        rsgis::cmds::executePrintPolyGeom(pszInputVector);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+
+    Py_RETURN_NONE;
+}
+
 static PyObject *VectorUtils_BufferVector(PyObject *self, PyObject *args)
 {
     const char *pszInputVector, *pszOutputVector;
@@ -161,6 +180,17 @@ static PyMethodDef VectorUtilsMethods[] = {
 "  vectorutils.buffervector(inputVector, outputVector, bufferDist, True)\n"
 "\n"},
 
+    {"printpolygeom", VectorUtils_PrintPolyGeom, METH_VARARGS, 
+"vectorutils.printpolygeom(inputvector))\n"
+"A command to print the polygon geometries (to the console) of the inputted shapefile\n"
+"Where:\n"
+"\n"
+"* inputvector is a string containing the name of the input vector\n"
+"Example::\n"
+"\n"
+"   inputVector = './Vectors/injune_p142_psu_utm.shp'\n"
+"   vectorutils.printpolygeom(inputVector)\n"
+"\n"},
 
     {NULL}        /* Sentinel */
 };
