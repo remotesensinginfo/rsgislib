@@ -129,13 +129,31 @@ static PyObject *VectorUtils_BufferVector(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
+static PyObject *VectorUtils_FindReplaceText(PyObject *self, PyObject *args)
+{
+    const char *pszInputVector, *pszAttribute, *pszFind, *pszReplace;
+    if( !PyArg_ParseTuple(args, "ssss:findreplacetext", &pszInputVector, &pszAttribute, &pszFind, &pszReplace))
+        return NULL;
 
+    try
+    {
+        rsgis::cmds::executeFindReplaceText(pszInputVector, pszAttribute, pszFind, pszReplace);
+     
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+
+    Py_RETURN_NONE;
+}
 
 
 // Our list of functions in this module
 static PyMethodDef VectorUtilsMethods[] = {
     {"generateConvexHullsGroups", VectorUtils_GenerateConvexHullsGroups, METH_VARARGS, 
-"vectorutils.generateConvexHullsGroups(inputfile, outputvector, outVecProj, force, eastingsColIdx, northingsColIdx, attributeColIdx))\n"
+"vectorutils.generateConvexHullsGroups(inputfile, outputvector, outVecProj, force, eastingsColIdx, northingsColIdx, attributeColIdx)\n"
 "A command to produce convex hulls for groups of (X, Y, Attribute) point locations.\n\n"
 "Where:\n"
 "\n"
@@ -149,7 +167,7 @@ static PyMethodDef VectorUtilsMethods[] = {
 "\n"},
 
     {"removeattributes", VectorUtils_RemoveAttributes, METH_VARARGS, 
-"vectorutils.removeattributes(inputvector, outputvector, force))\n"
+"vectorutils.removeattributes(inputvector, outputvector, force)\n"
 "A command to copy the geometry, dropping attributes.\n\n"
 "Where:\n"
 "\n"
@@ -164,7 +182,7 @@ static PyMethodDef VectorUtilsMethods[] = {
 "\n"},
 
     {"buffervector", VectorUtils_BufferVector, METH_VARARGS, 
-"vectorutils.buffervector(inputvector, outputvector, bufferDist, force))\n"
+"vectorutils.buffervector(inputvector, outputvector, bufferDist, force)\n"
 "A command to buffer a vector by a specified distance.\n\n"
 "Where:\n"
 "\n"
@@ -181,7 +199,7 @@ static PyMethodDef VectorUtilsMethods[] = {
 "\n"},
 
     {"printpolygeom", VectorUtils_PrintPolyGeom, METH_VARARGS, 
-"vectorutils.printpolygeom(inputvector))\n"
+"vectorutils.printpolygeom(inputvector)\n"
 "A command to print the polygon geometries (to the console) of the inputted shapefile\n"
 "Where:\n"
 "\n"
@@ -191,6 +209,25 @@ static PyMethodDef VectorUtilsMethods[] = {
 "   inputVector = './Vectors/injune_p142_psu_utm.shp'\n"
 "   vectorutils.printpolygeom(inputVector)\n"
 "\n"},
+
+    {"findreplacetext", VectorUtils_FindReplaceText, METH_VARARGS, 
+"vectorutils.findreplacetext(inputvector, attribute, find, replace)\n"
+"A command to undertake find and replace on a given attribute with the shapefile\n"
+"Where:\n"
+"\n"
+"* inputvector is a string containing the name of the input vector.\n"
+"* attribute is a string containing the name of field in the attribute table.\n"
+"* find is a string to find.\n"
+"* replace is a string to replace 'find'.\n"
+"Example::\n"
+"\n"
+"   inputVector = './TestOutputs/injune_p142_psu_utm_findreplace.shp'\n"
+"   attribute = 'PSU'\n"
+"   find = '142'\n"
+"   replace = '142'\n"
+"   vectorutils.findreplacetext(inputVector, attribute, find, replace)\n"
+"\n"},
+
 
     {NULL}        /* Sentinel */
 };

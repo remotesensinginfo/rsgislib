@@ -80,6 +80,7 @@ class RSGISTests:
         os.system('cp ./Rasters/injune_p142_casi_sub_utm.kea ./TestOutputs/injune_p142_casi_sub_utm.kea')
         
         os.system('cp ./RATS/injune_p142_casi_sub_utm_segs_nostats.kea ./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_nostats_addstats.kea')
+        os.system('cp ./Vectors/injune_p142_psu_utm.* ./TestOutputs/')
     
     def checkDIRStructure(self):
         """ Create directory and sub directories for test
@@ -615,11 +616,18 @@ class RSGISTests:
         bufferDist = 1
         vectorutils.buffervector(inputVector, outputVector, bufferDist, True)
 
-    def testBufferVector(self):
+    def testPrintPolyGeom(self):
         print("PYTHON TEST: buffervector")
         inputVector = './Vectors/injune_p142_psu_utm.shp'
         vectorutils.printpolygeom(inputVector)
-                  
+
+    def testFindReplaceText(self):
+        print("PYTHON TEST: findreplacetext")
+        inputVector = './TestOutputs/injune_p142_psu_utm.shp'
+        attribute = 'PSU'
+        find = '142'
+        replace = '142'
+        vectorutils.findreplacetext(inputVector, attribute, find, replace)
 
 if __name__ == '__main__':
 
@@ -727,6 +735,8 @@ if __name__ == '__main__':
         """ Vector Utils functions """
         t.tryFuncAndCatch(t.testRemoveAttributes)
         t.tryFuncAndCatch(t.testBufferVector)
+        t.tryFuncAndCatch(t.testPrintPolyGeom)
+        t.tryFuncAndCatch(t.testFindReplaceText)
     
     print("%s TESTS COMPLETED - %s FAILURES LISTED BELOW:"%(t.numTests, len(t.failures)))
     if(len(t.failures)):
