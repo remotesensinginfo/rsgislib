@@ -35,15 +35,15 @@ namespace rsgis{ namespace cmds {
 
     struct RSGISFilterParameters
     {
-        std::string type = "";
-        std::string fileEnding = "";
-        std::string option = "";
-        unsigned int size = 3;
-        unsigned int nLooks = 3;
-        float stddev = 0;
-        float stddevX = 0;
-        float stddevY = 0;
-        float angle = 0;
+        std::string type;
+        std::string fileEnding;
+        std::string option;
+        unsigned int size;
+        unsigned int nLooks;
+        float stddev;
+        float stddevX;
+        float stddevY;
+        float angle;
     };
 
     /** Function to apply filters to an image */

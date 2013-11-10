@@ -38,14 +38,16 @@ try:
     from rsgislib import rastergis
     from rsgislib import zonalstats
     from rsgislib import imageregistration
+    from rsgislib import imagefilter
     from rsgislib.imagecalc import BandDefn
 except ImportError as err:
     print(err)
     sys.exit()
     
 
-path = os.sys.path[0]
+path = os.sys.path[0] + '/'
 inFileName = os.path.join(path,"Rasters","injune_p142_casi_sub_utm.kea")
+print(inFileName)
 
 class RSGISTests:
 
@@ -629,6 +631,44 @@ class RSGISTests:
         replace = '142'
         vectorutils.findreplacetext(inputVector, attribute, find, replace)
 
+    # Image filter
+    def testFilter(self, allFilters=False):
+        print("PYTHON TEST: filter")
+        inputImage = './Rasters/injune_p142_casi_sub_utm_single_band.vrt'
+        outputImageBase = './TestOutputs/injune_p142_casi_sub_utm_single_band'
+        gdalFormat = 'KEA'
+        outExt = 'kea'
+        dataType = rsgislib.TYPE_32FLOAT
+        filters = []
+        filters.append(imagefilter.FilterParameters(filterType = 'GaussianSmooth', fileEnding = 'gausmooth', size=3, stddevX = 1., stddevY = 1, angle = 0.) )
+        if allFilters:
+            filters.append(imagefilter.FilterParameters(filterType = 'Gaussian1st', fileEnding = 'gau1st', size=3, stddevX = 1., stddevY = 1, angle = 0.) )
+            filters.append(imagefilter.FilterParameters(filterType = 'Gaussian2nd', fileEnding = 'gau1st', size=3, stddevX = 1., stddevY = 1, angle = 0.) )
+            filters.append(imagefilter.FilterParameters(filterType = 'Laplacian', fileEnding = 'laplacian', size=3, stddev = 1) )
+            filters.append(imagefilter.FilterParameters(filterType = 'Sobel', fileEnding = 'sobelx', option = 'x') )
+            filters.append(imagefilter.FilterParameters(filterType = 'Sobel', fileEnding = 'sobely', option = 'y') )
+            filters.append(imagefilter.FilterParameters(filterType = 'Sobel', fileEnding = 'sobelxy', option = 'xy') )
+            filters.append(imagefilter.FilterParameters(filterType = 'Prewitt', fileEnding = 'prewittx', option = 'x') )
+            filters.append(imagefilter.FilterParameters(filterType = 'Prewitt', fileEnding = 'prewitty', option = 'y') )
+            filters.append(imagefilter.FilterParameters(filterType = 'Prewitt', fileEnding = 'prewittxy', option = 'xy') )
+            filters.append(imagefilter.FilterParameters(filterType = 'Mean', fileEnding = 'mean', size=3) )
+            filters.append(imagefilter.FilterParameters(filterType = 'Median', fileEnding = 'median', size=3) )
+            filters.append(imagefilter.FilterParameters(filterType = 'Mode', fileEnding = 'mode', size=3) )
+            filters.append(imagefilter.FilterParameters(filterType = 'StdDev', fileEnding = 'stddev', size=3) )
+            filters.append(imagefilter.FilterParameters(filterType = 'Range', fileEnding = 'range', size=3) )
+            filters.append(imagefilter.FilterParameters(filterType = 'CoeffOfVar', fileEnding = 'coeffofvar', size=3) )
+            filters.append(imagefilter.FilterParameters(filterType = 'Min', fileEnding = 'min', size=3) )
+            filters.append(imagefilter.FilterParameters(filterType = 'Max', fileEnding = 'max', size=3) )
+            filters.append(imagefilter.FilterParameters(filterType = 'Total', fileEnding = 'total', size=3) )
+            filters.append(imagefilter.FilterParameters(filterType = 'Kuwahara', fileEnding = 'kuwahara', size=3) )
+            filters.append(imagefilter.FilterParameters(filterType = 'Lee', fileEnding = 'lee', size=3, nLooks=3) )
+            filters.append(imagefilter.FilterParameters(filterType = 'NormVar', fileEnding = 'normvar', size=3) )
+            filters.append(imagefilter.FilterParameters(filterType = 'NormVarSqrt', fileEnding = 'normvarsqrt', size=3) )
+            filters.append(imagefilter.FilterParameters(filterType = 'NormVarLn', fileEnding = 'normvarln', size=3) )
+            filters.append(imagefilter.FilterParameters(filterType = 'TextureVar', fileEnding = 'texturevar', size=3) )
+
+        imagefilter.applyfilters(inputImage, outputImageBase, filters, gdalFormat, outExt, dataType)
+
 if __name__ == '__main__':
 
     t = RSGISTests()
@@ -737,6 +777,10 @@ if __name__ == '__main__':
         t.tryFuncAndCatch(t.testBufferVector)
         t.tryFuncAndCatch(t.testPrintPolyGeom)
         t.tryFuncAndCatch(t.testFindReplaceText)
+
+    if testLibraries == 'all' or testLibraries == 'imagefilter':
+        """ Image filter functions """ 
+        t.tryFuncAndCatch(t.testFilter)
     
     print("%s TESTS COMPLETED - %s FAILURES LISTED BELOW:"%(t.numTests, len(t.failures)))
     if(len(t.failures)):

@@ -34,12 +34,13 @@ Python documentation
    rsgislib
    rsgislib_calibration
    rsgislib_imagecalc
+   rsgislib_imagefilter
+   rsgislib_imageregistration
    rsgislib_imageutils
-   rsgislib_vectorutils
    rsgislib_rastergis
    rsgislib_segmentation
+   rsgislib_vectorutils
    rsgislib_zonalstats
-   rsgislib_imageregistration
    
 * :ref:`modindex`
 * :ref:`search`

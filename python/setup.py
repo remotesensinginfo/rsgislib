@@ -42,9 +42,14 @@ imageregistration_module = Extension(name='imageregistration._imageregistration'
                 library_dirs=['../src'],
                 libraries=['rsgis_cmds'])
 
-                
 vectorutils_module = Extension(name='vectorutils._vectorutils',
                 sources=['src/vectorutils.cpp'],
+                include_dirs=['../src/cmds', '../src'],
+                library_dirs=['../src'],
+                libraries=['rsgis_cmds'])
+
+imagefilter_module = Extension(name='imagefilter._imagefilter',
+                sources=['src/imagefilter.cpp'],
                 include_dirs=['../src/cmds', '../src'],
                 library_dirs=['../src'],
                 libraries=['rsgis_cmds'])
@@ -57,8 +62,8 @@ setup( name = 'RSGISLib',
         author = 'Sam Gillingham',
         author_email = 'gillingham.sam@gmail.com',
         packages = ['rsgislib', 'rsgislib.imagecalc', 'rsgislib.imageutils',
-                        'rsgislib.segmentation','rsgislib.imagecalibration','rsgislib.rastergis','rsgislib.zonalstats','rsgislib.imageregistration','rsgislib.vectorutils'],
+                        'rsgislib.segmentation','rsgislib.imagecalibration','rsgislib.rastergis','rsgislib.zonalstats','rsgislib.imageregistration','rsgislib.vectorutils','rsgislib.imagefilter'],
         ext_package = 'rsgislib',
         ext_modules = [imagecalc_module, imageutils_module, 
-                            segmentation_module, imagecalibration_module, rastergis_module, zonalstats_module, imageregistration_module,vectorutils_module])
+                            segmentation_module, imagecalibration_module, rastergis_module, zonalstats_module, imageregistration_module,vectorutils_module,imagefilter_module])
 
