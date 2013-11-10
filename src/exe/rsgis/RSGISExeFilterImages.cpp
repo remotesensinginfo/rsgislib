@@ -122,35 +122,43 @@ void RSGISExeFilterImages::retrieveParameters(xercesc::DOMElement *argElement) t
         if(xercesc::XMLString::equals(dtByte, dtXMLValue))
         {
             this->outDataType = GDT_Byte;
+            this->rsgisOutDataType = rsgis::rsgis_8int;
         }
         else if(xercesc::XMLString::equals(dtUInt16, dtXMLValue))
         {
             this->outDataType = GDT_UInt16;
+            this->rsgisOutDataType = rsgis::rsgis_16uint;
         }
         else if(xercesc::XMLString::equals(dtInt16, dtXMLValue))
         {
             this->outDataType = GDT_Int16;
+            this->rsgisOutDataType = rsgis::rsgis_16int;
         }
         else if(xercesc::XMLString::equals(dtUInt32, dtXMLValue))
         {
             this->outDataType = GDT_UInt32;
+            this->rsgisOutDataType = rsgis::rsgis_32uint;
         }
         else if(xercesc::XMLString::equals(dtInt32, dtXMLValue))
         {
             this->outDataType = GDT_Int32;
+            this->rsgisOutDataType = rsgis::rsgis_32int;
         }
         else if(xercesc::XMLString::equals(dtFloat32, dtXMLValue))
         {
             this->outDataType = GDT_Float32;
+            this->rsgisOutDataType = rsgis::rsgis_32float;
         }
         else if(xercesc::XMLString::equals(dtFloat64, dtXMLValue))
         {
             this->outDataType = GDT_Float64;
+            this->rsgisOutDataType = rsgis::rsgis_64float;
         }
         else
         {
             std::cerr << "Data type not recognised, defaulting to 32 bit float.";
             this->outDataType = GDT_Float32;
+            this->rsgisOutDataType = rsgis::rsgis_32float;
         }
 
         xercesc::XMLString::release(&dtByte);
@@ -215,7 +223,12 @@ void RSGISExeFilterImages::retrieveParameters(xercesc::DOMElement *argElement) t
 		XMLCh *filterTypeOptionX = xercesc::XMLString::transcode("x");
 		XMLCh *filterTypeOptionY = xercesc::XMLString::transcode("y");
 		XMLCh *filterTypeOptionXY = xercesc::XMLString::transcode("xy");
-
+                
+        this->filterParameters = new std::vector<rsgis::cmds::RSGISFilterParameters*>();
+        this->filterParameters->reserve(numFilters);
+        
+        rsgis::cmds::RSGISFilterParameters *filterPar = NULL;
+        
 		for(int i = 0; i < numFilters; i++)
 		{
 			filterElement = static_cast<xercesc::DOMElement*>(filterNodesList->item(i));
@@ -233,13 +246,17 @@ void RSGISExeFilterImages::retrieveParameters(xercesc::DOMElement *argElement) t
 				float angle = mathUtils.strtofloat(xercesc::XMLString::transcode(filterElement->getAttribute(xercesc::XMLString::transcode("angle"))));
 				float angleRadians = angle*(M_PI/180);
 
-				rsgis::filter::RSGISCalcGaussianSmoothFilter *calcGaussianSmoothFilter = new rsgis::filter::RSGISCalcGaussianSmoothFilter(stddevX, stddevY, angleRadians);
-				rsgis::filter::RSGISGenerateFilter *genFilter = new rsgis::filter::RSGISGenerateFilter(calcGaussianSmoothFilter);
-				rsgis::filter::ImageFilter *filterKernal = genFilter->generateFilter(size);
-				rsgis::filter::RSGISImageFilter *filter = new rsgis::filter::RSGISImageKernelFilter(0, size, fileEnding, filterKernal);
-				filterBank->addFilter(filter);
-				delete calcGaussianSmoothFilter;
-				delete genFilter;
+                filterPar = new rsgis::cmds::RSGISFilterParameters();
+                
+                filterPar->type = "GaussianSmooth";
+                filterPar->fileEnding = fileEnding;
+                filterPar->size = size;
+                filterPar->stddevX = stddevX;
+                filterPar->stddevY = stddevY;
+                filterPar->angle = angleRadians;
+                
+                this->filterParameters->push_back(filterPar);
+
 			}
 			else if(xercesc::XMLString::equals(filterTypeGuassian1st, filterType))
 			{
@@ -252,13 +269,16 @@ void RSGISExeFilterImages::retrieveParameters(xercesc::DOMElement *argElement) t
 				float angle = mathUtils.strtofloat(xercesc::XMLString::transcode(filterElement->getAttribute(xercesc::XMLString::transcode("angle"))));
 				float angleRadians = angle*(M_PI/180);
 
-				rsgis::filter::RSGISCalcGaussianFirstDerivativeFilter *calcGaussian1stDerivFilter = new rsgis::filter::RSGISCalcGaussianFirstDerivativeFilter(stddevX, stddevY, angleRadians);
-				rsgis::filter::RSGISGenerateFilter *genFilter = new rsgis::filter::RSGISGenerateFilter(calcGaussian1stDerivFilter);
-				rsgis::filter::ImageFilter *filterKernal = genFilter->generateFilter(size);
-				rsgis::filter::RSGISImageFilter *filter = new rsgis::filter::RSGISImageKernelFilter(0, size, fileEnding, filterKernal);
-				filterBank->addFilter(filter);
-				delete calcGaussian1stDerivFilter;
-				delete genFilter;
+                filterPar = new rsgis::cmds::RSGISFilterParameters();
+                
+                filterPar->type = "Gaussian1st";
+                filterPar->fileEnding = fileEnding;
+                filterPar->size = size;
+                filterPar->stddevX = stddevX;
+                filterPar->stddevY = stddevY;
+                filterPar->angle = angleRadians;
+                
+                this->filterParameters->push_back(filterPar);
 
 			}
 			else if(xercesc::XMLString::equals(filterTypeGuassian2nd, filterType))
@@ -271,14 +291,18 @@ void RSGISExeFilterImages::retrieveParameters(xercesc::DOMElement *argElement) t
 				float stddevY = mathUtils.strtofloat(xercesc::XMLString::transcode(filterElement->getAttribute(xercesc::XMLString::transcode("stddevY"))));
 				float angle = mathUtils.strtofloat(xercesc::XMLString::transcode(filterElement->getAttribute(xercesc::XMLString::transcode("angle"))));
 				float angleRadians = angle*(M_PI/180);
-
-				rsgis::filter::RSGISCalcGaussianSecondDerivativeFilter *calcGaussian2ndDerivFilter = new rsgis::filter::RSGISCalcGaussianSecondDerivativeFilter(stddevX, stddevY, angleRadians);
-				rsgis::filter::RSGISGenerateFilter *genFilter = new rsgis::filter::RSGISGenerateFilter(calcGaussian2ndDerivFilter);
-				rsgis::filter::ImageFilter *filterKernal = genFilter->generateFilter(size);
-				rsgis::filter::RSGISImageFilter *filter = new rsgis::filter::RSGISImageKernelFilter(0, size, fileEnding, filterKernal);
-				filterBank->addFilter(filter);
-				delete calcGaussian2ndDerivFilter;
-				delete genFilter;
+                
+                filterPar = new rsgis::cmds::RSGISFilterParameters();
+                
+                filterPar->type = "Gaussian2nd";
+                filterPar->fileEnding = fileEnding;
+                filterPar->size = size;
+                filterPar->stddevX = stddevX;
+                filterPar->stddevY = stddevY;
+                filterPar->angle = angleRadians;
+                
+                this->filterParameters->push_back(filterPar);
+                
 			}
 			else if(xercesc::XMLString::equals(filterTypeLaplacian, filterType))
 			{
@@ -287,14 +311,16 @@ void RSGISExeFilterImages::retrieveParameters(xercesc::DOMElement *argElement) t
 
 				int size = mathUtils.strtofloat(xercesc::XMLString::transcode(filterElement->getAttribute(xercesc::XMLString::transcode("size"))));
 				float stddev = mathUtils.strtofloat(xercesc::XMLString::transcode(filterElement->getAttribute(xercesc::XMLString::transcode("stddev"))));
+                
+                filterPar = new rsgis::cmds::RSGISFilterParameters();
+                
+                filterPar->type = "Laplacian";
+                filterPar->fileEnding = fileEnding;
+                filterPar->size = size;
+                filterPar->stddev = stddev;
+                
+                this->filterParameters->push_back(filterPar);
 
-				rsgis::filter::RSGISCalcLapacianFilter *calcLapacianFilter = new rsgis::filter::RSGISCalcLapacianFilter(stddev);
-				rsgis::filter::RSGISGenerateFilter *genFilter = new rsgis::filter::RSGISGenerateFilter(calcLapacianFilter);
-				rsgis::filter::ImageFilter *filterKernal = genFilter->generateFilter(size);
-				rsgis::filter::RSGISImageFilter *filter = new rsgis::filter::RSGISImageKernelFilter(0, size, fileEnding, filterKernal);
-				filterBank->addFilter(filter);
-				delete calcLapacianFilter;
-				delete genFilter;
 			}
 			else if(xercesc::XMLString::equals(filterTypeSobel, filterType))
 			{
@@ -615,28 +641,13 @@ void RSGISExeFilterImages::runAlgorithm() throw(rsgis::RSGISException)
     {
         if(option == RSGISExeFilterImages::filter)
         {
-            GDALAllRegister();
-            GDALDataset **dataset = NULL;
             try
             {
-                dataset = new GDALDataset*[1];
-                std::cout << this->inputImage << std::endl;
-                dataset[0] = (GDALDataset *) GDALOpenShared(this->inputImage.c_str(), GA_ReadOnly);
-                if(dataset[0] == NULL)
-                {
-                    std::string message = std::string("Could not open image ") + this->inputImage;
-                    throw rsgis::RSGISImageException(message.c_str());
-                }
-
-                filterBank->executeFilters(dataset, 1, this->outputImageBase, this->imageFormat, this->imageExt, this->outDataType);
-
-                GDALClose(dataset[0]);
-                delete[] dataset;
-                delete filterBank;
+                rsgis::cmds::executeFilter(this->inputImage, this->filterParameters, this->outputImageBase, this->imageFormat, this->imageExt, this->rsgisOutDataType);
             }
-            catch(rsgis::RSGISException e)
+            catch(rsgis::cmds::RSGISCmdException &e)
             {
-                throw e;
+                throw rsgis::RSGISException(e.what());
             }
         }
         else if(option == RSGISExeFilterImages::nldenoising)
