@@ -92,9 +92,136 @@ namespace rsgis{ namespace cmds {
                     delete calcLapacianFilter;
                     delete genFilter;
                 }
+                else if((*iterFilter)->type == "Sobel")
+                {
+                    
+                    rsgis::filter::RSGISImageFilter *filter = NULL;
+                    
+                    if((*iterFilter)->option == "x")
+                    {
+                        filter = new rsgis::filter::RSGISSobelFilter(0, 3, (*iterFilter)->fileEnding, rsgis::filter::RSGISSobelFilter::x);
+                    }
+                    else if((*iterFilter)->option == "y")
+                    {
+                        filter = new rsgis::filter::RSGISSobelFilter(0, 3, (*iterFilter)->fileEnding, rsgis::filter::RSGISSobelFilter::y);
+                    }
+                    else if ((*iterFilter)->option == "xy")
+                    {
+                        filter = new rsgis::filter::RSGISSobelFilter(0, 3, (*iterFilter)->fileEnding, rsgis::filter::RSGISSobelFilter::xy);
+                    }
+                    else
+                    {
+                        std::cerr << "Sobel type not recognised, skipping filter" << std::endl;
+                    }
+                    
+                    filterBank->addFilter(filter);
+                }
+                else if((*iterFilter)->type == "Prewitt")
+                {
+                    
+                    rsgis::filter::RSGISImageFilter *filter = NULL;
+                    
+                    if((*iterFilter)->option == "x")
+                    {
+                        filter = new rsgis::filter::RSGISPrewittFilter(0, 3, (*iterFilter)->fileEnding, rsgis::filter::RSGISPrewittFilter::x);
+                    }
+                    else if((*iterFilter)->option == "y")
+                    {
+                        filter = new rsgis::filter::RSGISPrewittFilter(0, 3, (*iterFilter)->fileEnding, rsgis::filter::RSGISPrewittFilter::y);
+                    }
+                    else if ((*iterFilter)->option == "xy")
+                    {
+                        filter = new rsgis::filter::RSGISPrewittFilter(0, 3, (*iterFilter)->fileEnding, rsgis::filter::RSGISPrewittFilter::xy);
+                    }
+                    else
+                    {
+                        std::cerr << "Prewitt type not recognised, skipping filter" << std::endl;
+                    }
+                    
+                    filterBank->addFilter(filter);
+                }
+                else if((*iterFilter)->type == "Mean")
+                {
+                    rsgis::filter::RSGISImageFilter *filter = new rsgis::filter::RSGISMeanFilter(0, (*iterFilter)->size, (*iterFilter)->fileEnding);
+                    filterBank->addFilter(filter);
+                }
+                else if((*iterFilter)->type == "Median")
+                {
+                    rsgis::filter::RSGISImageFilter *filter = new rsgis::filter::RSGISMedianFilter(0, (*iterFilter)->size, (*iterFilter)->fileEnding);
+                    filterBank->addFilter(filter);
+                }
+                else if((*iterFilter)->type == "Mode")
+                {
+                    rsgis::filter::RSGISImageFilter *filter = new rsgis::filter::RSGISModeFilter(0, (*iterFilter)->size, (*iterFilter)->fileEnding);
+                    filterBank->addFilter(filter);
+                }
+                else if((*iterFilter)->type == "Range")
+                {
+                    rsgis::filter::RSGISImageFilter *filter = new rsgis::filter::RSGISRangeFilter(0, (*iterFilter)->size, (*iterFilter)->fileEnding);
+                    filterBank->addFilter(filter);
+                }
+                else if((*iterFilter)->type == "StdDev")
+                {
+                    rsgis::filter::RSGISImageFilter *filter = new rsgis::filter::RSGISStdDevFilter(0, (*iterFilter)->size, (*iterFilter)->fileEnding);
+                    filterBank->addFilter(filter);
+                }
+                else if((*iterFilter)->type == "CoeffOfVar")
+                {
+                    rsgis::filter::RSGISImageFilter *filter = new rsgis::filter::RSGISCoeffOfVarFilter(0, (*iterFilter)->size, (*iterFilter)->fileEnding);
+                    filterBank->addFilter(filter);
+                }
+                else if((*iterFilter)->type == "Min")
+                {
+                    rsgis::filter::RSGISImageFilter *filter = new rsgis::filter::RSGISMinFilter(0, (*iterFilter)->size, (*iterFilter)->fileEnding);
+                    filterBank->addFilter(filter);
+                }
+                else if((*iterFilter)->type == "Max")
+                {
+                    rsgis::filter::RSGISImageFilter *filter = new rsgis::filter::RSGISMaxFilter(0, (*iterFilter)->size, (*iterFilter)->fileEnding);
+                    filterBank->addFilter(filter);
+                }
+                else if((*iterFilter)->type == "Total")
+                {
+                    rsgis::filter::RSGISImageFilter *filter = new rsgis::filter::RSGISTotalFilter(0, (*iterFilter)->size, (*iterFilter)->fileEnding);
+                    filterBank->addFilter(filter);
+                }
+                else if((*iterFilter)->type == "Kuwahara")
+                {
+                    rsgis::filter::RSGISImageFilter *filter = new rsgis::filter::RSGISKuwaharaFilter(0, (*iterFilter)->size, (*iterFilter)->fileEnding);
+                    filterBank->addFilter(filter);
+                }
+                else if((*iterFilter)->type == "Lee")
+                {
+                    rsgis::filter::RSGISImageFilter *filter = new rsgis::filter::RSGISLeeFilter(0, (*iterFilter)->size, (*iterFilter)->fileEnding, (*iterFilter)->nLooks);
+                    filterBank->addFilter(filter);
+                }
+                else if( ((*iterFilter)->type == "NormVar") | ((*iterFilter)->type == "NormVarPower") )
+                {
+                    rsgis::filter::RSGISImageFilter *filter = new rsgis::filter::RSGISNormVarPowerFilter(0, (*iterFilter)->size, (*iterFilter)->fileEnding);
+                    filterBank->addFilter(filter);
+                }
+                else if( ((*iterFilter)->type == "NormVarSqrt") | ((*iterFilter)->type == "NormVarAmplitude") )
+                {
+                    rsgis::filter::RSGISImageFilter *filter = new rsgis::filter::RSGISNormVarAmplitudeFilter(0, (*iterFilter)->size, (*iterFilter)->fileEnding);
+                    filterBank->addFilter(filter);
+                }
+                else if( ((*iterFilter)->type == "NormVarLn") | ((*iterFilter)->type == "NormVarLnPower") )
+                {
+                    rsgis::filter::RSGISImageFilter *filter = new rsgis::filter::RSGISNormVarLnPowerFilter(0, (*iterFilter)->size, (*iterFilter)->fileEnding);
+                    filterBank->addFilter(filter);
+                }
+                else if((*iterFilter)->type == "NormLn")
+                {
+                    rsgis::filter::RSGISImageFilter *filter = new rsgis::filter::RSGISNormLnFilter(0, (*iterFilter)->size, (*iterFilter)->fileEnding);
+                    filterBank->addFilter(filter);
+                }
+                else if((*iterFilter)->type == "TextureVar")
+                {
+                    rsgis::filter::RSGISImageFilter *filter = new rsgis::filter::RSGISTextureVar(0, (*iterFilter)->size, (*iterFilter)->fileEnding);
+                    filterBank->addFilter(filter);
+                }
+                else{std::cerr << "Filter not recognised - skipping" << std::endl;}
 
-                    
-                    
             }
             
             GDALAllRegister();
