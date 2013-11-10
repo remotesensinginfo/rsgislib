@@ -33,6 +33,8 @@
 
 #include "math/RSGISMathsUtils.h"
 
+#include "cmds/RSGISCmdFilterImages.h"
+
 #include "filtering/RSGISFilterBank.h"
 #include "filtering/RSGISImageFilter.h"
 #include "filtering/RSGISCalcImageFilters.h"
@@ -78,9 +80,11 @@ class RSGISExeFilterImages : public rsgis::RSGISAlgorithmParameters
 		std::string inputImage;
 		std::string outputImageBase;
 		rsgis::filter::RSGISFilterBank *filterBank;
+        std::vector<rsgis::cmds::RSGISFilterParameters*> *filterParameters;
         std::string imageFormat;
         std::string imageExt;
         GDALDataType outDataType;
+        rsgis::RSGISLibDataType rsgisOutDataType;
         double aPar;
         double hPar;
 	};
