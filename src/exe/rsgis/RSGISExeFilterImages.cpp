@@ -326,57 +326,62 @@ void RSGISExeFilterImages::retrieveParameters(xercesc::DOMElement *argElement) t
 			{
 				const XMLCh *fileEndingStr = filterElement->getAttribute(xercesc::XMLString::transcode("fileending"));
 				std::string fileEnding = xercesc::XMLString::transcode(fileEndingStr);
-
-				const XMLCh *sobelFilterOption = filterElement->getAttribute(xercesc::XMLString::transcode("option"));
-
-				rsgis::filter::RSGISImageFilter *filter = NULL;
+                
+                filterPar = new rsgis::cmds::RSGISFilterParameters();
+                filterPar->type = "Sobel";
+                filterPar->fileEnding = fileEnding;
+                
+                const XMLCh *sobelFilterOption = filterElement->getAttribute(xercesc::XMLString::transcode("option"));
 
 				if(xercesc::XMLString::equals(filterTypeOptionX, sobelFilterOption))
 				{
-					filter = new rsgis::filter::RSGISSobelFilter(0, 3, fileEnding, rsgis::filter::RSGISSobelFilter::x);
+					filterPar->option = "x";
 				}
 				else if(xercesc::XMLString::equals(filterTypeOptionY, sobelFilterOption))
 				{
-					filter = new rsgis::filter::RSGISSobelFilter(0, 3, fileEnding, rsgis::filter::RSGISSobelFilter::y);
+					filterPar->option = "y";
 				}
 				else if(xercesc::XMLString::equals(filterTypeOptionXY, sobelFilterOption))
 				{
-					filter = new rsgis::filter::RSGISSobelFilter(0, 3, fileEnding, rsgis::filter::RSGISSobelFilter::xy);
+					filterPar->option = "xy";
 				}
 				else
 				{
 					throw rsgis::RSGISXMLArgumentsException("Sobel type not recognised");
 				}
 
-				filterBank->addFilter(filter);
+                this->filterParameters->push_back(filterPar);
 			}
 			else if(xercesc::XMLString::equals(filterTypePrewitt, filterType))
 			{
 				const XMLCh *fileEndingStr = filterElement->getAttribute(xercesc::XMLString::transcode("fileending"));
 				std::string fileEnding = xercesc::XMLString::transcode(fileEndingStr);
-
-				const XMLCh *prewittFilterOption = filterElement->getAttribute(xercesc::XMLString::transcode("option"));
-
-				rsgis::filter::RSGISImageFilter *filter = NULL;
-
+                
+                filterPar = new rsgis::cmds::RSGISFilterParameters();
+                filterPar->type = "Prewitt";
+                filterPar->fileEnding = fileEnding;
+                
+                const XMLCh *prewittFilterOption = filterElement->getAttribute(xercesc::XMLString::transcode("option"));
+                
 				if(xercesc::XMLString::equals(filterTypeOptionX, prewittFilterOption))
 				{
-					filter = new rsgis::filter::RSGISPrewittFilter(0, 3, fileEnding, rsgis::filter::RSGISPrewittFilter::x);
+					filterPar->option = "x";
 				}
 				else if(xercesc::XMLString::equals(filterTypeOptionY, prewittFilterOption))
 				{
-					filter = new rsgis::filter::RSGISPrewittFilter(0, 3, fileEnding, rsgis::filter::RSGISPrewittFilter::y);
+					filterPar->option = "y";
 				}
 				else if(xercesc::XMLString::equals(filterTypeOptionXY, prewittFilterOption))
 				{
-					filter = new rsgis::filter::RSGISPrewittFilter(0, 3, fileEnding, rsgis::filter::RSGISPrewittFilter::xy);
+					filterPar->option = "xy";
 				}
 				else
 				{
-					throw rsgis::RSGISXMLArgumentsException("Sobel type not recognised");
+					throw rsgis::RSGISXMLArgumentsException("Prewitt type not recognised");
 				}
+                
+                this->filterParameters->push_back(filterPar);
 
-				filterBank->addFilter(filter);
 			}
 			else if(xercesc::XMLString::equals(filterTypeMean, filterType))
 			{
@@ -385,18 +390,30 @@ void RSGISExeFilterImages::retrieveParameters(xercesc::DOMElement *argElement) t
 
 				int size = mathUtils.strtofloat(xercesc::XMLString::transcode(filterElement->getAttribute(xercesc::XMLString::transcode("size"))));
 
-				rsgis::filter::RSGISImageFilter *filter = new rsgis::filter::RSGISMeanFilter(0, size, fileEnding);
-				filterBank->addFilter(filter);
+                filterPar = new rsgis::cmds::RSGISFilterParameters();
+                
+                filterPar->type = "Mean";
+                filterPar->fileEnding = fileEnding;
+                filterPar->size = size;
+                
+                this->filterParameters->push_back(filterPar);
+                
 			}
 			else if(xercesc::XMLString::equals(filterTypeMedian, filterType))
 			{
 				const XMLCh *fileEndingStr = filterElement->getAttribute(xercesc::XMLString::transcode("fileending"));
 				std::string fileEnding = xercesc::XMLString::transcode(fileEndingStr);
+                
+                int size = mathUtils.strtofloat(xercesc::XMLString::transcode(filterElement->getAttribute(xercesc::XMLString::transcode("size"))));
+                
+                filterPar = new rsgis::cmds::RSGISFilterParameters();
+                
+                filterPar->type = "Median";
+                filterPar->fileEnding = fileEnding;
+                filterPar->size = size;
+                
+                this->filterParameters->push_back(filterPar);
 
-				int size = mathUtils.strtofloat(xercesc::XMLString::transcode(filterElement->getAttribute(xercesc::XMLString::transcode("size"))));
-
-				rsgis::filter::RSGISImageFilter *filter = new rsgis::filter::RSGISMedianFilter(0, size, fileEnding);
-				filterBank->addFilter(filter);
 			}
 			else if(xercesc::XMLString::equals(filterTypeMode, filterType))
 			{
@@ -405,8 +422,14 @@ void RSGISExeFilterImages::retrieveParameters(xercesc::DOMElement *argElement) t
 
 				int size = mathUtils.strtofloat(xercesc::XMLString::transcode(filterElement->getAttribute(xercesc::XMLString::transcode("size"))));
 
-				rsgis::filter::RSGISImageFilter *filter = new rsgis::filter::RSGISModeFilter(0, size, fileEnding);
-				filterBank->addFilter(filter);
+                filterPar = new rsgis::cmds::RSGISFilterParameters();
+                
+                filterPar->type = "Mode";
+                filterPar->fileEnding = fileEnding;
+                filterPar->size = size;
+                
+                this->filterParameters->push_back(filterPar);
+                
 			}
 			else if(xercesc::XMLString::equals(filterTypeRange, filterType))
 			{
@@ -415,8 +438,13 @@ void RSGISExeFilterImages::retrieveParameters(xercesc::DOMElement *argElement) t
 
 				int size = mathUtils.strtofloat(xercesc::XMLString::transcode(filterElement->getAttribute(xercesc::XMLString::transcode("size"))));
 
-				rsgis::filter::RSGISImageFilter *filter = new rsgis::filter::RSGISRangeFilter(0, size, fileEnding);
-				filterBank->addFilter(filter);
+                filterPar = new rsgis::cmds::RSGISFilterParameters();
+                
+                filterPar->type = "Range";
+                filterPar->fileEnding = fileEnding;
+                filterPar->size = size;
+                
+                this->filterParameters->push_back(filterPar);
 
 			}
 			else if(xercesc::XMLString::equals(filterTypeStdDev, filterType))
@@ -426,8 +454,13 @@ void RSGISExeFilterImages::retrieveParameters(xercesc::DOMElement *argElement) t
 
 				int size = mathUtils.strtofloat(xercesc::XMLString::transcode(filterElement->getAttribute(xercesc::XMLString::transcode("size"))));
 
-				rsgis::filter::RSGISImageFilter *filter = new rsgis::filter::RSGISStdDevFilter(0, size, fileEnding);
-				filterBank->addFilter(filter);
+                filterPar = new rsgis::cmds::RSGISFilterParameters();
+                
+                filterPar->type = "StdDev";
+                filterPar->fileEnding = fileEnding;
+                filterPar->size = size;
+                
+                this->filterParameters->push_back(filterPar);
 
 			}
             else if(xercesc::XMLString::equals(filterTypeCoeffOfVar, filterType))
@@ -437,8 +470,14 @@ void RSGISExeFilterImages::retrieveParameters(xercesc::DOMElement *argElement) t
 
 				int size = mathUtils.strtofloat(xercesc::XMLString::transcode(filterElement->getAttribute(xercesc::XMLString::transcode("size"))));
 
-				rsgis::filter::RSGISImageFilter *filter = new rsgis::filter::RSGISCoeffOfVarFilter(0, size, fileEnding);
-				filterBank->addFilter(filter);
+                filterPar = new rsgis::cmds::RSGISFilterParameters();
+                
+                filterPar->type = "CoeffOfVar";
+                filterPar->fileEnding = fileEnding;
+                filterPar->size = size;
+                
+                this->filterParameters->push_back(filterPar);
+                
 			}
 			else if(xercesc::XMLString::equals(filterTypeMin, filterType))
 			{
@@ -447,8 +486,13 @@ void RSGISExeFilterImages::retrieveParameters(xercesc::DOMElement *argElement) t
 
 				int size = mathUtils.strtofloat(xercesc::XMLString::transcode(filterElement->getAttribute(xercesc::XMLString::transcode("size"))));
 
-				rsgis::filter::RSGISImageFilter *filter = new rsgis::filter::RSGISMinFilter(0, size, fileEnding);
-				filterBank->addFilter(filter);
+                filterPar = new rsgis::cmds::RSGISFilterParameters();
+                
+                filterPar->type = "Min";
+                filterPar->fileEnding = fileEnding;
+                filterPar->size = size;
+                
+                this->filterParameters->push_back(filterPar);
 
 			}
 			else if(xercesc::XMLString::equals(filterTypeMax, filterType))
@@ -458,8 +502,13 @@ void RSGISExeFilterImages::retrieveParameters(xercesc::DOMElement *argElement) t
 
 				int size = mathUtils.strtofloat(xercesc::XMLString::transcode(filterElement->getAttribute(xercesc::XMLString::transcode("size"))));
 
-				rsgis::filter::RSGISImageFilter *filter = new rsgis::filter::RSGISMaxFilter(0, size, fileEnding);
-				filterBank->addFilter(filter);
+                filterPar = new rsgis::cmds::RSGISFilterParameters();
+                
+                filterPar->type = "Max";
+                filterPar->fileEnding = fileEnding;
+                filterPar->size = size;
+                
+                this->filterParameters->push_back(filterPar);
 
 			}
 			else if(xercesc::XMLString::equals(filterTypeTotal, filterType))
@@ -469,8 +518,13 @@ void RSGISExeFilterImages::retrieveParameters(xercesc::DOMElement *argElement) t
 
 				int size = mathUtils.strtofloat(xercesc::XMLString::transcode(filterElement->getAttribute(xercesc::XMLString::transcode("size"))));
 
-				rsgis::filter::RSGISImageFilter *filter = new rsgis::filter::RSGISTotalFilter(0, size, fileEnding);
-				filterBank->addFilter(filter);
+                filterPar = new rsgis::cmds::RSGISFilterParameters();
+                
+                filterPar->type = "Total";
+                filterPar->fileEnding = fileEnding;
+                filterPar->size = size;
+                
+                this->filterParameters->push_back(filterPar);
 
 			}
 			else if(xercesc::XMLString::equals(filterTypeKuwahara, filterType))
@@ -480,8 +534,14 @@ void RSGISExeFilterImages::retrieveParameters(xercesc::DOMElement *argElement) t
 
 				int size = mathUtils.strtofloat(xercesc::XMLString::transcode(filterElement->getAttribute(xercesc::XMLString::transcode("size"))));
 
-				rsgis::filter::RSGISImageFilter *filter = new rsgis::filter::RSGISKuwaharaFilter(0, size, fileEnding);
-				filterBank->addFilter(filter);
+                filterPar = new rsgis::cmds::RSGISFilterParameters();
+                
+                filterPar->type = "Kuwahara";
+                filterPar->fileEnding = fileEnding;
+                filterPar->size = size;
+                
+                this->filterParameters->push_back(filterPar);
+                
 			}
             else if(xercesc::XMLString::equals(filterTypeLee, filterType))
 			{
@@ -491,7 +551,7 @@ void RSGISExeFilterImages::retrieveParameters(xercesc::DOMElement *argElement) t
 				int size = mathUtils.strtofloat(xercesc::XMLString::transcode(filterElement->getAttribute(xercesc::XMLString::transcode("size"))));
 
                 unsigned int nLooks = size; // Set number of looks to window size
-
+                
                 XMLCh *nLooksXMLStr = xercesc::XMLString::transcode("nLooks");
                 if(argElement->hasAttribute(nLooksXMLStr))
                 {
@@ -504,9 +564,15 @@ void RSGISExeFilterImages::retrieveParameters(xercesc::DOMElement *argElement) t
                     nLooks = size;
                 }
                 xercesc::XMLString::release(&nLooksXMLStr);
+                
+                filterPar = new rsgis::cmds::RSGISFilterParameters();
+                
+                filterPar->type = "Lee";
+                filterPar->fileEnding = fileEnding;
+                filterPar->size = size;
+                
+                this->filterParameters->push_back(filterPar);
 
-				rsgis::filter::RSGISImageFilter *filter = new rsgis::filter::RSGISLeeFilter(0, size, fileEnding, nLooks);
-				filterBank->addFilter(filter);
 			}
             // Normalised variance of DN (Power for SAR image)
             else if((xercesc::XMLString::equals(filterTypeNormVar, filterType)) | (xercesc::XMLString::equals(filterTypeNormVarPow, filterType)))
@@ -516,8 +582,14 @@ void RSGISExeFilterImages::retrieveParameters(xercesc::DOMElement *argElement) t
 
                 int size = mathUtils.strtofloat(xercesc::XMLString::transcode(filterElement->getAttribute(xercesc::XMLString::transcode("size"))));
 
-				rsgis::filter::RSGISImageFilter *filter = new rsgis::filter::RSGISNormVarPowerFilter(0, size, fileEnding);
-				filterBank->addFilter(filter);
+                filterPar = new rsgis::cmds::RSGISFilterParameters();
+                
+                filterPar->type = "NormVar";
+                filterPar->fileEnding = fileEnding;
+                filterPar->size = size;
+                
+                this->filterParameters->push_back(filterPar);
+
 			}
             // Normalised variance of Sqrt DN (Amplitude for SAR image)
             else if((xercesc::XMLString::equals(filterTypeNormVarSqrt, filterType)) | (xercesc::XMLString::equals(filterTypeNormVarAmp, filterType)))
@@ -526,9 +598,15 @@ void RSGISExeFilterImages::retrieveParameters(xercesc::DOMElement *argElement) t
 				std::string fileEnding = xercesc::XMLString::transcode(fileEndingStr);
 
                 int size = mathUtils.strtofloat(xercesc::XMLString::transcode(filterElement->getAttribute(xercesc::XMLString::transcode("size"))));
-
-				rsgis::filter::RSGISImageFilter *filter = new rsgis::filter::RSGISNormVarAmplitudeFilter(0, size, fileEnding);
-				filterBank->addFilter(filter);
+                
+                filterPar = new rsgis::cmds::RSGISFilterParameters();
+                
+                filterPar->type = "NormVarSqrt";
+                filterPar->fileEnding = fileEnding;
+                filterPar->size = size;
+                
+                this->filterParameters->push_back(filterPar);
+                
 			}
             // Normalised variance of ln DN (Natural log Power for SAR image)
             else if((xercesc::XMLString::equals(filterTypeNormVarLn, filterType)) | (xercesc::XMLString::equals(filterTypeNormVarLnPow, filterType)))
@@ -538,8 +616,14 @@ void RSGISExeFilterImages::retrieveParameters(xercesc::DOMElement *argElement) t
 
                 int size = mathUtils.strtofloat(xercesc::XMLString::transcode(filterElement->getAttribute(xercesc::XMLString::transcode("size"))));
 
-				rsgis::filter::RSGISImageFilter *filter = new rsgis::filter::RSGISNormVarLnPowerFilter(0, size, fileEnding);
-				filterBank->addFilter(filter);
+                filterPar = new rsgis::cmds::RSGISFilterParameters();
+                
+                filterPar->type = "NormVarLn";
+                filterPar->fileEnding = fileEnding;
+                filterPar->size = size;
+                
+                this->filterParameters->push_back(filterPar);
+                
 			}
             // Normalised natural log
             else if(xercesc::XMLString::equals(filterTypeNormLn, filterType))
@@ -548,9 +632,15 @@ void RSGISExeFilterImages::retrieveParameters(xercesc::DOMElement *argElement) t
 				std::string fileEnding = xercesc::XMLString::transcode(fileEndingStr);
 
                 int size = mathUtils.strtofloat(xercesc::XMLString::transcode(filterElement->getAttribute(xercesc::XMLString::transcode("size"))));
-
-				rsgis::filter::RSGISImageFilter *filter = new rsgis::filter::RSGISNormLnFilter(0, size, fileEnding);
-				filterBank->addFilter(filter);
+                
+                filterPar = new rsgis::cmds::RSGISFilterParameters();
+                
+                filterPar->type = "NormLn";
+                filterPar->fileEnding = fileEnding;
+                filterPar->size = size;
+                
+                this->filterParameters->push_back(filterPar);
+                
 			}
             // Texture variance (eq. 21.89b in Ulaby et. al, Microwave Remove Sensing - Vol III)
             else if(xercesc::XMLString::equals(filterTypeTextureVar, filterType))
@@ -560,8 +650,14 @@ void RSGISExeFilterImages::retrieveParameters(xercesc::DOMElement *argElement) t
 
                 int size = mathUtils.strtofloat(xercesc::XMLString::transcode(filterElement->getAttribute(xercesc::XMLString::transcode("size"))));
 
-				rsgis::filter::RSGISImageFilter *filter = new rsgis::filter::RSGISTextureVar(0, size, fileEnding);
-				filterBank->addFilter(filter);
+                filterPar = new rsgis::cmds::RSGISFilterParameters();
+                
+                filterPar->type = "TextureVar";
+                filterPar->fileEnding = fileEnding;
+                filterPar->size = size;
+                
+                this->filterParameters->push_back(filterPar);
+                
 			}
 			else if(xercesc::XMLString::equals(filterTypeHarlick, filterType))
 			{
