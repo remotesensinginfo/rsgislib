@@ -198,6 +198,38 @@ static PyObject *ImageFilter_Filter(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
+static PyObject *ImageFilter_LeungMalikFilterBank(PyObject *self, PyObject *args)
+{
+    const char *pszInputImage, *pszOutputImageBase;
+    const char *pszImageFormat = "KEA";
+    const char *pszImageExt = "kea";
+    int dataType = 9; // Default to 32 bit float
+    if( !PyArg_ParseTuple(args, "ss|ssi:LeungMalikFilterBank", &pszInputImage, &pszOutputImageBase, &pszImageFormat, &pszImageExt, &dataType))
+        return NULL;
+
+    try
+    {
+        // Set up filter Band
+        std::vector<rsgis::cmds::RSGISFilterParameters*> *filterParameters = NULL;
+        
+        filterParameters = rsgis::cmds::createLeungMalikFilterBank();
+        
+        std::cout << "Added 48 filters for Leung-Malik Filter Bank " << std::endl;
+        
+        // Excecute
+        rsgis::RSGISLibDataType type = (rsgis::RSGISLibDataType) dataType;
+        rsgis::cmds::executeFilter(pszInputImage, filterParameters, pszOutputImageBase, pszImageFormat, pszImageExt, type);
+
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+
+    Py_RETURN_NONE;
+}
+
 // Our list of functions in this module
 static PyMethodDef ImageFilterMethods[] = {
     {"applyfilters", ImageFilter_Filter, METH_VARARGS, 
@@ -246,6 +278,28 @@ static PyMethodDef ImageFilterMethods[] = {
 "   # Apply filters\n"
 "   imagefilter.applyfilters(inputImage, outputImageBase, filters, gdalFormat, outExt, dataType)\n"
 "\n"},
+
+    {"LeungMalikFilterBank", ImageFilter_LeungMalikFilterBank, METH_VARARGS, 
+"imagefilter.(inputimage, outputImageBase, gdalFormat, outExt, dataType)\n"
+"Implements the Leung-Malik filter bank described in:\n"
+"Leung, T., Malik, J., 2001. Representing and recognizing the visual appearance of materials using three-dimensional textons.\n"
+"International Journal of Computer Vision 43 (1), 29-44.\n"
+"Where:\n"
+"\n"
+"* inputimage is a string containing the name of the input image\n"
+"* outputImageBase is a string containing the base name of the output images\n"
+"* gdalFormat is a string containing the GDAL format for the output file - eg 'KEA'\n"
+"* dataType is an int containing one of the values from rsgislib.TYPE_*\n"
+"Example::\n"
+"\n"
+"   inputImage = './Rasters/injune_p142_casi_sub_utm_single_band.vrt'\n"
+"   outputImageBase = './TestOutputs/injune_p142_casi_sub_utm_single_band'\n"
+"   gdalFormat = 'KEA'\n"
+"   outExt = 'kea'\n"
+"   dataType = rsgislib.TYPE_32FLOAT\n"
+"   imagefilter.LeungMalikFilterBank(inputImage, outputImageBase, gdalFormat, outExt, dataType)\n"
+"\n"},
+
     {NULL}        /* Sentinel */
 };
 

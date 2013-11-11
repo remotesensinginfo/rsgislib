@@ -668,6 +668,14 @@ class RSGISTests:
             filters.append(imagefilter.FilterParameters(filterType = 'TextureVar', fileEnding = 'texturevar', size=3) )
 
         imagefilter.applyfilters(inputImage, outputImageBase, filters, gdalFormat, outExt, dataType)
+    
+    def testLeungMalikFilterBank(self):
+        inputImage = './Rasters/injune_p142_casi_sub_utm_single_band.vrt'
+        outputImageBase = './TestOutputs/injune_p142_casi_sub_utm_single_band'
+        gdalFormat = 'KEA'
+        outExt = 'kea'
+        dataType = rsgislib.TYPE_32FLOAT
+        imagefilter.LeungMalikFilterBank(inputImage, outputImageBase, gdalFormat, outExt, dataType)
 
 if __name__ == '__main__':
 
@@ -781,6 +789,7 @@ if __name__ == '__main__':
     if testLibraries == 'all' or testLibraries == 'imagefilter':
         """ Image filter functions """ 
         t.tryFuncAndCatch(t.testFilter)
+        #t.testLeungMalikFilterBank() # Skip as it takes a while
     
     print("%s TESTS COMPLETED - %s FAILURES LISTED BELOW:"%(t.numTests, len(t.failures)))
     if(len(t.failures)):
