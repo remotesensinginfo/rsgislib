@@ -252,5 +252,272 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
+                    
+                    
+    std::vector<rsgis::cmds::RSGISFilterParameters*> *createLeungMalikFilterBank() throw(RSGISCmdException)
+    {
+        try
+        {
+            float stddev = 0;
+            float stddevX = 0;
+            float stddevY = 0;
+            float angle = 0;
+            int size = 51;
+            std::string fileEnding = "";
+            std::string angleStr = "";
+
+            std::vector<rsgis::cmds::RSGISFilterParameters*> *filterParameters = new std::vector<rsgis::cmds::RSGISFilterParameters*>();
+            filterParameters->reserve(48);
+            
+            rsgis::cmds::RSGISFilterParameters *filterPar = NULL;
+            
+
+            // GENERATE LAPACIAN FILTERS
+            for(int i = 0; i < 8; i++)
+            {
+                if(i == 0)
+                {
+                    stddev = 1;
+                    fileEnding = "lap_1";
+                }
+                else if(i == 1)
+                {
+                    stddev = sqrt(2.0);
+                    fileEnding = "lap_sqrt2";
+                }
+                else if(i == 2)
+                {
+                    stddev = 2;
+                    fileEnding = "lap_2";
+                }
+                else if(i == 3)
+                {
+                    stddev = 2*sqrt(2.0);
+                    fileEnding = "lap_2sqrt2";
+                }
+                else if(i == 4)
+                {
+                    stddev = 3;
+                    fileEnding = "lap_3";
+                }
+                else if(i == 5)
+                {
+                    stddev = 3*sqrt(2.0);
+                    fileEnding = "lap_3sqrt2";
+                }
+                else if(i == 6)
+                {
+                    stddev = 6;
+                    fileEnding = "lap_6";
+                }
+                else if(i == 7)
+                {
+                    stddev = 6*sqrt(2.0);
+                    fileEnding = "lap_6sqrt2";
+                }
+                
+                filterPar = new rsgis::cmds::RSGISFilterParameters();
+                
+                filterPar->type = "Laplacian";
+                filterPar->fileEnding = fileEnding;
+                filterPar->size = size;
+                filterPar->stddev = stddev;
+                
+                filterParameters->push_back(filterPar);
+            }
+            
+            
+            // Gaussian Smoothing Filters
+            angle = 0;
+            for(int i = 0; i < 4; i++)
+            {
+                if(i == 0)
+                {
+                    stddevX = 1;
+                    stddevY = 1;
+                    fileEnding = "gausmooth1";
+                }
+                else if(i == 1)
+                {
+                    stddevX = sqrt(2.0);
+                    stddevY = sqrt(2.0);
+                    fileEnding = "gausmoothsqrt2";
+                }
+                else if(i == 2)
+                {
+                    stddevX = 2;
+                    stddevY = 2;
+                    fileEnding = "gausmooth2";
+                }
+                else if(i == 3)
+                {
+                    stddevX = 2*sqrt(2.0);
+                    stddevY = 2*sqrt(2.0);
+                    fileEnding = "gausmooth2sqrt2";
+                }
+                
+                filterPar = new rsgis::cmds::RSGISFilterParameters();
+                
+                filterPar->type = "GaussianSmooth";
+                filterPar->fileEnding = fileEnding;
+                filterPar->size = size;
+                filterPar->stddevX = stddevX;
+                filterPar->stddevY = stddevY;
+                filterPar->angle = angle;
+                
+                filterParameters->push_back(filterPar);
+            }
+            
+            //Gaussain First Filters
+            for(int i = 0; i < 6; i++)
+            {
+                if(i == 0)
+                {
+                    angle = 0;
+                    angleStr = "0";
+                }
+                else if(i == 1)
+                {
+                    angle = 30 * (M_PI/180);
+                    angleStr = "30";
+                }
+                else if(i == 2)
+                {
+                    angle = 60 * (M_PI/180);
+                    angleStr = "60";
+                }
+                else if(i == 3)
+                {
+                    angle = 90 * (M_PI/180);
+                    angleStr = "90";
+                }
+                else if(i == 4)
+                {
+                    angle = 120 * (M_PI/180);
+                    angleStr = "120";
+                }
+                else if(i == 5)
+                {
+                    angle = 150 * (M_PI/180);
+                    angleStr = "150";
+                }
+                
+                for(int j = 0; j < 3; j++)
+                {
+                    if(j == 0)
+                    {
+                        stddevX = 3;
+                        stddevY = 1;
+                        fileEnding = "gau1st_3_1_" + angleStr;
+                    }
+                    else if(j == 1)
+                    {
+                        stddevX = 3*sqrt(2.0);
+                        stddevY = sqrt(2.0);
+                        fileEnding = "gau1st_3sqrt1_sqrt2_" + angleStr;
+                    }
+                    else if(j == 2)
+                    {
+                        stddevX = 6;
+                        stddevY = 2;
+                        fileEnding = "gau1st_6_2_" + angleStr;
+                    }
+                    
+                    filterPar = new rsgis::cmds::RSGISFilterParameters();
+                    
+                    filterPar->type = "Gaussian1st";
+                    filterPar->fileEnding = fileEnding;
+                    filterPar->size = size;
+                    filterPar->stddevX = stddevX;
+                    filterPar->stddevY = stddevY;
+                    filterPar->angle = angle;
+                    
+                    filterParameters->push_back(filterPar);
+			
+                }
+            }
+            
+            //Gaussain Second Filters
+            for(int i = 0; i < 6; i++)
+            {
+                if(i == 0)
+                {
+                    angle = 0;
+                    angleStr = "0";
+                }
+                else if(i == 1)
+                {
+                    angle = 30 * (M_PI/180);
+                    angleStr = "30";
+                }
+                else if(i == 2)
+                {
+                    angle = 60 * (M_PI/180);
+                    angleStr = "60";
+                }
+                else if(i == 3)
+                {
+                    angle = 90 * (M_PI/180);
+                    angleStr = "90";
+                }
+                else if(i == 4)
+                {
+                    angle = 120 * (M_PI/180);
+                    angleStr = "120";
+                }
+                else if(i == 5)
+                {
+                    angle = 150 * (M_PI/180);
+                    angleStr = "150";
+                }
+                
+                
+                for(int j = 0; j < 3; j++)
+                {
+                    if(j == 0)
+                    {
+                        stddevX = 3;
+                        stddevY = 1;
+                        fileEnding = "gau2nd_3_1_" + angleStr;
+                    }
+                    else if(j == 1)
+                    {
+                        stddevX = 3*sqrt(2.0);
+                        stddevY = sqrt(2.0);
+                        fileEnding = "gau2nd_3sqrt1_sqrt2_" + angleStr;
+                    }
+                    else if(j == 2)
+                    {
+                        stddevX = 6;
+                        stddevY = 2;
+                        fileEnding = "gau2nd_6_2_" + angleStr;
+                    }
+                    
+                    filterPar = new rsgis::cmds::RSGISFilterParameters();
+                    
+                    filterPar->type = "Gaussian2nd";
+                    filterPar->fileEnding = fileEnding;
+                    filterPar->size = size;
+                    filterPar->stddevX = stddevX;
+                    filterPar->stddevY = stddevY;
+                    filterPar->angle = angle;
+                    
+                    filterParameters->push_back(filterPar);
+		
+                }
+            }
+            
+            return filterParameters;
+            
+        }
+        catch(rsgis::RSGISException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(std::exception &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
     
 }}

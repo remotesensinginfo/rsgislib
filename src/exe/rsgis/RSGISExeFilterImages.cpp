@@ -171,9 +171,6 @@ void RSGISExeFilterImages::retrieveParameters(xercesc::DOMElement *argElement) t
 	}
 	xercesc::XMLString::release(&datatypeXMLStr);
 
-
-	this->filterBank = new rsgis::filter::RSGISFilterBank();
-
 	if(argElement->hasAttribute(xercesc::XMLString::transcode("filterbank")))
 	{
 		const XMLCh *filterBankXMLStr = argElement->getAttribute(xercesc::XMLString::transcode("filterbank"));
@@ -182,7 +179,7 @@ void RSGISExeFilterImages::retrieveParameters(xercesc::DOMElement *argElement) t
 		const XMLCh *filterBankLM = xercesc::XMLString::transcode("LM");
 		if(xercesc::XMLString::equals(filterBankXMLStr, filterBankLM))
 		{
-			this->filterBank->createLeungMalikFilterBank();
+			this->filterParameters = rsgis::cmds::createLeungMalikFilterBank();
 		}
 		std::cout << "Created filter banks\n";
 	}
