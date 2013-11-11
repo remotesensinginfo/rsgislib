@@ -5,6 +5,7 @@ RSGISLib Image Filter Module
    :undoc-members:
 
 .. autofunction:: rsgislib.imagefilter.applyfilters
+.. autofunction:: rsgislib.imagefilter.LeungMalikFilterBank
 
 * :ref:`genindex`
 * :ref:`modindex`
