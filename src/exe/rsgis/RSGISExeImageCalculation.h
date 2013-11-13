@@ -135,7 +135,7 @@ namespace rsgisexe{
             mahalanobisdistimg2window,
             calcpxlcolstats,
             pxlcolregression,
-            windowedCorrelation
+            correlationWindow
 		};
 		
 		

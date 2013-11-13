@@ -40,6 +40,7 @@ Statistics
 .. autofunction:: rsgislib.imagecalc.covariance
 .. autofunction:: rsgislib.imagecalc.histogram
 .. autofunction:: rsgislib.imagecalc.correlation
+.. autofunction:: rsgislib.imagecalc.correlationWindow
 
 
 Normalise
