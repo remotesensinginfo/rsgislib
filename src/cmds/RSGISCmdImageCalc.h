@@ -119,7 +119,7 @@ namespace rsgis{ namespace cmds {
     /** Function to calculate the distance to the nearest geometry for every pixel in an image */
     void executeImageDist2Geoms(std::string inputImage, std::string inputVector, std::string imageFormat, std::string outputImage)throw(RSGISCmdException);
     /** Function to calculate correlation for windows */
-    void executeWindowedCorrelation(std::string inputImage, std::string outputImage, unsigned int winSize, unsigned int corrBandA, unsigned int corrBandB, std::string gdalFormat, RSGISLibDataType outDataType)throw(RSGISCmdException);
+    void executeCorrelationWindow(std::string inputImage, std::string outputImage, unsigned int winSize, unsigned int corrBandA, unsigned int corrBandB, std::string gdalFormat, RSGISLibDataType outDataType)throw(RSGISCmdException);
 }}
 
 

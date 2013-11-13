@@ -810,10 +810,8 @@
 	<rsgis:command algor="imagecalc" option="calcpxlcolstats" image="image.env" output="image.env" min="yes|no" max="yes|no" mean="yes|no" median="yes|no" sum="yes|no" stddev="yes|no" [nodata="float"] format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
 	<!-- A command to calculate a linear regression for each pixel column -->
 	<rsgis:command algor="imagecalc" option="pxlcolregression" image="image.env" output="image.env" bandvalues="file.txt" [nodata="float"] format="GDAL Format" />
-	
-	
-	
-
+	<!-- A command to calculate correlation between two images using a moving window -->
+    <rsgis:command algor="imagecalc" option="correlationWindow" image="image.env" output="image.env" window="int" bandA="int (=1)" bandB="int (=2)" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
 
     <!-- A command to calibrate image Landsat data from at sensor DNs to at sensor radiance (EQ: ((lmax-lmin)/(qcalmax-qcalmin)) * (DNs - qcalmin) + lmin) Eq is from landsat manual. -->
     <rsgis:command algor="imagecalibration" option="landsatradcal" output="image_out.env" format="GDAL Format" >

@@ -94,7 +94,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
     XMLCh *optionMahalanobisDistImg2Window = xercesc::XMLString::transcode("mahalanobisdistimg2window");
     XMLCh *optionCalcPxlColStats = xercesc::XMLString::transcode("calcpxlcolstats");
     XMLCh *optionPxlColRegression = xercesc::XMLString::transcode("pxlcolregression");
-    XMLCh *optionWindowedCorrelation = xercesc::XMLString::transcode("windowedCorrelation");
+    XMLCh *optionWindowedCorrelation = xercesc::XMLString::transcode("correlationWindow");
 
 
 	const XMLCh *algorNameEle = argElement->getAttribute(xercesc::XMLString::transcode("algor"));
@@ -2843,7 +2843,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 	}
     else if(xercesc::XMLString::equals(optionWindowedCorrelation, optionXML))
 	{
-		this->option = RSGISExeImageCalculation::windowedCorrelation;
+		this->option = RSGISExeImageCalculation::correlationWindow;
         
         XMLCh *imageXMLStr = xercesc::XMLString::transcode("image");
 		if(argElement->hasAttribute(imageXMLStr))
@@ -3666,7 +3666,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
                 throw rsgis::RSGISException(e.what());
             }
         }
-        else if(option == RSGISExeImageCalculation::windowedCorrelation)
+        else if(option == RSGISExeImageCalculation::correlationWindow)
         {
             std::cout << "A command to calculate correlation between two images using a moving window\n";
             std::cout << "Input Image: " << inputImage << std::endl;
@@ -3678,7 +3678,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
             
             try
             {
-                rsgis::cmds::executeWindowedCorrelation(this->inputImage, this->outputImage, this->windowSize, this->corrBandA, this->corrBandB, this->imageFormat, this->rsgisOutDataType);
+                rsgis::cmds::executeCorrelationWindow(this->inputImage, this->outputImage, this->windowSize, this->corrBandA, this->corrBandB, this->imageFormat, this->rsgisOutDataType);
             }
             catch (rsgis::RSGISException e)
             {
@@ -3997,7 +3997,7 @@ void RSGISExeImageCalculation::printParameters()
                 std::cout << "No data value: " << this->noDataValue << std::endl;
             }
         }
-        else if(option == RSGISExeImageCalculation::windowedCorrelation)
+        else if(option == RSGISExeImageCalculation::correlationWindow)
         {
             std::cout << "A command to calculate correlation between two images using a moving window\n";
             std::cout << "Input Image: " << inputImage << std::endl;

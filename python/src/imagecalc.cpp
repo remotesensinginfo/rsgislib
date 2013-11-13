@@ -1015,6 +1015,25 @@ static PyObject *ImageCalc_ImageDist2Geoms(PyObject *self, PyObject *args) {
     Py_RETURN_NONE;
 }
 
+static PyObject *ImageCalc_CorrelationWindow(PyObject *self, PyObject *args) {
+    const char *pszInputImage, *pszOutputImage, *pszGDALFormat;
+    int dataType, windowSize, bandA, bandB;
+
+    if(!PyArg_ParseTuple(args, "ssiiisi:correlationWindow", &pszInputImage, &pszOutputImage, &windowSize, &bandA, &bandB, &pszGDALFormat, &dataType))
+        return NULL;
+
+    rsgis::RSGISLibDataType type = (rsgis::RSGISLibDataType)dataType;
+    try 
+    {
+    rsgis::cmds::executeCorrelationWindow(pszInputImage, pszOutputImage, windowSize, bandA, bandB, pszGDALFormat, type);
+    } catch (rsgis::cmds::RSGISCmdException &e) {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+
+    Py_RETURN_NONE;
+}
+
 
 // Our list of functions in this module
 static PyMethodDef ImageCalcMethods[] = {
@@ -1432,6 +1451,31 @@ static PyMethodDef ImageCalcMethods[] = {
 "  * gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
 "  * outputImage is a string containing the name of the output image file\n"
 },
+
+    {"correlationWindow", ImageCalc_CorrelationWindow, METH_VARARGS,
+"imagecalc.correlationWindow(inputImage, outputImage, windowSize, bandA, bandB, gdalformat, gdaltype)\n"
+"Tests whether all bands are equal to the same value\n"
+"Where:\n"
+"\n"
+"* inputImage is a string containing the name of the input image file\n"
+"* outputImage is a string containing the name of the output image file\n"
+"* windowSize is an int providing the size of the window to calculate the correlation over\n"
+"* bandA is an int providing the first band to use.\n"
+"* bandB is an int providing the second band to use.\n"
+"* gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
+"* gdaltype is an containing one of the values from rsgislib.TYPE_*\n"
+"Example::\n"
+"\n"
+"   image = path + 'injune_p142_casi_sub_utm.kea'\n"
+"   output = path + 'injune_p142_casi_sub_utm_correlation.kea'\n"
+"   window = 9\n"
+"   bandA = 1\n"
+"   bandB = 1\n"
+"   format = 'KEA'\n"
+"   dataType = rsgislib.TYPE_32FLOAT\n"
+"   imagecalc.correlationWindow(image, output, window, bandA, bandB, format, dataType)\n"
+"\n"},
+
     {NULL}        /* Sentinel */
 };
 

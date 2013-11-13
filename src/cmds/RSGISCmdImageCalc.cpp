@@ -2036,14 +2036,14 @@ namespace rsgis{ namespace cmds {
 
     }
                 
-    void executeWindowedCorrelation(std::string inputImage, std::string outputImage, unsigned int winSize, unsigned int corrBandA, unsigned int corrBandB, std::string gdalFormat, RSGISLibDataType outDataType)throw(RSGISCmdException)
+    void executeCorrelationWindow(std::string inputImage, std::string outputImage, unsigned int winSize, unsigned int corrBandA, unsigned int corrBandB, std::string gdalFormat, RSGISLibDataType outDataType)throw(RSGISCmdException)
     {
         
         try
         {
             // Check sensible bands have been passed in
             if( (corrBandA == 0) | (corrBandB == 0) ){throw RSGISCmdException("Band numbering starts at 1 not 0");}
-            else if( corrBandA == corrBandB ){std::cerr << "Comparing the same band with itself will produce a correlation of 1!\nContinuing anyway..." << std::endl;}
+            else if( corrBandA == corrBandB ){std::cerr << "Comparing a band with itself will produce a correlation of 1!\nContinuing anyway..." << std::endl;}
             
             // Change numbering to start at 0 (internal use)
             corrBandA = corrBandA - 1;

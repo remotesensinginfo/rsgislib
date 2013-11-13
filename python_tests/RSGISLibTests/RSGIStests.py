@@ -181,7 +181,7 @@ class RSGISTests:
         outputImage = path + "TestOutputs/PSU142_multi1000.kea"
         format = "KEA"
         dataType = rsgislib.TYPE_32UINT
-        expression = "b1*1000"
+        expression = "1e3*b1"
         imagecalc.imageMath(inFileName, outputImage, expression, format, dataType)
 
     def testReplaceValuesLessThan(self):
@@ -319,6 +319,17 @@ class RSGISTests:
 
     def testPxlColRegression(self):
         print("PYTHON TEST: pxlColRegression - skipping due to lack of bandvalues file.txt")
+
+    def testCorrelationWindow(self):
+        print("PYTHON TEST: correlationWindow")
+        image = path + "Rasters/injune_p142_casi_sub_utm.kea"
+        output = path + "TestOutputs/injune_p142_casi_sub_utm_correlation.kea"
+        window = 9
+        bandA = 1
+        bandB = 1
+        format = "KEA"
+        dataType = rsgislib.TYPE_32FLOAT
+        imagecalc.correlationWindow(image, output, window, bandA, bandB, format, dataType)
 
     # Raster GIS
     
@@ -696,6 +707,7 @@ if __name__ == '__main__':
     
     if testLibraries == 'all' or testLibraries == 'imagecalc':
         """ ImageCalc functions """
+
         t.tryFuncAndCatch(t.testNormalise1)
         t.tryFuncAndCatch(t.testNormalise2)
         t.tryFuncAndCatch(t.testCorrelation)
@@ -731,6 +743,7 @@ if __name__ == '__main__':
         t.tryFuncAndCatch(t.testMahalanobisDistImg2Window)
         t.tryFuncAndCatch(t.testCalcPxlColStats)
         t.tryFuncAndCatch(t.testPxlColRegression)
+        t.tryFuncAndCatch(t.testCorrelationWindow)
         
     if testLibraries == 'all' or testLibraries == 'imageutils':
         
