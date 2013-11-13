@@ -283,13 +283,14 @@ namespace rsgis{namespace img{
 		double sumRSq = 0;
 		double sumFSq = 0;
         unsigned int nPixels = 0; // Tally of number of pixels
+        float blockCorrelation = 0;
         
         for(unsigned int i = 0; i < winSize; ++i)
         {
             for(unsigned int j = 0; j < winSize; ++j)
             {
 
-				if((!((boost::math::isnan)(dataBlock[bandA][i][j]))) & (!((boost::math::isnan)(dataBlock[bandB][i][j]))))
+				if( ( (boost::math::isfinite)(dataBlock[bandA][i][j]) ) & ( (boost::math::isfinite)(dataBlock[bandB][i][j]) ) )
 				{
 					sumRF += (dataBlock[bandA][i][j] * dataBlock[bandB][i][j]);
 					sumR += dataBlock[bandA][i][j];
@@ -301,8 +302,11 @@ namespace rsgis{namespace img{
             }
         }
 
-		float blockCorrelation = (((nPixels * sumRF) - (sumR * sumF))/sqrt(((nPixels*sumRSq)-(sumR*sumR))*((nPixels*sumFSq)-(sumF*sumF))));
-
+        if(nPixels > 1)
+        {
+            blockCorrelation = (((nPixels * sumRF) - (sumR * sumF))/sqrt(((nPixels*sumRSq)-(sumR*sumR))*((nPixels*sumFSq)-(sumF*sumF))));
+        }
+        if( !(boost::math::isfinite)(blockCorrelation)){blockCorrelation = 0;}
         output[0] = blockCorrelation;
 
     }
