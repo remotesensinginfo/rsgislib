@@ -94,6 +94,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
     XMLCh *optionMahalanobisDistImg2Window = xercesc::XMLString::transcode("mahalanobisdistimg2window");
     XMLCh *optionCalcPxlColStats = xercesc::XMLString::transcode("calcpxlcolstats");
     XMLCh *optionPxlColRegression = xercesc::XMLString::transcode("pxlcolregression");
+    XMLCh *optionWindowedCorrelation = xercesc::XMLString::transcode("windowedCorrelation");
 
 
 	const XMLCh *algorNameEle = argElement->getAttribute(xercesc::XMLString::transcode("algor"));
@@ -2840,6 +2841,77 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 		}
 		xercesc::XMLString::release(&noDataXMLStr);
 	}
+    else if(xercesc::XMLString::equals(optionWindowedCorrelation, optionXML))
+	{
+		this->option = RSGISExeImageCalculation::windowedCorrelation;
+        
+        XMLCh *imageXMLStr = xercesc::XMLString::transcode("image");
+		if(argElement->hasAttribute(imageXMLStr))
+		{
+			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(imageXMLStr));
+			this->inputImage = std::string(charValue);
+			xercesc::XMLString::release(&charValue);
+		}
+		else
+		{
+			throw rsgis::RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+		}
+		xercesc::XMLString::release(&imageXMLStr);
+        
+		XMLCh *outputXMLStr = xercesc::XMLString::transcode("output");
+		if(argElement->hasAttribute(outputXMLStr))
+		{
+			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outputXMLStr));
+			this->outputImage = std::string(charValue);
+			xercesc::XMLString::release(&charValue);
+		}
+		else
+		{
+			throw rsgis::RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+		}
+		xercesc::XMLString::release(&outputXMLStr);
+        
+        XMLCh *windowXMLStr = xercesc::XMLString::transcode("window");
+		if(argElement->hasAttribute(windowXMLStr))
+		{
+			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(windowXMLStr));
+			this->windowSize = mathUtils.strtounsignedint(std::string(charValue));
+			xercesc::XMLString::release(&charValue);
+		}
+		else
+		{
+			throw rsgis::RSGISXMLArgumentsException("No \'window\' attribute was provided.");
+		}
+		xercesc::XMLString::release(&windowXMLStr);
+        
+        XMLCh *bandAXMLStr = xercesc::XMLString::transcode("bandA");
+		if(argElement->hasAttribute(bandAXMLStr))
+		{
+			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(bandAXMLStr));
+			this->corrBandA = mathUtils.strtounsignedint(std::string(charValue));
+			xercesc::XMLString::release(&charValue);
+		}
+		else
+		{
+            this->corrBandA = 1;
+            std::cout << "\tAssuming first band in input image for 'bandA'" << std::endl;
+		}
+		xercesc::XMLString::release(&bandAXMLStr);
+        
+        XMLCh *bandBXMLStr = xercesc::XMLString::transcode("bandB");
+		if(argElement->hasAttribute(bandBXMLStr))
+		{
+			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(bandBXMLStr));
+			this->corrBandB = mathUtils.strtounsignedint(std::string(charValue));
+			xercesc::XMLString::release(&charValue);
+		}
+		else
+		{
+            this->corrBandA = 2;
+            std::cout << "\tAssuming second band in input image for 'bandB'" << std::endl;
+		}
+		xercesc::XMLString::release(&bandBXMLStr);
+	}
 	else
 	{
 		std::string message = std::string("The option (") + std::string(xercesc::XMLString::transcode(optionXML)) + std::string(") is not known: RSGISExeImageCalculation.");
@@ -3594,6 +3666,33 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
                 throw rsgis::RSGISException(e.what());
             }
         }
+        else if(option == RSGISExeImageCalculation::windowedCorrelation)
+        {
+            std::cout << "A command to calculate correlation between two images using a moving window\n";
+            std::cout << "Input Image: " << inputImage << std::endl;
+            std::cout << "Output Image: " << outputImage << std::endl;
+            std::cout << "Window Size: " << this->windowSize << std::endl;
+            std::cout << "Output Format: " << this->imageFormat << std::endl;
+            std::cout << "Band A: " << this->corrBandA << std::endl;
+            std::cout << "Band B: " << this->corrBandB << std::endl;
+            
+            try
+            {
+                rsgis::cmds::executeWindowedCorrelation(this->inputImage, this->outputImage, this->windowSize, this->corrBandA, this->corrBandB, this->imageFormat, this->rsgisOutDataType);
+            }
+            catch (rsgis::RSGISException e)
+            {
+                throw rsgis::RSGISException(e.what());
+            }
+            catch (rsgis::cmds::RSGISCmdException e)
+            {
+                throw rsgis::RSGISException(e.what());
+            }
+            catch (std::exception e)
+            {
+                throw rsgis::RSGISException(e.what());
+            }
+        }
 		else
 		{
 			std::cout << "Options not recognised\n";
@@ -3897,6 +3996,16 @@ void RSGISExeImageCalculation::printParameters()
             {
                 std::cout << "No data value: " << this->noDataValue << std::endl;
             }
+        }
+        else if(option == RSGISExeImageCalculation::windowedCorrelation)
+        {
+            std::cout << "A command to calculate correlation between two images using a moving window\n";
+            std::cout << "Input Image: " << inputImage << std::endl;
+            std::cout << "Output Image: " << outputImage << std::endl;
+            std::cout << "Window Size: " << this->windowSize << std::endl;
+            std::cout << "Output Format: " << this->imageFormat << std::endl;
+            std::cout << "Band A: " << this->corrBandA << std::endl;
+            std::cout << "Band B: " << this->corrBandB << std::endl;
         }
 		else
 		{

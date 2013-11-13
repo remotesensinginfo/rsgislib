@@ -2035,5 +2035,52 @@ namespace rsgis{ namespace cmds {
         }
 
     }
+                
+    void executeWindowedCorrelation(std::string inputImage, std::string outputImage, unsigned int winSize, unsigned int corrBandA, unsigned int corrBandB, std::string gdalFormat, RSGISLibDataType outDataType)throw(RSGISCmdException)
+    {
+        
+        try
+        {
+            // Check sensible bands have been passed in
+            if( (corrBandA == 0) | (corrBandB == 0) ){throw RSGISCmdException("Band numbering starts at 1 not 0");}
+            else if( corrBandA == corrBandB ){std::cerr << "Comparing the same band with itself will produce a correlation of 1!\nContinuing anyway..." << std::endl;}
+            
+            // Change numbering to start at 0 (internal use)
+            corrBandA = corrBandA - 1;
+            corrBandB = corrBandB - 1;
+            
+            GDALAllRegister();
+            GDALDataset **datasets = new GDALDataset*[1];
+            
+            datasets[0] = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_ReadOnly);
+            if(datasets[0] == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            rsgis::img::RSGISCalcImage *calcImage = NULL;
+            
+            rsgis::img::RSGISCalcImage2ImageCorrelation *calcWindowCorr = new rsgis::img::RSGISCalcImage2ImageCorrelation(corrBandA, corrBandB);
+            
+            calcImage = new rsgis::img::RSGISCalcImage(calcWindowCorr, "", true);
+            calcImage->calcImageWindowData(datasets, 1, outputImage, winSize, gdalFormat, RSGIS_to_GDAL_Type(outDataType));
+            delete calcWindowCorr;
+            delete calcImage;
+            
+            GDALClose(datasets[0]);
+            delete[] datasets;
+            GDALDestroyDriverManager();
+        }
+        catch(rsgis::RSGISException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(std::exception &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
+                
 }}
 
