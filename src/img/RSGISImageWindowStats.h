@@ -82,6 +82,26 @@ namespace rsgis{namespace img{
 
     };
 
+    class RSGISCalcImage2ImageCorrelation: public RSGISCalcImageValue
+    {
+    /** Calculates correlation between a window of two image bands.
+        Designed for change detection where input is a stack of:
+        yearA,yearB
+     */
+    public:
+        RSGISCalcImage2ImageCorrelation(unsigned int bandA = 0, unsigned int bandB = 1);
+        void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented");};
+        void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented");};
+        void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented");};
+        void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException);
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented");};
+        bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented");};
+        ~RSGISCalcImage2ImageCorrelation();
+    private:
+        unsigned int bandA;
+        unsigned int bandB;
+    };
     
     
 }}

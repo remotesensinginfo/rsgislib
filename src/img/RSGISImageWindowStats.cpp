@@ -263,6 +263,52 @@ namespace rsgis{namespace img{
         delete distVals;
     }
     
+    RSGISCalcImage2ImageCorrelation::RSGISCalcImage2ImageCorrelation(unsigned int bandA, unsigned int bandB) : RSGISCalcImageValue(1)
+    {
+        this->bandA = bandA;
+        this->bandB = bandB;
+    }
+    
+    void RSGISCalcImage2ImageCorrelation::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException)
+    {
+        
+        if( (this->bandA > numBands ) | (this->bandB > numBands) )
+        {
+            throw rsgis::img::RSGISImageCalcException("Requested band not in image");
+        }
+        
+        double sumRF = 0;
+		double sumR = 0;
+		double sumF = 0;
+		double sumRSq = 0;
+		double sumFSq = 0;
+        unsigned int nPixels = 0; // Tally of number of pixels
+        
+        for(unsigned int i = 0; i < winSize; ++i)
+        {
+            for(unsigned int j = 0; j < winSize; ++j)
+            {
+
+				if((!((boost::math::isnan)(dataBlock[bandA][i][j]))) & (!((boost::math::isnan)(dataBlock[bandB][i][j]))))
+				{
+					sumRF += (dataBlock[bandA][i][j] * dataBlock[bandB][i][j]);
+					sumR += dataBlock[bandA][i][j];
+					sumF += dataBlock[bandB][i][j];
+					sumRSq += (dataBlock[bandA][i][j] * dataBlock[bandA][i][j]);
+					sumFSq += (dataBlock[bandB][i][j] * dataBlock[bandB][i][j]);
+                    nPixels+=1;
+				}
+            }
+        }
+
+		float blockCorrelation = (((nPixels * sumRF) - (sumR * sumF))/sqrt(((nPixels*sumRSq)-(sumR*sumR))*((nPixels*sumFSq)-(sumF*sumF))));
+
+        output[0] = blockCorrelation;
+
+    }
+    
+    
+    RSGISCalcImage2ImageCorrelation::~RSGISCalcImage2ImageCorrelation(){}
 	
 }}
 

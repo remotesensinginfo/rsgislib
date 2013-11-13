@@ -134,7 +134,8 @@ namespace rsgisexe{
             mahalanobisdistwindow,
             mahalanobisdistimg2window,
             calcpxlcolstats,
-            pxlcolregression
+            pxlcolregression,
+            windowedCorrelation
 		};
 		
 		
@@ -223,6 +224,8 @@ namespace rsgisexe{
         bool noDataValueSpecified;
         unsigned int windowSize;
         rsgis::cmds::RSGISCmdStatsSummary statsSummary;
+        unsigned int corrBandA;
+        unsigned int corrBandB;
 	};
 }
 #endif
