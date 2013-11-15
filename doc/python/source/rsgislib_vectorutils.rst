@@ -19,6 +19,8 @@ Attributes
 -----------
 
 .. autofunction:: rsgislib.vectorutils.removeattributes
+.. autofunction:: rsgislib.vectorutils.findreplacetext
+.. autofunction:: rsgislib.vectorutils.calcarea
 
 * :ref:`genindex`
 * :ref:`modindex`

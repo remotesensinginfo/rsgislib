@@ -642,6 +642,13 @@ class RSGISTests:
         replace = '142'
         vectorutils.findreplacetext(inputVector, attribute, find, replace)
 
+    def testCalcArea(self):
+        print("PYTHON TEST: calcarea")
+        inputVector = './Vectors/injune_p142_psu_utm.shp'
+        outputVector = './TestOutputs/injune_p142_psu_utm_area.shp'
+        vectorutils.calcarea(inputVector, outputVector, True)
+
+
     # Image filter
     def testFilter(self, allFilters=False):
         print("PYTHON TEST: filter")
@@ -798,6 +805,7 @@ if __name__ == '__main__':
         t.tryFuncAndCatch(t.testBufferVector)
         t.tryFuncAndCatch(t.testPrintPolyGeom)
         t.tryFuncAndCatch(t.testFindReplaceText)
+        t.tryFuncAndCatch(t.testCalcArea)
 
     if testLibraries == 'all' or testLibraries == 'imagefilter':
         """ Image filter functions """ 
