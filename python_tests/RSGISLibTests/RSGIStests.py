@@ -648,6 +648,14 @@ class RSGISTests:
         outputVector = './TestOutputs/injune_p142_psu_utm_area.shp'
         vectorutils.calcarea(inputVector, outputVector, True)
 
+    def testPolygonsInPolygon(self):
+        print("PYTHON TEST: polygonsInPolygon")
+        inputVector = './Vectors/injune_p142_stem_locations.shp'
+        coverVector = './Vectors/injune_p142_psu_utm.shp'
+        outDIR = './TestOutputs'
+        attribute = 'PSU'
+        vectorutils.polygonsInPolygon(inputVector, coverVector, outDIR, attribute, True)
+
 
     # Image filter
     def testFilter(self, allFilters=False):
@@ -801,11 +809,14 @@ if __name__ == '__main__':
     if testLibraries == 'all' or testLibraries == 'vectorutils':
         
         """ Vector Utils functions """
+        t.testPolygonsInPolygon()
+        sys.exit()
         t.tryFuncAndCatch(t.testRemoveAttributes)
         t.tryFuncAndCatch(t.testBufferVector)
         t.tryFuncAndCatch(t.testPrintPolyGeom)
         t.tryFuncAndCatch(t.testFindReplaceText)
         t.tryFuncAndCatch(t.testCalcArea)
+        t.tryFuncAndCatch(t.testPolygonsInPolygon)
 
     if testLibraries == 'all' or testLibraries == 'imagefilter':
         """ Image filter functions """ 

@@ -44,6 +44,8 @@ namespace rsgis{ namespace cmds {
     void executeFindReplaceText(std::string inputVector, std::string attribute, std::string find, std::string replace) throw(RSGISCmdException);
     /** Function to calculate polygon area */
     void executeCalcPolyArea(std::string inputVector, std::string outputVector, bool force) throw(RSGISCmdException);
+    /** Split polygons in in vector by polygons in cover vector */
+    void excecutePolygonsInPolygon(std::string inputVector, std::string inputCoverVector, std::string output_DIR, std::string attributeName, bool force) throw(RSGISCmdException);
     
 }}
 
