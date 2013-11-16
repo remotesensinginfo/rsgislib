@@ -170,6 +170,27 @@ static PyObject *VectorUtils_CalcArea(PyObject *self, PyObject *args)
 
     Py_RETURN_NONE;
 }
+
+static PyObject *VectorUtils_PolygonsInPolygon(PyObject *self, PyObject *args)
+{
+    const char *pszInputVector, *pszInputCoverVector, *pszOutputDIR, *pszAttributeName;
+    int force = false;
+    if( !PyArg_ParseTuple(args, "ssss|i:polygonsInPolygon", &pszInputVector, &pszInputCoverVector, &pszOutputDIR, &pszAttributeName, &force))
+        return NULL;
+
+    try
+    {
+        rsgis::cmds::excecutePolygonsInPolygon(pszInputVector, pszInputCoverVector, pszOutputDIR, pszAttributeName, force);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+
+    Py_RETURN_NONE;
+}
+
 // Our list of functions in this module
 static PyMethodDef VectorUtilsMethods[] = {
     {"generateConvexHullsGroups", VectorUtils_GenerateConvexHullsGroups, METH_VARARGS, 
@@ -263,6 +284,23 @@ static PyMethodDef VectorUtilsMethods[] = {
 "  vectorutils.calcarea(inputVector, outputVector, True)\n"
 "\n"},
 
+    {"polygonsInPolygon", VectorUtils_PolygonsInPolygon, METH_VARARGS, 
+"vectorutils.polygonsInPolygon(inputvector, inputcovervector, outputDIR, attributeName, force)\n"
+"A command to create a new polygon containing only polygons within      cover vector. Loops through attributes and creates a new shapefile for each polygon in the cover vector.\n\n"
+"Where:\n"
+"\n"
+"* inputvector is a string containing the name of the input vector\n"
+"* inputcovervector is a string containing the name of the cover vector vector\n"
+"* outputDIR is a string containing the name of the output directory\n"
+"* force is a bool, specifying whether to force removal of the output vector if it exists\n"
+"Example::\n"
+"\n"
+"   inputVector = './Vectors/injune_p142_stem_locations.shp'\n"
+"   coverVector = './Vectors/injune_p142_psu_utm.shp'\n"
+"   outDIR = '/TestOutputs'\n"
+"   attribute = 'PSU'\n"
+"   vectorutils.polygonsInPolygon(inputVector, coverVector, outDIR, attribute, True)\n"
+"\n"},
 
     {NULL}        /* Sentinel */
 };

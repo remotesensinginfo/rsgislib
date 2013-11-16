@@ -37,6 +37,7 @@
 #include "vec/RSGISVectorAttributeFindReplace.h"
 #include "vec/RSGISVectorBuffer.h"
 #include "vec/RSGISCalcPolygonArea.h"
+#include "vec/RSGISCopyPolygonsInPolygon.h"
 
 #include "utils/RSGISTextUtils.h"
 #include "utils/RSGISFileUtils.h"
@@ -44,7 +45,7 @@
 #include "geos/geom/Coordinate.h"
 
 namespace rsgis{ namespace cmds {
-
+    
     void executeGenerateConvexHullsGroups(std::string inputFile, std::string outputVector, std::string outVecProj, bool force, unsigned int eastingsColIdx, unsigned int northingsColIdx, unsigned int attributeColIdx)throw(RSGISCmdException)
     {
         try
@@ -59,17 +60,17 @@ namespace rsgis{ namespace cmds {
             coordGrps = genConvexGrps.getCoordinateGroups(inputFile, eastingsColIdx, northingsColIdx, attributeColIdx);
             
             /*
-            for(std::vector<std::pair<std::string,std::vector<geos::geom::Coordinate>* >* >::iterator iterGrps = coordGrps->begin(); iterGrps != coordGrps->end(); ++iterGrps)
-            {
-                std::cout << (*iterGrps)->first << std::endl;
-                std::cout << "\t";
-                for(std::vector<geos::geom::Coordinate>::iterator iterCoords = (*iterGrps)->second->begin(); iterCoords != (*iterGrps)->second->end(); ++iterCoords)
-                {
-                    std::cout << "[" << (*iterCoords).x << "," << (*iterCoords).y << "]";
-                }
-                std::cout << std::endl;
-            }
-            */
+             for(std::vector<std::pair<std::string,std::vector<geos::geom::Coordinate>* >* >::iterator iterGrps = coordGrps->begin(); iterGrps != coordGrps->end(); ++iterGrps)
+             {
+             std::cout << (*iterGrps)->first << std::endl;
+             std::cout << "\t";
+             for(std::vector<geos::geom::Coordinate>::iterator iterCoords = (*iterGrps)->second->begin(); iterCoords != (*iterGrps)->second->end(); ++iterCoords)
+             {
+             std::cout << "[" << (*iterCoords).x << "," << (*iterCoords).y << "]";
+             }
+             std::cout << std::endl;
+             }
+             */
             
             std::cout << "Creating Polygons\n";
             genConvexGrps.createPolygonsAsShapefile(coordGrps, outputVector, wktProj, force);
@@ -80,8 +81,8 @@ namespace rsgis{ namespace cmds {
                 delete (*iterGrps)->second;
             }
             delete coordGrps;
-            
         }
+            
         catch(rsgis::RSGISVectorException &e)
         {
             throw RSGISCmdException(e.what());
@@ -95,7 +96,7 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
-            
+    
     void executeRemoveAttributes(std::string inputVector, std::string outputVector, bool force)throw(RSGISCmdException)
     {
         try
@@ -105,7 +106,7 @@ namespace rsgis{ namespace cmds {
             inputVector = boost::filesystem::absolute(inputVector).c_str();
             outputVector = boost::filesystem::absolute(outputVector).c_str();
             
-			OGRRegisterAll();
+            OGRRegisterAll();
             
             rsgis::utils::RSGISFileUtils fileUtils;
             rsgis::vec::RSGISVectorUtils vecUtils;
@@ -113,18 +114,18 @@ namespace rsgis{ namespace cmds {
             std::string SHPFileInLayer = vecUtils.getLayerName(inputVector);
             std::string SHPFileOutLayer = vecUtils.getLayerName(outputVector);
             
-			OGRDataSource *inputSHPDS = NULL;
-			OGRLayer *inputSHPLayer = NULL;
-			OGRSFDriver *shpFiledriver = NULL;
-			OGRDataSource *outputSHPDS = NULL;
-			OGRLayer *outputSHPLayer = NULL;
-			OGRSpatialReference* inputSpatialRef = NULL;
+            OGRDataSource *inputSHPDS = NULL;
+            OGRLayer *inputSHPLayer = NULL;
+            OGRSFDriver *shpFiledriver = NULL;
+            OGRDataSource *outputSHPDS = NULL;
+            OGRLayer *outputSHPLayer = NULL;
+            OGRSpatialReference* inputSpatialRef = NULL;
             
             rsgis::vec::RSGISProcessVector *processVector = NULL;
             rsgis::vec::RSGISProcessOGRFeature *processFeature = NULL;
             
             std::string outputDIR = "";
-
+            
             outputDIR = fileUtils.getFileDirectoryPath(outputVector);
             
             if(vecUtils.checkDIR4SHP(outputDIR, SHPFileOutLayer))
@@ -213,7 +214,7 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
-            
+    
     void executeBufferVector(std::string inputVector, std::string outputVector, float bufferDist, bool force) throw(RSGISCmdException)
     {
         try
@@ -222,7 +223,7 @@ namespace rsgis{ namespace cmds {
             inputVector = boost::filesystem::absolute(inputVector).c_str();
             outputVector = boost::filesystem::absolute(outputVector).c_str();
             
-			OGRRegisterAll();
+            OGRRegisterAll();
             
             rsgis::utils::RSGISFileUtils fileUtils;
             rsgis::vec::RSGISVectorUtils vecUtils;
@@ -230,19 +231,19 @@ namespace rsgis{ namespace cmds {
             std::string SHPFileInLayer = vecUtils.getLayerName(inputVector);
             std::string SHPFileOutLayer = vecUtils.getLayerName(outputVector);
             
-			OGRDataSource *inputSHPDS = NULL;
-			OGRLayer *inputSHPLayer = NULL;
-			OGRSFDriver *shpFiledriver = NULL;
-			OGRDataSource *outputSHPDS = NULL;
-			OGRLayer *outputSHPLayer = NULL;
-			OGRSpatialReference* inputSpatialRef = NULL;
-			OGRFeatureDefn *inFeatureDefn = NULL;
+            OGRDataSource *inputSHPDS = NULL;
+            OGRLayer *inputSHPLayer = NULL;
+            OGRSFDriver *shpFiledriver = NULL;
+            OGRDataSource *outputSHPDS = NULL;
+            OGRLayer *outputSHPLayer = NULL;
+            OGRSpatialReference* inputSpatialRef = NULL;
+            OGRFeatureDefn *inFeatureDefn = NULL;
             
             rsgis::vec::RSGISProcessGeometry *processVector = NULL;
             rsgis::vec::RSGISProcessOGRGeometry *processGeom = NULL;
             
             std::string outputDIR = "";
-
+            
             outputDIR = fileUtils.getFileDirectoryPath(outputVector);
             
             if(vecUtils.checkDIR4SHP(outputDIR, SHPFileOutLayer))
@@ -327,7 +328,7 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
-            
+    
     void  executePrintPolyGeom(std::string inputVector) throw(RSGISCmdException)
     {
         try
@@ -335,19 +336,19 @@ namespace rsgis{ namespace cmds {
             // Convert to absolute path
             inputVector = boost::filesystem::absolute(inputVector).c_str();
             
-			OGRRegisterAll();
+            OGRRegisterAll();
             
             rsgis::vec::RSGISVectorUtils vecUtils;
             
             std::string SHPFileInLayer = vecUtils.getLayerName(inputVector);
             
-			OGRDataSource *inputSHPDS = NULL;
-			OGRLayer *inputSHPLayer = NULL;
+            OGRDataSource *inputSHPDS = NULL;
+            OGRLayer *inputSHPLayer = NULL;
             
             rsgis::vec::RSGISVectorIO *vecIO = NULL;
             rsgis::vec::RSGISPolygonData **polygons = NULL;
-			int numFeatures = 0;
-
+            int numFeatures = 0;
+            
             /////////////////////////////////////
             //
             // Open Input Shapfile.
@@ -400,7 +401,7 @@ namespace rsgis{ namespace cmds {
             OGRDataSource::DestroyDataSource(inputSHPDS);
             
             //OGRCleanupAll();
-
+            
         }
         catch(rsgis::RSGISVectorException &e)
         {
@@ -415,8 +416,8 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
-
-            void  executeFindReplaceText(std::string inputVector, std::string attribute, std::string find, std::string replace) throw(RSGISCmdException)
+    
+    void  executeFindReplaceText(std::string inputVector, std::string attribute, std::string find, std::string replace) throw(RSGISCmdException)
     {
         try
         {
@@ -424,7 +425,7 @@ namespace rsgis{ namespace cmds {
             inputVector = boost::filesystem::absolute(inputVector).c_str();
             
             
-			OGRRegisterAll();
+            OGRRegisterAll();
             
             rsgis::vec::RSGISVectorUtils vecUtils;
             rsgis::vec::RSGISProcessVector *processVector = NULL;
@@ -432,8 +433,8 @@ namespace rsgis{ namespace cmds {
             
             std::string SHPFileInLayer = vecUtils.getLayerName(inputVector);
             
-			OGRDataSource *inputSHPDS = NULL;
-			OGRLayer *inputSHPLayer = NULL;
+            OGRDataSource *inputSHPDS = NULL;
+            OGRLayer *inputSHPLayer = NULL;
             
             /////////////////////////////////////
             //
@@ -478,7 +479,7 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
-
+    
     void executeCalcPolyArea(std::string inputVector, std::string outputVector, bool force) throw(RSGISCmdException)
     {
         try
@@ -488,7 +489,7 @@ namespace rsgis{ namespace cmds {
             outputVector = boost::filesystem::absolute(outputVector).c_str();
             
             
-			OGRRegisterAll();
+            OGRRegisterAll();
             
             rsgis::utils::RSGISFileUtils fileUtils;
             rsgis::vec::RSGISVectorUtils vecUtils;
@@ -496,19 +497,19 @@ namespace rsgis{ namespace cmds {
             std::string SHPFileInLayer = vecUtils.getLayerName(inputVector);
             std::string SHPFileOutLayer = vecUtils.getLayerName(outputVector);
             
-			OGRDataSource *inputSHPDS = NULL;
-			OGRLayer *inputSHPLayer = NULL;
-			OGRSFDriver *shpFiledriver = NULL;
-			OGRDataSource *outputSHPDS = NULL;
-			OGRLayer *outputSHPLayer = NULL;
-			OGRSpatialReference* inputSpatialRef = NULL;
-			OGRFeatureDefn *inFeatureDefn = NULL;
+            OGRDataSource *inputSHPDS = NULL;
+            OGRLayer *inputSHPLayer = NULL;
+            OGRSFDriver *shpFiledriver = NULL;
+            OGRDataSource *outputSHPDS = NULL;
+            OGRLayer *outputSHPLayer = NULL;
+            OGRSpatialReference* inputSpatialRef = NULL;
+            OGRFeatureDefn *inFeatureDefn = NULL;
             
             rsgis::vec::RSGISProcessVector *processVector = NULL;
             rsgis::vec::RSGISProcessOGRFeature *processFeature = NULL;
             
             std::string outputDIR = "";
-
+            
             outputDIR = fileUtils.getFileDirectoryPath(outputVector);
             
             if(vecUtils.checkDIR4SHP(outputDIR, SHPFileOutLayer))
@@ -594,6 +595,196 @@ namespace rsgis{ namespace cmds {
         }
         
     }
+    
+    void excecutePolygonsInPolygon(std::string inputVector, std::string inputCoverVector, std::string output_DIR, std::string attributeName, bool force) throw(RSGISCmdException)
+    {
+        try
+        {
+            // Convert to absolute path
+            inputVector = boost::filesystem::absolute(inputVector).c_str();
+            inputCoverVector = boost::filesystem::absolute(inputCoverVector).c_str();
+            output_DIR = boost::filesystem::absolute(output_DIR).c_str();
             
-}}
+            OGRRegisterAll();
+            
+            rsgis::utils::RSGISFileUtils fileUtils;
+            rsgis::vec::RSGISVectorUtils vecUtils;
+            
+            std::string coverSHPFileInLayer = vecUtils.getLayerName(inputCoverVector);
+            std::string SHPFileInLayer = vecUtils.getLayerName(inputVector);
+            
+            OGRDataSource *inputCoverSHPDS = NULL;
+            OGRLayer *inputCoverSHPLayer = NULL;
+            OGRSpatialReference* inputCoverSpatialRef = NULL;
+            
+            OGRDataSource *inputSHPDS = NULL;
+            OGRLayer *inputSHPLayer = NULL;
+            OGRSpatialReference* inputSpatialRef = NULL;
+            OGRGeometry *coverGeometry = NULL; // OGRGeometry representation of feature in cover layer
+            
+            // Output shapefile
+            OGRSFDriver *shpFiledriver = NULL;
+            const char *pszDriverName = "ESRI Shapefile";
+            shpFiledriver = OGRSFDriverRegistrar::GetRegistrar()->GetDriverByName(pszDriverName );
+            if( shpFiledriver == NULL )
+            {
+                throw rsgis::vec::RSGISVectorOutputException("SHP driver not available.");
+            }
+            std::string coverFeatureName = "";
+            std::string outVector = ""; // Filename of out vector
 
+            /************************
+             * OPEN COVER SHAPEFILE *
+             ************************/
+            
+            inputCoverSHPDS = OGRSFDriverRegistrar::Open(inputCoverVector.c_str(), FALSE);
+            if(inputCoverSHPDS == NULL)
+            {
+                std::string message = std::string("Could not open cover vector file ") + inputCoverVector;
+                throw rsgis::RSGISFileException(message.c_str());
+            }
+            inputCoverSHPLayer = inputCoverSHPDS->GetLayerByName(coverSHPFileInLayer.c_str());
+            if(inputCoverSHPLayer == NULL)
+            {
+                std::string message = std::string("Could not open vector layer ") + coverSHPFileInLayer;
+                throw rsgis::RSGISFileException(message.c_str());
+            }
+            inputCoverSpatialRef = inputCoverSHPLayer->GetSpatialRef();
+            
+            /*********************************
+             * OPEN SHAPEFILE                *
+             * This shapefile contains the   *
+             * polygons to check if          *
+             * covered by 'inputCoverVector' *
+             *********************************/
+            
+            inputSHPDS = OGRSFDriverRegistrar::Open(inputVector.c_str(), FALSE);
+            if(inputSHPDS == NULL)
+            {
+                std::string message = std::string("Could not open vector file ") + inputVector;
+                throw rsgis::RSGISFileException(message.c_str());
+            }
+            inputSHPLayer = inputSHPDS->GetLayerByName(SHPFileInLayer.c_str());
+            if(inputSHPLayer == NULL)
+            {
+                std::string message = std::string("Could not open vector layer ") + SHPFileInLayer;
+                throw rsgis::RSGISFileException(message.c_str());
+            }
+            inputSpatialRef = inputSHPLayer->GetSpatialRef();
+            
+            if(inputCoverSpatialRef != inputSpatialRef)
+            {
+                std::cerr << "Shapefiles are of different projection!" << std::endl;
+            }
+            
+            // Get Geometry Type.
+            OGRFeature *feature = inputSHPLayer->GetFeature(0);
+            OGRwkbGeometryType geometryType = feature->GetGeometryRef()->getGeometryType();
+            
+            /********************************************
+             * Loop through features in input shapefile *
+             ********************************************/
+            OGRFeature *inCoverFeature = NULL;
+            while( (inCoverFeature = inputCoverSHPLayer->GetNextFeature()) != NULL )
+            {
+                
+                // Get name of feature
+                int fieldIdx = inCoverFeature->GetFieldIndex(attributeName.c_str());
+                coverFeatureName = inCoverFeature->GetFieldAsString(fieldIdx);
+                
+                // Represent as OGRGeometry
+                coverGeometry = inCoverFeature->GetGeometryRef();
+                
+                outVector = output_DIR + "/" + coverFeatureName + ".shp";
+                std::string SHPFileOutLayer = vecUtils.getLayerName(outVector);
+                
+                OGRDataSource *outputSHPDS = NULL;
+                OGRLayer *outputSHPLayer = NULL;
+                
+                std::string outputDIR = "";
+                outputDIR = fileUtils.getFileDirectoryPath(outVector);
+                
+                if(vecUtils.checkDIR4SHP(outputDIR, SHPFileOutLayer))
+                {
+                    if(force)
+                    {
+                        vecUtils.deleteSHP(outputDIR, SHPFileOutLayer);
+                    }
+                    else
+                    {
+                        throw RSGISException("Shapefile already exists, either delete or select force.");
+                    }
+                }
+                
+                /**************************************
+                 * CREATE OUTPUT SHAPEFILE            *
+                 * This is the shapefile representing *
+                 * polygons contained within the	  *
+                 * cover feature                      *
+                 **************************************/
+                
+                outputSHPDS = shpFiledriver->CreateDataSource(outVector.c_str(), NULL);
+                
+                std::cout << "Creating new shapefile" << std::endl;
+                if( outputSHPDS == NULL )
+                {
+                    std::string message = std::string("Could not create vector file ") + outVector;
+                    throw rsgis::vec::RSGISVectorOutputException(message.c_str());
+                }
+                outputSHPLayer = outputSHPDS->CreateLayer(SHPFileOutLayer.c_str(), inputSpatialRef, geometryType, NULL );
+                if( outputSHPLayer == NULL )
+                {
+                    std::string message = std::string("Could not create vector layer ") + SHPFileOutLayer;
+                    throw rsgis::vec::RSGISVectorOutputException(message.c_str());
+                }
+                
+                std::cout << "Created shapefile " << outVector << std::endl;
+                
+                /************************************
+                 * ADD POLYGONS IN POLYGON TO NEW   *
+                 * SHAPEFILE						*
+                 ************************************/
+                rsgis::vec::RSGISCopyPolygonsInPolygon copyPolysinPoly;
+                long unsigned numPolygonsInCover = 0;
+                try
+                {
+                    numPolygonsInCover = copyPolysinPoly.copyPolygonsInPoly(inputSHPLayer, outputSHPLayer, coverGeometry);
+                    OGRDataSource::DestroyDataSource(outputSHPDS);
+                }
+                catch (RSGISVectorException &e)
+                {
+                    OGRDataSource::DestroyDataSource(outputSHPDS);
+                    //OGRCleanupAll();
+                    throw e;
+                }
+                // If no polygons in cover polygons, delete shapefile (will be empty)
+                if(numPolygonsInCover == 0)
+                {
+                    std::cout << SHPFileOutLayer << " covers no polygons and will be deleted" << std::endl;
+                    vecUtils.deleteSHP(outputDIR, SHPFileOutLayer);
+                }
+                else
+                {
+                    std::cout << coverFeatureName << " covers " << numPolygonsInCover << " polygons" << std::endl;
+                }
+                
+                
+            }
+            
+            //OGRCleanupAll();
+        }
+        catch(rsgis::RSGISVectorException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(rsgis::RSGISException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch (std::exception &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
+}}
+            
