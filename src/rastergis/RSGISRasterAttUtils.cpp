@@ -35,22 +35,29 @@ namespace rsgis{namespace rastergis{
         {
             std::cout << "Import attribute tables to memory.\n";
             const GDALRasterAttributeTable *gdalAttIn = inImage->GetRasterBand(1)->GetDefaultRAT();
-            GDALRasterAttributeTable *gdalAttOut = NULL;//new GDALRasterAttributeTable(*outImage->GetRasterBand(1)->GetDefaultRAT());
-            const GDALRasterAttributeTable *gdalAttOutTmp = outImage->GetRasterBand(1)->GetDefaultRAT();
+            if(gdalAttIn == NULL)
+            {
+                rsgis::RSGISAttributeTableException("The input image does not have an attribute table.");
+            }
             
-            if((gdalAttOutTmp == NULL) || (gdalAttOutTmp->GetRowCount() == 0))
+            GDALRasterAttributeTable *gdalAttOut = NULL;
+#ifdef HAVE_RFC40
+            gdalAttOut = outImage->GetRasterBand(1)->GetDefaultRAT();
+            if(gdalAttOut == NULL)
+            {
+                gdalAttOut = new GDALDefaultRasterAttributeTable();
+            }
+#else
+            const GDALRasterAttributeTable *attTableTmp = inputImage->GetRasterBand(1)->GetDefaultRAT();
+            if((attTableTmp == NULL) || (gdalAttOutTmp->GetRowCount() == 0))
             {
                 gdalAttOut = new GDALRasterAttributeTable();
             }
             else
             {
-                gdalAttOut = new GDALRasterAttributeTable(*gdalAttOutTmp);
+                gdalAttOut = new GDALRasterAttributeTable(*attTableTmp);
             }
-            
-            if(gdalAttIn == NULL)
-            {
-                rsgis::RSGISAttributeTableException("The input image does not have an attribute table.");
-            }
+#endif // HAVE_RFC40
             
             if(gdalAttIn->GetRowCount() > gdalAttOut->GetRowCount())
             {

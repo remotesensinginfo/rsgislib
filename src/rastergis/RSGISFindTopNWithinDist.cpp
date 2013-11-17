@@ -33,7 +33,21 @@ namespace rsgis{namespace rastergis{
     {
         try 
         {
-            GDALRasterAttributeTable *attTable = new GDALRasterAttributeTable(*dataset->GetRasterBand(1)->GetDefaultRAT());
+            GDALRasterAttributeTable *attTable = NULL;
+#ifdef HAVE_RFC40
+            attTable = dataset->GetRasterBand(1)->GetDefaultRAT();
+            if(attTable == NULL)
+            {
+                throw rsgis::RSGISAttributeTableException("Attribute table is not present within the image.");
+            }
+#else
+            const GDALRasterAttributeTable *attTableTmp = dataset->GetRasterBand(1)->GetDefaultRAT();
+            if(attTableTmp == NULL)
+            {
+                throw rsgis::RSGISAttributeTableException("Attribute table is not present within the image.");
+            }
+            attTable = new GDALRasterAttributeTable(*attTableTmp);
+#endif // HAVE_RFC40
             
             int numRows = attTable->GetRowCount();
             

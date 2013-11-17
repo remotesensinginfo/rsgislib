@@ -34,6 +34,7 @@
 #include "common/RSGISAttributeTableException.h"
 
 #include "math/RSGISMathException.h"
+#include "img/RSGISImageUtils.h"
 
 #include <boost/numeric/conversion/cast.hpp>
 #include <boost/lexical_cast.hpp>

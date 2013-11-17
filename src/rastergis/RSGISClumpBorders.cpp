@@ -34,16 +34,21 @@ namespace rsgis{namespace rastergis{
         try
         {
             RSGISRasterAttUtils attUtils;
-            const GDALRasterAttributeTable *attTableTmp = clumpImage->GetRasterBand(1)->GetDefaultRAT();
             GDALRasterAttributeTable *attTable = NULL;
-            if(attTableTmp != NULL)
+#ifdef HAVE_RFC40
+            attTable = clumpImage->GetRasterBand(1)->GetDefaultRAT();
+            if(attTable == NULL)
             {
-                attTable = new GDALRasterAttributeTable(*attTableTmp);
+                throw rsgis::RSGISImageException("Attribute table is not present within the image.");
             }
-            else
+#else
+            const GDALRasterAttributeTable *attTableTmp = clumpImage->GetRasterBand(1)->GetDefaultRAT();
+            if(attTableTmp == NULL)
             {
-                attTable = new GDALRasterAttributeTable();
+                throw rsgis::RSGISImageException("Attribute table is not present within the image.");
             }
+            attTable = new GDALRasterAttributeTable(*attTableTmp);
+#endif // HAVE_RFC40
             
             // Make sure it is long enough and extend if required.
             int numRows = attTable->GetRowCount();
@@ -109,16 +114,21 @@ namespace rsgis{namespace rastergis{
         try
         {
             RSGISRasterAttUtils attUtils;
-            const GDALRasterAttributeTable *attTableTmp = clumpImage->GetRasterBand(1)->GetDefaultRAT();
             GDALRasterAttributeTable *attTable = NULL;
-            if(attTableTmp != NULL)
+#ifdef HAVE_RFC40
+            attTable = clumpImage->GetRasterBand(1)->GetDefaultRAT();
+            if(attTable == NULL)
             {
-                attTable = new GDALRasterAttributeTable(*attTableTmp);
+                throw rsgis::RSGISImageException("Attribute table is not present within the image.");
             }
-            else
+#else
+            const GDALRasterAttributeTable *attTableTmp = clumpImage->GetRasterBand(1)->GetDefaultRAT();
+            if(attTableTmp == NULL)
             {
-                attTable = new GDALRasterAttributeTable();
+                throw rsgis::RSGISImageException("Attribute table is not present within the image.");
             }
+            attTable = new GDALRasterAttributeTable(*attTableTmp);
+#endif // HAVE_RFC40
             
             // Make sure it is long enough and extend if required.
             int numRows = attTable->GetRowCount();

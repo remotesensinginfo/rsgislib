@@ -35,6 +35,7 @@
 #include "math/RSGISMathException.h"
 
 #include "rastergis/RSGISFindTopNWithinDist.h"
+#include "img/RSGISImageUtils.h"
 
 #include <boost/numeric/conversion/cast.hpp>
 #include <boost/lexical_cast.hpp>

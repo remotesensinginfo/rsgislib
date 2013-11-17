@@ -36,6 +36,7 @@
 
 #include "common/RSGISImageException.h"
 #include "utils/RSGISTextUtils.h"
+#include "img/RSGISImageUtils.h"
 
 #include <boost/algorithm/string/trim_all.hpp>
 

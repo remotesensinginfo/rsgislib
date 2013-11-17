@@ -40,6 +40,7 @@
 #include "img/RSGISImageCalcException.h"
 #include "img/RSGISCalcImageValue.h"
 #include "img/RSGISCalcImage.h"
+#include "img/RSGISImageUtils.h"
 
 #include "rastergis/RSGISRasterAttUtils.h"
 

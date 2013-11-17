@@ -33,7 +33,21 @@ namespace rsgis{namespace rastergis{
     {
         try
         {
-            GDALRasterAttributeTable *attTable = new GDALRasterAttributeTable(*dataset->GetRasterBand(1)->GetDefaultRAT());
+            GDALRasterAttributeTable *attTable = NULL;
+#ifdef HAVE_RFC40
+            attTable = dataset->GetRasterBand(1)->GetDefaultRAT();
+            if(attTable == NULL)
+            {
+                throw rsgis::RSGISImageException("Attribute table is not present within the image.");
+            }
+#else
+            const GDALRasterAttributeTable *attTableTmp = dataset->GetRasterBand(1)->GetDefaultRAT();
+            if(attTableTmp == NULL)
+            {
+                throw rsgis::RSGISImageException("Attribute table is not present within the image.");
+            }
+            attTable = new GDALRasterAttributeTable(*attTableTmp);
+#endif // HAVE_RFC40
             
             int numRows = attTable->GetRowCount();
             
@@ -126,16 +140,22 @@ namespace rsgis{namespace rastergis{
     {
         try
         {
-            const GDALRasterAttributeTable *attTableTmp = image->GetRasterBand(1)->GetDefaultRAT();
             GDALRasterAttributeTable *attTable = NULL;
-            if(attTableTmp != NULL)
+#ifdef HAVE_RFC40
+            attTable = image->GetRasterBand(1)->GetDefaultRAT();
+            if(attTable == NULL)
             {
-                attTable = new GDALRasterAttributeTable(*attTableTmp);
+                throw rsgis::RSGISImageException("Attribute table is not present within the image.");
             }
-            else
+#else
+            const GDALRasterAttributeTable *attTableTmp = image->GetRasterBand(1)->GetDefaultRAT();
+            if(attTableTmp == NULL)
             {
-                attTable = new GDALRasterAttributeTable();
+                throw rsgis::RSGISImageException("Attribute table is not present within the image.");
             }
+            attTable = new GDALRasterAttributeTable(*attTableTmp);
+#endif // HAVE_RFC40
+            
             int numRows = attTable->GetRowCount();
             int numColumns = attTable->GetColumnCount();
             

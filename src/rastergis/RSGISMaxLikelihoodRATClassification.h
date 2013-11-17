@@ -37,6 +37,8 @@
 #include "math/RSGISMathsUtils.h"
 #include "math/RSGISMaximumLikelihood.h"
 
+#include "img/RSGISImageUtils.h"
+
 #include <boost/numeric/conversion/cast.hpp>
 #include <boost/lexical_cast.hpp>
 

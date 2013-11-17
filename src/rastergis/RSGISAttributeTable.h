@@ -40,6 +40,7 @@
 #include "common/RSGISAttributeTableException.h"
 
 #include "utils/RSGISTextUtils.h"
+#include "img/RSGISImageUtils.h"
 
 #include <xercesc/dom/DOM.hpp>
 #include <xercesc/util/XMLString.hpp>

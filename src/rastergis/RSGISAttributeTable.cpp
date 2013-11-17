@@ -1341,7 +1341,12 @@ namespace rsgis{namespace rastergis{
     {
         try
         {
-            GDALRasterAttributeTable *rasterAtt = new GDALRasterAttributeTable();
+            GDALRasterAttributeTable *rasterAtt = NULL;
+#ifdef HAVE_RFC40
+            rasterAtt = new GDALDefaultRasterAttributeTable();
+#else
+            rasterAtt = new GDALRasterAttributeTable();
+#endif // HAVE_RFC40
             
             rasterAtt->CreateColumn("FID", GFT_Integer, GFU_MinMax);
             unsigned int fidRATIdx = rasterAtt->GetColumnCount()-1;

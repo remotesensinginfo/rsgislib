@@ -45,7 +45,14 @@
 
 #include <boost/cstdint.hpp>
 
-namespace rsgis 
+#if (GDAL_VERSION_MAJOR >= 2) || ((GDAL_VERSION_MAJOR == 1) && (GDAL_VERSION_MINOR > 10))
+    #define HAVE_RFC40
+    #pragma message ("Defining HAVE_RFC40")
+#else
+    #pragma message ("HAVE_RFC40 not present")
+#endif
+
+namespace rsgis
 {
 	namespace img
 	{
