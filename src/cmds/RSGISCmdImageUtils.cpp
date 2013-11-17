@@ -683,7 +683,51 @@ namespace rsgis{ namespace cmds {
                 throw RSGISCmdException(e.what());
             }
         }
+                
+                
+        void executeSubsetImageBands(std::string inputImage, std::string outputImage, std::vector<unsigned int> bands, std::string gdalFormat, RSGISLibDataType outDataType)throw(RSGISCmdException)
+        {
+            try
+            {
+                GDALAllRegister();
+                
+                GDALDataset *imageDS = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_ReadOnly);
+                if(imageDS == NULL)
+                {
+                    std::string message = std::string("Could not open image ") + inputImage;
+                    throw RSGISImageException(message.c_str());
+                }
+                
+                unsigned int numBands = imageDS->GetRasterCount();
+                
+                for(std::vector<unsigned int>::iterator iterBands = bands.begin(); iterBands != bands.end(); ++iterBands)
+                {
+                    if(((*iterBands) == 0) || ((*iterBands) > numBands))
+                    {
+                        throw RSGISImageException("Not all the image bands are present within the input image file (Note. Bands are numbered from 1).");
+                    }
+                }
 
+                rsgis::img::RSGISCopyImageBandSelect *copyImageBands = new rsgis::img::RSGISCopyImageBandSelect(bands);
+                rsgis::img::RSGISCalcImage *calcImage = new rsgis::img::RSGISCalcImage(copyImageBands, "", true);
+                
+                calcImage->calcImage(&imageDS, 1, outputImage, false, NULL, gdalFormat, RSGIS_to_GDAL_Type(outDataType));
+                
+                GDALClose(imageDS);
+            }
+            catch (RSGISImageException& e)
+            {
+                throw RSGISCmdException(e.what());
+            }
+            catch (RSGISException& e)
+            {
+                throw RSGISCmdException(e.what());
+            }
+            catch(std::exception& e)
+            {
+                throw RSGISCmdException(e.what());
+            }
+        }
     }
 }
 

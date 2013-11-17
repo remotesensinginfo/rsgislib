@@ -22,6 +22,7 @@
 
 #include "rsgispy_common.h"
 #include "cmds/RSGISCmdImageUtils.h"
+#include <vector>
 
 /* An exception object for this module */
 /* created in the init function */
@@ -444,6 +445,53 @@ static PyObject *ImageUtils_ExtractZoneImageValues2HDF(PyObject *self, PyObject 
     Py_RETURN_NONE;
 }
 
+static PyObject *ImageUtils_SelectImageBands(PyObject *self, PyObject *args)
+{
+    const char *pszInputImage;
+    const char *pszOutputFile;
+    const char *pszGDALFormat;
+    int nDataType;
+    PyObject *pImageBands = NULL;
+    
+    if( !PyArg_ParseTuple(args, "sssiO:selectImageBands", &pszInputImage, &pszOutputFile, &pszGDALFormat, &nDataType, &pImageBands))
+        return NULL;
+    
+    if(!PySequence_Check(pImageBands)) {
+        PyErr_SetString(GETSTATE(self)->error, "Last argument must be a sequence of image bands (int)");
+        return NULL;
+    }
+    
+    std::vector<unsigned int> imgBands;
+    Py_ssize_t nFields = PySequence_Size(pImageBands);
+    
+    for(int i = 0; i < nFields; ++i)
+    {
+        PyObject *intObj = PySequence_GetItem(pImageBands, i);
+        
+        if(!RSGISPY_CHECK_INT(intObj))
+        {
+            PyErr_SetString(GETSTATE(pImageBands)->error, "Fields must be integers");
+            Py_DECREF(intObj);
+            return NULL;
+        }
+        
+        imgBands.push_back(RSGISPY_INT_EXTRACT(intObj));
+        Py_DECREF(intObj);
+    }
+    
+    try
+    {
+        rsgis::cmds::executeSubsetImageBands(std::string(pszInputImage), std::string(pszOutputFile), imgBands, std::string(pszGDALFormat), (rsgis::RSGISLibDataType)nDataType);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
 
 // Our list of functions in this module
 static PyMethodDef ImageUtilsMethods[] = {
@@ -586,12 +634,21 @@ static PyMethodDef ImageUtilsMethods[] = {
 " * rotY is a double representing Y rotation of the image.\n"},
     
     {"extractZoneImageValues2HDF", ImageUtils_ExtractZoneImageValues2HDF, METH_VARARGS,
-    "rsgislib.imageutils.extractZoneImageValues2HDF(inputImage, imageMask, outputHDF, maskValue)\n"
-    "Extract the all the pixel values for raster regions to a HDF5 file (1 column for each image band).\n"
-    " * inputImage is a string containing the name and path of the input file\n"
-    " * imageMask is a string containing the name and path of the input image mask file; the mask file must have only 1 image band.\n"
-    " * outputHDF is a string containing the name and path of the output HDF5 file\n"
-    " * maskValue is a float containing the value of the pixel within the mask for which values are to be extracted\n"},
+"rsgislib.imageutils.extractZoneImageValues2HDF(inputImage, imageMask, outputHDF, maskValue)\n"
+"Extract the all the pixel values for raster regions to a HDF5 file (1 column for each image band).\n"
+" * inputImage is a string containing the name and path of the input file\n"
+" * imageMask is a string containing the name and path of the input image mask file; the mask file must have only 1 image band.\n"
+" * outputHDF is a string containing the name and path of the output HDF5 file\n"
+" * maskValue is a float containing the value of the pixel within the mask for which values are to be extracted\n"},
+
+    {"selectImageBands", ImageUtils_SelectImageBands, METH_VARARGS,
+"rsgislib.imageutils.selectImageBands(inputImage, outputImage, gdalformat, type, bands)\n"
+"Extract the all the pixel values for raster regions to a HDF5 file (1 column for each image band).\n"
+" * inputImage is a string containing the name and path of the input file\n"
+" * outputImage is a string containing the name and path of the output file.\n"
+" * gdalformat is a string providing the output format of the tiles (e.g., KEA).\n"
+" * type is a rsgislib.TYPE_* value providing the output data type of the tiles.\n"
+" * bands is a list of integers for the bands in the input image to exported to the output image (Note band count starts at 1)."},
 
     {NULL}        /* Sentinel */
 };

@@ -116,6 +116,7 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
     XMLCh *optionCopyProjDef = XMLString::transcode("copyprojdef");
     XMLCh *optionCopyProjDefSpatialInfo = XMLString::transcode("copyprojdefspatialinfo");
     XMLCh *optionImageRasterZone2HDF = XMLString::transcode("imagerasterzone2hdf");
+    XMLCh *optionBandSelect = XMLString::transcode("bandselect");
 
 	const XMLCh *algorNameEle = argElement->getAttribute(algorXMLStr);
 	if(!XMLString::equals(algorName, algorNameEle))
@@ -3682,6 +3683,66 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 		}
 		XMLString::release(&maskValueXMLStr);
 	}
+    else if (XMLString::equals(optionBandSelect, optionXML))
+	{
+		this->option = RSGISExeImageUtils::bandselect;
+        
+		XMLCh *imageXMLStr = XMLString::transcode("image");
+		if(argElement->hasAttribute(imageXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(imageXMLStr));
+			this->inputImage = string(charValue);
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+		}
+		XMLString::release(&imageXMLStr);
+        
+        XMLCh *outputXMLStr = XMLString::transcode("output");
+		if(argElement->hasAttribute(outputXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(outputXMLStr));
+			this->outputFile = string(charValue);
+			XMLString::release(&charValue);
+		}
+		else
+		{
+			throw RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+		}
+		XMLString::release(&outputXMLStr);
+        
+        DOMElement *bandElement = NULL;
+        XMLCh *rsgisBandXMLStr = XMLString::transcode("rsgis:band");
+        XMLCh *bandXMLStr = XMLString::transcode("band");
+        
+        DOMNodeList *bandsList = argElement->getElementsByTagName(rsgisBandXMLStr);
+        unsigned int numBandsSpecified = bandsList->getLength();
+        this->selectBands.reserve(numBandsSpecified);
+        
+        
+        unsigned int bandNo = 0;
+        for(int i = 0; i < numBandsSpecified; i++)
+        {
+            bandElement = static_cast<DOMElement*>(bandsList->item(i));
+            
+            if(bandElement->hasAttribute(bandXMLStr))
+            {
+                char *charValue = XMLString::transcode(bandElement->getAttribute(bandXMLStr));
+                bandNo = mathUtils.strtounsignedint(string(charValue));
+                XMLString::release(&charValue);
+            }
+            else
+            {
+                throw RSGISXMLArgumentsException("No \'band\' attribute was provided.");
+            }
+            
+            selectBands.push_back(bandNo);
+        }
+        XMLString::release(&bandXMLStr);
+        XMLString::release(&rsgisBandXMLStr);
+	}
 	else
 	{
 		string message = string("The option (") + string(XMLString::transcode(optionXML)) + string(") is not known: RSGISExeImageUtils.");
@@ -3741,6 +3802,7 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
     XMLString::release(&optionCopyProjDef);
     XMLString::release(&optionCopyProjDefSpatialInfo);
     XMLString::release(&optionImageRasterZone2HDF);
+    XMLString::release(&optionBandSelect);
 
 	parsed = true;
 }
@@ -5888,6 +5950,37 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
             try
             {
                 rsgis::cmds::executeImageRasterZone2HDF(this->inputImage, this->imageMask, this->outputHDFFile, this->maskValue);
+            }
+            catch (rsgis::cmds::RSGISCmdException &e)
+            {
+                throw rsgis::RSGISException(e.what());
+            }
+        }
+        else if(option == RSGISExeImageUtils::bandselect)
+        {
+            cout.precision(12);
+            cout << "A command to subset an image to a given set of the input image bands.\n";
+            cout << "Input Image: " << this->inputImage << endl;
+            cout << "Output Image: " << this->outputFile << endl;
+            cout << "Bands: ";
+            bool first = true;
+            for(std::vector<unsigned int>::iterator iterBands = selectBands.begin(); iterBands != selectBands.end(); ++iterBands)
+            {
+                if(first)
+                {
+                    cout << (*iterBands);
+                    first = false;
+                }
+                else
+                {
+                    cout << ", " << (*iterBands);
+                }
+            }
+            cout << endl;
+            
+            try
+            {
+                rsgis::cmds::executeSubsetImageBands(this->inputImage, this->outputFile, selectBands, this->imageFormat, this->rsgisOutDataType);
             }
             catch (rsgis::cmds::RSGISCmdException &e)
             {
