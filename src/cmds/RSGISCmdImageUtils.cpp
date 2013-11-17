@@ -40,6 +40,8 @@
 #include "img/RSGISAddBands.h"
 #include "img/RSGISExtractImageValues.h"
 
+#include "vec/RSGISVectorUtils.h"
+
 namespace rsgis{ namespace cmds {
 
         void executeStretchImage(std::string inputImage, std::string outputImage, bool saveOutStats, std::string outStatsFile, bool ignoreZeros, bool onePassSD, std::string gdalFormat, RSGISLibDataType outDataType, RSGISStretches stretchType, float stretchParam)throw(RSGISCmdException)
@@ -208,7 +210,7 @@ namespace rsgis{ namespace cmds {
             {
                 // Open Image
                 dataset = new GDALDataset*[1];
-                //cout << this->inputImage << endl;
+                //cout << inputImage << endl;
                 dataset[0] = (GDALDataset *) GDALOpenShared(inputImage.c_str(), GA_ReadOnly);
                 if(dataset[0] == NULL)
                 {
@@ -684,6 +686,79 @@ namespace rsgis{ namespace cmds {
             }
         }
 
-    }
-}
+        void excecuteSubset(std::string inputImage, std::string inputVector, std::string outputImage, std::string format, RSGISLibDataType outDataType) throw(RSGISCmdException)
+        {
+            try
+            {
+                GDALAllRegister();
+                OGRRegisterAll();
+                
+                GDALDataset **dataset = NULL;
+                OGRDataSource *inputVecDS = NULL;
+                OGRLayer *inputVecLayer = NULL;
+                
+                rsgis::img::RSGISCopyImage *copyImage = NULL;
+                rsgis::img::RSGISCalcImage *calcImage = NULL;
+                
+                rsgis::vec::RSGISVectorUtils vecUtils;
+                
+                std::string vectorLayerName = vecUtils.getLayerName(inputVector);
+                int numImageBands = 0;
+                
+                // Open Image
+                dataset = new GDALDataset*[1];
+                std::cout << inputImage << std::endl;
+                dataset[0] = (GDALDataset *) GDALOpenShared(inputImage.c_str(), GA_ReadOnly);
+                if(dataset[0] == NULL)
+                {
+                    std::string message = std::string("Could not open image ") + inputImage;
+                    throw rsgis::RSGISImageException(message.c_str());
+                }
+                numImageBands = dataset[0]->GetRasterCount();
+                std::cout << "Raster Band Count = " << numImageBands << std::endl;
+                
+                // Open vector
+                inputVecDS = OGRSFDriverRegistrar::Open(inputVector.c_str(), FALSE);
+                if(inputVecDS == NULL)
+                {
+                    std::string message = std::string("Could not open vector file ") + inputVector;
+                    throw RSGISFileException(message.c_str());
+                }
+                inputVecLayer = inputVecDS->GetLayerByName(vectorLayerName.c_str());
+                if(inputVecLayer == NULL)
+                {
+                    std::string message = std::string("Could not open vector layer ") + vectorLayerName;
+                    throw RSGISFileException(message.c_str());
+                }
+                OGREnvelope ogrExtent;
+                inputVecLayer->GetExtent(&ogrExtent);
+                geos::geom::Envelope extent = geos::geom::Envelope(ogrExtent.MinX, ogrExtent.MaxX, ogrExtent.MinY, ogrExtent.MaxY);
+                
+                copyImage = new rsgis::img::RSGISCopyImage(numImageBands);
+                calcImage = new rsgis::img::RSGISCalcImage(copyImage, "", true);
+                calcImage->calcImageInEnv(dataset, 1, outputImage, &extent, false, NULL, format, RSGIS_to_GDAL_Type(outDataType));
+                
+                GDALClose(dataset[0]);
+                delete[] dataset;
+                OGRDataSource::DestroyDataSource(inputVecDS);
+                OGRCleanupAll();
+                GDALDestroyDriverManager();
+                delete calcImage;
+                delete copyImage;
+            }
+            catch (RSGISImageException& e)
+            {
+                throw RSGISCmdException(e.what());
+            }
+            catch (RSGISException& e)
+            {
+                throw RSGISCmdException(e.what());
+            }
+            catch(std::exception& e)
+            {
+                throw RSGISCmdException(e.what());
+            }
+        }
+
+}}
 
