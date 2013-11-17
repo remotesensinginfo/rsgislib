@@ -48,7 +48,7 @@ if __name__ == '__main__':
                                                    segmentation algorithm.''')
 
     # Request the version number.
-    parser.add_argument('-v', '--version', action='version', version='%(prog)s Version 0.1a')
+    parser.add_argument('-v', '--version', action='version', version='%(prog)s Version 1.0')
 
     # Define the argument for specifying the input image.
     parser.add_argument("-i", "--input", type=str, help='''Specify the input image file.''', required=True)
@@ -70,6 +70,9 @@ if __name__ == '__main__':
     
     # Define the argument for specifying the output image.
     parser.add_argument("-d", "--distthres", type=float, help='''Specify the distance threshold for joining the segments (default is a very large value which turns off this option.).''', default=1000000, required=False)
+    
+    # Define the argment for specifying the selected image bands.
+    parser.add_argument('-b', '--band', metavar='N', type=int, nargs='+', help='An integer specifying the selected image bands.')
     
     # Define the argument for specifying the image file format.
     parser.add_argument("-f", "--format", type=str, default="KEA",
@@ -99,5 +102,5 @@ if __name__ == '__main__':
     print('This script was distributed with @RSGISLIB_PACKAGE_STRING@')
     print('Copyright (C) @RSGISLIB_COPYRIGHT_YEAR@ Peter Bunting and Daniel Clewley')
     print('For maintainance email @RSGISLIB_PACKAGE_BUGREPORT@')
-	
-    rsgislib.segmentation.segutils.runShepherdSegmentation(args.input, args.output, args.outmeanimg, args.tmpath, args.format, args.nostats, args.nostretch, args.nodelete, args.numclusters, args.minpxls, args.distthres)
+    
+    rsgislib.segmentation.segutils.runShepherdSegmentation(args.input, args.output, args.outmeanimg, args.tmpath, args.format, args.nostats, args.nostretch, args.nodelete, args.numclusters, args.minpxls, args.distthres, args.band)

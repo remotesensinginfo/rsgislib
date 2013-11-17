@@ -42,36 +42,50 @@ namespace rsgis{namespace img{
 		}
 	}
 	
-	void RSGISCopyImage::calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException)
-	{
-		throw RSGISImageCalcException("No implemented");
-	}
-	
-	void RSGISCopyImage::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(RSGISImageCalcException)
-	{
-		throw RSGISImageCalcException("Not Implemented");
-	}
-	
-	void RSGISCopyImage::calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(RSGISImageCalcException)
-	{
-		throw RSGISImageCalcException("No implemented");
-	}
-	
-	void RSGISCopyImage::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException)
-	{
-		throw RSGISImageCalcException("No implemented");
-	}
-
-	bool RSGISCopyImage::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException)
-	{
-		throw RSGISImageCalcException("No implemented");
-	}
-	
 	RSGISCopyImage::~RSGISCopyImage()
 	{
 		
 	}
-	
+    
+    
+    
+    RSGISCopyImageBandSelect::RSGISCopyImageBandSelect(std::vector<unsigned int> bands) : RSGISCalcImageValue(bands.size())
+    {
+        this->bands = bands;
+    }
+    
+    void RSGISCopyImageBandSelect::calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException)
+    {
+        if(numOutBands == 0)
+		{
+			RSGISImageCalcException("The number of output image bands must be greater than 0.");
+		}
+        else if(numOutBands != bands.size())
+        {
+            RSGISImageCalcException("The number of output image bands must be equal to the number of band specified.");
+        }
+		
+        unsigned int bandIdx = 0;
+		for(std::vector<unsigned int>::iterator iterBands = bands.begin(); iterBands != bands.end(); ++iterBands)
+		{
+            if((*iterBands) == 0)
+            {
+                RSGISImageCalcException("A band index of zero has been specified, band numbering starts at 1.");
+            }
+            if((*iterBands) > numBands)
+            {
+                RSGISImageCalcException("A band index outside of the input image range has been specified, band numbering starts at 1.");
+            }
+			output[bandIdx++] = bandValues[(*iterBands)-1];
+		}
+    }
+    
+    RSGISCopyImageBandSelect::~RSGISCopyImageBandSelect()
+    {
+        
+    }
+    
+    
 }}
 
 
