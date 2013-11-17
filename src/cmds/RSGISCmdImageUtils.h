@@ -95,6 +95,7 @@ namespace rsgis{ namespace cmds {
 
     /** A function to subset an input data by to a set of image bands */
     void executeSubsetImageBands(std::string inputImage, std::string outputImage, std::vector<unsigned int> bands, std::string gdalFormat, RSGISLibDataType outDataType)throw(RSGISCmdException);
+    
 
 }}
 
