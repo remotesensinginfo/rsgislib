@@ -84,6 +84,9 @@ namespace rsgis{ namespace cmds {
     /** A function to extract image values to a HDF file */
     void executeImageRasterZone2HDF(std::string imageFile, std::string maskImage, std::string outputHDF, float maskVal)throw(RSGISCmdException);
     
+    /** A function to subset an input data by to a set of image bands */
+    void executeSubsetImageBands(std::string inputImage, std::string outputImage, std::vector<unsigned int> bands, std::string gdalFormat, RSGISLibDataType outDataType)throw(RSGISCmdException);
+    
 }}
 
 

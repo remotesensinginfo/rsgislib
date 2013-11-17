@@ -153,7 +153,8 @@ class RSGISExeImageUtils : public RSGISAlgorithmParameters
             darktargetmask,
             copyprojdef,
             copyprojdefspatialinfo,
-            imagerasterzone2hdf
+            imagerasterzone2hdf,
+            bandselect
 		};
 
 		enum interpolators
@@ -281,6 +282,7 @@ class RSGISExeImageUtils : public RSGISAlgorithmParameters
         bool offsetTiling;
         unsigned int imageSample;
         unsigned int overlapBehaviour; // Behaviour for multiple pixels in mosaic
+        std::vector<unsigned int> selectBands;
 	};
 }
 #endif
