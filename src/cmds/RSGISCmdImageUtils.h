@@ -85,7 +85,10 @@ namespace rsgis{ namespace cmds {
     void executeImageRasterZone2HDF(std::string imageFile, std::string maskImage, std::string outputHDF, float maskVal)throw(RSGISCmdException);
     
     /** A fuunction to subset an image to the bounding box of a polygon */
-    void excecuteSubset(std::string inputImage, std::string inputVector, std::string outputImage, std::string format, RSGISLibDataType outDataType) throw(RSGISCmdException);
+    void excecuteSubset(std::string inputImage, std::string inputVector, std::string outputImage, std::string imageFormat, RSGISLibDataType outDataType) throw(RSGISCmdException);
+    
+    /** A function to subset an image to polygons within shapefile */
+    void excecuteSubset2Polys(std::string inputImage, std::string inputVector, std::string filenameAttribute, std::string outputImageBase, std::string imageFormat, RSGISLibDataType outDataType, std::string outFileExtension) throw(RSGISCmdException);
     
 }}
 

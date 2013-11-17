@@ -4838,112 +4838,14 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
         else if(option == RSGISExeImageUtils::subset2polys)
 		{
             std::cout << "Subset image to bounding box of polygons\n";
-            
-			GDALAllRegister();
-			OGRRegisterAll();
-
-			GDALDataset **dataset = NULL;
-			OGRDataSource *inputVecDS = NULL;
-			OGRLayer *inputVecLayer = NULL;
-
-			RSGISCopyImage *copyImage = NULL;
-			RSGISCalcImage *calcImage = NULL;
-
-			RSGISVectorIO vecIO;
-			RSGISPolygonData **polyData = NULL;
-			RSGISImageTileVector **data = NULL;
-			RSGISVectorUtils vecUtils;
-
-			string vectorLayerName = vecUtils.getLayerName(this->inputVector);
-			int numImageBands = 0;
-			int numFeatures = 0;
-			string outputFilePath;
-
-			try
-			{
-				// Open Image
-				dataset = new GDALDataset*[1];
-				cout << this->inputImage << endl;
-				dataset[0] = (GDALDataset *) GDALOpenShared(this->inputImage.c_str(), GA_ReadOnly);
-				if(dataset[0] == NULL)
-				{
-					string message = string("Could not open image ") + this->inputImage;
-					throw RSGISImageException(message.c_str());
-				}
-				numImageBands = dataset[0]->GetRasterCount();
-				cout << "Raster Band Count = " << numImageBands << endl;
-
-				// Open vector
-				inputVecDS = OGRSFDriverRegistrar::Open(this->inputVector.c_str(), FALSE);
-				if(inputVecDS == NULL)
-				{
-					string message = string("Could not open vector file ") + this->inputVector;
-					throw RSGISFileException(message.c_str());
-				}
-				inputVecLayer = inputVecDS->GetLayerByName(vectorLayerName.c_str());
-				if(inputVecLayer == NULL)
-				{
-					string message = string("Could not open vector layer ") + vectorLayerName;
-					throw RSGISFileException(message.c_str());
-				}
-
-				// READ IN SHAPEFILE
-				numFeatures = inputVecLayer->GetFeatureCount();
-				polyData = new RSGISPolygonData*[numFeatures];
-				for(int i = 0; i < numFeatures; i++)
-				{
-					polyData[i] = new RSGISImageTileVector(this->filenameAttribute);
-				}
-				cout << "Reading in " << numFeatures << " features\n";
-				vecIO.readPolygons(inputVecLayer, polyData, numFeatures);
-
-				//Convert to RSGISImageTileVector
-				data = new RSGISImageTileVector*[numFeatures];
-				for(int i = 0; i < numFeatures; i++)
-				{
-					data[i] = dynamic_cast<RSGISImageTileVector*>(polyData[i]);
-				}
-				delete[] polyData;
-
-				copyImage = new RSGISCopyImage(numImageBands);
-				calcImage = new RSGISCalcImage(copyImage, "", true);
-
-				unsigned int failCount = 0;
-				for(int i = 0; i < numFeatures; i++)
-				{
-					outputFilePath = this->outputImage + data[i]->getFileName() + "." + this->outFileExtension;
-					cout << i << ": " << outputFilePath << endl;
-                    try
-                    {
-                        calcImage->calcImageInEnv(dataset, 1, outputFilePath, data[i]->getBBox(), false, NULL, this->imageFormat, this->outDataType);
-                    }
-                    catch (RSGISImageBandException e)
-                    {
-                        ++failCount;
-                        if(failCount <= 100)
-                        {
-                            cerr << "RSGISException caught: " << e.what() << endl;
-                            cerr << "Check output path exists and is writable and all polygons in shapefile:" << endl;
-                            cerr << " " << this->inputVector << endl;
-                            cerr << "Are completely within:" << endl;
-                            cerr << " " << this->inputImage << endl;
-                        }
-                        else
-                        {
-                            cerr << "Over 100 exceptions have been caught, exiting" << endl;
-                            throw e;
-                        }
-                    }
-				}
-
-				GDALClose(dataset[0]);
-				delete[] dataset;
-				OGRDataSource::DestroyDataSource(inputVecDS);
-				OGRCleanupAll();
-				GDALDestroyDriverManager();
-				delete calcImage;
-				delete copyImage;
-			}
+            cout << "Input Image: " << this->inputImage << endl;
+            cout << "Input Vector: " << this->inputVector << endl;
+			cout << "Output Image base: " << this->outputImage << endl;
+        
+            try
+            {
+                rsgis::cmds::excecuteSubset2Polys(this->inputImage, this->inputVector, this->filenameAttribute, this->outputImage, this->imageFormat, this->rsgisOutDataType, this->outFileExtension);
+            }
 			catch(RSGISException e)
 			{
 				cerr << "RSGISException caught: " << e.what() << endl;

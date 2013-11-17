@@ -40,7 +40,11 @@
 #include "img/RSGISAddBands.h"
 #include "img/RSGISExtractImageValues.h"
 
+#include "vec/RSGISImageTileVector.h"
+#include "vec/RSGISVectorOutputException.h"
+#include "vec/RSGISVectorIO.h"
 #include "vec/RSGISVectorUtils.h"
+#include "vec/RSGISPolygonData.h"
 
 namespace rsgis{ namespace cmds {
 
@@ -686,7 +690,7 @@ namespace rsgis{ namespace cmds {
             }
         }
 
-        void excecuteSubset(std::string inputImage, std::string inputVector, std::string outputImage, std::string format, RSGISLibDataType outDataType) throw(RSGISCmdException)
+        void excecuteSubset(std::string inputImage, std::string inputVector, std::string outputImage, std::string imageFormat, RSGISLibDataType outDataType) throw(RSGISCmdException)
         {
             try
             {
@@ -736,7 +740,7 @@ namespace rsgis{ namespace cmds {
                 
                 copyImage = new rsgis::img::RSGISCopyImage(numImageBands);
                 calcImage = new rsgis::img::RSGISCalcImage(copyImage, "", true);
-                calcImage->calcImageInEnv(dataset, 1, outputImage, &extent, false, NULL, format, RSGIS_to_GDAL_Type(outDataType));
+                calcImage->calcImageInEnv(dataset, 1, outputImage, &extent, false, NULL, imageFormat, RSGIS_to_GDAL_Type(outDataType));
                 
                 GDALClose(dataset[0]);
                 delete[] dataset;
@@ -760,5 +764,126 @@ namespace rsgis{ namespace cmds {
             }
         }
 
+        void excecuteSubset2Polys(std::string inputImage, std::string inputVector, std::string filenameAttribute, std::string outputImageBase, std::string imageFormat, RSGISLibDataType outDataType, std::string outFileExtension) throw(RSGISCmdException)
+        {
+            try
+            {
+                GDALAllRegister();
+                OGRRegisterAll();
+                
+                GDALDataset **dataset = NULL;
+                OGRDataSource *inputVecDS = NULL;
+                OGRLayer *inputVecLayer = NULL;
+                
+                rsgis::img::RSGISCopyImage *copyImage = NULL;
+                rsgis::img::RSGISCalcImage *calcImage = NULL;
+                
+                rsgis::vec::RSGISVectorIO vecIO;
+                rsgis::vec::RSGISPolygonData **polyData = NULL;
+                rsgis::vec::RSGISImageTileVector **data = NULL;
+                rsgis::vec::RSGISVectorUtils vecUtils;
+                
+                std::string vectorLayerName = vecUtils.getLayerName(inputVector);
+                int numImageBands = 0;
+                int numFeatures = 0;
+                std::string outputFilePath;
+                
+                // Open Image
+                dataset = new GDALDataset*[1];
+                std::cout << inputImage << std::endl;
+                dataset[0] = (GDALDataset *) GDALOpenShared(inputImage.c_str(), GA_ReadOnly);
+                if(dataset[0] == NULL)
+                {
+                    std::string message = std::string("Could not open image ") + inputImage;
+                    throw rsgis::RSGISImageException(message.c_str());
+                }
+                numImageBands = dataset[0]->GetRasterCount();
+                std::cout << "Raster Band Count = " << numImageBands << std::endl;
+                
+                // Open vector
+                inputVecDS = OGRSFDriverRegistrar::Open(inputVector.c_str(), FALSE);
+                if(inputVecDS == NULL)
+                {
+                    std::string message = std::string("Could not open vector file ") + inputVector;
+                    throw rsgis::RSGISFileException(message.c_str());
+                }
+                inputVecLayer = inputVecDS->GetLayerByName(vectorLayerName.c_str());
+                if(inputVecLayer == NULL)
+                {
+                    std::string message = std::string("Could not open vector layer ") + vectorLayerName;
+                    throw rsgis::RSGISFileException(message.c_str());
+                }
+                
+                // READ IN SHAPEFILE
+                numFeatures = inputVecLayer->GetFeatureCount();
+                polyData = new rsgis::vec::RSGISPolygonData*[numFeatures];
+                for(int i = 0; i < numFeatures; i++)
+                {
+                    polyData[i] = new rsgis::vec::RSGISImageTileVector(filenameAttribute);
+                }
+                std::cout << "Reading in " << numFeatures << " features\n";
+                vecIO.readPolygons(inputVecLayer, polyData, numFeatures);
+                
+                //Convert to RSGISImageTileVector
+                data = new rsgis::vec::RSGISImageTileVector*[numFeatures];
+                for(int i = 0; i < numFeatures; i++)
+                {
+                    data[i] = dynamic_cast<rsgis::vec::RSGISImageTileVector*>(polyData[i]);
+                }
+                delete[] polyData;
+                
+                copyImage = new rsgis::img::RSGISCopyImage(numImageBands);
+                calcImage = new rsgis::img::RSGISCalcImage(copyImage, "", true);
+                
+                unsigned int failCount = 0;
+                for(int i = 0; i < numFeatures; i++)
+                {
+                    outputFilePath = outputImageBase + data[i]->getFileName() + "." + outFileExtension;
+                    std::cout << i << ": " << outputFilePath << std::endl;
+                    try
+                    {
+                        calcImage->calcImageInEnv(dataset, 1, outputFilePath, data[i]->getBBox(), false, NULL, imageFormat, RSGIS_to_GDAL_Type(outDataType));
+                    }
+                    catch (rsgis::img::RSGISImageBandException e)
+                    {
+                        ++failCount;
+                        if(failCount <= 100)
+                        {
+                            std::cerr << "RSGISException caught: " << e.what() << std::endl;
+                            std::cerr << "Check output path exists and is writable and all polygons in shapefile:" << std::endl;
+                            std::cerr << " " << inputVector << std::endl;
+                            std::cerr << "Are completely within:" << std::endl;
+                            std::cerr << " " << inputImage << std::endl;
+                        }
+                        else
+                        {
+                            std::cerr << "Over 100 exceptions have been caught, exiting" << std::endl;
+                            throw e;
+                        }
+                    }
+                }
+                
+                GDALClose(dataset[0]);
+                delete[] dataset;
+                OGRDataSource::DestroyDataSource(inputVecDS);
+                OGRCleanupAll();
+                GDALDestroyDriverManager();
+                delete calcImage;
+                delete copyImage;
+            }
+            catch (RSGISImageException& e)
+            {
+                throw RSGISCmdException(e.what());
+            }
+            catch (RSGISException& e)
+            {
+                throw RSGISCmdException(e.what());
+            }
+            catch(std::exception& e)
+            {
+                throw RSGISCmdException(e.what());
+            }
+        }
+    
 }}
 
