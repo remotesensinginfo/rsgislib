@@ -3,8 +3,7 @@ The segmentation module contains the segmentation functionality for RSGISLib.
 
 The segmentation uses the algorithm descriped in:
 
-Shepherd, J., Bunting, P., Dymond, J., 2013. Segmentation of imagery based on
-iterative elimination. Remote Sensing. Accepted for Publication.
+Shepherd, J., Bunting, P., Dymond, J., 2013. Operational large-scale segmentation of imagery based on iterative elimination. Journal of Applied Remote Sensing. Submitted.
 
 To segment an image requires a number of commands to be run in sequence.
 

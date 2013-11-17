@@ -1,0 +1,54 @@
+#!/usr/bin/env python
+
+#############################################
+# rsgislib_attributeRAT.py
+#
+# A script to calculate attribute a RAT with 
+# statistics from each band in an input image.
+#
+# Requires RSGISLib HG version > 639
+#
+# Dan Clewley (daniel.clewley@gmail.com) 17/10/2013
+# 
+#############################################
+import sys, argparse
+
+try:
+    import rsgislib
+    import rsgislib.rastergis.ratutils
+except ImportError:
+    print("ERROR: Couldn't import RSGISLib python modules")
+    sys.exit()
+
+# Set up options
+parser = argparse.ArgumentParser()
+parser.add_argument("--inimage", type=str, help="Input image.", required=True)
+parser.add_argument("--inclumps", type=str, \
+    help="Input clumps file", required=True)
+parser.add_argument("--outascii", type=str, help="Output ASCII file (CSV) - optional", default=None)
+parser.add_argument("--min", dest='calcMin', default=False, action='store_true')
+parser.add_argument("--max", dest='calcMax', default=False, action='store_true')
+parser.add_argument("--mean", dest='calcMean', default=False, action='store_true')
+parser.add_argument("--stddev", dest='calcStDev', default=False, \
+    action='store_true')
+parser.add_argument("--median", dest='calcMedian', default=False, action='store_true')
+parser.add_argument("--sum", dest='calcSum', default=False, action='store_true')
+parser.add_argument("--count", dest='calcCount', default=False, action='store_true')
+parser.add_argument("--area", dest='calcArea', default=False, action='store_true')
+parser.add_argument("--length", dest='calcLength', default=False, action='store_true')
+parser.add_argument("--width", dest='calcWidth', default=False, action='store_true')
+parser.add_argument("--lengthwidth", dest='calcLengthWidth', default=False, action='store_true')
+parser.add_argument("--threshold", dest='threshold', type=float, default=0.0)
+
+args = parser.parse_args() 
+
+
+print('rsgislibattributerat.py script provides command line utility.')
+print('for populating statistics within a RAT from another image. ')
+print('This script was distributed with @RSGISLIB_PACKAGE_STRING@')
+print('Copyright (C) @RSGISLIB_COPYRIGHT_YEAR@ Peter Bunting and Daniel Clewley')
+print('For maintainance email @RSGISLIB_PACKAGE_BUGREPORT@')
+
+rsgislib.rastergis.ratutils.populateImageStats(args.inimage, args.inclumps, args.outascii, args.threshold, args.calcMin, args.calcMax, args.calcSum, args.calcMean, args.calcStDev, args.calcMedian, args.calcCount, args.calcArea, args.calcLength, args.calcWidth, args.calcLengthWidth)
+
+
