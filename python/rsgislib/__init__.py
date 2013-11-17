@@ -146,6 +146,25 @@ class RSGISPyUtils (object):
             raise RSGISPyException("The extension for the format specified is unknown.")
         return ext
     
+    def getGDALFormatFromExt(self, fileName):
+        """ Get GDAL format, based on filename """
+        gdalStr = ''
+        extension = os.path.splitext(fileName)[-1] 
+        if extension == '.env':
+            gdalStr = 'ENVI'
+        elif extension == '.kea':
+            gdalStr = 'KEA'
+        elif extension == '.tif' or extension == '.tiff':
+            gdalStr = 'GTiff'
+        elif extension == '.img':
+            gdalStr = 'HFA'
+        elif extension == '.pix':
+            gdalStr = 'PCIDSK'
+        else:
+            raise Exception('Type not recognised')
+        
+        return gdalStr
+
     def deleteFileWithBasename(self, filePath):
         """
         Function to delete all the files which have a path
