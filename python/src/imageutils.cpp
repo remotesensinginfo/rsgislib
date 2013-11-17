@@ -616,7 +616,13 @@ static PyMethodDef ImageUtilsMethods[] = {
 " * inputImage is a string containing the name of the input file\n"
 " * useNoDataValue is a boolean stating whether the no data value is to be used.\n"
 " * noDataValue is a floating point value to be used as the no data value.\n"
-" * buildPyramids is a boolean stating whether image pyramids should be calculated.\n"},
+" * buildPyramids is a boolean stating whether image pyramids should be calculated.\n"
+"Example::\n"
+"\n"
+"   from rsgislib import imageutils\n"
+"   inputImage = './TestOutputs/injune_p142_casi_sub_utm.kea'\n"
+"   imageutils.popImageStats(inputImage,True,0.,True)\n"
+"\n"},
     
     {"assignProj", ImageUtils_AssignProj, METH_VARARGS,
 "rsgislib.imageutils.assignProj(inputImage, wktString, wktStringFile)\n"
