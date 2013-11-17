@@ -52,8 +52,9 @@ import os
 # Import the collections module
 import collections
 import fnmatch
+import osgeo.gdal as gdal
 
-def runShepherdSegmentation(inputImg, outputClumps, outputMeanImg, tmpath, gdalFormat, noStats, noStretch, noDelete, numClusters, minPxls, distThres): 
+def runShepherdSegmentation(inputImg, outputClumps, outputMeanImg, tmpath, gdalFormat, noStats, noStretch, noDelete, numClusters, minPxls, distThres, bands): 
     rsgisUtils = rsgislib.RSGISPyUtils()
     
     basefile = os.path.basename(inputImg)
@@ -66,17 +67,28 @@ def runShepherdSegmentation(inputImg, outputClumps, outputMeanImg, tmpath, gdalF
         os.makedirs(tmpath)
         createdDIR = True
         
-    # Select Image Bands if required - needs new RSGISLib command for this!!!
+    # Select Image Bands if required
+    inputImgBands = inputImg
+    selectBands = False
+    if not bands == None:
+        print("Subsetting the image bands")
+        selectBands = True
+        gdalDS = gdal.Open(inputImg, gdal.GA_ReadOnly)
+        rsgisUtils = rsgislib.RSGISPyUtils()
+        dType = rsgisUtils.getRSGISLibDataType(gdal.GetDataTypeName(gdalDS.GetRasterBand(1).DataType))
+        gdalDS = None
+        inputImgBands = os.path.join(tmpath,basename+str("_bselect")+outFileExt)
+        rsgislib.imageutils.selectImageBands(inputImg, inputImgBands, gdalFormat, dType, bands)        
     
     # Stretch input data if required.
-    segmentFile = inputImg
+    segmentFile = inputImgBands
     if not noStretch:
         segmentFile = os.path.join(tmpath,basename+str("_stchd")+outFileExt)
         strchFile = os.path.join(tmpath,basename+str("_stchdonly")+outFileExt)
         strchFileOffset = os.path.join(tmpath,basename+str("_stchdonlyOff")+outFileExt)
         strchMaskFile = os.path.join(tmpath,basename+str("_stchdmaskonly")+outFileExt)
         print("Stretch Input Image")
-        rsgislib.imageutils.stretchImage(inputImg, strchFile, False, "", True, False, gdalFormat, rsgislib.TYPE_32FLOAT, rsgislib.imageutils.STRETCH_LINEARSTDDEV, 2)
+        rsgislib.imageutils.stretchImage(inputImgBands, strchFile, False, "", True, False, gdalFormat, rsgislib.TYPE_32FLOAT, rsgislib.imageutils.STRETCH_LINEARSTDDEV, 2)
         
         print("Add 1 to stretched file to ensure there are no all zeros (i.e., no data) regions created.")
         rsgislib.imagecalc.imageMath(strchFile, strchFileOffset, "b1+1", gdalFormat, rsgislib.TYPE_32FLOAT)
@@ -84,7 +96,7 @@ def runShepherdSegmentation(inputImg, outputClumps, outputMeanImg, tmpath, gdalF
         print("Create Input Image Mask.")
         ImgBand = collections.namedtuple('ImgBands', ['bandName', 'fileName', 'bandIndex'])
         bandMathBands = list()
-        bandMathBands.append(ImgBand(bandName="b1", fileName=inputImg, bandIndex=1))
+        bandMathBands.append(ImgBand(bandName="b1", fileName=inputImgBands, bandIndex=1))
         rsgislib.imagecalc.bandMath(strchMaskFile, "b1==0?1:0", gdalFormat, rsgislib.TYPE_32FLOAT, bandMathBands)
         
         print("Mask stretched Image.")
@@ -144,7 +156,9 @@ def runShepherdSegmentation(inputImg, outputClumps, outputMeanImg, tmpath, gdalF
         rsgisUtils.deleteFileWithBasename(kMeansFileZonesNoSgls)
         rsgisUtils.deleteFileWithBasename(kMeansFileZonesNoSglsTmp)
         rsgisUtils.deleteFileWithBasename(initClumpsFile)
-        rsgisUtils.deleteFileWithBasename(elimClumpsFile)          
+        rsgisUtils.deleteFileWithBasename(elimClumpsFile)
+        if selectBands:
+            rsgisUtils.deleteFileWithBasename(inputImgBands)
         if not noStretch:
             rsgisUtils.deleteFileWithBasename(segmentFile)
         if createdDIR:
