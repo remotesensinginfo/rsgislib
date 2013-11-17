@@ -21,12 +21,22 @@ Tile & Mosaic
 
 Visualisation / Normalisation
 ------------------------------
+
 .. autofunction:: rsgislib.imageutils.stretchImage
 .. autofunction:: rsgislib.imageutils.stretchImageWithStats
 
+
+Subset / Mask
+--------------
+
+.. autofunction:: rsgislib.imageutils.maskImage
+.. autofunction:: rsgislib.imageutils.subset
+.. autofunction:: rsgislib.imageutils.subset2img
+.. autofunction:: rsgislib.imageutils.subset2polys
+
+
 Other
 ------
-.. autofunction:: rsgislib.imageutils.maskImage
 .. autofunction:: rsgislib.imageutils.popImageStats
 
 * :ref:`genindex`

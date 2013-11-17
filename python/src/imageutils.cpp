@@ -445,6 +445,69 @@ static PyObject *ImageUtils_ExtractZoneImageValues2HDF(PyObject *self, PyObject 
 }
 
 
+static PyObject *ImageUtils_Subset(PyObject *self, PyObject *args)
+{
+    const char *pszInputImage, *pszInputVector, *pszOutputImage, *pszGDALFormat;
+    int nOutDataType;
+
+    if( !PyArg_ParseTuple(args, "ssssi:subset", &pszInputImage, &pszInputVector, &pszOutputImage, &pszGDALFormat, &nOutDataType))
+        return NULL;
+    
+    try
+    {
+        rsgis::cmds::excecuteSubset(pszInputImage, pszInputVector, pszOutputImage, pszGDALFormat, (rsgis::RSGISLibDataType)nOutDataType);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
+static PyObject *ImageUtils_Subset2Polys(PyObject *self, PyObject *args)
+{
+    const char *pszInputImage, *pszInputVector, *pszOutputImageBase, *pszAttribute, *pszGDALFormat, *pszOutputExt;
+    int nOutDataType;
+
+    if( !PyArg_ParseTuple(args, "sssssis:subset2polys", &pszInputImage, &pszInputVector, &pszAttribute, &pszOutputImageBase, &pszGDALFormat, &nOutDataType, &pszOutputExt))
+        return NULL;
+    
+    try
+    {
+        rsgis::cmds::excecuteSubset2Polys(pszInputImage, pszInputVector, pszAttribute, pszOutputImageBase, pszGDALFormat, (rsgis::RSGISLibDataType)nOutDataType, pszOutputExt);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
+static PyObject *ImageUtils_Subset2Img(PyObject *self, PyObject *args)
+{
+    const char *pszInputImage, *pszInputROI, *pszOutputImage, *pszGDALFormat;
+    int nOutDataType;
+
+    if( !PyArg_ParseTuple(args, "ssssi:subset2img", &pszInputImage, &pszInputROI, &pszOutputImage, &pszGDALFormat, &nOutDataType))
+        return NULL;
+    
+    try
+    {
+        rsgis::cmds::excecuteSubset2Img(pszInputImage, pszInputROI, pszOutputImage, pszGDALFormat, (rsgis::RSGISLibDataType)nOutDataType);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
 // Our list of functions in this module
 static PyMethodDef ImageUtilsMethods[] = {
     {"stretchImage", ImageUtils_StretchImage, METH_VARARGS, 
@@ -592,6 +655,78 @@ static PyMethodDef ImageUtilsMethods[] = {
     " * imageMask is a string containing the name and path of the input image mask file; the mask file must have only 1 image band.\n"
     " * outputHDF is a string containing the name and path of the output HDF5 file\n"
     " * maskValue is a float containing the value of the pixel within the mask for which values are to be extracted\n"},
+
+    {"subset", ImageUtils_Subset, METH_VARARGS,
+"imageutils.subset(inputimage, inputvector, outputimage, gdalformat, type)"
+"Subset an image to the bounding box of a vector.\n"
+"Where:\n"
+"\n"
+" * inputimage is a string providing the name of the input file.\n"
+" * inputvector is a string providing the vector which the image is to be clipped to. \n"
+" * outputimage is a string providing the output image. \n"
+" * gdalformat is a string providing the output format of the tiles (e.g., KEA).\n"
+" * type is a rsgislib.TYPE_* value providing the output data type of the tiles.\n"
+"Example::\n"
+"\n"
+"	import rsgislib\n"
+"	from rsgislib import imageutils\n"
+"   inputImage = './Rasters/injune_p142_casi_sub_utm.kea'\n"
+"   inputVector = './Vectors/injune_p142_plot_location_utm.shp'\n"
+"   outputImage = './TestOutputs/injune_p142_casi_sub_utm_subset.kea'\n"
+"   format = 'KEA'\n"
+"   dataType = rsgislib.TYPE_32FLOAT\n"
+"   imageutils.subset(inputImage, inputVector, outputImage, format, dataType)\n"
+"\n"},
+
+    {"subset2polys", ImageUtils_Subset2Polys, METH_VARARGS,
+"imageutils.subset(inputimage, inputvector, attribute, baseimage, gdalformat, type, ext)"
+"Subset an image to the bounding box of a each polygon in an input vector.\n"
+"Useful for splitting an image into tiles of unequal sizes.\n"
+"Where:\n"
+"\n"
+" * inputimage is a string providing the name of the input file.\n"
+" * inputvector is a string providing the vector which the image is to be clipped to. \n"
+" * attribute is a string providing the attribute in the vector to use for the ouput name\n"
+" * baseimage is a string providing the base name of the output file. The specified attribute of each polygon and extension will be appended."
+" * gdalformat is a string providing the output format of the tiles (e.g., KEA).\n"
+" * type is a rsgislib.TYPE_* value providing the output data type of the tiles.\n"
+" * ext is a string providing the extension for the tiles (as required by the specified data type).\n"
+"Example::\n"
+"\n"
+"	import rsgislib\n"
+"	from rsgislib import imageutils\n"
+"   inputImage = './Rasters/injune_p142_casi_sub_utm.kea'\n"
+"   inputVector = './Vectors/injune_p142_plot_location_utm.shp'\n"
+"   attribute = 'PLOTNO'\n"
+"   outputImageBase = './TestOutputs/injune_p142_casi_sub_utm_subset_polys_'\n"
+"   format = 'KEA'\n"
+"   dataType = rsgislib.TYPE_32FLOAT\n"
+"   ext = 'kea'\n"
+"   imageutils.subset2polys(inputImage, inputVector, attribute, outputImageBase, format, dataType, ext)\n"
+"\n"},
+
+    {"subset2img", ImageUtils_Subset2Img, METH_VARARGS,
+"imageutils.subset2img(inputimage, inputROIimage, outputimage, gdalformat, type)"
+"Subset an image to the bounding box of an image.\n"
+"Where:\n"
+"\n"
+" * inputimage is a string providing the name of the input file.\n"
+" * inputvector is a string providing the image which the 'inputimage' is to be clipped to. \n"
+" * outputimage is a string providing the output image. \n"
+" * gdalformat is a string providing the output format of the tiles (e.g., KEA).\n"
+" * type is a rsgislib.TYPE_* value providing the output data type of the tiles.\n"
+"Example::\n"
+"\n"
+"	import rsgislib\n"
+"	from rsgislib import imageutils\n"
+"   inputImage = './Rasters/injune_p142_casi_sub_utm.kea'\n"
+"   inputVector = './Vectors/injune_p142_plot_location_utm.shp'\n"
+"   outputImage = './TestOutputs/injune_p142_casi_sub_utm_subset.kea'\n"
+"   format = 'KEA'\n"
+"   dataType = rsgislib.TYPE_32FLOAT\n"
+"   imageutils.subset(inputImage, inputVector, outputImage, format, dataType)\n"
+"\n"},
+
 
     {NULL}        /* Sentinel */
 };

@@ -493,7 +493,33 @@ class RSGISTests:
         inputImage = './TestOutputs/injune_p142_casi_sub_utm.kea'
         imageutils.popImageStats(inputImage,True,0.,True)
         
-    # Zonal Stats
+    def testSubset(self):
+        inputImage = './Rasters/injune_p142_casi_sub_utm.kea'
+        inputVector = './Vectors/injune_p142_plot_location_utm.shp'
+        outputImage = './TestOutputs/injune_p142_casi_sub_utm_subset.kea'
+        format = "KEA"
+        dataType = rsgislib.TYPE_32FLOAT
+        imageutils.subset(inputImage, inputVector, outputImage, format, dataType)
+
+    def testSubset2Polys(self):
+        inputImage = './Rasters/injune_p142_casi_sub_utm.kea'
+        inputVector = './Vectors/injune_p142_plot_location_utm.shp'
+        attribute = 'PLOTNO'
+        outputImageBase = './TestOutputs/injune_p142_casi_sub_utm_subset_polys_'
+        format = 'KEA'
+        dataType = rsgislib.TYPE_32FLOAT
+        ext = 'kea'
+        imageutils.subset2polys(inputImage, inputVector, attribute, outputImageBase, format, dataType, ext)
+
+    def testSubset2Img(self):
+        inputImage = './Rasters/injune_p142_casi_sub_utm.kea'
+        inputROIImage = './TestOutputs/injune_p142_casi_sub_utm_subset.kea'
+        outputImage = './TestOutputs/injune_p142_casi_sub_utm_subset2img.kea'
+        format = "KEA"
+        dataType = rsgislib.TYPE_32FLOAT
+        imageutils.subset2img(inputImage, inputROIImage, outputImage, format, dataType)
+
+     # Zonal Stats
 
     def testPointValue2SHP(self):
         # Not all pixels are within image - should print warnings but pass test.
@@ -766,6 +792,9 @@ if __name__ == '__main__':
         t.tryFuncAndCatch(t.testCreateTiles)
         t.tryFuncAndCatch(t.testCreateImageMosaic)
         t.tryFuncAndCatch(t.testPopImageStats)
+        t.tryFuncAndCatch(t.testSubset)
+        t.tryFuncAndCatch(t.testSubset2Polys)
+        t.tryFuncAndCatch(t.testSubset2Img)
         
     if testLibraries == 'all' or testLibraries == 'rastergis':
     
