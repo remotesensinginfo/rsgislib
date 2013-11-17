@@ -216,6 +216,7 @@ static PyObject *ImageUtils_createImageMosaic(PyObject *self, PyObject *args)
 
     Py_RETURN_NONE;
 }
+
 static PyObject *ImageUtils_PopImageStats(PyObject *self, PyObject *args)
 {
     const char *pszInputImage;
@@ -421,7 +422,6 @@ static PyObject *ImageUtils_AssignSpatialInfo(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
-
 static PyObject *ImageUtils_ExtractZoneImageValues2HDF(PyObject *self, PyObject *args)
 {
     const char *pszInputImage;
@@ -492,7 +492,6 @@ static PyObject *ImageUtils_SelectImageBands(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
-
 static PyObject *ImageUtils_Subset(PyObject *self, PyObject *args)
 {
     const char *pszInputImage, *pszInputVector, *pszOutputImage, *pszGDALFormat;
@@ -546,6 +545,81 @@ static PyObject *ImageUtils_Subset2Img(PyObject *self, PyObject *args)
     try
     {
         rsgis::cmds::excecuteSubset2Img(pszInputImage, pszInputROI, pszOutputImage, pszGDALFormat, (rsgis::RSGISLibDataType)nOutDataType);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
+static PyObject *ImageUtils_StackImageBands(PyObject *self, PyObject *args)
+{
+    const char *pszOutputFile;
+    const char *pszGDALFormat;
+    int nDataType;
+    float noDataValue;
+    PyObject *skipValueObj = NULL;
+    PyObject *pInputImages = NULL;
+    PyObject *pimageBandNames = NULL;
+    
+    if( !PyArg_ParseTuple(args, "OOsOfsi:stackImageBands", &pInputImages, &pimageBandNames, &pszOutputFile, &skipValueObj, &noDataValue, &pszGDALFormat, &nDataType))
+        return NULL;
+    
+    bool skipPixels = false;
+    float skipValue = 0.0;
+    if(skipValueObj != Py_None)
+    {
+        if(RSGISPY_CHECK_FLOAT(skipValueObj) | RSGISPY_CHECK_INT(skipValueObj))
+        {
+            skipValue = RSGISPY_FLOAT_EXTRACT(skipValueObj);
+            skipPixels = true;
+        }
+    }
+    
+    if(!PySequence_Check(pInputImages)) {
+        PyErr_SetString(GETSTATE(self)->error, "First argument must be a sequence with a list of band names.");
+        return NULL;
+    }
+    
+    // Extract list of images to array of strings.
+    int numImages = 0;
+    std::string *inputImages = ExtractStringArrayFromSequence(pInputImages, &numImages);
+    if(numImages == 0)
+    {
+        PyErr_SetString(GETSTATE(self)->error, "No input images were provided");
+        return NULL;
+    }
+    
+    bool replaceBandNames = false;
+    std::string *imageBandNames = NULL;
+    if(PySequence_Check(pimageBandNames))
+    {
+        // Extract list of images to array of strings.
+        int numBandName = 0;
+        imageBandNames = ExtractStringArrayFromSequence(pimageBandNames, &numBandName);
+        if(numBandName == 0)
+        {
+            replaceBandNames = false;
+        }
+        else if(numBandName != numImages)
+        {
+            PyErr_SetString(GETSTATE(self)->error, "The number of band names must match the number of input images.");
+            return NULL;
+        }
+        else
+        {
+            replaceBandNames = true;
+        }
+    }
+    
+    
+    
+    try
+    {
+        rsgis::cmds::executeStackImageBands(inputImages, imageBandNames, numImages, std::string(pszOutputFile), skipPixels, skipValue, noDataValue, std::string(pszGDALFormat), (rsgis::RSGISLibDataType)nDataType, replaceBandNames);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -717,7 +791,15 @@ static PyMethodDef ImageUtilsMethods[] = {
 " * outputImage is a string containing the name and path of the output file.\n"
 " * gdalformat is a string providing the output format of the tiles (e.g., KEA).\n"
 " * type is a rsgislib.TYPE_* value providing the output data type of the tiles.\n"
-" * bands is a list of integers for the bands in the input image to exported to the output image (Note band count starts at 1)."},
+" * bands is a list of integers for the bands in the input image to exported to the output image (Note band count starts at 1)."
+"Example::\n"
+"\n"
+"import rsgislib.imageutils\n"
+"import rsgislib\n"
+"\n"
+"bands = [1,2]\n"
+"rsgislib.imageutils.selectImageBands(\"N06W053_07_ALL_sl_sub.kea\", \"N06W053_07_ALL_sl_sub_HHVV.kea\", \"KEA\", rsgislib.TYPE_32INT, bands)\n"
+"\n"},
 
     {"subset", ImageUtils_Subset, METH_VARARGS,
 "imageutils.subset(inputimage, inputvector, outputimage, gdalformat, type)"
@@ -789,7 +871,21 @@ static PyMethodDef ImageUtilsMethods[] = {
 "   dataType = rsgislib.TYPE_32FLOAT\n"
 "   imageutils.subset(inputImage, inputVector, outputImage, format, dataType)\n"
 "\n"},
-
+    
+    
+{"stackImageBands", ImageUtils_StackImageBands, METH_VARARGS,
+    "imageutils.stackImageBands(inputImages, imageBandNames, outputImage, skipValue, noDataValue, gdalformat, type)\n"
+    "Create a single image from list of input images through band stacking.\n"
+    " * inputImages is a list of input images.\n"
+    " * imageBandNames is a list of band names (one for each input image). If None then ignored.\n"
+    " * outputImage is a string containing the name and path for the outputted image.\n"
+    " * skipVal is a float providing the value to be skipped (nodata values) in the input images (If None then ignored)\n"
+    " * noDataValue is float specifying a no data value.\n"
+    " * gdalformat is a string providing the output format of the tiles (e.g., KEA).\n"
+    " * type is a rsgislib.TYPE_* value providing the output data type of the tiles.\n"
+    "Example::\n"
+    "\n"
+    "\n"},
 
     {NULL}        /* Sentinel */
 };
