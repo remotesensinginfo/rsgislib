@@ -5399,63 +5399,18 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
         }
         else if(option == RSGISExeImageUtils::subset2img)
 		{
-			cout << "Subset image to another image\n";
-			GDALAllRegister();
-			OGRRegisterAll();
-
-			GDALDataset **dataset = NULL;
-            GDALDataset *roiDataset = NULL;
-
-			RSGISCopyImage *copyImage = NULL;
-			RSGISCalcImage *calcImage = NULL;
-
-			int numImageBands = 0;
-
-			try
-			{
-				// Open Image
-				dataset = new GDALDataset*[1];
-				cout << this->inputImage << endl;
-				dataset[0] = (GDALDataset *) GDALOpenShared(this->inputImage.c_str(), GA_ReadOnly);
-				if(dataset[0] == NULL)
-				{
-					string message = string("Could not open image ") + this->inputImage;
-					throw RSGISImageException(message.c_str());
-				}
-				numImageBands = dataset[0]->GetRasterCount();
-				cout << "Raster Band Count = " << numImageBands << endl;
-
-                roiDataset = (GDALDataset *) GDALOpenShared(this->inputROIImage.c_str(), GA_ReadOnly);
-				if(roiDataset == NULL)
-				{
-					string message = string("Could not open image ") + this->inputROIImage;
-					throw RSGISImageException(message.c_str());
-				}
-
-                RSGISImageUtils imgUtils;
-
-                OGREnvelope *ogrExtent = imgUtils.getSpatialExtent(roiDataset);
-                geos::geom::Envelope extent = geos::geom::Envelope(ogrExtent->MinX, ogrExtent->MaxX, ogrExtent->MinY, ogrExtent->MaxY);
-
-                cout.precision(12);
-                cout << "BBOX [" << ogrExtent->MinX << "," << ogrExtent->MaxX << "][" << ogrExtent->MinY << "," << ogrExtent->MaxY << "]\n";
-
-				copyImage = new RSGISCopyImage(numImageBands);
-				calcImage = new RSGISCalcImage(copyImage, "", true);
-                calcImage->calcImageInEnv(dataset, 1, outputImage, &extent, false, NULL, imageFormat, outDataType);
-
-				GDALClose(dataset[0]);
-				delete[] dataset;
-                GDALClose(roiDataset);
-
-				GDALDestroyDriverManager();
-				delete calcImage;
-				delete copyImage;
-			}
-			catch(RSGISException e)
-			{
-				cout << "RSGISException caught: " << e.what() << endl;
-			}
+            std::cout << "Subset image to another image\n";
+            std::cout << "Image: " << this->inputImage << std::endl;
+            std::cout << "ROI: " << this->inputROIImage << std::endl;
+            std::cout << "Output: " << this->outputImage << std::endl;
+            try
+            {
+                rsgis::cmds::excecuteSubset2Img(this->inputImage, this->inputROIImage, this->outputImage, this->imageFormat, this->rsgisOutDataType);
+            }
+            catch (rsgis::cmds::RSGISCmdException &e)
+            {
+                throw rsgis::RSGISException(e.what());
+            }
 		}
         else if(option == RSGISExeImageUtils::defineimgtiles)
         {

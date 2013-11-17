@@ -875,6 +875,10 @@ namespace rsgis{ namespace cmds {
             {
                 throw RSGISCmdException(e.what());
             }
+            catch (rsgis::vec::RSGISVectorOutputException& e)
+            {
+                throw RSGISCmdException(e.what());
+            }
             catch (RSGISException& e)
             {
                 throw RSGISCmdException(e.what());
@@ -884,6 +888,72 @@ namespace rsgis{ namespace cmds {
                 throw RSGISCmdException(e.what());
             }
         }
-    
+    void excecuteSubset2Img(std::string inputImage, std::string inputROIImage, std::string outputImage, std::string imageFormat, RSGISLibDataType outDataType) throw(RSGISCmdException)
+    {
+        try
+        {
+			GDALAllRegister();
+			OGRRegisterAll();
+            
+			GDALDataset **dataset = NULL;
+            GDALDataset *roiDataset = NULL;
+            
+            rsgis::img::RSGISCopyImage *copyImage = NULL;
+            rsgis::img::RSGISCalcImage *calcImage = NULL;
+            
+			int numImageBands = 0;
+            
+            // Open Image
+            dataset = new GDALDataset*[1];
+            std::cout << inputImage << std::endl;
+            dataset[0] = (GDALDataset *) GDALOpenShared(inputImage.c_str(), GA_ReadOnly);
+            if(dataset[0] == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputImage;
+                throw RSGISImageException(message.c_str());
+            }
+            numImageBands = dataset[0]->GetRasterCount();
+            std::cout << "Raster Band Count = " << numImageBands << std::endl;
+            
+            roiDataset = (GDALDataset *) GDALOpenShared(inputROIImage.c_str(), GA_ReadOnly);
+            if(roiDataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputROIImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            rsgis::img::RSGISImageUtils imgUtils;
+            
+            OGREnvelope *ogrExtent = imgUtils.getSpatialExtent(roiDataset);
+            geos::geom::Envelope extent = geos::geom::Envelope(ogrExtent->MinX, ogrExtent->MaxX, ogrExtent->MinY, ogrExtent->MaxY);
+            
+            std::cout.precision(12);
+            std::cout << "BBOX [" << ogrExtent->MinX << "," << ogrExtent->MaxX << "][" << ogrExtent->MinY << "," << ogrExtent->MaxY << "]\n";
+            
+            copyImage = new rsgis::img::RSGISCopyImage(numImageBands);
+            calcImage = new rsgis::img::RSGISCalcImage(copyImage, "", true);
+            calcImage->calcImageInEnv(dataset, 1, outputImage, &extent, false, NULL, imageFormat, RSGIS_to_GDAL_Type(outDataType));
+            
+            GDALClose(dataset[0]);
+            delete[] dataset;
+            GDALClose(roiDataset);
+            
+            GDALDestroyDriverManager();
+            delete calcImage;
+            delete copyImage;
+        }
+        catch (RSGISImageException& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch (RSGISException& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(std::exception& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
 }}
 
