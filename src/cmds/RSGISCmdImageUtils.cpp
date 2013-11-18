@@ -20,6 +20,8 @@
  *
  */
 
+#include <boost/filesystem.hpp>
+
 #include "RSGISCmdImageUtils.h"
 #include "RSGISCmdParent.h"
 
@@ -752,6 +754,9 @@ namespace rsgis{ namespace cmds {
             
             rsgis::vec::RSGISVectorUtils vecUtils;
             
+            // Convert to absolute path
+            inputVector = boost::filesystem::absolute(inputVector).c_str();
+            
             std::string vectorLayerName = vecUtils.getLayerName(inputVector);
             int numImageBands = 0;
             
@@ -828,6 +833,9 @@ namespace rsgis{ namespace cmds {
             rsgis::vec::RSGISPolygonData **polyData = NULL;
             rsgis::vec::RSGISImageTileVector **data = NULL;
             rsgis::vec::RSGISVectorUtils vecUtils;
+            
+            // Convert to absolute path
+            inputVector = boost::filesystem::absolute(inputVector).c_str();
             
             std::string vectorLayerName = vecUtils.getLayerName(inputVector);
             int numImageBands = 0;
