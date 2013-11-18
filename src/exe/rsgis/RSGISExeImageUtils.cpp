@@ -1546,18 +1546,18 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 		XMLString::release(&resolutionXMLStr);
 
 
-		XMLCh *proj4XMLStr = XMLString::transcode("proj4");
-		if(argElement->hasAttribute(proj4XMLStr))
+		XMLCh *wktFileXMLStr = XMLString::transcode("wktfile");
+		if(argElement->hasAttribute(wktFileXMLStr))
 		{
-			char *charValue = XMLString::transcode(argElement->getAttribute(proj4XMLStr));
-			this->proj = string(charValue);
+			char *charValue = XMLString::transcode(argElement->getAttribute(wktFileXMLStr));
+			this->projFile = string(charValue);
 			XMLString::release(&charValue);
 		}
 		else
 		{
-			throw RSGISXMLArgumentsException("No \'proj4\' attribute was provided.");
+			throw RSGISXMLArgumentsException("No \'wktfile\' attribute was provided.");
 		}
-		XMLString::release(&proj4XMLStr);
+		XMLString::release(&wktFileXMLStr);
 
 
 	}
@@ -4617,11 +4617,14 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
 			cout << "TL Geo: [" << this->eastings << "," << this->northings << "]\n";
 			cout << "Resolution: " << this->resolution << endl;
 			cout << "Default Value: " << this->outValue << endl;
-			cout << "Projection: " << this->proj << endl;
+			cout << "Projection: " << this->projFile << endl;
 
-			RSGISImageUtils imgUtils;
+			//RSGISImageUtils imgUtils;
 			try
 			{
+                rsgis::cmds::executeCreateBlankImage(this->outputImage, this->numBands, this->width, this->height, this->eastings, this->northings, this->resolution, this->outValue, this->projFile, imageFormat, rsgisOutDataType);
+                
+                /*
 				GDALAllRegister();
 				double *transformation = new double[6];
 				transformation[0] = eastings;
@@ -4647,15 +4650,12 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
 				GDALDataset* outImage = imgUtils.createBlankImage(outputImage, transformation, width, height, numBands, projection, outValue);
 				GDALClose(outImage);
 				GDALDestroyDriverManager();
+                */
 			}
-			catch(RSGISImageBandException &e)
-			{
-				throw RSGISException(e.what());
-			}
-			catch (RSGISImageException &e)
-			{
-				throw RSGISException(e.what());
-			}
+			catch(rsgis::cmds::RSGISCmdException &e)
+            {
+                throw RSGISException(e.what());
+            }
 		}
 		else if(option == RSGISExeImageUtils::stretch)
 		{
@@ -5213,7 +5213,8 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
 
             try
             {
-                GDALAllRegister();
+                rsgis::cmds::executeCreateCopyBlankImage(inputImage, outputImage, numBands, dataValue, imageFormat, rsgisOutDataType);
+                /*GDALAllRegister();
                 GDALDataset *inDataset = NULL;
                 inDataset = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_Update);
                 if(inDataset == NULL)
@@ -5228,11 +5229,15 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
 
                 GDALClose(inDataset);
                 GDALClose(outDataset);
-                GDALDestroyDriverManager();
+                GDALDestroyDriverManager();*/
             }
-            catch (RSGISException &e)
+            catch(rsgis::cmds::RSGISCmdException& e)
             {
-                throw e;
+                throw RSGISException(e.what());
+            }
+            catch(std::exception& e)
+            {
+                throw RSGISException(e.what());
             }
         }
         else if(option == RSGISExeImageUtils::createKMLFile)

@@ -96,7 +96,12 @@ namespace rsgis{ namespace cmds {
     /** A function to subset an input data by to a set of image bands */
     void executeSubsetImageBands(std::string inputImage, std::string outputImage, std::vector<unsigned int> bands, std::string gdalFormat, RSGISLibDataType outDataType)throw(RSGISCmdException);
     
+    /** A function to create a new blank image */
+    void executeCreateBlankImage(std::string outputImage, unsigned int numBands, unsigned int width, unsigned int height, double tlX, double tlY, double resolution, float pxlVal, std::string wktFile, std::string gdalFormat, RSGISLibDataType outDataType) throw(RSGISCmdException);
 
+    /** A function to create a new blank image using an exising image as a base. */
+    void executeCreateCopyBlankImage(std::string inputImage, std::string outputImage, unsigned int numBands, float pxlVal, std::string gdalFormat, RSGISLibDataType outDataType) throw(RSGISCmdException);
+    
 }}
 
 
