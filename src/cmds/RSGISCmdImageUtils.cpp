@@ -1002,5 +1002,82 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
+            
+            
+            
+            
+    void executeCreateBlankImage(std::string outputImage, unsigned int numBands, unsigned int width, unsigned int height, double tlX, double tlY, double resolution, float pxlVal, std::string wktFile, std::string gdalFormat, RSGISLibDataType outDataType) throw(RSGISCmdException)
+    {
+        try
+        {
+			GDALAllRegister();
+            double *transformation = new double[6];
+            transformation[0] = tlX;
+            transformation[1] = resolution;
+            transformation[2] = 0;
+            transformation[3] = tlY;
+            transformation[4] = 0;
+            transformation[5] = resolution * (-1);
+            
+            std::string projection = "";
+            if(wktFile != "")
+            {
+                rsgis::utils::RSGISTextUtils textUtils;
+                projection = textUtils.readFileToString(wktFile);
+            }
+            
+            rsgis::img::RSGISImageUtils imgUtils;
+            GDALDataset* outImage = imgUtils.createBlankImage(outputImage, transformation, width, height, numBands, projection, pxlVal, gdalFormat, RSGIS_to_GDAL_Type(outDataType));
+            GDALClose(outImage);
+        }
+        catch (RSGISImageException& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch (RSGISException& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(std::exception& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
+            
+            
+    void executeCreateCopyBlankImage(std::string inputImage, std::string outputImage, unsigned int numBands, float pxlVal, std::string gdalFormat, RSGISLibDataType outDataType) throw(RSGISCmdException)
+    {
+        try
+        {
+			GDALAllRegister();
+            GDALDataset *inDataset = NULL;
+            inDataset = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_ReadOnly);
+            if(inDataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputImage;
+                throw RSGISImageException(message.c_str());
+            }
+            
+            rsgis::img::RSGISImageUtils imgUtils;
+            GDALDataset *outDataset = imgUtils.createCopy(inDataset, numBands, outputImage, gdalFormat, RSGIS_to_GDAL_Type(outDataType));
+            imgUtils.assignValGDALDataset(outDataset, pxlVal);
+            
+            GDALClose(inDataset);
+            GDALClose(outDataset);
+        }
+        catch (RSGISImageException& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch (RSGISException& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(std::exception& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
+    
 }}
 

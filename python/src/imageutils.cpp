@@ -630,6 +630,54 @@ static PyObject *ImageUtils_StackImageBands(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
+
+static PyObject *ImageUtils_CreateBlankImage(PyObject *self, PyObject *args)
+{
+    const char *pszOutputImage, *pszGDALFormat, *wktFile;
+    int nOutDataType;
+    unsigned int numBands, width, height = 0;
+    double tlX, tlY, res = 0;
+    float pxlVal = 0;
+    
+    if( !PyArg_ParseTuple(args, "sIIIffffssi:createBlankImage", &pszOutputImage, &numBands, &width, &height, &tlX, &tlY, &res, &pxlVal, &wktFile, &pszGDALFormat, &nOutDataType))
+        return NULL;
+    
+    try
+    {
+        rsgis::cmds::executeCreateBlankImage(std::string(pszOutputImage), numBands, width, height, tlX, tlY, res, pxlVal, std::string(wktFile), std::string(pszGDALFormat), (rsgis::RSGISLibDataType)nOutDataType);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
+static PyObject *ImageUtils_CreateCopyImage(PyObject *self, PyObject *args)
+{
+    const char *pszInputImage, *pszOutputImage, *pszGDALFormat;
+    int nOutDataType;
+    unsigned int numBands;
+    float pxlVal = 0;
+    
+    if( !PyArg_ParseTuple(args, "ssIfsi:createCopyImage", &pszInputImage, &pszOutputImage, &numBands, &pxlVal, &pszGDALFormat, &nOutDataType))
+        return NULL;
+    
+    try
+    {
+        rsgis::cmds::executeCreateCopyBlankImage(std::string(pszInputImage), std::string(pszOutputImage), numBands, pxlVal, std::string(pszGDALFormat), (rsgis::RSGISLibDataType)nOutDataType);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
 // Our list of functions in this module
 static PyMethodDef ImageUtilsMethods[] = {
     {"stretchImage", ImageUtils_StretchImage, METH_VARARGS, 
@@ -881,6 +929,37 @@ static PyMethodDef ImageUtilsMethods[] = {
     " * outputImage is a string containing the name and path for the outputted image.\n"
     " * skipVal is a float providing the value to be skipped (nodata values) in the input images (If None then ignored)\n"
     " * noDataValue is float specifying a no data value.\n"
+    " * gdalformat is a string providing the output format of the tiles (e.g., KEA).\n"
+    " * type is a rsgislib.TYPE_* value providing the output data type of the tiles.\n"
+    "Example::\n"
+    "\n"
+    "\n"},
+    
+{"createBlankImage", ImageUtils_CreateBlankImage, METH_VARARGS,
+    "imageutils.createBlankImage(outputImage, numBands, width, height, tlX, tlY, res, pxlVal, wktFile, gdalformat, type)\n"
+    "Create a new blank image with the parameters specified.\n"
+    " * outputImage is a string containing the name and path for the outputted image.\n"
+    " * numBands is an integer specifying the number of image bands in the output image.\n"
+    " * width is an integer specifying the width of the output image.\n"
+    " * height is an integer specifying the height of the output image.\n"
+    " * tlX is a double specifying the Top Left pixel X coordinate (eastings) of the output image.\n"
+    " * tlY is a double specifying the Top Left pixel Y coordinate (northings) of the output image.\n"
+    " * res is a double specifying the pixel resolution of the output image.\n"
+    " * pxlVal is a float specifying the pixel value of the output image.\n"
+    " * wktFile is a string specifying the location of a file containing the WKT string representing the coordinate system and projection of the output image.\n"
+    " * gdalformat is a string providing the output format of the tiles (e.g., KEA).\n"
+    " * type is a rsgislib.TYPE_* value providing the output data type of the tiles.\n"
+    "Example::\n"
+    "\n"
+    "\n"},
+
+{"createCopyImage", ImageUtils_CreateCopyImage, METH_VARARGS,
+    "imageutils.createCopyImage(inputImage, outputImage, numBands, pxlVal, gdalformat, type)\n"
+    "Create a new blank image with the parameters specified.\n"
+    " * inputImage is a string containing the name and path for the input image, which is to be copied.\n"
+    " * outputImage is a string containing the name and path for the outputted image.\n"
+    " * numBands is an integer specifying the number of image bands in the output image.\n"
+    " * pxlVal is a float specifying the pixel value of the output image.\n"
     " * gdalformat is a string providing the output format of the tiles (e.g., KEA).\n"
     " * type is a rsgislib.TYPE_* value providing the output data type of the tiles.\n"
     "Example::\n"
