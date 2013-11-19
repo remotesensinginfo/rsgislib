@@ -38,6 +38,7 @@ Subset / Mask
 Other
 ------
 .. autofunction:: rsgislib.imageutils.popImageStats
+.. autofunction:: rsgislib.imageutils.stackImageBands
 
 * :ref:`genindex`
 * :ref:`modindex`
