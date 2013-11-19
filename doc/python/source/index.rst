@@ -11,7 +11,7 @@ The Remote Sensing and GIS software library (RSGISLib) is a collection of tools 
 
 The project is hosted on Bitbucket and is available to download from https://bitbucket.org/petebunting/rsgislib 
 
-The project is led by Pete Bunting (`Earth Observation and Ecosystem Dynamics Group <http://www.aber.ac.uk/en/iges/research-groups/earth-observation-laboratory/>`_ , `Aberystwyth University <http://www.aber.ac.uk/>`_) with contributions from Dan Clewley (`Microwave Systems, Sensors and Imaging Lab <http://mixil.usc.edu>`_, `The University of Southern California <http://www.usc.edu>`_).
+The project is jointly led by Pete Bunting (`Earth Observation and Ecosystem Dynamics Group <http://www.aber.ac.uk/en/iges/research-groups/earth-observation-laboratory/>`_ , `Aberystwyth University <http://www.aber.ac.uk/>`_) and Dan Clewley (`Microwave Systems, Sensors and Imaging Lab <http://mixil.usc.edu>`_, `The University of Southern California <http://www.usc.edu>`_).
 
 
 Information
@@ -23,6 +23,7 @@ Information
    about
    download
    documentation
+   commandlineutilities
 
 
 Python documentation
@@ -33,6 +34,7 @@ Python documentation
 
    rsgislib
    rsgislib_calibration
+   rsgislib_classification
    rsgislib_imagecalc
    rsgislib_imagefilter
    rsgislib_imageregistration
@@ -41,6 +43,9 @@ Python documentation
    rsgislib_segmentation
    rsgislib_vectorutils
    rsgislib_zonalstats
+
+
+
    
 * :ref:`modindex`
 * :ref:`search`

@@ -105,19 +105,23 @@ static PyMethodDef ClassificationMethods[] = {
 "classification.collapseClasses(inputimage, outputimage, gdalformat, classColumn)\n"
 "Collapses an attribute table with a large number of classified clumps (segments) to\n"
 "a attribute table with a single row per class (i.e. a classification rather than segmentation.\n"
-"where:\n"
-" * inputImage is a string containing the name and path of the input file with attribute table.\n"
-" * outputImage is a string containing the name and path of the output file.\n"
-" * gdalformat is a string with the output image format for the GDAL driver.\n"
-" * classColumn is a string with the name of the column with the class names\n"},
+"\n"
+"Where:\n"
+"\n"
+"* inputImage is a string containing the name and path of the input file with attribute table.\n"
+"* outputImage is a string containing the name and path of the output file.\n"
+"* gdalformat is a string with the output image format for the GDAL driver.\n"
+"* classColumn is a string with the name of the column with the class names\n"},
 
 {"colour3bands", Classification_Colour3Bands, METH_VARARGS,
 "classification.colour3bands(inputimage, outputimage, gdalformat)\n"
 "Generates a 3 band colour image from the colour table in the input file.\n"
-"where:\n"
-" * inputImage is a string containing the name and path of the input file with attribute table.\n"
-" * outputImage is a string containing the name and path of the output file.\n"
-" * gdalformat is a string with the output image format for the GDAL driver.\n"},
+"\n"
+"Where:\n"
+"\n"
+"* inputImage is a string containing the name and path of the input file with attribute table.\n"
+"* outputImage is a string containing the name and path of the output file.\n"
+"* gdalformat is a string with the output image format for the GDAL driver.\n"},
 
     {NULL}        /* Sentinel */
 };
