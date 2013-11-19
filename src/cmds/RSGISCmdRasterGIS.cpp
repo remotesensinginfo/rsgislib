@@ -980,53 +980,44 @@ namespace rsgis{ namespace cmds {
         }
     }
 
-    void executeFindChangeClumpsFromStdDev(std::string clumpsImage, std::string classField, std::string changeField, std::vector<std::string> attFields, std::vector<cmds::RSGISClassChangeFieldsCmds> classChangeFields)throw(RSGISCmdException) {
-        GDALAllRegister();
-        GDALDataset *clumpsDataset;
-
-        try {
-            clumpsDataset = (GDALDataset *) GDALOpen(clumpsImage.c_str(), GA_Update);
+    void executeFindChangeClumpsFromStdDev(std::string clumpsImage, std::string classField, std::string changeField, std::vector<std::string> attFields, std::vector<cmds::RSGISClassChangeFieldsCmds> classChangeFields)throw(RSGISCmdException)
+    {
+        try
+        {
+            GDALAllRegister();
+            GDALDataset *clumpsDataset = (GDALDataset *) GDALOpen(clumpsImage.c_str(), GA_Update);
             if(clumpsDataset == NULL) {
                 std::string message = std::string("Could not open image ") + clumpsImage;
                 throw rsgis::RSGISImageException(message.c_str());
             }
-
-            // cast void pointers vector to correct type, actually may as well not do void pointers but convert our data structures
             
-            struct RSGISClassChangeFields
+            std::vector<rastergis::RSGISClassChangeFields *> *classFields = new std::vector<rastergis::RSGISClassChangeFields *>();
+            classFields->reserve(classChangeFields.size());
+            
+            for(std::vector<cmds::RSGISClassChangeFieldsCmds>::iterator classIter = classChangeFields.begin(); classIter != classChangeFields.end(); ++classIter)
             {
-                std::string name;
-                int outName;
-                float threshold;
-                float *means;
-                float *stddev;
-                size_t count;
-            };
-            
-            std::vector<rastergis::RSGISClassChangeFields *> classFields;
-            rastergis::RSGISClassChangeFields *fieldStore = new rastergis::RSGISClassChangeFields[classChangeFields.size()];
-            classFields.reserve(classChangeFields.size());
-            std::vector<cmds::RSGISClassChangeFieldsCmds>::iterator classIter;
-            int i;
-            
-            for(classIter = classChangeFields.begin(), i = 0; classIter != classChangeFields.end(); ++classIter, ++i) {
-                rastergis::RSGISClassChangeFields c;
-                c.name = (*classIter).name;
-                c.outName = (*classIter).outName;
-                c.threshold = (*classIter).threshold;
-                c.means = (*classIter).means;
-                c.stddev = (*classIter).stddev;
-                c.count = (*classIter).count;
-                fieldStore[i] = c;
+                rastergis::RSGISClassChangeFields *c = new rastergis::RSGISClassChangeFields();
+                c->name = (*classIter).name;
+                c->outName = (*classIter).outName;
+                c->threshold = (*classIter).threshold;
+                c->means = NULL;
+                c->stddev = NULL;
+                c->count = 0;
+                classFields->push_back(c);
             }
 
             rsgis::rastergis::RSGISFindChangeClumps changeClumps;
-            changeClumps.findChangeStdDevThreshold(clumpsDataset, classField, changeField, &attFields, &classFields);
+            changeClumps.findChangeStdDevThreshold(clumpsDataset, classField, changeField, &attFields, classFields);
 
+            for(std::vector<rastergis::RSGISClassChangeFields*>::iterator classIter = classFields->begin(); classIter != classFields->end(); ++classIter)
+            {
+                delete *classIter;
+            }
+            delete classFields;
             GDALClose(clumpsDataset);
-            delete[] fieldStore;
-            
-        } catch (rsgis::RSGISException &e) {
+        }
+        catch (rsgis::RSGISException &e)
+        {
             throw RSGISCmdException(e.what());
         }
     }

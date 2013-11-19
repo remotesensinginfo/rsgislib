@@ -108,9 +108,6 @@ namespace rsgis{ namespace cmds {
         std::string name;
         int outName;
         float threshold;
-        float *means;
-        float *stddev;
-        size_t count;
     };
 
 

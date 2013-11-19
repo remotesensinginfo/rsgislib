@@ -1043,21 +1043,23 @@ static PyObject *RasterGIS_FindChangeClumpsFromStdDev(PyObject *self, PyObject *
     std::vector<rsgis::cmds::RSGISClassChangeFieldsCmds> classFields;
     classFields.reserve(nFields);
     
-    for(int i = 0; i < nFields; ++i) {
+    for(int i = 0; i < nFields; ++i)
+    {
         PyObject *o = PySequence_GetItem(pClassFields, i);     // the python object
         
         rsgis::cmds::RSGISClassChangeFieldsCmds classField;
         
         // declare and initialise pointers for all the attributes of the struct
-        PyObject *name, *outName, *threshold, *means, *stdDevs, *count;
-        name = outName = threshold = means = stdDevs = count = NULL;
+        PyObject *name, *outName, *threshold;
+        name = outName = threshold = NULL;
         
         std::vector<PyObject*> extractedAttributes;     // store a list of extracted pyobjects to dereference later
         extractedAttributes.push_back(o);
         
         name = PyObject_GetAttrString(o, "name");
         extractedAttributes.push_back(name);
-        if( ( name == NULL ) || ( name == Py_None ) || !RSGISPY_CHECK_STRING(name)) {
+        if( ( name == NULL ) || ( name == Py_None ) || !RSGISPY_CHECK_STRING(name))
+        {
             PyErr_SetString(GETSTATE(self)->error, "could not find string attribute \'name\'" );
             FreePythonObjects(extractedAttributes);
             return NULL;
@@ -1065,7 +1067,8 @@ static PyObject *RasterGIS_FindChangeClumpsFromStdDev(PyObject *self, PyObject *
         
         outName = PyObject_GetAttrString(o, "outName");
         extractedAttributes.push_back(outName);
-        if( ( outName == NULL ) || ( outName == Py_None ) || !RSGISPY_CHECK_INT(outName)) {
+        if( ( outName == NULL ) || ( outName == Py_None ) || !RSGISPY_CHECK_INT(outName))
+        {
             PyErr_SetString(GETSTATE(self)->error, "could not find int attribute \'outName\'" );
             FreePythonObjects(extractedAttributes);
             return NULL;
@@ -1073,32 +1076,9 @@ static PyObject *RasterGIS_FindChangeClumpsFromStdDev(PyObject *self, PyObject *
         
         threshold = PyObject_GetAttrString(o, "threshold");
         extractedAttributes.push_back(threshold);
-        if( ( threshold == NULL ) || ( threshold == Py_None ) || !RSGISPY_CHECK_FLOAT(threshold)) {
+        if( ( threshold == NULL ) || ( threshold == Py_None ) || !RSGISPY_CHECK_FLOAT(threshold))
+        {
             PyErr_SetString(GETSTATE(self)->error, "could not find float attribute \'threshold\'" );
-            FreePythonObjects(extractedAttributes);
-            return NULL;
-        }
-        
-        count = PyObject_GetAttrString(o, "count");
-        extractedAttributes.push_back(count);
-        if( ( count == NULL ) || ( count == Py_None ) || !RSGISPY_CHECK_INT(count)) {
-            PyErr_SetString(GETSTATE(self)->error, "could not find int attribute \'count\'" );
-            FreePythonObjects(extractedAttributes);
-            return NULL;
-        }
-        
-        means = PyObject_GetAttrString(o, "means");
-        extractedAttributes.push_back(means);
-        if( ( means == NULL ) || ( means == Py_None ) || !PySequence_Check(means)) {
-            PyErr_SetString(GETSTATE(self)->error, "could not find sequence attribute \'means\'" );
-            FreePythonObjects(extractedAttributes);
-            return NULL;
-        }
-        
-        stdDevs = PyObject_GetAttrString(o, "stddev");
-        extractedAttributes.push_back(stdDevs);
-        if( ( stdDevs == NULL ) || ( stdDevs == Py_None ) || !PySequence_Check(stdDevs)) {
-            PyErr_SetString(GETSTATE(self)->error, "could not find sequence attribute \'stddev\'" );
             FreePythonObjects(extractedAttributes);
             return NULL;
         }
@@ -1106,52 +1086,17 @@ static PyObject *RasterGIS_FindChangeClumpsFromStdDev(PyObject *self, PyObject *
         classField.name = RSGISPY_STRING_EXTRACT(name);
         classField.outName = RSGISPY_INT_EXTRACT(outName);
         classField.threshold = RSGISPY_FLOAT_EXTRACT(threshold);
-        classField.count = RSGISPY_INT_EXTRACT(count);
-        
-        // now unpack the sequences
-        Py_ssize_t nMeans = PySequence_Size(means);
-        classField.means = new float[nMeans];
-        
-        for(int i = 0; i < nMeans; ++i) {
-            PyObject *fieldObj = PySequence_GetItem(means, i);
-            
-            if(!RSGISPY_CHECK_FLOAT(fieldObj)) {
-                PyErr_SetString(GETSTATE(self)->error, "Means must be floats");
-                Py_DECREF(fieldObj);
-                delete classField.means;
-                FreePythonObjects(extractedAttributes);
-                return NULL;
-            }
-            
-            classField.means[i] = RSGISPY_FLOAT_EXTRACT(fieldObj);
-            Py_DECREF(fieldObj);
-        }
-        
-        Py_ssize_t nStdDev = PySequence_Size(stdDevs);
-        classField.stddev = new float[nStdDev];
-        
-        for(int i = 0; i < nStdDev; ++i) {
-            PyObject *fieldObj = PySequence_GetItem(stdDevs, i);
-            
-            if(!RSGISPY_CHECK_FLOAT(fieldObj)) {
-                PyErr_SetString(GETSTATE(self)->error, "Stddevs must be floats");
-                Py_DECREF(fieldObj);
-                delete classField.stddev;
-                FreePythonObjects(extractedAttributes);
-                return NULL;
-            }
-            
-            classField.stddev[i] = RSGISPY_FLOAT_EXTRACT(fieldObj);
-            Py_DECREF(fieldObj);
-        }
         
         classFields.push_back(classField);
         FreePythonObjects(extractedAttributes);
     }
     
-    try {
+    try
+    {
         rsgis::cmds::executeFindChangeClumpsFromStdDev(std::string(clumpsImage), std::string(classField), std::string(changeField), attFields, classFields);
-    } catch (rsgis::cmds::RSGISCmdException &e) {
+    }
+    catch (rsgis::cmds::RSGISCmdException &e)
+    {
         PyErr_SetString(GETSTATE(self)->error, e.what());
         return NULL;
     }
@@ -1580,12 +1525,9 @@ static PyMethodDef RasterGISMethods[] = {
 " * attFields is a sequence of strings\n"
 " * classChangeFields is a sequence of python objects having the following attributes:\n"
 "\n"
-"   * name - a string holding the name\n"
-"   * outName - an int\n"
-"   * threshold - a float\n"
-"   * count - an int, possibly number of means/std devs? TODO: Check these\n"
-"   * means - a sequence of floats, containing the means\n"
-"   * stddev - a sequence of floats, containing the stddevs corresponding to the means\n"
+"   * name - The class name in which change is going to be search for\n"
+"   * outName - An integer to uniquely identify the clumps identify as change\n"
+"   * threshold - The number of standard deviations away from the mean above which segments are identified as change.\n"
 "\n"},
 
 {"selectClumpsOnGrid", RasterGIS_SelectClumpsOnGrid, METH_VARARGS,
