@@ -1901,28 +1901,11 @@ void RSGISExeClassification::runAlgorithm() throw(rsgis::RSGISException)
             
             try
             {
-                rsgis::img::RSGISImageUtils imgUtils;
-                
-                std::cout << "Opening an image\n";
-                GDALAllRegister();
-                GDALDataset *imageDataset = NULL;
-                imageDataset = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_ReadOnly);
-                if(imageDataset == NULL)
-                {
-                    std::string message = std::string("Could not open image ") + this->inputImage;
-                    throw rsgis::RSGISImageException(message.c_str());
-                }
-                
-                rsgis::classifier::RSGISCollapseSegmentsClassification collapseSegments;
-                collapseSegments.collapseClassification(imageDataset, this->classNameCol, this->outputImage, this->imageFormat);
-                
-                // Tidy up
-                GDALClose(imageDataset);
-                GDALDestroyDriverManager();
+                rsgis::cmds::executeCollapseRAT2Class(this->inputImage, this->outputImage, this->imageFormat, this->classNameCol);
             }
-            catch (rsgis::RSGISException &e)
+            catch (rsgis::cmds::RSGISCmdException &e)
             {
-                throw e;
+                throw rsgis::RSGISException(e.what());
             }
             
         }
@@ -1935,46 +1918,11 @@ void RSGISExeClassification::runAlgorithm() throw(rsgis::RSGISException)
             
             try
             {
-                std::cout << "Openning input image.\n";
-                rsgis::img::RSGISImageUtils imgUtils;
-                
-                GDALAllRegister();
-                GDALDataset **imageDataset = new GDALDataset*[1];
-                imageDataset[0] = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_ReadOnly);
-                if(imageDataset[0] == NULL)
-                {
-                    std::string message = std::string("Could not open image ") + this->inputImage;
-                    throw rsgis::RSGISImageException(message.c_str());
-                }
-                
-                std::cout << "Reading colour table\n";
-                GDALColorTable *clrTab = imageDataset[0]->GetRasterBand(1)->GetColorTable();
-                /*
-                for(int i = 0; i < clrTab->GetColorEntryCount(); ++i)
-                {
-                    const GDALColorEntry *clr = clrTab->GetColorEntry(i);
-                    std::cout << i << ": [" <<  clr->c1 << "," << clr->c2 << "," << clr->c3 << "]\n";
-                }
-                */
-                std::string *bandNames = new std::string[3];
-                bandNames[0] = "Red";
-                bandNames[1] = "Green";
-                bandNames[2] = "Blue";
-                
-                std::cout << "Applying to the image\n";
-                rsgis::classifier::RSGISColourImageFromClassRAT *clrAsRGB = new rsgis::classifier::RSGISColourImageFromClassRAT(clrTab);
-                rsgis::img::RSGISCalcImage calcImg = rsgis::img::RSGISCalcImage(clrAsRGB, "", true);
-				calcImg.calcImage(imageDataset, 1, this->outputImage, true, bandNames, this->imageFormat, GDT_Byte);
-                delete[] bandNames;
-                
-                // Tidy up
-                GDALClose(imageDataset[0]);
-                delete[] imageDataset;
-                GDALDestroyDriverManager();
+                rsgis::cmds::executeGenerate3BandFromColourTable(this->inputImage, this->outputImage, this->imageFormat);
             }
-            catch (rsgis::RSGISException &e)
+            catch (rsgis::cmds::RSGISCmdException &e)
             {
-                throw e;
+                throw rsgis::RSGISException(e.what());
             }
             
         }

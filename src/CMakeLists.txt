@@ -82,6 +82,7 @@ set(LIB_COMMANDS_H
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdException.h
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdParent.h
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdCommon.h
+	${RSGIS_SRC_CMDS_DIR}/RSGISCmdClassification.h
     ${RSGIS_SRC_CMDS_DIR}/RSGISCmdFilterImages.h
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdImageCalc.h 
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdImageCalibration.h
@@ -98,6 +99,8 @@ set(LIB_COMMANDS_CPP
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdException.cpp
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdParent.h
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdCommon.h
+	${RSGIS_SRC_CMDS_DIR}/RSGISCmdClassification.cpp
+	${RSGIS_SRC_CMDS_DIR}/RSGISCmdClassification.h
     ${RSGIS_SRC_CMDS_DIR}/RSGISCmdFilterImages.cpp
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdFilterImages.h
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdImageCalc.cpp 

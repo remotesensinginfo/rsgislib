@@ -53,17 +53,21 @@ imagefilter_module = Extension(name='imagefilter._imagefilter',
                 include_dirs=['../src/cmds', '../src'],
                 library_dirs=['../src'],
                 libraries=['rsgis_cmds'])
+                
+classification_module = Extension(name='classification._classification',
+                sources=['src/classification.cpp'],
+                include_dirs=['../src/cmds', '../src'],
+                library_dirs=['../src'],
+                libraries=['rsgis_cmds'])
 
 
 # do the setup
 setup( name = 'RSGISLib',
         version = '0.1',
         description = 'Python interface onto RSGISLib',
-        author = 'Sam Gillingham',
-        author_email = 'gillingham.sam@gmail.com',
-        packages = ['rsgislib', 'rsgislib.imagecalc', 'rsgislib.imageutils',
-                        'rsgislib.segmentation','rsgislib.imagecalibration','rsgislib.rastergis','rsgislib.zonalstats','rsgislib.imageregistration','rsgislib.vectorutils','rsgislib.imagefilter'],
+        author = 'Sam Gillingham, Pete Bunting and Dan Clewley',
+        author_email = 'gillingham.sam@gmail.com, petebunting@mac.com, daniel.clewley@gmail.com',
+        packages = ['rsgislib', 'rsgislib.imagecalc', 'rsgislib.imageutils', 'rsgislib.segmentation', 'rsgislib.imagecalibration', 'rsgislib.rastergis', 'rsgislib.zonalstats', 'rsgislib.imageregistration', 'rsgislib.vectorutils', 'rsgislib.imagefilter', 'rsgislib.classification'],
         ext_package = 'rsgislib',
-        ext_modules = [imagecalc_module, imageutils_module, 
-                            segmentation_module, imagecalibration_module, rastergis_module, zonalstats_module, imageregistration_module,vectorutils_module,imagefilter_module])
+        ext_modules = [imagecalc_module, imageutils_module, segmentation_module, imagecalibration_module, rastergis_module, zonalstats_module, imageregistration_module, vectorutils_module, imagefilter_module, classification_module])
 

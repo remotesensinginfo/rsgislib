@@ -54,6 +54,9 @@
 #include "classifier/RSGISClassificationUtils.h"
 #include "classifier/RSGISRATClassificationUtils.h"
 
+#include "cmds/RSGISCmdClassification.h"
+#include "cmds/RSGISCmdException.h"
+
 #include "img/RSGISCalcImage.h"
 #include "img/RSGISImageUtils.h"
 
