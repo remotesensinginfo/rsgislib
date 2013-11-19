@@ -5,6 +5,12 @@ RSGISLib Image Segmentation Module
    :members:
    :undoc-members:
 
+Utilities
+---------
+.. autofunction:: rsgislib.segmentation.segutils.runShepherdSegmentation
+
+Main
+-----
 .. autofunction:: rsgislib.segmentation.RMSmallClumpsStepwise
 .. autofunction:: rsgislib.segmentation.UnionOfClumps
 .. autofunction:: rsgislib.segmentation.clump

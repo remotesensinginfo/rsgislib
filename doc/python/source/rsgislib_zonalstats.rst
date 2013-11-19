@@ -1,8 +1,6 @@
 RSGISLib Zonal Stats Module
 =================================
 
-The zonal stats module provides functions to perform pixel-in-polygon or point-in-pixel analysis. 
-
 .. automodule:: rsgislib.zonalstats
    :members:
    :undoc-members:

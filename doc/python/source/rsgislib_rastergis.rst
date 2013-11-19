@@ -5,6 +5,9 @@ RSGISLib Raster GIS Module
    :members:
    :undoc-members:
 
+Utilities
+---------
+.. autofunction:: rsgislib.rastergis.ratutils.populateImageStats
 
 
 

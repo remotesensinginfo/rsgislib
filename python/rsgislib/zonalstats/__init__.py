@@ -1,5 +1,5 @@
 """
-Contains zonal stats functionality for rsgislib
+The zonal stats module provides functions to perform pixel-in-polygon or point-in-pixel analysis. 
 """
 
 # import the C++ extension into this level
