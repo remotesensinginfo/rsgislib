@@ -4163,25 +4163,30 @@ namespace rsgisexe{
                     std::vector<rsgis::cmds::RSGISClassChangeFieldsCmds> classFields;
                     std::vector<rsgis::rastergis::RSGISClassChangeFields*>::iterator classIter;
                     classFields.reserve(classChangeField->size());
-                    for(classIter = classChangeField->begin(); classIter != classChangeField->end(); ++classIter) {
+                    for(classIter = classChangeField->begin(); classIter != classChangeField->end(); ++classIter)
+                    {
                         rsgis::cmds::RSGISClassChangeFieldsCmds classField;
                         classField.name = (*classIter)->name;
                         classField.outName = (*classIter)->outName;
                         classField.threshold = (*classIter)->threshold;
-                        classField.means = (*classIter)->means;
-                        classField.stddev = (*classIter)->stddev;
-                        classField.count = (*classIter)->count;
                         classFields.push_back(classField);
                         delete *classIter;
                     }
 
                     rsgis::cmds::executeFindChangeClumpsFromStdDev(this->clumpsImage, this->classField, this->changeField, *this->attFields, classFields);
+                    
                     delete classChangeField;
-                } catch (rsgis::RSGISException e) {
+                }
+                catch (rsgis::RSGISException e)
+                {
                     throw rsgis::RSGISException(e.what());
-                } catch (rsgis::cmds::RSGISCmdException e) {
+                }
+                catch (rsgis::cmds::RSGISCmdException e)
+                {
                     throw rsgis::RSGISException(e.what());
-                } catch (std::exception e) {
+                }
+                catch (std::exception e)
+                {
                     throw rsgis::RSGISException(e.what());
                 }
             }
