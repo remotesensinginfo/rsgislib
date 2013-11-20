@@ -367,7 +367,7 @@ void Control::help()
 	std::cout << "-p xml file - Parses and prints the parameters for the xml file specified\n";
 	std::cout << "-x xml file - Executes the application with the algorithms and parameters specified\n";
     std::cout << "-v - Prints the version information for the software\n";
-	std::cout << "Bugs are to be reported on the trac or directly to " << RSGISLIB_PACKAGE_BUGREPORT << std::endl << std::endl;
+	std::cout << "For support please email " << RSGISLIB_PACKAGE_BUGREPORT << std::endl << std::endl;
 }
 
 void Control::versionInfo()
@@ -403,7 +403,7 @@ int main(int argc, char **argv)
     std::cout << "This program comes with ABSOLUTELY NO WARRANTY.\n";
     std::cout << "This is free software, and you are welcome to redistribute it\n";
     std::cout << "under certain conditions; See website (http://www.rsgislib.org).\n";
-	std::cout << "Bugs are to be reported on the trac or directly to " << RSGISLIB_PACKAGE_BUGREPORT << std::endl << std::endl;
+	std::cout << "For support please email " << RSGISLIB_PACKAGE_BUGREPORT << std::endl << std::endl;
 
 	Control *ctrl = NULL;
 
