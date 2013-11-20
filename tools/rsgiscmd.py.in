@@ -115,7 +115,7 @@ or open:
 This script was distributed with @RSGISLIB_PACKAGE_STRING@.
 Copyright (C) @RSGISLIB_COPYRIGHT_YEAR@ Peter Bunting and Daniel Clewley
 
-Report bugs on the trac or directly to @RSGISLIB_PACKAGE_BUGREPORT@
+For support please email @RSGISLIB_PACKAGE_BUGREPORT@.
 '''
         print(helpText)
 

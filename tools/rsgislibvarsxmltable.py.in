@@ -84,7 +84,7 @@ class RSGISLibXMLVariablesTable (object):
         print('@PACKAGE@ software library from a user defined template.')
         print('This script was distributed with @RSGISLIB_PACKAGE_STRING@')
         print('Copyright (C) @RSGISLIB_COPYRIGHT_YEAR@ Peter Bunting and Daniel Clewley')
-        print('For maintainance email @RSGISLIB_PACKAGE_BUGREPORT@')
+        print('For support please email @RSGISLIB_PACKAGE_BUGREPORT@')
 
         inTemplateStr = self.readInputTemplate(cmdargs.inputxml)
         print(cmdargs.headerrows)
