@@ -14,11 +14,22 @@ Frequently Asked Questions
 
 **What does RSGISLib do?**
 
-RSGISLib contains a number of algorithms for processing and analysing remote sensing data that are the product of research carried out by the authors and their collaborators. The primary aim of RSGISLib was to make it easier to develop code for our research. Over time, more functionality has been added to make it easier to carry out our research. The project was released with the hope it will be of use to others working with Remote Sensing and GIS data. To date it's been used as part of a number of publications and theses.
+RSGISLib contains a number of algorithms for processing and analysing remote sensing data that are the product of research carried out by the authors and their collaborators. The primary aim of RSGISLib was to make it easier to develop code for our research. Over time, more functionality has been added to make it easier to carry out our research. The project was released with the hope it will be of use to others working with Remote Sensing and GIS data. Some of the functionality available within RSGISlib includes:
+
+* Image segmentation
+* Object-based classification
+* Image-to-image registration
+* Image filtering
+* Zonal statistics
+* General raster and vector processing
+
+To date it's been used as part of a number of publications and theses, for more details see:
+
+Peter Bunting, Daniel Clewley, Richard M. Lucas and Sam Gillingham. 2014. The Remote Sensing and GIS Software Library (RSGISLib), Computers & Geosciences. Volume 62, Pages 216-226 http://dx.doi.org/10.1016/j.cageo.2013.08.007.
 
 **Is RSGISLib intended to be a substitute for commercial GIS / RS packages or other open source packages?**
 
-No, RSGISLib is not being developed as a substitute for ArcMap / QGIS or ENVI. As stated above, RSGISLib is mainly developed to support our research, because of this there is a lot of advanced functionality in RSGISLib that is unavailable in other packages. 
+No, RSGISLib is not being developed as a substitute for ArcMap / QGIS or ENVI. As stated above, RSGISLib is mainly developed to support our research, because of this there is a lot of advanced functionality in RSGISLib that is unavailable in other packages. Although RSGISLib works well on the desktop, it scales well to a High Performance Computing (HPC) environment, which is an area many of the previously mentioned software aren't focusing on.
 
 For visualising data it is recommended RSGISLib is used in combination with TuiView, an open source cross-platform viewer available to download from `here <https://bitbucket.org/chchrsc/tuiview>`_.
 
@@ -28,22 +39,20 @@ Yes, this software is provided freely under a GPL3 license. The software is free
 
 **Where can I get help with RSGISLib?**
 
-The manual is available to download from `here <https://bitbucket.org/petebunting/rsgislib-documentation/>`_.
+The RSGISLib documentation, which contains tutorials for selected functions is available to download from `here <https://bitbucket.org/petebunting/rsgislib-documentation/>`_ , documentation for the Python bindings is available on this website.
 
-Help is provided via our mailing list. 
-rsgislib-develop@lists.sourceforge.net 
+Help is available for RSGISLib through emailing our mailing list: rsgislib-support@googlegroups.com
 
-The archives can be accessed at: 
-http://sourceforge.net/p/rsgislib/mailman/rsgislib-develop
+The archive is available to view at `groups.google.com <https://groups.google.com/forum/#!forum/rsgislib-support>`_ 
 
 **How do I go about getting functionality added to RSGISLib?**
 
 For general suggestions submit a ticket on our `issues <https://bitbucket.org/petebunting/rsgislib/issues?status=new&status=open>`_ page on Bitbucket or post a suggestion on the mailing list. If there's functionality you need adding for a specific project you could try to add it yourself or you can contact us to enquire about consultancy work. 
 
-**How do I cite RSGISLib**
+**How do I cite RSGISLib?**
 
 If you have used RSGISLib for published work then you should cite the following publication, and / or the specific paper of the algorithm you used (if applicable). 
 
-Peter Bunting, Daniel Clewley, Richard M. Lucas and Sam Gillingham. The Remote Sensing and GIS Software Library (RSGISLib), Computers & Geosciences, Available online 19 September 2013, ISSN 0098-3004. http://dx.doi.org/10.1016/j.cageo.2013.08.007.
+Peter Bunting, Daniel Clewley, Richard M. Lucas and Sam Gillingham. 2014. The Remote Sensing and GIS Software Library (RSGISLib), Computers & Geosciences. Volume 62, Pages 216-226 http://dx.doi.org/10.1016/j.cageo.2013.08.007.
 
 
