@@ -47,7 +47,7 @@ print('rsgislibattributerat.py script provides command line utility.')
 print('for populating statistics within a RAT from another image. ')
 print('This script was distributed with @RSGISLIB_PACKAGE_STRING@')
 print('Copyright (C) @RSGISLIB_COPYRIGHT_YEAR@ Peter Bunting and Daniel Clewley')
-print('For maintainance email @RSGISLIB_PACKAGE_BUGREPORT@')
+print('For support please email @RSGISLIB_PACKAGE_BUGREPORT@')
 
 rsgislib.rastergis.ratutils.populateImageStats(args.inimage, args.inclumps, args.outascii, args.threshold, args.calcMin, args.calcMax, args.calcSum, args.calcMean, args.calcStDev, args.calcMedian, args.calcCount, args.calcArea, args.calcLength, args.calcWidth, args.calcLengthWidth)
 
