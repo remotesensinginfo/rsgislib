@@ -237,7 +237,7 @@ class RSGISLibXML (object):
         print('')
         print('This script was distributed with @RSGISLIB_PACKAGE_STRING@')
         print('Copyright (C) @RSGISLIB_COPYRIGHT_YEAR@ Peter Bunting and Daniel Clewley')
-        print('For maintainance email @RSGISLIB_PACKAGE_BUGREPORT@')
+        print('For support please email @RSGISLIB_PACKAGE_BUGREPORT@')
         print('')
         print('Within XML Template (--input):')
         print('\t$FILEPATH - Replaced with full file path')

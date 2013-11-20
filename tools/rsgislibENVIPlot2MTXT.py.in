@@ -132,7 +132,7 @@ class RSGISLibENVIPlot2MTXT (object):
         print '\t<INPUT> - list of plots exported from ENVI as ASCII (see user guide)'
         print '\nThis script was distributed with @RSGISLIB_PACKAGE_STRING@'
         print 'Copyright (C) @RSGISLIB_COPYRIGHT_YEAR@ Peter Bunting and Daniel Clewley'
-        print 'For maintainance email @RSGISLIB_PACKAGE_BUGREPORT@'
+        print 'For support please email @RSGISLIB_PACKAGE_BUGREPORT@'
 
 
 if __name__ == '__main__':
