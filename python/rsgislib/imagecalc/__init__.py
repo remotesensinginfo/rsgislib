@@ -1,5 +1,5 @@
 """
-Contains ImageCalc functionality for rsgislib
+The imagecalc module contains functions for performing a number of calculating on images.
 """
 
 # import the C++ extension into this level

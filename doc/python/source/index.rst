@@ -11,7 +11,7 @@ The Remote Sensing and GIS software library (RSGISLib) is a collection of tools 
 
 The project is hosted on Bitbucket and is available to download from https://bitbucket.org/petebunting/rsgislib 
 
-The project is jointly led by Pete Bunting (`Earth Observation and Ecosystem Dynamics Group <http://www.aber.ac.uk/en/iges/research-groups/earth-observation-laboratory/>`_ , `Aberystwyth University <http://www.aber.ac.uk/>`_) and Dan Clewley (`Microwave Systems, Sensors and Imaging Lab <http://mixil.usc.edu>`_, `The University of Southern California <http://www.usc.edu>`_).
+The project is jointly led by Pete Bunting (`Earth Observation and Ecosystem Dynamics Group <http://www.aber.ac.uk/en/iges/research-groups/earth-observation-laboratory/>`_ , `Aberystwyth University <http://www.aber.ac.uk/>`_) and Dan Clewley (`Microwave Systems, Sensors and Imaging Lab <http://mixil.usc.edu>`_, `University of Southern California <http://www.usc.edu>`_).
 
 
 Information
