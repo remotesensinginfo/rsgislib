@@ -217,9 +217,10 @@ static PyMethodDef VectorUtilsMethods[] = {
 "* force is a bool, specifying whether to force removal of the output vector if it exists\n"
 "Example::\n"
 "\n"
-"  inputVector = './Vectors/injune_p142_stem_locations.shp'\n"
-"  outputVector = './TestOutputs/injune_p142_stem_locations_noatts.shp'\n"
-"  vectorutils.removeattributes(inputVector, outputVector, True)\n"
+"   from rsgislib import vectorutils\n"
+"   inputVector = './Vectors/injune_p142_stem_locations.shp'\n"
+"   outputVector = './TestOutputs/injune_p142_stem_locations_noatts.shp'\n"
+"   vectorutils.removeattributes(inputVector, outputVector, True)\n"
 "\n"},
 
     {"buffervector", VectorUtils_BufferVector, METH_VARARGS, 
@@ -233,10 +234,11 @@ static PyMethodDef VectorUtilsMethods[] = {
 "* force is a bool, specifying whether to force removal of the output vector if it exists\n"
 "Example::\n"
 "\n"
-"  inputVector = './Vectors/injune_p142_stem_locations.shp'\n"
-"  outputVector = './TestOutputs/injune_p142_stem_locations_1mbuffer.shp'\n"
-"  bufferDist = 1\n"
-"  vectorutils.buffervector(inputVector, outputVector, bufferDist, True)\n"
+"   from rsgislib import vectorutils\n"
+"   inputVector = './Vectors/injune_p142_stem_locations.shp'\n"
+"   outputVector = './TestOutputs/injune_p142_stem_locations_1mbuffer.shp'\n"
+"   bufferDist = 1\n"
+"   vectorutils.buffervector(inputVector, outputVector, bufferDist, True)\n"
 "\n"},
 
     {"printpolygeom", VectorUtils_PrintPolyGeom, METH_VARARGS, 
@@ -247,6 +249,7 @@ static PyMethodDef VectorUtilsMethods[] = {
 "* inputvector is a string containing the name of the input vector\n"
 "Example::\n"
 "\n"
+"   from rsgislib import vectorutils\n"
 "   inputVector = './Vectors/injune_p142_psu_utm.shp'\n"
 "   vectorutils.printpolygeom(inputVector)\n"
 "\n"},
@@ -262,6 +265,7 @@ static PyMethodDef VectorUtilsMethods[] = {
 "* replace is a string to replace 'find'.\n"
 "Example::\n"
 "\n"
+"   from rsgislib import vectorutils\n"
 "   inputVector = './TestOutputs/injune_p142_psu_utm_findreplace.shp'\n"
 "   attribute = 'PSU'\n"
 "   find = '142'\n"
@@ -279,9 +283,10 @@ static PyMethodDef VectorUtilsMethods[] = {
 "* force is a bool, specifying whether to force removal of the output vector if it exists\n"
 "Example::\n"
 "\n"
-"  inputVector = './Vectors/injune_p142_psu_utm.shp'\n"
-"  outputVector = './TestOutputs/injune_p142_psu_utm_area.shp'\n"
-"  vectorutils.calcarea(inputVector, outputVector, True)\n"
+"   from rsgislib import vectorutils\n"
+"   inputVector = './Vectors/injune_p142_psu_utm.shp'\n"
+"   outputVector = './TestOutputs/injune_p142_psu_utm_area.shp'\n"
+"   vectorutils.calcarea(inputVector, outputVector, True)\n"
 "\n"},
 
     {"polygonsInPolygon", VectorUtils_PolygonsInPolygon, METH_VARARGS, 
@@ -295,6 +300,7 @@ static PyMethodDef VectorUtilsMethods[] = {
 "* force is a bool, specifying whether to force removal of the output vector if it exists\n"
 "Example::\n"
 "\n"
+"   from rsgislib import vectorutils\n"
 "   inputVector = './Vectors/injune_p142_stem_locations.shp'\n"
 "   coverVector = './Vectors/injune_p142_psu_utm.shp'\n"
 "   outDIR = '/TestOutputs'\n"

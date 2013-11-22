@@ -1,5 +1,5 @@
 """
-Contains segmentation functionality for rsgislib
+The Raster GIS module contains functions for attributing and manipulating raster attribute tables.
 """
 
 # import the C++ extension into this level

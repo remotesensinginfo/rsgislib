@@ -268,7 +268,7 @@ static PyObject *ZonalStats_PixelStats2TXT(PyObject *self, PyObject *args)
     if(zonalAtts->calcStdDev) {zonalAtts->calcStdDev = RSGISPY_INT_EXTRACT(pCalcStdDev);}
     if(zonalAtts->calcMode) {zonalAtts->calcMode = RSGISPY_INT_EXTRACT(pCalcMode);}
     if(zonalAtts->calcSum) {zonalAtts->calcSum = RSGISPY_INT_EXTRACT(pCalcSum);}
-    
+   
     // Check if thresholds have been set - use default values (+/- Inf) if not.
     // Check for float or int (want float but don't complain if we get int.)
     pMinThreshold = PyObject_GetAttrString(pBandAttZonalStatsCmds, "minThreshold");
