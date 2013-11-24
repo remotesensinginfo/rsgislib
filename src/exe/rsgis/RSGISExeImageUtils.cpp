@@ -5060,6 +5060,10 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
         }
 		else if(option == RSGISExeImageUtils::imageComposite)
 		{
+            cout << "A command to calculate summary stats for each pixel over a number of bands in a composite\n";
+            cout << "Input Image: " << this->inputImage << std::endl;
+            cout << "Output Image: " << this->outputImage << std::endl;
+            
             GDALAllRegister();
 			GDALDataset **datasets = NULL;
 			RSGISCalcImage *calcImage = NULL;

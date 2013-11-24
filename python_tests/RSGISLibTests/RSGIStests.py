@@ -850,7 +850,7 @@ if __name__ == '__main__':
     if testLibraries == 'all' or testLibraries == 'imagefilter':
         """ Image filter functions """ 
         t.tryFuncAndCatch(t.testFilter)
-        #t.testLeungMalikFilterBank() # Skip as it takes a while
+        #t.tryFuncAndCatch(t.testLeungMalikFilterBank) # Skip as it takes a while
     
     print("%s TESTS COMPLETED - %s FAILURES LISTED BELOW:"%(t.numTests, len(t.failures)))
     if(len(t.failures)):
