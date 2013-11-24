@@ -737,6 +737,13 @@ void RSGISExeFilterImages::runAlgorithm() throw(rsgis::RSGISException)
             try
             {
                 rsgis::cmds::executeFilter(this->inputImage, this->filterParameters, this->outputImageBase, this->imageFormat, this->imageExt, this->rsgisOutDataType);
+                
+                // Delete filter parameters
+                for(std::vector<rsgis::cmds::RSGISFilterParameters*>::iterator iterFilter = this->filterParameters->begin(); iterFilter != this->filterParameters->end(); ++iterFilter)
+                {
+                    delete *iterFilter;
+                }
+                delete this->filterParameters;
             }
             catch(rsgis::cmds::RSGISCmdException &e)
             {

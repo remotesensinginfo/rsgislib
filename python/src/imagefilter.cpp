@@ -188,6 +188,13 @@ static PyObject *ImageFilter_Filter(PyObject *self, PyObject *args)
         rsgis::RSGISLibDataType type = (rsgis::RSGISLibDataType) dataType;
         rsgis::cmds::executeFilter(pszInputImage, filterParameters, pszOutputImageBase, pszImageFormat, pszImageExt, type);
 
+        // Delete filter parameters
+        for(std::vector<rsgis::cmds::RSGISFilterParameters*>::iterator iterFilter = filterParameters->begin(); iterFilter != filterParameters->end(); ++iterFilter)
+        {
+            delete *iterFilter;
+        }
+        delete filterParameters;
+
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -219,6 +226,13 @@ static PyObject *ImageFilter_LeungMalikFilterBank(PyObject *self, PyObject *args
         // Excecute
         rsgis::RSGISLibDataType type = (rsgis::RSGISLibDataType) dataType;
         rsgis::cmds::executeFilter(pszInputImage, filterParameters, pszOutputImageBase, pszImageFormat, pszImageExt, type);
+
+        // Delete filter parameters
+        for(std::vector<rsgis::cmds::RSGISFilterParameters*>::iterator iterFilter = filterParameters->begin(); iterFilter != filterParameters->end(); ++iterFilter)
+        {
+            delete *iterFilter;
+        }
+        delete filterParameters;
 
     }
     catch(rsgis::cmds::RSGISCmdException &e)
