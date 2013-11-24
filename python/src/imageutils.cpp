@@ -933,6 +933,14 @@ static PyMethodDef ImageUtilsMethods[] = {
     " * type is a rsgislib.TYPE_* value providing the output data type of the tiles.\n"
     "Example::\n"
     "\n"
+    "   import rsgislib\n"
+    "   from rsgislib import imageutils\n"
+    "   imageList = ['./Rasters/injune_p142_casi_sub_utm_single_band.vrt','./Rasters/injune_p142_casi_sub_utm_single_band.vrt']\n"
+    "   bandNamesList = ['Image1','Image2']\n"
+    "   outputImage = './TestOutputs/injune_p142_casi_sub_stack.kea'\n"
+    "   format = 'KEA'\n"
+    "   dataType = rsgislib.TYPE_32FLOAT\n"
+    "   imageutils.stackImageBands(imageList, bandNamesList, outputImage, None, 0, format, dataType)\n"
     "\n"},
     
 {"createBlankImage", ImageUtils_CreateBlankImage, METH_VARARGS,

@@ -519,6 +519,14 @@ class RSGISTests:
         dataType = rsgislib.TYPE_32FLOAT
         imageutils.subset2img(inputImage, inputROIImage, outputImage, format, dataType)
 
+    def testStackBands(self):
+        imageList = ['./Rasters/injune_p142_casi_sub_utm_single_band.vrt','./Rasters/injune_p142_casi_sub_utm_single_band.vrt']
+        bandNamesList = ['Image1','Image2']
+        outputImage = './TestOutputs/injune_p142_casi_sub_stack.kea'
+        format = "KEA"
+        dataType = rsgislib.TYPE_32FLOAT
+        imageutils.stackImageBands(imageList, bandNamesList, outputImage, None, 0, format, dataType)
+
      # Zonal Stats
 
     def testPointValue2SHP(self):
@@ -795,6 +803,7 @@ if __name__ == '__main__':
         t.tryFuncAndCatch(t.testSubset)
         t.tryFuncAndCatch(t.testSubset2Polys)
         t.tryFuncAndCatch(t.testSubset2Img)
+        t.tryFuncAndCatch(t.testStackBands)
         
     if testLibraries == 'all' or testLibraries == 'rastergis':
     
