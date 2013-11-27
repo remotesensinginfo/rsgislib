@@ -88,7 +88,7 @@ namespace rsgis{ namespace cmds {
     void excecuteSubset(std::string inputImage, std::string inputVector, std::string outputImage, std::string imageFormat, RSGISLibDataType outDataType) throw(RSGISCmdException);
     
     /** A function to subset an image to polygons within shapefile */
-    void excecuteSubset2Polys(std::string inputImage, std::string inputVector, std::string filenameAttribute, std::string outputImageBase, std::string imageFormat, RSGISLibDataType outDataType, std::string outFileExtension) throw(RSGISCmdException);
+    void excecuteSubset2Polys(std::string inputImage, std::string inputVector, std::string filenameAttribute, std::string outputImageBase, std::string imageFormat, RSGISLibDataType outDataType, std::string outFileExtension, std::vector<std::string> *outFileNames = NULL) throw(RSGISCmdException);
     
     /** A function to subset an image to another image*/
     void excecuteSubset2Img(std::string inputImage, std::string inputROIImage, std::string outputImage, std::string imageFormat, RSGISLibDataType outDataType) throw(RSGISCmdException);
