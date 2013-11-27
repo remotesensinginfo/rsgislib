@@ -521,9 +521,21 @@ static PyObject *ImageUtils_Subset2Polys(PyObject *self, PyObject *args)
     if( !PyArg_ParseTuple(args, "sssssis:subset2polys", &pszInputImage, &pszInputVector, &pszAttribute, &pszOutputImageBase, &pszGDALFormat, &nOutDataType, &pszOutputExt))
         return NULL;
     
+    PyObject *pOutList;
     try
     {
-        rsgis::cmds::excecuteSubset2Polys(pszInputImage, pszInputVector, pszAttribute, pszOutputImageBase, pszGDALFormat, (rsgis::RSGISLibDataType)nOutDataType, pszOutputExt);
+        std::vector<std::string> outFileNames;
+        
+        rsgis::cmds::excecuteSubset2Polys(pszInputImage, pszInputVector, pszAttribute, pszOutputImageBase, pszGDALFormat, (rsgis::RSGISLibDataType)nOutDataType, pszOutputExt, &outFileNames);
+     
+        pOutList = PyList_New(outFileNames.size());
+        Py_ssize_t nIndex = 0;
+        for( std::vector<std::string>::iterator itr = outFileNames.begin(); itr != outFileNames.end(); itr++)
+        {
+            PyObject *pVal = RSGISPY_CREATE_STRING((*itr).c_str());
+            PyList_SetItem(pOutList, nIndex, pVal ); // steals a reference
+            nIndex++;
+        }
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -531,7 +543,7 @@ static PyObject *ImageUtils_Subset2Polys(PyObject *self, PyObject *args)
         return NULL;
     }
     
-    Py_RETURN_NONE;
+    return pOutList;
 }
 
 static PyObject *ImageUtils_Subset2Img(PyObject *self, PyObject *args)
@@ -884,6 +896,7 @@ static PyMethodDef ImageUtilsMethods[] = {
 " * gdalformat is a string providing the output format of the tiles (e.g., KEA).\n"
 " * type is a rsgislib.TYPE_* value providing the output data type of the tiles.\n"
 " * ext is a string providing the extension for the tiles (as required by the specified data type).\n"
+"\nA list of strings containing the filenames is returned.\n"
 "Example::\n"
 "\n"
 "   import rsgislib\n"

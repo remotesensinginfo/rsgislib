@@ -509,7 +509,7 @@ class RSGISTests:
         format = 'KEA'
         dataType = rsgislib.TYPE_32FLOAT
         ext = 'kea'
-        imageutils.subset2polys(inputImage, inputVector, attribute, outputImageBase, format, dataType, ext)
+        outFiles = imageutils.subset2polys(inputImage, inputVector, attribute, outputImageBase, format, dataType, ext)
 
     def testSubset2Img(self):
         inputImage = './Rasters/injune_p142_casi_sub_utm.kea'

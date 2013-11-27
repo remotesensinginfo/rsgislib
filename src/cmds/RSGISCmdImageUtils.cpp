@@ -815,7 +815,8 @@ namespace rsgis{ namespace cmds {
         }
     }
 
-    void excecuteSubset2Polys(std::string inputImage, std::string inputVector, std::string filenameAttribute, std::string outputImageBase, std::string imageFormat, RSGISLibDataType outDataType, std::string outFileExtension) throw(RSGISCmdException)
+    void excecuteSubset2Polys(std::string inputImage, std::string inputVector, std::string filenameAttribute, std::string outputImageBase,
+                              std::string imageFormat, RSGISLibDataType outDataType, std::string outFileExtension, std::vector<std::string> *outFileNames) throw(RSGISCmdException)
     {
         try
         {
@@ -897,6 +898,7 @@ namespace rsgis{ namespace cmds {
                 try
                 {
                     calcImage->calcImageInEnv(dataset, 1, outputFilePath, data[i]->getBBox(), false, NULL, imageFormat, RSGIS_to_GDAL_Type(outDataType));
+                    if(outFileNames != NULL){outFileNames->push_back(outputFilePath);}
                 }
                 catch (rsgis::img::RSGISImageBandException e)
                 {
