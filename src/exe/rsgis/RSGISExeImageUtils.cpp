@@ -3979,29 +3979,15 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
                     cout << "Band " << *iterBands << endl;
                 }
             }
-			GDALAllRegister();
-			GDALDataset *baseDS = NULL;
-			RSGISImageMosaic mosaic;
+            cout << this->inputImage << endl;
 			try
-			{
-				cout << this->inputImage << endl;
-				baseDS = (GDALDataset *) GDALOpenShared(this->inputImage.c_str(), GA_Update);
-				if(baseDS == NULL)
-				{
-					string message = string("Could not open image ") + this->inputImage;
-					throw RSGISImageException(message.c_str());
-				}
-
-				mosaic.includeDatasets(baseDS, this->inputImages, this->numImages, this->bands, this->bandsDefined);
-
-				GDALClose(baseDS);
-				GDALDestroyDriverManager();
-				delete[] inputImages;
-			}
-			catch (RSGISException e)
-			{
-				throw e;
-			}
+            {
+                rsgis::cmds::executeImageInclude(this->inputImages, this->numImages, this->inputImage, this->bandsDefined, this->bands);
+            }
+            catch(rsgis::cmds::RSGISCmdException &e)
+            {
+                throw RSGISException(e.what());
+            }
 		}
 		else if(option == RSGISExeImageUtils::cut2poly)
 		{
