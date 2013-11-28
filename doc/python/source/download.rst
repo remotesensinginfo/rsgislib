@@ -16,10 +16,10 @@ Instructions on installing RSGISLib and the pre-requisites are in the documentat
 
 For help with installation you can email our mailing list:
 
-rsgislib-develop@lists.sourceforge.net 
+rsgislib-support@googlegroups.com
 
 The archives can be accessed at: 
-http://sourceforge.net/p/rsgislib/mailman/rsgislib-develop
+https://groups.google.com/forum/#!forum/rsgislib-support
 
 
 Binary Downloads
