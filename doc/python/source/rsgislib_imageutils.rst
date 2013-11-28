@@ -18,6 +18,7 @@ Tile & Mosaic
 
 .. autofunction:: rsgislib.imageutils.createTiles
 .. autofunction:: rsgislib.imageutils.createImageMosaic
+.. autofunction:: rsgislib.imageutils.includeImages
 
 Visualisation / Normalisation
 ------------------------------

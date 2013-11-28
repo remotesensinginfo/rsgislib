@@ -60,6 +60,28 @@ static std::string *ExtractStringArrayFromSequence(PyObject *sequence, int *nEle
     return stringsArray;
 }
 
+// Helper function to extract python sequence to array of integers
+/*static int *ExtractIntArrayFromSequence(PyObject *sequence, int *nElements) {
+    Py_ssize_t nFields = PySequence_Size(sequence);
+    *nElements = nFields;
+    int *intArray = new int[nFields];
+
+    for(int i = 0; i < nFields; ++i) {
+        PyObject *intObj = PySequence_GetItem(sequence, i);
+
+        if(!RSGISPY_CHECK_INT(intObj)) {
+            PyErr_SetString(GETSTATE(sequence)->error, "Fields must be integers");
+            Py_DECREF(intObj);
+            return intArray;
+        }
+
+        intArray[i] = RSGISPY_INT_EXTRACT(intObj);
+        Py_DECREF(intObj);
+    }
+
+    return intArray;
+}*/
+
 static PyObject *ImageUtils_StretchImage(PyObject *self, PyObject *args)
 {
     const char *pszInputImage, *pszOutputFile, *pszGDALFormat, *pszOutStatsFile;
@@ -207,6 +229,67 @@ static PyObject *ImageUtils_createImageMosaic(PyObject *self, PyObject *args)
         rsgis::cmds::executeImageMosaic(inputImages, numImages, pszOutputImage, backgroundVal, 
                     skipVal, skipBand, overlapBehaviour, pszGDALFormat, (rsgis::RSGISLibDataType)nDataType);
 
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+
+    Py_RETURN_NONE;
+}
+
+static PyObject *ImageUtils_IncludeImages(PyObject *self, PyObject *args)
+{
+    const char *pszBaseImage;
+    int bandsDefined = false;
+    PyObject *pInputImages; // List of input images
+    PyObject *pInputBands = Py_None; // List of bands
+
+    // Check parameters are present and of correct type
+    if( !PyArg_ParseTuple(args, "sO|O:includeImages", &pszBaseImage, &pInputImages, &pInputBands))
+        return NULL;
+
+    // TODO: Look into this function - doesn't seem to catch when only a single image is provided.
+    if(!PySequence_Check(pInputImages)) {
+        PyErr_SetString(GETSTATE(self)->error, "Second argument must be a list of images");
+        return NULL;
+    }
+
+    // Extract list of images to array of strings.
+    int numImages = 0;
+    std::string *inputImages = ExtractStringArrayFromSequence(pInputImages, &numImages);
+    if(numImages == 0) 
+    { 
+        PyErr_SetString(GETSTATE(self)->error, "No input images provided");
+        return NULL; 
+    }
+
+    if(pInputBands == Py_None){bandsDefined = false;}
+    // Extract bands to an array (if using)
+    std::vector<int> imgBands;
+    if(bandsDefined)
+    {
+        Py_ssize_t nFields = PySequence_Size(pInputBands);
+        
+        for(int i = 0; i < nFields; ++i)
+        {
+            PyObject *intObj = PySequence_GetItem(pInputBands, i);
+            
+            if(!RSGISPY_CHECK_INT(intObj))
+            {
+                PyErr_SetString(GETSTATE(pInputBands)->error, "Bands must be integers");
+                Py_DECREF(intObj);
+                return NULL;
+            }
+            
+            imgBands.push_back(RSGISPY_INT_EXTRACT(intObj));
+            Py_DECREF(intObj);
+        }
+    }
+    try
+    {
+        rsgis::cmds::executeImageInclude(inputImages, numImages, pszBaseImage, bandsDefined, imgBands);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -791,7 +874,24 @@ static PyMethodDef ImageUtilsMethods[] = {
 "	imageutils.createImageMosaic(inputList, outImage, backgroundVal, skipVal, skipBand, overlapBehaviour, format, dataType)\n"
 "\n"},
  
+    {"includeImages", ImageUtils_IncludeImages, METH_VARARGS,
+"imageutils.includeImages(baseImage, inputImages, inputBands=None)\n"  
+"Create mosaic from list of input images.\n"
+" * baseImage is a string containing the name of the input image to add image to\n"
+" * inputimagelist is a list of input images\n"
+" * inputBands is a subset of input bands to use (optional)\n"
+"Example::\n"
+"\n"
+"	import rsgislib\n"
+"	from rsgislib import imageutils\n"
+"	import glob\n"
+"	# Search for all files with the extension 'kea'\n"
+"	baseImage = './TestOutputs/injune_p142_casi_sub_utm_mosaic.kea'\n"
+"	inputList = glob.glob('./TestOutputs/Tiles/*.kea')\n"
+"	imageutils.includeImages(baseImage, inputList)\n"
+"\n"},
  
+  
     {"popImageStats", ImageUtils_PopImageStats, METH_VARARGS,
 "rsgislib.imageutils.popImageStats(inputImage, useNoDataValue, noDataValue, buildPyramids)\n"
 "Calculate the image statistics and build image pyramids populating the image file.\n"

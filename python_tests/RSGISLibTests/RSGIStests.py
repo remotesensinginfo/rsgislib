@@ -488,6 +488,12 @@ class RSGISTests:
         format = "KEA"
         dataType = rsgislib.TYPE_32FLOAT
         imageutils.createImageMosaic(inputList, outImage, backgroundVal, skipVal, skipBand, overlapBehaviour, format, dataType)
+
+    def testIncludeImages(self):
+        print("PYTHON TEST: includeImages")
+        baseImage = './TestOutputs/injune_p142_casi_sub_utm_remosaic.kea'
+        inputList = ['./TestOutputs/Tiles/injune_p142_casi_sub_utm_tile0.kea','./TestOutputs/Tiles/injune_p142_casi_sub_utm_tile1.kea']
+        imageutils.includeImages(baseImage, inputList)
     
     def testPopImageStats(self):
         inputImage = './TestOutputs/injune_p142_casi_sub_utm.kea'
@@ -799,6 +805,7 @@ if __name__ == '__main__':
         """ ImageUtils functions """
         t.tryFuncAndCatch(t.testCreateTiles)
         t.tryFuncAndCatch(t.testCreateImageMosaic)
+        t.tryFuncAndCatch(t.testIncludeImages)
         t.tryFuncAndCatch(t.testPopImageStats)
         t.tryFuncAndCatch(t.testSubset)
         t.tryFuncAndCatch(t.testSubset2Polys)

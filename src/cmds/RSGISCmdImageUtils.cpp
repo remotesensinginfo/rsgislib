@@ -420,7 +420,39 @@ namespace rsgis{ namespace cmds {
         }
     }
     
-    
+    void executeImageInclude(std::string *inputImages, int numDS, std::string baseImage, bool bandsDefined, std::vector<int> bands) throw(RSGISCmdException)
+    {
+        try
+        {
+            
+            GDALAllRegister();
+			GDALDataset *baseDS = NULL;
+            rsgis::img::RSGISImageMosaic mosaic;
+
+            baseDS = (GDALDataset *) GDALOpenShared(baseImage.c_str(), GA_Update);
+            if(baseDS == NULL)
+            {
+                std::string message = std::string("Could not open image ") + baseImage;
+                throw RSGISImageException(message.c_str());
+            }
+            
+            mosaic.includeDatasets(baseDS, inputImages, numDS, bands, bandsDefined);
+            
+            GDALClose(baseDS);
+            GDALDestroyDriverManager();
+            delete[] inputImages;
+            
+        }
+        catch (RSGISImageException& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(std::exception& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
+            
     void executeAssignProj(std::string inputImage, std::string wktStr, bool readWKTFromFile, std::string wktFile)throw(RSGISCmdException)
     {
         try
