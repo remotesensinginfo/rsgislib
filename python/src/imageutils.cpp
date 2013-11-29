@@ -773,6 +773,41 @@ static PyObject *ImageUtils_CreateCopyImage(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
+
+static PyObject *ImageUtils_StackStats(PyObject *self, PyObject *args)
+{
+    const char *pszInputImage, *pszOutputImage, *pszGDALFormat, *pszCalcStat;
+    int nOutDataType;
+    PyObject *nBandsObj;
+    unsigned int numBands = 0;
+    bool allBands = true;
+    
+    if( !PyArg_ParseTuple(args, "ssOssi:stackStats", &pszInputImage, &pszOutputImage, &nBandsObj, &pszCalcStat, &pszGDALFormat, &nOutDataType))
+        return NULL;
+
+    // If an integer has been passes in for bands, extract it, otherwise assume all bands are needed.
+    if(nBandsObj != Py_None)
+    {
+        if(RSGISPY_CHECK_INT(nBandsObj))
+        {
+            numBands = RSGISPY_INT_EXTRACT(nBandsObj);
+            allBands = false;
+        }
+    }
+    
+    try
+    {
+        rsgis::cmds::executeStackStats(pszInputImage, pszOutputImage, pszCalcStat, allBands, numBands, std::string(pszGDALFormat), (rsgis::RSGISLibDataType)nOutDataType);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
 // Our list of functions in this module
 static PyMethodDef ImageUtilsMethods[] = {
     {"stretchImage", ImageUtils_StretchImage, METH_VARARGS, 
@@ -855,8 +890,8 @@ static PyMethodDef ImageUtilsMethods[] = {
 "      * 1 - Overwrite if value of new pixel is lower (minimum)\n"
 "      * 2 - Overwrite if value of new pixel is higher (maximum)\n"
 "\n"
-" * gdalformat is a string providing the output format of the tiles (e.g., KEA).\n"
-" * type is a rsgislib.TYPE_* value providing the output data type of the tiles.\n"
+" * gdalformat is a string providing the format of the output image (e.g., KEA).\n"
+" * type is a rsgislib.TYPE_* value providing the data type of the output image.\n"
 "Example::\n"
 "\n"
 "	import rsgislib\n"
@@ -949,8 +984,8 @@ static PyMethodDef ImageUtilsMethods[] = {
 "Extract the all the pixel values for raster regions to a HDF5 file (1 column for each image band).\n"
 " * inputImage is a string containing the name and path of the input file\n"
 " * outputImage is a string containing the name and path of the output file.\n"
-" * gdalformat is a string providing the output format of the tiles (e.g., KEA).\n"
-" * type is a rsgislib.TYPE_* value providing the output data type of the tiles.\n"
+" * gdalformat is a string providing the format of the output image (e.g., KEA).\n"
+" * type is a rsgislib.TYPE_* value providing the data type of the output image.\n"
 " * bands is a list of integers for the bands in the input image to exported to the output image (Note band count starts at 1)."
 "Example::\n"
 "\n"
@@ -969,8 +1004,8 @@ static PyMethodDef ImageUtilsMethods[] = {
 " * inputimage is a string providing the name of the input file.\n"
 " * inputvector is a string providing the vector which the image is to be clipped to. \n"
 " * outputimage is a string providing the output image. \n"
-" * gdalformat is a string providing the output format of the tiles (e.g., KEA).\n"
-" * type is a rsgislib.TYPE_* value providing the output data type of the tiles.\n"
+" * gdalformat is a string providing the format of the output image (e.g., KEA).\n"
+" * type is a rsgislib.TYPE_* value providing the data type of the output image.\n"
 "Example::\n"
 "\n"
 "   import rsgislib\n"
@@ -993,9 +1028,9 @@ static PyMethodDef ImageUtilsMethods[] = {
 " * inputvector is a string providing the vector which the image is to be clipped to. \n"
 " * attribute is a string providing the attribute in the vector to use for the ouput name\n"
 " * baseimage is a string providing the base name of the output file. The specified attribute of each polygon and extension will be appended."
-" * gdalformat is a string providing the output format of the tiles (e.g., KEA).\n"
-" * type is a rsgislib.TYPE_* value providing the output data type of the tiles.\n"
-" * ext is a string providing the extension for the tiles (as required by the specified data type).\n"
+" * gdalformat is a string providing the output format of the subsets (e.g., KEA).\n"
+" * type is a rsgislib.TYPE_* value providing the output data type of the subsets.\n"
+" * ext is a string providing the extension for the tiles (as required by the specified data format).\n"
 "\nA list of strings containing the filenames is returned.\n"
 "Example::\n"
 "\n"
@@ -1019,8 +1054,8 @@ static PyMethodDef ImageUtilsMethods[] = {
 " * inputimage is a string providing the name of the input file.\n"
 " * inputvector is a string providing the image which the 'inputimage' is to be clipped to. \n"
 " * outputimage is a string providing the output image. \n"
-" * gdalformat is a string providing the output format of the tiles (e.g., KEA).\n"
-" * type is a rsgislib.TYPE_* value providing the output data type of the tiles.\n"
+" * gdalformat is a string providing the format of the output image (e.g., KEA).\n"
+" * type is a rsgislib.TYPE_* value providing the data type of the output image.\n"
 "Example::\n"
 "\n"
 "   import rsgislib\n"
@@ -1042,8 +1077,8 @@ static PyMethodDef ImageUtilsMethods[] = {
     " * outputImage is a string containing the name and path for the outputted image.\n"
     " * skipVal is a float providing the value to be skipped (nodata values) in the input images (If None then ignored)\n"
     " * noDataValue is float specifying a no data value.\n"
-    " * gdalformat is a string providing the output format of the tiles (e.g., KEA).\n"
-    " * type is a rsgislib.TYPE_* value providing the output data type of the tiles.\n"
+    " * gdalformat is a string providing the format of the output image (e.g., KEA).\n"
+    " * type is a rsgislib.TYPE_* value providing the data type of the output image.\n"
     "Example::\n"
     "\n"
     "   import rsgislib\n"
@@ -1068,8 +1103,8 @@ static PyMethodDef ImageUtilsMethods[] = {
     " * res is a double specifying the pixel resolution of the output image.\n"
     " * pxlVal is a float specifying the pixel value of the output image.\n"
     " * wktFile is a string specifying the location of a file containing the WKT string representing the coordinate system and projection of the output image.\n"
-    " * gdalformat is a string providing the output format of the tiles (e.g., KEA).\n"
-    " * type is a rsgislib.TYPE_* value providing the output data type of the tiles.\n"
+    " * gdalformat is a string providing the format of the output image (e.g., KEA).\n"
+    " * type is a rsgislib.TYPE_* value providing the data type of the output image.\n"
     "Example::\n"
     "\n"
     "\n"},
@@ -1081,11 +1116,37 @@ static PyMethodDef ImageUtilsMethods[] = {
     " * outputImage is a string containing the name and path for the outputted image.\n"
     " * numBands is an integer specifying the number of image bands in the output image.\n"
     " * pxlVal is a float specifying the pixel value of the output image.\n"
-    " * gdalformat is a string providing the output format of the tiles (e.g., KEA).\n"
-    " * type is a rsgislib.TYPE_* value providing the output data type of the tiles.\n"
+    " * gdalformat is a string providing the format of the output image (e.g., KEA).\n"
+    " * type is a rsgislib.TYPE_* value providing the data type of the output image.\n"
     "Example::\n"
     "\n"
+    "   inputImage = './Rasters/injune_p142_casi_sub_utm.kea'\n"
+    "   outputImage = './TestOutputs/injune_p142_casi_sub_utm_blank.kea'\n"
+    "   format = 'KEA'\n"
+    "   dataType = rsgislib.TYPE_32FLOAT\n"
+    "   imageutils.createCopyImage(inputImage, outputImage, 1, 3, format, dataType)\n"
     "\n"},
+
+{"stackStats", ImageUtils_StackStats, METH_VARARGS,
+    "imageutils.stackStats(inputImage, outputImage, numBands, stat, gdalformat, type)\n"
+    "Create a new blank image with the parameters specified.\n"
+    "\n"
+    "* inputImage is a string containing the name and path for the input image, which is to be copied.\n"
+    "* outputImage is a string containing the name and path for the outputted image.\n"
+    "* numBands is an integer specifying the number of image bands in the output image, pass 'None' to use all bands.\n"
+    "* stat is a string providing the statistics to calculate, options are 'mean', 'min', 'max', and 'range'.\n"
+    "* gdalformat is a string providing the format of the output image (e.g., KEA).\n"
+    "* type is a rsgislib.TYPE_* value providing the data type of the output image.\n"
+    "\n"
+    "Example::\n"
+    "\n"
+    "   inputImage = './Rasters/injune_p142_casi_sub_utm.kea'\n"
+    "   outputImage = './TestOutputs/injune_p142_casi_sub_utm_stackStats.kea'\n"
+    "   format = 'KEA'\n"
+    "   dataType = rsgislib.TYPE_32FLOAT\n"
+    "   imageutils.stackStats(inputImage, outputImage, None, 'mean', format, dataType)\n"
+    "\n"},
+
 
     {NULL}        /* Sentinel */
 };
