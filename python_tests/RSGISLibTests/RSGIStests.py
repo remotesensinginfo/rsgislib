@@ -496,10 +496,12 @@ class RSGISTests:
         imageutils.includeImages(baseImage, inputList)
     
     def testPopImageStats(self):
+        print("PYTHON TEST: popImageStats")
         inputImage = './TestOutputs/injune_p142_casi_sub_utm.kea'
         imageutils.popImageStats(inputImage,True,0.,True)
         
     def testSubset(self):
+        print("PYTHON TEST: subset")
         inputImage = './Rasters/injune_p142_casi_sub_utm.kea'
         inputVector = './Vectors/injune_p142_plot_location_utm.shp'
         outputImage = './TestOutputs/injune_p142_casi_sub_utm_subset.kea'
@@ -508,6 +510,7 @@ class RSGISTests:
         imageutils.subset(inputImage, inputVector, outputImage, format, dataType)
 
     def testSubset2Polys(self):
+        print("PYTHON TEST: subset2polys")
         inputImage = './Rasters/injune_p142_casi_sub_utm.kea'
         inputVector = './Vectors/injune_p142_plot_location_utm.shp'
         attribute = 'PLOTNO'
@@ -518,6 +521,7 @@ class RSGISTests:
         outFiles = imageutils.subset2polys(inputImage, inputVector, attribute, outputImageBase, format, dataType, ext)
 
     def testSubset2Img(self):
+        print("PYTHON TEST: subset2img")
         inputImage = './Rasters/injune_p142_casi_sub_utm.kea'
         inputROIImage = './TestOutputs/injune_p142_casi_sub_utm_subset.kea'
         outputImage = './TestOutputs/injune_p142_casi_sub_utm_subset2img.kea'
@@ -526,12 +530,29 @@ class RSGISTests:
         imageutils.subset2img(inputImage, inputROIImage, outputImage, format, dataType)
 
     def testStackBands(self):
+        print("PYTHON TEST: stackImageBands")
         imageList = ['./Rasters/injune_p142_casi_sub_utm_single_band.vrt','./Rasters/injune_p142_casi_sub_utm_single_band.vrt']
         bandNamesList = ['Image1','Image2']
         outputImage = './TestOutputs/injune_p142_casi_sub_stack.kea'
         format = "KEA"
         dataType = rsgislib.TYPE_32FLOAT
         imageutils.stackImageBands(imageList, bandNamesList, outputImage, None, 0, format, dataType)
+
+    def testCreateCopyImage(self):
+        print("PYTHON TEST: createCopyImage")
+        inputImage = './Rasters/injune_p142_casi_sub_utm.kea'
+        outputImage = './TestOutputs/injune_p142_casi_sub_utm_blank.kea'
+        format = 'KEA'
+        dataType = rsgislib.TYPE_32FLOAT
+        imageutils.createCopyImage(inputImage, outputImage, 1, 3, format, dataType)
+
+    def testStackStats(self):
+        print("PYTHON TEST: stackStats")
+        inputImage = './Rasters/injune_p142_casi_sub_utm.kea'
+        outputImage = './TestOutputs/injune_p142_casi_sub_utm_stackStats.kea'
+        format = 'KEA'
+        dataType = rsgislib.TYPE_32FLOAT
+        imageutils.stackStats(inputImage, outputImage, None, 'mean', format, dataType)
 
      # Zonal Stats
 
@@ -811,6 +832,8 @@ if __name__ == '__main__':
         t.tryFuncAndCatch(t.testSubset2Polys)
         t.tryFuncAndCatch(t.testSubset2Img)
         t.tryFuncAndCatch(t.testStackBands)
+        t.tryFuncAndCatch(t.testStackStats)
+        t.tryFuncAndCatch(t.testCreateCopyImage)
         
     if testLibraries == 'all' or testLibraries == 'rastergis':
     
