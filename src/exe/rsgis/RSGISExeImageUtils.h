@@ -243,7 +243,7 @@ class RSGISExeImageUtils : public RSGISAlgorithmParameters
 		int panWinSize;
         bool processInMemory;
         unsigned int compositeBands;
-        compositeStat outCompStat;
+        std::string outCompStat;
         bool ignoreZeros;
         bool onePassSD;
         GDALDataType outDataType;
@@ -283,6 +283,7 @@ class RSGISExeImageUtils : public RSGISAlgorithmParameters
         unsigned int imageSample;
         unsigned int overlapBehaviour; // Behaviour for multiple pixels in mosaic
         std::vector<unsigned int> selectBands;
+        bool allBands;
 	};
 }
 #endif

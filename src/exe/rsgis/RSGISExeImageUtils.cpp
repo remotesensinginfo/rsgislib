@@ -96,6 +96,7 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
     XMLCh *optionCreateSlices = XMLString::transcode("createslices");
 	XMLCh *optionClump = XMLString::transcode("clump");
     XMLCh *optionComposite = XMLString::transcode("composite");
+    XMLCh *optionStackStats = XMLString::transcode("stackStats");
     XMLCh *optionRelabel = XMLString::transcode("relabel");
     XMLCh *optionAssignProj = XMLString::transcode("assignproj");
     XMLCh *optionPopImgStats = XMLString::transcode("popimgstats");
@@ -2298,7 +2299,7 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 		XMLString::release(&projXMLStr);
 
     }
-    else if (XMLString::equals(optionComposite, optionXML))
+    else if ( (XMLString::equals(optionComposite, optionXML)) | (XMLString::equals(optionStackStats, optionXML)) )
 	{
 		this->option = RSGISExeImageUtils::imageComposite;
 
@@ -2328,18 +2329,31 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 		}
 		XMLString::release(&outputXMLStr);
 
+        this->allBands = true;
 		XMLCh *cBandsXMLStr = XMLString::transcode("compositeBands");
+        XMLCh *nBandsXMLStr = XMLString::transcode("numBands");
 		if(argElement->hasAttribute(cBandsXMLStr))
 		{
 			char *charValue = XMLString::transcode(argElement->getAttribute(cBandsXMLStr));
 			this->compositeBands = mathUtils.strtoint(string(charValue));
 			XMLString::release(&charValue);
+            this->allBands = false;
+		}
+        
+		if(argElement->hasAttribute(nBandsXMLStr))
+		{
+			char *charValue = XMLString::transcode(argElement->getAttribute(nBandsXMLStr));
+			this->compositeBands = mathUtils.strtoint(string(charValue));
+			XMLString::release(&charValue);
+            this->allBands = false;
 		}
 		else
 		{
-			throw RSGISXMLArgumentsException("No \'compositeBands\' attribute was provided.");
+            this->allBands = true;
+            std::cout << "Calculating statistics over all bands" << std::endl;
 		}
 		XMLString::release(&cBandsXMLStr);
+        XMLString::release(&nBandsXMLStr);
 
 		XMLCh *typeXMLStr = XMLString::transcode("stats");
         this->outCompStat = compositeMean; // Set to default (mean)
@@ -2349,19 +2363,19 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 			string typeStr = string(charValue);
 			if (typeStr == "mean")
 			{
-				this->outCompStat = compositeMean;
+				this->outCompStat = "mean";
 			}
 			else if (typeStr == "min")
 			{
-				this->outCompStat = compositeMin;
+				this->outCompStat = "min";
 			}
             else if (typeStr == "max")
 			{
-				this->outCompStat = compositeMax;
+				this->outCompStat = "max";
 			}
             else if (typeStr == "range")
 			{
-				this->outCompStat = compositeRange;
+				this->outCompStat = "range";
 			}
             else
             {
@@ -5046,40 +5060,24 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
         }
 		else if(option == RSGISExeImageUtils::imageComposite)
 		{
-            cout << "A command to calculate summary stats for each pixel over a number of bands in a composite\n";
+            if(this->allBands){cout << "A command to calculate summary stats for each pixel over all bands in a stack\n";}
+            else{cout << "A command to calculate summary stats for each pixel over every " << this->compositeBands << "bands in a stack\n";}
+            
             cout << "Input Image: " << this->inputImage << std::endl;
             cout << "Output Image: " << this->outputImage << std::endl;
             
-            GDALAllRegister();
-			GDALDataset **datasets = NULL;
-			RSGISCalcImage *calcImage = NULL;
-
-			datasets = new GDALDataset*[1];
-
-			datasets[0] = (GDALDataset *) GDALOpen(this->inputImage.c_str(), GA_ReadOnly);
-			if(datasets[0] == NULL)
-			{
-				string message = string("Could not open image ") + this->inputImage;
-				throw RSGISImageException(message.c_str());
-			}
-
-			int numRasterBands = datasets[0]->GetRasterCount();
-
-            int numOutputBands = numRasterBands / this->compositeBands;
-
-            cout << "Calculating statistics for every " << this->compositeBands << " bands of a " << numRasterBands << " band input image to create a " << numOutputBands << " band output image" << endl;
-
-
-			RSGISImageComposite *compositeImage = new RSGISImageComposite(numOutputBands, this->compositeBands, this->outCompStat);
-			calcImage = new RSGISCalcImage(compositeImage, "", true);
-			calcImage->calcImage(datasets, 1, this->outputImage);
-
-			// Tidy up
-			GDALClose(datasets[0]);
-			delete[] datasets;
-
-			delete calcImage;
-			delete compositeImage;
+            try
+            {
+                rsgis::cmds::executeStackStats(this->inputImage, this->outputImage, this->outCompStat, this->allBands, this->compositeBands, this->imageFormat, this->rsgisOutDataType);
+            }
+            catch(rsgis::cmds::RSGISCmdException& e)
+            {
+                throw RSGISException(e.what());
+            }
+            catch(std::exception& e)
+            {
+                throw RSGISException(e.what());
+            }
 		}
         else if(option == RSGISExeImageUtils::createtiles)
 		{

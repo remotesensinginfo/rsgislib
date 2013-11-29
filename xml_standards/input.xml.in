@@ -685,8 +685,8 @@
     <rsgis:command algor="imageutils" option="createtiles" image="image.env" output="image_out_base" width="int" height="int" overlap="int" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" [offset="yes|no"] [outTilesList="list.txt"]/>
     <!-- A command to clump an image for a given pixel values -->
     <rsgis:command algor="imageutils" option="clump" image="image.env" output="image_out.env" format="GDAL Format" inmemory="yes | no" proj="OSGB | NZ2000 | NZ1949 | IMAGE" />
-    <!-- A command to create a composite image from a multi-band input image -->
-    <rsgis:command algor="imageutils" option="composite" image="image.env" output="image_out.env" compositeBands="int" stats="mean | min | max | range" />
+    <!-- A command to calculate summary stats for all all every N bands in a multiple band image -->
+    <rsgis:command algor="imageutils" option="stackStats" image="image.env" output="image_out.env" [numBands="int"] stats="mean | min | max | range" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
     <!-- A command to relabel image pixel using a look up table from a gmtxt matrix file (m=2 n=X) -->
     <rsgis:command algor="imageutils" option="relabel" image="image.env" output="image_out.env" lut="matrix.gmtxt" format="GDAL Format" />
     <!-- A command to assign and update an image to a specific projection -->
