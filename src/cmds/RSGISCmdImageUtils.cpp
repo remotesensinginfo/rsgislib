@@ -41,6 +41,7 @@
 #include "img/RSGISPopWithStats.h"
 #include "img/RSGISAddBands.h"
 #include "img/RSGISExtractImageValues.h"
+#include "img/RSGISImageComposite.h"
 
 #include "vec/RSGISImageTileVector.h"
 #include "vec/RSGISVectorOutputException.h"
@@ -1120,6 +1121,73 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
-    
+            
+    void executeStackStats(std::string inputImage, std::string outputImage, std::string calcStat, bool allBands, unsigned int numBands, std::string imageFormat, RSGISLibDataType outDataType) throw(RSGISCmdException)
+    {
+        try
+        {
+            GDALAllRegister();
+            GDALDataset **datasets = NULL;
+            rsgis::img::RSGISCalcImage *calcImage = NULL;
+            
+            datasets = new GDALDataset*[1];
+            
+            datasets[0] = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_ReadOnly);
+            if(datasets[0] == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputImage;
+                throw RSGISImageException(message.c_str());
+            }
+            
+            int numRasterBands = datasets[0]->GetRasterCount();
+            
+            int numOutputBands = 1;
+            
+            // If calculating stats using all image bands
+            if(allBands)
+            {
+                numBands = numRasterBands;
+                std::cout << "Calculating " << calcStat << " over all bands of a " << numRasterBands << " band input image to create a " << numOutputBands << " band output image" << std::endl;
+            }
+            // If using ever n bands
+            else
+            {
+                numOutputBands = numRasterBands / numBands;
+                
+                std::cout << "Calculating " << calcStat << " for every " << numBands << " bands of a " << numRasterBands << " band input image to create a " << numOutputBands << " band output image" << std::endl;
+            }
+            
+            // Convert from string to enum
+            rsgis::img::compositeStat outCompStat;
+            if(calcStat == "mean"){outCompStat = rsgis::img::compositeMean;}
+            else if(calcStat == "min"){outCompStat = rsgis::img::compositeMin;}
+            else if(calcStat == "max"){outCompStat = rsgis::img::compositeMax;}
+            else if(calcStat == "range"){outCompStat = rsgis::img::compositeRange;}
+            else{throw RSGISCmdException("Statistic not recognized, options are: mean, min, max, range.");}
+            
+            rsgis::img::RSGISImageComposite *compositeImage = new rsgis::img::RSGISImageComposite(numOutputBands, numBands, outCompStat);
+            calcImage = new rsgis::img::RSGISCalcImage(compositeImage, "", true);
+            calcImage->calcImage(datasets, 1, outputImage, false, NULL, imageFormat, RSGIS_to_GDAL_Type(outDataType));
+            
+            // Tidy up
+            GDALClose(datasets[0]);
+            delete[] datasets;
+            
+            delete calcImage;
+            delete compositeImage;
+        }
+        catch (RSGISImageException& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch (RSGISException& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(std::exception& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
 }}
 

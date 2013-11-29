@@ -110,6 +110,9 @@ namespace rsgis{ namespace cmds {
     /** A function to create a new blank image using an exising image as a base. */
     void executeCreateCopyBlankImage(std::string inputImage, std::string outputImage, unsigned int numBands, float pxlVal, std::string gdalFormat, RSGISLibDataType outDataType) throw(RSGISCmdException);
     
+    /** A function to calculate summary statistics for every band in a stack or every n bands */
+    void executeStackStats(std::string inputImage, std::string outputImage, std::string calcStat, bool allBands, unsigned int numBands, std::string gdalFormat, RSGISLibDataType outDataType) throw(RSGISCmdException);
+    
 }}
 
 
