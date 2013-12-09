@@ -229,8 +229,6 @@ namespace rsgis{ namespace cmds {
         std::cout << "for pixels with values between " << minThreshAllVal << " and " << maxThreshAllVal << "." << std::endl;
         std::cout << "and pixelcount for all pixels in polygon." << std::endl;
 
-        std::cout << "minThreshAllVal = " << minThreshAllVal << std::endl;
-
         // Copy attributes to shapefile be default
         bool copyAttributes = true;
 

@@ -1853,6 +1853,7 @@ namespace rsgis{namespace vec{
 			inOGRPoly = (OGRPolygon *) feature->GetGeometryRef();
 			poly = vecUtils.convertOGRPolygon2GEOSPolygon(inOGRPoly);
 			
+            std::cout << "Calc image values\n";
 			calcImage->calcImageWithinPolygon(datasets, 1, this->data, env, poly, true, method);
 			
 			// Add header info for first line
@@ -2094,6 +2095,13 @@ namespace rsgis{namespace vec{
 	
 	void RSGISCalcZonalStatsFromPolygon::calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt) throw(rsgis::img::RSGISImageCalcException)
 	{
+        /*
+        for(int i = 0; i < numBands; ++i)
+        {
+            std::cout << i+1 << " Band = " << bandValuesImage[i] << std::endl;
+        }
+        */
+        
 		for(int i = 0; i < this->numAttributes; i++)
 		{
 			bool first = true;

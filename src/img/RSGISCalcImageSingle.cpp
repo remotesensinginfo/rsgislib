@@ -553,8 +553,8 @@ namespace rsgis{namespace img{
 	
 	void RSGISCalcImageSingle::calcImageWithinPolygon(GDALDataset **datasets, int numDS, double *outputValue, geos::geom::Envelope *env, geos::geom::Polygon *poly, bool output, pixelInPolyOption pixelPolyOption) throw(RSGISImageCalcException,RSGISImageBandException)
 	{
-        //std::cout.precision(12);
-        //std::cout << "[" << env->getMinX() << "," << env->getMinY() << "," << env->getMaxX() << "," << env->getMaxY() << "]\n";
+        std::cout.precision(12);
+        //std::cout << "calcImageWithinPolygon [" << env->getMinX() << "," << env->getMinY() << "," << env->getMaxX() << "," << env->getMaxY() << "]\n";
 		GDALAllRegister();
 		RSGISImageUtils imgUtils;
 		double *gdalTranslation = NULL;
@@ -625,6 +625,8 @@ namespace rsgis{namespace img{
 				imgUtils.getImageOverlap(datasets, numDS, dsOffsets, &width, &height, gdalTranslation, env);
 			}
 			
+            //std::cout << "Overlapped region has size [" << width << ", " << height << "]\n";
+            
 			pxlTLX = gdalTranslation[0];
 			pxlTLY = gdalTranslation[3];
 			
@@ -670,7 +672,8 @@ namespace rsgis{namespace img{
 			// Loop images to process data
 			for(int i = 0; i < height; i++)
 			{
-				if (height > 100) 
+                //std::cout << "i = " << i << std::endl;
+				if (height > 100)
 				{
 					if((i % feedback) == 0)
 					{
@@ -716,9 +719,9 @@ namespace rsgis{namespace img{
 							//std::cout << "Data Value = " << inDataColumnA[0] << std::endl;
 							this->valueCalc->calcImageValue(inDataColumnA, 1, numInBands, poly, pt);
 						}
-						//else 
+						//else
 						//{
-							//std::cout << "OUTSIDE\n";
+						//	std::cout << "OUTSIDE\n";
 						//}
 						
 						//std::cout << std::endl;
