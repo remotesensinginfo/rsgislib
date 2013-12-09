@@ -429,7 +429,7 @@ static PyMethodDef ZonalStatsMethods[] = {
 },
 
     {"pixelStats2TXT", ZonalStats_PixelStats2TXT, METH_VARARGS, 
-"zonalstats.pixelStats2TXT(inputimage, inputvector, outputtxt, zonalattributes, useBandNames, noProjWarning=False, pixelInPolyMethod=METHOD_POLYCONTAINSPIXELCENTER)\n"
+"zonalstats.pixelStats2TXT(inputimage, inputvector, outputtxt, zonalattributes, useBandNames, noProjWarning=False, pixelInPolyMethod=METHOD_POLYCONTAINSPIXELCENTER, shortenBandNames=True)\n"
 "Calculate statistics for pixels falling within each polygon in a shapefile output as a CSV.\n\n"
 "Where:\n"
 "\n"
@@ -451,6 +451,7 @@ static PyMethodDef ZonalStatsMethods[] = {
 "* useBandNames is a bool, specifying whether to use the band names of the input dataset in the output file (if not uses b1, b2, etc.)\n"
 "* noProjWarning is a bool, specifying whether to skip printing a warning if the vector and image have a different projections.\n"
 "* pixelInPolyMethod is the method for determining if a pixel is included with a polygon of type rsgislib.zonalstats.METHOD_*.\n"
+"* shortenBandNames is a bool to specify whether the band names should be shorted (as with a shapefile) in creating the column name.\n"
 "Example::\n"
 "\n"
 "    from rsgislib import zonalstats\n"
@@ -459,7 +460,7 @@ static PyMethodDef ZonalStatsMethods[] = {
 "    inputVector = './Vectors/injune_p142_crowns_utm.shp'\n"
 "    outputtxt = './TestOutputs/injune_p142_casi_sub_utm_stats.txt'\n"
 "    zonalattributes = zonalstats.ZonalAttributes(minThreshold=0, maxThreshold=10000, calcCount=True, calcMin=True, calcMax=True, calcMean=True, calcStdDev=True, calcMode=False, calcSum=True)\n"
-"    zonalstats.pixelStats2SHP(inputImage, inputVector, outputtxt, zonalattributes, True, True, zonalstats.METHOD_POLYCONTAINSPIXELCENTER)\n"
+"    zonalstats.pixelStats2SHP(inputImage, inputVector, outputtxt, zonalattributes, True, True, zonalstats.METHOD_POLYCONTAINSPIXELCENTER, False)\n"
 "\n"},
 {"imageZoneToHDF", ZonalStats_ImageZoneToHDF, METH_VARARGS,
     "rsgislib.zonalstats.imageZoneToHDF(inputimage, inputvector, outputHDF, noProjWarning=False, pixelInPolyMethod=METHOD_POLYCONTAINSPIXELCENTER)\n"

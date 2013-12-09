@@ -962,6 +962,8 @@ namespace rsgis{namespace img{
 				throw RSGISImageBandException("Images do not overlap in the Y axis");
 			}
 			
+            //std::cout << "Image Area: [" << minX << ", " << minY << ", " << maxX << ", " << maxY << "]\n";
+            
 			// Check if OK to process.
 			// Changed from throwing exception (left old code) - Dan
 			bool process = true;
@@ -1009,7 +1011,7 @@ namespace rsgis{namespace img{
 				maxX = env->getMaxX();
 				minY = env->getMinY();
 				maxY = env->getMaxY();
-				
+                
 				// Define output values.
 				gdalTransform[0] = minX;
 				gdalTransform[1] = pixelXRes;
@@ -1048,7 +1050,7 @@ namespace rsgis{namespace img{
 					}
 				}
 			}
-			/* Commented out else statement, this was added to fix problem with cut2poly but caused problems with zonal stats commands
+            /* Commented out else statement, this was added to fix problem with cut2poly but caused problems with zonal stats commands
 			 * It has therefore been commented out - Dan Clewley 24/01/11 
              * Update (16/03/11) - Dan Clewley
              * - The uncommented code fixed the problem of a polygon that was large than the image but caused problems when
@@ -1056,7 +1058,7 @@ namespace rsgis{namespace img{
              * - If the polygon does not fit inside the scene the center is calculated, if this is within the scene it calculates the overlap.
              *   
              */
-			/*else
+			else
 			{				
                 // Calculate centre of envelope
                 double centreEnvelopeX = (env->getMaxX() + env->getMinX()) / 2.0;
@@ -1102,7 +1104,7 @@ namespace rsgis{namespace img{
                         }
                     }
                 }
-			}*/
+			}
 			
 		}
 		catch(RSGISImageBandException& e)
@@ -1262,6 +1264,7 @@ namespace rsgis{namespace img{
 				std::cout << "MaxY = " << maxY << std::endl;
 				throw RSGISImageBandException("Images do not overlap in the Y axis");
 			}
+            
 			
 			// Cut to env extent
 			if(env->getMinX() > minX)
