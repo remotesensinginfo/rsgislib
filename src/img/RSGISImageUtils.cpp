@@ -1053,10 +1053,11 @@ namespace rsgis{namespace img{
             /* Commented out else statement, this was added to fix problem with cut2poly but caused problems with zonal stats commands
 			 * It has therefore been commented out - Dan Clewley 24/01/11 
              * Update (16/03/11) - Dan Clewley
-             * - The uncommented code fixed the problem of a polygon that was large than the image but caused problems when
+             * - The uncommented code fixed the problem of a polygon that was larger than the image but caused problems when
              *  the polygon was outside the scene.
              * - If the polygon does not fit inside the scene the center is calculated, if this is within the scene it calculates the overlap.
-             *   
+             * Update (09/12/13) - Pete Bunting
+             * Uncommented lines, doesn't seem to be causing problems.
              */
 			else
 			{				
@@ -1066,7 +1067,7 @@ namespace rsgis{namespace img{
                 
                 if((centreEnvelopeX < maxX) && (centreEnvelopeY < maxY)) // If center of envolope within overlap proceed
                 {
-					// Define output values.
+                    // Define output values.
                     gdalTransform[0] = minX;
                     gdalTransform[1] = pixelXRes;
                     gdalTransform[2] = rotateX;

@@ -572,17 +572,25 @@ class RSGISTests:
         outputTxt = './TestOutputs/injune_p142_stem_locations_stats_txt.csv'
         zonalstats.pointValue2TXT(inputImage, inputVector, outputTxt, True)
         
-    def testPixelStats2SHP(self):
+    def testPixelStats2SHP(self, allCases=False):
+        """ Check for three cases, all polygons inside image (1) and polygons outside image (2) """
         print("PYTHON TEST: pixelStats2SHP")
-        inputImage = './Rasters/injune_p142_casi_sub_utm.kea'
+        inputImage1 = './Rasters/injune_p142_casi_sub_utm.kea'
+        inputImage2 = './Rasters/injune_p142_casi_sub_left_utm.kea'
+        inputImage3 = './Rasters/injune_p142_casi_sub_right_utm.kea'
         inputVector = './Vectors/injune_p142_crowns_utm.shp'
-        outputVector = './TestOutputs/injune_p142_casi_sub_utm_stats.shp'
+        outputVector1 = './TestOutputs/injune_p142_casi_sub_utm_stats1.shp'
+        outputVector2 = './TestOutputs/injune_p142_casi_sub_utm_stats2.shp'
+        outputVector3 = './TestOutputs/injune_p142_casi_sub_utm_stats3.shp'
         zonalattributes = zonalstats.ZonalAttributes(minThreshold=0, maxThreshold=10000, calcCount=True, calcMin=True, calcMax=True, calcMean=True, calcStdDev=True, calcMode=False, calcSum=True)
-        zonalstats.pixelStats2SHP(inputImage, inputVector, outputVector, zonalattributes, True, True, True, zonalstats.METHOD_POLYCONTAINSPIXELCENTER)
+        zonalstats.pixelStats2SHP(inputImage1, inputVector, outputVector1, zonalattributes, True, True, True, zonalstats.METHOD_POLYCONTAINSPIXELCENTER)
+        if allCases:
+            zonalstats.pixelStats2SHP(inputImage2, inputVector, outputVector2, zonalattributes, True, True, True, zonalstats.METHOD_POLYCONTAINSPIXELCENTER)
+            zonalstats.pixelStats2SHP(inputImage3, inputVector, outputVector3, zonalattributes, True, True, True, zonalstats.METHOD_POLYCONTAINSPIXELCENTER)
     
     def testPixelStats2TXT(self):
         print("PYTHON TEST: pixelStats2TXT")
-        inputImage = './Rasters/injune_p142_casi_sub_utm.kea'
+        inputImage = './Rasters/injune_p142_casi_sub_left_utm.kea'
         inputVector = './Vectors/injune_p142_crowns_utm.shp'
         outputTxt = './TestOutputs/injune_p142_casi_sub_utm_stats_txt.csv'
         zonalattributes = zonalstats.ZonalAttributes(minThreshold=0, maxThreshold=10000, calcCount=True, calcMin=True, calcMax=True, calcMean=True, calcStdDev=True, calcMode=False, calcSum=True)
