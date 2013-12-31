@@ -52,6 +52,16 @@ namespace rsgis{ namespace cmds {
         float multiVal;
     };
     
+    struct Cmds6SElevationLUT
+    {
+        float elev;
+        unsigned int *imageBands;
+        float *aX;
+        float *bX;
+        float *cX;
+        unsigned int numValues;
+    };
+    
     /** Function to convert DN landsat scence to radiance */
     void executeConvertLandsat2Radiance(std::string outputImage, std::string gdalFormat, std::vector<CmdsLandsatRadianceGainsOffsets> landsatRadGainOffs)throw(RSGISCmdException);
     
@@ -63,6 +73,9 @@ namespace rsgis{ namespace cmds {
     
     /** Function to convert radiance into surface reflectance using a single parameterisation of 6S */
     void executeRad2SREFSingle6sParams(std::string inputImage, std::string outputImage, std::string gdalFormat, rsgis::RSGISLibDataType rsgisOutDataType, float scaleFactor, unsigned int *imageBands, float *aX, float *bX, float *cX, int numValues, float noDataVal, bool useNoDataVal)throw(RSGISCmdException);
+    
+    /** Function to convert radiance into surface reflectance using a LUT for surface elevation of 6S */
+    void executeRad2SREFElevLUT6sParams(std::string inputRadImage, std::string inputDEM, std::string outputImage, std::string gdalFormat, rsgis::RSGISLibDataType rsgisOutDataType, float scaleFactor, std::vector<Cmds6SElevationLUT> *lut, float noDataVal, bool useNoDataVal)throw(RSGISCmdException);
 }}
 
 

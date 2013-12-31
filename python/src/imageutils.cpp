@@ -728,18 +728,18 @@ static PyObject *ImageUtils_StackImageBands(PyObject *self, PyObject *args)
 
 static PyObject *ImageUtils_CreateBlankImage(PyObject *self, PyObject *args)
 {
-    const char *pszOutputImage, *pszGDALFormat, *wktFile;
+    const char *pszOutputImage, *pszGDALFormat, *wktFile, *wktString;
     int nOutDataType;
     unsigned int numBands, width, height = 0;
     double tlX, tlY, res = 0;
     float pxlVal = 0;
     
-    if( !PyArg_ParseTuple(args, "sIIIffffssi:createBlankImage", &pszOutputImage, &numBands, &width, &height, &tlX, &tlY, &res, &pxlVal, &wktFile, &pszGDALFormat, &nOutDataType))
+    if( !PyArg_ParseTuple(args, "sIIIdddfssi:createBlankImage", &pszOutputImage, &numBands, &width, &height, &tlX, &tlY, &res, &pxlVal, &wktFile, &wktString, &pszGDALFormat, &nOutDataType))
         return NULL;
     
     try
     {
-        rsgis::cmds::executeCreateBlankImage(std::string(pszOutputImage), numBands, width, height, tlX, tlY, res, pxlVal, std::string(wktFile), std::string(pszGDALFormat), (rsgis::RSGISLibDataType)nOutDataType);
+        rsgis::cmds::executeCreateBlankImage(std::string(pszOutputImage), numBands, width, height, tlX, tlY, res, pxlVal, std::string(wktFile), std::string(wktString), std::string(pszGDALFormat), (rsgis::RSGISLibDataType)nOutDataType);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -1116,7 +1116,7 @@ static PyMethodDef ImageUtilsMethods[] = {
     "\n"},
     
 {"createBlankImage", ImageUtils_CreateBlankImage, METH_VARARGS,
-    "imageutils.createBlankImage(outputImage, numBands, width, height, tlX, tlY, res, pxlVal, wktFile, gdalformat, type)\n"
+    "imageutils.createBlankImage(outputImage, numBands, width, height, tlX, tlY, res, pxlVal, wktFile, wktString, gdalformat, type)\n"
     "Create a new blank image with the parameters specified.\n"
 	"\n"
     "* outputImage is a string containing the name and path for the outputted image.\n"
@@ -1127,7 +1127,8 @@ static PyMethodDef ImageUtilsMethods[] = {
     "* tlY is a double specifying the Top Left pixel Y coordinate (northings) of the output image.\n"
     "* res is a double specifying the pixel resolution of the output image.\n"
     "* pxlVal is a float specifying the pixel value of the output image.\n"
-    "* wktFile is a string specifying the location of a file containing the WKT string representing the coordinate system and projection of the output image.\n"
+    "* wktFile is a string specifying the location of a file containing the WKT string representing the coordinate system and projection of the output image (if specified this parameter overrides the wktString parameter).\n"
+    "* wktString is a string specifying the WKT string representing the coordinate system and projection of the output image.\n"
     "* gdalformat is a string providing the format of the output image (e.g., KEA).\n"
     "* type is a rsgislib.TYPE_* value providing the data type of the output image.\n"
     "\nExample::\n"

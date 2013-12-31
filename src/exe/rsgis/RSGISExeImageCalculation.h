@@ -135,7 +135,8 @@ namespace rsgisexe{
             mahalanobisdistimg2window,
             calcpxlcolstats,
             pxlcolregression,
-            correlationWindow
+            correlationWindow,
+            imagebandstatsenv
 		};
 		
 		
@@ -226,6 +227,11 @@ namespace rsgisexe{
         rsgis::cmds::RSGISCmdStatsSummary statsSummary;
         unsigned int corrBandA;
         unsigned int corrBandB;
+        unsigned int imageBand;
+        double latMin;
+        double latMax;
+        double longMin;
+        double longMax;
 	};
 }
 #endif

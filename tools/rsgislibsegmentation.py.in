@@ -68,11 +68,20 @@ if __name__ == '__main__':
     # Define the argument for specifying the output image.
     parser.add_argument("-n", "--minpxls", type=int, help='''Specify the minimum number pixels within a segments.''', required=True)
     
+    # Define the argument for specifying the image subsampling.
+    parser.add_argument("-s", "--sampling", type=int, help='''Specify the subsampling of the image for the data used within the KMeans (1 == no subsampling; default is 100).''', default=100, required=False)
+    
+    # Define the argument for specifying the number of iterations for the KMeans.
+    parser.add_argument("--maxiter", type=int, help='''Specify the maximum number of iterations used for the KMeans (default is 200).''', default=200, required=False)
+    
     # Define the argument for specifying the output image.
     parser.add_argument("-d", "--distthres", type=float, help='''Specify the distance threshold for joining the segments (default is a very large value which turns off this option.).''', default=1000000, required=False)
     
     # Define the argment for specifying the selected image bands.
     parser.add_argument('-b', '--band', metavar='N', type=int, nargs='+', help='An integer specifying the selected image bands.')
+    
+    # Define the argument for specifying the image subsampling.
+    #parser.add_argument("--nodata", type=float, help='''Specify a no data value for the input image (default is 0).''', default=0, required=False)
     
     # Define the argument for specifying the image file format.
     parser.add_argument("-f", "--format", type=str, default="KEA",
@@ -103,4 +112,4 @@ if __name__ == '__main__':
     print('Copyright (C) @RSGISLIB_COPYRIGHT_YEAR@ Peter Bunting and Daniel Clewley')
     print('For support please email @RSGISLIB_PACKAGE_BUGREPORT@')
     
-    rsgislib.segmentation.segutils.runShepherdSegmentation(args.input, args.output, args.outmeanimg, args.tmpath, args.format, args.nostats, args.nostretch, args.nodelete, args.numclusters, args.minpxls, args.distthres, args.band)
+    rsgislib.segmentation.segutils.runShepherdSegmentation(args.input, args.output, args.outmeanimg, args.tmpath, args.format, args.nostats, args.nostretch, args.nodelete, args.numclusters, args.minpxls, args.distthres, args.band, args.sampling, args.maxiter)
