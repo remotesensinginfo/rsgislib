@@ -38,6 +38,17 @@
 #include "img/RSGISCalcImage.h"
 
 namespace rsgis{namespace calib{
+    
+    
+    struct LUT6SElevation
+    {
+        float elev;
+        unsigned int *imageBands;
+        float *aX;
+        float *bX;
+        float *cX;
+        unsigned int numValues;
+    };
 	    
 	class RSGISApply6SCoefficientsSingleParam : public rsgis::img::RSGISCalcImageValue
     {
@@ -57,6 +68,27 @@ namespace rsgis{namespace calib{
         float *bX;
         float *cX;
         unsigned int numValues;
+        float scaleFactor;
+        float noDataVal;
+        bool useNoDataVal;
+    };
+    
+    
+    
+    class RSGISApply6SCoefficientsElevLUTParam : public rsgis::img::RSGISCalcImageValue
+    {
+    public:
+        RSGISApply6SCoefficientsElevLUTParam(unsigned int numOutBands, std::vector<LUT6SElevation> *lut, float noDataVal = 0.0, bool useNoDataVal=false, float scaleFactor = 1.0);
+        void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException);
+        void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implmented.");};
+        void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implmented.");};
+        void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implmented.");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implmented.");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+        bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implmented.");};
+        ~RSGISApply6SCoefficientsElevLUTParam();
+    protected:
+        std::vector<LUT6SElevation> *lut;
         float scaleFactor;
         float noDataVal;
         bool useNoDataVal;

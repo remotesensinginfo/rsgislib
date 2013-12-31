@@ -39,6 +39,17 @@ namespace rsgis{ namespace cmds {
         std::string name;
         int bandNum;
     };
+    
+    struct ImageStatsCmds
+	{
+		double mean;
+		double max;
+		double min;
+		double stddev;
+        double sum;
+        double median;
+        double mode;
+	};
 
     enum RSGISInitClustererMethods
     {
@@ -120,6 +131,10 @@ namespace rsgis{ namespace cmds {
     void executeImageDist2Geoms(std::string inputImage, std::string inputVector, std::string imageFormat, std::string outputImage)throw(RSGISCmdException);
     /** Function to calculate correlation for windows */
     void executeCorrelationWindow(std::string inputImage, std::string outputImage, unsigned int winSize, unsigned int corrBandA, unsigned int corrBandB, std::string gdalFormat, RSGISLibDataType outDataType)throw(RSGISCmdException);
+    /** Function to calculate the statistics for an individual image band within an envelope defined in Lat / Long */
+    void executeImageBandStatsEnv(std::string inputImage, rsgis::cmds::ImageStatsCmds *stats, unsigned int imgBand, bool noDataValueSpecified, float noDataVal, double latMin, double latMax, double longMin, double longMax)throw(RSGISCmdException);
+    
+    
 }}
 
 

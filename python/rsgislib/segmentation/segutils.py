@@ -54,7 +54,7 @@ import collections
 import fnmatch
 import osgeo.gdal as gdal
 
-def runShepherdSegmentation(inputImg, outputClumps, outputMeanImg, tmpath, gdalFormat, noStats, noStretch, noDelete, numClusters, minPxls, distThres, bands): 
+def runShepherdSegmentation(inputImg, outputClumps, outputMeanImg, tmpath, gdalFormat, noStats, noStretch, noDelete, numClusters, minPxls, distThres, bands, sampling, kmMaxIter): 
     rsgisUtils = rsgislib.RSGISPyUtils()
     
     basefile = os.path.basename(inputImg)
@@ -111,7 +111,7 @@ def runShepherdSegmentation(inputImg, outputClumps, outputMeanImg, tmpath, gdalF
     # Perform KMEANS
     print("Performing KMeans.")
     outMatrixFile = os.path.join(tmpath,basename+str("_kmeansclusters"))
-    rsgislib.imagecalc.kMeansClustering(segmentFile, outMatrixFile, numClusters, 200, 100, True, 0.0025, rsgislib.imagecalc.INITCLUSTER_DIAGONAL_FULL_ATTACH)
+    rsgislib.imagecalc.kMeansClustering(segmentFile, outMatrixFile, numClusters, kmMaxIter, sampling, True, 0.0025, rsgislib.imagecalc.INITCLUSTER_DIAGONAL_FULL_ATTACH)
     
     # Apply KMEANS
     print("Apply KMeans to image.")

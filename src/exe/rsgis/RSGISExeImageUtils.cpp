@@ -4622,7 +4622,7 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
 			//RSGISImageUtils imgUtils;
 			try
 			{
-                rsgis::cmds::executeCreateBlankImage(this->outputImage, this->numBands, this->width, this->height, this->eastings, this->northings, this->resolution, this->outValue, this->projFile, imageFormat, rsgisOutDataType);
+                rsgis::cmds::executeCreateBlankImage(this->outputImage, this->numBands, this->width, this->height, this->eastings, this->northings, this->resolution, this->outValue, this->projFile, "", imageFormat, rsgisOutDataType);
                 
                 /*
 				GDALAllRegister();
