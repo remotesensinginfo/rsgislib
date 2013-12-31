@@ -29,6 +29,8 @@
 
 #include "gdal_priv.h"
 
+#include "geos/geom/Envelope.h"
+
 #include "img/RSGISImageCalcException.h"
 #include "img/RSGISCalcImageValue.h"
 #include "img/RSGISImageUtils.h"
@@ -60,6 +62,7 @@ namespace rsgis{namespace img{
         void calcImageStatistics(GDALDataset **datasets, int numDS, ImageStats **stats, int numInputBands, bool stddev, bool ignoreZeros=false, bool onePassSD=false)throw(RSGISImageCalcException,RSGISImageBandException);
         void calcImageStatistics(GDALDataset **datasets, int numDS, ImageStats **stats, int numInputBands, bool stddev, rsgis::math::RSGISMathFunction *func, bool ignoreZeros=false, bool onePassSD=false)throw(RSGISImageCalcException,RSGISImageBandException);
         void calcImageStatistics(GDALDataset **datasets, int numDS, ImageStats *stats, bool stddev, bool ignoreZeros=false, bool onePassSD=false)throw(RSGISImageCalcException,RSGISImageBandException);
+        void calcImageStatistics(GDALDataset **datasets, int numDS, ImageStats **stats, int numInputBands, bool stddev, bool noDataSpecified, float noDataVal, bool onePassSD, double xMin, double xMax, double yMin, double yMax)throw(RSGISImageCalcException,RSGISImageBandException);
     };
 	
 	
@@ -94,7 +97,40 @@ namespace rsgis{namespace img{
         double *sumDiffZ;
         double diffZ;
         rsgis::math::RSGISMathFunction *func;
-        
+    };
+    
+    class RSGISCalcImageStatisticsNoData : public RSGISCalcImageValue
+    {
+    public:
+        RSGISCalcImageStatisticsNoData(int numInputBands, bool calcSD, rsgis::math::RSGISMathFunction *func, bool noDataSpecified, float noDataVal, bool onePassSD);
+        void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException);
+        void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+        bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
+        void getImageStats(ImageStats** inStats, int numInputBands) throw(RSGISImageCalcException);
+        void calcStdDev();
+        ~RSGISCalcImageStatisticsNoData();
+    protected:
+        bool noDataSpecified;
+        float noDataVal;
+        bool onePassSD;
+        bool calcSD;
+        int numInputBands;
+        bool *firstMean;
+        bool *firstSD;
+        bool calcMean;
+        unsigned long *n;
+        double *mean;
+        double *meanSum;
+        double *sumSq;
+        double *min;
+        double *max;
+        double *sumDiffZ;
+        double diffZ;
+        rsgis::math::RSGISMathFunction *func;
     };
     
     class RSGISCalcImageStatisticsAllBands : public RSGISCalcImageValue

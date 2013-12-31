@@ -1034,6 +1034,77 @@ static PyObject *ImageCalc_CorrelationWindow(PyObject *self, PyObject *args) {
     Py_RETURN_NONE;
 }
 
+static PyObject *ImageCalc_GetImageStatsInEnv(PyObject *self, PyObject *args) {
+    const char *inputImage;
+    unsigned int imgBand;
+    double latMin, latMax, longMin, longMax;
+    PyObject *noDataValueObj;
+    
+    if(!PyArg_ParseTuple(args, "sIOdddd:getImageStatsInEnv", &inputImage, &imgBand, &noDataValueObj, &latMin, &latMax, &longMin, &longMax))
+        return NULL;
+    
+    bool noDataValueSpecified = false;
+    float noDataValue = 0.0;
+    
+    if( ( noDataValueObj == NULL ) || ( noDataValueObj == Py_None ) || !RSGISPY_CHECK_FLOAT(noDataValueObj) )
+    {
+        noDataValueSpecified = false;
+    }
+    else
+    {
+        noDataValueSpecified = true;
+        noDataValue = RSGISPY_FLOAT_EXTRACT(noDataValueObj);
+    }
+    
+    PyObject *outValsList = PyTuple_New(5);
+    try
+    {
+        
+        rsgis::cmds::ImageStatsCmds *stats = new rsgis::cmds::ImageStatsCmds();
+        stats->max = 0;
+        stats->min = 0;
+        stats->mean = 0;
+        stats->stddev = 0;
+        stats->sum = 0;
+        
+        rsgis::cmds::executeImageBandStatsEnv(std::string(inputImage), stats, imgBand, noDataValueSpecified, noDataValue, latMin, latMax, longMin, longMax);
+        
+        
+        if(PyTuple_SetItem(outValsList, 0, Py_BuildValue("d", stats->min)) == -1)
+        {
+            throw rsgis::cmds::RSGISCmdException("Failed to add \'min\' value to the list...");
+        }
+        if(PyTuple_SetItem(outValsList, 1, Py_BuildValue("d", stats->max)) == -1)
+        {
+            throw rsgis::cmds::RSGISCmdException("Failed to add \'max\' value to the list...");
+        }
+        if(PyTuple_SetItem(outValsList, 2, Py_BuildValue("d", stats->mean)) == -1)
+        {
+            throw rsgis::cmds::RSGISCmdException("Failed to add \'mean\' value to the list...");
+        }
+        if(PyTuple_SetItem(outValsList, 3, Py_BuildValue("d", stats->stddev)) == -1)
+        {
+            throw rsgis::cmds::RSGISCmdException("Failed to add \'stddev\' value to the list...");
+        }
+        if(PyTuple_SetItem(outValsList, 4, Py_BuildValue("d", stats->sum)) == -1)
+        {
+            throw rsgis::cmds::RSGISCmdException("Failed to add \'sum\' value to the list...");
+        }
+        
+    }
+    catch (rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    return outValsList;
+}
+
+
+
+
+
 
 // Our list of functions in this module
 static PyMethodDef ImageCalcMethods[] = {
@@ -1480,6 +1551,34 @@ static PyMethodDef ImageCalcMethods[] = {
 "   dataType = rsgislib.TYPE_32FLOAT\n"
 "   imagecalc.correlationWindow(image, output, window, bandA, bandB, format, dataType)\n"
 "\n"},
+{"getImageStatsInEnv", ImageCalc_GetImageStatsInEnv, METH_VARARGS,
+"imagecalc.getImageStatsInEnv(inputImage, imgBand, noDataVal, latMin, latMax, longMin, longMax)\n"
+"Calculates and returns statistics (min, max, mean, stddev, sum) for a region.\n"
+"defined by the bounding box (latMin, latMax, longMin, longMax) which is specified\n"
+"geographic latitude and longitude. The coordinates are converted to the projection\n"
+"of the input image at runtime (if required) and therefore the image projection needs\n"
+"to be correctly defined so please check this is the case and define it if necessary."
+"where:\n"
+"  * inputImage is a string containing the name of the input image file\n"
+"  * imgBand is an unsigned int specifying the image band starting from 1.\n"
+"  * noDataVal is a float specifying a no data value, to be ignored in the calculation.\n"
+"              If a value of \'None\' is provided then a no data value is not used.\n"
+"  * latMin is a double specifying the minimum latitude of the BBOX\n"
+"  * latMax is a double specifying the maximum latitude of the BBOX\n"
+"  * longMin is a double specifying the minimum longitude of the BBOX\n"
+"  * longMax is a double specifying the maximum longitude of the BBOX\n"
+"returns:\n"
+"  * list with 5 values (min, max, mean, stddev, sum)\n"
+"Example::\n"
+"\n"
+"import rsgislib.imagecalc\n"
+"stats = rsgislib.imagecalc.getImageStatsInEnv(\"/Users/pete/Desktop/FinalSRTMTanzaniaDEM_30m.kea\", 1, -32767.0, -7.0, -8.0, 30.0, 31.0)\n"
+"print(\"Min: \", stats[0])\n"
+"print(\"Max: \", stats[1])\n"
+"print(\"Mean: \", stats[2])\n"
+"print(\"StdDev: \", stats[3])\n"
+"print(\"Sum: \", stats[4])\n\n"
+},
 
     {NULL}        /* Sentinel */
 };

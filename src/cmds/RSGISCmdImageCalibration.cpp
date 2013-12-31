@@ -276,6 +276,98 @@ namespace rsgis{ namespace cmds {
         }
         
     }
+                
+                
+    void executeRad2SREFElevLUT6sParams(std::string inputRadImage, std::string inputDEM, std::string outputImage, std::string gdalFormat, rsgis::RSGISLibDataType rsgisOutDataType, float scaleFactor, std::vector<Cmds6SElevationLUT> *lut, float noDataVal, bool useNoDataVal)throw(RSGISCmdException)
+    {
+        try
+        {
+            GDALAllRegister();
+            GDALDataset **datasets = new GDALDataset*[2];
+            std::cout << "Open DEM image: \'" << inputDEM << "\'" << std::endl;
+            datasets[0] = (GDALDataset *) GDALOpen(inputDEM.c_str(), GA_ReadOnly);
+            if(datasets[0] == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputDEM;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            std::cout << "Open Radiance image: \'" << inputRadImage << "\'" << std::endl;
+            datasets[1] = (GDALDataset *) GDALOpen(inputRadImage.c_str(), GA_ReadOnly);
+            if(datasets[1] == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputRadImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            int numRasterBands = datasets[1]->GetRasterCount();
+            
+            std::vector<rsgis::calib::LUT6SElevation> *rsgisLUT = new std::vector<rsgis::calib::LUT6SElevation>();
+            
+            for(std::vector<Cmds6SElevationLUT>::iterator iterLUT = lut->begin(); iterLUT != lut->end(); ++iterLUT)
+            {
+                rsgis::calib::LUT6SElevation lutVal = rsgis::calib::LUT6SElevation();
+                std::cout << "Elevation: " << (*iterLUT).elev << std::endl;
+                
+                lutVal.numValues = (*iterLUT).numValues;
+                lutVal.elev = (*iterLUT).elev;
+                lutVal.imageBands = new unsigned int[lutVal.numValues];
+                lutVal.aX = new float[lutVal.numValues];
+                lutVal.bX = new float[lutVal.numValues];
+                lutVal.cX = new float[lutVal.numValues];
+                
+                
+                for(unsigned int i = 0; i < (*iterLUT).numValues; ++i)
+                {
+                    if((*iterLUT).imageBands[i] > numRasterBands)
+                    {
+                        GDALClose(datasets[0]);
+                        GDALClose(datasets[1]);
+                        delete[] datasets;
+                        throw rsgis::RSGISException("The number of input image bands is not equal to the number coefficients provided.");
+                    }
+                    lutVal.imageBands[i] = (*iterLUT).imageBands[i];
+                    lutVal.aX[i] = (*iterLUT).aX[i];
+                    lutVal.bX[i] = (*iterLUT).bX[i];
+                    lutVal.cX[i] = (*iterLUT).cX[i];
+                    std::cout << "\tBand " << lutVal.imageBands[i] << ": aX = " << lutVal.aX[i] << " bX = " << lutVal.bX[i] << " cX = " << lutVal.cX[i] << std::endl;
+                }
+                
+                rsgisLUT->push_back(lutVal);
+            }
+            
+            std::cout << "Apply Coefficients to input image...\n";
+
+            rsgis::calib::RSGISApply6SCoefficientsElevLUTParam *apply6SCoefficients = new rsgis::calib::RSGISApply6SCoefficientsElevLUTParam(numRasterBands, rsgisLUT, noDataVal, useNoDataVal, scaleFactor);
+            
+            rsgis::img::RSGISCalcImage *calcImage = new rsgis::img::RSGISCalcImage(apply6SCoefficients, "", true);
+            calcImage->calcImage(datasets, 2, outputImage, false, NULL, gdalFormat, RSGIS_to_GDAL_Type(rsgisOutDataType));
+            
+            delete apply6SCoefficients;
+            delete calcImage;
+            
+            for(std::vector<rsgis::calib::LUT6SElevation>::iterator iterLUT = rsgisLUT->begin(); iterLUT != rsgisLUT->end(); ++iterLUT)
+            {
+                delete[] (*iterLUT).imageBands;
+                delete[] (*iterLUT).aX;
+                delete[] (*iterLUT).bX;
+                delete[] (*iterLUT).cX;
+            }
+            delete rsgisLUT;
+            
+            GDALClose(datasets[0]);
+            GDALClose(datasets[1]);
+            delete[] datasets;
+        }
+        catch(rsgis::RSGISException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(std::exception &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
     
 }}
 
