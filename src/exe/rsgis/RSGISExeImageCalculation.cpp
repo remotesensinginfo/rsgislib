@@ -95,6 +95,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
     XMLCh *optionCalcPxlColStats = xercesc::XMLString::transcode("calcpxlcolstats");
     XMLCh *optionPxlColRegression = xercesc::XMLString::transcode("pxlcolregression");
     XMLCh *optionWindowedCorrelation = xercesc::XMLString::transcode("correlationWindow");
+    XMLCh *optionImageBandStatsEnv = xercesc::XMLString::transcode("imagebandstatsenv");
 
 
 	const XMLCh *algorNameEle = argElement->getAttribute(xercesc::XMLString::transcode("algor"));
@@ -235,7 +236,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 			{
 				this->inputImages = fileUtils.getDIRList(dirStr, extStr, &this->numImages, false);
 			}
-			catch(rsgis::RSGISException e)
+			catch(rsgis::RSGISException &e)
 			{
 				throw rsgis::RSGISXMLArgumentsException(e.what());
 			}
@@ -2912,6 +2913,116 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
 		}
 		xercesc::XMLString::release(&bandBXMLStr);
 	}
+    else if(xercesc::XMLString::equals(optionImageBandStatsEnv, optionXML))
+	{
+		this->option = RSGISExeImageCalculation::imagebandstatsenv;
+        
+        
+        XMLCh *imageXMLStr = xercesc::XMLString::transcode("image");
+		if(argElement->hasAttribute(imageXMLStr))
+		{
+			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(imageXMLStr));
+			this->inputImage = std::string(charValue);
+			xercesc::XMLString::release(&charValue);
+		}
+		else
+		{
+			throw rsgis::RSGISXMLArgumentsException("No \'image\' attribute was provided.");
+		}
+		xercesc::XMLString::release(&imageXMLStr);
+        
+        XMLCh *outputXMLStr = xercesc::XMLString::transcode("output");
+		if(argElement->hasAttribute(outputXMLStr))
+		{
+			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(outputXMLStr));
+			this->outputFile = std::string(charValue);
+			xercesc::XMLString::release(&charValue);
+		}
+		else
+		{
+			throw rsgis::RSGISXMLArgumentsException("No \'output\' attribute was provided.");
+		}
+		xercesc::XMLString::release(&outputXMLStr);
+        
+        XMLCh *noDataXMLStr = xercesc::XMLString::transcode("nodata");
+		if(argElement->hasAttribute(noDataXMLStr))
+		{
+			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(noDataXMLStr));
+			this->noDataValue = mathUtils.strtofloat(std::string(charValue));
+            this->noDataValueSpecified = true;
+			xercesc::XMLString::release(&charValue);
+		}
+		else
+		{
+			this->noDataValueSpecified = false;
+		}
+		xercesc::XMLString::release(&noDataXMLStr);
+        
+        XMLCh *bandXMLStr = xercesc::XMLString::transcode("band");
+		if(argElement->hasAttribute(bandXMLStr))
+		{
+			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(bandXMLStr));
+			this->imageBand = mathUtils.strtounsignedint(std::string(charValue));
+			xercesc::XMLString::release(&charValue);
+		}
+		else
+		{
+			throw rsgis::RSGISXMLArgumentsException("No \'band\' attribute was provided.");
+		}
+		xercesc::XMLString::release(&bandXMLStr);
+        
+        XMLCh *latMinXMLStr = xercesc::XMLString::transcode("latMin");
+		if(argElement->hasAttribute(latMinXMLStr))
+		{
+			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(latMinXMLStr));
+			this->latMin = mathUtils.strtodouble(std::string(charValue));
+			xercesc::XMLString::release(&charValue);
+		}
+		else
+		{
+			throw rsgis::RSGISXMLArgumentsException("No \'latMin\' attribute was provided.");
+		}
+		xercesc::XMLString::release(&latMinXMLStr);
+        
+        XMLCh *latMaxXMLStr = xercesc::XMLString::transcode("latMax");
+		if(argElement->hasAttribute(latMaxXMLStr))
+		{
+			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(latMaxXMLStr));
+			this->latMax = mathUtils.strtodouble(std::string(charValue));
+			xercesc::XMLString::release(&charValue);
+		}
+		else
+		{
+			throw rsgis::RSGISXMLArgumentsException("No \'latMax\' attribute was provided.");
+		}
+		xercesc::XMLString::release(&latMaxXMLStr);
+        
+        XMLCh *longMinXMLStr = xercesc::XMLString::transcode("longMin");
+		if(argElement->hasAttribute(longMinXMLStr))
+		{
+			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(longMinXMLStr));
+			this->longMin = mathUtils.strtodouble(std::string(charValue));
+			xercesc::XMLString::release(&charValue);
+		}
+		else
+		{
+			throw rsgis::RSGISXMLArgumentsException("No \'longMin\' attribute was provided.");
+		}
+		xercesc::XMLString::release(&longMinXMLStr);
+        
+        XMLCh *longMaxXMLStr = xercesc::XMLString::transcode("longMax");
+		if(argElement->hasAttribute(longMaxXMLStr))
+		{
+			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(longMaxXMLStr));
+			this->longMax = mathUtils.strtodouble(std::string(charValue));
+			xercesc::XMLString::release(&charValue);
+		}
+		else
+		{
+			throw rsgis::RSGISXMLArgumentsException("No \'longMax\' attribute was provided.");
+		}
+		xercesc::XMLString::release(&longMaxXMLStr);
+	}
 	else
 	{
 		std::string message = std::string("The option (") + std::string(xercesc::XMLString::transcode(optionXML)) + std::string(") is not known: RSGISExeImageCalculation.");
@@ -2951,6 +3062,7 @@ void RSGISExeImageCalculation::retrieveParameters(xercesc::DOMElement *argElemen
     xercesc::XMLString::release(&optionMahalanobisDistImg2Window);
     xercesc::XMLString::release(&optionCalcPxlColStats);
     xercesc::XMLString::release(&optionPxlColRegression);
+    xercesc::XMLString::release(&optionImageBandStatsEnv);
 
 	parsed = true;
 }
@@ -2983,11 +3095,11 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
             // pass to function and catch errors
             try {
                 rsgis::cmds::executeNormalisation(inImages, outImages, this->calcInMinMax, this->inMin, this->inMax, this->outMin, this->outMax);
-            } catch (rsgis::RSGISException e) {
+            } catch (rsgis::RSGISException &e) {
                 throw rsgis::RSGISException(e.what());
-            } catch (rsgis::cmds::RSGISCmdException e) {
+            } catch (rsgis::cmds::RSGISCmdException &e) {
                 throw rsgis::RSGISException(e.what());
-            } catch (std::exception e) {
+            } catch (std::exception &e) {
                 throw rsgis::RSGISException(e.what());
             }
 
@@ -2998,9 +3110,9 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
                 rsgis::cmds::executeCorrelation(this->inputImageA, this->inputImageB, this->outputMatrix);
             } catch (rsgis::RSGISException &e) {
                 throw rsgis::RSGISException(e.what());
-            } catch (rsgis::cmds::RSGISCmdException e) {
+            } catch (rsgis::cmds::RSGISCmdException &e) {
                 throw rsgis::RSGISException(e.what());
-            } catch (std::exception e) {
+            } catch (std::exception &e) {
                 throw rsgis::RSGISException(e.what());
             }
 
@@ -3009,11 +3121,11 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 		{
 			try {
                 rsgis::cmds::executeCovariance(this->inputImageA, this->inputImageB, this->inputMatrixA, this->inputMatrixB, this->calcMean, this->outputMatrix);
-            } catch (rsgis::RSGISException e) {
+            } catch (rsgis::RSGISException &e) {
                 throw rsgis::RSGISException(e.what());
-            } catch (rsgis::cmds::RSGISCmdException e) {
+            } catch (rsgis::cmds::RSGISCmdException &e) {
                 throw rsgis::RSGISException(e.what());
-            } catch (std::exception e) {
+            } catch (std::exception &e) {
                 throw rsgis::RSGISException(e.what());
             }
 		}
@@ -3021,11 +3133,11 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 		{
             try {
                 rsgis::cmds::executeMeanVector(this->inputImage, this->outputMatrix);
-            } catch (rsgis::RSGISException e) {
+            } catch (rsgis::RSGISException &e) {
                 throw rsgis::RSGISException(e.what());
-            } catch (rsgis::cmds::RSGISCmdException e) {
+            } catch (rsgis::cmds::RSGISCmdException &e) {
                 throw rsgis::RSGISException(e.what());
-            } catch (std::exception e) {
+            } catch (std::exception &e) {
                 throw rsgis::RSGISException(e.what());
             }
         }
@@ -3033,11 +3145,11 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 		{
 			try {
                 rsgis::cmds::executePCA(this->eigenvectors, this->inputImage, this->outputImage, this->numComponents);
-            } catch (rsgis::RSGISException e) {
+            } catch (rsgis::RSGISException &e) {
                 throw rsgis::RSGISException(e.what());
-            } catch (rsgis::cmds::RSGISCmdException e) {
+            } catch (rsgis::cmds::RSGISCmdException &e) {
                 throw rsgis::RSGISException(e.what());
-            } catch (std::exception e) {
+            } catch (std::exception &e) {
                 throw rsgis::RSGISException(e.what());
             }
 		}
@@ -3045,11 +3157,11 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 		{
 			try {
                 rsgis::cmds::executeStandardise(this->meanvectorStr, this->inputImage, this->outputImage);
-            } catch (rsgis::RSGISException e) {
+            } catch (rsgis::RSGISException &e) {
                 throw rsgis::RSGISException(e.what());
-            } catch (rsgis::cmds::RSGISCmdException e) {
+            } catch (rsgis::cmds::RSGISCmdException &e) {
                 throw rsgis::RSGISException(e.what());
-            } catch (std::exception e) {
+            } catch (std::exception &e) {
                 throw rsgis::RSGISException(e.what());
             }
 		}
@@ -3068,15 +3180,15 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
                 rsgis::cmds::executeBandMaths(variables, numVars, outputImage, mathsExpression, imageFormat, rsgisOutDataType);
                 delete[] variables;
             }
-            catch (rsgis::RSGISException e)
+            catch (rsgis::RSGISException &e)
             {
                 throw rsgis::RSGISException(e.what());
             }
-            catch (rsgis::cmds::RSGISCmdException e)
+            catch (rsgis::cmds::RSGISCmdException &e)
             {
                 throw rsgis::RSGISException(e.what());
             }
-            catch (std::exception e)
+            catch (std::exception &e)
             {
                 throw rsgis::RSGISException(e.what());
             }
@@ -3091,11 +3203,11 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 
 			try {
                 rsgis::cmds::executeReplaceValuesLessThan(this->inputImage, this->outputImage, this->threshold, this->value);
-            } catch (rsgis::RSGISException e) {
+            } catch (rsgis::RSGISException &e) {
                 throw rsgis::RSGISException(e.what());
-            } catch (rsgis::cmds::RSGISCmdException e) {
+            } catch (rsgis::cmds::RSGISCmdException &e) {
                 throw rsgis::RSGISException(e.what());
-            } catch (std::exception e) {
+            } catch (std::exception &e) {
                 throw rsgis::RSGISException(e.what());
             }
 		}
@@ -3107,11 +3219,11 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 			std::cout << "Image Bands Matrix: " << this->inMatrixfile << std::endl;
             try {
                 rsgis::cmds::executeUnitArea(this->inputImage, this->outputImage, this->inMatrixfile);
-            } catch (rsgis::RSGISException e) {
+            } catch (rsgis::RSGISException &e) {
                 throw rsgis::RSGISException(e.what());
-            } catch (rsgis::cmds::RSGISCmdException e) {
+            } catch (rsgis::cmds::RSGISCmdException &e) {
                 throw rsgis::RSGISException(e.what());
-            } catch (std::exception e) {
+            } catch (std::exception &e) {
                 throw rsgis::RSGISException(e.what());
             }
         }
@@ -3126,15 +3238,15 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
             {
                 rsgis::cmds::executeImageMaths(this->inputImage, this->outputImage, this->mathsExpression, this->imageFormat, rsgisOutDataType);
             }
-            catch (rsgis::RSGISException e)
+            catch (rsgis::RSGISException &e)
             {
                 throw rsgis::RSGISException(e.what());
             }
-            catch (rsgis::cmds::RSGISCmdException e)
+            catch (rsgis::cmds::RSGISCmdException &e)
             {
                 throw rsgis::RSGISException(e.what());
             }
-            catch (std::exception e)
+            catch (std::exception &e)
             {
                 throw rsgis::RSGISException(e.what());
             }
@@ -3168,11 +3280,11 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 
 			try {
                 rsgis::cmds::executeMovementSpeed(inImages, inImageBands, inImageTimes, this->upper, this->lower, this->outputImage);
-            } catch (rsgis::RSGISException e) {
+            } catch (rsgis::RSGISException &e) {
                 throw rsgis::RSGISException(e.what());
-            } catch (rsgis::cmds::RSGISCmdException e) {
+            } catch (rsgis::cmds::RSGISCmdException &e) {
                 throw rsgis::RSGISException(e.what());
-            } catch (std::exception e) {
+            } catch (std::exception &e) {
                 throw rsgis::RSGISException(e.what());
             }
 		}
@@ -3186,11 +3298,11 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 
 			try {
                 rsgis::cmds::executeCountValsInCols(this->inputImage, this->upper, this->lower, this->outputImage);
-            } catch (rsgis::RSGISException e) {
+            } catch (rsgis::RSGISException &e) {
                 throw rsgis::RSGISException(e.what());
-            } catch (rsgis::cmds::RSGISCmdException e) {
+            } catch (rsgis::cmds::RSGISCmdException &e) {
                 throw rsgis::RSGISException(e.what());
-            } catch (std::exception e) {
+            } catch (std::exception &e) {
                 throw rsgis::RSGISException(e.what());
             }
 		}
@@ -3198,11 +3310,11 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 		{
 			try {
                 rsgis::cmds::executeCalculateRMSE(this->inputImageA, this->inputBandA, this->inputImageB, this->inputBandB);
-            } catch (rsgis::RSGISException e) {
+            } catch (rsgis::RSGISException &e) {
                 throw rsgis::RSGISException(e.what());
-            } catch (rsgis::cmds::RSGISCmdException e) {
+            } catch (rsgis::cmds::RSGISCmdException &e) {
                 throw rsgis::RSGISException(e.what());
-            } catch (std::exception e) {
+            } catch (std::exception &e) {
                 throw rsgis::RSGISException(e.what());
             }
 		}
@@ -3210,11 +3322,11 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 		{
 			try {
                 rsgis::cmds::executeApply2VarFunction(this->inputImage, this->twoVarFunction, this->outputImage);
-            } catch (rsgis::RSGISException e) {
+            } catch (rsgis::RSGISException &e) {
                 throw rsgis::RSGISException(e.what());
-            } catch (rsgis::cmds::RSGISCmdException e) {
+            } catch (rsgis::cmds::RSGISCmdException &e) {
                 throw rsgis::RSGISException(e.what());
-            } catch (std::exception e) {
+            } catch (std::exception &e) {
                 throw rsgis::RSGISException(e.what());
             }
 		}
@@ -3222,11 +3334,11 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 		{
             try {
                 rsgis::cmds::executeApply3VarFunction(this->inputImage, this->threeVarFunction, this->outputImage);
-            }  catch (rsgis::RSGISException e) {
+            }  catch (rsgis::RSGISException &e) {
                 throw rsgis::RSGISException(e.what());
-            } catch (rsgis::cmds::RSGISCmdException e) {
+            } catch (rsgis::cmds::RSGISCmdException &e) {
                 throw rsgis::RSGISException(e.what());
-            } catch (std::exception e) {
+            } catch (std::exception &e) {
                 throw rsgis::RSGISException(e.what());
             }
         }
@@ -3239,11 +3351,11 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 
             try {
                 rsgis::cmds::executeDist2Geoms(this->inputVector, this->imgResolution, this->outputImage);
-            } catch (rsgis::RSGISException e) {
+            } catch (rsgis::RSGISException &e) {
                 throw rsgis::RSGISException(e.what());
-            } catch (rsgis::cmds::RSGISCmdException e) {
+            } catch (rsgis::cmds::RSGISCmdException &e) {
                 throw rsgis::RSGISException(e.what());
-            } catch (std::exception e) {
+            } catch (std::exception &e) {
                 throw rsgis::RSGISException(e.what());
             }
         }
@@ -3259,11 +3371,11 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 
 			try {
                 rsgis::cmds::executeImageBandStats(this->inputImage, this->outputFile, this->ignoreZeros);
-            } catch (rsgis::RSGISException e) {
+            } catch (rsgis::RSGISException &e) {
                 throw rsgis::RSGISException(e.what());
-            } catch (rsgis::cmds::RSGISCmdException e) {
+            } catch (rsgis::cmds::RSGISCmdException &e) {
                 throw rsgis::RSGISException(e.what());
-            } catch (std::exception e) {
+            } catch (std::exception &e) {
                 throw rsgis::RSGISException(e.what());
             }
         }
@@ -3279,11 +3391,11 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 
             try {
                 rsgis::cmds::executeImageStats(this->inputImage, this->outputFile, this->ignoreZeros);
-            } catch (rsgis::RSGISException e) {
+            } catch (rsgis::RSGISException &e) {
                 throw rsgis::RSGISException(e.what());
-            } catch (rsgis::cmds::RSGISCmdException e) {
+            } catch (rsgis::cmds::RSGISCmdException &e) {
                 throw rsgis::RSGISException(e.what());
-            } catch (std::exception e) {
+            } catch (std::exception &e) {
                 throw rsgis::RSGISException(e.what());
             }
         }
@@ -3298,11 +3410,11 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 
             try {
                 rsgis::cmds::executeUnconLinearSpecUnmix(this->inputImage, this->imageFormat, this->rsgisOutDataType, this->lsumGain, this->lsumOffset, this->outputFile, this->endmembersFile);
-            } catch (rsgis::RSGISException e) {
+            } catch (rsgis::RSGISException &e) {
                 throw rsgis::RSGISException(e.what());
-            } catch (rsgis::cmds::RSGISCmdException e) {
+            } catch (rsgis::cmds::RSGISCmdException &e) {
                 throw rsgis::RSGISException(e.what());
-            } catch (std::exception e) {
+            } catch (std::exception &e) {
                 throw rsgis::RSGISException(e.what());
             }
         }
@@ -3318,11 +3430,11 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 
             try {
                 rsgis::cmds::executeExhconLinearSpecUnmix(this->inputImage, this->imageFormat, this->rsgisOutDataType, this->lsumGain, this->lsumOffset, this->outputFile, this->endmembersFile, this->stepResolution);
-            } catch (rsgis::RSGISException e) {
+            } catch (rsgis::RSGISException &e) {
                 throw rsgis::RSGISException(e.what());
-            } catch (rsgis::cmds::RSGISCmdException e) {
+            } catch (rsgis::cmds::RSGISCmdException &e) {
                 throw rsgis::RSGISException(e.what());
-            } catch (std::exception e) {
+            } catch (std::exception &e) {
                 throw rsgis::RSGISException(e.what());
             }
         }
@@ -3338,11 +3450,11 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 
             try {
                 rsgis::cmds::executeConSum1LinearSpecUnmix(this->inputImage, this->imageFormat, this->rsgisOutDataType, this->lsumGain, this->lsumOffset, this->lsumWeight, this->outputFile, this->endmembersFile);
-            } catch (rsgis::RSGISException e) {
+            } catch (rsgis::RSGISException &e) {
                 throw rsgis::RSGISException(e.what());
-            } catch (rsgis::cmds::RSGISCmdException e) {
+            } catch (rsgis::cmds::RSGISCmdException &e) {
                 throw rsgis::RSGISException(e.what());
-            } catch (std::exception e) {
+            } catch (std::exception &e) {
                 throw rsgis::RSGISException(e.what());
             }
         }
@@ -3358,11 +3470,11 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 
             try {
                 rsgis::cmds::executeNnConSum1LinearSpecUnmix(this->inputImage, this->imageFormat, this->rsgisOutDataType, this->lsumGain, this->lsumOffset, this->lsumWeight, this->outputFile, this->endmembersFile);
-            } catch (rsgis::RSGISException e) {
+            } catch (rsgis::RSGISException &e) {
                 throw rsgis::RSGISException(e.what());
-            } catch (rsgis::cmds::RSGISCmdException e) {
+            } catch (rsgis::cmds::RSGISCmdException &e) {
                 throw rsgis::RSGISException(e.what());
-            } catch (std::exception e) {
+            } catch (std::exception &e) {
                 throw rsgis::RSGISException(e.what());
             }
         }
@@ -3420,7 +3532,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
                  */
                 rsgis::cmds::executeISODataClustering(this->inputImage, this->outputFile, this->numClusters, this->maxNumIterations, this->subSample, this->ignoreZeros, this->degreeOfChange, this->initClusterMethod, this->minDistBetweenClusters, this->minNumFeatures, this->maxStdDev, this->minNumClusters, this->startIteration, this->endIteration);
 			}
-			catch(rsgis::RSGISException e)
+			catch(rsgis::RSGISException &e)
 			{
 				throw e;
 			}
@@ -3436,11 +3548,11 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 
 			try {
                 rsgis::cmds::executeAllBandsEqualTo(this->inputImage, this->imgValue, this->outputTrueVal, this->outputFalseVal, this->outputImage, this->imageFormat, this->rsgisOutDataType);
-			} catch (rsgis::RSGISException e) {
+			} catch (rsgis::RSGISException &e) {
                 throw rsgis::RSGISException(e.what());
-            } catch (rsgis::cmds::RSGISCmdException e) {
+            } catch (rsgis::cmds::RSGISCmdException &e) {
                 throw rsgis::RSGISException(e.what());
-            } catch (std::exception e) {
+            } catch (std::exception &e) {
                 throw rsgis::RSGISException(e.what());
             }
         }
@@ -3465,11 +3577,11 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 
 			try {
                 rsgis::cmds::executeHistogram(this->inputImage, this->imageMask, this->outputFile, this->imgBand, this->imgValue, this->binWidth, this->calcInMinMax, this->inMin, this->inMax);
-            } catch (rsgis::RSGISException e) {
+            } catch (rsgis::RSGISException &e) {
                 throw rsgis::RSGISException(e.what());
-            } catch (rsgis::cmds::RSGISCmdException e) {
+            } catch (rsgis::cmds::RSGISCmdException &e) {
                 throw rsgis::RSGISException(e.what());
-            } catch (std::exception e) {
+            } catch (std::exception &e) {
                 throw rsgis::RSGISException(e.what());
             }
         }
@@ -3486,11 +3598,11 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 
             try {
                 rsgis::cmds::executeBandPercentile(this->inputImage, this->percentile, this->noDataValue, this->noDataValueSpecified, this->outputFile);
-			} catch (rsgis::RSGISException e) {
+			} catch (rsgis::RSGISException &e) {
                 throw rsgis::RSGISException(e.what());
-            } catch (rsgis::cmds::RSGISCmdException e) {
+            } catch (rsgis::cmds::RSGISCmdException &e) {
                 throw rsgis::RSGISException(e.what());
-            } catch (std::exception e) {
+            } catch (std::exception &e) {
                 throw rsgis::RSGISException(e.what());
             }
         }
@@ -3503,11 +3615,11 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 
             try {
                 rsgis::cmds::executeImageDist2Geoms(this->inputImage, this->inputVector, this->imageFormat, this->outputImage);
-            } catch (rsgis::RSGISException e) {
+            } catch (rsgis::RSGISException &e) {
                 throw rsgis::RSGISException(e.what());
-            } catch (rsgis::cmds::RSGISCmdException e) {
+            } catch (rsgis::cmds::RSGISCmdException &e) {
                 throw rsgis::RSGISException(e.what());
-            } catch (std::exception e) {
+            } catch (std::exception &e) {
                 throw rsgis::RSGISException(e.what());
             }
 
@@ -3522,15 +3634,15 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 			{
                 rsgis::cmds::executeImageCalcDistance(this->inputImage, this->outputImage, this->imageFormat);
 			}
-			catch (rsgis::RSGISException e)
+			catch (rsgis::RSGISException &e)
             {
                 throw rsgis::RSGISException(e.what());
             }
-            catch (rsgis::cmds::RSGISCmdException e)
+            catch (rsgis::cmds::RSGISCmdException &e)
             {
                 throw rsgis::RSGISException(e.what());
             }
-            catch (std::exception e)
+            catch (std::exception &e)
             {
                 throw rsgis::RSGISException(e.what());
             }
@@ -3547,15 +3659,15 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
             {
                 rsgis::cmds::executeMahalanobisDistFilter(this->inputImage, this->outputImage, this->windowSize, this->imageFormat, this->rsgisOutDataType);
             }
-            catch (rsgis::RSGISException e)
+            catch (rsgis::RSGISException &e)
             {
                 throw rsgis::RSGISException(e.what());
             }
-            catch (rsgis::cmds::RSGISCmdException e)
+            catch (rsgis::cmds::RSGISCmdException &e)
             {
                 throw rsgis::RSGISException(e.what());
             }
-            catch (std::exception e)
+            catch (std::exception &e)
             {
                 throw rsgis::RSGISException(e.what());
             }
@@ -3572,15 +3684,15 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
             {
                 rsgis::cmds::executeMahalanobisDist2ImgFilter(this->inputImage, this->outputImage, this->windowSize, this->imageFormat, this->rsgisOutDataType);
             }
-            catch (rsgis::RSGISException e)
+            catch (rsgis::RSGISException &e)
             {
                 throw rsgis::RSGISException(e.what());
             }
-            catch (rsgis::cmds::RSGISCmdException e)
+            catch (rsgis::cmds::RSGISCmdException &e)
             {
                 throw rsgis::RSGISException(e.what());
             }
-            catch (std::exception e)
+            catch (std::exception &e)
             {
                 throw rsgis::RSGISException(e.what());
             }
@@ -3624,15 +3736,15 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
             {
                 rsgis::cmds::executeImagePixelColumnSummary(this->inputImage, this->outputImage, this->statsSummary, this->imageFormat, this->rsgisOutDataType, this->noDataValue, this->noDataValueSpecified);
             }
-            catch (rsgis::RSGISException e)
+            catch (rsgis::RSGISException &e)
             {
                 throw rsgis::RSGISException(e.what());
             }
-            catch (rsgis::cmds::RSGISCmdException e)
+            catch (rsgis::cmds::RSGISCmdException &e)
             {
                 throw rsgis::RSGISException(e.what());
             }
-            catch (std::exception e)
+            catch (std::exception &e)
             {
                 throw rsgis::RSGISException(e.what());
             }
@@ -3653,15 +3765,15 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
             {
                 rsgis::cmds::executeImagePixelLinearFit(this->inputImage, this->outputImage, this->imageFormat, this->bandValues, this->noDataValue, this->noDataValueSpecified);
             }
-            catch (rsgis::RSGISException e)
+            catch (rsgis::RSGISException &e)
             {
                 throw rsgis::RSGISException(e.what());
             }
-            catch (rsgis::cmds::RSGISCmdException e)
+            catch (rsgis::cmds::RSGISCmdException &e)
             {
                 throw rsgis::RSGISException(e.what());
             }
-            catch (std::exception e)
+            catch (std::exception &e)
             {
                 throw rsgis::RSGISException(e.what());
             }
@@ -3680,15 +3792,60 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
             {
                 rsgis::cmds::executeCorrelationWindow(this->inputImage, this->outputImage, this->windowSize, this->corrBandA, this->corrBandB, this->imageFormat, this->rsgisOutDataType);
             }
-            catch (rsgis::RSGISException e)
+            catch (rsgis::RSGISException &e)
             {
                 throw rsgis::RSGISException(e.what());
             }
-            catch (rsgis::cmds::RSGISCmdException e)
+            catch (rsgis::cmds::RSGISCmdException &e)
             {
                 throw rsgis::RSGISException(e.what());
             }
-            catch (std::exception e)
+            catch (std::exception &e)
+            {
+                throw rsgis::RSGISException(e.what());
+            }
+        }
+        else if(option == RSGISExeImageCalculation::imagebandstatsenv)
+		{
+            std::cout << "A command to calculate the statistics for an individual image band within an envelope defined in Lat / Long\n";
+            std::cout << "Input Image: " << inputImage << std::endl;
+            std::cout << "Output File: " << outputFile << std::endl;
+            if(this->noDataValueSpecified)
+            {
+                std::cout << "No Data = " << this->noDataValue << std::endl;
+            }
+            std::cout << "Image Band: " << this->imageBand << std::endl;
+            std::cout << "Lat: [" << this->latMin << ", " << this->latMax << "]" << std::endl;
+            std::cout << "Long: [" << this->longMin << ", " << this->longMax << "]" << std::endl;
+            
+			try
+            {
+                rsgis::cmds::ImageStatsCmds *stats = new rsgis::cmds::ImageStatsCmds();
+                stats->max = 0;
+                stats->min = 0;
+                stats->mean = 0;
+                stats->stddev = 0;
+                stats->sum = 0;
+                
+                rsgis::cmds::executeImageBandStatsEnv(this->inputImage, stats, this->imageBand, this->noDataValueSpecified, this->noDataValue, this->latMin, this->latMax, this->longMin, this->longMax);
+                
+                std::ofstream outTxtFile;
+                outTxtFile.open(outputFile.c_str());
+                outTxtFile.precision(15);
+                outTxtFile << "Min,Max,Mean,StdDev,Sum\n";
+                outTxtFile << stats->min << "," << stats->max << "," << stats->mean << "," << stats->stddev << "," << stats->sum << std::endl;
+                outTxtFile.flush();
+                outTxtFile.close();
+            }
+            catch (rsgis::RSGISException &e)
+            {
+                throw rsgis::RSGISException(e.what());
+            }
+            catch (rsgis::cmds::RSGISCmdException &e)
+            {
+                throw rsgis::RSGISException(e.what());
+            }
+            catch (std::exception &e)
             {
                 throw rsgis::RSGISException(e.what());
             }
@@ -4006,6 +4163,19 @@ void RSGISExeImageCalculation::printParameters()
             std::cout << "Output Format: " << this->imageFormat << std::endl;
             std::cout << "Band A: " << this->corrBandA << std::endl;
             std::cout << "Band B: " << this->corrBandB << std::endl;
+        }
+        else if(option == RSGISExeImageCalculation::imagebandstatsenv)
+		{
+            std::cout << "A command to calculate the statistics for an individual image band within an envelope defined in Lat / Long\n";
+            std::cout << "Input Image: " << inputImage << std::endl;
+            std::cout << "Output File: " << outputFile << std::endl;
+            if(this->noDataValueSpecified)
+            {
+                std::cout << "No Data = " << this->noDataValue << std::endl;
+            }
+            std::cout << "Image Band: " << this->imageBand << std::endl;
+            std::cout << "Lat: [" << this->latMin << ", " << this->latMax << "]" << std::endl;
+            std::cout << "Long: [" << this->longMin << ", " << this->longMax << "]" << std::endl;
         }
 		else
 		{

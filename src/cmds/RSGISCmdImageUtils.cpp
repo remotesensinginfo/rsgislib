@@ -1049,7 +1049,7 @@ namespace rsgis{ namespace cmds {
             
             
             
-    void executeCreateBlankImage(std::string outputImage, unsigned int numBands, unsigned int width, unsigned int height, double tlX, double tlY, double resolution, float pxlVal, std::string wktFile, std::string gdalFormat, RSGISLibDataType outDataType) throw(RSGISCmdException)
+    void executeCreateBlankImage(std::string outputImage, unsigned int numBands, unsigned int width, unsigned int height, double tlX, double tlY, double resolution, float pxlVal, std::string wktFile, std::string wktStr, std::string gdalFormat, RSGISLibDataType outDataType) throw(RSGISCmdException)
     {
         try
         {
@@ -1067,6 +1067,10 @@ namespace rsgis{ namespace cmds {
             {
                 rsgis::utils::RSGISTextUtils textUtils;
                 projection = textUtils.readFileToString(wktFile);
+            }
+            else
+            {
+                projection = wktStr;
             }
             
             rsgis::img::RSGISImageUtils imgUtils;

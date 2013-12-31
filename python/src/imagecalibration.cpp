@@ -374,7 +374,7 @@ static PyObject *ImageCalibration_Apply6SCoefficentsSingleParam(PyObject *self, 
         PyObject *pBand = PyObject_GetAttrString(o, "band");
         if( ( pBand == NULL ) || ( pBand == Py_None ) || !RSGISPY_CHECK_INT(pBand) )
         {
-            PyErr_SetString(GETSTATE(self)->error, "Could not find float attribute \'band\'" );
+            PyErr_SetString(GETSTATE(self)->error, "Could not find int attribute \'band\'" );
             Py_XDECREF(pBand);
             Py_DECREF(o);
             return NULL;
@@ -440,6 +440,143 @@ static PyObject *ImageCalibration_Apply6SCoefficentsSingleParam(PyObject *self, 
     delete[] bX;
     delete[] cX;
     delete[] imageBands;
+    
+    Py_RETURN_NONE;
+}
+
+
+static PyObject *ImageCalibration_Apply6SCoefficentsElevLUTParam(PyObject *self, PyObject *args)
+{
+    const char *pszInputRadFile, *pszInputDEMFile, *pszOutputFile, *pszGDALFormat;
+    int nDataType, useNoDataVal;
+    float scaleFactor, noDataVal;
+    PyObject *pLUTObj;
+    if( !PyArg_ParseTuple(args, "ssssiffiO:apply6SCoeffElevLUTParam", &pszInputRadFile, &pszInputDEMFile, &pszOutputFile, &pszGDALFormat, &nDataType, &scaleFactor, &noDataVal, &useNoDataVal, &pLUTObj))
+    {
+        return NULL;
+    }
+    
+    if( !PySequence_Check(pLUTObj))
+    {
+        PyErr_SetString(GETSTATE(self)->error, "Last argument must be a sequence");
+        return NULL;
+    }
+    
+    Py_ssize_t nLUTDefns = PySequence_Size(pLUTObj);
+    
+    std::vector<rsgis::cmds::Cmds6SElevationLUT> *elevLUT = new std::vector<rsgis::cmds::Cmds6SElevationLUT>();
+    
+    for( Py_ssize_t n = 0; n < nLUTDefns; ++n )
+    {
+        PyObject *pLUTValuesObj = PySequence_GetItem(pLUTObj, n);
+        rsgis::cmds::Cmds6SElevationLUT lutVal = rsgis::cmds::Cmds6SElevationLUT();
+        
+        PyObject *pElev = PyObject_GetAttrString(pLUTValuesObj, "Elev");
+        if( ( pElev == NULL ) || ( pElev == Py_None ) || !RSGISPY_CHECK_FLOAT(pElev) )
+        {
+            PyErr_SetString(GETSTATE(self)->error, "Could not find float attribute \'Elev\' for the LUT (make sure it is a float!)" );
+            Py_XDECREF(pElev);
+            Py_DECREF(pLUTValuesObj);
+            return NULL;
+        }
+        lutVal.elev = RSGISPY_FLOAT_EXTRACT(pElev);
+        Py_DECREF(pElev);
+        
+        PyObject *pBandValuesObj = PyObject_GetAttrString(pLUTValuesObj, "Coeffs");
+        
+        if( !PySequence_Check(pBandValuesObj))
+        {
+            PyErr_SetString(GETSTATE(self)->error, "Each element in the LUT have a sequence \'Coeffs\' be a sequence.");
+            return NULL;
+        }
+        Py_ssize_t nBandValDefns = PySequence_Size(pBandValuesObj);
+        
+        lutVal.numValues = nBandValDefns;
+        lutVal.imageBands = new unsigned int[lutVal.numValues];
+        lutVal.aX = new float[lutVal.numValues];
+        lutVal.bX = new float[lutVal.numValues];
+        lutVal.cX = new float[lutVal.numValues];
+        
+        for( Py_ssize_t m = 0; m < nBandValDefns; ++m )
+        {
+            PyObject *o = PySequence_GetItem(pBandValuesObj, m);
+            PyObject *pBand = PyObject_GetAttrString(o, "band");
+            if( ( pBand == NULL ) || ( pBand == Py_None ) || !RSGISPY_CHECK_INT(pBand) )
+            {
+                PyErr_SetString(GETSTATE(self)->error, "Could not find int attribute \'band\'" );
+                Py_XDECREF(pBand);
+                Py_DECREF(o);
+                return NULL;
+            }
+        
+            PyObject *pAX = PyObject_GetAttrString(o, "aX");
+            if( ( pAX == NULL ) || ( pAX == Py_None ) || !RSGISPY_CHECK_FLOAT(pAX) )
+            {
+                PyErr_SetString(GETSTATE(self)->error, "Could not find float attribute \'aX\'" );
+                Py_XDECREF(pBand);
+                Py_XDECREF(pAX);
+                Py_DECREF(o);
+                return NULL;
+            }
+        
+            PyObject *pBX = PyObject_GetAttrString(o, "bX");
+            if( ( pBX == NULL ) || ( pBX == Py_None ) || !RSGISPY_CHECK_FLOAT(pBX) )
+            {
+                PyErr_SetString(GETSTATE(self)->error, "Could not find float attribute \'bX\'" );
+                Py_XDECREF(pBand);
+                Py_XDECREF(pAX);
+                Py_XDECREF(pBX);
+                Py_DECREF(o);
+                return NULL;
+            }
+        
+            PyObject *pCX = PyObject_GetAttrString(o, "cX");
+            if( ( pCX == NULL ) || ( pCX == Py_None ) || !RSGISPY_CHECK_FLOAT(pCX) )
+            {
+                PyErr_SetString(GETSTATE(self)->error, "Could not find float attribute \'cX\'" );
+                Py_XDECREF(pBand);
+                Py_XDECREF(pAX);
+                Py_XDECREF(pBX);
+                Py_XDECREF(pCX);
+                Py_DECREF(o);
+                return NULL;
+            }
+        
+            lutVal.imageBands[m] = RSGISPY_INT_EXTRACT(pBand);
+            lutVal.aX[m] = RSGISPY_FLOAT_EXTRACT(pAX);
+            lutVal.bX[m] = RSGISPY_FLOAT_EXTRACT(pBX);
+            lutVal.cX[m] = RSGISPY_FLOAT_EXTRACT(pCX);
+            
+            Py_DECREF(pBand);
+            Py_DECREF(pAX);
+            Py_DECREF(pBX);
+            Py_DECREF(pCX);
+            Py_DECREF(o);
+        }
+        Py_DECREF(pBandValuesObj);
+        
+        elevLUT->push_back(lutVal);
+    }
+        
+    try
+    {
+        rsgis::RSGISLibDataType type = (rsgis::RSGISLibDataType)nDataType;
+        rsgis::cmds::executeRad2SREFElevLUT6sParams(std::string(pszInputRadFile), std::string(pszInputDEMFile), std::string(pszOutputFile), std::string(pszGDALFormat), type, scaleFactor, elevLUT, noDataVal, useNoDataVal);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    for(std::vector<rsgis::cmds::Cmds6SElevationLUT>::iterator iterLUT = elevLUT->begin(); iterLUT != elevLUT->end(); ++iterLUT)
+    {
+        delete[] (*iterLUT).imageBands;
+        delete[] (*iterLUT).aX;
+        delete[] (*iterLUT).bX;
+        delete[] (*iterLUT).cX;
+    }
+    delete elevLUT;
     
     Py_RETURN_NONE;
 }
@@ -516,6 +653,31 @@ static PyMethodDef ImageCalibrationMethods[] = {
     "    * bX - A float for the bX coefficient.\n"
     "    * cX - A float for the cX coefficient.\n"
 	"\n"},
+    
+{"apply6SCoeffElevLUTParam", ImageCalibration_Apply6SCoefficentsElevLUTParam, METH_VARARGS,
+    "imagecalibration.apply6SCoeffElevLUTParam(inputRadFile, inputDEMFile, outputFile, gdalFormat, gdaltype, scaleFactor, noDataValue, useNoDataValue, lutElev)\n"
+    "Converts at sensor radiance values to surface reflectance by applying coefficients from the 6S model for each band (aX, bX, cX), where the coefficients can be varied for surface elevation.\n"
+    "where:\n"
+    "  * inputRadFile is a string containing the name of the input Radiance image file\n"
+    "  * inputDEMFile is a string containing the name of the input DEM image file (needs to be the same projection and resolution as radiance image.)\n"
+    "  * outputFile is a string containing the name of the output image file\n"
+    "  * gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
+    "  * gdaltype is an containing one of the values from rsgislib.TYPE_*\n"
+    "  * scaleFactor is a float which can be used to scale the output pixel values (e.g., multiple by 1000), set as 1 for no scaling.\n"
+    "  * noDataValue is a float which if all bands contain that value will be ignored.\n"
+    "  * useNoDataValue is a boolean as to whether the no data value specified is to be used.\n"
+    "  * lutElev is a sequence of objects with the following named fields - note these are expected to be in elevation order (low to high).\n"
+    "    Requires:\n"
+    "\n"
+    "    * \'Elev\' - The elevation for the element in the LUT (in metres).\n"
+    "    * \'Coeffs\' - The sequence of 6S coeffecients for the given elevation for the element in the LUT.\n"
+    "\n"
+    "    \'Coeffs\' Requires a sequence with the following:\n"
+    "        * \'band\' - An integer specifying the image band in the input file.\n"
+    "        * \'aX\' - A float for the aX coefficient.\n"
+    "        * \'bX\' - A float for the bX coefficient.\n"
+    "        * \'cX\' - A float for the cX coefficient.\n"
+    "\n"},
     
     {NULL}        /* Sentinel */
 };
