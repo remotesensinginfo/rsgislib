@@ -150,7 +150,7 @@ namespace rsgis{namespace calib{
 		
         if(nodata)
         {
-            for(unsigned int i = 0; i < numBands-1; ++i)
+            for(unsigned int i = 0; i < this->numOutBands; ++i)
             {
                 output[i] = 0;
             }
@@ -207,6 +207,135 @@ namespace rsgis{namespace calib{
     }
     
     RSGISApply6SCoefficientsElevLUTParam::~RSGISApply6SCoefficientsElevLUTParam()
+    {
+        
+    }
+    
+    
+    
+    
+    RSGISApply6SCoefficientsElevAOTLUTParam::RSGISApply6SCoefficientsElevAOTLUTParam(unsigned int numOutBands, std::vector<LUT6SBaseElevAOT> *lut, float noDataVal, bool useNoDataVal, float scaleFactor):rsgis::img::RSGISCalcImageValue(numOutBands)
+    {
+		this->lut = lut;
+        this->scaleFactor = scaleFactor;
+        this->noDataVal = noDataVal;
+        this->useNoDataVal = useNoDataVal;
+    }
+    
+    void RSGISApply6SCoefficientsElevAOTLUTParam::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
+    {
+        if(numBands-2 != this->numOutBands)
+        {
+            throw rsgis::img::RSGISImageCalcException("The number of input image bands needs to be equal to the number of output image bands.");
+        }
+        
+        double tmpVal = 0;
+        float elevVal = bandValues[0];
+        float aotVal = bandValues[1];
+		
+        bool nodata = true;
+        if(this->useNoDataVal)
+        {
+            for(int i = 2; i < numBands; ++i)
+            {
+                if(bandValues[i] != this->noDataVal)
+                {
+                    nodata = false;
+                    break;
+                }
+            }
+        }
+        else
+        {
+            nodata = false;
+        }
+        
+        
+		
+        if(nodata)
+        {
+            for(unsigned int i = 0; i < this->numOutBands; ++i)
+            {
+                output[i] = 0;
+            }
+        }
+        else
+        {
+            LUT6SBaseElevAOT elevLUTVal;
+            unsigned int elevLUTIdx = 0;
+            float dist = 0.0;
+            float minDist = 0.0;
+            
+            //std::cout << "LUT Size = " << lut->size() << std::endl;
+            
+            for(unsigned int i = 0; i < lut->size(); ++i)
+            {
+                dist = (lut->at(i).elev - elevVal) * (lut->at(i).elev - elevVal);
+                if(i == 0)
+                {
+                    minDist = dist;
+                    elevLUTIdx = i;
+                }
+                else if(dist < minDist)
+                {
+                    minDist = dist;
+                    elevLUTIdx = i;
+                }
+            }
+            //std::cout << "elevLUTIdx = " << elevLUTIdx << std::endl;
+            elevLUTVal = lut->at(elevLUTIdx);
+            //std::cout << "elevLUTVal = " << elevLUTVal.elev << "(AOT LUT Size = " << elevLUTVal.aotLUT.size() << ")" << std::endl;
+            
+            LUT6SAOT aotLUTVal;
+            unsigned int aotLUTIdx = 0;
+            
+            for(unsigned int i = 0; i < elevLUTVal.aotLUT.size(); ++i)
+            {
+                dist = (elevLUTVal.aotLUT.at(i).aot - aotVal) * (elevLUTVal.aotLUT.at(i).aot - aotVal);
+                if(i == 0)
+                {
+                    minDist = dist;
+                    aotLUTIdx = i;
+                }
+                else if(dist < minDist)
+                {
+                    minDist = dist;
+                    aotLUTIdx = i;
+                }
+            }
+            
+            //std::cout << "aotLUTIdx = " << aotLUTIdx << std::endl;
+            
+            aotLUTVal = elevLUTVal.aotLUT.at(aotLUTIdx);
+            
+            for(unsigned int i = 0; i < aotLUTVal.numValues; ++i)
+            {
+                if(aotLUTVal.imageBands[i] > numBands)
+                {
+                    std::cout << "Image band: " << aotLUTVal.imageBands[i] << std::endl;
+                    throw rsgis::img::RSGISImageCalcException("Image band is not within image.");
+                }
+                
+                tmpVal=aotLUTVal.aX[i]*bandValues[aotLUTVal.imageBands[i]]-aotLUTVal.bX[i];
+                output[i] = (tmpVal/(1.0+aotLUTVal.cX[i]*tmpVal))*this->scaleFactor;
+                
+                if(this->useNoDataVal & (this->noDataVal == 0.0))
+                {
+                    if(output[i] < 1)
+                    {
+                        output[i] = 1.0;
+                    }
+                    else
+                    {
+                        output[i] = output[i] + 1.0;
+                    }
+                }
+            }
+        }
+        
+    }
+    
+    RSGISApply6SCoefficientsElevAOTLUTParam::~RSGISApply6SCoefficientsElevAOTLUTParam()
     {
         
     }
