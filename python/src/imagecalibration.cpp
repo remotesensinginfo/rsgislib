@@ -556,6 +556,8 @@ static PyObject *ImageCalibration_Apply6SCoefficentsElevLUTParam(PyObject *self,
         Py_DECREF(pBandValuesObj);
         
         elevLUT->push_back(lutVal);
+        
+        Py_DECREF(pLUTValuesObj);
     }
         
     try
@@ -582,10 +584,195 @@ static PyObject *ImageCalibration_Apply6SCoefficentsElevLUTParam(PyObject *self,
 }
 
 
+static PyObject *ImageCalibration_Apply6SCoefficentsElevAOTLUTParam(PyObject *self, PyObject *args)
+{
+    const char *pszInputRadFile, *pszInputDEMFile, *pszInputAOTFile, *pszOutputFile, *pszGDALFormat;
+    int nDataType, useNoDataVal;
+    float scaleFactor, noDataVal;
+    PyObject *pLUTObj;
+    if( !PyArg_ParseTuple(args, "sssssiffiO:apply6SCoeffElevAOTLUTParam", &pszInputRadFile, &pszInputDEMFile, &pszInputAOTFile, &pszOutputFile, &pszGDALFormat, &nDataType, &scaleFactor, &noDataVal, &useNoDataVal, &pLUTObj))
+    {
+        return NULL;
+    }
+    
+    if( !PySequence_Check(pLUTObj))
+    {
+        PyErr_SetString(GETSTATE(self)->error, "Last argument must be a sequence");
+        return NULL;
+    }
+    
+    Py_ssize_t nLUTDefns = PySequence_Size(pLUTObj);
+    
+    std::vector<rsgis::cmds::Cmds6SBaseElevAOTLUT> *elevAOTLUT = new std::vector<rsgis::cmds::Cmds6SBaseElevAOTLUT>();
+    elevAOTLUT->reserve(nLUTDefns);
+    
+    for( Py_ssize_t n = 0; n < nLUTDefns; ++n )
+    {
+        PyObject *pElevLUTValuesObj = PySequence_GetItem(pLUTObj, n);
+        rsgis::cmds::Cmds6SBaseElevAOTLUT lutElevVal = rsgis::cmds::Cmds6SBaseElevAOTLUT();
+        
+        PyObject *pElev = PyObject_GetAttrString(pElevLUTValuesObj, "Elev");
+        if( ( pElev == NULL ) || ( pElev == Py_None ) || !RSGISPY_CHECK_FLOAT(pElev) )
+        {
+            PyErr_SetString(GETSTATE(self)->error, "Could not find float attribute \'Elev\' for the LUT (make sure it is a float!)" );
+            Py_XDECREF(pElev);
+            Py_DECREF(pElevLUTValuesObj);
+            return NULL;
+        }
+        lutElevVal.elev = RSGISPY_FLOAT_EXTRACT(pElev);
+        Py_DECREF(pElev);
+        
+        
+        PyObject *pAOTLUTValuesObj = PyObject_GetAttrString(pElevLUTValuesObj, "Coeffs");
+        
+        if( !PySequence_Check(pAOTLUTValuesObj))
+        {
+            PyErr_SetString(GETSTATE(self)->error, "Each element in the Elevation LUT have a sequence of AOT \'Coeffs\'.");
+            return NULL;
+        }
+        Py_ssize_t nAOTLUTDefns = PySequence_Size(pAOTLUTValuesObj);
+        lutElevVal.aotLUT = std::vector<rsgis::cmds::Cmds6SAOTLUT>();
+        lutElevVal.aotLUT.reserve(nAOTLUTDefns);
+        
+        for( Py_ssize_t k = 0; k < nAOTLUTDefns; ++k )
+        {
+            PyObject *pAOTValuesObj = PySequence_GetItem(pAOTLUTValuesObj, k);
+            rsgis::cmds::Cmds6SAOTLUT lutAOTVal = rsgis::cmds::Cmds6SAOTLUT();
+            
+            PyObject *pAOT = PyObject_GetAttrString(pAOTValuesObj, "AOT");
+            if( ( pAOT == NULL ) || ( pAOT == Py_None ) || !RSGISPY_CHECK_FLOAT(pAOT) )
+            {
+                PyErr_SetString(GETSTATE(self)->error, "Could not find float attribute \'AOT\' for the LUT (make sure it is a float!)" );
+                Py_XDECREF(pAOT);
+                Py_DECREF(pAOTValuesObj);
+                Py_DECREF(pElevLUTValuesObj);
+                return NULL;
+            }
+            lutAOTVal.aot = RSGISPY_FLOAT_EXTRACT(pAOT);
+            Py_DECREF(pAOT);
+            
+            PyObject *pBandValuesObj = PyObject_GetAttrString(pAOTValuesObj, "Coeffs");
+            
+            if( !PySequence_Check(pBandValuesObj))
+            {
+                PyErr_SetString(GETSTATE(self)->error, "Each element in the AOT LUT have a sequence \'Coeffs\'.");
+                Py_DECREF(pAOTValuesObj);
+                Py_DECREF(pElevLUTValuesObj);
+                return NULL;
+            }
+            Py_ssize_t nBandValDefns = PySequence_Size(pBandValuesObj);
+            
+            lutAOTVal.numValues = nBandValDefns;
+            lutAOTVal.imageBands = new unsigned int[lutAOTVal.numValues];
+            lutAOTVal.aX = new float[lutAOTVal.numValues];
+            lutAOTVal.bX = new float[lutAOTVal.numValues];
+            lutAOTVal.cX = new float[lutAOTVal.numValues];
+            
+            for( Py_ssize_t m = 0; m < nBandValDefns; ++m )
+            {
+                PyObject *o = PySequence_GetItem(pBandValuesObj, m);
+                PyObject *pBand = PyObject_GetAttrString(o, "band");
+                if( ( pBand == NULL ) || ( pBand == Py_None ) || !RSGISPY_CHECK_INT(pBand) )
+                {
+                    PyErr_SetString(GETSTATE(self)->error, "Could not find int attribute \'band\'" );
+                    Py_XDECREF(pBand);
+                    Py_DECREF(o);
+                    Py_DECREF(pAOTValuesObj);
+                    Py_DECREF(pElevLUTValuesObj);
+                    return NULL;
+                }
+                
+                PyObject *pAX = PyObject_GetAttrString(o, "aX");
+                if( ( pAX == NULL ) || ( pAX == Py_None ) || !RSGISPY_CHECK_FLOAT(pAX) )
+                {
+                    PyErr_SetString(GETSTATE(self)->error, "Could not find float attribute \'aX\'" );
+                    Py_XDECREF(pBand);
+                    Py_XDECREF(pAX);
+                    Py_DECREF(o);
+                    Py_DECREF(pAOTValuesObj);
+                    Py_DECREF(pElevLUTValuesObj);
+                    return NULL;
+                }
+                
+                PyObject *pBX = PyObject_GetAttrString(o, "bX");
+                if( ( pBX == NULL ) || ( pBX == Py_None ) || !RSGISPY_CHECK_FLOAT(pBX) )
+                {
+                    PyErr_SetString(GETSTATE(self)->error, "Could not find float attribute \'bX\'" );
+                    Py_XDECREF(pBand);
+                    Py_XDECREF(pAX);
+                    Py_XDECREF(pBX);
+                    Py_DECREF(o);
+                    Py_DECREF(pAOTValuesObj);
+                    Py_DECREF(pElevLUTValuesObj);
+                    return NULL;
+                }
+                
+                PyObject *pCX = PyObject_GetAttrString(o, "cX");
+                if( ( pCX == NULL ) || ( pCX == Py_None ) || !RSGISPY_CHECK_FLOAT(pCX) )
+                {
+                    PyErr_SetString(GETSTATE(self)->error, "Could not find float attribute \'cX\'" );
+                    Py_XDECREF(pBand);
+                    Py_XDECREF(pAX);
+                    Py_XDECREF(pBX);
+                    Py_XDECREF(pCX);
+                    Py_DECREF(o);
+                    Py_DECREF(pAOTValuesObj);
+                    Py_DECREF(pElevLUTValuesObj);
+                    return NULL;
+                }
+                
+                lutAOTVal.imageBands[m] = RSGISPY_INT_EXTRACT(pBand);
+                lutAOTVal.aX[m] = RSGISPY_FLOAT_EXTRACT(pAX);
+                lutAOTVal.bX[m] = RSGISPY_FLOAT_EXTRACT(pBX);
+                lutAOTVal.cX[m] = RSGISPY_FLOAT_EXTRACT(pCX);
+                
+                Py_DECREF(pBand);
+                Py_DECREF(pAX);
+                Py_DECREF(pBX);
+                Py_DECREF(pCX);
+                Py_DECREF(o);
+            }
+            Py_DECREF(pBandValuesObj);
+            
+            lutElevVal.aotLUT.push_back(lutAOTVal);
+            Py_DECREF(pAOTValuesObj);
+        }
+        
+        elevAOTLUT->push_back(lutElevVal);
+        Py_DECREF(pElevLUTValuesObj);
+    }
+    
+    try
+    {
+        rsgis::RSGISLibDataType type = (rsgis::RSGISLibDataType)nDataType;
+        rsgis::cmds::executeRad2SREFElevAOTLUT6sParams(std::string(pszInputRadFile), std::string(pszInputDEMFile), std::string(pszInputAOTFile), std::string(pszOutputFile), std::string(pszGDALFormat), type, scaleFactor, elevAOTLUT, noDataVal, useNoDataVal);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    for(std::vector<rsgis::cmds::Cmds6SBaseElevAOTLUT>::iterator iterLUT = elevAOTLUT->begin(); iterLUT != elevAOTLUT->end(); ++iterLUT)
+    {
+        for(std::vector<rsgis::cmds::Cmds6SAOTLUT>::iterator iterAOTLUT = (*iterLUT).aotLUT.begin(); iterAOTLUT != (*iterLUT).aotLUT.end(); ++iterAOTLUT)
+        {
+            delete[] (*iterAOTLUT).imageBands;
+            delete[] (*iterAOTLUT).aX;
+            delete[] (*iterAOTLUT).bX;
+            delete[] (*iterAOTLUT).cX;
+        }
+    }
+    delete elevAOTLUT;
+    
+    Py_RETURN_NONE;
+}
+
+
 
 // Our list of functions in this module
 static PyMethodDef ImageCalibrationMethods[] = {
-    {"landsat2Radiance", ImageCalibration_landsat2Radiance, METH_VARARGS,
+{"landsat2Radiance", ImageCalibration_landsat2Radiance, METH_VARARGS,
 "imagecalibration.landsat2Radiance(outputImage, gdalformat, bandDefnSeq)\n"
 "Converts Landsat DN values to at sensor radiance.\n"
 "where:\n"
@@ -603,80 +790,109 @@ static PyMethodDef ImageCalibrationMethods[] = {
 "    *  qCalMax - qCalMax value from Landsat header.\n"
 "\n"},
     
-    {"landsat2RadianceMultiAdd", ImageCalibration_landsat2RadianceMultiAdd, METH_VARARGS,
-        "imagecalibration.landsat2RadianceMultiAdd(outputImage, gdalformat, bandDefnSeq)\n"
-        "Converts Landsat DN values to at sensor radiance.\n"
-        "where:\n"
-        "  * outputImage is a string containing the name of the output file\n"
-        "  * gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
-        "  * bandDefnSeq is a sequence of rsgislib.imagecalibration.CmdsLandsatRadianceGainsOffsets objects that define the inputs\n"
-        "    Requires:\n"
-		"\n"
-        "    * bandName - Name of image band in output file.\n"
-        "    * fileName - input image file.\n"
-        "    * bandIndex - Index (starting from 1) of the band in the image file.\n"
-        "    * addVal - RADIANCE_ADD value from Landsat header.\n"
-        "    * multiVal - RADIANCE_MULT value from Landsat header.\n"
-		"\n"},
+{"landsat2RadianceMultiAdd", ImageCalibration_landsat2RadianceMultiAdd, METH_VARARGS,
+"imagecalibration.landsat2RadianceMultiAdd(outputImage, gdalformat, bandDefnSeq)\n"
+"Converts Landsat DN values to at sensor radiance.\n"
+"where:\n"
+"  * outputImage is a string containing the name of the output file\n"
+"  * gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
+"  * bandDefnSeq is a sequence of rsgislib.imagecalibration.CmdsLandsatRadianceGainsOffsets objects that define the inputs\n"
+"    Requires:\n"
+"\n"
+"    * bandName - Name of image band in output file.\n"
+"    * fileName - input image file.\n"
+"    * bandIndex - Index (starting from 1) of the band in the image file.\n"
+"    * addVal - RADIANCE_ADD value from Landsat header.\n"
+"    * multiVal - RADIANCE_MULT value from Landsat header.\n"
+"\n"},
     
 {"radiance2TOARefl", ImageCalibration_Radiance2TOARefl, METH_VARARGS,
-    "imagecalibration.radiance2TOARefl(inputFile, outputFile, gdalFormat, gdaltype, scaleFactor, julianDay, solarZenith, solarIrradianceVals)\n"
-    "Converts at sensor radiance values to Top of Atmosphere Reflectance.\n"
-    "where:\n"
-    "  * inputFile is a string containing the name of the input image file\n"
-    "  * outputFile is a string containing the name of the output image file\n"
-    "  * gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
-    "  * gdaltype is an containing one of the values from rsgislib.TYPE_*\n"
-    "  * scaleFactor is a float which can be used to scale the output pixel values (e.g., multiple by 1000), set as 1 if not wanted.\n"
-    "  * year is an int with the year of the sensor acquisition.\n"
-    "  * month is an int with the month of the sensor acquisition.\n"
-    "  * day is an int with the day of the sensor acquisition.\n"
-    "  * solarZenith is a a float with the solar zenith in degrees at the time of the acquisition (note 90-solarElevation = solarZenith).\n"
-    "  * solarIrradianceVals is a sequence of floats each with the name \'irradiance\' which is in order of the bands in the input image.\n"},
+"imagecalibration.radiance2TOARefl(inputFile, outputFile, gdalFormat, gdaltype, scaleFactor, julianDay, solarZenith, solarIrradianceVals)\n"
+"Converts at sensor radiance values to Top of Atmosphere Reflectance.\n"
+"where:\n"
+"  * inputFile is a string containing the name of the input image file\n"
+"  * outputFile is a string containing the name of the output image file\n"
+"  * gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
+"  * gdaltype is an containing one of the values from rsgislib.TYPE_*\n"
+"  * scaleFactor is a float which can be used to scale the output pixel values (e.g., multiple by 1000), set as 1 if not wanted.\n"
+"  * year is an int with the year of the sensor acquisition.\n"
+"  * month is an int with the month of the sensor acquisition.\n"
+"  * day is an int with the day of the sensor acquisition.\n"
+"  * solarZenith is a a float with the solar zenith in degrees at the time of the acquisition (note 90-solarElevation = solarZenith).\n"
+"  * solarIrradianceVals is a sequence of floats each with the name \'irradiance\' which is in order of the bands in the input image.\n"},
 
 {"apply6SCoeffSingleParam", ImageCalibration_Apply6SCoefficentsSingleParam, METH_VARARGS,
-    "imagecalibration.apply6SCoeffSingleParam(inputFile, outputFile, gdalFormat, gdaltype, scaleFactor, noDataValue, useNoDataValue, bandCoeffs)\n"
-    "Converts at sensor radiance values to surface reflectance by applying coefficients from the 6S model for each band (aX, bX, cX).\n"
-    "where:\n"
-    "  * inputFile is a string containing the name of the input image file\n"
-    "  * outputFile is a string containing the name of the output image file\n"
-    "  * gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
-    "  * gdaltype is an containing one of the values from rsgislib.TYPE_*\n"
-    "  * scaleFactor is a float which can be used to scale the output pixel values (e.g., multiple by 1000), set as 1 for no scaling.\n"
-    "  * noDataValue is a float which if all bands contain that value will be ignored.\n"
-    "  * useNoDataValue is a boolean as to whether the no data value specified is to be used.\n"
-    "  * bandCoeffs is a sequence of objects with the following named fields.\n"
-    "    Requires:\n"
-	"\n"
-    "    * band - An integer specifying the image band in the input file.\n"
-    "    * aX - A float for the aX coefficient.\n"
-    "    * bX - A float for the bX coefficient.\n"
-    "    * cX - A float for the cX coefficient.\n"
-	"\n"},
+"imagecalibration.apply6SCoeffSingleParam(inputFile, outputFile, gdalFormat, gdaltype, scaleFactor, noDataValue, useNoDataValue, bandCoeffs)\n"
+"Converts at sensor radiance values to surface reflectance by applying coefficients from the 6S model for each band (aX, bX, cX).\n"
+"where:\n"
+"  * inputFile is a string containing the name of the input image file\n"
+"  * outputFile is a string containing the name of the output image file\n"
+"  * gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
+"  * gdaltype is an containing one of the values from rsgislib.TYPE_*\n"
+"  * scaleFactor is a float which can be used to scale the output pixel values (e.g., multiple by 1000), set as 1 for no scaling.\n"
+"  * noDataValue is a float which if all bands contain that value will be ignored.\n"
+"  * useNoDataValue is a boolean as to whether the no data value specified is to be used.\n"
+"  * bandCoeffs is a sequence of objects with the following named fields.\n"
+"    Requires:\n"
+"\n"
+"    * band - An integer specifying the image band in the input file.\n"
+"    * aX - A float for the aX coefficient.\n"
+"    * bX - A float for the bX coefficient.\n"
+"    * cX - A float for the cX coefficient.\n"
+"\n"},
     
 {"apply6SCoeffElevLUTParam", ImageCalibration_Apply6SCoefficentsElevLUTParam, METH_VARARGS,
-    "imagecalibration.apply6SCoeffElevLUTParam(inputRadFile, inputDEMFile, outputFile, gdalFormat, gdaltype, scaleFactor, noDataValue, useNoDataValue, lutElev)\n"
+"imagecalibration.apply6SCoeffElevLUTParam(inputRadFile, inputDEMFile, outputFile, gdalFormat, gdaltype, scaleFactor, noDataValue, useNoDataValue, lutElev)\n"
+"Converts at sensor radiance values to surface reflectance by applying coefficients from the 6S model for each band (aX, bX, cX), where the coefficients can be varied for surface elevation.\n"
+"where:\n"
+"  * inputRadFile is a string containing the name of the input Radiance image file\n"
+"  * inputDEMFile is a string containing the name of the input DEM image file (needs to be the same projection and resolution as radiance image.)\n"
+"  * outputFile is a string containing the name of the output image file\n"
+"  * gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
+"  * gdaltype is an containing one of the values from rsgislib.TYPE_*\n"
+"  * scaleFactor is a float which can be used to scale the output pixel values (e.g., multiple by 1000), set as 1 for no scaling.\n"
+"  * noDataValue is a float which if all bands contain that value will be ignored.\n"
+"  * useNoDataValue is a boolean as to whether the no data value specified is to be used.\n"
+"  * lutElev is a sequence of objects with the following named fields - note these are expected to be in elevation order (low to high).\n"
+"    Requires:\n"
+"\n"
+"    * \'Elev\' - The elevation for the element in the LUT (in metres).\n"
+"    * \'Coeffs\' - The sequence of 6S coeffecients for the given elevation for the element in the LUT.\n"
+"\n"
+"    \'Coeffs\' Requires a sequence with the following:\n"
+"        * \'band\' - An integer specifying the image band in the input file (band numbers start at 1).\n"
+"        * \'aX\' - A float for the aX coefficient.\n"
+"        * \'bX\' - A float for the bX coefficient.\n"
+"        * \'cX\' - A float for the cX coefficient.\n"
+"\n"},
+    
+{"apply6SCoeffElevAOTLUTParam", ImageCalibration_Apply6SCoefficentsElevAOTLUTParam, METH_VARARGS,
+    "imagecalibration.apply6SCoeffElevLUTParam(inputRadFile, inputDEMFile, inputAOTImage, outputFile, gdalFormat, gdaltype, scaleFactor, noDataValue, useNoDataValue, lutElevAOT)\n"
     "Converts at sensor radiance values to surface reflectance by applying coefficients from the 6S model for each band (aX, bX, cX), where the coefficients can be varied for surface elevation.\n"
     "where:\n"
     "  * inputRadFile is a string containing the name of the input Radiance image file\n"
     "  * inputDEMFile is a string containing the name of the input DEM image file (needs to be the same projection and resolution as radiance image.)\n"
+    "  * inputAOTImage is a string containing the name of the input AOT image file (needs to be the same projection and resolution as radiance image.)\n"
     "  * outputFile is a string containing the name of the output image file\n"
     "  * gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
     "  * gdaltype is an containing one of the values from rsgislib.TYPE_*\n"
     "  * scaleFactor is a float which can be used to scale the output pixel values (e.g., multiple by 1000), set as 1 for no scaling.\n"
     "  * noDataValue is a float which if all bands contain that value will be ignored.\n"
     "  * useNoDataValue is a boolean as to whether the no data value specified is to be used.\n"
-    "  * lutElev is a sequence of objects with the following named fields - note these are expected to be in elevation order (low to high).\n"
+    "  * lutElevAOT is a sequence of objects with the following named fields - note these are expected to be in elevation order (low to high) and then AOT order (low to high).\n"
     "    Requires:\n"
     "\n"
     "    * \'Elev\' - The elevation for the element in the LUT (in metres).\n"
-    "    * \'Coeffs\' - The sequence of 6S coeffecients for the given elevation for the element in the LUT.\n"
+    "    * \'Coeffs\' - For the specified Elevation an LUT for AOT specifying the 6S coefficients.\n"
     "\n"
-    "    \'Coeffs\' Requires a sequence with the following:\n"
-    "        * \'band\' - An integer specifying the image band in the input file.\n"
-    "        * \'aX\' - A float for the aX coefficient.\n"
-    "        * \'bX\' - A float for the bX coefficient.\n"
-    "        * \'cX\' - A float for the cX coefficient.\n"
+    "    * \'AOT\' - The AOT value for this element within the LUT.\n"
+    "    * \'Coeffs\' - The sequence of 6S coeffecients for the given elevation and AOT for the element in the LUT.\n"
+    "\n"
+    "        \'Coeffs\' Requires a sequence with the following:\n"
+    "            * \'band\' - An integer specifying the image band in the input file (band numbers start at 1).\n"
+    "            * \'aX\' - A float for the aX coefficient.\n"
+    "            * \'bX\' - A float for the bX coefficient.\n"
+    "            * \'cX\' - A float for the cX coefficient.\n"
     "\n"},
     
     {NULL}        /* Sentinel */

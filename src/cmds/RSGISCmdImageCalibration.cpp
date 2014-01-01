@@ -368,6 +368,121 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
+                
+                
+                
+    void executeRad2SREFElevAOTLUT6sParams(std::string inputRadImage, std::string inputDEM, std::string inputAOTImg, std::string outputImage, std::string gdalFormat, rsgis::RSGISLibDataType rsgisOutDataType, float scaleFactor, std::vector<Cmds6SBaseElevAOTLUT> *lut, float noDataVal, bool useNoDataVal)throw(RSGISCmdException)
+    {
+        try
+        {
+            GDALAllRegister();
+            GDALDataset **datasets = new GDALDataset*[3];
+            std::cout << "Open DEM image: \'" << inputDEM << "\'" << std::endl;
+            datasets[0] = (GDALDataset *) GDALOpen(inputDEM.c_str(), GA_ReadOnly);
+            if(datasets[0] == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputDEM;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            std::cout << "Open AOT image: \'" << inputAOTImg << "\'" << std::endl;
+            datasets[1] = (GDALDataset *) GDALOpen(inputAOTImg.c_str(), GA_ReadOnly);
+            if(datasets[1] == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputAOTImg;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            std::cout << "Open Radiance image: \'" << inputRadImage << "\'" << std::endl;
+            datasets[2] = (GDALDataset *) GDALOpen(inputRadImage.c_str(), GA_ReadOnly);
+            if(datasets[2] == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputRadImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            int numRasterBands = datasets[2]->GetRasterCount();
+            
+            std::vector<rsgis::calib::LUT6SBaseElevAOT> *rsgisLUT = new std::vector<rsgis::calib::LUT6SBaseElevAOT>();
+            
+            for(std::vector<Cmds6SBaseElevAOTLUT>::iterator iterElevLUT = lut->begin(); iterElevLUT != lut->end(); ++iterElevLUT)
+            {
+                rsgis::calib::LUT6SBaseElevAOT lutElevVal = rsgis::calib::LUT6SBaseElevAOT();
+                std::cout << "Elevation: " << (*iterElevLUT).elev << std::endl;
+                lutElevVal.aotLUT = std::vector<rsgis::calib::LUT6SAOT>();
+                lutElevVal.aotLUT.reserve((*iterElevLUT).aotLUT.size());
+                
+                for(std::vector<Cmds6SAOTLUT>::iterator iterAOTLUT = (*iterElevLUT).aotLUT.begin(); iterAOTLUT != (*iterElevLUT).aotLUT.end(); ++iterAOTLUT)
+                {
+                    rsgis::calib::LUT6SAOT aotLUTVal = rsgis::calib::LUT6SAOT();
+                    aotLUTVal.aot = (*iterAOTLUT).aot;
+                    aotLUTVal.numValues = (*iterAOTLUT).numValues;
+                    aotLUTVal.imageBands = new unsigned int[aotLUTVal.numValues];
+                    aotLUTVal.aX = new float[aotLUTVal.numValues];
+                    aotLUTVal.bX = new float[aotLUTVal.numValues];
+                    aotLUTVal.cX = new float[aotLUTVal.numValues];
+                    
+                    std::cout << "\tAOT: " << (*iterAOTLUT).aot << std::endl;
+                    for(unsigned int i = 0; i < (*iterAOTLUT).numValues; ++i)
+                    {
+                        if((*iterAOTLUT).imageBands[i] > numRasterBands)
+                        {
+                            GDALClose(datasets[0]);
+                            GDALClose(datasets[1]);
+                            GDALClose(datasets[2]);
+                            delete[] datasets;
+                            throw rsgis::RSGISException("The number of input image bands is not equal to the number coefficients provided.");
+                        }
+                        aotLUTVal.imageBands[i] = (*iterAOTLUT).imageBands[i]+1;
+                        aotLUTVal.aX[i] = (*iterAOTLUT).aX[i];
+                        aotLUTVal.bX[i] = (*iterAOTLUT).bX[i];
+                        aotLUTVal.cX[i] = (*iterAOTLUT).cX[i];
+                        std::cout << "\t\tBand " << aotLUTVal.imageBands[i] << ": aX = " << aotLUTVal.aX[i] << " bX = " << aotLUTVal.bX[i] << " cX = " << aotLUTVal.cX[i] << std::endl;
+                    }
+                    
+                    lutElevVal.aotLUT.push_back(aotLUTVal);
+                }
+                lutElevVal.elev = (*iterElevLUT).elev;
+                
+                rsgisLUT->push_back(lutElevVal);
+            }
+            
+            std::cout << "Apply Coefficients to input image...\n";
+            
+            rsgis::calib::RSGISApply6SCoefficientsElevAOTLUTParam *apply6SCoefficients = new rsgis::calib::RSGISApply6SCoefficientsElevAOTLUTParam(numRasterBands, rsgisLUT, noDataVal, useNoDataVal, scaleFactor);
+            
+            rsgis::img::RSGISCalcImage *calcImage = new rsgis::img::RSGISCalcImage(apply6SCoefficients, "", true);
+            calcImage->calcImage(datasets, 3, outputImage, false, NULL, gdalFormat, RSGIS_to_GDAL_Type(rsgisOutDataType));
+            
+            delete apply6SCoefficients;
+            delete calcImage;
+            
+            for(std::vector<rsgis::calib::LUT6SBaseElevAOT>::iterator iterLUT = rsgisLUT->begin(); iterLUT != rsgisLUT->end(); ++iterLUT)
+            {
+                for(std::vector<rsgis::calib::LUT6SAOT>::iterator iterAOTLUT = (*iterLUT).aotLUT.begin(); iterAOTLUT != (*iterLUT).aotLUT.end(); ++iterAOTLUT)
+                {
+                    delete[] (*iterAOTLUT).imageBands;
+                    delete[] (*iterAOTLUT).aX;
+                    delete[] (*iterAOTLUT).bX;
+                    delete[] (*iterAOTLUT).cX;
+                }
+            }
+            delete rsgisLUT;
+            
+            GDALClose(datasets[0]);
+            GDALClose(datasets[1]);
+            GDALClose(datasets[2]);
+            delete[] datasets;
+        }
+        catch(rsgis::RSGISException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(std::exception &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
     
 }}
 
