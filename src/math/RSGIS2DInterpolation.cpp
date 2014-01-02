@@ -283,6 +283,52 @@ namespace rsgis {namespace math{
         return outValue;
     }
     
+    
+    
+    
+    
+    void RSGISAllPointsIDWInterpolator::initInterpolator(std::vector<RSGISInterpolatorDataPoint> *pts) throw(RSGISInterpolationException)
+    {
+        this->pts = pts;
+        this->initialised = true;
+    }
+    
+    double RSGISAllPointsIDWInterpolator::getValue(double eastings, double northings) throw(RSGISInterpolationException)
+    {
+        float outValue = std::numeric_limits<float>::signaling_NaN();
+        if(initialised)
+        {
+            try
+            {
+                double totalWeight = 0.0;
+                double weight = 0.0;
+                for(std::vector<RSGISInterpolatorDataPoint>::iterator iterPts = pts->begin(); iterPts != pts->end(); ++iterPts)
+                {
+                    weight = 1 / pow(sqrt(pow((eastings - (*iterPts).x), 2) + pow((northings - (*iterPts).y), 2)),this->p);
+                    totalWeight += weight;
+                }
+                
+                
+                outValue = 0.0;
+                
+                for(std::vector<RSGISInterpolatorDataPoint>::iterator iterPts = pts->begin(); iterPts != pts->end(); ++iterPts)
+                {
+                    weight = 1 / pow(sqrt(pow((eastings - (*iterPts).x), 2) + pow((northings - (*iterPts).y), 2)),this->p);
+                    
+                    outValue += ((*iterPts).value * weight) / totalWeight;
+                }
+                
+            }
+            catch(RSGISInterpolationException &e)
+            {
+                throw e;
+            }
+        }
+        return outValue;
+    }
+    
+    
+    
 }}
 
 

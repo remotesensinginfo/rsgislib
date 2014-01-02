@@ -1096,6 +1096,10 @@ namespace rsgis{ namespace cmds {
             {
                 interpolator = new rsgis::math::RSGISKNearestNeighbour2DInterpolator(3);
             }
+            else if(methodStr == "idwall")
+            {
+                interpolator = new rsgis::math::RSGISAllPointsIDWInterpolator(8);
+            }
             else
             {
                 throw rsgis::RSGISAttributeTableException("The interpolated specified was not recognised.");

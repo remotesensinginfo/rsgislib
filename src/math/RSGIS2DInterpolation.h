@@ -145,6 +145,19 @@ namespace rsgis {namespace math{
 		~RSGISKNearestNeighbour2DInterpolator(){};
 	};
     
+    
+    class RSGISAllPointsIDWInterpolator : public RSGIS2DInterpolator
+	{
+	public:
+		RSGISAllPointsIDWInterpolator(float p):RSGIS2DInterpolator(){this->p = p;};
+        void initInterpolator(std::vector<RSGISInterpolatorDataPoint> *pts) throw(RSGISInterpolationException);
+		double getValue(double eastings, double northings) throw(RSGISInterpolationException);
+		~RSGISAllPointsIDWInterpolator(){};
+    protected:
+        std::vector<RSGISInterpolatorDataPoint> *pts;
+        float p;
+	};
+    
 
 }}
 

@@ -529,7 +529,7 @@
 	<!-- A command to identify an extreme clump/segment with regions of the image, regions defined on a grid -->
 	<rsgis:command algor="rastergis" option="selectclumpsongrid" clumps="clumps.kea" inselectfield="string" outselectfield="string" eastings="string" northings="string" method="min | max | mean" rows="int" cols="int" metriccol="string" />
 	<!-- A command to interpolate values from clumps to the whole image of pixels. -->
-	<rsgis:command algor="rastergis" option="interpolateclumpvalues2img" clumps="clumps.kea" output="image.kea" selectfield="string" eastings="string" northings="string" valuecol="string" method="nearestneighbour | naturalneighbour | naturalnearestneighbour | knearestneighbour" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
+	<rsgis:command algor="rastergis" option="interpolateclumpvalues2img" clumps="clumps.kea" output="image.kea" selectfield="string" eastings="string" northings="string" valuecol="string" method="nearestneighbour | naturalneighbour | naturalnearestneighbour | knearestneighbour | idwall" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
 
 
 
