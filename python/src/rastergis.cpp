@@ -1553,7 +1553,7 @@ static PyMethodDef RasterGISMethods[] = {
     " * selectField is a string which defines the column name where a value of 1 defines the clumps which will be included in the analysis.\n"
     " * eastingsField is a string which defines a column with a eastings for each clump.\n"
     " * northingsField is a string which defines a column with a northings for each clump.\n"
-    " * methodStr is a string which defines a column with a value for each clump which will be used for the distance, nearestneighbour or naturalneighbour or naturalnearestneighbour or knearestneighbour anaylsis.\n"
+    " * methodStr is a string which defines a column with a value for each clump which will be used for the distance, nearestneighbour or naturalneighbour or naturalnearestneighbour or knearestneighbour or idwall anaylsis.\n"
     " * valueField is a string which defines a column containing the values to be interpolated creating the new image.\n"
     " * outputFile is a string for the path to the output image file.\n"
     " * imageFormat is string defining the GDAL format of the output image.\n"
