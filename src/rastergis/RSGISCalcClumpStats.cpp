@@ -171,7 +171,7 @@ namespace rsgis{namespace rastergis{
             
             RSGISCalcClusterPxlValueStats *calcImgValStats = new RSGISCalcClusterPxlValueStats(attTable, pxlCountIdx, bandStats, firstVal);
             rsgis::img::RSGISCalcImage calcImageStats(calcImgValStats);
-            calcImageStats.calcImage(datasets, 2);
+            calcImageStats.calcImage(datasets, 1, 1);
             delete calcImgValStats;
             
             for(int i = 0; i < numRows; ++i)
@@ -618,6 +618,79 @@ namespace rsgis{namespace rastergis{
                         else
                         {
                             attTable->SetValue(fid, (*iterBands)->sumIdx, (attTable->GetValueAsDouble(fid, (*iterBands)->sumIdx) + bandValues[(*iterBands)->band]));
+                        }
+                    }
+                }
+            }
+            
+            if(firstVal[fid])
+            {
+                attTable->SetValue(fid, countColIdx, 1);
+                firstVal[fid] = false;
+            }
+            else
+            {
+                attTable->SetValue(fid, countColIdx, (attTable->GetValueAsInt(fid, countColIdx)+1));
+            }
+        }
+    }
+    
+    void RSGISCalcClusterPxlValueStats::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(rsgis::img::RSGISImageCalcException)
+    {
+        //std::cout << "intBandValues[0] = " << intBandValues[0] << std::endl;
+        if(intBandValues[0] > 0)
+        {
+            size_t fid = boost::lexical_cast<size_t>(intBandValues[0]);
+            //std::cout << "FID: " << fid << std::endl;
+            for(std::vector<rsgis::rastergis::RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
+            {
+                if(boost::math::isfinite(floatBandValues[(*iterBands)->band]))
+                {
+                    if((*iterBands)->calcMin)
+                    {
+                        if(firstVal[fid])
+                        {
+                            attTable->SetValue(fid, (*iterBands)->minIdx, floatBandValues[(*iterBands)->band-1]);
+                        }
+                        else if(floatBandValues[(*iterBands)->band-1] < attTable->GetValueAsDouble(fid, (*iterBands)->minIdx))
+                        {
+                            attTable->SetValue(fid, (*iterBands)->minIdx, floatBandValues[(*iterBands)->band-1]);
+                        }
+                    }
+                    
+                    if((*iterBands)->calcMax)
+                    {
+                        if(firstVal[fid])
+                        {
+                            attTable->SetValue(fid, (*iterBands)->maxIdx, floatBandValues[(*iterBands)->band-1]);
+                        }
+                        else if(floatBandValues[(*iterBands)->band-1] > attTable->GetValueAsDouble(fid, (*iterBands)->maxIdx))
+                        {
+                            attTable->SetValue(fid, (*iterBands)->maxIdx, floatBandValues[(*iterBands)->band-1]);
+                        }
+                    }
+                    
+                    if((*iterBands)->calcMean)
+                    {
+                        if(firstVal[fid])
+                        {
+                            attTable->SetValue(fid, (*iterBands)->meanIdx, floatBandValues[(*iterBands)->band-1]);
+                        }
+                        else
+                        {
+                            attTable->SetValue(fid, (*iterBands)->meanIdx, (attTable->GetValueAsDouble(fid, (*iterBands)->meanIdx) + floatBandValues[(*iterBands)->band-1]));
+                        }
+                    }
+                    
+                    if((*iterBands)->calcSum)
+                    {
+                        if(firstVal[fid])
+                        {
+                            attTable->SetValue(fid, (*iterBands)->sumIdx, floatBandValues[(*iterBands)->band-1]);
+                        }
+                        else
+                        {
+                            attTable->SetValue(fid, (*iterBands)->sumIdx, (attTable->GetValueAsDouble(fid, (*iterBands)->sumIdx) + floatBandValues[(*iterBands)->band-1]));
                         }
                     }
                 }
