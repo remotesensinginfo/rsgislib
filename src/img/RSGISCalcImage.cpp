@@ -996,7 +996,7 @@ namespace rsgis{namespace img{
 				}
 			}
             
-            
+            counter = 0;
             for(int i = numIntDS; i < numDS; i++)
 			{
 				for(int j = 0; j < datasets[i]->GetRasterCount(); j++)
@@ -1568,7 +1568,7 @@ namespace rsgis{namespace img{
 				}
 			}
             
-            
+            counter = 0;
             for(int i = numIntDS; i < numDS; i++)
 			{
 				for(int j = 0; j < datasets[i]->GetRasterCount(); j++)
