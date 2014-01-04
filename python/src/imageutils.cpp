@@ -734,7 +734,7 @@ static PyObject *ImageUtils_CreateBlankImage(PyObject *self, PyObject *args)
     double tlX, tlY, res = 0;
     float pxlVal = 0;
     
-    if( !PyArg_ParseTuple(args, "sIIIdddfssi:createBlankImage", &pszOutputImage, &numBands, &width, &height, &tlX, &tlY, &res, &pxlVal, &wktFile, &wktString, &pszGDALFormat, &nOutDataType))
+    if( !PyArg_ParseTuple(args, "sIIIdddfsssi:createBlankImage", &pszOutputImage, &numBands, &width, &height, &tlX, &tlY, &res, &pxlVal, &wktFile, &wktString, &pszGDALFormat, &nOutDataType))
         return NULL;
     
     try
