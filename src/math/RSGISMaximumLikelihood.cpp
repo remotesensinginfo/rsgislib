@@ -27,15 +27,23 @@
 
 #include "RSGISMaximumLikelihood.h"
 
+#include <sstream>
+
 namespace rsgis {namespace math{
 
+    std::string NumberToString(int Number)
+    {
+        std::ostringstream ss;
+        ss << Number;
+        return ss.str();
+    }
     
     RSGISMaximumLikelihood::RSGISMaximumLikelihood()
     {
         
     }
     
-    int RSGISMaximumLikelihood::compute_ml(MaximumLikelihood *ml,int n,int d,double *x[],int y[])
+    int RSGISMaximumLikelihood::compute_ml(MaximumLikelihood *ml,int n,int d,double *x[],int y[]) throw(RSGISMaximumLikelihoodException)
     {
         double ***tmpMat;
         int *index;
@@ -46,22 +54,19 @@ namespace rsgis {namespace math{
         
         if(ml->nclasses<=0)
         {
-            fprintf(stderr,"compute_ml: iunique error\n");
-            return 1;
+            throw RSGISMaximumLikelihoodException("compute_ml: iunique error");
         }
         
         if(ml->nclasses==1)
         {
-            fprintf(stderr,"compute_ml: only 1 class recognized\n");
-            return 1;
+            throw RSGISMaximumLikelihoodException("compute_ml: only 1 class recognized");
         }
         
         if(ml->nclasses==2)
         {
             if(ml->classes[0] != -1 || ml->classes[1] != 1)
             {
-                fprintf(stderr,"compute_ml: for binary classification classes must be -1,1\n");
-                return 1;
+                throw RSGISMaximumLikelihoodException("compute_ml: for binary classification classes must be -1,1");
             }
         }
         
@@ -72,16 +77,16 @@ namespace rsgis {namespace math{
                 //std::cout << "ml->classes[" << i << "]: " << ml->classes[i] << std::endl;
                 if(ml->classes[i] != i+1)
                 {
-                    fprintf(stderr,"compute_ml: for %d-class classification classes must be 1,...,%d\n",ml->nclasses,ml->nclasses);
-                    return 1;
+                    std::string msg = std::string("compute_ml: for ") + NumberToString(ml->nclasses) + "-class classification classes must be 1,...," +
+                            NumberToString(ml->nclasses);
+                    throw RSGISMaximumLikelihoodException(msg);
                 }
             }
         }
         
         if(!(ml->npoints_for_class=ivector(ml->nclasses)))
         {
-            fprintf(stderr,"compute_ml: out of memory\n");
-            return 1;
+            throw RSGISMaximumLikelihoodException("compute_ml: out of memory");
         }
         
         for(i=0;i<n;i++)
@@ -98,52 +103,44 @@ namespace rsgis {namespace math{
         ml->d = d;
         if(!(ml->priors = dvector(ml->nclasses)))
         {
-            fprintf(stderr,"compute_ml: out of memory\n");
-            return 1;
+            throw RSGISMaximumLikelihoodException("compute_ml: out of memory");
         }
         if(!(ml->mean=dmatrix(ml->nclasses,ml->d)))
         {
-            fprintf(stderr,"compute_ml: out of memory\n");
-            return 1;
+            throw RSGISMaximumLikelihoodException("compute_ml: out of memory");
         }
         if(!(ml->det = dvector(ml->nclasses)))
         {
-            fprintf(stderr,"compute_ml: out of memory\n");
-            return 1;
+            throw RSGISMaximumLikelihoodException("compute_ml: out of memory");
         }
         if(!(ml->covar = (double ***) calloc(ml->nclasses, sizeof(double **))))
         {
-            fprintf(stderr,"compute_ml: out of memory\n");
-            return 1;
+            throw RSGISMaximumLikelihoodException("compute_ml: out of memory");
         }
         for(i=0;i<ml->nclasses;i++)
         {
             if(!(ml->covar[i] = dmatrix(ml->d,ml->d)))
             {
-                fprintf(stderr,"compute_ml: out of memory\n");
-                return 1;
+                throw RSGISMaximumLikelihoodException("compute_ml: out of memory");
             }
         }
         
         if(!(tmpMat = (double ***) calloc(ml->nclasses, sizeof(double **))))
         {
-            fprintf(stderr,"compute_ml: out of memory\n");
-            return 1;
+            throw RSGISMaximumLikelihoodException("compute_ml: out of memory");
         }
         for(i=0;i<ml->nclasses;i++)
         {
             if(!(tmpMat[i] = dmatrix(ml->npoints_for_class[i],ml->d)))
             {
-                fprintf(stderr,"compute_ml: out of memory\n");
-                return 1;
+                throw RSGISMaximumLikelihoodException("compute_ml: out of memory");
             }
         }
         
         
         if(!(index = ivector(ml->nclasses)))
         {
-            fprintf(stderr,"compute_ml: out of memory\n");
-            return 1;
+            throw RSGISMaximumLikelihoodException("compute_ml: out of memory");
         }
         for(i=0;i<n;i++)
         {
@@ -182,20 +179,17 @@ namespace rsgis {namespace math{
         
         if(!(ml->det = dvector(ml->nclasses)))
         {
-            fprintf(stderr,"compute_ml: out of memory\n");
-            return 1;
+            throw RSGISMaximumLikelihoodException("compute_ml: out of memory");
         }
         if(!(ml->inv_covar = (double ***) calloc(ml->nclasses, sizeof(double **))))
         {
-            fprintf(stderr,"compute_ml: out of memory\n");
-            return 1;
+            throw RSGISMaximumLikelihoodException("compute_ml: out of memory");
         }
         for(i=0;i<ml->nclasses;i++)
         {
             if(!(ml->inv_covar[i] = dmatrix(ml->d,ml->d)))
             {
-                fprintf(stderr,"compute_ml: out of memory\n");
-                return 1;   
+                throw RSGISMaximumLikelihoodException("compute_ml: out of memory");
             }
         }
         
@@ -204,7 +198,7 @@ namespace rsgis {namespace math{
             ml->det[j] = determinant(ml->covar[j],ml->d);
             if(inverse(ml->covar[j],ml->inv_covar[j],ml->d)!=0)
             {
-                fprintf(stderr,"compute_ml: error computing inverse covariance matrix of class %d\n",ml->classes[j]);
+                std::string msg = std::string("compute_ml: error computing inverse covariance matrix of class ") + NumberToString(ml->classes[j]);
             }
         }
         
@@ -215,7 +209,7 @@ namespace rsgis {namespace math{
     }
     
     
-    int RSGISMaximumLikelihood::predict_ml(MaximumLikelihood *ml, double x[], double **margin)
+    int RSGISMaximumLikelihood::predict_ml(MaximumLikelihood *ml, double x[], double **margin) throw(RSGISMaximumLikelihoodException)
     {
         int i,j,c;
         double *tmpVect;
@@ -227,18 +221,15 @@ namespace rsgis {namespace math{
         
         if(!(tmpVect = dvector(ml->d)))
         {
-            fprintf(stderr,"predict_ml: out of memory\n");
-            return -2;
+            throw RSGISMaximumLikelihoodException("predict_ml: out of memory");
         }
         if(!(distmean= dvector(ml->d)))
         {
-            fprintf(stderr,"predict_ml: out of memory\n");
-            return -2;
+            throw RSGISMaximumLikelihoodException("predict_ml: out of memory");
         }
         if(!((*margin)= dvector(ml->nclasses)))
         {
-            fprintf(stderr,"predict_ml: out of memory\n");
-            return -2;
+            throw RSGISMaximumLikelihoodException("predict_ml: out of memory");
         }
         
         for(c=0;c<ml->nclasses;c++)
@@ -273,8 +264,8 @@ namespace rsgis {namespace math{
             }
             else
             {
-                fprintf(stderr, "predict_ml:  det. of cov. matrix of class %d = 0\n",c);
-                return -2;
+                std::string msg = std::string("predict_ml:  det. of cov. matrix of class ") + NumberToString(c) + " = 0";
+                throw RSGISMaximumLikelihoodException(msg);
             }
             (*margin)[c] = (*margin)[c] * ml->priors[c];
         }
@@ -302,7 +293,7 @@ namespace rsgis {namespace math{
         return ml->classes[max_posterior_index];
     }
     
-    int RSGISMaximumLikelihood::iunique(int y[], int n, int **values)
+    int RSGISMaximumLikelihood::iunique(int y[], int n, int **values) throw(RSGISMaximumLikelihoodException)
     {
         int nvalues=1;
         int i,j;
@@ -311,8 +302,7 @@ namespace rsgis {namespace math{
         
         if(!(*values=ivector(1)))
         {
-            std::cerr << "iunique: out of memory\n";
-            return 0;
+            throw RSGISMaximumLikelihoodException("iunique: out of memory");
         }
         
         (*values)[0]=y[0];
@@ -330,8 +320,7 @@ namespace rsgis {namespace math{
             {
                 if(!(*values=(int*)realloc(*values,(nvalues+1)*sizeof(int))))
                 {
-                    fprintf(stderr,"iunique: out of memory\n");
-                    return 0;
+                    throw RSGISMaximumLikelihoodException("iunique: out of memory");
                 }
                 (*values)[nvalues++]=y[i];
             }
@@ -339,16 +328,14 @@ namespace rsgis {namespace math{
         
         if(!(indx=ivector(nvalues)))
         {
-            fprintf(stderr,"iunique: out of memory\n");
-            return 0;
+            throw RSGISMaximumLikelihoodException("iunique: out of memory");
         }
         
         this->isort(*values, indx, nvalues, rsgis_ascending);
         
         if(free_ivector(indx)!=0)
         {
-            fprintf(stderr,"iunique: free_ivector error\n");
-            return 0;
+            throw RSGISMaximumLikelihoodException("iunique: free_ivector error");
         }
         
         return nvalues;
