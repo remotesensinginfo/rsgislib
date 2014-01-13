@@ -46,19 +46,21 @@ namespace rsgis{namespace rastergis{
     
     enum rsgismlpriors
     {
-        rsgis_samples,
-        rsgis_area,
-        rsgis_equal,
-        rsgis_userdefined,
-        rsgis_weighted
+        rsgis_samples, // as calculated by ML
+        rsgis_area,    // priors set by the relative area
+        rsgis_equal,   // priors all equal
+        rsgis_userdefined, // priors passed in to function
+        rsgis_weighted     // priors by area but with a weight applied
     };
     
     class RSGISMaxLikelihoodRATClassification
     {
     public:
         RSGISMaxLikelihoodRATClassification();
-        void applyMLClassifier(GDALDataset *image, std::string inClassCol, std::string outClassCol, std::string trainingSelectCol, std::string areaCol, std::vector<std::string> inColumns, rsgismlpriors priorsMethod, std::vector<float> defPriors) throw(rsgis::RSGISAttributeTableException);
-        void applyMLClassifierLocalPriors(GDALDataset *image, std::string inClassCol, std::string outClassCol, std::string trainingSelectCol, std::string areaCol, std::vector<std::string> inColumns, std::string eastingsCol, std::string northingsCol, float searchRadius, rsgismlpriors priorsMethod, float weightA, bool allowZeroPriors) throw(rsgis::RSGISAttributeTableException);
+        void applyMLClassifier(GDALDataset *image, std::string inClassCol, std::string outClassCol, std::string trainingSelectCol, std::string classifySelectCol, 
+                std::string areaCol, std::vector<std::string> inColumns, rsgismlpriors priorsMethod, std::vector<float> defPriors) throw(rsgis::RSGISAttributeTableException);
+        void applyMLClassifierLocalPriors(GDALDataset *image, std::string inClassCol, std::string outClassCol, std::string trainingSelectCol, 
+                std::string classifySelectCol, std::string areaCol, std::vector<std::string> inColumns, std::string eastingsCol, std::string northingsCol, float searchRadius, rsgismlpriors priorsMethod, float weightA, bool allowZeroPriors) throw(rsgis::RSGISAttributeTableException);
         ~RSGISMaxLikelihoodRATClassification();
     protected:
         inline double getEuclideanDistance(std::vector<double> *vals1, std::vector<double> *vals2)throw(rsgis::math::RSGISMathException);

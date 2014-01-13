@@ -30,7 +30,18 @@ namespace rsgis{namespace rastergis{
         
     }
     
-    void RSGISMaxLikelihoodRATClassification::applyMLClassifier(GDALDataset *image, std::string inClassCol, std::string outClassCol, std::string trainingSelectCol, std::string areaCol, std::vector<std::string> inColumns, rsgismlpriors priorsMethod, std::vector<float> defPriors) throw(rsgis::RSGISAttributeTableException)
+    // image is the GDAL Dataset to classify - the first band is used
+    // inClassCol is the classification column to train on - should be an integer column specifying the class of each row
+    // outClassCol is the output classification column
+    // trainingSelectCol is the name of the column containing 1's where a row should be used in the training. 0 otherwise
+    // classifySelectCol is the name of the column containing 1's where a row should be used in the classification. 0 otherwise. 0 will be put in
+    //      outClassCol where this is 0.
+    // areaCol is the name of the column containing the relative area - usually the histogram column. Used when priorsMethod == rsgis_area
+    // inColumns is a vector of columns names to use for training the classifier
+    // priorsMethod is the method to use. either rsgis_equal, rsgis_samples, rsgis_area or rsgis_userdefined
+    // defPriors is a vector for prior probabilities. Use when priorsMethod == rsgis_userdefined
+    void RSGISMaxLikelihoodRATClassification::applyMLClassifier(GDALDataset *image, std::string inClassCol, std::string outClassCol, std::string trainingSelectCol, 
+                std::string classifySelectCol, std::string areaCol, std::vector<std::string> inColumns, rsgismlpriors priorsMethod, std::vector<float> defPriors) throw(rsgis::RSGISAttributeTableException)
     {
         try
         {
@@ -64,6 +75,8 @@ namespace rsgis{namespace rastergis{
             bool inClassColFound = false;
             int trainingSelectColIdx = 0;
             bool trainingSelectColFound = false;
+            int classifySelectColIdx = 0;
+            bool classifySelectColFound = false;
             int outClassColIdx = 0;
             bool outClassColFound = false;
             int areaColIdx = 0;
@@ -87,6 +100,11 @@ namespace rsgis{namespace rastergis{
                 {
                     trainingSelectColFound = true;
                     trainingSelectColIdx = i;
+                }
+                else if(!classifySelectColFound && (std::string(attTable->GetNameOfCol(i)) == classifySelectCol))
+                {
+                    classifySelectColFound = true;
+                    classifySelectColIdx = i;
                 }
                 else if(!outClassColFound && (std::string(attTable->GetNameOfCol(i)) == outClassCol))
                 {
@@ -121,6 +139,11 @@ namespace rsgis{namespace rastergis{
                 throw rsgis::RSGISAttributeTableException("Could not find the selected for training column.");
             }
             
+            if(!classifySelectColFound)
+            {
+                throw rsgis::RSGISAttributeTableException("Could not find the selected for classify column.");
+            }
+
             if(!areaColFound)
             {
                 throw rsgis::RSGISAttributeTableException("Could not find the area column.");
@@ -194,6 +217,7 @@ namespace rsgis{namespace rastergis{
             mlStruct->classes = new int[mlStruct->nclasses];
             mlStruct->d = inColumns.size();
             
+            // save the post probs as their own columns            
             unsigned int idx = 0;
             std::vector<std::string> outColPostNames;
             rsgis::math::RSGISMathsUtils mathUtils;
@@ -311,7 +335,7 @@ namespace rsgis{namespace rastergis{
                     feedback += 10;
                 }
                 classID = 0;
-                if(attTable->GetValueAsInt(i, inClassColIdx) > 0)
+                if(attTable->GetValueAsInt(i, classifySelectColIdx) == 1)
                 {
                     for(size_t j = 0; j < inColumns.size(); ++j)
                     {
@@ -357,7 +381,23 @@ namespace rsgis{namespace rastergis{
         }
     }
     
-    void RSGISMaxLikelihoodRATClassification::applyMLClassifierLocalPriors(GDALDataset *image, std::string inClassCol, std::string outClassCol, std::string trainingSelectCol, std::string areaCol, std::vector<std::string> inColumns, std::string eastingsCol, std::string northingsCol, float searchRadius, rsgismlpriors priorsMethod, float weightA, bool allowZeroPriors) throw(rsgis::RSGISAttributeTableException)
+    // image is the GDAL Dataset to classify - the first band is used
+    // inClassCol is the classification column to train on - should be an integer column specifying the class of each row
+    // outClassCol is the output classification column
+    // trainingSelectCol is the name of the column containing 1's where a row should be used in the training. 0 otherwise
+    // classifySelectCol is the name of the column containing 1's where a row should be used in the classification. 0 otherwise. 0 will be put in
+    //      outClassCol where this is 0.
+    // areaCol is the name of the column containing the relative area - usually the histogram column.
+    // inColumns is a vector of columns names to use for training the classifier
+    // eastingsCol is the name of the column containing the mean eastings of the clumps (use spatialLocation to calculate this)
+    // northingsCol is the name of the column containing the mean northings of the clumps (use spatialLocation to calculate this)
+    // searchRadius is the radius in image units to search when setting the priors from the neighbouring clumps
+    // priorsMethod is the method to use. either rsgis_area or rsgis_weighted
+    // weightA if priorsMethod == rsgis_weighted this is the weight to use
+    // allowZeroPriors. If true resets the priors that are zero to the minimum prior value (excluding zero).
+    void RSGISMaxLikelihoodRATClassification::applyMLClassifierLocalPriors(GDALDataset *image, std::string inClassCol, std::string outClassCol, std::string trainingSelectCol, 
+            std::string classifySelectCol, std::string areaCol, std::vector<std::string> inColumns, std::string eastingsCol, std::string northingsCol, 
+            float searchRadius, rsgismlpriors priorsMethod, float weightA, bool allowZeroPriors) throw(rsgis::RSGISAttributeTableException)
     {
         try
         {
@@ -391,6 +431,8 @@ namespace rsgis{namespace rastergis{
             bool inClassColFound = false;
             int trainingSelectColIdx = 0;
             bool trainingSelectColFound = false;
+            int classifySelectColIdx = 0;
+            bool classifySelectColFound = false;
             int outClassColIdx = 0;
             bool outClassColFound = false;
             int eastColIdx = 0;
@@ -418,6 +460,11 @@ namespace rsgis{namespace rastergis{
                 {
                     trainingSelectColFound = true;
                     trainingSelectColIdx = i;
+                }
+                else if(!classifySelectColFound && (std::string(attTable->GetNameOfCol(i)) == classifySelectCol))
+                {
+                    classifySelectColFound = true;
+                    classifySelectColIdx = i;
                 }
                 else if(!outClassColFound && (std::string(attTable->GetNameOfCol(i)) == outClassCol))
                 {
@@ -460,6 +507,11 @@ namespace rsgis{namespace rastergis{
             if(!trainingSelectColFound)
             {
                 throw rsgis::RSGISAttributeTableException("Could not find the selected for training column.");
+            }
+
+            if(!classifySelectColFound)
+            {
+                throw rsgis::RSGISAttributeTableException("Could not find the selected for classify column.");
             }
             
             if(!eastColFound)
@@ -544,7 +596,8 @@ namespace rsgis{namespace rastergis{
             mlStruct->nclasses = classes.size();
             mlStruct->classes = new int[mlStruct->nclasses];
             mlStruct->d = inColumns.size();
-            
+
+            // save the post and prior probs as their own columns            
             unsigned int idx = 0;
             std::vector<std::string> outColPostNames;
             std::vector<std::string> outColPriorNames;
@@ -650,7 +703,7 @@ namespace rsgis{namespace rastergis{
                     feedback += 10;
                 }
                 classID = 0;
-                if(attTable->GetValueAsInt(i, inClassColIdx) > 0)
+                if(attTable->GetValueAsInt(i, classifySelectColIdx) == 1)
                 {
                     // Find local priors...
                     this->getLocalPriors(mlStruct, attTable, i, trainingSelectColIdx, eastColIdx, northColIdx, inClassColIdx, forwardMapping, areaColIdx, searchRadius, allowZeroPriors, priorsMethod, weightA);
@@ -717,7 +770,9 @@ namespace rsgis{namespace rastergis{
         return sqrt(dist/((double)numVals));
     }
     
-    void RSGISMaxLikelihoodRATClassification::getLocalPriors(rsgis::math::MaximumLikelihood *mlStruct, GDALRasterAttributeTable *attTable, size_t fid, int trainingSelectColIdx, int eastingsIdx, int northingsIdx, int classColIdx, std::map<int, int> &forwardMapping, int areaColIdx, float spatialRadius, bool allowZeroPriors, rsgismlpriors priorsMethod, float weightA)throw(rsgis::RSGISAttributeTableException)
+    void RSGISMaxLikelihoodRATClassification::getLocalPriors(rsgis::math::MaximumLikelihood *mlStruct, GDALRasterAttributeTable *attTable, size_t fid, 
+            int trainingSelectColIdx, int eastingsIdx, int northingsIdx, int classColIdx, std::map<int, int> &forwardMapping, int areaColIdx, float spatialRadius, 
+            bool allowZeroPriors, rsgismlpriors priorsMethod, float weightA)throw(rsgis::RSGISAttributeTableException)
     {
         try
         {

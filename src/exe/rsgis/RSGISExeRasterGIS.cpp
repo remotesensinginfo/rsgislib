@@ -1950,6 +1950,19 @@ namespace rsgisexe{
                 }
                 xercesc::XMLString::release(&trainingColXMLStr);
 
+                XMLCh *classifyColXMLStr = xercesc::XMLString::transcode("classifycol");
+                if(argElement->hasAttribute(classifyColXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(classifyColXMLStr));
+                    this->classifySelectCol = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'classifycol\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&classifyColXMLStr);
+
                 XMLCh *areaXMLStr = xercesc::XMLString::transcode("area");
                 if(argElement->hasAttribute(areaXMLStr))
                 {
@@ -2088,6 +2101,19 @@ namespace rsgisexe{
                     throw rsgis::RSGISXMLArgumentsException("No \'trainingcol\' attribute was provided.");
                 }
                 xercesc::XMLString::release(&trainingColXMLStr);
+
+                XMLCh *classifyColXMLStr = xercesc::XMLString::transcode("classifycol");
+                if(argElement->hasAttribute(classifyColXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(classifyColXMLStr));
+                    this->classifySelectCol = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'classifycol\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&classifyColXMLStr);
 
                 XMLCh *eastingsXMLStr = xercesc::XMLString::transcode("eastings");
                 if(argElement->hasAttribute(eastingsXMLStr))
@@ -3853,6 +3879,7 @@ namespace rsgisexe{
                 std::cout << "Input Class Field: " << this->inClassNameField << std::endl;
                 std::cout << "Output Class Field: " << this->outClassNameField << std::endl;
                 std::cout << "Selected Training: " << this->trainingSelectCol << std::endl;
+                std::cout << "Selected Classify: " << this->classifySelectCol << std::endl;
                 std::cout << "Area Field: " << this->areaField << std::endl;
                 std::vector<float> priors;
                 if(this->priorsMethod == rsgis::rastergis::rsgis_samples) {
@@ -3876,7 +3903,8 @@ namespace rsgisexe{
                 }
 
                 try {
-                    rsgis::cmds::executeMaxLikelihoodClassifier(this->inputImage, this->inClassNameField, this->outClassNameField, this->trainingSelectCol, this->areaField, this->fields, (rsgis::cmds::rsgismlpriorscmds)this->priorsMethod, this->priorStrs);
+                    rsgis::cmds::executeMaxLikelihoodClassifier(this->inputImage, this->inClassNameField, this->outClassNameField, this->trainingSelectCol, 
+                    this->classifySelectCol, this->areaField, this->fields, (rsgis::cmds::rsgismlpriorscmds)this->priorsMethod, this->priorStrs);
                 } catch (rsgis::RSGISException e) {
                     throw rsgis::RSGISException(e.what());
                 } catch (rsgis::cmds::RSGISCmdException e) {
@@ -3892,6 +3920,7 @@ namespace rsgisexe{
                 std::cout << "Input Class Field: " << this->inClassNameField << std::endl;
                 std::cout << "Output Class Field: " << this->outClassNameField << std::endl;
                 std::cout << "Selected Training: " << this->trainingSelectCol << std::endl;
+                std::cout << "Selected Classify: " << this->classifySelectCol << std::endl;
                 std::cout << "Eastings Field: " << this->eastingsField << std::endl;
                 std::cout << "Northings Field: " << this->northingsField << std::endl;
                 std::cout << "Area Field: " << this->areaField << std::endl;
@@ -3920,7 +3949,9 @@ namespace rsgisexe{
                 }
 
                 try {
-                    rsgis::cmds::executeMaxLikelihoodClassifierLocalPriors(this->inputImage, this->inClassNameField, this->outClassNameField, this->trainingSelectCol, this->areaField, this->fields, this->eastingsField, this->northingsField, this->distThreshold, (rsgis::cmds::rsgismlpriorscmds)this->priorsMethod, this->weightA, this->allowZeroPriors);
+                    rsgis::cmds::executeMaxLikelihoodClassifierLocalPriors(this->inputImage, this->inClassNameField, this->outClassNameField, this->trainingSelectCol, 
+                    this->classifySelectCol, this->areaField, this->fields, this->eastingsField, this->northingsField, this->distThreshold, 
+                    (rsgis::cmds::rsgismlpriorscmds)this->priorsMethod, this->weightA, this->allowZeroPriors);
                 } catch (rsgis::RSGISException e) {
                     throw rsgis::RSGISException(e.what());
                 } catch (rsgis::cmds::RSGISCmdException e) {
