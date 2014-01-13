@@ -40,6 +40,8 @@
 #include <gsl/gsl_linalg.h>
 #include <gsl/gsl_blas.h>
 
+#include <boost/math/special_functions/fpclassify.hpp>
+
 namespace rsgis{namespace img{
 
     class RSGISCalcImgPxlNeighboursDist: public RSGISCalcImageValue

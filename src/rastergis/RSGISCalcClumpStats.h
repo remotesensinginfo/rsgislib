@@ -48,6 +48,8 @@
 
 #include "gsl/gsl_statistics_double.h"
 
+#include <boost/math/special_functions/fpclassify.hpp>
+
 namespace rsgis{namespace rastergis{
 	
     struct RSGISBandAttStats
