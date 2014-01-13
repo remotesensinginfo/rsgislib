@@ -142,8 +142,9 @@ namespace rsgis{namespace rastergis{
             }
             delete[] foundIdx;
             
+            // find the ids of the classes we need to train on            
             int numTrainingSamples = 0;
-            std::list<int> classes;
+            std::set<int> classes;
             int classID = 0;
             std::cout << "Finding the classes...\n";
             for(size_t i = 1; i < numRows; ++i)
@@ -151,13 +152,42 @@ namespace rsgis{namespace rastergis{
                 classID = attTable->GetValueAsInt(i, inClassColIdx);
                 if((attTable->GetValueAsInt(i, trainingSelectColIdx) == 1) & (classID > 0))
                 {
-                    classes.push_back(classID);
+                    classes.insert(classID);
                     ++numTrainingSamples;
                 }
             }
-            
-            classes.sort();
-            classes.unique();
+
+            // by default, a std::set is sorted and contains unique values
+            // however, rsgis::math::MaximumLikelihood needs values to be 
+            // contiguous so we set up a mapping
+            std::map<int, int> forwardMapping;
+            std::map<int, int> backMapping;
+
+            if( classes.size() < 2 )
+            {
+                throw rsgis::RSGISAttributeTableException("need at least 2 unique classes");
+            }
+            else if( classes.size() == 2 )
+            {
+                // for some reason the ml stuff needs the values to be -1 and 1 in this case
+                std::set<int>::iterator itr = classes.begin();
+                forwardMapping.insert(std::pair<int, int>(*(itr), -1));
+                backMapping.insert(std::pair<int, int>(-1, *(itr)));
+                itr++;
+                forwardMapping.insert(std::pair<int, int>(*(itr), 1));
+                backMapping.insert(std::pair<int, int>(1, (*itr)));
+            }
+            else
+            {
+                // make a contiguous mapping
+                classID = 1;
+                for(std::set<int>::iterator itr = classes.begin(); itr != classes.end(); itr++)
+                {
+                    forwardMapping.insert(std::pair<int, int>(*(itr), classID));
+                    backMapping.insert(std::pair<int, int>(classID, *(itr)));
+                    classID++;
+                }
+            }
             
             rsgis::math::MaximumLikelihood *mlStruct = new rsgis::math::MaximumLikelihood();
             mlStruct->nclasses = classes.size();
@@ -168,9 +198,9 @@ namespace rsgis{namespace rastergis{
             std::vector<std::string> outColPostNames;
             rsgis::math::RSGISMathsUtils mathUtils;
             std::string colName = "";
-            for(std::list<int>::iterator iterClasses = classes.begin(); iterClasses != classes.end(); ++iterClasses)
+            for(std::set<int>::iterator iterClasses = classes.begin(); iterClasses != classes.end(); ++iterClasses)
             {
-                std::cout << "Class " << *iterClasses << std::endl;
+                std::cout << "Class " << *iterClasses << " mapped to " << forwardMapping[*iterClasses] << std::endl;
                 mlStruct->classes[idx] = *iterClasses;
                 colName = outClassCol + std::string("_") + mathUtils.inttostring(*iterClasses);
                 outColPostNames.push_back(colName);
@@ -217,6 +247,7 @@ namespace rsgis{namespace rastergis{
             for(size_t i = 1; i < numRows; ++i)
             {
                 classID = attTable->GetValueAsInt(i, inClassColIdx);
+                classID = forwardMapping[classID]; // do lookup into contiguous classes
                 if((attTable->GetValueAsInt(i, trainingSelectColIdx) == 1) & (classID > 0))
                 {
                     mlClasses[idx] = classID;
@@ -288,6 +319,7 @@ namespace rsgis{namespace rastergis{
                     }
                     
                     classID = mlObj.predict_ml(mlStruct, data, &posteriorProbs);
+                    classID = backMapping[classID]; // convert back to our non contigous classes
                     
                     //std::cout << i << ")\n";
                     for(int j = 0; j < mlStruct->nclasses; ++j)
@@ -329,6 +361,7 @@ namespace rsgis{namespace rastergis{
     {
         try
         {
+            // get the RAT
             const GDALRasterAttributeTable *attTableTmp = image->GetRasterBand(1)->GetDefaultRAT();
             GDALRasterAttributeTable *attTable = NULL;
             if(attTableTmp != NULL)
@@ -459,9 +492,10 @@ namespace rsgis{namespace rastergis{
                 }
             }
             delete[] foundIdx;
-            
+
+            // find the ids of the classes we need to train on            
             int numTrainingSamples = 0;
-            std::list<int> classes;
+            std::set<int> classes;
             int classID = 0;
             std::cout << "Finding the classes...\n";
             for(size_t i = 1; i < numRows; ++i)
@@ -469,13 +503,42 @@ namespace rsgis{namespace rastergis{
                 classID = attTable->GetValueAsInt(i, inClassColIdx);
                 if((attTable->GetValueAsInt(i, trainingSelectColIdx) == 1) & (classID > 0))
                 {
-                    classes.push_back(classID);
+                    classes.insert(classID);
                     ++numTrainingSamples;
                 }
             }
-            
-            classes.sort();
-            classes.unique();
+
+            // by default, a std::set is sorted and contains unique values
+            // however, rsgis::math::MaximumLikelihood needs values to be 
+            // contiguous so we set up a mapping
+            std::map<int, int> forwardMapping;
+            std::map<int, int> backMapping;
+
+            if( classes.size() < 2 )
+            {
+                throw rsgis::RSGISAttributeTableException("need at least 2 unique classes");
+            }
+            else if( classes.size() == 2 )
+            {
+                // for some reason the ml stuff needs the values to be -1 and 1 in this case
+                std::set<int>::iterator itr = classes.begin();
+                forwardMapping.insert(std::pair<int, int>(*(itr), -1));
+                backMapping.insert(std::pair<int, int>(-1, *(itr)));
+                itr++;
+                forwardMapping.insert(std::pair<int, int>(*(itr), 1));
+                backMapping.insert(std::pair<int, int>(1, (*itr)));
+            }
+            else
+            {
+                // make a contiguous mapping
+                classID = 1;
+                for(std::set<int>::iterator itr = classes.begin(); itr != classes.end(); itr++)
+                {
+                    forwardMapping.insert(std::pair<int, int>(*(itr), classID));
+                    backMapping.insert(std::pair<int, int>(classID, *(itr)));
+                    classID++;
+                }
+            }
             
             rsgis::math::MaximumLikelihood *mlStruct = new rsgis::math::MaximumLikelihood();
             mlStruct->nclasses = classes.size();
@@ -487,9 +550,9 @@ namespace rsgis{namespace rastergis{
             std::vector<std::string> outColPriorNames;
             rsgis::math::RSGISMathsUtils mathUtils;
             std::string colName = "";
-            for(std::list<int>::iterator iterClasses = classes.begin(); iterClasses != classes.end(); ++iterClasses)
+            for(std::set<int>::iterator iterClasses = classes.begin(); iterClasses != classes.end(); ++iterClasses)
             {
-                std::cout << "Class " << *iterClasses << std::endl;
+                std::cout << "Class " << *iterClasses << " mapped to " << forwardMapping[*iterClasses] << std::endl;
                 mlStruct->classes[idx] = *iterClasses;
                 colName = outClassCol + std::string("Po_") + mathUtils.inttostring(*iterClasses);
                 outColPostNames.push_back(colName);
@@ -555,6 +618,7 @@ namespace rsgis{namespace rastergis{
             for(size_t i = 1; i < numRows; ++i)
             {
                 classID = attTable->GetValueAsInt(i, inClassColIdx);
+                classID = forwardMapping[classID]; // do lookup into contiguous classes
                 if((attTable->GetValueAsInt(i, trainingSelectColIdx) == 1) & (classID > 0))
                 {
                     mlClasses[idx] = classID;
@@ -589,7 +653,7 @@ namespace rsgis{namespace rastergis{
                 if(attTable->GetValueAsInt(i, inClassColIdx) > 0)
                 {
                     // Find local priors...
-                    this->getLocalPriors(mlStruct, attTable, i, trainingSelectColIdx, eastColIdx, northColIdx, inClassColIdx, areaColIdx, searchRadius, allowZeroPriors, priorsMethod, weightA);
+                    this->getLocalPriors(mlStruct, attTable, i, trainingSelectColIdx, eastColIdx, northColIdx, inClassColIdx, forwardMapping, areaColIdx, searchRadius, allowZeroPriors, priorsMethod, weightA);
                     
                     for(size_t j = 0; j < inColumns.size(); ++j)
                     {
@@ -597,6 +661,7 @@ namespace rsgis{namespace rastergis{
                     }
                     
                     classID = mlObj.predict_ml(mlStruct, data, &posteriorProbs);
+                    classID = backMapping[classID]; // convert back to our non contigous classes
                     
                     for(int j = 0; j < mlStruct->nclasses; ++j)
                     {
@@ -652,7 +717,7 @@ namespace rsgis{namespace rastergis{
         return sqrt(dist/((double)numVals));
     }
     
-    void RSGISMaxLikelihoodRATClassification::getLocalPriors(rsgis::math::MaximumLikelihood *mlStruct, GDALRasterAttributeTable *attTable, size_t fid, int trainingSelectColIdx, int eastingsIdx, int northingsIdx, int classColIdx, int areaColIdx, float spatialRadius, bool allowZeroPriors, rsgismlpriors priorsMethod, float weightA)throw(rsgis::RSGISAttributeTableException)
+    void RSGISMaxLikelihoodRATClassification::getLocalPriors(rsgis::math::MaximumLikelihood *mlStruct, GDALRasterAttributeTable *attTable, size_t fid, int trainingSelectColIdx, int eastingsIdx, int northingsIdx, int classColIdx, std::map<int, int> &forwardMapping, int areaColIdx, float spatialRadius, bool allowZeroPriors, rsgismlpriors priorsMethod, float weightA)throw(rsgis::RSGISAttributeTableException)
     {
         try
         {
@@ -688,6 +753,7 @@ namespace rsgis{namespace rastergis{
                     if(dist < spatialRadius)
                     {
                         classVal = attTable->GetValueAsInt(n, classColIdx);
+                        classVal = forwardMapping[classVal];
                         if(classVal > 0)
                         {
                             classFound = false;

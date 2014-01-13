@@ -27,6 +27,8 @@
 #include <string>
 #include <math.h>
 #include <list>
+#include <map>
+#include <set>
 
 #include "gdal_priv.h"
 #include "gdal_rat.h"
@@ -60,7 +62,7 @@ namespace rsgis{namespace rastergis{
         ~RSGISMaxLikelihoodRATClassification();
     protected:
         inline double getEuclideanDistance(std::vector<double> *vals1, std::vector<double> *vals2)throw(rsgis::math::RSGISMathException);
-        inline void getLocalPriors(rsgis::math::MaximumLikelihood *mlStruct, GDALRasterAttributeTable *attTable, size_t fid, int trainingSelectColIdx, int eastingsIdx, int northingsIdx, int classColIdx, int areaColIdx, float spatialRadius, bool allowZeroPriors, rsgismlpriors priorsMethod, float weightA)throw(rsgis::RSGISAttributeTableException);
+        inline void getLocalPriors(rsgis::math::MaximumLikelihood *mlStruct, GDALRasterAttributeTable *attTable, size_t fid, int trainingSelectColIdx, int eastingsIdx, int northingsIdx, int classColIdx, std::map<int, int> &forwardMapping, int areaColIdx, float spatialRadius, bool allowZeroPriors, rsgismlpriors priorsMethod, float weightA)throw(rsgis::RSGISAttributeTableException);
     };
 	
 }}
