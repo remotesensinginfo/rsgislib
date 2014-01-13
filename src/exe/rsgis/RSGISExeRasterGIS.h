@@ -152,6 +152,7 @@ namespace rsgisexe{
         std::string baseClassCol;
         std::string infoClassCol;
         std::string trainingSelectCol;
+        std::string classifySelectCol;
         std::string className;
         std::string tileImage;
         std::string maskImage;

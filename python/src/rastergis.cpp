@@ -764,11 +764,11 @@ static PyObject *RasterGIS_SpecDistMajorityClassifier(PyObject *self, PyObject *
 
 
 static PyObject *RasterGIS_MaxLikelihoodClassifier(PyObject *self, PyObject *args) {
-    const char *inputImage, *inClassNameField, *outClassNameField, *trainingSelectCol, *areaField;
+    const char *inputImage, *inClassNameField, *outClassNameField, *trainingSelectCol, *classifySelectCol, *areaField;
     int priorsMethod;
     PyObject *pFields, *pPriorStrs;
     
-    if(!PyArg_ParseTuple(args, "sssssOiO:maxLikelihoodClassifier", &inputImage, &inClassNameField, &outClassNameField, &trainingSelectCol, &areaField, &pFields, &priorsMethod, &pPriorStrs)) {
+    if(!PyArg_ParseTuple(args, "ssssssOiO:maxLikelihoodClassifier", &inputImage, &inClassNameField, &outClassNameField, &trainingSelectCol, &classifySelectCol, &areaField, &pFields, &priorsMethod, &pPriorStrs)) {
         return NULL;
     }
        
@@ -784,7 +784,8 @@ static PyObject *RasterGIS_MaxLikelihoodClassifier(PyObject *self, PyObject *arg
     rsgis::cmds::rsgismlpriorscmds method = (rsgis::cmds::rsgismlpriorscmds)priorsMethod;
     
     try {
-        rsgis::cmds::executeMaxLikelihoodClassifier(std::string(inputImage), std::string(inClassNameField), std::string(outClassNameField), std::string(trainingSelectCol), std::string(areaField), fields, method, priorStrs);
+        rsgis::cmds::executeMaxLikelihoodClassifier(std::string(inputImage), std::string(inClassNameField), std::string(outClassNameField), std::string(trainingSelectCol), 
+            std::string(classifySelectCol), std::string(areaField), fields, method, priorStrs);
     } catch (rsgis::cmds::RSGISCmdException &e) {
         PyErr_SetString(GETSTATE(self)->error, e.what());
         return NULL;
@@ -795,12 +796,12 @@ static PyObject *RasterGIS_MaxLikelihoodClassifier(PyObject *self, PyObject *arg
 }
 
 static PyObject *RasterGIS_MaxLikelihoodClassifierLocalPriors(PyObject *self, PyObject *args) {
-    const char *inputImage, *inClassNameField, *outClassNameField, *trainingSelectCol, *areaField, *eastingsField, *northingsField;
+    const char *inputImage, *inClassNameField, *outClassNameField, *trainingSelectCol, *classifySelectCol, *areaField, *eastingsField, *northingsField;
     float distThreshold, weightA;
     int priorsMethod, iAllowZeroPriors;
     PyObject *pFields;
     
-    if(!PyArg_ParseTuple(args, "sssssOssfifi:maxLikelihoodClassifierLocalPriors", &inputImage, &inClassNameField, &outClassNameField, &trainingSelectCol, &areaField, &pFields, &eastingsField, &northingsField, &distThreshold, &priorsMethod, &weightA, &iAllowZeroPriors)) {
+    if(!PyArg_ParseTuple(args, "ssssssOssfifi:maxLikelihoodClassifierLocalPriors", &inputImage, &inClassNameField, &outClassNameField, &trainingSelectCol, &classifySelectCol, &areaField, &pFields, &eastingsField, &northingsField, &distThreshold, &priorsMethod, &weightA, &iAllowZeroPriors)) {
         return NULL;
     }
     
@@ -817,7 +818,8 @@ static PyObject *RasterGIS_MaxLikelihoodClassifierLocalPriors(PyObject *self, Py
     bool allowZeroPriors = (iAllowZeroPriors != 0);
     
     try {
-        rsgis::cmds::executeMaxLikelihoodClassifierLocalPriors(std::string(inputImage), std::string(inClassNameField), std::string(outClassNameField), std::string(trainingSelectCol), std::string(areaField), fields, std::string(eastingsField), std::string(northingsField), distThreshold, method, weightA, allowZeroPriors);
+        rsgis::cmds::executeMaxLikelihoodClassifierLocalPriors(std::string(inputImage), std::string(inClassNameField), std::string(outClassNameField), std::string(trainingSelectCol), 
+            std::string(classifySelectCol), std::string(areaField), fields, std::string(eastingsField), std::string(northingsField), distThreshold, method, weightA, allowZeroPriors);
     } catch (rsgis::cmds::RSGISCmdException &e) {
         PyErr_SetString(GETSTATE(self)->error, e.what());
         return NULL;
@@ -1398,37 +1400,39 @@ static PyMethodDef RasterGISMethods[] = {
 },
     
     {"maxLikelihoodClassifier", RasterGIS_MaxLikelihoodClassifier, METH_VARARGS,
-"rastergis.maxLikelihoodClassifier(inputImage, inClassNameField, outClassNameField, trainingSelectCol, areaField, \n"
-"Classifies segments using a maximum likelihood classification\n"
+"rastergis.maxLikelihoodClassifier(inputImage, inClassNameField, outClassNameField, trainingSelectCol, classifySelectCol, areaField, \n"
 "                                                    fields, priorsMethod, priorStrs)\n"
+"Classifies segments using a maximum likelihood classification\n"
 "where:\n"
-" * inputImage is a string containing the name of the input image file TODO: expand\n"
-" * inClassNameField is a string\n"
-" * outClassNameField is a string\n"
-" * trainingSelectCol is a string\n"
-" * areaField is a string\n"
-" * fields is a sequence of strings containing field names\n"
-" * priorsMethod is an int containing one of the values from rsgislib.METHOD_*\n"
-" * priorStrs is a sequence of strings\n"
+" * inputImage is a string containing the name of the input image file. The RAT of the first band is used.\n"
+" * inClassNameField is a string containing the classification column to train on - should be an integer column specifying the class of each row\n"
+" * outClassNameField is a string - the output classification column\n"
+" * trainingSelectCol is a string - the name of the column containing 1's where a row should be used in the training. 0 otherwise\n"
+" * classifySelectCol is a string - the name of the column containing 1's where a row should be used in the classification. 0 otherwise. 0 will be put in outClassCol where this is 0.\n"
+" * areaField is a string - the name of the column containing the relative area - usually the histogram column. Used when priorsMethod == METHOD_AREA\n"
+" * fields is a sequence of strings containing field names for training the classifier\n"
+" * priorsMethod is an int containing one of the values from rsgislib.METHOD_*. Should be either METHOD_EQUAL, METHOD_SAMPLES, METHOD_AREA or METHOD_USERDEFINED\n"
+" * priorStrs is a sequence of strings - containing the priors for METHOD_USERDEFINED - will be converted to floats\n"
 },
     
     {"maxLikelihoodClassifierLocalPriors", RasterGIS_MaxLikelihoodClassifierLocalPriors, METH_VARARGS,
-"rastergis.maxLikelihoodClassifierLocalPriors(inputImage, inClassNameField, outClassNameField, trainingSelectCol, areaField, fields, \n"
-"Classifies segments using a maximum likelihood classification and local priors\n"
+"rastergis.maxLikelihoodClassifierLocalPriors(inputImage, inClassNameField, outClassNameField, trainingSelectCol, classifySelectCol, areaField, fields, \n"
 "                                                    eastingsField, northingsField, distThreshold, priorsMethod, weightA, allowZeroPriors)\n"
+"Classifies segments using a maximum likelihood classification and local priors\n"
 "where:\n"
-" * inputImage is a string containing the name of the input image file TODO: expand\n"
-" * inClassNameField is a string\n"
-" * outClassNameField is a string\n"
-" * trainingSelectCol is a string\n"
-" * areaField is a string\n"
-" * fields is a sequence of strings containing field names\n"
+" * inputImage is a string containing the name of the input image file. The RAT of the first band is used.\n"
+" * inClassNameField is a string containing the classification column to train on - should be an integer column specifying the class of each row\n"
+" * outClassNameField is a string - the output classification column\n"
+" * trainingSelectCol is a string - the name of the column containing 1's where a row should be used in the training. 0 otherwise\n"
+" * classifySelectCol is a string - the name of the column containing 1's where a row should be used in the classification. 0 otherwise. 0 will be put in outClassCol where this is 0.\n"
+" * areaField is a string - the name of the column containing the relative area - usually the histogram column.\n"
+" * fields is a sequence of strings containing field names for training the classifier\n"
 " * eastingsField is a string containing the name of the field holding the eastings\n"
 " * northingsField is a string containing the name of the field holding the northings\n"
-" * distThreshold is a float\n"
-" * priorsMethod is an int containing one of the values from rsgislib.METHOD_*\n"
-" * weightA is a float\n"
-" * allowZeroPriors is a bool\n"
+" * distThreshold is a float - the radius in image units to search when setting the priors from the neighbouring clumps\n"
+" * priorsMethod is an int containing one of the values from rsgislib.METHOD_*. Should be either METHOD_AREA or METHOD_WEIGHTED\n"
+" * weightA is a float. If priorsMethod == METHOD_WEIGHTED this is the weight to use\n"
+" * allowZeroPriors is a bool. If true resets the priors that are zero to the minimum prior value (excluding zero).\n"
 },
     
     {"classMask", RasterGIS_ClassMask, METH_VARARGS,
