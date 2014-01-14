@@ -395,9 +395,10 @@ namespace rsgis{namespace rastergis{
     // priorsMethod is the method to use. either rsgis_area or rsgis_weighted
     // weightA if priorsMethod == rsgis_weighted this is the weight to use
     // allowZeroPriors. If true resets the priors that are zero to the minimum prior value (excluding zero).
+    // forceChangeInClassification. If true modifies the priors so that what the clumps is currently classified as has its prior probability equal to 0
     void RSGISMaxLikelihoodRATClassification::applyMLClassifierLocalPriors(GDALDataset *image, std::string inClassCol, std::string outClassCol, std::string trainingSelectCol, 
             std::string classifySelectCol, std::string areaCol, std::vector<std::string> inColumns, std::string eastingsCol, std::string northingsCol, 
-            float searchRadius, rsgismlpriors priorsMethod, float weightA, bool allowZeroPriors) throw(rsgis::RSGISAttributeTableException)
+            float searchRadius, rsgismlpriors priorsMethod, float weightA, bool allowZeroPriors, bool forceChangeInClassification) throw(rsgis::RSGISAttributeTableException)
     {
         try
         {
@@ -706,7 +707,8 @@ namespace rsgis{namespace rastergis{
                 if(attTable->GetValueAsInt(i, classifySelectColIdx) == 1)
                 {
                     // Find local priors...
-                    this->getLocalPriors(mlStruct, attTable, i, trainingSelectColIdx, eastColIdx, northColIdx, inClassColIdx, forwardMapping, areaColIdx, searchRadius, allowZeroPriors, priorsMethod, weightA);
+                    this->getLocalPriors(mlStruct, attTable, i, trainingSelectColIdx, eastColIdx, northColIdx, inClassColIdx, forwardMapping, areaColIdx, searchRadius, 
+                        allowZeroPriors, priorsMethod, weightA, forceChangeInClassification);
                     
                     for(size_t j = 0; j < inColumns.size(); ++j)
                     {
@@ -714,7 +716,7 @@ namespace rsgis{namespace rastergis{
                     }
                     
                     classID = mlObj.predict_ml(mlStruct, data, &posteriorProbs);
-                    classID = backMapping[classID]; // convert back to our non contigous classes
+                    classID = backMapping[classID]; // convert back to our non contiguous classes
                     
                     for(int j = 0; j < mlStruct->nclasses; ++j)
                     {
@@ -772,7 +774,7 @@ namespace rsgis{namespace rastergis{
     
     void RSGISMaxLikelihoodRATClassification::getLocalPriors(rsgis::math::MaximumLikelihood *mlStruct, GDALRasterAttributeTable *attTable, size_t fid, 
             int trainingSelectColIdx, int eastingsIdx, int northingsIdx, int classColIdx, std::map<int, int> &forwardMapping, int areaColIdx, float spatialRadius, 
-            bool allowZeroPriors, rsgismlpriors priorsMethod, float weightA)throw(rsgis::RSGISAttributeTableException)
+            bool allowZeroPriors, rsgismlpriors priorsMethod, float weightA, bool forceChangeInClassification)throw(rsgis::RSGISAttributeTableException)
     {
         try
         {
@@ -919,7 +921,42 @@ namespace rsgis{namespace rastergis{
                         }
                         sumPriors += mlStruct->priors[i];
                     }
-                    
+                    // make sum to 1                    
+                    for(unsigned int i = 0; i < mlStruct->nclasses; ++i)
+                    {
+                        mlStruct->priors[i] = mlStruct->priors[i]/sumPriors;
+                    }
+                }
+            }
+
+            // set the prior for the current class to 0
+            if(forceChangeInClassification)
+            {
+                classVal = attTable->GetValueAsInt(fid, classColIdx);
+                classVal = forwardMapping[classVal];
+                classFound = false;
+                classFoundIdx = 0;
+                for(unsigned int i = 0; i < mlStruct->nclasses; ++i)
+                {
+                    if(classVal == mlStruct->classes[i])
+                    {
+                        classFound = true;
+                        classFoundIdx = i;
+                        break;
+                    }
+                }
+    
+                if(classFound)
+                {
+                    mlStruct->priors[classFoundIdx] = 0.0;
+                    // ensure it still all sums to 1
+                    float sumPriors = 0;
+
+                    for(unsigned int i = 0; i < mlStruct->nclasses; ++i)
+                    {
+                        sumPriors += mlStruct->priors[i];
+                    }
+                    // make sum to 1                    
                     for(unsigned int i = 0; i < mlStruct->nclasses; ++i)
                     {
                         mlStruct->priors[i] = mlStruct->priors[i]/sumPriors;

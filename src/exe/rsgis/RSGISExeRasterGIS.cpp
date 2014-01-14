@@ -2227,6 +2227,27 @@ namespace rsgisexe{
                 }
                 xercesc::XMLString::release(&noZeroPriorsXMLStr);
 
+                XMLCh *forceChangeInClassificationXMLStr = xercesc::XMLString::transcode("forcechangeinclassification");
+                if(argElement->hasAttribute(forceChangeInClassificationXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(forceChangeInClassificationXMLStr));
+                    std::string forceChangeInClassificationStr = std::string(charValue);
+                    if(forceChangeInClassificationStr == "yes")
+                    {
+                        this->forceChangeInClassification = true;
+                    }
+                    else
+                    {
+                        this->forceChangeInClassification = false;
+                    }
+                    xercesc::XMLString::release(&charValue);
+                }
+                else
+                {
+                    throw rsgis::RSGISXMLArgumentsException("No \'forcechangeinclassification\' attribute was provided.");
+                }
+                xercesc::XMLString::release(&forceChangeInClassificationXMLStr);
+
                 XMLCh *rsgisFieldXMLStr = xercesc::XMLString::transcode("rsgis:field");
                 xercesc::DOMNodeList *fieldNodesList = argElement->getElementsByTagName(rsgisFieldXMLStr);
                 unsigned int numFieldTags = fieldNodesList->getLength();
@@ -3942,6 +3963,14 @@ namespace rsgisexe{
                 {
                     std::cout << "Zero priors will not be allowed\n";
                 }
+                if(this->forceChangeInClassification)
+                {
+                    std::cout << "Classification will be forced to change from current class\n";
+                }
+                else
+                {
+                    std::cout << "Classification will not be forced to change from current class\n";
+                }
                 std::cout << "Using Features:\n";
                 for(std::vector<std::string>::iterator iterFields = fields.begin(); iterFields != fields.end(); ++iterFields)
                 {
@@ -3951,7 +3980,7 @@ namespace rsgisexe{
                 try {
                     rsgis::cmds::executeMaxLikelihoodClassifierLocalPriors(this->inputImage, this->inClassNameField, this->outClassNameField, this->trainingSelectCol, 
                     this->classifySelectCol, this->areaField, this->fields, this->eastingsField, this->northingsField, this->distThreshold, 
-                    (rsgis::cmds::rsgismlpriorscmds)this->priorsMethod, this->weightA, this->allowZeroPriors);
+                    (rsgis::cmds::rsgismlpriorscmds)this->priorsMethod, this->weightA, this->allowZeroPriors, this->forceChangeInClassification);
                 } catch (rsgis::RSGISException e) {
                     throw rsgis::RSGISException(e.what());
                 } catch (rsgis::cmds::RSGISCmdException e) {

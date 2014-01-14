@@ -798,10 +798,11 @@ static PyObject *RasterGIS_MaxLikelihoodClassifier(PyObject *self, PyObject *arg
 static PyObject *RasterGIS_MaxLikelihoodClassifierLocalPriors(PyObject *self, PyObject *args) {
     const char *inputImage, *inClassNameField, *outClassNameField, *trainingSelectCol, *classifySelectCol, *areaField, *eastingsField, *northingsField;
     float distThreshold, weightA;
-    int priorsMethod, iAllowZeroPriors;
+    int priorsMethod, iAllowZeroPriors, iforceChangeInClassification;
     PyObject *pFields;
     
-    if(!PyArg_ParseTuple(args, "ssssssOssfifi:maxLikelihoodClassifierLocalPriors", &inputImage, &inClassNameField, &outClassNameField, &trainingSelectCol, &classifySelectCol, &areaField, &pFields, &eastingsField, &northingsField, &distThreshold, &priorsMethod, &weightA, &iAllowZeroPriors)) {
+    if(!PyArg_ParseTuple(args, "ssssssOssfifii:maxLikelihoodClassifierLocalPriors", &inputImage, &inClassNameField, &outClassNameField, &trainingSelectCol, 
+            &classifySelectCol, &areaField, &pFields, &eastingsField, &northingsField, &distThreshold, &priorsMethod, &weightA, &iAllowZeroPriors, &iforceChangeInClassification)) {
         return NULL;
     }
     
@@ -816,10 +817,11 @@ static PyObject *RasterGIS_MaxLikelihoodClassifierLocalPriors(PyObject *self, Py
     
     rsgis::cmds::rsgismlpriorscmds method = (rsgis::cmds::rsgismlpriorscmds)priorsMethod;
     bool allowZeroPriors = (iAllowZeroPriors != 0);
+    bool forceChangeInClassification = (iforceChangeInClassification != 0);
     
     try {
         rsgis::cmds::executeMaxLikelihoodClassifierLocalPriors(std::string(inputImage), std::string(inClassNameField), std::string(outClassNameField), std::string(trainingSelectCol), 
-            std::string(classifySelectCol), std::string(areaField), fields, std::string(eastingsField), std::string(northingsField), distThreshold, method, weightA, allowZeroPriors);
+            std::string(classifySelectCol), std::string(areaField), fields, std::string(eastingsField), std::string(northingsField), distThreshold, method, weightA, allowZeroPriors, forceChangeInClassification);
     } catch (rsgis::cmds::RSGISCmdException &e) {
         PyErr_SetString(GETSTATE(self)->error, e.what());
         return NULL;
