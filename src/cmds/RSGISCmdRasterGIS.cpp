@@ -750,7 +750,7 @@ namespace rsgis{ namespace cmds {
 
     void executeMaxLikelihoodClassifierLocalPriors(std::string inputImage, std::string inClassNameField, std::string outClassNameField, std::string trainingSelectCol, std::string classifySelectCol, 
                                                   std::string areaField, std::vector<std::string> fields, std::string eastingsField, std::string northingsField,
-                                                  float distThreshold, rsgismlpriorscmds priorsMethod, float weightA, bool allowZeroPriors)throw(RSGISCmdException) {
+                                                  float distThreshold, rsgismlpriorscmds priorsMethod, float weightA, bool allowZeroPriors, bool forceChangeInClassification)throw(RSGISCmdException) {
         GDALAllRegister();
         GDALDataset *inputDataset;
         try {
@@ -765,7 +765,7 @@ namespace rsgis{ namespace cmds {
             rsgis::rastergis::rsgismlpriors priMeth = (rsgis::rastergis::rsgismlpriors) priorsMethod;
 
             mlRat.applyMLClassifierLocalPriors(inputDataset, inClassNameField, outClassNameField, trainingSelectCol, classifySelectCol, areaField, 
-                    fields, eastingsField, northingsField, distThreshold, priMeth, weightA, allowZeroPriors);
+                    fields, eastingsField, northingsField, distThreshold, priMeth, weightA, allowZeroPriors, forceChangeInClassification);
 
             GDALClose(inputDataset);
         } catch(rsgis::RSGISException &e) {

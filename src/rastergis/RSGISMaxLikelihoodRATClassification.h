@@ -60,11 +60,14 @@ namespace rsgis{namespace rastergis{
         void applyMLClassifier(GDALDataset *image, std::string inClassCol, std::string outClassCol, std::string trainingSelectCol, std::string classifySelectCol, 
                 std::string areaCol, std::vector<std::string> inColumns, rsgismlpriors priorsMethod, std::vector<float> defPriors) throw(rsgis::RSGISAttributeTableException);
         void applyMLClassifierLocalPriors(GDALDataset *image, std::string inClassCol, std::string outClassCol, std::string trainingSelectCol, 
-                std::string classifySelectCol, std::string areaCol, std::vector<std::string> inColumns, std::string eastingsCol, std::string northingsCol, float searchRadius, rsgismlpriors priorsMethod, float weightA, bool allowZeroPriors) throw(rsgis::RSGISAttributeTableException);
+                std::string classifySelectCol, std::string areaCol, std::vector<std::string> inColumns, std::string eastingsCol, std::string northingsCol, float searchRadius, 
+                rsgismlpriors priorsMethod, float weightA, bool allowZeroPriors, bool forceChangeInClassification) throw(rsgis::RSGISAttributeTableException);
         ~RSGISMaxLikelihoodRATClassification();
     protected:
         inline double getEuclideanDistance(std::vector<double> *vals1, std::vector<double> *vals2)throw(rsgis::math::RSGISMathException);
-        inline void getLocalPriors(rsgis::math::MaximumLikelihood *mlStruct, GDALRasterAttributeTable *attTable, size_t fid, int trainingSelectColIdx, int eastingsIdx, int northingsIdx, int classColIdx, std::map<int, int> &forwardMapping, int areaColIdx, float spatialRadius, bool allowZeroPriors, rsgismlpriors priorsMethod, float weightA)throw(rsgis::RSGISAttributeTableException);
+        inline void getLocalPriors(rsgis::math::MaximumLikelihood *mlStruct, GDALRasterAttributeTable *attTable, size_t fid, int trainingSelectColIdx, int eastingsIdx, int northingsIdx, 
+            int classColIdx, std::map<int, int> &forwardMapping, int areaColIdx, float spatialRadius, bool allowZeroPriors, rsgismlpriors priorsMethod, 
+            float weightA, bool forceChangeInClassification)throw(rsgis::RSGISAttributeTableException);
     };
 	
 }}

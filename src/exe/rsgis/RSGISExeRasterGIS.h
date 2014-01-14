@@ -185,6 +185,7 @@ namespace rsgisexe{
         rsgis::rastergis::rsgismlpriors priorsMethod;
         std::vector<std::string> priorStrs;
         bool allowZeroPriors;
+        bool forceChangeInClassification;
         bool ignoreZeroEdges;
         std::vector<rsgis::rastergis::RSGISShapeParam*> *shapeIndexes;
         unsigned int tileBoundary;
