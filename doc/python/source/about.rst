@@ -27,6 +27,12 @@ To date it's been used as part of a number of publications and theses, for more 
 
 Peter Bunting, Daniel Clewley, Richard M. Lucas and Sam Gillingham. 2014. The Remote Sensing and GIS Software Library (RSGISLib), Computers & Geosciences. Volume 62, Pages 216-226 http://dx.doi.org/10.1016/j.cageo.2013.08.007.
 
+**How do I cite RSGISLib?**
+
+If you have used RSGISLib for published work then you should cite the following publication, and / or the specific paper of the algorithm you used (if applicable). 
+
+Peter Bunting, Daniel Clewley, Richard M. Lucas and Sam Gillingham. 2014. The Remote Sensing and GIS Software Library (RSGISLib), Computers & Geosciences. Volume 62, Pages 216-226 http://dx.doi.org/10.1016/j.cageo.2013.08.007.
+
 **Is RSGISLib intended to be a substitute for commercial GIS / RS packages or other open source packages?**
 
 No, RSGISLib is not being developed as a substitute for ArcMap / QGIS or ENVI. As stated above, RSGISLib is mainly developed to support our research, because of this there is a lot of advanced functionality in RSGISLib that is unavailable in other packages. Although RSGISLib works well on the desktop, it scales well to a High Performance Computing (HPC) environment, which is an area many of the previously mentioned software aren't focusing on.
@@ -35,7 +41,7 @@ For visualising data it is recommended RSGISLib is used in combination with TuiV
 
 **Is this free software?**
 
-Yes, this software is provided freely under a GPL3 license. The software is free to use and the source code is available to look at and modify.
+Yes, this software is provided freely under a GPL3 license. The software is free to use and the source code is available to view and modify.
 
 **Where can I get help with RSGISLib?**
 
@@ -45,14 +51,19 @@ Help is available for RSGISLib through emailing our mailing list: rsgislib-suppo
 
 The archive is available to view at `groups.google.com <https://groups.google.com/forum/#!forum/rsgislib-support>`_ 
 
+**Do you offer training on RSGISLib?**
+
+RSGISLib is taught as part of the Masters course at Aberystwyth University. The notes for the Python course, which include a chapter using RSGISLib for object based classification is available `Here <https://bitbucket.org/petebunting/python-tutorial-for-spatial-data-processing>`_. We have recently given a training course at the 20th JAXA Kyoto & Carbon initiative meeting (notes available shortly). If you are interested in training sessions, please contact us.
+
 **How do I go about getting functionality added to RSGISLib?**
 
-For general suggestions submit a ticket on our `issues <https://bitbucket.org/petebunting/rsgislib/issues?status=new&status=open>`_ page on Bitbucket or post a suggestion on the mailing list. If there's functionality you need adding for a specific project you could try to add it yourself or you can contact us to enquire about consultancy work. 
+For general suggestions submit a ticket on our `issues <https://bitbucket.org/petebunting/rsgislib/issues?status=new&status=open>`_ page on Bitbucket or post a suggestion to the Google groups mainling list. If there's functionality you need adding for a specific project you could try to add it yourself or you can contact us to enquire about consultancy work. 
 
-**How do I cite RSGISLib?**
+**Who funds RSGISLib?**
 
-If you have used RSGISLib for published work then you should cite the following publication, and / or the specific paper of the algorithm you used (if applicable). 
+There has been no direct funding to develop RSGISLib or obligations to release it. However, there has been funding which has supported us and allowed us work on it. 
 
-Peter Bunting, Daniel Clewley, Richard M. Lucas and Sam Gillingham. 2014. The Remote Sensing and GIS Software Library (RSGISLib), Computers & Geosciences. Volume 62, Pages 216-226 http://dx.doi.org/10.1016/j.cageo.2013.08.007.
+Pete Bunting is employed by Aberystwyth University and has been since RSGISLib was started, with the exception of a year spent at Landcare Research (New Zealand), where a number of features including the segmentation and Raster GIS were added. Landcare Research continue to provide support for Pete. 
 
+Dan Clewley's PhD (2008 - 2012) was funded by a NERC studentship. He is currently employed in `Mahta Moghaddam's <http://mixil.usc.edu/people/director/>`_ Microwave Systems Sensors and Imaging Lab (MiXIL) at the University of Southern California, primarily funded through a NASA-ESDR award.
 
