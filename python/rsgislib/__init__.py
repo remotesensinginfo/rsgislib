@@ -18,13 +18,13 @@ Data Types for images:
     * TYPE_32FLOAT = 9
     * TYPE_64FLOAT = 10
 
-TODO: What are these for???
+Methods for the Maximum Likelihood Classifier:
 
-    * METHOD_SAMPLES = 0
-    * METHOD_AREA = 1
-    * METHOD_EQUAL = 2
-    * METHOD_USERDEFINED = 3
-    * METHOD_WEIGHTED = 4
+    * METHOD_SAMPLES = 0        # as calculated by ML
+    * METHOD_AREA = 1           # priors set by the relative area
+    * METHOD_EQUAL = 2          # priors all equal
+    * METHOD_USERDEFINED = 3    # priors passed in to function
+    * METHOD_WEIGHTED = 4       # priors by area but with a weight applied
 
 Shape indexes used with RasterGIS:
 
@@ -73,11 +73,11 @@ TYPE_64UINT = 8
 TYPE_32FLOAT = 9
 TYPE_64FLOAT = 10
 
-METHOD_SAMPLES = 0
-METHOD_AREA = 1
-METHOD_EQUAL = 2
-METHOD_USERDEFINED = 3
-METHOD_WEIGHTED = 4
+METHOD_SAMPLES = 0      # as calculated by ML
+METHOD_AREA = 1         # priors set by the relative area
+METHOD_EQUAL = 2        # priors all equal
+METHOD_USERDEFINED = 3  # priors passed in to function
+METHOD_WEIGHTED = 4     # priors by area but with a weight applied
 
 SHAPE_SHAPENA = 0
 SHAPE_SHAPEAREA = 1
