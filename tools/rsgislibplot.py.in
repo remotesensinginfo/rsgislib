@@ -41,14 +41,14 @@ from pylab import *
 try:
     import numpy as np
 except ImportError:
-    print '''Numpy is required for this script, not found.
-Check: http://numpy.scipy.org/'''
+    print('''Numpy is required for this script, not found.
+Check: http://numpy.scipy.org/''')
     exit()
 try:
     import matplotlib.pyplot as plt
 except ImportError:
-    print '''MatPlotLib is required for this script, not found.
-Check: http://matplotlib.sourceforge.net/'''
+    print('''MatPlotLib is required for this script, not found.
+Check: http://matplotlib.sourceforge.net/''')
     exit()
 try:
     from enthought.mayavi import mlab
@@ -93,11 +93,11 @@ class PlotFreq2D (object):
     def help(self):
         plotObj = RSGISLibPlot();
         plotObj.help()
-        print 'Additional Parameters for Freq2D.'
-        print '\t<FORMAT> - output file format of the plot (PNG | PDF)'
+        print('Additional Parameters for Freq2D.')
+        print('\t<FORMAT> - output file format of the plot (PNG | PDF)')
     
     def createPlot(self):
-        print "PlotFreq2D - Basic Implementation.."
+        print("PlotFreq2D - Basic Implementation..")
         numargs = len(sys.argv)
         if numargs == 4:
             inputFile = sys.argv[1].strip()
@@ -113,22 +113,22 @@ class PlotFreq2D (object):
 class PlotFreq3D (object):
     
     def createPlot(self):
-        print "PlotFreq3D - NOT IMPLEMENTED YET!!"
+        print("PlotFreq3D - NOT IMPLEMENTED YET!!")
 
 class PlotLines2D (object):
     
     def createPlot(self):
-        print "PlotLines2D - NOT IMPLEMENTED YET!!"
+        print("PlotLines2D - NOT IMPLEMENTED YET!!")
 
 class PlotLines3D (object):
     
     def createPlot(self):
-        print "PlotLines3D - NOT IMPLEMENTED YET!!"
+        print("PlotLines3D - NOT IMPLEMENTED YET!!")
 
 class PlotDensity (object):
     
     def createPlot(self):
-        print "PlotDensity - NOT IMPLEMENTED YET!!"
+        print("PlotDensity - NOT IMPLEMENTED YET!!")
 
 class Plot2DScatter (object):
     
@@ -153,11 +153,11 @@ class Plot2DScatter (object):
     def help(self):
         plotObj = RSGISLibPlot();
         plotObj.help()
-        print 'Additional Parameters for Freq2D.'
-        print '\t<FORMAT> - output file format of the plot (PNG | PDF)'
+        print('Additional Parameters for Freq2D.')
+        print('\t<FORMAT> - output file format of the plot (PNG | PDF)')
     
     def createPlot(self):
-        print "Plot2DScatter - Basic Implementation.."
+        print("Plot2DScatter - Basic Implementation..")
         numargs = len(sys.argv)
         if numargs == 4:
             inputFile = sys.argv[1].strip()
@@ -169,8 +169,8 @@ class Plot2DScatter (object):
             try:
                 self.readPTXTFile(inputFile, dataX, dataY)
                 self.plot(dataX, dataY, outputFile, format)
-            except Exception, e:
-                print "Error: ", e
+            except Exception as e:
+                print("Error: ", e)
         else:
             self.help()
         
@@ -250,11 +250,11 @@ class PlotClass2DScatter (object):
     def help(self):
         plotObj = RSGISLibPlot();
         plotObj.help()
-        print 'Additional Parameters for Class2DScatter.'
-        print '\t<FORMAT> - output file format of the plot (PNG | PDF)'
+        print('Additional Parameters for Class2DScatter.')
+        print('\t<FORMAT> - output file format of the plot (PNG | PDF)')
     
     def createPlot(self):
-        print "Class2DScatter "
+        print("Class2DScatter ")
         numargs = len(sys.argv)
         if numargs == 4:
             inputFile = sys.argv[1].strip()
@@ -278,8 +278,8 @@ class PlotClass2DScatter (object):
                 del dataRawX
                 del dataRawY
                 self.plot(dataX, dataY, classNames, classNamesLowLim, classNamesUpLim, outputFile, format)
-            except Exception, e:
-                print "Error: ", e
+            except Exception as e:
+                print("Error: ", e)
         else:
             self.help()
 
@@ -340,11 +340,11 @@ class Plot3DScatter (object):
     def help(self):
         plotObj = RSGISLibPlot();
         plotObj.help()
-        print 'Additional Parameters for scatter3D.'
-        print '\t<FORMAT> - output file format of the plot (PNG | PDF)'
+        print('Additional Parameters for scatter3D.')
+        print('\t<FORMAT> - output file format of the plot (PNG | PDF)')
     
     def createPlot(self):
-        print "Plot3DScatter - Basic Implementation.."
+        print("Plot3DScatter - Basic Implementation..")
         numargs = len(sys.argv)
         if numargs == 4:
             inputFile = sys.argv[1].strip()
@@ -357,20 +357,20 @@ class Plot3DScatter (object):
             try:
                 self.readPTXTFile(inputFile, dataX, dataY, dataZ)
                 self.plot(dataX, dataY, dataZ, outputFile, format)
-            except Exception, e:
-                print "Error: ", e
+            except Exception as e:
+                print("Error: ", e)
         else:
             self.help()
 
 class Plotc2DScatter (object):
 
     def createPlot(self):
-        print "Plotc2DScatter - NOT IMPLEMENTED YET!!"
+        print("Plotc2DScatter - NOT IMPLEMENTED YET!!")
 
 class Plotc3DScatter (object):
     
     def createPlot(self):
-        print "Plotc3DScatter - NOT IMPLEMENTED YET!!"
+        print("Plotc3DScatter - NOT IMPLEMENTED YET!!")
 
 class PlotSurface (object):
     
@@ -416,9 +416,9 @@ class PlotSurface (object):
         plotObj.help()
     
     def createPlot(self):
-        print "PlotSurface - Basic Implementation.."
+        print("PlotSurface - Basic Implementation..")
         if importMlab == False:
-            print 'mayavi, from Enthough Python distribution is required for surface plots, not found'
+            print('mayavi, from Enthough Python distribution is required for surface plots, not found')
             exit()
         numargs = len(sys.argv)
         if numargs == 4: 
@@ -429,18 +429,18 @@ class PlotSurface (object):
             dataY = list()
             dataZ = list()
             try:
-                print "Reading Data "
+                print("Reading Data ")
                 self.readPTXTFile(inputFile, dataX, dataY, dataZ)   
                 self.plot(dataX, dataY, dataZ, outputFile)
-            except Exception, e:
-                print "Error: ", e
+            except Exception as e:
+                print("Error: ", e)
         else:
             self.help()
 
 class PlotcSurface (object):
     
     def createPlot(self):
-        print "PlotcSurface - NOT IMPLEMENTED YET!!"
+        print("PlotcSurface - NOT IMPLEMENTED YET!!")
 
 
 class RSGISLibPlot (object):
@@ -458,51 +458,51 @@ class RSGISLibPlot (object):
             plotObj = PlotFreq2D()
             plotObj.createPlot()
         elif plottype == "#freq3D":
-            print "Plot freq3D"
+            print("Plot freq3D")
             plotObj = PlotFreq3D()
             plotObj.createPlot()
         elif plottype == "#lines2D":
-            print "Plot lines2D"
+            print("Plot lines2D")
             plotObj = PlotLines2D()
             plotObj.createPlot()
         elif plottype == "#lines3D":
-            print "Plot lines3D"
+            print("Plot lines3D")
             plotObj = PlotLines3D()
             plotObj.createPlot()
         elif plottype == "#Density":
-            print "Plot Density"
+            print("Plot Density")
             plotObj = PlotDensity()
             plotObj.createPlot()
         elif plottype == "#2DScatter":
-            print "Plot 2DScatter"
+            print("Plot 2DScatter")
             plotObj = Plot2DScatter()
             plotObj.createPlot()
         elif plottype == "#ClassScatter2D":
-            print "Plot ClassScatter2D"
+            print("Plot ClassScatter2D")
             plotObj = PlotClass2DScatter()
             plotObj.createPlot()
         elif plottype == "#3DScatter":
-            print "Plot 3DScatter"
+            print("Plot 3DScatter")
             plotObj = Plot3DScatter()
             plotObj.createPlot()
         elif plottype == "#c2DScatter":
-            print "Plot c2DScatter"
+            print("Plot c2DScatter")
             plotObj = Plotc2DScatter()
             plotObj.createPlot()
         elif plottype == "#c3DScatter":
-            print "Plot c3DScatter"
+            print("Plot c3DScatter")
             plotObj = Plotc3DScatter()
             plotObj.createPlot()
         elif plottype == "#Surface":
-            print "Plot Surface"
+            print("Plot Surface")
             plotObj = PlotSurface()
             plotObj.createPlot()
         elif plottype == "#cSurface":
-            print "Plot cSurface"
+            print("Plot cSurface")
             plotObj = PlotcSurface()
             plotObj.createPlot()
         else:
-            print "ERROR: Did not recognise the plot type \'" + plottype + "\'."
+            print("ERROR: Did not recognise the plot type \'" + plottype + "\'.")
             
     
     def run(self):
@@ -513,19 +513,19 @@ class RSGISLibPlot (object):
             if os.path.exists(inputFile):
                 self.runPlot(inputFile)
             else:
-                print 'Input File does not exist'
+                print('Input File does not exist')
         else:
             self.help()
     
     def help(self):
-        print 'rsgislibplot.py script generates plots from ptxt files generated from the '
-        print '@PACKAGE@ software library'
-        print 'Usage: python rsgislibplot.py <INPUT> <OUTPUT> [PLOT SPECIFIC]'
-        print '\t<INPUT> - input ptxt file'
-        print '\t<OUTPUT> - output plot'
-        print '\nThis script was distributed with @RSGISLIB_PACKAGE_STRING@'
-        print 'Copyright (C) @RSGISLIB_COPYRIGHT_YEAR@ Peter Bunting and Daniel Clewley'
-        print 'For support please email @RSGISLIB_PACKAGE_BUGREPORT@'
+        print('rsgislibplot.py script generates plots from ptxt files generated from the ')
+        print('@PACKAGE@ software library')
+        print('Usage: python rsgislibplot.py <INPUT> <OUTPUT> [PLOT SPECIFIC]')
+        print('\t<INPUT> - input ptxt file')
+        print('\t<OUTPUT> - output plot')
+        print('\nThis script was distributed with @RSGISLIB_PACKAGE_STRING@')
+        print('Copyright (C) @RSGISLIB_COPYRIGHT_YEAR@ Peter Bunting and Daniel Clewley')
+        print('For support please email @RSGISLIB_PACKAGE_BUGREPORT@')
 
 if __name__ == '__main__':
     obj = RSGISLibPlot()
