@@ -55,7 +55,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'RSGISLib'
-copyright = u'2013, Pete Bunting and Daniel Clewley'
+copyright = u'2014, Pete Bunting and Daniel Clewley'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
