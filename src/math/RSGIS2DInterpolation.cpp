@@ -304,7 +304,7 @@ namespace rsgis {namespace math{
                 double weight = 0.0;
                 for(std::vector<RSGISInterpolatorDataPoint>::iterator iterPts = pts->begin(); iterPts != pts->end(); ++iterPts)
                 {
-                    weight = 1 / pow(sqrt(pow((eastings - (*iterPts).x), 2) + pow((northings - (*iterPts).y), 2)),this->p);
+                    weight = 1 / pow(sqrt(pow((eastings - (*iterPts).x), 2) + pow((northings - (*iterPts).y), 2)),(double)this->p);
                     totalWeight += weight;
                 }
                 
@@ -313,7 +313,7 @@ namespace rsgis {namespace math{
                 
                 for(std::vector<RSGISInterpolatorDataPoint>::iterator iterPts = pts->begin(); iterPts != pts->end(); ++iterPts)
                 {
-                    weight = 1 / pow(sqrt(pow((eastings - (*iterPts).x), 2) + pow((northings - (*iterPts).y), 2)),this->p);
+                    weight = 1 / pow(sqrt(pow((eastings - (*iterPts).x), 2) + pow((northings - (*iterPts).y), 2)),(double)this->p);
                     
                     outValue += ((*iterPts).value * weight) / totalWeight;
                 }

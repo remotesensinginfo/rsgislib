@@ -43,7 +43,7 @@ namespace rsgis{namespace filter{
             numVal = 0;
 
             // Check for data at the centre of the block (skip if no data to preserve scene edges)
-            if((dataBlock[i][middleVal][middleVal] == 0) | (boost::math::isnan(dataBlock[i][middleVal][middleVal])))
+            if((dataBlock[i][middleVal][middleVal] == 0) | ((boost::math::isnan)(dataBlock[i][middleVal][middleVal])))
             {
                 outI = 0;
             }
@@ -53,7 +53,7 @@ namespace rsgis{namespace filter{
                 {
                     for(int k = 0; k < size; k++)
                     {
-                         if((dataBlock[i][j][k] != 0) && (boost::math::isnan(dataBlock[i][j][k]) == false))
+                         if((dataBlock[i][j][k] != 0) && ((boost::math::isnan)(dataBlock[i][j][k]) == false))
                          {
                              iMean = iMean + dataBlock[i][j][k];
                              iSqMean = iSqMean + (dataBlock[i][j][k]*dataBlock[i][j][k]);
@@ -107,7 +107,7 @@ namespace rsgis{namespace filter{
             numVal = 0;
 
             // Check for data at the centre of the block (skip if no data to preserve scene edges)
-            if((dataBlock[i][middleVal][middleVal] == 0) | (boost::math::isnan(dataBlock[i][middleVal][middleVal])))
+            if((dataBlock[i][middleVal][middleVal] == 0) | ((boost::math::isnan)(dataBlock[i][middleVal][middleVal])))
             {
                 outI = 0;
             }
@@ -117,7 +117,7 @@ namespace rsgis{namespace filter{
                 {
                     for(int k = 0; k < size; k++)
                     {
-                        if((dataBlock[i][j][k] != 0) && (boost::math::isnan(dataBlock[i][j][k]) == false))
+                        if((dataBlock[i][j][k] != 0) && ((boost::math::isnan)(dataBlock[i][j][k]) == false))
                         {
                             iMean = iMean + sqrt(dataBlock[i][j][k]);
                             iSqMean = iSqMean + dataBlock[i][j][k];
@@ -163,7 +163,7 @@ namespace rsgis{namespace filter{
             numVal = 0;
 
             // Check for data at the centre of the block (skip if no data to preserve scene edges)
-            if((dataBlock[i][middleVal][middleVal] == 0) | (boost::math::isnan(dataBlock[i][middleVal][middleVal])))
+            if((dataBlock[i][middleVal][middleVal] == 0) | ((boost::math::isnan)(dataBlock[i][middleVal][middleVal])))
             {
                 outI = 0;
             }
@@ -173,7 +173,7 @@ namespace rsgis{namespace filter{
                 {
                     for(int k = 0; k < size; k++)
                     {
-                        if((dataBlock[i][j][k] != 0) && (boost::math::isnan(dataBlock[i][j][k]) == false))
+                        if((dataBlock[i][j][k] != 0) && ((boost::math::isnan)(dataBlock[i][j][k]) == false))
                         {
                             iMean = iMean + log(dataBlock[i][j][k]);
                             iSqMean = iSqMean + log(dataBlock[i][j][k])*log(dataBlock[i][j][k]);
@@ -218,7 +218,7 @@ namespace rsgis{namespace filter{
             numVal = 0;
 
             // Check for data at the centre of the block (skip if no data to preserve scene edges)
-            if((dataBlock[i][middleVal][middleVal] == 0) | (boost::math::isnan(dataBlock[i][middleVal][middleVal])))
+            if((dataBlock[i][middleVal][middleVal] == 0) | ((boost::math::isnan)(dataBlock[i][middleVal][middleVal])))
             {
                 outI = 0;
             }
@@ -228,7 +228,7 @@ namespace rsgis{namespace filter{
                 {
                     for(int k = 0; k < size; k++)
                     {
-                        if((dataBlock[i][j][k] != 0) && (boost::math::isnan(dataBlock[i][j][k]) == false))
+                        if((dataBlock[i][j][k] != 0) && ((boost::math::isnan)(dataBlock[i][j][k]) == false))
                         {
                             iMean = iMean + dataBlock[i][j][k];
                             iLnMean = iLnMean + log(dataBlock[i][j][k]);
@@ -274,7 +274,7 @@ namespace rsgis{namespace filter{
             numVal = 0;
 
             // Check for data at the centre of the block (skip if no data to preserve scene edges)
-            if((dataBlock[i][middleVal][middleVal] == 0) | (boost::math::isnan(dataBlock[i][middleVal][middleVal])))
+            if((dataBlock[i][middleVal][middleVal] == 0) | ((boost::math::isnan)(dataBlock[i][middleVal][middleVal])))
             {
                 outI = 0;
             }
@@ -284,7 +284,7 @@ namespace rsgis{namespace filter{
                 {
                     for(int k = 0; k < size; k++)
                     {
-                         if((dataBlock[i][j][k] != 0) && (boost::math::isnan(dataBlock[i][j][k]) == false))
+                         if((dataBlock[i][j][k] != 0) && ((boost::math::isnan)(dataBlock[i][j][k]) == false))
                          {
                              iSum = iSum + dataBlock[i][j][k];
                              ++numVal;
@@ -301,7 +301,7 @@ namespace rsgis{namespace filter{
                     {
                         for(int k = 0; k < size; k++)
                         {
-                             if((dataBlock[i][j][k] != 0) && (boost::math::isnan(dataBlock[i][j][k]) == false))
+                             if((dataBlock[i][j][k] != 0) && ((boost::math::isnan)(dataBlock[i][j][k]) == false))
                              {
                                  iMinusMeanSqSum = iMinusMeanSqSum + pow((dataBlock[i][j][k] - iMean),2);
                              }

@@ -152,6 +152,7 @@ namespace rsgisexe{
         std::string baseClassCol;
         std::string infoClassCol;
         std::string trainingSelectCol;
+        std::string classifySelectCol;
         std::string className;
         std::string tileImage;
         std::string maskImage;
@@ -184,6 +185,7 @@ namespace rsgisexe{
         rsgis::rastergis::rsgismlpriors priorsMethod;
         std::vector<std::string> priorStrs;
         bool allowZeroPriors;
+        bool forceChangeInClassification;
         bool ignoreZeroEdges;
         std::vector<rsgis::rastergis::RSGISShapeParam*> *shapeIndexes;
         unsigned int tileBoundary;

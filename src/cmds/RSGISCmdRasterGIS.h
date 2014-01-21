@@ -187,10 +187,10 @@ namespace rsgis{ namespace cmds {
     void executeSpecDistMajorityClassifier(std::string inputImage, std::string inClassNameField, std::string outClassNameField, std::string trainingSelectCol, std::string eastingsField, std::string northingsField, std::string areaField, std::string majWeightField, std::vector<std::string> fields, float distThreshold, float specDistThreshold, SpectralDistanceMethodCmds distMethod, float specThresOriginDist)throw(RSGISCmdException);
 
     /** Function to classify segments using a maximum likelihood classification */
-    void executeMaxLikelihoodClassifier(std::string inputImage, std::string inClassNameField, std::string outClassNameField, std::string trainingSelectCol, std::string areaField, std::vector<std::string> fields, rsgismlpriorscmds priorsMethod, std::vector<std::string> priorStrs)throw(RSGISCmdException);
+    void executeMaxLikelihoodClassifier(std::string inputImage, std::string inClassNameField, std::string outClassNameField, std::string trainingSelectCol, std::string classifySelectCol, std::string areaField, std::vector<std::string> fields, rsgismlpriorscmds priorsMethod, std::vector<std::string> priorStrs)throw(RSGISCmdException);
 
     /** Function to classify segments using a spectral distance majority classification */
-    void executeMaxLikelihoodClassifierLocalPriors(std::string inputImage, std::string inClassNameField, std::string outClassNameField, std::string trainingSelectCol, std::string areaField, std::vector<std::string> fields, std::string eastingsField, std::string northingsField, float distThreshold, rsgismlpriorscmds priorsMethod, float weightA, bool allowZeroPriors)throw(RSGISCmdException);
+    void executeMaxLikelihoodClassifierLocalPriors(std::string inputImage, std::string inClassNameField, std::string outClassNameField, std::string trainingSelectCol, std::string classifySelectCol, std::string areaField, std::vector<std::string> fields, std::string eastingsField, std::string northingsField, float distThreshold, rsgismlpriorscmds priorsMethod, float weightA, bool allowZeroPriors, bool forceChangeInClassification)throw(RSGISCmdException);
 
     /** Function to generate a mask for paraticular class */
     void executeClassMask(std::string inputImage, std::string classField, std::string className, std::string outputFile, std::string imageFormat, RSGISLibDataType dataType)throw(RSGISCmdException);
