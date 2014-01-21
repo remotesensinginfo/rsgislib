@@ -46,7 +46,7 @@ def stringTokenizer(line, delimiter):
             token = str()
         else:
             token = token + line[i]
-    if token.strip() <> '':
+    if token.strip() != '':
         tokens.append(token)
     return tokens
 
@@ -81,7 +81,7 @@ class RSGISLibENVIPlot2MTXT (object):
                 lengthN = len(dataList)
             else:
                 if lengthN != len(dataList):
-                    print "ERROR: All input datasets need to be of the same length."
+                    print("ERROR: All input datasets need to be of the same length.")
                     sys.exit(-1)
         outFile = open(outputFilePath, 'w')
         outFile.write("m=")
@@ -105,7 +105,7 @@ class RSGISLibENVIPlot2MTXT (object):
     def run(self):
         numArgs = len(sys.argv)
         if numArgs > 2:
-            print "Start."
+            print("Start.")
             outputFile = sys.argv[1].strip()
             fileList = list()
             count = 0
@@ -114,25 +114,25 @@ class RSGISLibENVIPlot2MTXT (object):
                     if os.path.exists(item):
                         fileList.append(item.strip())
                     else:
-                        print str(item) + ' does not exist.'
+                        print(str(item) + ' does not exist.')
                         sys.exit(-1)
                 count = count + 1
             inputtedData = self.importASCIIPlots(fileList)
             self.exportData(outputFile, inputtedData)
-            print "Complete."
+            print("Complete.")
         else:
-            print "You need to provide at least two parameters\n"
+            print("You need to provide at least two parameters\n")
             self.help()
     
     def help(self):
-        print 'rsgislibENVIPlot2MTXT.py script converts ENVI ASCII plot '
-        print 'to an matrix (mtxt) file for the @PACKAGE@ software library'
-        print 'Usage: python rsgislibENVIPlot2MTXT.py <OUTPUT> <LIST OF INPUTS>'
-        print '\t<OUTPUT> - output mtxt (rsgislib matrix) file'
-        print '\t<INPUT> - list of plots exported from ENVI as ASCII (see user guide)'
-        print '\nThis script was distributed with @RSGISLIB_PACKAGE_STRING@'
-        print 'Copyright (C) @RSGISLIB_COPYRIGHT_YEAR@ Peter Bunting and Daniel Clewley'
-        print 'For support please email @RSGISLIB_PACKAGE_BUGREPORT@'
+        print('rsgislibENVIPlot2MTXT.py script converts ENVI ASCII plot ')
+        print('to an matrix (mtxt) file for the @PACKAGE@ software library')
+        print('Usage: python rsgislibENVIPlot2MTXT.py <OUTPUT> <LIST OF INPUTS>')
+        print('\t<OUTPUT> - output mtxt (rsgislib matrix) file')
+        print('\t<INPUT> - list of plots exported from ENVI as ASCII (see user guide)')
+        print('\nThis script was distributed with @RSGISLIB_PACKAGE_STRING@')
+        print('Copyright (C) @RSGISLIB_COPYRIGHT_YEAR@ Peter Bunting and Daniel Clewley')
+        print('For support please email @RSGISLIB_PACKAGE_BUGREPORT@')
 
 
 if __name__ == '__main__':
