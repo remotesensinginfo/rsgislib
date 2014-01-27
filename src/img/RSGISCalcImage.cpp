@@ -948,8 +948,8 @@ namespace rsgis{namespace img{
 				numFloatBands += datasets[i]->GetRasterCount();
 			}
             
-            std::cout << "Number of Int Bands: " << numIntBands << std::endl;
-            std::cout << "Number of Float Bands: " << numFloatBands << std::endl;
+            //std::cout << "Number of Int Bands: " << numIntBands << std::endl;
+            //std::cout << "Number of Float Bands: " << numFloatBands << std::endl;
 			
             // Create new Image
 			gdalDriver = GetGDALDriverManager()->GetDriverByName(gdalFormat.c_str());
@@ -1544,8 +1544,8 @@ namespace rsgis{namespace img{
 				numFloatBands += datasets[i]->GetRasterCount();
 			}
             
-            std::cout << "Number of Int Bands: " << numIntBands << std::endl;
-            std::cout << "Number of Float Bands: " << numFloatBands << std::endl;
+            //std::cout << "Number of Int Bands: " << numIntBands << std::endl;
+            //std::cout << "Number of Float Bands: " << numFloatBands << std::endl;
 			
 			// Get Image Input Bands
 			bandIntOffsets = new int*[numIntBands];

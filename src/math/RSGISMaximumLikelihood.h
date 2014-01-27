@@ -41,7 +41,6 @@
 namespace rsgis {namespace math{
     
     #define CTINY 1.0e-32
-    
     typedef struct MaximumLikelihood
     {
         /**

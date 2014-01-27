@@ -96,6 +96,10 @@ namespace rsgis{ namespace cmds {
     /** Function to convert radiance into surface reflectance using a LUT for surface elevation and AOT of 6S */
     void executeRad2SREFElevAOTLUT6sParams(std::string inputRadImage, std::string inputDEM, std::string inputAOTImg, std::string outputImage, std::string gdalFormat, rsgis::RSGISLibDataType rsgisOutDataType, float scaleFactor, std::vector<Cmds6SBaseElevAOTLUT> *lut, float noDataVal, bool useNoDataVal)throw(RSGISCmdException);
     
+    /** Function to apply an offset image within the context of dark object subtraction */
+    void executeApplySubtractOffsets(std::string inputImage, std::string outputImage, std::string offsetImage, bool nonNegative, std::string gdalFormat, rsgis::RSGISLibDataType rsgisOutDataType, float noDataVal, bool useNoDataVal) throw(RSGISCmdException);
+    
+    
 }}
 
 

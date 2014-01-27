@@ -769,6 +769,31 @@ static PyObject *ImageCalibration_Apply6SCoefficentsElevAOTLUTParam(PyObject *se
 }
 
 
+static PyObject *ImageCalibration_ApplySubtractOffsets(PyObject *self, PyObject *args)
+{
+    const char *pszInputFile, *pszInputOffsetsFile, *pszOutputFile, *pszGDALFormat;
+    int nDataType, useNoDataValInt, nonNegativeInt;
+    float noDataVal;
+
+    if( !PyArg_ParseTuple(args, "ssssiiif:applySubtractOffsets", &pszInputFile, &pszInputOffsetsFile, &pszOutputFile, &pszGDALFormat, &nDataType, &nonNegativeInt, &useNoDataValInt, &noDataVal))
+    {
+        return NULL;
+    }
+    
+    try
+    {
+        rsgis::RSGISLibDataType type = (rsgis::RSGISLibDataType)nDataType;
+        rsgis::cmds::executeApplySubtractOffsets(std::string(pszInputFile), std::string(pszOutputFile), std::string(pszInputOffsetsFile), (bool)nonNegativeInt, std::string(pszGDALFormat), type, noDataVal, (bool)useNoDataValInt);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
 
 // Our list of functions in this module
 static PyMethodDef ImageCalibrationMethods[] = {
@@ -894,6 +919,19 @@ static PyMethodDef ImageCalibrationMethods[] = {
     "            * \'bX\' - A float for the bX coefficient.\n"
     "            * \'cX\' - A float for the cX coefficient.\n"
     "\n"},
+    
+{"applySubtractOffsets", ImageCalibration_ApplySubtractOffsets, METH_VARARGS,
+    "imagecalibration.applySubtractOffsets(inputFile, inputOffsetsFile, outputFile, gdalformat, gdaltype, nonNegative, useNoDataVal, noDataVal)\n"
+    "Converts at sensor radiance values to Top of Atmosphere Reflectance.\n"
+    "where:\n"
+    "  * inputFile is a string containing the name of the input image file\n"
+    "  * inputOffsetsFile is a string containing the name of the input offsets image file, which must have the same number of bands as the input image."
+    "  * outputFile is a string containing the name of the output image file\n"
+    "  * gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
+    "  * gdaltype is an containing one of the values from rsgislib.TYPE_*\n"
+    "  * nonNegative is a boolean specifying whether any negative values from the offset application should be removed (i.e., set to 1; 0 being no data).\n"
+    "  * useNoDataVal a boolean specifying whether a no data value is present within the input image.\n"
+    "  * noDataVal is a float specifying the no data value for the input image.\n"},
     
     {NULL}        /* Sentinel */
 };

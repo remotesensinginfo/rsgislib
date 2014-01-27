@@ -26,7 +26,8 @@ set(LIB_CALIBRATION_H
 	${RSGIS_SRC_CALIBRATION_DIR}/RSGISApply6SCoefficients.h
 	${RSGIS_SRC_CALIBRATION_DIR}/RSGISCalculateTopOfAtmosphereReflectance.h 
 	${RSGIS_SRC_CALIBRATION_DIR}/RSGISDEMTools.h
-	${RSGIS_SRC_CALIBRATION_DIR}/RSGISStandardDN2RadianceCalibration.h  )
+	${RSGIS_SRC_CALIBRATION_DIR}/RSGISStandardDN2RadianceCalibration.h
+	${RSGIS_SRC_CALIBRATION_DIR}/RSGISApplySubtractOffsets.h  )
 	
 set(LIB_CALIBRATION_CPP
 	${RSGIS_SRC_CALIBRATION_DIR}/RSGISApply6SCoefficients.cpp
@@ -36,7 +37,9 @@ set(LIB_CALIBRATION_CPP
 	${RSGIS_SRC_CALIBRATION_DIR}/RSGISDEMTools.cpp 
 	${RSGIS_SRC_CALIBRATION_DIR}/RSGISDEMTools.h
 	${RSGIS_SRC_CALIBRATION_DIR}/RSGISStandardDN2RadianceCalibration.cpp 
-	${RSGIS_SRC_CALIBRATION_DIR}/RSGISStandardDN2RadianceCalibration.h )
+	${RSGIS_SRC_CALIBRATION_DIR}/RSGISStandardDN2RadianceCalibration.h
+	${RSGIS_SRC_CALIBRATION_DIR}/RSGISApplySubtractOffsets.cpp 
+	${RSGIS_SRC_CALIBRATION_DIR}/RSGISApplySubtractOffsets.h  )
 ###############################################################################
 
 ###############################################################################

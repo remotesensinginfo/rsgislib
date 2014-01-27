@@ -41,11 +41,11 @@ namespace rsgis{ namespace cmds {
 
     enum rsgismlpriorscmds
     {
-        rsgis_samples,
-        rsgis_area,
-        rsgis_equal,
-        rsgis_userdefined,
-        rsgis_weighted
+        rsgis_samples = 0,
+        rsgis_area = 1,
+        rsgis_equal = 2,
+        rsgis_userdefined = 3,
+        rsgis_weighted = 4
     };
 
     enum rsgisshapeindexcmds
