@@ -26,6 +26,7 @@
 #include "calibration/RSGISStandardDN2RadianceCalibration.h"
 #include "calibration/RSGISCalculateTopOfAtmosphereReflectance.h"
 #include "calibration/RSGISApply6SCoefficients.h"
+#include "calibration/RSGISApplySubtractOffsets.h"
 
 #include "img/RSGISImageCalcException.h"
 #include "img/RSGISCalcImageValue.h"
@@ -472,6 +473,60 @@ namespace rsgis{ namespace cmds {
             GDALClose(datasets[0]);
             GDALClose(datasets[1]);
             GDALClose(datasets[2]);
+            delete[] datasets;
+        }
+        catch(rsgis::RSGISException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(std::exception &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
+                
+                
+    void executeApplySubtractOffsets(std::string inputImage, std::string outputImage, std::string offsetImage, bool nonNegative, std::string gdalFormat, rsgis::RSGISLibDataType rsgisOutDataType, float noDataVal, bool useNoDataVal) throw(RSGISCmdException)
+    {
+        try
+        {
+            GDALAllRegister();
+            GDALDataset **datasets = new GDALDataset*[2];
+            
+            std::cout << "Open input image: \'" << inputImage << "\'" << std::endl;
+            datasets[0] = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_ReadOnly);
+            if(datasets[0] == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            std::cout << "Open Offset image: \'" << offsetImage << "\'" << std::endl;
+            datasets[1] = (GDALDataset *) GDALOpen(offsetImage.c_str(), GA_ReadOnly);
+            if(datasets[1] == NULL)
+            {
+                std::string message = std::string("Could not open image ") + offsetImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            if(datasets[0]->GetRasterCount() != datasets[1]->GetRasterCount())
+            {
+                throw rsgis::RSGISImageException("The two input images need to have the same number of image bands.");
+            }
+            int numRasterBands = datasets[0]->GetRasterCount();
+            
+            std::cout << "Apply offsets to input image...\n";
+            
+            rsgis::calib::RSGISApplyDarkObjSubtractOffsets *applyOffsets = new rsgis::calib::RSGISApplyDarkObjSubtractOffsets(numRasterBands, nonNegative, noDataVal, useNoDataVal);
+            
+            rsgis::img::RSGISCalcImage *calcImage = new rsgis::img::RSGISCalcImage(applyOffsets, "", true);
+            calcImage->calcImage(datasets, 2, outputImage, false, NULL, gdalFormat, RSGIS_to_GDAL_Type(rsgisOutDataType));
+            
+            delete applyOffsets;
+            delete calcImage;
+            
+            GDALClose(datasets[0]);
+            GDALClose(datasets[1]);
             delete[] datasets;
         }
         catch(rsgis::RSGISException &e)
