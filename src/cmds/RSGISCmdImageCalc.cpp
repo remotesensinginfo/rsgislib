@@ -2313,7 +2313,12 @@ namespace rsgis{ namespace cmds {
                     maxY = yMaxLatCon;
                 }
             }
-            
+            /*
+            std::cout << "Min X: " << minX << std::endl;
+            std::cout << "Max X: " << maxX << std::endl;
+            std::cout << "Min Y: " << minY << std::endl;
+            std::cout << "Max Y: " << maxY << std::endl;
+            */
             rsgis::img::ImageStats **imgStats = new rsgis::img::ImageStats*[numImageBands];
             for(unsigned int i = 0; i < numImageBands; ++i)
             {
@@ -2328,18 +2333,30 @@ namespace rsgis{ namespace cmds {
             rsgis::img::RSGISImageStatistics calcImgStats;
             calcImgStats.calcImageStatistics(&dataset, 1, imgStats, numImageBands, true, noDataValueSpecified, noDataVal, false, minX, maxX, minY, maxY);
             
+            //std::cout << "imgStats[imgBand-1]->max = " << imgStats[imgBand-1]->max << std::endl;
+            //std::cout << "imgStats[imgBand-1]->min = " << imgStats[imgBand-1]->min << std::endl;
+            
             float imgRange = imgStats[imgBand-1]->max - imgStats[imgBand-1]->min;
-            unsigned int numBins = ceil(imgRange / binWidth)+1;
+            unsigned int numBins = ceil(imgRange / binWidth) + 1;
             unsigned int *binCounts = new unsigned int[numBins];
             float *binRanges = new float[numBins+1];
-            float minVal = imgStats[imgBand-1]->min;
+            float minVal = (imgStats[imgBand-1]->min) - 0.5;
+            /*
+            std::cout << "imgRange = " << imgRange << std::endl;
+            std::cout << "binWidth = " << binWidth << std::endl;
+            std::cout << "ceil(imgRange / binWidth) = " << ceil(imgRange / binWidth) << std::endl;
+            std::cout << "numBins = " << numBins << std::endl;
+            std::cout << "minVal = " << minVal << std::endl;
+            */
             
             for(unsigned int i = 0; i < numBins; ++i)
             {
                 binCounts[i] = 0;
                 binRanges[i] = minVal + (binWidth * i);
+                //std::cout << "binRanges[" << i << "] = " << binRanges[i] << std::endl;
             }
             binRanges[numBins] = minVal + (binWidth * numBins);
+            //std::cout << "binRanges[" << numBins << "] = " << binRanges[numBins] << std::endl;
             
             calcImgStats.calcImageHistogram(&dataset, 1, imgBand, numBins, binRanges, binCounts, noDataValueSpecified, noDataVal, minX, maxX, minY, maxY);
             

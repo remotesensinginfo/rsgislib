@@ -1009,14 +1009,19 @@ namespace rsgis{namespace img{
     
     void RSGISCalcImageHistogramNoData::calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException)
     {
+        //std::cout << "bandValues[" << imgBand-1 << "] = " << bandValues[imgBand-1] << std::endl;
+        
         if(this->noDataSpecified)
         {
             if(bandValues[imgBand-1] != noDataVal)
             {
                 for(unsigned int i = 0; i < numBins; ++i)
                 {
-                    if((bandValues[imgBand-1] > binRanges[i]) & (bandValues[imgBand-1] < binRanges[i+1]))
+                    //std::cout << "binRanges[" << i << "] --  binRanges[" << i+1 << "] = " << binRanges[i] << " -- " << binRanges[i+1] << std::endl;
+                    //std::cout << "bandValues[" << imgBand-1 << "] = " << bandValues[imgBand-1] << std::endl;
+                    if((bandValues[imgBand-1] >= binRanges[i]) & (bandValues[imgBand-1] < binRanges[i+1]))
                     {
+                        //std::cout << "Within bin\n";
                         ++this->binCounts[i];
                         break;
                     }
@@ -1027,7 +1032,7 @@ namespace rsgis{namespace img{
         {
             for(unsigned int i = 0; i < numBins; ++i)
             {
-                if((bandValues[imgBand-1] > binRanges[i]) & (bandValues[imgBand-1] < binRanges[i+1]))
+                if((bandValues[imgBand-1] >= binRanges[i]) & (bandValues[imgBand-1] < binRanges[i+1]))
                 {
                     ++this->binCounts[i];
                     break;
