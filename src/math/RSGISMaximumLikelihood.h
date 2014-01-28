@@ -35,11 +35,20 @@
 #include <stdio.h>
 #include <math.h>
 
-#include "math/RSGISMaximumLikelihoodException.h"
 #include "RSGISMathsUtils.h"
+#include "math/RSGISMathException.h"
 
 
 namespace rsgis {namespace math{
+    
+    
+    class RSGISMaximumLikelihoodException : public RSGISMathException
+    {
+    public:
+        RSGISMaximumLikelihoodException(): RSGISMathException("A RSGISMaximumLikelihoodException has been created.."){};
+        RSGISMaximumLikelihoodException(const char* message): RSGISMathException(message){};
+        RSGISMaximumLikelihoodException(std::string message): RSGISMathException(message){};
+    };
     
     #define CTINY 1.0e-32
     typedef struct MaximumLikelihood

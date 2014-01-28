@@ -2217,5 +2217,195 @@ namespace rsgis{ namespace cmds {
         }
     }
                 
+                
+    float executeImageBandModeEnv(std::string inputImage, float binWidth, unsigned int imgBand, bool noDataValueSpecified, float noDataVal, double latMin, double latMax, double longMin, double longMax)throw(RSGISCmdException)
+    {
+        float outputModeVal = 0.0;
+        try
+        {
+            GDALAllRegister();
+            GDALDataset *dataset = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_ReadOnly);
+            
+            if(dataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            unsigned int numImageBands = dataset->GetRasterCount();
+            //std::cout << "Num Image Bands = " << numImageBands << std::endl;
+            //std::cout << "Image Band = " << imgBand << std::endl;
+            if(imgBand > numImageBands)
+            {
+                throw rsgis::RSGISException("Specified image band is not within the input image.");
+            }
+            
+            const char *wktProj = dataset->GetProjectionRef();
+            
+            if(std::string(wktProj) == "")
+            {
+                throw rsgis::RSGISException("The input image needs to have the projection defined within the file.");
+            }
+            
+            OGRSpatialReference imgSpatRef = OGRSpatialReference(wktProj);
+            OGRSpatialReference latLongSpatRef = OGRSpatialReference();
+            latLongSpatRef.importFromEPSG(4326);
+            
+            double minX = 0.0;
+            double maxX = 0.0;
+            double minY = 0.0;
+            double maxY = 0.0;
+            
+            if(latLongSpatRef.IsSame(&imgSpatRef))
+            {
+                minX = longMin;
+                maxX = longMax;
+                minY = latMin;
+                maxY = latMax;
+            }
+            else
+            {
+                // Convert bbox to the same projection as the input image...
+                std::cout << "Converting Image Projection\n";
+                OGRCoordinateTransformation *poCT = OGRCreateCoordinateTransformation( &latLongSpatRef, &imgSpatRef );
+                
+                double xMinLongCon, yMinLatCon, xMaxLongCon, yMaxLatCon = 0.0;
+                xMinLongCon = longMin;
+                yMinLatCon = latMin;
+                
+                xMaxLongCon = longMax;
+                yMaxLatCon = latMax;
+                
+                if( poCT == NULL || !poCT->Transform( 1, &xMinLongCon, &yMinLatCon ) )
+                {
+                    throw rsgis::RSGISException("Coordinate System Transformation failed (Min).");
+                }
+                
+                if( poCT == NULL || !poCT->Transform( 1, &xMaxLongCon, &yMaxLatCon ) )
+                {
+                    throw rsgis::RSGISException("Coordinate System Transformation failed (Max).");
+                }
+                std::cout.precision(12);
+                std::cout << "Min X: " << xMinLongCon << std::endl;
+                std::cout << "Max X: " << xMaxLongCon << std::endl;
+                std::cout << "Min Y: " << yMinLatCon << std::endl;
+                std::cout << "Max Y: " << yMaxLatCon << std::endl;
+                
+                if(xMinLongCon > xMaxLongCon)
+                {
+                    minX = xMaxLongCon;
+                    maxX = xMinLongCon;
+                }
+                else
+                {
+                    minX = xMinLongCon;
+                    maxX = xMaxLongCon;
+                }
+                
+                if(yMinLatCon > yMaxLatCon)
+                {
+                    minY = yMaxLatCon;
+                    maxY = yMinLatCon;
+                }
+                else
+                {
+                    minY = yMinLatCon;
+                    maxY = yMaxLatCon;
+                }
+            }
+            
+            rsgis::img::ImageStats **imgStats = new rsgis::img::ImageStats*[numImageBands];
+            for(unsigned int i = 0; i < numImageBands; ++i)
+            {
+                imgStats[i] = new rsgis::img::ImageStats();
+                imgStats[i]->min = 0;
+                imgStats[i]->max = 0;
+                imgStats[i]->mean = 0;
+                imgStats[i]->sum = 0;
+                imgStats[i]->stddev = 0;
+            }
+            
+            rsgis::img::RSGISImageStatistics calcImgStats;
+            calcImgStats.calcImageStatistics(&dataset, 1, imgStats, numImageBands, true, noDataValueSpecified, noDataVal, false, minX, maxX, minY, maxY);
+            
+            float imgRange = imgStats[imgBand-1]->max - imgStats[imgBand-1]->min;
+            unsigned int numBins = ceil(imgRange / binWidth)+1;
+            unsigned int *binCounts = new unsigned int[numBins];
+            float *binRanges = new float[numBins+1];
+            float minVal = imgStats[imgBand-1]->min;
+            
+            for(unsigned int i = 0; i < numBins; ++i)
+            {
+                binCounts[i] = 0;
+                binRanges[i] = minVal + (binWidth * i);
+            }
+            binRanges[numBins] = minVal + (binWidth * numBins);
+            
+            calcImgStats.calcImageHistogram(&dataset, 1, imgBand, numBins, binRanges, binCounts, noDataValueSpecified, noDataVal, minX, maxX, minY, maxY);
+            
+            bool first = true;
+            unsigned int maxBin = 0;
+            unsigned int maxBinCount = 0;
+            
+            for(unsigned int i = 0; i < numBins; ++i)
+            {
+                if(binCounts[i] > 0.0)
+                {
+                    if(first)
+                    {
+                        maxBin = i;
+                        maxBinCount = binCounts[i];
+                        first = false;
+                    }
+                    else if(binCounts[i] > maxBinCount)
+                    {
+                        maxBin = i;
+                        maxBinCount = binCounts[i];
+                    }
+                }
+            }
+            
+            if(first)
+            {
+                outputModeVal = std::numeric_limits<double>::signaling_NaN();
+                delete[] binCounts;
+                delete[] binRanges;
+                for(unsigned int i = 0; i < numImageBands; ++i)
+                {
+                    delete imgStats[i];
+                }
+                delete[] imgStats;
+                
+                GDALClose(dataset);
+                
+                throw rsgis::RSGISException("A mode value could not be calculated as all the histogram bin values were 0.");
+            }
+            else
+            {
+                outputModeVal = binRanges[maxBin] + ((binRanges[maxBin+1] - binRanges[maxBin])/2);
+            }
+            
+            delete[] binCounts;
+            delete[] binRanges;
+            for(unsigned int i = 0; i < numImageBands; ++i)
+            {
+                delete imgStats[i];
+            }
+            delete[] imgStats;
+            
+            GDALClose(dataset);
+        }
+        catch(rsgis::RSGISException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(std::exception &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        
+        return outputModeVal;
+    }
+                
 }}
 

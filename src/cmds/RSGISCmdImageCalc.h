@@ -133,6 +133,8 @@ namespace rsgis{ namespace cmds {
     void executeCorrelationWindow(std::string inputImage, std::string outputImage, unsigned int winSize, unsigned int corrBandA, unsigned int corrBandB, std::string gdalFormat, RSGISLibDataType outDataType)throw(RSGISCmdException);
     /** Function to calculate the statistics for an individual image band within an envelope defined in Lat / Long */
     void executeImageBandStatsEnv(std::string inputImage, rsgis::cmds::ImageStatsCmds *stats, unsigned int imgBand, bool noDataValueSpecified, float noDataVal, double latMin, double latMax, double longMin, double longMax)throw(RSGISCmdException);
+    /** Function to calculate the mode for an individual image band within an envelope defined in Lat / Long */
+    float executeImageBandModeEnv(std::string inputImage, float binWidth, unsigned int imgBand, bool noDataValueSpecified, float noDataVal, double latMin, double latMax, double longMin, double longMax)throw(RSGISCmdException);
     
     
 }}
