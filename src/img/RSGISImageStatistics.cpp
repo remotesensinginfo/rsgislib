@@ -257,7 +257,56 @@ namespace rsgis{namespace img{
 			delete calcImg;
 		}
     }
+    
+    void RSGISImageStatistics::calcImageHistogram(GDALDataset **datasets, int numDS, unsigned int imgBand, unsigned int numBins, float *binRanges, unsigned int *binCounts, bool noDataSpecified, float noDataVal, double xMin, double xMax, double yMin, double yMax)throw(RSGISImageCalcException,RSGISImageBandException)
+    {
+        RSGISCalcImageHistogramNoData *calcImageStats = NULL;
+		RSGISCalcImage *calcImg = NULL;
+		try
+		{
+            geos::geom::Envelope *env = new geos::geom::Envelope(xMin, xMax, yMin, yMax);
+            
+			calcImageStats = new RSGISCalcImageHistogramNoData(imgBand, noDataSpecified, noDataVal, numBins, binRanges, binCounts);
+			calcImg = new RSGISCalcImage(calcImageStats, "", true);
+			
+            calcImg->calcImageInEnv(datasets, numDS, env);
 
+            delete env;
+		}
+		catch(RSGISImageCalcException e)
+		{
+			if(calcImageStats != NULL)
+			{
+				delete calcImageStats;
+			}
+			if(calcImg != NULL)
+			{
+				delete calcImg;
+			}
+			throw e;
+		}
+		catch(RSGISImageBandException e)
+		{
+			if(calcImageStats != NULL)
+			{
+				delete calcImageStats;
+			}
+			if(calcImg != NULL)
+			{
+				delete calcImg;
+			}
+			throw e;
+		}
+		
+		if(calcImageStats != NULL)
+		{
+			delete calcImageStats;
+		}
+		if(calcImg != NULL)
+		{
+			delete calcImg;
+		}
+    }
     
     
     
@@ -937,6 +986,57 @@ namespace rsgis{namespace img{
     }
     
     RSGISImagePixelSummaries::~RSGISImagePixelSummaries()
+    {
+        
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    RSGISCalcImageHistogramNoData::RSGISCalcImageHistogramNoData(unsigned int imgBand, bool noDataSpecified, float noDataVal, unsigned int numBins, float *binRanges, unsigned int *binCounts): RSGISCalcImageValue(0)
+    {
+        this->imgBand = imgBand;
+        this->noDataSpecified = noDataSpecified;
+        this->noDataVal = noDataVal;
+        this->numBins = numBins;
+        this->binRanges = binRanges;
+        this->binCounts = binCounts;
+    }
+    
+    void RSGISCalcImageHistogramNoData::calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException)
+    {
+        if(this->noDataSpecified)
+        {
+            if(bandValues[imgBand-1] != noDataVal)
+            {
+                for(unsigned int i = 0; i < numBins; ++i)
+                {
+                    if((bandValues[imgBand-1] > binRanges[i]) & (bandValues[imgBand-1] < binRanges[i+1]))
+                    {
+                        ++this->binCounts[i];
+                        break;
+                    }
+                }
+            }
+        }
+        else
+        {
+            for(unsigned int i = 0; i < numBins; ++i)
+            {
+                if((bandValues[imgBand-1] > binRanges[i]) & (bandValues[imgBand-1] < binRanges[i+1]))
+                {
+                    ++this->binCounts[i];
+                    break;
+                }
+            }
+        }
+    }
+    
+    RSGISCalcImageHistogramNoData::~RSGISCalcImageHistogramNoData()
     {
         
     }

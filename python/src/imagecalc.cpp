@@ -1102,6 +1102,50 @@ static PyObject *ImageCalc_GetImageStatsInEnv(PyObject *self, PyObject *args) {
 }
 
 
+static PyObject *ImageCalc_GetImageBandModeInEnv(PyObject *self, PyObject *args) {
+    const char *inputImage;
+    unsigned int imgBand;
+    double latMin, latMax, longMin, longMax;
+    float binWidth;
+    PyObject *noDataValueObj;
+    
+    if(!PyArg_ParseTuple(args, "sIfOdddd:getImageBandModeInEnv", &inputImage, &imgBand, &binWidth, &noDataValueObj, &latMin, &latMax, &longMin, &longMax))
+        return NULL;
+    
+    bool noDataValueSpecified = false;
+    float noDataValue = 0.0;
+    
+    if( ( noDataValueObj == NULL ) || ( noDataValueObj == Py_None ) || !RSGISPY_CHECK_FLOAT(noDataValueObj) )
+    {
+        noDataValueSpecified = false;
+    }
+    else
+    {
+        noDataValueSpecified = true;
+        noDataValue = RSGISPY_FLOAT_EXTRACT(noDataValueObj);
+    }
+    
+    PyObject *outVal = PyTuple_New(1);
+    try
+    {
+        float modeVal = rsgis::cmds::executeImageBandModeEnv(std::string(inputImage), binWidth, imgBand, noDataValueSpecified, noDataValue, latMin, latMax, longMin, longMax);
+        
+        if(PyTuple_SetItem(outVal, 0, Py_BuildValue("f", modeVal)) == -1)
+        {
+            throw rsgis::cmds::RSGISCmdException("Failed to add \'mode\' value to the list...");
+        }
+        
+    }
+    catch (rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    return outVal;
+}
+
+
 
 
 
@@ -1578,6 +1622,28 @@ static PyMethodDef ImageCalcMethods[] = {
 "print(\"Mean: \", stats[2])\n"
 "print(\"StdDev: \", stats[3])\n"
 "print(\"Sum: \", stats[4])\n\n"
+},
+    
+{"getImageBandModeInEnv", ImageCalc_GetImageBandModeInEnv, METH_VARARGS,
+    "imagecalc.getImageBandModeInEnv(inputImage, imgBand, binWidth, noDataVal, latMin, latMax, longMin, longMax)\n"
+    "Calculates and returns the image mode for a region.\n"
+    "defined by the bounding box (latMin, latMax, longMin, longMax) which is specified\n"
+    "geographic latitude and longitude. The coordinates are converted to the projection\n"
+    "of the input image at runtime (if required) and therefore the image projection needs\n"
+    "to be correctly defined so please check this is the case and define it if necessary."
+    "where:\n"
+    "  * inputImage is a string containing the name of the input image file\n"
+    "  * imgBand is an unsigned int specifying the image band starting from 1.\n"
+    "  * binWidth is a float specifying the binWidth for the histogram generated to calculate the mode.\n"
+    "  * noDataVal is a float specifying a no data value, to be ignored in the calculation.\n"
+    "              If a value of \'None\' is provided then a no data value is not used.\n"
+    "  * latMin is a double specifying the minimum latitude of the BBOX\n"
+    "  * latMax is a double specifying the maximum latitude of the BBOX\n"
+    "  * longMin is a double specifying the minimum longitude of the BBOX\n"
+    "  * longMax is a double specifying the maximum longitude of the BBOX\n"
+    "returns:\n"
+    "  * float with image mode for the region within the BBOX.\n"
+
 },
 
     {NULL}        /* Sentinel */

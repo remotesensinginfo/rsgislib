@@ -99,7 +99,7 @@ namespace rsgis{ namespace cmds {
             }
 
             GDALClose(inDataset);
-            GDALDestroyDriverManager();
+            //GDALDestroyDriverManager();
         }
         catch(RSGISException& e)
         {
@@ -151,7 +151,7 @@ namespace rsgis{ namespace cmds {
             }
 
             GDALClose(inDataset);
-            GDALDestroyDriverManager();
+            //GDALDestroyDriverManager();
         }
         catch(RSGISException& e)
         {
@@ -187,7 +187,7 @@ namespace rsgis{ namespace cmds {
 
             GDALClose(dataset);
             GDALClose(mask);
-            GDALDestroyDriverManager();
+            //GDALDestroyDriverManager();
         }
         catch(RSGISException& e)
         {
@@ -359,7 +359,7 @@ namespace rsgis{ namespace cmds {
 
             GDALClose(dataset[0]);
             delete[] dataset;
-            GDALDestroyDriverManager();
+            //GDALDestroyDriverManager();
             delete calcImage;
             delete copyImage;
         }
@@ -390,7 +390,7 @@ namespace rsgis{ namespace cmds {
 
 
             GDALClose(inDataset);
-            GDALDestroyDriverManager();
+            //GDALDestroyDriverManager();
         }
         catch(rsgis::RSGISException& e)
         {
@@ -440,7 +440,7 @@ namespace rsgis{ namespace cmds {
             mosaic.includeDatasets(baseDS, inputImages, numDS, bands, bandsDefined);
             
             GDALClose(baseDS);
-            GDALDestroyDriverManager();
+            //GDALDestroyDriverManager();
             delete[] inputImages;
             
         }
@@ -830,7 +830,7 @@ namespace rsgis{ namespace cmds {
             delete[] dataset;
             OGRDataSource::DestroyDataSource(inputVecDS);
             OGRCleanupAll();
-            GDALDestroyDriverManager();
+            //GDALDestroyDriverManager();
             delete calcImage;
             delete copyImage;
         }
@@ -956,7 +956,7 @@ namespace rsgis{ namespace cmds {
             delete[] dataset;
             OGRDataSource::DestroyDataSource(inputVecDS);
             OGRCleanupAll();
-            GDALDestroyDriverManager();
+            //GDALDestroyDriverManager();
             delete calcImage;
             delete copyImage;
         }
@@ -1028,7 +1028,7 @@ namespace rsgis{ namespace cmds {
             delete[] dataset;
             GDALClose(roiDataset);
             
-            GDALDestroyDriverManager();
+            //GDALDestroyDriverManager();
             delete calcImage;
             delete copyImage;
         }
