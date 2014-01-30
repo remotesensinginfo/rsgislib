@@ -63,8 +63,9 @@ namespace rsgis { namespace img {
         {
             pszType = "NEAREST";
         }
-
-        handle->BuildOverviews( pszType, nOverviews, nLevels, 0, NULL, StatsTextProgress, NULL );
+        
+        int nLastProgress = -1;
+        handle->BuildOverviews( pszType, nOverviews, nLevels, 0, NULL, StatsTextProgress, &nLastProgress );
     }
 
     void RSGISPopWithStats::getRangeMean(float *pData,int size,float &min,float &max,float &mean, bool ignore, float ignoreVal)
@@ -357,7 +358,8 @@ namespace rsgis { namespace img {
             
             /* Find min, Max and mean */ 
             double fmin=0, fmax=0, fMean=0, fStdDev=0;
-            hBand->ComputeStatistics(false, &fmin, &fmax, &fMean, &fStdDev, StatsTextProgress, NULL);
+            int nLastProgress = -1;
+            hBand->ComputeStatistics(false, &fmin, &fmax, &fMean, &fStdDev, StatsTextProgress, &nLastProgress);
             std::cout << std::endl;
 
             /* Write Statistics */
@@ -429,7 +431,8 @@ namespace rsgis { namespace img {
             }
             else
             {
-                hBand->GetHistogram(histminTmp, histmaxTmp, nHistBuckets, pHisto, true, false, StatsTextProgress, NULL);
+                int nLastProgress = -1;
+                hBand->GetHistogram(histminTmp, histmaxTmp, nHistBuckets, pHisto, true, false, StatsTextProgress, &nLastProgress);
                 std::cout << std::endl;
             }
             
