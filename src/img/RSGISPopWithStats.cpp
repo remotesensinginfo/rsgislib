@@ -360,7 +360,6 @@ namespace rsgis { namespace img {
             double fmin=0, fmax=0, fMean=0, fStdDev=0;
             int nLastProgress = -1;
             hBand->ComputeStatistics(false, &fmin, &fmax, &fMean, &fStdDev, StatsTextProgress, &nLastProgress);
-            std::cout << std::endl;
 
             /* Write Statistics */
             sprintf( szTemp, "%f", fmin );
@@ -433,7 +432,6 @@ namespace rsgis { namespace img {
             {
                 int nLastProgress = -1;
                 hBand->GetHistogram(histminTmp, histmaxTmp, nHistBuckets, pHisto, true, false, StatsTextProgress, &nLastProgress);
-                std::cout << std::endl;
             }
             
             int histoStrLen = nHistBuckets * 8;
