@@ -74,6 +74,10 @@ namespace rsgis{ namespace cmds {
     /** A command to add images to an existing image*/
     void executeImageInclude(std::string *inputImages, int numDS, std::string baseImage, bool bandsDefined, std::vector<int> bands) throw(RSGISCmdException);
     
+    /** A command to order a set of input images based on the proportion of valid data within each of the scenes */
+    std::vector<std::string> executeOrderImageUsingValidDataProp(std::vector<std::string> images, float noDataValue) throw(RSGISCmdException);
+    
+    
     /** A function to assign the projection on an image file */
     void executeAssignProj(std::string inputImage, std::string wktStr, bool readWKTFromFile=false, std::string wktFile="")throw(RSGISCmdException);
     

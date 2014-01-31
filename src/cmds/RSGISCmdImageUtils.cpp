@@ -404,12 +404,12 @@ namespace rsgis{ namespace cmds {
 
     void executeImageMosaic(std::string *inputImages, int numDS, std::string outputImage, float background, float skipVal, unsigned int skipBand, unsigned int overlapBehaviour, std::string format, RSGISLibDataType outDataType) throw(RSGISCmdException)
     {
+        GDALAllRegister();
         try
         {
-            rsgis::img::RSGISImageMosaic *mosaic = NULL;
-            mosaic = new rsgis::img::RSGISImageMosaic();
+            rsgis::img::RSGISImageMosaic mosaic;
             // Projection hardcoded to from image (to simplify interface)
-            mosaic->mosaicSkipVals(inputImages, numDS, outputImage, background, skipVal, true, "", skipBand, overlapBehaviour, format, RSGIS_to_GDAL_Type(outDataType));
+            mosaic.mosaicSkipVals(inputImages, numDS, outputImage, background, skipVal, true, "", skipBand, overlapBehaviour, format, RSGIS_to_GDAL_Type(outDataType));
         }
         catch (RSGISImageException& e)
         {
@@ -420,29 +420,45 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
+            
+    std::vector<std::string> executeOrderImageUsingValidDataProp(std::vector<std::string> images, float noDataValue) throw(RSGISCmdException)
+    {
+        GDALAllRegister();
+        std::vector<std::string> orderedImages;
+        try
+        {
+            rsgis::img::RSGISImageMosaic mosaic;
+            mosaic.orderInImagesValidData(images, &orderedImages, noDataValue);
+        }
+        catch (RSGISImageException& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(std::exception& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        return orderedImages;
+    }
     
     void executeImageInclude(std::string *inputImages, int numDS, std::string baseImage, bool bandsDefined, std::vector<int> bands) throw(RSGISCmdException)
     {
         try
         {
-            
             GDALAllRegister();
-			GDALDataset *baseDS = NULL;
-            rsgis::img::RSGISImageMosaic mosaic;
 
-            baseDS = (GDALDataset *) GDALOpenShared(baseImage.c_str(), GA_Update);
+            GDALDataset *baseDS = (GDALDataset *) GDALOpenShared(baseImage.c_str(), GA_Update);
             if(baseDS == NULL)
             {
                 std::string message = std::string("Could not open image ") + baseImage;
                 throw RSGISImageException(message.c_str());
             }
             
+            rsgis::img::RSGISImageMosaic mosaic;
             mosaic.includeDatasets(baseDS, inputImages, numDS, bands, bandsDefined);
             
             GDALClose(baseDS);
-            //GDALDestroyDriverManager();
             delete[] inputImages;
-            
         }
         catch (RSGISImageException& e)
         {

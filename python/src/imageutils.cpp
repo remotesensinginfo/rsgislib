@@ -60,6 +60,29 @@ static std::string *ExtractStringArrayFromSequence(PyObject *sequence, int *nEle
     return stringsArray;
 }
 
+static std::vector<std::string> ExtractStringVectorFromSequence(PyObject *sequence, int *nElements) {
+    Py_ssize_t nFields = PySequence_Size(sequence);
+    *nElements = nFields;
+    std::vector<std::string> stringsArray;
+    stringsArray.reserve(*nElements);
+    
+    for(int i = 0; i < nFields; ++i)
+    {
+        PyObject *stringObj = PySequence_GetItem(sequence, i);
+        
+        if(!RSGISPY_CHECK_STRING(stringObj)) {
+            PyErr_SetString(GETSTATE(sequence)->error, "Fields must be strings");
+            Py_DECREF(stringObj);
+            return stringsArray;
+        }
+        
+        stringsArray.push_back(RSGISPY_STRING_EXTRACT(stringObj));
+        Py_DECREF(stringObj);
+    }
+    
+    return stringsArray;
+}
+
 // Helper function to extract python sequence to array of integers
 /*static int *ExtractIntArrayFromSequence(PyObject *sequence, int *nElements) {
     Py_ssize_t nFields = PySequence_Size(sequence);
@@ -808,6 +831,60 @@ static PyObject *ImageUtils_StackStats(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
+static PyObject *ImageUtils_OrderImagesUsingPropValidData(PyObject *self, PyObject *args)
+{
+    float noDataValue;
+    PyObject *pInputImages; // List of input images
+    
+    // Check parameters are present and of correct type
+    if( !PyArg_ParseTuple(args, "Of:orderImageUsingPropValidPxls", &pInputImages, &noDataValue))
+        return NULL;
+    
+    // TODO: Look into this function - doesn't seem to catch when only a single image is provided.
+    if(!PySequence_Check(pInputImages)) {
+        PyErr_SetString(GETSTATE(self)->error, "First argument must be a sequence");
+        return NULL;
+    }
+    
+    // Extract list of images to array of strings.
+    int numImages = 0;
+    std::vector<std::string> inputImages = ExtractStringVectorFromSequence(pInputImages, &numImages);
+    if(numImages == 0)
+    {
+        PyErr_SetString(GETSTATE(self)->error, "No input images provided");
+        return NULL;
+    }
+
+    PyObject *outImagesList = NULL;
+    try
+    {
+        std::vector<std::string> orderedInputImages = rsgis::cmds::executeOrderImageUsingValidDataProp(inputImages, noDataValue);
+        
+        outImagesList = PyTuple_New(orderedInputImages.size());
+        
+        if(outImagesList == NULL)
+        {
+            throw rsgis::cmds::RSGISCmdException("Could not create a python list...");
+        }
+        
+        for(unsigned int i = 0; i < orderedInputImages.size(); ++i)
+        {
+            //std::cout << i << " = " << orderedInputImages.at(i) << std::endl;
+            if(PyTuple_SetItem(outImagesList, i, Py_BuildValue("s", orderedInputImages.at(i).c_str())) == -1)
+            {
+                throw rsgis::cmds::RSGISCmdException("Failed to add a value to the list...");
+            }
+        }
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    return outImagesList;
+}
+
 // Our list of functions in this module
 static PyMethodDef ImageUtilsMethods[] = {
     {"stretchImage", ImageUtils_StretchImage, METH_VARARGS, 
@@ -1172,6 +1249,18 @@ static PyMethodDef ImageUtilsMethods[] = {
     "   format = 'KEA'\n"
     "   dataType = rsgislib.TYPE_32FLOAT\n"
     "   imageutils.stackStats(inputImage, outputImage, None, 'mean', format, dataType)\n"
+    "\n"},
+    
+{"orderImageUsingValidPxls", ImageUtils_OrderImagesUsingPropValidData, METH_VARARGS,
+    "imageutils.orderImageUsingValidPxls(inputImages, noDataVal)\n"
+    "Order the list of input images based on the their proportion of valid image pixels.\n"
+    "The primary use of this function is expected to be order (rank) images ahead of mosaicing.\n"
+    "\n"
+    "* inputImages is a list of string containing the name and path for the input images.\n"
+    "* noDataVal is a float which specifies the no data value used to defined \'invalid\' pixels.\n"
+    "\n"
+    "Returns: a list of images ordered, from low to high (i.e., the first image will be the image \n"
+    "         with the smallest number of valid image pixels).\n"
     "\n"},
 
 
