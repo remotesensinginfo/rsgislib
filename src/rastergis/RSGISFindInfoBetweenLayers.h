@@ -41,20 +41,20 @@
 #include <boost/lexical_cast.hpp>
 
 namespace rsgis{namespace rastergis{
-    
+
     class RSGISFindInfoBetweenLayers
     {
     public:
         RSGISFindInfoBetweenLayers();
-        void findClassMajority(GDALDataset *baseSegmentsDS, GDALDataset *infoSegmentsDS, std::string baseClassCol, std::string infoClassCol) throw(RSGISAttributeTableException);
+        void findClassMajority(GDALDataset *baseSegmentsDS, GDALDataset *infoSegmentsDS, std::string baseClassCol, std::string infoClassCol, bool ignoreZero = true) throw(RSGISAttributeTableException);
         ~RSGISFindInfoBetweenLayers();
     };
-    
-    
+
+
     class RSGISCalcClumpClassMajorities : public rsgis::img::RSGISCalcImageValue
 	{
 	public:
-		RSGISCalcClumpClassMajorities(GDALRasterAttributeTable *baseATable, GDALRasterAttributeTable *infoATable, unsigned int infoClassIdx, std::vector<std::string> classes, unsigned int **clumpCounter);
+		RSGISCalcClumpClassMajorities(GDALRasterAttributeTable *baseATable, GDALRasterAttributeTable *infoATable, unsigned int infoClassIdx, std::vector<std::string> classes, unsigned int **clumpCounter, bool ignoreZero = true);
 		void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
 		void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException);
         void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
@@ -71,9 +71,9 @@ namespace rsgis{namespace rastergis{
         unsigned int infoClassIdx;
         std::vector<std::string> classes;
         unsigned int **clumpCounter;
-        
+        bool ignoreZero;
 	};
-	
+
 }}
 
 #endif
