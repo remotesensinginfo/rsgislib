@@ -716,12 +716,13 @@ static PyObject *RasterGIS_GenerateColourTable(PyObject *self, PyObject *args) {
 
 static PyObject *RasterGIS_StrClassMajority(PyObject *self, PyObject *args) {
     const char *baseSegment, *infoSegment, *bassClassCol, *infoClassCol;
+    int ignoreZero = 1;
 
-    if(!PyArg_ParseTuple(args, "ssss:strClassMajority", &baseSegment, &infoSegment, &bassClassCol, &infoClassCol))
+    if(!PyArg_ParseTuple(args, "ssss|i:strClassMajority", &baseSegment, &infoSegment, &bassClassCol, &infoClassCol, &ignoreZero))
         return NULL;
 
     try {
-        rsgis::cmds::executeStrClassMajority(std::string(baseSegment), std::string(infoSegment), std::string(bassClassCol), std::string(infoClassCol));
+        rsgis::cmds::executeStrClassMajority(std::string(baseSegment), std::string(infoSegment), std::string(bassClassCol), std::string(infoClassCol), ignoreZero);
     } catch (rsgis::cmds::RSGISCmdException &e) {
         PyErr_SetString(GETSTATE(self)->error, e.what());
         return NULL;
@@ -1368,18 +1369,19 @@ static PyMethodDef RasterGISMethods[] = {
 
     {"strClassMajority", RasterGIS_StrClassMajority, METH_VARARGS,
 "Finds the majority for class (string - field) from a set of small objects to large objects\n"
-"rastergis.strClassMajority(baseSegment, infoSegment, baseClassCol, infoClassCol)\n"
+"rastergis.strClassMajority(baseSegment, infoSegment, baseClassCol, infoClassCol, ignoreZero=True)\n"
 "where:\n"
 " * baseSegment is a the base clumps file, to be attribured.\n"
 " * infoSegment is the file to take attributes from.\n"
 " * baseClassCol the output column name in the baseSegment file.\n"
 " * infoClassCol is the colum name in the infoSegment file.\n"
+" * ignoreZero is a boolean specifying if zeros should be ignored in input layer. If set to false values of 0 will be included when calculating the class majority, otherwise the majority calculation will only consider objects with a value greater than 0.\n"
 "Example::\n"
 "\n"
 "	from rsgislib import rastergis\n"
 "	clumps='./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_popstats.kea'\n"
 "	classRAT='./TestOutputs/RasterGIS/reInt_rat.kea'\n"
-"	rastergis.strClassMajority(clumps, classRAT, 'REInt', 'REInt')\n"
+"	rastergis.strClassMajority(clumps, classRAT, 'class_dst', 'class_src')\n"
 "\n"},
 
     {"specDistMajorityClassifier", RasterGIS_SpecDistMajorityClassifier, METH_VARARGS,
