@@ -30,31 +30,68 @@
 
 #include <iostream>
 #include <string>
-#include "img/RSGISImageUtils.h"
 
-namespace rsgis 
-{
-	namespace img
-	{
-		class RSGISImageMosaic
-        /**
-         overlapBehaviour:
-          0 - overwrite mosic with new pixel value
-          1 - overwrite mosaic if new pixel value is smaller (min)
-          2 - overwrite mosaic if new pixel value is larger (max)
-         
-         */
-			{
-			public: 
-				RSGISImageMosaic();
-				void mosaic(std::string *inputImages, int numDS, std::string outputImage, float background, bool projFromImage, std::string proj, std::string format="ENVI", GDALDataType imgDataType=GDT_Float32) throw(RSGISImageException);
-				void mosaicSkipVals(std::string *inputImages, int numDS, std::string outputImage, float background, float skipVal, bool projFromImage, std::string proj, unsigned int skipBand = 0, unsigned int overlapBehaviour = 0, std::string format="ENVI", GDALDataType imgDataType=GDT_Float32) throw(RSGISImageException);
-				void mosaicSkipThresh(std::string *inputImages, int numDS, std::string outputImage, float background, float skipLowerThresh, float skipUpperThresh, bool projFromImage, std::string proj, unsigned int threshBand = 0, unsigned int overlapBehaviour = 0, std::string format="ENVI", GDALDataType imgDataType=GDT_Float32) throw(RSGISImageException);
-				void includeDatasets(GDALDataset *baseImage, std::string *inputImages, int numDS, std::vector<int> bands, bool bandsDefined) throw(RSGISImageException);
-				~RSGISImageMosaic();
-			};
-	}
-}
+#include "img/RSGISImageCalcException.h"
+#include "img/RSGISCalcImageValue.h"
+#include "img/RSGISImageUtils.h"
+#include "img/RSGISCalcImage.h"
+
+namespace rsgis{namespace img{
+    
+    struct RSGISImageValidDataMetric
+    {
+        std::string imageFile;
+        unsigned int validPxlCount;
+        unsigned int noDataPxlCount;
+        unsigned int totalNumPxls;
+        double validPxlFunc;
+    };
+    
+    inline bool compare_ImageValidPxlCounts (const RSGISImageValidDataMetric& first, const RSGISImageValidDataMetric& second)
+    {
+        return ( first.validPxlFunc < second.validPxlFunc );
+    }
+    
+    class RSGISImageMosaic
+    /**
+     overlapBehaviour:
+      0 - overwrite mosic with new pixel value
+      1 - overwrite mosaic if new pixel value is smaller (min)
+      2 - overwrite mosaic if new pixel value is larger (max)
+     
+     */
+    {
+    public:
+        RSGISImageMosaic();
+        void mosaic(std::string *inputImages, int numDS, std::string outputImage, float background, bool projFromImage, std::string proj, std::string format="ENVI", GDALDataType imgDataType=GDT_Float32) throw(RSGISImageException);
+        void mosaicSkipVals(std::string *inputImages, int numDS, std::string outputImage, float background, float skipVal, bool projFromImage, std::string proj, unsigned int skipBand = 0, unsigned int overlapBehaviour = 0, std::string format="ENVI", GDALDataType imgDataType=GDT_Float32) throw(RSGISImageException);
+        void mosaicSkipThresh(std::string *inputImages, int numDS, std::string outputImage, float background, float skipLowerThresh, float skipUpperThresh, bool projFromImage, std::string proj, unsigned int threshBand = 0, unsigned int overlapBehaviour = 0, std::string format="ENVI", GDALDataType imgDataType=GDT_Float32) throw(RSGISImageException);
+        void includeDatasets(GDALDataset *baseImage, std::string *inputImages, int numDS, std::vector<int> bands, bool bandsDefined) throw(RSGISImageException);
+        void orderInImagesValidData(std::vector<std::string> images, std::vector<std::string> *orderedImages, float noDataValue) throw(RSGISImageException);
+        ~RSGISImageMosaic();
+    };
+    
+    
+    class RSGISCountValidPixels : public RSGISCalcImageValue
+    {
+    public:
+        RSGISCountValidPixels(RSGISImageValidDataMetric *validPxlsObj, float noDataVal);
+        void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException);
+        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
+        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+        bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
+        void resetValidPxlsObj();
+        ~RSGISCountValidPixels();
+    protected:
+        RSGISImageValidDataMetric *validPxlsObj;
+        float noDataVal;
+    };
+}}
 
 #endif
 
