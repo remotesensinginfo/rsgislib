@@ -36,10 +36,31 @@ Subset / Mask
 .. autofunction:: rsgislib.imageutils.subset2polys
 
 
+Extract
+--------
+
+.. autofunction:: rsgislib.imageutils.extractZoneImageValues2HDF
+
+
+Create
+---------
+
+.. autofunction:: rsgislib.imageutils.createBlankImage
+.. autofunction:: rsgislib.imageutils.createCopyImage
+
+Select / Stack bands
+---------------------
+
+.. autofunction:: rsgislib.imageutils.selectImageBands
+.. autofunction:: rsgislib.imageutils.stackImageBands
+
+
 Other
 ------
+
 .. autofunction:: rsgislib.imageutils.popImageStats
-.. autofunction:: rsgislib.imageutils.stackImageBands
+.. autofunction:: rsgislib.imageutils.stackStats
+.. autofunction:: rsgislib.imageutils.orderImageUsingValidPxls
 
 * :ref:`genindex`
 * :ref:`modindex`
