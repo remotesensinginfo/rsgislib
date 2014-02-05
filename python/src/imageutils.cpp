@@ -1127,11 +1127,10 @@ static PyMethodDef ImageUtilsMethods[] = {
 "* bands is a list of integers for the bands in the input image to exported to the output image (Note band count starts at 1)."
 "\nExample::\n"
 "\n"
-"import rsgislib.imageutils\n"
-"import rsgislib\n"
-"\n"
-"bands = [1,2]\n"
-"rsgislib.imageutils.selectImageBands(\"N06W053_07_ALL_sl_sub.kea\", \"N06W053_07_ALL_sl_sub_HHVV.kea\", \"KEA\", rsgislib.TYPE_32INT, bands)\n"
+"   import rsgislib.imageutils\n"
+"   import rsgislib\n"
+"   bands = [1,2]\n"
+"   rsgislib.imageutils.selectImageBands('N06W053_07_ALL_sl_sub.kea', 'N06W053_07_ALL_sl_sub_HHVV.kea', 'KEA', rsgislib.TYPE_32INT, bands)\n"
 "\n"},
 
     {"subset", ImageUtils_Subset, METH_VARARGS,
@@ -1271,10 +1270,12 @@ static PyMethodDef ImageUtilsMethods[] = {
 
 {"stackStats", ImageUtils_StackStats, METH_VARARGS,
     "imageutils.stackStats(inputImage, outputImage, numBands, stat, gdalformat, type)\n"
-    "Create a new blank image with the parameters specified.\n"
+    "Calculate statistics for every pixel in a stack of image. If all bands are used a single band image is produced with the specified statistics.\n"
+    "If a number of bands are specified statistics are taken over every n bands to provide an image with B / n bands (where B is the number of input bands. \
+    For example, can be used to produce monthly composite images from a stack with images from every day.\n"
     "\n"
-    "* inputImage is a string containing the name and path for the input image, which is to be copied.\n"
-    "* outputImage is a string containing the name and path for the outputted image.\n"
+    "* inputImage is a string containing the name and path for the input image.\n"
+    "* outputImage is a string containing the name and path for the output image.\n"
     "* numBands is an integer specifying the number of image bands in the output image, pass 'None' to use all bands.\n"
     "* stat is a string providing the statistics to calculate, options are 'mean', 'min', 'max', and 'range'.\n"
     "* gdalformat is a string providing the gdalformat of the output image (e.g., KEA).\n"
@@ -1282,6 +1283,8 @@ static PyMethodDef ImageUtilsMethods[] = {
     "\n"
     "Example::\n"
     "\n"
+    "   import rsgislib\n"
+    "   from rsgislib import imageutils\n"
     "   inputImage = './Rasters/injune_p142_casi_sub_utm.kea'\n"
     "   outputImage = './TestOutputs/injune_p142_casi_sub_utm_stackStats.kea'\n"
     "   gdalformat = 'KEA'\n"

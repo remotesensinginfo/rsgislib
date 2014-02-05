@@ -1162,6 +1162,14 @@ static PyMethodDef RasterGISMethods[] = {
 "* clumpsImage is a string containing the name of the input clump file\n"
 "* addColourTable2Img is a boolean TODO: expand\n"
 "* calcImagePyramids is a boolean\n"
+"\n"
+"Example::\n"
+"\n"
+"   from rsgislib import rastergis\n"
+"   clumps='injune_p142_casi_sub_utm_segs_nostats_addstats.kea'\n"
+"   pyramids=True\n"
+"   colourtable=True\n"
+"   rastergis.populateStats(clumps, colourtable, pyramids)\n"
 "\n"},
 
     {"copyRAT", RasterGIS_CopyRAT, METH_VARARGS,
@@ -1205,6 +1213,14 @@ static PyMethodDef RasterGISMethods[] = {
 "* inputImage is a string containing the name of the input image file\n"
 "* eastingsField is a string containing the name of the eastings field\n"
 "* northingsField is a string containing the name of the northings field\n"
+"\n"
+"Example::\n"
+"\n"
+"   from rsgislib import rastergis\n"
+"   image = 'injune_p142_casi_sub_utm_segs_spatloc_eucdist.kea'\n"
+"   eastings = 'Easting'\n"
+"   northings = 'Northing'\n"
+"   rastergis.spatialLocation(image, eastings, northings)\n"
 "\n"},
 
     {"populateRATWithStats", RasterGIS_PopulateRATWithStats, METH_VARARGS,
