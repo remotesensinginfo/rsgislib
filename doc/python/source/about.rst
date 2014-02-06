@@ -33,6 +33,16 @@ If you have used RSGISLib for published work then you should cite the following 
 
 Peter Bunting, Daniel Clewley, Richard M. Lucas and Sam Gillingham. 2014. The Remote Sensing and GIS Software Library (RSGISLib), Computers & Geosciences. Volume 62, Pages 216-226 http://dx.doi.org/10.1016/j.cageo.2013.08.007.
 
+Bibtex::
+
+    @article{Bunting_etal_2014,
+    	Author = {Bunting, Peter and Clewley, Daniel and Lucas, Richard M and Gillingham, Sam},
+    	Title = {{The Remote Sensing and GIS Software Library (RSGISLib)}},
+    	Journal = {Computers and Geosciences},
+    	Pages = {216--226},
+    	Volume = {62},
+    	Year = {2014}}
+    
 **Is RSGISLib intended to be a substitute for commercial GIS / RS packages or other open source packages?**
 
 No, RSGISLib is not being developed as a substitute for ArcMap / QGIS or ENVI. As stated above, RSGISLib is mainly developed to support our research, because of this there is a lot of advanced functionality in RSGISLib that is unavailable in other packages. Although RSGISLib works well on the desktop, it scales well to a High Performance Computing (HPC) environment, which is an area many of the previously mentioned software aren't focusing on.
