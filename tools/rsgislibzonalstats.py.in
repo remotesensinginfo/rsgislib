@@ -1,0 +1,92 @@
+#!/usr/bin/env python
+
+#############################################
+# rsgislibzonalstats.py
+#
+#  Copyright 2014 RSGISLib.
+#
+#  RSGISLib: 'The remote sensing and GIS Software Library'
+#
+#  RSGISLib is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  RSGISLib is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with RSGISLib.  If not, see <http://www.gnu.org/licenses/>.
+#
+# Purpose:  Extracting statistics for pixels within polygons 
+#
+# Author: Dan Clewley
+# Email: daniel.clewley@gmail.com
+# Date: 18/08/2013
+# Version: 1.0
+# 
+#############################################
+
+import os, sys, argparse
+try:
+    import rsgislib
+    from rsgislib import zonalstats
+except ImportError:
+    print("ERROR: Couldn't import RSGISLib python modules")
+    sys.exit()
+
+# Set up options
+parser = argparse.ArgumentParser()
+parser.add_argument("--inimage", type=str, help="Input image.", required=True)
+parser.add_argument("--invector", type=str, \
+    help="Input Shapefile containing regions of interest.", required=True)
+parser.add_argument("--outstats", type=str, \
+    help="Output Shapefile / CSV file with statistics.", required=True)
+parser.add_argument("--force", dest='force', default=False, action='store_true', \
+    help="Force removal of output shapefile if it exists.")
+parser.add_argument("--noprojwarnings", dest='noprojwarnings', default=False, \
+    action='store_true', \
+    help="Don't print warning if projection is different for 'inimage' \
+    and 'invector'")
+parser.add_argument("--min", dest='calcMin', default=False, action='store_true')
+parser.add_argument("--max", dest='calcMax', default=False, action='store_true')
+parser.add_argument("--mean", dest='calcMean', default=False, action='store_true')
+parser.add_argument("--stddev", dest='calcStDev', default=False, \
+    action='store_true')
+parser.add_argument("--mode", dest='calcMode', default=False, action='store_true')
+parser.add_argument("--sum", dest='calcSum', default=False, action='store_true')
+parser.add_argument("--minThreshold", dest='minThreshold', type=float, default=None)
+parser.add_argument("--maxThreshold", dest='maxThreshold', type=float, default=None)
+args = parser.parse_args() 
+
+# Set up ZonalAttributes object with statistics to calculate
+zonalattributes = zonalstats.ZonalAttributes(minThreshold=args.minThreshold, \
+maxThreshold=args.maxThreshold, calcCount=False, calcMin=args.calcMin, \
+calcMax=args.calcMax, calcMean=args.calcMean, calcStdDev=args.calcStDev, \
+calcMode=args.calcMode, calcSum=args.calcSum)
+
+# Use input raster band names (if available) for output
+# column names
+useBandNames = True
+# Include pixels where the center is in the polygon
+zonalStatsMethod = zonalstats.METHOD_POLYCONTAINSPIXELCENTER
+
+print('rsgislibzonalstats.py script provides command line utility.')
+print('for extracting statistics for pixels within polygons ')
+print('This script was distributed with @RSGISLIB_PACKAGE_STRING@')
+print('Copyright (C) @RSGISLIB_COPYRIGHT_YEAR@ Peter Bunting and Daniel Clewley')
+print('For support please email @RSGISLIB_PACKAGE_BUGREPORT@')
+
+# Check if a CSV or Shapefile is required for output statistics.
+if os.path.splitext(args.outstats)[-1] == '.csv':
+    zonalstats.pixelStats2TXT(args.inimage, args.invector, args.outstats, \
+    zonalattributes, useBandNames, args.noprojwarnings, zonalStatsMethod)
+elif os.path.splitext(args.outstats)[-1] == '.shp':
+    zonalstats.pixelStats2SHP(args.inimage, args.invector, args.outstats, \
+    zonalattributes, args.force, useBandNames, args.noprojwarnings, \
+    zonalStatsMethod) 
+else:
+    print("--outstats file must end in '.csv' (CSV) or '.shp' \
+    (ESRI Shapefile)")
