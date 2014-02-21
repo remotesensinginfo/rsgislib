@@ -54,7 +54,39 @@ import collections
 import fnmatch
 import osgeo.gdal as gdal
 
-def runShepherdSegmentation(inputImg, outputClumps, outputMeanImg, tmpath, gdalFormat, noStats, noStretch, noDelete, numClusters, minPxls, distThres, bands, sampling, kmMaxIter): 
+def runShepherdSegmentation(inputImg, outputClumps, outputMeanImg=None, tmpath='.', gdalFormat='KEA', noStats=False, noStretch=False, noDelete=False, numClusters=100, minPxls=10, distThres=1000000, bands=None, sampling=100, kmMaxIter=200): 
+    """
+Utility function to call the segmentation algorithm of Shepherd et al. (2014).
+
+Where:
+
+* inputImg is a string containing the name of the input file
+* outputClumps is a string containing the name of the output clump file
+* outputMeanImg is the output mean image file (clumps attributed with pixel mean from input image) - pass 'None' to skip creating.
+* tmpath is a file path for intermediate files (default is current directory).
+* gdalformat is a string containing the GDAL format for the output file (default is KEA)
+* noStats is a bool which specifies that no image statistics and pyramids should be built for the output images.
+* noStretch is a bool which specifies that the input image bands should not be stretched.
+* noDelete is a book which specifies that the temporary images created during processing should not be deleted once processing has been completed.
+* numClusters is an int which specifies the number of clusters within the KMeans clustering
+* minPxls is an int which specifies the minimum number pixels within a segments.
+* distThres specifies the distance threshold for joining the segments (default is a very large value which turns off this option.).
+* bands is an array providing a subset of image bands to use (default is None to use all bands)
+* sampling specify the subsampling of the image for the data used within the KMeans (1 == no subsampling; default is 100)
+* kmMaxIter maximum iterations for KMeans.
+
+Example::
+
+    from rsgislib.segmentation import segutils
+    
+    inputImg = 'jers1palsar_stack.kea'
+    outputClumps = 'jers1palsar_stack_clumps_elim_final.kea'
+    outputMeanImg = 'jers1palsar_stack_clumps_elim_final_mean.kea'
+    
+    segutils.runShepherdSegmentation(inputImg, outputClumps, outputMeanImg, minPxls=100)
+
+
+    """
     rsgisUtils = rsgislib.RSGISPyUtils()
     
     basefile = os.path.basename(inputImg)
