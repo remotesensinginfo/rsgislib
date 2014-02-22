@@ -2,7 +2,6 @@ RSGISLib Image Utilities Module
 =================================
 
 .. automodule:: rsgislib.imageutils
-   :members:
    :undoc-members:
 
 Projection
@@ -61,6 +60,7 @@ Other
 .. autofunction:: rsgislib.imageutils.popImageStats
 .. autofunction:: rsgislib.imageutils.stackStats
 .. autofunction:: rsgislib.imageutils.orderImageUsingValidPxls
+.. autofunction:: rsgislib.imageutils.setBandNames
 
 * :ref:`genindex`
 * :ref:`modindex`
