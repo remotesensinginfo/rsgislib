@@ -1344,6 +1344,7 @@ static PyMethodDef RasterGISMethods[] = {
 "rastergis.export2Ascii(inputImage, outputFile, fields)\n"
 "Exports selected columns from a GDAL RAT to ASCII file (comma separated).\n"
 "Where:\n"
+"\n"
 "* inputImage is a string containing the name of the input image file TODO: check and expand\n"
 "* outputFile is a string containing the name of the output file \n"
 "* fields is a sequence of strings containing the field names\n"
