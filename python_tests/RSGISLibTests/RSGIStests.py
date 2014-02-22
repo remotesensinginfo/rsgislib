@@ -562,6 +562,12 @@ class RSGISTests:
         dataType = rsgislib.TYPE_8INT
         imageutils.stretchImage(inputImage, outputImage, False, "", True, False, gdalformat, dataType, imageutils.STRETCH_LINEARSTDDEV, 2)
 
+    def testSetBandNames(self):
+        print("PYTHON TEST: popImageStats")
+        inputImage = './TestOutputs/injune_p142_casi_sub_utm.kea'
+        bandNames = ['446nm','530nm','549nm','569nm','598nm','633nm','680nm','696nm','714nm','732nm','741nm','752nm','800nm','838nm']
+        imageutils.setBandNames(inputImage, bandNames)
+
      # Zonal Stats
 
     def testPointValue2SHP(self):
@@ -851,6 +857,7 @@ if __name__ == '__main__':
         t.tryFuncAndCatch(t.testStackStats)
         t.tryFuncAndCatch(t.testCreateCopyImage)
         t.tryFuncAndCatch(t.testStretchImage)
+        t.tryFuncAndCatch(t.testSetBandNames)
         
     if testLibraries == 'all' or testLibraries == 'rastergis':
     
