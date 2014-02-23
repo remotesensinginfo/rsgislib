@@ -24,9 +24,10 @@
 
 namespace rsgis{namespace filter{
     
-	RSGISLeeFilter::RSGISLeeFilter(int numberOutBands, int size, std::string filenameEnding, unsigned int nLooks) : RSGISImageFilter(numberOutBands, size, filenameEnding)
+	RSGISLeeFilter::RSGISLeeFilter(int numberOutBands, int size, std::string filenameEnding, unsigned int nLooks, float internalScaleFactor) : RSGISImageFilter(numberOutBands, size, filenameEnding)
     {
         this->nLooks = nLooks;
+        this->internalScaleFactor = internalScaleFactor;
     }
 	
 	void RSGISLeeFilter::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
@@ -41,7 +42,7 @@ namespace rsgis{namespace filter{
       	float cU = sqrt(1. / this->nLooks); // Noise variation coefficient;
 		float nNoiseMean = 1; // Mean multiplicative noise
 		float k = 0;
-
+        
         for(int i = 0; i < numBands; i++)
         {
             iMean = 0;
@@ -55,10 +56,10 @@ namespace rsgis{namespace filter{
                 {
                     if(dataBlock[i][j][k] != 0)
 					{
-							iMean = iMean + dataBlock[i][j][k];
+							iMean = iMean + dataBlock[i][j][k]*this->internalScaleFactor;
 							if((j == middleVal) && (k == middleVal))
 							{
-								iVal = dataBlock[i][j][k];
+								iVal = dataBlock[i][j][k]*this->internalScaleFactor;
 							}
 							numVal++;
 					}
@@ -74,7 +75,7 @@ namespace rsgis{namespace filter{
                 {
                      if(dataBlock[i][j][k] != 0)
 					 {
-					     iVar = iVar + pow((dataBlock[i][j][k] - iMean), 2);
+					     iVar = iVar + pow((dataBlock[i][j][k]*this->internalScaleFactor - iMean), 2);
 					 }
                 }
             }
@@ -83,8 +84,7 @@ namespace rsgis{namespace filter{
             
             k = (nNoiseMean * iVar) / (iMean*iMean*cU + nNoiseMean*nNoiseMean*iVar);
             outI = iMean + k*(iVal - nNoiseMean + iMean);
-            output[i] = outI;
-            //std::cout << "w = " << w << ", In = " << iVal << ", out = " << outI << std::endl;
+            output[i] = outI / this->internalScaleFactor;
         }
 	}
 	
