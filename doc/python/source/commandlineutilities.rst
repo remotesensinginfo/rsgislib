@@ -14,6 +14,7 @@ Processing
 * rsgislibsegmentation.py - Run image segmentation
 * rsgislibattributerat.py - Attribute Raster Attribute Table
 * rsgislibzonalstats.py - Zonal statistics
+* rsgislibmosaic.py - Mosaic
 
 Other
 -----
