@@ -30,11 +30,11 @@
 # 
 ##############################################
 
-import os, sys, subprocess
-from time import strftime
+import os
 import rsgislib
 from rsgislib import imageutils
 import argparse
+import fnmatch
 
 def getRSGISLibDataType(gdaltype):
     gdaltype = gdaltype.lower()
@@ -88,12 +88,13 @@ parser = argparse.ArgumentParser()
 parser.add_argument("-i", "--indir", type=str, required=True, help="Input directory to recursively search")
 parser.add_argument("-s", "--search", type=str, required=True, help="Search string, e.g., '*kea'")
 parser.add_argument("-o", "--outmosaic", type=str, required=True, help="Output mosaic file")
-parser.add_argument("-ot", dest='datatype',type=str, default='Float32',help="Data type")
-parser.add_argument("--backgroundval", dest='datatype',type=float, default=0,help="Background Value (Default 0)")
-parser.add_argument("--skipval", dest='datatype',type=float, default=0,help="Value to be skipped (nodata values) in the input images (Default 0)")
-parser.add_argument("--skipband", dest='datatype',type=int, default=1,help="Band to check for skip val (Default 1)")
-parser.add_argument("--minpix", action='store_true', default=False, help="Use minimum pixel in overlap areas (default, use last in)")
-parser.add_argument("--maxpix", action='store_false',default=False, help="User maximum pixel in overlap areas (default, use last in)")
+parser.add_argument("-l",'--outlist',type=str, default=None,help="Output text file with list of files in mosaic (optional)")
+parser.add_argument("-ot",'--datatype',type=str, default='Float32',help="Data type")
+parser.add_argument("--backgroundval", type=float, default=0,help="Background Value (default 0)")
+parser.add_argument("--skipval", type=float, default=0,help="Value to be skipped (nodata values) in the input images (default 0)")
+parser.add_argument("--skipband", type=int, default=1,help="Band to check for skip val (default 1)")
+parser.add_argument("--minpix", action='store_true', default=False, help="Use minimum pixel in overlap areas (default, use last image in)")
+parser.add_argument("--maxpix", action='store_false',default=False, help="Use maximum pixel in overlap areas (default, use last image in)")
 args = parser.parse_args()    
 
 overlapBehaviour = 0
@@ -108,18 +109,24 @@ if args.maxpix:
 outFormat=getGDALFormat(args.outmosaic)
 
 # Recursively find all files in the input directory using specified search string
-command='find ' + args.indir + ' -name \'' + args.search + '\''
-out = subprocess.Popen(command,shell=True,stdin=subprocess.PIPE, stdout=subprocess.PIPE,stderr=subprocess.PIPE)
-(stdout, stderr) = out.communicate()
-# Check which python version we're using
-if sys.version_info[0] > 2:
-    fileList = stdout.decode().split()
-else:
-    fileList = stdout[:-1].split('\n')
+fileList = []
+
+# Walk through directory
+for dName, sdName, fList in os.walk(args.indir):
+    for fileName in fList:
+        if fnmatch.fnmatch(fileName, args.search): # Match search string
+            fileList.append(os.path.join(dName, fileName))
 
 fileCount=len(fileList)
 
 print('Found %i files'%fileCount)
+
+# Save list of files
+if args.outlist is not None:
+    outFile = open(args.outlist,'w')
+    for fileName in fileList:
+        outFile.write(fileName + '\n')
+    outFile.close()
 
 print('Creating mosaic...')
 t = rsgislib.RSGISTime()
