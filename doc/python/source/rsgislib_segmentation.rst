@@ -1,5 +1,5 @@
 RSGISLib Image Segmentation Module
-=================================
+===================================
 
 .. automodule:: rsgislib.segmentation
    :members:
@@ -9,15 +9,36 @@ Utilities
 ---------
 .. autofunction:: rsgislib.segmentation.segutils.runShepherdSegmentation
 
-Main
------
-.. autofunction:: rsgislib.segmentation.RMSmallClumpsStepwise
-.. autofunction:: rsgislib.segmentation.UnionOfClumps
+
+Clump
+------
 .. autofunction:: rsgislib.segmentation.clump
-.. autofunction:: rsgislib.segmentation.eliminateSinglePixels
+
+Label
+------
 .. autofunction:: rsgislib.segmentation.labelPixelsFromClusterCentres
-.. autofunction:: rsgislib.segmentation.mergeSegmentationTiles
 .. autofunction:: rsgislib.segmentation.relabelClumps
+
+
+Elimination
+--------------
+.. autofunction:: rsgislib.segmentation.eliminateSinglePixels
+.. autofunction:: rsgislib.segmentation.rmSmallClumps
+.. autofunction:: rsgislib.segmentation.RMSmallClumpsStepwise
+
+Join / Union
+-------------
+.. autofunction:: rsgislib.segmentation.UnionOfClumps
+
+
+Visualisation
+--------------
+.. autofunction:: rsgislib.segmentation.meanImage
+
+
+Tiles
+------
+.. autofunction:: rsgislib.segmentation.mergeSegmentationTiles
 
 * :ref:`genindex`
 * :ref:`modindex`

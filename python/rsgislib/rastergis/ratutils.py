@@ -39,13 +39,8 @@
 ############################################################################
 
 import sys
-
-try:
-    import rsgislib
-    from rsgislib import rastergis
-except ImportError:
-    print("ERROR: Couldn't import RSGISLib python modules")
-    sys.exit()
+import rsgislib
+from rsgislib import rastergis
 
 try:
     import osgeo.gdal as gdal
@@ -53,10 +48,34 @@ except ImportError:
     print("ERROR: Couldn't import GDAL python bindings")
     sys.exit()
 
-def populateImageStats(inputImage, clumpsFile, outascii, threshold, calcMin, calcMax, calcSum, calcMean, calcStDev, calcMedian, calcCount, calcArea, calcLength, calcWidth, calcLengthWidth):
+def populateImageStats(inputImage, clumpsFile, outascii=None, threshold=0.0, calcMin=False, calcMax=False, calcSum=False, calcMean=False, calcStDev=False, calcMedian=False, calcCount=False, calcArea=False, calcLength=False, calcWidth=False, calcLengthWidth=False):
     
-    """ Attribute RAT with stats from all bands in an input
-        image.
+    """ Attribute RAT with statistics from from all bands in an input image.
+
+Where:
+
+* inputImage - input image to calculate statistics from, if band names are avaialble these will be used for attribute names in the output RAT.
+* clumpsFile - input clumps file, statistics are added to RAT.
+* threshold - float, values below this are ignored (default=0)
+* outascii - string providing output CSV file (optional).
+* calcMin - Calculate minimum
+* calcMax - Calculate maximum
+* calcSum - Calculate sum
+* calcMean - Calculate mean
+* calcStDev - Calculate standard deviation
+* calcMedian - Calculate median
+* calcCount - Calculate count
+* calcArea - Calculate clump area 
+* calcLength - Calculate clump lenght
+* calcWidth - Calculate clump width
+
+Example::
+
+    from rsgislib.rastergis import ratutils
+    inputImage = 'jers1palsar_stack.kea'
+    clumpsFile = 'jers1palsar_stack_clumps_elim_final.kea'
+    ratutils.populateImageStats(inputImage, clumpsFile, calcMean=True)
+
     """
 
     # Open image

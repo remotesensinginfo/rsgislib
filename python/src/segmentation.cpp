@@ -308,7 +308,6 @@ static PyObject *Segmentation_rmSmallClumps(PyObject *self, PyObject *args)
 {
     const char *pszInputClumps, *pszOutputClumps, *pszGDALFormat;
     float areaThreshold;
-    PyObject *pNoData; //could be none or a number
     if( !PyArg_ParseTuple(args, "ssfs:rmSmallClumps", &pszInputClumps, &pszOutputClumps, &areaThreshold, &pszGDALFormat))
         return NULL;
     
@@ -330,7 +329,6 @@ static PyObject *Segmentation_meanImage(PyObject *self, PyObject *args)
 {
     const char *pszInputImage, *pszInputClumps, *pszOutputImage, *pszGDALFormat;
     int nDataType;
-    PyObject *pNoData; //could be none or a number
     if( !PyArg_ParseTuple(args, "ssssi:mergeImage", &pszInputImage, &pszInputClumps, &pszOutputImage, &pszGDALFormat, &nDataType))
         return NULL;
     
@@ -357,98 +355,115 @@ static PyMethodDef SegmentationMethods[] = {
 "segmentation.labelPixelsFromClusterCentres(inputimage, outputimage, clustercenters, ignorezeros, gdalformat)\n"
 "Labels image pixels with the ID of the nearest cluster centre.\n"
 "where:\n"
-" * inputimage is a string containing the name of the input file\n"
-" * outputimage is a string containing the name of the output file\n"
-" * clustercentres is a string containing the name of the cluster centre file\n"
-" * ignore zeros is a bool\n"
-" * gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"},
+"\n"
+"* inputimage is a string containing the name of the input file\n"
+"* outputimage is a string containing the name of the output file\n"
+"* clustercentres is a string containing the name of the cluster centre file\n"
+"* ignore zeros is a bool\n"
+"* gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
+"\n"},
 
     {"eliminateSinglePixels", Segmentation_eliminateSinglePixels, METH_VARARGS, 
 "segmentation.eliminateSinglePixels(inputimage, clumpsimage, outputimage, tempfile, gdalformat, processinmemory, ignorezeros)\n"
 "Eliminates single pixels\n"
 "where:\n"
-" * inputimage is a string containing the name of the input file\n"
-" * clumpsimage is a string containing the name of the clump file\n"
-" * outputimage is a string containing the name of the output file\n"
-" * tempfile is a string containing the name of the temporary file to use\n"
-" * gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
-" * processinmemory is a bool specifying if processing should be carried out in memory (faster if sufficient RAM is available, set to False if unsure).\n"
-" * ignore zeros is a bool\n"},
+"\n"
+"* inputimage is a string containing the name of the input file\n"
+"* clumpsimage is a string containing the name of the clump file\n"
+"* outputimage is a string containing the name of the output file\n"
+"* tempfile is a string containing the name of the temporary file to use\n"
+"* gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
+"* processinmemory is a bool specifying if processing should be carried out in memory (faster if sufficient RAM is available, set to False if unsure).\n"
+"* ignore zeros is a bool\n"
+"\n"},
 
     {"clump", Segmentation_clump, METH_VARARGS,
 "segmentation.clump(inputimage, outputimage, gdalformat, processinmemory, nodata)\n"
 "clump\n"
 "where:\n"
-" * inputimage is a string containing the name of the input file\n"
-" * outputimage is a string containing the name of the output file\n"
-" * gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
-" * processinmemory is a bool specifying if processing should be carried out in memory (faster if sufficient RAM is available, set to False if unsure).\n"
-" * nodata is None or float\n"},
+"\n"
+"* inputimage is a string containing the name of the input file\n"
+"* outputimage is a string containing the name of the output file\n"
+"* gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
+"* processinmemory is a bool specifying if processing should be carried out in memory (faster if sufficient RAM is available, set to False if unsure).\n"
+"* nodata is None or float\n"
+"\n"},
 
     {"RMSmallClumpsStepwise", Segmentation_RMSmallClumpsStepwise, METH_VARARGS,
 "segmentation.RMSmallClumpsStepwise(inputimage, clumpsimage, outputimage, gdalformat, stretchstatsavail, stretchstatsfile, storemean, processinmemory, minclumpsize, specThreshold)\n"
 "eliminate clumps smaller than a given size from the scene, small clumps will be combined with their spectrally closest neighbouring  clump in a stepwise fashion unless over spectral distance threshold\n"
-"Does even more stuff\n"
 "where:\n"
-" * inputimage is a string containing the name of the input file\n"
-" * clumpsimage is a string containing the name of the clump file\n"
-" * outputimage is a string containing the name of the output file\n"
-" * gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
-" * stretchstatsavail is a bool\n"
-" * stretchstatsfile is a string containing the name of the stretch stats file\n"
-" * storemean is a bool\n"
+"\n"
+"* inputimage is a string containing the name of the input file\n"
+"* clumpsimage is a string containing the name of the clump file\n"
+"* outputimage is a string containing the name of the output file\n"
+"* gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
+"* stretchstatsavail is a bool\n"
+"* stretchstatsfile is a string containing the name of the stretch stats file\n"
+"* storemean is a bool\n"
 " * processinmemory is a bool specifying if processing should be carried out in memory (faster if sufficient RAM is available, set to False if unsure).\n"
 " * minclumpsize is an unsigned integer providing the minimum size for clumps.\n"
-" * specThreshold is a float providing the maximum (Euclidian distance) spectral separation for which to merge clumps. Set to a large value to ignore spectral separation and always merge.\n"},
+" * specThreshold is a float providing the maximum (Euclidian distance) spectral separation for which to merge clumps. Set to a large value to ignore spectral separation and always merge.\n"
+"\n"},
 
     {"relabelClumps", Segmentation_relabelClumps, METH_VARARGS,
 "segmentation.relabelClumps(inputimage, outputimage, gdalformat, processinmemory)\n"
 "Relabel clumps\n"
 "where:\n"
-" * inputimage is a string containing the name of the input file\n"
-" * outputimage is a string containing the name of the output file\n"
-" * gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
-" * processinmemory is a bool specifying if processing should be carried out in memory (faster if sufficient RAM is available, set to False if unsure).\n"},
+"\n"
+"* inputimage is a string containing the name of the input file\n"
+"* outputimage is a string containing the name of the output file\n"
+"* gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
+"* processinmemory is a bool specifying if processing should be carried out in memory (faster if sufficient RAM is available, set to False if unsure).\n"
+"\n"},
                                 
     {"UnionOfClumps", Segmentation_unionOfClumps, METH_VARARGS,
 "segmentation.unionOfClumps(outputimage, gdalformat, inputimagepaths, nodata)\n"
 "Union of clumps\n"
 "where:\n"
-" * outputimage is a string containing the name of the output file\n"
-" * gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
-" * inputimagepaths is a list of input image paths\n"
-" * nodata is None or float\n"},
+"\n"
+"* outputimage is a string containing the name of the output file\n"
+"* gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
+"* inputimagepaths is a list of input image paths\n"
+"* nodata is None or float\n"
+"\n"},
 
     {"mergeSegmentationTiles", Segmentation_mergeSegmentationTiles, METH_VARARGS,
 "segmentation.mergeSegmentationTiles(outputimage, bordermaskimage, tileboundary, tileoverlap, tilebody, colsname, inputimagepaths)\n"
 "Merge segmentation tiles\n"
 "where:\n"
+"\n"
 " * outputimage is a string containing the name of the output file\n"
 " * bordermaskimage is a string containing the name of the border mask file\n"
 " * tileboundary is an unsigned integer containing the tile boundary pixel value\n"
 " * tileoverlap is an unsigned integer containing the tile overlap pixel value\n"
 " * tilebody is an unsigned integer containing the tile body pixel value\n"
 " * colsname is a string containing the name of the object id column\n"
-" * inputimagepaths is a list of input image paths\n"},
+" * inputimagepaths is a list of input image paths\n"
+"\n"},
 
     {"rmSmallClumps", Segmentation_rmSmallClumps, METH_VARARGS,
 "segmentation.rmSmallClumps(clumpsImage, outputImage, threshold, gdalFormat)\n"
 "A function to remove small clumps and set them with a value of 0 (i.e., no data) \n"
 "where:\n"
-"  clumpsImage is a string containing the name of the input clumps file - note a column called \'Histogram\'.\n"
-"  outputImage is a string containing the name of the output clumps file\n"
-"  threshold is a float containing the area threshold (in pixels)\n"
-"  gdalFormat is a string defining the format of the output image.\n"},
+"\n"
+"* clumpsImage is a string containing the name of the input clumps file - note a column called \'Histogram\'.\n"
+"* outputImage is a string containing the name of the output clumps file\n"
+"* threshold is a float containing the area threshold (in pixels)\n"
+"* gdalFormat is a string defining the format of the output image.\n"
+"\n"},
     
     {"meanImage", Segmentation_meanImage, METH_VARARGS,
         "segmentation.meanImage(inputImage, inputClumps, outputImage, gdalFormat, gdaltype)\n"
         "A function to generate an image where with the mean value for each clump. Primarily for visualisation and evaluating segmentation.\n"
         "where:\n"
-        "  inputImage is a string containing the name of the input image file from which the mean is taken.\n"
-        "  inputClumps is a string containing the name of the input clumps file\n"
-        "  outputImage is a string containing the name of the output image.\n"
-        "  gdalFormat is a string defining the format of the output image.\n"
-        "  gdaltype is an containing one of the values from rsgislib.TYPE_*\n"},
+        "\n"
+        "* inputImage is a string containing the name of the input image file from which the mean is taken.\n"
+        "* inputClumps is a string containing the name of the input clumps file\n"
+        "* outputImage is a string containing the name of the output image.\n"
+        "* gdalFormat is a string defining the format of the output image.\n"
+        "* gdaltype is an containing one of the values from rsgislib.TYPE_*\n"
+        "\n"},
 
     {NULL}        /* Sentinel */
 };
