@@ -23,9 +23,11 @@ RSGISLib contains a number of algorithms for processing and analysing remote sen
 * Zonal statistics
 * General raster and vector processing
 
-To date it's been used as part of a number of publications and theses, for more details see:
+To date RSGISLib been used as part of a number of publications and theses, for more details see:
 
 Peter Bunting, Daniel Clewley, Richard M. Lucas and Sam Gillingham. 2014. The Remote Sensing and GIS Software Library (RSGISLib), Computers & Geosciences. Volume 62, Pages 216-226 http://dx.doi.org/10.1016/j.cageo.2013.08.007.
+
+For storing and processing laser scanning data the Sorted Pulse Data Library (SPDLib) is available to download from http://www.spdlib.org/
 
 **How do I cite RSGISLib?**
 
@@ -33,6 +35,16 @@ If you have used RSGISLib for published work then you should cite the following 
 
 Peter Bunting, Daniel Clewley, Richard M. Lucas and Sam Gillingham. 2014. The Remote Sensing and GIS Software Library (RSGISLib), Computers & Geosciences. Volume 62, Pages 216-226 http://dx.doi.org/10.1016/j.cageo.2013.08.007.
 
+Bibtex::
+
+    @article{Bunting_etal_2014,
+    	Author = {Bunting, Peter and Clewley, Daniel and Lucas, Richard M and Gillingham, Sam},
+    	Title = {{The Remote Sensing and GIS Software Library (RSGISLib)}},
+    	Journal = {Computers and Geosciences},
+    	Pages = {216--226},
+    	Volume = {62},
+    	Year = {2014}}
+    
 **Is RSGISLib intended to be a substitute for commercial GIS / RS packages or other open source packages?**
 
 No, RSGISLib is not being developed as a substitute for ArcMap / QGIS or ENVI. As stated above, RSGISLib is mainly developed to support our research, because of this there is a lot of advanced functionality in RSGISLib that is unavailable in other packages. Although RSGISLib works well on the desktop, it scales well to a High Performance Computing (HPC) environment, which is an area many of the previously mentioned software aren't focusing on.
@@ -57,11 +69,11 @@ RSGISLib is taught as part of the Masters course at Aberystwyth University. The 
 
 **How do I go about getting functionality added to RSGISLib?**
 
-For general suggestions submit a ticket on our `issues <https://bitbucket.org/petebunting/rsgislib/issues?status=new&status=open>`_ page on Bitbucket or post a suggestion to the Google groups mainling list. If there's functionality you need adding for a specific project you could try to add it yourself or you can contact us to enquire about consultancy work. 
+For general suggestions submit a ticket on our `issues <https://bitbucket.org/petebunting/rsgislib/issues?status=new&status=open>`_ page on Bitbucket or post a suggestion to the Google groups mailing list. If there's functionality you need adding for a specific project you could try to add it yourself or you can contact us to enquire about consultancy work. 
 
 **Who funds RSGISLib?**
 
-There has been no direct funding to develop RSGISLib or obligations to release it. However, there has been funding which has supported us and allowed us work on it. 
+There has been no direct funding to develop RSGISLib or obligations to release it. However, there has been funding which has supported us and allowed us work on it and we feel strongly about the role of open source software in reproducible research.
 
 Pete Bunting is employed by Aberystwyth University and has been since RSGISLib was started, with the exception of a year spent at Landcare Research (New Zealand), where a number of features including the segmentation and Raster GIS were added. Landcare Research continue to provide support for Pete. 
 

@@ -168,21 +168,21 @@ class RSGISTests:
         # NOT WORKING band not in image
         print("PYTHON TEST: Testing bandMath")
         outputImage = path + "TestOutputs/PSU142_b1mb2.kea"
-        format = "KEA"
+        gdalformat = "KEA"
         dataType = rsgislib.TYPE_32FLOAT
         expression = "b1*b2"
         bandDefns = []
         bandDefns.append(BandDefn("b1", inFileName, 1))
         bandDefns.append(BandDefn("b2", inFileName, 2))
-        imagecalc.bandMath(outputImage, expression, format, dataType, bandDefns)
+        imagecalc.bandMath(outputImage, expression, gdalformat, dataType, bandDefns)
 
     def testImageMaths(self):
         print("PYTHON TEST: Testing imageMath")
         outputImage = path + "TestOutputs/PSU142_multi1000.kea"
-        format = "KEA"
+        gdalformat = "KEA"
         dataType = rsgislib.TYPE_32UINT
         expression = "1e3*b1"
-        imagecalc.imageMath(inFileName, outputImage, expression, format, dataType)
+        imagecalc.imageMath(inFileName, outputImage, expression, gdalformat, dataType)
 
     def testReplaceValuesLessThan(self):
         print("PYTHON TEST: Replace values less than")
@@ -266,12 +266,12 @@ class RSGISTests:
         print("PYTHON TEST: allBandsEqualTo")
         inputImage = path + "Rasters/injune_p142_casi_sub_right_utm.kea"
         output = path + "TestOutputs/PSU142_Allbandsequal0Mask.kea"
-        format = "KEA"
+        gdalformat = "KEA"
         value = 0
         trueout = 0
         falseout = 1
         dataType = rsgislib.TYPE_8INT
-        imagecalc.allBandsEqualTo(inputImage, value, trueout, falseout, output, format, dataType)
+        imagecalc.allBandsEqualTo(inputImage, value, trueout, falseout, output, gdalformat, dataType)
 
     def testHistogram(self):
         print("PYTHON TEST: Histogram")
@@ -295,27 +295,27 @@ class RSGISTests:
         image = path + "Rasters/injune_p142_casi_sub_right_utm.kea"
         output = path + "TestOutputs/PSU142_MabDistWin.kea"
         window = 7
-        format = "KEA"
+        gdalformat = "KEA"
         dataType = rsgislib.TYPE_32FLOAT
-        imagecalc.mahalanobisDistFilter(image, output, window, format, dataType)
+        imagecalc.mahalanobisDistFilter(image, output, window, gdalformat, dataType)
 
     def testMahalanobisDistImg2Window(self):
         print("PYTHON TEST: MahalanobisDistImg2Window")
         image = path + "Rasters/injune_p142_casi_sub_right_utm.kea"
         output = path + "TestOutputs/PSU142_MabDist2ImgWin.kea"
         window = 7
-        format = "KEA"
+        gdalformat = "KEA"
         dataType = rsgislib.TYPE_32FLOAT
-        imagecalc.mahalanobisDist2ImgFilter(image, output, window, format, dataType)
+        imagecalc.mahalanobisDist2ImgFilter(image, output, window, gdalformat, dataType)
 
     def testCalcPxlColStats(self):
         print("PYTHON TEST: pxlColStats")
         image = path + "Rasters/injune_p142_casi_sub_right_utm.kea"
         output = path + "TestOutputs/PSU142_ImageStats.kea"
-        format = "KEA"
+        gdalformat = "KEA"
         dataType = rsgislib.TYPE_32FLOAT
         s = imagecalc.StatsSummary(calcMin=True, calcMax=True, calcSum=True, calcMean=True, calcMedian=True, calcStdDev=True, min=0.0)
-        imagecalc.imagePixelColumnSummary(image, output, s, format, dataType, 0, True)
+        imagecalc.imagePixelColumnSummary(image, output, s, gdalformat, dataType, 0, True)
 
     def testPxlColRegression(self):
         print("PYTHON TEST: pxlColRegression - skipping due to lack of bandvalues file.txt")
@@ -327,9 +327,9 @@ class RSGISTests:
         window = 9
         bandA = 1
         bandB = 1
-        format = "KEA"
+        gdalformat = "KEA"
         dataType = rsgislib.TYPE_32FLOAT
-        imagecalc.correlationWindow(image, output, window, bandA, bandB, format, dataType)
+        imagecalc.correlationWindow(image, output, window, bandA, bandB, gdalformat, dataType)
 
     # Raster GIS
     
@@ -414,10 +414,10 @@ class RSGISTests:
         print("PYTHON TEST: exportCols2GDALImage")
         clumps="./RATS/injune_p142_casi_sub_utm_clumps_elim_final_clumps_elim_final.kea"
         output="./TestOutputs/RasterGIS/injune_p142_casi_rgb_export.kea"
-        format = "KEA"
+        gdalformat = "KEA"
         dataType = rsgislib.TYPE_32FLOAT
         fields = ["BlueAvg", "GreenAvg", "RedAvg"]
-        rastergis.exportCols2GDALImage(clumps, output, format, dataType, fields)
+        rastergis.exportCols2GDALImage(clumps, output, gdalformat, dataType, fields)
 
     def testFindNeighbours(self):
         print("PYTHON TEST: findNeighbours")
@@ -428,8 +428,8 @@ class RSGISTests:
         print("PYTHON TEST: findBoundaryPixels")
         clumps="./RATS/injune_p142_casi_sub_utm_segs.kea"
         output="./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_borpxls.kea"
-        format="KEA"
-        rastergis.findBoundaryPixels(clumps, output, format)
+        gdalformat="KEA"
+        rastergis.findBoundaryPixels(clumps, output, gdalformat)
 
     def testCalcBorderLength(self):
         print("PYTHON TEST: calcBorderLength")
@@ -472,10 +472,10 @@ class RSGISTests:
         height = width
         overlap = 5
         offsettiling = 0
-        format = "KEA"
+        gdalformat = "KEA"
         dataType = rsgislib.TYPE_32INT
         ext='kea'
-        imageutils.createTiles(inputImage, outBase, width, height, overlap, offsettiling, format, dataType, ext)
+        imageutils.createTiles(inputImage, outBase, width, height, overlap, offsettiling, gdalformat, dataType, ext)
 
     def testCreateImageMosaic(self):
         print("PYTHON TEST: createImageMosaic")
@@ -485,9 +485,9 @@ class RSGISTests:
         skipVal = 0.
         skipBand = 1
         overlapBehaviour = 0
-        format = "KEA"
+        gdalformat = "KEA"
         dataType = rsgislib.TYPE_32FLOAT
-        imageutils.createImageMosaic(inputList, outImage, backgroundVal, skipVal, skipBand, overlapBehaviour, format, dataType)
+        imageutils.createImageMosaic(inputList, outImage, backgroundVal, skipVal, skipBand, overlapBehaviour, gdalformat, dataType)
 
     def testIncludeImages(self):
         print("PYTHON TEST: includeImages")
@@ -505,9 +505,9 @@ class RSGISTests:
         inputImage = './Rasters/injune_p142_casi_sub_utm.kea'
         inputVector = './Vectors/injune_p142_plot_location_utm.shp'
         outputImage = './TestOutputs/injune_p142_casi_sub_utm_subset.kea'
-        format = "KEA"
+        gdalformat = "KEA"
         dataType = rsgislib.TYPE_32FLOAT
-        imageutils.subset(inputImage, inputVector, outputImage, format, dataType)
+        imageutils.subset(inputImage, inputVector, outputImage, gdalformat, dataType)
 
     def testSubset2Polys(self):
         print("PYTHON TEST: subset2polys")
@@ -515,44 +515,58 @@ class RSGISTests:
         inputVector = './Vectors/injune_p142_plot_location_utm.shp'
         attribute = 'PLOTNO'
         outputImageBase = './TestOutputs/injune_p142_casi_sub_utm_subset_polys_'
-        format = 'KEA'
+        gdalformat = 'KEA'
         dataType = rsgislib.TYPE_32FLOAT
         ext = 'kea'
-        outFiles = imageutils.subset2polys(inputImage, inputVector, attribute, outputImageBase, format, dataType, ext)
+        outFiles = imageutils.subset2polys(inputImage, inputVector, attribute, outputImageBase, gdalformat, dataType, ext)
 
     def testSubset2Img(self):
         print("PYTHON TEST: subset2img")
         inputImage = './Rasters/injune_p142_casi_sub_utm.kea'
         inputROIImage = './TestOutputs/injune_p142_casi_sub_utm_subset.kea'
         outputImage = './TestOutputs/injune_p142_casi_sub_utm_subset2img.kea'
-        format = "KEA"
+        gdalformat = "KEA"
         dataType = rsgislib.TYPE_32FLOAT
-        imageutils.subset2img(inputImage, inputROIImage, outputImage, format, dataType)
+        imageutils.subset2img(inputImage, inputROIImage, outputImage, gdalformat, dataType)
 
     def testStackBands(self):
         print("PYTHON TEST: stackImageBands")
         imageList = ['./Rasters/injune_p142_casi_sub_utm_single_band.vrt','./Rasters/injune_p142_casi_sub_utm_single_band.vrt']
         bandNamesList = ['Image1','Image2']
         outputImage = './TestOutputs/injune_p142_casi_sub_stack.kea'
-        format = "KEA"
+        gdalformat = "KEA"
         dataType = rsgislib.TYPE_32FLOAT
-        imageutils.stackImageBands(imageList, bandNamesList, outputImage, None, 0, format, dataType)
+        imageutils.stackImageBands(imageList, bandNamesList, outputImage, None, 0, gdalformat, dataType)
 
     def testCreateCopyImage(self):
         print("PYTHON TEST: createCopyImage")
         inputImage = './Rasters/injune_p142_casi_sub_utm.kea'
         outputImage = './TestOutputs/injune_p142_casi_sub_utm_blank.kea'
-        format = 'KEA'
+        gdalformat = 'KEA'
         dataType = rsgislib.TYPE_32FLOAT
-        imageutils.createCopyImage(inputImage, outputImage, 1, 3, format, dataType)
+        imageutils.createCopyImage(inputImage, outputImage, 1, 3, gdalformat, dataType)
 
     def testStackStats(self):
         print("PYTHON TEST: stackStats")
         inputImage = './Rasters/injune_p142_casi_sub_utm.kea'
         outputImage = './TestOutputs/injune_p142_casi_sub_utm_stackStats.kea'
-        format = 'KEA'
+        gdalformat = 'KEA'
         dataType = rsgislib.TYPE_32FLOAT
-        imageutils.stackStats(inputImage, outputImage, None, 'mean', format, dataType)
+        imageutils.stackStats(inputImage, outputImage, None, 'mean', gdalformat, dataType)
+
+    def testStretchImage(self):
+        print("PYTHON TEST: stretchImage")
+        inputImage = './Rasters/injune_p142_casi_sub_utm.kea'
+        outputImage = './TestOutputs/injune_p142_casi_sub_utm_2sd.kea'
+        gdalformat = 'KEA'
+        dataType = rsgislib.TYPE_8INT
+        imageutils.stretchImage(inputImage, outputImage, False, "", True, False, gdalformat, dataType, imageutils.STRETCH_LINEARSTDDEV, 2)
+
+    def testSetBandNames(self):
+        print("PYTHON TEST: popImageStats")
+        inputImage = './TestOutputs/injune_p142_casi_sub_utm.kea'
+        bandNames = ['446nm','530nm','549nm','569nm','598nm','633nm','680nm','696nm','714nm','732nm','741nm','752nm','800nm','838nm']
+        imageutils.setBandNames(inputImage, bandNames)
 
      # Zonal Stats
 
@@ -653,8 +667,8 @@ class RSGISTests:
         outputImage = './TestOutputs/injune_p142_casi_sub_utm_single_band_offset3x3y_twarp.kea'
         wktStringFile = './Vectors/injune_p142_crowns_utm.prj'
         resolution = 1
-        format = 'KEA'
-        imageregistration.triangularwarp(inputImage,inputGCPs, outputImage, wktStringFile, resolution, format)
+        gdalformat = 'KEA'
+        imageregistration.triangularwarp(inputImage,inputGCPs, outputImage, wktStringFile, resolution, gdalformat)
         
     def testNNWarp(self):        
         inputImage = './Rasters/injune_p142_casi_sub_utm_single_band_offset3x3y.vrt'
@@ -662,8 +676,8 @@ class RSGISTests:
         outputImage = './TestOutputs/injune_p142_casi_sub_utm_single_band_offset3x3y_nnwarp.kea'
         wktStringFile = './Vectors/injune_p142_crowns_utm.prj'
         resolution = 1
-        format = 'KEA'
-        imageregistration.nnwarp(inputImage,inputGCPs, outputImage, wktStringFile, resolution, format)
+        gdalformat = 'KEA'
+        imageregistration.nnwarp(inputImage,inputGCPs, outputImage, wktStringFile, resolution, gdalformat)
 
     def testPolyWarp(self):        
         inputImage = './Rasters/injune_p142_casi_sub_utm_single_band_offset3x3y.vrt'
@@ -672,17 +686,17 @@ class RSGISTests:
         wktStringFile = './Vectors/injune_p142_crowns_utm.prj'
         resolution = 1
         polyOrder = 1
-        format = 'KEA'
-        imageregistration.polywarp(inputImage,inputGCPs, outputImage, wktStringFile, resolution, polyOrder, format)
+        gdalformat = 'KEA'
+        imageregistration.polywarp(inputImage,inputGCPs, outputImage, wktStringFile, resolution, polyOrder, gdalformat)
 
     def testGCP2GDAL(self):
         print("PYTHON TEST: gcps2gdal")
         inputImage = './Rasters/injune_p142_casi_sub_utm_single_band_offset3x3y.vrt'
         inputGCPs = './TestOutputs/injune_p142_casi_sub_utm_tie_points_basic.txt'
         outputImage = './TestOutputs/injune_p142_casi_sub_utm_single_band_offset3x3y_gcps.kea'
-        format = "KEA"
+        gdalformat = "KEA"
         dataType = rsgislib.TYPE_32INT
-        imageregistration.gcp2gdal(inputImage,inputGCPs, outputImage, format, dataType)
+        imageregistration.gcp2gdal(inputImage,inputGCPs, outputImage, gdalformat, dataType)
     
     # Vector utils
     def testRemoveAttributes(self):
@@ -842,6 +856,8 @@ if __name__ == '__main__':
         t.tryFuncAndCatch(t.testStackBands)
         t.tryFuncAndCatch(t.testStackStats)
         t.tryFuncAndCatch(t.testCreateCopyImage)
+        t.tryFuncAndCatch(t.testStretchImage)
+        t.tryFuncAndCatch(t.testSetBandNames)
         
     if testLibraries == 'all' or testLibraries == 'rastergis':
     

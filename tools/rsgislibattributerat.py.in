@@ -1,14 +1,31 @@
 #!/usr/bin/env python
 
 #############################################
-# rsgislib_attributeRAT.py
+# rsgislibattributerat.py
 #
-# A script to calculate attribute a RAT with 
-# statistics from each band in an input image.
+#  Copyright 2014 RSGISLib.
 #
-# Requires RSGISLib HG version > 639
+#  RSGISLib: 'The remote sensing and GIS Software Library'
 #
-# Dan Clewley (daniel.clewley@gmail.com) 17/10/2013
+#  RSGISLib is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  RSGISLib is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with RSGISLib.  If not, see <http://www.gnu.org/licenses/>.
+#
+# Purpose:  Attribute RAT with statistics from image
+#
+# Author: Dan Clewley
+# Email: daniel.clewley@gmail.com
+# Date: 17/10/2013
+# Version: 1.0
 # 
 #############################################
 import sys, argparse

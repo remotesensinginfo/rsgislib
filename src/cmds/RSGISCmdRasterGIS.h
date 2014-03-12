@@ -95,14 +95,14 @@ namespace rsgis{ namespace cmds {
         unsigned int percentile;
         std::string fieldName;
     };
-    
+
     struct RSGISShapeParamCmds
     {
         rsgisshapeindexcmds idx;
         std::string colName;
         unsigned int colIdx;
     };
-    
+
     struct RSGISClassChangeFieldsCmds
     {
         std::string name;
@@ -181,7 +181,7 @@ namespace rsgis{ namespace cmds {
     void executeGenerateColourTable(std::string inputImage, std::string clumpsImage, unsigned int redBand, unsigned int greenBand, unsigned int blueBand)throw(RSGISCmdException);
 
     /** Function to find the majority for class (string - field) from a set of small objects to large objects */
-    void executeStrClassMajority(std::string baseSegment, std::string infoSegment, std::string baseClassCol, std::string infoClassCol)throw(RSGISCmdException);
+    void executeStrClassMajority(std::string baseSegment, std::string infoSegment, std::string baseClassCol, std::string infoClassCol, bool ignoreZero = true)throw(RSGISCmdException);
 
     /** Function to classify segments using a spectral distance majority classification */
     void executeSpecDistMajorityClassifier(std::string inputImage, std::string inClassNameField, std::string outClassNameField, std::string trainingSelectCol, std::string eastingsField, std::string northingsField, std::string areaField, std::string majWeightField, std::vector<std::string> fields, float distThreshold, float specDistThreshold, SpectralDistanceMethodCmds distMethod, float specThresOriginDist)throw(RSGISCmdException);
@@ -194,7 +194,7 @@ namespace rsgis{ namespace cmds {
 
     /** Function to generate a mask for paraticular class */
     void executeClassMask(std::string inputImage, std::string classField, std::string className, std::string outputFile, std::string imageFormat, RSGISLibDataType dataType)throw(RSGISCmdException);
-    
+
     /** Function to find the clump neighbours */
     void executeFindNeighbours(std::string inputImage)throw(RSGISCmdException);
 
@@ -218,13 +218,13 @@ namespace rsgis{ namespace cmds {
 
     /** Function to identify segments which have changed by looking for statistical outliers (std dev) from class population */
     void executeFindChangeClumpsFromStdDev(std::string clumpsImage, std::string classField, std::string changeField, std::vector<std::string> attFields, std::vector<cmds::RSGISClassChangeFieldsCmds> classChangeFields)throw(RSGISCmdException);
-    
+
     /** Function to identify an extreme clump/segment with regions of the image, regions defined on a grid */
     void executeIdentifyClumpExtremesOnGrid(std::string clumpsImage, std::string inSelectField, std::string outSelectField, std::string eastingsCol, std::string northingsCol, std::string methodStr, unsigned int rows, unsigned int cols, std::string metricField)throw(RSGISCmdException);
-    
+
     /** Function to interpolate values from clumps to the whole image of pixels */
     void executeInterpolateClumpValuesToImage(std::string clumpsImage, std::string selectField, std::string eastingsField, std::string northingsField, std::string methodStr, std::string valueField, std::string outputFile, std::string imageFormat, RSGISLibDataType dataType)throw(RSGISCmdException);
-    
+
 }}
 
 

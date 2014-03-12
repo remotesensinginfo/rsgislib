@@ -23,13 +23,13 @@
 #include "RSGISFindInfoBetweenLayers.h"
 
 namespace rsgis{namespace rastergis{
-    
+
     RSGISFindInfoBetweenLayers::RSGISFindInfoBetweenLayers()
     {
-        
+
     }
-    
-    void RSGISFindInfoBetweenLayers::findClassMajority(GDALDataset *baseSegmentsDS, GDALDataset *infoSegmentsDS, std::string baseClassCol, std::string infoClassCol) throw(RSGISAttributeTableException)
+
+    void RSGISFindInfoBetweenLayers::findClassMajority(GDALDataset *baseSegmentsDS, GDALDataset *infoSegmentsDS, std::string baseClassCol, std::string infoClassCol, bool ignoreZero) throw(RSGISAttributeTableException)
     {
         try
         {
@@ -45,7 +45,7 @@ namespace rsgis{namespace rastergis{
             {
                 throw RSGISAttributeTableException("The info dataset (band 1) did not have a RAT.");
             }
-            
+
             const GDALRasterAttributeTable *attTableTmpBase = baseSegmentsDS->GetRasterBand(1)->GetDefaultRAT();
             GDALRasterAttributeTable *baseATable = NULL;
             if(attTableTmpBase != NULL)
@@ -56,18 +56,18 @@ namespace rsgis{namespace rastergis{
             {
                 baseATable = new GDALRasterAttributeTable();
             }
-            
+
             int numBaseRows = baseATable->GetRowCount();
             int numInfoRows = infoATable->GetRowCount();
-            
+
             int baseClassIdx = 0;
             int infoClassIdx = 0;
-            
+
             int numBaseCols = baseATable->GetColumnCount();
             int numInfoCols = infoATable->GetColumnCount();
             std::string colName = "";
             bool foundCol = false;
-            
+
             for(int i = 0; i < numBaseCols; ++i)
             {
                 colName = std::string(baseATable->GetNameOfCol(i));
@@ -77,7 +77,7 @@ namespace rsgis{namespace rastergis{
                     foundCol = true;
                 }
             }
-            
+
             if(!foundCol)
             {
                 baseATable->CreateColumn(baseClassCol.c_str(), GFT_String, GFU_Generic);
@@ -86,7 +86,7 @@ namespace rsgis{namespace rastergis{
 
             colName = "";
             foundCol = false;
-            
+
             for(int i = 0; i < numInfoCols; ++i)
             {
                 colName = std::string(infoATable->GetNameOfCol(i));
@@ -96,13 +96,13 @@ namespace rsgis{namespace rastergis{
                     foundCol = true;
                 }
             }
-            
+
             if(!foundCol)
             {
                 std::string message = std::string("Info layer column \'") + infoClassCol + std::string("\' was not found.");
                 throw RSGISAttributeTableException(message);
             }
-            
+
             // Find all the classes in the info column.
             std::cout << "Finding all classes in the info dataset column\n";
             std::vector<std::string> classes;
@@ -111,7 +111,7 @@ namespace rsgis{namespace rastergis{
             for(size_t i = 0; i < numInfoRows; ++i)
             {
                 rowClass = std::string(infoATable->GetValueAsString(i, infoClassIdx));
-                
+
                 found = false;
                 for(std::vector<std::string>::iterator iterClass = classes.begin(); iterClass != classes.end(); ++iterClass)
                 {
@@ -121,13 +121,13 @@ namespace rsgis{namespace rastergis{
                         break;
                     }
                 }
-                
+
                 if(!found)
                 {
                     classes.push_back(rowClass);
                 }
             }
-            
+
             std::cout << "Available Classes:\n";
             unsigned int idx = 0;
             for(std::vector<std::string>::iterator iterClass = classes.begin(); iterClass != classes.end(); ++iterClass)
@@ -135,8 +135,8 @@ namespace rsgis{namespace rastergis{
                 std::cout << idx++ << ") Class: \'" << *iterClass << "\'" << std::endl;
             }
             unsigned int numClasses = classes.size();
-            
-            
+
+
             // Create a data structure to whole the data for each clump.
             unsigned int **clumpCounter = new unsigned int*[numBaseRows];
             for(unsigned int i = 0; i < numBaseRows; ++i)
@@ -147,20 +147,20 @@ namespace rsgis{namespace rastergis{
                     clumpCounter[i][j] = 0;
                 }
             }
-            
+
             // Iterate through the images to populate the data structure.
             GDALDataset **datasets = new GDALDataset*[2];
             datasets[0] = baseSegmentsDS;
             datasets[1] = infoSegmentsDS;
-            
-            RSGISCalcClumpClassMajorities *calcImgClumpClassStats = new RSGISCalcClumpClassMajorities(baseATable, infoATable, infoClassIdx, classes, clumpCounter);
+
+            RSGISCalcClumpClassMajorities *calcImgClumpClassStats = new RSGISCalcClumpClassMajorities(baseATable, infoATable, infoClassIdx, classes, clumpCounter, ignoreZero);
             rsgis::img::RSGISCalcImage calcImageStats(calcImgClumpClassStats);
             calcImageStats.calcImage(datasets, 2);
             delete calcImgClumpClassStats;
             delete[] datasets;
-            
-            
-            
+
+
+
             // Find the majority column
             unsigned int maxIdx = 0;
             unsigned int maxVal = 0;
@@ -168,7 +168,7 @@ namespace rsgis{namespace rastergis{
             for(unsigned int i = 0; i < numBaseRows; ++i)
             {
                 for(unsigned int j = 0; j < numClasses; ++j)
-                {                    
+                {
                     if(j == 0)
                     {
                         maxIdx = 0;
@@ -180,7 +180,7 @@ namespace rsgis{namespace rastergis{
                         maxVal = clumpCounter[i][j];
                     }
                 }
-                
+
                 if(maxVal == 0)
                 {
                     clumpMajorityIdx[i] = -1;
@@ -192,7 +192,7 @@ namespace rsgis{namespace rastergis{
                 delete[] clumpCounter[i];
             }
             delete[] clumpCounter;
-            
+
             // Export to large objects.
             for(unsigned int i = 0; i < numBaseRows; ++i)
             {
@@ -206,7 +206,7 @@ namespace rsgis{namespace rastergis{
                 }
             }
             delete[] clumpMajorityIdx;
-            
+
             baseSegmentsDS->GetRasterBand(1)->SetDefaultRAT(baseATable);
         }
         catch (rsgis::img::RSGISImageCalcException &e)
@@ -218,39 +218,41 @@ namespace rsgis{namespace rastergis{
             throw e;
         }
     }
-    
+
     RSGISFindInfoBetweenLayers::~RSGISFindInfoBetweenLayers()
     {
-        
+
     }
-    
-    	
-    RSGISCalcClumpClassMajorities::RSGISCalcClumpClassMajorities(GDALRasterAttributeTable *baseATable, GDALRasterAttributeTable *infoATable, unsigned int infoClassIdx, std::vector<std::string> classes, unsigned int **clumpCounter) : rsgis::img::RSGISCalcImageValue(0)
+
+
+    RSGISCalcClumpClassMajorities::RSGISCalcClumpClassMajorities(GDALRasterAttributeTable *baseATable, GDALRasterAttributeTable *infoATable, unsigned int infoClassIdx, std::vector<std::string> classes, unsigned int **clumpCounter, bool ignoreZero) : rsgis::img::RSGISCalcImageValue(0)
     {
         this->baseATable = baseATable;
         this->infoATable = infoATable;
         this->infoClassIdx = infoClassIdx;
         this->classes = classes;
         this->clumpCounter = clumpCounter;
+        this->ignoreZero = ignoreZero; // Ignore values less than 0 in info layer
     }
-    
+
     void RSGISCalcClumpClassMajorities::calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException)
     {
         if(numBands != 2)
         {
             throw rsgis::img::RSGISImageCalcException("There must be just 2 image bands.");
         }
-        
-        if(bandValues[0] > 0 & bandValues[1] > 0)
+
+        if( ((bandValues[0] > 0) & (!this->ignoreZero) ) |
+        ((bandValues[0] > 0) & (bandValues[1] > 0)) )
         {
             // Band 1 is the base.
             // Band 2 is the info.
             size_t fidBase = boost::lexical_cast<size_t>(bandValues[0]);
             size_t fidInfo = boost::lexical_cast<size_t>(bandValues[1]);
-            
+
             // Get class of the info unit.
             std::string classVal = infoATable->GetValueAsString(fidInfo, infoClassIdx);
-            
+
             unsigned int idx = 0;
             bool foundClass = false;
             for(std::vector<std::string>::iterator iterClass = classes.begin(); iterClass != classes.end(); ++iterClass)
@@ -265,24 +267,24 @@ namespace rsgis{namespace rastergis{
                     ++idx;
                 }
             }
-            
+
             if(!foundClass)
             {
                 std::string message = std::string("Could not find class \'") + classVal + std::string("\'");
                 throw rsgis::img::RSGISImageCalcException(message);
             }
-            
+
             // Increment the class count for the base unit.
             ++this->clumpCounter[fidBase][idx];
         }
-        
+
     }
-		
+
     RSGISCalcClumpClassMajorities::~RSGISCalcClumpClassMajorities()
     {
-        
+
 	}
-	
+
 }}
 
 

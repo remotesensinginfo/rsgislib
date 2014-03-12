@@ -1,5 +1,5 @@
 RSGISLib Image Calculations Module
-=================================
+===================================
 .. automodule:: rsgislib.imagecalc
    :members:
    :undoc-members:

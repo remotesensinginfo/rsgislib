@@ -664,7 +664,7 @@ namespace rsgis{ namespace cmds {
 
     }
 
-    void executeStrClassMajority(std::string baseSegment, std::string infoSegment, std::string baseClassCol, std::string infoClassCol)throw(RSGISCmdException) {
+    void executeStrClassMajority(std::string baseSegment, std::string infoSegment, std::string baseClassCol, std::string infoClassCol, bool ignoreZero)throw(RSGISCmdException) {
         GDALAllRegister();
         GDALDataset *baseSegDataset, *infoSegDataset;
         try {
@@ -681,7 +681,7 @@ namespace rsgis{ namespace cmds {
             }
 
             rsgis::rastergis::RSGISFindInfoBetweenLayers findClassMajority;
-            findClassMajority.findClassMajority(baseSegDataset, infoSegDataset, baseClassCol, infoClassCol);
+            findClassMajority.findClassMajority(baseSegDataset, infoSegDataset, baseClassCol, infoClassCol, ignoreZero);
 
             GDALClose(baseSegDataset);
             GDALClose(infoSegDataset);
@@ -711,7 +711,7 @@ namespace rsgis{ namespace cmds {
         }
     }
 
-    void executeMaxLikelihoodClassifier(std::string inputImage, std::string inClassNameField, std::string outClassNameField, std::string trainingSelectCol, 
+    void executeMaxLikelihoodClassifier(std::string inputImage, std::string inClassNameField, std::string outClassNameField, std::string trainingSelectCol,
             std::string classifySelectCol, std::string areaField, std::vector<std::string> fields, rsgismlpriorscmds priorsMethod, std::vector<std::string> priorStrs)throw(RSGISCmdException) {
         GDALAllRegister();
         GDALDataset *inputDataset;
@@ -748,7 +748,7 @@ namespace rsgis{ namespace cmds {
         }
     }
 
-    void executeMaxLikelihoodClassifierLocalPriors(std::string inputImage, std::string inClassNameField, std::string outClassNameField, std::string trainingSelectCol, std::string classifySelectCol, 
+    void executeMaxLikelihoodClassifierLocalPriors(std::string inputImage, std::string inClassNameField, std::string outClassNameField, std::string trainingSelectCol, std::string classifySelectCol,
                                                   std::string areaField, std::vector<std::string> fields, std::string eastingsField, std::string northingsField,
                                                   float distThreshold, rsgismlpriorscmds priorsMethod, float weightA, bool allowZeroPriors, bool forceChangeInClassification)throw(RSGISCmdException) {
         GDALAllRegister();
@@ -764,7 +764,7 @@ namespace rsgis{ namespace cmds {
 
             rsgis::rastergis::rsgismlpriors priMeth = (rsgis::rastergis::rsgismlpriors) priorsMethod;
 
-            mlRat.applyMLClassifierLocalPriors(inputDataset, inClassNameField, outClassNameField, trainingSelectCol, classifySelectCol, areaField, 
+            mlRat.applyMLClassifierLocalPriors(inputDataset, inClassNameField, outClassNameField, trainingSelectCol, classifySelectCol, areaField,
                     fields, eastingsField, northingsField, distThreshold, priMeth, weightA, allowZeroPriors, forceChangeInClassification);
 
             GDALClose(inputDataset);
@@ -897,7 +897,7 @@ namespace rsgis{ namespace cmds {
                 std::string message = std::string("Could not open image ") + inputImage;
                 throw rsgis::RSGISImageException(message.c_str());
             }
-            
+
             std::vector<rastergis::RSGISShapeParam*> shapes;
             shapes.reserve(shapeIndexes.size());
             std::vector<RSGISShapeParamCmds>::iterator shapeIter;
@@ -992,10 +992,10 @@ namespace rsgis{ namespace cmds {
                 std::string message = std::string("Could not open image ") + clumpsImage;
                 throw rsgis::RSGISImageException(message.c_str());
             }
-            
+
             std::vector<rastergis::RSGISClassChangeFields *> *classFields = new std::vector<rastergis::RSGISClassChangeFields *>();
             classFields->reserve(classChangeFields.size());
-            
+
             for(std::vector<cmds::RSGISClassChangeFieldsCmds>::iterator classIter = classChangeFields.begin(); classIter != classChangeFields.end(); ++classIter)
             {
                 rastergis::RSGISClassChangeFields *c = new rastergis::RSGISClassChangeFields();
@@ -1023,12 +1023,12 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
-    
+
     void executeIdentifyClumpExtremesOnGrid(std::string clumpsImage, std::string inSelectField, std::string outSelectField, std::string eastingsCol, std::string northingsCol, std::string methodStr, unsigned int rows, unsigned int cols, std::string metricField)throw(RSGISCmdException)
     {
         GDALAllRegister();
         GDALDataset *clumpsDataset;
-        
+
         try
         {
             rsgis::rastergis::RSGISSelectMethods method = rsgis::rastergis::noMethod;
@@ -1048,18 +1048,18 @@ namespace rsgis{ namespace cmds {
             {
                 throw rsgis::RSGISAttributeTableException("Method was not recognised. Must be \'min\', \'max\' or \'mean\'.");
             }
-            
+
             clumpsDataset = (GDALDataset *) GDALOpen(clumpsImage.c_str(), GA_Update);
             if(clumpsDataset == NULL)
             {
                 std::string message = std::string("Could not open image ") + clumpsImage;
                 throw rsgis::RSGISImageException(message.c_str());
-            }            
-            
+            }
+
             rsgis::rastergis::RSGISSelectClumpsOnGrid selectClumps;
             selectClumps.selectClumpsOnGrid(clumpsDataset, inSelectField, outSelectField, eastingsCol, northingsCol, metricField, rows, cols, method);
-            
-            
+
+
             GDALClose(clumpsDataset);
         }
         catch(rsgis::RSGISAttributeTableException &e)
@@ -1071,16 +1071,16 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
-    
+
     void executeInterpolateClumpValuesToImage(std::string clumpsImage, std::string selectField, std::string eastingsField, std::string northingsField, std::string methodStr, std::string valueField, std::string outputFile, std::string imageFormat, RSGISLibDataType dataType)throw(RSGISCmdException)
     {
         GDALAllRegister();
         GDALDataset *clumpsDataset;
-        
+
         try
         {
             std::cout.precision(12);
-            
+
             rsgis::math::RSGIS2DInterpolator *interpolator = NULL;
             if(methodStr == "nearestneighbour")
             {
@@ -1106,19 +1106,19 @@ namespace rsgis{ namespace cmds {
             {
                 throw rsgis::RSGISAttributeTableException("The interpolated specified was not recognised.");
             }
-            
+
             clumpsDataset = (GDALDataset *) GDALOpen(clumpsImage.c_str(), GA_ReadOnly);
             if(clumpsDataset == NULL)
             {
                 std::string message = std::string("Could not open image ") + clumpsImage;
                 throw rsgis::RSGISImageException(message.c_str());
             }
-                        
+
             rsgis::rastergis::RSGISInterpolateClumpValues2Image interpClumpVals;
             interpClumpVals.interpolateImageFromClumps(clumpsDataset, selectField, eastingsField, northingsField, valueField, outputFile, imageFormat, rsgis::cmds::RSGIS_to_GDAL_Type(dataType), interpolator);
-            
+
             delete interpolator;
-            
+
             GDALClose(clumpsDataset);
         }
         catch(rsgis::RSGISAttributeTableException &e)
