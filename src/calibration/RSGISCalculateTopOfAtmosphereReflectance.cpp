@@ -52,5 +52,43 @@ namespace rsgis{namespace calib{
     {
         
     }
+    
+    
+    
+    RSGISCalculateTOAThermalBrightness::RSGISCalculateTOAThermalBrightness(int numberOutBands, float *k1, float *k2, float scaleFactor):rsgis::img::RSGISCalcImageValue(numberOutBands)
+    {
+        this->k1 = k1;
+        this->k2 = k2;
+        this->scaleFactor = scaleFactor;
+    }
+    
+    void RSGISCalculateTOAThermalBrightness::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
+    {
+        if(numBands != this->numOutBands)
+        {
+            throw rsgis::img::RSGISImageCalcException("The number of input and output image bands needs to be the same.");
+        }
+        
+        for(unsigned int i = 0; i < numBands; ++i)
+        {
+            if(bandValues[i] != 0.0)
+            {
+                double temp =  k2[i] / log((k1[i] / bandValues[i]) + 1.0);
+                
+                output[i] = (temp + 273.15) * scaleFactor;
+            }
+            else
+            {
+                output[i] = 0.0;
+            }
+        }
+        
+        
+    }
+    
+    RSGISCalculateTOAThermalBrightness::~RSGISCalculateTOAThermalBrightness()
+    {
+        
+    }
 }}
 

@@ -45,6 +45,12 @@ namespace rsgis{namespace calib{
         float qCalMin;
     };
     
+    struct RSGISSaturatedPixelInfo
+    {
+        unsigned int band;
+        float satVal;
+    };
+    
     struct LandsatRadianceGainsOffsetsMultiAdd
     {
         unsigned int band;
@@ -298,6 +304,27 @@ namespace rsgis{namespace calib{
         WorldView2RadianceGainsOffsets *radGainOff;
     };
 
+    
+    class RSGISIdentifySaturatePixels : public rsgis::img::RSGISCalcImageValue
+    {
+    public:
+        RSGISIdentifySaturatePixels(unsigned int numberOutBands, RSGISSaturatedPixelInfo *saturatePxlInfo):rsgis::img::RSGISCalcImageValue(numberOutBands)
+        {
+            this->saturatePxlInfo = saturatePxlInfo;
+        };
+        void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException);
+        void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implmented.");};
+        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implmented.");};
+        void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implmented.");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implmented.");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+        bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implmented.");};
+        ~RSGISIdentifySaturatePixels(){};
+    protected:
+        RSGISSaturatedPixelInfo *saturatePxlInfo;
+    };
     
     
 }}

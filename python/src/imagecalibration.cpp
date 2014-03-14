@@ -794,6 +794,197 @@ static PyObject *ImageCalibration_ApplySubtractOffsets(PyObject *self, PyObject 
     Py_RETURN_NONE;
 }
 
+static PyObject *ImageCalibration_saturatedPixelsMask(PyObject *self, PyObject *args)
+{
+    const char *pszOutputFile, *pszGDALFormat;
+    PyObject *pBandDefnObj;
+    if( !PyArg_ParseTuple(args, "ssO:saturatedPixelsMask", &pszOutputFile, &pszGDALFormat, &pBandDefnObj))
+    {
+        return NULL;
+    }
+    
+    if( !PySequence_Check(pBandDefnObj))
+    {
+        PyErr_SetString(GETSTATE(self)->error, "Last argument must be a sequence");
+        return NULL;
+    }
+    
+    Py_ssize_t nBandDefns = PySequence_Size(pBandDefnObj);
+    std::vector<rsgis::cmds::CmdsSaturatedPixel> satBandPxlInfo;
+    satBandPxlInfo.reserve(nBandDefns);
+    
+    for( Py_ssize_t n = 0; n < nBandDefns; n++ )
+    {
+        PyObject *o = PySequence_GetItem(pBandDefnObj, n);
+        
+        PyObject *pBandName = PyObject_GetAttrString(o, "bandName");
+        if( ( pBandName == NULL ) || ( pBandName == Py_None ) || !RSGISPY_CHECK_STRING(pBandName) )
+        {
+            PyErr_SetString(GETSTATE(self)->error, "Could not find string attribute \'bandName\'" );
+            Py_XDECREF(pBandName);
+            Py_DECREF(o);
+            return NULL;
+        }
+        
+        PyObject *pFileName = PyObject_GetAttrString(o, "fileName");
+        if( ( pFileName == NULL ) || ( pFileName == Py_None ) || !RSGISPY_CHECK_STRING(pFileName) )
+        {
+            PyErr_SetString(GETSTATE(self)->error, "Could not find string attribute \'fileName\'" );
+            Py_DECREF(pBandName);
+            Py_XDECREF(pFileName);
+            Py_DECREF(o);
+            return NULL;
+        }
+        
+        PyObject *pBandIndex = PyObject_GetAttrString(o, "bandIndex");
+        if( ( pBandIndex == NULL ) || ( pBandIndex == Py_None ) || !RSGISPY_CHECK_INT(pBandIndex) )
+        {
+            PyErr_SetString(GETSTATE(self)->error, "Could not find integer attribute \'bandIndex\'" );
+            Py_DECREF(pBandName);
+            Py_DECREF(pFileName);
+            Py_XDECREF(pBandIndex);
+            Py_DECREF(o);
+            return NULL;
+        }
+        
+        PyObject *pSatVal = PyObject_GetAttrString(o, "satVal");
+        if( ( pSatVal == NULL ) || ( pSatVal == Py_None ) || !RSGISPY_CHECK_FLOAT(pSatVal) )
+        {
+            PyErr_SetString(GETSTATE(self)->error, "Could not find float attribute \'satVal\'" );
+            Py_DECREF(pBandName);
+            Py_DECREF(pFileName);
+            Py_XDECREF(pBandIndex);
+            Py_XDECREF(pSatVal);
+            Py_DECREF(o);
+            return NULL;
+        }
+        
+        rsgis::cmds::CmdsSaturatedPixel satVals;
+        satVals.bandName = RSGISPY_STRING_EXTRACT(pBandName);
+        satVals.imagePath = RSGISPY_STRING_EXTRACT(pFileName);
+        satVals.band = RSGISPY_INT_EXTRACT(pBandIndex);
+        satVals.satVal = RSGISPY_FLOAT_EXTRACT(pSatVal);
+        
+        satBandPxlInfo.push_back(satVals);
+        
+        Py_DECREF(pBandName);
+        Py_DECREF(pFileName);
+        Py_DECREF(pBandIndex);
+        Py_XDECREF(pSatVal);
+        Py_DECREF(o);
+    }
+    
+    try
+    {
+        rsgis::cmds::executeGenerateSaturationMask(pszOutputFile, pszGDALFormat, satBandPxlInfo);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
+
+static PyObject *ImageCalibration_landsatThermalRad2Brightness(PyObject *self, PyObject *args)
+{
+    const char *pszInputFile, *pszOutputFile, *pszGDALFormat;
+    int nDataType;
+    float scaleFactor;
+    PyObject *pBandDefnObj;
+    if( !PyArg_ParseTuple(args, "sssifO:landsatThermalRad2Brightness", &pszInputFile, &pszOutputFile, &pszGDALFormat, &nDataType, &scaleFactor, &pBandDefnObj))
+    {
+        return NULL;
+    }
+    
+    if( !PySequence_Check(pBandDefnObj))
+    {
+        PyErr_SetString(GETSTATE(self)->error, "Last argument must be a sequence");
+        return NULL;
+    }
+    
+    Py_ssize_t nBandDefns = PySequence_Size(pBandDefnObj);
+    std::vector<rsgis::cmds::CmdsLandsatThermalCoeffs> thermBandPxlInfo;
+    thermBandPxlInfo.reserve(nBandDefns);
+    
+    for( Py_ssize_t n = 0; n < nBandDefns; n++ )
+    {
+        PyObject *o = PySequence_GetItem(pBandDefnObj, n);
+        
+        PyObject *pBandName = PyObject_GetAttrString(o, "bandName");
+        if( ( pBandName == NULL ) || ( pBandName == Py_None ) || !RSGISPY_CHECK_STRING(pBandName) )
+        {
+            PyErr_SetString(GETSTATE(self)->error, "Could not find string attribute \'bandName\'" );
+            Py_XDECREF(pBandName);
+            Py_DECREF(o);
+            return NULL;
+        }
+        
+        PyObject *pBandIndex = PyObject_GetAttrString(o, "bandIndex");
+        if( ( pBandIndex == NULL ) || ( pBandIndex == Py_None ) || !RSGISPY_CHECK_INT(pBandIndex) )
+        {
+            PyErr_SetString(GETSTATE(self)->error, "Could not find integer attribute \'bandIndex\'" );
+            Py_DECREF(pBandName);
+            Py_XDECREF(pBandIndex);
+            Py_DECREF(o);
+            return NULL;
+        }
+        
+        PyObject *pK1 = PyObject_GetAttrString(o, "k1");
+        if( ( pK1 == NULL ) || ( pK1 == Py_None ) || !RSGISPY_CHECK_FLOAT(pK1) )
+        {
+            PyErr_SetString(GETSTATE(self)->error, "Could not find float attribute \'k1\'" );
+            Py_DECREF(pBandName);
+            Py_XDECREF(pBandIndex);
+            Py_XDECREF(pK1);
+            Py_DECREF(o);
+            return NULL;
+        }
+        
+        PyObject *pK2 = PyObject_GetAttrString(o, "k2");
+        if( ( pK2 == NULL ) || ( pK2 == Py_None ) || !RSGISPY_CHECK_FLOAT(pK2) )
+        {
+            PyErr_SetString(GETSTATE(self)->error, "Could not find float attribute \'k2\'" );
+            Py_DECREF(pBandName);
+            Py_XDECREF(pBandIndex);
+            Py_XDECREF(pK1);
+            Py_XDECREF(pK2);
+            Py_DECREF(o);
+            return NULL;
+        }
+        
+        rsgis::cmds::CmdsLandsatThermalCoeffs thermVals;
+        thermVals.bandName = RSGISPY_STRING_EXTRACT(pBandName);
+        thermVals.band = RSGISPY_INT_EXTRACT(pBandIndex);
+        thermVals.k1 = RSGISPY_FLOAT_EXTRACT(pK1);
+        thermVals.k2 = RSGISPY_FLOAT_EXTRACT(pK2);
+        
+        thermBandPxlInfo.push_back(thermVals);
+        
+        Py_DECREF(pBandName);
+        Py_DECREF(pBandIndex);
+        Py_XDECREF(pK1);
+        Py_XDECREF(pK2);
+        Py_DECREF(o);
+    }
+    
+    try
+    {
+        rsgis::RSGISLibDataType type = (rsgis::RSGISLibDataType)nDataType;
+        rsgis::cmds::executeLandsatThermalRad2ThermalBrightness(std::string(pszInputFile), std::string(pszOutputFile), std::string(pszGDALFormat), type, scaleFactor, thermBandPxlInfo);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
+
 
 // Our list of functions in this module
 static PyMethodDef ImageCalibrationMethods[] = {
@@ -932,6 +1123,39 @@ static PyMethodDef ImageCalibrationMethods[] = {
     "  * nonNegative is a boolean specifying whether any negative values from the offset application should be removed (i.e., set to 1; 0 being no data).\n"
     "  * useNoDataVal a boolean specifying whether a no data value is present within the input image.\n"
     "  * noDataVal is a float specifying the no data value for the input image.\n"},
+
+{"saturatedPixelsMask", ImageCalibration_saturatedPixelsMask, METH_VARARGS,
+    "imagecalibration.saturatedPixelsMask(outputImage, gdalformat, bandDefnSeq)\n"
+    "Creates a mask of the saturated image pixels on a per band basis.\n"
+    "where:\n"
+    "  * outputImage is a string containing the name of the output file\n"
+    "  * gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
+    "  * bandDefnSeq is a sequence of rsgislib.imagecalibration.CmdsSaturatedPixel objects that define the inputs\n"
+    "    Requires:\n"
+    "\n"
+    "    *  bandName - Name of image band in output file.\n"
+    "    *  fileName - input image file.\n"
+    "    *  bandIndex - Index (starting from 1) of the band in the image file.\n"
+    "    *  satVal - Saturation value for the image band.\n"
+    "\n"},
+
+{"landsatThermalRad2Brightness", ImageCalibration_landsatThermalRad2Brightness, METH_VARARGS,
+    "imagecalibration.landsatThermalRad2Brightness(inputImage, outputImage, gdalformat, gdaltype, scaleFactor, bandDefnSeq)\n"
+    "Converts Landsat TM thermal radiation to degrees celsius for at sensor temperature.\n"
+    "where:\n"
+    "  * inputImage is a string containing the name of the input file path.\n"
+    "  * outputImage is a string containing the name of the output file path.\n"
+    "  * gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
+    "  * gdaltype is an containing one of the values from rsgislib.TYPE_*\n"
+    "  * scaleFactor is a float which can be used to scale the output pixel values (e.g., multiple by 1000), set as 1 for no scaling.\n"
+    "  * bandDefnSeq is a sequence of rsgislib.imagecalibration.CmdsLandsatThermalCoeffs objects that define the inputs\n"
+    "    Requires:\n"
+    "\n"
+    "    *  bandName - Name of image band in output file.\n"
+    "    *  bandIndex - Index (starting from 1) of the band in the image file.\n"
+    "    *  k1 - k1 coefficient from Landsat header.\n"
+    "    *  k2 - k2 coefficient from Landsat header.\n"
+    "\n"},
     
     {NULL}        /* Sentinel */
 };

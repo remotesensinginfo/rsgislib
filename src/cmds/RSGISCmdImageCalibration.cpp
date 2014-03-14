@@ -278,7 +278,6 @@ namespace rsgis{ namespace cmds {
         
     }
                 
-                
     void executeRad2SREFElevLUT6sParams(std::string inputRadImage, std::string inputDEM, std::string outputImage, std::string gdalFormat, rsgis::RSGISLibDataType rsgisOutDataType, float scaleFactor, std::vector<Cmds6SElevationLUT> *lut, float noDataVal, bool useNoDataVal)throw(RSGISCmdException)
     {
         try
@@ -369,8 +368,6 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
-                
-                
                 
     void executeRad2SREFElevAOTLUT6sParams(std::string inputRadImage, std::string inputDEM, std::string inputAOTImg, std::string outputImage, std::string gdalFormat, rsgis::RSGISLibDataType rsgisOutDataType, float scaleFactor, std::vector<Cmds6SBaseElevAOTLUT> *lut, float noDataVal, bool useNoDataVal)throw(RSGISCmdException)
     {
@@ -485,7 +482,6 @@ namespace rsgis{ namespace cmds {
         }
     }
                 
-                
     void executeApplySubtractOffsets(std::string inputImage, std::string outputImage, std::string offsetImage, bool nonNegative, std::string gdalFormat, rsgis::RSGISLibDataType rsgisOutDataType, float noDataVal, bool useNoDataVal) throw(RSGISCmdException)
     {
         try
@@ -538,6 +534,143 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
+                
+    void executeLandsatThermalRad2ThermalBrightness(std::string inputImage, std::string outputImage, std::string gdalFormat, rsgis::RSGISLibDataType rsgisOutDataType, float scaleFactor, std::vector<CmdsLandsatThermalCoeffs> landsatThermalCoeffs) throw(RSGISCmdException)
+    {
+        GDALAllRegister();
+        try
+        {
+            unsigned int numBands = landsatThermalCoeffs.size();
+            
+            std::cout << "Opening: " << inputImage << std::endl;
+            GDALDataset *dataset = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_ReadOnly);
+            if(dataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputImage;
+                throw RSGISImageException(message.c_str());
+            }
+            unsigned int numRasterBands = dataset->GetRasterCount();
+            
+            std::string *outBandNames = new std::string[numRasterBands];
+            float *k1 = new float[numRasterBands];
+            float *k2 = new float[numRasterBands];
+            
+            unsigned int i = 0;
+            for(std::vector<rsgis::cmds::CmdsLandsatThermalCoeffs>::iterator iterBands = landsatThermalCoeffs.begin(); iterBands != landsatThermalCoeffs.end(); ++iterBands)
+			{
+                if((*iterBands).band != (i+1))
+                {
+                    throw RSGISImageException("The bands must be specified in order.");
+                }
+                
+                if((*iterBands).band > numRasterBands)
+                {
+                    throw RSGISImageException("You have specified a band which is not within the image");
+                }
+                
+                k1[i] = (*iterBands).k1;
+                k2[i] = (*iterBands).k2;
+                outBandNames[i] = (*iterBands).bandName;
+                
+                ++i;
+			}
+            
+            rsgis::calib::RSGISCalculateTOAThermalBrightness *calibLandsatThermalTOA = new rsgis::calib::RSGISCalculateTOAThermalBrightness(numBands, k1, k2, scaleFactor);
+            rsgis::img::RSGISCalcImage *calcImage = new rsgis::img::RSGISCalcImage(calibLandsatThermalTOA, "", true);
+            
+            calcImage->calcImage(&dataset, 1, outputImage, true, outBandNames, gdalFormat, RSGIS_to_GDAL_Type(rsgisOutDataType));
+            
+            
+            GDALClose(dataset);
+            delete[] k1;
+            delete[] k2;
+            delete[] outBandNames;
+            
+            delete calibLandsatThermalTOA;
+            delete calcImage;
+        }
+        catch(RSGISException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(std::exception &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
+                
+    void executeGenerateSaturationMask(std::string outputImage, std::string gdalFormat, std::vector<CmdsSaturatedPixel> imgBandInfo)throw(RSGISCmdException)
+    {
+        GDALAllRegister();
+        try
+        {
+            unsigned int numBands = imgBandInfo.size();
+            GDALDataset **datasets = new GDALDataset*[numBands];
+            std::string *outBandNames = new std::string[numBands];
+            
+            rsgis::calib::RSGISSaturatedPixelInfo *satBandPxlInfo = new rsgis::calib::RSGISSaturatedPixelInfo[numBands];
+            
+            unsigned int i = 0;
+            unsigned int numRasterBands = 0;
+            unsigned int totalNumRasterBands = 0;
+            for(std::vector<rsgis::cmds::CmdsSaturatedPixel>::iterator iterBands = imgBandInfo.begin(); iterBands != imgBandInfo.end(); ++iterBands)
+			{
+                std::cout << "Opening: " << (*iterBands).imagePath << std::endl;
+                
+                datasets[i] = (GDALDataset *) GDALOpen((*iterBands).imagePath.c_str(), GA_ReadOnly);
+                if(datasets[i] == NULL)
+                {
+                    std::string message = std::string("Could not open image ") + (*iterBands).imagePath;
+                    throw RSGISImageException(message.c_str());
+                }
+                
+                numRasterBands = datasets[i]->GetRasterCount();
+                
+                if((*iterBands).band > numRasterBands)
+                {
+                    throw RSGISImageException("You have specified a band which is not within the image");
+                }
+                satBandPxlInfo[i].band = totalNumRasterBands + (*iterBands).band-1;
+                satBandPxlInfo[i].satVal = (*iterBands).satVal;
+                outBandNames[i] = (*iterBands).bandName;
+                
+                totalNumRasterBands += numRasterBands;
+                ++i;
+			}
+            
+            rsgis::calib::RSGISIdentifySaturatePixels *createSatPxlMask = new rsgis::calib::RSGISIdentifySaturatePixels(numBands, satBandPxlInfo);
+            rsgis::img::RSGISCalcImage *calcImage = new rsgis::img::RSGISCalcImage(createSatPxlMask, "", true);
+            
+            calcImage->calcImage(datasets, numBands, outputImage, true, outBandNames, gdalFormat, GDT_Byte);
+            
+            for(unsigned int i = 0; i < numBands; ++i)
+            {
+                GDALClose(datasets[i]);
+            }
+            
+            delete[] datasets;
+            delete[] satBandPxlInfo;
+            delete[] outBandNames;
+            
+            delete createSatPxlMask;
+            delete calcImage;
+        }
+        catch(RSGISException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(std::exception &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
+    
+    void executeLandsatTMCloudFMask(std::string inputTOAImage, std::string inputThermalImage, std::string inputSaturateImage, std::string outputImage, std::string outputTmpImage, std::string gdalFormat, float scaleFactorIn) throw(RSGISCmdException)
+    {
+        
+    }
+                
+
     
 }}
 

@@ -43,6 +43,22 @@ namespace rsgis{ namespace cmds {
         float qCalMin;
     };
     
+    struct CmdsSaturatedPixel
+    {
+        std::string imagePath;
+        std::string bandName;
+        unsigned int band;
+        float satVal;
+    };
+    
+    struct CmdsLandsatThermalCoeffs
+    {
+        std::string bandName;
+        unsigned int band;
+        float k1;
+        float k2;
+    };
+    
     struct CmdsLandsatRadianceGainsOffsetsMultiAdd
     {
         std::string imagePath;
@@ -99,6 +115,16 @@ namespace rsgis{ namespace cmds {
     /** Function to apply an offset image within the context of dark object subtraction */
     void executeApplySubtractOffsets(std::string inputImage, std::string outputImage, std::string offsetImage, bool nonNegative, std::string gdalFormat, rsgis::RSGISLibDataType rsgisOutDataType, float noDataVal, bool useNoDataVal) throw(RSGISCmdException);
     
+    /** Function to convert thermal radiance to thermal brightness for Landsat */
+    void executeLandsatThermalRad2ThermalBrightness(std::string inputImage, std::string outputImage, std::string gdalFormat, rsgis::RSGISLibDataType rsgisOutDataType, float scaleFactor, std::vector<CmdsLandsatThermalCoeffs> landsatThermalCoeffs) throw(RSGISCmdException);
+    
+    /** Function to generate a per-band image band mask of the saturated image pixels */
+    void executeGenerateSaturationMask(std::string outputImage, std::string gdalFormat, std::vector<CmdsSaturatedPixel> imgBandInfo)throw(RSGISCmdException);
+    
+    /** Function to apply the FMask algorithm for classifying cloud for Landsat TM and ETM+ data */
+    void executeLandsatTMCloudFMask(std::string inputTOAImage, std::string inputThermalImage, std::string inputSaturateImage, std::string outputImage, std::string outputTmpImage, std::string gdalFormat, float scaleFactorIn) throw(RSGISCmdException);
+    
+
     
 }}
 
