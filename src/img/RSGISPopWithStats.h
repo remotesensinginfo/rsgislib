@@ -93,11 +93,11 @@ namespace rsgis { namespace img {
         {
             if(nPercent == 0)
             {
-                std::cout << "Started ." << nPercent << std::flush;
+                std::cout << "Started ." << nPercent << "." << std::flush;
             }
             else if(nPercent == 100)
             {
-                std::cout << nPercent << ". Complete." << std::endl;
+                std::cout << "." << nPercent << ". Complete." << std::endl;
             }
             else
             {
