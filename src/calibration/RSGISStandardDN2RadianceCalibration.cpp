@@ -183,5 +183,26 @@ namespace rsgis{namespace calib{
         }
     }
     
+    
+    void RSGISIdentifySaturatePixels::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
+    {
+        for(unsigned int i = 0; i < this->numOutBands; ++i)
+        {
+            if(this->saturatePxlInfo[i].band > numBands)
+            {
+                throw rsgis::img::RSGISImageCalcException("Band is not within input image bands.");
+            }
+            
+            if(bandValues[this->saturatePxlInfo[i].band] == this->saturatePxlInfo[i].satVal)
+            {
+                output[i] = 1.0;
+            }
+            else
+            {
+                output[i] = 0.0;
+            }
+        }
+    }
+    
 }}
 

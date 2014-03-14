@@ -27,7 +27,9 @@ set(LIB_CALIBRATION_H
 	${RSGIS_SRC_CALIBRATION_DIR}/RSGISCalculateTopOfAtmosphereReflectance.h 
 	${RSGIS_SRC_CALIBRATION_DIR}/RSGISDEMTools.h
 	${RSGIS_SRC_CALIBRATION_DIR}/RSGISStandardDN2RadianceCalibration.h
-	${RSGIS_SRC_CALIBRATION_DIR}/RSGISApplySubtractOffsets.h  )
+	${RSGIS_SRC_CALIBRATION_DIR}/RSGISApplySubtractOffsets.h
+	${RSGIS_SRC_CALIBRATION_DIR}/RSGISCloudMasking.h
+	)
 	
 set(LIB_CALIBRATION_CPP
 	${RSGIS_SRC_CALIBRATION_DIR}/RSGISApply6SCoefficients.cpp
@@ -39,7 +41,10 @@ set(LIB_CALIBRATION_CPP
 	${RSGIS_SRC_CALIBRATION_DIR}/RSGISStandardDN2RadianceCalibration.cpp 
 	${RSGIS_SRC_CALIBRATION_DIR}/RSGISStandardDN2RadianceCalibration.h
 	${RSGIS_SRC_CALIBRATION_DIR}/RSGISApplySubtractOffsets.cpp 
-	${RSGIS_SRC_CALIBRATION_DIR}/RSGISApplySubtractOffsets.h  )
+	${RSGIS_SRC_CALIBRATION_DIR}/RSGISApplySubtractOffsets.h
+	${RSGIS_SRC_CALIBRATION_DIR}/RSGISCloudMasking.cpp
+	${RSGIS_SRC_CALIBRATION_DIR}/RSGISCloudMasking.h
+	)
 ###############################################################################
 
 ###############################################################################
@@ -54,7 +59,8 @@ set(LIB_CLASSIFY_H
 	${RSGIS_SRC_CLASSIFY_DIR}/RSGISCumulativeAreaClassifier.h 
 	${RSGIS_SRC_CLASSIFY_DIR}/RSGISKMeanImageClassifier.h 
 	${RSGIS_SRC_CLASSIFY_DIR}/RSGISISODATAImageClassifier.h
-	${RSGIS_SRC_CLASSIFY_DIR}/RSGISRATClassificationUtils.h)
+	${RSGIS_SRC_CLASSIFY_DIR}/RSGISRATClassificationUtils.h
+	)
 	
 set(LIB_CLASSIFY_CPP
 	${RSGIS_SRC_CLASSIFY_DIR}/RSGISClassifier.cpp 
@@ -76,7 +82,8 @@ set(LIB_CLASSIFY_CPP
 	${RSGIS_SRC_CLASSIFY_DIR}/RSGISISODATAImageClassifier.cpp 
 	${RSGIS_SRC_CLASSIFY_DIR}/RSGISISODATAImageClassifier.h
 	${RSGIS_SRC_CLASSIFY_DIR}/RSGISRATClassificationUtils.cpp
-	${RSGIS_SRC_CLASSIFY_DIR}/RSGISRATClassificationUtils.h)
+	${RSGIS_SRC_CLASSIFY_DIR}/RSGISRATClassificationUtils.h
+	)
 ###############################################################################
 
 ###############################################################################
@@ -145,7 +152,8 @@ set(LIB_COMMON_H
 	${RSGIS_SRC_COMMON_DIR}/RSGISAlgorParamsFactory.h 
 	${RSGIS_SRC_COMMON_DIR}/RSGISParseXMLArguments.h
 	${RSGIS_SRC_COMMON_DIR}/RSGISAttributeTableException.h
-	${RSGIS_SRC_COMMON_DIR}/rsgis-config.h )
+	${RSGIS_SRC_COMMON_DIR}/rsgis-config.h
+	)
 	
 set(LIB_COMMON_CPP
 	${RSGIS_SRC_COMMON_DIR}/RSGISCommons.h
@@ -181,7 +189,8 @@ set(LIB_COMMON_CPP
 	${RSGIS_SRC_COMMON_DIR}/RSGISParseXMLArguments.h
 	${RSGIS_SRC_COMMON_DIR}/RSGISAttributeTableException.cpp
 	${RSGIS_SRC_COMMON_DIR}/RSGISAttributeTableException.h
-	${RSGIS_SRC_COMMON_DIR}/rsgis-config.h )
+	${RSGIS_SRC_COMMON_DIR}/rsgis-config.h
+	)
 ###############################################################################
 
 ###############################################################################
@@ -189,14 +198,16 @@ set(LIB_COMMON_CPP
 set(LIB_DATASTRUCT_H
 	${RSGIS_SRC_DATASTRUCT_DIR}/RSGISListException.h 
 	${RSGIS_SRC_DATASTRUCT_DIR}/RSGISItemNotFoundException.h 
-	${RSGIS_SRC_DATASTRUCT_DIR}/SortedGenericList.cpp)
+	${RSGIS_SRC_DATASTRUCT_DIR}/SortedGenericList.cpp
+	)
 	
 set(LIB_DATASTRUCT_CPP
 	${RSGIS_SRC_DATASTRUCT_DIR}/RSGISListException.cpp 
 	${RSGIS_SRC_DATASTRUCT_DIR}/RSGISListException.h 
 	${RSGIS_SRC_DATASTRUCT_DIR}/RSGISItemNotFoundException.cpp 
 	${RSGIS_SRC_DATASTRUCT_DIR}/RSGISItemNotFoundException.h 
-	${RSGIS_SRC_DATASTRUCT_DIR}/SortedGenericList.cpp )
+	${RSGIS_SRC_DATASTRUCT_DIR}/SortedGenericList.cpp
+	)
 ###############################################################################
 
 ###############################################################################
@@ -220,7 +231,8 @@ set(LIB_FILTERING_H
 	${RSGIS_SRC_FILTERING_DIR}/RSGISMorphologyTopHat.h
 	${RSGIS_SRC_FILTERING_DIR}/RSGISSpeckleFilters.h
 	${RSGIS_SRC_FILTERING_DIR}/RSGISSARTextureFilters.h
-	${RSGIS_SRC_FILTERING_DIR}/RSGISNonLocalDenoising.h)
+	${RSGIS_SRC_FILTERING_DIR}/RSGISNonLocalDenoising.h
+	)
 	
 set(LIB_FILTERING_CPP
 	${RSGIS_SRC_FILTERING_DIR}/RSGISCalcFilter.h
@@ -261,7 +273,8 @@ set(LIB_FILTERING_CPP
 	${RSGIS_SRC_FILTERING_DIR}/RSGISMorphologyTopHat.cpp
 	${RSGIS_SRC_FILTERING_DIR}/RSGISMorphologyTopHat.h 
 	${RSGIS_SRC_FILTERING_DIR}/RSGISNonLocalDenoising.cpp
-	${RSGIS_SRC_FILTERING_DIR}/RSGISNonLocalDenoising.h)
+	${RSGIS_SRC_FILTERING_DIR}/RSGISNonLocalDenoising.h
+	)
 
 ###############################################################################
 
@@ -283,7 +296,8 @@ set(LIB_GEOM_H
 	${RSGIS_SRC_GEOM_DIR}/RSGISSpatialClustererInterface.h 
 	${RSGIS_SRC_GEOM_DIR}/RSGISMinSpanTreeClustererEdgeLenThreshold.h 
 	${RSGIS_SRC_GEOM_DIR}/RSGISMinSpanTreeClustererStdDevThreshold.h 
-	${RSGIS_SRC_GEOM_DIR}/RSGISIdentifyNonConvexPolygonsSnakes.h)
+	${RSGIS_SRC_GEOM_DIR}/RSGISIdentifyNonConvexPolygonsSnakes.h
+	)
 	
 set(LIB_GEOM_CPP
 	${RSGIS_SRC_GEOM_DIR}/RSGISGeometryException.cpp 
@@ -314,7 +328,8 @@ set(LIB_GEOM_CPP
 	${RSGIS_SRC_GEOM_DIR}/RSGISMinSpanTreeClustererStdDevThreshold.cpp 
 	${RSGIS_SRC_GEOM_DIR}/RSGISMinSpanTreeClustererStdDevThreshold.h 
 	${RSGIS_SRC_GEOM_DIR}/RSGISIdentifyNonConvexPolygonsSnakes.cpp 
-	${RSGIS_SRC_GEOM_DIR}/RSGISIdentifyNonConvexPolygonsSnakes.h )
+	${RSGIS_SRC_GEOM_DIR}/RSGISIdentifyNonConvexPolygonsSnakes.h
+	)
 ###############################################################################
 
 ###############################################################################
@@ -568,7 +583,8 @@ set(LIB_MATH_H
 	${RSGIS_SRC_MATH_DIR}/RSGISClustering.h 
 	${RSGIS_SRC_MATH_DIR}/RSGISMaximumLikelihood.h
 	${RSGIS_SRC_MATH_DIR}/RSGISMaximumLikelihoodException.h
-	${RSGIS_SRC_MATH_DIR}/RSGIS2DInterpolation.h )
+	${RSGIS_SRC_MATH_DIR}/RSGIS2DInterpolation.h
+	)
 	
 set(LIB_MATH_CPP
 	${RSGIS_SRC_MATH_DIR}/RSGISMathException.cpp 
@@ -639,7 +655,8 @@ set(LIB_MATH_CPP
 	${RSGIS_SRC_MATH_DIR}/RSGISMaximumLikelihoodException.cpp
 	${RSGIS_SRC_MATH_DIR}/RSGISMaximumLikelihoodException.h
 	${RSGIS_SRC_MATH_DIR}/RSGIS2DInterpolation.cpp
-	${RSGIS_SRC_MATH_DIR}/RSGIS2DInterpolation.h )
+	${RSGIS_SRC_MATH_DIR}/RSGIS2DInterpolation.h
+	)
 ###############################################################################
 
 ###############################################################################
@@ -653,7 +670,8 @@ set(LIB_MODELING_H
 	${RSGIS_SRC_MODELING_DIR}/RSGISCalcFPC.h  
 	${RSGIS_SRC_MODELING_DIR}/RSGISModelingException.h 
 	${RSGIS_SRC_MODELING_DIR}/RSGISModelTreeParameters.h 
-	${RSGIS_SRC_MODELING_DIR}/RSGISCalcCanopyCover.h)
+	${RSGIS_SRC_MODELING_DIR}/RSGISCalcCanopyCover.h
+	)
 	
 set(LIB_MODELING_CPP
 	${RSGIS_SRC_MODELING_DIR}/RSGISTransect.h 
@@ -672,7 +690,8 @@ set(LIB_MODELING_CPP
 	${RSGIS_SRC_MODELING_DIR}/RSGISModelTreeParameters.cpp 
 	${RSGIS_SRC_MODELING_DIR}/RSGISModelTreeParameters.h 
 	${RSGIS_SRC_MODELING_DIR}/RSGISCalcCanopyCover.cpp 
-	${RSGIS_SRC_MODELING_DIR}/RSGISCalcCanopyCover.h )
+	${RSGIS_SRC_MODELING_DIR}/RSGISCalcCanopyCover.h
+	)
 ###############################################################################
 
 ###############################################################################
@@ -693,7 +712,8 @@ set(LIB_RADAR_H
 	${RSGIS_SRC_RADAR_DIR}/RSGISEstimationGSLOptimiser.h 
 	${RSGIS_SRC_RADAR_DIR}/RSGISEstimationLinearLeastSquares.h 
 	${RSGIS_SRC_RADAR_DIR}/RSGISEstimationThresholdAccepting.h 
-	${RSGIS_SRC_RADAR_DIR}/RSGISObjectBasedEstimation.h)
+	${RSGIS_SRC_RADAR_DIR}/RSGISObjectBasedEstimation.h
+	)
 	
 set(LIB_RADAR_UTILS_CPP
 	${RSGIS_SRC_RADAR_DIR}/RSGISCalcGammaZero.cpp 
@@ -701,13 +721,15 @@ set(LIB_RADAR_UTILS_CPP
 	${RSGIS_SRC_RADAR_DIR}/RSGISRadarUtils.cpp 
 	${RSGIS_SRC_RADAR_DIR}/RSGISRadarUtils.h 
 	${RSGIS_SRC_RADAR_DIR}/RSGISSoilDielectricMixingModel.cpp 
-	${RSGIS_SRC_RADAR_DIR}/RSGISSoilDielectricMixingModel.h)
+	${RSGIS_SRC_RADAR_DIR}/RSGISSoilDielectricMixingModel.h
+	)
 
 set(LIB_RADAR_BIOMASS_CPP
 	${RSGIS_SRC_RADAR_DIR}/RSGISCalcSaatchiBiomass.cpp 
 	${RSGIS_SRC_RADAR_DIR}/RSGISCalcSaatchiBiomass.h 
 	${RSGIS_SRC_RADAR_DIR}/RSGISDefaultSplitBiomassFunction.cpp 
-	${RSGIS_SRC_RADAR_DIR}/RSGISDefaultSplitBiomassFunction.h)
+	${RSGIS_SRC_RADAR_DIR}/RSGISDefaultSplitBiomassFunction.h
+	)
 	
 set(LIB_RADAR_INVERSION_CPP
 	${RSGIS_SRC_RADAR_DIR}/RSGISEstimationConjugateGradient.cpp 
@@ -729,7 +751,8 @@ set(LIB_RADAR_INVERSION_CPP
 	${RSGIS_SRC_RADAR_DIR}/RSGISEstimationThresholdAccepting.cpp 
 	${RSGIS_SRC_RADAR_DIR}/RSGISEstimationThresholdAccepting.h 
 	${RSGIS_SRC_RADAR_DIR}/RSGISObjectBasedEstimation.h 
-	${RSGIS_SRC_RADAR_DIR}/RSGISObjectBasedEstimation.cpp )
+	${RSGIS_SRC_RADAR_DIR}/RSGISObjectBasedEstimation.cpp
+	)
 
 ###############################################################################
 
@@ -766,7 +789,8 @@ set(LIB_RASTERGIS_H
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISCalcClumpShapeParameters.h
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindChangeClumps.h
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISSelectClumps.h
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISInterpolateClumpValues2Image.h )
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISInterpolateClumpValues2Image.h
+	)
 	
 	
 set(LIB_RASTERGIS_CPP
@@ -831,7 +855,8 @@ set(LIB_RASTERGIS_CPP
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISSelectClumps.cpp
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISSelectClumps.h 
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISInterpolateClumpValues2Image.cpp
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISInterpolateClumpValues2Image.h)
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISInterpolateClumpValues2Image.h
+	)
 	
 ###############################################################################
 
@@ -851,7 +876,8 @@ set(LIB_REGISTRATION_H
 	${RSGIS_SRC_REGISTRATION_DIR}/RSGISBasicNNGCPImageWarp.h
 	${RSGIS_SRC_REGISTRATION_DIR}/RSGISPolynomialImageWarp.h
 	${RSGIS_SRC_REGISTRATION_DIR}/RSGISImagePixelRegistration.h
-	${RSGIS_SRC_REGISTRATION_DIR}/RSGISAddGCPsGDAL.h)
+	${RSGIS_SRC_REGISTRATION_DIR}/RSGISAddGCPsGDAL.h
+	)
 	
 set(LIB_REGISTRATION_CPP
 	${RSGIS_SRC_REGISTRATION_DIR}/RSGISImageWarpException.cpp 
@@ -880,7 +906,8 @@ set(LIB_REGISTRATION_CPP
 	${RSGIS_SRC_REGISTRATION_DIR}/RSGISImagePixelRegistration.cpp
 	${RSGIS_SRC_REGISTRATION_DIR}/RSGISImagePixelRegistration.h
 	${RSGIS_SRC_REGISTRATION_DIR}/RSGISAddGCPsGDAL.cpp
-	${RSGIS_SRC_REGISTRATION_DIR}/RSGISAddGCPsGDAL.h)
+	${RSGIS_SRC_REGISTRATION_DIR}/RSGISAddGCPsGDAL.h
+	)
 ###############################################################################
 
 ###############################################################################
@@ -900,7 +927,8 @@ set(LIB_SEGMENTATION_H
 	${RSGIS_SRC_SEGMENTATION_DIR}/RSGISDefineSpectralDivision.h 
 	${RSGIS_SRC_SEGMENTATION_DIR}/RSGISEliminateSinglePixels.h
 	${RSGIS_SRC_SEGMENTATION_DIR}/RSGISMergeSegmentationTiles.h
-	${RSGIS_SRC_SEGMENTATION_DIR}/RSGISBottomUpShapeFeatureExtraction.h)
+	${RSGIS_SRC_SEGMENTATION_DIR}/RSGISBottomUpShapeFeatureExtraction.h
+	)
 	
 set(LIB_SEGMENTATION_CPP
 	${RSGIS_SRC_SEGMENTATION_DIR}/RSGISGenMeanSegImage.cpp 
@@ -932,7 +960,8 @@ set(LIB_SEGMENTATION_CPP
 	${RSGIS_SRC_SEGMENTATION_DIR}/RSGISMergeSegmentationTiles.cpp
 	${RSGIS_SRC_SEGMENTATION_DIR}/RSGISMergeSegmentationTiles.h
 	${RSGIS_SRC_SEGMENTATION_DIR}/RSGISBottomUpShapeFeatureExtraction.cpp
-	${RSGIS_SRC_SEGMENTATION_DIR}/RSGISBottomUpShapeFeatureExtraction.h)
+	${RSGIS_SRC_SEGMENTATION_DIR}/RSGISBottomUpShapeFeatureExtraction.h
+	)
 ###############################################################################
 
 ###############################################################################
@@ -953,7 +982,8 @@ set(LIB_UTILS_H
 	${RSGIS_SRC_UTILS_DIR}/RSGISPlotPolygonsCSVParse.h 
 	${RSGIS_SRC_UTILS_DIR}/RSGISImageFootprintPolygonsCSVParse.h 
 	${RSGIS_SRC_UTILS_DIR}/RSGISExportForPlottingIncremental.h
-	${RSGIS_SRC_UTILS_DIR}/RSGISExportData2HDF.h )
+	${RSGIS_SRC_UTILS_DIR}/RSGISExportData2HDF.h
+	)
 	
 set(LIB_UTILS_CPP
 	${RSGIS_SRC_UTILS_DIR}/RSGISENVIROIException.cpp 
@@ -986,7 +1016,8 @@ set(LIB_UTILS_CPP
 	${RSGIS_SRC_UTILS_DIR}/RSGISExportForPlottingIncremental.cpp 
 	${RSGIS_SRC_UTILS_DIR}/RSGISExportForPlottingIncremental.h
 	${RSGIS_SRC_UTILS_DIR}/RSGISExportData2HDF.cpp
-	${RSGIS_SRC_UTILS_DIR}/RSGISExportData2HDF.h )
+	${RSGIS_SRC_UTILS_DIR}/RSGISExportData2HDF.h
+	)
 ###############################################################################
 
 ###############################################################################
@@ -1014,7 +1045,6 @@ set(LIB_VEC_REPRESENTATION_CPP
 	${RSGIS_SRC_VEC_DIR}/RSGISPointData.h
 	${RSGIS_SRC_VEC_DIR}/RSGISZonalPolygons.cpp 
 	${RSGIS_SRC_VEC_DIR}/RSGISZonalPolygons.h 
-
 )
 
 set(LIB_VEC_PROCESSING_CPP
@@ -1048,8 +1078,6 @@ set(LIB_VEC_PROCESSING_CPP
 	${RSGIS_SRC_VEC_DIR}/RSGISVectorIO.h
 	${RSGIS_SRC_VEC_DIR}/RSGISVectorProcessing.cpp 
 	${RSGIS_SRC_VEC_DIR}/RSGISVectorProcessing.h 
-
-	
 )
 
 set(LIB_VEC_ZONALSTATS_CPP
@@ -1283,7 +1311,8 @@ set(EXE_RSGISEXE_CPP
 	${RSGIS_SRC_EXE_DIR}/RSGISExeImageMorphology.h
 	${RSGIS_SRC_EXE_DIR}/RSGISExeRasterGIS.cpp
 	${RSGIS_SRC_EXE_DIR}/RSGISExeRasterGIS.h
-	${RSGIS_SRC_EXE_DIR}/main.cpp)
+	${RSGIS_SRC_EXE_DIR}/main.cpp
+	)
 
 ###############################################################################
 
