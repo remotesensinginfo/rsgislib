@@ -122,7 +122,7 @@ namespace rsgis{ namespace cmds {
     void executeGenerateSaturationMask(std::string outputImage, std::string gdalFormat, std::vector<CmdsSaturatedPixel> imgBandInfo)throw(RSGISCmdException);
     
     /** Function to apply the FMask algorithm for classifying cloud for Landsat TM and ETM+ data */
-    void executeLandsatTMCloudFMask(std::string inputTOAImage, std::string inputThermalImage, std::string inputSaturateImage, std::string outputImage, std::string outputTmpImage, std::string gdalFormat, float scaleFactorIn) throw(RSGISCmdException);
+    void executeLandsatTMCloudFMask(std::string inputTOAImage, std::string inputThermalImage, std::string inputSaturateImage, std::string outputImage, std::string pass1TmpOutImage, std::string gdalFormat, float scaleFactorIn) throw(RSGISCmdException);
     
 
     

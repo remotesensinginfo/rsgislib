@@ -926,6 +926,75 @@ namespace rsgis{namespace rastergis{
         return colIdx;
     }
     
+    double RSGISRasterAttUtils::readDoubleColumnVal(const GDALRasterAttributeTable *gdalATT, std::string colName, unsigned int row) throw(RSGISAttributeTableException)
+    {
+        double val = 0.0;
+        try
+        {
+            unsigned int colIdx = this->findColumnIndex(gdalATT, colName);
+            
+            if(row > gdalATT->GetRowCount())
+            {
+                throw RSGISAttributeTableException("Row is not within the RAT.");
+            }
+            
+            val = gdalATT->GetValueAsDouble(row, colIdx);
+            
+        }
+        catch(RSGISAttributeTableException &e)
+        {
+            throw e;
+        }
+        
+        return val;
+    }
+    
+    long RSGISRasterAttUtils::readIntColumnVal(const GDALRasterAttributeTable *gdalATT, std::string colName, unsigned int row) throw(RSGISAttributeTableException)
+    {
+        long val = 0;
+        try
+        {
+            unsigned int colIdx = this->findColumnIndex(gdalATT, colName);
+            
+            if(row > gdalATT->GetRowCount())
+            {
+                throw RSGISAttributeTableException("Row is not within the RAT.");
+            }
+            
+            val = gdalATT->GetValueAsInt(row, colIdx);
+            
+        }
+        catch(RSGISAttributeTableException &e)
+        {
+            throw e;
+        }
+        
+        return val;
+    }
+    
+    std::string RSGISRasterAttUtils::readStringColumnVal(const GDALRasterAttributeTable *gdalATT, std::string colName, unsigned int row) throw(RSGISAttributeTableException)
+    {
+        std::string val = "";
+        try
+        {
+            unsigned int colIdx = this->findColumnIndex(gdalATT, colName);
+            
+            if(row > gdalATT->GetRowCount())
+            {
+                throw RSGISAttributeTableException("Row is not within the RAT.");
+            }
+            
+            val = std::string(gdalATT->GetValueAsString(row, colIdx));
+            
+        }
+        catch(RSGISAttributeTableException &e)
+        {
+            throw e;
+        }
+        
+        return val;
+    }
+    
     RSGISRasterAttUtils::~RSGISRasterAttUtils()
     {
         

@@ -985,6 +985,29 @@ static PyObject *ImageCalibration_landsatThermalRad2Brightness(PyObject *self, P
 }
 
 
+static PyObject *ImageCalibration_applyLandsatTMCloudFMask(PyObject *self, PyObject *args)
+{
+    const char *pszInputTOAFile, *pszInputThermalFile, *pszInputSatFile, *pszOutputFile, *pszOutputTmpFile, *pszGDALFormat;
+    float scaleFactor;
+    
+    if( !PyArg_ParseTuple(args, "ssssssf:applyLandsatTMCloudFMask", &pszInputTOAFile, &pszInputThermalFile, &pszInputSatFile, &pszOutputFile, &pszOutputTmpFile, &pszGDALFormat, &scaleFactor))
+    {
+        return NULL;
+    }
+    
+    try
+    {
+        rsgis::cmds::executeLandsatTMCloudFMask(std::string(pszInputTOAFile), std::string(pszInputThermalFile), std::string(pszInputSatFile), std::string(pszOutputFile), std::string(pszOutputTmpFile), std::string(pszGDALFormat), scaleFactor);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
 
 // Our list of functions in this module
 static PyMethodDef ImageCalibrationMethods[] = {
@@ -1157,6 +1180,18 @@ static PyMethodDef ImageCalibrationMethods[] = {
     "    *  k2 - k2 coefficient from Landsat header.\n"
     "\n"},
     
+{"applyLandsatTMCloudFMask", ImageCalibration_applyLandsatTMCloudFMask, METH_VARARGS,
+    "imagecalibration.applyLandsatTMCloudFMask(inputTOAImage, inputThermalImage, inputSaturateImage, outputImage, pass1OutputTmpImage, gdalFormat, scaleFactorIn)\n"
+    "Converts at sensor radiance values to Top of Atmosphere Reflectance.\n"
+    "where:\n"
+    "  * inputTOAImage is a string containing the name of the input image TOA reflectance file\n"
+    "  * inputThermalImage is a string containing the name of the input image with at sensor temperature (in celsius)"
+    "  * inputSaturateImage is a string containing the name of the input image file mask for the saturated pixels per band (including thermal)\n"
+    "  * outputImage is a string containing the name of the output image file\n"
+    "  * pass1OutputTmpImage is a string containing the name of a output tempoary image file for pass 1.\n"
+    "  * gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
+    "  * scaleFactorIn is a float with the scale factor used to multiple the input image (reflectance and thermal) data.\n"},
+
     {NULL}        /* Sentinel */
 };
 

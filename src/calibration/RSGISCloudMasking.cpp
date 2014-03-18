@@ -67,6 +67,7 @@ namespace rsgis{namespace calib{
             }
         }
         
+        
         if(!noData)
         {
             double ndsi = (bandValues[greenIdx] - bandValues[swir1Idx]) / (bandValues[greenIdx] + bandValues[swir1Idx]);
@@ -103,32 +104,32 @@ namespace rsgis{namespace calib{
             {
                 if(basicTest & whitenessTest & nirswirTest & hotTest)
                 {
-                    output[0] = 5;
+                    output[0] = 5;  // Cloud Water
                 }
                 else if((bandValues[swir2Idx] < (0.03 * this->scaleFactor)))
                 {
-                    output[0] = 3;
+                    output[0] = 3; // Clear Sky Water
                 }
                 else
                 {
-                    output[0] = 2;
+                    output[0] = 2; // Not clear enough for probability calculations (coming up in pass 2) and not clouds
                 }
             }
             else
             {
                 if(basicTest & whitenessTest & nirswirTest & hotTest)
                 {
-                    output[0] = 4;
+                    output[0] = 4; // Cloud Land
                 }
                 else
                 {
-                    output[0] = 1;
+                    output[0] = 1; // Clear Sky Land
                 }
             }
         }
         else
         {
-            output[0] = 0;
+            output[0] = 0; // Outside of image
         }
     }
     
@@ -258,9 +259,11 @@ namespace rsgis{namespace calib{
             {
                 output[0] = 0;
             }
+            //std::cout << "output = " << output[0] << std::endl;
         }
         else
         {
+            //std::cout << "No data\n";
             output[0] = 0;
         }
         
