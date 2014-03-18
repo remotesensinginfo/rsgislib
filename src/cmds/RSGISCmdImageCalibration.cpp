@@ -27,10 +27,15 @@
 #include "calibration/RSGISCalculateTopOfAtmosphereReflectance.h"
 #include "calibration/RSGISApply6SCoefficients.h"
 #include "calibration/RSGISApplySubtractOffsets.h"
+#include "calibration/RSGISCloudMasking.h"
 
 #include "img/RSGISImageCalcException.h"
 #include "img/RSGISCalcImageValue.h"
 #include "img/RSGISCalcImage.h"
+#include "img/RSGISImageUtils.h"
+
+#include "rastergis/RSGISCalcClumpStats.h"
+#include "rastergis/RSGISRasterAttUtils.h"
 
 namespace rsgis{ namespace cmds {
     
@@ -665,9 +670,149 @@ namespace rsgis{ namespace cmds {
         }
     }
     
-    void executeLandsatTMCloudFMask(std::string inputTOAImage, std::string inputThermalImage, std::string inputSaturateImage, std::string outputImage, std::string outputTmpImage, std::string gdalFormat, float scaleFactorIn) throw(RSGISCmdException)
+    void executeLandsatTMCloudFMask(std::string inputTOAImage, std::string inputThermalImage, std::string inputSaturateImage, std::string outputImage, std::string pass1TmpOutImage, std::string gdalFormat, float scaleFactorIn) throw(RSGISCmdException)
     {
-        
+        GDALAllRegister();
+        try
+        {
+            rsgis::img::RSGISImageUtils imgUtils;
+            rsgis::rastergis::RSGISRasterAttUtils ratUtils;
+            rsgis::rastergis::RSGISCalcClumpStats calcClumpStats;
+            
+            GDALDataset **datasets = NULL;
+            std::cout << "Opening: " << inputTOAImage << std::endl;
+            GDALDataset *reflDataset = (GDALDataset *) GDALOpen(inputTOAImage.c_str(), GA_ReadOnly);
+            if(reflDataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputTOAImage;
+                throw RSGISImageException(message.c_str());
+            }
+            unsigned int numReflBands = reflDataset->GetRasterCount();
+            
+            std::cout << "Opening: " << inputThermalImage << std::endl;
+            GDALDataset *thermDataset = (GDALDataset *) GDALOpen(inputThermalImage.c_str(), GA_ReadOnly);
+            if(thermDataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputThermalImage;
+                throw RSGISImageException(message.c_str());
+            }
+            unsigned int numThermBands = thermDataset->GetRasterCount();
+            
+            std::cout << "Opening: " << inputSaturateImage << std::endl;
+            GDALDataset *saturateDataset = (GDALDataset *) GDALOpen(inputSaturateImage.c_str(), GA_ReadOnly);
+            if(saturateDataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputSaturateImage;
+                throw RSGISImageException(message.c_str());
+            }
+            unsigned int numSaturateBands = saturateDataset->GetRasterCount();
+            
+            if((numReflBands+numThermBands) != numSaturateBands)
+            {
+                throw RSGISImageException("The number of saturation bands is not equal to the number of refl and thermal bands.");
+                
+                GDALClose(reflDataset);
+                GDALClose(thermDataset);
+                GDALClose(saturateDataset);
+            }
+            
+            rsgis::calib::RSGISLandsatFMaskPass1CloudMasking cloudMaskPass1 = rsgis::calib::RSGISLandsatFMaskPass1CloudMasking(scaleFactorIn);
+            rsgis::img::RSGISCalcImage *calcImage = new rsgis::img::RSGISCalcImage(&cloudMaskPass1, "", true);
+            datasets = new GDALDataset*[2];
+            datasets[0] = reflDataset;
+            datasets[1] = thermDataset;
+            GDALDataset *pass1DS = imgUtils.createCopy(reflDataset, 1, pass1TmpOutImage, gdalFormat, GDT_Int32);
+            calcImage->calcImage(datasets, 2, pass1DS);
+            delete calcImage;
+            delete[] datasets;
+            
+            std::cout << "Adding colour table and histogram to image\n";
+            rsgis::rastergis::RSGISPopulateWithImageStats popImageStats;
+            popImageStats.populateImageWithRasterGISStats(pass1DS, true, false);
+            
+            
+            std::cout << "Populating RAT with Thermal Stats\n";
+            std::vector<rsgis::rastergis::RSGISBandAttPercentiles *> *bandPercentStats = new std::vector<rsgis::rastergis::RSGISBandAttPercentiles *>();
+            rsgis::rastergis::RSGISBandAttPercentiles *tempUpperPercent = new rsgis::rastergis::RSGISBandAttPercentiles();
+            tempUpperPercent->band = 1;
+            tempUpperPercent->fieldName = "UpperTempThres";
+            tempUpperPercent->percentile = 82;
+            bandPercentStats->push_back(tempUpperPercent);
+            rsgis::rastergis::RSGISBandAttPercentiles *tempLowerPercent = new rsgis::rastergis::RSGISBandAttPercentiles();
+            tempLowerPercent->band = 1;
+            tempLowerPercent->fieldName = "LowerTempThres";
+            tempLowerPercent->percentile = 17;
+            bandPercentStats->push_back(tempLowerPercent);
+            calcClumpStats.calcImageClumpPercentiles(pass1DS, thermDataset, bandPercentStats);
+            delete tempUpperPercent;
+            delete tempLowerPercent;
+            delete bandPercentStats;
+            
+            std::cout << "Get Thresholds From the RAT\n";
+            const GDALRasterAttributeTable *pass1RAT = pass1DS->GetRasterBand(1)->GetDefaultRAT();
+            double lowerWaterThres = ratUtils.readDoubleColumnVal(pass1RAT, "LowerTempThres", 3);
+            double upperWaterThres = ratUtils.readDoubleColumnVal(pass1RAT, "UpperTempThres", 3);
+            double lowerLandThres = ratUtils.readDoubleColumnVal(pass1RAT, "LowerTempThres", 1);
+            double upperLandThres = ratUtils.readDoubleColumnVal(pass1RAT, "UpperTempThres", 1);
+            
+            std::cout << "Lower Water Threshold = " << lowerWaterThres << std::endl;
+            std::cout << "Upper Water Threshold = " << upperWaterThres << std::endl;
+            
+            std::cout << "Lower Land Threshold = " << lowerLandThres << std::endl;
+            std::cout << "Upper Land Threshold = " << upperLandThres << std::endl;
+            
+            
+            rsgis::calib::RSGISLandsatFMaskPass2ClearSkyCloudProbCloudMasking cloudMaskPass2Part1 = rsgis::calib::RSGISLandsatFMaskPass2ClearSkyCloudProbCloudMasking(scaleFactorIn, numThermBands, upperWaterThres, upperLandThres, lowerLandThres);
+            calcImage = new rsgis::img::RSGISCalcImage(&cloudMaskPass2Part1, "", true);
+            datasets = new GDALDataset*[3];
+            datasets[0] = pass1DS;
+            datasets[1] = reflDataset;
+            datasets[2] = thermDataset;
+            GDALDataset *pass2DS = imgUtils.createCopy(reflDataset, 1, "/Users/pete/Temp/LandsatTestScene/OutImages/LS7_20050622_lat53lon354_r23p204_cloudsTMP2.kea", "MEM", GDT_Float32);
+            calcImage->calcImage(datasets, 3, pass2DS);
+            delete calcImage;
+            delete[] datasets;
+            
+            bandPercentStats = new std::vector<rsgis::rastergis::RSGISBandAttPercentiles *>();
+            rsgis::rastergis::RSGISBandAttPercentiles *landCloudProbPercent = new rsgis::rastergis::RSGISBandAttPercentiles();
+            landCloudProbPercent->band = 1;
+            landCloudProbPercent->fieldName = "UpperCloudLandThres";
+            landCloudProbPercent->percentile = 82;
+            bandPercentStats->push_back(landCloudProbPercent);
+            calcClumpStats.calcImageClumpPercentiles(pass1DS, pass2DS, bandPercentStats);
+            delete landCloudProbPercent;
+            delete bandPercentStats;
+
+            pass1RAT = pass1DS->GetRasterBand(1)->GetDefaultRAT();
+            double landCloudProbUpperThres = ratUtils.readDoubleColumnVal(pass1RAT, "UpperCloudLandThres", 1);
+            
+            std::cout << "Upper Land Cloud Prob Threshold = " << landCloudProbUpperThres << std::endl;
+            
+            rsgis::calib::RSGISLandsatFMaskPass2CloudMasking cloudMaskPass2Part2 = rsgis::calib::RSGISLandsatFMaskPass2CloudMasking(scaleFactorIn, numThermBands, upperWaterThres, upperLandThres, lowerLandThres, landCloudProbUpperThres);
+            calcImage = new rsgis::img::RSGISCalcImage(&cloudMaskPass2Part2, "", true);
+            datasets = new GDALDataset*[4];
+            datasets[0] = pass1DS;
+            datasets[1] = reflDataset;
+            datasets[2] = thermDataset;
+            datasets[3] = saturateDataset;
+            calcImage->calcImage(datasets, 4, outputImage, false, NULL, gdalFormat, GDT_Int32);
+            delete calcImage;
+            delete[] datasets;
+            
+            GDALClose(pass1DS);
+            GDALClose(pass2DS);
+            GDALClose(reflDataset);
+            GDALClose(thermDataset);
+            GDALClose(saturateDataset);
+        }
+        catch(RSGISException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(std::exception &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
     }
                 
 

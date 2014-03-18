@@ -326,7 +326,7 @@ namespace rsgis{namespace rastergis{
             calcImageStats.calcImage(datasets, 2);
             delete calcImgValStats;
             delete[] datasets;
-                        
+            
             for(size_t i = 0; i < numRows; ++i)
             {
                 for(std::vector<rsgis::rastergis::RSGISBandAttPercentiles*>::iterator iterBands = bandPercentiles->begin(); iterBands != bandPercentiles->end(); ++iterBands)
@@ -343,7 +343,9 @@ namespace rsgis{namespace rastergis{
             }
             delete[] data;
             
+            
             clumpDS->GetRasterBand(1)->SetDefaultRAT(attTable);
+            delete attTable;
         }
         catch(rsgis::img::RSGISImageBandException &e)
         {
