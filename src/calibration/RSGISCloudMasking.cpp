@@ -100,7 +100,13 @@ namespace rsgis{namespace calib{
             
             bool waterTest = ((ndvi < 0.01) & (bandValues[nirIdx] < (0.11 * this->scaleFactor))) | ((ndvi < 0.1) & (bandValues[nirIdx] < (0.05 * this->scaleFactor)));
             
-            if(waterTest)
+            bool snowTest = (ndsi > 0.15) & (bandValues[therm1Idx] < (3.8 * this->scaleFactor)) & (bandValues[nirIdx] > (0.11 * this->scaleFactor)) & (bandValues[greenIdx] > (0.1 * this->scaleFactor));
+            
+            if(snowTest)
+            {
+                output[0] = 6;  // Snow
+            }
+            else if(waterTest)
             {
                 if(basicTest & whitenessTest & nirswirTest & hotTest)
                 {
@@ -191,6 +197,8 @@ namespace rsgis{namespace calib{
     
     void RSGISLandsatFMaskPass2ClearSkyCloudProbCloudMasking::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
     {
+        output[0] = 0.0;
+        
         bool noData = true;
         for(unsigned i = 1; i < numBands; ++i)
         {
@@ -254,17 +262,21 @@ namespace rsgis{namespace calib{
                 double variabilityProb = 1-variabMaxVal;
                 
                 output[0] = variabilityProb * landTempProb;
+                if(!((output[0] > 0) | (output[0] < 1)))
+                {
+                    output[0] = 0.0;
+                }
             }
             else
             {
-                output[0] = 0;
+                output[0] = 0.0;
             }
             //std::cout << "output = " << output[0] << std::endl;
         }
         else
         {
             //std::cout << "No data\n";
-            output[0] = 0;
+            output[0] = 0.0;
         }
         
     }
@@ -388,15 +400,15 @@ namespace rsgis{namespace calib{
                 
                 if(wCloudProb > 0.5)
                 {
-                    output[0] = 2;
+                    output[0] = 2; // Cloud
                 }
                 else
                 {
-                    output[0] = 1;
+                    output[0] = 1; // Clear Sky
                 }
                 
             }
-            else if((bandValues[pass1Idx] == 4) | (bandValues[pass1Idx] == 1)) // POSSIBLE LAND CLOUDS!!
+            else if(bandValues[pass1Idx] == 4)//(bandValues[pass1Idx] == 1) | () // POSSIBLE LAND CLOUDS!!
             {
                 double landTempProb = (land82ndThres + ((4*this->scaleFactor)-bandValues[therm1Idx])) / (land82ndThres + ((4*this->scaleFactor) - (land17thThres - (4*this->scaleFactor))));
                 
@@ -433,29 +445,37 @@ namespace rsgis{namespace calib{
                 
                 if((bandValues[pass1Idx] == 4) & (lCloudPProb > this->landCloudProb82ndThres))
                 {
-                    output[0] = 2;
+                    output[0] = 2; // Cloud
                 }
                 else if(lCloudPProb > 0.99)
                 {
-                    output[0] = 2;
+                    output[0] = 2; // Cloud
                 }
                 else if(bandValues[therm1Idx] < (this->land17thThres - (35 * this->scaleFactor)))
                 {
-                    output[0] = 2;
+                    output[0] = 2; // Cloud
+                }
+                else if((bandValues[this->blueSatIdx] == 1) & (bandValues[this->greenSatIdx] == 1) & (bandValues[this->redSatIdx] == 1))
+                {
+                    output[0] = 2; // Cloud
                 }
                 else
                 {
-                    output[0] = 1;
+                    output[0] = 1; // Clear Sky
                 }
+            }
+            else if(bandValues[pass1Idx] == 6)
+            {
+                output[0] = 4; // Snow!
             }
             else
             {
-                output[0] = 1;
+                output[0] = 1; // Clear Sky
             }
         }
         else
         {
-            output[0] = 0;
+            output[0] = 0; // No data
         }
         
     }

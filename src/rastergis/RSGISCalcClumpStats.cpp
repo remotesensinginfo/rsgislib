@@ -871,7 +871,8 @@ namespace rsgis{namespace rastergis{
             double min = 0;
             
             std::cout << "Get Image Min and Max.\n";
-            band->ComputeStatistics(false, &min, &max, NULL, NULL, StatsTextProgress, NULL);
+            int nLastProgress = -1;
+            band->ComputeStatistics(false, &min, &max, NULL, NULL, StatsTextProgress, &nLastProgress);
             
             if(min < 0)
             {
@@ -987,7 +988,8 @@ namespace rsgis{namespace rastergis{
                     }
                 }
                 
-                clumpsDataset->BuildOverviews(pszType, nOverviews, nLevels, 0, NULL, StatsTextProgress, NULL);
+                int nLastProgress = -1;
+                clumpsDataset->BuildOverviews(pszType, nOverviews, nLevels, 0, NULL, StatsTextProgress, &nLastProgress);
             }
                         
             delete[] histo;

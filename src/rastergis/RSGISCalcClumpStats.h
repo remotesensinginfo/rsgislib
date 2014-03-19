@@ -216,11 +216,81 @@ namespace rsgis{namespace rastergis{
     
     inline int StatsTextProgress( double dfComplete, const char *pszMessage, void *pData)
     {
+        int nPercent = int(dfComplete*100);
+        int *pnLastComplete = (int*)pData;
+        
+        if(nPercent < 10)
+        {
+            nPercent = 0;
+        }
+        else if(nPercent < 20)
+        {
+            nPercent = 10;
+        }
+        else if(nPercent < 30)
+        {
+            nPercent = 20;
+        }
+        else if(nPercent < 40)
+        {
+            nPercent = 30;
+        }
+        else if(nPercent < 50)
+        {
+            nPercent = 40;
+        }
+        else if(nPercent < 60)
+        {
+            nPercent = 50;
+        }
+        else if(nPercent < 70)
+        {
+            nPercent = 60;
+        }
+        else if(nPercent < 80)
+        {
+            nPercent = 70;
+        }
+        else if(nPercent < 90)
+        {
+            nPercent = 80;
+        }
+        else if(nPercent < 95)
+        {
+            nPercent = 90;
+        }
+        else
+        {
+            nPercent = 100;
+        }
+        
+        if( (pnLastComplete != NULL) && (nPercent != *pnLastComplete ))
+        {
+            if(nPercent == 0)
+            {
+                std::cout << "Started ." << nPercent << "." << std::flush;
+            }
+            else if(nPercent == 100)
+            {
+                std::cout << "." << nPercent << ". Complete." << std::endl;
+            }
+            else
+            {
+                std::cout << "." << nPercent << "." << std::flush;
+            }
+        }
+        
+        *pnLastComplete = nPercent;
+        
+        /*return TRUE;
+        
+        
+        
         if( pszMessage != NULL )
             printf( "%d%% complete: %s\r", (int) (dfComplete*100), pszMessage );
         else
             printf( "%d%% complete.\r", (int) (dfComplete*100) );
-        
+        */
         return true;
     };
     

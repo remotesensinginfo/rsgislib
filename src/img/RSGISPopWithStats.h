@@ -107,7 +107,7 @@ namespace rsgis { namespace img {
         
         *pnLastComplete = nPercent;
         
-        return TRUE;
+        return true;
     };
     
     
