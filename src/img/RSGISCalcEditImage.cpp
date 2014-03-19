@@ -85,7 +85,7 @@ namespace rsgis
                 
                 int feedback = height/10;
                 int feedbackCounter = 0;
-                std::cout << "Started" << std::flush;
+                std::cout << "Started " << std::flush;
                 // Loop images to process data
                 for(int i = 0; i < height; i++)
                 {
@@ -267,7 +267,7 @@ namespace rsgis
                 
                 int feedback = height/10.0;
                 int feedbackCounter = 0;
-                std::cout << "Started" << std::flush;
+                std::cout << "Started " << std::flush;
                 // Loop images to process data
                 for(int i = 0; i < nYBlocks; i++)
                 {

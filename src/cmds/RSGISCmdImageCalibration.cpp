@@ -33,6 +33,7 @@
 #include "img/RSGISCalcImageValue.h"
 #include "img/RSGISCalcImage.h"
 #include "img/RSGISImageUtils.h"
+#include "img/RSGISCalcEditImage.h"
 
 #include "rastergis/RSGISCalcClumpStats.h"
 #include "rastergis/RSGISRasterAttUtils.h"
@@ -715,7 +716,7 @@ namespace rsgis{ namespace cmds {
                 GDALClose(thermDataset);
                 GDALClose(saturateDataset);
             }
-            
+            std::cout << "Apply first pass FMask to classifiy initial clear sky regions...\n";
             rsgis::calib::RSGISLandsatFMaskPass1CloudMasking cloudMaskPass1 = rsgis::calib::RSGISLandsatFMaskPass1CloudMasking(scaleFactorIn);
             rsgis::img::RSGISCalcImage *calcImage = new rsgis::img::RSGISCalcImage(&cloudMaskPass1, "", true);
             datasets = new GDALDataset*[2];
@@ -761,7 +762,7 @@ namespace rsgis{ namespace cmds {
             std::cout << "Lower Land Threshold = " << lowerLandThres << std::endl;
             std::cout << "Upper Land Threshold = " << upperLandThres << std::endl;
             
-            
+            std::cout << "Calculate the cloud probability over the land area...\n";
             rsgis::calib::RSGISLandsatFMaskPass2ClearSkyCloudProbCloudMasking cloudMaskPass2Part1 = rsgis::calib::RSGISLandsatFMaskPass2ClearSkyCloudProbCloudMasking(scaleFactorIn, numThermBands, upperWaterThres, upperLandThres, lowerLandThres);
             calcImage = new rsgis::img::RSGISCalcImage(&cloudMaskPass2Part1, "", true);
             datasets = new GDALDataset*[3];
@@ -788,6 +789,7 @@ namespace rsgis{ namespace cmds {
             
             std::cout << "Upper Land Cloud Prob Threshold = " << landCloudProbUpperThres << std::endl;
             
+            std::cout << "Apply second pass FMask to classifiy final clouds mask...\n";
             rsgis::calib::RSGISLandsatFMaskPass2CloudMasking cloudMaskPass2Part2 = rsgis::calib::RSGISLandsatFMaskPass2CloudMasking(scaleFactorIn, numThermBands, upperWaterThres, upperLandThres, lowerLandThres, landCloudProbUpperThres);
             calcImage = new rsgis::img::RSGISCalcImage(&cloudMaskPass2Part2, "", true);
             datasets = new GDALDataset*[4];
@@ -795,12 +797,20 @@ namespace rsgis{ namespace cmds {
             datasets[1] = reflDataset;
             datasets[2] = thermDataset;
             datasets[3] = saturateDataset;
-            calcImage->calcImage(datasets, 4, outputImage, false, NULL, gdalFormat, GDT_Int32);
+            GDALDataset *cloudMaskDS = imgUtils.createCopy(reflDataset, 1, outputImage, gdalFormat, GDT_Int32);
+            calcImage->calcImage(datasets, 4, cloudMaskDS);
             delete calcImage;
             delete[] datasets;
             
+            std::cout << "Apply cloud majority filter...\n";
+            rsgis::calib::RSGISCalcImageCloudMajorityFilter *cloudMajFilter = new rsgis::calib::RSGISCalcImageCloudMajorityFilter();
+            rsgis::img::RSGISCalcEditImage editImgCalc = rsgis::img::RSGISCalcEditImage(cloudMajFilter);
+            editImgCalc.calcImageWindowData(cloudMaskDS, 3);
+            delete cloudMajFilter;
+            
             GDALClose(pass1DS);
             GDALClose(pass2DS);
+            GDALClose(cloudMaskDS);
             GDALClose(reflDataset);
             GDALClose(thermDataset);
             GDALClose(saturateDataset);

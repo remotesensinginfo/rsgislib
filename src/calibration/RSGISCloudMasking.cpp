@@ -485,6 +485,70 @@ namespace rsgis{namespace calib{
         
     }
     
+    
+    
+    
+
+    void RSGISCalcImageCloudMajorityFilter::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
+    {
+        if(numBands != 1)
+        {
+            rsgis::img::RSGISImageCalcException("Image must only have 1 band.");
+        }
+                
+        output[0] = dataBlock[0][1][1];
+        
+        if(dataBlock[0][1][1] == 2)
+        {
+            unsigned int notCloudPxlCount = 0;
+            for(unsigned int i = 0; i < winSize; ++i)
+            {
+                for(unsigned int j = 0; j < winSize; ++j)
+                {
+                    if((i != 1) | (j != 1))
+                    {
+                        if(dataBlock[0][i][j] != 2)
+                        {
+                            ++notCloudPxlCount;
+                        }
+                    }
+                }
+            }
+            if(notCloudPxlCount > 6)
+            {
+                output[0] = 1;
+            }
+        }
+        
+        if(dataBlock[0][1][1] != 2)
+        {
+            unsigned int cloudPxlCount = 0;
+            for(unsigned int i = 0; i < winSize; ++i)
+            {
+                for(unsigned int j = 0; j < winSize; ++j)
+                {
+                    if((i != 1) | (j != 1))
+                    {
+                        if(dataBlock[0][i][j] == 2)
+                        {
+                            ++cloudPxlCount;
+                        }
+                    }
+                }
+            }
+            
+            if(cloudPxlCount > 4)
+            {
+                output[0] = 2;
+            }
+        }
+    }
+    
+  
+
+    
+    
+    
 }}
 
 
