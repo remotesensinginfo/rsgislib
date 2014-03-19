@@ -670,7 +670,7 @@ namespace rsgis{ namespace cmds {
         }
     }
     
-    void executeLandsatTMCloudFMask(std::string inputTOAImage, std::string inputThermalImage, std::string inputSaturateImage, std::string outputImage, std::string pass1TmpOutImage, std::string gdalFormat, float scaleFactorIn) throw(RSGISCmdException)
+    void executeLandsatTMCloudFMask(std::string inputTOAImage, std::string inputThermalImage, std::string inputSaturateImage, std::string outputImage, std::string pass1TmpOutImage, std::string cloudLandProbTmpOutImage, std::string gdalFormat, float scaleFactorIn) throw(RSGISCmdException)
     {
         GDALAllRegister();
         try
@@ -768,7 +768,7 @@ namespace rsgis{ namespace cmds {
             datasets[0] = pass1DS;
             datasets[1] = reflDataset;
             datasets[2] = thermDataset;
-            GDALDataset *pass2DS = imgUtils.createCopy(reflDataset, 1, "/Users/pete/Temp/LandsatTestScene/OutImages/LS7_20050622_lat53lon354_r23p204_cloudsTMP2.kea", "MEM", GDT_Float32);
+            GDALDataset *pass2DS = imgUtils.createCopy(reflDataset, 1, cloudLandProbTmpOutImage, gdalFormat, GDT_Float32);
             calcImage->calcImage(datasets, 3, pass2DS);
             delete calcImage;
             delete[] datasets;
