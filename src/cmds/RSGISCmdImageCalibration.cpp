@@ -717,7 +717,7 @@ namespace rsgis{ namespace cmds {
                 GDALClose(saturateDataset);
             }
             std::cout << "Apply first pass FMask to classifiy initial clear sky regions...\n";
-            rsgis::calib::RSGISLandsatFMaskPass1CloudMasking cloudMaskPass1 = rsgis::calib::RSGISLandsatFMaskPass1CloudMasking(scaleFactorIn);
+            rsgis::calib::RSGISLandsatFMaskPass1CloudMasking cloudMaskPass1 = rsgis::calib::RSGISLandsatFMaskPass1CloudMasking(scaleFactorIn, (numReflBands+numThermBands));
             rsgis::img::RSGISCalcImage *calcImage = new rsgis::img::RSGISCalcImage(&cloudMaskPass1, "", true);
             datasets = new GDALDataset*[2];
             datasets[0] = reflDataset;
@@ -763,7 +763,7 @@ namespace rsgis{ namespace cmds {
             std::cout << "Upper Land Threshold = " << upperLandThres << std::endl;
             
             std::cout << "Calculate the cloud probability over the land area...\n";
-            rsgis::calib::RSGISLandsatFMaskPass2ClearSkyCloudProbCloudMasking cloudMaskPass2Part1 = rsgis::calib::RSGISLandsatFMaskPass2ClearSkyCloudProbCloudMasking(scaleFactorIn, numThermBands, upperWaterThres, upperLandThres, lowerLandThres);
+            rsgis::calib::RSGISLandsatFMaskPass2ClearSkyCloudProbCloudMasking cloudMaskPass2Part1 = rsgis::calib::RSGISLandsatFMaskPass2ClearSkyCloudProbCloudMasking(scaleFactorIn, (numReflBands+numThermBands), upperWaterThres, upperLandThres, lowerLandThres);
             calcImage = new rsgis::img::RSGISCalcImage(&cloudMaskPass2Part1, "", true);
             datasets = new GDALDataset*[3];
             datasets[0] = pass1DS;
@@ -790,7 +790,7 @@ namespace rsgis{ namespace cmds {
             std::cout << "Upper Land Cloud Prob Threshold = " << landCloudProbUpperThres << std::endl;
             
             std::cout << "Apply second pass FMask to classifiy final clouds mask...\n";
-            rsgis::calib::RSGISLandsatFMaskPass2CloudMasking cloudMaskPass2Part2 = rsgis::calib::RSGISLandsatFMaskPass2CloudMasking(scaleFactorIn, numThermBands, upperWaterThres, upperLandThres, lowerLandThres, landCloudProbUpperThres);
+            rsgis::calib::RSGISLandsatFMaskPass2CloudMasking cloudMaskPass2Part2 = rsgis::calib::RSGISLandsatFMaskPass2CloudMasking(scaleFactorIn, (numReflBands+numThermBands), upperWaterThres, upperLandThres, lowerLandThres, landCloudProbUpperThres);
             calcImage = new rsgis::img::RSGISCalcImage(&cloudMaskPass2Part2, "", true);
             datasets = new GDALDataset*[4];
             datasets[0] = pass1DS;

@@ -25,17 +25,49 @@
 
 namespace rsgis{namespace calib{
     
-    RSGISLandsatFMaskPass1CloudMasking::RSGISLandsatFMaskPass1CloudMasking(unsigned int scaleFactor):rsgis::img::RSGISCalcImageValue(1)
+    RSGISLandsatFMaskPass1CloudMasking::RSGISLandsatFMaskPass1CloudMasking(unsigned int scaleFactor, unsigned int numLSBands) throw(rsgis::img::RSGISImageCalcException):rsgis::img::RSGISCalcImageValue(1)
     {
         this->scaleFactor = scaleFactor;
-        this->blueIdx = 0;
-        this->greenIdx = 1;
-        this->redIdx = 2;
-        this->nirIdx = 3;
-        this->swir1Idx = 4;
-        this->swir2Idx = 5;
-        this->therm1Idx = 6;
-        this->therm2Idx = 7;
+        if(numLSBands == 9)
+        {
+            this->coastalIdx = 0;
+            this->blueIdx = 1;
+            this->greenIdx = 2;
+            this->redIdx = 3;
+            this->nirIdx = 4;
+            this->swir1Idx = 5;
+            this->swir2Idx = 6;
+            this->therm1Idx = 7;
+            this->therm2Idx = 8;
+        }
+        else if(numLSBands == 8)
+        {
+            this->coastalIdx = 0;
+            this->blueIdx = 0;
+            this->greenIdx = 1;
+            this->redIdx = 2;
+            this->nirIdx = 3;
+            this->swir1Idx = 4;
+            this->swir2Idx = 5;
+            this->therm1Idx = 6;
+            this->therm2Idx = 7;
+        }
+        else if(numLSBands == 7)
+        {
+            this->coastalIdx = 0;
+            this->blueIdx = 0;
+            this->greenIdx = 1;
+            this->redIdx = 2;
+            this->nirIdx = 3;
+            this->swir1Idx = 4;
+            this->swir2Idx = 5;
+            this->therm1Idx = 6;
+            this->therm2Idx = 6;
+        }
+        else
+        {
+            throw rsgis::img::RSGISImageCalcException("Number of landsat bands is not recognised.");
+        }
     }
     
     void RSGISLandsatFMaskPass1CloudMasking::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
@@ -152,25 +184,29 @@ namespace rsgis{namespace calib{
     
     
     
-    RSGISLandsatFMaskPass2ClearSkyCloudProbCloudMasking::RSGISLandsatFMaskPass2ClearSkyCloudProbCloudMasking(unsigned int scaleFactor, unsigned int numThermalBands, double water82ndThres, double land82ndThres, double land17thThres):rsgis::img::RSGISCalcImageValue(1)
+    RSGISLandsatFMaskPass2ClearSkyCloudProbCloudMasking::RSGISLandsatFMaskPass2ClearSkyCloudProbCloudMasking(unsigned int scaleFactor, unsigned int numLSBands, double water82ndThres, double land82ndThres, double land17thThres) throw(rsgis::img::RSGISImageCalcException):rsgis::img::RSGISCalcImageValue(1)
     {
         this->scaleFactor = scaleFactor;
-        this->numThermalBands = numThermalBands;
+        this->numLSBands = numLSBands;
         this->water82ndThres = water82ndThres;
         this->land82ndThres = land82ndThres;
         this->land17thThres = land17thThres;
-        this->pass1Idx = 0;
-        this->blueIdx = 1;
-        this->greenIdx = 2;
-        this->redIdx = 3;
-        this->nirIdx = 4;
-        this->swir1Idx = 5;
-        this->swir2Idx = 6;
-        this->therm1Idx = 7;
-        if(numThermalBands == 1)
+        
+        if(numLSBands == 7)
         {
+            this->pass1Idx = 0;
+            
+            this->coastalIdx = 1;
+            this->blueIdx = 1;
+            this->greenIdx = 2;
+            this->redIdx = 3;
+            this->nirIdx = 4;
+            this->swir1Idx = 5;
+            this->swir2Idx = 6;
+            this->therm1Idx = 7;
             this->therm2Idx = 7;
             
+            this->coastalSatIdx = 8;
             this->blueSatIdx = 8;
             this->greenSatIdx = 9;
             this->redSatIdx = 10;
@@ -180,10 +216,21 @@ namespace rsgis{namespace calib{
             this->therm1SatIdx = 14;
             this->therm2SatIdx = 14;
         }
-        else
+        else if(numLSBands == 8)
         {
+            this->pass1Idx = 0;
+            
+            this->coastalIdx = 1;
+            this->blueIdx = 1;
+            this->greenIdx = 2;
+            this->redIdx = 3;
+            this->nirIdx = 4;
+            this->swir1Idx = 5;
+            this->swir2Idx = 6;
+            this->therm1Idx = 7;
             this->therm2Idx = 8;
             
+            this->coastalSatIdx = 9;
             this->blueSatIdx = 9;
             this->greenSatIdx = 10;
             this->redSatIdx = 11;
@@ -192,6 +239,34 @@ namespace rsgis{namespace calib{
             this->swir2SatIdx = 14;
             this->therm1SatIdx = 15;
             this->therm2SatIdx = 16;
+        }
+        else if(numLSBands == 9)
+        {
+            this->pass1Idx = 0;
+            
+            this->coastalIdx = 1;
+            this->blueIdx = 2;
+            this->greenIdx = 3;
+            this->redIdx = 4;
+            this->nirIdx = 5;
+            this->swir1Idx = 6;
+            this->swir2Idx = 7;
+            this->therm1Idx = 8;
+            this->therm2Idx = 9;
+            
+            this->coastalSatIdx = 10;
+            this->blueSatIdx = 11;
+            this->greenSatIdx = 12;
+            this->redSatIdx = 13;
+            this->nirSatIdx = 14;
+            this->swir1SatIdx = 15;
+            this->swir2SatIdx = 16;
+            this->therm1SatIdx = 17;
+            this->therm2SatIdx = 18;
+        }
+        else
+        {
+            throw rsgis::img::RSGISImageCalcException("Number of landsat bands is not recognised.");
         }
     }
     
@@ -210,16 +285,16 @@ namespace rsgis{namespace calib{
         
         if(!noData)
         {
-            if(numBands == 9)
+            if(numLSBands == 7)
             {
-                if((bandValues[therm1Idx] == 0) && (bandValues[therm2Idx] == 0))
+                if(bandValues[therm1Idx] == 0)
                 {
                     noData = true;
                 }
             }
-            else if(numBands == 8)
+            else if((numBands == 8) | (numBands == 9))
             {
-                if(bandValues[therm1Idx] == 0)
+                if((bandValues[therm1Idx] == 0) && (bandValues[therm2Idx] == 0))
                 {
                     noData = true;
                 }
@@ -310,26 +385,31 @@ namespace rsgis{namespace calib{
     
     
     
-    RSGISLandsatFMaskPass2CloudMasking::RSGISLandsatFMaskPass2CloudMasking(unsigned int scaleFactor, unsigned int numThermalBands, double water82ndThres, double land82ndThres, double land17thThres, double landCloudProb82ndThres):rsgis::img::RSGISCalcImageValue(1)
+    RSGISLandsatFMaskPass2CloudMasking::RSGISLandsatFMaskPass2CloudMasking(unsigned int scaleFactor, unsigned int numLSBands, double water82ndThres, double land82ndThres, double land17thThres, double landCloudProb82ndThres) throw(rsgis::img::RSGISImageCalcException):rsgis::img::RSGISCalcImageValue(1)
     {
         this->scaleFactor = scaleFactor;
-        this->numThermalBands = numThermalBands;
+        this->numLSBands = numLSBands;
         this->water82ndThres = water82ndThres;
         this->land82ndThres = land82ndThres;
         this->land17thThres = land17thThres;
         this->landCloudProb82ndThres = landCloudProb82ndThres;
-        this->pass1Idx = 0;
-        this->blueIdx = 1;
-        this->greenIdx = 2;
-        this->redIdx = 3;
-        this->nirIdx = 4;
-        this->swir1Idx = 5;
-        this->swir2Idx = 6;
-        this->therm1Idx = 7;
-        if(numThermalBands == 1)
+        
+        
+        if(numLSBands == 7)
         {
+            this->pass1Idx = 0;
+            
+            this->coastalIdx = 1;
+            this->blueIdx = 1;
+            this->greenIdx = 2;
+            this->redIdx = 3;
+            this->nirIdx = 4;
+            this->swir1Idx = 5;
+            this->swir2Idx = 6;
+            this->therm1Idx = 7;
             this->therm2Idx = 7;
-
+            
+            this->coastalSatIdx = 8;
             this->blueSatIdx = 8;
             this->greenSatIdx = 9;
             this->redSatIdx = 10;
@@ -339,10 +419,21 @@ namespace rsgis{namespace calib{
             this->therm1SatIdx = 14;
             this->therm2SatIdx = 14;
         }
-        else
+        else if(numLSBands == 8)
         {
+            this->pass1Idx = 0;
+            
+            this->coastalIdx = 1;
+            this->blueIdx = 1;
+            this->greenIdx = 2;
+            this->redIdx = 3;
+            this->nirIdx = 4;
+            this->swir1Idx = 5;
+            this->swir2Idx = 6;
+            this->therm1Idx = 7;
             this->therm2Idx = 8;
             
+            this->coastalSatIdx = 9;
             this->blueSatIdx = 9;
             this->greenSatIdx = 10;
             this->redSatIdx = 11;
@@ -351,6 +442,34 @@ namespace rsgis{namespace calib{
             this->swir2SatIdx = 14;
             this->therm1SatIdx = 15;
             this->therm2SatIdx = 16;
+        }
+        else if(numLSBands == 9)
+        {
+            this->pass1Idx = 0;
+            
+            this->coastalIdx = 1;
+            this->blueIdx = 2;
+            this->greenIdx = 3;
+            this->redIdx = 4;
+            this->nirIdx = 5;
+            this->swir1Idx = 6;
+            this->swir2Idx = 7;
+            this->therm1Idx = 8;
+            this->therm2Idx = 9;
+            
+            this->coastalSatIdx = 10;
+            this->blueSatIdx = 11;
+            this->greenSatIdx = 12;
+            this->redSatIdx = 13;
+            this->nirSatIdx = 14;
+            this->swir1SatIdx = 15;
+            this->swir2SatIdx = 16;
+            this->therm1SatIdx = 17;
+            this->therm2SatIdx = 18;
+        }
+        else
+        {
+            throw rsgis::img::RSGISImageCalcException("Number of landsat bands is not recognised.");
         }
     }
     
@@ -367,16 +486,16 @@ namespace rsgis{namespace calib{
         
         if(!noData)
         {
-            if(numBands == 9)
+            if(numLSBands == 7)
             {
-                if((bandValues[therm1Idx] == 0) && (bandValues[therm2Idx] == 0))
+                if(bandValues[therm1Idx] == 0)
                 {
                     noData = true;
                 }
             }
-            else if(numBands == 8)
+            else if((numBands == 8) | (numBands == 9))
             {
-                if(bandValues[therm1Idx] == 0)
+                if((bandValues[therm1Idx] == 0) && (bandValues[therm2Idx] == 0))
                 {
                     noData = true;
                 }
