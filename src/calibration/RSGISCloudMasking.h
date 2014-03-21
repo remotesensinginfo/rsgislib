@@ -40,7 +40,7 @@ namespace rsgis{namespace calib{
 	class RSGISLandsatFMaskPass1CloudMasking : public rsgis::img::RSGISCalcImageValue
     {
     public:
-        RSGISLandsatFMaskPass1CloudMasking(unsigned int scaleFactor);
+        RSGISLandsatFMaskPass1CloudMasking(unsigned int scaleFactor, unsigned int numLSBands)throw(rsgis::img::RSGISImageCalcException);
         void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException);
         void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implmented.");};
         void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
@@ -53,6 +53,7 @@ namespace rsgis{namespace calib{
         ~RSGISLandsatFMaskPass1CloudMasking();
     protected:
         unsigned int scaleFactor;
+        unsigned int coastalIdx;
         unsigned int blueIdx;
         unsigned int greenIdx;
         unsigned int redIdx;
@@ -66,7 +67,7 @@ namespace rsgis{namespace calib{
     class RSGISLandsatFMaskPass2ClearSkyCloudProbCloudMasking : public rsgis::img::RSGISCalcImageValue
     {
     public:
-        RSGISLandsatFMaskPass2ClearSkyCloudProbCloudMasking(unsigned int scaleFactor, unsigned int numThermalBands, double water82ndThres, double land82ndThres, double land17thThres);
+        RSGISLandsatFMaskPass2ClearSkyCloudProbCloudMasking(unsigned int scaleFactor, unsigned int numLSBands, double water82ndThres, double land82ndThres, double land17thThres)throw(rsgis::img::RSGISImageCalcException);
         void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException);
         void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implmented.");};
         void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
@@ -79,8 +80,9 @@ namespace rsgis{namespace calib{
         ~RSGISLandsatFMaskPass2ClearSkyCloudProbCloudMasking();
     protected:
         unsigned int scaleFactor;
-        unsigned int numThermalBands;
+        unsigned int numLSBands;
         unsigned int pass1Idx;
+        unsigned int coastalIdx;
         unsigned int blueIdx;
         unsigned int greenIdx;
         unsigned int redIdx;
@@ -89,6 +91,7 @@ namespace rsgis{namespace calib{
         unsigned int swir2Idx;
         unsigned int therm1Idx;
         unsigned int therm2Idx;
+        unsigned int coastalSatIdx;
         unsigned int blueSatIdx;
         unsigned int greenSatIdx;
         unsigned int redSatIdx;
@@ -105,7 +108,7 @@ namespace rsgis{namespace calib{
     class RSGISLandsatFMaskPass2CloudMasking : public rsgis::img::RSGISCalcImageValue
     {
     public:
-        RSGISLandsatFMaskPass2CloudMasking(unsigned int scaleFactor, unsigned int numThermalBands, double water82ndThres, double land82ndThres, double land17thThres, double landCloudProb82ndThres);
+        RSGISLandsatFMaskPass2CloudMasking(unsigned int scaleFactor, unsigned int numThermalBands, double water82ndThres, double land82ndThres, double land17thThres, double landCloudProb82ndThres)throw(rsgis::img::RSGISImageCalcException);
         void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException);
         void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implmented.");};
         void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
@@ -118,8 +121,9 @@ namespace rsgis{namespace calib{
         ~RSGISLandsatFMaskPass2CloudMasking();
     protected:
         unsigned int scaleFactor;
-        unsigned int numThermalBands;
+        unsigned int numLSBands;
         unsigned int pass1Idx;
+        unsigned int coastalIdx;
         unsigned int blueIdx;
         unsigned int greenIdx;
         unsigned int redIdx;
@@ -128,6 +132,7 @@ namespace rsgis{namespace calib{
         unsigned int swir2Idx;
         unsigned int therm1Idx;
         unsigned int therm2Idx;
+        unsigned int coastalSatIdx;
         unsigned int blueSatIdx;
         unsigned int greenSatIdx;
         unsigned int redSatIdx;
