@@ -50,6 +50,8 @@
 
 #include <boost/math/special_functions/fpclassify.hpp>
 
+#include "libkea/KEAImageIO.h"
+
 namespace rsgis{namespace rastergis{
 	
     struct RSGISBandAttStats
@@ -323,6 +325,22 @@ namespace rsgis{namespace rastergis{
         unsigned int *histogram;
         unsigned int maxVal;
 	};
+    
+    struct JXSegQualityScoreBand
+    {
+        float bandVar;
+        float bandMI;
+        float bandVarNorm;
+        float bandMINorm;
+    };
+    
+    class RSGISCalcSegmentQualityStatistics
+    {
+    public:
+        RSGISCalcSegmentQualityStatistics();
+        double calcJohnsonXie2011Metric(GDALDataset *clumpsDataset, unsigned int numBands, std::string colPrefix, float minNormV, float maxNormV, float minNormMI, float maxNormMI, std::vector<JXSegQualityScoreBand*> *scores) throw(rsgis::RSGISImageException);
+        ~RSGISCalcSegmentQualityStatistics();
+    };
     
 	
 }}

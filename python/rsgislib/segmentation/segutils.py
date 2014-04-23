@@ -195,3 +195,329 @@ Example::
             rsgisUtils.deleteFileWithBasename(segmentFile)
         if createdDIR:
             rsgisUtils.deleteDIR(tmpath)
+            
+            
+def runShepherdSegmentationTestNumClumps(inputImg, outputClumpsBase, outStatsFile, outputMeanImgBase=None, tmpath='.', gdalFormat='KEA', noStats=False, noStretch=False, noDelete=False, numClustersStart=10, numClustersStep=10, numOfClustersSteps=10, minPxls=10, distThres=1000000, bands=None, sampling=100, kmMaxIter=200, minNormV=None, maxNormV=None, minNormMI=None, maxNormMI=None): 
+    """
+Utility function to call the segmentation algorithm of Shepherd et al. (2014) and to test are range of 'k' within the kMeans.
+
+Where:
+
+* inputImg is a string containing the name of the input file
+* outputClumps is a string containing the name of the output clump file
+* outStatsFile is a string containing the name of the output CSV file with the image segmentation stats
+* outputMeanImg is the output mean image file (clumps attributed with pixel mean from input image) - pass 'None' to skip creating.
+* tmpath is a file path for intermediate files (default is current directory).
+* gdalformat is a string containing the GDAL format for the output file (default is KEA)
+* noStats is a bool which specifies that no image statistics and pyramids should be built for the output images.
+* noStretch is a bool which specifies that the input image bands should not be stretched.
+* noDelete is a book which specifies that the temporary images created during processing should not be deleted once processing has been completed.
+* numClustersStart is an int which specifies the number of clusters within the KMeans clustering to start the process
+* numClustersStep is an int which specifies the number of clusters within the KMeans clustering added with each step
+* numOfClustersSteps is an int which specifies the number steps (i.e., tests) which are performed.
+* minPxls is an int which specifies the minimum number pixels within a segments.
+* distThres specifies the distance threshold for joining the segments (default is a very large value which turns off this option.).
+* bands is an array providing a subset of image bands to use (default is None to use all bands)
+* sampling specify the subsampling of the image for the data used within the KMeans (1 == no subsampling; default is 100)
+* kmMaxIter maximum iterations for KMeans.
+* minNormV is a floating point =None
+* maxNormV=None
+* minNormMI=None
+* maxNormMI=None)
+
+Example::
+
+    from rsgislib.segmentation import segutils
+
+
+    inputImg = './WV2_525N040W_20110727_TOARefl_b762_stch.kea'
+    outputClumpsBase = './OptimalTests/WV2_525N040W_20110727_Clumps'
+    outputMeanImgBase = './OptimalTests/WV2_525N040W_20110727_ClumpsMean'
+    tmpath='./OptimalTests/tmp/'
+    outStatsFile = './OptimalTests/StatsClumps.csv'
+
+    # Will test clump values from 10 to 200 with intervals of 10.
+    segutils.runShepherdSegmentationTestNumClumps(inputImg, outputClumpsBase, outStatsFile, outputMeanImgBase=outputMeanImgBase, tmpath=tmpath, noStretch=True, numClustersStart=10, numClustersStep=10, numOfClustersSteps=20, minPxls=50, minNormV=None, maxNormV=None, minNormMI=None, maxNormMI=None)
+
+
+    """
+    colsPrefix = 'gs'
+    calcNeighbours = True
+    calcNormVals = False
+    if minNormV==None or  maxNormV==None or minNormMI==None or maxNormMI==None:
+        minNormV = 0.0
+        maxNormV = 1.0
+        minNormMI = 0.0
+        maxNormMI = 1.0
+        calcNormVals = True
+    
+    
+    
+    outputStats = list()
+    
+    numClusters = numClustersStart
+    for i in range(numOfClustersSteps):
+        numClusters = numClustersStart + (i * numClustersStep)
+        print("Processing ", numClusters)
+        outputClumps = outputClumpsBase + "_c" + str(numClusters) + ".kea"
+        outputMeanImg = outputMeanImgBase + "_c" + str(numClusters) + ".kea"
+        
+        runShepherdSegmentation(inputImg, outputClumps, outputMeanImg=outputMeanImg, tmpath=tmpath, gdalFormat=gdalFormat, noStats=noStats, noStretch=noStretch, noDelete=noDelete, numClusters=numClusters, minPxls=minPxls, distThres=distThres, bands=bands, sampling=sampling, kmMaxIter=kmMaxIter)
+        
+        segScores = rsgislib.rastergis.calcGlobalSegmentationScore(outputClumps, inputImg, colsPrefix, calcNeighbours, minNormV, maxNormV, minNormMI, maxNormMI)
+        
+        tup = (numClusters, segScores)
+        outputStats.append(tup)
+        
+    
+    numImgBands = int(len(outputStats[0][1][1])/4)
+    
+    
+    if calcNormVals:
+        minVar = 0.0
+        maxVar = 0.0
+        scaleVar = 0.0
+        minMI = 0.0
+        maxMI = 0.0
+        scaleMI = 0.0
+        first = True
+        
+        for stat in outputStats:        
+            for i in range(numImgBands):
+                idxVar = i*4
+                idxMI = (i*4)+1
+                if first:
+                    minVar = stat[1][1][idxVar] # Var Min
+                    maxVar = stat[1][1][idxVar] # Var Max
+                    minMI = stat[1][1][idxMI] # MI Min
+                    maxMI = stat[1][1][idxMI] # MI Max
+                    first = False
+                else:
+                    if stat[1][1][idxVar] < minVar:
+                        minVar = stat[1][1][idxVar] # Set Var Min
+                    elif stat[1][1][idxVar] > maxVar:
+                        maxVar = stat[1][1][idxVar] # Set Var Max
+                        
+                    if stat[1][1][idxMI] < minMI:
+                        minMI = stat[1][1][idxMI] # Set MI Min
+                    elif stat[1][1][idxMI] > maxMI:
+                        maxMI = stat[1][1][idxMI] # Set MI Max
+        
+        print("Var Min: ", minVar)
+        print("Var Max: ", maxVar)
+        print("MI Min: ", minMI)
+        print("MI Max: ", maxMI)
+    
+        if (maxVar - minVar) > 0:
+            scaleVar = 1/(maxVar - minVar)
+        else:
+            scaleVar = 1
+        
+        if (maxMI - minMI) > 0:
+            scaleMI = 1/(maxMI - minMI)
+        else:
+            scaleMI = 1
+    
+        print("Var Scale: ", scaleVar)
+        print("MI Scale: ", scaleMI)
+    
+        for stat in outputStats:
+            gScore = 0.0
+            for i in range(numImgBands):
+                idxVar = i*4
+                idxMI = (i*4) + 1
+                idxVarNorm = (i*4) + 2
+                idxMINorm = (i*4) + 3
+                
+                stat[1][1][idxVarNorm] = (stat[1][1][idxVar] - minVar) * scaleVar
+                stat[1][1][idxMINorm] = (stat[1][1][idxMI] - minMI) * scaleMI
+            
+                gScore = gScore + stat[1][1][idxVarNorm] + stat[1][1][idxMINorm]
+            stat[1][0] = gScore
+    
+    fileStats = open(outStatsFile, "w")
+    
+    colNames = "Clusters, Overall Score"
+    for i in range(numImgBands):
+        colNames = colNames + ", B" + str(i+1) + "_Variance"
+        colNames = colNames + ", B" + str(i+1) + "_MI"
+        colNames = colNames + ", B" + str(i+1) + "_VarianceNorm"
+        colNames = colNames + ", B" + str(i+1) + "_MINorm"
+    colNames = colNames + "\n"
+    
+    fileStats.write(colNames)
+    
+    print("Clusters, Overall Score")
+    for stat in outputStats:
+        line = str(stat[0]) + ", " + "{:.9f}".format(stat[1][0])
+        print(line)
+        for val in stat[1][1]:
+            line = line + ", " + "{:.9f}".format(val)
+        line = line + "\n"
+        fileStats.write(line)  
+        
+    fileStats.close()
+    print("Complete.\n")
+    
+def runShepherdSegmentationTestMinObjSize(inputImg, outputClumpsBase, outStatsFile, outputMeanImgBase=None, tmpath='.', gdalFormat='KEA', noStats=False, noStretch=False, noDelete=False, numClusters=100, minPxlsStart=10, minPxlsStep=5, numOfMinPxlsSteps=20, distThres=1000000, bands=None, sampling=100, kmMaxIter=200, minNormV=None, maxNormV=None, minNormMI=None, maxNormMI=None): 
+    """
+Utility function to call the segmentation algorithm of Shepherd et al. (2014) and to test are range of 'k' within the kMeans.
+
+Where:
+
+* inputImg is a string containing the name of the input file
+* outputClumps is a string containing the name of the output clump file
+* outStatsFile is a string containing the name of the output CSV file with the image segmentation stats
+* outputMeanImg is the output mean image file (clumps attributed with pixel mean from input image) - pass 'None' to skip creating.
+* tmpath is a file path for intermediate files (default is current directory).
+* gdalformat is a string containing the GDAL format for the output file (default is KEA)
+* noStats is a bool which specifies that no image statistics and pyramids should be built for the output images.
+* noStretch is a bool which specifies that the input image bands should not be stretched.
+* noDelete is a book which specifies that the temporary images created during processing should not be deleted once processing has been completed.
+* numClusters is an int which specifies the number of clusters within the KMeans clustering process
+* minPxlsStart is an int which specifies the minimum number pixels within a segments at the start of processing.
+* minPxlsStep is an int which specifies the minimum number pixels within a segments increment each step.
+* numOfMinPxlsSteps is an int which specifies the number steps (i.e., tests) which are performed.
+* distThres specifies the distance threshold for joining the segments (default is a very large value which turns off this option.).
+* bands is an array providing a subset of image bands to use (default is None to use all bands)
+* sampling specify the subsampling of the image for the data used within the KMeans (1 == no subsampling; default is 100)
+* kmMaxIter maximum iterations for KMeans.
+* minNormV is a floating point =None
+* maxNormV=None
+* minNormMI=None
+* maxNormMI=None)
+
+Example::
+
+    from rsgislib.segmentation import segutils
+
+
+    inputImg = './WV2_525N040W_20110727_TOARefl_b762_stch.kea'
+    outputClumpsBase = './OptimalTests/WV2_525N040W_20110727_MinPxl'
+    outputMeanImgBase = './OptimalTests/WV2_525N040W_20110727_MinPxlMean'
+    tmpath='./OptimalTests/tmp/'
+    outStatsFile = './OptimalTests/StatsMinPxl.csv'
+
+    # Will test minimum number of pixels within an object from 10 to 100 with intervals of 5.
+    segutils.runShepherdSegmentationTestMinObjSize(inputImg, outputClumpsBase, outStatsFile, outputMeanImgBase=outputMeanImgBase, tmpath=tmpath, noStretch=True, numClusters=100, minPxlsStart=5, minPxlsStep=5, numOfMinPxlsSteps=20, minNormV=None, maxNormV=None, minNormMI=None, maxNormMI=None)
+
+
+    """
+    colsPrefix = 'gs'
+    calcNeighbours = True
+    calcNormVals = False
+    if minNormV==None or  maxNormV==None or minNormMI==None or maxNormMI==None:
+        minNormV = 0.0
+        maxNormV = 1.0
+        minNormMI = 0.0
+        maxNormMI = 1.0
+        calcNormVals = True
+    
+    
+    
+    outputStats = list()
+    
+    minPxls = minPxlsStart
+    for i in range(numOfMinPxlsSteps):
+        minPxls = minPxlsStart + (i * minPxlsStep)
+        print("Processing ", minPxls)
+        outputClumps = outputClumpsBase + "_mp" + str(minPxls) + ".kea"
+        outputMeanImg = outputMeanImgBase + "_mp" + str(minPxls) + ".kea"
+        
+        runShepherdSegmentation(inputImg, outputClumps, outputMeanImg=outputMeanImg, tmpath=tmpath, gdalFormat=gdalFormat, noStats=noStats, noStretch=noStretch, noDelete=noDelete, numClusters=numClusters, minPxls=minPxls, distThres=distThres, bands=bands, sampling=sampling, kmMaxIter=kmMaxIter)
+        
+        segScores = rsgislib.rastergis.calcGlobalSegmentationScore(outputClumps, inputImg, colsPrefix, calcNeighbours, minNormV, maxNormV, minNormMI, maxNormMI)
+        
+        tup = (minPxls, segScores)
+        outputStats.append(tup)
+        
+    
+    numImgBands = int(len(outputStats[0][1][1])/4)
+    
+    
+    if calcNormVals:
+        minVar = 0.0
+        maxVar = 0.0
+        scaleVar = 0.0
+        minMI = 0.0
+        maxMI = 0.0
+        scaleMI = 0.0
+        first = True
+        
+        for stat in outputStats:        
+            for i in range(numImgBands):
+                idxVar = i*4
+                idxMI = (i*4)+1
+                if first:
+                    minVar = stat[1][1][idxVar] # Var Min
+                    maxVar = stat[1][1][idxVar] # Var Max
+                    minMI = stat[1][1][idxMI] # MI Min
+                    maxMI = stat[1][1][idxMI] # MI Max
+                    first = False
+                else:
+                    if stat[1][1][idxVar] < minVar:
+                        minVar = stat[1][1][idxVar] # Set Var Min
+                    elif stat[1][1][idxVar] > maxVar:
+                        maxVar = stat[1][1][idxVar] # Set Var Max
+                        
+                    if stat[1][1][idxMI] < minMI:
+                        minMI = stat[1][1][idxMI] # Set MI Min
+                    elif stat[1][1][idxMI] > maxMI:
+                        maxMI = stat[1][1][idxMI] # Set MI Max
+        
+        print("Var Min: ", minVar)
+        print("Var Max: ", maxVar)
+        print("MI Min: ", minMI)
+        print("MI Max: ", maxMI)
+    
+        if (maxVar - minVar) > 0:
+            scaleVar = 1/(maxVar - minVar)
+        else:
+            scaleVar = 1
+        
+        if (maxMI - minMI) > 0:
+            scaleMI = 1/(maxMI - minMI)
+        else:
+            scaleMI = 1
+    
+        print("Var Scale: ", scaleVar)
+        print("MI Scale: ", scaleMI)
+    
+        for stat in outputStats:
+            gScore = 0.0
+            for i in range(numImgBands):
+                idxVar = i*4
+                idxMI = (i*4) + 1
+                idxVarNorm = (i*4) + 2
+                idxMINorm = (i*4) + 3
+                
+                stat[1][1][idxVarNorm] = (stat[1][1][idxVar] - minVar) * scaleVar
+                stat[1][1][idxMINorm] = (stat[1][1][idxMI] - minMI) * scaleMI
+            
+                gScore = gScore + stat[1][1][idxVarNorm] + stat[1][1][idxMINorm]
+            stat[1][0] = gScore
+    
+    fileStats = open(outStatsFile, "w")
+    
+    colNames = "MinNumPxls, Overall Score"
+    for i in range(numImgBands):
+        colNames = colNames + ", B" + str(i+1) + "_Variance"
+        colNames = colNames + ", B" + str(i+1) + "_MI"
+        colNames = colNames + ", B" + str(i+1) + "_VarianceNorm"
+        colNames = colNames + ", B" + str(i+1) + "_MINorm"
+    colNames = colNames + "\n"
+    
+    fileStats.write(colNames)
+    
+    print("Clusters, Overall Score")
+    for stat in outputStats:
+        line = str(stat[0]) + ", " + "{:.9f}".format(stat[1][0])
+        print(line)
+        for val in stat[1][1]:
+            line = line + ", " + "{:.9f}".format(val)
+        line = line + "\n"
+        fileStats.write(line)  
+        
+    fileStats.close()
+    print("Complete.\n")
+

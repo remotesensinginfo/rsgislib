@@ -1036,6 +1036,177 @@ namespace rsgis{namespace rastergis{
     }
     
     
+    
+    
+    
+    
+    
+    
+    
+    RSGISCalcSegmentQualityStatistics::RSGISCalcSegmentQualityStatistics()
+    {
+        
+    }
+    
+    double RSGISCalcSegmentQualityStatistics::calcJohnsonXie2011Metric(GDALDataset *clumpsDataset, unsigned int numBands, std::string colPrefix, float minNormV, float maxNormV, float minNormMI, float maxNormMI, std::vector<JXSegQualityScoreBand*> *scores) throw(rsgis::RSGISImageException)
+    {
+        double returnGSSVal = 0.0;
+        
+        try
+        {
+            rsgis::utils::RSGISTextUtils txtUtils;
+            RSGISRasterAttUtils ratUtils;
+            
+            const GDALRasterAttributeTable *attTableTmp = clumpsDataset->GetRasterBand(1)->GetDefaultRAT();
+            GDALRasterAttributeTable *attTable = NULL;
+            if(attTableTmp != NULL)
+            {
+                attTable = new GDALRasterAttributeTable(*attTableTmp);
+            }
+            else
+            {
+                throw rsgis::RSGISImageException("No RAT was presented within the inputted clumps image.");
+            }
+            
+            kealib::KEAImageIO *keaImgIO;
+            void *internalData = clumpsDataset->GetInternalHandle("");
+            if(internalData != NULL)
+            {
+                try
+                {
+                    keaImgIO = static_cast<kealib::KEAImageIO*>(internalData);
+                    
+                    if((keaImgIO == NULL) | (keaImgIO == 0))
+                    {
+                        throw rsgis::img::RSGISImageCalcException("Could not get hold of the internal KEA Image IO Object - was ");
+                    }
+                }
+                catch(boost::numeric::negative_overflow& e)
+                {
+                    throw rsgis::RSGISImageException(e.what());
+                }
+                catch(boost::numeric::positive_overflow& e)
+                {
+                    throw rsgis::RSGISImageException(e.what());
+                }
+                catch(boost::numeric::bad_numeric_cast& e)
+                {
+                    throw rsgis::RSGISImageException(e.what());
+                }
+            }
+            else
+            {
+                throw rsgis::RSGISImageException("Internal data on GDAL Dataset was NULL - check input file is KEA.");
+            }
+            
+            
+            std::string meanColName = "";
+            std::string stdDevColName = "";
+            
+            unsigned int meanColIdx = 0;
+            unsigned int stdDevColIdx = 0;
+            unsigned int histoColIdx = ratUtils.findColumnIndex(attTable, "Histogram");
+            unsigned int numNeighColIdx = ratUtils.findColumnIndex(attTable, "NumNeighbours");
+            int numRows = attTable->GetRowCount();
+            
+            kealib::KEAAttributeTable *keaAtt = keaImgIO->getAttributeTable(kealib::kea_att_mem, 1);
+            
+            double sumArea = 0.0;
+            double sumWVar = 0.0;
+            double areaVal = 0.0;
+            double meanValBase = 0.0;
+            double meanValNeigh = 0.0;
+            double meanBandVal = 0.0;
+            double sumMIPart1 = 0.0;
+            double sumMIPart2 = 0.0;
+            double countNumClumpPairs = 0.0;
+            unsigned int numNeighbours = 0;
+            unsigned int neighbourFID = 0;
+            kealib::KEAATTFeature *attFeat = NULL;
+            
+            double varScale = 1/(maxNormV - minNormV);
+            double mIScale = 1/(maxNormMI - minNormMI);
+            
+            double varOut = 0.0;
+            double mIOut = 0.0;
+            
+            double varNormOut = 0.0;
+            double mINormOut = 0.0;
+            
+            for(unsigned int i = 0; i < numBands; ++i)
+            {
+                std::cout << "Processing for Image Band " << i+1 << std::endl;
+                meanColName = colPrefix + "_b" + txtUtils.uInt16bittostring(i+1) + "_Mean";
+                stdDevColName = colPrefix + "_b" + txtUtils.uInt16bittostring(i+1) + "_StdDev";
+                
+                meanColIdx = ratUtils.findColumnIndex(attTable, meanColName);
+                stdDevColIdx = ratUtils.findColumnIndex(attTable, stdDevColName);
+                
+                sumArea = 0.0;
+                sumWVar = 0.0;
+                
+                for(size_t j = 1; j < numRows; ++j)
+                {
+                    meanBandVal += attTable->GetValueAsDouble(j, meanColIdx);
+                }
+                
+                meanBandVal = meanBandVal / (numRows-1);
+                
+                
+                for(size_t j = 1; j < numRows; ++j)
+                {
+                    areaVal = attTable->GetValueAsDouble(j, histoColIdx);
+                    sumArea += areaVal;
+                    sumWVar += areaVal * attTable->GetValueAsDouble(j, stdDevColIdx);
+                    
+                    meanValBase = attTable->GetValueAsDouble(j, meanColIdx);
+                    numNeighbours = attTable->GetValueAsInt(j, numNeighColIdx);
+                    attFeat = keaAtt->getFeature(j);
+                    for(unsigned int k = 0; k < numNeighbours; ++k)
+                    {
+                        neighbourFID = attFeat->neighbours->at(k);
+                        meanValNeigh = attTable->GetValueAsDouble(neighbourFID, meanColIdx);
+                        
+                        sumMIPart1 += (meanValBase - meanBandVal) * (meanValNeigh - meanBandVal);
+                        sumMIPart2 += (meanValBase - meanBandVal) * (meanValBase - meanBandVal);
+                        countNumClumpPairs += 1.0;
+                    }
+                }
+                
+                varOut = sumWVar/sumArea;
+                mIOut = (sumMIPart1 * (numRows-1)) / (sumMIPart2 * countNumClumpPairs);
+                
+                varNormOut = (varOut - minNormV) * varScale;
+                mINormOut = (mIOut - minNormMI) * mIScale;
+                
+                std::cout << "Variance Metric = " << varOut << " Normalised = " << varNormOut << std::endl;
+                std::cout << "MI Metric = " << mIOut << " Normalised = " << mINormOut << std::endl;
+                
+                JXSegQualityScoreBand *qualScore = new JXSegQualityScoreBand();
+                qualScore->bandVar = varOut;
+                qualScore->bandMI = mIOut;
+                qualScore->bandVarNorm = varNormOut;
+                qualScore->bandMINorm = mINormOut;
+                
+                scores->push_back(qualScore);
+                
+                returnGSSVal += (varNormOut + mINormOut);
+            }
+        }
+        catch (rsgis::RSGISImageException &e)
+        {
+            throw e;
+        }
+        
+        return returnGSSVal;
+    }
+    
+    RSGISCalcSegmentQualityStatistics::~RSGISCalcSegmentQualityStatistics()
+    {
+        
+    }
+    
+    
 	
 }}
 
