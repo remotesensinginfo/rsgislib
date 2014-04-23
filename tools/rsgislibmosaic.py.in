@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 #############################################
-# rsgislibzonalstats.py
+# rsgislibmosaic.py
 #
 #  Copyright 2014 RSGISLib.
 #
@@ -30,7 +30,7 @@
 # 
 ##############################################
 
-import os
+import os, sys
 import rsgislib
 from rsgislib import imageutils
 import argparse
@@ -81,12 +81,12 @@ print('rsgislibmosaic.py script provides command line utility.')
 print('for recursively finding files and mosaicking.  ')
 print('This script was distributed with @RSGISLIB_PACKAGE_STRING@')
 print('Copyright (C) @RSGISLIB_COPYRIGHT_YEAR@ Peter Bunting and Daniel Clewley')
-print('For support please email @RSGISLIB_PACKAGE_BUGREPORT@')
+print('For support please email @RSGISLIB_PACKAGE_BUGREPORT@\n')
 
 # Get input parameters
 parser = argparse.ArgumentParser()
 parser.add_argument("-i", "--indir", type=str, required=True, help="Input directory to recursively search")
-parser.add_argument("-s", "--search", type=str, required=True, help="Search string, e.g., '*kea'")
+parser.add_argument("-s", "--search", type=str, required=True, help="Search string, e.g., '*kea', must be in quotes.")
 parser.add_argument("-o", "--outmosaic", type=str, required=True, help="Output mosaic file")
 parser.add_argument("-l",'--outlist',type=str, default=None,help="Output text file with list of files in mosaic (optional)")
 parser.add_argument("-ot",'--datatype',type=str, default='Float32',help="Data type")
@@ -94,16 +94,26 @@ parser.add_argument("--backgroundval", type=float, default=0,help="Background Va
 parser.add_argument("--skipval", type=float, default=0,help="Value to be skipped (nodata values) in the input images (default 0)")
 parser.add_argument("--skipband", type=int, default=1,help="Band to check for skip val (default 1)")
 parser.add_argument("--minpix", action='store_true', default=False, help="Use minimum pixel in overlap areas (default, use last image in)")
-parser.add_argument("--maxpix", action='store_false',default=False, help="Use maximum pixel in overlap areas (default, use last image in)")
+parser.add_argument("--maxpix", action='store_true',default=False, help="Use maximum pixel in overlap areas (default, use last image in)")
+parser.add_argument("--nostats", action='store_true',default=False, help="Don't calculate statistics and pyramids for mosaic (default is to calculate)")
 args = parser.parse_args()    
 
 overlapBehaviour = 0
 
 if args.minpix:
+    print("Taking minimum pixel value in band {} for overlapping areas.\n".format(args.skipband))
     overlapBehaviour = 1
 
-if args.maxpix:
+elif args.maxpix:
+    print("Taking maximum pixel value in band {} for overlapping areas.\n".format(args.skipband))
     overlapBehaviour = 2
+
+else:
+    print("Using values of last image for overlapping areas.\n")
+
+if args.minpix and args.maxpix:
+    print("ERROR: Either '--minpix' or '--maxpix' expected (not both)")
+    sys.exit()
 
 # Get output extension from input file
 outFormat=getGDALFormat(args.outmosaic)
@@ -119,7 +129,11 @@ for dName, sdName, fList in os.walk(args.indir):
 
 fileCount=len(fileList)
 
-print('Found %i files'%fileCount)
+if fileCount == 0:
+    print('ERROR: No files found')
+    sys.exit()
+else:
+    print('Found %i files'%fileCount)
 
 # Save list of files
 if args.outlist is not None:
@@ -134,10 +148,11 @@ t.start(True)
 imageutils.createImageMosaic(fileList, args.outmosaic, args.backgroundval, args.skipval, args.skipband, overlapBehaviour, outFormat, getRSGISLibDataType(args.datatype))
 t.end()
 
-# Create pyramids
-print('\nCalculating stats and pyramids...')
-t.start(True)
-imageutils.popImageStats(args.outmosaic,True,0.,True)
-t.end()
-print('Finished')
-
+if not args.nostats:
+    # Create pyramids
+    print('\nCalculating stats and pyramids...')
+    t.start(True)
+    imageutils.popImageStats(args.outmosaic,True,0.,True)
+    t.end()
+    print('Finished')
+    
