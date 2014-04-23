@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 #############################################
-# rsgislibzonalstats.py
+# rsgislibmosaic.py
 #
 #  Copyright 2014 RSGISLib.
 #
@@ -30,7 +30,7 @@
 # 
 ##############################################
 
-import os
+import os, sys
 import rsgislib
 from rsgislib import imageutils
 import argparse
@@ -81,7 +81,7 @@ print('rsgislibmosaic.py script provides command line utility.')
 print('for recursively finding files and mosaicking.  ')
 print('This script was distributed with @RSGISLIB_PACKAGE_STRING@')
 print('Copyright (C) @RSGISLIB_COPYRIGHT_YEAR@ Peter Bunting and Daniel Clewley')
-print('For support please email @RSGISLIB_PACKAGE_BUGREPORT@')
+print('For support please email @RSGISLIB_PACKAGE_BUGREPORT@\n')
 
 # Get input parameters
 parser = argparse.ArgumentParser()
@@ -119,7 +119,11 @@ for dName, sdName, fList in os.walk(args.indir):
 
 fileCount=len(fileList)
 
-print('Found %i files'%fileCount)
+if fileCount == 0:
+    print('ERROR: No files found')
+    sys.exit()
+else:
+    print('Found %i files'%fileCount)
 
 # Save list of files
 if args.outlist is not None:
