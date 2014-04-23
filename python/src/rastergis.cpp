@@ -1150,6 +1150,61 @@ static PyObject *RasterGIS_InterpolateClumpValues2Img(PyObject *self, PyObject *
 }
 
 
+static PyObject *RasterGIS_FindGlobalSegmentationScore(PyObject *self, PyObject *args) {
+    const char *clumpsImage, *inputImage, *colPrefix;
+    int calcNeighBool;
+    float minNormV, maxNormV, minNormMI, maxNormMI;
+    
+    if(!PyArg_ParseTuple(args, "sssiffff:calcGlobalSegmentationScore", &clumpsImage, &inputImage, &colPrefix, &calcNeighBool, &minNormV, &maxNormV, &minNormMI, &maxNormMI))
+    {
+        return NULL;
+    }
+    
+    PyObject *outList = PyList_New(2);
+    PyObject *scoreCompsList = NULL;
+    try
+    {
+        bool calcNeighbours = (bool)calcNeighBool;
+        
+        std::vector<rsgis::cmds::RSGISJXSegQualityScoreBandCmds> *scoreBandComps = new std::vector<rsgis::cmds::RSGISJXSegQualityScoreBandCmds>();
+        
+        float segScore = rsgis::cmds::executeFindGlobalSegmentationScore4Clumps(std::string(clumpsImage), std::string(inputImage), std::string(colPrefix), calcNeighbours, minNormV, maxNormV, minNormMI, maxNormMI, scoreBandComps);
+        
+        Py_ssize_t listLen = scoreBandComps->size() * 4;
+        scoreCompsList = PyList_New(listLen);
+        
+        unsigned int i = 0;
+        for(std::vector<rsgis::cmds::RSGISJXSegQualityScoreBandCmds>::iterator iterScoreComps = scoreBandComps->begin(); iterScoreComps != scoreBandComps->end(); ++iterScoreComps)
+        {
+            PyList_SetItem(scoreCompsList, i++, Py_BuildValue("f", (*iterScoreComps).bandVar));
+            PyList_SetItem(scoreCompsList, i++, Py_BuildValue("f", (*iterScoreComps).bandMI));
+            PyList_SetItem(scoreCompsList, i++, Py_BuildValue("f", (*iterScoreComps).bandVarNorm));
+            PyList_SetItem(scoreCompsList, i++, Py_BuildValue("f", (*iterScoreComps).bandMINorm));
+        }
+        
+        
+        if(PyList_SetItem(outList, 0, Py_BuildValue("f", segScore)) == -1)
+        {
+            throw rsgis::cmds::RSGISCmdException("Failed to add a segmentation score value to the list...");
+        }
+        else if(PyList_SetItem(outList, 1, scoreCompsList) == -1)
+        {
+            throw rsgis::cmds::RSGISCmdException("Failed to add a segmentation component score values to the list...");
+        }
+        
+        
+        //std::cout << "segScore = " << segScore << std::endl;
+    }
+    catch (rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    return outList;
+}
+
+
 
 
 
@@ -1647,6 +1702,25 @@ static PyMethodDef RasterGISMethods[] = {
     "* outputFile is a string for the path to the output image file.\n"
     "* imageFormat is string defining the GDAL format of the output image.\n"
     "* dataType is an containing one of the values from rsgislib.TYPE_*\n"
+    "\n"},
+    
+    
+{"calcGlobalSegmentationScore", RasterGIS_FindGlobalSegmentationScore, METH_VARARGS,
+    "rsgislib.rastergis.calcGlobalSegmentationScore(clumpsImage, inputImage, colsPrefix, calcNeighbours, minNormV, maxNormV, minNormMI, maxNormMI)\n"
+    "Calculates the Global Score defined in Johnson and Xie 2011 'Unsupervised image segmentation evaluation and "
+    " refinement using a multi-scale approach', ISPRS Journal of Photogrammetery and Remote Sensing.\n"
+    "Where:\n"
+    "\n"
+    "* clumpsImage is a string containing the name and path to the input clump file to be tested.\n"
+    "* inputImage is a string containing the name and path to the input image file the homogeneity is to be tested on.\n"
+    "* colsPrefix is a string which defines a prefix (e.g., 'gs') for the columns created during this processing.\n"
+    "* calcNeighbours is a boolean which defines whether the clump neighbours need to be calculated (note, if they are not pre-calculated this must be true or processing will fail).\n"
+    "* minNormV is a float which defines a minimum value for normalising the variance component of the score.\n"
+    "* maxNormV is a float which defines a maximum value for normalising the variance component of the score.\n"
+    "* minNormMI is a float which defines a minimum value for normalising the Moran's I component of the score.\n"
+    "* maxNormMI is a float which defines a maximum value for normalising the Moran's I component of the score.\n"
+    "Returns:\n"
+    "float - The global segmentation score. (higher == worse and lower == better)."
     "\n"},
     
     

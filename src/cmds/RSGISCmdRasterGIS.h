@@ -109,6 +109,22 @@ namespace rsgis{ namespace cmds {
         int outName;
         float threshold;
     };
+    
+    struct RSGISJXSegQualityScoreBandCmds
+    {
+        RSGISJXSegQualityScoreBandCmds(float bandVar, float bandMI, float bandVarNorm, float bandMINorm)
+        {
+            this->bandVar = bandVar;
+            this->bandMI = bandMI;
+            this->bandVarNorm = bandVarNorm;
+            this->bandMINorm = bandMINorm;
+        };
+        
+        float bandVar;
+        float bandMI;
+        float bandVarNorm;
+        float bandMINorm;
+    };
 
 
     class RSGISColourIntCmds {
@@ -225,6 +241,9 @@ namespace rsgis{ namespace cmds {
     /** Function to interpolate values from clumps to the whole image of pixels */
     void executeInterpolateClumpValuesToImage(std::string clumpsImage, std::string selectField, std::string eastingsField, std::string northingsField, std::string methodStr, std::string valueField, std::string outputFile, std::string imageFormat, RSGISLibDataType dataType)throw(RSGISCmdException);
 
+    /** Function to calculate the 'Global Segmentation Score' for the clumps using a given input image */
+    float executeFindGlobalSegmentationScore4Clumps(std::string clumpsImage, std::string inputImage, std::string colPrefix, bool calcNeighbours, float minNormV, float maxNormV, float minNormMI, float maxNormMI, std::vector<cmds::RSGISJXSegQualityScoreBandCmds> *scoreBandComps)throw(RSGISCmdException);
+    
 }}
 
 

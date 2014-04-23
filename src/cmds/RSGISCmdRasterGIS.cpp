@@ -28,6 +28,8 @@
 
 #include "math/RSGIS2DInterpolation.h"
 
+#include "utils/RSGISTextUtils.h"
+
 #include "rastergis/RSGISRasterAttUtils.h"
 #include "rastergis/RSGISCalcClumpStats.h"
 #include "rastergis/RSGISCalcClusterLocation.h"
@@ -1129,6 +1131,116 @@ namespace rsgis{ namespace cmds {
         {
             throw RSGISCmdException(e.what());
         }
+    }
+            
+            
+            
+            
+    float executeFindGlobalSegmentationScore4Clumps(std::string clumpsImage, std::string inputImage, std::string colPrefix, bool calcNeighbours, float minNormV, float maxNormV, float minNormMI, float maxNormMI, std::vector<cmds::RSGISJXSegQualityScoreBandCmds> *scoreBandComps)throw(RSGISCmdException)
+    {
+        double returnGSSVal = 0.0;
+        GDALAllRegister();
+        GDALDataset *clumpsDataset;
+        GDALDataset *inputImageDataset;
+        
+        try
+        {
+            std::cout.precision(12);
+            rsgis::utils::RSGISTextUtils txtUtils;
+            
+            clumpsDataset = (GDALDataset *) GDALOpen(clumpsImage.c_str(), GA_Update);
+            if(clumpsDataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + clumpsImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            inputImageDataset = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_ReadOnly);
+            if(inputImageDataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            if(calcNeighbours)
+            {
+                std::cout << "Populating the clumps with their neighbours\n";
+                rsgis::rastergis::RSGISFindClumpNeighbours findNeighboursObj;
+                findNeighboursObj.findNeighboursKEAImageCalc(clumpsDataset);
+            }
+  
+            unsigned int numImgBands = inputImageDataset->GetRasterCount();
+            
+            std::vector<rsgis::rastergis::RSGISBandAttStats*> *bandStats = new std::vector<rsgis::rastergis::RSGISBandAttStats*>();
+            bandStats->reserve(numImgBands);
+            
+            rsgis::rastergis::RSGISBandAttStats *bandStat = NULL;
+            for(unsigned int i = 0; i < numImgBands; ++i)
+            {
+                bandStat = new rsgis::rastergis::RSGISBandAttStats();
+                bandStat->band = i+1;
+                bandStat->threshold = 0;
+                bandStat->calcCount = false;
+                bandStat->countField = "";
+                bandStat->calcMin = false;
+                bandStat->minField = "";
+                bandStat->calcMax = false;
+                bandStat->maxField = "";
+                bandStat->calcMean = true;
+                bandStat->meanField = colPrefix + "_b" + txtUtils.uInt16bittostring(i+1) + "_Mean";
+                bandStat->calcStdDev = true;
+                bandStat->stdDevField = colPrefix + "_b" + txtUtils.uInt16bittostring(i+1) + "_StdDev";
+                bandStat->calcMedian = false;
+                bandStat->medianField = "";
+                bandStat->calcSum = false;
+                bandStat->sumField = "";
+                
+                bandStat->countIdxDef = false;
+                bandStat->minIdxDef = false;
+                bandStat->maxIdxDef = false;
+                bandStat->meanIdxDef = false;
+                bandStat->sumIdxDef = false;
+                bandStat->stdDevIdxDef = false;
+                bandStat->medianIdxDef = false;
+                
+                bandStats->push_back(bandStat);
+            }
+            
+            std::cout << "Calculating the clump statistics (Mean and Standard Deviation).\n";
+            rsgis::rastergis::RSGISCalcClumpStats clumpStats;
+            clumpStats.calcImageClumpStatistic(clumpsDataset, inputImageDataset, bandStats);
+            
+            for(std::vector<rsgis::rastergis::RSGISBandAttStats*>::iterator iterBand = bandStats->begin(); iterBand != bandStats->end(); ++iterBand)
+            {
+                delete *iterBand;
+            }
+            delete bandStats;
+            
+            std::vector<rsgis::rastergis::JXSegQualityScoreBand*> *scoreComponents = new std::vector<rsgis::rastergis::JXSegQualityScoreBand*>();
+            rsgis::rastergis::RSGISCalcSegmentQualityStatistics  calcSegsQuality;
+            returnGSSVal = calcSegsQuality.calcJohnsonXie2011Metric(clumpsDataset, numImgBands, colPrefix, minNormV, maxNormV, minNormMI, maxNormMI, scoreComponents);
+            
+            for(std::vector<rsgis::rastergis::JXSegQualityScoreBand*>::iterator iterScores = scoreComponents->begin(); iterScores != scoreComponents->end(); ++iterScores)
+            {
+                scoreBandComps->push_back(cmds::RSGISJXSegQualityScoreBandCmds((*iterScores)->bandVar, (*iterScores)->bandMI, (*iterScores)->bandVarNorm, (*iterScores)->bandMINorm));
+                
+                delete *iterScores;
+            }
+            delete scoreComponents;
+            
+            GDALClose(clumpsDataset);
+            GDALClose(inputImageDataset);
+        }
+        catch(rsgis::RSGISAttributeTableException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch (rsgis::RSGISException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        
+        return returnGSSVal;
     }
 
 }}
