@@ -56,7 +56,7 @@ namespace rsgis{namespace rastergis{
             double northings = 0;
             double value = 0;
             
-            
+            unsigned int numSelectValues = 0;
             std::vector<rsgis::math::RSGISInterpolatorDataPoint> *pts = new std::vector<rsgis::math::RSGISInterpolatorDataPoint>();
             for(unsigned int i = 0; i < numRATRows; ++i)
             {
@@ -68,8 +68,10 @@ namespace rsgis{namespace rastergis{
                     value = gdalAtt->GetValueAsDouble(i, valueIdx);
                     std::cout << "Clump " << i << " [" << eastings << "," << northings << "] = " << value << std::endl;
                     pts->push_back(rsgis::math::RSGISInterpolatorDataPoint(eastings, northings, value));
+                    ++numSelectValues;
                 }
             }
+            std::cout << "There are " << numSelectValues << " selected features.\n";
             
             interpolator->initInterpolator(pts);
             

@@ -60,7 +60,7 @@ namespace rsgis{namespace rastergis{
             unsigned int outSelectIdx = attUtils.findColumnIndexOrCreate(gdalAttOut, outSelectField, GFT_Integer);
             
             unsigned int numTiles = rows * cols;
-            //std::cout << "Number of Tiles: " << numTiles << std::endl;
+            std::cout << "Number of Tiles: " << numTiles << std::endl;
             
             OGREnvelope *imgExtent = imgUtils.getSpatialExtent(clumpsDataset);
             double imgWidth = imgExtent->MaxX - imgExtent->MinX;
@@ -72,8 +72,8 @@ namespace rsgis{namespace rastergis{
             double tileWidth = imgWidth / ((double)cols);
             double tileHeight = imgHeight / ((double)rows);
             
-            //std::cout << "Tile Width = " << tileWidth << std::endl;
-            //std::cout << "Tile Height = " << tileHeight << std::endl;
+            std::cout << "Tile Width = " << tileWidth << std::endl;
+            std::cout << "Tile Height = " << tileHeight << std::endl;
             
             double *selectVal = new double[numTiles];
             unsigned int *selectIdx = new unsigned int[numTiles];
