@@ -223,8 +223,8 @@ static PyObject *ImageUtils_createTiles(PyObject *self, PyObject *args)
 static PyObject *ImageUtils_createImageMosaic(PyObject *self, PyObject *args)
 {
     const char *pszOutputImage, *pszGDALFormat;
-    float backgroundVal, skipVal, skipBand;
-    int nDataType, overlapBehaviour;
+    float backgroundVal, skipVal;
+    int skipBand, nDataType, overlapBehaviour;
     PyObject *pInputImages; // List of input images
 
     // Check parameters are present and of correct type
@@ -250,7 +250,7 @@ static PyObject *ImageUtils_createImageMosaic(PyObject *self, PyObject *args)
     try
     {
         rsgis::cmds::executeImageMosaic(inputImages, numImages, pszOutputImage, backgroundVal, 
-                    skipVal, skipBand, overlapBehaviour, pszGDALFormat, (rsgis::RSGISLibDataType)nDataType);
+                    skipVal, skipBand-1, overlapBehaviour, pszGDALFormat, (rsgis::RSGISLibDataType)nDataType);
 
     }
     catch(rsgis::cmds::RSGISCmdException &e)
