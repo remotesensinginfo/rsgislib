@@ -1134,13 +1134,13 @@ namespace rsgis{namespace img{
             {
                 outputBand[i] = baseImage->GetRasterBand(i+1);
             }
-            
+
             int xBlockSize = 0;
             int yBlockSize = 0;
             outputBand[0]->GetBlockSize (&xBlockSize, &yBlockSize);
-            
+
             std::cout << "Max. block size: " << yBlockSize << std::endl;
-            
+
 			std::cout << "Started (total " << numDS << ") ." << std::flush;
 
 			for(int i = 0; i < numDS; i++)
@@ -1163,11 +1163,11 @@ namespace rsgis{namespace img{
 				xStart = floor(xDiff/baseTransform[1]);
 				yStart = floor(yDiff/baseTransform[1]);
 				imgData = (float *) CPLMalloc(sizeof(float)*(tileXSize*yBlockSize));
-                
+
                 int nYBlocks = tileYSize / yBlockSize;
                 int remainRows = tileYSize - (nYBlocks * yBlockSize);
                 int rowOffset = 0;
-                
+
                 for(int i = 0; i < nYBlocks; i++)
                 {
                     rowOffset = yBlockSize * i;
@@ -1218,10 +1218,10 @@ namespace rsgis{namespace img{
                                 throw RSGISImageException("Band is not within the input dataset.");
                             }
                             inputBand = dataset->GetRasterBand(*iterBands);
-                            
+
                             inputBand->RasterIO(GF_Read, 0, rowOffset, tileXSize, remainRows, imgData, tileXSize, remainRows, GDT_Float32, 0, 0);
                             outputBand[nBand-1]->RasterIO(GF_Write, xStart, (yStart + rowOffset), tileXSize, remainRows, imgData, tileXSize, remainRows, GDT_Float32, 0, 0);
-                            
+
                             ++nBand;
                         }
                     }
@@ -1231,7 +1231,7 @@ namespace rsgis{namespace img{
                         {
                             throw RSGISImageException("The number of bands in the input datasets and base dataset need to be the same.");
                         }
-                        
+
                         for(int n = 1; n <= numberBands; n++)
                         {
                             inputBand = dataset->GetRasterBand(n);
@@ -1272,7 +1272,7 @@ namespace rsgis{namespace img{
 			delete[] imgTransform;
 		}
 	}
-    
+
     void RSGISImageMosaic::orderInImagesValidData(std::vector<std::string> images, std::vector<std::string> *orderedImages, float noDataValue) throw(RSGISImageException)
     {
         try
@@ -1280,7 +1280,7 @@ namespace rsgis{namespace img{
             RSGISImageValidDataMetric *validPxlCountObj = new RSGISImageValidDataMetric();
             RSGISCountValidPixels *calcImageValidPxlCount = new RSGISCountValidPixels(validPxlCountObj, noDataValue);
 			RSGISCalcImage calcImg = RSGISCalcImage(calcImageValidPxlCount, "", true);
-            
+
             std::list<RSGISImageValidDataMetric> validDataImageMetrics;
             for(std::vector<std::string>::iterator iterImage = images.begin(); iterImage != images.end(); ++iterImage)
             {
@@ -1289,7 +1289,7 @@ namespace rsgis{namespace img{
                 validPxlCountObj->validPxlCount = 0;
                 validPxlCountObj->noDataPxlCount = 0;
                 calcImageValidPxlCount->resetValidPxlsObj();
-                
+
                 std::cout << "Processing Image: " << (*iterImage) << std::endl;
                 GDALDataset *dataset = (GDALDataset *) GDALOpen((*iterImage).c_str(), GA_ReadOnly);
                 if(dataset == NULL)
@@ -1297,20 +1297,20 @@ namespace rsgis{namespace img{
                     std::string message = std::string("Could not open image ") + (*iterImage);
                     throw rsgis::RSGISImageException(message.c_str());
                 }
-                
+
                 try
                 {
                     calcImg.calcImage(&dataset, 1);
-                    
+
                     RSGISImageValidDataMetric imgDataMetric;
                     imgDataMetric.imageFile = (*iterImage);
                     imgDataMetric.totalNumPxls = validPxlCountObj->totalNumPxls;
                     imgDataMetric.validPxlCount = validPxlCountObj->validPxlCount;
                     imgDataMetric.noDataPxlCount = validPxlCountObj->noDataPxlCount;
                     imgDataMetric.validPxlFunc = ((double)validPxlCountObj->validPxlCount) / ((double)validPxlCountObj->totalNumPxls);
-                    
+
                     validDataImageMetrics.push_back(imgDataMetric);
-                    
+
                     GDALClose(dataset);
                 }
                 catch (rsgis::RSGISException &e)
@@ -1328,7 +1328,7 @@ namespace rsgis{namespace img{
                     throw RSGISImageException(e.what());
                 }
             }
-            
+
             validDataImageMetrics.sort(compare_ImageValidPxlCounts);
 
             orderedImages->clear();
@@ -1336,7 +1336,7 @@ namespace rsgis{namespace img{
             {
                 orderedImages->push_back((*iterImage).imageFile);
             }
-            
+
             delete validPxlCountObj;
             delete calcImageValidPxlCount;
         }
@@ -1358,14 +1358,14 @@ namespace rsgis{namespace img{
 	{
 
 	}
-    
-    
+
+
     RSGISCountValidPixels::RSGISCountValidPixels(RSGISImageValidDataMetric *validPxlsObj, float noDataVal):RSGISCalcImageValue(0)
     {
         this->validPxlsObj = validPxlsObj;
         this->noDataVal = noDataVal;
     }
-    
+
     void RSGISCountValidPixels::calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException)
     {
         bool pxlIsNoData = true;
@@ -1377,7 +1377,7 @@ namespace rsgis{namespace img{
                 break;
             }
         }
-        
+
         if(pxlIsNoData)
         {
             ++this->validPxlsObj->noDataPxlCount;
@@ -1386,7 +1386,7 @@ namespace rsgis{namespace img{
         {
             ++this->validPxlsObj->validPxlCount;
         }
-        
+
         ++this->validPxlsObj->totalNumPxls;
     }
 
@@ -1396,13 +1396,13 @@ namespace rsgis{namespace img{
         this->validPxlsObj->validPxlCount = 0;
         this->validPxlsObj->totalNumPxls = 0;
     }
-    
+
     RSGISCountValidPixels::~RSGISCountValidPixels()
     {
-        
+
     }
-    
-    
-    
+
+
+
 }}
 
