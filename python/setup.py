@@ -59,15 +59,21 @@ classification_module = Extension(name='classification._classification',
                 include_dirs=['../src/cmds', '../src'],
                 library_dirs=['../src'],
                 libraries=['rsgis_cmds'])
+                
+elevation_module = Extension(name='elevation._elevation',
+                sources=['src/elevation.cpp'],
+                include_dirs=['../src/cmds', '../src'],
+                library_dirs=['../src'],
+                libraries=['rsgis_cmds'])
 
 
 # do the setup
 setup( name = 'RSGISLib',
         version = '0.1',
         description = 'Python interface onto RSGISLib',
-        author = 'Sam Gillingham, Pete Bunting and Dan Clewley',
-        author_email = 'gillingham.sam@gmail.com, petebunting@mac.com, daniel.clewley@gmail.com',
-        packages = ['rsgislib', 'rsgislib.imagecalc', 'rsgislib.imageutils', 'rsgislib.segmentation', 'rsgislib.imagecalibration', 'rsgislib.rastergis', 'rsgislib.zonalstats', 'rsgislib.imageregistration', 'rsgislib.vectorutils', 'rsgislib.imagefilter', 'rsgislib.classification'],
+        author = 'Pete Bunting, Dan Clewley and Sam Gillingham',
+        author_email = 'petebunting@mac.com, daniel.clewley@gmail.com, gillingham.sam@gmail.com',
+        packages = ['rsgislib', 'rsgislib.imagecalc', 'rsgislib.imageutils', 'rsgislib.segmentation', 'rsgislib.imagecalibration', 'rsgislib.rastergis', 'rsgislib.zonalstats', 'rsgislib.imageregistration', 'rsgislib.vectorutils', 'rsgislib.imagefilter', 'rsgislib.classification', 'rsgislib.elevation'],
         ext_package = 'rsgislib',
-        ext_modules = [imagecalc_module, imageutils_module, segmentation_module, imagecalibration_module, rastergis_module, zonalstats_module, imageregistration_module, vectorutils_module, imagefilter_module, classification_module])
+        ext_modules = [imagecalc_module, imageutils_module, segmentation_module, imagecalibration_module, rastergis_module, zonalstats_module, imageregistration_module, vectorutils_module, imagefilter_module, classification_module, elevation_module])
 

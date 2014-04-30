@@ -111,6 +111,8 @@ set(LIB_COMMANDS_CPP
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdCommon.h
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdClassification.cpp
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdClassification.h
+	${RSGIS_SRC_CMDS_DIR}/RSGISCmdElevationTools.cpp
+	${RSGIS_SRC_CMDS_DIR}/RSGISCmdElevationTools.h
     ${RSGIS_SRC_CMDS_DIR}/RSGISCmdFilterImages.cpp
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdFilterImages.h
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdImageCalc.cpp 
