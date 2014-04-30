@@ -295,6 +295,47 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
+            
+    void executeDTMAspectMedianFilter(std::string demImage, std::string aspectImage, std::string outputImage, float aspectRange, int winHSize, std::string outImageFormat)throw(RSGISCmdException)
+    {
+        try
+        {
+            GDALAllRegister();
+            GDALDataset **datasets = new GDALDataset*[2];
+            
+            std::cout << "Open " << demImage << std::endl;
+            datasets[0] = (GDALDataset *) GDALOpen(demImage.c_str(), GA_ReadOnly);
+            if(datasets[0] == NULL)
+            {
+                std::string message = std::string("Could not open image ") + demImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            std::cout << "Open " << aspectImage << std::endl;
+            datasets[1] = (GDALDataset *) GDALOpen(aspectImage.c_str(), GA_ReadOnly);
+            if(datasets[1] == NULL)
+            {
+                std::string message = std::string("Could not open image ") + aspectImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            int winSize = (winHSize * 2) + 1;
+            
+            rsgis::calib::RSGISFilterDTMWithAspectMedianFilter *dtmFilter = new rsgis::calib::RSGISFilterDTMWithAspectMedianFilter(aspectRange);
+            
+            rsgis::img::RSGISCalcImage calcImage = rsgis::img::RSGISCalcImage(dtmFilter, "", true);
+            calcImage.calcImageWindowData(datasets, 2, outputImage, winSize, outImageFormat, GDT_Float32);
+            
+            delete dtmFilter;
+
+            GDALClose(datasets[0]);
+            GDALClose(datasets[1]);
+            delete[] datasets;
+        }
+        catch(rsgis::RSGISException e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
     
     
 }}

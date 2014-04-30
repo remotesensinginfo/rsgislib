@@ -121,6 +121,7 @@ namespace rsgis{namespace math{
             void generateStats(std::vector<double> *data, RSGISStatsSummary *stats) throw(RSGISMathException);
             void initStatsSummary(RSGISStatsSummary *stats);
             void initStatsSummaryValues(RSGISStatsSummary *stats);
+            bool angleWithinRange(float angle, float lower, float upper);
 		};
 	
 }}

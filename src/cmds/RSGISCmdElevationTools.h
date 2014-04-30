@@ -51,7 +51,8 @@ namespace rsgis{ namespace cmds {
     void executeCalcLocalIncidenceAngle(std::string demImage, std::string outputImage, float solarAzimuth, float solarZenith, std::string outImageFormat)throw(RSGISCmdException);
     /** A function to generate a local exitance angle layer given a viewers position */
     void executeCalcLocalExitanceAngle(std::string demImage, std::string outputImage, float azimuth, float zenith, std::string outImageFormat)throw(RSGISCmdException);
-    
+    /** A function to filter a DTM using a variable filter with respect to aspect */
+    void executeDTMAspectMedianFilter(std::string demImage, std::string aspectImage, std::string outputImage, float aspectRange, int winHSize, std::string outImageFormat)throw(RSGISCmdException);
     
 }}
 

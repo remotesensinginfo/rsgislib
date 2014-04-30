@@ -193,6 +193,27 @@ static PyObject *Elevation_calcLocalExistanceAngle(PyObject *self, PyObject *arg
     Py_RETURN_NONE;
 }
 
+static PyObject *Elevation_dtmAspectMedianFilter(PyObject *self, PyObject *args)
+{
+    const char *pszInputDTMImage, *pszInputAspectImage, *pszOutputFile, *pszGDALFormat;
+    float aspectRange = 0.0;
+    int winHSize = 0;
+    if( !PyArg_ParseTuple(args, "sssfis:dtmAspectMedianFilter", &pszInputDTMImage, &pszInputAspectImage, &pszOutputFile, &aspectRange, &winHSize, &pszGDALFormat))
+        return NULL;
+    
+    try
+    {
+        rsgis::cmds::executeDTMAspectMedianFilter(std::string(pszInputDTMImage), std::string(pszInputAspectImage), std::string(pszOutputFile), aspectRange, winHSize, std::string(pszGDALFormat));
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
 
 // Our list of functions in this module
 static PyMethodDef ElevationMethods[] = {
@@ -265,6 +286,20 @@ static PyMethodDef ElevationMethods[] = {
 "* outputImage is a string containing the name and path of the output file.\n"
 "* azimuth is a float with the solar azimuth in degrees.\n"
 "* zenith is a float with the solar zenith in degrees.\n"
+"* gdalFormat is a string with the output image format for the GDAL driver.\n"},
+    
+{"dtmAspectMedianFilter", Elevation_dtmAspectMedianFilter, METH_VARARGS,
+"rsgislib.elevation.dtmAspectMedianFilter(inputDTMImage, inputAspectImage, outputImage, aspectRange, winHSize, gdalFormat)\n"
+"Filter the DTM for noise using a median filter with an aspect restriction (i.e., only pixels"
+" within the aspect range of the centre pixel will be used within the median filter).\n"
+"\n"
+"Where:\n"
+"\n"
+"* inputDTMImage is a string containing the name and path of the input DTM file.\n"
+"* inputAspectImage is a string containing the name and path of the input Aspect file (in degrees).\n"
+"* outputImage is a string containing the name and path of the output file.\n"
+"* aspectRange is a float with the range of from the centre pixel in degrees.\n"
+"* winHSize is an integer for half the window size.\n"
 "* gdalFormat is a string with the output image format for the GDAL driver.\n"},
 
     {NULL}        /* Sentinel */

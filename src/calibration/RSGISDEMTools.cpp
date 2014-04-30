@@ -787,7 +787,92 @@ namespace rsgis{namespace calib{
     {
         
     }
-
+    
+    
+    
+    
+    
+    RSGISFilterDTMWithAspectMedianFilter::RSGISFilterDTMWithAspectMedianFilter(float aspectRange) : rsgis::img::RSGISCalcImageValue(1)
+    {
+        this->aspectRange = aspectRange;
+    }
+    
+    void RSGISFilterDTMWithAspectMedianFilter::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
+    {
+        rsgis::math::RSGISMathsUtils mathUtils;
+        int midPoint = floor(((float)winSize)/2.0);
+        
+        float aspectVal = dataBlock[1][midPoint][midPoint];
+        float lowerAspThres = aspectVal - aspectRange;
+        float upperAspThres = aspectVal + aspectRange;
+        
+        if(lowerAspThres < 0)
+        {
+            lowerAspThres = 360 + lowerAspThres;
+        }
+        
+        if(upperAspThres > 360)
+        {
+            upperAspThres = upperAspThres - 360;
+        }
+        
+        std::vector<float> vals;
+        
+        for(unsigned int i = 0; i < winSize; ++i)
+        {
+            for(unsigned int j = 0; j < winSize; ++j)
+            {
+                if(mathUtils.angleWithinRange(dataBlock[1][i][j], lowerAspThres, upperAspThres))
+                {
+                    if(!boost::math::isnan(dataBlock[0][i][j]))
+                    {
+                        vals.push_back(dataBlock[0][i][j]);
+                    }
+                }
+            }
+        }
+        if(vals.size() > 0)
+        {
+            std::sort(vals.begin(), vals.end());
+            int midpt = floor(vals.size()/2);
+            
+            output[0] = vals.at(midpt);
+        }
+        else
+        {
+            for(unsigned int i = 0; i < winSize; ++i)
+            {
+                for(unsigned int j = 0; j < winSize; ++j)
+                {
+                    if(!boost::math::isnan(dataBlock[0][i][j]))
+                    {
+                        vals.push_back(dataBlock[0][i][j]);
+                    }
+                }
+            }
+            if(vals.size() > 0)
+            {
+                std::sort(vals.begin(), vals.end());
+                int midpt = floor(vals.size()/2);
+                
+                output[0] = vals.at(midpt);
+            }
+            else
+            {
+                output[0] = std::numeric_limits<float>::signaling_NaN();
+            }
+            
+        }
+        
+    }
+    
+    RSGISFilterDTMWithAspectMedianFilter::~RSGISFilterDTMWithAspectMedianFilter()
+    {
+        
+    }
+    
+    
+    
     
     
     

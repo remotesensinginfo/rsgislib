@@ -736,6 +736,34 @@ namespace rsgis{namespace math{
             stats->median = 0;
         }
     }
+    
+    
+    bool RSGISMathsUtils::angleWithinRange(float angle, float lower, float upper)
+    {
+        bool withinRange = false;
+        
+        
+        if(lower < upper)
+        {
+            if((angle > lower) & (angle < upper))
+            {
+                withinRange = true;
+            }
+        }
+        else
+        {
+            if((angle > 0) & (angle < upper))
+            {
+                withinRange = true;
+            }
+            else if((angle > lower) & (angle < 0))
+            {
+                withinRange = true;
+            }
+        }        
+        
+        return withinRange;
+    }
 
 }}
 
