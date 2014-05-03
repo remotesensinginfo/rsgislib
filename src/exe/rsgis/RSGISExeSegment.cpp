@@ -2510,7 +2510,7 @@ void RSGISExeSegment::retrieveParameters(xercesc::DOMElement *argElement) throw(
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(seedsXMLStr));
             try 
             {
-                this->regionGrowingPxlSeeds = rsgis::segment::RSGISRegionGrowSegmentsPixels::parseSeedsText(std::string(charValue));
+                //this->regionGrowingPxlSeeds = rsgis::segment::RSGISRegionGrowSegmentsPixels::parseSeedsText(std::string(charValue));
             } 
             catch (rsgis::utils::RSGISTextException &e)
             {
@@ -2646,7 +2646,7 @@ void RSGISExeSegment::retrieveParameters(xercesc::DOMElement *argElement) throw(
 			char *charValue = xercesc::XMLString::transcode(argElement->getAttribute(seedsXMLStr));
             try 
             {
-                this->regionGrowingPxlSeeds = rsgis::segment::RSGISRegionGrowSegmentsPixels::parseSeedsText(std::string(charValue));
+                //this->regionGrowingPxlSeeds = rsgis::segment::RSGISRegionGrowSegmentsPixels::parseSeedsText(std::string(charValue));
             } 
             catch (rsgis::utils::RSGISTextException &e)
             {
@@ -4741,7 +4741,7 @@ void RSGISExeSegment::runAlgorithm() throw(rsgis::RSGISException)
         std::cout << "Input Image: " << this->inputImage << std::endl;
         std::cout << "Output Image: " << this->outputImage << std::endl;
         std::cout << "Threshold: " << this->specThreshold << std::endl;
-        
+        /*
         try
         {
             GDALAllRegister();
@@ -4816,6 +4816,7 @@ void RSGISExeSegment::runAlgorithm() throw(rsgis::RSGISException)
         {
             throw e;
         }
+        */
     }
     else if(option == RSGISExeSegment::growregionspixelsauto)
     {
@@ -4826,7 +4827,7 @@ void RSGISExeSegment::runAlgorithm() throw(rsgis::RSGISException)
         std::cout << "Threshold Increments: " << this->thresholdRegionGrowincrements << std::endl;
         std::cout << "Maximum Threshold: " << this->maxRegionGrowthreshold << std::endl;
         std::cout << "Maximum Number of Iterations: " << this->maxRegionGrowiterations << std::endl;
-        
+       /*
         try
         {
             GDALAllRegister();
@@ -4901,6 +4902,7 @@ void RSGISExeSegment::runAlgorithm() throw(rsgis::RSGISException)
         {
             throw e;
         }
+        */
     }
     else if(option == RSGISExeSegment::spectraldiv)
     {
@@ -4955,7 +4957,7 @@ void RSGISExeSegment::runAlgorithm() throw(rsgis::RSGISException)
         {
             std::cout << "Outputting with consecutive FIDs\n";
         }
-        
+        /*
         try
         {
             GDALAllRegister();
@@ -5014,6 +5016,7 @@ void RSGISExeSegment::runAlgorithm() throw(rsgis::RSGISException)
         {
             throw e;
         }
+        */
     }
     else if(option == RSGISExeSegment::elimsinglepxls)
     {

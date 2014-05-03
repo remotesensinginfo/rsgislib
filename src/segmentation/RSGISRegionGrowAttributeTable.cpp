@@ -24,7 +24,7 @@
 
 
 namespace rsgis{namespace segment{
-    
+  /*
     RSGISRegionGrowAttributeTable::RSGISRegionGrowAttributeTable()
     {
         
@@ -211,6 +211,7 @@ namespace rsgis{namespace segment{
     {
         
     }
+   */
     
 }}
 
