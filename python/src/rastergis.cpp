@@ -145,15 +145,21 @@ static PyObject *RasterGIS_SpatialLocation(PyObject *self, PyObject *args) {
 
     Py_RETURN_NONE;
 }
-
-static PyObject *RasterGIS_PopulateRATWithStats(PyObject *self, PyObject *args) {
+*/
+static PyObject *RasterGIS_PopulateRATWithStats(PyObject *self, PyObject *args, PyObject *keywds)
+{
     const char *inputImage, *clumpsImage;
     PyObject *pBandAttStatsCmds;
+    unsigned int ratBand = 1;
+    static char *kwlist[] = {"valsimage", "clumps", "bandstats", "ratband", NULL};
 
-    if(!PyArg_ParseTuple(args, "ssO:populateRATWithStats", &inputImage, &clumpsImage, &pBandAttStatsCmds))
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "ssO|i:populateRATWithStats", kwlist, &inputImage, &clumpsImage, &pBandAttStatsCmds, &ratBand))
+    {
         return NULL;
+    }
 
-     if(!PySequence_Check(pBandAttStatsCmds)) {
+    if(!PySequence_Check(pBandAttStatsCmds))
+    {
         PyErr_SetString(GETSTATE(self)->error, "last argument must be a sequence");
         return NULL;
     }
@@ -163,21 +169,23 @@ static PyObject *RasterGIS_PopulateRATWithStats(PyObject *self, PyObject *args) 
     std::vector<rsgis::cmds::RSGISBandAttStatsCmds*> bandStatsCmds;
     bandStatsCmds.reserve(nCmds);
 
-    for(int i = 0; i < nCmds; ++i) {
+    for(int i = 0; i < nCmds; ++i)
+    {
         PyObject *o = PySequence_GetItem(pBandAttStatsCmds, i);     // the python object
 
         rsgis::cmds::RSGISBandAttStatsCmds *cmdObj = new rsgis::cmds::RSGISBandAttStatsCmds();   // the c++ object we need to pass pointers of
 
         // declare and initialise pointers for all the attributes of the struct
-        PyObject *pBand, *pThreshold, *pCountField, *pMinField, *pMaxField, *pStdDevField, *pMedianField, *pSumField, *pMeanField;
-        pBand = pThreshold = pCountField = pMinField = pMaxField = pMeanField = pStdDevField = pMedianField = pSumField = NULL;
+        PyObject *pBand, *pMinField, *pMaxField, *pStdDevField, *pSumField, *pMeanField;
+        pBand = pBand = pMinField = pMaxField = pMeanField = pStdDevField = pSumField = NULL;
 
         std::vector<PyObject*> extractedAttributes;     // store a list of extracted pyobjects to dereference
         extractedAttributes.push_back(o);
         
         pBand = PyObject_GetAttrString(o, "band");
         extractedAttributes.push_back(pBand);
-        if( ( pBand == NULL ) || ( pBand == Py_None ) || !RSGISPY_CHECK_INT(pBand)) {
+        if( ( pBand == NULL ) || ( pBand == Py_None ) || !RSGISPY_CHECK_INT(pBand))
+        {
             PyErr_SetString(GETSTATE(self)->error, "could not find int attribute \'band\'" );
             FreePythonObjects(extractedAttributes);
             for(std::vector<rsgis::cmds::RSGISBandAttStatsCmds*>::iterator iter = bandStatsCmds.begin(); iter != bandStatsCmds.end(); ++iter) {
@@ -186,23 +194,6 @@ static PyObject *RasterGIS_PopulateRATWithStats(PyObject *self, PyObject *args) 
             delete cmdObj;
             return NULL;
         }
-
-        pThreshold = PyObject_GetAttrString(o, "threshold");
-        extractedAttributes.push_back(pThreshold);
-        if( ( pThreshold == NULL ) || ( pThreshold == Py_None ) || !RSGISPY_CHECK_FLOAT(pThreshold) ) {
-            PyErr_SetString(GETSTATE(self)->error, "could not find float attribute \'threshold\'" );
-            FreePythonObjects(extractedAttributes);
-            for(std::vector<rsgis::cmds::RSGISBandAttStatsCmds*>::iterator iter = bandStatsCmds.begin(); iter != bandStatsCmds.end(); ++iter) {
-                delete *iter;
-            }
-            delete cmdObj;
-            return NULL;
-        }
-        
-        // check if fields have been set, set calcValue accordingly
-        pCountField = PyObject_GetAttrString(o, "countField");
-        extractedAttributes.push_back(pCountField);
-        cmdObj->calcCount = !(pCountField == NULL || !RSGISPY_CHECK_STRING(pCountField));
 
         pMinField = PyObject_GetAttrString(o, "minField");
         extractedAttributes.push_back(pMinField);
@@ -220,61 +211,61 @@ static PyObject *RasterGIS_PopulateRATWithStats(PyObject *self, PyObject *args) 
         extractedAttributes.push_back(pStdDevField);
         cmdObj->calcStdDev = !(pStdDevField == NULL || !RSGISPY_CHECK_STRING(pStdDevField));
 
-        pMedianField = PyObject_GetAttrString(o, "medianField");
-        extractedAttributes.push_back(pMedianField);
-        cmdObj->calcMedian = !(pMedianField == NULL || !RSGISPY_CHECK_STRING(pMedianField));
-
         pSumField = PyObject_GetAttrString(o, "sumField");
         extractedAttributes.push_back(pSumField);
         cmdObj->calcSum = !(pSumField == NULL || !RSGISPY_CHECK_STRING(pSumField));
 
         // extract the values from the objects
         cmdObj->band = RSGISPY_INT_EXTRACT(pBand);
-        cmdObj->threshold = RSGISPY_FLOAT_EXTRACT(pThreshold);
         // check the calcValue and extract fields if required
-        if(cmdObj->calcCount) {
-            cmdObj->countField = RSGISPY_STRING_EXTRACT(pCountField);
-        }
-        if(cmdObj->calcMax) {
+        if(cmdObj->calcMax)
+        {
             cmdObj->maxField = RSGISPY_STRING_EXTRACT(pMaxField);
         }
-        if(cmdObj->calcMean) {
+        if(cmdObj->calcMean)
+        {
             cmdObj->meanField = RSGISPY_STRING_EXTRACT(pMeanField);
         }
-        if(cmdObj->calcMedian) {
-            cmdObj->medianField = RSGISPY_STRING_EXTRACT(pMedianField);
-        }
-        if(cmdObj->calcMin) {
+        if(cmdObj->calcMin)
+        {
             cmdObj->minField = RSGISPY_STRING_EXTRACT(pMinField);
         }
-        if(cmdObj->calcStdDev) {
+        if(cmdObj->calcStdDev)
+        {
             cmdObj->stdDevField = RSGISPY_STRING_EXTRACT(pStdDevField);
         }
-        if(cmdObj->calcSum) {
+        if(cmdObj->calcSum)
+        {
             cmdObj->sumField = RSGISPY_STRING_EXTRACT(pSumField);
         }
         
         FreePythonObjects(extractedAttributes);
         bandStatsCmds.push_back(cmdObj);
     }
-    try {
-        rsgis::cmds::executePopulateRATWithStats(std::string(inputImage), std::string(clumpsImage), &bandStatsCmds);
-    } catch (rsgis::cmds::RSGISCmdException &e) {
+    
+    try
+    {
+        rsgis::cmds::executePopulateRATWithStats(std::string(inputImage), std::string(clumpsImage), &bandStatsCmds, ratBand);
+    }
+    catch (rsgis::cmds::RSGISCmdException &e)
+    {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        for(std::vector<rsgis::cmds::RSGISBandAttStatsCmds*>::iterator iter = bandStatsCmds.begin(); iter != bandStatsCmds.end(); ++iter) {
+        for(std::vector<rsgis::cmds::RSGISBandAttStatsCmds*>::iterator iter = bandStatsCmds.begin(); iter != bandStatsCmds.end(); ++iter)
+        {
             delete *iter;
         }
         return NULL;
     }
 
     // free temp structs
-    for(std::vector<rsgis::cmds::RSGISBandAttStatsCmds*>::iterator iter = bandStatsCmds.begin(); iter != bandStatsCmds.end(); ++iter) {
+    for(std::vector<rsgis::cmds::RSGISBandAttStatsCmds*>::iterator iter = bandStatsCmds.begin(); iter != bandStatsCmds.end(); ++iter)
+    {
         delete *iter;
     }
 
     Py_RETURN_NONE;
 }
-
+/*
 static PyObject *RasterGIS_PopulateRATWithPercentiles(PyObject *self, PyObject *args) {
     const char *inputImage, *clumpsImage;
     PyObject *pBandPercentilesCmds;
@@ -1277,24 +1268,23 @@ static PyMethodDef RasterGISMethods[] = {
 "   northings = 'Northing'\n"
 "   rastergis.spatialLocation(image, eastings, northings)\n"
 "\n"},
-
-    {"populateRATWithStats", RasterGIS_PopulateRATWithStats, METH_VARARGS,
-"rsgislib.rastergis.populateRATWithStats(inputImage, clumpsImage, bandStatsCmds)\n"
-"Populates an attribute table with statistics from an image.\n"
+*/
+    {"populateRATWithStats", (PyCFunction)RasterGIS_PopulateRATWithStats, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.rastergis.populateRATWithStats(valsimage=inputImage, clumps=clumpsImage, bandstats=bandStatsCmds, ratband=int)\n"
+"Populates an attribute table with statistics from an input values image.\n"
 "Where:\n"
 "\n"
-"* inputImage is a string containing the name of the input image file\n"
-"* clumpsImage is a string containing the name of the input clump file\n"
-"* bandStatsCmds is a sequence of rsgislib.rastergis.BandAttStats objects that have attributes in line with rsgis.cmds.RSGISBandAttStatsCmds\n"
+"* valsimage is a string containing the name of the input image file from which the clumps are to populated.\n"
+"* clumps is a string containing the name of the input clumps image file\n"
+"* bandstats is a sequence of rsgislib.rastergis.BandAttStats objects that have attributes in line with rsgis.cmds.RSGISBandAttStatsCmds\n"
 "\n"
 "      * band: int defining the image band to process\n"
-"      * countField: string defining the name of the field for count value\n"
 "      * minField: string defining the name of the field for min value\n"
 "      * maxField: string defining the name of the field for max value\n"
 "      * sumField: string defining the name of the field for sum value\n"
 "      * meanField: string defining the name of the field for mean value\n"
 "      * stdDevField: string defining the name of the field for standard deviation value\n"
-"      * medianField: string defining the name of the field for median value\n"
+"ratband is an optional (default = 1) integer parameter specifying the image band to which the RAT is associated."
 "Example::\n"
 "\n"
 "	from rsgislib import rastergis\n"
@@ -1306,6 +1296,7 @@ static PyMethodDef RasterGISMethods[] = {
 "	bs.append(rastergis.BandAttStats(band=3, minField='b3Min', maxField='b3Max', meanField='b3Mean', sumField='b3Sum', stdDevField='b3StdDev'))\n"
 "	rastergis.populateRATWithStats(input, clumps, bs)\n"
 "\n"},
+    /*
 
     {"populateRATWithPercentiles", RasterGIS_PopulateRATWithPercentiles, METH_VARARGS,
 "rastergis.populateRATWithPercentiles(inputImage, clumpsImage, bandPercentiles)\n"
