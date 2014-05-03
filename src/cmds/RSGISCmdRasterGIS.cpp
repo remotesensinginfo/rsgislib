@@ -26,11 +26,14 @@
 #include "common/RSGISImageException.h"
 #include "common/RSGISAttributeTableException.h"
 
-/*
+
 #include "math/RSGIS2DInterpolation.h"
 
 #include "utils/RSGISTextUtils.h"
 
+#include "rastergis/RSGISRasterAttUtils.h"
+
+/*
 #include "rastergis/RSGISRasterAttUtils.h"
 #include "rastergis/RSGISCalcClumpStats.h"
 #include "rastergis/RSGISCalcClusterLocation.h"
@@ -529,8 +532,9 @@ namespace rsgis{ namespace cmds {
         }
 
     }
-
-    void executeExport2Ascii(std::string inputImage, std::string outputFile, std::vector<std::string> fields)throw(RSGISCmdException) {
+*/
+    void executeExport2Ascii(std::string inputImage, std::string outputFile, std::vector<std::string> fields, int ratBand)throw(RSGISCmdException)
+    {
         GDALAllRegister();
         GDALDataset *inputDataset;
 
@@ -551,7 +555,7 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
-
+/*
     void executeClassTranslate(std::string inputImage, std::string classInField, std::string classOutField, std::map<size_t, size_t> classPairs)throw(RSGISCmdException) {
         GDALAllRegister();
         GDALDataset *inputDataset;
