@@ -35,15 +35,15 @@
 
 #include "RSGISClumpPxls.h"
 
-#include "rastergis/RSGISCalcClumpShapeParameters.h"
-#include "rastergis/RSGISRasterAttUtils.h"
+//#include "rastergis/RSGISCalcClumpShapeParameters.h"
+//#include "rastergis/RSGISRasterAttUtils.h"
 
 #include "gdal_priv.h"
 #include "ogrsf_frmts.h"
 #include "ogr_api.h"
 
 namespace rsgis{namespace segment{
-    
+ /*
     struct FeatureShapeDescription
     {
         bool area;
@@ -156,7 +156,7 @@ namespace rsgis{namespace segment{
         bool change;
         unsigned int numChangePxls;
 	};
-    
+    */
 }}
 
 #endif

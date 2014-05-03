@@ -78,8 +78,8 @@
 #include "vec/RSGISVectorUtils.h"
 #include "vec/RSGISPolygonData.h"
 
-#include "rastergis/RSGISDefineImageTiles.h"
-#include "rastergis/RSGISCreateImageTiles.h"
+//#include "rastergis/RSGISDefineImageTiles.h"
+//#include "rastergis/RSGISCreateImageTiles.h"
 
 #include "cmds/RSGISCmdImageUtils.h"
 #include "cmds/RSGISCmdException.h"

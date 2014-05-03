@@ -35,7 +35,7 @@
 #include "img/RSGISImageUtils.h"
 #include "img/RSGISCalcEditImage.h"
 
-#include "rastergis/RSGISCalcClumpStats.h"
+//#include "rastergis/RSGISCalcClumpStats.h"
 #include "rastergis/RSGISRasterAttUtils.h"
 
 namespace rsgis{ namespace cmds {
@@ -673,6 +673,7 @@ namespace rsgis{ namespace cmds {
     
     void executeLandsatTMCloudFMask(std::string inputTOAImage, std::string inputThermalImage, std::string inputSaturateImage, std::string outputImage, std::string pass1TmpOutImage, std::string cloudLandProbTmpOutImage, std::string gdalFormat, float scaleFactorIn) throw(RSGISCmdException)
     {
+        /*
         GDALAllRegister();
         try
         {
@@ -823,6 +824,7 @@ namespace rsgis{ namespace cmds {
         {
             throw RSGISCmdException(e.what());
         }
+         */
     }
                 
 

@@ -44,9 +44,9 @@
 #include "img/RSGISCalcImage.h"
 #include "img/RSGISStretchImage.h"
 
-#include "rastergis/RSGISAttributeTable.h"
-#include "rastergis/RSGISPopulateAttributeTable.h"
-#include "rastergis/RSGISFindClumpNeighbours.h"
+//#include "rastergis/RSGISAttributeTable.h"
+//#include "rastergis/RSGISPopulateAttributeTable.h"
+//#include "rastergis/RSGISFindClumpNeighbours.h"
 
 namespace rsgis{namespace segment{
     
@@ -58,14 +58,14 @@ namespace rsgis{namespace segment{
         void stepwiseEliminateSmallClumps(GDALDataset *spectral, GDALDataset *clumps, unsigned int minClumpSize, float specThreshold, std::vector<rsgis::img::BandSpecThresholdStats> *bandStretchStats, bool bandStatsAvail) throw(rsgis::img::RSGISImageCalcException);
         void stepwiseIterativeEliminateSmallClumps(GDALDataset *spectral, GDALDataset *clumps, unsigned int minClumpSize, float specThreshold, std::vector<rsgis::img::BandSpecThresholdStats> *bandStretchStats, bool bandStatsAvail) throw(rsgis::img::RSGISImageCalcException);
         void stepwiseEliminateSmallClumpsNoMean(GDALDataset *spectral, GDALDataset *clumps, unsigned int minClumpSize, float specThreshold, std::vector<rsgis::img::BandSpecThresholdStats> *bandStretchStats, bool bandStatsAvail) throw(rsgis::img::RSGISImageCalcException);
-        void stepwiseEliminateSmallClumpsWithAtt(GDALDataset *spectral, GDALDataset *clumps, std::string outputImageFile, std::string imageFormat, bool useImageProj, std::string proj, rsgis::rastergis::RSGISAttributeTable *attTable, unsigned int minClumpSize, float specThreshold, bool outputWithConsecutiveFIDs, std::vector<rsgis::img::BandSpecThresholdStats> *bandStretchStats, bool bandStatsAvail) throw(rsgis::img::RSGISImageCalcException);
+        //void stepwiseEliminateSmallClumpsWithAtt(GDALDataset *spectral, GDALDataset *clumps, std::string outputImageFile, std::string imageFormat, bool useImageProj, std::string proj, rsgis::rastergis::RSGISAttributeTable *attTable, unsigned int minClumpSize, float specThreshold, bool outputWithConsecutiveFIDs, std::vector<rsgis::img::BandSpecThresholdStats> *bandStretchStats, bool bandStatsAvail) throw(rsgis::img::RSGISImageCalcException);
         ~RSGISEliminateSmallClumps();
-    protected:
-        void defineOutputFID(rsgis::rastergis::RSGISAttributeTable *attTable, rsgis::rastergis::RSGISFeature *feat, unsigned int eliminatedFieldIdx, unsigned int mergedToFIDIdx, unsigned int outFIDIdx, unsigned int outFIDSetFieldIdx) throw(rsgis::RSGISAttributeTableException);
-        void performElimination(rsgis::rastergis::RSGISAttributeTable *attTable, std::vector<std::pair<unsigned long, unsigned long> > *eliminationVectors, unsigned int eliminatedFieldIdx, unsigned int mergedToFIDIdx, unsigned int pxlCountIdx, std::vector<rsgis::rastergis::RSGISBandAttStats*> *bandStats) throw(rsgis::RSGISAttributeTableException);
-        rsgis::rastergis::RSGISFeature* getEliminatedNeighbour(rsgis::rastergis::RSGISFeature *feat, rsgis::rastergis::RSGISAttributeTable *attTable, unsigned int eliminatedFieldIdx, unsigned int mergedToFIDIdx)throw(rsgis::RSGISAttributeTableException);
+        //protected:
+        //void defineOutputFID(rsgis::rastergis::RSGISAttributeTable *attTable, rsgis::rastergis::RSGISFeature *feat, unsigned int eliminatedFieldIdx, unsigned int mergedToFIDIdx, unsigned int outFIDIdx, unsigned int outFIDSetFieldIdx) throw(rsgis::RSGISAttributeTableException);
+        //void performElimination(rsgis::rastergis::RSGISAttributeTable *attTable, std::vector<std::pair<unsigned long, unsigned long> > *eliminationVectors, unsigned int eliminatedFieldIdx, unsigned int mergedToFIDIdx, unsigned int pxlCountIdx, std::vector<rsgis::rastergis::RSGISBandAttStats*> *bandStats) throw(rsgis::RSGISAttributeTableException);
+        //rsgis::rastergis::RSGISFeature* getEliminatedNeighbour(rsgis::rastergis::RSGISFeature *feat, rsgis::rastergis::RSGISAttributeTable *attTable, unsigned int eliminatedFieldIdx, unsigned int mergedToFIDIdx)throw(rsgis::RSGISAttributeTableException);
     };
-    
+    /*
     class RSGISEliminateFeature : public rsgis::rastergis::RSGISProcessFeature
     {
     public:
@@ -86,8 +86,9 @@ namespace rsgis{namespace segment{
         double *stretch2reflOffs;
         double *stretch2reflGains;
     };
+    */
     
-    
+    /*
     class RSGISApplyOutputFIDs : public rsgis::img::RSGISCalcImageValue
     {
     public:
@@ -107,8 +108,8 @@ namespace rsgis{namespace segment{
         unsigned int outFIDIdx;
         unsigned int outFIDSetFieldIdx;
     };
+    */
     
-
     class RSGISPopulateMeansPxlLocs : public rsgis::img::RSGISCalcImageValue
     {
     public:
@@ -129,7 +130,7 @@ namespace rsgis{namespace segment{
     };
     
     
-    
+  /*
     class RSGISRemoveClumpsBelowThreshold : public rsgis::img::RSGISCalcImageValue
     {
     public:
@@ -149,7 +150,7 @@ namespace rsgis{namespace segment{
         const GDALRasterAttributeTable *rat;
         unsigned int colID;
     };
-
+    */
     
 }}
 

@@ -5483,7 +5483,7 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
                 cout << "A no data value has not been defined\n";
             }
             cout << "Image format: " << this->imageFormat << endl;
-
+            /*
             GDALAllRegister();
 
 			try
@@ -5505,7 +5505,7 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
 				throw e;
 			}
 			GDALDestroyDriverManager();
-
+            */
         }
         else if(option == RSGISExeImageUtils::gentilemasks)
         {
@@ -5522,7 +5522,7 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
             }
             cout << "Image format: " << this->imageFormat << endl;
             cout << "Image Extension: " << this->outFileExtension << endl;
-
+            /*
             GDALAllRegister();
 
 			try
@@ -5544,7 +5544,7 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
 				throw e;
 			}
 			GDALDestroyDriverManager();
-
+             */
         }
         else if(option == RSGISExeImageUtils::cutouttile)
         {
@@ -5554,7 +5554,7 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
             cout << "Tile: " << this->tileImage << endl;
             cout << "Image format: " << this->imageFormat << endl;
             cout << "No Data: " << this->nodataValue << endl;
-
+            /*
             GDALAllRegister();
 
 			try
@@ -5591,7 +5591,7 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
 				throw e;
 			}
 			GDALDestroyDriverManager();
-
+            */
         }
         else if(option == RSGISExeImageUtils::stretchwithstats)
 		{

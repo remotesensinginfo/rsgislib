@@ -1292,7 +1292,7 @@ namespace rsgis{namespace segment{
         }
         delete[] spectralVals;
     }
-    
+   /*
     void RSGISEliminateSmallClumps::stepwiseEliminateSmallClumpsWithAtt(GDALDataset *spectral, GDALDataset *clumps, std::string outputImageFile, std::string imageFormat, bool useImageProj, std::string proj, rsgis::rastergis::RSGISAttributeTable *attTable, unsigned int minClumpSize, float specThreshold, bool outputWithConsecutiveFIDs, std::vector<rsgis::img::BandSpecThresholdStats> *bandStretchStats, bool bandStatsAvail) throw(rsgis::img::RSGISImageCalcException)
     {
         try
@@ -1635,7 +1635,7 @@ namespace rsgis{namespace segment{
         }
         return nFeat;
     }
-    
+    */
     RSGISEliminateSmallClumps::~RSGISEliminateSmallClumps()
     {
         
@@ -1647,7 +1647,7 @@ namespace rsgis{namespace segment{
     
     
     
-    
+    /*
     
     RSGISEliminateFeature::RSGISEliminateFeature(unsigned int eliminatedFieldIdx, unsigned int mergedToFIDIdx, float specThreshold, unsigned int pxlCountIdx, std::vector<rsgis::rastergis::RSGISBandAttStats*> *bandStats, std::vector<std::pair<unsigned long, unsigned long> > *eliminationPairs, bool bandStatsAvail, double *stretch2reflOffs, double *stretch2reflGains):RSGISProcessFeature()
     {
@@ -1868,6 +1868,7 @@ namespace rsgis{namespace segment{
     {
         
     }
+    */
     
     
 
@@ -1932,7 +1933,7 @@ namespace rsgis{namespace segment{
     }
     
     
-    
+    /*
     RSGISRemoveClumpsBelowThreshold::RSGISRemoveClumpsBelowThreshold(float threshold, const GDALRasterAttributeTable *rat, unsigned int colID): rsgis::img::RSGISCalcImageValue(1)
     {
         this->threshold = threshold;
@@ -1987,6 +1988,7 @@ namespace rsgis{namespace segment{
     {
         
     }
+     */
     
 }}
 

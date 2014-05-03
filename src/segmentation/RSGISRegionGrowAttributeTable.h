@@ -33,14 +33,14 @@
 #include "common/RSGISAttributeTableException.h"
 
 #include "math/RSGISMathsUtils.h"
-#include "rastergis/RSGISAttributeTable.h"
+//#include "rastergis/RSGISAttributeTable.h"
 
 #include "gdal_priv.h"
 #include "ogrsf_frmts.h"
 #include "ogr_api.h"
 
 namespace rsgis{namespace segment{
-    
+/*
     class RSGISRegionGrowAttributeTable
     {
     public:
@@ -52,7 +52,7 @@ namespace rsgis{namespace segment{
         void updateMask(bool **mask, rsgis::rastergis::RSGISAttributeTable *attTable, GDALDataset *clumps, unsigned int width, unsigned int height, unsigned int classFieldIdx, int classVal);
         void getConnectedClumps(std::list<unsigned int> *connectedClumps, rsgis::rastergis::RSGISAttributeTable *attTable, GDALDataset *clumps, bool **mask, unsigned int width, unsigned int height);
     };
-    
+*/
 }}
 
 #endif
