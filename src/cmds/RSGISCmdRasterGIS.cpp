@@ -26,6 +26,7 @@
 #include "common/RSGISImageException.h"
 #include "common/RSGISAttributeTableException.h"
 
+/*
 #include "math/RSGIS2DInterpolation.h"
 
 #include "utils/RSGISTextUtils.h"
@@ -49,9 +50,9 @@
 #include "rastergis/RSGISFindChangeClumps.h"
 #include "rastergis/RSGISSelectClumps.h"
 #include "rastergis/RSGISInterpolateClumpValues2Image.h"
-
+*/
 namespace rsgis{ namespace cmds {
-
+/*
     void executePopulateStats(std::string clumpsImage, bool addColourTable2Img, bool calcImgPyramids)throw(RSGISCmdException) {
         try
         {
@@ -1242,6 +1243,6 @@ namespace rsgis{ namespace cmds {
         
         return returnGSSVal;
     }
-
+*/
 }}
 

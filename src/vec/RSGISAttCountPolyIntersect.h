@@ -38,7 +38,7 @@
 #include "img/RSGISCalcImageValue.h"
 #include "img/RSGISPixelInPoly.h"
 
-#include "rastergis/RSGISAttributeTable.h"
+//#include "rastergis/RSGISAttributeTable.h"
 #include "common/RSGISAttributeTableException.h"
 
 #include "geos/geom/Envelope.h"
@@ -46,7 +46,7 @@
 #include "geos/geom/Polygon.h"
 
 namespace rsgis{namespace vec{    
-    
+    /*
 	class RSGISAttCountPolyIntersect
 	{
 	public:
@@ -90,7 +90,7 @@ namespace rsgis{namespace vec{
         rsgis::img::pixelInPolyOption pixelPolyOption;
     };
     
-
+*/
     
 }}
 

@@ -24,7 +24,7 @@
 #include "RSGISBottomUpShapeFeatureExtraction.h"
 
 namespace rsgis{namespace segment{
-    
+   /*
     RSGISBottomUpShapeFeatureExtraction::RSGISBottomUpShapeFeatureExtraction()
     {
         
@@ -515,5 +515,6 @@ namespace rsgis{namespace segment{
     {
         
     }
+    */
     
 }}

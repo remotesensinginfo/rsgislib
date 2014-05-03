@@ -759,105 +759,15 @@ set(LIB_RADAR_INVERSION_CPP
 ###############################################################################
 
 ###############################################################################
-# Files within the registration Library.
+# Files within the Raster GIS Library.
 set(LIB_RASTERGIS_H
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISAttributeTable.h
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISAttributeTableMem.h
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISAttributeTableHDF.h
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISAttributeTableNeighbours.h
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISCreateNewAttributeTable.h
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISPopulateAttributeTable.h
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISCreateImageFromAttributeTable.h
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISHierarchicalClumps.h
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindClumpNeighbours.h
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindClumpCategoryMajority.h
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindMeanDist2Neighbours.h 
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISKNNATTable.h
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISCalcClusterLocation.h
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISCalcEucDistanceInAttTable.h
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindTopNWithinDist.h
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISRasterAttUtils.h
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISKNNATTMajorityClassifier.h
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISCalcClumpStats.h
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindClumpCatagoryStats.h
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISExportColumns2Image.h
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindInfoBetweenLayers.h
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindClosestSpecSpatialFeats.h
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISMaxLikelihoodRATClassification.h
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISClassMask.h
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISDefineImageTiles.h 
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISCreateImageTiles.h
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISClumpBorders.h
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISCalcClumpShapeParameters.h
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindChangeClumps.h
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISSelectClumps.h
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISInterpolateClumpValues2Image.h
 	)
 	
 	
 set(LIB_RASTERGIS_CPP
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISAttributeTable.cpp
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISAttributeTable.h
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISAttributeTableMem.cpp
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISAttributeTableMem.h
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISAttributeTableHDF.cpp
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISAttributeTableHDF.h
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISAttributeTableNeighbours.cpp
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISAttributeTableNeighbours.h
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISCreateNewAttributeTable.cpp
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISCreateNewAttributeTable.h
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISPopulateAttributeTable.cpp
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISPopulateAttributeTable.h
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISCreateImageFromAttributeTable.cpp
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISCreateImageFromAttributeTable.h
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISHierarchicalClumps.cpp
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISHierarchicalClumps.h
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindClumpNeighbours.cpp
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindClumpNeighbours.h 
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindClumpCategoryMajority.cpp
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindClumpCategoryMajority.h
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindMeanDist2Neighbours.cpp
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindMeanDist2Neighbours.h
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISKNNATTable.cpp
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISKNNATTable.h 
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISCalcClusterLocation.cpp
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISCalcClusterLocation.h
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISCalcEucDistanceInAttTable.cpp
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISCalcEucDistanceInAttTable.h
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindTopNWithinDist.cpp
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindTopNWithinDist.h
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISRasterAttUtils.cpp
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISRasterAttUtils.h
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISKNNATTMajorityClassifier.cpp
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISKNNATTMajorityClassifier.h
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISCalcClumpStats.cpp
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISCalcClumpStats.h
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindClumpCatagoryStats.cpp
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindClumpCatagoryStats.h
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISExportColumns2Image.cpp
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISExportColumns2Image.h
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindInfoBetweenLayers.cpp
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindInfoBetweenLayers.h
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindClosestSpecSpatialFeats.cpp
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindClosestSpecSpatialFeats.h
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISMaxLikelihoodRATClassification.cpp
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISMaxLikelihoodRATClassification.h
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISClassMask.cpp
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISClassMask.h 
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISDefineImageTiles.cpp
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISDefineImageTiles.h 
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISCreateImageTiles.cpp
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISCreateImageTiles.h
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISClumpBorders.cpp
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISClumpBorders.h
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISCalcClumpShapeParameters.cpp
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISCalcClumpShapeParameters.h
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindChangeClumps.cpp
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindChangeClumps.h
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISSelectClumps.cpp
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISSelectClumps.h 
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISInterpolateClumpValues2Image.cpp
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISInterpolateClumpValues2Image.h
 	)
 	
 ###############################################################################
@@ -1307,12 +1217,8 @@ set(EXE_RSGISEXE_CPP
 	${RSGIS_SRC_EXE_DIR}/RSGISExeImageCalibration.h 
 	${RSGIS_SRC_EXE_DIR}/RSGISExeElevationDataTools.cpp
 	${RSGIS_SRC_EXE_DIR}/RSGISExeElevationDataTools.h 
-	${RSGIS_SRC_EXE_DIR}/RSGISExeRasterGIS_old.cpp
-	${RSGIS_SRC_EXE_DIR}/RSGISExeRasterGIS_old.h
 	${RSGIS_SRC_EXE_DIR}/RSGISExeImageMorphology.cpp
 	${RSGIS_SRC_EXE_DIR}/RSGISExeImageMorphology.h
-	${RSGIS_SRC_EXE_DIR}/RSGISExeRasterGIS.cpp
-	${RSGIS_SRC_EXE_DIR}/RSGISExeRasterGIS.h
 	${RSGIS_SRC_EXE_DIR}/main.cpp
 	)
 

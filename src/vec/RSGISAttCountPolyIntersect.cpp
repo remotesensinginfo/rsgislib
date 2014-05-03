@@ -25,7 +25,7 @@
 
 namespace rsgis{namespace vec{
 	
-    
+    /*
     RSGISAttCountPolyIntersect::RSGISAttCountPolyIntersect()
     {
         
@@ -202,7 +202,7 @@ namespace rsgis{namespace vec{
         
     }
     
-    
+    */
     
 }}
 

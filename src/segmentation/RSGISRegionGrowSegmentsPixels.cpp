@@ -25,7 +25,7 @@
 namespace rsgis{namespace segment{
     
 
-
+/*
     RSGISRegionGrowSegmentsPixels::RSGISRegionGrowSegmentsPixels(GDALDataset *inRefl, GDALDataset *outDataset)throw(RSGISImageException)
     {
         this->inRefl = inRefl;
@@ -717,19 +717,7 @@ namespace rsgis{namespace segment{
                 
                 subClumpWidth = subClump->maxPxlX - subClump->minPxlX;
                 subClumpHeight = subClump->maxPxlY - subClump->minPxlY;
-                /*
-                std::cout << "subClumpWidth = " << subClumpWidth << std::endl;
-                std::cout << "subClumpHeight = " << subClumpHeight << std::endl;
-                
-                std::cout << "X: [" << subClump->minPxlX << "," << subClump->maxPxlX << "]\n";
-                std::cout << "Y: [" << subClump->minPxlY << "," << subClump->maxPxlY << "]\n";
-                
-                std::cout << "Sub Clumps:\n";
-                for(std::list<unsigned int>::iterator iterIdx = subClump->subclumps.begin(); iterIdx != subClump->subclumps.end(); ++iterIdx)
-                {
-                    std::cout << "\t" << (*iterIdx)+1 << std::endl;
-                }
-                */
+
                 for(unsigned int n = 0; n < numSpecBands; ++n)
                 {
                     spectralValues[n] = new float[subClumpWidth];
@@ -865,7 +853,7 @@ namespace rsgis{namespace segment{
     {
         
     }
-    
+    */
     
     
 }}
