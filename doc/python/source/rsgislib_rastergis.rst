@@ -54,6 +54,10 @@ Colour Tables
 .. autofunction:: rsgislib.rastergis.generateColourTable
 .. autofunction:: rsgislib.rastergis.copyCategoriesColours
 
+Segmentation Quality
+---------------------
+.. autofunction:: rsgislib.rastergis.calcGlobalSegmentationScore
+
 
 * :ref:`genindex`
 * :ref:`modindex`
