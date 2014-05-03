@@ -34,16 +34,8 @@ namespace rsgis{namespace img{
     {
         try
         {
-            const GDALRasterAttributeTable *attTableTmp = inputImage->GetRasterBand(1)->GetDefaultRAT();
-            GDALRasterAttributeTable *attTable = NULL;
-            if(attTableTmp != NULL)
-            {
-                attTable = new GDALRasterAttributeTable(*attTableTmp);
-            }
-            else
-            {
-                throw rsgis::RSGISImageException("Attribute table is not present within the image.");
-            }
+            GDALRasterAttributeTable *attTable = inputImage->GetRasterBand(1)->GetDefaultRAT();
+            
             int numRows = attTable->GetRowCount();
             int numColumns = attTable->GetColumnCount();
             
@@ -234,16 +226,8 @@ namespace rsgis{namespace img{
     {
         try
         {
-            const GDALRasterAttributeTable *attTableTmp = inputImage->GetRasterBand(1)->GetDefaultRAT();
-            GDALRasterAttributeTable *attTable = NULL;
-            if(attTableTmp != NULL)
-            {
-                attTable = new GDALRasterAttributeTable(*attTableTmp);
-            }
-            else
-            {
-                throw rsgis::RSGISImageException("Attribute table is not present within the image.");
-            }
+            GDALRasterAttributeTable *attTable = inputImage->GetRasterBand(1)->GetDefaultRAT();
+            
             int numRows = attTable->GetRowCount();
             int numColumns = attTable->GetColumnCount();
             

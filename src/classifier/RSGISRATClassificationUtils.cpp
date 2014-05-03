@@ -71,9 +71,9 @@ namespace rsgis{ namespace classifier{
                     std::cout << iterClasses->second->classID << ":\t " << iterClasses->second->classname << ": [" << iterClasses->second->red << "," << iterClasses->second->green << "," << iterClasses->second->blue << "]\n";
                 }
             }
-            
+
             // Create the new RAT.
-            GDALRasterAttributeTable *outRAT = new GDALRasterAttributeTable();
+            GDALRasterAttributeTable *outRAT = new GDALDefaultRasterAttributeTable();
             outRAT->CreateColumn("Red", GFT_Integer, GFU_Red);
             outRAT->CreateColumn("Green", GFT_Integer, GFU_Green);
             outRAT->CreateColumn("Blue", GFT_Integer, GFU_Blue);

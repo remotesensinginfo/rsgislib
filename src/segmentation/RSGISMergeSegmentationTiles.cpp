@@ -128,7 +128,7 @@ namespace rsgis{namespace segment{
                     throw RSGISImageException("Number of rows and maximum image pixel value does not match.");
                 }
                 
-                attTable = new GDALRasterAttributeTable(*attTableTmp);
+                attTable = new GDALDefaultRasterAttributeTable(*((GDALDefaultRasterAttributeTable*)attTableTmp));
                 
                 std::cout << "Row Count: " << numRows << std::endl;
                 
@@ -208,7 +208,7 @@ namespace rsgis{namespace segment{
                     throw RSGISImageException("Number of rows and maximum image pixel value does not match.");
                 }
                 
-                attTable = new GDALRasterAttributeTable(*attTableTmp);
+                attTable = new GDALDefaultRasterAttributeTable(*((GDALDefaultRasterAttributeTable*)attTableTmp));
                 
                 std::cout << "Row Count: " << numRows << std::endl;
                                 
