@@ -40,11 +40,11 @@ namespace rsgis{namespace rastergis{
             
             if((gdalAttOutTmp == NULL) || (gdalAttOutTmp->GetRowCount() == 0))
             {
-                gdalAttOut = new GDALRasterAttributeTable();
+                gdalAttOut = new GDALDefaultRasterAttributeTable();
             }
             else
             {
-                gdalAttOut = new GDALRasterAttributeTable(*gdalAttOutTmp);
+                gdalAttOut = new GDALDefaultRasterAttributeTable(*((GDALDefaultRasterAttributeTable*)gdalAttOutTmp));
             }
             
             if(gdalAttIn == NULL)
@@ -176,7 +176,7 @@ namespace rsgis{namespace rastergis{
         try 
         {
             std::cout << "Import attribute tables to memory.\n";
-            const GDALRasterAttributeTable *gdalAttIn = catsImage->GetRasterBand(1)->GetDefaultRAT();
+            GDALRasterAttributeTable *gdalAttIn = catsImage->GetRasterBand(1)->GetDefaultRAT();
             GDALRasterAttributeTable *gdalAttClumps = NULL;//new GDALRasterAttributeTable(*outImage->GetRasterBand(1)->GetDefaultRAT());
             const GDALRasterAttributeTable *gdalAttClasses = classImage->GetRasterBand(1)->GetDefaultRAT();
             
@@ -186,7 +186,7 @@ namespace rsgis{namespace rastergis{
             }
             else
             {
-                gdalAttClumps = new GDALRasterAttributeTable(*gdalAttIn);
+                gdalAttClumps = new GDALDefaultRasterAttributeTable(*((GDALDefaultRasterAttributeTable*)gdalAttIn));
             }
             
             if((gdalAttClasses == NULL) || (gdalAttClasses->GetRowCount() == 0))
@@ -501,7 +501,7 @@ namespace rsgis{namespace rastergis{
             }
             else
             {
-                gdalAttIn = new GDALRasterAttributeTable(*gdalAttInTmp);
+                gdalAttIn = new GDALDefaultRasterAttributeTable(*((GDALDefaultRasterAttributeTable*)gdalAttInTmp));
             }
             
             
@@ -600,7 +600,7 @@ namespace rsgis{namespace rastergis{
         }
         else
         {
-            gdalAttIn = new GDALRasterAttributeTable(*gdalAttInTmp);
+            gdalAttIn = new GDALDefaultRasterAttributeTable(*((GDALDefaultRasterAttributeTable*)gdalAttInTmp));
         }
         
         std::cout << "Find field column indexes in RAT.\n";
@@ -745,7 +745,7 @@ namespace rsgis{namespace rastergis{
         }
         else
         {
-            gdalAttIn = new GDALRasterAttributeTable(*gdalAttInTmp);
+            gdalAttIn = new GDALDefaultRasterAttributeTable(*((GDALDefaultRasterAttributeTable*)gdalAttInTmp));
         }
         
         std::cout << "Find field column indexes in RAT.\n";
