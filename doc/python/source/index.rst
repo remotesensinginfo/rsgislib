@@ -35,6 +35,7 @@ Python documentation
    rsgislib
    rsgislib_calibration
    rsgislib_classification
+   rsgislib_elevation
    rsgislib_imagecalc
    rsgislib_imagefilter
    rsgislib_imageregistration

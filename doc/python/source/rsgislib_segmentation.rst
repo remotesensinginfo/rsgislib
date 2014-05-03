@@ -8,6 +8,8 @@ RSGISLib Image Segmentation Module
 Utilities
 ---------
 .. autofunction:: rsgislib.segmentation.segutils.runShepherdSegmentation
+.. autofunction:: rsgislib.segmentation.segutils.runShepherdSegmentationTestMinObjSize
+.. autofunction:: rsgislib.segmentation.segutils.runShepherdSegmentationTestNumClumps
 
 
 Clump
