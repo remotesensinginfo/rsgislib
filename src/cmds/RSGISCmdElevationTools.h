@@ -43,6 +43,10 @@ namespace rsgis{ namespace cmds {
     void executeCalcSlope(std::string demImage, std::string outputImage, RSGISAngleMeasure outAngleUnit, std::string outImageFormat)throw(RSGISCmdException);
     /** A function to generate an aspect layer */
     void executeCalcAspect(std::string demImage, std::string outputImage, std::string outImageFormat)throw(RSGISCmdException);
+    
+    /** A function to categorise an aspect layer */
+    void executeCatagoriseAspect(std::string aspectImage, std::string outputImage, std::string outImageFormat)throw(RSGISCmdException);
+    
     /** A function to generate a hillshade layer */
     void executeCalcHillshade(std::string demImage, std::string outputImage, float solarAzimuth, float solarZenith, std::string outImageFormat)throw(RSGISCmdException);
     /** A function to generate a shadow mask layer */

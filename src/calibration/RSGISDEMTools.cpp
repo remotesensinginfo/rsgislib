@@ -129,6 +129,63 @@ namespace rsgis{namespace calib{
     }
     
     
+    RSGISRecodeAspect::RSGISRecodeAspect():rsgis::img::RSGISCalcImageValue(1)
+    {
+        
+    }
+
+    void RSGISRecodeAspect::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
+    {
+        if(!boost::math::isnan(bandValues[0]))
+        {
+            if((bandValues[0] >= 0) & (bandValues[0] < 45))
+            {
+                output[0] = 1;
+            }
+            else if((bandValues[0] >= 45) & (bandValues[0] < 90))
+            {
+                output[0] = 2;
+            }
+            else if((bandValues[0] >= 90) & (bandValues[0] < 135))
+            {
+                output[0] = 3;
+            }
+            else if((bandValues[0] >= 135) & (bandValues[0] < 180))
+            {
+                output[0] = 4;
+            }
+            else if((bandValues[0] >= 180) & (bandValues[0] < 225))
+            {
+                output[0] = 5;
+            }
+            else if((bandValues[0] >= 225) & (bandValues[0] < 270))
+            {
+                output[0] = 6;
+            }
+            else if((bandValues[0] >= 270) & (bandValues[0] < 315))
+            {
+                output[0] = 7;
+            }
+            else if((bandValues[0] >= 315) & (bandValues[0] <= 360))
+            {
+                output[0] = 7;
+            }
+            else
+            {
+                throw rsgis::img::RSGISImageCalcException("The input image pixel values much be between 0 and 360 degrees.");
+            }
+        }
+        else
+        {
+            output[0] = std::numeric_limits<float>::signaling_NaN();
+        }
+    }
+    
+    RSGISRecodeAspect::~RSGISRecodeAspect()
+    {
+        
+    }
+    
     
     
 

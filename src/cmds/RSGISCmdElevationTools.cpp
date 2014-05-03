@@ -111,6 +111,33 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
+            
+    void executeCatagoriseAspect(std::string aspectImage, std::string outputImage, std::string outImageFormat)throw(RSGISCmdException)
+    {
+        try
+        {
+            GDALAllRegister();
+            
+            std::cout << "Open Aspect Image: " << aspectImage << std::endl;
+            GDALDataset *dataset = (GDALDataset *) GDALOpen(aspectImage.c_str(), GA_ReadOnly);
+            if(dataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + aspectImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            rsgis::calib::RSGISRecodeAspect *catAspect = new rsgis::calib::RSGISRecodeAspect();
+            rsgis::img::RSGISCalcImage calcImage = rsgis::img::RSGISCalcImage(catAspect, "", true);
+            calcImage.calcImage(&dataset, 1, outputImage, false, NULL, outImageFormat, GDT_Byte);
+            
+            GDALClose(dataset);
+            delete catAspect;
+        }
+        catch(rsgis::RSGISException e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
 
     
     void executeCalcHillshade(std::string demImage, std::string outputImage, float solarAzimuth, float solarZenith, std::string outImageFormat)throw(RSGISCmdException)

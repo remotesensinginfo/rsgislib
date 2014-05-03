@@ -113,6 +113,25 @@ static PyObject *Elevation_calcAspect(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
+static PyObject *Elevation_catAspect(PyObject *self, PyObject *args)
+{
+    const char *pszInputImage, *pszOutputFile, *pszGDALFormat;
+    if( !PyArg_ParseTuple(args, "sss:catagoriseAspect", &pszInputImage, &pszOutputFile, &pszGDALFormat))
+        return NULL;
+    
+    try
+    {
+        rsgis::cmds::executeCatagoriseAspect(std::string(pszInputImage), std::string(pszOutputFile), std::string(pszGDALFormat));
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
 static PyObject *Elevation_calcHillshade(PyObject *self, PyObject *args)
 {
     const char *pszInputImage, *pszOutputFile, *pszGDALFormat;
@@ -235,6 +254,17 @@ static PyMethodDef ElevationMethods[] = {
 "Where:\n"
 "\n"
 "* inputImage is a string containing the name and path of the input DEM file.\n"
+"* outputImage is a string containing the name and path of the output file.\n"
+"* gdalFormat is a string with the output image format for the GDAL driver.\n"},
+    
+{"catagoriseAspect", Elevation_catAspect, METH_VARARGS,
+"rsgislib.elevation.catagoriseAspect(inputImage, outputImage, gdalFormat)\n"
+"Creates an aspect layer which is categorised into 8 catergories from 0-45, \n"
+"45-90, 90-135, 135-180, 180-225, 225-270, 270-315 and 315-360.\n"
+"\n"
+"Where:\n"
+"\n"
+"* inputImage is a string containing the name and path of the input aspect (in degrees) file.\n"
 "* outputImage is a string containing the name and path of the output file.\n"
 "* gdalFormat is a string with the output image format for the GDAL driver.\n"},
     
