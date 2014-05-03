@@ -79,7 +79,7 @@ static PyObject *RasterGIS_PopulateStats(PyObject *self, PyObject *args) {
         return NULL;
 
     try {
-        rsgis::cmds::executePopulateStats(std::string(clumpsImage), addColourTable2Img, calcImgPyramids);
+        //rsgis::cmds::executePopulateStats(std::string(clumpsImage), addColourTable2Img, calcImgPyramids);
     } catch (rsgis::cmds::RSGISCmdException &e) {
         PyErr_SetString(GETSTATE(self)->error, e.what());
         return NULL;
@@ -87,7 +87,7 @@ static PyObject *RasterGIS_PopulateStats(PyObject *self, PyObject *args) {
 
     Py_RETURN_NONE;
 }
-
+/*
 static PyObject *RasterGIS_CopyRAT(PyObject *self, PyObject *args) {
     const char *clumpsImage, *inputImage;
 
@@ -1203,7 +1203,7 @@ static PyObject *RasterGIS_FindGlobalSegmentationScore(PyObject *self, PyObject 
     
     return outList;
 }
-
+*/
 
 
 
@@ -1226,7 +1226,7 @@ static PyMethodDef RasterGISMethods[] = {
 "   colourtable=True\n"
 "   rastergis.populateStats(clumps, colourtable, pyramids)\n"
 "\n"},
-
+/*
     {"copyRAT", RasterGIS_CopyRAT, METH_VARARGS,
 "rastergis.copyRAT(inputImage, clumpsImage)\n"
 "Copies a GDAL RAT from one image to another\n"
@@ -1309,7 +1309,7 @@ static PyMethodDef RasterGISMethods[] = {
 
     {"populateRATWithPercentiles", RasterGIS_PopulateRATWithPercentiles, METH_VARARGS,
 "rastergis.populateRATWithPercentiles(inputImage, clumpsImage, bandPercentiles)\n"
-"Populates an attribute table with a percentile of the pixel values from an image */\n"
+"Populates an attribute table with a percentile of the pixel values from an image \n"
 "Where:\n"
 "\n"
 "* inputImage is a string containing the name of the input image file\n"
@@ -1722,7 +1722,7 @@ static PyMethodDef RasterGISMethods[] = {
     "Returns:\n"
     "float - The global segmentation score. (higher == worse and lower == better)."
     "\n"},
-    
+    */
     
     {NULL}        /* Sentinel */
 };

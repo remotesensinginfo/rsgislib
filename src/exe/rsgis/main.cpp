@@ -61,9 +61,9 @@
 #include "RSGISExeImageRegistration.h"
 #include "RSGISExeImageCalibration.h"
 #include "RSGISExeElevationDataTools.h"
-#include "RSGISExeRasterGIS_old.h"
+//#include "RSGISExeRasterGIS_old.h"
 #include "RSGISExeImageMorphology.h"
-#include "RSGISExeRasterGIS.h"
+//#include "RSGISExeRasterGIS.h"
 
 class Control
 	{
@@ -116,9 +116,9 @@ void Control::setUpAlgorithmFactory() throw(rsgis::RSGISException)
 	algorParams->push_back(new rsgisexe::RSGISExeZonalStats());
     algorParams->push_back(new rsgisexe::RSGISExeImageCalibration());
     algorParams->push_back(new rsgisexe::RSGISExeElevationDataTools());
-    algorParams->push_back(new rsgisexe::RSGISExeRasterGIS_old());
+    //algorParams->push_back(new rsgisexe::RSGISExeRasterGIS_old());
     algorParams->push_back(new rsgisexe::RSGISExeImageMorphology());
-    algorParams->push_back(new rsgisexe::RSGISExeRasterGIS());
+    //algorParams->push_back(new rsgisexe::RSGISExeRasterGIS());
 
 	factory = new rsgis::RSGISAlgorParamsFactory(algorParams);
 }

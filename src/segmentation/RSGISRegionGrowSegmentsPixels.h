@@ -37,14 +37,14 @@
 
 #include "img/RSGISImageCalcException.h"
 #include "img/RSGISImageUtils.h"
-#include "rastergis/RSGISHierarchicalClumps.h"
+//#include "rastergis/RSGISHierarchicalClumps.h"
 
 #include "gdal_priv.h"
 #include "ogrsf_frmts.h"
 #include "ogr_api.h"
 
 namespace rsgis{namespace segment{
-    
+/*
     struct RSGISRegionGrowPxlSeeds
     {
         RSGISRegionGrowPxlSeeds()
@@ -108,7 +108,7 @@ namespace rsgis{namespace segment{
         std::vector<RSGISRegionGrowPxlSeeds>* findSeeds(GDALDataset *inRefl, GDALDataset *clumps, std::vector<rsgis::rastergis::RSGISSubClumps*> *regions)throw(rsgis::img::RSGISImageCalcException);
         ~RSGISFindRegionGrowingSeeds();
     };
-    
+    */
 }}
 
 #endif

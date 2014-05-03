@@ -54,8 +54,8 @@
 #include "segmentation/RSGISEliminateSinglePixels.h"
 #include "segmentation/RSGISMergeSegmentationTiles.h"
 
-#include "rastergis/RSGISAttributeTable.h"
-#include "rastergis/RSGISCreateNewAttributeTable.h"
+//#include "rastergis/RSGISAttributeTable.h"
+//#include "rastergis/RSGISCreateNewAttributeTable.h"
 
 #include "utils/RSGISFileUtils.h"
 #include "math/RSGISMathsUtils.h"
@@ -144,7 +144,7 @@ namespace rsgisexe{
         bool noDataValProvided;
         rsgis::segment::RSGISSelectClumps::ClumpSelection selectionMethod;
         bool ignoreZeros;
-        std::vector<rsgis::segment::RSGISRegionGrowPxlSeeds> *regionGrowingPxlSeeds;
+        //std::vector<rsgis::segment::RSGISRegionGrowPxlSeeds> *regionGrowingPxlSeeds;
         unsigned int subDivision;
         unsigned int levels;
         bool outputWithConsecutiveFIDs;
