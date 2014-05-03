@@ -332,7 +332,7 @@ class RSGISTests:
         imagecalc.correlationWindow(image, output, window, bandA, bandB, gdalformat, dataType)
 
     # Raster GIS
-    
+    """
     def testCopyGDLATT(self):
         print("PYTHON TEST: copyRAT")
         table = "./RATS/injune_p142_casi_sub_utm_clumps_elim_final_clumps_elim_final.kea"
@@ -402,14 +402,14 @@ class RSGISTests:
         bp.append(rastergis.BandAttPercentiles(band=1, percentile=75, fieldName="B1Per75"))
         rastergis.populateRATWithPercentiles(input, clumps, bp)
 
-
+    """
     def testExport2Ascii(self):
         print("PYTHON TEST: export2Ascii")
         table="./RATS/injune_p142_casi_sub_utm_clumps_elim_final_clumps_elim_final.kea"
         output="./TestOutputs/RasterGIS/injune_p142_casi_rgb_exportascii.txt"
         fields = ["BlueAvg", "GreenAvg", "RedAvg"]
         rastergis.export2Ascii(table, output, fields)
-
+    """
     def testExporCols2GDALImage(self):
         print("PYTHON TEST: exportCols2GDALImage")
         clumps="./RATS/injune_p142_casi_sub_utm_clumps_elim_final_clumps_elim_final.kea"
@@ -461,7 +461,7 @@ class RSGISTests:
         pyramids=True
         colourtable=True
         rastergis.populateStats(clumps, colourtable, pyramids)
-
+    """
     # Image Utils 
     
     def testCreateTiles(self):
@@ -863,20 +863,20 @@ if __name__ == '__main__':
     
         """ RasterGIS functions """
         
-        t.tryFuncAndCatch(t.testCopyGDLATT)
-        t.tryFuncAndCatch(t.testCopyGDLATTColumns)
-        t.tryFuncAndCatch(t.testSpatialLocation)
-        t.tryFuncAndCatch(t.testEucDistFromFeat)
-        t.tryFuncAndCatch(t.testFindTopN)
-        t.tryFuncAndCatch(t.testFindSpecClose)
-        t.tryFuncAndCatch(t.testPopulateRATWithStats)
-        t.tryFuncAndCatch(t.testPopulateRATWithPercentiles)
+        #t.tryFuncAndCatch(t.testCopyGDLATT)
+        #t.tryFuncAndCatch(t.testCopyGDLATTColumns)
+        #t.tryFuncAndCatch(t.testSpatialLocation)
+        #t.tryFuncAndCatch(t.testEucDistFromFeat)
+        #t.tryFuncAndCatch(t.testFindTopN)
+        #t.tryFuncAndCatch(t.testFindSpecClose)
+        #t.tryFuncAndCatch(t.testPopulateRATWithStats)
+        #t.tryFuncAndCatch(t.testPopulateRATWithPercentiles)
         t.tryFuncAndCatch(t.testExport2Ascii)
-        t.tryFuncAndCatch(t.testExporCols2GDALImage)
-        t.tryFuncAndCatch(t.testFindNeighbours)
-        t.tryFuncAndCatch(t.testFindBoundaryPixels)
-        t.tryFuncAndCatch(t.testCalcBorderLength)
-        t.tryFuncAndCatch(t.testCalcShapeIndices)
+        #t.tryFuncAndCatch(t.testExporCols2GDALImage)
+        #t.tryFuncAndCatch(t.testFindNeighbours)
+        #t.tryFuncAndCatch(t.testFindBoundaryPixels)
+        #t.tryFuncAndCatch(t.testCalcBorderLength)
+        #t.tryFuncAndCatch(t.testCalcShapeIndices)
         
     if testLibraries == 'all' or testLibraries == 'zonalstats':
         

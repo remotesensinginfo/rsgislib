@@ -32,7 +32,7 @@
 #include "RSGISCmdException.h"
 
 namespace rsgis{ namespace cmds {
-/*
+
     enum SpectralDistanceMethodCmds
     {
         stdEucSpecDist,
@@ -141,7 +141,7 @@ namespace rsgis{ namespace cmds {
         int blue;
         int alpha;
     };
-    */
+ 
     /** Function to populate statics for thermatic images */
     //void executePopulateStats(std::string clumpsImage, bool addColourTable2Img, bool calcImgPyramids)throw(RSGISCmdException);
 
@@ -182,7 +182,7 @@ namespace rsgis{ namespace cmds {
     //void executeKnnMajorityClassifier(std::string inputImage, std::string inClassNameField, std::string outClassNameField, std::string trainingSelectCol, std::string eastingsField, std::string northingsField, std::string areaField, std::string majWeightField, std::vector<std::string> fields, unsigned int nFeatures, float distThreshold, float weightA, void *majorMethod)throw(RSGISCmdException);
 
     /** Function to export columns from a GDAL RAT to ascii */
-    //void executeExport2Ascii(std::string inputImage, std::string outputFile, std::vector<std::string> fields)throw(RSGISCmdException);
+    void executeExport2Ascii(std::string inputImage, std::string outputFile, std::vector<std::string> fields, int ratBand=1)throw(RSGISCmdException);
 
     /** Function to translate a set of classes to another */
     //void executeClassTranslate(std::string inputImage, std::string classInField, std::string classOutField, std::map<size_t, size_t> classPairs)throw(RSGISCmdException);
