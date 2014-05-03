@@ -68,13 +68,10 @@ namespace rsgis{ namespace cmds {
         rsgis_roundness = 15,
         rsgis_shapeindex = 16
     };
-
+*/
     struct RSGISBandAttStatsCmds
     {
         unsigned int band;
-        float threshold;
-        bool calcCount;
-        std::string countField;
         bool calcMin;
         std::string minField;
         bool calcMax;
@@ -83,12 +80,10 @@ namespace rsgis{ namespace cmds {
         std::string meanField;
         bool calcStdDev;
         std::string stdDevField;
-        bool calcMedian;
-        std::string medianField;
         bool calcSum;
         std::string sumField;
     };
-
+/*
     struct RSGISBandAttPercentilesCmds
     {
         unsigned int band;
@@ -155,7 +150,7 @@ namespace rsgis{ namespace cmds {
     //void executeSpatialLocation(std::string inputImage, std::string eastingsField, std::string northingsField)throw(RSGISCmdException);
 
     /** Function for populating an attribute table from an image */
-    //void executePopulateRATWithStats(std::string inputImage, std::string clumpsImage, std::vector<rsgis::cmds::RSGISBandAttStatsCmds*> *bandStatsCmds)throw(RSGISCmdException);
+    void executePopulateRATWithStats(std::string inputImage, std::string clumpsImage, std::vector<rsgis::cmds::RSGISBandAttStatsCmds*> *bandStatsCmds, unsigned int ratBand)throw(RSGISCmdException);
 
     /** Function for populating an attribute table with a percentile of the pixel values */
     //void executePopulateRATWithPercentiles(std::string inputImage, std::string clumpsImage, std::vector<rsgis::cmds::RSGISBandAttPercentilesCmds*> *bandPercentilesCmds)throw(RSGISCmdException);

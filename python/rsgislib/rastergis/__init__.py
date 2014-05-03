@@ -7,16 +7,13 @@ from ._rastergis import *
 
 class BandAttStats:
     """ This is passed to the populateRATWithStats function """
-    def __init__(self, band, threshold=0.0, countField=None, minField=None, maxField=None, sumField=None, medianField=None, stdDevField=None, meanField=None):
+    def __init__(self, band, minField=None, maxField=None, sumField=None, stdDevField=None, meanField=None):
         self.band = band
-        self.threshold = threshold
         self.minField = minField
         self.maxField = maxField
         self.sumField = sumField
         self.meanField = meanField
         self.stdDevField = stdDevField
-        self.medianField = medianField
-        self.countField = countField
 
 class BandAttPercentiles:
     """ This is passed to the populateRATWithPercentiles function """

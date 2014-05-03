@@ -23,6 +23,8 @@
 #ifndef RSGISRasterAttUtils_H
 #define RSGISRasterAttUtils_H
 
+#define RAT_BLOCK_LENGTH 100000 // Define block length (Default block length for KEA is 1000)
+
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -41,7 +43,8 @@
 #include <boost/lexical_cast.hpp>
 
 namespace rsgis{namespace rastergis{
-	
+    
+    
     class RSGISRasterAttUtils
     {
     public:

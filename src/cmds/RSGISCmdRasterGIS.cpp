@@ -26,12 +26,11 @@
 #include "common/RSGISImageException.h"
 #include "common/RSGISAttributeTableException.h"
 
-/*
-#include "math/RSGIS2DInterpolation.h"
-
 #include "utils/RSGISTextUtils.h"
 
 #include "rastergis/RSGISRasterAttUtils.h"
+#include "rastergis/RSGISPopRATWithStats.h"
+/*
 #include "rastergis/RSGISCalcClumpStats.h"
 #include "rastergis/RSGISCalcClusterLocation.h"
 #include "rastergis/RSGISFindClumpCatagoryStats.h"
@@ -50,6 +49,9 @@
 #include "rastergis/RSGISFindChangeClumps.h"
 #include "rastergis/RSGISSelectClumps.h"
 #include "rastergis/RSGISInterpolateClumpValues2Image.h"
+ 
+ #include "math/RSGIS2DInterpolation.h"
+
 */
 namespace rsgis{ namespace cmds {
 /*
@@ -185,8 +187,9 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
-
-    void executePopulateRATWithStats(std::string inputImage, std::string clumpsImage, std::vector<rsgis::cmds::RSGISBandAttStatsCmds*> *bandStatsCmds)throw(RSGISCmdException) {
+*/
+    void executePopulateRATWithStats(std::string inputImage, std::string clumpsImage, std::vector<rsgis::cmds::RSGISBandAttStatsCmds*> *bandStatsCmds, unsigned int ratBand)throw(RSGISCmdException)
+    {
         try
         {
             GDALAllRegister();
@@ -212,9 +215,6 @@ namespace rsgis{ namespace cmds {
             {
                 bandStat = new rsgis::rastergis::RSGISBandAttStats();
                 bandStat->band = (*iterBand)->band;
-                bandStat->threshold = (*iterBand)->threshold;
-                bandStat->calcCount = (*iterBand)->calcCount;
-                bandStat->countField = (*iterBand)->countField;
                 bandStat->calcMin = (*iterBand)->calcMin;
                 bandStat->minField = (*iterBand)->minField;
                 bandStat->calcMax = (*iterBand)->calcMax;
@@ -223,24 +223,14 @@ namespace rsgis{ namespace cmds {
                 bandStat->meanField = (*iterBand)->meanField;
                 bandStat->calcStdDev = (*iterBand)->calcStdDev;
                 bandStat->stdDevField = (*iterBand)->stdDevField;
-                bandStat->calcMedian = (*iterBand)->calcMedian;
-                bandStat->medianField = (*iterBand)->medianField;
                 bandStat->calcSum = (*iterBand)->calcSum;
                 bandStat->sumField = (*iterBand)->sumField;
-
-                bandStat->countIdxDef = false;
-                bandStat->minIdxDef = false;
-                bandStat->maxIdxDef = false;
-                bandStat->meanIdxDef = false;
-                bandStat->sumIdxDef = false;
-                bandStat->stdDevIdxDef = false;
-                bandStat->medianIdxDef = false;
 
                 bandStats->push_back(bandStat);
             }
 
-            rsgis::rastergis::RSGISCalcClumpStats clumpStats;
-            clumpStats.calcImageClumpStatistic(clumpsDataset, imageDataset, bandStats);
+            rsgis::rastergis::RSGISPopRATWithStats clumpStats;
+            clumpStats.populateRATWithBasicStats(clumpsDataset, imageDataset, bandStats, ratBand);
 
             for(std::vector<rsgis::rastergis::RSGISBandAttStats*>::iterator iterBand = bandStats->begin(); iterBand != bandStats->end(); ++iterBand)
             {
@@ -252,7 +242,6 @@ namespace rsgis{ namespace cmds {
 
             GDALClose(clumpsDataset);
             GDALClose(imageDataset);
-            //GDALDestroyDriverManager();
         }
         catch(rsgis::RSGISException &e)
         {
@@ -263,7 +252,7 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
-
+/*
     void executePopulateRATWithPercentiles(std::string inputImage, std::string clumpsImage, std::vector<rsgis::cmds::RSGISBandAttPercentilesCmds*> *bandPercentilesCmds)throw(RSGISCmdException) {
         try
         {

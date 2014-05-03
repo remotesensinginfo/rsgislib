@@ -762,12 +762,15 @@ set(LIB_RADAR_INVERSION_CPP
 # Files within the Raster GIS Library.
 set(LIB_RASTERGIS_H
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISRasterAttUtils.h
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISPopRATWithStats.h
 	)
 	
 	
 set(LIB_RASTERGIS_CPP
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISRasterAttUtils.cpp
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISRasterAttUtils.h
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISPopRATWithStats.cpp
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISPopRATWithStats.h
 	)
 	
 ###############################################################################
