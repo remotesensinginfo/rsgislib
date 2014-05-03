@@ -620,6 +620,7 @@ namespace rsgis{ namespace cmds {
     
     void executeExtractBrightFeatures(std::string inputImage, std::string maskImage, std::string outputImage, std::string temp1Image, std::string temp2Image, std::string outputFormat, float initThres, float thresIncrement, float thresholdUpper, std::vector<rsgis::cmds::FeatureShapeDescription*> shapeFeatDescript)throw(RSGISCmdException)
     {
+        /*
         try
         {
             rsgis::img::RSGISImageUtils imgUtils;
@@ -676,6 +677,7 @@ namespace rsgis{ namespace cmds {
         {
             throw rsgis::cmds::RSGISCmdException(e.what());
         }
+         */
     }
     
     void executeRMSmallClumps(std::string clumpsImage, std::string outputImage, float threshold, std::string imgFormat)throw(RSGISCmdException)
@@ -685,6 +687,7 @@ namespace rsgis{ namespace cmds {
         
         try
         {
+            /*
             clumpsDataset = (GDALDataset *) GDALOpen(clumpsImage.c_str(), GA_ReadOnly);
             if(clumpsDataset == NULL)
             {
@@ -716,6 +719,7 @@ namespace rsgis{ namespace cmds {
             popImageStats.populateImageWithRasterGISStats(outClumpsDataset, true, true);
             
             GDALClose(outClumpsDataset);
+            */
         }
         catch (rsgis::RSGISException &e)
         {
