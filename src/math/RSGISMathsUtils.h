@@ -122,6 +122,7 @@ namespace rsgis{namespace math{
             void initStatsSummary(RSGISStatsSummary *stats);
             void initStatsSummaryValues(RSGISStatsSummary *stats);
             bool angleWithinRange(float angle, float lower, float upper);
+            double calcPercentile(float percentile, double *binBounds, double binWidth, unsigned int numBins, unsigned int *hist) throw(RSGISMathException);
 		};
 	
 }}

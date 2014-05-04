@@ -765,6 +765,7 @@ set(LIB_RASTERGIS_H
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISExportColumns2Image.h
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISPopRATWithStats.h
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISCalcImageStatsAndPyramids.h
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISCalcClusterLocation.h
 	)
 	
 	
@@ -777,6 +778,8 @@ set(LIB_RASTERGIS_CPP
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISPopRATWithStats.h
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISCalcImageStatsAndPyramids.cpp
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISCalcImageStatsAndPyramids.h
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISCalcClusterLocation.cpp
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISCalcClusterLocation.h
 	)
 	
 ###############################################################################

@@ -36,13 +36,14 @@
 #include "rastergis/RSGISExportColumns2Image.h"
 #include "rastergis/RSGISCalcImageStatsAndPyramids.h"
 #include "rastergis/RSGISPopRATWithStats.h"
+#include "rastergis/RSGISCalcClusterLocation.h"
 
 /*
 #include "rastergis/RSGISRasterAttUtils.h"
 #include "rastergis/RSGISPopRATWithStats.h"
 #include "rastergis/RSGISCalcImageStatsAndPyramids.h"
 #include "rastergis/RSGISCalcClumpStats.h"
-#include "rastergis/RSGISCalcClusterLocation.h"
+
 #include "rastergis/RSGISFindClumpCatagoryStats.h"
 #include "rastergis/RSGISCalcEucDistanceInAttTable.h"
 #include "rastergis/RSGISFindTopNWithinDist.h"
@@ -82,7 +83,6 @@ namespace rsgis{ namespace cmds {
             popImageStats.populateImageWithRasterGISStats(clumpsDataset, addColourTable2Img, calcImgPyramids, ignoreZero, ratBand);
 
             GDALClose(clumpsDataset);
-            //GDALDestroyDriverManager();
         }
         catch(rsgis::RSGISException &e)
         {
@@ -122,7 +122,6 @@ namespace rsgis{ namespace cmds {
 
             GDALClose(inputDataset);
             GDALClose(outRATDataset);
-            //GDALDestroyDriverManager();
         }
         catch(rsgis::RSGISException &e)
         {
@@ -160,7 +159,6 @@ namespace rsgis{ namespace cmds {
 
             GDALClose(inputDataset);
             GDALClose(outRATDataset);
-            //GDALDestroyDriverManager();
         }
         catch(rsgis::RSGISException &e)
         {
@@ -171,8 +169,8 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
-    /*
-    void executeSpatialLocation(std::string inputImage, std::string eastingsField, std::string northingsField)throw(RSGISCmdException) {
+    
+    void executeSpatialLocation(std::string inputImage, unsigned int ratBand, std::string eastingsField, std::string northingsField)throw(RSGISCmdException) {
         try
         {
             GDALAllRegister();
@@ -185,10 +183,9 @@ namespace rsgis{ namespace cmds {
             }
 
             rsgis::rastergis::RSGISCalcClusterLocation calcLoc;
-            calcLoc.populateAttWithClumpLocation(inputDataset, eastingsField, northingsField);
+            calcLoc.populateAttWithClumpLocation(inputDataset, ratBand, eastingsField, northingsField);
 
             GDALClose(inputDataset);
-            //GDALDestroyDriverManager();
         }
         catch(rsgis::RSGISException &e)
         {
@@ -199,7 +196,7 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
-*/
+
     void executePopulateRATWithStats(std::string inputImage, std::string clumpsImage, std::vector<rsgis::cmds::RSGISBandAttStatsCmds*> *bandStatsCmds, unsigned int ratBand)throw(RSGISCmdException)
     {
         try
@@ -264,8 +261,9 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
-/*
-    void executePopulateRATWithPercentiles(std::string inputImage, std::string clumpsImage, std::vector<rsgis::cmds::RSGISBandAttPercentilesCmds*> *bandPercentilesCmds)throw(RSGISCmdException) {
+
+    void executePopulateRATWithPercentiles(std::string inputImage, std::string clumpsImage, unsigned int band, std::vector<rsgis::cmds::RSGISBandAttPercentilesCmds*> *bandPercentilesCmds, unsigned int ratBand, unsigned int numHistBins)throw(RSGISCmdException)
+    {
         try
         {
             GDALAllRegister();
@@ -292,17 +290,14 @@ namespace rsgis{ namespace cmds {
             {
                 bandPercentile = new rsgis::rastergis::RSGISBandAttPercentiles();
 
-                bandPercentile->band = (*iterBand)->band;
                 bandPercentile->percentile = (*iterBand)->percentile;
                 bandPercentile->fieldName = (*iterBand)->fieldName;
-
-                bandPercentile->fieldIdxDef = false;
 
                 bandPercentiles->push_back(bandPercentile);
             }
 
-            rsgis::rastergis::RSGISCalcClumpStats clumpStats;
-            clumpStats.calcImageClumpPercentiles(clumpsDataset, imageDataset, bandPercentiles);
+            rsgis::rastergis::RSGISPopRATWithStats popClumpStats;
+            popClumpStats.populateRATWithPercentileStats(clumpsDataset, imageDataset, band, bandPercentiles, ratBand, numHistBins);
 
             for(std::vector<rsgis::rastergis::RSGISBandAttPercentiles*>::iterator iterBand = bandPercentiles->begin(); iterBand != bandPercentiles->end(); ++iterBand)
             {
@@ -314,7 +309,6 @@ namespace rsgis{ namespace cmds {
 
             GDALClose(clumpsDataset);
             GDALClose(imageDataset);
-            //GDALDestroyDriverManager();
         }
         catch(rsgis::RSGISException &e)
         {
@@ -325,7 +319,7 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
-
+/*
     void executePopulateCategoryProportions(std::string categoriesImage, std::string clumpsImage, std::string outColsName, std::string majorityColName, bool copyClassNames, std::string majClassNameField, std::string classNameField)throw(RSGISCmdException) {
         try
         {

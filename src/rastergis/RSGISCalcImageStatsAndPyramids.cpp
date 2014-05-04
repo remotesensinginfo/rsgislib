@@ -74,6 +74,11 @@ namespace rsgis{namespace rastergis{
             calcImageStats.calcImage(&clumpsDataset, 1, 0);
             delete calcImgHisto;
             
+            if(ignoreZero)
+            {
+                histo[0] = 0.0;
+            }
+            
             if(addColourTable)
             {
                 std::cout << "Adding Histogram and Colour Table to image file\n";
