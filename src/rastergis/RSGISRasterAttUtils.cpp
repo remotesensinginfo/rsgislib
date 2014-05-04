@@ -367,53 +367,93 @@ namespace rsgis{namespace rastergis{
         }
     }
     
-    void RSGISRasterAttUtils::exportColumns2ASCII(GDALDataset *inImage, std::string outputFile, std::vector<std::string> fields) throw(RSGISAttributeTableException)
+    void RSGISRasterAttUtils::exportColumns2ASCII(GDALDataset *inImage, std::string outputFile, std::vector<std::string> fields, int ratBand) throw(RSGISAttributeTableException)
     {
         try
         {
-            std::cout << "Import attribute table to memory.\n";
-            const GDALRasterAttributeTable *gdalAttIn = inImage->GetRasterBand(1)->GetDefaultRAT();
+            GDALRasterAttributeTable *gdalAttIn = inImage->GetRasterBand(ratBand)->GetDefaultRAT();
             
             if(gdalAttIn == NULL)
             {
                 rsgis::RSGISAttributeTableException("The input image does not have an attribute table.");
             }
-            
-            std::cout << "Find field column indexes in RAT.\n";
-            bool *foundInIdx = new bool[fields.size()];
-            int *colInIdxs = new int[fields.size()];
-            for(size_t i = 0; i < fields.size(); ++i)
-            {
-                foundInIdx[i] = false;
-                colInIdxs[i] = 0;
-            }
-            
             if(gdalAttIn->GetRowCount() == 0)
             {
                 rsgis::RSGISAttributeTableException("There are no columns in the input attribute table.");
             }
-            else
+        
+            // Find required attributes in RAT
+            bool *foundInIdx = new bool[fields.size()];
+            int *colInIdxs = new int[fields.size()];     // Index in RAT
+            int *colBlockIndxs = new int[fields.size()]; // Index in array to store block (array dependent on type)
+            
+            for(size_t i = 0; i < fields.size(); ++i)
             {
-                for(int i = 0; i < gdalAttIn->GetColumnCount(); ++i)
+                foundInIdx[i] = false;
+                colInIdxs[i] = 0;
+                colBlockIndxs[i] = 0;
+            }
+            
+            unsigned int nIntCol = 0;
+            unsigned int nRealCol = 0;
+            unsigned int nStringCol = 0;
+            
+            for(int i = 0; i < gdalAttIn->GetColumnCount(); ++i)
+            {
+                for(size_t j = 0; j < fields.size(); ++j)
                 {
-                    for(size_t j = 0; j < fields.size(); ++j)
+                    if(!foundInIdx[j] && (std::string(gdalAttIn->GetNameOfCol(i)) == fields.at(j)))
                     {
-                        if(!foundInIdx[j] && (std::string(gdalAttIn->GetNameOfCol(i)) == fields.at(j)))
+                        colInIdxs[j] = i;
+                        foundInIdx[j] = true;
+                    
+                        if(gdalAttIn->GetTypeOfCol(i) == GFT_Integer)
                         {
-                            colInIdxs[j] = i;
-                            foundInIdx[j] = true;
+                            colBlockIndxs[j] = nIntCol;
+                            ++nIntCol;
+                        }
+                        else if(gdalAttIn->GetTypeOfCol(i) == GFT_Real)
+                        {
+                            colBlockIndxs[j] = nRealCol;
+                            ++nRealCol;
+                        }
+                        else if(gdalAttIn->GetTypeOfCol(i) == GFT_String)
+                        {
+                            colBlockIndxs[j] = nStringCol;
+                            ++nStringCol;
                         }
                     }
                 }
-                
-                for(size_t j = 0; j < fields.size(); ++j)
+            }
+            
+            for(size_t j = 0; j < fields.size(); ++j)
+            {
+                if(!foundInIdx[j])
                 {
-                    if(!foundInIdx[j])
-                    {
-                        std::string message = std::string("Column ") + fields.at(j) + std::string(" is not within the input attribute table.");
-                        throw rsgis::RSGISAttributeTableException(message);
-                    }
-                }                
+                    std::string message = std::string("Column ") + fields.at(j) + std::string(" is not within the input attribute table.");
+                    throw rsgis::RSGISAttributeTableException(message);
+                }
+            }
+            
+            // Allocate arrays to store blocks of data
+            int nRows = gdalAttIn->GetRowCount();
+            
+            int **blockDataInt = new int*[nIntCol];
+            for(int i = 0; i < nIntCol; ++i)
+            {
+                blockDataInt[i] = new int[RAT_BLOCK_LENGTH];
+            }
+            
+            double **blockDataReal = new double*[nRealCol];
+            for(int i = 0; i < nRealCol; ++i)
+            {
+                blockDataReal[i] = new double[RAT_BLOCK_LENGTH];
+            }
+            
+            char ***blockDataStr = new char**[nStringCol];
+            for(int i = 0; i < nStringCol; ++i)
+            {
+                blockDataStr[i] = new char*[RAT_BLOCK_LENGTH];
             }
             
             std::cout << "Copying columns to the ASCII file.\n";
@@ -423,6 +463,7 @@ namespace rsgis{namespace rastergis{
             {
                 outFile.precision(12);
                 
+                // Write column headings
                 for(size_t j = 0; j < fields.size(); ++j)
                 {
                     if(j != 0)
@@ -433,53 +474,165 @@ namespace rsgis{namespace rastergis{
                 }
                 outFile << std::endl;
                 
-                size_t numRows = gdalAttIn->GetRowCount();
-                unsigned int feedbackStep = numRows/10;
-                unsigned int feedback = 0;
-                std::cout << "Started." << std::flush;
-                for(int i = 0; i < numRows; ++i)
+                // Itterate through blocks
+                int nBlocks = floor(((double) nRows) / ((double) RAT_BLOCK_LENGTH));
+                int remainRows = nRows - (nBlocks * RAT_BLOCK_LENGTH );
+                
+                int feedback = nRows/10.0;
+                int feedbackCounter = 0;
+                
+                std::cout << "Started " << std::flush;
+                
+                int rowOffset = 0;
+                for(int i = 0; i < nBlocks; i++)
                 {
-                    if((numRows > 20) && (i % feedbackStep == 0))
-                    {
-                        std::cout << "." << feedback << "." << std::flush;
-                        feedback += 10;
-                    }
+                    rowOffset =  RAT_BLOCK_LENGTH * i;
                     
+                    // Get block of data from RAT
                     for(size_t j = 0; j < fields.size(); ++j)
                     {
-                        if(j != 0)
-                        {
-                            outFile << ",";
-                        }
                         if(gdalAttIn->GetTypeOfCol(colInIdxs[j]) == GFT_Integer)
                         {
-                            outFile << gdalAttIn->GetValueAsInt(i, colInIdxs[j]);
+                            gdalAttIn->ValuesIO(GF_Read, colInIdxs[j], rowOffset, RAT_BLOCK_LENGTH, blockDataInt[colBlockIndxs[j]]);
                         }
                         else if(gdalAttIn->GetTypeOfCol(colInIdxs[j]) == GFT_Real)
                         {
-                            outFile << floor((gdalAttIn->GetValueAsDouble(i, colInIdxs[j]) * 1000)+0.5) / 1000;
+                            gdalAttIn->ValuesIO(GF_Read, colInIdxs[j], rowOffset, RAT_BLOCK_LENGTH, blockDataReal[colBlockIndxs[j]]);
                         }
                         else if(gdalAttIn->GetTypeOfCol(colInIdxs[j]) == GFT_String)
                         {
-                            outFile << "\"" << gdalAttIn->GetValueAsString(i, colInIdxs[j]) << "\"" ;
+                            gdalAttIn->ValuesIO(GF_Read, colInIdxs[j], rowOffset, RAT_BLOCK_LENGTH, blockDataStr[colBlockIndxs[j]]);
                         }
-                        else
-                        {
-                            throw rsgis::RSGISAttributeTableException("Column data type was not recognised.");
-                        }                        
                     }
-                    outFile << std::endl;
+                    
+                    // Loop through block
+                    
+                    for(int m = 0; m < RAT_BLOCK_LENGTH; ++m)
+                    {
+                        // Show progress
+                        if((feedback != 0) && (((i*RAT_BLOCK_LENGTH)+m) % feedback) == 0)
+                        {
+                            std::cout << "." << feedbackCounter << "." << std::flush;
+                            feedbackCounter = feedbackCounter + 10;
+                        }
+                        
+                        for(size_t j = 0; j < fields.size(); ++j)
+                        {
+                            if(j != 0)
+                            {
+                                outFile << ",";
+                            }
+                            if(gdalAttIn->GetTypeOfCol(colInIdxs[j]) == GFT_Integer)
+                            {
+                                outFile << blockDataInt[colBlockIndxs[j]][m];
+                            }
+                            else if(gdalAttIn->GetTypeOfCol(colInIdxs[j]) == GFT_Real)
+                            {
+                                outFile << floor((blockDataReal[colBlockIndxs[j]][m]*1000)+0.5) / 1000;
+                            }
+                            else if(gdalAttIn->GetTypeOfCol(colInIdxs[j]) == GFT_String)
+                            {
+                                outFile << "\"" << blockDataStr[colBlockIndxs[j]][m] << "\"" ;
+                            }
+                            else
+                            {
+                                throw rsgis::RSGISAttributeTableException("Column data type was not recognised.");
+                            }
+                        }
+                        outFile << std::endl;
+                    }
+                    
+                }
+                if(remainRows > 0)
+                {
+                    rowOffset =  RAT_BLOCK_LENGTH * nBlocks;
+                    
+                    // Get block of data from RAT
+                    for(size_t j = 0; j < fields.size(); ++j)
+                    {
+                        if(gdalAttIn->GetTypeOfCol(colInIdxs[j]) == GFT_Integer)
+                        {
+                            gdalAttIn->ValuesIO(GF_Read, colInIdxs[j], rowOffset, remainRows, blockDataInt[colBlockIndxs[j]]);
+                        }
+                        else if(gdalAttIn->GetTypeOfCol(colInIdxs[j]) == GFT_Real)
+                        {
+                            gdalAttIn->ValuesIO(GF_Read, colInIdxs[j], rowOffset, remainRows, blockDataReal[colBlockIndxs[j]]);
+                        }
+                        else if(gdalAttIn->GetTypeOfCol(colInIdxs[j]) == GFT_String)
+                        {
+                            gdalAttIn->ValuesIO(GF_Read, colInIdxs[j], rowOffset, remainRows, blockDataStr[colBlockIndxs[j]]);
+                        }
+                    }
+                    
+                    // Loop through block
+                    
+                    for(int m = 0; m < remainRows; ++m)
+                    {
+                        // Show progress
+                        if((feedback != 0) && (((nBlocks*RAT_BLOCK_LENGTH)+m) % feedback) == 0)
+                        {
+                            std::cout << "." << feedbackCounter << "." << std::flush;
+                            feedbackCounter = feedbackCounter + 10;
+                        }
+                        
+                        for(size_t j = 0; j < fields.size(); ++j)
+                        {
+                            if(j != 0)
+                            {
+                                outFile << ",";
+                            }
+                            if(gdalAttIn->GetTypeOfCol(colInIdxs[j]) == GFT_Integer)
+                            {
+                                outFile << blockDataInt[colBlockIndxs[j]][m];
+                            }
+                            else if(gdalAttIn->GetTypeOfCol(colInIdxs[j]) == GFT_Real)
+                            {
+                                outFile << floor((blockDataReal[colBlockIndxs[j]][m]* 1000)+0.5) / 1000;
+                            }
+                            else if(gdalAttIn->GetTypeOfCol(colInIdxs[j]) == GFT_String)
+                            {
+                                outFile << "\"" << blockDataStr[colBlockIndxs[j]][m] << "\"" ;
+                            }
+                            else
+                            {
+                                throw rsgis::RSGISAttributeTableException("Column data type was not recognised.");
+                            }
+                        }
+                        outFile << std::endl;
+                    }
                 }
                 std::cout << ".Completed\n";
                 outFile.flush();
                 outFile.close();
+
             }
             else
             {
                 rsgis::RSGISAttributeTableException("Could not open the specified output ASCII file.");
             }
+
+            // Tidy up
+            for(int i = 0; i < nIntCol; ++i)
+            {
+                delete[] blockDataInt[i];
+            }
+            delete[] blockDataInt;
+        
+            for(int i = 0; i < nRealCol; ++i)
+            {
+                delete[] blockDataReal[i];
+            }
+            delete blockDataReal;
             
+            for(int i = 0; i < nStringCol; ++i)
+            {
+                delete[] blockDataStr[i];
+            }
+            delete[] blockDataStr;
             
+            delete[] foundInIdx;
+            delete[] colInIdxs;
+            delete[] colBlockIndxs;
         }
         catch (rsgis::RSGISAttributeTableException &e)
         {

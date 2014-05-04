@@ -332,13 +332,13 @@ class RSGISTests:
         imagecalc.correlationWindow(image, output, window, bandA, bandB, gdalformat, dataType)
 
     # Raster GIS
-    
+
     def testCopyGDLATT(self):
         print("PYTHON TEST: copyRAT")
         table = "./RATS/injune_p142_casi_sub_utm_clumps_elim_final_clumps_elim_final.kea"
         image = "./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_cptab.kea"
         rastergis.copyRAT(image, table)
-
+    """
     def testCopyGDLATTColumns(self):
         print("PYTHON TEST: copyGDALATTColumns")
         table = "./RATS/injune_p142_casi_sub_utm_clumps_elim_final_clumps_elim_final.kea"
@@ -381,7 +381,7 @@ class RSGISTests:
         spatdistthreshold=100
         outfield="Closest2Feat10"
         rastergis.findSpecClose(image, spatialdist, metricdist, outfield, specdistthreshold, spatdistthreshold)
-
+    """
     def testPopulateRATWithStats(self):
         print("PYTHON TEST: populateRATWithStats")
         clumps="./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_popstats.kea"
@@ -391,7 +391,7 @@ class RSGISTests:
         bs.append(rastergis.BandAttStats(band=2, minField="b2Min", maxField="b2Max", meanField="b2Mean", sumField="b2Sum", stdDevField="b2StdDev"))
         bs.append(rastergis.BandAttStats(band=3, minField="b3Min", maxField="b3Max", meanField="b3Mean", sumField="b3Sum", stdDevField="b3StdDev"))
         rastergis.populateRATWithStats(input, clumps, bs)
-
+    """
     def testPopulateRATWithPercentiles(self):
         print("PYTHON TEST: populateRATWithPercentiles")
         clumps = "./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_popstats.kea"
@@ -402,7 +402,7 @@ class RSGISTests:
         bp.append(rastergis.BandAttPercentiles(band=1, percentile=75, fieldName="B1Per75"))
         rastergis.populateRATWithPercentiles(input, clumps, bp)
 
-
+    """
     def testExport2Ascii(self):
         print("PYTHON TEST: export2Ascii")
         table="./RATS/injune_p142_casi_sub_utm_clumps_elim_final_clumps_elim_final.kea"
@@ -418,7 +418,7 @@ class RSGISTests:
         dataType = rsgislib.TYPE_32FLOAT
         fields = ["BlueAvg", "GreenAvg", "RedAvg"]
         rastergis.exportCols2GDALImage(clumps, output, gdalformat, dataType, fields)
-
+    """
     def testFindNeighbours(self):
         print("PYTHON TEST: findNeighbours")
         input = "./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_neighbours.kea"
@@ -461,7 +461,7 @@ class RSGISTests:
         pyramids=True
         colourtable=True
         rastergis.populateStats(clumps, colourtable, pyramids)
-
+    """
     # Image Utils 
     
     def testCreateTiles(self):
@@ -864,19 +864,19 @@ if __name__ == '__main__':
         """ RasterGIS functions """
         
         t.tryFuncAndCatch(t.testCopyGDLATT)
-        t.tryFuncAndCatch(t.testCopyGDLATTColumns)
-        t.tryFuncAndCatch(t.testSpatialLocation)
-        t.tryFuncAndCatch(t.testEucDistFromFeat)
-        t.tryFuncAndCatch(t.testFindTopN)
-        t.tryFuncAndCatch(t.testFindSpecClose)
+        #t.tryFuncAndCatch(t.testCopyGDLATTColumns)
+        #t.tryFuncAndCatch(t.testSpatialLocation)
+        #t.tryFuncAndCatch(t.testEucDistFromFeat)
+        #t.tryFuncAndCatch(t.testFindTopN)
+        #t.tryFuncAndCatch(t.testFindSpecClose)
         t.tryFuncAndCatch(t.testPopulateRATWithStats)
-        t.tryFuncAndCatch(t.testPopulateRATWithPercentiles)
+        #t.tryFuncAndCatch(t.testPopulateRATWithPercentiles)
         t.tryFuncAndCatch(t.testExport2Ascii)
         t.tryFuncAndCatch(t.testExporCols2GDALImage)
-        t.tryFuncAndCatch(t.testFindNeighbours)
-        t.tryFuncAndCatch(t.testFindBoundaryPixels)
-        t.tryFuncAndCatch(t.testCalcBorderLength)
-        t.tryFuncAndCatch(t.testCalcShapeIndices)
+        #t.tryFuncAndCatch(t.testFindNeighbours)
+        #t.tryFuncAndCatch(t.testFindBoundaryPixels)
+        #t.tryFuncAndCatch(t.testCalcBorderLength)
+        #t.tryFuncAndCatch(t.testCalcShapeIndices)
         
     if testLibraries == 'all' or testLibraries == 'zonalstats':
         
