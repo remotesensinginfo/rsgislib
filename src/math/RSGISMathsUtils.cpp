@@ -764,6 +764,64 @@ namespace rsgis{namespace math{
         
         return withinRange;
     }
+    
+    double RSGISMathsUtils::calcPercentile(float percentile, double *binBounds, double binWidth, unsigned int numBins, unsigned int *hist) throw(RSGISMathException)
+    {
+        double percentVal = 0.0;
+        try
+        {
+            size_t numVals = 0;
+            for(unsigned int i = 0; i < numBins; ++i)
+            {
+                numVals += hist[i];
+            }
+            
+            percentile = percentile / 100;
+            unsigned int percentileValCount = floor(((double)numVals) * percentile);
+            
+            if(percentileValCount == 0)
+            {
+                percentVal = binBounds[0] + binWidth/2;
+            }
+            else
+            {
+                size_t valCount = 0;
+                bool foundBin = false;
+                unsigned int binIdx = 0;
+                for(unsigned int i = 0; i < numBins; ++i)
+                {
+                    valCount += hist[i];
+                    if(valCount >= percentileValCount)
+                    {
+                        binIdx = i;
+                        foundBin = true;
+                        break;
+                    }
+                }
+                
+                if(!foundBin)
+                {
+                    throw RSGISMathException("Could not find percentile bin! Something I cannot explain has gone wrong!");
+                }
+                percentVal = binBounds[binIdx] + binWidth/2;
+            }
+            
+        }
+        catch(RSGISMathException &e)
+        {
+            throw e;
+        }
+        catch(RSGISException &e)
+        {
+            throw RSGISMathException(e.what());
+        }
+        catch(std::exception &e)
+        {
+            throw RSGISMathException(e.what());
+        }
+        
+        return percentVal;
+    }
 
 }}
 

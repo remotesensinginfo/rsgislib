@@ -1,8 +1,8 @@
 /*
- *  RSGISExportColumns2Image.h
+ *  RSGISCalcClusterLocation.h
  *  RSGIS_LIB
  *
- *  Created by Pete Bunting on 04/09/2012.
+ *  Created by Pete Bunting on 28/07/2012.
  *  Copyright 2012 RSGISLib.
  * 
  *  RSGISLib is free software: you can redistribute it and/or modify
@@ -20,57 +20,60 @@
  *
  */
 
-#ifndef RSGISExportColumns2Image_H
-#define RSGISExportColumns2Image_H
+#ifndef RSGISCalcClusterLocation_H
+#define RSGISCalcClusterLocation_H
 
 #include <iostream>
 #include <string>
 #include <math.h>
-#include <algorithm>
 
 #include "gdal_priv.h"
 #include "gdal_rat.h"
 
 #include "common/RSGISAttributeTableException.h"
 
-#include "math/RSGISMathException.h"
+#include "rastergis/RSGISRasterAttUtils.h"
 
 #include "img/RSGISImageCalcException.h"
 #include "img/RSGISCalcImageValue.h"
-
-#include "rastergis/RSGISRasterAttUtils.h"
+#include "img/RSGISCalcImage.h"
 
 #include <boost/numeric/conversion/cast.hpp>
 #include <boost/lexical_cast.hpp>
 
-
 namespace rsgis{namespace rastergis{
+	
+    class RSGISCalcClusterLocation
+    {
+    public:
+        RSGISCalcClusterLocation();
+        void populateAttWithClumpLocation(GDALDataset *dataset, unsigned int ratBand, std::string eastColumn, std::string northColumn)throw(rsgis::RSGISAttributeTableException);
+        ~RSGISCalcClusterLocation();
+    };
     
-    class RSGISExportColumns2ImageCalcImage : public rsgis::img::RSGISCalcImageValue
+    
+    
+	class RSGISCalcClusterLocationCalcValue : public rsgis::img::RSGISCalcImageValue
 	{
 	public: 
-		RSGISExportColumns2ImageCalcImage(int numberOutBands, GDALRasterAttributeTable *attTable, unsigned int columnIndex);
-        void loadColumn(int columnIndex);
+		RSGISCalcClusterLocationCalcValue(double **spatialLoc, unsigned int ratBand);
 		void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
 		void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
         void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
-        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, float *output) throw(rsgis::img::RSGISImageCalcException);
-		void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
-		void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, geos::geom::Envelope extent)throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+		void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, geos::geom::Envelope extent)throw(rsgis::img::RSGISImageCalcException);
+        void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
 		void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
 		void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
         void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
 		bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
-		~RSGISExportColumns2ImageCalcImage();
-    protected:
-        GDALRasterAttributeTable *attTable;
-        unsigned int nRows;
-        double *columnData;
+		~RSGISCalcClusterLocationCalcValue();
+    private:
+        double **spatialLoc;
+        unsigned int ratBand;
 	};
 	
 }}
 
 #endif
-
-
 

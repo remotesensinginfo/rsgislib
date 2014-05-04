@@ -17,8 +17,7 @@ class BandAttStats:
 
 class BandAttPercentiles:
     """ This is passed to the populateRATWithPercentiles function """
-    def __init__(self, band, percentile, fieldName):
-        self.band = band
+    def __init__(self, percentile, fieldName):
         self.percentile = percentile
         self.fieldName = fieldName
 
