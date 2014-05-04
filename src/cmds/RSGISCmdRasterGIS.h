@@ -119,7 +119,7 @@ namespace rsgis{ namespace cmds {
         float bandVarNorm;
         float bandMINorm;
     };
-
+ */
 
     class RSGISColourIntCmds {
     public:
@@ -135,7 +135,7 @@ namespace rsgis{ namespace cmds {
         int blue;
         int alpha;
     };
- */
+
     /** Function to populate statics for thermatic images */
     void executePopulateStats(std::string clumpsImage, bool addColourTable2Img, bool calcImgPyramids, bool ignoreZero, unsigned int ratBand)throw(RSGISCmdException);
 
@@ -182,7 +182,7 @@ namespace rsgis{ namespace cmds {
     //void executeClassTranslate(std::string inputImage, std::string classInField, std::string classOutField, std::map<size_t, size_t> classPairs)throw(RSGISCmdException);
 
     /** Function to set a colour table for a set of classes within the attribute table */
-    //void executeColourClasses(std::string inputImage, std::string classInField, std::map<size_t, RSGISColourIntCmds> classColourPairs)throw(RSGISCmdException);
+    void executeColourClasses(std::string inputImage, std::string classInField, std::map<size_t, RSGISColourIntCmds> classColourPairs, int ratBand=1)throw(RSGISCmdException);
 
     /** Function to set a colour table for a set of classes (string column) within the attribute table */
     //void executeColourStrClasses(std::string inputImage, std::string classInField, std::map<std::string, RSGISColourIntCmds> classStrColourPairs)throw(RSGISCmdException);

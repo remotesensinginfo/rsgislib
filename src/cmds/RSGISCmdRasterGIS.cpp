@@ -570,15 +570,18 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
-
-    void executeColourClasses(std::string inputImage, std::string classInField, std::map<size_t, RSGISColourIntCmds> classColourPairs)throw(RSGISCmdException) {
+*/
+    void executeColourClasses(std::string inputImage, std::string classInField, std::map<size_t, RSGISColourIntCmds> classColourPairs, int ratBand)throw(RSGISCmdException)
+    {
         GDALAllRegister();
         GDALDataset *inputDataset;
 
-        try {
+        try
+        {
             inputDataset = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_Update);
 
-            if(inputDataset == NULL) {
+            if(inputDataset == NULL)
+            {
                 std::string message = std::string("Could not open image ") + inputImage;
                 throw rsgis::RSGISImageException(message.c_str());
             }
@@ -587,7 +590,8 @@ namespace rsgis{ namespace cmds {
             std::map<size_t, utils::RSGISColourInt> ccPairs;
             int r,g,b,a;
 
-            for(std::map<size_t, RSGISColourIntCmds>::iterator iterClass = classColourPairs.begin(); iterClass != classColourPairs.end(); ++iterClass) {
+            for(std::map<size_t, RSGISColourIntCmds>::iterator iterClass = classColourPairs.begin(); iterClass != classColourPairs.end(); ++iterClass)
+            {
                 r = (*iterClass).second.getRed();
                 g = (*iterClass).second.getGreen();
                 b = (*iterClass).second.getBlue();
@@ -596,14 +600,16 @@ namespace rsgis{ namespace cmds {
             }
 
             rsgis::rastergis::RSGISRasterAttUtils attUtils;
-            attUtils.applyClassColours(inputDataset, classInField, ccPairs);
+            attUtils.applyClassColours(inputDataset, classInField, ccPairs, ratBand);
 
             GDALClose(inputDataset);
-        } catch(rsgis::RSGISException &e) {
+        }
+        catch(rsgis::RSGISException &e)
+        {
             throw RSGISCmdException(e.what());
         }
     }
-
+/*
     void executeColourStrClasses(std::string inputImage, std::string classInField, std::map<std::string, RSGISColourIntCmds> classStrColourPairs)throw(RSGISCmdException) {
         GDALAllRegister();
         GDALDataset *inputDataset;
