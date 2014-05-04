@@ -601,6 +601,7 @@ static PyObject *RasterGIS_ColourClasses(PyObject *self, PyObject *args, PyObjec
     const char *inputImage, *classInField;
     PyObject *pClassColourPairs;
     int ratBand = 1;
+    bool intKet = true;
     
     static char *kwlist[] = {"clumps", "class","field", "ratband", NULL};
 
@@ -616,14 +617,19 @@ static PyObject *RasterGIS_ColourClasses(PyObject *self, PyObject *args, PyObjec
         return NULL;
     }
 
-    std::map<size_t, rsgis::cmds::RSGISColourIntCmds> classPairs;
+    std::map<size_t, rsgis::cmds::RSGISColourIntCmds> classPairsInt;
+    std::map<std::string, rsgis::cmds::RSGISColourIntCmds> classPairsStr;
+    
     PyObject *key, *value;
     Py_ssize_t pos = 0;
 
     while (PyDict_Next(pClassColourPairs, &pos, &key, &value)) 
     {
-        if(!RSGISPY_CHECK_INT(key)) {
-            PyErr_SetString(GETSTATE(self)->error, "dict keys must be ints");
+        if(RSGISPY_CHECK_INT(key)){intKet = true;}
+        else if(RSGISPY_CHECK_STRING(key)){intKet = false;}
+        else
+        {
+            PyErr_SetString(GETSTATE(self)->error, "dict keys must be ints or strings");
             return NULL;
         }
 
@@ -665,13 +671,28 @@ static PyObject *RasterGIS_ColourClasses(PyObject *self, PyObject *args, PyObjec
         }
 
         rsgis::cmds::RSGISColourIntCmds colour(RSGISPY_INT_EXTRACT(pRed), RSGISPY_INT_EXTRACT(pGreen), RSGISPY_INT_EXTRACT(pBlue), RSGISPY_INT_EXTRACT(pAlpha));
-        classPairs[(size_t)RSGISPY_INT_EXTRACT(key)] = colour;
+        
+        if(intKet)
+        {
+            classPairsInt[(size_t)RSGISPY_INT_EXTRACT(key)] = colour;
+        }
+        else
+        {
+            classPairsStr[RSGISPY_STRING_EXTRACT(key)] = colour;
+        }
         FreePythonObjects(extractedAttributes);
     }
 
     try 
     {
-        rsgis::cmds::executeColourClasses(std::string(inputImage), std::string(classInField), classPairs, ratBand);
+        if(intKet)
+        {
+            rsgis::cmds::executeColourClasses(std::string(inputImage), std::string(classInField), classPairsInt, ratBand);
+        }
+        else
+        {
+            rsgis::cmds::executeColourStrClasses(std::string(inputImage), std::string(classInField), classPairsStr, ratBand);
+        }
     } 
     catch (rsgis::cmds::RSGISCmdException &e) 
     {
@@ -682,80 +703,6 @@ static PyObject *RasterGIS_ColourClasses(PyObject *self, PyObject *args, PyObjec
     Py_RETURN_NONE;
 }
 /*
-static PyObject *RasterGIS_ColourStrClasses(PyObject *self, PyObject *args) {
-    const char *inputImage, *classInField;
-    PyObject *pClassColourPairs;
-
-    if(!PyArg_ParseTuple(args, "ssO:colourClasses", &inputImage, &classInField, &pClassColourPairs))
-        return NULL;
-
-    if(!PyDict_Check(pClassColourPairs)) {
-        PyErr_SetString(GETSTATE(self)->error, "last argument must be a dict");
-        return NULL;
-    }
-
-    std::map<std::string, rsgis::cmds::RSGISColourIntCmds> classPairs;
-    PyObject *key, *value;
-    Py_ssize_t pos = 0;
-
-    while (PyDict_Next(pClassColourPairs, &pos, &key, &value)) {
-        if(!RSGISPY_CHECK_STRING(key)) {
-            PyErr_SetString(GETSTATE(self)->error, "dict keys must be strings");
-            return NULL;
-        }
-
-        PyObject *pRed, *pGreen, *pBlue, *pAlpha;
-        pRed = pGreen = pBlue = pAlpha = NULL;
-
-        std::vector<PyObject*> extractedAttributes;     // store a list of extracted pyobjects to dereference
-
-        pRed = PyObject_GetAttrString(value, "red");
-        extractedAttributes.push_back(pRed);
-        if( ( pRed == NULL ) || ( pRed == Py_None ) || !RSGISPY_CHECK_INT(pRed)) {
-            PyErr_SetString(GETSTATE(self)->error, "could not find int attribute \'red\'" );
-            FreePythonObjects(extractedAttributes);
-            return NULL;
-        }
-
-        pGreen = PyObject_GetAttrString(value, "green");
-        extractedAttributes.push_back(pGreen);
-        if( ( pGreen == NULL ) || ( pGreen == Py_None ) || !RSGISPY_CHECK_INT(pGreen)) {
-            PyErr_SetString(GETSTATE(self)->error, "could not find int attribute \'green\'" );
-            FreePythonObjects(extractedAttributes);
-            return NULL;
-        }
-
-        pBlue = PyObject_GetAttrString(value, "blue");
-        extractedAttributes.push_back(pBlue);
-        if( ( pBlue == NULL ) || ( pBlue == Py_None ) || !RSGISPY_CHECK_INT(pBlue)) {
-            PyErr_SetString(GETSTATE(self)->error, "could not find int attribute \'blue\'" );
-            FreePythonObjects(extractedAttributes);
-            return NULL;
-        }
-
-        pAlpha = PyObject_GetAttrString(value, "alpha");
-        extractedAttributes.push_back(pAlpha);
-        if( ( pAlpha == NULL ) || ( pAlpha == Py_None ) || !RSGISPY_CHECK_INT(pAlpha)) {
-            PyErr_SetString(GETSTATE(self)->error, "could not find int attribute \'alpha\'" );
-            FreePythonObjects(extractedAttributes);
-            return NULL;
-        }
-
-        rsgis::cmds::RSGISColourIntCmds colour(RSGISPY_INT_EXTRACT(pRed), RSGISPY_INT_EXTRACT(pGreen), RSGISPY_INT_EXTRACT(pBlue), RSGISPY_INT_EXTRACT(pAlpha));
-        classPairs[RSGISPY_STRING_EXTRACT(key)] = colour;
-        FreePythonObjects(extractedAttributes);
-    }
-
-    try {
-        rsgis::cmds::executeColourStrClasses(std::string(inputImage), std::string(classInField), classPairs);
-    } catch (rsgis::cmds::RSGISCmdException &e) {
-        PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
-    }
-
-    Py_RETURN_NONE;
-}
-
 static PyObject *RasterGIS_GenerateColourTable(PyObject *self, PyObject *args) {
     const char *inputImage, *clumpsImage;
     unsigned int redBand, greenBand, blueBand;
@@ -1533,7 +1480,7 @@ static PyMethodDef RasterGISMethods[] = {
 "Where:\n"
 "\n"
 "* clumps is a string containing the name of the input file\n"
-"* field is a string containing the name of the input class field (class should be an integer).\n"
+"* field is a string containing the name of the input class field (class can be a string or integer).\n"
 "* classcolours is dict mapping int class ids to an object having the following attributes:\n"
 "\n"
 "   * red: int defining the red colour component (0 - 255)\n"
@@ -1556,22 +1503,6 @@ static PyMethodDef RasterGISMethods[] = {
 "   rastergis.colourClasses(clumps, field, classcolours)\n"
 "\n"},
 /*
-    {"colourStrClasses", RasterGIS_ColourStrClasses, METH_VARARGS,
-"rastergis.colourStrClasses(inputImage, classInField, classColourPairs)\n"
-"Sets a colour table for a set of classes (string column) within the attribute table\n"
-"Where:\n"
-"\n"
-"* inputImage is a string containing the name of the input image file TODO: check and expand\n"
-"* classInField is a string containing the name of the input class field\n"
-"* classColourPairs is dict mapping string class columns to an object having attributes matching rsgis.cmds.RSGISColourIntCmds TODO: Fixme\n"
-" Requires:\n"
-"\n"
-"   * red: int defining the red colour component (0 - 255)\n"
-"   * green: int defining the green colour component (0 - 255)\n"
-"   * blue: int defining the bluecolour component (0 - 255)\n"
-"   * alpha: int defining the alpha colour component (0 - 255)\n"
-"\n"},
-
     {"generateColourTable", RasterGIS_GenerateColourTable, METH_VARARGS,
 "rastergis.generateColourTable(inputImage, classInField, classColourPairs)\n"
 "Generates a colour table using an input image.\n"
@@ -1673,7 +1604,7 @@ static PyMethodDef RasterGISMethods[] = {
 "* gdalFormat is a string containing the GDAL format for the output file - eg 'KEA'\n"
 "* gdaltype is an int containing one of the values from rsgislib.TYPE_*\n"
 "\n"},
-  */
+
     {"findNeighbours", RasterGIS_FindNeighbours, METH_VARARGS,
 "rastergis.findNeighbours(inputImage, ratBand)\n"
 "Finds the clump neighbours from an image\n"
@@ -1693,7 +1624,7 @@ static PyMethodDef RasterGISMethods[] = {
 "* gdalFormat is a string containing the GDAL format for the output file - (Optional, Default = 'KEA')\n"
 "* ratBand is an int containing band for which the neighbours are to be calculated for (Optional, Default = 1)\n"
 "\n"},
-    /*
+
     {"calcBorderLength", RasterGIS_CalcBorderLength, METH_VARARGS,
 "rastergis.calcBorderLength(inputImage, ignoreZeroEdges, outColsName)\n"
 "Calculate the border length of clumps\n"
