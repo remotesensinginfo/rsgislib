@@ -182,7 +182,7 @@ static PyObject *RasterGIS_PopulateRATWithStats(PyObject *self, PyObject *args, 
 
     if(!PySequence_Check(pBandAttStatsCmds))
     {
-        PyErr_SetString(GETSTATE(self)->error, "last argument must be a sequence");
+        PyErr_SetString(GETSTATE(self)->error, "bandstats argument must be a sequence");
         return NULL;
     }
 
@@ -287,16 +287,24 @@ static PyObject *RasterGIS_PopulateRATWithStats(PyObject *self, PyObject *args, 
 
     Py_RETURN_NONE;
 }
-/*
-static PyObject *RasterGIS_PopulateRATWithPercentiles(PyObject *self, PyObject *args) {
+
+static PyObject *RasterGIS_PopulateRATWithPercentiles(PyObject *self, PyObject *args, PyObject *keywds)
+{
     const char *inputImage, *clumpsImage;
     PyObject *pBandPercentilesCmds;
+    unsigned int ratBand = 1;
+    unsigned int band = 1;
+    unsigned int numHistBins = 200;
+    static char *kwlist[] = {"valsimage", "clumps", "band", "bandstats", "histbins", "ratband", NULL};
 
-    if(!PyArg_ParseTuple(args, "ssO:populateRATWithPercentiles", &inputImage, &clumpsImage, &pBandPercentilesCmds))
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "ssIO|II:populateRATWithPercentiles", kwlist, &inputImage, &clumpsImage, &band, &pBandPercentilesCmds, &numHistBins, &ratBand))
+    {
         return NULL;
+    }
 
-    if(!PySequence_Check(pBandPercentilesCmds)) {
-        PyErr_SetString(GETSTATE(self)->error, "last argument must be a sequence");
+    if(!PySequence_Check(pBandPercentilesCmds))
+    {
+        PyErr_SetString(GETSTATE(self)->error, "bandstats argument must be a sequence");
         return NULL;
     }
 
@@ -305,7 +313,8 @@ static PyObject *RasterGIS_PopulateRATWithPercentiles(PyObject *self, PyObject *
     std::vector<rsgis::cmds::RSGISBandAttPercentilesCmds*> bandPercentilesCmds;
     bandPercentilesCmds.reserve(nPercentiles);
 
-    for(int i = 0; i < nPercentiles; ++i) {
+    for(int i = 0; i < nPercentiles; ++i)
+    {
         PyObject *o = PySequence_GetItem(pBandPercentilesCmds, i);     // the python object
 
         rsgis::cmds::RSGISBandAttPercentilesCmds *percObj = new rsgis::cmds::RSGISBandAttPercentilesCmds;   // the c++ object we need to pass pointers of
@@ -317,24 +326,14 @@ static PyObject *RasterGIS_PopulateRATWithPercentiles(PyObject *self, PyObject *
         std::vector<PyObject*> extractedAttributes;     // store a list of extracted pyobjects to dereference
         extractedAttributes.push_back(o);
 
-        pBand = PyObject_GetAttrString(o, "band");
-        extractedAttributes.push_back(pBand);
-        if( ( pBand == NULL ) || ( pBand == Py_None ) || !RSGISPY_CHECK_INT(pBand)) {
-            PyErr_SetString(GETSTATE(self)->error, "could not find int attribute \'band\'" );
-            FreePythonObjects(extractedAttributes);
-            for(std::vector<rsgis::cmds::RSGISBandAttPercentilesCmds*>::iterator iter = bandPercentilesCmds.begin(); iter != bandPercentilesCmds.end(); ++iter) {
-                delete *iter;
-            }
-            delete percObj;
-            return NULL;
-        }
-
         pPercentile = PyObject_GetAttrString(o, "percentile");
         extractedAttributes.push_back(pPercentile);
-        if( ( pPercentile == NULL ) || ( pPercentile == Py_None ) || !RSGISPY_CHECK_INT(pPercentile)) {
+        if( ( pPercentile == NULL ) || ( pPercentile == Py_None ) || !RSGISPY_CHECK_FLOAT(pPercentile))
+        {
             PyErr_SetString(GETSTATE(self)->error, "could not find int attribute \'percentile\'" );
             FreePythonObjects(extractedAttributes);
-            for(std::vector<rsgis::cmds::RSGISBandAttPercentilesCmds*>::iterator iter = bandPercentilesCmds.begin(); iter != bandPercentilesCmds.end(); ++iter) {
+            for(std::vector<rsgis::cmds::RSGISBandAttPercentilesCmds*>::iterator iter = bandPercentilesCmds.begin(); iter != bandPercentilesCmds.end(); ++iter)
+            {
                 delete *iter;
             }
             delete percObj;
@@ -343,41 +342,49 @@ static PyObject *RasterGIS_PopulateRATWithPercentiles(PyObject *self, PyObject *
 
         pFieldName = PyObject_GetAttrString(o, "fieldName");
         extractedAttributes.push_back(pFieldName);
-        if( ( pFieldName == NULL ) || ( pFieldName == Py_None ) || !RSGISPY_CHECK_STRING(pFieldName)) {
+        if( ( pFieldName == NULL ) || ( pFieldName == Py_None ) || !RSGISPY_CHECK_STRING(pFieldName))
+        {
             PyErr_SetString(GETSTATE(self)->error, "could not find string attribute \'fieldName\'" );
             FreePythonObjects(extractedAttributes);
-            for(std::vector<rsgis::cmds::RSGISBandAttPercentilesCmds*>::iterator iter = bandPercentilesCmds.begin(); iter != bandPercentilesCmds.end(); ++iter) {
+            for(std::vector<rsgis::cmds::RSGISBandAttPercentilesCmds*>::iterator iter = bandPercentilesCmds.begin(); iter != bandPercentilesCmds.end(); ++iter)
+            {
                 delete *iter;
             }
             delete percObj;
             return NULL;
         }
 
-        percObj->band = RSGISPY_INT_EXTRACT(pBand);
-        percObj->percentile = RSGISPY_INT_EXTRACT(pPercentile);
+        percObj->percentile = RSGISPY_FLOAT_EXTRACT(pPercentile);
         percObj->fieldName = RSGISPY_STRING_EXTRACT(pFieldName);
 
         FreePythonObjects(extractedAttributes);
         bandPercentilesCmds.push_back(percObj);
     }
 
-    try {
-        rsgis::cmds::executePopulateRATWithPercentiles(std::string(inputImage), std::string(clumpsImage), &bandPercentilesCmds);
-    } catch (rsgis::cmds::RSGISCmdException &e) {
+    try
+    {
+        rsgis::cmds::executePopulateRATWithPercentiles(std::string(inputImage), std::string(clumpsImage), band, &bandPercentilesCmds, ratBand, numHistBins);
+    }
+    catch (rsgis::cmds::RSGISCmdException &e)
+    {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        for(std::vector<rsgis::cmds::RSGISBandAttPercentilesCmds*>::iterator iter = bandPercentilesCmds.begin(); iter != bandPercentilesCmds.end(); ++iter) {
+        for(std::vector<rsgis::cmds::RSGISBandAttPercentilesCmds*>::iterator iter = bandPercentilesCmds.begin(); iter != bandPercentilesCmds.end(); ++iter)
+        {
             delete *iter;
         }
         return NULL;
     }
 
     // free temp structs
-    for(std::vector<rsgis::cmds::RSGISBandAttPercentilesCmds*>::iterator iter = bandPercentilesCmds.begin(); iter != bandPercentilesCmds.end(); ++iter) {
+    for(std::vector<rsgis::cmds::RSGISBandAttPercentilesCmds*>::iterator iter = bandPercentilesCmds.begin(); iter != bandPercentilesCmds.end(); ++iter)
+    {
         delete *iter;
     }
 
     Py_RETURN_NONE;
 }
+
+/*
 
 static PyObject *RasterGIS_PopulateCategoryProportions(PyObject *self, PyObject *args) {
     const char *clumpsImage, *categoriesImage, *outColsName, *majorityColName, *majClassNameField, *classNameField;
@@ -1338,23 +1345,24 @@ static PyMethodDef RasterGISMethods[] = {
 "	bs.append(rastergis.BandAttStats(band=3, minField='b3Min', maxField='b3Max', meanField='b3Mean', sumField='b3Sum', stdDevField='b3StdDev'))\n"
 "	rastergis.populateRATWithStats(input, clumps, bs)\n"
 "\n"},
-    /*
 
-    {"populateRATWithPercentiles", RasterGIS_PopulateRATWithPercentiles, METH_VARARGS,
-"rastergis.populateRATWithPercentiles(inputImage, clumpsImage, bandPercentiles)\n"
+    {"populateRATWithPercentiles", (PyCFunction)RasterGIS_PopulateRATWithPercentiles, METH_VARARGS | METH_KEYWORDS,
+"rastergis.populateRATWithPercentiles(valsimage=string, clumps=string, band=int, bandstats=rsgislib.rastergis.BandAttStats, histbins=int, ratband=int)\n"
 "Populates an attribute table with a percentile of the pixel values from an image \n"
 "Where:\n"
 "\n"
 "* inputImage is a string containing the name of the input image file\n"
 "* clumpsImage is a string containing the name of the input clump file\n"
-"* bandPercentiles is a sequence of objects that have attributes matching rsgis.cmds.RSGISBandAttPercentilesCmds\n"
-"Requires: TODO: Check\n"
+"* band is an int which specifies the image band (from valsimage) for which the stats are to be calculated\n"
+"* bandPercentiles is a sequence of objects that have attributes matching rsgislib.rastergis.BandAttPercentiles\n"
+"Requires: \n"
 "\n"
-"   * band: int defining the image band to process\n"
-"   * percentile: int defining the percentile to calculate\n"
+"   * percentile: float defining the percentile to calculate (Valid range is 0 - 100)\n"
 "   * fieldName: string defining the name of the field to use for this percentile\n"
+"* histbins is an optional (default = 200) integer specifying the number of bins within the histogram (note this governs the accuracy to which percentile can be calculated).\n"
+"* ratband is an optional (default = 1) integer parameter specifying the image band to which the RAT is associated.\n"
 "\n"},
-
+/*
    {"populateCategoryProportions", RasterGIS_PopulateCategoryProportions, METH_VARARGS,
 "rastergis.populateCategoryProportions(categoriesImage, clumpsImage, outColsName, majorityColName, copyClassNames, majClassNameField, classNameField)\n"
 "Populates the attribute table with the proportions of intersecting categories\n"

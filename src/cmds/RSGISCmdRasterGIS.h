@@ -83,14 +83,13 @@ namespace rsgis{ namespace cmds {
         bool calcSum;
         std::string sumField;
     };
-/*
+
     struct RSGISBandAttPercentilesCmds
     {
-        unsigned int band;
-        unsigned int percentile;
+        float percentile;
         std::string fieldName;
     };
-
+/*
     struct RSGISShapeParamCmds
     {
         rsgisshapeindexcmds idx;
@@ -153,7 +152,7 @@ namespace rsgis{ namespace cmds {
     void executePopulateRATWithStats(std::string inputImage, std::string clumpsImage, std::vector<rsgis::cmds::RSGISBandAttStatsCmds*> *bandStatsCmds, unsigned int ratBand)throw(RSGISCmdException);
 
     /** Function for populating an attribute table with a percentile of the pixel values */
-    //void executePopulateRATWithPercentiles(std::string inputImage, std::string clumpsImage, std::vector<rsgis::cmds::RSGISBandAttPercentilesCmds*> *bandPercentilesCmds)throw(RSGISCmdException);
+    void executePopulateRATWithPercentiles(std::string inputImage, std::string clumpsImage, unsigned int band, std::vector<rsgis::cmds::RSGISBandAttPercentilesCmds*> *bandPercentilesCmds, unsigned int ratBand, unsigned int numHistBins)throw(RSGISCmdException);
 
     /** Function for populating the attribute table with the proporations of intersecting catagories */
     //void executePopulateCategoryProportions(std::string categoriesImage, std::string clumpsImage, std::string outColsName, std::string majorityColName, bool copyClassNames, std::string majClassNameField, std::string classNameField)throw(RSGISCmdException);
