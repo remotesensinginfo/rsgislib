@@ -97,23 +97,29 @@ static PyObject *RasterGIS_PopulateStats(PyObject *self, PyObject *args, PyObjec
 
     Py_RETURN_NONE;
 }
-/*
-static PyObject *RasterGIS_CopyRAT(PyObject *self, PyObject *args) {
-    const char *clumpsImage, *inputImage;
 
-    if(!PyArg_ParseTuple(args, "ss:copyRAT", &inputImage, &clumpsImage))
+static PyObject *RasterGIS_CopyRAT(PyObject *self, PyObject *args, PyObject *keywds) 
+{
+    const char *clumpsImage, *inputImage;
+    int ratBand = 1;
+    static char *kwlist[] = {"clumps", "outimage", "ratband", NULL};
+
+    if(!PyArg_ParseTupleAndKeywords(args, keywds,"ss|i:copyRAT", kwlist, &inputImage, &clumpsImage))
         return NULL;
 
-    try {
-        rsgis::cmds::executeCopyRAT(std::string(clumpsImage), std::string(inputImage));
-    } catch (rsgis::cmds::RSGISCmdException &e) {
+    try 
+    {
+        rsgis::cmds::executeCopyRAT(std::string(clumpsImage), std::string(inputImage),ratBand);
+    }
+    catch (rsgis::cmds::RSGISCmdException &e) 
+    {
         PyErr_SetString(GETSTATE(self)->error, e.what());
         return NULL;
     }
 
     Py_RETURN_NONE;
 }
-
+/*
 static PyObject *RasterGIS_CopyGDALATTColumns(PyObject *self, PyObject *args) {
     const char *clumpsImage, *inputImage;
     PyObject *pFields;
@@ -400,16 +406,23 @@ static PyObject *RasterGIS_CopyCategoriesColours(PyObject *self, PyObject *args)
 
     Py_RETURN_NONE;
 }
-
-static PyObject *RasterGIS_ExportCols2GDALImage(PyObject *self, PyObject *args) {
+*/
+static PyObject *RasterGIS_ExportCols2GDALImage(PyObject *self, PyObject *args, PyObject *keywds) 
+{
     const char *inputImage, *outputFile, *imageFormat;
     int dataType;
+    int ratBand = 1;
     PyObject *pFields;
 
-    if(!PyArg_ParseTuple(args, "sssiO:copyCategoriesColours", &inputImage, &outputFile, &imageFormat, &dataType, &pFields))
-        return NULL;
+    static char *kwlist[] = {"clumps", "outimage", "gdalformat", "datatype", "fields", "ratband", NULL};
 
-    if(!PySequence_Check(pFields)) {
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "sssiO|i:ExportCols2GDALImage", kwlist, &inputImage, &outputFile, &imageFormat, &dataType, &pFields, &ratBand))
+    {
+        return NULL;
+    }
+
+    if(!PySequence_Check(pFields)) 
+    {
         PyErr_SetString(GETSTATE(self)->error, "last argument must be a sequence");
         return NULL;
     }
@@ -419,16 +432,19 @@ static PyObject *RasterGIS_ExportCols2GDALImage(PyObject *self, PyObject *args) 
     std::vector<std::string> fields = ExtractVectorStringFromSequence(pFields);
     if(fields.size() == 0) { return NULL; }
 
-    try {
-        rsgis::cmds::executeExportCols2GDALImage(std::string(inputImage), std::string(outputFile), std::string(imageFormat), type, fields);
-    } catch (rsgis::cmds::RSGISCmdException &e) {
+    try 
+    {
+        rsgis::cmds::executeExportCols2GDALImage(std::string(inputImage), std::string(outputFile), std::string(imageFormat), type, fields, ratBand);
+    }
+    catch (rsgis::cmds::RSGISCmdException &e) 
+    {
         PyErr_SetString(GETSTATE(self)->error, e.what());
         return NULL;
     }
 
     Py_RETURN_NONE;
 }
-
+/*
 static PyObject *RasterGIS_EucDistFromFeature(PyObject *self, PyObject *args) {
     const char *inputImage, *outputField;
     int fid;
@@ -489,13 +505,18 @@ static PyObject *RasterGIS_FindSpecClose(PyObject *self, PyObject *args) {
 
     Py_RETURN_NONE;
 }
-
-static PyObject *RasterGIS_Export2Ascii(PyObject *self, PyObject *args) {
+*/
+static PyObject *RasterGIS_Export2Ascii(PyObject *self, PyObject *args, PyObject *keywds) 
+{
     const char *inputImage, *outputFile;
+    unsigned int ratBand = 1;
     PyObject *pFields;
+    static char *kwlist[] = {"clumps", "outfile","fields", "ratband", NULL};
 
-    if(!PyArg_ParseTuple(args, "ssO:export2Ascii", &inputImage, &outputFile, &pFields))
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "ssO|i:export2Ascii", kwlist, &inputImage, &outputFile, &pFields, &ratBand))
+    {
         return NULL;
+    }
 
     if(!PySequence_Check(pFields)) {
         PyErr_SetString(GETSTATE(self)->error, "last argument must be a sequence");
@@ -504,17 +525,19 @@ static PyObject *RasterGIS_Export2Ascii(PyObject *self, PyObject *args) {
 
     std::vector<std::string> fields = ExtractVectorStringFromSequence(pFields);
     if(fields.size() == 0) { return NULL; }
-
-    try {
-        rsgis::cmds::executeExport2Ascii(std::string(inputImage), std::string(outputFile), fields);
-    } catch (rsgis::cmds::RSGISCmdException &e) {
+    try 
+    {
+        rsgis::cmds::executeExport2Ascii(std::string(inputImage), std::string(outputFile), fields, ratBand);
+    }
+    catch (rsgis::cmds::RSGISCmdException &e) 
+    {
         PyErr_SetString(GETSTATE(self)->error, e.what());
         return NULL;
     }
 
     Py_RETURN_NONE;
 }
-
+/*
 static PyObject *RasterGIS_ClassTranslate(PyObject *self, PyObject *args) {
     const char *inputImage, *classInField, *classOutField;
     PyObject *pClassPairs;
@@ -1228,23 +1251,23 @@ static PyMethodDef RasterGISMethods[] = {
 "   colourtable=True\n"
 "   rastergis.populateStats(clumps, colourtable, pyramids)\n"
 "\n"},
-/*
-    {"copyRAT", RasterGIS_CopyRAT, METH_VARARGS,
-"rastergis.copyRAT(inputImage, clumpsImage)\n"
+
+    {"copyRAT", (PyCFunction)RasterGIS_CopyRAT, METH_VARARGS | METH_KEYWORDS,
+"rastergis.copyRAT(clumps, outimage,ratband=1)\n"
 "Copies a GDAL RAT from one image to another\n"
 "Where:\n"
 "\n"
-"* inputImage is a string containing the name of the input image file\n"
-"* clumpsImage is a string containing the name of the input clump file\n"
+"* clumps is a string containing the name of the input file with RAT\n"
+"* outimage is a string containing the name of the output file to add the RAT to\n"
 "\n"
 "Example::\n"
 "\n"
 "   from rsgislib import rastergis\n"
-"   table = './RATS/injune_p142_casi_sub_utm_clumps_elim_final_clumps_elim_final.kea'\n"
-"   image = './TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_cptab.kea'\n"
-"   rastergis.copyRAT(image, table)\n"
+"   clumps = './RATS/injune_p142_casi_sub_utm_clumps_elim_final_clumps_elim_final.kea'\n"
+"   outimage = './TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_cptab.kea'\n"
+"   rastergis.copyRAT(clumps, outimage)\n"
 "\n"},
-
+/*
     {"copyGDALATTColumns", RasterGIS_CopyGDALATTColumns, METH_VARARGS,
 "rastergis.copyGDALATTColumns(inputImage, clumpsImage, fields)\n"
 "Copies GDAL RAT columns from one image to another\n"
@@ -1347,19 +1370,20 @@ static PyMethodDef RasterGISMethods[] = {
 "* clumpsImage is a string containing the name of the input clump file\n"
 "* outColsName is a string containing the name of the class field\n"
 "\n"},
-
-   {"exportCols2GDALImage", RasterGIS_ExportCols2GDALImage, METH_VARARGS,
-"rastergis.exportCols2GDALImage(inputImage, outputFile, gdalFormat, gdalDataType, fields)\n"
+*/
+   {"exportCols2GDALImage", (PyCFunction)RasterGIS_ExportCols2GDALImage, METH_VARARGS | METH_KEYWORDS,
+"rastergis.exportCols2GDALImage(clumps, outimage, gdalformat, datatype, fields,ratband=1)\n"
 "Exports columns of the raster attribute table as bands in a GDAL image.\n"
 "Where:\n"
 "\n"
-"* inputImage is a string containing the name of the input image file with RAT\n"
-"* outputFile is a string containing the name of the output gdal file\n"
-"* gdalFormat is a string containing the GDAL format for the output file - eg 'KEA'\n"
-"* gdaltype is an int containing one of the values from rsgislib.TYPE_*\n"
+"* clumps is a string containing the name of the input image file with RAT\n"
+"* outimage is a string containing the name of the output gdal file\n"
+"* gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
+"* datatype is an int containing one of the values from rsgislib.TYPE_*\n"
 "* fields is a sequence of strings, providing the columns to be exported.\n"
+"* ratband is an optional (default = 1) integer parameter specifying the image band to which the RAT is associated."
 "\n"},
-
+/*
    {"eucDistFromFeature", RasterGIS_EucDistFromFeature, METH_VARARGS,
 "rastergis.eucDistFromFeature(inputImage, fid, outputField, fields)\n"
 "Calculates the euclidean distance from a feature to all other features.\n"
@@ -1396,25 +1420,26 @@ static PyMethodDef RasterGISMethods[] = {
 "* specDistThreshold is a float specifying the spectral distance threshold with which to operate\n"
 "* distThreshold is a float specifying the spatial distance threshold with which to operate\n"
 "\n"},
-
-    {"export2Ascii", RasterGIS_Export2Ascii, METH_VARARGS,
-"rastergis.export2Ascii(inputImage, outputFile, fields)\n"
+*/
+    {"export2Ascii",  (PyCFunction)RasterGIS_Export2Ascii, METH_VARARGS | METH_KEYWORDS,
+"rastergis.export2Ascii(clumps, outfile, fields,ratband=1)\n"
 "Exports selected columns from a GDAL RAT to ASCII file (comma separated).\n"
 "Where:\n"
 "\n"
-"* inputImage is a string containing the name of the input image file TODO: check and expand\n"
-"* outputFile is a string containing the name of the output file \n"
+"* clumps is a string containing the name of the input RAT \n"
+"* outfile is a string containing the name of the output file \n"
 "* fields is a sequence of strings containing the field names\n"
+"* ratband is an optional (default = 1) integer parameter specifying the image band to which the RAT is associated."
 "\n"
 "Example::\n"
 "\n"
 "   from rsgislib import rastergis\n"
-"   table='./RATS/injune_p142_casi_sub_utm_clumps_elim_final_clumps_elim_final.kea'\n"
-"   output='./TestOutputs/RasterGIS/injune_p142_casi_rgb_exportascii.txt'\n"
+"   clumps='./RATS/injune_p142_casi_sub_utm_clumps_elim_final_clumps_elim_final.kea'\n"
+"   outfile='./TestOutputs/RasterGIS/injune_p142_casi_rgb_exportascii.txt'\n"
 "   fields = ['BlueAvg', 'GreenAvg', 'RedAvg']\n"
-"   rastergis.export2Ascii(table, output, fields)\n"
+"   rastergis.export2Ascii(clumps, outfile, fields)\n"
 "\n"},
-
+/*
     {"classTranslate", RasterGIS_ClassTranslate, METH_VARARGS,
 "rastergis.classTranslate(inputImage, classInField, classOutField, classPairs)\n"
 "Translates a set of classes to another.\n"

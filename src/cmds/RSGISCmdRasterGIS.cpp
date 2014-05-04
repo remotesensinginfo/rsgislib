@@ -26,16 +26,24 @@
 #include "common/RSGISImageException.h"
 #include "common/RSGISAttributeTableException.h"
 
+#include "math/RSGIS2DInterpolation.h"
+
 #include "utils/RSGISTextUtils.h"
 
+#include "img/RSGISCalcImage.h"
+
+#include "rastergis/RSGISRasterAttUtils.h"
+#include "rastergis/RSGISExportColumns2Image.h"
+#include "rastergis/RSGISCalcImageStatsAndPyramids.h"
+#include "rastergis/RSGISPopRATWithStats.h"
+
+/*
 #include "rastergis/RSGISRasterAttUtils.h"
 #include "rastergis/RSGISPopRATWithStats.h"
 #include "rastergis/RSGISCalcImageStatsAndPyramids.h"
-/*
 #include "rastergis/RSGISCalcClumpStats.h"
 #include "rastergis/RSGISCalcClusterLocation.h"
 #include "rastergis/RSGISFindClumpCatagoryStats.h"
-#include "rastergis/RSGISExportColumns2Image.h"
 #include "rastergis/RSGISCalcEucDistanceInAttTable.h"
 #include "rastergis/RSGISFindTopNWithinDist.h"
 #include "rastergis/RSGISFindClosestSpecSpatialFeats.h"
@@ -85,8 +93,9 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
-/*
-    void executeCopyRAT(std::string inputImage, std::string clumpsImage)throw(RSGISCmdException) {
+
+    void executeCopyRAT(std::string inputImage, std::string clumpsImage,  int ratBand)throw(RSGISCmdException)
+    {
         try
         {
             GDALAllRegister();
@@ -105,11 +114,11 @@ namespace rsgis{ namespace cmds {
             }
 
             std::cout << "Import attribute table\n";
-            const GDALRasterAttributeTable *gdalAtt = inputDataset->GetRasterBand(1)->GetDefaultRAT();
+            const GDALRasterAttributeTable *gdalAtt = inputDataset->GetRasterBand(ratBand)->GetDefaultRAT();
 
             std::cout << "Adding RAT\n";
-            outRATDataset->GetRasterBand(1)->SetDefaultRAT(gdalAtt);
-            outRATDataset->GetRasterBand(1)->SetMetadataItem("LAYER_TYPE", "thematic");
+            outRATDataset->GetRasterBand(ratBand)->SetDefaultRAT(gdalAtt);
+            outRATDataset->GetRasterBand(ratBand)->SetMetadataItem("LAYER_TYPE", "thematic");
 
             GDALClose(inputDataset);
             GDALClose(outRATDataset);
@@ -124,7 +133,7 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
-
+    /*
     void executeCopyGDALATTColumns(std::string inputImage, std::string clumpsImage, std::vector<std::string> fields)throw(RSGISCmdException) {
         try
         {
@@ -389,8 +398,8 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
-
-    void executeExportCols2GDALImage(std::string inputImage, std::string outputFile, std::string imageFormat, RSGISLibDataType outDataType, std::vector<std::string> fields)throw(RSGISCmdException) {
+    */
+    void executeExportCols2GDALImage(std::string inputImage, std::string outputFile, std::string imageFormat, RSGISLibDataType outDataType, std::vector<std::string> fields, int ratBand)throw(RSGISCmdException) {
         try
         {
             GDALAllRegister();
@@ -403,7 +412,7 @@ namespace rsgis{ namespace cmds {
             }
 
             rsgis::rastergis::RSGISRasterAttUtils attUtils;
-            const GDALRasterAttributeTable *gdalATT = inputDataset->GetRasterBand(1)->GetDefaultRAT();
+            const GDALRasterAttributeTable *gdalATT = inputDataset->GetRasterBand(ratBand)->GetDefaultRAT();
 
             std::vector<unsigned int> *colIdxs = new std::vector<unsigned int>();
             std::string *bandNames = new std::string[fields.size()];
@@ -433,7 +442,7 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
-
+    /*
     void executeEucDistFromFeature(std::string inputImage, size_t fid, std::string outputField, std::vector<std::string> fields)throw(RSGISCmdException) {
         GDALAllRegister();
         GDALDataset *inputDataset;
@@ -520,8 +529,9 @@ namespace rsgis{ namespace cmds {
         }
 
     }
-
-    void executeExport2Ascii(std::string inputImage, std::string outputFile, std::vector<std::string> fields)throw(RSGISCmdException) {
+*/
+    void executeExport2Ascii(std::string inputImage, std::string outputFile, std::vector<std::string> fields, int ratBand)throw(RSGISCmdException)
+    {
         GDALAllRegister();
         GDALDataset *inputDataset;
 
@@ -542,7 +552,7 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
-
+/*
     void executeClassTranslate(std::string inputImage, std::string classInField, std::string classOutField, std::map<size_t, size_t> classPairs)throw(RSGISCmdException) {
         GDALAllRegister();
         GDALDataset *inputDataset;
