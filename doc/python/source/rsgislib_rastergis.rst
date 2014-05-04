@@ -7,6 +7,7 @@ RSGISLib Raster GIS Module
 
 Utilities
 ---------
+
 .. autofunction:: rsgislib.rastergis.ratutils.populateImageStats
 
 Attribute Segments
@@ -33,11 +34,6 @@ Attribute Segments
 .. autofunction:: rsgislib.rastergis.specDistMajorityClassifier
 .. autofunction:: rsgislib.rastergis.strClassMajority
 
-Classification
----------------
-.. autofunction:: rsgislib.rastergis.maxLikelihoodClassifier
-.. autofunction:: rsgislib.rastergis.maxLikelihoodClassifierLocalPriors
-
 Copy & Export
 ----------------
 .. autofunction:: rsgislib.rastergis.export2Ascii
@@ -50,10 +46,6 @@ Colour Tables
 .. autofunction:: rsgislib.rastergis.colourClasses
 .. autofunction:: rsgislib.rastergis.generateColourTable
 .. autofunction:: rsgislib.rastergis.copyCategoriesColours
-
-Segmentation Quality
----------------------
-.. autofunction:: rsgislib.rastergis.calcGlobalSegmentationScore
 
 
 * :ref:`genindex`
