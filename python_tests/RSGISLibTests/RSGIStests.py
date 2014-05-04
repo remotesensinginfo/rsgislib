@@ -30,6 +30,7 @@
 #############################################################################
 
 import sys, os
+import collections
 try:
     import rsgislib
     from rsgislib import imageutils
@@ -71,14 +72,15 @@ class RSGISTests:
     def copyData(self):
         """ Copy data files from original directory to test directory """
         print("COPYING DATA")
-        os.system('cp ./RATS/injune_p142_casi_sub_utm_segs.kea ./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_cptab.kea')
-        os.system('cp ./RATS/injune_p142_casi_sub_utm_segs.kea ./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_cpcols.kea')
-        os.system('cp ./RATS/injune_p142_casi_sub_utm_clumps_elim_final_clumps_elim_final.kea ./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_spatloc_eucdist.kea')
-        os.system('cp ./RATS/injune_p142_casi_sub_utm_segs.kea ./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_popstats.kea')
+        os.system('cp ./RATS/injune_p142_casi_sub_utm_segs_nostats.kea ./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_cptab.kea')
+        os.system('cp ./RATS/injune_p142_casi_sub_utm_segs_nostats.kea ./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_cpcols.kea')
+        os.system('cp ./RATS/injune_p142_casi_sub_utm_segs_nostats.kea ./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_spatloc_eucdist.kea')
+        os.system('cp ./RATS/injune_p142_casi_sub_utm_segs_nostats.kea ./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_popstats.kea')
         os.system('cp ./RATS/injune_p142_casi_sub_utm_segs.kea ./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_neighbours.kea')
         os.system('cp ./RATS/injune_p142_casi_sub_utm_segs.kea ./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_borlen.kea')
         os.system('cp ./RATS/injune_p142_casi_sub_utm_segs.kea ./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_borlen.kea')
         os.system('cp ./RATS/injune_p142_casi_sub_utm_segs.kea ./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_shape.kea')
+        os.system('cp ./RATS/injune_p142_casi_sub_utm_segs.kea ./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_col.kea')
         os.system('cp ./Rasters/injune_p142_casi_sub_utm.kea ./TestOutputs/injune_p142_casi_sub_utm.kea')
         
         os.system('cp ./RATS/injune_p142_casi_sub_utm_segs_nostats.kea ./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_nostats_addstats.kea')
@@ -335,15 +337,15 @@ class RSGISTests:
 
     def testCopyGDLATT(self):
         print("PYTHON TEST: copyRAT")
-        table = "./RATS/injune_p142_casi_sub_utm_clumps_elim_final_clumps_elim_final.kea"
+        table = "./RATS/injune_p142_casi_sub_utm_segs.kea"
         image = "./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_cptab.kea"
         rastergis.copyRAT(image, table)
 
     def testCopyGDLATTColumns(self):
         print("PYTHON TEST: copyGDALATTColumns")
-        table = "./RATS/injune_p142_casi_sub_utm_clumps_elim_final_clumps_elim_final.kea"
+        table = "./RATS/injune_p142_casi_sub_utm_segs.kea"
         image = "./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_cpcols.kea"
-        fields = ["BlueAvg", "GreenAvg", "RedAvg"]
+        fields = ["b1Mean", "b2Mean", "b2Mean"]
         rastergis.copyGDALATTColumns(table, image, fields)
     """
     def testSpatialLocation(self):
@@ -405,19 +407,29 @@ class RSGISTests:
     """
     def testExport2Ascii(self):
         print("PYTHON TEST: export2Ascii")
-        table="./RATS/injune_p142_casi_sub_utm_clumps_elim_final_clumps_elim_final.kea"
+        table="./RATS/injune_p142_casi_sub_utm_segs.kea"
         output="./TestOutputs/RasterGIS/injune_p142_casi_rgb_exportascii.txt"
-        fields = ["BlueAvg", "GreenAvg", "RedAvg"]
+        fields = ["b1Mean", "b2Mean", "b3Mean"]
         rastergis.export2Ascii(table, output, fields)
 
     def testExporCols2GDALImage(self):
         print("PYTHON TEST: exportCol2GDALImage")
-        clumps="./RATS/injune_p142_casi_sub_utm_clumps_elim_final_clumps_elim_final.kea"
+        clumps="./RATS/injune_p142_casi_sub_utm_segs.kea"
         output="./TestOutputs/RasterGIS/injune_p142_casi_rgb_export.kea"
         gdalformat = "KEA"
         dataType = rsgislib.TYPE_32FLOAT
-        field = "RedAvg"
+        field = "b1Mean"
         rastergis.exportCol2GDALImage(clumps, output, gdalformat, dataType, field)
+        
+    def testExportColourClasses(self):
+        print("PYTHON TEST: colourClasses")
+        clumps='./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_col.kea'
+        field = 'outClass'
+        classcolours = {}
+        colourCat = collections.namedtuple('ColourCat', ['red', 'green', 'blue', 'alpha'])
+        classcolours[0] = colourCat(red=200, green=50, blue=50, alpha=255)
+        classcolours[1] = colourCat(red=200, green=240, blue=50, alpha=255)
+        rastergis.colourClasses(clumps, field, classcolours)
     """
     def testFindNeighbours(self):
         print("PYTHON TEST: findNeighbours")
@@ -864,6 +876,7 @@ if __name__ == '__main__':
         """ RasterGIS functions """
         t.tryFuncAndCatch(t.testCopyGDLATT)
         t.tryFuncAndCatch(t.testCopyGDLATTColumns)
+        t.tryFuncAndCatch(t.testExportColourClasses)
         #t.tryFuncAndCatch(t.testSpatialLocation)
         #t.tryFuncAndCatch(t.testEucDistFromFeat)
         #t.tryFuncAndCatch(t.testFindTopN)
