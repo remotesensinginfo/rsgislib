@@ -766,6 +766,7 @@ set(LIB_RASTERGIS_H
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISPopRATWithStats.h
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISCalcImageStatsAndPyramids.h
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISCalcClusterLocation.h
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindClumpNeighbours.h
 	)
 	
 	
@@ -780,6 +781,8 @@ set(LIB_RASTERGIS_CPP
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISCalcImageStatsAndPyramids.h
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISCalcClusterLocation.cpp
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISCalcClusterLocation.h
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindClumpNeighbours.cpp
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindClumpNeighbours.h
 	)
 	
 ###############################################################################
