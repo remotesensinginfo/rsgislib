@@ -36,13 +36,14 @@
 #include "rastergis/RSGISExportColumns2Image.h"
 #include "rastergis/RSGISCalcImageStatsAndPyramids.h"
 #include "rastergis/RSGISPopRATWithStats.h"
+#include "rastergis/RSGISCalcClusterLocation.h"
 
 /*
 #include "rastergis/RSGISRasterAttUtils.h"
 #include "rastergis/RSGISPopRATWithStats.h"
 #include "rastergis/RSGISCalcImageStatsAndPyramids.h"
 #include "rastergis/RSGISCalcClumpStats.h"
-#include "rastergis/RSGISCalcClusterLocation.h"
+
 #include "rastergis/RSGISFindClumpCatagoryStats.h"
 #include "rastergis/RSGISCalcEucDistanceInAttTable.h"
 #include "rastergis/RSGISFindTopNWithinDist.h"
@@ -82,7 +83,6 @@ namespace rsgis{ namespace cmds {
             popImageStats.populateImageWithRasterGISStats(clumpsDataset, addColourTable2Img, calcImgPyramids, ignoreZero, ratBand);
 
             GDALClose(clumpsDataset);
-            //GDALDestroyDriverManager();
         }
         catch(rsgis::RSGISException &e)
         {
@@ -122,7 +122,6 @@ namespace rsgis{ namespace cmds {
 
             GDALClose(inputDataset);
             GDALClose(outRATDataset);
-            //GDALDestroyDriverManager();
         }
         catch(rsgis::RSGISException &e)
         {
@@ -160,7 +159,6 @@ namespace rsgis{ namespace cmds {
 
             GDALClose(inputDataset);
             GDALClose(outRATDataset);
-            //GDALDestroyDriverManager();
         }
         catch(rsgis::RSGISException &e)
         {
@@ -171,8 +169,8 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
-    /*
-    void executeSpatialLocation(std::string inputImage, std::string eastingsField, std::string northingsField)throw(RSGISCmdException) {
+    
+    void executeSpatialLocation(std::string inputImage, unsigned int ratBand, std::string eastingsField, std::string northingsField)throw(RSGISCmdException) {
         try
         {
             GDALAllRegister();
@@ -185,10 +183,9 @@ namespace rsgis{ namespace cmds {
             }
 
             rsgis::rastergis::RSGISCalcClusterLocation calcLoc;
-            calcLoc.populateAttWithClumpLocation(inputDataset, eastingsField, northingsField);
+            calcLoc.populateAttWithClumpLocation(inputDataset, ratBand, eastingsField, northingsField);
 
             GDALClose(inputDataset);
-            //GDALDestroyDriverManager();
         }
         catch(rsgis::RSGISException &e)
         {
@@ -199,7 +196,7 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
-*/
+
     void executePopulateRATWithStats(std::string inputImage, std::string clumpsImage, std::vector<rsgis::cmds::RSGISBandAttStatsCmds*> *bandStatsCmds, unsigned int ratBand)throw(RSGISCmdException)
     {
         try

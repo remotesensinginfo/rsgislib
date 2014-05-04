@@ -427,6 +427,7 @@ namespace rsgis{namespace rastergis{
             }
             double imageValMin = 0.0;
             double imageValMax = 0.0;
+            nLastProgress = -1;
             inputValsImage->GetRasterBand(band)->ComputeStatistics(false, &imageValMin, &imageValMax, NULL, NULL, RSGISRATStatsTextProgress, &nLastProgress);
             
             std::cout << "Image Min = " << imageValMin << " Image Max = " << imageValMax << std::endl;

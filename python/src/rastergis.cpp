@@ -151,23 +151,31 @@ static PyObject *RasterGIS_CopyGDALATTColumns(PyObject *self, PyObject *args, Py
 
     Py_RETURN_NONE;
 }
-/*
-static PyObject *RasterGIS_SpatialLocation(PyObject *self, PyObject *args) {
+
+static PyObject *RasterGIS_SpatialLocation(PyObject *self, PyObject *args, PyObject *keywds)
+{
     const char *inputImage, *eastingsField, *northingsField;
+    unsigned int ratBand = 1;
+    static char *kwlist[] = {"clumps", "eastings", "northings","ratband", NULL};
 
-    if(!PyArg_ParseTuple(args, "sss:spatialLocation", &inputImage, &eastingsField, &northingsField))
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "sss|I:spatialLocation", kwlist, &inputImage, &eastingsField, &northingsField, &ratBand))
+    {
         return NULL;
+    }
 
-    try {
-        rsgis::cmds::executeSpatialLocation(std::string(inputImage), std::string(eastingsField), std::string(northingsField));
-    } catch (rsgis::cmds::RSGISCmdException &e) {
+    try
+    {
+        rsgis::cmds::executeSpatialLocation(std::string(inputImage), ratBand, std::string(eastingsField), std::string(northingsField));
+    }
+    catch (rsgis::cmds::RSGISCmdException &e)
+    {
         PyErr_SetString(GETSTATE(self)->error, e.what());
         return NULL;
     }
 
     Py_RETURN_NONE;
 }
-*/
+
 static PyObject *RasterGIS_PopulateRATWithStats(PyObject *self, PyObject *args, PyObject *keywds)
 {
     const char *inputImage, *clumpsImage;
@@ -1300,14 +1308,15 @@ static PyMethodDef RasterGISMethods[] = {
 "   fields = ['NIRAvg', 'BlueAvg', 'GreenAvg', 'RedAvg']\n"
 "   rastergis.copyGDALATTColumns(image, table, fields)\n"
 "\n"},
-/*
-   {"spatialLocation", RasterGIS_SpatialLocation, METH_VARARGS,
-"rastergis.spatialLocation(inputImage, eastingsField, northingsField)\n"
+
+{"spatialLocation", (PyCFunction)RasterGIS_SpatialLocation, METH_VARARGS | METH_KEYWORDS,
+"rastergis.spatialLocation(clumps=string, eastings=string, northings=string, ratband=int)\n"
 "Adds spatial location columns to the attribute table\n"
 "Where:\n"
 "* inputImage is a string containing the name of the input image file\n"
 "* eastingsField is a string containing the name of the eastings field\n"
 "* northingsField is a string containing the name of the northings field\n"
+"* ratband is an integer containing the band number for the RAT (Optional, default = 1)\n"
 "\n"
 "Example::\n"
 "\n"
@@ -1317,7 +1326,7 @@ static PyMethodDef RasterGISMethods[] = {
 "   northings = 'Northing'\n"
 "   rastergis.spatialLocation(image, eastings, northings)\n"
 "\n"},
-*/
+    
     {"populateRATWithStats", (PyCFunction)RasterGIS_PopulateRATWithStats, METH_VARARGS | METH_KEYWORDS,
 "rsgislib.rastergis.populateRATWithStats(valsimage=string, clumps=string, bandstats=rsgislib.rastergis.BandAttStats, ratband=int)\n"
 "Populates an attribute table with statistics from an input values image.\n"
