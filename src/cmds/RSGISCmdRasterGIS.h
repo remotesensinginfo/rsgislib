@@ -146,7 +146,7 @@ namespace rsgis{ namespace cmds {
     void executeCopyGDALATTColumns(std::string inputImage, std::string clumpsImage, std::vector<std::string> fields, int ratBand=1)throw(RSGISCmdException);
 
     /** Function for adding spatial location columns to the attribute table */
-    //void executeSpatialLocation(std::string inputImage, std::string eastingsField, std::string northingsField)throw(RSGISCmdException);
+    void executeSpatialLocation(std::string inputImage, unsigned int ratBand, std::string eastingsField, std::string northingsField)throw(RSGISCmdException);
 
     /** Function for populating an attribute table from an image */
     void executePopulateRATWithStats(std::string inputImage, std::string clumpsImage, std::vector<rsgis::cmds::RSGISBandAttStatsCmds*> *bandStatsCmds, unsigned int ratBand)throw(RSGISCmdException);
