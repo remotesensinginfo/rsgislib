@@ -343,8 +343,8 @@ class RSGISTests:
         print("PYTHON TEST: copyGDALATTColumns")
         table = "./RATS/injune_p142_casi_sub_utm_clumps_elim_final_clumps_elim_final.kea"
         image = "./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_cpcols.kea"
-        fields = ["NIRAvg", "BlueAvg", "GreenAvg", "RedAvg"]
-        rastergis.copyGDALATTColumns(image, table, fields)
+        fields = ["BlueAvg", "GreenAvg", "RedAvg"]
+        rastergis.copyGDALATTColumns(table, image, fields)
     """
     def testSpatialLocation(self):
         print("PYTHON TEST: spatialLocation")
