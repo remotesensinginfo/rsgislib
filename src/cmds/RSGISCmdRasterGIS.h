@@ -32,7 +32,7 @@
 #include "RSGISCmdException.h"
 
 namespace rsgis{ namespace cmds {
-/*
+
     enum SpectralDistanceMethodCmds
     {
         stdEucSpecDist,
@@ -68,7 +68,7 @@ namespace rsgis{ namespace cmds {
         rsgis_roundness = 15,
         rsgis_shapeindex = 16
     };
-*/
+
     struct RSGISBandAttStatsCmds
     {
         unsigned int band;
@@ -135,12 +135,12 @@ namespace rsgis{ namespace cmds {
         int blue;
         int alpha;
     };
-    */
+ */
     /** Function to populate statics for thermatic images */
     void executePopulateStats(std::string clumpsImage, bool addColourTable2Img, bool calcImgPyramids, bool ignoreZero, unsigned int ratBand)throw(RSGISCmdException);
 
     /** Function for copying a GDAL RAT from one image to anoother */
-    //void executeCopyRAT(std::string inputImage, std::string clumpsImage)throw(RSGISCmdException);
+    void executeCopyRAT(std::string inputImage, std::string clumpsImage, int ratBand=1)throw(RSGISCmdException);
 
     /** Function for copying GDAL RAT columns from one image to another */
     //void executeCopyGDALATTColumns(std::string inputImage, std::string clumpsImage, std::vector<std::string> fields)throw(RSGISCmdException);
@@ -161,7 +161,7 @@ namespace rsgis{ namespace cmds {
     //void executeCopyCategoriesColours(std::string categoriesImage, std::string clumpsImage, std::string classField)throw(RSGISCmdException);
 
     /** Function for exporting columns of the attribute table as GDAL images */
-    //void executeExportCols2GDALImage(std::string inputImage, std::string outputFile, std::string imageFormat, RSGISLibDataType outDataType, std::vector<std::string> fields)throw(RSGISCmdException);
+    void executeExportCols2GDALImage(std::string inputImage, std::string outputFile, std::string imageFormat, RSGISLibDataType outDataType, std::vector<std::string> fields, int ratBand=1)throw(RSGISCmdException);
 
     /** Function for calculating the euclidean distance from a feature to all other features */
     //void executeEucDistFromFeature(std::string inputImage, size_t fid, std::string outputField, std::vector<std::string> fields)throw(RSGISCmdException);
@@ -176,7 +176,7 @@ namespace rsgis{ namespace cmds {
     //void executeKnnMajorityClassifier(std::string inputImage, std::string inClassNameField, std::string outClassNameField, std::string trainingSelectCol, std::string eastingsField, std::string northingsField, std::string areaField, std::string majWeightField, std::vector<std::string> fields, unsigned int nFeatures, float distThreshold, float weightA, void *majorMethod)throw(RSGISCmdException);
 
     /** Function to export columns from a GDAL RAT to ascii */
-    //void executeExport2Ascii(std::string inputImage, std::string outputFile, std::vector<std::string> fields)throw(RSGISCmdException);
+    void executeExport2Ascii(std::string inputImage, std::string outputFile, std::vector<std::string> fields, int ratBand=1)throw(RSGISCmdException);
 
     /** Function to translate a set of classes to another */
     //void executeClassTranslate(std::string inputImage, std::string classInField, std::string classOutField, std::map<size_t, size_t> classPairs)throw(RSGISCmdException);
