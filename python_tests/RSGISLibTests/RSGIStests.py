@@ -338,14 +338,14 @@ class RSGISTests:
         table = "./RATS/injune_p142_casi_sub_utm_clumps_elim_final_clumps_elim_final.kea"
         image = "./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_cptab.kea"
         rastergis.copyRAT(image, table)
-    """
+
     def testCopyGDLATTColumns(self):
         print("PYTHON TEST: copyGDALATTColumns")
         table = "./RATS/injune_p142_casi_sub_utm_clumps_elim_final_clumps_elim_final.kea"
         image = "./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_cpcols.kea"
         fields = ["NIRAvg", "BlueAvg", "GreenAvg", "RedAvg"]
         rastergis.copyGDALATTColumns(image, table, fields)
-
+    """
     def testSpatialLocation(self):
         print("PYTHON TEST: spatialLocation")
         image = "./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_spatloc_eucdist.kea"
@@ -862,9 +862,10 @@ if __name__ == '__main__':
     if testLibraries == 'all' or testLibraries == 'rastergis':
     
         """ RasterGIS functions """
-        
+        t.testCopyGDLATTColumns()
+        exit()
         t.tryFuncAndCatch(t.testCopyGDLATT)
-        #t.tryFuncAndCatch(t.testCopyGDLATTColumns)
+        t.tryFuncAndCatch(t.testCopyGDLATTColumns)
         #t.tryFuncAndCatch(t.testSpatialLocation)
         #t.tryFuncAndCatch(t.testEucDistFromFeat)
         #t.tryFuncAndCatch(t.testFindTopN)

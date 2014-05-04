@@ -119,7 +119,7 @@ namespace rsgis{namespace rastergis{
     {
     public:
         RSGISRasterAttUtils();
-        void copyAttColumns(GDALDataset *inImage, GDALDataset *outImage, std::vector<std::string> fields) throw(RSGISAttributeTableException);
+        void copyAttColumns(GDALDataset *inImage, GDALDataset *outImage, std::vector<std::string> fields, int ratBand=1) throw(RSGISAttributeTableException);
         void copyColourForCats(GDALDataset *catsImage, GDALDataset *classImage, std::string classField) throw(RSGISAttributeTableException);
         void exportColumns2ASCII(GDALDataset *inImage, std::string outputFile, std::vector<std::string> fields, int ratBand=1) throw(RSGISAttributeTableException);
         void translateClasses(GDALDataset *inImage, std::string classInField, std::string classOutField, std::map<size_t, size_t> classPairs) throw(RSGISAttributeTableException);

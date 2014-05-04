@@ -133,8 +133,9 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
-    /*
-    void executeCopyGDALATTColumns(std::string inputImage, std::string clumpsImage, std::vector<std::string> fields)throw(RSGISCmdException) {
+
+    void executeCopyGDALATTColumns(std::string inputImage, std::string clumpsImage, std::vector<std::string> fields, int ratBand) throw(RSGISCmdException)
+    {
         try
         {
             GDALAllRegister();
@@ -153,9 +154,9 @@ namespace rsgis{ namespace cmds {
             }
 
             rsgis::rastergis::RSGISRasterAttUtils attUtils;
-            attUtils.copyAttColumns(inputDataset, outRATDataset, fields);
+            attUtils.copyAttColumns(inputDataset, outRATDataset, fields, ratBand);
 
-            outRATDataset->GetRasterBand(1)->SetMetadataItem("LAYER_TYPE", "thematic");
+            outRATDataset->GetRasterBand(ratBand)->SetMetadataItem("LAYER_TYPE", "thematic");
 
             GDALClose(inputDataset);
             GDALClose(outRATDataset);
@@ -170,7 +171,7 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
-
+    /*
     void executeSpatialLocation(std::string inputImage, std::string eastingsField, std::string northingsField)throw(RSGISCmdException) {
         try
         {
