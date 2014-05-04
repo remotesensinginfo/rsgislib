@@ -81,6 +81,7 @@ class RSGISTests:
         os.system('cp ./RATS/injune_p142_casi_sub_utm_segs.kea ./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_borlen.kea')
         os.system('cp ./RATS/injune_p142_casi_sub_utm_segs.kea ./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_shape.kea')
         os.system('cp ./RATS/injune_p142_casi_sub_utm_segs.kea ./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_col.kea')
+        os.system('cp ./RATS/injune_p142_casi_sub_utm_segs.kea ./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_col_str.kea')
         os.system('cp ./Rasters/injune_p142_casi_sub_utm.kea ./TestOutputs/injune_p142_casi_sub_utm.kea')
         
         os.system('cp ./RATS/injune_p142_casi_sub_utm_segs_nostats.kea ./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_nostats_addstats.kea')
@@ -428,6 +429,16 @@ class RSGISTests:
         colourCat = collections.namedtuple('ColourCat', ['red', 'green', 'blue', 'alpha'])
         classcolours[0] = colourCat(red=200, green=50, blue=50, alpha=255)
         classcolours[1] = colourCat(red=200, green=240, blue=50, alpha=255)
+        rastergis.colourClasses(clumps, field, classcolours)
+        
+    def testExportColourClassesStr(self):
+        print("PYTHON TEST: colourClasses (String)")
+        clumps='./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_col_str.kea'
+        field = 'outClassStr'
+        classcolours = {}
+        colourCat = collections.namedtuple('ColourCat', ['red', 'green', 'blue', 'alpha'])
+        classcolours['ClassA'] = colourCat(red=200, green=50, blue=50, alpha=255)
+        classcolours['ClassB'] = colourCat(red=200, green=240, blue=50, alpha=255)
         rastergis.colourClasses(clumps, field, classcolours)
     """
     def testFindNeighbours(self):
@@ -876,6 +887,7 @@ if __name__ == '__main__':
         t.tryFuncAndCatch(t.testCopyGDLATT)
         t.tryFuncAndCatch(t.testCopyGDLATTColumns)
         t.tryFuncAndCatch(t.testExportColourClasses)
+        t.tryFuncAndCatch(t.testExportColourClassesStr)
         #t.tryFuncAndCatch(t.testSpatialLocation)
         #t.tryFuncAndCatch(t.testEucDistFromFeat)
         #t.tryFuncAndCatch(t.testFindTopN)

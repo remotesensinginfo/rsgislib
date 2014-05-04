@@ -9,8 +9,6 @@ Utilities
 ---------
 .. autofunction:: rsgislib.rastergis.ratutils.populateImageStats
 
-
-
 Attribute Segments
 -------------------
 
@@ -50,7 +48,6 @@ Copy & Export
 Colour Tables
 ---------------
 .. autofunction:: rsgislib.rastergis.colourClasses
-.. autofunction:: rsgislib.rastergis.colourStrClasses
 .. autofunction:: rsgislib.rastergis.generateColourTable
 .. autofunction:: rsgislib.rastergis.copyCategoriesColours
 
