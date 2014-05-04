@@ -43,7 +43,7 @@ Classification
 Copy & Export
 ----------------
 .. autofunction:: rsgislib.rastergis.export2Ascii
-.. autofunction:: rsgislib.rastergis.exportCols2GDALImage
+.. autofunction:: rsgislib.rastergis.exportCol2GDALImage
 .. autofunction:: rsgislib.rastergis.copyGDALATTColumns
 .. autofunction:: rsgislib.rastergis.copyRAT
 

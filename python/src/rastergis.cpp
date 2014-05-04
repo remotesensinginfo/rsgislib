@@ -413,34 +413,25 @@ static PyObject *RasterGIS_CopyCategoriesColours(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 */
-static PyObject *RasterGIS_ExportCols2GDALImage(PyObject *self, PyObject *args, PyObject *keywds) 
+static PyObject *RasterGIS_ExportCol2GDALImage(PyObject *self, PyObject *args, PyObject *keywds) 
 {
-    const char *inputImage, *outputFile, *imageFormat;
+    const char *inputImage, *outputFile, *imageFormat, *field;
     int dataType;
     int ratBand = 1;
     PyObject *pFields;
 
-    static char *kwlist[] = {"clumps", "outimage", "gdalformat", "datatype", "fields", "ratband", NULL};
+    static char *kwlist[] = {"clumps", "outimage", "gdalformat", "datatype", "field", "ratband", NULL};
 
-    if(!PyArg_ParseTupleAndKeywords(args, keywds, "sssiO|i:ExportCols2GDALImage", kwlist, &inputImage, &outputFile, &imageFormat, &dataType, &pFields, &ratBand))
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "sssis|i:exportCol2GDALImage", kwlist, &inputImage, &outputFile, &imageFormat, &dataType, &field, &ratBand))
     {
         return NULL;
     }
 
-    if(!PySequence_Check(pFields)) 
-    {
-        PyErr_SetString(GETSTATE(self)->error, "last argument must be a sequence");
-        return NULL;
-    }
-
-    rsgis::RSGISLibDataType type = (rsgis::RSGISLibDataType)dataType;
-
-    std::vector<std::string> fields = ExtractVectorStringFromSequence(pFields);
-    if(fields.size() == 0) { return NULL; }
+    rsgis::RSGISLibDataType type = (rsgis::RSGISLibDataType) dataType;
 
     try 
     {
-        rsgis::cmds::executeExportCols2GDALImage(std::string(inputImage), std::string(outputFile), std::string(imageFormat), type, fields, ratBand);
+        rsgis::cmds::executeExportCols2GDALImage(std::string(inputImage), std::string(outputFile), std::string(imageFormat), type, std::string(field), ratBand);
     }
     catch (rsgis::cmds::RSGISCmdException &e) 
     {
@@ -1379,8 +1370,8 @@ static PyMethodDef RasterGISMethods[] = {
 "* outColsName is a string containing the name of the class field\n"
 "\n"},
 */
-   {"exportCols2GDALImage", (PyCFunction)RasterGIS_ExportCols2GDALImage, METH_VARARGS | METH_KEYWORDS,
-"rastergis.exportCols2GDALImage(clumps, outimage, gdalformat, datatype, fields,ratband=1)\n"
+   {"exportCol2GDALImage", (PyCFunction)RasterGIS_ExportCol2GDALImage, METH_VARARGS | METH_KEYWORDS,
+"rastergis.exportCol2GDALImage(clumps, outimage, gdalformat, datatype, field, ratband=1)\n"
 "Exports columns of the raster attribute table as bands in a GDAL image.\n"
 "Where:\n"
 "\n"
@@ -1388,7 +1379,7 @@ static PyMethodDef RasterGISMethods[] = {
 "* outimage is a string containing the name of the output gdal file\n"
 "* gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
 "* datatype is an int containing one of the values from rsgislib.TYPE_*\n"
-"* fields is a sequence of strings, providing the columns to be exported.\n"
+"* field is a strings, providing the name of the column to be exported.\n"
 "* ratband is an optional (default = 1) integer parameter specifying the image band to which the RAT is associated."
 "\n"
 "Example::\n"
@@ -1397,8 +1388,8 @@ static PyMethodDef RasterGISMethods[] = {
 "   outimage='./TestOutputs/RasterGIS/injune_p142_casi_rgb_export.kea'\n"
 "   gdalformat = 'KEA'\n"
 "   datatype = rsgislib.TYPE_32FLOAT\n"
-"   fields = ['BlueAvg', 'GreenAvg', 'RedAvg']\n"
-"   rastergis.exportCols2GDALImage(clumps, outimage, gdalformat, datatype, fields)"
+"   field = 'RedAvg'\n"
+"   rastergis.ExportCol2GDALImage(clumps, outimage, gdalformat, datatype, field)"
 "\n"},
 /*
    {"eucDistFromFeature", RasterGIS_EucDistFromFeature, METH_VARARGS,

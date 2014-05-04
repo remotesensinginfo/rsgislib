@@ -400,7 +400,7 @@ namespace rsgis{ namespace cmds {
         }
     }
     */
-    void executeExportCols2GDALImage(std::string inputImage, std::string outputFile, std::string imageFormat, RSGISLibDataType outDataType, std::vector<std::string> fields, int ratBand) throw(RSGISCmdException)
+    void executeExportCols2GDALImage(std::string inputImage, std::string outputFile, std::string imageFormat, RSGISLibDataType outDataType, std::string field, int ratBand) throw(RSGISCmdException)
     {
         try
         {
@@ -414,21 +414,19 @@ namespace rsgis{ namespace cmds {
             }
 
             rsgis::rastergis::RSGISRasterAttUtils attUtils;
-            const GDALRasterAttributeTable *gdalATT = inputDataset->GetRasterBand(ratBand)->GetDefaultRAT();
+            GDALRasterAttributeTable *gdalATT = inputDataset->GetRasterBand(ratBand)->GetDefaultRAT();
 
-            std::vector<unsigned int> *colIdxs = new std::vector<unsigned int>();
-            std::string *bandNames = new std::string[fields.size()];
-            unsigned int i = 0;
-            for(std::vector<std::string>::iterator iterFields = fields.begin(); iterFields != fields.end(); ++iterFields)
-            {
-                bandNames[i] = *iterFields;
-                colIdxs->push_back(attUtils.findColumnIndex(gdalATT, *iterFields));
-                ++i;
-            }
+            std::string *bandNames = new std::string[1];
+            bandNames[0] = field;
+            
+            // Get column intex in RAT
+            unsigned int columnIndex = attUtils.findColumnIndex(gdalATT, field);
 
-            rsgis::rastergis::RSGISExportColumns2ImageCalcImage *calcImageVal = new rsgis::rastergis::RSGISExportColumns2ImageCalcImage(fields.size(), gdalATT, colIdxs);
+            rsgis::rastergis::RSGISExportColumns2ImageCalcImage *calcImageVal = new rsgis::rastergis::RSGISExportColumns2ImageCalcImage(1, gdalATT, columnIndex);
             rsgis::img::RSGISCalcImage calcImage(calcImageVal);
-            calcImage.calcImage(&inputDataset, 1, outputFile, true, bandNames, imageFormat, RSGIS_to_GDAL_Type(outDataType));
+            
+            calcImage.calcImage(&inputDataset, 1, 0, outputFile, true, bandNames, imageFormat, RSGIS_to_GDAL_Type(outDataType));
+            
             delete calcImageVal;
             delete[] bandNames;
 
