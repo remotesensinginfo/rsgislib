@@ -29,14 +29,14 @@ namespace rsgis{namespace rastergis{
         
     }
     
-    void RSGISRasterAttUtils::copyAttColumns(GDALDataset *inImage, GDALDataset *outImage, std::vector<std::string> fields) throw(RSGISAttributeTableException)
+    void RSGISRasterAttUtils::copyAttColumns(GDALDataset *inImage, GDALDataset *outImage, std::vector<std::string> fields, int ratBand) throw(RSGISAttributeTableException)
     {
         try 
         {
             std::cout << "Import attribute tables to memory.\n";
-            const GDALRasterAttributeTable *gdalAttIn = inImage->GetRasterBand(1)->GetDefaultRAT();
-            GDALRasterAttributeTable *gdalAttOut = NULL;//new GDALRasterAttributeTable(*outImage->GetRasterBand(1)->GetDefaultRAT());
-            const GDALRasterAttributeTable *gdalAttOutTmp = outImage->GetRasterBand(1)->GetDefaultRAT();
+            GDALRasterAttributeTable *gdalAttIn = inImage->GetRasterBand(ratBand)->GetDefaultRAT();
+            GDALRasterAttributeTable *gdalAttOut = NULL;
+            GDALRasterAttributeTable *gdalAttOutTmp = outImage->GetRasterBand(ratBand)->GetDefaultRAT();
             
             if((gdalAttOutTmp == NULL) || (gdalAttOutTmp->GetRowCount() == 0))
             {
@@ -137,33 +137,96 @@ namespace rsgis{namespace rastergis{
             }
             
             std::cout << "Copying columns to the new attribute table\n";
-            for(int i = 0; i < gdalAttIn->GetRowCount(); ++i)
+            // Allocate arrays to store blocks of data
+            int nRows = gdalAttIn->GetRowCount();
+            
+            int *blockDataInt = new int[RAT_BLOCK_LENGTH];
+            double *blockDataReal = new double[RAT_BLOCK_LENGTH];
+            char **blockDataStr = new char*[RAT_BLOCK_LENGTH];
+   
+            // Itterate through blocks
+            int nBlocks = floor(((double) nRows) / ((double) RAT_BLOCK_LENGTH));
+            int remainRows = nRows - (nBlocks * RAT_BLOCK_LENGTH );
+            
+            int feedback = nBlocks/10.0;
+            int feedbackCounter = 0;
+            
+            std::cout << "Started " << std::flush;
+            
+            int rowOffset = 0;
+            for(int i = 0; i < nBlocks; i++)
             {
+                rowOffset =  RAT_BLOCK_LENGTH * i;
+                
+                if((feedback != 0) && ((i % feedback) == 0))
+                {
+                    std::cout << "." << feedbackCounter << "." << std::flush;
+                    feedbackCounter = feedbackCounter + 10;
+                }
+                
                 for(size_t j = 0; j < fields.size(); ++j)
                 {
+                    // For each column read a block of data from the input RAT and write to the output RAT
                     if(gdalAttIn->GetTypeOfCol(colInIdxs[j]) == GFT_Integer)
                     {
-                        gdalAttOut->SetValue(i, colOutIdxs[j], gdalAttIn->GetValueAsInt(i, colInIdxs[j]));
+                        gdalAttIn->ValuesIO(GF_Read, colInIdxs[j], rowOffset, RAT_BLOCK_LENGTH, blockDataInt);
+                        gdalAttOut->ValuesIO(GF_Write, colOutIdxs[j], rowOffset, RAT_BLOCK_LENGTH, blockDataInt);
                     }
                     else if(gdalAttIn->GetTypeOfCol(colInIdxs[j]) == GFT_Real)
                     {
-                        gdalAttOut->SetValue(i, colOutIdxs[j], gdalAttIn->GetValueAsDouble(i, colInIdxs[j]));
+                        gdalAttIn->ValuesIO(GF_Read, colInIdxs[j], rowOffset, RAT_BLOCK_LENGTH, blockDataReal);
+                        gdalAttOut->ValuesIO(GF_Write, colOutIdxs[j], rowOffset, RAT_BLOCK_LENGTH, blockDataReal);
                     }
                     else if(gdalAttIn->GetTypeOfCol(colInIdxs[j]) == GFT_String)
                     {
-                        gdalAttOut->SetValue(i, colOutIdxs[j], gdalAttIn->GetValueAsString(i, colInIdxs[j]));
+                        gdalAttIn->ValuesIO(GF_Read, colInIdxs[j], rowOffset, RAT_BLOCK_LENGTH, blockDataStr);
+                        gdalAttOut->ValuesIO(GF_Write, colOutIdxs[j], rowOffset, RAT_BLOCK_LENGTH, blockDataStr);
                     }
                     else
                     {
                         throw rsgis::RSGISAttributeTableException("Column data type was not recognised.");
                     }
                 }
+        
             }
+            if(remainRows > 0)
+            {
+                rowOffset =  RAT_BLOCK_LENGTH * nBlocks;
+                
+                for(size_t j = 0; j < fields.size(); ++j)
+                {
+                    // For each column read a block of data from the input RAT and write to the output RAT
+                    if(gdalAttIn->GetTypeOfCol(colInIdxs[j]) == GFT_Integer)
+                    {
+                        gdalAttIn->ValuesIO(GF_Read, colInIdxs[j], rowOffset, remainRows, blockDataInt);
+                        gdalAttOut->ValuesIO(GF_Write, colOutIdxs[j], rowOffset, remainRows, blockDataInt);
+                    }
+                    else if(gdalAttIn->GetTypeOfCol(colInIdxs[j]) == GFT_Real)
+                    {
+                        gdalAttIn->ValuesIO(GF_Read, colInIdxs[j], rowOffset, remainRows, blockDataReal);
+                        gdalAttOut->ValuesIO(GF_Write, colOutIdxs[j], rowOffset, remainRows, blockDataReal);
+                    }
+                    else if(gdalAttIn->GetTypeOfCol(colInIdxs[j]) == GFT_String)
+                    {
+                        gdalAttIn->ValuesIO(GF_Read, colInIdxs[j], rowOffset, remainRows, blockDataStr);
+                        gdalAttOut->ValuesIO(GF_Write, colOutIdxs[j], rowOffset, remainRows, blockDataStr);
+                    }
+                    else
+                    {
+                        throw rsgis::RSGISAttributeTableException("Column data type was not recognised.");
+                    }
+                }
+                
+            }
+
+            // Tidy up
+            delete[] blockDataInt;
+            delete[] blockDataReal;
+            delete[] blockDataReal;
             
             std::cout << "Adding RAT to output file.\n";
-            outImage->GetRasterBand(1)->SetDefaultRAT(gdalAttOut);
-            
-            
+            outImage->GetRasterBand(ratBand)->SetDefaultRAT(gdalAttOut);
+  
         }
         catch (RSGISAttributeTableException &e)
         {

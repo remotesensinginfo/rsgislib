@@ -104,7 +104,7 @@ static PyObject *RasterGIS_CopyRAT(PyObject *self, PyObject *args, PyObject *key
     int ratBand = 1;
     static char *kwlist[] = {"clumps", "outimage", "ratband", NULL};
 
-    if(!PyArg_ParseTupleAndKeywords(args, keywds,"ss|i:copyRAT", kwlist, &inputImage, &clumpsImage))
+    if(!PyArg_ParseTupleAndKeywords(args, keywds,"ss|i:copyRAT", kwlist, &inputImage, &clumpsImage, &ratBand))
         return NULL;
 
     try 
@@ -119,12 +119,15 @@ static PyObject *RasterGIS_CopyRAT(PyObject *self, PyObject *args, PyObject *key
 
     Py_RETURN_NONE;
 }
-/*
-static PyObject *RasterGIS_CopyGDALATTColumns(PyObject *self, PyObject *args) {
+
+static PyObject *RasterGIS_CopyGDALATTColumns(PyObject *self, PyObject *args, PyObject *keywds)
+{
     const char *clumpsImage, *inputImage;
     PyObject *pFields;
+    int ratBand = 1;
+    static char *kwlist[] = {"clumps", "outimage", "fields","ratband", NULL};
 
-    if(!PyArg_ParseTuple(args, "ssO:copyGDALATTColumns", &inputImage, &clumpsImage, &pFields))
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "ssO|i:copyGDALATTColumns", kwlist, &inputImage, &clumpsImage, &pFields, &ratBand))
         return NULL;
 
     if(!PySequence_Check(pFields)) {
@@ -136,16 +139,19 @@ static PyObject *RasterGIS_CopyGDALATTColumns(PyObject *self, PyObject *args) {
     if(fields.size() == 0) { return NULL; }
 
 
-    try {
-        rsgis::cmds::executeCopyGDALATTColumns(std::string(inputImage), std::string(clumpsImage), fields);
-    } catch (rsgis::cmds::RSGISCmdException &e) {
+    try 
+    {
+        rsgis::cmds::executeCopyGDALATTColumns(std::string(inputImage), std::string(clumpsImage), fields, ratBand);
+    }
+    catch (rsgis::cmds::RSGISCmdException &e) 
+    {
         PyErr_SetString(GETSTATE(self)->error, e.what());
         return NULL;
     }
 
     Py_RETURN_NONE;
 }
-
+/*
 static PyObject *RasterGIS_SpatialLocation(PyObject *self, PyObject *args) {
     const char *inputImage, *eastingsField, *northingsField;
 
@@ -1259,6 +1265,7 @@ static PyMethodDef RasterGISMethods[] = {
 "\n"
 "* clumps is a string containing the name of the input file with RAT\n"
 "* outimage is a string containing the name of the output file to add the RAT to\n"
+"* ratband is an optional (default = 1) integer parameter specifying the image band to which the RAT is associated."
 "\n"
 "Example::\n"
 "\n"
@@ -1267,15 +1274,16 @@ static PyMethodDef RasterGISMethods[] = {
 "   outimage = './TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_cptab.kea'\n"
 "   rastergis.copyRAT(clumps, outimage)\n"
 "\n"},
-/*
-    {"copyGDALATTColumns", RasterGIS_CopyGDALATTColumns, METH_VARARGS,
-"rastergis.copyGDALATTColumns(inputImage, clumpsImage, fields)\n"
+
+    {"copyGDALATTColumns", (PyCFunction)RasterGIS_CopyGDALATTColumns, METH_VARARGS | METH_KEYWORDS,
+"rastergis.copyGDALATTColumns(clumps, outimage, fields, ratband=1)\n"
 "Copies GDAL RAT columns from one image to another\n"
 "Where:\n"
 "\n"
-"* inputImage is a string containing the name of the input image file\n"
-"* clumpsImage is a string containing the name of the input clump file\n"
-"* fields is a sequence of strings containing the names of the fields TODO: expand"
+"* clumps is a string containing the name of the input image file\n"
+"* outimage is a string containing the name of the input clump file\n"
+"* fields is a sequence of strings containing the names of the fields to copy"
+"* ratband is an optional (default = 1) integer parameter specifying the image band to which the RAT is associated."
 "\n"
 "Example::\n"
 "\n"
@@ -1285,7 +1293,7 @@ static PyMethodDef RasterGISMethods[] = {
 "   fields = ['NIRAvg', 'BlueAvg', 'GreenAvg', 'RedAvg']\n"
 "   rastergis.copyGDALATTColumns(image, table, fields)\n"
 "\n"},
-
+/*
    {"spatialLocation", RasterGIS_SpatialLocation, METH_VARARGS,
 "rastergis.spatialLocation(inputImage, eastingsField, northingsField)\n"
 "Adds spatial location columns to the attribute table\n"
@@ -1382,6 +1390,15 @@ static PyMethodDef RasterGISMethods[] = {
 "* datatype is an int containing one of the values from rsgislib.TYPE_*\n"
 "* fields is a sequence of strings, providing the columns to be exported.\n"
 "* ratband is an optional (default = 1) integer parameter specifying the image band to which the RAT is associated."
+"\n"
+"Example::\n"
+"\n"
+"   clumps='./RATS/injune_p142_casi_sub_utm_clumps_elim_final_clumps_elim_final.kea'\n"
+"   outimage='./TestOutputs/RasterGIS/injune_p142_casi_rgb_export.kea'\n"
+"   gdalformat = 'KEA'\n"
+"   datatype = rsgislib.TYPE_32FLOAT\n"
+"   fields = ['BlueAvg', 'GreenAvg', 'RedAvg']\n"
+"   rastergis.exportCols2GDALImage(clumps, outimage, gdalformat, datatype, fields)"
 "\n"},
 /*
    {"eucDistFromFeature", RasterGIS_EucDistFromFeature, METH_VARARGS,
