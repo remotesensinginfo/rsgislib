@@ -862,8 +862,6 @@ if __name__ == '__main__':
     if testLibraries == 'all' or testLibraries == 'rastergis':
     
         """ RasterGIS functions """
-        t.testCopyGDLATTColumns()
-        exit()
         t.tryFuncAndCatch(t.testCopyGDLATT)
         t.tryFuncAndCatch(t.testCopyGDLATTColumns)
         #t.tryFuncAndCatch(t.testSpatialLocation)
