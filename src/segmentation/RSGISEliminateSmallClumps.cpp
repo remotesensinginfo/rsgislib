@@ -1933,28 +1933,24 @@ namespace rsgis{namespace segment{
     }
     
     
-    /*
-    RSGISRemoveClumpsBelowThreshold::RSGISRemoveClumpsBelowThreshold(float threshold, const GDALRasterAttributeTable *rat, unsigned int colID): rsgis::img::RSGISCalcImageValue(1)
+    RSGISRemoveClumpsBelowThreshold::RSGISRemoveClumpsBelowThreshold(float threshold, int *clumpHisto, size_t numHistVals): rsgis::img::RSGISCalcImageValue(1)
     {
         this->threshold = threshold;
-        this->rat = rat;
-        this->colID = colID;
+        this->clumpHisto = clumpHisto;
+        this->numHistVals = numHistVals;
     }
     
-    void RSGISRemoveClumpsBelowThreshold::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISRemoveClumpsBelowThreshold::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, float *output) throw(rsgis::img::RSGISImageCalcException)
     {
         try
         {
-            if(bandValues[0] > 0)
+            if(intBandValues[0] > 0)
             {
-                size_t fid = boost::lexical_cast<size_t>(bandValues[0]);
-                
-                float area = rat->GetValueAsDouble(fid, colID);
-                //std::cout << "Area = " << area << std::endl;
-                //std::cout << "Threshold = " << this->threshold << std::endl;
-                if(area > this->threshold)
+                size_t fid = boost::lexical_cast<size_t>(intBandValues[0]);
+
+                if(clumpHisto[fid] > this->threshold)
                 {
-                    output[0] = bandValues[0];
+                    output[0] = intBandValues[0];
                 }
                 else
                 {
@@ -1988,7 +1984,6 @@ namespace rsgis{namespace segment{
     {
         
     }
-     */
     
 }}
 
