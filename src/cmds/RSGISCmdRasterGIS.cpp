@@ -37,6 +37,7 @@
 #include "rastergis/RSGISCalcImageStatsAndPyramids.h"
 #include "rastergis/RSGISPopRATWithStats.h"
 #include "rastergis/RSGISCalcClusterLocation.h"
+#include "rastergis/RSGISFindClumpNeighbours.h"
 
 /*
 #include "rastergis/RSGISRasterAttUtils.h"
@@ -52,7 +53,7 @@
 #include "rastergis/RSGISFindInfoBetweenLayers.h"
 #include "rastergis/RSGISMaxLikelihoodRATClassification.h"
 #include "rastergis/RSGISClassMask.h"
-#include "rastergis/RSGISFindClumpNeighbours.h"
+
 #include "rastergis/RSGISClumpBorders.h"
 #include "rastergis/RSGISCalcClumpShapeParameters.h"
 #include "rastergis/RSGISDefineImageTiles.h"
@@ -802,48 +803,59 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
-
-    void executeFindNeighbours(std::string inputImage)throw(RSGISCmdException) {
+*/
+    void executeFindNeighbours(std::string inputImage, unsigned int ratBand)throw(RSGISCmdException)
+    {
         GDALAllRegister();
         GDALDataset *inputDataset;
-        try {
+        try
+        {
+            std::cout << "Opening Dataset " << inputImage << std::endl;
             inputDataset = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_Update);
-            if(inputDataset == NULL) {
+            if(inputDataset == NULL)
+            {
                 std::string message = std::string("Could not open image ") + inputImage;
                 throw rsgis::RSGISImageException(message.c_str());
             }
 
             rsgis::rastergis::RSGISFindClumpNeighbours findNeighboursObj;
-            findNeighboursObj.findNeighboursKEAImageCalc(inputDataset);
+            findNeighboursObj.findNeighboursKEAImageCalc(inputDataset, ratBand);
 
             GDALClose(inputDataset);
-        } catch(rsgis::RSGISException &e) {
+        }
+        catch(rsgis::RSGISException &e)
+        {
             throw RSGISCmdException(e.what());
         }
     }
 
-    void executeFindBoundaryPixels(std::string inputImage, std::string outputFile, std::string imageFormat)throw(RSGISCmdException) {
+    void executeFindBoundaryPixels(std::string inputImage, unsigned int ratBand, std::string outputFile, std::string imageFormat)throw(RSGISCmdException)
+    {
         GDALAllRegister();
         GDALDataset *inputDataset;
-        try {
+        try
+        {
             inputDataset = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_Update);
-            if(inputDataset == NULL) {
+            if(inputDataset == NULL)
+            {
                 std::string message = std::string("Could not open image ") + inputImage;
                 throw rsgis::RSGISImageException(message.c_str());
             }
 
-            rsgis::img::RSGISCalcImageValue *findBoundaries = new rsgis::rastergis::RSGISIdentifyBoundaryPixels();
+            rsgis::img::RSGISCalcImageValue *findBoundaries = new rsgis::rastergis::RSGISIdentifyBoundaryPixels(ratBand);
             rsgis::img::RSGISCalcImage imgCalc = rsgis::img::RSGISCalcImage(findBoundaries);
 
             imgCalc.calcImageWindowData(&inputDataset, 1, outputFile, 3, imageFormat, GDT_Byte);
 
             GDALClose(inputDataset);
             delete findBoundaries;
-        } catch(rsgis::RSGISException &e) {
+        }
+        catch(rsgis::RSGISException &e)
+        {
             throw RSGISCmdException(e.what());
         }
     }
-
+/*
     void executeCalcBorderLength(std::string inputImage, bool ignoreZeroEdges, std::string outColsName)throw(RSGISCmdException) {
         GDALAllRegister();
         GDALDataset *inputDataset;

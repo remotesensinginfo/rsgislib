@@ -887,17 +887,23 @@ static PyObject *RasterGIS_ClassMask(PyObject *self, PyObject *args) {
     
     Py_RETURN_NONE;
 }
-
-static PyObject *RasterGIS_FindNeighbours(PyObject *self, PyObject *args) {
+*/
+static PyObject *RasterGIS_FindNeighbours(PyObject *self, PyObject *args)
+{
     const char *inputImage;
+    unsigned int ratBand = 1;
     
-    if(!PyArg_ParseTuple(args, "s:findNeighbours", &inputImage)) {
+    if(!PyArg_ParseTuple(args, "s|I:findNeighbours", &inputImage, &ratBand))
+    {
         return NULL;
     }
     
-    try {
-        rsgis::cmds::executeFindNeighbours(std::string(inputImage));
-    } catch (rsgis::cmds::RSGISCmdException &e) {
+    try
+    {
+        rsgis::cmds::executeFindNeighbours(std::string(inputImage), ratBand);
+    }
+    catch (rsgis::cmds::RSGISCmdException &e)
+    {
         PyErr_SetString(GETSTATE(self)->error, e.what());
         return NULL;
     }
@@ -905,23 +911,30 @@ static PyObject *RasterGIS_FindNeighbours(PyObject *self, PyObject *args) {
     Py_RETURN_NONE;
 }
 
-static PyObject *RasterGIS_FindBoundaryPixels(PyObject *self, PyObject *args) {
-    const char *inputImage, *outputFile, *imageFormat;
+static PyObject *RasterGIS_FindBoundaryPixels(PyObject *self, PyObject *args)
+{
+    const char *inputImage, *outputFile;
+    const char *imageFormat = "KEA";
+    unsigned int ratBand = 1;
     
-    if(!PyArg_ParseTuple(args, "sss:findBoundaryPixels", &inputImage, &outputFile, &imageFormat)) {
+    if(!PyArg_ParseTuple(args, "ss|sI:findBoundaryPixels", &inputImage, &outputFile, &imageFormat, &ratBand))
+    {
         return NULL;
     }
     
-    try {
-        rsgis::cmds::executeFindBoundaryPixels(std::string(inputImage), std::string(outputFile), std::string(imageFormat));
-    } catch (rsgis::cmds::RSGISCmdException &e) {
+    try
+    {
+        rsgis::cmds::executeFindBoundaryPixels(std::string(inputImage), ratBand, std::string(outputFile), std::string(imageFormat));
+    }
+    catch (rsgis::cmds::RSGISCmdException &e)
+    {
         PyErr_SetString(GETSTATE(self)->error, e.what());
         return NULL;
     }
     
     Py_RETURN_NONE;
 }
-
+/*
 static PyObject *RasterGIS_CalcBorderLength(PyObject *self, PyObject *args) {
     const char *inputImage, *outColsName;
     int iIgnoreZeroEdges;
@@ -1609,25 +1622,27 @@ static PyMethodDef RasterGISMethods[] = {
 "* gdalFormat is a string containing the GDAL format for the output file - eg 'KEA'\n"
 "* gdaltype is an int containing one of the values from rsgislib.TYPE_*\n"
 "\n"},
-    
+  */
     {"findNeighbours", RasterGIS_FindNeighbours, METH_VARARGS,
-"rastergis.findNeighbours(inputImage)\n"
+"rastergis.findNeighbours(inputImage, ratBand)\n"
 "Finds the clump neighbours from an image\n"
 "Where:\n"
 "\n"
 "* inputImage is a string containing the name of the input image file\n"
+"* ratBand is an int containing band for which the neighbours are to be calculated for (Optional, Default = 1)\n"
 "\n"},
     
     {"findBoundaryPixels", RasterGIS_FindBoundaryPixels, METH_VARARGS,
-"rastergis.findBoundaryPixels(inputImage, outputFile, gdalFormat)\n"
+"rastergis.findBoundaryPixels(inputImage, outputFile, gdalFormat, ratBand)\n"
 "Identifies the pixels on the boundary of the clumps\n"
 "Where:\n"
 "\n"
 "* inputImage is a string containing the name of the input image file\n"
 "* outputFile is a string containing the name of the output file\n"
-"* gdalFormat is a string containing the GDAL format for the output file - eg 'KEA'\n"
+"* gdalFormat is a string containing the GDAL format for the output file - (Optional, Default = 'KEA')\n"
+"* ratBand is an int containing band for which the neighbours are to be calculated for (Optional, Default = 1)\n"
 "\n"},
-    
+    /*
     {"calcBorderLength", RasterGIS_CalcBorderLength, METH_VARARGS,
 "rastergis.calcBorderLength(inputImage, ignoreZeroEdges, outColsName)\n"
 "Calculate the border length of clumps\n"
