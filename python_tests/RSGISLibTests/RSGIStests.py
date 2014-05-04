@@ -409,7 +409,7 @@ class RSGISTests:
         output="./TestOutputs/RasterGIS/injune_p142_casi_rgb_exportascii.txt"
         fields = ["BlueAvg", "GreenAvg", "RedAvg"]
         rastergis.export2Ascii(table, output, fields)
-    """
+
     def testExporCols2GDALImage(self):
         print("PYTHON TEST: exportCols2GDALImage")
         clumps="./RATS/injune_p142_casi_sub_utm_clumps_elim_final_clumps_elim_final.kea"
@@ -418,7 +418,7 @@ class RSGISTests:
         dataType = rsgislib.TYPE_32FLOAT
         fields = ["BlueAvg", "GreenAvg", "RedAvg"]
         rastergis.exportCols2GDALImage(clumps, output, gdalformat, dataType, fields)
-
+    """
     def testFindNeighbours(self):
         print("PYTHON TEST: findNeighbours")
         input = "./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_neighbours.kea"
@@ -872,7 +872,7 @@ if __name__ == '__main__':
         #t.tryFuncAndCatch(t.testPopulateRATWithStats)
         #t.tryFuncAndCatch(t.testPopulateRATWithPercentiles)
         t.tryFuncAndCatch(t.testExport2Ascii)
-        #t.tryFuncAndCatch(t.testExporCols2GDALImage)
+        t.tryFuncAndCatch(t.testExporCols2GDALImage)
         #t.tryFuncAndCatch(t.testFindNeighbours)
         #t.tryFuncAndCatch(t.testFindBoundaryPixels)
         #t.tryFuncAndCatch(t.testCalcBorderLength)
