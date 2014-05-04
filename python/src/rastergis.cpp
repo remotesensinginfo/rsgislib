@@ -392,19 +392,30 @@ static PyObject *RasterGIS_PopulateRATWithPercentiles(PyObject *self, PyObject *
     Py_RETURN_NONE;
 }
 
-/*
 
-static PyObject *RasterGIS_PopulateCategoryProportions(PyObject *self, PyObject *args) {
-    const char *clumpsImage, *categoriesImage, *outColsName, *majorityColName, *majClassNameField, *classNameField;
-    int copyClassNames;
-
-    if(!PyArg_ParseTuple(args, "ssssiss:populateCategoryProportions", &categoriesImage, &clumpsImage, &outColsName, &majorityColName, &copyClassNames, &majClassNameField, &classNameField))
+static PyObject *RasterGIS_PopulateCategoryProportions(PyObject *self, PyObject *args, PyObject *keywds)
+{
+    const char *clumpsImage, *categoriesImage, *outColsName, *majorityColName;
+    const char *majClassNameField = "";
+    const char *classNameField = "";
+    int copyClassNames = false;
+    unsigned int ratBandClumps = 1;
+    unsigned int ratBandCats = 1;
+    
+    static char *kwlist[] = {"catsimage", "clumps", "outcolsname", "majcolname", "cpclassnames", "majclassnamefield", "classnamefield", "ratbandclumps", "ratbandcats", NULL};
+    
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "ssss|issII:populateCategoryProportions", kwlist, &categoriesImage, &clumpsImage, &outColsName, &majorityColName, &copyClassNames, &majClassNameField, &classNameField, &ratBandClumps, &ratBandCats))
+    {
         return NULL;
+    }
 
-    try {
+    try
+    {
         rsgis::cmds::executePopulateCategoryProportions(std::string(categoriesImage), std::string(clumpsImage), std::string(outColsName), std::string(majorityColName),
-                                                        (copyClassNames != 0), std::string(majClassNameField), std::string(classNameField));
-    } catch (rsgis::cmds::RSGISCmdException &e) {
+                                                        (copyClassNames != 0), std::string(majClassNameField), std::string(classNameField), ratBandClumps, ratBandCats);
+    }
+    catch (rsgis::cmds::RSGISCmdException &e)
+    {
         PyErr_SetString(GETSTATE(self)->error, e.what());
         return NULL;
     }
@@ -412,6 +423,7 @@ static PyObject *RasterGIS_PopulateCategoryProportions(PyObject *self, PyObject 
     Py_RETURN_NONE;
 }
 
+/*
 static PyObject *RasterGIS_CopyCategoriesColours(PyObject *self, PyObject *args) {
     const char *clumpsImage, *categoriesImage, *classField;
 
@@ -1375,21 +1387,23 @@ static PyMethodDef RasterGISMethods[] = {
 "* histbins is an optional (default = 200) integer specifying the number of bins within the histogram (note this governs the accuracy to which percentile can be calculated).\n"
 "* ratband is an optional (default = 1) integer parameter specifying the image band to which the RAT is associated.\n"
 "\n"},
-/*
-   {"populateCategoryProportions", RasterGIS_PopulateCategoryProportions, METH_VARARGS,
-"rastergis.populateCategoryProportions(categoriesImage, clumpsImage, outColsName, majorityColName, copyClassNames, majClassNameField, classNameField)\n"
+
+   {"populateCategoryProportions", (PyCFunction)RasterGIS_PopulateCategoryProportions, METH_VARARGS | METH_KEYWORDS,
+"rastergis.populateCategoryProportions(catsimage=string, clumps=string, outcolsname=string, majcolname=string, cpclassnames=boolean, majclassnamefield=string classnamefield=string, ratbandclumps=int, ratbandcats=int)\n"
 "Populates the attribute table with the proportions of intersecting categories\n"
 "Where:\n"
 "\n"
-"* categoriesImage is a string containing the name of the categories image file TODO: check and expand\n"
-"* clumpsImage is a string containing the name of the input clump file\n"
-"* outColsName is a string\n"
-"* majorityColName is a string\n"
-"* copyClassNames is a boolean defining whether class names should be copied\n"
-"* majClassNameField is a string\n"
-"* classNameField is a string\n"
+"* categoriesImage is a string containing the name of the categories (classification) image file from which the propotions are calculated\n"
+"* clumpsImage is a string containing the name of the input clump file to which the proportions are to be populated.\n"
+"* outColsName is a string representing the base name for the output columns containing the proportions.\n"
+"* majorityColName is a string for name of the field which will hold the majority class.\n"
+"* copyClassNames is a boolean defining whether class names should be copied (Optional, Default = false).\n"
+"* majClassNameField is a string for the output column within the clumps image with the majority class names field (Optional, only used if copyClassNames == True)\n"
+"* classNameField is a string with the name of the column within the categories image for the class names (Optional, only used if copyClassNames == True)\n"
+"* ratbandclumps is an optional (default = 1) integer parameter specifying the image band to which the RAT is associated in the clumps image.\n"
+"* ratbandcats is an optional (default = 1) integer parameter specifying the image band to which the RAT is associated in the catagories image.\n"
 "\n"},
-
+/*
    {"copyCategoriesColours", RasterGIS_CopyCategoriesColours, METH_VARARGS,
 "rastergis.copyCategoriesColours(categoriesImage, clumpsImage, classField)\n"
 "Copies an attribute tables colour table to another table based on class column\n"

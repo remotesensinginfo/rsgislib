@@ -155,7 +155,7 @@ namespace rsgis{ namespace cmds {
     void executePopulateRATWithPercentiles(std::string inputImage, std::string clumpsImage, unsigned int band, std::vector<rsgis::cmds::RSGISBandAttPercentilesCmds*> *bandPercentilesCmds, unsigned int ratBand, unsigned int numHistBins)throw(RSGISCmdException);
 
     /** Function for populating the attribute table with the proporations of intersecting catagories */
-    //void executePopulateCategoryProportions(std::string categoriesImage, std::string clumpsImage, std::string outColsName, std::string majorityColName, bool copyClassNames, std::string majClassNameField, std::string classNameField)throw(RSGISCmdException);
+    void executePopulateCategoryProportions(std::string categoriesImage, std::string clumpsImage, std::string outColsName, std::string majorityColName, bool copyClassNames, std::string majClassNameField, std::string classNameField, unsigned int ratBandClumps, unsigned int ratBandCats)throw(RSGISCmdException);
 
     /** Function for copying an attribute tables colour table to another table based on class column */
     //void executeCopyCategoriesColours(std::string categoriesImage, std::string clumpsImage, std::string classField)throw(RSGISCmdException);

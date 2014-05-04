@@ -469,7 +469,7 @@ namespace rsgis{namespace rastergis{
             calcImageStats.calcImage(datasets, 1, 1);
             delete calcImgValHists;
             
-            std::cout << "Writting Percentile Values to Output RAT\n";
+            std::cout << "Writing Percentile Values to Output RAT\n";
             size_t numBlocks = floor((double)numRows/(double)RAT_BLOCK_LENGTH);
             size_t rowsRemain = numRows - (numBlocks * RAT_BLOCK_LENGTH);
             
