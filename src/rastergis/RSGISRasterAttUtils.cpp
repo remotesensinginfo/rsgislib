@@ -902,7 +902,7 @@ namespace rsgis{namespace rastergis{
         return colIdx;
     }
     
-    unsigned int RSGISRasterAttUtils::findColumnIndexOrCreate(GDALRasterAttributeTable *gdalATT, std::string colName, GDALRATFieldType dType) throw(RSGISAttributeTableException)
+    unsigned int RSGISRasterAttUtils::findColumnIndexOrCreate(GDALRasterAttributeTable *gdalATT, std::string colName, GDALRATFieldType dType, GDALRATFieldUsage dUsage) throw(RSGISAttributeTableException)
     {
         int numColumns = gdalATT->GetColumnCount();
         bool foundCol = false;
@@ -919,7 +919,7 @@ namespace rsgis{namespace rastergis{
         
         if(!foundCol)
         {
-            gdalATT->CreateColumn(colName.c_str(), dType, GFU_Generic);
+            gdalATT->CreateColumn(colName.c_str(), dType, dUsage);
             colIdx = numColumns;
         }
         

@@ -71,16 +71,26 @@ static std::vector<std::string> ExtractVectorStringFromSequence(PyObject *sequen
     return fields;
 }
 
-static PyObject *RasterGIS_PopulateStats(PyObject *self, PyObject *args) {
+static PyObject *RasterGIS_PopulateStats(PyObject *self, PyObject *args, PyObject *keywds)
+{
     const char *clumpsImage;
-    int addColourTable2Img, calcImgPyramids;
-
-    if(!PyArg_ParseTuple(args, "sii:populateStats", &clumpsImage, &addColourTable2Img, &calcImgPyramids))
+    int addColourTable2Img = 1;
+    int calcImgPyramids = 1;
+    int ignoreZeroVal = 1;
+    unsigned int ratBand = 1;
+    static char *kwlist[] = {"clumps", "addclrtab", "calcpyramids", "ignorezero", "ratband", NULL};
+    
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "s|iiiI:populateStats", kwlist, &clumpsImage, &addColourTable2Img, &calcImgPyramids, &ignoreZeroVal, &ratBand))
+    {
         return NULL;
+    }
 
-    try {
-        //rsgis::cmds::executePopulateStats(std::string(clumpsImage), addColourTable2Img, calcImgPyramids);
-    } catch (rsgis::cmds::RSGISCmdException &e) {
+    try
+    {
+        rsgis::cmds::executePopulateStats(std::string(clumpsImage), addColourTable2Img, calcImgPyramids, ignoreZeroVal, ratBand);
+    }
+    catch (rsgis::cmds::RSGISCmdException &e)
+    {
         PyErr_SetString(GETSTATE(self)->error, e.what());
         return NULL;
     }
@@ -153,7 +163,7 @@ static PyObject *RasterGIS_PopulateRATWithStats(PyObject *self, PyObject *args, 
     unsigned int ratBand = 1;
     static char *kwlist[] = {"valsimage", "clumps", "bandstats", "ratband", NULL};
 
-    if(!PyArg_ParseTupleAndKeywords(args, keywds, "ssO|i:populateRATWithStats", kwlist, &inputImage, &clumpsImage, &pBandAttStatsCmds, &ratBand))
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "ssO|I:populateRATWithStats", kwlist, &inputImage, &clumpsImage, &pBandAttStatsCmds, &ratBand))
     {
         return NULL;
     }
@@ -1198,16 +1208,17 @@ static PyObject *RasterGIS_FindGlobalSegmentationScore(PyObject *self, PyObject 
 
 
 
-
 static PyMethodDef RasterGISMethods[] = {
-    {"populateStats", RasterGIS_PopulateStats, METH_VARARGS,
-"rastergis.populateStats(clumpsImage, addColourTable2Img, calcImgPyramids)\n"
+    {"populateStats", (PyCFunction)RasterGIS_PopulateStats, METH_VARARGS | METH_KEYWORDS,
+"rastergis.populateStats(clumps=string, addclrtab=boolean, calcpyramids=boolean, ignorezero=boolean, ratband=int)\n"
 "Populates statics for thematic images.\n"
 "Where:\n"
 "\n"
-"* clumpsImage is a string containing the name of the input clump file\n"
-"* addColourTable2Img is a boolean TODO: expand\n"
-"* calcImagePyramids is a boolean\n"
+"* clumps is a string containing the name of the input clump file\n"
+"* addclrtab is a boolean to specify whether a colour table should created and added (colours will be random) (Optional, default = True)\n"
+"* calcpyramids is a boolean to specify where overview images could be created (Optional, default = True)\n"
+"* ignorezero is a boolean specifying whether zero should be ignored (i.e., set as a no data value). (Optional, default = True)\n"
+"* ratband is an optional (default = 1) integer parameter specifying the image band to which the RAT is associated.\n"
 "\n"
 "Example::\n"
 "\n"
@@ -1270,7 +1281,7 @@ static PyMethodDef RasterGISMethods[] = {
 "\n"},
 */
     {"populateRATWithStats", (PyCFunction)RasterGIS_PopulateRATWithStats, METH_VARARGS | METH_KEYWORDS,
-"rsgislib.rastergis.populateRATWithStats(valsimage=inputImage, clumps=clumpsImage, bandstats=bandStatsCmds, ratband=int)\n"
+"rsgislib.rastergis.populateRATWithStats(valsimage=string, clumps=string, bandstats=rsgislib.rastergis.BandAttStats, ratband=int)\n"
 "Populates an attribute table with statistics from an input values image.\n"
 "Where:\n"
 "\n"
@@ -1284,7 +1295,7 @@ static PyMethodDef RasterGISMethods[] = {
 "      * sumField: string defining the name of the field for sum value\n"
 "      * meanField: string defining the name of the field for mean value\n"
 "      * stdDevField: string defining the name of the field for standard deviation value\n"
-"ratband is an optional (default = 1) integer parameter specifying the image band to which the RAT is associated."
+"* ratband is an optional (default = 1) integer parameter specifying the image band to which the RAT is associated.\n"
 "Example::\n"
 "\n"
 "	from rsgislib import rastergis\n"

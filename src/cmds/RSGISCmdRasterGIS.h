@@ -138,7 +138,7 @@ namespace rsgis{ namespace cmds {
     };
     */
     /** Function to populate statics for thermatic images */
-    //void executePopulateStats(std::string clumpsImage, bool addColourTable2Img, bool calcImgPyramids)throw(RSGISCmdException);
+    void executePopulateStats(std::string clumpsImage, bool addColourTable2Img, bool calcImgPyramids, bool ignoreZero, unsigned int ratBand)throw(RSGISCmdException);
 
     /** Function for copying a GDAL RAT from one image to anoother */
     //void executeCopyRAT(std::string inputImage, std::string clumpsImage)throw(RSGISCmdException);

@@ -123,7 +123,8 @@ namespace rsgis{namespace rastergis{
             calcImageStats.calcImage(datasets, 1, 1);
             delete calcImgValStats;
             
-            size_t numBlocks = floor(numRows/RAT_BLOCK_LENGTH);
+            std::cout << "Writting Stats (Min, Max, Mean, Sum) to Output RAT\n";
+            size_t numBlocks = floor((double)numRows/(double)RAT_BLOCK_LENGTH);
             size_t rowsRemain = numRows - (numBlocks * RAT_BLOCK_LENGTH);
             
             double *dataBlock = new double[RAT_BLOCK_LENGTH];
@@ -201,7 +202,7 @@ namespace rsgis{namespace rastergis{
                                 dataBlock[j] = 0.0;
                             }
                         }
-                        rat->ValuesIO(GF_Write, (*iterBands)->meanFieldIdx, startRow, RAT_BLOCK_LENGTH, dataBlock);
+                        rat->ValuesIO(GF_Write, (*iterBands)->sumFieldIdx, startRow, RAT_BLOCK_LENGTH, dataBlock);
                     }
                 }
                 startRow += RAT_BLOCK_LENGTH;
@@ -304,7 +305,7 @@ namespace rsgis{namespace rastergis{
                 calcImageStdDev.calcImage(datasets, 1, 1);
                 delete calcImgValStdDev;
 
-
+                std::cout << "Writting Standard Deviation Stats to Output RAT\n";
                 startRow = 0;
                 for(size_t i = 0; i < numBlocks; ++i)
                 {

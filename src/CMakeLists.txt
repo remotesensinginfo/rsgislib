@@ -763,6 +763,7 @@ set(LIB_RADAR_INVERSION_CPP
 set(LIB_RASTERGIS_H
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISRasterAttUtils.h
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISPopRATWithStats.h
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISCalcImageStatsAndPyramids.h
 	)
 	
 	
@@ -771,6 +772,8 @@ set(LIB_RASTERGIS_CPP
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISRasterAttUtils.h
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISPopRATWithStats.cpp
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISPopRATWithStats.h
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISCalcImageStatsAndPyramids.cpp
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISCalcImageStatsAndPyramids.h
 	)
 	
 ###############################################################################
