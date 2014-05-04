@@ -38,6 +38,8 @@
 #include "rastergis/RSGISPopRATWithStats.h"
 #include "rastergis/RSGISCalcClusterLocation.h"
 #include "rastergis/RSGISFindClumpNeighbours.h"
+#include "rastergis/RSGISFindClumpCatagoryStats.h"
+
 
 /*
 #include "rastergis/RSGISRasterAttUtils.h"
@@ -45,7 +47,6 @@
 #include "rastergis/RSGISCalcImageStatsAndPyramids.h"
 #include "rastergis/RSGISCalcClumpStats.h"
 
-#include "rastergis/RSGISFindClumpCatagoryStats.h"
 #include "rastergis/RSGISCalcEucDistanceInAttTable.h"
 #include "rastergis/RSGISFindTopNWithinDist.h"
 #include "rastergis/RSGISFindClosestSpecSpatialFeats.h"
@@ -320,18 +321,20 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
-/*
-    void executePopulateCategoryProportions(std::string categoriesImage, std::string clumpsImage, std::string outColsName, std::string majorityColName, bool copyClassNames, std::string majClassNameField, std::string classNameField)throw(RSGISCmdException) {
+
+    void executePopulateCategoryProportions(std::string categoriesImage, std::string clumpsImage, std::string outColsName, std::string majorityColName, bool copyClassNames, std::string majClassNameField, std::string classNameField, unsigned int ratBandClumps, unsigned int ratBandCats)throw(RSGISCmdException)
+    {
         try
         {
             GDALAllRegister();
-
+            std::cout << "Opening Clumps Image: " << clumpsImage << std::endl;
             GDALDataset *clumpsDataset = (GDALDataset *) GDALOpenShared(clumpsImage.c_str(), GA_Update);
             if(clumpsDataset == NULL)
             {
                 std::string message = std::string("Could not open image ") + clumpsImage;
                 throw rsgis::RSGISImageException(message.c_str());
             }
+            std::cout << "Opening Cats Image: " << categoriesImage << std::endl;
             GDALDataset *catsDataset = (GDALDataset *) GDALOpenShared(categoriesImage.c_str(), GA_ReadOnly);
             if(catsDataset == NULL)
             {
@@ -340,13 +343,12 @@ namespace rsgis{ namespace cmds {
             }
 
             rsgis::rastergis::RSGISFindClumpCatagoryStats findClumpStats;
-            findClumpStats.calcCatergoriesOverlaps(clumpsDataset, catsDataset, outColsName, majorityColName, copyClassNames, majClassNameField, classNameField);
+            findClumpStats.calcCatergoriesOverlaps(clumpsDataset, catsDataset, outColsName, majorityColName, copyClassNames, majClassNameField, classNameField, ratBandClumps, ratBandCats);
 
             clumpsDataset->GetRasterBand(1)->SetMetadataItem("LAYER_TYPE", "thematic");
 
             GDALClose(clumpsDataset);
             GDALClose(catsDataset);
-            //GDALDestroyDriverManager();
         }
         catch(rsgis::RSGISException &e)
         {
@@ -357,7 +359,7 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
-
+/*
     void executeCopyCategoriesColours(std::string categoriesImage, std::string clumpsImage, std::string classField)throw(RSGISCmdException) {
         try
         {
