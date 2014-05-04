@@ -429,12 +429,16 @@ namespace rsgis{namespace rastergis{
             double imageValMax = 0.0;
             inputValsImage->GetRasterBand(band)->ComputeStatistics(false, &imageValMin, &imageValMax, NULL, NULL, RSGISRATStatsTextProgress, &nLastProgress);
             
+            std::cout << "Image Min = " << imageValMin << " Image Max = " << imageValMax << std::endl;
+            
             double imageValsRange = imageValMax - imageValMin;
-            double binWidth = imageValsRange / numHistBins+1;
+            double binWidth = imageValsRange / numHistBins+2;
+            std::cout << "Image Range = " << imageValsRange << " Bin Width = " << binWidth << std::endl;
+            
             double *binBounds = new double[numHistBins+1];
             for(unsigned int i = 0; i < numHistBins; ++i)
             {
-                binBounds[i] = imageValMin + (i * binWidth);
+                binBounds[i] = (imageValMin-binWidth) + (i * binWidth);
             }
             binBounds[numHistBins] = imageValMin + (numHistBins * binWidth);
             
