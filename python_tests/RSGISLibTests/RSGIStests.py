@@ -393,18 +393,17 @@ class RSGISTests:
         bs.append(rastergis.BandAttStats(band=2, minField="b2Min", maxField="b2Max", meanField="b2Mean", sumField="b2Sum", stdDevField="b2StdDev"))
         bs.append(rastergis.BandAttStats(band=3, minField="b3Min", maxField="b3Max", meanField="b3Mean", sumField="b3Sum", stdDevField="b3StdDev"))
         rastergis.populateRATWithStats(input, clumps, bs)
-    """
+
     def testPopulateRATWithPercentiles(self):
         print("PYTHON TEST: populateRATWithPercentiles")
         clumps = "./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_popstats.kea"
         input = "./Rasters/injune_p142_casi_sub_utm.kea"
         bp = []
-        bp.append(rastergis.BandAttPercentiles(band=1, percentile=25, fieldName="B1Per25"))
-        bp.append(rastergis.BandAttPercentiles(band=1, percentile=50, fieldName="B1Per50"))
-        bp.append(rastergis.BandAttPercentiles(band=1, percentile=75, fieldName="B1Per75"))
-        rastergis.populateRATWithPercentiles(input, clumps, bp)
+        bp.append(rastergis.BandAttPercentiles(percentile=25.0, fieldName="B1Per25"))
+        bp.append(rastergis.BandAttPercentiles(percentile=50.0, fieldName="B1Per50"))
+        bp.append(rastergis.BandAttPercentiles(percentile=75.0, fieldName="B1Per75"))
+        rastergis.populateRATWithPercentiles(input, clumps, 1, bp)
 
-    """
     def testExport2Ascii(self):
         print("PYTHON TEST: export2Ascii")
         table="./RATS/injune_p142_casi_sub_utm_segs.kea"
@@ -466,14 +465,14 @@ class RSGISTests:
         shapes.append(rastergis.ShapeIndex(colName="Compactness", idx=rsgislib.SHAPE_COMPACTNESS))
         shapes.append(rastergis.ShapeIndex(colName="MainDirection", idx=rsgislib.SHAPE_MAINDIRECTION))
         rastergis.calcShapeIndices(clumps, shapes)
-
+    """
     def testPopulateStats(self):
         print("PYTHON TEST: populateStats")
         clumps="./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_nostats_addstats.kea"
         pyramids=True
         colourtable=True
         rastergis.populateStats(clumps, colourtable, pyramids)
-    """
+
     # Image Utils 
     
     def testCreateTiles(self):
@@ -882,9 +881,10 @@ if __name__ == '__main__':
         #t.tryFuncAndCatch(t.testFindTopN)
         #t.tryFuncAndCatch(t.testFindSpecClose)
         t.tryFuncAndCatch(t.testPopulateRATWithStats)
-        #t.tryFuncAndCatch(t.testPopulateRATWithPercentiles)
+        t.tryFuncAndCatch(t.testPopulateRATWithPercentiles)
         t.tryFuncAndCatch(t.testExport2Ascii)
         t.tryFuncAndCatch(t.testExporCols2GDALImage)
+        t.tryFuncAndCatch(t.testPopulateStats)
         #t.tryFuncAndCatch(t.testFindNeighbours)
         #t.tryFuncAndCatch(t.testFindBoundaryPixels)
         #t.tryFuncAndCatch(t.testCalcBorderLength)
