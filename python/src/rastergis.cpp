@@ -87,23 +87,29 @@ static PyObject *RasterGIS_PopulateStats(PyObject *self, PyObject *args) {
 
     Py_RETURN_NONE;
 }
-/*
-static PyObject *RasterGIS_CopyRAT(PyObject *self, PyObject *args) {
-    const char *clumpsImage, *inputImage;
 
-    if(!PyArg_ParseTuple(args, "ss:copyRAT", &inputImage, &clumpsImage))
+static PyObject *RasterGIS_CopyRAT(PyObject *self, PyObject *args, PyObject *keywds) 
+{
+    const char *clumpsImage, *inputImage;
+    int ratBand = 1;
+    static char *kwlist[] = {"clumps", "outimage", "ratband", NULL};
+
+    if(!PyArg_ParseTupleAndKeywords(args, keywds,"ss|i:copyRAT", kwlist, &inputImage, &clumpsImage))
         return NULL;
 
-    try {
-        rsgis::cmds::executeCopyRAT(std::string(clumpsImage), std::string(inputImage));
-    } catch (rsgis::cmds::RSGISCmdException &e) {
+    try 
+    {
+        rsgis::cmds::executeCopyRAT(std::string(clumpsImage), std::string(inputImage),ratBand);
+    }
+    catch (rsgis::cmds::RSGISCmdException &e) 
+    {
         PyErr_SetString(GETSTATE(self)->error, e.what());
         return NULL;
     }
 
     Py_RETURN_NONE;
 }
-
+/*
 static PyObject *RasterGIS_CopyGDALATTColumns(PyObject *self, PyObject *args) {
     const char *clumpsImage, *inputImage;
     PyObject *pFields;
@@ -404,7 +410,7 @@ static PyObject *RasterGIS_ExportCols2GDALImage(PyObject *self, PyObject *args, 
 {
     const char *inputImage, *outputFile, *imageFormat;
     int dataType;
-    int ratBand = 0;
+    int ratBand = 1;
     PyObject *pFields;
 
     static char *kwlist[] = {"clumps", "outimage", "gdalformat", "datatype", "fields", "ratband", NULL};
@@ -427,7 +433,7 @@ static PyObject *RasterGIS_ExportCols2GDALImage(PyObject *self, PyObject *args, 
 
     try 
     {
-        rsgis::cmds::executeExportCols2GDALImage(std::string(inputImage), std::string(outputFile), std::string(imageFormat), type, fields);
+        rsgis::cmds::executeExportCols2GDALImage(std::string(inputImage), std::string(outputFile), std::string(imageFormat), type, fields, ratBand);
     }
     catch (rsgis::cmds::RSGISCmdException &e) 
     {
@@ -520,7 +526,7 @@ static PyObject *RasterGIS_Export2Ascii(PyObject *self, PyObject *args, PyObject
     if(fields.size() == 0) { return NULL; }
     try 
     {
-        rsgis::cmds::executeExport2Ascii(std::string(inputImage), std::string(outputFile), fields);
+        rsgis::cmds::executeExport2Ascii(std::string(inputImage), std::string(outputFile), fields, ratBand);
     }
     catch (rsgis::cmds::RSGISCmdException &e) 
     {
@@ -1243,23 +1249,23 @@ static PyMethodDef RasterGISMethods[] = {
 "   colourtable=True\n"
 "   rastergis.populateStats(clumps, colourtable, pyramids)\n"
 "\n"},
-/*
-    {"copyRAT", RasterGIS_CopyRAT, METH_VARARGS,
-"rastergis.copyRAT(inputImage, clumpsImage)\n"
+
+    {"copyRAT", (PyCFunction)RasterGIS_CopyRAT, METH_VARARGS | METH_KEYWORDS,
+"rastergis.copyRAT(clumps, outimage,ratband=1)\n"
 "Copies a GDAL RAT from one image to another\n"
 "Where:\n"
 "\n"
-"* inputImage is a string containing the name of the input image file\n"
-"* clumpsImage is a string containing the name of the input clump file\n"
+"* clumps is a string containing the name of the input file with RAT\n"
+"* outimage is a string containing the name of the output file to add the RAT to\n"
 "\n"
 "Example::\n"
 "\n"
 "   from rsgislib import rastergis\n"
-"   table = './RATS/injune_p142_casi_sub_utm_clumps_elim_final_clumps_elim_final.kea'\n"
-"   image = './TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_cptab.kea'\n"
-"   rastergis.copyRAT(image, table)\n"
+"   clumps = './RATS/injune_p142_casi_sub_utm_clumps_elim_final_clumps_elim_final.kea'\n"
+"   outimage = './TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_cptab.kea'\n"
+"   rastergis.copyRAT(clumps, outimage)\n"
 "\n"},
-
+/*
     {"copyGDALATTColumns", RasterGIS_CopyGDALATTColumns, METH_VARARGS,
 "rastergis.copyGDALATTColumns(inputImage, clumpsImage, fields)\n"
 "Copies GDAL RAT columns from one image to another\n"

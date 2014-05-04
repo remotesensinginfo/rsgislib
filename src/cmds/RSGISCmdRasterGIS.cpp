@@ -86,8 +86,8 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
-
-    void executeCopyRAT(std::string inputImage, std::string clumpsImage)throw(RSGISCmdException) {
+    */
+    void executeCopyRAT(std::string inputImage, std::string clumpsImage,  int ratBand)throw(RSGISCmdException) {
         try
         {
             GDALAllRegister();
@@ -106,11 +106,11 @@ namespace rsgis{ namespace cmds {
             }
 
             std::cout << "Import attribute table\n";
-            const GDALRasterAttributeTable *gdalAtt = inputDataset->GetRasterBand(1)->GetDefaultRAT();
+            const GDALRasterAttributeTable *gdalAtt = inputDataset->GetRasterBand(ratBand)->GetDefaultRAT();
 
             std::cout << "Adding RAT\n";
-            outRATDataset->GetRasterBand(1)->SetDefaultRAT(gdalAtt);
-            outRATDataset->GetRasterBand(1)->SetMetadataItem("LAYER_TYPE", "thematic");
+            outRATDataset->GetRasterBand(ratBand)->SetDefaultRAT(gdalAtt);
+            outRATDataset->GetRasterBand(ratBand)->SetMetadataItem("LAYER_TYPE", "thematic");
 
             GDALClose(inputDataset);
             GDALClose(outRATDataset);
@@ -125,7 +125,7 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
-
+    /*
     void executeCopyGDALATTColumns(std::string inputImage, std::string clumpsImage, std::vector<std::string> fields)throw(RSGISCmdException) {
         try
         {
