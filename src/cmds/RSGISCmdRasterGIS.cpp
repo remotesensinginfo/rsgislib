@@ -31,14 +31,16 @@
 
 #include "utils/RSGISTextUtils.h"
 
+#include "img/RSGISCalcImage.h"
+
 #include "rastergis/RSGISRasterAttUtils.h"
+#include "rastergis/RSGISExportColumns2Image.h"
 
 /*
 #include "rastergis/RSGISRasterAttUtils.h"
 #include "rastergis/RSGISCalcClumpStats.h"
 #include "rastergis/RSGISCalcClusterLocation.h"
 #include "rastergis/RSGISFindClumpCatagoryStats.h"
-#include "rastergis/RSGISExportColumns2Image.h"
 #include "rastergis/RSGISCalcEucDistanceInAttTable.h"
 #include "rastergis/RSGISFindTopNWithinDist.h"
 #include "rastergis/RSGISFindClosestSpecSpatialFeats.h"
@@ -401,8 +403,8 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
-
-    void executeExportCols2GDALImage(std::string inputImage, std::string outputFile, std::string imageFormat, RSGISLibDataType outDataType, std::vector<std::string> fields)throw(RSGISCmdException) {
+    */
+    void executeExportCols2GDALImage(std::string inputImage, std::string outputFile, std::string imageFormat, RSGISLibDataType outDataType, std::vector<std::string> fields, int ratBand)throw(RSGISCmdException) {
         try
         {
             GDALAllRegister();
@@ -415,7 +417,7 @@ namespace rsgis{ namespace cmds {
             }
 
             rsgis::rastergis::RSGISRasterAttUtils attUtils;
-            const GDALRasterAttributeTable *gdalATT = inputDataset->GetRasterBand(1)->GetDefaultRAT();
+            const GDALRasterAttributeTable *gdalATT = inputDataset->GetRasterBand(ratBand)->GetDefaultRAT();
 
             std::vector<unsigned int> *colIdxs = new std::vector<unsigned int>();
             std::string *bandNames = new std::string[fields.size()];
@@ -445,7 +447,7 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
-
+    /*
     void executeEucDistFromFeature(std::string inputImage, size_t fid, std::string outputField, std::vector<std::string> fields)throw(RSGISCmdException) {
         GDALAllRegister();
         GDALDataset *inputDataset;

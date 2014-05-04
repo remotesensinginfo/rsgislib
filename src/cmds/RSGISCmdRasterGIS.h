@@ -167,7 +167,7 @@ namespace rsgis{ namespace cmds {
     //void executeCopyCategoriesColours(std::string categoriesImage, std::string clumpsImage, std::string classField)throw(RSGISCmdException);
 
     /** Function for exporting columns of the attribute table as GDAL images */
-    //void executeExportCols2GDALImage(std::string inputImage, std::string outputFile, std::string imageFormat, RSGISLibDataType outDataType, std::vector<std::string> fields)throw(RSGISCmdException);
+    void executeExportCols2GDALImage(std::string inputImage, std::string outputFile, std::string imageFormat, RSGISLibDataType outDataType, std::vector<std::string> fields, int ratBand=1)throw(RSGISCmdException);
 
     /** Function for calculating the euclidean distance from a feature to all other features */
     //void executeEucDistFromFeature(std::string inputImage, size_t fid, std::string outputField, std::vector<std::string> fields)throw(RSGISCmdException);
