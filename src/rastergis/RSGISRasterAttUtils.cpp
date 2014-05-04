@@ -406,13 +406,11 @@ namespace rsgis{namespace rastergis{
             }
         
             // Find required attributes in RAT
-            bool *foundInIdx = new bool[fields.size()];
             int *colInIdxs = new int[fields.size()];     // Index in RAT
             int *colBlockIndxs = new int[fields.size()]; // Index in array to store block (array dependent on type)
             
             for(size_t i = 0; i < fields.size(); ++i)
             {
-                foundInIdx[i] = false;
                 colInIdxs[i] = 0;
                 colBlockIndxs[i] = 0;
             }
@@ -421,43 +419,27 @@ namespace rsgis{namespace rastergis{
             unsigned int nRealCol = 0;
             unsigned int nStringCol = 0;
             
-            for(int i = 0; i < gdalAttIn->GetColumnCount(); ++i)
-            {
-                for(size_t j = 0; j < fields.size(); ++j)
-                {
-                    if(!foundInIdx[j] && (std::string(gdalAttIn->GetNameOfCol(i)) == fields.at(j)))
-                    {
-                        colInIdxs[j] = i;
-                        foundInIdx[j] = true;
-                    
-                        if(gdalAttIn->GetTypeOfCol(i) == GFT_Integer)
-                        {
-                            colBlockIndxs[j] = nIntCol;
-                            ++nIntCol;
-                        }
-                        else if(gdalAttIn->GetTypeOfCol(i) == GFT_Real)
-                        {
-                            colBlockIndxs[j] = nRealCol;
-                            ++nRealCol;
-                        }
-                        else if(gdalAttIn->GetTypeOfCol(i) == GFT_String)
-                        {
-                            colBlockIndxs[j] = nStringCol;
-                            ++nStringCol;
-                        }
-                    }
-                }
-            }
-            
             for(size_t j = 0; j < fields.size(); ++j)
             {
-                if(!foundInIdx[j])
+                colInIdxs[j] = findColumnIndex(gdalAttIn, fields.at(j));
+                
+                if(gdalAttIn->GetTypeOfCol(colInIdxs[j]) == GFT_Integer)
                 {
-                    std::string message = std::string("Column ") + fields.at(j) + std::string(" is not within the input attribute table.");
-                    throw rsgis::RSGISAttributeTableException(message);
+                    colBlockIndxs[j] = nIntCol;
+                    ++nIntCol;
+                }
+                else if(gdalAttIn->GetTypeOfCol(colInIdxs[j]) == GFT_Real)
+                {
+                    colBlockIndxs[j] = nRealCol;
+                    ++nRealCol;
+                }
+                else if(gdalAttIn->GetTypeOfCol(colInIdxs[j]) == GFT_String)
+                {
+                    colBlockIndxs[j] = nStringCol;
+                    ++nStringCol;
                 }
             }
-            
+
             // Allocate arrays to store blocks of data
             int nRows = gdalAttIn->GetRowCount();
             
@@ -653,7 +635,6 @@ namespace rsgis{namespace rastergis{
             }
             delete[] blockDataStr;
             
-            delete[] foundInIdx;
             delete[] colInIdxs;
             delete[] colBlockIndxs;
         }

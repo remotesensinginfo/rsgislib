@@ -400,7 +400,8 @@ namespace rsgis{ namespace cmds {
         }
     }
     */
-    void executeExportCols2GDALImage(std::string inputImage, std::string outputFile, std::string imageFormat, RSGISLibDataType outDataType, std::vector<std::string> fields, int ratBand)throw(RSGISCmdException) {
+    void executeExportCols2GDALImage(std::string inputImage, std::string outputFile, std::string imageFormat, RSGISLibDataType outDataType, std::vector<std::string> fields, int ratBand) throw(RSGISCmdException)
+    {
         try
         {
             GDALAllRegister();
