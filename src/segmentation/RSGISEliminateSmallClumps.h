@@ -132,15 +132,15 @@ namespace rsgis{namespace segment{
     };
     
     
-  /*
+
     class RSGISRemoveClumpsBelowThreshold : public rsgis::img::RSGISCalcImageValue
     {
     public:
-        RSGISRemoveClumpsBelowThreshold(float threshold, const GDALRasterAttributeTable *rat, unsigned int colID);
-        void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException);
+        RSGISRemoveClumpsBelowThreshold(float threshold, int *clumpHisto, size_t numHistVals);
+        void calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
         void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented.");};
         void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
-        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, float *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, float *output) throw(rsgis::img::RSGISImageCalcException);
         void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, geos::geom::Envelope extent)throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
         void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented.");};
         void calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented.");};
@@ -150,10 +150,9 @@ namespace rsgis{namespace segment{
         ~RSGISRemoveClumpsBelowThreshold();
     protected:
         float threshold;
-        const GDALRasterAttributeTable *rat;
-        unsigned int colID;
+        int *clumpHisto;
+        size_t numHistVals;
     };
-    */
     
 }}
 

@@ -41,6 +41,7 @@
 #include "segmentation/RSGISBottomUpShapeFeatureExtraction.h"
 
 #include "rastergis/RSGISRasterAttUtils.h"
+#include "rastergis/RSGISCalcImageStatsAndPyramids.h"
 
 namespace rsgis{ namespace cmds {
     
@@ -687,7 +688,6 @@ namespace rsgis{ namespace cmds {
         
         try
         {
-            /*
             clumpsDataset = (GDALDataset *) GDALOpen(clumpsImage.c_str(), GA_ReadOnly);
             if(clumpsDataset == NULL)
             {
@@ -695,14 +695,15 @@ namespace rsgis{ namespace cmds {
                 throw rsgis::RSGISImageException(message.c_str());
             }
             
-            const GDALRasterAttributeTable *rat = clumpsDataset->GetRasterBand(1)->GetDefaultRAT();
+            GDALRasterAttributeTable *rat = clumpsDataset->GetRasterBand(1)->GetDefaultRAT();
             
             rsgis::rastergis::RSGISRasterAttUtils attUtils;
-            unsigned int colID = attUtils.findColumnIndex(rat, "Histogram");
+            size_t numRows = 0;
+            int *ratHisto = attUtils.readIntColumn(rat, "Histogram", &numRows);
             
-            rsgis::segment::RSGISRemoveClumpsBelowThreshold *rmClumpBelowSize = new rsgis::segment::RSGISRemoveClumpsBelowThreshold(threshold, rat, colID);
+            rsgis::segment::RSGISRemoveClumpsBelowThreshold *rmClumpBelowSize = new rsgis::segment::RSGISRemoveClumpsBelowThreshold(threshold, ratHisto, numRows);
             rsgis::img::RSGISCalcImage calcImg = rsgis::img::RSGISCalcImage(rmClumpBelowSize, "", true);
-            calcImg.calcImage(&clumpsDataset, 1, outputImage, false, NULL, imgFormat, GDT_UInt32);
+            calcImg.calcImage(&clumpsDataset, 1, 0, outputImage, false, NULL, imgFormat, GDT_UInt32);
             
             delete rmClumpBelowSize;
             GDALClose(clumpsDataset);
@@ -716,10 +717,9 @@ namespace rsgis{ namespace cmds {
             outClumpsDataset->GetRasterBand(1)->SetMetadataItem("LAYER_TYPE", "thematic");
             
             rsgis::rastergis::RSGISPopulateWithImageStats popImageStats;
-            popImageStats.populateImageWithRasterGISStats(outClumpsDataset, true, true);
+            popImageStats.populateImageWithRasterGISStats(outClumpsDataset, true, true, true, 1);
             
             GDALClose(outClumpsDataset);
-            */
         }
         catch (rsgis::RSGISException &e)
         {
