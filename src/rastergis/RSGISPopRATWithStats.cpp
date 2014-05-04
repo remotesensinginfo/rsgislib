@@ -47,7 +47,8 @@ namespace rsgis{namespace rastergis{
             GDALRasterAttributeTable *rat = inputClumps->GetRasterBand(ratBand)->GetDefaultRAT();
             size_t numRows = rat->GetRowCount();
             double maxClumpID = 0.0;
-            inputClumps->GetRasterBand(ratBand)->ComputeStatistics(false, NULL, &maxClumpID, NULL, NULL, NULL, NULL);
+            int nLastProgress = -1;
+            inputClumps->GetRasterBand(ratBand)->ComputeStatistics(false, NULL, &maxClumpID, NULL, NULL, RSGISRATStatsTextProgress, &nLastProgress);
             if(maxClumpID > numRows)
             {
                 numRows = boost::lexical_cast<size_t>(maxClumpID);
@@ -391,6 +392,156 @@ namespace rsgis{namespace rastergis{
         }
     }
     
+    void RSGISPopRATWithStats::populateRATWithPercentileStats(GDALDataset *inputClumps, GDALDataset *inputValsImage, unsigned int band, std::vector<RSGISBandAttPercentiles*> *bandStats, unsigned int ratBand, unsigned int numHistBins)throw(RSGISAttributeTableException)
+    {
+        try
+        {
+            if(ratBand == 0)
+            {
+                throw rsgis::RSGISAttributeTableException("RAT Band must be greater than zero.");
+            }
+            if(ratBand > inputClumps->GetRasterCount())
+            {
+                throw rsgis::RSGISAttributeTableException("RAT Band is larger than the number of bands within the image.");
+            }
+            
+            if(band == 0)
+            {
+                throw rsgis::RSGISAttributeTableException("Values image band must be greater than zero.");
+            }
+            if(band > inputValsImage->GetRasterCount())
+            {
+                throw rsgis::RSGISAttributeTableException("Values image band is larger than the number of bands within the image.");
+            }
+            
+            RSGISRasterAttUtils attUtils;
+            GDALRasterAttributeTable *rat = inputClumps->GetRasterBand(ratBand)->GetDefaultRAT();
+            size_t numRows = rat->GetRowCount();
+            double maxClumpID = 0.0;
+            int nLastProgress = -1;
+            inputClumps->GetRasterBand(ratBand)->ComputeStatistics(false, NULL, &maxClumpID, NULL, NULL, RSGISRATStatsTextProgress, &nLastProgress);
+            if(maxClumpID > numRows)
+            {
+                numRows = boost::lexical_cast<size_t>(maxClumpID);
+                rat->SetRowCount(numRows);
+            }
+            double imageValMin = 0.0;
+            double imageValMax = 0.0;
+            inputValsImage->GetRasterBand(band)->ComputeStatistics(false, &imageValMin, &imageValMax, NULL, NULL, RSGISRATStatsTextProgress, &nLastProgress);
+            
+            double imageValsRange = imageValMax - imageValMin;
+            double binWidth = imageValsRange / numHistBins+1;
+            double *binBounds = new double[numHistBins+1];
+            for(unsigned int i = 0; i < numHistBins; ++i)
+            {
+                binBounds[i] = imageValMin + (i * binWidth);
+            }
+            binBounds[numHistBins] = imageValMin + (numHistBins * binWidth);
+            
+            for(std::vector<rsgis::rastergis::RSGISBandAttPercentiles*>::iterator iterFeat = bandStats->begin(); iterFeat != bandStats->end(); ++iterFeat)
+            {
+                (*iterFeat)->fieldIdx = attUtils.findColumnIndexOrCreate(rat, (*iterFeat)->fieldName, GFT_Real);
+            }
+            
+            unsigned int histoIdx = attUtils.findColumnIndex(rat, "Histogram");
+            
+            GDALDataset **datasets = new GDALDataset*[2];
+            datasets[0] = inputClumps;
+            datasets[1] = inputValsImage;
+            
+            unsigned int **clumpHistData = new unsigned int*[numRows];
+            for(unsigned int i = 0; i < numRows; ++i)
+            {
+                clumpHistData[i] = new unsigned int[numHistBins];
+                for(unsigned int j = 0; j < numHistBins; ++j)
+                {
+                    clumpHistData[i][j] = 0.0;
+                }
+            }
+            
+            RSGISCalcClusterPxlValueHistograms *calcImgValHists = new RSGISCalcClusterPxlValueHistograms(clumpHistData, binBounds, numHistBins, ratBand, band);
+            rsgis::img::RSGISCalcImage calcImageStats(calcImgValHists);
+            calcImageStats.calcImage(datasets, 1, 1);
+            delete calcImgValHists;
+            
+            std::cout << "Writting Percentile Values to Output RAT\n";
+            size_t numBlocks = floor((double)numRows/(double)RAT_BLOCK_LENGTH);
+            size_t rowsRemain = numRows - (numBlocks * RAT_BLOCK_LENGTH);
+            
+            rsgis::math::RSGISMathsUtils mathUtils;
+            double *dataBlock = new double[RAT_BLOCK_LENGTH];
+            double *histDataBlock = new double[RAT_BLOCK_LENGTH];
+            size_t startRow = 0;
+            size_t rowID = 0;
+            for(size_t i = 0; i < numBlocks; ++i)
+            {
+                rat->ValuesIO(GF_Read, histoIdx, startRow, RAT_BLOCK_LENGTH, histDataBlock);
+                for(std::vector<rsgis::rastergis::RSGISBandAttPercentiles*>::iterator iterFeat = bandStats->begin(); iterFeat != bandStats->end(); ++iterFeat)
+                {
+                    rowID = startRow;
+                    for(size_t j = 0; j < RAT_BLOCK_LENGTH; ++j)
+                    {
+                        if(histDataBlock[j] > 0)
+                        {
+                            dataBlock[j] = mathUtils.calcPercentile((*iterFeat)->percentile, binBounds, binWidth, numHistBins, clumpHistData[rowID++]); // calc percentile from the histogram...
+                        }
+                        else
+                        {
+                            dataBlock[j] = 0.0;
+                        }
+                    }
+                    rat->ValuesIO(GF_Write, (*iterFeat)->fieldIdx, startRow, RAT_BLOCK_LENGTH, dataBlock);
+                }
+                startRow += RAT_BLOCK_LENGTH;
+            }
+            if(rowsRemain > 0)
+            {
+                rat->ValuesIO(GF_Read, histoIdx, startRow, rowsRemain, histDataBlock);
+                for(std::vector<rsgis::rastergis::RSGISBandAttPercentiles*>::iterator iterFeat = bandStats->begin(); iterFeat != bandStats->end(); ++iterFeat)
+                {
+                    rowID = startRow;
+                    for(size_t j = 0; j < rowsRemain; ++j)
+                    {
+                        if(histDataBlock[j] > 0)
+                        {
+                            dataBlock[j] = mathUtils.calcPercentile((*iterFeat)->percentile, binBounds, binWidth, numHistBins, clumpHistData[rowID++]); // calc percentile from the histogram...
+                        }
+                        else
+                        {
+                            dataBlock[j] = 0.0;
+                        }
+                    }
+                    rat->ValuesIO(GF_Write, (*iterFeat)->fieldIdx, startRow, rowsRemain, dataBlock);
+                }
+            }
+            
+            
+            for(unsigned int i = 0; i < numRows; ++i)
+            {
+                delete[] clumpHistData[i];
+            }
+            delete[] clumpHistData;
+            
+            
+            delete[] dataBlock;
+            delete[] histDataBlock;
+            delete[] datasets;
+        }
+        catch(RSGISAttributeTableException &e)
+        {
+            throw e;
+        }
+        catch(RSGISException &e)
+        {
+            throw RSGISAttributeTableException(e.what());
+        }
+        catch(std::exception &e)
+        {
+            throw RSGISAttributeTableException(e.what());
+        }
+    }
+
+    
     RSGISPopRATWithStats::~RSGISPopRATWithStats()
     {
         
@@ -518,6 +669,52 @@ namespace rsgis{namespace rastergis{
     }
     
     RSGISCalcClusterPxlValueStdDev::~RSGISCalcClusterPxlValueStdDev()
+    {
+        
+    }
+    
+    
+    
+    
+    RSGISCalcClusterPxlValueHistograms::RSGISCalcClusterPxlValueHistograms(unsigned int **clumpHistData, double *binBounds, unsigned int numBins, unsigned int ratBand, unsigned int imgBand): rsgis::img::RSGISCalcImageValue(0)
+    {
+        this->clumpHistData = clumpHistData;
+        this->binBounds = binBounds;
+        this->numBins = numBins;
+        this->ratBand = ratBand;
+        this->imgBand = imgBand;
+    }
+
+    void RSGISCalcClusterPxlValueHistograms::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(rsgis::img::RSGISImageCalcException)
+    {
+        if(intBandValues[ratBand-1] > 0)
+        {
+            size_t fid = boost::lexical_cast<size_t>(intBandValues[ratBand-1]);
+            if(boost::math::isfinite(floatBandValues[imgBand-1]))
+            {
+                unsigned int binIdx = 0;
+                bool foundBinIdx = false;
+                for(unsigned int i = 0; i < numBins; ++i)
+                {
+                    if((floatBandValues[imgBand-1] >= binBounds[i]) & (floatBandValues[imgBand-1] < binBounds[i+1]))
+                    {
+                        binIdx = i;
+                        foundBinIdx = true;
+                        break;
+                    }
+                }
+                if(!foundBinIdx)
+                {
+                    std::cout << "The pixel value which has caused the problem is " << floatBandValues[imgBand-1] << std::endl;
+                    throw rsgis::img::RSGISImageCalcException("The image pixel value was not found within the histogram range specified - either too big or too small.");
+                }
+                
+                ++clumpHistData[fid][binIdx];
+            }
+        }
+    }
+		
+    RSGISCalcClusterPxlValueHistograms::~RSGISCalcClusterPxlValueHistograms()
     {
         
     }
