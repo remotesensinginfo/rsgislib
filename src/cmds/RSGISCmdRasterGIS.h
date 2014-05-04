@@ -206,10 +206,10 @@ namespace rsgis{ namespace cmds {
     //void executeClassMask(std::string inputImage, std::string classField, std::string className, std::string outputFile, std::string imageFormat, RSGISLibDataType dataType)throw(RSGISCmdException);
 
     /** Function to find the clump neighbours */
-    //void executeFindNeighbours(std::string inputImage)throw(RSGISCmdException);
+    void executeFindNeighbours(std::string inputImage, unsigned int ratBand)throw(RSGISCmdException);
 
     /** Function to identify the pixels on the boundary of the clumps */
-    //void executeFindBoundaryPixels(std::string inputImage, std::string outputFile, std::string imageFormat)throw(RSGISCmdException);
+    void executeFindBoundaryPixels(std::string inputImage, unsigned int ratBand, std::string outputFile, std::string imageFormat)throw(RSGISCmdException);
 
     /** Function to calculate the border length of the clumps */
     //void executeCalcBorderLength(std::string inputImage, bool ignoreZeroEdges, std::string outColsName)throw(RSGISCmdException);
