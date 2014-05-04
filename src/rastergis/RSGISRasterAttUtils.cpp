@@ -33,18 +33,20 @@ namespace rsgis{namespace rastergis{
     {
         try 
         {
-            std::cout << "Import attribute tables to memory.\n";
+            std::cout << "Open attribute table\n";
             GDALRasterAttributeTable *gdalAttIn = inImage->GetRasterBand(ratBand)->GetDefaultRAT();
             GDALRasterAttributeTable *gdalAttOut = NULL;
             GDALRasterAttributeTable *gdalAttOutTmp = outImage->GetRasterBand(ratBand)->GetDefaultRAT();
             
             if((gdalAttOutTmp == NULL) || (gdalAttOutTmp->GetRowCount() == 0))
             {
+                std::cout << "Using existing attribute table " << std::endl;
                 gdalAttOut = new GDALDefaultRasterAttributeTable();
             }
             else
             {
-                gdalAttOut = new GDALDefaultRasterAttributeTable(*((GDALDefaultRasterAttributeTable*)gdalAttOutTmp));
+                std::cout << "Creating new attribute table " << std::endl;
+                gdalAttOut = new GDALDefaultRasterAttributeTable();
             }
             
             if(gdalAttIn == NULL)
@@ -57,16 +59,12 @@ namespace rsgis{namespace rastergis{
                 gdalAttOut->SetRowCount(gdalAttIn->GetRowCount());
             }
             
-            std::cout << "Find field column indexes and created columns were required.\n";
-            bool *foundInIdx = new bool[fields.size()];
+            std::cout << "Find field column indexes and create required columns.\n";
             int *colInIdxs = new int[fields.size()];
-            bool *foundOutIdx = new bool[fields.size()];
             int *colOutIdxs = new int[fields.size()];
             for(size_t i = 0; i < fields.size(); ++i)
             {
-                foundInIdx[i] = false;
                 colInIdxs[i] = 0;
-                foundOutIdx[i] = false;
                 colOutIdxs[i] = 0;
             }
             
@@ -76,62 +74,24 @@ namespace rsgis{namespace rastergis{
             }
             else
             {
-                for(int i = 0; i < gdalAttIn->GetColumnCount(); ++i)
+                for(size_t j = 0; j < fields.size(); ++j)
                 {
-                    for(size_t j = 0; j < fields.size(); ++j)
-                    {
-                        if(!foundInIdx[j] && (std::string(gdalAttIn->GetNameOfCol(i)) == fields.at(j)))
-                        {
-                            colInIdxs[j] = i;
-                            foundInIdx[j] = true;
-                        }
-                    }
+                    colInIdxs[j] = findColumnIndex(gdalAttIn, fields.at(j));
                 }
                 
                 for(size_t j = 0; j < fields.size(); ++j)
                 {
-                    if(!foundInIdx[j])
+                    if(gdalAttIn->GetTypeOfCol(colInIdxs[j]) == GFT_Integer)
                     {
-                        std::string message = std::string("Column ") + fields.at(j) + std::string(" is not within the input attribute table.");
-                        throw rsgis::RSGISAttributeTableException(message);
+                        colOutIdxs[j] = findColumnIndexOrCreate(gdalAttOut, fields.at(j), GFT_Integer, gdalAttIn->GetUsageOfCol(colInIdxs[j]));
                     }
-                }
-                
-                
-                for(int i = 0; i < gdalAttOut->GetColumnCount(); ++i)
-                {
-                    for(size_t j = 0; j < fields.size(); ++j)
+                    else if(gdalAttIn->GetTypeOfCol(colInIdxs[j]) == GFT_Real)
                     {
-                        if(!foundOutIdx[j] && (std::string(gdalAttOut->GetNameOfCol(i)) == fields.at(j)))
-                        {
-                            colOutIdxs[j] = i;
-                            foundOutIdx[j] = true;
-                        }
+                        colOutIdxs[j] = findColumnIndexOrCreate(gdalAttOut, fields.at(j), GFT_Real, gdalAttIn->GetUsageOfCol(colInIdxs[j]));
                     }
-                }
-                
-                for(size_t j = 0; j < fields.size(); ++j)
-                {
-                    if(!foundOutIdx[j])
+                    else if(gdalAttIn->GetTypeOfCol(colInIdxs[j]) == GFT_String)
                     {
-                        if(gdalAttIn->GetTypeOfCol(colInIdxs[j]) == GFT_Integer)
-                        {
-                            gdalAttOut->CreateColumn(fields.at(j).c_str(), GFT_Integer, GFU_Generic);
-                        }
-                        else if(gdalAttIn->GetTypeOfCol(colInIdxs[j]) == GFT_Real)
-                        {
-                            gdalAttOut->CreateColumn(fields.at(j).c_str(), GFT_Real, GFU_Generic);
-                        }
-                        else if(gdalAttIn->GetTypeOfCol(colInIdxs[j]) == GFT_String)
-                        {
-                            gdalAttOut->CreateColumn(fields.at(j).c_str(), GFT_String, GFU_Generic);
-                        }
-                        else
-                        {
-                            throw rsgis::RSGISAttributeTableException("Column data type was not recognised.");
-                        }
-                        colOutIdxs[j] = gdalAttOut->GetColumnCount()-1;
-                        foundOutIdx[j] = true;
+                        colOutIdxs[j] = findColumnIndexOrCreate(gdalAttOut, fields.at(j), GFT_String, gdalAttIn->GetUsageOfCol(colInIdxs[j]));
                     }
                 }
             }
@@ -218,15 +178,15 @@ namespace rsgis{namespace rastergis{
                 }
                 
             }
-
-            // Tidy up
-            delete[] blockDataInt;
-            delete[] blockDataReal;
-            delete[] blockDataReal;
+            std::cout << ".Completed\n";
             
             std::cout << "Adding RAT to output file.\n";
             outImage->GetRasterBand(ratBand)->SetDefaultRAT(gdalAttOut);
   
+            // Tidy up
+            delete[] blockDataInt;
+            delete[] blockDataReal;
+            delete[] blockDataStr;
         }
         catch (RSGISAttributeTableException &e)
         {
