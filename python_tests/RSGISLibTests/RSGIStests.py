@@ -411,13 +411,13 @@ class RSGISTests:
         rastergis.export2Ascii(table, output, fields)
 
     def testExporCols2GDALImage(self):
-        print("PYTHON TEST: exportCols2GDALImage")
+        print("PYTHON TEST: exportCol2GDALImage")
         clumps="./RATS/injune_p142_casi_sub_utm_clumps_elim_final_clumps_elim_final.kea"
         output="./TestOutputs/RasterGIS/injune_p142_casi_rgb_export.kea"
         gdalformat = "KEA"
         dataType = rsgislib.TYPE_32FLOAT
-        fields = ["BlueAvg", "GreenAvg", "RedAvg"]
-        rastergis.exportCols2GDALImage(clumps, output, gdalformat, dataType, fields)
+        field = "RedAvg"
+        rastergis.exportCol2GDALImage(clumps, output, gdalformat, dataType, field)
     """
     def testFindNeighbours(self):
         print("PYTHON TEST: findNeighbours")

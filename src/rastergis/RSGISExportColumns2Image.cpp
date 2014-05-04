@@ -25,51 +25,100 @@
 namespace rsgis{namespace rastergis{
     
 
-    RSGISExportColumns2ImageCalcImage::RSGISExportColumns2ImageCalcImage(int numberOutBands, const GDALRasterAttributeTable *attTable, std::vector<unsigned int> *colIdxs): rsgis::img::RSGISCalcImageValue(numberOutBands)
+    RSGISExportColumns2ImageCalcImage::RSGISExportColumns2ImageCalcImage(int numberOutBands, GDALRasterAttributeTable *attTable, unsigned int columnIndex): rsgis::img::RSGISCalcImageValue(numberOutBands)
     {
         this->attTable = attTable;
-        this->colIdxs = colIdxs;
-        this->previousFID = 0;
-        this->previousValues = new double[this->colIdxs->size()];
+        this->nRows = attTable->GetRowCount();
+        if(this->nRows == 0)
+        {
+            rsgis::RSGISAttributeTableException("There are no columns in the input attribute table.");
+        }
+        this->columnData = new double[this->nRows]; // Set up array to hold column from RAT
+        
+        // Load column to memory
+        loadColumn(columnIndex);
     }
     
-    void RSGISExportColumns2ImageCalcImage::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISExportColumns2ImageCalcImage::loadColumn(int columnIndex)
     {
-        if(bandValues[0] > 0)
+        if(this->attTable->GetTypeOfCol(columnIndex) == GFT_String)
         {
-            size_t fid = boost::lexical_cast<size_t>(bandValues[0]);
+            throw rsgis::RSGISAttributeTableException("Can't export a column containing strings to an image");
+        }
+        
+        // Itterate through blocks
+        int nRows = this->attTable ->GetRowCount();
+        int nBlocks = floor(((double) nRows) / ((double) RAT_BLOCK_LENGTH));
+        int remainRows = nRows - (nBlocks * RAT_BLOCK_LENGTH );
+        
+        double *blockDataReal = new double[RAT_BLOCK_LENGTH];
+        
+        int feedback = nRows/10.0;
+        int feedbackCounter = 0;
+        
+        std::cout << "Reading column to memory" << std::endl;
+        std::cout << "Started " << std::flush;
+        
+        int rowOffset = 0;
+        for(int i = 0; i < nBlocks; i++)
+        {
+            rowOffset =  RAT_BLOCK_LENGTH * i;
             
-            // If same as previous FID use saved values
-            if(fid == this->previousFID)
+            // Read block
+            this->attTable->ValuesIO(GF_Read, columnIndex, rowOffset, RAT_BLOCK_LENGTH, blockDataReal);
+            
+            // Loop through block
+            
+            for(int m = 0; m < RAT_BLOCK_LENGTH; ++m)
             {
-                for(size_t i = 0; i < colIdxs->size(); ++i)
+                // Show progress
+                if((feedback != 0) && (((i*RAT_BLOCK_LENGTH)+m) % feedback) == 0)
                 {
-                    output[i] = previousValues[i];
+                    std::cout << "." << feedbackCounter << "." << std::flush;
+                    feedbackCounter = feedbackCounter + 10;
                 }
+                this->columnData[(i*RAT_BLOCK_LENGTH)+m] = blockDataReal[m];
             }
-            // Otherwise get from attribute table (and save new values)
-            else
+            
+        }
+        if(remainRows > 0)
+        {
+            rowOffset =  RAT_BLOCK_LENGTH * nBlocks;
+            
+            // Read block
+            this->attTable->ValuesIO(GF_Read, columnIndex, rowOffset, remainRows, blockDataReal);
+            
+            // Loop through block
+            
+            for(int m = 0; m < remainRows; ++m)
             {
-                for(size_t i = 0; i < colIdxs->size(); ++i)
+                // Show progress
+                if((feedback != 0) && (((nBlocks*RAT_BLOCK_LENGTH)+m) % feedback) == 0)
                 {
-                    output[i] = attTable->GetValueAsDouble(fid, colIdxs->at(i));
-                    previousValues[i]=output[i];
+                    std::cout << "." << feedbackCounter << "." << std::flush;
+                    feedbackCounter = feedbackCounter + 10;
                 }
+                this->columnData[(nBlocks*RAT_BLOCK_LENGTH)+m] = blockDataReal[m];
             }
-         
-            this->previousFID=fid;
+        }
+        std::cout << ".Completed\n";
+    }
+    
+    void RSGISExportColumns2ImageCalcImage::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, float *output) throw(rsgis::img::RSGISImageCalcException)
+    {
+        if(intBandValues[0] > 0)
+        {
+            size_t fid = boost::lexical_cast<size_t>(intBandValues[0]);
+            output[0] = columnData[fid];
         }
         else
         {
-            for(size_t i = 0; i < colIdxs->size(); ++i)
-            {
-                output[i] = 0;
-            }
+            output[0] = 0;
         }
     }
     RSGISExportColumns2ImageCalcImage::~RSGISExportColumns2ImageCalcImage()
     {
-        delete[] this->previousValues;
+        delete[] this->columnData;
     }
 
 }}
