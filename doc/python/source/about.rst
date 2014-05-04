@@ -65,7 +65,7 @@ The archive is available to view at `groups.google.com <https://groups.google.co
 
 **Do you offer training on RSGISLib?**
 
-RSGISLib is taught as part of the Masters course at Aberystwyth University. The notes for the Python course, which include a chapter using RSGISLib for object based classification is available `Here <https://bitbucket.org/petebunting/python-tutorial-for-spatial-data-processing>`_. We have recently given a training course at the 20th JAXA Kyoto & Carbon initiative meeting (notes available shortly). If you are interested in training sessions, please contact us.
+RSGISLib is taught as part of the Masters course at Aberystwyth University. The notes for the Python course, which include a chapter using RSGISLib for object based classification are available `here <https://bitbucket.org/petebunting/python-tutorial-for-spatial-data-processing>`_. We have recently given a training course at the 20th JAXA Kyoto & Carbon initiative meeting (notes available shortly). If you are interested in training sessions, please contact us.
 
 **How do I go about getting functionality added to RSGISLib?**
 
