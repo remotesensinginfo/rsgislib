@@ -146,7 +146,7 @@ namespace rsgis{ namespace cmds {
     //void executePopulateStats(std::string clumpsImage, bool addColourTable2Img, bool calcImgPyramids)throw(RSGISCmdException);
 
     /** Function for copying a GDAL RAT from one image to anoother */
-    //void executeCopyRAT(std::string inputImage, std::string clumpsImage)throw(RSGISCmdException);
+    void executeCopyRAT(std::string inputImage, std::string clumpsImage, int ratBand=1)throw(RSGISCmdException);
 
     /** Function for copying GDAL RAT columns from one image to another */
     //void executeCopyGDALATTColumns(std::string inputImage, std::string clumpsImage, std::vector<std::string> fields)throw(RSGISCmdException);

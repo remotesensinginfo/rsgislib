@@ -332,13 +332,13 @@ class RSGISTests:
         imagecalc.correlationWindow(image, output, window, bandA, bandB, gdalformat, dataType)
 
     # Raster GIS
-    """
+
     def testCopyGDLATT(self):
         print("PYTHON TEST: copyRAT")
         table = "./RATS/injune_p142_casi_sub_utm_clumps_elim_final_clumps_elim_final.kea"
         image = "./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_cptab.kea"
         rastergis.copyRAT(image, table)
-
+    """
     def testCopyGDLATTColumns(self):
         print("PYTHON TEST: copyGDALATTColumns")
         table = "./RATS/injune_p142_casi_sub_utm_clumps_elim_final_clumps_elim_final.kea"
@@ -863,7 +863,7 @@ if __name__ == '__main__':
     
         """ RasterGIS functions """
         
-        #t.tryFuncAndCatch(t.testCopyGDLATT)
+        t.tryFuncAndCatch(t.testCopyGDLATT)
         #t.tryFuncAndCatch(t.testCopyGDLATTColumns)
         #t.tryFuncAndCatch(t.testSpatialLocation)
         #t.tryFuncAndCatch(t.testEucDistFromFeat)
