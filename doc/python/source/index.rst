@@ -5,29 +5,11 @@
 
 .. _contents:
 
-The Remote Sensing and GIS Software Library (RSGISLib)
-========================================================
-The Remote Sensing and GIS software library (RSGISLib) is a collection of tools for processing remote sensing and GIS datasets. The tools are accessed using an XML interface or python bindings. 
+RSGISLib 2.1 Python Documentation
+==================================
 
-The project is hosted on Bitbucket and is available to download from https://bitbucket.org/petebunting/rsgislib 
+This is the Python documentation for version 2.1 of the Remote Sensing and GIS software library (RSGISLib). For documentation for the latest version see `rsgislib.org <http://rsgislib.org>`_
 
-The project is jointly led by Pete Bunting (`Earth Observation and Ecosystem Dynamics Group <http://www.aber.ac.uk/en/iges/research-groups/earth-observation-laboratory/>`_ , `Aberystwyth University <http://www.aber.ac.uk/>`_) and Dan Clewley (`Microwave Systems, Sensors and Imaging Lab <http://mixil.usc.edu>`_, `University of Southern California <http://www.usc.edu>`_).
-
-
-Information
----------------
-
-.. toctree::
-   :maxdepth: 2
-
-   about
-   download
-   documentation
-   commandlineutilities
-
-
-Python documentation
-----------------------
 
 .. toctree::
    :maxdepth: 1
@@ -44,8 +26,6 @@ Python documentation
    rsgislib_segmentation
    rsgislib_vectorutils
    rsgislib_zonalstats
-
-
 
    
 * :ref:`modindex`
