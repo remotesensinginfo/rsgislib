@@ -595,15 +595,23 @@ static PyObject *RasterGIS_ClassTranslate(PyObject *self, PyObject *args) {
 
     Py_RETURN_NONE;
 }
-
-static PyObject *RasterGIS_ColourClasses(PyObject *self, PyObject *args) {
+*/
+static PyObject *RasterGIS_ColourClasses(PyObject *self, PyObject *args, PyObject *keywds) 
+{
     const char *inputImage, *classInField;
     PyObject *pClassColourPairs;
+    int ratBand = 1;
+    
+    static char *kwlist[] = {"clumps", "class","field", "ratband", NULL};
 
-    if(!PyArg_ParseTuple(args, "ssO:colourClasses", &inputImage, &classInField, &pClassColourPairs))
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "ssO|i:colourClasses", kwlist, &inputImage, &classInField, &pClassColourPairs, &ratBand))
+    {
         return NULL;
+    }
+    
 
-    if(!PyDict_Check(pClassColourPairs)) {
+    if(!PyDict_Check(pClassColourPairs)) 
+    {
         PyErr_SetString(GETSTATE(self)->error, "last argument must be a dict");
         return NULL;
     }
@@ -612,7 +620,8 @@ static PyObject *RasterGIS_ColourClasses(PyObject *self, PyObject *args) {
     PyObject *key, *value;
     Py_ssize_t pos = 0;
 
-    while (PyDict_Next(pClassColourPairs, &pos, &key, &value)) {
+    while (PyDict_Next(pClassColourPairs, &pos, &key, &value)) 
+    {
         if(!RSGISPY_CHECK_INT(key)) {
             PyErr_SetString(GETSTATE(self)->error, "dict keys must be ints");
             return NULL;
@@ -660,16 +669,19 @@ static PyObject *RasterGIS_ColourClasses(PyObject *self, PyObject *args) {
         FreePythonObjects(extractedAttributes);
     }
 
-    try {
-        rsgis::cmds::executeColourClasses(std::string(inputImage), std::string(classInField), classPairs);
-    } catch (rsgis::cmds::RSGISCmdException &e) {
+    try 
+    {
+        rsgis::cmds::executeColourClasses(std::string(inputImage), std::string(classInField), classPairs, ratBand);
+    } 
+    catch (rsgis::cmds::RSGISCmdException &e) 
+    {
         PyErr_SetString(GETSTATE(self)->error, e.what());
         return NULL;
     }
 
     Py_RETURN_NONE;
 }
-
+/*
 static PyObject *RasterGIS_ColourStrClasses(PyObject *self, PyObject *args) {
     const char *inputImage, *classInField;
     PyObject *pClassColourPairs;
@@ -1502,23 +1514,34 @@ static PyMethodDef RasterGISMethods[] = {
 "* classOutField is a string containing the name of the output class field\n"
 "* classPairs is a dict of int key value pairs mapping the classes. TODO: Fixme\n"
 "\n"},
-
-    {"colourClasses", RasterGIS_ColourClasses, METH_VARARGS,
-"rastergis.colourClasses(inputImage, classInField, classColourPairs)\n"
+*/
+    {"colourClasses", (PyCFunction)RasterGIS_ColourClasses, METH_VARARGS | METH_KEYWORDS,
+"rastergis.colourClasses(clumps, field, classcolours, ratband)\n"
 "Sets a colour table for a set of classes within the attribute table\n"
 "Where:\n"
 "\n"
-"* inputImage is a string containing the name of the input image file TODO: check and expand\n"
-"* classInField is a string containing the name of the input class field\n"
-"* classColourPairs is dict mapping int class ids to an object having attributes matching rsgis.cmds.RSGISColourIntCmds TODO: Fixme\n"
-" Requires:\n"
+"* clumps is a string containing the name of the input file\n"
+"* field is a string containing the name of the input class field (class should be an integer).\n"
+"* classcolours is dict mapping int class ids to an object having the following attributes:\n"
 "\n"
 "   * red: int defining the red colour component (0 - 255)\n"
 "   * green: int defining the green colour component (0 - 255)\n"
 "   * blue: int defining the bluecolour component (0 - 255)\n"
 "   * alpha: int defining the alpha colour component (0 - 255)\n"
+"\n"
+"* ratband is an optional (default = 1) integer parameter specifying the image band to which the RAT is associated."
+"\n"
+"Example::\n"
+"\n"
+"   clumps='./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_col.kea'\n"
+"   field = 'outClass'\n"
+"   classcolours = {}\n"
+"   colourCat = collections.namedtuple('ColourCat', ['red', 'green', 'blue', 'alpha'])\n"
+"   classcolours[0] = colourCat(red=200, green=50, blue=50, alpha=255)\n"
+"   classcolours[1] = colourCat(red=200, green=240, blue=50, alpha=255)\n"
+"   rastergis.colourClasses(clumps, field, classcolours)\n"
 "\n"},
-
+/*
     {"colourStrClasses", RasterGIS_ColourStrClasses, METH_VARARGS,
 "rastergis.colourStrClasses(inputImage, classInField, classColourPairs)\n"
 "Sets a colour table for a set of classes (string column) within the attribute table\n"
