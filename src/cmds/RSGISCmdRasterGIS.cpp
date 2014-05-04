@@ -30,6 +30,7 @@
 
 #include "rastergis/RSGISRasterAttUtils.h"
 #include "rastergis/RSGISPopRATWithStats.h"
+#include "rastergis/RSGISCalcImageStatsAndPyramids.h"
 /*
 #include "rastergis/RSGISCalcClumpStats.h"
 #include "rastergis/RSGISCalcClusterLocation.h"
@@ -54,8 +55,9 @@
 
 */
 namespace rsgis{ namespace cmds {
-/*
-    void executePopulateStats(std::string clumpsImage, bool addColourTable2Img, bool calcImgPyramids)throw(RSGISCmdException) {
+
+    void executePopulateStats(std::string clumpsImage, bool addColourTable2Img, bool calcImgPyramids, bool ignoreZero, unsigned int ratBand)throw(RSGISCmdException)
+    {
         try
         {
             GDALAllRegister();
@@ -69,7 +71,7 @@ namespace rsgis{ namespace cmds {
             clumpsDataset->GetRasterBand(1)->SetMetadataItem("LAYER_TYPE", "thematic");
 
             rsgis::rastergis::RSGISPopulateWithImageStats popImageStats;
-            popImageStats.populateImageWithRasterGISStats(clumpsDataset, addColourTable2Img, calcImgPyramids);
+            popImageStats.populateImageWithRasterGISStats(clumpsDataset, addColourTable2Img, calcImgPyramids, ignoreZero, ratBand);
 
             GDALClose(clumpsDataset);
             //GDALDestroyDriverManager();
@@ -83,7 +85,7 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
-
+/*
     void executeCopyRAT(std::string inputImage, std::string clumpsImage)throw(RSGISCmdException) {
         try
         {
