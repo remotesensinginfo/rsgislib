@@ -185,7 +185,7 @@ namespace rsgis{ namespace cmds {
     void executeColourClasses(std::string inputImage, std::string classInField, std::map<size_t, RSGISColourIntCmds> classColourPairs, int ratBand=1)throw(RSGISCmdException);
 
     /** Function to set a colour table for a set of classes (string column) within the attribute table */
-    //void executeColourStrClasses(std::string inputImage, std::string classInField, std::map<std::string, RSGISColourIntCmds> classStrColourPairs)throw(RSGISCmdException);
+    void executeColourStrClasses(std::string inputImage, std::string classInField, std::map<std::string, RSGISColourIntCmds> classStrColourPairs, int ratBand=1)throw(RSGISCmdException);
 
     /** Function to generate a colour table using an input image */
     //void executeGenerateColourTable(std::string inputImage, std::string clumpsImage, unsigned int redBand, unsigned int greenBand, unsigned int blueBand)throw(RSGISCmdException);
