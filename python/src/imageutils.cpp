@@ -1118,7 +1118,7 @@ static PyMethodDef ImageUtilsMethods[] = {
 
     {"selectImageBands", ImageUtils_SelectImageBands, METH_VARARGS,
 "rsgislib.imageutils.selectImageBands(inputImage, outputImage, gdalformat, type, bands)\n"
-"Extract the all the pixel values for raster regions to a HDF5 file (1 column for each image band).\n"
+"Copy selected image bands from an image to a new image.\n"
 "\n"
 "* inputImage is a string containing the name and path of the input file\n"
 "* outputImage is a string containing the name and path of the output file.\n"

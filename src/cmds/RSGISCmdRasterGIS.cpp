@@ -397,7 +397,7 @@ namespace rsgis{ namespace cmds {
         }
     }
     */
-    void executeExportCols2GDALImage(std::string inputImage, std::string outputFile, std::string imageFormat, RSGISLibDataType outDataType, std::string field, int ratBand) throw(RSGISCmdException)
+    void executeExportCols2GDALImage(std::string inputImage, std::string outputFile, std::string imageFormat, RSGISLibDataType outDataType, std::string field, bool copyColours, bool copyHist, int ratBand) throw(RSGISCmdException)
     {
         try
         {

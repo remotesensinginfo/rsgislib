@@ -125,13 +125,16 @@ static PyObject *RasterGIS_CopyGDALATTColumns(PyObject *self, PyObject *args, Py
     const char *clumpsImage, *inputImage;
     PyObject *pFields;
     int ratBand = 1;
-    static char *kwlist[] = {"clumps", "outimage", "fields","ratband", NULL};
+    int copyColours = 1;
+    int copyHist = 1;
+    static char *kwlist[] = {"clumps", "outimage", "fields","copycolours","copyhist","ratband", NULL};
 
-    if(!PyArg_ParseTupleAndKeywords(args, keywds, "ssO|i:copyGDALATTColumns", kwlist, &inputImage, &clumpsImage, &pFields, &ratBand))
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "ssO|i:copyGDALATTColumns", kwlist, &inputImage, &clumpsImage, &pFields, &copyColours, &copyHist, &ratBand))
         return NULL;
 
-    if(!PySequence_Check(pFields)) {
-        PyErr_SetString(GETSTATE(self)->error, "last argument must be a sequence");
+    if(!PySequence_Check(pFields)) 
+    {
+        PyErr_SetString(GETSTATE(self)->error, "'fields'  must be a sequence");
         return NULL;
     }
 
@@ -141,7 +144,7 @@ static PyObject *RasterGIS_CopyGDALATTColumns(PyObject *self, PyObject *args, Py
 
     try 
     {
-        rsgis::cmds::executeCopyGDALATTColumns(std::string(inputImage), std::string(clumpsImage), fields, ratBand);
+        rsgis::cmds::executeCopyGDALATTColumns(std::string(inputImage), std::string(clumpsImage), fields, copyColours, copyHist, ratBand);
     }
     catch (rsgis::cmds::RSGISCmdException &e) 
     {
@@ -1266,13 +1269,15 @@ static PyMethodDef RasterGISMethods[] = {
 "\n"},
 
     {"copyGDALATTColumns", (PyCFunction)RasterGIS_CopyGDALATTColumns, METH_VARARGS | METH_KEYWORDS,
-"rastergis.copyGDALATTColumns(clumps, outimage, fields, ratband=1)\n"
+"rastergis.copyGDALATTColumns(clumps, outimage, fields, copycolours=True, copyhist=True, ratband=1)\n"
 "Copies GDAL RAT columns from one image to another\n"
 "Where:\n"
 "\n"
 "* clumps is a string containing the name of the input image file\n"
 "* outimage is a string containing the name of the input clump file\n"
 "* fields is a sequence of strings containing the names of the fields to copy"
+"* copycolours is a bool specifying if the colour columns should be copied (default = True)"
+"* copyhist is a bool specifying if the histogram  should be copied (default = True)"
 "* ratband is an optional (default = 1) integer parameter specifying the image band to which the RAT is associated."
 "\n"
 "Example::\n"
