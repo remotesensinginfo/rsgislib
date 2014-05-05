@@ -129,7 +129,7 @@ static PyObject *RasterGIS_CopyGDALATTColumns(PyObject *self, PyObject *args, Py
     int copyHist = 1;
     static char *kwlist[] = {"clumps", "outimage", "fields","copycolours","copyhist","ratband", NULL};
 
-    if(!PyArg_ParseTupleAndKeywords(args, keywds, "ssO|i:copyGDALATTColumns", kwlist, &inputImage, &clumpsImage, &pFields, &copyColours, &copyHist, &ratBand))
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "ssO|iii:copyGDALATTColumns", kwlist, &inputImage, &clumpsImage, &pFields, &copyColours, &copyHist, &ratBand))
         return NULL;
 
     if(!PySequence_Check(pFields)) 
@@ -1273,7 +1273,7 @@ static PyMethodDef RasterGISMethods[] = {
 "   rastergis.copyRAT(clumps, outimage)\n"
 "\n"},
 
-    {"copyGDALATTColumns", (PyCFunction)RasterGIS_CopyGDALATTColumns, METH_VARARGS | METH_KEYWORDS,
+{"copyGDALATTColumns", (PyCFunction)RasterGIS_CopyGDALATTColumns, METH_VARARGS | METH_KEYWORDS,
 "rastergis.copyGDALATTColumns(clumps, outimage, fields, copycolours=True, copyhist=True, ratband=1)\n"
 "Copies GDAL RAT columns from one image to another\n"
 "Where:\n"
@@ -1292,6 +1292,19 @@ static PyMethodDef RasterGISMethods[] = {
 "   image = './TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_cpcols.kea'\n"
 "   fields = ['NIRAvg', 'BlueAvg', 'GreenAvg', 'RedAvg']\n"
 "   rastergis.copyGDALATTColumns(image, table, fields)\n"
+"\n"
+"To copy subset if columns from one RAT to a new file the following can be used::\n"
+"\n"
+"   import rsgislib\n"
+"   import rsgislib.imageutils\n"
+"   from rsgislib import rastergis\n"
+"   ratband=1\n"
+"   table='inRAT.kea'\n"
+"   output='outRAT_nir_only.kea'\n"
+"   bands = [ratband]\n"
+"   rsgislib.imageutils.selectImageBands(table, output,'KEA', rsgislib.TYPE_32INT, bands)\n"
+"   fields = ['NIRAvg']\n"
+"   rastergis.copyGDALATTColumns(table, output, fields, copycolours=True, copyhist=True, ratband=ratband)\n"
 "\n"},
 
 {"spatialLocation", (PyCFunction)RasterGIS_SpatialLocation, METH_VARARGS | METH_KEYWORDS,
@@ -1614,7 +1627,7 @@ static PyMethodDef RasterGISMethods[] = {
 "* gdalFormat is a string containing the GDAL format for the output file - eg 'KEA'\n"
 "* gdaltype is an int containing one of the values from rsgislib.TYPE_*\n"
 "\n"},
-
+*/  
     {"findNeighbours", RasterGIS_FindNeighbours, METH_VARARGS,
 "rastergis.findNeighbours(inputImage, ratBand)\n"
 "Finds the clump neighbours from an image\n"
@@ -1623,7 +1636,7 @@ static PyMethodDef RasterGISMethods[] = {
 "* inputImage is a string containing the name of the input image file\n"
 "* ratBand is an int containing band for which the neighbours are to be calculated for (Optional, Default = 1)\n"
 "\n"},
-    
+  
     {"findBoundaryPixels", RasterGIS_FindBoundaryPixels, METH_VARARGS,
 "rastergis.findBoundaryPixels(inputImage, outputFile, gdalFormat, ratBand)\n"
 "Identifies the pixels on the boundary of the clumps\n"
@@ -1634,7 +1647,7 @@ static PyMethodDef RasterGISMethods[] = {
 "* gdalFormat is a string containing the GDAL format for the output file - (Optional, Default = 'KEA')\n"
 "* ratBand is an int containing band for which the neighbours are to be calculated for (Optional, Default = 1)\n"
 "\n"},
-
+/*
     {"calcBorderLength", RasterGIS_CalcBorderLength, METH_VARARGS,
 "rastergis.calcBorderLength(inputImage, ignoreZeroEdges, outColsName)\n"
 "Calculate the border length of clumps\n"

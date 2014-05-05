@@ -135,7 +135,7 @@ namespace rsgis{ namespace cmds {
         }
     }
 
-    void executeCopyGDALATTColumns(std::string inputImage, std::string clumpsImage, std::vector<std::string> fields, int ratBand) throw(RSGISCmdException)
+    void executeCopyGDALATTColumns(std::string inputImage, std::string clumpsImage, std::vector<std::string> fields, bool copyColours, bool copyHist, int ratBand) throw(RSGISCmdException)
     {
         try
         {
@@ -155,7 +155,7 @@ namespace rsgis{ namespace cmds {
             }
 
             rsgis::rastergis::RSGISRasterAttUtils attUtils;
-            attUtils.copyAttColumns(inputDataset, outRATDataset, fields, ratBand);
+            attUtils.copyAttColumns(inputDataset, outRATDataset, fields, copyColours, copyHist, ratBand);
 
             outRATDataset->GetRasterBand(ratBand)->SetMetadataItem("LAYER_TYPE", "thematic");
 
@@ -397,7 +397,7 @@ namespace rsgis{ namespace cmds {
         }
     }
     */
-    void executeExportCols2GDALImage(std::string inputImage, std::string outputFile, std::string imageFormat, RSGISLibDataType outDataType, std::string field, bool copyColours, bool copyHist, int ratBand) throw(RSGISCmdException)
+    void executeExportCols2GDALImage(std::string inputImage, std::string outputFile, std::string imageFormat, RSGISLibDataType outDataType, std::string field, int ratBand) throw(RSGISCmdException)
     {
         try
         {
